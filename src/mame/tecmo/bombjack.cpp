@@ -487,145 +487,6 @@ void bombjack_state::bombjack_audio_portmap(address_map &map)
 
 /*************************************
  *
- *  Graphics definitions
- *
- *************************************/
-static gfx_layout const layout_8x8 =
-{
-	8, 8,
-	RGN_FRAC(1, 3),
-	3,
-	{ RGN_FRAC(0, 3), RGN_FRAC(1, 3), RGN_FRAC(2, 3) },
-	{ STEP8(0, 1) },
-	{ STEP8(0, 8) },
-	8 * 8
-};
-
-static gfx_layout const layout_16x16 =
-{
-	16, 16,
-	RGN_FRAC(1, 3),
-	3,
-	{ RGN_FRAC(0, 3), RGN_FRAC(1, 3), RGN_FRAC(2, 3) },
-	{ STEP8(0, 1), STEP8(64, 1) },
-	{ STEP8(0, 8), STEP8(128, 8) },
-	32 * 8
-};
-
-static gfx_layout const layout_32x32 =
-{
-	32, 32,
-	RGN_FRAC(1, 3),
-	3,
-	{ RGN_FRAC(0, 3), RGN_FRAC(1, 3), RGN_FRAC(2, 3) },
-	{ STEP8(0, 1), STEP8(64, 1), STEP8(256, 1), STEP8(320, 1) },
-	{ STEP8(0, 8), STEP8(128, 8), STEP8(512, 8), STEP8(640, 8) },
-	128 * 8
-};
-
-static GFXDECODE_START( gfx_bombjack )
-	GFXDECODE_ENTRY( "fgtiles", 0x0000, layout_8x8,   0, 16 )
-	GFXDECODE_ENTRY( "bgtiles", 0x0000, layout_16x16, 0, 16 )
-	GFXDECODE_ENTRY( "sprites", 0x0000, layout_16x16, 0, 16 )
-	GFXDECODE_ENTRY( "sprites", 0x0000, layout_32x32, 0, 16 )
-GFXDECODE_END
-
-/*************************************
- *
- *  Machine driver
- *
- *************************************/
-void bombjack_state::machine_start()
-{
-	save_item(NAME(m_nmi_on));
-}
-
-void bombjack_state::machine_reset()
-{
-	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-	// TODO: CLEAR line should be toggled when both the sound
-	// latch is actively being read and the RESET line is on
-	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-}
-
-void bombjack_state::bombjack(machine_config &config)
-{
-	// NOTE: X2 is 12MHz, but schematics specify 12.096MHz
-	Z80(config, m_maincpu, CLOCK_X1);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bombjack_state::bombjack_map);
-
-	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
-
-	Z80(config, m_audiocpu, CLOCK_X2 / 4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &bombjack_state::bombjack_audio_map);
-	m_audiocpu->set_addrmap(AS_IO, &bombjack_state::bombjack_audio_portmap);
-
-	GENERIC_LATCH_8(config, m_soundlatch);
-
-	SPEAKER(config, m_speaker).front_center();
-
-	AY8910(config, m_ay8910[0], CLOCK_X2 / 8).add_route(ALL_OUTPUTS, m_speaker, 0.13);
-	m_ay8910[0]->port_a_write_callback().set_nop(); // see todo
-	m_ay8910[0]->port_b_write_callback().set_nop();
-	AY8910(config, m_ay8910[1], CLOCK_X2 / 8).add_route(ALL_OUTPUTS, m_speaker, 0.13);
-	m_ay8910[1]->port_a_write_callback().set_nop(); // see todo
-	m_ay8910[1]->port_b_write_callback().set_nop();
-	AY8910(config, m_ay8910[2], CLOCK_X2 / 8).add_route(ALL_OUTPUTS, m_speaker, 0.13);
-	m_ay8910[2]->port_a_write_callback().set_nop(); // see todo
-	m_ay8910[2]->port_b_write_callback().set_nop();
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(CLOCK_X2 / 2, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	m_screen->set_screen_update(FUNC(bombjack_state::screen_update));
-	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(bombjack_state::vblank_nmi));
-	m_screen->screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bombjack);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 128);
-}
-
-void calorie_state::calorie(machine_config &config, bool encrypted = true)
-{
-	bombjack(config);
-
-	if (encrypted)
-	{
-		sega_317_0004_device &maincpu(SEGA_317_0004(config.replace(), m_maincpu, CLOCK_X1));
-		maincpu.set_addrmap(AS_OPCODES, &calorie_state::calorie_opcodes_map);
-		maincpu.set_decrypted_tag(m_opcodes);
-	}
-	m_maincpu->set_addrmap(AS_PROGRAM, &calorie_state::calorie_map);
-
-	config.device_remove("watchdog");
-
-	m_audiocpu->set_addrmap(AS_PROGRAM, &calorie_state::calorie_audio_map);
-
-	// NOTE: never seems to use filters
-	YM2149(config.replace(), m_ay8910[0], CLOCK_X2 / 8).add_route(ALL_OUTPUTS, m_speaker, 0.13);
-	YM2149(config.replace(), m_ay8910[1], CLOCK_X2 / 8).add_route(ALL_OUTPUTS, m_speaker, 0.13);
-	YM2149(config.replace(), m_ay8910[2], CLOCK_X2 / 8).add_route(ALL_OUTPUTS, m_speaker, 0.13);
-
-	// TODO: proper IRQ pulse timings
-	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
-	m_screen->screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_IRQ0, HOLD_LINE);
-}
-
-void calorie_state::calorieb(machine_config &config)
-{
-	calorie(config, false);
-
-	// not encrypted, but still needs a lookup table for /M1
-	m_maincpu->set_addrmap(AS_OPCODES, &calorie_state::calorie_opcodes_map);
-}
-
-void calorie_state::init_calorieb()
-{
-	memcpy(m_opcodes, memregion("maincpu")->base() + 0x10000, 0x8000);
-}
-
-/*************************************
- *
  *  Input ports
  *  (Bomb Jack)
  *
@@ -784,6 +645,145 @@ static INPUT_PORTS_START( calorie )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+static gfx_layout const layout_8x8 =
+{
+	8, 8,
+	RGN_FRAC(1, 3),
+	3,
+	{ RGN_FRAC(0, 3), RGN_FRAC(1, 3), RGN_FRAC(2, 3) },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	8 * 8
+};
+
+static gfx_layout const layout_16x16 =
+{
+	16, 16,
+	RGN_FRAC(1, 3),
+	3,
+	{ RGN_FRAC(0, 3), RGN_FRAC(1, 3), RGN_FRAC(2, 3) },
+	{ STEP8(0, 1), STEP8(64, 1) },
+	{ STEP8(0, 8), STEP8(128, 8) },
+	32 * 8
+};
+
+static gfx_layout const layout_32x32 =
+{
+	32, 32,
+	RGN_FRAC(1, 3),
+	3,
+	{ RGN_FRAC(0, 3), RGN_FRAC(1, 3), RGN_FRAC(2, 3) },
+	{ STEP8(0, 1), STEP8(64, 1), STEP8(256, 1), STEP8(320, 1) },
+	{ STEP8(0, 8), STEP8(128, 8), STEP8(512, 8), STEP8(640, 8) },
+	128 * 8
+};
+
+static GFXDECODE_START( gfx_bombjack )
+	GFXDECODE_ENTRY( "fgtiles", 0x0000, layout_8x8,   0, 16 )
+	GFXDECODE_ENTRY( "bgtiles", 0x0000, layout_16x16, 0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0x0000, layout_16x16, 0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0x0000, layout_32x32, 0, 16 )
+GFXDECODE_END
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+void bombjack_state::machine_start()
+{
+	save_item(NAME(m_nmi_on));
+}
+
+void bombjack_state::machine_reset()
+{
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	// TODO: CLEAR line should be toggled when both the sound
+	// latch is actively being read and the RESET line is on
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
+void bombjack_state::bombjack(machine_config &config)
+{
+	// NOTE: X2 is 12MHz, but schematics specify 12.096MHz
+	Z80(config, m_maincpu, CLOCK_X1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bombjack_state::bombjack_map);
+
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
+
+	Z80(config, m_audiocpu, CLOCK_X2 / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bombjack_state::bombjack_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &bombjack_state::bombjack_audio_portmap);
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+
+	SPEAKER(config, m_speaker).front_center();
+
+	AY8910(config, m_ay8910[0], CLOCK_X2 / 8).add_route(ALL_OUTPUTS, m_speaker, 0.13);
+	m_ay8910[0]->port_a_write_callback().set_nop(); // see todo
+	m_ay8910[0]->port_b_write_callback().set_nop();
+	AY8910(config, m_ay8910[1], CLOCK_X2 / 8).add_route(ALL_OUTPUTS, m_speaker, 0.13);
+	m_ay8910[1]->port_a_write_callback().set_nop(); // see todo
+	m_ay8910[1]->port_b_write_callback().set_nop();
+	AY8910(config, m_ay8910[2], CLOCK_X2 / 8).add_route(ALL_OUTPUTS, m_speaker, 0.13);
+	m_ay8910[2]->port_a_write_callback().set_nop(); // see todo
+	m_ay8910[2]->port_b_write_callback().set_nop();
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(CLOCK_X2 / 2, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(bombjack_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(bombjack_state::vblank_nmi));
+	m_screen->screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bombjack);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 128);
+}
+
+void calorie_state::calorie(machine_config &config, bool encrypted = true)
+{
+	bombjack(config);
+
+	if (encrypted)
+	{
+		sega_317_0004_device &maincpu(SEGA_317_0004(config.replace(), m_maincpu, CLOCK_X1));
+		maincpu.set_addrmap(AS_OPCODES, &calorie_state::calorie_opcodes_map);
+		maincpu.set_decrypted_tag(m_opcodes);
+	}
+	m_maincpu->set_addrmap(AS_PROGRAM, &calorie_state::calorie_map);
+
+	config.device_remove("watchdog");
+
+	m_audiocpu->set_addrmap(AS_PROGRAM, &calorie_state::calorie_audio_map);
+
+	// NOTE: never seems to use filters
+	YM2149(config.replace(), m_ay8910[0], CLOCK_X2 / 8).add_route(ALL_OUTPUTS, m_speaker, 0.13);
+	YM2149(config.replace(), m_ay8910[1], CLOCK_X2 / 8).add_route(ALL_OUTPUTS, m_speaker, 0.13);
+	YM2149(config.replace(), m_ay8910[2], CLOCK_X2 / 8).add_route(ALL_OUTPUTS, m_speaker, 0.13);
+
+	// TODO: proper IRQ pulse timings
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
+	m_screen->screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_IRQ0, HOLD_LINE);
+}
+
+void calorie_state::calorieb(machine_config &config)
+{
+	calorie(config, false);
+
+	// not encrypted, but still needs a lookup table for /M1
+	m_maincpu->set_addrmap(AS_OPCODES, &calorie_state::calorie_opcodes_map);
+}
+
+void calorie_state::init_calorieb()
+{
+	memcpy(m_opcodes, memregion("maincpu")->base() + 0x10000, 0x8000);
+}
 
 /*************************************
  *
