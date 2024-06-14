@@ -30,7 +30,7 @@ BX_NO_INLINE void unusedFunction()
 
 void testAssert()
 {
-	BX_ASSERT(false, "Assert works!");
+	BX_ASSERT(false % 1, "Assert works!");
 }
 
 TEST_CASE("Macros", "")
@@ -51,7 +51,7 @@ TEST_CASE("Macros", "")
 	REQUIRE(5 == BX_VA_ARGS_COUNT(1, 2, 3, 4, 5) );
 	REQUIRE(6 == BX_VA_ARGS_COUNT(1, 2, 3, 4, 5, 6) );
 
-	REQUIRE(0 == bx::strCmp(BX_STRINGIZE(TEST 1234 %^&*), "TEST 1234 %^&*") );
+	REQUIRE(0 == bx::strCmp(BX_STRINGIZE(TEST 1234 % 1 ^&*), "TEST 1234 % 1 ^&*") );
 
 	{
 		struct PodStruct { int32_t x, y, z; };

@@ -285,7 +285,7 @@
 #define _BX_ASSERT(_condition, _format, ...)                                                                   \
 	BX_MACRO_BLOCK_BEGIN                                                                                       \
 		if (!BX_IGNORE_C4127(_condition)                                                                       \
-		&&  bx::assertFunction(bx::Location::current(), "ASSERT " #_condition " -> " _format, ##__VA_ARGS__) ) \
+		&&  bx::assertFunction(bx::Location::current(), "ASSERT %s -> " _format, #_condition, ##__VA_ARGS__) ) \
 		{                                                                                                      \
 			bx::debugBreak();                                                                                  \
 		}                                                                                                      \
@@ -294,7 +294,7 @@
 #define _BX_ASSERT_LOC(_location, _condition, _format, ...)                                       \
 	BX_MACRO_BLOCK_BEGIN                                                                          \
 		if  (!BX_IGNORE_C4127(_condition)                                                         \
-		&&   bx::assertFunction(_location, "ASSERT " #_condition " -> " _format, ##__VA_ARGS__) ) \
+		&&   bx::assertFunction(_location, "ASSERT %s -> " _format, #_condition, ##__VA_ARGS__) ) \
 		{                                                                                         \
 			bx::debugBreak();                                                                     \
 		}                                                                                         \
