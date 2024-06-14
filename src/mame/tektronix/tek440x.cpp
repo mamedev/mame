@@ -16,7 +16,8 @@
         * MC68681 DUART / timer (3.6864 MHz clock) (serial channel A = keyboard, channel B = RS-232 port)
         * AM9513 timer (source of timer IRQ)
         * NCR5385 SCSI controller
-
+				* 8255 Centronics printer interface
+				
         Video is a 640x480 1bpp window on a 1024x1024 VRAM area; smooth panning around that area
         is possible as is flat-out changing the scanout address.
 
@@ -27,7 +28,7 @@
         4 = Spare (exp slots)
         3 = SCSI
         2 = DMA
-        1 = Timer
+        1 = Timer	(and Printer)
         0 = Unused
 
     MMU info:
@@ -57,6 +58,7 @@
 #include "machine/mos6551.h"    // debug tty
 #include "machine/ncr5385.h"
 #include "machine/ns32081.h"
+#include "machine/i8255.h"
 #include "machine/nscsi_bus.h"
 #include "sound/sn76496.h"
 
@@ -97,6 +99,7 @@ public:
 		m_vint(*this, "vint"),
 		m_screen(*this, "screen"),
 		m_acia(*this, "acia"),
+		m_printer(*this, "printer"),
 		m_prom(*this, "maincpu"),			// FIXME why is the bootrom called 'maincpu'?
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
@@ -132,8 +135,8 @@ private:
 	u8 mouse_r(offs_t offset);
 	void mouse_w(u8 data);
 	void led_w(u8 data);
-	u8 videoaddr_r(offs_t offset);
-	void videoaddr_w(offs_t offset, u8 data);
+	u16 videoaddr_r(offs_t offset);
+	void videoaddr_w(offs_t offset, u16 data);
 	u8 videocntl_r();
 	void videocntl_w(u8 data);
 
@@ -168,6 +171,7 @@ private:
 	required_device<input_merger_all_high_device> m_vint;
 	required_device<screen_device> m_screen;
 	required_device<mos6551_device> m_acia;
+	required_device<i8255_device> m_printer;
 
 	required_region_ptr<u16> m_prom;
 	required_shared_ptr<u16> m_mainram;
@@ -443,14 +447,14 @@ void tek440x_state::mapcntl_w(u8 data)
 	
 }
 
-u8 tek440x_state::videoaddr_r(offs_t offset)
+u16 tek440x_state::videoaddr_r(offs_t offset)
 {
 	LOG("videoaddr_r %08x\n", offset);
 
 	return m_videoaddr[offset];
 }
 
-void tek440x_state::videoaddr_w(offs_t offset, u8 data)
+void tek440x_state::videoaddr_w(offs_t offset, u16 data)
 {
 //	LOG("videoaddr_w %08x %04x\n", offset, data);
 	m_videoaddr[offset] = data;
@@ -661,7 +665,7 @@ void tek440x_state::physical_map(address_map &map)
 	// 780000-79ffff processor board I/O
 	map(0x780000, 0x780000).rw(FUNC(tek440x_state::mapcntl_r), FUNC(tek440x_state::mapcntl_w));
 	// 782000-783fff: video address registers
-	map(0x782000, 0x782000).rw(FUNC(tek440x_state::videoaddr_r),FUNC(tek440x_state::videoaddr_w));
+	map(0x782000, 0x782001).rw(FUNC(tek440x_state::videoaddr_r),FUNC(tek440x_state::videoaddr_w));
 	// 784000-785fff: video control registers
 	map(0x784000, 0x784000).rw(FUNC(tek440x_state::videocntl_r),FUNC(tek440x_state::videocntl_w));
 	// 786000-787fff: spare
@@ -675,6 +679,8 @@ void tek440x_state::physical_map(address_map &map)
 	map(0x7b0000, 0x7b0000).rw(FUNC(tek440x_state::diag_r),FUNC(tek440x_state::diag_w));
 	// 7b1000-7b1fff: diagnostic registers
 	// 7b2000-7b3fff: Centronics printer data
+	map(0x7b2000, 0x7b3fff).rw(m_printer, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	
 	map(0x7b4000, 0x7b401f).rw(FUNC(tek440x_state::duart_r), FUNC(tek440x_state::duart_w)).umask16(0xff00);
 	// 7b6000-7b7fff: Mouse
 	map(0x7b6000, 0x7b6fff).rw(FUNC(tek440x_state::mouse_r),FUNC(tek440x_state::mouse_w));
@@ -766,6 +772,8 @@ void tek440x_state::tek4404(machine_config &config)
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->irq_handler().set_inputline(m_maincpu, M68K_IRQ_7);
+
+	I8255A(config, m_printer);
 
 	MC68681(config, m_duart, 14.7456_MHz_XTAL / 4);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5); // auto-vectored
