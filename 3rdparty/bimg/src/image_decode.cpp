@@ -844,8 +844,8 @@ namespace bimg
 		heif_image* image;
 		heif_decode_image(handle, &image, heif_colorspace_RGB, heif_chroma_interleaved_RGBA, NULL);
 
-		int32_t stride;
-		const uint8_t* data = heif_image_get_plane_readonly(image, heif_channel_interleaved, &stride);
+		int32_t srcStride;
+		const uint8_t* data = heif_image_get_plane_readonly(image, heif_channel_interleaved, &srcStride);
 
 		ImageContainer* output = NULL;
 		if (NULL != data)
@@ -853,6 +853,7 @@ namespace bimg
 			const bimg::TextureFormat::Enum format = bimg::TextureFormat::RGBA8;
 			const int32_t width  = heif_image_handle_get_width(handle);
 			const int32_t height = heif_image_handle_get_height(handle);
+			const int32_t dstStride = width*4;
 
 			output = imageAlloc(_allocator
 				, format
@@ -862,8 +863,10 @@ namespace bimg
 				, 1
 				, false
 				, false
-				, data
+				, NULL
 				);
+
+			bx::memCopy(output->m_data, dstStride, data, srcStride, dstStride, height);
 		}
 
 		heif_image_release(image);
