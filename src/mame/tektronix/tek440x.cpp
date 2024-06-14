@@ -141,6 +141,8 @@ private:
 	void write_txd(int state);
 
 	// need to handle bit 8 reset
+	void irq1_w(int state);
+	u16 timer_r(offs_t offset);
 	void timer_w(offs_t offset, u16 data);
 
 	// need to handle loopback mode
@@ -314,7 +316,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 	if ((m_maincpu->get_fc() & 4) == 0)
 	if (BIT(m_map_control, MAP_VM_ENABLE))
 	{
-		LOG("memory_w: m_map(0x%04x)\n", m_map[offset >> 11]);
+		//LOG("memory_w: m_map(0x%04x)\n", m_map[offset >> 11]);
 	
 		// is cpuWr
 		m_map_control |= (1 << MAP_CPU_WR);
@@ -407,7 +409,7 @@ u8 tek440x_state::mapcntl_r()
 	// page 2.1-54 implies that this can only be read in user mode
 
 
-	LOG("mapcntl_r(%02x)\n", m_map_control);
+	//LOG("mapcntl_r(%02x)\n", m_map_control);
 
 	u8 ans = m_map_control;
 	
@@ -422,10 +424,12 @@ u8 tek440x_state::mapcntl_r()
 
 void tek440x_state::mapcntl_w(u8 data)
 {
+#if 0
 	LOG("mapcntl_w mmu_enable   %2d\n", BIT(data, MAP_VM_ENABLE));
 	LOG("mapcntl_w write_enable %2d\n", BIT(data, MAP_SYS_WR_ENABLE));
 	LOG("mapcntl_w pte PID    0x%02x\n", data & 15);
-	
+#endif
+
 #if 0
 	// think this is just wrong
 	if (BIT(data, MAP_VM_ENABLE))
@@ -579,11 +583,38 @@ void tek440x_state::kb_tdata_w(int state)
 	}
 }
 
+int irqstate = 0;
+
+void tek440x_state::irq1_w(int state)
+{
+	LOG("irq_w %04x\n", state);
+	
+	irqstate = state;
+	if (state == 1)
+	{
+		LOG("M68K_IRQ_1 assert\n");
+		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+	}
+}
+
 // to handle offset 0x1xx writes resetting TPInt...
+u16 tek440x_state::timer_r(offs_t offset)
+{
+	LOG("timer_r %08x\n", offset);
+	return m_timer->read16(offset);
+}
+
 void tek440x_state::timer_w(offs_t offset, u16 data)
 {
-	LOG("timer_w %08x %04x\n", offset, data);
+	LOG("timer_w %08x %04x\n", OFF16_TO_OFF8(offset), data);
 	m_timer->write16(offset, data);
+
+	if (irqstate)
+	{
+		LOG("M68K_IRQ_1 clear\n");
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+		irqstate = 0;
+	}
 }
 
 u8 tek440x_state::duart_r(offs_t offset)
@@ -598,7 +629,7 @@ void tek440x_state::duart_w(offs_t offset, u8 data)
 	{
 		if (m_diag & 0x80)
 		{
-			LOG("LOOPBACK\n");
+			LOG("LOOPBACK mode\n");
 			m_duart->write(0x0, 0x80);
 		}
 	}
@@ -648,7 +679,8 @@ void tek440x_state::physical_map(address_map &map)
 	// 7b6000-7b7fff: Mouse
 	map(0x7b6000, 0x7b6fff).rw(FUNC(tek440x_state::mouse_r),FUNC(tek440x_state::mouse_w));
 
-	map(0x7b8000, 0x7b8003).mirror(0x100).rw(m_timer, FUNC(am9513_device::read16), FUNC(am9513_device::write16));
+	map(0x7b8000, 0x7b8003).rw(m_timer, FUNC(am9513_device::read16), FUNC(am9513_device::write16));
+	map(0x7b8100, 0x7b8103).rw(FUNC(tek440x_state::timer_r), FUNC(tek440x_state::timer_w));
 	// FIXME: writes 0x1xx should reset timer/printer interrupt latch..
 //	map(0x7b8100, 0x7b8103).w("irq1", FUNC(input_merger_device::in_clear<0>));
 	
@@ -754,7 +786,7 @@ void tek440x_state::tek4404(machine_config &config)
 	// see diagram page 2.2-6
 	m_timer->out1_cb().set("irq1", FUNC(input_merger_device::in_w<0>));
 	m_timer->out2_cb().set("irq1", FUNC(input_merger_device::in_w<1>));
-	INPUT_MERGER_ALL_HIGH(config, "irq1").output_handler().set_inputline(m_maincpu, M68K_IRQ_1);
+	INPUT_MERGER_ALL_LOW(config, "irq1").output_handler().set(FUNC(tek440x_state::irq1_w));
 
 	MC146818(config, m_rtc, 32.768_MHz_XTAL);
 
