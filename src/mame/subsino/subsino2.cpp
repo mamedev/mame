@@ -32,6 +32,11 @@ Year  Game                CPU         Sound            Custom                   
 **  SS9689 6433044A22F
 *** SP006  6433044A65F
 
+All other large QFPs are gate arrays. Die labels below:
+- SS9601: (M) NEC, 65650-302
+- SS9802/SS9803: (C) (M) 1993 Goldstar, 8406, GVC10032
+- SS9904: (C) (M) 1997?, LG SEMICON, GVS693Q5
+
 Graphics for the H8-based games are stored in either four socketed DIP28 8-bit EPROMs, two socketed DIP40 16-bit EPROMs or one
 surface-mounted SSOP70 32-bit ROM. Later H8-based PCBs have a custom QFP device labeled "SG 003" instead of the off-the-shelf
 RAMDAC.
@@ -44,7 +49,7 @@ TODO:
 - xtrain: it runs faster than a video from the real thing. It doesn't use vblank irqs (but reads the vblank bit).
 - mtrain: implement hopper.
 - xplan: starts with 4 credits, no controls to move the aircraft
-- which PCBs have the newer SP006 H8 instead of SS9689?
+- which PCBs have the newer SP006 H8 instead of SS9689? is it the ones with a SG 003?
 
 Protection seems to work the same way on every game in this driver, using a bitbanged Dallas 1-Wire EEPROM. First a Read ROM
 command is issued, and only the first 8 bits returned are examined to determine whether they match the expected device code (0x14).
