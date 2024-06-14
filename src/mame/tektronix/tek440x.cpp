@@ -681,8 +681,6 @@ void tek440x_state::physical_map(address_map &map)
 
 	map(0x7b8000, 0x7b8003).rw(m_timer, FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	map(0x7b8100, 0x7b8103).rw(FUNC(tek440x_state::timer_r), FUNC(tek440x_state::timer_w));
-	// FIXME: writes 0x1xx should reset timer/printer interrupt latch..
-//	map(0x7b8100, 0x7b8103).w("irq1", FUNC(input_merger_device::in_clear<0>));
 	
 	// 7ba000-7bbfff: MC146818 RTC
 	map(0x7bc000, 0x7bc000).lw8(
