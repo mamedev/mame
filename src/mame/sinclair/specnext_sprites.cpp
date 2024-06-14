@@ -99,7 +99,7 @@ void specnext_sprites_device::update_sprites_cache()
 	m_sprites_cache.clear();
 	m_sprites_cache.reserve(128);
 
-	sprite_data *anchor;
+	sprite_data *anchor = nullptr;
 	bool anchor_vis = false;
 	u8 *sprite_attr = m_sprite_attr_ram;
 	for (auto i = 0; i < 128; i++, sprite_attr += 8)
