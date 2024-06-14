@@ -780,8 +780,6 @@ void tek440x_state::tek4404(machine_config &config)
 	m_keyboard->rdata_callback().set(FUNC(tek440x_state::kb_rdata_w));
 
 	AM9513(config, m_timer, 40_MHz_XTAL / 4 / 10); // from CPU E output
-//	m_timer->out1_cb().set_inputline(m_maincpu, M68K_IRQ_1);
-//	m_timer->out2_cb().set_inputline(m_maincpu, M68K_IRQ_1);
 
 	// see diagram page 2.2-6
 	m_timer->out1_cb().set("irq1", FUNC(input_merger_device::in_w<0>));
