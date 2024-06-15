@@ -183,6 +183,8 @@ private:
 	required_ioport m_mousey;
 	required_ioport m_mousebtn;
 	
+	int m_u244latch;
+	
 	bool m_boot;
 	u8 m_map_control;
 	bool m_kb_rdata;
@@ -224,18 +226,11 @@ void tek440x_state::machine_reset()
 {
 	m_boot = true;
 	diag_w(0);
+	m_u244latch = 0;
 	m_keyboard->kdo_w(1);
 	mapcntl_w(0);
 	m_vint->in_w<1>(0);
-	
-	// want to simulate a connection so we can get debug output
-	//m_acia->write_dsr(0);
-	//m_acia->write_dcd(0);
-	
-	m_acia->write(4, 0x10);
-	
 }
-
 
 
 /*************************************
@@ -248,6 +243,8 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 {
 	for (int y = 0; y < 480; y++)
 	{
+	
+		//  FIXME: add in videopan
 		u16 *const line = &bitmap.pix(y);
 		u16 const *video_ram = &m_vram[y * 64];
 
@@ -587,13 +584,11 @@ void tek440x_state::kb_tdata_w(int state)
 	}
 }
 
-int irqstate = 0;
-
 void tek440x_state::irq1_w(int state)
 {
 	LOG("irq_w %04x\n", state);
 	
-	irqstate = state;
+	m_u244latch = state;
 	if (state == 1)
 	{
 		LOG("M68K_IRQ_1 assert\n");
@@ -613,11 +608,11 @@ void tek440x_state::timer_w(offs_t offset, u16 data)
 	LOG("timer_w %08x %04x\n", OFF16_TO_OFF8(offset), data);
 	m_timer->write16(offset, data);
 
-	if (irqstate)
+	if (m_u244latch)
 	{
 		LOG("M68K_IRQ_1 clear\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-		irqstate = 0;
+		m_u244latch = 0;
 	}
 }
 
