@@ -83,6 +83,12 @@
 
 namespace {
 
+	enum {
+		PHASE_STATIC,
+		PHASE_POSITIVE,
+		PHASE_NEGATIVE
+	};
+	
 class tek440x_state : public driver_device
 {
 public:
@@ -113,7 +119,14 @@ public:
 		m_kb_rdata(true),
 		m_kb_tdata(true),
 		m_kb_rclamp(false),
-		m_kb_loop(false)
+		m_kb_loop(false),
+		m_mouse(0),
+		m_mouse_x(0),
+		m_mouse_y(0),
+		m_mouse_px(PHASE_STATIC),
+		m_mouse_py(PHASE_STATIC),
+		m_mouse_pc(0)
+
 	{ }
 
 	void tek4404(machine_config &config);
@@ -132,6 +145,8 @@ private:
 	void sound_w(u8 data);
 	u8 diag_r();
 	void diag_w(u8 data);
+	
+	int mouseupdate();
 	u8 mouse_r(offs_t offset);
 	void mouse_w(u8 data);
 	void led_w(u8 data);
@@ -195,7 +210,8 @@ private:
 	u8 m_videoaddr[4];
 	u8 m_videocntl;
 	u8 m_diag;
-	u8 m_mouse;
+	u8 m_mouse,m_mouse_x,m_mouse_y;
+	u8 m_mouse_px,m_mouse_py,m_mouse_pc;
 };
 
 /*************************************
@@ -397,7 +413,7 @@ u16 tek440x_state::map_r(offs_t offset)
 
 void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	LOG("map_w 0x%08x <= %04x\n",offset>>11, data);
+	//LOG("map_w 0x%08x <= %04x\n",offset>>11, data);
 
 	if (BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
@@ -513,23 +529,70 @@ void tek440x_state::diag_w(u8 data)
 	m_diag = data;
 }
 
+// copied from stkbd.cpp
+int tek440x_state::mouseupdate()
+{
+const int mouse_xya[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
+const int mouse_xyb[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
+
+	uint8_t x = m_mousex->read();
+	uint8_t y = m_mousey->read();
+
+	if(!m_mouse_pc) {
+		if(x == m_mouse_x)
+			m_mouse_px = PHASE_STATIC;
+
+		else if((x > m_mouse_x) || (x == 0 && m_mouse_x == 0xff))
+			m_mouse_px = PHASE_POSITIVE;
+
+		else if((x < m_mouse_x) || (x == 0xff && m_mouse_x == 0))
+			m_mouse_px = PHASE_NEGATIVE;
+
+		if(y == m_mouse_y)
+			m_mouse_py = PHASE_STATIC;
+
+		else if((y > m_mouse_y) || (y == 0 && m_mouse_y == 0xff))
+			m_mouse_py = PHASE_POSITIVE;
+
+		else if((y < m_mouse_y) || (y == 0xff && m_mouse_y == 0))
+			m_mouse_py = PHASE_NEGATIVE;
+
+		m_mouse_x = x;
+		m_mouse_y = y;
+	}
+
+	m_mouse <<= 4;
+	m_mouse &= ~15;
+
+	m_mouse |= mouse_xyb[m_mouse_px][m_mouse_pc];      // XB
+	m_mouse |= mouse_xya[m_mouse_px][m_mouse_pc] << 1; // XA
+	m_mouse |= mouse_xyb[m_mouse_py][m_mouse_pc] << 2; // YA
+	m_mouse |= mouse_xya[m_mouse_py][m_mouse_pc] << 3; // YB
+
+	m_mouse_pc++;
+	m_mouse_pc &= 0x03;
+	
+	return m_mouse;
+}
+
 u8 tek440x_state::mouse_r(offs_t offset)
 {
+
 	u8 ans = 0;
 	
 	switch(offset)
 	{
 		case 0:
-			ans = m_mousex->read();
+			ans = m_mouse_x;
 			break;
 		case 2:
-			ans = m_mousey->read();
+			ans = m_mouse_y;
 			break;
 		case 4:
 			ans = m_mousebtn->read();
 			break;
 		case 6:
-			ans = m_mousebtn->read();
+			mouseupdate();
 			break;
 
 		default:
@@ -593,6 +656,7 @@ void tek440x_state::irq1_w(int state)
 	{
 		LOG("M68K_IRQ_1 assert\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+
 	}
 }
 
@@ -706,10 +770,10 @@ void tek440x_state::physical_map(address_map &map)
 
 static INPUT_PORTS_START( tek4404 )
 	PORT_START("mousex")
-	PORT_BIT( 0x00ff, 0, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
+	PORT_BIT( 0x00ff, 0, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
 
 	PORT_START("mousey")
-	PORT_BIT( 0x00ff, 0, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
+	PORT_BIT( 0x00ff, 0, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
 
 	PORT_START("mousebtn")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
