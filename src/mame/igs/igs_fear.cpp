@@ -57,7 +57,7 @@ void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect
 {
 	if ((romoffset != 0) && (romoffset != 0xffffffff))
 	{
-		logerror("x=%d, y=%d, w=%d pix, h=%d pix, c=0x%02x, romoffset=0x%08x\n", xpos, ypos, width, height, palette, romoffset << 2);
+		//logerror("x=%d, y=%d, w=%d pix, h=%d pix, c=0x%02x, romoffset=0x%08x\n", xpos, ypos, width, height, palette, romoffset << 2);
 		uint8_t* gfxrom = &m_gfxrom[romoffset << 2];
 		palette = (palette & 0x3f) << 7;
 
