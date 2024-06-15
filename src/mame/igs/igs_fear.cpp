@@ -34,7 +34,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<u32> m_videoram;
+	required_shared_ptr<uint32_t> m_videoram;
 	required_device<palette_device> m_palette;
 	required_region_ptr<uint8_t> m_gfxrom;
 
@@ -58,15 +58,15 @@ void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect
 	if ((romoffset != 0) && (romoffset != 0xffffffff))
 	{
 		logerror("x=%d, y=%d, w=%d pix, h=%d pix, c=0x%02x, romoffset=0x%08x\n", xpos, ypos, width, height, palette, romoffset << 2);
-		u8* gfxrom = &m_gfxrom[romoffset << 2];
+		uint8_t* gfxrom = &m_gfxrom[romoffset << 2];
 		palette = (palette & 0x3f) << 7;
 
 		for (int y = 0; y < height; y++)
 		{
-			u16* dest = &bitmap.pix(ypos + y);
+			uint16_t* dest = &bitmap.pix(ypos + y);
 			for (int x = 0; x < width; x++)
 			{
-				u8 pix = *gfxrom++;
+				uint8_t pix = *gfxrom++;
 				if (pix)
 				{
 					if (cliprect.contains(xpos + x, ypos + y))
