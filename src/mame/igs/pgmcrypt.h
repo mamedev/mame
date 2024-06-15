@@ -34,6 +34,7 @@ void lhzb3_decrypt(running_machine &machine);
 void mgfx_decrypt(running_machine &machine);
 void lhzb4_decrypt(running_machine &machine);
 void fearless_decrypt(running_machine &machine);
+void superkds_decrypt(running_machine &machine);
 void pgm_decrypt_pgm3in1(running_machine &machine);
 void slqz3_decrypt(running_machine &machine);
 void fruitpar_decrypt(running_machine &machine);
