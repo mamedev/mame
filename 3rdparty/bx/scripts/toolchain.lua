@@ -545,7 +545,9 @@ function toolchain(_buildDir, _libDir)
 			"/wd4201", -- warning C4201: nonstandard extension used: nameless struct/union
 			"/wd4324", -- warning C4324: '': structure was padded due to alignment specifier
 			"/Ob2",    -- The Inline Function Expansion
-			"/Zc:__cplusplus", -- Enable updated __cplusplus macro
+
+			"/Zc:__cplusplus",  -- Enable updated __cplusplus macro.
+			"/Zc:preprocessor", -- Enable preprocessor conformance mode.
 		}
 		linkoptions {
 			"/ignore:4221", -- LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
