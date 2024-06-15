@@ -32,12 +32,12 @@ protected:
 
 private:
 	void sound_irq(int state);
-	uint32_t screen_update_igs_fear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pgm_create_dummy_internal_arm_region();
 	required_device<cpu_device> m_maincpu;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void igs_igs_fear_map(address_map &map);
+	void main_map(address_map &map);
 };
 
 
@@ -46,12 +46,12 @@ void igs_fear_state::video_start()
 }
 
 
-uint32_t igs_fear_state::screen_update_igs_fear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igs_fear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-void igs_fear_state::igs_igs_fear_map(address_map &map)
+void igs_fear_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x00003fff).rom(); /* Internal ROM */
 	map(0x08000000, 0x0807ffff).rom().region("user1", 0);/* Game ROM */
@@ -87,14 +87,14 @@ void igs_fear_state::sound_irq(int state)
 void igs_fear_state::igs_fear(machine_config &config)
 {
 	ARM7(config, m_maincpu, 50000000/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::igs_igs_fear_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::main_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);
-	screen.set_screen_update(FUNC(igs_fear_state::screen_update_igs_fear));
+	screen.set_screen_update(FUNC(igs_fear_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(0x200);
