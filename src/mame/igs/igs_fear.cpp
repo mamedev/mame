@@ -38,7 +38,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_region_ptr<uint8_t> m_gfxrom;
 
-	void igs_igs_fear_map(address_map &map);
+	void igs_fear_map(address_map &map);
 
 	void sound_irq(int state);
 	void vblank_irq(int state);
@@ -103,7 +103,7 @@ uint32_t igs_fear_state::screen_update_igs_fear(screen_device& screen, bitmap_in
 	return 0;
 }
 
-void igs_fear_state::igs_igs_fear_map(address_map &map)
+void igs_fear_state::igs_fear_map(address_map &map)
 {
 	map(0x00000000, 0x00003fff).rom(); /* Internal ROM */
 	map(0x08000000, 0x0807ffff).rom().region("user1", 0);/* Game ROM */
@@ -130,7 +130,7 @@ void igs_fear_state::vblank_irq(int state)
 void igs_fear_state::igs_fear(machine_config &config)
 {
 	ARM7(config, m_maincpu, 50000000/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::igs_igs_fear_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::igs_fear_map);
 
 	// MX10EXAQC (Philips 80C51 XA)
 
