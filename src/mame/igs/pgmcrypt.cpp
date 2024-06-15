@@ -1393,7 +1393,11 @@ void lhzb4_decrypt(running_machine &machine)
 }
 
 
-static const uint8_t fearless_tab[256] = {
+
+//////////////////////////////////////////////////////////////////////
+// should fearless and superkds be using the same decrypt? fearless will fail ROM check with superkds function at the moment
+
+static const uint8_t superkds_tab[256] = {
 	0x49, 0x47, 0x53, 0x30, 0x32, 0x30, 0x32, 0x52, 0x44, 0x32, 0x30, 0x35, 0x30, 0x31, 0x30, 0x33,
 	0x0a, 0x68, 0x3c, 0x24, 0x56, 0x67, 0xed, 0xe3, 0x3a, 0x99, 0x20, 0x24, 0x09, 0x4d, 0x0c, 0xb6,
 	0x0d, 0xbb, 0xe0, 0xe4, 0x93, 0x79, 0x6c, 0x10, 0x3b, 0x3b, 0x10, 0x91, 0x7e, 0xcf, 0xe5, 0xc9,
@@ -1411,6 +1415,31 @@ static const uint8_t fearless_tab[256] = {
 	0xb8, 0x27, 0x00, 0x07, 0x4f, 0x14, 0x29, 0x0b, 0x22, 0xf5, 0x72, 0x98, 0x17, 0xf3, 0x00, 0x8f,
 	0xfd, 0xcd, 0x60, 0x7c, 0x97, 0x54, 0x2d, 0x32, 0xe9, 0x24, 0x05, 0xa7, 0xc1, 0xa4, 0xaf, 0x11
 };
+
+void superkds_decrypt(running_machine &machine)
+{
+	auto const src = reinterpret_cast<u16 *>(machine.root_device().memregion("user1")->base());
+
+	int const rom_size = 0x80000;
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		uint16_t x = src[i];
+
+		IGS27_CRYPT1
+		IGS27_CRYPT2_ALT
+		IGS27_CRYPT3
+		IGS27_CRYPT4
+		// IGS27_CRYPT5
+		IGS27_CRYPT6
+		IGS27_CRYPT7
+		IGS27_CRYPT8
+
+		x ^= superkds_tab[(i>> 1) & 0xff] << 8;
+
+		src[i] = x;
+	}
+}
 
 void fearless_decrypt(running_machine &machine)
 {
@@ -1432,11 +1461,12 @@ void fearless_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
-		x ^= fearless_tab[(i>> 1) & 0xff] << 8;
+		x ^= superkds_tab[(i>> 1) & 0xff] << 8;
 
 		src[i] = x;
 	}
 }
+
 
 
 static unsigned char pgm3in1_tab[256] = {
