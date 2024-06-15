@@ -4,8 +4,6 @@
 
     ACT Apricot FP
 
-    preliminary driver by Angelo Salese
-
 
 11/09/2011 - modernised. The portable doesn't seem to have
              scroll registers, and it sets the palette to black.
