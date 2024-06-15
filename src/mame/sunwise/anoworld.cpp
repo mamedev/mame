@@ -8,7 +8,11 @@ TODO:
 - Identify irq sources ($24 timer, $26 VBLANK?, $20 or $22 quadrature encoder);
 - Z80DMA never sends a ready signal, workaround by forcing is_ready fn to 1;
 - Verify data ROM bank;
-- Sound;
+- Sound i/f not fully understood:
+  \- no irq from CTC, hooking up YM irq in daisy chain will fail device validation;
+  \- sound ROMs mainly decodes as regular 8-bit DAC, mono, 8000 Hz.
+  \- Denote they ends abruptly towards the end (bad ROMs?).
+  \- is output connected to CTC ZC0 / ZC1 as DAC1BIT?
 
 ====================================================================================================
 
@@ -45,6 +49,7 @@ video output
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/msm6242.h"
 #include "machine/z80ctc.h"
@@ -80,6 +85,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_dma(*this, "dma")
+		, m_soundlatch(*this, "soundlatch%u", 0U)
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_video_view(*this, "video_view")
@@ -98,8 +104,9 @@ protected:
 
 private:
 	required_device<z80_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<z80_device> m_audiocpu;
 	required_device<z80dma_device> m_dma;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -247,7 +254,7 @@ void anoworld_state::main_io_map(address_map &map)
 	map(0x20, 0x2f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x30, 0x33).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x43).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-    // writes goes to outputs, cfr. second item in Test Mode
+	// writes goes to outputs, cfr. second item in Test Mode
 	map(0x50, 0x50).portr("IN0").nopw();
 	map(0x60, 0x60).portr("IN1").nopw();
 }
@@ -263,19 +270,25 @@ void anoworld_state::audio_program_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0xc000, 0xffff).bankr(m_audiobank);
+	map(0x8000, 0xffff).bankr(m_audiobank);
 }
 
 void anoworld_state::audio_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 
-	//map(0x00, 0x03).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); //TODO: maybe
-	//map(0x04, 0x07).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)); //TODO: maybe. 0x05 seems to set the audio bank
-	//map(0x08, 0x09).w // YM?
-	//map(0x0c, 0x0c).r? // latch? irq ack?
+	map(0x00, 0x03).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x04, 0x07).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x09).rw("ym", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x0c, 0x0c).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 }
 
+static const z80_daisy_config audio_daisy_chain[] =
+{
+//  { "ym" },
+	{ "ctc1" },
+	{ nullptr }
+};
 
 // TODO: Test Mode shows abbreviated forms, identify them all
 static INPUT_PORTS_START( anoworld )
@@ -350,7 +363,7 @@ void anoworld_state::machine_start()
 
 	m_databank->configure_entries(0, 0x40, memregion("data")->base(), 0x4000);
 	m_databank->set_entry(0);
-	m_audiobank->configure_entries(0, 32, memregion("audiocpu")->base(), 0x4000);
+	m_audiobank->configure_entries(0, 16, memregion("audiocpu")->base(), 0x8000);
 	m_audiobank->set_entry(1);
 }
 
@@ -360,7 +373,7 @@ void anoworld_state::machine_reset()
 }
 
 /*
- * Irq table:
+ * main IRQ table:
  * $+10 (DMA) writes to $9e61
  * $+20 (CTC ch0, counter mode) increments or decrements $9e88
  * $+22 (CTC ch1, counter mode) increments or decrements $9e8a
@@ -376,9 +389,10 @@ void anoworld_state::anoworld(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &anoworld_state::main_io_map);
 	m_maincpu->set_daisy_config(main_daisy_chain);
 
-	Z80(config, m_audiocpu, 4_MHz_XTAL).set_disable();
+	Z80(config, m_audiocpu, 4_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &anoworld_state::audio_program_map);
 	m_audiocpu->set_addrmap(AS_IO, &anoworld_state::audio_io_map);
+	m_audiocpu->set_daisy_config(audio_daisy_chain);
 
 	z80ctc_device &ctc0(Z80CTC(config, "ctc0", 4_MHz_XTAL));
 	ctc0.intr_callback().set_inputline("maincpu", 0);
@@ -391,16 +405,19 @@ void anoworld_state::anoworld(machine_config &config)
 	m_dma->in_iorq_callback().set(FUNC(anoworld_state::dma_io_r));
 	m_dma->out_iorq_callback().set(FUNC(anoworld_state::dma_io_w));
 
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
+
 	z80ctc_device &ctc1(Z80CTC(config, "ctc1", 4_MHz_XTAL));
-	ctc1.intr_callback().set([this] (int state) { LOGPORTS("%s: CTC1 INTR handler %d\n", machine().describe_context(), state); });
-	ctc1.zc_callback<0>().set([this] (int state) { LOGPORTS("%s: CTC1 ZC0 handler %d\n", machine().describe_context(), state); });
-	ctc1.zc_callback<1>().set([this] (int state) { LOGPORTS("%s: CTC1 ZC1 handler %d\n", machine().describe_context(), state); });
-	ctc1.zc_callback<2>().set([this] (int state) { LOGPORTS("%s: CTC1 ZC2 handler %d\n", machine().describe_context(), state); });
+	ctc1.intr_callback().set_inputline("audiocpu", 0);
+	// Triggers ZC0 and ZC1, for DAC playback?
+//  ctc1.zc_callback<0>().set([this] (int state) { LOGPORTS("%s: CTC1 ZC0 handler %d\n", machine().describe_context(), state); });
+//  ctc1.zc_callback<1>().set([this] (int state) { LOGPORTS("%s: CTC1 ZC1 handler %d\n", machine().describe_context(), state); });
+//  ctc1.zc_callback<2>().set([this] (int state) { LOGPORTS("%s: CTC1 ZC2 handler %d\n", machine().describe_context(), state); });
 
 	i8255_device &ppi0(I8255A(config, "ppi0")); // NEC D8255AC-2
 	// PA (input) / PB (output): sound latches
-	ppi0.in_pa_callback().set([this] () { LOGPORTS("%s: PPI0 port A in\n", machine().describe_context()); return uint8_t(0); });
-	ppi0.in_pb_callback().set([this] () { LOGPORTS("%s: PPI0 port B in\n", machine().describe_context()); return uint8_t(0); });
+	ppi0.in_pa_callback().set(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 	ppi0.in_pc_callback().set([this] () {
 		// punts to an insert coin screen if this is 0xff,
 		// reacts to D0-D7 signals in test mode.
@@ -408,8 +425,8 @@ void anoworld_state::anoworld(machine_config &config)
 		(void)this;
 		return uint8_t(0);
 	});
-	ppi0.out_pa_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port A out %02x\n", machine().describe_context(), data); });
-	ppi0.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port B out %02x\n", machine().describe_context(), data); });
+	// voice = 0x40, sound = 0x81
+	ppi0.out_pb_callback().set(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	ppi0.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port C out %02x\n", machine().describe_context(), data); });
 
 	i8255_device &ppi1(I8255A(config, "ppi1")); // NEC D8255AC-2
@@ -417,10 +434,32 @@ void anoworld_state::anoworld(machine_config &config)
 	ppi1.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port B out %02x\n", machine().describe_context(), data); });
 	ppi1.out_pc_callback().set(FUNC(anoworld_state::video_bank_w));
 
+	i8255_device &ppi2(I8255A(config, "ppi2")); // NEC D8255AC-2
+	ppi2.in_pc_callback().set([this] () {
+		LOGPORTS("%s: PPI2 port C in\n", machine().describe_context());
+		return uint8_t(0);
+	});
+	ppi2.out_pa_callback().set(m_soundlatch[1], FUNC(generic_latch_8_device::write));
+	ppi2.out_pb_callback().set([this] (uint8_t data) {
+		// HACK: avoid initializing bank to null at PPI init
+		if (data == 0xff)
+			return;
+		if (data & 0xf0)
+			LOGPORTS("%s: PPI2 (sound) port B out %02x\n", machine().describe_context(), data);
+		// TODO: confirm me
+		const u8 sound_bank = std::min((data & 0xf) + 1, 0xf);
+		m_audiobank->set_entry(sound_bank);
+	});
+	ppi2.out_pc_callback().set([this] (uint8_t data) {
+		//LOGPORTS("%s: PPI2 port C out %02x\n", machine().describe_context(), data);
+		m_soundlatch[0]->clear_w();
+	});
+
+
 	msm6242_device &rtc(MSM6242(config, "rtc", 32.768_kHz_XTAL));
 	rtc.out_int_handler().set("ctc0", FUNC(z80ctc_device::trg3)); // source guessed
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: everything
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

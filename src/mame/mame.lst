@@ -38933,10 +38933,6 @@ mineswpr4                       // [1977 Amutech]
 @source:sega/calcune.cpp
 calcune
 
-@source:sega/calorie.cpp
-calorie                         // (c) 1986 Sega
-calorieb                        // (c) 1986 Sega (but bootleg)
-
 @source:sega/chihiro.cpp
 ccfboxa                         // 2009.03.31 Firmware Update For Compact Flash Box (Rev A)
 chihiro                         // 2002.?? Chihiro BIOS
@@ -44274,6 +44270,8 @@ bombjack                        // (c) 1984 Tehkan
 bombjack2                       // (c) 1984 Tehkan
 bombjackbl                      // bootleg
 bombjackt                       // (c) 1984 Tehkan + Tecfri license
+calorie                         // (c) 1986 Sega
+calorieb                        // (c) 1986 Sega (but bootleg)
 
 @source:tecmo/gaiden.cpp
 drgnbowl                        // (c) 1992 Nics
