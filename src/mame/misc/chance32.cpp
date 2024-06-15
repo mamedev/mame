@@ -85,8 +85,8 @@ private:
 
 template <unsigned N> TILE_GET_INFO_MEMBER(chance32_state::get_tile_info)
 {
-	int code = (m_vram[N][tile_index * 2 + 1] << 8) | m_vram[N][tile_index * 2];
-	int flip = (~code >> 12) & 1;
+	const u16 code = (m_vram[N][tile_index * 2 + 1] << 8) | m_vram[N][tile_index * 2];
+	const u8 flip = (~code >> 12) & 1;
 	tileinfo.set(
 		N,
 		code & 0x0fff,
@@ -455,13 +455,11 @@ void chance32_state::machine_reset()
 
 void chance32_state::chance32(machine_config &config)
 {
-	/* basic machine hardware */
 	Z80(config, m_maincpu, 12000000/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &chance32_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &chance32_state::main_io);
 	m_maincpu->set_vblank_int("screen", FUNC(chance32_state::irq0_line_hold));
 
-	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(52.786);
 //  screen.set_refresh_hz(60);
@@ -470,8 +468,7 @@ void chance32_state::chance32(machine_config &config)
 	screen.set_visarea(0, 35*16-1, 0, 29*8-1);
 	screen.set_screen_update(FUNC(chance32_state::screen_update));
 
-	 /* 52.786 Hz (similar to Major Poker) */
-	hd6845s_device &crtc(HD6845S(config, "crtc", 12000000/16));
+	hd6845s_device &crtc(HD6845S(config, "crtc", 12000000/16)); // 52.786 Hz (similar to Major Poker)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(16);
@@ -479,7 +476,6 @@ void chance32_state::chance32(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_chance32);
 	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 0x800);
 
-	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	/* clock at 1050 kHz match the 8000 Hz samples stored inside the ROM */
