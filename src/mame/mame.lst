@@ -46132,6 +46132,9 @@ inteladv
 iqunlim                         // (c) 1995 Vtech / Integrated Systems Inc.
 iqunlimgr                       // (c) 1995 VTech / Integrated Systems Inc.
 
+@source:vtech/kidsupstar.cpp
+kidsupstar                      // (c) 2016 VTech
+
 @source:vtech/laser3k.cpp
 las3000                         // 1983 Laser 3000
 
