@@ -12,7 +12,7 @@
 
     To do:
 
-        * On-screen display support
+        * On-screen display support (we just popmessage the data)
         * Better CLV support
         * Chapter-search support
         * Repeat support (we only store the command)
