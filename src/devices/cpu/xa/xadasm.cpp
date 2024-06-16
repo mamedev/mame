@@ -10,13 +10,13 @@ The CPU implements the following opcodes
 
 ADD Rd, Rs                  Add regs direct                                                         2 3     0000 S001  dddd ssss
 ADD Rd, [Rs]                Add reg-ind to reg                                                      2 4     0000 S010  dddd 0sss
-ADD [Rd], Rs                Add reg to reg-ind                                                      2 4     0000 S010  dddd 1sss
+ADD [Rd], Rs                Add reg to reg-ind                                                      2 4     0000 S010  ssss 1ddd
 ADD Rd, [Rs+offset8]        Add reg-ind w/ 8-bit offs to reg                                        3 6     0000 S100  dddd 0sss
-ADD [Rd+offset8], Rs        Add reg to reg-ind w/ 8-bit offs                                        3 6     0000 S100  dddd 1sss
+ADD [Rd+offset8], Rs        Add reg to reg-ind w/ 8-bit offs                                        3 6     0000 S100  ssss 1ddd
 ADD Rd, [Rs+offset16]       Add reg-ind w/ 16-bit offs to reg                                       4 6     0000 S101  dddd 0sss
-ADD [Rd+offset16], Rs       Add reg to reg-ind w/ 16-bit offs                                       4 6     0000 S101  dddd 1sss
+ADD [Rd+offset16], Rs       Add reg to reg-ind w/ 16-bit offs                                       4 6     0000 S101  ssss 1ddd
 ADD Rd, [Rs+]               Add reg-ind w/ autoinc to reg                                           2 5     0000 S011  dddd 0sss
-ADD [Rd+], Rs               Add reg-ind w/ autoinc to reg                                           2 5     0000 S011  dddd 1sss
+ADD [Rd+], Rs               Add reg-ind w/ autoinc to reg                                           2 5     0000 S011  ssss 1ddd
 ADD direct, Rs              Add reg to mem                                                          3 4     0000 S110  ssss 1DDD
 ADD Rd, direct              Add mem to reg                                                          3 4     0000 S110  dddd 0DDD
 
@@ -29,19 +29,19 @@ ADD [Rd+], #data16          Add 16-bit imm data to reg-ind w/ autoinc           
 ADD [Rd+offset8], #data8    Add 8-bit imm data to reg-ind w/ 8-bit offs                             4 6     1001 0100  0ddd 0000  oooo oooo  iiii iiii
 ADD [Rd+offset8], #data16   Add 16-bit imm data to reg-ind w/ 8-bit offs                            5 6     1001 1100  0ddd 0000  oooo oooo  iiii iiii  iiii iiii
 ADD [Rd+offset16], #data8   Add 8-bit imm data to reg-ind w/ 16-bit offs                            5 6     1001 0101  0ddd 0000  oooo oooo  oooo oooo  iiii iiii
-ADD [Rd+offset16], #data16  Add 16-bit imm data to reg-ind w/ 16-bit offs                           6 6     1001 1101  0ddd 0000  oooo oooo  oooo oooo  iiii iiii  iiii iiii 
+ADD [Rd+offset16], #data16  Add 16-bit imm data to reg-ind w/ 16-bit offs                           6 6     1001 1101  0ddd 0000  oooo oooo  oooo oooo  iiii iiii  iiii iiii
 ADD direct, #data8          Add 8-bit imm data to mem                                               4 4     1001 0110  0DDD 0000  DDDD DDDD  iiii iiii
 ADD direct, #data16         Add 16-bit imm data to mem                                              5 4     1001 1110  0DDD 0000  DDDD DDDD  iiii iiii  iiii iiii
 
 ADDC Rd, Rs                 Add regs direct w/ carry                                                2 3     0001 S001  dddd ssss
 ADDC Rd, [Rs]               Add reg-ind to reg w/ carry                                             2 4     0001 S010  dddd 0sss
-ADDC [Rd], Rs               Add reg to reg-ind w/ carry                                             2 4     0001 S010  dddd 1sss
+ADDC [Rd], Rs               Add reg to reg-ind w/ carry                                             2 4     0001 S010  ssss 1ddd
 ADDC Rd, [Rs+offset8]       Add reg-ind w/ 8-bit offs to reg w/ carry                               3 6     0001 S100  dddd 0sss
-ADDC [Rd+offset8], Rs       Add reg to reg-ind w/ 8-bit offs w/ carry                               3 6     0001 S100  dddd 1sss
+ADDC [Rd+offset8], Rs       Add reg to reg-ind w/ 8-bit offs w/ carry                               3 6     0001 S100  ssss 1ddd
 ADDC Rd, [Rs+offset16]      Add reg-ind w/ 16-bit offs to reg w/ carry                              4 6     0001 S101  dddd 0sss
-ADDC [Rd+offset16], Rs      Add reg to reg-ind w/ 16-bit offs w/ carry                              4 6     0001 S101  dddd 1sss
+ADDC [Rd+offset16], Rs      Add reg to reg-ind w/ 16-bit offs w/ carry                              4 6     0001 S101  ssss 1ddd
 ADDC Rd, [Rs+]              Add reg-ind w/ autoinc to reg w/ carry                                  2 5     0001 S011  dddd 0sss
-ADDC [Rd+], Rs              Add reg-ind w/ autoinc to reg w/ carry                                  2 5     0001 S011  dddd 1sss
+ADDC [Rd+], Rs              Add reg-ind w/ autoinc to reg w/ carry                                  2 5     0001 S011  ssss 1ddd
 ADDC direct, Rs             Add reg to mem w/ carry                                                 3 4     0001 S110  ssss 1DDD
 ADDC Rd, direct             Add mem to reg w/ carry                                                 3 4     0001 S110  dddd 0DDD
 
@@ -54,7 +54,7 @@ ADDC [Rd+], #data16         Add 16-bit imm data to reg-ind and autoinc w/ carry 
 ADDC [Rd+offset8], #data8   Add 8-bit imm data to reg-ind w/ 8-bit offs and carry                   4 6     1001 0100  0ddd 0001  oooo oooo  iiii iiii
 ADDC [Rd+offset8], #data16  Add 16-bit imm data to reg-ind w/ 8-bit offs and carry                  5 6     1001 1100  0ddd 0001  oooo oooo  iiii iiii  iiii iiii
 ADDC [Rd+offset16], #data8  Add 8-bit imm data to reg-ind w/ 16-bit offs and carry                  5 6     1001 0101  0ddd 0001  oooo oooo  oooo oooo  iiii iiii
-ADDC [Rd+offset16], #data16 Add 16-bit imm data to reg-ind w/ 16-bit offs and carry                 6 6     1001 1101  0ddd 0001  oooo oooo  oooo oooo  iiii iiii  iiii iiii 
+ADDC [Rd+offset16], #data16 Add 16-bit imm data to reg-ind w/ 16-bit offs and carry                 6 6     1001 1101  0ddd 0001  oooo oooo  oooo oooo  iiii iiii  iiii iiii
 ADDC direct, #data8         Add 8-bit imm data to mem w/ carry                                      4 4     1001 0110  0DDD 0001  DDDD DDDD  iiii iiii
 ADDC direct, #data16        Add 16-bit imm data to mem w/ carry                                     5 4     1001 1110  0DDD 0001  DDDD DDDD  iiii iiii  iiii iiii
 
@@ -66,29 +66,29 @@ ADDS [Rd+offset16], #data4  Add reg-ind w/ 16-bit offs to 4-bit signed imm data 
 ADDS direct, #data4         Add 4-bit signed imm data to mem                                        3 4     1010 S110  0DDD iiii  DDDD DDDD
 
 AND Rd, Rs                  Logical AND regs direct                                                 2 3     0101 S001  dddd ssss
-AND Rd, [Rs]                Logical AND reg-ind to reg                                              2 4
-AND [Rd], Rs                Logical AND reg to reg-ind                                              2 4
-AND Rd, [Rs+offset8]        Logical AND reg-ind w/ 8-bit offs to reg                                3 6
-AND [Rd+offset8], Rs        Logical AND reg to reg-ind w/ 8-bit offs                                3 6
-AND Rd, [Rs+offset16]       Logical AND reg-ind w/ 16-bit offs to reg                               4 6
-AND [Rd+offset16], Rs       Logical AND reg to reg-ind w/ 16-bit offs                               4 6
-AND Rd, [Rs+]               Logical AND reg-ind w/ autoinc to reg                                   2 5
-AND [Rd+], Rs               Logical AND reg-ind w/ autoinc to reg                                   2 5
-AND direct, Rs              Logical AND reg to mem                                                  3 4
-AND Rd, direct              Logical AND mem to reg                                                  3 4
+AND Rd, [Rs]                Logical AND reg-ind to reg                                              2 4     0101 S010  dddd 0sss
+AND [Rd], Rs                Logical AND reg to reg-ind                                              2 4     0101 S010  ssss 1ddd
+AND Rd, [Rs+offset8]        Logical AND reg-ind w/ 8-bit offs to reg                                3 6     0101 S100  dddd 0sss
+AND [Rd+offset8], Rs        Logical AND reg to reg-ind w/ 8-bit offs                                3 6     0101 S100  ssss 1ddd
+AND Rd, [Rs+offset16]       Logical AND reg-ind w/ 16-bit offs to reg                               4 6     0101 S101  dddd 0sss
+AND [Rd+offset16], Rs       Logical AND reg to reg-ind w/ 16-bit offs                               4 6     0101 S101  ssss 1ddd
+AND Rd, [Rs+]               Logical AND reg-ind w/ autoinc to reg                                   2 5     0101 S011  dddd 0sss
+AND [Rd+], Rs               Logical AND reg-ind w/ autoinc to reg                                   2 5     0101 S011  ssss 1ddd
+AND direct, Rs              Logical AND reg to mem                                                  3 4     0101 S110  ssss 1DDD
+AND Rd, direct              Logical AND mem to reg                                                  3 4     0101 S110  dddd 0DDD
 
 AND Rd, #data8              Logical AND 8-bit imm data to reg                                       3 3     1001 0001  dddd 0101  iiii iiii
-AND Rd, #data16             Logical AND 16-bit imm data to reg                                      4 3
-AND [Rd], #data8            Logical AND 8-bit imm data to reg-ind                                   3 4
-AND [Rd], #data16           Logical AND 16-bit imm data to reg-ind                                  4 4
-AND [Rd+], #data8           Logical AND 8-bit imm data to reg-ind and autoinc                       3 5
-AND [Rd+], #data16          Logical AND 16-bit imm data to reg-ind and autoinc                      4 5
-AND [Rd+offset8], #data8    Logical AND 8-bit imm data to reg-ind w/ 8-bit offs                     4 6
-AND [Rd+offset8], #data16   Logical AND 16-bit imm data to reg-ind w/ 8-bit offs                    5 6
-AND [Rd+offset16], #data8   Logical AND 8-bit imm data to reg-ind w/ 16-bit offs                    5 6
-AND [Rd+offset16], #data16  Logical AND 16-bit imm data to reg-ind w/ 16-bit offs                   6 6
-AND direct, #data8          Logical AND 8-bit imm data to mem                                       4 4
-AND direct, #data16         Logical AND 16-bit imm data to mem                                      5 4
+AND Rd, #data16             Logical AND 16-bit imm data to reg                                      4 3     1001 1001  dddd 0101  iiii iiii  iiii iiii
+AND [Rd], #data8            Logical AND 8-bit imm data to reg-ind                                   3 4     1001 0010  0ddd 0101  iiii iiii
+AND [Rd], #data16           Logical AND 16-bit imm data to reg-ind                                  4 4     1001 1010  0ddd 0101  iiii iiii  iiii iiii
+AND [Rd+], #data8           Logical AND 8-bit imm data to reg-ind and autoinc                       3 5     1001 0011  0ddd 0101  iiii iiii
+AND [Rd+], #data16          Logical AND 16-bit imm data to reg-ind and autoinc                      4 5     1001 1011  0ddd 0101  iiii iiii  iiii iiii
+AND [Rd+offset8], #data8    Logical AND 8-bit imm data to reg-ind w/ 8-bit offs                     4 6     1001 0100  0ddd 0101  oooo oooo  iiii iiii
+AND [Rd+offset8], #data16   Logical AND 16-bit imm data to reg-ind w/ 8-bit offs                    5 6     1001 1100  0ddd 0101  oooo oooo  iiii iiii  iiii iiii
+AND [Rd+offset16], #data8   Logical AND 8-bit imm data to reg-ind w/ 16-bit offs                    5 6     1001 0101  0ddd 0101  oooo oooo  oooo oooo  iiii iiii
+AND [Rd+offset16], #data16  Logical AND 16-bit imm data to reg-ind w/ 16-bit offs                   6 6     1001 1101  0ddd 0101  oooo oooo  oooo oooo  iiii iiii  iiii iiii
+AND direct, #data8          Logical AND 8-bit imm data to mem                                       4 4     1001 0110  0DDD 0101  DDDD DDDD  iiii iiii
+AND direct, #data16         Logical AND 16-bit imm data to mem                                      5 4     1001 1110  0DDD 0101  DDDD DDDD  iiii iiii  iiii iiii
 
 ANL C, bit                  Logical AND bit to carry                                                3 4     0000 1000  0100 00bb  bbbb bbbb
 
@@ -128,6 +128,7 @@ CMP direct, #data8          Compare 8-bit imm data to mem                       
 CMP direct, #data16         Compare 16-bit imm data to mem                                          5 4
 
 DA Rd                       Decimal Adjust byte reg                                                 2 4
+
 DIV.w Rd, Rs                16x8 signed reg divide                                                  2 14
 DIV.w Rd, #data8            16x8 signed divide reg w/ imm word                                      3 14
 DIV.d Rd, Rs                32x16 signed double reg divide                                          2 24
@@ -153,32 +154,32 @@ MULU.w Rd, #data16          16X16 unsigned multiply 16-bit imm data w/ reg      
 
 NEG Rd                      Negate (twos complement) reg                                            2 3
 
-SEXT Rd                     Sign extend last operation to reg                                       2 3
+SEXT Rd                     Sign extend last operation to reg                                       2 3     1001 S000  dddd 1001
 
-SUB Rd, Rs                  Subtract regs direct                                                    2 3
-SUB Rd, [Rs]                Subtract reg-ind to reg                                                 2 4
-SUB [Rd], Rs                Subtract reg to reg-ind                                                 2 4
-SUB Rd, [Rs+offset8]        Subtract reg-ind w/ 8-bit offs to reg                                   3 6
-SUB [Rd+offset8], Rs        Subtract reg to reg-ind w/ 8-bit offs                                   3 6
-SUB Rd, [Rs+offset16]       Subtract reg-ind w/ 16-bit offs to reg                                  4 6
-SUB [Rd+offset16], Rs       Subtract reg to reg-ind w/ 16-bit offs                                  4 6
-SUB Rd, [Rs+]               Subtract reg-ind w/ autoinc to reg                                      2 5
-SUB [Rd+], Rs               Subtract reg-ind w/ autoinc to reg                                      2 5
-SUB direct, Rs              Subtract reg to mem                                                     3 4
-SUB Rd, direct              Subtract mem to reg                                                     3 4
+SUB Rd, Rs                  Subtract regs direct                                                    2 3     0010 S001  dddd ssss
+SUB Rd, [Rs]                Subtract reg-ind to reg                                                 2 4     0010 S010  dddd 0sss
+SUB [Rd], Rs                Subtract reg to reg-ind                                                 2 4     0010 S010  ssss 1ddd
+SUB Rd, [Rs+offset8]        Subtract reg-ind w/ 8-bit offs to reg                                   3 6     0010 S100  dddd 0sss
+SUB [Rd+offset8], Rs        Subtract reg to reg-ind w/ 8-bit offs                                   3 6     0010 S100  ssss 1ddd
+SUB Rd, [Rs+offset16]       Subtract reg-ind w/ 16-bit offs to reg                                  4 6     0010 S101  dddd 0sss
+SUB [Rd+offset16], Rs       Subtract reg to reg-ind w/ 16-bit offs                                  4 6     0010 S101  ssss 1ddd
+SUB Rd, [Rs+]               Subtract reg-ind w/ autoinc to reg                                      2 5     0010 S011  dddd 0sss
+SUB [Rd+], Rs               Subtract reg-ind w/ autoinc to reg                                      2 5     0010 S011  ssss 1ddd
+SUB direct, Rs              Subtract reg to mem                                                     3 4     0010 S110  ssss 1DDD
+SUB Rd, direct              Subtract mem to reg                                                     3 4     0010 S110  dddd 0DDD
 
-SUB Rd, #data8              Subtract 8-bit imm data to reg                                          3 3
-SUB Rd, #data16             Subtract 16-bit imm data to reg                                         4 3
-SUB [Rd], #data8            Subtract 8-bit imm data to reg-ind                                      3 4
-SUB [Rd], #data16           Subtract 16-bit imm data to reg-ind                                     4 4
-SUB [Rd+], #data8           Subtract 8-bit imm data to reg-ind w/ autoinc                           3 5
-SUB [Rd+], #data16          Subtract 16-bit imm data to reg-ind w/ autoinc                          4 5
-SUB [Rd+offset8], #data8    Subtract 8-bit imm data to reg-ind w/ 8-bit offs                        4 6
-SUB [Rd+offset8], #data16   Subtract 16-bit imm data to reg-ind w/ 8-bit offs                       5 6
-SUB [Rd+offset16], #data8   Subtract 8-bit imm data to reg-ind w/ 16-bit offs                       5 6
-SUB [Rd+offset16], #data16  Subtract 16-bit imm data to reg-ind w/ 16-bit offs                      6 6
-SUB direct, #data8          Subtract 8-bit imm data to mem                                          4 4
-SUB direct, #data16         Subtract 16-bit imm data to mem                                         5 4
+SUB Rd, #data8              Subtract 8-bit imm data to reg                                          3 3     1001 0001  dddd 0010  iiii iiii
+SUB Rd, #data16             Subtract 16-bit imm data to reg                                         4 3     1001 1001  dddd 0010  iiii iiii  iiii iiii
+SUB [Rd], #data8            Subtract 8-bit imm data to reg-ind                                      3 4     1001 0010  0ddd 0010  iiii iiii
+SUB [Rd], #data16           Subtract 16-bit imm data to reg-ind                                     4 4     1001 1010  0ddd 0010  iiii iiii  iiii iiii
+SUB [Rd+], #data8           Subtract 8-bit imm data to reg-ind w/ autoinc                           3 5     1001 0011  0ddd 0010  iiii iiii
+SUB [Rd+], #data16          Subtract 16-bit imm data to reg-ind w/ autoinc                          4 5     1001 1011  0ddd 0010  iiii iiii  iiii iiii
+SUB [Rd+offset8], #data8    Subtract 8-bit imm data to reg-ind w/ 8-bit offs                        4 6     1001 0100  0ddd 0010  oooo oooo  iiii iiii
+SUB [Rd+offset8], #data16   Subtract 16-bit imm data to reg-ind w/ 8-bit offs                       5 6     1001 1100  0ddd 0010  oooo oooo  iiii iiii  iiii iiii
+SUB [Rd+offset16], #data8   Subtract 8-bit imm data to reg-ind w/ 16-bit offs                       5 6     1001 0101  0ddd 0010  oooo oooo  oooo oooo  iiii iiii
+SUB [Rd+offset16], #data16  Subtract 16-bit imm data to reg-ind w/ 16-bit offs                      6 6     1001 1101  0ddd 0010  oooo oooo  oooo oooo  iiii iiii  iiii iiii
+SUB direct, #data8          Subtract 8-bit imm data to mem                                          4 4     1001 0110  0DDD 0010  DDDD DDDD  iiii iiii
+SUB direct, #data16         Subtract 16-bit imm data to mem                                         5 4     1001 1110  0DDD 0010  DDDD DDDD  iiii iiii  iiii iiii
 
 SUBB Rd, Rs                 Subtract w/ borrow regs direct                                          2 3
 SUBB Rd, [Rs]               Subtract w/ borrow reg-ind to reg                                       2 4
