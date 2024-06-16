@@ -42035,6 +42035,9 @@ lilith                          //
 @source:skeleton/lms46.cpp
 lms46                           //
 
+@source:skeleton/madmoney2.cpp
+madmoney2                       // (c) 1988 Picmatic
+
 @source:skeleton/mes.cpp
 mes                             //
 
