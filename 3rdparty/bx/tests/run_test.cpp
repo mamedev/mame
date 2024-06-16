@@ -26,12 +26,13 @@ int runAllTests(int _argc, const char* _argv[])
 
 	DBG("Compiler: " BX_COMPILER_NAME
 		", CPU: " BX_CPU_NAME
-		", Architecture: " BX_ARCH_NAME
+		", Arch: " BX_ARCH_NAME
 		", OS: " BX_PLATFORM_NAME
 		", CRT: " BX_CRT_NAME
+		", C++: " BX_CPP_NAME
+
 		", Date: " __DATE__
 		", Time: " __TIME__
-		", C++: " BX_CPP_NAME
 		);
 
 	using namespace Catch;

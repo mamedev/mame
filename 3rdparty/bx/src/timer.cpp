@@ -6,7 +6,7 @@
 #include <bx/timer.h>
 
 #if BX_CRT_NONE
-#	include "crt0.h"
+#	include <bx/crt0.h>
 #elif BX_PLATFORM_ANDROID
 #	include <time.h> // clock, clock_gettime
 #elif BX_PLATFORM_EMSCRIPTEN

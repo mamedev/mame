@@ -30,7 +30,6 @@
 
 // C Runtime
 #define BX_CRT_BIONIC 0
-#define BX_CRT_BSD    0
 #define BX_CRT_GLIBC  0
 #define BX_CRT_LIBCXX 0
 #define BX_CRT_MINGW  0
@@ -236,33 +235,19 @@
 #	if defined(__BIONIC__)
 #		undef  BX_CRT_BIONIC
 #		define BX_CRT_BIONIC 1
-#	elif defined(_MSC_VER)
-#		undef  BX_CRT_MSVC
-#		define BX_CRT_MSVC 1
 #	elif defined(__GLIBC__)
 #		undef  BX_CRT_GLIBC
 #		define BX_CRT_GLIBC (__GLIBC__ * 10000 + __GLIBC_MINOR__ * 100)
-#	elif defined(__MINGW32__) || defined(__MINGW64__)
-#		undef  BX_CRT_MINGW
-#		define BX_CRT_MINGW 1
 #	elif defined(__apple_build_version__) || defined(__ORBIS__) || defined(__EMSCRIPTEN__) || defined(__llvm__) || defined(__HAIKU__)
 #		undef  BX_CRT_LIBCXX
 #		define BX_CRT_LIBCXX 1
-#	elif BX_PLATFORM_BSD
-#		undef  BX_CRT_BSD
-#		define BX_CRT_BSD 1
+#	elif defined(__MINGW32__) || defined(__MINGW64__)
+#		undef  BX_CRT_MINGW
+#		define BX_CRT_MINGW 1
+#	elif defined(_MSC_VER)
+#		undef  BX_CRT_MSVC
+#		define BX_CRT_MSVC 1
 #	endif //
-
-#	if !BX_CRT_BIONIC \
-	&& !BX_CRT_BSD    \
-	&& !BX_CRT_GLIBC  \
-	&& !BX_CRT_LIBCXX \
-	&& !BX_CRT_MINGW  \
-	&& !BX_CRT_MSVC   \
-	&& !BX_CRT_NEWLIB
-#		undef  BX_CRT_NONE
-#		define BX_CRT_NONE 1
-#	endif // BX_CRT_*
 #endif // !BX_CRT_NONE
 
 ///
@@ -428,8 +413,6 @@
 
 #if BX_CRT_BIONIC
 #	define BX_CRT_NAME "Bionic libc"
-#elif BX_CRT_BSD
-#	define BX_CRT_NAME "BSD libc"
 #elif BX_CRT_GLIBC
 #	define BX_CRT_NAME "GNU C Library"
 #elif BX_CRT_MSVC
@@ -443,7 +426,7 @@
 #elif BX_CRT_NONE
 #	define BX_CRT_NAME "None"
 #else
-#	error "Unknown BX_CRT!"
+#	define BX_CRT_NAME "Unknown CRT"
 #endif // BX_CRT_
 
 #if BX_ARCH_32BIT

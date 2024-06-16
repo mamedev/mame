@@ -13,7 +13,7 @@
 #endif
 
 #if BX_CRT_NONE
-#	include "crt0.h"
+#	include <bx/crt0.h>
 #elif  BX_PLATFORM_ANDROID \
 	|| BX_PLATFORM_LINUX   \
 	|| BX_PLATFORM_IOS     \

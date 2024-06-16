@@ -9,7 +9,7 @@
 #include <inttypes.h>        // PRIx*
 
 #if BX_CRT_NONE
-#	include "crt0.h"
+#	include <bx/crt0.h>
 #elif BX_PLATFORM_ANDROID
 #	include <android/log.h>
 #elif  BX_PLATFORM_WINDOWS \

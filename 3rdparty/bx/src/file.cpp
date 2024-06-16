@@ -14,7 +14,7 @@
 #endif // BX_CONFIG_CRT_DIRECTORY_READER
 
 #if BX_CRT_NONE
-#	include "crt0.h"
+#	include <bx/crt0.h>
 #else
 #	if BX_CONFIG_CRT_DIRECTORY_READER
 #		include <dirent.h>
