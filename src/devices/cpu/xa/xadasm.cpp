@@ -280,29 +280,28 @@ RRC Rd, #data4              Rotate right reg though carry by the 4-bit imm value
 
 DA Rd                       Decimal Adjust byte reg                                                 2 4         1001 0000  dddd 1000
 
-DIV.w Rd, Rs                16x8 signed reg divide                                                  2 14
-DIV.w Rd, #data8            16x8 signed divide reg w/ imm word                                      3 14
-DIV.d Rd, Rs                32x16 signed double reg divide                                          2 24
-DIV.d Rd, #data16           32x16 signed double reg divide w/ imm word                              4 24
+DIV.w Rd, Rs                16x8 signed reg divide                                                  2 14        1110 0111  dddd ssss
+DIV.w Rd, #data8            16x8 signed divide reg w/ imm word                                      3 14        1110 1000  dddd 1011  iiii iiii
+DIV.d Rd, Rs                32x16 signed double reg divide                                          2 24        1110 1111  ddd0 ssss
+DIV.d Rd, #data16           32x16 signed double reg divide w/ imm word                              4 24        1110 1001  ddd0 1001  iiii iiii  iiii iiii
 
-DIVU.b Rd, Rs               8x8 unsigned reg divide                                                 2 12
-DIVU.b Rd, #data8           8X8 unsigned reg divide w/ imm byte                                     3 12
-DIVU.w Rd, Rs               16X8 unsigned reg divide                                                2 12
-DIVU.w Rd, #data8           16X8 unsigned reg divide w/ imm byte                                    3 12
-DIVU.d Rd, Rs               32X16 unsigned double reg divide                                        2 22
-DIVU.d Rd, #data16          32X16 unsigned double reg divide w/ imm word                            4 22
+DIVU.b Rd, Rs               8x8 unsigned reg divide                                                 2 12        1110 0001  dddd ssss
+DIVU.b Rd, #data8           8X8 unsigned reg divide w/ imm byte                                     3 12        1110 1000  dddd 0001  iiii iiii
+DIVU.w Rd, Rs               16X8 unsigned reg divide                                                2 12        1110 0101  dddd ssss
+DIVU.w Rd, #data8           16X8 unsigned reg divide w/ imm byte                                    3 12        1110 1000  dddd 0011  iiii iiii
+DIVU.d Rd, Rs               32X16 unsigned double reg divide                                        2 22        1110 1101  ddd0 ssss
+DIVU.d Rd, #data16          32X16 unsigned double reg divide w/ imm word                            4 22        1110 1001  ddd0 0001  iiii iiii  iiii iiii
 
-MUL.w Rd, Rs                16X16 signed multiply of reg contents                                   2 12
-MUL.w Rd, #data16           16X16 signed multiply 16-bit imm data w/ reg                            4 12
+MUL.w Rd, Rs                16X16 signed multiply of reg contents                                   2 12        1110 0110  dddd ssss
+MUL.w Rd, #data16           16X16 signed multiply 16-bit imm data w/ reg                            4 12        1110 1001  dddd 1000  iiii iiii  iiii iiii
 
-MULU.b Rd, Rs               8X8 unsigned multiply of reg contents                                   2 12
-MULU.b Rd, #data8           8X8 unsigned multiply of 8-bit imm data w/ reg                          3 12
-MULU.w Rd, Rs               16X16 unsigned reg multiply                                             2 12
-MULU.w Rd, #data16          16X16 unsigned multiply 16-bit imm data w/ reg                          4 12
+MULU.b Rd, Rs               8X8 unsigned multiply of reg contents                                   2 12        1110 0000  dddd ssss
+MULU.b Rd, #data8           8X8 unsigned multiply of 8-bit imm data w/ reg                          3 12        1110 1000  dddd 0000  iiii iiii
+MULU.w Rd, Rs               16X16 unsigned reg multiply                                             2 12        1110 0100  dddd ssss
+MULU.w Rd, #data16          16X16 unsigned multiply 16-bit imm data w/ reg                          4 12        1110 1001  dddd 0000  iiii iiii  iiii iiii
 
 LEA Rd, Rs+offset8          Load 16-bit effective address w/ 8-bit offs to reg                      3 3         0100 0000  0ddd 0sss  oooo oooo
 LEA Rd, Rs+offset16         Load 16-bit effective address w/ 16-bit offs to reg                     4 3         0100 1000  0ddd 0sss  oooo oooo  oooo oooo
-
 
 CPL Rd                      Complement (ones complement) reg                                        2 3         1001 S000  dddd 1010
 
