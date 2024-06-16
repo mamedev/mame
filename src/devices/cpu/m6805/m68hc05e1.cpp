@@ -41,8 +41,8 @@ void m68hc05ex_device::device_start()
 	memset(m_ports, 0, sizeof(m_ports));
 	memset(m_ddrs, 0, sizeof(m_ddrs));
 
-	m_timer = timer_alloc(FUNC(m68hc05e1_device::seconds_tick), this);
-	m_prog_timer = timer_alloc(FUNC(m68hc05e1_device::timer_tick), this);
+	m_timer = timer_alloc(FUNC(m68hc05ex_device::seconds_tick), this);
+	m_prog_timer = timer_alloc(FUNC(m68hc05ex_device::timer_tick), this);
 }
 
 void m68hc05ex_device::device_reset()
@@ -247,7 +247,7 @@ m68hc05e1_device::m68hc05e1_device(const machine_config &mconfig, const char *ta
 }
 
 m68hc05e1_device::m68hc05e1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int addrbits, address_map_constructor internal_map) :
-	m68hc05ex_device(mconfig, M68HC05E1, tag, owner, clock, 13, internal_map),
+	m68hc05ex_device(mconfig, type, tag, owner, clock, 13, internal_map),
 	m_internal_ram(*this, "internal_ram")
 {
 }
