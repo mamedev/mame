@@ -11,14 +11,14 @@ The CPU implements the following opcodes
 ADD Rd, Rs                  Add regs direct                                                         2 3     0000 S001  dddd ssss
 ADD Rd, [Rs]                Add reg-ind to reg                                                      2 4     0000 S010  dddd 0sss
 ADD [Rd], Rs                Add reg to reg-ind                                                      2 4     0000 S010  ssss 1ddd
-ADD Rd, [Rs+offset8]        Add reg-ind w/ 8-bit offs to reg                                        3 6     0000 S100  dddd 0sss
-ADD [Rd+offset8], Rs        Add reg to reg-ind w/ 8-bit offs                                        3 6     0000 S100  ssss 1ddd
-ADD Rd, [Rs+offset16]       Add reg-ind w/ 16-bit offs to reg                                       4 6     0000 S101  dddd 0sss
-ADD [Rd+offset16], Rs       Add reg to reg-ind w/ 16-bit offs                                       4 6     0000 S101  ssss 1ddd
+ADD Rd, [Rs+offset8]        Add reg-ind w/ 8-bit offs to reg                                        3 6     0000 S100  dddd 0sss  oooo oooo
+ADD [Rd+offset8], Rs        Add reg to reg-ind w/ 8-bit offs                                        3 6     0000 S100  ssss 1ddd  oooo oooo
+ADD Rd, [Rs+offset16]       Add reg-ind w/ 16-bit offs to reg                                       4 6     0000 S101  dddd 0sss  oooo oooo  oooo oooo
+ADD [Rd+offset16], Rs       Add reg to reg-ind w/ 16-bit offs                                       4 6     0000 S101  ssss 1ddd  oooo oooo  oooo oooo
 ADD Rd, [Rs+]               Add reg-ind w/ autoinc to reg                                           2 5     0000 S011  dddd 0sss
 ADD [Rd+], Rs               Add reg-ind w/ autoinc to reg                                           2 5     0000 S011  ssss 1ddd
-ADD direct, Rs              Add reg to mem                                                          3 4     0000 S110  ssss 1DDD
-ADD Rd, direct              Add mem to reg                                                          3 4     0000 S110  dddd 0DDD
+ADD direct, Rs              Add reg to mem                                                          3 4     0000 S110  ssss 1DDD  DDDD DDDD
+ADD Rd, direct              Add mem to reg                                                          3 4     0000 S110  dddd 0DDD  DDDD DDDD
 
 ADD Rd, #data8              Add 8-bit imm data to reg                                               3 3     1001 0001  dddd 0000  iiii iiii
 ADD Rd, #data16             Add 16-bit imm data to reg                                              4 3     1001 1001  dddd 0000  iiii iiii  iiii iiii
@@ -36,14 +36,14 @@ ADD direct, #data16         Add 16-bit imm data to mem                          
 ADDC Rd, Rs                 Add regs direct w/ carry                                                2 3     0001 S001  dddd ssss
 ADDC Rd, [Rs]               Add reg-ind to reg w/ carry                                             2 4     0001 S010  dddd 0sss
 ADDC [Rd], Rs               Add reg to reg-ind w/ carry                                             2 4     0001 S010  ssss 1ddd
-ADDC Rd, [Rs+offset8]       Add reg-ind w/ 8-bit offs to reg w/ carry                               3 6     0001 S100  dddd 0sss
-ADDC [Rd+offset8], Rs       Add reg to reg-ind w/ 8-bit offs w/ carry                               3 6     0001 S100  ssss 1ddd
-ADDC Rd, [Rs+offset16]      Add reg-ind w/ 16-bit offs to reg w/ carry                              4 6     0001 S101  dddd 0sss
-ADDC [Rd+offset16], Rs      Add reg to reg-ind w/ 16-bit offs w/ carry                              4 6     0001 S101  ssss 1ddd
+ADDC Rd, [Rs+offset8]       Add reg-ind w/ 8-bit offs to reg w/ carry                               3 6     0001 S100  dddd 0sss  oooo oooo
+ADDC [Rd+offset8], Rs       Add reg to reg-ind w/ 8-bit offs w/ carry                               3 6     0001 S100  ssss 1ddd  oooo oooo
+ADDC Rd, [Rs+offset16]      Add reg-ind w/ 16-bit offs to reg w/ carry                              4 6     0001 S101  dddd 0sss  oooo oooo  oooo oooo
+ADDC [Rd+offset16], Rs      Add reg to reg-ind w/ 16-bit offs w/ carry                              4 6     0001 S101  ssss 1ddd  oooo oooo  oooo oooo
 ADDC Rd, [Rs+]              Add reg-ind w/ autoinc to reg w/ carry                                  2 5     0001 S011  dddd 0sss
 ADDC [Rd+], Rs              Add reg-ind w/ autoinc to reg w/ carry                                  2 5     0001 S011  ssss 1ddd
-ADDC direct, Rs             Add reg to mem w/ carry                                                 3 4     0001 S110  ssss 1DDD
-ADDC Rd, direct             Add mem to reg w/ carry                                                 3 4     0001 S110  dddd 0DDD
+ADDC direct, Rs             Add reg to mem w/ carry                                                 3 4     0001 S110  ssss 1DDD  DDDD DDDD
+ADDC Rd, direct             Add mem to reg w/ carry                                                 3 4     0001 S110  dddd 0DDD  DDDD DDDD
 
 ADDC Rd, #data8             Add 8-bit imm data to reg w/ carry                                      3 3     1001 0001  dddd 0001  iiii iiii
 ADDC Rd, #data16            Add 16-bit imm data to reg w/ carry                                     4 3     1001 1001  dddd 0001  iiii iiii  iiii iiii
@@ -68,14 +68,14 @@ ADDS direct, #data4         Add 4-bit signed imm data to mem                    
 AND Rd, Rs                  Logical AND regs direct                                                 2 3     0101 S001  dddd ssss
 AND Rd, [Rs]                Logical AND reg-ind to reg                                              2 4     0101 S010  dddd 0sss
 AND [Rd], Rs                Logical AND reg to reg-ind                                              2 4     0101 S010  ssss 1ddd
-AND Rd, [Rs+offset8]        Logical AND reg-ind w/ 8-bit offs to reg                                3 6     0101 S100  dddd 0sss
-AND [Rd+offset8], Rs        Logical AND reg to reg-ind w/ 8-bit offs                                3 6     0101 S100  ssss 1ddd
-AND Rd, [Rs+offset16]       Logical AND reg-ind w/ 16-bit offs to reg                               4 6     0101 S101  dddd 0sss
-AND [Rd+offset16], Rs       Logical AND reg to reg-ind w/ 16-bit offs                               4 6     0101 S101  ssss 1ddd
+AND Rd, [Rs+offset8]        Logical AND reg-ind w/ 8-bit offs to reg                                3 6     0101 S100  dddd 0sss  oooo oooo
+AND [Rd+offset8], Rs        Logical AND reg to reg-ind w/ 8-bit offs                                3 6     0101 S100  ssss 1ddd  oooo oooo
+AND Rd, [Rs+offset16]       Logical AND reg-ind w/ 16-bit offs to reg                               4 6     0101 S101  dddd 0sss  oooo oooo  oooo oooo
+AND [Rd+offset16], Rs       Logical AND reg to reg-ind w/ 16-bit offs                               4 6     0101 S101  ssss 1ddd  oooo oooo  oooo oooo
 AND Rd, [Rs+]               Logical AND reg-ind w/ autoinc to reg                                   2 5     0101 S011  dddd 0sss
 AND [Rd+], Rs               Logical AND reg-ind w/ autoinc to reg                                   2 5     0101 S011  ssss 1ddd
-AND direct, Rs              Logical AND reg to mem                                                  3 4     0101 S110  ssss 1DDD
-AND Rd, direct              Logical AND mem to reg                                                  3 4     0101 S110  dddd 0DDD
+AND direct, Rs              Logical AND reg to mem                                                  3 4     0101 S110  ssss 1DDD  DDDD DDDD
+AND Rd, direct              Logical AND mem to reg                                                  3 4     0101 S110  dddd 0DDD  DDDD DDDD
 
 AND Rd, #data8              Logical AND 8-bit imm data to reg                                       3 3     1001 0001  dddd 0101  iiii iiii
 AND Rd, #data16             Logical AND 16-bit imm data to reg                                      4 3     1001 1001  dddd 0101  iiii iiii  iiii iiii
@@ -102,13 +102,13 @@ ASR Rd, Rs                  Arithmetic shift right dest reg by the count in the 
 ASR Rd, #data4              Arithmetic shift right reg by the 4-bit imm count                       2 a*    1101 SS10  dddd iiii
 ASR Rd, #data5              Arithmetic shift right reg by the 5-bit imm count                       2 a*    1101 1110  dddi iiii
 
-CMP Rd, Rs                  Compare dest and src regs                                               2 3
-CMP [Rd], Rs                Compare reg w/ reg-ind                                                  2 4
-CMP Rd, [Rs]                Compare reg-ind w/ reg                                                  2 4
-CMP [Rd+offset8], Rs        Compare reg w/ reg-ind w/ 8-bit offs                                    3 6
-CMP [Rd+offset16], Rs       Compare reg w/ reg-ind w/ 16-bit offs                                   4 6
-CMP Rd, [Rs+offset8]        Compare reg-ind w/ 8-bit offs w/ reg                                    3 6
+CMP Rd, Rs                  Compare dest and src regs                                               2 3     0100 S001  dddd ssss
+CMP Rd, [Rs]                Compare reg-ind w/ reg                                                  2 4     0100 S010  dddd 0sss
+CMP [Rd], Rs                Compare reg w/ reg-ind                                                  2 4     0100 S010  ssss 1ddd
+CMP Rd, [Rs+offset8]        Compare reg-ind w/ 8-bit offs w/ reg                                    3 6     0100 S100  dddd 0sss  oooo oooo
+CMP [Rd+offset8], Rs        Compare reg w/ reg-ind w/ 8-bit offs                                    3 6     0100 S100  ssss 1ddd  oooo oooo
 CMP Rd,[Rs+offset16]        Compare reg-ind w/ 16-bit offs w/ reg                                   4 6
+CMP [Rd+offset16], Rs       Compare reg w/ reg-ind w/ 16-bit offs                                   4 6
 CMP Rd, [Rs+]               Compare autoinc reg-ind w/ reg                                          2 5
 CMP [Rd+], Rs               Compare reg w/ autoinc reg-ind                                          2 5
 CMP direct, Rs              Compare reg w/ mem                                                      3 4
@@ -159,14 +159,14 @@ SEXT Rd                     Sign extend last operation to reg                   
 SUB Rd, Rs                  Subtract regs direct                                                    2 3     0010 S001  dddd ssss
 SUB Rd, [Rs]                Subtract reg-ind to reg                                                 2 4     0010 S010  dddd 0sss
 SUB [Rd], Rs                Subtract reg to reg-ind                                                 2 4     0010 S010  ssss 1ddd
-SUB Rd, [Rs+offset8]        Subtract reg-ind w/ 8-bit offs to reg                                   3 6     0010 S100  dddd 0sss
-SUB [Rd+offset8], Rs        Subtract reg to reg-ind w/ 8-bit offs                                   3 6     0010 S100  ssss 1ddd
-SUB Rd, [Rs+offset16]       Subtract reg-ind w/ 16-bit offs to reg                                  4 6     0010 S101  dddd 0sss
-SUB [Rd+offset16], Rs       Subtract reg to reg-ind w/ 16-bit offs                                  4 6     0010 S101  ssss 1ddd
+SUB Rd, [Rs+offset8]        Subtract reg-ind w/ 8-bit offs to reg                                   3 6     0010 S100  dddd 0sss  oooo oooo
+SUB [Rd+offset8], Rs        Subtract reg to reg-ind w/ 8-bit offs                                   3 6     0010 S100  ssss 1ddd  oooo oooo
+SUB Rd, [Rs+offset16]       Subtract reg-ind w/ 16-bit offs to reg                                  4 6     0010 S101  dddd 0sss  oooo oooo  oooo oooo
+SUB [Rd+offset16], Rs       Subtract reg to reg-ind w/ 16-bit offs                                  4 6     0010 S101  ssss 1ddd  oooo oooo  oooo oooo
 SUB Rd, [Rs+]               Subtract reg-ind w/ autoinc to reg                                      2 5     0010 S011  dddd 0sss
 SUB [Rd+], Rs               Subtract reg-ind w/ autoinc to reg                                      2 5     0010 S011  ssss 1ddd
-SUB direct, Rs              Subtract reg to mem                                                     3 4     0010 S110  ssss 1DDD
-SUB Rd, direct              Subtract mem to reg                                                     3 4     0010 S110  dddd 0DDD
+SUB direct, Rs              Subtract reg to mem                                                     3 4     0010 S110  ssss 1DDD  DDDD DDDD
+SUB Rd, direct              Subtract mem to reg                                                     3 4     0010 S110  dddd 0DDD  DDDD DDDD
 
 SUB Rd, #data8              Subtract 8-bit imm data to reg                                          3 3     1001 0001  dddd 0010  iiii iiii
 SUB Rd, #data16             Subtract 16-bit imm data to reg                                         4 3     1001 1001  dddd 0010  iiii iiii  iiii iiii
@@ -270,7 +270,7 @@ XOR [Rd+offset16], #data16  Logical XOR 16-bit imm data to reg-ind w/ 16-bit off
 XOR direct, #data8          Logical XOR 8-bit imm data to mem                                       4 4
 XOR direct, #data16         Logical XOR 16-bit imm data to mem                                      5 4
 
-MOV Rd, Rs                  Move reg to reg                                                         2 3
+MOV Rd, Rs                  Move reg to reg                                                         2 3     1000 S001  dddd ssss
 MOV Rd, [Rs]                Move reg-ind to reg                                                     2 3
 MOV [Rd], Rs                Move reg to reg-ind                                                     2 3
 MOV Rd, [Rs+offset8]        Move reg-ind w/ 8-bit offs to reg                                       3 5
@@ -281,11 +281,8 @@ MOV Rd, [Rs+]               Move reg-ind w/ autoinc to reg                      
 MOV [Rd+], Rs               Move reg-ind w/ autoinc to reg                                          2 4
 MOV direct, Rs              Move reg to mem                                                         3 4
 MOV Rd, direct              Move mem to reg                                                         3 4
-MOV [Rd+], [Rs+]            Move reg-ind to reg-ind, both pointers autoinc                          2 6
-MOV direct, [Rs]            Move reg-ind to mem                                                     3 4
-MOV [Rd], direct            Move mem to reg-ind                                                     3 4
 
-MOV Rd, #data8              Move 8-bit imm data to reg                                              3 3
+MOV Rd, #data8              Move 8-bit imm data to reg                                              3 3     1001 0001  dddd 1000  iiii iiii
 MOV Rd, #data16             Move 16-bit imm data to reg                                             4 3
 MOV [Rd], #data8            Move 16-bit imm data to reg-ind                                         3 3
 MOV [Rd], #data16           Move 16-bit imm data to reg-ind                                         4 3
@@ -297,9 +294,14 @@ MOV [Rd+offset16], #data8   Move 8-bit imm data to reg-ind w/ 16-bit offs       
 MOV [Rd+offset16], #data16  Move 16-bit imm data to reg-ind w/ 16-bit offs                          6 5
 MOV direct, #data8          Move 8-bit imm data to mem                                              4 3
 MOV direct, #data16         Move 16-bit imm data to mem                                             5 3
-MOV direct, direct          Move mem to mem                                                         4 4
-MOV Rd, USP                 Move User Stack Pointer to reg (system mode only)                       2 3
-MOV USP, Rs                 Move reg to User Stack Pointer (system mode only)                       2 3
+
+MOV [Rd+], [Rs+]            Move reg-ind to reg-ind, both pointers autoinc                          2 6     1001 S000  0ddd 0sss
+MOV direct, [Rs]            Move reg-ind to mem                                                     3 4     1010 S000  1sss 0DDD  DDDD DDDD
+MOV [Rd], direct            Move mem to reg-ind                                                     3 4     1010 S000  0ddd 0DDD  DDDD DDDD
+
+MOV direct, direct          Move mem to mem                                                         4 4     1001 S111  0DDD 0ddd  DDDD DDDD  dddd dddd
+MOV Rd, USP                 Move User Stack Pointer to reg (system mode only)                       2 3     1001 0000  dddd 1111
+MOV USP, Rs                 Move reg to User Stack Pointer (system mode only)                       2 3     1001 1000  ssss 1111
 
 MOVC Rd, [Rs+]              Move data from WS:Rs address of code mem to reg w/ autoinc              2 4
 MOVC A, [A+DPTR]            Move data from code mem to the accumulator ind w/ DPTR                  2 6
