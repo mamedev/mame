@@ -69,6 +69,17 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<software name="antiair">
+		<description>AntiAir</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="7941">
+				<rom name="antiair.rom" size="7941" crc="8fabe383" sha1="4d211840ea17045556b977255b9d858337335c49" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="arnodash">
 		<description>Arno Dash</description>
 		<year>2021</year>
@@ -76,6 +87,17 @@ Unoffical software releases for the Coleco Colecovision
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="arno-dash-2021.rom" size="32768" crc="ead5e824" sha1="647259250d7079ca171ea1f2d47636e810768ade" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ascend">
+		<description>Ascend</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="9371">
+				<rom name="ascend.rom" size="9371" crc="c7f84f5f" sha1="1ddcc477841cf393197f40729ae70a8a472771ea" />
 			</dataarea>
 		</part>
 	</software>
@@ -121,6 +143,17 @@ Unoffical software releases for the Coleco Colecovision
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="26878">
 				<rom name="bankruptcy-builder-2013.rom" size="26878" crc="25112f05" sha1="a797b4b2a7df9562e32c902ab6a1f89b7ffee3c8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlot">
+		<description>Battlot</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="9601">
+				<rom name="battlot.rom" size="9601" crc="115d32a3" sha1="8c44d7edf81f2234ac51422990cdfe16a280d17a" />
 			</dataarea>
 		</part>
 	</software>
@@ -240,6 +273,17 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<software name="cacorm">
+		<description>Cacorm</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="8423">
+				<rom name="cacorm.rom" size="8423" crc="60000902" sha1="59a4cb2f041b527104ca0849b1355a71d186a9af" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="caosbegn">
 		<description>Caos Begins</description>
 		<year>2016</year>
@@ -319,6 +363,17 @@ Unoffical software releases for the Coleco Colecovision
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="cold-blood-2017.rom" size="32768" crc="960f7086" sha1="3449c1aabdcfc64fe672f393be017f7c6faafc04" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cracky">
+		<description>Cracky</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="7332">
+				<rom name="cracky.rom" size="7332" crc="bb13bc66" sha1="2579ee67448f0b5cc30d447107dd17cb93b7acff" />
 			</dataarea>
 		</part>
 	</software>
@@ -600,6 +655,17 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<software name="guntus">
+		<description>Guntus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="11740">
+				<rom name="guntus.rom" size="11740" crc="64488291" sha1="df5bfad174d0b27d2be798d6ec206b92ac4c3052" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Shows 'Hang-On II' on the title screen -->
 	<software name="hangon">
 		<description>Hang-On</description>
@@ -620,6 +686,17 @@ Unoffical software releases for the Coleco Colecovision
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="heroes-arena-2017.rom" size="32768" crc="87a49761" sha1="46c31708300e4a431cc6732d2963c798aba4d7d9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopman">
+		<description>Hopman</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="9834">
+				<rom name="hopman.rom" size="9834" crc="856fc7b8" sha1="0778be62035e08cdf9adf7a8a1784f80156be73d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1770,6 +1847,17 @@ Unoffical software releases for the Coleco Colecovision
 			<feature name="slot" value="megacart" />
 			<dataarea name="rom" size="524288">
 				<rom name="wizard-of-wor-2018.rom" size="524288" crc="146fad7f" sha1="1fd0a70cc248d8d1362e20fc6030e5b70feec921" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yewdow">
+		<description>Yewdow</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="yewdow.rom" size="16384" crc="706895db" sha1="751506cf08734397d63b84993e5f9f28930290c7" />
 			</dataarea>
 		</part>
 	</software>
