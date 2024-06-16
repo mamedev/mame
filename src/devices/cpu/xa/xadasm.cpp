@@ -107,25 +107,25 @@ CMP Rd, [Rs]                Compare reg-ind w/ reg                              
 CMP [Rd], Rs                Compare reg w/ reg-ind                                                  2 4     0100 S010  ssss 1ddd
 CMP Rd, [Rs+offset8]        Compare reg-ind w/ 8-bit offs w/ reg                                    3 6     0100 S100  dddd 0sss  oooo oooo
 CMP [Rd+offset8], Rs        Compare reg w/ reg-ind w/ 8-bit offs                                    3 6     0100 S100  ssss 1ddd  oooo oooo
-CMP Rd,[Rs+offset16]        Compare reg-ind w/ 16-bit offs w/ reg                                   4 6
-CMP [Rd+offset16], Rs       Compare reg w/ reg-ind w/ 16-bit offs                                   4 6
-CMP Rd, [Rs+]               Compare autoinc reg-ind w/ reg                                          2 5
-CMP [Rd+], Rs               Compare reg w/ autoinc reg-ind                                          2 5
-CMP direct, Rs              Compare reg w/ mem                                                      3 4
-CMP Rd, direct              Compare mem w/ reg                                                      3 4
+CMP Rd,[Rs+offset16]        Compare reg-ind w/ 16-bit offs w/ reg                                   4 6     0100 S101  dddd 0sss  oooo oooo  oooo oooo
+CMP [Rd+offset16], Rs       Compare reg w/ reg-ind w/ 16-bit offs                                   4 6     0100 S101  ssss 1ddd  oooo oooo  oooo oooo
+CMP Rd, [Rs+]               Compare autoinc reg-ind w/ reg                                          2 5     0100 S011  dddd 0sss
+CMP [Rd+], Rs               Compare reg w/ autoinc reg-ind                                          2 5     0100 S011  ssss 1ddd
+CMP direct, Rs              Compare reg w/ mem                                                      3 4     0100 S110  ssss 1DDD  DDDD DDDD
+CMP Rd, direct              Compare mem w/ reg                                                      3 4     0100 S110  dddd 0DDD  DDDD DDDD
 
-CMP Rd, #data8              Compare 8-bit imm data to reg                                           3 3
-CMP Rd, #data16             Compare 16-bit imm data to reg                                          4 3
-CMP [Rd], #data8            Compare 8 -bit imm data to reg-ind                                      3 4
-CMP [Rd], #data16           Compare 16-bit imm data to reg-ind                                      4 4
-CMP [Rd+], #data8           Compare 8-bit imm data to reg-ind w/ autoinc                            3 5
-CMP [Rd+], #data16          Compare 16-bit imm data to reg-ind w/ autoinc                           4 5
-CMP [Rd+offset8], #data8    Compare 8-bit imm data to reg-ind w/ 8-bit offs                         4 6
-CMP [Rd+offset8], #data16   Compare 16-bit imm data to reg-ind w/ 8-bit offs                        5 6
-CMP [Rd+offset16], #data8   Compare 8-bit imm data to reg-ind w/ 16-bit offs                        5 6
-CMP [Rd+offset16], #data16  Compare 16-bit imm data to reg-ind w/ 16-bit offs                       6 6
-CMP direct, #data8          Compare 8-bit imm data to mem                                           4 4
-CMP direct, #data16         Compare 16-bit imm data to mem                                          5 4
+CMP Rd, #data8              Compare 8-bit imm data to reg                                           3 3     1001 0001  dddd 0100  iiii iiii
+CMP Rd, #data16             Compare 16-bit imm data to reg                                          4 3     1001 1001  dddd 0100  iiii iiii  iiii iiii
+CMP [Rd], #data8            Compare 8 -bit imm data to reg-ind                                      3 4     1001 0010  0ddd 0100  iiii iiii
+CMP [Rd], #data16           Compare 16-bit imm data to reg-ind                                      4 4     1001 1010  0ddd 0100  iiii iiii  iiii iiii
+CMP [Rd+], #data8           Compare 8-bit imm data to reg-ind w/ autoinc                            3 5     1001 0011  0ddd 0100  iiii iiii
+CMP [Rd+], #data16          Compare 16-bit imm data to reg-ind w/ autoinc                           4 5     1001 1011  0ddd 0100  iiii iiii  iiii iiii
+CMP [Rd+offset8], #data8    Compare 8-bit imm data to reg-ind w/ 8-bit offs                         4 6     1001 0100  0ddd 0100  oooo oooo  iiii iiii
+CMP [Rd+offset8], #data16   Compare 16-bit imm data to reg-ind w/ 8-bit offs                        5 6     1001 1100  0ddd 0100  oooo oooo  iiii iiii  iiii iiii
+CMP [Rd+offset16], #data8   Compare 8-bit imm data to reg-ind w/ 16-bit offs                        5 6     1001 0101  0ddd 0100  oooo oooo  oooo oooo  iiii iiii
+CMP [Rd+offset16], #data16  Compare 16-bit imm data to reg-ind w/ 16-bit offs                       6 6     1001 1101  0ddd 0100  oooo oooo  oooo oooo  iiii iiii  iiii iiii 
+CMP direct, #data8          Compare 8-bit imm data to mem                                           4 4     1001 0110  0DDD 0100  DDDD DDDD  iiii iiii
+CMP direct, #data16         Compare 16-bit imm data to mem                                          5 4     1001 1110  0DDD 0100  DDDD DDDD  iiii iiii  iiii iiii
 
 DA Rd                       Decimal Adjust byte reg                                                 2 4
 
@@ -181,30 +181,30 @@ SUB [Rd+offset16], #data16  Subtract 16-bit imm data to reg-ind w/ 16-bit offs  
 SUB direct, #data8          Subtract 8-bit imm data to mem                                          4 4     1001 0110  0DDD 0010  DDDD DDDD  iiii iiii
 SUB direct, #data16         Subtract 16-bit imm data to mem                                         5 4     1001 1110  0DDD 0010  DDDD DDDD  iiii iiii  iiii iiii
 
-SUBB Rd, Rs                 Subtract w/ borrow regs direct                                          2 3
-SUBB Rd, [Rs]               Subtract w/ borrow reg-ind to reg                                       2 4
-SUBB [Rd], Rs               Subtract w/ borrow reg to reg-ind                                       2 4
-SUBB Rd, [Rs+offset8]       Subtract w/ borrow reg-ind w/ 8-bit offs to reg                         3 6
-SUBB [Rd+offset8], Rs       Subtract w/ borrow reg to reg-ind w/ 8-bit offs                         3 6
-SUBB Rd, [Rs+offset16]      Subtract w/ borrow reg-ind w/ 16-bit offs to reg                        4 6
-SUBB [Rd+offset16], Rs      Subtract w/ borrow reg to reg-ind w/ 16-bit offs                        4 6
-SUBB Rd, [Rs+]              Subtract w/ borrow reg-ind w/ autoinc to reg                            2 5
-SUBB [Rd+], Rs              Subtract w/ borrow reg-ind w/ autoinc to reg                            2 5
-SUBB direct, Rs             Subtract w/ borrow reg to mem                                           3 4
-SUBB Rd, direct             Subtract w/ borrow mem to reg                                           3 4
+SUBB Rd, Rs                 Subtract w/ borrow regs direct                                          2 3     0011 S001  dddd ssss
+SUBB Rd, [Rs]               Subtract w/ borrow reg-ind to reg                                       2 4     0011 S010  dddd 0sss
+SUBB [Rd], Rs               Subtract w/ borrow reg to reg-ind                                       2 4     0011 S010  ssss 1ddd
+SUBB Rd, [Rs+offset8]       Subtract w/ borrow reg-ind w/ 8-bit offs to reg                         3 6     0011 S100  dddd 0sss  oooo oooo
+SUBB [Rd+offset8], Rs       Subtract w/ borrow reg to reg-ind w/ 8-bit offs                         3 6     0011 S100  ssss 1ddd  oooo oooo
+SUBB Rd, [Rs+offset16]      Subtract w/ borrow reg-ind w/ 16-bit offs to reg                        4 6     0011 S101  dddd 0sss  oooo oooo  oooo oooo
+SUBB [Rd+offset16], Rs      Subtract w/ borrow reg to reg-ind w/ 16-bit offs                        4 6     0011 S101  ssss 1ddd  oooo oooo  oooo oooo
+SUBB Rd, [Rs+]              Subtract w/ borrow reg-ind w/ autoinc to reg                            2 5     0011 S011  dddd 0sss
+SUBB [Rd+], Rs              Subtract w/ borrow reg-ind w/ autoinc to reg                            2 5     0011 S011  ssss 1ddd
+SUBB direct, Rs             Subtract w/ borrow reg to mem                                           3 4     0011 S110  ssss 1DDD  DDDD DDDD
+SUBB Rd, direct             Subtract w/ borrow mem to reg                                           3 4     0011 S110  dddd 0DDD  DDDD DDDD
 
-SUBB Rd, #data8             Subtract w/ borrow 8-bit imm data to reg                                3 3
-SUBB Rd, #data16            Subtract w/ borrow 16-bit imm data to reg                               4 3
-SUBB [Rd], #data8           Subtract w/ borrow 8-bit imm data to reg-ind                            3 4
-SUBB [Rd], #data16          Subtract w/ borrow 16-bit imm data to reg-ind                           4 4
-SUBB [Rd+], #data8          Subtract w/ borrow 8-bit imm data to reg-ind w/ autoinc                 3 5
-SUBB [Rd+], #data16         Subtract w/ borrow 16-bit imm data to reg-ind w/ autoinc                4 5
-SUBB [Rd+offset8], #data8   Subtract w/ borrow 8-bit imm data to reg-ind w/ 8-bit offs              4 6
-SUBB [Rd+offset8], #data16  Subtract w/ borrow 16-bit imm data to reg-ind w/ 8-bit offs             5 6
-SUBB [Rd+offset16], #data8  Subtract w/ borrow 8-bit imm data to reg-ind w/ 16-bit offs             5 6
-SUBB [Rd+offset16], #data16 Subtract w/ borrow 16-bit imm data to reg-ind w/ 16-bit offs            6 6
-SUBB direct, #data8         Subtract w/ borrow 8-bit imm data to mem                                4 4
-SUBB direct, #data16        Subtract w/ borrow 16-bit imm data to mem                               5 4
+SUBB Rd, #data8             Subtract w/ borrow 8-bit imm data to reg                                3 3     1001 0001  dddd 0011  iiii iiii
+SUBB Rd, #data16            Subtract w/ borrow 16-bit imm data to reg                               4 3     1001 1001  dddd 0011  iiii iiii  iiii iiii
+SUBB [Rd], #data8           Subtract w/ borrow 8-bit imm data to reg-ind                            3 4     1001 0010  0ddd 0011  iiii iiii
+SUBB [Rd], #data16          Subtract w/ borrow 16-bit imm data to reg-ind                           4 4     1001 1010  0ddd 0011  iiii iiii  iiii iiii
+SUBB [Rd+], #data8          Subtract w/ borrow 8-bit imm data to reg-ind w/ autoinc                 3 5     1001 0011  0ddd 0011  iiii iiii
+SUBB [Rd+], #data16         Subtract w/ borrow 16-bit imm data to reg-ind w/ autoinc                4 5     1001 1011  0ddd 0011  iiii iiii  iiii iiii
+SUBB [Rd+offset8], #data8   Subtract w/ borrow 8-bit imm data to reg-ind w/ 8-bit offs              4 6     1001 0100  0ddd 0011  oooo oooo  iiii iiii
+SUBB [Rd+offset8], #data16  Subtract w/ borrow 16-bit imm data to reg-ind w/ 8-bit offs             5 6     1001 1100  0ddd 0011  oooo oooo  iiii iiii  iiii iiii
+SUBB [Rd+offset16], #data8  Subtract w/ borrow 8-bit imm data to reg-ind w/ 16-bit offs             5 6     1001 0101  0ddd 0011  oooo oooo  oooo oooo  iiii iiii
+SUBB [Rd+offset16], #data16 Subtract w/ borrow 16-bit imm data to reg-ind w/ 16-bit offs            6 6     1001 1101  0ddd 0011  oooo oooo  oooo oooo  iiii iiii  iiii iiii 
+SUBB direct, #data8         Subtract w/ borrow 8-bit imm data to mem                                4 4     1001 0110  0DDD 0011  DDDD DDDD  iiii iiii
+SUBB direct, #data16        Subtract w/ borrow 16-bit imm data to mem                               5 4     1001 1110  0DDD 0011  DDDD DDDD  iiii iiii  iiii iiii
 
 CPL Rd                      Complement (ones complement) reg                                        2 3
 
@@ -212,30 +212,30 @@ LSR Rd, Rs                  Logical right shift dest reg by the value in the src
 LSR Rd, #data4              Logical right shift reg by the 4-bit imm value                          2 a*
 NORM Rd, Rs                 Logical shift left dest reg by the value in the src reg until MSB set   2 a*
 
-OR Rd, Rs                   Logical OR regs                                                         2 3
-OR Rd, [Rs]                 Logical OR reg-ind to reg                                               2 4
-OR [Rd], Rs                 Logical OR reg to reg-ind                                               2 4
-OR Rd, [Rs+offset8]         Logical OR reg-ind w/ 8-bit offs to reg                                 3 6
-OR [Rd+offset8], Rs         Logical OR reg to reg-ind w/ 8-bit offs                                 3 6
-OR Rd, [Rs+offset16]        Logical OR reg-ind w/ 16-bit offs to reg                                4 6
-OR [Rd+offset16], Rs        Logical OR reg to reg-ind w/ 16-bit offs                                4 6
-OR Rd, [Rs+]                Logical OR reg-ind w/ autoinc to reg                                    2 5
-OR [Rd+], Rs                Logical OR reg-ind w/ autoinc to reg                                    2 5
-OR direct, Rs               Logical OR reg to mem                                                   3 4
-OR Rd, direct               Logical OR mem to reg                                                   3 4
+OR Rd, Rs                   Logical OR regs                                                         2 3     0110 S001  dddd ssss
+OR Rd, [Rs]                 Logical OR reg-ind to reg                                               2 4     0110 S010  dddd 0sss
+OR [Rd], Rs                 Logical OR reg to reg-ind                                               2 4     0110 S010  ssss 1ddd
+OR Rd, [Rs+offset8]         Logical OR reg-ind w/ 8-bit offs to reg                                 3 6     0110 S100  dddd 0sss  oooo oooo
+OR [Rd+offset8], Rs         Logical OR reg to reg-ind w/ 8-bit offs                                 3 6     0110 S100  ssss 1ddd  oooo oooo
+OR Rd, [Rs+offset16]        Logical OR reg-ind w/ 16-bit offs to reg                                4 6     0110 S101  dddd 0sss  oooo oooo  oooo oooo
+OR [Rd+offset16], Rs        Logical OR reg to reg-ind w/ 16-bit offs                                4 6     0110 S101  ssss 1ddd  oooo oooo  oooo oooo
+OR Rd, [Rs+]                Logical OR reg-ind w/ autoinc to reg                                    2 5     0110 S011  dddd 0sss
+OR [Rd+], Rs                Logical OR reg-ind w/ autoinc to reg                                    2 5     0110 S011  ssss 1ddd
+OR direct, Rs               Logical OR reg to mem                                                   3 4     0110 S110  ssss 1DDD  DDDD DDDD
+OR Rd, direct               Logical OR mem to reg                                                   3 4     0110 S110  dddd 0DDD  DDDD DDDD
 
-OR Rd, #data8               Logical OR 8-bit imm data to reg                                        3 3
-OR Rd, #data16              Logical OR 16-bit imm data to reg                                       4 3
-OR [Rd], #data8             Logical OR 8-bit imm data to reg-ind                                    3 4
-OR [Rd], #data16            Logical OR 16-bit imm data to reg-ind                                   4 4
-OR [Rd+], #data8            Logical OR 8-bit imm data to reg-ind w/ autoinc                         3 5
-OR [Rd+], #data16           Logical OR 16-bit imm data to reg-ind w/ autoinc                        4 5
-OR [Rd+offset8], #data8     Logical OR 8-bit imm data to reg-ind w/ 8-bit offs                      4 6
-OR [Rd+offset8], #data16    Logical OR 16-bit imm data to reg-ind w/ 8-bit offs                     5 6
-OR [Rd+offset16], #data8    Logical OR 8-bit imm data to reg-ind w/ 16-bit offs                     5 6
-OR [Rd+offset16], #data16   Logical OR 16-bit imm data to reg-ind w/ 16-bit offs                    6 6
-OR direct, #data8           Logical OR 8-bit imm data to mem                                        4 4
-OR direct, #data16          Logical OR 16-bit imm data to mem                                       5 4
+OR Rd, #data8               Logical OR 8-bit imm data to reg                                        3 3     1001 0001  dddd 0110  iiii iiii
+OR Rd, #data16              Logical OR 16-bit imm data to reg                                       4 3     1001 1001  dddd 0110  iiii iiii  iiii iiii
+OR [Rd], #data8             Logical OR 8-bit imm data to reg-ind                                    3 4     1001 0010  0ddd 0110  iiii iiii
+OR [Rd], #data16            Logical OR 16-bit imm data to reg-ind                                   4 4     1001 1010  0ddd 0110  iiii iiii  iiii iiii
+OR [Rd+], #data8            Logical OR 8-bit imm data to reg-ind w/ autoinc                         3 5     1001 0011  0ddd 0110  iiii iiii
+OR [Rd+], #data16           Logical OR 16-bit imm data to reg-ind w/ autoinc                        4 5     1001 1011  0ddd 0110  iiii iiii  iiii iiii
+OR [Rd+offset8], #data8     Logical OR 8-bit imm data to reg-ind w/ 8-bit offs                      4 6     1001 0100  0ddd 0110  oooo oooo  iiii iiii
+OR [Rd+offset8], #data16    Logical OR 16-bit imm data to reg-ind w/ 8-bit offs                     5 6     1001 1100  0ddd 0110  oooo oooo  iiii iiii  iiii iiii
+OR [Rd+offset16], #data8    Logical OR 8-bit imm data to reg-ind w/ 16-bit offs                     5 6     1001 0101  0ddd 0110  oooo oooo  oooo oooo  iiii iiii
+OR [Rd+offset16], #data16   Logical OR 16-bit imm data to reg-ind w/ 16-bit offs                    6 6     1001 1101  0ddd 0110  oooo oooo  oooo oooo  iiii iiii  iiii iiii 
+OR direct, #data8           Logical OR 8-bit imm data to mem                                        4 4     1001 0110  0DDD 0110  DDDD DDDD  iiii iiii
+OR direct, #data16          Logical OR 16-bit imm data to mem                                       5 4     1001 1110  0DDD 0110  DDDD DDDD  iiii iiii  iiii iiii
 
 RL Rd, #data4               Rotate left reg by the 4-bit imm value                                  2 a*
 
@@ -245,55 +245,55 @@ RR Rd, #data4               Rotate right reg by the 4-bit imm value             
 
 RRC Rd, #data4              Rotate right reg though carry by the 4-bit imm value                    2 a*
 
-XOR Rd, Rs                  Logical XOR regs                                                        2 3
-XOR Rd, [Rs]                Logical XOR reg-ind to reg                                              2 4
-XOR [Rd], Rs                Logical XOR reg to reg-ind                                              2 4
-XOR Rd, [Rs+offset8]        Logical XOR reg-ind w/ 8-bit offs to reg                                3 6
-XOR [Rd+offset8], Rs        Logical XOR reg to reg-ind w/ 8-bit offs                                3 6
-XOR Rd, [Rs+offset16]       Logical XOR reg-ind w/ 16-bit offs to reg                               4 6
-XOR [Rd+offset16], Rs       Logical XOR reg to reg-ind w/ 16-bit offs                               4 6
-XOR Rd, [Rs+]               Logical XOR reg-ind w/ autoinc to reg                                   2 5
-XOR [Rd+], Rs               Logical XOR reg-ind w/ autoinc to reg                                   2 5
-XOR direct, Rs              Logical XOR reg to mem                                                  3 4
-XOR Rd, direct              Logical XOR mem to reg                                                  3 4
+XOR Rd, Rs                  Logical XOR regs                                                        2 3     0111 S001  dddd ssss
+XOR Rd, [Rs]                Logical XOR reg-ind to reg                                              2 4     0111 S010  dddd 0sss
+XOR [Rd], Rs                Logical XOR reg to reg-ind                                              2 4     0111 S010  ssss 1ddd
+XOR Rd, [Rs+offset8]        Logical XOR reg-ind w/ 8-bit offs to reg                                3 6     0111 S100  dddd 0sss  oooo oooo
+XOR [Rd+offset8], Rs        Logical XOR reg to reg-ind w/ 8-bit offs                                3 6     0111 S100  ssss 1ddd  oooo oooo
+XOR Rd, [Rs+offset16]       Logical XOR reg-ind w/ 16-bit offs to reg                               4 6     0111 S101  dddd 0sss  oooo oooo  oooo oooo
+XOR [Rd+offset16], Rs       Logical XOR reg to reg-ind w/ 16-bit offs                               4 6     0111 S101  ssss 1ddd  oooo oooo  oooo oooo
+XOR Rd, [Rs+]               Logical XOR reg-ind w/ autoinc to reg                                   2 5     0111 S011  dddd 0sss
+XOR [Rd+], Rs               Logical XOR reg-ind w/ autoinc to reg                                   2 5     0111 S011  ssss 1ddd
+XOR direct, Rs              Logical XOR reg to mem                                                  3 4     0111 S110  ssss 1DDD  DDDD DDDD
+XOR Rd, direct              Logical XOR mem to reg                                                  3 4     0111 S110  dddd 0DDD  DDDD DDDD
 
-XOR Rd, #data8              Logical XOR 8-bit imm data to reg                                       3 3
-XOR Rd, #data16             Logical XOR 16-bit imm data to reg                                      4 3
-XOR [Rd], #data8            Logical XOR 8-bit imm data to reg-ind                                   3 4
-XOR [Rd], #data16           Logical XOR 16-bit imm data to reg-ind                                  4 4
-XOR [Rd+], #data8           Logical XOR 8-bit imm data to reg-ind w/ autoinc                        3 5
-XOR [Rd+], #data16          Logical XOR 16-bit imm data to reg-ind w/ autoinc                       4 5
-XOR [Rd+offset8], #data8    Logical XOR 8-bit imm data to reg-ind w/ 8-bit offs                     4 6
-XOR [Rd+offset8], #data16   Logical XOR 16-bit imm data to reg-ind w/ 8-bit offs                    5 6
-XOR [Rd+offset16], #data8   Logical XOR 8-bit imm data to reg-ind w/ 16-bit offs                    5 6
-XOR [Rd+offset16], #data16  Logical XOR 16-bit imm data to reg-ind w/ 16-bit offs                   6 6
-XOR direct, #data8          Logical XOR 8-bit imm data to mem                                       4 4
-XOR direct, #data16         Logical XOR 16-bit imm data to mem                                      5 4
+XOR Rd, #data8              Logical XOR 8-bit imm data to reg                                       3 3     1001 0001  dddd 0111  iiii iiii
+XOR Rd, #data16             Logical XOR 16-bit imm data to reg                                      4 3     1001 1001  dddd 0111  iiii iiii  iiii iiii
+XOR [Rd], #data8            Logical XOR 8-bit imm data to reg-ind                                   3 4     1001 0010  0ddd 0111  iiii iiii
+XOR [Rd], #data16           Logical XOR 16-bit imm data to reg-ind                                  4 4     1001 1010  0ddd 0111  iiii iiii  iiii iiii
+XOR [Rd+], #data8           Logical XOR 8-bit imm data to reg-ind w/ autoinc                        3 5     1001 0011  0ddd 0111  iiii iiii
+XOR [Rd+], #data16          Logical XOR 16-bit imm data to reg-ind w/ autoinc                       4 5     1001 1011  0ddd 0111  iiii iiii  iiii iiii
+XOR [Rd+offset8], #data8    Logical XOR 8-bit imm data to reg-ind w/ 8-bit offs                     4 6     1001 0100  0ddd 0111  oooo oooo  iiii iiii
+XOR [Rd+offset8], #data16   Logical XOR 16-bit imm data to reg-ind w/ 8-bit offs                    5 6     1001 1100  0ddd 0111  oooo oooo  iiii iiii  iiii iiii
+XOR [Rd+offset16], #data8   Logical XOR 8-bit imm data to reg-ind w/ 16-bit offs                    5 6     1001 0101  0ddd 0111  oooo oooo  oooo oooo  iiii iiii
+XOR [Rd+offset16], #data16  Logical XOR 16-bit imm data to reg-ind w/ 16-bit offs                   6 6     1001 1101  0ddd 0111  oooo oooo  oooo oooo  iiii iiii  iiii iiii 
+XOR direct, #data8          Logical XOR 8-bit imm data to mem                                       4 4     1001 0110  0DDD 0111  DDDD DDDD  iiii iiii
+XOR direct, #data16         Logical XOR 16-bit imm data to mem                                      5 4     1001 1110  0DDD 0111  DDDD DDDD  iiii iiii  iiii iiii
 
 MOV Rd, Rs                  Move reg to reg                                                         2 3     1000 S001  dddd ssss
-MOV Rd, [Rs]                Move reg-ind to reg                                                     2 3
-MOV [Rd], Rs                Move reg to reg-ind                                                     2 3
-MOV Rd, [Rs+offset8]        Move reg-ind w/ 8-bit offs to reg                                       3 5
-MOV [Rd+offset8], Rs        Move reg to reg-ind w/ 8-bit offs                                       3 5
-MOV Rd, [Rs+offset16]       Move reg-ind w/ 16-bit offs to reg                                      4 5
-MOV [Rd+offset16], Rs       Move reg to reg-ind w/ 16-bit offs                                      4 5
-MOV Rd, [Rs+]               Move reg-ind w/ autoinc to reg                                          2 4
-MOV [Rd+], Rs               Move reg-ind w/ autoinc to reg                                          2 4
-MOV direct, Rs              Move reg to mem                                                         3 4
-MOV Rd, direct              Move mem to reg                                                         3 4
+MOV Rd, [Rs]                Move reg-ind to reg                                                     2 3     1000 S010  dddd 0sss
+MOV [Rd], Rs                Move reg to reg-ind                                                     2 3     1000 S010  ssss 1ddd
+MOV Rd, [Rs+offset8]        Move reg-ind w/ 8-bit offs to reg                                       3 5     1000 S100  dddd 0sss  oooo oooo
+MOV [Rd+offset8], Rs        Move reg to reg-ind w/ 8-bit offs                                       3 5     1000 S100  ssss 1ddd  oooo oooo
+MOV Rd, [Rs+offset16]       Move reg-ind w/ 16-bit offs to reg                                      4 5     1000 S101  dddd 0sss  oooo oooo  oooo oooo
+MOV [Rd+offset16], Rs       Move reg to reg-ind w/ 16-bit offs                                      4 5     1000 S101  ssss 1ddd  oooo oooo  oooo oooo
+MOV Rd, [Rs+]               Move reg-ind w/ autoinc to reg                                          2 4     1000 S011  dddd 0sss
+MOV [Rd+], Rs               Move reg-ind w/ autoinc to reg                                          2 4     1000 S011  ssss 1ddd
+MOV direct, Rs              Move reg to mem                                                         3 4     1000 S110  ssss 1DDD  DDDD DDDD
+MOV Rd, direct              Move mem to reg                                                         3 4     1000 S110  dddd 0DDD  DDDD DDDD
 
 MOV Rd, #data8              Move 8-bit imm data to reg                                              3 3     1001 0001  dddd 1000  iiii iiii
-MOV Rd, #data16             Move 16-bit imm data to reg                                             4 3
-MOV [Rd], #data8            Move 16-bit imm data to reg-ind                                         3 3
-MOV [Rd], #data16           Move 16-bit imm data to reg-ind                                         4 3
-MOV [Rd+], #data8           Move 8-bit imm data to reg-ind w/ autoinc                               3 4
-MOV [Rd+], #data16          Move 16-bit imm data to reg-ind w/ autoinc                              4 4
-MOV [Rd+offset8], #data8    Move 8-bit imm data to reg-ind w/ 8-bit offs                            4 5
-MOV [Rd+offset8], #data16   Move 16-bit imm data to reg-ind w/ 8-bit offs                           5 5
-MOV [Rd+offset16], #data8   Move 8-bit imm data to reg-ind w/ 16-bit offs                           5 5
-MOV [Rd+offset16], #data16  Move 16-bit imm data to reg-ind w/ 16-bit offs                          6 5
-MOV direct, #data8          Move 8-bit imm data to mem                                              4 3
-MOV direct, #data16         Move 16-bit imm data to mem                                             5 3
+MOV Rd, #data16             Move 16-bit imm data to reg                                             4 3     1001 1001  dddd 1000  iiii iiii  iiii iiii
+MOV [Rd], #data8            Move 16-bit imm data to reg-ind                                         3 3     1001 0010  0ddd 1000  iiii iiii
+MOV [Rd], #data16           Move 16-bit imm data to reg-ind                                         4 3     1001 1010  0ddd 1000  iiii iiii  iiii iiii
+MOV [Rd+], #data8           Move 8-bit imm data to reg-ind w/ autoinc                               3 4     1001 0011  0ddd 1000  iiii iiii
+MOV [Rd+], #data16          Move 16-bit imm data to reg-ind w/ autoinc                              4 4     1001 1011  0ddd 1000  iiii iiii  iiii iiii
+MOV [Rd+offset8], #data8    Move 8-bit imm data to reg-ind w/ 8-bit offs                            4 5     1001 0100  0ddd 1000  oooo oooo  iiii iiii
+MOV [Rd+offset8], #data16   Move 16-bit imm data to reg-ind w/ 8-bit offs                           5 5     1001 1100  0ddd 1000  oooo oooo  iiii iiii  iiii iiii
+MOV [Rd+offset16], #data8   Move 8-bit imm data to reg-ind w/ 16-bit offs                           5 5     1001 0101  0ddd 1000  oooo oooo  oooo oooo  iiii iiii
+MOV [Rd+offset16], #data16  Move 16-bit imm data to reg-ind w/ 16-bit offs                          6 5     1001 1101  0ddd 1000  oooo oooo  oooo oooo  iiii iiii  iiii iiii 
+MOV direct, #data8          Move 8-bit imm data to mem                                              4 3     1001 0110  0DDD 1000  DDDD DDDD  iiii iiii
+MOV direct, #data16         Move 16-bit imm data to mem                                             5 3     1001 1110  0DDD 1000  DDDD DDDD  iiii iiii  iiii iiii
 
 MOV [Rd+], [Rs+]            Move reg-ind to reg-ind, both pointers autoinc                          2 6     1001 S000  0ddd 0sss
 MOV direct, [Rs]            Move reg-ind to mem                                                     3 4     1010 S000  1sss 0DDD  DDDD DDDD

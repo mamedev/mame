@@ -6,6 +6,8 @@
    this is a distinct architecture.  The opcode set does extend on an 80c51, and tools were provided to
    help convert 80c51 sources to run on the XA architecture, but the encoding is entirely different and
    there is no binary compatibility.
+
+   https://www.ceibo.com/eng/datasheets/Philips-XA-User-Guide.pdf 
 */
 
 #include "emu.h"
