@@ -1200,6 +1200,25 @@ if opt_tool(CPUS, "AXC51") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/acx51/axc51dasm.h")
 end
 
+
+--------------------------------------------------
+-- Philips XA (80c51 inspired)
+--@src/devices/cpu/xa/xa.h,CPUS["XA"] = true
+--------------------------------------------------
+
+if CPUS["XA"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/xa/xa.cpp",
+		MAME_DIR .. "src/devices/cpu/xa/xa.h",
+	}
+end
+
+if opt_tool(CPUS, "XA") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/xa/xadasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/xa/xadasm.h")
+end
+
+
 --------------------------------------------------
 -- Intel MCS-96
 --@src/devices/cpu/mcs96/mcs96.h,CPUS["MCS96"] = true
