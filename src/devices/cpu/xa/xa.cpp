@@ -7,7 +7,7 @@
    help convert 80c51 sources to run on the XA architecture, but the encoding is entirely different and
    there is no binary compatibility.
 
-   https://www.ceibo.com/eng/datasheets/Philips-XA-User-Guide.pdf 
+   https://www.ceibo.com/eng/datasheets/Philips-XA-User-Guide.pdf
 */
 
 #include "emu.h"
