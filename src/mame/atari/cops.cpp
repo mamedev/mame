@@ -10,17 +10,24 @@
     Bad Boys by Inner Circle, so there is musical accompaniment to areas
     where the laserdisc audio is muted.
 
-    The different games here have subtly different control PCBs COPS has an Atari
+    The different games here have subtly different control PCBs. COPS has an Atari
     part number (58-12B), while Revelations simply refers to a Lasermax control PCB
-    (Lasermax being the consumer name for the LDP series)
+    (Lasermax being the consumer name for the LDP series).
+	COPS, Street Viper and all other Nova Productions laserdisc games run on forms of this
+	hardware.
 
-    NOTES: To boot up Revelations, turn the refill key (R) and press button A
+    NOTES: To first boot up Revelations, turn the refill key (R) and press button A
     to init NVRAM.
 
     TODO: There are probably more ROMs for Revelations and related, the disc
     contains full data for a non-payout US release of the game called 'Vision Quest'.
     However, the Vision Quest Laserdisc for the USA is slightly different, with 
     Revelations specific data seemingly replaced with black level.
+	We have a disc image for Vision Quest in full, but no ROM
+
+	BTANB for Revelations:
+	Game options cannot be adjusted, any attempt to do so resets the machine (seen on real hardware)
+	Volume control cycles in the 'Stereo' test, but cannot be tested.
 
 
     This should be similar hardware for Street Viper if we get a dump.
