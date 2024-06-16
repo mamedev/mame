@@ -66,6 +66,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "tek4404.lh"
+
 #define VERBOSE 1
 #include "logmacro.h"
 
@@ -114,6 +116,10 @@ public:
 		m_mousex(*this, "mousex"),
 		m_mousey(*this, "mousey"),
 		m_mousebtn(*this, "mousebtn"),
+		m_led_1(*this, "led_1"),
+		m_led_2(*this, "led_2"),
+		m_led_4(*this, "led_4"),
+		m_led_8(*this, "led_8"),
 		m_boot(false),
 		m_map_control(0),
 		m_kb_rdata(true),
@@ -198,6 +204,11 @@ private:
 	required_ioport m_mousey;
 	required_ioport m_mousebtn;
 	
+	output_finder<> m_led_1;
+	output_finder<> m_led_2;
+	output_finder<> m_led_4;
+	output_finder<> m_led_8;
+
 	int m_u244latch;
 	
 	bool m_boot;
@@ -206,7 +217,6 @@ private:
 	bool m_kb_tdata;
 	bool m_kb_rclamp;
 	bool m_kb_loop;
-	u8 m_leds;
 	u8 m_videoaddr[4];
 	u8 m_videocntl;
 	u8 m_diag;
@@ -228,6 +238,11 @@ void tek440x_state::machine_start()
 	save_item(NAME(m_kb_tdata));
 	save_item(NAME(m_kb_rclamp));
 	save_item(NAME(m_kb_loop));
+	
+	m_led_1.resolve();
+	m_led_2.resolve();
+	m_led_4.resolve();
+	m_led_8.resolve();
 }
 
 
@@ -511,8 +526,13 @@ void tek440x_state::sound_w(u8 data)
 void tek440x_state::led_w(u8 data)
 {
 
-	m_leds = data;
-	LOG("LED %c%c%c%c\n",m_leds & 8 ? '*' : '-',m_leds & 4 ? '*' : '-',m_leds & 2 ? '*' : '-',m_leds & 1 ? '*' : '-');
+	LOG("LED %c%c%c%c\n",data & 8 ? '*' : '-',data & 4 ? '*' : '-',data & 2 ? '*' : '-',data & 1 ? '*' : '-');
+
+	m_led_1 = !BIT(data, 0);
+	m_led_2 = !BIT(data, 1);
+	m_led_4 = !BIT(data, 2);
+	m_led_8 = !BIT(data, 3);
+
 }
 
 u8 tek440x_state::diag_r()
@@ -880,6 +900,8 @@ void tek440x_state::tek4404(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	SN76496(config, m_snsnd, 25.2_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
+	
+	config.set_default_layout(layout_tek4404);
 }
 
 
@@ -909,4 +931,4 @@ ROM_END
  *
  *************************************/
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME                               FLAGS
-COMP( 1984, tek4404, 0,      0,      tek4404, tek4404, tek440x_state, empty_init, "Tektronix", "4404 Artificial Intelligence System", MACHINE_NOT_WORKING )
+COMP( 1984, tek4404, 0,      0,      tek4404, tek4404, tek440x_state, empty_init, "Tektronix", "4404 Artificial Intelligence System", MACHINE_NOT_WORKING  )
