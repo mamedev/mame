@@ -19,6 +19,7 @@ ADD Rd, [Rs+]               Add reg-ind w/ autoinc to reg                       
 ADD [Rd+], Rs               Add reg-ind w/ autoinc to reg                                           2 5     0000 S011  dddd 1sss
 ADD direct, Rs              Add reg to mem                                                          3 4     0000 S110  ssss 1DDD
 ADD Rd, direct              Add mem to reg                                                          3 4     0000 S110  dddd 0DDD
+
 ADD Rd, #data8              Add 8-bit imm data to reg                                               3 3     1001 0001  dddd 0000  iiii iiii
 ADD Rd, #data16             Add 16-bit imm data to reg                                              4 3     1001 1001  dddd 0000  iiii iiii  iiii iiii
 ADD [Rd], #data8            Add 8-bit imm data to reg-ind                                           3 4     1001 0010  0ddd 0000  iiii iiii
@@ -32,42 +33,74 @@ ADD [Rd+offset16], #data16  Add 16-bit imm data to reg-ind w/ 16-bit offs       
 ADD direct, #data8          Add 8-bit imm data to mem                                               4 4     1001 0110  0DDD 0000  DDDD DDDD  iiii iiii
 ADD direct, #data16         Add 16-bit imm data to mem                                              5 4     1001 1110  0DDD 0000  DDDD DDDD  iiii iiii  iiii iiii
 
-ADDC Rd, Rs                 Add regs direct w/ carry                                                2 3
-ADDC Rd, [Rs]               Add reg-ind to reg w/ carry                                             2 4
-ADDC [Rd], Rs               Add reg to reg-ind w/ carry                                             2 4
-ADDC Rd, [Rs+offset8]       Add reg-ind w/ 8-bit offs to reg w/ carry                               3 6
-ADDC [Rd+offset8], Rs       Add reg to reg-ind w/ 8-bit offs w/ carry                               3 6
-ADDC Rd, [Rs+offset16]      Add reg-ind w/ 16-bit offs to reg w/ carry                              4 6
-ADDC [Rd+offset16], Rs      Add reg to reg-ind w/ 16-bit offs w/ carry                              4 6
-ADDC Rd, [Rs+]              Add reg-ind w/ autoinc to reg w/ carry                                  2 5
-ADDC [Rd+], Rs              Add reg-ind w/ autoinc to reg w/ carry                                  2 5
-ADDC direct, Rs             Add reg to mem w/ carry                                                 3 4
-ADDC Rd, direct             Add mem to reg w/ carry                                                 3 4
-ADDC Rd, #data8             Add 8-bit imm data to reg w/ carry                                      3 3
-ADDC Rd, #data16            Add 16-bit imm data to reg w/ carry                                     4 3
-ADDC [Rd], #data8           Add 16-bit imm data to reg-ind w/ carry                                 3 4
-ADDC [Rd], #data16          Add 16-bit imm data to reg-ind w/ carry                                 4 4
-ADDC [Rd+], #data8          Add 8-bit imm data to reg-ind and autoinc w/ carry                      3 5
-ADDC [Rd+], #data16         Add 16-bit imm data to reg-ind and autoinc w/ carry                     4 5
-ADDC [Rd+offset8], #data8   Add 8-bit imm data to reg-ind w/ 8-bit offs and carry                   4 6
-ADDC [Rd+offset8], #data16  Add 16-bit imm data to reg-ind w/ 8-bit offs and carry                  5 6
-ADDC [Rd+offset16], #data8  Add 8-bit imm data to reg-ind w/ 16-bit offs and carry                  5 6
-ADDC [Rd+offset16], #data16 Add 16-bit imm data to reg-ind w/ 16-bit offs and carry                 6 6
-ADDC direct, #data8         Add 8-bit imm data to mem w/ carry                                      4 4
-ADDC direct, #data16        Add 16-bit imm data to mem w/ carry                                     5 4
+ADDC Rd, Rs                 Add regs direct w/ carry                                                2 3     0001 S001  dddd ssss
+ADDC Rd, [Rs]               Add reg-ind to reg w/ carry                                             2 4     0001 S010  dddd 0sss
+ADDC [Rd], Rs               Add reg to reg-ind w/ carry                                             2 4     0001 S010  dddd 1sss
+ADDC Rd, [Rs+offset8]       Add reg-ind w/ 8-bit offs to reg w/ carry                               3 6     0001 S100  dddd 0sss
+ADDC [Rd+offset8], Rs       Add reg to reg-ind w/ 8-bit offs w/ carry                               3 6     0001 S100  dddd 1sss
+ADDC Rd, [Rs+offset16]      Add reg-ind w/ 16-bit offs to reg w/ carry                              4 6     0001 S101  dddd 0sss
+ADDC [Rd+offset16], Rs      Add reg to reg-ind w/ 16-bit offs w/ carry                              4 6     0001 S101  dddd 1sss
+ADDC Rd, [Rs+]              Add reg-ind w/ autoinc to reg w/ carry                                  2 5     0001 S011  dddd 0sss
+ADDC [Rd+], Rs              Add reg-ind w/ autoinc to reg w/ carry                                  2 5     0001 S011  dddd 1sss
+ADDC direct, Rs             Add reg to mem w/ carry                                                 3 4     0001 S110  ssss 1DDD
+ADDC Rd, direct             Add mem to reg w/ carry                                                 3 4     0001 S110  dddd 0DDD
 
-ADDS Rd, #data4             Add 4-bit signed imm data to reg                                        2 3
-ADDS [Rd], #data4           Add 4-bit signed imm data to reg-ind                                    2 4
-ADDS [Rd+], #data4          Add 4-bit signed imm data to reg-ind w/ autoinc                         2 5
-ADDS [Rd+offset8], #data4   Add reg-ind w/ 8-bit offs to 4-bit signed imm data                      3 6
-ADDS [Rd+offset16], #data4  Add reg-ind w/ 16-bit offs to 4-bit signed imm data                     4 6
-ADDS direct, #data4         Add 4-bit signed imm data to mem                                        3 4
+ADDC Rd, #data8             Add 8-bit imm data to reg w/ carry                                      3 3     1001 0001  dddd 0001  iiii iiii
+ADDC Rd, #data16            Add 16-bit imm data to reg w/ carry                                     4 3     1001 1001  dddd 0001  iiii iiii  iiii iiii
+ADDC [Rd], #data8           Add 16-bit imm data to reg-ind w/ carry                                 3 4     1001 0010  0ddd 0001  iiii iiii
+ADDC [Rd], #data16          Add 16-bit imm data to reg-ind w/ carry                                 4 4     1001 1010  0ddd 0001  iiii iiii  iiii iiii
+ADDC [Rd+], #data8          Add 8-bit imm data to reg-ind and autoinc w/ carry                      3 5     1001 0011  0ddd 0001  iiii iiii
+ADDC [Rd+], #data16         Add 16-bit imm data to reg-ind and autoinc w/ carry                     4 5     1001 1011  0ddd 0001  iiii iiii  iiii iiii
+ADDC [Rd+offset8], #data8   Add 8-bit imm data to reg-ind w/ 8-bit offs and carry                   4 6     1001 0100  0ddd 0001  oooo oooo  iiii iiii
+ADDC [Rd+offset8], #data16  Add 16-bit imm data to reg-ind w/ 8-bit offs and carry                  5 6     1001 1100  0ddd 0001  oooo oooo  iiii iiii  iiii iiii
+ADDC [Rd+offset16], #data8  Add 8-bit imm data to reg-ind w/ 16-bit offs and carry                  5 6     1001 0101  0ddd 0001  oooo oooo  oooo oooo  iiii iiii
+ADDC [Rd+offset16], #data16 Add 16-bit imm data to reg-ind w/ 16-bit offs and carry                 6 6     1001 1101  0ddd 0001  oooo oooo  oooo oooo  iiii iiii  iiii iiii 
+ADDC direct, #data8         Add 8-bit imm data to mem w/ carry                                      4 4     1001 0110  0DDD 0001  DDDD DDDD  iiii iiii
+ADDC direct, #data16        Add 16-bit imm data to mem w/ carry                                     5 4     1001 1110  0DDD 0001  DDDD DDDD  iiii iiii  iiii iiii
 
-ASL Rd, Rs                  Logical left shift dest reg by the value in the src reg                 2 a*
-ASL Rd, #data4              Logical left shift reg by the 4-bit imm value                           2 a*
+ADDS Rd, #data4             Add 4-bit signed imm data to reg                                        2 3     1010 S001  dddd iiii
+ADDS [Rd], #data4           Add 4-bit signed imm data to reg-ind                                    2 4     1010 S010  0ddd iiii
+ADDS [Rd+], #data4          Add 4-bit signed imm data to reg-ind w/ autoinc                         2 5     1010 S011  0ddd iiii
+ADDS [Rd+offset8], #data4   Add reg-ind w/ 8-bit offs to 4-bit signed imm data                      3 6     1010 S100  0ddd iiii  oooo oooo
+ADDS [Rd+offset16], #data4  Add reg-ind w/ 16-bit offs to 4-bit signed imm data                     4 6     1010 S101  0ddd iiii  oooo oooo  oooo oooo
+ADDS direct, #data4         Add 4-bit signed imm data to mem                                        3 4     1010 S110  0DDD iiii  DDDD DDDD
 
-ASR Rd, Rs                  Arithmetic shift right dest reg by the count in the src                 2 a*
-ASR Rd, #data4              Arithmetic shift right reg by the 4-bit imm count                       2 a*
+AND Rd, Rs                  Logical AND regs direct                                                 2 3     0101 S001  dddd ssss
+AND Rd, [Rs]                Logical AND reg-ind to reg                                              2 4
+AND [Rd], Rs                Logical AND reg to reg-ind                                              2 4
+AND Rd, [Rs+offset8]        Logical AND reg-ind w/ 8-bit offs to reg                                3 6
+AND [Rd+offset8], Rs        Logical AND reg to reg-ind w/ 8-bit offs                                3 6
+AND Rd, [Rs+offset16]       Logical AND reg-ind w/ 16-bit offs to reg                               4 6
+AND [Rd+offset16], Rs       Logical AND reg to reg-ind w/ 16-bit offs                               4 6
+AND Rd, [Rs+]               Logical AND reg-ind w/ autoinc to reg                                   2 5
+AND [Rd+], Rs               Logical AND reg-ind w/ autoinc to reg                                   2 5
+AND direct, Rs              Logical AND reg to mem                                                  3 4
+AND Rd, direct              Logical AND mem to reg                                                  3 4
+
+AND Rd, #data8              Logical AND 8-bit imm data to reg                                       3 3     1001 0001  dddd 0101  iiii iiii
+AND Rd, #data16             Logical AND 16-bit imm data to reg                                      4 3
+AND [Rd], #data8            Logical AND 8-bit imm data to reg-ind                                   3 4
+AND [Rd], #data16           Logical AND 16-bit imm data to reg-ind                                  4 4
+AND [Rd+], #data8           Logical AND 8-bit imm data to reg-ind and autoinc                       3 5
+AND [Rd+], #data16          Logical AND 16-bit imm data to reg-ind and autoinc                      4 5
+AND [Rd+offset8], #data8    Logical AND 8-bit imm data to reg-ind w/ 8-bit offs                     4 6
+AND [Rd+offset8], #data16   Logical AND 16-bit imm data to reg-ind w/ 8-bit offs                    5 6
+AND [Rd+offset16], #data8   Logical AND 8-bit imm data to reg-ind w/ 16-bit offs                    5 6
+AND [Rd+offset16], #data16  Logical AND 16-bit imm data to reg-ind w/ 16-bit offs                   6 6
+AND direct, #data8          Logical AND 8-bit imm data to mem                                       4 4
+AND direct, #data16         Logical AND 16-bit imm data to mem                                      5 4
+
+ANL C, bit                  Logical AND bit to carry                                                3 4     0000 1000  0100 00bb  bbbb bbbb
+
+ANL C, /bit                 Logical AND complement of a bit to carry                                3 4
+
+ASL Rd, Rs                  Logical left shift dest reg by the value in the src reg                 2 a*    1100 SS01  dddd ssss
+ASL Rd, #data4              Logical left shift reg by the 4-bit imm value                           2 a*    1101 SS01  dddd iiii
+ASL Rd, #data5              Logical left shift reg by the 5-bit imm value                           2 a*    1101 1101  dddi iiii
+
+ASR Rd, Rs                  Arithmetic shift right dest reg by the count in the src                 2 a*    1100 SS10  dddd ssss
+ASR Rd, #data4              Arithmetic shift right reg by the 4-bit imm count                       2 a*    1101 SS10  dddd iiii
+ASR Rd, #data5              Arithmetic shift right reg by the 5-bit imm count                       2 a*    1101 1110  dddi iiii
 
 CMP Rd, Rs                  Compare dest and src regs                                               2 3
 CMP [Rd], Rs                Compare reg w/ reg-ind                                                  2 4
@@ -80,6 +113,7 @@ CMP Rd, [Rs+]               Compare autoinc reg-ind w/ reg                      
 CMP [Rd+], Rs               Compare reg w/ autoinc reg-ind                                          2 5
 CMP direct, Rs              Compare reg w/ mem                                                      3 4
 CMP Rd, direct              Compare mem w/ reg                                                      3 4
+
 CMP Rd, #data8              Compare 8-bit imm data to reg                                           3 3
 CMP Rd, #data16             Compare 16-bit imm data to reg                                          4 3
 CMP [Rd], #data8            Compare 8 -bit imm data to reg-ind                                      3 4
@@ -130,9 +164,9 @@ SUB Rd, [Rs+offset16]       Subtract reg-ind w/ 16-bit offs to reg              
 SUB [Rd+offset16], Rs       Subtract reg to reg-ind w/ 16-bit offs                                  4 6
 SUB Rd, [Rs+]               Subtract reg-ind w/ autoinc to reg                                      2 5
 SUB [Rd+], Rs               Subtract reg-ind w/ autoinc to reg                                      2 5
-
 SUB direct, Rs              Subtract reg to mem                                                     3 4
 SUB Rd, direct              Subtract mem to reg                                                     3 4
+
 SUB Rd, #data8              Subtract 8-bit imm data to reg                                          3 3
 SUB Rd, #data16             Subtract 16-bit imm data to reg                                         4 3
 SUB [Rd], #data8            Subtract 8-bit imm data to reg-ind                                      3 4
@@ -157,6 +191,7 @@ SUBB Rd, [Rs+]              Subtract w/ borrow reg-ind w/ autoinc to reg        
 SUBB [Rd+], Rs              Subtract w/ borrow reg-ind w/ autoinc to reg                            2 5
 SUBB direct, Rs             Subtract w/ borrow reg to mem                                           3 4
 SUBB Rd, direct             Subtract w/ borrow mem to reg                                           3 4
+
 SUBB Rd, #data8             Subtract w/ borrow 8-bit imm data to reg                                3 3
 SUBB Rd, #data16            Subtract w/ borrow 16-bit imm data to reg                               4 3
 SUBB [Rd], #data8           Subtract w/ borrow 8-bit imm data to reg-ind                            3 4
@@ -169,30 +204,6 @@ SUBB [Rd+offset16], #data8  Subtract w/ borrow 8-bit imm data to reg-ind w/ 16-b
 SUBB [Rd+offset16], #data16 Subtract w/ borrow 16-bit imm data to reg-ind w/ 16-bit offs            6 6
 SUBB direct, #data8         Subtract w/ borrow 8-bit imm data to mem                                4 4
 SUBB direct, #data16        Subtract w/ borrow 16-bit imm data to mem                               5 4
-
-AND Rd, Rs                  Logical AND regs direct                                                 2 3
-AND Rd, [Rs]                Logical AND reg-ind to reg                                              2 4
-AND [Rd], Rs                Logical AND reg to reg-ind                                              2 4
-AND Rd, [Rs+offset8]        Logical AND reg-ind w/ 8-bit offs to reg                                3 6
-AND [Rd+offset8], Rs        Logical AND reg to reg-ind w/ 8-bit offs                                3 6
-AND Rd, [Rs+offset16]       Logical AND reg-ind w/ 16-bit offs to reg                               4 6
-AND [Rd+offset16], Rs       Logical AND reg to reg-ind w/ 16-bit offs                               4 6
-AND Rd, [Rs+]               Logical AND reg-ind w/ autoinc to reg                                   2 5
-AND [Rd+], Rs               Logical AND reg-ind w/ autoinc to reg                                   2 5
-AND direct, Rs              Logical AND reg to mem                                                  3 4
-AND Rd, direct              Logical AND mem to reg                                                  3 4
-AND Rd, #data8              Logical AND 8-bit imm data to reg                                       3 3
-AND Rd, #data16             Logical AND 16-bit imm data to reg                                      4 3
-AND [Rd], #data8            Logical AND 8-bit imm data to reg-ind                                   3 4
-AND [Rd], #data16           Logical AND 16-bit imm data to reg-ind                                  4 4
-AND [Rd+], #data8           Logical AND 8-bit imm data to reg-ind and autoinc                       3 5
-AND [Rd+], #data16          Logical AND 16-bit imm data to reg-ind and autoinc                      4 5
-AND [Rd+offset8], #data8    Logical AND 8-bit imm data to reg-ind w/ 8-bit offs                     4 6
-AND [Rd+offset8], #data16   Logical AND 16-bit imm data to reg-ind w/ 8-bit offs                    5 6
-AND [Rd+offset16], #data8   Logical AND 8-bit imm data to reg-ind w/ 16-bit offs                    5 6
-AND [Rd+offset16], #data16  Logical AND 16-bit imm data to reg-ind w/ 16-bit offs                   6 6
-AND direct, #data8          Logical AND 8-bit imm data to mem                                       4 4
-AND direct, #data16         Logical AND 16-bit imm data to mem                                      5 4
 
 CPL Rd                      Complement (ones complement) reg                                        2 3
 
@@ -211,6 +222,7 @@ OR Rd, [Rs+]                Logical OR reg-ind w/ autoinc to reg                
 OR [Rd+], Rs                Logical OR reg-ind w/ autoinc to reg                                    2 5
 OR direct, Rs               Logical OR reg to mem                                                   3 4
 OR Rd, direct               Logical OR mem to reg                                                   3 4
+
 OR Rd, #data8               Logical OR 8-bit imm data to reg                                        3 3
 OR Rd, #data16              Logical OR 16-bit imm data to reg                                       4 3
 OR [Rd], #data8             Logical OR 8-bit imm data to reg-ind                                    3 4
@@ -243,6 +255,7 @@ XOR Rd, [Rs+]               Logical XOR reg-ind w/ autoinc to reg               
 XOR [Rd+], Rs               Logical XOR reg-ind w/ autoinc to reg                                   2 5
 XOR direct, Rs              Logical XOR reg to mem                                                  3 4
 XOR Rd, direct              Logical XOR mem to reg                                                  3 4
+
 XOR Rd, #data8              Logical XOR 8-bit imm data to reg                                       3 3
 XOR Rd, #data16             Logical XOR 16-bit imm data to reg                                      4 3
 XOR [Rd], #data8            Logical XOR 8-bit imm data to reg-ind                                   3 4
@@ -270,9 +283,9 @@ MOV Rd, direct              Move mem to reg                                     
 MOV [Rd+], [Rs+]            Move reg-ind to reg-ind, both pointers autoinc                          2 6
 MOV direct, [Rs]            Move reg-ind to mem                                                     3 4
 MOV [Rd], direct            Move mem to reg-ind                                                     3 4
+
 MOV Rd, #data8              Move 8-bit imm data to reg                                              3 3
 MOV Rd, #data16             Move 16-bit imm data to reg                                             4 3
-
 MOV [Rd], #data8            Move 16-bit imm data to reg-ind                                         3 3
 MOV [Rd], #data16           Move 16-bit imm data to reg-ind                                         4 3
 MOV [Rd+], #data8           Move 8-bit imm data to reg-ind w/ autoinc                               3 4
@@ -321,35 +334,43 @@ XCH Rd, Rs                  Exchange contents of two regs                       
 XCH Rd, [Rs]                Exchange contents of a reg-ind address w/ a reg                         2 6
 XCH Rd, direct              Exchange contents of mem w/ a reg                                       3 6
 
-BCC rel8                    Branch if the carry flag is clear                                       2 6t/3nt
-BCS rel8                    Branch if the carry flag is set                                         2 6t/3nt
-BEQ rel8                    Branch if the zero flag is set                                          2 6t/3nt
-BNE rel8                    Branch if the zero flag is not set                                      2 6t/3nt
-BG rel8                     Branch if greater than (unsigned)                                       2 6t/3nt
-BGE rel8                    Branch if greater than or equal to (signed)                             2 6t/3nt
-BGT rel8                    Branch if greater than (signed)                                         2 6t/3nt
+BCC rel8                    Branch if the carry flag is clear                                       2 6t/3nt   1111 0000  rrrr rrrr
+BCS rel8                    Branch if the carry flag is set                                         2 6t/3nt   1111 0001  rrrr rrrr
+BNE rel8                    Branch if the zero flag is not set                                      2 6t/3nt   1111 0010  rrrr rrrr
+BEQ rel8                    Branch if the zero flag is set                                          2 6t/3nt   1111 0011  rrrr rrrr
+BNV rel8                    Branch if overflow flag is clear                                        2 6t/3nt   1111 0100  rrrr rrrr
+BOV rel8                    Branch if overflow flag is set                                          2 6t/3nt   1111 0101  rrrr rrrr
+BPL rel8                    Branch if the negative flag is clear                                    2 6t/3nt   1111 0110  rrrr rrrr
+BMI rel8                    Branch if the negative flag is set                                      2 6t/3nt   1111 0111  rrrr rrrr
+BG rel8                     Branch if greater than (unsigned)                                       2 6t/3nt   1111 1000  rrrr rrrr
+BL rel8                     Branch if less than or equal to (unsigned)                              2 6t/3nt   1111 1001  rrrr rrrr
+BGE rel8                    Branch if greater than or equal to (signed)                             2 6t/3nt   1111 1010  rrrr rrrr
+BLT rel8                    Branch if less than (signed)                                            2 6t/3nt   1111 1011  rrrr rrrr
+BGT rel8                    Branch if greater than (signed)                                         2 6t/3nt   1111 1100  rrrr rrrr
+BLE rel8                    Branch if less than or equal to (signed)                                2 6t/3nt   1111 1101  rrrr rrrr
 
-BL rel8                     Branch if less than or equal to (unsigned)                              2 6t/3nt
-BLE rel8                    Branch if less than or equal to (signed)                                2 6t/3nt
-BLT rel8                    Branch if less than (signed)                                            2 6t/3nt
-BMI rel8                    Branch if the negative flag is set                                      2 6t/3nt
-BPL rel8                    Branch if the negative flag is clear                                    2 6t/3nt
-BNV rel8                    Branch if overflow flag is clear                                        2 6t/3nt
-BOV rel8                    Branch if overflow flag is set                                          2 6t/3nt
-BR rel8                     Short unconditional branch                                              2 6
-CALL [Rs]                   Subroutine call ind w/ a reg                                            2 8/5(PZ)
-CALL rel16                  Relative call (range +/- 64K)                                           3 7/4(PZ)
-CJNE Rd,direct,rel8         Compare dir byte to reg and jump if not equal                           4 10t/7nt
-CJNE Rd,#data8,rel8         Compare imm byte to reg and jump if not equal                           4 9t/6nt
-CJNE Rd,#data16,rel8        Compare imm word to reg and jump if not equal                           5 9t/6nt
-CJNE [Rd],#data8,rel8       Compare imm word to reg-ind and jump if not equal                       4 10t/7nt
-CJNE [Rd],#data16,rel8      Compare imm word to reg-ind and jump if not equal                       5 10t/7nt
-DJNZ Rd,rel8                Decrement reg and jump if not zero                                      3 8t/5nt
-DJNZ direct,rel8            Decrement mem and jump if not zero                                      4 9t/5nt
-FCALL addr24                Far call (full 24-bit address space)                                    4 12/8(PZ)
-FJMP addr24                 Far jump (full 24-bit address space)                                    4 6
+BR rel8                     Short unconditional branch                                              2 6        1111 1110  rrrr rrrr
+
+CALL [Rs]                   Subroutine call ind w/ a reg                                            2 8/5(PZ)  1100 0110  0000 0sss
+CALL rel16                  Relative call (range +/- 64K)                                           3 7/4(PZ)  1100 0101  rrrr rrrr  rrrr rrrr
+
+CJNE Rd,direct,rel8         Compare dir byte to reg and jump if not equal                           4 10t/7nt  1110 S010  dddd 0DDD  DDDD DDDD  rrrr rrrr
+CJNE Rd,#data8,rel8         Compare imm byte to reg and jump if not equal                           4 9t/6nt   1110 0011  dddd 0000  rrrr rrrr  iiii iiii
+CJNE Rd,#data16,rel8        Compare imm word to reg and jump if not equal                           5 9t/6nt   1110 1011  dddd 0000  rrrr rrrr  iiii iiii  iiii iiii
+CJNE [Rd],#data8,rel8       Compare imm word to reg-ind and jump if not equal                       4 10t/7nt  1110 0011  0ddd 1000  rrrr rrrr  iiii iiii
+CJNE [Rd],#data16,rel8      Compare imm word to reg-ind and jump if not equal                       5 10t/7nt  1110 1011  0ddd 1000  rrrr rrrr  iiii iiii  iiii iiii
+
+DJNZ Rd,rel8                Decrement reg and jump if not zero                                      3 8t/5nt   1000 S111  dddd 1000  rrrr rrrr
+DJNZ direct,rel8            Decrement mem and jump if not zero                                      4 9t/5nt   1110 S010  0000 1DDD  DDDD DDDD  rrrr rrrr
+
+FCALL addr24                Far call (full 24-bit address space)                                    4 12/8(PZ) 1100 0100  aaaa aaaa  AAAA AAAA  AAAA AAAA
+
+FJMP addr24                 Far jump (full 24-bit address space)                                    4 6        1101 0100  aaaa aaaa  AAAA AAAA  AAAA AAAA
+
 JB bit,rel8                 Jump if bit set                                                         4 10t/6nt
+
 JBC bit,rel8                Jump if bit set and then clear the bit                                  4 11t/7nt
+
 JMP rel16                   Long unconditional branch                                               3 6
 JMP [Rs]                    Jump ind to the address in the reg (64K)                                2 7
 JMP [A+DPTR]                Jump ind relative to the DPTR                                           2 5
@@ -358,17 +379,22 @@ JMP [[Rs+]]                 Jump double-ind to the address (pointer to a pointer
 JNB bit,rel8                Jump if bit not set                                                     4 10t/6nt
 JNZ rel8                    Jump if accumulator not equal zero                                      2 6t/3nt
 JZ rel8                     Jump if accumulator equals zero                                         2 6t/3nt
+
 NOP                         No operation                                                            1 3
+
 RET                         Return from subroutine                                                  2 8/6(PZ)
+
 RETI                        Return from interrupt                                                   2 10/8(PZ)
 
-ANL C, bit                  Logical AND bit to carry                                                3 4
-ANL C, /bit                 Logical AND complement of a bit to carry                                3 4
 CLR bit                     Clear bit                                                               3 4
+
 MOV C, bit                  Move bit to the carry flag                                              3 4
+
 MOV bit, C                  Move carry to bit                                                       3 4
+
 ORL C, bit                  Logical OR a bit to carry                                               3 4
 ORL C, /bit                 Logical OR complement of a bit to carry                                 3 4
+
 SETB bit                    Sets the bit specified                                                  3 4
 
 BKPT                        Cause the breakpoint trap to be executed.                               1 23/19(PZ)
