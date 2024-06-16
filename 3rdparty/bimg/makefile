@@ -154,9 +154,9 @@ vs2017: vs2017-debug32 vs2017-release32 vs2017-debug64 vs2017-release64 ## Build
 .build/projects/gmake-osx-x64:
 	$(GENIE) --gcc=osx-x64 gmake
 osx-x64-debug: .build/projects/gmake-osx-x64
-	make -C .build/projects/gmake-osx config=debug
+	make -C .build/projects/gmake-osx-x64 config=debug
 osx-x64-release: .build/projects/gmake-osx-x64
-	make -C .build/projects/gmake-osx config=release
+	make -C .build/projects/gmake-osx-x64 config=release
 osx-x64: osx-x64-debug osx-x64-release
 
 .build/projects/gmake-osx-arm64:
