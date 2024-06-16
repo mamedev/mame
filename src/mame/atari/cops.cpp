@@ -738,7 +738,7 @@ ROM_START( revlatns )
 	ROM_LOAD( "revelations_sys.u17", 0x0000, 0x8000, CRC(43e5e3ec) SHA1(fa44b102b5aa7ad2421c575abdc67f1c29f23bc1) ) //u17
 
 	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "nova dp1-3a", 0, BAD_DUMP SHA1(96bdbd9470e5efea6e6da7d414c0b19f66448197) ) //one disc, no correction
+	DISK_IMAGE_READONLY( "nova dp1-3a", 0, BAD_DUMP SHA1(f69c6a3def1e1eec0a58862c487e47d4da12b25e)) ) //one disc, no correction
 ROM_END
 
 } // Anonymous namespace
@@ -746,4 +746,4 @@ ROM_END
 
 GAMEL( 1994, cops,     0,    cops,     cops,     cops_state, init_cops, ROT0, "Atari Games",                      "Cops (USA)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
 GAMEL( 1994, copsuk,   cops, cops,     cops,     cops_state, init_cops, ROT0, "Nova Productions / Deith Leisure", "Cops (UK)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1994, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions",                 "Revelations", layout_revlatns )
+GAMEL( 1994, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions",                 "Revelations", MACHINE_SUPPORTS_SAVE, layout_revlatns )
