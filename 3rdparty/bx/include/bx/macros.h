@@ -59,18 +59,13 @@
 #	define BX_UNREACHABLE __builtin_unreachable()
 #	define BX_NO_VTABLE
 #	define BX_PRINTF_ARGS(_format, _args) __attribute__( (format(__printf__, _format, _args) ) )
-
-#	if BX_CLANG_HAS_FEATURE(cxx_thread_local) \
-	|| (!BX_PLATFORM_OSX && (BX_COMPILER_GCC >= 40200) ) \
-	|| (BX_COMPILER_GCC >= 40500)
-#		define BX_THREAD_LOCAL __thread
-#	endif // BX_COMPILER_GCC
-
+#	define BX_THREAD_LOCAL __thread
 #	define BX_ATTRIBUTE(_x) __attribute__( (_x) )
 
 #	if BX_CRT_MSVC
 #		define __stdcall
 #	endif // BX_CRT_MSVC
+
 #elif BX_COMPILER_MSVC
 #	define BX_ASSUME(_condition) __assume(_condition)
 #	define BX_ALIGN_DECL(_align, _decl) __declspec(align(_align) ) _decl
@@ -140,7 +135,7 @@
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG(_x)
 #endif // BX_COMPILER_CLANG
 
-#if BX_COMPILER_GCC && BX_COMPILER_GCC >= 40600
+#if BX_COMPILER_GCC
 #	define BX_PRAGMA_DIAGNOSTIC_PUSH_GCC_()       _Pragma("GCC diagnostic push")
 #	define BX_PRAGMA_DIAGNOSTIC_POP_GCC_()        _Pragma("GCC diagnostic pop")
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC(_x)   _Pragma(BX_STRINGIZE(GCC diagnostic ignored _x) )

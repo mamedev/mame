@@ -464,6 +464,22 @@
 //#error "Minimum supported macOS version is 16.00.\n"
 #endif // BX_PLATFORM_OSX < 130000
 
+#if BX_COMPILER_CLANG && BX_COMPILER_CLANG < 11000
+// https://releases.llvm.org/
+static_assert(false, "\n\n"
+	"\t** IMPORTANT! **\n\n"
+	"\tMinimum supported Clang version is 11.0 (October 12, 2020).\n");
+	"\t\n");
+#endif // BX_COMPILER_*
+
+#if BX_COMPILER_GCC && BX_COMPILER_GCC < 80400
+// https://gcc.gnu.org/releases.html
+static_assert(false, "\n\n"
+	"\t** IMPORTANT! **\n\n"
+	"\tMinimum supported GCC version is 8.4 (March 4, 2020).\n"
+	"\t\n");
+#endif // BX_COMPILER_*
+
 #if BX_CPU_ENDIAN_BIG
 static_assert(false, "\n\n"
 	"\t** IMPORTANT! **\n\n"
