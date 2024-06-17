@@ -745,7 +745,7 @@ ROM_START( revlatns )
 	ROM_LOAD( "revelations_sys.u17", 0x0000, 0x8000, CRC(43e5e3ec) SHA1(fa44b102b5aa7ad2421c575abdc67f1c29f23bc1) ) //u17
 
 	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "nova dp1-3a", 0, BAD_DUMP SHA1(f69c6a3def1e1eec0a58862c487e47d4da12b25e)) ) //one disc, no correction
+	DISK_IMAGE_READONLY( "nova dp1-3a", 0, BAD_DUMP SHA1(f69c6a3def1e1eec0a58862c487e47d4da12b25e))  //one disc, no correction
 ROM_END
 
 } // Anonymous namespace
