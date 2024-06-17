@@ -264,26 +264,4 @@ private:
 	required_ioport m_io_display_type;
 };
 
-// partially implemented non working RM480z
-class rm480z_state : public rm380z_state_cos40
-{
-public:
-	rm480z_state(const machine_config &mconfig, device_type type, const char *tag) :
-		rm380z_state_cos40(mconfig, type, tag)
-	{
-	}
-
-	void rm480z(machine_config &config);
-	void rm480za(machine_config &config) { rm480z(config); }
-
-protected:
-	void machine_reset() override;
-
-	void update_screen(bitmap_ind16 &bitmap) const override;
-
-private:
-	void rm480z_io(address_map &map);
-	void rm480z_mem(address_map &map);
-};
-
 #endif // MAME_RM_RM380Z_H
