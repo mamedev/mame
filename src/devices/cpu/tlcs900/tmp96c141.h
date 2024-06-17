@@ -88,6 +88,9 @@ protected:
 	virtual void tlcs900_handle_ad() override;
 	virtual void tlcs900_handle_timers() override;
 
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
 private:
 	void internal_mem(address_map &map);
 };
