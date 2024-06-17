@@ -48,6 +48,221 @@ int xa_dasm::d_illegal(XA_DASM_PARAMS)
 	return 1;
 }
 
+
+int xa_dasm::handle_alu_type0(XA_DASM_PARAMS, int alu_op)
+{
+	int size = opcode & 0x08;
+	const u8 opcode2 = opcodes.r8(pc++);
+
+	switch (opcode & 0x07)
+	{
+	case 0x01:
+	{
+		util::stream_format(stream, "%s%s Rd, Rs", m_aluops[alu_op], size ? ".w" : ".b" );
+		return 2;
+	}
+
+	case 0x02:
+	{
+		int optype = opcode2 & 0x08;
+		if (!optype)
+		{
+			util::stream_format(stream, "%s%s Rd, [Rs]", m_aluops[alu_op], size ? ".w" : ".b" );
+		}
+		else
+		{
+			util::stream_format(stream, "%s%s [Rd], Rs", m_aluops[alu_op], size ? ".w" : ".b" );
+		}
+		return 2;
+	}
+
+	case 0x03:
+	{
+		int optype = opcode2 & 0x08;
+		if (!optype)
+		{
+			util::stream_format(stream, "%s%s Rd, [Rs+]", m_aluops[alu_op], size ? ".w" : ".b" );
+		}
+		else
+		{
+			util::stream_format(stream, "%s%s [Rd+], Rs", m_aluops[alu_op], size ? ".w" : ".b" );
+		}
+		return 2;
+	}
+
+	case 0x04:
+	{
+		int optype = opcode2 & 0x08;
+		const u8 opcode3 = opcodes.r8(pc++);
+
+		if (!optype)
+		{
+			util::stream_format(stream, "%s%s Rd, [Rs+offset8] %02x", m_aluops[alu_op], size ? ".w" : ".b", opcode3 );
+		}
+		else
+		{
+			util::stream_format(stream, "%s%s [Rd+offset8], Rs %02x", m_aluops[alu_op], size ? ".w" : ".b", opcode3 );
+		}
+		return 3;
+	}
+
+	case 0x05:
+	{
+		int optype = opcode2 & 0x08;
+		const u8 opcode3 = opcodes.r8(pc++);
+		const u8 opcode4 = opcodes.r8(pc++);
+
+		if (!optype)
+		{
+			util::stream_format(stream, "%s%s Rd, [Rs+offset16] %02x%02x", m_aluops[alu_op], size ? ".w" : ".b", opcode3, opcode4 );
+		}
+		else
+		{
+			util::stream_format(stream, "%s%s [Rd+offset16], Rs %02x%02x", m_aluops[alu_op], size ? ".w" : ".b", opcode3, opcode4 );
+		}
+		return 4;
+	}
+
+	case 0x06:
+	{
+		int optype = opcode2 & 0x08;
+		const u8 opcode3 = opcodes.r8(pc++);
+
+		if (!optype)
+		{
+			util::stream_format(stream, "%s%s direct, Rs %02x", m_aluops[alu_op], size ? ".w" : ".b", opcode3 );
+		}
+		else
+		{
+			util::stream_format(stream, "%s%s Rd, direct %02x", m_aluops[alu_op], size ? ".w" : ".b", opcode3 );
+		}
+		return 3;
+	}
+
+	}
+
+	return 1;
+}
+
+
+int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t opcode2)
+{
+	int alu_op = opcode2 & 0x0f;
+
+	switch (opcode & 0x0f)
+	{
+	case 0x01:
+	{
+		const u8 opcode3 = opcodes.r8(pc++);
+		util::stream_format(stream, "%s Rd, #data8 %02x", m_aluops[alu_op], opcode3 );
+		return 3;
+	}
+
+	case 0x02:
+	{
+		const u8 opcode3 = opcodes.r8(pc++);
+		util::stream_format(stream, "%s [Rd], #data8 %02x", m_aluops[alu_op], opcode3 );
+		return 3;
+	}
+
+	case 0x03:
+	{
+		const u8 opcode3 = opcodes.r8(pc++);
+		util::stream_format(stream, "%s [Rd+], #data8 %02x", m_aluops[alu_op], opcode3 );
+		return 3;
+	}
+
+	case 0x04:
+	{
+		const u8 opcode3 = opcodes.r8(pc++);
+		const u8 opcode4 = opcodes.r8(pc++);
+
+		util::stream_format(stream, "%s [Rd+offset8], #data8 %02x %02x", m_aluops[alu_op], opcode3, opcode4 );
+		return 4;
+	}
+
+	case 0x05:
+	{
+		const u8 opcode3 = opcodes.r8(pc++);
+		const u8 opcode4 = opcodes.r8(pc++);
+		const u8 opcode5 = opcodes.r8(pc++);
+
+		util::stream_format(stream, "%s [Rd+offset16], #data8 %02x%02x %02x", m_aluops[alu_op], opcode3, opcode4, opcode5 );
+		return 5;
+	}
+
+	case 0x06:
+	{
+		const u8 opcode3 = opcodes.r8(pc++);
+		const u8 opcode4 = opcodes.r8(pc++);
+
+		util::stream_format(stream, "%s direct, #data8 %02x %02x", m_aluops[alu_op], opcode3, opcode4 );
+		return 4;
+	}
+
+	case 0x09:
+	{
+		const u8 opcode3 = opcodes.r8(pc++);
+		const u8 opcode4 = opcodes.r8(pc++);
+
+		util::stream_format(stream, "%s Rd, #data16 %02x%02x", m_aluops[alu_op], opcode3, opcode4 );
+		return 4;
+	}
+
+	case 0x0a:
+	{
+		const u8 opcode3 = opcodes.r8(pc++);
+		const u8 opcode4 = opcodes.r8(pc++);
+
+		util::stream_format(stream, "%s [Rd], #data16 %02x%02x", m_aluops[alu_op], opcode3, opcode4 );
+		return 4;
+	}
+
+	case 0x0b:
+	{
+		const u8 opcode3 = opcodes.r8(pc++);
+		const u8 opcode4 = opcodes.r8(pc++);
+
+		util::stream_format(stream, "%s [Rd+], #data16 %02x%02x", m_aluops[alu_op], opcode3, opcode4 );
+		return 4;
+	}
+
+	case 0x0c:
+	{
+		const u8 opcode3 = opcodes.r8(pc++);
+		const u8 opcode4 = opcodes.r8(pc++);
+		const u8 opcode5 = opcodes.r8(pc++);
+
+		util::stream_format(stream, "%s [Rd+offset8], #data16 %02x %02x%02x", m_aluops[alu_op], opcode3, opcode4, opcode5 );
+		return 5;
+	}
+
+	case 0x0d:
+	{
+		const u8 opcode3 = opcodes.r8(pc++);
+		const u8 opcode4 = opcodes.r8(pc++);
+		const u8 opcode5 = opcodes.r8(pc++);
+		const u8 opcode6 = opcodes.r8(pc++);
+
+		util::stream_format(stream, "%s [Rd+offset16], #data16 %02x%02x %02x%02x", m_aluops[alu_op], opcode3, opcode4, opcode5, opcode6 );
+		return 5;
+	}
+
+	case 0x0e:
+	{
+		const u8 opcode3 = opcodes.r8(pc++);
+		const u8 opcode4 = opcodes.r8(pc++);
+		const u8 opcode5 = opcodes.r8(pc++);
+
+		util::stream_format(stream, "%s direct, #data16 %02x %02x%02x", m_aluops[alu_op], opcode3, opcode4, opcode5 );
+		return 5;
+	}
+	}
+
+	return 1;
+}
+
+
 /*
 
 The CPU implements the following opcodes
@@ -74,12 +289,12 @@ MOV bit, C                  Move carry to bit                                   
 ADD Rd, Rs                  Add regs direct                                                         2 3         0000 S001  dddd ssss
 ADD Rd, [Rs]                Add reg-ind to reg                                                      2 4         0000 S010  dddd 0sss
 ADD [Rd], Rs                Add reg to reg-ind                                                      2 4         0000 S010  ssss 1ddd
+ADD Rd, [Rs+]               Add reg-ind w/ autoinc to reg                                           2 5         0000 S011  dddd 0sss
+ADD [Rd+], Rs               Add reg-ind w/ autoinc to reg                                           2 5         0000 S011  ssss 1ddd
 ADD Rd, [Rs+offset8]        Add reg-ind w/ 8-bit offs to reg                                        3 6         0000 S100  dddd 0sss  oooo oooo
 ADD [Rd+offset8], Rs        Add reg to reg-ind w/ 8-bit offs                                        3 6         0000 S100  ssss 1ddd  oooo oooo
 ADD Rd, [Rs+offset16]       Add reg-ind w/ 16-bit offs to reg                                       4 6         0000 S101  dddd 0sss  oooo oooo  oooo oooo
 ADD [Rd+offset16], Rs       Add reg to reg-ind w/ 16-bit offs                                       4 6         0000 S101  ssss 1ddd  oooo oooo  oooo oooo
-ADD Rd, [Rs+]               Add reg-ind w/ autoinc to reg                                           2 5         0000 S011  dddd 0sss
-ADD [Rd+], Rs               Add reg-ind w/ autoinc to reg                                           2 5         0000 S011  ssss 1ddd
 ADD direct, Rs              Add reg to mem                                                          3 4         0000 S110  ssss 1DDD  DDDD DDDD
 ADD Rd, direct              Add mem to reg                                                          3 4         0000 S110  dddd 0DDD  DDDD DDDD
 
@@ -101,7 +316,7 @@ int xa_dasm::d_bitgroup(XA_DASM_PARAMS)
 
 int xa_dasm::d_add(XA_DASM_PARAMS)
 {
-	return 1;
+	return handle_alu_type0(XA_CALL_PARAMS, 0);
 }
 
 int xa_dasm::d_push_rlist(XA_DASM_PARAMS)
@@ -157,7 +372,7 @@ PUSHU Rlist                 Push regs (b/w) from the user stack                 
 
 int xa_dasm::d_addc(XA_DASM_PARAMS)
 {
-	return 1;
+	return handle_alu_type0(XA_CALL_PARAMS, 1);
 }
 
 int xa_dasm::d_pushu_rlist(XA_DASM_PARAMS)
@@ -187,7 +402,7 @@ POP Rlist                   Pop regs (b/w) from the current stack               
 
 int xa_dasm::d_sub(XA_DASM_PARAMS)
 {
-	return 1;
+	return handle_alu_type0(XA_CALL_PARAMS, 2);
 }
 
 int xa_dasm::d_pop_rlist(XA_DASM_PARAMS)
@@ -216,7 +431,7 @@ POPU Rlist                  Pop regs (b/w) from the user stack                  
 
 int xa_dasm::d_subb(XA_DASM_PARAMS)
 {
-	return 1;
+	return handle_alu_type0(XA_CALL_PARAMS, 3);
 }
 
 int xa_dasm::d_popu_rlist(XA_DASM_PARAMS)
@@ -258,7 +473,7 @@ int xa_dasm::d_lea_offset16(XA_DASM_PARAMS)
 
 int xa_dasm::d_cmp(XA_DASM_PARAMS)
 {
-	return 1;
+	return handle_alu_type0(XA_CALL_PARAMS, 4);
 }
 
 /*
@@ -290,7 +505,7 @@ int xa_dasm::d_xch_type1(XA_DASM_PARAMS)
 
 int xa_dasm::d_and(XA_DASM_PARAMS)
 {
-	return 1;
+	return handle_alu_type0(XA_CALL_PARAMS, 5);
 }
 
 
@@ -324,7 +539,7 @@ int xa_dasm::d_xch_type2(XA_DASM_PARAMS)
 
 int xa_dasm::d_or(XA_DASM_PARAMS)
 {
-	return 1;
+	return handle_alu_type0(XA_CALL_PARAMS, 6);
 }
 
 
@@ -350,7 +565,7 @@ XOR Rd, direct              Logical XOR mem to reg                              
 
 int xa_dasm::d_xor(XA_DASM_PARAMS)
 {
-	return 1;
+	return handle_alu_type0(XA_CALL_PARAMS, 7);
 }
 
 /*
@@ -387,7 +602,7 @@ int xa_dasm::d_movc_rd_rsinc(XA_DASM_PARAMS)
 
 int xa_dasm::d_mov(XA_DASM_PARAMS)
 {
-	return 1;
+	return handle_alu_type0(XA_CALL_PARAMS, 8);
 }
 
 int xa_dasm::d_pushpop_djnz_subgroup(XA_DASM_PARAMS)
@@ -444,16 +659,16 @@ SEXT Rd                     Sign extend last operation to reg                   
 MOV [Rd+], [Rs+]            Move reg-ind to reg-ind, both pointers autoinc                          2 6         1001 S000  0ddd 0sss
 
 ADD Rd, #data8              Add 8-bit imm data to reg                                               3 3         1001 0001  dddd 0000  iiii iiii
-ADD Rd, #data16             Add 16-bit imm data to reg                                              4 3         1001 1001  dddd 0000  iiii iiii  iiii iiii
 ADD [Rd], #data8            Add 8-bit imm data to reg-ind                                           3 4         1001 0010  0ddd 0000  iiii iiii
-ADD [Rd], #data16           Add 16-bit imm data to reg-ind                                          4 4         1001 1010  0ddd 0000  iiii iiii  iiii iiii
 ADD [Rd+], #data8           Add 8-bit imm data to reg-ind w/ autoinc                                3 5         1001 0011  0ddd 0000  iiii iiii
-ADD [Rd+], #data16          Add 16-bit imm data to reg-ind w/ autoinc                               4 5         1001 1011  0ddd 0000  iiii iiii  iiii iiii
 ADD [Rd+offset8], #data8    Add 8-bit imm data to reg-ind w/ 8-bit offs                             4 6         1001 0100  0ddd 0000  oooo oooo  iiii iiii
-ADD [Rd+offset8], #data16   Add 16-bit imm data to reg-ind w/ 8-bit offs                            5 6         1001 1100  0ddd 0000  oooo oooo  iiii iiii  iiii iiii
 ADD [Rd+offset16], #data8   Add 8-bit imm data to reg-ind w/ 16-bit offs                            5 6         1001 0101  0ddd 0000  oooo oooo  oooo oooo  iiii iiii
-ADD [Rd+offset16], #data16  Add 16-bit imm data to reg-ind w/ 16-bit offs                           6 6         1001 1101  0ddd 0000  oooo oooo  oooo oooo  iiii iiii  iiii iiii
 ADD direct, #data8          Add 8-bit imm data to mem                                               4 4         1001 0110  0DDD 0000  DDDD DDDD  iiii iiii
+ADD Rd, #data16             Add 16-bit imm data to reg                                              4 3         1001 1001  dddd 0000  iiii iiii  iiii iiii
+ADD [Rd], #data16           Add 16-bit imm data to reg-ind                                          4 4         1001 1010  0ddd 0000  iiii iiii  iiii iiii
+ADD [Rd+], #data16          Add 16-bit imm data to reg-ind w/ autoinc                               4 5         1001 1011  0ddd 0000  iiii iiii  iiii iiii
+ADD [Rd+offset8], #data16   Add 16-bit imm data to reg-ind w/ 8-bit offs                            5 6         1001 1100  0ddd 0000  oooo oooo  iiii iiii  iiii iiii
+ADD [Rd+offset16], #data16  Add 16-bit imm data to reg-ind w/ 16-bit offs                           6 6         1001 1101  0ddd 0000  oooo oooo  oooo oooo  iiii iiii  iiii iiii
 ADD direct, #data16         Add 16-bit imm data to mem                                              5 4         1001 1110  0DDD 0000  DDDD DDDD  iiii iiii  iiii iiii
 
 ADDC Rd, #data8             Add 8-bit imm data to reg w/ carry                                      3 3         1001 0001  dddd 0001  iiii iiii
@@ -577,7 +792,8 @@ int xa_dasm::d_g9_subgroup(XA_DASM_PARAMS)
 
 int xa_dasm::d_alu(XA_DASM_PARAMS)
 {
-	return 1;
+	const u8 opcode2 = opcodes.r8(pc++);
+	return handle_alu_type1(XA_CALL_PARAMS, opcode2);
 }
 
 int xa_dasm::d_jb_mov_subgroup(XA_DASM_PARAMS)
@@ -929,7 +1145,7 @@ offs_t xa_dasm::disassemble(std::ostream& stream, offs_t pc, const data_buffer& 
 {
 	const u8 opcode = opcodes.r8(pc++);
 
-	int size = (this->*s_instruction[opcode])(opcode, stream, pc, opcodes, params);
+	int size = (this->*s_instruction[opcode])(XA_CALL_PARAMS);
 
 	return size;
 }
