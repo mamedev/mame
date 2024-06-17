@@ -581,6 +581,9 @@ altos486
 @source:altos/altos8600.cpp
 altos8600
 
+@source:altos/altos586.cpp
+altos586
+
 @source:amiga/alg.cpp
 alg_bios                        //
 aplatoon                        // (c) 199? Nova?

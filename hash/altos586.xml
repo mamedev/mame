@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="altos586" description="Altos 586 floppies">
+
+	<software name="diag" supported="yes">
+		<description>Altos Diagnostic Executive</description>
+		<year>1983</year>
+		<publisher>Altos Computer Systems</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="733392">
+				<rom name="SDX-586.IMD" size="733392" crc="160fac51" sha1="91a53c8b26bbe4b1f38b1b3811d3176442955d09"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
