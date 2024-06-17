@@ -86,7 +86,7 @@
 namespace {
 
 	enum {
-		PHASE_STATIC,
+		PHASE_STATIC = 0,
 		PHASE_POSITIVE,
 		PHASE_NEGATIVE
 	};
@@ -120,6 +120,7 @@ public:
 		m_led_2(*this, "led_2"),
 		m_led_4(*this, "led_4"),
 		m_led_8(*this, "led_8"),
+		m_led_disk(*this, "led_disk"),
 		m_boot(false),
 		m_map_control(0),
 		m_kb_rdata(true),
@@ -173,7 +174,8 @@ private:
 	u8 duart_r(offs_t offset);
 	void duart_w(offs_t offset, u8 data);
 
-	
+	void ppi_pc_w(u8 data);
+
 	void kb_rdata_w(int state);
 	void kb_tdata_w(int state);
 	void kb_rclamp_w(int state);
@@ -208,11 +210,14 @@ private:
 	output_finder<> m_led_2;
 	output_finder<> m_led_4;
 	output_finder<> m_led_8;
+	output_finder<> m_led_disk;
 
 	int m_u244latch;
 	
 	bool m_boot;
 	u8 m_map_control;
+	
+	u8 m_ppi_pc;
 	bool m_kb_rdata;
 	bool m_kb_tdata;
 	bool m_kb_rclamp;
@@ -243,6 +248,7 @@ void tek440x_state::machine_start()
 	m_led_2.resolve();
 	m_led_4.resolve();
 	m_led_8.resolve();
+	m_led_disk.resolve();
 }
 
 
@@ -558,7 +564,8 @@ const int mouse_xyb[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
 	uint8_t x = m_mousex->read();
 	uint8_t y = m_mousey->read();
 
-	if(!m_mouse_pc) {
+	if(m_mouse_pc == 0)
+	{
 		if(x == m_mouse_x)
 			m_mouse_px = PHASE_STATIC;
 
@@ -609,7 +616,11 @@ u8 tek440x_state::mouse_r(offs_t offset)
 			ans = m_mouse_y;
 			break;
 		case 4:
-			ans = m_mousebtn->read();
+			ans = m_mousebtn->read() & 7;		// selftest xor diag register with it
+			ans |= (m_mouse & 15) << 3;
+			if (m_kb_loop) ans ^= (m_diag & 15) << 3;
+			ans |= 0x80;										// VCC from calender(?)
+			
 			break;
 		case 6:
 			mouseupdate();
@@ -619,7 +630,7 @@ u8 tek440x_state::mouse_r(offs_t offset)
 			break;
 	}
 
-	LOG("mouse_r %04x => %04x\n", offset, ans);
+	//LOG("mouse_r %04x => %04x\n", offset, ans);
 	
 	return ans;
 }
@@ -632,8 +643,20 @@ void tek440x_state::mouse_w(u8 data)
 
 void tek440x_state::write_txd(int state)
 {
-	LOG("mouse write_txd(%x)\n", state);
+	LOG("acia write_txd(%x)\n", state);
 }
+
+void tek440x_state::ppi_pc_w(u8 data)
+{
+
+	LOG("ppi_pc_w(%02x)\n", data);
+
+	if (!m_kb_rclamp && BIT(m_ppi_pc, 2) != BIT(data, 2))
+		m_keyboard->kdo_w(!BIT(data, 2) || m_kb_tdata);
+
+	m_ppi_pc = data;
+}
+
 
 void tek440x_state::kb_rdata_w(int state)
 {
@@ -684,6 +707,14 @@ void tek440x_state::irq1_w(int state)
 u16 tek440x_state::timer_r(offs_t offset)
 {
 	LOG("timer_r %08x\n", offset);
+
+	if (m_u244latch)
+	{
+		LOG("M68K_IRQ_1 clear\n");
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+		m_u244latch = 0;
+	}
+
 	return m_timer->read16(offset);
 }
 
@@ -710,9 +741,8 @@ void tek440x_state::duart_w(offs_t offset, u8 data)
 	// Transmit Buffer?
 	if (offset == 3)
 	{
-		if (m_diag & 0x80)
+		if (m_kb_loop)
 		{
-			LOG("LOOPBACK mode\n");
 			m_duart->write(0x0, 0x80);
 		}
 	}
@@ -775,6 +805,10 @@ void tek440x_state::physical_map(address_map &map)
 
 			// TODO: bit 7 -> SCSI bus reset
 			LOG("scsi bus reset %d\n", BIT(data, 7));
+			
+			// TODO: should be disk activity
+			m_led_disk = !BIT(data, 7);
+			
 		}, "scsi_addr"); // 7bc000-7bdfff: SCSI bus address registers
 	map(0x7be000, 0x7be01f).m(m_scsi, FUNC(ncr5385_device::map)).umask16(0xff00); //.mirror(0x1fe0) .cswidth(16);
 
@@ -853,6 +887,9 @@ void tek440x_state::tek4404(machine_config &config)
 	m_acia->irq_handler().set_inputline(m_maincpu, M68K_IRQ_7);
 
 	I8255A(config, m_printer);
+	m_printer->in_pb_callback().set_constant(0x30);
+m_printer->in_pb_callback().set_constant(0x80);		// HACK:  vblank always check if printer status < 0
+	m_printer->out_pc_callback().set(FUNC(tek440x_state::ppi_pc_w));
 
 	MC68681(config, m_duart, 14.7456_MHz_XTAL / 4);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5); // auto-vectored
