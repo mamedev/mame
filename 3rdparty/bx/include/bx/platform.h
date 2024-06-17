@@ -437,11 +437,11 @@
 
 #if defined(__cplusplus)
 #	if BX_COMPILER_MSVC && defined(_MSVC_LANG) && _MSVC_LANG != __cplusplus
-#			error "When using MSVC you must set /Zc:__cplusplus compiler option."
+#		error "When using MSVC you must set /Zc:__cplusplus compiler option."
 #	endif // BX_COMPILER_MSVC && defined(_MSVC_LANG) && _MSVC_LANG != __cplusplus
 
 #	if   __cplusplus < BX_LANGUAGE_CPP17
-#		error "C++17 standard support is required to build."
+#		define BX_CPP_NAME "C++Unsupported"
 #	elif __cplusplus < BX_LANGUAGE_CPP20
 #		define BX_CPP_NAME "C++17"
 #	elif __cplusplus < BX_LANGUAGE_CPP23
@@ -458,11 +458,12 @@
 #	error "When using MSVC you must set /Zc:preprocessor compiler option."
 #endif // BX_COMPILER_MSVC && (!defined(_MSVC_TRADITIONAL) || _MSVC_TRADITIONAL)
 
-#if BX_PLATFORM_OSX && BX_PLATFORM_OSX < 130000
-//#error "Minimum supported macOS version is 13.00.\n"
-#elif BX_PLATFORM_IOS && BX_PLATFORM_IOS < 160000
-//#error "Minimum supported macOS version is 16.00.\n"
-#endif // BX_PLATFORM_OSX < 130000
+#if defined(__cplusplus)
+
+static_assert(__cplusplus >= BX_LANGUAGE_CPP17, "\n\n"
+	"\t** IMPORTANT! **\n\n"
+	"\tC++17 standard support is required to build.\n"
+	"\t\n");
 
 // https://releases.llvm.org/
 static_assert(!BX_COMPILER_CLANG || BX_COMPILER_CLANG >= 110000, "\n\n"
@@ -481,10 +482,7 @@ static_assert(!BX_CPU_ENDIAN_BIG, "\n\n"
 	"\tThe code was not tested for big endian, and big endian CPU is considered unsupported.\n"
 	"\t\n");
 
-#if BX_PLATFORM_BSD   \
- || BX_PLATFORM_HAIKU \
- || BX_PLATFORM_HURD
-static_assert(false, "\n\n"
+static_assert(!BX_PLATFORM_BSD || !BX_PLATFORM_HAIKU || !BX_PLATFORM_HURD, "\n\n"
 	"\t** IMPORTANT! **\n\n"
 	"\tYou're compiling for unsupported platform!\n"
 	"\tIf you wish to support this platform, make your own fork, and modify code for _yourself_.\n"
@@ -493,6 +491,7 @@ static_assert(false, "\n\n"
 	"\tto test on these platforms, and over years there wasn't any serious contributor who wanted to take\n"
 	"\tburden of maintaining code for these platforms.\n"
 	"\t\n");
-#endif // BX_PLATFORM_*
+
+#endif // defined(__cplusplus)
 
 #endif // BX_PLATFORM_H_HEADER_GUARD
