@@ -262,6 +262,37 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t opcode2)
 	return 1;
 }
 
+int xa_dasm::handle_pushpop_rlist(XA_DASM_PARAMS, int type)
+{
+//	int h = opcode & 0x40;
+	int sz = opcode & 0x08;
+	const u8 opcode2 = opcodes.r8(pc++);
+
+	if (sz)
+	{
+		// h is ignored?
+		util::stream_format(stream, "%s%s ", m_pushpull[type], sz ? ".w" : ".b");
+
+		bool firstbit = true;
+		for (int i = 0; i < 8; i++)
+		{
+			int bit = (opcode2 & (1 << i));
+
+			if (bit)
+			{
+				util::stream_format(stream, "%s%s", firstbit ? "" : ",", m_regnames16[i]);
+				firstbit = false;
+			}
+		}
+	}
+	else
+	{
+
+	}
+
+	return 2;
+}
+
 
 /*
 
@@ -321,33 +352,7 @@ int xa_dasm::d_add(XA_DASM_PARAMS)
 
 int xa_dasm::d_push_rlist(XA_DASM_PARAMS)
 {
-//	int h = opcode & 0x40;
-	int sz = opcode & 0x08;
-	const u8 opcode2 = opcodes.r8(pc++);
-
-	if (sz)
-	{
-		// h is ignored?
-		util::stream_format(stream, "PUSH%s ", sz ? ".w" : ".b");
-
-		bool firstbit = true;
-		for (int i = 0; i < 8; i++)
-		{
-			int bit = (opcode2 & (1 << i));
-
-			if (bit)
-			{
-				util::stream_format(stream, "%s%s", firstbit ? "" : ",", m_regnames16[i]);
-				firstbit = false;
-			}
-		}
-	}
-	else
-	{
-
-	}
-
-	return 2;
+	return handle_pushpop_rlist(XA_CALL_PARAMS, 0);
 }
 
 /*
@@ -370,6 +375,8 @@ PUSHU Rlist                 Push regs (b/w) from the user stack                 
 
 */
 
+// group 1
+
 int xa_dasm::d_addc(XA_DASM_PARAMS)
 {
 	return handle_alu_type0(XA_CALL_PARAMS, 1);
@@ -377,7 +384,7 @@ int xa_dasm::d_addc(XA_DASM_PARAMS)
 
 int xa_dasm::d_pushu_rlist(XA_DASM_PARAMS)
 {
-	return 1;
+	return handle_pushpop_rlist(XA_CALL_PARAMS, 1);
 }
 
 /*
@@ -400,6 +407,8 @@ POP Rlist                   Pop regs (b/w) from the current stack               
 
 */
 
+// group 2
+
 int xa_dasm::d_sub(XA_DASM_PARAMS)
 {
 	return handle_alu_type0(XA_CALL_PARAMS, 2);
@@ -407,7 +416,7 @@ int xa_dasm::d_sub(XA_DASM_PARAMS)
 
 int xa_dasm::d_pop_rlist(XA_DASM_PARAMS)
 {
-	return 1;
+	return handle_pushpop_rlist(XA_CALL_PARAMS, 2);
 }
 
 /*
@@ -429,6 +438,8 @@ POPU Rlist                  Pop regs (b/w) from the user stack                  
 
 */
 
+// group 3
+
 int xa_dasm::d_subb(XA_DASM_PARAMS)
 {
 	return handle_alu_type0(XA_CALL_PARAMS, 3);
@@ -436,7 +447,7 @@ int xa_dasm::d_subb(XA_DASM_PARAMS)
 
 int xa_dasm::d_popu_rlist(XA_DASM_PARAMS)
 {
-	return 1;
+	return handle_pushpop_rlist(XA_CALL_PARAMS, 3);
 }
 
 /*
@@ -460,6 +471,8 @@ CMP Rd, direct              Compare mem w/ reg                                  
 ( PUSH Rlist                  Push regs (b/w) onto the current stack                                  2 b*        0H00 S111  LLLL LLLL )
 
 */
+
+// group 4
 
 int xa_dasm::d_lea_offset8(XA_DASM_PARAMS)
 {
@@ -498,6 +511,8 @@ AND Rd, direct              Logical AND mem to reg                              
 
 */
 
+// group 5
+
 int xa_dasm::d_xch_type1(XA_DASM_PARAMS)
 {
 	return 1;
@@ -532,6 +547,8 @@ OR Rd, direct               Logical OR mem to reg                               
 
 */
 
+// group 6
+
 int xa_dasm::d_xch_type2(XA_DASM_PARAMS)
 {
 	return 1;
@@ -562,6 +579,8 @@ XOR Rd, direct              Logical XOR mem to reg                              
 ( POPU Rlist                  Pop regs (b/w) from the user stack                                      2 c*        0H11 S111  LLLL LLLL )
 
 */
+
+// group 7
 
 int xa_dasm::d_xor(XA_DASM_PARAMS)
 {
@@ -784,6 +803,7 @@ MOV direct, direct          Move mem to mem                                     
 
 */
 
+// group 9
 
 int xa_dasm::d_g9_subgroup(XA_DASM_PARAMS)
 {
@@ -823,6 +843,8 @@ MOVX [Rd], Rs               Move external data from reg to mem                  
 
 */
 
+// group a
+
 int xa_dasm::d_movdir(XA_DASM_PARAMS)
 {
 	return 1;
@@ -856,6 +878,7 @@ RRC Rd, #data4              Rotate right reg though carry by the 4-bit imm value
 
 */
 
+// group b
 
 int xa_dasm::d_rr(XA_DASM_PARAMS)
 {
@@ -894,24 +917,105 @@ NORM Rd, Rs                 Logical shift left dest reg by the value in the src 
 
 */
 
+// group c
+
 int xa_dasm::d_lsr_fc(XA_DASM_PARAMS)
 {
+	int size = opcode & 0x0c;
+	switch (size)
+	{
+	case 0x00: case 0x08: case 0x0c:
+	{
+		const u8 opcode2 = opcodes.r8(pc++);
+		util::stream_format(stream, "LSR%s Rd, Rs %02x", m_dwparamsizes[size >> 2], opcode2);
+		return 2;
+	}
+	case 0x04:
+	{
+		const u8 opcode2 = opcodes.r8(pc++);
+		const u8 opcode3 = opcodes.r8(pc++);
+		const u8 opcode4 = opcodes.r8(pc++);
+
+		util::stream_format(stream, "FCALL addr24 %02x%02x%02x", opcode2, opcode3, opcode4);
+
+		return 4;
+	}
+	}
+
 	return 1;
 }
 
 
 int xa_dasm::d_asl_c(XA_DASM_PARAMS)
 {
+	int size = opcode & 0x0c;
+	switch (size)
+	{
+	case 0x00: case 0x08: case 0x0c:
+	{
+		const u8 opcode2 = opcodes.r8(pc++);
+		util::stream_format(stream, "ASL%s Rd, Rs %02x", m_dwparamsizes[size >> 2], opcode2);
+		return 2;
+	}
+	case 0x04:
+	{
+		const u8 opcode2 = opcodes.r8(pc++);
+		const u8 opcode3 = opcodes.r8(pc++);
+
+		util::stream_format(stream, "CALL rel16  %02x%02x", opcode2, opcode3);
+
+		return 3;
+	}
+	}
+
 	return 1;
 }
 
 int xa_dasm::d_asr_c(XA_DASM_PARAMS)
 {
+	int size = opcode & 0x0c;
+	switch (size)
+	{
+	case 0x00: case 0x08: case 0x0c:
+	{
+		const u8 opcode2 = opcodes.r8(pc++);
+		util::stream_format(stream, "ASR%s Rd, Rs  %02x", m_dwparamsizes[size >> 2], opcode2);
+		return 2;
+	}
+	case 0x04:
+	{
+		const u8 opcode2 = opcodes.r8(pc++);
+
+		util::stream_format(stream, "CALL [Rs]  %02x", opcode2);
+
+		return 2;
+	}
+	}
+
 	return 1;
 }
 
 int xa_dasm::d_norm(XA_DASM_PARAMS)
 {
+	int size = opcode & 0x0c;
+	switch (size)
+	{
+	case 0x00: case 0x08: case 0x0c:
+	{
+		const u8 opcode2 = opcodes.r8(pc++);
+		util::stream_format(stream, "NORM%s Rd, Rs  %02x", m_dwparamsizes[size >> 2], opcode2);
+		return 2;
+	}
+	case 0x04:
+	{
+		const u8 opcode2 = opcodes.r8(pc++);
+
+		util::stream_format(stream, "illegal %02x", opcode2);
+
+		return 2;
+	}
+	}
+
 	return 1;
 }
 
@@ -939,33 +1043,146 @@ RET                         Return from subroutine                              
 RETI                        Return from interrupt                                                   2 10/8(PZ)  1101 0110  1001 0000
 
 RL Rd, #data4               Rotate left reg by the 4-bit imm value                                  2 a*        1101 S011  dddd iiii
+
 RLC Rd, #data4              Rotate left reg though carry by the 4-bit imm value                     2 a*        1101 S111  dddd iiii
 
 */
 
+// group d
+
 int xa_dasm::d_lsr_fj(XA_DASM_PARAMS)
 {
+	int size = opcode & 0x0c;
+	switch (size)
+	{
+	case 0x00: case 0x08: case 0x0c:
+	{
+		const u8 opcode2 = opcodes.r8(pc++);
+		util::stream_format(stream, "LSR%s Rd, #data4 %02x", m_dwparamsizes[size >> 2], opcode2);
+		return 2;
+	}
+	case 0x04:
+	{
+		const u8 opcode2 = opcodes.r8(pc++);
+		const u8 opcode3 = opcodes.r8(pc++);
+		const u8 opcode4 = opcodes.r8(pc++);
+
+		util::stream_format(stream, "FJMP addr24 %02x%02x%02x", opcode2, opcode3, opcode4);
+
+		return 4;
+	}
+	}
+
 	return 1;
 }
 
 int xa_dasm::d_asl_j(XA_DASM_PARAMS)
 {
+	int size = opcode & 0x0c;
+	switch (size)
+	{
+	case 0x00: case 0x08: case 0x0c:
+	{
+		const u8 opcode2 = opcodes.r8(pc++);
+		util::stream_format(stream, "ASL%s Rd, #data4 %02x", m_dwparamsizes[size >> 2], opcode2);
+		return 2;
+	}
+	case 0x04:
+	{
+		const u8 opcode2 = opcodes.r8(pc++);
+		const u8 opcode3 = opcodes.r8(pc++);
+
+		util::stream_format(stream, "JMP rel16  %02x%02x", opcode2, opcode3);
+
+		return 3;
+	}
+	}
+
 	return 1;
 }
 
 int xa_dasm::d_asr_j(XA_DASM_PARAMS)
 {
-	return 1;
+	int size = opcode & 0x0c;
+	const u8 opcode2 = opcodes.r8(pc++);
+
+	switch (size)
+	{
+	case 0x00: case 0x08: case 0x0c:
+	{
+		util::stream_format(stream, "ASR%s Rd, #data4 %02x", m_dwparamsizes[size >> 2], opcode2);
+		break;
+	}
+	case 0x04:
+	{
+		switch (opcode2 & 0xf0)
+		{
+		case 0x10:
+		{
+			util::stream_format(stream, "RESET");
+			break;
+		}
+		case 0x30:
+		{
+			util::stream_format(stream, "TRAP");
+			break;
+		}
+		case 0x40:
+		{
+			util::stream_format(stream, "JMP [A+DPTR]");
+			break;
+		}
+		case 0x60:
+		{
+			util::stream_format(stream, "JMP [[Rs+]]");
+			break;
+		}
+		case 0x70:
+		{
+			util::stream_format(stream, "JMP [Rs]");
+			break;
+		}
+		case 0x80:
+		{
+			util::stream_format(stream, "RET");
+			break;
+		}
+		case 0x90:
+		{
+			util::stream_format(stream, "RTI");
+			break;
+		}
+		default:
+		{
+			util::stream_format(stream, "illegal");
+			break;
+		}
+		}
+
+	}
+	}
+
+	return 2;
 }
 
 int xa_dasm::d_rl(XA_DASM_PARAMS)
 {
-	return 1;
+	int size = opcode & 0x08;
+	const u8 opcode2 = opcodes.r8(pc++);
+
+	util::stream_format(stream, "RL%s Rd, #data4", size ? ".w" : ".b", opcode2);
+
+	return 2;
 }
 
 int xa_dasm::d_rlc(XA_DASM_PARAMS)
 {
-	return 1;
+	int size = opcode & 0x08;
+	const u8 opcode2 = opcodes.r8(pc++);
+
+	util::stream_format(stream, "RLC%s Rd, #data4", size ? ".w" : ".b", opcode2);
+
+	return 2;
 }
 
 
@@ -1015,6 +1232,8 @@ CJNE [Rd],#data16,rel8      Compare imm word to reg-ind and jump if not equal   
 
 
 */
+
+// group e
 
 int xa_dasm::d_djnz_cjne(XA_DASM_PARAMS)
 {
@@ -1118,13 +1337,18 @@ BKPT                        Cause the breakpoint trap to be executed.           
 --------------------------------------
 */
 
+// group f
+
 int xa_dasm::d_branch(XA_DASM_PARAMS)
 {
-	return 1;
+	const u8 opcode2 = opcodes.r8(pc++);
+	util::stream_format(stream, "%s %02x", m_branches[opcode & 0xf], opcode2);
+	return 2;
 }
 
 int xa_dasm::d_bkpt(XA_DASM_PARAMS)
 {
+	util::stream_format(stream, "BKPT");
 	return 1;
 }
 
