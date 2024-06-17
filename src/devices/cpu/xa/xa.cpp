@@ -27,7 +27,7 @@ xa_cpu_device::xa_cpu_device(const machine_config &mconfig, const char *tag, dev
 
 std::unique_ptr<util::disasm_interface> xa_cpu_device::create_disassembler()
 {
-	return std::make_unique<xa_disassembler>();
+	return std::make_unique<xa_dasm>();
 }
 
 /*****************************************************************************/
@@ -54,6 +54,8 @@ void xa_cpu_device::device_start()
 
 void xa_cpu_device::device_reset()
 {
+	// temp, as there is code here on superkds
+	m_pc = 0x192C;
 }
 
 /*****************************************************************************/

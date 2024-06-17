@@ -6,14 +6,83 @@
 
 #pragma once
 
-class xa_disassembler : public util::disasm_interface
+#define XA_DASM_PARAMS uint8_t opcode, std::ostream& stream, offs_t pc, const data_buffer& opcodes, const data_buffer& params
+
+class xa_dasm : public util::disasm_interface
 {
 public:
-	xa_disassembler() = default;
-	virtual ~xa_disassembler() = default;
+	xa_dasm() = default;
+	virtual ~xa_dasm() = default;
 
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+
+	typedef int (xa_dasm::*op_func) (XA_DASM_PARAMS);
+	static const op_func s_instruction[256];
+
+	const char* m_regnames16[8] = { "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7" };
+	const char* m_regnames8[16] = { "R0L", "R0H", "R1L", "R1H", "R2L", "R2H", "R3L", "R3H", "R4L", "R4H", "R5L", "R5H", "R6L", "R6H", "R7L", "R7H"};
+
+
+	int d_illegal(XA_DASM_PARAMS);
+
+	int d_nop(XA_DASM_PARAMS);
+	int d_bitgroup(XA_DASM_PARAMS);
+	int d_add(XA_DASM_PARAMS);
+	int d_push_rlist(XA_DASM_PARAMS);
+	int d_addc(XA_DASM_PARAMS);
+	int d_pushu_rlist(XA_DASM_PARAMS);
+	int d_sub(XA_DASM_PARAMS);
+	int d_pop_rlist(XA_DASM_PARAMS);
+	int d_subb(XA_DASM_PARAMS);
+	int d_popu_rlist(XA_DASM_PARAMS);
+	int d_lea_offset8(XA_DASM_PARAMS);
+	int d_lea_offset16(XA_DASM_PARAMS);
+	int d_cmp(XA_DASM_PARAMS);
+	int d_xch_type1(XA_DASM_PARAMS);
+	int d_and(XA_DASM_PARAMS);
+	int d_xch_type2(XA_DASM_PARAMS);
+	int d_or(XA_DASM_PARAMS);
+	int d_xor(XA_DASM_PARAMS);
+	int d_movc_rd_rsinc(XA_DASM_PARAMS);
+	int d_mov(XA_DASM_PARAMS);
+	int d_pushpop_djnz_subgroup(XA_DASM_PARAMS);
+	int d_g9_subgroup(XA_DASM_PARAMS);
+	int d_alu(XA_DASM_PARAMS);
+	int d_jb_mov_subgroup(XA_DASM_PARAMS);
+	int d_movdir(XA_DASM_PARAMS);
+	int d_adds(XA_DASM_PARAMS);
+	int d_movx_subgroup(XA_DASM_PARAMS);
+	int d_rr(XA_DASM_PARAMS);
+	int d_movs(XA_DASM_PARAMS);
+	int d_rrc(XA_DASM_PARAMS);
+	int d_lsr_fc(XA_DASM_PARAMS);
+	int d_asl_c(XA_DASM_PARAMS);
+	int d_asr_c(XA_DASM_PARAMS);
+	int d_norm(XA_DASM_PARAMS);
+	int d_lsr_fj(XA_DASM_PARAMS);
+	int d_asl_j(XA_DASM_PARAMS);
+	int d_asr_j(XA_DASM_PARAMS);
+	int d_rl(XA_DASM_PARAMS);
+	int d_rlc(XA_DASM_PARAMS);
+	int d_djnz_cjne(XA_DASM_PARAMS);
+	int d_mulu_b(XA_DASM_PARAMS);
+	int d_divu_b(XA_DASM_PARAMS);
+	int d_mulu_w(XA_DASM_PARAMS);
+	int d_divu_w(XA_DASM_PARAMS);
+	int d_mul_w(XA_DASM_PARAMS);
+	int d_div_w(XA_DASM_PARAMS);
+	int d_div_data8(XA_DASM_PARAMS);
+	int d_div_d16(XA_DASM_PARAMS);
+	int d_divu_d(XA_DASM_PARAMS);
+	int d_div_d(XA_DASM_PARAMS);
+	int d_cjne_d8(XA_DASM_PARAMS);
+	int d_cjne_d16(XA_DASM_PARAMS);
+	int d_jz_rel8(XA_DASM_PARAMS);
+	int d_jnz_rel8(XA_DASM_PARAMS);
+	int d_branch(XA_DASM_PARAMS);
+	int d_bkpt(XA_DASM_PARAMS);
 };
 
 #endif // MAME_CPU_XA_XADASM_H
