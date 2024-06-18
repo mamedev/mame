@@ -9997,9 +9997,8 @@ ROM_END
   * Sharp SM510 under epoxy (die label MJ1)
   * lcd screen with custom segments, 1-bit sound
 
-  TODO or BTANB?: Energy and weapon power bars are swapped. Not verified on the
-  handheld. The manual does show them correctly, but looking at the LCD segment
-  ID groupings, the SVG is not wrong.
+  BTANB: Energy and weapon power bars are the wrong way around. The manual does
+  show them correctly, but it appears to be a doctored picture.
 
 *******************************************************************************/
 
