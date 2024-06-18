@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy, Angelo Salese
-/*******************************************************************************************
+/**************************************************************************************************
 
 Royal Casino (c) 1984 Dyna
 Casino Winner (c) 1985 Aristocrat
@@ -9,12 +9,12 @@ driver by Chris Hardy & Angelo Salese
 original rcasino.c driver by Curt Coder
 
 TODO:
-- Imperfect 8-liner video mode;
+- Imperfect 8-liner video mode, which in turn looks derived from misc/summit.cpp?
 - Hookup payout (press 'I' to bypass when "call dealer" happens);
 - Add lamps support;
 - p1 & p2 inputs are tied to the same port...maybe they are mux-ed with the flip screen bit?
 
-============================================================================================
+===================================================================================================
     ----------------------------------------
     Casino Royal by Dyna Electronics CO. LTD
     ----------------------------------------
@@ -65,7 +65,7 @@ TODO:
     Main processor  - Z80A
     Sound           - AY-3-8910
 
-*******************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -387,13 +387,11 @@ void caswin_state::palette_init(palette_device &palette) const
 
 void caswin_state::vvillage(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	Z80(config, m_maincpu, XTAL(6'000'000)); // Z80A @ 6 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &caswin_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &caswin_state::main_io);
 	m_maincpu->set_vblank_int("screen", FUNC(caswin_state::irq0_line_hold));
 
-	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -409,7 +407,7 @@ void caswin_state::vvillage(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 4000000 / 4));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(6'000'000) / 4)); // TODO: unconfirmed clock
 	aysnd.port_a_read_callback().set_ioport("DSW1");
 	aysnd.port_b_read_callback().set_ioport("DSW2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
