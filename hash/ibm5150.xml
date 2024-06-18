@@ -10003,9 +10003,9 @@ If you fail the Budokan Family Crest identification, you will only be able to pr
 	</software>
 
 	<software name="budokan35a" cloneof="budokan">
-		<description>Budokan - The Martial Spirit (3.5", Big Games release)</description>
+		<description>Budokan - The Martial Spirit (3.5", Big Games)</description>
 		<year>1995</year>
-		<publisher>Big Games</publisher>
+		<publisher>Jackson Libri</publisher>
 		<notes><![CDATA[
 This release doesn't have copy protection.
 ]]></notes>
@@ -12166,9 +12166,10 @@ The game freezes after choosing the characters.
 	</software>
 
 	<software name="gunship">
-		<description>Gunship</description>
+		<description>Gunship (5.25")</description>
 		<year>1987</year>
 		<publisher>MicroProse</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="MicroProse" />
 		<info name="version" value="429.05" />
 		<part name="flop1" interface="floppy_5_25">
@@ -12179,6 +12180,19 @@ The game freezes after choosing the characters.
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Gunship v429.05 [Microprose] [1987] [5.25DD] [Disk 2 of 2].img" size="368640" crc="edcb863f" sha1="3391538e151626280ae59875619dcb9bfafaf1c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gunship_35" cloneof="gunship">
+		<description>Gunship (3.5", Futura Games)</description>
+		<year>1995</year>
+		<publisher>Futura Publishing</publisher>
+		<info name="developer" value="MicroProse" />
+		<info name="version" value="429.05" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Gunship [Futura] [1995] [3.5DD] [Disk 1 of 1].img" size="737280" crc="5588c20b" sha1="bee3b0b23a34d99cada655bbfa950bdc58da9f2d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17311,6 +17325,17 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		</part>
 	</software>
 
+	<software name="stuntcar">
+		<description>Stunt Car Racer (Big Games)</description>
+		<year>1995</year>
+		<publisher>Jackson Libri</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Stunt Car Racer (Big Games) [1995] [3.5DD] [Disk 1 of 1].img" size="737280" crc="904f17f0" sha1="bdaec36517fa972eba064c358c4149fdc1157d5d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="superc">
 		<description>Super C</description>
 		<year>1990</year>
@@ -17677,16 +17702,39 @@ Disk 1 has a modified "go.bat" file
 	<software name="term2">
 		<description>Terminator 2: Judgment Day</description>
 		<year>1991</year>
-		<publisher>Ocean Software</publisher>
+		<publisher>Ocean</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Dementia" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Terminator 2 - Disk 1" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Terminator 2 Judgment Day [Ocean] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="d0935eef" sha1="5816a1ab889f293ec4d1492abfdcdbc232176554"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Terminator 2 - Disk 2" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Terminator 2 Judgment Day [Ocean] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="1ce42358" sha1="bdce14d4f6dd17a79391c0fffe6d8e6d7a2f4c5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="term2_a" cloneof="term2">
+		<description>Terminator 2: Judgment Day (Big Games)</description>
+		<year>1995</year>
+		<publisher>Jackson Libri</publisher>
+		<info name="developer" value="Dementia" />
+		<info name="usage" value="Supports: EGA, VGA &amp; Tandy" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Terminator 2 - Disco 1" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Terminator 2 Judgment Day [Big Games] [1995] [3.5DD] [Disk 1 of 2].img" size="737280" crc="9128102d" sha1="a129185b35858e6b60817df92ba11816c85e3e7f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Terminator 2 - Disco 2" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Terminator 2 Judgment Day [Big Games] [1995] [3.5DD] [Disk 2 of 2].img" size="737280" crc="7a2555be" sha1="5ab1e41adafbc8da553eef856b0adfeedb1a65b0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18733,9 +18781,9 @@ Disk 1 has a created "RESOURCE.CFG" file
 	</software>
 
 	<software name="zoola" cloneof="zool">
-		<description>Zool (Big Games release)</description>
+		<description>Zool (Big Games)</description>
 		<year>1995</year>
-		<publisher>Gremlin Graphics</publisher>
+		<publisher>Jackson Libri</publisher>
 		<info name="developer" value="Gremlin Graphics" />
 		<info name="ported by" value="Cygnus Software" />
 		<info name="version" value="14/09/93" />
