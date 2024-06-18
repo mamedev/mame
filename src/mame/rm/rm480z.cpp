@@ -311,6 +311,11 @@ INPUT_PORTS_START( rm480z )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(": *")             PORT_CODE(KEYCODE_COLON)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("^ ~")             PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("@ `")             PORT_CODE(KEYCODE_ASTERISK)
+
+	PORT_START("display_type")
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, rm480z_state, monitor_changed, 0)
+	PORT_CONFSETTING( 0x00, "TTL RGB Colour Monitor" )
+	PORT_CONFSETTING( 0x01, "Monochrome b/w Monitor" )
 INPUT_PORTS_END
 
 uint32_t rm480z_state::screen_update_rm480z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -341,7 +346,7 @@ void rm480z_state::rm480z(machine_config &config)
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* video hardware */
-	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
+	PALETTE(config, m_palette).set_init(FUNC(rm480z_state::palette_init)).set_entries(19);
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(FUNC(rm480z_state::screen_update_rm480z));
 	m_screen->set_palette(m_palette);

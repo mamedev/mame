@@ -129,8 +129,18 @@ uint8_t rm480z_state::hrg_port_read(offs_t offset)
 		{
 			ret_val |= 0x02;
 		}
+		// bit 6 is low when screen memory is open
+		if (!m_hrg_mem_open)
+		{
+			ret_val |= 0x40;
+		}
 		break;
 	case 3:
+		int index = calculate_hrg_vram_index();
+		if (index >= 0)
+		{
+			ret_val = m_hrg_ram[index];
+		}
 		break;	
 	}	
 
@@ -139,6 +149,59 @@ uint8_t rm480z_state::hrg_port_read(offs_t offset)
 
 void rm480z_state::hrg_port_write(offs_t offset, uint8_t data)
 {
+	switch (offset)
+	{
+	case 0:
+		m_hrg_port0 = data;
+		break;
+	case 1:
+		m_hrg_port1 = data;
+		break;
+	case 2:
+		if (BIT(data, 7))
+		{
+			change_palette(data & 0x0f, 255 - m_hrg_port0);
+		}
+		else if (BIT(data, 1))
+		{
+			switch ((data >> 4) & 0x03)
+			{
+			case 0x00:
+				m_hrg_display_mode = hrg_display_mode::extra_high;
+				break;
+			case 0x01:
+				m_hrg_display_mode = hrg_display_mode::high;
+				break;
+			case 0x03:
+				if (BIT(data, 3))
+				{
+					m_hrg_display_mode = hrg_display_mode::medium_1;
+				}
+				else
+				{
+					m_hrg_display_mode = hrg_display_mode::medium_0;
+				}
+				break;
+			default:
+				m_hrg_display_mode = hrg_display_mode::none;
+				break;
+			}
+		}
+		else
+		{
+			// HRG output inhibited when bit 1 is low
+			m_hrg_display_mode = hrg_display_mode::none;
+		}
+		m_hrg_mem_open = !BIT(data, 6);
+		break;
+	case 3:
+		int index = calculate_hrg_vram_index();
+		if (index >= 0)
+		{
+			m_hrg_ram[index] = data;
+		}
+		break;	
+	}
 }
 
 void rm480z_state::machine_reset()

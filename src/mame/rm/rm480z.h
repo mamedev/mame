@@ -44,9 +44,12 @@ public:
 		m_ctc(*this, "ctc"),
 		m_speaker(*this, "speaker"),
 		m_io_kbrow(*this, "kbrow.%u", 0U),
+		m_io_display_type(*this, "display_type"),
 		m_chargen(*this, "chargen")
 	{
 	}
+
+	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
 
 	void rm480z(machine_config &config);
 	void rm480za(machine_config &config);
@@ -66,10 +69,21 @@ private:
 		uint8_t m_chars[ROWS][COLS];
 	};
 
+	enum class hrg_display_mode : uint8_t
+	{
+		none = 0,
+		high = 1,
+		medium_0 = 2,
+		medium_1 = 3,
+		extra_high = 4
+	};
+
 	static inline constexpr int RM480Z_SCREENROWS = 24;
 	static inline constexpr int RM480Z_SCREENCOLS = 80;
 	static inline constexpr int RM480Z_VIDEOMODE_40COL = 0x01;
 	static inline constexpr int RM480Z_VIDEOMODE_80COL = 0x02;
+	static inline constexpr int RM480Z_HRG_RAM_SIZE = 16384; // 16k
+	static inline constexpr int RM480Z_HRG_SCRATCHPAD_SIZE = 16;
 
 	memory_view m_view;
 
@@ -83,6 +97,13 @@ private:
 	int m_videomode = RM480Z_VIDEOMODE_80COL;
 	bool m_alt_char_set = false;
 
+	uint8_t m_hrg_ram[RM480Z_HRG_RAM_SIZE];
+	uint8_t m_hrg_scratchpad[RM480Z_HRG_SCRATCHPAD_SIZE];
+	hrg_display_mode m_hrg_display_mode = hrg_display_mode::none;
+	uint8_t m_hrg_port0 = 0;
+	uint8_t m_hrg_port1 = 0;
+	bool m_hrg_mem_open = false;
+
 	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -90,6 +111,7 @@ private:
 	required_device<z80ctc_device> m_ctc;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<8> m_io_kbrow;
+	required_ioport m_io_display_type;
 	required_region_ptr<u8> m_chargen;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kbd_scan);
@@ -111,6 +133,12 @@ private:
 	void update_screen(bitmap_ind16 &bitmap) const;
 	void putChar(int charnum, int x, int y, bitmap_ind16 &bitmap) const;
 	void config_videomode(bool b80col);
+	int calculate_hrg_vram_index() const;
+	void palette_init(palette_device &palette);
+	void change_palette(int index, uint8_t value);
+	void draw_extra_high_res_graphics(bitmap_ind16 &bitmap) const;
+	void draw_high_res_graphics(bitmap_ind16 &bitmap) const;
+	void draw_medium_res_graphics(bitmap_ind16 &bitmap) const;
 };
 
 #endif // MAME_RM_RM480Z_H
