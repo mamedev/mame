@@ -7,36 +7,52 @@
 
 const xa_dasm::op_func xa_dasm::s_instruction[256] =
 {
+// group 0	
 &xa_dasm::d_nop,			&xa_dasm::d_add,	&xa_dasm::d_add,		&xa_dasm::d_add,		&xa_dasm::d_add,	&xa_dasm::d_add,	&xa_dasm::d_add,		&xa_dasm::d_push_rlist,
 &xa_dasm::d_bitgroup,		&xa_dasm::d_add,	&xa_dasm::d_add,		&xa_dasm::d_add,		&xa_dasm::d_add,	&xa_dasm::d_add,	&xa_dasm::d_add,		&xa_dasm::d_push_rlist, 
-&xa_dasm::d_illegal,		&xa_dasm::d_addc,	&xa_dasm::d_addc,		&xa_dasm::d_addc,		&xa_dasm::d_addc,	&xa_dasm::d_addc,	&xa_dasm::d_addc,		&xa_dasm::d_pushu_rlist,
+// group 1
+&xa_dasm::d_unknown10,		&xa_dasm::d_addc,	&xa_dasm::d_addc,		&xa_dasm::d_addc,		&xa_dasm::d_addc,	&xa_dasm::d_addc,	&xa_dasm::d_addc,		&xa_dasm::d_pushu_rlist,
 &xa_dasm::d_illegal,		&xa_dasm::d_addc,	&xa_dasm::d_addc,		&xa_dasm::d_addc,		&xa_dasm::d_addc,	&xa_dasm::d_addc,	&xa_dasm::d_addc,		&xa_dasm::d_pushu_rlist, 
+// group 2
 &xa_dasm::d_illegal,		&xa_dasm::d_sub,	&xa_dasm::d_sub,		&xa_dasm::d_sub,		&xa_dasm::d_sub,	&xa_dasm::d_sub,	&xa_dasm::d_sub,		&xa_dasm::d_pop_rlist,
 &xa_dasm::d_illegal,		&xa_dasm::d_sub,	&xa_dasm::d_sub,		&xa_dasm::d_sub,		&xa_dasm::d_sub,	&xa_dasm::d_sub,	&xa_dasm::d_sub,		&xa_dasm::d_pop_rlist, 
+// group 3
 &xa_dasm::d_illegal,		&xa_dasm::d_subb,	&xa_dasm::d_subb,		&xa_dasm::d_subb,		&xa_dasm::d_subb,	&xa_dasm::d_subb,	&xa_dasm::d_subb,		&xa_dasm::d_popu_rlist,
 &xa_dasm::d_illegal,		&xa_dasm::d_subb,	&xa_dasm::d_subb,		&xa_dasm::d_subb,		&xa_dasm::d_subb,	&xa_dasm::d_subb,	&xa_dasm::d_subb,		&xa_dasm::d_popu_rlist, 
+// group 4
 &xa_dasm::d_lea_offset8,	&xa_dasm::d_cmp,	&xa_dasm::d_cmp,		&xa_dasm::d_cmp,		&xa_dasm::d_cmp,	&xa_dasm::d_cmp,	&xa_dasm::d_cmp,		&xa_dasm::d_push_rlist,
 &xa_dasm::d_lea_offset16,	&xa_dasm::d_cmp,	&xa_dasm::d_cmp,		&xa_dasm::d_cmp,		&xa_dasm::d_cmp,	&xa_dasm::d_cmp,	&xa_dasm::d_cmp,		&xa_dasm::d_push_rlist, 
+// group 5
 &xa_dasm::d_xch_type1,		&xa_dasm::d_and,	&xa_dasm::d_and,		&xa_dasm::d_and,		&xa_dasm::d_and,	&xa_dasm::d_and,	&xa_dasm::d_and,		&xa_dasm::d_pushu_rlist,
 &xa_dasm::d_xch_type1,		&xa_dasm::d_and,	&xa_dasm::d_and,		&xa_dasm::d_and,		&xa_dasm::d_and,	&xa_dasm::d_and,	&xa_dasm::d_and,		&xa_dasm::d_pushu_rlist, 
+// group 6
 &xa_dasm::d_xch_type2,		&xa_dasm::d_or,		&xa_dasm::d_or,			&xa_dasm::d_or,			&xa_dasm::d_or,		&xa_dasm::d_or,		&xa_dasm::d_or,			&xa_dasm::d_pop_rlist,
 &xa_dasm::d_xch_type2,		&xa_dasm::d_or,		&xa_dasm::d_or,			&xa_dasm::d_or,			&xa_dasm::d_or,		&xa_dasm::d_or,		&xa_dasm::d_or,			&xa_dasm::d_pop_rlist, 
+// group 7
 &xa_dasm::d_illegal,		&xa_dasm::d_xor,	&xa_dasm::d_xor,		&xa_dasm::d_xor,		&xa_dasm::d_xor,	&xa_dasm::d_xor,	&xa_dasm::d_xor,		&xa_dasm::d_popu_rlist,
 &xa_dasm::d_illegal,		&xa_dasm::d_xor,	&xa_dasm::d_xor,		&xa_dasm::d_xor,		&xa_dasm::d_xor,	&xa_dasm::d_xor,	&xa_dasm::d_xor,		&xa_dasm::d_popu_rlist, 
+// group 8
 &xa_dasm::d_movc_rd_rsinc,	&xa_dasm::d_mov,	&xa_dasm::d_mov,		&xa_dasm::d_mov,		&xa_dasm::d_mov,	&xa_dasm::d_mov,	&xa_dasm::d_mov,		&xa_dasm::d_pushpop_djnz_subgroup,
 &xa_dasm::d_movc_rd_rsinc,	&xa_dasm::d_mov,	&xa_dasm::d_mov,		&xa_dasm::d_mov,		&xa_dasm::d_mov,	&xa_dasm::d_mov,	&xa_dasm::d_mov,		&xa_dasm::d_pushpop_djnz_subgroup, 
+// group 9
 &xa_dasm::d_g9_subgroup,	&xa_dasm::d_alu,	&xa_dasm::d_alu,		&xa_dasm::d_alu,		&xa_dasm::d_alu,	&xa_dasm::d_alu,	&xa_dasm::d_alu,		&xa_dasm::d_jb_mov_subgroup,
 &xa_dasm::d_g9_subgroup,	&xa_dasm::d_alu,	&xa_dasm::d_alu,		&xa_dasm::d_alu,		&xa_dasm::d_alu,	&xa_dasm::d_alu,	&xa_dasm::d_alu,		&xa_dasm::d_jb_mov_subgroup, 
+// group a
 &xa_dasm::d_movdir,			&xa_dasm::d_adds,	&xa_dasm::d_adds,		&xa_dasm::d_adds,		&xa_dasm::d_adds,	&xa_dasm::d_adds,	&xa_dasm::d_adds,		&xa_dasm::d_movx_subgroup,
 &xa_dasm::d_movdir,			&xa_dasm::d_adds,	&xa_dasm::d_adds,		&xa_dasm::d_adds,		&xa_dasm::d_adds,	&xa_dasm::d_adds,	&xa_dasm::d_adds,		&xa_dasm::d_movx_subgroup, 
+// group b
 &xa_dasm::d_rr,				&xa_dasm::d_movs,	&xa_dasm::d_movs,		&xa_dasm::d_movs,		&xa_dasm::d_movs,	&xa_dasm::d_movs,	&xa_dasm::d_movs,		&xa_dasm::d_rrc,
 &xa_dasm::d_rr,				&xa_dasm::d_movs,	&xa_dasm::d_movs,		&xa_dasm::d_movs,		&xa_dasm::d_movs,	&xa_dasm::d_movs,	&xa_dasm::d_movs,		&xa_dasm::d_rrc, 
+// group c
 &xa_dasm::d_lsr_fc,			&xa_dasm::d_asl_c,	&xa_dasm::d_asr_c,		&xa_dasm::d_norm,		&xa_dasm::d_lsr_fc,	&xa_dasm::d_asl_c,	&xa_dasm::d_asr_c,		&xa_dasm::d_norm,
 &xa_dasm::d_lsr_fc,			&xa_dasm::d_asl_c,	&xa_dasm::d_asr_c,		&xa_dasm::d_norm,		&xa_dasm::d_lsr_fc,	&xa_dasm::d_asl_c,	&xa_dasm::d_asr_c,		&xa_dasm::d_norm, 
+// group d
 &xa_dasm::d_lsr_fj,			&xa_dasm::d_asl_j,	&xa_dasm::d_asr_j,		&xa_dasm::d_rl,			&xa_dasm::d_lsr_fj,	&xa_dasm::d_asl_j,	&xa_dasm::d_asr_j,		&xa_dasm::d_rlc,
 &xa_dasm::d_lsr_fj,			&xa_dasm::d_asl_j,	&xa_dasm::d_asr_j,		&xa_dasm::d_rl,			&xa_dasm::d_lsr_fj,	&xa_dasm::d_asl_j,	&xa_dasm::d_asr_j,		&xa_dasm::d_rlc, 
+// group e
 &xa_dasm::d_mulu_b,			&xa_dasm::d_divu_b,	&xa_dasm::d_djnz_cjne,	&xa_dasm::d_cjne_d8,	&xa_dasm::d_mulu_w,	&xa_dasm::d_divu_w,	&xa_dasm::d_mul_w,		&xa_dasm::d_div_w,
 &xa_dasm::d_div_data8,		&xa_dasm::d_div_d16,&xa_dasm::d_djnz_cjne,	&xa_dasm::d_cjne_d16,	&xa_dasm::d_jz_rel8,&xa_dasm::d_divu_d,	&xa_dasm::d_jnz_rel8,	&xa_dasm::d_div_d, 
+// group f
 &xa_dasm::d_branch,			&xa_dasm::d_branch,	&xa_dasm::d_branch,		&xa_dasm::d_branch,		&xa_dasm::d_branch,	&xa_dasm::d_branch,	&xa_dasm::d_branch,		&xa_dasm::d_branch,
 &xa_dasm::d_branch,			&xa_dasm::d_branch,	&xa_dasm::d_branch,		&xa_dasm::d_branch,		&xa_dasm::d_branch,	&xa_dasm::d_branch,	&xa_dasm::d_branch,		&xa_dasm::d_bkpt, 
 };
@@ -309,12 +325,12 @@ int xa_dasm::d_nop(XA_DASM_PARAMS)
 /*
 CLR bit                     Clear bit                                                               3 4         0000 1000  0000 00bb  bbbb bbbb
 SETB bit                    Sets the bit specified                                                  3 4         0000 1000  0001 00bb  bbbb bbbb
+MOV C, bit                  Move bit to the carry flag                                              3 4         0000 1000  0010 00bb  bbbb bbbb
+MOV bit, C                  Move carry to bit                                                       3 4         0000 1000  0011 00bb  bbbb bbbb
 ANL C, bit                  Logical AND bit to carry                                                3 4         0000 1000  0100 00bb  bbbb bbbb
 ANL C, /bit                 Logical AND complement of a bit to carry                                3 4         0000 1000  0101 00bb  bbbb bbbb
 ORL C, bit                  Logical OR a bit to carry                                               3 4         0000 1000  0110 00bb  bbbb bbbb
 ORL C, /bit                 Logical OR complement of a bit to carry                                 3 4         0000 1000  0111 00bb  bbbb bbbb
-MOV C, bit                  Move bit to the carry flag                                              3 4         0000 1000  0010 00bb  bbbb bbbb
-MOV bit, C                  Move carry to bit                                                       3 4         0000 1000  0011 00bb  bbbb bbbb
 */
 int xa_dasm::d_bitgroup(XA_DASM_PARAMS)
 {
@@ -362,6 +378,18 @@ ADDC [Rd+], Rs              Add reg-ind w/ autoinc to reg w/ carry              
 ADDC direct, Rs             Add reg to mem w/ carry                                                 3 4         0001 S110  ssss 1DDD  DDDD DDDD
 ADDC Rd, direct             Add mem to reg w/ carry                                                 3 4         0001 S110  dddd 0DDD  DDDD DDDD
 */
+
+int xa_dasm::d_unknown10(XA_DASM_PARAMS)
+{
+	// this appears to be used at 0x19A3 in the superkds ROM, but CPU manual doesn't list it (IDA does't know it either)
+	const u8 opcode2 = opcodes.r8(pc++);
+	const u8 opcode3 = opcodes.r8(pc++);
+
+	util::stream_format(stream, "unknown Op %02x %02x %02x", opcode, opcode2, opcode3);
+	return 3;
+}
+
+
 int xa_dasm::d_addc(XA_DASM_PARAMS)
 {
 	return handle_alu_type0(XA_CALL_PARAMS, 1);
@@ -553,7 +581,11 @@ MOVC Rd, [Rs+]              Move data from WS:Rs address of code mem to reg w/ a
 */
 int xa_dasm::d_movc_rd_rsinc(XA_DASM_PARAMS)
 {
-	return 1;
+	const u8 opcode2 = opcodes.r8(pc++);
+	int size = opcode & 0x08;
+
+	util::stream_format(stream, "MOVC%s Rd, [Rs+]  %02x", size ? ".w" : ".b", opcode2);
+	return 2;
 }
 
 /*
@@ -585,31 +617,34 @@ int xa_dasm::d_pushpop_djnz_subgroup(XA_DASM_PARAMS)
 {
 	const u8 opcode2 = opcodes.r8(pc++);
 	const u8 opcode3 = opcodes.r8(pc++);
+	int size = opcode & 0x08;
 
 	int direct = ((opcode2 & 0x07) << 8) | opcode3;
 
 	if (opcode2 & 0x08)
 	{
-		// DJNZ Rd,rel8 
+		// DJNZ Rd,rel8
+		util::stream_format(stream, "DJNZ%s Rd,rel8  %02x %02x", size ? ".w" : ".b", opcode2, opcode3);
+		return 3;
 	}
 	else
 	{
 		switch (opcode2 & 0xf0)
 		{
 		case 0x00:
-			util::stream_format(stream, "POPU %03x", direct);
+			util::stream_format(stream, "POPU%s %03x", size ? ".w" : ".b", direct);
 			break;
 
 		case 0x10:
-			util::stream_format(stream, "POP %03x", direct);
+			util::stream_format(stream, "POP%s %03x", size ? ".w" : ".b", direct);
 			break;
 
 		case 0x20:
-			util::stream_format(stream, "PUSHU %03x", direct);
+			util::stream_format(stream, "PUSHU%s %03x", size ? ".w" : ".b", direct);
 			break;
 
 		case 0x30:
-			util::stream_format(stream, "PUSH %03x", direct);
+			util::stream_format(stream, "PUSH%s %03x", size ? ".w" : ".b", direct);
 			break;
 
 		default:
@@ -834,6 +869,43 @@ JBC bit,rel8                Jump if bit set and then clear the bit              
 */
 int xa_dasm::d_jb_mov_subgroup(XA_DASM_PARAMS)
 {
+	const u8 opcode2 = opcodes.r8(pc++);
+	const u8 opcode3 = opcodes.r8(pc++);
+	const u8 opcode4 = opcodes.r8(pc++);
+
+	if (opcode2 & 0x80)
+	{
+		switch (opcode2 & 0x70)
+		{
+		case 0x00:
+		{
+			util::stream_format(stream, "JB bit,rel8 %02x %02x %02x", opcode2, opcode3, opcode4);
+			return 4;
+		}
+		case 0x20:
+		{
+			util::stream_format(stream, "JNB bit,rel8  %02x %02x %02x", opcode2, opcode3, opcode4);
+			return 4;
+		}
+		case 0x40:
+		{
+			util::stream_format(stream, "JBC bit,rel8  %02x %02x %02x", opcode2, opcode3, opcode4);
+			return 4;
+		}
+		default:
+		{
+			util::stream_format(stream, "illegal %02x %02x %02x", opcode2, opcode3, opcode4);
+			return 4;
+		}
+
+		}
+	}
+	else
+	{
+		util::stream_format(stream, "MOV direct, direct  %02x %02x %02x", opcode2, opcode3, opcode4);
+		return 4;
+	}
+
 	return 1;
 }
 
