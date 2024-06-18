@@ -9,10 +9,10 @@ driver by Chris Hardy & Angelo Salese
 original rcasino.c driver by Curt Coder
 
 TODO:
--Cherry-type subgames appears to have wrong graphics alignment,maybe it's some fancy window
- effect?
--Add lamps support;
--p1 & p2 inputs are tied to the same port...maybe they are mux-ed with the flip screen bit?
+- Imperfect 8-liner video mode;
+- Hookup payout (press 'I' to bypass when "call dealer" happens);
+- Add lamps support;
+- p1 & p2 inputs are tied to the same port...maybe they are mux-ed with the flip screen bit?
 
 ============================================================================================
     ----------------------------------------
@@ -84,11 +84,11 @@ class caswin_state : public driver_device
 public:
 	caswin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_vram(*this, "vram")
-		, m_attr(*this, "attr")
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_lamps(*this, "lamp%u", 0U)
+		, m_vram(*this, "vram")
+		, m_attr(*this, "attr")
 	{ }
 
 	void vvillage(machine_config &config);
@@ -111,12 +111,14 @@ private:
 	void main_io(address_map &map);
 	void main_map(address_map &map);
 
-	required_shared_ptr<uint8_t> m_vram;
-	required_shared_ptr<uint8_t> m_attr;
 	tilemap_t *m_tilemap = nullptr;
+	bool m_window_enable = false;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<5> m_lamps;
+	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_attr;
 };
 
 
@@ -127,6 +129,7 @@ TILE_GET_INFO_MEMBER(caswin_state::get_tile_info)
 	const u16 tile = (m_vram[tile_index] | ((attr & 0x70)<<4)) & 0x7ff;
 	const u8 colour = m_attr[tile_index] & 0xf;
 
+	// for 8-liner mode all dedicated objects have this high
 	tileinfo.category = BIT(attr, 3);
 
 	tileinfo.set(0,
@@ -139,11 +142,51 @@ void caswin_state::video_start()
 {
 	m_lamps.resolve();
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(caswin_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap->set_transparent_pen(0);
 }
 
 uint32_t caswin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (!m_window_enable)
+	{
+		m_tilemap->set_scroll_rows(1);
+		m_tilemap->set_scrollx(0, 0);
+		m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
+		return 0;
+	}
+	// 8-liner mode
+	rectangle clip;
+
+	bitmap.fill(0, cliprect);
+
+	m_tilemap->set_scroll_rows(1);
+	m_tilemap->set_scrollx(0, 0);
+
+	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(0), 0);
+	const rectangle &visarea = screen.visible_area();
+	// these limits are calculated thru tilemap viewer against the markers,
+	// which shouldn't draw
+	clip.set(56, 199, visarea.min_y, visarea.max_y);
+	clip &= cliprect;
+	m_tilemap->set_scroll_rows(32);
+
+	// TODO: still some cutoffs / object change flashing
+    // goofy rowscroll, expects to wraparound over its own canvas ...
+	for (int i = 0; i < 32; i ++)
+	{
+		const u16 scroll_data = m_vram[i];
+		m_tilemap->set_scrollx(i, scroll_data ? scroll_data + 0 : 0);
+	}
+
+	m_tilemap->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(1), 0);
+
+	for (int i = 0; i < 32; i ++)
+	{
+		const u16 scroll_data = m_vram[i];
+		m_tilemap->set_scrollx(i, scroll_data ? scroll_data + 96 : 0);
+	}
+
+	m_tilemap->draw(screen, bitmap, clip, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(1), 0);
 	return 0;
 }
 
@@ -159,8 +202,8 @@ void caswin_state::attr_w(offs_t offset, uint8_t data)
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-// TODO: bit 5 unknown
-// TODO: bits 4-0 base scroll?
+// TODO: bit 5 unknown, acts as flip-flop
+// TODO: bits 4-0 gets often changed during reel motion.
 void caswin_state::base_scroll_w(uint8_t data)
 {
 	//...
@@ -171,6 +214,7 @@ void caswin_state::base_scroll_w(uint8_t data)
 void caswin_state::vregs_w(uint8_t data)
 {
 	flip_screen_set(data & 1);
+	m_window_enable = bool(BIT(data, 1));
 }
 
 /**********************
