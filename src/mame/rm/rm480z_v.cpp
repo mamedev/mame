@@ -23,7 +23,7 @@ void rm480z_state::change_palette(int index, uint8_t value)
 {
 	rgb_t new_colour;
 
-	if (m_io_display_type->read() & 0x01)
+	if (m_io_display_type->read())
 	{
 		// value is intensity for a b/w monochrome display
 		new_colour = rgb_t(value, value, value);
@@ -52,34 +52,6 @@ void rm480z_state::palette_init(palette_device &palette)
 	for (int c = 3; c < 19; c++)
 	{
 		palette.set_pen_color(c, rgb_t::black());
-	}
-}
-
-void rm480z_state::config_videomode(bool b80col)
-{
-	int old_mode = m_videomode;
-
-	if (b80col)
-	{
-		// 80 cols
-		m_videomode = RM480Z_VIDEOMODE_80COL;
-	}
-	else
-	{
-		// 40 cols
-		m_videomode = RM480Z_VIDEOMODE_40COL;
-	}
-
-	if (m_videomode != old_mode)
-	{
-		if (m_videomode == RM480Z_VIDEOMODE_80COL)
-		{
-			m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);
-		}
-		else
-		{
-			m_screen->set_raw(8_MHz_XTAL, 512, 0, 320, 312, 0, 240);
-		}
 	}
 }
 
@@ -125,6 +97,8 @@ void rm480z_state::videoram_write(offs_t offset, uint8_t data)
 
 void rm480z_state::putChar(int charnum, int x, int y, bitmap_ind16 &bitmap) const
 {
+	const int pw = (m_videomode == RM480Z_VIDEOMODE_40COL) ? 2 : 1;
+	const int ph = 1;
 	bool attrDim = false;
 	bool attrRev = false;
 
@@ -161,7 +135,7 @@ void rm480z_state::putChar(int charnum, int x, int y, bitmap_ind16 &bitmap) cons
 			}
 			if (pixel_value)
 			{
-				bitmap.pix(y * 10 + r, x * 8 + c) = pixel_value;
+				bitmap.plot_box((x * 8 + c) * pw, y * 10 + r, pw, ph, pixel_value);
 			}
 		}
 	}
@@ -182,7 +156,10 @@ void rm480z_state::draw_extra_high_res_graphics(bitmap_ind16 &bitmap) const
 			for (int c = 0; c < 8; c++, data <<= 1)
 			{
 				uint8_t pixel_value = data & 0x80 ? 2 : 0;
-				bitmap.plot_box((x + c)*pw, y*ph, pw, ph, pixel_value);
+				if (pixel_value)
+				{
+					bitmap.plot_box((x + c)*pw, y*ph, pw, ph, pixel_value);
+				}
 			}
 		}
 	}
@@ -190,7 +167,7 @@ void rm480z_state::draw_extra_high_res_graphics(bitmap_ind16 &bitmap) const
 
 void rm480z_state::draw_high_res_graphics(bitmap_ind16 &bitmap) const
 {
-	const int pw = (m_videomode == RM480Z_VIDEOMODE_40COL) ? 1 : 2;
+	const int pw = 2;
 	const int ph = 1;
 
 	// (2-bits per pixel, 4 pixels per byte)
@@ -211,7 +188,7 @@ void rm480z_state::draw_high_res_graphics(bitmap_ind16 &bitmap) const
 void rm480z_state::draw_medium_res_graphics(bitmap_ind16 &bitmap) const
 {
 	const int page = (m_hrg_display_mode == hrg_display_mode::medium_0) ? 0 : 1;
-	const int pw = (m_videomode == RM480Z_VIDEOMODE_40COL) ? 2 : 4;
+	const int pw = 4;
 	const int ph = 2;
 
 	// (4-bits per pixel, 2 pixels per byte)
@@ -234,7 +211,7 @@ void rm480z_state::update_screen(bitmap_ind16 &bitmap) const
 {
 	const int ncols = (m_videomode == RM480Z_VIDEOMODE_40COL) ? 40 : 80;
 
-	if (!m_hrg_mem_open)
+	if (!m_hrg_mem_open && (!m_hrg_inhibit || !m_io_display_type->read()))
 	{
 		switch (m_hrg_display_mode)
 		{
@@ -254,12 +231,15 @@ void rm480z_state::update_screen(bitmap_ind16 &bitmap) const
 		}
 	}
 
-	for (int row = 0; row < RM480Z_SCREENROWS; row++)
+	if (!m_video_inhibit || m_io_display_type->read())
 	{
-		for (int col = 0; col < ncols; col++)
+		for (int row = 0; row < RM480Z_SCREENROWS; row++)
 		{
-			uint8_t curch = m_vram.get_char(row, col);
-			putChar(curch, col, row, bitmap);
+			for (int col = 0; col < ncols; col++)
+			{
+				uint8_t curch = m_vram.get_char(row, col);
+				putChar(curch, col, row, bitmap);
+			}
 		}
 	}
 }

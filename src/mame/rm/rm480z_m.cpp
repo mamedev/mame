@@ -61,7 +61,7 @@ void rm480z_state::control_port_write(offs_t offset, uint8_t data)
 		printf("control port write %d: %d\n", offset, data);
 		m_speaker->level_w(BIT(data, 5));
 		m_alt_char_set = BIT(data, 6);
-		config_videomode(BIT(data, 7));
+		m_videomode = BIT(data, 7) ? RM480Z_VIDEOMODE_80COL : RM480Z_VIDEOMODE_40COL;
 		break;
 	case 3:
 		break;
@@ -162,7 +162,7 @@ void rm480z_state::hrg_port_write(offs_t offset, uint8_t data)
 		{
 			change_palette(data & 0x0f, 255 - m_hrg_port0);
 		}
-		else if (BIT(data, 1))
+		else
 		{
 			switch ((data >> 4) & 0x03)
 			{
@@ -187,11 +187,8 @@ void rm480z_state::hrg_port_write(offs_t offset, uint8_t data)
 				break;
 			}
 		}
-		else
-		{
-			// HRG output inhibited when bit 1 is low
-			m_hrg_display_mode = hrg_display_mode::none;
-		}
+		m_hrg_inhibit = !BIT(data, 1);
+		m_video_inhibit = !BIT(data, 2);
 		m_hrg_mem_open = !BIT(data, 6);
 		break;
 	case 3:
@@ -207,6 +204,7 @@ void rm480z_state::hrg_port_write(offs_t offset, uint8_t data)
 void rm480z_state::machine_reset()
 {
 	m_vram.reset();
+	memset(m_hrg_ram, 0, sizeof(m_hrg_ram));
 	m_alt_char_set = false;
 
 	m_kbd_reset = true;

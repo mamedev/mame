@@ -103,6 +103,8 @@ private:
 	uint8_t m_hrg_port0 = 0;
 	uint8_t m_hrg_port1 = 0;
 	bool m_hrg_mem_open = false;
+	bool m_video_inhibit = false;
+	bool m_hrg_inhibit = false;
 
 	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -132,7 +134,6 @@ private:
 	uint32_t screen_update_rm480z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_screen(bitmap_ind16 &bitmap) const;
 	void putChar(int charnum, int x, int y, bitmap_ind16 &bitmap) const;
-	void config_videomode(bool b80col);
 	int calculate_hrg_vram_index() const;
 	void palette_init(palette_device &palette);
 	void change_palette(int index, uint8_t value);
