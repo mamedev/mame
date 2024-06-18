@@ -33,6 +33,7 @@
 #define LOG_INPUT (1U << 2)
 #define LOG_TC    (1U << 3)
 //#define VERBOSE (LOG_GENERAL | LOG_MODE)
+#define VERBOSE -1
 
 #include "logmacro.h"
 
@@ -442,7 +443,7 @@ void am9513_device::set_counter_mode(int c, u16 data)
 		else if (source >= 6 && source <= 10)
 			LOGMASKED(LOG_MODE, "Counter %d: Count on %s edge of GATE %d\n", c + 1, BIT(data, 12) ? "falling" : "rising", source - 5);
 		else if (source == 0)
-			LOGMASKED(LOG_MODE, "Counter %d: Count on %s edge of TC%d\n", c + 1, BIT(data, 12) ? "falling" : "rising", c - 1);
+			LOGMASKED(LOG_MODE, "Counter %d: Count on %s edge of TC%d\n", c + 1, BIT(data, 12) ? "falling" : "rising", c );
 		else
 			LOGMASKED(LOG_MODE, "Counter %d: Count on %s edge of SRC %d\n", c + 1, BIT(data, 12) ? "falling" : "rising", source);
 	}
