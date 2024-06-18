@@ -11,12 +11,11 @@
 #include "machine/swim2.h"
 #include "sound/asc.h"
 #include "emupal.h"
-#include "speaker.h"
 #include "screen.h"
 
 // ======================> v8_device
 
-class v8_device :  public device_t
+class v8_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
@@ -63,6 +62,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
 	virtual u8 pseudovia_r(offs_t offset);
 
 	void asc_irq(int state);
@@ -77,6 +78,7 @@ private:
 	required_device<via6522_device> m_via1;
 	required_region_ptr<u32> m_rom;
 
+	sound_stream *m_stream;
 	emu_timer *m_6015_timer;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
 	u8 m_pseudovia_ier, m_pseudovia_ifr;
