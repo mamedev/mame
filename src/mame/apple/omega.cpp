@@ -9,8 +9,8 @@
         with DFAC.  On the rising edge of the latch, it takes note of the
         next 16 bits.  The first 7 are the N parameter, the next 7 bits are
         the D parameter, and the final 2 are the P parameter.  The actual
-        formula is identical to the Gazelle chip and the Sierra Semiconductor
-        SC11412.
+        formula is similar to the Gazelle chip and the Sierra Semiconductor
+        SC11412 but deviates quickly for higher pixel clocks.
 
         Pixel clock = (31.3344 MHz * (N / D)) / P;
 
