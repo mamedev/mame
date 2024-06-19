@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// license: BSD-3-Clause
+// copyright-holders: Angelo Salese, Curt Coder, AJR
 /**************************************************************************************************
 
 ACT Apricot F1 series
