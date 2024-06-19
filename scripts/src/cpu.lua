@@ -4086,8 +4086,16 @@ if opt_tool(CPUS, "PALM") then
 end
 
 --------------------------------------------------
--- Oki OLMS-66K/nX-8 series, disassembler only
+-- Oki OLMS-66K/nX-8 series
+--@src/devices/cpu/olms66k/msm665xx.h,CPUS["OLMS66K"] = true
 --------------------------------------------------
+
+if CPUS["OLMS66K"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/olms66k/msm665xx.cpp",
+		MAME_DIR .. "src/devices/cpu/olms66k/msm665xx.h",
+	}
+end
 
 if opt_tool(CPUS, "OLMS66K") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/olms66k/nx8dasm.cpp")
