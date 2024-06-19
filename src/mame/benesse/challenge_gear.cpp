@@ -3,7 +3,7 @@
 
 #include "emu.h"
 
-//#include "cpu/olms66k/nx8.h"
+#include "cpu/olms66k/msm665xx.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -59,7 +59,7 @@ protected:
 private:
 	uint32_t screen_update_challenge_gear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	void challenge_gear_map(address_map &map);
+	void program_map(address_map &map);
 
 	//required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
@@ -85,6 +85,11 @@ uint32_t challenge_gear_state::screen_update_challenge_gear(screen_device &scree
 	return 0;
 }
 
+void challenge_gear_state::program_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom().region("maincpu", 0);
+}
+
 static INPUT_PORTS_START( challenge_gear )
 INPUT_PORTS_END
 
@@ -100,7 +105,8 @@ void challenge_gear_state::machine_reset()
 void challenge_gear_state::challenge_gear(machine_config &config)
 {
 	/* basic machine hardware */
-	// Oki nX-8/500S
+	msm665xx_device &maincpu(MSM66573(config, "maincpu", 14'000'000));
+	maincpu.set_addrmap(AS_PROGRAM, &challenge_gear_state::program_map);
 
 	/* video hardware - this is incorrect, but it does have a screen */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
