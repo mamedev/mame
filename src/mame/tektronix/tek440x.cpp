@@ -434,7 +434,7 @@ u16 tek440x_state::map_r(offs_t offset)
 
 void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	//LOG("map_w 0x%08x <= %04x\n",offset>>11, data);
+	LOG("map_w 0x%08x <= %04x\n",offset>>11, data);
 
 	if (BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
@@ -534,10 +534,10 @@ void tek440x_state::led_w(u8 data)
 
 	LOG("LED %c%c%c%c\n",data & 8 ? '*' : '-',data & 4 ? '*' : '-',data & 2 ? '*' : '-',data & 1 ? '*' : '-');
 
-	m_led_1 = !BIT(data, 0);
-	m_led_2 = !BIT(data, 1);
-	m_led_4 = !BIT(data, 2);
-	m_led_8 = !BIT(data, 3);
+	m_led_1 = BIT(data, 0);
+	m_led_2 = BIT(data, 1);
+	m_led_4 = BIT(data, 2);
+	m_led_8 = BIT(data, 3);
 
 }
 
@@ -700,6 +700,7 @@ void tek440x_state::irq1_w(int state)
 		LOG("M68K_IRQ_1 assert\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);		// hack experiment;  where is IRQ1 raised elsewhere?
 	}
 }
 
@@ -888,7 +889,7 @@ void tek440x_state::tek4404(machine_config &config)
 
 	I8255A(config, m_printer);
 	m_printer->in_pb_callback().set_constant(0x30);
-m_printer->in_pb_callback().set_constant(0x80);		// HACK:  vblank always check if printer status < 0
+m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks if printer status < 0
 	m_printer->out_pc_callback().set(FUNC(tek440x_state::ppi_pc_w));
 
 	MC68681(config, m_duart, 14.7456_MHz_XTAL / 4);
