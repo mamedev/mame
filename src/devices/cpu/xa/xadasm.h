@@ -36,7 +36,6 @@ public:
 	int handle_pushpop_rlist(XA_DASM_PARAMS, int type);
 
 	int d_illegal(XA_DASM_PARAMS);
-	int d_unknown10(XA_DASM_PARAMS);
 
 	int d_nop(XA_DASM_PARAMS);
 	int d_bitgroup(XA_DASM_PARAMS);

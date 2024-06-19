@@ -11,7 +11,7 @@ const xa_dasm::op_func xa_dasm::s_instruction[256] =
 &xa_dasm::d_nop,			&xa_dasm::d_add,	&xa_dasm::d_add,		&xa_dasm::d_add,		&xa_dasm::d_add,	&xa_dasm::d_add,	&xa_dasm::d_add,		&xa_dasm::d_push_rlist,
 &xa_dasm::d_bitgroup,		&xa_dasm::d_add,	&xa_dasm::d_add,		&xa_dasm::d_add,		&xa_dasm::d_add,	&xa_dasm::d_add,	&xa_dasm::d_add,		&xa_dasm::d_push_rlist, 
 // group 1
-&xa_dasm::d_unknown10,		&xa_dasm::d_addc,	&xa_dasm::d_addc,		&xa_dasm::d_addc,		&xa_dasm::d_addc,	&xa_dasm::d_addc,	&xa_dasm::d_addc,		&xa_dasm::d_pushu_rlist,
+&xa_dasm::d_illegal,		&xa_dasm::d_addc,	&xa_dasm::d_addc,		&xa_dasm::d_addc,		&xa_dasm::d_addc,	&xa_dasm::d_addc,	&xa_dasm::d_addc,		&xa_dasm::d_pushu_rlist,
 &xa_dasm::d_illegal,		&xa_dasm::d_addc,	&xa_dasm::d_addc,		&xa_dasm::d_addc,		&xa_dasm::d_addc,	&xa_dasm::d_addc,	&xa_dasm::d_addc,		&xa_dasm::d_pushu_rlist, 
 // group 2
 &xa_dasm::d_illegal,		&xa_dasm::d_sub,	&xa_dasm::d_sub,		&xa_dasm::d_sub,		&xa_dasm::d_sub,	&xa_dasm::d_sub,	&xa_dasm::d_sub,		&xa_dasm::d_pop_rlist,
@@ -378,17 +378,6 @@ ADDC [Rd+], Rs              Add reg-ind w/ autoinc to reg w/ carry              
 ADDC direct, Rs             Add reg to mem w/ carry                                                 3 4         0001 S110  ssss 1DDD  DDDD DDDD
 ADDC Rd, direct             Add mem to reg w/ carry                                                 3 4         0001 S110  dddd 0DDD  DDDD DDDD
 */
-
-int xa_dasm::d_unknown10(XA_DASM_PARAMS)
-{
-	// this appears to be used at 0x19A3 in the superkds ROM, but CPU manual doesn't list it (IDA does't know it either)
-	const u8 opcode2 = opcodes.r8(pc++);
-	const u8 opcode3 = opcodes.r8(pc++);
-
-	util::stream_format(stream, "unknown Op %02x %02x %02x", opcode, opcode2, opcode3);
-	return 3;
-}
-
 
 int xa_dasm::d_addc(XA_DASM_PARAMS)
 {
