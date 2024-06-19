@@ -8,7 +8,7 @@ Driver by Angelo Salese
 LaserDisc and artwork hookup by Ryan Holtz
 
 TODO:
-- Sony LDP-1450 and Pioneer LD-V4200 are HLE; needs a dump of the BIOSes and
+- Sony LDP-1450 player (not hooked up) and Pioneer LD-V4200 are HLE; needs a dump of the BIOSes and
   proper hook-up.
 
 ==================================================================================================
@@ -28,7 +28,6 @@ CPU is an Intel 80188
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
 #include "machine/ldv4200hle.h"
-#include "machine/ldp1450hle.h"
 #include "sound/dac.h"
 #include "emupal.h"
 #include "speaker.h"
@@ -74,8 +73,7 @@ private:
 
 	required_device<i80188_cpu_device> m_maincpu;
 	required_device<ns16450_device> m_uart;
-	// required_device<pioneer_ldv4200hle_device> m_laserdisc;
-	required_device<sony_ldp1450hle_device> m_laserdisc;
+	required_device<pioneer_ldv4200hle_device> m_laserdisc;
 	required_device<dac_1bit_device> m_audiodac;
 	output_finder<16> m_digits;
 	output_finder<16> m_decimals;
@@ -283,7 +281,7 @@ static INPUT_PORTS_START( timetrv )
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x10, 0x00, "LaserDisc Player Protocol" ) PORT_DIPLOCATION("SW3:5")
+	PORT_DIPNAME( 0x10, 0x10, "LaserDisc Player Protocol" ) PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(    0x10, "Pioneer LDV-4200" )
 	PORT_DIPSETTING(    0x00, "Sony LDP-1450" )
 	PORT_DIPNAME( 0xe0, 0x60, "Bill Multiplier" ) PORT_DIPLOCATION("SW3:6,7,8")
@@ -319,11 +317,10 @@ void timetrv_state::timetrv(machine_config &config)
 	ppi2.in_pc_callback().set_ioport("DSW3");
 
 	NS16450(config, m_uart, 768000); // P82050 (serial interface for Laserdisc player)
-	m_uart->out_tx_callback().set(m_laserdisc, FUNC(sony_ldp1450hle_device::rx_w));
+	m_uart->out_tx_callback().set(m_laserdisc, FUNC(pioneer_ldv4200hle_device::rx_w));
 
 	/* video hardware */
-	SONY_LDP1450HLE(config, m_laserdisc, 0);
-	m_laserdisc->set_baud(4800);
+	PIONEER_LDV4200HLE(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(256, 256, FUNC(timetrv_state::screen_update));
 	m_laserdisc->add_route(0, "mono", 0.4);
 	m_laserdisc->add_route(1, "mono", 0.4);
