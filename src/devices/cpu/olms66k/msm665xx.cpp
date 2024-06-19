@@ -100,7 +100,7 @@ void msm665xx_device::device_start()
 			[this, fixed, n](u16 data) { fixed[(m_psw & 0x07) << 2 | n] = data; }
 		);
 	for (int n = 0; n < 4; n++)
-		state_add<u16>(MSM665XX_ER0 + n, util::string_format("R%d", n).c_str(),
+		state_add<u16>(MSM665XX_ER0 + n, util::string_format("ER%d", n).c_str(),
 			[this, fixed, n]() { return fixed[(m_lrb & 0x00ff) << 2 | n]; },
 			[this, fixed, n](u16 data) { fixed[(m_lrb & 0x00ff) << 2 | n] = data; }
 		);
