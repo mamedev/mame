@@ -2371,6 +2371,7 @@ sv8000                          // Super Vision 8000
 tama                            // Bandai
 
 @source:bandai/wswan.cpp
+pockchv2                        // Benesse Pocket Challenge V2
 wscolor                         // Bandai WonderSwan Color Handheld
 wswan                           // Bandai WonderSwan Handheld
 
@@ -9151,6 +9152,12 @@ bebox2                          // BeBox Dual603-133
 
 @source:beehive/microb.cpp
 dm3270                          //
+
+@source:benesse/challenge_gear.cpp
+chalgear
+
+@source:benesse/pockchal.cpp
+pockchal
 
 @source:bfm/bfcobra.cpp
 beeline                         // 1991 BFM
@@ -42177,9 +42184,6 @@ plan80                          //
 
 @source:skeleton/pm68k.cpp
 pm68k                           //
-
-@source:skeleton/pockchal.cpp
-pockchal
 
 @source:skeleton/proteus3.cpp
 proteus3                        //
