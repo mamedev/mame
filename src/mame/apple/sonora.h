@@ -43,6 +43,8 @@ public:
 	template <u8 mask> void slot_irq_w(int state);
 	void scc_irq_w(int state);
 
+	void pixel_clock_w(u32 pclk) { m_video->set_pixel_clock(pclk); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
