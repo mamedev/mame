@@ -278,6 +278,57 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t opcode2)
 	return 1;
 }
 
+int xa_dasm::handle_adds_movs(XA_DASM_PARAMS, int which)
+{
+	const u8 opcode2 = opcodes.r8(pc++);
+	int size = opcode & 0x08;
+
+	switch (opcode & 0x07)
+	{
+	case 0x01:
+	{
+		util::stream_format(stream, "%s%s Rd, #data4 %02x", m_addsmovs[which], size ? ".w" : ".b", opcode2);
+		return 2;
+	}
+
+	case 0x02:
+	{
+		util::stream_format(stream, "%s%s [Rd], #data4 %02x", m_addsmovs[which], size ? ".w" : ".b", opcode2);
+		return 2;
+	}
+
+	case 0x03:
+	{
+		util::stream_format(stream, "%s%s [Rd+], #data4 %02x", m_addsmovs[which], size ? ".w" : ".b", opcode2);
+		return 2;
+	}
+
+	case 0x04:
+	{
+		const u8 opcode3 = opcodes.r8(pc++);
+		util::stream_format(stream, "%s%s [Rd+offset8], #data4 %02x %02x", m_addsmovs[which], size ? ".w" : ".b", opcode2, opcode3);
+		return 3;
+	}
+
+	case 0x05:
+	{
+		const u8 opcode3 = opcodes.r8(pc++);
+		const u8 opcode4 = opcodes.r8(pc++);
+		util::stream_format(stream, "%s%s [Rd+offset16], #data4 %02x %02x%02x", m_addsmovs[which], size ? ".w" : ".b", opcode2, opcode3, opcode4);
+		return 4;
+	}
+	case 0x06:
+	{
+		const u8 opcode3 = opcodes.r8(pc++);
+		util::stream_format(stream, "%s%s direct, #data4 %02x %02x", m_addsmovs[which], size ? ".w" : ".b", opcode2, opcode3);
+		return 3;
+	}
+	}
+
+	return 1;
+}
+
+
 int xa_dasm::handle_pushpop_rlist(XA_DASM_PARAMS, int type)
 {
 	int h = opcode & 0x40;
@@ -1017,52 +1068,7 @@ ADDS direct, #data4         Add 4-bit signed imm data to mem                    
 */
 int xa_dasm::d_adds(XA_DASM_PARAMS)
 {
-	const u8 opcode2 = opcodes.r8(pc++);
-	int size = opcode & 0x08;
-
-	switch (opcode & 0x07)
-	{
-	case 0x01:
-	{
-		util::stream_format(stream, "ADDS%s Rd, #data4 %02x", size ? ".w" : ".b", opcode2);
-		return 2;
-	}
-
-	case 0x02:
-	{
-		util::stream_format(stream, "ADDS%s [Rd], #data4 %02x", size ? ".w" : ".b", opcode2);
-		return 2;
-	}
-
-	case 0x03:
-	{
-		util::stream_format(stream, "ADDS%s [Rd+], #data4 %02x", size ? ".w" : ".b", opcode2);
-		return 2;
-	}
-
-	case 0x04:
-	{
-		const u8 opcode3 = opcodes.r8(pc++);
-		util::stream_format(stream, "ADDS%s [Rd+offset8], #data4 %02x %02x", size ? ".w" : ".b", opcode2, opcode3);
-		return 3;
-	}
-
-	case 0x05:
-	{
-		const u8 opcode3 = opcodes.r8(pc++);
-		const u8 opcode4 = opcodes.r8(pc++);
-		util::stream_format(stream, "ADDS%s [Rd+offset16], #data4 %02x %02x%02x", size ? ".w" : ".b", opcode2, opcode3, opcode4);
-		return 4;
-	}
-	case 0x06:
-	{
-		const u8 opcode3 = opcodes.r8(pc++);
-		util::stream_format(stream, "ADDS%s direct, #data4 %02x %02x", size ? ".w" : ".b", opcode2, opcode3);
-		return 3;
-	}
-	}
-
-	return 1;
+	return handle_adds_movs(XA_CALL_PARAMS, 0);
 }
 
 /*
@@ -1110,53 +1116,7 @@ MOVS direct, #data4         Move 4-bit sign-extended imm data to mem            
 */
 int xa_dasm::d_movs(XA_DASM_PARAMS)
 {
-	// same decode as ADDS
-	const u8 opcode2 = opcodes.r8(pc++);
-	int size = opcode & 0x08;
-
-	switch (opcode & 0x07)
-	{
-	case 0x01:
-	{
-		util::stream_format(stream, "MOVS%s Rd, #data4 %02x", size ? ".w" : ".b", opcode2);
-		return 2;
-	}
-
-	case 0x02:
-	{
-		util::stream_format(stream, "MOVS%s [Rd], #data4 %02x", size ? ".w" : ".b", opcode2);
-		return 2;
-	}
-
-	case 0x03:
-	{
-		util::stream_format(stream, "MOVS%s [Rd+], #data4 %02x", size ? ".w" : ".b", opcode2);
-		return 2;
-	}
-
-	case 0x04:
-	{
-		const u8 opcode3 = opcodes.r8(pc++);
-		util::stream_format(stream, "MOVS%s [Rd+offset8], #data4 %02x %02x", size ? ".w" : ".b", opcode2, opcode3);
-		return 3;
-	}
-
-	case 0x05:
-	{
-		const u8 opcode3 = opcodes.r8(pc++);
-		const u8 opcode4 = opcodes.r8(pc++);
-		util::stream_format(stream, "MOVS%s [Rd+offset16], #data4 %02x %02x%02x", size ? ".w" : ".b", opcode2, opcode3, opcode4);
-		return 4;
-	}
-	case 0x06:
-	{
-		const u8 opcode3 = opcodes.r8(pc++);
-		util::stream_format(stream, "MOVS%s direct, #data4 %02x %02x", size ? ".w" : ".b", opcode2, opcode3);
-		return 3;
-	}
-	}
-
-	return 1;
+	return handle_adds_movs(XA_CALL_PARAMS, 1);
 }
 
 /*

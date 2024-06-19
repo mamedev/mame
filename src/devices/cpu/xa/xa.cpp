@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(XA, xa_cpu_device, "xa", "Philips 80c51 XA")
 
 xa_cpu_device::xa_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, XA, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 8, 24, 0)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_pc(0)
 	, m_program(nullptr)
 	, m_icount(0)
@@ -55,7 +55,7 @@ void xa_cpu_device::device_start()
 void xa_cpu_device::device_reset()
 {
 	// temp, as there is code here on superkds
-	m_pc = 0x192C;
+	m_pc = m_program->read_word(2);
 }
 
 /*****************************************************************************/
