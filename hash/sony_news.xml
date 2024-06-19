@@ -3,14 +3,14 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="sony_news_risc" description="Sony NEWS RISC (MIPS) software">
+<softwarelist name="sony_news" description="Sony NEWS software">
 
 	<software name="nwf_672rb" supported="partial">
 		<description>NEWS-OS Release 4.1R Version Up Kit</description>
 		<year>1991</year>
 		<publisher>Sony</publisher>
 		<notes>The floppies can boot on both CISC and RISC systems due to some bootloader magic, but the MO image is only for the first wave of RISC NEWS machines (NWS-3000 series)</notes>
-		
+		<sharedfeat name="compatibility" value="RISC" />
 		<!--
 		The installation floppy and MO disk work, but the format disk hangs after printing a few messages on RISC systems. 
 		Therefore, use of this kit requires use of a pre-formatted hard disk image for now.
@@ -44,6 +44,7 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Sony</publisher>
 		<notes>Usable only on NWS-5000 series computers</notes>
+		<sharedfeat name="compatibility" value="RISC" />
 
 		<!-- Source: WinWorld -->
 		<!-- The "STAMP" file has the build date of 05/05/93 -->
