@@ -633,5 +633,5 @@ GAME( 1989, shisena,   matchit,   shisen,   shisen,  shisen_state, empty_init, R
 
 // Bootleg hardware
 GAME( 1989, matchitb,  matchit,   shisen,   matchit, shisen_state, empty_init, ROT0, "bootleg", "Match It (bootleg)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sichuan2,  matchit,   shisen,   shisen,  shisen_state, empty_init, ROT0, "bootleg", "Sichuan II (bootlet, set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sichuan2,  matchit,   shisen,   shisen,  shisen_state, empty_init, ROT0, "bootleg", "Sichuan II (bootleg, set 1)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1989, sichuan2a, matchit,   shisen,   shisen,  shisen_state, empty_init, ROT0, "bootleg", "Sichuan II (bootleg, set 2)",             MACHINE_SUPPORTS_SAVE )

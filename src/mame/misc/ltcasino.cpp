@@ -510,7 +510,7 @@ void ltcasino_state::output_t_w(uint8_t data)
 
 void ltcasino_state::ltcasino(machine_config &config)
 {
-	M6502(config, m_maincpu, 18_MHz_XTAL/16); // clock unknown
+	M6502(config, m_maincpu, 18_MHz_XTAL / 16); // clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &ltcasino_state::main_map);
 
 	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq"));
@@ -529,14 +529,14 @@ void ltcasino_state::ltcasino(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(ltcasino_state::output_t_w));
 
 	// video hardware
-	CRT5037(config, m_vtc, 18_MHz_XTAL/16); // this clock gives about 60/50 hz
+	CRT5037(config, m_vtc, 18_MHz_XTAL / 16); // this clock gives about 60/50 hz
 	m_vtc->set_char_width(8);
 	m_vtc->set_screen("screen");
 	m_vtc->set_visarea(48, 463, 0, 255);
 	m_vtc->vsyn_callback().set(m_pia[0], FUNC(pia6821_device::cb2_w)).invert(); // ? (CA1, CA2 also enabled)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(18_MHz_XTAL/2, 560, 48, 464, 268, 0, 256);
+	m_screen->set_raw(18_MHz_XTAL / 2, 560, 48, 464, 268, 0, 256);
 	m_screen->set_screen_update(FUNC(ltcasino_state::screen_update));
 	m_screen->set_palette("palette");
 
@@ -625,8 +625,23 @@ ROM_END
 
 // Selection text: "PLEASE MAKE SELECTION!"
 // Games: Black Jack, Draw Poker, Craps, Slots, Horse
+ROM_START( ltcasin2 ) // all labels peeled off - need to verify labels
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "v30_00_ra.bin", 0x8000, 0x1000, CRC(8d446c26) SHA1(d5b78fd17798bf69fbac5e060f020799bb10cf64) ) // 30.00.00 in test mode
+	ROM_LOAD( "v30_00_rb.bin", 0x9000, 0x1000, CRC(38ca5193) SHA1(715add68a633b78eceabe149a7564aa2fb513837) ) // 30.00.00 in test mode
+	ROM_LOAD( "v30_00_rc.bin", 0xa000, 0x1000, CRC(f05095db) SHA1(61c5c9bef20c057348ce1321c71195d340dc0cd6) ) // 30.00.00 in test mode
+	ROM_LOAD( "v30_00_rd.bin", 0xb000, 0x1000, CRC(53e534dc) SHA1(3d964f51b254f9bd0bd3fb4926f57aa7d5224968) ) // 30.00.00 in test mode
+	ROM_LOAD( "v30_00_re.bin", 0xc000, 0x1000, CRC(972fd4ab) SHA1(f91556588315e0836a860f138730314688f99ec7) ) // 30.00.00 in test mode
+	ROM_LOAD( "v30_00_rf.bin", 0xf000, 0x1000, CRC(b711c779) SHA1(2bab84cab174a35fccfd23003a8a41aa241d4595) ) // 18.01.02 in test mode (== v18_10_rf.bin below)
+
+	ROM_REGION( 0x1000, "tiles", 0 )
+	ROM_LOAD( "v30_00_rv.bin", 0x0000, 0x1000, CRC(135ec308) SHA1(699711ceaeb5a00f31ccd88b7be7e9f0055fa58b) )
+ROM_END
+
+// Selection text: "PLEASE MAKE SELECTION!"
+// Games: Black Jack, Draw Poker, Craps, Slots, Horse
 // Board was marked version 18.1 (C)1984
-ROM_START( ltcasin2 )
+ROM_START( ltcasin2a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "v18_10_ra.bin", 0x8000, 0x1000, CRC(f0c5cc96) SHA1(ec50918ba2a2487df70694f9e1a52d4b8d1bc7e2) ) // 18.01.01 in test mode
 	ROM_LOAD( "v18_10_rb.bin", 0x9000, 0x1000, CRC(2ece16e4) SHA1(ef6adc45be2ecc510cd8b2e9682635066013a5e4) ) // 18.01.01 in test mode
@@ -641,7 +656,7 @@ ROM_END
 
 // Selection text: "PLEASE PICK YOUR POISON!"
 // Games: Black Jack, Draw Poker, Craps, Hi-Lo, Horse
-ROM_START( ltcasin2a )
+ROM_START( ltcasin2b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "v17_00_ra.bin", 0x8000, 0x1000, CRC(1a595442) SHA1(b8fe3e5ed2024a57187c0ce547c1bbef2429ed63) ) // 17.00.00 in test mode
 	ROM_LOAD( "v17_00_rb.bin", 0x9000, 0x1000, CRC(4f5502c1) SHA1(cd1b7c08d26fed71c45e44ebd208bd18dc262e8f) ) // 17.00.00 in test mode
@@ -654,21 +669,6 @@ ROM_START( ltcasin2a )
 	ROM_LOAD( "v17_00_rv.bin", 0x0000, 0x1000, CRC(84cbee7b) SHA1(742831d5ae0db6c7c644a18a837831ee0474d472) )
 ROM_END
 
-// Selection text: "PLEASE MAKE SELECTION!"
-// Games: Black Jack, Draw Poker, Craps, Slots, Horse
-ROM_START( ltcasin2b ) // all labels peeled off
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a.bin", 0x8000, 0x1000, CRC(8d446c26) SHA1(d5b78fd17798bf69fbac5e060f020799bb10cf64) ) // 30.00.00 in test mode
-	ROM_LOAD( "b.bin", 0x9000, 0x1000, CRC(38ca5193) SHA1(715add68a633b78eceabe149a7564aa2fb513837) ) // 30.00.00 in test mode
-	ROM_LOAD( "c.bin", 0xa000, 0x1000, CRC(f05095db) SHA1(61c5c9bef20c057348ce1321c71195d340dc0cd6) ) // 30.00.00 in test mode
-	ROM_LOAD( "d.bin", 0xb000, 0x1000, CRC(53e534dc) SHA1(3d964f51b254f9bd0bd3fb4926f57aa7d5224968) ) // 30.00.00 in test mode
-	ROM_LOAD( "e.bin", 0xc000, 0x1000, CRC(972fd4ab) SHA1(f91556588315e0836a860f138730314688f99ec7) ) // 30.00.00 in test mode
-	ROM_LOAD( "f.bin", 0xf000, 0x1000, CRC(b711c779) SHA1(2bab84cab174a35fccfd23003a8a41aa241d4595) ) // same as ltcasin2, 18.01.02 in test mode
-
-	ROM_REGION( 0x1000, "tiles", 0 )
-	ROM_LOAD( "g.bin", 0x0000, 0x1000, CRC(135ec308) SHA1(699711ceaeb5a00f31ccd88b7be7e9f0055fa58b) )
-ROM_END
-
 } // anonymous namespace
 
 
@@ -676,10 +676,10 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT         ROTATION  COMPANY                            FULLNAME                            FLAGS
-GAMEL( 1982, ltcasino,  0,        ltcasino, ltcasino,  ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino (set 1)",            MACHINE_SUPPORTS_SAVE, layout_ltcasino )
-GAMEL( 1982, ltcasinoa, ltcasino, ltcasino, ltcasino,  ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino (set 2)",            MACHINE_SUPPORTS_SAVE, layout_ltcasino )
-GAMEL( 1983, mv4in1,    0,        mv4in1,   mv4in1,    ltcasin2_state, init_mv4in1, ROT0,     "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1",                  MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
-GAMEL( 1984, ltcasin2,  0,        ltcasin2, ltcasin2,  ltcasin2_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino II (v18.1, set 1)",  MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
-GAMEL( 1984, ltcasin2a, ltcasin2, ltcasin2, ltcasin2a, ltcasin2_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino II (v17.0)",         MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
-GAMEL( 1984, ltcasin2b, ltcasin2, ltcasin2, ltcasin2,  ltcasin2_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino II (v18.1, set 2)",  MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
+//     YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT         ROTATION  COMPANY                            FULLNAME                     FLAGS
+GAMEL( 1982, ltcasino,  0,        ltcasino, ltcasino,  ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino (set 1)",     MACHINE_SUPPORTS_SAVE, layout_ltcasino )
+GAMEL( 1982, ltcasinoa, ltcasino, ltcasino, ltcasino,  ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino (set 2)",     MACHINE_SUPPORTS_SAVE, layout_ltcasino )
+GAMEL( 1983, mv4in1,    0,        mv4in1,   mv4in1,    ltcasin2_state, init_mv4in1, ROT0,     "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1",           MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
+GAMEL( 1984, ltcasin2,  0,        ltcasin2, ltcasin2,  ltcasin2_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino II (v30.0)",  MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
+GAMEL( 1984, ltcasin2a, ltcasin2, ltcasin2, ltcasin2,  ltcasin2_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino II (v18.1)",  MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
+GAMEL( 1984, ltcasin2b, ltcasin2, ltcasin2, ltcasin2a, ltcasin2_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino II (v17.0)",  MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
