@@ -135,6 +135,7 @@ using util::BIT;
 #include "cpu/nova/novadasm.h"
 #include "cpu/ns32000/ns32000d.h"
 #include "cpu/nuon/nuondasm.h"
+#include "cpu/olms66k/nx8dasm.h"
 #include "cpu/pace/pacedasm.h"
 #include "cpu/palm/palmd.h"
 #include "cpu/patinhofeio/patinho_feio_dasm.h"
@@ -566,6 +567,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "ns32000",         le,  0, []() -> util::disasm_interface * { return new ns32000_disassembler; } },
 	{ "nuon",            be,  0, []() -> util::disasm_interface * { return new nuon_disassembler; } },
 	{ "nsc8105",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(8105); } },
+	{ "nx8_500s",        le,  0, []() -> util::disasm_interface * { return new nx8_500s_disassembler; } },
 	{ "p8xc552",         le,  0, []() -> util::disasm_interface * { return new p8xc552_disassembler; } },
 	{ "p8xc562",         le,  0, []() -> util::disasm_interface * { return new p8xc562_disassembler; } },
 	{ "pace",            le, -1, []() -> util::disasm_interface * { return new pace_disassembler; } },

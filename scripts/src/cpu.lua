@@ -4084,3 +4084,12 @@ if opt_tool(CPUS, "PALM") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/palm/palmd.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/palm/palmd.h")
 end
+
+--------------------------------------------------
+-- Oki OLMS-66K/nX-8 series, disassembler only
+--------------------------------------------------
+
+if opt_tool(CPUS, "OLMS66K") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/olms66k/nx8dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/olms66k/nx8dasm.h")
+end
