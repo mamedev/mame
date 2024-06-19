@@ -138,4 +138,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                FULLNAME                      FLAGS
-CONS( 199?, pockchal, 0,      0,      pockchalv1, pockchalv1, pockchalv1_state, empty_init, "Benesse Corporation", "Pocket Challenge W (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 199?, pockchal, 0,      0,      pockchalv1, pockchalv1, pockchalv1_state, empty_init, "Benesse Corporation", "Pocket Challenge W (Japan)", MACHINE_IS_SKELETON )
