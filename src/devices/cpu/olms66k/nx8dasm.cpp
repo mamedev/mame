@@ -552,8 +552,8 @@ offs_t nx8_500s_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		}
 		else if (byte2 == 0x39)
 		{
-			// FRET encoding is documented as 07 09, but 06 39 may be used instead
-			stream << "FRET";
+			// FRT encoding is documented as 07 09, but 06 39 may be used instead
+			stream << "FRT";
 			return 2 | STEP_OUT | SUPPORTED;
 		}
 		else if ((byte2 & 0x30) != 0x30 && (byte2 & 0x0f) != 0)
