@@ -185,7 +185,7 @@ ROM_START( superkds )
 	ROM_LOAD( "superkids_s019cn.u37", 0x000000, 0x80000, CRC(1a7f17dd) SHA1(ba20c0f521bff2f5ae2103ea49bd413b0e6459ba) )
 
 	ROM_REGION( 0x10000, "plcc", 0 ) // MX10EXAQC (80C51 XA based MCU) marked 07, not read protected
-	ROM_LOAD( "superkids_mx10exa.u33", 0x000000, 0x10000, CRC(bb4881e4) SHA1(7b78c5a1b9a061f6e27adbe696d42cc92d2e3df2) ) // sticker marked G6
+	ROM_LOAD( "superkids_mx10exa.u33", 0x000000, 0x10000, CRC(8baf5ba2) SHA1(2f8c2c48e756264e593bce7c09260e50d5cac827) ) // sticker marked G6
 
 	ROM_REGION( 0x2000000, "gfx1", 0 ) // FIXED BITS (0xxxxxxx) (graphics are 7bpp)
 	ROM_LOAD32_WORD( "superkids_cg-0l.u7",  0x0000000, 0x800000, CRC(6c4eff23) SHA1(1089222bfedcd562f2a3c43c90512bbb9e22a8bf) )
