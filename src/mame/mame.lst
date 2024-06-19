@@ -21340,6 +21340,14 @@ xmultiplm72                     // (c) 1989 (Japan)
 @source:irem/m78.cpp
 bj92
 
+@source:irem/m80.cpp
+matchit                         // (c) 1989 Tamtex
+matchitb                        // bootleg
+shisen                          // (c) 1989 Tamtex
+shisena                         // (c) 1989 Tamtex
+sichuan2                        // bootleg
+sichuan2a                       // bootleg
+
 @source:irem/m90.cpp
 atompunk                        // (c) 1991 Irem America (licensed from Hudson Soft)
 bbmanw                          // (c) 1992 Irem (World)
@@ -21424,12 +21432,6 @@ demoneye                        // M27 (c) 1981
 panther                         // M27 no copyright notice
 redalert                        // M27 (c) 1981 + "GDI presents"
 ww3                             // M27 (c) 1981
-
-@source:irem/shisen.cpp
-matchit                         // (c) 1989 Tamtex
-shisen                          // (c) 1989 Tamtex
-sichuan2                        // (c) 1989 Tamtex
-sichuan2a                       // (c) 1989 Tamtex
 
 @source:irem/spartanxtec.cpp
 spartanxtec
