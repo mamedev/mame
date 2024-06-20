@@ -65,6 +65,42 @@ Other: Hitachi HD46821P 1MHz NMOS Peripheral Interface Adapter (PIA) x 2
        D1 - Power On Diode
        44 pin edge connector
 
+***************************************************************************
+
+Little Casino II
+Digital Controls Inc. 1984
+ +---------------------------------------------------------------------+
+ |    +----------+ DSW3 +---------+ M2114 M2114*     +---+         LED |
+ |    | HD46821P |      | TMS9937 | M2114 M2114*     | S |   V18_10_RA |
+ |    +----------+      +---------+ M2114 M2114*     | Y |             |
+++                                  M2114 M2114*     | 6 |             |
+|                                                    | 5 |   V18_10_RB |
+|     +----------+                                   | 0 |             |
+|     | HD46821P |                                   | 2 |             |
+|     +----------+                                   +---+   V18_10_RC |
+|                       V18_10_RV                                      |
+|     +---------+                                                      |
+|     |AY-3-9810|                                            V18_10_RD |
+|     +---------+                                                      |
+|                 M2114                                                |
+|     DSW1 DSW2   M2114                                      V18_10_RE |
+++                M2114                                                |
+ |  MB3712        M2114  18.000MHz                                     |
+ |                                                           V18_10_RF |
+ |                                                                     |
+ +---------------------------------------------------------------------+
+
+  CPU: SY6502 2MHz
+Video: TMS9937 NL CRT5037 NMOS Single chip Video Timer/Controller (VTC)
+Sound: AY-3-8910
+       MB3712 5.7W Amp
+  OSC: 18.000MHz
+  RAM: MM2114N-3 1KBx4 SRAM x 12 (*some PCBs only had 8 RAM chips populated)
+  DSW: 3 8-switch dipswitches
+Other: Hitachi HD46821P 1MHz NMOS Peripheral Interface Adapter (PIA) x 2
+       LED - Power On LED
+       44 pin edge connector
+
 
 ***************************************************************************/
 
