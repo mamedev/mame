@@ -1215,7 +1215,11 @@ int xa_dasm::d_asl_c(XA_DASM_PARAMS)
 		const u8 op2 = opcodes.r8(pc++);
 		const u8 op3 = opcodes.r8(pc++);
 
-		util::stream_format(stream, "CALL rel16  %02x%02x", op2, op3);
+		u16 offset = (op2 << 8) | op3;
+		int address = pc + ((s16)offset)*2;
+		address &= ~1; // must be word aligned
+
+		util::stream_format(stream, "CALL $%04x", address);
 
 		return 3;
 	}
@@ -1728,7 +1732,11 @@ BR rel8                     Short unconditional branch                          
 int xa_dasm::d_branch(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
-	util::stream_format(stream, "%s %02x", m_branches[op & 0xf], op2);
+
+	int address = pc + ((s8)op2)*2;
+	address &= ~1; // must be word aligned
+
+	util::stream_format(stream, "%s $%04x", m_branches[op & 0xf], address);
 	return 2;
 }
 
