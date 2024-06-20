@@ -228,7 +228,7 @@ ROM_START( rfsantafem )
 	ROM_LOAD( "11497a.u3",            0x00000, 0x80000, CRC(8395d6ad) SHA1(d09c2d86932330cc99c19d0f06cadb92c96c4db1) )
 
 	ROM_REGION( 0x180000, "pic_reels", 0 )
-	ROM_LOAD( "34996a.u2",            0x00000, 0x02000, CRC(503c364d) SHA1(6c93766e5bba61babc608ef8393dd2c6c948a625) )
+	ROM_LOAD( "34996a.u2",            0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "pic_driver", 0 )
 	ROM_LOAD( "pic16c57.u1",          0x00000, 0x02000, NO_DUMP )
@@ -243,7 +243,7 @@ ROM_START( rfsantafema )
 	ROM_LOAD( "11497a.u3",            0x00000, 0x80000, CRC(8395d6ad) SHA1(d09c2d86932330cc99c19d0f06cadb92c96c4db1) )
 
 	ROM_REGION( 0x180000, "pic_reels", 0 )
-	ROM_LOAD( "34996a.u2",            0x00000, 0x02000, CRC(503c364d) SHA1(6c93766e5bba61babc608ef8393dd2c6c948a625) )
+	ROM_LOAD( "34996a.u2",            0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "pic_driver", 0 )
 	ROM_LOAD( "pic16c57.u1",          0x00000, 0x02000, NO_DUMP )
