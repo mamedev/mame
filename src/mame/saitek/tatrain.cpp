@@ -7,10 +7,17 @@ Saitek Kasparov Turbo Advanced Trainer
 
 The chess engine is by Frans Morsch, it is the same as the one in GK 2000.
 
-Hardware notes (1997 version):
+Hardware notes:
+
+1992 version:
+- PCB label: ST14B-PE-003, PN/N 512090-00311, REV.1
+- Hitachi H8/323 MCU, 20MHz XTAL
+- piezo, 24 LEDs, button sensors chessboard
+
+1997 version:
 - PCB label: ST14B-PE 003, PN/N 512090-00312, REV.2
 - Hitachi H8/3212 MCU, 10MHz XTAL
-- piezo, 24 LEDs, button sensors chessboard
+- rest is same as 1992 version
 
 H8/323 A14 MCU is used in:
 - Saitek Turbo Advanced Trainer (1992 version)
@@ -26,7 +33,6 @@ Turbo Advanced Trainer looks similar to Saitek Team-Mate. Virtuoso and Capella
 are in the same housing as SciSys Astral, they lack the coach LED and button.
 
 TODO:
-- dump/add 1992 version
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
 
@@ -35,6 +41,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/h8/h83217.h"
+#include "cpu/h8/h8325.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
@@ -59,7 +66,9 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	void shared(machine_config &config);
 	void tatrain(machine_config &config);
+	void tatraina(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
@@ -68,7 +77,7 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<h83212_device> m_maincpu;
+	required_device<h8_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
@@ -184,23 +193,23 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void tatrain_state::tatrain(machine_config &config)
+#define CPU_CONFIG() \
+	maincpu.nvram_enable_backup(true); \
+	maincpu.standby_cb().set(m_maincpu, FUNC(h8_device::nvram_set_battery)); \
+	maincpu.standby_cb().append([this](int state) { if (state) m_display->clear(); }); \
+	maincpu.write_port1().set(FUNC(tatrain_state::leds_w<0>)); \
+	maincpu.write_port2().set(FUNC(tatrain_state::leds_w<1>)); \
+	maincpu.write_port3().set(FUNC(tatrain_state::leds_w<2>)); \
+	maincpu.read_port4().set(FUNC(tatrain_state::p4_r)); \
+	maincpu.read_port5().set_constant(0xff); \
+	maincpu.write_port5().set(FUNC(tatrain_state::p5_w)); \
+	maincpu.read_port6().set_ioport("IN.2").invert(); \
+	maincpu.write_port6().set(FUNC(tatrain_state::p6_w)); \
+	maincpu.write_port7().set(FUNC(tatrain_state::p7_w))
+
+void tatrain_state::shared(machine_config &config)
 {
 	// basic machine hardware
-	H83212(config, m_maincpu, 10_MHz_XTAL);
-	m_maincpu->nvram_enable_backup(true);
-	m_maincpu->standby_cb().set(m_maincpu, FUNC(h83212_device::nvram_set_battery));
-	m_maincpu->standby_cb().append([this](int state) { if (state) m_display->clear(); });
-	m_maincpu->write_port1().set(FUNC(tatrain_state::leds_w<0>));
-	m_maincpu->write_port2().set(FUNC(tatrain_state::leds_w<1>));
-	m_maincpu->write_port3().set(FUNC(tatrain_state::leds_w<2>));
-	m_maincpu->read_port4().set(FUNC(tatrain_state::p4_r));
-	m_maincpu->read_port5().set_constant(0xff);
-	m_maincpu->write_port5().set(FUNC(tatrain_state::p5_w));
-	m_maincpu->read_port6().set_ioport("IN.2").invert();
-	m_maincpu->write_port6().set(FUNC(tatrain_state::p6_w));
-	m_maincpu->write_port7().set(FUNC(tatrain_state::p7_w));
-
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
@@ -215,6 +224,24 @@ void tatrain_state::tatrain(machine_config &config)
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
+void tatrain_state::tatrain(machine_config &config)
+{
+	H83212(config, m_maincpu, 10_MHz_XTAL);
+	auto &maincpu = downcast<h83212_device &>(*m_maincpu);
+	CPU_CONFIG();
+
+	shared(config);
+}
+
+void tatrain_state::tatraina(machine_config &config)
+{
+	H8323(config, m_maincpu, 20_MHz_XTAL);
+	auto &maincpu = downcast<h8323_device &>(*m_maincpu);
+	CPU_CONFIG();
+
+	shared(config);
+}
+
 
 
 /*******************************************************************************
@@ -226,6 +253,11 @@ ROM_START( tatrain )
 	ROM_LOAD("97_saitek_86158430421_hd6433212v02p.u1", 0x0000, 0x4000, CRC(73f9abb6) SHA1(3a4c3a8ad668327fe9f61c4b054e31ec6af9c48d) )
 ROM_END
 
+ROM_START( tatraina )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD("92_saitek_86069221x14_3238a14p.u1", 0x0000, 0x4000, CRC(ae2d536c) SHA1(6397c38d21a4291a992bf317e695aadbd4510260) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -234,5 +266,6 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1997, tatrain, 0,      0,      tatrain, tatrain, tatrain_state, empty_init, "Saitek", "Kasparov Turbo Advanced Trainer (1997 version)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1997, tatrain,  0,       0,      tatrain,  tatrain, tatrain_state, empty_init, "Saitek", "Kasparov Turbo Advanced Trainer (H8/3212 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1992, tatraina, tatrain, 0,      tatraina, tatrain, tatrain_state, empty_init, "Saitek", "Kasparov Turbo Advanced Trainer (H8/323 version)", MACHINE_SUPPORTS_SAVE )
