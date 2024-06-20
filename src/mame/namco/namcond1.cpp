@@ -229,7 +229,6 @@ public:
 
 	void abcheck(machine_config &config);
 	void namcond1(machine_config &config);
-	void ncv2(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -535,16 +534,6 @@ void namcond1_state::namcond1(machine_config &config)
 	AT28C16(config, "at28c16", 0);
 }
 
-void namcond1_state::ncv2(machine_config &config)
-{
-	namcond1(config);
-
-	config.device_remove("c352");
-	c352_device &c352(C352(config, "c352", 25326000, 288));
-	c352.add_route(0, "lspeaker", 1.00);
-	c352.add_route(1, "rspeaker", 1.00);
-}
-
 void namcond1_state::abcheck(machine_config &config)
 {
 	namcond1(config);
@@ -703,7 +692,7 @@ GAME( 1995, ncv1j2,  ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90
 
 GAME( 1996, gynotai, 0,    namcond1, gynotai,  namcond1_state, empty_init, ROT0,  "Namco", "Gynotai (Japan)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // 1.04
 
-GAME( 1996, ncv2,    0,        ncv2, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // 1.10
-GAME( 1996, ncv2j,   ncv2,     ncv2, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ncv2,    0,    namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // 1.10
+GAME( 1996, ncv2j,   ncv2, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, abcheck, 0,    abcheck,  abcheck,  namcond1_state, empty_init, ROT0,  "Namco", "Abnormal Check",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // 1.20EM
