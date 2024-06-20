@@ -134,4 +134,4 @@ ROM_END
 
 } // Anonymous namespace
 
-CONS( 199?, chalgear, 0,      0,      challenge_gear, challenge_gear, challenge_gear_state, empty_init, "Benesse Corporation", "Challenge Gear (Japan)", MACHINE_IS_SKELETON )
+CONS( 2002, chalgear, 0,      0,      challenge_gear, challenge_gear, challenge_gear_state, empty_init, "Benesse Corporation", "Challenge Gear (Japan)", MACHINE_IS_SKELETON )
