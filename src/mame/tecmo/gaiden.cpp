@@ -151,6 +151,9 @@ Notes:
 
 #include <algorithm>
 
+//#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
+
 
 void gaiden_state::irq_ack_w(uint16_t data)
 {
@@ -181,7 +184,7 @@ void wildfang_state::wildfang_protection_w(offs_t offset, uint16_t data, uint16_
 	{
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n",m_maincpu->pc(),data);
+		LOG("PC %06x: prot = %02x\n", m_maincpu->pc(), data);
 
 		switch (data & 0xf0)
 		{
@@ -219,7 +222,7 @@ void wildfang_state::wildfang_protection_w(offs_t offset, uint16_t data, uint16_
 
 uint16_t wildfang_state::protection_r()
 {
-//  logerror("PC %06x: read prot %02x\n", m_maincpu->pc(), m_prot);
+	LOG("PC %06x: read prot %02x\n", m_maincpu->pc(), m_prot);
 	return m_prot;
 }
 
@@ -353,6 +356,7 @@ void raiga_state::machine_start()
 
 void raiga_state::device_post_load()
 {
+	wildfang_state::device_post_load();
 	m_jumppoints = m_protmode ? raiga_jumppoints_other : raiga_jumppoints_00;
 }
 
@@ -362,7 +366,7 @@ void raiga_state::raiga_protection_w(offs_t offset, uint16_t data, uint16_t mem_
 	{
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n", m_maincpu->pc(), data);
+		LOG("PC %06x: prot = %02x\n", m_maincpu->pc(), data);
 
 		switch (data & 0xf0)
 		{

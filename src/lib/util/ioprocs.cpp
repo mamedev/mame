@@ -796,8 +796,9 @@ std::pair<std::error_condition, std::size_t> write(write_stream &stream, void co
 	{
 		std::size_t written;
 		std::error_condition err = stream.write_some(buffer, length, written);
+		assert(written || err || !length);
 		actual += written;
-		if ((err || !actual) && (std::errc::interrupted != err))
+		if (err && (std::errc::interrupted != err))
 			return std::make_pair(err, actual);
 		buffer = reinterpret_cast<std::uint8_t const *>(buffer) + written;
 		length -= written;
