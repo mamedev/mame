@@ -4,6 +4,16 @@
 #include "emu.h"
 #include "xadasm.h"
 
+// SFR names
+const xa_dasm::mem_info xa_dasm::default_names[] = {
+	// the following are bit addressable
+	{  0x400, "PSWL" },
+	{  0x401, "PSWH" },
+	// the following are not bit addressable
+	{  0x440, "SCR" },
+	{ -1 }
+};
+
 
 const xa_dasm::op_func xa_dasm::s_instruction[256] =
 {
@@ -189,20 +199,7 @@ int xa_dasm::handle_alu_type0(XA_DASM_PARAMS, int alu_op)
 	return 1;
 }
 
-/*
-ADD Rd, #data8              Add 8-bit imm data to reg                                               3 3         1001 0001  dddd 0000  iiii iiii
-ADD [Rd], #data8            Add 8-bit imm data to reg-ind                                           3 4         1001 0010  0ddd 0000  iiii iiii
-ADD [Rd+], #data8           Add 8-bit imm data to reg-ind w/ autoinc                                3 5         1001 0011  0ddd 0000  iiii iiii
-ADD [Rd+offset8], #data8    Add 8-bit imm data to reg-ind w/ 8-bit offs                             4 6         1001 0100  0ddd 0000  oooo oooo  iiii iiii
-ADD [Rd+offset16], #data8   Add 8-bit imm data to reg-ind w/ 16-bit offs                            5 6         1001 0101  0ddd 0000  oooo oooo  oooo oooo  iiii iiii
-ADD direct, #data8          Add 8-bit imm data to mem                                               4 4         1001 0110  0DDD 0000  DDDD DDDD  iiii iiii
-ADD Rd, #data16             Add 16-bit imm data to reg                                              4 3         1001 1001  dddd 0000  iiii iiii  iiii iiii
-ADD [Rd], #data16           Add 16-bit imm data to reg-ind                                          4 4         1001 1010  0ddd 0000  iiii iiii  iiii iiii
-ADD [Rd+], #data16          Add 16-bit imm data to reg-ind w/ autoinc                               4 5         1001 1011  0ddd 0000  iiii iiii  iiii iiii
-ADD [Rd+offset8], #data16   Add 16-bit imm data to reg-ind w/ 8-bit offs                            5 6         1001 1100  0ddd 0000  oooo oooo  iiii iiii  iiii iiii
-ADD [Rd+offset16], #data16  Add 16-bit imm data to reg-ind w/ 16-bit offs                           6 6         1001 1101  0ddd 0000  oooo oooo  oooo oooo  iiii iiii  iiii iiii
-ADD direct, #data16         Add 16-bit imm data to mem                                              5 4         1001 1110  0DDD 0000  DDDD DDDD  iiii iiii  iiii iiii
-*/
+
 
 int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 {
@@ -277,7 +274,10 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 op4 = opcodes.r8(pc++);
 
-		util::stream_format(stream, "%s Rd, #data16 %02x%02x", m_aluops[alu_op], op3, op4 );
+		const u8 rd = (op2 & 0xf0) >> 4;
+		const u16 data = (op3 << 8) | op4;
+
+		util::stream_format(stream, "%s %s, #$%04x", m_aluops[alu_op], m_regnames16[rd], data );
 		return 4;
 	}
 
@@ -285,8 +285,10 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 	{
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 op4 = opcodes.r8(pc++);
+		const u8 rd = (op2 & 0xf0) >> 4;
+		const u16 data = (op3 << 8) | op4;
 
-		util::stream_format(stream, "%s [Rd], #data16 %02x%02x", m_aluops[alu_op], op3, op4 );
+		util::stream_format(stream, "%s [%s], #$%04x", m_aluops[alu_op], m_regnames16[rd], data );
 		return 4;
 	}
 
@@ -294,8 +296,10 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 	{
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 op4 = opcodes.r8(pc++);
+		const u8 rd = (op2 & 0xf0) >> 4;
+		const u16 data = (op3 << 8) | op4;
 
-		util::stream_format(stream, "%s [Rd+], #data16 %02x%02x", m_aluops[alu_op], op3, op4 );
+		util::stream_format(stream, "%s [%s+], #$%04x", m_aluops[alu_op], m_regnames16[rd], data );
 		return 4;
 	}
 
@@ -305,7 +309,11 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 op4 = opcodes.r8(pc++);
 		const u8 op5 = opcodes.r8(pc++);
 
-		util::stream_format(stream, "%s [Rd+offset8], #data16 %02x %02x%02x", m_aluops[alu_op], op3, op4, op5 );
+		const u8 rd = (op2 & 0xf0) >> 4;
+		const int offset = op3;
+		const u16 data = (op4 << 8) | op5;
+
+		util::stream_format(stream, "%s [%s+#$%02x], #$%04x", m_aluops[alu_op], m_regnames16[rd], offset, data );
 		return 5;
 	}
 
@@ -316,8 +324,12 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 op5 = opcodes.r8(pc++);
 		const u8 op6 = opcodes.r8(pc++);
 
-		util::stream_format(stream, "%s [Rd+offset16], #data16 %02x%02x %02x%02x", m_aluops[alu_op], op3, op4, op5, op6 );
-		return 5;
+		const u8 rd = (op2 & 0xf0) >> 4;
+		const int offset = (op3 << 8) | op4;
+		const u16 data = (op5 << 8) | op6;
+
+		util::stream_format(stream, "%s [%s+#$%04x], #$%04x", m_aluops[alu_op], m_regnames16[rd], offset, data  );
+		return 6;
 	}
 
 	case 0x0e:
@@ -326,7 +338,10 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 op4 = opcodes.r8(pc++);
 		const u8 op5 = opcodes.r8(pc++);
 
-		util::stream_format(stream, "%s direct, #data16 %02x %02x%02x", m_aluops[alu_op], op3, op4, op5 );
+		const u8 direct =( (op2 & 0xf0) << 4) | op3;
+		const u16 data = (op4 << 8) | op5;
+
+		util::stream_format(stream, "%s %03x, #$%04x", m_aluops[alu_op], direct, data );
 		return 5;
 	}
 	}

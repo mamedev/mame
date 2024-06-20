@@ -15,6 +15,13 @@ public:
 	xa_dasm() = default;
 	virtual ~xa_dasm() = default;
 
+	struct mem_info {
+		int addr;
+		const char *name;
+	};
+
+	static const mem_info default_names[];
+
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
