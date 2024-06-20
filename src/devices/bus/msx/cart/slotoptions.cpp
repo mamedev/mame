@@ -31,6 +31,7 @@ char const *const DISK_NMS1200    = "disk_nms1200";
 char const *const DISK_TADPF550   = "disk_tadpf550";
 char const *const DISK_VY0010     = "disk_vy0010";
 char const *const DOOLY           = "dooly";
+char const *const DOUBLE_RAM      = "double_ram";
 char const *const EASISPEECH      = "easispeech";
 char const *const EC701           = "ec701";
 char const *const FMPAC           = "fmpac";

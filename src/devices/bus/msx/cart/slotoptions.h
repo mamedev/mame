@@ -33,6 +33,7 @@ extern char const *const DISK_ML30DC;
 extern char const *const DISK_NMS1200;
 extern char const *const DISK_TADPF550;
 extern char const *const DISK_VY0010;
+extern char const *const DOUBLE_RAM;
 extern char const *const DOOLY;
 extern char const *const EASISPEECH;
 extern char const *const EC701;

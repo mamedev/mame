@@ -566,11 +566,11 @@ offs_t nx8_500s_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 				break;
 
 			case 0x1f:
-				stream << "CR";
+				stream << "PR";
 				break;
 
 			case 0x2e:
-				stream << "PR";
+				stream << "CR";
 				break;
 
 			default:
