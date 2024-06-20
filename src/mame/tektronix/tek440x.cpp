@@ -74,6 +74,7 @@
 // mapcntl bits
 #define MAP_VM_ENABLE 4
 #define MAP_SYS_WR_ENABLE 5
+// mapcntrl result bits
 #define MAP_BLOCK_ACCESS 6
 #define MAP_CPU_WR 7
 
@@ -351,7 +352,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	const offs_t offset0 = offset;
-	if ((m_maincpu->get_fc() & 4) == 0)
+	if ((m_maincpu->get_fc() & 4) == 0)			// only in User mode
 	if (BIT(m_map_control, MAP_VM_ENABLE))
 	{
 		//LOG("memory_w: m_map(0x%04x)\n", m_map[offset >> 11]);
@@ -370,7 +371,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
 			
-			mem_mask = 0;
+			mem_mask = 0;	// disable write
 		}
 		else
 		{
@@ -388,7 +389,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
 			
-			mem_mask = 0;
+			mem_mask = 0;	// disable write
 		}
 
 		// mark page dirty (NB before we overwrite offset)
