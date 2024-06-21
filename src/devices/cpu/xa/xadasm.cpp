@@ -100,7 +100,7 @@ int xa_dasm::handle_shift(XA_DASM_PARAMS, int shift_type)
 	if (size == 0x0c)
 	{
 		data = op2 & 0x1f;
-		rd = (op2 & 0xe0) >> 5;
+		rd = (op2 & 0xe0) >> 4;
 	}
 	else
 	{
@@ -1224,11 +1224,10 @@ int xa_dasm::d_rr(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
 	int size = op & 0x08;
-
-
-
-	util::stream_format(stream, "RR%s Rd, #data4 %02x", size ? ".w" : ".b", op2);
-
+	const char** regnames = size ? m_regnames16 : m_regnames8;
+	const u8 rd = (op2 & 0xf0) >> 4;
+	const u8 data = rd & 0x0f;
+	util::stream_format(stream, "RR%s %s, %d", size ? ".w" : ".b", regnames[rd], data);
 	return 2;
 }
 
@@ -1252,8 +1251,10 @@ int xa_dasm::d_rrc(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
 	int size = op & 0x08;
-
-	util::stream_format(stream, "RRC%s Rd, #data4 %02x", size ? ".w" : ".b", op2);
+	const char** regnames = size ? m_regnames16 : m_regnames8;
+	const u8 rd = (op2 & 0xf0) >> 4;
+	const u8 data = rd & 0x0f;
+	util::stream_format(stream, "RRC%s %s, %d", size ? ".w" : ".b", regnames[rd], data);
 
 	return 2;
 }
@@ -1273,7 +1274,10 @@ int xa_dasm::d_lsr_fc(XA_DASM_PARAMS)
 	case 0x00: case 0x08: case 0x0c:
 	{
 		const u8 op2 = opcodes.r8(pc++);
-		util::stream_format(stream, "LSR%s Rd, Rs %02x", m_dwparamsizes[size >> 2], op2);
+		const char** regnames = ((size != 0) ? m_regnames8 : m_regnames16);
+		const u8 rd = (op2 & 0xf0) >> 4;
+		const u8 rs = (op2 & 0x0f);
+		util::stream_format(stream, "LSR %s, %s", regnames[rd], regnames[rs]);
 		return 2;
 	}
 	case 0x04:
@@ -1302,7 +1306,12 @@ int xa_dasm::d_asl_c(XA_DASM_PARAMS)
 	{
 	case 0x00: case 0x08: case 0x0c:
 	{
-		return handle_shift(XA_CALL_PARAMS, 0);
+		const u8 op2 = opcodes.r8(pc++);
+		const char** regnames = ((size != 0) ? m_regnames8 : m_regnames16);
+		const u8 rd = (op2 & 0xf0) >> 4;
+		const u8 rs = (op2 & 0x0f);
+		util::stream_format(stream, "ASL %s, %s", regnames[rd], regnames[rs]);
+		return 2;
 	}
 	case 0x04:
 	{
@@ -1330,7 +1339,12 @@ int xa_dasm::d_asr_c(XA_DASM_PARAMS)
 	{
 	case 0x00: case 0x08: case 0x0c:
 	{
-		return handle_shift(XA_CALL_PARAMS, 1);
+		const u8 op2 = opcodes.r8(pc++);
+		const char** regnames = ((size != 0) ? m_regnames8 : m_regnames16);
+		const u8 rd = (op2 & 0xf0) >> 4;
+		const u8 rs = (op2 & 0x0f);
+		util::stream_format(stream, "ASR %s, %s", regnames[rd], regnames[rs]);
+		return 2;
 	}
 	case 0x04:
 	{
@@ -1409,9 +1423,7 @@ int xa_dasm::d_asl_j(XA_DASM_PARAMS)
 	{
 	case 0x00: case 0x08: case 0x0c:
 	{
-		const u8 op2 = opcodes.r8(pc++);
-		util::stream_format(stream, "ASL%s Rd, #data4 %02x", m_dwparamsizes[size >> 2], op2);
-		return 2;
+		return handle_shift(XA_CALL_PARAMS, 0);
 	}
 	case 0x04:
 	{
@@ -1448,8 +1460,7 @@ int xa_dasm::d_asr_j(XA_DASM_PARAMS)
 	{
 	case 0x00: case 0x08: case 0x0c:
 	{
-		util::stream_format(stream, "ASR%s Rd, #data4 %02x", m_dwparamsizes[size >> 2], op2);
-		break;
+		return handle_shift(XA_CALL_PARAMS, 1);
 	}
 	case 0x04:
 	{
