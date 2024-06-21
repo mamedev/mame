@@ -10000,6 +10000,10 @@ ROM_END
   BTANB: Energy and weapon power bars are the wrong way around. The manual does
   show them correctly, but it appears to be a doctored picture.
 
+  There's also a newer version called Project Alien, presumed to be the same ROM.
+  The LCD is different (no Xenomorph aliens). The background inlay is different
+  too, and this time the weapon/energy labels are placed correctly.
+
 *******************************************************************************/
 
 class topaliens_state : public hh_sm510_state

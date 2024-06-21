@@ -31,6 +31,8 @@ H8/3212 V02 MCU is used in:
 
 Turbo Advanced Trainer looks similar to Saitek Team-Mate. Virtuoso and Capella
 are in the same housing as SciSys Astral, they lack the coach LED and button.
+Note that the H8/323 has an internal /2 clock divider, so even though the newer
+version has a lower frequency XTAL, it runs at the same speed.
 
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME

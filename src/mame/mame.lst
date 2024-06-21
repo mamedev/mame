@@ -35058,6 +35058,9 @@ nsvipb
 nsvipc
 nvip
 
+@source:novag/zircon2.cpp
+zircon2
+
 @source:novation/basssta.cpp
 bassstr                         //
 sbasssta                        //
