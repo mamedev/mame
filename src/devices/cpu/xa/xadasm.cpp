@@ -731,7 +731,9 @@ XCH Rd, [Rs]                Exchange contents of a reg-ind address w/ a reg     
 */
 int xa_dasm::d_xch_type1(XA_DASM_PARAMS)
 {
-	return 1;
+	const u8 op2 = opcodes.r8(pc++);
+	util::stream_format(stream, "XCH Rd, [Rs] %02x", op2);
+	return 2;
 }
 
 /*
@@ -1145,31 +1147,37 @@ int xa_dasm::d_jb_mov_subgroup(XA_DASM_PARAMS)
 // -------------------------------------- Group a --------------------------------------
 
 /*
+XCH Rd, direct              Exchange contents of mem w/ a reg                                       3 6         1010 S000  dddd 1DDD  DDDD DDDD
+
 MOV direct, [Rs]            Move reg-ind to mem                                                     3 4         1010 S000  1sss 0DDD  DDDD DDDD
 MOV [Rd], direct            Move mem to reg-ind                                                     3 4         1010 S000  0ddd 0DDD  DDDD DDDD
-XCH Rd, direct              Exchange contents of mem w/ a reg                                       3 6         1010 S000  dddd 1DDD  DDDD DDDD
 */
 int xa_dasm::d_movdir(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
 	const u8 op3 = opcodes.r8(pc++);
 	int size = op & 0x08;
+	const int direct = ((op2 & 0x07) << 8) | op3;
 
 	if (op2 & 0x08)
 	{
-		util::stream_format(stream, "XCH%s Rd, direct %02x %02x", size ? ".w" : ".b", op2, op3);
+		const u8 rd = op2 & (0xf0) >> 4;
+		const char** regnames = size ? m_regnames16 : m_regnames8;
+		util::stream_format(stream, "XCH%s %s, %s", size ? ".w" : ".b", regnames[rd], get_directtext(direct) );
 		return 3;
 	}
 	else
 	{
 		if (op2 & 0x80)
 		{
-			util::stream_format(stream, "MOV%s direct, [Rs] %02x %02x", size ? ".w" : ".b", op2, op3);
+			const u8 rs = op2 & (0x70) >> 4;
+			util::stream_format(stream, "MOV%s %s, [%s]", size ? ".w" : ".b", get_directtext(direct), m_regnames16[rs]);
 			return 3;
 		}
 		else
 		{
-			util::stream_format(stream, "MOV%s [Rd], direct %02x %02x",  size ? ".w" : ".b", op2, op3);
+			const u8 rd = op2 & (0x70) >> 4;
+			util::stream_format(stream, "MOV%s [%s], %s",  size ? ".w" : ".b", m_regnames16[rd], get_directtext(direct));
 			return 3;	
 		}
 	}
@@ -1286,7 +1294,9 @@ int xa_dasm::d_lsr_fc(XA_DASM_PARAMS)
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 op4 = opcodes.r8(pc++);
 
-		util::stream_format(stream, "FCALL addr24 %02x%02x%02x", op2, op3, op4);
+		const u32 addr = (op2 << 8) | op3 | (op4 << 16);
+
+		util::stream_format(stream, "FCALL $%06x", addr);
 
 		return 4;
 	}
@@ -1349,7 +1359,8 @@ int xa_dasm::d_asr_c(XA_DASM_PARAMS)
 	case 0x04:
 	{
 		const u8 op2 = opcodes.r8(pc++);
-		util::stream_format(stream, "CALL [Rs]  %02x", op2);
+		const u8 rs = op2 & 0x07;
+		util::stream_format(stream, "CALL [%d]", m_regnames16[rs]);
 		return 2;
 	}
 	}
@@ -1403,7 +1414,8 @@ int xa_dasm::d_lsr_fj(XA_DASM_PARAMS)
 		const u8 op2 = opcodes.r8(pc++);
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 op4 = opcodes.r8(pc++);
-		util::stream_format(stream, "FJMP addr24 %02x%02x%02x", op2, op3, op4);
+		const u32 addr = (op2 << 8) | op3 | (op4 << 16);
+		util::stream_format(stream, "FJMP addr24 $%06x", addr);
 		return 4;
 	}
 	}
@@ -1467,10 +1479,10 @@ int xa_dasm::d_asr_j(XA_DASM_PARAMS)
 		switch (op2 & 0xf0)
 		{
 		case 0x10: util::stream_format(stream, "RESET"); break;
-		case 0x30: util::stream_format(stream, "TRAP"); break;
+		case 0x30: util::stream_format(stream, "TRAP %d", op2 & 0x0f); break;
 		case 0x40: util::stream_format(stream, "JMP [A+DPTR]"); break;
-		case 0x60: util::stream_format(stream, "JMP [[Rs+]]"); break;
-		case 0x70: util::stream_format(stream, "JMP [Rs]"); break;
+		case 0x60: util::stream_format(stream, "JMP [[%s+]]", m_regnames16[op2 & 0x07]); break;
+		case 0x70: util::stream_format(stream, "JMP [%s]", m_regnames16[op2 & 0x07]); break;
 		case 0x80: util::stream_format(stream, "RET"); break;
 		case 0x90: util::stream_format(stream, "RTI"); break;
 		default:   util::stream_format(stream, "illegal"); break;
