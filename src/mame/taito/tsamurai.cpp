@@ -872,7 +872,7 @@ ROM_START( tsamurai ) // there's a protection device labeled B5 at location l3 o
 	ROM_LOAD( "a35-18.2m",  0x200, 0x0100, CRC(918e4732) SHA1(a38686b32d5ac0ebcba59fdba3201fe35c83d4d0) )
 ROM_END
 
-ROM_START( tsamurai2 )
+ROM_START( tsamuraia )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "a35-01.3r",  0x0000, 0x4000, CRC(282d96ad) SHA1(c9d7a9b7acbe6431c061a9b50c05fab3ae664094) )
 	ROM_LOAD( "a35-02.3t",  0x4000, 0x4000, CRC(e3fa0cfa) SHA1(3ed8a67789f666fe12d7597014d39deea3c12506) )
@@ -1042,7 +1042,7 @@ ROM_START( ladymstr ) // there's a protection device labeled 6 at location l3 on
 	ROM_LOAD( "a49-18.2m",  0x200, 0x0100, CRC(f5ce3c45) SHA1(f2dcdaf95b55b8fd713bdbb965731c064b4a0757) )
 ROM_END
 
-ROM_START( ladymstr2 ) // there's a protection device labeled 6 at location l3 on the main board
+ROM_START( ladymstra ) // there's a protection device labeled 6 at location l3 on the main board
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "a49-01.3r",  0x0000, 0x4000, CRC(8729e50e) SHA1(0b75dd6da26e71b32cfd1dfc1160e35f928286c4) )
 	ROM_LOAD( "a49-02.3t",  0x4000, 0x4000, CRC(b0a9020b) SHA1(78c777ffa6e9063fe4e816d9a58e394f45bd875b) )
@@ -1322,7 +1322,7 @@ ROM_START( ringfgt )
 	ROM_LOAD( "rft-13.6p", 0x200, 0x0100, CRC(0e4fd17a) SHA1(d4e32bd9dd903177af61f77976a25c5db1467bba) )
 ROM_END
 
-ROM_START( ringfgt2 )
+ROM_START( ringfgta )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "rft_04.5a", 0x0000, 0x2000, CRC(6b9b3f3d) SHA1(ea75e77e0e3379a22381b1d0aae7f96b53cd7562) )
 	ROM_LOAD( "rft_03.5c", 0x2000, 0x2000, CRC(1821974b) SHA1(1ce52f20bf49c111000f870bbe3416d27673b91d) )
@@ -1356,15 +1356,15 @@ void m660_state::init_the26thz()
 }
 
 GAME( 1984, vsgongf,   0,        vsgongf,  vsgongf,   vsgongf_state, empty_init,    ROT90, "Kaneko", "VS Gong Fight", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1984, ringfgt,   vsgongf,  vsgongf,  vsgongf,   vsgongf_state, empty_init,    ROT90, "Kaneko (Taito license)", "Ring Fighter (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ringfgt2,  vsgongf,  vsgongf,  vsgongf,   vsgongf_state, empty_init,    ROT90, "Kaneko (Taito license)", "Ring Fighter (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ringfgt,   vsgongf,  vsgongf,  vsgongf,   vsgongf_state, empty_init,    ROT90, "Kaneko (Taito license)", "Ring Fighter (rev 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ringfgta,  vsgongf,  vsgongf,  vsgongf,   vsgongf_state, empty_init,    ROT90, "Kaneko (Taito license)", "Ring Fighter", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, tsamurai,  0,        tsamurai, tsamurai,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tsamurai2, tsamurai, tsamurai, tsamurai,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tsamurai,  0,        tsamurai, tsamurai,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tsamuraia, tsamurai, tsamurai, tsamurai,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi",  MACHINE_SUPPORTS_SAVE )
 GAME( 1985, tsamuraih, tsamurai, tsamurai, tsamuraih, tsamurai_state, empty_init,    ROT90, "bootleg", "Samurai Nihon-Ichi (bootleg, harder)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, ladymstr,  0,        tsamurai, ladymstr,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Lady Master of Kung Fu (set 1, newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ladymstr2, ladymstr, tsamurai, ladymstr,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Lady Master of Kung Fu (set 2, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ladymstr,  0,        tsamurai, ladymstr,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Lady Master of Kung Fu (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ladymstra, ladymstr, tsamurai, ladymstr,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Lady Master of Kung Fu", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, nunchaku,  ladymstr, tsamurai, nunchaku,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Nunchackun", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, yamagchi,  0,        tsamurai, yamagchi,  tsamurai_state, empty_init,    ROT90, "Kaneko / Taito", "Go Go Mr. Yamaguchi / Yuke Yuke Yamaguchi-kun", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -43168,6 +43168,7 @@ eto                             // (c) 1994 Visco (Japan)
 etoa                            // (c) 1994 Visco (Japan)
 galmedes                        // (c) 1992 Visco (Japan)
 jigkmgri                        // B41 (c) 1988 Taito Corporation (Japan)
+jigkmgria
 mofflott                        // C17 (c) 1989 Taito Corporation (Japan)
 
 @source:taito/bigevglf.cpp
@@ -43346,13 +43347,13 @@ lgpalt                          // (c) 1983 Taito
 @source:taito/lkage.cpp
 bygone                          // A53 (c) 1985 Taito Corporation - prototype ?
 lkage                           // A54 (c) 1984 Taito Corporation
-lkageb                          // bootleg
-lkageb2                         // bootleg
-lkageb3                         // bootleg
-lkageb4                         // bootleg
+lkagea                          // A54 (c) 1984 Taito Corporation
+lkageb                          // A54 (c) 1984 Taito Corporation
+lkagebl1                        // bootleg
+lkagebl2                        // bootleg
+lkagebl3                        // bootleg
+lkagebl4                        // bootleg
 lkagem                          //
-lkageo                          // A54 (c) 1984 Taito Corporation
-lkageo2                         // A54 (c) 1984 Taito Corporation
 
 @source:taito/lsasquad.cpp
 daikaiju                        // A74 (c) 1986 Taito
@@ -43405,7 +43406,7 @@ othunderj                       // B67 (c) 1988 Taito Corporation (Japan)
 othunderjsc                     // B67 (c) 1988 Taito Corporation (Japan)
 othundero                       // B67 (c) 1988 Taito Corporation Japan (World)
 othunderu                       // B67 (c) 1988 Taito America Corporation (US, rev 1)
-othunderuo                      // B67 (c) 1988 Taito America Corporation (US)
+othunderua                      // B67 (c) 1988 Taito America Corporation (US)
 
 @source:taito/pitnrun.cpp
 jumpkun                         // prototype
@@ -43420,10 +43421,10 @@ shun                            // D43
 @source:taito/qix.cpp
 complexx                        // CX  (c) 1984 Taito America Corporation
 elecyoyo                        // YY  (c) 1982 Taito America Corporation
-elecyoyo2                       // YY  (c) 1982 Taito America Corporation
+elecyoyoa                       // YY  (c) 1982 Taito America Corporation
 kram                            // KS  (c) 1982 Taito America Corporation
-kram2                           // KS  (c) 1982 Taito America Corporation
-kram3                           // KS  (c) 1982 Taito America Corporation
+krama                           // KS  (c) 1982 Taito America Corporation
+krame                           // KS  (c) 1982 Taito America Corporation
 qix                             // LK  (c) 1981 Taito America Corporation
 qix2                            // ??  (c) 1981 Taito America Corporation
 qixa                            // LK  (c) 1981 Taito America Corporation
@@ -43985,16 +43986,16 @@ topspeedu                       // B14 (c) 1987 Taito America Corporation (US)
 @source:taito/tsamurai.cpp
 alphaxz                         // AZ  (c) 1986 Ed/Wood Place
 ladymstr                        // A49 (c) 1985 Taito
-ladymstr2                       // A49 (c) 1985 Taito
+ladymstra                       // A49 (c) 1985 Taito
 m660                            // ??? (c) 1986 Taito America Corporation
 m660b                           // bootleg
 m660j                           // ??? (c) 1986 Taito Corporation (Japan)
 nunchaku                        // ??? (c) 1985 Taito
 ringfgt                         // (c) 1984 Taito
-ringfgt2                        // (c) 1984 Taito
+ringfgta                        // (c) 1984 Taito
 the26thz                        // A72 (c) 1986 Taito
 tsamurai                        // A35 (c) 1985 Taito
-tsamurai2                       // A35 (c) 1985 Taito
+tsamuraia                       // A35 (c) 1985 Taito
 tsamuraih                       // bootleg
 vsgongf                         // (c) 1984 Kaneko
 yamagchi                        // A38 (c) 1985 Taito
