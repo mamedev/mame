@@ -35,6 +35,9 @@ public:
 	const char* m_branches[15] = { "BCC", "BCS", "BNE", "BEQ", "BNV", "BOV", "BPL", "BMI", "BG", "BL", "BGE", "BLT", "BGT", "BLE", "BR" };
 	const char* m_addsmovs[2] = { "ADDS", "MOVS" };
 	const char* m_pushpull[4] = { "PUSH", "PUSHU", "POP", "POPU" };
+	const char* m_shifts[3] = { "ASL", "ASR", "LSR" };
+
+
 
 	const char* m_dwparamsizes[4] = { ".b", "invalid", ".w", ".dw" };
 
@@ -46,6 +49,7 @@ public:
 	int handle_alu_type1(XA_DASM_PARAMS, uint8_t op2);
 	int handle_pushpop_rlist(XA_DASM_PARAMS, int type);
 	int handle_adds_movs(XA_DASM_PARAMS, int which);
+	int handle_shift(XA_DASM_PARAMS, int shift_type);
 
 	int d_illegal(XA_DASM_PARAMS);
 

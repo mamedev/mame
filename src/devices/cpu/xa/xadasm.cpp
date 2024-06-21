@@ -92,6 +92,34 @@ int xa_dasm::d_illegal(XA_DASM_PARAMS)
 	return 1;
 }
 
+int xa_dasm::handle_shift(XA_DASM_PARAMS, int shift_type)
+{
+	int size = op & 0x0c;
+	const u8 op2 = opcodes.r8(pc++);
+	u8 data, rd;
+	if (size == 0x0c)
+	{
+		data = op2 & 0x1f;
+		rd = (op2 & 0xe0) >> 5;
+	}
+	else
+	{
+		data = op2 & 0x0f;
+		rd = (op2 & 0xf0) >> 4;
+	}
+
+	if (size == 0x00)
+	{
+		util::stream_format(stream, "%s%s %s, %d", m_shifts[shift_type], m_dwparamsizes[size >> 2], m_regnames8[rd], data);
+	}
+	else
+	{
+		util::stream_format(stream, "%s%s %s, %d", m_shifts[shift_type], m_dwparamsizes[size >> 2], m_regnames16[rd], data);
+	}
+
+	return 2;
+}
+
 
 int xa_dasm::handle_alu_type0(XA_DASM_PARAMS, int alu_op)
 {
@@ -1163,21 +1191,26 @@ int xa_dasm::d_adds(XA_DASM_PARAMS)
 }
 
 /*
-MOVX Rd, [Rs]               Move external data from mem to reg                                      2 6         1010 S111  dddd 0sss
 MOVX [Rd], Rs               Move external data from reg to mem                                      2 6         1010 S111  ssss 1ddd
+MOVX Rd, [Rs]               Move external data from mem to reg                                      2 6         1010 S111  dddd 0sss
 */
 int xa_dasm::d_movx_subgroup(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
 	int size = op & 0x08;
+	const char** regnames = size ? m_regnames16 : m_regnames8;
 
 	if (op2 & 0x08)
 	{
-		util::stream_format(stream, "MOVX%s [Rd], Rs %02x", size ? ".w" : ".b", op2);
+		const u8 rs = (op2 & 0xf0) >> 4;
+		const u8 rd = (op2 & 0x07);
+		util::stream_format(stream, "MOVX%s [%s], %s", size ? ".w" : ".b", m_regnames16[rd], regnames[rs]);
 	}
 	else
 	{
-		util::stream_format(stream, "MOVX%s Rd, [Rs] %02x", size ? ".w" : ".b", op2);
+		const u8 rd = (op2 & 0xf0) >> 4;
+		const u8 rs = (op2 & 0x07);
+		util::stream_format(stream, "MOVX%s %s, [%s]", size ? ".w" : ".b", regnames[rd], m_regnames16[rs]);
 	}
 	return 2;
 }
@@ -1191,6 +1224,8 @@ int xa_dasm::d_rr(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
 	int size = op & 0x08;
+
+
 
 	util::stream_format(stream, "RR%s Rd, #data4 %02x", size ? ".w" : ".b", op2);
 
@@ -1267,21 +1302,16 @@ int xa_dasm::d_asl_c(XA_DASM_PARAMS)
 	{
 	case 0x00: case 0x08: case 0x0c:
 	{
-		const u8 op2 = opcodes.r8(pc++);
-		util::stream_format(stream, "ASL%s Rd, Rs %02x", m_dwparamsizes[size >> 2], op2);
-		return 2;
+		return handle_shift(XA_CALL_PARAMS, 0);
 	}
 	case 0x04:
 	{
 		const u8 op2 = opcodes.r8(pc++);
 		const u8 op3 = opcodes.r8(pc++);
-
 		u16 offset = (op2 << 8) | op3;
 		int address = pc + ((s16)offset)*2;
 		address &= ~1; // must be word aligned
-
 		util::stream_format(stream, "CALL $%04x", address);
-
 		return 3;
 	}
 	}
@@ -1300,16 +1330,12 @@ int xa_dasm::d_asr_c(XA_DASM_PARAMS)
 	{
 	case 0x00: case 0x08: case 0x0c:
 	{
-		const u8 op2 = opcodes.r8(pc++);
-		util::stream_format(stream, "ASR%s Rd, Rs  %02x", m_dwparamsizes[size >> 2], op2);
-		return 2;
+		return handle_shift(XA_CALL_PARAMS, 1);
 	}
 	case 0x04:
 	{
 		const u8 op2 = opcodes.r8(pc++);
-
 		util::stream_format(stream, "CALL [Rs]  %02x", op2);
-
 		return 2;
 	}
 	}
@@ -1334,9 +1360,7 @@ int xa_dasm::d_norm(XA_DASM_PARAMS)
 	case 0x04:
 	{
 		const u8 op2 = opcodes.r8(pc++);
-
 		util::stream_format(stream, "illegal %02x", op2);
-
 		return 2;
 	}
 	}
@@ -1358,18 +1382,14 @@ int xa_dasm::d_lsr_fj(XA_DASM_PARAMS)
 	{
 	case 0x00: case 0x08: case 0x0c:
 	{
-		const u8 op2 = opcodes.r8(pc++);
-		util::stream_format(stream, "LSR%s Rd, #data4 %02x", m_dwparamsizes[size >> 2], op2);
-		return 2;
+		return handle_shift(XA_CALL_PARAMS, 2);
 	}
 	case 0x04:
 	{
 		const u8 op2 = opcodes.r8(pc++);
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 op4 = opcodes.r8(pc++);
-
 		util::stream_format(stream, "FJMP addr24 %02x%02x%02x", op2, op3, op4);
-
 		return 4;
 	}
 	}
@@ -1397,13 +1417,10 @@ int xa_dasm::d_asl_j(XA_DASM_PARAMS)
 	{
 		const u8 op2 = opcodes.r8(pc++);
 		const u8 op3 = opcodes.r8(pc++);
-
 		u16 offset = (op2 << 8) | op3;
 		int address = pc + ((s16)offset)*2;
 		address &= ~1; // must be word aligned
-
 		util::stream_format(stream, "JMP $%04x", address);
-
 		return 3;
 	}
 	}
