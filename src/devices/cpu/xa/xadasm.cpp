@@ -228,7 +228,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 	{
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 rd = (op2 & 0xf0) >> 4;
-		util::stream_format(stream, "%s %s, #$%02x", m_aluops[alu_op], m_regnames16[rd], op3 );
+		util::stream_format(stream, "%s %s, #$%02x", m_aluops[alu_op], m_regnames8[rd], op3 );
 		return 3;
 	}
 
@@ -295,7 +295,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 rd = (op2 & 0xf0) >> 4;
 		const u16 data = (op3 << 8) | op4;
 
-		util::stream_format(stream, "%s %s, #$%04x", m_aluops[alu_op], m_regnames16[rd], data );
+		util::stream_format(stream, "%s %s, #$%04x", m_aluops[alu_op], m_regnames8[rd], data );
 		return 4;
 	}
 
@@ -367,16 +367,6 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 	return 1;
 }
 
-
-/*
-ADDS Rd, #data4             Add 4-bit signed imm data to reg                                        2 3         1010 S001  dddd iiii
-ADDS [Rd], #data4           Add 4-bit signed imm data to reg-ind                                    2 4         1010 S010  0ddd iiii
-ADDS [Rd+], #data4          Add 4-bit signed imm data to reg-ind w/ autoinc                         2 5         1010 S011  0ddd iiii
-ADDS [Rd+offset8], #data4   Add reg-ind w/ 8-bit offs to 4-bit signed imm data                      3 6         1010 S100  0ddd iiii  oooo oooo
-ADDS [Rd+offset16], #data4  Add reg-ind w/ 16-bit offs to 4-bit signed imm data                     4 6         1010 S101  0ddd iiii  oooo oooo  oooo oooo
-ADDS direct, #data4         Add 4-bit signed imm data to mem                                        3 4         1010 S110  0DDD iiii  DDDD DDDD
-*/
-
 void xa_dasm::show_expanded_data4(XA_DASM_PARAMS, u16 data4, int size)
 {
 	u16 extended = util::sext(data4, 4);
@@ -411,7 +401,6 @@ int xa_dasm::handle_adds_movs(XA_DASM_PARAMS, int which)
 
 	case 0x02:
 	{
-
 		util::stream_format(stream, "%s%s [Rd], ", m_addsmovs[which], size ? ".w" : ".b");
 		show_expanded_data4(XA_CALL_PARAMS, data4, size);
 		return 2;
@@ -444,9 +433,7 @@ int xa_dasm::handle_adds_movs(XA_DASM_PARAMS, int which)
 	case 0x06:
 	{
 		const u8 op3 = opcodes.r8(pc++);
-
 		const int direct = ((op2 & 0xf0) << 4) | op3;
-
 		util::stream_format(stream, "%s%s %s, ", m_addsmovs[which], size ? ".w" : ".b", get_directtext(direct));
 		show_expanded_data4(XA_CALL_PARAMS, data4, size);
 		return 3;
@@ -792,7 +779,11 @@ int xa_dasm::d_movc_rd_rsinc(XA_DASM_PARAMS)
 	const u8 op2 = opcodes.r8(pc++);
 	int size = op & 0x08;
 
-	util::stream_format(stream, "MOVC%s Rd, [Rs+]  %02x", size ? ".w" : ".b", op2);
+	int rd = (op2 & 0xf0) >> 4;
+	int rs = (op2 & 0x07);
+	const char** regnames = size ? m_regnames16 : m_regnames8;
+
+	util::stream_format(stream, "MOVC%s %s, [%s+]", size ? ".w" : ".b", regnames[rd], m_regnames16[rs]);
 	return 2;
 }
 
@@ -827,16 +818,20 @@ int xa_dasm::d_pushpop_djnz_subgroup(XA_DASM_PARAMS)
 	const u8 op3 = opcodes.r8(pc++);
 	int size = op & 0x08;
 
-	int direct = ((op2 & 0x07) << 8) | op3;
 
 	if (op2 & 0x08)
 	{
-		// DJNZ Rd,rel8
-		util::stream_format(stream, "DJNZ%s Rd,rel8  %02x %02x", size ? ".w" : ".b", op2, op3);
+		int address = pc + ((s8)op3)*2;
+		int rd = (op2 & 0xf0) >> 4;
+		address &= ~1; // must be word aligned
+		const char** regnames = size ? m_regnames16 : m_regnames8;
+		util::stream_format(stream, "DJNZ%s %s, $%04x", size ? ".w" : ".b", regnames[rd], address);
 		return 3;
 	}
 	else
 	{
+		int direct = ((op2 & 0x07) << 8) | op3;
+
 		switch (op2 & 0xf0)
 		{
 		case 0x00:
@@ -1083,38 +1078,26 @@ int xa_dasm::d_jb_mov_subgroup(XA_DASM_PARAMS)
 
 	if (op2 & 0x80)
 	{
+		int address = pc + ((s8)op4)*2;
+		int bit = ((op2 & 0x03) << 8) | op3;
+		address &= ~1; // must be word aligned
+
 		switch (op2 & 0x70)
 		{
-		case 0x00:
-		{
-			util::stream_format(stream, "JB bit,rel8 %02x %02x %02x", op2, op3, op4);
-			return 4;
-		}
-		case 0x20:
-		{
-			util::stream_format(stream, "JNB bit,rel8  %02x %02x %02x", op2, op3, op4);
-			return 4;
-		}
-		case 0x40:
-		{
-			util::stream_format(stream, "JBC bit,rel8  %02x %02x %02x", op2, op3, op4);
-			return 4;
-		}
-		default:
-		{
-			util::stream_format(stream, "illegal %02x %02x %02x", op2, op3, op4);
-			return 4;
-		}
-
+		case 0x00: util::stream_format(stream, "JB %s, $%02x", get_bittext(bit), address ); break;
+		case 0x20: util::stream_format(stream, "JNB %s, $%02x", get_bittext(bit), address ); break;
+		case 0x40: util::stream_format(stream, "JBC %s, $%02x", get_bittext(bit), address ); break;
+		default:   util::stream_format(stream, "illegal %s $%02x", get_bittext(bit), address ); break;
 		}
 	}
 	else
 	{
-		util::stream_format(stream, "MOV direct, direct  %02x %02x %02x", op2, op3, op4);
-		return 4;
+		int direct_dst = ((op2 & 0x70) << 4) | op3;
+		int direct_src = ((op2 & 0x07) << 8) | op4;
+		util::stream_format(stream, "MOV %s, %s", get_directtext(direct_dst), get_directtext(direct_src));
 	}
 
-	return 1;
+	return 4;
 }
 
 // -------------------------------------- Group a --------------------------------------
@@ -1494,13 +1477,19 @@ int xa_dasm::d_djnz_cjne(XA_DASM_PARAMS)
 	const u8 op3 = opcodes.r8(pc++);
 	const u8 op4 = opcodes.r8(pc++);
 
+	int address = pc + ((s8)op4)*2;
+	address &= ~1; // must be word aligned
+
+	int direct = ((op2 & 0x07) << 8) | op3;
+
 	if (op2 & 0x08)
 	{
-		util::stream_format(stream, "DJNZ direct,rel8  %02x %02x %02x", op2, op3, op4);
+		util::stream_format(stream, "DJNZ %s, $%04x", get_directtext(direct), address);
 	}
 	else
 	{
-		util::stream_format(stream, "CJNE Rd,direct,rel8 %02x %02x %02x", op2, op3, op4);
+		int rd = (op2 & 0xf0) >> 4;
+		util::stream_format(stream, "CJNE %s, %s, $%04x", m_regnames16[rd], get_directtext(direct), address);
 	}
 
 	return 4;
@@ -1767,10 +1756,8 @@ BR rel8                     Short unconditional branch                          
 int xa_dasm::d_branch(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
-
 	int address = pc + ((s8)op2)*2;
 	address &= ~1; // must be word aligned
-
 	util::stream_format(stream, "%s $%04x", m_branches[op & 0xf], address);
 	return 2;
 }
