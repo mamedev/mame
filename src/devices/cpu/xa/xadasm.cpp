@@ -394,39 +394,44 @@ int xa_dasm::handle_adds_movs(XA_DASM_PARAMS, int which)
 	{
 	case 0x01:
 	{
-		util::stream_format(stream, "%s%s Rd, ", m_addsmovs[which], size ? ".w" : ".b");
+		int rd = (op2 & 0xf0) >> 4;
+		util::stream_format(stream, "%s%s %s, ", m_addsmovs[which], size ? ".w" : ".b", m_regnames8[rd]);
 		show_expanded_data4(XA_CALL_PARAMS, data4, size);
 		return 2;
 	}
 
 	case 0x02:
 	{
-		util::stream_format(stream, "%s%s [Rd], ", m_addsmovs[which], size ? ".w" : ".b");
+		int rd = (op2 & 0x70) >> 4;
+		util::stream_format(stream, "%s%s [%s], ", m_addsmovs[which], size ? ".w" : ".b", m_regnames16[rd]);
 		show_expanded_data4(XA_CALL_PARAMS, data4, size);
 		return 2;
 	}
 
 	case 0x03:
 	{
-		util::stream_format(stream, "%s%s [Rd+], ", m_addsmovs[which], size ? ".w" : ".b");
+		int rd = (op2 & 0x70) >> 4;
+		util::stream_format(stream, "%s%s [%s+], ", m_addsmovs[which], size ? ".w" : ".b", m_regnames16[rd]);
 		show_expanded_data4(XA_CALL_PARAMS, data4, size);
 		return 2;
 	}
 
 	case 0x04:
 	{
+		int rd = (op2 & 0x70) >> 4;
 		const u8 op3 = opcodes.r8(pc++);
-		util::stream_format(stream, "%s%s [Rd+%02x], ", m_addsmovs[which], size ? ".w" : ".b", op3);
+		util::stream_format(stream, "%s%s [%s+$%02x], ", m_addsmovs[which], size ? ".w" : ".b", m_regnames16[rd], op3);
 		show_expanded_data4(XA_CALL_PARAMS, data4, size);
 		return 3;
 	}
 
 	case 0x05:
 	{
+		int rd = (op2 & 0x70) >> 4;
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 op4 = opcodes.r8(pc++);
 		const int offset = (op3 << 8) | op4;
-		util::stream_format(stream, "%s%s [Rd+offset16], ", m_addsmovs[which], size ? ".w" : ".b", offset);
+		util::stream_format(stream, "%s%s [%s+$%04x], ", m_addsmovs[which], size ? ".w" : ".b", m_regnames16[rd], offset);
 		show_expanded_data4(XA_CALL_PARAMS, data4, size);
 		return 4;
 	}
@@ -877,10 +882,13 @@ int xa_dasm::d_g9_subgroup(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
 	int size = op & 0x08;
+	const char** regnames = size ? m_regnames16 : m_regnames8;
 
 	if ((op2 & 0x0f) < 0x08)
 	{
-		util::stream_format(stream, "MOV%s [Rd+], [Rs+] %02x", size ? ".w" : ".b", op2);
+		int rd = (op2 & 0x70) >> 4;
+		int rs = (op2 & 0x07);
+		util::stream_format(stream, "MOV%s [%s+], [%s+]", size ? ".w" : ".b", m_regnames16[rd], m_regnames16[rs]);
 	}
 	else
 	{
@@ -888,43 +896,49 @@ int xa_dasm::d_g9_subgroup(XA_DASM_PARAMS)
 		{
 		case 0x08:
 		{
-			util::stream_format(stream, "DA Rd %02x", op2);
+			int rd = (op2 & 0xf0) >> 4;
+			util::stream_format(stream, "DA %s", m_regnames8[rd]);
 			return 2;
 		}
 		case 0x09:
 		{
-			util::stream_format(stream, "SEXT%s Rd %02x", size ? ".w" : ".b", op2);
+			int rd = (op2 & 0xf0) >> 4;
+			util::stream_format(stream, "SEXT%s %s", size ? ".w" : ".b", regnames[rd]);
 			return 2;
 		}
 		case 0x0a:
 		{
-			util::stream_format(stream, "CPL%s Rd %02x", size ? ".w" : ".b", op2);
+			int rd = (op2 & 0xf0) >> 4;
+			util::stream_format(stream, "CPL%s %s", size ? ".w" : ".b", regnames[rd]);
 			return 2;
 		}
 		case 0x0b:
 		{
-			util::stream_format(stream, "NEG%s Rd %02x", size ? ".w" : ".b", op2);
+			int rd = (op2 & 0xf0) >> 4;
+			util::stream_format(stream, "NEG%s %sx", size ? ".w" : ".b", regnames[rd]);
 			return 2;
 		}
 		case 0x0c:
 		{
-			util::stream_format(stream, "MOVC A, [A+PC] %02x", op2);
+			util::stream_format(stream, "MOVC A, [A+PC]");
 			return 2;
 		}
 		case 0x0e:
 		{
-			util::stream_format(stream, "MOVC A, [A+DPTR] %02x", op2);
+			util::stream_format(stream, "MOVC A, [A+DPTR]");
 			return 2;
 		}
 		case 0x0f:
 		{
 			if (!size)
 			{
-				util::stream_format(stream, "MOV Rd, USP %02x", op2);		 
+				int rd = (op2 & 0xf0) >> 4;
+				util::stream_format(stream, "MOV %s, USP", m_regnames16[rd]);		 
 			}
 			else
 			{
-				util::stream_format(stream, "MOV USP, Rs %02x", op2);		 
+				int rs = (op2 & 0xf0) >> 4;
+				util::stream_format(stream, "MOV USP, %s", m_regnames16[rs]);		 
 			}
 			return 2;
 		}
@@ -1521,7 +1535,9 @@ MULU.w Rd, Rs               16X16 unsigned reg multiply                         
 int xa_dasm::d_mulu_w(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
-	util::stream_format(stream, "MULU.w Rd, Rs %02x", op2);
+	const u8 rd = (op2 & 0xf0) >> 4;
+	const u8 rs = (op2 & 0x0f);
+	util::stream_format(stream, "MULU.w %s, %s", m_regnames16[rd], m_regnames16[rs]);
 	return 2;
 }
 
@@ -1531,7 +1547,9 @@ DIVU.w Rd, Rs               16X8 unsigned reg divide                            
 int xa_dasm::d_divu_w(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
-	util::stream_format(stream, "DIVU.w Rd, Rs %02x", op2);
+	const u8 rd = (op2 & 0xf0) >> 4;
+	const u8 rs = (op2 & 0x0f);
+	util::stream_format(stream, "DIVU.w %s, %s", m_regnames16[rd], m_regnames16[rs]);
 	return 2;
 }
 
@@ -1541,7 +1559,9 @@ MUL.w Rd, Rs                16X16 signed multiply of reg contents               
 int xa_dasm::d_mul_w(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
-	util::stream_format(stream, "MUL.w Rd, Rs %02x", op2);
+	const u8 rd = (op2 & 0xf0) >> 4;
+	const u8 rs = (op2 & 0x0f);
+	util::stream_format(stream, "MUL.w %s, %s", m_regnames16[rd], m_regnames16[rs]);
 	return 2;
 }
 
@@ -1551,7 +1571,9 @@ DIV.w Rd, Rs                16x8 signed reg divide                              
 int xa_dasm::d_div_w(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
-	util::stream_format(stream, "DIV.w Rd, Rs %02x", op2);
+	const u8 rd = (op2 & 0xf0) >> 4;
+	const u8 rs = (op2 & 0x0f);
+	util::stream_format(stream, "DIV.w %s, %s", m_regnames16[rd], m_regnames16[rs]);
 	return 2;
 }
 
