@@ -477,60 +477,35 @@ ANL C, /bit                 Logical AND complement of a bit to carry            
 ORL C, bit                  Logical OR a bit to carry                                               3 4         0000 1000  0110 00bb  bbbb bbbb
 ORL C, /bit                 Logical OR complement of a bit to carry                                 3 4         0000 1000  0111 00bb  bbbb bbbb
 */
+
+// temporary, need to indicate SFRs and Register bit accesses in this
+// rather than this non-standard syntax 
+const char* xa_dasm::get_bittext(int bit)
+{
+	static char tempstring[256];
+	sprintf(tempstring, "BIT($%03x)", bit);
+	return tempstring;
+}
+
 int xa_dasm::d_bitgroup(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
 	const u8 op3 = opcodes.r8(pc++);
 
+	u16 bit = ((op2 & 0x03) << 8) | op3;
+
 	switch (op2 & 0xf0)
 	{
-	case 0x00:
-	{
-		util::stream_format(stream, "CLR bit %02x %02x", op2, op3 );
-		break;
+	case 0x00: util::stream_format(stream, "CLR %s", get_bittext(bit) ); break; 
+	case 0x10: util::stream_format(stream, "SETB %s", get_bittext(bit) ); break;
+	case 0x20: util::stream_format(stream, "MOV C, %s", get_bittext(bit) );	break;
+	case 0x30: util::stream_format(stream, "MOV %s, C", get_bittext(bit) ); break;
+	case 0x40: util::stream_format(stream, "ANL C, %s", get_bittext(bit) ); break;
+	case 0x50: util::stream_format(stream, "ANL C, /%s", get_bittext(bit) ); break;
+	case 0x60: util::stream_format(stream, "ORL C, %s", get_bittext(bit) ); break;
+	case 0x70: util::stream_format(stream, "ORL C, /%s", get_bittext(bit) ); break;
+	default:   util::stream_format(stream, "illegal bit op %s", get_bittext(bit) );	break;
 	}
-	case 0x10:
-	{
-		util::stream_format(stream, "SETB bit %02x %02x", op2, op3 );
-		break;
-	}
-	case 0x20:
-	{
-		util::stream_format(stream, "MOV C, bit %02x %02x", op2, op3 );
-		break;
-	}
-	case 0x30:
-	{
-		util::stream_format(stream, "MOV bit, C %02x %02x", op2, op3 );
-		break;
-	}
-	case 0x40:
-	{
-		util::stream_format(stream, "ANL C, bit %02x %02x", op2, op3 );
-		break;
-	}
-	case 0x50:
-	{
-		util::stream_format(stream, "ANL C, /bit %02x %02x", op2, op3 );
-		break;
-	}
-	case 0x60:
-	{
-		util::stream_format(stream, "ORL C, bit %02x %02x", op2, op3 );
-		break;
-	}
-	case 0x70:
-	{
-		util::stream_format(stream, "ORL C, /bit %02x %02x", op2, op3 );
-		break;
-	}
-	default:
-	{
-		util::stream_format(stream, "illegal bit op %02x %02x", op2, op3 );
-		break;
-	}
-	}
-
 	return 3;
 }
 
