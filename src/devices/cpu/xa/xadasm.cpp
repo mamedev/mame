@@ -689,7 +689,9 @@ int xa_dasm::d_lea_offset8(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
 	const u8 op3 = opcodes.r8(pc++);
-	util::stream_format(stream, "LEA Rd, Rs+offset8 %02x %02x", op2, op3);
+	const u8 rd = (op2 & 0x70) >> 4;
+	const u8 rs = (op2 & 0x07);
+	util::stream_format(stream, "LEA %s, %s+#$%02x", m_regnames16[rd], m_regnames16[rs], op3);
 	return 3;
 }
 
@@ -701,8 +703,11 @@ int xa_dasm::d_lea_offset16(XA_DASM_PARAMS)
 	const u8 op2 = opcodes.r8(pc++);
 	const u8 op3 = opcodes.r8(pc++);
 	const u8 op4 = opcodes.r8(pc++);
+	const u8 rd = (op2 & 0x70) >> 4;
+	const u8 rs = (op2 & 0x07);
+	const u16 offset = (op3 << 8) | op4;
 
-	util::stream_format(stream, "LEA Rd, Rs+offset16 %02x %02x %02x", op2, op3, op4);
+	util::stream_format(stream, "LEA %s, %s+#$%04x ", m_regnames16[rd], m_regnames16[rs], offset);
 	return 4;
 }
 
@@ -732,7 +737,11 @@ XCH Rd, [Rs]                Exchange contents of a reg-ind address w/ a reg     
 int xa_dasm::d_xch_type1(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
-	util::stream_format(stream, "XCH Rd, [Rs] %02x", op2);
+	int size = op & 0x08;
+	const char** regnames = size ? m_regnames16 : m_regnames8;
+	const u8 rd = (op2 & 0xf0) >> 4;
+	const u8 rs = (op2 & 0x07);
+	util::stream_format(stream, "XCH %s, [%s]", regnames[rd], m_regnames16[rs]);
 	return 2;
 }
 
@@ -762,7 +771,12 @@ XCH Rd, Rs                  Exchange contents of two regs                       
 int xa_dasm::d_xch_type2(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
-	util::stream_format(stream, "XCH Rd, Rs %02x", op2);
+	int size = op & 0x08;
+	const char** regnames = size ? m_regnames16 : m_regnames8;
+	const u8 rd = (op2 & 0xf0) >> 4;
+	const u8 rs = (op2 & 0x0f);
+
+	util::stream_format(stream, "XCH %s, %s", regnames[rd], regnames[rs]);
 	return 2;
 }
 
@@ -1379,7 +1393,11 @@ int xa_dasm::d_norm(XA_DASM_PARAMS)
 	case 0x00: case 0x08: case 0x0c:
 	{
 		const u8 op2 = opcodes.r8(pc++);
-		util::stream_format(stream, "NORM%s Rd, Rs  %02x", m_dwparamsizes[size >> 2], op2);
+		int rd = (op2 & 0xf0) >> 4;
+		int rs = (op2 & 0x0f);
+		const char** regnames = ((size != 0) ? m_regnames8 : m_regnames16);
+		// doesn't have a #data5 mode like the other shifts?
+		util::stream_format(stream, "NORM%s %s, %s", m_dwparamsizes[size >> 2], regnames[rd], regnames[rs]);
 		return 2;
 	}
 	case 0x04:
@@ -1500,8 +1518,11 @@ int xa_dasm::d_rl(XA_DASM_PARAMS)
 {
 	int size = op & 0x08;
 	const u8 op2 = opcodes.r8(pc++);
+	const char** regnames = size ? m_regnames16 : m_regnames8;
+	const u8 rd = (op2 & 0xf0) >> 4;
+	const u8 data4 = (op2 & 0x0f);
 
-	util::stream_format(stream, "RL%s Rd, #data4", size ? ".w" : ".b", op2);
+	util::stream_format(stream, "RL%s %d, %d", size ? ".w" : ".b", regnames[rd], data4);
 
 	return 2;
 }
@@ -1513,8 +1534,11 @@ int xa_dasm::d_rlc(XA_DASM_PARAMS)
 {
 	int size = op & 0x08;
 	const u8 op2 = opcodes.r8(pc++);
+	const char** regnames = size ? m_regnames16 : m_regnames8;
+	const u8 rd = (op2 & 0xf0) >> 4;
+	const u8 data4 = (op2 & 0x0f);
 
-	util::stream_format(stream, "RLC%s Rd, #data4", size ? ".w" : ".b", op2);
+	util::stream_format(stream, "RLC%s Rd, %d", size ? ".w" : ".b", regnames[rd], data4);
 
 	return 2;
 }
