@@ -442,6 +442,7 @@ void popobear_state::main_map(address_map &map)
 	map(0x280000, 0x2fffff).ram().share("spriteram"); // unknown boundaries
 	map(0x300000, 0x3fffff).ram().w(FUNC(popobear_state::vram_w)).share("vram"); // tile definitions + tilemaps
 
+    // TODO: is the 48xxxx block entirely from AIA90423?
 	map(0x480000, 0x48001f).ram().share("vregs");
 	map(0x480031, 0x480031).w(FUNC(popobear_state::irq_ack_w));
 	map(0x480034, 0x480035).nopr(); // uses bset/bclr to write, which causes a read (ignored)
@@ -455,7 +456,7 @@ void popobear_state::main_map(address_map &map)
 		NAME([this] (offs_t offset) -> u16 {
 			// TODO: absolute guess, controls title screen faces animation
 			// Most likely Free Running Timer
-			// - PC=039532 latches in $2100b5-b2 at with $48003a / $480022 (upper bytes)
+			// - PC=039532 latches in $2100b5-b2 with $48003a / $480022 (upper bytes)
 			// - PC=039f4a Reads $48003a (word), writes contents of $480022 (word),
 			//   ANDs with 0xf for title screen anim.
 			const u8 frame_count = (m_maincpu->total_cycles() >> 8) & 0xf;

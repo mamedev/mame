@@ -4,10 +4,9 @@
 
   Goori Goori (c) Unico 1999
 
- hardware is loosely derived from snowbros / Kaneko Pandora
+ hardware is loosely derived from kaneko/snowbros.cpp / Kaneko Pandora
 
  ToDo:
- background image is visible briefly at the start of level, is this correct?
  is more than one button used?
 
 Goori Goori PCB layout:
@@ -89,9 +88,6 @@ protected:
 private:
 	void goori_map(address_map& map);
 
-	void goori_300008_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void goori_30000e_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
 	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -111,6 +107,8 @@ private:
 
 	// video related
 	tilemap_t* m_bg_tilemap = nullptr;
+
+	bool m_display_enable = false;
 };
 
 
@@ -137,7 +135,11 @@ void goori_state::video_start()
 
 uint32_t goori_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
-	//bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);
+
+	if (!m_display_enable)
+		return 0;
+
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	gfx_element *gfx = m_gfxdecode->gfx(0);
@@ -173,24 +175,6 @@ uint32_t goori_state::screen_update(screen_device& screen, bitmap_ind16& bitmap,
 	return 0;
 }
 
-void goori_state::goori_300008_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	//popmessage("goori_300008_w %04x %04x\n", data, mem_mask); // possibly display disable?
-}
-
-void goori_state::goori_30000e_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	// eeprom writes?
-	logerror("%06x goori_30000e_w %04x %04x\n", machine().describe_context(), data, mem_mask); // startup only?
-
-	if (mem_mask & 0x00ff)
-	{
-		m_eeprom->di_write(BIT(data, 2));
-		m_eeprom->cs_write(BIT(data, 0));
-		m_eeprom->clk_write(BIT(data, 1));
-	}
-}
-
 void goori_state::goori_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
@@ -199,9 +183,15 @@ void goori_state::goori_map(address_map &map)
 	map(0x300000, 0x300003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0xff00);
 	map(0x300004, 0x300004).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0x300008, 0x300009).w(FUNC(goori_state::goori_300008_w));
+	map(0x300008, 0x300008).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			if (data & 0xef)
+				logerror("$300008: write %02x\n", data);
+			m_display_enable = bool(BIT(data, 4));
+		})
+	);
 
-	map(0x30000e, 0x30000f).w(FUNC(goori_state::goori_30000e_w));
+	map(0x30000e, 0x30000f).portw("EEPROM");
 
 	map(0x400000, 0x400fff).ram().w(FUNC(goori_state::bg_videoram_w)).share(m_bg_videoram); // 8-bit?
 
@@ -216,6 +206,12 @@ void goori_state::goori_map(address_map &map)
 }
 
 static INPUT_PORTS_START( goori )
+	PORT_START("EEPROM")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0xfff8, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
 	PORT_START("DSW1")  /* 500001 */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED ) // no dips on this PCB
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -268,6 +264,7 @@ GFXDECODE_END
 
 void goori_state::machine_start()
 {
+	save_item(NAME(m_display_enable));
 }
 
 void goori_state::goori(machine_config &config)
