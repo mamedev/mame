@@ -40,13 +40,24 @@ FRONT:                BACK:
 
 -->
 
+<!--
+
+The following are known to exist
+
+2002 4th Grade: Penta no Daibouken (ぺんたのだいぼうけん)
+2002 5th Grade: Angel Guard (エンジェルガード）
+2003 5th Grade: Sky Kight (スカイナイト)
+Extra: Nihon kaitaku no tabi Game (日本かいたくの旅ゲーム）
+
+-->
 
 <softwarelist name="challenge_gear_cart" description="Benesse Challenge Gear cartridges">
 
-	<software name="6years" supported="no">
-		<description>Challenge 6 Years</description>
-		<year>199?</year>
+	<software name="6grade" supported="no">
+		<description>6th Grade: Dance Battle</description>
+		<year>2003</year>
 		<publisher>Benesse Corporation</publisher>
+		<info name="alt_title" value="ダンスバトル" />
 		<part name="cart" interface="challenge_gear_cart">
 			<dataarea name="rom" size="0x80000">
 				<rom name="MS040601.ic1" size="0x80000" crc="487ecb9c" sha1="bc89468aff7f06f1694eed17f15cab46c0d1638e" />
@@ -55,6 +66,3 @@ FRONT:                BACK:
 	</software>
 
 </softwarelist>
-
-
-
