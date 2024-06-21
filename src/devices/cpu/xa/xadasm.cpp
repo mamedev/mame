@@ -1360,7 +1360,7 @@ int xa_dasm::d_asr_c(XA_DASM_PARAMS)
 	{
 		const u8 op2 = opcodes.r8(pc++);
 		const u8 rs = op2 & 0x07;
-		util::stream_format(stream, "CALL [%d]", m_regnames16[rs]);
+		util::stream_format(stream, "CALL [%s]", m_regnames16[rs]);
 		return 2;
 	}
 	}
@@ -1415,7 +1415,7 @@ int xa_dasm::d_lsr_fj(XA_DASM_PARAMS)
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 op4 = opcodes.r8(pc++);
 		const u32 addr = (op2 << 8) | op3 | (op4 << 16);
-		util::stream_format(stream, "FJMP addr24 $%06x", addr);
+		util::stream_format(stream, "FJMP $%06x", addr);
 		return 4;
 	}
 	}
@@ -1555,7 +1555,9 @@ MULU.b Rd, Rs               8X8 unsigned multiply of reg contents               
 int xa_dasm::d_mulu_b(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
-	util::stream_format(stream, "MULU.b Rd, Rs %02x", op2);
+	const u8 rd = (op2 & 0xf0) >> 4;
+	const u8 rs = (op2 & 0x0f);
+	util::stream_format(stream, "MULU.b %s, %s", m_regnames8[rd], m_regnames8[rs]);
 	return 2;
 }
 
@@ -1565,7 +1567,9 @@ DIVU.b Rd, Rs               8x8 unsigned reg divide                             
 int xa_dasm::d_divu_b(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
-	util::stream_format(stream, "DIVU.b Rd, Rs %02x", op2);
+	const u8 rd = (op2 & 0xf0) >> 4;
+	const u8 rs = (op2 & 0x0f);
+	util::stream_format(stream, "DIVU.b %s, %s", m_regnames8[rd], m_regnames8[rs]);
 	return 2;
 }
 
@@ -1627,37 +1631,38 @@ int xa_dasm::d_div_data8(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
 	const u8 op3 = opcodes.r8(pc++);
+	const u8 rd = (op2 & 0xf0) >> 4;
 
 	switch (op2 & 0x0f)
 	{
 
 	case 0x00:
 	{
-		util::stream_format(stream, "MULU.b Rd, #data8 %02x %02x", op2, op3);
+		util::stream_format(stream, "MULU.b %s, #$%02x", m_regnames8[rd], op3);
 		break;
 	}
 
 	case 0x01:
 	{
-		util::stream_format(stream, "DIVU.b Rd, #data8 %02x %02x", op2, op3);
+		util::stream_format(stream, "DIVU.b %s, #$%02x", m_regnames8[rd], op3);
 		break;
 	}
 
 	case 0x03:
 	{
-		util::stream_format(stream, "DIVU.w Rd, #data8  %02x %02x", op2, op3);
+		util::stream_format(stream, "DIVU.w %s, #$%02x", m_regnames8[rd], op3);
 		break;
 	}
 
 	case 0x0b:
 	{
-		util::stream_format(stream, "DIV.w Rd, #data8 %02x %02x %02x", op2, op3);
+		util::stream_format(stream, "DIV.w %s, #$%02x", m_regnames8[rd], op3);
 		break;
 	}
 
 	default:
 	{
-		util::stream_format(stream, "illegal #data8 %02x %02x", op2, op3);
+		util::stream_format(stream, "illegal %s #$%02x", m_regnames8[rd], op3);
 		break;
 	}
 
@@ -1677,33 +1682,40 @@ int xa_dasm::d_div_d16(XA_DASM_PARAMS)
 	const u8 op3 = opcodes.r8(pc++);
 	const u8 op4 = opcodes.r8(pc++);
 
+	const u16 data = (op3 << 8) | op4;
+
 	switch (op2 & 0x0f)
 	{
 	case 0x00:
 	{
-		util::stream_format(stream, "MULU.w Rd, #data16 %02x %02x %02x", op2, op3, op4);
+		const u8 rd = (op2 & 0xf0) >> 4;
+		util::stream_format(stream, "MULU.w %s, #$%04x", m_regnames16[rd], data);
 		break;
 	}
 	case 0x01:
 	{
-		util::stream_format(stream, "DIVU.d Rd, #data16 %02x %02x %02x", op2, op3, op4);
+		const u8 rd = (op2 & 0xe0) >> 4;
+		util::stream_format(stream, "DIVU.d %s, #$%04x", m_regnames16[rd], data);
 		break;
 	}
 
 	case 0x08:
 	{
-		util::stream_format(stream, "MUL.w Rd, #data16 %02x %02x %02x", op2, op3, op4);
+		const u8 rd = (op2 & 0xf0) >> 4;
+		util::stream_format(stream, "MUL.w %s, #$%04x", m_regnames16[rd], data);
 		break;
 	}
 
 	case 0x09:
 	{
-		util::stream_format(stream, "DIV.d Rd, #data16 %02x %02x %02x", op2, op3, op4);
+		const u8 rd = (op2 & 0xe0) >> 4;
+		util::stream_format(stream, "DIV.d %s, #$%04x", m_regnames16[rd], data);
 		break;
 	}
 	default:
 	{
-		util::stream_format(stream, "illegal #data16 %02x %02x %02x", op2, op3, op4);
+		const u8 rd = (op2 & 0xf0) >> 4;
+		util::stream_format(stream, "illegal %s, #$%04x", m_regnames16[rd], data);
 		break;
 	}
 
@@ -1717,7 +1729,9 @@ DIVU.d Rd, Rs               32X16 unsigned double reg divide                    
 int xa_dasm::d_divu_d(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
-	util::stream_format(stream, "DIVU.d Rd, Rs %02x", op2);
+	const u8 rd = (op2 & 0xe0) >> 4;
+	const u8 rs = (op2 & 0x0f);
+	util::stream_format(stream, "DIVU.d %s, %s", m_regnames16[rd], m_regnames16[rs]);
 	return 2;
 }
 
@@ -1727,13 +1741,15 @@ DIV.d Rd, Rs                32x16 signed double reg divide                      
 int xa_dasm::d_div_d(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
-	util::stream_format(stream, "DIV.d Rd, Rs %02x", op2);
+	const u8 rd = (op2 & 0xe0) >> 4;
+	const u8 rs = (op2 & 0x0f);
+	util::stream_format(stream, "DIV.d %s, %s", m_regnames16[rd], m_regnames16[rs]);
 	return 2;
 }
 
 /*
-CJNE Rd,#data8,rel8         Compare imm byte to reg and jump if not equal                           4 9t/6nt    1110 0011  dddd 0000  rrrr rrrr  iiii iiii
 CJNE [Rd],#data8,rel8       Compare imm word to reg-ind and jump if not equal                       4 10t/7nt   1110 0011  0ddd 1000  rrrr rrrr  iiii iiii
+CJNE Rd,#data8,rel8         Compare imm byte to reg and jump if not equal                           4 9t/6nt    1110 0011  dddd 0000  rrrr rrrr  iiii iiii
 */
 int xa_dasm::d_cjne_d8(XA_DASM_PARAMS)
 {
@@ -1741,20 +1757,25 @@ int xa_dasm::d_cjne_d8(XA_DASM_PARAMS)
 	const u8 op3 = opcodes.r8(pc++);
 	const u8 op4 = opcodes.r8(pc++);
 
+	int address = pc + ((s8)op3)*2;
+	address &= ~1; // must be word aligned
+
 	if (op2 & 0x08)
 	{
-		util::stream_format(stream, "CJNE [Rd],#data8,rel8 %02x %02x %02x", op2, op3, op4);
+		const u8 rd = (op2 & 0x70) >> 4;
+		util::stream_format(stream, "CJNE [%d],#$%02x, $%04x", m_regnames16[rd], op4, address);
 	}
 	else
 	{
-		util::stream_format(stream, "CJNE Rd,#data8,rel8 %02x %02x %02x", op2, op3, op4);
+		const u8 rd = (op2 & 0xf0) >> 4;
+		util::stream_format(stream, "CJNE %d,#$%02x, $%04x", m_regnames8[rd], op4, address);
 	}
 	return 4;
 }
 
 /*
-CJNE Rd,#data16,rel8        Compare imm word to reg and jump if not equal                           5 9t/6nt    1110 1011  dddd 0000  rrrr rrrr  iiii iiii  iiii iiii
 CJNE [Rd],#data16,rel8      Compare imm word to reg-ind and jump if not equal                       5 10t/7nt   1110 1011  0ddd 1000  rrrr rrrr  iiii iiii  iiii iiii
+CJNE Rd,#data16,rel8        Compare imm word to reg and jump if not equal                           5 9t/6nt    1110 1011  dddd 0000  rrrr rrrr  iiii iiii  iiii iiii
 */
 int xa_dasm::d_cjne_d16(XA_DASM_PARAMS)
 {
@@ -1763,13 +1784,20 @@ int xa_dasm::d_cjne_d16(XA_DASM_PARAMS)
 	const u8 op4 = opcodes.r8(pc++);
 	const u8 op5 = opcodes.r8(pc++);
 
+	const u16 data = (op4 << 8) | op5;
+
+	int address = pc + ((s8)op3)*2;
+	address &= ~1; // must be word aligned
+
 	if (op2 & 0x08)
 	{
-		util::stream_format(stream, "CJNE [Rd],#data16,rel8 %02x %02x %02x %02x", op2, op3, op4, op5);
+		const u8 rd = (op2 & 0x70) >> 4;
+		util::stream_format(stream, "CJNE [%s], #$%04x, $%04x", m_regnames16[rd], data, address);
 	}
 	else
 	{
-		util::stream_format(stream, "CJNE Rd,#data16,rel8 %02x %02x %02x %02x", op2, op3, op4, op5);
+		const u8 rd = (op2 & 0xf0) >> 4;
+		util::stream_format(stream, "CJNE %s, #$%04x, $%04x", m_regnames8[rd], data, address);
 	}
 
 	return 5;
@@ -1781,7 +1809,10 @@ JZ rel8                     Jump if accumulator equals zero                     
 int xa_dasm::d_jz_rel8(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
-	util::stream_format(stream, "JZ rel8 %02x", op2);
+	int address = pc + ((s8)op2)*2;
+	address &= ~1; // must be word aligned
+
+	util::stream_format(stream, "JZ $%04x", address);
 	return 2;
 }
 
@@ -1791,7 +1822,10 @@ JNZ rel8                    Jump if accumulator not equal zero                  
 int xa_dasm::d_jnz_rel8(XA_DASM_PARAMS)
 {
 	const u8 op2 = opcodes.r8(pc++);
-	util::stream_format(stream, "JNZ rel8 %02x", op2);
+	int address = pc + ((s8)op2)*2;
+	address &= ~1; // must be word aligned
+
+	util::stream_format(stream, "JNZ $%04x", address);
 	return 2;
 }
 
