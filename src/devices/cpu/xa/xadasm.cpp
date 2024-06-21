@@ -67,6 +67,24 @@ const xa_dasm::op_func xa_dasm::s_instruction[256] =
 &xa_dasm::d_branch,			&xa_dasm::d_branch,	&xa_dasm::d_branch,		&xa_dasm::d_branch,		&xa_dasm::d_branch,	&xa_dasm::d_branch,	&xa_dasm::d_branch,		&xa_dasm::d_bkpt, 
 };
 
+// temporary, need to indicate SFRs and Register bit accesses in this
+// rather than this non-standard syntax 
+const char* xa_dasm::get_bittext(int bit)
+{
+	static char tempstring[256];
+	sprintf(tempstring, "BIT($%03x)", bit);
+	return tempstring;
+}
+
+// temporary, need to indicate SFRs and Register bit accesses in this
+// rather than this non-standard syntax 
+const char* xa_dasm::get_directtext(int direct)
+{
+	static char tempstring[256];
+	sprintf(tempstring, "DIRECT($%03x)", direct);
+	return tempstring;
+}
+
 
 int xa_dasm::d_illegal(XA_DASM_PARAMS)
 {
@@ -184,12 +202,12 @@ int xa_dasm::handle_alu_type0(XA_DASM_PARAMS, int alu_op)
 		if (!optype)
 		{
 			const u8 rd = (op2 & 0xf0) >> 4;
-			util::stream_format(stream, "%s%s %s, $%03x", m_aluops[alu_op], size ? ".w" : ".b", regnames[rd], direct );
+			util::stream_format(stream, "%s%s %s, %s", m_aluops[alu_op], size ? ".w" : ".b", regnames[rd], get_directtext(direct) );
 		}
 		else
 		{
 			const u8 rs = (op2 & 0xf0) >> 4;
-			util::stream_format(stream, "%s%s $%03x, %s", m_aluops[alu_op], size ? ".w" : ".b", direct, regnames[rs] );
+			util::stream_format(stream, "%s%s %s, %s", m_aluops[alu_op], size ? ".w" : ".b", get_directtext(direct), regnames[rs] );
 		}
 		return 3;
 	}
@@ -265,7 +283,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 direct =( (op2 & 0xf0) << 4) | op3;
 		const u8 data8 = op4;
 
-		util::stream_format(stream, "%s %03x, #$%02x", m_aluops[alu_op], direct, data8 );
+		util::stream_format(stream, "%s %s, #$%02x", m_aluops[alu_op], get_directtext(direct), data8 );
 		return 4;
 	}
 
@@ -341,7 +359,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 direct =( (op2 & 0xf0) << 4) | op3;
 		const u16 data = (op4 << 8) | op5;
 
-		util::stream_format(stream, "%s %03x, #$%04x", m_aluops[alu_op], direct, data );
+		util::stream_format(stream, "%s %s, #$%04x", m_aluops[alu_op], get_directtext(direct), data );
 		return 5;
 	}
 	}
@@ -359,36 +377,58 @@ ADDS [Rd+offset16], #data4  Add reg-ind w/ 16-bit offs to 4-bit signed imm data 
 ADDS direct, #data4         Add 4-bit signed imm data to mem                                        3 4         1010 S110  0DDD iiii  DDDD DDDD
 */
 
+void xa_dasm::show_expanded_data4(XA_DASM_PARAMS, u16 data4, int size)
+{
+	u16 extended = util::sext(data4, 4);
+
+	if (!size)
+	{
+		extended &= 0xff;
+		util::stream_format(stream, "#$%02x", extended);
+	}
+	else
+	{
+		util::stream_format(stream, "#$%04x", extended);
+	}
+}
+
+
 int xa_dasm::handle_adds_movs(XA_DASM_PARAMS, int which)
 {
 	const u8 op2 = opcodes.r8(pc++);
 	int size = op & 0x08;
 
+	const u16 data4 = op2 & 0x0f;
+
 	switch (op & 0x07)
 	{
 	case 0x01:
 	{
-		util::stream_format(stream, "%s%s Rd, #data4 %02x", m_addsmovs[which], size ? ".w" : ".b", op2);
+		util::stream_format(stream, "%s%s Rd, ", m_addsmovs[which], size ? ".w" : ".b");
+		show_expanded_data4(XA_CALL_PARAMS, data4, size);
 		return 2;
 	}
 
 	case 0x02:
 	{
 
-		util::stream_format(stream, "%s%s [Rd], #data4 %02x", m_addsmovs[which], size ? ".w" : ".b", op2);
+		util::stream_format(stream, "%s%s [Rd], ", m_addsmovs[which], size ? ".w" : ".b");
+		show_expanded_data4(XA_CALL_PARAMS, data4, size);
 		return 2;
 	}
 
 	case 0x03:
 	{
-		util::stream_format(stream, "%s%s [Rd+], #data4 %02x", m_addsmovs[which], size ? ".w" : ".b", op2);
+		util::stream_format(stream, "%s%s [Rd+], ", m_addsmovs[which], size ? ".w" : ".b");
+		show_expanded_data4(XA_CALL_PARAMS, data4, size);
 		return 2;
 	}
 
 	case 0x04:
 	{
 		const u8 op3 = opcodes.r8(pc++);
-		util::stream_format(stream, "%s%s [Rd+offset8], #data4 %02x %02x", m_addsmovs[which], size ? ".w" : ".b", op2, op3);
+		util::stream_format(stream, "%s%s [Rd+%02x], ", m_addsmovs[which], size ? ".w" : ".b", op3);
+		show_expanded_data4(XA_CALL_PARAMS, data4, size);
 		return 3;
 	}
 
@@ -396,13 +436,19 @@ int xa_dasm::handle_adds_movs(XA_DASM_PARAMS, int which)
 	{
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 op4 = opcodes.r8(pc++);
-		util::stream_format(stream, "%s%s [Rd+offset16], #data4 %02x %02x%02x", m_addsmovs[which], size ? ".w" : ".b", op2, op3, op4);
+		const int offset = (op3 << 8) | op4;
+		util::stream_format(stream, "%s%s [Rd+offset16], ", m_addsmovs[which], size ? ".w" : ".b", offset);
+		show_expanded_data4(XA_CALL_PARAMS, data4, size);
 		return 4;
 	}
 	case 0x06:
 	{
 		const u8 op3 = opcodes.r8(pc++);
-		util::stream_format(stream, "%s%s direct, #data4 %02x %02x", m_addsmovs[which], size ? ".w" : ".b", op2, op3);
+
+		const int direct = ((op2 & 0xf0) << 4) | op3;
+
+		util::stream_format(stream, "%s%s %s, ", m_addsmovs[which], size ? ".w" : ".b", get_directtext(direct));
+		show_expanded_data4(XA_CALL_PARAMS, data4, size);
 		return 3;
 	}
 	}
@@ -477,15 +523,6 @@ ANL C, /bit                 Logical AND complement of a bit to carry            
 ORL C, bit                  Logical OR a bit to carry                                               3 4         0000 1000  0110 00bb  bbbb bbbb
 ORL C, /bit                 Logical OR complement of a bit to carry                                 3 4         0000 1000  0111 00bb  bbbb bbbb
 */
-
-// temporary, need to indicate SFRs and Register bit accesses in this
-// rather than this non-standard syntax 
-const char* xa_dasm::get_bittext(int bit)
-{
-	static char tempstring[256];
-	sprintf(tempstring, "BIT($%03x)", bit);
-	return tempstring;
-}
 
 int xa_dasm::d_bitgroup(XA_DASM_PARAMS)
 {
@@ -803,19 +840,19 @@ int xa_dasm::d_pushpop_djnz_subgroup(XA_DASM_PARAMS)
 		switch (op2 & 0xf0)
 		{
 		case 0x00:
-			util::stream_format(stream, "POPU%s %03x", size ? ".w" : ".b", direct);
+			util::stream_format(stream, "POPU%s %s", size ? ".w" : ".b", get_directtext(direct));
 			break;
 
 		case 0x10:
-			util::stream_format(stream, "POP%s %03x", size ? ".w" : ".b", direct);
+			util::stream_format(stream, "POP%s %s", size ? ".w" : ".b", get_directtext(direct));
 			break;
 
 		case 0x20:
-			util::stream_format(stream, "PUSHU%s %03x", size ? ".w" : ".b", direct);
+			util::stream_format(stream, "PUSHU%s %s", size ? ".w" : ".b", get_directtext(direct));
 			break;
 
 		case 0x30:
-			util::stream_format(stream, "PUSH%s %03x", size ? ".w" : ".b", direct);
+			util::stream_format(stream, "PUSH%s %s", size ? ".w" : ".b", get_directtext(direct));
 			break;
 
 		default:
@@ -1364,7 +1401,11 @@ int xa_dasm::d_asl_j(XA_DASM_PARAMS)
 		const u8 op2 = opcodes.r8(pc++);
 		const u8 op3 = opcodes.r8(pc++);
 
-		util::stream_format(stream, "JMP rel16  %02x%02x", op2, op3);
+		u16 offset = (op2 << 8) | op3;
+		int address = pc + ((s16)offset)*2;
+		address &= ~1; // must be word aligned
+
+		util::stream_format(stream, "JMP $%04x", address);
 
 		return 3;
 	}
@@ -1400,48 +1441,15 @@ int xa_dasm::d_asr_j(XA_DASM_PARAMS)
 	{
 		switch (op2 & 0xf0)
 		{
-		case 0x10:
-		{
-			util::stream_format(stream, "RESET");
-			break;
+		case 0x10: util::stream_format(stream, "RESET"); break;
+		case 0x30: util::stream_format(stream, "TRAP"); break;
+		case 0x40: util::stream_format(stream, "JMP [A+DPTR]"); break;
+		case 0x60: util::stream_format(stream, "JMP [[Rs+]]"); break;
+		case 0x70: util::stream_format(stream, "JMP [Rs]"); break;
+		case 0x80: util::stream_format(stream, "RET"); break;
+		case 0x90: util::stream_format(stream, "RTI"); break;
+		default:   util::stream_format(stream, "illegal"); break;
 		}
-		case 0x30:
-		{
-			util::stream_format(stream, "TRAP");
-			break;
-		}
-		case 0x40:
-		{
-			util::stream_format(stream, "JMP [A+DPTR]");
-			break;
-		}
-		case 0x60:
-		{
-			util::stream_format(stream, "JMP [[Rs+]]");
-			break;
-		}
-		case 0x70:
-		{
-			util::stream_format(stream, "JMP [Rs]");
-			break;
-		}
-		case 0x80:
-		{
-			util::stream_format(stream, "RET");
-			break;
-		}
-		case 0x90:
-		{
-			util::stream_format(stream, "RTI");
-			break;
-		}
-		default:
-		{
-			util::stream_format(stream, "illegal");
-			break;
-		}
-		}
-
 	}
 	}
 

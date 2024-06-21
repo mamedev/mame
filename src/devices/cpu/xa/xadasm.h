@@ -39,6 +39,8 @@ public:
 	const char* m_dwparamsizes[4] = { ".b", "invalid", ".w", ".dw" };
 
 	const char* get_bittext(int bit);
+	const char* get_directtext(int bit);
+	void show_expanded_data4(XA_DASM_PARAMS, u16 data4, int size);
 
 	int handle_alu_type0(XA_DASM_PARAMS, int alu_op);
 	int handle_alu_type1(XA_DASM_PARAMS, uint8_t op2);
