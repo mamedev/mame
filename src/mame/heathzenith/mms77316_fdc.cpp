@@ -138,7 +138,7 @@ u8 mms77316_fdc_device::data_r()
 {
 	if (burst_mode_r() && !m_drq && !m_irq)
 	{
-		LOGBURST("%s: burst_mode_r\n", FUNCNAME);
+		LOGBURST("%s: burst_mode setting wait state\n", FUNCNAME);
 		m_wait_cb(ASSERT_LINE);
 
 		return(0x00);
@@ -271,6 +271,7 @@ void mms77316_fdc_device::set_irq(int state)
 
 	if (state)
 	{
+		m_wait_cb(CLEAR_LINE);
 		m_drq_count = 0;
 	}
 
@@ -281,31 +282,22 @@ void mms77316_fdc_device::set_irq(int state)
 
 void mms77316_fdc_device::set_drq(int state)
 {
-	bool drq_allowed = false;
-
 	LOGLINES("set drq, allowed: %d state: %d\n", m_drq_allowed, state);
+
 	m_drq = state;
 
-	if (burst_mode_r() && m_drq_count > 0)
+	if (burst_mode_r())
 	{
+		LOGBURST("%s: in burst mode drq: %d, m_drq_count: %d\n", FUNCNAME, m_drq, m_drq_count);
 		if (m_drq)
 		{
 			m_wait_cb(CLEAR_LINE);
 		}
-		m_drq_cb(m_drq);
+
+		m_drq_cb(m_drq_count == 0 ? m_drq : CLEAR_LINE);
 	}
 	else
 	{
-		if (m_drq)
-		{
-			if (burst_mode_r())
-			{
-				m_wait_cb(CLEAR_LINE);
-			}
-			// even if drq bit is not set, trigger if the first one after an IRQ.
-			drq_allowed = m_drq_allowed || (m_drq_count++ == 0);
-		}
-
-		m_drq_cb(drq_allowed ? m_drq : CLEAR_LINE);
+		m_drq_cb(m_drq_allowed ? m_drq : CLEAR_LINE);
 	}
 }
