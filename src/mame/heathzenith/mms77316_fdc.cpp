@@ -41,6 +41,7 @@ mms77316_fdc_device::mms77316_fdc_device(const machine_config &mconfig, const ch
 	device_t(mconfig, MMS77316_FDC, tag, owner, 0),
 	m_irq_cb(*this),
 	m_drq_cb(*this),
+	m_wait_cb(*this),
 	m_fdc(*this, "mms_fdc"),
 	m_floppies(*this, "mms_fdc:%u", 0U)
 {
@@ -84,7 +85,7 @@ void mms77316_fdc_device::ctrl_w(u8 val)
 			floppy_image_device *floppy = elem->get_device();
 			if (floppy)
 			{
-				// turn on all installed 5" floppies
+				// set motor for installed 5" drives
 				floppy->mon_w(!five_in_drv);
 			}
 		}
@@ -93,10 +94,12 @@ void mms77316_fdc_device::ctrl_w(u8 val)
 
 void mms77316_fdc_device::data_w(u8 val)
 {
-	if (burstMode())
+	if (burst_mode_r() && !m_drq && !m_irq)
 	{
-		// TODO add wait states in burst mode, currently blocked on Z80 properly supporting wait states
-		LOGBURST("%s: burst_mode: %d\n", FUNCNAME, val);
+		LOGBURST("%s: burst_mode_r\n", FUNCNAME);
+		m_wait_cb(ASSERT_LINE);
+
+		return;
 	}
 
 	m_fdc->data_w(val);
@@ -133,10 +136,12 @@ void mms77316_fdc_device::write(offs_t reg, u8 val)
 
 u8 mms77316_fdc_device::data_r()
 {
-	if (burstMode())
+	if (burst_mode_r() && !m_drq && !m_irq)
 	{
-		// TODO add wait states in burst mode, currently blocked on Z80 properly supporting wait states
-		LOGBURST("%s: burst_mode\n", FUNCNAME);
+		LOGBURST("%s: burst_mode_r\n", FUNCNAME);
+		m_wait_cb(ASSERT_LINE);
+
+		return(0x00);
 	}
 
 	return m_fdc->data_r();
@@ -193,6 +198,7 @@ void mms77316_fdc_device::device_reset()
 
 	m_irq_cb(0);
 	m_drq_cb(0);
+	m_wait_cb(0);
 	for (int i = 0; i < 4; i++)
 	{
 		auto elem = m_floppies[i];
@@ -280,11 +286,26 @@ void mms77316_fdc_device::set_drq(int state)
 	LOGLINES("set drq, allowed: %d state: %d\n", m_drq_allowed, state);
 	m_drq = state;
 
-	if (m_drq)
+	if (burst_mode_r() && m_drq_count > 0)
 	{
-		// even if drq bit is not set, trigger if the first one after an IRQ.
-		drq_allowed = m_drq_allowed || (m_drq_count++ == 0);
+		if (m_drq)
+		{
+			m_wait_cb(CLEAR_LINE);
+		}
+		m_drq_cb(m_drq);
 	}
+	else
+	{
+		if (m_drq)
+		{
+			if (burst_mode_r())
+			{
+				m_wait_cb(CLEAR_LINE);
+			}
+			// even if drq bit is not set, trigger if the first one after an IRQ.
+			drq_allowed = m_drq_allowed || (m_drq_count++ == 0);
+		}
 
-	m_drq_cb(drq_allowed ? m_drq : CLEAR_LINE);
+		m_drq_cb(drq_allowed ? m_drq : CLEAR_LINE);
+	}
 }
