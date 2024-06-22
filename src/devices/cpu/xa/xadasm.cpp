@@ -4,17 +4,6 @@
 #include "emu.h"
 #include "xadasm.h"
 
-// SFR names
-const xa_dasm::mem_info xa_dasm::default_names[] = {
-	// the following are bit addressable
-	{  0x400, "PSWL" },
-	{  0x401, "PSWH" },
-	// the following are not bit addressable
-	{  0x440, "SCR" },
-	{ -1 }
-};
-
-
 const xa_dasm::op_func xa_dasm::s_instruction[256] =
 {
 // group 0	
@@ -67,12 +56,52 @@ const xa_dasm::op_func xa_dasm::s_instruction[256] =
 &xa_dasm::d_branch,			&xa_dasm::d_branch,	&xa_dasm::d_branch,		&xa_dasm::d_branch,		&xa_dasm::d_branch,	&xa_dasm::d_branch,	&xa_dasm::d_branch,		&xa_dasm::d_bkpt, 
 };
 
+// SFR names
+const xa_dasm::mem_info xa_dasm::default_names[] = {
+	// the following are bit addressable
+	{  0x400, "PSWL" },
+	{  0x401, "PSWH" },
+	// the following are not bit addressable
+	{  0x440, "SCR" },
+	{ -1 }
+};
+
+
+
+void xa_dasm::add_names(const mem_info *info)
+{
+	for(unsigned int i=0; info[i].addr >= 0; i++)
+		m_names[info[i].addr] = info[i].name;
+}
+
+std::string xa_dasm::get_data_address(u16 arg) const
+{
+	auto i = m_names.find(arg);
+	if (i == m_names.end())
+		return util::string_format("unk_SFR_%03X", arg);
+	else
+		return i->second;
+}
+
 // temporary, need to indicate SFRs and Register bit accesses in this
 // rather than this non-standard syntax 
 const char* xa_dasm::get_bittext(int bit)
 {
 	static char tempstring[256];
-	sprintf(tempstring, "BIT($%03x)", bit);
+
+	if (bit < 0x100)
+	{
+		sprintf(tempstring, "REG_BIT($%03x)", bit & 0xff);
+	}
+	else if (bit < 0x200)
+	{
+		sprintf(tempstring, "RAM_BIT($%03x)", bit & 0xff);
+	}
+	else
+	{
+		sprintf(tempstring, "SFR_BIT($%03x)", bit & 0x1ff);
+	}
+
 	return tempstring;
 }
 
@@ -81,7 +110,16 @@ const char* xa_dasm::get_bittext(int bit)
 const char* xa_dasm::get_directtext(int direct)
 {
 	static char tempstring[256];
-	sprintf(tempstring, "DIRECT($%03x)", direct);
+
+	if (direct < 0x400)
+	{
+		sprintf(tempstring, "$%03X", direct);
+	}
+	else
+	{
+		sprintf(tempstring, "%s", get_data_address(direct).c_str());
+	}
+
 	return tempstring;
 }
 

@@ -12,7 +12,11 @@
 class xa_dasm : public util::disasm_interface
 {
 public:
-	xa_dasm() = default;
+	xa_dasm()
+	{
+		add_names(default_names);
+	};
+
 	virtual ~xa_dasm() = default;
 
 	struct mem_info {
@@ -21,6 +25,9 @@ public:
 	};
 
 	static const mem_info default_names[];
+	void add_names(const mem_info *info);
+
+	std::string get_data_address(u16 arg) const;
 
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
@@ -109,6 +116,9 @@ public:
 	int d_jnz_rel8(XA_DASM_PARAMS);
 	int d_branch(XA_DASM_PARAMS);
 	int d_bkpt(XA_DASM_PARAMS);
+
+private:
+	std::unordered_map<offs_t, const char *> m_names;
 };
 
 #endif // MAME_CPU_XA_XADASM_H
