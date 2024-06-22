@@ -29,6 +29,8 @@
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "cpu/xa/xa.h"
+
 #include "machine/nvram.h"
 
 #include "screen.h"
@@ -43,10 +45,12 @@ public:
 		driver_device(mconfig, type, tag),
 		m_igs_mainram(*this, "igs_mainram"),
 		m_maincpu(*this, "maincpu"),
+		m_xa(*this, "xa"),
 		m_igs017_igs031(*this, "igs017_igs031")
 	{ }
 
 	void igs_mahjong(machine_config &config);
+	void igs_mahjong_xa(machine_config &config);
 
 	void init_sdwx();
 	void init_chessc2();
@@ -73,7 +77,10 @@ protected:
 private:
 	optional_shared_ptr<u32> m_igs_mainram;
 	required_device<cpu_device> m_maincpu;
+	optional_device<xa_cpu_device> m_xa;
 	required_device<igs017_igs031_device> m_igs017_igs031;
+
+	void xa_map(address_map &map);
 
 	void vblank_irq(int state);
 
@@ -352,6 +359,19 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 
 	// sound hardware
 	// OK6295
+}
+
+void igs_m027_state::xa_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+}
+
+void igs_m027_state::igs_mahjong_xa(machine_config &config)
+{
+	igs_mahjong(config);
+
+	XA(config, m_xa, 10000000); // MX10EXAQC (Philips 80C51 XA) unknown frequency
+	m_xa->set_addrmap(AS_PROGRAM, &igs_m027_state::xa_map);
 }
 
 
@@ -907,7 +927,7 @@ ROM_START( haunthig ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "hauntedhouse_ver-101us.u34", 0x000000, 0x80000, CRC(4bf045d4) SHA1(78c848fd69961df8d9b75f92ad57c3534fbf08db) )
 
-	ROM_REGION( 0x10000, "plcc", 0 )
+	ROM_REGION( 0x10000, "xa", 0 )
 	ROM_LOAD( "hauntedhouse.u17", 0x000000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // MX10EXAQC (80C51 XA based MCU) marked J9, not read protected?
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -918,7 +938,7 @@ ROM_START( haunthig ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_LOAD( "haunted-h_cg.u32",  0x000000, 0x400000, CRC(e0ea10e6) SHA1(e81be78fea93e72d4b1f4c0b58560bda46cf7948) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 	ROM_LOAD( "haunted-h_ext.u12", 0x400000, 0x400000, CRC(662eb883) SHA1(831ebe29e1e7a8b2c2fff7fbc608975771c3486c) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x200000, "samples", 0 ) // samples, but not OKI? possibly ICS? PCB only has an Oki M6295 though. Maybe scrambled ROM?
+	ROM_REGION( 0x200000, "samples", 0 ) // Oki M6295 samples, missing sample table, bad?
 	ROM_LOAD( "haunted-h_sp.u3", 0x00000, 0x200000,  CRC(fe3fcddf) SHA1(ac57ab6d4e4883747c093bd19d0025cf6588cb2c) )
 
 	ROM_REGION( 0x500, "plds", ROMREGION_ERASE00 )
@@ -934,7 +954,7 @@ ROM_START( crzybugs ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "cray_bugs_v-103jp.u34", 0x000000, 0x200000, CRC(1e35ed79) SHA1(0e4f8b706cdfcaf2aacdc40eec422df9d865b311) )
 
-	ROM_REGION( 0x10000, "plcc", 0 )
+	ROM_REGION( 0x10000, "xa", 0 )
 	ROM_LOAD( "e9.u17", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // MX10EXAQC (80C51 XA based MCU) marked E9, same as haunthig
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -1236,8 +1256,11 @@ GAME( 200?, klxyj,     0,        igs_mahjong, sdwx,     igs_m027_state, init_klx
 GAME( 2000, mgfx,      0,        igs_mahjong, sdwx,     igs_m027_state, init_mgfx,     ROT0, "IGS", "Man Guan Fu Xing",   MACHINE_IS_SKELETON )
 GAME( 200?, gonefsh2,  0,        igs_mahjong, sdwx,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2",   MACHINE_IS_SKELETON )
 GAME( 2002, chessc2,   0,        igs_mahjong, sdwx,     igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II",   MACHINE_IS_SKELETON )
-GAME( 2006, haunthig,  0,        igs_mahjong, sdwx,     igs_m027_state, init_hauntedh, ROT0, "IGS", "Haunted House (IGS)",   MACHINE_IS_SKELETON )
 GAME( 200?, extradrw,  0,        igs_mahjong, sdwx,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Extra Draw",   MACHINE_IS_SKELETON )
-GAME( 2007, crzybugs,  0,        igs_mahjong, sdwx,     igs_m027_state, init_crzybugs, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_IS_SKELETON )
 GAME( 2003, mgzz,      0,        igs_mahjong, sdwx,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)",   MACHINE_IS_SKELETON )
 GAME( 2007, mgcs3,     0,        igs_mahjong, sdwx,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)",   MACHINE_IS_SKELETON )
+
+// these have an Philips 80c51XA
+GAME( 2006, haunthig,  0,        igs_mahjong_xa, sdwx,     igs_m027_state, init_hauntedh, ROT0, "IGS", "Haunted House (IGS)",   MACHINE_IS_SKELETON )
+GAME( 2007, crzybugs,  0,        igs_mahjong_xa, sdwx,     igs_m027_state, init_crzybugs, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_IS_SKELETON )
+
