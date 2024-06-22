@@ -17,9 +17,9 @@ H8/325 B84 MCU is used in:
 - Novag Chess Wizard IQ V (Zircon II rebranded by Mitco Industries)
 - Novag Aquamarine Risc II 26.6MHz (Siglo XXI version too)
 
-Versions manufactured after around 1997 have a 16MHz H8/3214, it's a bit faster
-than the ~26.6MHz H8/325 due to the latter /2 divider. Newer revisions of Chess
-Wizard IQ V and Aquamarine Risc II have it, presumably others too.
+Versions manufactured after around 1997 have a 16MHz H8/3214 (100186 C PCB), it's
+a bit faster than the ~26.6MHz H8/325 due to the latter /2 divider. Newer revisions
+of Chess Wizard IQ V and Aquamarine Risc II have it, presumably others too.
 
 TODO:
 - dump/add H8/3214 version

@@ -8,6 +8,7 @@ authors:hap
 <!-- define elements -->
 
 	<element name="black"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
 
 	<element name="ledr" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
@@ -307,7 +308,6 @@ authors:hap
 
 	<element name="blackd"><disk><color red="0.17" green="0.15" blue="0.15" /></disk></element>
 	<element name="redd"><disk><color red="0.8" green="0.2" blue="0.1" /></disk></element>
-	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="whitem"><rect><color red="0.64" green="0.65" blue="0.64" /></rect></element>
 
 	<element name="hlb" defstate="0">
@@ -520,6 +520,21 @@ authors:hap
 
 <!-- build screen -->
 
+	<view name="Internal Layout (LCD V)">
+		<bounds left="-12.8" right="106.3" top="0" bottom="101.25" />
+		<group ref="common"><bounds left="-12.8" right="106.3" top="0" bottom="88" /></group>
+
+		<!-- lcd panels -->
+		<element ref="black"><bounds x="0" y="89.5" width="106.3" height="11.75" /></element>
+		<element ref="blackb"><bounds xc="88.1" y="89" width="11" height="15" /></element>
+
+		<element ref="text_black"><bounds xc="88.1" y="89.3" width="5" height="1.5" /></element>
+		<group ref="lcd2"><bounds xc="88.1" y="91.0" width="7.5" height="3.14" /></group>
+
+		<group ref="lcd1"><bounds xc="88.1" y="96.25" width="7.5" height="3.14" /></group>
+		<element ref="text_white"><bounds xc="88.1" y="99.6" width="5" height="1.5" /></element>
+	</view>
+
 	<view name="Internal Layout (LCD H)">
 		<bounds left="-12.8" right="106.3" top="0" bottom="94.14" />
 		<group ref="common"><bounds left="-12.8" right="106.3" top="0" bottom="88" /></group>
@@ -527,18 +542,6 @@ authors:hap
 		<!-- lcd panels (actually they're above eachother instead of side by side, but it looks better this way) -->
 		<group ref="lcd2"><bounds xc="90" y="89.5" width="7.5" height="3.14" /></group>
 		<group ref="lcd1"><bounds xc="99" y="89.5" width="7.5" height="3.14" /></group>
-	</view>
-
-	<view name="Internal Layout (LCD V)">
-		<bounds left="-12.8" right="106.3" top="0" bottom="102.75" />
-		<group ref="common"><bounds left="-12.8" right="106.3" top="0" bottom="88" /></group>
-
-		<!-- lcd panels -->
-		<element ref="text_black"><bounds xc="88.1" y="89.3" width="5" height="1.5" /></element>
-		<group ref="lcd2"><bounds xc="88.1" y="91.0" width="7.5" height="3.14" /></group>
-
-		<group ref="lcd1"><bounds xc="88.1" y="96.25" width="7.5" height="3.14" /></group>
-		<element ref="text_white"><bounds xc="88.1" y="99.6" width="5" height="1.5" /></element>
 	</view>
 
 </mamelayout>
