@@ -225,7 +225,7 @@ int xa_dasm::handle_alu_type0(XA_DASM_PARAMS, int alu_op)
 		const int optype = op2 & 0x08;
 		const u8 op3 = opcodes.r8(pc++);
 
-		const int direct = ((op2 & 0x07) << 8) | op3;
+		const u16 direct = ((op2 & 0x07) << 8) | op3;
 
 		if (!optype)
 		{
@@ -308,7 +308,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 op4 = opcodes.r8(pc++);
 
-		const u8 direct =( (op2 & 0xf0) << 4) | op3;
+		const u16 direct =( (op2 & 0xf0) << 4) | op3;
 		const u8 data8 = op4;
 
 		util::stream_format(stream, "%s %s, #$%02x", m_aluops[alu_op], get_directtext(direct), data8 );
@@ -384,7 +384,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 op4 = opcodes.r8(pc++);
 		const u8 op5 = opcodes.r8(pc++);
 
-		const u8 direct =( (op2 & 0xf0) << 4) | op3;
+		const u16 direct =( (op2 & 0xf0) << 4) | op3;
 		const u16 data = (op4 << 8) | op5;
 
 		util::stream_format(stream, "%s %s, #$%04x", m_aluops[alu_op], get_directtext(direct), data );
@@ -466,7 +466,7 @@ int xa_dasm::handle_adds_movs(XA_DASM_PARAMS, int which)
 	case 0x06:
 	{
 		const u8 op3 = opcodes.r8(pc++);
-		const int direct = ((op2 & 0xf0) << 4) | op3;
+		const u16 direct = ((op2 & 0xf0) << 4) | op3;
 		util::stream_format(stream, "%s%s %s, ", m_addsmovs[which], size ? ".w" : ".b", get_directtext(direct));
 		show_expanded_data4(XA_CALL_PARAMS, data4, size);
 		return 3;
@@ -879,7 +879,7 @@ int xa_dasm::d_pushpop_djnz_subgroup(XA_DASM_PARAMS)
 	}
 	else
 	{
-		int direct = ((op2 & 0x07) << 8) | op3;
+		const u16 direct = ((op2 & 0x07) << 8) | op3;
 
 		switch (op2 & 0xf0)
 		{
@@ -1171,7 +1171,7 @@ int xa_dasm::d_movdir(XA_DASM_PARAMS)
 	const u8 op2 = opcodes.r8(pc++);
 	const u8 op3 = opcodes.r8(pc++);
 	int size = op & 0x08;
-	const int direct = ((op2 & 0x07) << 8) | op3;
+	const u16 direct = ((op2 & 0x07) << 8) | op3;
 
 	if (op2 & 0x08)
 	{
@@ -1558,7 +1558,7 @@ int xa_dasm::d_djnz_cjne(XA_DASM_PARAMS)
 	int address = pc + ((s8)op4)*2;
 	address &= ~1; // must be word aligned
 
-	int direct = ((op2 & 0x07) << 8) | op3;
+	const u16 direct = ((op2 & 0x07) << 8) | op3;
 
 	if (op2 & 0x08)
 	{
