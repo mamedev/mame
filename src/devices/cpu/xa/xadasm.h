@@ -19,6 +19,8 @@ public:
 
 	virtual ~xa_dasm() = default;
 
+private:
+
 	struct mem_info {
 		int addr;
 		const char *name;
@@ -32,7 +34,6 @@ public:
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
-
 	typedef int (xa_dasm::*op_func) (XA_DASM_PARAMS);
 	static const op_func s_instruction[256];
 
@@ -43,14 +44,11 @@ public:
 	const char* m_addsmovs[2] = { "ADDS", "MOVS" };
 	const char* m_pushpull[4] = { "PUSH", "PUSHU", "POP", "POPU" };
 	const char* m_shifts[3] = { "ASL", "ASR", "LSR" };
-
-
-
 	const char* m_dwparamsizes[4] = { ".b", "invalid", ".w", ".dw" };
 
-	const char* get_bittext(int bit);
-	const char* get_directtext(int bit);
-	void show_expanded_data4(XA_DASM_PARAMS, u16 data4, int size);
+	std::string get_bittext(int bit);
+	std::string get_directtext(int bit);
+	std::string show_expanded_data4(u16 data4, int size);
 
 	int handle_alu_type0(XA_DASM_PARAMS, int alu_op);
 	int handle_alu_type1(XA_DASM_PARAMS, uint8_t op2);
@@ -117,7 +115,6 @@ public:
 	int d_branch(XA_DASM_PARAMS);
 	int d_bkpt(XA_DASM_PARAMS);
 
-private:
 	std::unordered_map<offs_t, const char *> m_names;
 };
 
