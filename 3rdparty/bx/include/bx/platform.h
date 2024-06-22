@@ -238,12 +238,12 @@
 #	elif defined(__GLIBC__)
 #		undef  BX_CRT_GLIBC
 #		define BX_CRT_GLIBC (__GLIBC__ * 10000 + __GLIBC_MINOR__ * 100)
-#	elif defined(__apple_build_version__) || defined(__ORBIS__) || defined(__EMSCRIPTEN__) || defined(__llvm__) || defined(__HAIKU__)
-#		undef  BX_CRT_LIBCXX
-#		define BX_CRT_LIBCXX 1
 #	elif defined(__MINGW32__) || defined(__MINGW64__)
 #		undef  BX_CRT_MINGW
 #		define BX_CRT_MINGW 1
+#	elif defined(__apple_build_version__) || defined(__ORBIS__) || defined(__EMSCRIPTEN__) || defined(__llvm__) || defined(__HAIKU__)
+#		undef  BX_CRT_LIBCXX
+#		define BX_CRT_LIBCXX 1
 #	elif defined(_MSC_VER)
 #		undef  BX_CRT_MSVC
 #		define BX_CRT_MSVC 1

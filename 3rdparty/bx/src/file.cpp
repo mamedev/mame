@@ -800,7 +800,7 @@ namespace bx
 #if BX_CRT_MSVC
 		int32_t result = ::_mkdir(_filePath.getCPtr() );
 #elif BX_CRT_MINGW
-		int32_t result = ::mkdir(_filePath.getCPtr());
+		int32_t result = ::mkdir(_filePath.getCPtr() );
 #elif BX_CRT_NONE
 		BX_UNUSED(_filePath);
 		int32_t result = -1;
