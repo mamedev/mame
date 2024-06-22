@@ -1260,7 +1260,8 @@ GAME( 200?, extradrw,  0,        igs_mahjong, sdwx,     igs_m027_state, init_qlg
 GAME( 2003, mgzz,      0,        igs_mahjong, sdwx,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)",   MACHINE_IS_SKELETON )
 GAME( 2007, mgcs3,     0,        igs_mahjong, sdwx,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)",   MACHINE_IS_SKELETON )
 
-// these have an Philips 80c51XA
+// These use the MX10EXAQC (80c51XA from Philips) and maybe don't belong in here
+// the PCBs are closer to igs_fear.cpp in terms of layout
 GAME( 2006, haunthig,  0,        igs_mahjong_xa, sdwx,     igs_m027_state, init_hauntedh, ROT0, "IGS", "Haunted House (IGS)",   MACHINE_IS_SKELETON )
 GAME( 2007, crzybugs,  0,        igs_mahjong_xa, sdwx,     igs_m027_state, init_crzybugs, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_IS_SKELETON )
 
