@@ -68,6 +68,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	template <typename T> void cpu_config(T &maincpu);
 	void shared(machine_config &config);
 	void tatrain(machine_config &config);
 	void tatraina(machine_config &config);
@@ -195,19 +196,22 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-#define CPU_CONFIG() \
-	maincpu.nvram_enable_backup(true); \
-	maincpu.standby_cb().set(m_maincpu, FUNC(h8_device::nvram_set_battery)); \
-	maincpu.standby_cb().append([this](int state) { if (state) m_display->clear(); }); \
-	maincpu.write_port1().set(FUNC(tatrain_state::leds_w<0>)); \
-	maincpu.write_port2().set(FUNC(tatrain_state::leds_w<1>)); \
-	maincpu.write_port3().set(FUNC(tatrain_state::leds_w<2>)); \
-	maincpu.read_port4().set(FUNC(tatrain_state::p4_r)); \
-	maincpu.read_port5().set_constant(0xff); \
-	maincpu.write_port5().set(FUNC(tatrain_state::p5_w)); \
-	maincpu.read_port6().set_ioport("IN.2").invert(); \
-	maincpu.write_port6().set(FUNC(tatrain_state::p6_w)); \
-	maincpu.write_port7().set(FUNC(tatrain_state::p7_w))
+template <typename T>
+void tatrain_state::cpu_config(T &maincpu)
+{
+	maincpu.nvram_enable_backup(true);
+	maincpu.standby_cb().set(m_maincpu, FUNC(h8_device::nvram_set_battery));
+	maincpu.standby_cb().append([this](int state) { if (state) m_display->clear(); });
+	maincpu.write_port1().set(FUNC(tatrain_state::leds_w<0>));
+	maincpu.write_port2().set(FUNC(tatrain_state::leds_w<1>));
+	maincpu.write_port3().set(FUNC(tatrain_state::leds_w<2>));
+	maincpu.read_port4().set(FUNC(tatrain_state::p4_r));
+	maincpu.read_port5().set_constant(0xff);
+	maincpu.write_port5().set(FUNC(tatrain_state::p5_w));
+	maincpu.read_port6().set_ioport("IN.2").invert();
+	maincpu.write_port6().set(FUNC(tatrain_state::p6_w));
+	maincpu.write_port7().set(FUNC(tatrain_state::p7_w));
+}
 
 void tatrain_state::shared(machine_config &config)
 {
@@ -229,8 +233,7 @@ void tatrain_state::shared(machine_config &config)
 void tatrain_state::tatrain(machine_config &config)
 {
 	H83212(config, m_maincpu, 10_MHz_XTAL);
-	auto &maincpu = downcast<h83212_device &>(*m_maincpu);
-	CPU_CONFIG();
+	cpu_config<h83212_device>(downcast<h83212_device &>(*m_maincpu));
 
 	shared(config);
 }
@@ -238,8 +241,7 @@ void tatrain_state::tatrain(machine_config &config)
 void tatrain_state::tatraina(machine_config &config)
 {
 	H8323(config, m_maincpu, 20_MHz_XTAL);
-	auto &maincpu = downcast<h8323_device &>(*m_maincpu);
-	CPU_CONFIG();
+	cpu_config<h8323_device>(downcast<h8323_device &>(*m_maincpu));
 
 	shared(config);
 }
