@@ -323,7 +323,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 rd = (op2 & 0xf0) >> 4;
 		const u16 data = (op3 << 8) | op4;
 
-		util::stream_format(stream, "%s %s, #$%04x", m_aluops[alu_op], m_regnames8[rd], data );
+		util::stream_format(stream, "%s %s, #$%04x", m_aluops[alu_op], m_regnames16[rd], data );
 		return 4;
 	}
 
@@ -1296,7 +1296,7 @@ int xa_dasm::d_lsr_fc(XA_DASM_PARAMS)
 	case 0x00: case 0x08: case 0x0c:
 	{
 		const u8 op2 = opcodes.r8(pc++);
-		const char** regnames = ((size != 0) ? m_regnames8 : m_regnames16);
+		const char** regnames = ((size != 0) ? m_regnames16 : m_regnames8);
 		const u8 rd = (op2 & 0xf0) >> 4;
 		const u8 rs = (op2 & 0x0f);
 		util::stream_format(stream, "LSR %s, %s", regnames[rd], regnames[rs]);
@@ -1331,7 +1331,7 @@ int xa_dasm::d_asl_c(XA_DASM_PARAMS)
 	case 0x00: case 0x08: case 0x0c:
 	{
 		const u8 op2 = opcodes.r8(pc++);
-		const char** regnames = ((size != 0) ? m_regnames8 : m_regnames16);
+		const char** regnames = ((size != 0) ? m_regnames16 : m_regnames8);
 		const u8 rd = (op2 & 0xf0) >> 4;
 		const u8 rs = (op2 & 0x0f);
 		util::stream_format(stream, "ASL %s, %s", regnames[rd], regnames[rs]);
@@ -1364,7 +1364,7 @@ int xa_dasm::d_asr_c(XA_DASM_PARAMS)
 	case 0x00: case 0x08: case 0x0c:
 	{
 		const u8 op2 = opcodes.r8(pc++);
-		const char** regnames = ((size != 0) ? m_regnames8 : m_regnames16);
+		const char** regnames = ((size != 0) ? m_regnames16 : m_regnames8);
 		const u8 rd = (op2 & 0xf0) >> 4;
 		const u8 rs = (op2 & 0x0f);
 		util::stream_format(stream, "ASR %s, %s", regnames[rd], regnames[rs]);
@@ -1395,7 +1395,7 @@ int xa_dasm::d_norm(XA_DASM_PARAMS)
 		const u8 op2 = opcodes.r8(pc++);
 		int rd = (op2 & 0xf0) >> 4;
 		int rs = (op2 & 0x0f);
-		const char** regnames = ((size != 0) ? m_regnames8 : m_regnames16);
+		const char** regnames = ((size != 0) ? m_regnames16 : m_regnames8);
 		// doesn't have a #data5 mode like the other shifts?
 		util::stream_format(stream, "NORM%s %s, %s", m_dwparamsizes[size >> 2], regnames[rd], regnames[rs]);
 		return 2;
@@ -1787,12 +1787,12 @@ int xa_dasm::d_cjne_d8(XA_DASM_PARAMS)
 	if (op2 & 0x08)
 	{
 		const u8 rd = (op2 & 0x70) >> 4;
-		util::stream_format(stream, "CJNE [%d],#$%02x, $%04x", m_regnames16[rd], op4, address);
+		util::stream_format(stream, "CJNE [%d], #$%02x, $%04x", m_regnames16[rd], op4, address);
 	}
 	else
 	{
 		const u8 rd = (op2 & 0xf0) >> 4;
-		util::stream_format(stream, "CJNE %d,#$%02x, $%04x", m_regnames8[rd], op4, address);
+		util::stream_format(stream, "CJNE %d, #$%02x, $%04x", m_regnames8[rd], op4, address);
 	}
 	return 4;
 }
