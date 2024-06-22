@@ -62,6 +62,11 @@ const xa_dasm::mem_info xa_dasm::default_names[] = {
 	{  0x400, "PSWL" },
 	{  0x401, "PSWH" },
 	// the following are not bit addressable
+
+	{  0x430, "P0" },
+	{  0x431, "P1" },
+	{  0x432, "P2" },
+	{  0x433, "P3" },
 	{  0x440, "SCR" },
 	{ -1 }
 };
@@ -83,6 +88,8 @@ std::string xa_dasm::get_data_address(u16 arg) const
 		return i->second;
 }
 
+
+
 // temporary, need to indicate SFRs and Register bit accesses in this
 // rather than this non-standard syntax 
 const char* xa_dasm::get_bittext(int bit)
@@ -95,11 +102,16 @@ const char* xa_dasm::get_bittext(int bit)
 	}
 	else if (bit < 0x200)
 	{
-		sprintf(tempstring, "RAM_BIT($%03x)", bit & 0xff);
+		int addr = ((bit & 0x1ff) >> 3) + 0x20;
+		int position = bit & 7;
+
+		sprintf(tempstring, "$%02x.%d", addr, position);
 	}
 	else
 	{
-		sprintf(tempstring, "SFR_BIT($%03x)", bit & 0x1ff);
+		int sfr = ((bit & 0x1ff) >> 3) + 0x400;
+		int position = bit & 7;
+		sprintf(tempstring, "%s.%d", get_data_address(sfr).c_str(), position);
 	}
 
 	return tempstring;
