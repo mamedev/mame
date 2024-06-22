@@ -87,10 +87,10 @@ public:
 
 protected:
 	// constants
-	static XTAL constexpr CLOCK_X1 = 4_MHz_XTAL,
-	                      CLOCK_X2 = 12_MHz_XTAL;
-	static u16 constexpr HTOTAL = 384, HBSTART = 256, HBEND = 0,
-	                     VTOTAL = 264, VBSTART = 240, VBEND = 16;
+	static inline constexpr XTAL CLOCK_X1 = 4_MHz_XTAL;
+	static inline constexpr XTAL CLOCK_X2 = 12_MHz_XTAL;
+	static inline constexpr u16 HTOTAL = 384, HBSTART = 256, HBEND = 0;
+	static inline constexpr u16 VTOTAL = 264, VBSTART = 240, VBEND = 16;
 
 	// initialization
 	virtual void machine_start() override;
@@ -313,7 +313,7 @@ TILE_GET_INFO_MEMBER(bombjack_state::get_bg_tile_info)
 
 	set_bg_tile_info(attr, code, color, flipx, flipy);
 	tileinfo.set(1, code, color, (flipx ? TILE_FLIPX : 0) |
-	                             (flipy ? TILE_FLIPY : 0));
+								 (flipy ? TILE_FLIPY : 0));
 }
 
 void bombjack_state::set_fg_tile_info(u8 const attr, u16 &code, u8 &color, bool &flipx, bool &flipy)
@@ -340,14 +340,14 @@ TILE_GET_INFO_MEMBER(bombjack_state::get_fg_tile_info)
 
 	set_fg_tile_info(attr, code, color, flipx, flipy);
 	tileinfo.set(0, code, color, (flipx ? TILE_FLIPX : 0) |
-	                             (flipy ? TILE_FLIPY : 0));
+								 (flipy ? TILE_FLIPY : 0));
 }
 
 bool bombjack_state::large_sprite(int const index, u8 const attr)
 {
 	bool const reverse = m_spritectrl[0] > m_spritectrl[1];
 	return (index >  m_spritectrl[reverse ? 1 : 0]) &&
-	       (index <= m_spritectrl[reverse ? 0 : 1]);
+		   (index <= m_spritectrl[reverse ? 0 : 1]);
 }
 
 bool calorie_state::large_sprite(int const index, u8 const attr)
@@ -852,7 +852,7 @@ ROM_START( bombjack2 )
 
 	ROM_REGION( 0x2000, "bgmaps", 0 ) // schematics specify 2764, final board has a smaller ROM in place
 	ROM_LOAD( "02_p04t.bin", 0x0000, 0x1000, CRC(398d4a02) SHA1(ac18a8219f99ba9178b96c9564de3978e39c59fd) )
-    ROM_RELOAD(              0x1000, 0x1000)
+	ROM_RELOAD(              0x1000, 0x1000)
 ROM_END
 
 ROM_START( bombjackt )

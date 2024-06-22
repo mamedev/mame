@@ -916,8 +916,8 @@ uint8_t expro02_state::comad_okim6295_r()
 
 void expro02_state::expro02(machine_config &config)
 {
-    static constexpr XTAL CPU_CLOCK = XTAL(12'000'000);
-    static constexpr XTAL VDP_CLOCK = XTAL(16'000'000);
+	static constexpr XTAL CPU_CLOCK = XTAL(12'000'000);
+	static constexpr XTAL VDP_CLOCK = XTAL(16'000'000);
 
 	/* basic machine hardware */
 	M68000(config, m_maincpu, CPU_CLOCK);
@@ -926,7 +926,7 @@ void expro02_state::expro02(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-    m_screen->set_raw(VDP_CLOCK / 3, 341, 0, 256, 262, 0, 224); // ~60 Hz
+	m_screen->set_raw(VDP_CLOCK / 3, 341, 0, 256, 262, 0, 224); // ~60 Hz
 	m_screen->set_screen_update(FUNC(expro02_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -971,7 +971,7 @@ void expro02_state::comad(machine_config &config)
 	m_view2->set_invert_flip(1);
 	m_view2->set_offset(-256, -216, 256, 224);
 
-    // FIXME: can't be 0 seconds
+	// FIXME: can't be 0 seconds
 	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(0));
 }
 

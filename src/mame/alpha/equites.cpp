@@ -555,8 +555,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(equites_state::scanline_cb)
 {
 	int scanline = param;
 
-    // all games but bullfgtr have both valid
-    // bullfgtr definitely expects to vblank from 2, reversing will make it to run at half speed.
+	// all games but bullfgtr have both valid
+	// bullfgtr definitely expects to vblank from 2, reversing will make it to run at half speed.
 	if(scanline == 232) // vblank-in irq
 		m_maincpu->set_input_line(2, HOLD_LINE);
 

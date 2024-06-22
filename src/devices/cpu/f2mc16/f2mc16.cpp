@@ -1304,7 +1304,7 @@ void f2mc16_device::execute_run()
 							m_pc = read_16(uVecAddr);
 							m_pcb = read_8(uVecAddr + 2);
 							bFoundVec = true;
-//							printf("RETI vector chain to %02x%04x\n", m_pcb, m_pc);
+							//printf("RETI vector chain to %02x%04x\n", m_pcb, m_pc);
 							break;
 						}
 					}

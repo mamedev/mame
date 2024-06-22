@@ -12,7 +12,7 @@ license:CC0-1.0
 		<notes>The floppies can boot on both CISC and RISC systems due to some bootloader magic, but the MO image is only for the first wave of RISC NEWS machines (NWS-3000 series)</notes>
 		<sharedfeat name="compatibility" value="RISC" />
 		<!--
-		The installation floppy and MO disk work, but the format disk hangs after printing a few messages on RISC systems. 
+		The installation floppy and MO disk work, but the format disk hangs after printing a few messages on RISC systems.
 		Therefore, use of this kit requires use of a pre-formatted hard disk image for now.
 		The disk image loads on the CISC NEWS driver, so it is most likely an emulation issue, not a disk image issue.
 		-->

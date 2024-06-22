@@ -171,7 +171,7 @@ uint32_t caswin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_tilemap->set_scroll_rows(32);
 
 	// TODO: still some cutoffs / object change flashing
-    // goofy rowscroll, expects to wraparound over its own canvas ...
+	// goofy rowscroll, expects to wraparound over its own canvas ...
 	for (int i = 0; i < 32; i ++)
 	{
 		const u16 scroll_data = m_vram[i];

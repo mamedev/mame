@@ -442,7 +442,7 @@ void popobear_state::main_map(address_map &map)
 	map(0x280000, 0x2fffff).ram().share("spriteram"); // unknown boundaries
 	map(0x300000, 0x3fffff).ram().w(FUNC(popobear_state::vram_w)).share("vram"); // tile definitions + tilemaps
 
-    // TODO: is the 48xxxx block entirely from AIA90423?
+	// TODO: is the 48xxxx block entirely from AIA90423?
 	map(0x480000, 0x48001f).ram().share("vregs");
 	map(0x480031, 0x480031).w(FUNC(popobear_state::irq_ack_w));
 	map(0x480034, 0x480035).nopr(); // uses bset/bclr to write, which causes a read (ignored)

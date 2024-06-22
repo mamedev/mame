@@ -37,7 +37,7 @@ A04 --|16    17|-- A03
        --------
 
 */
- 
+
 namespace {
 
 class challenge_gear_state : public driver_device

@@ -5,7 +5,7 @@
   Microchip PIC16X8x Emulator
 
   Based on MAME's PIC16C5x cpu_device dissasm developed by Tony La Porta.
- 
+
 
 */
 

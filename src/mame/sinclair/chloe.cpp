@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
 /**********************************************************************
-	Chloe 280SE
+    Chloe 280SE
 **********************************************************************/
 
 #include "emu.h"
@@ -725,7 +725,7 @@ INPUT_PORTS_START(chloe)
 	PORT_BIT(0xe820, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IO_LINE5") /* 0xDFFE */
-	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p   P   \"")   PORT_CODE(KEYCODE_P)       PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR('"') 
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p   P   \"")   PORT_CODE(KEYCODE_P)       PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR('"')
 	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("o   O   ;")    PORT_CODE(KEYCODE_O)       PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(';')
 																			PORT_CODE(KEYCODE_COLON)
 	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("i   I   Ins")  PORT_CODE(KEYCODE_I)       PORT_CHAR('i') PORT_CHAR('I')

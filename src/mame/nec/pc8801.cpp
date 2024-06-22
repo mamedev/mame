@@ -814,7 +814,7 @@ void pc8801_state::palram_w(offs_t offset, uint8_t data)
 	// p8suite Analog RGB test cross bars (reportedly works in 24 kHz / 80 column only)
 	// NB: it uses a bunch of non-waitstate related opcodes to cycle time it right,
 	// implying a stress-test for Z80 opcode cycles.
-    m_screen->update_partial(m_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 }
 
 

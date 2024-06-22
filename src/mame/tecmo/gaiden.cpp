@@ -682,7 +682,7 @@ INPUT_PORTS_END
 
 
 static GFXDECODE_START( gfx_gaiden )
-	GFXDECODE_ENTRY( "txtiles", 0, gfx_8x8x4_packed_msb,               0x100,    16 ) // tiles 8x8 
+	GFXDECODE_ENTRY( "txtiles", 0, gfx_8x8x4_packed_msb,               0x100,    16 ) // tiles 8x8
 	GFXDECODE_ENTRY( "bgtiles", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 0x100 ) // tiles 16x16
 	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 0x100 ) // tiles 16x16 (only colors 0x00-0x0f and 0x80-0x8f are used)
 GFXDECODE_END
@@ -714,7 +714,7 @@ static const gfx_layout mastninj_spritelayout =
 };
 
 static GFXDECODE_START( gfx_mastninj )
-	GFXDECODE_ENTRY( "txtiles", 0, gfx_8x8x4_packed_msb,  0x000, 16 )  // tiles 8x8 
+	GFXDECODE_ENTRY( "txtiles", 0, gfx_8x8x4_packed_msb,  0x000, 16 )  // tiles 8x8
 	GFXDECODE_ENTRY( "bgtiles", 0, mastninj_tile2layout,  0x300, 16 ) // tiles 16x16
 	GFXDECODE_ENTRY( "fgtiles", 0, mastninj_tile2layout,  0x200, 16 ) // tiles 16x16
 	GFXDECODE_ENTRY( "sprites", 0, mastninj_spritelayout, 0x100, 16 ) // sprites 16x16
@@ -743,7 +743,7 @@ static const gfx_layout drgnbowl_spritelayout =
 };
 
 static GFXDECODE_START( gfx_drgnbowl )
-	GFXDECODE_ENTRY( "txtiles", 0,       gfx_8x8x4_packed_msb,      0, 16 )    // tiles 8x8 
+	GFXDECODE_ENTRY( "txtiles", 0,       gfx_8x8x4_packed_msb,      0, 16 )    // tiles 8x8
 	GFXDECODE_ENTRY( "bgtiles", 0x00000, drgnbowl_tile2layout,  0x300, 16 )    // tiles 16x16
 	GFXDECODE_ENTRY( "bgtiles", 0x20000, drgnbowl_tile2layout,  0x200, 16 )    // tiles 16x16
 	GFXDECODE_ENTRY( "sprites", 0,       drgnbowl_spritelayout, 0x100, 16 )    // sprites 16x16
@@ -1058,7 +1058,7 @@ ROM_START( shadoww )
 	ROM_LOAD16_BYTE( "shadowa_2.4s",     0x00001, 0x20000, CRC(f3f08921) SHA1(df6bb7302714e0eab12cbd0a7f2a4ca751a600e1) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "gaiden_3.4b",     0x0000, 0x10000, CRC(75fd3e6a) SHA1(3333e84ed4983caa133e60a8e8895fa897ab4949) )   // Audio CPU is a Z80 
+	ROM_LOAD( "gaiden_3.4b",     0x0000, 0x10000, CRC(75fd3e6a) SHA1(3333e84ed4983caa133e60a8e8895fa897ab4949) )   // Audio CPU is a Z80
 
 	ROM_REGION( 0x010000, "txtiles", 0 )
 	ROM_LOAD( "gaiden_5.7a",     0x000000, 0x10000, CRC(8d4035f7) SHA1(3473456cdd24e312e3073586d7e8f24eb71bbea1) )  // 8x8 tiles
@@ -1095,7 +1095,7 @@ ROM_START( shadowwa )
 	ROM_LOAD16_BYTE( "shadoww_2.4s",    0x00001, 0x20000, CRC(9b9d6b18) SHA1(75068611fb1de61120be8bf840f61d90c0dc86ca) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "gaiden_3.4b",     0x0000, 0x10000, CRC(75fd3e6a) SHA1(3333e84ed4983caa133e60a8e8895fa897ab4949) )   // Audio CPU is a Z80 
+	ROM_LOAD( "gaiden_3.4b",     0x0000, 0x10000, CRC(75fd3e6a) SHA1(3333e84ed4983caa133e60a8e8895fa897ab4949) )   // Audio CPU is a Z80
 
 	ROM_REGION( 0x010000, "txtiles", 0 )
 	ROM_LOAD( "gaiden_5.7a",     0x000000, 0x10000, CRC(8d4035f7) SHA1(3473456cdd24e312e3073586d7e8f24eb71bbea1) )  // 8x8 tiles
@@ -1132,7 +1132,7 @@ ROM_START( gaiden )
 	ROM_LOAD16_BYTE( "gaiden_2.4s",     0x00001, 0x20000, CRC(454f7314) SHA1(231296423870f00ea2e545faf0fbb37577430a4f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "gaiden_3.4b",     0x0000, 0x10000, CRC(75fd3e6a) SHA1(3333e84ed4983caa133e60a8e8895fa897ab4949) )   // Audio CPU is a Z80 
+	ROM_LOAD( "gaiden_3.4b",     0x0000, 0x10000, CRC(75fd3e6a) SHA1(3333e84ed4983caa133e60a8e8895fa897ab4949) )   // Audio CPU is a Z80
 
 	ROM_REGION( 0x010000, "txtiles", 0 )
 	ROM_LOAD( "gaiden_5.7a",     0x000000, 0x10000, CRC(8d4035f7) SHA1(3473456cdd24e312e3073586d7e8f24eb71bbea1) )  // 8x8 tiles
@@ -1169,7 +1169,7 @@ ROM_START( ryukendn )
 	ROM_LOAD16_BYTE( "ryukendn_2.4s",  0x00001, 0x20000, CRC(9e99f522) SHA1(b2277d8934b5e6e2f556aee5092f5d1050774a34) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "3.4b",   0x0000, 0x10000, CRC(6b686b69) SHA1(f0fa553acb3945f8dbbf466073c8bae35a0375ef) )   // Audio CPU is a Z80 
+	ROM_LOAD( "3.4b",   0x0000, 0x10000, CRC(6b686b69) SHA1(f0fa553acb3945f8dbbf466073c8bae35a0375ef) )   // Audio CPU is a Z80
 
 	ROM_REGION( 0x010000, "txtiles", 0 )
 	ROM_LOAD( "hn27512p.7a",   0x000000, 0x10000, CRC(765e7baa) SHA1(4d0a50f091b284739b6d9a8ceb4f81999da445fc) )    // 8x8 tiles
@@ -1216,7 +1216,7 @@ ROM_START( ryukendna )
 	ROM_LOAD16_BYTE( "2.4s",  0x00001, 0x20000, CRC(a93a8256) SHA1(6bf6c189f82cb9341d3427a822de83cbaed27bc0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "3.4b",   0x0000, 0x10000, CRC(6b686b69) SHA1(f0fa553acb3945f8dbbf466073c8bae35a0375ef) )   // Audio CPU is a Z80 
+	ROM_LOAD( "3.4b",   0x0000, 0x10000, CRC(6b686b69) SHA1(f0fa553acb3945f8dbbf466073c8bae35a0375ef) )   // Audio CPU is a Z80
 
 	ROM_REGION( 0x010000, "txtiles", 0 )
 	ROM_LOAD( "hn27512p.7a",   0x000000, 0x10000, CRC(765e7baa) SHA1(4d0a50f091b284739b6d9a8ceb4f81999da445fc) )    // 8x8 tiles

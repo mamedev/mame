@@ -29,7 +29,7 @@
       the 53C96's transfer count is zero.  The earlier ROM has the same logic as
       previous (and later!) 53C96 machines and works fine.
 
-	  Video in chips
+      Video in chips
 
 
 ****************************************************************************/

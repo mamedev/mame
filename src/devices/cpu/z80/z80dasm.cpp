@@ -23,7 +23,7 @@ static const char *const s_mnemonic[] =
 	"rrc" ,"rrca","rrd" ,"rst" ,"sbc" ,"scf" ,"set" ,"sla" ,
 	"sll" ,"sra" ,"srl" ,"sub" ,"xor "
 	// z80n
-	                                  ,"swap","mirr","test",
+									  ,"swap","mirr","test",
 	"bsla","bsra","bsrl","bsrf","brlc","mul" ,"otib","nreg",
 	"pxdn","pxad","stae","ldix","ldws","lddx","lirx","lprx",
 	"ldrx"
@@ -41,7 +41,7 @@ const u32 z80_disassembler::s_flags[] =
 	0        ,0        ,0        ,STEP_OVER,0        ,0    ,0        ,0        ,
 	0        ,0        ,0        ,0        ,0
 	// z80n
-	                                                 ,0    ,0        ,0        ,
+													 ,0    ,0        ,0        ,
 	0        ,0        ,0        ,0        ,0        ,0    ,0        ,0        ,
 	0        ,0        ,0        ,0        ,0        ,0    ,0        ,0        ,
 	0
