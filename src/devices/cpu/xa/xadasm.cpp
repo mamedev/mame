@@ -410,7 +410,6 @@ void xa_dasm::show_expanded_data4(XA_DASM_PARAMS, u16 data4, int size)
 	}
 }
 
-
 int xa_dasm::handle_adds_movs(XA_DASM_PARAMS, int which)
 {
 	const u8 op2 = opcodes.r8(pc++);
@@ -423,7 +422,8 @@ int xa_dasm::handle_adds_movs(XA_DASM_PARAMS, int which)
 	case 0x01:
 	{
 		int rd = (op2 & 0xf0) >> 4;
-		util::stream_format(stream, "%s%s %s, ", m_addsmovs[which], size ? ".w" : ".b", m_regnames8[rd]);
+		const char** regnames = size ? m_regnames16 : m_regnames8;
+		util::stream_format(stream, "%s%s %s, ", m_addsmovs[which], size ? ".w" : ".b", regnames[rd]); // last is not m_regnames8
 		show_expanded_data4(XA_CALL_PARAMS, data4, size);
 		return 2;
 	}
