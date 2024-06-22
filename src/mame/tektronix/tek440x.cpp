@@ -112,7 +112,7 @@ public:
 		m_prom(*this, "maincpu"),			// FIXME why is the bootrom called 'maincpu'?
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
-		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),
+		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),		// 2k 16-bit entries
 		m_map_view(*this, "map"),
 		m_mousex(*this, "mousex"),
 		m_mousey(*this, "mousey"),
@@ -166,6 +166,11 @@ private:
 	// fake output of serial
 	void write_txd(int state);
 
+	void vblank(int state);
+
+	u8 rtc_r(offs_t offset);
+	void rtc_w(offs_t offset, u8 data);
+
 	// need to handle bit 8 reset
 	void irq1_w(int state);
 	u16 timer_r(offs_t offset);
@@ -175,7 +180,7 @@ private:
 	u8 duart_r(offs_t offset);
 	void duart_w(offs_t offset, u8 data);
 
-	void ppi_pc_w(u8 data);
+	void printer_pc_w(u8 data);
 
 	void kb_rdata_w(int state);
 	void kb_tdata_w(int state);
@@ -218,12 +223,12 @@ private:
 	bool m_boot;
 	u8 m_map_control;
 	
-	u8 m_ppi_pc;
+	u8 m_printer_pc;
 	bool m_kb_rdata;
 	bool m_kb_tdata;
 	bool m_kb_rclamp;
 	bool m_kb_loop;
-	u8 m_videoaddr[4];
+	u16 m_videoaddr[4];
 	u8 m_videocntl;
 	u8 m_diag;
 	u8 m_mouse,m_mouse_x,m_mouse_y;
@@ -267,7 +272,8 @@ void tek440x_state::machine_reset()
 	m_u244latch = 0;
 	m_keyboard->kdo_w(1);
 	mapcntl_w(0);
-	m_vint->in_w<1>(0);
+	m_vint->in_w<0>(0);		// VBL enable
+	m_vint->in_w<1>(0);		// VBL 
 }
 
 
@@ -324,9 +330,8 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 		{
 
 			m_map_control |= (1 << MAP_BLOCK_ACCESS);
-			LOG("memory_r: m_map_control(%02x)\n", m_map_control);
 
-			LOG("memory_r: bus error: PID(%d) wrong %08x fc(%d)\n", BIT(m_map[offset >> 11], 11, 3), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
+			LOG("memory_r: bus error: PID(%d) != %d %08x fc(%d)\n", BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
@@ -364,9 +369,8 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		if (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
 		{
 			m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
-			LOG("memory_w: m_map_control(%02x)\n", m_map_control);
 
-			LOG("memory_w: bus error: PID(%d) wrong %08x fc(%d)\n", BIT(m_map[offset >> 11], 11, 3), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
+			LOG("memory_w: bus error: PID(%d) != %d %08x fc(%d)\n", BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
@@ -382,7 +386,6 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		if (BIT(m_map[offset >> 11], 14) == 0)
 		{
 			m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
-			LOG("memory_w: m_map_control(%02x)\n", m_map_control);
 
 			LOG("memory_w: bus error: READONLY %08x fc(%d)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -418,7 +421,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 
 u16 tek440x_state::map_r(offs_t offset)
 {
-	LOG("map_r 0x%08x => %04x\n",offset>>11, m_map[offset >> 11] );
+	//LOG("map_r 0x%08x => %04x\n",offset>>11, m_map[offset >> 11] );
 
 	// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
 	if (!BIT(m_map_control, MAP_SYS_WR_ENABLE))
@@ -435,7 +438,7 @@ u16 tek440x_state::map_r(offs_t offset)
 
 void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	LOG("map_w 0x%08x <= %04x\n",offset>>11, data);
+	//LOG("map_w 0x%08x <= %04x\n",offset>>11, data);
 
 	if (BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
@@ -614,7 +617,9 @@ u8 tek440x_state::mouse_r(offs_t offset)
 			ans = m_mouse_x;
 			break;
 		case 2:
-			ans = m_mouse_y;
+			ans = m_mouse;
+			ans ^= (m_diag & 15);
+			
 			break;
 		case 4:
 			ans = m_mousebtn->read() & 7;		// selftest xor diag register with it
@@ -647,15 +652,15 @@ void tek440x_state::write_txd(int state)
 	LOG("acia write_txd(%x)\n", state);
 }
 
-void tek440x_state::ppi_pc_w(u8 data)
+void tek440x_state::printer_pc_w(u8 data)
 {
 
-	LOG("ppi_pc_w(%02x)\n", data);
+	LOG("printer_pc_w(%02x)\n", data);
 
-	if (!m_kb_rclamp && BIT(m_ppi_pc, 2) != BIT(data, 2))
+	if (!m_kb_rclamp && BIT(m_printer_pc, 2) != BIT(data, 2))
 		m_keyboard->kdo_w(!BIT(data, 2) || m_kb_tdata);
 
-	m_ppi_pc = data;
+	m_printer_pc = data;
 }
 
 
@@ -691,6 +696,19 @@ void tek440x_state::kb_tdata_w(int state)
 	}
 }
 
+void tek440x_state::vblank(int state)
+{
+
+	if (state == 1)
+	if (BIT(m_videocntl, 6))
+	{
+		LOG("vblank %04x\n", state);
+		m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
+	}
+}
+
+
 void tek440x_state::irq1_w(int state)
 {
 	LOG("irq_w %04x\n", state);
@@ -700,9 +718,19 @@ void tek440x_state::irq1_w(int state)
 	{
 		LOG("M68K_IRQ_1 assert\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
-
-		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);		// hack experiment;  where is IRQ1 raised elsewhere?
 	}
+}
+
+u8 tek440x_state::rtc_r(offs_t offset)
+{
+	LOG("rtc_r %08x\n", offset);
+	return 0;
+}
+
+void tek440x_state::rtc_w(offs_t offset, u8 data)
+{
+	LOG("rtc_w %08x\n", offset);
+
 }
 
 // to handle offset 0x1xx writes resetting TPInt...
@@ -759,8 +787,10 @@ void tek440x_state::logical_map(address_map &map)
 	map(0x800000, 0xffffff).view(m_map_view);
 	m_map_view[0](0x800000, 0xffffff).rw(FUNC(tek440x_state::map_r), FUNC(tek440x_state::map_w));
 #else
-	map(0x800000, 0xffffff).rw(FUNC(tek440x_state::map_r), FUNC(tek440x_state::map_w));
+	map(0x800000, 0x801fff).rw(FUNC(tek440x_state::map_r), FUNC(tek440x_state::map_w));
 #endif
+
+	map(0x802000, 0xffffff).noprw();	// selftest writes from 0x802000 - 0xffffffff
 }
 
 void tek440x_state::physical_map(address_map &map)
@@ -776,7 +806,7 @@ void tek440x_state::physical_map(address_map &map)
 	// 780000-79ffff processor board I/O
 	map(0x780000, 0x780000).rw(FUNC(tek440x_state::mapcntl_r), FUNC(tek440x_state::mapcntl_w));
 	// 782000-783fff: video address registers
-	map(0x782000, 0x782001).rw(FUNC(tek440x_state::videoaddr_r),FUNC(tek440x_state::videoaddr_w));
+	map(0x782000, 0x782003).rw(FUNC(tek440x_state::videoaddr_r),FUNC(tek440x_state::videoaddr_w));
 	// 784000-785fff: video control registers
 	map(0x784000, 0x784000).rw(FUNC(tek440x_state::videocntl_r),FUNC(tek440x_state::videocntl_w));
 	// 786000-787fff: spare
@@ -800,6 +830,8 @@ void tek440x_state::physical_map(address_map &map)
 	map(0x7b8100, 0x7b8103).rw(FUNC(tek440x_state::timer_r), FUNC(tek440x_state::timer_w));
 	
 	// 7ba000-7bbfff: MC146818 RTC
+	map(0x7ba000, 0x7ba103).rw(FUNC(tek440x_state::rtc_r), FUNC(tek440x_state::rtc_w));
+	
 	map(0x7bc000, 0x7bc000).lw8(
 		[this](u8 data)
 		{
@@ -807,9 +839,6 @@ void tek440x_state::physical_map(address_map &map)
 
 			// TODO: bit 7 -> SCSI bus reset
 			LOG("scsi bus reset %d\n", BIT(data, 7));
-			
-			// TODO: should be disk activity
-			m_led_disk = !BIT(data, 7);
 			
 		}, "scsi_addr"); // 7bc000-7bdfff: SCSI bus address registers
 	map(0x7be000, 0x7be01f).m(m_scsi, FUNC(ncr5385_device::map)).umask16(0xff00); //.mirror(0x1fe0) .cswidth(16);
@@ -891,7 +920,7 @@ void tek440x_state::tek4404(machine_config &config)
 	I8255A(config, m_printer);
 	m_printer->in_pb_callback().set_constant(0x30);
 m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks if printer status < 0
-	m_printer->out_pc_callback().set(FUNC(tek440x_state::ppi_pc_w));
+	m_printer->out_pc_callback().set(FUNC(tek440x_state::printer_pc_w));
 
 	MC68681(config, m_duart, 14.7456_MHz_XTAL / 4);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5); // auto-vectored
@@ -914,7 +943,7 @@ m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks 
 
 	NSCSI_BUS(config, "scsi");
 	// hard disk is a Micropolis 1304 (https://www.micropolis.com/support/hard-drives/1304)
-	// with a Xebec 1401 SASI adapter inside the Mass Storage Unit
+	// AB: Not sure this is correct:  with a Xebec 1401 SASI adapter inside the Mass Storage Unit
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "tek_msu_fdc");
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
