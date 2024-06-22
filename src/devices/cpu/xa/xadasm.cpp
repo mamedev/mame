@@ -1299,7 +1299,7 @@ int xa_dasm::d_lsr_fc(XA_DASM_PARAMS)
 		const char** regnames = ((size != 0) ? m_regnames16 : m_regnames8);
 		const u8 rd = (op2 & 0xf0) >> 4;
 		const u8 rs = (op2 & 0x0f);
-		util::stream_format(stream, "LSR %s, %s", regnames[rd], regnames[rs]);
+		util::stream_format(stream, "LSR %s, %s", regnames[rd], m_regnames8[rs]); // m_regnames8 or regnames for last param?
 		return 2;
 	}
 	case 0x04:
@@ -1334,7 +1334,7 @@ int xa_dasm::d_asl_c(XA_DASM_PARAMS)
 		const char** regnames = ((size != 0) ? m_regnames16 : m_regnames8);
 		const u8 rd = (op2 & 0xf0) >> 4;
 		const u8 rs = (op2 & 0x0f);
-		util::stream_format(stream, "ASL %s, %s", regnames[rd], regnames[rs]);
+		util::stream_format(stream, "ASL %s, %s", regnames[rd], m_regnames8[rs]); // m_regnames8 or regnames for last param? (check 03D4 in superkds)
 		return 2;
 	}
 	case 0x04:
@@ -1367,7 +1367,7 @@ int xa_dasm::d_asr_c(XA_DASM_PARAMS)
 		const char** regnames = ((size != 0) ? m_regnames16 : m_regnames8);
 		const u8 rd = (op2 & 0xf0) >> 4;
 		const u8 rs = (op2 & 0x0f);
-		util::stream_format(stream, "ASR %s, %s", regnames[rd], regnames[rs]);
+		util::stream_format(stream, "ASR %s, %s", regnames[rd], m_regnames8[rs]); // m_regnames8 or regnames for last param?
 		return 2;
 	}
 	case 0x04:
@@ -1397,7 +1397,7 @@ int xa_dasm::d_norm(XA_DASM_PARAMS)
 		int rs = (op2 & 0x0f);
 		const char** regnames = ((size != 0) ? m_regnames16 : m_regnames8);
 		// doesn't have a #data5 mode like the other shifts?
-		util::stream_format(stream, "NORM%s %s, %s", m_dwparamsizes[size >> 2], regnames[rd], regnames[rs]);
+		util::stream_format(stream, "NORM%s %s, %s", m_dwparamsizes[size >> 2], regnames[rd], m_regnames8[rs]); // m_regnames8 or regnames for last param?
 		return 2;
 	}
 	case 0x04:
