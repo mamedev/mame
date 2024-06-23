@@ -15,13 +15,28 @@
 #include "xadasm.h"
 
 DEFINE_DEVICE_TYPE(XA, xa_cpu_device, "xa", "Philips 80c51 XA")
+DEFINE_DEVICE_TYPE(MX10EXA, mx10exa_cpu_device, "mx10exa", "Philips MX10EXA")
 
-xa_cpu_device::xa_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, XA, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
+
+
+
+xa_cpu_device::xa_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prg_map)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("data", ENDIANNESS_LITTLE, 16, 24, 0, prg_map)
 	, m_pc(0)
 	, m_program(nullptr)
 	, m_icount(0)
+{
+}
+
+xa_cpu_device::xa_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: xa_cpu_device(mconfig, XA, tag, owner, clock, address_map_constructor(FUNC(xa_cpu_device::internal_map), this))
+{
+}
+
+
+mx10exa_cpu_device::mx10exa_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: xa_cpu_device(mconfig, MX10EXA, tag, owner, clock, address_map_constructor(FUNC(mx10exa_cpu_device::mx10exa_internal_map), this))
 {
 }
 
@@ -31,6 +46,16 @@ std::unique_ptr<util::disasm_interface> xa_cpu_device::create_disassembler()
 }
 
 /*****************************************************************************/
+
+void xa_cpu_device::internal_map(address_map &map)
+{
+}
+
+void mx10exa_cpu_device::mx10exa_internal_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+}
+
 
 device_memory_interface::space_config_vector xa_cpu_device::memory_space_config() const
 {

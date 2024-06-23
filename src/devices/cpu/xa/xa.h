@@ -12,6 +12,8 @@ public:
 	xa_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	xa_cpu_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor prg_map);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -25,6 +27,8 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
+	void internal_map(address_map &map);
+
 	address_space_config m_program_config;
 
 	uint32_t m_pc;
@@ -33,6 +37,17 @@ private:
 	int m_icount;
 };
 
+class mx10exa_cpu_device : public xa_cpu_device
+{
+public:
+	mx10exa_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+private:
+	void mx10exa_internal_map(address_map &map);
+};
+
+
 DECLARE_DEVICE_TYPE(XA, xa_cpu_device)
+DECLARE_DEVICE_TYPE(MX10EXA, mx10exa_cpu_device)
 
 #endif // MAME_CPU_XA_XA_H

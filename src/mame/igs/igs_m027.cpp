@@ -80,8 +80,6 @@ private:
 	optional_device<xa_cpu_device> m_xa;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 
-	void xa_map(address_map &map);
-
 	void vblank_irq(int state);
 
 	void sdwx_gfx_decrypt();
@@ -361,17 +359,11 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 	// OK6295
 }
 
-void igs_m027_state::xa_map(address_map &map)
-{
-	map(0x000000, 0x00ffff).rom();
-}
-
 void igs_m027_state::igs_mahjong_xa(machine_config &config)
 {
 	igs_mahjong(config);
 
-	XA(config, m_xa, 10000000); // MX10EXAQC (Philips 80C51 XA) unknown frequency
-	m_xa->set_addrmap(AS_PROGRAM, &igs_m027_state::xa_map);
+	MX10EXA(config, m_xa, 10000000); // MX10EXAQC (Philips 80C51 XA) unknown frequency
 }
 
 

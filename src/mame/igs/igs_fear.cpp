@@ -42,7 +42,6 @@ private:
 	required_region_ptr<uint8_t> m_gfxrom;
 
 	void main_map(address_map &map);
-	void xa_map(address_map &map);
 
 	void sound_irq(int state);
 	void vblank_irq(int state);
@@ -118,11 +117,6 @@ void igs_fear_state::main_map(address_map &map)
 	map(0x38004000, 0x38007fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
-void igs_fear_state::xa_map(address_map &map)
-{
-	map(0x000000, 0x00ffff).rom();
-}
-
 static INPUT_PORTS_START( fear )
 INPUT_PORTS_END
 
@@ -141,8 +135,7 @@ void igs_fear_state::igs_fear(machine_config &config)
 	ARM7(config, m_maincpu, 50000000/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::main_map);
 
-	XA(config, m_xa, 10000000); // MX10EXAQC (Philips 80C51 XA) unknown frequency
-	m_xa->set_addrmap(AS_PROGRAM, &igs_fear_state::xa_map);
+	MX10EXA(config, m_xa, 10000000); // MX10EXAQC (Philips 80C51 XA) unknown frequency
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
