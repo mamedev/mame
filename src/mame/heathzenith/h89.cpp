@@ -150,6 +150,8 @@ protected:
 
 	void h89_base_io(address_map &map);
 
+	void set_wait_state(int data);
+
 	u8 raise_NMI_r();
 	void raise_NMI_w(u8 data);
 	void console_intr(int data);
@@ -247,14 +249,14 @@ class h89_mms_state : public h89_base_state
 public:
 	h89_mms_state(const machine_config &mconfig, device_type type, const char *tag):
 		h89_base_state(mconfig, type, tag),
-		m_mms(*this, "mms_fdc")
+		m_mms316(*this, "mms77316")
 	{
 	}
 
 	void h89_mms(machine_config &config);
 
 protected:
-	required_device<mms77316_fdc_device> m_mms;
+	required_device<mms77316_fdc_device> m_mms316;
 
 	void h89_mms_io(address_map &map);
 };
@@ -466,7 +468,7 @@ void h89_mms_state::h89_mms_io(address_map &map)
 	h89_base_state::h89_base_io(map);
 
 	// Add MMS 77316 Double Density Controller
-	map(0x38,0x3f).rw(m_mms, FUNC(mms77316_fdc_device::read), FUNC(mms77316_fdc_device::write));
+	map(0x38,0x3f).rw(m_mms316, FUNC(mms77316_fdc_device::read), FUNC(mms77316_fdc_device::write));
 }
 
 
@@ -783,6 +785,16 @@ void h89_base_state::machine_reset()
 	update_mem_view();
 }
 
+void h89_base_state::set_wait_state(int data)
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, data);
+	if (data)
+	{
+		machine().scheduler().synchronize();
+		m_maincpu->defer_access();
+	}
+}
+
 u8 h89_base_state::raise_NMI_r()
 {
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_usec(2));
@@ -1010,9 +1022,10 @@ void h89_mms_state::h89_mms(machine_config &config)
 	m_intr_socket->set_default_option("mms");
 	m_intr_socket->set_fixed(true);
 
-	MMS77316_FDC(config, m_mms);
-	m_mms->drq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
-	m_mms->irq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_irq));
+	MMS77316_FDC(config, m_mms316);
+	m_mms316->drq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
+	m_mms316->irq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_irq));
+	m_mms316->wait_cb().set(FUNC(h89_mms_state::set_wait_state));
 }
 
 
