@@ -1730,12 +1730,51 @@ void sega_9h0_0008_state::sega_9h0_0008(machine_config &config)
 }
 
 
-class sega_beena_state : public sega_9h0_0008_state
+class sega_9h0_0008_cart_state : public sega_9h0_0008_state
+{
+public:
+	sega_9h0_0008_cart_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sega_9h0_0008_state(mconfig, type, tag)
+		, m_cart(*this, "cartslot")
+	{ }
+
+protected:
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+	required_device<generic_slot_device> m_cart;
+};
+
+DEVICE_IMAGE_LOAD_MEMBER(sega_9h0_0008_cart_state::cart_load)
+{
+	uint32_t const size = m_cart->common_get_size("rom");
+
+	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_BIG);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	if (!image.loaded_through_softlist()) {
+		// loadflags weren't parsed, start by manually applying `endianness="big"`,
+		// taking into consideration the host's endianness.
+		uint32_t *rom32 = reinterpret_cast<uint32_t *>(m_cart->get_rom_base());
+		for (size_t i = 0; i < size / 4; i++) {
+			rom32[i] = big_endianize_int32(rom32[i]);
+		}
+		// Afterwards apply `load16_word_swap`, regardless of host's endianness,
+		// since this reflects how ROM data was stored, not the CPU's architecture.
+		uint16_t *rom16 = reinterpret_cast<uint16_t *>(m_cart->get_rom_base());
+		for (size_t i = 0; i < size / 2; i++) {
+			rom16[i] = swapendian_int16(rom16[i]);
+		}
+	}
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+
+class sega_beena_state : public sega_9h0_0008_cart_state
 {
 public:
 	sega_beena_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sega_9h0_0008_state(mconfig, type, tag)
-		, m_cart(*this, "cartslot")
+		: sega_9h0_0008_cart_state(mconfig, type, tag)
 		, m_io_page_config(*this, "PAGE_CONFIG")
 		, m_io_page(*this, "PAGE")
 		, m_io_pad_left(*this, "PAD_LEFT")
@@ -1751,12 +1790,9 @@ public:
 	virtual DECLARE_CROSSHAIR_MAPPER_MEMBER(pen_y_mapper);
 
 private:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	virtual void install_game_rom() override;
 	virtual void update_crosshair(screen_device &screen) override;
 	virtual void update_sensors(offs_t offset) override;
-
-	required_device<generic_slot_device> m_cart;
 
 	required_ioport m_io_page_config;
 	required_ioport m_io_page;
@@ -1943,31 +1979,6 @@ void sega_beena_state::update_sensors(offs_t offset)
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(sega_beena_state::cart_load)
-{
-	uint32_t const size = m_cart->common_get_size("rom");
-
-	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_BIG);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	if (!image.loaded_through_softlist()) {
-		// loadflags weren't parsed, start by manually applying `endianness="big"`,
-		// taking into consideration the host's endianness.
-		uint32_t *rom32 = reinterpret_cast<uint32_t *>(m_cart->get_rom_base());
-		for (size_t i = 0; i < size / 4; i++) {
-			rom32[i] = big_endianize_int32(rom32[i]);
-		}
-		// Afterwards apply `load16_word_swap`, regardless of host's endianness,
-		// since this reflects how ROM data was stored, not the CPU's architecture.
-		uint16_t *rom16 = reinterpret_cast<uint16_t *>(m_cart->get_rom_base());
-		for (size_t i = 0; i < size / 2; i++) {
-			rom16[i] = swapendian_int16(rom16[i]);
-		}
-	}
-
-	return std::make_pair(std::error_condition(), std::string());
-}
-
 CROSSHAIR_MAPPER_MEMBER(sega_beena_state::pen_y_mapper)
 {
 	// TODO: Either remove or adapt for Storyware layout
@@ -2140,12 +2151,11 @@ void tvochken_state::install_game_rom()
 }
 
 
-class carbeena_state : public sega_9h0_0008_state
+class carbeena_state : public sega_9h0_0008_cart_state
 {
 public:
 	carbeena_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sega_9h0_0008_state(mconfig, type, tag)
-		, m_cart(*this, "cartslot")
+		: sega_9h0_0008_cart_state(mconfig, type, tag)
 		, m_io_buttons(*this, "BUTTONS")
 	{ }
 
@@ -2154,13 +2164,7 @@ public:
 	virtual uint32_t io_expansion_r() override;
 
 private:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	virtual void install_game_rom() override;
-
-	required_device<generic_slot_device> m_cart;
 
 	required_ioport m_io_buttons;
 };
@@ -2176,41 +2180,6 @@ void carbeena_state::carbeena(machine_config &config)
 	m_cart->set_must_be_loaded(false);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("carbeena_cart");
-}
-
-DEVICE_IMAGE_LOAD_MEMBER(carbeena_state::cart_load)
-{
-	uint32_t const size = m_cart->common_get_size("rom");
-
-	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_BIG);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	if (!image.loaded_through_softlist()) {
-		// loadflags weren't parsed, start by manually applying `endianness="big"`,
-		// taking into consideration the host's endianness.
-		uint32_t *rom32 = reinterpret_cast<uint32_t *>(m_cart->get_rom_base());
-		for (size_t i = 0; i < size / 4; i++) {
-			rom32[i] = big_endianize_int32(rom32[i]);
-		}
-		// Afterwards apply `load16_word_swap`, regardless of host's endianness,
-		// since this reflects how ROM data was stored, not the CPU's architecture.
-		uint16_t *rom16 = reinterpret_cast<uint16_t *>(m_cart->get_rom_base());
-		for (size_t i = 0; i < size / 2; i++) {
-			rom16[i] = swapendian_int16(rom16[i]);
-		}
-	}
-
-	return std::make_pair(std::error_condition(), std::string());
-}
-
-void carbeena_state::machine_start()
-{
-	sega_9h0_0008_state::machine_start();
-}
-
-void carbeena_state::machine_reset()
-{
-	sega_9h0_0008_state::machine_reset();
 }
 
 uint32_t carbeena_state::io_expansion_r()
