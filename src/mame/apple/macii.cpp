@@ -2,7 +2,7 @@
 // copyright-holders: Nathan Woods, Raphael Nabet, R. Belmont, O. Galibert
 /****************************************************************************
 
-    mac.cpp
+    macii.cpp
     Macintosh II ("Becks, Cabernet, Ikki, Little Big Mac, Paris, Reno, Uzi, Milwaukee")
     Macintosh II FDHD (Codenames not known)
     Macintosh IIx ("Spock, Stratos")
@@ -55,17 +55,17 @@ namespace {
 #define C7M  (C15M/2)
 
 // video parameters for classic Macs
-#define MAC_H_VIS   (512)
-#define MAC_V_VIS   (342)
-#define MAC_H_TOTAL (704)  // (512+192)
-#define MAC_V_TOTAL (370) // (342+28)
+constexpr int MAC_H_VIS   = 512;
+constexpr int MAC_V_VIS   = 342;
+constexpr int MAC_H_TOTAL = 704;  // (512+192)
+constexpr int MAC_V_TOTAL = 370; // (342+28)
 
 // Mac driver data
 
-class mac_state:public driver_device
+class macii_state:public driver_device
 {
 public:
-	mac_state(const machine_config &mconfig, device_type type, const char *tag) :
+	macii_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via1(*this, "via6522_0"),
@@ -81,13 +81,27 @@ public:
 		m_floppy(*this, "fdc:%d", 0U),
 		m_rtc(*this, "rtc"),
 		m_vram(*this,"vram"),
-		m_via2_ca1_hack(0),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_overlay(0),
+		m_via2_vbl(0),
+		m_se30_vbl_enable(0),
+		m_nubus_irq_state(0),
+		m_glue_ram_size(0),
+		m_is_original_ii(false),
+		m_adb_irq_pending(0),
+		m_screen_buffer(0),
+		m_scc_interrupt(false),
+		m_via_interrupt(false),
+		m_via2_interrupt(false),
+		m_scsi_interrupt(false),
+		m_last_taken_interrupt(0),
+		m_via2_ca1_hack(0),
+		m_rom_size(0),
+		m_rom_ptr(nullptr),
+		m_scanline_timer(nullptr),
+		m_cur_floppy(nullptr)
 	{
-		m_rom_size = 0;
-		m_rom_ptr = nullptr;
-		m_cur_floppy = nullptr;
 	}
 
 	void macii(machine_config &config);
@@ -97,29 +111,69 @@ public:
 	void maciicx(machine_config &config);
 	void macse30(machine_config &config);
 
-	void init_maciifdhd();
-	void init_macse30();
-	void init_macii();
-	void init_maciix();
-	void init_maciicx();
-
-	/* tells which model is being emulated (set by macxxx_init) */
-	enum model_t
-	{
-		MODEL_MAC_II,       // Mac II class 68020/030 machines
-		MODEL_MAC_II_FDHD,
-		MODEL_MAC_IIX,
-		MODEL_MAC_IICX,
-		MODEL_MAC_SE30
-	};
-
-	model_t m_model;
+	void macii_init();
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
+	void set_memory_overlay(int overlay);
+	void scc_mouse_irq(int x, int y);
+	void nubus_slot_interrupt(u8 slot, u32 state);
+	void set_scc_interrupt(int state);
+	void set_via_interrupt(int value);
+	void set_via2_interrupt(int value);
+	void field_interrupts();
+	void vblank_irq();
+	void update_volume();
+
+	void via_sync();
+	u16 via_r(offs_t offset);
+	void via_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 via2_r(offs_t offset);
+	void via2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 iwm_r(offs_t offset, u16 mem_mask = ~0);
+	void iwm_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 scc_r(offs_t offset);
+	void scc_w(offs_t offset, u16 data);
+	u16 scsi_r(offs_t offset, u16 mem_mask = ~0);
+	void scsi_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u32 scsi_drq_r(offs_t offset, u32 mem_mask = ~0);
+	void scsi_drq_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void scsi_berr_w(u8 data);
+
+	template <int Slot> void nubus_irq_w(int state);
+
+	void scsi_irq(int state);
+	void mac_asc_irq(int state);
+	void adb_irq_w(int state) { m_adb_irq_pending = state; }
+
+	void macii_map(address_map &map);
+	void macse30_map(address_map &map);
+
+	void phases_w(u8 phases);
+	void devsel_w(u8 devsel);
+
+	u32 screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TIMER_CALLBACK_MEMBER(scanline_tick);
+	u8 via_in_a();
+	u8 iicx_via_in_a();
+	u8 via_in_b();
+	void via_out_a(u8 data);
+	void via_out_b(u8 data);
+	void se30_via_out_b(u8 data);
+	u8 via2_in_a();
+	u8 via2_in_b();
+	u8 iix_via2_in_b();
+	void via2_out_a(u8 data);
+	void via2_out_b(u8 data);
+	void hmmu_via2_out_b(u8 data);
+	void state_load();
+	void via_irq(int state);
+	void via2_irq(int state);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via1;
 	required_device<via6522_device> m_via2;
@@ -133,110 +187,44 @@ private:
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<rtc3430042_device> m_rtc;
-
-	uint32_t m_overlay = 0;
-
-	uint32_t m_via2_vbl = 0;
-	uint32_t m_se30_vbl_enable = 0;
-	uint8_t m_nubus_irq_state = 0;
-
-	emu_timer *m_overlay_timeout = nullptr;
-	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
-
-	int m_adb_irq_pending = 0;
-	int m_screen_buffer = 0;
-	int ca1_data = 0;
-
-	// ADB refresh timer, independent of anything else going on
-	emu_timer *m_adbupdate_timer = nullptr;
-
-	void adb_irq_w(int state) { m_adb_irq_pending = state; }
-
-	// this is shared among all video setups with vram
-	optional_shared_ptr<uint32_t> m_vram;
-
-	// interrupts
-	int m_scc_interrupt = false, m_via_interrupt = false, m_via2_interrupt = false, m_scsi_interrupt = false, m_last_taken_interrupt = false;
-
-	// defined in machine/mac.c
-	void set_memory_overlay(int overlay);
-	void scc_mouse_irq( int x, int y );
-	void nubus_slot_interrupt(uint8_t slot, uint32_t state);
-	void set_scc_interrupt(int state);
-	void set_via_interrupt(int value);
-	void set_via2_interrupt(int value);
-	void field_interrupts();
-	void vblank_irq();
-	void update_volume();
-
-	void mac_via_sync();
-	uint16_t mac_via_r(offs_t offset);
-	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t mac_via2_r(offs_t offset);
-	void mac_via2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t mac_iwm_r(offs_t offset, uint16_t mem_mask = ~0);
-	void mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	u16 mac_scc_r(offs_t offset);
-	void mac_scc_w(offs_t offset, u16 data);
-	uint16_t macplus_scsi_r(offs_t offset, uint16_t mem_mask = ~0);
-	void macii_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint32_t macii_scsi_drq_r(offs_t offset, uint32_t mem_mask = ~0);
-	void macii_scsi_drq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void scsi_berr_w(uint8_t data);
-
-	template <int Slot> void nubus_irq_w(int state);
-
-	void mac_scsi_irq(int state);
-	void mac_asc_irq(int state);
-
-	void macii_map(address_map &map);
-	void macse30_map(address_map &map);
-
-	int m_via2_ca1_hack = 0;
+	optional_shared_ptr<u32> m_vram;
 	optional_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 
-	uint32_t m_rom_size = 0;
-	uint32_t *m_rom_ptr = nullptr;
+	u32 m_overlay;
+	u32 m_via2_vbl;
+	u32 m_se30_vbl_enable;
+	u8 m_nubus_irq_state = 0x3f;
+	u8 m_glue_ram_size;
+	bool m_is_original_ii;
 
-	emu_timer *m_scanline_timer = nullptr;
+	int m_adb_irq_pending;
+	int m_screen_buffer;
 
-	floppy_image_device *m_cur_floppy = nullptr;
+	// interrupts
+	int m_scc_interrupt, m_via_interrupt, m_via2_interrupt, m_scsi_interrupt, m_last_taken_interrupt;
 
-	void phases_w(uint8_t phases);
-	void devsel_w(uint8_t devsel);
+	int m_via2_ca1_hack;
+	u32 m_rom_size;
+	u32 *m_rom_ptr;
 
-	uint32_t screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	emu_timer *m_scanline_timer;
 
-	TIMER_CALLBACK_MEMBER(mac_adbrefresh_tick);
-	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
-	uint8_t mac_via_in_a();
-	uint8_t mac_via_in_b();
-	void mac_via_out_a(uint8_t data);
-	void mac_via_out_b(uint8_t data);
-	uint8_t mac_via2_in_a();
-	uint8_t mac_via2_in_b();
-	void mac_via2_out_a(uint8_t data);
-	void mac_via2_out_b(uint8_t data);
-	void mac_state_load();
-	void mac_via_irq(int state);
-	void mac_via2_irq(int state);
-	void mac_driver_init(model_t model);
-	void mac_install_memory(offs_t memory_begin, offs_t memory_end, offs_t memory_size, void *memory_data, int is_rom);
+	floppy_image_device *m_cur_floppy;
 };
 
-uint32_t mac_state::screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 macii_state::screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint32_t const video_base = (m_screen_buffer ? 0x8000 : 0) + (MAC_H_VIS / 8);
-	uint16_t const *const video_ram = (const uint16_t *)&m_vram[video_base / 4];
+	u32 const video_base = (m_screen_buffer ? 0x8000 : 0) + (MAC_H_VIS / 8);
+	u16 const *const video_ram = (const u16 *)&m_vram[video_base / 4];
 
 	for (int y = 0; y < MAC_V_VIS; y++)
 	{
-		uint16_t *const line = &bitmap.pix(y);
+		u16 *const line = &bitmap.pix(y);
 
 		for (int x = 0; x < MAC_H_VIS; x += 16)
 		{
-			uint16_t const word = video_ram[((y * MAC_H_VIS) / 16) + ((x / 16) ^ 1)];
+			u16 const word = video_ram[((y * MAC_H_VIS) / 16) + ((x / 16) ^ 1)];
 			for (int b = 0; b < 16; b++)
 			{
 				line[x + b] = (word >> (15 - b)) & 0x0001;
@@ -246,31 +234,7 @@ uint32_t mac_state::screen_update_macse30(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-void mac_state::mac_install_memory(offs_t memory_begin, offs_t memory_end,
-								   offs_t memory_size, void *memory_data, int is_rom)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	offs_t memory_mirror;
-
-	memory_size = std::min(memory_size, (memory_end + 1 - memory_begin));
-	memory_mirror = (memory_end - memory_begin) & ~(memory_size - 1);
-
-	if (!is_rom)
-	{
-		space.install_ram(memory_begin, memory_end & ~memory_mirror, memory_mirror, memory_data);
-	}
-	else
-	{
-		space.unmap_write(memory_begin, memory_end);
-		space.install_rom(memory_begin, memory_end & ~memory_mirror, memory_mirror, memory_data);
-	}
-}
-
-/*
-    Interrupt handling
-*/
-
-void mac_state::field_interrupts()
+void macii_state::field_interrupts()
 {
 	int take_interrupt = -1;
 
@@ -300,126 +264,57 @@ void mac_state::field_interrupts()
 	}
 }
 
-void mac_state::set_scc_interrupt(int state)
+void macii_state::set_scc_interrupt(int state)
 {
 	m_scc_interrupt = state;
 	this->field_interrupts();
 }
 
-void mac_state::set_via_interrupt(int value)
+void macii_state::set_via_interrupt(int value)
 {
 	m_via_interrupt = value;
 	this->field_interrupts();
 }
 
-void mac_state::set_via2_interrupt(int value)
+void macii_state::set_via2_interrupt(int value)
 {
 	m_via2_interrupt = value;
 	this->field_interrupts();
 }
 
-void mac_state::mac_asc_irq(int state)
+void macii_state::mac_asc_irq(int state)
 {
 	m_via2->write_cb1(state ^ 1);
 }
 
-void mac_state::set_memory_overlay(int overlay)
+void macii_state::set_memory_overlay(int overlay)
 {
-	offs_t memory_size;
-	uint8_t *memory_data;
-	int is_rom;
-
-	/* normalize overlay */
-	overlay = overlay ? true : false;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	if (overlay != m_overlay)
 	{
-		/* set up either main RAM area or ROM mirror at 0x000000-0x3fffff */
+		m_overlay = overlay;
 		if (overlay)
 		{
-			/* ROM mirror */
-			memory_size = m_rom_size;
-			memory_data = reinterpret_cast<uint8_t *>(m_rom_ptr);
-			is_rom = true;
+			space.install_rom(0x00000000, m_rom_size - 1, (void *)m_rom_ptr);
 		}
 		else
 		{
-			/* RAM */
-			memory_size = m_ram->size();
-			memory_data = m_ram->pointer();
-			is_rom = false;
+			via2_out_a(0x3f);
 		}
-
-		/* install the memory */
-		mac_install_memory(0x00000000, 0x3fffffff, memory_size, memory_data, is_rom);
-
-		m_overlay = overlay;
 	}
 }
 
-
-/* *************************************************************************
- * SCSI
- * *************************************************************************/
-
-/*
-
-From http://www.mac.m68k-linux.org/devel/plushw.php
-
-The address of each register is computed as follows:
-
-  $580drn
-
-  where r represents the register number (from 0 through 7),
-  n determines whether it a read or write operation
-  (0 for reads, or 1 for writes), and
-  d determines whether the DACK signal to the NCR 5380 is asserted.
-  (0 for not asserted, 1 is for asserted)
-
-Here's an example of the address expressed in binary:
-
-  0101 1000 0000 00d0 0rrr 000n
-
-Note:  Asserting the DACK signal applies only to write operations to
-       the output data register and read operations from the input
-       data register.
-
-  Symbolic            Memory
-  Location            Location   NCR 5380 Internal Register
-
-  scsiWr+sODR+dackWr  $580201    Output Data Register with DACK
-  scsiWr+sODR         $580001    Output Data Register
-  scsiWr+sICR         $580011    Initiator Command Register
-  scsiWr+sMR          $580021    Mode Register
-  scsiWr+sTCR         $580031    Target Command Register
-  scsiWr+sSER         $580041    Select Enable Register
-  scsiWr+sDMAtx       $580051    Start DMA Send
-  scsiWr+sTDMArx      $580061    Start DMA Target Receive
-  scsiWr+sIDMArx      $580071    Start DMA Initiator Receive
-
-  scsiRd+sIDR+dackRd  $580260    Current SCSI Data with DACK
-  scsiRd+sCDR         $580000    Current SCSI Data
-  scsiRd+sICR         $580010    Initiator Command Register
-  scsiRd+sMR          $580020    Mode Registor
-  scsiRd+sTCR         $580030    Target Command Register
-  scsiRd+sCSR         $580040    Current SCSI Bus Status
-  scsiRd+sBSR         $580050    Bus and Status Register
-  scsiRd+sIDR         $580060    Input Data Register
-  scsiRd+sRESET       $580070    Reset Parity/Interrupt
-             */
-
-uint16_t mac_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)
+u16 macii_state::scsi_r(offs_t offset, u16 mem_mask)
 {
 	int reg = (offset >> 3) & 0xf;
-
-	//  logerror("macplus_scsi_r: offset %x mask %x\n", offset, mem_mask);
 
 	bool pseudo_dma = (reg == 6) && (offset == 0x130);
 
 	return m_scsihelp->read_wrapper(pseudo_dma, reg) << 8;
 }
 
-uint32_t mac_state::macii_scsi_drq_r(offs_t offset, uint32_t mem_mask)
+u32 macii_state::scsi_drq_r(offs_t offset, u32 mem_mask)
 {
 	switch (mem_mask)
 	{
@@ -433,13 +328,13 @@ uint32_t mac_state::macii_scsi_drq_r(offs_t offset, uint32_t mem_mask)
 		return (m_scsihelp->read_wrapper(true, 6) << 24) | (m_scsihelp->read_wrapper(true, 6) << 16) | (m_scsihelp->read_wrapper(true, 6) << 8) | m_scsihelp->read_wrapper(true, 6);
 
 	default:
-		logerror("macii_scsi_drq_r: unknown mem_mask %08x\n", mem_mask);
+		logerror("scsi_drq_r: unknown mem_mask %08x\n", mem_mask);
 	}
 
 	return 0;
 }
 
-void mac_state::macii_scsi_drq_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void macii_state::scsi_drq_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	switch (mem_mask)
 	{
@@ -460,62 +355,45 @@ void mac_state::macii_scsi_drq_w(offs_t offset, uint32_t data, uint32_t mem_mask
 		break;
 
 	default:
-		logerror("macii_scsi_drq_w: unknown mem_mask %08x\n", mem_mask);
+		logerror("scsi_drq_w: unknown mem_mask %08x\n", mem_mask);
 		break;
 	}
 }
 
-void mac_state::macii_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void macii_state::scsi_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	int reg = (offset >> 3) & 0xf;
 
-	//  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, m_maincpu->pc());
+	//  logerror("scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, m_maincpu->pc());
 
 	bool pseudo_dma = (reg == 0) && (offset == 0x100);
 
 	m_scsihelp->write_wrapper(pseudo_dma, reg, data >> 8);
 }
 
-void mac_state::mac_scsi_irq(int state)
+void macii_state::scsi_irq(int state)
 {
 }
 
-void mac_state::scsi_berr_w(uint8_t data)
+void macii_state::scsi_berr_w(u8 data)
 {
 	m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
 }
 
-/* *************************************************************************
- * SCC
- *
- * Serial Communications Controller
- * *************************************************************************/
-u16 mac_state::mac_scc_r(offs_t offset)
+u16 macii_state::scc_r(offs_t offset)
 {
 	u16 result = m_scc->dc_ab_r(offset);
 	return (result << 8) | result;
 }
 
-void mac_state::mac_scc_w(offs_t offset, u16 data)
+void macii_state::scc_w(offs_t offset, u16 data)
 {
 	m_scc->dc_ab_w(offset, data >> 8);
 }
 
-/* ********************************** *
- * IWM Code specific to the Mac Plus  *
- * ********************************** */
-
-uint16_t mac_state::mac_iwm_r(offs_t offset, uint16_t mem_mask)
+u16 macii_state::iwm_r(offs_t offset, u16 mem_mask)
 {
-	/* The first time this is called is in a floppy test, which goes from
-	 * $400104 to $400126.  After that, all access to the floppy goes through
-	 * the disk driver in the MacOS
-	 *
-	 * I just thought this would be on interest to someone trying to further
-	 * this driver along
-	 */
-
-	uint16_t result = m_fdc->read(offset >> 8);
+	u16 result = m_fdc->read(offset >> 8);
 
 	if (!machine().side_effects_disabled())
 		m_maincpu->adjust_icount(-5);
@@ -523,7 +401,7 @@ uint16_t mac_state::mac_iwm_r(offs_t offset, uint16_t mem_mask)
 	return (result << 8) | result;
 }
 
-void mac_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void macii_state::iwm_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_fdc->write((offset >> 8), data & 0xff);
@@ -534,65 +412,17 @@ void mac_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_maincpu->adjust_icount(-5);
 }
 
-/* *************************************************************************
- * VIA
- * *************************************************************************
- *
- *
- * PORT A
- *
- *  bit 7               R   SCC Wait/Request
- *  bit 6               W   Main/Alternate screen buffer select
- *  bit 5               W   Floppy Disk Line Selection
- *  bit 4               W   Overlay/Normal memory mapping
- *  bit 3               W   Main/Alternate sound buffer
- *  bit 2-0             W   Sound Volume
- *
- *
- * PORT B
- *
- *  bit 7               W   Sound enable
- *  bit 6               R   Video beam in display
- *  bit 5   (pre-ADB)   R   Mouse Y2
- *          (ADB)       W   ADB ST1
- *  bit 4   (pre-ADB)   R   Mouse X2
- *          (ADB)       W   ADB ST0
- *  bit 3   (pre-ADB)   R   Mouse button (active low)
- *          (ADB)       R   ADB INT
- *  bit 2               W   Real time clock enable
- *  bit 1               W   Real time clock data clock
- *  bit 0               RW  Real time clock data
- *
- */
-
-#define PA6 0x40
-#define PA4 0x10
-#define PA2 0x04
-#define PA1 0x02
-
-uint8_t mac_state::mac_via_in_a()
+u8 macii_state::via_in_a()
 {
-	//  printf("%s VIA1 IN_A\n", machine().describe_context().c_str());
-
-	switch (m_model)
-	{
-	case MODEL_MAC_II:
-	case MODEL_MAC_II_FDHD:
-	case MODEL_MAC_IIX:
-		return 0x81; // bit 0 must be set on most Macs to avoid attempting to boot from AppleTalk
-
-	case MODEL_MAC_SE30:
-		return 0x81 | PA6;
-
-	case MODEL_MAC_IICX:
-		return 0x81 | PA6;
-
-	default:
-		return 0x80;
-	}
+	return 0x81;
 }
 
-uint8_t mac_state::mac_via_in_b()
+u8 macii_state::iicx_via_in_a()
+{
+	return 0x81 | 0x40; // bit 6 set for IIcx and SE/30
+}
+
+u8 macii_state::via_in_b()
 {
 	int val = 0;
 
@@ -602,51 +432,47 @@ uint8_t mac_state::mac_via_in_b()
 	}
 
 	val |= m_rtc->data_r();
-
-	//  printf("%s VIA1 IN_B_II = %02x\n", machine().describe_context().c_str(), val);
-
 	return val;
 }
 
-void mac_state::mac_via_out_a(uint8_t data)
+void macii_state::via_out_a(u8 data)
 {
-	//  printf("%s VIA1 OUT A: %02x\n", machine().describe_context().c_str(), data);
-
-	m_screen_buffer = (data & 0x40) >> 6;
+	m_screen_buffer = BIT(data, 6);
 	if (m_cur_floppy)
-		m_cur_floppy->ss_w((data & 0x20) >> 5);
+		m_cur_floppy->ss_w(BIT(data, 5));
+	set_memory_overlay(BIT(data, 4));
 }
 
-void mac_state::mac_via_out_b(uint8_t data)
+void macii_state::via_out_b(u8 data)
 {
-	//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
-
-	if (m_model == MODEL_MAC_SE30)
-	{
-		// 0x40 = 0 means enable vblank on SE/30
-		m_se30_vbl_enable = (data & 0x40) ? 0 : 1;
-
-		// clear the interrupt if we disabled it
-		if (!m_se30_vbl_enable)
-		{
-			nubus_slot_interrupt(0xe, 0);
-		}
-	}
-
 	m_adbmodem->set_via_state((data & 0x30) >> 4);
 
-	m_rtc->ce_w((data & 0x04) >> 2);
-	m_rtc->data_w(data & 0x01);
-	m_rtc->clk_w((data >> 1) & 0x01);
+	m_rtc->ce_w(BIT(data, 2));
+	m_rtc->data_w(BIT(data, 0));
+	m_rtc->clk_w(BIT(data, 1));
 }
 
-void mac_state::mac_via_irq(int state)
+void macii_state::se30_via_out_b(u8 data)
+{
+	// 0x40 = 0 means enable vblank on SE/30
+	m_se30_vbl_enable = BIT(data, 6) ^ 1;
+
+	// clear the interrupt if we disabled it
+	if (!m_se30_vbl_enable)
+	{
+		nubus_slot_interrupt(0xe, 0);
+	}
+
+	via_out_b(data);
+}
+
+void macii_state::via_irq(int state)
 {
 	/* interrupt the 68k (level 1) */
 	set_via_interrupt(state);
 }
 
-void mac_state::mac_via_sync()
+void macii_state::via_sync()
 {
 	// The via runs at 783.36KHz while the main cpu runs at 15MHz or
 	// more, so we need to sync the access with the via clock.  Plus
@@ -669,12 +495,12 @@ void mac_state::mac_via_sync()
 	m_maincpu->adjust_icount(-int(main_cycle - cycle));
 }
 
-uint16_t mac_state::mac_via_r(offs_t offset)
+u16 macii_state::via_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
-		mac_via_sync();
+		via_sync();
 
-	uint16_t data;
+	u16 data;
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -684,9 +510,9 @@ uint16_t mac_state::mac_via_r(offs_t offset)
 	return (data & 0xff) | (data << 8);
 }
 
-void mac_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void macii_state::via_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	mac_via_sync();
+	via_sync();
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -697,21 +523,17 @@ void mac_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_via1->write(offset, (data >> 8) & 0xff);
 }
 
-/* *************************************************************************
- * VIA 2 (on Mac IIs, PowerBooks > 100, and PowerMacs)
- * *************************************************************************/
-
-void mac_state::mac_via2_irq(int state)
+void macii_state::via2_irq(int state)
 {
 	set_via2_interrupt(state);
 }
 
-uint16_t mac_state::mac_via2_r(offs_t offset)
+u16 macii_state::via2_r(offs_t offset)
 {
 	int data;
 
 	if (!machine().side_effects_disabled())
-		mac_via_sync();
+		via_sync();
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -721,9 +543,9 @@ uint16_t mac_state::mac_via2_r(offs_t offset)
 	return (data & 0xff) | (data << 8);
 }
 
-void mac_state::mac_via2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void macii_state::via2_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	mac_via_sync();
+	via_sync();
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -734,74 +556,206 @@ void mac_state::mac_via2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_via2->write(offset, (data >> 8) & 0xff);
 }
 
-uint8_t mac_state::mac_via2_in_a()
+u8 macii_state::via2_in_a()
 {
-	return 0xc0 | m_nubus_irq_state;
+	return m_glue_ram_size | m_nubus_irq_state;
 }
 
-uint8_t mac_state::mac_via2_in_b()
+u8 macii_state::via2_in_b()
 {
-	if ((m_model == MODEL_MAC_SE30) || (m_model == MODEL_MAC_IIX))
+	// PB6 set for SE/30 and IIcx
+	return 0xcf;
+}
+
+u8 macii_state::iix_via2_in_b()
+{
+	return 0x87;
+}
+
+void macii_state::via2_out_a(u8 data)
+{
+	m_glue_ram_size = data & 0xc0;
+
+	if (!m_overlay)
 	{
-		return 0x87; // bits 3 and 6 are tied low on SE/30
+		address_space &space = m_maincpu->space(AS_PROGRAM);
+		const u8 *ram = m_ram->pointer();
+		const u32 memsize = m_ram->size();
+		u32 asize = (memsize >= 0x4000000) ? 0x4000000 : memsize;
+		u32 bsize = (memsize >= 0x4000000) ? (memsize - 0x4000000) : 0;
+
+		space.unmap_readwrite(0x00000000, 0x3fffffff);
+
+		u32 blocation = 0;
+		switch (m_glue_ram_size >> 6)
+		{
+			case 0: // bank B at 1 meg
+				blocation = 0x00100000;
+				break;
+
+			case 1: // bank B at 2 megs
+				blocation = 0x00200000;
+				break;
+
+			case 2: // bank B at 8 megs
+				blocation = 0x00800000;
+				break;
+
+			case 3: // bank B at 32 megs
+				blocation = 0x02000000;
+				break;
+		}
+
+		bool bNoMirroring = false;
+		bool bMirrorB = false;
+		switch (memsize/0x100000)
+		{
+			case 1:
+			case 16:
+				bNoMirroring = true;
+				break;
+
+			case 2:
+				asize = bsize = 0x100000;
+				break;
+
+			case 4:
+				bNoMirroring = true;
+				asize = bsize = 0x200000;
+				break;
+
+			case 5:
+				asize = 0x400000;
+				bsize = 0x100000;
+				bMirrorB = true;
+				break;
+
+			case 8:
+				asize = bsize = 0x400000;
+				break;
+
+			case 17:
+				asize = 0x01000000;
+				bsize = 0x00100000;
+				bMirrorB = true;
+				break;
+
+			case 20:
+				asize = 0x01000000;
+				bsize = 0x00400000;
+				bMirrorB = true;
+				break;
+
+			case 65:
+				asize = 0x04000000;
+				bsize = 0x00100000;
+				bMirrorB = true;
+				break;
+
+			case 68:
+				asize = 0x04000000;
+				bsize = 0x00400000;
+				bMirrorB = true;
+				break;
+
+			case 80:
+				asize = 0x04000000;
+				bsize = 0x01000000;
+				bMirrorB = true;
+				break;
+
+			case 128:
+				asize = 0x04000000;
+				bsize = 0x04000000;
+				break;
+		}
+
+		// Wait for a window small enough to satisfy the weird fragile ROM code in the original II
+		if (blocation <= memsize)
+		{
+			space.install_ram(0x00000000, memsize - 1, (void *)ram);
+
+			// Almost all supported sizes in the ROM need a bank A mirror afterward, but "non-power-of-2"
+			// RAM sizes (ones where the size has more than 1 "1" bit, like 5 MiB or 68 MiB) need bank B
+			// as the mirror instead.
+			if (!bNoMirroring)
+			{
+				if (bMirrorB)
+				{
+					space.install_ram(memsize, memsize + bsize - 1, (void *)&ram[asize]);
+				}
+				else
+				{
+					space.install_ram(memsize, memsize + asize - 1, (void *)ram);
+				}
+			}
+
+			// If our image is smaller than the window, plant bank B at its location to pass the initial test.
+			if ((bsize > 0) && (blocation >= (memsize + asize)))
+			{
+				space.install_ram(blocation, blocation + bsize - 1, (void *)&ram[asize]);
+			}
+		}
+		else
+		{
+			// The FDHD and later ROM system deaths if no RAM is present before running the memory
+			// sizing checks, so always have 1 MiB valid at 0.
+			space.install_ram(0x00000000, 0x000fffff, (void *)ram);
+		}
 	}
-
-	return 0xcf; // indicate no NuBus transaction error
 }
 
-void mac_state::mac_via2_out_a(uint8_t data)
-{
-}
-
-void mac_state::mac_via2_out_b(uint8_t data)
+void macii_state::via2_out_b(u8 data)
 {
 	// chain 60.15 Hz to VIA1
 	m_via1->write_ca1(data >> 7);
-
-	if (m_model == MODEL_MAC_II)
-	{
-		m68000_musashi_device *m68k = downcast<m68000_musashi_device *>(m_maincpu.target());
-		m68k->set_hmmu_enable((data & 0x8) ? M68K_HMMU_DISABLE : M68K_HMMU_ENABLE_II);
-	}
 }
 
-void mac_state::machine_start()
+void macii_state::hmmu_via2_out_b(u8 data)
+{
+	m68000_musashi_device *m68k = downcast<m68000_musashi_device *>(m_maincpu.target());
+	m68k->set_hmmu_enable((data & 0x8) ? M68K_HMMU_DISABLE : M68K_HMMU_ENABLE_II);
+	via2_out_b(data);
+}
+
+void macii_state::machine_start()
 {
 	if (m_screen)
 	{
-		this->m_scanline_timer = timer_alloc(FUNC(mac_state::mac_scanline_tick), this);
+		this->m_scanline_timer = timer_alloc(FUNC(macii_state::scanline_tick), this);
 		this->m_scanline_timer->adjust(m_screen->time_until_pos(0, 0));
 	}
-	else
-	{
-		m_adbupdate_timer = timer_alloc(FUNC(mac_state::mac_adbrefresh_tick), this);
-		m_adbupdate_timer->adjust(attotime::from_hz(70));
-	}
 
-	save_item(NAME(m_nubus_irq_state));
+	save_item(NAME(m_overlay));
+	save_item(NAME(m_via2_vbl));
 	save_item(NAME(m_se30_vbl_enable));
+	save_item(NAME(m_nubus_irq_state));
+	save_item(NAME(m_glue_ram_size));
 	save_item(NAME(m_adb_irq_pending));
-	save_item(NAME(ca1_data));
+	save_item(NAME(m_screen_buffer));
 	save_item(NAME(m_scc_interrupt));
 	save_item(NAME(m_via_interrupt));
 	save_item(NAME(m_via2_interrupt));
 	save_item(NAME(m_scsi_interrupt));
 	save_item(NAME(m_last_taken_interrupt));
 	save_item(NAME(m_via2_ca1_hack));
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	const u32 rom_id = space.read_dword(0);
+
+	if ((rom_id == 0x97851db6) || (rom_id == 0x9779d2c4))
+	{
+		m_is_original_ii = true;
+	}
 }
 
-void mac_state::machine_reset()
+void macii_state::machine_reset()
 {
 	m_last_taken_interrupt = -1;
 
 	/* setup the memory overlay */
 	m_overlay = -1; // insure no match
 	this->set_memory_overlay(1);
-
-	if (m_overlay_timeout != (emu_timer *)nullptr)
-	{
-		m_overlay_timeout->adjust(m_maincpu->cycles_to_attotime(8));
-	}
 
 	/* setup videoram */
 	this->m_screen_buffer = 1;
@@ -818,63 +772,37 @@ void mac_state::machine_reset()
 	m_last_taken_interrupt = 0;
 }
 
-void mac_state::mac_state_load()
+void macii_state::state_load()
 {
 	int overlay = m_overlay;
 	m_overlay = -1;
 	set_memory_overlay(overlay);
 }
 
-TIMER_CALLBACK_MEMBER(mac_state::overlay_timeout_func)
-{
-	if (m_overlay != -1)
-	{
-		set_memory_overlay(0); // kill the overlay
-	}
-
-	// we're a one-time-only thing
-	m_overlay_timeout->adjust(attotime::never);
-}
-
-void mac_state::mac_driver_init(model_t model)
+void macii_state::macii_init()
 {
 	m_overlay = 1;
 	m_scsi_interrupt = 0;
-	m_model = model;
 	m_scc_interrupt = 0;
 	m_via_interrupt = 0;
 	m_via2_interrupt = 0;
 
 	m_rom_size = memregion("bootrom")->bytes();
-	m_rom_ptr = reinterpret_cast<uint32_t *>(memregion("bootrom")->base());
+	m_rom_ptr = reinterpret_cast<u32 *>(memregion("bootrom")->base());
 
 	m_overlay = -1;
 	set_memory_overlay(1);
 
 	memset(m_ram->pointer(), 0, m_ram->size());
 
-	m_overlay_timeout = timer_alloc(FUNC(mac_state::overlay_timeout_func), this);
-
 	/* save state stuff */
-	machine().save().register_postload(save_prepost_delegate(FUNC(mac_state::mac_state_load), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(macii_state::state_load), this));
 }
 
-#define MAC_DRIVER_INIT(label, model) \
-	void mac_state::init_##label()    \
-	{                                 \
-		mac_driver_init(model);       \
-	}
-
-MAC_DRIVER_INIT(macii, MODEL_MAC_II)
-MAC_DRIVER_INIT(macse30, MODEL_MAC_SE30)
-MAC_DRIVER_INIT(maciicx, MODEL_MAC_IICX)
-MAC_DRIVER_INIT(maciifdhd, MODEL_MAC_II_FDHD)
-MAC_DRIVER_INIT(maciix, MODEL_MAC_IIX)
-
-void mac_state::nubus_slot_interrupt(uint8_t slot, uint32_t state)
+void macii_state::nubus_slot_interrupt(u8 slot, u32 state)
 {
-	static const uint8_t masks[8] = {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
-	uint8_t mask = 0x3f;
+	static const u8 masks[8] = {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
+	u8 mask = 0x3f;
 
 	slot -= 9;
 
@@ -904,32 +832,20 @@ void mac_state::nubus_slot_interrupt(uint8_t slot, uint32_t state)
 	}
 }
 
-void mac_state::vblank_irq()
+void macii_state::vblank_irq()
 {
-	/* handle ADB keyboard/mouse */
-	m_macadb->adb_vblank();
-
 	// handle SE/30 vblank IRQ
-	if (m_model == MODEL_MAC_SE30)
+	if (m_se30_vbl_enable)
 	{
-		if (m_se30_vbl_enable)
+		m_via2_vbl ^= 1;
+		if (!m_via2_vbl)
 		{
-			m_via2_vbl ^= 1;
-			if (!m_via2_vbl)
-			{
-				this->nubus_slot_interrupt(0xe, 1);
-			}
+			this->nubus_slot_interrupt(0xe, 1);
 		}
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mac_state::mac_adbrefresh_tick)
-{
-	vblank_irq();
-	m_adbupdate_timer->adjust(attotime::from_hz(70));
-}
-
-TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
+TIMER_CALLBACK_MEMBER(macii_state::scanline_tick)
 {
 	const int scanline = m_screen->vpos();
 	if (scanline == 0)
@@ -940,25 +856,25 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 	m_scanline_timer->adjust(m_screen->time_until_pos(next_scanline), next_scanline);
 }
 
-template <int Slot> void mac_state::nubus_irq_w(int state)
+template <int Slot> void macii_state::nubus_irq_w(int state)
 {
 	nubus_slot_interrupt(Slot, state);
 }
 
-template void mac_state::nubus_irq_w<9>(int state);
-template void mac_state::nubus_irq_w<0xa>(int state);
-template void mac_state::nubus_irq_w<0xb>(int state);
-template void mac_state::nubus_irq_w<0xc>(int state);
-template void mac_state::nubus_irq_w<0xd>(int state);
-template void mac_state::nubus_irq_w<0xe>(int state);
+template void macii_state::nubus_irq_w<9>(int state);
+template void macii_state::nubus_irq_w<0xa>(int state);
+template void macii_state::nubus_irq_w<0xb>(int state);
+template void macii_state::nubus_irq_w<0xc>(int state);
+template void macii_state::nubus_irq_w<0xd>(int state);
+template void macii_state::nubus_irq_w<0xe>(int state);
 
-void mac_state::phases_w(uint8_t phases)
+void macii_state::phases_w(u8 phases)
 {
 	if (m_cur_floppy)
 		m_cur_floppy->seek_phase_w(phases);
 }
 
-void mac_state::devsel_w(uint8_t devsel)
+void macii_state::devsel_w(u8 devsel)
 {
 	if (devsel == 1)
 		m_cur_floppy = m_floppy[0]->get_device();
@@ -975,24 +891,24 @@ void mac_state::devsel_w(uint8_t devsel)
     ADDRESS MAPS
 ***************************************************************************/
 
-void mac_state::macii_map(address_map &map)
+void macii_state::macii_map(address_map &map)
 {
 	map(0x40000000, 0x4003ffff).rom().region("bootrom", 0).mirror(0x0ffc0000);
 
 	// MMU remaps I/O without the F
-	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
-	map(0x50002000, 0x50003fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00f00000);
-	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_w)).mirror(0x00f00000);
-	map(0x50006000, 0x50006003).w(FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
-	map(0x50006060, 0x50006063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
-	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
-	map(0x50012000, 0x50013fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
+	map(0x50000000, 0x50001fff).rw(FUNC(macii_state::via_r), FUNC(macii_state::via_w)).mirror(0x00f00000);
+	map(0x50002000, 0x50003fff).rw(FUNC(macii_state::via2_r), FUNC(macii_state::via2_w)).mirror(0x00f00000);
+	map(0x50004000, 0x50005fff).rw(FUNC(macii_state::scc_r), FUNC(macii_state::scc_w)).mirror(0x00f00000);
+	map(0x50006000, 0x50006003).w(FUNC(macii_state::scsi_drq_w)).mirror(0x00f00000);
+	map(0x50006060, 0x50006063).r(FUNC(macii_state::scsi_drq_r)).mirror(0x00f00000);
+	map(0x50010000, 0x50011fff).rw(FUNC(macii_state::scsi_r), FUNC(macii_state::scsi_w)).mirror(0x00f00000);
+	map(0x50012000, 0x50013fff).rw(FUNC(macii_state::scsi_drq_r), FUNC(macii_state::scsi_drq_w)).mirror(0x00f00000);
 	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
-	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
-	map(0x50040000, 0x50041fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50016000, 0x50017fff).rw(FUNC(macii_state::iwm_r), FUNC(macii_state::iwm_w)).mirror(0x00f00000);
+	map(0x50040000, 0x50041fff).rw(FUNC(macii_state::via_r), FUNC(macii_state::via_w)).mirror(0x00f00000);
 }
 
-void mac_state::macse30_map(address_map &map)
+void macii_state::macse30_map(address_map &map)
 {
 	macii_map(map);
 
@@ -1005,16 +921,16 @@ void mac_state::macse30_map(address_map &map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-void mac_state::macii(machine_config &config)
+void macii_state::macii(machine_config &config)
 {
 	M68020PMMU(config, m_maincpu, C15M);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &macii_state::macii_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	ASC(config, m_asc, C15M, asc_device::asc_type::ASC);
-	m_asc->irqf_callback().set(FUNC(mac_state::mac_asc_irq));
+	m_asc->irqf_callback().set(FUNC(macii_state::mac_asc_irq));
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);
 
@@ -1022,14 +938,14 @@ void mac_state::macii(machine_config &config)
 	m_rtc->cko_cb().set(m_via1, FUNC(via6522_device::write_ca2));
 
 	IWM(config, m_fdc, C15M);
-	m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
-	m_fdc->phases_cb().set(FUNC(mac_state::phases_w));
+	m_fdc->devsel_cb().set(FUNC(macii_state::devsel_w));
+	m_fdc->phases_cb().set(FUNC(macii_state::phases_w));
 	applefdintf_device::add_35(config, m_floppy[0]);
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
-	m_scc->out_int_callback().set(FUNC(mac_state::set_scc_interrupt));
+	m_scc->out_int_callback().set(FUNC(macii_state::set_scc_interrupt));
 	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
 
@@ -1057,7 +973,7 @@ void mac_state::macii(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device)
 																					 {
 		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
-		adapter.irq_handler().set(*this, FUNC(mac_state::mac_scsi_irq));
+		adapter.irq_handler().set(*this, FUNC(macii_state::scsi_irq));
 		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w)); });
 
 	MAC_SCSI_HELPER(config, m_scsihelp);
@@ -1066,19 +982,19 @@ void mac_state::macii(machine_config &config)
 	m_scsihelp->scsi_dma_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_r));
 	m_scsihelp->scsi_dma_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_w));
 	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	m_scsihelp->timeout_error_callback().set(FUNC(mac_state::scsi_berr_w));
+	m_scsihelp->timeout_error_callback().set(FUNC(macii_state::scsi_berr_w));
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68020");
 
 	nubus_device &nubus(NUBUS(config, "nubus", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
-	nubus.out_irq9_callback().set(FUNC(mac_state::nubus_irq_w<9>));
-	nubus.out_irqa_callback().set(FUNC(mac_state::nubus_irq_w<0xa>));
-	nubus.out_irqb_callback().set(FUNC(mac_state::nubus_irq_w<0xb>));
-	nubus.out_irqc_callback().set(FUNC(mac_state::nubus_irq_w<0xc>));
-	nubus.out_irqd_callback().set(FUNC(mac_state::nubus_irq_w<0xd>));
-	nubus.out_irqe_callback().set(FUNC(mac_state::nubus_irq_w<0xe>));
+	nubus.out_irq9_callback().set(FUNC(macii_state::nubus_irq_w<9>));
+	nubus.out_irqa_callback().set(FUNC(macii_state::nubus_irq_w<0xa>));
+	nubus.out_irqb_callback().set(FUNC(macii_state::nubus_irq_w<0xb>));
+	nubus.out_irqc_callback().set(FUNC(macii_state::nubus_irq_w<0xc>));
+	nubus.out_irqd_callback().set(FUNC(macii_state::nubus_irq_w<0xd>));
+	nubus.out_irqe_callback().set(FUNC(macii_state::nubus_irq_w<0xe>));
 	NUBUS_SLOT(config, "nb9", "nubus", mac_nubus_cards, "mdc824");
 	NUBUS_SLOT(config, "nba", "nubus", mac_nubus_cards, nullptr);
 	NUBUS_SLOT(config, "nbb", "nubus", mac_nubus_cards, nullptr);
@@ -1087,24 +1003,24 @@ void mac_state::macii(machine_config &config)
 	NUBUS_SLOT(config, "nbe", "nubus", mac_nubus_cards, nullptr);
 
 	R65NC22(config, m_via1, C7M/10);
-	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a));
-	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b));
-	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a));
-	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b));
-	m_via1->irq_handler().set(FUNC(mac_state::mac_via_irq));
+	m_via1->readpa_handler().set(FUNC(macii_state::via_in_a));
+	m_via1->readpb_handler().set(FUNC(macii_state::via_in_b));
+	m_via1->writepa_handler().set(FUNC(macii_state::via_out_a));
+	m_via1->writepb_handler().set(FUNC(macii_state::via_out_b));
+	m_via1->irq_handler().set(FUNC(macii_state::via_irq));
 
 	R65NC22(config, m_via2, C7M/10);
-	m_via2->readpa_handler().set(FUNC(mac_state::mac_via2_in_a));
-	m_via2->readpb_handler().set(FUNC(mac_state::mac_via2_in_b));
-	m_via2->writepa_handler().set(FUNC(mac_state::mac_via2_out_a));
-	m_via2->writepb_handler().set(FUNC(mac_state::mac_via2_out_b));
-	m_via2->irq_handler().set(FUNC(mac_state::mac_via2_irq));
+	m_via2->readpa_handler().set(FUNC(macii_state::via2_in_a));
+	m_via2->readpb_handler().set(FUNC(macii_state::via2_in_b));
+	m_via2->writepa_handler().set(FUNC(macii_state::via2_out_a));
+	m_via2->writepb_handler().set(FUNC(macii_state::via2_out_b));
+	m_via2->irq_handler().set(FUNC(macii_state::via2_irq));
 
 	ADBMODEM(config, m_adbmodem, C7M);
 	m_adbmodem->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_adbmodem->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
 	m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
-	m_adbmodem->irq_callback().set(FUNC(mac_state::adb_irq_w));
+	m_adbmodem->irq_callback().set(FUNC(macii_state::adb_irq_w));
 	m_via1->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
 	config.set_perfect_quantum(m_maincpu);
 
@@ -1113,49 +1029,59 @@ void mac_state::macii(machine_config &config)
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");
-	m_ram->set_extra_options("8M,32M,64M,96M,128M");
+	// The original Mac II will go off the rails if it sees RAM greater than 8MB.
+	// This was fixed for the II FDHD/IIx/IIcx/SE30 ROM.
+	m_ram->set_extra_options("1M,4M,5M,8M");
 
 	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
-void mac_state::maciihmu(machine_config &config)
+void macii_state::maciihmu(machine_config &config)
 {
 	macii(config);
 
 	M68020HMMU(config.replace(), m_maincpu, C15M);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &macii_state::macii_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
+
+	m_via2->writepb_handler().set(FUNC(macii_state::hmmu_via2_out_b));
 }
 
-void mac_state::maciihd(machine_config &config)
+void macii_state::maciihd(machine_config &config)
 {
 	macii(config);
 
 	// Mac II FDHD = Mac II with a SWIM1 instead of IWM
 	SWIM1(config.replace(), m_fdc, C15M);
-	m_fdc->phases_cb().set(FUNC(mac_state::phases_w));
-	m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
+	m_fdc->phases_cb().set(FUNC(macii_state::phases_w));
+	m_fdc->devsel_cb().set(FUNC(macii_state::devsel_w));
 
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_hd(config, m_floppy[1]);
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
+
+	// The table of valid RAM sizes is at 0x4080366E in the 97221136 ROM (II FDHD, IIx, IIcx, SE/30).
+	// Shift each byte left by 20 bits to get the size in bytes.  0x01 => 0x00100000 (1 MiB) and so on.
+	m_ram->set_extra_options("1M,4M,5M,8M,16M,17M,20M,32M,64M,65M,68M,80M,128M");
 }
 
-void mac_state::maciix(machine_config &config)
+void macii_state::maciix(machine_config &config)
 {
 	maciihd(config);
 
 	// IIx = Mac II FDHD with a 68030 instead of the 020
 	M68030(config.replace(), m_maincpu, C15M);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &macii_state::macii_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
+
+	m_via2->readpb_handler().set(FUNC(macii_state::iix_via2_in_b));
 
 	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030");
 }
 
-void mac_state::maciicx(machine_config &config)
+void macii_state::maciicx(machine_config &config)
 {
 	maciix(config);
 
@@ -1163,15 +1089,22 @@ void mac_state::maciicx(machine_config &config)
 	config.device_remove("nbc");
 	config.device_remove("nbd");
 	config.device_remove("nbe");
+
+	m_via1->readpa_handler().set(FUNC(macii_state::iicx_via_in_a));
+	m_via2->readpb_handler().set(FUNC(macii_state::via2_in_b));
 }
 
-void mac_state::macse30(machine_config &config)
+void macii_state::macse30(machine_config &config)
 {
 	maciicx(config);
 
 	// SE/30 = IIx with no slots and built-in video
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macse30_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &macii_state::macse30_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
+
+	m_via1->writepb_handler().set(FUNC(macii_state::se30_via_out_b));
+	m_via1->readpa_handler().set(FUNC(macii_state::iicx_via_in_a));
+	m_via2->readpb_handler().set(FUNC(macii_state::iix_via2_in_b));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1180,7 +1113,7 @@ void mac_state::macse30(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1260));
 	m_screen->set_size(MAC_H_TOTAL, MAC_V_TOTAL);
 	m_screen->set_visarea(0, MAC_H_VIS-1, 0, MAC_V_VIS-1);
-	m_screen->set_screen_update(FUNC(mac_state::screen_update_macse30));
+	m_screen->set_screen_update(FUNC(macii_state::screen_update_macse30));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_INVERTED);
@@ -1192,12 +1125,12 @@ void mac_state::macse30(machine_config &config)
 
 	nubus_device &nubus(NUBUS(config, "pds", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
-	nubus.out_irq9_callback().set(FUNC(mac_state::nubus_irq_w<9>));
-	nubus.out_irqa_callback().set(FUNC(mac_state::nubus_irq_w<0xa>));
-	nubus.out_irqb_callback().set(FUNC(mac_state::nubus_irq_w<0xb>));
-	nubus.out_irqc_callback().set(FUNC(mac_state::nubus_irq_w<0xc>));
-	nubus.out_irqd_callback().set(FUNC(mac_state::nubus_irq_w<0xd>));
-	nubus.out_irqe_callback().set(FUNC(mac_state::nubus_irq_w<0xe>));
+	nubus.out_irq9_callback().set(FUNC(macii_state::nubus_irq_w<9>));
+	nubus.out_irqa_callback().set(FUNC(macii_state::nubus_irq_w<0xa>));
+	nubus.out_irqb_callback().set(FUNC(macii_state::nubus_irq_w<0xb>));
+	nubus.out_irqc_callback().set(FUNC(macii_state::nubus_irq_w<0xc>));
+	nubus.out_irqd_callback().set(FUNC(macii_state::nubus_irq_w<0xd>));
+	nubus.out_irqe_callback().set(FUNC(macii_state::nubus_irq_w<0xe>));
 	NUBUS_SLOT(config, "pds030", "pds", mac_pds030_cards, nullptr);
 }
 
@@ -1245,10 +1178,10 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS      INIT                COMPANY           FULLNAME
-COMP( 1987, macii,     0,        0,      macii,    macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II",                 MACHINE_SUPPORTS_SAVE )
-COMP( 1987, maciihmu,  macii,    0,      maciihmu, macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II (w/o 68851 MMU)", MACHINE_SUPPORTS_SAVE )
-COMP( 1988, mac2fdhd,  0,        0,      maciihd,  macadb,  mac_state, init_maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",          MACHINE_SUPPORTS_SAVE )
-COMP( 1988, maciix,    mac2fdhd, 0,      maciix,   macadb,  mac_state, init_maciix,        "Apple Computer", "Macintosh IIx",                MACHINE_SUPPORTS_SAVE )
-COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  mac_state, init_macse30,       "Apple Computer", "Macintosh SE/30",              MACHINE_SUPPORTS_SAVE )
-COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  mac_state, init_maciicx,       "Apple Computer", "Macintosh IIcx",               MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT        COMPANY           FULLNAME
+COMP( 1987, macii,     0,        0,      macii,    macadb,  macii_state, macii_init, "Apple Computer", "Macintosh II",                 MACHINE_SUPPORTS_SAVE )
+COMP( 1987, maciihmu,  macii,    0,      maciihmu, macadb,  macii_state, macii_init, "Apple Computer", "Macintosh II (w/o 68851 MMU)", MACHINE_SUPPORTS_SAVE )
+COMP( 1988, mac2fdhd,  0,        0,      maciihd,  macadb,  macii_state, macii_init, "Apple Computer", "Macintosh II (FDHD)",          MACHINE_SUPPORTS_SAVE )
+COMP( 1988, maciix,    mac2fdhd, 0,      maciix,   macadb,  macii_state, macii_init, "Apple Computer", "Macintosh IIx",                MACHINE_SUPPORTS_SAVE )
+COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  macii_state, macii_init, "Apple Computer", "Macintosh SE/30",              MACHINE_SUPPORTS_SAVE )
+COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  macii_state, macii_init, "Apple Computer", "Macintosh IIcx",               MACHINE_SUPPORTS_SAVE )
