@@ -61,10 +61,6 @@ enum
 class tms3202x_device : public cpu_device
 {
 public:
-	// construction/destruction
-	tms3202x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tms3202x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
 	// configuration helpers
 	auto bio_in_cb() { return m_bio_in.bind(); }
 	auto hold_in_cb() { return m_hold_in.bind(); }
@@ -77,6 +73,7 @@ public:
 	void tms3202x_data(address_map &map);
 	void tms32026_data(address_map &map);
 protected:
+	// construction/destruction
 	tms3202x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap);
 
 	// device-level overrides
