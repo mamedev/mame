@@ -282,7 +282,7 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 }
 
 tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: tms3202x_device(mconfig, type, tag, owner, clock, address_map_constructor(), address_map_constructor(FUNC(tms3202x_device::tms3202x_data), this))
+	: tms32025_device(mconfig, type, tag, owner, clock, address_map_constructor(), address_map_constructor(FUNC(tms3202x_device::tms3202x_data), this))
 {
 	m_fixed_STR1 = 0x0180;
 }
