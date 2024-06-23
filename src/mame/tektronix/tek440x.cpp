@@ -965,7 +965,7 @@ m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks 
 	m_timer->out2_cb().set("irq1", FUNC(input_merger_device::in_w<1>));
 	INPUT_MERGER_ALL_LOW(config, "irq1").output_handler().set(FUNC(tek440x_state::irq1_w));
 
-	MC146818(config, m_rtc, 32.768_MHz_XTAL);
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 
 	NSCSI_BUS(config, "scsi");
 	// hard disk is a Micropolis 1304 (https://www.micropolis.com/support/hard-drives/1304)
