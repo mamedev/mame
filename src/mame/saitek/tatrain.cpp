@@ -9,21 +9,24 @@ The chess engine is by Frans Morsch, it is the same as the one in GK 2000.
 
 Hardware notes:
 
-1992 version:
+H8/323 version (1992):
 - PCB label: ST14B-PE-003, PN/N 512090-00311, REV.1
 - Hitachi H8/323 MCU, 20MHz XTAL
 - piezo, 24 LEDs, button sensors chessboard
 
-1997 version:
+H8/3212 version (1997):
 - PCB label: ST14B-PE 003, PN/N 512090-00312, REV.2
 - Hitachi H8/3212 MCU, 10MHz XTAL
 - rest is same as 1992 version
 
 H8/323 A14 MCU is used in:
 - Saitek Turbo Advanced Trainer (1992 version)
-- Saitek Champion Advanced Trainer (suspected)
+- Saitek Champion Advanced Trainer
 - Saitek Virtuoso
+- Saitek Mephisto Champion (Mephisto brand Champion Advanced Trainer)
 - Hegener + Glaser Schach-Trainer (H+G brand Turbo Advanced Trainer)
+
+Champion Advanced Trainer and Mephisto Champion are 14MHz instead of 20MHz.
 
 H8/3212 V02 MCU is used in:
 - Saitek Turbo Advanced Trainer (1997 version)
@@ -74,6 +77,7 @@ public:
 	void tatraina(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
@@ -98,8 +102,14 @@ private:
 
 void tatrain_state::machine_start()
 {
-	// register for savestates
 	save_item(NAME(m_inp_mux));
+}
+
+INPUT_CHANGED_MEMBER(tatrain_state::change_cpu_freq)
+{
+	// H8/323 16MHz and 24MHz versions don't exist, but the software supports it
+	static const XTAL freq[4] = { 20_MHz_XTAL, 16_MHz_XTAL, 14_MHz_XTAL, 24_MHz_XTAL };
+	m_maincpu->set_unscaled_clock(freq[newval & 3]);
 }
 
 
@@ -188,6 +198,18 @@ static INPUT_PORTS_START( tatrain )
 	PORT_START("IN.2")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, tatrain_state, go_button, 0) PORT_NAME("Go / Stop")
 	PORT_BIT(0xef, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("FREQ")
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tatraina )
+	PORT_INCLUDE( tatrain )
+
+	PORT_MODIFY("FREQ")
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, tatrain_state, change_cpu_freq, 0) // factory set
+	PORT_CONFSETTING(    0x02, "14Mhz (Champion Advanced Trainer)" )
+	PORT_CONFSETTING(    0x00, "20Mhz (Turbo Advanced Trainer)" )
 INPUT_PORTS_END
 
 
@@ -206,7 +228,7 @@ void tatrain_state::cpu_config(T &maincpu)
 	maincpu.write_port2().set(FUNC(tatrain_state::leds_w<1>));
 	maincpu.write_port3().set(FUNC(tatrain_state::leds_w<2>));
 	maincpu.read_port4().set(FUNC(tatrain_state::p4_r));
-	maincpu.read_port5().set_constant(0xff);
+	maincpu.read_port5().set_ioport("FREQ").invert();
 	maincpu.write_port5().set(FUNC(tatrain_state::p5_w));
 	maincpu.read_port6().set_ioport("IN.2").invert();
 	maincpu.write_port6().set(FUNC(tatrain_state::p6_w));
@@ -270,6 +292,6 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1997, tatrain,  0,       0,      tatrain,  tatrain, tatrain_state, empty_init, "Saitek", "Kasparov Turbo Advanced Trainer (H8/3212 version)", MACHINE_SUPPORTS_SAVE )
-SYST( 1992, tatraina, tatrain, 0,      tatraina, tatrain, tatrain_state, empty_init, "Saitek", "Kasparov Turbo Advanced Trainer (H8/323 version)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1997, tatrain,  0,       0,      tatrain,  tatrain,  tatrain_state, empty_init, "Saitek", "Kasparov Turbo Advanced Trainer (H8/3212 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1992, tatraina, tatrain, 0,      tatraina, tatraina, tatrain_state, empty_init, "Saitek", "Kasparov Turbo Advanced Trainer (H8/323 version)", MACHINE_SUPPORTS_SAVE )

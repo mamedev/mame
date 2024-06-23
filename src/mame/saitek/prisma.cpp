@@ -16,7 +16,7 @@ And/or it could also be due to the programmer(s) being unfamiliar with H8.
 Hardware notes:
 - PCB label: ST9A-PE-001
 - Hitachi H8/325 MCU, 20MHz XTAL
-- Epson SED1502F, LCD screen (same as simultano)
+- Epson SED1502F, LCD screen (same as Saitek Simultano)
 - piezo, 16+3 LEDs, button sensors chessboard
 
 In 1992, it was also sold by Tandy as Chess Champion 2150L, still manufactured

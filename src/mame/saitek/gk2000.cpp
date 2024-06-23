@@ -17,11 +17,12 @@ A13 MCU is used in:
 - Saitek GK 2000 (86071220X12)
 - Saitek Travel Champion 2080 (86071220X12)
 - Saitek Barracuda (suspected)
-- Saitek Mephisto Champion (suspected)
 - Saitek Mephisto Mythos (86142221X34)
 - Tandy (Radio Shack) Mega 2050X (86071221X12)
 - Tandy (Radio Shack) Master 2200X (suspected)
 - Tandy (Radio Shack) Chess Master (suspected)
+
+Travel Champion 2080 and Tandy Mega 2050X are 14MHz instead of 20MHz.
 
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
