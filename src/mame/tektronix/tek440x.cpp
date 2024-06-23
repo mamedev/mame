@@ -88,10 +88,6 @@ class led_ncr5385_device : public ncr5385_device
 {
 	output_finder<> *m_disk_led = nullptr;
 	
-	public:
-	
-	using ncr5385_device::ncr5385_device;
-	
 	void led_cmd_w(u8 data)
 	{
 		ncr5385_device::cmd_w(data);
@@ -101,6 +97,10 @@ class led_ncr5385_device : public ncr5385_device
 			*m_disk_led = !BIT(data, 3);
 	}
 
+	public:
+	
+	using ncr5385_device::ncr5385_device;
+	
 	void map(address_map &map)
 	{
 		ncr5385_device::map(map);
@@ -110,7 +110,7 @@ class led_ncr5385_device : public ncr5385_device
 		
 	}
 	
-	void useled(output_finder<> *led)
+	void attachLED(output_finder<> *led)
 	{
 		m_disk_led = led;
 	}
@@ -293,7 +293,7 @@ void tek440x_state::machine_start()
 	m_led_8.resolve();
 	
 	m_led_disk.resolve();
-	m_scsi->useled(&m_led_disk);
+	m_scsi->attachLED(&m_led_disk);
 }
 
 
