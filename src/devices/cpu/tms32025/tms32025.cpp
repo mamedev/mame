@@ -505,7 +505,7 @@ void tms3202x_device::CALCULATE_SUB_OVERFLOW(int32_t subval)
 	}
 }
 
-uint16_t tms3202x_device::POP_STACK()
+inline uint16_t tms3202x_device::POP_STACK()
 {
 	uint16_t data = m_STACK[3];
 	m_STACK[3] = m_STACK[2];
@@ -513,7 +513,7 @@ uint16_t tms3202x_device::POP_STACK()
 	m_STACK[1] = m_STACK[0];
 	return data;
 }
-void tms3202x_device::PUSH_STACK(uint16_t data)
+inline void tms3202x_device::PUSH_STACK(uint16_t data)
 {
 	m_STACK[0] = m_STACK[1];
 	m_STACK[1] = m_STACK[2];
@@ -521,7 +521,7 @@ void tms3202x_device::PUSH_STACK(uint16_t data)
 	m_STACK[3] = data;
 }
 
-uint16_t tms32025_device::POP_STACK()
+inline uint16_t tms32025_device::POP_STACK()
 {
 	uint16_t data = m_STACK[7];
 	m_STACK[7] = m_STACK[6];
@@ -533,7 +533,7 @@ uint16_t tms32025_device::POP_STACK()
 	m_STACK[1] = m_STACK[0];
 	return data;
 }
-void tms32025_device::PUSH_STACK(uint16_t data)
+inline void tms32025_device::PUSH_STACK(uint16_t data)
 {
 	m_STACK[0] = m_STACK[1];
 	m_STACK[1] = m_STACK[2];

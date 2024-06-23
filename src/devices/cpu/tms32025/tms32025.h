@@ -193,8 +193,8 @@ protected:
 	inline void CALCULATE_SUB_CARRY();
 	inline void CALCULATE_ADD_OVERFLOW(int32_t addval);
 	inline void CALCULATE_SUB_OVERFLOW(int32_t subval);
-	virtual inline uint16_t POP_STACK();
-	virtual inline void PUSH_STACK(uint16_t data);
+	virtual uint16_t POP_STACK();
+	virtual void PUSH_STACK(uint16_t data);
 	inline void SHIFT_Preg_TO_ALU();
 	inline void GETDATA(int shift,int signext);
 	inline void PUTDATA(uint16_t data);
@@ -385,8 +385,8 @@ protected:
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	virtual inline uint16_t POP_STACK() override;
-	virtual inline void PUSH_STACK(uint16_t data) override;
+	virtual uint16_t POP_STACK() override;
+	virtual void PUSH_STACK(uint16_t data) override;
 
 	bool    m_mp_mc;
 };
