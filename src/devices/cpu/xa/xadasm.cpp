@@ -336,7 +336,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 	{
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 rd = (op2 & 0xf0) >> 4;
-		util::stream_format(stream, "%s %s, #$%02x", m_aluops[alu_op], m_regnames8[rd], op3 );
+		util::stream_format(stream, "%s.b %s, #$%02x", m_aluops[alu_op], m_regnames8[rd], op3 );
 		return 3;
 	}
 
@@ -344,7 +344,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 	{
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 rd = (op2 & 0xf0) >> 4;
-		util::stream_format(stream, "%s [%s], #$%02x", m_aluops[alu_op], m_regnames16[rd], op3 );
+		util::stream_format(stream, "%s.b [%s], #$%02x", m_aluops[alu_op], m_regnames16[rd], op3 );
 		return 3;
 	}
 
@@ -352,7 +352,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 	{
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 rd = (op2 & 0xf0) >> 4;
-		util::stream_format(stream, "%s [%s+], #$%02x", m_aluops[alu_op], m_regnames16[rd], op3 );
+		util::stream_format(stream, "%s.b [%s+], #$%02x", m_aluops[alu_op], m_regnames16[rd], op3 );
 		return 3;
 	}
 
@@ -361,7 +361,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 op4 = opcodes.r8(pc++);
 		const u8 rd = (op2 & 0xf0) >> 4;
-		util::stream_format(stream, "%s [%s+#$%02x], #$%02x", m_aluops[alu_op], m_regnames16[rd], op3, op4 );
+		util::stream_format(stream, "%s.b [%s+#$%02x], #$%02x", m_aluops[alu_op], m_regnames16[rd], op3, op4 );
 		return 4;
 	}
 
@@ -372,7 +372,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 op5 = opcodes.r8(pc++);
 		const u8 rd = (op2 & 0xf0) >> 4;
 		const u16 offset = (op3 << 8) | op4;
-		util::stream_format(stream, "%s [%s+#$%04x], #$%02d", m_aluops[alu_op], m_regnames16[rd], offset, op5 );
+		util::stream_format(stream, "%s.b [%s+#$%04x], #$%02d", m_aluops[alu_op], m_regnames16[rd], offset, op5 );
 		return 5;
 	}
 
@@ -381,7 +381,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 op3 = opcodes.r8(pc++);
 		const u8 op4 = opcodes.r8(pc++);
 		const u16 direct = ((op2 & 0xf0) << 4) | op3;
-		util::stream_format(stream, "%s %s, #$%02x", m_aluops[alu_op], get_directtext(direct), op4 );
+		util::stream_format(stream, "%s.b %s, #$%02x", m_aluops[alu_op], get_directtext(direct), op4 );
 		return 4;
 	}
 
@@ -391,7 +391,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 op4 = opcodes.r8(pc++);
 		const u8 rd = (op2 & 0xf0) >> 4;
 		const u16 data = (op3 << 8) | op4;
-		util::stream_format(stream, "%s %s, #$%04x", m_aluops[alu_op], m_regnames16[rd], data );
+		util::stream_format(stream, "%s.w %s, #$%04x", m_aluops[alu_op], m_regnames16[rd], data );
 		return 4;
 	}
 
@@ -401,7 +401,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 op4 = opcodes.r8(pc++);
 		const u8 rd = (op2 & 0xf0) >> 4;
 		const u16 data = (op3 << 8) | op4;
-		util::stream_format(stream, "%s [%s], #$%04x", m_aluops[alu_op], m_regnames16[rd], data );
+		util::stream_format(stream, "%s.w [%s], #$%04x", m_aluops[alu_op], m_regnames16[rd], data );
 		return 4;
 	}
 
@@ -411,7 +411,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 op4 = opcodes.r8(pc++);
 		const u8 rd = (op2 & 0xf0) >> 4;
 		const u16 data = (op3 << 8) | op4;
-		util::stream_format(stream, "%s [%s+], #$%04x", m_aluops[alu_op], m_regnames16[rd], data );
+		util::stream_format(stream, "%s.w [%s+], #$%04x", m_aluops[alu_op], m_regnames16[rd], data );
 		return 4;
 	}
 
@@ -423,7 +423,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 rd = (op2 & 0xf0) >> 4;
 		const int offset = op3;
 		const u16 data = (op4 << 8) | op5;
-		util::stream_format(stream, "%s [%s+#$%02x], #$%04x", m_aluops[alu_op], m_regnames16[rd], offset, data );
+		util::stream_format(stream, "%s.w [%s+#$%02x], #$%04x", m_aluops[alu_op], m_regnames16[rd], offset, data );
 		return 5;
 	}
 
@@ -436,7 +436,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 rd = (op2 & 0xf0) >> 4;
 		const int offset = (op3 << 8) | op4;
 		const u16 data = (op5 << 8) | op6;
-		util::stream_format(stream, "%s [%s+#$%04x], #$%04x", m_aluops[alu_op], m_regnames16[rd], offset, data  );
+		util::stream_format(stream, "%s.w [%s+#$%04x], #$%04x", m_aluops[alu_op], m_regnames16[rd], offset, data  );
 		return 6;
 	}
 
@@ -447,7 +447,7 @@ int xa_dasm::handle_alu_type1(XA_DASM_PARAMS, uint8_t op2)
 		const u8 op5 = opcodes.r8(pc++);
 		const u16 direct =( (op2 & 0xf0) << 4) | op3;
 		const u16 data = (op4 << 8) | op5;
-		util::stream_format(stream, "%s %s, #$%04x", m_aluops[alu_op], get_directtext(direct), data );
+		util::stream_format(stream, "%s.w %s, #$%04x", m_aluops[alu_op], get_directtext(direct), data );
 		return 5;
 	}
 	}
