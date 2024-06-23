@@ -165,6 +165,7 @@ Module timer tag static_vblank_timer name m_expire.seconds
 
 #include "emu.h"
 #include "rm480z.h"
+#include "machine/clock.h"
 #include "speaker.h"
 #include "screen.h"
 #include "utf8.h"
@@ -223,6 +224,7 @@ void rm480z_state::rm480z_io(address_map &map)
 	map(0x00, 0x17).select(0x7f00).rw(FUNC(rm480z_state::videoram_read), FUNC(rm480z_state::videoram_write));
 	map(0x18, 0x1d).mirror(0xff00).rw(FUNC(rm480z_state::status_port_read), FUNC(rm480z_state::control_port_write));
 	map(0x20, 0x23).mirror(0xff00).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x24, 0x27).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x38, 0x3b).mirror(0xff00).rw(FUNC(rm480z_state::hrg_port_read), FUNC(rm480z_state::hrg_port_write));
 	//map(0x20, 0x23).mirror(0xff00); // system CTC - 0=SIO4&cassin, 1=SIO2&cassio, 2=keybd int, 3=50Hz int for repeat key
 	//map(0x24, 0x27).mirror(0xff00); // system SIO - 0=chA network data, 1=chB SIO4 data, 2=ChA control, 3=ChB control
@@ -330,6 +332,7 @@ uint32_t rm480z_state::screen_update_rm480z(screen_device &screen, bitmap_ind16 
 
 static const z80_daisy_config daisy_chain[] =
 {
+	{ "sio" },
 	{ "ctc" },
 	{ nullptr }
 };
@@ -342,8 +345,24 @@ void rm480z_state::rm480z(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &rm480z_state::rm480z_io);
 	m_maincpu->set_daisy_config(daisy_chain);
 
+	Z80SIO(config, m_sio, 16_MHz_XTAL / 4);
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_sio->out_txdb_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtrb_callback().set(m_rs232, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsb_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
+
+	// rs232 port
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
+	m_rs232->dcd_handler().set(m_sio, FUNC(z80sio_device::dcdb_w));
+	m_rs232->dsr_handler().set(m_sio, FUNC(z80sio_device::syncb_w));
+	m_rs232->cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w));
+
 	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
+
+	CLOCK(config, "ctc_clock", 16_MHz_XTAL / 8).signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
 
 	/* video hardware */
 	PALETTE(config, m_palette).set_init(FUNC(rm480z_state::palette_init)).set_entries(19);

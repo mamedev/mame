@@ -40,11 +40,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rm480z_state::kbd_scan)
 
 void rm480z_state::vblank_callback(screen_device &screen, bool vblank_state)
 {
-	if (vblank_state)
-	{
-		m_ctc->trg3(0);
-		m_ctc->trg3(1);
-	}
+	m_ctc->trg3(vblank_state);
 }
 
 void rm480z_state::control_port_write(offs_t offset, uint8_t data)

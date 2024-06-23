@@ -12,11 +12,13 @@ Research Machines RM 480Z
 
 #pragma once
 
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "machine/ram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80daisy.h"
+#include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 
 #include "emupal.h"
@@ -42,6 +44,8 @@ public:
 		m_palette(*this, "palette"),
 		m_messram(*this, RAM_TAG),
 		m_ctc(*this, "ctc"),
+		m_sio(*this, "sio"),
+		m_rs232(*this, "rs232"),
 		m_speaker(*this, "speaker"),
 		m_io_kbrow(*this, "kbrow.%u", 0U),
 		m_io_display_type(*this, "display_type"),
@@ -111,6 +115,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<ram_device> m_messram;
 	required_device<z80ctc_device> m_ctc;
+	required_device<z80sio_device> m_sio;
+	required_device<rs232_port_device> m_rs232;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<8> m_io_kbrow;
 	required_ioport m_io_display_type;
