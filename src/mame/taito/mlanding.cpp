@@ -43,7 +43,6 @@
         * Determine correct video timing
         * Unknown sound writes (volume and body sonic control?)
         * Better document mecha drive CPU
-        * Use TMS32020(currently unemulated) device instead of TMS32025
 
 ****************************************************************************/
 
@@ -955,7 +954,7 @@ void mlanding_state::mlanding(machine_config &config)
 	m_mechacpu->set_addrmap(AS_PROGRAM, &mlanding_state::mecha_map_prog);
 	m_mechacpu->set_vblank_int("screen", FUNC(mlanding_state::irq0_line_hold));
 
-	tms32025_device& dsp(TMS32025(config, m_dsp, 16_MHz_XTAL)); // TMS32020GBL
+	tms32020_device& dsp(TMS32020(config, m_dsp, 16_MHz_XTAL)); // TMS32020GBL
 	dsp.set_addrmap(AS_PROGRAM, &mlanding_state::dsp_map_prog);
 	dsp.set_addrmap(AS_DATA, &mlanding_state::dsp_map_data);
 	dsp.hold_in_cb().set(FUNC(mlanding_state::dsp_hold_signal_r));
