@@ -2,10 +2,10 @@
 // copyright-holders:jwallace
 /**********************************************************************
 
-    Rockwell 65C52  Dual Asynchronous Communication Interface Adapter
+	Rockwell 65C52  Dual Asynchronous Communication Interface Adapter
 
 	A slightly tweaked combination of two 6551 ACIAs on a single chip
-	
+
 **********************************************************************/
 
 #include "emu.h"
@@ -14,67 +14,64 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-
 DEFINE_DEVICE_TYPE(R65C52, r65c52_device, "r65c52", "Rockwell 65C52 DACIA")
 
-r65c52_device::r65c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, R65C52, tag, owner, clock),
-	m_internal_clock1(*this, "clock1"),
-	m_internal_clock2(*this, "clock2"),
-	m_irq_handler(*this),
-	m_txd_handler(*this),
-	m_rxc_handler(*this),
-	m_rts_handler(*this),
-	m_dtr_handler(*this),
-	m_aux_ctrl{0, 0}, m_control{0, 0},
-	m_compare{0, 0},
-	m_format{0, 0}, m_status{0, 0},
-	m_tdr{0, 0}, m_tdre{true, true},
-	m_rdr{0, 0}, m_rdrf{false, false},
-	m_ier{0, 0}, m_isr{0, 0},
-	m_irq{0, 0},
-	m_overrun{false, false},
-	m_parity_err{false, false},
-	m_parity_err_mode{0, 0},
-	m_txd{0, 0},
-	m_rxc(0),
-	m_rts{0, 0},
-	m_dtr{0, 0},
-	m_xtal(clock),
-	m_divide{0, 0},
-	m_cts{0, 0},
-	m_dsr{0, 0},
-	m_dcd{0, 0},
-	m_rxd{0, 0}, m_wordlength{0, 0}, m_stoplength{0, 0}, m_brk{0, 0}, m_echo_mode{0, 0}, m_parity{0, 0},
-	m_rx_state{STATE_START, STATE_START},
-	m_rx_clock{0, 0}, m_rx_bits{0, 0}, m_rx_shift{0, 0}, m_rx_parity{0, 0},
-	m_rx_counter{0, 0},
-	m_tx_state{STATE_START, STATE_START},
-	m_tx_output{OUTPUT_MARK, OUTPUT_MARK},
-	m_tx_clock{0, 0}, m_tx_bits{0, 0}, m_tx_shift{0, 0}, m_tx_parity{0, 0},
-	m_tx_counter{0, 0}
+r65c52_device::r65c52_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) : device_t(mconfig, R65C52, tag, owner, clock),
+																												m_internal_clock1(*this, "clock1"),
+																												m_internal_clock2(*this, "clock2"),
+																												m_irq_handler(*this),
+																												m_txd_handler(*this),
+																												m_rxc_handler(*this),
+																												m_rts_handler(*this),
+																												m_dtr_handler(*this),
+																												m_aux_ctrl{0, 0}, m_control{0, 0},
+																												m_compare{0, 0},
+																												m_format{0, 0}, m_status{0, 0},
+																												m_tdr{0, 0}, m_tdre{true, true},
+																												m_rdr{0, 0}, m_rdrf{false, false},
+																												m_ier{0, 0}, m_isr{0, 0},
+																												m_irq{0, 0},
+																												m_overrun{false, false},
+																												m_parity_err{false, false},
+																												m_parity_err_mode{0, 0},
+																												m_txd{0, 0},
+																												m_rxc(0),
+																												m_rts{0, 0},
+																												m_dtr{0, 0},
+																												m_xtal(clock),
+																												m_divide{0, 0},
+																												m_cts{0, 0},
+																												m_dsr{0, 0},
+																												m_dcd{0, 0},
+																												m_rxd{0, 0}, m_wordlength{0, 0}, m_stoplength{0, 0}, m_brk{0, 0}, m_echo_mode{0, 0}, m_parity{0, 0},
+																												m_rx_state{STATE_START, STATE_START},
+																												m_rx_clock{0, 0}, m_rx_bits{0, 0}, m_rx_shift{0, 0}, m_rx_parity{0, 0},
+																												m_rx_counter{0, 0},
+																												m_tx_state{STATE_START, STATE_START},
+																												m_tx_output{OUTPUT_MARK, OUTPUT_MARK},
+																												m_tx_clock{0, 0}, m_tx_bits{0, 0}, m_tx_shift{0, 0}, m_tx_parity{0, 0},
+																												m_tx_counter{0, 0}
 {
 }
 
 const int r65c52_device::internal_divider[16] =
-{
-	4608,
-	2096,
-	1713,
-	1536,
-	768,
-	384,
-	192,
-	128,
-	96,
-	64,
-	48,
-	32,
-	24,
-	12,
-	6,
-	1
-};
+	{
+		4608,
+		2096,
+		1713,
+		1536,
+		768,
+		384,
+		192,
+		128,
+		96,
+		64,
+		48,
+		32,
+		24,
+		12,
+		6,
+		1};
 
 void r65c52_device::device_add_mconfig(machine_config &config)
 {
@@ -83,7 +80,6 @@ void r65c52_device::device_add_mconfig(machine_config &config)
 	m_internal_clock1->signal_handler().set(FUNC(r65c52_device::internal_clock1));
 	m_internal_clock2->signal_handler().set(FUNC(r65c52_device::internal_clock2));
 }
-
 
 void r65c52_device::device_start()
 {
@@ -148,9 +144,9 @@ void r65c52_device::device_start()
 
 void r65c52_device::device_reset()
 {
-	for (int i=0; i<2; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		m_tdre[i]=true;
+		m_tdre[i] = true;
 		m_rdrf[i] = true;
 
 		m_status[i] = SR_FRAMING_ERROR;
@@ -173,7 +169,7 @@ void r65c52_device::device_reset()
 	}
 }
 
-uint8_t r65c52_device::stoplengthcounter(int idx)
+u8 r65c52_device::stoplengthcounter(int idx)
 {
 	if (m_stoplength[idx] == 2)
 	{
@@ -193,7 +189,7 @@ uint8_t r65c52_device::stoplengthcounter(int idx)
 
 void r65c52_device::output_irq(int idx, int irq)
 {
-	LOG("R65C52: %x  IRQ %x \n", idx+1, irq);
+	LOG("R65C52: %x  IRQ %x \n", idx + 1, irq);
 
 	if (m_irq[idx] != irq)
 	{
@@ -207,13 +203,13 @@ void r65c52_device::output_txd(int idx, int txd)
 {
 	switch (m_tx_output[idx])
 	{
-		case OUTPUT_MARK:
-			txd = 1;
-			break;
+	case OUTPUT_MARK:
+		txd = 1;
+		break;
 
-		case OUTPUT_BREAK:
-			txd = 0;
-			break;
+	case OUTPUT_BREAK:
+		txd = 0;
+		break;
 	}
 
 	if (m_txd[idx] != txd)
@@ -225,7 +221,7 @@ void r65c52_device::output_txd(int idx, int txd)
 
 void r65c52_device::output_rts(int idx, int rts)
 {
-	LOG("R65C52: %x  RTS %x \n", idx+1, rts);
+	LOG("R65C52: %x  RTS %x \n", idx + 1, rts);
 	if (m_rts[idx] != rts)
 	{
 		m_rts[idx] = rts;
@@ -243,7 +239,7 @@ void r65c52_device::output_rts(int idx, int rts)
 
 void r65c52_device::output_dtr(int idx, int dtr)
 {
-	LOG("R65C52: %x  DTR %x \n", idx+1, dtr);
+	LOG("R65C52: %x  DTR %x \n", idx + 1, dtr);
 	if (m_dtr[idx] != dtr)
 	{
 		m_dtr[idx] = dtr;
@@ -257,17 +253,15 @@ void r65c52_device::output_dtr(int idx, int dtr)
 			m_status[idx] &= ~SR_DTR;
 		}
 	}
-	// update_divider(idx);
-
 }
 
 void r65c52_device::update_irq(int idx)
 {
 	bool irq = false;
-	LOG("R65C52: %x  IER  %x ISR %x\n", idx+1, m_ier[idx], m_isr[idx]);
+	LOG("R65C52: %x  IER  %x ISR %x\n", idx + 1, m_ier[idx], m_isr[idx]);
 	for (int i = 0; i < 8; i++)
 	{
-		if  ( (m_ier[idx]  & (1 >> i)) && ( (m_isr[idx]  & (1 >> i))) )
+		if ((m_ier[idx] & (1 >> i)) && ((m_isr[idx] & (1 >> i))))
 		{
 			irq = true;
 		}
@@ -286,15 +280,14 @@ void r65c52_device::update_divider(int idx)
 		m_divide[idx] = 16;
 		if (!m_dtr[idx] || m_rx_state[idx] != STATE_START)
 		{
-			scale = (double) 1 / scale;
+			scale = (double)1 / scale;
 		}
 		else
 		{
 			scale = 0;
 		}
 
-		LOG("R65C52: %x  CLOCK %d SCALE %f \n", idx+1, m_xtal* scale, scale);
-
+		LOG("R65C52: %x  CLOCK %d SCALE %f \n", idx + 1, m_xtal * scale, scale);
 	}
 	else
 	{
@@ -310,30 +303,29 @@ void r65c52_device::update_divider(int idx)
 	{
 		m_internal_clock2->set_clock_scale(scale);
 	}
-
 }
 
-uint8_t r65c52_device::read_rdr(int idx)
+u8 r65c52_device::read_rdr(int idx)
 {
 	m_status[idx] &= ~(SR_BRK | SR_FRAMING_ERROR);
-	m_isr[idx] &= ~( IRQ_PAR | IRQ_FOB | IRQ_RDRF);
+	m_isr[idx] &= ~(IRQ_PAR | IRQ_FOB | IRQ_RDRF);
 	m_rdrf[idx] = false;
 	m_parity_err[idx] = false;
 	m_overrun[idx] = false;
 	update_irq(idx);
-	LOG("R65C52: %x  RDR %x \n", idx+1, m_rdr[idx]);
+	LOG("R65C52: %x  RDR %x \n", idx + 1, m_rdr[idx]);
 	return m_rdr[idx];
 }
 
-uint8_t r65c52_device::read_status(int idx)
+u8 r65c52_device::read_status(int idx)
 {
-	LOG("R65C52: %x  STATUS %x \n", idx+1, m_status[idx]);
-	m_dtr[idx]=false;
-	m_rts[idx]=false;
+	LOG("R65C52: %x  STATUS %x \n", idx + 1, m_status[idx]);
+	m_dtr[idx] = false;
+	m_rts[idx] = false;
 	return m_status[idx];
 }
 
-void r65c52_device::write_ier(int idx, uint8_t data)
+void r65c52_device::write_ier(int idx, u8 data)
 {
 	if (data & 0x80)
 	{
@@ -344,23 +336,22 @@ void r65c52_device::write_ier(int idx, uint8_t data)
 		m_ier[idx] &= ~(data & 0x7f);
 	}
 
-	// m_ier[idx] &= 0x7f;
-	LOG("R65C52: %x  IER %x \n", idx+1, m_ier[idx]);
+	LOG("R65C52: %x  IER %x \n", idx + 1, m_ier[idx]);
 }
 
-void r65c52_device::write_tdr(int idx, uint8_t data)
+void r65c52_device::write_tdr(int idx, u8 data)
 {
 	m_tdr[idx] = data;
 	m_tdre[idx] = false;
 	m_isr[idx] &= ~IRQ_TDRE;
-	LOG("R65C52: %x  TDR %x \n", idx+1, m_tdr[idx]);
+	LOG("R65C52: %x  TDR %x \n", idx + 1, m_tdr[idx]);
 }
 
-void r65c52_device::write_control(int idx, uint8_t data)
+void r65c52_device::write_control(int idx, u8 data)
 {
 	m_control[idx] = data;
 
-	//bits 0-3
+	// bits 0-3
 	update_divider(idx);
 
 	// bit 4
@@ -369,17 +360,15 @@ void r65c52_device::write_control(int idx, uint8_t data)
 	// bit 5
 	m_stoplength[idx] = 1 + ((m_control[idx] >> 5) & 1);
 
-
-	LOG("R65C52: %x CTRL%X ECHO %x STOP%x\n", idx+1, m_control[idx], m_echo_mode[idx], m_stoplength[idx]);
-
+	LOG("R65C52: %x CTRL%X ECHO %x STOP%x\n", idx + 1, m_control[idx], m_echo_mode[idx], m_stoplength[idx]);
 }
 
-void r65c52_device::write_format(int idx, uint8_t data)
+void r65c52_device::write_format(int idx, u8 data)
 {
 	m_format[idx] = data;
 
 	// bit 0
-	output_rts(idx,  ((m_format[idx] >> 0) & 1));
+	output_rts(idx, ((m_format[idx] >> 0) & 1));
 
 	// bit 1
 	output_dtr(idx, ((m_format[idx] >> 1) & 1));
@@ -389,7 +378,8 @@ void r65c52_device::write_format(int idx, uint8_t data)
 	{
 		m_parity[idx] = PARITY_NONE;
 	}
-	else{
+	else
+	{
 		// bits 3-4
 		m_parity[idx] = (m_format[idx] >> 3) & 3;
 	}
@@ -397,13 +387,12 @@ void r65c52_device::write_format(int idx, uint8_t data)
 	// bits 5-6
 	m_wordlength[idx] = 5 + ((m_format[idx] >> 5) & 3);
 
-
-	LOG("R65C52: %x FMT %x RTS %x DTR %x PARITY %x WORDLENGTH %x \n", idx+1, m_format[idx], (m_format[idx] >> 0) & 1, (m_format[idx] >> 1)& 1, m_parity[idx], m_wordlength[idx]);
+	LOG("R65C52: %x FMT %x RTS %x DTR %x PARITY %x WORDLENGTH %x \n", idx + 1, m_format[idx], (m_format[idx] >> 0) & 1, (m_format[idx] >> 1) & 1, m_parity[idx], m_wordlength[idx]);
 
 	update_divider(idx);
 }
 
-void r65c52_device::write_aux_ctrl(int idx, uint8_t data)
+void r65c52_device::write_aux_ctrl(int idx, u8 data)
 {
 	m_aux_ctrl[idx] = data;
 
@@ -413,25 +402,24 @@ void r65c52_device::write_aux_ctrl(int idx, uint8_t data)
 	// bit 1
 	m_brk[idx] = (m_format[idx] >> 1) & 1;
 
-	LOG("R65C52: %x  AUX CTRL %x \n", idx+1, m_aux_ctrl[idx]);
+	LOG("R65C52: %x  AUX CTRL %x \n", idx + 1, m_aux_ctrl[idx]);
 }
 
-void r65c52_device::write_compare(int idx, uint8_t data)
+void r65c52_device::write_compare(int idx, u8 data)
 {
-	LOG("R65C52: %x COMPARE %x \n", idx+1, data);
+	LOG("R65C52: %x COMPARE %x \n", idx + 1, data);
 	m_compare[idx] = data;
 }
 
-
-uint8_t r65c52_device::read_isr(int idx)
+u8 r65c52_device::read_isr(int idx)
 {
 
 	if (m_status[idx] & SR_BRK || m_status[idx] & SR_FRAMING_ERROR || m_overrun[idx])
 	{
-		m_isr[idx] |= IRQ_FOB;		
+		m_isr[idx] |= IRQ_FOB;
 	}
 
-	uint8_t isr = m_isr[idx];
+	u8 isr = m_isr[idx];
 
 	if (isr != 0)
 	{
@@ -451,104 +439,72 @@ uint8_t r65c52_device::read_isr(int idx)
 
 	m_isr[idx] &= ~(IRQ_CTS | IRQ_DCD | IRQ_DSR | IRQ_FOB);
 
-	LOG("R65C52: %x  ISR %x \n", idx+1, m_isr[idx]);
+	LOG("R65C52: %x  ISR %x \n", idx + 1, m_isr[idx]);
 
 	return isr;
 }
 
-uint8_t r65c52_device::read(offs_t offset)
+void r65c52_device::map(address_map &map)
 {
-	switch (offset & 0x07)
-	{
-		case 0:
-			return read_isr(0);
-
-		case 1:
-			return read_status(0);
-
-		case 3:
-			return read_rdr(0);
-
-		case 4:
-			return read_isr(1);
-
-		case 5:
-			return read_status(1);
-
-		case 7:
-			return read_rdr(1);
-	}
-	return 0;
+	map(0x00, 0x00).rw(FUNC(r65c52_device::isr_0_r), FUNC(r65c52_device::ier_0_w));
+	map(0x01, 0x01).rw(FUNC(r65c52_device::status_0_r), FUNC(r65c52_device::format_ctrl_0_w));
+	map(0x02, 0x02).nopr().w(FUNC(r65c52_device::aux_compare_0_w));
+	map(0x03, 0x03).rw(FUNC(r65c52_device::rdr_0_r), FUNC(r65c52_device::tdr_0_w));
+	map(0x04, 0x04).rw(FUNC(r65c52_device::isr_1_r), FUNC(r65c52_device::ier_1_w));
+	map(0x05, 0x05).rw(FUNC(r65c52_device::status_1_r), FUNC(r65c52_device::format_ctrl_1_w));
+	map(0x06, 0x06).nopr().w(FUNC(r65c52_device::aux_compare_1_w));
+	map(0x07, 0x07).rw(FUNC(r65c52_device::rdr_1_r), FUNC(r65c52_device::tdr_1_w));
 }
 
-void r65c52_device::write(offs_t offset, uint8_t data)
+void r65c52_device::format_ctrl_0_w(u8 data)
 {
-
-	switch (offset & 0x07)
+	if (data & 0x80)
 	{
-		case 0:
-			write_ier(0, data);
-			break;
-
-		case 1:
-			if (data & 0x80)
-			{
-				write_format(0, data);
-			}
-			else
-			{
-				write_control(0, data);
-			}
-			break;
-
-		case 2:
-			if (data & 0x40)
-			{
-				write_aux_ctrl(0, data);
-			}
-			else
-			{
-				write_compare(0, data);
-			}
-			break;
-
-		case 3:
-			write_tdr(0, data);
-			break;
-
-		case 4:
-			write_ier(1, data);
-			break;
-
-		case 5:
-			if (data & 0x80)
-			{
-				write_format(1, data);
-			}
-			else
-			{
-				write_control(1, data);
-			}
-			break;
-
-		case 6:
-			if (data & 0x40)
-			{
-				write_aux_ctrl(1,data);
-			}
-			else
-			{
-				write_compare(1, data);
-			}
-			break;
-
-		case 7:
-			write_tdr(1, data);
-			break;
+		write_format(0, data);
+	}
+	else
+	{
+		write_control(0, data);
 	}
 }
 
-void r65c52_device::set_xtal(uint32_t xtal)
+void r65c52_device::format_ctrl_1_w(u8 data)
+{
+	if (data & 0x80)
+	{
+		write_format(1, data);
+	}
+	else
+	{
+		write_control(1, data);
+	}
+}
+
+void r65c52_device::aux_compare_0_w(u8 data)
+{
+	if (data & 0x40)
+	{
+		write_aux_ctrl(0, data);
+	}
+	else
+	{
+		write_compare(0, data);
+	}
+}
+
+void r65c52_device::aux_compare_1_w(u8 data)
+{
+	if (data & 0x40)
+	{
+		write_aux_ctrl(1, data);
+	}
+	else
+	{
+		write_compare(1, data);
+	}
+}
+
+void r65c52_device::set_xtal(u32 xtal)
 {
 	m_xtal = xtal;
 
@@ -575,7 +531,7 @@ void r65c52_device::internal_clock2(int state)
 
 void r65c52_device::write_rxc(int state)
 {
-	for (int i = 0 ; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		receiver_clock(i, state);
 	}
@@ -583,7 +539,7 @@ void r65c52_device::write_rxc(int state)
 
 void r65c52_device::write_txc(int state)
 {
-	for (int i = 0 ; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		transmitter_clock(i, state);
 	}
@@ -619,7 +575,7 @@ void r65c52_device::_write_cts(int idx, int state)
 		if (m_cts[idx])
 		{
 			m_status[idx] |= SR_CTS;
-			
+
 			if (m_tx_output[idx] == OUTPUT_TXD)
 			{
 				m_tx_output[idx] = OUTPUT_MARK;
@@ -632,8 +588,7 @@ void r65c52_device::_write_cts(int idx, int state)
 		}
 		update_irq(idx);
 	}
-	LOG("R65C52: %x  CTS STATUS %x \n", idx+1, m_status[idx]);
-
+	LOG("R65C52: %x  CTS STATUS %x \n", idx + 1, m_status[idx]);
 }
 
 void r65c52_device::write_dsr1(int state)
@@ -663,8 +618,7 @@ void r65c52_device::_write_dsr(int idx, int state)
 		}
 		update_irq(idx);
 	}
-	LOG("R65C52: %x  DSR STATUS %x \n", idx+1, m_status[idx]);
-
+	LOG("R65C52: %x  DSR STATUS %x \n", idx + 1, m_status[idx]);
 }
 
 void r65c52_device::write_dcd1(int state)
@@ -694,8 +648,7 @@ void r65c52_device::_write_dcd(int idx, int state)
 		}
 		update_irq(idx);
 	}
-	LOG("R65C52: %x  DCD STATUS %x \n", idx+1, m_status[idx]);
-
+	LOG("R65C52: %x  DCD STATUS %x \n", idx + 1, m_status[idx]);
 }
 
 void r65c52_device::receiver_clock(int idx, int state)
@@ -715,7 +668,7 @@ void r65c52_device::receiver_clock(int idx, int state)
 				{
 					if (!m_rxd[idx] && !m_dtr[idx])
 					{
-						LOG("R65C52: RX%x START BIT \n", idx+1);
+						LOG("R65C52: RX%x START BIT \n", idx + 1);
 					}
 					else
 					{
@@ -737,7 +690,7 @@ void r65c52_device::receiver_clock(int idx, int state)
 					{
 						m_rx_counter[idx] = 0;
 
-						LOG("R65C52: RX%x false START BIT\n", idx+1);
+						LOG("R65C52: RX%x false START BIT\n", idx + 1);
 					}
 				}
 				break;
@@ -749,11 +702,11 @@ void r65c52_device::receiver_clock(int idx, int state)
 
 					if (m_rx_bits[idx] < m_wordlength[idx])
 					{
-						LOG("R65C52: RX%x DATA BIT %d %d\n", idx+1, m_rx_bits[idx], m_rxd[idx]); 
+						LOG("R65C52: RX%x DATA BIT %d %d\n", idx + 1, m_rx_bits[idx], m_rxd[idx]);
 					}
 					else
 					{
-						LOG("R65C52: RX%x PARITY BIT %x\n", idx+1, m_rxd[idx]);
+						LOG("R65C52: RX%x PARITY BIT %x\n", idx + 1, m_rxd[idx]);
 					}
 
 					if (m_rxd[idx])
@@ -778,7 +731,7 @@ void r65c52_device::receiver_clock(int idx, int state)
 				{
 					m_rx_counter[idx] = 0;
 
-					LOG("R65C52: RX%x STOP BIT\n", idx+1);
+					LOG("R65C52: RX%x STOP BIT\n", idx + 1);
 					if (!(m_rdrf[idx]))
 					{
 						if (!m_rxd[idx])
@@ -800,11 +753,11 @@ void r65c52_device::receiver_clock(int idx, int state)
 						{
 							if (m_parity_err[idx])
 							{
-								m_isr[idx] |= IRQ_PAR; 
+								m_isr[idx] |= IRQ_PAR;
 							}
 							else
 							{
-								m_isr[idx] &= ~IRQ_PAR; 
+								m_isr[idx] &= ~IRQ_PAR;
 							}
 							update_irq(idx);
 						}
@@ -822,7 +775,6 @@ void r65c52_device::receiver_clock(int idx, int state)
 							m_isr[idx] |= IRQ_RDRF;
 							m_compare[idx] = 0;
 							update_irq(idx);
-
 						}
 						m_overrun[idx] = false;
 					}
@@ -831,7 +783,7 @@ void r65c52_device::receiver_clock(int idx, int state)
 						m_overrun[idx] = true;
 					}
 
-					LOG("R65C52: RX%x DATA %x\n", idx+1, m_rdr[idx]);
+					LOG("R65C52: RX%x DATA %x\n", idx + 1, m_rdr[idx]);
 
 					m_rx_state[idx] = STATE_START;
 
@@ -852,7 +804,7 @@ void r65c52_device::transmitter_clock(int idx, int state)
 	{
 		m_tx_clock[idx] = state;
 
-		if (!m_tx_clock[idx] && !m_dtr[idx] )
+		if (!m_tx_clock[idx] && !m_dtr[idx])
 		{
 			if (m_echo_mode[idx])
 			{
@@ -876,159 +828,159 @@ void r65c52_device::transmitter_clock(int idx, int state)
 
 			switch (m_tx_state[idx])
 			{
-				case STATE_START:
+			case STATE_START:
+			{
+				m_tx_counter[idx] = 0;
+
+				m_tx_state[idx] = STATE_DATA;
+				m_tx_shift[idx] = m_tdr[idx];
+				m_tx_bits[idx] = 0;
+				m_tx_parity[idx] = 0;
+
+				if (m_cts[idx])
+				{
+					m_tx_output[idx] = OUTPUT_MARK;
+					LOG("R65C52: TX%x CTS MARK START\n", idx + 1);
+				}
+				else if (!(m_tdre[idx]))
+				{
+					LOG("R65C52: TX%x DATA %x\n", idx + 1, m_tdr[idx]);
+
+					m_tx_output[idx] = OUTPUT_TXD;
+
+					LOG("R65C52: TX%x START BIT\n", idx + 1);
+
+					m_tdre[idx] = true;
+					m_isr[idx] |= IRQ_TDRE;
+					update_irq(idx);
+				}
+				else if (m_brk[idx])
+				{
+					m_tx_output[idx] = OUTPUT_BREAK;
+
+					LOG("R65C52: TX%x BREAK START\n", idx + 1);
+				}
+				else
+				{
+					m_tx_output[idx] = OUTPUT_MARK;
+					LOG("R65C52: TX%x MARK START\n", idx + 1);
+				}
+
+				if (m_tx_output[idx] != OUTPUT_BREAK)
+				{
+					m_tdre[idx] = true;
+					m_isr[idx] |= IRQ_TDRE;
+					update_irq(idx);
+				}
+
+				// fatalerror("setup");
+				output_txd(idx, 0);
+				break;
+			}
+			case STATE_DATA:
+			{
+				if (m_tx_counter[idx] == m_divide[idx])
 				{
 					m_tx_counter[idx] = 0;
 
-					m_tx_state[idx] = STATE_DATA;
-					m_tx_shift[idx] = m_tdr[idx];
-					m_tx_bits[idx] = 0;
-					m_tx_parity[idx] = 0;
-
-					if (m_cts[idx])
+					if (m_tx_bits[idx] < m_wordlength[idx])
 					{
-						m_tx_output[idx] = OUTPUT_MARK;
-						LOG("R65C52: TX%x CTS MARK START\n", idx+1);
-					}
-					else if (!(m_tdre[idx]))
-					{
-						LOG("R65C52: TX%x DATA %x\n", idx+1, m_tdr[idx]);
+						output_txd(idx, (m_tx_shift[idx] >> m_tx_bits[idx]) & 1);
 
-						m_tx_output[idx] = OUTPUT_TXD;
+						m_tx_bits[idx]++;
+						m_tx_parity[idx] ^= m_txd[idx];
 
-						LOG("R65C52: TX%x START BIT\n", idx+1);
-
-						m_tdre[idx] = true;
-						m_isr[idx] |= IRQ_TDRE;
-						update_irq(idx);
-					}
-					else if (m_brk[idx])
-					{
-						m_tx_output[idx] = OUTPUT_BREAK;
-
-						LOG("R65C52: TX%x BREAK START\n", idx+1);
-					}
-					else
-					{
-						m_tx_output[idx] = OUTPUT_MARK;
-						LOG("R65C52: TX%x MARK START\n", idx+1);
-					}
-
-					if (m_tx_output[idx] != OUTPUT_BREAK)
-					{
-						m_tdre[idx] = true;
-						m_isr[idx] |= IRQ_TDRE;
-						update_irq(idx);
-					}
-
-					// fatalerror("setup");
-					output_txd(idx, 0);
-					break;
-				}
-				case STATE_DATA:
-				{
-					if (m_tx_counter[idx] == m_divide[idx])
-					{
-						m_tx_counter[idx] = 0;
-
-						if (m_tx_bits[idx] < m_wordlength[idx])
+						if (m_tx_output[idx] == OUTPUT_TXD)
 						{
-							output_txd(idx, (m_tx_shift[idx] >> m_tx_bits[idx]) & 1);
-
-							m_tx_bits[idx]++;
-							m_tx_parity[idx] ^= m_txd[idx];
-
-							if (m_tx_output[idx] == OUTPUT_TXD)
-							{
-								LOG("R65C52: TX%x DATA BIT TXD %d %d\n", idx+1, m_tx_bits[idx], m_txd[idx]);
-							}
-						}
-						else if (m_tx_bits[idx] == m_wordlength[idx] && m_parity[idx] != PARITY_NONE)
-						{
-							m_tx_bits[idx]++;
-
-							switch (m_parity[idx])
-							{
-							case PARITY_ODD:
-								m_tx_parity[idx] = !m_tx_parity[idx];
-								break;
-
-							case PARITY_MARK:
-								m_tx_parity[idx] = 1;
-								break;
-
-							case PARITY_SPACE:
-								m_tx_parity[idx] = 0;
-								break;
-							}
-
-							output_txd(idx, m_tx_parity[idx]);
-
-							if (m_tx_output[idx] == OUTPUT_TXD)
-							{
-								LOG("R65C52: TX%x PARITY BIT %d\n", idx+1, m_txd);
-							}
-
-							if (!m_parity_err_mode[idx])
-							{
-								if (m_tx_parity[idx])
-								{
-									m_isr[idx] |= IRQ_PAR; 
-								}
-								else
-								{
-									m_isr[idx] &= ~IRQ_PAR; 
-								}
-								update_irq(idx);
-							}
-						}
-						else
-						{
-							m_tx_state[idx] = STATE_STOP;
-
-							output_txd(idx, 1);
-							// m_tdre[idx] = true;
-							// m_isr[idx] |= IRQ_TDRE;
-							// update_irq(idx);
-
-							if (m_tx_output[idx] == OUTPUT_TXD)
-							{
-								LOG("R65C52: TX%x STOP BIT\n", idx+1);
-							}
+							LOG("R65C52: TX%x DATA BIT TXD %d %d\n", idx + 1, m_tx_bits[idx], m_txd[idx]);
 						}
 					}
-					break;
-				}
-
-				case STATE_STOP:
-				{
-					if (m_tx_counter[idx] >= stoplengthcounter(idx))
+					else if (m_tx_bits[idx] == m_wordlength[idx] && m_parity[idx] != PARITY_NONE)
 					{
-						if (m_tx_output[idx] == OUTPUT_BREAK)
+						m_tx_bits[idx]++;
+
+						switch (m_parity[idx])
 						{
-							if (!m_brk[idx])
+						case PARITY_ODD:
+							m_tx_parity[idx] = !m_tx_parity[idx];
+							break;
+
+						case PARITY_MARK:
+							m_tx_parity[idx] = 1;
+							break;
+
+						case PARITY_SPACE:
+							m_tx_parity[idx] = 0;
+							break;
+						}
+
+						output_txd(idx, m_tx_parity[idx]);
+
+						if (m_tx_output[idx] == OUTPUT_TXD)
+						{
+							LOG("R65C52: TX%x PARITY BIT %d\n", idx + 1, m_txd);
+						}
+
+						if (!m_parity_err_mode[idx])
+						{
+							if (m_tx_parity[idx])
 							{
-								LOG("R65C52: TX%x BREAK END\n", idx+1);
-
-								m_tx_counter[idx] = 0;
-								m_tx_state[idx] = STATE_STOP;
-								m_tx_output[idx] = OUTPUT_TXD;
-
-								output_txd(idx, 1);
+								m_isr[idx] |= IRQ_PAR;
 							}
 							else
 							{
-								m_tx_counter[idx]--;
+								m_isr[idx] &= ~IRQ_PAR;
 							}
+							update_irq(idx);
+						}
+					}
+					else
+					{
+						m_tx_state[idx] = STATE_STOP;
+
+						output_txd(idx, 1);
+						// m_tdre[idx] = true;
+						// m_isr[idx] |= IRQ_TDRE;
+						// update_irq(idx);
+
+						if (m_tx_output[idx] == OUTPUT_TXD)
+						{
+							LOG("R65C52: TX%x STOP BIT\n", idx + 1);
+						}
+					}
+				}
+				break;
+			}
+
+			case STATE_STOP:
+			{
+				if (m_tx_counter[idx] >= stoplengthcounter(idx))
+				{
+					if (m_tx_output[idx] == OUTPUT_BREAK)
+					{
+						if (!m_brk[idx])
+						{
+							LOG("R65C52: TX%x BREAK END\n", idx + 1);
+
+							m_tx_counter[idx] = 0;
+							m_tx_state[idx] = STATE_STOP;
+							m_tx_output[idx] = OUTPUT_TXD;
+
+							output_txd(idx, 1);
 						}
 						else
 						{
-							m_tx_state[idx] = STATE_START;
-							m_tx_counter[idx] = 0;
+							m_tx_counter[idx]--;
 						}
 					}
-					break;
+					else
+					{
+						m_tx_state[idx] = STATE_START;
+						m_tx_counter[idx] = 0;
+					}
 				}
+				break;
+			}
 			}
 		}
 	}

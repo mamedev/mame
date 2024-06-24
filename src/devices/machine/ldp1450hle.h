@@ -35,11 +35,11 @@ class sony_ldp1450hle_device : public laserdisc_device, public device_serial_int
 {
 public:
 	// construction/destruction
-	sony_ldp1450hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sony_ldp1450hle_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto serial_tx() { return m_serial_tx.bind(); }
 
-	void set_baud(int32_t clock) { m_baud = clock; }
+	void set_baud(s32 clock) { m_baud = clock; }
 
 protected:
 	// device-level overrides
@@ -48,7 +48,7 @@ protected:
 
 	// laserdisc overrides
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
-	virtual int32_t player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
+	virtual s32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
 	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
 
 	// diserial overrides
@@ -61,7 +61,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(process_queue);
 
 private:
-	enum player_command : uint16_t
+	enum player_command : u16
 	{
 		CMD_AUDIO_OFF           =0x24,
 		CMD_AUDIO_ON            =0x25,
@@ -105,7 +105,7 @@ private:
 		CMD_USER_INDEX_OFF      =0x82,
 	};
 
-	enum player_mode : uint8_t
+	enum player_mode : u8
 	{
 		MODE_PARK,
 		MODE_DOOR_OPEN,
@@ -131,21 +131,21 @@ private:
 
 	};
 
-	enum address_mode : uint8_t
+	enum address_mode : u8
 	{
 		ADDRESS_FRAME,
 		ADDRESS_CHAPTER
 	};
 
 
-	void queue_reply(uint8_t reply, float delay);
-	void queue_reply_buffer (const uint8_t reply[], float delay);
+	void queue_reply(u8 reply, float delay);
+	void queue_reply_buffer (const u8 reply[], float delay);
 
-	static uint32_t bcd_to_literal(uint32_t bcd);
+	static u32 bcd_to_literal(u32 bcd);
 	static bool is_number(char value);
-	void add_command_byte(uint8_t command);
+	void add_command_byte(u8 command);
 
-	void begin_search(uint32_t value);
+	void begin_search(u32 value);
 
 	void update_audio_squelch();
 	void update_video_enable();
@@ -155,45 +155,45 @@ private:
 	emu_timer *         m_vbi_fetch;
 	emu_timer *         m_queue_timer;
 	bool                m_cmd_running;
-	uint8_t             m_reply_buffer[64];
+	u8             m_reply_buffer[64];
 	
-	uint8_t             m_reply_write_index;
-	uint8_t             m_reply_read_index;
-	uint8_t             m_reply;
+	u8             m_reply_write_index;
+	u8             m_reply_read_index;
+	u8             m_reply;
 
-	uint8_t             m_mode;                 // current player mode
-	uint8_t             m_submode;
-	uint32_t            m_baud;
-	uint32_t            m_chapter;
-	uint32_t            m_time;
-	uint32_t            m_frame;                // raw frame index (CAV mode)
-	uint32_t            m_search_chapter;
-	uint32_t            m_search_frame;
-	int32_t             m_cmd_buffer;
-	uint32_t            m_mark_chapter;
-	uint32_t            m_mark_frame;
-	uint32_t            m_repeat_chapter_start;
-	uint32_t            m_repeat_chapter_end;
-	uint32_t            m_repeat_frame_start;
-	uint32_t            m_repeat_frame_end;
-	uint32_t            m_repeat_repetitions;
+	u8             m_mode;                 // current player mode
+	u8             m_submode;
+	u32            m_baud;
+	u32            m_chapter;
+	u32            m_time;
+	u32            m_frame;                // raw frame index (CAV mode)
+	u32            m_search_chapter;
+	u32            m_search_frame;
+	s32            m_cmd_buffer;
+	u32            m_mark_chapter;
+	u32            m_mark_frame;
+	u32            m_repeat_chapter_start;
+	u32            m_repeat_chapter_end;
+	u32            m_repeat_frame_start;
+	u32            m_repeat_frame_end;
+	u32            m_repeat_repetitions;
 
-	uint8_t             m_video_switch;
-	bool                m_ch1_switch;
-	bool                m_ch2_switch;
-	uint8_t             m_display_switch;
-	uint8_t             m_address_flag;
-	uint16_t            m_base_speed;
-	uint16_t            m_speed;
-	uint32_t            m_speed_accum;
-	uint32_t            m_curr_frame;
+	u8             m_video_switch;
+	bool           m_ch1_switch;
+	bool           m_ch2_switch;
+	u8             m_display_switch;
+	u8             m_address_flag;
+	u16            m_base_speed;
+	u16            m_speed;
+	u32            m_speed_accum;
+	u32            m_curr_frame;
 
-	uint8_t             m_user_index_x;
-	uint8_t             m_user_index_y;
-	uint8_t             m_user_index_mode;
-	uint8_t             m_user_index_char_idx;
-	uint8_t             m_user_index_window_idx;
-	char                m_user_index_chars[32];
+	u8             m_user_index_x;
+	u8             m_user_index_y;
+	u8             m_user_index_mode;
+	u8             m_user_index_char_idx;
+	u8             m_user_index_window_idx;
+	char           m_user_index_chars[32];
 
 };
 

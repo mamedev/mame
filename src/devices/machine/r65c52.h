@@ -43,7 +43,9 @@
 class r65c52_device : public device_t
 {
 public:
-	r65c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	r65c52_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	void map(address_map &map);
 
 	auto irq1_handler() { return m_irq_handler[0].bind(); }
 	auto irq2_handler() { return m_irq_handler[1].bind(); }
@@ -54,8 +56,7 @@ public:
 	auto dtr1_handler() { return m_dtr_handler[0].bind(); }
 	auto dtr2_handler() { return m_dtr_handler[1].bind(); }
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	u8 read(offs_t offset);
 
 	void write_txc(int state); // txc
 	void write_rxc(int state);
@@ -73,7 +74,7 @@ public:
 	void _write_dsr(int idx, int state);
 	void _write_dcd(int idx, int state);
 
-	void set_xtal(uint32_t clock);
+	void set_xtal(u32 clock);
 	void set_xtal(const XTAL &clock) { set_xtal(clock.value()); }
 
 protected:
@@ -128,7 +129,7 @@ private:
 		OUTPUT_BREAK
 	};
 
-	uint8_t stoplengthcounter(int idx);
+	u8 stoplengthcounter(int idx);
 
 	void output_irq(int idx, int irq);
 	void output_txd(int idx, int txd);
@@ -138,17 +139,40 @@ private:
 	void update_irq(int idx);
 	void update_divider(int idx);
 
-	uint8_t read_isr(int idx);
-	uint8_t read_rdr(int idx);
-	uint8_t read_status(int idx);
-	uint8_t read_command(int idx);
+	u8 read_isr(int idx);
+	u8 read_rdr(int idx);
+	u8 read_status(int idx);
+	u8 read_command(int idx);
 
-	void write_ier(int idx, uint8_t data);
-	void write_tdr(int idx, uint8_t data);
-	void write_aux_ctrl(int idx, uint8_t data);
-	void write_compare(int idx, uint8_t data);
-	void write_control(int idx, uint8_t data);
-	void write_format(int idx, uint8_t data);
+
+	void ier_0_w(u8 data) { write_ier(0, data); }
+	void ier_1_w(u8 data) { write_ier(1, data); }
+
+	u8 isr_0_r() { return read_isr(0); }
+	u8 isr_1_r() { return read_isr(1); }
+
+	u8 rdr_0_r() { return read_rdr(0); }
+	u8 rdr_1_r() { return read_rdr(1); }
+
+	u8 status_0_r() { return read_status(0); }
+	u8 status_1_r() { return read_status(1); }
+
+	void tdr_0_w(u8 data) { write_tdr(0, data); }
+	void tdr_1_w(u8 data) { write_tdr(1, data); }
+
+	void write_ier(int idx, u8 data);
+	void write_tdr(int idx, u8 data);
+
+	void aux_compare_0_w(u8 data);
+	void aux_compare_1_w(u8 data);
+
+	void format_ctrl_0_w(u8 data);
+	void format_ctrl_1_w(u8 data);
+
+	void write_aux_ctrl(int idx, u8 data);
+	void write_compare(int idx, u8 data);
+	void write_control(int idx, u8 data);
+	void write_format(int idx, u8 data);
 	void isr_bit_set(int idx);
 
 	void internal_clock1(int state);
@@ -168,57 +192,57 @@ private:
 	devcb_write_line::array<2> m_dtr_handler;
 
 
-	uint8_t m_aux_ctrl[2];
-	uint8_t m_control[2];
-	uint8_t m_compare[2];
-	uint8_t m_format[2];
-	uint8_t m_status[2];
-	uint8_t m_tdr[2];
+	u8 m_aux_ctrl[2];
+	u8 m_control[2];
+	u8 m_compare[2];
+	u8 m_format[2];
+	u8 m_status[2];
+	u8 m_tdr[2];
 	bool m_tdre[2];
-	uint8_t m_rdr[2];
+	u8 m_rdr[2];
 	bool m_rdrf[2];
 
-	uint8_t m_ier[2];
-	uint8_t m_isr[2];
+	u8 m_ier[2];
+	u8 m_isr[2];
 
-	uint8_t m_irq[2];
+	u8 m_irq[2];
 
 	bool m_overrun[2];
 	bool m_parity_err[2];
-	uint8_t m_parity_err_mode[2];
+	u8 m_parity_err_mode[2];
 
-	uint8_t m_txd[2];
-	uint8_t m_rxc;
-	uint8_t m_rts[2];
-	uint8_t m_dtr[2];
+	u8 m_txd[2];
+	u8 m_rxc;
+	u8 m_rts[2];
+	u8 m_dtr[2];
 
-	uint32_t m_xtal;
-	uint8_t m_divide[2];
-	uint8_t m_cts[2];
-	uint8_t m_dsr[2];
-	uint8_t m_dcd[2];
-	uint8_t m_rxd[2];
+	u32 m_xtal;
+	u8 m_divide[2];
+	u8 m_cts[2];
+	u8 m_dsr[2];
+	u8 m_dcd[2];
+	u8 m_rxd[2];
 
-	uint8_t m_wordlength[2];
-	uint8_t m_stoplength[2];
-	uint8_t m_brk[2];
-	uint8_t m_echo_mode[2];
+	u8 m_wordlength[2];
+	u8 m_stoplength[2];
+	u8 m_brk[2];
+	u8 m_echo_mode[2];
 	int m_parity[2];
 
-	uint8_t m_rx_state[2];
-	uint8_t m_rx_clock[2];
-	uint8_t m_rx_bits[2];
-	uint8_t m_rx_shift[2];
+	u8 m_rx_state[2];
+	u8 m_rx_clock[2];
+	u8 m_rx_bits[2];
+	u8 m_rx_shift[2];
 	int m_rx_parity[2];
-	uint8_t m_rx_counter[2];
+	u8 m_rx_counter[2];
 
-	uint8_t m_tx_state[2];
-	uint8_t m_tx_output[2];
-	uint8_t m_tx_clock[2];
-	uint8_t m_tx_bits[2];
-	uint8_t m_tx_shift[2];
+	u8 m_tx_state[2];
+	u8 m_tx_output[2];
+	u8 m_tx_clock[2];
+	u8 m_tx_bits[2];
+	u8 m_tx_shift[2];
 	int m_tx_parity[2];
-	uint8_t m_tx_counter[2];
+	u8 m_tx_counter[2];
 };
 
 DECLARE_DEVICE_TYPE(R65C52, r65c52_device)

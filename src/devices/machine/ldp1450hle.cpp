@@ -64,7 +64,7 @@ DEFINE_DEVICE_TYPE(SONY_LDP1450HLE, sony_ldp1450hle_device, "ldp1450hle", "Sony 
 //  sony_ldp1450hle_device - constructor
 //-------------------------------------------------
 
-sony_ldp1450hle_device::sony_ldp1450hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sony_ldp1450hle_device::sony_ldp1450hle_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: laserdisc_device(mconfig, SONY_LDP1450HLE, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_serial_tx(*this)
@@ -75,10 +75,10 @@ sony_ldp1450hle_device::sony_ldp1450hle_device(const machine_config &mconfig, co
 	, m_mode(MODE_PARK)
 	, m_chapter(0)
 	, m_time(0)
-	, m_search_chapter(~uint32_t(0))
-	, m_search_frame(~uint32_t(0))
-	, m_mark_chapter(~uint32_t(0))
-	, m_mark_frame(~uint32_t(0))
+	, m_search_chapter(~u32(0))
+	, m_search_frame(~u32(0))
+	, m_mark_chapter(~u32(0))
+	, m_mark_frame(~u32(0))
 	, m_video_switch(1)
 	, m_ch1_switch(false)
 	, m_ch2_switch(false)
@@ -92,16 +92,16 @@ sony_ldp1450hle_device::sony_ldp1450hle_device(const machine_config &mconfig, co
 }
 
 
-void sony_ldp1450hle_device::queue_reply(uint8_t reply, float delay)
+void sony_ldp1450hle_device::queue_reply(u8 reply, float delay)
 {
-	const uint8_t reply_buffer[5] = {reply, 0, 0, 0, 0};
+	const u8 reply_buffer[5] = {reply, 0, 0, 0, 0};
 	queue_reply_buffer(reply_buffer, delay);
 }
 
-void sony_ldp1450hle_device::queue_reply_buffer(const uint8_t reply[], float delay)
+void sony_ldp1450hle_device::queue_reply_buffer(const u8 reply[], float delay)
 {
-	uint8_t max_writable = (uint8_t)std::size(m_reply_buffer);
-	for (uint8_t i = 0; i < 5 && reply[i] != 0; i++)
+	u8 max_writable = (u8)std::size(m_reply_buffer);
+	for (u8 i = 0; i < 5 && reply[i] != 0; i++)
 	{
 		m_reply_buffer[m_reply_write_index] = reply[i];
 		m_reply_write_index = (m_reply_write_index + 1) % max_writable;
@@ -112,7 +112,7 @@ void sony_ldp1450hle_device::queue_reply_buffer(const uint8_t reply[], float del
 
 TIMER_CALLBACK_MEMBER(sony_ldp1450hle_device::process_queue)
 {
-	LOGMASKED(LOG_REPLY_BYTES, "Sending reply byte: %02x\n", (uint8_t)m_reply_buffer[m_reply_read_index]);
+	LOGMASKED(LOG_REPLY_BYTES, "Sending reply byte: %02x\n", (u8)m_reply_buffer[m_reply_read_index]);
 	transmit_register_setup(m_reply_buffer[m_reply_read_index]);
 }
 
@@ -121,14 +121,14 @@ TIMER_CALLBACK_MEMBER(sony_ldp1450hle_device::process_queue)
 //  commands a direct numeric value
 //-------------------------------------------------
 
-uint32_t sony_ldp1450hle_device::bcd_to_literal(uint32_t bcd)
+u32 sony_ldp1450hle_device::bcd_to_literal(u32 bcd)
 {
-	uint32_t value = 0;
-	uint32_t shift = 28;
-	uint32_t multiplier = 10000000;
-	for (uint32_t i = 0; i < 8; i++)
+	u32 value = 0;
+	u32 shift = 28;
+	u32 multiplier = 10000000;
+	for (u32 i = 0; i < 8; i++)
 	{
-		uint32_t digit = (bcd >> shift) & 0xf;
+		u32 digit = (bcd >> shift) & 0xf;
 		bcd &= ~(0xf << shift);
 
 		value += digit * multiplier;
@@ -144,7 +144,7 @@ uint32_t sony_ldp1450hle_device::bcd_to_literal(uint32_t bcd)
 //  from the command buffer
 //-------------------------------------------------
 
-void sony_ldp1450hle_device::add_command_byte(uint8_t command)
+void sony_ldp1450hle_device::add_command_byte(u8 command)
 {
 	switch (m_submode)
 	{
@@ -304,7 +304,7 @@ void sony_ldp1450hle_device::add_command_byte(uint8_t command)
 				{
 					m_mode = MODE_STILL;
 					set_audio_squelch(true, true);
-					m_mark_frame = ~uint32_t(0);
+					m_mark_frame = ~u32(0);
 					advance_slider(1);
 					queue_reply(0x0a, 1.4);
 					break;
@@ -313,7 +313,7 @@ void sony_ldp1450hle_device::add_command_byte(uint8_t command)
 				{
 					m_mode = MODE_STILL;
 					set_audio_squelch(true, true);
-					m_mark_frame = ~uint32_t(0);
+					m_mark_frame = ~u32(0);
 					advance_slider(-1);
 					queue_reply(0x0a, 1.4);
 					break;
@@ -440,7 +440,7 @@ void sony_ldp1450hle_device::add_command_byte(uint8_t command)
 					m_repeat_chapter_start = 0;
 					m_repeat_chapter_end = 0;
 					m_repeat_repetitions = 0;
-					m_search_frame = ~uint32_t(0);
+					m_search_frame = ~u32(0);
 					update_audio_squelch();
 					queue_reply(0x0a, 9.0);
 					break;
@@ -570,9 +570,9 @@ void sony_ldp1450hle_device::add_command_byte(uint8_t command)
 				}
 				case CMD_ADDR_INQ:
 				{
-					uint8_t frame_buffer[5];
-					uint32_t frame_val = m_curr_frame;
-					for (uint8_t i = 0; i < 5; i++)
+					u8 frame_buffer[5];
+					u32 frame_val = m_curr_frame;
+					for (u8 i = 0; i < 5; i++)
 					{
 						frame_buffer[4 - i] = frame_val%10 + 0x30;
 						frame_val /= 10;
@@ -582,7 +582,7 @@ void sony_ldp1450hle_device::add_command_byte(uint8_t command)
 				}
 				case CMD_STATUS_INQ:
 				{
-					uint8_t status_buffer[5] = { 0x80, 0x00, 0x10, 0x00, 0xff};
+					u8 status_buffer[5] = { 0x80, 0x00, 0x10, 0x00, 0xff};
 
 					if (m_mode == MODE_PLAY || m_mode == MODE_MS_FORWARD || m_mode == MODE_MS_REVERSE)
 					{
@@ -632,7 +632,7 @@ void sony_ldp1450hle_device::add_command_byte(uint8_t command)
 //  begin_search - initiates a search operation
 //-------------------------------------------------
 
-void sony_ldp1450hle_device::begin_search(uint32_t value)
+void sony_ldp1450hle_device::begin_search(u32 value)
 {
 	if (m_address_flag == ADDRESS_FRAME)
 	{
@@ -754,15 +754,15 @@ void sony_ldp1450hle_device::device_reset()
 	m_mode = MODE_PARK;
 	m_chapter = 0;
 	m_time = 0;
-	m_cmd_buffer = ~uint32_t(0);
-	m_search_chapter = ~uint32_t(0);
-	m_search_frame = ~uint32_t(0);
-	m_mark_chapter = ~uint32_t(0);
-	m_mark_frame = ~uint32_t(0);
-	m_repeat_chapter_start = ~uint32_t(0);
-	m_repeat_chapter_end = ~uint32_t(0);
-	m_repeat_frame_start = ~uint32_t(0);
-	m_repeat_frame_end = ~uint32_t(0);
+	m_cmd_buffer = ~u32(0);
+	m_search_chapter = ~u32(0);
+	m_search_frame = ~u32(0);
+	m_mark_chapter = ~u32(0);
+	m_mark_frame = ~u32(0);
+	m_repeat_chapter_start = ~u32(0);
+	m_repeat_chapter_end = ~u32(0);
+	m_repeat_frame_start = ~u32(0);
+	m_repeat_frame_end = ~u32(0);
 	m_video_switch = 1;
 	m_ch1_switch = false;
 	m_ch2_switch = false;
@@ -784,10 +784,10 @@ void sony_ldp1450hle_device::device_reset()
 
 TIMER_CALLBACK_MEMBER(sony_ldp1450hle_device::process_vbi_data)
 {
-	uint32_t line = get_field_code(LASERDISC_CODE_LINE1718, false);
+	u32 line = get_field_code(LASERDISC_CODE_LINE1718, false);
 	if ((line & 0xf80000) == 0xf80000 || line == VBI_CODE_LEADIN || line == VBI_CODE_LEADOUT)
 	{
-		uint32_t old_frame = m_curr_frame;
+		u32 old_frame = m_curr_frame;
 		if (line == VBI_CODE_LEADIN)
 			m_curr_frame = 0;
 		else if (line == VBI_CODE_LEADOUT)
@@ -804,14 +804,14 @@ TIMER_CALLBACK_MEMBER(sony_ldp1450hle_device::process_vbi_data)
 		if (m_mode != MODE_STILL && m_mode != MODE_PAUSE)
 		{
 
-			if (m_mark_frame != ~uint32_t(0) && m_search_frame == ~uint32_t(0))
+			if (m_mark_frame != ~u32(0) && m_search_frame == ~u32(0))
 			{
 				int32_t old_delta = (int32_t)m_mark_frame - (int32_t)old_frame;
 				int32_t curr_delta = (int32_t)m_mark_frame - (int32_t)m_curr_frame;
 				LOGMASKED(LOG_STOPS, "Stop Mark is currently %d, old frame is %d, current frame is %d, old delta %d, curr delta %d\n", m_mark_frame, old_frame, m_curr_frame, old_delta, curr_delta);
 				if (curr_delta == 0 || (old_delta < 0) != (curr_delta < 0))
 				{
-					m_mark_frame = ~uint32_t(0);
+					m_mark_frame = ~u32(0);
 					if (is_cav_disc())
 					{
 						m_mode = MODE_STILL;
@@ -827,13 +827,13 @@ TIMER_CALLBACK_MEMBER(sony_ldp1450hle_device::process_vbi_data)
 				}
 			}
 
-			if (m_search_frame != ~uint32_t(0))
+			if (m_search_frame != ~u32(0))
 			{
 				// TODO: Chapter-search support
 				int32_t delta = (int32_t)m_search_frame - (int32_t)m_curr_frame;
 				if (delta == 0)
 				{
-					m_search_frame = ~uint32_t(0);
+					m_search_frame = ~u32(0);
 					if (is_cav_disc())
 					{
 						if (m_mode == MODE_SEARCH_REP)
@@ -872,7 +872,7 @@ TIMER_CALLBACK_MEMBER(sony_ldp1450hle_device::process_vbi_data)
 			}
 
 
-			bool repeat_hit = ((m_repeat_frame_end != ~uint32_t(0) && m_curr_frame >= m_repeat_frame_end) ||  (m_mode == MODE_MS_REVERSE && (m_repeat_frame_start != ~uint32_t(0) && m_curr_frame <= m_repeat_frame_start) ));
+			bool repeat_hit = ((m_repeat_frame_end != ~u32(0) && m_curr_frame >= m_repeat_frame_end) ||  (m_mode == MODE_MS_REVERSE && (m_repeat_frame_start != ~u32(0) && m_curr_frame <= m_repeat_frame_start) ));
 			if (m_repeat_repetitions != 0 && repeat_hit)
 			{
 
@@ -899,8 +899,8 @@ TIMER_CALLBACK_MEMBER(sony_ldp1450hle_device::process_vbi_data)
 				}
 				else
 				{
-					m_repeat_frame_end = ~uint32_t(0);
-					m_repeat_frame_start = ~uint32_t(0);
+					m_repeat_frame_end = ~u32(0);
+					m_repeat_frame_start = ~u32(0);
 					queue_reply(0x01, 1.3);
 				}
 			}
@@ -943,7 +943,7 @@ int32_t sony_ldp1450hle_device::player_update(const vbi_metadata &vbi, int field
 		if (m_mode == MODE_MS_REVERSE)
 			elapsed_tracks *= -1;
 
-		if (m_mark_frame != ~uint32_t(0))
+		if (m_mark_frame != ~u32(0))
 		{
 			int32_t jump_frame = (int32_t)m_curr_frame + elapsed_tracks;
 			int32_t curr_delta = (int32_t)m_mark_frame - (int32_t)m_curr_frame;
@@ -985,10 +985,10 @@ void sony_ldp1450hle_device::rcv_complete()
 
 void sony_ldp1450hle_device::tra_complete()
 {
-	m_reply_read_index = (m_reply_read_index + 1) % (uint8_t)std::size(m_reply_buffer);
+	m_reply_read_index = (m_reply_read_index + 1) % (u8)std::size(m_reply_buffer);
 	if (m_reply_read_index != m_reply_write_index)
 	{
-		uint8_t data = (uint8_t)m_reply_buffer[m_reply_read_index];
+		u8 data = (u8)m_reply_buffer[m_reply_read_index];
 		LOGMASKED(LOG_REPLY_BYTES, "Sending reply byte: %02x\n", data);
 		transmit_register_setup(data);
 	}

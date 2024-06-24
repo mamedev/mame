@@ -61,11 +61,8 @@
 
 namespace {
 
-#define CMP_REGISTER 0
-#define AUX_REGISTER 1
-
-#define MAIN_CLOCK XTAL(4'000'000)
-#define DACIA_CLOCK XTAL(3'686'400)
+#define MAIN_CLOCK 4_MHz_XTAL
+#define DACIA_CLOCK 3.6864_MHz_XTAL
 
 class cops_state : public driver_device
 {
@@ -305,7 +302,7 @@ void cops_state::io1_cops_w(offs_t offset, uint8_t data)
 			logerror("WOP6: data = %02x\n", data);
 			break;
 		case 0x07: /* WOP7 - watchdog*/
-			// m_watchdog->reset_w(data);
+			m_watchdog->reset_w(data);
 			break;
 		default:
 			logerror("Unknown io1_w, offset = %03x, data = %02x\n", offset, data);
@@ -385,7 +382,7 @@ void cops_state::io1_w(offs_t offset, uint8_t data)
 			4 C lamp
 			5 Continue lamp
 			6 Cash out meter
-			7 * lamp
+			7 '*' lamp
 			*/
 
 			// logerror("WOP5 (lamps): data = %02x\n", data);
@@ -421,15 +418,13 @@ void cops_state::io2_w(offs_t offset, uint8_t data)
 		case 0x02:
 			m_lamps[0xf] = BIT(data, 0); // Flash red
 			m_lamps[0x10] = BIT(data, 7); // Flash blue
-//			if ( data & ~0x91 ) logerror("Unknown io2_w, offset = %02x, data = %02x\n", offset, data);
+			// Any other I/O here?
 			break;
 		case 0x04:
 			for (int i = 5; i >= 0; i--)
 				m_lamps[0x11 + i] = BIT(data, i); // bullet
-			// if ( data & ~0x3f ) logerror("Unknown io2_w, offset = %02x, data = %02x\n", offset, data);
 			break;
 		default:
-			// logerror("Unknown io2_w, offset = %02x, data = %02x\n", offset, data);
 			break;
 	}
 }
@@ -464,14 +459,6 @@ void cops_state::via1_irq(int state)
 
 void cops_state::via1_a_w(uint8_t data)
 {
-
-//	logerror("via1_w, data = %02x\n", data);
-
-}
-
-void cops_state::via1_a_revlatns_w(uint8_t data)
-{
-	// logerror("vol, data = %02x\n", data & 0x70);
 }
 
 void cops_state::via1_b_w(uint8_t data)
@@ -525,7 +512,7 @@ void cops_state::cops_map(address_map &map)
 	map(0xb000, 0xb00f).m("via6522_1", FUNC(via6522_device::map));  /* VIA 1 */
 	map(0xb800, 0xb80f).m("via6522_2", FUNC(via6522_device::map));  /* VIA 2 */
 	map(0xc000, 0xcfff).rw(FUNC(cops_state::io2_r), FUNC(cops_state::io2_w));
-	map(0xd000, 0xd007).rw(m_dacia, FUNC(r65c52_device::read), FUNC(r65c52_device::write)); /* DACIA */
+	map(0xd000, 0xd007).m(m_dacia, FUNC(r65c52_device::map));
 	map(0xd800, 0xd80f).m("via6522_3", FUNC(via6522_device::map));  /* VIA 3 */
 	map(0xe000, 0xffff).bankr("sysbank1");
 }
@@ -537,7 +524,7 @@ void cops_state::revlatns_map(address_map &map)
 	map(0xa000, 0xafff).rw(FUNC(cops_state::io1_r), FUNC(cops_state::io1_w));
 	map(0xb000, 0xb00f).m("via6522_1", FUNC(via6522_device::map));  /* VIA 1 */
 	map(0xc000, 0xc00f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0xd000, 0xd007).rw(m_dacia, FUNC(r65c52_device::read), FUNC(r65c52_device::write)); /* DACIA */
+	map(0xd000, 0xd007).m(m_dacia, FUNC(r65c52_device::map));
 	map(0xe000, 0xffff).bankr("sysbank1");
 }
 
@@ -687,7 +674,6 @@ void cops_state::revlatns(machine_config &config)
 	/* via */
 	via6522_device &via1(MOS6522(config, "via6522_1", MAIN_CLOCK/4));
 	via1.irq_handler().set(FUNC(cops_state::via1_irq));
-	via1.writepa_handler().set(FUNC(cops_state::via1_a_revlatns_w));
 	via1.writepb_handler().set(FUNC(cops_state::via1_b_w));
 	via1.cb1_handler().set(FUNC(cops_state::via1_cb1_w));
 
@@ -700,7 +686,7 @@ void cops_state::revlatns(machine_config &config)
 
 	bacta.rxd_handler().set("dacia", FUNC(r65c52_device::write_rxd2));
 
-	MSM6242(config, "rtc", XTAL(32'768));
+	MSM6242(config, "rtc", 32.768_kHz_XTAL);
 }
 
 /***************************************************************************
@@ -739,18 +725,18 @@ ROM_END
 
 ROM_START( revlatns )
 	ROM_REGION( 0x8000, "program", 0 )
-	ROM_LOAD( "revelations_prog.u31", 0x0000, 0x8000, CRC(5ab41ac3) SHA1(0f7027551da17011576cf077e2f199729bb10482) ) //u31
+	ROM_LOAD( "revelations_prog.u31", 0x0000, 0x8000, CRC(5ab41ac3) SHA1(0f7027551da17011576cf077e2f199729bb10482) )
 
 	ROM_REGION( 0x8000, "system", 0 )
-	ROM_LOAD( "revelations_sys.u17", 0x0000, 0x8000, CRC(43e5e3ec) SHA1(fa44b102b5aa7ad2421c575abdc67f1c29f23bc1) ) //u17
+	ROM_LOAD( "revelations_sys.u17", 0x0000, 0x8000, CRC(43e5e3ec) SHA1(fa44b102b5aa7ad2421c575abdc67f1c29f23bc1) )
 
 	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "nova dp1-3a", 0, BAD_DUMP SHA1(f69c6a3def1e1eec0a58862c487e47d4da12b25e))  //one disc, no correction
+	DISK_IMAGE_READONLY( "nova dp1-3a", 0, BAD_DUMP SHA1(f69c6a3def1e1eec0a58862c487e47d4da12b25e))  //one disc, no correction, old method
 ROM_END
 
 } // Anonymous namespace
 
 
-GAMEL( 1994, cops,     0,    cops,     cops,     cops_state, init_cops, ROT0, "Atari Games",                      "Cops (USA)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1994, copsuk,   cops, cops,     cops,     cops_state, init_cops, ROT0, "Nova Productions / Deith Leisure", "Cops (UK)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1991, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions",                 "Revelations", MACHINE_SUPPORTS_SAVE, layout_revlatns ) 
+GAMEL( 1994, cops,     0,    cops,     cops,     cops_state, init_cops, ROT0, "Atari Games",                           "Cops (USA)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1994, copsuk,   cops, cops,     cops,     cops_state, init_cops, ROT0, "Nova Productions Ltd./ Deith Leisure",  "Cops (UK)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1991, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions Ltd.",                 "Revelations", MACHINE_SUPPORTS_SAVE, layout_revlatns ) 
