@@ -427,6 +427,9 @@ skattva                         // (c) 1995
 backgamn                        // (c) 1990
 manohman                        // 199?, Merkur.
 
+@source:adp/stella8085.cpp
+dicemstr
+
 @source:adp/stellafr.cpp
 st_ohla                         //
 st_vulkn                        //

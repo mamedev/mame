@@ -8,7 +8,7 @@ Standard PC with Intel DH61CR motherboard (IT8892E PCIe to PCI Bridge, Nuvoton W
 -Unknown RAM, unknown exact CPU type.
 -No security dongle needed (at least on the dumped machine).
 
-And an external PCB for I/O, conected by USB to the motherboard:
+And an external PCB for I/O, connected by USB to the motherboard:
 -ColdFire MCF51JM32VLK.
 -Two 8 dip switches banks.
 

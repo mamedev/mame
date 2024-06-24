@@ -176,6 +176,7 @@ const double XTAL::known_xtals[] = {
 	  9'987'000, /* 9.987_MHz_XTAL         Crazy Balloon */
 	 10'000'000, /* 10_MHz_XTAL            - */
 	 10'137'600, /* 10.1376_MHz_XTAL       Wyse WY-100 */
+	 10'240'000, /* 10.240_MHz_XTAL        Stella 8085 based fruit machines */
 	 10'245'000, /* 10.245_MHz_XTAL        PES Speech box */
 	 10'380'000, /* 10.38_MHz_XTAL         Fairlight Q219 Lightpen/Graphics Card */
 	 10'480'000, /* 10.48_MHz_XTAL         System-80 (50 Hz) */
