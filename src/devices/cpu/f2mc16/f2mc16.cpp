@@ -5028,7 +5028,7 @@ void f2mc16_device::opcodes_ea77(u8 operand)
 			m_tmp16 = read_rwX(operand & 3);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
 			m_tmp16 = read_16(m_tmpea);
-			m_tmp16 &= (m_acc & 0xffff);
+			m_tmp16 |= (m_acc & 0xffff);
 			write_16(m_tmpea, m_tmp16);
 			setNZ_16(m_tmp16);
 			m_ps &= ~F_V;
@@ -5052,7 +5052,7 @@ void f2mc16_device::opcodes_ea77(u8 operand)
 			m_tmp16 = read_rwX(operand & 3);
 			m_tmpea = getRWbank(operand & 3, m_tmp16);
 			m_tmp16 = read_16(m_tmpea);
-			m_tmp16 &= (m_acc & 0xffff);
+			m_tmp16 ^= (m_acc & 0xffff);
 			write_16(m_tmpea, m_tmp16);
 			setNZ_16(m_tmp16);
 			m_ps &= ~F_V;
