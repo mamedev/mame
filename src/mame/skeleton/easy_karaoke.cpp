@@ -282,6 +282,165 @@ ROM_START( karatvst )
 ROM_END
 
 /*
+The 'karatvsta' set has the following 25 songs built in, there don't appear to be any downloaded songs in this NAND dump
+These are a subset of the songs in the 50 song unit, and while the box advertises 35 songs, 10 of those are via a download voucher
+
+Always On My Mind                           Elvis Presley (R)
+Brick House                                 Commodores, The
+Dancing Queen                               Abba
+Don't Let Me Get Me                         Pink
+Drive (For Daddy Gene)                      Alan Jackson
+Fallin'                                     Alicia Keys
+Goodbye Earl                                Dixie Chicks
+Heard It Through The Grapevine              Marvin Gaye
+I Should Be Sleeping                        Emerson Drive
+Lady Marmalade                              Christina Aguilera
+Love Shack                                  B52's
+Me And Bobby Mcgee                          Janis Joplin
+My Girl                                     Temptations
+My Guy                                      Mary Wells
+New York New York                           Frank Sinatra
+No More Drama                               Mary J.Blige
+Over The Rainbow                            Judy Garland
+Stand By Your Man                           Tammy Wynette
+That's The Way (I Like It)                  KC And The Sunshine Band
+The Greatest Love Of All                    Whitney Houston
+The Loco-Motion                             Kylie Minogue
+There Is No Arizona                         Jamie O'neal
+What's Going On                             Marvin Gaye
+Wild Thing                                  Troggs
+Wrapped Around                              Brad Paisley
+*/
+
+ROM_START( karatvsta )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "tvstarkaraoke_sst37vf010_bfc5.bin", 0x000000, 0x20000, CRC(fbac56e9) SHA1(bae393ce86de108b6ddc603770863ced885280b6) ) // bootloader, only final bytes differ from karatvsta, serial number?
+
+	ROM_REGION( 0x840000, "nand", ROMREGION_ERASEFF ) // NAND with main program, graphics, built in songs (and potentially user downloads)
+	ROM_LOAD( "tvstarkaraoke_tc58v64aft_98e6a59a.bin", 0x000000, 0x840000, CRC(207f2c6b) SHA1(a8853b792ba23bdead913c8d5ad0c75c39a48c99) )
+ROM_END
+
+/*
+
+ABC                                         Jackson 5
+All I Have To Give                          Backstreet Boys
+Always On My Mind                           Elvis Presley
+Amazing Grace                               Traditional
+America The Beautiful                       Standard
+Auld Lang Syne                              Traditional
+...Baby One More Time                       Britney Spears
+Brick House                                 The Commodores
+Bye Bye Bye                                 N'Sync
+Dancing Queen                               Abba
+ Danny Boy                                   Traditional
+Don't Let Me Get Me                         pink
+Drive (For Daddy Gene)                      Alan Jackson
+Fallin'                                     Alicia Keys
+Girlfriend                                  N'Sync
+Goodbye Earl                                Dixie Chicks
+Hit 'Em Up Style                            Blu Cantrell
+I Believe I Can Fly                         R. Kelly
+I Heard It Through the Grapevine            Marvin Gaye
+I Wanna Know                                Joe
+I Want It That Way                          Backstreet Boys
+It's A Great Day To Be Alive                Travis Tritt
+Jingle Bells                                Traditional
+Lady Marmalade                              Christina Aguilera
+Love Shack                                  B52's
+Me And Bobby McGee                          Kris Kristofferson
+My Girl                                     Temptations
+My Guy                                      Mary Wells
+New York New York                           Frank Sinatra
+No More Drama                               Mary J. Blige
+O Sole Mio                                  Traditional
+One Fine Day                                Chiffons
+Oops...I Did It Again                       Britney Spears
+Over The Rainbow                            Judy Garland
+Overprotected                               Britney Spears
+Stand By Your Man                           Tammy Wynette
+Star Spangled Banner                        Public Domain
+Stop In The Name Of Love                    Supremes
+Stronger                                    Britney Spears
+Superman                                    Five For Fighting
+Swing Low, Sweet Chariot                    Traditional
+That's The Way (I Like It)                  KC And The Sunshine Band
+The Greatest Love Of All                    Whitney Houston
+The One                                     Backstreet Boys
+There Is No Arizona                         Jamie O'Neal
+We Wish You A Merry Xmas                    Traditional
+What's Going On                             Marvin Gaye
+When The Saints Go Marching In              Traditional
+Wild Thing                                  The Troggs
+Wrapped Around                              Brad Paisley
+
+-- downloaded songs?
+
+All The Things You Are                      Frank Sinatra
+How Great Thou Art                          Popular
+(Let Me Be Your) Teddy Bear                 Elvis Presley
+All I Have To Do Is Dream                   Everly Brothers
+Ave Maria                                   Christmas
+Blue Hawaii                                 Elvis Presley
+Blue Velvet                                 Bobby Vinton
+Breaking Up Is Hard To Do                   Neil Sedaka
+Calendar Girl                               Neil Sedaka
+Can't Help Falling In Love                  Elvis Presley
+Don't                                       Elvis Presley
+Everybody Loves Somebody                    Dean Martin
+For Me And My Gal                           Popular
+Frosty The Snowman                          Christmas
+Georgia On My Mind                          Ray Charles
+Give My Regards To Broadway                 Popular
+Good Luck Charm                             Elvis Presley
+It's Now Or Never                           Elvis Presley
+Jingle Bells                                Christmas
+Love Me Tender                              Elvis Presley
+Moon River                                  Andy Williams
+O Holy Night (Cantique De Noel)             Christmas
+Put Your Head On My Shoulder                Paul Anka
+Rudolph The Red Nosed Reindeer              Christmas
+Surfin' U.S.A.                              Beach Boys
+That's Life                                 Frank Sinatra
+The Beat Goes On                            Sonny & Cher
+Twinkle, Twinkle, Little Star               Children
+Unchained Melody                            Righteous Brothers
+What A Wonderful World                      Louis Armstrong
+White Christmas                             Bing Crosby
+Yesterday Once More                         Carpenters
+zz Free Test Song                           For Testing Download
+Crazy                                       Leann Rimes
+Nobody Does It Better                       Carly Simon
+As Time Goes By                             Frank Sinatra
+Smoke Gets In Your Eyes                     Platters
+Could I Have This Dance                     Anne Murray
+The Christmas Song                          Nat King Cole
+I Only Have Eyes For You                    Frank Sinatra
+Oh Pretty Woman                             Roy Orbison
+When I Fall In Love                         Clive Griffin
+Live And Let Die                            Guns N' Roses
+You're Sixteen                              Ringo Starr
+Puff (The Magic Dragon)                     Peter, Paul & Mary
+Crazy                                       Patsy Cline
+Hopelessly Devoted to You                   Olivia Newton-John
+I Can't Stop Loving You                     Ray Charles
+On The Road Again                           Willie Nelson
+You Light Up My Life                        Leann Rimes
+Happy Birthday Sweet Sixteen                Neil Sedaka
+Save The Last Dance For Me                  Drifters
+You're Nobody Till Somebody Loves You       Dean Martin
+Only You                                    Platters
+
+*/
+
+ROM_START( mks4001 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "memorex_sst37vf010.bin", 0x000000, 0x20000, CRC(e2eb86f1) SHA1(846734c1e193b268e24b8493334639a4311a8053) ) // bootloader, only final bytes differ from karatvsta, serial number?
+
+	ROM_REGION( 0x840000, "nand", ROMREGION_ERASEFF ) // NAND with main program, graphics, built in songs (and user downloads)
+	ROM_LOAD( "memorex_tc58v64bft.bin", 0x000000, 0x840000, CRC(980589e8) SHA1(e3f8d65ba92e7dbdba356a8c565aef9b0e800347) )
+ROM_END
+
+/*
 
 song list is unknown for the Japanese version as the titles aren't stored as ASCII in the flash ROM
 
@@ -381,12 +540,13 @@ ROM_END
 // This is the original US release, there's no cartridge slot, but it has a NAND Flash inside, and in addition to 50 built-in songs, advertises
 // use of a (now defunct) www.onkeysongs.com service for downloading additional songs to the microphone via bundled PC software.
 CONS( 2002, karatvst,      0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies", "KaraokeTV Star (US, with 50 songs)", MACHINE_IS_SKELETON )
+CONS( 2002, karatvsta,     karatvst,       0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies", "KaraokeTV Star (US, with 25 songs, 'FREE 35 Hit Songs / $35 value' packaging)", MACHINE_IS_SKELETON ) // 25 songs on unit, download code for 10 songs
+
+// The "Memorex Star Singer Karaoke / MKS4001" is also made by IVL and boasts 50 built in songs, the casing is different too.
+CONS( 2002, mks4001,       0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Memorex license)", "Star Singer Karaoke (MKS4001)", MACHINE_IS_SKELETON ) // 50 songs built in, appears to have around 54 downloads, including a test download
+
 // Bandai's Japanese release also lacks a cartridge slot, relying on downloads for additional songs. It also comes with a CD containing the PC-side software.  The external microphone design differs slightly.
 CONS( 2002, bkarast,       karatvst,       0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan)", MACHINE_IS_SKELETON )
-
-
-// There is also a 35 song US version
-// The "Memorex Star Singer Karaoke / MKS4001" is also made by IVL and boasts 50 built in songs, the casing is different, so it could differ from the standard version.
 
 // The European releases take cartridges rather than relying on a download service
 CONS( 2004, easykara,      karatvst,       0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Easy Karaoke license)", "Easy Karaoke Groove Station (UK)", MACHINE_IS_SKELETON )
