@@ -167,6 +167,7 @@ namespace bx
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_XBOXONE    \
 	|| BX_PLATFORM_WINRT      \
+	|| BX_PLATFORM_NX         \
 	|| BX_CRT_NONE
 		BX_UNUSED(_filePath);
 		return NULL;
@@ -190,6 +191,7 @@ namespace bx
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_XBOXONE    \
 	|| BX_PLATFORM_WINRT      \
+	|| BX_PLATFORM_NX         \
 	|| BX_CRT_NONE
 		BX_UNUSED(_handle);
 #else
@@ -209,6 +211,7 @@ namespace bx
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_XBOXONE    \
 	|| BX_PLATFORM_WINRT      \
+	|| BX_PLATFORM_NX         \
 	|| BX_CRT_NONE
 		BX_UNUSED(_handle, symbol);
 		return NULL;
@@ -232,6 +235,7 @@ namespace bx
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_XBOXONE    \
 	|| BX_PLATFORM_WINRT      \
+	|| BX_PLATFORM_NX         \
 	|| BX_CRT_NONE
 		BX_UNUSED(name, _out, _inOutSize);
 		return false;
@@ -275,6 +279,7 @@ namespace bx
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_XBOXONE    \
 	|| BX_PLATFORM_WINRT      \
+	|| BX_PLATFORM_NX         \
 	|| BX_CRT_NONE
 		BX_UNUSED(name, value);
 #else
