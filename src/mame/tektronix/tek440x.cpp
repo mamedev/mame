@@ -21,7 +21,7 @@
         Video is a 640x480 1bpp window on a 1024x1024 VRAM area; smooth panning around that area
         is possible as is flat-out changing the scanout address.
 
-    IRQ levels:
+    IRQ levels:	(see Figure 2.1-8)
         7 = Debug (NMI)
         6 = VBL
         5 = UART
@@ -118,7 +118,7 @@ class led_ncr5385_device : public ncr5385_device
 };
 DECLARE_DEVICE_TYPE(LED_NCR5385, led_ncr5385_device)
 
-DEFINE_DEVICE_TYPE(LED_NCR5385, led_ncr5385_device, "led_ncr5385", "NCR 5385 SCSI Protocol Controller")
+DEFINE_DEVICE_TYPE(LED_NCR5385, led_ncr5385_device, "led_ncr5385", "NCR 5385 SCSI Protocol Controller with LED")
 
 namespace {
 
@@ -209,7 +209,7 @@ private:
 	void rtc_w(offs_t offset, u8 data);
 
 	// need to handle bit 8 reset
-	void irq1_w(int state);
+	void irq1_raise(int state);
 	u16 timer_r(offs_t offset);
 	void timer_w(offs_t offset, u16 data);
 
@@ -308,6 +308,7 @@ void tek440x_state::machine_reset()
 	m_boot = true;
 	diag_w(0);
 	m_u244latch = 0;
+	m_led_disk = 0;
 	m_keyboard->kdo_w(1);
 	mapcntl_w(0);
 	m_vint->in_w<0>(0);		// VBL enable
@@ -323,6 +324,8 @@ void tek440x_state::machine_reset()
 
 u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	u16 invert = BIT(m_videocntl, 4) ? 0x0000 : 0xffff;
+
 	for (int y = 0; y < 480; y++)
 	{
 	
@@ -332,7 +335,7 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		for (int x = 0; x < 640; x += 16)
 		{
-			u16 const word = *(video_ram++);
+			u16 const word = *(video_ram++) ^ invert;
 			for (int b = 0; b < 16; b++)
 			{
 				line[x + b] = BIT(word, 15 - b);
@@ -471,7 +474,7 @@ u16 tek440x_state::map_r(offs_t offset)
 			return 0;
 	}
 
-	return m_map[offset >> 11];
+	return m_map[(offset >> 11) & 0x7ff];
 }
 
 void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
@@ -480,7 +483,7 @@ void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 
 	if (BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
-		COMBINE_DATA(&m_map[offset >> 11]);
+		COMBINE_DATA(&m_map[(offset >> 11) & 0x7ff]);
 	}
 }
 
@@ -738,19 +741,6 @@ void tek440x_state::vblank(int state)
 	}
 }
 
-
-void tek440x_state::irq1_w(int state)
-{
-	LOG("irq_w %04x\n", state);
-	
-	m_u244latch = state;
-	if (state == 1)
-	{
-		LOG("M68K_IRQ_1 assert\n");
-		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
-	}
-}
-
 u8 tek440x_state::rtc_r(offs_t offset)
 {
 	LOG("rtc_r %08x\n", offset);
@@ -763,12 +753,25 @@ void tek440x_state::rtc_w(offs_t offset, u8 data)
 
 }
 
+
+void tek440x_state::irq1_raise(int state)
+{
+	LOG("irq1_raise %04x\n", state);
+	
+//	if (m_u244latch == 1 && state == 0)
+	{
+		LOG("M68K_IRQ_1 assert\n");
+		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+	}
+	m_u244latch = state;
+}
+
 // to handle offset 0x1xx writes resetting TPInt...
 u16 tek440x_state::timer_r(offs_t offset)
 {
 	LOG("timer_r %08x\n", offset);
 
-	if (m_u244latch)
+//	if (m_u244latch)
 	{
 		LOG("M68K_IRQ_1 clear\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
@@ -778,12 +781,13 @@ u16 tek440x_state::timer_r(offs_t offset)
 	return m_timer->read16(offset);
 }
 
+// to handle offset 0x1xx writes resetting TPInt...
 void tek440x_state::timer_w(offs_t offset, u16 data)
 {
 	LOG("timer_w %08x %04x\n", OFF16_TO_OFF8(offset), data);
 	m_timer->write16(offset, data);
 
-	if (m_u244latch)
+//	if (m_u244latch)
 	{
 		LOG("M68K_IRQ_1 clear\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
@@ -814,9 +818,8 @@ void tek440x_state::logical_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rw(FUNC(tek440x_state::memory_r), FUNC(tek440x_state::memory_w));
 
-	map(0x800000, 0x803fff).rw(FUNC(tek440x_state::map_r), FUNC(tek440x_state::map_w));
-
-	map(0x804000, 0xffffff).noprw();	// selftest writes from 0x804000 - 0xffffff
+	// NB we mask in handlers because I do not understand .mirror()!
+	map(0x800000, 0xffffff).rw(FUNC(tek440x_state::map_r), FUNC(tek440x_state::map_w));
 }
 
 void tek440x_state::physical_map(address_map &map)
@@ -963,7 +966,7 @@ m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks 
 	// see diagram page 2.2-6
 	m_timer->out1_cb().set("irq1", FUNC(input_merger_device::in_w<0>));
 	m_timer->out2_cb().set("irq1", FUNC(input_merger_device::in_w<1>));
-	INPUT_MERGER_ALL_LOW(config, "irq1").output_handler().set(FUNC(tek440x_state::irq1_w));
+	INPUT_MERGER_ALL_HIGH(config, "irq1").output_handler().set(FUNC(tek440x_state::irq1_raise));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 
