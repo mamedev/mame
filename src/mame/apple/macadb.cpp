@@ -13,6 +13,7 @@
 #define LOG_STATE           (1U << 2)
 #define LOG_LINESTATE       (1U << 3)
 #define VERBOSE             (0)
+
 #include "logmacro.h"
 
 // ADB states
@@ -31,7 +32,7 @@ static constexpr int adb_timebase = 2000000;
 
 static constexpr int adb_short = 85;
 static constexpr int adb_long = 157;
-static constexpr int adb_srq = ((85+157)*3);
+static constexpr int adb_srq = 300;     // too long annoys the M50753 PMUs but Egret/Cuda/PIC are fine with it
 
 // ADB line states
 enum
@@ -731,7 +732,12 @@ void macadb_device::adb_talk()
 					LOGMASKED(LOG_TALK_LISTEN, "ADB: talking to unconnected device %d (K %d M %d)\n", addr, m_adb_keybaddr, m_adb_mouseaddr);
 					m_adb_buffer[0] = m_adb_buffer[1] = 0;
 					m_adb_datasize = 0;
-					m_adb_srqflag = true;
+
+					if ((adb_pollmouse()) && (m_mouse_handler & 0x20))
+					{
+						LOGMASKED(LOG_TALK_LISTEN, "Mouse requesting service\n");
+						m_adb_srqflag = true;
+					}
 				}
 				break;
 		}
