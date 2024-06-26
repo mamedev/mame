@@ -102,7 +102,6 @@ private:
 	void rtc_w(offs_t offset, u8 data);
 	void fdc_intrq_w(int state);
 	void fdc_drq_w(int state);
-	void busreq_w(int state);
 	void sio1_rdya_w(int state);
 	void sio1_rdyb_w(int state);
 	void sio2_rdya_w(int state);

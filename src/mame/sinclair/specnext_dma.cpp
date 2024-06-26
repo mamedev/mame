@@ -37,11 +37,6 @@ specnext_dma_device::specnext_dma_device(const machine_config &mconfig, const ch
 {
 }
 
-int specnext_dma_device::is_ready()
-{
-	return is_dma_enabled() || z80dma_device::is_ready();
-}
-
 void specnext_dma_device::write(u8 data)
 {
 	z80dma_device::write(data);
@@ -74,8 +69,7 @@ void specnext_dma_device::do_write()
 	if (m_byte_counter)
 		m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
 
-	u8 const mode = TRANSFER_MODE;
-	switch (mode)
+	switch (TRANSFER_MODE)
 	{
 	case TM_TRANSFER:
 		do_transfer_write();
@@ -91,7 +85,7 @@ void specnext_dma_device::do_write()
 		break;
 
 	default:
-		logerror("z80dma_do_operation: invalid mode %d!\n", mode);
+		logerror("z80dma_do_operation: invalid mode %d!\n", TRANSFER_MODE);
 		break;
 	}
 

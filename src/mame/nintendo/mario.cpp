@@ -341,10 +341,11 @@ void mario_state::mario_base(machine_config &config)
 	Z80(config, m_maincpu, Z80_CLOCK); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mario_state::mario_map);
 	m_maincpu->set_addrmap(AS_IO, &mario_state::mario_io_map);
+	downcast<z80_device &>(*m_maincpu).busack_cb().set(m_z80dma, FUNC(z80dma_device::bai_w));
 
 	/* devices */
 	Z80DMA(config, m_z80dma, Z80_CLOCK);
-	m_z80dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_z80dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_z80dma->in_mreq_callback().set(FUNC(mario_state::memory_read_byte));
 	m_z80dma->out_mreq_callback().set(FUNC(mario_state::memory_write_byte));
 

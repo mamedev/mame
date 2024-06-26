@@ -20,7 +20,6 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual int is_ready() override;
 	virtual void do_write() override;
 
 private:
