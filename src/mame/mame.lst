@@ -23411,7 +23411,8 @@ galsnewt                        // (c) 1990 Kaneko (Taiwan)
 galsnewu                        // (c) 1990 Kaneko (US)
 hotnight                        // (c) 1994 Bulldog Amusements Inc.
 missmw96                        // (c) 1996 Comad
-missw02                         // (c) 2002 Daigom
+missw02                         // (c) 2002 Comad
+missw02d                        // (c) 2002 Daigom
 missw96                         // (c) 1996 Comad
 missw96a                        // (c) 1996 Comad
 missw96b                        // (c) 1996 Comad
@@ -23424,6 +23425,7 @@ smissw                          //
 supmodel                        // (c) 1994 Comad & New Japan System
 supmodl2                        // (c) 1997 Comad
 wownfant                        // (c) 2002 Comad
+wownfanta                       // (c) 2002 Comad
 zipzap                          // (c) 1995 Barko Corp
 zipzapa                         // (c) 1995 Barko Corp
 
@@ -27027,9 +27029,9 @@ chkndrawa                       // (c) 1984 Merit
 couple                          // (c) 1988 Merit
 couplei                         // (c) 1988 Merit
 couplep                         // (c) 1988 Merit
-dodgectya                       // (c) 1986 Merit
-dodgectyb                       // (c) 1986 Merit
-dodgectyc                       // (c) 1986 Merit
+dodgectya                       // (c) 1988 Merit
+dodgectyb                       // (c) 1989 Merit
+dodgectyc                       // (c) 1989 Merit
 dtrvwz5                         // (c) 1987 Merit
 dtrvwz5v                        // (c) 1987 Merit
 housecard                       // (c) 1983 Merit
@@ -27042,6 +27044,7 @@ mdchoice                        // (c) 1983 Merit
 mpchoice                        // (c) 1983 Merit
 mpchoicea                       // (c) 1983 Merit
 mroundup                        // (c) 1984 Merit
+msupstar                        // (c) 1989 Merit
 phrcraze                        // (c) 1986 Merit
 phrcrazea                       // (c) 1986 Merit
 phrcrazeb                       // (c) 1986 Merit
@@ -27074,7 +27077,6 @@ trvwz4va                        // (c) 1985 Merit
 trvwza                          // (c) 1985 Merit
 trvwzb                          // (c) 1985 Merit
 trvwzv                          // (c) 1985 Merit
-unkmerit                        // (c) 1989 Merit
 
 @source:merit/merit3xx.cpp
 ma6710                          // (c) 1989 Merit
@@ -32876,6 +32878,7 @@ abcheck                         // (c) 1996 (Japan)
 
 @source:namco/namcops2.cpp
 acedriv3                        //
+batlgr3                         //
 bldyr3b                         //
 cobrata                         //
 dragchrn                        //
