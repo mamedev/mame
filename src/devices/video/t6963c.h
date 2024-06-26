@@ -78,6 +78,7 @@ private:
 	u8 m_font_size;
 	u8 m_number_cols;
 	u8 m_number_lines;
+	u8 m_read_data;
 };
 
 // ======================> lm24014h_device
