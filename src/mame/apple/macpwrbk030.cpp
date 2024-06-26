@@ -283,8 +283,6 @@ private:
 	void macgsc_palette(palette_device &palette) const;
 
 	u8 m_pmu_from_via = 0, m_pmu_to_via = 0, m_pmu_ack = 0, m_pmu_req = 0;
-	u8 m_pmu_akd = 0;
-
 
 	u8 pmu_p1_r() { return 0; }
 	u8 pmu_data_r() { return m_pmu_from_via; }
