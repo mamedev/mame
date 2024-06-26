@@ -40,6 +40,7 @@ protected:
 		zRETN ,zRL   ,zRLA  ,zRLC  ,zRLCA ,zRLD  ,zRR   ,zRRA  ,
 		zRRC  ,zRRCA ,zRRD  ,zRST  ,zSBC  ,zSCF  ,zSET  ,zSLA  ,
 		zSLL  ,zSRA  ,zSRL  ,zSUB  ,zXOR
+
 		// z80n
 										  ,zSWAP ,zMIRR ,zTEST ,
 		zBSLA ,zBSRA ,zBSRL ,zBSRF ,zBRLC ,zMUL  ,zOTIB ,zNREG ,
