@@ -14,8 +14,10 @@ TODO:
 all games:
 - Blitter needs to be device-ized
 shangha3:
-- The zoom used for the "100" floating score when you remove tiles is very
-  rough.
+- The zoom used for the "100" floating score when you remove tiles draws with
+  upper/bottom lines missing;
+- identify what exactly is the "protection device";
+- sometimes samples have playback drifts (btanb?);
 heberpop:
 - Unknown writes to sound ports 40/41
 blocken:
