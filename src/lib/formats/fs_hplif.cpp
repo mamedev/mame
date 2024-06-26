@@ -120,10 +120,10 @@ const char *fs::hplif_image::description() const
 
 void fs::hplif_image::enumerate_f(floppy_enumerator &fe) const
 {
-	fe.add(FLOPPY_HP300_FORMAT, floppy_image::FF_35, floppy_image::DSDD,  630784,  "hp_lif_9121_format_1",   "HP 9212 LIF 3.5\" dual-sided double density Format 1");
+	fe.add(FLOPPY_HP300_FORMAT, floppy_image::FF_35, floppy_image::DSDD,  630784,  "hp_lif_9121_format_1",   "HP 9121 LIF 3.5\" dual-sided double density Format 1");
 	fe.add(FLOPPY_HP300_FORMAT, floppy_image::FF_35, floppy_image::DSDD,  709632,  "hp_lif_9121_format_2",   "HP 9121 LIF 3.5\" dual-sided double density Format 2");
 	fe.add(FLOPPY_HP300_FORMAT, floppy_image::FF_35, floppy_image::DSDD,  788480,  "hp_lif_9121_format_3",   "HP 9121 LIF 3.5\" dual-sided double density Format 3");
-	fe.add(FLOPPY_HP300_FORMAT, floppy_image::FF_35, floppy_image::SSDD,  286720,  "hp_lif_9121_format_4",   "HP 9121 LIF 3.5\" single-sided double density Format 4");
+	fe.add(FLOPPY_HP300_FORMAT, floppy_image::FF_35, floppy_image::SSDD,  270336,  "hp_lif_9121_format_4",   "HP 9121 LIF 3.5\" single-sided double density Format 4");
 	fe.add(FLOPPY_HP300_FORMAT, floppy_image::FF_35, floppy_image::DSDD,  737280,  "hp_lif_9121_format_16",  "HP 9121 LIF 3.5\" dual-sided double density Format 16");
 
 	fe.add(FLOPPY_HP300_FORMAT, floppy_image::FF_35, floppy_image::DSHD, 1261568, "hp_lif_9122_format_014", "HP 9122 LIF 3.5\" dual-sided high density Format 0, 1, 4");
