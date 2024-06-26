@@ -14,6 +14,7 @@
 #include "video/rgbutil.h"
 #include "render.h"
 
+#include <array>
 
 template <typename PixelType, int SrcShiftR, int SrcShiftG, int SrcShiftB, int DstShiftR, int DstShiftG, int DstShiftB, bool NoDestRead = false, bool BilinearFilter = false>
 class software_renderer
@@ -426,8 +427,15 @@ private:
 
 	static void draw_line(render_primitive const &prim, PixelType *dstdata, s32 width, s32 height, u32 pitch)
 	{
-		// internal tables
-		static u32 s_cosine_table[2049];
+		// internal cosine table generated at compile-time
+		static const auto s_cosine_table = []() {
+			std::array<u32, 2049> result{};
+
+			for (int entry = 0; entry <= 2048; entry++)
+				result[entry] = int(double(1.0 / cos(atan(double(entry) / 2048.0))) * 0x10000000 + 0.5);
+
+			return static_cast<const std::array<u32, 2049>>(result);
+		}();
 
 		// compute the start/end coordinates
 		int x1 = int(prim.bounds.x0 * 65536.0f);
@@ -440,11 +448,6 @@ private:
 
 		if (PRIMFLAG_GET_ANTIALIAS(prim.flags))
 		{
-			// build up the cosine table if we haven't yet
-			if (s_cosine_table[0] == 0)
-				for (int entry = 0; entry <= 2048; entry++)
-					s_cosine_table[entry] = int(double(1.0 / cos(atan(double(entry) / 2048.0))) * 0x10000000 + 0.5);
-
 			int beam = prim.width * 65536.0f;
 			if (beam < 0x00010000)
 				beam = 0x00010000;
