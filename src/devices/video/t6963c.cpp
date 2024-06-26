@@ -238,7 +238,6 @@ void t6963c_device::do_command(u8 cmd)
 	else if ((cmd & 0xf8) == 0xa0)
 	{
 		logerror("%s: Select %d-line cursor\n", machine().describe_context(), (cmd & 0x07) + 1);
-		printf("Select %d-line cursor\n", (cmd & 0x07) + 1);
 	}
 	else if ((cmd & 0xfe) == 0xb0)
 	{
