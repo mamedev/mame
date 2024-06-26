@@ -23,7 +23,7 @@
 #define LOG_DMA      (1U << 4)
 #define LOG_COMMAND  (1U << 5)
 
-//#define VERBOSE (LOG_GENERAL|LOG_REGW|LOG_REGR|LOG_STATE|LOG_DMA|LOG_COMMAND)
+#define VERBOSE (LOG_GENERAL|LOG_REGW|LOG_REGR|LOG_STATE|LOG_DMA|LOG_COMMAND)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NCR5385, ncr5385_device, "ncr5385", "NCR 5385 SCSI Protocol Controller")
@@ -421,6 +421,8 @@ void ncr5385_device::cmd_w(u8 data)
 		case 0x18: case 0x19: case 0x1a: case 0x1b:
 		case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 			// reserved
+			m_int_status |= INT_INVALID_CMD;
+			update_int();
 			break;
 		}
 	}
