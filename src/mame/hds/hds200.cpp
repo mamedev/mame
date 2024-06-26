@@ -305,6 +305,7 @@ void hds200_state::hds200(machine_config &config)
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &hds200_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &hds200_state::io_map);
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	input_merger_device &z80_irq(INPUT_MERGER_ANY_HIGH(config, "z80_irq"));
 	z80_irq.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -312,7 +313,7 @@ void hds200_state::hds200(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	Z80DMA(config, m_dma, 8_MHz_XTAL / 2); // divider not verified
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->in_mreq_callback().set(FUNC(hds200_state::dma_mreq_r));
 	m_dma->out_mreq_callback().set(FUNC(hds200_state::dma_mreq_w));
 
