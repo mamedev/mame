@@ -29,6 +29,9 @@
       the 53C96's transfer count is zero.  The earlier ROM has the same logic as
       previous (and later!) 53C96 machines and works fine.
 
+      Video in chips
+
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -43,6 +46,7 @@
 #include "bus/nubus/cards.h"
 #include "bus/nubus/nubus.h"
 #include "cpu/m68000/m68040.h"
+#include "machine/input_merger.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 
@@ -166,16 +170,23 @@ void quadra630_state::macqd630(machine_config &config)
 
 	MACADB(config, m_macadb, C15M);
 
-	// TODO: recapamac.com.au's logic board photos show Cuda 2.40 for both Q630 and LC580,
-	// but both ROM versions have issues syncing with 2.38 and 2.40 while 2.37 works.
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
-	m_cuda->set_default_bios_tag("341s0788");
+	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(quadra630_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_primetimeii, FUNC(primetime_device::cb1_w));
 	m_cuda->via_data_callback().set(m_primetimeii, FUNC(primetime_device::cb2_w));
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
 	config.set_perfect_quantum(m_maincpu);
+
+	input_merger_device &sda_merger(INPUT_MERGER_ALL_HIGH(config, "sda"));
+	sda_merger.output_handler().append(m_cuda, FUNC(cuda_device::set_iic_sda));
+
+	m_cuda->iic_sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<0>));
+	m_cuda->iic_sda_callback().append(m_video, FUNC(valkyrie_device::sda_write));
+	m_cuda->iic_scl_callback().set(m_video, FUNC(valkyrie_device::scl_write));
+
+	m_video->sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<1>));
 
 	m_primetimeii->pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));
 	m_primetimeii->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));

@@ -164,6 +164,7 @@ const double XTAL::known_xtals[] = {
 	  8'960'000, /* 8.96_MHz_XTAL          Casio CZ-101 (divided by 2 for Music LSI) */
 	  9'000'000, /* 9_MHz_XTAL             Homedata PCBs */
 	  9'216'000, /* 9.216_MHz_XTAL         Univac UTS 20 */
+	  9'263'750, /* 9.263750_MHz_XTAL      Sai Yu Gou Ma Roku bootleg */
 	  9'400'000, /* 9.4_MHz_XTAL           Yamaha MU-5 and TG-100 */
 	  9'426'500, /* 9.4265_MHz_XTAL        Yamaha DX7, and DX9 */
 	  9'600'000, /* 9.6_MHz_XTAL           WD37C65 second clock (for 300 KB/sec rate) */
@@ -175,6 +176,7 @@ const double XTAL::known_xtals[] = {
 	  9'987'000, /* 9.987_MHz_XTAL         Crazy Balloon */
 	 10'000'000, /* 10_MHz_XTAL            - */
 	 10'137'600, /* 10.1376_MHz_XTAL       Wyse WY-100 */
+	 10'240'000, /* 10.240_MHz_XTAL        Stella 8085 based fruit machines */
 	 10'245'000, /* 10.245_MHz_XTAL        PES Speech box */
 	 10'380'000, /* 10.38_MHz_XTAL         Fairlight Q219 Lightpen/Graphics Card */
 	 10'480'000, /* 10.48_MHz_XTAL         System-80 (50 Hz) */
@@ -430,6 +432,7 @@ const double XTAL::known_xtals[] = {
 	 34'000'000, /* 34_MHz_XTAL            Gaelco PCBs */
 	 34'291'712, /* 34.291712_MHz_XTAL     Fairlight CMI master card */
 	 34'846'000, /* 34.846_MHz_XTAL        Visual 550 */
+	 35'452'500, /* 35.4525_MHz_XTAL       Nokia MikroMikko 2 */
 	 35'469'000, /* 35.469_MHz_XTAL        ZX Spectrum +2/+3 (~8x PAL subcarrier) */
 	 35'640'000, /* 35.640_MHz_XTAL        HDS200 132-column display clock */
 	 35'834'400, /* 35.8344_MHz_XTAL       Tab Products E-22 132-column display clock */
@@ -473,6 +476,7 @@ const double XTAL::known_xtals[] = {
 	 51'200'000, /* 51.2_MHz_XTAL          Namco Super System 22 video clock */
 	 52'000'000, /* 52_MHz_XTAL            Cojag */
 	 52'832'000, /* 52.832_MHz_XTAL        Wang PC TIG video controller */
+	 52'867'000, /* 52.867_MHz_XTAL        Atlus Print Club (Sega C2 PCB) */
 	 53'203'424, /* 53.203424_MHz_XTAL     Master System, Mega Drive PAL (12x PAL subcarrier) */
 	 53'693'175, /* 53.693175_MHz_XTAL     PSX-based h/w, Sony ZN1-2-based (15x NTSC subcarrier) */
 	 54'000'000, /* 54_MHz_XTAL            Taito JC */

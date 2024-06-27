@@ -840,7 +840,9 @@ void ti99_4x_state::console_reset(int state)
 	{
 		LOGMASKED(LOG_RESETLOAD, "Console reset line = %d\n", state);
 		m_cpu->set_input_line(INT_9900_RESET, state);
-		m_video->reset_line(state);
+		// Don't reset the (not existing) console video chip in the EVPC configuration
+		if (m_model != MODEL_4EV)
+			m_video->reset_line(state);
 		m_ioport->reset_in(state);
 	}
 }

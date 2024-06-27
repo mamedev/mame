@@ -4,7 +4,7 @@
 
     okim9810.h
 
-    OKI MSM9810 ADPCM(2) sound chip.
+    OKI MSM9810 / MSM9811 ADPCM(2) sound chips.
 
     TODO:
         Serial input/output are not verified
@@ -154,6 +154,10 @@ void okim9810_device::device_start()
 	save_item(STRUCT_MEMBER(m_voice, m_samplingFreq));
 	save_item(STRUCT_MEMBER(m_voice, m_playing));
 	save_item(STRUCT_MEMBER(m_voice, m_sample));
+	save_item(STRUCT_MEMBER(m_voice, m_phrase_offset));
+	save_item(STRUCT_MEMBER(m_voice, m_phrase_count));
+	save_item(STRUCT_MEMBER(m_voice, m_phrase_wait_cnt));
+	save_item(STRUCT_MEMBER(m_voice, m_phrase_state));
 	save_item(STRUCT_MEMBER(m_voice, m_channel_volume));
 	save_item(STRUCT_MEMBER(m_voice, m_pan_volume_left));
 	save_item(STRUCT_MEMBER(m_voice, m_pan_volume_right));
@@ -362,39 +366,37 @@ void okim9810_device::write_command(uint8_t data)
 			endAddr |= read_byte(base + 6) << 8;
 			endAddr |= read_byte(base + 7) << 0;
 
-			// Sub-table
-			if (startFlags & 0x80)
+			if (BIT(startFlags, 7))
 			{
-				offs_t subTable = startAddr;
-				// TODO: New startFlags &= 0x80.  Are there further subtables?
-				startFlags = read_byte(subTable + 0);
-				startAddr  = read_byte(subTable + 1) << 16;
-				startAddr |= read_byte(subTable + 2) << 8;
-				startAddr |= read_byte(subTable + 3) << 0;
-
-				// TODO: What does byte (subTable + 4) refer to?
-				endAddr  = read_byte(subTable + 5) << 16;
-				endAddr |= read_byte(subTable + 6) << 8;
-				endAddr |= read_byte(subTable + 7) << 0;
+				// use "Phrase Control Table" mode
+				m_voice[channel].m_phrase_offset = startAddr;
+				m_voice[channel].m_phrase_count = endAddr - startAddr + 1;
+				if (m_voice[channel].m_phrase_count == 0)
+					LOG("MSM9810: Empty phrase subtable\n");
+				m_voice[channel].m_phrase_state = SEQ_ACTIVE;
 			}
+			else
+			{
+				// single sample mode
+				m_voice[channel].m_phrase_state = SEQ_STOP;
+				m_voice[channel].m_sample = 0;
+				m_voice[channel].m_interpSampleNum = 0;
+				m_voice[channel].m_startFlags = startFlags;
+				m_voice[channel].m_base_offset = startAddr;
+				m_voice[channel].m_endFlags = endFlags;
+				m_voice[channel].m_count = endAddr - startAddr + 1;
 
-			m_voice[channel].m_sample = 0;
-			m_voice[channel].m_interpSampleNum = 0;
-			m_voice[channel].m_startFlags = startFlags;
-			m_voice[channel].m_base_offset = startAddr;
-			m_voice[channel].m_endFlags = endFlags;
-			m_voice[channel].m_count = (endAddr-startAddr) + 1;     // Is there yet another extra byte at the end?
+				m_voice[channel].m_playbackAlgo = (startFlags & 0x30) >> 4; // Not verified
+				m_voice[channel].m_samplingFreq = startFlags & 0x0f;
+				if (m_voice[channel].m_playbackAlgo == ADPCM_PLAYBACK ||
+					m_voice[channel].m_playbackAlgo == ADPCM2_PLAYBACK)
+					m_voice[channel].m_count *= 2;
+				else if (m_voice[channel].m_playbackAlgo == NONLINEAR8_PLAYBACK)
+					logerror("MSM9810: UNIMPLEMENTED PLAYBACK METHOD %d\n", m_voice[channel].m_playbackAlgo);
 
-			m_voice[channel].m_playbackAlgo = (startFlags & 0x30) >> 4; // Not verified
-			m_voice[channel].m_samplingFreq = startFlags & 0x0f;
-			if (m_voice[channel].m_playbackAlgo == ADPCM_PLAYBACK ||
-				m_voice[channel].m_playbackAlgo == ADPCM2_PLAYBACK)
-				m_voice[channel].m_count *= 2;
-			else if (m_voice[channel].m_playbackAlgo == NONLINEAR8_PLAYBACK)
-				logerror("MSM9810: UNIMPLEMENTED PLAYBACK METHOD %d\n", m_voice[channel].m_playbackAlgo);
-
-			LOG("FADR  channel %d phrase offset %02x => ", channel, m_TMP_register);
-			LOG("startFlags(%02x) startAddr(%06x) endFlags(%02x) endAddr(%06x) bytes(%d)\n", startFlags, startAddr, endFlags, endAddr, endAddr-startAddr);
+				LOG("FADR  channel %d phrase offset %02x => ", channel, m_TMP_register);
+				LOG("startFlags(%02x) startAddr(%06x) endFlags(%02x) endAddr(%06x) bytes(%d)\n", startFlags, startAddr, endFlags, endAddr, endAddr - startAddr);
+			}
 			break;
 		}
 
@@ -406,6 +408,7 @@ void okim9810_device::write_command(uint8_t data)
 				offs_t endAddr = m_dadr_end_offset;
 				uint8_t startFlags = m_dadr_flags;
 
+				m_voice[channel].m_phrase_state = SEQ_STOP;
 				m_voice[channel].m_sample = 0;
 				m_voice[channel].m_interpSampleNum = 0;
 				m_voice[channel].m_startFlags = startFlags;
@@ -605,6 +608,10 @@ okim9810_device::okim_voice::okim_voice()
 		m_samplingFreq(2),
 		m_playing(false),
 		m_sample(0),
+		m_phrase_offset(0),
+		m_phrase_count(0),
+		m_phrase_wait_cnt(0),
+		m_phrase_state(SEQ_STOP),
 		m_channel_volume(0x00),
 		m_pan_volume_left(0x00),
 		m_pan_volume_right(0x00),
@@ -644,6 +651,59 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 	// loop while we still have samples to generate
 	for (int sampindex = 0; sampindex < outL.samples(); sampindex++)
 	{
+		if (m_phrase_state == SEQ_PAUSE)
+		{
+			m_phrase_wait_cnt--;
+			if (m_phrase_wait_cnt > 0)
+				continue;
+			else
+				m_phrase_state = SEQ_ACTIVE;
+		}
+		if (m_phrase_state == SEQ_ACTIVE)
+		{
+			if (m_phrase_count > 0)
+			{
+				offs_t startAddr, endAddr;
+				uint8_t startFlags = rom.read_byte(m_phrase_offset++);
+				m_phrase_count--;
+				if (!BIT(startFlags, 7))
+				{
+					m_phrase_state = SEQ_PAUSE;
+					m_phrase_wait_cnt = (startFlags & 0x1f) * 16384; // not verified, doc says range from 4ms to 124ms
+					continue;
+				}
+
+				startAddr = rom.read_byte(m_phrase_offset++) << 16;
+				startAddr |= rom.read_byte(m_phrase_offset++) << 8;
+				startAddr |= rom.read_byte(m_phrase_offset++) << 0;
+				m_channel_volume = rom.read_byte(m_phrase_offset++) & 0xf; // not verified
+				endAddr = rom.read_byte(m_phrase_offset++) << 16;
+				endAddr |= rom.read_byte(m_phrase_offset++) << 8;
+				endAddr |= rom.read_byte(m_phrase_offset++) << 0;
+				m_phrase_count -= 7;
+
+				m_sample = 0;
+				m_interpSampleNum = 0;
+				m_startFlags = startFlags;
+				m_base_offset = startAddr;
+				m_count = endAddr - startAddr + 1;
+				m_playbackAlgo = (startFlags & 0x30) >> 4; // Not verified
+				m_samplingFreq = startFlags & 0x0f;
+				if (m_playbackAlgo == ADPCM_PLAYBACK || m_playbackAlgo == ADPCM2_PLAYBACK)
+					m_count *= 2;
+
+				m_phrase_state = SEQ_PLAY;
+				totalInterpSamples = s_sampling_freq_div_table[m_samplingFreq];
+				if (totalInterpSamples == 1)
+					return;
+			}
+			else
+			{
+				m_phrase_state = SEQ_STOP;
+				m_playing = false;
+				break;
+			}
+		}
 		// If interpSampleNum == 0, we are at the beginning of a new interp chunk, gather data
 		if (m_interpSampleNum == 0)
 		{
@@ -772,8 +832,13 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 		{
 			if (!m_looping)
 			{
-				m_playing = false;
-				break;
+				if (m_phrase_state == SEQ_STOP)
+				{
+					m_playing = false;
+					break;
+				}
+				else
+					m_phrase_state = SEQ_ACTIVE;
 			}
 			else
 			{

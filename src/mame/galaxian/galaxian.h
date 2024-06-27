@@ -121,6 +121,7 @@ public:
 	void theend_protection_w(uint8_t data);
 	uint8_t theend_protection_r();
 	template <int N> int theend_protection_alt_r();
+	uint8_t scrammr_protection_r();
 	void explorer_sound_control_w(uint8_t data);
 	uint8_t frogger_ppi8255_r(offs_t offset);
 	void frogger_ppi8255_w(offs_t offset, uint8_t data);
@@ -278,6 +279,7 @@ public:
 	void turtles(machine_config &config);
 	void fantastc(machine_config &config);
 	void jumpbug(machine_config &config);
+	void jumpbugbrf(machine_config &config);
 	void checkmaj(machine_config &config);
 	void pacmanbl(machine_config &config);
 	void quaak(machine_config &config);
@@ -311,6 +313,7 @@ public:
 	void thepitm(machine_config &config);
 	void kong(machine_config &config);
 	void bongo(machine_config &config);
+	void bongog(machine_config &config);
 	void scorpnmc(machine_config &config);
 	void ckongg(machine_config &config);
 	void ckongmc(machine_config &config);
@@ -319,6 +322,7 @@ public:
 	void mimonscr(machine_config &config);
 	void galartic(machine_config &config);
 	void bigkonggx(machine_config &config);
+	void scrammr(machine_config &config);
 
 	template <int Mask> CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
 	template <int Mask> int ckongs_coinage_r();
@@ -339,6 +343,7 @@ protected:
 	void astroamb_map(address_map &map);
 	void bigkonggx_map(address_map &map);
 	void bongo_map(address_map &map);
+	void bongog_map(address_map &map);
 	void bongo_io_map(address_map &map);
 	void checkmaj_sound_map(address_map &map);
 	void checkman_sound_map(address_map &map);
@@ -363,6 +368,7 @@ protected:
 	void galaxian_map_discrete(address_map &map);
 	void highroll_map(address_map &map);
 	void jumpbug_map(address_map &map);
+	void jumpbugbrf_map(address_map &map);
 	void jungsub_map(address_map &map);
 	void jungsub_io_map(address_map &map);
 	void konami_sound_map(address_map &map);

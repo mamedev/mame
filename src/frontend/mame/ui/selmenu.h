@@ -314,7 +314,8 @@ private:
 	{
 		if (!m_prev_selected)
 		{
-			set_selected_index(0);
+			if (m_available_items)
+				set_selected_index(0);
 		}
 		else
 		{

@@ -313,6 +313,9 @@ void tsconf_state::tsconf(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(tsconf_state::tsconf_palette), 256);
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(0), 448, 320, with_vblank(0), 320);
+	m_screen->set_screen_update(FUNC(tsconf_state::screen_update));
+	m_screen->set_no_palette();
+
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tsconf);
 	RAM(config, m_cram).set_default_size("512").set_default_value(0);
 	RAM(config, m_sfile).set_default_size("512").set_default_value(0); // 85*6

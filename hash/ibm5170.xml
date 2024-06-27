@@ -6645,6 +6645,20 @@ https://admin.pci-ids.ucw.cz/read/PC/10ec/8139/1429d010
 		</part>
 	</software>
 
+	<software name="nokiamona" cloneof="nokiamon" supported="no">
+		<description>Nokia Monitor Setup for Windows 95 (Alt)</description>
+		<year>1995</year>
+		<publisher>Nokia</publisher>
+		<notes><![CDATA[
+Various Nokia [monitor] drivers, 44x-based
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="zk0001.img" size="1474560" crc="9ac0b2e8" sha1="8539cfe9990d0b6f842e0218c6536e9688898e4f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nokiamon" supported="no">
 		<description>Nokia Monitor Setup for Windows 95</description>
 		<year>1998</year>
@@ -24149,6 +24163,60 @@ Bombs: An amusing little desktop game.
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="diskd.img" size="1474560" crc="5d84110d" sha1="0140425ccb5aea27ccbff00a320941cccd86ac7a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elecprin" supported="no">
+		<description>Electronics Principles 3.0</description>
+		<year>1997</year>
+		<publisher>EPT Educational Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="effbf2c7" sha1="3462a6fbc29dd0b5059c58e503cae3b0c2c75169"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="9a6f2fdc" sha1="75d3ad80a155214cddcf3df7e97ae64d1ccc1212"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcbdesgn" supported="no">
+		<description>PCB Designer</description>
+		<year>1996</year>
+		<publisher>Niche Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk.img" size="737280" crc="90bd7c5b" sha1="b3ae2ba4e0ac43934b04fe8845ce216d382929b1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpdj6x0" supported="no">
+		<description>HP DeskJet -kirjoitinohjelmisto DeskJet 600- ja 660C -kirjoittimille (Fin)</description>
+		<year>1995</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="c2184-10016.img" size="1474560" crc="601c263d" sha1="d7e8d4892a519aad964dd5f3b08fe73a9ebc066a"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="c2184-10017.img" size="1474560" crc="6d69fd64" sha1="a3b11e36a0e5345a50ecebe15f0fa372bb5baf0d"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="c2184-10018.img" size="1474560" crc="3e99bc78" sha1="2a9aa6bea9ca7f6197d53aa9c2cf2546c8c2e1ab"/>
 			</dataarea>
 		</part>
 	</software>

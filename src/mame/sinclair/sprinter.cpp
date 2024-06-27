@@ -123,6 +123,7 @@ protected:
 	void update_cpu();
 
 	virtual TIMER_CALLBACK_MEMBER(irq_on) override;
+	virtual TIMER_CALLBACK_MEMBER(irq_off) override;
 	TIMER_CALLBACK_MEMBER(cbl_tick);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -258,6 +259,7 @@ private:
 	u8 m_isa_addr_ext;
 	std::pair<s8, s8> m_hold;
 	u8 m_kbd_data_cnt;
+	bool m_in_out_cmd;
 
 	bool m_ata_selected; // 0-primary, 1-secondary
 	u8 m_ata_data_latch;
@@ -281,6 +283,7 @@ private:
 	u8 m_cbl_wa;
 	bool m_cbl_wae;
 	emu_timer *m_cbl_timer = nullptr;
+	bool m_hold_irq;
 };
 
 void sprinter_state::update_memory()
@@ -858,7 +861,7 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 void sprinter_state::accel_control_r(u8 data)
 {
 	const bool is_prefix = (data == 0xcb) || (data == 0xdd) || (data == 0xed) || (data == 0xfd);
-	if (!is_prefix && !m_prf_d) // neither prefix nor prefixed
+	if (acc_ena() && !is_prefix && !m_prf_d) // neither prefix nor prefixed
 	{
 		if ((((data & 0x1b) == 0x00) || ((data & 0x1b) == 0x09) || ((data & 0x1b) == 0x12) || ((data & 0x1b) == 0x1b))
 			&& (((data & 0xe4) == 0x40) || ((data & 0xe4) == 0x64)))
@@ -1087,7 +1090,7 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 				vram_w(vxa, data);
 			}
 		}
-		else if ((m_acc_dir != OFF) && (page == 0xfd))
+		else if ((m_acc_dir == COPY) && (page == 0xfd))
 		{
 			if (!cbl_mode16())
 				m_cbl_data[m_cbl_wa++] = (data << 8);
@@ -1195,8 +1198,12 @@ u8 sprinter_state::m1_r(offs_t offset)
 	u8 data = m_program.read_byte(offset);
 	m_z80_m1 = 0;
 
-	if (!machine().side_effects_disabled() && acc_ena())
+	if (!machine().side_effects_disabled())
+	{
+		if (!m_prf_d)
+			m_in_out_cmd = (data & 0xf7) == 0xd3; // d3/db
 		accel_control_r(data);
+	}
 
 	return data;
 }
@@ -1255,6 +1262,8 @@ void sprinter_state::init_taps()
 	{
 		if (!machine().side_effects_disabled())
 		{
+			if (!m_z80_m1 && m_in_out_cmd && data == 0x1f)
+				data = 0x0f;
 			if (!(m_pages[BIT(offset, 14, 2)] & (BANK_FASTRAM_MASK | BANK_ISA_MASK))) // ROM+RAM
 				do_cpu_wait();
 			if(!m_z80_m1 && acc_ena() && (m_acc_dir != OFF))
@@ -1263,6 +1272,8 @@ void sprinter_state::init_taps()
 	});
 	prg.install_write_tap(0x10000, 0x1ffff, "accel_write", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
+		if (!m_z80_m1 && m_in_out_cmd && data == 0x1f)
+			data = 0x0f;
 		if (!(m_pages[BIT(offset, 14, 2)] & 0xff00)) // ROM only, RAM(w) applies waits manually
 			do_cpu_wait();
 		if (!m_z80_m1 && acc_ena() && (m_acc_dir != OFF))
@@ -1304,6 +1315,7 @@ void sprinter_state::machine_start()
 	save_item(NAME(m_isa_addr_ext));
 	//save_item(NAME(m_hold));
 	save_item(NAME(m_kbd_data_cnt));
+	save_item(NAME(m_in_out_cmd));
 	save_item(NAME(m_ata_selected));
 	save_item(NAME(m_ata_data_latch));
 	save_item(NAME(m_skip_write));
@@ -1321,6 +1333,7 @@ void sprinter_state::machine_start()
 	save_item(NAME(m_cbl_cnt));
 	save_item(NAME(m_cbl_wa));
 	save_item(NAME(m_cbl_wae));
+	save_item(NAME(m_hold_irq));
 
 	m_beta->enable();
 
@@ -1376,10 +1389,12 @@ void sprinter_state::machine_reset()
 
 	m_cbl_xx = 0;
 	m_cbl_wa = 0;
+	m_hold_irq = 0;
 
 	m_ata_selected = 0;
 
 	m_kbd_data_cnt = 0;
+	m_in_out_cmd = false;
 	m_turbo_hard = 1;
 
 	if (m_conf_loading)
@@ -1441,7 +1456,7 @@ void sprinter_state::video_start()
 static void sprinter_ata_devices(device_slot_interface &device)
 {
 	device.option_add("hdd", IDE_HARDDISK);
-	device.option_add("cdrom", ATAPI_FIXED_CDROM);
+	device.option_add("cdrom", ATAPI_FIXED_CDROM); // TODO must be ATAPI_CDROM
 	device.option_add("dvdrom", ATAPI_FIXED_DVDROM);
 }
 
@@ -1506,8 +1521,19 @@ void sprinter_state::do_cpu_wait(bool is_io)
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 {
-	m_maincpu->pulse_input_line(INPUT_LINE_IRQ0, attotime::from_ticks(26, m_maincpu->clock()));
+	if (!m_hold_irq)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
+	}
 	update_int(false);
+}
+
+TIMER_CALLBACK_MEMBER(sprinter_state::irq_off)
+{
+	m_irq_off_timer->adjust(attotime::never); // in case it's called from INT Ack, not by timer itself
+	m_hold_irq = 0;
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
@@ -1523,7 +1549,11 @@ TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
 	m_rdac->write(right);
 
 	if (cbl_int_ena() && !(m_cbl_cnt & 0x7f))
+	{
+		m_hold_irq = 1;
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_irq_off_timer->adjust(attotime::never);
+	}
 }
 
 INPUT_CHANGED_MEMBER(sprinter_state::turbo_changed)
@@ -1692,7 +1722,7 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->set_io_map(&sprinter_state::map_io);
 	m_maincpu->nomreq_cb().set_nop();
 	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
-	m_maincpu->irqack_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_maincpu->irqack_cb().set(FUNC(sprinter_state::irq_off));
 
 	ISA8(config, m_isa[0], 0);
 	m_isa[0]->set_custom_spaces();

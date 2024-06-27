@@ -485,7 +485,7 @@ inline int pleiads_sound_device::tone4(int samplerate)
 
 /*****************************************************************************
  * Noise comes from a shift register (4006) hooked up just like in Phoenix.
- * Difference: the clock frequecy is toggled between two values only by
+ * Difference: the clock frequency is toggled between two values only by
  * bit 4 of latch A. The output of the first shift register can be zapped(?)
  * by some control line (IC87 in Pop Flamer: not yet implemented)
  *****************************************************************************/

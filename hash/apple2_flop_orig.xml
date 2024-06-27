@@ -799,21 +799,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="falcons">
-		<description>Falcons</description>
-		<year>1981</year>
-		<publisher>Piccadilly Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2018-09-19 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="146916">
-				<rom name="falcons.woz" size="146916" crc="cc93f644" sha1="7766debe7d678380aae96def6f14cedd6ff1683a" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="fnight">
 		<description>Fight Night</description>
 		<year>1985</year>
@@ -2122,21 +2107,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="qix">
-		<description>Qix</description>
-		<year>1989</year>
-		<publisher>Taito America</publisher>
-		<info name="usage" value="Requires a 128K Apple //e, //c, or IIgs." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2018-08-05 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="233475">
-				<rom name="qix.woz" size="233475" crc="50acf331" sha1="9cbbe0b29761aa9e19a7e965932e9bf694f97825" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="radwarr">
 		<description>Rad Warrior</description>
 		<year>1987</year>
@@ -3235,59 +3205,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carmnusa">
-		<description>Where in the USA is Carmen Sandiego?</description>
-		<year>1986</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Runs on any Apple II with 64K." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2018-10-01 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="240205">
-				<rom name="where in the usa is carmen sandiego side a.woz" size="240205" crc="a1cfee60" sha1="fcc406c480127a71e4d186939e9671c0c0bf7c14" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="233549">
-				<rom name="where in the usa is carmen sandiego side b.woz" size="233549" crc="1ac6f62d" sha1="7940fad2b4b52615180cf51ce2348efe10e8e780" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="carmntime">
-		<description>Where in Time is Carmen Sandiego? (v1.1)</description>
-		<year>1990</year>
-		<publisher>Brøderbund Software</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side A" />
-			<dataarea name="flop" size="233672">
-				<rom name="where in time is carmen sandiego v1.1 - side a.woz" size="233672" crc="ea58dd13" sha1="a872d51b3352b3a1c5a6817ec10ed0ea0d1b3ed7" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side B" />
-			<dataarea name="flop" size="240328">
-				<rom name="where in time is carmen sandiego v1.1 - side b.woz" size="240328" crc="d91930ff" sha1="746cbb0f837fe28651f2bf2f19efc815f7c316d9" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 Side C" />
-			<dataarea name="flop" size="240328">
-				<rom name="where in time is carmen sandiego v1.1 - side c.woz" size="240328" crc="e720deac" sha1="2951a75612d58f001096f5daa4cb6c768098acea" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 Side D" />
-			<dataarea name="flop" size="233672">
-				<rom name="where in time is carmen sandiego v1.1 - side d.woz" size="233672" crc="20c6a3f7" sha1="7f9832c7e6ce06a3731ba0ca04c04ddd6cd0b929" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wof">
 		<description>Wings of Fury</description>
 		<year>1987</year>
@@ -3841,28 +3758,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carmnwld">
-		<description>Where in the World is Carmen Sandiego?</description>
-		<year>1985</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Runs on any Apple II with 64K." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-03-16 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="332120">
-				<rom name="where in the world is carmen sandiego side a.woz" size="332120" crc="9e9bc183" sha1="bfcf9c5156a3bd57384f14656d7da9adfe546d2e" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234840">
-				<rom name="where in the world is carmen sandiego side b.woz" size="234840" crc="771e61bd" sha1="672a843e9d7b927b8f2d14d0ea3679913add4175" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="labyrnth">
 		<description>Labyrinth</description>
 		<year>1982</year>
@@ -4131,21 +4026,6 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 
-	</software>
-
-	<software name="arkanoid">
-		<description>Arkanoid</description>
-		<year>1988</year>
-		<publisher>Taito America</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-04-04 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="233449">
-				<rom name="arkanoid.woz" size="233449" crc="ed2ce549" sha1="421e17ac0441f3a513846eda613b234b4b1d756f" />
-			</dataarea>
-		</part>
 	</software>
 
 	<software name="fantvisn">
@@ -4600,28 +4480,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carmneur">
-		<description>Where in Europe is Carmen Sandiego?</description>
-		<year>1988</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-04-28 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="233533">
-				<rom name="where in europe is carmen sandiego side a.woz" size="233533" crc="aa41e758" sha1="cccfae850e791d3eeae13097d4fbefd85f3543a6" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="233533">
-				<rom name="where in europe is carmen sandiego side b.woz" size="233533" crc="32e8e026" sha1="701d0a865e3a567c663d214b03edc57472ca585a" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wishbr68">
 		<description>Wishbringer (Release 68 / 850501)</description>
 		<year>1985</year>
@@ -4990,28 +4848,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234735">
 				<rom name="ultima i - the beginning.woz" size="234735" crc="d06b8c18" sha1="9d909f6e098f23935854a9e63f7b2d7b8efc8dfc" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="renegade">
-		<description>Renegade</description>
-		<year>1989</year>
-		<publisher>Taito America</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-05-25 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234755">
-				<rom name="renegade side a.woz" size="234755" crc="040575e3" sha1="be136b6986f712453d1ffa826cf704fd35e95c49" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234755">
-				<rom name="renegade side b.woz" size="234755" crc="d245d5ae" sha1="7113632f3d6b9933402ee0e9ab612a2d8a460d92" />
 			</dataarea>
 		</part>
 	</software>
@@ -6219,21 +6055,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="242144">
 				<rom name="times of lore side b.woz" size="242144" crc="37142802" sha1="59bbdacf4ead58dde5a04e0fa9ff4e8764aa86d7" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bchead">
-		<description>Beach-Head</description>
-		<year>1985</year>
-		<publisher>Access Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-08-03 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="235525">
-				<rom name="beach-head.woz" size="235525" crc="45f55dbd" sha1="c805e8bd5463b15e7e7326620b5abc186bd4714e" />
 			</dataarea>
 		</part>
 	</software>
@@ -8107,21 +7928,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pnctbbls">
-		<description>Punctuation: Building Better Language Skills</description>
-		<year>1991</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-10-26 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="235489">
-				<rom name="punctuation - building better language skills.woz" size="235489" crc="0c41a2e0" sha1="dca8d539917b8c6f17bd5e9632828fb31044be9b" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="howwest">
 		<description>How The West Was One + Three x Four</description>
 		<year>1987</year>
@@ -8239,28 +8045,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234809">
 				<rom name="appilot edu-disk.woz" size="234809" crc="d8c62a72" sha1="21d9518179cc8b9f32211b1252f36b49a6b1c5ff" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrdzappr">
-		<description>Word Zapper</description>
-		<year>1990</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-11-03 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Beginning" />
-			<dataarea name="flop" size="235499">
-				<rom name="word zapper disk 1 - beginning.woz" size="235499" crc="1c20054b" sha1="2331dee02b4bdcfc7d93310e7cb8956eafd6e714" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Advanced" />
-			<dataarea name="flop" size="235498">
-				<rom name="word zapper disk 2 - advanced.woz" size="235498" crc="6faf09df" sha1="b3591e7d5fb1a2cc4f86ec89a75bbc00e1d998b5" />
 			</dataarea>
 		</part>
 	</software>
@@ -9712,21 +9496,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ochess70">
-		<description>Chess (Odesta) (version 7.0)</description>
-		<year>1982</year>
-		<publisher>Odesta Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-01-14 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234821">
-				<rom name="chess v7.0 (odesta).woz" size="234821" crc="dea3482d" sha1="40d127ba91d83be331a266e4f7d9727baeb78711" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="rambop2">
 		<description>Rambo: First Blood Part II</description>
 		<year>1985</year>
@@ -11037,434 +10806,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ndcarmen">
-		<description>Where in North Dakota is Carmen Sandiego?</description>
-		<year>1989</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-09 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234963">
-				<rom name="where in north dakota is carmen sandiego side a.woz" size="234963" crc="482c92f4" sha1="e59481a41d75aca6e670cf9ea87c6f0a1b14646a" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234963">
-				<rom name="where in north dakota is carmen sandiego side b.woz" size="234963" crc="cf47fe0c" sha1="25c5bbbdf0f4265e0a63de456c3a4258d87afc95" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cndalman">
-		<description>Carmen's North Dakota Almanac Database (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-11 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234788">
-				<rom name="carmen's north dakota almanac database.woz" size="234788" crc="757d3e67" sha1="618423e72b222f16e6624750d80e09aecf6f4656" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndcrmn98">
-		<description>Where in North Dakota is Carmen Sandiego? (version 0.98 beta)</description>
-		<year>1989</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-12 -->
-		<!-- This is v0.98 beta, labeled as "for workshops and demonstrations
-		only." It is not copy protected. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="235025">
-				<rom name="where in north dakota is carmen sandiego v0.98 beta side a.woz" size="235025" crc="ce6d7066" sha1="d690a7dfbe00b1f43fce826356995a7fdfa39fe8" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="235025">
-				<rom name="where in north dakota is carmen sandiego v0.98 beta side b.woz" size="235025" crc="3c638e67" sha1="3d6f235b01a80644ff37e22ed4f51a7a642c8dcb" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndcrmnb1">
-		<description>Where in North Dakota is Carmen Sandiego? (version 1.0 final beta)</description>
-		<year>1989</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-17 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234980">
-				<rom name="where in north dakota is carmen sandiego v1.0-final-beta side a.woz" size="234980" crc="1fc431b1" sha1="e1bf54f99059247657d72ef67e7196c9fc592120" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234980">
-				<rom name="where in north dakota is carmen sandiego v1.0-final-beta side b.woz" size="234980" crc="f9412d0b" sha1="e611506a904841cf644ffb58d24705d68fe70429" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gaflndd">
-		<description>Governors and First Ladies of North Dakota Database (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-17 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234813">
-				<rom name="governors and first ladies of north dakota database.woz" size="234813" crc="9fddb019" sha1="2be825d65d27591e49654873de30086b496af70d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndagridb">
-		<description>North Dakota Agriculture Database (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-17 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234795">
-				<rom name="north dakota agriculture database.woz" size="234795" crc="7dfea486" sha1="b0504bc333ffc3b2ff70bea46b3607e62a7ef2cd" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndcity16">
-		<description>North Dakota Cities (version 1.6)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 64K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-17 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234766">
-				<rom name="north dakota cities v1.6 side a.woz" size="234766" crc="01172d62" sha1="7fe5771d7d99a7cc4ebe3ad1cb479ee60d6b1fa9" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234766">
-				<rom name="north dakota cities v1.6 side b.woz" size="234766" crc="afbbd59d" sha1="1841f97fd13834b83bb02954b5ecf8d5aba054da" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndc500b">
-		<description>North Dakota Cities with Population Under 500 (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-18 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234807">
-				<rom name="north dakota cities with population under 500 database.woz" size="234807" crc="26fd3aae" sha1="6065680920edb68a51f5b8babb6e7dcc38630403" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndc500u">
-		<description>North Dakota Cities with Population 500 and Above (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-18 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234811">
-				<rom name="north dakota cities with population 500 and above database.woz" size="234811" crc="c5ca75ae" sha1="81fc62349dd3afdecc1db519ebb700404f71058d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndcnty">
-		<description>North Dakota Counties (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-18 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234783">
-				<rom name="north dakota counties database.woz" size="234783" crc="d6df23a4" sha1="ef48c731e1e245b3b2f12ca13cde757703924015" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndexplor">
-		<description>North Dakota Explorers (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-18 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234784">
-				<rom name="north dakota explorers database.woz" size="234784" crc="84f60ca6" sha1="bf064dc7c8a3eda897d4794f361336431681d6fb" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndindtrb">
-		<description>North Dakota Indian Tribes (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-18 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234788">
-				<rom name="north dakota indian tribes.woz" size="234788" crc="0c8540c3" sha1="2e0e93a04b9002f9732d3a92086e4958b57aac9a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndminrls">
-		<description>Minerals of North Dakota (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-18 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234786">
-				<rom name="minerals of north dakota.woz" size="234786" crc="16c550e4" sha1="1221551a2df3a59e5b81e328863ab0c672107605" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndnotper">
-		<description>Notable People of North Dakota (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-19 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234792">
-				<rom name="notable people of north dakota.woz" size="234792" crc="73752e7c" sha1="b3b24917dc6c21636ac676ecf81d4616546e5aa9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndprkhs">
-		<description>North Dakota Parks and Historical Sites (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-19 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234801">
-				<rom name="north dakota parks and historical sites.woz" size="234801" crc="e4648f2b" sha1="3c2cfef269ed387988705717f8b369bd502d2505" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndplants">
-		<description>North Dakota Plants (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-19 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234781">
-				<rom name="north dakota plants.woz" size="234781" crc="6c978fc3" sha1="ad24084bf410dff2aaa584367dc26b83b2f0c88b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndsymbls">
-		<description>North Dakota Symbols (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-19 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234782">
-				<rom name="north dakota symbols.woz" size="234782" crc="4e904c78" sha1="e8f19de16437067e1aea7256a0983f79229873d4" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndsenrep">
-		<description>North Dakota U.S. Senators and Representatives (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-19 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234808">
-				<rom name="north dakota u.s. senators and representatives.woz" size="234808" crc="e7c06937" sha1="c81e2fb70ff021b203db05b43a974a8e8145fc57" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndwildlf">
-		<description>North Dakota Wildlife (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-19 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234783">
-				<rom name="north dakota wildlife.woz" size="234783" crc="39e62a9b" sha1="bbffd66cdef57839e6c15e3fd72f0e6526c39e64" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndpride">
-		<description>North Dakota Pride (version 1.0)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-19 -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234780">
-				<rom name="north dakota pride.woz" size="234780" crc="436ed557" sha1="2067daae9ae657f2df24a556a2d7cef724598a30" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ladytut">
 		<description>Lady Tut</description>
 		<year>1983</year>
@@ -11864,34 +11205,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234852">
 				<rom name="microbe side b.woz" size="234852" crc="e23a8340" sha1="1d085179f9e2905179b4eb57fbd716430da18c2c" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wwmathl4">
-		<description>Wild West Math Level 4</description>
-		<year>1990</year>
-		<publisher>Micrograms</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-04-23 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="234794">
-				<rom name="wild west math level 4 disk a.woz" size="234794" crc="a43e5a5e" sha1="553ab5f970ee45190aa5dc29b0ca634a006fd337" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="234794">
-				<rom name="wild west math level 4 disk b.woz" size="234794" crc="20a3050d" sha1="17af493d2f55e469ac14bc532553eae2dfca8fc3" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C" />
-			<dataarea name="flop" size="234794">
-				<rom name="wild west math level 4 disk c.woz" size="234794" crc="aeb036c1" sha1="3f91f0f0e7ed453a8d91fb34656b04fdc5ce5818" />
 			</dataarea>
 		</part>
 	</software>
@@ -12484,34 +11797,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="234802">
 				<rom name="winnie the pooh in the hundred acre wood disk 2.woz" size="234802" crc="06be776d" sha1="d1826e1eaac9625c9924b55e51f0fbb68af745bd" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wwmathl5">
-		<description>Wild West Math Level 5</description>
-		<year>1990</year>
-		<publisher>Micrograms</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-04 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="234771">
-				<rom name="wild west math level 5 disk 1.woz" size="234771" crc="2fc279e1" sha1="31fc31aba7983a287f19d534c76996e0eeb1a9b5" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="234771">
-				<rom name="wild west math level 5 disk 2.woz" size="234771" crc="e4a87d20" sha1="c0d02644c3126f29e62e6b4bdd3f793f4d6758bf" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="234771">
-				<rom name="wild west math level 5 disk 3.woz" size="234771" crc="72328d75" sha1="df6e2970184d6267e9a6b3b6f5a08253e8fd63c0" />
 			</dataarea>
 		</part>
 	</software>
@@ -16086,22 +15371,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="crmneu35">
-		<description>Where in Europe is Carmen Sandiego? (800K 3.5")</description>
-		<year>1988</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-07-06 redumped: 2021-12-14 to fix incorrect header information -->
-		<!--"Where in Europe is Carmen Sandiego?" is a 1988 educational game developed by Ken Bull, Gene Portwood, Lauren Elliott, Leila Bronstein, Don Albrecht, Katherine Bird, Susan Meyers, and Louis Ewens, and distributed by Brøderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296763">
-				<rom name="where in europe is carmen sandiego 800k.woz" size="1296763" crc="549ffd83" sha1="d6350738f600af581e5dc598aa8a90f8ee47bcf1" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="playroom35">
 		<description>The Playroom (version 1.0) (800K 3.5")</description>
 		<year>1989</year>
@@ -16947,38 +16216,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="nibaw2c3">
-		<description>Nibbles Away ][ (version C3)</description>
-		<year>1983</year>
-		<publisher>COMPUTER:applications</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-11-04 -->
-		<!--"Nibbles Away ][" is a 1983 disk utility developed and distributed by COMPUTER:applications. This is version C3. It runs on any Apple ][ with 48K.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="146764">
-				<rom name="nibbles away ][.woz" size="146764" crc="db6d9e93" sha1="8729a7c7e69d74bb474a96e14a36a8b2fe0c085f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="eddupl44">
-		<description>Essential Data Duplicator (version 4.4)</description>
-		<year>1986</year>
-		<publisher>Utilico Microware</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-11-04 -->
-		<!--"Essential Data Duplicator" is a 1986 disk utility developed by Donald A. Schnapp and distributed by Utilico Microware. This is version 4.4. It runs on any Apple ][ with 48K.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="106863">
-				<rom name="essential data duplicator v4.4.woz" size="106863" crc="a50ae8ed" sha1="c3f6a000171af417c81af7d47c81dc7f1d2026f7" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bbatlm35">
 		<description>Beauty and the Beast and The Little Mermaid (800K 3.5")</description>
 		<year>1992</year>
@@ -17685,29 +16922,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234804">
 				<rom name="competition karate.woz" size="234804" crc="5ad403a7" sha1="97830c60250ad1f487f1508e44e8f6afb07b6bf9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nibaw3v125b">
-		<description>Nibbles Away III (version 1.25B)</description>
-		<year>1985</year>
-		<publisher>COMPUTER:applications</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-09 -->
-		<!--"Nibbles Away III" is a 1985 disk utility developed and distributed by COMPUTER:applications, Inc. This is version 1.25B. It runs on any Apple II with 48K.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Program" />
-			<dataarea name="flop" size="234776">
-				<rom name="nibbles away iii v1.25b disk 1 - program.woz" size="234776" crc="3eb9f3b7" sha1="a7236341f1ba481a780ee25103cd70cb300b2e38" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Library" />
-			<dataarea name="flop" size="234776">
-				<rom name="nibbles away iii v1.25b disk 2 - library disk.woz" size="234776" crc="1bd02293" sha1="2a2fb311fec6c4846e8d88befb2eee792ccea106" />
 			</dataarea>
 		</part>
 	</software>
@@ -20191,54 +19405,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="edd30840206">
-		<description>Essential Data Duplicator (version 3.0-1984-02-06)</description>
-		<year>1984</year>
-		<publisher>Utilico Microware</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-27 -->
-		<!--"Essential Data Duplicator" is a 1984 disk utility developed by Donald Anthony Schnapp and distributed by Utilico Microware. This is version 3.0-1984-02-06. It runs on any Apple ][ with 48K. Due to aggressive copy protection (!) this disk image does not boot in all emulators. It was verified working in &lt;a href="https://archive.org/details/OpenEmulatorSnapshots" rel="nofollow"&gt;OpenEmulator v1.1&lt;/a&gt;.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="248150">
-				<rom name="essential data duplicator iii v3.0-1984-02-06.woz" size="248150" crc="0a30990a" sha1="16dd4115b4dbba341504ee066500b5e6901b7cf5" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="edd30840525">
-		<description>Essential Data Duplicator (version 3.0-1984-05-25)</description>
-		<year>1984</year>
-		<publisher>Utilico Microware</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-27 -->
-		<!--"Essential Data Duplicator" is a 1984 disk utility developed by Donald Anthony Schnapp and distributed by Utilico Microware. This is version 3.0-1984-05-25. It runs on any Apple ][ with 48K. Due to aggressive copy protection (!) this disk image does not boot in all emulators. It was verified working in OpenEmulator v1.1.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="247145">
-				<rom name="essential data duplicator iii v3.0-1984-05-25.woz" size="247145" crc="7b1493eb" sha1="1de36a7c74a19786cf4516b4d1f16e4c7164837e" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="backitup36">
-		<description>Back It Up (version 3.6)</description>
-		<year>1983</year>
-		<publisher>Sensible Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-27 -->
-		<!--"Back It Up" is a 1983 disk utility developed by Henry A. Roberts and distributed by Sensible Software. This is version 3.6. It runs on any Apple ][ with 48K. Due to aggressive copy protection (!) this disk image does not boot in all emulators. It was verified working in OpenEmulator v1.1.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="121660">
-				<rom name="back it up iii v3.6.woz" size="121660" crc="9161150d" sha1="07398e4da71fcba119534eb56ec3feba26958170" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sdiskc36">
 		<description>Super Disk Copy (version 3.6)</description>
 		<year>1981</year>
@@ -20370,29 +19536,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234783">
 				<rom name="grey seas, grey skies.woz" size="234783" crc="13f63025" sha1="e4710714eea886f901787570d2b8d73724c7b74f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wcleaderb">
-		<description>World Class Leader Board</description>
-		<year>1987</year>
-		<publisher>Access Software</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-04-01 -->
-		<!--"World Class Leader Board" is a 1987 sports game developed by Bruce and Roger Carver, ported to the Apple II by Vance Cook, and distributed by Access Software. It requires a 64K Apple ][+ or later. This archive also includes "World Class Famous Course Disk Volume 1", originally sold separately.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234815">
-				<rom name="world class leader board side a.woz" size="234815" crc="ac7104f3" sha1="b913bbcab30a3dad52cb28556bdeb4d34e67a4b4" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="241471">
-				<rom name="world class leader board side b.woz" size="241471" crc="14e4bd7c" sha1="ee2fa7be8a79549f07f62925c1635b2ed6768ffd" />
 			</dataarea>
 		</part>
 	</software>
@@ -22755,38 +21898,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296273">
 				<rom name="vocabulary science and health 800k.woz" size="1296273" crc="26f62b7f" sha1="3aeaa6a076e7da6c0679ca11c37cf5c4fd4e8c2e" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crmusa35">
-		<description>Where in the USA is Carmen Sandiego? (800K 3.5")</description>
-		<year>1990</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-09-11 -->
-		<!--"Where in the USA is Carmen Sandiego" is a 1990 educational program developed by Ken Bull, Gene Portwood, and Lauren Elliot, and distributed by Brøderbund Software. It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296119">
-				<rom name="where in the usa is carmen sandiego 800k.woz" size="1296119" crc="c7075c63" sha1="bbc102ed01fb20393fecd3655d5bc0c523d57e50" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crmtime35">
-		<description>Where in Time is Carmen Sandiego? (800K 3.5")</description>
-		<year>1990</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-09-11 -->
-		<!--"Where in Time is Carmen Sandiego" is a 1990 educational program developed by Lauren Elliott, Rod Nelsen, Leila Bronstein, Jenny Martin, Gail Rathbun, Mark Schlichting, Tom Rettig, and Claire Curtin, and distributed by Brøderbund Software. This is version 1.1. It requires an Apple IIgs, //c+, or a 128K //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296281">
-				<rom name="where in time is carmen sandiego 800k.woz" size="1296281" crc="8d38e3cd" sha1="9b96556dcb289a7c3b36762b64372f2c4a747951" />
 			</dataarea>
 		</part>
 	</software>
@@ -26252,519 +25363,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="calendar">
-		<description>Calendar</description>
-		<year>1988</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Calendar" is a 1988 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234766">
-				<rom name="calendar.woz" size="234766" crc="9d0c7d47" sha1="bc721113db6312ab669ded9254fddc37917a45cc" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bblsadjadv">
-		<description>Building Better Language Skills: Adjectives and Adverbs</description>
-		<year>1991</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Building Better Language Skills: Adjectives and Adverbs" is a 1991 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234821">
-				<rom name="building better language skills- adjectives and adverbs.woz" size="234821" crc="80941ab0" sha1="ec0fc4c98bb98c750c7089a6834e545b18e8a2ec" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bblsnouns">
-		<description>Building Better Language Skills: Nouns</description>
-		<year>1991</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Building Better Language Skills: Nouns" is a 1991 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234804">
-				<rom name="building better language skills- nouns.woz" size="234804" crc="9794170b" sha1="28c6dcfcc73b7ba06c8dad17ec0c0d42442e1862" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bblscapit">
-		<description>Capitalization</description>
-		<year>1991</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Capitalization" is a 1991 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234756">
-				<rom name="capitalization.woz" size="234756" crc="aea53d17" sha1="9b773a8c049dd18baa74f4ae4c0beb0056004e42" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cntcoins">
-		<description>Counting Coins</description>
-		<year>1987</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Counting Coins" is a 1987 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234772">
-				<rom name="counting coins.woz" size="234772" crc="e2ef9068" sha1="30b4e130e12e3786fc671b1c7e0729d1ca0b789a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dsktopzoo">
-		<description>Desktop Zoo</description>
-		<year>1989</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Desktop Zoo" is a 1989 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234769">
-				<rom name="desktop zoo.woz" size="234769" crc="da8ff2f6" sha1="331e190e56226476fd8431e6b2ba150ce6dd1fbd" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="itsabttm">
-		<description>It's About Time</description>
-		<year>1989</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"It's About Time" is a 1989 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234773">
-				<rom name="it's about time.woz" size="234773" crc="b5905f9d" sha1="536a2bd895f941b2ae54cdb06f80e7a13e13cc7c" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kcaddphn">
-		<description>Kinder Critters: Address and Phone Number</description>
-		<year>1991</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Kinder Critters: Address and Phone Number" is a 1991 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234807">
-				<rom name="kinder critters- address and phone number.woz" size="234807" crc="9a1f8a9f" sha1="8a338ce20ff4328d2f5c4b82b0f511c749dbc57a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kcletpat">
-		<description>Kinder Critters: Letters and Patterns</description>
-		<year>1991</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Kinder Critters: Letters and Patterns" is a 1991 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234803">
-				<rom name="kinder critters- letters and patterns.woz" size="234803" crc="cc43ebbe" sha1="495ff9e15d607f7db830a5c651a70153303740c2" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="msaurcomp">
-		<description>Mathosaurus: Computation</description>
-		<year>1989</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Mathosaurus: Computation" is a 1989 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234790">
-				<rom name="mathosaurus- computation.woz" size="234790" crc="2e275172" sha1="262ba4c9e8ab922999f81c9e7d1afe107ea01b91" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="olvcword">
-		<description>Oliver's Crosswords</description>
-		<year>1990</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Oliver's Crosswords" is a 1990 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234777">
-				<rom name="oliver's crosswords side a.woz" size="234777" crc="69a602e3" sha1="f943186b0ec801e36da67b4e42c402c7fce82c8a" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234777">
-				<rom name="oliver's crosswords side b.woz" size="234777" crc="a3b0570f" sha1="ad398cff43b42998c8ac9a140a7d044d13274a1b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rdtrchst">
-		<description>Reader's Treasure Chest</description>
-		<year>1987</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Reader's Treasure Chest" is a 1987 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234781">
-				<rom name="reader's treasure chest.woz" size="234781" crc="2c9fc291" sha1="33ef1b383500179830dd91f6bacb2f4433191904" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rmlev1">
-		<description>Real Math: Level I</description>
-		<year>1988</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Real Math: Level I" is a 1988 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234781">
-				<rom name="real math- level i.woz" size="234781" crc="a0765a0d" sha1="f6006bd41c5fb98dde3caf8d3c981232526c7d0f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rmlev2">
-		<description>Real Math: Level II</description>
-		<year>1988</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Real Math: Level II" is a 1988 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234782">
-				<rom name="real math- level ii.woz" size="234782" crc="75a0e505" sha1="1a0d2e9fbc2ad223f70fe9895ab7ff4ba3cdc296" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rmlev3">
-		<description>Real Math: Level III</description>
-		<year>1988</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Real Math: Level III" is a 1988 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234783">
-				<rom name="real math- level iii.woz" size="234783" crc="a6127c37" sha1="4542622a48b9f62c0c7f2157067c5cde39a05771" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shpspatt">
-		<description>Shapes and Patterns</description>
-		<year>1988</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Shapes and Patterns" is a 1988 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234774">
-				<rom name="shapes and patterns.woz" size="234774" crc="d716cc89" sha1="a055cff882adc289c45d60a89b81971898f0eb88" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="trcgd2">
-		<description>Top Readers' Club: Grade 2</description>
-		<year>1989</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Top Readers' Club: Grade 2" is a 1989 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234789">
-				<rom name="top readers' club- grade 2.woz" size="234789" crc="ad824184" sha1="8feb5cdf2502b54205587db9fc2423d8a45037e0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="trcgd3">
-		<description>Top Readers' Club: Grade 3</description>
-		<year>1989</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Top Readers' Club: Grade 3" is a 1989 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234789">
-				<rom name="top readers' club- grade 3.woz" size="234789" crc="71252654" sha1="b4dc1b8aa2c563b15ef86ee19874c0431fc6fa42" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="trcgd4">
-		<description>Top Readers' Club: Grade 4</description>
-		<year>1989</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Top Readers' Club: Grade 4" is a 1989 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234789">
-				<rom name="top readers' club- grade 4.woz" size="234789" crc="899c9c19" sha1="8cd7e25a9f72e36b49da80b9fefe6e435d0cb2aa" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="trcgd5">
-		<description>Top Readers' Club: Grade 5</description>
-		<year>1989</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 64K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Top Readers' Club: Grade 5" is a 1989 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234789">
-				<rom name="top readers' club- grade 5.woz" size="234789" crc="f7220442" sha1="de62a19842c881a49f96b658a3094f169e811acb" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="grancook">
-		<description>Granny Applebee's Cookie Factory</description>
-		<year>1993</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Granny Applebee's Cookie Factory" is a 1993 educational program developed and distributed by Micrograms Publishing-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234788">
-				<rom name="granny applebee's cookie factory.woz" size="234788" crc="f1349cbb" sha1="57c0b3a9ce886f22c834310195d769c110678cac" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hugohound">
-		<description>Hugo Hound's Vowel Sounds: Long Vowels</description>
-		<year>1993</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Hugo Hound's Vowel Sounds: Long Vowels" is a 1993 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234802">
-				<rom name="hugo hound's vowel sounds- long vowels.woz" size="234802" crc="780ba877" sha1="3167aa6f35b598cf400a07d6d6722e284f2efcf8" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="martyfrd">
-		<description>Marty's Family Reader</description>
-		<year>1992</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Marty's Family Reader" is a 1992 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="234795">
-				<rom name="marty's family reader - disk 1.woz" size="234795" crc="51c46b95" sha1="58d3b9120e913e140984f5e89d756adcb992bba4" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="234795">
-				<rom name="marty's family reader - disk 2.woz" size="234795" crc="08e83c2c" sha1="290e5bd096d1d444a6c9559043fc1b6d3cbd5230" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="234795">
-				<rom name="marty's family reader - disk 3.woz" size="234795" crc="d6590d18" sha1="5837af795cff24db8cf791d3a09612edb6064353" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4" />
-			<dataarea name="flop" size="234795">
-				<rom name="marty's family reader - disk 4.woz" size="234795" crc="ebb16406" sha1="e20547f132df1feb0abafd9df40050812421d091" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5" />
-			<dataarea name="flop" size="234795">
-				<rom name="marty's family reader - disk 5.woz" size="234795" crc="63bbddbd" sha1="826b7623f9b7e6360a13621d9e397e78153f5111" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6" />
-			<dataarea name="flop" size="234795">
-				<rom name="marty's family reader - disk 6.woz" size="234795" crc="ed3788ab" sha1="2b2332d84ded516115f5020159ba2b773590f198" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 7" />
-			<dataarea name="flop" size="234795">
-				<rom name="marty's family reader - disk 7.woz" size="234795" crc="5ebb03c6" sha1="6b80083af9da670e22ae460fa318863a6f30ca38" />
-			</dataarea>
-		</part>
-		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 8" />
-			<dataarea name="flop" size="234787">
-				<rom name="marty's family reader - disk 8.woz" size="234787" crc="ed4c85ac" sha1="d2fc51ca77785dd869ab41e90aa0d5a2ac4b43e0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="martyrdwk">
-		<description>Marty's Reading Workout</description>
-		<year>1992</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Marty's Reading Workout" is a 1992 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="234797">
-				<rom name="marty's reading workout - disk 1.woz" size="234797" crc="5fcaa755" sha1="5dd2d140615fba1973c9647577acdcf2c2764e7b" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="234797">
-				<rom name="marty's reading workout - disk 2.woz" size="234797" crc="1bba4690" sha1="1005a002cb9212e9bfc7a9490cb8ef5323e3fd3e" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="234797">
-				<rom name="marty's reading workout - disk 3.woz" size="234797" crc="ac0d0491" sha1="79fa8161faeee1be4f665c0924c176a1b7fc842b" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4" />
-			<dataarea name="flop" size="234797">
-				<rom name="marty's reading workout - disk 4.woz" size="234797" crc="3ee5110e" sha1="bdf0180783e4bf6fd2f034cf471874eb8522e4b9" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5" />
-			<dataarea name="flop" size="234797">
-				<rom name="marty's reading workout - disk 5.woz" size="234797" crc="3375fd76" sha1="90dc7f78fd2655c16a7e83fdd404cc5bd102f708" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6" />
-			<dataarea name="flop" size="234797">
-				<rom name="marty's reading workout - disk 6.woz" size="234797" crc="fec5c180" sha1="e0d9f241c2e1ae67cf75334b0b78efd84e231267" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 7" />
-			<dataarea name="flop" size="234797">
-				<rom name="marty's reading workout - disk 7.woz" size="234797" crc="049e0d67" sha1="0d8bcb14950092b17f55c878111ba5a6ed270f82" />
-			</dataarea>
-		</part>
-		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 8" />
-			<dataarea name="flop" size="234797">
-				<rom name="marty's reading workout - disk 8.woz" size="234797" crc="610a2d0b" sha1="e24f02ba03c3e6afdae59b2e54df3dbd5f538d9b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="numbball">
-		<description>Numberball</description>
-		<year>1994</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Numberball" is a 1994 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234766">
-				<rom name="numberball.woz" size="234766" crc="161a93e1" sha1="9fd7357972fbaaf16609e2b8fa8f987be08b53cd" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="uccsbcon">
-		<description>Uncle Clyde's Consonant Slides: Beginning Consonants</description>
-		<year>1993</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Uncle Clyde's Consonant Slides: Beginning Consonants" is a 1993 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234816">
-				<rom name="uncle clyde's consonant slides- beginning consonants.woz" size="234816" crc="88348c39" sha1="52540c0a55312cee61423de49d25f26c79aed449" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="uccsbldg">
-		<description>Uncle Clyde's Consonant Slides: Blends and Digraphs</description>
-		<year>1993</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Uncle Clyde's Consonant Slides: Blends and Digraphs" is a 1993 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234815">
-				<rom name="uncle clyde's consonant slides- blends and digraphs.woz" size="234815" crc="4ac31653" sha1="7f965a68ed1350390196324319ca45c209c3bd9f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="uccsecon">
-		<description>Uncle Clyde's Consonant Slides: Ending Consonants</description>
-		<year>1993</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-27-->
-		<!--"Uncle Clyde's Consonant Slides: Ending Consonants" is a 1993 educational program developed and distributed by Micrograms Publishing.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234813">
-				<rom name="uncle clyde's consonant slides- ending consonants.woz" size="234813" crc="bfe6adfe" sha1="bc12cd855cf9687cfd10031ede34ebb60f17f7f2" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dungdoom">
 		<description>Dungeon of Doom</description>
 		<year>1980</year>
@@ -26901,6 +25499,38 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="aceyduec">
+		<description>Acey-Deucey</description>
+		<year>1982</year>
+		<publisher>L &amp; S Computerware</publisher>
+		<info name="programmer" value="Larry Sherman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-28-->
+		<!--card game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="61652">
+				<rom name="acey-deucey.woz" size="61652" crc="6a372c08" sha1="f3c467cfe38e27b94edb353e566ccf9a8a417119" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advbwalk">
+		<description>Advance to Boardwalk</description>
+		<year>1990</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="GameTek" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234734">
+				<rom name="advance to boardwalk.woz" size="234734" crc="a7b89d2d" sha1="8cb709d0f8b0f3b6c7a1b6b3c074b944207dda19" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="advfrac10">
 		<description>Adventures with Fractions (A-774 version 1.0)</description>
 		<year>1983</year>
@@ -27002,6 +25632,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="anchorman">
+		<description>Anchorman</description>
+		<year>1988</year>
+		<publisher>Virginia Real Software</publisher>
+		<info name="programmer" value="Hal Kiefer" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-02-02-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="anchorman.woz" size="234779" crc="b63194b8" sha1="a90958e1fe57c97c563a99370be1d0944ecec834" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="anmstoriv">
 		<description>Animal Stories IV</description>
 		<year>1990</year>
@@ -27052,11 +25698,26 @@ license:CC0-1.0
 		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-25 -->
+		<!--Dump released: 2022-02-25-->
 		<!--educational program-->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296251">
 				<rom name="arizona mix 800k.woz" size="1296251" crc="c4931edf" sha1="f823f858b00a3848bc9fcfad27b2178888c5ab96" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkanoid">
+		<description>Arkanoid</description>
+		<year>1988</year>
+		<publisher>Taito America</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later. Works with Apple II Mouse Card in slot 4: -sl4 mouse." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-04-04-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="233449">
+				<rom name="arkanoid.woz" size="233449" crc="ed2ce549" sha1="421e17ac0441f3a513846eda613b234b4b1d756f" />
 			</dataarea>
 		</part>
 	</software>
@@ -27145,6 +25806,41 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="backitup3v34" cloneof="backitup3">
+		<description>Back It Up III (version 3.4)</description>
+		<year>1983</year>
+		<publisher>Sensible Software</publisher>
+		<info name="programmer" value="Henry A. Roberts, Jr." />
+		<info name="usage" value="Requires an Apple ][, Apple ][+, Apple //e, and enhanced Apple //e with 48K." />
+		<info name="version" value="3.4" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE" />
+		<!--Due to aggressive copy protection, it does not boot on later models (//c or IIgs).-->
+		<!--Dump released: 2024-03-17-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="301268">
+				<rom name="back it up iii v3.4.woz" size="301268" crc="859eceae" sha1="5f5250a50115f8e069d8c79d6f568d3e2d8ba5b1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backitup3">
+		<description>Back It Up III (version 3.6)</description>
+		<year>1983</year>
+		<publisher>Sensible Software</publisher>
+		<info name="programmer" value="Henry A. Roberts, Jr." />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="3.6" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-03-27-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="121660">
+				<rom name="back it up iii v3.6.woz" size="121660" crc="9161150d" sha1="07398e4da71fcba119534eb56ec3feba26958170" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bckydbrd_525" cloneof="bckydbrd">
 		<description>Backyard Birds (A-216 version 1.0)</description>
 		<year>1989</year>
@@ -27197,6 +25893,38 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bchead">
+		<description>Beach-Head</description>
+		<year>1985</year>
+		<publisher>Access Software</publisher>
+		<info name="programmer" value="Brent Erickson, Bruce Carver, and Bryan Brandenburg" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-08-03-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235525">
+				<rom name="beach-head.woz" size="235525" crc="45f55dbd" sha1="c805e8bd5463b15e7e7326620b5abc186bd4714e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bchead2">
+		<description>Beach-Head II</description>
+		<year>1985</year>
+		<publisher>Access Software</publisher>
+		<info name="programmer" value="Peter Adams" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234760">
+				<rom name="beach-head ii.woz" size="234760" crc="b28bb733" sha1="58b13942ffd570223f755f867cf9ba76fc3c689d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blkbeltr1">
 		<description>Black Belt (revision 1)</description>
 		<year>1984</year>
@@ -27228,6 +25956,85 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234869">
 				<rom name="bluegrass bluff.woz" size="234869" crc="ccef05ca" sha1="4cf9cbf571e3de33af0cb70101f099f3aa55aa4b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bublbobl">
+		<description>Bubble Bobble</description>
+		<year>1988</year>
+		<publisher>Taito America</publisher>
+		<info name="developer" value="NovaLogic" />
+		<info name="programmer" value="Chris Eisnaugle" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-19-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234789">
+				<rom name="bubble bobble side a.woz" size="234789" crc="e3123378" sha1="ad715935ba02fe2f3f01e8846a8398a612921810" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234789">
+				<rom name="bubble bobble side b.woz" size="234789" crc="6e0b4873" sha1="fe1e318170aa05a853020c838e94ff7948551a9a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calendar">
+		<description>Calendar</description>
+		<year>1988</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234766">
+				<rom name="calendar.woz" size="234766" crc="9d0c7d47" sha1="bc721113db6312ab669ded9254fddc37917a45cc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="candyland">
+		<description>Candy Land</description>
+		<year>1988</year>
+		<publisher>GameTek</publisher>
+		<info name="programmer" value="Michael Robert Hausman" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234773">
+				<rom name="candy land side a.woz" size="234773" crc="038a986e" sha1="aeb758ad95d92ab80a44792e10fce2e804a1e674" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot" />
+			<dataarea name="flop" size="234773">
+				<rom name="candy land side b (boot).woz" size="234773" crc="11f0df3c" sha1="406d12484536fde25a8643c37b80db71d7fea184" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="capbbls">
+		<description>Capitalization: Building Better Language Skills</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234756">
+				<rom name="capitalization.woz" size="234756" crc="aea53d17" sha1="9b773a8c049dd18baa74f4ae4c0beb0056004e42" />
 			</dataarea>
 		</part>
 	</software>
@@ -27267,6 +26074,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="crdshark">
+		<description>Card Sharks</description>
+		<year>1988</year>
+		<publisher>ShareData</publisher>
+		<info name="developer" value="ShareData" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234727">
+				<rom name="card sharks side a.woz" size="234727" crc="a31ae17b" sha1="7972b37a2b5f39a82f22ff7acea72c7f359c2acf" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234727">
+				<rom name="card sharks side b.woz" size="234727" crc="1db21d62" sha1="c667a7496e95f5b5881e0712734ecab11551d4a2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cseffwmih">
 		<description>Cause and Effect: What Makes It Happen</description>
 		<year>1988</year>
@@ -27297,6 +26127,41 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241539">
 				<rom name="cavity busters.woz" size="241539" crc="6cd640b3" sha1="fb7432c0dd5a894c7daef8811acdb8ba74be0b42" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="checkers">
+		<description>Checkers (version 2.1)</description>
+		<year>1981</year>
+		<publisher>Odesta Software</publisher>
+		<info name="developer" value="The Alpha-Beta Software Group" />
+		<info name="programmer" value="David Slate" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="2.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="48408">
+				<rom name="checkers v2.1.woz" size="48408" crc="3b3c7d82" sha1="cc6a3bd158b0ec2dad094955b13336b8883f0286" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chesso">
+		<description>Chess (Odesta Software) (version 7.0)</description>
+		<year>1982</year>
+		<publisher>Odesta Software</publisher>
+		<info name="programmer" value="Larry Atkin" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="7.0" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-01-14-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234821">
+				<rom name="chess v7.0 (odesta).woz" size="234821" crc="dea3482d" sha1="40d127ba91d83be331a266e4f7d9727baeb78711" />
 			</dataarea>
 		</part>
 	</software>
@@ -27351,6 +26216,29 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234890">
 				<rom name="chemistry- the periodic table v1.0.woz" size="234890" crc="232c6255" sha1="e52f576c864fe325dcb705513b53ebafb628a430" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cyeagaft">
+		<description>Chuck Yeager's Advanced Flight Trainer</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Gene Kusmiak" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-16-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234833">
+				<rom name="chuck yeager's advanced flight trainer side a.woz" size="234833" crc="7991d3cc" sha1="a84b2fbc0ad9b16e8aefb2ffbfeb823f12b61f4b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234833">
+				<rom name="chuck yeager's advanced flight trainer side b.woz" size="234833" crc="9f55431e" sha1="e6f2c741b84fd077bdb175f91516a2c567023eba" />
 			</dataarea>
 		</part>
 	</software>
@@ -28006,6 +26894,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="copy2pv33" cloneof="copy2p">
+		<description>Copy II Plus (version 3.3)</description>
+		<year>1982</year>
+		<publisher>Central Point Software</publisher>
+		<info name="programmer" value="Michael A. Brown" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="3.3" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-12-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="28483">
+				<rom name="copy ii plus v3.3.woz" size="28483" crc="1912cb81" sha1="3c6bda79887a8a917b483675aa60cc05389ce4d3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="copy2pv41" cloneof="copy2p">
 		<description>Copy II Plus (version 4.1)</description>
 		<year>1982</year>
@@ -28620,6 +27525,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="cntcoins">
+		<description>Counting Coins</description>
+		<year>1987</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234772">
+				<rom name="counting coins.woz" size="234772" crc="e2ef9068" sha1="30b4e130e12e3786fc671b1c7e0729d1ca0b789a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crtabase">
 		<description>Create-A-Base (A-406 version 1.0)</description>
 		<year>1985</year>
@@ -28773,6 +27694,326 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dqcarmndalm">
+		<description>Dataquest: Carmen's North Dakota Almanac Database (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-11-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="carmen's north dakota almanac database.woz" size="234788" crc="757d3e67" sha1="618423e72b222f16e6624750d80e09aecf6f4656" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqgovflnd">
+		<description>Dataquest: Governors and First Ladies of North Dakota Database (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-17-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234813">
+				<rom name="governors and first ladies of north dakota database.woz" size="234813" crc="9fddb019" sha1="2be825d65d27591e49654873de30086b496af70d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqminnd">
+		<description>Dataquest: Minerals of North Dakota Database (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-18-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234786">
+				<rom name="minerals of north dakota.woz" size="234786" crc="16c550e4" sha1="1221551a2df3a59e5b81e328863ab0c672107605" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndagr">
+		<description>Dataquest: North Dakota Agriculture Database (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-17-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234795">
+				<rom name="north dakota agriculture database.woz" size="234795" crc="7dfea486" sha1="b0504bc333ffc3b2ff70bea46b3607e62a7ef2cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndcpopu500">
+		<description>Dataquest: North Dakota Cities with Population Under 500 (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-18-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234807">
+				<rom name="north dakota cities with population under 500 database.woz" size="234807" crc="26fd3aae" sha1="6065680920edb68a51f5b8babb6e7dcc38630403" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndcpop500a">
+		<description>Dataquest: North Dakota Cities with Population 500 and Above (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-18-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234811">
+				<rom name="north dakota cities with population 500 and above database.woz" size="234811" crc="c5ca75ae" sha1="81fc62349dd3afdecc1db519ebb700404f71058d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndcount">
+		<description>Dataquest: North Dakota Counties (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-18-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234783">
+				<rom name="north dakota counties database.woz" size="234783" crc="d6df23a4" sha1="ef48c731e1e245b3b2f12ca13cde757703924015" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndexp">
+		<description>Dataquest: North Dakota Explorers (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-18-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234784">
+				<rom name="north dakota explorers database.woz" size="234784" crc="84f60ca6" sha1="bf064dc7c8a3eda897d4794f361336431681d6fb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndindtr">
+		<description>Dataquest: North Dakota Indian Tribes (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-18-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="north dakota indian tribes.woz" size="234788" crc="0c8540c3" sha1="2e0e93a04b9002f9732d3a92086e4958b57aac9a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndparkhs">
+		<description>Dataquest: North Dakota Parks and Historical Sites (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-19-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234801">
+				<rom name="north dakota parks and historical sites.woz" size="234801" crc="e4648f2b" sha1="3c2cfef269ed387988705717f8b369bd502d2505" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndplant">
+		<description>Dataquest: North Dakota Plants (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-19-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234781">
+				<rom name="north dakota plants.woz" size="234781" crc="6c978fc3" sha1="ad24084bf410dff2aaa584367dc26b83b2f0c88b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndpride">
+		<description>Dataquest: North Dakota Pride (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-19-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234780">
+				<rom name="north dakota pride.woz" size="234780" crc="436ed557" sha1="2067daae9ae657f2df24a556a2d7cef724598a30" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndsymb">
+		<description>Dataquest: North Dakota Symbols (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-19-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234782">
+				<rom name="north dakota symbols.woz" size="234782" crc="4e904c78" sha1="e8f19de16437067e1aea7256a0983f79229873d4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndsenrep">
+		<description>Dataquest: North Dakota U.S. Senators and Representatives (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-19-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234808">
+				<rom name="north dakota u.s. senators and representatives.woz" size="234808" crc="e7c06937" sha1="c81e2fb70ff021b203db05b43a974a8e8145fc57" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndwildlf">
+		<description>Dataquest: North Dakota Wildlife (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-19-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234783">
+				<rom name="north dakota wildlife.woz" size="234783" crc="39e62a9b" sha1="bbffd66cdef57839e6c15e3fd72f0e6526c39e64" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqnpeopnd">
+		<description>Dataquest: Notable People of North Dakota (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-19-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234792">
+				<rom name="notable people of north dakota.woz" size="234792" crc="73752e7c" sha1="b3b24917dc6c21636ac676ecf81d4616546e5aa9" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dqsample">
 		<description>Dataquest: Sampler (A-173 version 1.0)</description>
 		<year>1986</year>
@@ -28787,6 +28028,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234791">
 				<rom name="dataquest- sampler v1.0.woz" size="234791" crc="4614b4ca" sha1="0990bc15bdec596603cb4d6f632f29547df9d795" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desktzoo">
+		<description>Desktop Zoo</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234769">
+				<rom name="desktop zoo.woz" size="234769" crc="da8ff2f6" sha1="331e190e56226476fd8431e6b2ba150ce6dd1fbd" />
 			</dataarea>
 		</part>
 	</software>
@@ -28932,6 +28189,58 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="earlwvbb">
+		<description>Earl Weaver Baseball</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Eddie Dombrower, Larry Rice, Mark Whittlesey, and John Heitmann" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234829">
+				<rom name="earl weaver baseball side a.woz" size="234829" crc="ea49d284" sha1="81f0147a9894e7fb0e6396b08b0b8f9f519e5118" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234829">
+				<rom name="earl weaver baseball side b.woz" size="234829" crc="d241c453" sha1="a5431f0a35ad9ea1388c3e472f30575c37a15b04" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Stat Disk" />
+			<dataarea name="flop" size="234829">
+				<rom name="earl weaver baseball 1988 baseball stat disk.woz" size="234829" crc="5318c670" sha1="d27dab23ec3962c6a3e4f5defea2e06fc6a4054f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="echelon">
+		<description>Echelon</description>
+		<year>1988</year>
+		<publisher>Access Software</publisher>
+		<info name="programmer" value="Brent Erickson, Roger Carver, Bruce Carver, and Doug Vandegrift" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-28-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234803">
+				<rom name="echelon side a.woz" size="234803" crc="82cec901" sha1="d561cfbc16d2396d37716507a7d5fc4e596f3063" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234803">
+				<rom name="echelon side b.woz" size="234803" crc="1bcbb636" sha1="1dd68769e670d7404877cdc8972cc6df3e381b78" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eerievlib_525" cloneof="eerievlib">
 		<description>Eerieville Library (A-304 version 1.0)</description>
 		<year>1993</year>
@@ -28987,6 +28296,107 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="eddup30840206" cloneof="eddup3">
+		<description>Essential Data Duplicator III (version 3.0-1984-02-06)</description>
+		<year>1984</year>
+		<publisher>Utilico Microware</publisher>
+		<info name="programmer" value="Donald Anthony Schnapp" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="3.0-1984-02-06" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-03-27-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="248150">
+				<rom name="essential data duplicator iii v3.0-1984-02-06.woz" size="248150" crc="0a30990a" sha1="16dd4115b4dbba341504ee066500b5e6901b7cf5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eddup3">
+		<description>Essential Data Duplicator III (version 3.0-1984-05-25)</description>
+		<year>1984</year>
+		<publisher>Utilico Microware</publisher>
+		<info name="programmer" value="Donald Anthony Schnapp" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="3.0-1984-05-25" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-03-27-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="247145">
+				<rom name="essential data duplicator iii v3.0-1984-05-25.woz" size="247145" crc="7b1493eb" sha1="1de36a7c74a19786cf4516b4d1f16e4c7164837e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eddup4">
+		<description>Essential Data Duplicator 4 (version 4.4)</description>
+		<year>1986</year>
+		<publisher>Utilico Microware</publisher>
+		<info name="programmer" value="Donald Anthony Schnapp" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="4.4" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-11-04-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="106863">
+				<rom name="essential data duplicator v4.4.woz" size="106863" crc="a50ae8ed" sha1="c3f6a000171af417c81af7d47c81dc7f1d2026f7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eddup4p">
+		<description>Essential Data Duplicator 4 Plus (version 4.1)</description>
+		<year>1986</year>
+		<publisher>Utilico Microware</publisher>
+		<info name="programmer" value="Donald Anthony Schnapp" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="4.1" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-17-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="95026">
+				<rom name="essential data duplicator 4 plus v4.1.woz" size="95026" crc="1e3718ff" sha1="46e7db7d52a25133db8665a4a98bdbef1a56a759" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f15streag">
+		<description>F-15 Strike Eagle (version 1.4)</description>
+		<year>1985</year>
+		<publisher>Microprose Software</publisher>
+		<info name="programmer" value="Sid Meier and Jim Synoski" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.4" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228179">
+				<rom name="f-15 strike eagle v1.4.woz" size="228179" crc="9dfd7e1d" sha1="784ff404399e282836ca53b6ce29e3467bd5a3fe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="falcons">
+		<description>Falcons</description>
+		<year>1981</year>
+		<publisher>Piccadilly Software</publisher>
+		<info name="programmer" value="Thomas Ball and Eric Varsanyi" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-19-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="146916">
+				<rom name="falcons.woz" size="146916" crc="cc93f644" sha1="7766debe7d678380aae96def6f14cedd6ff1683a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="faywrd35">
 		<description>Fay: The Word Hunter (800K 3.5")</description>
 		<year>1991</year>
@@ -29035,6 +28445,54 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="grbblsadjadv">
+		<description>Grammar: Building Better Language Skills: Adjectives and Adverbs</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234821">
+				<rom name="building better language skills- adjectives and adverbs.woz" size="234821" crc="80941ab0" sha1="ec0fc4c98bb98c750c7089a6834e545b18e8a2ec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grbblsnoun">
+		<description>Grammar: Building Better Language Skills: Nouns</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234804">
+				<rom name="building better language skills- nouns.woz" size="234804" crc="9794170b" sha1="28c6dcfcc73b7ba06c8dad17ec0c0d42442e1862" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grancook">
+		<description>Granny Applebee's Cookie Factory</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="granny applebee's cookie factory.woz" size="234788" crc="f1349cbb" sha1="57c0b3a9ce886f22c834310195d769c110678cac" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="graphing10">
 		<description>Graphing (A-817 version 1.0)</description>
 		<year>1983</year>
@@ -29064,6 +28522,38 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="226887">
 				<rom name="hard hat mack.woz" size="226887" crc="82a26a65" sha1="7fe8fa5f6c0a303221f6f6c4fd542feaec2c84e3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hresfbal">
+		<description>Hi-Res Football</description>
+		<year>1980</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="programmer" value="Jay Sullivan and Ken Williams" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="68405">
+				<rom name="hi-res football.woz" size="68405" crc="5eee5ba3" sha1="d46fb8bb288c177c09ed11bf6811532f8dcede44" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhlngvwl">
+		<description>Hugo Hound's Vowel Sounds: Long Vowels</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--May be missing disk 2 - "Short Vowels" based on manual.-->
+		<!--education program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234802">
+				<rom name="hugo hound's vowel sounds- long vowels.woz" size="234802" crc="780ba877" sha1="3167aa6f35b598cf400a07d6d6722e284f2efcf8" />
 			</dataarea>
 		</part>
 	</software>
@@ -29103,6 +28593,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="itsabttm">
+		<description>It's About Time</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234773">
+				<rom name="it's about time.woz" size="234773" crc="b5905f9d" sha1="536a2bd895f941b2ae54cdb06f80e7a13e13cc7c" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jbird">
 		<description>J-Bird</description>
 		<year>1983</year>
@@ -29132,6 +28638,38 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296146">
 				<rom name="jumblezzz 800k.woz" size="1296146" crc="2a75cc48" sha1="97256ce15f81da727488dd33fd53c52709c2442b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kcaddphn">
+		<description>Kinder Critters: Address and Phone Number</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234807">
+				<rom name="kinder critters- address and phone number.woz" size="234807" crc="9a1f8a9f" sha1="8a338ce20ff4328d2f5c4b82b0f511c749dbc57a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kcletpat">
+		<description>Kinder Critters: Letters and Patterns</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234803">
+				<rom name="kinder critters- letters and patterns.woz" size="234803" crc="cc43ebbe" sha1="495ff9e15d607f7db830a5c651a70153303740c2" />
 			</dataarea>
 		</part>
 	</software>
@@ -29202,6 +28740,124 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296218">
 				<rom name="magic spells 800k.woz" size="1296218" crc="8fdcca18" sha1="88beae2101715a83a12dce18e0087e8d78f45533" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="martyfrd">
+		<description>Marty's Family Reader</description>
+		<year>1992</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="234795">
+				<rom name="marty's family reader - disk 1.woz" size="234795" crc="51c46b95" sha1="58d3b9120e913e140984f5e89d756adcb992bba4" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="234795">
+				<rom name="marty's family reader - disk 2.woz" size="234795" crc="08e83c2c" sha1="290e5bd096d1d444a6c9559043fc1b6d3cbd5230" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="234795">
+				<rom name="marty's family reader - disk 3.woz" size="234795" crc="d6590d18" sha1="5837af795cff24db8cf791d3a09612edb6064353" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="234795">
+				<rom name="marty's family reader - disk 4.woz" size="234795" crc="ebb16406" sha1="e20547f132df1feb0abafd9df40050812421d091" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="234795">
+				<rom name="marty's family reader - disk 5.woz" size="234795" crc="63bbddbd" sha1="826b7623f9b7e6360a13621d9e397e78153f5111" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="234795">
+				<rom name="marty's family reader - disk 6.woz" size="234795" crc="ed3788ab" sha1="2b2332d84ded516115f5020159ba2b773590f198" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="234795">
+				<rom name="marty's family reader - disk 7.woz" size="234795" crc="5ebb03c6" sha1="6b80083af9da670e22ae460fa318863a6f30ca38" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8" />
+			<dataarea name="flop" size="234787">
+				<rom name="marty's family reader - disk 8.woz" size="234787" crc="ed4c85ac" sha1="d2fc51ca77785dd869ab41e90aa0d5a2ac4b43e0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="martyrdwk">
+		<description>Marty's Reading Workout</description>
+		<year>1992</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 1.woz" size="234797" crc="5fcaa755" sha1="5dd2d140615fba1973c9647577acdcf2c2764e7b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 2.woz" size="234797" crc="1bba4690" sha1="1005a002cb9212e9bfc7a9490cb8ef5323e3fd3e" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 3.woz" size="234797" crc="ac0d0491" sha1="79fa8161faeee1be4f665c0924c176a1b7fc842b" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 4.woz" size="234797" crc="3ee5110e" sha1="bdf0180783e4bf6fd2f034cf471874eb8522e4b9" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 5.woz" size="234797" crc="3375fd76" sha1="90dc7f78fd2655c16a7e83fdd404cc5bd102f708" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 6.woz" size="234797" crc="fec5c180" sha1="e0d9f241c2e1ae67cf75334b0b78efd84e231267" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 7.woz" size="234797" crc="049e0d67" sha1="0d8bcb14950092b17f55c878111ba5a6ed270f82" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8" />
+			<dataarea name="flop" size="234797">
+				<rom name="marty's reading workout - disk 8.woz" size="234797" crc="610a2d0b" sha1="e24f02ba03c3e6afdae59b2e54df3dbd5f538d9b" />
 			</dataarea>
 		</part>
 	</software>
@@ -29481,6 +29137,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="msaurcomp">
+		<description>Mathosaurus: Computation</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234790">
+				<rom name="mathosaurus- computation.woz" size="234790" crc="2e275172" sha1="262ba4c9e8ab922999f81c9e7d1afe107ea01b91" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mdqpres11" cloneof="mdqpres">
 		<description>MECC Dataquest: The Presidents (A-140 version 1.1)</description>
 		<year>1985</year>
@@ -29693,7 +29365,7 @@ license:CC0-1.0
 		<info name="developer" value="Prentice Associates" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-04-24 -->
+		<!--Dump released: 2021-04-24-->
 		<!--education program-->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side 1" />
@@ -29721,6 +29393,148 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="nibaw">
+		<description>Nibbles Away (version B2)</description>
+		<year>1981</year>
+		<publisher>COMPUTER:applications</publisher>
+		<info name="developer" value="COMPUTER:applications" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="B2" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-07-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="129797">
+				<rom name="nibbles away vb2.woz" size="129797" crc="9d73e8fa" sha1="80391d17d7094e5c0a381cd8bf5da4c64d561f86" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nibaw2a1" cloneof="nibaw2">
+		<description>Nibbles Away ][ (version A1)</description>
+		<year>1981</year>
+		<publisher>COMPUTER:applications</publisher>
+		<info name="developer" value="COMPUTER:applications" />
+		<info name="usage" value="Requires an Apple ][ or Apple ][+ with 48K" />
+		<info name="version" value="A1" />
+		<sharedfeat name="compatibility" value="A2,A2P" />
+		<!--Due to aggressive copy protection, it does not boot on later models.-->
+		<!--Dump released: 2024-03-17-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="nibbles away ii va1.woz" size="234779" crc="a247f034" sha1="c0f74dc31daa6d1ed4de765a4cf368e2ef242143" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nibaw2">
+		<description>Nibbles Away ][ (version C3)</description>
+		<year>1983</year>
+		<publisher>COMPUTER:applications</publisher>
+		<info name="developer" value="COMPUTER:applications" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="C3" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-11-04-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="146764">
+				<rom name="nibbles away ][.woz" size="146764" crc="db6d9e93" sha1="8729a7c7e69d74bb474a96e14a36a8b2fe0c085f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nibaw3">
+		<description>Nibbles Away III (version 1.25B)</description>
+		<year>1985</year>
+		<publisher>COMPUTER:applications</publisher>
+		<info name="developer" value="COMPUTER:applications" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="1.25B" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-09-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program" />
+			<dataarea name="flop" size="234776">
+				<rom name="nibbles away iii v1.25b disk 1 - program.woz" size="234776" crc="3eb9f3b7" sha1="a7236341f1ba481a780ee25103cd70cb300b2e38" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Library" />
+			<dataarea name="flop" size="234776">
+				<rom name="nibbles away iii v1.25b disk 2 - library disk.woz" size="234776" crc="1bd02293" sha1="2a2fb311fec6c4846e8d88befb2eee792ccea106" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndcity">
+		<description>North Dakota Cities Database (version 1.6)</description>
+		<year>1989</year>
+		<publisher>North Dakota Centennial Project</publisher>
+		<info name="programmer" value="David McCormack" />
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<info name="version" value="1.6" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-17-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234766">
+				<rom name="north dakota cities v1.6 side a.woz" size="234766" crc="01172d62" sha1="7fe5771d7d99a7cc4ebe3ad1cb479ee60d6b1fa9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234766">
+				<rom name="north dakota cities v1.6 side b.woz" size="234766" crc="afbbd59d" sha1="1841f97fd13834b83bb02954b5ecf8d5aba054da" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numbball">
+		<description>Numberball</description>
+		<year>1994</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--education program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234766">
+				<rom name="numberball.woz" size="234766" crc="161a93e1" sha1="9fd7357972fbaaf16609e2b8fa8f987be08b53cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="olvcword">
+		<description>Oliver's Crosswords</description>
+		<year>1990</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--education program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234777">
+				<rom name="oliver's crosswords side a.woz" size="234777" crc="69a602e3" sha1="f943186b0ec801e36da67b4e42c402c7fce82c8a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234777">
+				<rom name="oliver's crosswords side b.woz" size="234777" crc="a3b0570f" sha1="ad398cff43b42998c8ac9a140a7d044d13274a1b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pollspol">
 		<description>Polls and Politics Volume 1 (A-820 version 1.0)</description>
 		<year>1984</year>
@@ -29734,6 +29548,29 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234793">
 				<rom name="polls and politics v1.0.woz" size="234793" crc="a9c32849" sha1="e5c63d30087975a550b75610690e91c30580c7ec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pressylk">
+		<description>Press Your Luck</description>
+		<year>1988</year>
+		<publisher>GameTek</publisher>
+		<info name="programmer" value="Michael Robert Hausman" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234796">
+				<rom name="press your luck side a.woz" size="234796" crc="c3454f0b" sha1="9b095b16a22c5da0bd5dc8467e13e4eed251c562" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234796">
+				<rom name="press your luck side b.woz" size="234796" crc="7f400b08" sha1="0f45957be53ff84c9e43ae854d8997c9e8569194" />
 			</dataarea>
 		</part>
 	</software>
@@ -29752,6 +29589,101 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234801">
 				<rom name="problem-solving strategies v1.0.woz" size="234801" crc="8e33f814" sha1="6674eb2c9dd393195bd949937cd9e1ce7722971b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pnctbbls">
+		<description>Punctuation: Building Better Language Skills</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-10-26-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235489">
+				<rom name="punctuation - building better language skills.woz" size="235489" crc="0c41a2e0" sha1="dca8d539917b8c6f17bd5e9632828fb31044be9b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qm1prihel">
+		<description>Questmaster I: The Prism of Heheutotol</description>
+		<year>1989</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="Sean B. Barger, Allan J. Lamb, Sean B. Barger, Greg Hopkins, Dave Kuchta, and Rick Incrocci" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-05-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1" />
+			<dataarea name="flop" size="234967">
+				<rom name="questmaster i- the prism of heheutotol - side 1.woz" size="234967" crc="18af8da0" sha1="7b7940d544f2887c8de0159f1eac6d6ba81f3742" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2" />
+			<dataarea name="flop" size="234967">
+				<rom name="questmaster i- the prism of heheutotol - side 2.woz" size="234967" crc="e81feeac" sha1="5a4e1554bd9375410c6898b10c04837abcad2d6c" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3" />
+			<dataarea name="flop" size="234967">
+				<rom name="questmaster i- the prism of heheutotol - side 3.woz" size="234967" crc="a053a1f9" sha1="a2b4e2dc65ca0e43fa36c16b7b55c003ab91ac6a" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4" />
+			<dataarea name="flop" size="234967">
+				<rom name="questmaster i- the prism of heheutotol - side 4.woz" size="234967" crc="9ff3706c" sha1="692b07fb4a9d28097bd014293adea9d901270a3e" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Side 5" />
+			<dataarea name="flop" size="234967">
+				<rom name="questmaster i- the prism of heheutotol - side 5.woz" size="234967" crc="434a7d0c" sha1="47e542d2edb107167c962c1688b61d9e81ba08c7" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Side 6" />
+			<dataarea name="flop" size="234967">
+				<rom name="questmaster i- the prism of heheutotol - side 6.woz" size="234967" crc="52038971" sha1="c334883cbbd31bb88239f558bcd1fdef73b77078" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qix">
+		<description>Qix</description>
+		<year>1989</year>
+		<publisher>Taito America</publisher>
+		<info name="developer" value="Alien Technology Group" />
+		<info name="usage" value="Requires a 128K Apple //e, //c, or IIgs." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-08-05-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="233475">
+				<rom name="qix.woz" size="233475" crc="50acf331" sha1="9cbbe0b29761aa9e19a7e965932e9bf694f97825" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rdtrchst">
+		<description>Reader's Treasure Chest</description>
+		<year>1987</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234781">
+				<rom name="reader's treasure chest.woz" size="234781" crc="2c9fc291" sha1="33ef1b383500179830dd91f6bacb2f4433191904" />
 			</dataarea>
 		</part>
 	</software>
@@ -29865,6 +29797,54 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="rmlev1">
+		<description>Real Math: Level I</description>
+		<year>1988</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234781">
+				<rom name="real math- level i.woz" size="234781" crc="a0765a0d" sha1="f6006bd41c5fb98dde3caf8d3c981232526c7d0f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rmlev2">
+		<description>Real Math: Level II</description>
+		<year>1988</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234782">
+				<rom name="real math- level ii.woz" size="234782" crc="75a0e505" sha1="1a0d2e9fbc2ad223f70fe9895ab7ff4ba3cdc296" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rmlev3">
+		<description>Real Math: Level III</description>
+		<year>1988</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234783">
+				<rom name="real math- level iii.woz" size="234783" crc="a6127c37" sha1="4542622a48b9f62c0c7f2157067c5cde39a05771" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rendramatr">
 		<description>Rendezvous with Rama</description>
 		<year>1984</year>
@@ -29872,7 +29852,7 @@ license:CC0-1.0
 		<info name="programmer" value="Lee Jacknow, Ronald Martinez, Robert Strong, Lebbeus Woods, Michael P. Meyer, Andre Garneau, David M. Harris, Isaac V. Kerlow, and Jeffrey Schneider" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-02-01 -->
+		<!--Dump released: 2019-02-01-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 Side A" />
@@ -29896,6 +29876,29 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 Side B" />
 			<dataarea name="flop" size="233443">
 				<rom name="rendezvous with rama disk 2b.woz" size="233443" crc="75753923" sha1="c05a3b522851bac6e6fa66c0e40f0f4ca9132bb2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="renegade">
+		<description>Renegade</description>
+		<year>1989</year>
+		<publisher>Taito America</publisher>
+		<info name="programmer" value="Kyle Freeman" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-05-25-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234755">
+				<rom name="renegade side a.woz" size="234755" crc="040575e3" sha1="be136b6986f712453d1ffa826cf704fd35e95c49" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234755">
+				<rom name="renegade side b.woz" size="234755" crc="d245d5ae" sha1="7113632f3d6b9933402ee0e9ab612a2d8a460d92" />
 			</dataarea>
 		</part>
 	</software>
@@ -29940,11 +29943,43 @@ license:CC0-1.0
 		<publisher>Horizon Simulations</publisher>
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-17 -->
-		<!--"strategy game-->
+		<!--Dump released: 2022-02-17-->
+		<!--strategy game-->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234773">
 				<rom name="shadow hawk one.woz" size="234773" crc="bcee3ca5" sha1="92795b9d977de453863d43fb0ab336b39ed15330" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shpspatt">
+		<description>Shapes and Patterns</description>
+		<year>1988</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234774">
+				<rom name="shapes and patterns.woz" size="234774" crc="d716cc89" sha1="a055cff882adc289c45d60a89b81971898f0eb88" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sitcrit">
+		<description>Situation: Critical</description>
+		<year>1984</year>
+		<publisher>Prism Software</publisher>
+		<info name="programmer" value="Alex Stern, Peter Rokitski, and Greg George" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-19-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="181562">
+				<rom name="situation- critical.woz" size="181562" crc="22b69582" sha1="a5775c0a6a2cb88d72f1421163300839cd99039c" />
 			</dataarea>
 		</part>
 	</software>
@@ -30044,7 +30079,7 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<info name="version" value="demo" />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-10 -->
+		<!--Dump released: 2023-06-10-->
 		<!--educational program-->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234850">
@@ -30162,7 +30197,7 @@ license:CC0-1.0
 		<info name="version" value="1988" />
 		<!--1988 re-release-->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-07-14 -->
+		<!--Dump released: 2021-07-14-->
 		<!--educational program-->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1286445">
@@ -30531,6 +30566,75 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="spasswrd">
+		<description>Super Password</description>
+		<year>1988</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="Softie, Inc." />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234751">
+				<rom name="super password side a.woz" size="234751" crc="3e4870ce" sha1="582cd10f8d6d067539681c56a3bf08d64a6bad2d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234751">
+				<rom name="super password side b.woz" size="234751" crc="e36f3d4e" sha1="79e28db9bfc105bb2bb132ad549e47c862234f95" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssicehock">
+		<description>Superstar Ice Hockey</description>
+		<year>1988</year>
+		<publisher>Mindscape</publisher>
+		<info name="programmer" value="Jim Karaganis and Jerry Karaganis" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234812">
+				<rom name="superstar ice hockey side a.woz" size="234812" crc="bdac7f8c" sha1="e2e80a8a6acdc205b687cd34db49d8ae373b7f2a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234812">
+				<rom name="superstar ice hockey side b.woz" size="234812" crc="e5c84010" sha1="c485bca929a78a6a30a3a8cbfd437aa837c58328" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anfamfeud">
+		<description>The All New Family Feud</description>
+		<year>1989</year>
+		<publisher>ShareData</publisher>
+		<info name="programmer" value="John Dunn" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234790">
+				<rom name="the all new family feud side a.woz" size="234790" crc="9acd30bb" sha1="af43fba11df5547da39caaea5bb3804487b888ba" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234790">
+				<rom name="the all new family feud side b.woz" size="234790" crc="dd370ce7" sha1="20ae959e3583d0a3ff37d5044cb41751eb7521ce" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="banksim">
 		<description>The Banking Simulation</description>
 		<year>1986</year>
@@ -30617,6 +30721,70 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="trcgd2">
+		<description>Top Readers' Club: Grade 2</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="top readers' club- grade 2.woz" size="234789" crc="ad824184" sha1="8feb5cdf2502b54205587db9fc2423d8a45037e0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trcgd3">
+		<description>Top Readers' Club: Grade 3</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="top readers' club- grade 3.woz" size="234789" crc="71252654" sha1="b4dc1b8aa2c563b15ef86ee19874c0431fc6fa42" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trcgd4">
+		<description>Top Readers' Club: Grade 4</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="top readers' club- grade 4.woz" size="234789" crc="899c9c19" sha1="8cd7e25a9f72e36b49da80b9fefe6e435d0cb2aa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trcgd5">
+		<description>Top Readers' Club: Grade 5</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="top readers' club- grade 5.woz" size="234789" crc="f7220442" sha1="de62a19842c881a49f96b658a3094f169e811acb" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="trlspmth">
 		<description>Troll Sports Math: Math Word Problems for Grades 4 to 6 (800K 3.5")</description>
 		<year>1991</year>
@@ -30629,6 +30797,54 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296307">
 				<rom name="troll sports math 800k.woz" size="1296307" crc="66c531ac" sha1="4313b2cecab98701fac6c6724013fd2cc3908a06" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uccsbcon">
+		<description>Uncle Clyde's Consonant Slides: Beginning Consonants</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234816">
+				<rom name="uncle clyde's consonant slides- beginning consonants.woz" size="234816" crc="88348c39" sha1="52540c0a55312cee61423de49d25f26c79aed449" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uccsbldg">
+		<description>Uncle Clyde's Consonant Slides: Blends and Digraphs</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234815">
+				<rom name="uncle clyde's consonant slides- blends and digraphs.woz" size="234815" crc="4ac31653" sha1="7f965a68ed1350390196324319ca45c209c3bd9f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uccsecon">
+		<description>Uncle Clyde's Consonant Slides: Ending Consonants</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-27-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234813">
+				<rom name="uncle clyde's consonant slides- ending consonants.woz" size="234813" crc="bfe6adfe" sha1="bc12cd855cf9687cfd10031ede34ebb60f17f7f2" />
 			</dataarea>
 		</part>
 	</software>
@@ -30648,6 +30864,443 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="war">
+		<description>War</description>
+		<year>1982</year>
+		<publisher>Adventure International</publisher>
+		<info name="developer" value="Adventure International" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234765">
+				<rom name="war (adventure international).woz" size="234765" crc="79dbdd18" sha1="059f29a61f8d47a45a16b66c4634eed837860805" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmneur_525" cloneof="carmeur">
+		<description>Where in Europe is Carmen Sandiego?</description>
+		<year>1988</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Ken Bull, Gene Portwood, Lauren Elliott, Leila Bronstein, Don Albrecht, Katherine Bird, Susan Meyers, and Louis Ewens" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-04-28-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="233533">
+				<rom name="where in europe is carmen sandiego side a.woz" size="233533" crc="aa41e758" sha1="cccfae850e791d3eeae13097d4fbefd85f3543a6" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="233533">
+				<rom name="where in europe is carmen sandiego side b.woz" size="233533" crc="32e8e026" sha1="701d0a865e3a567c663d214b03edc57472ca585a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmeur">
+		<description>Where in Europe is Carmen Sandiego? (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Ken Bull, Gene Portwood, Lauren Elliott, Leila Bronstein, Don Albrecht, Katherine Bird, Susan Meyers, and Louis Ewens" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-07-06. Redumped: 2021-12-14 to fix incorrect header information-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296763">
+				<rom name="where in europe is carmen sandiego 800k.woz" size="1296763" crc="549ffd83" sha1="d6350738f600af581e5dc598aa8a90f8ee47bcf1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmndv98b" cloneof="carmnd">
+		<description>Where in North Dakota is Carmen Sandiego? (version 0.98 beta)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Ken Bull, Katherine Bird, Janese Freed, Leila Bronstein, Rick Incrocci, Michelle McBride, Roseann Mitchell, Arturo Sinclair, Diane Wilcox, and Louis Ewens" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="0.98 beta" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-12-->
+		<!--This is v0.98 beta, labeled as "for workshops and demonstrations only." It is not copy protected.-->
+		<!--educational game-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="235025">
+				<rom name="where in north dakota is carmen sandiego v0.98 beta side a.woz" size="235025" crc="ce6d7066" sha1="d690a7dfbe00b1f43fce826356995a7fdfa39fe8" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="235025">
+				<rom name="where in north dakota is carmen sandiego v0.98 beta side b.woz" size="235025" crc="3c638e67" sha1="3d6f235b01a80644ff37e22ed4f51a7a642c8dcb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmndv10fb" cloneof="carmnd">
+		<description>Where in North Dakota is Carmen Sandiego? (version 1.0 final beta)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Ken Bull, Katherine Bird, Janese Freed, Leila Bronstein, Rick Incrocci, Michelle McBride, Roseann Mitchell, Arturo Sinclair, Diane Wilcox, and Louis Ewens" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0 final beta" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-17-->
+		<!--This is v0.98 beta, labeled as "for workshops and demonstrations only." It is not copy protected.-->
+		<!--educational game-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234980">
+				<rom name="where in north dakota is carmen sandiego v1.0-final-beta side a.woz" size="234980" crc="1fc431b1" sha1="e1bf54f99059247657d72ef67e7196c9fc592120" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234980">
+				<rom name="where in north dakota is carmen sandiego v1.0-final-beta side b.woz" size="234980" crc="f9412d0b" sha1="e611506a904841cf644ffb58d24705d68fe70429" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmnd">
+		<description>Where in North Dakota is Carmen Sandiego? (version 1.0)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Ken Bull, Katherine Bird, Janese Freed, Leila Bronstein, Rick Incrocci, Michelle McBride, Roseann Mitchell, Arturo Sinclair, Diane Wilcox, and Louis Ewens" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-09-->
+		<!--educational game-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234963">
+				<rom name="where in north dakota is carmen sandiego side a.woz" size="234963" crc="482c92f4" sha1="e59481a41d75aca6e670cf9ea87c6f0a1b14646a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234963">
+				<rom name="where in north dakota is carmen sandiego side b.woz" size="234963" crc="cf47fe0c" sha1="25c5bbbdf0f4265e0a63de456c3a4258d87afc95" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmtime_525" cloneof="carmtime">
+		<description>Where in Time is Carmen Sandiego? (verson 1.1)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Rod Nelsen, Leila Bronstein, Jenny Martin, Gail Rathbun, Mark Schlichtinng, and Tom Rettig" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-02-05-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A" />
+			<dataarea name="flop" size="233672">
+				<rom name="where in time is carmen sandiego v1.1 - side a.woz" size="233672" crc="ea58dd13" sha1="a872d51b3352b3a1c5a6817ec10ed0ea0d1b3ed7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B" />
+			<dataarea name="flop" size="240328">
+				<rom name="where in time is carmen sandiego v1.1 - side b.woz" size="240328" crc="d91930ff" sha1="746cbb0f837fe28651f2bf2f19efc815f7c316d9" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side C" />
+			<dataarea name="flop" size="240328">
+				<rom name="where in time is carmen sandiego v1.1 - side c.woz" size="240328" crc="e720deac" sha1="2951a75612d58f001096f5daa4cb6c768098acea" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side D" />
+			<dataarea name="flop" size="233672">
+				<rom name="where in time is carmen sandiego v1.1 - side d.woz" size="233672" crc="20c6a3f7" sha1="7f9832c7e6ce06a3731ba0ca04c04ddd6cd0b929" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmtime">
+		<description>Where in Time is Carmen Sandiego? (version 1.1) (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Rod Nelsen, Leila Bronstein, Jenny Martin, Gail Rathbun, Mark Schlichtinng, and Tom Rettig" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-09-11-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296281">
+				<rom name="where in time is carmen sandiego 800k.woz" size="1296281" crc="8d38e3cd" sha1="9b96556dcb289a7c3b36762b64372f2c4a747951" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmusa86" cloneof="carmusa">
+		<description>Where in the USA is Carmen Sandiego? (version 1.0 1986)</description>
+		<year>1986</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Ken Bull, Gene Portwood, and Lauren Elliott" />
+		<info name="usage" value="Requires a 64K Apple ][ or later." />
+		<info name="version" value="1.0 1986" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-01-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="240205">
+				<rom name="where in the usa is carmen sandiego side a.woz" size="240205" crc="a1cfee60" sha1="fcc406c480127a71e4d186939e9671c0c0bf7c14" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="233549">
+				<rom name="where in the usa is carmen sandiego side b.woz" size="233549" crc="1ac6f62d" sha1="7940fad2b4b52615180cf51ce2348efe10e8e780" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmusa90" cloneof="carmusa">
+		<description>Where in the USA is Carmen Sandiego? (version 1990) (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Ken Bull, Gene Portwood, and Lauren Elliott" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1990" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-09-11-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296119">
+				<rom name="where in the usa is carmen sandiego 800k.woz" size="1296119" crc="c7075c63" sha1="bbc102ed01fb20393fecd3655d5bc0c523d57e50" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmusa">
+		<description>Where in the USA is Carmen Sandiego? (version 2.1)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Ken Bull, Gene Portwood, and Lauren Elliott" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="2.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-19-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234876">
+				<rom name="where in the usa is carmen sandiego v2.1 side a.woz" size="234876" crc="e15c7cbd" sha1="2295a661fdf08ffee4b45159808f51fd81cb4fb6" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234845">
+				<rom name="where in the usa is carmen sandiego v2.1 side b.woz" size="234845" crc="b8296122" sha1="c6471bbc24e0ee9556e660c425fb7f2153215fab" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C" />
+			<dataarea name="flop" size="234845">
+				<rom name="where in the usa is carmen sandiego v2.1 side c.woz" size="234845" crc="8006d0d5" sha1="e9064ada0a2e1151a3d1e305c12ff87e213c416f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmwrld85" cloneof="carmwrld">
+		<description>Where in the World is Carmen Sandiego? (version 1985)</description>
+		<year>1985</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Dane Bigham, Gene Portwood, and Lauren Elliott" />
+		<info name="usage" value="Requires a 64K Apple ][ or later." />
+		<info name="version" value="1985" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-03-16-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="332120">
+				<rom name="where in the world is carmen sandiego side a.woz" size="332120" crc="9e9bc183" sha1="bfcf9c5156a3bd57384f14656d7da9adfe546d2e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234840">
+				<rom name="where in the world is carmen sandiego side b.woz" size="234840" crc="771e61bd" sha1="672a843e9d7b927b8f2d14d0ea3679913add4175" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmwrld">
+		<description>Where in the World is Carmen Sandiego? (version 2.1)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Ken Bull, Dane Bigham, Gene Portwood, and Lauren Elliott" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="2.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-19-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk  Side " />
+			<dataarea name="flop" size="234890">
+				<rom name="where in the world is carmen sandiego v2.1 side a.woz" size="234890" crc="ebb9b426" sha1="a96cc5bef8344c02c5d39115cae165cd69ca9666" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk  Side " />
+			<dataarea name="flop" size="234890">
+				<rom name="where in the world is carmen sandiego v2.1 side b.woz" size="234890" crc="e66e7010" sha1="afaf0ca540bca34c7c8e53a86ca3c4302441d3f3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwmathl4">
+		<description>Wild West Math Level 4</description>
+		<year>1990</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-04-23-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="234794">
+				<rom name="wild west math level 4 disk a.woz" size="234794" crc="a43e5a5e" sha1="553ab5f970ee45190aa5dc29b0ca634a006fd337" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="234794">
+				<rom name="wild west math level 4 disk b.woz" size="234794" crc="20a3050d" sha1="17af493d2f55e469ac14bc532553eae2dfca8fc3" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="234794">
+				<rom name="wild west math level 4 disk c.woz" size="234794" crc="aeb036c1" sha1="3f91f0f0e7ed453a8d91fb34656b04fdc5ce5818" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwmathl5">
+		<description>Wild West Math Level 5</description>
+		<year>1990</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-04-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="234771">
+				<rom name="wild west math level 5 disk 1.woz" size="234771" crc="2fc279e1" sha1="31fc31aba7983a287f19d534c76996e0eeb1a9b5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="234771">
+				<rom name="wild west math level 5 disk 2.woz" size="234771" crc="e4a87d20" sha1="c0d02644c3126f29e62e6b4bdd3f793f4d6758bf" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="234771">
+				<rom name="wild west math level 5 disk 3.woz" size="234771" crc="72328d75" sha1="df6e2970184d6267e9a6b3b6f5a08253e8fd63c0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winlosdr">
+		<description>Win, Lose or Draw</description>
+		<year>1988</year>
+		<publisher>Hi-Tech Expressions</publisher>
+		<info name="developer" value="Softie, Inc." />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-21-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234766">
+				<rom name="win, lose or draw side a.woz" size="234766" crc="220e6ab7" sha1="0eebde3fb99c11c589a40116e86bae785024193a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234766">
+				<rom name="win, lose or draw side b.woz" size="234766" crc="6846a7f9" sha1="86faf856fdd217e10fce1287612d578acb73ef83" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winlosdrjr">
+		<description>Win, Lose or Draw Junior</description>
+		<year>1989</year>
+		<publisher>Hi-Tech Expressions</publisher>
+		<info name="developer" value="Softie, Inc." />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-21-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234789">
+				<rom name="win, lose or draw junior side a.woz" size="234789" crc="533877f3" sha1="d16345f294829b2969c3285805918efc43df78c3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234789">
+				<rom name="win, lose or draw junior side b.woz" size="234789" crc="05d6051c" sha1="515e6350a6e18d04a36dc3b37e42cbfd398de219" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winlosdr2">
+		<description>Win, Lose or Draw Second Edition</description>
+		<year>1989</year>
+		<publisher>Hi-Tech Expressions</publisher>
+		<info name="developer" value="Softie, Inc." />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-21-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234781">
+				<rom name="win lose or draw second edition side a.woz" size="234781" crc="db3e9410" sha1="da3a24b7d52512a241ffefcd5d21e7cccb45bf59" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234781">
+				<rom name="win lose or draw second edition side b.woz" size="234781" crc="f27f2fc2" sha1="b0cab71c34e69eb746c119a76ce16148d7d0e588" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wingsshad">
 		<description>Wings Out of Shadow</description>
 		<year>1983</year>
@@ -30660,6 +31313,156 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234892">
 				<rom name="wings out of shadow.woz" size="234892" crc="3dd30c72" sha1="22ac1989ce534d437c29e35f061b89b5a7f8266a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wipeout">
+		<description>Wipeout</description>
+		<year>1988</year>
+		<publisher>ShareData</publisher>
+		<info name="developer" value="Softie, Inc." />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-20-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234746">
+				<rom name="wipeout side a.woz" size="234746" crc="49a9104d" sha1="929abe88093db5fab3aaa247ca1213b93c6f9944" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234746">
+				<rom name="wipeout side b.woz" size="234746" crc="15b916fc" sha1="26831d8e420c4bbccd57594546ef44fac03848ff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizcovlad">
+		<description>Wizimore: Catacombs of Vlad</description>
+		<year>1987</year>
+		<publisher>Backstreet Software</publisher>
+		<info name="programmer" value="Joel Fenton" />
+		<info name="usage" value="Requires a 48K Apple ][ or later. Scenario disk for Wizardry 1: Proving Grounds of the Mad Overlord." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-21-->
+		<!--roleplaying scenario-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234891">
+				<rom name="wizimore - catacombs of vlad.woz" size="234891" crc="5d4499d2" sha1="cdb4d341f51912df5c5fc7bf0d1428b2af9548dc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wiznihon">
+		<description>Wizimore: Nihonbashi</description>
+		<year>1987</year>
+		<publisher>Backstreet Software</publisher>
+		<info name="programmer" value="Joel Fenton" />
+		<info name="usage" value="Requires a 48K Apple ][ or later. Scenario disk for Wizardry 1: Proving Grounds of the Mad Overlord." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-21-->
+		<!--roleplaying scenario-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234884">
+				<rom name="wizimore - nihonbashi.woz" size="234884" crc="9899bbcd" sha1="31da8032f80faad7bc057b1cc66faf8a638dcc03" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizomine">
+		<description>Wizimore: O'Connor's Mine</description>
+		<year>1985</year>
+		<publisher>Backstreet Software</publisher>
+		<info name="programmer" value="Joel Fenton" />
+		<info name="usage" value="Requires a 48K Apple ][ or later. Scenario disk for Wizardry 1: Proving Grounds of the Mad Overlord." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-21-->
+		<!--roleplaying scenario-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234889">
+				<rom name="wizimore - o'connor's mine.woz" size="234889" crc="decf27bd" sha1="6463c751f1378dfbb33c8e9a5bb5f42af739931a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizempsl">
+		<description>Wizimore: The Emperor's Seal</description>
+		<year>1987</year>
+		<publisher>Backstreet Software</publisher>
+		<info name="programmer" value="Joel Fenton" />
+		<info name="usage" value="Requires a 48K Apple ][ or later. Scenario disk for Wizardry 1: Proving Grounds of the Mad Overlord." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-21-->
+		<!--roleplaying scenario-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234892">
+				<rom name="wizimore - the emperor's seal.woz" size="234892" crc="fcee2feb" sha1="b4bc61c77949c2dc59830afbf7c3d6e31ffdd20e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizsbhh">
+		<description>Wizimore: The Scarlet Brotherhood of Hsi Ho</description>
+		<year>1985</year>
+		<publisher>Backstreet Software</publisher>
+		<info name="programmer" value="Joel Fenton" />
+		<info name="usage" value="Requires a 48K Apple ][ or later. Scenario disk for Wizardry 1: Proving Grounds of the Mad Overlord." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-19-->
+		<!--roleplaying scenario-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234907">
+				<rom name="wizimore - the scarlet brotherhood of hsi ho.woz" size="234907" crc="c52237ac" sha1="aec32fb58baebb34cb1e0578189781fe958ed9bf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcleaderb">
+		<description>World Class Leader Board</description>
+		<year>1987</year>
+		<publisher>Access Software</publisher>
+		<info name="programmer" value="Bruce Carver, Roger Carver, and Vance Cook" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-04-01-->
+		<!--sports game-->
+		<!--This archive also includes "World Class Famous Course Disk Volume 1", originally sold separately.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234815">
+				<rom name="world class leader board side a.woz" size="234815" crc="ac7104f3" sha1="b913bbcab30a3dad52cb28556bdeb4d34e67a4b4" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="241471">
+				<rom name="world class leader board side b.woz" size="241471" crc="14e4bd7c" sha1="ee2fa7be8a79549f07f62925c1635b2ed6768ffd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrdzappr">
+		<description>Word Zapper</description>
+		<year>1990</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-11-03-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Beginning" />
+			<dataarea name="flop" size="235499">
+				<rom name="word zapper disk 1 - beginning.woz" size="235499" crc="1c20054b" sha1="2331dee02b4bdcfc7d93310e7cb8956eafd6e714" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Advanced" />
+			<dataarea name="flop" size="235498">
+				<rom name="word zapper disk 2 - advanced.woz" size="235498" crc="6faf09df" sha1="b3591e7d5fb1a2cc4f86ec89a75bbc00e1d998b5" />
 			</dataarea>
 		</part>
 	</software>

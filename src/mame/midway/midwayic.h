@@ -219,7 +219,7 @@ private:
 	uint8_t   m_shuffle_type;
 	uint8_t   m_shuffle_default;
 	uint8_t   m_shuffle_active;
-	const uint8_t *   m_shuffle_map;
+	const uint8_t *m_shuffle_map;
 	uint8_t   m_irq_state;
 	uint16_t  m_sound_irq_state;
 	uint8_t   m_auto_ack;

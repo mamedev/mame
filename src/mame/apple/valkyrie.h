@@ -7,11 +7,12 @@
 #pragma once
 
 #include "cpu/m68000/m68040.h"
+#include "machine/i2chle.h"
 
 #include "emupal.h"
 #include "screen.h"
 
-class valkyrie_device : public device_t
+class valkyrie_device : public device_t, public i2c_hle_interface
 {
 public:
 	valkyrie_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -22,10 +23,14 @@ public:
 	auto write_irq() { return m_irq.bind(); }
 
 protected:
+	// device_t overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	// i2c_hle_interface overrides
 	virtual ioport_constructor device_input_ports() const override;
+	virtual void write_data(u16 offset, u8 data) override;
+	virtual const char *get_tag() override { return tag(); }
 
 	void recalc_ints();
 	void recalc_mode();
@@ -48,7 +53,7 @@ private:
 	u32 m_base, m_stride, m_video_timing;
 	s32 m_int_status;
 	u32 m_hres, m_vres, m_htotal, m_vtotal, m_config;
-	bool m_enable;
+	u8 m_M, m_N, m_P;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

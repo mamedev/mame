@@ -293,8 +293,8 @@ void wallc_state::unkitpkr_out2_w(uint8_t data)
 void wallc_state::wallc_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   /* 2114, 2114 */
-	map(0xa000, 0xa3ff).ram();     /* 2114, 2114 */
+	map(0x8000, 0x83ff).ram().w(FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   // 2114, 2114
+	map(0xa000, 0xa3ff).ram();     // 2114, 2114
 
 	map(0xb000, 0xb000).portr("DSW1");
 	map(0xb200, 0xb200).portr("SYSTEM");
@@ -310,8 +310,8 @@ void wallc_state::wallc_map(address_map &map)
 void wallc_state::unkitpkr_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   /* 2114, 2114 */
-	map(0xa000, 0xa3ff).ram();     /* 2114, 2114 */
+	map(0x8000, 0x83ff).ram().w(FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   // 2114, 2114
+	map(0xa000, 0xa3ff).ram();     // 2114, 2114
 
 	map(0xb000, 0xb000).portr("DSW1");
 	map(0xb100, 0xb100).portr("IN1");
@@ -328,7 +328,7 @@ void wallc_state::unkitpkr_map(address_map &map)
 
 
 static INPUT_PORTS_START( wallc )
-	PORT_START("SYSTEM")    /* b200 */
+	PORT_START("SYSTEM")    // b200
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )    //Right curve button; select current playfield in test mode
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    //not used ?
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )   //service?? plays loud,high-pitched sound
@@ -338,10 +338,10 @@ static INPUT_PORTS_START( wallc )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )  //ok
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) //ok
 
-	PORT_START("DIAL")      /* b400 - player position 8 bit analog input - value read is used as position of the player directly - what type of input is that ? DIAL ?*/
+	PORT_START("DIAL")      // b400 - player position 8 bit analog input - value read is used as position of the player directly - what type of input is that ? DIAL ?
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(3) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("DSW1")      /* b000 */
+	PORT_START("DSW1")      // b000
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "5" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -364,7 +364,7 @@ static INPUT_PORTS_START( wallc )
 	PORT_DIPSETTING(    0x80, "Free Play With Level Select" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 
-	PORT_START("DSW2")      /* b600 */
+	PORT_START("DSW2")      // b600
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -380,12 +380,12 @@ static INPUT_PORTS_START( wallc )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_5C ) )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" ) /* Shown as "Unused" in the manual */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" ) /* Shown as "Unused" in the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" ) // Shown as "Unused" in the manual
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" ) // Shown as "Unused" in the manual
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( unkitpkr )
-	PORT_START("DSW1")    /* b000 */
+	PORT_START("DSW1")    // b000
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
@@ -395,7 +395,7 @@ static INPUT_PORTS_START( unkitpkr )
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
 
-	PORT_START("IN1")    /* b100 */
+	PORT_START("IN1")    // b100
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) // coin out
@@ -405,7 +405,7 @@ static INPUT_PORTS_START( unkitpkr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
-	PORT_START("IN2")    /* b200 */
+	PORT_START("IN2")    // b200
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
@@ -415,7 +415,7 @@ static INPUT_PORTS_START( unkitpkr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 
-	PORT_START("IN3")    /* b300 */
+	PORT_START("IN3")    // b300
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
@@ -425,7 +425,7 @@ static INPUT_PORTS_START( unkitpkr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("DSW2")      /* b600 */
+	PORT_START("DSW2")      // b600
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW2:1,2") // ok
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
@@ -448,7 +448,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sidampkr )
 	PORT_INCLUDE(unkitpkr)
 
-	PORT_MODIFY("DSW1")    /* b000 */
+	PORT_MODIFY("DSW1")    // b000
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
@@ -488,13 +488,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
+	8,8,    // 8*8 characters
 	RGN_FRAC(1,3),
-	3,  /* 3 bits per pixel */
-	{ RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3) }, /* the bitplanes are separated */
+	3,  // 3 bits per pixel
+	{ RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3) }, // the bitplanes are separated
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // every char takes 8 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_wallc )
@@ -508,8 +508,8 @@ void wallc_state::init_wallc()
 
 	for (uint32_t i = 0; i < 0x2000 * 2; i++)
 	{
-		uint8_t c = ROM[ i ] ^ 0x55 ^ 0xff; /* NOTE: this can be shortened but now it fully reflects what the bigger module really does */
-		c = bitswap<8>(c, 4,2,6,0,7,1,3,5); /* also swapped inside of the bigger module */
+		uint8_t c = ROM[ i ] ^ 0x55 ^ 0xff; // NOTE: this can be shortened but now it fully reflects what the bigger module really does
+		c = bitswap<8>(c, 4,2,6,0,7,1,3,5); // also swapped inside of the bigger module
 		ROM[ i ] = c;
 	}
 }
@@ -539,14 +539,14 @@ void wallc_state::init_wallca()
 
 void wallc_state::wallc(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 12.288_MHz_XTAL / 4);  /* 3.072 MHz ? */
+	// basic machine hardware
+	Z80(config, m_maincpu, 12.288_MHz_XTAL / 4);  // 3.072 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &wallc_state::wallc_map);
 	m_maincpu->set_vblank_int("screen", FUNC(wallc_state::irq0_line_hold));
 
 	ADC0804(config, "adc", 640000).vin_callback().set_ioport("DIAL"); // clock not verified
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
@@ -558,7 +558,7 @@ void wallc_state::wallc(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_wallc);
 	PALETTE(config, "palette", FUNC(wallc_state::wallc_palette), 32);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	ay8912_device &aysnd(AY8912(config, "aysnd", 12288000 / 8));
 	aysnd.port_a_read_callback().set_ioport("DSW2");
@@ -580,7 +580,7 @@ void wallc_state::sidampkra(machine_config &config)
 
 	subdevice<palette_device>("palette")->set_init(FUNC(wallc_state::unkitpkr_palette));
 
-	/* sound hardware */
+	// sound hardware
 	subdevice<ay8912_device>("aysnd")->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -618,7 +618,7 @@ ROM_START( wallc )
 	ROM_LOAD( "74s288.c2",  0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) )
 ROM_END
 
-/* this set uses a different encryption, but the decrypted code is the same */
+// this set uses a different encryption, but the decrypted code is the same
 ROM_START( wallca )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom4.rom",     0x0000, 0x2000, CRC(ce43af1b) SHA1(c05419cb4aa57c6187b469573a3787d9123c4a05) )
@@ -635,7 +635,7 @@ ROM_END
 
 ROM_START( brkblast )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "fadesa-r0.6m",     0x0000, 0x4000, CRC(4e96ca15) SHA1(87f1a3538712aa3d6c3713b845679dd42a4ba5a4) )
+	ROM_LOAD( "fadesa-r0.6m", 0x0000, 0x4000, CRC(4e96ca15) SHA1(87f1a3538712aa3d6c3713b845679dd42a4ba5a4) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_LOAD( "rom3.rom",     0x0800, 0x0800, CRC(6634db73) SHA1(fe6104f974495a250e0cd14c0745eec8e44b8d3a) )
@@ -643,7 +643,10 @@ ROM_START( brkblast )
 	ROM_LOAD( "rom1.rom",     0x2800, 0x0800, CRC(3884fd4f) SHA1(47254c8828128ac48fc15f05b52fe4d42d4919e7) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "74s288.c2",  0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) )
+	ROM_LOAD( "74s288.c2",    0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) )
+
+	ROM_REGION( 0x00eb, "plds", 0 )
+	ROM_LOAD( "82s153.h8",    0x0000, 0x00eb, CRC(a6db7c28) SHA1(023f393c45ae35c0008f61af6c3a1b21f7fe7c79) ) // On the CPU subboard
 ROM_END
 
 

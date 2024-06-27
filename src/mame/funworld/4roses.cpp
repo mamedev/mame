@@ -50,8 +50,8 @@
 
     - The color palettes are stored in a normal ROM.
 
-	- The code initializes a couple of inexistent PIAs 6821 that handle the I/O, so surely 
-	   these are emulated/simulated. However, set Rugby has both physical PIAs in the PCB.
+    - The code initializes a couple of inexistent PIAs 6821 that handle the I/O, so surely
+       these are emulated/simulated. However, set Rugby has both physical PIAs in the PCB.
 
 
 ***********************************************************************************
@@ -434,10 +434,10 @@ static const gfx_layout charlayout =
 	4,
 	8,
   0x1000,
-//	RGN_FRAC(1,2),
+//  RGN_FRAC(1,2),
 	4,
   { 0, 4, 0x8000*8, 0x8000*8+4 },
-//	{ RGN_FRAC(0,2), RGN_FRAC(0,2) + 4, RGN_FRAC(1,2), RGN_FRAC(1,2) + 4 },
+//  { RGN_FRAC(0,2), RGN_FRAC(0,2) + 4, RGN_FRAC(1,2), RGN_FRAC(1,2) + 4 },
 	{ 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*4*2

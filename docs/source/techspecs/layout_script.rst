@@ -495,8 +495,8 @@ providing what’s needed:
 * ``emu.print_verbose``, ``emu.print_error``, ``emu.print_warning``,
   ``emu.print_info`` and ``emu.print_debug`` functions for diagnostic output.
 * Standard Lua ``tonumber``, ``tostring``, ``pairs`` and ``ipairs`` functions,
-  and ``table`` and ``string`` objects for manipulating strings, tables and
-  other containers.
+  and ``math``, ``table`` and ``string`` objects for manipulating numbers,
+  strings, tables and other containers.
 * Standard Lua ``print`` function for text output to the console.
 
 

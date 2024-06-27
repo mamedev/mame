@@ -22,7 +22,7 @@
  *
  *************************************/
 
-#define MAC_CLK             XTAL(10'000'000)
+static constexpr XTAL MAC_CLK = XTAL(10'000'000);
 #define VTXROM_FMT(x)       (((x) << 14) | ((x) & (1 << 15) ? 0xc0000000 : 0))
 
 
@@ -64,7 +64,7 @@ uint8_t micro3d_state::duart_input_r()
 */
 void micro3d_state::duart_output_w(uint8_t data)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -109,9 +109,7 @@ inline constexpr int64_t micro3d_state::micro3d_vtx::dot_product(micro3d_vtx con
 
 static inline int64_t normalised_multiply(int32_t a, int32_t b)
 {
-	int64_t result;
-
-	result = (int64_t)a * (int64_t)b;
+	int64_t const result = (int64_t)a * (int64_t)b;
 	return result >> 14;
 }
 
@@ -121,41 +119,35 @@ TIMER_CALLBACK_MEMBER(micro3d_state::mac_done_callback)
 	m_mac_stat = 0;
 }
 
-void micro3d_state::micro3d_mac1_w(uint32_t data)
+void micro3d_state::mac1_w(uint32_t data)
 {
 	m_vtx_addr = (data & 0x3ffff);
 	m_sram_w_addr = (data >> 18) & 0xfff;
 }
 
-uint32_t micro3d_state::micro3d_mac2_r()
+uint32_t micro3d_state::mac2_r()
 {
 	return (m_mac_inst << 1) | m_mac_stat;
 }
 
-void micro3d_state::micro3d_mac2_w(uint32_t data)
+void micro3d_state::mac2_w(uint32_t data)
 {
 	uint32_t cnt = data & 0xff;
-	uint32_t inst = (data >> 8) & 0x1f;
+	uint32_t const inst = (data >> 8) & 0x1f;
 	uint32_t mac_cycles = 1;
-
-	uint32_t mrab11;
-	uint32_t vtx_addr;
-	uint32_t sram_r_addr;
-	uint32_t sram_w_addr;
-	uint32_t *mac_sram;
 
 	m_mac_stat = BIT(data, 13);
 	m_mac_inst = inst & 0x7;
 	m_mrab11 = (data >> 18) & (1 << 11);
 	m_sram_r_addr = (data >> 18) & 0xfff;
 
-	mrab11 = m_mrab11;
-	vtx_addr = m_vtx_addr;
-	sram_r_addr = m_sram_r_addr;
-	sram_w_addr = m_sram_w_addr;
-	mac_sram = m_mac_sram;
+	uint32_t const mrab11 = m_mrab11;
+	uint32_t vtx_addr = m_vtx_addr;
+	uint32_t sram_r_addr = m_sram_r_addr;
+	uint32_t sram_w_addr = m_sram_w_addr;
+	uint32_t *mac_sram = m_mac_sram;
 
-	if (data & (1 << 14))
+	if (BIT(data, 14))
 		m_drmath->set_input_line(AM29000_INTR0, CLEAR_LINE);
 
 	switch (inst)
@@ -168,10 +160,9 @@ void micro3d_state::micro3d_mac2_w(uint32_t data)
 		case 0x09: cnt += 0x100; [[fallthrough]];
 		case 0x08:
 		{
-			int i;
 			const uint16_t *rom = (uint16_t*)m_vertex->base();
 
-			for (i = 0; i <= cnt; ++i)
+			for (int i = 0; i <= cnt; ++i)
 			{
 				int64_t acc;
 				micro3d_vtx v1;
@@ -207,10 +198,9 @@ void micro3d_state::micro3d_mac2_w(uint32_t data)
 		case 0x0d: cnt += 0x100; [[fallthrough]];
 		case 0x0c:
 		{
-			int i;
 			const uint16_t *rom = (uint16_t*)m_vertex->base();
 
-			for (i = 0; i <= cnt; ++i)
+			for (int i = 0; i <= cnt; ++i)
 			{
 				int64_t acc;
 				micro3d_vtx v1;
@@ -240,10 +230,9 @@ void micro3d_state::micro3d_mac2_w(uint32_t data)
 		}
 		case 0x0f:
 		{
-			int i;
 			const uint16_t *rom = (uint16_t*)m_vertex->base();
 
-			for (i = 0; i <= cnt; ++i, vtx_addr += 4)
+			for (int i = 0; i <= cnt; ++i, vtx_addr += 4)
 			{
 				mac_sram[sram_w_addr++] = VTXROM_FMT(rom[vtx_addr + 0]);
 				mac_sram[sram_w_addr++] = VTXROM_FMT(rom[vtx_addr + 1]);
@@ -254,7 +243,7 @@ void micro3d_state::micro3d_mac2_w(uint32_t data)
 			mac_cycles = 8 * cnt;
 			break;
 		}
-		/* Dot product of SRAM vectors with single SRAM vector */
+		// Dot product of SRAM vectors with single SRAM vector
 		case 0x11: cnt += 0x100; [[fallthrough]];
 		case 0x10:
 		{
@@ -279,7 +268,7 @@ void micro3d_state::micro3d_mac2_w(uint32_t data)
 			mac_cycles = 10 * cnt;
 			break;
 		}
-		/* Dot product of SRAM vectors with SRAM vectors */
+		// Dot product of SRAM vectors with SRAM vectors
 		case 0x16: cnt += 0x100; [[fallthrough]];
 		case 0x15: cnt += 0x100; [[fallthrough]];
 		case 0x14:
@@ -310,7 +299,7 @@ void micro3d_state::micro3d_mac2_w(uint32_t data)
 			break;
 	}
 
-	/* TODO: Calculate a better estimate for timing */
+	// TODO: Calculate a better estimate for timing
 	if (m_mac_stat)
 		m_mac_done_timer->adjust(attotime::from_hz(MAC_CLK) * mac_cycles);
 
@@ -327,18 +316,18 @@ void micro3d_state::micro3d_mac2_w(uint32_t data)
  *
  *************************************/
 
-uint16_t micro3d_state::micro3d_encoder_h_r()
+uint16_t micro3d_state::encoder_h_r()
 {
-	uint16_t x_encoder = m_joystick_x.read_safe(0);
-	uint16_t y_encoder = m_joystick_y.read_safe(0);
+	uint16_t const x_encoder = m_joystick_x.read_safe(0);
+	uint16_t const y_encoder = m_joystick_y.read_safe(0);
 
 	return (y_encoder & 0xf00) | ((x_encoder & 0xf00) >> 8);
 }
 
-uint16_t micro3d_state::micro3d_encoder_l_r()
+uint16_t micro3d_state::encoder_l_r()
 {
-	uint16_t x_encoder = m_joystick_x.read_safe(0);
-	uint16_t y_encoder = m_joystick_y.read_safe(0);
+	uint16_t const x_encoder = m_joystick_x.read_safe(0);
+	uint16_t const y_encoder = m_joystick_y.read_safe(0);
 
 	return ((y_encoder & 0xff) << 8) | (x_encoder & 0xff);
 }
@@ -355,13 +344,15 @@ int micro3d_state::botss_hwchk_r()
 
 uint16_t micro3d_state::botss_140000_r()
 {
-	m_botss_latch = 0;
+	if (!machine().side_effects_disabled())
+		m_botss_latch = 0;
 	return 0xffff;
 }
 
 uint16_t micro3d_state::botss_180000_r()
 {
-	m_botss_latch = 1;
+	if (!machine().side_effects_disabled())
+		m_botss_latch = 1;
 	return 0xffff;
 }
 
@@ -371,12 +362,11 @@ uint16_t micro3d_state::botss_180000_r()
  *
  *************************************/
 
-void micro3d_state::micro3d_reset_w(uint16_t data)
+void micro3d_state::reset_w(uint16_t data)
 {
-	data >>= 8;
-	m_drmath->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
-	m_vgb->set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
-	/* TODO: Joystick reset? */
+	m_drmath->set_input_line(INPUT_LINE_RESET, BIT(data, 8) ? CLEAR_LINE : ASSERT_LINE);
+	m_vgb->set_input_line(INPUT_LINE_RESET, BIT(data, 9) ? CLEAR_LINE : ASSERT_LINE);
+	// TODO: Joystick reset?
 }
 
 void micro3d_state::host_drmath_int_w(uint16_t data)
@@ -392,13 +382,13 @@ void micro3d_state::host_drmath_int_w(uint16_t data)
  *
  *************************************/
 
-void micro3d_state::micro3d_shared_w(offs_t offset, uint32_t data)
+void micro3d_state::shared_w(offs_t offset, uint32_t data)
 {
 	m_shared_ram[offset * 2 + 1] = data & 0xffff;
 	m_shared_ram[offset * 2 + 0] = data >> 16;
 }
 
-uint32_t micro3d_state::micro3d_shared_r(offs_t offset)
+uint32_t micro3d_state::shared_r(offs_t offset)
 {
 	return (m_shared_ram[offset * 2] << 16) | m_shared_ram[offset * 2 + 1];
 }
@@ -432,26 +422,25 @@ void micro3d_state::drmath_intr2_ack(uint32_t data)
 ***************************************************************************/
 
 
-void micro3d_state::micro3d_snd_dac_a(uint8_t data)
+void micro3d_state::snd_dac_a(uint8_t data)
 {
-	m_noise_1->dac_w(data);
-	m_noise_2->dac_w(data);
+	m_noise[0]->dac_w(data);
+	m_noise[1]->dac_w(data);
 }
 
-void micro3d_state::micro3d_snd_dac_b(uint8_t data)
+void micro3d_state::snd_dac_b(uint8_t data)
 {
-	/* TODO: This controls upd7759 volume */
+	// TODO: This controls upd7759 volume
 }
 
-void micro3d_state::micro3d_sound_p1_w(uint8_t data)
+void micro3d_state::sound_p1_w(uint8_t data)
 {
 	m_sound_port_latch[1] = data;
 
-	micro3d_sound_device *noise = (data & 4) ? m_noise_2 : m_noise_1;
-	noise->noise_sh_w(data);
+	m_noise[BIT(data, 2)]->noise_sh_w(data);
 }
 
-void micro3d_state::micro3d_sound_p3_w(uint8_t data)
+void micro3d_state::sound_p3_w(uint8_t data)
 {
 	// preserve RXD input
 	m_sound_port_latch[3] = (m_sound_port_latch[3] & 1) | (data & ~1);
@@ -461,17 +450,17 @@ void micro3d_state::micro3d_sound_p3_w(uint8_t data)
 	m_upd7759->reset_w(!BIT(data, 4));
 }
 
-uint8_t micro3d_state::micro3d_sound_p1_r()
+uint8_t micro3d_state::sound_p1_r()
 {
 	return (m_sound_port_latch[1] & 0x7f) | m_sound_sw->read();
 }
 
-uint8_t micro3d_state::micro3d_sound_p3_r()
+uint8_t micro3d_state::sound_p3_r()
 {
 	return (m_sound_port_latch[3] & 0xf7) | (m_upd7759->busy_r() ? 0x08 : 0);
 }
 
-void micro3d_state::micro3d_upd7759_w(uint8_t data)
+void micro3d_state::upd7759_w(uint8_t data)
 {
 	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
@@ -503,7 +492,7 @@ void micro3d_state::init_botss()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	/* Required to pass the hardware version check */
+	// Required to pass the hardware version check
 	space.install_read_handler(0x140000, 0x140001, read16smo_delegate(*this, FUNC(micro3d_state::botss_140000_r)));
 	space.install_read_handler(0x180000, 0x180001, read16smo_delegate(*this, FUNC(micro3d_state::botss_180000_r)));
 
@@ -513,6 +502,16 @@ void micro3d_state::init_botss()
 void micro3d_state::machine_start()
 {
 	m_mac_done_timer = timer_alloc(FUNC(micro3d_state::mac_done_callback), this);
+
+	save_item(NAME(m_m68681_tx0));
+	save_item(NAME(m_sound_port_latch));
+	save_item(NAME(m_botss_latch));
+	save_item(NAME(m_sram_r_addr));
+	save_item(NAME(m_sram_w_addr));
+	save_item(NAME(m_vtx_addr));
+	save_item(NAME(m_mrab11));
+	save_item(NAME(m_mac_stat));
+	save_item(NAME(m_mac_inst));
 }
 
 void micro3d_state::machine_reset()

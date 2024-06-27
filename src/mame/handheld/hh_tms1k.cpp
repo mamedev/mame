@@ -82,6 +82,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP0169   TMS1000   1979, Conic Electronic Baseball
  @MP0170   TMS1000   1979, Conic Football
  *MP0171   TMS1000   1979, Tomy Soccer
+ *MP0186   TMS1000   1980, Hornby Railways Zero 1: Master Control Unit R944
  *MP0220   TMS1000   1980, Tomy Teacher
  @MP0230   TMS1000   1980, Entex Blast It (6015)
  @MP0271   TMS1000   1982, Tandy (Radio Shack) Monkey See

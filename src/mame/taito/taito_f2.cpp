@@ -5567,20 +5567,20 @@ void taitof2_state::init_driveout()
 //    YEAR  NAME        PARENT    MACHINE    INPUT       CLASS          INIT           ROT     COMPANY                      FULLNAME
 
 GAME( 1988, finalb,     0,        finalb,    finalb,     taitof2_state, init_finalb,   ROT0,   "Taito Corporation Japan",   "Final Blow (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, finalbu,    finalb,   finalb,    finalbu,    taitof2_state, init_finalb,   ROT0,   "Taito America Corporation", "Final Blow (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, finalbu,    finalb,   finalb,    finalbu,    taitof2_state, init_finalb,   ROT0,   "Taito America Corporation", "Final Blow (US, rev 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, finalbj,    finalb,   finalb,    finalbj,    taitof2_state, init_finalb,   ROT0,   "Taito Corporation",         "Final Blow (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, dondokod,   0,        dondokod,  dondokod,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Don Doko Don (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dondokodu,  dondokod, dondokod,  dondokodu,  taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Don Doko Don (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dondokodj,  dondokod, dondokod,  dondokodj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Don Doko Don (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dondokod,   0,        dondokod,  dondokod,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Don Doko Don (World, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dondokodu,  dondokod, dondokod,  dondokodu,  taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Don Doko Don (US, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dondokodj,  dondokod, dondokod,  dondokodj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Don Doko Don (Japan, rev 1)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, megablst,   0,        megab,     megab,      taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Mega Blast (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, megablstu,  megablst, megab,     megabu,     taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Mega Blast (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, megablstj,  megablst, megab,     megabj,     taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Mega Blast (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, thundfox,   0,        thundfox,  thundfox,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Thunder Fox (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, thundfoxu,  thundfox, thundfox,  thundfoxu,  taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Thunder Fox (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, thundfoxj,  thundfox, thundfox,  thundfoxj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Thunder Fox (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, thundfox,   0,        thundfox,  thundfox,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Thunder Fox (World, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, thundfoxu,  thundfox, thundfox,  thundfoxu,  taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Thunder Fox (US, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, thundfoxj,  thundfox, thundfox,  thundfoxj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Thunder Fox (Japan, rev 1)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, cameltry,   0,        cameltry,  cameltry,   taitof2_state, init_cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, cameltryj,  cameltry, cameltry,  cameltryj,  taitof2_state, init_cameltry, ROT0,   "Taito Corporation",         "Cameltry (Japan, YM2610)", MACHINE_SUPPORTS_SAVE )

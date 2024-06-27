@@ -9,6 +9,9 @@ Novag (Perfect Technology*) Star Diamond
 under Perfect Technology, Ltd., established by the daughter of Novag's founder.
 The main programmer (David Kittinger) also moved to the new company.
 
+Although there may be newer Novag products with (old) software by David Kittinger,
+Star Diamond was the last chess computer that he personally worked on.
+
 Hardware notes:
 - PCB label: TF-05 94V0Δ
 - Hitachi H8S/2312 12312VTE25V, 25MHz XTAL
@@ -62,8 +65,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
 protected:
-	virtual void machine_reset() override { set_power(true); }
 	virtual void machine_start() override;
+	virtual void machine_reset() override { set_power(true); }
 
 private:
 	// devices/pointers
@@ -85,13 +88,13 @@ private:
 	void main_map(address_map &map);
 
 	// I/O handlers
+	void standby(int state);
+	void set_power(bool power);
+
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void update_lcd();
 	void lcd_segs_w(u8 data);
 	void lcd_com_w(offs_t offset, u8 data, u8 mem_mask);
-
-	void standby(int state);
-	void set_power(bool power);
 
 	void p1_w(u8 data);
 	u8 p2_r();

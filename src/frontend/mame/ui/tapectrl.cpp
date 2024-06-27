@@ -9,22 +9,47 @@
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "ui/tapectrl.h"
 
+#include <string_view>
+
+
 namespace ui {
+
+namespace {
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-#define TAPECMD_NULL            ((void *) 0x0000)
-#define TAPECMD_STOP            ((void *) 0x0001)
-#define TAPECMD_PLAY            ((void *) 0x0002)
-#define TAPECMD_RECORD          ((void *) 0x0003)
-#define TAPECMD_REWIND          ((void *) 0x0004)
-#define TAPECMD_FAST_FORWARD    ((void *) 0x0005)
-#define TAPECMD_SLIDER          ((void *) 0x0006)
-#define TAPECMD_SELECT          ((void *) 0x0007)
+#define TAPECMD_NULL            ((void *)0x0000)
+#define TAPECMD_STOP            ((void *)0x0001)
+#define TAPECMD_PLAY            ((void *)0x0002)
+#define TAPECMD_RECORD          ((void *)0x0003)
+#define TAPECMD_REWIND          ((void *)0x0004)
+#define TAPECMD_FAST_FORWARD    ((void *)0x0005)
+#define TAPECMD_SLIDER          ((void *)0x0006)
+#define TAPECMD_SELECT          ((void *)0x0007)
+
+
+inline std::string_view tape_state_string(cassette_image_device &device)
+{
+	cassette_state const state(device.get_state());
+	if ((state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED)
+		return _("stopped");
+	else if ((state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
+		return ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED) ? _("playing") : _("(playing)");
+	else
+		return ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED) ? _("recording") : _("(recording)");
+}
+
+
+inline uint32_t tape_position_flags(double position, double length)
+{
+	return ((position > 0.0) ? menu::FLAG_LEFT_ARROW : 0U) | ((position < length) ? menu::FLAG_RIGHT_ARROW : 0U);
+}
+
+} // anonymous namespace
 
 
 /***************************************************************************
@@ -37,9 +62,14 @@ namespace ui {
 
 menu_tape_control::menu_tape_control(mame_ui_manager &mui, render_container &container, cassette_image_device *device)
 	: menu_device_control<cassette_image_device>(mui, container, device)
+	, m_slider_item_index(-1)
 {
 	set_process_flags(PROCESS_LR_REPEAT);
 	set_heading(_("Tape Control"));
+
+	if (device)
+	{
+	}
 }
 
 
@@ -58,40 +88,29 @@ menu_tape_control::~menu_tape_control()
 
 void menu_tape_control::populate()
 {
+	m_notifier.reset();
+	m_slider_item_index = -1;
 	if (current_device())
 	{
+		// repopulate the menu if an image is mounted or unmounted
+		m_notifier = current_device()->add_media_change_notifier(
+				[this] (device_image_interface::media_change_event ev)
+				{
+					reset(reset_options::REMEMBER_POSITION);
+				});
+
 		// name of tape
 		item_append(current_display_name(), current_device()->exists() ? current_device()->filename() : "No Tape Image loaded", current_display_flags(), TAPECMD_SELECT);
 
 		if (current_device()->exists())
 		{
-			std::string timepos;
-			cassette_state state;
-			double t0 = current_device()->get_position();
-			double t1 = current_device()->get_length();
-			uint32_t tapeflags = 0;
-
-			// state
-			if (t1 > 0)
-			{
-				if (t0 > 0)
-					tapeflags |= FLAG_LEFT_ARROW;
-				if (t0 < t1)
-					tapeflags |= FLAG_RIGHT_ARROW;
-			}
-
-			get_time_string(timepos, current_device(), nullptr, nullptr);
-			state = current_device()->get_state();
-			item_append(
-						(state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED
-						?   _("stopped")
-						:   ((state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY
-								? ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? _("playing") : _("(playing)"))
-								: ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? _("recording") : _("(recording)"))
-								),
-								timepos,
-						tapeflags,
-						TAPECMD_SLIDER);
+			double const t0 = current_device()->get_position();
+			double const t1 = current_device()->get_length();
+			m_slider_item_index = item_append(
+					std::string(tape_state_string(*current_device())),
+					util::string_format("%04d/%04d", t1 ? int(t0) : 0, int(t1)),
+					tape_position_flags(t0, t1),
+					TAPECMD_SLIDER);
 
 			// pause or stop
 			item_append(_("Pause/Stop"), 0, TAPECMD_STOP);
@@ -127,16 +146,26 @@ bool menu_tape_control::handle(event const *ev)
 		{
 		case IPT_UI_LEFT:
 			if (ev->itemref == TAPECMD_SLIDER)
+			{
 				current_device()->seek(-1, SEEK_CUR);
+			}
 			else if (ev->itemref == TAPECMD_SELECT)
+			{
+				m_slider_item_index = -1;
 				previous();
+			}
 			break;
 
 		case IPT_UI_RIGHT:
 			if (ev->itemref == TAPECMD_SLIDER)
+			{
 				current_device()->seek(+1, SEEK_CUR);
+			}
 			else if (ev->itemref == TAPECMD_SELECT)
+			{
+				m_slider_item_index = -1;
 				next();
+			}
 			break;
 
 		case IPT_UI_SELECT:
@@ -156,33 +185,18 @@ bool menu_tape_control::handle(event const *ev)
 		}
 	}
 
-	// hacky way to update the tape counter by repopulating every frame
-	reset(reset_options::REMEMBER_POSITION);
+	// uupdate counters
+	if ((0 <= m_slider_item_index) && current_device() && current_device()->exists())
+	{
+		menu_item &slider_item(item(m_slider_item_index));
+		double const t0(current_device()->get_position());
+		double const t1(current_device()->get_length());
+		slider_item.set_text(tape_state_string(*current_device()));
+		slider_item.set_subtext(util::string_format("%04d/%04d", t1 ? int(t0) : 0, int(t1)));
+		slider_item.set_flags(tape_position_flags(t0, t1));
+	}
+
 	return false;
-}
-
-
-//-------------------------------------------------
-//  get_time_string - returns a textual
-//  representation of the time
-//-------------------------------------------------
-
-void menu_tape_control::get_time_string(std::string &dest, cassette_image_device *cassette, int *curpos, int *endpos)
-{
-	double t0, t1;
-
-	t0 = cassette->get_position();
-	t1 = cassette->get_length();
-
-	if (t1)
-		dest = string_format("%04d/%04d", (int)t0, (int)t1);
-	else
-		dest = string_format("%04d/%04d", 0, (int)t1);
-
-	if (curpos != nullptr)
-		*curpos = t0;
-	if (endpos != nullptr)
-		*endpos = t1;
 }
 
 } // namespace ui

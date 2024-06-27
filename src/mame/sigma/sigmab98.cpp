@@ -253,7 +253,9 @@ public:
 	}
 
 	void init_lufykzku();
+	void init_rockman();
 	void lufykzku(machine_config &config);
+	void rockman(machine_config& config);
 
 private:
 	required_device<mb3773_device> m_watchdog;
@@ -269,6 +271,7 @@ private:
 	void lufykzku_watchdog_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(rockman_timer_irq);
 
 	void lufykzku_io_map(address_map &map);
 	void lufykzku_mem_map(address_map &map);
@@ -1484,11 +1487,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_state::lufykzku_irq)
 	int scanline = param;
 
 	if (scanline == 240)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_vblank_vector); // Z80
+	{
+		if (m_vblank_vector) m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_vblank_vector); // Z80
+	}
 	else if (scanline == 128)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer0_vector); // Z80
+	{
+		if (m_timer0_vector) m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer0_vector); // Z80
+	}
 	else if ((scanline % 8) == 0)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer1_vector); // Z80 - this needs to be called often or the state of the door is not read at boot (at least 5 times before bb9 is called)
+	{
+		if (m_timer1_vector) m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer1_vector); // Z80 - this needs to be called often or the state of the door is not read at boot (at least 5 times before bb9 is called)
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_state::rockman_timer_irq)
+{
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc);
 }
 
 void lufykzku_state::lufykzku(machine_config &config)
@@ -1536,6 +1550,11 @@ void lufykzku_state::lufykzku(machine_config &config)
 	oki.add_route(1, "rspeaker", 0.80);
 }
 
+void lufykzku_state::rockman(machine_config& config)
+{
+	lufykzku(config);
+	TIMER(config, "unktimer").configure_periodic(FUNC(lufykzku_state::rockman_timer_irq), attotime::from_hz(100));
+}
 
 /***************************************************************************
                              Sammy Medal Games
@@ -2006,6 +2025,26 @@ void lufykzku_state::init_lufykzku()
 	m_gfxdecode->gfx(1)->set_granularity(16);
 }
 
+void lufykzku_state::init_rockman()
+{
+	m_vblank_vector = 0xfa; // nop
+	m_timer0_vector = 0;
+	m_timer1_vector = 0xfe;
+
+	m_gfxdecode->gfx(1)->set_granularity(16);
+}
+
+// Banpresto BPSC-2001M-A PCB, same as lufykzku
+ROM_START( mnrockman )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ka-108_p1_ver1.02.ic1", 0x000000, 0x020000, CRC(727edf2f) SHA1(51a5f89a9ba64e16a1f46cc1145efa792ebb6401) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "ka-108_g1_ver1.00.ic3", 0x000000, 0x200000, CRC(ef79a6de) SHA1(50cbe7665e80b58a6bb0b20bae2deeca2e29c9da) )
+
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "ka-108_s1_ver1.00.ic2", 0x000000, 0x080000, CRC(828dd3bd) SHA1(9788a30199d81f6db54f5409fcb146098a29e6aa) )
+ROM_END
 
 /***************************************************************************
 
@@ -2055,10 +2094,12 @@ void lufykzku_state::init_lufykzku()
 
 ***************************************************************************/
 
-#define SAMMYMDL_BIOS                                                                                               \
-	ROM_REGION( 0x80000, "mainbios", 0 )                                                                            \
-	ROM_SYSTEM_BIOS( 0, "v5", "IPL Ver. 5.0" )                                                                      \
-	ROM_LOAD( "vm1211l01.u2", 0x000000, 0x080000, CRC(c3c74dc5) SHA1(07352e6dba7514214e778ba39e1ca773e4698858) )
+#define SAMMYMDL_BIOS                                                                                                           \
+	ROM_REGION( 0x80000, "mainbios", 0 )                                                                                        \
+	ROM_SYSTEM_BIOS( 0, "v5", "IPL Ver. 5.0" ) /* (c)2003 */                                                                    \
+	ROMX_LOAD( "vm1211l01.u2",  0x000000, 0x080000, CRC(c3c74dc5) SHA1(07352e6dba7514214e778ba39e1ca773e4698858), ROM_BIOS(0) ) \
+	ROM_SYSTEM_BIOS( 1, "v4", "IPL Ver. 4.0" ) /* (c)2000, ROM patches not correct for this BIOS */                             \
+	ROMX_LOAD( "mt201l04.u012", 0x000000, 0x080000, CRC(c8c6d25f) SHA1(5be39fa72b65f2e455ccc146dbab58d24ab46505), ROM_BIOS(1) )
 
 ROM_START( sammymdl )
 	SAMMYMDL_BIOS
@@ -2092,6 +2133,19 @@ ROM_START( animalc )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "vx2301l01.u016", 0x00000, 0x200000, CRC(4ae14ff9) SHA1(1273d15ea642452fecacff572655cd3ab47a5884) )   // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+ROM_END
+
+ROM_START( gunkids )
+	SAMMYMDL_BIOS
+
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "vx2302l01.u021", 0x00000, 0x200000, CRC(3d989a45) SHA1(f4e1dc13bfe9ef8bf733735b6647946dda6962f2) )
+
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_COPY( "oki", 0x1c0000, 0x00000, 0x40000 )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "vx2301l01.u016", 0x00000, 0x200000, CRC(5e356b68) SHA1(0e4e28b02dcb5ff7d2a7139c5cdf31cbd08167f4) )
 ROM_END
 
 void sammymdl_state::init_animalc()
@@ -2297,6 +2351,7 @@ GAME( 1997, ucytokyu, 0,        sigmab98, sigma_js, sigmab98_state, init_ucytoky
 GAME( 2000, dashhero, 0,        sigmab98, sigma_1b, sigmab98_state, init_dashhero, ROT0, "Sigma",             "Minna Ganbare! Dash Hero",             MACHINE_NOT_WORKING ) // 1999 in the rom
 // Banpresto Medal Games
 GAME( 2001, lufykzku, 0,        lufykzku, lufykzku, lufykzku_state, init_lufykzku, ROT0, "Banpresto / Eiichiro Oda / Shueisha - Fuji TV - Toho Animation", "Otakara Itadaki Luffy Kaizoku-Dan! (Japan, v1.02)", 0 )
+GAME( 2002, mnrockman,0,        rockman,  lufykzku, lufykzku_state, init_rockman,  ROT0, "Banpresto / Capcom / Shogakukan / ShoPro / TV Tokyo", "Medal Network: Rockman EXE", 0 )
 // Sammy Medal Games:
 GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Sammy Medal Game System BIOS",         MACHINE_IS_BIOS_ROOT )
 GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Animal Catch",                         0 )
@@ -2304,4 +2359,5 @@ GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, sammymdl_state, init_itazura
 GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",                      0 )
 GAME( 2000, tdoboon,  sammymdl, tdoboon,  haekaka,  sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Taihou de Doboon",                     0 )
 GAME( 2001, haekaka,  sammymdl, haekaka,  haekaka,  sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",                     0 )
+GAME( 2002, gunkids,  sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Hayauchi Gun Kids",                    0 )
 GAME( 2003, gocowboy, 0,        gocowboy, gocowboy, sammymdl_state, empty_init,    ROT0, "Sammy",             "Go Go Cowboy (English, prize)",        0 )

@@ -2,7 +2,7 @@
 // read_until.cpp
 // ~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,17 +17,12 @@
 #include "asio/read_until.hpp"
 
 #include <cstring>
+#include <functional>
 #include "archetypes/async_result.hpp"
 #include "asio/io_context.hpp"
 #include "asio/post.hpp"
 #include "asio/streambuf.hpp"
 #include "unit_test.hpp"
-
-#if defined(ASIO_HAS_BOOST_BIND)
-# include <boost/bind/bind.hpp>
-#else // defined(ASIO_HAS_BOOST_BIND)
-# include <functional>
-#endif // defined(ASIO_HAS_BOOST_BIND)
 
 class test_stream
 {
@@ -42,7 +37,7 @@ public:
   {
   }
 
-  executor_type get_executor() ASIO_NOEXCEPT
+  executor_type get_executor() noexcept
   {
     return io_context_.get_executor();
   }
@@ -88,7 +83,7 @@ public:
     size_t bytes_transferred = read_some(buffers);
     asio::post(get_executor(),
         asio::detail::bind_handler(
-          ASIO_MOVE_CAST(Handler)(handler),
+          static_cast<Handler&&>(handler),
           asio::error_code(), bytes_transferred));
   }
 
@@ -673,11 +668,7 @@ void async_read_handler(
 
 void test_dynamic_string_async_read_until_char()
 {
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -836,11 +827,7 @@ void test_dynamic_string_async_read_until_char()
 void test_streambuf_async_read_until_char()
 {
 #if !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -996,11 +983,7 @@ void test_streambuf_async_read_until_char()
 
 void test_dynamic_string_async_read_until_string()
 {
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -1159,11 +1142,7 @@ void test_dynamic_string_async_read_until_string()
 void test_streambuf_async_read_until_string()
 {
 #if !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -1319,11 +1298,7 @@ void test_streambuf_async_read_until_string()
 
 void test_dynamic_string_async_read_until_match_condition()
 {
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -1482,11 +1457,7 @@ void test_dynamic_string_async_read_until_match_condition()
 void test_streambuf_async_read_until_match_condition()
 {
 #if !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 

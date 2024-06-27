@@ -19,17 +19,6 @@ class sh_intc_device;
 
 class sh_adc_device : public device_t {
 public:
-	sh_adc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
-	template<typename T, typename U> sh_adc_device(const machine_config &mconfig, const char *tag, device_t *owner,
-												   T &&cpu, U &&intc, int vect) :
-		sh_adc_device(mconfig, tag, owner)
-	{
-		m_cpu.set_tag(std::forward<T>(cpu));
-		m_intc.set_tag(std::forward<U>(intc));
-		m_intc_vector = vect;
-	}
-
 	u16 addr_r(offs_t offset);
 	u8 adcsr_r();
 	u8 adcr_r();
@@ -41,9 +30,13 @@ public:
 	u64 internal_update(u64 current_time);
 
 protected:
+	sh_adc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	required_device<sh7042_device> m_cpu;
 	required_device<sh_intc_device> m_intc;
+	int m_port_base, m_port_mask, m_port_shift;
 	int m_intc_vector;
+	bool m_is_hs;
 
 	enum {
 		T_SOFT  = 1<<0,
@@ -95,6 +88,37 @@ protected:
 	int get_channel_index(int count);
 };
 
-DECLARE_DEVICE_TYPE(SH_ADC, sh_adc_device)
+class sh_adc_ms_device : public sh_adc_device {
+public:
+	sh_adc_ms_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	template<typename T, typename U> sh_adc_ms_device(const machine_config &mconfig, const char *tag, device_t *owner,
+												   T &&cpu, U &&intc, int port_base, int vect) :
+		sh_adc_ms_device(mconfig, tag, owner)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_intc.set_tag(std::forward<U>(intc));
+		m_is_hs = false;
+		m_port_base = port_base;
+		m_intc_vector = vect;
+	}
+};
+
+class sh_adc_hs_device : public sh_adc_device {
+public:
+	sh_adc_hs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	template<typename T, typename U> sh_adc_hs_device(const machine_config &mconfig, const char *tag, device_t *owner,
+												   T &&cpu, U &&intc, int vect) :
+		sh_adc_hs_device(mconfig, tag, owner)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu));
+		m_intc.set_tag(std::forward<U>(intc));
+		m_intc_vector = vect;
+	}
+};
+
+DECLARE_DEVICE_TYPE(SH_ADC_MS, sh_adc_ms_device)
+DECLARE_DEVICE_TYPE(SH_ADC_HS, sh_adc_hs_device)
 
 #endif // MAME_CPU_SH_SH_ADC_H

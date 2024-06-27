@@ -43,21 +43,21 @@ static constexpr XTAL AIM65_CLOCK(4_MHz_XTAL / 4);
     ADDRESS MAPS
 ***************************************************************************/
 
-/* Note: RAM is mapped dynamically in machine/aim65.c */
+// Note: RAM is mapped dynamically in machine/aim65.c
 void aim65_state::mem_map(address_map &map)
 {
-	map(0x1000, 0x3fff).noprw(); /* User available expansions */
-	map(0x4000, 0x7fff).rom(); /* 4 ROM sockets in 16K PROM/ROM module */
-	map(0x8000, 0x9fff).noprw(); /* User available expansions */
+	map(0x1000, 0x3fff).noprw(); // User available expansions
+	map(0x4000, 0x7fff).rom(); // 4 ROM sockets in 16K PROM/ROM module
+	map(0x8000, 0x9fff).noprw(); // User available expansions
 	map(0xa000, 0xa00f).mirror(0x3f0).m(m_via1, FUNC(via6522_device::map)); // user via
 	map(0xa400, 0xa47f).m(m_riot, FUNC(mos6532_device::ram_map));
 	map(0xa480, 0xa497).m(m_riot, FUNC(mos6532_device::io_map));
-	map(0xa498, 0xa7ff).noprw(); /* Not available */
+	map(0xa498, 0xa7ff).noprw(); // Not available
 	map(0xa800, 0xa80f).mirror(0x3f0).m(m_via0, FUNC(via6522_device::map)); // system via
 	map(0xac00, 0xac03).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xac04, 0xac43).ram(); /* PIA RAM */
-	map(0xac44, 0xafff).noprw(); /* Not available */
-	map(0xb000, 0xffff).rom(); /* 5 ROM sockets */
+	map(0xac04, 0xac43).ram(); // PIA RAM
+	map(0xac44, 0xafff).noprw(); // Not available
+	map(0xb000, 0xffff).rom(); // 5 ROM sockets
 }
 
 
@@ -213,13 +213,13 @@ DEVICE_INPUT_DEFAULTS_END
 
 void aim65_state::aim65(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, AIM65_CLOCK); /* 1 MHz */
+	// basic machine hardware
+	M6502(config, m_maincpu, AIM65_CLOCK); // 1 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &aim65_state::mem_map);
 
 	config.set_default_layout(layout_aim65);
 
-	/* alpha-numeric display */
+	// alpha-numeric display
 	DL1416T(config, m_ds[0], u32(0));
 	m_ds[0]->update().set(FUNC(aim65_state::update_ds<1>));
 	DL1416T(config, m_ds[1], u32(0));
@@ -234,7 +234,7 @@ void aim65_state::aim65(machine_config &config)
 	// pseudo-"screen" for the thermal printer. Index 0.
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_screen_update(FUNC(aim65_state::screen_update));
 	screen.set_size(160, 200);
 	screen.set_visarea_full();
@@ -242,10 +242,10 @@ void aim65_state::aim65(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(aim65_state::aim65_palette), 2);
 
-	/* Sound - wave sound only */
+	// Sound - wave sound only
 	SPEAKER(config, "mono").front_center();
 
-	/* other devices */
+	// other devices
 	MOS6532(config, m_riot, AIM65_CLOCK);
 	m_riot->pa_wr_callback().set([this] (u8 data) { m_riot_port_a = data; });
 	m_riot->pb_rd_callback().set([this] () { return aim65_state::z33_pb_r(); });
@@ -287,16 +287,16 @@ void aim65_state::aim65(machine_config &config)
 	GENERIC_SOCKET(config, "z25", generic_plain_slot, "aim65_z25_cart", "z25").set_device_load(FUNC(aim65_state::z25_load));
 	GENERIC_SOCKET(config, "z24", generic_plain_slot, "aim65_z24_cart", "z24").set_device_load(FUNC(aim65_state::z24_load));
 
-	/* PROM/ROM module sockets */
+	// PROM/ROM module sockets
 	GENERIC_SOCKET(config, "z12", generic_plain_slot, "rm65_z12_cart", "z12").set_device_load(FUNC(aim65_state::z12_load));
 	GENERIC_SOCKET(config, "z13", generic_plain_slot, "rm65_z13_cart", "z13").set_device_load(FUNC(aim65_state::z13_load));
 	GENERIC_SOCKET(config, "z14", generic_plain_slot, "rm65_z14_cart", "z14").set_device_load(FUNC(aim65_state::z14_load));
 	GENERIC_SOCKET(config, "z15", generic_plain_slot, "rm65_z15_cart", "z15").set_device_load(FUNC(aim65_state::z15_load));
 
-	/* internal ram */
+	// internal ram
 	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("1K,2K,3K");
 
-	/* Software lists */
+	// Software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("aim65_cart");
 }
 
@@ -313,25 +313,10 @@ ROM_START( aim65 )
 	ROM_SYSTEM_BIOS(1, "dynatem",  "Dynatem AIM-65")
 	ROMX_LOAD("dynaim65.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(1))
 	ROMX_LOAD("dynaim65.z22", 0xf000, 0x1000, CRC(83e1c6e7) SHA1(444134043edd83385bd70434cb100269901c4417), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "spc100",  "Siemens PC100")
+	ROMX_LOAD("pc100.z23",    0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(2))
+	ROMX_LOAD("pc100.z22",    0xf000, 0x1000, CRC(aa07742a) SHA1(3b9bee24a00cf23b7b50cee97ccc12e3fa9da1ea), ROM_BIOS(2))
 ROM_END
-
-/* Currently dumped and available software:
- *
- * Name             Loc  CRC32     SHA1
- * ------------------------------------------------------------------------
- * Assembler        Z24  0878b399  483e92b57d64be51643a9f6490521a8572aa2f68
- * Basic V1.1       Z25  d7b42d2a  4bbdb28d332429825adea0266ed9192786d9e392
- * Basic V1.1       Z26  36a61f39  f5ce0126cb594a565e730973fd140d03c298cefa
- * Forth V1.3       Z25  0671d019  dd2a1613e435c833634100cf4a22c6cff70c7a26
- * Forth V1.3       Z26  a80ad472  42a2e8c86829a2fe48090e6665ff9fe25b12b070
- * Mathpack         Z24  4889af55  5e9541ddfc06e3802d09b30d1bd89c5da914c76e
- * Monitor          Z22  d01914b0  e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf
- * Monitor          Z23  90e44afe  78e38601edf6bfc787b58750555a636b0cf74c5c
- * Monitor Dynatem  Z22  83e1c6e7  444134043edd83385bd70434cb100269901c4417
- * PL/65 V1.0       Z25  76dcf864  e937c54ed109401f796640cd45b27dfefb76667e
- * PL/65 V1.0       Z26  2ac71abd  6df5e3125bebefac80d51d9337555f54bdf0d8ea
- *
- */
 
 
 /***************************************************************************

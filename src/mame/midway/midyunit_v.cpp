@@ -39,20 +39,16 @@ enum
  *
  *************************************/
 
-VIDEO_START_MEMBER(midyunit_state,common)
+void midyunit_base_state::video_start()
 {
 	// allocate memory
-	m_cmos_ram = std::make_unique<uint16_t[]>((0x2000 * 4)/2);
 	m_local_videoram = make_unique_clear<uint16_t[]>(0x80000/2);
 	m_pen_map = std::make_unique<pen_t[]>(65536);
 
-	m_nvram->set_base(m_cmos_ram.get(), 0x2000 * 4);
-
-	m_dma_timer = timer_alloc(FUNC(midyunit_state::dma_callback), this);
-	m_autoerase_line_timer = timer_alloc(FUNC(midyunit_state::autoerase_line), this);
+	m_dma_timer = timer_alloc(FUNC(midyunit_base_state::dma_callback), this);
+	m_autoerase_line_timer = timer_alloc(FUNC(midyunit_base_state::autoerase_line), this);
 
 	// reset all the globals
-	m_cmos_page = 0;
 	m_autoerase_enable = 0;
 	m_yawdim_dma = 0;
 
@@ -63,15 +59,14 @@ VIDEO_START_MEMBER(midyunit_state,common)
 	// register for state saving
 	save_item(NAME(m_autoerase_enable));
 	save_pointer(NAME(m_local_videoram), 0x80000/2);
-	save_pointer(NAME(m_cmos_ram), (0x2000 * 4)/2);
 	save_item(NAME(m_videobank_select));
 	save_item(NAME(m_dma_register));
 }
 
 
-VIDEO_START_MEMBER(midyunit_state,midyunit_4bit)
+VIDEO_START_MEMBER(midyunit_base_state,midyunit_4bit)
 {
-	VIDEO_START_CALL_MEMBER(common);
+	midyunit_base_state::video_start();
 
 	// init for 4-bit
 	for (int i = 0; i < 65536; i++)
@@ -80,9 +75,9 @@ VIDEO_START_MEMBER(midyunit_state,midyunit_4bit)
 }
 
 
-VIDEO_START_MEMBER(midyunit_state,midyunit_6bit)
+VIDEO_START_MEMBER(midyunit_base_state,midyunit_6bit)
 {
-	VIDEO_START_CALL_MEMBER(common);
+	midyunit_base_state::video_start();
 
 	// init for 6-bit
 	for (int i = 0; i < 65536; i++)
@@ -98,9 +93,9 @@ void mkyawdim_state::video_start()
 }
 
 
-VIDEO_START_MEMBER(midyunit_state,midzunit)
+void midzunit_state::video_start()
 {
-	VIDEO_START_CALL_MEMBER(common);
+	midyunit_base_state::video_start();
 
 	// init for 8-bit
 	for (int i = 0; i < 65536; i++)
@@ -116,7 +111,7 @@ VIDEO_START_MEMBER(midyunit_state,midzunit)
  *
  *************************************/
 
-uint16_t midyunit_state::midyunit_gfxrom_r(offs_t offset)
+uint16_t midyunit_base_state::gfxrom_r(offs_t offset)
 {
 	offset *= 2;
 	if (m_palette_mask == 0x00ff)
@@ -134,7 +129,7 @@ uint16_t midyunit_state::midyunit_gfxrom_r(offs_t offset)
  *
  *************************************/
 
-void midyunit_state::midyunit_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midyunit_base_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset *= 2;
 	if (m_videobank_select)
@@ -154,7 +149,7 @@ void midyunit_state::midyunit_vram_w(offs_t offset, uint16_t data, uint16_t mem_
 }
 
 
-uint16_t midyunit_state::midyunit_vram_r(offs_t offset)
+uint16_t midyunit_base_state::vram_r(offs_t offset)
 {
 	offset *= 2;
 	if (m_videobank_select)
@@ -171,13 +166,13 @@ uint16_t midyunit_state::midyunit_vram_r(offs_t offset)
  *
  *************************************/
 
-TMS340X0_TO_SHIFTREG_CB_MEMBER(midyunit_state::to_shiftreg)
+TMS340X0_TO_SHIFTREG_CB_MEMBER(midyunit_base_state::to_shiftreg)
 {
 	memcpy(shiftreg, &m_local_videoram[address >> 3], 2 * 512 * sizeof(uint16_t));
 }
 
 
-TMS340X0_FROM_SHIFTREG_CB_MEMBER(midyunit_state::from_shiftreg)
+TMS340X0_FROM_SHIFTREG_CB_MEMBER(midyunit_base_state::from_shiftreg)
 {
 	memcpy(&m_local_videoram[address >> 3], shiftreg, 2 * 512 * sizeof(uint16_t));
 }
@@ -190,7 +185,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(midyunit_state::from_shiftreg)
  *
  *************************************/
 
-void midyunit_state::midyunit_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midyunit_base_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	 * Narc 'Z-unit' system register, accessed via '/SEL.MISC' being asserted
@@ -229,13 +224,13 @@ void midyunit_state::midyunit_control_w(offs_t offset, uint16_t data, uint16_t m
 	if (ACCESSING_BITS_0_7)
 	{
 		// CMOS page is bits 6-7
-		m_cmos_page = ((data >> 6) & 3) * 0x1000;
+		m_cmos_page = BIT(data, 6, 2) * 0x1000;
 
 		// video bank select is bit 5
-		m_videobank_select = (data >> 5) & 1;
+		m_videobank_select = BIT(data, 5);
 
 		// handle autoerase disable (bit 4)
-		m_autoerase_enable = ((data & 0x10) == 0);
+		m_autoerase_enable = BIT(~data, 4);
 	}
 }
 
@@ -247,12 +242,10 @@ void midyunit_state::midyunit_control_w(offs_t offset, uint16_t data, uint16_t m
  *
  *************************************/
 
-void midyunit_state::midyunit_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midyunit_base_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int newword;
-
 	COMBINE_DATA(&m_paletteram[offset]);
-	newword = m_paletteram[offset];
+	uint16_t const newword = m_paletteram[offset];
 	m_palette->set_pen_color(offset & m_palette_mask, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
 }
 
@@ -264,7 +257,7 @@ void midyunit_state::midyunit_paletteram_w(offs_t offset, uint16_t data, uint16_
  *
  *************************************/
 
-void midyunit_state::dma_draw(uint16_t command)
+void midyunit_base_state::dma_draw(uint16_t command)
 {
 	int const dx = (command & 0x10) ? -1 : 1;
 	int const height = m_dma_state.height;
@@ -372,7 +365,7 @@ void midyunit_state::dma_draw(uint16_t command)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(midyunit_state::dma_callback)
+TIMER_CALLBACK_MEMBER(midyunit_base_state::dma_callback)
 {
 	m_dma_register[DMA_COMMAND] &= ~0x8000; // tell the cpu we're done
 	m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -386,7 +379,7 @@ TIMER_CALLBACK_MEMBER(midyunit_state::dma_callback)
  *
  *************************************/
 
-uint16_t midyunit_state::midyunit_dma_r(offs_t offset)
+uint16_t midyunit_base_state::dma_r(offs_t offset)
 {
 	return m_dma_register[offset];
 }
@@ -424,7 +417,7 @@ uint16_t midyunit_state::midyunit_dma_r(offs_t offset)
  *     9     | xxxxxxxxxxxxxxxx | color
  */
 
-void midyunit_state::midyunit_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midyunit_base_state::dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// blend with the current register contents
 	COMBINE_DATA(&m_dma_register[offset]);
@@ -536,7 +529,7 @@ void midyunit_state::midyunit_dma_w(offs_t offset, uint16_t data, uint16_t mem_m
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(midyunit_state::autoerase_line)
+TIMER_CALLBACK_MEMBER(midyunit_base_state::autoerase_line)
 {
 	int scanline = param;
 
@@ -545,7 +538,7 @@ TIMER_CALLBACK_MEMBER(midyunit_state::autoerase_line)
 }
 
 
-TMS340X0_SCANLINE_IND16_CB_MEMBER(midyunit_state::scanline_update)
+TMS340X0_SCANLINE_IND16_CB_MEMBER(midyunit_base_state::scanline_update)
 {
 	uint16_t const *const src = &m_local_videoram[(params->rowaddr << 9) & 0x3fe00];
 	uint16_t *const dest = &bitmap.pix(scanline);

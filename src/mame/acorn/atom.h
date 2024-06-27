@@ -46,6 +46,7 @@ public:
 		, m_vdg(*this, MC6847_TAG)
 		, m_cassette(*this, "cassette")
 		, m_fdc(*this, I8271_TAG)
+		, m_floppies(*this, I8271_TAG ":%u", 0U)
 		, m_centronics(*this, CENTRONICS_TAG)
 		, m_speaker(*this, "speaker")
 		, m_cart(*this, "cartslot")
@@ -65,6 +66,7 @@ protected:
 	required_device<mc6847_base_device> m_vdg;
 	required_device<cassette_image_device> m_cassette;
 	optional_device<i8271_device> m_fdc;
+	optional_device_array<floppy_connector, 2> m_floppies;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<generic_slot_device> m_cart;

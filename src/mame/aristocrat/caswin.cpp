@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy, Angelo Salese
-/*******************************************************************************************
+/**************************************************************************************************
 
 Royal Casino (c) 1984 Dyna
 Casino Winner (c) 1985 Aristocrat
@@ -9,12 +9,12 @@ driver by Chris Hardy & Angelo Salese
 original rcasino.c driver by Curt Coder
 
 TODO:
--Cherry-type subgames appears to have wrong graphics alignment,maybe it's some fancy window
- effect?
--Add lamps support;
--p1 & p2 inputs are tied to the same port...maybe they are mux-ed with the flip screen bit?
+- Imperfect 8-liner video mode, which in turn looks derived from misc/summit.cpp?
+- Hookup payout (press 'I' to bypass when "call dealer" happens);
+- Add lamps support;
+- p1 & p2 inputs are tied to the same port...maybe they are mux-ed with the flip screen bit?
 
-============================================================================================
+===================================================================================================
     ----------------------------------------
     Casino Royal by Dyna Electronics CO. LTD
     ----------------------------------------
@@ -65,7 +65,7 @@ TODO:
     Main processor  - Z80A
     Sound           - AY-3-8910
 
-*******************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -82,48 +82,55 @@ namespace {
 class caswin_state : public driver_device
 {
 public:
-	caswin_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_sc0_vram(*this, "sc0_vram"),
-		m_sc0_attr(*this, "sc0_attr"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_lamps(*this, "lamp%u", 0U)
+	caswin_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_lamps(*this, "lamp%u", 0U)
+		, m_vram(*this, "vram")
+		, m_attr(*this, "attr")
 	{ }
 
 	void vvillage(machine_config &config);
 
 protected:
-	void sc0_vram_w(offs_t offset, uint8_t data);
-	void sc0_attr_w(offs_t offset, uint8_t data);
-	void vvillage_scroll_w(uint8_t data);
-	void vvillage_vregs_w(uint8_t data);
-	uint8_t vvillage_rng_r();
-	void vvillage_output_w(uint8_t data);
-	void vvillage_lamps_w(uint8_t data);
-	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
-	void caswin_palette(palette_device &palette) const;
-	uint32_t screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	virtual void video_start() override;
-	void vvillage_io(address_map &map);
-	void vvillage_mem(address_map &map);
 
 private:
-	required_shared_ptr<uint8_t> m_sc0_vram;
-	required_shared_ptr<uint8_t> m_sc0_attr;
-	tilemap_t *m_sc0_tilemap = nullptr;
+	void vram_w(offs_t offset, uint8_t data);
+	void attr_w(offs_t offset, uint8_t data);
+	void base_scroll_w(uint8_t data);
+	void vregs_w(uint8_t data);
+	uint8_t rng_r();
+	void coin_meters_w(uint8_t data);
+	void lamps_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	void palette_init(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_io(address_map &map);
+	void main_map(address_map &map);
+
+	tilemap_t *m_tilemap = nullptr;
+	bool m_window_enable = false;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<5> m_lamps;
+	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_attr;
 };
 
 
 
-TILE_GET_INFO_MEMBER(caswin_state::get_sc0_tile_info)
+TILE_GET_INFO_MEMBER(caswin_state::get_tile_info)
 {
-	int tile = (m_sc0_vram[tile_index] | ((m_sc0_attr[tile_index] & 0x70)<<4)) & 0x7ff;
-	int colour = m_sc0_attr[tile_index] & 0xf;
+	const u8 attr = m_attr[tile_index];
+	const u16 tile = (m_vram[tile_index] | ((attr & 0x70)<<4)) & 0x7ff;
+	const u8 colour = m_attr[tile_index] & 0xf;
+
+	// for 8-liner mode all dedicated objects have this high
+	tileinfo.category = BIT(attr, 3);
 
 	tileinfo.set(0,
 			tile,
@@ -134,52 +141,95 @@ TILE_GET_INFO_MEMBER(caswin_state::get_sc0_tile_info)
 void caswin_state::video_start()
 {
 	m_lamps.resolve();
-	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(caswin_state::get_sc0_tile_info)), TILEMAP_SCAN_ROWS, 8,8,32,32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(caswin_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap->set_transparent_pen(0);
 }
 
-uint32_t caswin_state::screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t caswin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	if (!m_window_enable)
+	{
+		m_tilemap->set_scroll_rows(1);
+		m_tilemap->set_scrollx(0, 0);
+		m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
+		return 0;
+	}
+	// 8-liner mode
+	rectangle clip;
+
+	bitmap.fill(0, cliprect);
+
+	m_tilemap->set_scroll_rows(1);
+	m_tilemap->set_scrollx(0, 0);
+
+	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(0), 0);
+	const rectangle &visarea = screen.visible_area();
+	// these limits are calculated thru tilemap viewer against the markers,
+	// which shouldn't draw
+	clip.set(56, 199, visarea.min_y, visarea.max_y);
+	clip &= cliprect;
+	m_tilemap->set_scroll_rows(32);
+
+	// TODO: still some cutoffs / object change flashing
+	// goofy rowscroll, expects to wraparound over its own canvas ...
+	for (int i = 0; i < 32; i ++)
+	{
+		const u16 scroll_data = m_vram[i];
+		m_tilemap->set_scrollx(i, scroll_data ? scroll_data + 0 : 0);
+	}
+
+	m_tilemap->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(1), 0);
+
+	for (int i = 0; i < 32; i ++)
+	{
+		const u16 scroll_data = m_vram[i];
+		m_tilemap->set_scrollx(i, scroll_data ? scroll_data + 96 : 0);
+	}
+
+	m_tilemap->draw(screen, bitmap, clip, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(1), 0);
 	return 0;
 }
 
-void caswin_state::sc0_vram_w(offs_t offset, uint8_t data)
+void caswin_state::vram_w(offs_t offset, uint8_t data)
 {
-	m_sc0_vram[offset] = data;
-	m_sc0_tilemap->mark_tile_dirty(offset);
+	m_vram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
-void caswin_state::sc0_attr_w(offs_t offset, uint8_t data)
+void caswin_state::attr_w(offs_t offset, uint8_t data)
 {
-	m_sc0_attr[offset] = data;
-	m_sc0_tilemap->mark_tile_dirty(offset);
+	m_attr[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
-/*These two are tested during the two cherry sub-games.I really don't know what is supposed to do...*/
-void caswin_state::vvillage_scroll_w(uint8_t data)
+// TODO: bit 5 unknown, acts as flip-flop
+// TODO: bits 4-0 gets often changed during reel motion.
+void caswin_state::base_scroll_w(uint8_t data)
 {
 	//...
 }
 
-/*---- --x- window effect? */
+/*---- --x- enable window effect? */
 /*---- ---x flip screen */
-void caswin_state::vvillage_vregs_w(uint8_t data)
+void caswin_state::vregs_w(uint8_t data)
 {
 	flip_screen_set(data & 1);
+	m_window_enable = bool(BIT(data, 1));
 }
 
 /**********************
 *
-* End of Video Hardware
+* I/Os
 *
 **********************/
 
-uint8_t caswin_state::vvillage_rng_r()
+// TODO: pinpoint actual algo
+uint8_t caswin_state::rng_r()
 {
 	return machine().rand();
 }
 
-void caswin_state::vvillage_output_w(uint8_t data)
+void caswin_state::coin_meters_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 1);
 	machine().bookkeeping().coin_counter_w(1,data & 1);
@@ -188,40 +238,39 @@ void caswin_state::vvillage_output_w(uint8_t data)
 	machine().bookkeeping().coin_lockout_w(1,data & 0x20);
 }
 
-void caswin_state::vvillage_lamps_w(uint8_t data)
+/*
+ * ---x ---- lamp button 5
+ * ---- x--- lamp button 4
+ * ---- -x-- lamp button 3
+ * ---- --x- lamp button 2
+ * ---- ---x lamp button 1
+ */
+void caswin_state::lamps_w(uint8_t data)
 {
-	/*
-	---x ---- lamp button 5
-	---- x--- lamp button 4
-	---- -x-- lamp button 3
-	---- --x- lamp button 2
-	---- ---x lamp button 1
-	*/
-
 	for (unsigned i = 0; i < 5; i++)
 		m_lamps[i] = BIT(data, i);
 }
 
-void caswin_state::vvillage_mem(address_map &map)
+void caswin_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xa000, 0xa000).r(FUNC(caswin_state::vvillage_rng_r)); //accessed by caswin only
+	map(0xa000, 0xa000).r(FUNC(caswin_state::rng_r)); //accessed by caswin only
 	map(0xe000, 0xe7ff).ram().share("nvram");
-	map(0xf000, 0xf3ff).ram().w(FUNC(caswin_state::sc0_vram_w)).share("sc0_vram");
-	map(0xf800, 0xfbff).ram().w(FUNC(caswin_state::sc0_attr_w)).share("sc0_attr");
+	map(0xf000, 0xf3ff).ram().w(FUNC(caswin_state::vram_w)).share("vram");
+	map(0xf800, 0xfbff).ram().w(FUNC(caswin_state::attr_w)).share("attr");
 }
 
-void caswin_state::vvillage_io(address_map &map)
+void caswin_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x10, 0x10).portr("IN0");
 	map(0x11, 0x11).portr("IN1");
-	map(0x10, 0x10).w(FUNC(caswin_state::vvillage_scroll_w));
-	map(0x11, 0x11).w(FUNC(caswin_state::vvillage_vregs_w));
-	map(0x12, 0x12).w(FUNC(caswin_state::vvillage_lamps_w));
-	map(0x13, 0x13).w(FUNC(caswin_state::vvillage_output_w));
+	map(0x10, 0x10).w(FUNC(caswin_state::base_scroll_w));
+	map(0x11, 0x11).w(FUNC(caswin_state::vregs_w));
+	map(0x12, 0x12).w(FUNC(caswin_state::lamps_w));
+	map(0x13, 0x13).w(FUNC(caswin_state::coin_meters_w));
 }
 
 
@@ -279,7 +328,7 @@ static INPUT_PORTS_START( vvillage )
 	PORT_DIPNAME( 0x04, 0x04, "Hi Lo, Royal Flush" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Game Bet") PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Game Bet" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "Normal Game")
 	PORT_DIPSETTING(    0x00, "Double Game")
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:5")
@@ -300,9 +349,9 @@ static const gfx_layout tiles8x8_layout =
 	8,8,
 	RGN_FRAC(1,2),
 	2,
-	{ 0,RGN_FRAC(1,2) },
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ RGN_FRAC(0, 2), RGN_FRAC(1,2) },
+	{ STEP8(7, -1) },
+	{ STEP8(0, 8) },
 	8*8
 };
 
@@ -310,7 +359,7 @@ static GFXDECODE_START( gfx_vvillage )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-void caswin_state::caswin_palette(palette_device &palette) const
+void caswin_state::palette_init(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	for (int i = 0; i < 0x40; ++i)
@@ -338,29 +387,27 @@ void caswin_state::caswin_palette(palette_device &palette) const
 
 void caswin_state::vvillage(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);         /* ? MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &caswin_state::vvillage_mem);
-	m_maincpu->set_addrmap(AS_IO, &caswin_state::vvillage_io);
+	Z80(config, m_maincpu, XTAL(6'000'000)); // Z80A @ 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &caswin_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &caswin_state::main_io);
 	m_maincpu->set_vblank_int("screen", FUNC(caswin_state::irq0_line_hold));
 
-	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 16, 256-16-1);
-	screen.set_screen_update(FUNC(caswin_state::screen_update_vvillage));
+	screen.set_screen_update(FUNC(caswin_state::screen_update));
 	screen.set_palette("palette");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_vvillage);
-	PALETTE(config, "palette", FUNC(caswin_state::caswin_palette), 0x40);
+	PALETTE(config, "palette", FUNC(caswin_state::palette_init), 0x40);
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 4000000 / 4));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(6'000'000) / 4)); // TODO: unconfirmed clock
 	aysnd.port_a_read_callback().set_ioport("DSW1");
 	aysnd.port_b_read_callback().set_ioport("DSW2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);

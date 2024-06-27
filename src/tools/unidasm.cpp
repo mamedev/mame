@@ -122,6 +122,7 @@ using util::BIT;
 #include "cpu/minx/minxd.h"
 #include "cpu/mips/mips3dsm.h"
 #include "cpu/mips/mips1dsm.h"
+#include "cpu/mipsx/mipsxdasm.h"
 #include "cpu/mk1/mk1dasm.h"
 #include "cpu/mn1400/mn1400d.h"
 #include "cpu/mn1610/mn1610d.h"
@@ -134,6 +135,7 @@ using util::BIT;
 #include "cpu/nova/novadasm.h"
 #include "cpu/ns32000/ns32000d.h"
 #include "cpu/nuon/nuondasm.h"
+#include "cpu/olms66k/nx8dasm.h"
 #include "cpu/pace/pacedasm.h"
 #include "cpu/palm/palmd.h"
 #include "cpu/patinhofeio/patinho_feio_dasm.h"
@@ -545,6 +547,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "mips1le",         le,  0, []() -> util::disasm_interface * { return new mips1_disassembler; } },
 	{ "mips3be",         be,  0, []() -> util::disasm_interface * { return new mips3_disassembler; } },
 	{ "mips3le",         le,  0, []() -> util::disasm_interface * { return new mips3_disassembler; } },
+	{ "mipsx",           be,  0, []() -> util::disasm_interface * { return new mipsx_disassembler; } },
 	{ "mk1",             le,  0, []() -> util::disasm_interface * { return new mk1_disassembler; } },
 	{ "mm5799",          le,  0, []() -> util::disasm_interface * { return new mm5799_disassembler; } },
 	{ "mm76",            le,  0, []() -> util::disasm_interface * { return new mm76_disassembler; } },
@@ -564,6 +567,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "ns32000",         le,  0, []() -> util::disasm_interface * { return new ns32000_disassembler; } },
 	{ "nuon",            be,  0, []() -> util::disasm_interface * { return new nuon_disassembler; } },
 	{ "nsc8105",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(8105); } },
+	{ "nx8_500s",        le,  0, []() -> util::disasm_interface * { return new nx8_500s_disassembler; } },
 	{ "p8xc552",         le,  0, []() -> util::disasm_interface * { return new p8xc552_disassembler; } },
 	{ "p8xc562",         le,  0, []() -> util::disasm_interface * { return new p8xc562_disassembler; } },
 	{ "pace",            le, -1, []() -> util::disasm_interface * { return new pace_disassembler; } },

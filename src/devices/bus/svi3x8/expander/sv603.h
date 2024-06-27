@@ -21,8 +21,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> sv603_device
-
 class sv603_device : public device_t, public device_svi_expander_interface
 {
 public:
@@ -50,7 +48,7 @@ private:
 	required_device<colecovision_cartridge_slot_device> m_cart;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(SV603, sv603_device)
 
 #endif // MAME_BUS_SVI3X8_EXPANDER_SV603_H

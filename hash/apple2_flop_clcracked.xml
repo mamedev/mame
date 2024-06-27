@@ -33,6 +33,8 @@ license:CC0-1.0
 	  disks 1, 2, and 7.
 	-->
 
+	<!--Set "hhlngvwl" (Hugo Hound's Vowel Sounds) may be missing disk 2 - "Short Vowels" based on manual found later.-->
+
 	<!-- Imperfect cracks for Epyx software were missing and never added
 	  to this list, thus only the corrected versions are listed here. -->
 
@@ -191,26 +193,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bublbobl">
-		<description>Bubble Bobble (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Taito America / NovaLogic</publisher>
-		<info name="release" value="2017-08-23"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop1" size="143360">
-				<rom name="bubble bobble disk 1 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="2af0a5d4" sha1="4810c07e9514d6d3a49ee9babee7497103428d43" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop1" size="143360">
-				<rom name="bubble bobble disk 2 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="ac056c8d" sha1="0f30fb98d37e91f166d0c8c6b328e898cdf37ec1" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="cntdsht">
 		<description>Countdown to Shutdown (cleanly cracked)</description>
 		<year>1985</year>
@@ -244,120 +226,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="crisis mountain (1982)(synergistic software)(4am crack).dsk" size="143360" crc="f43e80de" sha1="1bbdbe1a89ea35dce064406b79cee8cb10da81a4" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="carmntime">
-		<description>Where in Time is Carmen Sandiego (version 1.1) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego v1.1 side a (1989)(broderbund)(trex crack).dsk" size="143360" crc="9d391061" sha1="32f18c02974e0a915e3ac74abe10ec9cf5f67533" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego v1.1 side b (1989)(broderbund)(trex crack).dsk" size="143360" crc="33e65f76" sha1="8995ca7786b6a70d68b8305625e65a534c15d435" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Side C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego v1.1 side c (1989)(broderbund)(trex crack).dsk" size="143360" crc="15942fc0" sha1="03189fdefa100e64c0ad9ba38804bab7508f9881" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Side D"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego v1.1 side d (1989)(broderbund)(trex crack).dsk" size="143360" crc="704551a0" sha1="469ef6f3be3919cd904c63d37d6e8d46e895ab31" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="carmntime35">
-		<description>Where in Time is Carmen Sandiego (version 1.1) (800K 3.5") (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819264">
-				<rom name="where in time is carmen sandiego v1.1 800k 3.5 disk (1989)(broderbund)(trex crack).2mg" size="819264" crc="36d3ff6d" sha1="21051ecf94f598da648355e75e46641351ed3230" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="carmntime10">
-		<description>Where in Time is Carmen Sandiego (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego v1.0 (4am crack) disk a.dsk" size="143360" crc="e56e9ec4" sha1="043858a5a900e1212b27c84698dc22ec1464a1ff" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego v1.0 (4am crack) disk b.dsk" size="143360" crc="f5741491" sha1="2b9ab6d218f72db2e4fdb4133f815a5975d08a89" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Side C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego (4am crack) disk c.dsk" size="143360" crc="650735af" sha1="aecf8b17bb26e73036100ac648e5eddede12fe91" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Side D"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego (4am crack) disk d.dsk" size="143360" crc="3c7643ca" sha1="8a6a168f25b4698465b89db9546d9b35489fe042" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cartime10b" cloneof="carmntime10">
-		<description>Where in Time is Carmen Sandiego (version 1.0) (imperfect clean crack)</description>
-		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego v1.0 (imperfect 4am crack) side a.dsk" size="143360" crc="cd3da2a7" sha1="21a9fc7220c84ffec91b4e76b28dc8b514ab56a3" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego v1.0 (imperfect 4am crack) side b.dsk" size="143360" crc="3bad4b59" sha1="7e84dc0db9e964db44692fa340b6c6828f83bfe6" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Side C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego v1.0 (imperfect 4am crack) side c.dsk" size="143360" crc="650735af" sha1="aecf8b17bb26e73036100ac648e5eddede12fe91" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Side D"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in time is carmen sandiego v1.0 (imperfect 4am crack) side d.dsk" size="143360" crc="3c7643ca" sha1="8a6a168f25b4698465b89db9546d9b35489fe042" />
 			</dataarea>
 		</part>
 	</software>
@@ -863,20 +731,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="animal kingdom (4am crack) side b.dsk" size="143360" crc="98b5bc0f" sha1="c50c55c2fffc2e37c3d3319b4e8eb0c04c282beb" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="arkanoid">
-		<description>Arkanoid (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Taito America</publisher>
-		<info name="release" value="2015-03-03"/>
-		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="arkanoid (4am crack).dsk" size="143360" crc="c10ff8bf" sha1="4ac7d069e9b189405c0b345ab71904b357aa8393" />
 			</dataarea>
 		</part>
 	</software>
@@ -1732,19 +1586,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="first degree linear equations (4am crack).dsk" size="143360" crc="bc9f6657" sha1="8ecb52e40aaa9b2888d7c3c10d6dc80ef265309b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="falcons">
-		<description>Falcons (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Piccadilly Software</publisher>
-		<info name="release" value="2015-04-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="falcons (4am crack).dsk" size="143360" crc="b2eb0e24" sha1="b94e95a0f657230684a81637ad3c9b2a3fdfbbfd" />
 			</dataarea>
 		</part>
 	</software>
@@ -5883,28 +5724,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="confvtv2">
-		<description>Conflict in Vietnam (version 2) (128K enhanced) (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Microprose Software</publisher>
-		<info name="release" value="2017-08-30"/>
-		<!-- Version 2 comes with an option to use double hi-res
-		graphics on 128K machines -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="conflict in vietnam 128k (4am and san inc crack) side a.dsk" size="143360" crc="818547f3" sha1="e71d53cc92a9f08a66b17c6c7d88a1cac5259b4d" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="conflict in vietnam 128k (4am and san inc crack) side b.dsk" size="143360" crc="b1730ad9" sha1="2e32fb4793653f6e7a72cc634d7b393d52a55984" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="congcoll">
 		<description>Conglomerates Collide (cleanly cracked)</description>
 		<year>1981</year>
@@ -6012,19 +5831,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="correct behavior - the mexican way (4am crack) side b.dsk" size="143360" crc="7a944853" sha1="962eae0b1731043e568bebb69ff84bda00699d74" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cntcoins">
-		<description>Counting Coins (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2018-06-16"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="counting coins (4am crack).dsk" size="143360" crc="28a6e2e5" sha1="b24c91eb063825bc292ccc9a6a3e1daccdec02c2" />
 			</dataarea>
 		</part>
 	</software>
@@ -6323,39 +6129,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="crown of arthain (4am crack).dsk" size="143360" crc="7e0723ca" sha1="375ec42326da5ef055a2bd7c59ddbdf1f3cb2b10" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="creu128k">
-		<description>Crusade in Europe (128K version) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Microprose Software</publisher>
-		<info name="release" value="2017-08-10"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="crusade in europe 128k (4am and san inc crack) side a.dsk" size="143360" crc="dc958462" sha1="076f257759c2f3777c637fbc812cb0c771248936" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="crusade in europe 128k (4am and san inc crack) side b.dsk" size="143360" crc="c981ba8f" sha1="a0e477352074cbda9cbd6555dd9282f6474c6048" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="creu64k">
-		<description>Crusade in Europe (64K version) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Microprose Software</publisher>
-		<info name="release" value="2017-08-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="crusade in europe 64k (4am and san inc crack).dsk" size="143360" crc="6a9d1ff0" sha1="0de70a7f7eca1d25203ba2e32007b24eb76491e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -9325,19 +9098,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gacookie">
-		<description>Granny Applebee's Cookie Factory (cleanly cracked)</description>
-		<year>1993</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2016-10-17"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="granny applebee's cookie factory (4am crack).dsk" size="143360" crc="07234fbd" sha1="18b9bdc16e7c5adde81a1eccff10791a1c7ff9bf" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="graphmkr">
 		<description>Graph Maker: Introduction to Graphs and Charts (cleanly cracked)</description>
 		<year>1993</year>
@@ -11406,32 +11166,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="islands of beta (4am crack).dsk" size="143360" crc="42f5e0dc" sha1="20e4d10b4b51aef9d2d2a8d6a4e6284cb5dd71b1" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="abttime">
-		<description>It's About Time (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>McCarthy-McCormack</publisher>
-		<info name="release" value="2015-06-02"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="it's about time (4am crack).dsk" size="143360" crc="9be8d4c9" sha1="bcfc08ee08ba58c62d4673d4b422eef74fab0f28" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mabttime">
-		<description>It's About Time (Micrograms) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2018-06-16"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="it's about time (micrograms) (4am crack).dsk" size="143360" crc="f7ae8a72" sha1="530323a118e22e126e6b968ee72b20ae3d7622a9" />
 			</dataarea>
 		</part>
 	</software>
@@ -16315,26 +16049,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="oil's well (4am crack).dsk" size="143360" crc="f37459cf" sha1="f88030fc774e1e5af46b4beb8bcacbff13f0e9da" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="olcrswrd">
-		<description>Oliver's Crosswords (cleanly cracked)</description>
-		<year>1990</year>
-		<publisher>Micrograms Publishing</publisher>
-		<info name="release" value="2017-06-22"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="oliver's crosswords (4am crack) disk a.dsk" size="143360" crc="c4b6e6df" sha1="673231fed35ecd2aea32d7e8a6a2ced28e59ba9e" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="oliver's crosswords (4am crack) disk b.dsk" size="143360" crc="c7de0295" sha1="b310a7a7813ae4b049655b1966b971ed247a18eb" />
 			</dataarea>
 		</part>
 	</software>
@@ -23881,55 +23595,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carmneur">
-		<description>Where in Europe is Carmen Sandiego? (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Broderbund Software</publisher>
-		<info name="release" value="2016-08-01"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in europe is carmen sandiego (4am crack) side a.dsk" size="143360" crc="3355a002" sha1="c6af7b62829030b88fd3be5e34cc5b0527b06afe" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in europe is carmen sandiego (4am crack) side b.dsk" size="143360" crc="6b3c939a" sha1="542b72a2bacbf86ef4e65ee310501456dc9cb8ab" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="carmneurb" cloneof="carmneur">
-		<description>Where in Europe is Carmen Sandiego? (imperfect clean crack)</description>
-		<year>1988</year>
-		<publisher>Broderbund Software</publisher>
-		<info name="release" value="2016-08-01"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in europe is carmen sandiego (imperfect 4am crack) side a.dsk" size="143360" crc="d5a2ddd7" sha1="c4ee1714220a00286f26daaa80b791425a5689d9" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in europe is carmen sandiego (imperfect 4am crack) side b.dsk" size="143360" crc="6b3c939a" sha1="542b72a2bacbf86ef4e65ee310501456dc9cb8ab" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="rgzilfin">
 		<description>Rings of Zilfin (cleanly cracked)</description>
 		<year>1985</year>
@@ -26281,84 +25946,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wwmathl3">
-		<description>Wild West Math Level 3 (cleanly cracked)</description>
-		<year>1990</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2017-06-20"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 3 (4am crack) disk a.dsk" size="143360" crc="999709bd" sha1="3668662cdd69b22755767f21f56b1b0f04754d5d" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 3 (4am crack) disk b.dsk" size="143360" crc="3ff9505d" sha1="df771c0be34133b44a37bbb139952b6d49facf4f" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 3 (4am crack) disk c.dsk" size="143360" crc="c20f29be" sha1="d98fd9245b3b2eb8a1fe3727b3291d342b9bced8" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wwmathl4">
-		<description>Wild West Math Level 4 (cleanly cracked)</description>
-		<year>1990</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2017-06-20"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 4 (4am crack) disk a.dsk" size="143360" crc="26b7e7c3" sha1="2af723a49d5d6aed85aecc139ca9ce2a43461cc7" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 4 (4am crack) disk b.dsk" size="143360" crc="52cb2bd9" sha1="d4c8474ffd42669b2d406dbf1b5367cd034bb7e6" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 4 (4am crack) disk c.dsk" size="143360" crc="aff51478" sha1="1042ab224399638b566f5a858ed1c66f27b5a34b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wwmathl5">
-		<description>Wild West Math Level 5 (cleanly cracked)</description>
-		<year>1990</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2017-06-20"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 5 (4am crack) disk a.dsk" size="143360" crc="ee8492d9" sha1="dce6ffcda41edb06b0ab0278a82d9a015b01260b" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 5 (4am crack) disk b.dsk" size="143360" crc="7cead118" sha1="8e32116876c34634b742539a34f00439ad292f2f" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wild west math level 5 (4am crack) disk c.dsk" size="143360" crc="da77e766" sha1="57145617b4d25b71924ea5d1f1a0fea13a15aaea" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tlktxtwr">
 		<description>Talking Text Writer (cleanly cracked)</description>
 		<year>1986</year>
@@ -28211,19 +27798,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="shppatrn">
-		<description>Shapes and Patterns (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2017-12-29"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="shapes and patterns (4am crack).dsk" size="143360" crc="89884218" sha1="213bbee8ddb774e1dad28836ec08bf849d7cc412" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wrdinv0">
 		<description>Word Invasion (Revision 0) (cleanly cracked)</description>
 		<year>1983</year>
@@ -29866,71 +29440,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="crmusa89">
-		<description>Where in the USA is Carmen Sandiego? (version 2.0, 26-APR-1989) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
-		<info name="release" value="2018-09-05"/>
-		<!-- This re-release on 3 sides is dated 26-APR-1989 according to ProDOS
-		file metadata.-->
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in the usa is carmen sandiego v2.0 (4am crack) side a.dsk" size="143360" crc="74c99392" sha1="28feab5a1ddca487af5c5f2ab041d6fbdfda2a42" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in the usa is carmen sandiego v2.0 (4am crack) side b.dsk" size="143360" crc="0c1470ee" sha1="6e491ac8d2bb1c83a207c2ff0b8d993a6c94ccab" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Side C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in the usa is carmen sandiego v2.0 (4am crack) side c.dsk" size="143360" crc="f41a8d2b" sha1="9d788a8c21a4fb08372b2f319188252203667b36" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crmusa89b" cloneof="crmusa89">
-		<description>Where in the USA is Carmen Sandiego? (version 2.0, 26-APR-1989) (imperfect clean crack)</description>
-		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
-		<info name="release" value="2018-09-05"/>
-		<!-- This re-release on 3 sides is dated 26-APR-1989 according to ProDOS
-		file metadata.-->
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in the usa is carmen sandiego v2.0 (imperfect 4am crack) side a.dsk" size="143360" crc="923eee47" sha1="42425214a5c27a091b09b6fd5ffdb665dbdafd53" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in the usa is carmen sandiego v2.0 (imperfect 4am crack) side b.dsk" size="143360" crc="0c1470ee" sha1="6e491ac8d2bb1c83a207c2ff0b8d993a6c94ccab" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Side C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in the usa is carmen sandiego v2.0 (imperfect 4am crack) side c.dsk" size="143360" crc="f41a8d2b" sha1="9d788a8c21a4fb08372b2f319188252203667b36" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="seqred">
 		<description>Sequence: Red Level (cleanly cracked)</description>
 		<year>1982</year>
@@ -29940,59 +29449,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="sequence - red level (4am crack).dsk" size="143360" crc="4c5a3a5f" sha1="21e08175e7cdceab0682c727e54d90832d4e7d4c" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crmwld89">
-		<description>Where in the World is Carmen Sandiego? (version 2.0 / 15-AUG-1989) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
-		<info name="release" value="2018-09-05"/>
-		<!-- This ProDOS re-release is dated 15-AUG-1989 according to file
-		metadata. -->
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in the world is carmen sandiego v2.0 (4am crack) side a.dsk" size="143360" crc="dbc59bd8" sha1="c3236200035b77e7f24e8fd24103467be73daf7a" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in the world is carmen sandiego v2.0 (4am crack) side b.dsk" size="143360" crc="29b48061" sha1="96fc5b5cf4de66d6f4e1ac0364b0c3347b26e2d1" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crmwld89b">
-		<description>Where in the World is Carmen Sandiego? (version 2.0 / 15-AUG-1989) (imperfect clean crack)</description>
-		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
-		<info name="release" value="2018-09-05"/>
-		<!-- This ProDOS re-release is dated 15-AUG-1989 according to file
-		metadata. -->
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in the world is carmen sandiego v2.0 (imperfect 4am crack) side a.dsk" size="143360" crc="20e8edb2" sha1="11d018c3665cb9764ac3838a17f9fbcad40b4d5b" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in the world is carmen sandiego v2.0 (imperfect 4am crack) side b.dsk" size="143360" crc="29b48061" sha1="96fc5b5cf4de66d6f4e1ac0364b0c3347b26e2d1" />
 			</dataarea>
 		</part>
 	</software>
@@ -32740,336 +32196,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ndcarmen">
-		<description>Where in North Dakota is Carmen Sandiego? (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
-		<info name="release" value="2020-03-09"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in north dakota is carmen sandiego (4am crack) side a.dsk" size="143360" crc="fd587990" sha1="206650c1d3de793b1746071308c84b7820852e97" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in north dakota is carmen sandiego (4am crack) side b.dsk" size="143360" crc="7235925f" sha1="67758499be96c5844cdcd12a9ae91e49d6d15794"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndcarmenb" cloneof="ndcarmen">
-		<description>Where in North Dakota is Carmen Sandiego? (imperfect clean crack)</description>
-		<year>1989</year>
-		<publisher>Broderbund Software</publisher>
-		<info name="release" value="2020-03-09"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in north dakota is carmen sandiego (imperfect 4am crack) side a.dsk" size="143360" crc="72421125" sha1="9f673c85383c89b2ddd92d8379af8c130daf2d0d"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="where in north dakota is carmen sandiego (imperfect 4am crack) side b.dsk" size="143360" crc="7235925f" sha1="67758499be96c5844cdcd12a9ae91e49d6d15794"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cndalman">
-		<description>Carmen's North Dakota Almanac Database (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="release" value="2020-03-11"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="carmen's north dakota almanac database (4am crack).dsk" size="143360" crc="20248891" sha1="579eb26ce965ed79ebd47ff6262c82a3ad93cf82"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gaflndd">
-		<description>Governors and First Ladies of North Dakota Database (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="release" value="2020-03-20"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="governors and first ladies of north dakota (4am crack).dsk" size="143360" crc="29c548b7" sha1="6d12533696ccf49e17c99921b2ec58c429dcb592"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndagridb">
-		<description>North Dakota Agriculture Database (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="release" value="2020-03-20"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="north dakota agriculture (4am crack).dsk" size="143360" crc="3d6e4023" sha1="880a5232ce130ee7199f4168c8657e0b04ed9884"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndc500b">
-		<description>North Dakota Cities with Population Under 500 (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="release" value="2020-03-21"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="north dakota cities with population under 500 (4am crack).dsk" size="143360" crc="1986d96c" sha1="6162436dac03758b35d6e7b61da619afd799f5cd"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndc500u">
-		<description>North Dakota Cities With Population 500 and Above (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="release" value="2020-03-21"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="north dakota cities with population 500 and above (4am crack).dsk" size="143360" crc="186b2e5e" sha1="26ccb43cc26effa373063ab2ed7ec9f19e572a2a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndcnty">
-		<description>North Dakota Counties (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="release" value="2020-03-21"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="north dakota counties (4am crack).dsk" size="143360" crc="e1b6370b" sha1="4e44496ffb32564dbe50a91da88d44f4975cbc23"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndexplor">
-		<description>North Dakota Explorers (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="release" value="2020-03-21"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="north dakota explorers (4am crack).dsk" size="143360" crc="8fab16d9" sha1="9f1d0da2ae81925843d2b670c5c549d009d69525"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndindtrb">
-		<description>North Dakota Indian Tribes (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="release" value="2020-03-21"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="north dakota indian tribes (4am crack).dsk" size="143360" crc="f4b7d0ca" sha1="86239cacfe478db1e71527ad351e09fc13e1327b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndnotper">
-		<description>Notable People of North Dakota (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="release" value="2020-03-22"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="notable people of north dakota (4am crack).dsk" size="143360" crc="b9067082" sha1="aded144536c675b7477f68b516d1c022387f338f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndprkhs">
-		<description>North Dakota Parks and Historical Sites (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<info name="release" value="2020-03-22"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="north dakota parks and historical sites (4am crack).dsk" size="143360" crc="1be8abde" sha1="fd4df9a60c3fd7bcc1425c56a321dad23cfce47d"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndplants">
-		<description>North Dakota Plants (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="release" value="2020-03-22"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="north dakota plants (4am crack).dsk" size="143360" crc="8d2dd87b" sha1="de9512d06ed1312e5fb78cd223d65989b1a25c85"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndpride">
-		<description>North Dakota Pride (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="release" value="2020-03-22"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="north dakota pride (4am crack).dsk" size="143360" crc="71d7071e" sha1="ac7d7d584af4280b8d8d354f1362a42974c71efa"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndsymbls">
-		<description>North Dakota Symbols (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="release" value="2020-03-22"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="north dakota symbols (4am crack).dsk" size="143360" crc="d330ff70" sha1="e9c92bdb500e2c27e30b7a77d4ebab0b958398f0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndsenrep">
-		<description>North Dakota U.S. Senators and Representatives (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="release" value="2020-03-22"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="north dakota u.s. senators and representatives (4am crack).dsk" size="143360" crc="990ca91d" sha1="6cf57c50159fc7cf90981f68e69e6c469411816f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndwildlf">
-		<description>North Dakota Wildlife (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="release" value="2020-03-22"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="north dakota wildlife (4am crack).dsk" size="143360" crc="68ee645d" sha1="c961bd1abff360b5d9c677766c9f6746b313502b"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bsmpndra">
 		<description>The Wreck of the BSM Pandora (cleanly cracked)</description>
 		<year>1981</year>
@@ -33096,24 +32222,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the sea voyagers (4am crack).dsk" size="143360" crc="21466949" sha1="e277b1e1419432826046bc1feb39fa601da71b66"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ndminrls">
-		<description>Minerals of North Dakota (version 1.0) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>North Dakota Database Project</publisher>
-		<info name="release" value="2020-03-22"/>
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
-		set. Please refer to the following website for more details on the
-		history of this particular disk:
-		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
-		-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="minerals of north dakota (4am crack).dsk" size="143360" crc="d62e156e" sha1="239bb06cb1e088d2d35d47260aa6f0736656ca8e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34988,19 +34096,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hhlngvwl">
-		<description>Hugo Hound's Vowel Sounds: Long Vowels (cleanly cracked)</description>
-		<year>1993</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2020-12-30"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="hugo hound's vowel sounds - long vowels (4am crack).dsk" size="143360" crc="b1b4cad8" sha1="bb6ea89ff429fcbb74665b587e551966fdf12709"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="timcatfr">
 		<description>Tim and the Cat and Grog the Frog (cleanly cracked)</description>
 		<year>1992</year>
@@ -35269,19 +34364,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="starship commander (4am crack).dsk" size="143360" crc="10275bba" sha1="35fb4ec9c69cc8ddeb2b0aa02f94da70c5c59226"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="uccsbc">
-		<description>Uncle Clyde's Consonant Slides: Beginning Consonants (cleanly cracked)</description>
-		<year>1993</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2021-02-10"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="uncle clyde's consonant slides - beginning consonants (4am crack).dsk" size="143360" crc="239d4daa" sha1="7b530d4f20e8275e767c6a23e37de3cb85f2fe4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -38501,34 +37583,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="uccscbd">
-		<description>Uncle Clyde's Consonant Slides: Consonant Blends and Digraphs (cleanly cracked)</description>
-		<year>1993</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2021-05-09"/>
-		<!--"Uncle Clyde's Consonant Slides: Consonant Blends and Digraphs" is a 1993 educational program developed and distributed by Micrograms. It is preserved here for the first time.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="uncle clyde's consonant slides - consonant blends and digraphs (4am crack).dsk" size="143360" crc="dec1edfc" sha1="93088790186e6c08bd762196f80d1d5f57837da1"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="uccsec">
-		<description>Uncle Clyde's Consonant Slides: Ending Consonants (cleanly cracked)</description>
-		<year>1993</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2021-05-09"/>
-		<!--"Uncle Clyde's Consonant Slides: Ending Consonants" is a 1993 educational program developed and distributed by Micrograms. It is preserved here for the first time.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="uncle clyde's consonant slides - ending consonants (4am crack).dsk" size="143360" crc="67153156" sha1="211cd07bb41d1dc7b98c2e30dfceb5550676f78f"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="chschkbk">
 		<description>Chess, Checkers, and Backgammon (cleanly cracked)</description>
 		<year>1987</year>
@@ -40007,20 +39061,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="soloflt">
-		<description>Solo Flight (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Microprose Software</publisher>
-		<info name="release" value="2021-09-30"/>
-		<!--"Solo Flight" is a 1984 simulation game designed by Sid Meier, ported to the Apple II by Andy Hollis, and distributed by Microprose Software.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="solo flight (4am crack).dsk" size="143360" crc="ed040baf" sha1="5945d9d7d491ce5b13f207f73271f48bd1103b10"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bldrdash2">
 		<description>Boulder Dash II (cleanly cracked)</description>
 		<year>1986</year>
@@ -40298,20 +39338,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="winter games (4am crack) side b.dsk" size="143360" crc="b8d713fd" sha1="e2c6b9b0dfdf2f23c59c03ec803b0ffb79135482" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nmbrball">
-		<description>Numberball (cleanly cracked)</description>
-		<year>1994</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2021-11-10"/>
-		<!--"Numberball" is a 1994 educational game developed and distributed by Micrograms Publishing.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="numberball (4am crack).dsk" size="143360" crc="bd983ba9" sha1="73da61404aa405fd65616a957ef75ffc12f6af04"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42143,20 +41169,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="desktzoo">
-		<description>Desktop Zoo (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Micrograms</publisher>
-		<info name="release" value="2022-06-10"/>
-		<!--"Desktop Zoo" is a 1989 educational program developed and distributed by Micrograms.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="desktop zoo (4am crack).dsk" size="143360" crc="369c223c" sha1="a3373b95967dbdc59be845cf3f965f52148e1a89"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="gothmogl">
 		<description>Gothmog's Lair (cleanly cracked)</description>
 		<year>1984</year>
@@ -43934,6 +42946,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="arkanoid">
+		<description>Arkanoid (4am crack)</description>
+		<year>1988</year>
+		<publisher>Taito America</publisher>
+		<info name="usage" value="Requires a 64K Apple ][+ or later. Works with Apple II Mouse Card in slot 4: -sl4 mouse." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2015-03-03-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="arkanoid (4am crack).dsk" size="143360" crc="c10ff8bf" sha1="4ac7d069e9b189405c0b345ab71904b357aa8393" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="agrizzly">
 		<description>Audubon Wildlife Adventrues: Grizzly Bears (4am crack)</description>
 		<year>1988</year>
@@ -44300,6 +43327,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bublbobl">
+		<description>Bubble Bobble (4am and trex crack)</description>
+		<year>1988</year>
+		<publisher>Taito America</publisher>
+		<info name="developer" value="NovaLogic" />
+		<info name="programmer" value="Chris Eisnaugle" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-08-23-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop1" size="143360">
+				<rom name="bubble bobble disk 1 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="2af0a5d4" sha1="4810c07e9514d6d3a49ee9babee7497103428d43" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop1" size="143360">
+				<rom name="bubble bobble disk 2 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="ac056c8d" sha1="0f30fb98d37e91f166d0c8c6b328e898cdf37ec1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cstdecim">
 		<description>CAAT Skill Tester: Decimals (4am crack)</description>
 		<year>1986</year>
@@ -44388,6 +43439,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="143360">
 				<rom name="caat skill tester- whole numbers (4am crack) side b.dsk" size="143360" crc="c88eb765" sha1="c0d98a8e5e4de4932aead98dcc5f8f0469dd0a10" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="capbbls">
+		<description>Capitalization: Building Better Language Skills (4am crack)</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="capitalization- building better language skills (4am crack).dsk" size="143360" crc="1206b7d9" sha1="a06fbade81df011c6fa8aa3fa047bfee32b640b6" />
 			</dataarea>
 		</part>
 	</software>
@@ -44665,7 +43732,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="chempertab">
-		<description>>Chemistry: The Periodic Table (A-251 version 1.1) (4am crack)</description>
+		<description>Chemistry: The Periodic Table (A-251 version 1.1) (4am crack)</description>
 		<year>1988</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-251" />
@@ -44795,6 +43862,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="classmate (4am crack).dsk" size="143360" crc="c52d247a" sha1="73b904b598e2a8282e3ab2eead0858c1fe5a86a5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clauswhs">
+		<description>Clauses and Whole Sentences (4am crack)</description>
+		<year>1983</year>
+		<publisher>Intellectual Software</publisher>
+		<info name="developer" value="Intellectual Software" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-02-04-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="clauses and whole sentences (4am crack).dsk" size="143360" crc="cdef418b" sha1="211c3d2ab112afd320b32f597c2721e84bcbb7f9" />
 			</dataarea>
 		</part>
 	</software>
@@ -45203,6 +44286,31 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="mecc-a122 computers in government v1.0 (4am crack).dsk" size="143360" crc="45fe4a2a" sha1="c4884f1ad1f0ca37bc02154769764222221e3d71" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="confviet">
+		<description>Conflict in Vietnam (version 2) (4am and san inc crack)</description>
+		<year>1986</year>
+		<publisher>Microprose Software</publisher>
+		<info name="programmer" value="Sid Meier, Ed Bever, and Jim Synoski" />
+		<info name="usage" value="Requires a 128K Apple ][+ or later." />
+		<info name="version" value="2" />
+		<!--Option to use double hi-res graphics on 128K machines.-->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-08-30-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="conflict in vietnam 128k (4am and san inc crack) side a.dsk" size="143360" crc="818547f3" sha1="e71d53cc92a9f08a66b17c6c7d88a1cac5259b4d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="conflict in vietnam 128k (4am and san inc crack) side b.dsk" size="143360" crc="b1730ad9" sha1="2e32fb4793653f6e7a72cc634d7b393d52a55984" />
 			</dataarea>
 		</part>
 	</software>
@@ -45693,6 +44801,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="cntcoins">
+		<description>Counting Coins (4am crack)</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-06-16-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="counting coins (4am crack).dsk" size="143360" crc="28a6e2e5" sha1="b24c91eb063825bc292ccc9a6a3e1daccdec02c2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cntparr0">
 		<description>Counting Parade (revision 0) (4am crack)</description>
 		<year>1985</year>
@@ -45883,6 +45007,48 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="cruseuropv1" cloneof="cruseurop">
+		<description>Crusade in Europe (version 1) (4am and san inc crack)</description>
+		<year>1985</year>
+		<publisher>Microprose Software</publisher>
+		<info name="programmer" value="Sid Meier, Ed Bever, and Jim Synoski" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-08-06-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="crusade in europe 64k (4am and san inc crack).dsk" size="143360" crc="6a9d1ff0" sha1="0de70a7f7eca1d25203ba2e32007b24eb76491e2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cruseurop">
+		<description>Crusade in Europe (version 2) (4am and san inc crack)</description>
+		<year>1985</year>
+		<publisher>Microprose Software</publisher>
+		<info name="programmer" value="Sid Meier, Ed Bever, and Jim Synoski" />
+		<info name="usage" value="Requires a 128K Apple ][+ or later." />
+		<info name="version" value="2" />
+		<!--Option to use double hi-res graphics on 128K machines.-->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-08-10-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="crusade in europe 128k (4am and san inc crack) side a.dsk" size="143360" crc="dc958462" sha1="076f257759c2f3777c637fbc812cb0c771248936" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="crusade in europe 128k (4am and san inc crack) side b.dsk" size="143360" crc="c981ba8f" sha1="a0e477352074cbda9cbd6555dd9282f6474c6048" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cryptqst">
 		<description>CryptoQuest (A-340 version 1.0) (4am crack)</description>
 		<year>1993</year>
@@ -46007,6 +45173,326 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dqcarmndalm">
+		<description>Dataquest: Carmen's North Dakota Almanac Database (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-11-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="carmen's north dakota almanac database (4am crack).dsk" size="143360" crc="20248891" sha1="579eb26ce965ed79ebd47ff6262c82a3ad93cf82"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqgovflnd">
+		<description>Dataquest: Governors and First Ladies of North Dakota Database (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-20-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="governors and first ladies of north dakota (4am crack).dsk" size="143360" crc="29c548b7" sha1="6d12533696ccf49e17c99921b2ec58c429dcb592"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqminnd">
+		<description>Dataquest: Minerals of North Dakota Database (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-22-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="minerals of north dakota (4am crack).dsk" size="143360" crc="d62e156e" sha1="239bb06cb1e088d2d35d47260aa6f0736656ca8e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndagr">
+		<description>Dataquest: North Dakota Agriculture Database (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-20-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota agriculture (4am crack).dsk" size="143360" crc="3d6e4023" sha1="880a5232ce130ee7199f4168c8657e0b04ed9884"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndcpopu500">
+		<description>Dataquest: North Dakota Cities with Population Under 500 (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-21-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota cities with population under 500 (4am crack).dsk" size="143360" crc="1986d96c" sha1="6162436dac03758b35d6e7b61da619afd799f5cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndcpop500a">
+		<description>Dataquest: North Dakota Cities with Population 500 and Above (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-21-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota cities with population 500 and above (4am crack).dsk" size="143360" crc="186b2e5e" sha1="26ccb43cc26effa373063ab2ed7ec9f19e572a2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndcount">
+		<description>Dataquest: North Dakota Counties (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-21-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota counties (4am crack).dsk" size="143360" crc="e1b6370b" sha1="4e44496ffb32564dbe50a91da88d44f4975cbc23"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndexp">
+		<description>Dataquest: North Dakota Explorers (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-21-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota explorers (4am crack).dsk" size="143360" crc="8fab16d9" sha1="9f1d0da2ae81925843d2b670c5c549d009d69525"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndindtr">
+		<description>Dataquest: North Dakota Indian Tribes (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-21-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota indian tribes (4am crack).dsk" size="143360" crc="f4b7d0ca" sha1="86239cacfe478db1e71527ad351e09fc13e1327b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndparkhs">
+		<description>Dataquest: North Dakota Parks and Historical Sites (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-22-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota parks and historical sites (4am crack).dsk" size="143360" crc="1be8abde" sha1="fd4df9a60c3fd7bcc1425c56a321dad23cfce47d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndplant">
+		<description>Dataquest: North Dakota Plants (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-22-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota plants (4am crack).dsk" size="143360" crc="8d2dd87b" sha1="de9512d06ed1312e5fb78cd223d65989b1a25c85"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndpride">
+		<description>Dataquest: North Dakota Pride (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-22-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota pride (4am crack).dsk" size="143360" crc="71d7071e" sha1="ac7d7d584af4280b8d8d354f1362a42974c71efa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndsymb">
+		<description>Dataquest: North Dakota Symbols (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-22-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota symbols (4am crack).dsk" size="143360" crc="d330ff70" sha1="e9c92bdb500e2c27e30b7a77d4ebab0b958398f0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndsenrep">
+		<description>Dataquest: North Dakota U.S. Senators and Representatives (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-22-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota u.s. senators and representatives (4am crack).dsk" size="143360" crc="990ca91d" sha1="6cf57c50159fc7cf90981f68e69e6c469411816f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqndwildlf">
+		<description>Dataquest: North Dakota Wildlife (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-22-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota wildlife (4am crack).dsk" size="143360" crc="68ee645d" sha1="c961bd1abff360b5d9c677766c9f6746b313502b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqnpeopnd">
+		<description>Dataquest: Notable People of North Dakota (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="developer" value="North Dakota Database Project" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-22-->
+		<!--educational program-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="notable people of north dakota (4am crack).dsk" size="143360" crc="b9067082" sha1="aded144536c675b7477f68b516d1c022387f338f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dqsample">
 		<description>Dataquest: Sampler (A-173 version 1.0) (4as crack)</description>
 		<year>1986</year>
@@ -46055,6 +45541,42 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="delta drawing 3.33 (4am crack).dsk" size="143360" crc="38cf358d" sha1="968ceaa46903f90111c4dd1026e58a2da3df44b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desktzoor1" cloneof="desktzoo">
+		<description>Desktop Zoo (revision 1) (4am crack)</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="revision 1" />
+		<!--Uses uppercase text.-->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-06-10-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="desktop zoo (4am crack).dsk" size="143360" crc="369c223c" sha1="a3373b95967dbdc59be845cf3f965f52148e1a89"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desktzoo">
+		<description>Desktop Zoo (revision 2) (4am crack)</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires an Apple //e or later." />
+		<!--Requires an Apple //e or later due to use of unconditional lowercase text.-->
+		<info name="version" value="revision 2" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="desktop zoo rev. 2 (4am crack).dsk" size="143360" crc="6aa48adc" sha1="57930a6f5d55b3cb3fe70068196ddfd07341844c" />
 			</dataarea>
 		</part>
 	</software>
@@ -46794,6 +46316,39 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="falconsps" cloneof="falcons">
+		<description>Falcons (4am crack)</description>
+		<year>1981</year>
+		<publisher>Piccadilly Software</publisher>
+		<info name="programmer" value="Thomas Ball and Eric Varsanyi" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2015-04-28-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="falcons (4am crack).dsk" size="143360" crc="b2eb0e24" sha1="b94e95a0f657230684a81637ad3c9b2a3fdfbbfd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="falcons">
+		<description>Falcons (Softsmith) (4am and san inc crack)</description>
+		<year>1981</year>
+		<publisher>Softsmith</publisher>
+		<info name="original_publisher" value="Piccadilly Software" />
+		<info name="programmer" value="Thomas Ball and Eric Varsanyi" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-02-04-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="falcons (softsmith) (4am and san inc crack).dsk" size="143360" crc="54ad4bde" sha1="6e56006b31f5ca1de398f3b4070c22a8f98cee9d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="farmfile">
 		<description>Farmfiler (version 03.11.83) (4am crack)</description>
 		<year>1983</year>
@@ -47189,6 +46744,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="fbegcont">
+		<description>From The Beginning... Contraception (4am crack)</description>
+		<year>1985</year>
+		<publisher>Orange Juice Software Systems</publisher>
+		<info name="programmer" value="Rita Houser and Larry Olbrantz" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="143360">
+				<rom name="from the beginning... contraception (4am crack) disk 1.dsk" size="143360" crc="b90955ad" sha1="98611b0d1b9de00c2bf4c951ce421c3fef1f3f43" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="143360">
+				<rom name="from the beginning... contraception (4am crack) disk 2.dsk" size="143360" crc="f42d2eb5" sha1="ca29581db2abbe6159c6f2f9c2243d3c67f816a3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fundirec84" cloneof="fundirec">
 		<description>Fun with Directions (version 1984) (4am crack)</description>
 		<year>1984</year>
@@ -47502,6 +47080,70 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="grbblsadjadv">
+		<description>Grammar: Building Better Language Skills: Adjectives and Adverbs (4am crack)</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="grammar- building better language skills- adjectives and adverbs (4am crack).dsk" size="143360" crc="b0d3fdbc" sha1="30784d416f80f06e5d2bda1f2d8b5ffcac6b2db1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grbblsnoun">
+		<description>Grammar: Building Better Language Skills: Nouns (4am crack)</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="grammar- building better language skills- nouns (4am crack).dsk" size="143360" crc="b9eff43a" sha1="8616d1337b068100bd958e079202cacf9b3e9806" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grbblssent">
+		<description>Grammar: Building Better Language Skills: Sentences (4am crack)</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="grammar- building better language skills- sentences (4am crack).dsk" size="143360" crc="30c92911" sha1="92639f11206a3b22b96b5ea39be4266d3968146b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grbblsverb">
+		<description>Grammar: Building Better Language Skills: Verbs (4am crack)</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="grammar- building better language skills- verbs (4am crack).dsk" size="143360" crc="8681942e" sha1="eb069aea48e455e933e4aac9fd6e5050381e1c8a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="grndhous">
 		<description>Grandma's House (4am crack)</description>
 		<year>1984</year>
@@ -47514,6 +47156,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="grandma's house (4am crack).dsk" size="143360" crc="ce2d4423" sha1="94ca7fe043b24504e8e8806de97fa360d149b3e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grancook">
+		<description>Granny Applebee's Cookie Factory (4am crack)</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2016-10-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="granny applebee's cookie factory (4am crack).dsk" size="143360" crc="07234fbd" sha1="18b9bdc16e7c5adde81a1eccff10791a1c7ff9bf" />
 			</dataarea>
 		</part>
 	</software>
@@ -47770,6 +47428,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="hhlngvwl">
+		<description>Hugo Hound's Vowel Sounds: Long Vowels (4am crack)</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-12-30-->
+		<!--May be missing disk 2 - "Short Vowels" based on manual.-->
+		<!--education program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="hugo hound's vowel sounds - long vowels (4am crack).dsk" size="143360" crc="b1b4cad8" sha1="bb6ea89ff429fcbb74665b587e551966fdf12709"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="humbodyex">
 		<description>Human Body Exploration (4am crack)</description>
 		<year>1987</year>
@@ -47907,6 +47582,38 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="inferential anne ii (4am crack).dsk" size="143360" crc="aaccfba4" sha1="47e7fe20de827e9292a8d2a5fe1912db93da2633" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmitsabttm">
+		<description>It's About Time (McCarthy-McCormack) (4am crack)</description>
+		<!--Different program than It's About Time from Micrograms Publishing.-->
+		<year>1983</year>
+		<publisher>McCarthy-McCormack</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2015-06-02-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="it's about time (4am crack).dsk" size="143360" crc="9be8d4c9" sha1="bcfc08ee08ba58c62d4673d4b422eef74fab0f28" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="itsabttm">
+		<description>It's About Time (4am crack)</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-06-16-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="it's about time (micrograms) (4am crack).dsk" size="143360" crc="f7ae8a72" sha1="530323a118e22e126e6b968ee72b20ae3d7622a9" />
 			</dataarea>
 		</part>
 	</software>
@@ -48091,6 +47798,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="kidwriter 1.0 (4am crack).dsk" size="143360" crc="5ca27432" sha1="13568d1d25794ead8a5f89e9ac21700f0cb382e6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kcaddphn">
+		<description>Kinder Critters: Address and Phone Number (4am crack)</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="kinder critters- address and phone number (4am crack).dsk" size="143360" crc="6add0391" sha1="fb479acb6cb8fa94fe3c5638bd0b77e7f4eab7b3" />
 			</dataarea>
 		</part>
 	</software>
@@ -50083,6 +49806,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="msaurkind">
+		<description>Mathosaurus: Kindergarten (4am crack)</description>
+		<year>1989</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mathosaurus- kindergarten (4am crack).dsk" size="143360" crc="67deee61" sha1="a91ca89ff42621e8c028116beb3fc0319002cb35" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mdqpres11" cloneof="mdqpres">
 		<description>MECC Dataquest: The Presidents (A-140 version 1.1) (4am crack)</description>
 		<year>1985</year>
@@ -50871,6 +50610,45 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="number bowling (4am crack).dsk" size="143360" crc="62cfab88" sha1="3700731fe0a85236bbb6733e2cf34b714c3f20ad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numbball">
+		<description>Numberball (4am crack)</description>
+		<year>1994</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-11-10-->
+		<!--education program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="numberball (4am crack).dsk" size="143360" crc="bd983ba9" sha1="73da61404aa405fd65616a957ef75ffc12f6af04"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="olvcword">
+		<description>Oliver's Crosswords (4am crack)</description>
+		<year>1990</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-06-22-->
+		<!--education program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="oliver's crosswords (4am crack) disk a.dsk" size="143360" crc="c4b6e6df" sha1="673231fed35ecd2aea32d7e8a6a2ced28e59ba9e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="oliver's crosswords (4am crack) disk b.dsk" size="143360" crc="c7de0295" sha1="b310a7a7813ae4b049655b1966b971ed247a18eb" />
 			</dataarea>
 		</part>
 	</software>
@@ -51799,6 +51577,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="pnctbbls">
+		<description>Punctuation: Building Better Language Skills (4am crack)</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="punctuation- building better language skills (4am crack).dsk" size="143360" crc="0cbc57bf" sha1="e676a7e78f2448c0527c5c4a11ee65c482798897" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pzlmastr">
 		<description>Puzzle Master (4am crack)</description>
 		<year>1984</year>
@@ -52661,6 +52455,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="scamble">
+		<description>Scramble (4am crack)</description>
+		<year>1987</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-04-17-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="scramble (4am crack).dsk" size="143360" crc="d4931983" sha1="7084a4fec4c4705cda0f8e3c5a8d255ce431912a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sentdiag">
 		<description>Sentence Diagramming (4am crack)</description>
 		<year>1985</year>
@@ -52695,7 +52505,7 @@ license:CC0-1.0
 				<rom name="sentence diagramming (4am crack) disk 4.dsk" size="143360" crc="e066b500" sha1="e24453611307982f8ac3a9baace9310f084dd9aa" />
 			</dataarea>
 		</part>
-		<!-- Disk #5 is missing. -->
+		<!--Disk #5 is missing.-->
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="143360">
@@ -52785,6 +52595,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="shadows and light (4am crack).dsk" size="143360" crc="b98b2c74" sha1="48b0cf528d775a756864b663313bc3f2cf99b4d4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shpspatt">
+		<description>Shapes and Patterns (4am crack)</description>
+		<year>1988</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-12-29-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="shapes and patterns (4am crack).dsk" size="143360" crc="89884218" sha1="213bbee8ddb774e1dad28836ec08bf849d7cc412" />
 			</dataarea>
 		</part>
 	</software>
@@ -52949,6 +52775,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="143360">
 				<rom name="social studies- africa (4am crack) disk 2.dsk" size="143360" crc="f7e467b0" sha1="b166cdba9a622f6cded72b7288e6e62395a64cc3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soloflt">
+		<description>Solo Flight (4am crack)</description>
+		<year>1984</year>
+		<publisher>Microprose Software</publisher>
+		<info name="programmer" value="Sid Meier and Andy Hollis" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-09-30-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="solo flight (4am crack).dsk" size="143360" crc="ed040baf" sha1="5945d9d7d491ce5b13f207f73271f48bd1103b10"/>
 			</dataarea>
 		</part>
 	</software>
@@ -54931,6 +54773,31 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="spysnam861001" cloneof="spysnam">
+		<description>The Spy's Adventures in North America (version 1986-10-01) (4am crack)</description>
+		<year>1986</year>
+		<publisher>Polarware</publisher>
+		<info name="developer" value="Magic Tree" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later. Requires a 128K Apple ][+ or later for hi-res graphics." />
+		<info name="version" value="1986-10-01" />
+		<!--According to file metadata-->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-03-26-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="143360">
+				<rom name="the spy's adventures in north america v1986-10-01 (4am crack) side a.dsk" size="143360" crc="250b9c24" sha1="d4fe728da6b4ab71f5b9f3712593bf747e2fce6a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot" />
+			<dataarea name="flop" size="143360">
+				<rom name="the spy's adventures in north america v1986-10-01 (4am crack) side b (boot).dsk" size="143360" crc="d31bbf32" sha1="37b40582d0acb5df88e47bb4e31fdf5e94fa28db" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spysnam870504" cloneof="spysnam">
 		<description>The Spy's Adventures in North America (version 1987-05-04) (4am crack)</description>
 		<year>1987</year>
@@ -55436,6 +55303,54 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="uccsbcon">
+		<description>Uncle Clyde's Consonant Slides: Beginning Consonants (4am crack)</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-02-10-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="uncle clyde's consonant slides - beginning consonants (4am crack).dsk" size="143360" crc="239d4daa" sha1="7b530d4f20e8275e767c6a23e37de3cb85f2fe4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uccsbldg">
+		<description>Uncle Clyde's Consonant Slides: Blends and Digraphs (4am crack)</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-05-09-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="uncle clyde's consonant slides - consonant blends and digraphs (4am crack).dsk" size="143360" crc="dec1edfc" sha1="93088790186e6c08bd762196f80d1d5f57837da1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uccsecon">
+		<description>Uncle Clyde's Consonant Slides: Ending Consonants (4am crack)</description>
+		<year>1993</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-05-09-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="uncle clyde's consonant slides - ending consonants (4am crack).dsk" size="143360" crc="67153156" sha1="211cd07bb41d1dc7b98c2e30dfceb5550676f78f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="undfire">
 		<description>Under Fire (4am crack)</description>
 		<year>1985</year>
@@ -55811,6 +55726,288 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="what's the problem- where in the world (4am crack).dsk" size="143360" crc="863f4453" sha1="c0edf9d006b4cc49236993b78789c4472172b58c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmeur">
+		<description>Where in Europe is Carmen Sandiego? (4am crack)</description>
+		<year>1988</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Ken Bull, Gene Portwood, Lauren Elliott, Leila Bronstein, Don Albrecht, Katherine Bird, Susan Meyers, and Louis Ewens" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2016-08-01. Redumped: 2021-08-28 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines.-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in europe is carmen sandiego (4am crack) side a.dsk" size="143360" crc="3355a002" sha1="c6af7b62829030b88fd3be5e34cc5b0527b06afe" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in europe is carmen sandiego (4am crack) side b.dsk" size="143360" crc="6b3c939a" sha1="542b72a2bacbf86ef4e65ee310501456dc9cb8ab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmnd">
+		<description>Where in North Dakota is Carmen Sandiego? (version 1.0) (4am crack)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Ken Bull, Katherine Bird, Janese Freed, Leila Bronstein, Rick Incrocci, Michelle McBride, Roseann Mitchell, Arturo Sinclair, Diane Wilcox, and Louis Ewens" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-09. Redumped 2021-08-27 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines.-->
+		<!--educational game-->
+		<!--This is part of the Where in North Dakota is Carmen Sandiego disk set. Please refer to the following website for more details on the history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in north dakota is carmen sandiego (4am crack) side a.dsk" size="143360" crc="fd587990" sha1="206650c1d3de793b1746071308c84b7820852e97" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in north dakota is carmen sandiego (4am crack) side b.dsk" size="143360" crc="7235925f" sha1="67758499be96c5844cdcd12a9ae91e49d6d15794"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmtimev10" cloneof="carmtime">
+		<description>Where in Time is Carmen Sandiego? (version 1.0) (4am and trex crack)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Rod Nelsen, Leila Bronstein, Jenny Martin, Gail Rathbun, Mark Schlichtinng, and Tom Rettig" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Redumped: 2021-08-28 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines.-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.0 (4am crack) disk a.dsk" size="143360" crc="e56e9ec4" sha1="043858a5a900e1212b27c84698dc22ec1464a1ff" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.0 (4am crack) disk b.dsk" size="143360" crc="f5741491" sha1="2b9ab6d218f72db2e4fdb4133f815a5975d08a89" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego (4am crack) disk c.dsk" size="143360" crc="650735af" sha1="aecf8b17bb26e73036100ac648e5eddede12fe91" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego (4am crack) disk d.dsk" size="143360" crc="3c7643ca" sha1="8a6a168f25b4698465b89db9546d9b35489fe042" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmtime_525" cloneof="carmtime">
+		<description>Where in Time is Carmen Sandiego? (version 1.1) (trex crack)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Rod Nelsen, Leila Bronstein, Jenny Martin, Gail Rathbun, Mark Schlichtinng, and Tom Rettig" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: ?-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.1 side a (1989)(broderbund)(trex crack).dsk" size="143360" crc="9d391061" sha1="32f18c02974e0a915e3ac74abe10ec9cf5f67533" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.1 side b (1989)(broderbund)(trex crack).dsk" size="143360" crc="33e65f76" sha1="8995ca7786b6a70d68b8305625e65a534c15d435" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.1 side c (1989)(broderbund)(trex crack).dsk" size="143360" crc="15942fc0" sha1="03189fdefa100e64c0ad9ba38804bab7508f9881" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.1 side d (1989)(broderbund)(trex crack).dsk" size="143360" crc="704551a0" sha1="469ef6f3be3919cd904c63d37d6e8d46e895ab31" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmtime">
+		<description>Where in Time is Carmen Sandiego? (version 1.1) (800K 3.5") (trex crack)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Portwood, Lauren Elliott, Rod Nelsen, Leila Bronstein, Jenny Martin, Gail Rathbun, Mark Schlichtinng, and Tom Rettig" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: ?-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="where in time is carmen sandiego v1.1 800k 3.5 disk (1989)(broderbund)(trex crack).2mg" size="819264" crc="36d3ff6d" sha1="21051ecf94f598da648355e75e46641351ed3230" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmusa">
+		<description>Where in the USA is Carmen Sandiego? (version 2.0, 26-APR-1989) (4am crack)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Ken Bull, Gene Portwood, and Lauren Elliott" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="2.0, 26-APR-1989" />
+		<!--ProDOS Re-release on 3 sides.-->
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-05. Redumped 2021-08-28 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines.-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in the usa is carmen sandiego v2.0 (4am crack) side a.dsk" size="143360" crc="74c99392" sha1="28feab5a1ddca487af5c5f2ab041d6fbdfda2a42" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in the usa is carmen sandiego v2.0 (4am crack) side b.dsk" size="143360" crc="0c1470ee" sha1="6e491ac8d2bb1c83a207c2ff0b8d993a6c94ccab" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in the usa is carmen sandiego v2.0 (4am crack) side c.dsk" size="143360" crc="f41a8d2b" sha1="9d788a8c21a4fb08372b2f319188252203667b36" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmwrld">
+		<description>Where in the World is Carmen Sandiego? (version 2.0, 15-AUG-1989) (4am crack)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Ken Bull, Dane Bigham, Gene Portwood, and Lauren Elliott" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="2.0, 15-AUG-1989" />
+		<!--ProDOS re-release-->
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-05. Redump: 2021-08-28. Due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines.-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in the world is carmen sandiego v2.0 (4am crack) side a.dsk" size="143360" crc="dbc59bd8" sha1="c3236200035b77e7f24e8fd24103467be73daf7a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in the world is carmen sandiego v2.0 (4am crack) side b.dsk" size="143360" crc="29b48061" sha1="96fc5b5cf4de66d6f4e1ac0364b0c3347b26e2d1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwmathl3">
+		<description>Wild West Math Level 3 (4am crack)</description>
+		<year>1990</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-06-20-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 3 (4am crack) disk a.dsk" size="143360" crc="999709bd" sha1="3668662cdd69b22755767f21f56b1b0f04754d5d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 3 (4am crack) disk b.dsk" size="143360" crc="3ff9505d" sha1="df771c0be34133b44a37bbb139952b6d49facf4f" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 3 (4am crack) disk c.dsk" size="143360" crc="c20f29be" sha1="d98fd9245b3b2eb8a1fe3727b3291d342b9bced8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwmathl4">
+		<description>Wild West Math Level 4 (4am crack)</description>
+		<year>1990</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-06-20-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 4 (4am crack) disk a.dsk" size="143360" crc="26b7e7c3" sha1="2af723a49d5d6aed85aecc139ca9ce2a43461cc7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 4 (4am crack) disk b.dsk" size="143360" crc="52cb2bd9" sha1="d4c8474ffd42669b2d406dbf1b5367cd034bb7e6" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 4 (4am crack) disk c.dsk" size="143360" crc="aff51478" sha1="1042ab224399638b566f5a858ed1c66f27b5a34b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwmathl5">
+		<description>Wild West Math Level 5 (4am crack)</description>
+		<year>1990</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="developer" value="Micrograms Publishing" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-06-20-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 5 (4am crack) disk a.dsk" size="143360" crc="ee8492d9" sha1="dce6ffcda41edb06b0ab0278a82d9a015b01260b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 5 (4am crack) disk b.dsk" size="143360" crc="7cead118" sha1="8e32116876c34634b742539a34f00439ad292f2f" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wild west math level 5 (4am crack) disk c.dsk" size="143360" crc="da77e766" sha1="57145617b4d25b71924ea5d1f1a0fea13a15aaea" />
 			</dataarea>
 		</part>
 	</software>

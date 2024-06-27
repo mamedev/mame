@@ -17,6 +17,7 @@ public:
 	auto opt_cb() { return m_opt_cb.bind(); }
 	auto ki_cb() { return m_ki_cb.bind(); }
 	auto in0_cb() { return m_in0_cb.bind(); }
+	auto input_flag_cb() { return m_input_flag_cb.bind(); }
 
 protected:
 	enum
@@ -74,6 +75,7 @@ private:
 	void set_zl_flag(bool is_zl);
 	void set_zh_flag(bool is_zh);
 	void set_cl_flag(bool is_cl);
+	void set_input_flag(bool is_input_set);
 	void op_msk(int size);
 	void op_and(int size);
 	void op_or(int size);
@@ -126,6 +128,7 @@ private:
 	devcb_write8 m_opt_cb;
 	devcb_read8 m_ki_cb;
 	devcb_read8 m_in0_cb;
+	devcb_read8 m_input_flag_cb;
 };
 
 

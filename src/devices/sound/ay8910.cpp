@@ -581,6 +581,7 @@ be induced by cutoff currents from the 15 FETs.
 
 #define LOG_IGNORED_WRITES (1U << 1)
 #define LOG_WARNINGS       (1U << 2)
+#define LOG_OUTPUT_CONFIG  (1U << 3)
 #define VERBOSE (LOG_WARNINGS)
 #include "logmacro.h"
 
@@ -1215,7 +1216,7 @@ void ay8910_device::build_mixer_table()
 
 	if ((m_flags & AY8910_LEGACY_OUTPUT) != 0)
 	{
-		LOGMASKED(LOG_WARNINGS, "%s using legacy output levels!\n", name());
+		LOGMASKED(LOG_OUTPUT_CONFIG, "%s using legacy output levels!\n", name());
 		normalize = 1;
 	}
 
@@ -1295,7 +1296,7 @@ void ay8910_device::device_start()
 
 	if ((m_flags & AY8910_SINGLE_OUTPUT) != 0)
 	{
-		LOGMASKED(LOG_WARNINGS, "%s device using single output!\n", name());
+		LOGMASKED(LOG_OUTPUT_CONFIG, "%s device using single output!\n", name());
 		m_streams = 1;
 	}
 

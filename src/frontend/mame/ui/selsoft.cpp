@@ -424,7 +424,7 @@ menu_select_software::~menu_select_software()
 
 bool menu_select_software::handle(event const *ev)
 {
-	if (m_prev_selected == nullptr && item_count() > 0)
+	if (!m_prev_selected && (item_count() > 0))
 		m_prev_selected = item(0).ref();
 
 	// FIXME: everything above here used run before events were processed

@@ -78,11 +78,11 @@ AUDIO:
 |CABLE |    +-------+   +---------+      +-------+         +-------+                                                                |
 |      |    |74LS02N|   |74LS245N |      |74LS138|         |74LS08N|                            +-------+             +---------+   |
 |TO    |    +-------+   +---------+      +-------+         +-------+        +---------------+   |74LS166|             |74LS273N | 5 |
-|SECOND|                                                                    |P1           6E|   +-------+             +---------+   |
+|SECOND|                                                                    |CG P1        6E|   +-------+             +---------+   |
 |PCB   |    +-------+     +-------+     +-------+          +-------+        |   M5L2764K    |   +-------+  +-------+  +-------+     |
 |      |    |74LS74A|     |       |     |74LS32N|          |74LS30N|        +---------------+   |74LS161|  |74LS161|  |74LS138|   6 |
 |      |    +-------+     +-------+     +-------+          +-------+        +---------------+   +-------+  +-------+  +-------+     |
-|      |                                                                    |P2           7E|   +-------+  +-------+  +-------+     |
+|      |                                                                    |CG P2        7E|   +-------+  +-------+  +-------+     |
 |      |    +---------+   +-------+      +-------+                          |   M5L2764K    |   |74LS161|  |74LS161|  |74LS04P|   7 |
 |      |    |74LS130N |   |74LS173|      |74LS138|                          +---------------+   +-------+  +-------+  +-------+     |
 +------+    +---------+   +-------+      +-------+      +------------+      +---------+  +-------+                                  |
@@ -96,7 +96,7 @@ AUDIO:
 |CONNEC|                  +-------+    +---------+                                                                       +----+     |
 |TOR   |                                                                                                                            |
 |      |    +-------+     +-------+    +------------+   +------------+      +-------+     +-------+    +---------+   +---------+    |
-|RIBBON|    |MC14053|     |74LS174|    | M5L8253P-5 |   |9D          |      |74LS367|     |74LS367|    |   SW2   |   |   SW1   | 10 |
+|RIBBON|    |MC14053|     |74LS174|    | M5L8253P-5 |   |S         9D|      |74LS367|     |74LS367|    |   SW2   |   |   SW1   | 10 |
 |CABLE |    +-------+     +-------+    |            |   |  M5L2732K  |      +-------+     +-------+    +---------+   +---------+    |
 |      |                               +------------+   +------------+                                                              |
 |TO    |                                                                   +---------+   +---------+   +---------+   +---------+    |
@@ -192,6 +192,33 @@ AUDIO:
 |                    +-------+        16B                                                                                           |
 |                          16A                                               P1422-2                                                |
 +-----------------------------------------------------------------------------------------------------------------------------------+
+
+
+                Vampire Edge Connector
+     Solder Side          |        Parts Side
+------------------------------------------------------------------
+         GND          | A | 1 |      GND
+         +5V          | B | 2 |      +5V
+                      | C | 3 |     +12V
+                      | D | 4 |    Audio Out
+        Coin          | E | 5 |
+        Coin          | F | 6 |
+                      | H | 7 |
+                      | J | 8 |
+                      | K | 9 |    Player Invisibility Button
+    Player 2 Start    | L | 10|
+    Player 1 Start    | M | 11|
+    Player 2 Left     | N | 12|
+    Player 2 Right    | P | 13|
+    Player 2 Down     | R | 14|
+    Player 2 Up       | S | 15|    Video Blue
+    Player 1 Left     | T | 16|    Video Red
+    Player 1 Right    | U | 17|    Video Green
+    Player 1 Down     | V | 18|    Video Sync (Composite)
+    Player 1 Up       | W | 19|
+                      | X | 20|
+         +5V          | Y | 21|      +5V
+         GND          | Z | 22|      GND
 
 */
 
@@ -626,21 +653,21 @@ void vampire_state::vampire(machine_config &config)
 
 ROM_START( vampire )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "h1.1f", 0x8000, 0x2000, CRC(7e69ff9b) SHA1(85f6303803a0577f96b879e0b9d280a4f22cca8c) )
-	ROM_LOAD( "h2.2f", 0xa000, 0x2000, CRC(e94155f8) SHA1(f60d82d9204f7b13aa9be189ca74ca48bf9e879a) )
-	ROM_LOAD( "h3.3f", 0xc000, 0x2000, CRC(ce27dd90) SHA1(4edd8ba08f828a0c3c6eb21a2d9e0d1e53fac407) )
-	ROM_LOAD( "h4.4f", 0xe000, 0x2000, CRC(a25f00bc) SHA1(db445c1876b79c4d553d4f9cc881f41f68b6667c) )
+	ROM_LOAD( "1h.1h", 0x8000, 0x2000, CRC(7e69ff9b) SHA1(85f6303803a0577f96b879e0b9d280a4f22cca8c) )
+	ROM_LOAD( "2h.2h", 0xa000, 0x2000, CRC(e94155f8) SHA1(f60d82d9204f7b13aa9be189ca74ca48bf9e879a) )
+	ROM_LOAD( "3h.3h", 0xc000, 0x2000, CRC(ce27dd90) SHA1(4edd8ba08f828a0c3c6eb21a2d9e0d1e53fac407) )
+	ROM_LOAD( "4h.4h", 0xe000, 0x2000, CRC(a25f00bc) SHA1(db445c1876b79c4d553d4f9cc881f41f68b6667c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "9d", 0xf000, 0x1000, CRC(e13a7aef) SHA1(77a49cb0f3f037826a32bbfa8fab524f17895992) )
+	ROM_LOAD( "s_9d.9d", 0xf000, 0x1000, CRC(e13a7aef) SHA1(77a49cb0f3f037826a32bbfa8fab524f17895992) )
 
 	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "cg_p1.6e", 0x0000, 0x2000, CRC(042661a4) SHA1(58ed7c782a2486aa8c2c650d6d9e54929e5dd50b) )
 	ROM_LOAD( "cg_p2.7e", 0x2000, 0x2000, CRC(e9dd9dff) SHA1(8a9ad8659763a9c010d0b482af3a40978c02cec7) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD_NIB_LOW(  "16a", 0x0000, 0x0100, CRC(bc60a2eb) SHA1(73b8f5f6eee90a4d59a5c62a6a342fa49185938c) )
-	ROM_LOAD_NIB_HIGH( "16b", 0x0000, 0x0100, CRC(aa6b627b) SHA1(556d6bab46419ce55dd254de9615981852be6e6f) )
+	ROM_LOAD_NIB_LOW(  "tb24s10.16a", 0x0000, 0x0100, CRC(bc60a2eb) SHA1(73b8f5f6eee90a4d59a5c62a6a342fa49185938c) ) // TB24S10 BPROM
+	ROM_LOAD_NIB_HIGH( "tb24s10.16b", 0x0000, 0x0100, CRC(aa6b627b) SHA1(556d6bab46419ce55dd254de9615981852be6e6f) ) // TB24S10 BPROM
 ROM_END
 
 void vampire_state::init_vampire()

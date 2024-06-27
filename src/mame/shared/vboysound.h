@@ -33,21 +33,21 @@ protected:
 	static constexpr unsigned CHANNELS        = 4;
 
 	struct s_snd_channel {
-		int8_t        playing = 0;    // the sound is playing
+		int8_t      playing = 0;    // the sound is playing
 
 		// state when sound was enabled
-		uint32_t      env_steptime = 0;       // Envelope step time
-		uint8_t       env0 = 0;               // Envelope data
-		uint8_t       env1 = 0;               // Envelope data
-		uint8_t       volLeft = 0;            // Left output volume
-		uint8_t       volRight = 0;           // Right output volume
-		uint8_t       sample[580]{};        // sample to play
+		uint32_t    env_steptime = 0;       // Envelope step time
+		uint8_t     env0 = 0;               // Envelope data
+		uint8_t     env1 = 0;               // Envelope data
+		uint8_t     volLeft = 0;            // Left output volume
+		uint8_t     volRight = 0;           // Right output volume
+		uint8_t     sample[580]{};        // sample to play
 		int         sample_len = 0;         // length of sample
 
 		// values that change, as the sample is played
 		int         offset = 0;             // current offset in sample
 		int         time = 0;               // the duration that this sample is to be played
-		uint8_t       envelope = 0;           // Current envelope level (604)
+		uint8_t     envelope = 0;           // Current envelope level (604)
 		int         env_time = 0;           // The duration between envelope decay/grow (608)
 	};
 

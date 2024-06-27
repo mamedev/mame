@@ -2,7 +2,7 @@
 // buffered_write_stream.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,6 +17,7 @@
 #include "asio/buffered_write_stream.hpp"
 
 #include <cstring>
+#include <functional>
 #include "archetypes/async_result.hpp"
 #include "asio/buffer.hpp"
 #include "asio/io_context.hpp"
@@ -29,12 +30,6 @@
 #else // defined(ASIO_HAS_BOOST_ARRAY)
 # include <array>
 #endif // defined(ASIO_HAS_BOOST_ARRAY)
-
-#if defined(ASIO_HAS_BOOST_BIND)
-# include <boost/bind/bind.hpp>
-#else // defined(ASIO_HAS_BOOST_BIND)
-# include <functional>
-#endif // defined(ASIO_HAS_BOOST_BIND)
 
 typedef asio::buffered_write_stream<
     asio::ip::tcp::socket> stream_type;
@@ -254,11 +249,7 @@ void test_async_operations()
 {
   using namespace std; // For memcmp.
 
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -347,7 +338,7 @@ void test_async_operations()
 ASIO_TEST_SUITE
 (
   "buffered_write_stream",
-  ASIO_TEST_CASE(test_compile)
+  ASIO_COMPILE_TEST_CASE(test_compile)
   ASIO_TEST_CASE(test_sync_operations)
   ASIO_TEST_CASE(test_async_operations)
 )

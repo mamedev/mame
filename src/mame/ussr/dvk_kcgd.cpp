@@ -199,7 +199,7 @@ TIMER_CALLBACK_MEMBER(kcgd_state::toggle_500hz)
 
 void kcgd_state::machine_reset()
 {
-	memset(&m_video, 0, sizeof(m_video));
+	m_video = decltype(m_video)();
 }
 
 void kcgd_state::machine_start()

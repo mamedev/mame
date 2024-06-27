@@ -100,6 +100,7 @@ void cpu_device::access_after_delay(u32 cycles) noexcept
 
 void cpu_device::defer_access() noexcept
 {
+	if(*m_icountptr > 0)
+		*m_icountptr = 0;
 	m_access_to_be_redone = true;
-	*m_icountptr = 0;
 }

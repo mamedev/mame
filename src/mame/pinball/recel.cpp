@@ -116,7 +116,7 @@ void recel_state::recel_io(address_map &map) // to be done
 	//map(0x20, 0x2f).rw("b2", FUNC(ra17xx_device::io_r), FUNC(ra17xx_device::io_w));
 	//map(0x30, 0x3f).rw("b3", FUNC(r10696_device::io_r), FUNC(r10696_device::io_w));
 	//map(0x50, 0x5f).rw("b5", FUNC(r10788_device::io_r), FUNC(r10788_device::io_w));
-	// map(0x??, 0x?f).r(FUNC(recel_state::bic_r)); //  get module data via BIC C6
+	//map(0x??, 0x?f).r(FUNC(recel_state::bic_r)); //  get module data via BIC C6
 }
 
 static INPUT_PORTS_START( recel )
@@ -497,13 +497,21 @@ ROM_START(r_quijote)
 	//ROM_LOAD( "qu3.c5",       0x0000, 0x0800, CRC(6eb5a08d) SHA1(3bfec2c0fdd1d8e1b03a5c189d2f37e1a52d065b) )
 ROM_END
 
-// PCB modified to use two 2716 instead of only one
+// PCB modified to use two 2716 instead of only one.
 ROM_START(r_spcgame7)
 	RECEL_BIOS
 
 	ROM_REGION( 0x1000, "module", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "spcgme_system_iii_l.bin", 0x0001, 0x0800, CRC(8700559c) SHA1(cd61e16cf30420e976537ee0b8ba9e95e3577ddc) )
 	ROM_LOAD16_BYTE( "spcgme_system_iii_h.bin", 0x0000, 0x0800, CRC(13eb1f52) SHA1(d0607b88314e86a37486ac8118d7fd0a17beb404) )
+ROM_END
+
+// Formula 1 was renamed as Antar for the Portuguese market, being distributed by Gorsam (without Recel logos).
+ROM_START(r_antar)
+	RECEL_BIOS
+
+	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
+	ROM_LOAD("antar.bin",     0x0000, 0x0800, CRC(17882b53) SHA1(6a4f34fcc2fa88aee0c7843be00f75c9f3af03ba) ) // TMS2516
 ROM_END
 
 ROM_START(r_flipper)
@@ -546,6 +554,7 @@ GAME(1979,  r_cavalier, recel,  recel,   recel, recel_state, empty_init, ROT0, "
 GAME(1979,  r_swash,    recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "SwashBuckler",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1979,  r_quijote,  recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Don Quijote",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1979,  r_spcgame7, recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Space Game (Bingo 6+1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_antar,    recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Antar (Recel)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1980,  r_flipper,  recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "The Flipper Game",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1980,  r_blackmag, recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Black Magic",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1980,  r_blackm4,  recel,  recel,   recel, recel_state, empty_init, ROT0, "Recel",     "Black Magic 4",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

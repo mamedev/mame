@@ -402,10 +402,10 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT     COMPAT  MACHINE    INPUT   CLASS         INIT            COMPANY, FULLNAME, FLAGS
-SYST( 1988, fdes2100d,  0,         0,      fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2100 Display (set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1988, fdes2100da, fdes2100d, 0,      fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2100 Display (set 2)", MACHINE_SUPPORTS_SAVE )
-SYST( 1988, fdes2000d,  fdes2100d, 0,      fdes2000d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, fdes2100d,  0,         0,      fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity International", "Designer 2100 Display (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, fdes2100da, fdes2100d, 0,      fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity International", "Designer 2100 Display (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, fdes2000d,  fdes2100d, 0,      fdes2000d, desdis, desdis_state, init_fdes2100d, "Fidelity International", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1989, fdes2265,   0,         0,      fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265 (set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1989, fdes2265a,  fdes2265,  0,      fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265 (set 2)", MACHINE_SUPPORTS_SAVE )
-SYST( 1991, fdes2325,   fdes2265,  0,      fdes2325,  desdis, desmas_state, empty_init,     "Fidelity Electronics", "Designer Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, fdes2265,   0,         0,      fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics International", "Designer Mach III Master 2265 (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, fdes2265a,  fdes2265,  0,      fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics International", "Designer Mach III Master 2265 (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, fdes2325,   fdes2265,  0,      fdes2325,  desdis, desmas_state, empty_init,     "Fidelity Electronics International", "Designer Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE )

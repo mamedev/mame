@@ -287,7 +287,7 @@ void konamigq_state::scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, in
 	m_dma_offset = n_address;
 	m_dma_size = n_size * 4;
 	m_dma_is_write = false;
-	m_dma_timer->adjust(attotime::from_usec(10));
+	m_dma_timer->adjust(attotime::zero);
 }
 
 void konamigq_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
@@ -296,12 +296,13 @@ void konamigq_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, i
 	m_dma_offset = n_address;
 	m_dma_size = n_size * 4;
 	m_dma_is_write = true;
-	m_dma_timer->adjust(attotime::from_usec(10));
+	m_dma_timer->adjust(attotime::zero);
 }
 
 TIMER_CALLBACK_MEMBER(konamigq_state::scsi_dma_transfer)
 {
-	if (m_dma_requested && m_dma_data_ptr != nullptr && m_dma_size > 0)
+	// TODO: Figure out proper DMA timings
+	while (m_dma_requested && m_dma_data_ptr != nullptr && m_dma_size > 0)
 	{
 		if (m_dma_is_write)
 			m_ncr53cf96->dma_w(util::little_endian_cast<const uint8_t>(m_dma_data_ptr)[m_dma_offset]);
@@ -311,15 +312,12 @@ TIMER_CALLBACK_MEMBER(konamigq_state::scsi_dma_transfer)
 		m_dma_offset++;
 		m_dma_size--;
 	}
-
-	if (m_dma_requested && m_dma_size > 0)
-		m_dma_timer->adjust(attotime::from_usec(10));
 }
 
 void konamigq_state::scsi_drq(int state)
 {
 	if (!m_dma_requested && state)
-		m_dma_timer->adjust(attotime::from_usec(10));
+		m_dma_timer->adjust(attotime::zero);
 
 	m_dma_requested = state;
 }
@@ -330,7 +328,6 @@ void konamigq_state::machine_start()
 	save_item(NAME(m_sound_intck));
 
 	m_dma_timer = timer_alloc(FUNC(konamigq_state::scsi_dma_transfer), this);
-	m_dma_timer->adjust(attotime::never);
 }
 
 void konamigq_state::machine_reset()
@@ -493,7 +490,7 @@ ROM_START( cryptklr )
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) /* bios */
 	ROM_LOAD( "420b03.27p",   0x0000000, 0x080000, CRC(aab391b1) SHA1(bf9dc7c0c8168c22a4be266fe6a66d3738df916b) )
 
-	DISK_REGION( "scsi:0:harddisk:image" )
+	DISK_REGION( "scsi:0:harddisk" )
 	DISK_IMAGE( "420uaa04", 0, SHA1(67cb1418fc0de2a89fc61847dc9efb9f1bebb347) )
 ROM_END
 

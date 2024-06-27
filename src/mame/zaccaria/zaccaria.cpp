@@ -346,7 +346,7 @@ void zaccaria_state::zaccaria(machine_config &config)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3G on 1B1141 I/O (Z80) board
 	mainlatch.q_out_cb<0>().set(FUNC(zaccaria_state::flip_screen_x_w)); // VCMA
-	mainlatch.q_out_cb<1>().set(FUNC(zaccaria_state::flip_screen_y_w)); // HCMA
+	mainlatch.q_out_cb<1>().set(FUNC(zaccaria_state::flip_screen_y_set)); // HCMA
 	mainlatch.q_out_cb<2>().set("audiopcb", FUNC(zac1b11142_audio_device::ressound_w)); // RESSOUND
 	mainlatch.q_out_cb<6>().set(FUNC(zaccaria_state::coin_w)); // COUNT
 	mainlatch.q_out_cb<7>().set(FUNC(zaccaria_state::nmi_mask_w)); // INTST

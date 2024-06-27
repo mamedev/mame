@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68000musashi.h"
 #include "cpu/z80/z80.h"
 #include "machine/mb3773.h"
 #include "segaic16.h"
@@ -123,9 +123,9 @@ private:
 	void update_irqs();
 
 	// devices
-	required_device<m68000_device> m_maincpu;
-	required_device<m68000_device> m_subx;
-	required_device<m68000_device> m_suby;
+	required_device<m68000msh_device> m_maincpu;
+	required_device<m68000msh_device> m_subx;
+	required_device<m68000msh_device> m_suby;
 	required_device<z80_device> m_soundcpu;
 	optional_device<z80_device> m_linkcpu;
 	required_device<mb3773_device> m_watchdog;

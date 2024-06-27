@@ -1196,30 +1196,30 @@ ROM_END
 // Single board game (PCB-0779-00-JG)
 ROM_START( bubucar )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "bu_bu_car-en_b5_internal_rom.u12", 0x00000000, 0x0004000, NO_DUMP )
+	ROM_LOAD( "bu_bu_car-en_b5_internal_rom.u12", 0x0000000, 0x0004000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "bubu-car-s1c0en_ev29lv160ab.u23",  0x00000000, 0x0200000, CRC(4c5009ef) SHA1(5b0c96d7bd1243523eb3670b7545cc7455b2d668) )
+	ROM_LOAD( "bubu-car-s1c0en_ev29lv160ab.u23",  0x0000000, 0x0200000, CRC(4c5009ef) SHA1(5b0c96d7bd1243523eb3670b7545cc7455b2d668) )
 
-	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASE00 )
-	ROM_LOAD( "jg_text.u31",                      0x00000000, 0x0200000, NO_DUMP ) // EN29LV160AB-70TCP
+	ROM_REGION( 0x0200000, "tiles", ROMREGION_ERASE00 )
+	ROM_LOAD( "jg_text.u31",                      0x0000000, 0x0200000, CRC(aa6e8317) SHA1(b982873d0e2faefb89d263f945a5a3ba5f4efcd4) ) // EN29LV160AB-70TCP
 
 	ROM_REGION( 0x2000000, "bgtile", ROMREGION_ERASE00 )
 	// BGL/BGH unpopulated (no background tilemap)
 
-	ROM_REGION( 0x08000000, "sprites_mask", 0 )
-	ROM_LOAD32_WORD( "jg_map_bml.u38",            0x00000000, 0x4000000, NO_DUMP ) // K8Q2815UQB
-	ROM_LOAD32_WORD( "jg_map_bmh.u37",            0x00000002, 0x4000000, NO_DUMP ) // K8Q2815UQB
+	ROM_REGION( 0x2000000, "sprites_mask", 0 )
+	ROM_LOAD32_WORD( "jg_map_bml.u38",            0x0000000, 0x1000000, CRC(c8c9fa6f) SHA1(22bf354f2ace9d3f05835525f24cc578feff6453) ) // K8Q2815UQB
+	ROM_LOAD32_WORD( "jg_map_bmh.u37",            0x0000002, 0x1000000, CRC(f9ba71fd) SHA1(79dc5ca48d1ba069b702a3854a28836040e981d0) ) // K8Q2815UQB
 
-	ROM_REGION( 0x20000000, "sprites_colour", 0 )
-	ROM_LOAD32_WORD( "jg_cg_cgl.u19",             0x00000000, 0x4000000, NO_DUMP ) // K8Q2815UQB
-	ROM_LOAD32_WORD( "jg_cg_cgh.u20",             0x00000002, 0x4000000, NO_DUMP ) // K8Q2815UQB
+	ROM_REGION( 0x2000000, "sprites_colour", 0 )
+	ROM_LOAD32_WORD( "jg_cg_cgl.u19",             0x0000000, 0x1000000, CRC(1d7ab9b2) SHA1(322d458f550ebe72b569efe1691aa8902de7a6d4) ) // K8Q2815UQB
+	ROM_LOAD32_WORD( "jg_cg_cgh.u20",             0x0000002, 0x1000000, CRC(2edeb815) SHA1(c9595108691586dfbb0b30bff9535f13e4c3afb3) ) // K8Q2815UQB
 
-	ROM_REGION( 0x08000000, "ymz774", ROMREGION_ERASEFF ) // YMZ774
-	ROM_LOAD16_WORD_SWAP( "jg_wave.u18",          0x00000000, 0x4000000, NO_DUMP ) // K8Q2815UQB
+	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) // YMZ774
+	ROM_LOAD16_WORD_SWAP( "jg_wave.u18",          0x0000000, 0x1000000, CRC(8ba99c0c) SHA1(5a7cccfae47eee5c9ea4c172f5126d514156f771) ) // K8Q2815UQB
 
 	ROM_REGION( 0x10000, "sram", 0 )
-	ROM_LOAD( "bubucar_en_sram",                  0x00000000, 0x0010000, NO_DUMP )
+	ROM_LOAD( "bubucar_en_sram",                  0x0000000, 0x0010000, NO_DUMP )
 ROM_END
 
 static void iga_u16_decode(u16 *rom, int len, int ixor)

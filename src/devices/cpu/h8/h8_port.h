@@ -29,6 +29,7 @@ public:
 
 	void ddr_w(u8 data);
 	u8 ddr_r();
+	u8 ff_r() { return 0xff; }
 	void dr_w(u8 data);
 	u8 dr_r();
 	u8 port_r();

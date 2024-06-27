@@ -623,13 +623,13 @@ private:
 		uint32_t eicr = 0U;
 		uint32_t svr = 0U;
 
-		uint8_t pctpr = 0xfU;
+		uint8_t pctpr = 0x0U;
 
 		int active_irq = 0;
 
-		MPC8240_IRQ irq[MPC8240_NUM_INTERRUPTS]{};
+		MPC8240_IRQ irq[MPC8240_NUM_INTERRUPTS];
 
-		MPC8240_GLOBAL_TIMER global_timer[4]{};
+		MPC8240_GLOBAL_TIMER global_timer[4];
 	};
 
 	MPC8240_EPIC m_epic{};
@@ -1238,7 +1238,7 @@ void viper_state::mpc8240_interrupt(int irq)
 
 void viper_state::mpc8240_epic_init()
 {
-	memset(&m_epic, 0, sizeof(m_epic));
+	m_epic = MPC8240_EPIC();
 	m_epic.global_timer[0].timer = timer_alloc(FUNC(viper_state::epic_global_timer_callback), this);
 	m_epic.global_timer[1].timer = timer_alloc(FUNC(viper_state::epic_global_timer_callback), this);
 	m_epic.global_timer[2].timer = timer_alloc(FUNC(viper_state::epic_global_timer_callback), this);

@@ -82,7 +82,8 @@ public:
 	void ide_interrupt_w(int state);
 
 	// credit card signals
-	void cc_cd_w(int state);
+	void cc_cd1_w(int state);
+	void cc_cd2_w(int state);
 	void cc_bvd1_w(int state);
 	void cc_bvd2_w(int state);
 	void cc_wp_w(int state);
@@ -148,6 +149,7 @@ private:
 
 	// internal latched line state
 	uint8_t m_line_state;
+	std::array<int8_t, 2> m_cd;
 };
 
 // device type definition

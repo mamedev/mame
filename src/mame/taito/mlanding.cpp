@@ -1076,5 +1076,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, mlanding,  0,        mlanding, mlanding,  mlanding_state, empty_init, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE ) // Japanese or German selectable via dip-switch. Copyright changes accordingly.
-GAME( 1987, mlandingj, mlanding, mlanding, mlandingj, mlanding_state, empty_init, ROT0, "Taito Corporation",         "Midnight Landing (Japan)",   MACHINE_SUPPORTS_SAVE ) // Japanese or English selectable via dip-switch. Copyright changes accordingly.
+GAME( 1987, mlanding,  0,        mlanding, mlanding,  mlanding_state, empty_init, ROT0, "Taito America Corporation", "Midnight Landing (Germany)",      MACHINE_SUPPORTS_SAVE ) // Japanese or German selectable via dip-switch. Copyright changes accordingly.
+GAME( 1987, mlandingj, mlanding, mlanding, mlandingj, mlanding_state, empty_init, ROT0, "Taito Corporation",         "Midnight Landing (Japan, rev 3)", MACHINE_SUPPORTS_SAVE ) // Japanese or English selectable via dip-switch. Copyright changes accordingly.

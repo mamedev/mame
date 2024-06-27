@@ -80973,6 +80973,27 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<!-- Hangs when selecting a game from the game list screen -->
+	<software name="mc_150cbhk" supported="no">
+		<description>150 Chāojí Bàng Hé Kǎ</description> <!-- 150 Super Cool Cards -->
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="150 超級棒合卡"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_ds927" />
+			<dataarea name="prg" size="1048576">
+				<rom name="donald1.bin" size="1048576" crc="fc210050" sha1="d698f54d5e225c95c0886009720bbb688c97020e" />
+			</dataarea>
+			<dataarea name="pld" size="0x104">
+				<rom name="pal16l8acn.bin" size="0x104" crc="d89af856" sha1="90e0fef5e63568ddd65ad571507986321ace7f02" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192" />
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192" />
+		</part>
+	</software>
+
 	<software name="mc_150um">
 		<description>150 in 1 Unchained Melody (Fight 150 Ver. Love)</description>
 		<year>199?</year>

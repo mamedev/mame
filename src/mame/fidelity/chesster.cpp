@@ -5,8 +5,10 @@
 
 Fidelity Chesster Challenger
 
-These were made after Hegener + Glaser took over Fidelity (design phase started
-before that). Kishon Chesster was released under both Fidelity, and Mephisto brands.
+These were made after Hegener + Glaser became the parent company of Fidelity
+(design phase started before that). Kishon Chesster was released under both
+Fidelity and Mephisto brands. Fidelity changed from Fidelity International,
+Inc. to Fidelity Electronics International, Inc. after becoming a subsidiary.
 
 ********************************************************************************
 
@@ -258,7 +260,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1990, chesster,  0,        0,      chesster, chesster, chesster_state, empty_init, "Fidelity Electronics", "Chesster Challenger (v1.3)", MACHINE_SUPPORTS_SAVE )
-SYST( 1990, chesstera, chesster, 0,      chesster, chesster, chesster_state, empty_init, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE )
-SYST( 1991, kishon,    chesster, 0,      kishon,   chesster, chesster_state, empty_init, "Fidelity Electronics", "Kishon Chesster (v2.3)", MACHINE_SUPPORTS_SAVE )
-SYST( 1991, kishona,   chesster, 0,      kishon,   chesster, chesster_state, empty_init, "Fidelity Electronics", "Kishon Chesster (v2.2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, chesster,  0,        0,      chesster, chesster, chesster_state, empty_init, "Fidelity Electronics International", "Chesster Challenger (v1.3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, chesstera, chesster, 0,      chesster, chesster, chesster_state, empty_init, "Fidelity Electronics International", "Chesster Challenger", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, kishon,    chesster, 0,      kishon,   chesster, chesster_state, empty_init, "Fidelity Electronics International", "Kishon Chesster (v2.3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, kishona,   chesster, 0,      kishon,   chesster, chesster_state, empty_init, "Fidelity Electronics International", "Kishon Chesster (v2.2)", MACHINE_SUPPORTS_SAVE )

@@ -22,6 +22,7 @@ Year + Game               License       PCB         Tilemaps        Sprites     
 -----------------------------------------------------------------------------------------
 94 Mazinger Z             Banpresto     BP943A      038 9335EX706   013 9341E7009   Z80
 94 Power Instinct 2       Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
+95 Jumbo Godzilla         Toho          N-42 EM     038 9345E7008   013 9442WX002
 95 Gogetsuji Legends      Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
 95 Metamoqester           Banpresto     BP947A      038 9437WX711   013 9346E7002   Z80
 95 Sailor Moon            Banpresto     BP945A      038 9437WX711   013 9346E7002   Z80
@@ -1230,6 +1231,61 @@ void cave_state::paccarn_map(address_map &map)
 }
 
 /***************************************************************************
+                                 Jumbo Godzilla
+
+  The cabinet is a chibi proportioned godzilla plastic/fiberglass sculpture,
+  where the player enters from the sides.
+
+  The whole cabinet has the ability to gently roll from side to side, in an
+  imitation of Godzilla's stomping.
+
+  There are light-up attack buttons arranged around the screen, like so:
+
+  (diagram not drawn to scale)
+                     ____________________________
+                    |                            |
+    [Red Button]    |                            |    [Red Button]
+        Tai         |                            |       Shippo
+       Atari        |                            |      Kougeki
+    (Body Slam)     |                            |   (Tail Attack)
+                    |         19" Monitor        |
+   [Blue Button]    |                            |    [Blue Button]
+      Nissen        |                            |       Nissen
+      Kougeki       |                            |       Kougeki
+ (Heat Ray Attack)  |                            |  (Heat Ray Attack)
+                    |____________________________|
+
+                           ( Blue Speaker )
+
+  To the sides of the screen area there are blue spinning lamps like you'd
+  see atop a police patrol car.
+
+  The buttons are lit when an attack is available. Upon pressing them, the
+  button lamps turn off, while the spinning lamps activate during the attack.
+
+***************************************************************************/
+
+void cave_state::jumbogod_leds_w(u8 data)
+{
+	// Numbering of attack button light outputs is guessed based upon the
+	// ordering of the button inputs in the test menu; in-game they all
+	// appear to be activated at once, so disambiguation is challenging.
+	m_led_outputs[0] = BIT(data, 0);  // tai atari / body slam
+	m_led_outputs[1] = BIT(data, 1);  // nissen kougeki / atomic breath
+	m_led_outputs[2] = BIT(data, 2);  // shippo kougeki / tail attack
+	m_led_outputs[3] = BIT(data, 3);  // nissen kougeki / atomic breath
+	m_led_outputs[4] = BIT(data, 4);  // motor & spinning lamps
+}
+
+void cave_state::jumbogod_map(address_map &map)
+{
+	pacslot_map(map);
+
+	map(0x900001, 0x900001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // M6295
+	map(0xc00001, 0xc00001).w(FUNC(cave_state::jumbogod_leds_w));                                    // Leds
+}
+
+/***************************************************************************
                                     Uo Poko
 ***************************************************************************/
 
@@ -1754,6 +1810,25 @@ static INPUT_PORTS_START( paccarn )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME( "Bet 4" )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME( "Bet 8" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME( "Bet 12" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jumbogod )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_IMPULSE(10) // credits (impulse needed to coin up reliably)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Tai Atari (Body Slam)" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME( "Shippo Kougeki (Tail Attack)")  // not a mistake; it is #3 by the game's test menu.
+	PORT_BIT( 0xC0, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW ) // must stay on during service mode
+	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_TOGGLE PORT_NAME( "Self Test" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2   ) PORT_NAME( "Nissen Kougeki (Atomic Breath) 1" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4   ) PORT_NAME( "Nissen Kougeki (Atomic Breath) 2" )
+	PORT_BIT( 0xC0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ppsatan )
@@ -2488,13 +2563,22 @@ void cave_state::pacslot(machine_config &config)
 void cave_state::paceight(machine_config &config)
 {
 	pacslot(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::paceight_map);
 }
 
 void cave_state::paccarn(machine_config &config)
 {
 	pacslot(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::paccarn_map);
+}
+
+void cave_state::jumbogod(machine_config &config)
+{
+	pacslot(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::jumbogod_map);
 }
 
 /***************************************************************************
@@ -4099,6 +4183,52 @@ ROM_START( nmaster )
 ROM_END
 
 
+
+/***************************************************************************
+
+  Jumbo Godzilla by Namco, licensed by Toho Co.,LTD.
+  Namco N-42 EM VIDEO PCB
+
+  TMP 68HC000P-16
+
+  013 9442WX002
+  038 9345E7008
+
+  OKI M6295 x 2
+
+  Battery
+  93C46 EEPROM (at U24)
+
+  28MHz XTAL
+
+  ROM Locations and general memory map match Pac-Slot, but OKI #2 is put to use.
+
+***************************************************************************/
+
+ROM_START( jumbogod )
+	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "jg1-mpro.u41", 0x00000, 0x80000, CRC(e57c842b) SHA1(a85ed036c36215d20ff95f5aaafdc5d5ef6bb94a) )
+
+	ROM_REGION( 0x100000, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_LOAD16_BYTE( "jg1-obj0.u52", 0x00000, 0x80000, CRC(6ee8b190) SHA1(5dc3f8ee6ed71f80e0b1612c9440d1dd100c1181) )
+	ROM_LOAD16_BYTE( "jg1-obj1.u53", 0x00001, 0x80000, CRC(460658cd) SHA1(2af915b161355907025f0705a44bf0de8e6c7dcd) )
+
+	ROM_REGION( 0x100000, "layer0", 0 )  /* Layer 0 */
+	ROM_LOAD16_BYTE( "jg1-cha0.u60", 0x00000, 0x80000, CRC(88a86c34) SHA1(f2e9e235cfde9b8afc79fc88e5b7090ba134445b) )
+	ROM_LOAD16_BYTE( "jg1-cha1.u61", 0x00001, 0x80000, CRC(55bd8830) SHA1(efecb20bb699b05bcefa011402d0dcc234e2696a) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* OKIM6295 #1 Samples */
+	ROM_LOAD( "jg1-voi1.u27", 0x00000, 0x40000, CRC(94d1361a) SHA1(b693bff50cbbf75328959508fd912bd3061a2677) )
+
+	ROM_REGION( 0x40000, "oki2", 0 )    /* OKIM6295 #2 Samples */
+	ROM_LOAD( "jg1-voi2.u32", 0x00000, 0x40000, CRC(82d40b9a) SHA1(4d8e7d994da96a40918ee9791a31d8c189b38e40) )
+
+	ROM_REGION( 0x117 * 3, "plds", 0 )
+	// Unlike N-44, there is a socketed 74LS138 at U1, instead of a GAL16V8.
+	ROM_LOAD( "k38.u3",  0x117*1, 0x117, NO_DUMP )  // GAL16V8B-15LP (Protected)
+	ROM_LOAD( "k38.u51", 0x117*2, 0x117, NO_DUMP )  // GAL16V8B-15LP (Protected) Probably matches paceight
+ROM_END
+
 /***************************************************************************
 
   Pac-Slot by Namco, 1996 (according to http://pacman.com/ja/museum/index.html)
@@ -5443,6 +5573,8 @@ GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, cave_z80_state, init_pwrin
 // The EEPROM determines the region, program roms are the same between sets
 GAME( 1994, mazinger,   0,        mazinger, cave,     cave_z80_state, init_mazinger,  ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (World)", MACHINE_SUPPORTS_SAVE ) // 1994/06/27 08:00
 GAME( 1994, mazingerj,  mazinger, mazinger, cave,     cave_z80_state, init_mazinger,  ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (Japan)", MACHINE_SUPPORTS_SAVE ) // 1994/06/27 08:00
+
+GAME( 1995, jumbogod,   0,        jumbogod, jumbogod, cave_state,     init_tjumpman,  ROT0,   "Namco",                                  "Jumbo Godzilla", MACHINE_SUPPORTS_SAVE )
 
 // Version/Date string is stored at 68000 ROM 0x400-0x41f
 GAME( 1995, donpachi,   0,        donpachi, cave,     cave_state,     init_donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (US)",                     MACHINE_SUPPORTS_SAVE ) // Ver.1.12 1995/05/2x XXXXX

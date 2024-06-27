@@ -3431,7 +3431,6 @@ void hd63266f_device::motor_control(int fid, bool start_motor)
 		if(selected_drive != fid)
 			return;
 
-		logerror("motor_on_counter %d\n", motor_on_counter);
 		// decrement motor on counter
 		if(motor_on_counter)
 			motor_on_counter--;

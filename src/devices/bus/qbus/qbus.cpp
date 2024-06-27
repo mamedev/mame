@@ -131,6 +131,14 @@ void qbus_device::device_reset()
 {
 }
 
+void qbus_device::init_w()
+{
+	for (device_qbus_card_interface &entry : m_device_list)
+	{
+		entry.init_w();
+	}
+}
+
 
 //-------------------------------------------------
 //  add_card - add card

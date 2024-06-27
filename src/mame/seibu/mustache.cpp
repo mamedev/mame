@@ -150,13 +150,13 @@ void mustache_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 	const rectangle &visarea = m_screen->visible_area();
 
-	for (int offs = 0;offs < m_spriteram.bytes();offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int sy = 240 - m_spriteram[offs];
 		int sx = 240 - m_spriteram[offs + 3];
 		int code = m_spriteram[offs + 2];
 		int const attr = m_spriteram[offs + 1];
-		int const color = (attr & 0xe0)>>5;
+		int const color = (attr & 0xe0) >> 5;
 
 		if (sy == 240) continue;
 
@@ -324,7 +324,9 @@ void mustache_state::mustache(machine_config &config)
 
 	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("maincpu");
 
-	T5182(config, "t5182", 0);
+	t5182_device &t5182(T5182(config, "t5182", 14.318181_MHz_XTAL / 4));
+	t5182.ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
+	t5182.ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -349,25 +351,25 @@ void mustache_state::mustache(machine_config &config)
 }
 
 ROM_START( mustache )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mustache.h18", 0x0000, 0x8000, CRC(123bd9b8) SHA1(33a7cba5c3a54b0b1a15dd1e24d298b6f7274321) )
 	ROM_LOAD( "mustache.h16", 0x8000, 0x4000, CRC(62552beb) SHA1(ee10991d7de0596608fa1db48805781cbfbbdb9f) )
 
-	ROM_REGION( 0x8000, "t5182_z80", 0 ) // Toshiba T5182 external ROM
+	ROM_REGION( 0x8000, "t5182:external", 0 ) // Toshiba T5182 external ROM
 	ROM_LOAD( "mustache.e5", 0x0000, 0x8000, CRC(efbb1943) SHA1(3320e9eaeb776d09ed63f7dedc79e720674e6718) )
 
-	ROM_REGION( 0x0c000, "tiles",0)
+	ROM_REGION( 0x0c000, "tiles", 0 )
 	ROM_LOAD( "mustache.a13", 0x0000,  0x4000, CRC(9baee4a7) SHA1(31bcec838789462e67e54ebe7256db9fc4e51b69) )
 	ROM_LOAD( "mustache.a14", 0x4000,  0x4000, CRC(8155387d) SHA1(5f0a394c7671442519a831b0eeeaba4eecd5a406) )
 	ROM_LOAD( "mustache.a16", 0x8000,  0x4000, CRC(4db4448d) SHA1(50a94fd65c263d95fd24b4009dbb87707929fdcb) )
 
-	ROM_REGION( 0x20000, "sprites",0 )
+	ROM_REGION( 0x20000, "sprites", 0 )
 	ROM_LOAD( "mustache.a4", 0x00000,  0x8000, CRC(d5c3bbbf) SHA1(914e3feea54246476701f492c31bd094ad9cea10) )
 	ROM_LOAD( "mustache.a7", 0x08000,  0x8000, CRC(e2a6012d) SHA1(4e4cd1a186870c8a88924d5bff917c6889da953d) )
 	ROM_LOAD( "mustache.a5", 0x10000,  0x8000, CRC(c975fb06) SHA1(4d166bd79e19c7cae422673de3e095ad8101e013) )
 	ROM_LOAD( "mustache.a8", 0x18000,  0x8000, CRC(2e180ee4) SHA1(a5684a25c337aeb4effeda7982164d35bc190af9) )
 
-	ROM_REGION( 0x1300, "proms",0 )
+	ROM_REGION( 0x1300, "proms", 0 )
 	ROM_LOAD( "mustache.c3",0x0000, 0x0100, CRC(68575300) SHA1(bc93a38df91ad8c2f335f9bccc98b52376f9b483) )
 	ROM_LOAD( "mustache.c2",0x0100, 0x0100, CRC(eb008d62) SHA1(a370fbd1affaa489210ea36eb9e365263fb4e232) )
 	ROM_LOAD( "mustache.c1",0x0200, 0x0100, CRC(65da3604) SHA1(e4874d4152a57944d4e47306250833ea5cd0d89b) )
@@ -376,25 +378,25 @@ ROM_START( mustache )
 ROM_END
 
 ROM_START( mustachei )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.h18", 0x0000, 0x8000, CRC(22893fbc) SHA1(724ea50642aec9be10547bd86fae5e1ebfe54685) )
 	ROM_LOAD( "2.h16", 0x8000, 0x4000, CRC(ec70cfd3) SHA1(0476eab03b907778ea488c802b79da99bf376eb6) )
 
-	ROM_REGION( 0x8000, "t5182_z80", 0 ) // Toshiba T5182 external ROM
+	ROM_REGION( 0x8000, "t5182:external", 0 ) // Toshiba T5182 external ROM
 	ROM_LOAD( "10.e5", 0x0000, 0x8000, CRC(efbb1943) SHA1(3320e9eaeb776d09ed63f7dedc79e720674e6718) )
 
-	ROM_REGION( 0x0c000, "tiles",0)
+	ROM_REGION( 0x0c000, "tiles", 0 )
 	ROM_LOAD( "5.a13", 0x0000,  0x4000, CRC(9baee4a7) SHA1(31bcec838789462e67e54ebe7256db9fc4e51b69) )
 	ROM_LOAD( "4.a15", 0x4000,  0x4000, CRC(8155387d) SHA1(5f0a394c7671442519a831b0eeeaba4eecd5a406) )
 	ROM_LOAD( "3.a16", 0x8000,  0x4000, CRC(4db4448d) SHA1(50a94fd65c263d95fd24b4009dbb87707929fdcb) )
 
-	ROM_REGION( 0x20000, "sprites",0 )
+	ROM_REGION( 0x20000, "sprites", 0 )
 	ROM_LOAD( "6.a4", 0x00000,  0x8000, CRC(4a95a89c) SHA1(b34ebbda9b0e591876988e42bd36fd505452f38c) )
 	ROM_LOAD( "8.a7", 0x08000,  0x8000, CRC(3e6be0fb) SHA1(319ea59107e37953c31f59f5f635fc520682b09f) )
 	ROM_LOAD( "7.a5", 0x10000,  0x8000, CRC(8ad38884) SHA1(e11f1e1db6d5d119afedbe6604d10a6fd6049f12) )
 	ROM_LOAD( "9.a8", 0x18000,  0x8000, CRC(3568c158) SHA1(c3a2120086befe396a112bd62f032638011cb47a) )
 
-	ROM_REGION( 0x1300, "proms",0 )
+	ROM_REGION( 0x1300, "proms", 0 )
 	ROM_LOAD( "d.c3",0x0000, 0x0100, CRC(68575300) SHA1(bc93a38df91ad8c2f335f9bccc98b52376f9b483) )
 	ROM_LOAD( "c.c2",0x0100, 0x0100, CRC(eb008d62) SHA1(a370fbd1affaa489210ea36eb9e365263fb4e232) )
 	ROM_LOAD( "b.c1",0x0200, 0x0100, CRC(65da3604) SHA1(e4874d4152a57944d4e47306250833ea5cd0d89b) )

@@ -37,12 +37,7 @@ private:
 
 	required_memory_region m_rom_region;
 	memory_bank_array_creator<6> m_bank;
-	memory_view m_view0;
-	memory_view m_view1;
-	memory_view m_view2;
-	memory_view m_view3;
-	memory_view m_view4;
-	memory_view m_view5;
+	memory_view m_view[6];
 	uint32_t m_region_offset;
 	uint8_t m_selected_bank[6];
 	bool m_ram_active[6];

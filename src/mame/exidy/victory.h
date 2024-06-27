@@ -70,13 +70,13 @@ private:
 	/* microcode state */
 	struct micro_t
 	{
-		uint16_t    i;
-		uint16_t    pc;
-		uint8_t     r,g,b;
-		uint8_t     xp,yp;
-		uint8_t     cmd,cmdlo;
-		emu_timer * timer;
-		uint8_t     timer_active;
+		uint16_t    i = 0;
+		uint16_t    pc = 0;
+		uint8_t     r = 0, g = 0, b = 0;
+		uint8_t     xp = 0, yp = 0;
+		uint8_t     cmd = 0, cmdlo = 0;
+		emu_timer * timer = nullptr;
+		uint8_t     timer_active = 0;
 		attotime    endtime;
 
 		void count_states(int states);

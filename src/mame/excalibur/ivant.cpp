@@ -17,7 +17,8 @@ Hardware notes:
 
 The MCU used here is a HD6433256A33P from Excalibur Mirage, the internal ROM
 is disabled. There's also a newer version on a H8/3216. The first version was
-produced in a CXG factory.
+produced in a factory owned by Eric White's company (ex-CXG). The LCD is the
+same as the one in CXG Sphinx Legend and Krypton Challenge/Regency.
 
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
@@ -196,8 +197,9 @@ u8 ivant_state::read_inputs()
 			data |= m_board->read_file(i, true);
 
 	// P64-P66 are also IRQ pins (the ON button is IRQ0)
-	for (int i = 0; i < 3; i++)
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0 + i, BIT(data, i + 4) ? ASSERT_LINE : CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		for (int i = 0; i < 3; i++)
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0 + i, BIT(data, i + 4) ? ASSERT_LINE : CLEAR_LINE);
 
 	return ~data;
 }
@@ -334,7 +336,7 @@ ROM_START( ivant )
 	ROM_LOAD("1996_701e_excalibur_ivan_t.ic2", 0x000000, 0x100000, CRC(f7c386a1) SHA1(357ca0b0c0b1409d33876b6fa00c5ad74b2643fc) )
 
 	ROM_REGION( 109652, "screen", 0 )
-	ROM_LOAD("emirage.svg", 0, 109652, CRC(6840c49e) SHA1(a9c91143c5bea5ab41fe323e719da4a46ab9d631) )
+	ROM_LOAD("regency.svg", 0, 109652, CRC(6840c49e) SHA1(a9c91143c5bea5ab41fe323e719da4a46ab9d631) )
 ROM_END
 
 } // anonymous namespace

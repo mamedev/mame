@@ -543,44 +543,19 @@ void tms9914_device::device_reset()
 	m_sic = false;
 	m_sre = false;
 	m_dai = false;
-	m_pts = false;
-	m_stdl = false;
-	m_shdw = false;
-	m_vstdl = false;
-	m_int_line = false;
-	m_accrq_line = true;    // Ensure change is propagated
-	m_dio = 0;
-
-	m_reg_int0_status = 0;
-	m_reg_int0_mask = 0;
-	m_reg_int1_status = 0;
-	m_reg_int1_mask = 0;
-	m_reg_address = 0;
-	m_reg_serial_p = 0;
-	m_reg_2nd_serial_p = 0;
-	m_reg_parallel_p = 0;
-	m_reg_2nd_parallel_p = 0;
-	m_reg_di = 0;
-	m_reg_do = 0;
-	m_reg_ulpa = false;
-	m_swrst = false;
-	m_hdfa = false;
-	m_hdfe = false;
-	m_rtl = false;
-	m_gts = false;
-	m_rpp = false;
-	m_sic = false;
-	m_sre = false;
-	m_dai = false;
-	m_pts = false;
 	m_stdl = false;
 	m_shdw = false;
 	m_vstdl = false;
 	m_rsvd2 = false;
+	m_int_line = true;
+	m_accrq_line = true;    // Ensure change is propagated
 
-
-	std::fill(std::begin(m_ext_signals), std::end(m_ext_signals), false);
-	std::fill(std::begin(m_signals), std::end(m_signals), false);
+	m_reg_int0_status = 0;
+	m_reg_int1_status = 0;
+	m_reg_serial_p = 0;
+	m_reg_2nd_serial_p = 0;
+	m_reg_parallel_p = 0;
+	m_reg_2nd_parallel_p = 0;
 
 	do_swrst();
 	update_fsm();

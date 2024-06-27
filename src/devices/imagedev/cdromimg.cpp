@@ -184,10 +184,24 @@ int cdrom_image_device::get_last_track() const
 	return 0;
 }
 
+int cdrom_image_device::get_last_session() const
+{
+	if (m_cdrom_handle)
+		return m_cdrom_handle->get_last_session();
+	return 0;
+}
+
 uint32_t cdrom_image_device::get_track(uint32_t frame) const
 {
 	if (m_cdrom_handle)
 		return m_cdrom_handle->get_track(frame);
+	return 0;
+}
+
+uint32_t cdrom_image_device::get_track_index(uint32_t frame) const
+{
+	if (m_cdrom_handle)
+		return m_cdrom_handle->get_track_index(frame);
 	return 0;
 }
 

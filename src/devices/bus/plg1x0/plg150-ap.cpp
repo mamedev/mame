@@ -47,6 +47,7 @@ plg150_ap_device::~plg150_ap_device()
 
 void plg150_ap_device::midi_rx(int state)
 {
+	logerror("%s rx=%d\n", machine().time().to_string(), state);
 	m_cpu->sci_rx_w<1>(state);
 }
 

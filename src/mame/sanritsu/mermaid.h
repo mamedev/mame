@@ -100,8 +100,6 @@ private:
 	void mermaid_videoram2_w(offs_t offset, uint8_t data);
 	void mermaid_videoram_w(offs_t offset, uint8_t data);
 	void mermaid_colorram_w(offs_t offset, uint8_t data);
-	void flip_screen_x_w(int state);
-	void flip_screen_y_w(int state);
 	void mermaid_bg_scroll_w(offs_t offset, uint8_t data);
 	void mermaid_fg_scroll_w(offs_t offset, uint8_t data);
 	void bg_mask_w(int state);

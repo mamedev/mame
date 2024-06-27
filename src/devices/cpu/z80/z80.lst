@@ -1,0 +1,6842 @@
+# license:BSD-3-Clause
+# copyright-holders:Juergen Buchmueller, Andrei I. Holub
+##########################################################
+# macros
+##########################################################
+macro   nomreq_addr
+	m_nomreq_cb(TADR, 0x00, 0xff);
+	+ 1
+
+macro   nomreq_ir   %cycles
+	TADR = (m_i << 8) | (m_r2 & 0x80) | (m_r & 0x7f);
+	%cycles * call nomreq_addr
+
+macro   in
+	m_iorq_cycles !! TDAT8 = m_io.read_interruptible(TADR);
+
+macro   out
+	m_iorq_cycles !! m_io.write_interruptible(TADR, TDAT8);
+
+macro   rm
+	m_memrq_cycles !! TDAT8 = data_read(TADR);
+
+macro   rm_reg
+	call rm
+	call nomreq_addr
+
+macro   rm16
+	call rm
+	TDAT_H = TDAT_L; TADR++;
+	call rm
+	using std::swap; std::swap(TDAT_H, TDAT_L);
+
+macro   wm
+	m_memrq_cycles !! data_write(TADR, TDAT8);
+
+macro   wm16
+	call wm
+	TADR++; TDAT8 = TDAT_H;
+	call wm
+
+macro   wm16_sp
+	SP--;
+	m_memrq_cycles !! data_write(SPD, TDAT_H);
+	SP--;
+	m_memrq_cycles !! data_write(SPD, TDAT_L);
+
+macro   rop
+	m_m1_cycles-2 !! TDAT8 = opcode_read();
+	m_refresh_cb((I << 8) | (R2 & 0x80) | (R & 0x7f), 0x00, 0xff);
+	+ 2
+	PC++; R++; Q = QT; QT = YF | XF;
+
+macro   arg
+	m_memrq_cycles !! TDAT8 = arg_read();
+	PC++;
+
+macro   arg16
+	call arg
+	TDAT_H = TDAT_L;
+	call arg
+	using std::swap; swap(TDAT_H, TDAT_L);
+
+macro   eax
+	call arg
+	m_ea = (u32)(u16)(IX + (s8)TDAT8); WZ = m_ea;
+
+macro   eay
+	call arg
+	m_ea = (u32)(u16)(IY + (s8)TDAT8); WZ = m_ea;
+
+macro   pop
+	m_memrq_cycles !! TDAT_L = data_read(SPD);
+	SP++;
+	m_memrq_cycles !! TDAT_H = data_read(SPD);
+	SP++;
+
+macro   push
+	call nomreq_ir 1
+	call wm16_sp
+
+macro   jp
+	call arg16
+	PCD = TDAT; WZ = PC;
+
+macro   jp_cond
+	if (TDAT8) {
+		call arg16
+		PC = TDAT; WZ = PCD;
+	} else {
+		// implicit do PC += 2
+		call arg16
+		WZ = TDAT;
+	}
+
+macro   jr
+	call arg
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	PC += (s8)TDAT8; WZ = PC;
+
+macro   jr_cond
+	if (TDAT8) {
+		call jr
+	} else {
+		call arg
+	}
+
+macro   arg16_call
+	call arg16
+	m_ea = TDAT; TADR = PCD-1;
+	call nomreq_addr
+	WZ = m_ea; TDAT = PC;
+	call wm16_sp
+	PCD = m_ea;
+
+macro   call_cond
+	if (TDAT8) {
+		call arg16_call
+	} else {
+		call arg16
+		WZ = TDAT;
+	}
+
+macro   ret_cond
+	call nomreq_ir 1
+	if (TDAT8) {
+		call pop
+		PC = TDAT; WZ = PC;
+	}
+
+macro   retn
+	call pop
+	PC = TDAT; LOGINT("RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
+
+macro   z80n:retn
+	m_out_retn_seen_cb(0);
+	call pop
+	if (m_stackless) {
+		m_pc.b.l = m_in_nextreg_cb(0xc2);
+		m_pc.b.h = m_in_nextreg_cb(0xc3);
+	} else {
+		PC = TDAT;
+	}
+	LOGINT("RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
+
+macro   reti
+	call pop
+	PC = TDAT; WZ = PC; m_iff1 = m_iff2; daisy_call_reti_device();
+
+macro   ld_r_a
+	call nomreq_ir 1
+	m_r = A; m_r2 = A & 0x80; // keep bit 7 of r
+
+macro   ld_a_r
+	call nomreq_ir 1
+	A = (m_r & 0x7f) | m_r2; set_f((F & CF) | SZ[A] | (m_iff2 << 2)); m_after_ldair = true;
+
+macro   ld_i_a
+	call nomreq_ir 1
+	m_i = A;
+
+macro   ld_a_i
+	call nomreq_ir 1
+	A = m_i; set_f((F & CF) | SZ[A] | (m_iff2 << 2)); m_after_ldair = true;
+
+macro   rst	 addr
+	TDAT = PC;
+	call push
+	PC = addr; WZ = PC;
+
+macro   rrd
+	TADR = HL;
+	call rm
+	WZ = HL+1;
+	4 * call nomreq_addr
+	TDAT_H = TDAT8; TDAT8 = (TDAT8 >> 4) | (A << 4);
+	call wm
+	A = (A & 0xf0) | (TDAT_H & 0x0f); set_f((F & CF) | SZP[A]);
+
+macro   rld
+	TADR = HL;
+	call rm
+	WZ = HL+1;
+	4 * call nomreq_addr
+	TDAT_H = TDAT8; TDAT8 = (TDAT8 << 4) | (A & 0x0f);
+	call wm
+	A = (A & 0xf0) | (TDAT_H >> 4); set_f((F & CF) | SZP[A]);
+
+macro   ex_sp
+	TDAT2 = TDAT;
+	call pop
+	TADR = SP-1;
+	call nomreq_addr
+	using std::swap; std::swap(TDAT, TDAT2);
+	call wm16_sp
+	TADR = SP;
+	2 * call nomreq_addr
+	using std::swap; std::swap(TDAT, TDAT2); WZ = TDAT;
+
+macro   add16
+	call nomreq_ir 7
+	{ u32 res = TDAT + TDAT2; WZ = TDAT + 1; set_f((F & (SF | ZF | VF)) | (((TDAT ^ res ^ TDAT2) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (YF | XF))); TDAT = (u16)res; }
+
+macro   adc_hl
+	call nomreq_ir 7
+	{ u32 res = HLD + TDAT + (F & CF); WZ = HL + 1; set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HLD ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13)); HL = (u16)res; }
+
+macro   sbc_hl
+	call nomreq_ir 7
+	{ u32 res = HLD - TDAT - (F & CF); WZ = HL + 1; set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HLD) & (HLD ^ res) &0x8000) >> 13)); HL = (u16)res; }
+
+macro   ldi
+	TADR = HL;
+	call rm
+	TADR = DE;
+	call wm
+	2 * call nomreq_addr
+	set_f(F & (SF | ZF | CF)); if ((A + TDAT8) & 0x02) F |= YF;  if ((A + TDAT8) & 0x08) F |= XF; HL++; DE++; BC--; if(BC) F |= VF;
+
+macro   cpi
+	TADR = HL;
+	call rm
+	5 * call nomreq_addr
+	{ u8 res = A - TDAT8; WZ++; HL++; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
+
+macro   ini
+	call nomreq_ir 1
+	TADR = BC;
+	call in
+	WZ = BC + 1; B--; TADR = HL;
+	call wm
+	{ HL++; set_f(SZ[B]); unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+
+macro   outi
+	call nomreq_ir 1
+	TADR = HL;
+	call rm
+	B--; WZ = BC + 1; TADR = BC;
+	call out
+	{ HL++; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+
+macro   ldd
+	TADR = HL;
+	call rm
+	TADR = DE;
+	call wm
+	2 * call nomreq_addr
+	{ set_f(F & (SF | ZF | CF)); if ((A + TDAT8) & 0x02) F |= YF;  if ((A + TDAT8) & 0x08) F |= XF; HL--; DE--; BC--; if (BC) F |= VF; }
+
+macro   cpd
+	TADR = HL;
+	call rm
+	TADR = HL;
+	5 * call nomreq_addr
+	{ u8 res = A - TDAT8; WZ--; HL--; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
+
+macro   ind
+	call nomreq_ir 1
+	TADR = BC;
+	call in
+	WZ = BC - 1; B--; TADR = HL;
+	call wm
+	{ HL--; set_f(SZ[B]); unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+
+macro   outd
+	call nomreq_ir 1
+	TADR = HL;
+	call rm
+	B--; WZ = BC - 1; TADR = BC;
+	call out
+	{ HL--; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+
+macro   ldir
+	call ldi
+	if (BC != 0) {
+		TADR = DE;
+		5 * call nomreq_addr
+		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+	}
+
+macro   cpir
+	call cpi
+	if (BC != 0 && !(F & ZF)) {
+		TADR = HL;
+		5 * call nomreq_addr
+		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+	}
+
+macro   inir
+	call ini
+	if (B != 0) {
+		TADR = HL;
+		5 * call nomreq_addr
+		PC -= 2; block_io_interrupted_flags();
+	}
+
+macro   otir
+	call outi
+	if (B != 0) {
+		TADR = BC;
+		5 * call nomreq_addr
+		PC -= 2; block_io_interrupted_flags();
+	}
+
+macro   lddr
+	call ldd
+	if (BC != 0) {
+		TADR = DE;
+		5 * call nomreq_addr
+		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+	}
+
+macro   cpdr
+	call cpd
+	if (BC != 0 && !(F & ZF)) {
+		TADR = HL;
+		5 * call nomreq_addr
+		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+	}
+
+macro   indr
+	call ind
+	if (B != 0) {
+		TADR = HL;
+		5 * call nomreq_addr
+		PC -= 2; block_io_interrupted_flags();
+	}
+
+macro   otdr
+	call outd
+	if (B != 0) {
+		TADR = BC;
+		5 * call nomreq_addr
+		PC -= 2; block_io_interrupted_flags();
+	}
+
+macro   jump	%opcode
+	m_ref = 0x%opcode00;
+	if (true) return;
+
+macro   jump_prefixed   %prefix
+	m_ref = (%prefix << 16) | (TDAT8 << 8);
+	if (true) return;
+
+macro   take_nmi
+	// Check if processor was halted
+	leave_halt();
+	#if HAS_LDAIR_QUIRK
+		// reset parity flag after LD A,I or LD A,R
+		if (m_after_ldair) F &= ~PF;
+	#endif
+	m_iff1 = 0;
+	m_r++;
+	+ 5
+	TDAT = PC;
+	call wm16_sp
+	PCD = 0x0066;
+	WZ = PCD;
+	m_nmi_pending = false;
+
+macro   take_interrupt
+	// check if processor was halted
+	leave_halt();
+	// clear both interrupt flip flops
+	m_iff1 = m_iff2 = 0;
+	// say hi
+	// Not precise in all cases. z80 must finish current instruction (NOP) to reach this state - in such case frame timings are shifter from cb event if calculated based on it.
+	m_irqack_cb(true);
+	m_r++;
+	{
+		// fetch the IRQ vector
+		device_z80daisy_interface *intf = daisy_get_irq_device();
+		m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w.l);
+		LOGINT("single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
+	}
+	// 'interrupt latency' cycles
+	+ 2
+	// Interrupt mode 2. Call [i:databyte]
+	if (m_im == 2) {
+		// Zilog's datasheet claims that "the least-significant bit must be a zero."
+		// However, experiments have confirmed that IM 2 vectors do not have to be
+		// even, and all 8 bits will be used; even $FF is handled normally.
+		// CALL opcode timing
+		+ 5
+		TDAT = PC;
+		call wm16_sp
+		m_tmp_irq_vector = (m_tmp_irq_vector & 0xff) | (m_i << 8);
+		TADR = m_tmp_irq_vector;
+		call rm16
+		PCD = TDAT;
+		LOGINT("IM2 [$%04x] = $%04x\n", m_tmp_irq_vector, PCD);
+	} else if (m_im == 1) {
+		// Interrupt mode 1. RST 38h
+		LOGINT("'%s' IM1 $0038\n", tag());
+		// RST $38
+		+ 5
+		TDAT = PC;
+		call wm16_sp
+		PCD = 0x0038;
+	} else {
+		/* Interrupt mode 0. We check for CALL and JP instructions,
+		   if neither of these were found we assume a 1 byte opcode
+		   was placed on the databus								*/
+		LOGINT("IM0 $%04x\n", m_tmp_irq_vector);
+
+		// check for nop
+		if (m_tmp_irq_vector != 0x00) {
+			if ((m_tmp_irq_vector & 0xff0000) == 0xcd0000) {
+				// CALL $xxxx cycles
+				+ 11
+				TDAT = PC;
+				call wm16_sp
+				PCD = m_tmp_irq_vector & 0xffff;
+			} else if ((m_tmp_irq_vector & 0xff0000) == 0xc30000) {
+				// JP $xxxx cycles
+				+ 10
+				PCD = m_tmp_irq_vector & 0xffff;
+			} else if (m_tmp_irq_vector == 0xfb) {
+				// rst (or other opcodes?)
+				+ 4
+				ei();
+			} else if ((m_tmp_irq_vector & 0xc7) == 0xc7) {
+				// RST $xx cycles
+				+ 5
+				TDAT = PC;
+				call wm16_sp
+				PCD = m_tmp_irq_vector & 0x0038;
+			} else {
+				logerror("take_interrupt: unexpected opcode in im0 mode: 0x%02x\n", m_tmp_irq_vector);
+			}
+		}
+	}
+	WZ = PCD;
+	#if HAS_LDAIR_QUIRK
+		// reset parity flag after LD A,I or LD A,R
+		if (m_after_ldair) F &= ~PF;
+	#endif
+
+macro   check_interrupts
+	if (m_nmi_pending) {
+		call take_nmi
+	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei) {
+		call take_interrupt
+	}
+
+macro   z80n:check_interrupts
+	if (m_nmi_pending) {
+		if (m_stackless) {
+			// on take_nmi
+			m_out_nextreg_cb(0xc2, m_pc.b.l);
+			m_out_nextreg_cb(0xc3, m_pc.b.h);
+		}
+		call take_nmi
+	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei) {
+		call take_interrupt
+	}
+
+macro   nsc800_take_interrupt
+	// Check if processor was halted
+	leave_halt();
+	// Clear both interrupt flip flops
+	m_iff1 = m_iff2 = 0;
+	// 'interrupt latency' cycles
+	+ 7
+	if (m_nsc800_irq_state[NSC800_RSTA]) {
+		TDAT = PC;
+		call wm16_sp
+		PCD = 0x003c;
+	} else if (m_nsc800_irq_state[NSC800_RSTB]) {
+		TDAT = PC;
+		call wm16_sp
+		PCD = 0x0034;
+	} else if (m_nsc800_irq_state[NSC800_RSTC]) {
+		TDAT = PC;
+		call wm16_sp
+		PCD = 0x002c;
+	} else {
+		+ 2 * m_memrq_cycles
+		;
+	}
+	WZ = PCD;
+	#if HAS_LDAIR_QUIRK
+		// reset parity flag after LD A,I or LD A,R
+		if (m_after_ldair) F &= ~PF;
+	#endif
+
+macro   ncs800:check_interrupts
+	if (m_nmi_pending) {
+		call take_nmi
+	} else if ((m_nsc800_irq_state[NSC800_RSTA] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTB] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTC] != CLEAR_LINE) && m_iff1 && !m_after_ei) {
+		call nsc800_take_interrupt
+	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei) {
+		call take_interrupt
+	}
+
+
+##########################################################
+# ROP
+##########################################################
+ffff
+	if (m_busrq_state) {
+		if (!m_busack_state) {
+			m_busack_state = 1;
+			m_busack_cb(1);
+		}
+		if (m_icount > 0)
+			m_icount = 0;
+		return;
+	} else if (m_busack_state) {
+		m_busack_state = 0;
+		m_busack_cb(0);
+	}
+	call check_interrupts
+	m_after_ei = false;
+	m_after_ldair = false;
+	PRVPC = PCD;
+	debugger_instruction_hook(PCD);
+	call rop
+	if (m_halt) {
+		PC--;
+		m_ref = 0xffff00;
+		return;
+	} else {
+		m_ref = (0x00 << 16) | (TDAT8 << 8);
+		return;
+	}
+
+
+##########################################################
+# opcodes with CB prefix
+# rotate, shift and bit operations
+##########################################################
+cb00	# RLC  B
+	B = rlc(B);
+
+cb01	# RLC  C
+	C = rlc(C);
+
+cb02	# RLC  D
+	D = rlc(D);
+
+cb03	# RLC  E
+	E = rlc(E);
+
+cb04	# RLC  H
+	H = rlc(H);
+
+cb05	# RLC  L
+	L = rlc(L);
+
+cb06	# RLC  (HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = rlc(TDAT8);
+	call wm
+
+cb07	# RLC  A
+	A = rlc(A);
+
+cb08	# RRC  B
+	B = rrc(B);
+
+cb09	# RRC  C
+	C = rrc(C);
+
+cb0a	# RRC  D
+	D = rrc(D);
+
+cb0b	# RRC  E
+	E = rrc(E);
+
+cb0c	# RRC  H
+	H = rrc(H);
+
+cb0d	# RRC  L
+	L = rrc(L);
+
+cb0e	# RRC  (HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = rrc(TDAT8);
+	call wm
+
+cb0f	# RRC  A
+	A = rrc(A);
+
+cb10	# RL   B
+	B = rl(B);
+
+cb11	# RL   C
+	C = rl(C);
+
+cb12	# RL   D
+	D = rl(D);
+
+cb13	# RL   E
+	E = rl(E);
+
+cb14	# RL   H
+	H = rl(H);
+
+cb15	# RL   L
+	L = rl(L);
+
+cb16	# RL   (HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = rl(TDAT8);
+	call wm
+
+cb17	# RL   A
+	A = rl(A);
+
+cb18	# RR   B
+	B = rr(B);
+
+cb19	# RR   C
+	C = rr(C);
+
+cb1a	# RR   D
+	D = rr(D);
+
+cb1b	# RR   E
+	E = rr(E);
+
+cb1c	# RR   H
+	H = rr(H);
+
+cb1d	# RR   L
+	L = rr(L);
+
+cb1e	# RR   (HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = rr(TDAT8);
+	call wm
+
+cb1f	# RR   A
+	A = rr(A);
+
+cb20	# SLA  B
+	B = sla(B);
+
+cb21	# SLA  C
+	C = sla(C);
+
+cb22	# SLA  D
+	D = sla(D);
+
+cb23	# SLA  E
+	E = sla(E);
+
+cb24	# SLA  H
+	H = sla(H);
+
+cb25	# SLA  L
+	L = sla(L);
+
+cb26	# SLA  (HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = sla(TDAT8);
+	call wm
+
+cb27	# SLA  A
+	A = sla(A);
+
+cb28	# SRA  B
+	B = sra(B);
+
+cb29	# SRA  C
+	C = sra(C);
+
+cb2a	# SRA  D
+	D = sra(D);
+
+cb2b	# SRA  E
+	E = sra(E);
+
+cb2c	# SRA  H
+	H = sra(H);
+
+cb2d	# SRA  L
+	L = sra(L);
+
+cb2e	# SRA  (HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = sra(TDAT8);
+	call wm
+
+cb2f	# SRA  A
+	A = sra(A);
+
+cb30	# SLL  B
+	B = sll(B);
+
+cb31	# SLL  C
+	C = sll(C);
+
+cb32	# SLL  D
+	D = sll(D);
+
+cb33	# SLL  E
+	E = sll(E);
+
+cb34	# SLL  H
+	H = sll(H);
+
+cb35	# SLL  L
+	L = sll(L);
+
+cb36	# SLL  (HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = sll(TDAT8);
+	call wm
+
+cb37	# SLL  A
+	A = sll(A);
+
+cb38	# SRL  B
+	B = srl(B);
+
+cb39	# SRL  C
+	C = srl(C);
+
+cb3a	# SRL  D
+	D = srl(D);
+
+cb3b	# SRL  E
+	E = srl(E);
+
+cb3c	# SRL  H
+	H = srl(H);
+
+cb3d	# SRL  L
+	L = srl(L);
+
+cb3e	# SRL  (HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = srl(TDAT8);
+	call wm
+
+cb3f	# SRL  A
+	A = srl(A);
+
+cb40	# BIT  0,B
+	bit(0, B);
+
+cb41	# BIT  0,C
+	bit(0, C);
+
+cb42	# BIT  0,D
+	bit(0, D);
+
+cb43	# BIT  0,E
+	bit(0, E);
+
+cb44	# BIT  0,H
+	bit(0, H);
+
+cb45	# BIT  0,L
+	bit(0, L);
+
+cb46	# BIT  0,(HL)
+	TADR = HL;
+	call rm_reg
+	bit_hl(0, TDAT8);
+
+cb47	# BIT  0,A
+	bit(0, A);
+
+cb48	# BIT  1,B
+	bit(1, B);
+
+cb49	# BIT  1,C
+	bit(1, C);
+
+cb4a	# BIT  1,D
+	bit(1, D);
+
+cb4b	# BIT  1,E
+	bit(1, E);
+
+cb4c	# BIT  1,H
+	bit(1, H);
+
+cb4d	# BIT  1,L
+	bit(1, L);
+
+cb4e	# BIT  1,(HL)
+	TADR = HL;
+	call rm_reg
+	bit_hl(1, TDAT8);
+
+cb4f	# BIT  1,A
+	bit(1, A);
+
+cb50	# BIT  2,B
+	bit(2, B);
+
+cb51	# BIT  2,C
+	bit(2, C);
+
+cb52	# BIT  2,D
+	bit(2, D);
+
+cb53	# BIT  2,E
+	bit(2, E);
+
+cb54	# BIT  2,H
+	bit(2, H);
+
+cb55	# BIT  2,L
+	bit(2, L);
+
+cb56	# BIT  2,(HL)
+	TADR = HL;
+	call rm_reg
+	bit_hl(2, TDAT8);
+
+cb57	# BIT  2,A
+	bit(2, A);
+
+cb58	# BIT  3,B
+	bit(3, B);
+
+cb59	# BIT  3,C
+	bit(3, C);
+
+cb5a	# BIT  3,D
+	bit(3, D);
+
+cb5b	# BIT  3,E
+	bit(3, E);
+
+cb5c	# BIT  3,H
+	bit(3, H);
+
+cb5d	# BIT  3,L
+	bit(3, L);
+
+cb5e	# BIT  3,(HL)
+	TADR = HL;
+	call rm_reg
+	bit_hl(3, TDAT8);
+
+cb5f	# BIT  3,A
+	bit(3, A);
+
+cb60	# BIT  4,B
+	bit(4, B);
+
+cb61	# BIT  4,C
+	bit(4, C);
+
+cb62	# BIT  4,D
+	bit(4, D);
+
+cb63	# BIT  4,E
+	bit(4, E);
+
+cb64	# BIT  4,H
+	bit(4, H);
+
+cb65	# BIT  4,L
+	bit(4, L);
+
+cb66	# BIT  4,(HL)
+	TADR = HL;
+	call rm_reg
+	bit_hl(4, TDAT8);
+
+cb67	# BIT  4,A
+	bit(4, A);
+
+cb68	# BIT  5,B
+	bit(5, B);
+
+cb69	# BIT  5,C
+	bit(5, C);
+
+cb6a	# BIT  5,D
+	bit(5, D);
+
+cb6b	# BIT  5,E
+	bit(5, E);
+
+cb6c	# BIT  5,H
+	bit(5, H);
+
+cb6d	# BIT  5,L
+	bit(5, L);
+
+cb6e	# BIT  5,(HL)
+	TADR = HL;
+	call rm_reg
+	bit_hl(5, TDAT8);
+
+cb6f	# BIT  5,A
+	bit(5, A);
+
+cb70	# BIT  6,B
+	bit(6, B);
+
+cb71	# BIT  6,C
+	bit(6, C);
+
+cb72	# BIT  6,D
+	bit(6, D);
+
+cb73	# BIT  6,E
+	bit(6, E);
+
+cb74	# BIT  6,H
+	bit(6, H);
+
+cb75	# BIT  6,L
+	bit(6, L);
+
+cb76	# BIT  6,(HL)
+	TADR = HL;
+	call rm_reg
+	bit_hl(6, TDAT8);
+
+cb77	# BIT  6,A
+	bit(6, A);
+
+cb78	# BIT  7,B
+	bit(7, B);
+
+cb79	# BIT  7,C
+	bit(7, C);
+
+cb7a	# BIT  7,D
+	bit(7, D);
+
+cb7b	# BIT  7,E
+	bit(7, E);
+
+cb7c	# BIT  7,H
+	bit(7, H);
+
+cb7d	# BIT  7,L
+	bit(7, L);
+
+cb7e	# BIT  7,(HL)
+	TADR = HL;
+	call rm_reg
+	bit_hl(7, TDAT8);
+
+cb7f	# BIT  7,A
+	bit(7, A);
+
+cb80	# RES  0,B
+	B = res(0, B);
+
+cb81	# RES  0,C
+	C = res(0, C);
+
+cb82	# RES  0,D
+	D = res(0, D);
+
+cb83	# RES  0,E
+	E = res(0, E);
+
+cb84	# RES  0,H
+	H = res(0, H);
+
+cb85	# RES  0,L
+	L = res(0, L);
+
+cb86	# RES  0,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = res(0, TDAT8);
+	call wm
+
+cb87	# RES  0,A
+	A = res(0, A);
+
+cb88	# RES  1,B
+	B = res(1, B);
+
+cb89	# RES  1,C
+	C = res(1, C);
+
+cb8a	# RES  1,D
+	D = res(1, D);
+
+cb8b	# RES  1,E
+	E = res(1, E);
+
+cb8c	# RES  1,H
+	H = res(1, H);
+
+cb8d	# RES  1,L
+	L = res(1, L);
+
+cb8e	# RES  1,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = res(1, TDAT8);
+	call wm
+
+cb8f	# RES  1,A
+	A = res(1, A);
+
+cb90	# RES  2,B
+	B = res(2, B);
+
+cb91	# RES  2,C
+	C = res(2, C);
+
+cb92	# RES  2,D
+	D = res(2, D);
+
+cb93	# RES  2,E
+	E = res(2, E);
+
+cb94	# RES  2,H
+	H = res(2, H);
+
+cb95	# RES  2,L
+	L = res(2, L);
+
+cb96	# RES  2,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = res(2, TDAT8);
+	call wm
+
+cb97	# RES  2,A
+	A = res(2, A);
+
+cb98	# RES  3,B
+	B = res(3, B);
+
+cb99	# RES  3,C
+	C = res(3, C);
+
+cb9a	# RES  3,D
+	D = res(3, D);
+
+cb9b	# RES  3,E
+	E = res(3, E);
+
+cb9c	# RES  3,H
+	H = res(3, H);
+
+cb9d	# RES  3,L
+	L = res(3, L);
+
+cb9e	# RES  3,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = res(3, TDAT8);
+	call wm
+
+cb9f	# RES  3,A
+	A = res(3, A);
+
+cba0	# RES  4,B
+	B = res(4, B);
+
+cba1	# RES  4,C
+	C = res(4, C);
+
+cba2	# RES  4,D
+	D = res(4, D);
+
+cba3	# RES  4,E
+	E = res(4, E);
+
+cba4	# RES  4,H
+	H = res(4, H);
+
+cba5	# RES  4,L
+	L = res(4, L);
+
+cba6	# RES  4,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = res(4, TDAT8);
+	call wm
+
+cba7	# RES  4,A
+	A = res(4, A);
+
+cba8	# RES  5,B
+	B = res(5, B);
+
+cba9	# RES  5,C
+	C = res(5, C);
+
+cbaa	# RES  5,D
+	D = res(5, D);
+
+cbab	# RES  5,E
+	E = res(5, E);
+
+cbac	# RES  5,H
+	H = res(5, H);
+
+cbad	# RES  5,L
+	L = res(5, L);
+
+cbae	# RES  5,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = res(5, TDAT8);
+	call wm
+
+cbaf	# RES  5,A
+	A = res(5, A);
+
+cbb0	# RES  6,B
+	B = res(6, B);
+
+cbb1	# RES  6,C
+	C = res(6, C);
+
+cbb2	# RES  6,D
+	D = res(6, D);
+
+cbb3	# RES  6,E
+	E = res(6, E);
+
+cbb4	# RES  6,H
+	H = res(6, H);
+
+cbb5	# RES  6,L
+	L = res(6, L);
+
+cbb6	# RES  6,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = res(6, TDAT8);
+	call wm
+
+cbb7	# RES  6,A
+	A = res(6, A);
+
+cbb8	# RES  7,B
+	B = res(7, B);
+
+cbb9	# RES  7,C
+	C = res(7, C);
+
+cbba	# RES  7,D
+	D = res(7, D);
+
+cbbb	# RES  7,E
+	E = res(7, E);
+
+cbbc	# RES  7,H
+	H = res(7, H);
+
+cbbd	# RES  7,L
+	L = res(7, L);
+
+cbbe	# RES  7,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = res(7, TDAT8);
+	call wm
+
+cbbf	# RES  7,A
+	A = res(7, A);
+
+cbc0	# SET  0,B
+	B = set(0, B);
+
+cbc1	# SET  0,C
+	C = set(0, C);
+
+cbc2	# SET  0,D
+	D = set(0, D);
+
+cbc3	# SET  0,E
+	E = set(0, E);
+
+cbc4	# SET  0,H
+	H = set(0, H);
+
+cbc5	# SET  0,L
+	L = set(0, L);
+
+cbc6	# SET  0,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = set(0, TDAT8);
+	call wm
+
+cbc7	# SET  0,A
+	A = set(0, A);
+
+cbc8	# SET  1,B
+	B = set(1, B);
+
+cbc9	# SET  1,C
+	C = set(1, C);
+
+cbca	# SET  1,D
+	D = set(1, D);
+
+cbcb	# SET  1,E
+	E = set(1, E);
+
+cbcc	# SET  1,H
+	H = set(1, H);
+
+cbcd	# SET  1,L
+	L = set(1, L);
+
+cbce	# SET  1,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = set(1, TDAT8);
+	call wm
+
+cbcf	# SET  1,A
+	A = set(1, A);
+
+cbd0	# SET  2,B
+	B = set(2, B);
+
+cbd1	# SET  2,C
+	C = set(2, C);
+
+cbd2	# SET  2,D
+	D = set(2, D);
+
+cbd3	# SET  2,E
+	E = set(2, E);
+
+cbd4	# SET  2,H
+	H = set(2, H);
+
+cbd5	# SET  2,L
+	L = set(2, L);
+
+cbd6	# SET  2,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = set(2, TDAT8);
+	call wm
+
+cbd7	# SET  2,A
+	A = set(2, A);
+
+cbd8	# SET  3,B
+	B = set(3, B);
+
+cbd9	# SET  3,C
+	C = set(3, C);
+
+cbda	# SET  3,D
+	D = set(3, D);
+
+cbdb	# SET  3,E
+	E = set(3, E);
+
+cbdc	# SET  3,H
+	H = set(3, H);
+
+cbdd	# SET  3,L
+	L = set(3, L);
+
+cbde	# SET  3,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = set(3, TDAT8);
+	call wm
+
+cbdf	# SET  3,A
+	A = set(3, A);
+
+cbe0	# SET  4,B
+	B = set(4, B);
+
+cbe1	# SET  4,C
+	C = set(4, C);
+
+cbe2	# SET  4,D
+	D = set(4, D);
+
+cbe3	# SET  4,E
+	E = set(4, E);
+
+cbe4	# SET  4,H
+	H = set(4, H);
+
+cbe5	# SET  4,L
+	L = set(4, L);
+
+cbe6	# SET  4,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = set(4, TDAT8);
+	call wm
+
+cbe7	# SET  4,A
+	A = set(4, A);
+
+cbe8	# SET  5,B
+	B = set(5, B);
+
+cbe9	# SET  5,C
+	C = set(5, C);
+
+cbea	# SET  5,D
+	D = set(5, D);
+
+cbeb	# SET  5,E
+	E = set(5, E);
+
+cbec	# SET  5,H
+	H = set(5, H);
+
+cbed	# SET  5,L
+	L = set(5, L);
+
+cbee	# SET  5,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = set(5, TDAT8);
+	call wm
+
+cbef	# SET  5,A
+	A = set(5, A);
+
+cbf0	# SET  6,B
+	B = set(6, B);
+
+cbf1	# SET  6,C
+	C = set(6, C);
+
+cbf2	# SET  6,D
+	D = set(6, D);
+
+cbf3	# SET  6,E
+	E = set(6, E);
+
+cbf4	# SET  6,H
+	H = set(6, H);
+
+cbf5	# SET  6,L
+	L = set(6, L);
+
+cbf6	# SET  6,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = set(6, TDAT8);
+	call wm
+
+cbf7	# SET  6,A
+	A = set(6, A);
+
+cbf8	# SET  7,B
+	B = set(7, B);
+
+cbf9	# SET  7,C
+	C = set(7, C);
+
+cbfa	# SET  7,D
+	D = set(7, D);
+
+cbfb	# SET  7,E
+	E = set(7, E);
+
+cbfc	# SET  7,H
+	H = set(7, H);
+
+cbfd	# SET  7,L
+	L = set(7, L);
+
+cbfe	# SET  7,(HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = set(7, TDAT8);
+	call wm
+
+cbff	# SET  7,A
+	A = set(7, A);
+
+
+##########################################################
+# opcodes with DD/FD CB prefix
+# rotate, shift and bit operations with (IX+o)
+##########################################################
+fe00	# RLC  B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = rlc(TDAT8); TDAT8 = B;
+	call wm
+
+fe01	# RLC  C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = rlc(TDAT8); TDAT8 = C;
+	call wm
+
+fe02	# RLC  D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = rlc(TDAT8); TDAT8 = D;
+	call wm
+
+fe03	# RLC  E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = rlc(TDAT8); TDAT8 = E;
+	call wm
+
+fe04	# RLC  H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = rlc(TDAT8); TDAT8 = H;
+	call wm
+
+fe05	# RLC  L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = rlc(TDAT8); TDAT8 = L;
+	call wm
+
+fe06	# RLC  (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = rlc(TDAT8);
+	call wm
+
+fe07	# RLC  A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = rlc(TDAT8); TDAT8 = A;
+	call wm
+
+fe08	# RRC  B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = rrc(TDAT8); TDAT8 = B;
+	call wm
+
+fe09	# RRC  C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = rrc(TDAT8); TDAT8 = C;
+	call wm
+
+fe0a	# RRC  D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = rrc(TDAT8); TDAT8 = D;
+	call wm
+
+fe0b	# RRC  E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = rrc(TDAT8); TDAT8 = E;
+	call wm
+
+fe0c	# RRC  H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = rrc(TDAT8); TDAT8 = H;
+	call wm
+
+fe0d	# RRC  L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = rrc(TDAT8); TDAT8 = L;
+	call wm
+
+fe0e	# RRC  (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = rrc(TDAT8);
+	call wm
+
+fe0f	# RRC  A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = rrc(TDAT8); TDAT8 = A;
+	call wm
+
+fe10	# RL   B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = rl(TDAT8); TDAT8 = B;
+	call wm
+
+fe11	# RL   C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = rl(TDAT8); TDAT8 = C;
+	call wm
+
+fe12	# RL   D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = rl(TDAT8); TDAT8 = D;
+	call wm
+
+fe13	# RL   E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = rl(TDAT8); TDAT8 = E;
+	call wm
+
+fe14	# RL   H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = rl(TDAT8); TDAT8 = H;
+	call wm
+
+fe15	# RL   L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = rl(TDAT8); TDAT8 = L;
+	call wm
+
+fe16	# RL   (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = rl(TDAT8);
+	call wm
+
+fe17	# RL   A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = rl(TDAT8); TDAT8 = A;
+	call wm
+
+fe18	# RR   B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = rr(TDAT8); TDAT8 = B;
+	call wm
+
+fe19	# RR   C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = rr(TDAT8); TDAT8 = C;
+	call wm
+
+fe1a	# RR   D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = rr(TDAT8); TDAT8 = D;
+	call wm
+
+fe1b	# RR   E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = rr(TDAT8); TDAT8 = E;
+	call wm
+
+fe1c	# RR   H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = rr(TDAT8); TDAT8 = H;
+	call wm
+
+fe1d	# RR   L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = rr(TDAT8); TDAT8 = L;
+	call wm
+
+fe1e	# RR   (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = rr(TDAT8);
+	call wm
+
+fe1f	# RR   A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = rr(TDAT8); TDAT8 = A;
+	call wm
+
+fe20	# SLA  B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = sla(TDAT8); TDAT8 = B;
+	call wm
+
+fe21	# SLA  C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = sla(TDAT8); TDAT8 = C;
+	call wm
+
+fe22	# SLA  D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = sla(TDAT8); TDAT8 = D;
+	call wm
+
+fe23	# SLA  E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = sla(TDAT8); TDAT8 = E;
+	call wm
+
+fe24	# SLA  H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = sla(TDAT8); TDAT8 = H;
+	call wm
+
+fe25	# SLA  L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = sla(TDAT8); TDAT8 = L;
+	call wm
+
+fe26	# SLA  (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = sla(TDAT8);
+	call wm
+
+fe27	# SLA  A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = sla(TDAT8); TDAT8 = A;
+	call wm
+
+fe28	# SRA  B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = sra(TDAT8); TDAT8 = B;
+	call wm
+
+fe29	# SRA  C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = sra(TDAT8); TDAT8 = C;
+	call wm
+
+fe2a	# SRA  D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = sra(TDAT8); TDAT8 = D;
+	call wm
+
+fe2b	# SRA  E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = sra(TDAT8); TDAT8 = E;
+	call wm
+
+fe2c	# SRA  H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = sra(TDAT8); TDAT8 = H;
+	call wm
+
+fe2d	# SRA  L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = sra(TDAT8); TDAT8 = L;
+	call wm
+
+fe2e	# SRA  (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = sra(TDAT8);
+	call wm
+
+fe2f	# SRA  A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = sra(TDAT8); TDAT8 = A;
+	call wm
+
+fe30	# SLL  B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = sll(TDAT8); TDAT8 = B;
+	call wm
+
+fe31	# SLL  C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = sll(TDAT8); TDAT8 = C;
+	call wm
+
+fe32	# SLL  D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = sll(TDAT8); TDAT8 = D;
+	call wm
+
+fe33	# SLL  E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = sll(TDAT8); TDAT8 = E;
+	call wm
+
+fe34	# SLL  H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = sll(TDAT8); TDAT8 = H;
+	call wm
+
+fe35	# SLL  L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = sll(TDAT8); TDAT8 = L;
+	call wm
+
+fe36	# SLL  (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = sll(TDAT8);
+	call wm
+
+fe37	# SLL  A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = sll(TDAT8); TDAT8 = A;
+	call wm
+
+fe38	# SRL  B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = srl(TDAT8); TDAT8 = B;
+	call wm
+
+fe39	# SRL  C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = srl(TDAT8); TDAT8 = C;
+	call wm
+
+fe3a	# SRL  D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = srl(TDAT8); TDAT8 = D;
+	call wm
+
+fe3b	# SRL  E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = srl(TDAT8); TDAT8 = E;
+	call wm
+
+fe3c	# SRL  H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = srl(TDAT8); TDAT8 = H;
+	call wm
+
+fe3d	# SRL  L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = srl(TDAT8); TDAT8 = L;
+	call wm
+
+fe3e	# SRL  (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = srl(TDAT8);
+	call wm
+
+fe3f	# SRL  A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = srl(TDAT8); TDAT8 = A;
+	call wm
+
+fe40	# BIT  0,(XY+o)
+	call jump fe46
+
+fe41	# BIT  0,(XY+o)
+	call jump fe46
+
+fe42	# BIT  0,(XY+o)
+	call jump fe46
+
+fe43	# BIT  0,(XY+o)
+	call jump fe46
+
+fe44	# BIT  0,(XY+o)
+	call jump fe46
+
+fe45	# BIT  0,(XY+o)
+	call jump fe46
+
+fe46	# BIT  0,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	bit_xy(0, TDAT8);
+
+fe47	# BIT  0,(XY+o)
+	call jump fe46
+
+fe48	# BIT  1,(XY+o)
+	call jump fe4e
+
+fe49	# BIT  1,(XY+o)
+	call jump fe4e
+
+fe4a	# BIT  1,(XY+o)
+	call jump fe4e
+
+fe4b	# BIT  1,(XY+o)
+	call jump fe4e
+
+fe4c	# BIT  1,(XY+o)
+	call jump fe4e
+
+fe4d	# BIT  1,(XY+o)
+	call jump fe4e
+
+fe4e	# BIT  1,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	bit_xy(1, TDAT8);
+
+fe4f	# BIT  1,(XY+o)
+	call jump fe4e
+
+fe50	# BIT  2,(XY+o)
+	call jump fe56
+
+fe51	# BIT  2,(XY+o)
+	call jump fe56
+
+fe52	# BIT  2,(XY+o)
+	call jump fe56
+
+fe53	# BIT  2,(XY+o)
+	call jump fe56
+
+fe54	# BIT  2,(XY+o)
+	call jump fe56
+
+fe55	# BIT  2,(XY+o)
+	call jump fe56
+
+fe56	# BIT  2,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	bit_xy(2, TDAT8);
+
+fe57	# BIT  2,(XY+o)
+	call jump fe56
+
+fe58	# BIT  3,(XY+o)
+	call jump fe5e
+
+fe59	# BIT  3,(XY+o)
+	call jump fe5e
+
+fe5a	# BIT  3,(XY+o)
+	call jump fe5e
+
+fe5b	# BIT  3,(XY+o)
+	call jump fe5e
+
+fe5c	# BIT  3,(XY+o)
+	call jump fe5e
+
+fe5d	# BIT  3,(XY+o)
+	call jump fe5e
+
+fe5e	# BIT  3,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	bit_xy(3, TDAT8);
+
+fe5f	# BIT  3,(XY+o)
+	call jump fe5e
+
+fe60	# BIT  4,(XY+o)
+	call jump fe66
+
+fe61	# BIT  4,(XY+o)
+	call jump fe66
+
+fe62	# BIT  4,(XY+o)
+	call jump fe66
+
+fe63	# BIT  4,(XY+o)
+	call jump fe66
+
+fe64	# BIT  4,(XY+o)
+	call jump fe66
+
+fe65	# BIT  4,(XY+o)
+	call jump fe66
+
+fe66	# BIT  4,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	bit_xy(4, TDAT8);
+
+fe67	# BIT  4,(XY+o)
+	call jump fe66
+
+fe68	# BIT  5,(XY+o)
+	call jump fe6e
+
+fe69	# BIT  5,(XY+o)
+	call jump fe6e
+
+fe6a	# BIT  5,(XY+o)
+	call jump fe6e
+
+fe6b	# BIT  5,(XY+o)
+	call jump fe6e
+
+fe6c	# BIT  5,(XY+o)
+	call jump fe6e
+
+fe6d	# BIT  5,(XY+o)
+	call jump fe6e
+
+fe6e	# BIT  5,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	bit_xy(5, TDAT8);
+
+fe6f	# BIT  5,(XY+o)
+	call jump fe6e
+
+fe70	# BIT  6,(XY+o)
+	call jump fe76
+
+fe71	# BIT  6,(XY+o)
+	call jump fe76
+
+fe72	# BIT  6,(XY+o)
+	call jump fe76
+
+fe73	# BIT  6,(XY+o)
+	call jump fe76
+
+fe74	# BIT  6,(XY+o)
+	call jump fe76
+
+fe75	# BIT  6,(XY+o)
+	call jump fe76
+
+fe76	# BIT  6,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	bit_xy(6, TDAT8);
+
+fe77	# BIT  6,(XY+o)
+	call jump fe76
+
+fe78	# BIT  7,(XY+o)
+	call jump fe7e
+
+fe79	# BIT  7,(XY+o)
+	call jump fe7e
+
+fe7a	# BIT  7,(XY+o)
+	call jump fe7e
+
+fe7b	# BIT  7,(XY+o)
+	call jump fe7e
+
+fe7c	# BIT  7,(XY+o)
+	call jump fe7e
+
+fe7d	# BIT  7,(XY+o)
+	call jump fe7e
+
+fe7e	# BIT  7,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	bit_xy(7, TDAT8);
+
+fe7f	# BIT  7,(XY+o)
+	call jump fe7e
+
+fe80	# RES  0,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = res(0, TDAT8); TDAT8 = B;
+	call wm
+
+fe81	# RES  0,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = res(0, TDAT8); TDAT8 = C;
+	call wm
+
+fe82	# RES  0,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = res(0, TDAT8); TDAT8 = D;
+	call wm
+
+fe83	# RES  0,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = res(0, TDAT8); TDAT8 = E;
+	call wm
+
+fe84	# RES  0,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = res(0, TDAT8); TDAT8 = H;
+	call wm
+
+fe85	# RES  0,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = res(0, TDAT8); TDAT8 = L;
+	call wm
+
+fe86	# RES  0,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = res(0, TDAT8);
+	call wm
+
+fe87	# RES  0,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = res(0, TDAT8); TDAT8 = A;
+	call wm
+
+fe88	# RES  1,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = res(1, TDAT8); TDAT8 = B;
+	call wm
+
+fe89	# RES  1,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = res(1, TDAT8); TDAT8 = C;
+	call wm
+
+fe8a	# RES  1,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = res(1, TDAT8); TDAT8 = D;
+	call wm
+
+fe8b	# RES  1,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = res(1, TDAT8); TDAT8 = E;
+	call wm
+
+fe8c	# RES  1,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = res(1, TDAT8); TDAT8 = H;
+	call wm
+
+fe8d	# RES  1,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = res(1, TDAT8); TDAT8 = L;
+	call wm
+
+fe8e	# RES  1,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = res(1, TDAT8);
+	call wm
+
+fe8f	# RES  1,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = res(1, TDAT8); TDAT8 = A;
+	call wm
+
+fe90	# RES  2,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = res(2, TDAT8); TDAT8 = B;
+	call wm
+
+fe91	# RES  2,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = res(2, TDAT8); TDAT8 = C;
+	call wm
+
+fe92	# RES  2,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = res(2, TDAT8); TDAT8 = D;
+	call wm
+
+fe93	# RES  2,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = res(2, TDAT8); TDAT8 = E;
+	call wm
+
+fe94	# RES  2,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = res(2, TDAT8); TDAT8 = H;
+	call wm
+
+fe95	# RES  2,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = res(2, TDAT8); TDAT8 = L;
+	call wm
+
+fe96	# RES  2,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = res(2, TDAT8);
+	call wm
+
+fe97	# RES  2,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = res(2, TDAT8); TDAT8 = A;
+	call wm
+
+fe98	# RES  3,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = res(3, TDAT8); TDAT8 = B;
+	call wm
+
+fe99	# RES  3,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = res(3, TDAT8); TDAT8 = C;
+	call wm
+
+fe9a	# RES  3,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = res(3, TDAT8); TDAT8 = D;
+	call wm
+
+fe9b	# RES  3,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = res(3, TDAT8); TDAT8 = E;
+	call wm
+
+fe9c	# RES  3,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = res(3, TDAT8); TDAT8 = H;
+	call wm
+
+fe9d	# RES  3,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = res(3, TDAT8); TDAT8 = L;
+	call wm
+
+fe9e	# RES  3,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = res(3, TDAT8);
+	call wm
+
+fe9f	# RES  3,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = res(3, TDAT8); TDAT8 = A;
+	call wm
+
+fea0	# RES  4,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = res(4, TDAT8); TDAT8 = B;
+	call wm
+
+fea1	# RES  4,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = res(4, TDAT8); TDAT8 = C;
+	call wm
+
+fea2	# RES  4,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = res(4, TDAT8); TDAT8 = D;
+	call wm
+
+fea3	# RES  4,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = res(4, TDAT8); TDAT8 = E;
+	call wm
+
+fea4	# RES  4,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = res(4, TDAT8); TDAT8 = H;
+	call wm
+
+fea5	# RES  4,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = res(4, TDAT8); TDAT8 = L;
+	call wm
+
+fea6	# RES  4,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = res(4, TDAT8);
+	call wm
+
+fea7	# RES  4,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = res(4, TDAT8); TDAT8 = A;
+	call wm
+
+fea8	# RES  5,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = res(5, TDAT8); TDAT8 = B;
+	call wm
+
+fea9	# RES  5,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = res(5, TDAT8); TDAT8 = C;
+	call wm
+
+feaa	# RES  5,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = res(5, TDAT8); TDAT8 = D;
+	call wm
+
+feab	# RES  5,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = res(5, TDAT8); TDAT8 = E;
+	call wm
+
+feac	# RES  5,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = res(5, TDAT8); TDAT8 = H;
+	call wm
+
+fead	# RES  5,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = res(5, TDAT8); TDAT8 = L;
+	call wm
+
+feae	# RES  5,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = res(5, TDAT8);
+	call wm
+
+feaf	# RES  5,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = res(5, TDAT8); TDAT8 = A;
+	call wm
+
+feb0	# RES  6,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = res(6, TDAT8); TDAT8 = B;
+	call wm
+
+feb1	# RES  6,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = res(6, TDAT8); TDAT8 = C;
+	call wm
+
+feb2	# RES  6,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = res(6, TDAT8); TDAT8 = D;
+	call wm
+
+feb3	# RES  6,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = res(6, TDAT8); TDAT8 = E;
+	call wm
+
+feb4	# RES  6,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = res(6, TDAT8); TDAT8 = H;
+	call wm
+
+feb5	# RES  6,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = res(6, TDAT8); TDAT8 = L;
+	call wm
+
+feb6	# RES  6,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = res(6, TDAT8);
+	call wm
+
+feb7	# RES  6,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = res(6, TDAT8); TDAT8 = A;
+	call wm
+
+feb8	# RES  7,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = res(7, TDAT8); TDAT8 = B;
+	call wm
+
+feb9	# RES  7,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = res(7, TDAT8); TDAT8 = C;
+	call wm
+
+feba	# RES  7,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = res(7, TDAT8); TDAT8 = D;
+	call wm
+
+febb	# RES  7,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = res(7, TDAT8); TDAT8 = E;
+	call wm
+
+febc	# RES  7,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = res(7, TDAT8); TDAT8 = H;
+	call wm
+
+febd	# RES  7,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = res(7, TDAT8); TDAT8 = L;
+	call wm
+
+febe	# RES  7,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = res(7, TDAT8);
+	call wm
+
+febf	# RES  7,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = res(7, TDAT8); TDAT8 = A;
+	call wm
+
+fec0	# SET  0,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = set(0, TDAT8); TDAT8 = B;
+	call wm
+
+fec1	# SET  0,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = set(0, TDAT8); TDAT8 = C;
+	call wm
+
+fec2	# SET  0,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = set(0, TDAT8); TDAT8 = D;
+	call wm
+
+fec3	# SET  0,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = set(0, TDAT8); TDAT8 = E;
+	call wm
+
+fec4	# SET  0,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = set(0, TDAT8); TDAT8 = H;
+	call wm
+
+fec5	# SET  0,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = set(0, TDAT8); TDAT8 = L;
+	call wm
+
+fec6	# SET  0,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = set(0, TDAT8);
+	call wm
+
+fec7	# SET  0,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = set(0, TDAT8); TDAT8 = A;
+	call wm
+
+fec8	# SET  1,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = set(1, TDAT8); TDAT8 = B;
+	call wm
+
+fec9	# SET  1,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = set(1, TDAT8); TDAT8 = C;
+	call wm
+
+feca	# SET  1,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = set(1, TDAT8); TDAT8 = D;
+	call wm
+
+fecb	# SET  1,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = set(1, TDAT8); TDAT8 = E;
+	call wm
+
+fecc	# SET  1,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = set(1, TDAT8); TDAT8 = H;
+	call wm
+
+fecd	# SET  1,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = set(1, TDAT8); TDAT8 = L;
+	call wm
+
+fece	# SET  1,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = set(1, TDAT8);
+	call wm
+
+fecf	# SET  1,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = set(1, TDAT8); TDAT8 = A;
+	call wm
+
+fed0	# SET  2,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = set(2, TDAT8); TDAT8 = B;
+	call wm
+
+fed1	# SET  2,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = set(2, TDAT8); TDAT8 = C;
+	call wm
+
+fed2	# SET  2,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = set(2, TDAT8); TDAT8 = D;
+	call wm
+
+fed3	# SET  2,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = set(2, TDAT8); TDAT8 = E;
+	call wm
+
+fed4	# SET  2,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = set(2, TDAT8); TDAT8 = H;
+	call wm
+
+fed5	# SET  2,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = set(2, TDAT8); TDAT8 = L;
+	call wm
+
+fed6	# SET  2,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = set(2, TDAT8);
+	call wm
+
+fed7	# SET  2,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = set(2, TDAT8); TDAT8 = A;
+	call wm
+
+fed8	# SET  3,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = set(3, TDAT8); TDAT8 = B;
+	call wm
+
+fed9	# SET  3,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = set(3, TDAT8); TDAT8 = C;
+	call wm
+
+feda	# SET  3,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = set(3, TDAT8); TDAT8 = D;
+	call wm
+
+fedb	# SET  3,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = set(3, TDAT8); TDAT8 = E;
+	call wm
+
+fedc	# SET  3,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = set(3, TDAT8); TDAT8 = H;
+	call wm
+
+fedd	# SET  3,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = set(3, TDAT8); TDAT8 = L;
+	call wm
+
+fede	# SET  3,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = set(3, TDAT8);
+	call wm
+
+fedf	# SET  3,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = set(3, TDAT8); TDAT8 = A;
+	call wm
+
+fee0	# SET  4,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = set(4, TDAT8); TDAT8 = B;
+	call wm
+
+fee1	# SET  4,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = set(4, TDAT8); TDAT8 = C;
+	call wm
+
+fee2	# SET  4,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = set(4, TDAT8); TDAT8 = D;
+	call wm
+
+fee3	# SET  4,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = set(4, TDAT8); TDAT8 = E;
+	call wm
+
+fee4	# SET  4,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = set(4, TDAT8); TDAT8 = H;
+	call wm
+
+fee5	# SET  4,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = set(4, TDAT8); TDAT8 = L;
+	call wm
+
+fee6	# SET  4,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = set(4, TDAT8);
+	call wm
+
+fee7	# SET  4,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = set(4, TDAT8); TDAT8 = A;
+	call wm
+
+fee8	# SET  5,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = set(5, TDAT8); TDAT8 = B;
+	call wm
+
+fee9	# SET  5,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = set(5, TDAT8); TDAT8 = C;
+	call wm
+
+feea	# SET  5,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = set(5, TDAT8); TDAT8 = D;
+	call wm
+
+feeb	# SET  5,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = set(5, TDAT8); TDAT8 = E;
+	call wm
+
+feec	# SET  5,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = set(5, TDAT8); TDAT8 = H;
+	call wm
+
+feed	# SET  5,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = set(5, TDAT8); TDAT8 = L;
+	call wm
+
+feee	# SET  5,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = set(5, TDAT8);
+	call wm
+
+feef	# SET  5,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = set(5, TDAT8); TDAT8 = A;
+	call wm
+
+fef0	# SET  6,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = set(6, TDAT8); TDAT8 = B;
+	call wm
+
+fef1	# SET  6,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = set(6, TDAT8); TDAT8 = C;
+	call wm
+
+fef2	# SET  6,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = set(6, TDAT8); TDAT8 = D;
+	call wm
+
+fef3	# SET  6,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = set(6, TDAT8); TDAT8 = E;
+	call wm
+
+fef4	# SET  6,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = set(6, TDAT8); TDAT8 = H;
+	call wm
+
+fef5	# SET  6,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = set(6, TDAT8); TDAT8 = L;
+	call wm
+
+fef6	# SET  6,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = set(6, TDAT8);
+	call wm
+
+fef7	# SET  6,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = set(6, TDAT8); TDAT8 = A;
+	call wm
+
+fef8	# SET  7,B = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	B = set(7, TDAT8); TDAT8 = B;
+	call wm
+
+fef9	# SET  7,C = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	C = set(7, TDAT8); TDAT8 = C;
+	call wm
+
+fefa	# SET  7,D = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	D = set(7, TDAT8); TDAT8 = D;
+	call wm
+
+fefb	# SET  7,E = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	E = set(7, TDAT8); TDAT8 = E;
+	call wm
+
+fefc	# SET  7,H = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	H = set(7, TDAT8); TDAT8 = H;
+	call wm
+
+fefd	# SET  7,L = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	L = set(7, TDAT8); TDAT8 = L;
+	call wm
+
+fefe	# SET  7,(XY+o)
+	TADR = m_ea;
+	call rm_reg
+	TDAT8 = set(7, TDAT8);
+	call wm
+
+feff	# SET  7,A = (XY+o)
+	TADR = m_ea;
+	call rm_reg
+	A = set(7, TDAT8); TDAT8 = A;
+	call wm
+
+
+##########################################################
+# IX register related opcodes (DD prefix)
+##########################################################
+dd00	# DB   DD
+	illegal_1();
+	call jump 0000
+
+dd01	# DB   DD
+	illegal_1();
+	call jump 0001
+
+dd02	# DB   DD
+	illegal_1();
+	call jump 0002
+
+dd03	# DB   DD
+	illegal_1();
+	call jump 0003
+
+dd04	# DB   DD
+	illegal_1();
+	call jump 0004
+
+dd05	# DB   DD
+	illegal_1();
+	call jump 0005
+
+dd06	# DB   DD
+	illegal_1();
+	call jump 0006
+
+dd07	# DB   DD
+	illegal_1();
+	call jump 0007
+
+dd08	# DB   DD
+	illegal_1();
+	call jump 0008
+
+dd09	# ADD  IX,BC
+	TDAT = IX; TDAT2 = BC;
+	call add16
+	IX = TDAT;
+
+dd0a	# DB   DD
+	illegal_1();
+	call jump 000a
+
+dd0b	# DB   DD
+	illegal_1();
+	call jump 000b
+
+dd0c	# DB   DD
+	illegal_1();
+	call jump 000c
+
+dd0d	# DB   DD
+	illegal_1();
+	call jump 000d
+
+dd0e	# DB   DD
+	illegal_1();
+	call jump 000e
+
+dd0f	# DB   DD
+	illegal_1();
+	call jump 000f
+
+dd10	# DB   DD
+	illegal_1();
+	call jump 0010
+
+dd11	# DB   DD
+	illegal_1();
+	call jump 0011
+
+dd12	# DB   DD
+	illegal_1();
+	call jump 0012
+
+dd13	# DB   DD
+	illegal_1();
+	call jump 0013
+
+dd14	# DB   DD
+	illegal_1();
+	call jump 0014
+
+dd15	# DB   DD
+	illegal_1();
+	call jump 0015
+
+dd16	# DB   DD
+	illegal_1();
+	call jump 0016
+
+dd17	# DB   DD
+	illegal_1();
+	call jump 0017
+
+dd18	# DB   DD
+	illegal_1();
+	call jump 0018
+
+dd19	# ADD  IX,DE
+	TDAT = IX; TDAT2 = DE;
+	call add16
+	IX = TDAT;
+
+dd1a	# DB   DD
+	illegal_1();
+	call jump 001a
+
+dd1b	# DB   DD
+	illegal_1();
+	call jump 001b
+
+dd1c	# DB   DD
+	illegal_1();
+	call jump 001c
+
+dd1d	# DB   DD
+	illegal_1();
+	call jump 001d
+
+dd1e	# DB   DD
+	illegal_1();
+	call jump 001e
+
+dd1f	# DB   DD
+	illegal_1();
+	call jump 001f
+
+dd20	# DB   DD
+	illegal_1();
+	call jump 0020
+
+dd21	# LD   IX,w
+	call arg16
+	IX = TDAT;
+
+dd22	# LD   (w),IX
+	call arg16
+	m_ea = TDAT; TADR = m_ea; TDAT = IX;
+	call wm16
+	WZ = m_ea + 1;
+
+dd23	# INC  IX
+	call nomreq_ir 2
+	IX++;
+
+dd24	# INC  HX
+	inc(HX);
+
+dd25	# DEC  HX
+	dec(HX);
+
+dd26	# LD   HX,n
+	call arg
+	HX = TDAT8;
+
+dd27	# DB   DD
+	illegal_1();
+	call jump 0027
+
+dd28	# DB   DD
+	illegal_1();
+	call jump 0028
+
+dd29	# ADD  IX,IX
+	TDAT = IX; TDAT2 = IX;
+	call add16
+	IX = TDAT;
+
+dd2a	# LD   IX,(w)
+	call arg16
+	m_ea = TDAT; TADR = m_ea;
+	call rm16
+	IX = TDAT; WZ = m_ea + 1;
+
+dd2b	# DEC  IX
+	call nomreq_ir 2
+	IX--;
+
+dd2c	# INC  LX
+	inc(LX);
+
+dd2d	# DEC  LX
+	dec(LX);
+
+dd2e	# LD   LX,n
+	call arg
+	LX = TDAT8;
+
+dd2f	# DB   DD
+	illegal_1();
+	call jump 002f
+
+dd30	# DB   DD
+	illegal_1();
+	call jump 0030
+
+dd31	# DB   DD
+	illegal_1();
+	call jump 0031
+
+dd32	# DB   DD
+	illegal_1();
+	call jump 0032
+
+dd33	# DB   DD
+	illegal_1();
+	call jump 0033
+
+dd34	# INC  (IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm_reg
+	inc(TDAT8);
+	call wm
+
+dd35	# DEC  (IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm_reg
+	dec(TDAT8);
+	call wm
+
+dd36	# LD   (IX+o),n
+	call eax
+	call arg
+	TADR = PCD-1;
+	2 * call nomreq_addr
+	TADR = m_ea;
+	call wm
+
+dd37	# DB   DD
+	illegal_1();
+	call jump 0037
+
+dd38	# DB   DD
+	illegal_1();
+	call jump 0038
+
+dd39	# ADD  IX,SP
+	TDAT = IX; TDAT2 = SP;
+	call add16
+	IX = TDAT;
+
+dd3a	# DB   DD
+	illegal_1();
+	call jump 003a
+
+dd3b	# DB   DD
+	illegal_1();
+	call jump 003b
+
+dd3c	# DB   DD
+	illegal_1();
+	call jump 003c
+
+dd3d	# DB   DD
+	illegal_1();
+	call jump 003d
+
+dd3e	# DB   DD
+	illegal_1();
+	call jump 003e
+
+dd3f	# DB   DD
+	illegal_1();
+	call jump 003f
+
+dd40	# DB   DD
+	illegal_1();
+	call jump 0040
+
+dd41	# DB   DD
+	illegal_1();
+	call jump 0041
+
+dd42	# DB   DD
+	illegal_1();
+	call jump 0042
+
+dd43	# DB   DD
+	illegal_1();
+	call jump 0043
+
+dd44	# LD   B,HX
+	B = HX;
+
+dd45	# LD   B,LX
+	B = LX;
+
+dd46	# LD   B,(IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	B = TDAT8;
+
+dd47	# DB   DD
+	illegal_1();
+	call jump 0047
+
+dd48	# DB   DD
+	illegal_1();
+	call jump 0048
+
+dd49	# DB   DD
+	illegal_1();
+	call jump 0049
+
+dd4a	# DB   DD
+	illegal_1();
+	call jump 004a
+
+dd4b	# DB   DD
+	illegal_1();
+	call jump 004b
+
+dd4c	# LD   C,HX
+	C = HX;
+
+dd4d	# LD   C,LX
+	C = LX;
+
+dd4e	# LD   C,(IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	C = TDAT8;
+
+dd4f	# DB   DD
+	illegal_1();
+	call jump 004f
+
+dd50	# DB   DD
+	illegal_1();
+	call jump 0050
+
+dd51	# DB   DD
+	illegal_1();
+	call jump 0051
+
+dd52	# DB   DD
+	illegal_1();
+	call jump 0052
+
+dd53	# DB   DD
+	illegal_1();
+	call jump 0053
+
+dd54	# LD   D,HX
+	D = HX;
+
+dd55	# LD   D,LX
+	D = LX;
+
+dd56	# LD   D,(IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	D = TDAT8;
+
+dd57	# DB   DD
+	illegal_1();
+	call jump 0057
+
+dd58	# DB   DD
+	illegal_1();
+	call jump 0058
+
+dd59	# DB   DD
+	illegal_1();
+	call jump 0059
+
+dd5a	# DB   DD
+	illegal_1();
+	call jump 005a
+
+dd5b	# DB   DD
+	illegal_1();
+	call jump 005b
+
+dd5c	# LD   E,HX
+	E = HX;
+
+dd5d	# LD   E,LX
+	E = LX;
+
+dd5e	# LD   E,(IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	E = TDAT8;
+
+dd5f	# DB   DD
+	illegal_1();
+	call jump 005f
+
+dd60	# LD   HX,B
+	HX = B;
+
+dd61	# LD   HX,C
+	HX = C;
+
+dd62	# LD   HX,D
+	HX = D;
+
+dd63	# LD   HX,E
+	HX = E;
+
+dd64	# LD   HX,HX
+
+dd65	# LD   HX,LX
+	HX = LX;
+
+dd66	# LD   H,(IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	H = TDAT8;
+
+dd67	# LD   HX,A
+	HX = A;
+
+dd68	# LD   LX,B
+	LX = B;
+
+dd69	# LD   LX,C
+	LX = C;
+
+dd6a	# LD   LX,D
+	LX = D;
+
+dd6b	# LD   LX,E
+	LX = E;
+
+dd6c	# LD   LX,HX
+	LX = HX;
+
+dd6d	# LD   LX,LX
+
+dd6e	# LD   L,(IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	L = TDAT8;
+
+dd6f	# LD   LX,A
+	LX = A;
+
+dd70	# LD   (IX+o),B
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea; TDAT8 = B;
+	call wm
+
+dd71	# LD   (IX+o),C
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea; TDAT8 = C;
+	call wm
+
+dd72	# LD   (IX+o),D
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea; TDAT8 = D;
+	call wm
+
+dd73	# LD   (IX+o),E
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea; TDAT8 = E;
+	call wm
+
+dd74	# LD   (IX+o),H
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea; TDAT8 = H;
+	call wm
+
+dd75	# LD   (IX+o),L
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea; TDAT8 = L;
+	call wm
+
+dd76	# DB   DD
+	illegal_1();
+	call jump 0076
+
+dd77	# LD   (IX+o),A
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea; TDAT8 = A;
+	call wm
+
+dd78	# DB   DD
+	illegal_1();
+	call jump 0078
+
+dd79	# DB   DD
+	illegal_1();
+	call jump 0079
+
+dd7a	# DB   DD
+	illegal_1();
+	call jump 007a
+
+dd7b	# DB   DD
+	illegal_1();
+	call jump 007b
+
+dd7c	# LD   A,HX
+	A = HX;
+
+dd7d	# LD   A,LX
+	A = LX;
+
+dd7e	# LD   A,(IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	A = TDAT8;
+
+dd7f	# DB   DD
+	illegal_1();
+	call jump 007f
+
+dd80	# DB   DD
+	illegal_1();
+	call jump 0080
+
+dd81	# DB   DD
+	illegal_1();
+	call jump 0081
+
+dd82	# DB   DD
+	illegal_1();
+	call jump 0082
+
+dd83	# DB   DD
+	illegal_1();
+	call jump 0083
+
+dd84	# ADD  A,HX
+	add_a(HX);
+
+dd85	# ADD  A,LX
+	add_a(LX);
+
+dd86	# ADD  A,(IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	add_a(TDAT8);
+
+dd87	# DB   DD
+	illegal_1();
+	call jump 0087
+
+dd88	# DB   DD
+	illegal_1();
+	call jump 0088
+
+dd89	# DB   DD
+	illegal_1();
+	call jump 0089
+
+dd8a	# DB   DD
+	illegal_1();
+	call jump 008a
+
+dd8b	# DB   DD
+	illegal_1();
+	call jump 008b
+
+dd8c	# ADC  A,HX
+	adc_a(HX);
+
+dd8d	# ADC  A,LX
+	adc_a(LX);
+
+dd8e	# ADC  A,(IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	adc_a(TDAT8);
+
+dd8f	# DB   DD
+	illegal_1();
+	call jump 008f
+
+dd90	# DB   DD
+	illegal_1();
+	call jump 0090
+
+dd91	# DB   DD
+	illegal_1();
+	call jump 0091
+
+dd92	# DB   DD
+	illegal_1();
+	call jump 0092
+
+dd93	# DB   DD
+	illegal_1();
+	call jump 0093
+
+dd94	# SUB  HX
+	sub(HX);
+
+dd95	# SUB  LX
+	sub(LX);
+
+dd96	# SUB  (IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	sub(TDAT8);
+
+dd97	# DB   DD
+	illegal_1();
+	call jump 0097
+
+dd98	# DB   DD
+	illegal_1();
+	call jump 0098
+
+dd99	# DB   DD
+	illegal_1();
+	call jump 0099
+
+dd9a	# DB   DD
+	illegal_1();
+	call jump 009a
+
+dd9b	# DB   DD
+	illegal_1();
+	call jump 009b
+
+dd9c	# SBC  A,HX
+	sbc_a(HX);
+
+dd9d	# SBC  A,LX
+	sbc_a(LX);
+
+dd9e	# SBC  A,(IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	sbc_a(TDAT8);
+
+dd9f	# DB   DD
+	illegal_1();
+	call jump 009f
+
+dda0	# DB   DD
+	illegal_1();
+	call jump 00a0
+
+dda1	# DB   DD
+	illegal_1();
+	call jump 00a1
+
+dda2	# DB   DD
+	illegal_1();
+	call jump 00a2
+
+dda3	# DB   DD
+	illegal_1();
+	call jump 00a3
+
+dda4	# AND  HX
+	and_a(HX);
+
+dda5	# AND  LX
+	and_a(LX);
+
+dda6	# AND  (IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	and_a(TDAT8);
+
+dda7	# DB   DD
+	illegal_1();
+	call jump 00a7
+
+dda8	# DB   DD
+	illegal_1();
+	call jump 00a8
+
+dda9	# DB   DD
+	illegal_1();
+	call jump 00a9
+
+ddaa	# DB   DD
+	illegal_1();
+	call jump 00aa
+
+ddab	# DB   DD
+	illegal_1();
+	call jump 00ab
+
+ddac	# XOR  HX
+	xor_a(HX);
+
+ddad	# XOR  LX
+	xor_a(LX);
+
+ddae	# XOR  (IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	xor_a(TDAT8);
+
+ddaf	# DB   DD
+	illegal_1();
+	call jump 00af
+
+ddb0	# DB   DD
+	illegal_1();
+	call jump 00b0
+
+ddb1	# DB   DD
+	illegal_1();
+	call jump 00b1
+
+ddb2	# DB   DD
+	illegal_1();
+	call jump 00b2
+
+ddb3	# DB   DD
+	illegal_1();
+	call jump 00b3
+
+ddb4	# OR   HX
+	or_a(HX);
+
+ddb5	# OR   LX
+	or_a(LX);
+
+ddb6	# OR   (IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	or_a(TDAT8);
+
+ddb7	# DB   DD
+	illegal_1();
+	call jump 00b7
+
+ddb8	# DB   DD
+	illegal_1();
+	call jump 00b8
+
+ddb9	# DB   DD
+	illegal_1();
+	call jump 00b9
+
+ddba	# DB   DD
+	illegal_1();
+	call jump 00ba
+
+ddbb	# DB   DD
+	illegal_1();
+	call jump 00bb
+
+ddbc	# CP   HX
+	cp(HX);
+
+ddbd	# CP   LX
+	cp(LX);
+
+ddbe	# CP   (IX+o)
+	call eax
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	cp(TDAT8);
+
+ddbf	# DB   DD
+	illegal_1();
+	call jump 00bf
+
+ddc0	# DB   DD
+	illegal_1();
+	call jump 00c0
+
+ddc1	# DB   DD
+	illegal_1();
+	call jump 00c1
+
+ddc2	# DB   DD
+	illegal_1();
+	call jump 00c2
+
+ddc3	# DB   DD
+	illegal_1();
+	call jump 00c3
+
+ddc4	# DB   DD
+	illegal_1();
+	call jump 00c4
+
+ddc5	# DB   DD
+	illegal_1();
+	call jump 00c5
+
+ddc6	# DB   DD
+	illegal_1();
+	call jump 00c6
+
+ddc7	# DB   DD
+	illegal_1();
+	call jump 00c7
+
+ddc8	# DB   DD
+	illegal_1();
+	call jump 00c8
+
+ddc9	# DB   DD
+	illegal_1();
+	call jump 00c9
+
+ddca	# DB   DD
+	illegal_1();
+	call jump 00ca
+
+ddcb	# **   DD CB xx
+	call eax
+	call arg
+	TADR = PCD-1;
+	2 * call nomreq_addr
+	call jump_prefixed 0xfe
+
+ddcc	# DB   DD
+	illegal_1();
+	call jump 00cc
+
+ddcd	# DB   DD
+	illegal_1();
+	call jump 00cd
+
+ddce	# DB   DD
+	illegal_1();
+	call jump 00ce
+
+ddcf	# DB   DD
+	illegal_1();
+	call jump 00cf
+
+ddd0	# DB   DD
+	illegal_1();
+	call jump 00d0
+
+ddd1	# DB   DD
+	illegal_1();
+	call jump 00d1
+
+ddd2	# DB   DD
+	illegal_1();
+	call jump 00d2
+
+ddd3	# DB   DD
+	illegal_1();
+	call jump 00d3
+
+ddd4	# DB   DD
+	illegal_1();
+	call jump 00d4
+
+ddd5	# DB   DD
+	illegal_1();
+	call jump 00d5
+
+ddd6	# DB   DD
+	illegal_1();
+	call jump 00d6
+
+ddd7	# DB   DD
+	illegal_1();
+	call jump 00d7
+
+ddd8	# DB   DD
+	illegal_1();
+	call jump 00d8
+
+ddd9	# DB   DD
+	illegal_1();
+	call jump 00d9
+
+ddda	# DB   DD
+	illegal_1();
+	call jump 00da
+
+dddb	# DB   DD
+	illegal_1();
+	call jump 00db
+
+dddc	# DB   DD
+	illegal_1();
+	call jump 00dc
+
+dddd	# DB   DD
+	illegal_1();
+	call jump 00dd
+
+ddde	# DB   DD
+	illegal_1();
+	call jump 00de
+
+dddf	# DB   DD
+	illegal_1();
+	call jump 00df
+
+dde0	# DB   DD
+	illegal_1();
+	call jump 00e0
+
+dde1	# POP  IX
+	call pop
+	IX = TDAT;
+
+dde2	# DB   DD
+	illegal_1();
+	call jump 00e2
+
+dde3	# EX   (SP),IX
+	TDAT = IX;
+	call ex_sp
+	IX = TDAT;
+
+dde4	# DB   DD
+	illegal_1();
+	call jump 00e4
+
+dde5	# PUSH IX
+	TDAT = IX;
+	call push
+
+dde6	# DB   DD
+	illegal_1();
+	call jump 00e6
+
+dde7	# DB   DD
+	illegal_1();
+	call jump 00e7
+
+dde8	# DB   DD
+	illegal_1();
+	call jump 00e8
+
+dde9	# JP   (IX)
+	PC = IX;
+
+ddea	# DB   DD
+	illegal_1();
+	call jump 00ea
+
+ddeb	# DB   DD
+	illegal_1();
+	call jump 00eb
+
+ddec	# DB   DD
+	illegal_1();
+	call jump 00ec
+
+dded	# DB   DD
+	illegal_1();
+	call jump 00ed
+
+ddee	# DB   DD
+	illegal_1();
+	call jump 00ee
+
+ddef	# DB   DD
+	illegal_1();
+	call jump 00ef
+
+ddf0	# DB   DD
+	illegal_1();
+	call jump 00f0
+
+ddf1	# DB   DD
+	illegal_1();
+	call jump 00f1
+
+ddf2	# DB   DD
+	illegal_1();
+	call jump 00f2
+
+ddf3	# DB   DD
+	illegal_1();
+	call jump 00f3
+
+ddf4	# DB   DD
+	illegal_1();
+	call jump 00f4
+
+ddf5	# DB   DD
+	illegal_1();
+	call jump 00f5
+
+ddf6	# DB   DD
+	illegal_1();
+	call jump 00f6
+
+ddf7	# DB   DD
+	illegal_1();
+	call jump 00f7
+
+ddf8	# DB   DD
+	illegal_1();
+	call jump 00f8
+
+ddf9	# LD   SP,IX
+	call nomreq_ir 2
+	SP = IX;
+
+ddfa	# DB   DD
+	illegal_1();
+	call jump 00fa
+
+ddfb	# DB   DD
+	illegal_1();
+	call jump 00fb
+
+ddfc	# DB   DD
+	illegal_1();
+	call jump 00fc
+
+ddfd	# DB   DD
+	illegal_1();
+	call jump 00fd
+
+ddfe	# DB   DD
+	illegal_1();
+	call jump 00fe
+
+ddff	# DB   DD
+	illegal_1();
+	call jump 00ff
+
+
+##########################################################
+# IY register related opcodes (FD prefix)
+##########################################################
+fd00	# DB   FD
+	illegal_1();
+	call jump 0000
+
+fd01	# DB   FD
+	illegal_1();
+	call jump 0001
+
+fd02	# DB   FD
+	illegal_1();
+	call jump 0002
+
+fd03	# DB   FD
+	illegal_1();
+	call jump 0003
+
+fd04	# DB   FD
+	illegal_1();
+	call jump 0004
+
+fd05	# DB   FD
+	illegal_1();
+	call jump 0005
+
+fd06	# DB   FD
+	illegal_1();
+	call jump 0006
+
+fd07	# DB   FD
+	illegal_1();
+	call jump 0007
+
+fd08	# DB   FD
+	illegal_1();
+	call jump 0008
+
+fd09	# ADD  IY,BC
+	TDAT = IY; TDAT2 = BC;
+	call add16
+	IY = TDAT;
+
+fd0a	# DB   FD
+	illegal_1();
+	call jump 000a
+
+fd0b	# DB   FD
+	illegal_1();
+	call jump 000b
+
+fd0c	# DB   FD
+	illegal_1();
+	call jump 000c
+
+fd0d	# DB   FD
+	illegal_1();
+	call jump 000d
+
+fd0e	# DB   FD
+	illegal_1();
+	call jump 000e
+
+fd0f	# DB   FD
+	illegal_1();
+	call jump 000f
+
+fd10	# DB   FD
+	illegal_1();
+	call jump 0010
+
+fd11	# DB   FD
+	illegal_1();
+	call jump 0011
+
+fd12	# DB   FD
+	illegal_1();
+	call jump 0012
+
+fd13	# DB   FD
+	illegal_1();
+	call jump 0013
+
+fd14	# DB   FD
+	illegal_1();
+	call jump 0014
+
+fd15	# DB   FD
+	illegal_1();
+	call jump 0015
+
+fd16	# DB   FD
+	illegal_1();
+	call jump 0016
+
+fd17	# DB   FD
+	illegal_1();
+	call jump 0017
+
+fd18	# DB   FD
+	illegal_1();
+	call jump 0018
+
+fd19	# ADD  IY,DE
+	TDAT = IY; TDAT2 = DE;
+	call add16
+	IY = TDAT;
+
+fd1a	# DB   FD
+	illegal_1();
+	call jump 001a
+
+fd1b	# DB   FD
+	illegal_1();
+	call jump 001b
+
+fd1c	# DB   FD
+	illegal_1();
+	call jump 001c
+
+fd1d	# DB   FD
+	illegal_1();
+	call jump 001d
+
+fd1e	# DB   FD
+	illegal_1();
+	call jump 001e
+
+fd1f	# DB   FD
+	illegal_1();
+	call jump 001f
+
+fd20	# DB   FD
+	illegal_1();
+	call jump 0020
+
+fd21	# LD   IY,w
+	call arg16
+	IY = TDAT;
+
+fd22	# LD   (w),IY
+	call arg16
+	m_ea = TDAT; TADR = m_ea; TDAT = IY;
+	call wm16
+	WZ = m_ea + 1;
+
+fd23	# INC  IY
+	call nomreq_ir 2
+	IY++;
+
+fd24	# INC  HY
+	inc(HY);
+
+fd25	# DEC  HY
+	dec(HY);
+
+fd26	# LD   HY,n
+	call arg
+	HY = TDAT8;
+
+fd27	# DB   FD
+	illegal_1();
+	call jump 0027
+
+fd28	# DB   FD
+	illegal_1();
+	call jump 0028
+
+fd29	# ADD  IY,IY
+	TDAT = IY; TDAT2 = IY;
+	call add16
+	IY = TDAT;
+
+fd2a	# LD   IY,(w)
+	call arg16
+	m_ea = TDAT; TADR = m_ea;
+	call rm16
+	IY = TDAT; WZ = m_ea + 1;
+
+fd2b	# DEC  IY
+	call nomreq_ir 2
+	IY--;
+
+fd2c	# INC  LY
+	inc(LY);
+
+fd2d	# DEC  LY
+	dec(LY);
+
+fd2e	# LD   LY,n
+	call arg
+	LY = TDAT8;
+
+fd2f	# DB   FD
+	illegal_1();
+	call jump 002f
+
+fd30	# DB   FD
+	illegal_1();
+	call jump 0030
+
+fd31	# DB   FD
+	illegal_1();
+	call jump 0031
+
+fd32	# DB   FD
+	illegal_1();
+	call jump 0032
+
+fd33	# DB   FD
+	illegal_1();
+	call jump 0033
+
+fd34	# INC  (IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm_reg
+	inc(TDAT8);
+	call wm
+
+fd35	# DEC  (IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm_reg
+	dec(TDAT8);
+	call wm
+
+fd36	# LD   (IY+o),n
+	call eay
+	call arg
+	TADR = PCD-1;
+	2 * call nomreq_addr
+	TADR = m_ea;
+	call wm
+
+fd37	# DB   FD
+	illegal_1();
+	call jump 0037
+
+fd38	# DB   FD
+	illegal_1();
+	call jump 0038
+
+fd39	# ADD  IY,SP
+	TDAT = IY; TDAT2 = SP;
+	call add16
+	IY = TDAT;
+
+fd3a	# DB   FD
+	illegal_1();
+	call jump 003a
+
+fd3b	# DB   FD
+	illegal_1();
+	call jump 003b
+
+fd3c	# DB   FD
+	illegal_1();
+	call jump 003c
+
+fd3d	# DB   FD
+	illegal_1();
+	call jump 003d
+
+fd3e	# DB   FD
+	illegal_1();
+	call jump 003e
+
+fd3f	# DB   FD
+	illegal_1();
+	call jump 003f
+
+fd40	# DB   FD
+	illegal_1();
+	call jump 0040
+
+fd41	# DB   FD
+	illegal_1();
+	call jump 0041
+
+fd42	# DB   FD
+	illegal_1();
+	call jump 0042
+
+fd43	# DB   FD
+	illegal_1();
+	call jump 0043
+
+fd44	# LD   B,HY
+	B = HY;
+
+fd45	# LD   B,LY
+	B = LY;
+
+fd46	# LD   B,(IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	B = TDAT8;
+
+fd47	# DB   FD
+	illegal_1();
+	call jump 0047
+
+fd48	# DB   FD
+	illegal_1();
+	call jump 0048
+
+fd49	# DB   FD
+	illegal_1();
+	call jump 0049
+
+fd4a	# DB   FD
+	illegal_1();
+	call jump 004a
+
+fd4b	# DB   FD
+	illegal_1();
+	call jump 004b
+
+fd4c	# LD   C,HY
+	C = HY;
+
+fd4d	# LD   C,LY
+	C = LY;
+
+fd4e	# LD   C,(IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	C = TDAT8;
+
+fd4f	# DB   FD
+	illegal_1();
+	call jump 004f
+
+fd50	# DB   FD
+	illegal_1();
+	call jump 0050
+
+fd51	# DB   FD
+	illegal_1();
+	call jump 0051
+
+fd52	# DB   FD
+	illegal_1();
+	call jump 0052
+
+fd53	# DB   FD
+	illegal_1();
+	call jump 0053
+
+fd54	# LD   D,HY
+	D = HY;
+
+fd55	# LD   D,LY
+	D = LY;
+
+fd56	# LD   D,(IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	D = TDAT8;
+
+fd57	# DB   FD
+	illegal_1();
+	call jump 0057
+
+fd58	# DB   FD
+	illegal_1();
+	call jump 0058
+
+fd59	# DB   FD
+	illegal_1();
+	call jump 0059
+
+fd5a	# DB   FD
+	illegal_1();
+	call jump 005a
+
+fd5b	# DB   FD
+	illegal_1();
+	call jump 005b
+
+fd5c	# LD   E,HY
+	E = HY;
+
+fd5d	# LD   E,LY
+	E = LY;
+
+fd5e	# LD   E,(IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	E = TDAT8;
+
+fd5f	# DB   FD
+	illegal_1();
+	call jump 005f
+
+fd60	# LD   HY,B
+	HY = B;
+
+fd61	# LD   HY,C
+	HY = C;
+
+fd62	# LD   HY,D
+	HY = D;
+
+fd63	# LD   HY,E
+	HY = E;
+
+fd64	# LD   HY,HY
+
+fd65	# LD   HY,LY
+	HY = LY;
+
+fd66	# LD   H,(IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	H = TDAT8;
+
+fd67	# LD   HY,A
+	HY = A;
+
+fd68	# LD   LY,B
+	LY = B;
+
+fd69	# LD   LY,C
+	LY = C;
+
+fd6a	# LD   LY,D
+	LY = D;
+
+fd6b	# LD   LY,E
+	LY = E;
+
+fd6c	# LD   LY,HY
+	LY = HY;
+
+fd6d	# LD   LY,LY
+
+fd6e	# LD   L,(IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	L = TDAT8;
+
+fd6f	# LD   LY,A
+	LY = A;
+
+fd70	# LD   (IY+o),B
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea; TDAT8 = B;
+	call wm
+
+fd71	# LD   (IY+o),C
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea; TDAT8 = C;
+	call wm
+
+fd72	# LD   (IY+o),D
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea; TDAT8 = D;
+	call wm
+
+fd73	# LD   (IY+o),E
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea; TDAT8 = E;
+	call wm
+
+fd74	# LD   (IY+o),H
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea; TDAT8 = H;
+	call wm
+
+fd75	# LD   (IY+o),L
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea; TDAT8 = L;
+	call wm
+
+fd76	# DB   FD
+	illegal_1();
+	call jump 0076
+
+fd77	# LD   (IY+o),A
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea; TDAT8 = A;
+	call wm
+
+fd78	# DB   FD
+	illegal_1();
+	call jump 0078
+
+fd79	# DB   FD
+	illegal_1();
+	call jump 0079
+
+fd7a	# DB   FD
+	illegal_1();
+	call jump 007a
+
+fd7b	# DB   FD
+	illegal_1();
+	call jump 007b
+
+fd7c	# LD   A,HY
+	A = HY;
+
+fd7d	# LD   A,LY
+	A = LY;
+
+fd7e	# LD   A,(IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	A = TDAT8;
+
+fd7f	# DB   FD
+	illegal_1();
+	call jump 007f
+
+fd80	# DB   FD
+	illegal_1();
+	call jump 0080
+
+fd81	# DB   FD
+	illegal_1();
+	call jump 0081
+
+fd82	# DB   FD
+	illegal_1();
+	call jump 0082
+
+fd83	# DB   FD
+	illegal_1();
+	call jump 0083
+
+fd84	# ADD  A,HY
+	add_a(HY);
+
+fd85	# ADD  A,LY
+	add_a(LY);
+
+fd86	# ADD  A,(IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	add_a(TDAT8);
+
+fd87	# DB   FD
+	illegal_1();
+	call jump 0087
+
+fd88	# DB   FD
+	illegal_1();
+	call jump 0088
+
+fd89	# DB   FD
+	illegal_1();
+	call jump 0089
+
+fd8a	# DB   FD
+	illegal_1();
+	call jump 008a
+
+fd8b	# DB   FD
+	illegal_1();
+	call jump 008b
+
+fd8c	# ADC  A,HY
+	adc_a(HY);
+
+fd8d	# ADC  A,LY
+	adc_a(LY);
+
+fd8e	# ADC  A,(IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	adc_a(TDAT8);
+
+fd8f	# DB   FD
+	illegal_1();
+	call jump 008f
+
+fd90	# DB   FD
+	illegal_1();
+	call jump 0090
+
+fd91	# DB   FD
+	illegal_1();
+	call jump 0091
+
+fd92	# DB   FD
+	illegal_1();
+	call jump 0092
+
+fd93	# DB   FD
+	illegal_1();
+	call jump 0093
+
+fd94	# SUB  HY
+	sub(HY);
+
+fd95	# SUB  LY
+	sub(LY);
+
+fd96	# SUB  (IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	sub(TDAT8);
+
+fd97	# DB   FD
+	illegal_1();
+	call jump 0097
+
+fd98	# DB   FD
+	illegal_1();
+	call jump 0098
+
+fd99	# DB   FD
+	illegal_1();
+	call jump 0099
+
+fd9a	# DB   FD
+	illegal_1();
+	call jump 009a
+
+fd9b	# DB   FD
+	illegal_1();
+	call jump 009b
+
+fd9c	# SBC  A,HY
+	sbc_a(HY);
+
+fd9d	# SBC  A,LY
+	sbc_a(LY);
+
+fd9e	# SBC  A,(IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	sbc_a(TDAT8);
+
+fd9f	# DB   FD
+	illegal_1();
+	call jump 009f
+
+fda0	# DB   FD
+	illegal_1();
+	call jump 00a0
+
+fda1	# DB   FD
+	illegal_1();
+	call jump 00a1
+
+fda2	# DB   FD
+	illegal_1();
+	call jump 00a2
+
+fda3	# DB   FD
+	illegal_1();
+	call jump 00a3
+
+fda4	# AND  HY
+	and_a(HY);
+
+fda5	# AND  LY
+	and_a(LY);
+
+fda6	# AND  (IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	and_a(TDAT8);
+
+fda7	# DB   FD
+	illegal_1();
+	call jump 00a7
+
+fda8	# DB   FD
+	illegal_1();
+	call jump 00a8
+
+fda9	# DB   FD
+	illegal_1();
+	call jump 00a9
+
+fdaa	# DB   FD
+	illegal_1();
+	call jump 00aa
+
+fdab	# DB   FD
+	illegal_1();
+	call jump 00ab
+
+fdac	# XOR  HY
+	xor_a(HY);
+
+fdad	# XOR  LY
+	xor_a(LY);
+
+fdae	# XOR  (IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	xor_a(TDAT8);
+
+fdaf	# DB   FD
+	illegal_1();
+	call jump 00af
+
+fdb0	# DB   FD
+	illegal_1();
+	call jump 00b0
+
+fdb1	# DB   FD
+	illegal_1();
+	call jump 00b1
+
+fdb2	# DB   FD
+	illegal_1();
+	call jump 00b2
+
+fdb3	# DB   FD
+	illegal_1();
+	call jump 00b3
+
+fdb4	# OR   HY
+	or_a(HY);
+
+fdb5	# OR   LY
+	or_a(LY);
+
+fdb6	# OR   (IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	or_a(TDAT8);
+
+fdb7	# DB   FD
+	illegal_1();
+	call jump 00b7
+
+fdb8	# DB   FD
+	illegal_1();
+	call jump 00b8
+
+fdb9	# DB   FD
+	illegal_1();
+	call jump 00b9
+
+fdba	# DB   FD
+	illegal_1();
+	call jump 00ba
+
+fdbb	# DB   FD
+	illegal_1();
+	call jump 00bb
+
+fdbc	# CP   HY
+	cp(HY);
+
+fdbd	# CP   LY
+	cp(LY);
+
+fdbe	# CP   (IY+o)
+	call eay
+	TADR = PCD-1;
+	5 * call nomreq_addr
+	TADR = m_ea;
+	call rm
+	cp(TDAT8);
+
+fdbf	# DB   FD
+	illegal_1();
+	call jump 00bf
+
+fdc0	# DB   FD
+	illegal_1();
+	call jump 00c0
+
+fdc1	# DB   FD
+	illegal_1();
+	call jump 00c1
+
+fdc2	# DB   FD
+	illegal_1();
+	call jump 00c2
+
+fdc3	# DB   FD
+	illegal_1();
+	call jump 00c3
+
+fdc4	# DB   FD
+	illegal_1();
+	call jump 00c4
+
+fdc5	# DB   FD
+	illegal_1();
+	call jump 00c5
+
+fdc6	# DB   FD
+	illegal_1();
+	call jump 00c6
+
+fdc7	# DB   FD
+	illegal_1();
+	call jump 00c7
+
+fdc8	# DB   FD
+	illegal_1();
+	call jump 00c8
+
+fdc9	# DB   FD
+	illegal_1();
+	call jump 00c9
+
+fdca	# DB   FD
+	illegal_1();
+	call jump 00ca
+
+fdcb	# **   FD CB xx
+	call eay
+	call arg
+	TADR = PCD-1;
+	2 * call nomreq_addr
+	call jump_prefixed 0xfe
+
+fdcc	# DB   FD
+	illegal_1();
+	call jump 00cc
+
+fdcd	# DB   FD
+	illegal_1();
+	call jump 00cd
+
+fdce	# DB   FD
+	illegal_1();
+	call jump 00ce
+
+fdcf	# DB   FD
+	illegal_1();
+	call jump 00cf
+
+fdd0	# DB   FD
+	illegal_1();
+	call jump 00d0
+
+fdd1	# DB   FD
+	illegal_1();
+	call jump 00d1
+
+fdd2	# DB   FD
+	illegal_1();
+	call jump 00d2
+
+fdd3	# DB   FD
+	illegal_1();
+	call jump 00d3
+
+fdd4	# DB   FD
+	illegal_1();
+	call jump 00d4
+
+fdd5	# DB   FD
+	illegal_1();
+	call jump 00d5
+
+fdd6	# DB   FD
+	illegal_1();
+	call jump 00d6
+
+fdd7	# DB   FD
+	illegal_1();
+	call jump 00d7
+
+fdd8	# DB   FD
+	illegal_1();
+	call jump 00d8
+
+fdd9	# DB   FD
+	illegal_1();
+	call jump 00d9
+
+fdda	# DB   FD
+	illegal_1();
+	call jump 00da
+
+fddb	# DB   FD
+	illegal_1();
+	call jump 00db
+
+fddc	# DB   FD
+	illegal_1();
+	call jump 00dc
+
+fddd	# DB   FD
+	illegal_1();
+	call jump 00dd
+
+fdde	# DB   FD
+	illegal_1();
+	call jump 00de
+
+fddf	# DB   FD
+	illegal_1();
+	call jump 00df
+
+fde0	# DB   FD
+	illegal_1();
+	call jump 00e0
+
+fde1	# POP  IY
+	call pop
+	IY = TDAT;
+
+fde2	# DB   FD
+	illegal_1();
+	call jump 00e2
+
+fde3	# EX   (SP),IY
+	TDAT = IY;
+	call ex_sp
+	IY = TDAT;
+
+fde4	# DB   FD
+	illegal_1();
+	call jump 00e4
+
+fde5	# PUSH IY
+	TDAT = IY;
+	call push
+
+fde6	# DB   FD
+	illegal_1();
+	call jump 00e6
+
+fde7	# DB   FD
+	illegal_1();
+	call jump 00e7
+
+fde8	# DB   FD
+	illegal_1();
+	call jump 00e8
+
+fde9	# JP   (IY)
+	PC = IY;
+
+fdea	# DB   FD
+	illegal_1();
+	call jump 00ea
+
+fdeb	# DB   FD
+	illegal_1();
+	call jump 00eb
+
+fdec	# DB   FD
+	illegal_1();
+	call jump 00ec
+
+fded	# DB   FD
+	illegal_1();
+	call jump 00ed
+
+fdee	# DB   FD
+	illegal_1();
+	call jump 00ee
+
+fdef	# DB   FD
+	illegal_1();
+	call jump 00ef
+
+fdf0	# DB   FD
+	illegal_1();
+	call jump 00f0
+
+fdf1	# DB   FD
+	illegal_1();
+	call jump 00f1
+
+fdf2	# DB   FD
+	illegal_1();
+	call jump 00f2
+
+fdf3	# DB   FD
+	illegal_1();
+	call jump 00f3
+
+fdf4	# DB   FD
+	illegal_1();
+	call jump 00f4
+
+fdf5	# DB   FD
+	illegal_1();
+	call jump 00f5
+
+fdf6	# DB   FD
+	illegal_1();
+	call jump 00f6
+
+fdf7	# DB   FD
+	illegal_1();
+	call jump 00f7
+
+fdf8	# DB   FD
+	illegal_1();
+	call jump 00f8
+
+fdf9	# LD   SP,IY
+	call nomreq_ir 2
+	SP = IY;
+
+fdfa	# DB   FD
+	illegal_1();
+	call jump 00fa
+
+fdfb	# DB   FD
+	illegal_1();
+	call jump 00fb
+
+fdfc	# DB   FD
+	illegal_1();
+	call jump 00fc
+
+fdfd	# DB   FD
+	illegal_1();
+	call jump 00fd
+
+fdfe	# DB   FD
+	illegal_1();
+	call jump 00fe
+
+fdff	# DB   FD
+	illegal_1();
+	call jump 00ff
+
+
+##########################################################
+# special opcodes (ED prefix)
+##########################################################
+ed00	# DB   ED
+	illegal_2();
+
+ed01	# DB   ED
+	illegal_2();
+
+ed02	# DB   ED
+	illegal_2();
+
+ed03	# DB   ED
+	illegal_2();
+
+ed04	# DB   ED
+	illegal_2();
+
+ed05	# DB   ED
+	illegal_2();
+
+ed06	# DB   ED
+	illegal_2();
+
+ed07	# DB   ED
+	illegal_2();
+
+ed08	# DB   ED
+	illegal_2();
+
+ed09	# DB   ED
+	illegal_2();
+
+ed0a	# DB   ED
+	illegal_2();
+
+ed0b	# DB   ED
+	illegal_2();
+
+ed0c	# DB   ED
+	illegal_2();
+
+ed0d	# DB   ED
+	illegal_2();
+
+ed0e	# DB   ED
+	illegal_2();
+
+ed0f	# DB   ED
+	illegal_2();
+
+ed10	# DB   ED
+	illegal_2();
+
+ed11	# DB   ED
+	illegal_2();
+
+ed12	# DB   ED
+	illegal_2();
+
+ed13	# DB   ED
+	illegal_2();
+
+ed14	# DB   ED
+	illegal_2();
+
+ed15	# DB   ED
+	illegal_2();
+
+ed16	# DB   ED
+	illegal_2();
+
+ed17	# DB   ED
+	illegal_2();
+
+ed18	# DB   ED
+	illegal_2();
+
+ed19	# DB   ED
+	illegal_2();
+
+ed1a	# DB   ED
+	illegal_2();
+
+ed1b	# DB   ED
+	illegal_2();
+
+ed1c	# DB   ED
+	illegal_2();
+
+ed1d	# DB   ED
+	illegal_2();
+
+ed1e	# DB   ED
+	illegal_2();
+
+ed1f	# DB   ED
+	illegal_2();
+
+ed20	# DB   ED
+	illegal_2();
+
+ed21	# DB   ED
+	illegal_2();
+
+ed22	# DB   ED
+	illegal_2();
+
+ed23	# DB   ED
+	illegal_2();
+
+ed24	# DB   ED
+	illegal_2();
+
+ed25	# DB   ED
+	illegal_2();
+
+ed26	# DB   ED
+	illegal_2();
+
+ed27	# DB   ED
+	illegal_2();
+
+ed28	# DB   ED
+	illegal_2();
+
+ed29	# DB   ED
+	illegal_2();
+
+ed2a	# DB   ED
+	illegal_2();
+
+ed2b	# DB   ED
+	illegal_2();
+
+ed2c	# DB   ED
+	illegal_2();
+
+ed2d	# DB   ED
+	illegal_2();
+
+ed2e	# DB   ED
+	illegal_2();
+
+ed2f	# DB   ED
+	illegal_2();
+
+ed30	# DB   ED
+	illegal_2();
+
+ed31	# DB   ED
+	illegal_2();
+
+ed32	# DB   ED
+	illegal_2();
+
+ed33	# DB   ED
+	illegal_2();
+
+ed34	# DB   ED
+	illegal_2();
+
+ed35	# DB   ED
+	illegal_2();
+
+ed36	# DB   ED
+	illegal_2();
+
+ed37	# DB   ED
+	illegal_2();
+
+ed38	# DB   ED
+	illegal_2();
+
+ed39	# DB   ED
+	illegal_2();
+
+ed3a	# DB   ED
+	illegal_2();
+
+ed3b	# DB   ED
+	illegal_2();
+
+ed3c	# DB   ED
+	illegal_2();
+
+ed3d	# DB   ED
+	illegal_2();
+
+ed3e	# DB   ED
+	illegal_2();
+
+ed3f	# DB   ED
+	illegal_2();
+
+ed40	# IN   B,(C)
+	TADR = BC;
+	call in
+	B = TDAT8; set_f((F & CF) | SZP[B]); WZ = TADR + 1;
+
+ed41	# OUT  (C),B
+	TADR = BC; TDAT8 = B;
+	call out
+	WZ = TADR + 1;
+
+ed42	# SBC  HL,BC
+	TDAT = BC;
+	call sbc_hl
+
+ed43	# LD   (w),BC
+	call arg16
+	m_ea = TDAT; TADR = m_ea; TDAT = BC;
+	call wm16
+	WZ = m_ea + 1;
+
+ed44	# NEG
+	neg();
+
+ed45	# RETN
+	call retn
+
+ed46	# IM   0
+	m_im = 0;
+
+ed47	# LD   i,A
+	call ld_i_a
+
+ed48	# IN   C,(C)
+	TADR = BC;
+	call in
+	C = TDAT8; set_f((F & CF) | SZP[C]); WZ = TADR + 1;
+
+ed49	# OUT  (C),C
+	TADR = BC; TDAT8 = C;
+	call out
+	WZ = TADR + 1;
+
+ed4a	# ADC  HL,BC
+	TDAT = BC;
+	call adc_hl
+
+ed4b	# LD   BC,(w)
+	call arg16
+	m_ea = TDAT; TADR = m_ea;
+	call rm16
+	BC = TDAT; WZ = m_ea + 1;
+
+ed4c	# NEG
+	neg();
+
+ed4d	# RETI
+	call reti
+
+ed4e	# IM   0
+	m_im = 0;
+
+ed4f	# LD   r,A
+	call ld_r_a
+
+ed50	# IN   D,(C)
+	TADR = BC;
+	call in
+	D = TDAT8; set_f((F & CF) | SZP[D]); WZ = TADR + 1;
+
+ed51	# OUT  (C),D
+	TADR = BC; TDAT8 = D;
+	call out
+	WZ = TADR + 1;
+
+ed52	# SBC  HL,DE
+	TDAT = DE;
+	call sbc_hl
+
+ed53	# LD   (w),DE
+	call arg16
+	m_ea = TDAT; TADR = m_ea; TDAT = DE;
+	call wm16
+	WZ = m_ea + 1;
+
+ed54	# NEG
+	neg();
+
+ed55	# RETN
+	call retn
+
+ed56	# IM   1
+	m_im = 1;
+
+ed57	# LD   A,i
+	call ld_a_i
+
+ed58	# IN   E,(C)
+	TADR = BC;
+	call in
+	E = TDAT8; set_f((F & CF) | SZP[E]); WZ = TADR + 1;
+
+ed59	# OUT  (C),E
+	TADR = BC; TDAT8 = E;
+	call out
+	WZ = TADR + 1;
+
+ed5a	# ADC  HL,DE
+	TDAT = DE;
+	call adc_hl
+
+ed5b	# LD   DE,(w)
+	call arg16
+	m_ea = TDAT; TADR = m_ea;
+	call rm16
+	DE = TDAT; WZ = m_ea + 1;
+
+ed5c	# NEG
+	neg();
+
+ed5d	# RETI
+	call reti
+
+ed5e	# IM   2
+	m_im = 2;
+
+ed5f	# LD   A,r
+	call ld_a_r
+
+ed60	# IN   H,(C)
+	TADR = BC;
+	call in
+	H = TDAT8; set_f((F & CF) | SZP[H]); WZ = TADR + 1;
+
+ed61	# OUT  (C),H
+	TADR = BC; TDAT8 = H;
+	call out
+	WZ = TADR + 1;
+
+ed62	# SBC  HL,HL
+	TDAT = HL;
+	call sbc_hl
+
+ed63	# LD   (w),HL
+	call arg16
+	m_ea = TDAT; TADR = m_ea; TDAT = HL;
+	call wm16
+	WZ = m_ea + 1;
+
+ed64	# NEG
+	neg();
+
+ed65	# RETN
+	call retn
+
+ed66	# IM   0
+	m_im = 0;
+
+ed67	# RRD  (HL)
+	call rrd
+
+ed68	# IN   L,(C)
+	TADR = BC;
+	call in
+	L = TDAT8; set_f((F & CF) | SZP[L]); WZ = TADR + 1;
+
+ed69	# OUT  (C),L
+	TADR = BC; TDAT8 = L;
+	call out
+	WZ = TADR + 1;
+
+ed6a	# ADC  HL,HL
+	TDAT = HL;
+	call adc_hl
+
+ed6b	# LD   HL,(w)
+	call arg16
+	m_ea = TDAT; TADR = m_ea;
+	call rm16
+	HL = TDAT; WZ = m_ea + 1;
+
+ed6c	# NEG
+	neg();
+
+ed6d	# RETI
+	call reti
+
+ed6e	# IM   0
+	m_im = 0;
+
+ed6f	# RLD  (HL)
+	call rld
+
+ed70	# IN   0,(C)
+	TADR = BC;
+	call in
+	set_f((F & CF) | SZP[TDAT8]); WZ = TADR + 1;
+
+ed71	# OUT  (C),0
+	TADR = BC; TDAT8 = 0;
+	call out
+	WZ = TADR + 1;
+
+ed72	# SBC  HL,SP
+	TDAT = SP;
+	call sbc_hl
+
+ed73	# LD   (w),SP
+	call arg16
+	m_ea = TDAT; TADR = m_ea; TDAT = SP;
+	call wm16
+	WZ = m_ea + 1;
+
+ed74	# NEG
+	neg();
+
+ed75	# RETN
+	call retn
+
+ed76	# IM   1
+	m_im = 1;
+
+ed77	# DB   ED,77
+	illegal_2();
+
+ed78	# IN   A,(C)
+	TADR = BC;
+	call in
+	A = TDAT8; set_f((F & CF) | SZP[A]); WZ = TADR + 1;
+
+ed79	# OUT  (C),A
+	TADR = BC; TDAT8 = A;
+	call out
+	WZ = TADR + 1;
+
+ed7a	# ADC  HL,SP
+	TDAT = SP;
+	call adc_hl
+
+ed7b	# LD   SP,(w)
+	call arg16
+	m_ea = TDAT; TADR = m_ea;
+	call rm16
+	SP = TDAT; WZ = m_ea + 1;
+
+ed7c	# NEG
+	neg();
+
+ed7d	# RETI
+	call reti
+
+ed7e	# IM   2
+	m_im = 2;
+
+ed7f	# DB   ED,7F
+	illegal_2();
+
+ed80	# DB   ED
+	illegal_2();
+
+ed81	# DB   ED
+	illegal_2();
+
+ed82	# DB   ED
+	illegal_2();
+
+ed83	# DB   ED
+	illegal_2();
+
+ed84	# DB   ED
+	illegal_2();
+
+ed85	# DB   ED
+	illegal_2();
+
+ed86	# DB   ED
+	illegal_2();
+
+ed87	# DB   ED
+	illegal_2();
+
+ed88	# DB   ED
+	illegal_2();
+
+ed89	# DB   ED
+	illegal_2();
+
+ed8a	# DB   ED
+	illegal_2();
+
+ed8b	# DB   ED
+	illegal_2();
+
+ed8c	# DB   ED
+	illegal_2();
+
+ed8d	# DB   ED
+	illegal_2();
+
+ed8e	# DB   ED
+	illegal_2();
+
+ed8f	# DB   ED
+	illegal_2();
+
+ed90	# DB   ED
+	illegal_2();
+
+ed91	# DB   ED
+	illegal_2();
+
+ed92	# DB   ED
+	illegal_2();
+
+ed93	# DB   ED
+	illegal_2();
+
+ed94	# DB   ED
+	illegal_2();
+
+ed95	# DB   ED
+	illegal_2();
+
+ed96	# DB   ED
+	illegal_2();
+
+ed97	# DB   ED
+	illegal_2();
+
+ed98	# DB   ED
+	illegal_2();
+
+ed99	# DB   ED
+	illegal_2();
+
+ed9a	# DB   ED
+	illegal_2();
+
+ed9b	# DB   ED
+	illegal_2();
+
+ed9c	# DB   ED
+	illegal_2();
+
+ed9d	# DB   ED
+	illegal_2();
+
+ed9e	# DB   ED
+	illegal_2();
+
+ed9f	# DB   ED
+	illegal_2();
+
+eda0	# LDI
+	call ldi
+
+eda1	# CPI
+	call cpi
+
+eda2	# INI
+	call ini
+
+eda3	# OUTI
+	call outi
+
+eda4	# DB   ED
+	illegal_2();
+
+eda5	# DB   ED
+	illegal_2();
+
+eda6	# DB   ED
+	illegal_2();
+
+eda7	# DB   ED
+	illegal_2();
+
+eda8	# LDD
+	call ldd
+
+eda9	# CPD
+	call cpd
+
+edaa	# IND
+	call ind
+
+edab	# OUTD
+	call outd
+
+edac	# DB   ED
+	illegal_2();
+
+edad	# DB   ED
+	illegal_2();
+
+edae	# DB   ED
+	illegal_2();
+
+edaf	# DB   ED
+	illegal_2();
+
+edb0	# LDIR
+	call ldir
+
+edb1	# CPIR
+	call cpir
+
+edb2	# INIR
+	call inir
+
+edb3	# OTIR
+	call otir
+
+edb4	# DB   ED
+	illegal_2();
+
+edb5	# DB   ED
+	illegal_2();
+
+edb6	# DB   ED
+	illegal_2();
+
+edb7	# DB   ED
+	illegal_2();
+
+edb8	# LDDR
+	call lddr
+
+edb9	# CPDR
+	call cpdr
+
+edba	# INDR
+	call indr
+
+edbb	# OTDR
+	call otdr
+
+edbc	# DB   ED
+	illegal_2();
+
+edbd	# DB   ED
+	illegal_2();
+
+edbe	# DB   ED
+	illegal_2();
+
+edbf	# DB   ED
+	illegal_2();
+
+edc0	# DB   ED
+	illegal_2();
+
+edc1	# DB   ED
+	illegal_2();
+
+edc2	# DB   ED
+	illegal_2();
+
+edc3	# DB   ED
+	illegal_2();
+
+edc4	# DB   ED
+	illegal_2();
+
+edc5	# DB   ED
+	illegal_2();
+
+edc6	# DB   ED
+	illegal_2();
+
+edc7	# DB   ED
+	illegal_2();
+
+edc8	# DB   ED
+	illegal_2();
+
+edc9	# DB   ED
+	illegal_2();
+
+edca	# DB   ED
+	illegal_2();
+
+edcb	# DB   ED
+	illegal_2();
+
+edcc	# DB   ED
+	illegal_2();
+
+edcd	# DB   ED
+	illegal_2();
+
+edce	# DB   ED
+	illegal_2();
+
+edcf	# DB   ED
+	illegal_2();
+
+edd0	# DB   ED
+	illegal_2();
+
+edd1	# DB   ED
+	illegal_2();
+
+edd2	# DB   ED
+	illegal_2();
+
+edd3	# DB   ED
+	illegal_2();
+
+edd4	# DB   ED
+	illegal_2();
+
+edd5	# DB   ED
+	illegal_2();
+
+edd6	# DB   ED
+	illegal_2();
+
+edd7	# DB   ED
+	illegal_2();
+
+edd8	# DB   ED
+	illegal_2();
+
+edd9	# DB   ED
+	illegal_2();
+
+edda	# DB   ED
+	illegal_2();
+
+eddb	# DB   ED
+	illegal_2();
+
+eddc	# DB   ED
+	illegal_2();
+
+eddd	# DB   ED
+	illegal_2();
+
+edde	# DB   ED
+	illegal_2();
+
+eddf	# DB   ED
+	illegal_2();
+
+ede0	# DB   ED
+	illegal_2();
+
+ede1	# DB   ED
+	illegal_2();
+
+ede2	# DB   ED
+	illegal_2();
+
+ede3	# DB   ED
+	illegal_2();
+
+ede4	# DB   ED
+	illegal_2();
+
+ede5	# DB   ED
+	illegal_2();
+
+ede6	# DB   ED
+	illegal_2();
+
+ede7	# DB   ED
+	illegal_2();
+
+ede8	# DB   ED
+	illegal_2();
+
+ede9	# DB   ED
+	illegal_2();
+
+edea	# DB   ED
+	illegal_2();
+
+edeb	# DB   ED
+	illegal_2();
+
+edec	# DB   ED
+	illegal_2();
+
+eded	# DB   ED
+	illegal_2();
+
+edee	# DB   ED
+	illegal_2();
+
+edef	# DB   ED
+	illegal_2();
+
+edf0	# DB   ED
+	illegal_2();
+
+edf1	# DB   ED
+	illegal_2();
+
+edf2	# DB   ED
+	illegal_2();
+
+edf3	# DB   ED
+	illegal_2();
+
+edf4	# DB   ED
+	illegal_2();
+
+edf5	# DB   ED
+	illegal_2();
+
+edf6	# DB   ED
+	illegal_2();
+
+edf7	# DB   ED
+	illegal_2();
+
+edf8	# DB   ED
+	illegal_2();
+
+edf9	# DB   ED
+	illegal_2();
+
+edfa	# DB   ED
+	illegal_2();
+
+edfb	# DB   ED
+	illegal_2();
+
+edfc	# DB   ED
+	illegal_2();
+
+edfd	# DB   ED
+	illegal_2();
+
+edfe	# DB   ED
+	illegal_2();
+
+edff	# DB   ED
+	illegal_2();
+
+
+##########################################################
+# main opcodes
+##########################################################
+0000	# NOP
+
+0001	# LD BC,w
+	call arg16
+	BC = TDAT;
+
+0002	# LD (BC),A
+	TADR = BC; TDAT8 = A;
+	call wm
+	WZ_L = (BC + 1) & 0xFF;  WZ_H = A;
+
+0003	# INC  BC
+	call nomreq_ir 2
+	BC++;
+
+0004	# INC  B
+	inc(B);
+
+0005	# DEC  B
+	dec(B);
+
+0006	# LD   B,n
+	call arg
+	B = TDAT8;
+
+0007	# RLCA
+	rlca();
+
+0008	# EX   AF,AF'
+	using std::swap; swap(m_af, m_af2);
+
+0009	# ADD  HL,BC
+	TDAT = HL; TDAT2 = BC;
+	call add16
+	HL = TDAT;
+
+000a	# LD   A,(BC)
+	TADR = BC;
+	call rm
+	A = TDAT8;  WZ = BC+1;
+
+000b	# DEC  BC
+	call nomreq_ir 2
+	BC--;
+
+000c	# INC  C
+	inc(C);
+
+000d	# DEC  C
+	dec(C);
+
+000e	# LD   C,n
+	call arg
+	C = TDAT8;
+
+000f	# RRCA
+	rrca();
+
+0010	# DJNZ o
+	call nomreq_ir 1
+	TDAT8 = --B;
+	call jr_cond
+
+0011	# LD   DE,w
+	call arg16
+	DE = TDAT;
+
+0012	# LD (DE),A
+	TADR = DE; TDAT8 = A;
+	call wm
+	WZ_L = (DE + 1) & 0xFF;  WZ_H = A;
+
+0013	# INC  DE
+	call nomreq_ir 2
+	DE++;
+
+0014	# INC  D
+	inc(D);
+
+0015	# DEC  D
+	dec(D);
+
+0016	# LD   D,n
+	call arg
+	D = TDAT8;
+
+0017	# RLA
+	rla();
+
+0018	# JR   o
+	call jr
+
+0019	# ADD  HL,DE
+	TDAT = HL; TDAT2 = DE;
+	call add16
+	HL = TDAT;
+
+001a	# LD   A,(DE)
+	TADR = DE;
+	call rm
+	A = TDAT8; WZ = DE + 1;
+
+001b	# DEC  DE
+	call nomreq_ir 2
+	DE--;
+
+001c	# INC  E
+	inc(E);
+
+001d	# DEC  E
+	dec(E);
+
+001e	# LD   E,n
+	call arg
+	E = TDAT8;
+
+001f	# RRA
+	rra();
+
+0020	# JR   NZ,o
+	TDAT8 = !(F & ZF);
+	call jr_cond
+
+0021	# LD   HL,w
+	call arg16
+	HL = TDAT;
+
+0022	# LD   (w),HL
+	call arg16
+	m_ea = TDAT; TADR = TDAT; TDAT = HL;
+	call wm16
+	WZ = m_ea + 1;
+
+0023	# INC  HL
+	call nomreq_ir 2
+	HL++;
+
+0024	# INC  H
+	inc(H);
+
+0025	# DEC  H
+	dec(H);
+
+0026	# LD   H,n
+	call arg
+	H = TDAT8;
+
+0027	# DAA
+	daa();
+
+0028	# JR   Z,o
+	TDAT8 = F & ZF;
+	call jr_cond
+
+0029	# ADD  HL,HL
+	TDAT = HL; TDAT2 = HL;
+	call add16
+	HL = TDAT;
+
+002a	# LD   HL,(w)
+	call arg16
+	m_ea = TDAT; TADR = TDAT;
+	call rm16
+	HL = TDAT; WZ = m_ea + 1;
+
+002b	# DEC  HL
+	call nomreq_ir 2
+	HL--;
+
+002c	# INC  L
+	inc(L);
+
+002d	# DEC  L
+	dec(L);
+
+002e	# LD   L,n
+	call arg
+	L = TDAT8;
+
+002f	# CPL
+	A ^= 0xff; set_f((F & (SF | ZF | PF | CF)) | HF | NF | (A & (YF | XF)));
+
+0030	# JR   NC,o
+	TDAT8 = !(F & CF);
+	call jr_cond
+
+0031	# LD   SP,w
+	call arg16
+	SP = TDAT;
+
+0032	# LD   (w),A
+	call arg16
+	m_ea = TDAT; TADR = m_ea; TDAT8 = A;
+	call wm
+	WZ_L = (m_ea + 1) & 0xFF; WZ_H = A;
+
+0033	# INC  SP
+	call nomreq_ir 2
+	SP++;
+
+0034	# INC  (HL)
+	TADR = HL;
+	call rm_reg
+	inc(TDAT8);
+	call wm
+
+0035	# DEC  (HL)
+	TADR = HL;
+	call rm_reg
+	dec(TDAT8);
+	call wm
+
+0036	# LD   (HL),n
+	call arg
+	TADR = HL;
+	call wm
+
+0037	# SCF
+	set_f((F & (SF | ZF | PF)) | CF | (((F & Q) | A) & (YF | XF)));
+
+0038	# JR   C,o
+	TDAT8 = F & CF;
+	call jr_cond
+
+0039	# ADD  HL,SP
+	TDAT = HL; TDAT2 = SP;
+	call add16
+	HL = TDAT;
+
+003a	# LD   A,(w)
+	call arg16
+	m_ea = TDAT; TADR = TDAT;
+	call rm
+	A = TDAT8; WZ = m_ea + 1;
+
+003b	# DEC  SP
+	call nomreq_ir 2
+	SP--;
+
+003c	# INC  A
+	inc(A);
+
+003d	# DEC  A
+	dec(A);
+
+003e	# LD   A,n
+	call arg
+	A = TDAT8;
+
+003f	# CCF
+	set_f(((F & (SF | ZF | PF | CF)) ^ CF) | ((F & CF) << 4) | (((F & Q) | A) & (YF | XF)));
+
+0040	# LD   B,B
+
+0041	# LD   B,C
+	B = C;
+
+0042	# LD   B,D
+	B = D;
+
+0043	# LD   B,E
+	B = E;
+
+0044	# LD   B,H
+	B = H;
+
+0045	# LD   B,L
+	B = L;
+
+0046	# LD   B,(HL)
+	TADR = HL;
+	call rm
+	B = TDAT8;
+
+0047	# LD   B,A
+	B = A;
+
+0048	# LD   C,B
+	C = B;
+
+0049	# LD   C,C
+
+004a	# LD   C,D
+	C = D;
+
+004b	# LD   C,E
+	C = E;
+
+004c	# LD   C,H
+	C = H;
+
+004d	# LD   C,L
+	C = L;
+
+004e	# LD   C,(HL)
+	TADR = HL;
+	call rm
+	C = TDAT8;
+
+004f	# LD   C,A
+	C = A;
+
+0050	# LD   D,B
+	D = B;
+
+0051	# LD   D,C
+	D = C;
+
+0052	# LD   D,D
+
+0053	# LD   D,E
+	D = E;
+
+0054	# LD   D,H
+	D = H;
+
+0055	# LD   D,L
+	D = L;
+
+0056	# LD   D,(HL)
+	TADR = HL;
+	call rm
+	D = TDAT8;
+
+0057	# LD   D,A
+	D = A;
+
+0058	# LD   E,B
+	E = B;
+
+0059	# LD   E,C
+	E = C;
+
+005a	# LD   E,D
+	E = D;
+
+005b	# LD   E,E
+
+005c	# LD   E,H
+	E = H;
+
+005d	# LD   E,L
+	E = L;
+
+005e	# LD   E,(HL)
+	TADR = HL;
+	call rm
+	E = TDAT8;
+
+005f	# LD   E,A
+	E = A;
+
+0060	# LD   H,B
+	H = B;
+
+0061	# LD   H,C
+	H = C;
+
+0062	# LD   H,D
+	H = D;
+
+0063	# LD   H,E
+	H = E;
+
+0064	# LD   H,H
+
+0065	# LD   H,L
+	H = L;
+
+0066	# LD   H,(HL)
+	TADR = HL;
+	call rm
+	H = TDAT8;
+
+0067	# LD   H,A
+	H = A;
+
+0068	# LD   L,B
+	L = B;
+
+0069	# LD   L,C
+	L = C;
+
+006a	# LD   L,D
+	L = D;
+
+006b	# LD   L,E
+	L = E;
+
+006c	# LD   L,H
+	L = H;
+
+006d	# LD   L,L
+
+006e	# LD   L,(HL)
+	TADR = HL;
+	call rm
+	L = TDAT8;
+
+006f	# LD   L,A
+	L = A;
+
+0070	# LD   (HL),B
+	TADR = HL; TDAT = B;
+	call wm
+
+0071	# LD   (HL),C
+	TADR = HL; TDAT = C;
+	call wm
+
+0072	# LD   (HL),D
+	TADR = HL; TDAT = D;
+	call wm
+
+0073	# LD   (HL),E
+	TADR = HL; TDAT = E;
+	call wm
+
+0074	# LD   (HL),H
+	TADR = HL; TDAT = H;
+	call wm
+
+0075	# LD   (HL),L
+	TADR = HL; TDAT = L;
+	call wm
+
+0076	# HALT
+	halt();
+
+0077	# LD   (HL),A
+	TADR = HL; TDAT = A;
+	call wm
+
+0078	# LD   A,B
+	A = B;
+
+0079	# LD   A,C
+	A = C;
+
+007a	# LD   A,D
+	A = D;
+
+007b	# LD   A,E
+	A = E;
+
+007c	# LD   A,H
+	A = H;
+
+007d	# LD   A,L
+	A = L;
+
+007e	# LD   A,(HL)
+	TADR = HL;
+	call rm
+	A = TDAT8;
+
+007f	# LD   A,A
+
+0080	# ADD  A,B
+	add_a(B);
+
+0081	# ADD  A,C
+	add_a(C);
+
+0082	# ADD  A,D
+	add_a(D);
+
+0083	# ADD  A,E
+	add_a(E);
+
+0084	# ADD  A,H
+	add_a(H);
+
+0085	# ADD  A,L
+	add_a(L);
+
+0086	# ADD  A,(HL)
+	TADR = HL;
+	call rm
+	add_a(TDAT8);
+
+0087	# ADD  A,A
+	add_a(A);
+
+0088	# ADC  A,B
+	adc_a(B);
+
+0089	# ADC  A,C
+	adc_a(C);
+
+008a	# ADC  A,D
+	adc_a(D);
+
+008b	# ADC  A,E
+	adc_a(E);
+
+008c	# ADC  A,H
+	adc_a(H);
+
+008d	# ADC  A,L
+	adc_a(L);
+
+008e	# ADC  A,(HL)
+	TADR = HL;
+	call rm
+	adc_a(TDAT8);
+
+008f	# ADC  A,A
+	adc_a(A);
+
+0090	# SUB  B
+	sub(B);
+
+0091	# SUB  C
+	sub(C);
+
+0092	# SUB  D
+	sub(D);
+
+0093	# SUB  E
+	sub(E);
+
+0094	# SUB  H
+	sub(H);
+
+0095	# SUB  L
+	sub(L);
+
+0096	# SUB  (HL)
+	TADR = HL;
+	call rm
+	sub(TDAT8);
+
+0097	# SUB  A
+	sub(A);
+
+0098	# SBC  A,B
+	sbc_a(B);
+
+0099	# SBC  A,C
+	sbc_a(C);
+
+009a	# SBC  A,D
+	sbc_a(D);
+
+009b	# SBC  A,E
+	sbc_a(E);
+
+009c	# SBC  A,H
+	sbc_a(H);
+
+009d	# SBC  A,L
+	sbc_a(L);
+
+009e	# SBC  A,(HL)
+	TADR = HL;
+	call rm
+	sbc_a(TDAT8);
+
+009f	# SBC  A,A
+	sbc_a(A);
+
+00a0	# AND  B
+	and_a(B);
+
+00a1	# AND  C
+	and_a(C);
+
+00a2	# AND  D
+	and_a(D);
+
+00a3	# AND  E
+	and_a(E);
+
+00a4	# AND  H
+	and_a(H);
+
+00a5	# AND  L
+	and_a(L);
+
+00a6	# AND  (HL)
+	TADR = HL;
+	call rm
+	and_a(TDAT8);
+
+00a7	# AND  A
+	and_a(A);
+
+00a8	# XOR  B
+	xor_a(B);
+
+00a9	# XOR  C
+	xor_a(C);
+
+00aa	# XOR  D
+	xor_a(D);
+
+00ab	# XOR  E
+	xor_a(E);
+
+00ac	# XOR  H
+	xor_a(H);
+
+00ad	# XOR  L
+	xor_a(L);
+
+00ae	# XOR  (HL)
+	TADR = HL;
+	call rm
+	xor_a(TDAT8);
+
+00af	# XOR  A
+	xor_a(A);
+
+00b0	# OR   B
+	or_a(B);
+
+00b1	# OR   C
+	or_a(C);
+
+00b2	# OR   D
+	or_a(D);
+
+00b3	# OR   E
+	or_a(E);
+
+00b4	# OR   H
+	or_a(H);
+
+00b5	# OR   L
+	or_a(L);
+
+00b6	# OR   (HL)
+	TADR = HL;
+	call rm
+	or_a(TDAT8);
+
+00b7	# OR   A
+	or_a(A);
+
+00b8	# CP   B
+	cp(B);
+
+00b9	# CP   C
+	cp(C);
+
+00ba	# CP   D
+	cp(D);
+
+00bb	# CP   E
+	cp(E);
+
+00bc	# CP   H
+	cp(H);
+
+00bd	# CP   L
+	cp(L);
+
+00be	# CP   (HL)
+	TADR = HL;
+	call rm
+	cp(TDAT8);
+
+00bf	# CP   A
+	cp(A);
+
+00c0	# RET  NZ
+	TDAT8 = !(F & ZF);
+	call ret_cond
+
+00c1	# POP  BC
+	call pop
+	BC = TDAT;
+
+00c2	# JP   NZ,a
+	TDAT8 = !(F & ZF);
+	call jp_cond
+
+00c3	# JP   a
+	call jp
+
+00c4	# CALL NZ,a
+	TDAT8 = !(F & ZF);
+	call call_cond
+
+00c5	# PUSH BC
+	TDAT = BC;
+	call push
+
+00c6	# ADD  A,n
+	call arg
+	add_a(TDAT8);
+
+00c7	# RST  0
+	call rst 0x00
+
+00c8	# RET  Z
+	TDAT8 = (F & ZF);
+	call ret_cond
+
+00c9	# RET
+	call pop
+	PC = TDAT; WZ = PCD;
+
+00ca	# JP   Z,a
+	TDAT8 = F & ZF;
+	call jp_cond
+
+00cb	# **** CB xx
+	call rop
+	call jump_prefixed 0xcb
+
+00cc	# CALL Z,a
+	TDAT8 = F & ZF;
+	call call_cond
+
+00cd	# CALL a
+	call arg16_call
+
+00ce	# ADC  A,n
+	call arg
+	adc_a(TDAT8);
+
+00cf	# RST  1
+	call rst 0x08
+
+00d0	# RET  NC
+	TDAT8 = !(F & CF);
+	call ret_cond
+
+00d1	# POP  DE
+	call pop
+	DE = TDAT;
+
+00d2	# JP   NC,a
+	TDAT8 = !(F & CF);
+	call jp_cond
+
+00d3	# OUT  (n),A
+	call arg
+	TADR = TDAT8 | (A << 8); TDAT = A;
+	call out
+	WZ_L = ((TADR & 0xff) + 1) & 0xff;  WZ_H = A;
+
+00d4	# CALL NC,a
+	TDAT8 = !(F & CF);
+	call call_cond
+
+00d5	# PUSH DE
+	TDAT = DE;
+	call push
+
+00d6	# SUB  n
+	call arg
+	sub(TDAT8);
+
+00d7	# RST  2
+	call rst 0x10
+
+00d8	# RET  C
+	TDAT8 = (F & CF);
+	call ret_cond
+
+00d9	# EXX
+	exx();
+
+00da	# JP   C,a
+	TDAT8 = F & CF;
+	call jp_cond
+
+00db	# IN   A,(n)
+	call arg
+	TADR = TDAT8 | (A << 8);
+	call in
+	A = TDAT8; WZ = TADR + 1;
+
+00dc	# CALL C,a
+	TDAT8 = F & CF;
+	call call_cond
+
+00dd	# **** DD xx
+	call rop
+	call jump_prefixed 0xdd
+
+00de	# SBC  A,n
+	call arg
+	sbc_a(TDAT8);
+
+00df	# RST  3
+	call rst 0x18
+
+00e0	# RET  PO
+	TDAT8 = !(F & PF);
+	call ret_cond
+
+00e1	# POP  HL
+	call pop
+	HL = TDAT;
+
+00e2	# JP   PO,a
+	TDAT8 = !(F & PF);
+	call jp_cond
+
+00e3	# EX   HL,(SP)
+	TDAT = HL;
+	call ex_sp
+	HL = TDAT;
+
+00e4	# CALL PO,a
+	TDAT8 = !(F & PF);
+	call call_cond
+
+00e5	# PUSH HL
+	TDAT = HL;
+	call push
+
+00e6	# AND  n
+	call arg
+	and_a(TDAT8);
+
+00e7	# RST  4
+	call rst 0x20
+
+00e8	# RET  PE
+	TDAT8 = (F & PF);
+	call ret_cond
+
+00e9	# JP   (HL)
+	PC = HL;
+
+00ea	# JP   PE,a
+	TDAT8 = F & PF;
+	call jp_cond
+
+00eb	# EX   DE,HL
+	using std::swap; swap(DE, HL);
+
+00ec	# CALL PE,a
+	TDAT8 = F & PF;
+	call call_cond
+
+00ed	# **** ED xx
+	call rop
+	call jump_prefixed 0xed
+
+00ee	# XOR  n
+	call arg
+	xor_a(TDAT8);
+
+00ef	# RST  5
+	call rst 0x28
+
+00f0	# RET  P
+	TDAT8 = !(F & SF);
+	call ret_cond
+
+00f1	# POP  AF
+	call pop
+	AF = TDAT;
+
+00f2	# JP   P,a
+	TDAT8 = !(F & SF);
+	call jp_cond
+
+00f3	# DI
+	m_iff1 = m_iff2 = 0;
+
+00f4	# CALL P,a
+	TDAT8 = !(F & SF);
+	call call_cond
+
+00f5	# PUSH AF
+	TDAT = AF;
+	call push
+
+00f6	# OR   n
+	call arg
+	or_a(TDAT8);
+
+00f7	# RST  6
+	call rst 0x30
+
+00f8	# RET  M
+	TDAT8 = (F & SF);
+	call ret_cond
+
+00f9	# LD   SP,HL
+	call nomreq_ir 2
+	SP = HL;
+
+00fa	# JP   M,a
+	TDAT8 = F & SF;
+	call jp_cond
+
+00fb	# EI
+	ei();
+
+00fc	# CALL M,a
+	TDAT8 = F & SF;
+	call call_cond
+
+00fd	# **** FD xx
+	call rop
+	call jump_prefixed 0xfd
+
+00fe	# CP   n
+	call arg
+	cp(TDAT8);
+
+00ff	# RST  7
+	call rst 0x38
+
+
+##########################################################
+# Z80N
+##########################################################
+macro   ldix
+	{
+		TADR = HL;
+		call rm
+		if (TDAT8 != A) {
+			TADR = DE;
+			call wm
+			;
+		}
+		HL++;
+		DE++;
+		BC--;
+	}
+
+macro   lddx
+	{
+		TADR = HL;
+		call rm
+		if (TDAT8 != A) {
+			TADR = DE;
+			call wm
+			;
+		}
+		DE++;
+		HL--;
+		BC--;
+	}
+
+z80n:ed23	# swapnib
+	A = (A << 4) | (A >> 4);
+
+z80n:ed24	# mirror a
+	A = bitswap<8>(A, 0, 1, 2, 3, 4, 5, 6, 7);
+
+z80n:ed27	# test *
+	TDAT_H = A;
+	call arg
+	and_a(TDAT8);
+	A = TDAT_H;
+
+z80n:ed28	# bsla de,b
+	DE <<= std::min(B & 31, 16);
+
+z80n:ed29	# bsra de,b
+	{
+		const u16 fill = (DE & 0x8000) ? ~u16(0) : u16(0);
+		DE = (DE >> std::min(B & 31, 16)) | (fill << (16 - std::min(B & 31, 16)));
+	}
+
+z80n:ed2a	# bsrl de,b
+	DE >>= std::min(B & 31, 16);
+
+z80n:ed2b	# bsrf de,b
+	DE = (DE >> std::min(B & 31, 16)) | (~u16(0) << (16 - std::min(B & 31, 16)));
+
+z80n:ed2c	# brlc de,b
+	DE = (DE << (B & 15)) | (DE >> (16 - (B & 15)));
+
+z80n:ed30	# mul d,e
+	DE = D * E;
+
+z80n:ed31	# add hl,a
+	HL += A;
+
+z80n:ed32	# add de,a
+	DE += A;
+
+z80n:ed33	# add bc,a
+	BC += A;
+
+z80n:ed34	# add hl,**
+	call arg16
+	HL += TDAT;
+
+z80n:ed35	# add de,**
+	call arg16
+	DE += TDAT;
+
+z80n:ed36	# add bc,**
+	call arg16
+	BC += TDAT;
+
+z80n:ed8a	# push **
+	call arg16
+	using std::swap; swap(TDAT_H, TDAT_L);
+	call push
+
+z80n:ed90	# outinb
+	TADR = HL;
+	call rm
+	TADR = BC;
+	call out
+	HL++;
+
+z80n:ed91	# nextreg *,*
+	call arg16
+	m_out_nextreg_cb(TDAT_L, TDAT_H);
+
+z80n:ed92	# nextreg *,a
+	call arg
+	m_out_nextreg_cb(TDAT8, A);
+
+z80n:ed93	# pixeldn
+	if (0x07 != (H & 0x07))
+		HL = HL + 0x100;
+	else if (0xe0 != (L & 0xe0))
+		HL = (HL & 0xf8ff) + 0x20;
+	else
+		HL = (HL & 0xf81f) + 0x800;
+
+z80n:ed94	# pixelad
+	HL = 0x4000 + ((D & 0xc0) << 5) + ((D & 0x07) << 8) + ((D & 0x38) << 2) + (E >> 3);
+
+z80n:ed95	# setae
+	A = 0x80 >> (E & 7);
+
+z80n:ed98	# jp (c)
+	TADR = BC;
+	call in
+	PCD = (PCD & 0xc000) + (TDAT8 << 6);
+
+z80n:eda4	# ldix
+	call ldix
+
+z80n:eda5	# ldws
+	TADR = HL;
+	call rm
+	TADR = DE;
+	call wm
+	L++;
+	inc(D);
+
+z80n:edac	# lddx
+	call lddx
+
+z80n:edb4	# ldirx
+	call ldix
+	if (BC != 0)
+		PC -= 2;
+
+z80n:edb7	# ldpirx
+	TADR = (HL & 0xfff8) + (E & 7);
+	call rm
+	if (TDAT8 != A) {
+		TADR = DE;
+		call wm
+		;
+	}
+	DE++;
+	BC--;
+	if (BC != 0)
+		PC -= 2;
+
+z80n:edbc	# lddrx
+	call lddx
+	if (BC != 0)
+		PC -= 2;

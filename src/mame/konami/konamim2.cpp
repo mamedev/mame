@@ -1268,8 +1268,8 @@ ROM_START( heatof11 )
 
 	DISK_REGION( "ata:0:cr589" )
 	/* Ring codes found on the disc:
-          703EAA02 PN.0000046809  1 + + + + +  IFPI L251
-          IFPI 42MO */
+	      703EAA02 PN.0000046809  1 + + + + +  IFPI L251
+	      IFPI 42MO */
 	DISK_IMAGE_READONLY( "703eaa02", 0, SHA1(f8a87eacfdbbd22659f39c7a72e3895f0a7697b7) )
 ROM_END
 

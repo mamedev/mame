@@ -485,4 +485,4 @@ void chanbara_state::init_chanbara()
 } // Anonymous namespace
 
 
-GAME( 1985, chanbara, 0, chanbara, chanbara, chanbara_state, init_chanbara, ROT270, "Data East", "Chanbara", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1985, chanbara, 0, chanbara, chanbara, chanbara_state, init_chanbara, ROT270, "Data East Corporation", "Chanbara (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // title & flyer suggests "Chan Bara" but it's actually チャンバラ

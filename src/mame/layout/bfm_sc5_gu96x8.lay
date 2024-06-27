@@ -52,7 +52,7 @@ license:CC0
 
 	<element name="SteppersReel2" defstate="0">
 		<reel stateoffset="682" symbollist="Fruit1,Fruit2,Fruit3,Fruit4,Fruit5,Fruit6,Fruit7,Fruit8,Fruit9,Fruit10,Fruit11,Fruit12,Fruit13,Fruit14,Fruit15,Fruit16">
-			"<color red="1.0" green="1.0" blue="1.0" />
+			<color red="1.0" green="1.0" blue="1.0" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</reel>
 	</element>
@@ -254,7 +254,7 @@ license:CC0
 			<param name="p" start="0" increment="40"/>
 			<param name="b" start="180" increment="22"/>
 			<repeat count="5">
-				<param name="s" start="~p~" incrment="8"/>
+				<param name="s" start="~p~" increment="8"/>
 				<param name="x" start="~b~" increment="4"/>
 				<repeat count="8">
 					<param name="n" start="~s~" increment="1"/>
@@ -270,7 +270,7 @@ license:CC0
 		<!-- the rest of the elements tend to be used for 7-segs
 		    so render them as both -->
 		<repeat count="12">
-			<param name="s" start="160" incrment="8"/>
+			<param name="s" start="160" increment="8"/>
 			<param name="x" start="280" increment="4"/>
 			<repeat count="8">
 				<param name="n" start="~s~" increment="1"/>

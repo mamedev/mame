@@ -199,9 +199,19 @@ void atapi_cdrom_device::ExecCommand()
 	}
 	t10mmc::ExecCommand();
 
-	// truckk requires seek complete flag to be set after calling the SEEK command
-	// so set the seek complete status flag after a successful request to emulate
-	// having asked the device itself to seek
-	if (command[0] == T10SBC_CMD_SEEK_10 && m_status_code == SCSI_STATUS_CODE_GOOD)
-		m_status |= IDE_STATUS_DSC;
+	if (m_status_code == SCSI_STATUS_CODE_GOOD)
+	{
+		switch (command[0])
+		{
+			// Set the DSC (Drive Seek Complete) bit on commands that involve a drive seek.
+			// truckk is known to rely on this flag being set after T10SBC_CMD_SEEK_10.
+			case T10SBC_CMD_SEEK_10:
+			case T10MMC_CMD_PLAY_AUDIO_10:
+			case T10MMC_CMD_PLAY_AUDIO_12:
+			case T10MMC_CMD_PLAY_AUDIO_MSF:
+			case T10MMC_CMD_PLAY_AUDIO_TRACK_INDEX:
+				m_status |= IDE_STATUS_DSC;
+				break;
+		}
+	}
 }
