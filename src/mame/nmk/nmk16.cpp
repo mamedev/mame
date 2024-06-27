@@ -3814,17 +3814,20 @@ LV4         LV2 LV1        LV1
 
  CPU is stopped during DMA
 
+ - 1 line   = 1 / (6MHz / 384 px) =    64 usec
+ - 1 frame  = 278 lines * 64 usec = 17792 usec
+ - VBlank   =  54 lines * 64 usec =  3456 usec
+ - Active   = 224 lines * 64 usec = 14336 usec
+ - IRQ1 gap = 128 lines * 64 usec =  8192 usec
  */
 
-// todo:total scanlines is 263, adjust according to that!
-// todo: replace with raw screen timings
 TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 {
-	const int NUM_SCANLINES = 256;
-	const int IRQ1_SCANLINE = 25; // guess
-	const int VBIN_SCANLINE = 0;
-	const int VBOUT_SCANLINE = 240;
-	const int SPRDMA_SCANLINE = 241; // 256 USEC after VBOUT
+	const int VBIN_SCANLINE = 16;
+	const int VBOUT_SCANLINE = VBIN_SCANLINE + 224;    // VBIN + 224 lines high of active video
+	const int SPRDMA_SCANLINE = VBOUT_SCANLINE + 4;    // 256 usec after VBOUT = 4 lines (each line is 64 USEC)
+	const int IRQ1_SCANLINE_1 = VBIN_SCANLINE + 52;    // 52 lines after VBIN and 68 from the start of frame
+	const int IRQ1_SCANLINE_2 = IRQ1_SCANLINE_1 + 128; // 128 lines after IRQ1_SCANLINE_1
 
 	int scanline = param;
 
@@ -3839,12 +3842,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 	if (scanline == VBIN_SCANLINE)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	// time from IRQ2 to first IRQ1 fire. is not stated, 25 is a guess
-	if (scanline == IRQ1_SCANLINE)
+	// time from IRQ2 to first IRQ1 fire
+	if (scanline == IRQ1_SCANLINE_1)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
-	// 8.9ms from first IRQ1 to second IRQ1 fire. approx 128 lines (half frame time)
-	if (scanline == IRQ1_SCANLINE+(NUM_SCANLINES/2)) // if this happens too late bioship sprites will glitch on the left edge
+	// 8.192ms from first IRQ1 to second IRQ1 fire. 128 lines
+	if (scanline == IRQ1_SCANLINE_2) // if this happens too late bioship sprites will glitch on the left edge
 		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
@@ -3864,32 +3867,33 @@ void nmk16_state::set_hacky_interrupt_timing(machine_config &config)
 void nmk16_state::set_hacky_screen_lowres(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	//m_screen->set_raw(XTAL(12'000'000)/2, 384, 0, 256, 278, 16, 240); // confirmed
-	m_screen->set_refresh_hz(56.18);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3450));
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(XTAL(12'000'000)/2, 384, 92, 348, 278, 16, 240); // confirmed
+	//m_screen->set_refresh_hz(56.18);
+	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3450));
+	//m_screen->set_size(256, 256);
+	//m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_palette(m_palette);
 
 	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(12'000'000)/2);
-	m_spritegen->set_screen_size(384, 256);
+	m_spritegen->set_screen_size(92+348, 16+240);
 	m_spritegen->set_max_sprite_clock(384 * 263); // from hardware manual
+	m_spritegen->set_videoshift(92);
 }
 
 void nmk16_state::set_hacky_screen_hires(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	//m_screen->set_raw(XTAL(16'000'000)/2, 512, 0, 384, 278, 16, 240); // confirmed
-	m_screen->set_refresh_hz(56.18);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3450));
-	m_screen->set_size(512, 256);
-	m_screen->set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(XTAL(16'000'000)/2, 512, 28, 412, 278, 16, 240); // confirmed
+	//m_screen->set_refresh_hz(56.18);
+	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3450));
+	//m_screen->set_size(512, 256);
+	//m_screen->set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
 	m_screen->set_palette(m_palette);
 
 	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(16'000'000)/2);
-	m_spritegen->set_screen_size(384, 256);
-	m_spritegen->set_max_sprite_clock(512 * 263); // not verified?
-	m_spritegen->set_videoshift(64);
+	m_spritegen->set_screen_size(28+412, 16+240);
+	m_spritegen->set_max_sprite_clock(384 * 263); // not verified?
+	m_spritegen->set_videoshift(28+64);
 }
 
 // OSC : 10MHz, 12MHz, 4MHz, 4.9152MHz

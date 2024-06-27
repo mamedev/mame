@@ -106,6 +106,8 @@ VIDEO_START_MEMBER(nmk16_state, bioship)
 	video_init();
 	m_bioship_background_bank=0;
 	save_item(NAME(m_bioship_background_bank));
+	m_bg_tilemap[0]->set_scrolldx(92, 92);
+	m_tx_tilemap->set_scrolldx(92, 92);
 }
 
 VIDEO_START_MEMBER(nmk16_state,macross)
@@ -117,6 +119,8 @@ VIDEO_START_MEMBER(nmk16_state,macross)
 	m_tx_tilemap->set_transparent_pen(15);
 
 	video_init();
+	m_bg_tilemap[0]->set_scrolldx(92, 92);
+	m_tx_tilemap->set_scrolldx(92, 92);
 }
 
 VIDEO_START_MEMBER(nmk16_state,strahl)
@@ -138,8 +142,8 @@ VIDEO_START_MEMBER(nmk16_state,macross2)
 
 	video_init();
 	// 384x224 screen, leftmost 64 pixels have to be retrieved from the other side of the tilemap (!)
-	m_bg_tilemap[0]->set_scrolldx(64,64);
-	m_tx_tilemap->set_scrolldx(64,64);
+	m_bg_tilemap[0]->set_scrolldx(28+64, 28+64);
+	m_tx_tilemap->set_scrolldx(28+64, 28+64);
 }
 
 VIDEO_START_MEMBER(nmk16_state,gunnail)
@@ -155,7 +159,7 @@ VIDEO_START_MEMBER(nmk16_state, bjtwin)
 
 	video_init();
 	// 384x224 screen, leftmost 64 pixels have to be retrieved from the other side of the tilemap (!)
-	m_bg_tilemap[0]->set_scrolldx(64,64);
+	m_bg_tilemap[0]->set_scrolldx(28+64, 28+64);
 }
 
 void nmk16_state::mustang_scroll_w(u16 data)
