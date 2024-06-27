@@ -9116,19 +9116,19 @@ ROM_END
 ***************************************************************************/
 
 
-GAME( 1989, tharrier,   0,        tharrier,     tharrier,     nmk16_state,        init_tharrier,        ROT270, "UPL",                          "Task Force Harrier", 0 )
-GAME( 1989, tharrieru,  tharrier, tharrier,     tharrier,     nmk16_state,        init_tharrier,        ROT270, "UPL (American Sammy license)", "Task Force Harrier (US)", 0 ) // US version but no regional notice
+GAME( 1989, tharrier,   0,        tharrier,     tharrier,     nmk16_state,        init_tharrier,        ROT270, "UPL",                          "Task Force Harrier", MACHINE_NO_COCKTAIL )
+GAME( 1989, tharrieru,  tharrier, tharrier,     tharrier,     nmk16_state,        init_tharrier,        ROT270, "UPL (American Sammy license)", "Task Force Harrier (US)", MACHINE_NO_COCKTAIL ) // US version but no regional notice
 
 GAME( 1990, mustang,    0,        mustang,      mustang,      nmk16_state,        empty_init,           ROT0,   "UPL",                          "US AAF Mustang (25th May. 1990)", 0 )
 GAME( 1990, mustangs,   mustang,  mustang,      mustang,      nmk16_state,        empty_init,           ROT0,   "UPL (Seoul Trading license)",  "US AAF Mustang (25th May. 1990 / Seoul Trading)", 0 )
 
-GAME( 1990, bioship,    0,        bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL (American Sammy license)", "Bio-ship Paladin", 0 ) // US version but no regional notice
-GAME( 1990, sbsgomo,    bioship,  bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL",                          "Space Battle Ship Gomorrah", 0 )
+GAME( 1990, bioship,    0,        bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL (American Sammy license)", "Bio-ship Paladin", MACHINE_NO_COCKTAIL ) // US version but no regional notice
+GAME( 1990, sbsgomo,    bioship,  bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL",                          "Space Battle Ship Gomorrah", MACHINE_NO_COCKTAIL )
 
-GAME( 1990, vandyke,    0,        vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL",                          "Vandyke (Japan)", 0 )
-GAME( 1990, vandykejal, vandyke,  vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 1)", 0 )
-GAME( 1990, vandykejal2,vandyke,  vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 2)", 0 )
-GAME( 1990, vandykeb,   vandyke,  vandykeb,     vandykeb,     nmk16_state,        init_vandykeb,        ROT270, "bootleg",                      "Vandyke (bootleg with PIC16c57)",  MACHINE_NO_SOUND )
+GAME( 1990, vandyke,    0,        vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL",                          "Vandyke (Japan)", MACHINE_NO_COCKTAIL )
+GAME( 1990, vandykejal, vandyke,  vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 1)", MACHINE_NO_COCKTAIL )
+GAME( 1990, vandykejal2,vandyke,  vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 2)", MACHINE_NO_COCKTAIL )
+GAME( 1990, vandykeb,   vandyke,  vandykeb,     vandykeb,     nmk16_state,        init_vandykeb,        ROT270, "bootleg",                      "Vandyke (bootleg with PIC16c57)",  MACHINE_NO_COCKTAIL | MACHINE_NO_SOUND )
 
 GAME( 1991, blkheart,   0,        blkheart,     blkheart,     nmk16_state,        empty_init,           ROT0,   "UPL",                          "Black Heart", 0 )
 GAME( 1991, blkheartj,  blkheart, blkheart,     blkheart,     nmk16_state,        empty_init,           ROT0,   "UPL",                          "Black Heart (Japan)", 0 )
@@ -9153,32 +9153,32 @@ GAME( 1993, gunnail,    0,        gunnail_prot, gunnail,      macross_prot_state
 GAME( 1992, gunnailp,   gunnail,  gunnail_prot, gunnail,      macross_prot_state, empty_init,           ROT270, "NMK",                          "GunNail (location test)", 0 ) // still has the 28th May. 1992 string, so unlikely that was the release date for either version.
 // a 1992 version of Gunnail exists, see https://www.youtube.com/watch?v=tf15Wz0zUiA  3:10; is this bootleg version 'gunnailb'?
 
-GAME( 1993, macross2,   0,        macross2,     macross2,     nmk16_state,        init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", MACHINE_NO_COCKTAIL )
-GAME( 1993, macross2g,  macross2, macross2,     macross2,     nmk16_state,        init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II (Gamest review build)", MACHINE_NO_COCKTAIL ) // Service switch pauses game
-GAME( 1993, macross2k,  macross2, macross2,     macross2,     nmk16_state,        init_banked_audiocpu, ROT0,   "Banpresto",                    "Macross II (Korea)", MACHINE_NO_COCKTAIL ) // Title screen only shows Macross II
+GAME( 1993, macross2,   0,        macross2,     macross2,     nmk16_state,        init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", 0 )
+GAME( 1993, macross2g,  macross2, macross2,     macross2,     nmk16_state,        init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II (Gamest review build)", 0 ) // Service switch pauses game
+GAME( 1993, macross2k,  macross2, macross2,     macross2,     nmk16_state,        init_banked_audiocpu, ROT0,   "Banpresto",                    "Macross II (Korea)", 0 ) // Title screen only shows Macross II
 
-GAME( 1993, tdragon2,   0,        tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", MACHINE_NO_COCKTAIL )
-GAME( 1993, tdragon2a,  tdragon2, tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bigbang,    tdragon2, tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993, set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bigbanga,   tdragon2, tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993, set 2)", MACHINE_NO_COCKTAIL )
-GAME( 1996, tdragon3h,  tdragon2, tdragon3h,    tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "bootleg (Conny Co Ltd.)",      "Thunder Dragon 3 (bootleg of Thunder Dragon 2)", MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL ) // based on 1st Oct. 1993 set, needs emulation of the mechanism used to simulate the missing YM2203' IRQs
+GAME( 1993, tdragon2,   0,        tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", 0 )
+GAME( 1993, tdragon2a,  tdragon2, tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", 0 )
+GAME( 1993, bigbang,    tdragon2, tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993, set 1)", 0 )
+GAME( 1993, bigbanga,   tdragon2, tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993, set 2)", 0 )
+GAME( 1996, tdragon3h,  tdragon2, tdragon3h,    tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "bootleg (Conny Co Ltd.)",      "Thunder Dragon 3 (bootleg of Thunder Dragon 2)", MACHINE_NO_SOUND | 0 ) // based on 1st Oct. 1993 set, needs emulation of the mechanism used to simulate the missing YM2203' IRQs
 
 GAME( 1994, arcadian,   0,        raphero,      raphero,      nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Arcadia (NMK)", 0 ) // 23rd July 1993 in test mode, (c)1994 on title screen
 GAME( 1994, raphero,    arcadian, raphero,      raphero,      nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Rapid Hero (NMK)", 0 )           // ^^
 GAME( 1994, rapheroa,   arcadian, raphero,      raphero,      nmk16_state,        init_banked_audiocpu, ROT270, "NMK (Media Trading license)",  "Rapid Hero (Media Trading)", 0 ) // ^^ - note that all ROM sets have Media Trading(aka Media Shoji) in the tile graphics, but this is the only set that shows it on the titlescreen
 
 // both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate
-GAME( 1992, sabotenb,   0,        bjtwin_prot, sabotenb,      macross_prot_state, empty_init,           ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1992, sabotenba,  sabotenb, bjtwin_prot, sabotenb,      macross_prot_state, empty_init,           ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", MACHINE_NO_COCKTAIL )
-GAME( 1992, cactus,     sabotenb, bjtwin,      sabotenb,      nmk16_state,        init_nmk,             ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", MACHINE_NO_COCKTAIL ) // PCB marked 'Cactus', no title screen
+GAME( 1992, sabotenb,   0,        bjtwin_prot, sabotenb,      macross_prot_state, empty_init,           ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", 0 )
+GAME( 1992, sabotenba,  sabotenb, bjtwin_prot, sabotenb,      macross_prot_state, empty_init,           ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", 0 )
+GAME( 1992, cactus,     sabotenb, bjtwin,      sabotenb,      nmk16_state,        init_nmk,             ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", 0 ) // PCB marked 'Cactus', no title screen
 
-GAME( 1993, bjtwin,     0,        bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bjtwina,    bjtwin,   bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (set 2)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bjtwinp,    bjtwin,   bjtwin,      bjtwin,        nmk16_state,        empty_init,           ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 1)", MACHINE_NO_COCKTAIL ) // Cheap looking PCB, but Genuine NMK PCB, GFX aren't encrypted (maybe Korean version not proto?)
-GAME( 1993, bjtwinpa,   bjtwin,   bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 2)", MACHINE_NO_COCKTAIL ) // same PCB as above, different program revision, GFX are encrypted
+GAME( 1993, bjtwin,     0,        bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (set 1)", 0 )
+GAME( 1993, bjtwina,    bjtwin,   bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (set 2)", 0 )
+GAME( 1993, bjtwinp,    bjtwin,   bjtwin,      bjtwin,        nmk16_state,        empty_init,           ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 1)", 0 ) // Cheap looking PCB, but Genuine NMK PCB, GFX aren't encrypted (maybe Korean version not proto?)
+GAME( 1993, bjtwinpa,   bjtwin,   bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 2)", 0 ) // same PCB as above, different program revision, GFX are encrypted
 
-GAME( 1995, nouryoku,   0,        bjtwin_prot, nouryoku,      macross_prot_state, empty_init,           ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai", MACHINE_NO_COCKTAIL )
-GAME( 1995, nouryokup,  nouryoku, bjtwin,      nouryoku,      nmk16_state,        empty_init,           ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai (prototype)", MACHINE_NO_COCKTAIL ) // GFX aren't encrypted
+GAME( 1995, nouryoku,   0,        bjtwin_prot, nouryoku,      macross_prot_state, empty_init,           ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai", 0 )
+GAME( 1995, nouryokup,  nouryoku, bjtwin,      nouryoku,      nmk16_state,        empty_init,           ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai (prototype)", 0 ) // GFX aren't encrypted
 
 // Non NMK boards
 
