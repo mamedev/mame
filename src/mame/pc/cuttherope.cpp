@@ -3,6 +3,9 @@
 /***********************************************************************************************************
 
 Skeleton driver for "Cut The Rope", by Innovative Concepts in Entertainment, Inc. (ICE).
+Redemption game with a vertical touch sceen and ticket payout, from 2016.
+ICE also produced a "Cut the Rope" electromechanical crane arcade machine in 2013, with a suction
+cup rather than a claw.
 
 Standard PC with Intel DH61CR motherboard (IT8892E PCIe to PCI Bridge, Nuvoton W83677HG-i Super I/O, etc.):
 -Unknown RAM, unknown exact CPU type.
@@ -10,7 +13,7 @@ Standard PC with Intel DH61CR motherboard (IT8892E PCIe to PCI Bridge, Nuvoton W
 
 And an external PCB for I/O, connected by USB to the motherboard:
 -ColdFire MCF51JM32VLK.
--Two 8 dip switches banks.
+-Two banks of 8 DIP switches.
 
 ***********************************************************************************************************/
 
@@ -34,6 +37,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+
 	void cuttherope_io(address_map &map);
 	void cuttherope_map(address_map &map);
 };
@@ -75,4 +79,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(2003, cuttherope, 0, cuttherope, cuttherope, cuttherope_state, empty_init, ROT90, "ICE", "Cut The Rope", MACHINE_IS_SKELETON )
+GAME(2016, cuttherope, 0, cuttherope, cuttherope, cuttherope_state, empty_init, ROT90, "ICE", "Cut The Rope", MACHINE_IS_SKELETON )
