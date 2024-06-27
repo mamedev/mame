@@ -421,6 +421,7 @@ void ncr5385_device::cmd_w(u8 data)
 		case 0x18: case 0x19: case 0x1a: case 0x1b:
 		case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 			// reserved
+			LOGMASKED(LOG_COMMAND, "reserved / invalid cmd\n");
 			m_int_status |= INT_INVALID_CMD;
 			update_int();
 			break;
@@ -816,7 +817,9 @@ void ncr5385_device::set_dreq(bool dreq)
 
 void ncr5385_device::update_int()
 {
-	bool const int_state = m_int_status & 0x5f;
+	bool const int_state = m_int_status & (INT_FUNC_COMPLETE | INT_BUS_SERVICE |
+																				INT_DISCONNECTED | INT_SELECTED |
+																				INT_RESELECTED |INT_INVALID_CMD);
 
 	if (m_int_state != int_state)
 	{
