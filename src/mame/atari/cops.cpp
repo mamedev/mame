@@ -16,9 +16,11 @@
 	COPS, Street Viper and all other Nova Productions laserdisc games run on forms of this
 	hardware.
 
-    NOTES: To first boot up Revelations, turn the refill key (R) and press button A
-    to init NVRAM.
-
+    NOTES: To init NVRAM on Revelations at first boot, turn the refill key (R) and press any button.
+    A and B adjust date/time (clock is not Y2K compliant), C selects. 
+	Once the clock is running,	press Collect or Continue.
+    Let it boot up to REFILL mode, and then turn the refill key off.
+ 
     TODO: There are probably more ROMs for Revelations and related, the disc
     contains full data for a non-payout US release of the game called 'Vision Quest'.
     However, the Vision Quest Laserdisc for the USA is slightly different, with 
