@@ -818,7 +818,8 @@ void ncr5385_device::set_dreq(bool dreq)
 void ncr5385_device::update_int()
 {
 	bool const int_state = m_int_status & (INT_FUNC_COMPLETE | INT_BUS_SERVICE |
-			INT_DISCONNECTED | INT_SELECTED | INT_RESELECTED | INT_INVALID_CMD);
+																				INT_DISCONNECTED | INT_SELECTED |
+																				INT_RESELECTED |INT_INVALID_CMD);
 
 	if (m_int_state != int_state)
 	{
