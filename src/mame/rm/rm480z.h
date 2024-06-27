@@ -42,7 +42,8 @@ public:
 		m_maincpu(*this, RM480Z_MAINCPU_TAG),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_messram(*this, RAM_TAG),
+		m_ram(*this, RAM_TAG),
+		m_bank(*this, "bank%u", 1U),
 		m_ctc(*this, "ctc"),
 		m_sio(*this, "sio"),
 		m_rs232(*this, "rs232"),
@@ -113,7 +114,8 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<ram_device> m_messram;
+	required_device<ram_device> m_ram;
+	required_memory_bank_array<4> m_bank;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80sio_device> m_sio;
 	required_device<rs232_port_device> m_rs232;

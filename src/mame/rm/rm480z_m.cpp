@@ -45,16 +45,31 @@ void rm480z_state::vblank_callback(screen_device &screen, bool vblank_state)
 
 void rm480z_state::control_port_write(offs_t offset, uint8_t data)
 {
-	switch (offset)
+	switch (offset & 0xff)
 	{
 	case 0:
+	{
+		int bank = (offset & 0x0300) >> 8;
+		uint8_t* ram = m_ram->pointer();
+		m_bank[bank]->set_base(ram + 0x4000 * (data & 0x0f));
 		break;
+	}
 	case 1:
+	{
+		int page = data & 0x03;
+		if (page == 3)
+		{
+			// page 3 is all RAM (no ROM)
+			m_view.disable();
+		}
+		else
+		{
+			m_view.select(page);
+		}
 		m_kbd_reset = !BIT(data, 6);
-		m_view.select(data & 0x03);
 		break;
+	}
 	case 2:
-		printf("control port write %d: %d\n", offset, data);
 		m_speaker->level_w(BIT(data, 5));
 		m_alt_char_set = BIT(data, 6);
 		m_videomode = BIT(data, 7) ? RM480Z_VIDEOMODE_80COL : RM480Z_VIDEOMODE_40COL;
@@ -70,7 +85,7 @@ uint8_t rm480z_state::status_port_read(offs_t offset)
 {
 	uint8_t ret_val = 0;
 
-	switch (offset)
+	switch (offset & 0xff)
 	{
 	case 0:
 		break;
@@ -199,6 +214,7 @@ void rm480z_state::hrg_port_write(offs_t offset, uint8_t data)
 
 void rm480z_state::machine_reset()
 {
+	uint8_t* mem = m_ram->pointer();
 	m_vram.reset();
 	memset(m_hrg_ram, 0, sizeof(m_hrg_ram));
 	m_alt_char_set = false;
@@ -210,4 +226,9 @@ void rm480z_state::machine_reset()
 	memset(m_kbd_state, 0, sizeof(m_kbd_scan_pos));
 
 	m_view.select(0);
+
+	m_bank[0]->set_base(mem);
+	m_bank[1]->set_base(mem + 0x4000);
+	m_bank[2]->set_base(mem + 0x8000);
+	m_bank[3]->set_base(mem + 0xc000);
 }

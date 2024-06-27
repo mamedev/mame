@@ -92,12 +92,12 @@ protected:
 	uint8_t m_fbfe = 0;
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<screen_device> m_screen;
-	optional_device<palette_device> m_palette;
-	optional_device<ram_device> m_messram;
-	optional_device<fd1771_device> m_fdc;
-	optional_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<ram_device> m_messram;
+	required_device<fd1771_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 };
 
 // COS 3.4 machine with cassette and VDU-40 display
@@ -198,7 +198,7 @@ protected:
 	uint8_t m_fbfd = 0;
 
 	required_region_ptr<u8> m_chargen;
-	optional_device<speaker_sound_device> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 
 private:
 	void config_videomode();

@@ -165,6 +165,9 @@ Module timer tag static_vblank_timer name m_expire.seconds
 
 #include "emu.h"
 #include "rm480z.h"
+#include "rm_mq2.h"
+#include "bus/rs232/loopback.h"
+#include "bus/rs232/terminal.h"
 #include "machine/clock.h"
 #include "speaker.h"
 #include "screen.h"
@@ -172,9 +175,10 @@ Module timer tag static_vblank_timer name m_expire.seconds
 
 void rm480z_state::rm480z_MK1_mem(address_map &map)
 {
-	map(0x0000, 0xe7ff).ram();
-	map(0xe800, 0xf7ff).rom().region("ros", 0x0800);
-	map(0xf800, 0xffff).ram();
+	map(0x0000, 0x3fff).bankrw(m_bank[0]);
+	map(0x4000, 0x7fff).bankrw(m_bank[1]);
+	map(0x8000, 0xbfff).bankrw(m_bank[2]);
+	map(0xc000, 0xffff).bankrw(m_bank[3]);
 
 	map(0x0000, 0xf7ff).view(m_view);
 	// page 0
@@ -182,47 +186,44 @@ void rm480z_state::rm480z_MK1_mem(address_map &map)
 	m_view[0](0x0800, 0x17ff).rom().region("bir0", 0x0800);
 	m_view[0](0x1800, 0x1fff).rom().region("bir1", 0x1800);
 	m_view[0](0x3800, 0x3fff).rom().region("ros", 0x1800);
-	m_view[0](0x4000, 0x7fff).ram().share("vector_ram");
+	m_view[0](0xe800, 0xf7ff).rom().region("ros", 0x0800);
 	// page 1
-	m_view[1](0x0000, 0x3fff).ram().share("vector_ram");
+	m_view[1](0xe800, 0xf7ff).rom().region("ros", 0x0800);
 	//page 2
-	m_view[2](0x0000, 0x3fff).ram().share("vector_ram");
 	m_view[2](0x9800, 0x9fff).rom().region("bir1", 0x1800);
 	m_view[2](0xa000, 0xbfff).rom().region("bir2", 0x0000);	
 	m_view[2](0xc000, 0xd7ff).rom().region("bir1", 0x0000);
 	m_view[2](0xd800, 0xdfff).rom().region("bir0", 0x1800);
 	m_view[2](0xe000, 0xe7ff).rom().region("bir0", 0x0000);
-	// page 3
-	m_view[3](0xe800, 0xf7ff).ram();
+	m_view[2](0xe800, 0xf7ff).rom().region("ros", 0x0800);
 }
 
 void rm480z_state::rm480z_MK2_mem(address_map &map)
 {
-	map(0x0000, 0xe7ff).ram();
-	map(0xe800, 0xf7ff).rom().region("rom0", 0x2800);
-	map(0xf800, 0xffff).ram();
+	map(0x0000, 0x3fff).bankrw(m_bank[0]);
+	map(0x4000, 0x7fff).bankrw(m_bank[1]);
+	map(0x8000, 0xbfff).bankrw(m_bank[2]);
+	map(0xc000, 0xffff).bankrw(m_bank[3]);
 
 	map(0x0000, 0xf7ff).view(m_view);
 	// page 0
 	m_view[0](0x0000, 0x07ff).rom().region("rom0", 0x0000);
 	m_view[0](0x0800, 0x1fff).rom().region("rom1", 0x0800);
-	m_view[0](0x4000, 0x77ff).ram().share("vector_ram");
 	m_view[0](0x7800, 0x7fff).rom().region("rom0", 0x3800);
+	m_view[0](0xe800, 0xf7ff).rom().region("rom0", 0x2800);
 	// page 1
-	m_view[1](0x0000, 0x37ff).ram().share("vector_ram");
+	m_view[1](0xe800, 0xf7ff).rom().region("rom0", 0x2800);
 	//page 2
-	m_view[2](0x0000, 0x37ff).ram().share("vector_ram");
 	m_view[2](0x9800, 0xbfff).rom().region("rom1", 0x1800);
 	m_view[2](0xc000, 0xc7ff).rom().region("rom1", 0x0000);
 	m_view[2](0xc800, 0xe7ff).rom().region("rom0", 0x0800);
-	// page 3
-	m_view[3](0xe800, 0xf7ff).ram();
+	m_view[2](0xe800, 0xf7ff).rom().region("rom0", 0x2800);
 }
 
 void rm480z_state::rm480z_io(address_map &map)
 {
 	map(0x00, 0x17).select(0x7f00).rw(FUNC(rm480z_state::videoram_read), FUNC(rm480z_state::videoram_write));
-	map(0x18, 0x1d).mirror(0xff00).rw(FUNC(rm480z_state::status_port_read), FUNC(rm480z_state::control_port_write));
+	map(0x18, 0x1d).select(0xff00).rw(FUNC(rm480z_state::status_port_read), FUNC(rm480z_state::control_port_write));
 	map(0x20, 0x23).mirror(0xff00).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x24, 0x27).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x38, 0x3b).mirror(0xff00).rw(FUNC(rm480z_state::hrg_port_read), FUNC(rm480z_state::hrg_port_write));
@@ -268,7 +269,7 @@ INPUT_PORTS_START( rm480z )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift")           PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Repeat")          PORT_CODE(KEYCODE_RALT)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[ {")             PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\\ |")            PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\\ |")            PORT_CODE(KEYCODE_BACKSLASH) PORT_CODE(KEYCODE_BACKSLASH2)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("] }")             PORT_CODE(KEYCODE_CLOSEBRACE)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Line Feed")       PORT_CODE(KEYCODE_MENU)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Delete")          PORT_CODE(KEYCODE_BACKSPACE)
@@ -330,6 +331,13 @@ uint32_t rm480z_state::screen_update_rm480z(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
+void rm480z_default_rs232_devices(device_slot_interface &device)
+{
+	device.option_add("rm_mq2",        RM_MQ2);
+	device.option_add("loopback",      RS232_LOOPBACK);
+	device.option_add("terminal",      SERIAL_TERMINAL);
+}
+
 static const z80_daisy_config daisy_chain[] =
 {
 	{ "sio" },
@@ -352,7 +360,7 @@ void rm480z_state::rm480z(machine_config &config)
 	m_sio->out_rtsb_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
 
 	// rs232 port
-	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	RS232_PORT(config, m_rs232, rm480z_default_rs232_devices, "rm_mq2");
 	m_rs232->rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
 	m_rs232->dcd_handler().set(m_sio, FUNC(z80sio_device::dcdb_w));
 	m_rs232->dsr_handler().set(m_sio, FUNC(z80sio_device::syncb_w));
@@ -378,7 +386,7 @@ void rm480z_state::rm480z(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* RAM configurations */
-	RAM(config, RAM_TAG).set_default_size("64K");
+	RAM(config, RAM_TAG).set_default_size("256K");
 }
 
 void rm480z_state::rm480za(machine_config &config)
