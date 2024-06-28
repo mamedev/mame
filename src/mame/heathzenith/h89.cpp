@@ -725,8 +725,16 @@ void h89_base_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_ram(0x2000, 0xffff, m_ram_ptr);
 
 		// install shadow writing to RAM when in ROM mode
-		m_mem_view[0].install_writeonly(0x0000, 0x1fff, m_ram_ptr + 0xe000);
-		m_mem_view[1].install_writeonly(0x0000, 0x1fff, m_ram_ptr + 0xe000);
+		m_mem_view[0].install_write_tap(0x0000, 0x1fff, "shadow_w", [this](offs_t offset, u8 &data, u8 mem_mask)
+		{
+			u8 *to = m_ram->pointer() + 0xe000;
+			to[offset] = data;
+		});
+		m_mem_view[1].install_write_tap(0x0000, 0x1fff, "shadow_w", [this](offs_t offset, u8 &data, u8 mem_mask)
+		{
+			u8 *to = m_ram->pointer() + 0xe000;
+			to[offset] = data;
+		});
 
 		// Only the CP/M - Org 0 view will have RAM at the lower 8k
 		m_mem_view[2].install_ram(0x0000, 0x1fff, m_ram_ptr + 0xe000);
