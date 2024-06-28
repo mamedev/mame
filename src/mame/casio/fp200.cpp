@@ -5,8 +5,8 @@
 FP-200 (c) 1982 Casio
 
 TODO:
-- Identify LCDC type, move to device (custom inside the gate array);
-- Confirm not having any sound capaibilities;
+- Identify LCDC, move to devices
+  (2x MSM6216-01GS-1K + 1x MSM6215-01GS-K glued together by the gate array);
 - backup RAM;
 - cassette i/f;
 - FDC (requires test program that Service manual mentions);
@@ -37,6 +37,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rtc(*this, "rtc")
 		, m_ioview(*this, "ioview")
+		, m_key(*this, "KEY%X", 0U)
 	{ }
 
 	void fp200(machine_config &config);
@@ -48,6 +49,7 @@ private:
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<rp5c01_device> m_rtc;
 	memory_view m_ioview;
+	required_ioport_array<16> m_key;
 	uint8_t *m_chargen = nullptr;
 	uint8_t m_keyb_matrix = 0;
 
@@ -324,29 +326,13 @@ void fp200_state::lcd_w(offs_t offset, uint8_t data)
 
 uint8_t fp200_state::keyb_r(offs_t offset)
 {
-	const char *const keynames[16] = { "KEY0", "KEY1", "KEY2", "KEY3",
-										"KEY4", "KEY5", "KEY6", "KEY7",
-										"KEY8", "KEY9", "UNUSED", "UNUSED",
-										"UNUSED", "UNUSED", "UNUSED", "UNUSED"};
-	uint8_t res;
-
-	if(offset == 0)
-		res = ioport(keynames[m_keyb_matrix])->read();
-	else
-	{
-		logerror("Unknown keyboard offset read access %02x\n",offset + 0x20);
-		res = 0;
-	}
-
+	const uint8_t res = m_key[m_keyb_matrix & 0xf]->read();
 	return res;
 }
 
 void fp200_state::keyb_w(offs_t offset, uint8_t data)
 {
-	if(offset == 1)
-		m_keyb_matrix = data & 0xf;
-	else
-		logerror("Unknown keyboard offset write access %02x %02x\n",offset + 0x20,data);
+	m_keyb_matrix = data & 0xf;
 }
 
 void fp200_state::main_map(address_map &map)
@@ -370,7 +356,8 @@ void fp200_state::main_io(address_map &map)
 	m_ioview[1](0x00, 0x0f).rw(FUNC(fp200_state::lcd_r), FUNC(fp200_state::lcd_w));
 //  m_ioview[1](0x10, 0x10) I/O control (w/o), D1 selects CMT or RS-232C
 //  m_ioview[1](0x11, 0x11) I/O control (w/o), uPD65010G gate array control
-	m_ioview[1](0x20, 0x2f).rw(FUNC(fp200_state::keyb_r), FUNC(fp200_state::keyb_w));
+	m_ioview[1](0x20, 0x20).r(FUNC(fp200_state::keyb_r));
+	m_ioview[1](0x21, 0x21).w(FUNC(fp200_state::keyb_w));
 //  m_ioview[1](0x40, 0x4f) CMT & RS-232C control
 //  m_ioview[1](0x80, 0x8f) [Centronics] printer
 }
@@ -381,7 +368,6 @@ INPUT_CHANGED_MEMBER(fp200_state::keyb_irq)
 	m_maincpu->set_input_line(I8085_RST75_LINE, (newval) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-// TODO: implement remote SW
 static INPUT_PORTS_START( fp200 )
 	PORT_START("KEY0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -470,6 +456,24 @@ static INPUT_PORTS_START( fp200 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, fp200_state,keyb_irq, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, fp200_state,keyb_irq, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, fp200_state,keyb_irq, 0)
+
+	PORT_START("KEYA")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("KEYB")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("KEYC")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("KEYD")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("KEYE")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("KEYF")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KEYMOD")
 	PORT_BIT( 0x01f, IP_ACTIVE_LOW, IPT_UNUSED )
