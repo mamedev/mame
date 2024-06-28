@@ -23,7 +23,7 @@
 #define LOG_DMA      (1U << 4)
 #define LOG_COMMAND  (1U << 5)
 
-#define VERBOSE (LOG_GENERAL|LOG_REGW|LOG_REGR|LOG_STATE|LOG_DMA|LOG_COMMAND)
+//#define VERBOSE (LOG_GENERAL|LOG_REGW|LOG_REGR|LOG_STATE|LOG_DMA|LOG_COMMAND)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NCR5385, ncr5385_device, "ncr5385", "NCR 5385 SCSI Protocol Controller")
@@ -818,8 +818,7 @@ void ncr5385_device::set_dreq(bool dreq)
 void ncr5385_device::update_int()
 {
 	bool const int_state = m_int_status & (INT_FUNC_COMPLETE | INT_BUS_SERVICE |
-																				INT_DISCONNECTED | INT_SELECTED |
-																				INT_RESELECTED |INT_INVALID_CMD);
+			INT_DISCONNECTED | INT_SELECTED | INT_RESELECTED | INT_INVALID_CMD);
 
 	if (m_int_state != int_state)
 	{
