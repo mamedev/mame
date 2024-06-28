@@ -9207,10 +9207,10 @@ GAME( 1991, tdragonb2,  tdragon,  tdragonb2,    tdragon,      nmk16_state, empty
 GAME( 1992, gunnailb,   gunnail,  gunnailb,     gunnail,      nmk16_state, init_gunnailb,        ROT270, "bootleg",                      "GunNail (bootleg)", MACHINE_IMPERFECT_SOUND ) // crappy sound, unknown how much of it is incomplete emulation and how much bootleg quality
 
 // these are from Comad, based on the Thunder Dragon code?
-GAME( 1992, ssmissin,   0,        ssmissin,     ssmissin,     nmk16_state, init_ssmissin,        ROT270, "Comad",                         "S.S. Mission", MACHINE_NO_COCKTAIL )
+GAME( 1992, ssmissin,   0,        ssmissin,     ssmissin,     nmk16_state, init_ssmissin,        ROT270, "Comad",                         "S.S. Mission", 0 )
 
-GAME( 1996, airattck,   0,        ssmissin,     airattck,     nmk16_state, init_ssmissin,        ROT270, "Comad",                         "Air Attack (set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1996, airattcka,  airattck, ssmissin,     airattck,     nmk16_state, init_ssmissin,        ROT270, "Comad",                         "Air Attack (set 2)", MACHINE_NO_COCKTAIL )
+GAME( 1996, airattck,   0,        ssmissin,     airattck,     nmk16_state, init_ssmissin,        ROT270, "Comad",                         "Air Attack (set 1)", 0 )
+GAME( 1996, airattcka,  airattck, ssmissin,     airattck,     nmk16_state, init_ssmissin,        ROT270, "Comad",                         "Air Attack (set 2)", 0 )
 
 // afega & clones
 GAME( 1995, twinactn,   0,        twinactn,     twinactn,     nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Twin Action", 0 ) // hacked from USSAF Mustang
@@ -9218,24 +9218,24 @@ GAME( 1995, twinactn,   0,        twinactn,     twinactn,     nmk16_state, init_
 GAME( 1995, dolmen,     0,        twinactn,     dolmen,       nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Dolmen", 0 )
 GAME( 1995, dolmenk,    dolmen,   twinactn,     dolmenk,      nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Goindol (Afega)", 0 )
 
-GAME( 1998, stagger1,   0,        stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Stagger I (Japan)", 0 )
-GAME( 1997, redhawk,    stagger1, stagger1,     stagger1,     afega_state, init_redhawk,         ROT270,             "Afega (New Vision Ent. license)",   "Red Hawk (USA, Canada & South America)", 0 )
-GAME( 1997, redhawki,   stagger1, redhawki,     stagger1,     afega_state, init_redhawki,        ROT0,               "Afega (Hae Dong Corp license)",     "Red Hawk (horizontal, Italy)", 0 ) // bootleg? strange scroll regs
-GAME( 1997, redhawks,   stagger1, redhawki,     stagger1,     afega_state, empty_init,           ROT0,               "Afega (Hae Dong Corp license)",     "Red Hawk (horizontal, Spain, set 1)", 0 )
-GAME( 1997, redhawksa,  stagger1, redhawki,     stagger1,     afega_state, init_redhawksa,       ROT0,               "Afega (Hae Dong Corp license)",     "Red Hawk (horizontal, Spain, set 2)", 0 )
-GAME( 1997, redhawkg,   stagger1, redhawki,     stagger1,     afega_state, init_redhawkg,        ROT0,               "Afega",                             "Red Hawk (horizontal, Greece)", 0 )
-GAME( 1997, redhawke,   stagger1, stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega (Excellent Co. license)",     "Red Hawk (Excellent Co., Ltd)", 0 ) // earlier revision? different afega logo and score and credit number fonts compared to other sets
-GAME( 1997, redhawkk,   stagger1, stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Red Hawk (Korea)", 0 )
-GAME( 1997, redhawkb,   stagger1, redhawkb,     redhawkb,     afega_state, empty_init,           ROT0,               "bootleg (Vince)",                   "Red Hawk (horizontal, bootleg)", 0 )
+GAME( 1998, stagger1,   0,        stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Stagger I (Japan)", MACHINE_NO_COCKTAIL )
+GAME( 1997, redhawk,    stagger1, stagger1,     stagger1,     afega_state, init_redhawk,         ROT270,             "Afega (New Vision Ent. license)",   "Red Hawk (USA, Canada & South America)", MACHINE_NO_COCKTAIL )
+GAME( 1997, redhawki,   stagger1, redhawki,     stagger1,     afega_state, init_redhawki,        ROT0,               "Afega (Hae Dong Corp license)",     "Red Hawk (horizontal, Italy)", MACHINE_NO_COCKTAIL ) // bootleg? strange scroll regs
+GAME( 1997, redhawks,   stagger1, redhawki,     stagger1,     afega_state, empty_init,           ROT0,               "Afega (Hae Dong Corp license)",     "Red Hawk (horizontal, Spain, set 1)", MACHINE_NO_COCKTAIL )
+GAME( 1997, redhawksa,  stagger1, redhawki,     stagger1,     afega_state, init_redhawksa,       ROT0,               "Afega (Hae Dong Corp license)",     "Red Hawk (horizontal, Spain, set 2)", MACHINE_NO_COCKTAIL )
+GAME( 1997, redhawkg,   stagger1, redhawki,     stagger1,     afega_state, init_redhawkg,        ROT0,               "Afega",                             "Red Hawk (horizontal, Greece)", MACHINE_NO_COCKTAIL )
+GAME( 1997, redhawke,   stagger1, stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega (Excellent Co. license)",     "Red Hawk (Excellent Co., Ltd)", MACHINE_NO_COCKTAIL ) // earlier revision? different afega logo and score and credit number fonts compared to other sets
+GAME( 1997, redhawkk,   stagger1, stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Red Hawk (Korea)", MACHINE_NO_COCKTAIL )
+GAME( 1997, redhawkb,   stagger1, redhawkb,     redhawkb,     afega_state, empty_init,           ROT0,               "bootleg (Vince)",                   "Red Hawk (horizontal, bootleg)", MACHINE_NO_COCKTAIL )
 
-GAME( 1998, grdnstrm,   0,        grdnstrm,     grdnstrm,     afega_state, empty_init,           ORIENTATION_FLIP_Y, "Afega (Apples Industries license)", "Guardian Storm (horizontal, not encrypted)", 0 )
-GAME( 1998, grdnstrmv,  grdnstrm, grdnstrmk,    grdnstrk,     afega_state, init_grdnstrm,        ROT270,             "Afega (Apples Industries license)", "Guardian Storm (vertical)", 0 )
-GAME( 1998, grdnstrmj,  grdnstrm, grdnstrmk,    grdnstrk,     afega_state, init_grdnstrmg,       ROT270,             "Afega",                             "Sen Jing - Guardian Storm (Japan)", 0 )
-GAME( 1998, grdnstrmk,  grdnstrm, grdnstrmk,    grdnstrk,     afega_state, init_grdnstrm,        ROT270,             "Afega",                             "Jeon Sin - Guardian Storm (Korea)", 0 )
-GAME( 1998, redfoxwp2,  grdnstrm, grdnstrmk,    grdnstrk,     afega_state, init_grdnstrm,        ROT270,             "Afega",                             "Hong Hu Zhanji II (China, set 1)", 0 )
-GAME( 1998, redfoxwp2a, grdnstrm, grdnstrmk,    grdnstrk,     afega_state, init_redfoxwp2a,      ROT270,             "Afega",                             "Hong Hu Zhanji II (China, set 2)", 0 )
-GAME( 1998, grdnstrmg,  grdnstrm, grdnstrmk,    grdnstrk,     afega_state, init_grdnstrmg,       ROT270,             "Afega",                             "Guardian Storm (Germany)", 0 )
-GAME( 1998, grdnstrmau, grdnstrm, grdnstrm,     grdnstrm,     afega_state, init_grdnstrmau,      ORIENTATION_FLIP_Y, "Afega",                             "Guardian Storm (horizontal, Australia)", 0 )
+GAME( 1998, grdnstrm,   0,        grdnstrm,     grdnstrm,     afega_state, empty_init,           ORIENTATION_FLIP_Y, "Afega (Apples Industries license)", "Guardian Storm (horizontal, not encrypted)", MACHINE_NO_COCKTAIL )
+GAME( 1998, grdnstrmv,  grdnstrm, grdnstrmk,    grdnstrk,     afega_state, init_grdnstrm,        ROT270,             "Afega (Apples Industries license)", "Guardian Storm (vertical)", MACHINE_NO_COCKTAIL )
+GAME( 1998, grdnstrmj,  grdnstrm, grdnstrmk,    grdnstrk,     afega_state, init_grdnstrmg,       ROT270,             "Afega",                             "Sen Jing - Guardian Storm (Japan)", MACHINE_NO_COCKTAIL )
+GAME( 1998, grdnstrmk,  grdnstrm, grdnstrmk,    grdnstrk,     afega_state, init_grdnstrm,        ROT270,             "Afega",                             "Jeon Sin - Guardian Storm (Korea)", MACHINE_NO_COCKTAIL )
+GAME( 1998, redfoxwp2,  grdnstrm, grdnstrmk,    grdnstrk,     afega_state, init_grdnstrm,        ROT270,             "Afega",                             "Hong Hu Zhanji II (China, set 1)", MACHINE_NO_COCKTAIL )
+GAME( 1998, redfoxwp2a, grdnstrm, grdnstrmk,    grdnstrk,     afega_state, init_redfoxwp2a,      ROT270,             "Afega",                             "Hong Hu Zhanji II (China, set 2)", MACHINE_NO_COCKTAIL )
+GAME( 1998, grdnstrmg,  grdnstrm, grdnstrmk,    grdnstrk,     afega_state, init_grdnstrmg,       ROT270,             "Afega",                             "Guardian Storm (Germany)", MACHINE_NO_COCKTAIL )
+GAME( 1998, grdnstrmau, grdnstrm, grdnstrm,     grdnstrm,     afega_state, init_grdnstrmau,      ORIENTATION_FLIP_Y, "Afega",                             "Guardian Storm (horizontal, Australia)", MACHINE_NO_COCKTAIL )
 
 // is there a 'bubble 2000' / 'hot bubble' version with Afega copyright, or is the only Afega release dolmen above, this seems like a sequel, not a clone?
 GAME( 1998, bubl2000,   0,        popspops,     bubl2000,     afega_state, init_bubl2000,        ROT0,               "Afega (Tuning license)",            "Bubble 2000", 0 ) // on a tuning board - Has a Demo Sound DSW

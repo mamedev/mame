@@ -420,6 +420,8 @@ VIDEO_START_MEMBER(afega_state,grdnstrm)
 	m_tx_tilemap->set_transparent_pen(15);
 
 	video_init();
+	m_bg_tilemap[0]->set_scrolldx(92, 92);
+	m_tx_tilemap->set_scrolldx(92, 92);
 }
 
 
