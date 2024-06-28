@@ -1722,7 +1722,7 @@ GAME(2001, tekken4a,  tekken4,   system246, system246, namcops2_state, empty_ini
 GAME(2001, tekken4b,  tekken4,   system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Tekken 4 (TEF1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2001, tekken4c,  tekken4,   system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Tekken 4 (TEF1 Ver. C)", MACHINE_IS_SKELETON)
 GAME(2001, wanganmd,  sys246,    system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Wangan Midnight (WMN1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2002, batlgr3,   sys246,    system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Battle Gear 3 (Ver.2.01A)", MACHINE_IS_SKELETON)
+GAME(2002, batlgr3,   sys246,    system246, system246, namcops2_state, empty_init, ROT0, "Taito", "Battle Gear 3 (Ver.2.01A)", MACHINE_IS_SKELETON)
 GAME(2002, dragchrn,  sys246,    system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Dragon Chronicles (DC001 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2002, netchu02c, sys246,    system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Netchuu Pro Yakyuu 2002 (NPY1 Ver. C)", MACHINE_IS_SKELETON)
 GAME(2002, netchu02b, netchu02c, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Netchuu Pro Yakyuu 2002 (NPY1 Ver. B)", MACHINE_IS_SKELETON)
