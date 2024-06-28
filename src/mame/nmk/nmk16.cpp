@@ -403,6 +403,7 @@ void nmk16_state::vandyke_map(address_map &map)
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
 	map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
+	map(0x080015, 0x080015).w(FUNC(nmk16_state::vandyke_flipscreen_w));
 	map(0x080016, 0x080017).w(FUNC(nmk16_state::nmk004_x0016_w));
 	map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
@@ -423,6 +424,7 @@ void nmk16_state::vandykeb_map(address_map &map)
 	map(0x08000a, 0x08000b).portr("DSW2");
 //  map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
 	map(0x080010, 0x08001d).w(FUNC(nmk16_state::vandykeb_scroll_w)); // 10, 12, 1a, 1c
+	map(0x080015, 0x080015).w(FUNC(nmk16_state::vandyke_flipscreen_w));
 	map(0x080016, 0x080017).nopw();    // IRQ enable?
 	map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
 //  map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
@@ -656,7 +658,7 @@ void nmk16_state::bioship_map(address_map &map)
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
 	map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
-//  map(0xc0015, 0xc0015).w(FUNC(nmk16_state::flipscreen_w));
+	map(0x080015, 0x080015).w(FUNC(nmk16_state::flipscreen_w));
 	map(0x080016, 0x080017).w(FUNC(nmk16_state::nmk004_bioship_x0016_w));
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x084001, 0x084001).w(FUNC(nmk16_state::bioship_bank_w));
@@ -9122,13 +9124,13 @@ GAME( 1989, tharrieru,  tharrier, tharrier,     tharrier,     nmk16_state,      
 GAME( 1990, mustang,    0,        mustang,      mustang,      nmk16_state,        empty_init,           ROT0,   "UPL",                          "US AAF Mustang (25th May. 1990)", 0 )
 GAME( 1990, mustangs,   mustang,  mustang,      mustang,      nmk16_state,        empty_init,           ROT0,   "UPL (Seoul Trading license)",  "US AAF Mustang (25th May. 1990 / Seoul Trading)", 0 )
 
-GAME( 1990, bioship,    0,        bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL (American Sammy license)", "Bio-ship Paladin", MACHINE_NO_COCKTAIL ) // US version but no regional notice
-GAME( 1990, sbsgomo,    bioship,  bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL",                          "Space Battle Ship Gomorrah", MACHINE_NO_COCKTAIL )
+GAME( 1990, bioship,    0,        bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL (American Sammy license)", "Bio-ship Paladin", 0 ) // US version but no regional notice
+GAME( 1990, sbsgomo,    bioship,  bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL",                          "Space Battle Ship Gomorrah", 0 )
 
-GAME( 1990, vandyke,    0,        vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL",                          "Vandyke (Japan)", MACHINE_NO_COCKTAIL )
-GAME( 1990, vandykejal, vandyke,  vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1990, vandykejal2,vandyke,  vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 2)", MACHINE_NO_COCKTAIL )
-GAME( 1990, vandykeb,   vandyke,  vandykeb,     vandykeb,     nmk16_state,        init_vandykeb,        ROT270, "bootleg",                      "Vandyke (bootleg with PIC16c57)",  MACHINE_NO_COCKTAIL | MACHINE_NO_SOUND )
+GAME( 1990, vandyke,    0,        vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL",                          "Vandyke (Japan)", 0 )
+GAME( 1990, vandykejal, vandyke,  vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 1)", 0 )
+GAME( 1990, vandykejal2,vandyke,  vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 2)", 0 )
+GAME( 1990, vandykeb,   vandyke,  vandykeb,     vandykeb,     nmk16_state,        init_vandykeb,        ROT270, "bootleg",                      "Vandyke (bootleg with PIC16c57)", MACHINE_NO_SOUND )
 
 GAME( 1991, blkheart,   0,        blkheart,     blkheart,     nmk16_state,        empty_init,           ROT0,   "UPL",                          "Black Heart", 0 )
 GAME( 1991, blkheartj,  blkheart, blkheart,     blkheart,     nmk16_state,        empty_init,           ROT0,   "UPL",                          "Black Heart (Japan)", 0 )

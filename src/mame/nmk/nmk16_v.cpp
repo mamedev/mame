@@ -107,6 +107,7 @@ VIDEO_START_MEMBER(nmk16_state, bioship)
 	m_bioship_background_bank=0;
 	save_item(NAME(m_bioship_background_bank));
 	m_bg_tilemap[0]->set_scrolldx(92, 92);
+	m_bg_tilemap[1]->set_scrolldx(92, 92);
 	m_tx_tilemap->set_scrolldx(92, 92);
 }
 
@@ -130,6 +131,7 @@ VIDEO_START_MEMBER(nmk16_state,strahl)
 	m_bg_tilemap[1]->set_transparent_pen(15);
 
 	m_sprdma_base = 0xf000;
+	m_bg_tilemap[1]->set_scrolldx(92, 92);
 }
 
 VIDEO_START_MEMBER(nmk16_state,macross2)
@@ -228,6 +230,12 @@ void nmk16_state::flipscreen_w(u8 data)
 {
 	flip_screen_set(data & 0x01);
 	m_spritegen->set_flip_screen(flip_screen());
+}
+
+// vandyke writes a 0 value when flip screen is enabled, contrary to rest of games that write 1
+void nmk16_state::vandyke_flipscreen_w(u8 data)
+{
+	flipscreen_w(~data);
 }
 
 void nmk16_state::tilebank_w(u8 data)
