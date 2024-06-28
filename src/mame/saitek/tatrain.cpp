@@ -77,7 +77,7 @@ public:
 	void tatraina(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
-	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
+	DECLARE_INPUT_CHANGED_MEMBER(tatraina_change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
@@ -105,7 +105,7 @@ void tatrain_state::machine_start()
 	save_item(NAME(m_inp_mux));
 }
 
-INPUT_CHANGED_MEMBER(tatrain_state::change_cpu_freq)
+INPUT_CHANGED_MEMBER(tatrain_state::tatraina_change_cpu_freq)
 {
 	// H8/323 16MHz and 24MHz versions don't exist, but the software supports it
 	static const XTAL freq[4] = { 20_MHz_XTAL, 16_MHz_XTAL, 14_MHz_XTAL, 24_MHz_XTAL };
@@ -207,9 +207,11 @@ static INPUT_PORTS_START( tatraina )
 	PORT_INCLUDE( tatrain )
 
 	PORT_MODIFY("FREQ")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, tatrain_state, change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, tatrain_state, tatraina_change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x02, "14Mhz (Champion Advanced Trainer)" )
-	PORT_CONFSETTING(    0x00, "20Mhz (Turbo Advanced Trainer)" )
+	PORT_CONFSETTING(    0x01, "16MHz (unofficial)" )
+	PORT_CONFSETTING(    0x00, "20Mhz (Turbo Advanced Trainer, Virtuoso)" )
+	PORT_CONFSETTING(    0x03, "24MHz (unofficial)" )
 INPUT_PORTS_END
 
 
@@ -222,7 +224,7 @@ template <typename T>
 void tatrain_state::cpu_config(T &maincpu)
 {
 	maincpu.nvram_enable_backup(true);
-	maincpu.standby_cb().set(m_maincpu, FUNC(h8_device::nvram_set_battery));
+	maincpu.standby_cb().set(maincpu, FUNC(T::nvram_set_battery));
 	maincpu.standby_cb().append([this](int state) { if (state) m_display->clear(); });
 	maincpu.write_port1().set(FUNC(tatrain_state::leds_w<0>));
 	maincpu.write_port2().set(FUNC(tatrain_state::leds_w<1>));

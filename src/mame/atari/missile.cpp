@@ -608,7 +608,7 @@ bool missile_state::get_madsel()
 	{
 		madsel = (m_maincpu->total_cycles() - m_madsel_lastcycles) == 5;
 
-		/* reset the count until next time */
+		// reset the count until next time
 		if (madsel && !machine().side_effects_disabled())
 			m_madsel_lastcycles = 0;
 	}
