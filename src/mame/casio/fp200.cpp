@@ -1,27 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
-    FP-200 (c) 1982 Casio
+FP-200 (c) 1982 Casio
 
-    preliminary driver by Angelo Salese
+TODO:
+- Identify LCDC type, move to device (custom inside the gate array);
+- Confirm not having any sound capaibilities;
+- backup RAM;
+- cassette i/f;
+- FDC (requires test program that Service manual mentions);
 
-    TODO:
-    - What's the LCDC type? Custom?
-    - Unless I've missed something in the schems, this one shouldn't have any
-      sound capability.
-    - backup RAM.
-    - Rewrite video emulation from scratch.
+Notes:
+- on start-up there's a "memory illegal" warning. Enter "RESET" command
+  to initialize it (thanks to Takeda Toshiya for pointing this out).
 
-    Notes:
-    - on start-up there's a "memory illegal" warning. Enter "RESET" command
-      to initialize it (thanks to Takeda Toshiya for pointing this out).
-
-***************************************************************************/
-
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/rp5c01.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -37,6 +35,8 @@ public:
 	fp200_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rtc(*this, "rtc")
+		, m_ioview(*this, "ioview")
 	{ }
 
 	void fp200(machine_config &config);
@@ -46,9 +46,10 @@ public:
 private:
 	// devices
 	required_device<i8085a_cpu_device> m_maincpu;
-	uint8_t m_io_type = 0;
+	required_device<rp5c01_device> m_rtc;
+	memory_view m_ioview;
 	uint8_t *m_chargen = nullptr;
-	uint8_t m_keyb_mux = 0;
+	uint8_t m_keyb_matrix = 0;
 
 	struct{
 		uint8_t x = 0;
@@ -65,19 +66,17 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint8_t fp200_io_r(offs_t offset);
-	void fp200_io_w(offs_t offset, uint8_t data);
-	uint8_t fp200_lcd_r(offs_t offset);
-	void fp200_lcd_w(offs_t offset, uint8_t data);
-	uint8_t fp200_keyb_r(offs_t offset);
-	void fp200_keyb_w(offs_t offset, uint8_t data);
+	uint8_t lcd_r(offs_t offset);
+	void lcd_w(offs_t offset, uint8_t data);
+	uint8_t keyb_r(offs_t offset);
+	void keyb_w(offs_t offset, uint8_t data);
 
 	void sod_w(int state);
 	int sid_r();
 
-	void fp200_palette(palette_device &palette) const;
-	void fp200_io(address_map &map);
-	void fp200_map(address_map &map);
+	void palette_init(palette_device &palette) const;
+	void main_io(address_map &map);
+	void main_map(address_map &map);
 
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -92,7 +91,7 @@ void fp200_state::video_start()
 	m_lcd.attr = make_unique_clear<uint8_t[]>(20*64);
 }
 
-/* TODO: Very preliminary, I actually believe that the LCDC writes in a blitter fashion ... */
+// TODO: rewrite, don't loop 4 times
 uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	uint16_t l_offs, r_offs;
@@ -101,11 +100,11 @@ uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 
 	l_offs = 0;
 	r_offs = 0;
-	for(int y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
+	for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for(int x=0;x<80;x++)
+		for(int x = 0; x < 80;x++)
 		{
-			if(m_lcd.attr[x/8+y*20] == 0x50)
+			if(m_lcd.attr[x / 8 + y * 20] == 0x50)
 			{
 				l_offs = (y & ~7);
 				break;
@@ -113,7 +112,7 @@ uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		}
 	}
 
-	for(int y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
+	for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		for(int x=80;x<160;x++)
 		{
@@ -125,7 +124,7 @@ uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		}
 	}
 
-	for(int y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
+	for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		for(int x=0;x<80;x++)
 		{
@@ -152,7 +151,7 @@ uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		}
 	}
 
-	for(int y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
+	for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		for(int x=80;x<160;x++)
 		{
@@ -224,7 +223,7 @@ uint8_t fp200_state::read_lcd_vram(uint16_t X, uint16_t Y)
 	return res;
 }
 
-uint8_t fp200_state::fp200_lcd_r(offs_t offset)
+uint8_t fp200_state::lcd_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -233,14 +232,14 @@ uint8_t fp200_state::fp200_lcd_r(offs_t offset)
 	switch(offset)
 	{
 		case 1:
-			//printf("%d %d -> (L) %02x\n",m_lcd.x,m_lcd.y,m_lcd.status);
+			//logerror("%d %d -> (L) %02x\n",m_lcd.x,m_lcd.y,m_lcd.status);
 			if(m_lcd.status == 0xb)
 				res = read_lcd_attr(m_lcd.x,m_lcd.y);
 			else if(m_lcd.status == 1)
 				res = read_lcd_vram(m_lcd.x,m_lcd.y);
 			break;
 		case 2:
-			//printf("%d %d -> (R) %02x\n",m_lcd.x,m_lcd.y,m_lcd.status);
+			//logerror("%d %d -> (R) %02x\n",m_lcd.x,m_lcd.y,m_lcd.status);
 			if(m_lcd.status == 0xb)
 				res = read_lcd_attr(m_lcd.x + 10,m_lcd.y);
 			else if(m_lcd.status == 1)
@@ -272,7 +271,7 @@ void fp200_state::write_lcd_attr(uint16_t X, uint16_t Y,uint8_t data)
 			return;
 
 		//if(data != 0x60)
-		//  printf("%d %d %02x\n",X,Y,data);
+		//  logerror("%d %d %02x\n",X,Y,data);
 
 		m_lcd.attr[base_offs] = data;
 	}
@@ -293,19 +292,19 @@ void fp200_state::write_lcd_vram(uint16_t X, uint16_t Y,uint8_t data)
 	}
 }
 
-void fp200_state::fp200_lcd_w(offs_t offset, uint8_t data)
+void fp200_state::lcd_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 		case 1:
-			//printf("%d %d -> %02x (%c) (L %02x)\n",m_lcd.x,m_lcd.y,data,data,m_lcd.status);
+			//logerror("%d %d -> %02x (%c) (L %02x)\n",m_lcd.x,m_lcd.y,data,data,m_lcd.status);
 			if(m_lcd.status == 0xb)
 				write_lcd_attr(m_lcd.x,m_lcd.y,data);
 			else if(m_lcd.status == 1)
 				write_lcd_vram(m_lcd.x,m_lcd.y,data);
 			break;
 		case 2:
-			//printf("%d %d -> %02x (%c) (R %02x)\n",m_lcd.x + 10,m_lcd.y,data,data,m_lcd.status);
+			//logerror("%d %d -> %02x (%c) (R %02x)\n",m_lcd.x + 10,m_lcd.y,data,data,m_lcd.status);
 			if(m_lcd.status == 0xb)
 				write_lcd_attr(m_lcd.x + 10,m_lcd.y,data);
 			else if(m_lcd.status == 1)
@@ -323,7 +322,7 @@ void fp200_state::fp200_lcd_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t fp200_state::fp200_keyb_r(offs_t offset)
+uint8_t fp200_state::keyb_r(offs_t offset)
 {
 	const char *const keynames[16] = { "KEY0", "KEY1", "KEY2", "KEY3",
 										"KEY4", "KEY5", "KEY6", "KEY7",
@@ -332,108 +331,57 @@ uint8_t fp200_state::fp200_keyb_r(offs_t offset)
 	uint8_t res;
 
 	if(offset == 0)
-		res = ioport(keynames[m_keyb_mux])->read();
+		res = ioport(keynames[m_keyb_matrix])->read();
 	else
 	{
-		printf("Unknown keyboard offset read access %02x\n",offset + 0x20);
+		logerror("Unknown keyboard offset read access %02x\n",offset + 0x20);
 		res = 0;
 	}
 
 	return res;
 }
 
-void fp200_state::fp200_keyb_w(offs_t offset, uint8_t data)
+void fp200_state::keyb_w(offs_t offset, uint8_t data)
 {
 	if(offset == 1)
-		m_keyb_mux = data & 0xf;
-	else if(offset == 0)
-	{
-		// ... ?
-	}
+		m_keyb_matrix = data & 0xf;
 	else
-		printf("Unknown keyboard offset write access %02x %02x\n",offset + 0x20,data);
+		logerror("Unknown keyboard offset write access %02x %02x\n",offset + 0x20,data);
 }
 
-/*
-Annoyingly the i/o map uses the SOD to access different devices, so we need trampolines.
-SOD = 0
-0x10 - 0x1f Timer control (RPC05 RTC)
-0x20 - 0x2f AUTO-POWER OFF
-0x40 - 0x4f FDC Device ID Code (5 for "FP-1021FD")
-0x80 - 0xff FDD (unknown type)
-SOD = 1
-0x00 - 0x0f LCD control.
-0x10 - 0x1f I/O control
-0x20 - 0x2f Keyboard
-0x40 - 0x4f MT.RS-232C control
-0x80 - 0x8f Printer (Centronics)
-*/
-uint8_t fp200_state::fp200_io_r(offs_t offset)
+void fp200_state::main_map(address_map &map)
 {
-	uint8_t res;
-
-	if(m_io_type == 0)
-	{
-		res = 0;
-		logerror("Unemulated I/O read %02x (%02x)\n",offset,m_io_type);
-	}
-	else
-	{
-		switch(offset & 0xf0)
-		{
-			//case 0x00: return;
-			case 0x00: res = fp200_lcd_r(offset & 0xf); break;
-			case 0x20: res = fp200_keyb_r(offset & 0xf); break;
-			default: res = 0; logerror("Unemulated I/O read %02x (%02x)\n",offset,m_io_type); break;
-		}
-	}
-
-	return res;
-}
-
-void fp200_state::fp200_io_w(offs_t offset, uint8_t data)
-{
-	if(m_io_type == 0)
-	{
-		switch(offset & 0xf0)
-		{
-			default:logerror("Unemulated I/O write %02x (%02x) <- %02x\n",offset,m_io_type,data); break;
-		}
-	}
-	else
-	{
-		switch(offset & 0xf0)
-		{
-			case 0x00: fp200_lcd_w(offset & 0xf,data); break;
-			case 0x20: fp200_keyb_w(offset & 0xf,data); break;
-			default:logerror("Unemulated I/O write %02x (%02x) <- %02x\n",offset,m_io_type,data); break;
-		}
-	}
-}
-
-void fp200_state::fp200_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).ram();
-//  0xa000, 0xffff exp RAM
+	map(0x0000, 0x7fff).rom(); // basic & cetl
+	// TODO: 1 waitstate penalty for accessing any RAM
+	map(0x8000, 0x9fff).ram(); // internal RAM
+//  0xa000, 0xffff exp RAM (FP-201RAM)
 	map(0xa000, 0xbfff).ram();
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xffff).ram();
+	map(0xe000, 0xffff).ram(); // or exp ROM (FP-206ROM)
 }
 
-void fp200_state::fp200_io(address_map &map)
+void fp200_state::main_io(address_map &map)
 {
-	map(0x00, 0xff).rw(FUNC(fp200_state::fp200_io_r), FUNC(fp200_state::fp200_io_w));
+	map(0x00, 0xff).view(m_ioview);
+	m_ioview[0](0x10, 0x1f).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
+//  m_ioview[0](0x20, 0x2f) AUTO-POWER OFF
+//  m_ioview[0](0x40, 0x4f) FDC Device ID Code (5 for "FP-1021FD")
+//  m_ioview[0](0x80, 0xff) FDD (unknown type)
+	m_ioview[1](0x00, 0x0f).rw(FUNC(fp200_state::lcd_r), FUNC(fp200_state::lcd_w));
+//  m_ioview[1](0x10, 0x10) I/O control (w/o), D1 selects CMT or RS-232C
+//  m_ioview[1](0x11, 0x11) I/O control (w/o), uPD65010G gate array control
+	m_ioview[1](0x20, 0x2f).rw(FUNC(fp200_state::keyb_r), FUNC(fp200_state::keyb_w));
+//  m_ioview[1](0x40, 0x4f) CMT & RS-232C control
+//  m_ioview[1](0x80, 0x8f) [Centronics] printer
 }
 
 INPUT_CHANGED_MEMBER(fp200_state::keyb_irq)
 {
 	/* a keyboard stroke causes a rst7.5 */
 	m_maincpu->set_input_line(I8085_RST75_LINE, (newval) ? ASSERT_LINE : CLEAR_LINE);
-
 }
 
-/* TODO: remote SW? */
+// TODO: implement remote SW
 static INPUT_PORTS_START( fp200 )
 	PORT_START("KEY0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -541,8 +489,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,1),
 	1,
 	{ RGN_FRAC(0,1) },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ STEP8(0, 8) },
+	{ STEP8(0, 1) },
 	8*8
 };
 
@@ -556,10 +504,9 @@ void fp200_state::machine_start()
 	uint8_t *raw_gfx = memregion("raw_gfx")->base();
 	m_chargen = memregion("chargen")->base();
 
-	for(int i=0;i<0x800;i++)
-	{
-		m_chargen[i] = raw_gfx[bitswap<16>(i,15,14,13,12,11,6,5,4,3,10,9,8,7,2,1,0)];
-	}
+	// HACK: convert GFX to a more usable format
+	for(int i = 0; i < 0x800; i++)
+		m_chargen[i] = raw_gfx[bitswap<16>(i, 15, 14, 13, 12, 11, 6, 5, 4, 3, 10, 9, 8, 7, 2, 1, 0)];
 }
 
 void fp200_state::machine_reset()
@@ -567,7 +514,7 @@ void fp200_state::machine_reset()
 }
 
 
-void fp200_state::fp200_palette(palette_device &palette) const
+void fp200_state::palette_init(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xa0, 0xa8, 0xa0);
 	palette.set_pen_color(1, 0x30, 0x38, 0x10);
@@ -575,22 +522,24 @@ void fp200_state::fp200_palette(palette_device &palette) const
 
 void fp200_state::sod_w(int state)
 {
-	m_io_type = state;
+	m_ioview.select(state);
 }
 
 int fp200_state::sid_r()
 {
-	return (ioport("KEYMOD")->read() >> m_keyb_mux) & 1;
+	return (ioport("KEYMOD")->read() >> m_keyb_matrix) & 1;
 }
 
 void fp200_state::fp200(machine_config &config)
 {
 	/* basic machine hardware */
 	I8085A(config, m_maincpu, MAIN_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fp200_state::fp200_map);
-	m_maincpu->set_addrmap(AS_IO, &fp200_state::fp200_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fp200_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &fp200_state::main_io);
 	m_maincpu->in_sid_func().set(FUNC(fp200_state::sid_r));
 	m_maincpu->out_sod_func().set(FUNC(fp200_state::sod_w));
+
+	RP5C01(config, "rtc", XTAL(32'768));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -603,10 +552,9 @@ void fp200_state::fp200(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_fp200);
 
-	PALETTE(config, "palette", FUNC(fp200_state::fp200_palette), 2);
+	PALETTE(config, "palette", FUNC(fp200_state::palette_init), 2);
 
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
+	// No sound HW
 }
 
 
