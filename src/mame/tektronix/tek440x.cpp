@@ -166,6 +166,7 @@ public:
 		m_kb_rclamp(false),
 		m_kb_loop(false),
 		m_mouse(0),
+		m_mouse_bnts(0),
 		m_mouse_x(0),
 		m_mouse_y(0),
 		m_mouse_px(PHASE_STATIC),
@@ -268,7 +269,7 @@ private:
 	u16 m_videoaddr[4];
 	u8 m_videocntl;
 	u8 m_diag;
-	u8 m_mouse,m_mouse_x,m_mouse_y;
+	u8 m_mouse,m_mouse_bnts,m_mouse_x,m_mouse_y;
 	u8 m_mouse_px,m_mouse_py,m_mouse_pc;
 };
 
@@ -287,6 +288,9 @@ void tek440x_state::machine_start()
 	save_item(NAME(m_kb_rclamp));
 	save_item(NAME(m_kb_loop));
 	
+	save_item(NAME(m_videocntl));
+	save_item(NAME(m_diag));
+	
 	m_led_1.resolve();
 	m_led_2.resolve();
 	m_led_4.resolve();
@@ -294,6 +298,9 @@ void tek440x_state::machine_start()
 	
 	m_led_disk.resolve();
 	m_scsi->attachLED(&m_led_disk);
+	
+	m_vint->in_w<0>(0);		// VBL enable
+	m_vint->in_w<1>(0);		// VBL
 }
 
 
@@ -305,14 +312,14 @@ void tek440x_state::machine_start()
 
 void tek440x_state::machine_reset()
 {
+
 	m_boot = true;
 	diag_w(0);
 	m_u244latch = 0;
-	m_led_disk = 0;
+	m_led_disk = 1;
 	m_keyboard->kdo_w(1);
 	mapcntl_w(0);
-	m_vint->in_w<0>(0);		// VBL enable
-	m_vint->in_w<1>(0);		// VBL 
+	videocntl_w(0);
 }
 
 
@@ -324,6 +331,12 @@ void tek440x_state::machine_reset()
 
 u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	if (!BIT(m_videocntl, 5))
+	{
+		// screen off
+		return 1;
+	}
+
 	u16 invert = BIT(m_videocntl, 4) ? 0x0000 : 0xffff;
 
 	for (int y = 0; y < 480; y++)
@@ -467,7 +480,7 @@ u16 tek440x_state::map_r(offs_t offset)
 	// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
 	if (!BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
-			LOG("map_r: bus error: PID(%d) %08x fc(%d)\n", BIT(m_map[offset >> 11], 11, 3), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
+			LOG("map_r: bus error: PID(%d) %08x fc(%d)\n", BIT(m_map[(offset >> 11) & 0x7ff], 11, 3), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset, 0, m_maincpu->get_fc());
@@ -655,9 +668,10 @@ u8 tek440x_state::mouse_r(offs_t offset)
 			
 			break;
 		case 4:
-			ans = m_mousebtn->read() & 7;		// selftest xor diag register with it
-			ans |= (m_mouse & 15) << 3;
-			if (m_kb_loop) ans ^= (m_diag & 15) << 3;
+			m_mouse_bnts <<= 3;
+			m_mouse_bnts |=  m_mousebtn->read() & 7;		// selftest xor diag register with it
+			ans = m_mouse_bnts & 0x1f;
+			ans ^= (m_diag & 15) << 3;
 			ans |= 0x80;										// VCC from calender(?)
 			
 			break;
@@ -964,9 +978,9 @@ m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks 
 	AM9513(config, m_timer, 40_MHz_XTAL / 4 / 10); // from CPU E output
 
 	// see diagram page 2.2-6
+	INPUT_MERGER_ALL_HIGH(config, "irq1").output_handler().set(FUNC(tek440x_state::irq1_raise));
 	m_timer->out1_cb().set("irq1", FUNC(input_merger_device::in_w<0>));
 	m_timer->out2_cb().set("irq1", FUNC(input_merger_device::in_w<1>));
-	INPUT_MERGER_ALL_HIGH(config, "irq1").output_handler().set(FUNC(tek440x_state::irq1_raise));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 
