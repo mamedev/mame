@@ -6,10 +6,10 @@
 FP-200 (c) 1982 Casio
 
 TODO:
-- backup RAM;
 - cassette i/f, glued together by discrete;
 - serial i/f;
 - FDC (requires test program that Service manual mentions);
+- ROM/RAM slot interface;
 - mini plotter printer (FP-1011PL)
 - graphic printer (FP-1012PR)
 
@@ -20,6 +20,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/nvram.h"
 #include "machine/rp5c01.h"
 #include "emupal.h"
 #include "screen.h"
@@ -37,6 +38,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_rtc(*this, "rtc")
+		, m_nvram(*this, "nvram")
 		, m_ioview(*this, "ioview")
 		, m_key(*this, "KEY%X", 0U)
 		, m_gfxrom(*this, "chargen")
@@ -50,6 +52,7 @@ private:
 	// devices
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<rp5c01_device> m_rtc;
+	required_device<nvram_device> m_nvram;
 	memory_view m_ioview;
 	required_ioport_array<16> m_key;
 	required_memory_region m_gfxrom;
@@ -220,7 +223,7 @@ void fp200_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); // basic & cetl
 	// TODO: 1 waitstate penalty for accessing any RAM
-	map(0x8000, 0x9fff).ram(); // internal RAM
+	map(0x8000, 0x9fff).ram().share("nvram"); // internal RAM
 //  0xa000, 0xffff exp RAM (FP-201RAM)
 	map(0xa000, 0xbfff).ram();
 	map(0xc000, 0xdfff).ram();
@@ -412,7 +415,6 @@ int fp200_state::sid_r()
 
 void fp200_state::fp200(machine_config &config)
 {
-	/* basic machine hardware */
 	I8085A(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fp200_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &fp200_state::main_io);
@@ -420,8 +422,8 @@ void fp200_state::fp200(machine_config &config)
 	m_maincpu->out_sod_func().set(FUNC(fp200_state::sod_w));
 
 	RP5C01(config, "rtc", XTAL(32'768));
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
