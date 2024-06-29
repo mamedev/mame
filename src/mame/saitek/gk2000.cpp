@@ -1,36 +1,93 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:Sean Riddle
+// thanks-to:Sean Riddle, Berger
 /*******************************************************************************
 
-Saitek Kasparov GK 2000
+Saitek GK 2000 / Centurion
 
-The chess engine is by Frans Morsch. According to schematics, GK 2100 is on the
-same hardware.
+These chess computers all have the same I/O and fit in the same driver. The chess
+engine is by Frans Morsch.
+
+TODO:
+- is the H8/3212 V03 version on the same hardware?
+- versions with the A20 ROM that don't officially support the extra options on
+  the 2nd row, can still access them when turning the computer on by simultaneously
+  pressing the Go/Stop button with the Option button. This doesn't work on MAME,
+  something with MCU standby stabilisation maybe?
+- it does a cold boot at every reset, so nvram won't work properly unless MAME
+  adds some kind of auxillary autosave state feature at power-off
+
+================================================================================
+
+Saitek GK 2000 family
 
 Hardware notes:
+
+GK 2000 (H8/323 version):
+- PCB label: ST12-PE-009 REV1
 - Hitachi H8/323 MCU, 20MHz XTAL
 - LCD with 5 7segs and custom segments
 - piezo, 16 LEDs, button sensors chessboard
 
-A13 MCU is used in:
+Saitek GK 2100 is on the same hardware, but has a H8/325 instead of H8/323.
+
+H8/323 A13 MCU is used in:
 - Saitek GK 2000 (86071220X12)
 - Saitek Travel Champion 2080 (86071220X12)
-- Saitek Barracuda (suspected)
-- Saitek Mephisto Champion (suspected)
 - Saitek Mephisto Mythos (86142221X34)
 - Tandy (Radio Shack) Mega 2050X (86071221X12)
 - Tandy (Radio Shack) Master 2200X (suspected)
-- Tandy (Radio Shack) Chess Master (suspected)
 
-TODO:
-- it does a cold boot at every reset, so nvram won't work properly unless MAME
-  adds some kind of auxillary autosave state feature at power-off
+Travel Champion 2080 and Tandy Mega 2050X are 14MHz instead of 20MHz.
+
+================================================================================
+
+Saitek Centurion family
+
+This is the program with the infamous H8 bug, not named after the MCU, but after
+the H8 square. The piece on H8 is moved immediately, regardless of playing level,
+often resulting in blunders.
+
+Hardware notes:
+
+Centurion / Cougar:
+- PCB label: ST42C/39A LOGIC PCB, SAITEK LTD, PN 51A125-01113 VER 3.0,
+  SCH ST42C-PE-000 REV 1.0, SCH ST39A-PE-002 VER 1.0
+- Hitachi H8/3214 MCU, configuration diodes for XTAL a.o.
+- same LCD and board hardware as GK 2000
+
+Mephisto Explorer Pro:
+- PCB label: 51CT12-01002, REV1.0 (smaller PCB)
+- same MCU as Cougar, 16MHz XTAL
+- LCD layout is slightly different, symbols are on the right side
+
+For test mode, hold Enter after cold boot during the LCD test. It will say "TST",
+press Enter again to see the diode configuration setting.
+
+S = Studies button (if absent, this input functions as new game)
+t = Teach mode (press a Symbol key after pressing Level)
+L = LEDs enabled
+n = 0/2/4/6 10+n MHz XTAL
+b = Playing mode options on the 2nd row
+
+All known chess computers with the A20 ROM have LEDs, and the S/t/b options are
+either configured as either St, or b. So, none of them that have the Studies
+button and teach mode officially support the extra options and vice versa.
+
+H8/3214 A20 MCU is used in:
+- Saitek Centurion (config: StL0_)
+- Saitek Cosmos (config: __L0b)
+- Saitek Cougar (config: __L6b)
+- Saitek Mephisto Chess Challenger (config: StL0_)
+- Saitek Mephisto Explorer Pro (config: StL6_)
+- Saitek Mephisto Expert Travel Chess (config: __L0b)
+- Saitek Mephisto Mystery (config: __L2b)
 
 *******************************************************************************/
 
 #include "emu.h"
 
+#include "cpu/h8/h83217.h"
 #include "cpu/h8/h8325.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -40,7 +97,10 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
+#include "saitek_centurion.lh"
+#include "saitek_cougar.lh"
 #include "saitek_gk2000.lh"
+#include "saitek_gk2100.lh"
 
 
 namespace {
@@ -59,17 +119,23 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
+	template <typename T> void cpu_config(T &maincpu);
+	void shared(machine_config &config);
 	void gk2000(machine_config &config);
+	void gk2100(machine_config &config);
+	void centurion(machine_config &config);
+	void cougar(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
-	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
+	DECLARE_INPUT_CHANGED_MEMBER(gk2000_change_cpu_freq);
+	DECLARE_INPUT_CHANGED_MEMBER(centurion_change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
 
 private:
 	// devices/pointers
-	required_device<h8323_device> m_maincpu;
+	required_device<h8_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
@@ -104,7 +170,7 @@ void gk2000_state::machine_start()
 	save_item(NAME(m_lcd_com));
 }
 
-INPUT_CHANGED_MEMBER(gk2000_state::change_cpu_freq)
+INPUT_CHANGED_MEMBER(gk2000_state::gk2000_change_cpu_freq)
 {
 	// only 20MHz and 14MHz versions are known to exist, but the software supports others
 	static const int xm[9] = { 8, 20, 24, 28, 32, -1, -1, -1, 14 }; // XTAL in MHz (-1 is invalid)
@@ -112,6 +178,13 @@ INPUT_CHANGED_MEMBER(gk2000_state::change_cpu_freq)
 
 	if (mhz > 0)
 		m_maincpu->set_unscaled_clock(mhz * 1'000'000);
+}
+
+INPUT_CHANGED_MEMBER(gk2000_state::centurion_change_cpu_freq)
+{
+	// 14MHz version doesn't exist, but the software supports it
+	static const XTAL freq[4] = { 12_MHz_XTAL, 16_MHz_XTAL, 14_MHz_XTAL, 10_MHz_XTAL };
+	m_maincpu->set_unscaled_clock(freq[newval & 3]);
 }
 
 
@@ -240,13 +313,55 @@ static INPUT_PORTS_START( gk2000 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Black / Right")
 
 	PORT_START("IN.2")
-	PORT_CONFNAME( 0xff, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, gk2000_state, change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0xff, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, gk2000_state, gk2000_change_cpu_freq, 0) // factory set
+	PORT_CONFSETTING(    0x01, "8MHz (unofficial)" )
 	PORT_CONFSETTING(    0x00, "14MHz (Travel Champion 2080)" )
-	PORT_CONFSETTING(    0x02, "20MHz (GK 2000)" )
+	PORT_CONFSETTING(    0x02, "20MHz (GK 2000, GK 2100)" )
+	PORT_CONFSETTING(    0x04, "24MHz (unofficial)" )
+	PORT_CONFSETTING(    0x08, "28MHz (unofficial)" )
+	PORT_CONFSETTING(    0x10, "32MHz (unofficial)" )
 
 	PORT_START("IN.3")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, gk2000_state, go_button, 0) PORT_NAME("Go / Stop")
 	PORT_BIT(0xef, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gk2100 )
+	PORT_INCLUDE( gk2000 )
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("White / -")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("Black / +")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cougar )
+	PORT_INCLUDE( gk2000 )
+
+	PORT_MODIFY("IN.2") // configuration diodes
+	PORT_BIT(0x27, 0x00, IPT_CUSTOM) // __Lnb
+	PORT_CONFNAME( 0x18, 0x08, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, gk2000_state, centurion_change_cpu_freq, 0)
+	PORT_CONFSETTING(    0x18, "10MHz (Centurion, Cosmos)" )
+	PORT_CONFSETTING(    0x00, "12MHz (Mephisto Mystery)" )
+	PORT_CONFSETTING(    0x10, "14MHz (unofficial)" )
+	PORT_CONFSETTING(    0x08, "16MHz (Cougar, Mephisto Explorer Pro)" )
+	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( centurion )
+	PORT_INCLUDE( cougar )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Studies")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_F1) PORT_NAME("Clear")   // combine for NEW GAME
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CODE(KEYCODE_F1) PORT_NAME("Enter") // "
+
+	PORT_MODIFY("IN.2") // change defaults
+	PORT_BIT(0x27, 0x23, IPT_CUSTOM) // StLn_
+	PORT_CONFNAME( 0x18, 0x18, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, gk2000_state, centurion_change_cpu_freq, 0)
+	PORT_CONFSETTING(    0x18, "10MHz (Centurion, Cosmos)" )
+	PORT_CONFSETTING(    0x00, "12MHz (Mephisto Mystery)" )
+	PORT_CONFSETTING(    0x10, "14MHz (unofficial)" )
+	PORT_CONFSETTING(    0x08, "16MHz (Cougar, Mephisto Explorer Pro)" )
 INPUT_PORTS_END
 
 
@@ -255,23 +370,26 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void gk2000_state::gk2000(machine_config &config)
+template <typename T>
+void gk2000_state::cpu_config(T &maincpu)
+{
+	maincpu.nvram_enable_backup(true);
+	maincpu.standby_cb().set(maincpu, FUNC(T::nvram_set_battery));
+	maincpu.standby_cb().append(FUNC(gk2000_state::standby));
+	maincpu.write_port1().set(FUNC(gk2000_state::lcd_segs_w<0>));
+	maincpu.write_port2().set(FUNC(gk2000_state::p2_w));
+	maincpu.write_port3().set(FUNC(gk2000_state::lcd_segs_w<1>));
+	maincpu.read_port4().set(FUNC(gk2000_state::p4_r));
+	maincpu.read_port5().set_constant(0xff);
+	maincpu.write_port5().set(FUNC(gk2000_state::p5_w));
+	maincpu.read_port6().set_ioport("IN.3").invert();
+	maincpu.write_port6().set(FUNC(gk2000_state::lcd_com_w));
+	maincpu.write_port7().set(FUNC(gk2000_state::lcd_segs_w<2>));
+}
+
+void gk2000_state::shared(machine_config &config)
 {
 	// basic machine hardware
-	H8323(config, m_maincpu, 20_MHz_XTAL);
-	m_maincpu->nvram_enable_backup(true);
-	m_maincpu->standby_cb().set(m_maincpu, FUNC(h8323_device::nvram_set_battery));
-	m_maincpu->standby_cb().append(FUNC(gk2000_state::standby));
-	m_maincpu->write_port1().set(FUNC(gk2000_state::lcd_segs_w<0>));
-	m_maincpu->write_port2().set(FUNC(gk2000_state::p2_w));
-	m_maincpu->write_port3().set(FUNC(gk2000_state::lcd_segs_w<1>));
-	m_maincpu->read_port4().set(FUNC(gk2000_state::p4_r));
-	m_maincpu->read_port5().set_constant(0xff);
-	m_maincpu->write_port5().set(FUNC(gk2000_state::p5_w));
-	m_maincpu->read_port6().set_ioport("IN.3").invert();
-	m_maincpu->write_port6().set(FUNC(gk2000_state::lcd_com_w));
-	m_maincpu->write_port7().set(FUNC(gk2000_state::lcd_segs_w<2>));
-
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
@@ -294,6 +412,42 @@ void gk2000_state::gk2000(machine_config &config)
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
+void gk2000_state::gk2000(machine_config &config)
+{
+	H8323(config, m_maincpu, 20_MHz_XTAL);
+	cpu_config<h8323_device>(downcast<h8323_device &>(*m_maincpu));
+
+	shared(config);
+}
+
+void gk2000_state::gk2100(machine_config &config)
+{
+	H8325(config, m_maincpu, 20_MHz_XTAL);
+	cpu_config<h8325_device>(downcast<h8325_device &>(*m_maincpu));
+
+	shared(config);
+
+	config.set_default_layout(layout_saitek_gk2100);
+}
+
+void gk2000_state::centurion(machine_config &config)
+{
+	H83214(config, m_maincpu, 10_MHz_XTAL);
+	cpu_config<h83214_device>(downcast<h83214_device &>(*m_maincpu));
+
+	shared(config);
+
+	config.set_default_layout(layout_saitek_centurion);
+}
+
+void gk2000_state::cougar(machine_config &config)
+{
+	centurion(config);
+	m_maincpu->set_clock(16_MHz_XTAL);
+
+	config.set_default_layout(layout_saitek_cougar);
+}
+
 
 
 /*******************************************************************************
@@ -308,6 +462,24 @@ ROM_START( gk2000 )
 	ROM_LOAD("gk2000.svg", 0, 68501, CRC(80554c49) SHA1(88f06ec8f403eaaf7cbce4cc84807b5742ce7108) )
 ROM_END
 
+ROM_START( gk2100 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD("94_saitek_86100150110_3258b40p.u1", 0x0000, 0x8000, CRC(33823df6) SHA1(df528bbbf5eed985d05ced07fcb8f1cfb91a9f1b) )
+
+	ROM_REGION( 68501, "screen", 0 )
+	ROM_LOAD("gk2000.svg", 0, 68501, CRC(80554c49) SHA1(88f06ec8f403eaaf7cbce4cc84807b5742ce7108) )
+ROM_END
+
+ROM_START( centurion )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD("98_saitek_86171400305_hd6433214a20p.u1", 0x0000, 0x8000, CRC(31e35d22) SHA1(92cc3d90fc4e33f9634c0229fdb339dd0d8c5133) )
+
+	ROM_REGION( 68501, "screen", 0 )
+	ROM_LOAD("gk2000.svg", 0, 68501, CRC(80554c49) SHA1(88f06ec8f403eaaf7cbce4cc84807b5742ce7108) )
+ROM_END
+
+#define rom_cougar rom_centurion
+
 } // anonymous namespace
 
 
@@ -316,5 +488,10 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1992, gk2000, 0,      0,      gk2000,  gk2000, gk2000_state, empty_init, "Saitek", "Kasparov GK 2000", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT     COMPAT  MACHINE     INPUT      CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1992, gk2000,    0,         0,      gk2000,     gk2000,    gk2000_state, empty_init, "Saitek", "Kasparov GK 2000", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1994, gk2100,    0,         0,      gk2100,     gk2100,    gk2000_state, empty_init, "Saitek", "Kasparov GK 2100", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1998, centurion, 0,         0,      centurion,  centurion, gk2000_state, empty_init, "Saitek", "Kasparov Centurion", MACHINE_SUPPORTS_SAVE )
+SYST( 1998, cougar,    centurion, 0,      cougar,     cougar,    gk2000_state, empty_init, "Saitek", "Kasparov Cougar", MACHINE_SUPPORTS_SAVE )

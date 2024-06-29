@@ -419,7 +419,7 @@ authors:hap
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="2.8" right="148.6" top="-3.2" bottom="87.2" />
+		<bounds left="2.8" right="148.6" top="-0.25" bottom="87.2" />
 
 		<element ref="cwhite"><bounds xc="61" yc="42" width="95" height="95" /></element>
 		<element ref="blackb"><bounds xc="61" yc="42" width="80.5" height="80.5" /></element>
@@ -445,6 +445,8 @@ authors:hap
 		<element name="1.7" ref="led"><bounds xc="96" y="85.2" width="0.9" height="3" /></element>
 
 		<element ref="cb_mask" blend="multiply"><bounds xc="61" yc="42" width="100" height="100" /></element>
+		<element ref="blackb"><bounds x="0" y="-10" width="150" height="9.75" /></element>
+
 		<group ref="sb_ui"><bounds x="4.3" y="2" width="10" height="80" /></group>
 
 		<!-- chessboard coords -->

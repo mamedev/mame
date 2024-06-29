@@ -229,9 +229,9 @@ void mm2_state::mm2(machine_config &config)
 	m_pit->set_clk<1>(16_MHz_XTAL/8);
 	m_pit->set_clk<2>(16_MHz_XTAL/8);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
-	//m_pit->out_handler<1>().set()); MPSC ch B line clock 
+	//m_pit->out_handler<1>().set()); MPSC ch B line clock
 	//m_pit->out_handler<2>().set()); Beep control
-	
+
 	I8274(config, m_mpsc, 16_MHz_XTAL/4);
 	m_mpsc->out_int_callback().set(m_pic, FUNC(pic8259_device::ir1_w));
 

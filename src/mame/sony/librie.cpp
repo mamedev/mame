@@ -3,7 +3,7 @@
 
 /*
 
-Skeleton driver for Sony Librie e-Books.
+Skeleton driver for Sony Librie e-book readers.
 
   Librie EBR-1000 (PCB EBX-5003):
     __________________________________________________________________________
@@ -59,11 +59,11 @@ namespace {
 class librie_state : public driver_device
 {
 public:
-	librie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	librie_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu")
-		{ }
+	{ }
 
 	void ebx5003(machine_config &config);
 
@@ -88,7 +88,7 @@ void librie_state::ebx5003(machine_config &config)
 {
 	ARM920T(config, m_maincpu, 66'000'000); // ARM920T core, unknown clock
 
-	screen_device&screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // Not LCD, but e-Ink, 800×600 with 167 PPI. It only had 4 grey scales
+	screen_device&screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // Not LCD, but e-Ink, 800×600, 167 PPI, four-level greyscale
 	screen.set_refresh_hz(60);
 	screen.set_size(600, 800);
 	screen.set_visarea(0, 600 - 1, 0, 800 - 1);
@@ -98,7 +98,7 @@ void librie_state::ebx5003(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 
-	H83002(config, m_mcu, 66'000'000); // Actually an Hitachi H8/3802 HD6473802FP. Unknown clock
+	H83002(config, m_mcu, 66'000'000); // Actually a Hitachi H8/3802 HD6473802FP. Unknown clock
 }
 
 

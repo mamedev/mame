@@ -7344,6 +7344,17 @@ Wave Studio v3.12
 		</part>
 	</software>
 
+	<software name="karatvst">
+		<description>Karaoke Manager Installation CD - Karaoke Manager Version 1.4 (bundled with KaraokeTV Star)</description>
+		<year>2002</year>
+		<publisher>IVL Technologies</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="karaokemanager_uscd1_4" sha1="83125d35a375496f3bce70072b7d47e24b4da130"/>
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="ultrasnd" supported="partial">
 		<!-- includes Gravis UltraSound (GUS) Installation - V4.11 -->
 		<description>The UltraSound CD</description>

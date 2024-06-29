@@ -43,7 +43,6 @@ static constexpr XTAL AIM65_CLOCK(4_MHz_XTAL / 4);
     ADDRESS MAPS
 ***************************************************************************/
 
-// Note: RAM is mapped dynamically in machine/aim65.c
 void aim65_state::mem_map(address_map &map)
 {
 	map(0x1000, 0x3fff).noprw(); // User available expansions
@@ -307,15 +306,25 @@ void aim65_state::aim65(machine_config &config)
 
 ROM_START( aim65 )
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_SYSTEM_BIOS(0, "aim65",  "Rockwell AIM-65")
+	ROM_SYSTEM_BIOS(0, "aim65",   "Rockwell AIM-65")
 	ROMX_LOAD("aim65mon.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(0))
 	ROMX_LOAD("aim65mon.z22", 0xf000, 0x1000, CRC(d01914b0) SHA1(e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "dynatem",  "Dynatem AIM-65")
-	ROMX_LOAD("dynaim65.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(1))
-	ROMX_LOAD("dynaim65.z22", 0xf000, 0x1000, CRC(83e1c6e7) SHA1(444134043edd83385bd70434cb100269901c4417), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "spc100",  "Siemens PC100")
-	ROMX_LOAD("pc100.z23",    0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(2))
-	ROMX_LOAD("pc100.z22",    0xf000, 0x1000, CRC(aa07742a) SHA1(3b9bee24a00cf23b7b50cee97ccc12e3fa9da1ea), ROM_BIOS(2))
+
+	/* DRAC/DRAC-1 is an industrial control computer from the Spanish company Comelta (more info: https://www.oldcomputers.es/drac-1/).
+	   It's based on a standard Rockwell AIM 65 PCB, but can be expanded with several cards and accessories made by Comelta, from CPU and
+	   memory modules to control or interface cards (more info and manuals with schematics: https://www.oldcomputers.es/drac-1-placas-cr/).
+	*/
+	ROM_SYSTEM_BIOS(1, "drac1",   "Comelta DRAC-1")
+	ROMX_LOAD("crosaim_v1.3_b_mone_2b_moni_01_e000.z23", 0xe000, 0x1000, CRC(ae83ba08) SHA1(4ee4157fe6cafda6c763547183be18859bdabc36), ROM_BIOS(1))
+	ROMX_LOAD("crosaim_v1.3_b_monf_2b_f000.z22",         0xf000, 0x1000, CRC(047c2ca8) SHA1(1877be29f7b725ee4fec7f21aa679d857391514b), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2, "dynatem", "Dynatem AIM-65")
+	ROMX_LOAD("dynaim65.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(2))
+	ROMX_LOAD("dynaim65.z22", 0xf000, 0x1000, CRC(83e1c6e7) SHA1(444134043edd83385bd70434cb100269901c4417), ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3, "spc100",  "Siemens PC100")
+	ROMX_LOAD("pc100.z23",    0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(3))
+	ROMX_LOAD("pc100.z22",    0xf000, 0x1000, CRC(aa07742a) SHA1(3b9bee24a00cf23b7b50cee97ccc12e3fa9da1ea), ROM_BIOS(3))
 ROM_END
 
 

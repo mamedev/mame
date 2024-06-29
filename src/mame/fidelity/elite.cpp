@@ -24,14 +24,14 @@ matches (they won it in 1983). A/S stands for auto sensory, it's the 1st
 Fidelity board with magnet sensors. The magnetic chessboard was licensed from
 AVE Micro Systems, in fact, the PC model board is the same one as in AVE's ARB.
 
-hardware overview:
-- 8*8 magnet sensors, 11 buttons, 8*(8+1) LEDs + 4*7seg LEDs
+Hardware notes:
+- PCB label: FIDELITY ELECTRONICS, 510-1071A01, copyright 1983
 - R65C02P4 or R6502BP CPU, default frequency 3MHz*
 - 4KB RAM (2*HM6116), 24KB ROM
 - TSI S14001A + speech ROM
 - I/O with 8255 PPI and bunch of TTL
+- 8*8 magnet sensors, 11 buttons, 8*(8+1) LEDs + 4*7seg LEDs
 - module slot and printer port
-- PCB label 510-1071A01
 
 *In West Germany, some distributors released it with overclocked CPUs,
 advertised as 3.2, 3.6, or 4MHz. Unmodified EAS PCB photos show only a 3MHz XTAL.
@@ -51,13 +51,22 @@ I was at an internal sales meeting. No one could figure out how to start a new g
 Sid turned to me with a questioning look. I showed him how to do it (multiple key
 presses as I recall) and explained about Kathy. He said, don't let them do it again."
 
-Prestige Challenger (PC) hardware is very similar. It was released before EAS,
-it doesn't have the 8255 PPI, but has more RAM(7*TMM2016P). Some were released at
-3.6MHz instead of 4MHz, maybe due to hardware instability? Opening module PC16 was
-included by default, this module is the same as CB16 but at different form factor.
+Prestige Challenger (model PC, 1982 510-1050A01 PCB) hardware is very similar. It
+was released before EAS, it doesn't have the 8255 PPI, but has more RAM (7*TMM2016P).
+Some were released at 3.6MHz instead of 4MHz, maybe due to hardware instability?
+Opening module PC16 was included by default, this module is the same as CB16 but
+at different form factor.
 
-Elite Avant Garde (models 6081,6088,6089) is on similar hardware as EAS. Level B8
-starts a self-test and displays ROM checksums, press CL to advance.
+There's also an unreleased prototype on a newer 1985 PCB revision (Fidelity Computer
+Products, 510-1071B01 PCB). It has 16KB RAM (2*HM6264LP-15), a 5MHz CPU, IRQ is via
+a 556 timer instead of a 38.4kHz resonator. This board came from Peter Reckwitz's
+inventory, he was a Fidelity representative in West Germany at the time. Considering
+the "EXP" (experimental?) EPROM labels, it can be speculated that this version
+competed in one of the chess computer tournaments.
+
+Elite Avant Garde (models 6081,6088,6089, Fidelity International, 510-1071C01 PCB)
+is nearly the same as the 510-1071B01 PCB above, with one extra 7seg panel. Level
+B8 starts a self-test and displays ROM checksums, press CL to advance.
 
 Fidelity Elite Private Line were EAS/EAG conversions released by Fidelity Deutschland.
 The "Elite Privat" was probably for the local market and the "Private Line" for
@@ -118,6 +127,7 @@ public:
 	void eas(machine_config &config);
 	void ewc(machine_config &config);
 	void easc(machine_config &config);
+	void easx(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
@@ -143,6 +153,7 @@ protected:
 
 	// address maps
 	void eas_map(address_map &map);
+	void eag_map(address_map &map);
 	void pc_map(address_map &map);
 
 	// I/O handlers
@@ -195,11 +206,9 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	// address maps
-	void eag_map(address_map &map);
 	void eag2100_map(address_map &map);
 
-	// I/O handlers
+	// board is rotated 90 degrees
 	virtual u8 board_r() override { return m_board->read_rank(m_inp_mux); }
 };
 
@@ -355,15 +364,15 @@ void elite_state::eas_map(address_map &map)
 	map(0xc000, 0xffff).rom();
 }
 
-void eag_state::eag_map(address_map &map)
+void elite_state::eag_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("nvram.ic8");
 	map(0x2000, 0x5fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0x7000, 0x7003).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7020, 0x7027).w(FUNC(eag_state::segment_w)).nopr();
-	map(0x7030, 0x7037).w(FUNC(eag_state::led_w)).nopr();
-	map(0x7050, 0x7050).r(FUNC(eag_state::input_r));
+	map(0x7020, 0x7027).w(FUNC(elite_state::segment_w)).nopr();
+	map(0x7030, 0x7037).w(FUNC(elite_state::led_w)).nopr();
+	map(0x7050, 0x7050).r(FUNC(elite_state::input_r));
 	map(0x8000, 0x9fff).ram().share("nvram.ic6");
 	map(0xa000, 0xffff).rom();
 }
@@ -432,6 +441,13 @@ static INPUT_PORTS_START( pc )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") // led display still says - G C -
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( easx )
+	PORT_INCLUDE( eas )
+
+	PORT_MODIFY("CPU") // 5MHz
+	PORT_BIT(0x03, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( eag )
 	PORT_INCLUDE( fidel_clockdiv_4 )
 
@@ -460,7 +476,7 @@ INPUT_PORTS_END
 void elite_state::pc(machine_config &config)
 {
 	// basic machine hardware
-	R65C02(config, m_maincpu, 4_MHz_XTAL); // R65C02P4
+	R65C02(config, m_maincpu, 4_MHz_XTAL); // R65C02P3/4
 	m_maincpu->set_addrmap(AS_PROGRAM, &elite_state::pc_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 38.4_kHz_XTAL/64)); // through 4060 IC, 600Hz
@@ -522,13 +538,13 @@ void elite_state::easc(machine_config &config)
 	m_maincpu->set_clock(4_MHz_XTAL);
 }
 
-void eag_state::eag(machine_config &config)
+void elite_state::easx(machine_config &config)
 {
 	eas(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(5_MHz_XTAL); // R65C02P4
-	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eag_map);
+	m_maincpu->set_clock(5_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &elite_state::eag_map);
 
 	auto &irq_clock(CLOCK(config.replace(), "irq_clock", 600)); // from 556 timer (22nF, 82K+pot, 1K), ideal frequency is 600Hz
 	irq_clock.set_pulse_width(attotime::from_nsec(15250)); // active for 15.25us
@@ -537,6 +553,11 @@ void eag_state::eag(machine_config &config)
 	config.device_remove("nvram");
 	NVRAM(config, "nvram.ic8", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "nvram.ic6", nvram_device::DEFAULT_ALL_0);
+}
+
+void eag_state::eag(machine_config &config)
+{
+	easx(config);
 
 	// video hardware
 	m_display->set_segmask(0x1ef, 0x7f);
@@ -655,15 +676,15 @@ ROM_END
 
 ROM_START( feasgla )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("4.0_86", 0x8000, 0x0800, CRC(32784e2d) SHA1(dae060a5c49cc1993a78db293cd80464adfd892d) )
+	ROM_LOAD("4.0_8_6", 0x8000, 0x0800, CRC(32784e2d) SHA1(dae060a5c49cc1993a78db293cd80464adfd892d) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
 	ROM_CONTINUE( 0x9800, 0x0800 )
-	ROM_LOAD("c5", 0xc000, 0x0800, CRC(ddb80412) SHA1(b1d9435d9a71b8eb241a2169bfbaa0499f510769) )
+	ROM_LOAD("4.0_c_5", 0xc000, 0x0800, CRC(ddb80412) SHA1(b1d9435d9a71b8eb241a2169bfbaa0499f510769) )
 	ROM_CONTINUE( 0xd000, 0x0800 )
 	ROM_CONTINUE( 0xc800, 0x0800 )
 	ROM_CONTINUE( 0xd800, 0x0800 )
-	ROM_LOAD("4.0_e4", 0xe000, 0x0800, CRC(62a5305a) SHA1(a361bd9a54b903d7b0fbacabe55ea5ccbbc1dc51) )
+	ROM_LOAD("4.0_e_4", 0xe000, 0x0800, CRC(62a5305a) SHA1(a361bd9a54b903d7b0fbacabe55ea5ccbbc1dc51) )
 	ROM_CONTINUE( 0xf000, 0x0800 )
 	ROM_CONTINUE( 0xe800, 0x0800 )
 	ROM_CONTINUE( 0xf800, 0x0800 )
@@ -739,6 +760,33 @@ ROM_START( feasglab )
 	ROM_CONTINUE( 0xf000, 0x0800 )
 	ROM_CONTINUE( 0xe800, 0x0800 )
 	ROM_CONTINUE( 0xf800, 0x0800 )
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( feasx ) // 510-1071B01 PCB
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("exp_8000_6", 0xa000, 0x2000, CRC(b555c5ab) SHA1(d85ae44f0c13e2bfafbc3cadf829e74c7f4ba2e3) ) // Seeq DQ5133-25
+	ROM_LOAD("exp_c000_5", 0xc000, 0x2000, CRC(fd8471e3) SHA1(e684ded8ed4934bc5ef0cc4ae37dc5d12496d39e) ) // "
+	ROM_LOAD("exp_e000_4", 0xe000, 0x2000, CRC(19c36d83) SHA1(33438c316284182ebe195a383bb2d96d3524c88d) ) // "
 
 	// speech ROM
 	ROM_DEFAULT_BIOS("en")
@@ -1095,6 +1143,7 @@ SYST( 1983, feasbua,   feas,   0,      ewc,      ewc,   elite_state, empty_init,
 SYST( 1984, feasgla,   feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 1)", MACHINE_SUPPORTS_SAVE )
 SYST( 1984, feasglaa,  feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 2)", MACHINE_SUPPORTS_SAVE )
 SYST( 1984, feasglab,  feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, feasx,     feas,   0,      easx,     easx,  elite_state, empty_init,   "Fidelity Computer Products", "Elite A/S Challenger (experimental)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1982, fpres,     0,      0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 1)", MACHINE_SUPPORTS_SAVE )
 SYST( 1982, fpresa,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 2)", MACHINE_SUPPORTS_SAVE )

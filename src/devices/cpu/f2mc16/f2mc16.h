@@ -622,7 +622,7 @@ private:
 		if (read_rwX(0) > 0)
 		{
 			m_icount -= 4;
-			while (read_rwX(0) > 0)
+			while (uint16_t n = read_rwX(0))
 			{
 				u16 al = (m_acc & 0xffff);
 				u16 ah = (m_acc >> 16) & 0xffff;
@@ -631,7 +631,7 @@ private:
 				al++;
 				ah++;
 				m_acc = (ah<<16) | al;
-				write_rwX(0, read_rwX(0) - 1);
+				write_rwX(0, n - 1);
 				m_icount -= 8;
 			}
 		}
@@ -647,7 +647,7 @@ private:
 		if (read_rwX(0) > 0)
 		{
 			m_icount -= 4;
-			while (read_rwX(0) > 0)
+			while (uint16_t n = read_rwX(0))
 			{
 				u16 al = (m_acc & 0xffff);
 				u16 ah = (m_acc >> 16) & 0xffff;
@@ -656,7 +656,7 @@ private:
 				al += 2;
 				ah += 2;
 				m_acc = (ah<<16) | al;
-				write_rwX(0, read_rwX(0) - 1);
+				write_rwX(0, n - 1);
 				m_icount -= 8;
 			}
 		}
@@ -670,15 +670,32 @@ private:
 	inline void filsi(u8 dst)
 	{
 		m_icount -= 6;
-		while (read_rwX(0) > 0)
+		while (uint16_t n = read_rwX(0))
 		{
 			u16 al = (m_acc & 0xffff);
 			u16 ah = (m_acc >> 16) & 0xffff;
 			write_8((dst<<16) | ah, al & 0xff);
 			ah++;
 			m_acc = (ah<<16) | al;
-			write_rwX(0, read_rwX(0) - 1);
+			write_rwX(0, n - 1);
 			setNZ_8(m_acc & 0xff);
+			m_icount -= 6;
+		}
+		m_pc += 2;
+	}
+
+	inline void filswi(u8 dst)
+	{
+		m_icount -= 6;
+		while (uint16_t n = read_rwX(0))
+		{
+			u16 al = (m_acc & 0xffff);
+			u16 ah = (m_acc >> 16) & 0xffff;
+			write_16((dst<<16) | ah, al);
+			ah += 2;
+			m_acc = (ah<<16) | al;
+			write_rwX(0, n - 1);
+			setNZ_16(m_acc & 0xffff);
 			m_icount -= 6;
 		}
 		m_pc += 2;
@@ -696,9 +713,11 @@ private:
 	void opcodes_ea76(u8 operand);
 	void opcodes_ea77(u8 operand);
 	void opcodes_ea78(u8 operand);
+	void opcodes_rwiea79(u8 operand);
 	void opcodes_riea7a(u8 operand);
 	void opcodes_rwiea7b(u8 operand);
 	void opcodes_eari7c(u8 operand);
+	void opcodes_earwi7d(u8 operand);
 	void opcodes_rwiea7f(u8 operand);
 
 	void set_irq(int vector, int level);

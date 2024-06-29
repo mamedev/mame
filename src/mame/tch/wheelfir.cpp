@@ -273,7 +273,7 @@ void wheelfir_state::do_blit()
 
 	float scale_u_step;
 	float scale_v_step;
-	
+
 	// calculate u zoom (horizontal source scale)
 	const int d1u = ((m_blitter_data[0x0a] & 0x1f00) >> 8) |
 					((m_blitter_data[0x08] & 0x0100) >> 3);
@@ -301,7 +301,7 @@ void wheelfir_state::do_blit()
 
 	scale_u_step = 100.f / scale_u;
 	scale_v_step = 100.f / scale_v;
-	
+
 
 	// do the draw
 	int y = dst_y0;
@@ -833,6 +833,19 @@ void wheelfir_state::kongball(machine_config& config)
 }
 
 
+void wheelfir_state::init_pwball()
+{
+	m_force_extra_irq1 = true;
+	//m_disable_raster_irq = true;
+}
+
+void wheelfir_state::init_kongball()
+{
+	m_force_extra_irq1 = true;
+	m_disable_raster_irq = true; // the raster interrupt points outside of code
+}
+
+
 ROM_START( wheelfir )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tch1.u19", 0x00001, 0x80000, CRC(33bbbc67) SHA1(c2ecc0ab522ee442076ea7b9536aee6e1fad0540) )
@@ -958,18 +971,6 @@ ROM_START( radendur )
 ROM_END
 
 } // anonymous namespace
-
-void wheelfir_state::init_pwball()
-{
-	m_force_extra_irq1 = true;
-//	m_disable_raster_irq = true;
-}
-
-void wheelfir_state::init_kongball()
-{
-	m_force_extra_irq1 = true;
-	m_disable_raster_irq = true; // the raster interrupt points outside of code
-}
 
 GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, empty_init,    ROT0,  "TCH", "Wheels & Fire", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 199?, pwball,      0, wheelfir,    pwball,   wheelfir_state, init_pwball,   ROT0,  "TCH", "Power Ball (prototype)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // mostly complete

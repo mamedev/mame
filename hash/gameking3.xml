@@ -112,4 +112,15 @@ see gameking.xml for information about cartridge types
 		</part>
 	</software>
 
+	<software name="2030" supported="partial">
+		<description>2030</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="2030.gk3" size="524288" crc="b9a69404" sha1="19e0a6ba1deafcb5307119cc312eb3f4a3da58cd"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

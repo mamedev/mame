@@ -102,7 +102,16 @@ adbmodem_device::adbmodem_device(const machine_config &mconfig, const char *tag,
 	write_via_clock(*this),
 	write_via_data(*this),
 	write_irq(*this),
-	m_maincpu(*this, "adbmodem")
+	m_maincpu(*this, "adbmodem"),
+	m_via_data(0),
+	m_via_clock(0),
+	m_last_adb(0),
+	m_via_state(0),
+	m_last_adb_time(0),
+	m_adb_in(false),
+	m_reset_line(0),
+	m_adb_dtime(0),
+	m_last_via_clock(1)
 #if USE_BUS_ADB
 	, m_adb_connector{{*this, "adb1"}, {*this, finder_base::DUMMY_TAG}}
 #endif
@@ -127,10 +136,10 @@ void adbmodem_device::device_start()
 	}
 #endif
 
-	save_item(NAME(via_data));
-	save_item(NAME(via_clock));
-	save_item(NAME(adb_in));
-	save_item(NAME(reset_line));
+	save_item(NAME(m_via_data));
+	save_item(NAME(m_via_clock));
+	save_item(NAME(m_adb_in));
+	save_item(NAME(m_reset_line));
 	save_item(NAME(m_adb_dtime));
 
 #if USE_BUS_ADB
@@ -152,17 +161,18 @@ void adbmodem_device::device_reset()
 	m_adb_device_poweron[0] = m_adb_device_poweron[1] = true;
 	#endif
 
-	adb_in = true;  // line is pulled up to +5v, so nothing plugged in would read as "1"
-	reset_line = 0;
-	via_data = 0;
-	via_clock = 0;
-	last_adb_time = m_maincpu->total_cycles();
-	last_adb = 0;
+	m_adb_in = true;  // line is pulled up to +5v, so nothing plugged in would read as "1"
+	m_reset_line = 0;
+	m_via_data = 0;
+	m_via_clock = 0;
+	m_last_adb_time = m_maincpu->total_cycles();
+	m_last_adb = 0;
+	m_last_via_clock = 1;
 }
 
 u8 adbmodem_device::porta_r()
 {
-	return (m_via_state & 3) | (adb_in << 3);
+	return (m_via_state & 3) | (m_adb_in << 3);
 }
 
 void adbmodem_device::porta_w(u8 data)
@@ -172,13 +182,37 @@ void adbmodem_device::porta_w(u8 data)
 
 u8 adbmodem_device::portb_r()
 {
-	return (via_data << 3);
+	return (m_via_data << 3);
 }
 
 void adbmodem_device::portb_w(u8 data)
 {
+	m_last_via_clock = BIT(data, 2);
 	write_via_data(BIT(data, 3));
 	write_via_clock(BIT(data, 2));
 	write_irq(BIT(data, 4) ^ 1);
 }
 
+void adbmodem_device::set_via_data(u8 dat)
+{
+	/*
+	    There is a race condition we sometimes lose on fast CPUs like the IIci where
+	    the final bit shifts out of the VIA and the 68k writes the VIA ACR (causing the
+	    data line to go high) before the PIC has sampled it to get the final bit state.
+	    This manifested as ADB TALK mouse commands going to register 1 instead of 0, which
+	    due to implementation details of macadb returned 00 00 for no mouse data available
+	    instead of 80 80, and therefore the mouse button state in MacOS went nuts.
+
+	    We solve this by only accepting ADB data line state changes when the last VIA clock
+	    we wrote was 0; the VIA is configured with this device to transmit on the falling
+	    edge of the clock.
+
+	    Thanks to Tashtari for his extensively commmented disassembly and port of this PIC
+	    program to the modern PIC16F87 and PIC16F88, which are pin-compatible with the
+	    PIC1654S originally used.  https://github.com/lampmerchant/macseadb88
+	*/
+	if (!m_last_via_clock)
+	{
+		m_via_data = dat;
+	}
+}

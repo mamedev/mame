@@ -2020,17 +2020,6 @@ void m68000_musashi_device::fmovem(u16 w2)
 	int mode = (w2 >> 11) & 0x3;
 	int reglist = w2 & 0xff;
 
-	u32 mem_addr = 0;
-	switch (ea >> 3)
-	{
-		case 5:     // (d16, An)
-			mem_addr= EA_AY_DI_32();
-			break;
-		case 6:     // (An) + (Xn) + d8
-			mem_addr= EA_AY_IX_32();
-			break;
-	}
-
 	if (dir)    // From FP regs to mem
 	{
 		switch (mode)
@@ -2116,17 +2105,12 @@ void m68000_musashi_device::fmovem(u16 w2)
 				{
 					if (reglist & (1 << i))
 					{
-						switch (ea >> 3)
+						m_fpr[7 - i] = READ_EA_FPE(imode, reg, di_mode_ea);
+						if (di_mode)
 						{
-							case 5:     // (d16, An)
-							case 6:     // (An) + (Xn) + d8
-								m_fpr[7-i] = load_extended_float80(mem_addr);
-								mem_addr += 12;
-								break;
-							default:
-								m_fpr[7 - i] = READ_EA_FPE(imode, reg, di_mode_ea);
-								break;
+							di_mode_ea += 12;
 						}
+
 						m_icount -= 2;
 					}
 				}

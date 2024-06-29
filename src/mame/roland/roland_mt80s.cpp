@@ -35,6 +35,8 @@ private:
 
 void roland_mt80s_state::mem_map(address_map &map)
 {
+	map(0x000100, 0x0008ff).ram(); // TODO: should be mapped as internal memory by device
+	map(0x100000, 0x13ffff).ram();
 	map(0xf80000, 0xffffff).rom().region("maincpu", 0);
 }
 

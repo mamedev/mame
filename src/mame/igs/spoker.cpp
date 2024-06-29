@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Mirko Buffoni, Roberto Fresca
+// copyright-holders: Mirko Buffoni, Roberto Fresca
+
 /***************************************************************************
 
   Super Poker (IGS)
@@ -13,7 +14,10 @@
   - Very similar to IGS009 driver, but without the reels stuff.
     Maybe both drivers can be merged at some point.
 
-  - The Super Poker US/UA sets look like they lack of PPI 8255 devices...
+  - The Super Poker US/UA sets seem to be something in-between hardware
+    emulated in igs/igspoker.cpp and the one in this driver. They lack of
+    PPI 8255 devices, sporting instead an IGS026A custom (verified via decap
+    as ULA for inputs/addressing).
 
 ****************************************************************************
 
@@ -21,7 +25,7 @@
 
   - Understand how to reset NVRAM
   - Map DSW (Operator mode doesn't help)
-  - Map Leds and Coin counters
+  - Verify LEDs and coin counters (should be ok)
   - 3super8 randomly crashes
   - 3super8 doesn't have the 8x32 tilemap, change the video emulation accordingly
 
@@ -56,14 +60,13 @@ public:
 		m_bg_tile_ram(*this, "bg_tile_ram"),
 		m_fg_tile_ram(*this, "fg_tile_ram"),
 		m_fg_color_ram(*this, "fg_color_ram"),
+		m_dsw(*this, "DSW%u", 1U),
 		m_leds(*this, "led%u", 0U)
 	{ }
 
 	void spoker(machine_config &config);
-	void spokeru(machine_config &config);
 	void _3super8(machine_config &config);
 
-	void init_spkleftover();
 	void init_spk100();
 	void init_spk114it();
 	void init_spk116it();
@@ -76,19 +79,19 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<uint8_t> m_bg_tile_ram;
+	optional_shared_ptr<uint8_t> m_bg_tile_ram;
 	tilemap_t *m_bg_tilemap = nullptr;
 
 	required_shared_ptr<uint8_t> m_fg_tile_ram;
 	required_shared_ptr<uint8_t> m_fg_color_ram;
 	tilemap_t *m_fg_tilemap = nullptr;
 
+	required_ioport_array<5> m_dsw;
 	output_finder<7> m_leds;
 
 	// common
@@ -117,10 +120,27 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void _3super8_portmap(address_map &map);
-	void spoker_map(address_map &map);
-	void spokeru_map(address_map &map);
+	void program_map(address_map &map);
 	void spoker_portmap(address_map &map);
-	void spokeru_portmap(address_map &map);
+};
+
+class spokeru_state : public spoker_state
+{
+public:
+	using spoker_state::spoker_state;
+
+	void spokeru(machine_config &config);
+	void init_spokeru();
+
+protected:
+	virtual void video_start() override;
+
+private:
+	void coins_w(uint8_t data);
+	void nmi_video_leds_w(uint8_t data);
+
+	void program_map(address_map &map);
+	void portmap(address_map &map);
 };
 
 
@@ -136,14 +156,14 @@ void spoker_state::bg_tile_w(offs_t offset, uint8_t data)
 
 TILE_GET_INFO_MEMBER(spoker_state::get_bg_tile_info)
 {
-	int code = m_bg_tile_ram[tile_index];
+	int const code = m_bg_tile_ram[tile_index];
 	tileinfo.set(1 + (tile_index & 3), code & 0xff, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(spoker_state::get_fg_tile_info)
 {
-	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
-	tileinfo.set(0, code, (4*(code >> 14)+3), 0);
+	int const code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
+	tileinfo.set(0, code, (4 * (code >> 14) + 3), 0);
 }
 
 void spoker_state::fg_tile_w(offs_t offset, uint8_t data)
@@ -160,15 +180,21 @@ void spoker_state::fg_color_w(offs_t offset, uint8_t data)
 
 void spoker_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spoker_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,  32, 128, 8);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spoker_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,  8,  128, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spoker_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 128, 8);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spoker_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 	m_fg_tilemap->set_transparent_pen(0);
+}
+
+void spokeru_state::video_start()
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spokeru_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 uint32_t spoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (m_bg_tilemap)
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -180,11 +206,11 @@ uint32_t spoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 int spoker_state::hopper_r()
 {
-	if (m_hopper) return !(m_screen->frame_number()%10);
+	if (m_hopper) return !(m_screen->frame_number() % 10);
 	return machine().input().code_pressed(KEYCODE_H);
 }
 
-static void show_out(running_machine &machine,  uint8_t *out)
+static void show_out(running_machine &machine, uint8_t *out)
 {
 #ifdef MAME_DEBUG
 	machine.popmessage("%02x %02x %02x", out[0], out[1], out[2]);
@@ -193,10 +219,10 @@ static void show_out(running_machine &machine,  uint8_t *out)
 
 void spoker_state::nmi_and_coins_w(uint8_t data)
 {
-	if ((data) & (0x22))
+	if (data & 0x22)
 	{
-		logerror("PC %06X: nmi_and_coins = %02x\n",m_maincpu->pc(),data);
-//      popmessage("%02x",data);
+		logerror("PC %06X: nmi_and_coins = %02x\n", m_maincpu->pc(), data);
+//      popmessage("%02x", data);
 	}
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);   // coin_a
@@ -206,10 +232,23 @@ void spoker_state::nmi_and_coins_w(uint8_t data)
 
 	m_leds[6] = BIT(data, 6);   // led for coin out / hopper active
 
-	if(((m_nmi_ack & 0x80) == 0) && data & 0x80)
+	if (((m_nmi_ack & 0x80) == 0) && data & 0x80)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	m_nmi_ack = data & 0x80;     // nmi acknowledge, 0 -> 1
+
+	m_out[0] = data;
+	show_out(machine(), m_out);
+}
+
+void spokeru_state::coins_w(uint8_t data)
+{
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);   // coin_a
+	machine().bookkeeping().coin_counter_w(1, data & 0x04);   // coin_c
+	machine().bookkeeping().coin_counter_w(2, data & 0x08);   // key in
+	machine().bookkeeping().coin_counter_w(3, data & 0x10);   // coin out mech
+
+	m_leds[6] = BIT(data, 6);   // led for coin out / hopper active
 
 	m_out[0] = data;
 	show_out(machine(), m_out);
@@ -221,7 +260,24 @@ void spoker_state::video_and_leds_w(uint8_t data)
 	m_leds[5] = BIT(data, 2); // l_bet?
 
 	m_video_enable = data & 0x40;
-	m_hopper = (~data)& 0x80;
+	m_hopper = (~data) & 0x80;
+
+	m_out[1] = data;
+	show_out(machine(), m_out);
+}
+
+void spokeru_state::nmi_video_leds_w(uint8_t data)
+{
+	m_leds[4] = BIT(data, 0); // start?
+	m_leds[5] = BIT(data, 2); // l_bet?
+
+	if (((m_nmi_ack & 0x20) == 0) && data & 0x20)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+
+	m_nmi_ack = data & 0x20;     // NMI acknowledge, 0 -> 1
+
+	m_video_enable = data & 0x40;
+	m_hopper = (~data) & 0x80;
 
 	m_out[1] = data;
 	show_out(machine(), m_out);
@@ -246,27 +302,27 @@ void spoker_state::magic_w(offs_t offset, uint8_t data)
 	if (offset == 0)
 		return;
 
-	switch(m_igs_magic[0])
+	switch (m_igs_magic[0])
 	{
 		case 0x01:
 			break;
 
 		default:
-//          popmessage("magic %x <- %04x",igs_magic[0],data);
+//          popmessage("magic %x <- %04x", m_igs_magic[0], data);
 			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", m_maincpu->pc(), m_igs_magic[0], data);
 	}
 }
 
 uint8_t spoker_state::magic_r()
 {
-	switch(m_igs_magic[0])
+	switch (m_igs_magic[0])
 	{
 		case 0x00:
-			if ( !(m_igs_magic[1] & 0x01) ) return ioport("DSW1")->read();
-			if ( !(m_igs_magic[1] & 0x02) ) return ioport("DSW2")->read();
-			if ( !(m_igs_magic[1] & 0x04) ) return ioport("DSW3")->read();
-			if ( !(m_igs_magic[1] & 0x08) ) return ioport("DSW4")->read();
-			if ( !(m_igs_magic[1] & 0x10) ) return ioport("DSW5")->read();
+			if (!(m_igs_magic[1] & 0x01)) return m_dsw[0]->read();
+			if (!(m_igs_magic[1] & 0x02)) return m_dsw[1]->read();
+			if (!(m_igs_magic[1] & 0x04)) return m_dsw[2]->read();
+			if (!(m_igs_magic[1] & 0x08)) return m_dsw[3]->read();
+			if (!(m_igs_magic[1] & 0x10)) return m_dsw[4]->read();
 			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", m_maincpu->pc(), m_igs_magic[1]);
 			break;
 
@@ -282,13 +338,13 @@ uint8_t spoker_state::magic_r()
                                 Memory Maps
 ***************************************************************************/
 
-void spoker_state::spoker_map(address_map &map)
+void spoker_state::program_map(address_map &map)
 {
 	map(0x00000, 0x0f3ff).rom();
 	map(0x0f400, 0x0ffff).ram().share("nvram");
 }
 
-void spoker_state::spokeru_map(address_map &map) // TODO: implement other differences
+void spokeru_state::program_map(address_map &map)
 {
 	map(0x00000, 0x0efff).rom();
 	map(0x0f000, 0x0ffff).ram().share("nvram");
@@ -301,8 +357,8 @@ void spoker_state::spoker_portmap(address_map &map)
 	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x3000, 0x33ff).ram().w(FUNC(spoker_state::bg_tile_w)).share(m_bg_tile_ram);
 	map(0x5000, 0x5fff).ram().w(FUNC(spoker_state::fg_tile_w)).share(m_fg_tile_ram);
-	map(0x6480, 0x6483).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* NMI and coins (w), service (r), coins (r) */
-	map(0x6490, 0x6493).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* buttons 1 (r), video and leds (w), leds (w) */
+	map(0x6480, 0x6483).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    // NMI and coins (w), service (r), coins (r)
+	map(0x6490, 0x6493).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    // buttons 1 (r), video and leds (w), leds (w)
 	map(0x64a0, 0x64a0).portr("BUTTONS2");
 	map(0x64b0, 0x64b1).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x64c0, 0x64c0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -310,26 +366,27 @@ void spoker_state::spoker_portmap(address_map &map)
 	map(0x7000, 0x7fff).ram().w(FUNC(spoker_state::fg_color_w)).share(m_fg_color_ram);
 }
 
-void spoker_state::spokeru_portmap(address_map &map)
+void spokeru_state::portmap(address_map &map)
 {
 	map(0x0000, 0x003f).ram(); // Z180 internal regs
-	map(0x2000, 0x23ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // should be good
-	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext"); // should be good
-	map(0x3000, 0x33ff).ram().w(FUNC(spoker_state::bg_tile_w)).share(m_bg_tile_ram); // should be good
-	map(0x4000, 0x4000).portr("DSW1"); // should be good
-	map(0x4001, 0x4001).portr("DSW2"); // should be good
-	map(0x4002, 0x4002).portr("DSW3"); // should be good
-	map(0x5080, 0x5080).portr("BUTTONS2"); // should be good
-	map(0x5081, 0x5081).portr("SERVICE"); // should be good
-	map(0x5082, 0x5082).portr("COINS"); // should be good
-	//map(0x5083, 0x5083).portr("");
-	map(0x5090, 0x5090).w(FUNC(spoker_state::nmi_and_coins_w)); // ?
-	map(0x5091, 0x5091).w(FUNC(spoker_state::leds_w)); // ?
-	map(0x5092, 0x5092).portr("BUTTONS1").w(FUNC(spoker_state::video_and_leds_w)); // ??
-	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write)); // should be good
-	map(0x50c0, 0x50c0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // should be good
-	map(0x6000, 0x6fff).ram().w(FUNC(spoker_state::fg_color_w)).share(m_fg_color_ram); // ?
-	map(0x7000, 0x7fff).ram().w(FUNC(spoker_state::fg_tile_w)).share(m_fg_tile_ram); // should be good
+	map(0x2000, 0x23ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0x4000, 0x4000).portr("DSW1");
+	map(0x4001, 0x4001).portr("DSW2");
+	map(0x4002, 0x4002).portr("DSW3");
+	map(0x4003, 0x4003).portr("DSW4");
+	map(0x4004, 0x4004).portr("DSW5");
+	map(0x5080, 0x5080).portr("BUTTONS2");
+	map(0x5081, 0x5081).portr("SERVICE");
+	map(0x5082, 0x5082).portr("COINS");
+	map(0x5083, 0x5083).portr("BUTTONS1");
+	map(0x5090, 0x5090).w(FUNC(spokeru_state::coins_w));
+	map(0x5091, 0x5091).w(FUNC(spokeru_state::leds_w));
+	map(0x5092, 0x5092).portr("BUTTONS1").w(FUNC(spokeru_state::nmi_video_leds_w));
+	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x50c0, 0x50c0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x7000, 0x77ff).ram().w(FUNC(spokeru_state::fg_tile_w)).share(m_fg_tile_ram);
+	map(0x7800, 0x7fff).ram().w(FUNC(spokeru_state::fg_color_w)).share(m_fg_color_ram);
 }
 
 void spoker_state::_3super8_portmap(address_map &map)
@@ -673,9 +730,9 @@ void spoker_state::machine_reset()
 
 void spoker_state::spoker(machine_config &config)
 {
-	/* basic machine hardware */
-	HD64180RP(config, m_maincpu, XTAL(12'000'000));   /* HD64180RP8, 8 MHz? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &spoker_state::spoker_map);
+	// basic machine hardware
+	HD64180RP(config, m_maincpu, 12_MHz_XTAL);   // HD64180RP8, 8 MHz?
+	m_maincpu->set_addrmap(AS_PROGRAM, &spoker_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &spoker_state::spoker_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(spoker_state::nmi_line_assert));
 
@@ -691,7 +748,7 @@ void spoker_state::spoker(machine_config &config)
 	ppi1.out_pb_callback().set(FUNC(spoker_state::video_and_leds_w));
 	ppi1.out_pc_callback().set(FUNC(spoker_state::leds_w));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -703,7 +760,7 @@ void spoker_state::spoker(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spoker);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.4);
 
@@ -711,12 +768,13 @@ void spoker_state::spoker(machine_config &config)
 }
 
 
-void spoker_state::spokeru(machine_config &config)
+void spokeru_state::spokeru(machine_config &config)
 {
 	spoker(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &spoker_state::spokeru_map);
-	m_maincpu->set_addrmap(AS_IO, &spoker_state::spokeru_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spokeru_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &spokeru_state::portmap);
+	m_maincpu->set_clock(12.288_MHz_XTAL);
 
 	config.device_remove("ppi8255_0");
 	config.device_remove("ppi8255_1");
@@ -727,8 +785,8 @@ void spoker_state::_3super8(machine_config &config)
 {
 	spoker(config);
 
-	Z80(config.replace(), m_maincpu, XTAL(24'000'000) / 4);    /* z840006, 24/4 MHz? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &spoker_state::spoker_map);
+	Z80(config.replace(), m_maincpu, 24_MHz_XTAL / 4);    // z840006, 24/4 MHz?
+	m_maincpu->set_addrmap(AS_PROGRAM, &spoker_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &spoker_state::_3super8_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(spoker_state::nmi_line_assert));
 	m_maincpu->set_periodic_int(FUNC(spoker_state::irq0_line_hold), attotime::from_hz(120)); // this signal comes from the PIC
@@ -757,7 +815,8 @@ void spoker_state::_3super8(machine_config &config)
    IGS026a (u10)
    IGS001a (u30)
    IGS002  (u20)
-   U3567   (u42)
+   K668    (u41) - Oki M6295 clone
+   U3567   (u42) - YM2413 clone
 
    1x 12.288 MHz Xtal. (next to HD64180RP8)
 
@@ -770,14 +829,14 @@ ROM_START( spk306us )
 	ROM_LOAD( "27c512_v306_us.u27",   0x0000, 0x10000, CRC(a6c6359e) SHA1(768c53e6c9a4d453e5342a169932fcc30b10fd04) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )
-	ROM_LOAD( "1_mx28f2000p_v306_us.u33",  0x80000, 0x40000, BAD_DUMP CRC(7ae9b639) SHA1(eb29acf94e96b5a8446dab1e46675766da0538f9) )
+	ROM_LOAD( "1_mx28f2000p_v306_us.u33",  0x00000, 0x40000, BAD_DUMP CRC(7ae9b639) SHA1(eb29acf94e96b5a8446dab1e46675766da0538f9) )
 	ROM_LOAD( "2_mx28f2000p_v306_us.u32",  0x40000, 0x40000, BAD_DUMP CRC(3a9fc765) SHA1(10ccacf4da189f41b1c0fdc8d943b24ac3464e17) )
-	ROM_LOAD( "3_mx28f2000p_v306_us.u31",  0x00000, 0x40000, BAD_DUMP CRC(71f6ea7a) SHA1(f91735d79af153cbbbe82312ba2af789b89c43dd) )
+	ROM_LOAD( "3_mx28f2000p_v306_us.u31",  0x80000, 0x40000, BAD_DUMP CRC(71f6ea7a) SHA1(f91735d79af153cbbbe82312ba2af789b89c43dd) )
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_FILL(                              0x0000, 0x30000, 0xff ) /* filling the whole bank */
+	ROM_FILL(                              0x0000, 0x30000, 0xff ) // filling the whole bank
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* 4-bit adpcm samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "mx28f2000p_v306_ussp.u34",   0x0000, 0x40000, BAD_DUMP CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
 ROM_END
 
@@ -786,14 +845,14 @@ ROM_START( spk205us )
 	ROM_LOAD( "27c512_v205_us.u27",   0x0000, 0x10000, CRC(4b743c73) SHA1(bd05db13e27dc441e0483b883b770365b2702254) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )
-	ROM_LOAD( "1_mx28f2000p_v205_us.u33",  0x80000, 0x40000, CRC(7ae9b639) SHA1(eb29acf94e96b5a8446dab1e46675766da0538f9) )
+	ROM_LOAD( "1_mx28f2000p_v205_us.u33",  0x00000, 0x40000, CRC(7ae9b639) SHA1(eb29acf94e96b5a8446dab1e46675766da0538f9) )
 	ROM_LOAD( "2_mx28f2000p_v205_us.u32",  0x40000, 0x40000, CRC(3a9fc765) SHA1(10ccacf4da189f41b1c0fdc8d943b24ac3464e17) )
-	ROM_LOAD( "3_mx28f2000p_v205_us.u31",  0x00000, 0x40000, CRC(71f6ea7a) SHA1(f91735d79af153cbbbe82312ba2af789b89c43dd) )
+	ROM_LOAD( "3_mx28f2000p_v205_us.u31",  0x80000, 0x40000, CRC(71f6ea7a) SHA1(f91735d79af153cbbbe82312ba2af789b89c43dd) )
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_FILL(                              0x0000, 0x30000, 0xff ) /* filling the whole bank */
+	ROM_FILL(                              0x0000, 0x30000, 0xff ) // filling the whole bank
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* 4-bit adpcm samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "mx28f2000p_v205_ussp.u34",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
 ROM_END
 
@@ -802,14 +861,14 @@ ROM_START( spk203us )
 	ROM_LOAD( "27c512_v203_us.u27",   0x0000, 0x10000, CRC(41328b3d) SHA1(2a4cf0cfdb09e72dabbaf09901cff222847c195a) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )
-	ROM_LOAD( "1_mx28f2000p_v203_us.u33",  0x80000, 0x40000, CRC(b309e9cf) SHA1(2e3f81c9c654c859c0fd4c0953302c9283e7a4d8) )
+	ROM_LOAD( "1_mx28f2000p_v203_us.u33",  0x00000, 0x40000, CRC(b309e9cf) SHA1(2e3f81c9c654c859c0fd4c0953302c9283e7a4d8) )
 	ROM_LOAD( "2_mx28f2000p_v203_us.u32",  0x40000, 0x40000, CRC(05048307) SHA1(38d5ba5522a60ae4f34731ea7bd3e2c16683125d) )
-	ROM_LOAD( "3_mx28f2000p_v203_us.u31",  0x00000, 0x40000, CRC(beae217b) SHA1(9bfa69954c42ada88bedb7cedaceff841cb88a58) )
+	ROM_LOAD( "3_mx28f2000p_v203_us.u31",  0x80000, 0x40000, CRC(beae217b) SHA1(9bfa69954c42ada88bedb7cedaceff841cb88a58) )
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_FILL(                              0x0000, 0x30000, 0xff ) /* filling the whole bank */
+	ROM_FILL(                              0x0000, 0x30000, 0xff ) // filling the whole bank
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* 4-bit adpcm samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "mx28f2000p_v203_ussp.u34",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
 ROM_END
 
@@ -818,14 +877,14 @@ ROM_START( spk201ua )
 	ROM_LOAD( "27c512_v201_ua.u27",   0x0000, 0x10000, CRC(c9186a07) SHA1(b62459affa7ade023d7a5ea97289d1a1474ad966) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )
-	ROM_LOAD( "1_mx28f2000p_v200_ua.u33",  0x80000, 0x40000, CRC(b309e9cf) SHA1(2e3f81c9c654c859c0fd4c0953302c9283e7a4d8) )
+	ROM_LOAD( "1_mx28f2000p_v200_ua.u33",  0x00000, 0x40000, CRC(b309e9cf) SHA1(2e3f81c9c654c859c0fd4c0953302c9283e7a4d8) )
 	ROM_LOAD( "2_mx28f2000p_v200_ua.u32",  0x40000, 0x40000, CRC(05048307) SHA1(38d5ba5522a60ae4f34731ea7bd3e2c16683125d) )
-	ROM_LOAD( "3_mx28f2000p_v200_ua.u31",  0x00000, 0x40000, CRC(beae217b) SHA1(9bfa69954c42ada88bedb7cedaceff841cb88a58) )
+	ROM_LOAD( "3_mx28f2000p_v200_ua.u31",  0x80000, 0x40000, CRC(beae217b) SHA1(9bfa69954c42ada88bedb7cedaceff841cb88a58) )
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_FILL(                              0x0000, 0x30000, 0xff ) /* filling the whole bank */
+	ROM_FILL(                              0x0000, 0x30000, 0xff ) // filling the whole bank
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* 4-bit adpcm samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "mx28f2000p_v200_uasp.u34",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
 ROM_END
 
@@ -834,14 +893,14 @@ ROM_START( spk200ua )
 	ROM_LOAD( "27c512_v200_ua.u27",   0x0000, 0x10000, CRC(f4572b88) SHA1(b1f845b5340639eee1464acb8a40241868a21070) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )
-	ROM_LOAD( "1_mx28f2000p_v200_ua.u33",  0x80000, 0x40000, CRC(b309e9cf) SHA1(2e3f81c9c654c859c0fd4c0953302c9283e7a4d8) )
+	ROM_LOAD( "1_mx28f2000p_v200_ua.u33",  0x00000, 0x40000, CRC(b309e9cf) SHA1(2e3f81c9c654c859c0fd4c0953302c9283e7a4d8) )
 	ROM_LOAD( "2_mx28f2000p_v200_ua.u32",  0x40000, 0x40000, CRC(05048307) SHA1(38d5ba5522a60ae4f34731ea7bd3e2c16683125d) )
-	ROM_LOAD( "3_mx28f2000p_v200_ua.u31",  0x00000, 0x40000, CRC(beae217b) SHA1(9bfa69954c42ada88bedb7cedaceff841cb88a58) )
+	ROM_LOAD( "3_mx28f2000p_v200_ua.u31",  0x80000, 0x40000, CRC(beae217b) SHA1(9bfa69954c42ada88bedb7cedaceff841cb88a58) )
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_FILL(                              0x0000, 0x30000, 0xff ) /* filling the whole bank */
+	ROM_FILL(                              0x0000, 0x30000, 0xff ) // filling the whole bank
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* 4-bit adpcm samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "mx28f2000p_v200_uasp.u34",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
 ROM_END
 
@@ -850,14 +909,14 @@ ROM_START( spk102ua )
 	ROM_LOAD( "27c512_v102_ua.u27",   0x0000, 0x10000, CRC(ec5e9f6d) SHA1(5d7a86f8faef7a4b7a9dde040b00b987ffb09479) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )
-	ROM_LOAD( "1_mx28f2000p_v102_ua.u33",  0x80000, 0x40000, CRC(b309e9cf) SHA1(2e3f81c9c654c859c0fd4c0953302c9283e7a4d8) )
+	ROM_LOAD( "1_mx28f2000p_v102_ua.u33",  0x00000, 0x40000, CRC(b309e9cf) SHA1(2e3f81c9c654c859c0fd4c0953302c9283e7a4d8) )
 	ROM_LOAD( "2_mx28f2000p_v102_ua.u32",  0x40000, 0x40000, CRC(05048307) SHA1(38d5ba5522a60ae4f34731ea7bd3e2c16683125d) )
-	ROM_LOAD( "3_mx28f2000p_v102_ua.u31",  0x00000, 0x40000, CRC(beae217b) SHA1(9bfa69954c42ada88bedb7cedaceff841cb88a58) )
+	ROM_LOAD( "3_mx28f2000p_v102_ua.u31",  0x80000, 0x40000, CRC(beae217b) SHA1(9bfa69954c42ada88bedb7cedaceff841cb88a58) )
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_FILL(                              0x0000, 0x30000, 0xff ) /* filling the whole bank */
+	ROM_FILL(                              0x0000, 0x30000, 0xff ) // filling the whole bank
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* 4-bit adpcm samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "mx28f2000p_v102_uasp.u34",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
 ROM_END
 
@@ -871,9 +930,9 @@ ROM_START( spk100 ) // no labels on the ROMs
 	ROM_LOAD( "u23",  0x80000, 0x40000, CRC(98b71478) SHA1(b5bd9eef91f5cc2e9628e5181fbbd6fd453487f0) )
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_FILL(                              0x0000, 0x30000, 0xff ) /* filling the whole bank */
+	ROM_FILL(                              0x0000, 0x30000, 0xff ) // filling the whole bank
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* 4-bit adpcm samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "u38",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
 ROM_END
 
@@ -895,7 +954,7 @@ ROM_START( spk116it )
 	ROM_LOAD( "2_v116it.bin",  0x10000, 0x10000, CRC(50fc3505) SHA1(ca1e4ee7e0bb59c3bd67727f65054a48000ae7fe) )
 	ROM_LOAD( "1_v116it.bin",  0x00000, 0x10000, CRC(28ce630a) SHA1(9b597073d33841e7db2c68bbe9f30b734d7f7b41) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* expansion rom - contains backgrounds and pictures charmaps */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "7_v116it.bin",   0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
 ROM_END
 
@@ -913,7 +972,7 @@ ROM_START( spk116itmx )
 	ROM_LOAD( "2_v116itmx.bin",  0x10000, 0x10000, CRC(50fc3505) SHA1(ca1e4ee7e0bb59c3bd67727f65054a48000ae7fe) )
 	ROM_LOAD( "1_v116itmx.bin",  0x00000, 0x10000, CRC(28ce630a) SHA1(9b597073d33841e7db2c68bbe9f30b734d7f7b41) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* expansion rom - contains backgrounds and pictures charmaps */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "7_v116itmx.bin",   0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
 ROM_END
 
@@ -931,7 +990,7 @@ ROM_START( spk115it )
 	ROM_LOAD( "2_v115it.bin",  0x10000, 0x10000, CRC(50fc3505) SHA1(ca1e4ee7e0bb59c3bd67727f65054a48000ae7fe) )
 	ROM_LOAD( "1_v115it.bin",  0x00000, 0x10000, CRC(28ce630a) SHA1(9b597073d33841e7db2c68bbe9f30b734d7f7b41) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* expansion rom - contains backgrounds and pictures charmaps */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "7_v115it.bin",   0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
 ROM_END
 
@@ -945,7 +1004,7 @@ ROM_START( spk114it )
 	ROM_LOAD( "4_v114it.bin",  0x00000, 0x40000, CRC(c2105b1c) SHA1(cd2a930e9c15d1fdcc02ce87c109b5b4107430fa) )
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_FILL(                  0x0000, 0x30000, 0xff ) /* filling the whole bank */
+	ROM_FILL(                  0x0000, 0x30000, 0xff ) // filling the whole bank
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7_v114it.bin",  0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
@@ -973,9 +1032,9 @@ Note
 
 */
 
-// all gfx / sound roms are bad.  they're definitely meant to have different data
+// All gfx / sound ROMs are bad.  They're definitely meant to have different data
 //  in each half, and maybe even be twice the size.
-//  in all cases the first half is missing (the sample table in the samples rom for example)
+//  In all cases the first half is missing (the sample table in the samples ROM for example)
 //1.bin                                           1ST AND 2ND HALF IDENTICAL
 //2.bin                                           1ST AND 2ND HALF IDENTICAL
 //3.bin                                           1ST AND 2ND HALF IDENTICAL
@@ -998,7 +1057,7 @@ ROM_START( 3super8 )
 
 	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0xc0000, "rep_gfx", 0 ) //not real, taken from spk116it
+	ROM_REGION( 0xc0000, "rep_gfx", 0 ) // not real, taken from spk116it
 	ROM_LOAD( "4.bin",  0x00000, 0x40000, BAD_DUMP CRC(ec2c6ac3) SHA1(e0a38da26202d2b9a481060fe5b88a38e284201e) )
 	ROM_LOAD( "5.bin",  0x40000, 0x40000, BAD_DUMP CRC(163f5b64) SHA1(5d3a5c2a64691ee9e2bb3a7c283aa9efa53fb35e) )
 	ROM_LOAD( "6.bin",  0x80000, 0x40000, BAD_DUMP CRC(55b54b11) SHA1(decf27d40ec842374af02c93d761375690be83a3) )
@@ -1012,65 +1071,65 @@ ROM_END
                               Driver Init
 ***************************************************************************/
 
-void spoker_state::init_spkleftover()
+void spokeru_state::init_spokeru()
 {
 /*  The last 4K have the scheme/table for the whole encryption.
     Maybe a leftover...
 */
 	uint8_t *rom = memregion("maincpu")->base();
-	for (int A = 0; A < 0x10000; A++)
+	for (int a = 0; a < 0x10000; a++)
 	{
-		int B = ((A & 0x0fff) | 0xf000);
-		rom[A] = rom[A] ^ rom[B];
+		int b = ((a & 0x0fff) | 0xf000);
+		rom[a] = rom[a] ^ rom[b];
 	}
 }
 
 void spoker_state::init_spk116it()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	for (int A = 0; A < 0x10000; A++)
+	for (int a = 0; a < 0x10000; a++)
 	{
-		rom[A] ^= 0x02;
-		if ((A & 0x0208) == 0x0208) rom[A] ^= 0x20;
-		if ((A & 0x0228) == 0x0008) rom[A] ^= 0x20;
-		if ((A & 0x04A0) == 0x04A0) rom[A] ^= 0x02;
-		if ((A & 0x1208) == 0x1208) rom[A] ^= 0x01;
+		rom[a] ^= 0x02;
+		if ((a & 0x0208) == 0x0208) rom[a] ^= 0x20;
+		if ((a & 0x0228) == 0x0008) rom[a] ^= 0x20;
+		if ((a & 0x04a0) == 0x04a0) rom[a] ^= 0x02;
+		if ((a & 0x1208) == 0x1208) rom[a] ^= 0x01;
 	}
 }
 
 void spoker_state::init_spk114it()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	for (int A = 0; A < 0x10000; A++)
+	for (int a = 0; a < 0x10000; a++)
 	{
-		rom[A] ^= 0x02;
-		if ((A & 0x0120) == 0x0020) rom[A] ^= 0x20;
-		if ((A & 0x04a0) == 0x04a0) rom[A] ^= 0x02;
-		if ((A & 0x1208) == 0x1208) rom[A] ^= 0x01;
+		rom[a] ^= 0x02;
+		if ((a & 0x0120) == 0x0020) rom[a] ^= 0x20;
+		if ((a & 0x04a0) == 0x04a0) rom[a] ^= 0x02;
+		if ((a & 0x1208) == 0x1208) rom[a] ^= 0x01;
 	}
 }
 
 void spoker_state::init_spk100()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	for (int A = 0; A < 0x10000; A++)
+	for (int a = 0; a < 0x10000; a++)
 	{
-		rom[A] ^= 0x22;
-		if ((A & 0x0090) == 0x0080) rom[A] ^= 0x20;
-		if ((A & 0x04a0) == 0x04a0) rom[A] ^= 0x02;
-		if ((A & 0x1208) == 0x1208) rom[A] ^= 0x01;
+		rom[a] ^= 0x22;
+		if ((a & 0x0090) == 0x0080) rom[a] ^= 0x20;
+		if ((a & 0x04a0) == 0x04a0) rom[a] ^= 0x02;
+		if ((a & 0x1208) == 0x1208) rom[a] ^= 0x01;
 	}
 }
 
 void spoker_state::init_3super8()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
-	/* Decryption is probably done using one macrocell/output on an address decoding pal which we do not have a dump of */
-	/* The encryption is quite awful actually, especially since the program rom is entirely blank/0xFF but encrypted on its second half, exposing the entire function in plaintext */
-	/* Input: A6, A7, A8, A9, A11; Output: D5 XOR */
-	/* function: (A6&A8)&((!A7&A11)|(A9&!A11)); */
-	/* nor-reduced: !(!(!(!A6|!A8))|!(!(A7|!A11)|!(!A9|A11))); */
+	/* Decryption is probably done using one macrocell/output on an address decoding pal which we do not have a dump of
+	   The encryption is quite awful actually, especially since the program ROM is entirely blank/0xFF but encrypted on its second half, exposing the entire function in plaintext
+	   Input: A6, A7, A8, A9, A11; Output: D5 XOR
+	   function: (A6&A8)&((!A7&A11)|(A9&!A11));
+	   nor-reduced: !(!(!(!A6|!A8))|!(!(A7|!A11)|!(!A9|A11))); */
 	for (int i = 0; i < 0x20000; i++)
 	{
 		uint8_t a6  = BIT(i, 6);
@@ -1079,10 +1138,10 @@ void spoker_state::init_3super8()
 		uint8_t a9  = BIT(i, 9);
 		uint8_t a11 = BIT(i, 11);
 		uint8_t d5 = (a6 & a8) & ((~a7 & a11) | (a9 & ~a11));
-		ROM[i] ^= d5 * 0x20;
+		rom[i] ^= d5 * 0x20;
 	}
 
-	/* cheesy hack: take gfx roms from spk116it and rearrange them for this game needs */
+	// cheesy hack: take gfx ROMs from spk116it and rearrange them for this game needs
 	{
 		uint8_t *src = memregion("rep_gfx")->base();
 		uint8_t *dst = memregion("gfx1")->base();
@@ -1091,10 +1150,10 @@ void spoker_state::init_3super8()
 		{
 			for (int i = 0; i < 0x20000; i += 4)
 			{
-				dst[i+0+x*0x40000] = src[i+0+x*0x40000];
-				dst[i+1+x*0x40000] = src[i+2+x*0x40000];
-				dst[i+2+x*0x40000] = src[i+1+x*0x40000];
-				dst[i+3+x*0x40000] = src[i+3+x*0x40000];
+				dst[i + 0 + x * 0x40000] = src[i + 0 + x * 0x40000];
+				dst[i + 1 + x * 0x40000] = src[i + 2 + x * 0x40000];
+				dst[i + 2 + x * 0x40000] = src[i + 1 + x * 0x40000];
+				dst[i + 3 + x * 0x40000] = src[i + 3 + x * 0x40000];
 			}
 		}
 	}
@@ -1107,16 +1166,16 @@ void spoker_state::init_3super8()
                               Game Drivers
 ***************************************************************************/
 
-//    YEAR   NAME        PARENT    MACHINE   INPUT     STATE          INIT              ROT    COMPANY      FULLNAME                    FLAGS
-GAME( 1996,  spk306us,   0,        spokeru,  spoker,   spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v306US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk205us,   spk306us, spokeru,  spoker,   spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v205US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk203us,   spk306us, spokeru,  spoker,   spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk201ua,   spk306us, spokeru,  spoker,   spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v201UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk200ua,   spk306us, spokeru,  spoker,   spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1993?, spk116it,   spk306us, spoker,   spoker,   spoker_state,  init_spk116it,    ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk116itmx, spk306us, spoker,   spoker,   spoker_state,  init_spk114it,    ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk115it,   spk306us, spoker,   spoker,   spoker_state,  init_spk116it,    ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk114it,   spk306us, spoker,   spk114it, spoker_state,  init_spk114it,    ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk102ua,   spk306us, spokeru,  spoker,   spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk100,     spk306us, spoker,   spk114it, spoker_state,  init_spk100,      ROT0,  "IGS",       "Super Poker (v100)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, 3super8,    0,        _3super8, 3super8,  spoker_state,  init_3super8,     ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
+//    YEAR   NAME        PARENT    MACHINE   INPUT     STATE          INIT           ROT    COMPANY      FULLNAME                    FLAGS
+GAME( 1996,  spk306us,   0,        spokeru,  spoker,   spokeru_state, init_spokeru,  ROT0,  "IGS",       "Super Poker (v306US)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk205us,   spk306us, spokeru,  spoker,   spokeru_state, init_spokeru,  ROT0,  "IGS",       "Super Poker (v205US)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk203us,   spk306us, spokeru,  spoker,   spokeru_state, init_spokeru,  ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_SUPPORTS_SAVE ) // LS1. 8 203US in test mode
+GAME( 1996,  spk201ua,   spk306us, spokeru,  spoker,   spokeru_state, init_spokeru,  ROT0,  "IGS",       "Super Poker (v201UA)",     MACHINE_SUPPORTS_SAVE ) // still shows 200UA in test mode
+GAME( 1996,  spk200ua,   spk306us, spokeru,  spoker,   spokeru_state, init_spokeru,  ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk116it,   spk306us, spoker,   spoker,   spoker_state,  init_spk116it, ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk116itmx, spk306us, spoker,   spoker,   spoker_state,  init_spk114it, ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk115it,   spk306us, spoker,   spoker,   spoker_state,  init_spk116it, ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk114it,   spk306us, spoker,   spk114it, spoker_state,  init_spk114it, ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk102ua,   spk306us, spokeru,  spoker,   spokeru_state, init_spokeru,  ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk100,     spk306us, spoker,   spk114it, spoker_state,  init_spk100,   ROT0,  "IGS",       "Super Poker (v100)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, 3super8,    0,        _3super8, 3super8,  spoker_state,  init_3super8,  ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped

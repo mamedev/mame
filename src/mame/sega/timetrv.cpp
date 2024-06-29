@@ -8,7 +8,7 @@ Driver by Angelo Salese
 LaserDisc and artwork hookup by Ryan Holtz
 
 TODO:
-- Unemulated Sony LDP-1450 player, and Pioneer LD-V4200 is HLE; needs a dump of the BIOSes and
+- Sony LDP-1450 player (not hooked up) and Pioneer LD-V4200 are HLE; needs a dump of the BIOSes and
   proper hook-up.
 
 ==================================================================================================

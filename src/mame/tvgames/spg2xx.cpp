@@ -1286,6 +1286,40 @@ static INPUT_PORTS_START( doraglobe )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( virtbb )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // why does this also act as 'hit'? doesn't seem likely the motion control sends this?
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // footmat
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+
+	PORT_MODIFY("P3")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( virtten )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+
+	PORT_MODIFY("P2")
+
+	PORT_MODIFY("P3")
+INPUT_PORTS_END
 
 void spg2xx_game_state::machine_start()
 {
@@ -2217,6 +2251,15 @@ ROM_START( doyousud )
 	ROM_LOAD( "at24c16a.u3", 0x000, 0x800, CRC(414ea94d) SHA1(8565a66fd0228104c64a169cdb20715e7b23cfaf) )
 ROM_END
 
+ROM_START( virtbb )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "virtualbb.bin", 0x000000, 0x400000, CRC(7cb7a69f) SHA1(eae0c516c1ff89a369662d09321feafc8a8054b0) )
+ROM_END
+
+ROM_START( virtten )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "virttennis.bin", 0x000000, 0x400000, CRC(e665bea9) SHA1(8c2c9f879c929e224cd885165ed60aed8baeb19d) )
+ROM_END
 
 void spg2xx_game_state::init_crc()
 {
@@ -2387,3 +2430,5 @@ CONS( 200?, tiktokmm,   0,        0, spg2xx,    spg2xx,    spg2xx_game_wfcentro_
 
 CONS( 2005, doyousud,   0,        0, spg2xx,    doyousud,  spg2xx_game_state,          empty_init,    "SDW Games",                                              "Sudoku: Do You Sudoku?",                                                MACHINE_NOT_WORKING )
 
+CONS( 200?, virtbb,     0,        0, spg2xx,    virtbb,    spg2xx_game_state,          empty_init,    "VTG Interactive",                                        "Virtual Baseball (VTG)",                                                MACHINE_NOT_WORKING ) // motion controls not fully understood
+CONS( 200?, virtten,    0,        0, spg2xx,    virtten,   spg2xx_game_state,          empty_init,    "VTG Interactive",                                        "Virtual Tennis (VTG)",                                                  MACHINE_NOT_WORKING ) // motion controls not fully understood

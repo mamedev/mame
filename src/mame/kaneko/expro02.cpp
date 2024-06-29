@@ -916,8 +916,8 @@ uint8_t expro02_state::comad_okim6295_r()
 
 void expro02_state::expro02(machine_config &config)
 {
-    static constexpr XTAL CPU_CLOCK = XTAL(12'000'000);
-    static constexpr XTAL VDP_CLOCK = XTAL(16'000'000);
+	static constexpr XTAL CPU_CLOCK = XTAL(12'000'000);
+	static constexpr XTAL VDP_CLOCK = XTAL(16'000'000);
 
 	/* basic machine hardware */
 	M68000(config, m_maincpu, CPU_CLOCK);
@@ -926,7 +926,7 @@ void expro02_state::expro02(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-    m_screen->set_raw(VDP_CLOCK / 3, 341, 0, 256, 262, 0, 224); // ~60 Hz
+	m_screen->set_raw(VDP_CLOCK / 3, 341, 0, 256, 262, 0, 224); // ~60 Hz
 	m_screen->set_screen_update(FUNC(expro02_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -971,7 +971,7 @@ void expro02_state::comad(machine_config &config)
 	m_view2->set_invert_flip(1);
 	m_view2->set_offset(-256, -216, 256, 224);
 
-    // FIXME: can't be 0 seconds
+	// FIXME: can't be 0 seconds
 	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(0));
 }
 
@@ -1749,27 +1749,61 @@ ROM_START( supmodl2 ) // PCB silkscreened COMAD INDUSTRY CO.,LTD 961210 MADE IN 
 	ROM_LOAD( "2_music2.uc6", 0x80000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
 ROM_END
 
-ROM_START( wownfant)
+ROM_START( wownfant )
 	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "ep-4001 42750001 u81.bin",     0x000000, 0x80000, CRC(9942d200) SHA1(d2f69c0949881ef4aef202b564eac069c030a497) )
-	ROM_LOAD16_BYTE( "ep-4001 42750001 u80.bin",     0x000001, 0x80000, CRC(17359eeb) SHA1(90bb9da6bdf56fa9eb0ad03691750518a2a3f879) )
+	ROM_LOAD16_BYTE( "ep-4001 42750001 u81.u81",     0x000000, 0x080000, CRC(9942d200) SHA1(d2f69c0949881ef4aef202b564eac069c030a497) )
+	ROM_LOAD16_BYTE( "ep-4001 42750001 u80.u80",     0x000001, 0x080000, CRC(17359eeb) SHA1(90bb9da6bdf56fa9eb0ad03691750518a2a3f879) )
 	ROM_LOAD16_WORD_SWAP( "ep-061 43750002 - 1.bin", 0x100000, 0x200000, CRC(c318e841) SHA1(ba7af736d3b0accca474b0de1c8299eb3c449ef9) )
 	ROM_LOAD16_WORD_SWAP( "ep-061 43750002 - 2.bin", 0x300000, 0x200000, CRC(8871dc3a) SHA1(8e028f1430474df19bb9a912ee9e407fe4582558) )
 
 	ROM_REGION( 0x100000, "kan_spr", 0 ) // sprites
-	ROM_LOAD( "ep-4001 42750001 u113.bin", 0x00000, 0x80000, CRC(3e77ca1f) SHA1(f946e65a29bc02b89c02b2a869578d38cfe7e2d0) )
-	ROM_LOAD( "ep-4001 42750001 u112.bin", 0x80000, 0x80000, CRC(51f4b604) SHA1(52e8ce0a2c1b9b00f04e0c775789bc550bad8ae0) )
+	ROM_LOAD( "ep-4001 42750001 u113.u113", 0x00000, 0x80000, CRC(3e77ca1f) SHA1(f946e65a29bc02b89c02b2a869578d38cfe7e2d0) )
+	ROM_LOAD( "ep-4001 42750001 u112.u112", 0x80000, 0x80000, CRC(51f4b604) SHA1(52e8ce0a2c1b9b00f04e0c775789bc550bad8ae0) )
 
 	ROM_REGION( 0x100000, "oki", 0 ) // OKIM6295 samples
 	// 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs
-	ROM_LOAD( "ep-4001 42750001 u4.bin", 0x00000, 0x80000, CRC(06dc889e) SHA1(726561ff01bbde43669293a6ff7ee22b048b4118) ) // almost the same as fantasia2, just some changes to the sample references in the header
-	ROM_LOAD( "ep-4001 42750001 u1.bin", 0x80000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
+	ROM_LOAD( "ep-4001 42750001 u4.u4", 0x00000, 0x80000, CRC(06dc889e) SHA1(726561ff01bbde43669293a6ff7ee22b048b4118) ) // almost the same as fantasia2, just some changes to the sample references in the header
+	ROM_LOAD( "ep-4001 42750001 u1.u1", 0x80000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
 ROM_END
 
-ROM_START( missw02)
+ROM_START( wownfanta )
 	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "8.u81",      0x000000, 0x80000, CRC(316666d0) SHA1(0ebebc55b49c1d00adac2b04bcfe9cfb317e8e74) ) // stickered as Miss World 2002 Rev.A
-	ROM_LOAD16_BYTE( "7.u80",      0x000001, 0x80000, CRC(d61f4d18) SHA1(caef5fb221cafc354875ef5b68e84419f91c0db7) )
+	ROM_LOAD16_BYTE( "2.u81",      0x000000, 0x080000, CRC(159178f8) SHA1(6013346218131941e8d964fcd43a61df04206749) )
+	ROM_LOAD16_BYTE( "1.u80",      0x000001, 0x080000, CRC(509bc2d2) SHA1(3dd277640403f189eed6f91b60e6b99bdc2019e8) )
+	ROM_LOAD16_WORD_SWAP( "3.bin", 0x100000, 0x200000, CRC(4d082ec1) SHA1(fab90eb2deb0aaf30a96eb7fcdb895a0b8da3857) )
+	ROM_LOAD16_WORD_SWAP( "4.bin", 0x300000, 0x200000, CRC(aee91094) SHA1(c541fc2618461d7d143437ae3b3cfe5d65fcbe8d) )
+
+	ROM_REGION( 0x100000, "kan_spr", 0 ) // sprites
+	ROM_LOAD( "5.u113", 0x00000, 0x80000, CRC(3e77ca1f) SHA1(f946e65a29bc02b89c02b2a869578d38cfe7e2d0) )
+	ROM_LOAD( "6.u112", 0x80000, 0x80000, CRC(0013473e) SHA1(e62416111f05ce586e50dbbda9ffee9fcd0985c2) )
+
+	ROM_REGION( 0x100000, "oki", 0 ) // OKIM6295 samples
+	// 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs
+	ROM_LOAD( "8.u4", 0x00000, 0x80000, CRC(06dc889e) SHA1(726561ff01bbde43669293a6ff7ee22b048b4118) ) // almost the same as fantasia2, just some changes to the sample references in the header
+	ROM_LOAD( "7.u1", 0x80000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
+ROM_END
+
+ROM_START( missw02 ) // all ROMs had non descript stickers, no labels
+	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "u81",       0x000000, 0x080000, CRC(86ca4d5f) SHA1(0f7781b10034383615836154b486a2a9f71c6a16) ) // stickered as Miss World 2002 Rev.A
+	ROM_LOAD16_BYTE( "u80",       0x000001, 0x080000, CRC(96d40592) SHA1(9ef7d37b68b2c748238d7da6fb4c2e67566b0784) )
+	ROM_LOAD16_WORD_SWAP( "gfx1", 0x100000, 0x200000, CRC(fdfe36ba) SHA1(128277e44e2368267e097bb3510c797cc690d1ff) )
+	ROM_LOAD16_WORD_SWAP( "gfx2", 0x300000, 0x200000, CRC(aa769a81) SHA1(2beb6da9327ddce7bec934bcf610061fc3b9ab09) )
+
+	ROM_REGION( 0x100000, "kan_spr", 0 ) // sprites
+	ROM_LOAD( "u113", 0x00000, 0x80000, CRC(3e77ca1f) SHA1(f946e65a29bc02b89c02b2a869578d38cfe7e2d0) ) // same as wowfant
+	ROM_LOAD( "u112", 0x80000, 0x80000, CRC(51f4b604) SHA1(52e8ce0a2c1b9b00f04e0c775789bc550bad8ae0) ) // same as wowfant
+
+	ROM_REGION( 0x100000, "oki", 0 ) // OKIM6295 samples
+	// 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs
+	ROM_LOAD( "u4", 0x00000, 0x80000, CRC(06dc889e) SHA1(726561ff01bbde43669293a6ff7ee22b048b4118) ) // these 2 same as wowfant
+	ROM_LOAD( "u1", 0x80000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
+ROM_END
+
+ROM_START( missw02d )
+	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "8.u81",      0x000000, 0x080000, CRC(316666d0) SHA1(0ebebc55b49c1d00adac2b04bcfe9cfb317e8e74) ) // stickered as Miss World 2002 Rev.A
+	ROM_LOAD16_BYTE( "7.u80",      0x000001, 0x080000, CRC(d61f4d18) SHA1(caef5fb221cafc354875ef5b68e84419f91c0db7) )
 	ROM_LOAD16_WORD_SWAP( "3.bin", 0x100000, 0x200000, CRC(fdfe36ba) SHA1(128277e44e2368267e097bb3510c797cc690d1ff) )
 	ROM_LOAD16_WORD_SWAP( "4.bin", 0x300000, 0x200000, CRC(aa769a81) SHA1(2beb6da9327ddce7bec934bcf610061fc3b9ab09) )
 
@@ -2003,8 +2037,10 @@ GAME( 1998, fantsia2n, fantsia2, fantsia2, missw96,   expro02_state, empty_init,
 
 GAME( 1997, supmodl2,  0,        supmodl2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Super Model II",              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "C" nudity level
 
-GAME( 2002, wownfant,  0,        fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "WOW New Fantasia", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
-GAME( 2002, missw02,   0,        fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Daigom",                   "Miss World 2002",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
+GAME( 2002, wownfant,  0,        fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "WOW New Fantasia (Explicit)",       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
+GAME( 2002, wownfanta, wownfant, fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "WOW New Fantasia",                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "C" nudity level
+GAME( 2002, missw02,   0,        fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Miss World 2002",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
+GAME( 2002, missw02d,  missw02,  fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Daigom",                   "Miss World 2002 (Daigom license)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
 
 GAME( 1996, pgalvip,   0,        galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "ACE International / Afega","Pocket Gals V.I.P (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
 GAME( 1997, pgalvipa,  pgalvip,  galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "<unknown>",                "Pocket Gals V.I.P (set 2)", MACHINE_SUPPORTS_SAVE )

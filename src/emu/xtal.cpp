@@ -112,6 +112,7 @@ const double XTAL::known_xtals[] = {
 	  4'032'000, /* 4.032_MHz_XTAL         GRiD Compass modem board */
 	  4'096'000, /* 4.096_MHz_XTAL         Used to drive OKI M9810 chips */
 	  4'194'304, /* 4.194304_MHz_XTAL      Used to drive MC146818 / Nintendo Game Boy */
+	  4'220'000, /* 4.220_MHz_XTAL         Used to drive OKI M6295 chips on some Namco boards, usually with /4 divider */
 	  4'224'000, /* 4.224_MHz_XTAL         Used to drive OKI M6295 chips, usually with /4 divider */
 	  4'410'000, /* 4.41_MHz_XTAL          Pioneer PR-8210 ldplayer */
 	  4'433'610, /* 4.43361_MHz_XTAL       Cidelsa Draco */
@@ -176,6 +177,7 @@ const double XTAL::known_xtals[] = {
 	  9'987'000, /* 9.987_MHz_XTAL         Crazy Balloon */
 	 10'000'000, /* 10_MHz_XTAL            - */
 	 10'137'600, /* 10.1376_MHz_XTAL       Wyse WY-100 */
+	 10'240'000, /* 10.240_MHz_XTAL        Stella 8085 based fruit machines */
 	 10'245'000, /* 10.245_MHz_XTAL        PES Speech box */
 	 10'380'000, /* 10.38_MHz_XTAL         Fairlight Q219 Lightpen/Graphics Card */
 	 10'480'000, /* 10.48_MHz_XTAL         System-80 (50 Hz) */

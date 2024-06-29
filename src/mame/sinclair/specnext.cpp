@@ -7,7 +7,7 @@
               Issue 2B (Kickstarter 1), Issue 2D, Issue 2E, Issue 2H,
               Issue 4 (Kickstarter 2)
     Current implementation is based on Issue 4. Only limited difference
-	tracked through PORT_CONFIG
+    tracked through PORT_CONFIG
 
     TODO:
     * improve zxnDMA
@@ -270,7 +270,7 @@ private:
 	bool port_eff7_io_en() const { return BIT(internal_port_enable(), 26); }
 	bool port_ctc_io_en() const { return BIT(internal_port_enable(), 27); }
 
-	u8 port_7ffd_bank() const {	return (((nr_8f_mapping_mode_pentagon() || nr_8f_mapping_mode_profi()) ? 0 : BIT(m_port_dffd_data, 3)) << 6) | ((!nr_8f_mapping_mode_pentagon() ? BIT(m_port_dffd_data, 2) : (nr_8f_mapping_mode_pentagon_1024_en() && BIT(m_port_7ffd_data, 5))) << 5) | ((nr_8f_mapping_mode_pentagon() ? BIT(m_port_7ffd_data, 6, 2) : (m_port_dffd_data & 3)) << 3) | (m_port_7ffd_data & 7); }
+	u8 port_7ffd_bank() const { return (((nr_8f_mapping_mode_pentagon() || nr_8f_mapping_mode_profi()) ? 0 : BIT(m_port_dffd_data, 3)) << 6) | ((!nr_8f_mapping_mode_pentagon() ? BIT(m_port_dffd_data, 2) : (nr_8f_mapping_mode_pentagon_1024_en() && BIT(m_port_7ffd_data, 5))) << 5) | ((nr_8f_mapping_mode_pentagon() ? BIT(m_port_7ffd_data, 6, 2) : (m_port_dffd_data & 3)) << 3) | (m_port_7ffd_data & 7); }
 	bool port_7ffd_shadow() const { return BIT(m_port_7ffd_data, 3); }
 	bool port_7ffd_locked() const { return (nr_8f_mapping_mode_pentagon_1024_en() || (nr_8f_mapping_mode_profi() && BIT(m_port_dffd_data, 4))) ? 0 : BIT(m_port_7ffd_data, 5); }
 	bool port_1ffd_special() const { return BIT(m_port_1ffd_data, 0); }
@@ -2695,22 +2695,22 @@ void specnext_state::map_io(address_map &map)
 	map(0x000b, 0x000b).mirror(0xff00).lrw8(NAME([this]() { return dma_r(1); }), NAME([this](u8 data) { dma_w(1, data); }));
 	map(0x006b, 0x006b).mirror(0xff00).lrw8(NAME([this]() { return dma_r(0); }), NAME([this](u8 data) { dma_w(0, data); }));
 
-	map(0x0bdf, 0x0bdf).mirror(0xf000).lr8(NAME([this]() -> u8 { return m_io_mouse[0]->read(); }));					// #fbdf
-	map(0x0fdf, 0x0fdf).mirror(0xf000).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));				// #ffdf
-	map(0x0adf, 0x0adf).mirror(0xf000).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));	// #fadf
+	map(0x0bdf, 0x0bdf).mirror(0xf000).lr8(NAME([this]() -> u8 { return m_io_mouse[0]->read(); }));                 // #fbdf
+	map(0x0fdf, 0x0fdf).mirror(0xf000).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));                // #ffdf
+	map(0x0adf, 0x0adf).mirror(0xf000).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); })); // #fadf
 
 	// TODO resolve conflicts mf+joy+DAC: 1f, 3f
 	//map(0x001f, 0x001f).mirror(0xff00).lr8(NAME([]() -> u8 { return 0x00; /* Joy1,2*/ })).lw8(NAME([this](u8 data) {
-	//	if (m_nr_08_dac_en)
-	//		m_dac[0]->data_w(data);
+	//  if (m_nr_08_dac_en)
+	//      m_dac[0]->data_w(data);
 	//}));
 	map(0x00f1, 0x00f1).mirror(0xff00).lw8(NAME([this](u8 data) {
 		if (m_nr_08_dac_en)
 			m_dac[0]->data_w(data);
 	}));
 	//map(0x003f, 0x003f).mirror(0xff00).lw8(NAME([this](u8 data) {
-	//	if (m_nr_08_dac_en)
-	//		m_dac[0]->data_w(data);
+	//  if (m_nr_08_dac_en)
+	//      m_dac[0]->data_w(data);
 	//}));
 	map(0x000f, 0x000f).mirror(0xff00).lw8(NAME([this](u8 data) {
 		if (m_nr_08_dac_en)
@@ -3186,15 +3186,15 @@ void specnext_state::machine_reset()
 	m_port_dffd_data = 0;
 	m_port_eff7_data = 0;
 /* TODO don't use inherited
-	port_fe_reg  = 0x00;
-	port_ff_reg  = 0x00;
-	port_7ffd_reg  = 0x00;
-	port_dffd_reg  = 0x00;
-	port_dffd_reg_6  = 0;
-	port_1ffd_reg  = 0x00;
-	port_1ffd_special_old  = 0;
-	port_eff7_reg_2  = 0;
-	port_eff7_reg_3  = 0;
+    port_fe_reg  = 0x00;
+    port_ff_reg  = 0x00;
+    port_7ffd_reg  = 0x00;
+    port_dffd_reg  = 0x00;
+    port_dffd_reg_6  = 0;
+    port_1ffd_reg  = 0x00;
+    port_1ffd_special_old  = 0;
+    port_eff7_reg_2  = 0;
+    port_eff7_reg_3  = 0;
 */
 	m_nr_02_generate_mf_nmi  = 0;
 	m_nr_02_generate_divmmc_nmi  = 0;

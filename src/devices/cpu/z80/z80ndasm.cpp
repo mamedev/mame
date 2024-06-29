@@ -5,6 +5,7 @@
  *
  *****************************************************************************/
 
+#include "emu.h"
 #include "z80ndasm.h"
 
 const z80_disassembler::z80dasm z80n_disassembler::mnemonic_ed_n[256] =

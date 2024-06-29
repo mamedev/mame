@@ -920,7 +920,7 @@ ROM_START( elecyoyo )
 ROM_END
 
 
-ROM_START( elecyoyo2 )
+ROM_START( elecyoyoa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "yy14",  0xa000, 0x1000, CRC(0d2edcb9) SHA1(36e1a1aa81111f38e1c06a8174e7de406478cc67) )
 	ROM_LOAD( "yy15",  0xb000, 0x1000, CRC(a91f01e3) SHA1(7818299d25a0816b856e83fae02d8019e5e8b4a3) )
@@ -970,7 +970,7 @@ ROM_START( kram )
 ROM_END
 
 
-ROM_START( kram2 )
+ROM_START( krama )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ks14", 0xa000, 0x1000, CRC(a2eac1ff) SHA1(128f83b1760492cbb272828ad8c67ea9a5db862a) )
 	ROM_LOAD( "ks15", 0xb000, 0x1000, CRC(4b2c175e) SHA1(4f9d4dcc78a12e994d499b182c8229d5fa63b805) )
@@ -995,7 +995,7 @@ ROM_START( kram2 )
 ROM_END
 
 
-ROM_START( kram3 )
+ROM_START( krame )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* encrypted */
 	ROM_LOAD( "kr-u14", 0xa000, 0x1000, CRC(02c1bd1e) SHA1(5f13f32ca2da0e93ed43b052c8c33af9ac67cb6c) )
 	ROM_LOAD( "kr-u15", 0xb000, 0x1000, CRC(46b3ff33) SHA1(7db45971972df144a21fee4cc015b0190b502e12) )
@@ -1471,12 +1471,12 @@ GAME( 1981, qix2,      qix,      qix,       qix,      qix_state,     empty_init,
 GAME( 1981, sdungeon,  0,        mcu,       sdungeon, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "Space Dungeon", MACHINE_SUPPORTS_SAVE ) // actually released July 1982
 GAME( 1981, sdungeona, sdungeon, mcu,       sdungeon, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "Space Dungeon (larger roms)", MACHINE_SUPPORTS_SAVE ) // same as above but uses larger ROMs
 
-GAMEL(1982, elecyoyo,  0,        mcu,       elecyoyo, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
-GAMEL(1982, elecyoyo2, elecyoyo, mcu,       elecyoyo, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
+GAMEL(1982, elecyoyo,  0,        mcu,       elecyoyo, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "The Electric Yo-Yo (rev 1)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
+GAMEL(1982, elecyoyoa, elecyoyo, mcu,       elecyoyo, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "The Electric Yo-Yo",         MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
 
-GAME( 1982, kram,      0,        mcu,       kram,     qixmcu_state,  empty_init,   ROT0,   "Taito America Corporation", "Kram (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kram2,     kram,     mcu,       kram,     qixmcu_state,  empty_init,   ROT0,   "Taito America Corporation", "Kram (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kram3,     kram,     kram3,     kram,     qix_state,     init_kram3,   ROT0,   "Taito America Corporation", "Kram (encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kram,      0,        mcu,       kram,     qixmcu_state,  empty_init,   ROT0,   "Taito America Corporation", "Kram (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, krama,     kram,     mcu,       kram,     qixmcu_state,  empty_init,   ROT0,   "Taito America Corporation", "Kram", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, krame,     kram,     kram3,     kram,     qix_state,     init_kram3,   ROT0,   "Taito America Corporation", "Kram (encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, zookeep,   0,        zookeep,   zookeep,  zookeep_state, empty_init,   ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, zookeep2,  zookeep,  zookeep,   zookeep,  zookeep_state, empty_init,   ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", MACHINE_SUPPORTS_SAVE )

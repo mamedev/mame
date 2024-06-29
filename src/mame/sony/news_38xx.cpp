@@ -425,6 +425,8 @@ void news_38xx_state::common(machine_config &config)
 	NEWS_HID_HLE(config, m_hid);
 	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(m_serial_irq, FUNC(input_merger_device::in_w<0>));
 	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(m_serial_irq, FUNC(input_merger_device::in_w<1>));
+
+	SOFTWARE_LIST(config, "software_list").set_original("sony_news").set_filter("RISC");
 }
 
 void news_38xx_state::nws3860(machine_config &config)
