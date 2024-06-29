@@ -854,19 +854,27 @@ void z80dma_device::write(u8 data)
 }
 
 /****************************************************************************
- * rdy_w - ready input
+ * rdy_write_callback - deferred RDY signal write
  ****************************************************************************/
-void z80dma_device::rdy_w(int state)
+TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 {
-	LOG("Z80DMA RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH);
 	// normalize state
-	m_rdy = state;
+	m_rdy = param;
 	m_status = (m_status & 0xFD) | (!is_ready() << 1);
 
 	if (is_ready() && INT_ON_READY)
 	{
 		trigger_interrupt(INT_RDY);
 	}
+}
+
+/****************************************************************************
+ * rdy_w - ready input
+ ****************************************************************************/
+void z80dma_device::rdy_w(int state)
+{
+	LOG("Z80DMA RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback),this), state);
 }
 
 /****************************************************************************

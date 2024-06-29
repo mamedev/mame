@@ -124,6 +124,7 @@ private:
 	virtual void z80daisy_irq_reti() override;
 
 	TIMER_CALLBACK_MEMBER(clock_w);
+	TIMER_CALLBACK_MEMBER(rdy_write_callback);
 
 	// internal state
 	devcb_write_line   m_out_busreq_cb;
