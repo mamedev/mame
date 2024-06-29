@@ -1250,7 +1250,10 @@ void stv_state::batmanfr_sound_comms_w(offs_t offset, uint32_t data, uint32_t me
 void stv_state::batmanfr(machine_config &config)
 {
 	stv(config);
-	ACCLAIM_RAX(config, "rax", 0);
+	ACCLAIM_RAX(config, m_rax, 0);
+	// TODO: RAX output connected to SCSP?
+	m_rax->add_route(0, "lspeaker", 1.0);
+	m_rax->add_route(1, "rspeaker", 1.0);
 }
 
 void stv_state::shienryu(machine_config &config)
