@@ -2975,9 +2975,9 @@ GAME( 1982, swimmera,    swimmer,  swimmer,   swimmer,   swimmer_state,  empty_i
 GAME( 1982, swimmerb,    swimmer,  swimmer,   swimmerb,  swimmer_state,  empty_init,     ROT0,   "Tehkan", "Swimmer (set 3)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, guzzler,     0,        guzzler,   guzzler,   swimmer_state,  empty_init,     ROT90,  "Tehkan", "Guzzler", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   swimmer_state,  empty_init,     ROT90,  "Tehkan", "Guzzler (Swimmer Conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   swimmer_state,  empty_init,     ROT90,  "Tehkan", "Guzzler (Swimmer conversion)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, au,          0,        au,        au,        swimmer_state,  empty_init,     ROT90,  "hack",   "Au", MACHINE_SUPPORTS_SAVE ) // suspect ROM has been tampered with
+GAME( 1983, au,          0,        au,        au,        swimmer_state,  empty_init,     ROT90,  "hack",   "Au (Swimmer conversion?)", MACHINE_SUPPORTS_SAVE ) // suspect ROM has been tampered with
 
 GAME( 1983, yamato,      0,        yamato,    yamato,    yamato_state,   init_yamato,    ROT90,  "Sega",   "Yamato (US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, yamato2,     yamato,   yamato,    yamato,    yamato_state,   init_yamato,    ROT90,  "Sega",   "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
