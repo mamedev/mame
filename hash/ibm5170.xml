@@ -9775,6 +9775,59 @@ Missing [modem] features, assume requiring a connection to a Reuters device such
 		</part>
 	</software>
 
+	<software name="acesdeep">
+		<description>Aces of the Deep</description>
+		<year>1994</year>
+		<publisher>Sierra On-line</publisher>
+		<notes><![CDATA[
+The disks have had their OEM IDs modified by Windows
+]]></notes>
+		<info name="developer" value="Dynamix" />
+		<info name="language" value="English" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1/5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces of the Deep [Sierra] [1994] [3.5HD] [disk 1 of 5].img" size="1474560" crc="ddb434c0" sha1="d7b5c58050aab3a50cbd47e8f419727905c616da" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2/5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces of the Deep [Sierra] [1994] [3.5HD] [disk 2 of 5].img" size="1474560" crc="c7d62a5d" sha1="9f45d4f753553740f254e9c96a7a5035d785d50a" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3/5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces of the Deep [Sierra] [1994] [3.5HD] [disk 3 of 5].img" size="1474560" crc="995c9734" sha1="702b1c427750528eca7eadd60da9cb6254586ce7" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4/5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces of the Deep [Sierra] [1994] [3.5HD] [disk 4 of 5].img" size="1474560" crc="a3591e9a" sha1="3fb1d22204356b28e835dc0fa5440b5d18ecb582" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5/5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces of the Deep [Sierra] [1994] [3.5HD] [disk 5 of 5].img" size="1474560" crc="009f59b5" sha1="1802ac5d5b309e99606f78a288c7ba0e390a4d6d" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acesdeeped">
+		<description>Aces of the Deep: Expansion Disk</description>
+		<year>1995</year>
+		<publisher>Sierra On-line</publisher>
+		<info name="developer" value="Dynamix" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces of the Deep - Expansion Disk [Sierra] [1995] [3.5HD] [disk 1 of 1].img" size="1474560" crc="5d9c40aa" sha1="c76fc6483efda10fad2cdd953d9ca1ad5b2f6ea0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aopac">
 		<description>Aces of the Pacific</description>
 		<year>1992</year>
@@ -9808,14 +9861,45 @@ Missing [modem] features, assume requiring a connection to a Reuters device such
 		</part>
 	</software>
 
-	<software name="aoefr">
-		<description>Aces Over Europe (French)</description>
-		<year>1993</year>
-		<publisher>Dynamix</publisher>
+	<software name="aceseuro">
+		<description>Aces Over Europe</description>
+		<year>1994</year>
+		<publisher>Sierra On-Line</publisher>
 		<notes><![CDATA[
 The disks have had their OEM IDs modified by Windows
 ]]></notes>
-		<info name="region" value="France" />
+		<info name="developer" value="Dynamix" />
+		<info name="language" value="English" />
+		<info name="version" value="1.02" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces Over Europe [Sierra] [1994] [3.5HD] [disk 1 of 3].img" size="1474560" crc="a711655c" sha1="567971e2d6c43d18a3360b786c17c4fa7917fb06" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces Over Europe [Sierra] [1994] [3.5HD] [disk 2 of 3].img" size="1474560" crc="cd920278" sha1="668c431b2e4cbb134b63c3182a77e21d6b2718d1" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces Over Europe [Sierra] [1994] [3.5HD] [disk 3 of 3].img" size="1474560" crc="6ba7526b" sha1="c8acdae20302a0feba1b6dc7ca8e6cf8f0b48c7c" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aceseuro_fr" cloneof="aceseuro">
+		<description>Aces Over Europe (France)</description>
+		<year>1994</year>
+		<publisher>Sierra On-Line</publisher>
+		<notes><![CDATA[
+The disks have had their OEM IDs modified by Windows
+]]></notes>
+		<info name="developer" value="Dynamix" />
+		<info name="language" value="French" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Aces Over Europe (France) (Disk 1).img" size="1474560" crc="4659ac93" sha1="f1296c37734f6a2cc5d6bcfa55a810535413795a" status="baddump"/>
@@ -9829,6 +9913,33 @@ The disks have had their OEM IDs modified by Windows
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Aces Over Europe (France) (Disk 3).img" size="1474560" crc="945f95f5" sha1="ee1ecf7bbb8577f81a6bd1bfd4206c8b50bf2de9" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aceseuro_de" cloneof="aceseuro">
+		<description>Aces Over Europe (Germany)</description>
+		<year>1994</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="language" value="German" />
+		<info name="version" value="1.01" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces Over Europe (German) [Sierra] [1994] [3.5HD] [disk 1 of 3].img" size="1474560" crc="dd290842" sha1="03bf918d1a933807db3efd6ac0aad8bbf30a0dd5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces Over Europe (German) [Sierra] [1994] [3.5HD] [disk 2 of 3].img" size="1474560" crc="1cc9b702" sha1="189660a45c5ace067ef197f9be216793aa54378c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces Over Europe (German) [Sierra] [1994] [3.5HD] [disk 3 of 3].img" size="1474560" crc="4a37621f" sha1="59338a2ec58fbd4e2a882868c90937729efb88c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10478,17 +10589,6 @@ This disk contains 6 packages of 6 saved games.
 		</part>
 	</software>
 
-	<software name="ampool">
-		<description>Archer Maclean's Pool</description>
-		<year>1992</year>
-		<publisher>Virgin</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "4186835">
-				<rom name="archer_macleans_pool.mfm" size="4186835" crc="3a55dc65" sha1="947cdea0a7f039fb5e2f8dfca93749bb18b7e323"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="anotherw">
 		<description>Another World (Europe) (Kixx XL release)</description>
 		<year>1993</year>
@@ -10550,10 +10650,63 @@ This disk contains 6 packages of 6 saved games.
 		<description>Arcade Pool</description>
 		<year>1994</year>
 		<publisher>Team 17</publisher>
+		<info name="copy_protection" value="Code Sheets required" />
 		<info name="developer" value="Team 17" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="ARCADE POOL" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Arcade Pool [Team 17] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="6ea83a73" sha1="4ab1bae96e522f98a0bbdc8fe114353a503067c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcpool_a" cloneof="arcpool">
+		<description>Arcade Pool (alt)</description>
+		<year>1994</year>
+		<publisher>Team 17</publisher>
+		<notes><![CDATA[
+Differences between clone/parent:
+- Installation setup background color: black (parent: blue)
+- Floppy disk DOS label: FF (parent: ARCADE POOL)
+]]></notes>
+		<info name="copy_protection" value="Code Sheets required" />
+		<info name="developer" value="Team 17" />
+		<info name="usage" value="Mouse required. VGA card required." />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="ARCADE POOL" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Arcade Pool (alt) [Team 17] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="95813372" sha1="00d2e7aaddb0255bab16d601b1259fc366a6a9b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ampool">
+		<description>Archer Maclean's Pool</description>
+		<year>1992</year>
+		<publisher>Virgin</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "4186835">
+				<rom name="archer_macleans_pool.mfm" size="4186835" crc="3a55dc65" sha1="947cdea0a7f039fb5e2f8dfca93749bb18b7e323"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcultra">
+		<description>Archon Ultra</description>
+		<year>1994</year>
+		<publisher>S.S.I.</publisher>
+		<info name="developer" value="Free Fall Associates" />
+		<info name="version" value="1.1a" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Archon Ultra [SSI] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="f1d37699" sha1="31816f7eb9c49ae9433fb8e903e46f67088c8ccd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Archon Ultra [SSI] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="1f6e0e6c" sha1="5f754428bd46ee81d4b53b17e602420b6103d425"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10823,38 +10976,44 @@ This disk contains 6 packages of 6 saved games.
 		<info name="language" value="English/French/German/Italian/Portuguese/Spanish/Swedish" />
 		<info name="region" value="Europe" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 1 OF 6" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Beneath a Steel Sky (euro) [Virgin] [1994] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="fdcdb506" sha1="78b12fa1c43bc0f94ec55091c4a60905962235b7"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 2 OF 6" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Beneath a Steel Sky (euro) [Virgin] [1994] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="93971d52" sha1="233cb0275fff27296f474fbff7874f1ada1b9957"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 3 OF 6" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Beneath a Steel Sky (euro) [Virgin] [1994] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="b624464b" sha1="08c638de7259836a472f2d7173312399be369588"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 4 OF 6" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Beneath a Steel Sky (euro) [Virgin] [1994] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="d1802f9e" sha1="36cd78784c013e3614ce3aae9591e2c2aa886ab0"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 5 OF 6" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Beneath a Steel Sky (euro) [Virgin] [1994] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="72680d7a" sha1="ca773d61aef0a3d5eee4fc51f62305645b879ce1"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 6 OF 6" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Beneath a Steel Sky (euro) [Virgin] [1994] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="68c95e68" sha1="788c850c5976560f129e91f49ea4c82750904b1b"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="steelskyfr" cloneof="steelsky">
+	<software name="steelsky_fr" cloneof="steelsky">
 		<description>Beneath a Steel Sky (France)</description>
 		<year>1994</year>
 		<publisher>Virgin</publisher>
@@ -10862,31 +11021,37 @@ This disk contains 6 packages of 6 saved games.
 		<info name="language" value="English/French/German" />
 		<info name="region" value="France" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 1 OF 6" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="6b5e3247" sha1="b4cc255abfc5f72fc5c5dbea1aca595c92bbe70a"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 2 OF 6" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="49c4e105" sha1="25ab45d316be2cb2551d3d47efd60bddd0959cd9"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 3 OF 6" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="902136fd" sha1="5bc6e36e2facae5e7b5ace84a13787cac050941e"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 4 OF 6" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="0b2df06f" sha1="ff8ce38870c22e078ab288d7f165c20dcd0943dd"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 5 OF 6" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="675693e5" sha1="efc84ebe51581650857e553cba1fd27cbd607d8a"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 6 OF 6" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="c7ec313f" sha1="bf18daa98d1387f96ec97c91a18b7775ba67a87c"/>
 			</dataarea>
@@ -10961,6 +11126,26 @@ This disk contains 6 packages of 6 saved games.
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Bio Menace (USA) (v.1.1) (Disk 2).img" size="1474560" crc="33d83897" sha1="7ef3a391ce171c344ec50a5968d50b5754e512cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blthorne">
+		<description>Blackthorne</description>
+		<year>1994</year>
+		<publisher>Interplay</publisher>
+		<info name="copy_protection" value="Manual required at installation setup" />
+		<info name="developer" value="Blizzard Entertainment" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Blackthorne [Interplay] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="f3fa87da" sha1="a62cc7dccbc32e470b7b0653d65aedda3b327f8e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="DISK 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Blackthorne [Interplay] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="64f91dcd" sha1="357f64dea04f7f2b5d904dd035cc68c50bc5600d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17068,6 +17253,36 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		</part>
 	</software>
 
+	<software name="lweapon">
+		<description>Lethal Weapon</description>
+		<year>1992</year>
+		<publisher>Ocean</publisher>
+		<notes>Bad dump: Modified ROOT and OEM id</notes>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
+		<info name="developer" value="Ocean" />
+		<info name="usage" value="Supports 286, 386, 486 &amp; compatibles. VGA only. Hard Disk required." />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Lethal Weapon" />
+			<dataarea name="flop" size = "2152153">
+				<rom name="Lethal Weapon [Ocean] [1992] [3.5DD] [Disk 1 of 1].mfm" size="2152153" crc="41aa20de" sha1="d34864ff62cde35b93e0388c128305cb7db66b2c" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lweapon_a" cloneof="lweapon">
+		<description>Lethal Weapon (Big Games)</description>
+		<year>1995</year>
+		<publisher>Jackson Libri</publisher>
+		<info name="developer" value="Ocean" />
+		<info name="usage" value="Supports 286, 386, 486 &amp; compatibles. VGA only. Hard Disk required." />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Lethal Weapon" />
+			<dataarea name="flop" size = "2181136">
+				<rom name="Lethal Weapon [Big Games] [1995] [3.5DD] [Disk 1 of 1].img" size="737280" crc="af8b76b2" sha1="a055b9348b9e1e808a5fc87cf933f34077db8c9e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- unfinished; VGA mode has heavy screen flickering as compared with DOSBox, but EGA mode is OK -->
 	<software name="ltquest" supported="partial">
 		<description>Light Quest (prototype)</description>
@@ -17219,6 +17434,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Adeline Software" />
+		<info name="usage" value="requires a VESA compatible video card" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Little Big Adventure [Electronic Arts] [1995] [3.5HD] [Disk 1 of 8].img" size="1474560" crc="365c0bb9" sha1="88fe434fdf3d3364eff3ac7cc44e067f103ba449"/>
@@ -17801,6 +18017,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Micro Machines 2: Turbo Tournament</description>
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Supersonic Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -17819,7 +18036,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Micro Machines 2 [Codemasters] [1995] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="242de9de" sha1="64b552300f3cdb5d5ff73f7e6ca71bda34fa5d32"/>
+				<rom name="Micro Machines 2 [Codemasters] [1995] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="c2cb7679" sha1="f8923d5ff7f015bd98da0859ea12afbb817a512e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19235,6 +19452,40 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		</part>
 	</software>
 
+	<software name="psychopb">
+		<description>Psycho Pinball</description>
+		<year>1995</year>
+		<publisher>Codemasters</publisher>
+		<notes>Bad dump: Modified ROOT and OEM id</notes>
+		<info name="copy_protection" value="Manual required" />
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Psycho Pinball [Codemasters] [1995] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="fcbb3a7a" sha1="06ce414876eb66c7389193fc83957f7a22b5c096" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Psycho Pinball [Codemasters] [1995] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="2cbdaaf5" sha1="733f7dc536e96bdebc569e39a1736b8067777b86" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Psycho Pinball [Codemasters] [1995] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="66d7dad4" sha1="f7ff02d684473519f216921ed2d1af5f87d41cd8" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Psycho Pinball [Codemasters] [1995] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="4b72487b" sha1="536446a058750fd5912b664e422f8fd827d2aa6d" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Psycho Pinball [Codemasters] [1995] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="b8347785" sha1="4ec3197c3bc2ad3f71ceba7e5157e6982472f8d6" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pushover">
 		<description>Push-Over (Big Games/The Hit Squad release)</description>
 		<year>1994</year>
@@ -20239,6 +20490,30 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="The Secret of Monkey Island (Spain) [Lucasfilm] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="60ccc3c2" sha1="582ea7d42c9a49ac5622bc49a768cec764db486b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swos">
+		<description>Sensible World of Soccer</description>
+		<year>1995</year>
+		<publisher>Renegade Software</publisher>
+		<notes>Bad dump: Modified ROOT and OEM id</notes>
+		<info name="developer" value="Sensible Software" />
+		<info name="version" value="V1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sensible World of Soccer [Renegade] [1995] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="aa7692ab" sha1="b225d78b7f3b479db8d424f981178b8be2214905" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sensible World of Soccer [Renegade] [1995] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="4089d5e4" sha1="b5ecf54801af94ec05b9c0fad171c8eae31198ae" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sensible World of Soccer [Renegade] [1995] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="faed53f8" sha1="80cdb9177d3614c3a39c1a07b507be20d33f52f7" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21912,6 +22187,55 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		</part>
 	</software>
 
+	<software name="ssf2t">
+		<description>Super Street Fighter II Turbo</description>
+		<year>1995</year>
+		<publisher>GameTek</publisher>
+		<notes>Bad dump: Modified ROOT and OEM id</notes>
+		<info name="developer" value="Eurocom Developments" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Super Street Fighter II Turbo [GameTek] [1995] [3.5HD] [Disk 1 of 8].img" size="1474560" crc="c22e39d0" sha1="7e11a8eec0c2b1b976876632071091edbd191670" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Super Street Fighter II Turbo [GameTek] [1995] [3.5HD] [Disk 2 of 8].img" size="1474560" crc="7ae5664f" sha1="07b02abbea0cb9190196e08e7792c775a4197851" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Super Street Fighter II Turbo [GameTek] [1995] [3.5HD] [Disk 3 of 8].img" size="1474560" crc="0f247858" sha1="792ef031b4684bbfac46582f28db7f2b0f67ce86" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Super Street Fighter II Turbo [GameTek] [1995] [3.5HD] [Disk 4 of 8].img" size="1474560" crc="e4d25e24" sha1="dd87b1addd53bb5fa2fdbd32a12630bcbfede711" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Super Street Fighter II Turbo [GameTek] [1995] [3.5HD] [Disk 5 of 8].img" size="1474560" crc="659c1242" sha1="30666a7f6d92bee3914d8bf3bd955101bd7d10bc" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Super Street Fighter II Turbo [GameTek] [1995] [3.5HD] [Disk 6 of 8].img" size="1474560" crc="ff0be3e2" sha1="a073394dc84c80a24ae4dc5265bf4f0ee9181d65" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Super Street Fighter II Turbo [GameTek] [1995] [3.5HD] [Disk 7 of 8].img" size="1474560" crc="2f0187c7" sha1="9abbad98430f0bf7b403efd0fb4dc5e8701adc64" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Super Street Fighter II Turbo [GameTek] [1995] [3.5HD] [Disk 8 of 8].img" size="1474560" crc="a28c05d8" sha1="433381e89c97c41179b2dd05e0c9e4ab9cbb73bb" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sw2050">
 		<description>Subwar 2050 - The Underwater Combat Simulation</description>
 		<year>1993</year>
@@ -22349,6 +22673,7 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
+
 	<software name="xcomufod" cloneof="ufoeu">
 		<description>X-COM - UFO Defense (USA)</description>
 		<year>1994</year>
@@ -22626,6 +22951,42 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="Warlords II - Scenario Builder [SSG] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="9181c3ea" sha1="00724a3f800f82a176ab9242cd42a87042f97b54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warriors">
+		<description>Warriors</description>
+		<year>1995</year>
+		<publisher>Mindscape</publisher>
+		<notes>Bad dump: Modified ROOT and OEM id</notes>
+		<info name="developer" value="Atreid Concept" />
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="usage" value="requires a VESA compatible video card" />
+		<info name="version" value="v1.0β" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Warriors [Mindscape] [1995] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="b68c9383" sha1="28fa6fbc92105bd60a97cdf8ff2cfb59a4849711" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Warriors [Mindscape] [1995] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="f9d79644" sha1="ab42dc37b7a996fe8688f624a6508f46ef6e44aa" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Warriors [Mindscape] [1995] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="ce88839a" sha1="8af2f5f94dd917d48dc89b2d25af40b4f2b559b6" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Warriors [Mindscape] [1995] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="68797cc2" sha1="1d1554b25445196c94ab0da783ca0726cc1951d2" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Warriors [Mindscape] [1995] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="91d9e04d" sha1="e0dd3d02b1ef3fe6d5767684ba10aba0cd96f3a9" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22962,36 +23323,6 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
-	<software name="wordresc">
-		<description>Word Rescue</description>
-		<year>1992</year>
-		<publisher>Apogee Software</publisher>
-		<info name="developer" value="Karen Crowther" />
-		<info name="version" value="2.0" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Word Rescue (USA) (v2.0).img" size="1474560" crc="0d3b9f45" sha1="162640737e6b9617245e04f1eefb6c36238b7a85"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wcusa94">
-		<description>World Cup USA '94</description>
-		<year>1994</year>
-		<publisher>U.S. Gold</publisher>
-		<info name="developer" value="Tiertex Design Studios" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="World Cup USA '94 [US Gold] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="d255e7dd" sha1="6d689cf624ba154a8254d7e9c26c11c112ded93d"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="World Cup USA '94 [US Gold] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="798bbcca" sha1="fc9ab648fa9cdf74b9b89ce34057a694cd0556e2"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wolf3d">
 		<!-- Dumped via Kryoflux, track 0 shows as modified on both disks -->
 		<description>Wolfenstein 3-D (v1.4, 3.5" DD)</description>
@@ -23113,6 +23444,63 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		</part>
 	</software>
 
+	<software name="wordresc">
+		<description>Word Rescue</description>
+		<year>1992</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Karen Crowther" />
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Word Rescue (USA) (v2.0).img" size="1474560" crc="0d3b9f45" sha1="162640737e6b9617245e04f1eefb6c36238b7a85"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcusa94">
+		<description>World Cup USA '94</description>
+		<year>1994</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="developer" value="Tiertex Design Studios" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="World Cup USA '94 [US Gold] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="d255e7dd" sha1="6d689cf624ba154a8254d7e9c26c11c112ded93d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="World Cup USA '94 [US Gold] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="798bbcca" sha1="fc9ab648fa9cdf74b9b89ce34057a694cd0556e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="worms">
+		<description>Worms</description>
+		<year>1995</year>
+		<publisher>Ocean</publisher>
+		<notes>Bad dump: Modified ROOT and OEM id</notes>
+		<info name="developer" value="Team 17" />
+		<info name="copy_protection" value="Code booklet required" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 of 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Worms [Ocean] [1995] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="e47c2e57" sha1="89ccaf079770a9a99940638dcef6ab4d51e61449" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 of 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Worms [Ocean] [1995] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="65d9022e" sha1="024b56db1f23567cfe3e4c0b132c3dd20397690c" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 of 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Worms [Ocean] [1995] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="9dd8d9de" sha1="bd8dc5f4e474c921b3dd8c0c7c26a07bdb070bea" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wwfeuro">
 		<description>WWF European Rampage Tour</description>
 		<year>1992</year>
@@ -23201,6 +23589,25 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Zool 2 [Gremlin Graphics] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="86d3b79b" sha1="21c13abb1b5a6e2cc4c8542de39f6897058633a3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoop">
+		<description>Zoop</description>
+		<year>1995</year>
+		<publisher>Viacom New Media</publisher>
+		<info name="developer" value="Hookstone" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Zoop [Viacom] [1995] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="09ccc610" sha1="72a4d5bb5b9b877292e1e0a0cf48cebf65b97d63"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Zoop [Viacom] [1995] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="df8df60c" sha1="3112a2dd90a65d2686785904eb3178c1c0af3c5f"/>
 			</dataarea>
 		</part>
 	</software>
