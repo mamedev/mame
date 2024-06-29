@@ -1316,7 +1316,6 @@ void yamato_state::yamato(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* 1.536 MHz */
-
 	AY8910(config, "ay2", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* 1.536 MHz */
 }
 
@@ -1381,7 +1380,6 @@ void swimmer_state::swimmer_root(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, "ay1", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* verified on pcb */
-
 	AY8910(config, "ay2", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* verified on pcb */
 }
 
@@ -1395,7 +1393,7 @@ void swimmer_state::swimmer(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(swimmer_state::swimmer_palette), 32*8+4*8+1);
 
-	MCFG_VIDEO_START_OVERRIDE(swimmer_state,swimmer)
+	MCFG_VIDEO_START_OVERRIDE(swimmer_state, swimmer)
 }
 
 void swimmer_state::guzzler(machine_config &config)
@@ -1418,14 +1416,21 @@ rgb_t swimmer_state::au_palette(u32 raw)
 void swimmer_state::au(machine_config &config)
 {
 	swimmer_root(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &swimmer_state::au_map);
-	m_audiocpu->set_periodic_int(FUNC(swimmer_state::nmi_line_pulse), attotime::from_hz(60.57)); /* IRQs are triggered by the main CPU */
+
+	m_audiocpu->remove_periodic_int();
+	m_screen->screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI);
+
+	m_audiocpu->set_clock(XTAL(18'432'000) / 6);
+	subdevice<ay8910_device>("ay1")->set_clock(XTAL(18'432'000) / 12);
+	subdevice<ay8910_device>("ay2")->set_clock(XTAL(18'432'000) / 12);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_au);
 
 	PALETTE(config, m_palette).set_format(2, &swimmer_state::au_palette, 64).set_endianness(ENDIANNESS_BIG);
 
-	MCFG_VIDEO_START_OVERRIDE(swimmer_state,au)
+	MCFG_VIDEO_START_OVERRIDE(swimmer_state, au)
 };
 
 /***************************************************************************
@@ -2972,7 +2977,7 @@ GAME( 1982, swimmerb,    swimmer,  swimmer,   swimmerb,  swimmer_state,  empty_i
 GAME( 1983, guzzler,     0,        guzzler,   guzzler,   swimmer_state,  empty_init,     ROT90,  "Tehkan", "Guzzler", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   swimmer_state,  empty_init,     ROT90,  "Tehkan", "Guzzler (Swimmer Conversion)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, au,          0,        au,        au,        swimmer_state,  empty_init,     ROT90,  "Tehkan", "Au", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, au,          0,        au,        au,        swimmer_state,  empty_init,     ROT90,  "hack",   "Au", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, yamato,      0,        yamato,    yamato,    yamato_state,   init_yamato,    ROT90,  "Sega",   "Yamato (US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, yamato2,     yamato,   yamato,    yamato,    yamato_state,   init_yamato,    ROT90,  "Sega",   "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
