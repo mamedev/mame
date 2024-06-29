@@ -6,8 +6,6 @@ license:CC0-1.0
 
 <softwarelist name="coco_cass" description="Tandy Radio Shack Color Computer cassette images">
 
-        <!-- cassette images (.cas,.wav) downloaded from the Color Computer Archive (colorcomputerarchive.com) -->
-
         <software name="grover">
                 <description>Grover's Number Rover (CCW)</description>
                 <year>1983</year>
@@ -16,8 +14,8 @@ license:CC0-1.0
                 <info name="usage" value="CLOAD:RUN" />
                 <sharedfeat name="compatibility" value="COCO,COCO3" />
                 <part name="cass" interface="coco_cass">
-                        <dataarea name="cass" size="3700">
-                                <rom name="Grover's Number Rover (CCW).cas" size="3700" crc="8fdf686b" sha1="f200645c9292a99e7aaac82e766c299db0d18263" />
+                        <dataarea name="cass" size="19025">
+                                <rom name="Grover's Number Rover (CCW).cas" size="19025" crc="8fdf686b" sha1="f200645c9292a99e7aaac82e766c299db0d18263" />
                         </dataarea>
                 </part>
         </software>
@@ -30,13 +28,13 @@ license:CC0-1.0
                 <info name="usage" value="CLOADM:EXEC" />
                 <sharedfeat name="compatibility" value="COCO,COCO3" />
                 <part name="cass1" interface="coco_cass">
-                        <dataarea name="cass" size="3700">
-                                <rom name="Sam Sleuth (part 1) (Computerware).cas" size="3700" crc="8f18ddc8" sha1="430901b403fbcb76820cc54a870dbd3d9f0d1dde" />
+                        <dataarea name="cass" size="17581">
+                                <rom name="Sam Sleuth (part 1) (Computerware).cas" size="17581" crc="8f18ddc8" sha1="430901b403fbcb76820cc54a870dbd3d9f0d1dde" />
                         </dataarea>
                 </part>
                 <part name="cass2" interface="coco_cass">
-                        <dataarea name="cass" size="3700">
-                                <rom name="Sam Sleuth (part 2) (Computerware).cas" size="3700" crc="f33b0e55" sha1="9b2b7550ee5eeaa8ff17c7e3430805d692968a65" />
+                        <dataarea name="cass" size="27275">
+                                <rom name="Sam Sleuth (part 2) (Computerware).cas" size="27275" crc="f33b0e55" sha1="9b2b7550ee5eeaa8ff17c7e3430805d692968a65" />
                         </dataarea>
                 </part>
         </software>
@@ -49,13 +47,13 @@ license:CC0-1.0
                 <info name="usage" value="CLOADM:EXEC" />
                 <sharedfeat name="compatibility" value="COCO,COCO3" />
                 <part name="cass1" interface="coco_cass">
-                        <dataarea name="cass" size="3700">
-                                <rom name="Zaxxon (Datasoft).cas" size="3700" crc="0b4af649" sha1="cbbe28a4e295232c629b6734a6df5fc838aefcfb" />
+                        <dataarea name="cass" size="17319">
+                                <rom name="Zaxxon (Datasoft).cas" size="17319" crc="0b4af649" sha1="cbbe28a4e295232c629b6734a6df5fc838aefcfb" />
                         </dataarea>
                 </part>
                 <part name="cass2" interface="coco_cass">
-                        <dataarea name="cass" size="3700">
-                                <rom name="Zaxxon (Datasoft).wav" size="3700" crc="00483372" sha1="daaf85bc0e8581c1bf3ec059cdf84983b720ba1c" />
+                        <dataarea name="cass" size="895764">
+                                <rom name="Zaxxon (Datasoft).wav" size="895764" crc="00483372" sha1="daaf85bc0e8581c1bf3ec059cdf84983b720ba1c" />
                         </dataarea>
                 </part>
         </software>
@@ -68,8 +66,8 @@ license:CC0-1.0
                 <info name="usage" value="CLOADM:EXEC" />
                 <sharedfeat name="compatibility" value="COCO,COCO3" />
                 <part name="cass" interface="coco_cass">
-                        <dataarea name="cass" size="3700">
-                                <rom name="Zonx (The Rainbow).cas" size="3700" crc="8facc668" sha1="7c949bd685a5db980dda034237564d6956654995" />
+                        <dataarea name="cass" size="2993">
+                                <rom name="Zonx (The Rainbow).cas" size="2993" crc="8facc668" sha1="7c949bd685a5db980dda034237564d6956654995" />
                         </dataarea>
                 </part>
         </software>
