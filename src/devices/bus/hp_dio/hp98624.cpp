@@ -10,14 +10,50 @@
 #include "hp98624.h"
 #include "machine/tms9914.h"
 #include "bus/ieee488/ieee488.h"
+#include "hp_dio.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(HPDIO_98624, bus::hp_dio::dio16_98624_device, "dio98624", "HP98624 GPIB Interface")
+namespace {
 
+class dio16_98624_device :
+		public device_t,
+		public bus::hp_dio::device_dio16_card_interface
+{
+public:
+	dio16_98624_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-namespace bus::hp_dio {
+protected:
+	dio16_98624_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	void dmack_w_in(int channel, uint8_t data) override;
+	uint8_t dmack_r_in(int channel) override;
+
+	uint16_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint16_t data);
+
+	required_device<tms9914_device> m_tms9914;
+	required_device<ieee488_device> m_ieee488;
+	required_ioport m_switches;
+private:
+	void update_gpib_irq();
+	void update_gpib_dma();
+	void gpib_irq(int state);
+	void gpib_dreq(int state);
+
+	bool m_gpib_irq_line;
+	bool m_gpib_dma_line;
+
+	bool     m_installed_io;
+	uint8_t  m_control;
+};
 
 void dio16_98624_device::device_add_mconfig(machine_config &config)
 {
@@ -298,4 +334,6 @@ uint8_t dio16_98624_device::dmack_r_in(int channel)
 	return ret;
 }
 
-} // namespace bus::hp_dio
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(HPDIO_98624, bus::hp_dio::device_dio16_card_interface, dio16_98624_device, "dio98624", "HP98624 GPIB Interface")
