@@ -57,7 +57,7 @@ private:
 	required_ioport_array<16> m_key;
 	required_memory_region m_gfxrom;
 
-	uint8_t *m_chargen = nullptr;
+	//uint8_t *m_chargen = nullptr;
 	uint8_t m_keyb_matrix = 0;
 
 	std::unique_ptr<uint8_t[]> m_lcd_vram[2];
