@@ -61,7 +61,7 @@ protected:
 	virtual void signature() override;
 
 	int m_can_identify_device;
-	uint16_t          m_num_cylinders;
+	uint32_t          m_num_cylinders;
 	uint8_t           m_num_sectors;
 	uint8_t           m_num_heads;
 
