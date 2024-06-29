@@ -14,14 +14,23 @@
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+
 #include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6503.h"
+
 #include "imagedev/cassette.h"
+
 #include "bus/rs232/rs232.h"
+
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
+#include "machine/wd_fdc.h"
 #include "machine/mos6530.h"
 #include "machine/ram.h"
+
 #include "video/dl1416.h"
+#include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -64,6 +73,7 @@ public:
 	}
 
 	void aim65(machine_config &config);
+	void drac1(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 

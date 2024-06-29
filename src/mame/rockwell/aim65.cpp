@@ -43,7 +43,6 @@ static constexpr XTAL AIM65_CLOCK(4_MHz_XTAL / 4);
     ADDRESS MAPS
 ***************************************************************************/
 
-// Note: RAM is mapped dynamically in machine/aim65.c
 void aim65_state::mem_map(address_map &map)
 {
 	map(0x1000, 0x3fff).noprw(); // User available expansions
@@ -300,6 +299,60 @@ void aim65_state::aim65(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("aim65_cart");
 }
 
+void aim65_state::drac1(machine_config &config)
+{
+	aim65(config);
+
+	/* Expansion boards.
+	   Not currently emulated. */
+
+	/* 
+	CR-113E expansion board: Video Control Module.
+	 -1 x R6520
+	 -1 x HD46505
+	 -2 x EPROM
+	https://www.oldcomputers.es/wp-content/uploads/CR-113.pdf
+	*/
+	PIA6821(config, "pia_cr113e"); // R6520
+	//SCREEN(config, "screen_cr113e", SCREEN_TYPE_RASTER).set_refresh_hz(50).set_screen_update(...);
+	//HD6845S(config, "crtc_cr113e", AIM65_CLOCK).set_screen("screen_cr113e"); // Hitachi HD46505, unknown clock
+
+	/* 
+	CR-119C expansion board: RAM/ROM/PROM Memory Expansion.
+	 -6 x D4016C-2
+	 -1 x 4 dip switches bank
+	 -2 x EPROM
+	https://www.oldcomputers.es/wp-content/uploads/CR-119.pdf
+	*/
+
+	/* 
+	CR-120D.E expansion board: EPROM Programmer Module.
+	 -2 x R6520
+	 -1 x 4 dip switches bank
+	 -1 x EPROM
+	https://www.oldcomputers.es/wp-content/uploads/CR-120.pdf
+	https://www.oldcomputers.es/wp-content/uploads/CR-120-2.pdf
+	*/
+	PIA6821(config, "pia1_cr120d"); // R6520
+	PIA6821(config, "pia2_cr120d"); // R6520
+
+	/* 
+	CR-125 expansion board: Floppy Control Card.
+	 -1 x R6503P ()
+	 -2 x R6522P
+	 -1 x FD1791A
+	 -1 x 4 dip switches bank
+	 -1 x EPROM
+	 -1 x floppy connector
+	https://www.oldcomputers.es/wp-content/uploads/CR-125.pdf
+	*/
+	MOS6522(config, "via1_cr125", AIM65_CLOCK); // R6522P, unknown clock
+	MOS6522(config, "via2_cr125", AIM65_CLOCK); // R6522P, unknown clock
+	FD1791(config, "fdc_cr125", AIM65_CLOCK); // FD1791A, unknown clock
+	//FLOPPY_CONNECTOR(...)
+	M6503(config, "cpu_cr125", AIM65_CLOCK);
+}
+
 
 /***************************************************************************
     ROM DEFINITIONS
@@ -307,15 +360,43 @@ void aim65_state::aim65(machine_config &config)
 
 ROM_START( aim65 )
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_SYSTEM_BIOS(0, "aim65",  "Rockwell AIM-65")
+	ROM_SYSTEM_BIOS(0, "aim65",   "Rockwell AIM-65")
 	ROMX_LOAD("aim65mon.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(0))
 	ROMX_LOAD("aim65mon.z22", 0xf000, 0x1000, CRC(d01914b0) SHA1(e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "dynatem",  "Dynatem AIM-65")
+	ROM_SYSTEM_BIOS(1, "dynatem", "Dynatem AIM-65")
 	ROMX_LOAD("dynaim65.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(1))
 	ROMX_LOAD("dynaim65.z22", 0xf000, 0x1000, CRC(83e1c6e7) SHA1(444134043edd83385bd70434cb100269901c4417), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "spc100",  "Siemens PC100")
 	ROMX_LOAD("pc100.z23",    0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(2))
 	ROMX_LOAD("pc100.z22",    0xf000, 0x1000, CRC(aa07742a) SHA1(3b9bee24a00cf23b7b50cee97ccc12e3fa9da1ea), ROM_BIOS(2))
+ROM_END
+
+/* DRAC/DRAC-1 is an industrial control computer from the Spanish company Comelta (more info: https://www.oldcomputers.es/drac-1/).
+   It's based on a standard Rockwell AIM 65 PCB, but can be expanded with several cards and accessories made by Comelta, from CPU and
+   memory modules to control or interface cards (more info and manuals with schematics: https://www.oldcomputers.es/drac-1-placas-cr/). 
+*/
+ROM_START( drac1 )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("crosaim_v1.3_b_mone_2b_moni_01_e000.z23", 0xe000, 0x1000, CRC(ae83ba08) SHA1(4ee4157fe6cafda6c763547183be18859bdabc36))
+	ROM_LOAD("crosaim_v1.3_b_monf_2b_f000.z22",         0xf000, 0x1000, CRC(047c2ca8) SHA1(1877be29f7b725ee4fec7f21aa679d857391514b))
+
+	/* Expansion boards.
+	   Just a placeholder for ROMs until they're properly emulated. */
+
+	ROM_REGION(0x2000, "cr113e", 0) // CR-113E expansion board: Video Control Module
+	ROM_LOAD("cr113_chargen_b_4-2-83.bin",              0x0000, 0x1000, CRC(70b468ff) SHA1(a078f9355c9ffb6cb4682f5a6218a75fe1d42f74))
+	ROM_LOAD("cr113_dr_60-15_8000.bin",                 0x1000, 0x0800, CRC(ccc0fb97) SHA1(f98c919f10a479c0e56aa10d0917c84cac5a5f85))
+
+	// On the dumped machine, CR-119C was populated with these EPROMs, but other software can be loaded with it too
+	ROM_REGION(0x2000, "cr119c", 0) // CR-119C expansion board: RAM/ROM/PROM Memory Expansion
+	ROM_LOAD("cr119_crosaim_v1.5_dos_23b_5800.bin",     0x0000, 0x0800, CRC(e3e26661) SHA1(77ffe672fa6d91a48b411e0bbd66d98ca45016c2))
+	ROM_LOAD("cr119_bd0_b69_6000.bin",                  0x1000, 0x0800, CRC(10de463d) SHA1(36a5e44f705f1d34e792338005dd13525aab95ad))
+
+	ROM_REGION(0x0800, "cr120d", 0) // CR-120D expansion board: EPROM Programmer Module
+	ROM_LOAD("cr120_crosaim_v-b_120_ve-c_7000.bin",     0x0000, 0x0800, CRC(09840652) SHA1(ad9ae4cbdcb86e749d8a385ec6334e97d37ef0d4))
+
+	ROM_REGION(0x0800, "cr125", 0) // CR-125 expansion board: Floppy Control Card
+	ROM_LOAD("cr125_v94_800.bin",                       0x0000, 0x0800, CRC(f0fddc5a) SHA1(d7e927c5f177977a7032b8dddeb17a217fcb3fdd))
 ROM_END
 
 
@@ -325,3 +406,4 @@ ROM_END
 
 //   YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
 COMP(1977, aim65, 0,      0,      aim65,   aim65, aim65_state, empty_init, "Rockwell", "AIM 65", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+COMP(1982, drac1, aim65,  0,      drac1,   aim65, aim65_state, empty_init, "Comelta",  "DRAC-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
