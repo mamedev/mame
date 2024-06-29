@@ -112,6 +112,7 @@ const double XTAL::known_xtals[] = {
 	  4'032'000, /* 4.032_MHz_XTAL         GRiD Compass modem board */
 	  4'096'000, /* 4.096_MHz_XTAL         Used to drive OKI M9810 chips */
 	  4'194'304, /* 4.194304_MHz_XTAL      Used to drive MC146818 / Nintendo Game Boy */
+	  4'220'000, /* 4.220_MHz_XTAL         Used to drive OKI M6295 chips on some Namco boards, usually with /4 divider */
 	  4'224'000, /* 4.224_MHz_XTAL         Used to drive OKI M6295 chips, usually with /4 divider */
 	  4'410'000, /* 4.41_MHz_XTAL          Pioneer PR-8210 ldplayer */
 	  4'433'610, /* 4.43361_MHz_XTAL       Cidelsa Draco */
