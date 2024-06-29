@@ -7,10 +7,8 @@ license:CC0-1.0
 <softwarelist name="coco_cass" description="Tandy Radio Shack Color Computer cassette images">
 
         <!-- cassette images (.cas,.wav) downloaded from the Color Computer Archive (colorcomputerarchive.com) -->
-        <!-- appending "1" to give cassettes unique software name (from diskettes) and
-             workaround Batocera Linux issue: https://github.com/batocera-linux/batocera.linux/issues/11781 -->
 
-        <software name="grover1">
+        <software name="grover">
                 <description>Grover's Number Rover (CCW)</description>
                 <year>1983</year>
                 <publisher>Children's Television Workshop</publisher>
@@ -24,7 +22,7 @@ license:CC0-1.0
                 </part>
         </software>
 
-        <software name="ssleuth1">
+        <software name="ssleuth">
                 <description>Sam Sleuth (Computerware)</description>
                 <year>1984</year>
                 <publisher>Computerware</publisher>
@@ -43,7 +41,7 @@ license:CC0-1.0
                 </part>
         </software>
 
-        <software name="zaxxon1">
+        <software name="zaxxon">
                 <description>Zaxxon (Datasoft)</description>
                 <year>1983</year>
                 <publisher>Datasoft</publisher>
@@ -62,7 +60,7 @@ license:CC0-1.0
                 </part>
         </software>
 
-        <software name="zonx1">
+        <software name="zonx">
                 <description>Zonx (The Rainbow)</description>
                 <year>1985</year>
                 <publisher>Falsoft</publisher>
