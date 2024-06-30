@@ -16,6 +16,8 @@ class msx_s1990_device : public device_t,
 public:
 	msx_s1990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	static constexpr feature_type imperfect_features() { return feature::TIMING; }
+
 	// configuration
 	template <typename T> void set_z80_tag(T &&tag) { m_z80.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_r800_tag(T &&tag) { m_r800.set_tag(std::forward<T>(tag)); }

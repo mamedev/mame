@@ -23,7 +23,7 @@ TODO:
 #define LOG_INT   (1U << 2)
 #define LOG_TIME  (1U << 3)
 
-#define VERBOSE ( LOG_UNDOC /*| LOG_INT*/ )
+//#define VERBOSE ( LOG_UNDOC /*| LOG_INT*/ )
 #include "logmacro.h"
 
 #define LOGUNDOC(...) LOGMASKED(LOG_UNDOC, __VA_ARGS__)

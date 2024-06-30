@@ -24,6 +24,8 @@ public:
 	// device type constructor
 	r800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	static constexpr feature_type imperfect_features() { return feature::TIMING; }
+
 protected:
 	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override;

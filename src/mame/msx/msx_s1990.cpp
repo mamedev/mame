@@ -8,7 +8,6 @@
 #define LOG_CPU (1U << 1)
 #define LOG_PCM (1U << 2)
 //#define VERBOSE (LOG_CPU | LOG_PCM)
-//#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
 /***************************************************************************
