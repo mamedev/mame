@@ -74,11 +74,30 @@ void z29_state::keyin_w(int state)
 	m_keyin = state;
 }
 
+/**
+ * Port 1 (based on ROM listing)
+ * 
+ * bit 0 - KB output line
+ * bit 1 - KB input line
+ * bit 2 - 0 = normal video       1 = suppressed
+ * bit 3 - 0 = setup mode locked  1 = normal
+ * bit 4 - Data Terminal Ready
+ * bit 5 - Ready to Send
+ * bit 6 - Expansion socket
+ * bit 7 - Clock run for CRT controller
+ */
 u8 z29_state::p1_r()
 {
 	return m_keyin ? 0xfd : 0xff;
 }
 
+/**
+ * Port 3 (based on ROM listing)
+ * 
+ * bit 1 - predefined serial port transmit pin
+ * bit 4 - 0 = clear memory  1 = DMA CRTC
+ * bit 5 - Clear to Send
+ */
 void z29_state::p3_w(u8 data)
 {
 	m_dmatype = BIT(data, 4);
@@ -124,12 +143,23 @@ void z29_state::prg_map(address_map &map)
 	map(0x6000, 0x67ff).mirror(0x800).r(FUNC(z29_state::bs_24k_r));
 }
 
+/**
+ * Memory map (based on ROM listing)
+ * 0x2000/0x2001 - 8275 CRTC
+ * 0x3000        - Memory Latch
+ * 0x4000        - Attribute Memory
+ * 0x5000        - Screen Character Memory
+ * 0x6000        - DMA Memory
+ * 0x7000        - EAROM
+ * 
+ */
 void z29_state::ext_map(address_map &map)
 {
 	map(0x2000, 0x2001).mirror(0xffe).r("crtc1", FUNC(i8276_device::read)).w(FUNC(z29_state::crtc_w));
 	map(0x3000, 0x3000).mirror(0xfff).w(FUNC(z29_state::latch_12k_w));
 	map(0x4000, 0x47ff).mirror(0x800).ram().share("attrmem");
 	map(0x5000, 0x57ff).mirror(0x800).ram().share("charmem");
+	//map(0x6000, ?).mirror(?).ram().share(?);
 	map(0x7000, 0x703f).mirror(0xfc0).rw("nvram", FUNC(x2210_device::read), FUNC(x2210_device::write));
 }
 
