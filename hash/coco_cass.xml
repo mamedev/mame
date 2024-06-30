@@ -6,6 +6,8 @@ license:CC0-1.0
 
 <softwarelist name="coco_cass" description="Tandy Radio Shack Color Computer cassette images">
 
+        <!-- cassette images (.cas,.wav) downloaded from the Color Computer Archive (colorcomputerarchive.com) -->
+
         <software name="grover">
                 <description>Grover's Number Rover</description>
                 <year>1983</year>
