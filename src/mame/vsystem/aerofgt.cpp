@@ -58,7 +58,6 @@ private:
 	void setbank(int layer, int num, int bank);
 	void gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t tile_callback(uint32_t code);
-	uint8_t soundlatch_pending_r();
 	void soundlatch_pending_w(int state);
 	void sh_bankswitch_w(uint8_t data);
 
@@ -186,16 +185,10 @@ uint32_t aerofgt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-uint8_t aerofgt_state::soundlatch_pending_r()
-{
-	return m_soundlatch->pending_r();
-}
-
 void aerofgt_state::soundlatch_pending_w(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 
-	// sound comms is 2-way (see soundlatch_pending_r),
 	// NMI routine is very short, so briefly set perfect_quantum to make sure that the timing is right
 	if (state)
 		machine().scheduler().perfect_quantum(attotime::from_usec(100));
@@ -453,4 +446,5 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1992, aerofgt,    0,        aerofgt,    aerofgt,   aerofgt_state,              empty_init,      ROT270, "Video System Co.",    "Aero Fighters (World / USA + Canada / Korea / Hong Kong / Taiwan) (newer hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, aerofgt, 0, aerofgt, aerofgt, aerofgt_state, empty_init, ROT270, "Video System Co.", "Aero Fighters (World / USA + Canada / Korea / Hong Kong / Taiwan) (newer hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+// All clones run on older type hardware and are in pspikes.cpp
