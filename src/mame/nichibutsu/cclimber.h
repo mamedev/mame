@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_NICHIBUT_CCLIMBER_H
-#define MAME_NICHIBUT_CCLIMBER_H
+#ifndef MAME_NICHIBUTSU_CCLIMBER_H
+#define MAME_NICHIBUTSU_CCLIMBER_H
 
 #pragma once
 
@@ -52,6 +52,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override { m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); }
+	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -89,7 +90,6 @@ protected:
 	void cclimber_draw_bigsprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 
-
 private:
 	optional_shared_ptr<uint8_t> m_column_scroll;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
@@ -99,7 +99,6 @@ private:
 	uint8_t bagmanf_a000_r();
 	void bagmanf_vblank_irq(int state);
 
-	DECLARE_VIDEO_START(cclimber);
 	void cclimber_palette(palette_device &palette) const;
 
 	uint32_t screen_update_cclimber(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -122,12 +121,14 @@ public:
 		cclimber_state(mconfig, type, tag),
 		m_swimmer_background_color(*this, "bgcolor"),
 		m_soundlatch(*this, "soundlatch")
-	{}
+	{ }
 
-	void swimmer_root(machine_config &config);
 	void swimmer(machine_config &config);
 	void au(machine_config &config);
 	void guzzler(machine_config &config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	optional_shared_ptr<uint8_t> m_swimmer_background_color;
@@ -145,19 +146,16 @@ private:
 	void au_map(address_map &map);
 	void guzzler_map(address_map &map);
 
-	static rgb_t au_palette(u32 raw);
-
 	void swimmer_palette(palette_device &palette) const;
 	void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element* gfx);
 	uint32_t screen_update_swimmer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void swimmer_set_background_pen();
+	void set_background_pen();
+	void set_sidepen(uint16_t pen) { m_sidepen = pen; }
 	TILE_GET_INFO_MEMBER(swimmer_get_pf_tile_info);
-	DECLARE_VIDEO_START(swimmer);
-	DECLARE_VIDEO_START(au);
 
-	bool m_swimmer_side_background_enabled = false;
-	bool m_swimmer_palettebank = false;
-	int m_swimmer_sidepen = 0x120;
+	bool m_side_background_enabled = false;
+	bool m_palettebank = false;
+	uint16_t m_sidepen = 0;
 
 	static constexpr int SWIMMER_BG_SPLIT = 0x18 * 8;
 };
@@ -171,11 +169,14 @@ public:
 		m_toprollr_bg_coloram(*this, "bg_coloram"),
 		m_bank1(*this, "bank1"),
 		m_bank1d(*this, "bank1d")
-	{}
+	{ }
 
 	void toprollr(machine_config &config);
 
 	void init_toprollr();
+
+protected:
+	virtual void video_start() override;
 
 private:
 	optional_shared_ptr<uint8_t> m_toprollr_bg_videoram;
@@ -193,10 +194,9 @@ private:
 	TILE_GET_INFO_MEMBER(toprollr_get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(toprollr_get_bs_tile_info);
 	TILE_GET_INFO_MEMBER(toproller_get_bg_tile_info);
-	DECLARE_VIDEO_START(toprollr);
 
-	tilemap_t *m_toproller_bg_tilemap = nullptr;
-	uint8_t m_toprollr_rombank = 0U;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_rombank = 0;
 };
 
 class yamato_state : public cclimber_state
@@ -204,7 +204,7 @@ class yamato_state : public cclimber_state
 public:
 	yamato_state(const machine_config &mconfig, device_type type, const char* tag) :
 		cclimber_state(mconfig, type, tag)
-	{}
+	{ }
 
 	void yamato(machine_config &config);
 
@@ -225,10 +225,10 @@ private:
 	void yamato_palette(palette_device &palette) const;
 	uint32_t screen_update_yamato(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint8_t m_yamato_p0 = 0U;
-	uint8_t m_yamato_p1 = 0U;
+	uint8_t m_yamato_p0 = 0;
+	uint8_t m_yamato_p1 = 0;
 
 	static constexpr int YAMATO_SKY_PEN_BASE = 0x60;
 };
 
-#endif // MAME_NICHIBUT_CCLIMBER_H
+#endif // MAME_NICHIBUTSU_CCLIMBER_H

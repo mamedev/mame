@@ -43,7 +43,7 @@ void cclimber_state::cclimber_palette(palette_device &palette) const
 			2, resistances_b,  weights_b,  0, 0,
 			0, nullptr, nullptr, 0, 0);
 
-	for (int i = 0;i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2;
 
@@ -165,9 +165,9 @@ void swimmer_state::swimmer_palette(palette_device &palette) const
 	// side panel backgrond pen
 #if 0
 	// values calculated from the resistors don't seem to match the real board
-	palette.set_pen_color(m_swimmer_sidepen, rgb_t(0x24, 0x5d, 0x4e));
+	palette.set_pen_color(m_sidepen, rgb_t(0x24, 0x5d, 0x4e));
 #endif
-	palette.set_pen_color(m_swimmer_sidepen, rgb_t(0x20, 0x98, 0x79));
+	palette.set_pen_color(m_sidepen, rgb_t(0x20, 0x98, 0x79));
 }
 
 
@@ -284,7 +284,7 @@ void toprollr_state::toprollr_palette(palette_device &palette) const
 
 ***************************************************************************/
 
-void swimmer_state::swimmer_set_background_pen()
+void swimmer_state::set_background_pen()
 {
 	int bit0, bit1, bit2;
 
@@ -310,8 +310,6 @@ void swimmer_state::swimmer_set_background_pen()
 }
 
 
-
-
 void cclimber_state::cclimber_colorram_w(offs_t offset, uint8_t data)
 {
 	/* A5 is not connected, there is only 0x200 bytes of RAM */
@@ -334,13 +332,13 @@ void cclimber_state::flip_screen_y_w(int state)
 
 void swimmer_state::sidebg_enable_w(int state)
 {
-	m_swimmer_side_background_enabled = state;
+	m_side_background_enabled = state;
 }
 
 
 void swimmer_state::palette_bank_w(int state)
 {
-	m_swimmer_palettebank = state;
+	m_palettebank = state;
 }
 
 
@@ -353,8 +351,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_pf_tile_info)
 		tile_index = tile_index ^ 0x20;
 
 	const int code = ((m_colorram[tile_index] & 0x10) << 5) |
-			((m_colorram[tile_index] & 0x20) << 3) |
-				m_videoram[tile_index];
+			((m_colorram[tile_index] & 0x20) << 3) | m_videoram[tile_index];
 
 	const int color = m_colorram[tile_index] & 0x0f;
 
@@ -371,7 +368,7 @@ TILE_GET_INFO_MEMBER(swimmer_state::swimmer_get_pf_tile_info)
 		tile_index = tile_index ^ 0x20;
 
 	const int code = ((m_colorram[tile_index] & 0x30) << 4) | m_videoram[tile_index];
-	const int color = (m_swimmer_palettebank << 4) | (m_colorram[tile_index] & 0x0f);
+	const int color = (m_palettebank << 4) | (m_colorram[tile_index] & 0x0f);
 
 	tileinfo.set(0, code, color, flags);
 }
@@ -396,7 +393,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_bs_tile_info)
 	tile_index = ((tile_index & 0x1e0) >> 1) | (tile_index & 0x0f);
 
 	const int code = ((m_bigsprite_control[1] & 0x08) << 5) | m_bigsprite_videoram[tile_index];
-	const int  color = m_bigsprite_control[1] & 0x07;
+	const int color = m_bigsprite_control[1] & 0x07;
 
 	tileinfo.set(2, code, color, 0);
 }
@@ -426,7 +423,7 @@ TILE_GET_INFO_MEMBER(toprollr_state::toproller_get_bg_tile_info)
 }
 
 
-VIDEO_START_MEMBER(cclimber_state,cclimber)
+void cclimber_state::video_start()
 {
 	m_pf_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cclimber_state::cclimber_get_pf_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_pf_tilemap->set_transparent_pen(0);
@@ -442,8 +439,7 @@ VIDEO_START_MEMBER(cclimber_state,cclimber)
 	save_item(NAME(m_flip_y));
 }
 
-
-VIDEO_START_MEMBER(swimmer_state,swimmer)
+void swimmer_state::video_start()
 {
 	m_pf_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(swimmer_state::swimmer_get_pf_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_pf_tilemap->set_transparent_pen(0);
@@ -457,23 +453,17 @@ VIDEO_START_MEMBER(swimmer_state,swimmer)
 
 	save_item(NAME(m_flip_x));
 	save_item(NAME(m_flip_y));
-	save_item(NAME(m_swimmer_side_background_enabled));
-	save_item(NAME(m_swimmer_palettebank));
+	save_item(NAME(m_side_background_enabled));
+	save_item(NAME(m_palettebank));
 }
 
-VIDEO_START_MEMBER(swimmer_state, au)
-{
-	VIDEO_START_CALL_MEMBER(swimmer);
-	m_swimmer_sidepen = 0;
-}
-
-VIDEO_START_MEMBER(toprollr_state,toprollr)
+void toprollr_state::video_start()
 {
 	m_pf_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toprollr_state::toprollr_get_pf_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_pf_tilemap->set_transparent_pen(0);
 
-	m_toproller_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toprollr_state::toproller_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_toproller_bg_tilemap->set_scroll_rows(1);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toprollr_state::toproller_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_scroll_rows(1);
 
 	m_bs_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toprollr_state::toprollr_get_bs_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bs_tilemap->set_scroll_cols(1);
@@ -548,7 +538,7 @@ void cclimber_state::cclimber_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 	{
 		int x = m_spriteram[offs + 3] + 1;
 		/* x + 1 is evident in cclimber and ckong. It looks worse,
-		but it has been confirmed on several PCBs. */
+		   but it has been confirmed on several PCBs. */
 
 		int y = 240 - m_spriteram[offs + 2];
 
@@ -625,7 +615,7 @@ void swimmer_state::swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 		const int code = ((m_spriteram[offs + 1] & 0x30) << 2) |
 					(m_spriteram[offs + 0] & 0x3f);
 
-		const int color = (m_swimmer_palettebank << 4) |
+		const int color = (m_palettebank << 4) |
 					(m_spriteram[offs + 1] & 0x0f);
 
 		int flipx = m_spriteram[offs + 0] & 0x40;
@@ -653,14 +643,14 @@ uint32_t cclimber_state::screen_update_cclimber(screen_device &screen, bitmap_in
 	bitmap.fill(0, cliprect);
 	draw_playfield(screen, bitmap, cliprect);
 
-	/* draw the "big sprite" under the regular sprites */
+	// draw the "big sprite" under the regular sprites 
 	if ((m_bigsprite_control[0] & 0x01))
 	{
 		cclimber_draw_bigsprite(screen, bitmap, cliprect);
 		cclimber_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
 	}
 
-	/* draw the "big sprite" over the regular sprites */
+	// draw the "big sprite" over the regular sprites 
 	else
 	{
 		cclimber_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
@@ -685,14 +675,14 @@ uint32_t yamato_state::screen_update_yamato(screen_device &screen, bitmap_ind16 
 
 	draw_playfield(screen, bitmap, cliprect);
 
-	/* draw the "big sprite" under the regular sprites */
+	// draw the "big sprite" under the regular sprites 
 	if ((m_bigsprite_control[0] & 0x01))
 	{
 		cclimber_draw_bigsprite(screen, bitmap, cliprect);
 		toprollr_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
 	}
 
-	/* draw the "big sprite" over the regular sprites */
+	// draw the "big sprite" over the regular sprites 
 	else
 	{
 		toprollr_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
@@ -706,9 +696,9 @@ uint32_t yamato_state::screen_update_yamato(screen_device &screen, bitmap_ind16 
 uint32_t swimmer_state::screen_update_swimmer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_swimmer_background_color)
-		swimmer_set_background_pen();
+		set_background_pen();
 
-	if (m_swimmer_side_background_enabled)
+	if (m_side_background_enabled)
 	{
 		if (m_flip_x)
 		{
@@ -716,7 +706,7 @@ uint32_t swimmer_state::screen_update_swimmer(screen_device &screen, bitmap_ind1
 			rectangle split_rect_right(0x100 - SWIMMER_BG_SPLIT, 0xff, 0, 0xff);
 
 			split_rect_left &= cliprect;
-			bitmap.fill(m_swimmer_sidepen, split_rect_left);
+			bitmap.fill(m_sidepen, split_rect_left);
 
 			split_rect_right &= cliprect;
 			bitmap.fill(0, split_rect_right);
@@ -730,7 +720,7 @@ uint32_t swimmer_state::screen_update_swimmer(screen_device &screen, bitmap_ind1
 			bitmap.fill(0, split_rect_left);
 
 			split_rect_right &= cliprect;
-			bitmap.fill(m_swimmer_sidepen, split_rect_right);
+			bitmap.fill(m_sidepen, split_rect_right);
 		}
 	}
 	else
@@ -738,14 +728,14 @@ uint32_t swimmer_state::screen_update_swimmer(screen_device &screen, bitmap_ind1
 
 	draw_playfield(screen, bitmap, cliprect);
 
-	/* draw the "big sprite" under the regular sprites */
+	// draw the "big sprite" under the regular sprites 
 	if ((m_bigsprite_control[0] & 0x01))
 	{
 		cclimber_draw_bigsprite(screen, bitmap, cliprect);
 		swimmer_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
 	}
 
-	/* draw the "big sprite" over the regular sprites */
+	// draw the "big sprite" over the regular sprites 
 	else
 	{
 		swimmer_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
@@ -765,19 +755,19 @@ uint32_t toprollr_state::screen_update_toprollr(screen_device &screen, bitmap_in
 
 	bitmap.fill(0, cliprect);
 
-	m_toproller_bg_tilemap->set_scrollx(0, m_toprollr_bg_videoram[0]);
-	m_toproller_bg_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ? TILEMAP_FLIPY : 0));
-	m_toproller_bg_tilemap->mark_all_dirty();
-	m_toproller_bg_tilemap->draw(screen, bitmap, scroll_area_clip, 0, 0);
+	m_bg_tilemap->set_scrollx(0, m_toprollr_bg_videoram[0]);
+	m_bg_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ? TILEMAP_FLIPY : 0));
+	m_bg_tilemap->mark_all_dirty();
+	m_bg_tilemap->draw(screen, bitmap, scroll_area_clip, 0, 0);
 
-	/* draw the "big sprite" over the regular sprites */
+	// draw the "big sprite" over the regular sprites 
 	if ((m_bigsprite_control[1] & 0x20))
 	{
 		toprollr_draw_sprites(bitmap, scroll_area_clip, m_gfxdecode->gfx(1));
 		toprollr_draw_bigsprite(screen, bitmap, scroll_area_clip);
 	}
 
-	/* draw the "big sprite" under the regular sprites */
+	// draw the "big sprite" under the regular sprites 
 	else
 	{
 		toprollr_draw_bigsprite(screen, bitmap, scroll_area_clip);
