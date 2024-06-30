@@ -447,7 +447,7 @@ authors:hap
 		<screen index="0"><bounds xc="125" yc="17.95" width="19" height="7.955" /></screen>
 		<element ref="lcdm" blend="multiply"><bounds xc="125" yc="17.95" width="20" height="9" /></element>
 
-		<element ref="cwhite"><bounds x="112.8" y="24" width="39.4" height="0.25" /></element>
+		<element ref="cgray"><bounds x="112.8" y="24" width="39.4" height="0.25" /></element>
 
 		<element ref="cgray"><bounds x="106.45" y="-0.25" width="50.25" height="10.25" /></element>
 		<element ref="cgray"><bounds x="106.45" y="72" width="50.25" height="16.7" /></element>
