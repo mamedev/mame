@@ -50,6 +50,10 @@ macro   rop
 	+ 2
 	PC++; R++; Q = QT; QT = YF | XF;
 
+macro   r800:rop
+	m_m1_cycles !! TDAT8 = opcode_read();
+	PC++; R++; Q = QT; QT = YF | XF;
+
 macro   arg
 	m_memrq_cycles !! TDAT8 = arg_read();
 	PC++;
@@ -98,6 +102,12 @@ macro   jr
 	5 * call nomreq_addr
 	PC += (s8)TDAT8; WZ = PC;
 
+macro   r800:jr
+	call arg
+	TADR = PCD-1;
+	+ 1
+	PC += (s8)TDAT8; WZ = PC;
+
 macro   jr_cond
 	if (TDAT8) {
 		call jr
@@ -106,6 +116,14 @@ macro   jr_cond
 	}
 
 macro   arg16_call
+	call arg16
+	m_ea = TDAT; TADR = PCD-1;
+	call nomreq_addr
+	WZ = m_ea; TDAT = PC;
+	call wm16_sp
+	PCD = m_ea;
+
+macro   r800:arg16_call
 	call arg16
 	m_ea = TDAT; TADR = PCD-1;
 	call nomreq_addr
@@ -151,16 +169,28 @@ macro   ld_r_a
 	call nomreq_ir 1
 	m_r = A; m_r2 = A & 0x80; // keep bit 7 of r
 
+macro   r800:ld_r_a
+	m_r = A; m_r2 = A & 0x80; // keep bit 7 of r
+
 macro   ld_a_r
 	call nomreq_ir 1
+	A = (m_r & 0x7f) | m_r2; set_f((F & CF) | SZ[A] | (m_iff2 << 2)); m_after_ldair = true;
+
+macro   r800:ld_a_r
 	A = (m_r & 0x7f) | m_r2; set_f((F & CF) | SZ[A] | (m_iff2 << 2)); m_after_ldair = true;
 
 macro   ld_i_a
 	call nomreq_ir 1
 	m_i = A;
 
+macro   r800:ld_i_a
+	m_i = A;
+
 macro   ld_a_i
 	call nomreq_ir 1
+	A = m_i; set_f((F & CF) | SZ[A] | (m_iff2 << 2)); m_after_ldair = true;
+
+macro   r800:ld_a_i
 	A = m_i; set_f((F & CF) | SZ[A] | (m_iff2 << 2)); m_after_ldair = true;
 
 macro   rst	 addr
@@ -201,12 +231,21 @@ macro   add16
 	call nomreq_ir 7
 	{ u32 res = TDAT + TDAT2; WZ = TDAT + 1; set_f((F & (SF | ZF | VF)) | (((TDAT ^ res ^ TDAT2) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (YF | XF))); TDAT = (u16)res; }
 
+macro   r800:add16
+	{ u32 res = TDAT + TDAT2; WZ = TDAT + 1; set_f((F & (SF | ZF | VF)) | (((TDAT ^ res ^ TDAT2) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (YF | XF))); TDAT = (u16)res; }
+
 macro   adc_hl
 	call nomreq_ir 7
 	{ u32 res = HLD + TDAT + (F & CF); WZ = HL + 1; set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HLD ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13)); HL = (u16)res; }
 
+macro   r800:adc_hl
+	{ u32 res = HLD + TDAT + (F & CF); WZ = HL + 1; set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HLD ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13)); HL = (u16)res; }
+
 macro   sbc_hl
 	call nomreq_ir 7
+	{ u32 res = HLD - TDAT - (F & CF); WZ = HL + 1; set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HLD) & (HLD ^ res) &0x8000) >> 13)); HL = (u16)res; }
+
+macro   r800:sbc_hl
 	{ u32 res = HLD - TDAT - (F & CF); WZ = HL + 1; set_f((((HLD ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HLD) & (HLD ^ res) &0x8000) >> 13)); HL = (u16)res; }
 
 macro   ldi
@@ -217,14 +256,35 @@ macro   ldi
 	2 * call nomreq_addr
 	set_f(F & (SF | ZF | CF)); if ((A + TDAT8) & 0x02) F |= YF;  if ((A + TDAT8) & 0x08) F |= XF; HL++; DE++; BC--; if(BC) F |= VF;
 
+macro   r800:ldi
+	TADR = HL;
+	call rm
+	TADR = DE;
+	call wm
+	call nomreq_addr
+	set_f(F & (SF | ZF | CF)); if ((A + TDAT8) & 0x02) F |= YF;  if ((A + TDAT8) & 0x08) F |= XF; HL++; DE++; BC--; if(BC) F |= VF;
+
 macro   cpi
 	TADR = HL;
 	call rm
 	5 * call nomreq_addr
 	{ u8 res = A - TDAT8; WZ++; HL++; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
 
+macro   r800:cpi
+	TADR = HL;
+	call rm
+	call nomreq_addr
+	{ u8 res = A - TDAT8; WZ++; HL++; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
+
 macro   ini
 	call nomreq_ir 1
+	TADR = BC;
+	call in
+	WZ = BC + 1; B--; TADR = HL;
+	call wm
+	{ HL++; set_f(SZ[B]); unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+
+macro   r800:ini
 	TADR = BC;
 	call in
 	WZ = BC + 1; B--; TADR = HL;
@@ -239,12 +299,27 @@ macro   outi
 	call out
 	{ HL++; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
 
+macro   r800:outi
+	TADR = HL;
+	call rm
+	B--; WZ = BC + 1; TADR = BC;
+	call out
+	{ HL++; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+
 macro   ldd
 	TADR = HL;
 	call rm
 	TADR = DE;
 	call wm
 	2 * call nomreq_addr
+	{ set_f(F & (SF | ZF | CF)); if ((A + TDAT8) & 0x02) F |= YF;  if ((A + TDAT8) & 0x08) F |= XF; HL--; DE--; BC--; if (BC) F |= VF; }
+
+macro   r800:ldd
+	TADR = HL;
+	call rm
+	TADR = DE;
+	call wm
+	call nomreq_addr
 	{ set_f(F & (SF | ZF | CF)); if ((A + TDAT8) & 0x02) F |= YF;  if ((A + TDAT8) & 0x08) F |= XF; HL--; DE--; BC--; if (BC) F |= VF; }
 
 macro   cpd
@@ -254,8 +329,22 @@ macro   cpd
 	5 * call nomreq_addr
 	{ u8 res = A - TDAT8; WZ--; HL--; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
 
+macro   r800:cpd
+	TADR = HL;
+	call rm
+	TADR = HL;
+	call nomreq_addr
+	{ u8 res = A - TDAT8; WZ--; HL--; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
+
 macro   ind
 	call nomreq_ir 1
+	TADR = BC;
+	call in
+	WZ = BC - 1; B--; TADR = HL;
+	call wm
+	{ HL--; set_f(SZ[B]); unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+
+macro   r800:ind
 	TADR = BC;
 	call in
 	WZ = BC - 1; B--; TADR = HL;
@@ -270,11 +359,26 @@ macro   outd
 	call out
 	{ HL--; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
 
+macro   r800:outd
+	TADR = HL;
+	call rm
+	B--; WZ = BC - 1; TADR = BC;
+	call out
+	{ HL--; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+
 macro   ldir
 	call ldi
 	if (BC != 0) {
 		TADR = DE;
 		5 * call nomreq_addr
+		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+	}
+
+macro   r800:ldir
+	call ldi
+	if (BC != 0) {
+		TADR = DE;
+		call nomreq_addr
 		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
 	}
 
@@ -286,6 +390,14 @@ macro   cpir
 		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
 	}
 
+macro   r800:cpir
+	call cpi
+	call nomreq_addr
+	if (BC != 0 && !(F & ZF)) {
+		TADR = HL;
+		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+	}
+
 macro   inir
 	call ini
 	if (B != 0) {
@@ -294,7 +406,26 @@ macro   inir
 		PC -= 2; block_io_interrupted_flags();
 	}
 
+macro   r800:inir
+	if (B == 1)
+		T(1);
+	call ini
+	if (B != 0) {
+		TADR = HL;
+		PC -= 2; block_io_interrupted_flags();
+	}
+
 macro   otir
+	call outi
+	if (B != 0) {
+		TADR = BC;
+		5 * call nomreq_addr
+		PC -= 2; block_io_interrupted_flags();
+	}
+
+macro   r800:otir
+	if (B == 1)
+		T(1);
 	call outi
 	if (B != 0) {
 		TADR = BC;
@@ -310,11 +441,27 @@ macro   lddr
 		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
 	}
 
+macro   r800:lddr
+	call ldd
+	if (BC != 0) {
+		TADR = DE;
+		call nomreq_addr
+		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+	}
+
 macro   cpdr
 	call cpd
 	if (BC != 0 && !(F & ZF)) {
 		TADR = HL;
 		5 * call nomreq_addr
+		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+	}
+
+macro   r800:cpdr
+	call cpd
+	call nomreq_addr
+	if (BC != 0 && !(F & ZF)) {
+		TADR = HL;
 		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
 	}
 
@@ -326,11 +473,29 @@ macro   indr
 		PC -= 2; block_io_interrupted_flags();
 	}
 
+macro   r800:indr
+	if (B == 1)
+		T(1);
+	call ind
+	if (B != 0) {
+		TADR = HL;
+		PC -= 2; block_io_interrupted_flags();
+	}
+
 macro   otdr
 	call outd
 	if (B != 0) {
 		TADR = BC;
 		5 * call nomreq_addr
+		PC -= 2; block_io_interrupted_flags();
+	}
+
+macro   r800:otdr
+	if (B == 1)
+		T(1);
+	call outd
+	if (B != 0) {
+		TADR = BC;
 		PC -= 2; block_io_interrupted_flags();
 	}
 
@@ -6678,6 +6843,1833 @@ edff	# DB   ED
 
 00ff	# RST  7
 	call rst 0x38
+
+
+
+##########################################################
+# R800
+##########################################################
+
+r800:fe00    # illegal
+	illegal_1();
+
+r800:fe01    # illegal
+	illegal_1();
+
+r800:fe02    # illegal
+	illegal_1();
+
+r800:fe03    # illegal
+	illegal_1();
+
+r800:fe04    # illegal
+	illegal_1();
+
+r800:fe05    # illegal
+	illegal_1();
+
+r800:fe07    # illegal
+	illegal_1();
+
+r800:fe08    # illegal
+	illegal_1();
+
+r800:fe09    # illegal
+	illegal_1();
+
+r800:fe0a    # illegal
+	illegal_1();
+
+r800:fe0b    # illegal
+	illegal_1();
+
+r800:fe0c    # illegal
+	illegal_1();
+
+r800:fe0d    # illegal
+	illegal_1();
+
+r800:fe0f    # illegal
+	illegal_1();
+
+r800:fe10    # illegal
+	illegal_1();
+
+r800:fe11    # illegal
+	illegal_1();
+
+r800:fe12    # illegal
+	illegal_1();
+
+r800:fe13    # illegal
+	illegal_1();
+
+r800:fe14    # illegal
+	illegal_1();
+
+r800:fe15    # illegal
+	illegal_1();
+
+r800:fe17    # illegal
+	illegal_1();
+
+r800:fe18    # illegal
+	illegal_1();
+
+r800:fe19    # illegal
+	illegal_1();
+
+r800:fe1a    # illegal
+	illegal_1();
+
+r800:fe1b    # illegal
+	illegal_1();
+
+r800:fe1c    # illegal
+	illegal_1();
+
+r800:fe1d    # illegal
+	illegal_1();
+
+r800:fe1f    # illegal
+	illegal_1();
+
+r800:fe20    # illegal
+	illegal_1();
+
+r800:fe21    # illegal
+	illegal_1();
+
+r800:fe22    # illegal
+	illegal_1();
+
+r800:fe23    # illegal
+	illegal_1();
+
+r800:fe24    # illegal
+	illegal_1();
+
+r800:fe25    # illegal
+	illegal_1();
+
+r800:fe27    # illegal
+	illegal_1();
+
+r800:fe28    # illegal
+	illegal_1();
+
+r800:fe29    # illegal
+	illegal_1();
+
+r800:fe2a    # illegal
+	illegal_1();
+
+r800:fe2b    # illegal
+	illegal_1();
+
+r800:fe2c    # illegal
+	illegal_1();
+
+r800:fe2d    # illegal
+	illegal_1();
+
+r800:fe2f    # illegal
+	illegal_1();
+
+r800:fe30    # illegal
+	illegal_1();
+
+r800:fe31    # illegal
+	illegal_1();
+
+r800:fe32    # illegal
+	illegal_1();
+
+r800:fe33    # illegal
+	illegal_1();
+
+r800:fe34    # illegal
+	illegal_1();
+
+r800:fe35    # illegal
+	illegal_1();
+
+r800:fe37    # illegal
+	illegal_1();
+
+r800:fe38    # illegal
+	illegal_1();
+
+r800:fe39    # illegal
+	illegal_1();
+
+r800:fe3a    # illegal
+	illegal_1();
+
+r800:fe3b    # illegal
+	illegal_1();
+
+r800:fe3c    # illegal
+	illegal_1();
+
+r800:fe3d    # illegal
+	illegal_1();
+
+r800:fe3f    # illegal
+	illegal_1();
+
+r800:fe40    # illegal
+	illegal_1();
+
+r800:fe41    # illegal
+	illegal_1();
+
+r800:fe42    # illegal
+	illegal_1();
+
+r800:fe43    # illegal
+	illegal_1();
+
+r800:fe44    # illegal
+	illegal_1();
+
+r800:fe45    # illegal
+	illegal_1();
+
+r800:fe47    # illegal
+	illegal_1();
+
+r800:fe48    # illegal
+	illegal_1();
+
+r800:fe49    # illegal
+	illegal_1();
+
+r800:fe4a    # illegal
+	illegal_1();
+
+r800:fe4b    # illegal
+	illegal_1();
+
+r800:fe4c    # illegal
+	illegal_1();
+
+r800:fe4d    # illegal
+	illegal_1();
+
+r800:fe4f    # illegal
+	illegal_1();
+
+r800:fe50    # illegal
+	illegal_1();
+
+r800:fe51    # illegal
+	illegal_1();
+
+r800:fe52    # illegal
+	illegal_1();
+
+r800:fe53    # illegal
+	illegal_1();
+
+r800:fe54    # illegal
+	illegal_1();
+
+r800:fe55    # illegal
+	illegal_1();
+
+r800:fe57    # illegal
+	illegal_1();
+
+r800:fe58    # illegal
+	illegal_1();
+
+r800:fe59    # illegal
+	illegal_1();
+
+r800:fe5a    # illegal
+	illegal_1();
+
+r800:fe5b    # illegal
+	illegal_1();
+
+r800:fe5c    # illegal
+	illegal_1();
+
+r800:fe5d    # illegal
+	illegal_1();
+
+r800:fe5f    # illegal
+	illegal_1();
+
+r800:fe60    # illegal
+	illegal_1();
+
+r800:fe61    # illegal
+	illegal_1();
+
+r800:fe62    # illegal
+	illegal_1();
+
+r800:fe63    # illegal
+	illegal_1();
+
+r800:fe64    # illegal
+	illegal_1();
+
+r800:fe65    # illegal
+	illegal_1();
+
+r800:fe67    # illegal
+	illegal_1();
+
+r800:fe68    # illegal
+	illegal_1();
+
+r800:fe69    # illegal
+	illegal_1();
+
+r800:fe6a    # illegal
+	illegal_1();
+
+r800:fe6b    # illegal
+	illegal_1();
+
+r800:fe6c    # illegal
+	illegal_1();
+
+r800:fe6d    # illegal
+	illegal_1();
+
+r800:fe6f    # illegal
+	illegal_1();
+
+r800:fe70    # illegal
+	illegal_1();
+
+r800:fe71    # illegal
+	illegal_1();
+
+r800:fe72    # illegal
+	illegal_1();
+
+r800:fe73    # illegal
+	illegal_1();
+
+r800:fe74    # illegal
+	illegal_1();
+
+r800:fe75    # illegal
+	illegal_1();
+
+r800:fe77    # illegal
+	illegal_1();
+
+r800:fe78    # illegal
+	illegal_1();
+
+r800:fe79    # illegal
+	illegal_1();
+
+r800:fe7a    # illegal
+	illegal_1();
+
+r800:fe7b    # illegal
+	illegal_1();
+
+r800:fe7c    # illegal
+	illegal_1();
+
+r800:fe7d    # illegal
+	illegal_1();
+
+r800:fe7f    # illegal
+	illegal_1();
+
+r800:fe80    # illegal
+	illegal_1();
+
+r800:fe81    # illegal
+	illegal_1();
+
+r800:fe82    # illegal
+	illegal_1();
+
+r800:fe83    # illegal
+	illegal_1();
+
+r800:fe84    # illegal
+	illegal_1();
+
+r800:fe85    # illegal
+	illegal_1();
+
+r800:fe87    # illegal
+	illegal_1();
+
+r800:fe88    # illegal
+	illegal_1();
+
+r800:fe89    # illegal
+	illegal_1();
+
+r800:fe8a    # illegal
+	illegal_1();
+
+r800:fe8b    # illegal
+	illegal_1();
+
+r800:fe8c    # illegal
+	illegal_1();
+
+r800:fe8d    # illegal
+	illegal_1();
+
+r800:fe8f    # illegal
+	illegal_1();
+
+r800:fe90    # illegal
+	illegal_1();
+
+r800:fe91    # illegal
+	illegal_1();
+
+r800:fe92    # illegal
+	illegal_1();
+
+r800:fe93    # illegal
+	illegal_1();
+
+r800:fe94    # illegal
+	illegal_1();
+
+r800:fe95    # illegal
+	illegal_1();
+
+r800:fe97    # illegal
+	illegal_1();
+
+r800:fe98    # illegal
+	illegal_1();
+
+r800:fe99    # illegal
+	illegal_1();
+
+r800:fe9a    # illegal
+	illegal_1();
+
+r800:fe9b    # illegal
+	illegal_1();
+
+r800:fe9c    # illegal
+	illegal_1();
+
+r800:fe9d    # illegal
+	illegal_1();
+
+r800:fe9f    # illegal
+	illegal_1();
+
+r800:fea0    # illegal
+	illegal_1();
+
+r800:fea1    # illegal
+	illegal_1();
+
+r800:fea2    # illegal
+	illegal_1();
+
+r800:fea3    # illegal
+	illegal_1();
+
+r800:fea4    # illegal
+	illegal_1();
+
+r800:fea5    # illegal
+	illegal_1();
+
+r800:fea7    # illegal
+	illegal_1();
+
+r800:fea8    # illegal
+	illegal_1();
+
+r800:fea9    # illegal
+	illegal_1();
+
+r800:feaa    # illegal
+	illegal_1();
+
+r800:feab    # illegal
+	illegal_1();
+
+r800:feac    # illegal
+	illegal_1();
+
+r800:fead    # illegal
+	illegal_1();
+
+r800:feaf    # illegal
+	illegal_1();
+
+r800:feb0    # illegal
+	illegal_1();
+
+r800:feb1    # illegal
+	illegal_1();
+
+r800:feb2    # illegal
+	illegal_1();
+
+r800:feb3    # illegal
+	illegal_1();
+
+r800:feb4    # illegal
+	illegal_1();
+
+r800:feb5    # illegal
+	illegal_1();
+
+r800:feb7    # illegal
+	illegal_1();
+
+r800:feb8    # illegal
+	illegal_1();
+
+r800:feb9    # illegal
+	illegal_1();
+
+r800:feba    # illegal
+	illegal_1();
+
+r800:febb    # illegal
+	illegal_1();
+
+r800:febc    # illegal
+	illegal_1();
+
+r800:febd    # illegal
+	illegal_1();
+
+r800:febf    # illegal
+	illegal_1();
+
+r800:fec0    # illegal
+	illegal_1();
+
+r800:fec1    # illegal
+	illegal_1();
+
+r800:fec2    # illegal
+	illegal_1();
+
+r800:fec3    # illegal
+	illegal_1();
+
+r800:fec4    # illegal
+	illegal_1();
+
+r800:fec5    # illegal
+	illegal_1();
+
+r800:fec7    # illegal
+	illegal_1();
+
+r800:fec8    # illegal
+	illegal_1();
+
+r800:fec9    # illegal
+	illegal_1();
+
+r800:feca    # illegal
+	illegal_1();
+
+r800:fecb    # illegal
+	illegal_1();
+
+r800:fecc    # illegal
+	illegal_1();
+
+r800:fecd    # illegal
+	illegal_1();
+
+r800:fecf    # illegal
+	illegal_1();
+
+r800:fed0    # illegal
+	illegal_1();
+
+r800:fed1    # illegal
+	illegal_1();
+
+r800:fed2    # illegal
+	illegal_1();
+
+r800:fed3    # illegal
+	illegal_1();
+
+r800:fed4    # illegal
+	illegal_1();
+
+r800:fed5    # illegal
+	illegal_1();
+
+r800:fed7    # illegal
+	illegal_1();
+
+r800:fed8    # illegal
+	illegal_1();
+
+r800:fed9    # illegal
+	illegal_1();
+
+r800:feda    # illegal
+	illegal_1();
+
+r800:fedb    # illegal
+	illegal_1();
+
+r800:fedc    # illegal
+	illegal_1();
+
+r800:fedd    # illegal
+	illegal_1();
+
+r800:fedf    # illegal
+	illegal_1();
+
+r800:fee0    # illegal
+	illegal_1();
+
+r800:fee1    # illegal
+	illegal_1();
+
+r800:fee2    # illegal
+	illegal_1();
+
+r800:fee3    # illegal
+	illegal_1();
+
+r800:fee4    # illegal
+	illegal_1();
+
+r800:fee5    # illegal
+	illegal_1();
+
+r800:fee7    # illegal
+	illegal_1();
+
+r800:fee8    # illegal
+	illegal_1();
+
+r800:fee9    # illegal
+	illegal_1();
+
+r800:feea    # illegal
+	illegal_1();
+
+r800:feeb    # illegal
+	illegal_1();
+
+r800:feec    # illegal
+	illegal_1();
+
+r800:feed    # illegal
+	illegal_1();
+
+r800:feef    # illegal
+	illegal_1();
+
+r800:fef0    # illegal
+	illegal_1();
+
+r800:fef1    # illegal
+	illegal_1();
+
+r800:fef2    # illegal
+	illegal_1();
+
+r800:fef3    # illegal
+	illegal_1();
+
+r800:fef4    # illegal
+	illegal_1();
+
+r800:fef5    # illegal
+	illegal_1();
+
+r800:fef7    # illegal
+	illegal_1();
+
+r800:fef8    # illegal
+	illegal_1();
+
+r800:fef9    # illegal
+	illegal_1();
+
+r800:fefa    # illegal
+	illegal_1();
+
+r800:fefb    # illegal
+	illegal_1();
+
+r800:fefc    # illegal
+	illegal_1();
+
+r800:fefd    # illegal
+	illegal_1();
+
+r800:feff    # illegal
+	illegal_1();
+
+r800:cb30    # SLL  B
+	B = r800_sll(B);
+
+r800:cb31    # SLL  C
+	C = r800_sll(C);
+
+r800:cb32    # SLL  D
+	D = r800_sll(D);
+
+r800:cb33    # SLL  E
+	E = r800_sll(E);
+
+r800:cb34    # SLL  H
+	H = r800_sll(H);
+
+r800:cb35    # SLL  L
+	L = r800_sll(L);
+
+r800:cb36    # SLL  (HL)
+	TADR = HL;
+	call rm_reg
+	TDAT8 = r800_sll(TDAT8);
+	call wm
+
+r800:cb37    # SLL  A
+	A = r800_sll(A);
+
+r800:dd00    # illegal
+	illegal_1();
+
+r800:dd01    # illegal
+	illegal_1();
+
+r800:dd02    # illegal
+	illegal_1();
+
+r800:dd03    # illegal
+	illegal_1();
+
+r800:dd04    # illegal
+	illegal_1();
+
+r800:dd05    # illegal
+	illegal_1();
+
+r800:dd06    # illegal
+	illegal_1();
+
+r800:dd07    # illegal
+	illegal_1();
+
+r800:dd08    # illegal
+	illegal_1();
+
+r800:dd0a    # illegal
+	illegal_1();
+
+r800:dd0b    # illegal
+	illegal_1();
+
+r800:dd0c    # illegal
+	illegal_1();
+
+r800:dd0d    # illegal
+	illegal_1();
+
+r800:dd0e    # illegal
+	illegal_1();
+
+r800:dd0f    # illegal
+	illegal_1();
+
+r800:dd10    # illegal
+	illegal_1();
+
+r800:dd11    # illegal
+	illegal_1();
+
+r800:dd12    # illegal
+	illegal_1();
+
+r800:dd13    # illegal
+	illegal_1();
+
+r800:dd14    # illegal
+	illegal_1();
+
+r800:dd15    # illegal
+	illegal_1();
+
+r800:dd16    # illegal
+	illegal_1();
+
+r800:dd17    # illegal
+	illegal_1();
+
+r800:dd18    # illegal
+	illegal_1();
+
+r800:dd1a    # illegal
+	illegal_1();
+
+r800:dd1b    # illegal
+	illegal_1();
+
+r800:dd1c    # illegal
+	illegal_1();
+
+r800:dd1d    # illegal
+	illegal_1();
+
+r800:dd1e    # illegal
+	illegal_1();
+
+r800:dd1f    # illegal
+	illegal_1();
+
+r800:dd20    # illegal
+	illegal_1();
+
+r800:dd27    # illegal
+	illegal_1();
+
+r800:dd28    # illegal
+	illegal_1();
+
+r800:dd2f    # illegal
+	illegal_1();
+
+r800:dd30    # illegal
+	illegal_1();
+
+r800:dd31    # illegal
+	illegal_1();
+
+r800:dd32    # illegal
+	illegal_1();
+
+r800:dd33    # illegal
+	illegal_1();
+
+r800:dd37    # illegal
+	illegal_1();
+
+r800:dd38    # illegal
+	illegal_1();
+
+r800:dd3a    # illegal
+	illegal_1();
+
+r800:dd3b    # illegal
+	illegal_1();
+
+r800:dd3c    # illegal
+	illegal_1();
+
+r800:dd3d    # illegal
+	illegal_1();
+
+r800:dd3e    # illegal
+	illegal_1();
+
+r800:dd3f    # illegal
+	illegal_1();
+
+r800:dd40    # illegal
+	illegal_1();
+
+r800:dd41    # illegal
+	illegal_1();
+
+r800:dd42    # illegal
+	illegal_1();
+
+r800:dd43    # illegal
+	illegal_1();
+
+r800:dd47    # illegal
+	illegal_1();
+
+r800:dd48    # illegal
+	illegal_1();
+
+r800:dd49    # illegal
+	illegal_1();
+
+r800:dd4a    # illegal
+	illegal_1();
+
+r800:dd4b    # illegal
+	illegal_1();
+
+r800:dd4f    # illegal
+	illegal_1();
+
+r800:dd50    # illegal
+	illegal_1();
+
+r800:dd51    # illegal
+	illegal_1();
+
+r800:dd52    # illegal
+	illegal_1();
+
+r800:dd53    # illegal
+	illegal_1();
+
+r800:dd57    # illegal
+	illegal_1();
+
+r800:dd58    # illegal
+	illegal_1();
+
+r800:dd59    # illegal
+	illegal_1();
+
+r800:dd5a    # illegal
+	illegal_1();
+
+r800:dd5b    # illegal
+	illegal_1();
+
+r800:dd5f    # illegal
+	illegal_1();
+
+r800:dd76    # illegal
+	illegal_1();
+
+r800:dd78    # illegal
+	illegal_1();
+
+r800:dd79    # illegal
+	illegal_1();
+
+r800:dd7a    # illegal
+	illegal_1();
+
+r800:dd7b    # illegal
+	illegal_1();
+
+r800:dd7f    # illegal
+	illegal_1();
+
+r800:dd80    # illegal
+	illegal_1();
+
+r800:dd81    # illegal
+	illegal_1();
+
+r800:dd82    # illegal
+	illegal_1();
+
+r800:dd83    # illegal
+	illegal_1();
+
+r800:dd87    # illegal
+	illegal_1();
+
+r800:dd88    # illegal
+	illegal_1();
+
+r800:dd89    # illegal
+	illegal_1();
+
+r800:dd8a    # illegal
+	illegal_1();
+
+r800:dd8b    # illegal
+	illegal_1();
+
+r800:dd8f    # illegal
+	illegal_1();
+
+r800:dd90    # illegal
+	illegal_1();
+
+r800:dd91    # illegal
+	illegal_1();
+
+r800:dd92    # illegal
+	illegal_1();
+
+r800:dd93    # illegal
+	illegal_1();
+
+r800:dd97    # illegal
+	illegal_1();
+
+r800:dd98    # illegal
+	illegal_1();
+
+r800:dd99    # illegal
+	illegal_1();
+
+r800:dd9a    # illegal
+	illegal_1();
+
+r800:dd9b    # illegal
+	illegal_1();
+
+r800:dd9f    # illegal
+	illegal_1();
+
+r800:dda0    # illegal
+	illegal_1();
+
+r800:dda1    # illegal
+	illegal_1();
+
+r800:dda2    # illegal
+	illegal_1();
+
+r800:dda3    # illegal
+	illegal_1();
+
+r800:dda7    # illegal
+	illegal_1();
+
+r800:dda8    # illegal
+	illegal_1();
+
+r800:dda9    # illegal
+	illegal_1();
+
+r800:ddaa    # illegal
+	illegal_1();
+
+r800:ddab    # illegal
+	illegal_1();
+
+r800:ddaf    # illegal
+	illegal_1();
+
+r800:ddb0    # illegal
+	illegal_1();
+
+r800:ddb1    # illegal
+	illegal_1();
+
+r800:ddb2    # illegal
+	illegal_1();
+
+r800:ddb3    # illegal
+	illegal_1();
+
+r800:ddb7    # illegal
+	illegal_1();
+
+r800:ddb8    # illegal
+	illegal_1();
+
+r800:ddb9    # illegal
+	illegal_1();
+
+r800:ddba    # illegal
+	illegal_1();
+
+r800:ddbb    # illegal
+	illegal_1();
+
+r800:ddbf    # illegal
+	illegal_1();
+
+r800:ddc0    # illegal
+	illegal_1();
+
+r800:ddc1    # illegal
+	illegal_1();
+
+r800:ddc2    # illegal
+	illegal_1();
+
+r800:ddc3    # illegal
+	illegal_1();
+
+r800:ddc4    # illegal
+	illegal_1();
+
+r800:ddc5    # illegal
+	illegal_1();
+
+r800:ddc6    # illegal
+	illegal_1();
+
+r800:ddc7    # illegal
+	illegal_1();
+
+r800:ddc8    # illegal
+	illegal_1();
+
+r800:ddc9    # illegal
+	illegal_1();
+
+r800:ddca    # illegal
+	illegal_1();
+
+r800:ddcc    # illegal
+	illegal_1();
+
+r800:ddcd    # illegal
+	illegal_1();
+
+r800:ddce    # illegal
+	illegal_1();
+
+r800:ddcf    # illegal
+	illegal_1();
+
+r800:ddd0    # illegal
+	illegal_1();
+
+r800:ddd1    # illegal
+	illegal_1();
+
+r800:ddd2    # illegal
+	illegal_1();
+
+r800:ddd3    # illegal
+	illegal_1();
+
+r800:ddd4    # illegal
+	illegal_1();
+
+r800:ddd5    # illegal
+	illegal_1();
+
+r800:ddd6    # illegal
+	illegal_1();
+
+r800:ddd7    # illegal
+	illegal_1();
+
+r800:ddd8    # illegal
+	illegal_1();
+
+r800:ddd9    # illegal
+	illegal_1();
+
+r800:ddda    # illegal
+	illegal_1();
+
+r800:dddb    # illegal
+	illegal_1();
+
+r800:dddc    # illegal
+	illegal_1();
+
+r800:dddd    # illegal
+	illegal_1();
+
+r800:ddde    # illegal
+	illegal_1();
+
+r800:dddf    # illegal
+	illegal_1();
+
+r800:dde0    # illegal
+	illegal_1();
+
+r800:dde2    # illegal
+	illegal_1();
+
+r800:dde4    # illegal
+	illegal_1();
+
+r800:dde6    # illegal
+	illegal_1();
+
+r800:dde7    # illegal
+	illegal_1();
+
+r800:dde8    # illegal
+	illegal_1();
+
+r800:ddea    # illegal
+	illegal_1();
+
+r800:ddeb    # illegal
+	illegal_1();
+
+r800:ddec    # illegal
+	illegal_1();
+
+r800:dded    # illegal
+	illegal_1();
+
+r800:ddee    # illegal
+	illegal_1();
+
+r800:ddef    # illegal
+	illegal_1();
+
+r800:ddf0    # illegal
+	illegal_1();
+
+r800:ddf1    # illegal
+	illegal_1();
+
+r800:ddf2    # illegal
+	illegal_1();
+
+r800:ddf3    # illegal
+	illegal_1();
+
+r800:ddf4    # illegal
+	illegal_1();
+
+r800:ddf5    # illegal
+	illegal_1();
+
+r800:ddf6    # illegal
+	illegal_1();
+
+r800:ddf7    # illegal
+	illegal_1();
+
+r800:ddf8    # illegal
+	illegal_1();
+
+r800:ddfa    # illegal
+	illegal_1();
+
+r800:ddfb    # illegal
+	illegal_1();
+
+r800:ddfc    # illegal
+	illegal_1();
+
+r800:ddfd    # illegal
+	illegal_1();
+
+r800:ddfe    # illegal
+	illegal_1();
+
+r800:ddff    # illegal
+	illegal_1();
+
+r800:fd00    # illegal
+	illegal_1();
+
+r800:fd01    # illegal
+	illegal_1();
+
+r800:fd02    # illegal
+	illegal_1();
+
+r800:fd03    # illegal
+	illegal_1();
+
+r800:fd04    # illegal
+	illegal_1();
+
+r800:fd05    # illegal
+	illegal_1();
+
+r800:fd06    # illegal
+	illegal_1();
+
+r800:fd07    # illegal
+	illegal_1();
+
+r800:fd08    # illegal
+	illegal_1();
+
+r800:fd0a    # illegal
+	illegal_1();
+
+r800:fd0b    # illegal
+	illegal_1();
+
+r800:fd0c    # illegal
+	illegal_1();
+
+r800:fd0d    # illegal
+	illegal_1();
+
+r800:fd0e    # illegal
+	illegal_1();
+
+r800:fd0f    # illegal
+	illegal_1();
+
+r800:fd10    # illegal
+	illegal_1();
+
+r800:fd11    # illegal
+	illegal_1();
+
+r800:fd12    # illegal
+	illegal_1();
+
+r800:fd13    # illegal
+	illegal_1();
+
+r800:fd14    # illegal
+	illegal_1();
+
+r800:fd15    # illegal
+	illegal_1();
+
+r800:fd16    # illegal
+	illegal_1();
+
+r800:fd17    # illegal
+	illegal_1();
+
+r800:fd18    # illegal
+	illegal_1();
+
+r800:fd1a    # illegal
+	illegal_1();
+
+r800:fd1b    # illegal
+	illegal_1();
+
+r800:fd1c    # illegal
+	illegal_1();
+
+r800:fd1d    # illegal
+	illegal_1();
+
+r800:fd1e    # illegal
+	illegal_1();
+
+r800:fd1f    # illegal
+	illegal_1();
+
+r800:fd20    # illegal
+	illegal_1();
+
+r800:fd27    # illegal
+	illegal_1();
+
+r800:fd28    # illegal
+	illegal_1();
+
+r800:fd2f    # illegal
+	illegal_1();
+
+r800:fd30    # illegal
+	illegal_1();
+
+r800:fd31    # illegal
+	illegal_1();
+
+r800:fd32    # illegal
+	illegal_1();
+
+r800:fd33    # illegal
+	illegal_1();
+
+r800:fd37    # illegal
+	illegal_1();
+
+r800:fd38    # illegal
+	illegal_1();
+
+r800:fd3a    # illegal
+	illegal_1();
+
+r800:fd3b    # illegal
+	illegal_1();
+
+r800:fd3c    # illegal
+	illegal_1();
+
+r800:fd3d    # illegal
+	illegal_1();
+
+r800:fd3e    # illegal
+	illegal_1();
+
+r800:fd3f    # illegal
+	illegal_1();
+
+r800:fd40    # illegal
+	illegal_1();
+
+r800:fd41    # illegal
+	illegal_1();
+
+r800:fd42    # illegal
+	illegal_1();
+
+r800:fd43    # illegal
+	illegal_1();
+
+r800:fd47    # illegal
+	illegal_1();
+
+r800:fd48    # illegal
+	illegal_1();
+
+r800:fd49    # illegal
+	illegal_1();
+
+r800:fd4a    # illegal
+	illegal_1();
+
+r800:fd4b    # illegal
+	illegal_1();
+
+r800:fd4f    # illegal
+	illegal_1();
+
+r800:fd50    # illegal
+	illegal_1();
+
+r800:fd51    # illegal
+	illegal_1();
+
+r800:fd52    # illegal
+	illegal_1();
+
+r800:fd53    # illegal
+	illegal_1();
+
+r800:fd57    # illegal
+	illegal_1();
+
+r800:fd58    # illegal
+	illegal_1();
+
+r800:fd59    # illegal
+	illegal_1();
+
+r800:fd5a    # illegal
+	illegal_1();
+
+r800:fd5b    # illegal
+	illegal_1();
+
+r800:fd5f    # illegal
+	illegal_1();
+
+r800:fd76    # illegal
+	illegal_1();
+
+r800:fd78    # illegal
+	illegal_1();
+
+r800:fd79    # illegal
+	illegal_1();
+
+r800:fd7a    # illegal
+	illegal_1();
+
+r800:fd7b    # illegal
+	illegal_1();
+
+r800:fd7f    # illegal
+	illegal_1();
+
+r800:fd80    # illegal
+	illegal_1();
+
+r800:fd81    # illegal
+	illegal_1();
+
+r800:fd82    # illegal
+	illegal_1();
+
+r800:fd83    # illegal
+	illegal_1();
+
+r800:fd87    # illegal
+	illegal_1();
+
+r800:fd88    # illegal
+	illegal_1();
+
+r800:fd89    # illegal
+	illegal_1();
+
+r800:fd8a    # illegal
+	illegal_1();
+
+r800:fd8b    # illegal
+	illegal_1();
+
+r800:fd8f    # illegal
+	illegal_1();
+
+r800:fd90    # illegal
+	illegal_1();
+
+r800:fd91    # illegal
+	illegal_1();
+
+r800:fd92    # illegal
+	illegal_1();
+
+r800:fd93    # illegal
+	illegal_1();
+
+r800:fd97    # illegal
+	illegal_1();
+
+r800:fd98    # illegal
+	illegal_1();
+
+r800:fd99    # illegal
+	illegal_1();
+
+r800:fd9a    # illegal
+	illegal_1();
+
+r800:fd9b    # illegal
+	illegal_1();
+
+r800:fd9f    # illegal
+	illegal_1();
+
+r800:fda0    # illegal
+	illegal_1();
+
+r800:fda1    # illegal
+	illegal_1();
+
+r800:fda2    # illegal
+	illegal_1();
+
+r800:fda3    # illegal
+	illegal_1();
+
+r800:fda7    # illegal
+	illegal_1();
+
+r800:fda8    # illegal
+	illegal_1();
+
+r800:fda9    # illegal
+	illegal_1();
+
+r800:fdaa    # illegal
+	illegal_1();
+
+r800:fdab    # illegal
+	illegal_1();
+
+r800:fdaf    # illegal
+	illegal_1();
+
+r800:fdb0    # illegal
+	illegal_1();
+
+r800:fdb1    # illegal
+	illegal_1();
+
+r800:fdb2    # illegal
+	illegal_1();
+
+r800:fdb3    # illegal
+	illegal_1();
+
+r800:fdb7    # illegal
+	illegal_1();
+
+r800:fdb8    # illegal
+	illegal_1();
+
+r800:fdb9    # illegal
+	illegal_1();
+
+r800:fdba    # illegal
+	illegal_1();
+
+r800:fdbb    # illegal
+	illegal_1();
+
+r800:fdbf    # illegal
+	illegal_1();
+
+r800:fdc0    # illegal
+	illegal_1();
+
+r800:fdc1    # illegal
+	illegal_1();
+
+r800:fdc2    # illegal
+	illegal_1();
+
+r800:fdc3    # illegal
+	illegal_1();
+
+r800:fdc4    # illegal
+	illegal_1();
+
+r800:fdc5    # illegal
+	illegal_1();
+
+r800:fdc6    # illegal
+	illegal_1();
+
+r800:fdc7    # illegal
+	illegal_1();
+
+r800:fdc8    # illegal
+	illegal_1();
+
+r800:fdc9    # illegal
+	illegal_1();
+
+r800:fdca    # illegal
+	illegal_1();
+
+r800:fdcc    # illegal
+	illegal_1();
+
+r800:fdcd    # illegal
+	illegal_1();
+
+r800:fdce    # illegal
+	illegal_1();
+
+r800:fdcf    # illegal
+	illegal_1();
+
+r800:fdd0    # illegal
+	illegal_1();
+
+r800:fdd1    # illegal
+	illegal_1();
+
+r800:fdd2    # illegal
+	illegal_1();
+
+r800:fdd3    # illegal
+	illegal_1();
+
+r800:fdd4    # illegal
+	illegal_1();
+
+r800:fdd5    # illegal
+	illegal_1();
+
+r800:fdd6    # illegal
+	illegal_1();
+
+r800:fdd7    # illegal
+	illegal_1();
+
+r800:fdd8    # illegal
+	illegal_1();
+
+r800:fdd9    # illegal
+	illegal_1();
+
+r800:fdda    # illegal
+	illegal_1();
+
+r800:fddb    # illegal
+	illegal_1();
+
+r800:fddc    # illegal
+	illegal_1();
+
+r800:fddd    # illegal
+	illegal_1();
+
+r800:fdde    # illegal
+	illegal_1();
+
+r800:fddf    # illegal
+	illegal_1();
+
+r800:fde0    # illegal
+	illegal_1();
+
+r800:fde2    # illegal
+	illegal_1();
+
+r800:fde4    # illegal
+	illegal_1();
+
+r800:fde6    # illegal
+	illegal_1();
+
+r800:fde7    # illegal
+	illegal_1();
+
+r800:fde8    # illegal
+	illegal_1();
+
+r800:fdea    # illegal
+	illegal_1();
+
+r800:fdeb    # illegal
+	illegal_1();
+
+r800:fdec    # illegal
+	illegal_1();
+
+r800:fded    # illegal
+	illegal_1();
+
+r800:fdee    # illegal
+	illegal_1();
+
+r800:fdef    # illegal
+	illegal_1();
+
+r800:fdf0    # illegal
+	illegal_1();
+
+r800:fdf1    # illegal
+	illegal_1();
+
+r800:fdf2    # illegal
+	illegal_1();
+
+r800:fdf3    # illegal
+	illegal_1();
+
+r800:fdf4    # illegal
+	illegal_1();
+
+r800:fdf5    # illegal
+	illegal_1();
+
+r800:fdf6    # illegal
+	illegal_1();
+
+r800:fdf7    # illegal
+	illegal_1();
+
+r800:fdf8    # illegal
+	illegal_1();
+
+r800:fdfa    # illegal
+	illegal_1();
+
+r800:fdfb    # illegal
+	illegal_1();
+
+r800:fdfc    # illegal
+	illegal_1();
+
+r800:fdfd    # illegal
+	illegal_1();
+
+r800:fdfe    # illegal
+	illegal_1();
+
+r800:fdff    # illegal
+	illegal_1();
+
+r800:ed46    # IM   0
+	m_im = 0; T(1);
+
+r800:ed4c    # illegal
+	illegal_2();
+
+r800:ed4e    # illegal
+	illegal_2();
+
+r800:ed54    # illegal
+	illegal_2();
+
+r800:ed55    # illegal
+	illegal_2();
+
+r800:ed56    # IM   1
+	m_im = 1; T(1);
+
+r800:ed5c    # illegal
+	illegal_2();
+
+r800:ed5d    # illegal
+	illegal_2();
+
+r800:ed5e    # IM   2
+	m_im = 2; T(1);
+
+r800:ed64    # illegal
+	illegal_2();
+
+r800:ed65    # illegal
+	illegal_2();
+
+r800:ed66    # illegal
+	illegal_2();
+
+r800:ed6c    # illegal
+	illegal_2();
+
+r800:ed6e    # IM   0
+	m_im = 0; T(1);
+
+# ed70 became legal IN F,(C)
+
+r800:ed71    # illegal
+	illegal_2();
+
+r800:ed74    # illegal
+	illegal_2();
+
+r800:ed75    # illegal
+	illegal_2();
+
+r800:ed76    # illegal
+	illegal_2();
+
+r800:ed7c    # illegal
+	illegal_2();
+
+r800:ed7d    # illegal
+	illegal_2();
+
+r800:ed7e    # illegal
+	illegal_2();
+
+r800:ed7f    # illegal
+	illegal_2();
+
+r800:edc1    # MULUB A,B
+	mulub(B); T(12);
+
+r800:edc3    # MULUW HL,BC
+	muluw(BC); T(34);
+
+r800:edc9    # MULUB A,C
+	mulub(C); T(12);
+
+r800:edd1    # MULUB A,D
+	mulub(D); T(12);
+
+r800:edd9    # MULUB A,E
+	mulub(E); T(12);
+
+r800:ede1    # MULUB A,H (undocumented)
+	mulub(H); T(12);
+
+r800:ede9    # MULUB A,L (undocumented)
+	mulub(L); T(12);
+
+r800:edf1    # MULUB A,A (undocumented)
+	mulub(A); T(12);
+
+r800:edf3    # MULUW HL,SP
+	muluw(SP); T(34);
+
+r800:edf9    # MULUB A,A (undocumented)
+	mulub(A); T(12);
+
+r800:00f3      # DI
+	m_iff1 = m_iff2 = 0; T(1);
+
 
 
 ##########################################################
