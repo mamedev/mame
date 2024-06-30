@@ -3800,7 +3800,7 @@ GAME( 1984, herodku,   hero,     s2650,     herodk,   dkong_state, empty_init,  
 GAME( 1984, 8ballact,  0,        herbiedk,  8ballact, dkong_state, empty_init,    ROT270, "Seatongrove UK, Ltd. (Magic Electronics USA license)", "Eight Ball Action (DK conversion)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1984, 8ballact2, 8ballact, herbiedk,  8ballact, dkong_state, empty_init,    ROT270, "Seatongrove UK, Ltd. (Magic Electronics USA license)", "Eight Ball Action (DKJr conversion)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1984, shootgal,  0,        s2650,     shootgal, dkong_state, empty_init,    ROT0,   "Seatongrove UK, Ltd. (Zaccaria license)",              "Shooting Gallery",                                          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, spclforc,  0,        spclforc,  spclforc, dkong_state, empty_init,    ROT270, "Senko Industries (Magic Electronics Inc. license)",    "Special Forces",                                            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spclforc,  0,        spclforc,  spclforc, dkong_state, empty_init,    ROT270, "Senko Industries (Magic Electronics Inc. license)",    "Special Forces - Kung Fu Commando",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1985, spcfrcii,  0,        spclforc,  spclforc, dkong_state, empty_init,    ROT270, "Senko Industries (Magic Electronics Inc. license)",    "Special Forces II",                                         MACHINE_SUPPORTS_SAVE )
 
 /* EPOS */
