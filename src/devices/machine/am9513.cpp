@@ -1452,9 +1452,6 @@ void am9513_device::write16(offs_t offset, u16 data)
 	}
 	else
 		data_write(data);
-		
-		
-LOGWARN("16-bit data bus selected %d\n", data);
 }
 
 
