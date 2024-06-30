@@ -118,6 +118,9 @@ protected:
 	required_region_ptr<uint8_t> m_chargen;
 
 private:
+	static inline constexpr unsigned TEXT_VRAM_SIZE = 2048;
+	static inline constexpr unsigned GRAPHIC_VRAM_SIZE = 16384;
+
 	void cpu_mem_map(address_map &map);
 	void diag_led_w(uint8_t data);
 	uint16_t text_r(offs_t offset);
@@ -138,10 +141,8 @@ private:
 	void upi_irq7_w(int state);
 	void uart_irq_w(int state);
 
-	static constexpr unsigned TEXT_VRAM_SIZE = 2048;
-	uint16_t m_text_vram[ TEXT_VRAM_SIZE ];
-	static constexpr unsigned GRAPHIC_VRAM_SIZE = 16384;
-	uint8_t m_graphic_vram[ GRAPHIC_VRAM_SIZE ];
+	uint16_t m_text_vram[TEXT_VRAM_SIZE];
+	uint8_t m_graphic_vram[GRAPHIC_VRAM_SIZE];
 	bool m_hsync_en;
 	bool m_graphic_en;
 	bool m_hpib_irq;
@@ -298,7 +299,7 @@ void hp9816_state::diag_led_w(uint8_t data)
 uint16_t hp9816_state::text_r(offs_t offset)
 {
 	if (BIT(offset, 12)) {
-		return m_text_vram[ offset & (TEXT_VRAM_SIZE - 1) ];
+		return m_text_vram[offset & (TEXT_VRAM_SIZE - 1)];
 	} else if (BIT(offset, 0)) {
 		return m_crtc->register_r();
 	} else {
@@ -311,7 +312,7 @@ void hp9816_state::text_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (BIT(offset, 12)) {
 		m_hsync_en = !BIT(offset, 14);
-		COMBINE_DATA(&m_text_vram[ offset & (TEXT_VRAM_SIZE - 1) ]);
+		COMBINE_DATA(&m_text_vram[offset & (TEXT_VRAM_SIZE - 1)]);
 	} else if (ACCESSING_BITS_0_7) {
 		if (BIT(offset, 0)) {
 			m_crtc->register_w(uint8_t(data));
@@ -328,7 +329,7 @@ uint16_t hp9816_state::graphic_r(offs_t offset, uint16_t mem_mask)
 	m_graphic_en = !BIT(offset, 14);
 
 	if (ACCESSING_BITS_0_7) {
-		return m_graphic_vram[ offset & (GRAPHIC_VRAM_SIZE - 1) ];
+		return m_graphic_vram[offset & (GRAPHIC_VRAM_SIZE - 1)];
 	} else {
 		return m_cpu->berr_r();
 	}
@@ -339,7 +340,7 @@ void hp9816_state::graphic_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_graphic_en = !BIT(offset, 14);
 
 	if (ACCESSING_BITS_0_7) {
-		m_graphic_vram[ offset & (GRAPHIC_VRAM_SIZE - 1) ] = uint8_t(data);
+		m_graphic_vram[offset & (GRAPHIC_VRAM_SIZE - 1)] = uint8_t(data);
 	} else {
 		return m_cpu->berr_w(0);
 	}
@@ -474,7 +475,7 @@ MC6845_UPDATE_ROW(hp9816_state::crtc_update_row)
 
 		// Text video
 		for (int i = 0; i < x_count; i++) {
-			uint16_t char_attr = m_text_vram[ (ma + i) & (TEXT_VRAM_SIZE - 1) ];
+			uint16_t char_attr = m_text_vram[(ma + i) & (TEXT_VRAM_SIZE - 1)];
 			// | Bit(s) | Meaning                    |
 			// |--------+----------------------------|
 			// |     15 | Select alternate char. set |
@@ -496,7 +497,7 @@ MC6845_UPDATE_ROW(hp9816_state::crtc_update_row)
 				if (BIT(char_attr, 15)) {
 					BIT_SET(chargen_addr, 12);
 				}
-				char_pixels = uint16_t(m_chargen[ chargen_addr ]) << 1;
+				char_pixels = uint16_t(m_chargen[chargen_addr]) << 1;
 				underline = BIT(char_attr, 10) && ra == 11;
 				invert = BIT(char_attr, 8);
 				cursor = cursor_x == i;
@@ -553,7 +554,7 @@ MC6845_UPDATE_ROW(hp9816_state::crtc_update_row)
 				char_pixels = ~char_pixels;
 			}
 			for (unsigned col = 0; col < 10; col++) {
-				bitmap.pix(y, i * 10 + col) = pen[ BIT(char_pixels, 9 - col) ? (half_bright ? 1 : 2) : 0 ];
+				bitmap.pix(y, i * 10 + col) = pen[BIT(char_pixels, 9 - col) ? (half_bright ? 1 : 2) : 0];
 			}
 		}
 
@@ -564,7 +565,7 @@ MC6845_UPDATE_ROW(hp9816_state::crtc_update_row)
 			unsigned g_bytes_per_line = g_cols / 8;
 			unsigned g_addr = y * g_bytes_per_line;
 			for (unsigned i = 0; i < g_bytes_per_line; i++) {
-				uint8_t graph_pixels = m_graphic_vram[ (g_addr + i) & (GRAPHIC_VRAM_SIZE - 1) ];
+				uint8_t graph_pixels = m_graphic_vram[(g_addr + i) & (GRAPHIC_VRAM_SIZE - 1)];
 				for (unsigned col = 0; col < 8; col++) {
 					if (BIT(graph_pixels, 7 - col)) {
 						// A graphic pixel covers 2 text pixels
@@ -581,12 +582,12 @@ MC6845_UPDATE_ROW(hp9816_state::crtc_update_row)
 							// |     0 | 2        |
 							// |     1 | 2        |
 							// |     2 | 0        |
-							pix = pen[ (pix == pen[ 2 ]) ? 0 : 2 ];
+							pix = pen[(pix == pen[2]) ? 0 : 2];
 						}
 						x_pos++;
 						{
 							auto &pix = bitmap.pix(y, x_pos);
-							pix = pen[ (pix == pen[ 2 ]) ? 0 : 2 ];
+							pix = pen[(pix == pen[2]) ? 0 : 2];
 						}
 					}
 				}
@@ -701,6 +702,7 @@ ROM_START(hp9816a)
 	ROM_SYSTEM_BIOS(1, "bios30",  "BIOS v3.0")
 	ROMX_LOAD("rom30.bin", 0x0000, 0x10000, CRC(05c07e75) SHA1(3066a65e6137482041f9a77d09ee2289fe0974aa), ROM_BIOS(1))
 ROM_END
+
 } // anonymous namespace
 
 //   YEAR  NAME     PARENT  COMPAT  MACHINE INPUT   CLASS        INIT        COMPANY            FULLNAME    FLAGS

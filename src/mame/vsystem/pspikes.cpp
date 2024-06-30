@@ -84,6 +84,7 @@ Verification still needed for the other PCBs.
 #include "speaker.h"
 #include "tilemap.h"
 
+
 namespace {
 
 class pspikes_base_state : public driver_device
@@ -171,7 +172,6 @@ protected:
 	int       m_charpalettebank = 0;
 	int       m_spritepalettebank = 0;
 	int       m_sprite_gfx = 0;
-
 };
 
 
@@ -217,8 +217,6 @@ private:
 	void aerfboot_sound_map(address_map &map);
 	void kickball_sound_map(address_map &map);
 	void kickball_sound_portmap(address_map &map);
-
-
 };
 
 

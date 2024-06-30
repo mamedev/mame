@@ -10,9 +10,11 @@
 
 #include "emu.h"
 #include "hp98544.h"
-#include "screen.h"
+
 #include "video/topcat.h"
-#include "hp_dio.h"
+
+#include "screen.h"
+
 
 #define HP98544_SCREEN_NAME   "98544_screen"
 #define HP98544_ROM_REGION    "98544_rom"

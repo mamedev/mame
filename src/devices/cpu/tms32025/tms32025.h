@@ -72,28 +72,29 @@ public:
 	//void tms32025_program(address_map &map);
 	void tms3202x_data(address_map &map);
 	void tms32026_data(address_map &map);
+
 protected:
 	// construction/destruction
-	tms3202x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap);
+	tms3202x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, unsigned stack_depth, address_map_constructor prgmap, address_map_constructor datamap);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual uint32_t execute_min_cycles() const noexcept override { return 4; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 20; }
 	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
-	// device_state_interface overrides
+	// device_state_interface implementation
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	void common_reset();
@@ -128,6 +129,8 @@ protected:
 	devcb_write16 m_xf_out;
 	devcb_read16 m_dr_in;
 	devcb_write16 m_dx_out;
+
+	unsigned const m_stack_limit;
 
 
 	/******************** CPU Internal Registers *******************/
@@ -177,25 +180,25 @@ protected:
 	uint16_t greg_r();
 	void greg_w(uint16_t data);
 
-	inline void CLR0(uint16_t flag);
-	inline void SET0(uint16_t flag);
-	inline void CLR1(uint16_t flag);
-	inline void SET1(uint16_t flag);
-	inline void MODIFY_DP(int data);
-	inline void MODIFY_PM(int data);
-	inline void MODIFY_ARP(int data);
+	void CLR0(uint16_t flag);
+	void SET0(uint16_t flag);
+	void CLR1(uint16_t flag);
+	void SET1(uint16_t flag);
+	void MODIFY_DP(int data);
+	void MODIFY_PM(int data);
+	void MODIFY_ARP(int data);
 	uint16_t reverse_carry_add(uint16_t arg0, uint16_t arg1 );
-	inline void MODIFY_AR_ARP();
-	inline void CALCULATE_ADD_CARRY();
-	inline void CALCULATE_SUB_CARRY();
-	inline void CALCULATE_ADD_OVERFLOW(int32_t addval);
-	inline void CALCULATE_SUB_OVERFLOW(int32_t subval);
-	virtual uint16_t POP_STACK();
-	virtual void PUSH_STACK(uint16_t data);
-	inline void SHIFT_Preg_TO_ALU();
-	inline void GETDATA(int shift,int signext);
-	inline void PUTDATA(uint16_t data);
-	inline void PUTDATA_SST(uint16_t data);
+	void MODIFY_AR_ARP();
+	void CALCULATE_ADD_CARRY();
+	void CALCULATE_SUB_CARRY();
+	void CALCULATE_ADD_OVERFLOW(int32_t addval);
+	void CALCULATE_SUB_OVERFLOW(int32_t subval);
+	uint16_t POP_STACK();
+	void PUSH_STACK(uint16_t data);
+	void SHIFT_Preg_TO_ALU();
+	void GETDATA(int shift,int signext);
+	void PUTDATA(uint16_t data);
+	void PUTDATA_SST(uint16_t data);
 	void opcodes_CE();
 	void opcodes_Dx();
 	void illegal();
@@ -351,8 +354,8 @@ protected:
 	void zalh();
 	void zalr();
 	void zals();
-	inline int process_IRQs();
-	inline void process_timer(int clocks);
+	int process_IRQs();
+	void process_timer(int clocks);
 };
 
 
@@ -377,13 +380,10 @@ protected:
 	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	virtual uint16_t POP_STACK() override;
-	virtual void PUSH_STACK(uint16_t data) override;
 
 	bool    m_mp_mc;
 };

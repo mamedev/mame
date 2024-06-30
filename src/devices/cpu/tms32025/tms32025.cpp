@@ -245,7 +245,15 @@ const tiny_rom_entry *tms32025_device::device_rom_region() const
 }
 
 
-tms3202x_device::tms3202x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap)
+tms3202x_device::tms3202x_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		unsigned stack_depth,
+		address_map_constructor prgmap,
+		address_map_constructor datamap)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1, prgmap)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1, datamap)
@@ -260,17 +268,18 @@ tms3202x_device::tms3202x_device(const machine_config &mconfig, device_type type
 	, m_xf_out(*this)
 	, m_dr_in(*this, 0xffff)
 	, m_dx_out(*this)
+	, m_stack_limit(stack_depth - 1)
 {
 }
 
 tms32020_device::tms32020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms3202x_device(mconfig, TMS32020, tag, owner, clock, address_map_constructor(), address_map_constructor(FUNC(tms3202x_device::tms3202x_data), this))
+	: tms3202x_device(mconfig, TMS32020, tag, owner, clock, 4, address_map_constructor(), address_map_constructor(FUNC(tms3202x_device::tms3202x_data), this))
 {
 	m_fixed_STR1 = 0x0180;
 }
 
 tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap)
-	: tms3202x_device(mconfig, type, tag, owner, clock, prgmap, datamap)
+	: tms3202x_device(mconfig, type, tag, owner, clock, 8, prgmap, datamap)
 	, m_mp_mc(true)
 {
 }
@@ -374,24 +383,24 @@ void tms3202x_device::greg_w(uint16_t data)
 }
 
 
-void tms3202x_device::CLR0(uint16_t flag) { m_STR0 &= ~flag; m_STR0 |= 0x0400; }
-void tms3202x_device::SET0(uint16_t flag) { m_STR0 |=  flag; m_STR0 |= 0x0400; }
-void tms3202x_device::CLR1(uint16_t flag) { m_STR1 &= ~flag; m_STR1 |= m_fixed_STR1; }
-void tms3202x_device::SET1(uint16_t flag) { m_STR1 |=  flag; m_STR1 |= m_fixed_STR1; }
+inline void tms3202x_device::CLR0(uint16_t flag) { m_STR0 &= ~flag; m_STR0 |= 0x0400; }
+inline void tms3202x_device::SET0(uint16_t flag) { m_STR0 |=  flag; m_STR0 |= 0x0400; }
+inline void tms3202x_device::CLR1(uint16_t flag) { m_STR1 &= ~flag; m_STR1 |= m_fixed_STR1; }
+inline void tms3202x_device::SET1(uint16_t flag) { m_STR1 |=  flag; m_STR1 |= m_fixed_STR1; }
 
-void tms3202x_device::MODIFY_DP(int data)
+inline void tms3202x_device::MODIFY_DP(int data)
 {
 	m_STR0 &= ~DP_REG;
 	m_STR0 |= (data & DP_REG);
 	m_STR0 |= 0x0400;
 }
-void tms3202x_device::MODIFY_PM(int data)
+inline void tms3202x_device::MODIFY_PM(int data)
 {
 	m_STR1 &= ~PM_REG;
 	m_STR1 |= (data & PM_REG);
 	m_STR1 |= m_fixed_STR1;
 }
-void tms3202x_device::MODIFY_ARP(int data)
+inline void tms3202x_device::MODIFY_ARP(int data)
 {
 	m_STR1 &= ~ARB_REG;
 	m_STR1 |= (m_STR0 & ARP_REG);
@@ -406,18 +415,18 @@ uint16_t tms3202x_device::reverse_carry_add(uint16_t arg0, uint16_t arg1 )
 	uint16_t result = 0;
 	int carry = 0;
 	int count;
-	for( count=0; count<16; count++ )
+	for (count = 0; count < 16; count++)
 	{
-		int sum = (arg0>>15)+(arg1>>15)+carry;
-		result = (result<<1)|(sum&1);
-		carry = sum>>1;
-		arg0<<=1;
-		arg1<<=1;
+		int sum = (arg0 >> 15) + (arg1 >> 15) + carry;
+		result = (result << 1) | (sum & 1);
+		carry = sum >> 1;
+		arg0 <<= 1;
+		arg1 <<= 1;
 	}
 	return result;
 }
 
-void tms3202x_device::MODIFY_AR_ARP()
+inline void tms3202x_device::MODIFY_AR_ARP()
 { /* modify address register referenced by ARP */
 	switch (m_opcode.b.l & 0x70)        /* Cases ordered by predicted useage */
 	{
@@ -452,7 +461,7 @@ void tms3202x_device::MODIFY_AR_ARP()
 			break;
 	}
 
-	if( !m_mHackIgnoreARP )
+	if (!m_mHackIgnoreARP)
 	{
 		if (m_opcode.b.l & 8)
 		{ /* bit 3 determines if new value is loaded into ARP */
@@ -461,92 +470,71 @@ void tms3202x_device::MODIFY_AR_ARP()
 	}
 }
 
-void tms3202x_device::CALCULATE_ADD_CARRY()
+inline void tms3202x_device::CALCULATE_ADD_CARRY()
 {
-	if ( (uint32_t)(m_oldacc.d) > (uint32_t)(m_ACC.d) ) {
+	if (uint32_t(m_oldacc.d) > uint32_t(m_ACC.d))
+	{
 		SET1(C_FLAG);
 	}
-	else {
+	else
+	{
 		CLR1(C_FLAG);
 	}
 }
 
-void tms3202x_device::CALCULATE_SUB_CARRY()
+inline void tms3202x_device::CALCULATE_SUB_CARRY()
 {
-	if ( (uint32_t)(m_oldacc.d) < (uint32_t)(m_ACC.d) ) {
+	if (uint32_t(m_oldacc.d) < uint32_t(m_ACC.d))
+	{
 		CLR1(C_FLAG);
 	}
-	else {
+	else
+	{
 		SET1(C_FLAG);
 	}
 }
 
-void tms3202x_device::CALCULATE_ADD_OVERFLOW(int32_t addval)
+inline void tms3202x_device::CALCULATE_ADD_OVERFLOW(int32_t addval)
 {
-	if ((int32_t)((m_ACC.d ^ addval) & (m_oldacc.d ^ m_ACC.d)) < 0)
+	if (int32_t((m_ACC.d ^ addval) & (m_oldacc.d ^ m_ACC.d)) < 0)
 	{
 		SET0(OV_FLAG);
 		if (OVM)
 		{
-			m_ACC.d = ((int32_t)m_oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
+			m_ACC.d = (int32_t(m_oldacc.d) < 0) ? 0x80000000 : 0x7fffffff;
 		}
 	}
 }
-void tms3202x_device::CALCULATE_SUB_OVERFLOW(int32_t subval)
+
+inline void tms3202x_device::CALCULATE_SUB_OVERFLOW(int32_t subval)
 {
 	if ((int32_t)((m_oldacc.d ^ subval) & (m_oldacc.d ^ m_ACC.d)) < 0)
 	{
 		SET0(OV_FLAG);
 		if (OVM)
 		{
-			m_ACC.d = ((int32_t)m_oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
+			m_ACC.d = (int32_t(m_oldacc.d) < 0) ? 0x80000000 : 0x7fffffff;
 		}
 	}
 }
 
 inline uint16_t tms3202x_device::POP_STACK()
 {
-	uint16_t data = m_STACK[3];
-	m_STACK[3] = m_STACK[2];
-	m_STACK[2] = m_STACK[1];
-	m_STACK[1] = m_STACK[0];
+	uint16_t const data = m_STACK[m_stack_limit];
+	for (unsigned i = m_stack_limit; 0 < i; --i)
+		m_STACK[i] = m_STACK[i - 1];
 	return data;
 }
 inline void tms3202x_device::PUSH_STACK(uint16_t data)
 {
-	m_STACK[0] = m_STACK[1];
-	m_STACK[1] = m_STACK[2];
-	m_STACK[2] = m_STACK[3];
-	m_STACK[3] = data;
+	for (unsigned i = 0; m_stack_limit > i; ++i)
+		m_STACK[i] = m_STACK[i + 1];
+	m_STACK[m_stack_limit] = data;
 }
 
-inline uint16_t tms32025_device::POP_STACK()
+inline void tms3202x_device::SHIFT_Preg_TO_ALU()
 {
-	uint16_t data = m_STACK[7];
-	m_STACK[7] = m_STACK[6];
-	m_STACK[6] = m_STACK[5];
-	m_STACK[5] = m_STACK[4];
-	m_STACK[4] = m_STACK[3];
-	m_STACK[3] = m_STACK[2];
-	m_STACK[2] = m_STACK[1];
-	m_STACK[1] = m_STACK[0];
-	return data;
-}
-inline void tms32025_device::PUSH_STACK(uint16_t data)
-{
-	m_STACK[0] = m_STACK[1];
-	m_STACK[1] = m_STACK[2];
-	m_STACK[2] = m_STACK[3];
-	m_STACK[3] = m_STACK[4];
-	m_STACK[4] = m_STACK[5];
-	m_STACK[5] = m_STACK[6];
-	m_STACK[6] = m_STACK[7];
-	m_STACK[7] = data;
-}
-
-void tms3202x_device::SHIFT_Preg_TO_ALU()
-{
-	switch(PM)      /* PM (in STR1) is the shift mode for Preg */
+	switch (PM)      /* PM (in STR1) is the shift mode for Preg */
 	{
 		case 0:     m_ALU.d = m_Preg.d; break;
 		case 1:     m_ALU.d = (m_Preg.d << 1); break;
@@ -556,7 +544,7 @@ void tms3202x_device::SHIFT_Preg_TO_ALU()
 	}
 }
 
-void tms3202x_device::GETDATA(int shift,int signext)
+inline void tms3202x_device::GETDATA(int shift,int signext)
 {
 	if (m_opcode.b.l & 0x80)
 	{ /* indirect memory access */
@@ -584,23 +572,25 @@ void tms3202x_device::GETDATA(int shift,int signext)
 	if (m_opcode.b.l & 0x80) MODIFY_AR_ARP();
 }
 
-void tms3202x_device::PUTDATA(uint16_t data)
+inline void tms3202x_device::PUTDATA(uint16_t data)
 {
-	if (m_opcode.b.l & 0x80) {
+	if (m_opcode.b.l & 0x80)
+	{
 		if (m_memaccess >= 0x800) m_external_mem_access = 1;    /* Pause if hold pin is active */
 		else m_external_mem_access = 0;
 
 		m_data.write_word(IND, data);
 		MODIFY_AR_ARP();
 	}
-	else {
+	else
+	{
 		if (m_memaccess >= 0x800) m_external_mem_access = 1;    /* Pause if hold pin is active */
 		else m_external_mem_access = 0;
 
 		m_data.write_word(DMA, data);
 	}
 }
-void tms3202x_device::PUTDATA_SST(uint16_t data)
+inline void tms3202x_device::PUTDATA_SST(uint16_t data)
 {
 	if (m_opcode.b.l & 0x80) m_memaccess = IND;
 	else m_memaccess = DMApg0;
@@ -1870,7 +1860,7 @@ void tms32026_device::device_reset()
 /****************************************************************************
  *  Issue an interrupt if necessary
  ****************************************************************************/
-int tms3202x_device::process_IRQs()
+inline int tms3202x_device::process_IRQs()
 {
 	/********** Interrupt Flag Register (IFR) **********
 	    |  5  |  4  |  3  |  2  |  1  |  0  |
@@ -1944,39 +1934,36 @@ int tms3202x_device::process_IRQs()
 }
 
 
-void tms3202x_device::process_timer(int clocks)
+inline void tms3202x_device::process_timer(int clocks)
 {
-	int preclocks, ticks;
-
-	/* easy case: no actual ticks */
-again:
-	preclocks = CLK - m_timerover;
-	if (clocks < preclocks)
+	while (true)
 	{
-		m_timerover += clocks;
-		m_icount -= clocks;
-		return;
-	}
+		int const preclocks = CLK - m_timerover;
+		if (clocks < preclocks)
+		{
+			/* easy case: no actual ticks */
+			m_timerover += clocks;
+			m_icount -= clocks;
+			break;
+		}
 
-	/* if we're not going to overflow the timer, just count the clocks */
-	ticks = 1 + (clocks - preclocks) / CLK;
-	if (ticks <= m_tim)
-	{
-		m_icount -= clocks;
-		m_timerover = clocks - (ticks - 1) * CLK - preclocks;
-		m_tim -= ticks;
-	}
+		int const ticks = 1 + (clocks - preclocks) / CLK;
+		if (ticks <= m_tim)
+		{
+			/* if we're not going to overflow the timer, just count the clocks */
+			m_icount -= clocks;
+			m_timerover = clocks - (ticks - 1) * CLK - preclocks;
+			m_tim -= ticks;
+			break;
+		}
 
-	/* otherwise, overflow the timer and signal an interrupt */
-	else
-	{
+		/* otherwise, overflow the timer and signal an interrupt */
 		m_icount -= preclocks + CLK * m_tim;
 		m_timerover = 0;
 		m_tim = m_prd;
 
 		m_IFR |= 0x08;
 		clocks = process_IRQs();        /* Handle Timer IRQ */
-		goto again;
 	}
 }
 

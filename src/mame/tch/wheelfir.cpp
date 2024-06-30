@@ -118,7 +118,7 @@ static const int NUM_COLORS = 256;
 class wheelfir_state : public driver_device
 {
 public:
-	wheelfir_state(const machine_config &mconfig, device_type type, const char* tag) :
+	wheelfir_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
@@ -187,7 +187,7 @@ private:
 	uint16_t wheelfir_7c0000_r(offs_t offset, uint16_t mem_mask = ~0);
 	void coin_cnt_w(uint16_t data);
 	void adc_eoc_w(int state);
-	uint32_t screen_update_wheelfir(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank_wheelfir(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
 	void ramdac_map(address_map &map);
@@ -212,7 +212,7 @@ void wheelfir_state::do_blit()
 	// blitter irq? should be timed?
 	m_maincpu->set_input_line(1, HOLD_LINE);
 
-	uint8_t const* const rom = m_tilepages;
+	uint8_t const *const rom = m_tilepages;
 
 	const int src_u0 = (m_blitter_data[0] >> 8) + ((m_blitter_data[6] & 0x100) ? 256 : 0);
 	const int src_v0 = (m_blitter_data[2] >> 8) + ((m_blitter_data[6] & 0x200) ? 256 : 0);
@@ -455,8 +455,8 @@ uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_in
 		int scrolly = y;
 		scrolly += m_current_yscroll;//
 		scrolly &= 0x1ff;
-		uint16_t const* const source = &m_tmp_bitmap[LAYER_BG]->pix(scrolly);
-		uint16_t* const dest = &bitmap.pix(y);
+		uint16_t const *const source = &m_tmp_bitmap[LAYER_BG]->pix(scrolly);
+		uint16_t *const dest = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -735,9 +735,9 @@ void wheelfir_state::machine_start()
 
 	for (int j = 0; j < 400; ++j)
 	{
-		/*
+#if 0
 		// calculate index for zoom
-		uint16_t* ROM = (uint16_t*)m_maincpurom;
+		uint16_t *ROM = (uint16_t *)m_maincpurom;
 		int i = j << 3;
 		int d1 = ROM[0x200 + i] & 0x1f;
 		int d0 = (ROM[0x200 + i] >> 8) & 0x1f;
@@ -749,7 +749,7 @@ void wheelfir_state::machine_start()
 		int dflag = (ROM[0x200 + 1 + i] & 0x10) ? 1 : 0;
 
 		int index = d0 | (d1 << 6) | (hflag << 12) | (dflag << 13);
-		*/
+#endif
 		m_zoom_table[zoom_index[j]] = j;
 	}
 }

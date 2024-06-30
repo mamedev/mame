@@ -548,7 +548,7 @@ void news_r3k_base_state::common(machine_config &config)
 	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(FUNC(news_r3k_base_state::irq_w<KBD>));
 	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(FUNC(news_r3k_base_state::irq_w<MOUSE>));
 
-	SOFTWARE_LIST(config, "software_list").set_original("sony_news").set_filter("RISC");
+	SOFTWARE_LIST(config, "software_list").set_original("sony_news").set_filter("RISC,NWS3000");
 }
 
 void nws3260_state::nws3260(machine_config &config)

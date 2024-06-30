@@ -400,7 +400,7 @@ macro   take_interrupt
 	} else {
 		/* Interrupt mode 0. We check for CALL and JP instructions,
 		   if neither of these were found we assume a 1 byte opcode
-		   was placed on the databus								*/
+		   was placed on the databus */
 		LOGINT("IM0 $%04x\n", m_tmp_irq_vector);
 
 		// check for nop

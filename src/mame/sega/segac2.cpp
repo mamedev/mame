@@ -2610,10 +2610,10 @@ int segac2_state::prot_func_dummy(int in)
 /* 317-0149 */
 int segac2_state::prot_func_columns(int in)
 {
-	int const b0 = BIT( in,2) ^ ((BIT(~in,0) && BIT( in,7)) || (BIT( in,4) && BIT( in,6)));
-	int const b1 = BIT(~in,0) ^ (BIT( in,2) || (BIT( in,5) && BIT(~in,6) && BIT( in,7)));
-	int const b2 = BIT( in,3) ^ ((BIT( in,0) && BIT( in,1)) || (BIT( in,4) && BIT( in,6)));
-	int const b3 = BIT( in,1) ^ ((BIT( in,0) && BIT( in,1)) || (BIT( in,4) && BIT( in,5)) || (BIT(~in,6) && BIT( in,7)));   // 1 repeated
+	int const b0 = BIT( in,2) ^ ((BIT(~in,0) & BIT( in,7)) | (BIT( in,4) & BIT( in,6)));
+	int const b1 = BIT(~in,0) ^ (BIT( in,2) | (BIT( in,5) & BIT(~in,6) & BIT( in,7)));
+	int const b2 = BIT( in,3) ^ ((BIT( in,0) & BIT( in,1)) | (BIT( in,4) & BIT( in,6)));
+	int const b3 = BIT( in,1) ^ ((BIT( in,0) & BIT( in,1)) | (BIT( in,4) & BIT( in,5)) | (BIT(~in,6) & BIT( in,7)));   // 1 repeated
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2621,10 +2621,10 @@ int segac2_state::prot_func_columns(int in)
 /* 317-0160 */
 int segac2_state::prot_func_columns2(int in)
 {
-	int const b0 =  BIT( in,2) ^ (BIT( in,1) || (BIT( in,4) && BIT( in,5)));
-	int const b1 = (BIT( in,0) && BIT( in,3) && BIT( in,4)) ^ (BIT( in,6) || (BIT( in,5) && BIT( in,7)));
-	int const b2 = (BIT( in,3) && BIT(~in,2) && BIT( in,4)) ^ (BIT( in,5) || (BIT( in,0) && BIT( in,1)) || (BIT( in,4) && BIT( in,6))); // 4 repeated
-	int const b3 = (BIT( in,1) && BIT( in,0) && BIT( in,2)) ^ ((BIT( in,4) && BIT(~in,6)) || (BIT( in,6) && BIT( in,7)));   // 6 repeated
+	int const b0 =  BIT( in,2) ^ (BIT( in,1) | (BIT( in,4) & BIT( in,5)));
+	int const b1 = (BIT( in,0) & BIT( in,3) & BIT( in,4)) ^ (BIT( in,6) | (BIT( in,5) & BIT( in,7)));
+	int const b2 = (BIT( in,3) & BIT(~in,2) & BIT( in,4)) ^ (BIT( in,5) | (BIT( in,0) & BIT( in,1)) | (BIT( in,4) & BIT( in,6))); // 4 repeated
+	int const b3 = (BIT( in,1) & BIT( in,0) & BIT( in,2)) ^ ((BIT( in,4) & BIT(~in,6)) | (BIT( in,6) & BIT( in,7)));   // 6 repeated
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2632,10 +2632,10 @@ int segac2_state::prot_func_columns2(int in)
 /* 317-0172 */
 int segac2_state::prot_func_tfrceac(int in)
 {
-	int const b0 = BIT(~in,2) ^ ((BIT( in,0) && BIT(~in,7)) || (BIT( in,3) && BIT( in,4)));
-	int const b1 = (BIT( in,4) && BIT(~in,5) && BIT( in,7)) ^ ((BIT(~in,0) || BIT(~in,3)) && (BIT(~in,6) || BIT(~in,7)));   // not in the form x1 XOR (x2 OR x3 OR x4)
-	int const b2 = BIT( in,2) ^ ((BIT( in,4) && BIT(~in,5) && BIT( in,7)) || (BIT(~in,1) && BIT( in,6)));
-	int const b3 = BIT( in,0) ^ ((BIT( in,1) && BIT( in,4) && BIT( in,6)) || (BIT( in,1) && BIT( in,4) && BIT( in,7))); // 1,4 repeated
+	int const b0 = BIT(~in,2) ^ ((BIT( in,0) & BIT(~in,7)) | (BIT( in,3) & BIT( in,4)));
+	int const b1 = (BIT( in,4) & BIT(~in,5) & BIT( in,7)) ^ ((BIT(~in,0) | BIT(~in,3)) & (BIT(~in,6) | BIT(~in,7)));   // not in the form x1 XOR (x2 OR x3 OR x4)
+	int const b2 = BIT( in,2) ^ ((BIT( in,4) & BIT(~in,5) & BIT( in,7)) | (BIT(~in,1) & BIT( in,6)));
+	int const b3 = BIT( in,0) ^ ((BIT( in,1) & BIT( in,4) & BIT( in,6)) | (BIT( in,1) & BIT( in,4) & BIT( in,7))); // 1,4 repeated
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2643,10 +2643,10 @@ int segac2_state::prot_func_tfrceac(int in)
 /* 317-0173 */
 int segac2_state::prot_func_borench(int in)
 {
-	int const b0 = (BIT( in,1) && BIT( in,2) && BIT( in,3) && BIT( in,7))   ^ (BIT( in,5) || (BIT(~in,0) && BIT(~in,4)));
-	int const b1 = (BIT(~in,2) && BIT( in,3) && BIT( in,5))                 ^ (BIT( in,1) || (BIT( in,0) && BIT(~in,4)));
-	int const b2 = (BIT( in,1) && BIT(~in,4) && BIT(~in,6))                 ^ (BIT( in,2) || BIT( in,3) || (BIT( in,5) && BIT( in,7)));
-	int const b3 = (BIT(~in,0) && BIT( in,5) && (BIT( in,6) || BIT( in,7))) ^ (BIT( in,1) || (BIT( in,3) && BIT( in,4)));   // not in the form x1 XOR (x2 OR x3 OR x4)
+	int const b0 = (BIT( in,1) & BIT( in,2) & BIT( in,3) & BIT( in,7))   ^ (BIT( in,5) | (BIT(~in,0) & BIT(~in,4)));
+	int const b1 = (BIT(~in,2) & BIT( in,3) & BIT( in,5))                ^ (BIT( in,1) | (BIT( in,0) & BIT(~in,4)));
+	int const b2 = (BIT( in,1) & BIT(~in,4) & BIT(~in,6))                ^ (BIT( in,2) | BIT( in,3) | (BIT( in,5) & BIT( in,7)));
+	int const b3 = (BIT(~in,0) & BIT( in,5) & (BIT( in,6) | BIT( in,7))) ^ (BIT( in,1) | (BIT( in,3) & BIT( in,4)));   // not in the form x1 XOR (x2 OR x3 OR x4)
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2654,10 +2654,10 @@ int segac2_state::prot_func_borench(int in)
 /* 317-0178 */
 int segac2_state::prot_func_ribbit(int in)
 {
-	int const b0 = (BIT( in,0) && BIT( in,4)) ^ ((BIT( in,1) && BIT( in,2)) || BIT( in,3) || BIT(~in,5));
-	int const b1 = (BIT( in,1) && BIT( in,5)) ^ ((BIT( in,2) && BIT( in,3)) || BIT( in,0) || BIT(~in,6));
-	int const b2 = (BIT( in,2) && BIT( in,7)) ^ ((BIT( in,3) && BIT( in,0)) || BIT(~in,1) || BIT( in,7));
-	int const b3 = (BIT( in,3) && BIT( in,6)) ^ ((BIT( in,0) && BIT( in,1)) || BIT(~in,2) || BIT( in,4));
+	int const b0 = (BIT( in,0) & BIT( in,4)) ^ ((BIT( in,1) & BIT( in,2)) | BIT( in,3) | BIT(~in,5));
+	int const b1 = (BIT( in,1) & BIT( in,5)) ^ ((BIT( in,2) & BIT( in,3)) | BIT( in,0) | BIT(~in,6));
+	int const b2 = (BIT( in,2) & BIT( in,7)) ^ ((BIT( in,3) & BIT( in,0)) | BIT(~in,1) | BIT( in,7));
+	int const b3 = (BIT( in,3) & BIT( in,6)) ^ ((BIT( in,0) & BIT( in,1)) | BIT(~in,2) | BIT( in,4));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2665,10 +2665,10 @@ int segac2_state::prot_func_ribbit(int in)
 /* 317-0193 */
 int segac2_state::prot_func_twinsqua(int in)
 {
-	int const b0 = (BIT( in,2) && BIT(~in,5)) ^ (BIT( in,3) || BIT(~in,4));
-	int const b1 = (BIT( in,0) && BIT(~in,2) && BIT( in,4)) ^ (BIT(~in,0) || BIT(~in,4) || BIT(~in,6)); // 0,4 repeated
-	int const b2 = (BIT( in,3) && BIT(~in,5)) ^ (BIT( in,4) && BIT( in,7));
-	int const b3 =  BIT( in,1) ^ ((BIT(~in,3) && BIT(~in,6)) || (BIT( in,4) && BIT(~in,6)) || (BIT(~in,1) && BIT( in,3) && BIT(~in,4)));    // 1,3,4,6 repeated
+	int const b0 = (BIT( in,2) & BIT(~in,5)) ^ (BIT( in,3) | BIT(~in,4));
+	int const b1 = (BIT( in,0) & BIT(~in,2) & BIT( in,4)) ^ (BIT(~in,0) | BIT(~in,4) | BIT(~in,6)); // 0,4 repeated
+	int const b2 = (BIT( in,3) & BIT(~in,5)) ^ (BIT( in,4) & BIT( in,7));
+	int const b3 =  BIT( in,1) ^ ((BIT(~in,3) & BIT(~in,6)) | (BIT( in,4) & BIT(~in,6)) | (BIT(~in,1) & BIT( in,3) & BIT(~in,4)));    // 1,3,4,6 repeated
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2676,10 +2676,10 @@ int segac2_state::prot_func_twinsqua(int in)
 /* 317-0203 */
 int segac2_state::prot_func_puyo(int in)
 {
-	int const b0 = (BIT(~in,3) && BIT( in,7)) ^ ((BIT(~in,0) && BIT(~in,1)) || (BIT(~in,1) && BIT(~in,4))); // 1 repeated
-	int const b1 = (BIT( in,3) && BIT( in,5)) ^ (BIT(~in,2) || BIT( in,4) || BIT( in,6));
-	int const b2 = (BIT(~in,2) && BIT(~in,5)) ^ (BIT( in,1) || BIT(~in,3) || BIT(~in,6));
-	int const b3 =  BIT( in,1)                ^ ((BIT( in,0) && BIT( in,3) && BIT( in,7)) || BIT( in,4));
+	int const b0 = (BIT(~in,3) & BIT( in,7)) ^ ((BIT(~in,0) & BIT(~in,1)) | (BIT(~in,1) & BIT(~in,4))); // 1 repeated
+	int const b1 = (BIT( in,3) & BIT( in,5)) ^ (BIT(~in,2) | BIT( in,4) | BIT( in,6));
+	int const b2 = (BIT(~in,2) & BIT(~in,5)) ^ (BIT( in,1) | BIT(~in,3) | BIT(~in,6));
+	int const b3 =  BIT( in,1)               ^ ((BIT( in,0) & BIT( in,3) & BIT( in,7)) | BIT( in,4));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2687,10 +2687,10 @@ int segac2_state::prot_func_puyo(int in)
 /* 317-0211 */
 int segac2_state::prot_func_tantr(int in)
 {
-	int const b0 = (BIT( in,0) && BIT( in,4)) ^ ( BIT( in,5) || BIT(~in,6)  || (BIT(~in,3) && BIT( in,7)));
-	int const b1 = (BIT( in,2) && BIT( in,6)) ^ ((BIT( in,1) && BIT( in,5)) || (BIT( in,3) && BIT( in,4)));
-	int const b2 = (BIT(~in,0) && BIT( in,2)) ^ ( BIT( in,4) || BIT( in,7)  || (BIT( in,1) && BIT(~in,5)));
-	int const b3 = (BIT(~in,2) && BIT( in,7)) ^ ( BIT(~in,0) || BIT( in,1)  || (BIT( in,3) && BIT( in,6)));
+	int const b0 = (BIT( in,0) & BIT( in,4)) ^ ( BIT( in,5) | BIT(~in,6)  | (BIT(~in,3) & BIT( in,7)));
+	int const b1 = (BIT( in,2) & BIT( in,6)) ^ ((BIT( in,1) & BIT( in,5)) | (BIT( in,3) & BIT( in,4)));
+	int const b2 = (BIT(~in,0) & BIT( in,2)) ^ ( BIT( in,4) | BIT( in,7)  | (BIT( in,1) & BIT(~in,5)));
+	int const b3 = (BIT(~in,2) & BIT( in,7)) ^ ( BIT(~in,0) | BIT( in,1)  | (BIT( in,3) & BIT( in,6)));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2698,10 +2698,10 @@ int segac2_state::prot_func_tantr(int in)
 /* 317-???? */
 int segac2_state::prot_func_tantrkor(int in)
 {
-	int const b0 = (BIT(~in,1) && BIT(~in,7)) ^ (BIT(~in,2) && BIT(~in,4));
-	int const b1 = (BIT( in,2) && BIT( in,6)) ^ (BIT( in,0) && BIT( in,1));
-	int const b2 = (BIT(~in,3) && BIT(~in,6)) ^ (BIT( in,1) || BIT(~in,4));
-	int const b3 = (BIT(~in,0) && BIT(~in,2)) ^ (BIT( in,5) && BIT(~in,6));
+	int const b0 = (BIT(~in,1) & BIT(~in,7)) ^ (BIT(~in,2) & BIT(~in,4));
+	int const b1 = (BIT( in,2) & BIT( in,6)) ^ (BIT( in,0) & BIT( in,1));
+	int const b2 = (BIT(~in,3) & BIT(~in,6)) ^ (BIT( in,1) | BIT(~in,4));
+	int const b3 = (BIT(~in,0) & BIT(~in,2)) ^ (BIT( in,5) & BIT(~in,6));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2709,10 +2709,10 @@ int segac2_state::prot_func_tantrkor(int in)
 /* 317-0218 */
 int segac2_state::prot_func_potopoto(int in)
 {
-	int const b0 = (BIT(~in,2) && BIT(~in,4)) ^ (BIT(~in,1) && BIT( in,3));
-	int const b1 = (BIT( in,0) && BIT( in,5)) ^ (BIT( in,2) || BIT(~in,7));
-	int const b2 = (BIT( in,0) && BIT( in,6)) ^ (BIT(~in,1) && BIT( in,7));
-	int const b3 = (BIT( in,0) && BIT(~in,7)) ^ (BIT(~in,1) && BIT(~in,6));
+	int const b0 = (BIT(~in,2) & BIT(~in,4)) ^ (BIT(~in,1) & BIT( in,3));
+	int const b1 = (BIT( in,0) & BIT( in,5)) ^ (BIT( in,2) | BIT(~in,7));
+	int const b2 = (BIT( in,0) & BIT( in,6)) ^ (BIT(~in,1) & BIT( in,7));
+	int const b3 = (BIT( in,0) & BIT(~in,7)) ^ (BIT(~in,1) & BIT(~in,6));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2720,10 +2720,10 @@ int segac2_state::prot_func_potopoto(int in)
 /* 317-0219 */
 int segac2_state::prot_func_stkclmnj(int in)
 {
-	int const b0 = (BIT( in,1) && BIT( in,4)) ^ (BIT( in,5) && BIT( in,2));
-	int const b1 = (BIT(~in,2) && BIT( in,6)) ^ (BIT(~in,5) && BIT( in,7));
-	int const b2 = (BIT(~in,3) && BIT( in,6)) ^ (BIT(~in,5) && BIT(~in,1));
-	int const b3 = (BIT(~in,3) && BIT( in,5)) ^ (BIT(~in,6) || BIT(~in,7));
+	int const b0 = (BIT( in,1) & BIT( in,4)) ^ (BIT( in,5) & BIT( in,2));
+	int const b1 = (BIT(~in,2) & BIT( in,6)) ^ (BIT(~in,5) & BIT( in,7));
+	int const b2 = (BIT(~in,3) & BIT( in,6)) ^ (BIT(~in,5) & BIT(~in,1));
+	int const b3 = (BIT(~in,3) & BIT( in,5)) ^ (BIT(~in,6) | BIT(~in,7));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2731,10 +2731,10 @@ int segac2_state::prot_func_stkclmnj(int in)
 /* 317-0223 */
 int segac2_state::prot_func_stkclmns(int in)
 {
-	int const b0 = (BIT( in,2) && BIT( in,4)) ^ (BIT( in,1) || BIT(~in,3));
-	int const b1 = (BIT( in,0) && BIT( in,5)) ^ (BIT( in,2) && BIT( in,7));
-	int const b2 = (BIT( in,0) && BIT(~in,6)) ^ (BIT( in,1) && BIT(~in,7));
-	int const b3 = (BIT( in,0) && BIT(~in,7)) ^ (BIT(~in,1) && BIT( in,6));
+	int const b0 = (BIT( in,2) & BIT( in,4)) ^ (BIT( in,1) | BIT(~in,3));
+	int const b1 = (BIT( in,0) & BIT( in,5)) ^ (BIT( in,2) & BIT( in,7));
+	int const b2 = (BIT( in,0) & BIT(~in,6)) ^ (BIT( in,1) & BIT(~in,7));
+	int const b3 = (BIT( in,0) & BIT(~in,7)) ^ (BIT(~in,1) & BIT( in,6));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2742,10 +2742,10 @@ int segac2_state::prot_func_stkclmns(int in)
 /* 317-0224 */
 int segac2_state::prot_func_ichirj(int in)
 {
-	int const b0 = (BIT( in,2) && BIT( in,4)) ^ (BIT(~in,5) && BIT(~in,2));
-	int const b1 = (BIT( in,2) && BIT(~in,6)) ^ (BIT( in,5) && BIT( in,7));
-	int const b2 = (BIT(~in,3) && BIT( in,6)) ^ (BIT(~in,5) && BIT(~in,1));
-	int const b3 = (BIT(~in,1) && BIT( in,5)) ^ (BIT(~in,5) && BIT( in,7));
+	int const b0 = (BIT( in,2) & BIT( in,4)) ^ (BIT(~in,5) & BIT(~in,2));
+	int const b1 = (BIT( in,2) & BIT(~in,6)) ^ (BIT( in,5) & BIT( in,7));
+	int const b2 = (BIT(~in,3) & BIT( in,6)) ^ (BIT(~in,5) & BIT(~in,1));
+	int const b3 = (BIT(~in,1) & BIT( in,5)) ^ (BIT(~in,5) & BIT( in,7));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2753,10 +2753,10 @@ int segac2_state::prot_func_ichirj(int in)
 /* 317-???? */
 int segac2_state::prot_func_ichir(int in)
 {
-	int const b0 = (BIT(~in,2) && BIT( in,4)) ^ (BIT( in,5) && BIT(~in,2));
-	int const b1 = (BIT( in,1) && BIT( in,6)) ^ (BIT( in,5) || BIT( in,7));
-	int const b2 = (BIT(~in,3) && BIT( in,6)) ^ (BIT(~in,5) && BIT(~in,3));
-	int const b3 = (BIT( in,0) && BIT(~in,5)) ^ (BIT( in,5) && BIT( in,7));
+	int const b0 = (BIT(~in,2) & BIT( in,4)) ^ (BIT( in,5) & BIT(~in,2));
+	int const b1 = (BIT( in,1) & BIT( in,6)) ^ (BIT( in,5) | BIT( in,7));
+	int const b2 = (BIT(~in,3) & BIT( in,6)) ^ (BIT(~in,5) & BIT(~in,3));
+	int const b3 = (BIT( in,0) & BIT(~in,5)) ^ (BIT( in,5) & BIT( in,7));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2764,10 +2764,10 @@ int segac2_state::prot_func_ichir(int in)
 /* 317-???? */
 int segac2_state::prot_func_ichirk(int in)
 {
-	int const b0 = (BIT(~in,2) && BIT( in,4)) ^ (BIT( in,5) && BIT(~in,1));
-	int const b1 = (BIT( in,0) && BIT( in,6)) ^ (BIT( in,5) && BIT( in,4));
-	int const b2 = (BIT(~in,1) && BIT(~in,6)) ^ (BIT(~in,5) && BIT( in,3));
-	int const b3 = (BIT( in,1) && BIT( in,5)) ^ (BIT( in,6) && BIT( in,7));
+	int const b0 = (BIT(~in,2) & BIT( in,4)) ^ (BIT( in,5) & BIT(~in,1));
+	int const b1 = (BIT( in,0) & BIT( in,6)) ^ (BIT( in,5) & BIT( in,4));
+	int const b2 = (BIT(~in,1) & BIT(~in,6)) ^ (BIT(~in,5) & BIT( in,3));
+	int const b3 = (BIT( in,1) & BIT( in,5)) ^ (BIT( in,6) & BIT( in,7));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2775,20 +2775,20 @@ int segac2_state::prot_func_ichirk(int in)
 /* 317-0228 */
 int segac2_state::prot_func_puyopuy2(int in)
 {
-	int const b0 = (BIT(~in,0) && BIT(~in,7)) ^ (BIT( in,1) || BIT(~in,4) || BIT(~in,6));
-	int const b1 = (BIT( in,0) && BIT(~in,6)) ^ (BIT( in,3) && BIT( in,5));
-	int const b2 = (BIT(~in,4) && BIT(~in,7)) ^ (BIT( in,0) || BIT(~in,6));
-	int const b3 = (BIT(~in,1) && BIT( in,4)) ^ (BIT( in,2) && BIT(~in,3));
+	int const b0 = (BIT(~in,0) & BIT(~in,7)) ^ (BIT( in,1) | BIT(~in,4) | BIT(~in,6));
+	int const b1 = (BIT( in,0) & BIT(~in,6)) ^ (BIT( in,3) & BIT( in,5));
+	int const b2 = (BIT(~in,4) & BIT(~in,7)) ^ (BIT( in,0) | BIT(~in,6));
+	int const b3 = (BIT(~in,1) & BIT( in,4)) ^ (BIT( in,2) & BIT(~in,3));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
 
 int segac2_state::prot_func_zunkyou(int in)
 {
-	int const b0 = (BIT(~in,1) && BIT( in,6)) ^ (BIT(~in,5) && BIT( in,7));
-	int const b1 = (BIT( in,0) && BIT(~in,5)) ^ (BIT(~in,3) || BIT( in,4));
-	int const b2 = (BIT( in,2) && BIT(~in,3)) ^ (BIT( in,4) && BIT(~in,5));
-	int const b3 = (BIT( in,0) && BIT(~in,4)) ^ (BIT(~in,2) && BIT(~in,6));
+	int const b0 = (BIT(~in,1) & BIT( in,6)) ^ (BIT(~in,5) & BIT( in,7));
+	int const b1 = (BIT( in,0) & BIT(~in,5)) ^ (BIT(~in,3) | BIT( in,4));
+	int const b2 = (BIT( in,2) & BIT(~in,3)) ^ (BIT( in,4) & BIT(~in,5));
+	int const b3 = (BIT( in,0) & BIT(~in,4)) ^ (BIT(~in,2) & BIT(~in,6));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2800,10 +2800,10 @@ int pclub_state::prot_func_pclub(int in)
 
 int pclub_state::prot_func_pclubjv2(int in)
 {
-	int const b0 = (BIT( in,3) && BIT(~in,4)) ^ ((BIT(~in,1) && BIT(~in,7)) || BIT( in,6));
-	int const b1 = (BIT( in,0) && BIT( in,5)) ^  (BIT( in,2) && BIT(~in,6));
-	int const b2 = (BIT(~in,1) && BIT( in,6)) ^  (BIT( in,3) || BIT(~in,5)  || BIT(~in,1)); // 1 repeated
-	int const b3 = (BIT(~in,2) && BIT(~in,7)) ^  (BIT(~in,0) || BIT(~in,4));
+	int const b0 = (BIT( in,3) & BIT(~in,4)) ^ ((BIT(~in,1) & BIT(~in,7)) | BIT( in,6));
+	int const b1 = (BIT( in,0) & BIT( in,5)) ^  (BIT( in,2) & BIT(~in,6));
+	int const b2 = (BIT(~in,1) & BIT( in,6)) ^  (BIT( in,3) | BIT(~in,5)  | BIT(~in,1)); // 1 repeated
+	int const b3 = (BIT(~in,2) & BIT(~in,7)) ^  (BIT(~in,0) | BIT(~in,4));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -2811,30 +2811,30 @@ int pclub_state::prot_func_pclubjv2(int in)
 int pclub_state::prot_func_pclubjv3(int in)
 {
 	// TODO: Determine correctly. This is just copied from V2 as a placeholder.
-	int const b0 = (BIT( in,3) && BIT(~in,4)) ^ ((BIT(~in,1) && BIT(~in,7)) || BIT( in,6));
-	int const b1 = (BIT( in,0) && BIT( in,5)) ^  (BIT( in,2) && BIT(~in,6));
-	int const b2 = (BIT(~in,1) && BIT( in,6)) ^  (BIT( in,3) || BIT(~in,5)  || BIT(~in,1)); // 1 repeated
-	int const b3 = (BIT(~in,2) && BIT(~in,7)) ^  (BIT(~in,0) || BIT(~in,4));
+	int const b0 = (BIT( in,3) & BIT(~in,4)) ^ ((BIT(~in,1) & BIT(~in,7)) | BIT( in,6));
+	int const b1 = (BIT( in,0) & BIT( in,5)) ^  (BIT( in,2) & BIT(~in,6));
+	int const b2 = (BIT(~in,1) & BIT( in,6)) ^  (BIT( in,3) | BIT(~in,5)  | BIT(~in,1)); // 1 repeated
+	int const b3 = (BIT(~in,2) & BIT(~in,7)) ^  (BIT(~in,0) | BIT(~in,4));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
 
 int pclub_state::prot_func_pclubjv4(int in)
 {
-	int const b0 = (BIT(~in,2) && BIT( in,4)) ^ (BIT( in,1) && BIT(~in,6) && BIT(~in,3));
-	int const b1 = (BIT(~in,3) && BIT(~in,4)) ^ (BIT( in,0) && BIT( in,5) && BIT(~in,6));
-	int const b2 =  BIT(~in,0)                ^ (BIT( in,3) && BIT( in,4));
-	int const b3 = (BIT(~in,1) && BIT( in,7)) ^ (BIT( in,5) && BIT(~in,7)); // 7 repeated
+	int const b0 = (BIT(~in,2) & BIT( in,4)) ^ (BIT( in,1) & BIT(~in,6) & BIT(~in,3));
+	int const b1 = (BIT(~in,3) & BIT(~in,4)) ^ (BIT( in,0) & BIT( in,5) & BIT(~in,6));
+	int const b2 =  BIT(~in,0)               ^ (BIT( in,3) & BIT( in,4));
+	int const b3 = (BIT(~in,1) & BIT( in,7)) ^ (BIT( in,5) & BIT(~in,7)); // 7 repeated
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
 
 int pclub_state::prot_func_pclubjv5(int in)
 {
-	int const b0 = (BIT(~in,1) && BIT( in,5)) ^ (BIT(~in,2) && BIT(~in,6));
-	int const b1 = (BIT(~in,0) && BIT( in,4)) ^ (BIT(~in,3) && BIT(~in,7));
-	int const b2 = (BIT(~in,3) && BIT( in,7)) ^ (BIT(~in,0) || BIT(~in,4));
-	int const b3 = (BIT(~in,2) && BIT( in,6)) ^ (BIT(~in,1) && BIT(~in,5));
+	int const b0 = (BIT(~in,1) & BIT( in,5)) ^ (BIT(~in,2) & BIT(~in,6));
+	int const b1 = (BIT(~in,0) & BIT( in,4)) ^ (BIT(~in,3) & BIT(~in,7));
+	int const b2 = (BIT(~in,3) & BIT( in,7)) ^ (BIT(~in,0) | BIT(~in,4));
+	int const b3 = (BIT(~in,2) & BIT( in,6)) ^ (BIT(~in,1) & BIT(~in,5));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }

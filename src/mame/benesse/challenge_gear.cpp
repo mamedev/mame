@@ -14,8 +14,8 @@
 
 /*
 
-TSOP32 Maskrom:
-The pinout matches nearly the 29LV040 (TSOP32) flashrom. It has no WE# and Pin 07 and 09 are swapped.
+TSOP32 mask ROM:
+The pinout nearly matches the 29LV040 (TSOP32) Flash ROM. It has no WE# and pin0 7 and 9 are swapped.
 
        --------
 A11 --|01    32|-- OE#

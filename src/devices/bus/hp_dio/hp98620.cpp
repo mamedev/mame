@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "hp98620.h"
-#include "hp_dio.h"
 
 #define VERBOSE 0
 #include "logmacro.h"

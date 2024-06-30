@@ -2,15 +2,19 @@
 // copyright-holders:David Haywood, XingXing
 
 #include "emu.h"
+
+#include "pgmcrypt.h"
+
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "cpu/xa/xa.h"
 #include "machine/nvram.h"
-#include "pgmcrypt.h"
 #include "sound/ics2115.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
 
 namespace {
 
@@ -61,12 +65,12 @@ void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect
 	if ((romoffset != 0) && (romoffset != 0xffffffff))
 	{
 		//logerror("x=%d, y=%d, w=%d pix, h=%d pix, c=0x%02x, romoffset=0x%08x\n", xpos, ypos, width, height, palette, romoffset << 2);
-		uint8_t* gfxrom = &m_gfxrom[romoffset << 2];
+		const uint8_t *gfxrom = &m_gfxrom[romoffset << 2];
 		palette = (palette & 0x3f) << 7;
 
 		for (int y = 0; y < height; y++)
 		{
-			uint16_t* dest = &bitmap.pix(ypos + y);
+			uint16_t *dest = &bitmap.pix(ypos + y);
 			for (int x = 0; x < width; x++)
 			{
 				uint8_t pix = *gfxrom++;
@@ -81,7 +85,7 @@ void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
-uint32_t igs_fear_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+uint32_t igs_fear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x3ff, cliprect);
 
@@ -181,7 +185,7 @@ ROM_START( fearless )
 ROM_END
 
 ROM_START( superkds )
-	ROM_REGION( 0x04000, "maincpu", 0 ) // Internal rom of IGS027A ARM based MCU */
+	ROM_REGION( 0x04000, "maincpu", 0 ) // Internal rom of IGS027A ARM based MCU
 	ROM_LOAD( "superkids_igs027a.bin", 0x00000, 0x4000, CRC(9a8e790d) SHA1(ab020a04a4ed0c0e5ec8c979f206fe57572d2304) ) // sticker marked 'F5'
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
@@ -208,6 +212,7 @@ void igs_fear_state::init_igs_fear()
 	*/
 	fearless_decrypt(machine());
 }
+
 void igs_fear_state::init_igs_superkds()
 {
 	/*

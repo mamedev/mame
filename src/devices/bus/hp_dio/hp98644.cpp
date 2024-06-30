@@ -8,9 +8,10 @@
 
 #include "emu.h"
 #include "hp98644.h"
+
 #include "bus/rs232/rs232.h"
 #include "machine/ins8250.h"
-#include "hp_dio.h"
+
 
 namespace {
 

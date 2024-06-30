@@ -1140,12 +1140,12 @@ void floppy_image_device::cache_clear()
 void floppy_image_device::cache_fill(const attotime &when)
 {
 	std::vector<uint32_t> &buf = m_image->get_buffer(m_cyl, m_ss, m_subcyl);
-	uint32_t cells = buf.size();
+	uint32_t const cells = buf.size();
 	if(cells <= 1) {
 		m_cache_start_time = attotime::zero;
 		m_cache_end_time = attotime::never;
 		m_cache_index = 0;
-		m_cache_entry = cells == 1 ? buf[0] : floppy_image::MG_N;
+		m_cache_entry = (cells == 1) ? buf[0] : floppy_image::MG_N;
 		cache_weakness_setup();
 		return;
 	}
@@ -1153,25 +1153,23 @@ void floppy_image_device::cache_fill(const attotime &when)
 	attotime base;
 	uint32_t position = find_position(base, when);
 
-	auto it = std::upper_bound(
-		buf.begin(), buf.end(), position,
-		[](uint32_t a, uint32_t b) {
-			return a < (b & floppy_image::TIME_MASK);
-		}
-	);
+	auto const it = std::upper_bound(
+			buf.begin(), buf.end(), position,
+			[] (uint32_t a, uint32_t b) { return a < (b & floppy_image::TIME_MASK); });
 
-	int index = int(it - buf.begin()) - 1;
-
-	if(index == -1) {
+	int index;
+	if(buf.begin() == it) {
 		base -= m_rev_time;
 		index = buf.size() - 1;
+	} else {
+		index = int(it - buf.begin()) - 1;
 	}
 
 	for(;;) {
 		cache_fill_index(buf, index, base);
 		if(m_cache_end_time > when) {
 			cache_weakness_setup();
-			return;
+			break;
 		}
 	}
 }

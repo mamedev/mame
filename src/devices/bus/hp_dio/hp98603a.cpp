@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "hp98603a.h"
-#include "hp_dio.h"
+
 
 #define HP98603A_ROM_REGION    "98603a_rom"
 

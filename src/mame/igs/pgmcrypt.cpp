@@ -1418,6 +1418,7 @@ static const uint8_t superkds_tab[256] = {
 
 void superkds_decrypt(running_machine &machine)
 {
+	// FIXME: Endianness bug - casting a 32-bit ROM region to u16
 	auto const src = reinterpret_cast<u16 *>(machine.root_device().memregion("user1")->base());
 
 	int const rom_size = 0x80000;
@@ -1435,7 +1436,7 @@ void superkds_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
-		x ^= superkds_tab[(i>> 1) & 0xff] << 8;
+		x ^= superkds_tab[(i >> 1) & 0xff] << 8;
 
 		src[i] = x;
 	}
@@ -1443,6 +1444,7 @@ void superkds_decrypt(running_machine &machine)
 
 void fearless_decrypt(running_machine &machine)
 {
+	// FIXME: Endianness bug - casting a 32-bit ROM region to u16
 	auto const src = reinterpret_cast<u16 *>(machine.root_device().memregion("user1")->base());
 
 	int const rom_size = 0x80000;
@@ -1461,7 +1463,7 @@ void fearless_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
-		x ^= superkds_tab[(i>> 1) & 0xff] << 8;
+		x ^= superkds_tab[(i >> 1) & 0xff] << 8;
 
 		src[i] = x;
 	}

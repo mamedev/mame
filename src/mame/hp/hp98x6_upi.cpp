@@ -32,9 +32,12 @@
 #include "emu.h"
 #include "hp98x6_upi.h"
 
+#include "speaker.h"
+
 // Debugging
 #define VERBOSE 1
 #include "logmacro.h"
+
 
 // Bit manipulation
 namespace {
@@ -440,33 +443,33 @@ void hp98x6_upi_device::device_reset()
 
 	m_last_dial = m_dial->read();
 	m_beep->set_state(0);
-	m_ram[ RAM_POS_0_R2_FLAGS1 ] = 0;
+	m_ram[RAM_POS_0_R2_FLAGS1] = 0;
 	// Mask out all interrupts
-	m_ram[ RAM_POS_0_R4_FLAGS2 ] =
+	m_ram[RAM_POS_0_R4_FLAGS2] =
 		BIT_MASK<uint8_t>(R4_FLAGS2_FHS_MASK_BIT) |
 		BIT_MASK<uint8_t>(R4_FLAGS2_PSI_MASK_BIT) |
 		BIT_MASK<uint8_t>(R4_FLAGS2_TMR_MASK_BIT) |
 		BIT_MASK<uint8_t>(R4_FLAGS2_RST_MASK_BIT) |
 		BIT_MASK<uint8_t>(R4_FLAGS2_KEY_MASK_BIT);
-	m_ram[ RAM_POS_0_R5_FLAGS3 ] = 0;
-	m_ram[ RAM_POS_0_R6_ROLLOVER ] = SCANCODE_NONE;
-	m_ram[ RAM_POS_0_R7_KEY_DOWN ] = SCANCODE_NONE;
+	m_ram[RAM_POS_0_R5_FLAGS3] = 0;
+	m_ram[RAM_POS_0_R6_ROLLOVER] = SCANCODE_NONE;
+	m_ram[RAM_POS_0_R7_KEY_DOWN] = SCANCODE_NONE;
 	// Assume RESET key is down
-	m_ram[ RAM_POS_RST_DEB_CNT ] = R2_FLAGS1_DEB_INIT;
+	m_ram[RAM_POS_RST_DEB_CNT] = R2_FLAGS1_DEB_INIT;
 	// PROM is present
-	m_ram[ RAM_POS_CFG_JUMPERS ] = BIT_MASK<uint8_t>(CFG_JUMPERS_PROM_BIT);
+	m_ram[RAM_POS_CFG_JUMPERS] = BIT_MASK<uint8_t>(CFG_JUMPERS_PROM_BIT);
 	// Assume US English
-	m_ram[ RAM_POS_LNG_JUMPERS ] = 0;
-	m_ram[ RAM_POS_1_R3_TIMER_STS ] = 0;
-	m_ram[ RAM_POS_1_R4_RPG_COUNT ] = 0;
-	m_ram[ RAM_POS_1_R5_W_PTR ] = 0;
-	m_ram[ RAM_POS_READING_PROM ] = 0;
+	m_ram[RAM_POS_LNG_JUMPERS] = 0;
+	m_ram[RAM_POS_1_R3_TIMER_STS] = 0;
+	m_ram[RAM_POS_1_R4_RPG_COUNT] = 0;
+	m_ram[RAM_POS_1_R5_W_PTR] = 0;
+	m_ram[RAM_POS_READING_PROM] = 0;
 
 	// Note that RAM is not cleared to avoid losing TOD after an UPI reset
 
 	m_status = 0;
 	m_ready = false;
-	m_fsm_state = FSM_ST::ST_POR_TEST1;
+	m_fsm_state = fsm_st::ST_POR_TEST1;
 	m_delay_timer->adjust(clocks_to_attotime(POR_DELAY1));
 	m_input_delay_timer->reset();
 }
@@ -483,24 +486,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp98x6_upi_device::ten_ms)
 TIMER_DEVICE_CALLBACK_MEMBER(hp98x6_upi_device::delay)
 {
 	switch (m_fsm_state) {
-	case FSM_ST::ST_POR_TEST1:
+	case fsm_st::ST_POR_TEST1:
 		m_irq1_write_func(false);
-		m_fsm_state = FSM_ST::ST_POR_TEST2;
+		m_fsm_state = fsm_st::ST_POR_TEST2;
 		m_delay_timer->adjust(clocks_to_attotime(POR_DELAY2));
 		break;
 
-	case FSM_ST::ST_POR_TEST2:
+	case fsm_st::ST_POR_TEST2:
 		write_ob_st(POST_BYTE, ST_POST_OK);
-		m_fsm_state = FSM_ST::ST_IDLE;
+		m_fsm_state = fsm_st::ST_IDLE;
 		update_fsm();
 		break;
 
-	case FSM_ST::ST_RESETTING:
+	case fsm_st::ST_RESETTING:
 		// Send NMI to 68k
 		m_irq7_write_func(true);
 		// F0 = 0 means "NMI from RESET key"
 		BIT_CLR(m_status, STATUS_F0_BIT);
-		m_fsm_state = FSM_ST::ST_IDLE;
+		m_fsm_state = fsm_st::ST_IDLE;
 		update_fsm();
 		break;
 
@@ -537,24 +540,24 @@ void hp98x6_upi_device::update_fsm()
 	uint8_t in_data;
 
 	// Check for incoming command or data
-	if (m_fsm_state == FSM_ST::ST_IDLE &&
+	if (m_fsm_state == fsm_st::ST_IDLE &&
 		m_ready &&
 		read_ib(in_data)) {
 		if (BIT(m_status, STATUS_F1_BIT)) {
 			// Command
 			LOG("UPI cmd %02x\n", in_data);
 			decode_cmd(in_data);
-		} else if (m_ram[ RAM_POS_1_R5_W_PTR ]) {
+		} else if (m_ram[RAM_POS_1_R5_W_PTR]) {
 			// Data
 			LOG("UPI data %02x\n", in_data);
-			uint8_t w_ptr = m_ram[ RAM_POS_1_R5_W_PTR ];
+			uint8_t w_ptr = m_ram[RAM_POS_1_R5_W_PTR];
 			if (w_ptr >= RAM_POS_TOD_1 && w_ptr <= RAM_POS_TOD_3) {
 				// Data written to TOD are summed in, not just stored
 				uint8_t inc[] = { 0, 0, 0 };
-				inc[ w_ptr - RAM_POS_TOD_1 ] = in_data;
+				inc[w_ptr - RAM_POS_TOD_1] = in_data;
 				(void)add_to_ctr(RAM_POS_TOD_1, 3, inc);
 			} else {
-				m_ram[ w_ptr ] = in_data;
+				m_ram[w_ptr] = in_data;
 			}
 			// Additional actions triggered by writing at the end of
 			// various counters
@@ -564,29 +567,29 @@ void hp98x6_upi_device::update_fsm()
 				if (in_data != 0) {
 					m_beep->set_clock((clock() * in_data) / BEEP_SCALING);
 					m_beep->set_state(1);
-					BIT_SET(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_BEEP_BIT);
+					BIT_SET(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_BEEP_BIT);
 				} else {
 					m_beep->set_state(0);
-					BIT_CLR(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_BEEP_BIT);
+					BIT_CLR(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_BEEP_BIT);
 				}
 				break;
 			case RAM_POS_RPG_INT_RATE:
-				m_ram[ RAM_POS_RPG_TIMER ] = m_ram[ RAM_POS_RPG_INT_RATE ];
+				m_ram[RAM_POS_RPG_TIMER] = m_ram[RAM_POS_RPG_INT_RATE];
 				break;
 			case RAM_POS_FHS_2:
-				BIT_SET(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_FHS_BIT);
+				BIT_SET(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_FHS_BIT);
 				break;
 			case RAM_POS_MATCH_3:
-				BIT_SET(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_MATCH_BIT);
+				BIT_SET(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_MATCH_BIT);
 				break;
 			case RAM_POS_DELAY_3:
-				BIT_SET(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_DELAY_BIT);
+				BIT_SET(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_DELAY_BIT);
 				break;
 			case RAM_POS_CYCLE_3:
-				BIT_SET(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_CYCLE_BIT);
-				m_ram[ RAM_POS_CYCLE_SAVE_1 ] = m_ram[ RAM_POS_CYCLE_1 ];
-				m_ram[ RAM_POS_CYCLE_SAVE_2 ] = m_ram[ RAM_POS_CYCLE_2 ];
-				m_ram[ RAM_POS_CYCLE_SAVE_3 ] = m_ram[ RAM_POS_CYCLE_3 ];
+				BIT_SET(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_CYCLE_BIT);
+				m_ram[RAM_POS_CYCLE_SAVE_1] = m_ram[RAM_POS_CYCLE_1];
+				m_ram[RAM_POS_CYCLE_SAVE_2] = m_ram[RAM_POS_CYCLE_2];
+				m_ram[RAM_POS_CYCLE_SAVE_3] = m_ram[RAM_POS_CYCLE_3];
 				break;
 			}
 
@@ -595,7 +598,7 @@ void hp98x6_upi_device::update_fsm()
 			if (w_ptr > 0x3f) {
 				LOG("Write pointer overflow\n");
 			} else {
-				m_ram[ RAM_POS_1_R5_W_PTR ] = w_ptr;
+				m_ram[RAM_POS_1_R5_W_PTR] = w_ptr;
 			}
 		} else {
 			// Not writing, data not expected
@@ -609,46 +612,46 @@ void hp98x6_upi_device::update_fsm()
 void hp98x6_upi_device::decode_cmd(uint8_t cmd)
 {
 	// Not writing to RAM unless we get the write command
-	m_ram[ RAM_POS_1_R5_W_PTR ] = 0;
+	m_ram[RAM_POS_1_R5_W_PTR] = 0;
 
 	// Decode command categories first
 	switch (cmd & CMD_MASK) {
 	case CMD_RD_RAM_LOW:
 		// 000x'xxxx
 		// Read low RAM
-		m_ram[ RAM_POS_1_R6_R_PTR ] = cmd & CMD_PARAM;
+		m_ram[RAM_POS_1_R6_R_PTR] = cmd & CMD_PARAM;
 		// Read from ID PROM when enabled
-		if (m_ram[ RAM_POS_READING_PROM ] &&
-			m_ram[ RAM_POS_1_R6_R_PTR ] == RAM_POS_0_R1) {
-			m_ram[ RAM_POS_0_R1 ] = id_prom[ m_ram[ RAM_POS_PROM_ADDR ] ];
-			LOG("PROM @%02x=%02x\n", m_ram[ RAM_POS_PROM_ADDR ], m_ram[ RAM_POS_0_R1 ]);
-			m_ram[ RAM_POS_PROM_ADDR ]++;
+		if (m_ram[RAM_POS_READING_PROM] &&
+			m_ram[RAM_POS_1_R6_R_PTR] == RAM_POS_0_R1) {
+			m_ram[RAM_POS_0_R1] = id_prom[m_ram[RAM_POS_PROM_ADDR]];
+			LOG("PROM @%02x=%02x\n", m_ram[RAM_POS_PROM_ADDR], m_ram[RAM_POS_0_R1]);
+			m_ram[RAM_POS_PROM_ADDR]++;
 		}
-		BIT_SET(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_READ_BIT);
+		BIT_SET(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_READ_BIT);
 		break;
 	case CMD_RD_RAM_HIGH:
 		// 001x'xxxx
 		// Read high RAM
 		{
 			unsigned idx = RAM_POS_HIGH_RAM_START - 4 + (cmd & CMD_PARAM);
-			m_ram[ RAM_POS_OUT_BUFF_1 ] = m_ram[ idx++ ];
-			m_ram[ RAM_POS_OUT_BUFF_2 ] = m_ram[ idx++ ];
-			m_ram[ RAM_POS_OUT_BUFF_3 ] = m_ram[ idx++ ];
-			m_ram[ RAM_POS_OUT_BUFF_4 ] = m_ram[ idx++ ];
-			m_ram[ RAM_POS_OUT_BUFF_5 ] = m_ram[ idx ];
+			m_ram[RAM_POS_OUT_BUFF_1] = m_ram[idx++];
+			m_ram[RAM_POS_OUT_BUFF_2] = m_ram[idx++];
+			m_ram[RAM_POS_OUT_BUFF_3] = m_ram[idx++];
+			m_ram[RAM_POS_OUT_BUFF_4] = m_ram[idx++];
+			m_ram[RAM_POS_OUT_BUFF_5] = m_ram[idx];
 		}
 		break;
 	case CMD_SET_INT_MASK:
 		// 010x'xxxx
 		// Set interrupt mask
-		m_ram[ RAM_POS_0_R4_FLAGS2 ] &= ~CMD_PARAM;
-		m_ram[ RAM_POS_0_R4_FLAGS2 ] |= (cmd & CMD_PARAM);
+		m_ram[RAM_POS_0_R4_FLAGS2] &= ~CMD_PARAM;
+		m_ram[RAM_POS_0_R4_FLAGS2] |= (cmd & CMD_PARAM);
 		try_fhs_output();
 		break;
 	case CMD_WR_RAM_HIGH:
 		// 101x'xxxx
 		// Write high RAM
-		m_ram[ RAM_POS_1_R5_W_PTR ] = RAM_POS_HIGH_RAM_START + (cmd & CMD_PARAM);
+		m_ram[RAM_POS_1_R5_W_PTR] = RAM_POS_HIGH_RAM_START + (cmd & CMD_PARAM);
 		break;
 	default:
 		// Decode single commands
@@ -657,14 +660,14 @@ void hp98x6_upi_device::decode_cmd(uint8_t cmd)
 			// 1100'0001
 			// Start reading ID PROM
 			LOG("Start PROM read\n");
-			m_ram[ RAM_POS_READING_PROM ] = 1;
-			m_ram[ RAM_POS_PROM_ADDR ] = 0;
+			m_ram[RAM_POS_READING_PROM] = 1;
+			m_ram[RAM_POS_PROM_ADDR] = 0;
 			break;
 		case CMD_RD_PROM_STOP:
 			// 1100'0000
 			// Stop reading ID PROM
 			LOG("Stop PROM read\n");
-			m_ram[ RAM_POS_READING_PROM ] = 0;
+			m_ram[RAM_POS_READING_PROM] = 0;
 			break;
 		default:
 			LOG("Unknown UPI cmd %02x\n", cmd);
@@ -673,43 +676,43 @@ void hp98x6_upi_device::decode_cmd(uint8_t cmd)
 	}
 
 	// Then decode write commands that require additional actions
-	switch (m_ram[ RAM_POS_1_R5_W_PTR ]) {
+	switch (m_ram[RAM_POS_1_R5_W_PTR]) {
 	case RAM_POS_TOD_1:
 		// Set time-of-day
-		m_ram[ RAM_POS_TOD_1 ] = 0;
-		m_ram[ RAM_POS_TOD_2 ] = 0;
-		m_ram[ RAM_POS_TOD_3 ] = 0;
+		m_ram[RAM_POS_TOD_1] = 0;
+		m_ram[RAM_POS_TOD_2] = 0;
+		m_ram[RAM_POS_TOD_3] = 0;
 		break;
 	case RAM_POS_DAY_1 - 1:
 		// Set day
-		m_ram[ RAM_POS_1_R5_W_PTR ] = RAM_POS_DAY_1;
+		m_ram[RAM_POS_1_R5_W_PTR] = RAM_POS_DAY_1;
 		break;
 	case RAM_POS_FHS_1:
 		// Set FHS
-		BIT_CLR(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_FHS_BIT);
-		BIT_CLR(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_FHS_BIT);
+		BIT_CLR(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_FHS_BIT);
+		BIT_CLR(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_FHS_BIT);
 		m_irq7_write_func(false);
 		break;
 	case RAM_POS_MATCH_1:
-		BIT_CLR(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_MATCH_BIT);
-		BIT_CLR(m_ram[ RAM_POS_1_R3_TIMER_STS ], R3_TIMER_STS_MATCH_BIT);
-		if ((m_ram[ RAM_POS_1_R3_TIMER_STS ] & R3_TIMER_STS_INT_MASK) == 0) {
-			BIT_CLR(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_USER_TMR_BIT);
+		BIT_CLR(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_MATCH_BIT);
+		BIT_CLR(m_ram[RAM_POS_1_R3_TIMER_STS], R3_TIMER_STS_MATCH_BIT);
+		if ((m_ram[RAM_POS_1_R3_TIMER_STS] & R3_TIMER_STS_INT_MASK) == 0) {
+			BIT_CLR(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_USER_TMR_BIT);
 		}
 		break;
 	case RAM_POS_DELAY_1:
-		BIT_CLR(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_DELAY_BIT);
-		BIT_CLR(m_ram[ RAM_POS_1_R3_TIMER_STS ], R3_TIMER_STS_DELAY_BIT);
-		if ((m_ram[ RAM_POS_1_R3_TIMER_STS ] & R3_TIMER_STS_INT_MASK) == 0) {
-			BIT_CLR(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_USER_TMR_BIT);
+		BIT_CLR(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_DELAY_BIT);
+		BIT_CLR(m_ram[RAM_POS_1_R3_TIMER_STS], R3_TIMER_STS_DELAY_BIT);
+		if ((m_ram[RAM_POS_1_R3_TIMER_STS] & R3_TIMER_STS_INT_MASK) == 0) {
+			BIT_CLR(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_USER_TMR_BIT);
 		}
 		break;
 	case RAM_POS_CYCLE_1:
-		BIT_CLR(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_CYCLE_BIT);
-		m_ram[ RAM_POS_1_R3_TIMER_STS ] &= ~(R3_TIMER_STS_MISSED_CYCLES_MASK |
+		BIT_CLR(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_CYCLE_BIT);
+		m_ram[RAM_POS_1_R3_TIMER_STS] &= ~(R3_TIMER_STS_MISSED_CYCLES_MASK |
 											 BIT_MASK<uint8_t>(R3_TIMER_STS_CYCLE_BIT));
-		if ((m_ram[ RAM_POS_1_R3_TIMER_STS ] & R3_TIMER_STS_INT_MASK) == 0) {
-			BIT_CLR(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_USER_TMR_BIT);
+		if ((m_ram[RAM_POS_1_R3_TIMER_STS] & R3_TIMER_STS_INT_MASK) == 0) {
+			BIT_CLR(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_USER_TMR_BIT);
 		}
 		break;
 	}
@@ -720,13 +723,13 @@ bool hp98x6_upi_device::add_to_ctr(unsigned ram_idx, unsigned len, const uint8_t
 	unsigned carry = 0;
 
 	for (unsigned i = ram_idx; i < ram_idx + len; i++) {
-		unsigned sum = unsigned(m_ram[ i ]) + carry + *op++;
+		unsigned sum = unsigned(m_ram[i]) + carry + *op++;
 		if (sum < 256) {
 			carry = 0;
-			m_ram[ i ] = uint8_t(sum);
+			m_ram[i] = uint8_t(sum);
 		} else {
 			carry = 1;
-			m_ram[ i ] = uint8_t(sum - 256);
+			m_ram[i] = uint8_t(sum - 256);
 		}
 	}
 
@@ -737,81 +740,81 @@ void hp98x6_upi_device::ten_ms_update_key()
 {
 	// Acquire shift & control (note that bits in R5_FLAGS3 are inverted)
 	if (BIT(m_shift->read(), 0)) {
-		BIT_CLR(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_SHIFT_UP_BIT);
+		BIT_CLR(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_SHIFT_UP_BIT);
 	} else {
-		BIT_SET(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_SHIFT_UP_BIT);
+		BIT_SET(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_SHIFT_UP_BIT);
 	}
 	if (BIT(m_shift->read(), 1)) {
-		BIT_CLR(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_CTRL_UP_BIT);
+		BIT_CLR(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_CTRL_UP_BIT);
 	} else {
-		BIT_SET(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_CTRL_UP_BIT);
+		BIT_SET(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_CTRL_UP_BIT);
 	}
 
 	// Scan keyboard
-	ioport_value keys[ 4 ];
+	ioport_value keys[4];
 	acquire_keys(keys);
 
 	for (uint8_t idx = MIN_SCANCODE; idx <= MAX_SCANCODE; idx++) {
 		if (is_key_down(keys, idx)) {
 			// Check for RESET key combo
-			if (!BIT(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_SHIFT_UP_BIT) &&
+			if (!BIT(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_SHIFT_UP_BIT) &&
 				idx == PAUSE_SCANCODE) {
-				if (m_ram[ RAM_POS_RST_DEB_CNT ] == 0 &&
-					!BIT(m_ram[ RAM_POS_0_R4_FLAGS2 ], R4_FLAGS2_RST_MASK_BIT)) {
+				if (m_ram[RAM_POS_RST_DEB_CNT] == 0 &&
+					!BIT(m_ram[RAM_POS_0_R4_FLAGS2], R4_FLAGS2_RST_MASK_BIT)) {
 					// RESET key pressed: start delay to interrupt 68k
 					LOG("Reset pressed\n");
-					m_fsm_state = FSM_ST::ST_RESETTING;
+					m_fsm_state = fsm_st::ST_RESETTING;
 					m_delay_timer->adjust(clocks_to_attotime(RESET_DELAY));
 					// Reset cancels FHS timer
-					BIT_CLR(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_FHS_BIT);
-					BIT_CLR(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_FHS_BIT);
+					BIT_CLR(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_FHS_BIT);
+					BIT_CLR(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_FHS_BIT);
 				}
-				m_ram[ RAM_POS_RST_DEB_CNT ] = R2_FLAGS1_DEB_INIT;
-			} else if (idx != m_ram[ RAM_POS_0_R7_KEY_DOWN ]) {
-				if (m_ram[ RAM_POS_0_R7_KEY_DOWN ] == SCANCODE_NONE) {
+				m_ram[RAM_POS_RST_DEB_CNT] = R2_FLAGS1_DEB_INIT;
+			} else if (idx != m_ram[RAM_POS_0_R7_KEY_DOWN]) {
+				if (m_ram[RAM_POS_0_R7_KEY_DOWN] == SCANCODE_NONE) {
 					// New key is down
 					LOG("Key %02x\n", idx);
 					set_new_key(idx);
-				} else if (m_ram[ RAM_POS_0_R6_ROLLOVER ] == SCANCODE_NONE) {
+				} else if (m_ram[RAM_POS_0_R6_ROLLOVER] == SCANCODE_NONE) {
 					// Save roll-over key
 					LOG("Rollover key %02x\n", idx);
-					m_ram[ RAM_POS_0_R6_ROLLOVER ] = idx;
+					m_ram[RAM_POS_0_R6_ROLLOVER] = idx;
 				}
 			} else {
 				// Key kept down, reload debounce counter
-				m_ram[ RAM_POS_0_R2_FLAGS1 ] = (m_ram[ RAM_POS_0_R2_FLAGS1 ] & ~R2_FLAGS1_DEB_MASK) | R2_FLAGS1_DEB_INIT;
+				m_ram[RAM_POS_0_R2_FLAGS1] = (m_ram[RAM_POS_0_R2_FLAGS1] & ~R2_FLAGS1_DEB_MASK) | R2_FLAGS1_DEB_INIT;
 			}
 		}
 	}
 
 	// Debounce RESET key
-	if (m_ram[ RAM_POS_RST_DEB_CNT ] != 0) {
-		m_ram[ RAM_POS_RST_DEB_CNT ]--;
+	if (m_ram[RAM_POS_RST_DEB_CNT] != 0) {
+		m_ram[RAM_POS_RST_DEB_CNT]--;
 	}
 
 	// Debounce, auto-repeat and roll-over
-	if (m_ram[ RAM_POS_0_R7_KEY_DOWN ] != SCANCODE_NONE) {
+	if (m_ram[RAM_POS_0_R7_KEY_DOWN] != SCANCODE_NONE) {
 		// Do debouncing
-		m_ram[ RAM_POS_0_R2_FLAGS1 ]--;
-		if ((m_ram[ RAM_POS_0_R2_FLAGS1 ] & R2_FLAGS1_DEB_MASK) != 0) {
+		m_ram[RAM_POS_0_R2_FLAGS1]--;
+		if ((m_ram[RAM_POS_0_R2_FLAGS1] & R2_FLAGS1_DEB_MASK) != 0) {
 			// Key still down
-			m_ram[ RAM_POS_AR_TIMER ]++;
-			if (m_ram[ RAM_POS_AR_TIMER ] == 0) {
+			m_ram[RAM_POS_AR_TIMER]++;
+			if (m_ram[RAM_POS_AR_TIMER] == 0) {
 				// Repeat key if A/R is enabled
-				m_ram[ RAM_POS_AR_TIMER ] = m_ram[ RAM_POS_AR_RATE ];
-				if (m_ram[ RAM_POS_AR_RATE ]) {
-					LOG("A/R key %02x\n", m_ram[ RAM_POS_0_R7_KEY_DOWN ]);
-					BIT_SET(m_ram[ RAM_POS_0_R4_FLAGS2 ], R4_FLAGS2_AR_BIT);
+				m_ram[RAM_POS_AR_TIMER] = m_ram[RAM_POS_AR_RATE];
+				if (m_ram[RAM_POS_AR_RATE]) {
+					LOG("A/R key %02x\n", m_ram[RAM_POS_0_R7_KEY_DOWN]);
+					BIT_SET(m_ram[RAM_POS_0_R4_FLAGS2], R4_FLAGS2_AR_BIT);
 				}
 			}
 			// Key is up & debounced, get roll-over key (if any)
-		} else if (m_ram[ RAM_POS_0_R6_ROLLOVER ] != SCANCODE_NONE) {
-			LOG("Shift rollover key %02x\n", m_ram[ RAM_POS_0_R6_ROLLOVER ]);
-			set_new_key(m_ram[ RAM_POS_0_R6_ROLLOVER ]);
-			m_ram[ RAM_POS_0_R6_ROLLOVER ] = SCANCODE_NONE;
+		} else if (m_ram[RAM_POS_0_R6_ROLLOVER] != SCANCODE_NONE) {
+			LOG("Shift rollover key %02x\n", m_ram[RAM_POS_0_R6_ROLLOVER]);
+			set_new_key(m_ram[RAM_POS_0_R6_ROLLOVER]);
+			m_ram[RAM_POS_0_R6_ROLLOVER] = SCANCODE_NONE;
 		} else {
-			m_ram[ RAM_POS_0_R7_KEY_DOWN ] = SCANCODE_NONE;
-			BIT_CLR(m_ram[ RAM_POS_0_R4_FLAGS2 ], R4_FLAGS2_AR_BIT);
+			m_ram[RAM_POS_0_R7_KEY_DOWN] = SCANCODE_NONE;
+			BIT_CLR(m_ram[RAM_POS_0_R4_FLAGS2], R4_FLAGS2_AR_BIT);
 		}
 	}
 }
@@ -827,7 +830,7 @@ void hp98x6_upi_device::ten_ms_update_dial()
 			diff_int -= 256;
 		}
 		LOG("DIAL %d\n", diff_int);
-		int pos = int(m_ram[ RAM_POS_1_R4_RPG_COUNT ]);
+		int pos = int(m_ram[RAM_POS_1_R4_RPG_COUNT]);
 		// Sign extension
 		if (BIT(pos, 7)) {
 			pos -= 256;
@@ -840,16 +843,16 @@ void hp98x6_upi_device::ten_ms_update_dial()
 			pos = 127;
 		}
 
-		m_ram[ RAM_POS_1_R4_RPG_COUNT ] = uint8_t(pos);
+		m_ram[RAM_POS_1_R4_RPG_COUNT] = uint8_t(pos);
 		m_last_dial = dial;
 	}
 
-	if (--m_ram[ RAM_POS_RPG_TIMER ] == 0) {
+	if (--m_ram[RAM_POS_RPG_TIMER] == 0) {
 		// Dial timer expired
-		m_ram[ RAM_POS_RPG_TIMER ] = m_ram[ RAM_POS_RPG_INT_RATE ];
-		if (m_ram[ RAM_POS_1_R4_RPG_COUNT ]) {
+		m_ram[RAM_POS_RPG_TIMER] = m_ram[RAM_POS_RPG_INT_RATE];
+		if (m_ram[RAM_POS_1_R4_RPG_COUNT]) {
 			// Time to send dial movement to 68k
-			BIT_SET(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_RPG_BIT);
+			BIT_SET(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_RPG_BIT);
 		}
 	}
 }
@@ -857,99 +860,99 @@ void hp98x6_upi_device::ten_ms_update_dial()
 void hp98x6_upi_device::ten_ms_update_timers()
 {
 	// 10-ms timer is up
-	BIT_SET(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_PSI_BIT);
+	BIT_SET(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_PSI_BIT);
 
 	// Advance TOD
 	uint8_t one[] = { 1, 0, 0 };
 	(void)add_to_ctr(RAM_POS_TOD_1, 3, one);
 	// Check for one full day of counting
-	if (m_ram[ RAM_POS_TOD_3 ] > TOD_3_ONE_DAY ||
-		(m_ram[ RAM_POS_TOD_3 ] == TOD_3_ONE_DAY &&
-		 (m_ram[ RAM_POS_TOD_2 ] > TOD_2_ONE_DAY ||
-		  (m_ram[ RAM_POS_TOD_2 ] == TOD_2_ONE_DAY &&
-		   m_ram[ RAM_POS_TOD_1 ] >= TOD_1_ONE_DAY)))) {
+	if (m_ram[RAM_POS_TOD_3] > TOD_3_ONE_DAY ||
+		(m_ram[RAM_POS_TOD_3] == TOD_3_ONE_DAY &&
+		 (m_ram[RAM_POS_TOD_2] > TOD_2_ONE_DAY ||
+		  (m_ram[RAM_POS_TOD_2] == TOD_2_ONE_DAY &&
+		   m_ram[RAM_POS_TOD_1] >= TOD_1_ONE_DAY)))) {
 		// Clear TOD and advance DAY counter
-		m_ram[ RAM_POS_TOD_1 ] = 0;
-		m_ram[ RAM_POS_TOD_2 ] = 0;
-		m_ram[ RAM_POS_TOD_3 ] = 0;
+		m_ram[RAM_POS_TOD_1] = 0;
+		m_ram[RAM_POS_TOD_2] = 0;
+		m_ram[RAM_POS_TOD_3] = 0;
 		(void)add_to_ctr(RAM_POS_DAY_1, 2, one);
 	}
 
 	// Check if "match" timer matches TOD
-	if (BIT(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_MATCH_BIT) &&
-		m_ram[ RAM_POS_TOD_1 ] == m_ram[ RAM_POS_MATCH_1 ] &&
-		m_ram[ RAM_POS_TOD_2 ] == m_ram[ RAM_POS_MATCH_2 ] &&
-		m_ram[ RAM_POS_TOD_3 ] == m_ram[ RAM_POS_MATCH_3 ]) {
-		BIT_SET(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_USER_TMR_BIT);
-		BIT_SET(m_ram[ RAM_POS_1_R3_TIMER_STS ], R3_TIMER_STS_MATCH_BIT);
+	if (BIT(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_MATCH_BIT) &&
+		m_ram[RAM_POS_TOD_1] == m_ram[RAM_POS_MATCH_1] &&
+		m_ram[RAM_POS_TOD_2] == m_ram[RAM_POS_MATCH_2] &&
+		m_ram[RAM_POS_TOD_3] == m_ram[RAM_POS_MATCH_3]) {
+		BIT_SET(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_USER_TMR_BIT);
+		BIT_SET(m_ram[RAM_POS_1_R3_TIMER_STS], R3_TIMER_STS_MATCH_BIT);
 		// Match timer is self-canceling
-		BIT_CLR(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_MATCH_BIT);
+		BIT_CLR(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_MATCH_BIT);
 	}
 
 	// Update FHS timer
-	if (BIT(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_FHS_BIT) &&
+	if (BIT(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_FHS_BIT) &&
 		add_to_ctr(RAM_POS_FHS_1, 2, one)) {
-		BIT_SET(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_FHS_BIT);
+		BIT_SET(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_FHS_BIT);
 		// Is the FHS timer self-canceling?
 		try_fhs_output();
 	}
 
 	// Update cyclic timer
-	if (BIT(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_CYCLE_BIT) &&
+	if (BIT(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_CYCLE_BIT) &&
 		add_to_ctr(RAM_POS_CYCLE_1, 3, one)) {
-		if (BIT(m_ram[ RAM_POS_1_R3_TIMER_STS ], R3_TIMER_STS_CYCLE_BIT) &&
-			(m_ram[ RAM_POS_1_R3_TIMER_STS ] & R3_TIMER_STS_MISSED_CYCLES_MASK) != R3_TIMER_STS_MISSED_CYCLES_MASK) {
+		if (BIT(m_ram[RAM_POS_1_R3_TIMER_STS], R3_TIMER_STS_CYCLE_BIT) &&
+			(m_ram[RAM_POS_1_R3_TIMER_STS] & R3_TIMER_STS_MISSED_CYCLES_MASK) != R3_TIMER_STS_MISSED_CYCLES_MASK) {
 			// Increment number of missed cycle interrupts
-			m_ram[ RAM_POS_1_R3_TIMER_STS ]++;
+			m_ram[RAM_POS_1_R3_TIMER_STS]++;
 		}
-		BIT_SET(m_ram[ RAM_POS_1_R3_TIMER_STS ], R3_TIMER_STS_CYCLE_BIT);
-		BIT_SET(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_USER_TMR_BIT);
+		BIT_SET(m_ram[RAM_POS_1_R3_TIMER_STS], R3_TIMER_STS_CYCLE_BIT);
+		BIT_SET(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_USER_TMR_BIT);
 		// Reload timer
-		m_ram[ RAM_POS_CYCLE_1 ] = m_ram[ RAM_POS_CYCLE_SAVE_1 ];
-		m_ram[ RAM_POS_CYCLE_2 ] = m_ram[ RAM_POS_CYCLE_SAVE_2 ];
-		m_ram[ RAM_POS_CYCLE_3 ] = m_ram[ RAM_POS_CYCLE_SAVE_3 ];
+		m_ram[RAM_POS_CYCLE_1] = m_ram[RAM_POS_CYCLE_SAVE_1];
+		m_ram[RAM_POS_CYCLE_2] = m_ram[RAM_POS_CYCLE_SAVE_2];
+		m_ram[RAM_POS_CYCLE_3] = m_ram[RAM_POS_CYCLE_SAVE_3];
 	}
 
 	// Update delay timer
-	if (BIT(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_DELAY_BIT) &&
+	if (BIT(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_DELAY_BIT) &&
 		add_to_ctr(RAM_POS_DELAY_1, 3, one)) {
-		BIT_SET(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_USER_TMR_BIT);
-		BIT_SET(m_ram[ RAM_POS_1_R3_TIMER_STS ], R3_TIMER_STS_DELAY_BIT);
+		BIT_SET(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_USER_TMR_BIT);
+		BIT_SET(m_ram[RAM_POS_1_R3_TIMER_STS], R3_TIMER_STS_DELAY_BIT);
 		// Is the delay timer self-canceling?
 	}
 }
 
 void hp98x6_upi_device::ten_ms_update_beep()
 {
-	if (BIT(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_BEEP_BIT) &&
-		++m_ram[ RAM_POS_BEEP_TIMER ] == 0) {
+	if (BIT(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_BEEP_BIT) &&
+		++m_ram[RAM_POS_BEEP_TIMER] == 0) {
 		m_beep->set_state(0);
-		BIT_CLR(m_ram[ RAM_POS_0_R2_FLAGS1 ], R2_FLAGS1_BEEP_BIT);
+		BIT_CLR(m_ram[RAM_POS_0_R2_FLAGS1], R2_FLAGS1_BEEP_BIT);
 	}
 }
 
 void hp98x6_upi_device::set_new_key(uint8_t scancode)
 {
-	m_ram[ RAM_POS_0_R7_KEY_DOWN ] = scancode;
+	m_ram[RAM_POS_0_R7_KEY_DOWN] = scancode;
 	// Trigger output of key
-	BIT_SET(m_ram[ RAM_POS_0_R4_FLAGS2 ], R4_FLAGS2_AR_BIT);
+	BIT_SET(m_ram[RAM_POS_0_R4_FLAGS2], R4_FLAGS2_AR_BIT);
 	// Set A/R delay counter
-	m_ram[ RAM_POS_AR_TIMER ] = m_ram[ RAM_POS_AR_WAIT ];
+	m_ram[RAM_POS_AR_TIMER] = m_ram[RAM_POS_AR_WAIT];
 	// Load debounce counter
-	m_ram[ RAM_POS_0_R2_FLAGS1 ] = (m_ram[ RAM_POS_0_R2_FLAGS1 ] & ~R2_FLAGS1_DEB_MASK) | R2_FLAGS1_DEB_INIT;
+	m_ram[RAM_POS_0_R2_FLAGS1] = (m_ram[RAM_POS_0_R2_FLAGS1] & ~R2_FLAGS1_DEB_MASK) | R2_FLAGS1_DEB_INIT;
 }
 
-void hp98x6_upi_device::acquire_keys(ioport_value input[ 4 ])
+void hp98x6_upi_device::acquire_keys(ioport_value input[4])
 {
 	// Search for longest sequence among pressed keys
 	int max_len = 0;
 	unsigned n_pressed = 0;
 	for (unsigned i = 0; i < 4; i++) {
-		input[ i ] = m_keys[ i ]->read();
-		auto w = input[ i ];
+		input[i] = m_keys[i]->read();
+		auto w = input[i];
 		while (w) {
 			auto mask = BIT_MASK<ioport_value>(31 - count_leading_zeros_32(w));
-			auto len = m_keys[ i ]->field(mask)->seq().length();
+			auto len = m_keys[i]->field(mask)->seq().length();
 			if (len > max_len) {
 				max_len = len;
 			}
@@ -960,12 +963,12 @@ void hp98x6_upi_device::acquire_keys(ioport_value input[ 4 ])
 	// Filter out pressed keys with sequences shorter than the longest one
 	if (n_pressed > 1) {
 		for (unsigned i = 0; i < 4; i++) {
-			auto w = input[ i ];
+			auto w = input[i];
 			while (w) {
 				auto mask = BIT_MASK<ioport_value>(31 - count_leading_zeros_32(w));
-				auto len = m_keys[ i ]->field(mask)->seq().length();
+				auto len = m_keys[i]->field(mask)->seq().length();
 				if (len < max_len) {
-					input[ i ] &= ~mask;
+					input[i] &= ~mask;
 				}
 				w &= ~mask;
 			}
@@ -973,19 +976,19 @@ void hp98x6_upi_device::acquire_keys(ioport_value input[ 4 ])
 	}
 }
 
-bool hp98x6_upi_device::is_key_down(const ioport_value input[ 4 ], uint8_t idx)
+bool hp98x6_upi_device::is_key_down(const ioport_value input[4], uint8_t idx)
 {
 	unsigned row = idx % 8;
 	unsigned col = idx / 8;
-	return BIT(input[ row / 2 ], col + ((row & 1) << 4));
+	return BIT(input[row / 2], col + ((row & 1) << 4));
 }
 
 uint8_t hp98x6_upi_device::encode_shift_ctrl(uint8_t st) const
 {
-	if (BIT(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_CTRL_UP_BIT)) {
+	if (BIT(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_CTRL_UP_BIT)) {
 		BIT_SET(st, 5);
 	}
-	if (BIT(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_SHIFT_UP_BIT)) {
+	if (BIT(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_SHIFT_UP_BIT)) {
 		BIT_SET(st, 4);
 	}
 	return st;
@@ -995,41 +998,41 @@ void hp98x6_upi_device::try_output()
 {
 	if (!BIT(m_status, STATUS_OBF_BIT)) {
 		// Key
-		if (BIT(m_ram[ RAM_POS_0_R4_FLAGS2 ], R4_FLAGS2_AR_BIT) &&
-			!BIT(m_ram[ RAM_POS_0_R4_FLAGS2 ], R4_FLAGS2_KEY_MASK_BIT)) {
+		if (BIT(m_ram[RAM_POS_0_R4_FLAGS2], R4_FLAGS2_AR_BIT) &&
+			!BIT(m_ram[RAM_POS_0_R4_FLAGS2], R4_FLAGS2_KEY_MASK_BIT)) {
 			uint8_t st = encode_shift_ctrl(ST_KEY);
-			write_ob_st(m_ram[ RAM_POS_0_R7_KEY_DOWN ], st);
-			BIT_CLR(m_ram[ RAM_POS_0_R4_FLAGS2 ], R4_FLAGS2_AR_BIT);
+			write_ob_st(m_ram[RAM_POS_0_R7_KEY_DOWN], st);
+			BIT_CLR(m_ram[RAM_POS_0_R4_FLAGS2], R4_FLAGS2_AR_BIT);
 			// If key output is not possible now, autorepeat bit is not cleared
 			// to try again at a later time
 		} else {
 			// PSI and/or timers
-			bool psi = BIT(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_PSI_BIT) &&
-				!BIT(m_ram[ RAM_POS_0_R4_FLAGS2 ], R4_FLAGS2_PSI_MASK_BIT);
-			bool timer = BIT(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_USER_TMR_BIT) &&
-				!BIT(m_ram[ RAM_POS_0_R4_FLAGS2 ], R4_FLAGS2_TMR_MASK_BIT);
+			bool psi = BIT(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_PSI_BIT) &&
+				!BIT(m_ram[RAM_POS_0_R4_FLAGS2], R4_FLAGS2_PSI_MASK_BIT);
+			bool timer = BIT(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_USER_TMR_BIT) &&
+				!BIT(m_ram[RAM_POS_0_R4_FLAGS2], R4_FLAGS2_TMR_MASK_BIT);
 
 			if (psi || timer) {
 				uint8_t st = (psi ? ST_PSI : 0) | (timer ? ST_TIMER : 0);
-				write_ob_st(m_ram[ RAM_POS_1_R3_TIMER_STS ], st);
+				write_ob_st(m_ram[RAM_POS_1_R3_TIMER_STS], st);
 				if (psi) {
-					BIT_CLR(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_PSI_BIT);
+					BIT_CLR(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_PSI_BIT);
 				}
 				if (timer) {
-					BIT_CLR(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_USER_TMR_BIT);
-					m_ram[ RAM_POS_1_R3_TIMER_STS ] = 0;
+					BIT_CLR(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_USER_TMR_BIT);
+					m_ram[RAM_POS_1_R3_TIMER_STS] = 0;
 				}
-			} else if (BIT(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_RPG_BIT) &&
-					   !BIT(m_ram[ RAM_POS_0_R4_FLAGS2 ], R4_FLAGS2_KEY_MASK_BIT)) {
+			} else if (BIT(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_RPG_BIT) &&
+					   !BIT(m_ram[RAM_POS_0_R4_FLAGS2], R4_FLAGS2_KEY_MASK_BIT)) {
 				// Dial position
 				uint8_t st = encode_shift_ctrl(ST_RPG);
-				write_ob_st(m_ram[ RAM_POS_1_R4_RPG_COUNT ], st);
-				m_ram[ RAM_POS_1_R4_RPG_COUNT ] = 0;
-				BIT_CLR(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_RPG_BIT);
-			} else if (BIT(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_READ_BIT)) {
+				write_ob_st(m_ram[RAM_POS_1_R4_RPG_COUNT], st);
+				m_ram[RAM_POS_1_R4_RPG_COUNT] = 0;
+				BIT_CLR(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_RPG_BIT);
+			} else if (BIT(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_READ_BIT)) {
 				// Read data
-				write_ob_st(m_ram[ m_ram[ RAM_POS_1_R6_R_PTR ] ], ST_REQUESTED_DATA);
-				BIT_CLR(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_READ_BIT);
+				write_ob_st(m_ram[m_ram[RAM_POS_1_R6_R_PTR]], ST_REQUESTED_DATA);
+				BIT_CLR(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_READ_BIT);
 			}
 		}
 	}
@@ -1038,10 +1041,10 @@ void hp98x6_upi_device::try_output()
 void hp98x6_upi_device::try_fhs_output()
 {
 	// Check if FHS NMI interrupt is to be raised
-	if (BIT(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_FHS_BIT) &&
-		!BIT(m_ram[ RAM_POS_0_R4_FLAGS2 ], R4_FLAGS2_FHS_MASK_BIT)) {
+	if (BIT(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_FHS_BIT) &&
+		!BIT(m_ram[RAM_POS_0_R4_FLAGS2], R4_FLAGS2_FHS_MASK_BIT)) {
 		LOG("NMI from FHS\n");
-		BIT_CLR(m_ram[ RAM_POS_0_R5_FLAGS3 ], R5_FLAGS3_FHS_BIT);
+		BIT_CLR(m_ram[RAM_POS_0_R5_FLAGS3], R5_FLAGS3_FHS_BIT);
 		// F0 = 1 means "NMI from FHS timer"
 		BIT_SET(m_status, STATUS_F0_BIT);
 		m_irq7_write_func(true);

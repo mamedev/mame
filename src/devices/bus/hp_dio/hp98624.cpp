@@ -8,9 +8,9 @@
 
 #include "emu.h"
 #include "hp98624.h"
-#include "machine/tms9914.h"
+
 #include "bus/ieee488/ieee488.h"
-#include "hp_dio.h"
+#include "machine/tms9914.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -42,6 +42,7 @@ protected:
 	required_device<tms9914_device> m_tms9914;
 	required_device<ieee488_device> m_ieee488;
 	required_ioport m_switches;
+
 private:
 	void update_gpib_irq();
 	void update_gpib_dma();
@@ -101,17 +102,17 @@ dio16_98624_device::dio16_98624_device(const machine_config &mconfig, device_typ
 {
 }
 
-#define REG_SWITCHES_SC 0x01
-#define REG_SWITCHES_REMOTE 0x02
+constexpr unsigned REG_SWITCHES_SC = 0x01;
+constexpr unsigned REG_SWITCHES_REMOTE = 0x02;
 
-#define REG_SWITCHES_INT_LEVEL_MASK 3
-#define REG_SWITCHES_INT_LEVEL_SHIFT 2
+constexpr unsigned REG_SWITCHES_INT_LEVEL_MASK = 3;
+constexpr unsigned REG_SWITCHES_INT_LEVEL_SHIFT = 2;
 
-#define REG_SWITCHES_SELECT_CODE_MASK 31
-#define REG_SWITCHES_SELECT_CODE_SHIFT 4
+constexpr unsigned REG_SWITCHES_SELECT_CODE_MASK = 31;
+constexpr unsigned REG_SWITCHES_SELECT_CODE_SHIFT = 4;
 
-#define REG_SWITCHES_GPIB_ADDR_MASK 31
-#define REG_SWITCHES_GPIB_ADDR_SHIFT 9
+constexpr unsigned REG_SWITCHES_GPIB_ADDR_MASK = 31;
+constexpr unsigned REG_SWITCHES_GPIB_ADDR_SHIFT = 9;
 
 static INPUT_PORTS_START(hp98624_port)
 	PORT_START("switches")

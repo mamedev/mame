@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Grull Osgo
+// copyright-holders:Tony La Porta, Grull Osgo
 /************************************************************************
 
   Microchip PIC16X8x Emulator
