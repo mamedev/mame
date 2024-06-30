@@ -38,6 +38,7 @@ void superkds_decrypt(running_machine &machine);
 void pgm_decrypt_pgm3in1(running_machine &machine);
 void slqz3_decrypt(running_machine &machine);
 void fruitpar_decrypt(running_machine &machine);
+void oceanpar_decrypt(running_machine &machine);
 void amazonia_decrypt(running_machine &machine);
 void amazoni2_decrypt(running_machine &machine);
 void mgzz_decrypt(running_machine &machine);

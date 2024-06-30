@@ -64,6 +64,7 @@ public:
 	void init_klxyj();
 	void init_slqz3();
 	void init_fruitpar();
+	void init_oceanpar();
 	void init_amazonia();
 	void init_amazoni2();
 	void init_qlgs();
@@ -1215,6 +1216,13 @@ void igs_m027_state::init_fruitpar()
 	pgm_create_dummy_internal_arm_region();
 }
 
+void igs_m027_state::init_oceanpar()
+{
+	oceanpar_decrypt(machine());
+	//sdwx_gfx_decrypt(machine());
+	pgm_create_dummy_internal_arm_region();
+}
+
 void igs_m027_state::init_amazonia()
 {
 	amazonia_decrypt(machine());
@@ -1271,8 +1279,8 @@ GAME( 1999, qlgs,      0,        igs_mahjong, sdwx,     igs_m027_state, init_qlg
 GAME( 1999, amazonia,  0,        igs_mahjong, amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_IS_SKELETON )
 GAME( 1999, amazonkp,  amazonia, igs_mahjong, amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King Plus (V204BR)", MACHINE_IS_SKELETON )
 GAME( 1999, fruitpar,  0,        igs_mahjong, sdwx,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_IS_SKELETON )
-GAME( 199?, oceanpar,  0,        igs_mahjong, sdwx,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_IS_SKELETON )
-GAME( 199?, oceanpara, oceanpar, igs_mahjong, sdwx,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_IS_SKELETON )
+GAME( 1999, oceanpar,  0,        igs_mahjong, sdwx,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_IS_SKELETON ) // 1999 copyright in ROM
+GAME( 1999, oceanpara, oceanpar, igs_mahjong, sdwx,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_IS_SKELETON ) // 1999 copyright in ROM
 GAME( 2002, sdwx,      0,        igs_mahjong, sdwx,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME( 2003, amazoni2,  0,        igs_mahjong, sdwx,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_IS_SKELETON )
 GAME( 200?, sddz,      0,        igs_mahjong, sdwx,     igs_m027_state, init_sddz,     ROT0, "IGS", "Super Dou Di Zhu",  MACHINE_IS_SKELETON )
