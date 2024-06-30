@@ -131,7 +131,6 @@ private:
 	u8 kbd_r();
 	void kbd_put(u8 data);
 	void clock_w(int state);
-	void busreq_w(int state);
 	void ctc_z1_w(int state);
 	void sio_wrdya_w(int state);
 	void sio_wrdyb_w(int state);
@@ -232,13 +231,6 @@ void bigbord2_state::fdc_drq_w(int state)
 
 /* Z80 DMA */
 
-
-void bigbord2_state::busreq_w(int state)
-{
-// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
-	m_dma->bai_w(state); // tell dma that bus has been granted
-}
 
 u8 bigbord2_state::memory_read_byte(offs_t offset)
 {
@@ -595,6 +587,7 @@ void bigbord2_state::bigbord2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bigbord2_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &bigbord2_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -607,7 +600,7 @@ void bigbord2_state::bigbord2(machine_config &config)
 
 	/* devices */
 	Z80DMA(config, m_dma, MAIN_CLOCK);  // U62
-	m_dma->out_busreq_callback().set(FUNC(bigbord2_state::busreq_w));
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dma->in_mreq_callback().set(FUNC(bigbord2_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(bigbord2_state::memory_write_byte));

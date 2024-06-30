@@ -124,7 +124,6 @@ private:
 	void data_bank_w(offs_t offset, u8 data);
 	void video_bank_w(offs_t offset, u8 data);
 
-	void dma_busreq_w(int state);
 	u8 dma_memory_r(offs_t offset);
 	void dma_memory_w(offs_t offset, u8 data);
 	u8 dma_io_r(offs_t offset);
@@ -184,14 +183,6 @@ void anoworld_state::video_bank_w(offs_t offset, u8 data)
 	// bit 2 used, video enable?
 	if (data != 0x14)
 		LOG("PPI port C video_bank_w: %02x\n", data);
-}
-
-void anoworld_state::dma_busreq_w(int state)
-{
-	// HACK: grant bus request immediately
-	LOGDMA("dma_busreq_w %d\n", state);
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
-	m_dma->bai_w(state);
 }
 
 u8 anoworld_state::dma_memory_r(offs_t offset)
@@ -388,6 +379,7 @@ void anoworld_state::anoworld(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &anoworld_state::main_program_map);
 	m_maincpu->set_addrmap(AS_IO, &anoworld_state::main_io_map);
 	m_maincpu->set_daisy_config(main_daisy_chain);
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	Z80(config, m_audiocpu, 4_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &anoworld_state::audio_program_map);
@@ -398,7 +390,7 @@ void anoworld_state::anoworld(machine_config &config)
 	ctc0.intr_callback().set_inputline("maincpu", 0);
 
 	Z80DMA(config, m_dma, 4_MHz_XTAL);
-	m_dma->out_busreq_callback().set(FUNC(anoworld_state::dma_busreq_w));
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->out_int_callback().set_inputline("maincpu", 0);
 	m_dma->in_mreq_callback().set(FUNC(anoworld_state::dma_memory_r));
 	m_dma->out_mreq_callback().set(FUNC(anoworld_state::dma_memory_w));

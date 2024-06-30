@@ -273,6 +273,7 @@ void ts816_state::ts816(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ts816_state::ts816_mem);
 	m_maincpu->set_addrmap(AS_IO, &ts816_state::ts816_io);
 	m_maincpu->set_daisy_config(daisy_chain);
+	m_maincpu->busack_cb().set("dma", FUNC(z80dma_device::bai_w));
 
 	/* video hardware */
 	GENERIC_TERMINAL(config, m_terminal, 0);
@@ -312,7 +313,7 @@ void ts816_state::ts816(machine_config &config)
 	ctc2.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	z80dma_device& dma(Z80DMA(config, "dma", XTAL(16'000'000) / 4));
-	//dma.out_busreq_callback().set(FUNC(ts816_state::busreq_w));
+	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 }
 
