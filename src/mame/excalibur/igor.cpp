@@ -181,8 +181,9 @@ u8 igor_state::read_inputs()
 			data |= m_board->read_file(i, true);
 
 	// P64-P66 are also IRQ pins (the ON button is IRQ0)
-	for (int i = 0; i < 3; i++)
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0 + i, BIT(data, i + 4) ? ASSERT_LINE : CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		for (int i = 0; i < 3; i++)
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0 + i, BIT(data, i + 4) ? ASSERT_LINE : CLEAR_LINE);
 
 	return ~data;
 }

@@ -178,6 +178,7 @@ void spi_sdcard_device::latch_in()
 					m_image->read(m_blknext++, &m_data[1]);
 					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[1], m_blksize);
 					put_u16be(&m_data[m_blksize + 1], crc16);
+					LOG("reading LBA %x: [0] %02x %02x .. [%d] %02x %02x [crc16] %04x\n", m_blknext - 1, m_data[1], m_data[2], m_blksize - 2, m_data[m_blksize - 1], m_data[m_blksize], crc16);
 					send_data(1 + m_blksize + 2, SD_STATE_DATA_MULTI);
 				}
 			}
@@ -356,11 +357,11 @@ void spi_sdcard_device::do_command()
 				{
 					blk /= m_blksize;
 				}
-				LOG("reading LBA %x\n", blk);
 				m_image->read(blk, &m_data[3]);
 				{
 					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], m_blksize);
 					put_u16be(&m_data[m_blksize + 3], crc16);
+					LOG("reading LBA %x: [0] %02x %02x .. [%d] %02x %02x [crc16] %04x\n", blk, m_data[3], m_data[4], m_blksize - 2, m_data[m_blksize + 1], m_data[m_blksize + 2], crc16);
 				}
 				send_data(3 + m_blksize + 2, SD_STATE_DATA);
 			}

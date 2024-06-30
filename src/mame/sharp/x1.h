@@ -133,9 +133,9 @@ public:
 	void x1_portc_w(uint8_t data);
 	void init_x1_kanji();
 	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(x1);
+	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_RESET(x1turbo);
+
 	uint32_t screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
@@ -181,6 +181,7 @@ protected:
 		uint8_t pcg_mode = 0;
 		uint8_t v400_mode = 0;
 		uint8_t ank_sel = 0;
+		uint8_t video_mode = 0; /**< temp debugging variable */
 
 		uint8_t pri = 0;
 		uint8_t blackclip = 0; // x1 turbo specific
@@ -339,6 +340,7 @@ public:
 protected:
 	void x1turbo_io_banks(address_map &map);
 	void x1turbo_mem(address_map &map);
+	virtual void machine_reset() override;
 
 private:
 	required_device<z80dma_device> m_dma;

@@ -222,6 +222,8 @@ protected:
 	u8 m_secondary_slot[4];
 	u8 m_port_c_old;
 	u8 m_keylatch;
+	u8 m_system_control;
+	bool m_has_system_control;
 	output_finder<> m_caps_led;
 	output_finder<> m_code_led;
 	const XTAL m_main_xtal;
@@ -337,7 +339,6 @@ protected:
 	optional_device<ym2413_device> m_ym2413;
 	required_device<rp5c01_device> m_rtc;
 
-	// rtc
 	u8 m_rtc_latch = 0;
 };
 

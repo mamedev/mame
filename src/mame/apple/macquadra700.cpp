@@ -13,6 +13,7 @@
 
 #include "adbmodem.h"
 #include "dafb.h"
+#include "dfac.h"
 #include "macadb.h"
 #include "macrtc.h"
 #include "mactoolbox.h"
@@ -44,7 +45,6 @@
 #define C7M (C32M/4)
 
 namespace {
-
 class macquadra_state : public driver_device
 {
 public:
@@ -64,6 +64,7 @@ public:
 		m_sonic(*this, "sonic"),
 		m_dafb(*this, "dafb"),
 		m_easc(*this, "easc"),
+		m_dfac(*this, "dfac"),
 		m_scc(*this, "scc"),
 		m_cur_floppy(nullptr),
 		m_hdsel(0)
@@ -89,6 +90,7 @@ private:
 	required_device<dp83932c_device> m_sonic;
 	required_device<dafb_device> m_dafb;
 	required_device<asc_device> m_easc;
+	required_device<dfac_device> m_dfac;
 	required_device<z80scc_device> m_scc;
 
 	virtual void machine_start() override;
@@ -535,6 +537,10 @@ void macquadra_state::mac_via2_out_b(u8 data)
 {
 	// chain 60.15 Hz to VIA1
 	m_via1->write_ca1(data>>7);
+
+	m_dfac->data_write(BIT(data, 3));
+	m_dfac->clock_write(BIT(data, 4));
+	m_dfac->latch_write(BIT(data, 0));
 }
 
 void macquadra_state::phases_w(u8 phases)
@@ -674,6 +680,9 @@ void macquadra_state::macqd700(machine_config &config)
 	m_easc->irqf_callback().set(m_via2, FUNC(via6522_device::write_cb1)).invert();
 	m_easc->add_route(0, "lspeaker", 1.0);
 	m_easc->add_route(1, "rspeaker", 1.0);
+
+	// DFAC is only for audio input on Q700/Q800
+	APPLE_DFAC(config, m_dfac, 22257);
 
 	/* internal ram */
 	RAM(config, m_ram);

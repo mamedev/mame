@@ -131,7 +131,7 @@ u8 heath_z37_fdc_device::data_r()
 
 void heath_z37_fdc_device::write(offs_t reg, u8 val)
 {
-	LOGFUNC("%s: reg: %d val: %d\n", FUNCNAME, reg, val);
+	LOGFUNC("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
 
 	switch (reg)
 	{
@@ -169,7 +169,7 @@ u8 heath_z37_fdc_device::read(offs_t reg)
 		break;
 	}
 
-	LOGFUNC("%s: reg: %d val: %d\n", FUNCNAME, reg, value);
+	LOGFUNC("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, value);
 
 	return value;
 }
@@ -229,7 +229,7 @@ void heath_z37_fdc_device::set_irq(int state)
 
 void heath_z37_fdc_device::set_drq(int state)
 {
-	LOGLINES("set drq, allowed: %d state: %d\n", m_irq_allowed, state);
+	LOGLINES("set drq, allowed: %d state: %d\n", m_drq_allowed, state);
 
 	m_drq_cb(m_drq_allowed ? state : CLEAR_LINE);
 }

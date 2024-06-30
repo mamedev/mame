@@ -14948,7 +14948,7 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 		<description>Heidi (Europe)</description>
 		<year>2005</year>
 		<publisher>East Entertainment Media</publisher>
-		<info name="alt_title" value="Heidi - The Game (Euro Box), Heidi - Das Spiel zum Film (Ger Box)" />
+		<info name="alt_title" value="Heidi - The Game (Europe Box), Heidi - Das Spiel zum Film (Germany Box)" />
 		<info name="serial" value="AGB-BHJP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />

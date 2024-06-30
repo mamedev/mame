@@ -425,6 +425,8 @@ void news_68k_state::common(machine_config &config)
 	m_vram->set_default_size("1MiB");
 	m_vram->set_default_value(0);
 #endif
+
+	SOFTWARE_LIST(config, "software_list").set_original("sony_news").set_filter("CISC");
 }
 
 void news_68k_state::nws1580(machine_config &config)

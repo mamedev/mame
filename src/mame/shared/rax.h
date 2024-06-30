@@ -16,7 +16,7 @@
 #include "sound/dmadac.h"
 
 
-class acclaim_rax_device : public device_t
+class acclaim_rax_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
@@ -29,18 +29,34 @@ public:
 	void adsp_irq(int which);
 	void recompute_sample_rate(int which);
 
-	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
+	TIMER_DEVICE_CALLBACK_MEMBER(dma_timer_callback);
 
-	void adsp_data_map(address_map &map);
-	void adsp_io_map(address_map &map);
-	void adsp_program_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	void adsp_sound_tx_callback(offs_t offset, uint32_t data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(adsp_irq0);
+	TIMER_DEVICE_CALLBACK_MEMBER(sport0_irq);
+	void dmovlay_callback(uint32_t data);
+
+	uint16_t adsp_control_r(offs_t offset);
+	void adsp_control_w(offs_t offset, uint16_t data);
+	void ram_bank_w(uint16_t data);
+	void rom_bank_w(uint16_t data);
+
+	uint16_t host_r();
+	void host_w(uint16_t data);
+
+	void adsp_data_map(address_map &map);
+	void adsp_io_map(address_map &map);
+	void adsp_program_map(address_map &map);
+
 	required_device<adsp2181_device>    m_cpu;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 	required_device<timer_device>       m_reg_timer;
@@ -48,6 +64,9 @@ private:
 	required_shared_ptr<uint32_t>       m_adsp_pram;
 	required_memory_bank                m_adsp_data_bank;
 	required_region_ptr<uint8_t>        m_rom;
+
+	required_device<generic_latch_16_device> m_data_in;
+	required_device<generic_latch_16_device> m_data_out;
 
 	uint32_t m_adsp_snd_pf0;
 
@@ -65,7 +84,7 @@ private:
 	uint16_t        m_control_regs[32];
 
 
-	/* sound output */
+	// sound output
 	uint16_t        m_size[2];
 	uint16_t        m_incs[2];
 	uint32_t        m_ireg[2];
@@ -76,23 +95,6 @@ private:
 	uint32_t        m_dmovlay_val;
 
 	std::unique_ptr<uint16_t[]> m_banked_ram;
-
-	required_device<generic_latch_16_device> m_data_in;
-	required_device<generic_latch_16_device> m_data_out;
-
-	void adsp_sound_tx_callback(offs_t offset, uint32_t data);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(adsp_irq0);
-	TIMER_DEVICE_CALLBACK_MEMBER(sport0_irq);
-	void dmovlay_callback(uint32_t data);
-
-	uint16_t adsp_control_r(offs_t offset);
-	void adsp_control_w(offs_t offset, uint16_t data);
-	void ram_bank_w(uint16_t data);
-	void rom_bank_w(uint16_t data);
-
-	uint16_t host_r();
-	void host_w(uint16_t data);
 };
 
 // device type definition

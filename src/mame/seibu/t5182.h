@@ -24,6 +24,10 @@ public:
 		CPU_CLEAR
 	};
 
+	// configuration
+	auto ym_read_callback()  { return m_ym_read_cb.bind(); }
+	auto ym_write_callback() { return m_ym_write_cb.bind(); }
+
 	void sound_irq_w(uint8_t data);
 	uint8_t sharedram_semaphore_snd_r();
 	void sharedram_semaphore_main_acquire_w(uint8_t data);
@@ -32,8 +36,6 @@ public:
 	void sharedram_w(offs_t offset, uint8_t data);
 	void ym2151_irq_handler(int state);
 
-	void t5182_io(address_map &map);
-	void t5182_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -42,12 +44,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	// internal state
-	required_device<cpu_device> m_ourcpu;
-	required_shared_ptr<uint8_t> m_sharedram;
-	int m_irqstate;
-	int m_semaphore_main;
-	int m_semaphore_snd;
 	TIMER_CALLBACK_MEMBER(setirq_callback);
 
 	void sharedram_semaphore_snd_acquire_w(uint8_t data);
@@ -55,6 +51,23 @@ private:
 	uint8_t sharedram_semaphore_main_r();
 	void ym2151_irq_ack_w(uint8_t data);
 	void cpu_irq_ack_w(uint8_t data);
+	uint8_t ym_r(offs_t offset);
+	void ym_w(offs_t offset, uint8_t data);
+
+	void t5182_io(address_map &map);
+	void t5182_map(address_map &map);
+
+	// internal state
+	required_device<cpu_device> m_ourcpu;
+	required_shared_ptr<uint8_t> m_sharedram;
+
+	// device callbacks
+	devcb_read8 m_ym_read_cb;
+	devcb_write8 m_ym_write_cb;
+
+	uint32_t m_irqstate;
+	bool m_semaphore_main;
+	bool m_semaphore_snd;
 };
 
 DECLARE_DEVICE_TYPE(T5182, t5182_device)

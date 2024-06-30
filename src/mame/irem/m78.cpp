@@ -1,12 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
+/**************************************************************************************************
 
-/*
 Irem M78
 
 Black Jack (1992)
 Flyers show this game has a main screen and 5 user screens.
 Is this the main unit or the satellite one?
+
+===================================================================================================
 
 2-PCB stack with IREM markings
 
@@ -33,7 +35,7 @@ TODO:
   Copied over sound handling from there for now;
 - comms;
 
-*/
+**************************************************************************************************/
 
 #include "emu.h"
 

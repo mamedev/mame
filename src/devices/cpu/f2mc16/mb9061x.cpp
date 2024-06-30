@@ -29,7 +29,13 @@ DEFINE_DEVICE_TYPE(MB90641A, mb90641_device, "mb90641a", "Fujitsu MB90641A")
 //-------------------------------------------------
 mb9061x_device::mb9061x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map) :
 	f2mc16_device(mconfig, type, tag, owner, clock),
-	m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0, internal_map)
+	m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0, internal_map),
+	m_read_port(*this, 0xff),
+	m_write_port(*this),
+	m_read_adcs(*this, 0xff),
+	m_write_adcs(*this),
+	m_read_adcr(*this, 0xff),
+	m_write_adcr(*this)
 {
 }
 
@@ -77,6 +83,9 @@ void mb9061x_device::execute_set_input(int inputnum, int state)
 /* MB90610 - "Evaluation device" with extra RAM */
 void mb90610_device::mb90610_map(address_map &map)
 {
+	map(0x0001, 0x000a).rw(FUNC(mb9061x_device::port_r), FUNC(mb9061x_device::port_w));
+	map(0x002c, 0x002d).rw(FUNC(mb9061x_device::adcs_r), FUNC(mb9061x_device::adcs_w));
+	map(0x002e, 0x002f).rw(FUNC(mb9061x_device::adcr_r), FUNC(mb9061x_device::adcr_w));
 	map(0x00a9, 0x00a9).rw(FUNC(mb9061x_device::tbtc_r), FUNC(mb9061x_device::tbtc_w));
 	map(0x00b0, 0x00bf).rw(FUNC(mb9061x_device::intc_r), FUNC(mb9061x_device::intc_w));
 	map(0x0100, 0x10ff).ram();  // 4K of internal RAM from 0x100 to 0x1100
@@ -406,6 +415,9 @@ void mb9061x_device::intc_clear_irq(int icr, int vector)
 /* MB90611 - Production version of this series */
 void mb90611_device::mb90611_map(address_map &map)
 {
+	map(0x0001, 0x000a).rw(FUNC(mb9061x_device::port_r), FUNC(mb9061x_device::port_w));
+	map(0x002c, 0x002d).rw(FUNC(mb9061x_device::adcs_r), FUNC(mb9061x_device::adcs_w));
+	map(0x002e, 0x002f).rw(FUNC(mb9061x_device::adcr_r), FUNC(mb9061x_device::adcr_w));
 	map(0x0038, 0x003f).rw(FUNC(mb9061x_device::timer_r), FUNC(mb9061x_device::timer_w));
 	map(0x00a9, 0x00a9).rw(FUNC(mb9061x_device::tbtc_r), FUNC(mb9061x_device::tbtc_w));
 	map(0x00b0, 0x00bf).rw(FUNC(mb9061x_device::intc_r), FUNC(mb9061x_device::intc_w));
@@ -425,6 +437,9 @@ mb90611_device::mb90611_device(const machine_config &mconfig, device_type type, 
 /* MB90641 - no A/D, extra UART and timers, optional internal ROM */
 void mb90641_device::mb90641_map(address_map &map)
 {
+	map(0x0001, 0x000a).rw(FUNC(mb9061x_device::port_r), FUNC(mb9061x_device::port_w));
+	map(0x002c, 0x002d).rw(FUNC(mb9061x_device::adcs_r), FUNC(mb9061x_device::adcs_w));
+	map(0x002e, 0x002f).rw(FUNC(mb9061x_device::adcr_r), FUNC(mb9061x_device::adcr_w));
 	map(0x0038, 0x003f).rw(FUNC(mb9061x_device::timer_r), FUNC(mb9061x_device::timer_w));
 	map(0x00a9, 0x00a9).rw(FUNC(mb9061x_device::tbtc_r), FUNC(mb9061x_device::tbtc_w));
 	map(0x00b0, 0x00bf).rw(FUNC(mb9061x_device::intc_r), FUNC(mb9061x_device::intc_w));

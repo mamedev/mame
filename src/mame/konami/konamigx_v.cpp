@@ -992,14 +992,26 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
 }
 
 
-/* PSAC4 */
+/*
+ * PSAC4
+ *
+ * racinfrc title screen prints this watermark in ROZ at origin 0,0:
+ * SYSTEM NWK250^tm
+ * -THE HI-SPEED PSAC4 DRIVER
+ * \tWITH SKIPPING+DROPPING REDUCED
+ * -SCREEN SYSTEM
+ * \t2^16x2^16 IMAGINALLY AREA (sic)
+ * -CHARACTER SYSTEM
+ *
+ * (c)KONAMI 1993
+ *
+ */
 /* these tilemaps are weird in both format and content, one of them
    doesn't really look like it should be displayed? - it's height data */
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1a_tile_info)
 {
 	int tileno, colour, flipx,flipy;
-	int flip;
-	flip=0;
+	int flip = 0;
 	colour = 0;
 
 	tileno = (m_psacram[tile_index*2] & 0x00003fff)>>0;
@@ -1020,18 +1032,20 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1a_tile_info)
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1b_tile_info)
 {
 	int tileno, colour, flipx,flipy;
-	int flip;
-	flip=0;
+	int flip = 0;
 
-	colour = 0;
-	tileno = (m_psacram[tile_index*2+1] & 0x00003fff)>>0;
+	// FIXME: has at least 32 entries of valid colors
+	// (from z-value as color depth effect?)
+	colour = (m_psacram[tile_index*2 + 1] & 0x000c'0000) >> 18;
+	// TODO: 0x7fff mask for opengolf
+	tileno = (m_psacram[tile_index*2 + 1] & 0x0000'3fff) >> 0;
 
 	// scanrows
-	//flipx  = (m_psacram[tile_index*2+1] & 0x00800000)>>23;
-	//flipy  = (m_psacram[tile_index*2+1] & 0x00400000)>>22;
+	//flipx  = (m_psacram[tile_index*2 + 1] & 0x0080'0000) >> 23;
+	//flipy  = (m_psacram[tile_index*2 + 1] & 0x0040'0000) >> 22;
 	// scancols
-	flipy  = (m_psacram[tile_index*2+1] & 0x00200000)>>21;
-	flipx  = (m_psacram[tile_index*2+1] & 0x00100000)>>20;
+	flipy  = (m_psacram[tile_index*2 + 1] & 0x0020'0000) >> 21;
+	flipx  = (m_psacram[tile_index*2 + 1] & 0x0010'0000) >> 20;
 
 	if (flipx) flip |= TILE_FLIPX;
 	if (flipy) flip |= TILE_FLIPY;
@@ -1454,20 +1468,18 @@ uint32_t konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rg
 		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, 0, nullptr, m_gx_rushingheroes_hack);
 	}
 
-
-
-	/* Hack! draw type-1 roz layer here for testing purposes only */
+	// HACK: draw type-1 roz layer here for testing purposes only
 	if (m_gx_specialrozenable == 1)
 	{
 		pen_t const *const paldata = m_palette->pens();
 
-		// hack, draw the roz tilemap if W is held
+		// draw the roz tilemap if W is held
 		if ( machine().input().code_pressed(KEYCODE_W) )
 		{
 			// make it flicker, to compare positioning
 			//if (screen.frame_number() & 1)
 			{
-				for (int y=0;y<256;y++)
+				for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 				{
 					//uint32_t *const dst = &bitmap.pix(y);
 					// ths K053936 rendering should probably just be flipped
@@ -1477,7 +1489,7 @@ uint32_t konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rg
 
 					uint32_t *const dst = &bitmap.pix((256+16)-y);
 
-					for (int x=0;x<512;x++)
+					for (int x = cliprect.min_x; x <= cliprect.max_x;x++)
 					{
 						uint16_t const dat = src[x];
 						dst[x] = paldata[dat];

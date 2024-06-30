@@ -58,13 +58,9 @@ enum
  */
 
 
-class tms32025_device : public cpu_device
+class tms3202x_device : public cpu_device
 {
 public:
-	// construction/destruction
-	tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
 	// configuration helpers
 	auto bio_in_cb() { return m_bio_in.bind(); }
 	auto hold_in_cb() { return m_hold_in.bind(); }
@@ -73,13 +69,12 @@ public:
 	auto dr_in_cb() { return m_dr_in.bind(); }
 	auto dx_out_cb() { return m_dx_out.bind(); }
 
-	void set_mp_mc(bool state) { m_mp_mc = state; }
-
 	//void tms32025_program(address_map &map);
-	void tms32025_data(address_map &map);
+	void tms3202x_data(address_map &map);
 	void tms32026_data(address_map &map);
 protected:
-	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap);
+	// construction/destruction
+	tms3202x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -101,8 +96,6 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 	void common_reset();
 
 	address_space_config m_program_config;
@@ -119,7 +112,7 @@ protected:
 	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_data;
 	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_io;
 
-	typedef void ( tms32025_device::*opcode_func ) ();
+	typedef void ( tms3202x_device::*opcode_func ) ();
 	struct tms32025_opcode
 	{
 		uint8_t       cycles;
@@ -147,8 +140,8 @@ protected:
 	PAIR    m_ACC;
 	PAIR    m_Preg;
 	uint16_t  m_Treg;
-	uint16_t  m_AR[8];
-	uint16_t  m_STACK[8];
+	uint16_t  m_AR[8]; // 5 for TMS32020, 8 for rest
+	uint16_t  m_STACK[8]; // 4 level for TMS32020, 8 level for rest
 	PAIR    m_ALU;
 	uint16_t  m_drr, m_dxr, m_tim, m_prd, m_imr, m_greg;
 
@@ -170,7 +163,6 @@ protected:
 	int     m_icount;
 	int     m_mHackIgnoreARP;          /* special handling for lst, lst1 instructions */
 	int     m_waiting_for_serial_frame;
-	bool    m_mp_mc;
 
 	uint16_t drr_r();
 	void drr_w(uint16_t data);
@@ -198,8 +190,8 @@ protected:
 	inline void CALCULATE_SUB_CARRY();
 	inline void CALCULATE_ADD_OVERFLOW(int32_t addval);
 	inline void CALCULATE_SUB_OVERFLOW(int32_t subval);
-	inline uint16_t POP_STACK();
-	inline void PUSH_STACK(uint16_t data);
+	virtual uint16_t POP_STACK();
+	virtual void PUSH_STACK(uint16_t data);
 	inline void SHIFT_Preg_TO_ALU();
 	inline void GETDATA(int shift,int signext);
 	inline void PUTDATA(uint16_t data);
@@ -364,6 +356,38 @@ protected:
 };
 
 
+class tms32020_device : public tms3202x_device
+{
+public:
+	// construction/destruction
+	tms32020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class tms32025_device : public tms3202x_device
+{
+public:
+	// construction/destruction
+	tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// configuration helpers
+	void set_mp_mc(bool state) { m_mp_mc = state; }
+
+protected:
+	// construction/destruction
+	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap);
+
+	// device-level overrides
+	virtual void device_start() override;
+
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	virtual uint16_t POP_STACK() override;
+	virtual void PUSH_STACK(uint16_t data) override;
+
+	bool    m_mp_mc;
+};
+
 class tms32026_device : public tms32025_device
 {
 public:
@@ -377,6 +401,7 @@ protected:
 	virtual void conf() override;
 };
 
+DECLARE_DEVICE_TYPE(TMS32020, tms32020_device)
 DECLARE_DEVICE_TYPE(TMS32025, tms32025_device)
 DECLARE_DEVICE_TYPE(TMS32026, tms32026_device)
 

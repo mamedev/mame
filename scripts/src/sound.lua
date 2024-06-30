@@ -700,6 +700,20 @@ end
 
 
 ---------------------------------------------------
+-- IMA ADPCM sample player
+--@src/devices/sound/imaadpcm.h,SOUNDS["IMAADPCM"] = true
+---------------------------------------------------
+
+if (SOUNDS["IMAADPCM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/imaadpcm.cpp",
+		MAME_DIR .. "src/devices/sound/imaadpcm.h",
+	}
+end
+
+
+
+---------------------------------------------------
 -- OKI ADPCM sample players
 --@src/devices/sound/okim6258.h,SOUNDS["OKIM6258"] = true
 --@src/devices/sound/msm5205.h,SOUNDS["MSM5205"] = true

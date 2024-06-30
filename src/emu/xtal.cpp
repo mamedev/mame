@@ -112,6 +112,7 @@ const double XTAL::known_xtals[] = {
 	  4'032'000, /* 4.032_MHz_XTAL         GRiD Compass modem board */
 	  4'096'000, /* 4.096_MHz_XTAL         Used to drive OKI M9810 chips */
 	  4'194'304, /* 4.194304_MHz_XTAL      Used to drive MC146818 / Nintendo Game Boy */
+	  4'220'000, /* 4.220_MHz_XTAL         Used to drive OKI M6295 chips on some Namco boards, usually with /4 divider */
 	  4'224'000, /* 4.224_MHz_XTAL         Used to drive OKI M6295 chips, usually with /4 divider */
 	  4'410'000, /* 4.41_MHz_XTAL          Pioneer PR-8210 ldplayer */
 	  4'433'610, /* 4.43361_MHz_XTAL       Cidelsa Draco */
@@ -176,6 +177,7 @@ const double XTAL::known_xtals[] = {
 	  9'987'000, /* 9.987_MHz_XTAL         Crazy Balloon */
 	 10'000'000, /* 10_MHz_XTAL            - */
 	 10'137'600, /* 10.1376_MHz_XTAL       Wyse WY-100 */
+	 10'240'000, /* 10.240_MHz_XTAL        Stella 8085 based fruit machines */
 	 10'245'000, /* 10.245_MHz_XTAL        PES Speech box */
 	 10'380'000, /* 10.38_MHz_XTAL         Fairlight Q219 Lightpen/Graphics Card */
 	 10'480'000, /* 10.48_MHz_XTAL         System-80 (50 Hz) */
@@ -475,6 +477,7 @@ const double XTAL::known_xtals[] = {
 	 51'200'000, /* 51.2_MHz_XTAL          Namco Super System 22 video clock */
 	 52'000'000, /* 52_MHz_XTAL            Cojag */
 	 52'832'000, /* 52.832_MHz_XTAL        Wang PC TIG video controller */
+	 52'867'000, /* 52.867_MHz_XTAL        Atlus Print Club (Sega C2 PCB) */
 	 53'203'424, /* 53.203424_MHz_XTAL     Master System, Mega Drive PAL (12x PAL subcarrier) */
 	 53'693'175, /* 53.693175_MHz_XTAL     PSX-based h/w, Sony ZN1-2-based (15x NTSC subcarrier) */
 	 54'000'000, /* 54_MHz_XTAL            Taito JC */

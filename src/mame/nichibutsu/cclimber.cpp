@@ -249,7 +249,6 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -258,41 +257,41 @@ void cclimber_state::machine_start()
 	save_item(NAME(m_nmi_mask));
 }
 
-void cclimber_state::swimmer_sh_soundlatch_w(uint8_t data)
+void swimmer_state::swimmer_sh_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 
-void cclimber_state::yamato_p0_w(uint8_t data)
+void yamato_state::yamato_p0_w(uint8_t data)
 {
 	m_yamato_p0 = data;
 }
 
-void cclimber_state::yamato_p1_w(uint8_t data)
+void yamato_state::yamato_p1_w(uint8_t data)
 {
 	m_yamato_p1 = data;
 }
 
-uint8_t cclimber_state::yamato_p0_r()
+uint8_t yamato_state::yamato_p0_r()
 {
 	return m_yamato_p0;
 }
 
-uint8_t cclimber_state::yamato_p1_r()
+uint8_t yamato_state::yamato_p1_r()
 {
 	return m_yamato_p1;
 }
 
 
-void cclimber_state::toprollr_rombank_w(int state)
+void toprollr_state::toprollr_rombank_w(int state)
 {
 	m_toprollr_rombank = m_mainlatch->q5_r() | (m_mainlatch->q6_r() << 1);
 
 	if (m_toprollr_rombank < 3) {
-		membank("bank1")->set_entry(m_toprollr_rombank);
-		membank("bank1d")->set_entry(m_toprollr_rombank);
+		m_bank1->set_entry(m_toprollr_rombank);
+		m_bank1d->set_entry(m_toprollr_rombank);
 	}
 }
 
@@ -375,32 +374,46 @@ void cclimber_state::cannonb_map(address_map &map)
 	map(0xb800, 0xb800).portr("SYSTEM");
 }
 
-void cclimber_state::swimmer_map(address_map &map)
+
+
+void swimmer_state::swimmer_root_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x88ff).mirror(0x0100).ram().share("bigspriteram");
+	map(0x8800, 0x88ff).mirror(0x0700).ram().share("bigspriteram");
 	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
-	map(0x9800, 0x981f).writeonly().share("column_scroll");
-	map(0x9880, 0x989f).writeonly().share("spriteram");
+	map(0x9800, 0x981f).ram().share("column_scroll");
+	map(0x9880, 0x989f).ram().share("spriteram");
 	map(0x98fc, 0x98ff).writeonly().share("bigspritectrl");
-	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
+	map(0x9c00, 0x9fff).ram().w(FUNC(swimmer_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0xa000, 0xa000).portr("P2");
-	map(0xa800, 0xa800).portr("P1").w(FUNC(cclimber_state::swimmer_sh_soundlatch_w));
-	map(0xb000, 0xb000).portr("DSW1");
-	map(0xb800, 0xb800).portr("DSW2").writeonly().share("bgcolor");
-	map(0xb880, 0xb880).portr("SYSTEM");
+	map(0xa000, 0xa000).mirror(0x07ff).portr("P2");
+	map(0xa800, 0xa800).mirror(0x07ff).portr("P1").w(FUNC(swimmer_state::swimmer_sh_soundlatch_w));
+	map(0xb000, 0xb000).mirror(0x07ff).portr("DSW1");
+	map(0xb800, 0xb800).mirror(0x07ff).portr("DSW2");
 }
 
-void cclimber_state::guzzler_map(address_map &map)
+void swimmer_state::swimmer_map(address_map &map)
+{
+	swimmer_root_map(map);
+	map(0xb800, 0xb800).mirror(0x07ff).writeonly().share("bgcolor");
+}
+
+void swimmer_state::au_map(address_map &map)
+{
+	swimmer_root_map(map);
+	map(0xb800, 0xb87f).mirror(0x0780).w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xc000, 0xc7ff).ram();
+}
+
+void swimmer_state::guzzler_map(address_map &map)
 {
 	swimmer_map(map);
-	map(0xc000, 0xc7ff).ram();                 /* ??? used by Guzzler */
-	map(0xe000, 0xffff).rom();                 /* Guzzler only */
+	map(0xc000, 0xc7ff).ram();
+	map(0xe000, 0xffff).rom();
 }
 
-void cclimber_state::yamato_map(address_map &map)
+void yamato_state::yamato_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram();
@@ -416,21 +429,20 @@ void cclimber_state::yamato_map(address_map &map)
 	map(0x98a0, 0x98db).ram();  /* not used, but initialized */
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
 	map(0x98e0, 0x9bff).ram();  /* not used, but initialized */
-	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
+	map(0x9c00, 0x9fff).ram().w(FUNC(yamato_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0xa000, 0xa000).portr("P1");
-	map(0xa800, 0xa800).portr("P2");
-	map(0xb000, 0xb000).portr("DSW");
-	map(0xb800, 0xb800).portr("COIN");
-	map(0xba00, 0xba00).portr("START");  /* maybe a mirror of b800 */
+	map(0xa000, 0xa000).mirror(0x07ff).portr("P1");
+	map(0xa800, 0xa800).mirror(0x07ff).portr("P2");
+	map(0xb000, 0xb000).mirror(0x07ff).portr("DSW");
+	map(0xb800, 0xb800).mirror(0x07ff).portr("COIN");
 }
 
-void cclimber_state::yamato_decrypted_opcodes_map(address_map &map)
+void yamato_state::yamato_decrypted_opcodes_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
 }
 
-void cclimber_state::toprollr_map(address_map &map)
+void toprollr_state::toprollr_map(address_map &map)
 {
 	map(0x0000, 0x5fff).bankr("bank1");
 	map(0x6000, 0x6bff).ram().share("ram");
@@ -441,7 +453,7 @@ void cclimber_state::toprollr_map(address_map &map)
 	map(0x9800, 0x987f).ram(); /* unused ? */
 	map(0x9880, 0x995f).ram().share("spriteram");
 	map(0x99dc, 0x99df).ram().share("bigspritectrl");
-	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
+	map(0x9c00, 0x9fff).ram().w(FUNC(toprollr_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa800, 0xa800).portr("P2").w("cclimber_audio", FUNC(cclimber_audio_device::sample_rate_w));
@@ -472,7 +484,7 @@ void cclimber_state::bagmanf_map(address_map &map)
 	map(0xb800, 0xb800).nopr();
 }
 
-void cclimber_state::toprollr_decrypted_opcodes_map(address_map &map)
+void toprollr_state::toprollr_decrypted_opcodes_map(address_map &map)
 {
 	map(0x0000, 0x5fff).bankr("bank1d");
 	map(0xc000, 0xffff).rom().region("maincpu", 0xc000);
@@ -493,43 +505,54 @@ void cclimber_state::rpatrol_portmap(address_map &map)
 	map(0x0c, 0x0c).r("aysnd", FUNC(ay8910_device::data_r));
 }
 
-void cclimber_state::yamato_portmap(address_map &map)
+void yamato_state::yamato_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(cclimber_state::yamato_p0_w));  /* ??? */
-	map(0x01, 0x01).w(FUNC(cclimber_state::yamato_p1_w));  /* ??? */
+	map(0x00, 0x00).w(FUNC(yamato_state::yamato_p0_w));  /* ??? */
+	map(0x01, 0x01).w(FUNC(yamato_state::yamato_p1_w));  /* ??? */
 }
 
 
-void cclimber_state::swimmer_audio_map(address_map &map)
+uint8_t swimmer_state::soundlatch_read_and_clear()
+{
+	// An extra flip-flop is used to clear the LS273 after reading it through a LS245
+	// (this flip-flop is then cleared in sync with the sound CPU clock)
+	uint8_t res = m_soundlatch->read();
+	if (!machine().side_effects_disabled())
+		m_soundlatch->clear_w();
+	return res;
+}
+
+
+void swimmer_state::swimmer_audio_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x3000, 0x3000).r(FUNC(swimmer_state::soundlatch_read_and_clear));
 	map(0x4000, 0x4001).ram();             /* ??? */
 }
 
-void cclimber_state::yamato_audio_map(address_map &map)
+void yamato_state::yamato_audio_map(address_map &map)
 {
 	map(0x0000, 0x07ff).rom();
 	map(0x5000, 0x53ff).ram();
 }
 
 
-void cclimber_state::swimmer_audio_portmap(address_map &map)
+void swimmer_state::swimmer_audio_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0x80, 0x81).w("ay2", FUNC(ay8910_device::data_address_w));
 }
 
-void cclimber_state::yamato_audio_portmap(address_map &map)
+void yamato_state::yamato_audio_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0x04, 0x04).r(FUNC(cclimber_state::yamato_p0_r));   /* ??? */
-	map(0x08, 0x08).r(FUNC(cclimber_state::yamato_p1_r));   /* ??? */
+	map(0x04, 0x04).r(FUNC(yamato_state::yamato_p0_r));   /* ??? */
+	map(0x08, 0x08).r(FUNC(yamato_state::yamato_p1_r));   /* ??? */
 }
 
 
@@ -815,7 +838,8 @@ static INPUT_PORTS_START( swimmer )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW B:!1")
@@ -829,11 +853,6 @@ static INPUT_PORTS_START( swimmer )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )     // labeled this way for similarities with 'swimmerb'
 	PORT_DIPSETTING(    0x80, DEF_STR( Harder ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Hardest ) )
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 /* Same as 'swimmer' but different "Difficulty" Dip Switch */
@@ -887,7 +906,10 @@ static INPUT_PORTS_START( guzzler )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW B:!1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -899,13 +921,6 @@ static INPUT_PORTS_START( guzzler )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Hardest ) )
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( yamato )
@@ -957,19 +972,9 @@ static INPUT_PORTS_START( yamato )
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) /* set 1 only */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 ) /* set 1 only */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("START")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 ) /* set 1 only */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1023,7 +1028,59 @@ static INPUT_PORTS_START( toprollr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
+ 
+static INPUT_PORTS_START( au )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW A:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, "Disabled")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW A:3,4")
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW A:5,6")
+	PORT_DIPSETTING(    0x00, "30000, 100000, Every 100000" )
+	PORT_DIPSETTING(    0x10, "20000, 50000, Every 50000" )
+	PORT_DIPSETTING(    0x20, "30000" )
+	PORT_DIPSETTING(    0x30, "None" )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW A:7,8")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x40, "4" )
+	PORT_DIPSETTING(    0x80, "5" )
+	PORT_DIPSETTING(    0xc0, "Infinite (Cheat)" )
+
+	PORT_START("DSW2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW B:1" ) 
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW B:2" ) 
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW B:3" ) 
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW B:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+INPUT_PORTS_END
+ 
 
 static const gfx_layout cclimber_charlayout =
 {
@@ -1098,28 +1155,34 @@ static const gfx_layout swimmer_spritelayout =
 };
 
 static GFXDECODE_START( gfx_cclimber )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, cclimber_charlayout,      0, 16 ) /* characters */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, cclimber_spritelayout,    0, 16 ) /* sprites */
-	GFXDECODE_ENTRY( "gfx2", 0x0000, cclimber_charlayout,   16*4,  8 ) /* big sprites */
+	GFXDECODE_ENTRY( "tile", 0x0000, cclimber_charlayout,      0, 16 ) /* characters */
+	GFXDECODE_ENTRY( "tile", 0x0000, cclimber_spritelayout,    0, 16 ) /* sprites */
+	GFXDECODE_ENTRY( "bigsprite", 0x0000, cclimber_charlayout,   16*4,  8 ) /* big sprites */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_cannonb )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, cannonb_charlayout,       0, 16 ) /* characters */
-	GFXDECODE_ENTRY( "gfx1", 0x1000, cannonb_spritelayout,     0, 16 ) /* sprites */
-	GFXDECODE_ENTRY( "gfx2", 0x0000, cclimber_charlayout,   16*4,  8 ) /* big sprites */
+	GFXDECODE_ENTRY( "tile", 0x0000, cannonb_charlayout,       0, 16 ) /* characters */
+	GFXDECODE_ENTRY( "tile", 0x1000, cannonb_spritelayout,     0, 16 ) /* sprites */
+	GFXDECODE_ENTRY( "bigsprite", 0x0000, cclimber_charlayout,   16*4,  8 ) /* big sprites */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_swimmer )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, swimmer_charlayout,       0, 32 ) /* characters */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, swimmer_spritelayout,     0, 32 ) /* sprites */
-	GFXDECODE_ENTRY( "gfx2", 0x0000, swimmer_charlayout,    32*8,  4 ) /* big sprites */
+	GFXDECODE_ENTRY( "tile", 0x0000, swimmer_charlayout,       0, 32 ) /* characters */
+	GFXDECODE_ENTRY( "tile", 0x0000, swimmer_spritelayout,     0, 32 ) /* sprites */
+	GFXDECODE_ENTRY( "bigsprite", 0x0000, swimmer_charlayout,    32*8,  4 ) /* big sprites */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_toprollr )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, cclimber_charlayout,      0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, cclimber_spritelayout,    0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, cclimber_charlayout,   16*4,  8 ) /* big sprites */
+	GFXDECODE_ENTRY( "tile", 0x0000, cclimber_charlayout,      0, 16 )
+	GFXDECODE_ENTRY( "tile", 0x0000, cclimber_spritelayout,    0, 16 )
+	GFXDECODE_ENTRY( "bigsprite", 0x0000, cclimber_charlayout,   16*4,  8 ) /* big sprites */
 	GFXDECODE_ENTRY( "gfx3", 0x0000, cclimber_charlayout,   24*4, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_au )
+	GFXDECODE_ENTRY( "tile", 0x0000, swimmer_charlayout,       0, 32 ) /* characters */
+	GFXDECODE_ENTRY( "tile", 0x0000, swimmer_spritelayout,     0, 32 ) /* sprites */
+	GFXDECODE_ENTRY( "bigsprite", 0x0000, swimmer_charlayout,	   0,  8 ) /* big sprites */
 GFXDECODE_END
 
 void cclimber_state::vblank_irq(int state)
@@ -1147,14 +1210,14 @@ void cclimber_state::root(machine_config &config)
 	m_mainlatch->q_out_cb<2>().set(FUNC(cclimber_state::flip_screen_y_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(cclimber_state::screen_update_cclimber));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(cclimber_state::vblank_irq));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(cclimber_state::screen_update_cclimber));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(cclimber_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cclimber);
 	PALETTE(config, m_palette, FUNC(cclimber_state::cclimber_palette), 16*4+8*4);
@@ -1228,95 +1291,88 @@ void cclimber_state::bagmanf(machine_config &config)
 }
 
 
-void cclimber_state::yamato(machine_config &config)
+void yamato_state::yamato(machine_config &config)
 {
 	root(config);
 
 	/* basic machine hardware */
 	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, XTAL(18'432'000)/3/2));  /* 3.072 MHz */
-	maincpu.set_addrmap(AS_PROGRAM, &cclimber_state::yamato_map);
-	maincpu.set_addrmap(AS_IO, &cclimber_state::yamato_portmap);
-	maincpu.set_addrmap(AS_OPCODES, &cclimber_state::yamato_decrypted_opcodes_map);
+	maincpu.set_addrmap(AS_PROGRAM, &yamato_state::yamato_map);
+	maincpu.set_addrmap(AS_IO, &yamato_state::yamato_portmap);
+	maincpu.set_addrmap(AS_OPCODES, &yamato_state::yamato_decrypted_opcodes_map);
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 
 	Z80(config, m_audiocpu, 3072000); /* 3.072 MHz ? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &cclimber_state::yamato_audio_map);
-	m_audiocpu->set_addrmap(AS_IO, &cclimber_state::yamato_audio_portmap);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &yamato_state::yamato_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &yamato_state::yamato_audio_portmap);
 
 	/* video hardware */
 	m_palette->set_entries(16*4+8*4+256);
-	m_palette->set_init(FUNC(cclimber_state::yamato_palette));
+	m_palette->set_init(FUNC(yamato_state::yamato_palette));
 
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(cclimber_state::screen_update_yamato));
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(yamato_state::screen_update_yamato));
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* 1.536 MHz */
-
 	AY8910(config, "ay2", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* 1.536 MHz */
 }
 
 
-void cclimber_state::toprollr(machine_config &config)
+void toprollr_state::toprollr(machine_config &config)
 {
 	cclimber(config);
 
 	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, XTAL(18'432'000)/3/2));  /* 3.072 MHz */
-	maincpu.set_addrmap(AS_PROGRAM, &cclimber_state::toprollr_map);
-	maincpu.set_addrmap(AS_IO, &cclimber_state::cclimber_portmap);
-	maincpu.set_addrmap(AS_OPCODES, &cclimber_state::toprollr_decrypted_opcodes_map);
+	maincpu.set_addrmap(AS_PROGRAM, &toprollr_state::toprollr_map);
+	maincpu.set_addrmap(AS_IO, &toprollr_state::cclimber_portmap);
+	maincpu.set_addrmap(AS_OPCODES, &toprollr_state::toprollr_decrypted_opcodes_map);
 	maincpu.set_size(0);
 	maincpu.set_numbanks(3);
 	maincpu.set_banksize(0x6000);
 
-	m_mainlatch->q_out_cb<5>().set(FUNC(cclimber_state::toprollr_rombank_w));
-	m_mainlatch->q_out_cb<6>().set(FUNC(cclimber_state::toprollr_rombank_w));
+	m_mainlatch->q_out_cb<5>().set(FUNC(toprollr_state::toprollr_rombank_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(toprollr_state::toprollr_rombank_w));
 
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_toprollr);
 	m_palette->set_entries(32*5);
-	m_palette->set_init(FUNC(cclimber_state::toprollr_palette));
+	m_palette->set_init(FUNC(toprollr_state::toprollr_palette));
 
-	MCFG_VIDEO_START_OVERRIDE(cclimber_state,toprollr)
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(cclimber_state::screen_update_toprollr));
+	MCFG_VIDEO_START_OVERRIDE(toprollr_state,toprollr)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(toprollr_state::screen_update_toprollr));
 
 	subdevice<cclimber_audio_device>("cclimber_audio")->set_sample_clockdiv(4);
 }
 
 
-void cclimber_state::swimmer(machine_config &config)
+void swimmer_state::swimmer_root(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(18'432'000)/6);    /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::swimmer_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &swimmer_state::swimmer_map);
 
 	LS259(config, m_mainlatch, 0);
-	m_mainlatch->q_out_cb<0>().set(FUNC(cclimber_state::nmi_mask_w));
-	m_mainlatch->q_out_cb<1>().set(FUNC(cclimber_state::flip_screen_x_w));
-	m_mainlatch->q_out_cb<2>().set(FUNC(cclimber_state::flip_screen_y_w));
-	m_mainlatch->q_out_cb<3>().set(FUNC(cclimber_state::sidebg_enable_w));
-	m_mainlatch->q_out_cb<4>().set(FUNC(cclimber_state::palette_bank_w));
+	m_mainlatch->q_out_cb<0>().set(FUNC(swimmer_state::nmi_mask_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(swimmer_state::flip_screen_x_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(swimmer_state::flip_screen_y_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(swimmer_state::sidebg_enable_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(swimmer_state::palette_bank_w));
 
 	Z80(config, m_audiocpu, XTAL(4'000'000)/2);  /* verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &cclimber_state::swimmer_audio_map);
-	m_audiocpu->set_addrmap(AS_IO, &cclimber_state::swimmer_audio_portmap);
-	m_audiocpu->set_periodic_int(FUNC(cclimber_state::nmi_line_pulse), attotime::from_hz((double)4000000/16384)); /* IRQs are triggered by the main CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &swimmer_state::swimmer_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &swimmer_state::swimmer_audio_portmap);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60.57); /* verified on pcb */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(cclimber_state::screen_update_swimmer));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(cclimber_state::vblank_irq));
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_swimmer);
-	PALETTE(config, m_palette, FUNC(cclimber_state::swimmer_palette), 32*8+4*8+1);
-
-	MCFG_VIDEO_START_OVERRIDE(cclimber_state,swimmer)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60.57); /* verified on pcb */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(swimmer_state::screen_update_swimmer));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(swimmer_state::vblank_irq));
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1324,18 +1380,58 @@ void cclimber_state::swimmer(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, "ay1", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* verified on pcb */
-
 	AY8910(config, "ay2", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* verified on pcb */
 }
 
-void cclimber_state::guzzler(machine_config &config)
+void swimmer_state::swimmer(machine_config &config)
+{
+	swimmer_root(config);
+
+	m_audiocpu->set_periodic_int(FUNC(swimmer_state::nmi_line_pulse), attotime::from_hz((double)4000000/16384)); /* IRQs are triggered by the main CPU */
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_swimmer);
+
+	PALETTE(config, m_palette, FUNC(swimmer_state::swimmer_palette), 32*8+4*8+1);
+
+	MCFG_VIDEO_START_OVERRIDE(swimmer_state, swimmer)
+}
+
+void swimmer_state::guzzler(machine_config &config)
 {
 	swimmer(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::guzzler_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &swimmer_state::guzzler_map);
 }
 
+rgb_t swimmer_state::au_palette(u32 raw)
+{
+	int r = (raw >> 0) & 0x07;
+	int g = (raw >> 4) & 0x07;
+	int b = (raw >> 8) & 0x07;
+
+	return rgb_t(r << 5, g << 5, b << 5);
+}
+
+void swimmer_state::au(machine_config &config)
+{
+	swimmer_root(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &swimmer_state::au_map);
+
+	m_audiocpu->remove_periodic_int();
+	m_screen->screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI);
+
+	m_audiocpu->set_clock(XTAL(18'432'000) / 6);
+	subdevice<ay8910_device>("ay1")->set_clock(XTAL(18'432'000) / 12);
+	subdevice<ay8910_device>("ay2")->set_clock(XTAL(18'432'000) / 12);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_au);
+
+	PALETTE(config, m_palette).set_format(2, &swimmer_state::au_palette, 64).set_endianness(ENDIANNESS_BIG);
+
+	MCFG_VIDEO_START_OVERRIDE(swimmer_state, au)
+};
 
 /***************************************************************************
 
@@ -1351,7 +1447,7 @@ ROM_START( cclimber )
 	ROM_LOAD( "cc08",         0x3000, 0x1000, CRC(f48c5fe3) SHA1(79072bbbf37387998ffd031afe8eb569a16fa9bd) )
 	ROM_LOAD( "cc07",         0x4000, 0x1000, CRC(3e873baf) SHA1(8870dc5948cdd3c8d2fe9e54a20cf6c311c94e53) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "cc06",         0x0000, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7) )
 	/* 0x0800-0x0fff - empty */
 	ROM_LOAD( "cc05",         0x1000, 0x0800, CRC(2c33b760) SHA1(2edea8fe13376fbd51a5586d97aba3b30d78e94b) )
@@ -1361,7 +1457,7 @@ ROM_START( cclimber )
 	ROM_LOAD( "cc03",         0x3000, 0x0800, CRC(4e4b3658) SHA1(0d39a8cb5cd6cf06008be60707f9b277a8a32a2d) )
 	/* 0x3800-0x3fff - empty */
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "cc02",         0x0000, 0x0800, CRC(14f3ecc9) SHA1(a1b5121abfbe8f07580eb3fa6384352d239a3d75) )
 	ROM_LOAD( "cc01",         0x0800, 0x0800, CRC(21c0f9fb) SHA1(44fad56d302a439257216ddac9fd62b3666589f1) )
 
@@ -1383,7 +1479,7 @@ ROM_START( cclimbera )
 	ROM_LOAD( "cc8",          0x3000, 0x1000, CRC(f48c5fe3) SHA1(79072bbbf37387998ffd031afe8eb569a16fa9bd) )
 	ROM_LOAD( "7",            0x4000, 0x1000, CRC(c2e06606) SHA1(2a8c4b6691ef3661cd52b9a21adfb827dc842c74) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "cc6",          0x0000, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7) )
 	/* 0x0800-0x0fff - empty */
 	ROM_LOAD( "cc5",          0x1000, 0x0800, CRC(2c33b760) SHA1(2edea8fe13376fbd51a5586d97aba3b30d78e94b) )
@@ -1393,7 +1489,7 @@ ROM_START( cclimbera )
 	ROM_LOAD( "cc3",          0x3000, 0x0800, CRC(4e4b3658) SHA1(0d39a8cb5cd6cf06008be60707f9b277a8a32a2d) )
 	/* 0x3800-0x3fff - empty */
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "cc2",          0x0000, 0x0800, CRC(14f3ecc9) SHA1(a1b5121abfbe8f07580eb3fa6384352d239a3d75) )
 	ROM_LOAD( "cc1",          0x0800, 0x0800, CRC(21c0f9fb) SHA1(44fad56d302a439257216ddac9fd62b3666589f1) )
 
@@ -1415,7 +1511,7 @@ ROM_START( cclimberj )
 	ROM_LOAD( "cc08j.bin",    0x3000, 0x1000, CRC(b33c96f8) SHA1(3974f4a60f37bed9e4faee7dafb565f553b9c201) )
 	ROM_LOAD( "cc07j.bin",    0x4000, 0x1000, CRC(fbc9626c) SHA1(32be2d06321b2943718d0bec77ec9ebb806e4b93) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "cc06",         0x0000, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7) )
 	/* 0x0800-0x0fff - empty */
 	ROM_LOAD( "cc05",         0x1000, 0x0800, CRC(2c33b760) SHA1(2edea8fe13376fbd51a5586d97aba3b30d78e94b) )
@@ -1425,7 +1521,7 @@ ROM_START( cclimberj )
 	ROM_LOAD( "cc03",         0x3000, 0x0800, CRC(4e4b3658) SHA1(0d39a8cb5cd6cf06008be60707f9b277a8a32a2d) )
 	/* 0x3800-0x3fff - empty */
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "cc02",         0x0000, 0x0800, CRC(14f3ecc9) SHA1(a1b5121abfbe8f07580eb3fa6384352d239a3d75) )
 	ROM_LOAD( "cc01",         0x0800, 0x0800, CRC(21c0f9fb) SHA1(44fad56d302a439257216ddac9fd62b3666589f1) )
 
@@ -1447,7 +1543,7 @@ ROM_START( ccboot )
 	ROM_LOAD( "m08.bin",      0x3000, 0x1000, CRC(e3c542d6) SHA1(645cc4c94d1b1601c0083b156de67ec47fe2449f) )
 	ROM_LOAD( "cc07j.bin",    0x4000, 0x1000, CRC(fbc9626c) SHA1(32be2d06321b2943718d0bec77ec9ebb806e4b93) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "cc06",         0x0000, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7) )
 	/* 0x0800-0x0fff - empty */
 	ROM_LOAD( "m05.bin",      0x1000, 0x0800, CRC(056af36b) SHA1(756a295bbf7ede201b2e4cb106ce67a127e008de) )
@@ -1457,7 +1553,7 @@ ROM_START( ccboot )
 	ROM_LOAD( "m03.bin",      0x3000, 0x0800, CRC(67127253) SHA1(e27556ed74e73644a2578ce6645c312d64f484c6) )
 	/* 0x3800-0x3fff - empty */
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "m02.bin",      0x0000, 0x0800, CRC(7f4877de) SHA1(c9aa9ff1b6cf907917fedfbd419b15ac337cf7bb) )
 	ROM_LOAD( "m01.bin",      0x0800, 0x0800, CRC(49fab908) SHA1(9665d6e26f390afcbf0ed9fe8fea9be94fbb3a84) )
 
@@ -1480,7 +1576,7 @@ ROM_START( ccboot2 )
 	ROM_LOAD( "m08.bin",      0x3000, 0x1000, CRC(e3c542d6) SHA1(645cc4c94d1b1601c0083b156de67ec47fe2449f) )
 	ROM_LOAD( "cc07j.bin",    0x4000, 0x1000, CRC(fbc9626c) SHA1(32be2d06321b2943718d0bec77ec9ebb806e4b93) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "cc06",         0x0000, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7) )
 	/* 0x0800-0x0fff - empty */
 	ROM_LOAD( "cc05",         0x1000, 0x0800, CRC(2c33b760) SHA1(2edea8fe13376fbd51a5586d97aba3b30d78e94b) )
@@ -1490,7 +1586,7 @@ ROM_START( ccboot2 )
 	ROM_LOAD( "cc03",         0x3000, 0x0800, CRC(4e4b3658) SHA1(0d39a8cb5cd6cf06008be60707f9b277a8a32a2d) )
 	/* 0x3800-0x3fff - empty */
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "cc02",         0x0000, 0x0800, CRC(14f3ecc9) SHA1(a1b5121abfbe8f07580eb3fa6384352d239a3d75) )
 	ROM_LOAD( "cc01",         0x0800, 0x0800, CRC(21c0f9fb) SHA1(44fad56d302a439257216ddac9fd62b3666589f1) )
 
@@ -1513,7 +1609,7 @@ ROM_START( ccbootmm )
 	ROM_LOAD( "2_mm", 0x3000, 0x1000, CRC(19205c51) SHA1(7c89604c682adb85abc79032e38f9db158d9affe) )
 	ROM_LOAD( "1_mm", 0x4000, 0x1000, CRC(499c0625) SHA1(55a407fcce207e3e9bd25d5db6d4aed883b75600) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "13_mm", 0x0000, 0x0800, CRC(2f303f40) SHA1(39606c19b041e3f090aa4f9a3f645255425b4cd5) )
 	// 0x0800-0x0fff - empty
 	ROM_LOAD( "12_mm", 0x1000, 0x0800, CRC(056af36b) SHA1(756a295bbf7ede201b2e4cb106ce67a127e008de) )
@@ -1523,7 +1619,7 @@ ROM_START( ccbootmm )
 	ROM_LOAD( "10_mm", 0x3000, 0x0800, CRC(71fb3ed9) SHA1(b9114a4aa88a375bd1e02753e3d0e7031218a48d) )
 	// 0x3800-0x3fff - empty
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "9_mm", 0x0000, 0x0800, BAD_DUMP CRC(943858c2) SHA1(255473793cae7ef40d3a738cb7e7b2b767859a6d) ) // hand fixed, needs redump
 	ROM_LOAD( "8_mm", 0x0800, 0x0800, BAD_DUMP CRC(76d75e83) SHA1(8f7232155d5c70b0056e59a29aaa19892a1de102) ) // "
 
@@ -1546,7 +1642,7 @@ ROM_START( ccbootmr )  /* Model Racing bootleg */
 	ROM_LOAD( "208.e4",       0x3000, 0x1000, CRC(e3c542d6) SHA1(645cc4c94d1b1601c0083b156de67ec47fe2449f) )
 	ROM_LOAD( "207.c4",       0x4000, 0x1000, CRC(fbc9626c) SHA1(32be2d06321b2943718d0bec77ec9ebb806e4b93) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "cc06",         0x0000, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7) ) // 206.n6
 	/* 0x0800-0x0fff - empty */
 	ROM_LOAD( "cc05",         0x1000, 0x0800, CRC(2c33b760) SHA1(2edea8fe13376fbd51a5586d97aba3b30d78e94b) ) // 205.l6
@@ -1556,7 +1652,7 @@ ROM_START( ccbootmr )  /* Model Racing bootleg */
 	ROM_LOAD( "cc03",         0x3000, 0x0800, CRC(4e4b3658) SHA1(0d39a8cb5cd6cf06008be60707f9b277a8a32a2d) ) // 203.h6
 	/* 0x3800-0x3fff - empty */
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "202.c6",       0x0000, 0x0800, CRC(5ec87c50) SHA1(68317533800a06abb0454303443cdcd913866977) )
 	ROM_LOAD( "201.a6",       0x0800, 0x0800, CRC(76d6d9a4) SHA1(3071dd65d5fe996b1b3a29e9a22d5c005cfd348d) )
 
@@ -1580,7 +1676,7 @@ ROM_START( cclimbroper )
 	ROM_LOAD( "cc2-2532.cpu",       0x3000, 0x1000, CRC(653cebc4) SHA1(c0b664389f7a6f58e880ba0870118aa26c636a37) )
 	ROM_LOAD( "cc1-2532.cpu",       0x4000, 0x1000, CRC(3fcf912b) SHA1(d540895018bc409ae011ce5841c8c5384bbbb1b9) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "cc13-2716.cpu",         0x0000, 0x0800, CRC(9324846d) SHA1(fc04635663ed9fb0f1b7924caff94fb3a1728050) )
 	/* 0x0800-0x0fff - empty */
 	ROM_LOAD( "cc12-2716.cpu",         0x1000, 0x0800, CRC(6d15ba36) SHA1(03d5b8866a27d70a8ddd9eb30717f42fe9164f4a) )
@@ -1590,7 +1686,7 @@ ROM_START( cclimbroper )
 	ROM_LOAD( "cc10-2716.cpu",         0x3000, 0x0800, CRC(437471ec) SHA1(07be06d4d82e862a1e73f51e331b0cd6c9e7889b) )
 	/* 0x3800-0x3fff - empty */
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "cc9-2716.cpu",         0x0000, 0x0800, CRC(a546a18f) SHA1(302ba08cef61b1badc361666fd559713037a2e43) )
 	ROM_LOAD( "cc8-2716.cpu",         0x0800, 0x0800, CRC(0224e507) SHA1(c9b534246b6bb743294581a5e74608a295cf0734) )
 
@@ -1613,7 +1709,7 @@ ROM_START( cclimbrrod )
 	ROM_LOAD( "cc2.bin",       0x3000, 0x1000, CRC(653cebc4) SHA1(c0b664389f7a6f58e880ba0870118aa26c636a37) )
 	ROM_LOAD( "cc1.bin",       0x4000, 0x1000, CRC(3fcf912b) SHA1(d540895018bc409ae011ce5841c8c5384bbbb1b9) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "cc13.bin",         0x0000, 0x0800, CRC(8e0299f5) SHA1(77aa4fd6ee2177971753168bad6eac33034d3fb9) )
 	/* 0x0800-0x0fff - empty */
 	ROM_LOAD( "cc12.bin",         0x1000, 0x0800, CRC(e8cd7b53) SHA1(d4d6120fa14016e197340e8d1eb1141f0eb0eee8) )
@@ -1623,7 +1719,7 @@ ROM_START( cclimbrrod )
 	ROM_LOAD( "cc10.bin",         0x3000, 0x0800, CRC(8ab5fa6b) SHA1(ff31d2c89fe8cd5a276247b11418fb60de03804c))
 	/* 0x3800-0x3fff - empty */
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "cc9.bin",         0x0000, 0x0800, CRC(6fb2afaf) SHA1(d2fe31d00af10e6bcabef51885ce52fb17d1bfbc) )
 	ROM_LOAD( "cc8.bin",         0x0800, 0x0800, CRC(227ee804) SHA1(0cda61a0ceeab299e7d40d33bf6dad3490928323) )
 
@@ -1649,13 +1745,13 @@ ROM_START( ckongpt2 )
 	ROM_LOAD( "11.5l",        0x4000, 0x1000, CRC(ae159192) SHA1(d467256a3a366e246243e7828ff4a45d4c146e2c) )
 	ROM_LOAD( "12.5n",        0x5000, 0x1000, CRC(966bc9ab) SHA1(4434fc620169ffea1b1f227b61674e1daf79b54b) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "6.11n",        0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
 	ROM_LOAD( "5.11l",        0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
 	ROM_LOAD( "4.11k",        0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
 	ROM_LOAD( "3.11h",        0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "2.11c",        0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
 	ROM_LOAD( "1.11a",        0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
 
@@ -1678,13 +1774,13 @@ ROM_START( ckongpt2a )
 	ROM_LOAD( "11.5l",        0x4000, 0x1000, CRC(ae159192) SHA1(d467256a3a366e246243e7828ff4a45d4c146e2c) )
 	ROM_LOAD( "12.5n",        0x5000, 0x1000, CRC(966bc9ab) SHA1(4434fc620169ffea1b1f227b61674e1daf79b54b) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "6.11n",        0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
 	ROM_LOAD( "5.11l",        0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
 	ROM_LOAD( "4.11k",        0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
 	ROM_LOAD( "3.11h",        0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "2.11c",        0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
 	ROM_LOAD( "1.11a",        0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
 
@@ -1707,13 +1803,13 @@ ROM_START( ckongpt2j )
 	ROM_LOAD( "11.5l",        0x4000, 0x1000, CRC(4164eb4d) SHA1(ec95f913820375c3f6dd24776b4d3fd04163f5de) )
 	ROM_LOAD( "12.5n",        0x5000, 0x1000, CRC(966bc9ab) SHA1(4434fc620169ffea1b1f227b61674e1daf79b54b) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "6.11n",        0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
 	ROM_LOAD( "5.11l",        0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
 	ROM_LOAD( "4.11k",        0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
 	ROM_LOAD( "3.11h",        0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "2.11c",        0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
 	ROM_LOAD( "1.11a",        0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
 
@@ -1736,13 +1832,13 @@ ROM_START( ckongpt2jeu )
 	ROM_LOAD( "11.5l",        0x4000, 0x1000, CRC(ae159192) SHA1(d467256a3a366e246243e7828ff4a45d4c146e2c) ) // sldh
 	ROM_LOAD( "ckjeu12.dat",  0x5000, 0x1000, CRC(0532f270) SHA1(a73680bd7939097bd821fb6834e8763cf1572b55) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "6.11n",        0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
 	ROM_LOAD( "5.11l",        0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
 	ROM_LOAD( "4.11k",        0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
 	ROM_LOAD( "3.11h",        0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "2.11c",        0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
 	ROM_LOAD( "1.11a",        0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
 
@@ -1765,13 +1861,13 @@ ROM_START( ckongpt2ss )
 	ROM_LOAD( "ck2_11.5l",    0x4000, 0x1000, CRC(ae159192) SHA1(d467256a3a366e246243e7828ff4a45d4c146e2c) )
 	ROM_LOAD( "ck_12.5n",     0x5000, 0x1000, CRC(25a015d3) SHA1(8b932cb9ae1ba67b4ff86b7b97be0c31cef23514) ) // unique
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "ck2_6.11n",    0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
 	ROM_LOAD( "ck2_5.11l",    0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
 	ROM_LOAD( "ck2_4.11k",    0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
 	ROM_LOAD( "ck2_3.11h",    0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "ck2_2.11c",    0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
 	ROM_LOAD( "ck2_1.11a",    0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
 
@@ -1794,13 +1890,13 @@ ROM_START( ckongpt2b )
 	ROM_LOAD( "l05-11.rom",   0x4000, 0x1000, CRC(07c30f3d) SHA1(9b72f8a76c64ab22f8b8c1bd8e457c10b86d95a1) )
 	ROM_LOAD( "n05-12.rom",   0x5000, 0x1000, CRC(151de90a) SHA1(5d063c4fe6767727d051815120d692818a30ee81) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "6.11n",        0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
 	ROM_LOAD( "5.11l",        0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
 	ROM_LOAD( "4.11k",        0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
 	ROM_LOAD( "3.11h",        0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "2.11c",        0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
 	ROM_LOAD( "1.11a",        0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
 
@@ -1823,13 +1919,13 @@ ROM_START( ckongpt2b2 )
 	ROM_LOAD( "4.bin",        0x4000, 0x1000, CRC(ae159192) SHA1(d467256a3a366e246243e7828ff4a45d4c146e2c) )
 	ROM_LOAD( "5.bin",        0x5000, 0x1000, CRC(966bc9ab) SHA1(4434fc620169ffea1b1f227b61674e1daf79b54b) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "d.bin",        0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
 	ROM_LOAD( "c.bin",        0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
 	ROM_LOAD( "b.bin",        0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
 	ROM_LOAD( "a.bin",        0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "9.bin",        0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
 	ROM_LOAD( "8.bin",        0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
 
@@ -1854,13 +1950,13 @@ ROM_START( ckong )
 	ROM_LOAD( "falcon11",     0x4000, 0x1000, CRC(327dcadf) SHA1(17b2d3b9e2a82b5278a01cc972cb49705d113127) )
 	/* no ROM at 5000 */
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "falcon6",      0x0000, 0x1000, CRC(a8916dc8) SHA1(472520aae3837e6026f2a7577d3b2aff371a316c) )
 	ROM_LOAD( "falcon5",      0x1000, 0x1000, CRC(cd3b5dde) SHA1(2319a2be04d70989b01f4fc703756ba6e1c1f388) )
 	ROM_LOAD( "falcon4",      0x2000, 0x1000, CRC(b62a0367) SHA1(8c285cbc714d7e6589bd63b3cef7c841ed1c2a4e) )
 	ROM_LOAD( "falcon3",      0x3000, 0x1000, CRC(61122c5e) SHA1(978b6dbec35f3adc651fddf332db17625099a92e) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "falcon2",  0x0000, 0x0800, CRC(f67c80f1) SHA1(d1fbcce1b6242f810e106ff50812636e3168ebc1) )
 	ROM_LOAD( "falcon1",  0x0800, 0x0800, CRC(80eb517d) SHA1(fef4111f656c58b28e7eac5aa5b5cc7e07ccb2fd) )
 
@@ -1884,7 +1980,7 @@ ROM_START( ckongo )
 	ROM_LOAD( "o55a-5",       0x4000, 0x1000, CRC(5182db06) SHA1(f3e981dc3744aff7756f8e0bfd4d92583a02417d) )
 	/* no ROM at 5000 */
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	/* same as ckongpt2 but with halves switched */
 	ROM_LOAD( "o50b-1",       0x0000, 0x0800, CRC(cae9e2bf) SHA1(bc62d98840b8b5b296de0f1379baabb1b4d25df0) )
 	ROM_CONTINUE(             0x1000, 0x0800 )
@@ -1895,7 +1991,7 @@ ROM_START( ckongo )
 	ROM_LOAD( "o50b-4",       0x2800, 0x0800, CRC(b7008b57) SHA1(9328ff79947dbebdc3e2dd8bcc362667b8201476) )
 	ROM_CONTINUE(             0x3800, 0x0800 )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "c11-02.bin",   0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
 	ROM_LOAD( "a11-01.bin",   0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
 
@@ -1918,13 +2014,13 @@ ROM_START( ckongalc )
 	ROM_LOAD( "ck11.bin",     0x4000, 0x1000, CRC(327dcadf) SHA1(17b2d3b9e2a82b5278a01cc972cb49705d113127) ) // sldh w/ckongdks
 	/* no ROM at 5000 */
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "ck6.bin",      0x0000, 0x1000, CRC(a8916dc8) SHA1(472520aae3837e6026f2a7577d3b2aff371a316c) )
 	ROM_LOAD( "ck5.bin",      0x1000, 0x1000, CRC(cd3b5dde) SHA1(2319a2be04d70989b01f4fc703756ba6e1c1f388) )
 	ROM_LOAD( "ck4.bin",      0x2000, 0x1000, CRC(b62a0367) SHA1(8c285cbc714d7e6589bd63b3cef7c841ed1c2a4e) )
 	ROM_LOAD( "ck3.bin",      0x3000, 0x1000, CRC(61122c5e) SHA1(978b6dbec35f3adc651fddf332db17625099a92e) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "alc_ck2.bin",  0x0000, 0x0800, CRC(f67c80f1) SHA1(d1fbcce1b6242f810e106ff50812636e3168ebc1) )
 	ROM_LOAD( "alc_ck1.bin",  0x0800, 0x0800, CRC(80eb517d) SHA1(fef4111f656c58b28e7eac5aa5b5cc7e07ccb2fd) )
 
@@ -1947,13 +2043,13 @@ ROM_START( bigkong )
 	ROM_LOAD( "dk05f11_2532.l5",   0x4000, 0x1000, CRC(45be1c6a) SHA1(3d45da4ab21586148a3608d085aa4c401bd257fe) )
 	ROM_LOAD( "n05-12.bin",   0x5000, 0x1000, CRC(966bc9ab) SHA1(4434fc620169ffea1b1f227b61674e1daf79b54b) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "n11-06.bin",   0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
 	ROM_LOAD( "l11-05.bin",   0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
 	ROM_LOAD( "k11-04.bin",   0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
 	ROM_LOAD( "h11-03.bin",   0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "c11-02.bin",   0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
 	ROM_LOAD( "a11-01.bin",   0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
 
@@ -1976,13 +2072,13 @@ ROM_START( monkeyd )
 	ROM_LOAD( "md5l.bin",     0x4000, 0x1000, CRC(d1db1bb0) SHA1(fe7d700c7f9eca9c389be3717ebebf3e7dc63aa2) )
 	/* no ROM at 5000 */
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "ck6.bin",      0x0000, 0x1000, CRC(a8916dc8) SHA1(472520aae3837e6026f2a7577d3b2aff371a316c) )
 	ROM_LOAD( "ck5.bin",      0x1000, 0x1000, CRC(cd3b5dde) SHA1(2319a2be04d70989b01f4fc703756ba6e1c1f388) )
 	ROM_LOAD( "ck4.bin",      0x2000, 0x1000, CRC(b62a0367) SHA1(8c285cbc714d7e6589bd63b3cef7c841ed1c2a4e) )
 	ROM_LOAD( "ck3.bin",      0x3000, 0x1000, CRC(61122c5e) SHA1(978b6dbec35f3adc651fddf332db17625099a92e) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "md_ck2.bin",   0x0000, 0x0800, CRC(f67c80f1) SHA1(d1fbcce1b6242f810e106ff50812636e3168ebc1) )
 	ROM_LOAD( "md_ck1.bin",   0x0800, 0x0800, CRC(80eb517d) SHA1(fef4111f656c58b28e7eac5aa5b5cc7e07ccb2fd) )
 
@@ -2148,13 +2244,13 @@ ROM_START( dking )
 	ROM_LOAD( "d8.1r",        0x4800, 0x0800, CRC(7c66fb5c) SHA1(5eda9b0037f958433d96bc945c1273b66ef9cac5) )
 	ROM_CONTINUE( 0x4000, 0x800 )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "falcon6",      0x0000, 0x1000, CRC(a8916dc8) SHA1(472520aae3837e6026f2a7577d3b2aff371a316c) ) // d4.6n
 	ROM_LOAD( "falcon5",      0x1000, 0x1000, CRC(cd3b5dde) SHA1(2319a2be04d70989b01f4fc703756ba6e1c1f388) ) // d3.6l
 	ROM_LOAD( "falcon4",      0x2000, 0x1000, CRC(b62a0367) SHA1(8c285cbc714d7e6589bd63b3cef7c841ed1c2a4e) ) // d2.6k
 	ROM_LOAD( "falcon3",      0x3000, 0x1000, CRC(61122c5e) SHA1(978b6dbec35f3adc651fddf332db17625099a92e) ) // d1.6h
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "falcon2",  0x0000, 0x0800, CRC(f67c80f1) SHA1(d1fbcce1b6242f810e106ff50812636e3168ebc1) ) // d12.6a
 	ROM_LOAD( "falcon1",  0x0800, 0x0800, CRC(80eb517d) SHA1(fef4111f656c58b28e7eac5aa5b5cc7e07ccb2fd) ) // d13.6c
 
@@ -2180,13 +2276,13 @@ ROM_START( ckongdks )
 	ROM_LOAD( "ck10.bin",      0x4800, 0x0800, CRC(c27a13f1) SHA1(14f11976bc0e643829a4d4d2d5bb27971979be6f) ) // 94.921875%
 	ROM_CONTINUE(              0x4000, 0x0800 )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "ck06.bin",      0x0000, 0x1000, CRC(a8916dc8) SHA1(472520aae3837e6026f2a7577d3b2aff371a316c) )
 	ROM_LOAD( "ck05.bin",      0x1000, 0x1000, CRC(cd3b5dde) SHA1(2319a2be04d70989b01f4fc703756ba6e1c1f388) )
 	ROM_LOAD( "ck04.bin",      0x2000, 0x1000, CRC(b62a0367) SHA1(8c285cbc714d7e6589bd63b3cef7c841ed1c2a4e) )
 	ROM_LOAD( "ck03.bin",      0x3000, 0x1000, CRC(61122c5e) SHA1(978b6dbec35f3adc651fddf332db17625099a92e) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "ck02.bin",  0x0000, 0x0800, CRC(085b5f90) SHA1(cce771fbd76c2bc7749325d71c95810898e5b0d9) ) // 98.730469%
 	ROM_LOAD( "ck01.bin",  0x0800, 0x0800, CRC(16fd47e2) SHA1(43e5ea70e99482db90681e401a7e1e2d2d36b6f4) ) // 98.339844%
 
@@ -2210,13 +2306,13 @@ ROM_START( rpatrol )
 	ROM_LOAD( "4.1c",    0x003000, 0x001000, CRC(41497a94) SHA1(7550e74f93c1fd1d5e7fc70c4a2cd2d1b4c22ce5) )
 	ROM_LOAD( "5.1a",    0x004000, 0x001000, CRC(e20ee7e7) SHA1(53f7ec5c6805043d3e8f014ade2480cd6dbd94db) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "6.6l.2732",    0x000000, 0x000800, CRC(b38d8aca) SHA1(b93aa0010b0c0ab23284188a881d4a9bb0fd4582) )
 	ROM_CONTINUE(             0x001000, 0x000800 )
 	ROM_LOAD( "7.6p.2732",    0x002000, 0x000800, CRC(bc2bddf9) SHA1(4057fc535b1a2db943f893290afe9bfd865ac84b) )
 	ROM_CONTINUE(             0x003000, 0x000800 )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "8.2s",    0x000000, 0x000800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
 	ROM_LOAD( "9.2t",    0x000800, 0x000800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
 
@@ -2234,13 +2330,13 @@ ROM_START( rpatroln )
 	ROM_LOAD( "4_2.3p", 0x3000, 0x1000, CRC(74a8f1f4) SHA1(6bbc4944e4b31425a6b82f370b6760e5a4b36f56) )
 	ROM_LOAD( "5_2.3r", 0x4000, 0x1000, CRC(d7ef6c87) SHA1(38e3b44b355907824919acc4f5064dcb98ebb1d0) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 ) /* located on an original ORCA OVG-50B PCB */
+	ROM_REGION( 0x4000, "tile", 0 ) /* located on an original ORCA OVG-50B PCB */
 	ROM_LOAD( "6.6l.2732", 0x000000, 0x000800, CRC(b38d8aca) SHA1(b93aa0010b0c0ab23284188a881d4a9bb0fd4582) )
 	ROM_CONTINUE(          0x001000, 0x000800 )
 	ROM_LOAD( "7.6p.2732", 0x002000, 0x000800, CRC(bc2bddf9) SHA1(4057fc535b1a2db943f893290afe9bfd865ac84b) )
 	ROM_CONTINUE(          0x003000, 0x000800 )
 
-	ROM_REGION( 0x1000, "gfx2", 0 ) /* located on an original ORCA OVG-50B PCB */
+	ROM_REGION( 0x1000, "bigsprite", 0 ) /* located on an original ORCA OVG-50B PCB */
 	ROM_LOAD( "8.2s", 0x000000, 0x000800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
 	ROM_LOAD( "9.2t", 0x000800, 0x000800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
 
@@ -2259,7 +2355,7 @@ ROM_START( rpatrolb )
 	ROM_LOAD( "rp5.4c",       0x4000, 0x1000, CRC(d7ef6c87) SHA1(38e3b44b355907824919acc4f5064dcb98ebb1d0) )
 	/* no ROM at 5000 */
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "rp6.6n",       0x0000, 0x0800, CRC(19f18e9e) SHA1(a5500ac36bcda772f3ba79d9e9d37b1eec7bfd13) )
 	/* 0x0800-0x0fff - empty */
 	ROM_LOAD( "rp7.6l",       0x1000, 0x0800, CRC(07f2070d) SHA1(39df286fda9e48eba6e770fe23a603b5e10d88b6) )
@@ -2269,7 +2365,7 @@ ROM_START( rpatrolb )
 	ROM_LOAD( "rp9.6h",       0x3000, 0x0800, CRC(ea5aafca) SHA1(d8f8fe270680ae261d63bd4702107961cd904699) )
 	/* 0x3800-0x3fff - empty */
 
-	ROM_REGION( 0x1000, "gfx2", 0 ) // roms swapped around
+	ROM_REGION( 0x1000, "bigsprite", 0 ) // roms swapped around
 	ROM_LOAD( "rp11.6c",      0x0000, 0x0800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
 	ROM_LOAD( "rp10.6a",      0x0800, 0x0800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
 
@@ -2290,7 +2386,7 @@ ROM_START( silvland )
 	ROM_LOAD( "11.1r",        0x4000, 0x1000, CRC(6f23f66f) SHA1(3ca8075c28956ec473ccb0e9f05e9ad8669f743d) )
 	ROM_LOAD( "12.2k",        0x5000, 0x1000, CRC(26f1537c) SHA1(0468352d49edec3a52e32612856735b78e11079b) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "6.6n",         0x0000, 0x0800, CRC(affb804f) SHA1(9fc77804690e91773787e06f3329accef075f9f3) )
 	/* 0x0800-0x0fff - empty */
 	ROM_LOAD( "5.6l",         0x1000, 0x0800, CRC(ad4642e5) SHA1(f4de2d9ed0e69c002be07f47247e95167a3ffffb) )
@@ -2300,7 +2396,7 @@ ROM_START( silvland )
 	ROM_LOAD( "3.6h",         0x3000, 0x0800, CRC(59125a1a) SHA1(37638fb690d6b4f11585f6a13586271c2f0e3743) )
 	/* 0x3800-0x3fff - empty */
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "2.6c",         0x0000, 0x0800, CRC(c8d32b8e) SHA1(7d655d243ed13cf2537f3fdfde5bf34229f7cb84) )
 	ROM_LOAD( "1.6a",         0x0800, 0x0800, CRC(ee333daf) SHA1(b02998dccec9a4f841838874221caabae8380fcc) )
 
@@ -2322,7 +2418,7 @@ ROM_START( cannonb )
 	ROM_LOAD( "canballs.5h",  0x2000, 0x1000, CRC(e18a836b) SHA1(19b90a55db82914c5db18486e05d9f59aba1b442) )
 	ROM_LOAD( "canballs.5k",  0x3000, 0x0800, CRC(6ed3cbf4) SHA1(070ba61dc97df6be8004f7e052a4cef836234888) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 ) // using gfx roms from other sets because the ones in this set were bad
+	ROM_REGION( 0x4000, "tile", 0 ) // using gfx roms from other sets because the ones in this set were bad
 	ROM_LOAD( "cb10.bin",   0x0000, 0x0800, CRC(602a6c2d) SHA1(788f83bcb0667d8a42c209f3d51708d496be58df) )
 	/* 0x0800-0x0fff - empty */
 	ROM_CONTINUE(           0x1000, 0x0800 )
@@ -2332,7 +2428,7 @@ ROM_START( cannonb )
 	ROM_CONTINUE(           0x3000, 0x0800 )
 	/* 0x3800-0x0fff - empty */
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "canballs.11c", 0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
 	ROM_LOAD( "canballs.11a", 0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
 
@@ -2361,7 +2457,7 @@ ROM_START( cannonb2 )
 	ROM_LOAD( "cb3.bin",   0x2000, 0x1000, CRC(e18a836b) SHA1(19b90a55db82914c5db18486e05d9f59aba1b442) )
 	ROM_LOAD( "cb4.bin",   0x3000, 0x1000, CRC(696ebdb0) SHA1(0bff115e4710199641722ca12af4e16dc5b0ec13) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "cb10.bin",   0x0000, 0x0800, CRC(602a6c2d) SHA1(788f83bcb0667d8a42c209f3d51708d496be58df) )
 	/* 0x0800-0x0fff - empty */
 	ROM_CONTINUE(           0x1000, 0x0800 )
@@ -2371,7 +2467,7 @@ ROM_START( cannonb2 )
 	ROM_CONTINUE(           0x3000, 0x0800 )
 	/* 0x3800-0x0fff - empty */
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "cb7.bin",   0x0000, 0x0800, CRC(80eb517d) SHA1(fef4111f656c58b28e7eac5aa5b5cc7e07ccb2fd) )
 	ROM_LOAD( "cb8.bin",   0x0800, 0x0800, CRC(f67c80f1) SHA1(d1fbcce1b6242f810e106ff50812636e3168ebc1) )
 
@@ -2392,7 +2488,7 @@ ROM_START( cannonb3 )
 	ROM_LOAD( "3 pos h5  2532.bin",  0x2000, 0x1000, CRC(e18a836b) SHA1(19b90a55db82914c5db18486e05d9f59aba1b442) )
 	ROM_LOAD( "4 pos k5  2716.bin",  0x3000, 0x0800, CRC(58e04f41) SHA1(d1d0adb36bd509928c0e1a3a0ee9ba296aa530ab) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "b pos n11  2532.bin",   0x0000, 0x0800, CRC(602a6c2d) SHA1(788f83bcb0667d8a42c209f3d51708d496be58df) )
 	/* 0x0800-0x0fff - empty */
 	ROM_CONTINUE(           0x1000, 0x0800 )
@@ -2402,7 +2498,7 @@ ROM_START( cannonb3 )
 	ROM_CONTINUE(           0x3000, 0x0800 )
 	/* 0x3800-0x0fff - empty */
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "bigsprite", 0 )
 	ROM_LOAD( "ck2 pos c11  2716.bin", 0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
 	ROM_LOAD( "ck1 pos a11  2716.bin", 0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
 
@@ -2438,13 +2534,13 @@ ROM_START( bagmanf )
 	ROM_LOAD( "2732 05 pos dboard.bin",  0x5000, 0x1000, CRC(91570033) SHA1(7cd7fe9541da36c3919324bc65e6db1d1ca635e0) )
 
 	// not 100% trusted, but close (unless bad tiles are supposed to be masked by color)
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "10.n11.bin",   0x2000, 0x1000, CRC(c680ef04) SHA1(79406bc786374abfcd9f548268c445b5c8d8858d) )
 	ROM_LOAD( "09.l11.bin",   0x3000, 0x1000, CRC(060b044c) SHA1(3121f07adb661663a2303085eea1b662968f8f98) )
 	ROM_LOAD( "12.k11.bin",   0x0000, 0x1000, CRC(4a0a6b55) SHA1(955f8bd4bd9b0fc3c6c359c25ba543ba26c04cbd) )
 	ROM_LOAD( "11.h11.bin",   0x1000, 0x1000, CRC(8043bc1a) SHA1(bd2f3dfe26cf8d987d9ecaa41eac4bdc4e16a692) )
 
-	ROM_REGION( 0x2000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x2000, "bigsprite", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0060, "proms", 0 )
 	ROM_LOAD( "v6",      0x0020, 0x0020, CRC(b3fc1505) SHA1(5b94adde0428a26b815c7eb9b3f3716470d349c7) )
@@ -2478,12 +2574,12 @@ ROM_START( swimmer )
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "sw12.4k",      0x0000, 0x1000, CRC(2eee9bcb) SHA1(ceafdf750a8af0c1c9abbbf437c3e9d9ae09f72b) )
 
-	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_REGION( 0x3000, "tile", 0 )
 	ROM_LOAD( "sw15.18k",     0x0000, 0x1000, CRC(4f3608cb) SHA1(cebcad69c4ad5dacc0bf597fdaed6f8950ffdfe1) )  /* chars */
 	ROM_LOAD( "sw14.18l",     0x1000, 0x1000, CRC(7181c8b4) SHA1(b22fa0ebac884002cf6f5651e4366f30d0ab09f5) )
 	ROM_LOAD( "sw13.18m",     0x2000, 0x1000, CRC(2eb1af5c) SHA1(0105d03adfc5ce9ca478e678a1e1d8bae7c516e0) )
 
-	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_REGION( 0x3000, "bigsprite", 0 )
 	ROM_LOAD( "sw23.6c",      0x0000, 0x0800, CRC(9ca67e24) SHA1(86f561abc1a1c6b0c29c6017246d805c5a48b999) )  /* bigsprite data */
 	ROM_RELOAD(               0x0800, 0x0800 )  /* Guzzler has larger ROMs */
 	ROM_LOAD( "sw22.5c",      0x1000, 0x0800, CRC(02c10992) SHA1(8c383fdcd83aa9997e5802a58419b9d993a9b38d) )
@@ -2511,12 +2607,12 @@ ROM_START( swimmera )
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "sw12.4k",      0x0000, 0x1000, CRC(2eee9bcb) SHA1(ceafdf750a8af0c1c9abbbf437c3e9d9ae09f72b) )
 
-	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_REGION( 0x3000, "tile", 0 )
 	ROM_LOAD( "sw15.18k",     0x0000, 0x1000, CRC(4f3608cb) SHA1(cebcad69c4ad5dacc0bf597fdaed6f8950ffdfe1) )  /* chars */
 	ROM_LOAD( "sw14.18l",     0x1000, 0x1000, CRC(7181c8b4) SHA1(b22fa0ebac884002cf6f5651e4366f30d0ab09f5) )
 	ROM_LOAD( "sw13.18m",     0x2000, 0x1000, CRC(2eb1af5c) SHA1(0105d03adfc5ce9ca478e678a1e1d8bae7c516e0) )
 
-	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_REGION( 0x3000, "bigsprite", 0 )
 	ROM_LOAD( "sw23.6c",      0x0000, 0x0800, CRC(9ca67e24) SHA1(86f561abc1a1c6b0c29c6017246d805c5a48b999) )  /* bigsprite data */
 	ROM_RELOAD(               0x0800, 0x0800 )  /* Guzzler has larger ROMs */
 	ROM_LOAD( "sw22.5c",      0x1000, 0x0800, CRC(02c10992) SHA1(8c383fdcd83aa9997e5802a58419b9d993a9b38d) )
@@ -2544,12 +2640,12 @@ ROM_START( swimmerb )
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "sw12.4k",      0x0000, 0x1000, CRC(2eee9bcb) SHA1(ceafdf750a8af0c1c9abbbf437c3e9d9ae09f72b) )
 
-	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_REGION( 0x3000, "tile", 0 )
 	ROM_LOAD( "sw15.18k",     0x0000, 0x1000, CRC(4f3608cb) SHA1(cebcad69c4ad5dacc0bf597fdaed6f8950ffdfe1) )  /* chars */
 	ROM_LOAD( "sw14.18l",     0x1000, 0x1000, CRC(7181c8b4) SHA1(b22fa0ebac884002cf6f5651e4366f30d0ab09f5) )
 	ROM_LOAD( "sw13.18m",     0x2000, 0x1000, CRC(2eb1af5c) SHA1(0105d03adfc5ce9ca478e678a1e1d8bae7c516e0) )
 
-	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_REGION( 0x3000, "bigsprite", 0 )
 	ROM_LOAD( "sw23.6c",      0x0000, 0x0800, CRC(9ca67e24) SHA1(86f561abc1a1c6b0c29c6017246d805c5a48b999) )  /* bigsprite data */
 	ROM_RELOAD(               0x0800, 0x0800 )  /* Guzzler has larger ROMs */
 	ROM_LOAD( "sw22.5c",      0x1000, 0x0800, CRC(02c10992) SHA1(8c383fdcd83aa9997e5802a58419b9d993a9b38d) )
@@ -2581,13 +2677,13 @@ ROM_START( guzzler )
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "guzz-12.bin",  0x0000, 0x1000, CRC(f3754d9e) SHA1(bb30832aba4e82ab0ecce40fc1223d9771ff7dd2) )
 
-	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_REGION( 0x3000, "tile", 0 )
 	ROM_LOAD( "guzz-13.bin",  0x0000, 0x1000, CRC(afc464e2) SHA1(61730b5e5add24ba3d4e8903c5d71cf4df9b77e0) )   /* chars */
 	ROM_LOAD( "guzz-14.bin",  0x1000, 0x1000, CRC(acbdfe1f) SHA1(ab7abe4bb321fc7dc4e73acab4b1a7133e6bcf20) )
 	ROM_LOAD( "guzz-15.bin",  0x2000, 0x1000, CRC(66978c05) SHA1(2c8d5545f8b1d3cd7cd63448f8064fd3712d6fee) )
 
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "guzz-11.bin",  0x0000, 0x1000, CRC(ec2e9d86) SHA1(2fc631229e78db68777e74a03f98f660f324a885) )   /* big sprite */
+	ROM_REGION( 0x3000, "bigsprite", 0 )
+	ROM_LOAD( "guzz-11.bin",  0x0000, 0x1000, CRC(ec2e9d86) SHA1(2fc631229e78db68777e74a03f98f660f324a885) )
 	ROM_LOAD( "guzz-10.bin",  0x1000, 0x1000, CRC(bd3f0bf7) SHA1(c57aff05812801c22104a4afc8a8a6bca33dda96) )
 	ROM_LOAD( "guzz-09.bin",  0x2000, 0x1000, CRC(18927579) SHA1(414676193ef1f6ce79a4cba73e4d017312f766f4) )
 
@@ -2620,12 +2716,12 @@ ROM_START( guzzlers ) /* Swimmer Conversion, 1k vs 2k romsize in maincpu */
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "guzz-12.bin",  0x0000, 0x1000, CRC(f3754d9e) SHA1(bb30832aba4e82ab0ecce40fc1223d9771ff7dd2) ) // GUZZ12.L4
 
-	ROM_REGION( 0x3000, "gfx1", 0 ) /* chars */
+	ROM_REGION( 0x3000, "tile", 0 ) /* chars */
 	ROM_LOAD( "guzz-13.bin",  0x0000, 0x1000, CRC(afc464e2) SHA1(61730b5e5add24ba3d4e8903c5d71cf4df9b77e0) ) // GUZZ13.JK18
 	ROM_LOAD( "guzz-14.bin",  0x1000, 0x1000, CRC(acbdfe1f) SHA1(ab7abe4bb321fc7dc4e73acab4b1a7133e6bcf20) ) // GUZZ14.L18
 	ROM_LOAD( "guzz-15.bin",  0x2000, 0x1000, CRC(66978c05) SHA1(2c8d5545f8b1d3cd7cd63448f8064fd3712d6fee) ) // GUZZ15.MN18
 
-	ROM_REGION( 0x3000, "gfx2", 0 ) /* big sprite */
+	ROM_REGION( 0x3000, "bigsprite", 0 )
 	ROM_LOAD( "guzz-11.bin",  0x0000, 0x1000, CRC(ec2e9d86) SHA1(2fc631229e78db68777e74a03f98f660f324a885) ) // 11.C6
 	ROM_LOAD( "guzz-10.bin",  0x1000, 0x1000, CRC(bd3f0bf7) SHA1(c57aff05812801c22104a4afc8a8a6bca33dda96) ) // 10.C5
 	ROM_LOAD( "guzz-09.bin",  0x2000, 0x1000, CRC(18927579) SHA1(414676193ef1f6ce79a4cba73e4d017312f766f4) ) // 9.C4
@@ -2639,6 +2735,39 @@ ROM_START( guzzlers ) /* Swimmer Conversion, 1k vs 2k romsize in maincpu */
 	ROM_LOAD( "tk01.bin",     0x0000, 0x0104, CRC(af082b3c) SHA1(94ee780945255ebfc2a0848a40289fbc4c7e7d7c) ) // appears to be PAL16L8
 ROM_END
 
+/*
+    Au (Swimmer Conversion)
+
+    CPU/Sound Board:   B102-403 (modified)
+    Video Board:       102-401 (modified)
+    Daughterboard: unmarked
+*/
+
+ROM_START( au )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "au1.l9",  0x0000, 0x1000, CRC(4e6b2ac1) SHA1(ddc24e292e7ece5e5b688798212c41b1f943ec83) )
+	ROM_LOAD( "au2.k9",  0x1000, 0x1000, CRC(07c1aea4) SHA1(9640a65d272f68af6bd080b113bd02e36a952989) )
+	ROM_LOAD( "au3.j9",  0x2000, 0x1000, CRC(d024a4e5) SHA1(13d5b48b27b8b94d7e97b2f8b67ca554c8bde9c0) )
+	ROM_LOAD( "au4.f9",  0x3000, 0x1000, CRC(afd783d9) SHA1(8940dd87f9a3bb63aa9b43533c4c12fe48a6b09d) )
+	ROM_LOAD( "au5.e9",  0x4000, 0x1000, CRC(372c06e9) SHA1(7b76959f99029e868c03141491dbfa74487890d9) )
+	ROM_LOAD( "au6.d9",  0x5000, 0x1000, CRC(2daa0b49) SHA1(20d7f31a1af759f8b55d65e99275c9692f4ad0b5) )
+	ROM_LOAD( "au7.c9",  0x6000, 0x1000, CRC(8345cce5) SHA1(bb6e8371d5f5acf91bca9568a5dd9335d95a501d) )
+	ROM_LOAD( "au8.a9",  0x7000, 0x1000, CRC(ad02f888) SHA1(1e8301311baa7f853510223c36982e7aa19ac34d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "au12.4k",  0x0000, 0x1000, CRC(0315f0a1) SHA1(18d1e72298448737c8aa226f6d8b9c592143c4e8) )
+
+	ROM_REGION( 0x6000, "tile", 0 )
+	ROM_LOAD( "au13.18k",  0x0000, 0x2000, CRC(faa24ff4) SHA1(b95a9df5ea44c638589b7bab507638210b369401) )
+	ROM_LOAD( "au14.18l",  0x2000, 0x2000, CRC(2bd7aa4e) SHA1(9a1482cedd689bd10a30208cc10469bf5b53a264) )
+	ROM_LOAD( "au15.18m",  0x4000, 0x2000, CRC(d5a8bf00) SHA1(6a9ad47477c5041c3757f8dcaf3d54f054257ed3) )
+
+	ROM_REGION( 0x3000, "bigsprite", 0 )
+	ROM_LOAD( "au11.6c", 0x0000, 0x1000, CRC(19d65322) SHA1(e1d1c5a19ef6d1d773485a30a887da51c6281e1d) )
+	ROM_LOAD( "au10.5c", 0x1000, 0x1000, CRC(dd2bf0ba) SHA1(4a9688555e73cc3be61665ce9800eb8975844d4f) )
+	ROM_LOAD( "au9.4c",  0x2000, 0x1000, CRC(4a22394e) SHA1(6b8d9658a0c4cad21d226fe8b10ba3e0c8e9fe28) )
+ROM_END
+
 ROM_START( yamato )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "2.5de",        0x0000, 0x2000, CRC(20895096) SHA1(af76786e3c519e710899f143d46c53087e9817c7) )
@@ -2650,11 +2779,11 @@ ROM_START( yamato )
 	ROM_REGION( 0x800, "audiocpu", 0 )
 	ROM_LOAD( "1.5v",         0x0000, 0x0800, CRC(3aad9e3c) SHA1(37b0414b265397881bb45b166ecab85880d1358d) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "10.11k",       0x0000, 0x2000, CRC(161121f5) SHA1(017c5c6b773b0ae1d0be52e4bac90b699ea196dd) )
 	ROM_LOAD( "9.11h",        0x2000, 0x2000, CRC(56e84cc4) SHA1(c48e0e5460376d6b34173c42a27907ef12218182) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "bigsprite", 0 )
 	ROM_LOAD( "8.11c",        0x0000, 0x1000, CRC(28024d9a) SHA1(c871c4d74be72a8bfea99e89d43f91922f4b734b) )
 	ROM_LOAD( "7.11a",        0x1000, 0x1000, CRC(4a179790) SHA1(7fb6b033de939ff8bd13055c073311dca2c1a6fe) )
 
@@ -2681,11 +2810,11 @@ ROM_START( yamato2 )
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "1.5v",         0x0000, 0x0800, CRC(3aad9e3c) SHA1(37b0414b265397881bb45b166ecab85880d1358d) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "10.11k",       0x0000, 0x2000, CRC(161121f5) SHA1(017c5c6b773b0ae1d0be52e4bac90b699ea196dd) )
 	ROM_LOAD( "9.11h",        0x2000, 0x2000, CRC(56e84cc4) SHA1(c48e0e5460376d6b34173c42a27907ef12218182) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "bigsprite", 0 )
 	ROM_LOAD( "8.11c",        0x0000, 0x1000, CRC(28024d9a) SHA1(c871c4d74be72a8bfea99e89d43f91922f4b734b) )
 	ROM_LOAD( "7.11a",        0x1000, 0x1000, CRC(4a179790) SHA1(7fb6b033de939ff8bd13055c073311dca2c1a6fe) )
 
@@ -2706,11 +2835,11 @@ ROM_START( toprollr )
 	ROM_LOAD( "10.k3", 0xc000, 0x2000, CRC(1e8914a6) SHA1(ec17f185f890d04ce75a5d8edf8b32da60e7a8d8) )
 	ROM_LOAD( "11.l3", 0xe000, 0x2000, CRC(b20a9fa2) SHA1(accd3296447eca002b0808e7b02832f5e35407e8) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "tile", 0 )
 	ROM_LOAD( "16.j4", 0x0000, 0x2000, CRC(ce3afe26) SHA1(7de00720f091537c64cc0fec687c061de3a8b1a3) )
 	ROM_LOAD( "15.h4", 0x2000, 0x2000, CRC(b6fe97f2) SHA1(00c58f693dda0aa3ea4893dcaae90b1b63054789) )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "bigsprite", 0 )
 	ROM_LOAD( "14.c4", 0x0000, 0x2000, CRC(7a945733) SHA1(14187ba303aecf0a812c425c34d8edda3deaa2b5) )
 	ROM_LOAD( "13.a4", 0x2000, 0x2000, CRC(89327329) SHA1(555331a3136aa8c5bb35b97dd54bc59da067be57) )
 
@@ -2742,14 +2871,14 @@ ROM_START( toprollr )
 ROM_END
 
 
-void cclimber_state::init_yamato()
+void yamato_state::init_yamato()
 {
 	save_item(NAME(m_yamato_p0));
 	save_item(NAME(m_yamato_p1));
 }
 
 
-void cclimber_state::init_toprollr()
+void toprollr_state::init_toprollr()
 {
 	m_opcodes = std::make_unique<uint8_t[]>(0x6000*3);
 
@@ -2757,14 +2886,16 @@ void cclimber_state::init_toprollr()
 	cpu.set_region_p(memregion("user1")->base());
 	cpu.set_decrypted_p(m_opcodes.get());
 
-	membank("bank1")->configure_entries(0, 3, memregion("user1")->base(), 0x6000);
-	membank("bank1d")->configure_entries(0, 3, m_opcodes.get(), 0x6000);
+	m_bank1->configure_entries(0, 3, memregion("user1")->base(), 0x6000);
+	m_bank1d->configure_entries(0, 3, m_opcodes.get(), 0x6000);
 
-	membank("bank1")->set_entry(0);
-	membank("bank1d")->set_entry(0);
+	m_bank1->set_entry(0);
+	m_bank1d->set_entry(0);
 
 	save_item(NAME(m_toprollr_rombank));
 }
+
+
 
 void cclimber_state::init_dking()
 {
@@ -2839,14 +2970,16 @@ GAME( 1985, cannonb,     cannonbp, cannonb,   cannonb,   cclimber_state, init_ca
 GAME( 1985, cannonb2,    cannonbp, cannonb,   cannonb,   cclimber_state, init_cannonb2,  ROT90,  "bootleg (TV Game Gruenberg)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 2, buggy)",         MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
 GAME( 1985, cannonb3,    cannonbp, cannonb,   cannonb,   cclimber_state, init_cannonb2,  ROT90,  "bootleg (Soft)",              "Cannon Ball (bootleg on Crazy Kong hardware) (set 3, no bonus game)", MACHINE_SUPPORTS_SAVE ) // the bonus game is patched out, thus avoiding the protection issue
 
-GAME( 1982, swimmer,     0,        swimmer,   swimmer,   cclimber_state, empty_init,     ROT0,   "Tehkan", "Swimmer (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, swimmera,    swimmer,  swimmer,   swimmer,   cclimber_state, empty_init,     ROT0,   "Tehkan", "Swimmer (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, swimmerb,    swimmer,  swimmer,   swimmerb,  cclimber_state, empty_init,     ROT0,   "Tehkan", "Swimmer (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, swimmer,     0,        swimmer,   swimmer,   swimmer_state,  empty_init,     ROT0,   "Tehkan", "Swimmer (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, swimmera,    swimmer,  swimmer,   swimmer,   swimmer_state,  empty_init,     ROT0,   "Tehkan", "Swimmer (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, swimmerb,    swimmer,  swimmer,   swimmerb,  swimmer_state,  empty_init,     ROT0,   "Tehkan", "Swimmer (set 3)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, guzzler,     0,        guzzler,   guzzler,   cclimber_state, empty_init,     ROT90,  "Tehkan", "Guzzler", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   cclimber_state, empty_init,     ROT90,  "Tehkan", "Guzzler (Swimmer Conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, guzzler,     0,        guzzler,   guzzler,   swimmer_state,  empty_init,     ROT90,  "Tehkan", "Guzzler", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   swimmer_state,  empty_init,     ROT90,  "Tehkan", "Guzzler (Swimmer conversion)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, yamato,      0,        yamato,    yamato,    cclimber_state, init_yamato,    ROT90,  "Sega",   "Yamato (US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, yamato2,     yamato,   yamato,    yamato,    cclimber_state, init_yamato,    ROT90,  "Sega",   "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, au,          0,        au,        au,        swimmer_state,  empty_init,     ROT90,  "hack",   "Au (Swimmer conversion?)", MACHINE_SUPPORTS_SAVE ) // suspect ROM has been tampered with
 
-GAME( 1983, toprollr,    0,        toprollr,  toprollr,  cclimber_state, init_toprollr,  ROT90,  "Jaleco", "Top Roller", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, yamato,      0,        yamato,    yamato,    yamato_state,   init_yamato,    ROT90,  "Sega",   "Yamato (US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, yamato2,     yamato,   yamato,    yamato,    yamato_state,   init_yamato,    ROT90,  "Sega",   "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1983, toprollr,    0,        toprollr,  toprollr,  toprollr_state, init_toprollr,  ROT90,  "Jaleco", "Top Roller", MACHINE_SUPPORTS_SAVE )

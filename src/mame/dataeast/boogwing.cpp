@@ -644,7 +644,7 @@ void boogwing_state::init_boogwing()
 	memcpy(dst, src, 0x100000);
 }
 
-GAME( 1992, boogwing,  0,        boogwing, boogwing, boogwing_state, init_boogwing, ROT0, "Data East Corporation", "Boogie Wings (Euro v1.5, 92.12.07)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, boogwing,  0,        boogwing, boogwing, boogwing_state, init_boogwing, ROT0, "Data East Corporation", "Boogie Wings (Europe v1.5, 92.12.07)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, boogwingu, boogwing, boogwing, boogwing, boogwing_state, init_boogwing, ROT0, "Data East Corporation", "Boogie Wings (USA v1.7, 92.12.14)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, boogwinga, boogwing, boogwing, boogwing, boogwing_state, init_boogwing, ROT0, "Data East Corporation", "Boogie Wings (Asia v1.5, 92.12.07)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, ragtime,   boogwing, boogwing, boogwing, boogwing_state, init_boogwing, ROT0, "Data East Corporation", "The Great Ragtime Show (Japan v1.5, 92.12.07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

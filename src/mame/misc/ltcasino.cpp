@@ -1,5 +1,6 @@
 // license: BSD-3-Clause
 // copyright-holders: Pierpaolo Prazzoli, David Haywood, Dirk Best
+
 /***************************************************************************
 
     Little Casino
@@ -64,16 +65,54 @@ Other: Hitachi HD46821P 1MHz NMOS Peripheral Interface Adapter (PIA) x 2
        D1 - Power On Diode
        44 pin edge connector
 
+***************************************************************************
+
+Little Casino II
+Digital Controls Inc. 1984
+ +---------------------------------------------------------------------+
+ |    +----------+ DSW3 +---------+ M2114 M2114*     +---+         LED |
+ |    | HD46821P |      | TMS9937 | M2114 M2114*     | S |   V18_10_RA |
+ |    +----------+      +---------+ M2114 M2114*     | Y |             |
+++                                  M2114 M2114*     | 6 |             |
+|                                                    | 5 |   V18_10_RB |
+|     +----------+                                   | 0 |             |
+|     | HD46821P |                                   | 2 |             |
+|     +----------+                                   +---+   V18_10_RC |
+|                       V18_10_RV                                      |
+|     +---------+                                                      |
+|     |AY-3-9810|                                            V18_10_RD |
+|     +---------+                                                      |
+|                 M2114                                                |
+|     DSW1 DSW2   M2114                                      V18_10_RE |
+++                M2114                                                |
+ |  MB3712        M2114  18.000MHz                                     |
+ |                                                           V18_10_RF |
+ |                                                                     |
+ +---------------------------------------------------------------------+
+
+  CPU: SY6502 2MHz
+Video: TMS9937 NL CRT5037 NMOS Single chip Video Timer/Controller (VTC)
+Sound: AY-3-8910
+       MB3712 5.7W Amp
+  OSC: 18.000MHz
+  RAM: MM2114N-3 1KBx4 SRAM x 12 (*some PCBs only had 8 RAM chips populated)
+  DSW: 3 8-switch dipswitches
+Other: Hitachi HD46821P 1MHz NMOS Peripheral Interface Adapter (PIA) x 2
+       LED - Power On LED
+       44 pin edge connector
+
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/tms9927.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -108,13 +147,11 @@ public:
 		m_tilemap(nullptr)
 	{ }
 
-	void init_mv4in1();
-
 	void ltcasino(machine_config &config);
-	void ltcasin2(machine_config &config);
-	void mv4in1(machine_config &config);
 
-private:
+protected:
+	virtual void machine_start() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device_array<pia6821_device, 2> m_pia;
 	required_device<crt5037_device> m_vtc;
@@ -129,15 +166,11 @@ private:
 
 	tilemap_t *m_tilemap;
 
+private:
 	void main_map(address_map &map);
 
-	void ltcasin2_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TILE_GET_INFO_MEMBER(ltcasino_tile_info);
-	TILE_GET_INFO_MEMBER(ltcasin2_tile_info);
-
-	void machine_start_ltcasino();
-	void machine_start_ltcasin2();
+	TILE_GET_INFO_MEMBER(tile_info);
 
 	uint8_t input_q_r();
 	uint8_t input_s_r();
@@ -146,6 +179,23 @@ private:
 	void output_t_w(uint8_t data);
 };
 
+class ltcasin2_state : public ltcasino_state
+{
+public:
+	using ltcasino_state::ltcasino_state;
+
+	void init_mv4in1();
+
+	void ltcasin2(machine_config &config);
+	void mv4in1(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void palette(palette_device &palette) const;
+	TILE_GET_INFO_MEMBER(tile_info);
+};
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -347,7 +397,7 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-void ltcasino_state::ltcasin2_palette(palette_device &palette) const
+void ltcasin2_state::palette(palette_device &palette) const
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -369,22 +419,22 @@ void ltcasino_state::ltcasin2_palette(palette_device &palette) const
  ---- x--- unknown (used by ltcasino)
  ---- -xxx background color
  */
-TILE_GET_INFO_MEMBER(ltcasino_state::ltcasino_tile_info)
+TILE_GET_INFO_MEMBER(ltcasino_state::tile_info)
 {
 	uint16_t code = m_video_ram[tile_index];
 	// +1 on attribute offset otherwise glitches occurs on left side of objects?
-	uint8_t attr = m_attribute_ram[(tile_index + 1) & 0x7ff];
+	uint8_t const attr = m_attribute_ram[(tile_index + 1) & 0x7ff];
 
 	code |= BIT(attr, 7) << 8;
 
 	tileinfo.set(0, code, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(ltcasino_state::ltcasin2_tile_info)
+TILE_GET_INFO_MEMBER(ltcasin2_state::tile_info)
 {
 	uint16_t code = m_video_ram[tile_index];
 	// +1 on attribute offset otherwise glitches occurs on left side of objects?
-	uint8_t attr = m_attribute_ram[(tile_index + 1) & 0x7ff];
+	uint8_t const attr = m_attribute_ram[(tile_index + 1) & 0x7ff];
 
 	code |= BIT(attr, 7) << 8;
 
@@ -411,11 +461,11 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( gfx_ltcasino )
-	GFXDECODE_ENTRY("gfx1", 0, tiles8x8_layout, 0, 1)
+	GFXDECODE_ENTRY("tiles", 0, tiles8x8_layout, 0, 1)
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_ltcasin2 )
-	GFXDECODE_ENTRY("gfx1", 0, tiles8x8_layout, 0, 64)
+	GFXDECODE_ENTRY("tiles", 0, tiles8x8_layout, 0, 64)
 GFXDECODE_END
 
 
@@ -423,22 +473,22 @@ GFXDECODE_END
 //  MACHINE EMULATION
 //**************************************************************************
 
-void ltcasino_state::init_mv4in1()
+void ltcasin2_state::init_mv4in1()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	for (int i = 0; i < 0x10000; i++)
 		rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
 }
 
-void ltcasino_state::machine_start_ltcasino()
+void ltcasino_state::machine_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ltcasino_state::ltcasino_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ltcasino_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_lamps.resolve();
 }
 
-void ltcasino_state::machine_start_ltcasin2()
+void ltcasin2_state::machine_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ltcasino_state::ltcasin2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ltcasin2_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_lamps.resolve();
 }
 
@@ -496,7 +546,7 @@ void ltcasino_state::output_t_w(uint8_t data)
 
 void ltcasino_state::ltcasino(machine_config &config)
 {
-	M6502(config, m_maincpu, 18_MHz_XTAL/16); // clock unknown
+	M6502(config, m_maincpu, 18_MHz_XTAL / 16); // clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &ltcasino_state::main_map);
 
 	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq"));
@@ -514,17 +564,15 @@ void ltcasino_state::ltcasino(machine_config &config)
 	m_pia[1]->readpa_handler().set(FUNC(ltcasino_state::input_s_r));
 	m_pia[1]->writepb_handler().set(FUNC(ltcasino_state::output_t_w));
 
-	MCFG_MACHINE_START_OVERRIDE(ltcasino_state, ltcasino)
-
 	// video hardware
-	CRT5037(config, m_vtc, 18_MHz_XTAL/16); // this clock gives about 60/50 hz
+	CRT5037(config, m_vtc, 18_MHz_XTAL / 16); // this clock gives about 60/50 hz
 	m_vtc->set_char_width(8);
 	m_vtc->set_screen("screen");
 	m_vtc->set_visarea(48, 463, 0, 255);
 	m_vtc->vsyn_callback().set(m_pia[0], FUNC(pia6821_device::cb2_w)).invert(); // ? (CA1, CA2 also enabled)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(18_MHz_XTAL/2, 560, 48, 464, 268, 0, 256);
+	m_screen->set_raw(18_MHz_XTAL / 2, 560, 48, 464, 268, 0, 256);
 	m_screen->set_screen_update(FUNC(ltcasino_state::screen_update));
 	m_screen->set_palette("palette");
 
@@ -541,27 +589,24 @@ void ltcasino_state::ltcasino(machine_config &config)
 	m_ay->add_route(ALL_OUTPUTS, "mono", 0.4);
 }
 
-void ltcasino_state::ltcasin2(machine_config &config)
+void ltcasin2_state::ltcasin2(machine_config &config)
 {
 	ltcasino(config);
 
-	MCFG_MACHINE_START_OVERRIDE(ltcasino_state, ltcasin2)
-
-	config.device_remove("palette");
-	PALETTE(config, "palette", FUNC(ltcasino_state::ltcasin2_palette), 128, 8);
+	PALETTE(config.replace(), "palette", FUNC(ltcasin2_state::palette), 128, 8);
 
 	m_gfxdecode->set_info(gfx_ltcasin2);
 }
 
-void ltcasino_state::mv4in1(machine_config &config)
+void ltcasin2_state::mv4in1(machine_config &config)
 {
 	ltcasin2(config);
 
 	// different XTAL
-	m_maincpu->set_clock(18.432_MHz_XTAL/16);
-	m_vtc->set_clock(18.432_MHz_XTAL/16);
-	m_screen->set_raw(18.432_MHz_XTAL/2, 560, 48, 464, 268, 0, 256);
-	m_ay->set_clock(18.432_MHz_XTAL/16);
+	m_maincpu->set_clock(18.432_MHz_XTAL / 16);
+	m_vtc->set_clock(18.432_MHz_XTAL / 16);
+	m_screen->set_raw(18.432_MHz_XTAL / 2, 560, 48, 464, 268, 0, 256);
+	m_ay->set_clock(18.432_MHz_XTAL / 16);
 }
 
 
@@ -580,8 +625,23 @@ ROM_START( ltcasino )
 	ROM_LOAD( "e", 0xc800, 0x0800, CRC(5f9e103a) SHA1(b0e9ace4c3962c06e5250fac16a245dca711350f) )
 	ROM_LOAD( "f", 0xf000, 0x1000, CRC(7345aada) SHA1(6640f5eb1130c8f1cb197eb12b8e6403c7f8d34d) )
 
-	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_REGION( 0x0800, "tiles", 0 )
 	ROM_LOAD( "v", 0x0000, 0x0800, CRC(f1f75675) SHA1(8f3777e6b2a3f824f94b28669cac501ec02bbf36) )
+ROM_END
+
+// Selection text: "SELECT GAME DESIRED!"
+// Games: Black Jack, Draw Poker, Craps, Hi-Lo
+ROM_START( ltcasinoa ) // all labels handwritten, tile ROM without label
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a1", 0x8000, 0x1000, CRC(14909fee) SHA1(bf53fa65da7f013ea1ac6b4942cdfdb34ef16252) )
+	ROM_LOAD( "b1", 0x9800, 0x0800, CRC(1473f854) SHA1(eadaec1f6d653e61458bc262945c20140f4530eb) )
+	ROM_LOAD( "c1", 0xa800, 0x0800, CRC(7a07004b) SHA1(62bd0f3d12b7eada6fc271abea60569aca7262b0) )
+	ROM_LOAD( "d1", 0xb800, 0x0800, CRC(5148cafc) SHA1(124039f48784bf032f612714db73fb67a216a1e7) )
+	ROM_LOAD( "e1", 0xc800, 0x0800, CRC(5f9e103a) SHA1(b0e9ace4c3962c06e5250fac16a245dca711350f) )
+	ROM_LOAD( "f1", 0xf000, 0x1000, CRC(37265ddf) SHA1(f6ec12f8836a280c7a06cc19f740b39c5149eabc) ) // only different ROM
+
+	ROM_REGION( 0x0800, "tiles", 0 )
+	ROM_LOAD( "g", 0x0000, 0x0800, CRC(f1f75675) SHA1(8f3777e6b2a3f824f94b28669cac501ec02bbf36) )
 ROM_END
 
 // Selection text: "PLAY YOUR FAVORITES"
@@ -595,38 +655,53 @@ ROM_START( mv4in1 )
 	ROM_LOAD( "c.ic17", 0xc000, 0x1000, CRC(e384edf4) SHA1(99042528ce2b35191248d90162ca06a1a585667c) )
 	ROM_LOAD( "b.ic18", 0xf000, 0x1000, CRC(3450b862) SHA1(816d13fd8d03c299c1dbecf971ee5fae2f1d64bc) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "tiles", 0 )
 	ROM_LOAD( "a.ic19", 0x0000, 0x1000, CRC(a25c125e) SHA1(e0ba83ccddbd82a2bf52585ae0accb9192cbb00e) )
 ROM_END
 
 // Selection text: "PLEASE MAKE SELECTION!"
 // Games: Black Jack, Draw Poker, Craps, Slots, Horse
-// Board was marked version 18.1 (C)1984
-ROM_START( ltcasin2 )
+ROM_START( ltcasin2 ) // all labels peeled off - need to verify labels
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "v18_10_ra.bin", 0x8000, 0x1000, CRC(f0c5cc96) SHA1(ec50918ba2a2487df70694f9e1a52d4b8d1bc7e2) )
-	ROM_LOAD( "v18_10_rb.bin", 0x9000, 0x1000, CRC(2ece16e4) SHA1(ef6adc45be2ecc510cd8b2e9682635066013a5e4) )
-	ROM_LOAD( "v18_10_rc.bin", 0xa000, 0x1000, CRC(16bae5c9) SHA1(e5cb61d9dcae3c46c7139f3494d1bf981ec8821f) )
-	ROM_LOAD( "v18_10_rd.bin", 0xb000, 0x1000, CRC(d12f2d6b) SHA1(e3544bf6b778c21b704a01f1ed06d6517ca01604) )
-	ROM_LOAD( "v18_10_re.bin", 0xc000, 0x1000, CRC(2acdad10) SHA1(2732b791fea0a9d1c6e4c174739381466f2b0270) )
-	ROM_LOAD( "v18_10_rf.bin", 0xf000, 0x1000, CRC(b711c779) SHA1(2bab84cab174a35fccfd23003a8a41aa241d4595) )
+	ROM_LOAD( "v30_00_ra.bin", 0x8000, 0x1000, CRC(8d446c26) SHA1(d5b78fd17798bf69fbac5e060f020799bb10cf64) ) // 30.00.00 in test mode
+	ROM_LOAD( "v30_00_rb.bin", 0x9000, 0x1000, CRC(38ca5193) SHA1(715add68a633b78eceabe149a7564aa2fb513837) ) // 30.00.00 in test mode
+	ROM_LOAD( "v30_00_rc.bin", 0xa000, 0x1000, CRC(f05095db) SHA1(61c5c9bef20c057348ce1321c71195d340dc0cd6) ) // 30.00.00 in test mode
+	ROM_LOAD( "v30_00_rd.bin", 0xb000, 0x1000, CRC(53e534dc) SHA1(3d964f51b254f9bd0bd3fb4926f57aa7d5224968) ) // 30.00.00 in test mode
+	ROM_LOAD( "v30_00_re.bin", 0xc000, 0x1000, CRC(972fd4ab) SHA1(f91556588315e0836a860f138730314688f99ec7) ) // 30.00.00 in test mode
+	ROM_LOAD( "v30_00_rf.bin", 0xf000, 0x1000, CRC(b711c779) SHA1(2bab84cab174a35fccfd23003a8a41aa241d4595) ) // 18.01.02 in test mode (== v18_10_rf.bin below)
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "tiles", 0 )
+	ROM_LOAD( "v30_00_rv.bin", 0x0000, 0x1000, CRC(135ec308) SHA1(699711ceaeb5a00f31ccd88b7be7e9f0055fa58b) )
+ROM_END
+
+// Selection text: "PLEASE MAKE SELECTION!"
+// Games: Black Jack, Draw Poker, Craps, Slots, Horse
+// Board was marked version 18.1 (C)1984
+ROM_START( ltcasin2a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "v18_10_ra.bin", 0x8000, 0x1000, CRC(f0c5cc96) SHA1(ec50918ba2a2487df70694f9e1a52d4b8d1bc7e2) ) // 18.01.01 in test mode
+	ROM_LOAD( "v18_10_rb.bin", 0x9000, 0x1000, CRC(2ece16e4) SHA1(ef6adc45be2ecc510cd8b2e9682635066013a5e4) ) // 18.01.01 in test mode
+	ROM_LOAD( "v18_10_rc.bin", 0xa000, 0x1000, CRC(16bae5c9) SHA1(e5cb61d9dcae3c46c7139f3494d1bf981ec8821f) ) // 18.01.00 in test mode
+	ROM_LOAD( "v18_10_rd.bin", 0xb000, 0x1000, CRC(d12f2d6b) SHA1(e3544bf6b778c21b704a01f1ed06d6517ca01604) ) // 18.01.00 in test mode
+	ROM_LOAD( "v18_10_re.bin", 0xc000, 0x1000, CRC(2acdad10) SHA1(2732b791fea0a9d1c6e4c174739381466f2b0270) ) // 18.01.00 in test mode
+	ROM_LOAD( "v18_10_rf.bin", 0xf000, 0x1000, CRC(b711c779) SHA1(2bab84cab174a35fccfd23003a8a41aa241d4595) ) // 18.01.02 in test mode
+
+	ROM_REGION( 0x1000, "tiles", 0 )
 	ROM_LOAD( "v18_10_rv.bin", 0x0000, 0x1000, CRC(7209898d) SHA1(94bd7e8c3a544429af721e9564c11cc56d7805be) )
 ROM_END
 
 // Selection text: "PLEASE PICK YOUR POISON!"
 // Games: Black Jack, Draw Poker, Craps, Hi-Lo, Horse
-ROM_START( ltcasin2a )
+ROM_START( ltcasin2b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "v17_00_ra.bin", 0x8000, 0x1000, CRC(1a595442) SHA1(b8fe3e5ed2024a57187c0ce547c1bbef2429ed63) )
-	ROM_LOAD( "v17_00_rb.bin", 0x9000, 0x1000, CRC(4f5502c1) SHA1(cd1b7c08d26fed71c45e44ebd208bd18dc262e8f) )
-	ROM_LOAD( "v17_00_rc.bin", 0xa000, 0x1000, CRC(990283b8) SHA1(8a3fe5be8381894b8e8dd14c7d42190e60a25600) )
-	ROM_LOAD( "v17_00_rd.bin", 0xb000, 0x1000, CRC(884f39dc) SHA1(fe149faf118279205e82760c5052cefb88a2f5be) )
-	ROM_LOAD( "v17_00_re.bin", 0xc000, 0x1000, CRC(fae38204) SHA1(e5908734cee0a89d873ab3761ded285f8ae138d3) )
-	ROM_LOAD( "v17_00_rf.bin", 0xf000, 0x1000, CRC(7e8ad9d3) SHA1(8cbe342af7d9f32b2214664db318edd3d2e75630) )
+	ROM_LOAD( "v17_00_ra.bin", 0x8000, 0x1000, CRC(1a595442) SHA1(b8fe3e5ed2024a57187c0ce547c1bbef2429ed63) ) // 17.00.00 in test mode
+	ROM_LOAD( "v17_00_rb.bin", 0x9000, 0x1000, CRC(4f5502c1) SHA1(cd1b7c08d26fed71c45e44ebd208bd18dc262e8f) ) // 17.00.00 in test mode
+	ROM_LOAD( "v17_00_rc.bin", 0xa000, 0x1000, CRC(990283b8) SHA1(8a3fe5be8381894b8e8dd14c7d42190e60a25600) ) // 17.00.00 in test mode
+	ROM_LOAD( "v17_00_rd.bin", 0xb000, 0x1000, CRC(884f39dc) SHA1(fe149faf118279205e82760c5052cefb88a2f5be) ) // 17.00.00 in test mode
+	ROM_LOAD( "v17_00_re.bin", 0xc000, 0x1000, CRC(fae38204) SHA1(e5908734cee0a89d873ab3761ded285f8ae138d3) ) // 17.00.00 in test mode
+	ROM_LOAD( "v17_00_rf.bin", 0xf000, 0x1000, CRC(7e8ad9d3) SHA1(8cbe342af7d9f32b2214664db318edd3d2e75630) ) // 17.00.00 in test mode
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "tiles", 0 )
 	ROM_LOAD( "v17_00_rv.bin", 0x0000, 0x1000, CRC(84cbee7b) SHA1(742831d5ae0db6c7c644a18a837831ee0474d472) )
 ROM_END
 
@@ -637,8 +712,10 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT         ROTATION  COMPANY                            FULLNAME                  FLAGS
-GAMEL( 1982, ltcasino,  0,        ltcasino, ltcasino,  ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino",          MACHINE_SUPPORTS_SAVE, layout_ltcasino )
-GAMEL( 1983, mv4in1,    0,        mv4in1,   mv4in1,    ltcasino_state, init_mv4in1, ROT0,     "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1",        MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
-GAMEL( 1984, ltcasin2,  0,        ltcasin2, ltcasin2,  ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino II v18.1", MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
-GAMEL( 1984, ltcasin2a, ltcasin2, ltcasin2, ltcasin2a, ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino II v17.0", MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
+//     YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT         ROTATION  COMPANY                            FULLNAME                     FLAGS
+GAMEL( 1982, ltcasino,  0,        ltcasino, ltcasino,  ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino (set 1)",     MACHINE_SUPPORTS_SAVE, layout_ltcasino )
+GAMEL( 1982, ltcasinoa, ltcasino, ltcasino, ltcasino,  ltcasino_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino (set 2)",     MACHINE_SUPPORTS_SAVE, layout_ltcasino )
+GAMEL( 1983, mv4in1,    0,        mv4in1,   mv4in1,    ltcasin2_state, init_mv4in1, ROT0,     "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1",           MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
+GAMEL( 1984, ltcasin2,  0,        ltcasin2, ltcasin2,  ltcasin2_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino II (v30.0)",  MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
+GAMEL( 1984, ltcasin2a, ltcasin2, ltcasin2, ltcasin2,  ltcasin2_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino II (v18.1)",  MACHINE_SUPPORTS_SAVE, layout_ltcasinn )
+GAMEL( 1984, ltcasin2b, ltcasin2, ltcasin2, ltcasin2a, ltcasin2_state, empty_init,  ROT0,     "Digital Controls Inc.",           "Little Casino II (v17.0)",  MACHINE_SUPPORTS_SAVE, layout_ltcasinn )

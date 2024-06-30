@@ -370,6 +370,7 @@ void msx2_state::cpc400(machine_config &config)
 	// FDC: mb8877a, 1 3.5" DS?DD drive
 	// 1 Cartridge slot
 	// 1 Expansion slot
+	// The check for an external kanji rom always fails; deliberately? expects other type of kanji extension? bad dump?
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 1, 1, 2, "hangul");
@@ -403,6 +404,7 @@ void msx2_state::cpc400s(machine_config &config)
 	// FDC: mb8877a, 1 3.5" DS?DD drive
 	// 1 Cartridge slot
 	// DW64MX1
+	// The check for an external kanji rom always fails; deliberately? expects other type of kanji extension? bad dump?
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "hangul1", 0, 1, 1, 1, "hangul", 0x4000);
@@ -721,9 +723,8 @@ void msx2_state::mlg3(machine_config &config)
 {
 	// YM2149 (in S3527)
 	// FDC: wd2793?, 1 3.5" DSDD drive
-	// S-1985 MSX Engine
+	// S3527 MSX Engine
 	// 4 Cartridge slots (3 internal, 1 taken by RS232 board)
-	// S3527
 	// RS232 with switch. What does the switch do?
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
