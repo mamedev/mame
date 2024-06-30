@@ -695,9 +695,7 @@ static INPUT_PORTS_START( merit3xx )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
-	PORT_DIPNAME( 0x80, 0x80, "IN0.8" ) // something printer related. Causes 'printing cash ticket' if switched with coins inserted
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x01, "IN1.1" )
@@ -801,7 +799,6 @@ void merit3xx_state::merit300(machine_config &config)
 	Z80(config, m_maincpu, 10_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &merit3xx_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &merit3xx_state::io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(merit3xx_state::irq0_line_hold));
 
 	 // TODO: reenable NVRAM, currently m6710a doesn't like it at all
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -823,6 +820,7 @@ void merit3xx_state::merit300(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.set_update_row_callback(FUNC(merit3xx_state::update_row));
+	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
 
 	BT476(config, "ramdac", 10_MHz_XTAL);
 

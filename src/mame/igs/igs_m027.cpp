@@ -471,12 +471,45 @@ ROM_START( fruitpar )
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "igs_m4101.u13",     0x000000, 0x400000, CRC(84899398) SHA1(badac65af6e03c490798f4368eb2b15db8c590d0) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 
-
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "igs_w4102.u28", 0x00000, 0x80000, CRC(558cab25) SHA1(0280b37a14589329f0385c048e5742b9e89bd587) )
 ROM_END
 
+ROM_START( oceanpar ) // IGS PCB-0331-02-FG
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "oceanpar_igs027a", 0x00000, 0x4000, NO_DUMP )
 
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "ocean_paradise_v105us.u23", 0x00000, 0x80000, CRC(e6eb66c3) SHA1(f6c1e31ccddc8ebb8218f52b5c0d97f0797b2e84) )
+
+	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "ocean_paradise_text.u12", 0x000000, 0x080000, CRC(bdaa4407) SHA1(845eead0902c81290c2b5d7543ac9dfda375fdd1) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_m4101.u13", 0x000000, 0x400000, CRC(84899398) SHA1(badac65af6e03c490798f4368eb2b15db8c590d0) ) // FIXED BITS (xxxxxxx0xxxxxxxx), same as fruitpar
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_w4102.u28", 0x00000, 0x80000, CRC(558cab25) SHA1(0280b37a14589329f0385c048e5742b9e89bd587) ) // same as fruitpar
+ROM_END
+
+ROM_START( oceanpara ) // IGS PCB-0331-01-FG
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "oceanpara_igs027a", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "ocean_paradise_v101us.u23", 0x00000, 0x80000, CRC(4f2bf87a) SHA1(559c8728632336ba84f455ac22b6e514967c644b) )
+
+	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "ocean_paradise_text.u12", 0x000000, 0x080000, CRC(bdaa4407) SHA1(845eead0902c81290c2b5d7543ac9dfda375fdd1) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_m4101.u13", 0x000000, 0x400000, CRC(84899398) SHA1(badac65af6e03c490798f4368eb2b15db8c590d0) ) // FIXED BITS (xxxxxxx0xxxxxxxx), same as fruitpar
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_w4102.u28", 0x00000, 0x80000, CRC(558cab25) SHA1(0280b37a14589329f0385c048e5742b9e89bd587) ) // same as fruitpar
+ROM_END
 
 /***************************************************************************
 
@@ -1238,6 +1271,8 @@ GAME( 1999, qlgs,      0,        igs_mahjong, sdwx,     igs_m027_state, init_qlg
 GAME( 1999, amazonia,  0,        igs_mahjong, amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_IS_SKELETON )
 GAME( 1999, amazonkp,  amazonia, igs_mahjong, amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King Plus (V204BR)", MACHINE_IS_SKELETON )
 GAME( 1999, fruitpar,  0,        igs_mahjong, sdwx,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_IS_SKELETON )
+GAME( 199?, oceanpar,  0,        igs_mahjong, sdwx,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_IS_SKELETON )
+GAME( 199?, oceanpara, oceanpar, igs_mahjong, sdwx,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_IS_SKELETON )
 GAME( 2002, sdwx,      0,        igs_mahjong, sdwx,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME( 2003, amazoni2,  0,        igs_mahjong, sdwx,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_IS_SKELETON )
 GAME( 200?, sddz,      0,        igs_mahjong, sdwx,     igs_m027_state, init_sddz,     ROT0, "IGS", "Super Dou Di Zhu",  MACHINE_IS_SKELETON )
