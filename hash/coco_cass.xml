@@ -7,7 +7,7 @@ license:CC0-1.0
 <softwarelist name="coco_cass" description="Tandy Radio Shack Color Computer cassette images">
 
         <software name="grover">
-                <description>Grover's Number Rover (CCW)</description>
+                <description>Grover's Number Rover</description>
                 <year>1983</year>
                 <publisher>Children's Television Workshop</publisher>
                 <info name="developer" value="Children's Computer Workshop" />
@@ -21,7 +21,7 @@ license:CC0-1.0
         </software>
 
         <software name="ssleuth">
-                <description>Sam Sleuth (Computerware)</description>
+                <description>Sam Sleuth</description>
                 <year>1984</year>
                 <publisher>Computerware</publisher>
                 <info name="author" value="Steve Hartford" />
@@ -40,7 +40,7 @@ license:CC0-1.0
         </software>
 
         <software name="zaxxon">
-                <description>Zaxxon (Datasoft)</description>
+                <description>Zaxxon</description>
                 <year>1983</year>
                 <publisher>Datasoft</publisher>
                 <info name="author" value="Steve Bjork" />
