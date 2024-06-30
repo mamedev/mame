@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "m68hc05e1.h"
+#include "m6805defs.h"
 #include "6805dasm.h"
 
 #define VERBOSE (0)

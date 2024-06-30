@@ -321,7 +321,7 @@ void wswan_state::pockchv2(machine_config &config)
 	wswan_base(config);
 
 	// software lists
-	SOFTWARE_LIST(config, "pc2_list").set_compatible("pockchalv2");
+	SOFTWARE_LIST(config, "pc2_list").set_original("pockchalv2");
 }
 
 void wscolor_state::wscolor(machine_config &config)

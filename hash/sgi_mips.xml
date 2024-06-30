@@ -5826,7 +5826,7 @@ license:CC0-1.0
 
 	<!-- NetBSD -->
 
-	<software name="netbsd_1_6_2">
+	<software name="netbsd_1_6_2" supported="no">
 		<description>NetBSD 1.6.2</description>
 		<year>2004</year> <!-- 10/04 -->
 		<publisher>The NetBSD Project</publisher>
@@ -5846,7 +5846,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_2_0" cloneof="netbsd_2_0_2">
+	<software name="netbsd_2_0" cloneof="netbsd_2_0_2" supported="no">
 		<description>NetBSD 2.0</description>
 		<year>2004</year> <!-- 12/04 -->
 		<publisher>The NetBSD Project</publisher>
@@ -5866,7 +5866,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_2_0_2">
+	<software name="netbsd_2_0_2" supported="no">
 		<description>NetBSD 2.0.2</description>
 		<year>2005</year> <!-- 04/05 -->
 		<publisher>The NetBSD Project</publisher>
@@ -5886,7 +5886,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_2_1">
+	<software name="netbsd_2_1" supported="no">
 		<description>NetBSD 2.1</description>
 		<year>2005</year> <!-- 10/04 -->
 		<publisher>The NetBSD Project</publisher>
@@ -5906,7 +5906,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_3_0" cloneof="netbsd_3_0_2">
+	<software name="netbsd_3_0" cloneof="netbsd_3_0_2" supported="no">
 		<description>NetBSD 3.0</description>
 		<year>2005</year> <!-- 12/05 -->
 		<publisher>The NetBSD Project</publisher>
@@ -5926,7 +5926,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_3_0_1" cloneof="netbsd_3_0_2">
+	<software name="netbsd_3_0_1" cloneof="netbsd_3_0_2" supported="no">
 		<description>NetBSD 3.0.1</description>
 		<year>2006</year> <!-- 07/06 -->
 		<publisher>The NetBSD Project</publisher>
@@ -5946,7 +5946,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_3_0_2">
+	<software name="netbsd_3_0_2" supported="no">
 		<description>NetBSD 3.0.2</description>
 		<year>2006</year> <!-- 11/06 -->
 		<publisher>The NetBSD Project</publisher>
@@ -5966,7 +5966,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_3_1">
+	<software name="netbsd_3_1" supported="no">
 		<description>NetBSD 3.1</description>
 		<year>2006</year> <!-- 11/06 -->
 		<publisher>The NetBSD Project</publisher>
@@ -5986,7 +5986,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_4_0" cloneof="netbsd_4_0_1">
+	<software name="netbsd_4_0" cloneof="netbsd_4_0_1" supported="no">
 		<description>NetBSD 4.0</description>
 		<year>2007</year> <!-- 12/07 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6006,7 +6006,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_4_0_1">
+	<software name="netbsd_4_0_1" supported="no">
 		<description>NetBSD 4.0.1</description>
 		<year>2008</year> <!-- 10/08 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6026,7 +6026,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_5_0" cloneof="netbsd_5_0_2">
+	<software name="netbsd_5_0" cloneof="netbsd_5_0_2" supported="no">
 		<description>NetBSD 5.0</description>
 		<year>2009</year> <!-- 04/09 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6046,7 +6046,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_5_0_1" cloneof="netbsd_5_0_2">
+	<software name="netbsd_5_0_1" cloneof="netbsd_5_0_2" supported="no">
 		<description>NetBSD 5.0.1</description>
 		<year>2009</year> <!-- 07/09 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6066,7 +6066,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_5_0_2">
+	<software name="netbsd_5_0_2" supported="no">
 		<description>NetBSD 5.0.2</description>
 		<year>2010</year> <!-- 02/10 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6086,7 +6086,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_5_1" cloneof="netbsd_5_1_5">
+	<software name="netbsd_5_1" cloneof="netbsd_5_1_5" supported="no">
 		<description>NetBSD 5.1</description>
 		<year>2010</year> <!-- 11/10 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6106,7 +6106,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_5_1_1" cloneof="netbsd_5_1_5">
+	<software name="netbsd_5_1_1" cloneof="netbsd_5_1_5" supported="no">
 		<description>NetBSD 5.1.1</description>
 		<year>2012</year> <!-- 01/12 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6126,7 +6126,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_5_1_2" cloneof="netbsd_5_1_5">
+	<software name="netbsd_5_1_2" cloneof="netbsd_5_1_5" supported="no">
 		<description>NetBSD 5.1.2</description>
 		<year>2012</year> <!-- 02/12 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6146,7 +6146,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_5_1_3" cloneof="netbsd_5_1_5">
+	<software name="netbsd_5_1_3" cloneof="netbsd_5_1_5" supported="no">
 		<description>NetBSD 5.1.3</description>
 		<year>2013</year> <!-- 09/13 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6166,7 +6166,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_5_1_4" cloneof="netbsd_5_1_5">
+	<software name="netbsd_5_1_4" cloneof="netbsd_5_1_5" supported="no">
 		<description>NetBSD 5.1.4</description>
 		<year>2014</year> <!-- 01/14 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6186,7 +6186,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_5_1_5">
+	<software name="netbsd_5_1_5" supported="no">
 		<description>NetBSD 5.1.5</description>
 		<year>2014</year> <!-- 11/14 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6206,7 +6206,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_5_2" cloneof="netbsd_5_2_3">
+	<software name="netbsd_5_2" cloneof="netbsd_5_2_3" supported="no">
 		<description>NetBSD 5.2</description>
 		<year>2012</year> <!-- 11/12 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6226,7 +6226,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_5_2_1" cloneof="netbsd_5_2_3">
+	<software name="netbsd_5_2_1" cloneof="netbsd_5_2_3" supported="no">
 		<description>NetBSD 5.2.1</description>
 		<year>2013</year> <!-- 09/13 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6246,7 +6246,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_5_2_2" cloneof="netbsd_5_2_3">
+	<software name="netbsd_5_2_2" cloneof="netbsd_5_2_3" supported="no">
 		<description>NetBSD 5.2.2</description>
 		<year>2014</year> <!-- 01/14 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6266,7 +6266,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_5_2_3">
+	<software name="netbsd_5_2_3" supported="no">
 		<description>NetBSD 5.2.3</description>
 		<year>2014</year> <!-- 11/14 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6286,7 +6286,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_6_0" cloneof="netbsd_6_0_3">
+	<software name="netbsd_6_0" cloneof="netbsd_6_0_3" supported="no">
 		<description>NetBSD 6.0</description>
 		<year>2012</year> <!-- 10/12 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6306,7 +6306,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_6_0_1" cloneof="netbsd_6_0_3">
+	<software name="netbsd_6_0_1" cloneof="netbsd_6_0_3" supported="no">
 		<description>NetBSD 6.0.1</description>
 		<year>2012</year> <!-- 12/12 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6326,7 +6326,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_6_0_2" cloneof="netbsd_6_0_3">
+	<software name="netbsd_6_0_2" cloneof="netbsd_6_0_3" supported="no">
 		<description>NetBSD 6.0.2</description>
 		<year>2013</year> <!-- 05/13 -->
 		<publisher>The NetBSD Project</publisher>
@@ -6346,7 +6346,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="netbsd_6_0_3">
+	<software name="netbsd_6_0_3" supported="no">
 		<description>NetBSD 6.0.3</description>
 		<year>2013</year> <!-- 09/13 -->
 		<publisher>The NetBSD Project</publisher>
