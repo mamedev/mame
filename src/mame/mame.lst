@@ -32686,9 +32686,13 @@ mkit09                          //
 mkit09a                         //
 
 @source:multitech/mpf1.cpp
-mpf1                            // 1979 Multitech Micro Professor 1
-mpf1b                           // 1979 Multitech Micro Professor 1B
-mpf1p                           //
+cs113                           // 198? Sciento Robot Arm
+mpf1                            // 1981 Multitech Micro-Professor 1
+mpf1b                           // 1982 Multitech Micro-Professor 1B
+mt80z                           // 1982 MT-80Z
+
+@source:multitech/mpf1p.cpp
+mpf1p                           // 1983 Multitech Micro-Professor 1P
 
 @source:multitech/mpf1_88.cpp
 mpf1_88                         // 1985 Multitech Micro-Professor I/88
