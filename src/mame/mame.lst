@@ -42413,6 +42413,9 @@ vectrix                         // (c) 19?? Olympia?
 @source:skeleton/vp415.cpp
 vp415                           // (c) 1983 Philips
 
+@source:skeleton/webtouchone.cpp
+wto2840sp                       //
+
 @source:skeleton/xbase09.cpp
 xbase09                         //
 
