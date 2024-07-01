@@ -13,7 +13,6 @@
   - add flipscreen according to schematics
   - pitboss: dip switches
   - general - add named output notifiers
-  - implement proper use of bit 0 in m_extra_video_bank_bit for Match'em Up sets and clones
 
 Notes: it's important that "questions" is 0xa0000 bytes with empty space filled
        with 0xff, because the built-in ROMs test checks how many question ROMs
@@ -165,7 +164,7 @@ private:
 
 	pen_t m_pens[NUM_PENS];
 	uint8_t m_lscnblk = 0;
-	uint16_t m_extra_video_bank_bit = 0;
+	uint16_t m_extra_video_bank_bit[2]{};
 
 	void hsync_changed(int state);
 	void led1_w(uint8_t data);
@@ -385,7 +384,7 @@ MC6845_UPDATE_ROW(merit_state::crtc_update_row)
 	{
 		int const attr = m_ram_attr[ma & 0x7ff];
 		int const region = (attr & 0x40) >> 6;
-		int addr = ((m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (m_extra_video_bank_bit)) << 4) | (ra & 0x0f);
+		int addr = ((m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (m_extra_video_bank_bit[0] | m_extra_video_bank_bit[1])) << 4) | (ra & 0x0f);
 		int const colour = (attr & 0x7f) << 3;
 
 		addr &= (rlen - 1);
@@ -476,11 +475,11 @@ void merit_state::led2_w(uint8_t data)
 void merit_state::misc_w(uint8_t data)
 {
 	flip_screen_set(~data & 0x10);
-	m_extra_video_bank_bit = (data & 2) << 8;
+	m_extra_video_bank_bit[0] = (data & 2) << 8;
+	m_extra_video_bank_bit[1] = (data & 1) << 10;
 	m_lscnblk = (data >> 3) & 1;
 
 	// other bits unknown
-	// TODO: bit 0 gets set by couple and clones in the levels where the tiles' GFX are wrong. Another video bank bit?
 }
 
 void merit_banked_state::bank_w(uint8_t data)
@@ -3027,8 +3026,8 @@ GAME( 1986, phrcrazev,  phrcraze, phrcraze, phrcrazs, merit_quiz_state,   init_k
 GAME( 1987, dtrvwz5,   0,         dtrvwz5,  dtrvwz5,  merit_quiz_state,   init_dtrvwz5, ROT0,  "Merit", "Deluxe Trivia ? Whiz (6221-70, U5-0A Edition 5)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1987, dtrvwz5v,  dtrvwz5,   dtrvwz5,  dtrvwz5,  merit_quiz_state,   init_dtrvwz5, ROT90, "Merit", "Deluxe Trivia ? Whiz (6221-75, U5-0 Edition 5 Vertical)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, matchem,   0,         couple,   matchem,  merit_state,        init_crt209,  ROT0,  "Merit",   "Match'em Up (6221-51, U5-1)",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // in some levels the tiles' GFX are jumbled
-GAME( 1986, matchemg,  matchem,   couple,   matchemg, merit_state,        init_crt209,  ROT0,  "Merit",   "Match'em Up (6221-55, U5-1 German)",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1988, couple,    matchem,   couple,   couple,   merit_state,        init_crt209,  ROT0,  "bootleg", "The Couples (set 1)",                                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1988, couplep,   matchem,   couple,   couplep,  merit_state,        init_crt209,  ROT0,  "bootleg", "The Couples (set 2)",                                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1988, couplei,   matchem,   couple,   couple,   merit_state,        init_crt209,  ROT0,  "bootleg", "The Couples (set 3)",                                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1986, matchem,   0,         couple,   matchem,  merit_state,        init_crt209,  ROT0,  "Merit",   "Match'em Up (6221-51, U5-1)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, matchemg,  matchem,   couple,   matchemg, merit_state,        init_crt209,  ROT0,  "Merit",   "Match'em Up (6221-55, U5-1 German)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, couple,    matchem,   couple,   couple,   merit_state,        init_crt209,  ROT0,  "bootleg", "The Couples (set 1)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, couplep,   matchem,   couple,   couplep,  merit_state,        init_crt209,  ROT0,  "bootleg", "The Couples (set 2)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, couplei,   matchem,   couple,   couple,   merit_state,        init_crt209,  ROT0,  "bootleg", "The Couples (set 3)",                                    MACHINE_SUPPORTS_SAVE )
