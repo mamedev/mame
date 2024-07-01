@@ -38,116 +38,6 @@ void raiden2_state::m_videoram_private_w(offs_t offset, uint16_t data)
 }
 
 
-void raiden2_state::draw_sprites(const rectangle &cliprect)
-{
-	m_sprite_bitmap.fill(0xf, cliprect);
-
-	gfx_element *gfx = m_gfxdecode->gfx(2);
-
-	/*
-	  00 fhhh Fwww ppcc cccc   h = height f=flipy w = width F = flipx p = priority c = color
-	  02 nnnn nnnn nnnn nnnn   n = tileno
-	  04 xxxx xxxx xxxx xxxx   x = xpos
-	  06 yyyy yyyy yyyy yyyy   y = ypos
-	 */
-
-	for (int srcindex = (m_spriteram->bytes()/2)-4; srcindex >= 0; srcindex -= 4)
-	{
-		u16 *source = &m_spriteram->buffer()[srcindex];
-		int tile_number = source[1];
-		int sx = source[2];
-		int sy = source[3];
-		int colr;
-		int xtiles, ytiles;
-		int ytlim, xtlim;
-		int xflip, yflip;
-		int xstep, ystep;
-		int pri;
-
-		ytlim = (source[0] >> 12) & 0x7;
-		xtlim = (source[0] >> 8 ) & 0x7;
-
-		xflip = (source[0] >> 15) & 0x1;
-		yflip = (source[0] >> 11) & 0x1;
-
-		colr = source[0] & 0x3f;
-
-		pri = (source[0] >> 6) & 3;
-
-		colr |= pri << (14-4);
-
-		ytlim += 1;
-		xtlim += 1;
-
-		xstep = 16;
-		ystep = 16;
-
-		if (xflip)
-		{
-			ystep = -16;
-			sy += ytlim*16-16;
-		}
-
-		if (yflip)
-		{
-			xstep = -16;
-			sx += xtlim*16-16;
-		}
-
-		for (xtiles = 0; xtiles < xtlim; xtiles++)
-		{
-			for (ytiles = 0; ytiles < ytlim; ytiles++)
-			{
-				/* note this wraparound handling could be wrong if some of the COP maths is wrong */
-
-#define ZEROTEAM_MASK_X (0x1ff) // causes a blank square in the corner of zero team, but otherwise the thrusters of the ship in the r2 intro are clipped, using 0x8000 as a sign bit instead of this logic works for r2, but not zero team
-#define ZEROTEAM_MASK_Y (0x1ff)
-
-
-
-						gfx->transpen_raw(
-						m_sprite_bitmap,
-						cliprect,
-						tile_number,
-						colr << 4,
-						yflip,xflip,
-						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y, 15);
-
-
-						gfx->transpen_raw(
-						m_sprite_bitmap,
-						cliprect,
-						tile_number,
-						colr << 4,
-						yflip,xflip,
-						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y, 15);
-
-
-						gfx->transpen_raw(
-						m_sprite_bitmap,
-						cliprect,
-						tile_number,
-						colr << 4,
-						yflip,xflip,
-						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200, 15);
-
-
-						gfx->transpen_raw(
-						m_sprite_bitmap,
-						cliprect,
-						tile_number,
-						colr << 4,
-						yflip,xflip,
-						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200, 15);
-
-
-				tile_number++;
-			}
-		}
-	}
-
-}
-
 void raiden2_state::background_w(offs_t offset, u16 data)
 {
 	if (m_back_data[offset] != data)
@@ -212,7 +102,7 @@ void raiden2_state::tile_scroll_w(offs_t offset, u16 data, u16 mem_mask)
 void raiden2_state::tile_bank_01_w(u8 data)
 {
 	int new_bank;
-	new_bank = 0 | ((data & 1)<<1);
+	new_bank = 0 | ((data & 1) << 1);
 	if (new_bank != m_bg_bank)
 	{
 		m_bg_bank = new_bank;
@@ -238,7 +128,7 @@ void raiden2_state::cop_tile_bank_2_w(offs_t offset, u16 data, u16 mem_mask)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		int new_bank = 4 | (data >> 14);
+		const int new_bank = 4 | (data >> 14);
 		if (new_bank != m_fg_bank)
 		{
 			m_fg_bank = new_bank;
@@ -251,17 +141,16 @@ void raiden2_state::raidendx_cop_bank_2_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_cop_bank);
 
-	int new_bank = 4 | ((m_cop_bank >> 4) & 3);
+	const int new_bank = 4 | ((m_cop_bank >> 4) & 3);
 	if (new_bank != m_fg_bank)
 	{
 		m_fg_bank = new_bank;
 		m_foreground_layer->mark_all_dirty();
 	}
 
-	/* mainbank2 coming from 6c9 ? */
-	int bb = m_cop_bank >> 12;
-	m_mainbank[0]->set_entry(bb + 16);
-	m_mainbank[1]->set_entry(3);
+	// m_mainbank[1] coming from 6c9 ?
+	const int bb = m_cop_bank >> 12;
+	m_mainbank->set_entry(bb);
 }
 
 
@@ -308,7 +197,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 void raiden2_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_tile_bitmap);
-	m_screen->register_screen_bitmap(m_sprite_bitmap);
+	m_spritegen->alloc_sprite_bitmap();
 
 	m_back_data = make_unique_clear<u16[]>(0x800/2);
 	m_fore_data = make_unique_clear<u16[]>(0x800/2);
@@ -368,34 +257,34 @@ u32 raiden2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	if (!(m_tilemap_enable & 16))
 	{
-		draw_sprites(cliprect);
+		m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram->buffer(), m_spriteram->bytes());
 
-		blend_layer(bitmap, cliprect, m_sprite_bitmap, m_cur_spri[0]);
+		blend_layer(bitmap, cliprect, m_spritegen->get_sprite_temp_bitmap(), m_cur_spri[0]);
 	}
 
 	if (!(m_tilemap_enable & 1))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, m_background_layer);
 
 	if (!(m_tilemap_enable & 16))
-		blend_layer(bitmap, cliprect, m_sprite_bitmap, m_cur_spri[1]);
+		blend_layer(bitmap, cliprect, m_spritegen->get_sprite_temp_bitmap(), m_cur_spri[1]);
 
 	if (!(m_tilemap_enable & 2))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, m_midground_layer);
 
 	if (!(m_tilemap_enable & 16))
-		blend_layer(bitmap, cliprect, m_sprite_bitmap, m_cur_spri[2]);
+		blend_layer(bitmap, cliprect, m_spritegen->get_sprite_temp_bitmap(), m_cur_spri[2]);
 
 	if (!(m_tilemap_enable & 4))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, m_foreground_layer);
 
 	if (!(m_tilemap_enable & 16))
-		blend_layer(bitmap, cliprect, m_sprite_bitmap, m_cur_spri[3]);
+		blend_layer(bitmap, cliprect, m_spritegen->get_sprite_temp_bitmap(), m_cur_spri[3]);
 
 	if (!(m_tilemap_enable & 8))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, m_text_layer);
 
 	if (!(m_tilemap_enable & 16))
-		blend_layer(bitmap, cliprect, m_sprite_bitmap, m_cur_spri[4]);
+		blend_layer(bitmap, cliprect, m_spritegen->get_sprite_temp_bitmap(), m_cur_spri[4]);
 
 	if (machine().input().code_pressed_once(KEYCODE_Z))
 		if (m_raiden2cop) m_raiden2cop->dump_table();

@@ -82,19 +82,6 @@
 
 namespace {
 
-// TBD, assume same as Seibu SPI
-#define MAIN_CLOCK   (XTAL(50'000'000)/2)
-#define PIXEL_CLOCK  (XTAL(28'636'363)/4)
-
-#define SPI_HTOTAL   (448)
-#define SPI_HBEND    (0)
-#define SPI_HBSTART  (320)
-
-#define SPI_VTOTAL   (296)
-#define SPI_VBEND    (0)
-#define SPI_VBSTART  (240) /* actually 253, but visible area is 240 lines */
-
-
 class seibucats_state : public seibuspi_state
 {
 public:
@@ -108,6 +95,12 @@ public:
 
 	void init_seibucats();
 
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	// screen updates
 //  u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -120,11 +113,6 @@ private:
 	void aux_rtc_w(u16 data);
 
 	void seibucats_map(address_map &map);
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	u16 m_input_select = 0;
 
@@ -149,7 +137,7 @@ void seibucats_state::video_start()
 
 	m_tilemap_ram = nullptr;
 	m_palette_ram = make_unique_clear<u32[]>(m_palette_ram_size/4);
-	m_sprite_ram = make_unique_clear<u32[]>(m_sprite_ram_size/4);
+	m_sprite_ram = make_unique_clear<u16[]>(m_sprite_ram_size/2);
 
 	m_palette->basemem().set(&m_palette_ram[0], m_palette_ram_size, 32, ENDIANNESS_LITTLE, 2);
 
@@ -179,9 +167,9 @@ void seibucats_state::input_select_w(u16 data)
 
 void seibucats_state::output_latch_w(u16 data)
 {
-	m_eeprom->di_write((data & 0x8000) ? 1 : 0);
-	m_eeprom->clk_write((data & 0x4000) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->cs_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write(BIT(data, 15));
+	m_eeprom->clk_write(BIT(data, 14) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->cs_write(BIT(data, 13) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void seibucats_state::aux_rtc_w(u16 data)
@@ -191,7 +179,7 @@ void seibucats_state::aux_rtc_w(u16 data)
 void seibucats_state::seibucats_map(address_map &map)
 {
 	// TODO: map devices
-	map(0x00000000, 0x0003ffff).ram().share("mainram");
+	map(0x00000000, 0x0003ffff).ram().share(m_mainram);
 
 	map(0x00000010, 0x00000010).r(FUNC(seibucats_state::spi_status_r));
 	map(0x00000400, 0x00000401).w(FUNC(seibucats_state::input_select_w));
@@ -313,7 +301,19 @@ IRQ_CALLBACK_MEMBER(seibucats_state::spi_irq_callback)
 
 void seibucats_state::seibucats(machine_config &config)
 {
-	/* basic machine hardware */
+	// TBD, assume same as Seibu SPI
+	constexpr XTAL MAIN_CLOCK = 50_MHz_XTAL / 2;
+	constexpr XTAL PIXEL_CLOCK = 28.636363_MHz_XTAL / 4;
+
+	constexpr u16 SPI_HTOTAL  = 448;
+	constexpr u16 SPI_HBEND   = 0;
+	constexpr u16 SPI_HBSTART = 320;
+
+	constexpr u16 SPI_VTOTAL  = 296;
+	constexpr u16 SPI_VBEND   = 0;
+	constexpr u16 SPI_VBSTART = 240; // actually 253, but visible area is 240 lines
+
+	// basic machine hardware
 	I386(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seibucats_state::seibucats_map);
 	m_maincpu->set_vblank_int("screen", FUNC(seibuspi_state::spi_interrupt));
@@ -326,17 +326,22 @@ void seibucats_state::seibucats(machine_config &config)
 	I8251(config, "usart1", 0);
 	I8251(config, "usart2", 0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 //  screen.set_screen_update(FUNC(seibucats_state::screen_update));
 	screen.set_screen_update(FUNC(seibuspi_state::screen_update_sys386f));
 	screen.set_raw(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seibucats);
-
 	PALETTE(config, m_palette, palette_device::BLACK, 8192);
 
-	/* sound hardware */
+	SEI25X_RISE1X(config, m_spritegen, 0, m_palette, gfx_seibucats);
+	m_spritegen->set_screen("screen");
+	// see above
+	m_spritegen->set_pix_raw_shift(6);
+	m_spritegen->set_pri_raw_shift(14);
+	m_spritegen->set_transpen(63);
+
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -361,7 +366,7 @@ void seibucats_state::seibucats(machine_config &config)
 
 
 ROM_START( emjjoshi )
-	ROM_REGION32_LE( 0x200000, "ipl", 0 ) /* i386 program */
+	ROM_REGION32_LE( 0x200000, "ipl", 0 ) // i386 program
 	ROM_LOAD32_BYTE( "prg0.u016",    0x000000, 0x080000, CRC(e69bed6d) SHA1(e9626e704c5d28419cfa6a7a2c1b13b4b46f941c) )
 	ROM_LOAD32_BYTE( "prg1.u011",    0x000001, 0x080000, CRC(1082ede1) SHA1(0d1a682f37ede5c9070c14d1c3491a3082ad0759) )
 	ROM_LOAD32_BYTE( "prg2.u017",    0x000002, 0x080000, CRC(df85a8f7) SHA1(83226767b0c33e8cc3baee6f6bb17e4f1a6c9c27) )
@@ -376,7 +381,7 @@ ROM_END
 
 // MJ1-1537
 ROM_START( emjscanb )
-	ROM_REGION32_LE( 0x200000, "ipl", 0 ) /* i386 program */
+	ROM_REGION32_LE( 0x200000, "ipl", 0 ) // i386 program
 	ROM_LOAD32_BYTE( "prg0.u016",    0x000000, 0x080000, CRC(6e5c7c16) SHA1(19c00833357b97d0ed91a962e95d3ae2582da66c) )
 	ROM_LOAD32_BYTE( "prg1.u011",    0x000001, 0x080000, CRC(a5a17fdd) SHA1(3295ecb1055cf1ab612eb915aabe8d2895aeca6a) )
 	ROM_LOAD32_BYTE( "prg2.u017",    0x000002, 0x080000, CRC(b89d7693) SHA1(174b2ecfd8a3c593a81905c1c9d62728f710f5d1) )
@@ -389,7 +394,7 @@ ROM_START( emjscanb )
 ROM_END
 
 ROM_START( emjtrapz )
-	ROM_REGION32_LE( 0x200000, "ipl", 0 ) /* i386 program */
+	ROM_REGION32_LE( 0x200000, "ipl", 0 ) // i386 program
 	ROM_LOAD32_BYTE( "prg0.u016",    0x000000, 0x080000, CRC(88e4ef2a) SHA1(110451c09983ce4720f75b89282ca49f47169a85) )
 	ROM_LOAD32_BYTE( "prg1.u011",    0x000001, 0x080000, CRC(e4716996) SHA1(6abd84c1e4facf6570988db0a63968a1647144b1) )
 	ROM_LOAD32_BYTE( "prg2.u017",    0x000002, 0x080000, CRC(69995273) SHA1(a7e10d21a524a286acd0a8c19c41a101eee30626) )
