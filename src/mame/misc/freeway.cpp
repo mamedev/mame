@@ -34,7 +34,7 @@ public:
 		, m_charram(*this, "charram")
 		, m_colorram(*this, "colorram")
 		, m_gfx_rom(*this, "gfx")
-		, m_color_rom(*this, "cor")
+		, m_color_rom(*this, "color_rom")
 		, m_lamps(*this, "lamp%u", 1U)
 	{
 	}
@@ -64,6 +64,8 @@ private:
 	required_region_ptr<u8> m_color_rom;
 
 	output_finder<3> m_lamps;
+
+	void palette_init(palette_device &palette) const;
 };
 
 void freeway_state::machine_start()
@@ -168,8 +170,32 @@ static INPUT_PORTS_START(freeway)
 INPUT_PORTS_END
 
 static GFXDECODE_START(gfx_freeway)
-	GFXDECODE_ENTRY("gfx", 0, gfx_8x8x3_planar, 0x0, 1)
+	GFXDECODE_ENTRY("gfx", 0, gfx_8x8x3_planar, 0x0, 0x20)
 GFXDECODE_END
+
+// TODO: diverges between freeway and freewaya
+// makes more sense with latter, different?
+void freeway_state::palette_init(palette_device &palette) const
+{
+	uint8_t const *const data = m_color_rom;
+
+	u8 value = 0;
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		value = data[i + 0x7c00];
+		int const r = (value == 0xff) ? 0 : 0x0e * BIT(value, 0) + 0x1f * BIT(value, 1) + 0x43 * BIT(value, 2) + 0x8f * BIT(value, 3);
+
+		value = data[i + 0x7d00];
+		int const g = (value == 0xff) ? 0 : 0x0e * BIT(value, 0) + 0x1f * BIT(value, 1) + 0x43 * BIT(value, 2) + 0x8f * BIT(value, 3);
+
+		value = data[i + 0x7f00];
+		int const b = (value == 0xff) ? 0 : 0x0e * BIT(value, 0) + 0x1f * BIT(value, 1) + 0x43 * BIT(value, 2) + 0x8f * BIT(value, 3);
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
 
 void freeway_state::freeway(machine_config &config)
 {
@@ -190,7 +216,7 @@ void freeway_state::freeway(machine_config &config)
 	screen.set_raw(10_MHz_XTAL / 2, 320, 0, 256, 312, 0, 256);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	PALETTE(config, "palette").set_entries(0x10);
+	PALETTE(config, "palette", FUNC(freeway_state::palette_init), 0x100);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_freeway);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 10_MHz_XTAL / 16));
@@ -231,7 +257,7 @@ ROM_START(freeway)
 	ROM_LOAD("sb_52.bin",  0x08000, 0x8000, CRC(f2b33acd) SHA1(e4786b4f00871d771aadacd9d6ec767691f4d939))
 	ROM_LOAD("sb_53.bin",  0x10000, 0x8000, CRC(50407ae6) SHA1(2c6c4803905bed5f27c6783f99a24f8dee62c19b))
 
-	ROM_REGION(0x8000, "cor", 0)
+	ROM_REGION(0x8000, "color_rom", 0)
 	ROM_LOAD("sb_cor.bin", 0x0000, 0x8000, CRC(5f86a160) SHA1(f21b7e0e6a407371c252d6fde6fcb32a2682824c)) // all 0xFF fill until 0x7C00; valid data is only 4 bits wide
 ROM_END
 
@@ -244,7 +270,7 @@ ROM_START(freewaya)
 	ROM_LOAD("rgb 2fw 256 vr 512b",  0x08000, 0x8000, CRC(ed1bb4d8) SHA1(78f9eced819c1fa269e685bb176671158ffcec26))
 	ROM_LOAD("rgb 3fw 256 vr 512b",  0x10000, 0x8000, CRC(c685c530) SHA1(deec9ce1df500f14b9ebd007d482473f97b3ecf3))
 
-	ROM_REGION(0x8000, "cor", 0)
+	ROM_REGION(0x8000, "color_rom", 0)
 	ROM_LOAD("color_431b_eprom-256", 0x0000, 0x8000, CRC(e49fc782) SHA1(2c50cf644b7c6449880ed3d6e778ba116e123ae2)) // FIXED BITS (0000xxxx)
 
 	ROM_REGION(0x21ee, "nvram", 0)
