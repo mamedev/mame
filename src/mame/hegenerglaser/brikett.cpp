@@ -12,7 +12,7 @@ in 1981, and in 1982 they released ESB 3000 and ESB 6000 for use with ESB II/III
 
 Hardware notes:
 
-1st model (Mephisto, Mephisto II 1981):
+1st model (Mephisto, early Mephisto II):
 - 2 PCBs: DH 4001-C(computer), DH 4002-C(LCD/keypad)
 - CDP1802CE @ 3.579MHz
 - CDP1852CE (I/O port chip), external port
@@ -21,11 +21,16 @@ Hardware notes:
 - piezo, TTL, 16-button keypad
 - module slot
 
-2nd model (Mephisto II 1982, Mephisto III): (listed differences)
+2nd model (later Mephisto II): (listed differences)
+- PCB label: DH 4005-101 00
+- CDP1802ACE @ 3.579MHz or 4.194MHz (chess clock runs faster on 4.194MHz)
+- 2*MWS5114E or 2*TC5514P (1KBx4 RAM)
+
+3rd model (later Mephisto II, Mephisto III): (listed differences)
 - PCB label: DH 4005-101 01
 - CDP1802ACE @ 6.144MHz, later serials also seen with 1806 CPU
 - 2 XTALs (3.579MHz and 6.144MHz), lower speed when running on battery
-- 2*TC5514P (1KBx4 RAM), unpopulated on some Mephisto III
+- 2*TC5514P may be unpopulated on some Mephisto III
 
 Mephisto Junior: (listed differences)
 - 2 PCBs: RAWE 003010 B(computer), RAWE 003010 A(LCD/keypad)
@@ -79,6 +84,7 @@ BTANB:
 
 #include "cpu/cosmac/cosmac.h"
 #include "machine/cdp1852.h"
+#include "machine/clock.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
@@ -101,6 +107,7 @@ public:
 	brikett_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_irq_clock(*this, "nmi_clock"),
 		m_extport(*this, "extport"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
@@ -111,7 +118,7 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { if (newval) machine_reset(); }
-	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 	// machine configs
 	void mephisto(machine_config &config);
@@ -122,11 +129,12 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override { m_reset = true; }
 
 private:
 	// devices/pointers
 	required_device<cdp1802_device> m_maincpu;
+	required_device<clock_device> m_irq_clock;
 	optional_device<cdp1852_device> m_extport;
 	optional_device<sensorboard_device> m_board;
 	required_device<mephisto_display1_device> m_display;
@@ -149,10 +157,7 @@ private:
 	void mephisto_io(address_map &map);
 	void mephistoj_io(address_map &map);
 
-	void set_cpu_freq();
-
 	// I/O handlers
-	INTERRUPT_GEN_MEMBER(interrupt);
 	int clear_r();
 	u8 input_r(offs_t offset);
 	u8 sound_r();
@@ -178,24 +183,31 @@ void brikett_state::machine_start()
 	save_item(NAME(m_esb_select));
 }
 
-void brikett_state::machine_reset()
+INPUT_CHANGED_MEMBER(brikett_state::change_cpu_freq)
 {
-	m_reset = true;
-	set_cpu_freq();
-}
+	newval = m_inputs[4]->read();
 
-void brikett_state::set_cpu_freq()
-{
-	u8 inp = m_inputs[4]->read();
-	if (~inp & 0x40)
-		return;
-	inp = inp >> 4 & inp;
+	if (newval & 8)
+	{
+		/*
+			3rd hardware model has 2 XTALs, it will increase CPU voltage (and speed)
+			when running on mains power, the 3.579545MHz XTAL is still used for IRQ.
 
-	// 2nd hardware model has 2 XTALs, it will increase CPU voltage (and speed) when running on mains power,
-	// the 3.579545MHz XTAL is still used for IRQ. Mephisto III could be fitted with a 12MHz XTAL instead of 6.144MHz
-	// and a newer CDP1805CE CPU by Hobby Computer Centrale on request.
-	// (It is unexpected that the 1805 accepts such a high overclock, but tests show that it is indeed twice faster)
-	m_maincpu->set_unscaled_clock((inp & 2) ? 12_MHz_XTAL : ((inp & 1) ? 6.144_MHz_XTAL : 3.579545_MHz_XTAL));
+			Mephisto III could be fitted with a 12MHz XTAL instead of 6.144MHz and
+			a newer CDP1805CE CPU by Hobby Computer Centrale on request. (It is
+			unexpected that the 1805 accepts such a high overclock, but tests show
+			that it is indeed twice faster)
+		*/
+		static const XTAL freq[3] = { 3.579545_MHz_XTAL, 6.144_MHz_XTAL, 12_MHz_XTAL };
+		m_maincpu->set_unscaled_clock(freq[(newval & 3) % 3]);
+	}
+	else
+	{
+		m_maincpu->set_unscaled_clock((newval & 4) ? 4.194304_MHz_XTAL : 3.579545_MHz_XTAL);
+	}
+
+	// also change interrupt frequency
+	m_irq_clock->set_period(attotime::from_ticks(0x10000, (newval & 4) ? 4.194304_MHz_XTAL : 3.579545_MHz_XTAL));
 }
 
 
@@ -205,11 +217,6 @@ void brikett_state::set_cpu_freq()
 *******************************************************************************/
 
 // base hardware
-
-INTERRUPT_GEN_MEMBER(brikett_state::interrupt)
-{
-	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, HOLD_LINE);
-}
 
 int brikett_state::clear_r()
 {
@@ -368,13 +375,14 @@ static INPUT_PORTS_START( mephisto )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("REV")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H / 8")
 
-	PORT_START("IN.4") // 2nd model main PCB has 2 XTALs on PCB
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, change_cpu_freq, 0) PORT_CONDITION("IN.4", 0x30, NOTEQUALS, 0x00)
+	PORT_START("IN.4") // 3rd model main PCB has 2 XTALs on PCB
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, change_cpu_freq, 0) PORT_CONDITION("IN.4", 0x0c, EQUALS, 0x08)
 	PORT_CONFSETTING(    0x00, "3.579MHz (Battery)" )
 	PORT_CONFSETTING(    0x01, "6.144MHz (Mains)" )
-	PORT_CONFNAME( 0x70, 0x40, "Base Hardware" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, change_cpu_freq, 0)
-	PORT_CONFSETTING(    0x40, "1st Model (1980)" )
-	PORT_CONFSETTING(    0x70, "2nd Model (1982)" )
+	PORT_CONFNAME( 0x0c, 0x00, "Base Hardware" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, change_cpu_freq, 0)
+	PORT_CONFSETTING(    0x00, "1st Model (3.579MHz)" ) // or 2nd model with this XTAL
+	PORT_CONFSETTING(    0x04, "2nd Model (4.194MHz)" )
+	PORT_CONFSETTING(    0x08, "3rd Model (2 XTALs)" )
 
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("RES") PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, reset_button, 0)
@@ -421,7 +429,7 @@ static INPUT_PORTS_START( mephisto3 )
 	PORT_CONFSETTING(    0x00, "3.579MHz (Battery)" )
 	PORT_CONFSETTING(    0x01, "6.144MHz (Mains)" )
 	PORT_CONFSETTING(    0x02, "12MHz (Special)" )
-	PORT_BIT(0x70, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x0c, 0x08, IPT_CUSTOM) // 3rd model
 INPUT_PORTS_END
 
 
@@ -439,8 +447,9 @@ void brikett_state::mephistoj(machine_config &config)
 	m_maincpu->clear_cb().set(FUNC(brikett_state::clear_r));
 	m_maincpu->q_cb().set(m_display, FUNC(mephisto_display1_device::strobe_w)).invert();
 
-	const attotime irq_period = attotime::from_hz(4.194304_MHz_XTAL / 0x10000); // through SAJ300T
-	m_maincpu->set_periodic_int(FUNC(brikett_state::interrupt), irq_period);
+	const attotime irq_period = attotime::from_ticks(0x10000, 4.194304_MHz_XTAL); // through SAJ300T
+	CLOCK(config, m_irq_clock).set_period(irq_period);
+	m_irq_clock->signal_handler().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT, HOLD_LINE);
 
 	// video hardware
 	MEPHISTO_DISPLAY_MODULE1(config, m_display); // internal
@@ -458,15 +467,14 @@ void brikett_state::mephisto(machine_config &config)
 	mephistoj(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(3.579545_MHz_XTAL); // see set_cpu_freq
+	m_maincpu->set_clock(3.579545_MHz_XTAL); // see change_cpu_freq
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto_map);
 	m_maincpu->set_addrmap(AS_IO, &brikett_state::mephisto_io);
 	m_maincpu->tpb_cb().set(m_extport, FUNC(cdp1852_device::clock_w));
 	m_maincpu->ef1_cb().set_constant(0); // external port
 	m_maincpu->ef3_cb().set_constant(0); // external port, but unused
 
-	const attotime irq_period = attotime::from_hz(3.579545_MHz_XTAL / 0x10000); // through SAJ300T
-	m_maincpu->set_periodic_int(FUNC(brikett_state::interrupt), irq_period);
+	m_irq_clock->set_period(attotime::from_ticks(0x10000, 3.579545_MHz_XTAL));
 
 	CDP1852(config, m_extport);
 	m_extport->mode_cb().set_constant(1);
