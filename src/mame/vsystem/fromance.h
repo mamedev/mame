@@ -16,7 +16,6 @@
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "vsystem_gga.h"
-#include "vsystem_spr2.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -80,19 +79,19 @@ private:
 	optional_device<generic_latch_8_device> m_sublatch;
 	optional_device<msm5205_device> m_msm;
 
-	/* video-related */
+	// video-related
 	std::unique_ptr<uint8_t[]>   m_local_videoram[2];
 	std::unique_ptr<uint8_t[]>  m_local_paletteram;
 
 	emu_timer *m_crtc_timer;
 
-	/* misc */
+	// misc
 	uint8_t    m_portselect = 0;
 	uint8_t    m_adpcm_reset = 0;
 	uint8_t    m_adpcm_data = 0;
 	uint8_t    m_vclk_left = 0;
 
-	/* devices */
+	// devices
 	uint8_t fromance_busycheck_main_r();
 	uint8_t fromance_busycheck_sub_r();
 	void fromance_rombank_w(uint8_t data);

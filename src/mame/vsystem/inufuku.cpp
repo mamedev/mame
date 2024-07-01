@@ -73,6 +73,8 @@ TODO:
 
 - Priority of tests and sprites seems to be correct, but I may have mistaken.
 
+- Tilemap offset is incorrect in inufuku?
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -134,14 +136,15 @@ private:
 	// video-related
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_tx_tilemap;
-	int       m_bg_scrollx = 0;
-	int       m_bg_scrolly = 0;
-	int       m_tx_scrollx = 0;
-	int       m_tx_scrolly = 0;
+	s32       m_bg_scrollx = 0;
+	s32       m_bg_scrolly = 0;
+	s32       m_tx_scrollx = 0;
+	s32       m_tx_scrolly = 0;
 	bool      m_bg_raster = false;
 	u8        m_bg_palettebank = 0;
 	u8        m_tx_palettebank = 0;
-	u32       tile_callback( u32 code );
+	u32       tile_callback(u32 code);
+	u32       pri_callback(u32 color);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -261,9 +264,22 @@ void inufuku_state::tx_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 
-u32 inufuku_state::tile_callback( u32 code )
+u32 inufuku_state::tile_callback(u32 code)
 {
 	return ((m_sprtileram[code * 2] & 0x0007) << 16) + m_sprtileram[(code * 2) + 1];
+}
+
+
+u32 inufuku_state::pri_callback(u32 color)
+{
+	switch ((color >> 4) & 3)
+	{
+		default:
+		case 0: return 0x00;
+		case 3: return 0xfe;
+		case 2: return 0xfc;
+		case 1: return 0xf0;
+	}
 }
 
 
@@ -312,7 +328,7 @@ u32 inufuku_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	m_tx_tilemap->set_scrolly(0, m_tx_scrolly);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
 
-	m_spr->draw_sprites( m_sprattrram->buffer(), m_sprattrram->bytes(), screen, bitmap, cliprect );
+	m_spr->draw_sprites(m_sprattrram->buffer(), m_sprattrram->bytes(), screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -489,13 +505,13 @@ INPUT_PORTS_END
 static GFXDECODE_START( gfx_inufuku )
 	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x8_raw,          0, 4096/256 )  // bg
 	GFXDECODE_ENTRY( "txtile",  0, gfx_8x8x8_raw,          0, 4096/256 )  // text
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_inufuku_spr )
 	GFXDECODE_ENTRY( "sprtile", 0, gfx_16x16x4_packed_msb, 0, 4096/16  )  // sprite
 GFXDECODE_END
 
-
-static GFXDECODE_START( gfx_3on3dunk )
-	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x8_raw,          0, 4096/256 )  // bg
-	GFXDECODE_ENTRY( "txtile",  0, gfx_8x8x8_raw,          0, 4096/256 )  // text
+static GFXDECODE_START( gfx_3on3dunk_spr )
 	GFXDECODE_ENTRY( "sprtile", 0, gfx_16x16x4_packed_lsb, 0, 4096/16  )  // sprite
 GFXDECODE_END
 
@@ -535,7 +551,7 @@ void inufuku_state::machine_reset()
 
 void inufuku_state::inufuku(machine_config &config)
 {
-	// basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, XTAL(32'000'000)/2); // 16.00 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &inufuku_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(inufuku_state::irq1_line_hold));
@@ -556,12 +572,10 @@ void inufuku_state::inufuku(machine_config &config)
 	screen.screen_vblank().set(m_sprattrram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
-	VSYSTEM_SPR(config, m_spr, 0);
+	VSYSTEM_SPR(config, m_spr, 0, m_palette, gfx_inufuku_spr);
 	m_spr->set_offsets(0, 1); // reference videos confirm at least the +1 against tilemaps in 3on3dunk (the highscore header text and black box are meant to be 1 pixel misaligned, although there is currently a priority bug there too)
-	m_spr->set_pdraw(true);
 	m_spr->set_tile_indirect_cb(FUNC(inufuku_state::tile_callback));
-	m_spr->set_gfx_region(2);
-	m_spr->set_gfxdecode_tag(m_gfxdecode);
+	m_spr->set_pri_cb(FUNC(inufuku_state::pri_callback));
 
 	BUFFERED_SPRITERAM16(config, m_sprattrram);
 
@@ -586,7 +600,7 @@ void inufuku_state::inufuku(machine_config &config)
 void inufuku_state::_3on3dunk(machine_config &config)
 {
 	inufuku(config);
-	m_gfxdecode->set_info(gfx_3on3dunk);
+	m_spr->set_info(gfx_3on3dunk_spr);
 }
 
 

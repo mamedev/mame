@@ -282,6 +282,7 @@ private:
 	uint16_t vbl_toggle_r();
 	void vbl_toggle_w(uint16_t data);
 
+	uint32_t pri_callback(uint32_t color);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
@@ -304,14 +305,19 @@ void gstriker_state::video_start()
 	m_bg->set_transparent_pen(0xf);
 }
 
+uint32_t gstriker_state::pri_callback(uint32_t color)
+{
+	return BIT(color, 5) ? 0 : GFX_PMASK_2;
+}
+
 void gstriker_state::screen_vblank(int state)
 {
 	// sprites are two frames ahead
 	// TODO: probably all Video System games are (Aero Fighters definitely desyncs wrt background)
 	if(state)
 	{
-		memcpy(m_buffered_spriteram[0], m_cg10103_vram, 0x2000);
 		memcpy(m_buffered_spriteram[1], m_buffered_spriteram[0], 0x2000);
+		memcpy(m_buffered_spriteram[0], m_cg10103_vram, 0x2000);
 	}
 }
 
@@ -319,6 +325,7 @@ void gstriker_state::screen_vblank(int state)
 uint32_t gstriker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_mixerregs[8] & 0x07ff, cliprect); // complete guess, causes green behind test grid in twc94 and blue behind title screen on gstriker
+	screen.priority().fill(0, cliprect);
 
 	/*
 	[4] AAAA BBBB ---- ---- sprite priority number A/B?
@@ -331,15 +338,11 @@ uint32_t gstriker_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_bg->set_pal_base((m_mixerregs[1] & 0xf000) >> 8);
 	m_tx->set_pal_base((m_mixerregs[2] & 0xf000) >> 8);
 
-
 	// Sandwiched screen/sprite0/score/sprite1. Surely wrong, probably needs sprite orthogonality
-	m_bg->draw(screen, bitmap, cliprect, 0);
+	m_bg->draw(screen, bitmap, cliprect, 1);
+	m_tx->draw(screen, bitmap, cliprect, 2);
 
-	m_spr->draw_sprites(m_buffered_spriteram[1], 0x2000, screen, bitmap, cliprect, 0x2, 0x0);
-
-	m_tx->draw(screen, bitmap, cliprect, 0);
-
-	m_spr->draw_sprites(m_buffered_spriteram[1], 0x2000, screen, bitmap, cliprect, 0x2, 0x2);
+	m_spr->draw_sprites(m_buffered_spriteram[1], 0x2000, screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -369,6 +372,9 @@ void gstriker_state::sh_bankswitch_w(uint8_t data)
 static GFXDECODE_START( gfx_gstriker )
 	GFXDECODE_ENTRY( "fix_tiles",    0, gfx_8x8x4_packed_lsb,   0, 256 )
 	GFXDECODE_ENTRY( "scroll_tiles", 0, gfx_16x16x4_packed_msb, 0, 256 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_gstriker_spr )
 	GFXDECODE_ENTRY( "sprites",      0, gfx_16x16x4_packed_msb, 0, 256 )
 GFXDECODE_END
 
@@ -655,11 +661,10 @@ void gstriker_state::base(machine_config &config)
 	m_tx->set_gfxdecode_tag(m_gfxdecode);
 	m_tx->set_gfx_region(0);
 
-	VSYSTEM_SPR(config, m_spr, 0);
-	m_spr->set_gfx_region(2);
+	VSYSTEM_SPR(config, m_spr, 0, m_palette, gfx_gstriker_spr);
+	m_spr->set_pri_cb(FUNC(gstriker_state::pri_callback));
 	m_spr->set_pal_mask(0x1f);
 	m_spr->set_transpen(0);
-	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

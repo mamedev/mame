@@ -58,6 +58,7 @@ private:
 	void setbank(int layer, int num, int bank);
 	void gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t tile_callback(uint32_t code);
+	uint32_t pri_callback(uint32_t color);
 	void soundlatch_pending_w(int state);
 	void sh_bankswitch_w(uint8_t data);
 
@@ -123,11 +124,17 @@ void aerofgt_state::video_start()
 
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_bank));
+	save_item(NAME(m_scrolly));
 }
 
 uint32_t aerofgt_state::tile_callback(uint32_t code)
 {
-	return m_sprlookupram[code&0x7fff];
+	return m_sprlookupram[code & 0x7fff];
+}
+
+uint32_t aerofgt_state::pri_callback(uint32_t color)
+{
+	return BIT(color, 5) ? 0 : GFX_PMASK_2;
 }
 
 
@@ -171,15 +178,10 @@ uint32_t aerofgt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	screen.priority().fill(0, cliprect);
 
-	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 2);
 
-	m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect, 0x03, 0x00);
-	m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect, 0x03, 0x01);
-
-	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-
-	m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect, 0x03, 0x02);
-	m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect, 0x03, 0x03);
+	m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -339,20 +341,23 @@ INPUT_PORTS_END
 
 
 static GFXDECODE_START( gfx_aerofgt )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,     0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,   256, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_msb, 512, 32 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_msb,     0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_msb,   256, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_aerofgt_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_msb, 512, 32 )
 GFXDECODE_END
 
 
 void aerofgt_state::machine_start()
 {
-	m_soundbank->configure_entries(0, 4, memregion("soundbank")->base(), 0x8000);
+	m_soundbank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
 }
 
 void aerofgt_state::machine_reset()
 {
-	m_soundbank->set_entry(0); // needed by spinlbrk
+	m_soundbank->set_entry(0);
 }
 
 void aerofgt_state::aerofgt(machine_config &config)
@@ -390,10 +395,9 @@ void aerofgt_state::aerofgt(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aerofgt);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	VSYSTEM_SPR(config, m_spr, 0);
+	VSYSTEM_SPR(config, m_spr, 0, m_palette, gfx_aerofgt_spr);
 	m_spr->set_tile_indirect_cb(FUNC(aerofgt_state::tile_callback));
-	m_spr->set_gfx_region(2);
-	m_spr->set_gfxdecode_tag(m_gfxdecode);
+	m_spr->set_pri_cb(FUNC(aerofgt_state::pri_callback));
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -423,17 +427,14 @@ ROM_START( aerofgt )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD_SWAP( "1.u4",         0x00000, 0x80000, CRC(6fdff0a2) SHA1(7cc9529b426091027aa3e23586cb7d162376c0ff) )
 
-	ROM_REGION( 0x20000, "soundbank", 0 )    // 128k for the audio CPU + banks
+	ROM_REGION( 0x20000, "audiocpu", 0 )    // 128k for the audio CPU + banks
 	ROM_LOAD( "2.153",        0x00000, 0x20000, CRC(a1ef64ec) SHA1(fa3e434738bf4e742ad68882c1e914100ce0f761) )
 
-	ROM_REGION( 0x08000, "audiocpu", 0 )    // 32k for the audio CPU
-	ROM_COPY( "soundbank", 0x00000, 0x00000, 0x08000 )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD16_WORD_SWAP( "538a54.124",   0x000000, 0x80000, CRC(4d2c4df2) SHA1(f51c2b3135f0a921ac1a79e63d6878c03cb6254b) )
 	ROM_LOAD16_WORD_SWAP( "1538a54.124",  0x080000, 0x80000, CRC(286d109e) SHA1(3a5f3d2d89cf58f6ef15e4bd3f570b84e8e695b2) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "538a53.u9",    0x000000, 0x100000, CRC(630d8e0b) SHA1(5a0c252ccd53c5199a695909d25ecb4e53dc15b9) )
 	ROM_LOAD16_WORD_SWAP( "534g8f.u18",   0x200000, 0x080000, CRC(76ce0926) SHA1(5ef4cec215d4dd600d8fcd1bd9a4c09081d59e33) )
 

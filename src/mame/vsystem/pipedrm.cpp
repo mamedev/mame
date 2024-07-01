@@ -164,6 +164,7 @@ Added Multiple Coin Feature:
 
 #include "emu.h"
 #include "fromance.h"
+#include "vsystem_spr2.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
@@ -252,12 +253,12 @@ void hatris_state::bankswitch_w(uint8_t data)
 	    D2-D0 = program ROM bank select
 	*/
 
-	/* set the memory bank on the Z80 using the low 3 bits */
+	// set the memory bank on the Z80 using the low 3 bits
 	m_rombank->set_entry(data & 0x7);
 
-	/* map to the fromance gfx register */
-	fromance_gfxreg_w(((data >> 6) & 0x01) |  /* flipscreen */
-					((~data >> 2) & 0x02)); /* videoram select */
+	// map to the fromance gfx register
+	fromance_gfxreg_w(((data >> 6) & 0x01) |  // flipscreen
+					((~data >> 2) & 0x02)); // videoram select
 }
 
 
@@ -302,15 +303,15 @@ uint32_t pipedrm_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	uint8_t* sram = m_spriteram;
 
-	/* there seems to be no logical mapping for the X scroll register -- maybe it's gone */
+	// there seems to be no logical mapping for the X scroll register -- maybe it's gone
 	m_bg_tilemap->set_scrolly(0, m_scrolly[1]);
 	m_fg_tilemap->set_scrolly(0, m_scrolly[0]);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_spr_old->turbofrc_draw_sprites((uint16_t*)sram, m_spriteram_size, 0, bitmap, cliprect, screen.priority(), 0);
-	m_spr_old->turbofrc_draw_sprites((uint16_t*)sram, m_spriteram_size, 0, bitmap, cliprect, screen.priority(), 1);
+	m_spr_old->draw_sprites((uint16_t*)sram, m_spriteram_size, 0, bitmap, cliprect, screen.priority(), 0);
+	m_spr_old->draw_sprites((uint16_t*)sram, m_spriteram_size, 0, bitmap, cliprect, screen.priority(), 1);
 	return 0;
 }
 
@@ -388,7 +389,7 @@ void hatris_state::sound_portmap(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( pipedrm )
-	PORT_START("P1")    /* $20 */
+	PORT_START("P1")    // $20
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -398,7 +399,7 @@ static INPUT_PORTS_START( pipedrm )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("P2")    /* $21 */
+	PORT_START("P2")    // $21
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -408,7 +409,7 @@ static INPUT_PORTS_START( pipedrm )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SYSTEM")    /* $24 */
+	PORT_START("SYSTEM")    // $24
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -418,7 +419,7 @@ static INPUT_PORTS_START( pipedrm )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW1")  /* $22 */
+	PORT_START("DSW1")  // $22
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x06, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
@@ -454,7 +455,7 @@ static INPUT_PORTS_START( pipedrm )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 
-	PORT_START("DSW2")  /* $23 */
+	PORT_START("DSW2")  // $23
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -479,7 +480,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( hatris )
-	PORT_START("P1")    /* $20 */
+	PORT_START("P1")    // $20
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -489,7 +490,7 @@ static INPUT_PORTS_START( hatris )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("P2")    /* $21 */
+	PORT_START("P2")    // $21
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -499,7 +500,7 @@ static INPUT_PORTS_START( hatris )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SYSTEM")    /* $24 */
+	PORT_START("SYSTEM")    // $24
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -509,7 +510,7 @@ static INPUT_PORTS_START( hatris )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW1")  /* $22 */
+	PORT_START("DSW1")  // $22
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x09, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
@@ -545,7 +546,7 @@ static INPUT_PORTS_START( hatris )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
 
-	PORT_START("DSW2")  /* $23 */
+	PORT_START("DSW2")  // $23
 	PORT_DIPNAME( 0x03, 0x00, "Hat Fall Velocity" ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
@@ -563,7 +564,7 @@ static INPUT_PORTS_START( hatris )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" ) /* Listed as "N.C." */
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" ) // Listed as "N.C."
 INPUT_PORTS_END
 
 
@@ -599,16 +600,13 @@ static const gfx_layout splayout =
 };
 
 
-static GFXDECODE_START( gfx_pipedrm )
-	GFXDECODE_ENTRY( "gfx1", 0, bglayout,    0, 128 )
-	GFXDECODE_ENTRY( "gfx2", 0, bglayout,    0, 128 )
-	GFXDECODE_ENTRY( "gfx3", 0, splayout, 1024, 32 )
-GFXDECODE_END
-
-
 static GFXDECODE_START( gfx_hatris )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,    0, 128 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_pipedrm_spr )
+	GFXDECODE_ENTRY( "gfx3", 0, splayout, 1024, 32 )
 GFXDECODE_END
 
 
@@ -620,15 +618,15 @@ GFXDECODE_END
 
 void hatris_state::machine_start()
 {
-	/* initialize main Z80 bank */
+	// initialize main Z80 bank
 	m_rombank->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x2000);
 	m_rombank->set_entry(0);
 
-	/* initialize sound bank */
+	// initialize sound bank
 	m_soundbank->configure_entries(0, 2, memregion("sub")->base() + 0x10000, 0x8000);
 	m_soundbank->set_entry(0);
 
-	/* video-related elements are saved in video_start */
+	// video-related elements are saved in video_start
 }
 
 void hatris_state::machine_reset()
@@ -648,7 +646,7 @@ void hatris_state::machine_reset()
 
 void pipedrm_state::pipedrm(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 12_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pipedrm_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &pipedrm_state::main_portmap);
@@ -658,28 +656,26 @@ void pipedrm_state::pipedrm(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &pipedrm_state::sound_map);
 	m_subcpu->set_addrmap(AS_IO, &pipedrm_state::sound_portmap);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(44*8, 30*8);
 	m_screen->set_visarea(0*8, 44*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(pipedrm_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pipedrm);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hatris);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	VSYSTEM_GGA(config, m_gga, 14.318181_MHz_XTAL / 2); // divider not verified
 	m_gga->write_cb().set(FUNC(pipedrm_state::fromance_gga_data_w));
 
-	VSYSTEM_SPR2(config, m_spr_old, 0);
-	m_spr_old->set_gfx_region(2);
+	VSYSTEM_SPR2(config, m_spr_old, 0, m_palette, gfx_pipedrm_spr);
 	m_spr_old->set_offsets(-13, -6);
 	m_spr_old->set_pritype(3);
-	m_spr_old->set_gfxdecode_tag(m_gfxdecode);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -695,7 +691,7 @@ void pipedrm_state::pipedrm(machine_config &config)
 
 void hatris_state::hatris(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 12_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hatris_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &hatris_state::main_portmap);
@@ -705,10 +701,10 @@ void hatris_state::hatris(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &hatris_state::sound_map);
 	m_subcpu->set_addrmap(AS_IO, &hatris_state::sound_portmap);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(44*8, 30*8);
 	m_screen->set_visarea(0*8, 44*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(hatris_state::screen_update_fromance));
@@ -720,7 +716,7 @@ void hatris_state::hatris(machine_config &config)
 	VSYSTEM_GGA(config, m_gga, 14.318181_MHz_XTAL / 2); // divider not verified
 	m_gga->write_cb().set(FUNC(hatris_state::fromance_gga_data_w));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -965,7 +961,7 @@ ROM_END
 void pipedrm_state::init_pipedrm()
 {
 	const memory_share *share = memshare("palette");
-	/* sprite RAM lives at the end of palette RAM */
+	// sprite RAM lives at the end of palette RAM
 	m_spriteram = (uint8_t*)share->ptr() + 0xc00;
 	m_spriteram_size = 0x400;
 	m_maincpu->space(AS_PROGRAM).install_ram(0xcc00, 0xcfff, m_spriteram);

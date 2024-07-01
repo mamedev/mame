@@ -205,7 +205,7 @@ TILE_GET_INFO_MEMBER(suprslam_state::get_bg_tile_info)
 	tileno += m_bg_bank;
 	colour = colour >> 12;
 
-	tileinfo.set(2, tileno, colour, 0);
+	tileinfo.set(1, tileno, colour, 0);
 }
 
 
@@ -385,24 +385,13 @@ INPUT_PORTS_END
 
 /*** GFX DECODE **************************************************************/
 
-static const gfx_layout suprslam_16x16x4_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 8, 12, 0, 4, 24, 28, 16, 20,
-	32+8, 32+12, 32+0, 32+4, 32+24,32+28,32+16,32+20},
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64
-	},
-	16*64
-};
-
 static GFXDECODE_START( gfx_suprslam )
-	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x4_packed_lsb,    0x000, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, suprslam_16x16x4_layout, 0x200, 16 )
-	GFXDECODE_ENTRY( "bgtiles", 0, suprslam_16x16x4_layout, 0x100, 16 )
+	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x4_packed_lsb,   0x000, 16 )
+	GFXDECODE_ENTRY( "bgtiles", 0, gfx_16x16x4_packed_msb, 0x100, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_suprslam_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_msb, 0x200, 16 )
 GFXDECODE_END
 
 
@@ -454,10 +443,8 @@ void suprslam_state::suprslam(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 0x800);
 
-	VSYSTEM_SPR(config, m_spr, 0);
+	VSYSTEM_SPR(config, m_spr, 0, m_palette, gfx_suprslam_spr);
 	m_spr->set_tile_indirect_cb(FUNC(suprslam_state::tile_callback));
-	m_spr->set_gfx_region(1);
-	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
 	K053936(config, m_k053936, 0);
 	m_k053936->set_wrap(1);
@@ -498,14 +485,14 @@ ROM_START( suprslam )
 	ROM_LOAD( "eb26ic43.bin", 0x000000, 0x200000, CRC(9dfb0959) SHA1(ba479192a422a55efcf8aa7ff995c914525b4a56) )
 
 	ROM_REGION( 0x800000, "sprites", 0 ) // 16x16x4 Sprites GFX
-	ROM_LOAD( "eb26ic09.bin", 0x000000, 0x200000, CRC(5a415365) SHA1(a59a4ab231980b0540e9a8356a02530217779dbd) )
-	ROM_LOAD( "eb26ic10.bin", 0x200000, 0x200000, CRC(a04f3140) SHA1(621ff823d93fecdde801912064ac951727b71677) )
-	ROM_LOAD( "eb26_100.bin", 0x400000, 0x200000, CRC(c2ee5eb6) SHA1(4b61e77a0d0f38b542d5e32fa25799a4c85bf651) )
-	ROM_LOAD( "eb26_101.bin", 0x600000, 0x200000, CRC(7df654b7) SHA1(3a5ed6ee7cc31566e908b835a065e9bce60389fb) )
+	ROM_LOAD16_WORD_SWAP( "eb26ic09.bin", 0x000000, 0x200000, CRC(5a415365) SHA1(a59a4ab231980b0540e9a8356a02530217779dbd) )
+	ROM_LOAD16_WORD_SWAP( "eb26ic10.bin", 0x200000, 0x200000, CRC(a04f3140) SHA1(621ff823d93fecdde801912064ac951727b71677) )
+	ROM_LOAD16_WORD_SWAP( "eb26_100.bin", 0x400000, 0x200000, CRC(c2ee5eb6) SHA1(4b61e77a0d0f38b542d5e32fa25799a4c85bf651) )
+	ROM_LOAD16_WORD_SWAP( "eb26_101.bin", 0x600000, 0x200000, CRC(7df654b7) SHA1(3a5ed6ee7cc31566e908b835a065e9bce60389fb) )
 
 	ROM_REGION( 0x400000, "bgtiles", 0 ) // 16x16x4 BG GFX
-	ROM_LOAD( "eb26ic12.bin", 0x000000, 0x200000, CRC(14561bd7) SHA1(5f69f68a305aba9acb21b844c8aa5b1de60f89ff) )
-	ROM_LOAD( "eb26ic36.bin", 0x200000, 0x200000, CRC(92019d89) SHA1(dbf6f8384341707996e4b9e07a3d4f536cf4905b) )
+	ROM_LOAD16_WORD_SWAP( "eb26ic12.bin", 0x000000, 0x200000, CRC(14561bd7) SHA1(5f69f68a305aba9acb21b844c8aa5b1de60f89ff) )
+	ROM_LOAD16_WORD_SWAP( "eb26ic36.bin", 0x200000, 0x200000, CRC(92019d89) SHA1(dbf6f8384341707996e4b9e07a3d4f536cf4905b) )
 ROM_END
 
 } // anonymous namespace
