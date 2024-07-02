@@ -6410,6 +6410,17 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 		</part>
 	</software>
 
+	<software name="cthdp" cloneof="cthd">
+		<description>Crouching Tiger, Hidden Dragon (prototype, 20020220)</description>
+		<year>2001</year>
+		<publisher>Ubi Soft</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="3353604">
+				<rom name="cthd.bin" size="3353604" crc="a1d2d006" sha1="3d554e4e33563211865b9c5481444b0b8b4e6127"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cthdup" cloneof="cthd">
 		<description>Crouching Tiger, Hidden Dragon (USA, prototype)</description>
 		<year>2001</year>
@@ -12321,6 +12332,17 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 		</part>
 	</software>
 
+	<software name="fuzzrock" cloneof="cthd">
+		<description>Fuzz &amp; Rocket (prototype, 20050118)</description>
+		<year>2005</year>
+		<publisher>Halfbrick Studios</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="4124984">
+				<rom name="fuzz050118.bin" size="4124984" crc="fd239437" sha1="e6dab28aa3e9a5b1417bbf3929c45ff7260803b0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gachaddb">
 		<description>Gachasute! Dino Device - Blue (Japan)</description>
 		<year>2002</year>
@@ -14559,6 +14581,19 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 		</part>
 	</software>
 
+	<software name="hamtarorp" cloneof="hamtaror">
+		<description>Hamtaro - Rainbow Rescue (prototype, 20030729)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="A84E"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="33554432">
+				<rom name="hamutaro4-a84e.gba" size="33554432" crc="e9442e7e" sha1="255432a07d0ea54bc9c5be204a207f203a44ad64"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hanabi">
 		<description>Hanabi Hyakkei Advance (Japan)</description>
 		<year>2004</year>
@@ -15790,6 +15825,18 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="hyper sports 2002 winter (japan).bin" size="4194304" crc="1a8b6863" sha1="928628f8486e9390bec5d039ed30751f56c40d58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Game crashes MAME immediately -->
+	<software name="ininjap" supported="no">
+		<description>I-Ninja (prototype)</description>
+		<year>2003</year>
+		<publisher>Namco</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="52428800">
+				<rom name="i-ninja (unlabeled prototype) (gameboy advance, unreleased).gba" size="52428800" crc="e0cf48d9" sha1="431f9cd0c2b5976bd3362844369e6377dfda77a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -35842,6 +35889,18 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="tom clancy's rainbow six - rogue spear (usa) (en,fr,de,es,it).bin" size="8388608" crc="23575bf2" sha1="6862d369daf3709a5de9458ceb3f8200b78b8160"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rainb6rsp" cloneof="rainb6rs">
+		<description>Tom Clancy's Rainbow Six - Rogue Spear (prototype, version 23, 20011025)</description>
+		<year>2002</year>
+		<publisher>Ubi Soft</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="7963152">
+				<rom name="roguespear_v23.bin" size="7963152" crc="666e31b5" sha1="d8426022537149670871817ff9336261b31172b5"/>
 			</dataarea>
 		</part>
 	</software>
