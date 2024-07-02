@@ -3922,11 +3922,14 @@ void analog_field::frame_update(running_machine &machine)
 
 	s64 keyscale = (m_accum >= 0) ? m_keyscalepos : m_keyscaleneg;
 
-	// if xwayjoystick is enabled, set to ignore inc and / or dec input if pressed last frame
+	// if xwayjoystick is enabled, and analog device is IPT_POSITIONAL, IPT_POSITIONAL_V,
+	// IPT_DIAL or IPT_DIAL_V set to ignore inc and / or dec input if pressed last frame
 	// this prevents one virtual inc or dec button based rotary step of an x-way joystick
 	// from sometimes causing the character to rotate 2 steps at the expense of updating
 	// character rotation up to half the frame rate instead of updating at the frame rate
-	if (m_xwayjoystick)
+	if (m_xwayjoystick
+			&& ((m_field.type() == IPT_POSITIONAL) || (m_field.type() == IPT_POSITIONAL_V)
+				|| (m_field.type() == IPT_DIAL) || (m_field.type() == IPT_DIAL_V)))
 	{
 		if (m_last_frame_dec)
 		{

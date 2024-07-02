@@ -659,9 +659,11 @@ void menu_analog::populate()
 			break;
 		}
 
-		// if xwayjoystick, only append if type is IPT_POSITIONAL or IPT_POSITIONAL_V
+		// if case is xwayjoystick, only append if type is IPT_POSITIONAL, IPT_POSITIONAL_V,
+		// IPT_DIAL or IPT_DIAL_V
 		if ((data.type != ANALOG_ITEM_XWAYJOYSTICK)
-				|| ((field->type() == IPT_POSITIONAL) || (field->type() == IPT_POSITIONAL_V)))
+				|| ((field->type() == IPT_POSITIONAL) || (field->type() == IPT_POSITIONAL_V)
+					|| (field->type() == IPT_DIAL) || (field->type() == IPT_DIAL_V)))
 		// append a menu item
 		{
 			item_append(
