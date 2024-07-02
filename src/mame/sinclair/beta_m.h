@@ -36,6 +36,7 @@ public:
 	void track_w(uint8_t data);
 	void sector_w(uint8_t data);
 	void data_w(uint8_t data);
+	void turbo_w(int state);
 
 	int is_active();
 	void enable();

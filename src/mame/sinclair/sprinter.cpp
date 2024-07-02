@@ -686,6 +686,8 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		m_beta->param_w(data);
 		break;
 	case 0x16:
+	case 0x17:
+		m_beta->turbo_w(dcpp & 1);
 		if (data & 2)
 			m_beta->disable();
 		else
