@@ -40,7 +40,7 @@
 #define LOG_PM_FAULT_DF     (1U << 10)
 #define LOG_PM_FAULT_UD     (1U << 11)
 
-#define VERBOSE (LOG_PM_FAULT_GP | LOG_PM_FAULT_UD | LOG_PM_EVENTS | LOG_LIMIT_CHECK)
+//#define VERBOSE (LOG_PM_FAULT_GP)
 #include "logmacro.h"
 
 /* seems to be defined on mingw-gcc */
