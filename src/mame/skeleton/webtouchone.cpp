@@ -7,7 +7,7 @@
   The phone asks for an adminstrative password for performing a factory reset.
 
   Hardware info for model 2840:
-   -CPU: Motorola Power PC 823
+   -CPU: Motorola PowerPC 823
    -Operating system: JavaOS over ChorusOS (Sun Microsystems)
    -Screen: Hitachi SX19V001-ZZA (7,6'' touch, color, 640x480)
    -Keyboard: N860-1428-T021
@@ -154,5 +154,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE      INPUT        CLASS              INIT        COMPANY    FULLNAME  FLAGS
-COMP( 1999, wto2840sp, 0,      0,      webtouchone, webtouchone, webtouchone_state, empty_init, "Alcatel", "Alcatel Web Touch One (model 2840, Terra, Spanish)", MACHINE_IS_SKELETON )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE      INPUT        CLASS              INIT        COMPANY    FULLNAME                                      FLAGS
+COMP( 1999, wto2840sp, 0,      0,      webtouchone, webtouchone, webtouchone_state, empty_init, "Alcatel", "Web Touch One (model 2840, Terra, Spanish)", MACHINE_IS_SKELETON )
