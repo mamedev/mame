@@ -311,27 +311,3 @@ custombuildtask {
 	layoutbuildtask("emu/layout", "quadhsxs"),
 }
 end
-
-project ("precompile")
-uuid ("a6fb15d4-b123-4445-acef-13c8e80fcacf")
-kind (LIBTYPE)
-
-addprojectflags()
-precompiledheaders()
-
-includedirs {
-	MAME_DIR .. "src/osd",
-	MAME_DIR .. "src/emu",
-	MAME_DIR .. "src/lib/util",
-}
-files {
-	MAME_DIR .. "src/emu/drivers/empty.cpp",
-}
-
-pchsource(MAME_DIR .. "src/emu/drivers/empty.cpp")
-
-dependency {
-	{ "$(OBJDIR)/src/emu/drivers/empty.o", "$(GCH)", true  },
-}
-
-
