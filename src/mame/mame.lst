@@ -44955,6 +44955,10 @@ instruct                        //
 mk14                            //
 mk14vdu                         //
 
+@source:trainer/thaler.cpp
+ct65                            // 1982 Thaler CT-65
+mps65                           // 1984 Thaler MPS-65
+
 @source:trainer/pro80.cpp
 pro80                           //
 
