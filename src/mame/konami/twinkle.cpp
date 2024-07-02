@@ -18,12 +18,14 @@ The SPU has an IRQ2 handler that doesn't do anything, find out if or to what it 
 
 
 Konami Twinkle Hardware Overview
-Konami 1999-2002
+Konami 1997-2002
 
 The following games are known to exist on this hardware (there may be more)
                                                                   Video CD      Security
 Game Title                            Year     Program CD       6/7/8 use DVD   Dongle      HDD label
 -----------------------------------------------------------------------------------------------------
+Ugoke! Purimucho                      1997     GQ751?           (not used)     ?           (not used)
+
 beatmania IIDX (English)              1999     GQ863 A01        GQ863 A04      863 A02!    863 HDD A01
 beatmania IIDX (Japanese)             1999     GQ863-JA B01     GQ863 A04      863 A02!    863 HDD A01
 beatmania IIDX + DDR Club Kit         1999     896 JA ABM       GQ863 A04      863 A02!    863 HDD A01
@@ -255,6 +257,12 @@ Notes:
       GM76C8128- LG GM76C8128CLLFW70 128kx8 low power CMOS static RAM
       863A05.2X- 27C4096 EPROM (DIP40)
 
+
+Ugoke! Purimucho notes:
+Ugoke! Purimucho's schematic shows TWINKLE/SUB GQ751PWB(B1) as the subboard instead of the SUB2 used by beatmania IIDX
+"VENDER GQ751PWB(C2)" for vendor box hardware
+Has an LCD with a touch panel overlayed on it
+Also includes a camera and printer (Mitsubishi CP700A, used to print pictures for keyholders)
 
 */
 
