@@ -2888,6 +2888,12 @@ msgctxt "menu-analoginput"
 msgid "%1$s Sensitivity"
 msgstr "Sensibilidade %1$s"
 
+#: src/frontend/mame/ui/analogipt.cpp:652
+#, c-format
+msgctxt "menu-analoginput"
+msgid "%1$s X-Way Joystick"
+msgstr ""
+
 #: src/frontend/mame/ui/analogipt.cpp:451
 msgctxt "menu-analoginput"
 msgid "[no analog inputs are enabled]"

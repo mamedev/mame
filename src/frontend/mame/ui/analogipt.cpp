@@ -45,6 +45,7 @@ inline menu_analog::item_data::item_data(ioport_field &f, int t) noexcept
 			(ANALOG_ITEM_CENTERSPEED == t) ? f.centerdelta() :
 			(ANALOG_ITEM_REVERSE == t) ? f.analog_reverse() :
 			(ANALOG_ITEM_SENSITIVITY == t) ? f.sensitivity() :
+			(ANALOG_ITEM_XWAYJOYSTICK == t) ? f.analog_xwayjoystick() :
 			-1)
 	, min((ANALOG_ITEM_SENSITIVITY == t) ? 1 : 0)
 	, max((ANALOG_ITEM_REVERSE == t) ? 1 : std::max(defvalue * 4, 255))
@@ -582,6 +583,7 @@ bool menu_analog::handle(event const *ev)
 				case ANALOG_ITEM_CENTERSPEED:   settings.centerdelta = newval;  break;
 				case ANALOG_ITEM_REVERSE:       settings.reverse = newval;      break;
 				case ANALOG_ITEM_SENSITIVITY:   settings.sensitivity = newval;  break;
+				case ANALOG_ITEM_XWAYJOYSTICK:	settings.xwayjoystick = newval;	break;
 			}
 			data.field.get().set_user_settings(settings);
 			data.cur = newval;
@@ -650,14 +652,24 @@ void menu_analog::populate()
 			text = string_format(_("menu-analoginput", "%1$s Sensitivity"), field->name());
 			data.cur = settings.sensitivity;
 			break;
+
+		case ANALOG_ITEM_XWAYJOYSTICK:
+			text = string_format(_("menu-analoginput", "%1$s X-Way Joystick"), field->name());
+			data.cur = settings.xwayjoystick;
+			break;
 		}
 
+		// if xwayjoystick, only append if type is IPT_POSITIONAL or IPT_POSITIONAL_V
+		if ((data.type != ANALOG_ITEM_XWAYJOYSTICK)
+				|| ((field->type() == IPT_POSITIONAL) || (field->type() == IPT_POSITIONAL_V)))
 		// append a menu item
-		item_append(
+		{
+			item_append(
 				std::move(text),
 				item_text(data.type, data.cur),
 				(data.cur <= data.min) ? FLAG_RIGHT_ARROW : (data.cur >= data.max) ? FLAG_LEFT_ARROW : FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW,
 				&data);
+		}
 	}
 
 	// display a message if there are toggle inputs enabled
@@ -804,6 +816,9 @@ std::string menu_analog::item_text(int type, int value)
 
 	case ANALOG_ITEM_SENSITIVITY:
 		return string_format("%d", value);
+
+	case ANALOG_ITEM_XWAYJOYSTICK:
+		return value ? _("On") : _("Off");
 	}
 }
 
