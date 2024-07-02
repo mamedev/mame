@@ -435,7 +435,7 @@ protected:
 	void register_state_i386();
 	void register_state_i386_x87();
 	void register_state_i386_x87_xmm();
-	uint32_t i386_translate(int segment, uint32_t ip, int rwn);
+	uint32_t i386_translate(int segment, uint32_t ip, int rwn, int size = 1);
 	inline vtlb_entry get_permissions(uint32_t pte, int wp);
 	bool i386_translate_address(int intention, bool debug, offs_t *address, vtlb_entry *entry);
 	bool translate_address(int pl, int type, uint32_t *address, uint32_t *error);
@@ -512,7 +512,7 @@ protected:
 	uint32_t GetEA(uint8_t modrm, int rwn);
 	uint32_t Getx87EA(uint8_t modrm, int rwn);
 	void i386_check_sreg_validity(int reg);
-	int i386_limit_check(int seg, uint32_t offset);
+	int i386_limit_check(int seg, uint32_t offset, int size = 1);
 	void i386_sreg_load(uint16_t selector, uint8_t reg, bool *fault);
 	void i386_trap(int irq, int irq_gate, int trap_level);
 	void i386_trap_with_error(int irq, int irq_gate, int trap_level, uint32_t error);
