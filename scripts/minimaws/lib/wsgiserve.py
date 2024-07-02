@@ -6,7 +6,6 @@
 from . import dbaccess
 from . import htmltmpl
 
-import cgi
 import inspect
 import json
 import mimetypes
@@ -16,11 +15,12 @@ import sys
 import urllib
 import wsgiref.util
 
-if hasattr(cgi, 'escape'):
-    htmlescape = cgi.escape
-else:
+try:
     import html
     htmlescape = html.escape
+except ImportError:
+    import cgi
+    htmlescape = cgi.escape
 
 try:
     import urllib.parse as urlparse

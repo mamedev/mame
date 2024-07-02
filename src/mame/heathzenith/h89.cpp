@@ -150,6 +150,8 @@ protected:
 
 	void h89_base_io(address_map &map);
 
+	void set_wait_state(int data);
+
 	u8 raise_NMI_r();
 	void raise_NMI_w(u8 data);
 	void console_intr(int data);
@@ -247,14 +249,14 @@ class h89_mms_state : public h89_base_state
 public:
 	h89_mms_state(const machine_config &mconfig, device_type type, const char *tag):
 		h89_base_state(mconfig, type, tag),
-		m_mms(*this, "mms_fdc")
+		m_mms316(*this, "mms77316")
 	{
 	}
 
 	void h89_mms(machine_config &config);
 
 protected:
-	required_device<mms77316_fdc_device> m_mms;
+	required_device<mms77316_fdc_device> m_mms316;
 
 	void h89_mms_io(address_map &map);
 };
@@ -466,7 +468,7 @@ void h89_mms_state::h89_mms_io(address_map &map)
 	h89_base_state::h89_base_io(map);
 
 	// Add MMS 77316 Double Density Controller
-	map(0x38,0x3f).rw(m_mms, FUNC(mms77316_fdc_device::read), FUNC(mms77316_fdc_device::write));
+	map(0x38,0x3f).rw(m_mms316, FUNC(mms77316_fdc_device::read), FUNC(mms77316_fdc_device::write));
 }
 
 
@@ -714,20 +716,26 @@ void h89_base_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	// update RAM mappings based on RAM size
-	u8 *m_ram_ptr = m_ram->pointer();
-	u32 ram_size  = m_ram->size();
+	u8 *ram_ptr  = m_ram->pointer();
+	u32 ram_size = m_ram->size();
 
 	if (ram_size == 0x10000)
 	{
 		// system has a full 64k
-		m_maincpu->space(AS_PROGRAM).install_ram(0x2000, 0xffff, m_ram_ptr);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x2000, 0xffff, ram_ptr);
 
-		// install shadow writing to RAM when in ROM mode
-		m_mem_view[0].install_writeonly(0x0000, 0x1fff, m_ram_ptr + 0xe000);
-		m_mem_view[1].install_writeonly(0x0000, 0x1fff, m_ram_ptr + 0xe000);
+		// install shadow writing to RAM when in ROM mode and Floppy RAM is write-protected.
+		m_mem_view[0].install_writeonly(0x0000, 0x1fff, ram_ptr + 0xe000);
+		// when Floppy RAM is in write enable mode, must use write_tap so writes occur to both RAMs
+		// NOTE: the H89 had space reserved for additional RAM (without write protection) in the ROM space, but not aware
+		// it was ever used. If that was added to this emulation, m_mem_view[0] would also need to be a write_tap.
+		m_mem_view[1].install_write_tap(0x0000, 0x1fff, "shadow_w", [ram_ptr](offs_t offset, u8 &data, u8 mem_mask)
+		{
+			ram_ptr[0xe000 + offset] = data;
+		});
 
-		// Only the CP/M - Org 0 view will have RAM at the lower 8k
-		m_mem_view[2].install_ram(0x0000, 0x1fff, m_ram_ptr + 0xe000);
+		// The Org-0 (often used for CP/M) view has RAM at the lower 8k
+		m_mem_view[2].install_ram(0x0000, 0x1fff, ram_ptr + 0xe000);
 	}
 	else
 	{
@@ -737,14 +745,14 @@ void h89_base_state::machine_start()
 		// the memory size, since the base starts at 8k.
 		u32 ram_top = ram_size + 0x1fff;
 
-		m_mem_view[0].install_ram(0x2000, ram_top, m_ram_ptr);
-		m_mem_view[1].install_ram(0x2000, ram_top, m_ram_ptr);
+		m_mem_view[0].install_ram(0x2000, ram_top, ram_ptr);
+		m_mem_view[1].install_ram(0x2000, ram_top, ram_ptr);
 
-		// when ROM is not active, memory still starts at 8k, but is 8k smaller
-		m_mem_view[2].install_ram(0x2000, ram_size - 1, m_ram_ptr);
+		// when ROM is not active, memory still starts at 8k, but is 8k smaller so the last 8k can be mapped to addr 0.
+		m_mem_view[2].install_ram(0x2000, ram_size - 1, ram_ptr);
 
 		// remap the top 8k down to addr 0
-		m_mem_view[2].install_ram(0x0000, 0x1fff, m_ram_ptr + ram_size - 0x2000);
+		m_mem_view[2].install_ram(0x0000, 0x1fff, ram_ptr + ram_size - 0x2000);
 	}
 }
 
@@ -781,6 +789,16 @@ void h89_base_state::machine_reset()
 
 	update_gpp(0);
 	update_mem_view();
+}
+
+void h89_base_state::set_wait_state(int data)
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, data);
+	if (data)
+	{
+		machine().scheduler().synchronize();
+		m_maincpu->defer_access();
+	}
 }
 
 u8 h89_base_state::raise_NMI_r()
@@ -1010,9 +1028,10 @@ void h89_mms_state::h89_mms(machine_config &config)
 	m_intr_socket->set_default_option("mms");
 	m_intr_socket->set_fixed(true);
 
-	MMS77316_FDC(config, m_mms);
-	m_mms->drq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
-	m_mms->irq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_irq));
+	MMS77316_FDC(config, m_mms316);
+	m_mms316->drq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
+	m_mms316->irq_cb().set(m_intr_socket, FUNC(heath_intr_socket::set_irq));
+	m_mms316->wait_cb().set(FUNC(h89_mms_state::set_wait_state));
 }
 
 

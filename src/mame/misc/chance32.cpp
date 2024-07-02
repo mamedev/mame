@@ -1,22 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Angelo Salese, Roberto Fresca
-/*********************************************************
+/**************************************************************************************************
 
-  Chance 32
+Chance 32
 
-  PAL System Co, Ltd.
-  Osaka, Japan.
+PAL System Co, Ltd.
+Osaka, Japan.
 
-  Driver by David Haywood, Angelo Salese & Roberto Fresca.
 
+TODO:
+- fill PCB details below;
+- some blanks in I/O section;
+- DIPs;
+- Need to flip everything in video/gfx code, is it possible to untangle?
+
+===================================================================================================
 
   1x HD46505SP / HD6845SP
   1x Z84C0008PEC
 
   XTAL: 12.000 Mhz
 
-
-*********************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -35,14 +40,13 @@ namespace {
 class chance32_state : public driver_device
 {
 public:
-	chance32_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_fgram(*this, "fgram"),
-		m_bgram(*this, "bgram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_lamps(*this, "lamp%u", 0U)
-	{ }
+	chance32_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_vram(*this, "vram%u", 0U)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_lamps(*this, "lamp%u", 0U)
+		{ }
 
 	void chance32(machine_config &config);
 
@@ -52,107 +56,88 @@ protected:
 	virtual void video_start() override;
 
 private:
-	void chance32_fgram_w(offs_t offset, uint8_t data)
+	template <unsigned N> void vram_w(offs_t offset, uint8_t data)
 	{
-		m_fgram[offset] = data;
-		m_fg_tilemap->mark_tile_dirty(offset / 2);
+		m_vram[N][offset] = data;
+		m_tilemap[N]->mark_tile_dirty(offset / 2);
 	}
 
-	void chance32_bgram_w(offs_t offset, uint8_t data)
-	{
-		m_bgram[offset] = data;
-		m_bg_tilemap->mark_tile_dirty(offset / 2);
-	}
+	void key_matrix_w(uint8_t data);
+	uint8_t key_matrix_r();
+	void lamps_ff_w(uint8_t data);
 
-	void mux_w(uint8_t data);
-	void muxout_w(uint8_t data);
-	uint8_t mux_r();
+	template <unsigned N> TILE_GET_INFO_MEMBER(get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void main_map(address_map &map);
+	void main_io(address_map &map);
 
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	uint32_t screen_update_chance32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void chance32_map(address_map &map);
-	void chance32_portmap(address_map &map);
+	tilemap_t *m_tilemap[2]{};
 
-	tilemap_t *m_fg_tilemap = nullptr;
-	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_port_select = 0;
 
-	required_shared_ptr<uint8_t> m_fgram;
-	required_shared_ptr<uint8_t> m_bgram;
-
-	uint8_t mux_data = 0;
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr_array<uint8_t, 2> m_vram;
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<13> m_lamps;
 };
 
 
-TILE_GET_INFO_MEMBER(chance32_state::get_fg_tile_info)
+template <unsigned N> TILE_GET_INFO_MEMBER(chance32_state::get_tile_info)
 {
-	int code = (m_fgram[tile_index * 2 + 1] << 8) | m_fgram[tile_index * 2];
-	int flip = (~code >> 12)&1;
-	tileinfo.set(1,
-			code & 0x0fff,
-			code >> 13,
-			TILE_FLIPYX(flip<<1)|flip);
+	const u16 code = (m_vram[N][tile_index * 2 + 1] << 8) | m_vram[N][tile_index * 2];
+	const u8 flip = (~code >> 12) & 1;
+	tileinfo.set(
+		N,
+		code & 0x0fff,
+		code >> 13,
+		TILE_FLIPYX(flip << 1 | flip)
+	);
 }
-
-TILE_GET_INFO_MEMBER(chance32_state::get_bg_tile_info)
-{
-	int code = (m_bgram[tile_index * 2 +1] << 8) | m_bgram[tile_index * 2];
-	int flip = (~code >> 12)&1;
-	tileinfo.set(0,
-			code & 0x0fff,
-			code >> 13,
-			TILE_FLIPYX(flip<<1|flip));
-}
-
 
 void chance32_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chance32_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
-	m_fg_tilemap->set_transparent_pen(0);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chance32_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
+	m_tilemap[1]->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chance32_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chance32_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
 
-	m_fg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
-	m_bg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
+	m_tilemap[0]->set_flip(TILE_FLIPX|TILE_FLIPY);
+	m_tilemap[1]->set_flip(TILE_FLIPX|TILE_FLIPY);
 }
 
 
-uint32_t chance32_state::screen_update_chance32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t chance32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
 
-void chance32_state::mux_w(uint8_t data)
+void chance32_state::key_matrix_w(uint8_t data)
 {
-	mux_data = data;
+	m_port_select = data;
 }
 
-uint8_t chance32_state::mux_r()
+uint8_t chance32_state::key_matrix_r()
 {
 	uint8_t res,i;
-	const char *const muxnames[4] = { "IN0", "IN1", "IN2", "IN3" };
+	const char *const portnames[4] = { "IN0", "IN1", "IN2", "IN3" };
 	res = 0;
 
-	for(i=0;i<4;i++)
+	for(i = 0; i < 4; i++)
 	{
-		if(mux_data & 1 << i)
-			res |= ioport(muxnames[i])->read();
+		if(BIT(m_port_select, i))
+			res |= ioport(portnames[i])->read();
 	}
 
 	return res;
 }
 
 
-void chance32_state::muxout_w(uint8_t data)
-{
-/* Muxed Lamps
+/* flip-flop lamps
 
   There are 2 groups of 7 output lines muxed in port 60h
   The first bit is the group/mux selector.
@@ -182,7 +167,10 @@ void chance32_state::muxout_w(uint8_t data)
   x--- ----   Bet lamp.
 
 */
-	if (data & 1)   // bit 0 is the mux selector.
+void chance32_state::lamps_ff_w(uint8_t data)
+{
+	 // bit 0 selects between the two banks
+	if (data & 1)
 	{
 		m_lamps[0] = BIT(data, 1);  /* Lamp 0 - Small / Big */
 		m_lamps[1] = BIT(data, 2);  /* Lamp 1 - Big / Small */
@@ -197,7 +185,7 @@ void chance32_state::muxout_w(uint8_t data)
 
 	else
 	{
-		// bit 1 is unknown...
+		// TODO: what's bit 1 for?
 		m_lamps[7] = BIT(data, 2);  /* Lamp 7 - Fever! */
 		m_lamps[8] = BIT(data, 3);  /* Lamp 8 - Cancel */
 		m_lamps[9] = BIT(data, 4);  /* Lamp 9 - D-Up / Take */
@@ -210,89 +198,89 @@ void chance32_state::muxout_w(uint8_t data)
 }
 
 
-void chance32_state::chance32_map(address_map &map)
+void chance32_state::main_map(address_map &map)
 {
 	map(0x0000, 0xcfff).rom();
 	map(0xd800, 0xdfff).ram();
 	map(0xe000, 0xefff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
-	map(0xf000, 0xf7ff).ram().w(FUNC(chance32_state::chance32_fgram_w)).share("fgram");
-	map(0xf800, 0xffff).ram().w(FUNC(chance32_state::chance32_bgram_w)).share("bgram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(chance32_state::vram_w<1>)).share("vram1");
+	map(0xf800, 0xffff).ram().w(FUNC(chance32_state::vram_w<0>)).share("vram0");
 }
 
-void chance32_state::chance32_portmap(address_map &map)
+void chance32_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x10, 0x10).nopw();        // writing bit3 constantly... watchdog?
-	map(0x13, 0x13).w(FUNC(chance32_state::mux_w));
+	map(0x13, 0x13).w(FUNC(chance32_state::key_matrix_w));
 	map(0x20, 0x20).portr("DSW0");
 	map(0x21, 0x21).portr("DSW1");
 	map(0x22, 0x22).portr("DSW2");
 	map(0x23, 0x23).portr("DSW3");
 	map(0x24, 0x24).portr("DSW4");
-	map(0x25, 0x25).r(FUNC(chance32_state::mux_r));
+	map(0x25, 0x25).r(FUNC(chance32_state::key_matrix_r));
 	map(0x26, 0x26).portr("UNK"); // vblank (other bits are checked for different reasons)
 	map(0x30, 0x30).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x31, 0x31).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x50, 0x50).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x60, 0x60).w(FUNC(chance32_state::muxout_w));
+	map(0x60, 0x60).w(FUNC(chance32_state::lamps_ff_w));
 }
 
 
+// TODO: diplocations are unconfirmed
 static INPUT_PORTS_START( chance32 )
-
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x00, "DSW0" )
+	PORT_DIPNAME( 0x01, 0x00, "DSW0" ) PORT_DIPLOCATION("SW0:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW0:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Auto Max Bet" )
+	PORT_DIPNAME( 0x04, 0x00, "Auto Max Bet" ) PORT_DIPLOCATION("SW0:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW0:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW0:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW0:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )
+	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" ) PORT_DIPLOCATION("SW0:7,8")
 	PORT_DIPSETTING(    0x00, "10" )
 	PORT_DIPSETTING(    0x40, "20" )
 	PORT_DIPSETTING(    0x80, "30" )
 	PORT_DIPSETTING(    0xc0, "50" )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "DSW1" )
+	PORT_DIPNAME( 0x01, 0x00, "DSW1" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Auto Hold" )
+	PORT_DIPNAME( 0x40, 0x00, "Auto Hold" ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Double-Up Type" )
+	PORT_DIPNAME( 0x80, 0x00, "Double-Up Type" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "Holds" )
 	PORT_DIPSETTING(    0x80, "Big/Small" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x00, "Remote" )
+	PORT_DIPNAME( 0x07, 0x00, "Remote" ) PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x01, "10" )
 	PORT_DIPSETTING(    0x02, "20" )
@@ -301,7 +289,7 @@ static INPUT_PORTS_START( chance32 )
 	PORT_DIPSETTING(    0x05, "50" )
 	PORT_DIPSETTING(    0x06, "60" )
 	PORT_DIPSETTING(    0x07, "100" )
-	PORT_DIPNAME( 0x38, 0x00, "A-B Coinage Multiplier" )
+	PORT_DIPNAME( 0x38, 0x00, "A-B Coinage Multiplier" ) PORT_DIPLOCATION("SW2:4,5,6")
 	PORT_DIPSETTING(    0x00, "x1" )
 	PORT_DIPSETTING(    0x08, "x2" )
 	PORT_DIPSETTING(    0x10, "x4" )
@@ -310,66 +298,69 @@ static INPUT_PORTS_START( chance32 )
 	PORT_DIPSETTING(    0x28, "x10" )
 	PORT_DIPSETTING(    0x30, "x25" )
 	PORT_DIPSETTING(    0x38, "x50" )
-	PORT_DIPNAME( 0x40, 0x00, "DSW2" )
+	PORT_DIPNAME( 0x40, 0x00, "DSW2" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, "DSW3" )
+	PORT_DIPNAME( 0x01, 0x00, "DSW3" ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x00, "DSW4" )
+	PORT_DIPNAME( 0x01, 0x00, "DSW4" ) PORT_DIPLOCATION("SW4:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x00, "Bet Limit" )
+	PORT_DIPNAME( 0x06, 0x00, "Bet Limit" ) PORT_DIPLOCATION("SW4:2,3")
 	PORT_DIPSETTING(    0x00, "5000" )
 	PORT_DIPSETTING(    0x02, "10000" )
 	PORT_DIPSETTING(    0x04, "20000" )
 	PORT_DIPSETTING(    0x06, "30000" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
+	// TODO: sixth DIP bank?
 	PORT_START("UNK")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")  /* Otherwise is a 'Freeze' DIP switch */
+	PORT_DIPNAME( 0x01, 0x00, "Freeze?" ) // checked at end of irq routine
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
@@ -428,8 +419,9 @@ static INPUT_PORTS_START( chance32 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("Coin B")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_8) PORT_NAME("Flip Screen 1")  /* unknown purpose */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_9) PORT_NAME("Flip Screen 2")  /* unknown purpose */
+	// both acts as a flip toggle, game intended for a cocktail cabinet?
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Flip Screen 1")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Flip Screen 2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYIN)
 INPUT_PORTS_END
 
@@ -439,9 +431,9 @@ static const gfx_layout tiles8x8_layout =
 	16,8,
 	RGN_FRAC(1,1),
 	8,
-	{ 0, 1, 2, 3,4,5,6,7 },
-	{ 15*8, 14*8, 13*8, 12*8, 11*8, 10*8, 9*8, 8*8, 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
-	{ 7*128, 6*128, 5*128, 4*128, 3*128, 2*128, 1*128, 0*128 },
+	{ STEP8(0, 1) },
+	{ STEP16(15*8, -8) },
+	{ STEP8(7*128, -128) },
 	128*8
 };
 
@@ -463,22 +455,20 @@ void chance32_state::machine_reset()
 
 void chance32_state::chance32(machine_config &config)
 {
-	/* basic machine hardware */
 	Z80(config, m_maincpu, 12000000/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &chance32_state::chance32_map);
-	m_maincpu->set_addrmap(AS_IO, &chance32_state::chance32_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &chance32_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &chance32_state::main_io);
 	m_maincpu->set_vblank_int("screen", FUNC(chance32_state::irq0_line_hold));
 
-	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(52.786);
 //  screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*16, 32*8);
 	screen.set_visarea(0, 35*16-1, 0, 29*8-1);
-	screen.set_screen_update(FUNC(chance32_state::screen_update_chance32));
+	screen.set_screen_update(FUNC(chance32_state::screen_update));
 
-	hd6845s_device &crtc(HD6845S(config, "crtc", 12000000/16));   /* 52.786 Hz (similar to Major Poker) */
+	hd6845s_device &crtc(HD6845S(config, "crtc", 12000000/16)); // 52.786 Hz (similar to Major Poker)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(16);
@@ -486,7 +476,6 @@ void chance32_state::chance32(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_chance32);
 	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 0x800);
 
-	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	/* clock at 1050 kHz match the 8000 Hz samples stored inside the ROM */

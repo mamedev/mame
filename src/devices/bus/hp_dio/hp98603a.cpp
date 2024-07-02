@@ -9,11 +9,35 @@
 #include "emu.h"
 #include "hp98603a.h"
 
-DEFINE_DEVICE_TYPE(HPDIO_98603A, bus::hp_dio::dio16_98603a_device, "dio98603a", "HP98603A BASIC 4.0 ROM card")
 
 #define HP98603A_ROM_REGION    "98603a_rom"
 
-namespace bus::hp_dio {
+namespace {
+
+class dio16_98603a_device :
+		public device_t,
+		public bus::hp_dio::device_dio16_card_interface
+{
+public:
+	// construction/destruction
+	dio16_98603a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	uint16_t rom_r(offs_t offset);
+	void rom_w(offs_t offset, uint16_t data);
+
+protected:
+	dio16_98603a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	uint8_t *m_rom;
+};
 
 ROM_START(hp98603a)
 	ROM_REGION(0x80000, HP98603A_ROM_REGION, 0)
@@ -79,4 +103,6 @@ void dio16_98603a_device::rom_w(offs_t offset, uint16_t data)
 {
 }
 
-} // namespace bus::hp_dio
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(HPDIO_98603A, bus::hp_dio::device_dio16_card_interface, dio16_98603a_device, "dio98603a", "HP98603A BASIC 4.0 ROM card")

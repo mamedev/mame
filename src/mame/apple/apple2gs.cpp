@@ -1047,7 +1047,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 
 	if (scanline == (192+BORDER_TOP))
 	{
-		m_macadb->adb_vblank();
 		m_vbl = true;
 
 		// VBL interrupt
@@ -3794,7 +3793,6 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_adbmicro->write_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_out));
 
 	MACADB(config, m_macadb, A2GS_MASTER_CLOCK/8);
-	m_macadb->set_mcu_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(apple2gs_state::set_adb_line));
 
 	RTC3430042(config, m_rtc, XTAL(32'768));

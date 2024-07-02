@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Grull Osgo
+// copyright-holders:Tony La Porta, Grull Osgo
 /************************************************************************
 
   Microchip PIC16x8x Emulator
@@ -58,7 +58,7 @@ public:
 
 	void ram_6(address_map &map);
 	void rom_9(address_map &map);
-	void ram_7(address_map &map);		
+	void ram_7(address_map &map);
 	void rom_10(address_map &map);
 
 protected:
@@ -106,11 +106,11 @@ protected:
 	u16 m_buff[0x40];
 
 	optional_memory_region m_region;
-	
+
 	// address spaces
 	address_space_config m_program_config;
 	address_space_config m_data_config;
-	
+
 	int m_program_width;
 
 private:

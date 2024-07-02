@@ -4,10 +4,9 @@
 
   Goori Goori (c) Unico 1999
 
- hardware is loosely derived from snowbros / Kaneko Pandora
+ hardware is loosely derived from kaneko/snowbros.cpp / Kaneko Pandora
 
  ToDo:
- background image is visible briefly at the start of level, is this correct?
  is more than one button used?
 
 Goori Goori PCB layout:
@@ -74,39 +73,42 @@ public:
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_oki(*this, "oki"),
-		m_spriteram(*this, "spriteram"),
-		m_bg_videoram(*this, "bg_videoram"),
 		m_screen(*this, "screen"),
-		m_eeprom(*this, "eeprom")
+		m_eeprom(*this, "eeprom"),
+		m_spriteram(*this, "spriteram"),
+		m_bg_videoram(*this, "bg_videoram")
 	{ }
 
 	void goori(machine_config& config);
 
 protected:
-
 	virtual void machine_start() override;
 	virtual void video_start() override;
-
-	uint32_t screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
 
 private:
 	void goori_map(address_map& map);
 
-	void goori_300008_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void goori_30000e_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
+	uint32_t screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
+
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<okim6295_device> m_oki;
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_device<screen_device> m_screen;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
+	// memory pointers
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+
+	// video related
 	tilemap_t* m_bg_tilemap = nullptr;
-	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	bool m_display_enable = false;
 };
 
 
@@ -118,10 +120,10 @@ void goori_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 TILE_GET_INFO_MEMBER(goori_state::get_bg_tile_info)
 {
-	int tilenolow = (m_bg_videoram[(tile_index * 2) + 1] & 0xff00) >> 8;
-	int tilenohigh = (m_bg_videoram[(tile_index * 2) + 0] & 0xff00) >> 8;
+	uint32_t const tilenolow = (m_bg_videoram[(tile_index * 2) + 1] & 0xff00) >> 8;
+	uint32_t const tilenohigh = (m_bg_videoram[(tile_index * 2) + 0] & 0xff00) >> 8;
 
-	int tile = tilenolow | (tilenohigh << 8);
+	uint32_t const tile = tilenolow | (tilenohigh << 8);
 
 	tileinfo.set(1, tile, 0x1f, 0);
 }
@@ -133,9 +135,14 @@ void goori_state::video_start()
 
 uint32_t goori_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
-	//bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);
+
+	if (!m_display_enable)
+		return 0;
+
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	// is this sprite format a clone of anything? (looks VERY similar to snowbros but this hardware also has a higer resolution, a tile layer and 8bpp)
 	for (int i = 0; i < 0x2000 / 2; i += 8)
 	{
@@ -148,12 +155,12 @@ uint32_t goori_state::screen_update(screen_device& screen, bitmap_ind16& bitmap,
 		// 6 tile low
 		// 7 tile high (and flip)
 
-		uint16_t tile = m_spriteram[i + 6] | ((m_spriteram[i + 7] & 0x3f) << 8);
+		uint16_t const tile = m_spriteram[i + 6] | ((m_spriteram[i + 7] & 0x3f) << 8);
 		int x = m_spriteram[i + 4];
-		int y = m_spriteram[i + 5];
-		uint16_t colour = (m_spriteram[i + 3] & 0xf8) >> 3;
+		int const y = m_spriteram[i + 5];
+		uint16_t const colour = (m_spriteram[i + 3] & 0xf8) >> 3;
 
-		int flipx = m_spriteram[i + 7] & 0x80;
+		bool const flipx = BIT(m_spriteram[i + 7], 7);
 
 		x |= (m_spriteram[i + 3] & 1) << 8;
 
@@ -162,29 +169,10 @@ uint32_t goori_state::screen_update(screen_device& screen, bitmap_ind16& bitmap,
 		if (realx >= 0x3e0)
 			realx -= 0x400;
 
-		gfx_element *gfx = m_gfxdecode->gfx(0);
-		gfx->transpen(bitmap,cliprect,tile,colour,flipx,0,realx,y,0xff);
+		gfx->transpen(bitmap, cliprect, tile, colour, flipx, 0, realx, y, 0xff);
 	}
 
 	return 0;
-}
-
-void goori_state::goori_300008_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	//popmessage("goori_300008_w %04x %04x\n", data, mem_mask); // possibly display disable?
-}
-
-void goori_state::goori_30000e_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	// eeprom writes?
-	logerror("%06x goori_30000e_w %04x %04x\n", machine().describe_context(), data, mem_mask); // startup only?
-
-	if (mem_mask & 0x00ff)
-	{
-		m_eeprom->di_write(BIT(data, 2));
-		m_eeprom->cs_write(BIT(data, 0));
-		m_eeprom->clk_write(BIT(data, 1));
-	}
 }
 
 void goori_state::goori_map(address_map &map)
@@ -193,25 +181,37 @@ void goori_state::goori_map(address_map &map)
 	map(0x100000, 0x10ffff).ram(); // RAM main
 
 	map(0x300000, 0x300003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0xff00);
-	map(0x300004, 0x300004).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x300004, 0x300004).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0x300008, 0x300009).w(FUNC(goori_state::goori_300008_w));
+	map(0x300008, 0x300008).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			if (data & 0xef)
+				logerror("$300008: write %02x\n", data);
+			m_display_enable = bool(BIT(data, 4));
+		})
+	);
 
-	map(0x30000e, 0x30000f).w(FUNC(goori_state::goori_30000e_w));
+	map(0x30000e, 0x30000f).portw("EEPROM");
 
-	map(0x400000, 0x400fff).ram().w(FUNC(goori_state::bg_videoram_w)).share("bg_videoram"); // 8-bit?
+	map(0x400000, 0x400fff).ram().w(FUNC(goori_state::bg_videoram_w)).share(m_bg_videoram); // 8-bit?
 
 	map(0x500000, 0x500001).portr("DSW1");
 	map(0x500002, 0x500003).portr("DSW2");
 	map(0x500004, 0x500005).portr("SYSTEM");
 
 	map(0x600000, 0x603fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x700000, 0x701fff).ram().share("spriteram"); // RAM sprites (8-bit?)
+	map(0x700000, 0x701fff).ram().share(m_spriteram); // RAM sprites (8-bit?)
 
 	map(0x800000, 0x800001).noprw(); // irq ack?
 }
 
 static INPUT_PORTS_START( goori )
+	PORT_START("EEPROM")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0xfff8, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
 	PORT_START("DSW1")  /* 500001 */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED ) // no dips on this PCB
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -257,24 +257,14 @@ static const gfx_layout layout_16x16x8 =
 };
 
 
-static const gfx_layout layout_16x16x8_alt =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8, 8 * 8, 9 * 8, 10 * 8, 11 * 8, 12 * 8, 13 * 8, 14 * 8, 15 * 8 },
-	{ STEP16(0,16*8) },
-	16*16*8,
-};
-
-static GFXDECODE_START( gfx_unico )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x0, 0x20 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8_alt, 0x0, 0x20 )
+static GFXDECODE_START( gfx_goori )
+	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x8,  0x0, 0x20 )
+	GFXDECODE_ENTRY( "tiles",   0, gfx_16x16x8_raw, 0x0, 0x20 )
 GFXDECODE_END
 
 void goori_state::machine_start()
 {
+	save_item(NAME(m_display_enable));
 }
 
 void goori_state::goori(machine_config &config)
@@ -295,7 +285,7 @@ void goori_state::goori(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom"); // 93C46CB1 - Jumper pads for 16bit made
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goori);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x2000);
 
@@ -315,11 +305,11 @@ ROM_START( goori )
 	ROM_LOAD16_BYTE( "2", 0x000000, 0x040000, CRC(82eae7bf) SHA1(a76743f8134f1614ec7fed76f33c5ee8dfe8ab2c) ) // Unico style label, simply labeled 2
 	ROM_LOAD16_BYTE( "3", 0x000001, 0x040000, CRC(39093929) SHA1(2e13690ee4994cc5225a96ee47cfcb84cf63041f) ) // Unico style label, simply labeled 3
 
-	ROM_REGION( 0x400000, "gfx1", 0 ) // sprites
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD( "mx29f1610ml_obj_16m_l", 0x000000, 0x200000, CRC(f26451b9) SHA1(c6818a44115d3efed2566442295dc0b253057602) ) // MX 29F1610ML - PCB silkscreened OBJ 16M/L
 	ROM_LOAD( "mx29f1610ml_obj_16m_h", 0x200000, 0x200000, CRC(058ceaec) SHA1(8639d41685a6f3fb2d81b9aaf3c160666de8155d) ) // MX 29F1610ML - PCB silkscreened OBJ 16M/H
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) // bgs
+	ROM_REGION( 0x400000, "tiles", 0 )
 	ROM_LOAD( "mx29f1610ml_scr_16m_l", 0x000000, 0x200000, CRC(8603a662) SHA1(fbe5ccb3fded60b431ffee27471158c95a8328f8) ) // MX 29F1610ML - PCB silkscreened SCR 16M/L
 	ROM_LOAD( "mx29f1610ml_scr_16m_h", 0x200000, 0x200000, CRC(4223383e) SHA1(aa17eab343dad3f6eab05a844081370e3eebcd2e) ) // MX 29F1610ML - PCB silkscreened SCR 16M/H
 
@@ -330,5 +320,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1999, goori, 0,       goori, goori, goori_state,    empty_init, ROT0, "Unico", "Goori Goori", 0 )
+GAME( 1999, goori, 0, goori, goori, goori_state, empty_init, ROT0, "Unico", "Goori Goori", 0 )
 

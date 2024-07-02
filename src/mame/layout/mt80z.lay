@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="ledred" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="ledgreen" defstate="0">
+		<disk state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="0.75" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="dot" defstate="0">
+		<disk state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<view name="Default Layout">
+		<element name="led0" ref="ledgreen">
+			<bounds x="277" y="375" width="15" height="15" />
+		</element>
+		<element name="led1" ref="ledred">
+			<bounds x="277" y="394" width="15" height="15" />
+		</element>
+
+		<element name="digit0" ref="digit">
+			<bounds x="19" y="377" width="28" height="38" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds x="58" y="377" width="28" height="38" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds x="96" y="377" width="28" height="38" />
+		</element>
+		<element name="digit3" ref="digit">
+			<bounds x="134" y="377" width="28" height="38" />
+		</element>
+		<element name="digit4" ref="digit">
+			<bounds x="185" y="377" width="28" height="38" />
+		</element>
+		<element name="digit5" ref="digit">
+			<bounds x="223" y="377" width="28" height="38" />
+		</element>
+
+		<element name="led2" ref="dot">
+			<bounds x="43" y="409" width="4" height="5" />
+		</element>
+		<element name="led3" ref="dot">
+			<bounds x="82" y="409" width="4" height="5" />
+		</element>
+		<element name="led4" ref="dot">
+			<bounds x="120" y="409" width="4" height="5" />
+		</element>
+		<element name="led5" ref="dot">
+			<bounds x="158" y="409" width="4" height="5" />
+		</element>
+		<element name="led6" ref="dot">
+			<bounds x="209" y="409" width="4" height="5" />
+		</element>
+		<element name="led7" ref="dot">
+			<bounds x="247" y="409" width="4" height="5" />
+		</element>
+
+	</view>
+</mamelayout>

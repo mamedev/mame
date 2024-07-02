@@ -55,6 +55,7 @@ ToDo:
 #include "cpu/m6809/m6809.h"
 #include "sound/msm5205.h"
 #include "sound/ymopm.h"
+
 #include "speaker.h"
 
 #include "de1.lh"
@@ -82,10 +83,11 @@ public:
 	void de_type2_alpha3(machine_config &config);
 	void de_type3(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
 	void de_bg_audio(machine_config &config);
 	void audio_map(address_map &map);
 
@@ -557,7 +559,7 @@ void de_2_state::lamps_w(offs_t offset, uint8_t data)
 
 void de_2_state::de_bg_audio(machine_config &config)
 {
-	/* sound CPU */
+	// sound CPU
 	MC6809E(config, m_audiocpu, XTAL(8'000'000) / 4); // MC68B09E
 	m_audiocpu->set_addrmap(AS_PROGRAM, &de_2_state::audio_map);
 
@@ -575,7 +577,7 @@ void de_2_state::de_bg_audio(machine_config &config)
 
 void de_2_state::de_type1(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	decocpu_type1_device &decocpu(DECOCPU1(config, "decocpu", XTAL(8'000'000) / 2, "maincpu"));
 	decocpu.display_read_callback().set(FUNC(de_2_state::display_r));
 	decocpu.display_write_callback().set(FUNC(de_2_state::display_w));
@@ -584,7 +586,7 @@ void de_2_state::de_type1(machine_config &config)
 	decocpu.switch_write_callback().set(FUNC(de_2_state::switch_w));
 	decocpu.lamp_write_callback().set(FUNC(de_2_state::lamps_w));
 
-	/* Video */
+	// Video
 	config.set_default_layout(layout_de1);
 
 	genpin_audio(config);
@@ -593,7 +595,7 @@ void de_2_state::de_type1(machine_config &config)
 
 void de_2_state::de_type2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	decocpu_type2_device &decocpu(DECOCPU2(config, "decocpu", XTAL(8'000'000) / 2, "maincpu"));
 	decocpu.display_read_callback().set(FUNC(de_2_state::display_r));
 	decocpu.display_write_callback().set(FUNC(de_2_state::display_w));
@@ -602,7 +604,7 @@ void de_2_state::de_type2(machine_config &config)
 	decocpu.switch_write_callback().set(FUNC(de_2_state::switch_w));
 	decocpu.lamp_write_callback().set(FUNC(de_2_state::lamps_w));
 
-	/* Video */
+	// Video
 	config.set_default_layout(layout_de2);
 
 	genpin_audio(config);
@@ -611,7 +613,7 @@ void de_2_state::de_type2(machine_config &config)
 
 void de_2_state::de_type2_alpha3(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	de_type2(config);
 	subdevice<decocpu_type2_device>("decocpu")->display_write_callback().set(FUNC(de_2_state::type2alpha3_display_w));
 	config.set_default_layout(layout_de2a3);
@@ -619,7 +621,7 @@ void de_2_state::de_type2_alpha3(machine_config &config)
 
 void de_2_state::de_type3(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	decocpu_type3_device &decocpu(DECOCPU3(config, "decocpu", XTAL(8'000'000) / 2, "maincpu"));
 	decocpu.display_read_callback().set(FUNC(de_2_state::display_r));
 	decocpu.display_write_callback().set(FUNC(de_2_state::type3_display_w));
@@ -629,7 +631,7 @@ void de_2_state::de_type3(machine_config &config)
 	decocpu.lamp_write_callback().set(FUNC(de_2_state::lamps_w));
 	decocpu.solenoid_write_callback().set(FUNC(de_2_state::sol_w));
 
-	/* Video */
+	// Video
 	config.set_default_layout(layout_de2a3);
 
 	genpin_audio(config);
@@ -891,6 +893,18 @@ ROM_START(ssvc_a42)
 	ROM_LOAD("ssv2f4.rom", 0x10000, 0x10000, CRC(53832d16) SHA1(2227eb784e0221f1bf2bdf7ea48ecd122433f1ea))
 ROM_END
 
+ROM_START(ssvc_e40)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("ssvce4-0.b5", 0x0000, 0x8000, CRC(1109be9b) SHA1(b0058d63868d6b97967fe8ee681f0a807d55cdaf))
+	ROM_LOAD("ssvce4-0.c5", 0x8000, 0x8000, CRC(4162833b) SHA1(1699287c7b25262053ce42bf38e5608bb8b0670c))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("sssndf7.rom", 0x8000, 0x8000, CRC(980778d0) SHA1(7c1f14d327b6d0e6d0fef058f96bb1cb440c9330))
+	ROM_REGION(0x20000, "sound1", 0)
+	ROM_LOAD("ssv1f6.rom", 0x00000, 0x10000, CRC(ccbc72f8) SHA1(c5c13fb8d05d7fb4005636655073d88b4d12d65e))
+	ROM_LOAD("ssv2f4.rom", 0x10000, 0x10000, CRC(53832d16) SHA1(2227eb784e0221f1bf2bdf7ea48ecd122433f1ea))
+ROM_END
+
+
 /*------------------------------------------------------------------------
 / The Simpsons - CPU Rev 3 /Alpha Type 3 16/32K Roms - 32/128K Sound Roms
 /------------------------------------------------------------------------*/
@@ -1000,6 +1014,7 @@ GAME( 1989, robo_a29, robo_a34, de_type3,        de2, de_2_state, empty_init, RO
 GAME( 1988, ssvc_a26, 0,        de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ssvc_b26, ssvc_a26, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ssvc_a42, ssvc_a26, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (4.2 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssvc_e40, ssvc_a26, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (4.0, Europe)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, simp_a27, 0,        de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "The Simpsons (2.7)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, simp_a20, simp_a27, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "The Simpsons (2.0)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tmac_a24, 0,        de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (2.4)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

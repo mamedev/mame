@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
 /**********************************************************************
-	Chloe 280SE
+    Chloe 280SE
 **********************************************************************/
 
 #include "emu.h"
@@ -34,10 +34,10 @@ namespace {
 #define TIMINGS_PERFECT     0
 
 // Must be 800x525 to match VGA. With below puts odd scanlines to the right in order to avoid the same line redrawing.
-static const u16 CYCLES_HORIZ = 800 << 1;
-static const u16 CYCLES_VERT = 525 >> 1;
-static const rectangle SCR_FULL = { 0, 640 - 1, 0, 240 - 1 };
-static const rectangle SCR_256x192 = {  64, 64 + (256 << 1) - 1, 24, 24 + 192 - 1 };
+static constexpr u16 CYCLES_HORIZ = 800 << 1;
+static constexpr u16 CYCLES_VERT = 525 >> 1;
+static constexpr rectangle SCR_FULL = { 0, 640 - 1, 0, 240 - 1 };
+static constexpr rectangle SCR_256x192 = {  64, 64 + (256 << 1) - 1, 24, 24 + 192 - 1 };
 
 class chloe_state : public spectrum_128_state
 {
@@ -62,7 +62,7 @@ public:
 	INPUT_CHANGED_MEMBER(on_divmmc_nmi);
 
 protected:
-	static const u8 BASIC48_ROM = 0x01;
+	static inline constexpr u8 BASIC48_ROM = 0x01;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -151,7 +151,7 @@ void chloe_state::update_memory()
 	const bool mapram_mode = BIT(m_divmmc_ctrl, 6);
 	const bool conmem = BIT(m_divmmc_ctrl, 7);
 	const bool divmmc_rom_active = m_divmmc_paged || conmem;
-	for (auto i = 0; i < 8; ++i)
+	for (int i = 0; i < 8; ++i)
 	{
 		const bool paged = BIT(m_timex_mmu, i);
 
@@ -485,7 +485,7 @@ void chloe_state::map_fetch(address_map &map)
 
 void chloe_state::map_mem(address_map &map)
 {
-	for (auto i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 		map(0x0000 + i * 0x2000, 0x1fff + i * 0x2000).bankrw(m_bank_ram[i]);
 
 	map(0x0000, 0x1fff).view(m_bank0_view);
@@ -633,7 +633,7 @@ u8 chloe_state::kbd_fe_r(offs_t offset)
 	data |= 0xe0;
 
 	/* cassette input from wav */
-	if (m_cassette->input() > 0.0038 )
+	if (m_cassette->input() > 0.0038)
 	{
 		data &= ~0x40;
 	}
@@ -725,7 +725,7 @@ INPUT_PORTS_START(chloe)
 	PORT_BIT(0xe820, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IO_LINE5") /* 0xDFFE */
-	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p   P   \"")   PORT_CODE(KEYCODE_P)       PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR('"') 
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p   P   \"")   PORT_CODE(KEYCODE_P)       PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR('"')
 	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("o   O   ;")    PORT_CODE(KEYCODE_O)       PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(';')
 																			PORT_CODE(KEYCODE_COLON)
 	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("i   I   Ins")  PORT_CODE(KEYCODE_I)       PORT_CHAR('i') PORT_CHAR('I')
@@ -814,7 +814,7 @@ void chloe_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 	m_maincpu->space(AS_IO).specific(m_io);
 
-	for (auto i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x2000, m_ram->pointer(), 0x2000);
 		m_bank_ram[i]->configure_entries( 8 << 1, 4, memregion("maincpu")->base(), 0x2000);

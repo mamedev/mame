@@ -1,209 +1,31 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller
 /*****************************************************************************
- *
- *   z80.cpp
- *   Portable Z80 emulator V3.9
- *
- *   TODO:
- *    - Interrupt mode 0 should be able to execute arbitrary opcodes
- *    - If LD A,I or LD A,R is interrupted, P/V flag gets reset, even if IFF2
- *      was set before this instruction (implemented, but not enabled: we need
- *      document Z80 types first, see below)
- *    - WAIT only stalls between instructions now, it should stall immediately.
- *    - Ideally, the tiny differences between Z80 types should be supported,
- *      currently known differences:
- *       - LD A,I/R P/V flag reset glitch is fixed on CMOS Z80
- *       - OUT (C),0 outputs 0 on NMOS Z80, $FF on CMOS Z80
- *       - SCF/CCF X/Y flags is ((flags | A) & 0x28) on SGS/SHARP/ZiLOG NMOS Z80,
- *         (flags & A & 0x28).
- *         However, recent findings say that SCF/CCF X/Y results depend on whether
- *         or not the previous instruction touched the flag register.
- *      This Z80 emulator assumes a ZiLOG NMOS model.
- *
- *   Changes in 0.243:
- *    Foundation for M cycles emulation. Currently we preserve cc_* tables with total timings.
- *    execute_run() behavior (simplified) ...
- *   Changes in 3.9:
- *    - Fixed cycle counts for LD IYL/IXL/IYH/IXH,n [Marshmellow]
- *    - Fixed X/Y flags in CCF/SCF/BIT, ZEXALL is happy now [hap]
- *    - Simplified DAA, renamed MEMPTR (3.8) to WZ, added TODO [hap]
- *    - Fixed IM2 interrupt cycles [eke]
- *   Changes in 3.8 [Miodrag Milanovic]:
- *    - Added MEMPTR register (according to informations provided
- *      by Vladimir Kladov
- *    - BIT n,(HL) now return valid values due to use of MEMPTR
- *    - Fixed BIT 6,(XY+o) undocumented instructions
- *   Changes in 3.7 [Aaron Giles]:
- *    - Changed NMI handling. NMIs are now latched in set_irq_state
- *      but are not taken there. Instead they are taken at the start of the
- *      execute loop.
- *    - Changed IRQ handling. IRQ state is set in set_irq_state but not taken
- *      except during the inner execute loop.
- *    - Removed x86 assembly hacks and obsolete timing loop catchers.
- *   Changes in 3.6:
- *    - Got rid of the code that would inexactly emulate a Z80, i.e. removed
- *      all the #if Z80_EXACT #else branches.
- *    - Removed leading underscores from local register name shortcuts as
- *      this violates the C99 standard.
- *    - Renamed the registers inside the Z80 context to lower case to avoid
- *      ambiguities (shortcuts would have had the same names as the fields
- *      of the structure).
- *   Changes in 3.5:
- *    - Implemented OTIR, INIR, etc. without look-up table for PF flag.
- *      [Ramsoft, Sean Young]
- *   Changes in 3.4:
- *    - Removed Z80-MSX specific code as it's not needed any more.
- *    - Implemented DAA without look-up table [Ramsoft, Sean Young]
- *   Changes in 3.3:
- *    - Fixed undocumented flags XF & YF in the non-asm versions of CP,
- *      and all the 16 bit arithmetic instructions. [Sean Young]
- *   Changes in 3.2:
- *    - Fixed undocumented flags XF & YF of RRCA, and CF and HF of
- *      INI/IND/OUTI/OUTD/INIR/INDR/OTIR/OTDR [Sean Young]
- *   Changes in 3.1:
- *    - removed the REPEAT_AT_ONCE execution of LDIR/CPIR etc. opcodes
- *      for readabilities sake and because the implementation was buggy
- *      (and i was not able to find the difference)
- *   Changes in 3.0:
- *    - 'finished' switch to dynamically overrideable cycle count tables
- *   Changes in 2.9:
- *    - added methods to access and override the cycle count tables
- *    - fixed handling and timing of multiple DD/FD prefixed opcodes
- *   Changes in 2.8:
- *    - OUTI/OUTD/OTIR/OTDR also pre-decrement the B register now.
- *      This was wrong because of a bug fix on the wrong side
- *      (astrocade sound driver).
- *   Changes in 2.7:
- *    - removed z80_vm specific code, it's not needed (and never was).
- *   Changes in 2.6:
- *    - BUSY_LOOP_HACKS needed to call change_pc() earlier, before
- *      checking the opcodes at the new address, because otherwise they
- *      might access the old (wrong or even nullptr) banked memory region.
- *      Thanks to Sean Young for finding this nasty bug.
- *   Changes in 2.5:
- *    - Burning cycles always adjusts the ICount by a multiple of 4.
- *    - In REPEAT_AT_ONCE cases the r register wasn't incremented twice
- *      per repetition as it should have been. Those repeated opcodes
- *      could also underflow the ICount.
- *    - Simplified TIME_LOOP_HACKS for BC and added two more for DE + HL
- *      timing loops. i think those hacks weren't endian safe before too.
- *   Changes in 2.4:
- *    - z80_reset zaps the entire context, sets IX and IY to 0xffff(!) and
- *      sets the Z flag. With these changes the Tehkan World Cup driver
- *      _seems_ to work again.
- *   Changes in 2.3:
- *    - External termination of the execution loop calls z80_burn() and
- *      z80_vm_burn() to burn an amount of cycles (r adjustment)
- *    - Shortcuts which burn CPU cycles (BUSY_LOOP_HACKS and TIME_LOOP_HACKS)
- *      now also adjust the r register depending on the skipped opcodes.
- *   Changes in 2.2:
- *    - Fixed bugs in CPL, SCF and CCF instructions flag handling.
- *    - Changed variable ea and arg16() function to u32; this
- *      produces slightly more efficient code.
- *    - The DD/FD XY CB opcodes where XY is 40-7F and Y is not 6/E
- *      are changed to calls to the X6/XE opcodes to reduce object size.
- *      They're hardly ever used so this should not yield a speed penalty.
- *   New in 2.0:
- *    - Optional more exact Z80 emulation (#define Z80_EXACT 1) according
- *      to a detailed description by Sean Young which can be found at:
- *      http://www.msxnet.org/tech/z80-documented.pdf
- *****************************************************************************/
+
+    ZiLOG Z80 emulator
+
+TODO:
+- Interrupt mode 0 should be able to execute arbitrary opcodes
+- If LD A,I or LD A,R is interrupted, P/V flag gets reset, even if IFF2
+  was set before this instruction (implemented, but not enabled: we need
+  document Z80 types first, see below)
+- Ideally, the tiny differences between Z80 types should be supported,
+  currently known differences:
+  - LD A,I/R P/V flag reset glitch is fixed on CMOS Z80
+  - OUT (C),0 outputs 0 on NMOS Z80, $FF on CMOS Z80
+  - SCF/CCF X/Y flags is ((flags | A) & 0x28) on SGS/SHARP/ZiLOG NMOS Z80,
+    (flags & A & 0x28).
+    However, recent findings say that SCF/CCF X/Y results depend on whether
+    or not the previous instruction touched the flag register.
+  This Z80 emulator assumes a ZiLOG NMOS model.
+
+*****************************************************************************/
 
 #include "emu.h"
 #include "z80.h"
 #include "z80dasm.h"
 
-#define LOG_UNDOC (1U << 1)
-#define LOG_INT   (1U << 2)
-#define LOG_TIME  (1U << 3)
-
-#define VERBOSE ( LOG_UNDOC /*| LOG_INT*/ )
-#include "logmacro.h"
-
-#define LOGUNDOC(...) LOGMASKED(LOG_UNDOC, __VA_ARGS__)
-#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
-
-
-/* On an NMOS Z80, if LD A,I or LD A,R is interrupted, P/V flag gets reset,
-   even if IFF2 was set before this instruction. This issue was fixed on
-   the CMOS Z80, so until knowing (most) Z80 types on hardware, it's disabled */
-#define HAS_LDAIR_QUIRK  0
-
-
-/****************************************************************************
- * The Z80 registers. halt is set to 1 when the CPU is halted, the refresh
- * register is calculated as follows: refresh = (r & 127) | (r2 & 128)
- ****************************************************************************/
-#define CF      0x01
-#define NF      0x02
-#define PF      0x04
-#define VF      PF
-#define XF      0x08
-#define HF      0x10
-#define YF      0x20
-#define ZF      0x40
-#define SF      0x80
-
-#define INT_IRQ 0x01
-#define NMI_IRQ 0x02
-
-#define PRVPC   m_prvpc.d     // previous program counter
-
-#define PCD     m_pc.d
-#define PC      m_pc.w.l
-
-#define SPD     m_sp.d
-#define SP      m_sp.w.l
-
-#define AFD     m_af.d
-#define AF      m_af.w.l
-#define A       m_af.b.h
-#define F       m_af.b.l
-#define Q       m_q
-#define QT      m_qtemp
-#define I       m_i
-#define R       m_r
-#define R2      m_r2
-
-#define BCD     m_bc.d
-#define BC      m_bc.w.l
-#define B       m_bc.b.h
-#define C       m_bc.b.l
-
-#define DED     m_de.d
-#define DE      m_de.w.l
-#define D       m_de.b.h
-#define E       m_de.b.l
-
-#define HLD     m_hl.d
-#define HL      m_hl.w.l
-#define H       m_hl.b.h
-#define L       m_hl.b.l
-
-#define IXD     m_ix.d
-#define IX      m_ix.w.l
-#define HX      m_ix.b.h
-#define LX      m_ix.b.l
-
-#define IYD     m_iy.d
-#define IY      m_iy.w.l
-#define HY      m_iy.b.h
-#define LY      m_iy.b.l
-
-#define WZ      m_wz.w.l
-#define WZ_H    m_wz.b.h
-#define WZ_L    m_wz.b.l
-
-
-#define TADR     m_shared_addr.w   // Typically represents values from A0..15 pins. 16bit input in steps.
-#define TADR_H   m_shared_addr.b.h
-#define TADR_L   m_shared_addr.b.l
-#define TDAT     m_shared_data.w   // 16bit input(if use as second parameter) or output in steps.
-#define TDAT2    m_shared_data2.w
-#define TDAT_H   m_shared_data.b.h
-#define TDAT_L   m_shared_data.b.l
-#define TDAT8    m_shared_data.b.l // Typically represents values from D0..8 pins. 8bit input or output in steps.
+#include "z80.inc"
 
 static bool tables_initialised = false;
 std::unique_ptr<u8[]> z80_device::SZ = std::make_unique<u8[]>(0x100);       // zero and sign flags
@@ -705,7 +527,7 @@ void z80_device::device_start()
 				// sbc with carry set
 				val = oldval - newval - 1;
 				*psbc = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
-				*psbc |= (newval & (YF | XF));  /* undocumented flag bits 5+3 */
+				*psbc |= (newval & (YF | XF));  // undocumented flag bits 5+3
 				if( (newval & 0x0f) >= (oldval & 0x0f) ) *psbc |= HF;
 				if( newval >= oldval ) *psbc |= CF;
 				if( (val^oldval) & (oldval^newval) & 0x80 ) *psbc |= VF;
@@ -768,6 +590,7 @@ void z80_device::device_start()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_wait_state));
 	save_item(NAME(m_busrq_state));
+	save_item(NAME(m_busack_state));
 	save_item(NAME(m_after_ei));
 	save_item(NAME(m_after_ldair));
 	save_item(NAME(m_ref));
@@ -803,6 +626,7 @@ void z80_device::device_start()
 	m_irq_state = 0;
 	m_wait_state = 0;
 	m_busrq_state = 0;
+	m_busack_state = 0;
 	m_after_ei = 0;
 	m_after_ldair = 0;
 	m_ea = 0;
@@ -883,46 +707,14 @@ void nsc800_device::device_reset()
 	memset(m_nsc800_irq_state, 0, sizeof(m_nsc800_irq_state));
 }
 
-bool z80_device::check_icount(u8 to_step, int icount_saved, bool redonable)
-{
-	if ((m_icount < 0) && redonable && access_to_be_redone())
-	{
-		m_icount = icount_saved;
-		m_ref = (m_ref & 0xffff00) | (to_step - 1);
-		m_redone = true;
-		return true;
-	}
-	if (m_wait_state)
-	{
-		m_icount = 0;
-	}
-	if (m_icount <= 0)
-	{
-		m_ref = (m_ref & 0xffff00) | to_step;
-		return true;
-	}
-
-	return false;
-}
-
 void z80_device::do_op()
 {
-	const bool is_rop = m_ref >= 0xffff00;
 	#include "cpu/z80/z80.hxx"
-	if (!is_rop)
-	{
-		m_ref = 0xffff00;
-	}
 }
 
 void nsc800_device::do_op()
 {
-	const bool is_rop = m_ref >= 0xffff00;
-	#include "cpu/z80/z80_ncs800.hxx"
-	if (!is_rop)
-	{
-		m_ref = 0xffff00;
-	}
+	#include "cpu/z80/ncs800.hxx"
 }
 
 /****************************************************************************
@@ -936,8 +728,7 @@ void z80_device::execute_run()
 		return;
 	}
 
-	m_redone = false;
-	while (m_icount > 0 && !m_redone)
+	while (m_icount > 0)
 	{
 		do_op();
 	}
@@ -1077,6 +868,7 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_refresh_cb(*this),
 	m_nomreq_cb(*this),
 	m_halt_cb(*this),
+	m_busack_cb(*this),
 	m_m1_cycles(4),
 	m_memrq_cycles(3),
 	m_iorq_cycles(4)

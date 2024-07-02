@@ -216,7 +216,7 @@ void i386_device::i386_check_sreg_validity(int reg)
 	}
 }
 
-int i386_device::i386_limit_check(int seg, uint32_t offset)
+int i386_device::i386_limit_check(int seg, uint32_t offset, int size)
 {
 	if(PROTECTED_MODE && !V8086_MODE)
 	{
@@ -231,7 +231,7 @@ int i386_device::i386_limit_check(int seg, uint32_t offset)
 		}
 		else
 		{
-			if(offset > m_sreg[seg].limit)
+			if((offset + size - 1) > m_sreg[seg].limit)
 			{
 				LOGMASKED(LOG_LIMIT_CHECK, "Limit check at 0x%08x failed. Segment %04x, limit %08x, offset %08x\n",m_pc,m_sreg[seg].selector,m_sreg[seg].limit,offset);
 				//machine().debug_break();

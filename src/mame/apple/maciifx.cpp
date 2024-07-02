@@ -170,6 +170,8 @@ void maciifx_state::machine_reset()
 	space.unmap_write(0x00000000, memory_end);
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
 	m_overlay = true;
+
+	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 }
 
 uint32_t maciifx_state::rom_switch_r(offs_t offset)
@@ -580,7 +582,7 @@ void maciifx_state::maciifx(machine_config &config)
 	swimpic.prd_callback().set(m_fdc, FUNC(applefdintf_device::read));
 	swimpic.pwr_callback().set(m_fdc, FUNC(applefdintf_device::write));
 	swimpic.hint_callback().set(FUNC(maciifx_state::oss_interrupt<6>));
-	swimpic.gpout0_callback().set(m_macadb, FUNC(macadb_device::adb_data_w));
+	swimpic.gpout0_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w)).invert();
 	swimpic.gpin_callback().set(FUNC(maciifx_state::adbin_r));
 
 	m_fdc->dat1byte_cb().set("swimpic", FUNC(applepic_device::reqa_w));

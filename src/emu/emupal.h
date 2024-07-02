@@ -210,11 +210,13 @@ public:
 	enum xrgb_333_t     { xRGB_333, xxxxxxxRRRGGGBBB };
 	enum xrbg_333_t     { xRBG_333, xxxxxxxRRRBBBGGG };
 	enum xbgr_333_t     { xBGR_333, xxxxxxxBBBGGGRRR };
+	enum xbgr_333_nib_t { xBGR_333_nibble, xxxxxBBBxGGGxRRR };
 	enum xrgb_444_t     { xRGB_444, xxxxRRRRGGGGBBBB };
 	enum xrbg_444_t     { xRBG_444, xxxxRRRRBBBBGGGG };
 	enum xbrg_444_t     { xBRG_444, xxxxBBBBRRRRGGGG };
 	enum xbgr_444_t     { xBGR_444, xxxxBBBBGGGGRRRR };
 	enum rgbx_444_t     { RGBx_444, RRRRGGGGBBBBxxxx };
+	enum grbx_444_t     { GRBx_444, GGGGRRRRBBBBxxxx };
 	enum gbrx_444_t     { GBRx_444, GGGGBBBBRRRRxxxx };
 	enum irgb_4444_t    { IRGB_4444, IIIIRRRRGGGGBBBB };
 	enum rgbi_4444_t    { RGBI_4444, RRRRGGGGBBBBIIII };
@@ -296,11 +298,13 @@ public:
 	palette_device &set_format(xrgb_333_t, u32 entries);
 	palette_device &set_format(xrbg_333_t, u32 entries);
 	palette_device &set_format(xbgr_333_t, u32 entries);
+	palette_device &set_format(xbgr_333_nib_t, u32 entries);
 	palette_device &set_format(xrgb_444_t, u32 entries);
 	palette_device &set_format(xrbg_444_t, u32 entries);
 	palette_device &set_format(xbrg_444_t, u32 entries);
 	palette_device &set_format(xbgr_444_t, u32 entries);
 	palette_device &set_format(rgbx_444_t, u32 entries);
+	palette_device &set_format(grbx_444_t, u32 entries);
 	palette_device &set_format(gbrx_444_t, u32 entries);
 	palette_device &set_format(irgb_4444_t, u32 entries);
 	palette_device &set_format(rgbi_4444_t, u32 entries);

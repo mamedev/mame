@@ -10,24 +10,66 @@
 
 #include "emu.h"
 #include "hp98544.h"
+
+#include "video/topcat.h"
+
 #include "screen.h"
+
 
 #define HP98544_SCREEN_NAME   "98544_screen"
 #define HP98544_ROM_REGION    "98544_rom"
+
+namespace {
+
+class dio16_98544_device :
+	public device_t,
+	public bus::hp_dio::device_dio16_card_interface,
+	public device_memory_interface
+{
+public:
+	// construction/destruction
+	dio16_98544_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint16_t rom_r(offs_t offset);
+	void rom_w(offs_t offset, uint16_t data);
+
+	required_device<topcat_device> m_topcat;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+ protected:
+	dio16_98544_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual space_config_vector memory_space_config() const override;
+private:
+
+	void vblank_w(int state);
+	void int_w(int state);
+
+	static constexpr int m_v_pix = 768;
+	static constexpr int m_h_pix = 1024;
+
+	const address_space_config m_space_config;
+	void map(address_map &map);
+	required_region_ptr<uint8_t> m_rom;
+	required_shared_ptr<uint8_t> m_vram;
+
+	uint8_t m_intreg;
+};
 
 //*************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(HPDIO_98544, bus::hp_dio::dio16_98544_device, "dio98544", "HP98544 high-res monochrome DIO video card")
-
-namespace bus::hp_dio {
-
 ROM_START( hp98544 )
 	ROM_REGION( 0x2000, HP98544_ROM_REGION, 0 )
 	ROM_LOAD( "98544_1818-1999.bin", 0x000000, 0x002000, CRC(8c7d6480) SHA1(d2bcfd39452c38bc652df39f84c7041cfdf6bd51) )
 ROM_END
-
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
@@ -49,8 +91,6 @@ void dio16_98544_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
-
-
 
 const tiny_rom_entry *dio16_98544_device::device_rom_region() const
 {
@@ -184,4 +224,6 @@ uint32_t dio16_98544_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-} // namespace bus::hp_dio
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(HPDIO_98544, bus::hp_dio::device_dio16_card_interface, dio16_98544_device, "dio98544", "HP98544 high-res monochrome DIO video card")

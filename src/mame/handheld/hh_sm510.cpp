@@ -9997,9 +9997,12 @@ ROM_END
   * Sharp SM510 under epoxy (die label MJ1)
   * lcd screen with custom segments, 1-bit sound
 
-  TODO or BTANB?: Energy and weapon power bars are swapped. Not verified on the
-  handheld. The manual does show them correctly, but looking at the LCD segment
-  ID groupings, the SVG is not wrong.
+  BTANB: Energy and weapon power bars are the wrong way around. The manual does
+  show them correctly, but it appears to be a doctored picture.
+
+  There's also a newer version called Project Alien, presumed to be the same ROM.
+  The LCD is different (no Xenomorph aliens). The background inlay is different
+  too, and this time the weapon/energy labels are placed correctly.
 
 *******************************************************************************/
 
@@ -11848,7 +11851,7 @@ SYST( 1993, tsddragon,    0,           0,      tsddragon,    tsddragon,    tsddr
 SYST( 1993, tdennis,      0,           0,      tdennis,      tdennis,      tdennis_state,      empty_init, "Tiger Electronics", "Dennis the Menace (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, tnmarebc,     0,           0,      tnmarebc,     tnmarebc,     tnmarebc_state,     empty_init, "Tiger Electronics", "Nightmare Before Christmas (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: title has no "The"
 SYST( 1993, ttransf2,     0,           0,      ttransf2,     ttransf2,     ttransf2_state,     empty_init, "Tiger Electronics", "Transformers: Generation 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1993, topaliens,    0,           0,      topaliens,    topaliens,    topaliens_state,    empty_init, "Tiger Electronics", "Operation: Aliens (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1994, topaliens,    0,           0,      topaliens,    topaliens,    topaliens_state,    empty_init, "Tiger Electronics", "Operation: Aliens (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, tmkombat,     0,           0,      tmkombat,     tmkombat,     tmkombat_state,     empty_init, "Tiger Electronics", "Mortal Kombat (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1994, tshadow,      0,           0,      tshadow,      tshadow,      tshadow_state,      empty_init, "Tiger Electronics", "The Shadow (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1994, tskelwarr,    0,           0,      tskelwarr,    tskelwarr,    tskelwarr_state,    empty_init, "Tiger Electronics", "Skeleton Warriors: The Dark Crusade (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

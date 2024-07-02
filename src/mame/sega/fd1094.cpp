@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Andreas Naive, Charles MacDonald
 /***************************************************************************
 
-    Hitachi FD1089FD1094 encryption emulation
+    Hitachi FD1094 encryption emulation
 
 ****************************************************************************
 
@@ -23,11 +23,11 @@
 
     The decryption can logically be split in two parts. The first part consists
     of a series of conditional XORs and bitswaps, controlled by the decryption
-    key, which will be described in the next paragraph. The second part does a replacement
-    of several values with FFFF. This last step is done to prevent usage of any
-    PC-relative opcode, which would easily allow an intruder to dump decrypted
-    values from program space. The FFFF replacement may affect either ~300 values
-    or ~5000, depending on the decryption key.
+    key, which will be described in the next paragraph. The second part does a
+    replacement of several values with FFFF. This last step is done to prevent
+    usage of any PC-relative opcode, which would easily allow an intruder to dump
+    decrypted values from program space. The FFFF replacement may affect either
+    ~300 values or ~5000, depending on the decryption key.
 
     The main part of the decryption can itself be subdivided in five consecutive
     steps. The first one is executed only if bit 15 of the encrypted value is 1;

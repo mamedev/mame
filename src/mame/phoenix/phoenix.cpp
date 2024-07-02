@@ -1515,6 +1515,7 @@ ROM_START( pleiadce )
 	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette high bits
 ROM_END
 
+// TIM-8001 + TIM-8002 PCBs. Sound section seems more similar to Phoenix (MM6221AA instead of TMS3615, etc)
 ROM_START( pleiadsgmp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic45",   0x0000, 0x0800, CRC(6a6dcabf) SHA1(cec3669674feb1ea86248d181f83f60a6affe68d) )
@@ -1786,7 +1787,7 @@ GAME( 1981, pleiads,    0,       pleiads,  pleiads,  phoenix_state, empty_init, 
 GAME( 1981, pleiadsb2,  pleiads, pleiads,  pleiads,  phoenix_state, empty_init,           ROT90, "bootleg (ESG)",                          "Pleiads (bootleg set 2)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadbl,   pleiads, pleiads,  pleiadbl, phoenix_state, empty_init,           ROT90, "bootleg",                                "Pleiads (bootleg set 1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadce,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Centuri license)",               "Pleiads (Centuri)",                                          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pleiadsgmp, pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (GMP Games)",                    "Pleiads (GMP Games)",                                        MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiadsgmp, pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (GMP Games)",                    "Pleiads (GMP Games)",                                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsi,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Irecsa)",                       "Pleiads (Irecsa, set 1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsia,  pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Irecsa)",                       "Pleiads (Irecsa, set 2)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsn,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Niemer S.A.)",                  "Pleiads (Niemer S.A.)",                                      MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

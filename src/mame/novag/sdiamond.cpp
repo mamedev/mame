@@ -65,8 +65,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
 protected:
-	virtual void machine_reset() override { set_power(true); }
 	virtual void machine_start() override;
+	virtual void machine_reset() override { set_power(true); }
 
 private:
 	// devices/pointers
@@ -88,13 +88,13 @@ private:
 	void main_map(address_map &map);
 
 	// I/O handlers
+	void standby(int state);
+	void set_power(bool power);
+
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void update_lcd();
 	void lcd_segs_w(u8 data);
 	void lcd_com_w(offs_t offset, u8 data, u8 mem_mask);
-
-	void standby(int state);
-	void set_power(bool power);
 
 	void p1_w(u8 data);
 	u8 p2_r();

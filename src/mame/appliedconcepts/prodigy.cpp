@@ -3,7 +3,6 @@
 /*******************************************************************************
 
 Applied Concepts Destiny Prodigy
-Like most other chess computers by ACI, it was also distributed by Chafitz.
 
 The chess engine is Morphy, which in turn is based on Sargon 2.5.
 
@@ -68,11 +67,13 @@ The keypad is connected to the 12 pin KPDCN connector left to right KP1:
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/sensorboard.h"
 #include "video/pwm.h"
 #include "sound/dac.h"
+
 #include "speaker.h"
 
 // internal artwork

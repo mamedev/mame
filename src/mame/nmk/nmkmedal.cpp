@@ -383,10 +383,20 @@ void omatsuri_state::omatsuri(machine_config &config)
 
 ROM_START( drail ) // handwritten labels
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1_dream rail v08c 2c0c v957220.u4", 0x00000, 0x10000, CRC(c14fae88) SHA1(f0478b563ac851372bc0b93772d89ab70ad61877) ) // 通ドリームレール V08C 2C0C V957220, 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "1_dream rail v08c 2c0c v987275.u1", 0x00000, 0x10000, CRC(c14fae88) SHA1(f0478b563ac851372bc0b93772d89ab70ad61877) ) // 通ドリームレール V08C 2C0C V957220, 1xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0xc0000, "oki", 0 ) // NMK112 device expects the first 0x40000 bytes to be left empty.
 	ROM_LOAD( "2_dream rail pcm.u11", 0x40000, 0x80000, CRC(efdc1eea) SHA1(c39fed6f97b71556b468e0872a8240fe7b6495e6) ) // ドリームレールPCM
+	// empty socket 3.u10
+ROM_END
+
+ROM_START( sluster2 ) // same PCB as drail
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "slusterii_v987275.u1", 0x00000, 0x10000, CRC(5139ac8f) SHA1(90739006e8f76cda460ef59b9a9cca40800bb44f) ) // SラスターII V987275, 11xxxxxxxxxxxxxx = 0xFF
+
+
+	ROM_REGION( 0xc0000, "oki", 0 ) // NMK112 device expects the first 0x40000 bytes to be left empty.
+	ROM_LOAD( "sluster2_2.u11", 0x40000, 0x80000, CRC(d8aa034c) SHA1(0082eec841c7278698a4a1ef4be3b2bb605d3582) ) // Sラスター2 ADPCM 2
 	// empty socket 3.u10
 ROM_END
 
@@ -465,5 +475,6 @@ GAME( 1996, hpierrot,   0, hpierrot, trocana, hpierrot_state, empty_init, ROT0, 
 GAME( 1996, sweethrt,   0, sweethrt, trocana, hpierrot_state, empty_init, ROT0, "NMK",        "Sweetheart",                                MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V96B29° strings
 GAME( 1998, draillov,   0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NTC / NMK",  "Dream Rail Lovely",                         MACHINE_IS_SKELETON_MECHANICAL ) // LOVELY D_RAIL LOVELY NMK LTD DR_LOLÙ MT155 \T2\V0° V98B27° UPRIGHT_PCB223_150CAP strings
 GAME( 1998, plpittashi, 0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Love Pi Chan (Power Link)",                 MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V98622°, LOVE PI, CHAN strings (title taken from string, very probably wrong)
+GAME( 1998, sluster2,   0, drail,    trocana, hpierrot_state, empty_init, ROT0, "NMK",        "Super Luster II",                           MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, H10072,·V040P, V98727 strings
 GAME( 1999, omatsuri,   0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK / Sega", "Shimura Ken no Bakatono-sama Ooedomatsuri", MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V99422 strings. Cabinet has NMK logo, manual has Sega logo
 GAME( 1999, pldoraemon, 0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Doraemon (Power Link)",                     MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V99204°, DORAMON (sic), STEPPING_PCB200_CAP75 strings

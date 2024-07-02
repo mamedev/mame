@@ -13,14 +13,11 @@
   - add flipscreen according to schematics
   - pitboss: dip switches
   - general - add named output notifiers
-  - implement proper use of bit 0 in m_extra_video_bank_bit for Match'em Up sets and clones
-  - for Dodge City and Unknown Merit Game, determine how to access the 'gfx2' data stored in
-    the ROM U37 in the gfx1 memory region
 
 Notes: it's important that "questions" is 0xa0000 bytes with empty space filled
        with 0xff, because the built-in ROMs test checks how many question ROMs
        the games has and the type of each one.
-       The type is stored in one byte in an offset which change for every game,
+       The type is stored in one byte in an offset which changes for every game,
        using it as a form of protection.
 
        ROM type byte legend:
@@ -69,11 +66,29 @@ Merit Riviera Notes - There are several known versions:
   of the various video poker games from Merit. RDI then licensed the games to Michigan Coin Op-Vending
   Inc. The legal battles over true ownership started in 2004 and carried on through at least 09/01/2011.
 
-NOTE: Based on tests and observations, the CRT-209 module seems to use the Z80's M1 signal when it fetches
-      an opcode to activate and overlay the module's built in 2816 EEPROM. While this prevents a simple
-      memory read of the 2816's memory region, it does limit the usable instructions to single byte opcodes.
+NOTE: Based on tests and deconstruction of the CRT-209 module, it uses the Z80's M1 signal when it fetches an
+      opcode to overlay the module's built in 2816 EEPROM data on to the Z80's 0xB000 memory range. While this
+      prevents a simple memory read of the 2816's memory region, it does limit the usable instructions to single
+      byte opcodes. The CRT-209 module contains the following or similar code to read inputs, which would be
+      encrypted by scrambling data and address lines to the 2816:
+        7A A4 47 7B A5 4F 7A B4 57 7B B5 5F C9
+      In case of future missing dumps of the CRT-209 module, the following data can be manually inserted into the
+      crt209 memory region, adjusting the offsets to what the game expects:
 
-
+    // called by subroutine which reads inputs
+    ROM_FILL( 0x01, 0x01, 0x7a ) // ld   a,d
+    ROM_FILL( 0x02, 0x01, 0xa4 ) // and  h
+    ROM_FILL( 0x03, 0x01, 0x47 ) // ld   b,a
+    ROM_FILL( 0x04, 0x01, 0x7b ) // ld   a,e
+    ROM_FILL( 0x05, 0x01, 0xa5 ) // and  l
+    ROM_FILL( 0x06, 0x01, 0x4f ) // ld   c,a
+    ROM_FILL( 0x07, 0x01, 0x7a ) // ld   a,d
+    ROM_FILL( 0x08, 0x01, 0xb4 ) // or   h
+    ROM_FILL( 0x09, 0x01, 0x57 ) // ld   d,a
+    ROM_FILL( 0x0a, 0x01, 0x7b ) // ld   a,e
+    ROM_FILL( 0x0b, 0x01, 0xb5 ) // or   l
+    ROM_FILL( 0x0c, 0x01, 0x5f ) // ld   e,a
+    ROM_FILL( 0x0a, 0x01, 0xc9 ) // ret
 */
 
 #include "emu.h"
@@ -118,6 +133,7 @@ public:
 	void couple(machine_config &config);
 	void misdraw(machine_config &config);
 	void mosdraw(machine_config &config);
+	void no_u40(machine_config &config);
 	void pitboss(machine_config &config);
 	void riviera(machine_config &config);
 
@@ -148,7 +164,7 @@ private:
 
 	pen_t m_pens[NUM_PENS];
 	uint8_t m_lscnblk = 0;
-	uint16_t m_extra_video_bank_bit = 0;
+	uint16_t m_extra_video_bank_bit[2]{};
 
 	void hsync_changed(int state);
 	void led1_w(uint8_t data);
@@ -157,6 +173,7 @@ private:
 
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
+	MC6845_UPDATE_ROW(crtc_update_row_no_u40);
 	void bigappg_map(address_map &map);
 	void couple_map(address_map &map);
 	void riviera_map(address_map &map);
@@ -200,6 +217,7 @@ public:
 	void trvwhiz(machine_config &config);
 	void trvwhziv(machine_config &config);
 
+	void init_dtrvwz5();
 	template <uint8_t Key> void init_key();
 
 protected:
@@ -366,7 +384,7 @@ MC6845_UPDATE_ROW(merit_state::crtc_update_row)
 	{
 		int const attr = m_ram_attr[ma & 0x7ff];
 		int const region = (attr & 0x40) >> 6;
-		int addr = ((m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (m_extra_video_bank_bit)) << 4) | (ra & 0x0f);
+		int addr = ((m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (m_extra_video_bank_bit[0] | m_extra_video_bank_bit[1])) << 4) | (ra & 0x0f);
 		int const colour = (attr & 0x7f) << 3;
 
 		addr &= (rlen - 1);
@@ -394,6 +412,35 @@ MC6845_UPDATE_ROW(merit_state::crtc_update_row)
 	}
 }
 
+MC6845_UPDATE_ROW(merit_state::crtc_update_row_no_u40)
+{
+	uint16_t x = 0;
+
+	for (uint8_t cx = 0; cx < x_count; cx++)
+	{
+		int const attr = m_ram_attr[ma & 0x7ff];
+		int addr = ((m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (attr & 0x40) << 3) << 4) | (ra & 0x0f);
+		int const colour = (attr & 0x7f) << 3;
+
+		addr &= 0x7fff;
+		uint8_t const *const data = m_gfx[0];
+
+		for (int i = 7; i >= 0; i--)
+		{
+			int col = colour;
+
+			col |= (BIT(data[0x0000 | addr], i) << 2);
+			col |= (BIT(data[0x8000 | addr], i) << 1);
+			col |= (BIT(data[0x10000 | addr], i) << 0);
+
+			col = m_ram_palette[col & 0x3ff];
+			bitmap.pix(y, x) = m_pens[col ? col & (NUM_PENS - 1) : (m_lscnblk ? 8 : 0)];
+
+			x++;
+		}
+		ma++;
+	}
+}
 
 void merit_state::hsync_changed(int state)
 {
@@ -428,11 +475,11 @@ void merit_state::led2_w(uint8_t data)
 void merit_state::misc_w(uint8_t data)
 {
 	flip_screen_set(~data & 0x10);
-	m_extra_video_bank_bit = (data & 2) << 8;
+	m_extra_video_bank_bit[0] = (data & 2) << 8;
+	m_extra_video_bank_bit[1] = (data & 1) << 10;
 	m_lscnblk = (data >> 3) & 1;
 
 	// other bits unknown
-	// TODO: bit 0 gets set by couple and clones in the levels where the tiles' GFX are wrong. Another video bank bit?
 }
 
 void merit_banked_state::bank_w(uint8_t data)
@@ -778,6 +825,21 @@ static INPUT_PORTS_START( riviera )
 	PORT_DIPSETTING(    0x80, "50" )
 	PORT_DIPSETTING(    0x00, "50" ) PORT_CONDITION("DSW", 0x08, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, "99" ) PORT_CONDITION("DSW", 0x08, EQUALS, 0x08)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( msupstar )
+	PORT_INCLUDE( meritpoker )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, IP_ACTIVE_HIGH, "SW1:1" ) // must be HIGH or game stalls with "GAME MALFUNCTION PLEASE CALL ATTENDANT" error!
+	PORT_DIPNAME( 0x10, 0x10, "Points Per Coin" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, "1 Point" )
+	PORT_DIPSETTING(    0x00, "5 Points" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Maximum Bet" ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0xc0, "20" )
+	PORT_DIPSETTING(    0x80, "50" )
+	PORT_DIPSETTING(    0x00, "50" ) // duplicate setting
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rivierab )
@@ -1314,7 +1376,7 @@ static INPUT_PORTS_START( trvwhziv )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( dtrvwh5 )
+static INPUT_PORTS_START( dtrvwz5 )
 	PORT_INCLUDE( merittrivia )
 
 	PORT_MODIFY("IN0")
@@ -1545,6 +1607,13 @@ void merit_state::riviera(machine_config &config)
 	bigappg(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &merit_state::riviera_map);
+}
+
+void merit_state::no_u40(machine_config &config)
+{
+	misdraw(config);
+
+	subdevice<mc6845_device>("crtc")->set_update_row_callback(FUNC(merit_state::crtc_update_row_no_u40));
 }
 
 void merit_state::mosdraw(machine_config &config)
@@ -1967,7 +2036,10 @@ ROM_START( misdraw )
 	ROM_LOAD( "haip_u40.u40", 0x0000, 0x2000, CRC(ac4983b8) SHA1(a552a15f813c331de67eaae2ed42cc037b26c5bd) )
 
 	ROM_REGION( 0x0800, "crt209", 0 ) // contains Z80 program code, the game jumps here on startup
-	ROM_LOAD( "crt-209_2131-16", 0x0000, 0x0800, CRC(34729437) SHA1(f097a1a97d8078d7d6a6af85be416b1d1d09c7f2) ) // 2816 EEPROM in Z80 epoxy CPU module
+	ROM_LOAD( "crt-209_2131-16", 0x0000, 0x0800, BAD_DUMP CRC(34729437) SHA1(f097a1a97d8078d7d6a6af85be416b1d1d09c7f2) ) // pre-decrypted code, not sure of method used to dump/obtain data
+
+	ROM_REGION( 0x117, "plds", 0 ) // PAL inside CRT-209 module
+	ROM_LOAD( "crt-209_pal16l8.bin", 0x000, 0x117, CRC(e916c56f) SHA1(1517091ff1791d923e5bd62d18d1428b6a3a8c72) ) // SC3339 20-pin 16L8 type PAL
 ROM_END
 
 ROM_START( iowapp )
@@ -2013,6 +2085,9 @@ ROM_START( dodgectyb )
 
 	ROM_REGION( 0x0800, "crt209", 0 ) // contains Z80 program code to read inputs
 	ROM_LOAD( "crt-209_2131-82", 0x0000, 0x0800, CRC(ec540d8a) SHA1(fbc64d4cc56f418bc090b47bb6798e3a90282f56) )
+
+	ROM_REGION( 0x117, "plds", 0 ) // PAL inside CRT-209 module
+	ROM_LOAD( "crt-209_pal16l8.bin", 0x000, 0x117, CRC(e916c56f) SHA1(1517091ff1791d923e5bd62d18d1428b6a3a8c72) ) // SC3339 20-pin 16L8 type PAL
 ROM_END
 
 ROM_START( dodgectyc )
@@ -2029,9 +2104,12 @@ ROM_START( dodgectyc )
 
 	ROM_REGION( 0x0800, "crt209", 0 ) // contains Z80 program code to read inputs
 	ROM_LOAD( "crt-209_2131-82", 0x0000, 0x0800, CRC(ec540d8a) SHA1(fbc64d4cc56f418bc090b47bb6798e3a90282f56) )
+
+	ROM_REGION( 0x117, "plds", 0 ) // PAL inside CRT-209 module
+	ROM_LOAD( "crt-209_pal16l8.bin", 0x000, 0x117, CRC(e916c56f) SHA1(1517091ff1791d923e5bd62d18d1428b6a3a8c72) ) // SC3339 20-pin 16L8 type PAL
 ROM_END
 
-ROM_START( unkmerit )
+ROM_START( msupstar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "4435-81_u5-1.u5", 0x0000, 0x8000, CRC(38ed804a) SHA1(fc500db9d5e5eac7d9a88756f7d0176a887f1fd1) ) // 4435-81 U5-1 984140  4435811
 
@@ -2044,21 +2122,10 @@ ROM_START( unkmerit )
 	// No U40 char ROM
 
 	ROM_REGION( 0x0800, "crt209", 0 ) // contains Z80 program code to read inputs
-	ROM_LOAD( "crt-209_4435-81.cpu", 0x0000, 0x0800, NO_DUMP ) // 2816 EEPROM in Z80 epoxy CPU module
-	// 7A A4 47 7B A5 4F 7A B4 57 7B B5 5F C9
-	ROM_FILL( 0x40, 0x01, 0x7a )
-	ROM_FILL( 0x41, 0x01, 0xa4 )
-	ROM_FILL( 0x42, 0x01, 0x47 )
-	ROM_FILL( 0x43, 0x01, 0x7b )
-	ROM_FILL( 0x44, 0x01, 0xa5 )
-	ROM_FILL( 0x45, 0x01, 0x4f )
-	ROM_FILL( 0x46, 0x01, 0x7a )
-	ROM_FILL( 0x47, 0x01, 0xb4 )
-	ROM_FILL( 0x48, 0x01, 0x57 )
-	ROM_FILL( 0x49, 0x01, 0x7b )
-	ROM_FILL( 0x4a, 0x01, 0xb5 )
-	ROM_FILL( 0x4b, 0x01, 0x5f )
-	ROM_FILL( 0x4c, 0x01, 0xc9 )
+	ROM_LOAD( "crt-209_4435-81.cpu", 0x0000, 0x0800, CRC(0c94ef71) SHA1(6e6eb0ffa7adf0ef7cdcc2d891c37814eb8d4a61) )
+
+	ROM_REGION( 0x117, "plds", 0 ) // PAL inside CRT-209 module
+	ROM_LOAD( "crt-209_pal16l8.bin", 0x000, 0x117, CRC(e916c56f) SHA1(1517091ff1791d923e5bd62d18d1428b6a3a8c72) ) // SC3339 20-pin 16L8 type PAL
 ROM_END
 
 ROM_START( trvwz )
@@ -2471,24 +2538,10 @@ ROM_START( dtrvwz5 )
 	ROM_LOAD( "sc-006", 0x00000, 0x0100, CRC(145f7f61) SHA1(f6967466791895710107987e9438177706d7b2a0) ) // 74S287 (==N82S129N) BPROM
 
 	ROM_REGION( 0x0800, "crt209", 0 ) // contains Z80 program code to read inputs
-	ROM_LOAD( "crt-209_6221-70.cpu", 0x0000, 0x0800, NO_DUMP ) // 2816 EEPROM in Z80 epoxy CPU module
+	ROM_LOAD( "crt-209_6221-70.cpu", 0x0000, 0x0800, BAD_DUMP CRC(9f78d976) SHA1(098651945074c9a21ac72b1d73f0c895f67e9c4e) ) // didn't give consistent reads, byte at 0x70 hand-fixed
 
-	ROM_FILL( 0x000, 0x800, 0xc9 ) // ret
-
-	// called by subroutine which reads inputs
-	ROM_FILL( 0x01, 0x01, 0x7a ) // ld   a,d
-	ROM_FILL( 0x02, 0x01, 0xa4 ) // and  h
-	ROM_FILL( 0x03, 0x01, 0x47 ) // ld   b,a
-	ROM_FILL( 0x04, 0x01, 0x7b ) // ld   a,e
-	ROM_FILL( 0x05, 0x01, 0xa5 ) // and  l
-	ROM_FILL( 0x06, 0x01, 0x4f ) // ld   c,a
-	ROM_FILL( 0x07, 0x01, 0x7a ) // ld   a,d
-	ROM_FILL( 0x08, 0x01, 0xb4 ) // or   h
-	ROM_FILL( 0x09, 0x01, 0x57 ) // ld   d,a
-	ROM_FILL( 0x0a, 0x01, 0x7b ) // ld   a,e
-	ROM_FILL( 0x0b, 0x01, 0xb5 ) // or   l
-	ROM_FILL( 0x0c, 0x01, 0x5f ) // ld   e,a
-	ROM_FILL( 0x0a, 0x01, 0xc9 ) // ret
+	ROM_REGION( 0x117, "plds", 0 ) // PAL inside CRT-209 module
+	ROM_LOAD( "crt-209_pal16l8.bin", 0x000, 0x117, CRC(e916c56f) SHA1(1517091ff1791d923e5bd62d18d1428b6a3a8c72) ) // SC3339 20-pin 16L8 type PAL
 ROM_END
 
 ROM_START( dtrvwz5v )
@@ -2519,24 +2572,10 @@ ROM_START( dtrvwz5v )
 	ROM_LOAD( "sc-006", 0x00000, 0x0100, CRC(145f7f61) SHA1(f6967466791895710107987e9438177706d7b2a0) ) // 74S287 (==N82S129N) BPROM
 
 	ROM_REGION( 0x0800, "crt209", 0 ) // contains Z80 program code to read inputs
-	ROM_LOAD( "crt-209_6221-75.cpu", 0x0000, 0x0800, NO_DUMP ) // 2816 EEPROM in Z80 epoxy CPU module
+	ROM_LOAD( "crt-209_6221-75.cpu", 0x0000, 0x0800, BAD_DUMP CRC(9f78d976) SHA1(098651945074c9a21ac72b1d73f0c895f67e9c4e) ) // didn't give consistent reads, byte at 0x70 hand-fixed
 
-	ROM_FILL( 0x000, 0x800, 0xc9 ) // ret
-
-	// called by subroutine which reads inputs
-	ROM_FILL( 0x01, 0x01, 0x7a ) // ld   a,d
-	ROM_FILL( 0x02, 0x01, 0xa4 ) // and  h
-	ROM_FILL( 0x03, 0x01, 0x47 ) // ld   b,a
-	ROM_FILL( 0x04, 0x01, 0x7b ) // ld   a,e
-	ROM_FILL( 0x05, 0x01, 0xa5 ) // and  l
-	ROM_FILL( 0x06, 0x01, 0x4f ) // ld   c,a
-	ROM_FILL( 0x07, 0x01, 0x7a ) // ld   a,d
-	ROM_FILL( 0x08, 0x01, 0xb4 ) // or   h
-	ROM_FILL( 0x09, 0x01, 0x57 ) // ld   d,a
-	ROM_FILL( 0x0a, 0x01, 0x7b ) // ld   a,e
-	ROM_FILL( 0x0b, 0x01, 0xb5 ) // or   l
-	ROM_FILL( 0x0c, 0x01, 0x5f ) // ld   e,a
-	ROM_FILL( 0x0a, 0x01, 0xc9 ) // ret
+	ROM_REGION( 0x117, "plds", 0 ) // PAL inside CRT-209 module
+	ROM_LOAD( "crt-209_pal16l8.bin", 0x000, 0x117, CRC(e916c56f) SHA1(1517091ff1791d923e5bd62d18d1428b6a3a8c72) ) // SC3339 20-pin 16L8 type PAL
 ROM_END
 
 /*
@@ -2809,8 +2848,9 @@ ROM_START( matchem )
 	ROM_REGION( 0x0800, "crt209", 0 ) // contains Z80 program code to read inputs
 	ROM_LOAD( "crt-209_6221-51.cpu",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )
 
-	ROM_REGION( 0x117, "plds", 0 )
-	ROM_LOAD( "dec003.u13", 0x000, 0x117, CRC(5b9a2fec) SHA1(c56c7bbe13028903cfc82440ee8b24df855134c2) ) // PAL16L8ANC - brute forced
+	ROM_REGION( 0x320, "plds", 0 )
+	ROM_LOAD( "dec003.u13",          0x000, 0x117, CRC(5b9a2fec) SHA1(c56c7bbe13028903cfc82440ee8b24df855134c2) ) // PAL16L8ANC - brute forced
+	ROM_LOAD( "crt-209_pal16l8.bin", 0x200, 0x117, CRC(e916c56f) SHA1(1517091ff1791d923e5bd62d18d1428b6a3a8c72) ) // SC3339 20-pin 16L8 type PAL (inside CRT-209 module)
 ROM_END
 
 ROM_START( matchemg )
@@ -2829,8 +2869,9 @@ ROM_START( matchemg )
 	ROM_REGION( 0x0800, "crt209", 0 ) // contains Z80 program code to read inputs
 	ROM_LOAD( "crt-209_6221-55.cpu",  0x00000, 0x0800, CRC(2c22b3a8) SHA1(663e3b687d4f2adc34e421e23773f234ca35c629) )
 
-	ROM_REGION( 0x117, "plds", 0 )
-	ROM_LOAD( "dec003.u13", 0x000, 0x117, CRC(5b9a2fec) SHA1(c56c7bbe13028903cfc82440ee8b24df855134c2) ) // PAL16L8ANC - brute forced
+	ROM_REGION( 0x320, "plds", 0 )
+	ROM_LOAD( "dec003.u13",          0x000, 0x117, CRC(5b9a2fec) SHA1(c56c7bbe13028903cfc82440ee8b24df855134c2) ) // PAL16L8ANC - brute forced
+	ROM_LOAD( "crt-209_pal16l8.bin", 0x200, 0x117, CRC(e916c56f) SHA1(1517091ff1791d923e5bd62d18d1428b6a3a8c72) ) // SC3339 20-pin 16L8 type PAL (inside CRT-209 module)
 ROM_END
 
 ROM_START( couple ) // PCB is marked: "230188", bootleg of Match'em Up (6221-51 U5-0)
@@ -2904,83 +2945,89 @@ void merit_state::init_crt209()
 	}
 }
 
+void merit_quiz_state::init_dtrvwz5()
+{
+	init_key<6>();
+
+	init_crt209();
+}
+
 } // anonymous namespace
 
 
 // Gambling type games
 
-GAME( 1983, pitboss,    0,        pitboss, pitbossa,  merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (2214-07, U5-0A)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // "7" hand written over a 5
-GAME( 1983, pitbossa,   pitboss,  pitboss, pitbossa,  merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (2214-07, U5-0)",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // "7" hand written over a 4
-GAME( 1983, pitboss04,  pitboss,  casino5, pitboss,   merit_banked_state, empty_init,  ROT0,  "Merit", "The Pit Boss (2214-04)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, pitboss03,  pitboss,  pitboss, pitbossa,  merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (2214-03, U5-0C)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // Also M4A4
-GAME( 1983, pitboss03a, pitboss,  pitboss, pitbossa1, merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (2214-03, U5-1C)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // Also M4A4
-GAME( 1983, pitboss03b, pitboss,  pitboss, pitbossa,  merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (M4A4)",                MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // No labels, so use internal designation
-GAME( 1983, pitbossm4,  pitboss,  pitboss, pitbossb,  merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (M4A1)",                MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, pitbossps,  pitboss,  pitboss, pitbossa,  merit_state,        empty_init,  ROT0,  "Merit", "The Pit Boss (PSB1)",                MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, housecard,  pitboss,  pitboss, pitbossa,  merit_state,        empty_init,  ROT0,  "Merit", "House of Cards (HSC1)",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, mdchoice,   pitboss,  pitboss, mdchoice,  merit_state,        empty_init,  ROT0,  "Merit", "Dealer's Choice (E4A1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // Copyright year based on other Pit Boss sets
-GAME( 1983, mpchoice,   pitboss,  pitboss, mpchoice,  merit_state,        empty_init,  ROT0,  "Merit", "Player's Choice (M4C1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1982, mpchoicea,  pitboss,  pitboss, mpchoicea, merit_state,        empty_init,  ROT0,  "Merit", "Player's Choice (M3C1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, pitboss,    0,        pitboss, pitbossa,  merit_state,        empty_init,   ROT0,  "Merit", "The Pit Boss (2214-07, U5-0A)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // "7" hand written over a 5
+GAME( 1983, pitbossa,   pitboss,  pitboss, pitbossa,  merit_state,        empty_init,   ROT0,  "Merit", "The Pit Boss (2214-07, U5-0)",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // "7" hand written over a 4
+GAME( 1983, pitboss04,  pitboss,  casino5, pitboss,   merit_banked_state, empty_init,   ROT0,  "Merit", "The Pit Boss (2214-04)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, pitboss03,  pitboss,  pitboss, pitbossa,  merit_state,        empty_init,   ROT0,  "Merit", "The Pit Boss (2214-03, U5-0C)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // Also M4A4
+GAME( 1983, pitboss03a, pitboss,  pitboss, pitbossa1, merit_state,        empty_init,   ROT0,  "Merit", "The Pit Boss (2214-03, U5-1C)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // Also M4A4
+GAME( 1983, pitboss03b, pitboss,  pitboss, pitbossa,  merit_state,        empty_init,   ROT0,  "Merit", "The Pit Boss (M4A4)",                MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // No labels, so use internal designation
+GAME( 1983, pitbossm4,  pitboss,  pitboss, pitbossb,  merit_state,        empty_init,   ROT0,  "Merit", "The Pit Boss (M4A1)",                MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossps,  pitboss,  pitboss, pitbossa,  merit_state,        empty_init,   ROT0,  "Merit", "The Pit Boss (PSB1)",                MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, housecard,  pitboss,  pitboss, pitbossa,  merit_state,        empty_init,   ROT0,  "Merit", "House of Cards (HSC1)",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, mdchoice,   pitboss,  pitboss, mdchoice,  merit_state,        empty_init,   ROT0,  "Merit", "Dealer's Choice (E4A1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // Copyright year based on other Pit Boss sets
+GAME( 1983, mpchoice,   pitboss,  pitboss, mpchoice,  merit_state,        empty_init,   ROT0,  "Merit", "Player's Choice (M4C1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1982, mpchoicea,  pitboss,  pitboss, mpchoicea, merit_state,        empty_init,   ROT0,  "Merit", "Player's Choice (M3C1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1989, casino5,    0,        casino5, casino5,   merit_banked_state, empty_init,  ROT0,  "Merit", "Casino Five (3315-02, U5-2B)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1984, casino5a,   casino5,  casino5, casino5,   merit_banked_state, empty_init,  ROT0,  "Merit", "Casino Five (3315-02, U5-0)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1984, casino5b,   casino5,  casino5, casino5,   merit_banked_state, empty_init,  ROT0,  "Merit", "Casino Five (3315-12, U5-0)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, casino5,    0,        casino5, casino5,   merit_banked_state, empty_init,   ROT0,  "Merit", "Casino Five (3315-02, U5-2B)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, casino5a,   casino5,  casino5, casino5,   merit_banked_state, empty_init,   ROT0,  "Merit", "Casino Five (3315-02, U5-0)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, casino5b,   casino5,  casino5, casino5,   merit_banked_state, empty_init,   ROT0,  "Merit", "Casino Five (3315-12, U5-0)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, mroundup,   0,        pitboss, mroundup,  merit_state,        empty_init,  ROT0,  "Merit", "The Round Up",                       MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1984, mroundup,   0,        pitboss, mroundup,  merit_state,        empty_init,   ROT0,  "Merit", "The Round Up",                       MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
-GAME( 1984, chkndraw,   0,        pitboss, chkndraw,  merit_state,        empty_init,  ROT0,  "Merit", "Chicken Draw (2131-04, U5-1)",       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, chkndrawa,  chkndraw, pitboss, chkndraw,  merit_state,        empty_init,  ROT0,  "Merit", "Chicken Draw (2131-04, U5-0)",       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, chkndraw,   0,        pitboss, chkndraw,  merit_state,        empty_init,   ROT0,  "Merit", "Chicken Draw (2131-04, U5-1)",       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, chkndrawa,  chkndraw, pitboss, chkndraw,  merit_state,        empty_init,   ROT0,  "Merit", "Chicken Draw (2131-04, U5-0)",       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1987, riviera,    0,        riviera, riviera,   merit_state,        empty_init,  ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, rivieraa,   riviera,  riviera, riviera,   merit_state,        empty_init,  ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, rivierab,   riviera,  riviera, rivierab,  merit_state,        empty_init,  ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1990, mosdraw,    0,        mosdraw, mosdraw,   merit_state,        empty_init,  ROT0,  "Merit", "Montana Super Draw (4436-05, U5-0)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // needs printer and RTC hook up
+GAME( 1987, riviera,    0,        riviera, riviera,   merit_state,        empty_init,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivieraa,   riviera,  riviera, riviera,   merit_state,        empty_init,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivierab,   riviera,  riviera, rivierab,  merit_state,        empty_init,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, mosdraw,    0,        mosdraw, mosdraw,   merit_state,        empty_init,   ROT0,  "Merit", "Montana Super Draw (4436-05, U5-0)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // needs printer and RTC hook up
 
-GAME( 1986, bigappg,    0,        bigappg, bigappg,   merit_state,        empty_init,  ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1986, misdraw,    0,        misdraw, bigappg,   merit_state,        empty_init,  ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1990, iowapp,     0,        riviera, iowapp,    merit_state,        empty_init,  ROT0,  "Merit",                   "Iowa Premium Player (2131-21, U5-1)",   MACHINE_SUPPORTS_SAVE ) // Copyright year based on ROM label
+GAME( 1986, bigappg,    0,        bigappg, bigappg,   merit_state,        empty_init,   ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1986, misdraw,    0,        misdraw, bigappg,   merit_state,        empty_init,   ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, iowapp,     0,        riviera, iowapp,    merit_state,        empty_init,   ROT0,  "Merit",                   "Iowa Premium Player (2131-21, U5-1)",   MACHINE_SUPPORTS_SAVE ) // Copyright year based on ROM label
 
-GAME( 1986, dodgectya,  dodgecty, misdraw, dodge,     merit_state,        init_crt209, ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no text shown, while cards are
-GAME( 1986, dodgectyb,  dodgecty, misdraw, dodge,     merit_state,        init_crt209, ROT0,  "Merit", "Dodge City (2131-82, U5-50)",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // "
-GAME( 1986, dodgectyc,  dodgecty, misdraw, dodge,     merit_state,        init_crt209, ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // "
+GAME( 1988, dodgectya,  dodgecty, no_u40,  dodge,     merit_state,        init_crt209,  ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1989, dodgectyb,  dodgecty, no_u40,  dodge,     merit_state,        init_crt209,  ROT0,  "Merit", "Dodge City (2131-82, U5-50)",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1989, dodgectyc,  dodgecty, no_u40,  dodge,     merit_state,        init_crt209,  ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
-// Superstar is part of the title
-GAME( 1989, unkmerit,   0,        misdraw, bigappg,   merit_state,        empty_init,  ROT0,  "Merit", "unknown Merit game (4435-81, U5-1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // CRT-209 module not dumped - no text shown, while cards are
+GAME( 1989, msupstar,   0,        no_u40,  msupstar,  merit_state,        init_crt209,  ROT0,  "Merit", "Superstar (4435-81, U5-1)",          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_PRINTER )
 
 // Trivia and Word games
 
-GAME( 1985, trvwz,      0,        trvwhiz,  trivia,   merit_quiz_state,   empty_init,  ROT0,  "Merit", "Trivia ? Whiz (6221-00)",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwza,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_init,  ROT0,  "Merit", "Trivia ? Whiz (6221-00, with Sex trivia)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwzb,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_init,  ROT0,  "Merit", "Trivia ? Whiz (6221-00, Alt Gen trivia)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwzv,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_init,  ROT90, "Merit", "Trivia ? Whiz (6221-02, Vertical)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz,      0,        trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-00)",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwza,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-00, with Sex trivia)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwzb,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-00, Alt Gen trivia)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwzv,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT90, "Merit", "Trivia ? Whiz (6221-02, Vertical)",                        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, trvwz2,     0,        trvwhiz,  trivia,   merit_quiz_state,   init_key<2>, ROT90, "Merit", "Trivia ? Whiz (6221-05, Edition 2)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz2a,    trvwz2,   trvwhiz,  trivia,   merit_quiz_state,   init_key<2>, ROT90, "Merit", "Trivia ? Whiz (6221-05, Edition 2 Alt Sex trivia)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz2,     0,        trvwhiz,  trivia,   merit_quiz_state,   init_key<2>,  ROT90, "Merit", "Trivia ? Whiz (6221-05, Edition 2)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz2a,    trvwz2,   trvwhiz,  trivia,   merit_quiz_state,   init_key<2>,  ROT90, "Merit", "Trivia ? Whiz (6221-05, Edition 2 Alt Sex trivia)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, trvwz3,     0,        trvwhiz,  trivia,   merit_quiz_state,   empty_init,  ROT0,  "Merit", "Trivia ? Whiz (6221-05, U5-0D, Edition 3)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz3a,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,  ROT0,  "Merit", "Trivia ? Whiz (6221-05, U5-0C, Edition 3)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz3b,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,  ROT0,  "Merit", "Trivia ? Whiz (6221-05, Edition 3 Sex trivia III)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz3v,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,  ROT90, "Merit", "Trivia ? Whiz (6221-04, U5-0E, Edition 3 Vertical)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz3,     0,        trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-05, U5-0D, Edition 3)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz3a,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-05, U5-0C, Edition 3)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz3b,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-05, Edition 3 Sex trivia III)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz3v,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT90, "Merit", "Trivia ? Whiz (6221-04, U5-0E, Edition 3 Vertical)",       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, trvwz4,     0,        trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>, ROT0,  "Merit", "Trivia ? Whiz (6221-10, U5-0A, Edition 4)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz4v,    trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>, ROT90, "Merit", "Trivia ? Whiz (6221-13, U5-0B, Edition 4 Vertical)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz4va,   trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>, ROT90, "Merit", "Trivia ? Whiz (6221-13, U5-0B, Edition 4 Vertical Alt Sex trivia)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz4,     0,        trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT0,  "Merit", "Trivia ? Whiz (6221-10, U5-0A, Edition 4)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz4v,    trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT90, "Merit", "Trivia ? Whiz (6221-13, U5-0B, Edition 4 Vertical)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz4va,   trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT90, "Merit", "Trivia ? Whiz (6221-13, U5-0B, Edition 4 Vertical Alt Sex trivia)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, tictac,     0,        tictac,   tictac,   merit_quiz_state,   init_key<8>, ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C, 07/07/86)",                MACHINE_SUPPORTS_SAVE ) // all new trivia categories
-GAME( 1985, tictaca,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>, ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C, 02/11/86)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tictacv,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>, ROT90, "Merit", "Tic Tac Trivia (6221-22, U5-0 Vertical)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tictac,     0,        tictac,   tictac,   merit_quiz_state,   init_key<8>,  ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C, 07/07/86)",                MACHINE_SUPPORTS_SAVE ) // all new trivia categories
+GAME( 1985, tictaca,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>,  ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C, 02/11/86)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tictacv,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>,  ROT90, "Merit", "Tic Tac Trivia (6221-22, U5-0 Vertical)",                  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, phrcraze,   0,        phrcraze, phrcrazs, merit_quiz_state,   init_key<7>, ROT0,  "Merit", "Phraze Craze (6221-40, U5-3A Expanded Questions)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1986, phrcrazea,  phrcraze, phrcraze, phrcrazs, merit_quiz_state,   init_key<7>, ROT0,  "Merit", "Phraze Craze (6221-40, U5-3 Expanded Questions)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1986, phrcrazeb,  phrcraze, phrcraze, phrcraze, merit_quiz_state,   init_key<7>, ROT0,  "Merit", "Phraze Craze (6221-40, U5-0A)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1986, phrcrazec,  phrcraze, phrcraze, phrcraza, merit_quiz_state,   init_key<7>, ROT0,  "Merit", "Phraze Craze (6221-40, U5-0)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, phrcrazev,  phrcraze, phrcraze, phrcrazs, merit_quiz_state,   init_key<7>, ROT90, "Merit", "Phraze Craze (6221-45, U5-2 Vertical)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, phrcraze,   0,        phrcraze, phrcrazs, merit_quiz_state,   init_key<7>,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-3A Expanded Questions)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1986, phrcrazea,  phrcraze, phrcraze, phrcrazs, merit_quiz_state,   init_key<7>,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-3 Expanded Questions)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1986, phrcrazeb,  phrcraze, phrcraze, phrcraze, merit_quiz_state,   init_key<7>,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-0A)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, phrcrazec,  phrcraze, phrcraze, phrcraza, merit_quiz_state,   init_key<7>,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-0)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, phrcrazev,  phrcraze, phrcraze, phrcrazs, merit_quiz_state,   init_key<7>,  ROT90, "Merit", "Phraze Craze (6221-45, U5-2 Vertical)",                    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, dtrvwz5,   0,         dtrvwz5,  dtrvwh5,  merit_quiz_state,   init_key<6>, ROT0,  "Merit", "Deluxe Trivia ? Whiz (6221-70, U5-0A Edition 5)",          MACHINE_SUPPORTS_SAVE ) // CRT-209 module not dumped
-GAME( 1987, dtrvwz5v,  dtrvwz5,   dtrvwz5,  dtrvwh5,  merit_quiz_state,   init_key<6>, ROT90, "Merit", "Deluxe Trivia ? Whiz (6221-75, U5-0 Edition 5 Vertical)",  MACHINE_SUPPORTS_SAVE ) // CRT-209 module not dumped
+GAME( 1987, dtrvwz5,   0,         dtrvwz5,  dtrvwz5,  merit_quiz_state,   init_dtrvwz5, ROT0,  "Merit", "Deluxe Trivia ? Whiz (6221-70, U5-0A Edition 5)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, dtrvwz5v,  dtrvwz5,   dtrvwz5,  dtrvwz5,  merit_quiz_state,   init_dtrvwz5, ROT90, "Merit", "Deluxe Trivia ? Whiz (6221-75, U5-0 Edition 5 Vertical)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, matchem,   0,         couple,   matchem,  merit_state,        init_crt209, ROT0,  "Merit",   "Match'em Up (6221-51, U5-1)",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // in some levels the tiles' GFX are jumbled
-GAME( 1986, matchemg,  matchem,   couple,   matchemg, merit_state,        init_crt209, ROT0,  "Merit",   "Match'em Up (6221-55, U5-1 German)",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1988, couple,    matchem,   couple,   couple,   merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 1)",                                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1988, couplep,   matchem,   couple,   couplep,  merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 2)",                                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1988, couplei,   matchem,   couple,   couple,   merit_state,        init_crt209, ROT0,  "bootleg", "The Couples (set 3)",                                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1986, matchem,   0,         couple,   matchem,  merit_state,        init_crt209,  ROT0,  "Merit",   "Match'em Up (6221-51, U5-1)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, matchemg,  matchem,   couple,   matchemg, merit_state,        init_crt209,  ROT0,  "Merit",   "Match'em Up (6221-55, U5-1 German)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, couple,    matchem,   couple,   couple,   merit_state,        init_crt209,  ROT0,  "bootleg", "The Couples (set 1)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, couplep,   matchem,   couple,   couplep,  merit_state,        init_crt209,  ROT0,  "bootleg", "The Couples (set 2)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, couplei,   matchem,   couple,   couple,   merit_state,        init_crt209,  ROT0,  "bootleg", "The Couples (set 3)",                                    MACHINE_SUPPORTS_SAVE )

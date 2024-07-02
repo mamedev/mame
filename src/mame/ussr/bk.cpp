@@ -95,13 +95,16 @@ void bk_state::bk0010(machine_config &config)
 
 	K1801VP014(config, m_kbd, 0);
 	m_kbd->virq_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
-	m_kbd->keydown_wr_callback().set([this] (int state) {
-		m_sel1 |= SEL1_UPDATED;
-		if (state) m_sel1 &= ~SEL1_KEYDOWN; else m_sel1 |= SEL1_KEYDOWN;
-	});
-	m_kbd->halt_wr_callback().set([this] (int state) {
-		m_maincpu->set_input_line(t11_device::HLT_LINE, state);
-	});
+	m_kbd->keydown_wr_callback().set(
+			[this] (int state)
+			{
+				m_sel1 |= SEL1_UPDATED;
+				if (state)
+					m_sel1 &= ~SEL1_KEYDOWN;
+				else
+					m_sel1 |= SEL1_KEYDOWN;
+			});
+	m_kbd->halt_wr_callback().set_inputline(m_maincpu, t11_device::HLT_LINE);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

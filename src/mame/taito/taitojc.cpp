@@ -14,8 +14,9 @@ Taito custom chips on this hardware:
 - TC0870HVP      : Vertex processor?
 
 TODO:
-- games are running at wrong speed(unthrottled?) compared to pcb recordings, easily noticeable on sidebs/sidebs2,
-  for example the selection screens are too fast, and the driving is almost twice as slow
+- Games are running at wrong speed(unthrottled?) compared to pcb recordings, easily noticeable on sidebs/sidebs2,
+  for example the selection screens are too fast, and the driving is almost twice as slow. Even slower after
+  the m68k fpu/softfloat update since MAME 0.267.
 - dendego intro object RAM usage has various gfx bugs (check video file)
 - dendego title screen builds up and it shouldn't
 - dendego attract mode train doesn't ride, demo mode doesn't set the throttle, but it does set the brake pressure

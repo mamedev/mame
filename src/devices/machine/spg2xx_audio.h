@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "sound/okiadpcm.h"
+#include "sound/imaadpcm.h"
 #include "cpu/unsp/unsp.h"
 
 class spg2xx_audio_device : public device_t, public device_sound_interface
@@ -366,7 +366,7 @@ protected:
 	emu_timer *m_channel_irq[16];
 
 	sound_stream *m_stream;
-	oki_adpcm_state m_adpcm[16];
+	ima_adpcm_state m_adpcm[16];
 	adpcm36_state m_adpcm36_state[16];
 
 	static const uint32_t s_rampdown_frame_counts[8];

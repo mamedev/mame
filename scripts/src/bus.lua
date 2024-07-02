@@ -1488,6 +1488,8 @@ if (BUSES["HPDIO"]~=null) then
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98603b.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98620.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98620.h",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98624.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98624.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98643.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98643.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98644.cpp",
@@ -1895,6 +1897,32 @@ if (BUSES["JAKKS_GAMEKEY"]~=null) then
 		MAME_DIR .. "src/devices/bus/jakks_gamekey/slot.h",
 		MAME_DIR .. "src/devices/bus/jakks_gamekey/rom.cpp",
 		MAME_DIR .. "src/devices/bus/jakks_gamekey/rom.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/mpf1/slot.h,BUSES["MPF1"] = true
+---------------------------------------------------
+
+if (BUSES["MPF1"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/mpf1/slot.cpp",
+		MAME_DIR .. "src/devices/bus/mpf1/slot.h",
+		MAME_DIR .. "src/devices/bus/mpf1/epb.cpp",
+		MAME_DIR .. "src/devices/bus/mpf1/epb.h",
+		MAME_DIR .. "src/devices/bus/mpf1/iom.cpp",
+		MAME_DIR .. "src/devices/bus/mpf1/iom.h",
+		MAME_DIR .. "src/devices/bus/mpf1/prt.cpp",
+		MAME_DIR .. "src/devices/bus/mpf1/prt.h",
+		MAME_DIR .. "src/devices/bus/mpf1/sgb.cpp",
+		MAME_DIR .. "src/devices/bus/mpf1/sgb.h",
+		MAME_DIR .. "src/devices/bus/mpf1/ssb.cpp",
+		MAME_DIR .. "src/devices/bus/mpf1/ssb.h",
+		MAME_DIR .. "src/devices/bus/mpf1/tva.cpp",
+		MAME_DIR .. "src/devices/bus/mpf1/tva.h",
+		MAME_DIR .. "src/devices/bus/mpf1/vid.cpp",
+		MAME_DIR .. "src/devices/bus/mpf1/vid.h",
 	}
 end
 

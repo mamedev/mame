@@ -370,7 +370,7 @@ void msx2_state::cpc400(machine_config &config)
 	// FDC: mb8877a, 1 3.5" DS?DD drive
 	// 1 Cartridge slot
 	// 1 Expansion slot
-	// The check for an external kanji rom always fails; deliberately? expects other type of kanji extension? bad dump?
+	// The check for an external kanji ROM always fails; deliberately? Expects other type of kanji extension? Bad dump?
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 1, 1, 2, "hangul");

@@ -8091,6 +8091,7 @@ yosakdona:
 ballbomb:
 lupin3:
 @:maincpu,program,20dc,03,00,00
+@delay=0.25
 
 
 invrvnge:
@@ -18875,3 +18876,11 @@ gnw_dkjr:
 @:maincpu,data,11,6,0,0
 ; game A
 @:maincpu,data,51,6,0,0
+
+; --------------------------------
+; Tandy/Radio Shack Color Computer
+; --------------------------------
+
+;Zonx (The Rainbow)
+coco3,zonx:
+@:maincpu,program,3e57,5,0,0

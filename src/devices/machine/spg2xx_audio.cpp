@@ -1159,7 +1159,7 @@ bool spg2xx_audio_device::fetch_sample(const uint32_t channel)
 			if (get_adpcm36_bit(channel))
 				m_audio_regs[wave_data_reg] = decode_adpcm36_nybble(channel, adpcm_sample);
 			else
-				m_audio_regs[wave_data_reg] = (uint16_t)(m_adpcm[channel].clock(adpcm_sample) << 4) ^ 0x8000;
+				m_audio_regs[wave_data_reg] = (uint16_t)(m_adpcm[channel].clock(adpcm_sample)) ^ 0x8000;
 		}
 		m_sample_count[channel]++;
 	}

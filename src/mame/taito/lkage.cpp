@@ -135,7 +135,7 @@ public:
 		m_soundnmi(*this, "soundnmi")
 	{ }
 
-	void lkageb(machine_config &config);
+	void lkagebl(machine_config &config);
 	void lkage(machine_config &config);
 
 protected:
@@ -187,7 +187,7 @@ protected:
 	uint8_t m_tx_tile_bank = 0U;
 	int8_t m_sprite_dx[2] = { };
 
-	// lkageb fake MCU
+	// lkagebl fake MCU
 	uint8_t m_mcu_val = 0U;
 	uint8_t m_mcu_ready = 0; // CPU data/MCU ready status
 };
@@ -800,7 +800,7 @@ static INPUT_PORTS_START( lkage )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( lkageb )
+static INPUT_PORTS_START( lkagebl )
 	PORT_INCLUDE( lkage )
 
 	PORT_MODIFY("DSW1")
@@ -1036,7 +1036,7 @@ void lkagem_state::lkagem(machine_config &config)
 	TA7630(config, m_ta7630);
 }
 
-void lkage_state::lkageb(machine_config &config)
+void lkage_state::lkagebl(machine_config &config)
 {
 	lkage(config);
 
@@ -1081,7 +1081,7 @@ ROM_START( lkage )
 	ROM_LOAD( "pal16l8a-a54-14.35", 0x0600, 0x0104, CRC(a89c644e) SHA1(b41a077d1d070d9563f924c776930c33a4ff27d0) )
 ROM_END
 
-ROM_START( lkageo )
+ROM_START( lkagea )
 	ROM_REGION( 0x14000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "a54-01-1.37", 0x0000, 0x8000, CRC(973da9c5) SHA1(ad3b5d6a329b784e47be563c6f8dc628f32ba0a5) )
 	ROM_LOAD( "a54-02-1.38", 0x8000, 0x8000, CRC(27b509da) SHA1(c623950bd7dd2b5699ca948e3731455964106b89) )
@@ -1111,7 +1111,7 @@ ROM_START( lkageo )
 	ROM_LOAD( "pal16l8a-a54-14.35", 0x0600, 0x0104, CRC(a89c644e) SHA1(b41a077d1d070d9563f924c776930c33a4ff27d0) )
 ROM_END
 
-ROM_START( lkageo2 )
+ROM_START( lkageb )
 	ROM_REGION( 0x14000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "a54-01.37", 0x0000, 0x8000, CRC(34eab2c5) SHA1(25bf2dc80d21aa68c3af5debf10b24c75d83a738) )
 	ROM_LOAD( "a54-02.38", 0x8000, 0x8000, CRC(ea471d8a) SHA1(1ffc7f78e3e983e16a23e97019f7030f9846569b) )
@@ -1168,7 +1168,7 @@ ROM_START( lkagem )
 	ROM_LOAD( "a51_14",   0x0000, 0x4000, CRC(493e76d8) SHA1(13c6160edd94ba2801fd89bb33bcae3a1e3454ff) )
 ROM_END
 
-ROM_START( lkageb )
+ROM_START( lkagebl1 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "ic37_1",      0x0000, 0x8000, CRC(05694f7b) SHA1(08a3796d6cf04d64db52ed8208a51084c420e10a) )
 	ROM_LOAD( "ic38_2",      0x8000, 0x8000, CRC(22efe29e) SHA1(f7a29d54081ca7509e822ad8823ec977bccc4a40) )
@@ -1189,7 +1189,7 @@ ROM_START( lkageb )
 	ROM_LOAD( "a54-10.2",    0x0000, 0x0200, CRC(17dfbd14) SHA1(f8f0b6dfedd4ba108dad43ccc7697ef4ab9cbf86) ) // unknown
 ROM_END
 
-ROM_START( lkageb2 )
+ROM_START( lkagebl2 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "lok.a",       0x0000, 0x8000, CRC(866df793) SHA1(44a9a773d7bbfc5f9d53f56682438ef8b23ecbd6) )
 	ROM_LOAD( "lok.b",       0x8000, 0x8000, CRC(fba9400f) SHA1(fedcb9b717feaeec31afda098f0ac2744df6c7be) )
@@ -1210,7 +1210,7 @@ ROM_START( lkageb2 )
 	ROM_LOAD( "a54-10.2",    0x0000, 0x0200, CRC(17dfbd14) SHA1(f8f0b6dfedd4ba108dad43ccc7697ef4ab9cbf86) ) // unknown
 ROM_END
 
-ROM_START( lkageb3 )
+ROM_START( lkagebl3 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "z1.bin",      0x0000, 0x8000, CRC(60cac488) SHA1(b61df14159f37143b1faed22d77fc7be31602022) )
 	ROM_LOAD( "z2.bin",      0x8000, 0x8000, CRC(22c95f17) SHA1(8ca438d508a36918778651adf599cf45a7c4a5d7) )
@@ -1231,7 +1231,7 @@ ROM_START( lkageb3 )
 	ROM_LOAD( "a54-10.2",    0x0000, 0x0200, CRC(17dfbd14) SHA1(f8f0b6dfedd4ba108dad43ccc7697ef4ab9cbf86) ) // unknown
 ROM_END
 
-ROM_START( lkageb4 )
+ROM_START( lkagebl4 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.ic37",      0x0000, 0x8000, CRC(fa20e863) SHA1(0edba6014e8d7cdd7f6ad1bb5eb65338a3a91243) )
 	ROM_LOAD( "2.ic38",      0x8000, 0x8000, CRC(a5bdd3b4) SHA1(4f691ea8b75fae0dd92f827998e97e40791d24b2) )
@@ -1372,14 +1372,14 @@ ROM_END
     Game drivers
 *******************************************************************************/
 
-//    YEAR  NAME     PARENT MACHINE  INPUT   CLASS         INIT        SCREEN COMPANY              FULLNAME                              FLAGS
-GAME( 1984, lkage,   0,     lkage,   lkage,  lkage_state,  empty_init, ROT0,  "Taito Corporation", "The Legend of Kage",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageo,  lkage, lkage,   lkage,  lkage_state,  empty_init, ROT0,  "Taito Corporation", "The Legend of Kage (older)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageo2, lkage, lkage,   lkage,  lkage_state,  empty_init, ROT0,  "Taito Corporation", "The Legend of Kage (oldest)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkagem,  lkage, lkagem,  lkage,  lkagem_state, empty_init, ROT0,  "Taito Corporation", "The Legend of Kage (MSM5232 sound)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb,  lkage, lkageb,  lkageb, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb2, lkage, lkageb,  lkageb, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb3, lkage, lkageb,  lkageb, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb4, lkage, lkageb,  lkageb, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 4)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT MACHINE  INPUT    CLASS         INIT        SCREEN COMPANY              FULLNAME                              FLAGS
+GAME( 1984, lkage,    0,     lkage,   lkage,   lkage_state,  empty_init, ROT0,  "Taito Corporation", "The Legend of Kage (rev 2)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkagea,   lkage, lkage,   lkage,   lkage_state,  empty_init, ROT0,  "Taito Corporation", "The Legend of Kage (rev 1)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb,   lkage, lkage,   lkage,   lkage_state,  empty_init, ROT0,  "Taito Corporation", "The Legend of Kage",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkagem,   lkage, lkagem,  lkage,   lkagem_state, empty_init, ROT0,  "Taito Corporation", "The Legend of Kage (rev 2, MSM5232 sound)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkagebl1, lkage, lkagebl, lkagebl, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkagebl2, lkage, lkagebl, lkagebl, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkagebl3, lkage, lkagebl, lkagebl, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 3)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkagebl4, lkage, lkagebl, lkagebl, lkage_state,  empty_init, ROT0,  "bootleg",           "The Legend of Kage (bootleg set 4)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, bygone,  0,     lkage,   bygone, lkage_state,  empty_init, ROT0,  "Taito Corporation", "Bygone (prototype)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bygone,   0,     lkage,   bygone,  lkage_state,  empty_init, ROT0,  "Taito Corporation", "Bygone (prototype)",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
