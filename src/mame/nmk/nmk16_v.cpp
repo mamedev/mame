@@ -106,6 +106,9 @@ VIDEO_START_MEMBER(nmk16_state, bioship)
 	video_init();
 	m_bioship_background_bank=0;
 	save_item(NAME(m_bioship_background_bank));
+	m_bg_tilemap[0]->set_scrolldx(92, 92);
+	m_bg_tilemap[1]->set_scrolldx(92, 92);
+	m_tx_tilemap->set_scrolldx(92, 92);
 }
 
 VIDEO_START_MEMBER(nmk16_state,macross)
@@ -117,6 +120,8 @@ VIDEO_START_MEMBER(nmk16_state,macross)
 	m_tx_tilemap->set_transparent_pen(15);
 
 	video_init();
+	m_bg_tilemap[0]->set_scrolldx(92, 92);
+	m_tx_tilemap->set_scrolldx(92, 92);
 }
 
 VIDEO_START_MEMBER(nmk16_state,strahl)
@@ -126,6 +131,7 @@ VIDEO_START_MEMBER(nmk16_state,strahl)
 	m_bg_tilemap[1]->set_transparent_pen(15);
 
 	m_sprdma_base = 0xf000;
+	m_bg_tilemap[1]->set_scrolldx(92, 92);
 }
 
 VIDEO_START_MEMBER(nmk16_state,macross2)
@@ -138,8 +144,8 @@ VIDEO_START_MEMBER(nmk16_state,macross2)
 
 	video_init();
 	// 384x224 screen, leftmost 64 pixels have to be retrieved from the other side of the tilemap (!)
-	m_bg_tilemap[0]->set_scrolldx(64,64);
-	m_tx_tilemap->set_scrolldx(64,64);
+	m_bg_tilemap[0]->set_scrolldx(28+64, 28+64);
+	m_tx_tilemap->set_scrolldx(28+64, 28+64);
 }
 
 VIDEO_START_MEMBER(nmk16_state,gunnail)
@@ -155,7 +161,7 @@ VIDEO_START_MEMBER(nmk16_state, bjtwin)
 
 	video_init();
 	// 384x224 screen, leftmost 64 pixels have to be retrieved from the other side of the tilemap (!)
-	m_bg_tilemap[0]->set_scrolldx(64,64);
+	m_bg_tilemap[0]->set_scrolldx(28+64, 28+64);
 }
 
 void nmk16_state::mustang_scroll_w(u16 data)
@@ -224,6 +230,12 @@ void nmk16_state::flipscreen_w(u8 data)
 {
 	flip_screen_set(data & 0x01);
 	m_spritegen->set_flip_screen(flip_screen());
+}
+
+// vandyke writes a 0 value when flip screen is enabled, contrary to rest of games that write 1
+void nmk16_state::vandyke_flipscreen_w(u8 data)
+{
+	flipscreen_w(~data);
 }
 
 void nmk16_state::tilebank_w(u8 data)
@@ -416,6 +428,8 @@ VIDEO_START_MEMBER(afega_state,grdnstrm)
 	m_tx_tilemap->set_transparent_pen(15);
 
 	video_init();
+	m_bg_tilemap[0]->set_scrolldx(92, 92);
+	m_tx_tilemap->set_scrolldx(92, 92);
 }
 
 

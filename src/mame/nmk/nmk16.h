@@ -95,6 +95,7 @@ protected:
 
 	void txvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void flipscreen_w(u8 data);
+	void vandyke_flipscreen_w(u8 data);
 	void tilebank_w(u8 data);
 
 	void macross2_sound_bank_w(u8 data);

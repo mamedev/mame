@@ -403,6 +403,7 @@ void nmk16_state::vandyke_map(address_map &map)
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
 	map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
+	map(0x080015, 0x080015).w(FUNC(nmk16_state::vandyke_flipscreen_w));
 	map(0x080016, 0x080017).w(FUNC(nmk16_state::nmk004_x0016_w));
 	map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
@@ -423,6 +424,7 @@ void nmk16_state::vandykeb_map(address_map &map)
 	map(0x08000a, 0x08000b).portr("DSW2");
 //  map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
 	map(0x080010, 0x08001d).w(FUNC(nmk16_state::vandykeb_scroll_w)); // 10, 12, 1a, 1c
+	map(0x080015, 0x080015).w(FUNC(nmk16_state::vandyke_flipscreen_w));
 	map(0x080016, 0x080017).nopw();    // IRQ enable?
 	map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
 //  map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
@@ -656,7 +658,7 @@ void nmk16_state::bioship_map(address_map &map)
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
 	map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
-//  map(0xc0015, 0xc0015).w(FUNC(nmk16_state::flipscreen_w));
+	map(0x080015, 0x080015).w(FUNC(nmk16_state::flipscreen_w));
 	map(0x080016, 0x080017).w(FUNC(nmk16_state::nmk004_bioship_x0016_w));
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x084001, 0x084001).w(FUNC(nmk16_state::bioship_bank_w));
@@ -3814,17 +3816,20 @@ LV4         LV2 LV1        LV1
 
  CPU is stopped during DMA
 
+ - 1 line   = 1 / (6MHz / 384 px) =    64 usec
+ - 1 frame  = 278 lines * 64 usec = 17792 usec
+ - VBlank   =  54 lines * 64 usec =  3456 usec
+ - Active   = 224 lines * 64 usec = 14336 usec
+ - IRQ1 gap = 128 lines * 64 usec =  8192 usec
  */
 
-// todo:total scanlines is 263, adjust according to that!
-// todo: replace with raw screen timings
 TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 {
-	const int NUM_SCANLINES = 256;
-	const int IRQ1_SCANLINE = 25; // guess
-	const int VBIN_SCANLINE = 0;
-	const int VBOUT_SCANLINE = 240;
-	const int SPRDMA_SCANLINE = 241; // 256 USEC after VBOUT
+	const int VBIN_SCANLINE = 16;
+	const int VBOUT_SCANLINE = VBIN_SCANLINE + 224;    // VBIN + 224 lines high of active video
+	const int SPRDMA_SCANLINE = VBOUT_SCANLINE + 4;    // 256 usec after VBOUT = 4 lines (each line is 64 USEC)
+	const int IRQ1_SCANLINE_1 = VBIN_SCANLINE + 52;    // 52 lines after VBIN and 68 from the start of frame
+	const int IRQ1_SCANLINE_2 = IRQ1_SCANLINE_1 + 128; // 128 lines after IRQ1_SCANLINE_1
 
 	int scanline = param;
 
@@ -3839,12 +3844,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 	if (scanline == VBIN_SCANLINE)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	// time from IRQ2 to first IRQ1 fire. is not stated, 25 is a guess
-	if (scanline == IRQ1_SCANLINE)
+	// time from IRQ2 to first IRQ1 fire
+	if (scanline == IRQ1_SCANLINE_1)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
-	// 8.9ms from first IRQ1 to second IRQ1 fire. approx 128 lines (half frame time)
-	if (scanline == IRQ1_SCANLINE+(NUM_SCANLINES/2)) // if this happens too late bioship sprites will glitch on the left edge
+	// 8.192ms from first IRQ1 to second IRQ1 fire. 128 lines
+	if (scanline == IRQ1_SCANLINE_2) // if this happens too late bioship sprites will glitch on the left edge
 		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
@@ -3864,32 +3869,25 @@ void nmk16_state::set_hacky_interrupt_timing(machine_config &config)
 void nmk16_state::set_hacky_screen_lowres(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	//m_screen->set_raw(XTAL(12'000'000)/2, 384, 0, 256, 278, 16, 240); // confirmed
-	m_screen->set_refresh_hz(56.18);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3450));
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(XTAL(12'000'000)/2, 384, 92, 348, 278, 16, 240); // confirmed
 	m_screen->set_palette(m_palette);
 
 	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(12'000'000)/2);
-	m_spritegen->set_screen_size(384, 256);
+	m_spritegen->set_screen_size(92+348, 16+240);
 	m_spritegen->set_max_sprite_clock(384 * 263); // from hardware manual
+	m_spritegen->set_videoshift(92);
 }
 
 void nmk16_state::set_hacky_screen_hires(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	//m_screen->set_raw(XTAL(16'000'000)/2, 512, 0, 384, 278, 16, 240); // confirmed
-	m_screen->set_refresh_hz(56.18);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3450));
-	m_screen->set_size(512, 256);
-	m_screen->set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(XTAL(16'000'000)/2, 512, 28, 412, 278, 16, 240); // confirmed
 	m_screen->set_palette(m_palette);
 
 	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(16'000'000)/2);
-	m_spritegen->set_screen_size(384, 256);
-	m_spritegen->set_max_sprite_clock(512 * 263); // not verified?
-	m_spritegen->set_videoshift(64);
+	m_spritegen->set_screen_size(28+412, 16+240);
+	m_spritegen->set_max_sprite_clock(384 * 263); // not verified?
+	m_spritegen->set_videoshift(28+64);
 }
 
 // OSC : 10MHz, 12MHz, 4MHz, 4.9152MHz
@@ -9112,8 +9110,8 @@ ROM_END
 ***************************************************************************/
 
 
-GAME( 1989, tharrier,   0,        tharrier,     tharrier,     nmk16_state,        init_tharrier,        ROT270, "UPL",                          "Task Force Harrier", 0 )
-GAME( 1989, tharrieru,  tharrier, tharrier,     tharrier,     nmk16_state,        init_tharrier,        ROT270, "UPL (American Sammy license)", "Task Force Harrier (US)", 0 ) // US version but no regional notice
+GAME( 1989, tharrier,   0,        tharrier,     tharrier,     nmk16_state,        init_tharrier,        ROT270, "UPL",                          "Task Force Harrier", MACHINE_NO_COCKTAIL )
+GAME( 1989, tharrieru,  tharrier, tharrier,     tharrier,     nmk16_state,        init_tharrier,        ROT270, "UPL (American Sammy license)", "Task Force Harrier (US)", MACHINE_NO_COCKTAIL ) // US version but no regional notice
 
 GAME( 1990, mustang,    0,        mustang,      mustang,      nmk16_state,        empty_init,           ROT0,   "UPL",                          "US AAF Mustang (25th May. 1990)", 0 )
 GAME( 1990, mustangs,   mustang,  mustang,      mustang,      nmk16_state,        empty_init,           ROT0,   "UPL (Seoul Trading license)",  "US AAF Mustang (25th May. 1990 / Seoul Trading)", 0 )
@@ -9124,7 +9122,7 @@ GAME( 1990, sbsgomo,    bioship,  bioship,      bioship,      nmk16_state,      
 GAME( 1990, vandyke,    0,        vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL",                          "Vandyke (Japan)", 0 )
 GAME( 1990, vandykejal, vandyke,  vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 1)", 0 )
 GAME( 1990, vandykejal2,vandyke,  vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 2)", 0 )
-GAME( 1990, vandykeb,   vandyke,  vandykeb,     vandykeb,     nmk16_state,        init_vandykeb,        ROT270, "bootleg",                      "Vandyke (bootleg with PIC16c57)",  MACHINE_NO_SOUND )
+GAME( 1990, vandykeb,   vandyke,  vandykeb,     vandykeb,     nmk16_state,        init_vandykeb,        ROT270, "bootleg",                      "Vandyke (bootleg with PIC16c57)", MACHINE_NO_SOUND )
 
 GAME( 1991, blkheart,   0,        blkheart,     blkheart,     nmk16_state,        empty_init,           ROT0,   "UPL",                          "Black Heart", 0 )
 GAME( 1991, blkheartj,  blkheart, blkheart,     blkheart,     nmk16_state,        empty_init,           ROT0,   "UPL",                          "Black Heart (Japan)", 0 )
@@ -9149,32 +9147,32 @@ GAME( 1993, gunnail,    0,        gunnail_prot, gunnail,      macross_prot_state
 GAME( 1992, gunnailp,   gunnail,  gunnail_prot, gunnail,      macross_prot_state, empty_init,           ROT270, "NMK",                          "GunNail (location test)", 0 ) // still has the 28th May. 1992 string, so unlikely that was the release date for either version.
 // a 1992 version of Gunnail exists, see https://www.youtube.com/watch?v=tf15Wz0zUiA  3:10; is this bootleg version 'gunnailb'?
 
-GAME( 1993, macross2,   0,        macross2,     macross2,     nmk16_state,        init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", MACHINE_NO_COCKTAIL )
-GAME( 1993, macross2g,  macross2, macross2,     macross2,     nmk16_state,        init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II (Gamest review build)", MACHINE_NO_COCKTAIL ) // Service switch pauses game
-GAME( 1993, macross2k,  macross2, macross2,     macross2,     nmk16_state,        init_banked_audiocpu, ROT0,   "Banpresto",                    "Macross II (Korea)", MACHINE_NO_COCKTAIL ) // Title screen only shows Macross II
+GAME( 1993, macross2,   0,        macross2,     macross2,     nmk16_state,        init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", 0 )
+GAME( 1993, macross2g,  macross2, macross2,     macross2,     nmk16_state,        init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II (Gamest review build)", 0 ) // Service switch pauses game
+GAME( 1993, macross2k,  macross2, macross2,     macross2,     nmk16_state,        init_banked_audiocpu, ROT0,   "Banpresto",                    "Macross II (Korea)", 0 ) // Title screen only shows Macross II
 
-GAME( 1993, tdragon2,   0,        tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", MACHINE_NO_COCKTAIL )
-GAME( 1993, tdragon2a,  tdragon2, tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bigbang,    tdragon2, tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993, set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bigbanga,   tdragon2, tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993, set 2)", MACHINE_NO_COCKTAIL )
-GAME( 1996, tdragon3h,  tdragon2, tdragon3h,    tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "bootleg (Conny Co Ltd.)",      "Thunder Dragon 3 (bootleg of Thunder Dragon 2)", MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL ) // based on 1st Oct. 1993 set, needs emulation of the mechanism used to simulate the missing YM2203' IRQs
+GAME( 1993, tdragon2,   0,        tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", 0 )
+GAME( 1993, tdragon2a,  tdragon2, tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", 0 )
+GAME( 1993, bigbang,    tdragon2, tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993, set 1)", 0 )
+GAME( 1993, bigbanga,   tdragon2, tdragon2,     tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993, set 2)", 0 )
+GAME( 1996, tdragon3h,  tdragon2, tdragon3h,    tdragon2,     nmk16_state,        init_banked_audiocpu, ROT270, "bootleg (Conny Co Ltd.)",      "Thunder Dragon 3 (bootleg of Thunder Dragon 2)", MACHINE_NO_SOUND | 0 ) // based on 1st Oct. 1993 set, needs emulation of the mechanism used to simulate the missing YM2203' IRQs
 
 GAME( 1994, arcadian,   0,        raphero,      raphero,      nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Arcadia (NMK)", 0 ) // 23rd July 1993 in test mode, (c)1994 on title screen
 GAME( 1994, raphero,    arcadian, raphero,      raphero,      nmk16_state,        init_banked_audiocpu, ROT270, "NMK",                          "Rapid Hero (NMK)", 0 )           // ^^
 GAME( 1994, rapheroa,   arcadian, raphero,      raphero,      nmk16_state,        init_banked_audiocpu, ROT270, "NMK (Media Trading license)",  "Rapid Hero (Media Trading)", 0 ) // ^^ - note that all ROM sets have Media Trading(aka Media Shoji) in the tile graphics, but this is the only set that shows it on the titlescreen
 
 // both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate
-GAME( 1992, sabotenb,   0,        bjtwin_prot, sabotenb,      macross_prot_state, empty_init,           ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1992, sabotenba,  sabotenb, bjtwin_prot, sabotenb,      macross_prot_state, empty_init,           ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", MACHINE_NO_COCKTAIL )
-GAME( 1992, cactus,     sabotenb, bjtwin,      sabotenb,      nmk16_state,        init_nmk,             ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", MACHINE_NO_COCKTAIL ) // PCB marked 'Cactus', no title screen
+GAME( 1992, sabotenb,   0,        bjtwin_prot, sabotenb,      macross_prot_state, empty_init,           ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", 0 )
+GAME( 1992, sabotenba,  sabotenb, bjtwin_prot, sabotenb,      macross_prot_state, empty_init,           ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", 0 )
+GAME( 1992, cactus,     sabotenb, bjtwin,      sabotenb,      nmk16_state,        init_nmk,             ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", 0 ) // PCB marked 'Cactus', no title screen
 
-GAME( 1993, bjtwin,     0,        bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bjtwina,    bjtwin,   bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (set 2)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bjtwinp,    bjtwin,   bjtwin,      bjtwin,        nmk16_state,        empty_init,           ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 1)", MACHINE_NO_COCKTAIL ) // Cheap looking PCB, but Genuine NMK PCB, GFX aren't encrypted (maybe Korean version not proto?)
-GAME( 1993, bjtwinpa,   bjtwin,   bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 2)", MACHINE_NO_COCKTAIL ) // same PCB as above, different program revision, GFX are encrypted
+GAME( 1993, bjtwin,     0,        bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (set 1)", 0 )
+GAME( 1993, bjtwina,    bjtwin,   bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (set 2)", 0 )
+GAME( 1993, bjtwinp,    bjtwin,   bjtwin,      bjtwin,        nmk16_state,        empty_init,           ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 1)", 0 ) // Cheap looking PCB, but Genuine NMK PCB, GFX aren't encrypted (maybe Korean version not proto?)
+GAME( 1993, bjtwinpa,   bjtwin,   bjtwin_prot, bjtwin,        macross_prot_state, empty_init,           ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 2)", 0 ) // same PCB as above, different program revision, GFX are encrypted
 
-GAME( 1995, nouryoku,   0,        bjtwin_prot, nouryoku,      macross_prot_state, empty_init,           ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai", MACHINE_NO_COCKTAIL )
-GAME( 1995, nouryokup,  nouryoku, bjtwin,      nouryoku,      nmk16_state,        empty_init,           ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai (prototype)", MACHINE_NO_COCKTAIL ) // GFX aren't encrypted
+GAME( 1995, nouryoku,   0,        bjtwin_prot, nouryoku,      macross_prot_state, empty_init,           ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai", 0 )
+GAME( 1995, nouryokup,  nouryoku, bjtwin,      nouryoku,      nmk16_state,        empty_init,           ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai (prototype)", 0 ) // GFX aren't encrypted
 
 // Non NMK boards
 
@@ -9203,10 +9201,10 @@ GAME( 1991, tdragonb2,  tdragon,  tdragonb2,    tdragon,      nmk16_state, empty
 GAME( 1992, gunnailb,   gunnail,  gunnailb,     gunnail,      nmk16_state, init_gunnailb,        ROT270, "bootleg",                      "GunNail (bootleg)", MACHINE_IMPERFECT_SOUND ) // crappy sound, unknown how much of it is incomplete emulation and how much bootleg quality
 
 // these are from Comad, based on the Thunder Dragon code?
-GAME( 1992, ssmissin,   0,        ssmissin,     ssmissin,     nmk16_state, init_ssmissin,        ROT270, "Comad",                         "S.S. Mission", MACHINE_NO_COCKTAIL )
+GAME( 1992, ssmissin,   0,        ssmissin,     ssmissin,     nmk16_state, init_ssmissin,        ROT270, "Comad",                         "S.S. Mission", 0 )
 
-GAME( 1996, airattck,   0,        ssmissin,     airattck,     nmk16_state, init_ssmissin,        ROT270, "Comad",                         "Air Attack (set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1996, airattcka,  airattck, ssmissin,     airattck,     nmk16_state, init_ssmissin,        ROT270, "Comad",                         "Air Attack (set 2)", MACHINE_NO_COCKTAIL )
+GAME( 1996, airattck,   0,        ssmissin,     airattck,     nmk16_state, init_ssmissin,        ROT270, "Comad",                         "Air Attack (set 1)", 0 )
+GAME( 1996, airattcka,  airattck, ssmissin,     airattck,     nmk16_state, init_ssmissin,        ROT270, "Comad",                         "Air Attack (set 2)", 0 )
 
 // afega & clones
 GAME( 1995, twinactn,   0,        twinactn,     twinactn,     nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Twin Action", 0 ) // hacked from USSAF Mustang
@@ -9214,7 +9212,7 @@ GAME( 1995, twinactn,   0,        twinactn,     twinactn,     nmk16_state, init_
 GAME( 1995, dolmen,     0,        twinactn,     dolmen,       nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Dolmen", 0 )
 GAME( 1995, dolmenk,    dolmen,   twinactn,     dolmenk,      nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Goindol (Afega)", 0 )
 
-GAME( 1998, stagger1,   0,        stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Stagger I (Japan)", 0 )
+GAME( 1998, stagger1,   0,        stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Stagger I (Japan)", 0 ) // flip-screen doesn't work on sprites for all sets
 GAME( 1997, redhawk,    stagger1, stagger1,     stagger1,     afega_state, init_redhawk,         ROT270,             "Afega (New Vision Ent. license)",   "Red Hawk (USA, Canada & South America)", 0 )
 GAME( 1997, redhawki,   stagger1, redhawki,     stagger1,     afega_state, init_redhawki,        ROT0,               "Afega (Hae Dong Corp license)",     "Red Hawk (horizontal, Italy)", 0 ) // bootleg? strange scroll regs
 GAME( 1997, redhawks,   stagger1, redhawki,     stagger1,     afega_state, empty_init,           ROT0,               "Afega (Hae Dong Corp license)",     "Red Hawk (horizontal, Spain, set 1)", 0 )
@@ -9224,7 +9222,7 @@ GAME( 1997, redhawke,   stagger1, stagger1,     stagger1,     afega_state, empty
 GAME( 1997, redhawkk,   stagger1, stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Red Hawk (Korea)", 0 )
 GAME( 1997, redhawkb,   stagger1, redhawkb,     redhawkb,     afega_state, empty_init,           ROT0,               "bootleg (Vince)",                   "Red Hawk (horizontal, bootleg)", 0 )
 
-GAME( 1998, grdnstrm,   0,        grdnstrm,     grdnstrm,     afega_state, empty_init,           ORIENTATION_FLIP_Y, "Afega (Apples Industries license)", "Guardian Storm (horizontal, not encrypted)", 0 )
+GAME( 1998, grdnstrm,   0,        grdnstrm,     grdnstrm,     afega_state, empty_init,           ORIENTATION_FLIP_Y, "Afega (Apples Industries license)", "Guardian Storm (horizontal, not encrypted)", 0 ) // flip-screen doesn't work on sprites for all sets
 GAME( 1998, grdnstrmv,  grdnstrm, grdnstrmk,    grdnstrk,     afega_state, init_grdnstrm,        ROT270,             "Afega (Apples Industries license)", "Guardian Storm (vertical)", 0 )
 GAME( 1998, grdnstrmj,  grdnstrm, grdnstrmk,    grdnstrk,     afega_state, init_grdnstrmg,       ROT270,             "Afega",                             "Sen Jing - Guardian Storm (Japan)", 0 )
 GAME( 1998, grdnstrmk,  grdnstrm, grdnstrmk,    grdnstrk,     afega_state, init_grdnstrm,        ROT270,             "Afega",                             "Jeon Sin - Guardian Storm (Korea)", 0 )
