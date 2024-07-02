@@ -14,7 +14,8 @@ pages; and multiple pieces of rom/ram/components can occur in a single slot.
 #include "slot.h"
 
 msx_internal_slot_interface::msx_internal_slot_interface(const machine_config &mconfig, device_t &device)
-	: m_mem_space(device, finder_base::DUMMY_TAG, -1)
+	: device_interface(device, "msx_internal_slot")
+	, m_mem_space(device, finder_base::DUMMY_TAG, -1)
 	, m_io_space(device, finder_base::DUMMY_TAG, -1)
 	, m_maincpu(device, finder_base::DUMMY_TAG)
 	, m_start_address(0)

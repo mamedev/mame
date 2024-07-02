@@ -27,15 +27,14 @@ TODO:
 
 #include "z80.inc"
 
-static bool tables_initialised = false;
-std::unique_ptr<u8[]> z80_device::SZ = std::make_unique<u8[]>(0x100);       // zero and sign flags
-std::unique_ptr<u8[]> z80_device::SZ_BIT = std::make_unique<u8[]>(0x100);   // zero, sign and parity/overflow (=zero) flags for BIT opcode
-std::unique_ptr<u8[]> z80_device::SZP = std::make_unique<u8[]>(0x100);      // zero, sign and parity flags
-std::unique_ptr<u8[]> z80_device::SZHV_inc = std::make_unique<u8[]>(0x100); // zero, sign, half carry and overflow flags INC r8
-std::unique_ptr<u8[]> z80_device::SZHV_dec = std::make_unique<u8[]>(0x100); // zero, sign, half carry and overflow flags DEC r8
-
-std::unique_ptr<u8[]> z80_device::SZHVC_add = std::make_unique<u8[]>(2 * 0x100 * 0x100);
-std::unique_ptr<u8[]> z80_device::SZHVC_sub = std::make_unique<u8[]>(2 * 0x100 * 0x100);
+bool z80_device::tables_initialised = false;
+u8 z80_device::SZ[] = {};       // zero and sign flags
+u8 z80_device::SZ_BIT[] = {};   // zero, sign and parity/overflow (=zero) flags for BIT opcode
+u8 z80_device::SZP[] = {};      // zero, sign and parity flags
+u8 z80_device::SZHV_inc[] = {}; // zero, sign, half carry and overflow flags INC r8
+u8 z80_device::SZHV_dec[] = {}; // zero, sign, half carry and overflow flags DEC r8
+u8 z80_device::SZHVC_add[] = {};
+u8 z80_device::SZHVC_sub[] = {};
 
 
 /***************************************************************
@@ -501,36 +500,36 @@ void z80_device::device_start()
 				int val = newval - oldval;
 				*padd = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
 				*padd |= (newval & (YF | XF));  // undocumented flag bits 5+3
-				if( (newval & 0x0f) < (oldval & 0x0f) ) *padd |= HF;
-				if( newval < oldval ) *padd |= CF;
-				if( (val^oldval^0x80) & (val^newval) & 0x80 ) *padd |= VF;
+				if ((newval & 0x0f) < (oldval & 0x0f)) *padd |= HF;
+				if (newval < oldval) *padd |= CF;
+				if ((val^oldval^0x80) & (val^newval) & 0x80) *padd |= VF;
 				padd++;
 
 				// adc with carry set
 				val = newval - oldval - 1;
 				*padc = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
 				*padc |= (newval & (YF | XF));  // undocumented flag bits 5+3
-				if( (newval & 0x0f) <= (oldval & 0x0f) ) *padc |= HF;
-				if( newval <= oldval ) *padc |= CF;
-				if( (val^oldval^0x80) & (val^newval) & 0x80 ) *padc |= VF;
+				if ((newval & 0x0f) <= (oldval & 0x0f)) *padc |= HF;
+				if (newval <= oldval) *padc |= CF;
+				if ((val^oldval^0x80) & (val^newval) & 0x80) *padc |= VF;
 				padc++;
 
 				// cp, sub or sbc w/o carry set
 				val = oldval - newval;
 				*psub = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
 				*psub |= (newval & (YF | XF));  // undocumented flag bits 5+3
-				if( (newval & 0x0f) > (oldval & 0x0f) ) *psub |= HF;
-				if( newval > oldval ) *psub |= CF;
-				if( (val^oldval) & (oldval^newval) & 0x80 ) *psub |= VF;
+				if ((newval & 0x0f) > (oldval & 0x0f)) *psub |= HF;
+				if (newval > oldval) *psub |= CF;
+				if ((val^oldval) & (oldval^newval) & 0x80) *psub |= VF;
 				psub++;
 
 				// sbc with carry set
 				val = oldval - newval - 1;
 				*psbc = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
 				*psbc |= (newval & (YF | XF));  // undocumented flag bits 5+3
-				if( (newval & 0x0f) >= (oldval & 0x0f) ) *psbc |= HF;
-				if( newval >= oldval ) *psbc |= CF;
-				if( (val^oldval) & (oldval^newval) & 0x80 ) *psbc |= VF;
+				if ((newval & 0x0f) >= (oldval & 0x0f)) *psbc |= HF;
+				if (newval >= oldval) *psbc |= CF;
+				if ((val^oldval) & (oldval^newval) & 0x80) *psbc |= VF;
 				psbc++;
 			}
 		}
@@ -538,25 +537,19 @@ void z80_device::device_start()
 		for (int i = 0; i < 256; i++)
 		{
 			int p = 0;
-			if( i&0x01 ) ++p;
-			if( i&0x02 ) ++p;
-			if( i&0x04 ) ++p;
-			if( i&0x08 ) ++p;
-			if( i&0x10 ) ++p;
-			if( i&0x20 ) ++p;
-			if( i&0x40 ) ++p;
-			if( i&0x80 ) ++p;
+			for (int b = 0; b < 8; b++)
+				p += BIT(i, b);
 			SZ[i] = i ? i & SF : ZF;
 			SZ[i] |= (i & (YF | XF));         // undocumented flag bits 5+3
 			SZ_BIT[i] = i ? i & SF : ZF | PF;
 			SZ_BIT[i] |= (i & (YF | XF));     // undocumented flag bits 5+3
 			SZP[i] = SZ[i] | ((p & 1) ? 0 : PF);
 			SZHV_inc[i] = SZ[i];
-			if( i == 0x80 ) SZHV_inc[i] |= VF;
-			if( (i & 0x0f) == 0x00 ) SZHV_inc[i] |= HF;
+			if (i == 0x80) SZHV_inc[i] |= VF;
+			if ((i & 0x0f) == 0x00) SZHV_inc[i] |= HF;
 			SZHV_dec[i] = SZ[i] | NF;
-			if( i == 0x7f ) SZHV_dec[i] |= VF;
-			if( (i & 0x0f) == 0x0f ) SZHV_dec[i] |= HF;
+			if (i == 0x7f) SZHV_dec[i] |= VF;
+			if ((i & 0x0f) == 0x0f) SZHV_dec[i] |= HF;
 		}
 
 		tables_initialised = true;
