@@ -164,7 +164,7 @@ private:
 
 	pen_t m_pens[NUM_PENS];
 	uint8_t m_lscnblk = 0;
-	uint16_t m_extra_video_bank_bit[2]{};
+	uint16_t m_extra_video_bank_bit = 0;
 
 	void hsync_changed(int state);
 	void led1_w(uint8_t data);
@@ -383,8 +383,8 @@ MC6845_UPDATE_ROW(merit_state::crtc_update_row)
 	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
 		int const attr = m_ram_attr[ma & 0x7ff];
-		int const region = (attr & 0x40) >> 6;
-		int addr = ((m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (m_extra_video_bank_bit[0] | m_extra_video_bank_bit[1])) << 4) | (ra & 0x0f);
+		int const region = BIT(attr, 6);
+		int addr = ((m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | m_extra_video_bank_bit) << 4) | (ra & 0x0f);
 		int const colour = (attr & 0x7f) << 3;
 
 		addr &= (rlen - 1);
@@ -474,10 +474,9 @@ void merit_state::led2_w(uint8_t data)
 
 void merit_state::misc_w(uint8_t data)
 {
-	flip_screen_set(~data & 0x10);
-	m_extra_video_bank_bit[0] = (data & 2) << 8;
-	m_extra_video_bank_bit[1] = (data & 1) << 10;
-	m_lscnblk = (data >> 3) & 1;
+	flip_screen_set(BIT(~data, 4));
+	m_extra_video_bank_bit = bitswap<2>(data, 0, 1) << 9;
+	m_lscnblk = BIT(data, 3);
 
 	// other bits unknown
 }

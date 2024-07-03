@@ -48,11 +48,11 @@ void aim65_state::mem_map(address_map &map)
 	map(0x1000, 0x3fff).noprw(); // User available expansions
 	map(0x4000, 0x7fff).rom(); // 4 ROM sockets in 16K PROM/ROM module
 	map(0x8000, 0x9fff).noprw(); // User available expansions
-	map(0xa000, 0xa00f).mirror(0x3f0).m(m_via1, FUNC(via6522_device::map)); // user via
+	map(0xa000, 0xa00f).mirror(0x3f0).m(m_via1, FUNC(via6522_device::map)); // user VIA
 	map(0xa400, 0xa47f).m(m_riot, FUNC(mos6532_device::ram_map));
 	map(0xa480, 0xa497).m(m_riot, FUNC(mos6532_device::io_map));
 	map(0xa498, 0xa7ff).noprw(); // Not available
-	map(0xa800, 0xa80f).mirror(0x3f0).m(m_via0, FUNC(via6522_device::map)); // system via
+	map(0xa800, 0xa80f).mirror(0x3f0).m(m_via0, FUNC(via6522_device::map)); // system VIA
 	map(0xac00, 0xac03).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xac04, 0xac43).ram(); // PIA RAM
 	map(0xac44, 0xafff).noprw(); // Not available

@@ -142,7 +142,7 @@ uint32_t goori_state::screen_update(screen_device& screen, bitmap_ind16& bitmap,
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	gfx_element *gfx = m_gfxdecode->gfx(0);
+	gfx_element &gfx = *m_gfxdecode->gfx(0);
 	// is this sprite format a clone of anything? (looks VERY similar to snowbros but this hardware also has a higer resolution, a tile layer and 8bpp)
 	for (int i = 0; i < 0x2000 / 2; i += 8)
 	{
@@ -169,7 +169,7 @@ uint32_t goori_state::screen_update(screen_device& screen, bitmap_ind16& bitmap,
 		if (realx >= 0x3e0)
 			realx -= 0x400;
 
-		gfx->transpen(bitmap, cliprect, tile, colour, flipx, 0, realx, y, 0xff);
+		gfx.transpen(bitmap, cliprect, tile, colour, flipx, 0, realx, y, 0xff);
 	}
 
 	return 0;
