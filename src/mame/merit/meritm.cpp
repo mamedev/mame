@@ -169,7 +169,6 @@ Not all regional versions are available for each Megatouch series
   - clean up V9938 interrupt implementation
   - finish inputs, dsw, outputs (lamps)
   - problem with registering touches on the bottom of the screen (currently hacked to work)
-  - megat5a: has jmp $0000 in the initialization code causing infinite loop - Dump verified on 4 different sets. (watchdog issue???)
 */
 
 #include "emu.h"
@@ -2324,10 +2323,13 @@ ROM_START( megat5a ) /* Dallas DS1204V security key at U5 labeled 9255-60-01 U5-
 	ROM_LOAD( "qs9255-05_u37-r0",   0x200000, 0x80000,  CRC(b713a1c5) SHA1(d6ccba2ea90fd0e2ecf15249514231eed54000c1) )
 	ROM_RELOAD(                     0x280000, 0x80000)
 	ROM_LOAD( "9255-60-01_u38-r0c", 0x300000, 0x100000, CRC(1091e7fd) SHA1(3c31c178eb7bea0d2c7e839dc3ec549463092296) ) /* Location U38, 07/10/1997 16:49:56 - Standard Version */
-	/* 9255-60-01_u38-r0c has been verified with 4 sets as correct. It's not working due to??? */
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
 	ROM_LOAD( "9255-60-01_u5-c-r01_c1998_mii", 0x000000, 0x000022, BAD_DUMP CRC(81f1c9b1) SHA1(e03ab8fae8225332edd353725039ad0cedcd9493) )
+
+	ROM_REGION( 0x8000, "nvram", 0 ) // DS1644 (or equivalent)
+	 // this was recreated, not dumped. To be 100% sure it would be better to get a real dump - will NOT start without a valid NVRAM
+	ROM_LOAD( "mt5a_ds1644.u31",  0x00000, 0x8000, BAD_DUMP CRC(5e13a99e) SHA1(6010c76090ddae4ebdd36f5501cf5588655ab843) )
 
 	ROM_REGION( 0x1000, "user2", 0 ) // PALs
 	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
@@ -2532,7 +2534,7 @@ GAME( 1996, megat4tea, megat4, crt260, meritm_crt260, meritm_state, init_megat3t
 GAME( 1996, megat4st,  megat4, crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Super Megatouch IV Tournament Edition (9255-51-01 R0B, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4stg, megat4, crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Super Megatouch IV Turnier Version (9255-51-50 R0A, Bi-Lingual GER/ENG version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, megat5,    0,      crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 5 (9255-60-01 R0I, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, megat5a,   megat5, crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 5 (9255-60-01 R0C, Standard version)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING )
+GAME( 1997, megat5a,   megat5, crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 5 (9255-60-01 R0C, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, megat5nj,  megat5, crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 5 (9255-60-07 R0N, New Jersey version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, megat5g,   megat5, crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 5 (9255-60-50 R0G, Bi-Lingual GER/ENG version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, megat5t,   megat5, crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Megatouch 5 Tournament Edition (9255-70-01 R0C, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
