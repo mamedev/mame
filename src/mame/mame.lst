@@ -19505,11 +19505,13 @@ mephisto
 mephisto1x
 mephisto2
 mephisto2a
-mephisto2e
+mephisto2b
 mephisto3
 mephisto3a
 mephisto3b
 mephisto3c
+mephistoe2
+mephistoe2a
 mephistoj
 
 @source:hegenerglaser/europa.cpp
@@ -19528,7 +19530,7 @@ nshort                          // 1993 Mephisto Nigel Short
 
 @source:hegenerglaser/mm1.cpp
 mm1
-mm1b
+mm1a
 mmirage
 
 @source:hegenerglaser/mm2.cpp
