@@ -284,6 +284,9 @@ public:
 		return *this;
 	}
 
+	// check basic constraints
+	bool valid() const { return m_buffer != nullptr; }
+
 	// return the local gain
 	sample_t gain() const { return m_gain; }
 
