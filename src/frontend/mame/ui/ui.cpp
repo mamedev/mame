@@ -593,7 +593,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 	// disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
 	// or if we are debugging, or if there's no mame window to send inputs to
-	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0 || video_none)
+	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		show_gameinfo = show_warnings = show_mandatory_fileman = false;
 
 #if defined(__EMSCRIPTEN__)
@@ -648,8 +648,13 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				warning_text = machine_info().game_info_string();
 			if (!warning_text.empty())
 			{
-				warning_text.append(_("\n\nPress any key to continue"));
-				set_handler(ui_callback_type::MODAL, handler_callback_func(handler_messagebox_anykey));
+				if (video_none)
+					osd_printf_info("%s\n\n", warning_text);
+				else
+				{
+					warning_text.append(_("\n\nPress any key to continue"));
+					set_handler(ui_callback_type::MODAL, handler_callback_func(handler_messagebox_anykey));
+				}
 			}
 			break;
 
@@ -721,9 +726,14 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				}
 				if (need_warning)
 				{
-					warning_text.append(_("\n\nPress any key to continue"));
-					set_handler(ui_callback_type::MODAL, handler_callback_func(handler_messagebox_anykey));
-					warning_color = machine_info().warnings_color();
+					if (video_none)
+						osd_printf_warning("%s\n\n", warning_text);
+					else
+					{
+						warning_text.append(_("\n\nPress any key to continue"));
+						set_handler(ui_callback_type::MODAL, handler_callback_func(handler_messagebox_anykey));
+						warning_color = machine_info().warnings_color();
+					}
 				}
 			}
 			break;
@@ -739,7 +749,10 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 						[&warning](const std::reference_wrapper<const std::string> &img)    { warning << "\"" << img.get() << "\""; },
 						[&warning]()                                                        { warning << ","; });
 
-				ui::menu_file_manager::force_file_manager(*this, machine().render().ui_container(), warning.str().c_str());
+				if (video_none)
+					osd_printf_error("%s\n\n", warning.str().c_str());
+				else
+					ui::menu_file_manager::force_file_manager(*this, machine().render().ui_container(), warning.str().c_str());
 			}
 			break;
 		}
