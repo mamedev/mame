@@ -168,9 +168,9 @@ void vsystem_spr_device::common_sprite_drawgfx(bitmap_ind16 &bitmap, const recta
 	int const yend = !m_curr_sprite.flipy ? (m_curr_sprite.ysize + 1) : -1;
 	int const yinc = !m_curr_sprite.flipy ? 1 : -1;
 
-	u32 const color = m_curr_sprite.color + m_pal_base;
-	u32 const zx = m_curr_sprite.zoomx << 11;
-	u32 const zy = m_curr_sprite.zoomy << 11;
+	uint32_t const color = m_curr_sprite.color + m_pal_base;
+	uint32_t const zx = m_curr_sprite.zoomx << 11;
+	uint32_t const zy = m_curr_sprite.zoomy << 11;
 
 	for (int ycnt = ystart; ycnt != yend; ycnt += yinc)
 	{
