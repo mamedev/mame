@@ -936,6 +936,8 @@ maclc580                        // April 3, 1995 Apple Macintosh LC/Performa 580
 
 @source:apple/macquadra700.cpp
 macqd700                        // 1991 Apple Macintosh Quadra 700
+macqd900                        // 1991 Apple Macintosh Quadra 900
+macqd950                        // 1992 Apple Macintosh Quadra 950
 
 @source:apple/macquadra800.cpp
 macqd800                        // 1993 Apple Macintosh Quadra 800

@@ -67,7 +67,12 @@ public:
 		m_scc(*this, "scc"),
 		m_asc(*this, "asc"),
 		m_cur_floppy(nullptr),
-		m_hdsel(0)
+		m_hdsel(0),
+		m_last_taken_interrupt(-1),
+		m_overlay(true),
+		m_rom_ptr(nullptr),
+		m_rom_size(0),
+		m_adb_in(0)
 	{
 	}
 
@@ -100,8 +105,8 @@ private:
 	emu_timer *m_6015_timer;
 
 	bool m_overlay;
-	u32 *m_rom_ptr = nullptr;
-	u32 m_rom_size = 0;
+	u32 *m_rom_ptr;
+	u32 m_rom_size;
 
 	int m_adb_in;
 
@@ -117,6 +122,7 @@ private:
 
 	void phases_w(uint8_t phases);
 	void devsel_w(uint8_t devsel);
+	void fdc_hdsel(int state);
 
 	uint32_t biu_r(offs_t offset, uint32_t mem_mask = ~0);
 	void biu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -129,13 +135,13 @@ private:
 	uint8_t maciifx_8010_r();
 	uint8_t maciifx_8040_r();
 
-	uint16_t mac_via_r(offs_t offset);
-	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint8_t mac_via_in_a();
-	uint8_t mac_via_in_b();
-	void mac_via_out_a(uint8_t data);
-	void mac_via_out_b(uint8_t data);
-	void mac_via_sync();
+	uint16_t via_r(offs_t offset);
+	void via_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint8_t via_in_a();
+	uint8_t via_in_b();
+	void via_out_a(uint8_t data);
+	void via_out_b(uint8_t data);
+	void via_sync();
 
 	uint32_t rom_switch_r(offs_t offset);
 
@@ -200,7 +206,7 @@ void maciifx_state::maciifx_map(address_map &map)
 {
 	map(0x40000000, 0x4007ffff).r(FUNC(maciifx_state::rom_switch_r)).mirror(0x0ff80000);
 
-	map(0x50000000, 0x50001fff).rw(FUNC(maciifx_state::mac_via_r), FUNC(maciifx_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50000000, 0x50001fff).rw(FUNC(maciifx_state::via_r), FUNC(maciifx_state::via_w)).mirror(0x00f00000);
 	map(0x50004000, 0x50005fff).rw("sccpic", FUNC(applepic_device::host_r), FUNC(applepic_device::host_w)).mirror(0x00f00000).umask32(0xff00ff00);
 	map(0x50004000, 0x50005fff).rw("sccpic", FUNC(applepic_device::host_r), FUNC(applepic_device::host_w)).mirror(0x00f00000).umask32(0x00ff00ff);
 	map(0x50008010, 0x50008010).r(FUNC(maciifx_state::maciifx_8010_r)).mirror(0x00f00000);
@@ -215,10 +221,10 @@ void maciifx_state::maciifx_map(address_map &map)
 	map(0x50018000, 0x50019fff).rw(FUNC(maciifx_state::biu_r), FUNC(maciifx_state::biu_w)).mirror(0x00f00000);
 	map(0x5001a000, 0x5001bfff).rw(FUNC(maciifx_state::oss_r), FUNC(maciifx_state::oss_w)).mirror(0x00f00000);
 	map(0x50024000, 0x50027fff).r(FUNC(maciifx_state::buserror_r)).mirror(0x00f00000); // must bus error on access here so ROM can determine we're an FMC
-	map(0x50040000, 0x50041fff).rw(FUNC(maciifx_state::mac_via_r), FUNC(maciifx_state::mac_via_w)).mirror(0x00f00000);
+	map(0x50040000, 0x50041fff).rw(FUNC(maciifx_state::via_r), FUNC(maciifx_state::via_w)).mirror(0x00f00000);
 }
 
-void maciifx_state::mac_via_sync()
+void maciifx_state::via_sync()
 {
 	// The via runs at 783.36KHz while the main cpu runs at 15MHz or
 	// more, so we need to sync the access with the via clock.  Plus
@@ -241,7 +247,7 @@ void maciifx_state::mac_via_sync()
 	m_maincpu->adjust_icount(-int(main_cycle - cycle));
 }
 
-uint16_t maciifx_state::mac_via_r(offs_t offset)
+uint16_t maciifx_state::via_r(offs_t offset)
 {
 	uint16_t data;
 
@@ -249,19 +255,19 @@ uint16_t maciifx_state::mac_via_r(offs_t offset)
 	offset &= 0x0f;
 
 	if (!machine().side_effects_disabled())
-		mac_via_sync();
+		via_sync();
 
 	data = m_via1->read(offset);
 
 	return (data & 0xff) | (data << 8);
 }
 
-void maciifx_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void maciifx_state::via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset >>= 8;
 	offset &= 0x0f;
 
-	mac_via_sync();
+	via_sync();
 
 	if (ACCESSING_BITS_0_7)
 		m_via1->write(offset, data & 0xff);
@@ -269,37 +275,22 @@ void maciifx_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_via1->write(offset, (data >> 8) & 0xff);
 }
 
-uint8_t maciifx_state::mac_via_in_a()
+uint8_t maciifx_state::via_in_a()
 {
 	return 0xd3;    // PA6 | PA4 | PA1
 }
 
-uint8_t maciifx_state::mac_via_in_b()
+uint8_t maciifx_state::via_in_b()
 {
-	int val = m_rtc->data_r();
-
-	//  printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
-
-	return val;
+	return  m_rtc->data_r();
 }
 
-void maciifx_state::mac_via_out_a(uint8_t data)
+void maciifx_state::via_out_a(uint8_t data)
 {
-	int hdsel = BIT(data, 5);
-	if (hdsel != m_hdsel)
-	{
-		if (m_cur_floppy)
-		{
-			m_cur_floppy->ss_w(hdsel);
-		}
-	}
-	m_hdsel = hdsel;
 }
 
-void maciifx_state::mac_via_out_b(uint8_t data)
+void maciifx_state::via_out_b(uint8_t data)
 {
-	//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
-
 	m_rtc->ce_w((data & 0x04) >> 2);
 	m_rtc->data_w(data & 0x01);
 	m_rtc->clk_w((data >> 1) & 0x01);
@@ -376,43 +367,69 @@ void maciifx_state::phases_w(uint8_t phases)
 void maciifx_state::devsel_w(uint8_t devsel)
 {
 	if (devsel == 1)
+	{
 		m_cur_floppy = m_floppy[0]->get_device();
+	}
 	else if (devsel == 2)
+	{
 		m_cur_floppy = m_floppy[1]->get_device();
+	}
 	else
+	{
 		m_cur_floppy = nullptr;
+	}
 
 	m_fdc->set_floppy(m_cur_floppy);
 	if (m_cur_floppy)
+	{
 		m_cur_floppy->ss_w(m_hdsel);
+	}
+}
+
+void maciifx_state::fdc_hdsel(int state)
+{
+	if (state != m_hdsel)
+	{
+		if (m_cur_floppy)
+		{
+			m_cur_floppy->ss_w(state);
+		}
+	}
+	m_hdsel = state;
 }
 
 uint32_t maciifx_state::biu_r(offs_t offset, uint32_t mem_mask)
 {
-	//  printf("biu_r @ %x, mask %08x\n", offset, mem_mask);
 	return 0;
 }
 
 void maciifx_state::biu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	//  printf("biu_w %x @ %x, mask %08x\n", data, offset, mem_mask);
 }
 
 template <int N>
 void maciifx_state::oss_interrupt(int state)
 {
 	if (state == ASSERT_LINE)
+	{
 		m_oss_regs[N >= 8 ? 0x202 : 0x203] |= 1 << (N & 7);
+	}
 	else
+	{
 		m_oss_regs[N >= 8 ? 0x202 : 0x203] &= ~(1 << (N & 7));
+	}
 
 	int take_interrupt = 0;
 	for (int n = 0; n < 8; n++)
 	{
 		if (BIT(m_oss_regs[0x203], n) && take_interrupt < m_oss_regs[n])
+		{
 			take_interrupt = m_oss_regs[n];
+		}
 		if (BIT(m_oss_regs[0x202], n) && take_interrupt < m_oss_regs[8 + n])
+		{
 			take_interrupt = m_oss_regs[8 + n];
+		}
 	}
 
 	if (m_last_taken_interrupt > -1)
@@ -439,25 +456,26 @@ TIMER_CALLBACK_MEMBER(maciifx_state::oss_6015_tick)
 
 uint8_t maciifx_state::oss_r(offs_t offset)
 {
-	//  printf("oss_r @ %x\n", offset);
-	//  if (offset <= 0xe)  // for interrupt mask registers, we're intended to return something different than is written in the low 3 bits (?)
-	//  {
-	//      return m_oss_regs[offset]<<4;
-	//  }
-
 	if (offset < std::size(m_oss_regs))
+	{
 		return m_oss_regs[offset];
+	}
 	else
+	{
 		return 0;
+	}
 }
 
 void maciifx_state::oss_w(offs_t offset, uint8_t data)
 {
-	//  printf("oss_w %x @ %x\n", data, offset);
 	if (offset == 0x207)
+	{
 		oss_interrupt<10>(CLEAR_LINE);
+	}
 	else if (offset < std::size(m_oss_regs))
+	{
 		m_oss_regs[offset] = data;
+	}
 }
 
 uint32_t maciifx_state::buserror_r()
@@ -500,6 +518,7 @@ void maciifx_state::maciifx(machine_config &config)
 	SWIM1(config, m_fdc, C15M);
 	m_fdc->devsel_cb().set(FUNC(maciifx_state::devsel_w));
 	m_fdc->phases_cb().set(FUNC(maciifx_state::phases_w));
+	m_fdc->hdsel_cb().set(FUNC(maciifx_state::fdc_hdsel));
 
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
@@ -560,10 +579,10 @@ void maciifx_state::maciifx(machine_config &config)
 	m_asc->irqf_callback().set(FUNC(maciifx_state::oss_interrupt<8>));
 
 	R65NC22(config, m_via1, C7M / 10);
-	m_via1->readpa_handler().set(FUNC(maciifx_state::mac_via_in_a));
-	m_via1->readpb_handler().set(FUNC(maciifx_state::mac_via_in_b));
-	m_via1->writepa_handler().set(FUNC(maciifx_state::mac_via_out_a));
-	m_via1->writepb_handler().set(FUNC(maciifx_state::mac_via_out_b));
+	m_via1->readpa_handler().set(FUNC(maciifx_state::via_in_a));
+	m_via1->readpb_handler().set(FUNC(maciifx_state::via_in_b));
+	m_via1->writepa_handler().set(FUNC(maciifx_state::via_out_a));
+	m_via1->writepb_handler().set(FUNC(maciifx_state::via_out_b));
 	m_via1->irq_handler().set(FUNC(maciifx_state::oss_interrupt<11>));
 
 	MACADB(config, m_macadb, C15M);
