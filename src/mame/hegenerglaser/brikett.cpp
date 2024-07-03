@@ -60,11 +60,11 @@ Mephisto III program module:
 - DM74LS373N (latch)
 - HCF4556BE (chip select?)
 
-ESB II interface (via module slot):
+ESB II board interface (via module slot):
 - PCB label: DH 5000 00 111 01
 - CD4001, 3*74373, MDP1603-331G (resistor array)
 
-ESB 6000 interface (via external port):
+ESB 6000 board interface (via external port):
 - PCB label: DH 5000 00 111 12
 - TC4081, TC4082, TC4017, 74373, 74374
 
@@ -92,7 +92,7 @@ BTANB:
 #include "machine/cdp1852.h"
 #include "machine/clock.h"
 #include "machine/sensorboard.h"
-#include "sound/dac.h"
+#include "sound/spkrdev.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
@@ -112,7 +112,7 @@ public:
 	brikett_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_clock(*this, "nmi_clock"),
+		m_irq_clock(*this, "irq_clock"),
 		m_extport(*this, "extport"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
@@ -144,7 +144,7 @@ private:
 	optional_device<sensorboard_device> m_board;
 	required_device<mephisto_display1_device> m_display;
 	optional_device<pwm_display_device> m_led_pwm;
-	required_device<dac_1bit_device> m_dac;
+	required_device<speaker_sound_device> m_dac;
 	optional_ioport_array<4+2> m_inputs;
 
 	emu_timer *m_speaker_off;
@@ -173,7 +173,7 @@ private:
 	void esb6_w(u8 data);
 	int esb6_r();
 
-	TIMER_CALLBACK_MEMBER(speaker_off) { m_dac->write(0); }
+	TIMER_CALLBACK_MEMBER(speaker_off) { m_dac->level_w(0); }
 };
 
 
@@ -241,8 +241,8 @@ u8 brikett_state::sound_r()
 	// port 1 read enables the speaker
 	if (!machine().side_effects_disabled())
 	{
-		m_dac->write(1);
-		m_speaker_off->adjust(attotime::from_usec(25));
+		m_dac->level_w(1);
+		m_speaker_off->adjust(attotime::from_ticks(8, m_maincpu->clock()));
 	}
 
 	return 0xff;
@@ -503,7 +503,7 @@ void brikett_state::mephistoj(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 void brikett_state::mephisto(machine_config &config)
