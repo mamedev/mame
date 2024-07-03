@@ -99,7 +99,6 @@ private:
 	void dma_write_byte(offs_t offset, uint8_t data);
 	uint8_t dma_read_word(offs_t offset);
 	void dma_write_word(offs_t offset, uint8_t data);
-	void iochrdy_w(int state) { m_maincpu->set_input_line(INPUT_LINE_HALT, state); };
 };
 
 DECLARE_DEVICE_TYPE(AT_MB, at_mb_device)
