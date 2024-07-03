@@ -188,6 +188,7 @@ void wd2010_device::device_start()
 	m_complete_write_timer = timer_alloc(FUNC(wd2010_device::complete_write), this);
 	m_deassert_write_timer = timer_alloc(FUNC(wd2010_device::deassert_write), this);
 	m_deassert_read_timer = timer_alloc(FUNC(wd2010_device::deassert_read), this);
+	m_next_sector_timer =  timer_alloc(FUNC(wd2010_device::next_sector), this);
 	m_present_cylinder = 0; // start somewhere
 }
 
@@ -582,9 +583,7 @@ void wd2010_device::read_sector(uint8_t data)
 
 			// FLAG "M" SET? (MULTIPLE SECTOR TRANSFERS)
 			if (data & 4)
-				logerror("WD2010 (READ): MULTIPLE SECTOR READ (M = 1).\n");
-
-			// Assume: NO "M" (MULTIPLE SECTOR TRANSFERS)
+				LOG("WD2010 (READ): MULTIPLE SECTOR READ (M = 1).\n");
 
 			m_out_bcs_cb(0); // deactivate BCS (!)
 
@@ -906,6 +905,23 @@ TIMER_CALLBACK_MEMBER(wd2010_device::deassert_read)
 	}
 }
 
+TIMER_CALLBACK_MEMBER(wd2010_device::next_sector)
+{
+	uint8_t cmd = m_task_file[TASK_FILE_COMMAND];
+
+	switch (cmd & 0xf0)
+	{
+	case 0x20:
+		read_sector(cmd);
+		break;
+	case 0x30:
+		write_sector(cmd);
+		break;
+	default:
+		break;
+	}
+}
+
 // Called by timer callbacks -
 void wd2010_device::complete_immediate(uint8_t status)
 {
@@ -917,6 +933,17 @@ void wd2010_device::complete_immediate(uint8_t status)
 	{
 		status &= ~(STATUS_DRQ);
 		m_out_bdrq_cb(0);
+	}
+
+	uint8_t cmd = m_task_file[TASK_FILE_COMMAND] & 0xf4;
+	if ((cmd == 0x24) || (cmd == 0x34))
+	{
+		if (--m_task_file[TASK_FILE_SECTOR_COUNT] > 1)
+		{
+			m_task_file[TASK_FILE_SECTOR_NUMBER]++;
+			m_next_sector_timer->adjust(attotime::from_usec(100));
+			return;
+		}
 	}
 
 	// Set current status (M_STATUS)
