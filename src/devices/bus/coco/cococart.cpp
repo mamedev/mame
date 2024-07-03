@@ -835,6 +835,7 @@ void coco_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("midi", COCO_MIDI);
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("ram", COCO_PAK_RAM);
+	device.option_add("rmulticart", COCO_PAK_RMULTICART);
 	device.option_add("rs232", COCO_RS232);
 	device.option_add("ssc", COCO_SSC);
 	device.option_add("ssfm", DRAGON_MSX2);
@@ -891,6 +892,7 @@ void dragon_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("pak", COCO_PAK);
 	device.option_add("serial", DRAGON_SERIAL);
 	device.option_add("ram", COCO_PAK_RAM);
+	device.option_add("rmulticart", COCO_PAK_RMULTICART);
 	device.option_add("sprites", DRAGON_SPRITES);
 	device.option_add("ssc", COCO_SSC);
 	device.option_add("ssfm", DRAGON_MSX2);
