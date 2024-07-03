@@ -403,6 +403,13 @@ std::error_condition osd_get_full_path(std::string &dst, std::string const &path
 {
 	try
 	{
+		if (posix_check_socket_path(path) ||
+		    posix_check_ptty_path(path)   ||
+		    posix_check_domain_path(path))
+		{
+			dst = path;
+			return std::error_condition();
+		}
 #if defined(_WIN32)
 		std::vector<char> path_buffer(MAX_PATH);
 		if (::_fullpath(&path_buffer[0], path.c_str(), MAX_PATH))
