@@ -31,7 +31,10 @@ private:
 
 	// internal helpers
 	template <int... Values>
-	static auto make_cosine_table(std::integer_sequence<int, Values...>) { return std::array{ u32((1.0 / cos(atan(double(Values) / double(sizeof...(Values) - 1)))) * 0x10000000 + 0.5)... }; }
+	static auto make_cosine_table(std::integer_sequence<int, Values...>)
+	{
+		return std::array<u32, sizeof...(Values)>{ u32((1.0 / cos(atan(double(Values) / double(sizeof...(Values) - 1)))) * 0x10000000 + 0.5)... };
+	}
 	static constexpr bool is_opaque(float alpha) { return (alpha >= (NoDestRead ? 0.5f : 1.0f)); }
 	static constexpr bool is_transparent(float alpha) { return (alpha < (NoDestRead ? 0.5f : 0.0001f)); }
 	static rgb_t apply_intensity(int intensity, rgb_t color) { return color.scale8(intensity); }
