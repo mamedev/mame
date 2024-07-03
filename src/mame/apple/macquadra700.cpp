@@ -7,15 +7,6 @@
 
     By R. Belmont
 
-    TODO:
-    - SWIM PIC won't send the first several ADB requests sent to it; it wakes
-      up when the ROM's bus scan to enumerate ADB devices hits 0xA out of 0xF.
-      Mac OS re-does the scan when it boots so this ends up harmless for normal
-      usage, but it does mean if there's no boot media you can't move the cursor.
-      (Also it clearly indicates a bug of some sort).
-    - The SWIM doesn't actually work.  Floppies are not recognized and the drive
-      motor isn't turned on.
-
 ****************************************************************************/
 
 #include "emu.h"
