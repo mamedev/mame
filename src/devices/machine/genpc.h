@@ -129,6 +129,7 @@ protected:
 	void iochck_w(int state);
 
 	void pc_select_dma_channel(int channel, bool state);
+	void iochrdy_w(int state) { m_maincpu->set_input_line(INPUT_LINE_HALT, state); };
 };
 
 
