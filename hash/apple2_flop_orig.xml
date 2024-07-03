@@ -1688,21 +1688,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mnstsmsh">
-		<description>Monster Smash</description>
-		<year>1983</year>
-		<publisher>Datamost</publisher>
-		<info name="usage" value="Requires a 48K Apple II+, //e, //c, or IIgs." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-01-04 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="233476">
-				<rom name="monster smash.woz" size="233476" crc="a2a01373" sha1="a0aeea2f9b66a1ff725fa5e49a3c5398a3be1273" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="monterev">
 		<description>Montezuma's Revenge</description>
 		<year>1984</year>
@@ -4333,138 +4318,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="saadland">
-		<description>Scott Adams Graphic Adventure 1: Adventureland (version 2.0/416)</description>
-		<year>1982</year>
-		<publisher>Adventure International</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-04-23 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234839">
-				<rom name="s.a.g.a. 1 - adventureland side a.woz" size="234839" crc="cb8da55c" sha1="3e2f79d3c52d6e97510aac3ced977c60eb6b5360" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Boot Disk" />
-			<dataarea name="flop" size="234839">
-				<rom name="s.a.g.a. 1 - adventureland side b (boot).woz" size="234839" crc="83cb42a3" sha1="a50127f7650549b4e73bb5a2e718ceefc456a232" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sapiradv">
-		<description>Scott Adams Graphic Adventure 2: Pirate Adventure (version 2.1/408)</description>
-		<year>1982</year>
-		<publisher>Adventure International</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-04-23 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234855">
-				<rom name="s.a.g.a. 2 - pirate adventure side a.woz" size="234855" crc="e1d89cb0" sha1="a1d672605f4b3bb4585f13824fc521b0681b3d89" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Boot Disk" />
-			<dataarea name="flop" size="234855">
-				<rom name="s.a.g.a. 2 - pirate adventure side b (boot).woz" size="234855" crc="36443115" sha1="bbe23e9d3f21b389f41be4795d34b2c9c1c87208" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="samisimp">
-		<description>Scott Adams Graphic Adventure 3: Mission Impossible (version 2.1/306)</description>
-		<year>1982</year>
-		<publisher>Adventure International</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-04-23 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234836">
-				<rom name="s.a.g.a. 3 - mission impossible side a.woz" size="234836" crc="6e0da536" sha1="dda47d2b1916803174a7b8d1dad23e0b428ff0d7" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Boot Disk" />
-			<dataarea name="flop" size="234836">
-				<rom name="s.a.g.a. 3 - mission impossible side b (boot).woz" size="234836" crc="b4c1cd26" sha1="4f68d858f02ebff83c115e06485ce78a7f47d8b9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="savoodoo">
-		<description>Scott Adams Graphic Adventure 4: Voodoo Castle (version 2.1/119)</description>
-		<year>1982</year>
-		<publisher>Adventure International</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-04-24 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234840">
-				<rom name="s.a.g.a. 4 - voodoo castle side a.woz" size="234840" crc="9922794b" sha1="a0ba732d20ae0f01f8a7237256c5e14fce74c9c6" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Boot Disk" />
-			<dataarea name="flop" size="234840">
-				<rom name="s.a.g.a. 4 - voodoo castle side b (boot).woz" size="234840" crc="00149d2f" sha1="ec747fef709fa8a01cf6bb0f0d8bff042015b528" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="satcount">
-		<description>Scott Adams Graphic Adventure 5: The Count (version 2.1/115)</description>
-		<year>1982</year>
-		<publisher>Adventure International</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-04-25 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234889">
-				<rom name="s.a.g.a. 5 - the count side a.woz" size="234889" crc="db0ac44a" sha1="6a49a12ed5f813fe1b1e543df5948fee37a539e3" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Boot Disk" />
-			<dataarea name="flop" size="234889">
-				<rom name="s.a.g.a. 5 - the count side b (boot).woz" size="234889" crc="20bfc490" sha1="d12e09db9bf8be8b901b57ca993c13d75defc557" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sastodys">
-		<description>Scott Adams Graphic Adventure 6: Strange Odyssey (version 2.1/119)</description>
-		<year>1982</year>
-		<publisher>Adventure International</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-04-26 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234841">
-				<rom name="s.a.g.a. 6 - strange odyssey side a.woz" size="234841" crc="1c916bcb" sha1="9fbaed1c571186abff4705db9716828103971d6a" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Boot Disk" />
-			<dataarea name="flop" size="234841">
-				<rom name="s.a.g.a. 6 - strange odyssey side b (boot).woz" size="234841" crc="78f7127a" sha1="aaca5ec74f1578b9e3b01df9074745cf43a33e2e" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="naptune">
 		<description>Neptune</description>
 		<year>1982</year>
@@ -5159,21 +5012,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234778">
 				<rom name="laf pak.woz" size="234778" crc="7e5e2002" sha1="8fbd21ff8d8b7f6194c0bdfbfa074aa716435e77" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sherwood">
-		<description>Sherwood Forest</description>
-		<year>1982</year>
-		<publisher>Phoenix Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-06-15 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="208154">
-				<rom name="sherwood forest.woz" size="208154" crc="49b76125" sha1="c2771aea964e43a3519cc52f61d6a17b4c009b42" />
 			</dataarea>
 		</part>
 	</software>
@@ -6845,21 +6683,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="inthocky">
-		<description>International Hockey</description>
-		<year>1987</year>
-		<publisher>Artworx</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-09-03 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="228095">
-				<rom name="international hockey.woz" size="228095" crc="c9c4e6f4" sha1="539b9dcb39c8a3e762dff56fd93c54a826bc6675" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="racter">
 		<description>Racter</description>
 		<year>1985</year>
@@ -7369,43 +7192,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="242146">
 				<rom name="crime stopper.woz" size="242146" crc="a3f353f8" sha1="9bafc69292e39aebf5fcf253ffcd34cb02ed669f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="qpspdrmn">
-		<description>Questprobe featuring Spider-Man</description>
-		<year>1984</year>
-		<publisher>Adventure International</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-09-28 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234823">
-				<rom name="questprobe featuring spider-man side a.woz" size="234823" crc="f560335e" sha1="8c7f230eb8fe444617b93af8c9e400906b75fe49" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234823">
-				<rom name="questprobe featuring spider-man side b.woz" size="234823" crc="1ad643ed" sha1="68b94de28f99620eb3a6a89f9462effd5e2919ac" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="vaultzur">
-		<description>Vaults of Zurich</description>
-		<year>1982</year>
-		<publisher>Artworx</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-09-28 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="235497">
-				<rom name="vaults of zurich.woz" size="235497" crc="1a42863c" sha1="fc1185de0dec030a34a1a2627af1d7bf5e968a58" />
 			</dataarea>
 		</part>
 	</software>
@@ -9779,28 +9565,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="qphulk">
-		<description>Questprobe featuring The Hulk (version 2.3/127)</description>
-		<year>1984</year>
-		<publisher>Adventure International</publisher>
-		<info name="usage" value="Requires an Apple II+ with 48K." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-01-20 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234828">
-				<rom name="questprobe featuring the hulk side a.woz" size="234828" crc="5878d49d" sha1="84cf1dbe3c38a0b98e8030932217f911a9146643" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B (Boot)" />
-			<dataarea name="flop" size="234828">
-				<rom name="questprobe featuring the hulk side b (boot).woz" size="234828" crc="54ddc830" sha1="c8884b9fb356cfb5dc496920e0653ee6b2572c2f" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="horizv">
 		<description>Horizon V</description>
 		<year>1982</year>
@@ -10045,21 +9809,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234751">
 				<rom name="spectrum- patterns and programs.woz" size="234751" crc="7b5a279a" sha1="f433ecbcbebd17f6d86925ce8c085d49ac4ab164" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="garftrv">
-		<description>Garfield Trivia Game</description>
-		<year>1989</year>
-		<publisher>Developmental Learning Materials</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-02-06 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="241463">
-				<rom name="garfield trivia game.woz" size="241463" crc="dfb2a731" sha1="7def8dbddb0149d4c74fc5c6a9c53f6db26d9232" />
 			</dataarea>
 		</part>
 	</software>
@@ -11168,21 +10917,6 @@ license:CC0-1.0
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="234776">
 				<rom name="abm.woz" size="234776" crc="e1f6c358" sha1="bddc3e453fc5c397b5666227de7b6ae17c1f9454" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ttnklobb">
-		<description>Tink!Tonk! Tonk in the Land of the Buddy-Bots</description>
-		<year>1984</year>
-		<publisher>Mindscape</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-04-11 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234814">
-				<rom name="tink tonk tonk in the land of buddy-bots.woz" size="234814" crc="0d3a8556" sha1="30b80f93ba4ad2684e09ec52db21c3734ba325e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -12886,28 +12620,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241419">
 				<rom name="quickflash.woz" size="241419" crc="24590b00" sha1="6e563223fc4ecc13ecad4de95e84e6bd36128e2b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="srccly22">
-		<description>The Sorcerer of Claymorgue Castle (version 2.2/122)</description>
-		<year>1984</year>
-		<publisher>Adventure International</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-08-15 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="241511">
-				<rom name="s.a.g.a. 13 - sorcerer of claymorgue castle side a.woz" size="241511" crc="4f5e141c" sha1="82b64408d2430877b7b68afca9ad625374180943" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Boot Disk" />
-			<dataarea name="flop" size="234855">
-				<rom name="s.a.g.a. 13 - sorcerer of claymorgue castle side b (boot).woz" size="234855" crc="12223084" sha1="54b12aecd5f80b7edc36f925552ec2a2810b5355" />
 			</dataarea>
 		</part>
 	</software>
@@ -16679,29 +16391,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="theinsti">
-		<description>The Institute</description>
-		<year>1983</year>
-		<publisher>Screenplay</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-02 -->
-		<!--"The Institute" is a 1983 adventure game developed by Jymm Pearson, Robin Pearson, Norm Sailer, and Richard Incrocci, and distributed by Screenplay. It requires a 48K Apple ][+ or later.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234818">
-				<rom name="the institute side a.woz" size="234818" crc="e9d314f8" sha1="880171c29d025fa1753193d68fc8f0bb2210fdcf" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234818">
-				<rom name="the institute side b.woz" size="234818" crc="90777e40" sha1="2f7c9d6ca142df55fe2b3c6d447571190fd07d88" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hazvolt">
 		<description>The Hazards of Voltageville</description>
 		<year>1994</year>
@@ -18038,22 +17727,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mcpetshop35">
-		<description>Pet Shop (version 1.0) (800K 3.5")</description>
-		<year>1994</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-25 -->
-		<!--"Pet Shop" is a 1994 educational program developed by Dave Denninger, John A. Persoon, and Jean Sharp, and distributed by MECC. This is version 1.0. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card. Note: this image has been modified to remove identifying site license information.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296204">
-				<rom name="pet shop 800k.woz" size="1296204" crc="70dece0e" sha1="d8ccb9fdc5936c2faf684888e514e92d15c32912" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sesmpm35">
 		<description>Science Explorers: Simple Machines (800K 3.5")</description>
 		<year>1990</year>
@@ -18178,22 +17851,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296206">
 				<rom name="word builder 800k.woz" size="1296206" crc="0da9b99f" sha1="2643adc1ba4dbfa867a518c1bbc29133fd717cc3" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="onbal35">
-		<description>On Balance (800K 3.5")</description>
-		<year>1986</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-28 -->
-		<!--"On Balance" is a 1986 productivity program developed by David Eisler and distributed by Brøderbund Software. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296169">
-				<rom name="on balance 800k.woz" size="1296169" crc="b71759ac" sha1="a9d5c9c565dffb97b1aa5cae0d55a3d4c3c20e7a" />
 			</dataarea>
 		</part>
 	</software>
@@ -19115,54 +18772,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 3 - Data disk" />
 			<dataarea name="flop" size="1276774">
 				<rom name="facts and fallacies 800k - disk 3 - data disk.woz" size="1276774" crc="2725075c" sha1="7f9e7983b37c8e301a43bad22900b221fad3fea5" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cgshopng">
-		<description>Curious George Goes Shopping (800K 3.5")</description>
-		<year>1989</year>
-		<publisher>Developmental Learning Materials</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-01 -->
-		<!--"Curious George Goes Shopping" is a 1989 educational program developed by Ahead Designs and distributed by Developmental Learning Materials. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345354">
-				<rom name="curious george goes shopping 800k.woz" size="1345354" crc="2c14df52" sha1="f6c46ae1671adfabe2568fb4137501e72f6e2703" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cgoutspc">
-		<description>Curious George in Outer Space (800K 3.5")</description>
-		<year>1989</year>
-		<publisher>Developmental Learning Materials</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-01 -->
-		<!--"Curious George in Outer Space" is a 1989 educational program developed by Ahead Designs and distributed by Developmental Learning Materials. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345355">
-				<rom name="curious george in outer space 800k.woz" size="1345355" crc="74deb6d4" sha1="d6df93f3de6df64a73ece451137a667b3596f40a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cglibrary">
-		<description>Curious George Visits the Library (800K 3.5")</description>
-		<year>1989</year>
-		<publisher>Developmental Learning Materials</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-01 -->
-		<!--"Curious George Visits the Library" is a 1989 educational program developed by Ahead Designs and distributed by Developmental Learning Materials. It requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345359">
-				<rom name="curious george visits the library 800k.woz" size="1345359" crc="9c8279e3" sha1="0d94bc7834461c0c4771ebc239422f0b80db0794" />
 			</dataarea>
 		</part>
 	</software>
@@ -27677,6 +27286,54 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="cgshopng">
+		<description>Curious George Goes Shopping (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Developmental Learning Materials (DLM)</publisher>
+		<info name="developer" value="Ahead Designs" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-03-01-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345354">
+				<rom name="curious george goes shopping 800k.woz" size="1345354" crc="2c14df52" sha1="f6c46ae1671adfabe2568fb4137501e72f6e2703" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cgoutspc">
+		<description>Curious George in Outer Space (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Developmental Learning Materials (DLM)</publisher>
+		<info name="developer" value="Ahead Designs" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-03-01-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345355">
+				<rom name="curious george in outer space 800k.woz" size="1345355" crc="74deb6d4" sha1="d6df93f3de6df64a73ece451137a667b3596f40a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cglibrary">
+		<description>Curious George Visits the Library (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Developmental Learning Materials (DLM)</publisher>
+		<info name="developer" value="Ahead Designs" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 64K ][+ or //e with a compatible drive controller card." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-03-01-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345359">
+				<rom name="curious george visits the library 800k.woz" size="1345359" crc="9c8279e3" sha1="0d94bc7834461c0c4771ebc239422f0b80db0794" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cyborg2">
 		<description>Cyborg (version 2)</description>
 		<year>1981</year>
@@ -28429,6 +28086,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="garftrv">
+		<description>Garfield Trivia Game</description>
+		<year>1989</year>
+		<publisher>Developmental Learning Materials (DLM)</publisher>
+		<info name="developer" value="EIS" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-02-06-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241463">
+				<rom name="garfield trivia game.woz" size="241463" crc="dfb2a731" sha1="7def8dbddb0149d4c74fc5c6a9c53f6db26d9232" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="genesis">
 		<description>Genesis</description>
 		<year>1983</year>
@@ -28589,6 +28262,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234790">
 				<rom name="inferential anne- level ii.woz" size="234790" crc="405375dc" sha1="f4745fdbc748d01ed457ef2737be962f456aeb8b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inthocky">
+		<description>International Hockey</description>
+		<year>1987</year>
+		<publisher>Artworx</publisher>
+		<info name="programmer" value=" Ken Grant and Peter Ward" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-09-03-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228095">
+				<rom name="international hockey.woz" size="228095" crc="c9c4e6f4" sha1="539b9dcb39c8a3e762dff56fd93c54a826bc6675" />
 			</dataarea>
 		</part>
 	</software>
@@ -29065,6 +28754,7 @@ license:CC0-1.0
 		<description>Math Word Problems Volume 1: Careers (800K 3.5")</description>
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
+		<info name="developer" value="Optimum Resource" />
 		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-27-->
@@ -29080,6 +28770,7 @@ license:CC0-1.0
 		<description>Math Word Problems Volume 2: Money (800K 3.5")</description>
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
+		<info name="developer" value="Optimum Resource" />
 		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-27-->
@@ -29095,6 +28786,7 @@ license:CC0-1.0
 		<description>Math Word Problems Volume 3: Sports (800K 3.5")</description>
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
+		<info name="developer" value="Optimum Resource" />
 		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-27-->
@@ -29110,6 +28802,7 @@ license:CC0-1.0
 		<description>Math Word Problems Volume 4: Travel (800K 3.5")</description>
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
+		<info name="developer" value="Optimum Resource" />
 		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-27-->
@@ -29123,9 +28816,11 @@ license:CC0-1.0
 
 	<software name="mathwp6">
 		<description>Math Word Problems Volume 6: Our Nation's Capital Washington D.C. (800K 3.5")</description>
-		<!--Title screen says "The Stickybear Math Word Problems-->
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
+		<info name="alt_title" value="Stickybear Math Word Problems: Our Nation's Capital Washington D.C." />
+		<!--From title screen-->
+		<info name="developer" value="Optimum Resource" />
 		<info name="usage" value="Requires an Apple IIgs, //c+, //e, or 64K ][+ with a compatible drive controller card." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!--Dump released: 2023-03-27-->
@@ -29393,6 +29088,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mnstsmsh">
+		<description>Monster Smash (version 2.0)</description>
+		<year>1983</year>
+		<publisher>Datamost</publisher>
+		<info name="programmer" value="Dave Eisler" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="2.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-01-04-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="233476">
+				<rom name="monster smash.woz" size="233476" crc="a2a01373" sha1="a0aeea2f9b66a1ff725fa5e49a3c5398a3be1273" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nibaw">
 		<description>Nibbles Away (version B2)</description>
 		<year>1981</year>
@@ -29535,6 +29247,40 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="onbalance">
+		<description>On Balance (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="David Eisler" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-28-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296169">
+				<rom name="on balance 800k.woz" size="1296169" crc="b71759ac" sha1="a9d5c9c565dffb97b1aa5cae0d55a3d4c3c20e7a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petshop">
+		<description>Pet Shop (A-347 version 1.0) (800K 3.5")</description>
+		<year>1994</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-347" />
+		<info name="programmer" value="Dave Denninger, John A. Persoon, and Jean Sharp" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-25-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296204">
+				<rom name="pet shop 800k.woz" size="1296204" crc="70dece0e" sha1="d8ccb9fdc5936c2faf684888e514e92d15c32912" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pollspol">
 		<description>Polls and Politics Volume 1 (A-820 version 1.0)</description>
 		<year>1984</year>
@@ -29656,6 +29402,54 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="qpspman">
+		<description>Questprobe featuring Spider-Man (version F-261)</description>
+		<year>1984</year>
+		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Mak Jukic and Scott Adams" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="F-261" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-09-28-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234823">
+				<rom name="questprobe featuring spider-man side a.woz" size="234823" crc="f560335e" sha1="8c7f230eb8fe444617b93af8c9e400906b75fe49" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234823">
+				<rom name="questprobe featuring spider-man side b.woz" size="234823" crc="1ad643ed" sha1="68b94de28f99620eb3a6a89f9462effd5e2919ac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qphulk">
+		<description>Questprobe featuring The Hulk (version 2.3/127)</description>
+		<year>1984</year>
+		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Scott Adams, John Romita Sr., Mark Gruenwald, Kem McNair, Scott Smith, John Byrne, and Bob Budiansky" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="2.3/127" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-01-20-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234828">
+				<rom name="questprobe featuring the hulk side a.woz" size="234828" crc="5878d49d" sha1="84cf1dbe3c38a0b98e8030932217f911a9146643" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot" />
+			<dataarea name="flop" size="234828">
+				<rom name="questprobe featuring the hulk side b (boot).woz" size="234828" crc="54ddc830" sha1="c8884b9fb356cfb5dc496920e0653ee6b2572c2f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qix">
 		<description>Qix</description>
 		<year>1989</year>
@@ -29673,7 +29467,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="rdtrchst">
-		<description>Reader's Treasure Chest</description>
+		<description>Reader's Treasure Chest: Level One</description>
 		<year>1987</year>
 		<publisher>Micrograms Publishing</publisher>
 		<info name="developer" value="Micrograms Publishing" />
@@ -29919,6 +29713,175 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="saga1alandv20">
+		<description>Scott Adams Graphic Adventure 1: Adventureland (version 2.0/416)</description>
+		<year>1982</year>
+		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Scott Adams" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="2.0/416" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-04-23-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234839">
+				<rom name="s.a.g.a. 1 - adventureland side a.woz" size="234839" crc="cb8da55c" sha1="3e2f79d3c52d6e97510aac3ced977c60eb6b5360" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot" />
+			<dataarea name="flop" size="234839">
+				<rom name="s.a.g.a. 1 - adventureland side b (boot).woz" size="234839" crc="83cb42a3" sha1="a50127f7650549b4e73bb5a2e718ceefc456a232" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saga2piradv">
+		<description>Scott Adams Graphic Adventure 2: Pirate Adventure (version 2.1/408)</description>
+		<year>1982</year>
+		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Scott Adams" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="2.1/408" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-04-23-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234855">
+				<rom name="s.a.g.a. 2 - pirate adventure side a.woz" size="234855" crc="e1d89cb0" sha1="a1d672605f4b3bb4585f13824fc521b0681b3d89" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot" />
+			<dataarea name="flop" size="234855">
+				<rom name="s.a.g.a. 2 - pirate adventure side b (boot).woz" size="234855" crc="36443115" sha1="bbe23e9d3f21b389f41be4795d34b2c9c1c87208" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saga3misimp">
+		<description>Scott Adams Graphic Adventure 3: Mission Impossible (version 2.1/306)</description>
+		<year>1982</year>
+		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Scott Adams" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="2.1/306" />
+		<!-- This version appears to have the game title scrubbed from both the graphical title page and the text introduction, for reasons unknown. (To be clear, this is on the original copy protected disk.) -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-04-23-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234836">
+				<rom name="s.a.g.a. 3 - mission impossible side a.woz" size="234836" crc="6e0da536" sha1="dda47d2b1916803174a7b8d1dad23e0b428ff0d7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot" />
+			<dataarea name="flop" size="234836">
+				<rom name="s.a.g.a. 3 - mission impossible side b (boot).woz" size="234836" crc="b4c1cd26" sha1="4f68d858f02ebff83c115e06485ce78a7f47d8b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saga4voocas">
+		<description>Scott Adams Graphic Adventure 4: Voodoo Castle (version 2.1/119)</description>
+		<year>1982</year>
+		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Alexis Adams" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="2.1/119" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-04-24-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234840">
+				<rom name="s.a.g.a. 4 - voodoo castle side a.woz" size="234840" crc="9922794b" sha1="a0ba732d20ae0f01f8a7237256c5e14fce74c9c6" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot" />
+			<dataarea name="flop" size="234840">
+				<rom name="s.a.g.a. 4 - voodoo castle side b (boot).woz" size="234840" crc="00149d2f" sha1="ec747fef709fa8a01cf6bb0f0d8bff042015b528" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saga5count">
+		<description>Scott Adams Graphic Adventure 5: The Count (version 2.1/115)</description>
+		<year>1982</year>
+		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Scott Adams, Kem McNair, and Norm Sailer" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="2.1/115" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-04-25-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234889">
+				<rom name="s.a.g.a. 5 - the count side a.woz" size="234889" crc="db0ac44a" sha1="6a49a12ed5f813fe1b1e543df5948fee37a539e3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot" />
+			<dataarea name="flop" size="234889">
+				<rom name="s.a.g.a. 5 - the count side b (boot).woz" size="234889" crc="20bfc490" sha1="d12e09db9bf8be8b901b57ca993c13d75defc557" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saga6strody">
+		<description>Scott Adams Graphic Adventure 6: Strange Odyssey (version 2.1/119)</description>
+		<year>1982</year>
+		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Scott Adams" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="2.1/119" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-04-26-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234841">
+				<rom name="s.a.g.a. 6 - strange odyssey side a.woz" size="234841" crc="1c916bcb" sha1="9fbaed1c571186abff4705db9716828103971d6a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot" />
+			<dataarea name="flop" size="234841">
+				<rom name="s.a.g.a. 6 - strange odyssey side b (boot).woz" size="234841" crc="78f7127a" sha1="aaca5ec74f1578b9e3b01df9074745cf43a33e2e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saga13sorcc">
+		<description>Scott Adams Graphic Adventure 13: The Sorcerer of Claymorgue Castle (version 2.2/122)</description>
+		<year>1984</year>
+		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Scott Adams" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="2.2/122" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-08-15-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="241511">
+				<rom name="s.a.g.a. 13 - sorcerer of claymorgue castle side a.woz" size="241511" crc="4f5e141c" sha1="82b64408d2430877b7b68afca9ad625374180943" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot Disk" />
+			<dataarea name="flop" size="234855">
+				<rom name="s.a.g.a. 13 - sorcerer of claymorgue castle side b (boot).woz" size="234855" crc="12223084" sha1="54b12aecd5f80b7edc36f925552ec2a2810b5355" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sentfun">
 		<description>Sentence Fun (version 1989) (800K 3.5")</description>
 		<year>1989</year>
@@ -29964,6 +29927,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234774">
 				<rom name="shapes and patterns.woz" size="234774" crc="d716cc89" sha1="a055cff882adc289c45d60a89b81971898f0eb88" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sherwood">
+		<description>Sherwood Forest</description>
+		<year>1982</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="programmer" value="Dale Johnson and Dav Holle" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-06-15-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="208154">
+				<rom name="sherwood forest.woz" size="208154" crc="49b76125" sha1="c2771aea964e43a3519cc52f61d6a17b4c009b42" />
 			</dataarea>
 		</part>
 	</software>
@@ -30651,6 +30630,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="theinsti">
+		<description>The Institute</description>
+		<year>1983</year>
+		<publisher>Screenplay</publisher>
+		<info name="programmer" value="Jymm Pearson, Robin Pearson, Norm Sailer, and Richard Incrocci" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-02-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234818">
+				<rom name="the institute side a.woz" size="234818" crc="e9d314f8" sha1="880171c29d025fa1753193d68fc8f0bb2210fdcf" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234818">
+				<rom name="the institute side b.woz" size="234818" crc="90777e40" sha1="2f7c9d6ca142df55fe2b3c6d447571190fd07d88" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thescoop">
 		<description>The Scoop</description>
 		<year>1989</year>
@@ -30717,6 +30719,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234862">
 				<rom name="the stickybear abc.woz" size="234862" crc="b384f0e4" sha1="a191367cdb60a2f96238dbd1bdba8a6325b33450" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tttldbb">
+		<description>Tink!Tonk!: Tonk in the Land of the Buddy-Bots by Mercer Mayer</description>
+		<year>1984</year>
+		<publisher>Mindscape</publisher>
+		<info name="author" value="Mercer Mayer"/>
+		<info name="developer" value=" Angelsoft" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-04-11-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234814">
+				<rom name="tink tonk tonk in the land of buddy-bots.woz" size="234814" crc="0d3a8556" sha1="30b80f93ba4ad2684e09ec52db21c3734ba325e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -30845,6 +30864,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234813">
 				<rom name="uncle clyde's consonant slides- ending consonants.woz" size="234813" crc="bfe6adfe" sha1="bc12cd855cf9687cfd10031ede34ebb60f17f7f2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vaultzur">
+		<description>Vaults of Zurich</description>
+		<year>1982</year>
+		<publisher>Artworx</publisher>
+		<info name="programmer" value="Felix Herlihy, Greg Herlihy, and Roger Harnish" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-09-28-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235497">
+				<rom name="vaults of zurich.woz" size="235497" crc="1a42863c" sha1="fc1185de0dec030a34a1a2627af1d7bf5e968a58" />
 			</dataarea>
 		</part>
 	</software>
