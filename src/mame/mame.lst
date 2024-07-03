@@ -44454,6 +44454,9 @@ tek6130                         // Tektronix 6130
 @source:tektronix/tekxp33x.cpp
 tekxp330                        //
 
+@source:tektronix/xd88.cpp
+xd88_01
+
 @source:telenova/compis.cpp
 compis                          // 1985 Telenova Compis
 compis2                         // 1985 Telenova Compis
