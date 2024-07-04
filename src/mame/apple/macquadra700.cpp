@@ -3,9 +3,19 @@
 /****************************************************************************
 
     drivers/macquadra700.cpp
-    Mac Quadra 700, 900, and 950 emulation
+    Mac Quadra 700 ("Spike"), 900 ("Eclipse"), and 950 ("Zydeco") emulation
 
-    By R. Belmont
+    Emulation by R. Belmont
+
+    These machines were sort of a "workstation class Mac II", with fast
+    built-in video, built-in Ethernet, and enhanced NuBus '90 slots that
+    were backwards compatible but also had some new tricks.
+
+    The Quadra 900 replaced the real-time clock with a compatible variant
+    of Egret, and offloaded ADB, serial, LocalTalk, and floppy processing
+    to the same pair of 65C02-based IOPs (I/O Processors) from the Mac IIfx.
+    This setup never appeared again, but its features, including doing real
+    DMA to and from the floppy drive, did.
 
 ****************************************************************************/
 
@@ -884,6 +894,9 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		m_swim->dat1byte_cb().append(m_swimpic, FUNC(applepic_device::reqb_w));
 		m_swim->hdsel_cb().set(FUNC(eclipse_state::fdc_hdsel));
 
+		// TODO: this is supposed to use a special version of Egret called "Caboose",
+		// but currently that version of the program boots up and refuses to listen
+		// to commands from the 68040.  Stock Egret works fine until that gets figured out.
 		EGRET(config, m_egret, XTAL(32'768));
 		m_egret->set_default_bios_tag("341s0851");
 		m_egret->reset_callback().set(FUNC(eclipse_state::egret_reset_w));
@@ -934,9 +947,7 @@ void eclipse_state::via2_out_b_q900(u8 data)
 	{
 		macqd900(config);
 
-		M68040(config.replace(), m_maincpu, 33.333_MHz_XTAL);
-		m_maincpu->set_addrmap(AS_PROGRAM, &eclipse_state::quadra900_map);
-		m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
+		m_maincpu->set_clock(33.333_MHz_XTAL);
 
 		DAFB_Q950(config.replace(), m_dafb, 50_MHz_XTAL / 2);
 		m_dafb->set_maincpu_tag("maincpu");
