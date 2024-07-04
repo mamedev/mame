@@ -4,7 +4,7 @@
 
     Rockwell 65C52  Dual Asynchronous Communication Interface Adapter
 
-	A slightly tweaked combination of two 6551 ACIAs on a single chip
+    A slightly tweaked combination of two 6551 ACIAs on a single chip
 
 **********************************************************************
                             _____   _____
@@ -45,8 +45,6 @@ class r65c52_device : public device_t
 public:
 	r65c52_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	void map(address_map &map);
-
 	auto irq1_handler() { return m_irq_handler[0].bind(); }
 	auto irq2_handler() { return m_irq_handler[1].bind(); }
 	auto txd1_handler() { return m_txd_handler[0].bind(); }
@@ -56,9 +54,11 @@ public:
 	auto dtr1_handler() { return m_dtr_handler[0].bind(); }
 	auto dtr2_handler() { return m_dtr_handler[1].bind(); }
 
+	void map(address_map &map);
+
 	u8 read(offs_t offset);
 
-	void write_txc(int state); // txc
+	void write_txc(int state);
 	void write_rxc(int state);
 	void write_rxd1(int state);
 	void write_rxd2(int state);
@@ -190,7 +190,6 @@ private:
 	devcb_write_line m_rxc_handler;
 	devcb_write_line::array<2> m_rts_handler;
 	devcb_write_line::array<2> m_dtr_handler;
-
 
 	u8 m_aux_ctrl[2];
 	u8 m_control[2];

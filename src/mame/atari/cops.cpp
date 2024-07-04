@@ -13,8 +13,8 @@
     The different games here have subtly different control PCBs. COPS has an Atari
     part number (58-12B), while Revelations simply refers to a Lasermax control PCB
     (Lasermax being the consumer name for the LDP series).
-	COPS, Street Viper and all other Nova Productions laserdisc games run on forms of this
-	hardware.
+    COPS, Street Viper and all other Nova Productions laserdisc games run on forms of this
+    hardware.
 
     NOTES: To init NVRAM on Revelations at first boot, turn the refill key (R) and press any button.
     A and B adjust date/time (clock is not Y2K compliant), C selects.
@@ -23,13 +23,13 @@
 
     TODO: There are probably more ROMs for Revelations and related, the disc
     contains full data for a non-payout US release of the game called 'Vision Quest'.
-    However, the Vision Quest Laserdisc for the USA is slightly different, with 
+    However, the Vision Quest Laserdisc for the USA is slightly different, with
     Revelations specific data seemingly replaced with black level.
-	We have a disc image for Vision Quest in full, but no ROM
+    We have a disc image for Vision Quest in full, but no ROM
 
-	BTANB for Revelations:
-	Game options cannot be adjusted, any attempt to do so resets the machine (seen on real hardware)
-	Volume control cycles in the 'Stereo' test, but cannot be tested.
+    BTANB for Revelations:
+    Game options cannot be adjusted, any attempt to do so resets the machine (seen on real hardware)
+    Volume control cycles in the 'Stereo' test, but cannot be tested.
 
 
     This should be similar hardware for Street Viper if we get a dump.
@@ -40,15 +40,14 @@
 
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
+#include "machine/bacta_datalogger.h"
 #include "machine/ldp1450hle.h"
-#include "machine/r65c52.h"
+#include "machine/meters.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
-#include "sound/sn76496.h"
+#include "machine/r65c52.h"
 #include "machine/watchdog.h"
-
-#include "machine/bacta_datalogger.h"
-#include "machine/meters.h"
+#include "sound/sn76496.h"
 
 #include "speaker.h"
 
@@ -100,22 +99,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void video_start() override;
-
 private:
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_nvram;
-	required_device<sn76489_device> m_sn;
-	required_device<sony_ldp1450hle_device> m_ld;
-   	required_device<r65c52_device> m_dacia;
-    required_device<watchdog_timer_device> m_watchdog;
-	optional_device<meters_device> m_meters;
-
-	required_ioport_array<3> m_switches;
-	optional_ioport m_steer;
-	output_finder<16> m_digits;
-	output_finder<23> m_lamps;
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -137,6 +121,22 @@ private:
 	void cdrom_data_w(uint8_t data);
 	void cdrom_ctrl_w(uint8_t data);
 	uint8_t cdrom_data_r();
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_nvram;
+	required_device<sn76489_device> m_sn;
+	required_device<sony_ldp1450hle_device> m_ld;
+	required_device<r65c52_device> m_dacia;
+	required_device<watchdog_timer_device> m_watchdog;
+	optional_device<meters_device> m_meters;
+
+	// I/O
+	required_ioport_array<3> m_switches;
+	optional_ioport m_steer;
+	output_finder<16> m_digits;
+	output_finder<23> m_lamps;
+
 	int m_irq, m_acia1_irq, m_acia2_irq;
 
 	uint8_t m_lcd_addr_l, m_lcd_addr_h;
@@ -148,10 +148,6 @@ private:
 	uint8_t m_sn_data;
 	uint8_t m_sn_cb1;
 };
-
-void cops_state::video_start()
-{
-}
 
 uint32_t cops_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -166,10 +162,10 @@ uint32_t cops_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 void cops_state::cdrom_data_w(uint8_t data)
 {
-	const char *regs[4] = { "CMD", "PARAM", "WRITE", "CTRL" };
-	m_cdrom_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
-	uint8_t reg = ((m_cdrom_ctrl & 4) >> 1) | ((m_cdrom_ctrl & 8) >> 3);
-	LOGMASKED(LOG_CDROM, "%s:cdrom_data_w(reg = %s, data = %02x)\n", machine().describe_context(), regs[reg & 0x03], m_cdrom_data);
+	char const *const regs[4] = { "CMD", "PARAM", "WRITE", "CTRL" };
+	m_cdrom_data = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
+	uint8_t const reg = bitswap<2>(m_cdrom_ctrl, 2, 3);
+	LOGMASKED(LOG_CDROM, "%s:cdrom_data_w(reg = %s, data = %02x)\n", machine().describe_context(), regs[reg], m_cdrom_data);
 }
 
 void cops_state::cdrom_ctrl_w(uint8_t data)
@@ -194,19 +190,19 @@ uint8_t cops_state::cdrom_data_r()
 
 void cops_state::acia1_irq(int state)
 {
-	m_acia1_irq=!state;
+	m_acia1_irq =! state;
 	dacia_irq();
 }
 
 void cops_state::acia2_irq(int state)
 {
-	m_acia2_irq=!state;
+	m_acia2_irq = !state;
 	dacia_irq();
 }
 
-void cops_state::dacia_irq()
+inline void cops_state::dacia_irq()
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, m_acia1_irq | m_acia2_irq? ASSERT_LINE:CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, (m_acia1_irq | m_acia2_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*************************************
@@ -465,7 +461,7 @@ void cops_state::via1_a_w(uint8_t data)
 
 void cops_state::via1_b_w(uint8_t data)
 {
-	m_sn_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
+	m_sn_data = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 	if (m_sn_cb1)
 	{
 		m_sn->write(m_sn_data);
@@ -600,14 +596,14 @@ void cops_state::machine_reset()
 	m_irq = 0;
 	m_lcd_addr_l = m_lcd_addr_h = 0;
 	m_lcd_data_l = m_lcd_data_h = 0;
-	}
+}
 
 
 void cops_state::init_cops()
 {
-	//The hardware is designed and programmed to use multiple system ROM banks, but for some reason it's hardwired to bank 2.
-	//For documentation's sake, here's the init
-	uint8_t *rom = memregion("system")->base();
+	// The hardware is designed and programmed to use multiple system ROM banks, but for some reason it's hardwired to bank 2.
+	// For documentation's sake, here's the init
+	uint8_t *const rom = memregion("system")->base();
 	membank("sysbank1")->configure_entries(0, 4, &rom[0x0000], 0x2000);
 	membank("sysbank1")->set_entry(2);
 }
@@ -741,4 +737,4 @@ ROM_END
 
 GAMEL( 1994, cops,     0,    cops,     cops,     cops_state, init_cops, ROT0, "Atari Games",                           "Cops (USA)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
 GAMEL( 1994, copsuk,   cops, cops,     cops,     cops_state, init_cops, ROT0, "Nova Productions Ltd./ Deith Leisure",  "Cops (UK)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1991, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions Ltd.",                 "Revelations", MACHINE_SUPPORTS_SAVE, layout_revlatns ) 
+GAMEL( 1991, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions Ltd.",                 "Revelations", MACHINE_SUPPORTS_SAVE, layout_revlatns )
