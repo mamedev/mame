@@ -384,7 +384,7 @@ void spokeru_state::portmap(address_map &map)
 	map(0x5083, 0x5083).portr("BUTTONS1");
 	map(0x5090, 0x5090).w(FUNC(spokeru_state::coins_w));
 	map(0x5091, 0x5091).w(FUNC(spokeru_state::leds_w));
-	map(0x5092, 0x5092).portr("BUTTONS1").w(FUNC(spokeru_state::nmi_video_leds_w));
+	map(0x5092, 0x5092).w(FUNC(spokeru_state::nmi_video_leds_w));
 	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x50c0, 0x50c0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x7000, 0x77ff).ram().w(FUNC(spokeru_state::fg_tile_w)).share(m_fg_tile_ram);

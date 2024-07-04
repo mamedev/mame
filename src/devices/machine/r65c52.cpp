@@ -356,7 +356,7 @@ void r65c52_device::write_control(int idx, u8 data)
 	update_divider(idx);
 
 	// bit 4
-	m_echo_mode[idx] = BIT(m_control[idx], 4)
+	m_echo_mode[idx] = BIT(m_control[idx], 4);
 
 	// bit 5
 	m_stoplength[idx] = 1 + BIT(m_control[idx], 5);

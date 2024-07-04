@@ -14,7 +14,7 @@ Siemens SAB 8256 A 2 P (MUART)
 NEC D8279C-2 (keyboard & display interface)
 RTC 62421A
 
-Is there a sound board or is is discrete?
+Is there a sound board or is it discrete?
 
 Game reference: https://www.youtube.com/watch?v=NlB06dMxjME
 */

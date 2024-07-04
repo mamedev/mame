@@ -2852,6 +2852,14 @@ ROM_START( matchem )
 	ROM_LOAD( "crt-209_pal16l8.bin", 0x200, 0x117, CRC(e916c56f) SHA1(1517091ff1791d923e5bd62d18d1428b6a3a8c72) ) // SC3339 20-pin 16L8 type PAL (inside CRT-209 module)
 ROM_END
 
+/*
+Known to exist but not currently dumped as seen from a manual:
+
+SEX MATCH'em UP (GERMAN) for crt200 board Program No. 6221-52 (U5-0 & U6-0)
+requires a CRT-209 Advanced Processor Module, properly encoded, inserted at U1
+
+*/
+
 ROM_START( matchemg )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "6221-55_u5-1.u5", 0x00000, 0x8000, CRC(152ad9f6) SHA1(fdd90ea7e5bbcd7dc8f7d6f10ac9efc08515b112) ) // 6221-55 U5-1 U6-1 01/14/86
