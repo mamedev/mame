@@ -260,14 +260,16 @@ void r65c52_device::update_irq(int idx)
 {
 	bool irq = false;
 	LOG("R65C52: %x  IER  %x ISR %x\n", idx + 1, m_ier[idx], m_isr[idx]);
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 7; i++)
 	{
-		if ((m_ier[idx] & (1 >> i)) && ((m_isr[idx] & (1 >> i))))
+		int ier_bit = BIT(m_ier[idx],i);
+		int isr_bit = BIT(m_isr[idx],i);
+
+		if ((ier_bit == isr_bit) && (ier_bit ==1))
 		{
 			irq = true;
 		}
 	}
-
 	output_irq(idx, irq);
 }
 
