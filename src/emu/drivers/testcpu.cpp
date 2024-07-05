@@ -12,6 +12,10 @@
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 
+#include <sstream>
+
+
+namespace {
 
 //**************************************************************************
 //  CONSTANTS
@@ -29,18 +33,37 @@ class testcpu_state : public driver_device
 {
 public:
 	// constructor
-	testcpu_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_cpu(*this, "maincpu"),
-			m_ram(*this, "ram"),
-			m_space(nullptr)
+	testcpu_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_cpu(*this, "maincpu"),
+		m_ram(*this, "ram"),
+		m_space(nullptr)
 	{
 	}
+
+	void testcpu(machine_config &config);
+
+private:
+	class disasm_data_buffer : public util::disasm_interface::data_buffer
+	{
+	public:
+		disasm_data_buffer(address_space &space) : m_space(space)
+		{
+		}
+
+		virtual u8 r8(offs_t pc) const override { return m_space.read_byte(pc); }
+		virtual u16 r16(offs_t pc) const override { return m_space.read_word(pc); }
+		virtual u32 r32(offs_t pc) const override { return m_space.read_dword(pc); }
+		virtual u64 r64(offs_t pc) const override { return m_space.read_qword(pc); }
+
+	private:
+		address_space &m_space;
+	};
 
 	// timer callback; used to wrest control of the system
 	TIMER_CALLBACK_MEMBER(timer_tick)
 	{
-		static const u32 sample_instructions[] =
+		static constexpr u32 sample_instructions[] =
 		{
 			0x3d40f900,     // li r10,0xf9000000
 			0x394af000,     // addi r10,r10,-0x1000
@@ -52,7 +75,7 @@ public:
 		};
 
 		// iterate over instructions
-		for (auto & sample_instruction : sample_instructions)
+		for (auto &sample_instruction : sample_instructions)
 		{
 			// write the instruction to execute, followed by a BLR which will terminate the
 			// basic block in the DRC
@@ -74,8 +97,8 @@ public:
 			}
 
 			// output initial state
-			printf("==================================================\n");
-			printf("Initial state:\n");
+			osd_printf_info("==================================================\n");
+			osd_printf_info("Initial state:\n");
 			dump_state(true);
 
 			// execute one instruction
@@ -83,7 +106,7 @@ public:
 			m_cpu->run();
 
 			// dump the final register state
-			printf("Final state:\n");
+			osd_printf_info("Final state:\n");
 			dump_state(false);
 		}
 
@@ -101,49 +124,43 @@ public:
 		m_cpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 		// set a timer to go off right away
-		timer_alloc(FUNC(timer_tick), this)->adjust(attotime::zero);
+		timer_alloc(FUNC(testcpu_state::timer_tick), this)->adjust(attotime::zero);
 	}
 
 	// dump the current CPU state
 	void dump_state(bool disassemble)
 	{
-		char buffer[256];
-		u8 instruction[32];
-		buffer[0] = 0;
+		std::ostringstream buffer;
 		int bytes = 0;
 		if (disassemble)
 		{
-			// fill in an array of bytes in the CPU's natural order
-			int maxbytes = m_cpu->max_opcode_bytes();
-			for (int bytenum = 0; bytenum < maxbytes; bytenum++)
-				instruction[bytenum] = m_space->read_byte(RAM_BASE + bytenum);
-
 			// disassemble the current instruction
-			bytes = m_cpu->disassemble(buffer, RAM_BASE, instruction, instruction) & DASMFLAG_LENGTHMASK;
+			disasm_data_buffer databuf(*m_space);
+			bytes = m_cpu->get_disassembler().disassemble(buffer, RAM_BASE, databuf, databuf) & util::disasm_interface::LENGTHMASK;
 		}
 
 		// output the registers
-		printf("PC : %08X", u32(m_cpu->state_int(PPC_PC)));
-		if (disassemble && bytes > 0)
+		osd_printf_info("PC : %08X", u32(m_cpu->state_int(PPC_PC)));
+		if (bytes > 0)
 		{
-			printf(" => ");
+			osd_printf_info(" => ");
 			for (int bytenum = 0; bytenum < bytes; bytenum++)
-				printf("%02X", instruction[bytenum]);
-			printf("  %s", buffer);
+				osd_printf_info("%02X", m_space->read_byte(RAM_BASE + bytenum));
+			osd_printf_info("  %s", buffer.str());
 		}
-		printf("\n");
+		osd_printf_info("\n");
 		for (int regnum = 0; regnum < 32; regnum++)
 		{
-			printf("R%-2d: %08X   ", regnum, u32(m_cpu->state_int(PPC_R0 + regnum)));
-			if (regnum % 4 == 3) printf("\n");
+			osd_printf_info("R%-2d: %08X   ", regnum, u32(m_cpu->state_int(PPC_R0 + regnum)));
+			if (regnum % 4 == 3) osd_printf_info("\n");
 		}
-		printf("CR : %08X   LR : %08X   CTR: %08X   XER: %08X\n",
+		osd_printf_info("CR : %08X   LR : %08X   CTR: %08X   XER: %08X\n",
 				u32(m_cpu->state_int(PPC_CR)), u32(m_cpu->state_int(PPC_LR)),
 				u32(m_cpu->state_int(PPC_CTR)), u32(m_cpu->state_int(PPC_XER)));
 		for (int regnum = 0; regnum < 32; regnum++)
 		{
-			printf("F%-2d: %10g   ", regnum, u2d(m_cpu->state_int(PPC_F0 + regnum)));
-			if (regnum % 4 == 3) printf("\n");
+			osd_printf_info("F%-2d: %10g   ", regnum, u2d(m_cpu->state_int(PPC_F0 + regnum)));
+			if (regnum % 4 == 3) osd_printf_info("\n");
 		}
 	}
 
@@ -152,20 +169,18 @@ public:
 	{
 		u64 fulloffs = offset;
 		u64 result = fulloffs + (fulloffs << 8) + (fulloffs << 16) + (fulloffs << 24) + (fulloffs << 32);
-		printf("Read from %08X & %08X%08X = %08X%08X\n", offset * 8, (int)((mem_mask&0xffffffff00000000LL) >> 32) , (int)(mem_mask&0xffffffff), (int)((result&0xffffffff00000000LL) >> 32), (int)(result&0xffffffff));
+		osd_printf_info("Read from %08X & %016X = %016X\n", offset * 8, mem_mask, result);
 		return result;
 	}
 
 	// report writes to anywhere
 	void general_w(offs_t offset, u64 data, u64 mem_mask = ~0)
 	{
-		printf("Write to %08X & %08X%08X = %08X%08X\n", offset * 8, (int)((mem_mask&0xffffffff00000000LL) >> 32) , (int)(mem_mask&0xffffffff), (int)((data&0xffffffff00000000LL) >> 32), (int)(data&0xffffffff));
+		osd_printf_info("Write to %08X & %016X = %016X\n", offset * 8, mem_mask, data);
 	}
 
-	void testcpu(machine_config &config);
-
 	void ppc_mem(address_map &map);
-private:
+
 	// internal state
 	required_device<ppc603e_device> m_cpu;
 	required_shared_ptr<u64> m_ram;
@@ -180,8 +195,8 @@ private:
 
 void testcpu_state::ppc_mem(address_map &map)
 {
+	map(0x00000000, 0xffffffff).rw(FUNC(testcpu_state::general_r), FUNC(testcpu_state::general_w));
 	map(RAM_BASE, RAM_BASE+7).ram().share("ram");
-	map(0x00000000, 0xffffffff).rw(this, FUNC(testcpu_state::general_r), FUNC(testcpu_state::general_w));
 }
 
 
@@ -193,8 +208,8 @@ void testcpu_state::ppc_mem(address_map &map)
 void testcpu_state::testcpu(machine_config &config)
 {
 	// CPUs
-	PPC603E(config, m_cpu, 66000000);
-	m_cpu->set_bus_frequency(66000000);  // Multiplier 1, Bus = 66MHz, Core = 66MHz
+	PPC603E(config, m_cpu, 66'000'000);
+	m_cpu->set_bus_frequency(66'000'000);  // Multiplier 1, Bus = 66MHz, Core = 66MHz
 	m_cpu->set_addrmap(AS_PROGRAM, &testcpu_state::ppc_mem);
 }
 
@@ -208,10 +223,11 @@ ROM_START( testcpu )
 	ROM_REGION( 0x10, "user1", ROMREGION_ERASEFF )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************
 //  GAME DRIVERS
 //**************************************************************************
 
-GAME( 2012, testcpu, 0, testcpu, 0, driver_device, 0, ROT0, "MAME", "CPU Tester", MACHINE_NO_SOUND )
+GAME( 2012, testcpu, 0, testcpu, 0, testcpu_state, empty_init, ROT0, "MAME", "CPU Tester", MACHINE_NO_SOUND_HW )
