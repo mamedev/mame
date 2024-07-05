@@ -353,23 +353,23 @@ DEVICE_IMAGE_LOAD_MEMBER(pv1000_state::cart_load)
 
 uint32_t pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_border_col); // TODO: might be either black or colored by this register
+	bitmap.fill(m_border_col); // border is on top and bottom
 
 	for (int y = 0; y < 24; y++)
 	{
-		for (int x = 2; x < 30; x++) // left-right most columns are definitely masked by the border color
+		for (int x = 2; x < 30; x++) // left-right most columns never even drawn, black instead
 		{
 			uint16_t tile = m_p_videoram[y * 32 + x];
 
 			if (tile < 0xe0 || m_force_pattern)
 			{
 				tile += (m_pcg_bank << 8);
-				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8);
+				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8-16, y*8+26);
 			}
 			else
 			{
 				tile -= 0xe0;
-				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8);
+				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8-16, y*8+26);
 			}
 		}
 	}
@@ -380,7 +380,7 @@ uint32_t pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 
 
 
 /* Interrupt is triggering 16 times during vblank. */
-/* we have chosen to trigger on scanlines 195, 199, 203, 207, 211, 215, 219, 223, 227, 231, 235, 239, 243, 247, 251, 255 */
+/* They are spaced every 4 scanlines, with equal padding before and after */
 TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_on_cb)
 {
 	int vpos = m_screen->vpos();
@@ -394,11 +394,11 @@ TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_on_cb)
 	m_irq_off_timer->adjust(m_screen->time_until_pos(vpos, 380/2));
 
 	/* Schedule next IRQ trigger */
-	if (vpos >= 255)
+	if (vpos >= 281)
 	{
-		next_vpos = 195;
+		next_vpos = 221;
 	}
-	m_irq_on_timer->adjust(m_screen->time_until_pos(next_vpos, 0));
+	m_irq_on_timer->adjust(m_screen->time_until_pos(next_vpos, 224));
 }
 
 
@@ -478,7 +478,7 @@ void pv1000_state::pv1000(machine_config &config)
 
 	/* D65010G031 - Video & sound chip */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(17897725/3, 380, 0, 256, 262, 0, 192);
+	m_screen->set_raw(17897725/4, 288, 0, 224, 262, 0, 244);
 	m_screen->set_screen_update(FUNC(pv1000_state::screen_update_pv1000));
 	m_screen->set_palette(m_palette);
 
