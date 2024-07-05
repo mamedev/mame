@@ -43,8 +43,8 @@ const tiny_rom_entry *rmMQ2_device::device_rom_region() const
 void rmMQ2_device::rmMQ2_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("idc_rom", 0);
-	map(0xe000, 0xffff).ram(); // 8K RAM
-	//map(0xe000, 0xe7ff).mirror(0x1800).ram(); // 2K RAM mirrored at 0xe800, 0xf000 and 0xf800
+	//map(0xe000, 0xffff).ram(); // 8K RAM
+	map(0xe000, 0xe7ff).mirror(0x1800).ram(); // 2K RAM mirrored at 0xe800, 0xf000 and 0xf800
 }
 
 //-------------------------------------------------
@@ -65,13 +65,6 @@ void rmMQ2_device::rmMQ2_io(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static const z80_daisy_config daisy_chain[] =
-{
-	{ "sio" },
-	{ "ctc" },
-	{ nullptr }
-};
-
 static void rmMQ2_floppies(device_slot_interface &device)
 {
 	device.option_add("525sd", FLOPPY_525_SD);
@@ -84,16 +77,13 @@ void rmMQ2_device::device_add_mconfig(machine_config &config)
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rmMQ2_device::rmMQ2_mem);
 	m_maincpu->set_addrmap(AS_IO, &rmMQ2_device::rmMQ2_io);
-	m_maincpu->set_daisy_config(daisy_chain);
 
 	Z80SIO(config, m_sio, 8_MHz_XTAL / 2);
-	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_sio->out_txdb_callback().set(FUNC(rmMQ2_device::output_rxd));
 	m_sio->out_dtrb_callback().set(FUNC(rmMQ2_device::output_cts));
 	m_sio->out_rtsb_callback().set(FUNC(rmMQ2_device::output_dcd));
 
 	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
-	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 
 	CLOCK(config, "ctc_clock", 8_MHz_XTAL / 4).signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
@@ -146,6 +136,7 @@ void rmMQ2_device::input_rts(int state)
 	if (started())
 	{
 	m_sio->dcdb_w(state);
+	// NMI generated to reset baud rate to 9600
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
@@ -153,20 +144,25 @@ void rmMQ2_device::input_rts(int state)
 void rmMQ2_device::port0_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
+	const int drive_no = ~data & 0x0f;
 
-	if (BIT(data, 0))
+	switch (drive_no)
 	{
-		floppy = m_floppy1->get_device();
-	}
-	else
-	{
+	case 1:
 		floppy = m_floppy0->get_device();
+		break;
+	case 2:
+		floppy = m_floppy1->get_device();
+		break;
+	default:
+		// ignore as only two drives supported
+		break;
 	}
-	m_fdc->set_floppy(floppy);
 
 	if (floppy)
 	{
-		// don't know how motor on is connected
+		m_fdc->set_floppy(floppy);
+		// motor should be controlled by bit 4, but it only seems to work if always on
 		floppy->mon_w(0);
 		floppy->ss_w(BIT(data, 5));
 	}
@@ -174,13 +170,13 @@ void rmMQ2_device::port0_w(uint8_t data)
 
 void rmMQ2_device::port1_w(uint8_t data)
 {
-	// bit 1 is set for DD, and cleared for SD
+	// bit 1 is set for DD (MFM encoding), and cleared for SD (FM encoding)
 	m_fdc->dden_w(!BIT(data, 1));
 }
 
 uint8_t rmMQ2_device::status_r()
 {
-	if (!bINTRQ && !bDRQ)
+	if (!m_fdc->intrq_r() && !m_fdc->drq_r())
 	{
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 	}
@@ -189,12 +185,11 @@ uint8_t rmMQ2_device::status_r()
 
 void rmMQ2_device::fdc_intrq_w(int state)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 	if (state)
 	{
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 	}
-	bINTRQ = state;
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
 void rmMQ2_device::fdc_drq_w(int state)
@@ -203,5 +198,4 @@ void rmMQ2_device::fdc_drq_w(int state)
 	{
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 	}
-	bDRQ = state;
 }

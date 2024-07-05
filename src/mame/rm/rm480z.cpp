@@ -380,7 +380,8 @@ void rm480z_state::rm480z(machine_config &config)
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);
 	m_screen->register_vblank_callback(vblank_state_delegate(&rm480z_state::vblank_callback, this));
 
-	TIMER(config, "kbd_scan").configure_periodic(FUNC(rm480z_state::kbd_scan), attotime::from_hz((500_kHz_XTAL / 8) / 8));
+	// keyboard is clocked by 500 kHz oscillator divided to give a 15625 Hz scan rate
+	TIMER(config, "kbd_scan").configure_periodic(FUNC(rm480z_state::kbd_scan), attotime::from_hz(500_kHz_XTAL / 32));
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
@@ -399,10 +400,8 @@ void rm480z_state::rm480za(machine_config &config)
 
 ROM_START( rm480z )
 	ROM_REGION( 0x4000, "rom0", 0 )
-	//ROM_LOAD( "ros2-2b-0.bin",   0x0000, 0x4000, CRC(fbb46129) SHA1(c83a423cdaea9bddf8f6b958061075ac7abac525) )
 	ROM_LOAD( "fv2.0_0_12099_19.2.86.ic83", 0x0000, 0x4000, CRC(a0f02d8a) SHA1(1c063b842699dc0ad85a5a5f337f2864497f9c0f) )
 	ROM_REGION( 0x4000, "rom1", 0 )
-	//ROM_LOAD( "ros2-2b-1.bin",   0x0000, 0x4000, CRC(2a93ca6e) SHA1(7fdd772d4251dbf951a687d184ed787cfe21212b) )
 	ROM_LOAD( "fv2.0_1_12100_27.2.86.ic93", 0x0000, 0x4000, CRC(2a93ca6e) SHA1(7fdd772d4251dbf951a687d184ed787cfe21212b) )
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "cg06_12098_28.2.86.ic98",    0x0000, 0x2000, CRC(15d40f7e) SHA1(a7266357eb9be849f77a97ff3013b236c0af8289) )
@@ -410,25 +409,24 @@ ROM_END
 
 ROM_START( rm480za )
 	ROM_REGION( 0x2000, "ros", 0 )
-	//ROM_LOAD( "ros_1.2b.ls",   0x0000, 0x2000, CRC(37e93287) SHA1(c96d4b7eedadb0fb8e3732b6ba3e898e123c393f) )
-	ROM_LOAD( "ros-1-2D.bin",   0x0000, 0x2000, CRC(3fe61618) SHA1(ee4d70694489ab7f123e59d73b304d6d5fcd8a81) )
+	ROM_DEFAULT_BIOS("1.2d")
+	ROM_SYSTEM_BIOS(0, "1.2b", "ROS 1.2B")
+	ROMX_LOAD( "ros_1.2b.ls",   0x0000, 0x2000, CRC(37e93287) SHA1(c96d4b7eedadb0fb8e3732b6ba3e898e123c393f), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "1.2d", "ROS 1.2D")
+	ROMX_LOAD( "ros-1-2d.bin",  0x0000, 0x2000, CRC(3fe61618) SHA1(ee4d70694489ab7f123e59d73b304d6d5fcd8a81), ROM_BIOS(1) )
+
 	ROM_REGION( 0x2000, "bir0", 0 )
-	//ROM_LOAD( "bir_5.4b_0.lt", 0x0000, 0x4000, CRC(64759792) SHA1(ffce5e59788cd492937e85b368b71e8a5a2aaa9c) )
-	ROM_LOAD( "bir5-4-0.bin", 0x0000, 0x2000, CRC(51875c95) SHA1(96bb058512a0f21634e629229effc6b36d0f0a7a) )
+	ROM_LOAD( "bir5-4-0.bin",  0x0000, 0x2000, CRC(51875c95) SHA1(96bb058512a0f21634e629229effc6b36d0f0a7a) )
 	ROM_REGION( 0x2000, "bir1", 0 )
-	//ROM_LOAD( "bir_5.4b_1.lu", 0x0000, 0x4000, CRC(adce35df) SHA1(dc20df0fcfefc5e2682b47e7ce454043dc593cd8) )
-	ROM_LOAD( "bir5-4-1.bin", 0x0000, 0x2000, CRC(63959245) SHA1(2e42453ce281fd6cc2de176ff98f0a326d3ae8a8) )
+	ROM_LOAD( "bir5-4-1.bin",  0x0000, 0x2000, CRC(63959245) SHA1(2e42453ce281fd6cc2de176ff98f0a326d3ae8a8) )
 	ROM_REGION( 0x2000, "bir2", 0 )
-	//ROM_LOAD( "bir_5.4b_2.lv", 0x0000, 0x4000, CRC(5a455fc8) SHA1(04c5f17120ee085c013e600b77ca63cbb138aa4d) )
-	ROM_LOAD( "bir5-4-2.bin", 0x0000, 0x2000, CRC(d3eb07cf) SHA1(9e576e8d2ae571319dc6c1cb035f13cf56abf690) )
-	//ROM_REGION( 0x10000, "user1", 0 ) // bioses for fdc board versions
-	//ROM_LOAD( "idc3-1i.rom",   0x0000, 0x2000, CRC(39e2cdf0) SHA1(ba523af357b61bbe6192727139850f36597d79f1) )
-	//ROM_LOAD( "idc5-1j.rom",   0x2000, 0x2000, CRC(d2ac27e2) SHA1(12d3966e0096c9bfb98135e15c3ddb37920cce15) )
+	ROM_LOAD( "bir5-4-2.bin",  0x0000, 0x2000, CRC(d3eb07cf) SHA1(9e576e8d2ae571319dc6c1cb035f13cf56abf690) )	
+
 	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "cg06.lq",       0x0000, 0x2000, BAD_DUMP CRC(15d40f7e) SHA1(a7266357eb9be849f77a97ff3013b236c0af8289) ) // chip is marked CG05, might not be the same, so marked as bad
+	ROM_LOAD( "cg06.lq",        0x0000, 0x2000, BAD_DUMP CRC(15d40f7e) SHA1(a7266357eb9be849f77a97ff3013b236c0af8289) ) // chip is marked CG05, might not be the same, so marked as bad
 ROM_END
 
 /* Driver */
-//   YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT      CLASS                   INIT                       COMPANY              FULLNAME                        FLAGS
-COMP(1981, rm480z,     0,       0,      rm480z,     rm480z,    rm480z_state,           driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 1)",         MACHINE_IS_SKELETON)
-COMP(1981, rm480za,    rm480z,  0,      rm480za,    rm480z,    rm480z_state,           driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 2)",         MACHINE_IS_SKELETON)
+//   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT                       COMPANY              FULLNAME                FLAGS
+COMP(1981, rm480z,  0,      0,      rm480z,  rm480z, rm480z_state, driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 1)", MACHINE_NOT_WORKING)
+COMP(1981, rm480za, rm480z, 0,      rm480za, rm480z, rm480z_state, driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 2)", MACHINE_NOT_WORKING)

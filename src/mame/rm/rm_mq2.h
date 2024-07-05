@@ -37,9 +37,6 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 
-	bool bINTRQ = false;
-	bool bDRQ = false;
-
 	void rmMQ2_mem(address_map &map);
 	void rmMQ2_io(address_map &map);
 	void port0_w(uint8_t data);
