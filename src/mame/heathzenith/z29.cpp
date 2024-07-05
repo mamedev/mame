@@ -149,7 +149,6 @@ void z29_state::ext_map(address_map &map)
 	map(0x3000, 0x3000).mirror(0xfff).w(FUNC(z29_state::latch_12k_w));
 	map(0x4000, 0x47ff).mirror(0x800).ram().share("attrmem");
 	map(0x5000, 0x57ff).mirror(0x800).ram().share("charmem");
-	// 0x6000 - DMA Memory
 	map(0x7000, 0x703f).mirror(0xfc0).rw("nvram", FUNC(x2210_device::read), FUNC(x2210_device::write));
 }
 
