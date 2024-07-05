@@ -416,7 +416,7 @@ The golf club acts like a LED gun. PCB power input is 12V.
 #define LOG_IRQ     (1U << 3)
 #define LOG_TIMER   (1U << 4)
 
-#define VERBOSE (LOG_GENERAL | LOG_I2C | LOG_IRQ | LOG_TIMER)
+#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
