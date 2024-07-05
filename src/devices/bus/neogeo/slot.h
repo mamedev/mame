@@ -74,6 +74,11 @@ enum
 	NEOGEO_KOF10TH,
 	NEOGEO_VLINER,
 	NEOGEO_JOCKEYGP,
+
+	//
+	// fullset Project Neon custom cart type
+	//
+	NEOGEO_NEON,
 };
 
 

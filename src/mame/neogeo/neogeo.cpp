@@ -1551,12 +1551,11 @@ void neogeo_base_state::set_slot_idx(int slot)
 			space.install_read_port(0x2c0000, 0x2c0001, "IN6");
 			break;
 		
-		default:
-			//
-			// fullset Project Neon i/o ports. Probably should implement these as a protection device (like above games)
-			// so that these ports are not wired up for all games. Another day...
-			//
-			
+		//
+		// fullset Project Neon i/o ports. Probably should implement these as a protection device (like above games)
+		// so that these ports are not wired up for all games. Another day...
+		//
+		case NEOGEO_NEON:
 			// enable mcu debug in mame
 			space.install_write_handler(0x500000, 0x500001, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_enable_debug_w)));
 
@@ -1573,6 +1572,12 @@ void neogeo_base_state::set_slot_idx(int slot)
 			// game to mcu ram
 			space.install_write_handler(0x210000, 0x21001f, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_mcu_ram_w)));
 			space.install_read_handler(0x210000, 0x21001f, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_mcu_ram_r)));
+			
+			printf("\n\n*** Fullset Cart Handlers Installed ***\n\n");
+			
+			break;
+
+		default:
 			break;
 		}
 	}
