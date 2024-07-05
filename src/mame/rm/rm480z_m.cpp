@@ -215,9 +215,15 @@ void rm480z_state::hrg_port_write(offs_t offset, uint8_t data)
 void rm480z_state::machine_reset()
 {
 	uint8_t* mem = m_ram->pointer();
+
 	m_vram.reset();
 	memset(m_hrg_ram, 0, sizeof(m_hrg_ram));
-	m_alt_char_set = false;
+	m_hrg_display_mode = hrg_display_mode::none;
+	m_hrg_port0 = 0;
+	m_hrg_port1 = 0;
+	m_hrg_mem_open = false;
+	m_video_inhibit = false;
+	m_hrg_inhibit = false;
 
 	m_kbd_reset = true;
 	m_kbd_ready = false;

@@ -141,7 +141,7 @@ private:
 	void machine_reset() override;
 	uint32_t screen_update_rm480z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_screen(bitmap_ind16 &bitmap) const;
-	void putChar(int charnum, int x, int y, bitmap_ind16 &bitmap) const;
+	void putChar(int charnum, int x, int y, bitmap_ind16 &bitmap, bool bMonochrome) const;
 	int calculate_hrg_vram_index() const;
 	void palette_init(palette_device &palette);
 	void change_palette(int index, uint8_t value);

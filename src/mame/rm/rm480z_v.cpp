@@ -95,7 +95,7 @@ void rm480z_state::videoram_write(offs_t offset, uint8_t data)
 	m_vram.set_char(row, col, data);
 }
 
-void rm480z_state::putChar(int charnum, int x, int y, bitmap_ind16 &bitmap) const
+void rm480z_state::putChar(int charnum, int x, int y, bitmap_ind16 &bitmap, bool bMonochrome) const
 {
 	const int pw = (m_videomode == RM480Z_VIDEOMODE_40COL) ? 2 : 1;
 	const int ph = 1;
@@ -124,13 +124,18 @@ void rm480z_state::putChar(int charnum, int x, int y, bitmap_ind16 &bitmap) cons
 
 		for (int c = 0; c < 8; c++, data <<= 1)
 		{
-			uint8_t pixel_value = BIT(data, 7) ? 2 : 0;
+			uint8_t pixel_value;
 			if (attrRev)
 			{
-				pixel_value = !pixel_value;
+				pixel_value = BIT(data, 7) ? 0 : 2;
 			}
-			if (attrDim && pixel_value)
+			else
 			{
+				pixel_value = BIT(data, 7) ? 2 : 0;
+			}
+			if (attrDim && pixel_value && bMonochrome)
+			{
+				// NB only monochrome monitors support dimmed (grey) text
 				pixel_value = 1;
 			}
 			if (pixel_value)
@@ -210,8 +215,9 @@ void rm480z_state::draw_medium_res_graphics(bitmap_ind16 &bitmap) const
 void rm480z_state::update_screen(bitmap_ind16 &bitmap) const
 {
 	const int ncols = (m_videomode == RM480Z_VIDEOMODE_40COL) ? 40 : 80;
+	const bool bMonochrome = m_io_display_type->read();
 
-	if (!m_hrg_mem_open && (!m_hrg_inhibit || !m_io_display_type->read()))
+	if (!m_hrg_mem_open && (!m_hrg_inhibit || !bMonochrome))
 	{
 		switch (m_hrg_display_mode)
 		{
@@ -231,14 +237,14 @@ void rm480z_state::update_screen(bitmap_ind16 &bitmap) const
 		}
 	}
 
-	if (!m_video_inhibit || m_io_display_type->read())
+	if (!m_video_inhibit || bMonochrome)
 	{
 		for (int row = 0; row < RM480Z_SCREENROWS; row++)
 		{
 			for (int col = 0; col < ncols; col++)
 			{
 				uint8_t curch = m_vram.get_char(row, col);
-				putChar(curch, col, row, bitmap);
+				putChar(curch, col, row, bitmap, bMonochrome);
 			}
 		}
 	}
