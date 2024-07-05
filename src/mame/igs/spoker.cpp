@@ -225,10 +225,10 @@ void spoker_state::nmi_and_coins_w(uint8_t data)
 //      popmessage("%02x", data);
 	}
 
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);   // coin_a
-	machine().bookkeeping().coin_counter_w(1, data & 0x04);   // coin_c
-	machine().bookkeeping().coin_counter_w(2, data & 0x08);   // key in
-	machine().bookkeeping().coin_counter_w(3, data & 0x10);   // coin out mech
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));   // coin_a
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));   // coin_c
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 3));   // key in
+	machine().bookkeeping().coin_counter_w(3, BIT(data, 4));   // coin out mech
 
 	m_leds[6] = BIT(data, 6);   // led for coin out / hopper active
 
@@ -318,13 +318,15 @@ uint8_t spoker_state::magic_r()
 	switch (m_igs_magic[0])
 	{
 		case 0x00:
-			if (!(m_igs_magic[1] & 0x01)) return m_dsw[0]->read();
-			if (!(m_igs_magic[1] & 0x02)) return m_dsw[1]->read();
-			if (!(m_igs_magic[1] & 0x04)) return m_dsw[2]->read();
-			if (!(m_igs_magic[1] & 0x08)) return m_dsw[3]->read();
-			if (!(m_igs_magic[1] & 0x10)) return m_dsw[4]->read();
-			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", m_maincpu->pc(), m_igs_magic[1]);
-			break;
+			{
+				uint8_t result = 0xff;
+				if (BIT(~m_igs_magic[1], 0)) result &= m_dsw[0]->read();
+				if (BIT(~m_igs_magic[1], 1)) result &= m_dsw[1]->read();
+				if (BIT(~m_igs_magic[1], 2)) result &= m_dsw[2]->read();
+				if (BIT(~m_igs_magic[1], 3)) result &= m_dsw[3]->read();
+				if (BIT(~m_igs_magic[1], 4)) result &= m_dsw[4]->read();
+				return result;
+			}
 
 		default:
 			logerror("%06x: warning, reading with igs_magic = %02x\n", m_maincpu->pc(), m_igs_magic[0]);
@@ -382,7 +384,7 @@ void spokeru_state::portmap(address_map &map)
 	map(0x5083, 0x5083).portr("BUTTONS1");
 	map(0x5090, 0x5090).w(FUNC(spokeru_state::coins_w));
 	map(0x5091, 0x5091).w(FUNC(spokeru_state::leds_w));
-	map(0x5092, 0x5092).portr("BUTTONS1").w(FUNC(spokeru_state::nmi_video_leds_w));
+	map(0x5092, 0x5092).w(FUNC(spokeru_state::nmi_video_leds_w));
 	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x50c0, 0x50c0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x7000, 0x77ff).ram().w(FUNC(spokeru_state::fg_tile_w)).share(m_fg_tile_ram);

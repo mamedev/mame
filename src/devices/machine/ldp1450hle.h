@@ -13,6 +13,7 @@
 #pragma once
 
 #include "laserdsc.h"
+
 #include "diserial.h"
 
 
@@ -42,20 +43,19 @@ public:
 	void set_baud(s32 clock) { m_baud = clock; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// laserdisc overrides
+	// laserdisc_device implementation
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
 	virtual s32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
 	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
 
-	// diserial overrides
+	// device_serial_interface implementation
 	virtual void rcv_complete() override;
 	virtual void tra_complete() override;
 	virtual void tra_callback() override;
-
 
 	TIMER_CALLBACK_MEMBER(process_vbi_data);
 	TIMER_CALLBACK_MEMBER(process_queue);
@@ -128,7 +128,6 @@ private:
 		SUBMODE_USER_INDEX_STRING_1,
 		SUBMODE_USER_INDEX_STRING_2,
 		SUBMODE_USER_INDEX_WINDOW,
-
 	};
 
 	enum address_mode : u8
@@ -137,9 +136,8 @@ private:
 		ADDRESS_CHAPTER
 	};
 
-
 	void queue_reply(u8 reply, float delay);
-	void queue_reply_buffer (const u8 reply[], float delay);
+	void queue_reply_buffer(const u8 reply[], float delay);
 
 	static u32 bcd_to_literal(u32 bcd);
 	static bool is_number(char value);
@@ -156,7 +154,7 @@ private:
 	emu_timer *         m_queue_timer;
 	bool                m_cmd_running;
 	u8             m_reply_buffer[64];
-	
+
 	u8             m_reply_write_index;
 	u8             m_reply_read_index;
 	u8             m_reply;

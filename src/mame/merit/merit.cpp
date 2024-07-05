@@ -164,7 +164,7 @@ private:
 
 	pen_t m_pens[NUM_PENS];
 	uint8_t m_lscnblk = 0;
-	uint16_t m_extra_video_bank_bit[2]{};
+	uint16_t m_extra_video_bank_bit = 0;
 
 	void hsync_changed(int state);
 	void led1_w(uint8_t data);
@@ -383,8 +383,8 @@ MC6845_UPDATE_ROW(merit_state::crtc_update_row)
 	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
 		int const attr = m_ram_attr[ma & 0x7ff];
-		int const region = (attr & 0x40) >> 6;
-		int addr = ((m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (m_extra_video_bank_bit[0] | m_extra_video_bank_bit[1])) << 4) | (ra & 0x0f);
+		int const region = BIT(attr, 6);
+		int addr = ((m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | m_extra_video_bank_bit) << 4) | (ra & 0x0f);
 		int const colour = (attr & 0x7f) << 3;
 
 		addr &= (rlen - 1);
@@ -474,10 +474,9 @@ void merit_state::led2_w(uint8_t data)
 
 void merit_state::misc_w(uint8_t data)
 {
-	flip_screen_set(~data & 0x10);
-	m_extra_video_bank_bit[0] = (data & 2) << 8;
-	m_extra_video_bank_bit[1] = (data & 1) << 10;
-	m_lscnblk = (data >> 3) & 1;
+	flip_screen_set(BIT(~data, 4));
+	m_extra_video_bank_bit = bitswap<2>(data, 0, 1) << 9;
+	m_lscnblk = BIT(data, 3);
 
 	// other bits unknown
 }
@@ -2852,6 +2851,14 @@ ROM_START( matchem )
 	ROM_LOAD( "dec003.u13",          0x000, 0x117, CRC(5b9a2fec) SHA1(c56c7bbe13028903cfc82440ee8b24df855134c2) ) // PAL16L8ANC - brute forced
 	ROM_LOAD( "crt-209_pal16l8.bin", 0x200, 0x117, CRC(e916c56f) SHA1(1517091ff1791d923e5bd62d18d1428b6a3a8c72) ) // SC3339 20-pin 16L8 type PAL (inside CRT-209 module)
 ROM_END
+
+/*
+Known to exist but not currently dumped as seen from a manual:
+
+SEX MATCH'em UP (GERMAN) for crt200 board Program No. 6221-52 (U5-0 & U6-0)
+requires a CRT-209 Advanced Processor Module, properly encoded, inserted at U1
+
+*/
 
 ROM_START( matchemg )
 	ROM_REGION( 0x20000, "maincpu", 0 )

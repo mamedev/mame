@@ -468,7 +468,6 @@ void ibm5160_mb_device::device_add_mconfig(machine_config &config)
 	m_isabus->drq2_callback().set(m_dma8237, FUNC(am9517a_device::dreq2_w));
 	m_isabus->drq3_callback().set(m_dma8237, FUNC(am9517a_device::dreq3_w));
 	m_isabus->iochck_callback().set(FUNC(ibm5160_mb_device::iochck_w));
-	m_isabus->iochrdy_callback().set_inputline(":maincpu", INPUT_LINE_HALT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

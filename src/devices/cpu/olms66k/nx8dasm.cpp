@@ -734,10 +734,11 @@ offs_t nx8_500s_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	{
 		const u8 byte2 = opcodes.r8(pc + 1);
 		util::stream_format(stream, "%-8sA,%d", BIT(byte1, 4) ? "LB" : "L", util::sext(byte2, 7));
+		// Documentation has these the other way around, but actual code suggests otherwise
 		if (BIT(byte2, 7))
-			stream << "[DP]";
-		else
 			stream << "[USP]";
+		else
+			stream << "[DP]";
 		return 2 | SUPPORTED;
 	}
 
@@ -880,10 +881,11 @@ offs_t nx8_500s_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	{
 		const u8 byte2 = opcodes.r8(pc + 1);
 		util::stream_format(stream, "%-8sA,%d", BIT(m_psw, 12) ? "ST" : "STB", util::sext(byte2, 7));
+		// Documentation has these the other way around, but actual code suggests otherwise
 		if (BIT(byte2, 7))
-			stream << "[DP]";
-		else
 			stream << "[USP]";
+		else
+			stream << "[DP]";
 		return 2 | SUPPORTED;
 	}
 

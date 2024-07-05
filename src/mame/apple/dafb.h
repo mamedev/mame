@@ -101,7 +101,7 @@ private:
 	TIMER_CALLBACK_MEMBER(cursor_tick);
 };
 
-// Discrete DAFB: Quadra 700 & 900, includes "TurboSCSI"
+// Discrete DAFB II: Quadra 950, includes "TurboSCSI"
 class dafb_device: public dafb_base
 {
 public:
@@ -120,11 +120,29 @@ public:
 	template <int bus> void turboscsi_dma_w(offs_t offset, u16 data, u16 mem_mask);
 
 protected:
+	dafb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	virtual void device_start() override;
 
 private:
 	required_device<m68000_musashi_device> m_maincpu;
 	ncr53c94_device *m_ncr[2];
+};
+
+class dafb_q950_device : public dafb_device
+{
+public:
+	dafb_q950_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
+
+	virtual u32 ramdac_r(offs_t offset) override;
+	virtual void ramdac_w(offs_t offset, u32 data) override;
+
+private:
+	u8 m_pcbr1;
 };
 
 class dafb_memc_device: public dafb_base
@@ -171,6 +189,7 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(DAFB, dafb_device)
+DECLARE_DEVICE_TYPE(DAFB_Q950, dafb_q950_device)
 DECLARE_DEVICE_TYPE(DAFB_MEMC, dafb_memc_device)
 DECLARE_DEVICE_TYPE(DAFB_MEMCJR, dafb_memcjr_device)
 

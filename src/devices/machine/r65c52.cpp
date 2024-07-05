@@ -2,9 +2,9 @@
 // copyright-holders:jwallace
 /**********************************************************************
 
-	Rockwell 65C52  Dual Asynchronous Communication Interface Adapter
+    Rockwell 65C52  Dual Asynchronous Communication Interface Adapter
 
-	A slightly tweaked combination of two 6551 ACIAs on a single chip
+    A slightly tweaked combination of two 6551 ACIAs on a single chip
 
 **********************************************************************/
 
@@ -16,41 +16,42 @@
 
 DEFINE_DEVICE_TYPE(R65C52, r65c52_device, "r65c52", "Rockwell 65C52 DACIA")
 
-r65c52_device::r65c52_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) : device_t(mconfig, R65C52, tag, owner, clock),
-																												m_internal_clock1(*this, "clock1"),
-																												m_internal_clock2(*this, "clock2"),
-																												m_irq_handler(*this),
-																												m_txd_handler(*this),
-																												m_rxc_handler(*this),
-																												m_rts_handler(*this),
-																												m_dtr_handler(*this),
-																												m_aux_ctrl{0, 0}, m_control{0, 0},
-																												m_compare{0, 0},
-																												m_format{0, 0}, m_status{0, 0},
-																												m_tdr{0, 0}, m_tdre{true, true},
-																												m_rdr{0, 0}, m_rdrf{false, false},
-																												m_ier{0, 0}, m_isr{0, 0},
-																												m_irq{0, 0},
-																												m_overrun{false, false},
-																												m_parity_err{false, false},
-																												m_parity_err_mode{0, 0},
-																												m_txd{0, 0},
-																												m_rxc(0),
-																												m_rts{0, 0},
-																												m_dtr{0, 0},
-																												m_xtal(clock),
-																												m_divide{0, 0},
-																												m_cts{0, 0},
-																												m_dsr{0, 0},
-																												m_dcd{0, 0},
-																												m_rxd{0, 0}, m_wordlength{0, 0}, m_stoplength{0, 0}, m_brk{0, 0}, m_echo_mode{0, 0}, m_parity{0, 0},
-																												m_rx_state{STATE_START, STATE_START},
-																												m_rx_clock{0, 0}, m_rx_bits{0, 0}, m_rx_shift{0, 0}, m_rx_parity{0, 0},
-																												m_rx_counter{0, 0},
-																												m_tx_state{STATE_START, STATE_START},
-																												m_tx_output{OUTPUT_MARK, OUTPUT_MARK},
-																												m_tx_clock{0, 0}, m_tx_bits{0, 0}, m_tx_shift{0, 0}, m_tx_parity{0, 0},
-																												m_tx_counter{0, 0}
+r65c52_device::r65c52_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, R65C52, tag, owner, clock),
+	m_internal_clock1(*this, "clock1"),
+	m_internal_clock2(*this, "clock2"),
+	m_irq_handler(*this),
+	m_txd_handler(*this),
+	m_rxc_handler(*this),
+	m_rts_handler(*this),
+	m_dtr_handler(*this),
+	m_aux_ctrl{0, 0}, m_control{0, 0},
+	m_compare{0, 0},
+	m_format{0, 0}, m_status{0, 0},
+	m_tdr{0, 0}, m_tdre{true, true},
+	m_rdr{0, 0}, m_rdrf{false, false},
+	m_ier{0, 0}, m_isr{0, 0},
+	m_irq{0, 0},
+	m_overrun{false, false},
+	m_parity_err{false, false},
+	m_parity_err_mode{0, 0},
+	m_txd{0, 0},
+	m_rxc(0),
+	m_rts{0, 0},
+	m_dtr{0, 0},
+	m_xtal(clock),
+	m_divide{0, 0},
+	m_cts{0, 0},
+	m_dsr{0, 0},
+	m_dcd{0, 0},
+	m_rxd{0, 0}, m_wordlength{0, 0}, m_stoplength{0, 0}, m_brk{0, 0}, m_echo_mode{0, 0}, m_parity{0, 0},
+	m_rx_state{STATE_START, STATE_START},
+	m_rx_clock{0, 0}, m_rx_bits{0, 0}, m_rx_shift{0, 0}, m_rx_parity{0, 0},
+	m_rx_counter{0, 0},
+	m_tx_state{STATE_START, STATE_START},
+	m_tx_output{OUTPUT_MARK, OUTPUT_MARK},
+	m_tx_clock{0, 0}, m_tx_bits{0, 0}, m_tx_shift{0, 0}, m_tx_parity{0, 0},
+	m_tx_counter{0, 0}
 {
 }
 
@@ -355,10 +356,10 @@ void r65c52_device::write_control(int idx, u8 data)
 	update_divider(idx);
 
 	// bit 4
-	m_echo_mode[idx] = (m_control[idx] >> 4) & 1;
+	m_echo_mode[idx] = BIT(m_control[idx], 4);
 
 	// bit 5
-	m_stoplength[idx] = 1 + ((m_control[idx] >> 5) & 1);
+	m_stoplength[idx] = 1 + BIT(m_control[idx], 5);
 
 	LOG("R65C52: %x CTRL%X ECHO %x STOP%x\n", idx + 1, m_control[idx], m_echo_mode[idx], m_stoplength[idx]);
 }
@@ -368,13 +369,13 @@ void r65c52_device::write_format(int idx, u8 data)
 	m_format[idx] = data;
 
 	// bit 0
-	output_rts(idx, ((m_format[idx] >> 0) & 1));
+	output_rts(idx, BIT(m_format[idx], 0));
 
 	// bit 1
-	output_dtr(idx, ((m_format[idx] >> 1) & 1));
+	output_dtr(idx, BIT(m_format[idx], 1));
 
 	// bit 2
-	if (!((m_format[idx] >> 2) & 1))
+	if (!BIT(m_format[idx], 2))
 	{
 		m_parity[idx] = PARITY_NONE;
 	}
@@ -397,10 +398,10 @@ void r65c52_device::write_aux_ctrl(int idx, u8 data)
 	m_aux_ctrl[idx] = data;
 
 	// bit 0
-	m_parity_err_mode[idx] = (m_format[idx] >> 0) & 1;
+	m_parity_err_mode[idx] = BIT(m_format[idx], 0);
 
 	// bit 1
-	m_brk[idx] = (m_format[idx] >> 1) & 1;
+	m_brk[idx] = BIT(m_format[idx], 1);
 
 	LOG("R65C52: %x  AUX CTRL %x \n", idx + 1, m_aux_ctrl[idx]);
 }
@@ -829,7 +830,6 @@ void r65c52_device::transmitter_clock(int idx, int state)
 			switch (m_tx_state[idx])
 			{
 			case STATE_START:
-			{
 				m_tx_counter[idx] = 0;
 
 				m_tx_state[idx] = STATE_DATA;
@@ -876,9 +876,8 @@ void r65c52_device::transmitter_clock(int idx, int state)
 				// fatalerror("setup");
 				output_txd(idx, 0);
 				break;
-			}
+
 			case STATE_DATA:
-			{
 				if (m_tx_counter[idx] == m_divide[idx])
 				{
 					m_tx_counter[idx] = 0;
@@ -950,10 +949,8 @@ void r65c52_device::transmitter_clock(int idx, int state)
 					}
 				}
 				break;
-			}
 
 			case STATE_STOP:
-			{
 				if (m_tx_counter[idx] >= stoplengthcounter(idx))
 				{
 					if (m_tx_output[idx] == OUTPUT_BREAK)
@@ -980,7 +977,6 @@ void r65c52_device::transmitter_clock(int idx, int state)
 					}
 				}
 				break;
-			}
 			}
 		}
 	}

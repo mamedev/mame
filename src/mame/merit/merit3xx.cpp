@@ -2,16 +2,69 @@
 // copyright-holders:
 
 /*
-The CRT-300 is an extension of CRT-250/CRT-260 boards found in meritm.cpp.
+
+Merit's CRT-300/CRT-350 Superstar platform
+
+Games generically named Superstar, but also Superstar 2000, Superstar 4000 both with & without Jackpot,
+  Dakota Superstar as well as Montana Superstar.
+
+ Featuring (as stated in flyer):
+  Games approved for Montana, South Dakota and Canada.
+  Fully approved by ALC
+  5 games in 1, featuring 3 pokers, Blackjack & Super Eight Lines
+  All games player selectable
+  Bi-lingual (French/English)
+  Enclosed NCR printer with quick reload
 
 TODO:
-- Hanging at UART device check (PC=5e44)
+- ma6710 hangs at UART device check (PC=5e44). Bypassing it, game stops with 'TOD CLOCK ERROR';
 - Never initializes RAMDAC;
-- Never initializes CRTC on 350 games;
-- Map secondary NVRAM module
-- Map / connect up Dallas DS1216 RTC
-- ma6710a starts with game malfunction message. It can be started by switching IN2:2 on,
+- Never initializes CRTC on CRT-352 games;
+- Map secondary NVRAM moduleM
+- Map / connect up Dallas DS1216 RTCM
+- ma6710a/ma9800 start with game malfunction message. It can be started by switching IN2:2 on,
   then pressing discard 3. Games 'Super Eight' and 'Black Jack' show GFX banking logic isn't correct.
+  'Black Jack' GFX are over 0x8000 in ROM but proper GFX bank bit hasn't been identified.
+
+===================================================================================================
+
+Standard Superstar machine button layout:
+
++---------------------------------------------------+
+| +-----+              Merit                +-----+ |
+| |COLCT|                                   | BET | |
+| +-----+                                   +-----+ |
+| +-----+   +---+ +---+ +---+ +---+ +---+   +-----+ |
+| |STAND|   | 1 | | 2 | | 3 | | 4 | | 5 |   |DEAL | |
+| +-----+   +---+ +---+ +---+ +---+ +---+   +-----+ |
++---------------------------------------------------+
+
+Bet & Collect buttons are usually universal, however the other buttons
+are labeled as needed per individual game requirements. Each button
+can be lit up depending on the needs and function of the game.
+
+As examples:
+
+The ma8350 set uses:
+
+COLLECT                                  BET
+MEUN/STAND    "DISCARD/RECALL" for 1-5   DEAL/RESET/DRAW/STAND
+
+
+The ma9800 set uses:
+
+KIFIZET                                  TET
+BEFEJEZ    "ELDOB/VISSZAVESZ" for 1-5    OSZT
+
+
+A Dakota Superstar which mimics pull tab cards uses:
+
+CASH OUT                                 BET/MISEZ
+SELECT TAB    "OPEN/EPOSEZ" for 1-5      OPEN ALL/EPOSEZ TOUT
+
+
+Other known buttons include an internal PERIOD RESET & BOOKS button, a
+JACKPOT RESET key switch and an external CALL ATTENDANT button.
 
 ===================================================================================================
 
@@ -57,6 +110,7 @@ Sound: AY8930
 Other: PC16550DN UART with FIFO clocked @ 1.84MHz
        D8255AC Programmable Peripheral Interface chip x 2
        DS1225Y-200 Dallas 8Kx8 NVRAM @ U6
+       BENCHMARQ bq4010YMA-150 8Kx8 NVRAM @ U7
        DS1231 Power Monitor Chip
 
 Note: U46 through U47 are for graphics ROMs which matched to the specific game/set
@@ -181,7 +235,7 @@ MEMORY EXPANSION BOARD CRT-352 rev A
 |                          |
 | DS1216.U18   GAL20XV10B  |
 |                          |
-| DS1230Y.U17              |
+| DS1230Y.U17    MAX232CPE |
 |                          |
 ||===========J1===========||
 |                          |
@@ -192,6 +246,7 @@ Other: DS1225Y-200 Dallas 8Kx8 NVRAM
        DS1230Y-200 Dallas 32Kx8 NVRAM
        DS1216 Dallas 2Kx8 SmartWatch RTC
        PC16550DN UART with FIFO clocked @ 1.84MHz
+       Maxim MAX232CPE RS-232 Line Transmitter/Reciver
        8 switch DIP switch block labeled SW1 (enable/disable games)
 
 Connectors:
@@ -578,8 +633,9 @@ public:
 		, m_attram(*this, "attrram")
 	{ }
 
-	void merit300(machine_config &config);
-	void merit350(machine_config &config);
+	void crt307(machine_config &config);
+	void crt307_alt(machine_config &config);
+	void crt352(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -588,29 +644,31 @@ protected:
 private:
 	MC6845_UPDATE_ROW(update_row);
 
-	void ppi1_pa_w(u8 data);
-	void crt350_rombank_w(u8 data);
+	void crt307_rombank_w(u8 data);
+	void crt352_rombank_w(u8 data);
+
 
 	void main_map(address_map &map);
-	void io_map(address_map &map);
-	void crt350_main_map(address_map &map);
-	void crt350_io_map(address_map &map);
+	void alt_main_map(address_map &map);
+	void crt307_io_map(address_map &map);
+	void crt352_io_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ym2149_device> m_ymsnd;
-	required_region_ptr<uint8_t> m_gfx;
-	required_shared_ptr<uint8_t> m_charram;
-	required_shared_ptr<uint8_t> m_attram;
+	required_region_ptr<u8> m_gfx;
+	required_shared_ptr<u8> m_charram;
+	required_shared_ptr<u8> m_attram;
 };
+
 
 MC6845_UPDATE_ROW(merit3xx_state::update_row)
 {
-	uint16_t x = 0;
-	uint8_t const *const data = m_gfx;
+	u16 x = 0;
+	u8 const *const data = m_gfx;
 
-	for (uint8_t cx = 0; cx < x_count; cx++)
+	for (u8 cx = 0; cx < x_count; cx++)
 	{
 		const u32 base_addr = (ma + cx) & 0x1fff;
 		int const attr = m_attram[base_addr];
@@ -639,12 +697,12 @@ MC6845_UPDATE_ROW(merit3xx_state::update_row)
 	}
 }
 
-void merit3xx_state::ppi1_pa_w(u8 data)
+void merit3xx_state::crt307_rombank_w(u8 data)
 {
 	m_rombank->set_entry((data & 0x04) >> 1 | (~data & 0x01));
 }
 
-void merit3xx_state::crt350_rombank_w(u8 data)
+void merit3xx_state::crt352_rombank_w(u8 data)
 {
 	m_rombank->set_entry(data & 0x07);
 }
@@ -653,14 +711,22 @@ void merit3xx_state::main_map(address_map &map)
 {
 //  map.unmap_value_high();
 	map(0x0000, 0x7fff).bankr("rombank");
-	map(0x8000, 0x9fff).ram();//.share("nvram"); // TODO: reenable NVRAM, currently m6710a doesn't like it at all
+	map(0x8000, 0x9fff).ram().share("nvram"); // TODO: reenable NVRAM, currently m6710a doesn't like it at all
 	// definitely accesses RAM here, would drop to "RAM error" with unmap high
 	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xdfff).ram().share("charram");
+	map(0xe000, 0xffff).ram().share("attrram");
+}
+
+void merit3xx_state::alt_main_map(address_map &map)
+{
+	main_map(map);
+
 	map(0xc000, 0xdfff).ram().share("attrram");
 	map(0xe000, 0xffff).ram().share("charram");
 }
 
-void merit3xx_state::io_map(address_map &map)
+void merit3xx_state::crt307_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -673,19 +739,27 @@ void merit3xx_state::io_map(address_map &map)
 	map(0x80, 0x81).w(m_ymsnd, FUNC(ym2149_device::address_data_w));
 }
 
-void merit3xx_state::crt350_main_map(address_map &map)
+void merit3xx_state::crt352_io_map(address_map &map)
 {
-	main_map(map);
-//  map(0xa000, 0xbfff).ram();
-}
-
-void merit3xx_state::crt350_io_map(address_map &map)
-{
-	io_map(map);
-	map(0x20, 0x20).w(FUNC(merit3xx_state::crt350_rombank_w));
+	crt307_io_map(map);
+	map(0x20, 0x20).w(FUNC(merit3xx_state::crt352_rombank_w));
 }
 
  // currently geared towards 'Joker Poker' in ma6710a
+/*
+Need to map:
+
+9 control panel buttons: 1-5, BET, COLLECT, STAND, DEAL <-- Done!!
+
+Internal door panel buttons: PERIOD RESET & BOOKS <-- Books is done
+
+JACKPOT RESET key switch <-- IN2, bit 0x04?? or is that "Period Reset"
+
+Call Attendant button & Call Attendant lamp
+
+lamps for control panel buttons
+
+*/
 static INPUT_PORTS_START( merit3xx )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1")
@@ -703,12 +777,8 @@ static INPUT_PORTS_START( merit3xx )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
-	PORT_DIPNAME( 0x08, 0x08, "IN1.4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN1.5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW ) // AKA Diagnostics - Not working
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )
 	PORT_DIPNAME( 0x20, 0x20, "IN1.6" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -718,13 +788,11 @@ static INPUT_PORTS_START( merit3xx )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )
-	PORT_DIPNAME( 0x02, 0x02, "IN2.2" ) // shows last hand during gameplay, needs to be switched on to avoid game malfunction message
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_TOGGLE
+	PORT_DIPNAME( 0x02, 0x00, "IN2.2" ) // shows last hand during gameplay, needs to be switched on to avoid game malfunction message
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "IN2.3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_K) // Jackpot Reset switch? - clears "GAME MALFUNCTION ... PLEASE CALL ATTENDANT" error message
 	PORT_DIPNAME( 0x08, 0x08, "IN2.4" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -768,6 +836,33 @@ static INPUT_PORTS_START( merit3xx )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ma9800 )
+	PORT_INCLUDE( merit3xx )
+
+//  PORT_START("IN1")
+//  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) // Button labeled ELDOB/VISSZAVESZ
+//  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) // Button labeled ELDOB/VISSZAVESZ
+//  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) // Button labeled ELDOB/VISSZAVESZ
+//  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) // Button labeled ELDOB/VISSZAVESZ
+//  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) // Button labeled ELDOB/VISSZAVESZ
+//  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) // Button labeled TET
+//  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) // Button labeled OSZT
+//  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // Button labeled KIFIZET
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) // gives 1 credit at a time (25 cents)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) // gives 4 credits at a time ($1.00)
+//  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) // Button labeled BEFEJEZ
+	PORT_DIPNAME( 0x20, 0x20, "IN1.6 Door" ) PORT_TOGGLE // <-- for ma9800 set, ON results in DOOR OPEN error
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN1.7 Door" ) PORT_TOGGLE // <-- for ma9800 set, ON results in DOOR OPEN error
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) // gives 4 credits at a time ($1.00)
+INPUT_PORTS_END
+
+
 static const gfx_layout gfx_8x8x3 =
 {
 	8,8,
@@ -783,6 +878,7 @@ static GFXDECODE_START( gfx_merit300 )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3, 0, 1 )
 GFXDECODE_END
 
+
 void merit3xx_state::machine_start()
 {
 	memory_region *rom = memregion("maincpu");
@@ -794,11 +890,12 @@ void merit3xx_state::machine_reset()
 	m_rombank->set_entry(0);
 }
 
-void merit3xx_state::merit300(machine_config &config)
+
+void merit3xx_state::crt307(machine_config &config)
 {
 	Z80(config, m_maincpu, 10_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &merit3xx_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &merit3xx_state::io_map);
+	m_maincpu->set_addrmap(AS_IO, &merit3xx_state::crt307_io_map);
 
 	 // TODO: reenable NVRAM, currently m6710a doesn't like it at all
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -809,7 +906,7 @@ void merit3xx_state::merit300(machine_config &config)
 	ppi0.in_pc_callback().set_ioport("IN2");
 
 	i8255_device &ppi1(I8255(config, "ppi1"));
-	ppi1.out_pa_callback().set(FUNC(merit3xx_state::ppi1_pa_w));
+	ppi1.out_pa_callback().set(FUNC(merit3xx_state::crt307_rombank_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(10_MHz_XTAL, 616, 0, 512, 270, 0, 256);
@@ -836,16 +933,21 @@ void merit3xx_state::merit300(machine_config &config)
 
 }
 
-void merit3xx_state::merit350(machine_config &config)
+void merit3xx_state::crt307_alt(machine_config &config)
 {
-	merit300(config);
+	crt307(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &merit3xx_state::crt350_main_map);
-	m_maincpu->set_addrmap(AS_IO, &merit3xx_state::crt350_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &merit3xx_state::alt_main_map);
+}
+
+void merit3xx_state::crt352(machine_config &config)
+{
+	crt307(config);
+
+	m_maincpu->set_addrmap(AS_IO, &merit3xx_state::crt352_io_map);
 
 	subdevice<i8255_device>("ppi1")->out_pa_callback().set_nop();
 }
-
 
 
 ROM_START( ma6710 ) // CRT-300 mainboard + CRT-307 rev A expansion board
@@ -869,12 +971,12 @@ ROM_END
 ROM_START( ma6710a ) // CRT-350 mainboard + CRT-307 rev A expansion board
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD( "6710-21_u1_5c.u1", 0x00000, 0x10000, CRC(cc8d40ca) SHA1(3988c82ed820fd2a8b9e6432e8231efbc0274721) ) // different jurisdiction than the 6710-13 set
-	ROM_LOAD( "6710-21_u1_5c.u2", 0x10000, 0x10000, CRC(47f08ef0) SHA1(f572df3807a83e11a1d361f7cb809818898b98b4) ) // 6710-21 TPT56 011299
+	ROM_LOAD( "6710-21_u2_5c.u2", 0x10000, 0x10000, CRC(47f08ef0) SHA1(f572df3807a83e11a1d361f7cb809818898b98b4) ) // 6710-21 TPT56 011299
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "mltp_u46.u46", 0x00000, 0x10000, CRC(77d89071) SHA1(bf5207aaca2831cbc45734f8cd4ef2468cfd7191) )
-	ROM_LOAD( "mltp_u46.u47", 0x10000, 0x10000, CRC(efdfad6a) SHA1(2f6d2a601f60351d3b5ff735a96bde1e11f2bb74) )
-	ROM_LOAD( "mltp_u46.u48", 0x20000, 0x10000, CRC(daeb9a0e) SHA1(d209ae3f802a5ceeb92e41ed71415629892bce91) )
+	ROM_LOAD( "mltp_u47.u47", 0x10000, 0x10000, CRC(efdfad6a) SHA1(2f6d2a601f60351d3b5ff735a96bde1e11f2bb74) )
+	ROM_LOAD( "mltp_u48.u48", 0x20000, 0x10000, CRC(daeb9a0e) SHA1(d209ae3f802a5ceeb92e41ed71415629892bce91) )
 
 	ROM_REGION( 0x2000, "nvram", 0 )
 	ROM_LOAD( "ds1225y.u7", 0x0000, 0x2000, CRC(b2977ed0) SHA1(63cddd7af4bdd6734b67dbb38effe1057515fa37) )
@@ -884,7 +986,30 @@ ROM_START( ma6710a ) // CRT-350 mainboard + CRT-307 rev A expansion board
 ROM_END
 
 
-ROM_START( ma7551t ) // all ROMs reads matched printed checksum
+ROM_START( ma9800 ) // CRT-350 mainboard + CRT-307 rev A expansion board
+	ROM_REGION(0x20000, "maincpu", 0)
+	ROM_LOAD( "9800-20-r0_u1.u1", 0x00000, 0x10000, CRC(8a815776) SHA1(56e538808b29d77ad88c27974bbdc40785221e64) ) // Hungarian regional set
+	ROM_LOAD( "9800-20-r0_u2.u2", 0x10000, 0x10000, CRC(386ea511) SHA1(ca212e091d50973e8c247fbc829937273b9f0b5b) ) // G9800-20 REV 100692
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "mltp_u46.u46", 0x00000, 0x10000, CRC(77d89071) SHA1(bf5207aaca2831cbc45734f8cd4ef2468cfd7191) )
+	ROM_LOAD( "mltp_u47.u47", 0x10000, 0x10000, CRC(efdfad6a) SHA1(2f6d2a601f60351d3b5ff735a96bde1e11f2bb74) )
+	ROM_LOAD( "mltp_u48.u48", 0x20000, 0x10000, CRC(daeb9a0e) SHA1(d209ae3f802a5ceeb92e41ed71415629892bce91) )
+
+	ROM_REGION( 0x2000, "nvram", 0 )
+	ROM_LOAD( "ds1225y.u7", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x8000, "nvram2", 0 )
+	ROM_LOAD( "ds1235yw.u16", 0x0000, 0x8000, NO_DUMP )
+ROM_END
+
+/**********************************************************
+
+         MEMORY EXPANSION BOARD CRT-352 sets
+
+**********************************************************/
+
+ROM_START( ma7551t ) // all ROMs' reads matched printed checksum
 	ROM_REGION(0x40000, "maincpu", 0)
 	ROM_LOAD( "u8_7551-20-r3t_1d98.u8",   0x00000, 0x08000, CRC(a130ec60) SHA1(7d09faf1c6a5df63890eb22317bb4a5ad55d8b8f) )
 	ROM_LOAD( "u9_7551-20-r3t_8f39.u9",   0x08000, 0x08000, CRC(6758e2f9) SHA1(f114bd78e1d940190bc2771d90642dba566d47ed) )
@@ -932,7 +1057,7 @@ ROM_START( ma7551p )
 ROM_END
 
 
-ROM_START( ma7556 ) // all ROMs reads matched printed checksum
+ROM_START( ma7556 ) // all ROMs' reads matched printed checksum
 	ROM_REGION(0x40000, "maincpu", 0)
 	ROM_LOAD( "u8_7556-01-r0_23c6.u8",   0x00000, 0x08000, CRC(4dfca3d2) SHA1(2d8cc59edad12368dbc267b763af46e095599bc0) )
 	ROM_LOAD( "u9_7556-01-r0_ef1e.u9",   0x08000, 0x08000, CRC(142370d6) SHA1(cb32f204b7bf78874990ef438fd5115cc3ed140e) )
@@ -956,7 +1081,7 @@ ROM_START( ma7556 ) // all ROMs reads matched printed checksum
 ROM_END
 
 
-ROM_START( ma7558 ) // all ROMs reads matched printed checksum
+ROM_START( ma7558 ) // all ROMs' reads matched printed checksum
 	ROM_REGION(0x40000, "maincpu", 0)
 	ROM_LOAD( "u8_7558-01-r0_ds_d27a.u8",   0x00000, 0x08000, CRC(ff59d929) SHA1(902ba35967a49b73a6b7c1990c736ac922e25672) )
 	ROM_LOAD( "u9_7558-01-r0_ds_e651.u9",   0x08000, 0x08000, CRC(e02f8c98) SHA1(d04351535f86907129b97811a02a590f96f108b9) )
@@ -1005,13 +1130,15 @@ ROM_END
 
 } // anonymous namespace
 
-// CRT-300 games
-GAME( 1989, ma6710,  0, merit300, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-13",     MACHINE_IS_SKELETON ) // build date is 04/25/96?
 
-// CRT-350 games
-GAME( 1991, ma6710a, 0, merit300, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-21",     MACHINE_IS_SKELETON ) // build date is 01/12/99? - but shows 1991 on screen
-GAME( 199?, ma7551t, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-20-R3T", MACHINE_IS_SKELETON ) // build date is 04/12/00?
-GAME( 199?, ma7551p, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-21-R2P", MACHINE_IS_SKELETON ) // build date is 12/27/00? - should be clone of ma7551t??
-GAME( 199?, ma7556,  0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7556-00-R2",  MACHINE_IS_SKELETON ) // build date is 10/20/98?
-GAME( 199?, ma7558,  0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7558-01-R0",  MACHINE_IS_SKELETON ) // build date is 02/25/02?
-GAME( 199?, ma8350,  0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 8350-00-R1",  MACHINE_IS_SKELETON ) // build date is 07/28/94?
+// CRT-300 or CRT-350 mainboard + CRT-307 Rev A ROM board
+GAME( 1989, ma6710,  0, crt307,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-13",     MACHINE_IS_SKELETON ) // build date is 04/25/96?
+GAME( 1991, ma6710a, 0, crt307_alt, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-21",     MACHINE_IS_SKELETON ) // build date is 01/12/99? - but shows 1991 on screen
+GAME( 1992, ma9800,  0, crt307_alt, ma9800,   merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 9800-20-R0",  MACHINE_IS_SKELETON ) // build date is 10/06/92?
+
+// CRT-350 mainboard + MEMORY EXPANSION BOARD CRT-352
+GAME( 199?, ma7551t, 0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-20-R3T", MACHINE_IS_SKELETON ) // build date is 04/12/00?
+GAME( 199?, ma7551p, 0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-21-R2P", MACHINE_IS_SKELETON ) // build date is 12/27/00? - should be clone of ma7551t??
+GAME( 199?, ma7556,  0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7556-00-R2",  MACHINE_IS_SKELETON ) // build date is 10/20/98?
+GAME( 199?, ma7558,  0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7558-01-R0",  MACHINE_IS_SKELETON ) // build date is 02/25/02?
+GAME( 199?, ma8350,  0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 8350-00-R1",  MACHINE_IS_SKELETON ) // build date is 07/28/94?

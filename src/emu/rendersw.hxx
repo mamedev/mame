@@ -30,10 +30,15 @@ private:
 	};
 
 	// internal helpers
+	template <int... Values>
+	static auto make_cosine_table(std::integer_sequence<int, Values...>)
+	{
+		return std::array<u32, sizeof...(Values)>{ u32((1.0 / cos(atan(double(Values) / double(sizeof...(Values) - 1)))) * 0x10000000 + 0.5)... };
+	}
 	static constexpr bool is_opaque(float alpha) { return (alpha >= (NoDestRead ? 0.5f : 1.0f)); }
 	static constexpr bool is_transparent(float alpha) { return (alpha < (NoDestRead ? 0.5f : 0.0001f)); }
-	static inline rgb_t apply_intensity(int intensity, rgb_t color) { return color.scale8(intensity); }
-	static inline float round_nearest(float f) { return floor(f + 0.5f); }
+	static rgb_t apply_intensity(int intensity, rgb_t color) { return color.scale8(intensity); }
+	static float round_nearest(float f) { return floor(f + 0.5f); }
 
 	// destination pixels are written based on the values of the template parameters
 	static constexpr PixelType dest_assemble_rgb(u32 r, u32 g, u32 b) { return (r << DstShiftR) | (g << DstShiftG) | (b << DstShiftB); }
@@ -427,15 +432,8 @@ private:
 
 	static void draw_line(render_primitive const &prim, PixelType *dstdata, s32 width, s32 height, u32 pitch)
 	{
-		// internal cosine table generated at compile-time
-		static const auto s_cosine_table = []() {
-			std::array<u32, 2049> result{};
-
-			for (int entry = 0; entry <= 2048; entry++)
-				result[entry] = int(double(1.0 / cos(atan(double(entry) / 2048.0))) * 0x10000000 + 0.5);
-
-			return static_cast<const std::array<u32, 2049>>(result);
-		}();
+		// internal cosine table generated at compile time
+		static auto const s_cosine_table = make_cosine_table(std::make_integer_sequence<int, 2049>());
 
 		// compute the start/end coordinates
 		int x1 = int(prim.bounds.x0 * 65536.0f);

@@ -936,6 +936,8 @@ maclc580                        // April 3, 1995 Apple Macintosh LC/Performa 580
 
 @source:apple/macquadra700.cpp
 macqd700                        // 1991 Apple Macintosh Quadra 700
+macqd900                        // 1991 Apple Macintosh Quadra 900
+macqd950                        // 1992 Apple Macintosh Quadra 950
 
 @source:apple/macquadra800.cpp
 macqd800                        // 1993 Apple Macintosh Quadra 800
@@ -19505,11 +19507,13 @@ mephisto
 mephisto1x
 mephisto2
 mephisto2a
-mephisto2e
+mephisto2b
 mephisto3
 mephisto3a
 mephisto3b
 mephisto3c
+mephistoe2
+mephistoe2a
 mephistoj
 
 @source:hegenerglaser/europa.cpp
@@ -19528,7 +19532,7 @@ nshort                          // 1993 Mephisto Nigel Short
 
 @source:hegenerglaser/mm1.cpp
 mm1
-mm1b
+mm1a
 mmirage
 
 @source:hegenerglaser/mm2.cpp
@@ -23824,8 +23828,10 @@ popnmt                          // GQ976 (c) 2000 (Japan)
 popnmt2                         // GQ976 (c) 2000 (Japan)
 popnanm                         // GQ987 (c) 2000 (Japan)
 popnanma                        // GQ987 (c) 2000 (Japan)
-popnanm2                        // GEA02 (c) 2001 (Japan)
-popnanm2a                       // GEA02 (c) 2001 (Japan)
+popnanm2                        // GEA02 (c) 2001 (Japan JAC)
+popnanm2a                       // GEA02 (c) 2001 (Japan JAC)
+popnanm2ja                      // GEA02 (c) 2001 (Japan JAA)
+popnanm2jaa                     // GEA02 (c) 2001 (Japan JAA)
 ppd                             // GQ977 (c) 2000 (Korea)
 ppp                             // GQ977 (c) 2000 (Japan)
 ppp11                           // GQ977 (c) 2000 (Japan)
@@ -27088,6 +27094,7 @@ ma7551t                         // (c) 199? Merit
 ma7556                          // (c) 199? Merit
 ma7558                          // (c) 199? Merit
 ma8350                          // (c) 199? Merit
+ma9800                          // (c) 199? Merit
 
 @source:merit/meritm.cpp
 americna                        // (c) 1987 Merit
@@ -41854,6 +41861,11 @@ ds348                           // Sigtron Daruma
 datacast                        //
 
 @source:skeleton/design.cpp
+azkoyent12                      // (c) Azkoyen
+azkoyent6                       // (c) Azkoyen
+azkoyent61                      // (c) Azkoyen
+azkoyent61a                     // (c) Azkoyen
+azkoyent8                       // (c) Azkoyen
 design6                         // (c) Azkoyen
 designe                         // (c) Azkoyen
 
@@ -44334,7 +44346,6 @@ shadowwa                        // 6215 - (c) 1988 Tecmo (World)
 stratof                         // (c) 1991 Tecmo
 tknight                         // (c) 1989 Tecmo
 wildfang                        // (c) 1989 Tecmo
-wildfangh                       // (c) 1991? Tecmo?
 wildfangs                       // (c) 1989 Tecmo
 
 @source:tecmo/lvcards.cpp
@@ -44453,6 +44464,9 @@ tek6130                         // Tektronix 6130
 
 @source:tektronix/tekxp33x.cpp
 tekxp330                        //
+
+@source:tektronix/xd88.cpp
+xd88_01
 
 @source:telenova/compis.cpp
 compis                          // 1985 Telenova Compis
