@@ -11,13 +11,13 @@
 
     IRQs:
 
-    IRQ0: ???               (Task 4)
-    IRQ1: unused
-    IRQ2: ???               Possibly UART? Accesses registers at 0xffe00008...f
+    IRQ0: VBLANK            (Task 4)
+    IRQ1: LANC              Accesses registers at 0xffe98000...7
+    IRQ2: UART              Accesses registers at 0xffe00008...f
     IRQ3: Sound             (Task 5)
     IRQ4: Voodoo3           Currently only for User Interrupt Command, maybe a more extensive handler gets installed later?
 
-    I2C:  ???               (no task switch) what drives this? network? U13 (ADC838) test fails if I2C doesn't work
+    I2C:  ???               (no task switch) U13 (ADC838) test fails if I2C doesn't work
     DMA0: unused
     DMA1: unused
     IIVPR3: unused
@@ -86,21 +86,16 @@
     - hookup adc0838, reads from i2c;
     - convert epic to be a device, make it input_merger/irq_callback complaint;
     - (more intermediate steps for proper PCI conversions here)
-    - xtrial: hangs when coined up;
-    - gticlub2: throws NETWORK ERROR after course select;
     - jpark3: attract mode demo play acts weird, the dinosaur gets submerged
       and camera doesn't really know what to do, CPU core bug?
     - jpark3: crashes during second attract cycle;
-    - sscopex, thrild2: attract mode black screens (coin still works), sogeki/sscopefh are unaffected;
-    - thrild2: no BGMs;
-    - wcombat: black screen when entering service mode;
+    - sscopex: attract mode black screens (coin still works), sogeki/sscopefh are unaffected;
     - mocapglf, sscopefh, sscopex: implement 2nd screen output, controlled by IP90C63A;
     \- sscopex/sogeki desyncs during gameplay intro, leaves heavy trails in gameplay;
     - ppp2nd: hangs when selecting game mode from service (manages to save);
-    - code1db: crashes when selecting single course type;
     - wcombatj: gets stuck on network check;
-    - thrild2c: blue screen;
-    - thrild2ac: black screen;
+    - thrild2c: blue screen (bad CF dump);
+    - thrild2ac: black screen (bad CF dump);
     - all games needs to be verified against factory settings
       (game options, coin options & sound options often don't match "green colored" defaults)
 
@@ -110,34 +105,6 @@
     - It seems that p911 has 3 unique regional images: U/E, K/A, and J. If you try booting, for example, U region on a K/A image, it won't find some files and will error out with "distribution error".
     - mocapglf: enable "show diag" at boot then disable it once the diag text appears.
       This will allow game to bypass the I/O SENSOR error later on.
-
-    Game status (potentially outdated, to be moved on top):
-        boxingm             Goes in-game. Controllers are not emulated. Various graphical glitches.
-        jpark3              Goes in-game. Controllers are not emulated. Various graphical glitches.
-        mocapb,j            Goes in-game. Controllers are not emulated. Various graphical glitches. Random crashes.
-        ppp2nd,a            Fully playable with graphical glitches. No network or DVD support. Crashes when returning to game mode from test menu.
-        p911(all)           Goes in-game. Controllers are not emulated. Various graphical glitches.
-        tsurugi,j           Goes in-game. Controllers are not emulated. Various graphical glitches.
-        p9112               Goes in-game. Controllers are not emulated. Various graphical glitches.
-
-        gticlub2,ea         Attract mode works. Coins up. Hangs in various places. Will crash with "network error" after stage is selected.
-        thrild2,a           Attract mode with partial graphics. Coins up. Hangs in various places.
-
-        sscopefh            Graphics heavily glitched. Gun controller is not emulated. Sensor error and hopper error stop it from working.
-
-        mfightc,c           Requires touch panel emulation. Gets stuck at "Waiting for central monitor, checking serial...".
-        xtrial              Hangs at "Please set the time for the bookkeeping" message.
-
-        code1d,b,a          Can boot but crashes randomly and quickly so it's hard to do anything.
-
-        mocapglf            Gets stuck at "SENSOR I/O ERROR" though test menu can still be entered.
-        sscopex,sogeki      Graphics very heavily glitched. Gun controller is not emulated.
-
-        wcombat             Can boot into a test menu by using a combination of dipswitches, but it says "serial check bad". Can't boot normally.
-        wcombatu            Bootable when dipsw 4 is set to on. Controls not implemented so it's not possible to pass nickname selection screen. Freezes when test button is pressed.
-        thrild2c,ac         Inf loop on blue screen
-
-
 
 ===================================================================================================
 
@@ -425,6 +392,8 @@ The golf club acts like a LED gun. PCB power input is 12V.
 
 #include "emu.h"
 
+#include "kviper_lanc.h"
+
 #include "cpu/powerpc/ppc.h"
 #include "cpu/upd78k/upd78k4.h"
 #include "bus/ata/ataintf.h"
@@ -447,7 +416,7 @@ The golf club acts like a LED gun. PCB power input is 12V.
 #define LOG_IRQ     (1U << 3)
 #define LOG_TIMER   (1U << 4)
 
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_GENERAL | LOG_I2C | LOG_IRQ | LOG_TIMER)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -480,7 +449,8 @@ public:
 		m_analog_input(*this, "AN%u", 0U),
 		m_gun_input(*this, "GUN%u", 0U),
 		m_io_ppp_sensors(*this, "SENSOR%u", 1U),
-		m_dmadac(*this, { "dacr", "dacl" })
+		m_dmadac(*this, { "dacr", "dacl" }),
+		m_lanc(*this, "lanc")
 	{
 	}
 
@@ -538,7 +508,7 @@ private:
 	uint16_t ppp_sensor_r(offs_t offset);
 
 	void uart_int(int state);
-
+	void lanc_int(int state);
 	void voodoo_vblank(int state);
 	void voodoo_pciint(int state);
 
@@ -667,6 +637,7 @@ private:
 	required_ioport_array<4> m_gun_input;
 	optional_ioport_array<4> m_io_ppp_sensors;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
+	required_device<kviper_lanc_device> m_lanc;
 
 	uint32_t mpc8240_pci_r(int function, int reg, uint32_t mem_mask);
 	void mpc8240_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
@@ -1856,15 +1827,14 @@ void viper_state::viper_map(address_map &map)
 //  map(0xffe28008, 0xffe2801f).noprw();
 	map(0xffe30000, 0xffe31fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 	map(0xffe40000, 0xffe40007).noprw(); // JTAG? 0x00 on normal operation, other values on POST,
-										 // 0xa8/0xa9 for unexpected irq (namely irq1)
 	map(0xffe50000, 0xffe50007).w(FUNC(viper_state::unk2_w));
 	map(0xffe60000, 0xffe60007).noprw();
 	map(0xffe70000, 0xffe70000).rw(FUNC(viper_state::ds2430_r), FUNC(viper_state::ds2430_w));
 	map(0xffe78000, 0xffe78000).rw(FUNC(viper_state::ds2430_ext_r), FUNC(viper_state::ds2430_ext_w));
 	map(0xffe80000, 0xffe80007).w(FUNC(viper_state::unk1a_w));
 	map(0xffe88000, 0xffe88007).w(FUNC(viper_state::unk1b_w));
-	map(0xffe98000, 0xffe98007).noprw(); // network?
-	map(0xffe9a000, 0xffe9bfff).ram();   // wcombat uses this
+	map(0xffe98000, 0xffe98007).m(m_lanc, FUNC(kviper_lanc_device::map));
+	map(0xffe9a000, 0xffe9bfff).rw(m_lanc, FUNC(kviper_lanc_device::ram_r), FUNC(kviper_lanc_device::ram_w));
 	map(0xffea0000, 0xffea0007).lr8(
 		NAME([this] (offs_t offset) {
 			const u8 res = m_gun_input[offset >> 1]->read() >> ((offset & 1) ? 0 : 8);
@@ -2341,7 +2311,7 @@ INPUT_PORTS_START( tsurugi )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Sensor Grip")
 INPUT_PORTS_END
 
-INPUT_PORTS_START( wcombat )
+INPUT_PORTS_START( wcombat_common )
 	PORT_INCLUDE( viper )
 
 	PORT_MODIFY("IN2")
@@ -2366,13 +2336,30 @@ INPUT_PORTS_START( wcombat )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // X flip screen
-
-	// TODO: whatever it reads from the i2c analog ports (needs service mode)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Gun Trigger") PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Gun Trigger") PORT_PLAYER(2)
 INPUT_PORTS_END
 
-// twin cab version?
-INPUT_PORTS_START( wcombatj )
-	PORT_INCLUDE( wcombat )
+// two player cab using optical lightguns
+INPUT_PORTS_START( wcombat2p )
+	PORT_INCLUDE( wcombat_common )
+
+	PORT_MODIFY("GUN0")
+	PORT_BIT( 0x07ff, 0x2f8, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0x00e0, 0x0510 ) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_PLAYER(1)
+
+	PORT_MODIFY("GUN1")
+	PORT_BIT( 0x01ff, 0x0e7, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x0020, 0x01af) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_PLAYER(1)
+
+	PORT_MODIFY("GUN2")
+	PORT_BIT( 0x07ff, 0x2f8, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0x00e0, 0x0510 ) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_PLAYER(2)
+
+	PORT_MODIFY("GUN3")
+	PORT_BIT( 0x01ff, 0x0e7, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x0020, 0x01af) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+// 4 player verion running on two viper pcbs networked using IR guns
+INPUT_PORTS_START( wcombat4p )
+	PORT_INCLUDE( wcombat_common )
 
 	// TODO: check if DIP2 ID selects side as stated by the manual
 
@@ -2380,6 +2367,8 @@ INPUT_PORTS_START( wcombatj )
 	PORT_MODIFY("IN5")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START3 )
+
+	// TODO: non-i2c analog ports (read through the left viper pcb's serial port)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( xtrial )
@@ -2448,6 +2437,12 @@ void viper_state::uart_int(int state)
 {
 	if (state)
 		mpc8240_interrupt(MPC8240_IRQ2);
+}
+
+void viper_state::lanc_int(int state)
+{
+	if (state)
+		mpc8240_interrupt(MPC8240_IRQ1);
 }
 
 void viper_state::voodoo_vblank(int state)
@@ -2612,6 +2607,9 @@ void viper_state::viper(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	DMADAC(config, "dacl").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	DMADAC(config, "dacr").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+
+	KVIPER_LANC(config, m_lanc);
+	m_lanc->irq_cb().set(FUNC(viper_state::lanc_int));
 
 	M48T58(config, "m48t58", 0);
 
@@ -3106,10 +3104,9 @@ ROM_START(thrild2ac)
 	ROM_LOAD("a41aaa_nvram.u39", 0x00000, 0x2000, CRC(d5de9b8e) SHA1(768bcd46a6ad20948f60f5e0ecd2f7b9c2901061))
 
 	DISK_REGION( "ata:0:hdd" )
-	DISK_IMAGE( "a41a02_alt2", 0, SHA1(c8bfbac4f5a1a2241df7417ad2f9eba7d9e9a9df) )
+	DISK_IMAGE( "a41a02_alt2", 0, BAD_DUMP SHA1(c8bfbac4f5a1a2241df7417ad2f9eba7d9e9a9df) )
 ROM_END
 
-/* This CF card has sticker 941EAA02 */
 ROM_START(thrild2c) //*
 	VIPER_BIOS
 
@@ -3120,7 +3117,7 @@ ROM_START(thrild2c) //*
 	ROM_LOAD("941eaa_nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd" )
-	DISK_IMAGE( "a41c02", 0, SHA1(ab3020e8709768c0fd2467573e92b679a05944e5) )
+	DISK_IMAGE( "a41c02", 0, BAD_DUMP SHA1(ab3020e8709768c0fd2467573e92b679a05944e5) )
 ROM_END
 
 ROM_START(tsurugi) //*
@@ -3363,11 +3360,11 @@ GAME(2001, thrild2c,  thrild2,   viper,     thrild2,    viper_state, init_viperc
 GAME(2002, tsurugi,   kviper,    viper,     tsurugi,    viper_state, init_vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING)
 GAME(2002, tsurugie,  tsurugi,   viper,     tsurugi,    viper_state, init_vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB, alt)", MACHINE_NOT_WORKING)
 GAME(2002, tsurugij,  tsurugi,   viper,     tsurugi,    viper_state, init_vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", MACHINE_NOT_WORKING)
-GAME(2002, wcombat,   kviper,    viper,     wcombat,    viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B)", MACHINE_NOT_WORKING)
-GAME(2002, wcombatb,  wcombat,   viper,     wcombat,    viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B, alt)", MACHINE_NOT_WORKING)
-GAME(2002, wcombatk,  wcombat,   viper,     wcombat,    viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)", MACHINE_NOT_WORKING)
-GAME(2002, wcombatu,  wcombat,   viper,     wcombat,    viper_state, init_vipercf,  ROT0,  "Konami", "World Combat / Warzaid (ver UCD:B)", MACHINE_NOT_WORKING)
-GAME(2002, wcombatj,  wcombat,   viper,     wcombatj,   viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING)
+GAME(2002, wcombat,   kviper,    viper,     wcombat4p,  viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B)", MACHINE_NOT_WORKING)
+GAME(2002, wcombatb,  wcombat,   viper,     wcombat4p,  viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B, alt)", MACHINE_NOT_WORKING)
+GAME(2002, wcombatk,  wcombat,   viper,     wcombat4p,  viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)", MACHINE_NOT_WORKING)
+GAME(2002, wcombatu,  wcombat,   viper,     wcombat2p,  viper_state, init_vipercf,  ROT0,  "Konami", "World Combat / Warzaid (ver UCD:B)", MACHINE_NOT_WORKING)
+GAME(2002, wcombatj,  wcombat,   viper,     wcombat4p,  viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING)
 GAME(2002, xtrial,    kviper,    viper,     xtrial,     viper_state, init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver JAB)", MACHINE_NOT_WORKING)
 
 GAME(2002, mfightc,   kviper,    viper,     mfightc,    viper_state, init_vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver JAD)", MACHINE_NOT_WORKING)
