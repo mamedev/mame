@@ -143,23 +143,13 @@ void z29_state::prg_map(address_map &map)
 	map(0x6000, 0x67ff).mirror(0x800).r(FUNC(z29_state::bs_24k_r));
 }
 
-/**
- * Memory map (based on ROM listing)
- * 0x2000/0x2001 - 8275 CRTC
- * 0x3000        - Memory Latch
- * 0x4000        - Attribute Memory
- * 0x5000        - Screen Character Memory
- * 0x6000        - DMA Memory
- * 0x7000        - EAROM
- * 
- */
 void z29_state::ext_map(address_map &map)
 {
 	map(0x2000, 0x2001).mirror(0xffe).r("crtc1", FUNC(i8276_device::read)).w(FUNC(z29_state::crtc_w));
 	map(0x3000, 0x3000).mirror(0xfff).w(FUNC(z29_state::latch_12k_w));
 	map(0x4000, 0x47ff).mirror(0x800).ram().share("attrmem");
 	map(0x5000, 0x57ff).mirror(0x800).ram().share("charmem");
-	//map(0x6000, ?).mirror(?).ram().share(?);
+	// 0x6000 - DMA Memory
 	map(0x7000, 0x703f).mirror(0xfc0).rw("nvram", FUNC(x2210_device::read), FUNC(x2210_device::write));
 }
 
