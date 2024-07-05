@@ -201,6 +201,8 @@ public:
 	}
 
 	void atetrisb3(machine_config &config);
+	void atetrisb3_11mhz(machine_config &config);
+
 
 protected:
 	uint8_t mcu_bus_r();
@@ -672,12 +674,16 @@ void atetris_mcu_state::atetrisb3(machine_config &config)
 		SN76489A(config, m_sn[i], 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-
-void atetris_m5205_state::atetb5205(machine_config &config)
+void atetris_mcu_state::atetrisb3_11mhz(machine_config &config)
 {
 	atetrisb3(config);
 
 	m_mcu->set_clock(11_MHz_XTAL);
+}
+
+void atetris_m5205_state::atetb5205(machine_config &config)
+{
+	atetrisb3_11mhz(config);
 
 	// TODO: Properly hook up OKI M5205
 	MSM5205(config, m_msm, 400_kHz_XTAL);
@@ -808,6 +814,32 @@ ROM_START( atetrisb3 )
 	ROM_LOAD( "pal16r4b-2cn.6",    0xa00, 0x104, NO_DUMP )
 ROM_END
 
+// Korean bootleg titled 링크. 11 MHz xtal for the 8749. 1 bank of 4 dip switches.
+ROM_START( link )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "prg.bin",    0x0000, 0x10000, CRC(2bcab107) SHA1(3cfb8df8cd3782f3ff7f6b32ff15c461352061ee) )
+
+	ROM_REGION( 0x10000, "tiles", 0 )
+	ROM_LOAD( "a2.bin",     0x0000, 0x10000, BAD_DUMP CRC(49fa3d01) SHA1(af4c646b9c8fbe2803c17b90d3a7e4f6523f2745) ) // Damaged ROM
+
+	// 8749 (11 MHz OSC) emulates POKEYs
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "8749h.bin",  0x0000, 0x0800, CRC(a66a9c47) SHA1(fbebd755a5e826c7d94ebcafdff2f9a01c9fd1a5) )
+	ROM_FILL( 0x06e2, 1, 0x96 ) // patch illegal opcode
+
+	// currently unused
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.bin", 0x00000, 0x0020, NO_DUMP )
+
+	ROM_REGION( 0xc00, "plds", 0 )
+	ROM_LOAD( "gal18v8a-25lp.1",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal18v8a-25lp.2",   0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "palce18v8h-25pc.3", 0x400, 0x117, NO_DUMP )
+	ROM_LOAD( "palce18v8h-25pc.4", 0x600, 0x117, NO_DUMP )
+	ROM_LOAD( "pal16r4b-2cn.5",    0x800, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r4b-2cn.6",    0xa00, 0x104, NO_DUMP )
+ROM_END
+
 ROM_START( atetrisb4 ) // bootleg on an unusually big PCB for this game
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.bin",    0x0000, 0x10000, CRC(56589096) SHA1(df0ff776f3e3506c86d703d2283db59a576abea6) ) // only difference is the credits for 'video graphics' where changed
@@ -872,7 +904,7 @@ ROM_START( atetb3482 )
 	ROM_REGION( 0x8000, "soundcpu", 0 ) // Not hooked up
 	ROM_LOAD( "k1-d3.bin", 0x0000, 0x8000, CRC(ce51c82b) SHA1(f90ed16f817e6b2a22b69db20348386b9c1ecb67) ) // Same 8K repeated four times
 
-	// See http://www.seanriddle.com/um348x/ for notes about the UM3482
+	// See http://www.seanriddle.com/um348x/ and http://arcadehacker.blogspot.com/2020/07/um3481a-series-multi-instrument-melody.html for notes about the UM3482
 	ROM_REGION( 0x01f0, "um3482", 0 ) // Not hooked up
 
 	/* Notes (3584 bits, which matches the datasheet's 512 7-bit notes).
@@ -943,8 +975,8 @@ ROM_START( atetb5205 )
 
 	ROM_REGION( 0x40000, "oki", 0)
 	ROM_LOAD( "1_am27c512.bin",    0x00000, 0x10000, CRC(3aecab3f) SHA1(f072ca51298a2c88ff1feb24933f2ffdb7f8eb63) )
-	ROM_LOAD( "2_tms27c512.bin",   0x10000, 0x10000, CRC(953d0ec4) SHA1(af2586332411d9b552241300e61c73463b0ffc5f) )
-	ROM_LOAD( "3_m5l27512.bin",    0x20000, 0x10000, BAD_DUMP CRC(20c1e632) SHA1(b33d276775e1f81a0c4799f2779c4d378436f7be) ) // Bitrotten, 0x1136 address bad
+	ROM_LOAD( "2_tms27c512.bin",   0x10000, 0x10000, CRC(b0c7353c) SHA1(f452ad0a055027d32da30104d1ad40f7fbcc34fb) )
+	ROM_LOAD( "3_m5l27512.bin",    0x20000, 0x10000, CRC(20c1e632) SHA1(b33d276775e1f81a0c4799f2779c4d378436f7be) )
 	ROM_LOAD( "4_am27c512.bin",    0x30000, 0x10000, CRC(a3a7fe78) SHA1(babbbe332a2b15efb67476e3563aeabaede2b55a) )
 
 	// PROM on main PCB
@@ -1026,15 +1058,16 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, atetris,   0,       atetris,   atetris,  atetris_state,        empty_init, ROT0,   "Atari Games", "Tetris (set 1)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisa,  atetris, atetris,   atetris,  atetris_state,        empty_init, ROT0,   "Atari Games", "Tetris (set 2)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb,  atetris, atetris,   atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 1)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb2, atetris, atetrisb2, atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 2)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb3, atetris, atetrisb3, atetris,  atetris_mcu_state,    empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 3)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb4, atetris, atetris,   atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 4)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb5, atetris, atetrisb5, atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 5)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetb3482, atetris, atetris,   atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 6, with UM3482)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1988, atetb5205, atetris, atetb5205, atetris,  atetris_m5205_state,  empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 7, with OKI M5205)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, atetrisbp, atetris, atetrisbp, atetris,  atetris_bartop_state, empty_init, ROT0,   "Atari Games", "Tetris (bartop, prototype)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1989, atetrisc,  atetris, atetris,   atetrisc, atetris_state,        empty_init, ROT270, "Atari Games", "Tetris (cocktail set 1)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1989, atetrisc2, atetris, atetris,   atetrisc, atetris_state,        empty_init, ROT270, "Atari Games", "Tetris (cocktail set 2)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetris,   0,       atetris,         atetris,  atetris_state,        empty_init, ROT0,   "Atari Games", "Tetris (set 1)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisa,  atetris, atetris,         atetris,  atetris_state,        empty_init, ROT0,   "Atari Games", "Tetris (set 2)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb,  atetris, atetris,         atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb2, atetris, atetrisb2,       atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 2)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb3, atetris, atetrisb3,       atetris,  atetris_mcu_state,    empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 3)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb4, atetris, atetris,         atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 4)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb5, atetris, atetrisb5,       atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 5)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetb3482, atetris, atetris,         atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 6, with UM3482)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, atetb5205, atetris, atetb5205,       atetris,  atetris_m5205_state,  empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 7, with OKI M5205)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, link,      atetris, atetrisb3_11mhz, atetris,  atetris_mcu_state,    empty_init, ROT0,   "bootleg",     "Link (Korean bootleg of Atari Tetris)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // Bad gfx ROM
+GAME( 1989, atetrisbp, atetris, atetrisbp,       atetris,  atetris_bartop_state, empty_init, ROT0,   "Atari Games", "Tetris (bartop, prototype)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, atetrisc,  atetris, atetris,         atetrisc, atetris_state,        empty_init, ROT270, "Atari Games", "Tetris (cocktail set 1)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, atetrisc2, atetris, atetris,         atetrisc, atetris_state,        empty_init, ROT270, "Atari Games", "Tetris (cocktail set 2)",                MACHINE_SUPPORTS_SAVE )
