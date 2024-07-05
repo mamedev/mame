@@ -2802,7 +2802,7 @@ msgstr ""
 #: src/frontend/mame/ui/analogipt.cpp:652
 #, c-format
 msgctxt "menu-analoginput"
-msgid "%1$s X-Way Joystick"
+msgid "%1$s Single Step Increment/Decrement"
 msgstr ""
 
 #: src/frontend/mame/ui/analogipt.cpp:451

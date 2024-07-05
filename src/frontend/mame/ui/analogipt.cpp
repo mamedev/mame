@@ -45,7 +45,7 @@ inline menu_analog::item_data::item_data(ioport_field &f, int t) noexcept
 			(ANALOG_ITEM_CENTERSPEED == t) ? f.centerdelta() :
 			(ANALOG_ITEM_REVERSE == t) ? f.analog_reverse() :
 			(ANALOG_ITEM_SENSITIVITY == t) ? f.sensitivity() :
-			(ANALOG_ITEM_XWAYJOYSTICK == t) ? f.analog_xwayjoystick() :
+			(ANALOG_ITEM_SINGLESTEPINCDEC == t) ? f.analog_singlestepincdec() :
 			-1)
 	, min((ANALOG_ITEM_SENSITIVITY == t) ? 1 : 0)
 	, max((ANALOG_ITEM_REVERSE == t) ? 1 : std::max(defvalue * 4, 255))
@@ -579,11 +579,11 @@ bool menu_analog::handle(event const *ev)
 			data.field.get().get_user_settings(settings);
 			switch (data.type)
 			{
-				case ANALOG_ITEM_KEYSPEED:      settings.delta = newval;        break;
-				case ANALOG_ITEM_CENTERSPEED:   settings.centerdelta = newval;  break;
-				case ANALOG_ITEM_REVERSE:       settings.reverse = newval;      break;
-				case ANALOG_ITEM_SENSITIVITY:   settings.sensitivity = newval;  break;
-				case ANALOG_ITEM_XWAYJOYSTICK:	settings.xwayjoystick = newval;	break;
+				case ANALOG_ITEM_KEYSPEED:          settings.delta = newval;            break;
+				case ANALOG_ITEM_CENTERSPEED:       settings.centerdelta = newval;      break;
+				case ANALOG_ITEM_REVERSE:           settings.reverse = newval;          break;
+				case ANALOG_ITEM_SENSITIVITY:       settings.sensitivity = newval;      break;
+				case ANALOG_ITEM_SINGLESTEPINCDEC:  settings.singlestepincdec = newval; break;
 			}
 			data.field.get().set_user_settings(settings);
 			data.cur = newval;
@@ -653,25 +653,18 @@ void menu_analog::populate()
 			data.cur = settings.sensitivity;
 			break;
 
-		case ANALOG_ITEM_XWAYJOYSTICK:
-			text = string_format(_("menu-analoginput", "%1$s X-Way Joystick"), field->name());
-			data.cur = settings.xwayjoystick;
+		case ANALOG_ITEM_SINGLESTEPINCDEC:
+			text = string_format(_("menu-analoginput", "%1$s Single Step Increment/Decrement"), field->name());
+			data.cur = settings.singlestepincdec;
 			break;
 		}
 
-		// if case is xwayjoystick, only append if type is IPT_POSITIONAL, IPT_POSITIONAL_V,
-		// IPT_DIAL or IPT_DIAL_V
-		if ((data.type != ANALOG_ITEM_XWAYJOYSTICK)
-				|| ((field->type() == IPT_POSITIONAL) || (field->type() == IPT_POSITIONAL_V)
-					|| (field->type() == IPT_DIAL) || (field->type() == IPT_DIAL_V)))
 		// append a menu item
-		{
-			item_append(
+		item_append(
 				std::move(text),
 				item_text(data.type, data.cur),
 				(data.cur <= data.min) ? FLAG_RIGHT_ARROW : (data.cur >= data.max) ? FLAG_LEFT_ARROW : FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW,
 				&data);
-		}
 	}
 
 	// display a message if there are toggle inputs enabled
@@ -819,7 +812,7 @@ std::string menu_analog::item_text(int type, int value)
 	case ANALOG_ITEM_SENSITIVITY:
 		return string_format("%d", value);
 
-	case ANALOG_ITEM_XWAYJOYSTICK:
+	case ANALOG_ITEM_SINGLESTEPINCDEC:
 		return value ? _("On") : _("Off");
 	}
 }

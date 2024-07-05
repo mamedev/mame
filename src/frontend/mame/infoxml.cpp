@@ -232,7 +232,7 @@ constexpr char f_dtd_string[] =
 		"\t\t\t\t<!ATTLIST control sensitivity CDATA #IMPLIED>\n"
 		"\t\t\t\t<!ATTLIST control keydelta CDATA #IMPLIED>\n"
 		"\t\t\t\t<!ATTLIST control reverse (yes|no) \"no\">\n"
-		"\t\t\t\t<!ATTLIST control xwayjoystick (yes|no) \"no\">\n"
+		"\t\t\t\t<!ATTLIST control singlestepincdec (yes|no) \"no\">\n"
 		"\t\t\t\t<!ATTLIST control ways CDATA #IMPLIED>\n"
 		"\t\t\t\t<!ATTLIST control ways2 CDATA #IMPLIED>\n"
 		"\t\t\t\t<!ATTLIST control ways3 CDATA #IMPLIED>\n"
@@ -1417,20 +1417,20 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 	// initialize the list of control types
 	struct
 	{
-		const char *    type;           // general type of input
-		int             player;         // player which the input belongs to
-		int             nbuttons;       // total number of buttons
-		int             reqbuttons;     // total number of non-optional buttons
-		uint32_t        maxbuttons;     // max index of buttons (using IPT_BUTTONn) [probably to be removed soonish]
-		int             ways;           // directions for joystick
-		bool            analog;         // is analog input?
-		uint8_t         helper[3];      // for dual joysticks [possibly to be removed soonish]
-		int32_t         min;            // analog minimum value
-		int32_t         max;            // analog maximum value
-		int32_t         sensitivity;    // default analog sensitivity
-		int32_t         keydelta;       // default analog keydelta
-		bool            reverse;        // default analog reverse setting
-		bool			xwayjoystick;	// default analog xwayjoystick setting
+		const char *    type;               // general type of input
+		int             player;             // player which the input belongs to
+		int             nbuttons;           // total number of buttons
+		int             reqbuttons;         // total number of non-optional buttons
+		uint32_t        maxbuttons;         // max index of buttons (using IPT_BUTTONn) [probably to be removed soonish]
+		int             ways;               // directions for joystick
+		bool            analog;             // is analog input?
+		uint8_t         helper[3];          // for dual joysticks [possibly to be removed soonish]
+		int32_t         min;                // analog minimum value
+		int32_t         max;                // analog maximum value
+		int32_t         sensitivity;        // default analog sensitivity
+		int32_t         keydelta;           // default analog keydelta
+		bool            reverse;            // default analog reverse setting
+		bool            singlestepincdec;   // default analog singlestepincdec setting
 	} control_info[CTRL_COUNT * CTRL_PCOUNT];
 
 	memset(&control_info, 0, sizeof(control_info));
@@ -1736,8 +1736,8 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					control_info[field.player() * CTRL_COUNT + ctrl_type].keydelta = field.delta();
 				if (field.analog_reverse() != 0)
 					control_info[field.player() * CTRL_COUNT + ctrl_type].reverse = true;
-				if (field.analog_xwayjoystick() != 0)
-					control_info[field.player() * CTRL_COUNT + ctrl_type].xwayjoystick = true;
+				if (field.analog_singlestepincdec() != 0)
+					control_info[field.player() * CTRL_COUNT + ctrl_type].singlestepincdec = true;
 			}
 		}
 	}
@@ -1800,8 +1800,8 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					util::stream_format(out, " keydelta=\"%d\"", elem.keydelta);
 				if (elem.reverse)
 					out << " reverse=\"yes\"";
-				if (elem.xwayjoystick)
-					out << " xwayjoystick=\"yes\"";
+				if (elem.singlestepincdec)
+					out << " singlestepincdec=\"yes\"";
 
 				out << "/>\n";
 			}

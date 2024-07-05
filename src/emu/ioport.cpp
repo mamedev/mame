@@ -1013,7 +1013,7 @@ void ioport_field::get_user_settings(user_settings &settings) const
 		settings.delta = m_live->analog->delta();
 		settings.centerdelta = m_live->analog->centerdelta();
 		settings.reverse = m_live->analog->reverse();
-		settings.xwayjoystick = m_live->analog->xwayjoystick();
+		settings.singlestepincdec = m_live->analog->singlestepincdec();
 	}
 	else
 	{
@@ -1051,7 +1051,7 @@ void ioport_field::set_user_settings(const user_settings &settings)
 		m_live->analog->m_delta = settings.delta;
 		m_live->analog->m_centerdelta = settings.centerdelta;
 		m_live->analog->m_reverse = settings.reverse;
-		m_live->analog->m_xwayjoystick = settings.xwayjoystick;
+		m_live->analog->m_singlestepincdec = settings.singlestepincdec;
 	}
 	else
 	{
@@ -2542,17 +2542,17 @@ bool ioport_manager::load_controller_config(
 					field.m_flags &= ~ioport_field::ANALOG_FLAG_REVERSE;
 				}
 
-				// fetch yes/no for xwayjoystick setting
-				char const *const xwaystring = portnode.get_attribute_string("xwayjoystick", nullptr);
-				if (revstring && !strcmp(revstring, "yes"))
+				// fetch yes/no for singlestepincdec setting
+				char const *const singlestepstring = portnode.get_attribute_string("singlestepincdec", nullptr);
+				if (singlestepstring && !strcmp(singlestepstring, "yes"))
 				{
-					field.live().analog->m_xwayjoystick = true;
-					field.m_flags |= ioport_field::ANALOG_FLAG_XWAYJOYSTICK;
+					field.live().analog->m_singlestepincdec = true;
+					field.m_flags |= ioport_field::ANALOG_FLAG_SINGLESTEPINCDEC;
 				}
-				else if (xwaystring && !strcmp(xwaystring, "no"))
+				else if (singlestepstring && !strcmp(singlestepstring, "no"))
 				{
-					field.live().analog->m_xayjoystick = false;
-					field.m_flags &= ~ioport_field::ANALOG_FLAG_XWAYJOYSTICK;
+					field.live().analog->m_singlestepincdec = false;
+					field.m_flags &= ~ioport_field::ANALOG_FLAG_SINGLESTEPINCDEC;
 				}
 #endif
 			}
@@ -2637,12 +2637,12 @@ void ioport_manager::load_system_config(
 					else if (revstring && !strcmp(revstring, "no"))
 						field.live().analog->m_reverse = false;
 
-					// fetch yes/no for xwayjoystick setting
-					char const *const xwaystring = portnode.get_attribute_string("xwayjoystick", nullptr);
-					if (xwaystring && !strcmp(xwaystring, "yes"))
-						field.live().analog->m_xwayjoystick = true;
-					else if (xwaystring && !strcmp(xwaystring, "no"))
-						field.live().analog->m_xwayjoystick = false;
+					// fetch yes/no for singlestepincdec setting
+					char const *const singlestepstring = portnode.get_attribute_string("singlestepincdec", nullptr);
+					if (singlestepstring && !strcmp(singlestepstring, "yes"))
+						field.live().analog->m_singlestepincdec = true;
+					else if (singlestepstring && !strcmp(singlestepstring, "no"))
+						field.live().analog->m_singlestepincdec = false;
 				}
 
 				// only break out of the loop for unconditional inputs
@@ -2891,7 +2891,7 @@ void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 					changed = changed || (field.live().analog->m_centerdelta != field.centerdelta());
 					changed = changed || (field.live().analog->m_sensitivity != field.sensitivity());
 					changed = changed || (field.live().analog->m_reverse != field.analog_reverse());
-					changed = changed || (field.live().analog->m_xwayjoystick != field.analog_xwayjoystick());
+					changed = changed || (field.live().analog->m_singlestepincdec != field.analog_singlestepincdec());
 				}
 
 				// if we did change, add a new node
@@ -2937,8 +2937,8 @@ void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 								portnode->set_attribute_int("sensitivity", field.live().analog->m_sensitivity);
 							if (field.live().analog->m_reverse != field.analog_reverse())
 								portnode->set_attribute("reverse", field.live().analog->m_reverse ? "yes" : "no");
-							if (field.live().analog->m_xwayjoystick != field.analog_xwayjoystick())
-								portnode->set_attribute("xwayjoystick", field.live().analog->m_xwayjoystick ? "yes" : "no");
+							if (field.live().analog->m_singlestepincdec != field.analog_singlestepincdec())
+								portnode->set_attribute("singlestepincdec", field.live().analog->m_singlestepincdec ? "yes" : "no");
 						}
 					}
 				}
@@ -3136,7 +3136,7 @@ void ioport_manager::playback_port(ioport_port &port)
 			// read configuration information
 			playback_read(analog.m_sensitivity);
 			playback_read(analog.m_reverse);
-			playback_read(analog.m_xwayjoystick);
+			playback_read(analog.m_singlestepincdec);
 		}
 	}
 }
@@ -3274,7 +3274,7 @@ void ioport_manager::record_port(ioport_port &port)
 			// store configuration information
 			record_write(analog.m_sensitivity);
 			record_write(analog.m_reverse);
-			record_write(analog.m_xwayjoystick);
+			record_write(analog.m_singlestepincdec);
 		}
 	}
 }
@@ -3558,7 +3558,7 @@ analog_field::analog_field(ioport_field &field)
 	, m_adjoverride((field.defvalue() & field.mask()) >> m_shift)
 	, m_sensitivity(field.sensitivity())
 	, m_reverse(field.analog_reverse())
-	, m_xwayjoystick(field.analog_xwayjoystick())
+	, m_singlestepincdec(field.analog_singlestepincdec())
 	, m_delta(field.delta())
 	, m_centerdelta(field.centerdelta())
 	, m_accum(0)
@@ -3845,8 +3845,8 @@ void analog_field::clear_value()
 
 void analog_field::frame_update(running_machine &machine)
 {
-	bool		ignore_dec = false,
-				ignore_inc = false;
+	bool ignore_dec = false;
+	bool ignore_inc = false;
 
 	// clamp the previous value to the min/max range
 	if (!m_wraps)
@@ -3922,14 +3922,12 @@ void analog_field::frame_update(running_machine &machine)
 
 	s64 keyscale = (m_accum >= 0) ? m_keyscalepos : m_keyscaleneg;
 
-	// if xwayjoystick is enabled, and analog device is IPT_POSITIONAL, IPT_POSITIONAL_V,
-	// IPT_DIAL or IPT_DIAL_V set to ignore inc and / or dec input if pressed last frame
-	// this prevents one virtual inc or dec button based rotary step of an x-way joystick
-	// from sometimes causing the character to rotate 2 steps at the expense of updating
-	// character rotation up to half the frame rate instead of updating at the frame rate
-	if (m_xwayjoystick
-			&& ((m_field.type() == IPT_POSITIONAL) || (m_field.type() == IPT_POSITIONAL_V)
-				|| (m_field.type() == IPT_DIAL) || (m_field.type() == IPT_DIAL_V)))
+	// If singlestepincdec is enabled, set to ignore inc and / or dec input if pressed last frame.
+	// In one scenario, this prevents one rotary step of a stepped rotary joystick that generates
+	// a 1.x frame duration virtual inc or dec button press from sometimes being detected twice.
+	// This is at the expense of the game getting button updates at up to half the frame rate
+	// instead of updating at the frame rate.
+	if (m_singlestepincdec)
 	{
 		if (m_last_frame_dec)
 		{

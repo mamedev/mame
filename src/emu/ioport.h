@@ -555,15 +555,15 @@ class ioport_field
 	friend class dynamic_field;
 
 	// flags for ioport_fields
-	static inline constexpr u32 FIELD_FLAG_OPTIONAL =      0x0001;    // set if this field is not required but recognized by hw
-	static inline constexpr u32 FIELD_FLAG_COCKTAIL =      0x0002;    // set if this field is relevant only for cocktail cabinets
-	static inline constexpr u32 FIELD_FLAG_TOGGLE =        0x0004;    // set if this field should behave as a toggle
-	static inline constexpr u32 FIELD_FLAG_ROTATED =       0x0008;    // set if this field represents a rotated control
-	static inline constexpr u32 ANALOG_FLAG_REVERSE =      0x0010;    // analog only: reverse the sense of the axis
-	static inline constexpr u32 ANALOG_FLAG_RESET =        0x0020;    // analog only: always preload in->default for relative axes, returning only deltas
-	static inline constexpr u32 ANALOG_FLAG_WRAPS =        0x0040;    // analog only: positional count wraps around
-	static inline constexpr u32 ANALOG_FLAG_INVERT =       0x0080;    // analog only: bitwise invert bits
-	static inline constexpr u32 ANALOG_FLAG_XWAYJOYSTICK = 0x0100;    // analog only: toggle xwayjoystick on or off
+	static inline constexpr u32 FIELD_FLAG_OPTIONAL =          0x0001;    // set if this field is not required but recognized by hw
+	static inline constexpr u32 FIELD_FLAG_COCKTAIL =          0x0002;    // set if this field is relevant only for cocktail cabinets
+	static inline constexpr u32 FIELD_FLAG_TOGGLE =            0x0004;    // set if this field should behave as a toggle
+	static inline constexpr u32 FIELD_FLAG_ROTATED =           0x0008;    // set if this field represents a rotated control
+	static inline constexpr u32 ANALOG_FLAG_REVERSE =          0x0010;    // analog only: reverse the sense of the axis
+	static inline constexpr u32 ANALOG_FLAG_RESET =            0x0020;    // analog only: always preload in->default for relative axes, returning only deltas
+	static inline constexpr u32 ANALOG_FLAG_WRAPS =            0x0040;    // analog only: positional count wraps around
+	static inline constexpr u32 ANALOG_FLAG_INVERT =           0x0080;    // analog only: bitwise invert bits
+	static inline constexpr u32 ANALOG_FLAG_SINGLESTEPINCDEC = 0x0100;    // analog only: toggle singlestepincdec on or off
 
 public:
 	// construction/destruction
@@ -595,7 +595,7 @@ public:
 	bool toggle() const { return ((m_flags & FIELD_FLAG_TOGGLE) != 0); }
 	bool rotated() const { return ((m_flags & FIELD_FLAG_ROTATED) != 0); }
 	bool analog_reverse() const { return ((m_flags & ANALOG_FLAG_REVERSE) != 0); }
-	bool analog_xwayjoystick() const { return ((m_flags & ANALOG_FLAG_XWAYJOYSTICK) != 0); }
+	bool analog_singlestepincdec() const { return ((m_flags & ANALOG_FLAG_SINGLESTEPINCDEC) != 0); }
 	bool analog_reset() const { return ((m_flags & ANALOG_FLAG_RESET) != 0); }
 	bool analog_wraps() const { return ((m_flags & ANALOG_FLAG_WRAPS) != 0); }
 	bool analog_invert() const { return ((m_flags & ANALOG_FLAG_INVERT) != 0); }
@@ -653,15 +653,15 @@ public:
 	// user-controllable settings for a field
 	struct user_settings
 	{
-		ioport_value    value = 0;              // for DIP switches
-		input_seq       seq[SEQ_TYPE_TOTAL];    // sequences of all types
-		std::string     cfg[SEQ_TYPE_TOTAL];    // configuration strings of all types
-		s32             sensitivity = 0;        // for analog controls
-		s32             delta = 0;              // for analog controls
-		s32             centerdelta = 0;        // for analog controls
-		bool            reverse = false;        // for analog controls
-		bool            xwayjoystick = false;	// for analog controls
-		bool            toggle = false;         // for non-analog controls
+		ioport_value    value = 0;                  // for DIP switches
+		input_seq       seq[SEQ_TYPE_TOTAL];        // sequences of all types
+		std::string     cfg[SEQ_TYPE_TOTAL];        // configuration strings of all types
+		s32             sensitivity = 0;            // for analog controls
+		s32             delta = 0;                  // for analog controls
+		s32             centerdelta = 0;            // for analog controls
+		bool            reverse = false;            // for analog controls
+		bool            singlestepincdec = false;   // for analog controls
+		bool            toggle = false;             // for non-analog controls
 	};
 	void get_user_settings(user_settings &settings) const;
 	void set_user_settings(const user_settings &settings);
@@ -819,7 +819,7 @@ public:
 	ioport_field &field() const noexcept { return m_field; }
 	s32 sensitivity() const noexcept { return m_sensitivity; }
 	bool reverse() const noexcept { return m_reverse; }
-	bool xwayjoystick() const noexcept { return m_xwayjoystick; }
+	bool singlestepincdec() const noexcept { return m_singlestepincdec; }
 	s32 delta() const noexcept { return m_delta; }
 	s32 centerdelta() const noexcept { return m_centerdelta; }
 
@@ -852,7 +852,7 @@ private:
 	// live values of configurable parameters
 	s32                 m_sensitivity;          // current live sensitivity (100=normal)
 	bool                m_reverse;              // current live reverse flag
-	bool                m_xwayjoystick;			// current live xwayjoystick flag
+	bool                m_singlestepincdec;     // current live singlestepincdec flag
 	s32                 m_delta;                // current live delta to apply each frame a digital inc/dec key is pressed
 	s32                 m_centerdelta;          // current live delta to apply each frame no digital inputs are pressed
 
@@ -866,7 +866,6 @@ private:
 	s32                 m_maximum;              // maximum adjusted value
 	s32                 m_center;               // center adjusted value for autocentering
 	s32                 m_reverse_val;          // value where we subtract from to reverse directions
-	s32                 m_xwayjoystick_val;		// value where we subtract from to xwayjoystick directions
 
 	// scaling factors
 	s64                 m_scalepos;             // scale factor to apply to positive adjusted values
@@ -884,9 +883,9 @@ private:
 	bool                m_lastdigital;          // was the last modification caused by a digital form?
 	bool                m_use_adjoverride;      // override what will be read from the field
 
-	// tracked for xwayjoystick
-	bool				m_last_frame_dec;		// last frame analog deincrement button was pressed
-	bool				m_last_frame_inc;		// last frame analog increment button was pressed
+	// tracked for singlestepincdec
+	bool                m_last_frame_dec;       // last frame analog deincrement button was pressed
+	bool                m_last_frame_inc;       // last frame analog increment button was pressed
 };
 
 
@@ -1064,7 +1063,7 @@ public:
 	ioport_configurer& field_set_toggle() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_TOGGLE; return *this; }
 	ioport_configurer& field_set_impulse(u8 impulse) { m_curfield->m_impulse = impulse; return *this; }
 	ioport_configurer& field_set_analog_reverse() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_REVERSE; return *this; }
-	ioport_configurer& field_set_analog_xwayjoystick() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_XWAYJOYSTICK; return *this; }
+	ioport_configurer& field_set_analog_singlestepincdec() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_SINGLESTEPINCDEC; return *this; }
 	[[deprecated("PORT_RESET is deprecated; manage counter state explicitly")]]
 	ioport_configurer& field_set_analog_reset() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_RESET; return *this; }
 	ioport_configurer& field_set_optional() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_OPTIONAL; return *this; }
@@ -1210,8 +1209,8 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 #define PORT_REVERSE \
 	configurer.field_set_analog_reverse();
 
-#define PORT_XWAYJOYSTICK \
-	configurer.field_set_analog_xwayjoystick();
+#define PORT_SINGLESTEPINCDEC \
+	configurer.field_set_analog_singlestepincdec();
 
 #define PORT_RESET \
 	configurer.field_set_analog_reset();
