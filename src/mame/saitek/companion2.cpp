@@ -14,7 +14,7 @@ If this is not done, NVRAM won't save properly.
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
 
-********************************************************************************
+================================================================================
 
 Hardware notes:
 
@@ -50,7 +50,7 @@ is either VCC or GND to distinguish between the two.
 
 The Tandy clones run at a lower clock frequency, 3MHz and 6MHz respectively.
 
-********************************************************************************
+================================================================================
 
 CXG Enterprise "S" / Star Chess is on very similar hardware, so it's emulated
 in this driver too.

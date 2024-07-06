@@ -69,7 +69,7 @@ ESB 6000 board interface (via external port):
 - TC4081, TC4082, TC4017, 74373, 74374
 
 ESB II/6000 chessboard:
-- 64 reed switches (magnet sensors)
+- 128 reed switches (magnet sensors, 2 per square)
 - 64 leds + power led
 
 ESB 3000 hardware is probably same as ESB 6000.
@@ -317,7 +317,7 @@ void brikett_state::esb6_w(u8 data)
 
 int brikett_state::esb6_r()
 {
-	// EF1: read chessboard sensor
+	// EF1: read chessboard square
 	if (m_inputs[5].read_safe(0))
 		return (m_board->read_file(m_esb_select - 2) & ~m_esb_row) ? 0 : 1;
 	else

@@ -56,23 +56,24 @@ r65c52_device::r65c52_device(const machine_config &mconfig, const char *tag, dev
 }
 
 const int r65c52_device::internal_divider[16] =
-	{
-		4608,
-		2096,
-		1713,
-		1536,
-		768,
-		384,
-		192,
-		128,
-		96,
-		64,
-		48,
-		32,
-		24,
-		12,
-		6,
-		1};
+{
+	4608,
+	2096,
+	1713,
+	1536,
+	768,
+	384,
+	192,
+	128,
+	96,
+	64,
+	48,
+	32,
+	24,
+	12,
+	6,
+	1
+};
 
 void r65c52_device::device_add_mconfig(machine_config &config)
 {
@@ -258,19 +259,8 @@ void r65c52_device::output_dtr(int idx, int dtr)
 
 void r65c52_device::update_irq(int idx)
 {
-	bool irq = false;
 	LOG("R65C52: %x  IER  %x ISR %x\n", idx + 1, m_ier[idx], m_isr[idx]);
-	for (int i = 0; i < 7; i++)
-	{
-		int ier_bit = BIT(m_ier[idx],i);
-		int isr_bit = BIT(m_isr[idx],i);
-
-		if ((ier_bit == isr_bit) && (ier_bit ==1))
-		{
-			irq = true;
-		}
-	}
-	output_irq(idx, irq);
+	output_irq(idx, (m_ier[idx] & m_isr[idx] & 0x7f) ? 1 : 0);
 }
 
 void r65c52_device::update_divider(int idx)
@@ -310,21 +300,27 @@ void r65c52_device::update_divider(int idx)
 
 u8 r65c52_device::read_rdr(int idx)
 {
-	m_status[idx] &= ~(SR_BRK | SR_FRAMING_ERROR);
-	m_isr[idx] &= ~(IRQ_PAR | IRQ_FOB | IRQ_RDRF);
-	m_rdrf[idx] = false;
-	m_parity_err[idx] = false;
-	m_overrun[idx] = false;
-	update_irq(idx);
-	LOG("R65C52: %x  RDR %x \n", idx + 1, m_rdr[idx]);
+	if (!machine().side_effects_disabled())
+	{
+		m_status[idx] &= ~(SR_BRK | SR_FRAMING_ERROR);
+		m_isr[idx] &= ~(IRQ_PAR | IRQ_FOB | IRQ_RDRF);
+		m_rdrf[idx] = false;
+		m_parity_err[idx] = false;
+		m_overrun[idx] = false;
+		LOG("R65C52: %x  RDR %x \n", idx + 1, m_rdr[idx]);
+		update_irq(idx);
+	}
 	return m_rdr[idx];
 }
 
 u8 r65c52_device::read_status(int idx)
 {
-	LOG("R65C52: %x  STATUS %x \n", idx + 1, m_status[idx]);
-	m_dtr[idx] = false;
-	m_rts[idx] = false;
+	if (!machine().side_effects_disabled())
+	{
+		LOG("R65C52: %x  STATUS %x \n", idx + 1, m_status[idx]);
+		m_dtr[idx] = false;
+		m_rts[idx] = false;
+	}
 	return m_status[idx];
 }
 
@@ -340,6 +336,7 @@ void r65c52_device::write_ier(int idx, u8 data)
 	}
 
 	LOG("R65C52: %x  IER %x \n", idx + 1, m_ier[idx]);
+	update_irq(idx);
 }
 
 void r65c52_device::write_tdr(int idx, u8 data)
@@ -347,7 +344,9 @@ void r65c52_device::write_tdr(int idx, u8 data)
 	m_tdr[idx] = data;
 	m_tdre[idx] = false;
 	m_isr[idx] &= ~IRQ_TDRE;
+
 	LOG("R65C52: %x  TDR %x \n", idx + 1, m_tdr[idx]);
+	update_irq(idx);
 }
 
 void r65c52_device::write_control(int idx, u8 data)
@@ -416,15 +415,14 @@ void r65c52_device::write_compare(int idx, u8 data)
 
 u8 r65c52_device::read_isr(int idx)
 {
+	u8 isr = m_isr[idx];
 
 	if (m_status[idx] & SR_BRK || m_status[idx] & SR_FRAMING_ERROR || m_overrun[idx])
 	{
-		m_isr[idx] |= IRQ_FOB;
+		isr |= IRQ_FOB;
 	}
 
-	u8 isr = m_isr[idx];
-
-	if (isr != 0)
+	if ((isr & 0x7f) != 0)
 	{
 		isr |= 0x80;
 	}
@@ -440,9 +438,14 @@ u8 r65c52_device::read_isr(int idx)
 		isr &= ~0x80;
 	}
 
-	m_isr[idx] &= ~(IRQ_CTS | IRQ_DCD | IRQ_DSR | IRQ_FOB);
+	isr &= ~(IRQ_CTS | IRQ_DCD | IRQ_DSR | IRQ_FOB);
 
-	LOG("R65C52: %x  ISR %x \n", idx + 1, m_isr[idx]);
+	if (!machine().side_effects_disabled())
+	{
+		m_isr[idx] = isr;
+		LOG("R65C52: %x  ISR %x \n", idx + 1, m_isr[idx]);
+		update_irq(idx);
+	}
 
 	return isr;
 }

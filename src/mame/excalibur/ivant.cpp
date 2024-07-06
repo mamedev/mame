@@ -3,7 +3,7 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-Excalibur Ivan The Terrible
+Excalibur Ivan The Terrible (model 701E)
 
 The chess engine is by Ron Nelson, similar to the one in Excalibur Mirage. It
 has speech, and also sound effects that are reminiscent of Battle Chess.
