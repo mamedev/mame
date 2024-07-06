@@ -296,13 +296,13 @@ void mm1_state::mm1(machine_config &config)
 
 ROM_START( mm1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("114", 0x0000, 0x4000, CRC(208b4c43) SHA1(48f891d614fa643f47d099f94aff15a44c2efc07) ) // D27128
-	ROM_LOAD("214", 0x4000, 0x4000, CRC(93734e49) SHA1(9ad6c191074c4122300f059e2ef9cfeff7b81463) ) // "
+	ROM_LOAD("mm1b.bin", 0x0000, 0x8000, CRC(90bf840e) SHA1(cdec6b02c1352b2a00d66964989a17c2b81ec79e) ) // HN613256P
 ROM_END
 
-ROM_START( mm1b )
+ROM_START( mm1a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("mm1b.bin", 0x0000, 0x8000, CRC(90bf840e) SHA1(cdec6b02c1352b2a00d66964989a17c2b81ec79e) ) // HN613256P
+	ROM_LOAD("114", 0x0000, 0x4000, CRC(208b4c43) SHA1(48f891d614fa643f47d099f94aff15a44c2efc07) ) // D27128
+	ROM_LOAD("214", 0x4000, 0x4000, CRC(93734e49) SHA1(9ad6c191074c4122300f059e2ef9cfeff7b81463) ) // "
 ROM_END
 
 
@@ -320,7 +320,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE INPUT   CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1983, mm1,     0,      0,      mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. A)", MACHINE_SUPPORTS_SAVE )
-SYST( 1983, mm1b,    mm1,    0,      mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, mm1,     0,      0,      mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, mm1a,    mm1,    0,      mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. A)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1984, mmirage, 0,      0,      mirage, mirage, mm1_state, empty_init, "Hegener + Glaser", "Mephisto Mirage", MACHINE_SUPPORTS_SAVE )

@@ -136,7 +136,7 @@ void leland_80186_sound_device::i80186_tmr1_w(int state)
 			}
 		}
 	}
-	set_clock_line(7, state);
+	set_clock_line(3, state);
 }
 
 void leland_80186_sound_device::device_add_mconfig(machine_config &config)
@@ -317,6 +317,7 @@ void leland_80186_sound_device::device_start()
 	save_item(NAME(m_clock_tick));
 	save_item(NAME(m_sound_command));
 	save_item(NAME(m_sound_response));
+	save_item(NAME(m_response_sync));
 	save_item(NAME(m_ext_start));
 	save_item(NAME(m_ext_stop));
 	save_item(NAME(m_ext_active));
@@ -328,6 +329,7 @@ void leland_80186_sound_device::device_start()
 	m_clock_tick = 0;
 	m_sound_command = 0;
 	m_sound_response = 0;
+	m_response_sync = false;
 	m_ext_start = 0;
 	m_ext_stop = 0;
 	m_ext_active = 0;
@@ -338,9 +340,11 @@ void leland_80186_sound_device::device_reset()
 	m_last_control = 0xf8;
 	m_clock_active = 0;
 	m_clock_tick = 0;
+	m_response_sync = false;
 	m_ext_start = 0;
 	m_ext_stop = 0;
 	m_ext_active = 0;
+
 	if (m_type == TYPE_WSF)
 		m_dacvol[3]->write(0xff);  //TODO: determine how to set this if at all
 }
@@ -419,6 +423,8 @@ void leland_80186_sound_device::peripheral_ctrl(offs_t offset, u16 data)
 	}
 }
 
+
+
 /*************************************
  *
  *  External 80186 control
@@ -446,11 +452,11 @@ void leland_80186_sound_device::leland_80186_control_w(u8 data)
 	m_audiocpu->set_input_line(INPUT_LINE_TEST, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* /NMI */
-/*  If the master CPU doesn't get a response by the time it's ready to send
-    the next command, it uses an NMI to force the issue; unfortunately, this
-    seems to really screw up the sound system. It turns out it's better to
-    just wait for the original interrupt to occur naturally */
-/*  m_audiocpu->set_input_line(INPUT_LINE_NMI, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);*/
+	/*  If the master CPU doesn't get a response by the time it's ready to send
+	    the next command, it uses an NMI to force the issue; unfortunately, this
+	    seems to really screw up the sound system. It turns out it's better to
+	    just wait for the original interrupt to occur naturally */
+	//m_audiocpu->set_input_line(INPUT_LINE_NMI, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* INT0 */
 	m_audiocpu->int0_w(data & 0x20);
@@ -486,45 +492,34 @@ void leland_80186_sound_device::command_hi_w(u8 data)
 
 
 
-
 /*************************************
  *
  *  Sound response handling
  *
  *************************************/
 
-void leland_80186_sound_device::delayed_response_r(s32 param)
-{
-	int checkpc = param;
-	int pc = m_master->pc();
-	int oldaf = m_master->state_int(Z80_AF);
-
-	/* This is pretty cheesy, but necessary. Since the CPUs run in round-robin order,
-	   synchronizing on the write to this register from the slave side does nothing.
-	   In order to make sure the master CPU get the real response, we synchronize on
-	   the read. However, the value we returned the first time around may not be
-	   accurate, so after the system has synced up, we go back into the master CPUs
-	   state and put the proper value into the A register. */
-	if (pc == checkpc)
-	{
-		LOGMASKED(LOG_COMM, "(Updated sound response latch to %02X)\n", m_sound_response);
-
-		oldaf = (oldaf & 0x00ff) | (m_sound_response << 8);
-		m_master->set_state_int(Z80_AF, oldaf);
-	}
-	else
-		LOGMASKED(LOG_COMM, "ERROR: delayed_response_r - current PC = %04X, checkPC = %04X\n", pc, checkpc);
-}
-
-
 u8 leland_80186_sound_device::response_r()
 {
-	offs_t pc = m_master->pcbase();
+	if (!machine().side_effects_disabled())
+	{
+		/* This is pretty cheesy, but necessary. Since the CPUs run in round-robin order,
+		   synchronizing on the write to this register from the slave side does nothing.
+		   The usual trick with briefly setting perfect quantum on master CPU side write
+		   is also ineffective. In order to make sure the master CPU gets the real response,
+		   we force a synchronize on the read like this. */
+		if (!m_response_sync)
+		{
+			machine().scheduler().synchronize();
+			m_master->defer_access();
+		}
+		else
+		{
+			LOGMASKED(LOG_COMM, "%s:Read sound response latch = %02X\n", machine().describe_context(), m_sound_response);
+		}
 
-	LOGMASKED(LOG_COMM, "%04X:Read sound response latch = %02X\n", pc, m_sound_response);
+		m_response_sync = !m_response_sync;
+	}
 
-	/* synchronize the response */
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(leland_80186_sound_device::delayed_response_r), this), pc + 2);
 	return m_sound_response;
 }
 

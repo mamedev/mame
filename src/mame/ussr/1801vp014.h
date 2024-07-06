@@ -34,7 +34,6 @@ public:
 	auto virq_wr_callback() { return m_write_virq.bind(); }
 	auto keydown_wr_callback() { return m_write_keydown.bind(); }
 	auto halt_wr_callback() { return m_write_halt.bind(); }
-	auto data_wr_callback() { return m_write_data.bind(); }
 
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -61,7 +60,6 @@ private:
 	devcb_write_line m_write_virq;
 	devcb_write_line m_write_keydown;
 	devcb_write_line m_write_halt;
-	devcb_write8 m_write_data;
 
 	uint8_t m_rxrdy;
 

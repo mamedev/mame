@@ -400,12 +400,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(splendor_state::scanline_cb)
 {
 	int scanline = param;
 
-    // vblank-in irq
+	// vblank-in irq
 	if(scanline == 224)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
-    // vblank-out irq or sprite DMA end, applies bg scroll writes
-    // and checks debug flag (if available) for screen freeze.
+	// vblank-out irq or sprite DMA end, applies bg scroll writes
+	// and checks debug flag (if available) for screen freeze.
 	if(scanline == 32)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 }

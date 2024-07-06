@@ -3,8 +3,9 @@
 // thanks-to:bataais, Berger
 /*******************************************************************************
 
-Applied Concepts Great Game Machine (GGM), electronic board game computer.
-2nd source distribution: Modular Game System (MGS), by Chafitz.
+Applied Concepts Great Game Machine (GGM), electronic board game computer,
+in cooperation with Chafitz, who marketed it as Modular Game System (MGS).
+After a legal dispute with Chafitz, all rights went to Applied Concepts.
 
 Hardware notes:
 - 6502A 2MHz, SYP6522 VIA
@@ -616,4 +617,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, ggm,  0,      0,      ggm,     ggm,   ggm_state, empty_init, "Applied Concepts", "Great Game Machine", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, ggm,  0,      0,      ggm,     ggm,   ggm_state, empty_init, "Applied Concepts / Chafitz", "Great Game Machine", MACHINE_SUPPORTS_SAVE )

@@ -1,11 +1,9 @@
-// license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// license: BSD-3-Clause
+// copyright-holders: Angelo Salese
+// thanks-to: Tomasz Slanina, Sarah Walker
 /***************************************************************************
 
     Acorn RiscPC line of computers
-
-    preliminary driver by Angelo Salese,
-    based on work by Tomasz Slanina and Sarah Walker
 
     TODO:
     - IOMD currently hardwired with ARM7500FE flavour for all machines, needs information about

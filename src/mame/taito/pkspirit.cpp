@@ -10,6 +10,8 @@ TODO:
 - Opto coin chutes are non-canonical, need to press H then L in quick succession
   (game will presumably draw a coin error if this isn't done right, needs Reset SW to fix)
 - EEPROM
+- shun: uses more GFX chipset features (i.e. scrolling); needs correct inputs; needs soft reset after
+  boot to display something; has unemulated 7-seg display
 
 ===================================================================================================
 
@@ -73,6 +75,7 @@ public:
 	{ }
 
 	void pkspirit(machine_config &config);
+	void shun(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -96,6 +99,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map);
+	void shun_main_map(address_map &map);
 	void sound_map(address_map &map);
 };
 
@@ -256,7 +260,26 @@ void pkspirit_state::main_map(address_map &map) // TODO: verify everything
 	map(0xb20000, 0xb2001f).ram(); // control registers for one of the custom GFX chips?
 }
 
+void pkspirit_state::shun_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x100000, 0x10001f).rw(m_mainio, FUNC(te7750_device::read), FUNC(te7750_device::write)).umask16(0x00ff);
+	map(0x200000, 0x20ffff).ram().share("mainram");
+	map(0x300000, 0x300001).portr("DSW");
+	// map(0x310000, 0x310007).rw() // ??
+	map(0x800001, 0x800001).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0x800003, 0x800003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+	//map(0x900000, 0x900001).nopw(); // ?
 
+	map(0xa00000, 0xa001ff).ram(); // is this still palette? (for the uploaded tiles?)
+	map(0xa04000, 0xa057ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // up to 0xa05fff for this game?
+	map(0xb00000, 0xb0ffff).ram().w(FUNC(pkspirit_state::vidram_w)).share("vidram"); // it uploads a 2bpp tileset at c000-cfff, why? it's just another copy of the basic font
+
+	map(0xb10000, 0xb107ff).ram().share("sprram"); // spritelist should be copied here
+
+	map(0xb10800, 0xb1087f).ram(); // control registers for one of the custom GFX chips?
+	map(0xb20000, 0xb2001f).ram(); // control registers for one of the custom GFX chips?
+}
 
 void pkspirit_state::sound_map(address_map &map) // TODO: verify everything
 {
@@ -444,6 +467,13 @@ void pkspirit_state::pkspirit(machine_config &config)
 	OKIM6295(config, "oki", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // all verified
 }
 
+void pkspirit_state::shun(machine_config &config)
+{
+	pkspirit(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &pkspirit_state::shun_main_map);
+}
+
 
 ROM_START( pkspirit )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // on base PCB
@@ -476,7 +506,38 @@ ROM_START( pkspirit )
 	ROM_LOAD( "d41_04.ic19", 0x200, 0x144, NO_DUMP ) // PAL20L8B, on video PCB
 ROM_END
 
+ROM_START( shun ) // “駿”
+	ROM_REGION( 0x40000, "maincpu", 0 ) // on base PCB
+	ROM_LOAD16_BYTE( "d43_13.ic26", 0x00000, 0x20000, CRC(ffaefe8d) SHA1(4851495f53ef6c68ef3274efa2e5d046d62e0ffc) )
+	ROM_LOAD16_BYTE( "d43_12.ic25", 0x00001, 0x20000, CRC(a35000c1) SHA1(315006e709f46e65dec5682318d2986b98acdaf2) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // on video PCB
+	ROM_LOAD( "d43_01.ic21", 0x00000, 0x10000, CRC(42b85482) SHA1(c121daed24f82b6b55a2475c1c1defb8f59e6b97) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x140000, "tiles", 0 )
+	ROM_LOAD16_BYTE( "d43_11.ic16", 0x000000, 0x20000, CRC(5a660455) SHA1(b1ceab84361b3064176939c7afaef6f77378b63d) )
+	ROM_LOAD16_BYTE( "d41_16.ic16", 0x000001, 0x20000, CRC(531167e9) SHA1(10ca3a71280989bac74001d386182b7db362c8e1) )
+	ROM_LOAD16_BYTE( "d43_07.ic9",  0x040000, 0x20000, CRC(ff94ba37) SHA1(44e40ddc47d10072d90ab29d7ec5c98a7f2837a2) )
+	ROM_LOAD16_BYTE( "d43_06.ic8",  0x040001, 0x20000, CRC(be7e8795) SHA1(db6da068674e66c01a90d6fe7f4500ada58282cc) )
+	ROM_LOAD16_BYTE( "d43_05.ic6",  0x080000, 0x20000, CRC(dfcf5018) SHA1(f7e263990e08c689a39ff3c49bb118abf2eebf22) )
+	ROM_LOAD16_BYTE( "d43_04.ic5",  0x080001, 0x20000, CRC(a35c6917) SHA1(13c42d0bc34198599dc255e1982bb458df30e1e6) )
+	ROM_LOAD16_BYTE( "d43_02.ic1",  0x0c0000, 0x20000, CRC(9009759d) SHA1(b0047017b50f4e9437194a2b10b70a27b994f150) )
+	ROM_LOAD16_BYTE( "d43_03.ic2",  0x0c0001, 0x20000, CRC(66cd4a76) SHA1(da9b08b5767d7881f0becddd04f2362bdba40a52) )
+	ROM_LOAD16_BYTE( "d43_10.ic15", 0x100000, 0x20000, CRC(ab43e4ff) SHA1(c7361cae6a0a8fdc01d37402c5eef3c57d06f1d4) )
+	ROM_LOAD16_BYTE( "d43_08.ic11", 0x100001, 0x20000, CRC(41a4723e) SHA1(7273be1b68d8552e4c25cccf455eb1589dc07eda) )
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 ) // on video PCB
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // on base PCB
+	ROM_LOAD( "93c46.ic37", 0x00, 0x80, NO_DUMP )
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "d41_05.ic13", 0x000, 0x144, NO_DUMP ) // PAL20L8B, on base PCB
+	ROM_LOAD( "d41_04.ic19", 0x200, 0x144, NO_DUMP ) // PAL20L8B, on video PCB
+ROM_END
+
 } // anonymous namespace
 
 
 GAME( 1992, pkspirit, 0, pkspirit, pkspirit, pkspirit_state, empty_init, ROT0, "Taito Corporation", "Poker Spirit", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, shun,     0, shun,     pkspirit, pkspirit_state, empty_init, ROT0, "Taito Corporation", "Shun",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -4,8 +4,6 @@
 
 Gundam RX-78 (c) 1983 Bandai
 
-Driver by Angelo Salese & Robbbert.
-
 TODO:
 - implement printer;
 - Implement 2nd cart slot

@@ -67,7 +67,7 @@ KKC - King Kong Cash, DDTE - ??):
 * Crimson Fire (HCD-STD-CRFI-11.1.2.5 2007)
 * Crimson Fire [KKC] (HCD_STD_KKCR_11.1.3.1 2008 SAP-NO. 66010132) [v11/v12]
 * Crystal Lake
-* Deal or no Deal The Show (HCDSTDDODB - 11.1.2.3 66008401 / 65023927)
+* Deal or No Deal The Show (HCDSTDDODB - 11.1.2.3 66008401 / 65023927)
 * Diamond Mine (HCD-STD-DIMI1CG-12.0.0.12 2009 SAP-NO. 66011438)
 * Diamond Mine [KKC] (HCD_STD_DIMI1KK_12.0.0.11 2010 SAP-NO. 66012065)
 * Deep Diamonds

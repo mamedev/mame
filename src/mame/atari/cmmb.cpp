@@ -5,24 +5,21 @@
 Centipede / Millipede / Missile Command / Let's Go Bowling
 (c) 1980-2 / 2002 - Infogrames / CosmoDog
 
-preliminary driver by Angelo Salese
-
 Earlier revisions of this cabinet did not include the bowling game.
  Known to exist "CMM Rev 1.03" (without Let's Go Bowling)
  Let's Go Bowling is actually a completely new game by Cosmodog, not
  a port or prototype of an old Atari game.
 
 TODO:
-- flash ROM hookup
+- flash ROM hookup;
 - finish video emulation;
-- trackball inputs
+- trackball inputs;
 - sound;
-- NVRAM (flash ROM, as per NVRAM test at 0xC2A7).
-- untangle switch-cases for inputs;
+- NVRAM (flash ROM, as per NVRAM test at 0xC2A7);
 - IRQs are problematic.  Haven't yet found a reliable enable that works
   for both mainline and service mode; maybe there's no mask and the
   processor's SEI/CLI instructions are used for that?
-  - If IRQs are enabled in service mode, they eventually trash all of memory.
+  NOTE: If IRQs are enabled in service mode, they eventually trash all of memory.
 
 
 Probably on the CPLD (CY39100V208B) - Quoted from Cosmodog's website:
@@ -55,7 +52,7 @@ OSC @ 72.576MHz
 #include "machine/bankdev.h"
 #include "emupal.h"
 #include "screen.h"
-
+#include "tilemap.h"
 
 namespace {
 
@@ -75,6 +72,13 @@ public:
 		m_bnk2000(*this, "bnk2000")
 	{ }
 
+	void cmmb(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<at29c020_device> m_flash;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -85,50 +89,44 @@ public:
 
 	uint8_t m_irq_mask = 0;
 
-	void cmmb_charram_w(offs_t offset, uint8_t data);
-	uint8_t cmmb_input_r(offs_t offset);
-	void cmmb_output_w(offs_t offset, uint8_t data);
 	uint8_t flash_r(offs_t offset);
 	void flash_w(offs_t offset, uint8_t data);
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void cmmb(machine_config &config);
 	void cmmb_map(address_map &map);
 	void bnk2000_map(address_map &map);
+
+	void vram_w(offs_t offset, uint8_t data);
+	void charram_w(offs_t offset, uint8_t data);
+	tilemap_t *m_tilemap = nullptr;
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+
+	//void irq_ack_w(offs_t offset, uint8_t data);
 };
+
+TILE_GET_INFO_MEMBER(cmmb_state::get_tile_info)
+{
+	const u8 tile = m_videoram[tile_index] & 0x7f;
+	const u8 colour = (m_videoram[tile_index] & 0xc0) >> 6;
+
+	tileinfo.set(0, tile, colour, 0);
+}
 
 
 void cmmb_state::video_start()
 {
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmmb_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-uint32_t cmmb_state::screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cmmb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_videoram;
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-	int count = 0x00000;
-
-	int y,x;
-
-	for (y=0;y<32;y++)
-	{
-		for (x=0;x<32;x++)
-		{
-			int tile = videoram[count] & 0x7f;
-			int colour = (videoram[count] & 0xc0)>>6;
-			gfx->opaque(bitmap,cliprect,tile,colour,0,0,x*8,y*8);
-
-			count++;
-		}
-	}
-
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-void cmmb_state::cmmb_charram_w(offs_t offset, uint8_t data)
+void cmmb_state::charram_w(offs_t offset, uint8_t data)
 {
 	m_charram[offset] = data;
 
@@ -136,6 +134,13 @@ void cmmb_state::cmmb_charram_w(offs_t offset, uint8_t data)
 	m_gfxdecode->gfx(0)->mark_dirty(offset >> 4);
 	m_gfxdecode->gfx(1)->mark_dirty(offset >> 5);
 }
+
+void cmmb_state::vram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
+}
+
 
 uint8_t cmmb_state::flash_r(offs_t offset)
 {
@@ -147,70 +152,54 @@ void cmmb_state::flash_w(offs_t offset, uint8_t data)
 	m_flash->write(offset + 0x2000, data);
 }
 
-uint8_t cmmb_state::cmmb_input_r(offs_t offset)
-{
-	//printf("%02x R\n",offset);
-	switch(offset)
-	{
-		case 0x00: return ioport("IN2")->read();
-		case 0x03: return 4; // incorrect image U9 otherwise (???)
-		case 0x0e: return ioport("IN0")->read();
-		case 0x0f: return ioport("IN1")->read();
-	}
-
-	return 0xff;
-}
-
-void cmmb_state::cmmb_output_w(offs_t offset, uint8_t data)
-{
-	//printf("%02x -> [%02x] W\n",data,offset);
-	switch(offset)
-	{
-		case 0x00:  // IRQ ack?  may also be 0x09.
-			m_maincpu->set_input_line(0, CLEAR_LINE);
-			//printf("IRQ ack\n");
-			break;
-		case 0x01:
-			m_irq_mask = data;
-			break;
-		case 0x02:
-			// bit 7 toggled - watchdog or status LED
-			// toggled by code at E3DB in IRQ handler - it's on when the frame count & 0x30 is 1 and off otherwise
-			// bit 6 set means accessing flash ROM at 0x2000
-			m_bnk2000->set_bank((data & 0x40) ? 1 : 0);
-			break;
-
-		case 0x03:
-			{
-				uint8_t *ROM = memregion("maincpu")->base();
-				uint32_t bankaddress;
-
-				//bankaddress = 0x10000 + (0x4000 * ((data & 0x0f)^0xf));
-				//printf("bank %02x => %x\n", data, bankaddress);
-				bankaddress = 0x10000 + 0x3a000;
-				membank("bank1")->set_base(&ROM[bankaddress]);
-				// bit 7 sub-devCB's flash at 0x2000-0x4000?
-			}
-			break;
-
-		case 0x07:
-			break;
-
-		case 0x09:
-			break;
-	}
-}
-
 /* overlap empty addresses */
 void cmmb_state::cmmb_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram(); /* zero page address */
 //  map(0x13c0, 0x13ff).ram(); //spriteram
-	map(0x1000, 0x1fff).ram().share("videoram");
+	map(0x1000, 0x1fff).ram().w(FUNC(cmmb_state::vram_w)).share("videoram");
 	map(0x2000, 0x9fff).m(m_bnk2000, FUNC(address_map_bank_device::amap8));
 	map(0xa000, 0xafff).ram();
-	map(0xb000, 0xbfff).ram().w(FUNC(cmmb_state::cmmb_charram_w)).share(m_charram);
-	map(0xc000, 0xc00f).rw(FUNC(cmmb_state::cmmb_input_r), FUNC(cmmb_state::cmmb_output_w));
+	map(0xb000, 0xbfff).ram().w(FUNC(cmmb_state::charram_w)).share(m_charram);
+	map(0xc000, 0xc000).portr("IN2").lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// maybe at $c009 instead
+			m_maincpu->set_input_line(0, CLEAR_LINE);
+		})
+	);
+	map(0xc001, 0xc001).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// FIXME: may be incorrect
+			// doesn't write to it when entering service mode, patched below in cmmb162
+			m_irq_mask = data;
+		})
+	);
+	map(0xc002, 0xc002).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// bit 7 toggled - watchdog or status LED
+			// toggled by code at E3DB in IRQ handler - it's on when the frame count & 0x30 is 1 and off otherwise
+			// bit 6 set means accessing flash ROM at 0x2000
+			m_bnk2000->set_bank((data & 0x40) ? 1 : 0);
+		})
+	);
+	map(0xc003, 0xc003).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			uint8_t *ROM = memregion("maincpu")->base();
+			uint32_t bankaddress;
+
+			//bankaddress = 0x10000 + (0x4000 * ((data & 0x0f)^0xf));
+			//printf("bank %02x => %x\n", data, bankaddress);
+			bankaddress = 0x10000 + 0x3a000;
+			membank("bank1")->set_base(&ROM[bankaddress]);
+			// bit 7 sub-devCB's flash at 0x2000-0x4000?
+		})
+	);
+	map(0xc003, 0xc003).lr8(NAME([] () {
+		// incorrect image U9 otherwise in cmmb162 (???)
+		return 4;
+	}));
+	map(0xc00e, 0xc00e).portr("IN0");
+	map(0xc00f, 0xc00f).portr("IN1");
 	map(0xc010, 0xffff).rom().region("maincpu", 0x1c010);
 }
 
@@ -345,6 +334,7 @@ static INPUT_PORTS_START( cmmb )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x01, 0x01, "IN2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -364,7 +354,7 @@ static INPUT_PORTS_START( cmmb )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_SERVICE2 )   // if this is lit up, coins will auto-insert each frame until they hit 99 (?!)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_SERVICE3 )   // if this is lit up, coins will auto-insert each frame until they hit 99 (?!), will gets stuck to copyright screen otherwise
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -373,8 +363,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,1),
 	2,
 	{ 1, 0 },
-	{ 6, 4, 2, 0, 14, 12, 10, 8 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP4(6, -2), STEP4(14, -2) },
+	{ STEP8(0, 16) },
 	8*16
 };
 
@@ -384,8 +374,8 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,1),
 	2,
 	{ 1, 0 },
-	{ 6, 4, 2, 0, 14, 12, 10, 8 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
+	{ STEP4(6, -2), STEP4(14, -2) },
+	{ STEP16(0, 16) },
 	8*32
 };
 
@@ -423,12 +413,12 @@ void cmmb_state::cmmb(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(MAIN_CLOCK/12, 384, 0, 256, 264, 0, 240); // TBD, not real measurements
-	screen.set_screen_update(FUNC(cmmb_state::screen_update_cmmb));
+	screen.set_screen_update(FUNC(cmmb_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cmmb);
 
-	PALETTE(config, m_palette).set_format(palette_device::RGB_332_inverted, 512);
+	PALETTE(config, m_palette).set_format(palette_device::RGB_332_inverted, 32);
 
 	/* sound hardware */
 //  SPEAKER(config, "mono").front_center();

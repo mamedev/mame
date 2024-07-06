@@ -8,8 +8,8 @@ authors:hap
 <!-- define elements -->
 
 	<element name="led" defstate="0">
-		<rect state="0"><color red="0.014" green="0.14" blue="0.02" /></rect>
-		<rect state="1"><color red="0.1" green="1.0" blue="0.15" /></rect>
+		<rect state="0"><color red="0.15" green="1.0" blue="0.1" alpha="0.13" /></rect>
+		<rect state="1"><color red="0.15" green="1.0" blue="0.1" /></rect>
 	</element>
 
 	<element name="but" defstate="0">
@@ -405,14 +405,14 @@ authors:hap
 		<bounds left="3" right="151.875" top="-0.25" bottom="89" />
 
 		<!-- chessboard coords -->
-		<element ref="text_8"><bounds x="18.7" y="6"  width="2" height="2" /></element>
-		<element ref="text_7"><bounds x="18.7" y="16" width="2" height="2" /></element>
-		<element ref="text_6"><bounds x="18.7" y="26" width="2" height="2" /></element>
-		<element ref="text_5"><bounds x="18.7" y="36" width="2" height="2" /></element>
-		<element ref="text_4"><bounds x="18.7" y="46" width="2" height="2" /></element>
-		<element ref="text_3"><bounds x="18.7" y="56" width="2" height="2" /></element>
-		<element ref="text_2"><bounds x="18.7" y="66" width="2" height="2" /></element>
-		<element ref="text_1"><bounds x="18.7" y="76" width="2" height="2" /></element>
+		<element ref="text_8"><bounds x="18.6" y="6"  width="2" height="2" /></element>
+		<element ref="text_7"><bounds x="18.6" y="16" width="2" height="2" /></element>
+		<element ref="text_6"><bounds x="18.6" y="26" width="2" height="2" /></element>
+		<element ref="text_5"><bounds x="18.6" y="36" width="2" height="2" /></element>
+		<element ref="text_4"><bounds x="18.6" y="46" width="2" height="2" /></element>
+		<element ref="text_3"><bounds x="18.6" y="56" width="2" height="2" /></element>
+		<element ref="text_2"><bounds x="18.6" y="66" width="2" height="2" /></element>
+		<element ref="text_1"><bounds x="18.6" y="76" width="2" height="2" /></element>
 		<element ref="text_a"><bounds x="25" y="82.6" width="2" height="2" /></element>
 		<element ref="text_b"><bounds x="35" y="82.6" width="2" height="2" /></element>
 		<element ref="text_c"><bounds x="45" y="82.6" width="2" height="2" /></element>
@@ -432,14 +432,14 @@ authors:hap
 		<group ref="buttons2"><bounds x="103.675" y="28.75" width="60" height="60" /></group>
 
 		<!-- chessboard leds -->
-		<element name="0.0"  ref="led"><bounds x="15.9" yc="7"  width="2" height="0.9" /></element>
-		<element name="0.1"  ref="led"><bounds x="15.9" yc="17" width="2" height="0.9" /></element>
-		<element name="0.2"  ref="led"><bounds x="15.9" yc="27" width="2" height="0.9" /></element>
-		<element name="0.12" ref="led"><bounds x="15.9" yc="37" width="2" height="0.9" /></element>
-		<element name="0.11" ref="led"><bounds x="15.9" yc="47" width="2" height="0.9" /></element>
-		<element name="0.10" ref="led"><bounds x="15.9" yc="57" width="2" height="0.9" /></element>
-		<element name="0.9"  ref="led"><bounds x="15.9" yc="67" width="2" height="0.9" /></element>
-		<element name="0.8"  ref="led"><bounds x="15.9" yc="77" width="2" height="0.9" /></element>
+		<element name="0.0"  ref="led"><bounds x="15.8" yc="7"  width="2" height="0.9" /></element>
+		<element name="0.1"  ref="led"><bounds x="15.8" yc="17" width="2" height="0.9" /></element>
+		<element name="0.2"  ref="led"><bounds x="15.8" yc="27" width="2" height="0.9" /></element>
+		<element name="0.12" ref="led"><bounds x="15.8" yc="37" width="2" height="0.9" /></element>
+		<element name="0.11" ref="led"><bounds x="15.8" yc="47" width="2" height="0.9" /></element>
+		<element name="0.10" ref="led"><bounds x="15.8" yc="57" width="2" height="0.9" /></element>
+		<element name="0.9"  ref="led"><bounds x="15.8" yc="67" width="2" height="0.9" /></element>
+		<element name="0.8"  ref="led"><bounds x="15.8" yc="77" width="2" height="0.9" /></element>
 
 		<element name="0.7"  ref="led"><bounds xc="26" y="85.2" width="0.9" height="2" /></element>
 		<element name="0.6"  ref="led"><bounds xc="36" y="85.2" width="0.9" height="2" /></element>

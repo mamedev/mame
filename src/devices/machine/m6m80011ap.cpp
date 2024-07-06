@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "m6m80011ap.h"
 
+#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -149,7 +151,7 @@ void m6m80011ap_device::set_clock_line(int state)
 							case 0x15: m_eeprom_state = EEPROM_READ; break;
 							case 0x95: m_eeprom_state = EEPROM_STATUS_OUTPUT; break;
 							default:
-								printf("Write M6M80011 unknown %02x cmd\n",m_current_cmd );
+								LOG("Write M6M80011 unknown %02x cmd\n",m_current_cmd );
 								break;
 						}
 					}
@@ -167,7 +169,7 @@ void m6m80011ap_device::set_clock_line(int state)
 					if(m_cmd_stream_pos>=8)
 					{
 						m_read_latch = (m_eeprom_data[m_current_addr] >> (23-m_cmd_stream_pos)) & 1;
-						//printf("%d %04x <- %04x %d\n",m_read_latch,m_eeprom_data[m_current_addr],m_current_addr,m_cmd_stream_pos-8);
+						//LOG("%d %04x <- %04x %d\n",m_read_latch,m_eeprom_data[m_current_addr],m_current_addr,m_cmd_stream_pos-8);
 					}
 
 					if(m_cmd_stream_pos==24)
@@ -191,7 +193,7 @@ void m6m80011ap_device::set_clock_line(int state)
 						if(m_eeprom_we)
 							m_eeprom_data[m_current_addr] = (m_current_cmd >> 8) & 0xffff;
 
-						//printf("%04x %04x -> %04x\n",m_eeprom_data[m_current_addr],m_current_addr,m_current_cmd >> 8);
+						//LOG("%04x %04x -> %04x\n",m_eeprom_data[m_current_addr],m_current_addr,m_current_cmd >> 8);
 
 						m_eeprom_state = EEPROM_GET_CMD;
 						m_cmd_stream_pos = 0;
@@ -218,7 +220,7 @@ void m6m80011ap_device::set_clock_line(int state)
 
 					if (m_cmd_stream_pos==8)
 					{
-						printf("Status output\n");
+						LOG("Status output\n");
 						m_eeprom_state = EEPROM_GET_CMD;
 						m_cmd_stream_pos = 0;
 					}

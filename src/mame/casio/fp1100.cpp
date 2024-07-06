@@ -65,13 +65,13 @@ class fp1100_state : public driver_device
 public:
 	fp1100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "sub")
 		, m_crtc(*this, "crtc")
 		, m_ipl(*this, "ipl")
 		, m_wram(*this, "wram")
-		, m_videoram(*this, "videoram")
+		, m_videoram(*this, "videoram.%u", 0)
+		, m_palette(*this, "palette")
 		, m_keyboard(*this, "KEY.%u", 0)
 		, m_beep(*this, "beeper")
 		, m_centronics(*this, "centronics")
@@ -84,12 +84,30 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device<upd7801_device> m_subcpu;
+	required_device<mc6845_device> m_crtc;
+	required_region_ptr<u8> m_ipl;
+	required_shared_ptr<u8> m_wram;
+	required_shared_ptr_array<u8, 3> m_videoram;
+	required_device<palette_device> m_palette;
+	required_ioport_array<16> m_keyboard;
+	required_device<beep_device> m_beep;
+	required_device<centronics_device> m_centronics;
+	required_device<cassette_image_device> m_cass;
+
+	void main_map(address_map &map);
+	void io_map(address_map &map);
+	void sub_map(address_map &map);
+
 	void main_bank_w(u8 data);
 	void irq_mask_w(u8 data);
 	void slot_bank_w(u8 data);
 	u8 slot_id_r();
 	u8 memory_r(offs_t offset);
 	void colour_control_w(u8 data);
+	template <unsigned N> u8 vram_r(offs_t offset);
+	template <unsigned N> void vram_w(offs_t offset, u8 data);
 	void kbd_row_w(u8 data);
 	void porta_w(u8 data);
 	u8 portb_r();
@@ -100,11 +118,6 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 
-	required_device<palette_device> m_palette;
-
-	void io_map(address_map &map);
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
 	void handle_int_to_main();
 
 	u8 m_irq_mask = 0;
@@ -130,29 +143,21 @@ private:
 		u8 portb = 0;
 		u8 portc = 0;
 	}m_upd7801;
-	required_device<cpu_device> m_maincpu;
-	required_device<upd7801_device> m_subcpu;
-	required_device<mc6845_device> m_crtc;
-	required_region_ptr<u8> m_ipl;
-	required_shared_ptr<u8> m_wram;
-	required_shared_ptr<u8> m_videoram;
-	required_ioport_array<16> m_keyboard;
-	required_device<beep_device> m_beep;
-	required_device<centronics_device> m_centronics;
-	required_device<cassette_image_device> m_cass;
 };
 
 MC6845_UPDATE_ROW( fp1100_state::crtc_update_row )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u32 *p = &bitmap.pix(y);
+	const u8 porta = m_upd7801.porta;
 
-	if (BIT(m_upd7801.porta, 4))
+	if (BIT(porta, 4))
 	{ // green screen
 		for (u16 x = 0; x < x_count; x++)
 		{
 			u16 const mem = (((ma + x) << 3) + ra) & 0x3fff;
-			u8 const g = m_videoram[mem];
+			// TODO: ORs contents from the other two layers (for FP-1100 only)
+			u8 const g = m_videoram[0][mem];
 			for (u8 i = 0; i < 8; i++)
 			{
 				u8 col = BIT(g, i);
@@ -167,9 +172,9 @@ MC6845_UPDATE_ROW( fp1100_state::crtc_update_row )
 		for (u16 x = 0; x < x_count; x++)
 		{
 			u16 const mem = (((ma + x) << 3) + ra) & 0x3fff;
-			u8 const b = m_videoram[mem];
-			u8 const r = m_videoram[mem + 0x4000];
-			u8 const g = m_videoram[mem + 0x8000];
+			u8 const b = BIT(porta, 2) ? m_videoram[0][mem] : 0;
+			u8 const r = BIT(porta, 1) ? m_videoram[1][mem] : 0;
+			u8 const g = BIT(porta, 0) ? m_videoram[2][mem] : 0;
 			for (u8 i = 0; i < 8; i++)
 			{
 				u8 col = BIT(r, i) | (BIT(g, i) << 1) | (BIT(b, i) << 2);
@@ -225,6 +230,7 @@ u8 fp1100_state::slot_id_r()
 	return m_slot[m_slot_num & 7].id;
 }
 
+// TODO: convert to `memory_view`
 u8 fp1100_state::memory_r(offs_t offset)
 {
 	if (offset < 0x9000 && !m_bank_sel)
@@ -259,14 +265,28 @@ d7     - 1=display area; 0=cursor
 */
 void fp1100_state::colour_control_w(u8 data)
 {
-	data = bitswap<8>(data, 7, 4, 6, 5, 3, 0, 2, 1);  // change BRG to RGB
-
+	// HACK: change BRG to RGB
+	data = bitswap<8>(data, 7, 4, 6, 5, 3, 0, 2, 1);
 	m_col_border = data & 7;
 
 	if (BIT(data, 7))
 		m_col_display = (data >> 4) & 7;
 	else
+	{
+		m_col_display = 0;
 		m_col_cursor = data >> 4;
+	}
+}
+
+template <unsigned N> u8 fp1100_state::vram_r(offs_t offset)
+{
+	return m_videoram[N][offset];
+}
+
+template <unsigned N> void fp1100_state::vram_w(offs_t offset, u8 data)
+{
+	// NOTE: POST makes sure to punt in FP-1000 mode if this don't XOR the value
+	m_videoram[N][offset] = ~data;
 }
 
 /*
@@ -287,7 +307,9 @@ void fp1100_state::kbd_row_w(u8 data)
 void fp1100_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("sub_ipl", 0x0000);
-	map(0x2000, 0xdfff).ram().share(m_videoram); //vram B/R/G
+	map(0x2000, 0x5fff).rw(FUNC(fp1100_state::vram_r<0>), FUNC(fp1100_state::vram_w<0>)).share(m_videoram[0]);
+	map(0x6000, 0x9fff).rw(FUNC(fp1100_state::vram_r<1>), FUNC(fp1100_state::vram_w<1>)).share(m_videoram[1]);
+	map(0xa000, 0xdfff).rw(FUNC(fp1100_state::vram_r<2>), FUNC(fp1100_state::vram_w<2>)).share(m_videoram[2]);
 	map(0xe000, 0xe000).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0xe400, 0xe400).mirror(0x3ff).portr("DSW").w(FUNC(fp1100_state::kbd_row_w));
@@ -309,10 +331,19 @@ The SO pin is Serial Output to CMT (1=2400Hz; 0=1200Hz)
 */
 void fp1100_state::porta_w(u8 data)
 {
-	m_upd7801.porta = data;
+	if (BIT(m_upd7801.porta, 5) && !BIT(data, 5))
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			const u8 fill_value = BIT(m_col_display, i) ? 0xff : 0;
+			std::fill(m_videoram[i].begin(), m_videoram[i].end(), fill_value);
+		}
+	}
 
-	if (BIT(data, 5))
-		memset(m_videoram, 0, 0xc000);
+	const u8 crtc_divider = BIT(data, 3) ? 16 : 8;
+	m_crtc->set_unscaled_clock(MAIN_CLOCK / crtc_divider);
+
+	m_upd7801.porta = data;
 }
 
 u8 fp1100_state::portb_r()
@@ -383,7 +414,7 @@ void fp1100_state::handle_int_to_main()
 	}
 }
 
-// Input ports
+
 static INPUT_PORTS_START( fp1100 )
 	PORT_START("KEY.0")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -654,7 +685,6 @@ void fp1100_state::machine_reset()
 
 void fp1100_state::fp1100(machine_config &config)
 {
-	// basic machine hardware
 	Z80(config, m_maincpu, MAIN_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fp1100_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &fp1100_state::io_map);
@@ -672,7 +702,17 @@ void fp1100_state::fp1100(machine_config &config)
 	GENERIC_LATCH_8(config, "main2sub");
 	GENERIC_LATCH_8(config, "sub2main");
 
-	// video hardware
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(fp1100_state::centronics_busy_w));
+
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
+
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_w").configure_periodic(FUNC(fp1100_state::kansas_w), attotime::from_hz(4800));
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
@@ -682,30 +722,15 @@ void fp1100_state::fp1100(machine_config &config)
 	PALETTE(config, m_palette).set_entries(8);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_fp1100);
 
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 950) // guess
-			.add_route(ALL_OUTPUTS, "mono", 0.50); // inside the keyboard
-
-	// CRTC
 	HD6845S(config, m_crtc, MAIN_CLOCK/8);   // hand tuned to get ~60 fps
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(fp1100_state::crtc_update_row));
 
-	// Printer
-	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->busy_handler().set(FUNC(fp1100_state::centronics_busy_w));
-
-	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
-	m_centronics->set_output_latch(latch);
-
-	// Cassette
-	CASSETTE(config, m_cass);
-	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
-	TIMER(config, "kansas_w").configure_periodic(FUNC(fp1100_state::kansas_w), attotime::from_hz(4800)); // cass write
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 950) // guess
+		.add_route(ALL_OUTPUTS, "mono", 0.50); // inside the keyboard
 }
 
 // ROM definitions

@@ -692,7 +692,7 @@ ROM_START( mm1m4 )
 	ROM_LOAD( "9081b.ic43", 0x0000, 0x2000, CRC(60841940) SHA1(d755e9be53f27f41d1e93b4c1793f9ea6a3e1229) )
 
 	ROM_REGION( 0x200, "address", 0 ) // address decoder
-	ROM_LOAD( "720793a.ic24", 0x0000, 0x0200, CRC(deea87a6) SHA1(8f19e43252c9a0b1befd02fc9d34fe1437477f3a) )
+	ROM_LOAD( "720793a.ic24", 0x000, 0x200, CRC(deea87a6) SHA1(8f19e43252c9a0b1befd02fc9d34fe1437477f3a) )
 
 	ROM_REGION( 0x1000, "chargen", 0 ) // character generator
 	ROM_LOAD( "6807b.ic61", 0x0000, 0x1000, CRC(32b36220) SHA1(8fe7a181badea3f7e656dfaea21ee9e4c9baf0f1) )
@@ -710,7 +710,7 @@ ROM_START( mm1m6 )
 	ROM_LOAD( "9081b.ic2", 0x0000, 0x2000, CRC(2955feb3) SHA1(946a6b0b8fb898be3f480c04da33d7aaa781152b) )
 
 	ROM_REGION( 0x200, "address", 0 ) // address decoder
-	ROM_LOAD( "720793a.ic24", 0x0000, 0x0200, CRC(deea87a6) SHA1(8f19e43252c9a0b1befd02fc9d34fe1437477f3a) )
+	ROM_LOAD( "720793a.ic24", 0x000, 0x200, CRC(deea87a6) SHA1(8f19e43252c9a0b1befd02fc9d34fe1437477f3a) )
 
 	ROM_REGION( 0x1000, "chargen", 0 ) // character generator
 	ROM_LOAD( "6807b.ic61", 0x0000, 0x1000, CRC(32b36220) SHA1(8fe7a181badea3f7e656dfaea21ee9e4c9baf0f1) )
@@ -728,7 +728,7 @@ ROM_START( mm1m7 )
 	ROM_LOAD( "9057c.ic2", 0x0000, 0x2000, CRC(89bbc042) SHA1(7e8800c94934b81ce08b7af862e1159e0517684d) )
 
 	ROM_REGION( 0x200, "address", 0 ) // address decoder
-	ROM_LOAD( "726972b.ic24", 0x0000, 0x0200, BAD_DUMP CRC(2487d4ca) SHA1(e883a2e9540c31abba3d7f3bc23a48941f655ea0) )
+	ROM_LOAD( "726972b.ic24", 0x000, 0x200, CRC(2487d4ca) SHA1(e883a2e9540c31abba3d7f3bc23a48941f655ea0) )
 
 	ROM_REGION( 0x1000, "chargen", 0 ) // character generator
 	ROM_LOAD( "6807b.ic61", 0x0000, 0x1000, CRC(32b36220) SHA1(8fe7a181badea3f7e656dfaea21ee9e4c9baf0f1) )

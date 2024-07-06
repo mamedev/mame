@@ -16,7 +16,7 @@ SEI-8611M (M6100219A)
 
 OSC  : 14.31818MHz,12.0000MHz,16.0000MHz
 CPU  : V20 (Sony CXQ70116D-8) @ 8.000MHz [16/2]
-       Toshiba T5182 @ 3.579545 (14.31818/4]
+       Toshiba T5182 @ 3.579545 [14.31818/4]
 Sound: YM2151 @ 3.579545 [14.31818/4]
     VSync 60Hz
     HSync 15.32kHz
@@ -87,7 +87,9 @@ public:
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
 		m_textram(*this, "textram"),
-		m_spritebank(*this, "spritebank")
+		m_spritebank(*this, "spritebank"),
+		m_tilerom(*this, "tilerom"),
+		m_attrrom(*this, "attrrom")
 	{ }
 
 	void panicr(machine_config &config);
@@ -95,26 +97,7 @@ public:
 	void init_panicr();
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<t5182_device> m_t5182;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-
-	required_shared_ptr<uint8_t> m_mainram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_textram;
-	required_shared_ptr<uint8_t> m_spritebank;
-
-	tilemap_t *m_bgtilemap = nullptr;
-	tilemap_t *m_infotilemap_2 = nullptr;
-	tilemap_t *m_txttilemap = nullptr;
-
-	int m_scrollx = 0;
-	std::unique_ptr<bitmap_ind16> m_temprender;
-	std::unique_ptr<bitmap_ind16> m_tempbitmap_1;
-	rectangle m_tempbitmap_clip;
-
+	void textram_w(offs_t offset, uint8_t data);
 	uint8_t collision_r(offs_t offset);
 	void scrollx_lo_w(uint8_t data);
 	void scrollx_hi_w(uint8_t data);
@@ -134,12 +117,34 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void panicr_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<t5182_device> m_t5182;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_mainram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_textram;
+	required_shared_ptr<uint8_t> m_spritebank;
+
+	required_region_ptr<uint8_t> m_tilerom;
+	required_region_ptr<uint8_t> m_attrrom;
+
+	tilemap_t *m_bgtilemap = nullptr;
+	tilemap_t *m_infotilemap_2 = nullptr;
+	tilemap_t *m_txttilemap = nullptr;
+
+	int m_scrollx = 0;
+	std::unique_ptr<bitmap_ind16> m_temprender;
+	std::unique_ptr<bitmap_ind16> m_tempbitmap_1;
+	rectangle m_tempbitmap_clip;
+
 };
 
 
-#define MASTER_CLOCK    XTAL(16'000'000)
-#define SOUND_CLOCK     XTAL(14'318'181)
-#define TC15_CLOCK      XTAL(12'000'000)
+//#define TC15_CLOCK      XTAL(12'000'000)
 
 
 /***************************************************************************
@@ -193,11 +198,9 @@ void panicr_state::panicr_palette(palette_device &palette) const
 
 TILE_GET_INFO_MEMBER(panicr_state::get_bgtile_info)
 {
-	int code,attr;
-
-	code=memregion("user1")->base()[tile_index];
-	attr=memregion("user2")->base()[tile_index];
-	code+=((attr&7)<<8);
+	int code = m_tilerom[tile_index];
+	int const attr = m_attrrom[tile_index];
+	code += ((attr & 7) << 8);
 	tileinfo.set(1,
 		code,
 		(attr & 0xf0) >> 4,
@@ -205,14 +208,11 @@ TILE_GET_INFO_MEMBER(panicr_state::get_bgtile_info)
 }
 
 
-
 TILE_GET_INFO_MEMBER(panicr_state::get_infotile_info_2)
 {
-	int code,attr;
-
-	code=memregion("user1")->base()[tile_index];
-	attr=memregion("user2")->base()[tile_index];
-	code+=((attr&7)<<8);
+	int code = m_tilerom[tile_index];
+	int const attr = m_attrrom[tile_index];
+	code += ((attr & 7) << 8);
 	tileinfo.set(3,
 		code,
 		0,
@@ -220,13 +220,11 @@ TILE_GET_INFO_MEMBER(panicr_state::get_infotile_info_2)
 }
 
 
-
-
 TILE_GET_INFO_MEMBER(panicr_state::get_txttile_info)
 {
-	int code=m_textram[tile_index*4];
-	int attr=m_textram[tile_index*4+2];
-	int color = attr & 0x07;
+	int const code = m_textram[tile_index * 4];
+	int const attr = m_textram[tile_index * 4 + 2];
+	int const color = attr & 0x07;
 
 	tileinfo.group = color;
 
@@ -250,36 +248,32 @@ void panicr_state::video_start()
 
 void panicr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	int offs,flipx,flipy,x,y,color,sprite;
-
-
 	// ssss ssss | Fx-- cccc | yyyy yyyy | xxxx xxxx
 
-	for (offs = m_spriteram.bytes() - 16; offs>=0; offs-=16)
+	for (int offs = m_spriteram.bytes() - 16; offs >= 0; offs -= 16)
 	{
-		flipx = 0;
-		flipy = m_spriteram[offs+1] & 0x80;
-		y = m_spriteram[offs+2];
-		x = m_spriteram[offs+3];
-		if (m_spriteram[offs+1] & 0x40) x -= 0x100;
+		bool const flipx = false;
+		bool const flipy = BIT(m_spriteram[offs + 1], 7);
+		int const y = m_spriteram[offs + 2];
+		int x = m_spriteram[offs + 3];
+		if (BIT(m_spriteram[offs + 1], 6)) x -= 0x100;
 
-		if (m_spriteram[offs+1] & 0x20)
+		if (BIT(m_spriteram[offs + 1], 5))
 		{
 			// often set
 		}
 
-		if (m_spriteram[offs+1] & 0x10)
+		if (BIT(m_spriteram[offs + 1], 4))
 		{
-			popmessage("(spriteram[offs+1] & 0x10) %02x\n", (m_spriteram[offs+1] & 0x10));
+			popmessage("(BIT(spriteram[offs + 1], 4)) %02x\n", BIT(m_spriteram[offs + 1], 4));
 		}
 
-
-		color = m_spriteram[offs+1] & 0x0f;
-		sprite = m_spriteram[offs+0] | (*m_spritebank << 8);
+		uint32_t const color = m_spriteram[offs + 1] & 0x0f;
+		uint32_t const sprite = m_spriteram[offs + 0] | (*m_spritebank << 8);
 
 		m_gfxdecode->gfx(2)->transmask(bitmap,cliprect,
 				sprite,
-				color,flipx,flipy,x,y,
+				color, flipx, flipy, x, y,
 				m_palette->transpen_mask(*m_gfxdecode->gfx(2), color, 0));
 	}
 }
@@ -292,44 +286,35 @@ uint32_t panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 //  m_infotilemap_2->set_scrollx(0, m_scrollx);
 //  m_infotilemap_2->draw(screen, *m_temprender, m_tempbitmap_clip, 0,0);
 
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	m_txttilemap->mark_all_dirty();
 
-
-
-	for (int y=0;y<256;y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint16_t const *const srcline = &m_temprender->pix(y);
 		uint16_t *const dstline = &bitmap.pix(y);
 
-		for (int x=0;x<256;x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			uint16_t const dat = srcline[x];
 
 			dstline[x] = ((dat & 0x00f) | ((dat & 0x1e0)>>0)) + 0x200;
-
 		}
-
 	}
 
 	draw_sprites(bitmap,cliprect);
 
-	for (int y=0;y<256;y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint16_t const *const srcline = &m_temprender->pix(y);
 		uint16_t *const dstline = &bitmap.pix(y);
 
-		for (int x=0;x<256;x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			uint16_t const dat = srcline[x];
 			if (dat & 0x10)
 				dstline[x] = ((dat & 0x00f) | ((dat & 0x1e0)>>0)) + 0x200;
-
 		}
-
 	}
-
 
 	m_txttilemap->draw(screen, bitmap, cliprect, 0,0);
 
@@ -342,6 +327,14 @@ uint32_t panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
   I/O / Memory
 
 ***************************************************************************/
+
+void panicr_state::textram_w(offs_t offset, uint8_t data)
+{
+	m_textram[offset] = data;
+	if (BIT(~offset, 0))
+		m_txttilemap->mark_tile_dirty(offset >> 2);
+}
+
 
 uint8_t panicr_state::collision_r(offs_t offset)
 {
@@ -357,32 +350,26 @@ uint8_t panicr_state::collision_r(offs_t offset)
 	m_infotilemap_2->set_scrollx(0, m_scrollx & 0xffff);
 	m_infotilemap_2->draw(*m_screen, *m_tempbitmap_1, m_tempbitmap_clip, 0,0);
 
-
-	int actual_column = offset&0x3f;
-	int actual_line = offset >> 6;
-
+	int actual_column = offset & 0x3f;
+	int const actual_line = offset >> 6;
 
 	actual_column = actual_column * 4;
 
 	actual_column -= m_scrollx;
 	actual_column &= 0xff;
 
-
 	uint8_t ret = 0;
 	uint16_t const *const srcline = &m_tempbitmap_1->pix(actual_line);
 
+	ret |= (srcline[(actual_column + 0) & 0xff] & 3) << 6;
+	ret |= (srcline[(actual_column + 1) & 0xff] & 3) << 4;
+	ret |= (srcline[(actual_column + 2) & 0xff] & 3) << 2;
+	ret |= (srcline[(actual_column + 3) & 0xff] & 3) << 0;
 
-	ret |= (srcline[(actual_column+0)&0xff]&3) << 6;
-	ret |= (srcline[(actual_column+1)&0xff]&3) << 4;
-	ret |= (srcline[(actual_column+2)&0xff]&3) << 2;
-	ret |= (srcline[(actual_column+3)&0xff]&3) << 0;
-
-	logerror("%06x: (scroll x upper bits is %04x (full %04x)) read %d %d\n", m_maincpu->pc(), (m_scrollx&0xff00)>>8, m_scrollx,  actual_line, actual_column);
-
+	if (!machine().side_effects_disabled())
+		logerror("%06x: (scroll x upper bits is %04x (full %04x)) read %d %d\n", m_maincpu->pc(), (m_scrollx&0xff00)>>8, m_scrollx,  actual_line, actual_column);
 
 	return ret;
-
-
 }
 
 
@@ -401,8 +388,8 @@ void panicr_state::scrollx_hi_w(uint8_t data)
 void panicr_state::output_w(uint8_t data)
 {
 	// d6, d7: play counter? (it only triggers on 1st coin)
-	machine().bookkeeping().coin_counter_w(0, (data & 0x40) ? 1 : 0);
-	machine().bookkeeping().coin_counter_w(1, (data & 0x80) ? 1 : 0);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 7));
 
 	logerror("output_w %02x\n", data);
 
@@ -426,11 +413,11 @@ void panicr_state::t5182shared_w(offs_t offset, uint8_t data)
 
 void panicr_state::panicr_map(address_map &map)
 {
-	map(0x00000, 0x01fff).ram().share("mainram");
-	map(0x02000, 0x03cff).ram().share("spriteram"); // how big is sprite ram, some places definitely have sprites at 3000+
+	map(0x00000, 0x01fff).ram().share(m_mainram);
+	map(0x02000, 0x03cff).ram().share(m_spriteram); // how big is sprite ram, some places definitely have sprites at 3000+
 	map(0x03d00, 0x03fff).ram();
 	map(0x08000, 0x0bfff).r(FUNC(panicr_state::collision_r));
-	map(0x0c000, 0x0cfff).ram().share("textram");
+	map(0x0c000, 0x0cfff).ram().w(FUNC(panicr_state::textram_w)).share(m_textram);
 	map(0x0d000, 0x0d000).w(m_t5182, FUNC(t5182_device::sound_irq_w));
 	map(0x0d002, 0x0d002).w(m_t5182, FUNC(t5182_device::sharedram_semaphore_main_acquire_w));
 	map(0x0d004, 0x0d004).r(m_t5182, FUNC(t5182_device::sharedram_semaphore_snd_r));
@@ -444,7 +431,7 @@ void panicr_state::panicr_map(address_map &map)
 	map(0x0d802, 0x0d802).w(FUNC(panicr_state::scrollx_hi_w));
 	map(0x0d804, 0x0d804).w(FUNC(panicr_state::scrollx_lo_w));
 	map(0x0d80a, 0x0d80a).w(FUNC(panicr_state::output_w));
-	map(0x0d80c, 0x0d80c).writeonly().share("spritebank");
+	map(0x0d80c, 0x0d80c).writeonly().share(m_spritebank);
 	map(0x0d818, 0x0d818).nopw(); // watchdog?
 	map(0xf0000, 0xfffff).rom();
 }
@@ -586,10 +573,10 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_panicr )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0x000,  8 )
-	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout,   0x200, 32 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0x100, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, infotilelayout_2, 0x100, 16 ) // palette is just to make it viewable with F4
+	GFXDECODE_ENTRY( "chars",   0, charlayout,       0x000,  8 )
+	GFXDECODE_ENTRY( "tiles",   0, bgtilelayout,     0x200, 32 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,     0x100, 16 )
+	GFXDECODE_ENTRY( "tiles",   0, infotilelayout_2, 0x100, 16 ) // palette is just to make it viewable with F4
 
 GFXDECODE_END
 
@@ -607,11 +594,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::scanline)
 
 void panicr_state::panicr(machine_config &config)
 {
-	V20(config, m_maincpu, MASTER_CLOCK/2); /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
+	constexpr XTAL MASTER_CLOCK = XTAL(16'000'000);
+	constexpr XTAL SOUND_CLOCK = XTAL(14'318'181);
+
+	V20(config, m_maincpu, MASTER_CLOCK/2); // Sony 8623h9 CXQ70116D-8 (V20 compatible)
 	m_maincpu->set_addrmap(AS_PROGRAM, &panicr_state::panicr_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(panicr_state::scanline), "screen", 0, 1);
 
-	T5182(config, m_t5182, 0);
+	T5182(config, m_t5182, SOUND_CLOCK/4);
+	m_t5182->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
+	m_t5182->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -625,10 +617,10 @@ void panicr_state::panicr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_panicr);
 	PALETTE(config, m_palette, FUNC(panicr_state::panicr_palette), 256 * 4, 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/4)); /* 3.579545 MHz */
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/4)); // 3.579545 MHz
 	ymsnd.irq_handler().set(m_t5182, FUNC(t5182_device::ym2151_irq_handler));
 	ymsnd.add_route(0, "mono", 1.0);
 	ymsnd.add_route(1, "mono", 1.0);
@@ -636,30 +628,30 @@ void panicr_state::panicr(machine_config &config)
 
 
 ROM_START( panicr )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* v20 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // v20 main cpu
 	ROM_LOAD16_BYTE("2.19m",   0x0f0000, 0x08000, CRC(3d48b0b5) SHA1(a6e8b38971a8964af463c16f32bb7dbd301dd314) )
 	ROM_LOAD16_BYTE("1.19n",   0x0f0001, 0x08000, CRC(674131b9) SHA1(63499cd5ad39e79e70f3ba7060680f0aa133f095) )
 
-	ROM_REGION( 0x8000, "t5182_z80", 0 ) /* Toshiba T5182 external ROM */
+	ROM_REGION( 0x8000, "t5182:external", 0 ) // Toshiba T5182 external ROM
 	ROM_LOAD( "22d.bin",   0x0000, 0x8000, CRC(eb1a46e1) SHA1(278859ae4bca9f421247e646d789fa1206dcd8fc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "13f.bin", 0x000000, 0x2000, CRC(4e6b3c04) SHA1(f388969d5d822df0eaa4d8300cbf9cee47468360) )
 	ROM_LOAD( "15f.bin", 0x002000, 0x2000, CRC(d735b572) SHA1(edcdb6daec97ac01a73c5010727b1694f512be71) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "2a.bin", 0x000000, 0x20000, CRC(3ac0e5b4) SHA1(96b8bdf02002ec8ce87fd47fd21f7797a79d79c9) )
 	ROM_LOAD( "2b.bin", 0x020000, 0x20000, CRC(567d327b) SHA1(762b18ef1627d71074ba02b0eb270bd9a01ac0d8) )
 	ROM_LOAD( "2c.bin", 0x040000, 0x20000, CRC(cd77ec79) SHA1(94b61b7d77c016ae274eddbb1e66e755f312e11d) )
 	ROM_LOAD( "2d.bin", 0x060000, 0x20000, CRC(218d2c3e) SHA1(9503b3b67e71dc63448aed7815845b844e240afe) )
 
-	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD( "2j.bin", 0x000000, 0x20000, CRC(80f05923) SHA1(5c886446fd77d3c39cb4fa43ea4beb8c89d20636) )
 	ROM_LOAD( "2k.bin", 0x020000, 0x20000, CRC(35f07bca) SHA1(54e6f82c2e6e1373c3ac1c6138ef738e5a0be6d0) )
 
-	ROM_REGION( 0x04000, "user1", 0 )
+	ROM_REGION( 0x04000, "tilerom", 0 )
 	ROM_LOAD( "5d.bin", 0x00000, 0x4000, CRC(f3466906) SHA1(42b512ba93ba7ac958402d1871c5ae015def3501) ) //tilemaps
-	ROM_REGION( 0x04000, "user2", 0 )
+	ROM_REGION( 0x04000, "attrrom", 0 )
 	ROM_LOAD( "7d.bin", 0x00000, 0x4000, CRC(8032c1e9) SHA1(fcc8579c0117ebe9271cff31e14a30f61a9cf031) ) //attribute maps
 
 	ROM_REGION( 0x0800,  "proms", 0 )
@@ -673,31 +665,31 @@ ROM_START( panicr )
 	ROM_LOAD( "10l.bpr", 0x00700, 0x100, CRC(f3f29695) SHA1(2607e96564a5e6e9a542377a01f399ea86a36c48) ) // unknown
 ROM_END
 
-ROM_START( panicrg ) /* Distributed by TV-Tuning Videospiele GMBH */
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* v20 main cpu */
+ROM_START( panicrg ) // Distributed by TV-Tuning Videospiele GMBH
+	ROM_REGION( 0x100000, "maincpu", 0 ) // v20 main cpu
 	ROM_LOAD16_BYTE("2g.19m",   0x0f0000, 0x08000, CRC(cf759403) SHA1(1a0911c943ecc752e46873c9a5da981745f7562d) )
 	ROM_LOAD16_BYTE("1g.19n",   0x0f0001, 0x08000, CRC(06877f9b) SHA1(8b92209d6422ff2b1f3cb66bd39a3ff84e399eec) )
 
-	ROM_REGION( 0x10000, "t5182_z80", 0 ) /* Toshiba T5182 external ROM */
+	ROM_REGION( 0x10000, "t5182:external", 0 ) // Toshiba T5182 external ROM
 	ROM_LOAD( "22d.bin",   0x0000, 0x8000, CRC(eb1a46e1) SHA1(278859ae4bca9f421247e646d789fa1206dcd8fc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "13f.bin", 0x000000, 0x2000, CRC(4e6b3c04) SHA1(f388969d5d822df0eaa4d8300cbf9cee47468360) )
 	ROM_LOAD( "15f.bin", 0x002000, 0x2000, CRC(d735b572) SHA1(edcdb6daec97ac01a73c5010727b1694f512be71) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "2a.bin", 0x000000, 0x20000, CRC(3ac0e5b4) SHA1(96b8bdf02002ec8ce87fd47fd21f7797a79d79c9) )
 	ROM_LOAD( "2b.bin", 0x020000, 0x20000, CRC(567d327b) SHA1(762b18ef1627d71074ba02b0eb270bd9a01ac0d8) )
 	ROM_LOAD( "2c.bin", 0x040000, 0x20000, CRC(cd77ec79) SHA1(94b61b7d77c016ae274eddbb1e66e755f312e11d) )
 	ROM_LOAD( "2d.bin", 0x060000, 0x20000, CRC(218d2c3e) SHA1(9503b3b67e71dc63448aed7815845b844e240afe) )
 
-	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD( "2j.bin", 0x000000, 0x20000, CRC(80f05923) SHA1(5c886446fd77d3c39cb4fa43ea4beb8c89d20636) )
 	ROM_LOAD( "2k.bin", 0x020000, 0x20000, CRC(35f07bca) SHA1(54e6f82c2e6e1373c3ac1c6138ef738e5a0be6d0) )
 
-	ROM_REGION( 0x04000, "user1", 0 )
+	ROM_REGION( 0x04000, "tilerom", 0 )
 	ROM_LOAD( "5d.bin", 0x00000, 0x4000, CRC(f3466906) SHA1(42b512ba93ba7ac958402d1871c5ae015def3501) ) //tilemaps
-	ROM_REGION( 0x04000, "user2", 0 )
+	ROM_REGION( 0x04000, "attrrom", 0 )
 	ROM_LOAD( "7d.bin", 0x00000, 0x4000, CRC(8032c1e9) SHA1(fcc8579c0117ebe9271cff31e14a30f61a9cf031) ) //attribute maps
 
 	ROM_REGION( 0x0800,  "proms", 0 )
@@ -716,8 +708,8 @@ void panicr_state::init_panicr()
 {
 	std::vector<uint8_t> buf(0x80000);
 
-	uint8_t *rom = memregion("gfx1")->base();
-	int size = memregion("gfx1")->bytes();
+	uint8_t *rom = memregion("chars")->base();
+	int size = memregion("chars")->bytes();
 
 	// text data lines
 	for (int i = 0; i < size / 2; i++)
@@ -735,8 +727,8 @@ void panicr_state::init_panicr()
 		rom[i] = buf[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6, 2,3,1,0,5,4)];
 	}
 
-	rom = memregion("gfx2")->base();
-	size = memregion("gfx2")->bytes();
+	rom = memregion("tiles")->base();
+	size = memregion("tiles")->bytes();
 
 	// tiles data lines
 	for (int i = 0; i < size / 4; i++)
@@ -759,8 +751,8 @@ void panicr_state::init_panicr()
 		rom[i] = buf[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12, 5,4,3,2, 11,10,9,8,7,6, 0,1)];
 	}
 
-	rom = memregion("gfx3")->base();
-	size = memregion("gfx3")->bytes();
+	rom = memregion("sprites")->base();
+	size = memregion("sprites")->bytes();
 
 	// sprites data lines
 	for (int i = 0; i < size / 2; i++)
@@ -779,8 +771,8 @@ void panicr_state::init_panicr()
 	}
 
 	//rearrange  bg tilemaps a bit....
-	rom = memregion("user1")->base();
-	size = memregion("user1")->bytes();
+	rom = memregion("tilerom")->base();
+	size = memregion("tilerom")->bytes();
 	memcpy(&buf[0], rom, size);
 
 	for (int j = 0; j < 16; j++)
@@ -791,8 +783,8 @@ void panicr_state::init_panicr()
 		}
 	}
 
-	rom = memregion("user2")->base();
-	size = memregion("user2")->bytes();
+	rom = memregion("attrrom")->base();
+	size = memregion("attrrom")->bytes();
 	memcpy(&buf[0], rom, size);
 
 	for (int j = 0; j < 16; j++)

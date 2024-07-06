@@ -23,8 +23,8 @@ public:
 	void copper_en_w(u8 data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(timer_callback);
 	TIMER_CALLBACK_MEMBER(frame_timer_callback);

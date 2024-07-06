@@ -11,15 +11,19 @@
     off /DTACK on pseudo-DMA reads and writes.
 
     Shipping configurations:
-    DAFB     - original standalone chip, Quadra 700 and 900 (returns versions 0 and 1)
-    DAFB II  - revised standalone chip with 15 bpp support added (uses AC842a CODEC instead of AC842) (returns version 2)
+    DAFB     - original standalone chip, Quadra 700 and 900 (returns versions 0, 1, and 2)
+    DAFB II  - revised standalone chip with 15 bpp support added (uses AC842a CODEC instead of AC842) (returns version 3)
                Used in Quadra 950.
     MEMC     - DAFB II without the Turbo SCSI logic, in the djMEMC and MEMCjr memory controllers. (returns version 3)
                Used in LC 475, LC 575, Quadra 605, Quadra 610, Quadra 650, and Quadra 800.
                This version uses a DP8534 timing generator instead of the DP8531 and an AC842a DAC instead of AC842.
-    Valkyrie - This video used in the LC/Performa/Quadra 630 and LC580 is stated by the developer note to be very similar to DAFB.
     DaMFB    - DAFB II with a PowerPC bus interface instead of 68040.  Used in the HPV card for the PowerMac 6100/7100/8100.
     Platinum - DAFB II with 4 MB VRAM support and a blitter bolted on.
+
+    The "Valkyrie" chip used in the LC/Performa/Quadra 630 and 580 and the Power Macintosh 5200/6200 is stated by
+    Apple's developer note to be "very similar" to DAFB but its register interface is entirely different.
+    Valkyrie implements a small set of fixed video modes that are selected by number rather than a fully programmable
+    CRTC as is found in DAFB.
 
     The Turbo SCSI block moved into the IOSB and PrimeTime I/O ASICs for the machines where DAFB moved into the
     memory controller.  It was enhanced slightly to allow longword pseudo-DMA transfers.
@@ -52,9 +56,11 @@
 #define LOG_TURBOSCSI   (1U << 5)
 
 #define VERBOSE (0)
+
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(DAFB, dafb_device, "macdafb", "Apple DAFB video")
+DEFINE_DEVICE_TYPE(DAFB_Q950, dafb_q950_device, "macdafb_q950", "Apple DAFB II video")
 DEFINE_DEVICE_TYPE(DAFB_MEMC, dafb_memc_device, "macdafb_djmemc", "Apple DAFB II video (djMEMC integrated)")
 DEFINE_DEVICE_TYPE(DAFB_MEMCJR, dafb_memcjr_device, "macdafb_memcjr", "Apple DAFB II video (MEMCjr integrated)")
 
@@ -94,11 +100,23 @@ dafb_base::dafb_base(const machine_config &mconfig, device_type type, const char
 }
 
 dafb_device::dafb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	dafb_base(mconfig, DAFB, tag, owner, clock),
+	dafb_device(mconfig, DAFB, tag, owner, clock)
+{
+}
+
+dafb_device::dafb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	dafb_base(mconfig, type, tag, owner, clock),
 	m_maincpu(*this, finder_base::DUMMY_TAG)
 {
 	m_drq[0] = m_drq[1] = 0;
 	m_ncr[0] = m_ncr[1] = nullptr;
+}
+
+
+dafb_q950_device::dafb_q950_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	dafb_device(mconfig, DAFB_Q950, tag, owner, clock),
+	m_pcbr1(0)
+{
 }
 
 dafb_memc_device::dafb_memc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -214,6 +232,11 @@ INPUT_PORTS_END
 ioport_constructor dafb_base::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(monitor_config);
+}
+
+ioport_constructor dafb_q950_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(monitor_config_noconv);
 }
 
 ioport_constructor dafb_memc_device::device_input_ports() const
@@ -1063,6 +1086,88 @@ void dafb_device::turboscsi_drq_w(int state)
 
 template void dafb_device::turboscsi_drq_w<0>(int state);
 template void dafb_device::turboscsi_drq_w<1>(int state);
+
+// ************************************************************************
+//  dafb_q950_device overrides/additions
+// ************************************************************************
+void dafb_q950_device::device_start()
+{
+	m_dafb_version = 3;
+	dafb_base::device_start();
+}
+
+u32 dafb_q950_device::ramdac_r(offs_t offset)
+{
+	switch (offset << 2)
+	{
+	case 0x20:
+		if ((m_pal_address == 1) && ((m_ac842_pbctrl & 0x06) == 0x06))
+		{
+			LOGMASKED(LOG_RAMDAC, "Read %02x from PCBR1\n", m_pcbr1);
+			return m_pcbr1;
+		}
+		else
+		{
+			return dafb_base::ramdac_r(offset);
+		}
+
+	default:
+		return dafb_base::ramdac_r(offset);
+	}
+}
+
+void dafb_q950_device::ramdac_w(offs_t offset, u32 data)
+{
+	switch (offset << 2)
+	{
+	case 0x20:
+		if ((m_pal_address == 1) && ((m_ac842_pbctrl & 0x06) == 0x06))
+		{
+			LOGMASKED(LOG_RAMDAC, "%02x to AC842a PCBR1\n", data);
+			m_pcbr1 = (data & 0xf0) | 0x01; // AC842a version ID
+		}
+		else
+		{
+			LOGMASKED(LOG_RAMDAC, "%02x to AC842a PCBR0, & 0x1c = %02x\n", data, data & 0x1c);
+			m_ac842_pbctrl = data;
+			if (((m_pcbr1 & 0xc0) == 0xc0) && ((data & 0x06) == 0x06))
+			{
+				m_mode = 5; // 16 bpp (x555)
+			}
+			else
+			{
+				switch (data & 0x1c)
+				{
+				case 0x00:
+					m_mode = 0; // 1bpp
+					break;
+
+				case 0x08:
+					m_mode = 1; // 2bpp
+					break;
+
+				case 0x10:
+					m_mode = 2; // 4bpp
+					break;
+
+				case 0x18:
+					m_mode = 3; // 8bpp
+					break;
+
+				case 0x1c:
+					m_mode = 4; // 24bpp
+					break;
+				}
+			}
+			recalc_mode();
+		}
+		break;
+
+	default:
+		dafb_base::ramdac_w(offset, data);
+		break;
+	}
+}
 
 // ************************************************************************
 //  dafb_memc_device overrides/additions

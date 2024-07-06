@@ -6,6 +6,62 @@ license:CC0-1.0
 
 <softwarelist name="mpf1_rom" description="Micro-Professor 1 ROMs">
 
+	<!-- Micro-Professor 1 -->
+
+	<software name="basic">
+		<description>BASIC-MPF</description>
+		<year>1981</year>
+		<publisher>Multitech</publisher>
+		<info name="usage" value="ADDR 2000 GO"/>
+		<sharedfeat name="compatibility" value="IA"/>
+		<part name="rom" interface="mpf1_rom">
+			<dataarea name="rom" size="2048">
+				<rom name="basic-mpf.bin" size="2048" crc="73ac279f" sha1="36271201266ee7f6435c46cf41bc2ef9f77505b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hex">
+		<description>Hex Download Program</description>
+		<year>19??</year>
+		<publisher>Flite Electronics</publisher>
+		<info name="usage" value="ADDR 2000 GO"/>
+		<sharedfeat name="compatibility" value="IB"/>
+		<part name="rom" interface="mpf1_rom">
+			<dataarea name="rom" size="4096">
+				<rom name="hex-1bp.bin" size="4096" crc="7c1b6534" sha1="6bb56f96f38699cd88e613368f6fc5076fb00c64"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Micro-Professor 1P -->
+
+	<software name="basic_ip">
+		<description>BASIC-IP</description>
+		<year>1983</year>
+		<publisher>Multitech</publisher>
+		<info name="usage" value="CONTROL-B"/>
+		<sharedfeat name="compatibility" value="IP"/>
+		<part name="rom" interface="mpf1_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="basic-ip.bin" size="8192" crc="fe9c0f73" sha1="62a15b020be2e95b7b465f96bd63dd6bb1655094"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forth_ip">
+		<description>FORTH-IP</description>
+		<year>1983</year>
+		<publisher>Multitech</publisher>
+		<info name="usage" value="CONTROL-B"/>
+		<sharedfeat name="compatibility" value="IP"/>
+		<part name="rom" interface="mpf1_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="forth-ip.bin" size="8192" crc="459a1715" sha1="4e62817885cb7262557c5da4765e75c371ee81b8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Micro-Professor 1/88 -->
 
 	<software name="forth_i88">

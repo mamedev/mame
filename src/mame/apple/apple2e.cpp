@@ -2493,7 +2493,7 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 		case 0x7e:  // read IOUDIS
 			m_vbl = false;
 			lower_irq(IRQ_VBL);
-			return (m_ioudis ? 0x00 : 0x80) | uFloatingBus7;
+			return (m_ioudis ? 0x80 : 0x00) | uFloatingBus7;
 
 		case 0x7f:  // read DHIRES
 			return (m_video->get_dhires() ? 0x00 : 0x80) | uFloatingBus7;

@@ -561,6 +561,6 @@ SYST( 1985, fexcela,   fexcel,  0,      fexcel,   fexcel,  excel_state, empty_in
 
 SYST( 1986, fexcelp,   0,       0,      fexcelp,  fexcel,  excel_state, empty_init, "Fidelity International", "The Par Excellence", MACHINE_SUPPORTS_SAVE )
 SYST( 1986, fexcelpb,  fexcelp, 0,      fexcelp,  fexcel,  excel_state, empty_init, "Fidelity International", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, granits,   fexcelp, 0,      granits,  fexcel,  excel_state, empty_init, "hack (RCS)", "Granit S", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, granits,   fexcelp, 0,      granits,  fexcel,  excel_state, empty_init, "hack (Remote Control Systems)", "Granit S", MACHINE_SUPPORTS_SAVE )
 SYST( 1988, fdes2000,  fexcelp, 0,      fdes2000, fdes,    excel_state, empty_init, "Fidelity International", "Designer 2000", MACHINE_SUPPORTS_SAVE )
 SYST( 1988, fdes2100,  fexcelp, 0,      fdes2100, fdes,    excel_state, empty_init, "Fidelity International", "Designer 2100", MACHINE_SUPPORTS_SAVE )

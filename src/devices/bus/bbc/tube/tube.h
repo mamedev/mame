@@ -37,11 +37,9 @@
 #pragma once
 
 
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
 
 // ======================> bbc_tube_slot_device
 
@@ -73,10 +71,14 @@ public:
 	uint8_t host_r(offs_t offset);
 	void host_w(offs_t offset, uint8_t data);
 
+	// JIM is not accessible on the Tube, but the PMS-B2P device connects to the Tube and also the NPGFD line of the 1MHz bus
+	uint8_t jim_r(offs_t offset);
+	void jim_w(offs_t offset, uint8_t data);
+
 	void irq_w(int state) { m_irq_handler(state); }
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override;
 
 	device_bbc_tube_interface *m_card;
@@ -96,6 +98,8 @@ public:
 	// reading and writing
 	virtual uint8_t host_r(offs_t offset) { return 0xfe; }
 	virtual void host_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t jim_r(offs_t offset) { return 0xff; }
+	virtual void jim_w(offs_t offset, uint8_t data) { }
 
 protected:
 	device_bbc_tube_interface(const machine_config &mconfig, device_t &device);
