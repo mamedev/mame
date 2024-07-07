@@ -139,7 +139,7 @@ void igs_fear_state::igs_fear(machine_config &config)
 	ARM7(config, m_maincpu, 50000000/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::main_map);
 
-	MX10EXA(config, m_xa, 10000000); // MX10EXAQC (Philips 80C51 XA) unknown frequency
+	MX10EXA(config, m_xa, 50000000/3); // MX10EXAQC (Philips 80C51 XA) unknown frequency
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
