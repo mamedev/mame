@@ -10,11 +10,11 @@
 
 #include "emu.h"
 
-#include "nabupc_kbd.h"
 
 #include "bus/centronics/ctronics.h"
 #include "bus/nabupc/adapter.h"
 #include "bus/nabupc/option.h"
+#include "bus/nabupc/keyboard/nabupc_kbd.h"
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/pty.h"
 #include "bus/rs232/rs232.h"
@@ -265,6 +265,12 @@ static void hcca_devices(device_slot_interface &device)
 	device.option_add("hcca_adapter",  NABUPC_NETWORK_ADAPTER);
 }
 
+// Keyboard Device
+static void keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("nabupc_kbd", NABUPC_KEYBOARD);
+}
+
 //**************************************************************************
 //  MACHINE CONFIGURATION
 //**************************************************************************
@@ -301,8 +307,8 @@ void nabupc_state::nabupc(machine_config &config)
 	I8251(config, m_kbduart, 10.738635_MHz_XTAL / 6);
 	m_kbduart->rxrdy_handler().set(*this, FUNC(nabupc_state::int_w<5>));
 
-	nabupc_keyboard_device &kbd(NABUPC_KEYBOARD(config, "kbd"));
-	kbd.rxd_cb().set(m_kbduart, FUNC(i8251_device::write_rxd));
+	rs232_port_device &kbd(RS232_PORT(config, "kbd", keyboard_devices, "nabupc_kbd"));
+	kbd.rxd_handler().set(m_kbduart, FUNC(i8251_device::write_rxd));
 
 	// HCCA
 	AY31015(config, m_hccauart);
