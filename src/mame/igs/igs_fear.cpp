@@ -162,8 +162,7 @@ void igs_fear_state::igs_fear(machine_config &config)
 
 ROM_START( fearless )
 	ROM_REGION( 0x04000, "maincpu", 0 ) // Internal rom of IGS027A ARM based MCU
-	// this is taken from superkds, the XOR table required (that is uploaded by this internal ROM) is the same as superkds at least, but actual internal ROM might not be identical
-	ROM_LOAD( "fearless_igs027a.bin", 0x00000, 0x4000, BAD_DUMP CRC(9a8e790d) SHA1(ab020a04a4ed0c0e5ec8c979f206fe57572d2304) ) // sticker marked 'F1'
+	ROM_LOAD( "fearless_igs027a.bin", 0x00000, 0x4000, CRC(2121f01b) SHA1(de44016b590fdcf6bfb63e3f8dbbbd679938fe87) ) // sticker marked 'F1'
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "fearlessp_v-101us.u37", 0x000000, 0x80000, CRC(2522873c) SHA1(8db709877311b6d2796353fc9a44a820937e35c2) )
