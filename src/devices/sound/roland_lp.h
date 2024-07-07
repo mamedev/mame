@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Valley Bell
-#ifndef MAME_SOUND_ROLANDPCM_H
-#define MAME_SOUND_ROLANDPCM_H
+#ifndef MAME_SOUND_ROLANDLP_H
+#define MAME_SOUND_ROLANDLP_H
 
 #pragma once
 
@@ -66,4 +66,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MB87419_MB87420, mb87419_mb87420_device)
 
-#endif // MAME_SOUND_ROLANDPCM_H
+#endif // MAME_SOUND_ROLANDLP_H

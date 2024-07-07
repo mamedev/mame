@@ -16,7 +16,7 @@
 #include "cpu/mcs96/i8x9x.h"
 #include "cpu/mcs96/i8xc196.h"
 #include "machine/timer.h"
-#include "sound/rolandpcm.h"
+#include "sound/roland_lp.h"
 #include "video/t6963c.h"
 
 #include "emupal.h"

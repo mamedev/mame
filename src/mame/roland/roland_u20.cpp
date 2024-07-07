@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/mcs96/i8x9x.h"
-#include "sound/rolandpcm.h"
+#include "sound/roland_lp.h"
 #include "speaker.h"
 
 

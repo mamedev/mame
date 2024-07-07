@@ -21,10 +21,10 @@
 //  02/03 - ?? (read after writing to 10/12)
 
 #include "emu.h"
-#include "rolandpcm.h"
+#include "roland_lp.h"
 
 
-DEFINE_DEVICE_TYPE(MB87419_MB87420, mb87419_mb87420_device, "mb87419_mb87420", "Roland MB87419/MB87420 PCM")
+DEFINE_DEVICE_TYPE(MB87419_MB87420, mb87419_mb87420_device, "mb87419_mb87420", "Roland LP MB87419/MB87420 PCM")
 
 mb87419_mb87420_device::mb87419_mb87420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MB87419_MB87420, tag, owner, clock)
