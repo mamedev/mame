@@ -1649,6 +1649,7 @@ atetb5205                       // (bootleg, with OKI M5205)
 atetrisbp                       //
 atetrisc                        // 136066           (c) 1989
 atetrisc2                       // 136066           (c) 1989
+link                            // (bootleg)
 
 @source:atari/avalnche.cpp
 avalnche                        // 030574           1978/04 [6502]
