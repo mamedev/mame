@@ -8,15 +8,15 @@
 *     RAM: 4 kilobytes                           *
 *   Input: 49 key keyboard                       *
 * Storage: Cassette tape                         *
-*   Video: 20x 16-segment LED display            *
+*   Video: 20x 16-segment VFD                    *
 *   Sound: Speaker                               *
 \************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "machine/timer.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
@@ -38,10 +38,10 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
+		, m_vfd_pwm(*this, "vfd_pwm")
 		, m_cassette(*this, "cassette")
 		, m_key(*this, "PC%u", 1U)
 		, m_special(*this, "SPECIAL")
-		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
@@ -55,10 +55,10 @@ protected:
 private:
 	required_device<z80_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<pwm_display_device> m_vfd_pwm;
 	required_device<cassette_image_device> m_cassette;
 	required_ioport_array<20> m_key;
 	required_ioport m_special;
-	output_finder<20> m_digits;
 	output_finder<2> m_leds;
 
 	void mpf1_step(address_map &map);
@@ -80,10 +80,10 @@ private:
 	int m_break = 0;
 	int m_m1 = 0;
 
-	uint32_t m_lednum = 0;
-	uint16_t m_led_data = 0;
+	uint32_t m_select = 0;
+	uint16_t m_vfd_data = 0;
 
-	void led_refresh(uint16_t data);
+	void vfd_refresh();
 };
 
 
@@ -231,13 +231,9 @@ static INPUT_PORTS_START( mpf1p )
 INPUT_PORTS_END
 
 
-void mpf1p_state::led_refresh(uint16_t data)
+void mpf1p_state::vfd_refresh()
 {
-	for (int digit = 0; digit < 20; digit++)
-	{
-		if (!BIT(m_lednum, digit))
-			m_digits[digit] = data ^ 0xffff;
-	}
+	m_vfd_pwm->matrix(~m_select, ~m_vfd_data);
 }
 
 
@@ -253,23 +249,20 @@ uint8_t mpf1p_state::ppi1_pc_r()
 
 void mpf1p_state::ppi1_pa_w(uint8_t data)
 {
-	m_lednum = (m_lednum & 0xffffff00) | data;
-
-	led_refresh(m_led_data);
+	m_select = (m_select & 0xffffff00) | data;
+	vfd_refresh();
 }
 
 void mpf1p_state::ppi1_pb_w(uint8_t data)
 {
-	m_lednum = (m_lednum & 0xffff00ff) | (data << 8);
-
-	led_refresh(m_led_data);
+	m_select = (m_select & 0xffff00ff) | (data << 8);
+	vfd_refresh();
 }
 
 void mpf1p_state::ppi1_pc_w(uint8_t data)
 {
-	m_lednum = (m_lednum & 0xfff0ffff) | (data << 16);
-
-	led_refresh(m_led_data);
+	m_select = (m_select & 0xff00ffff) | (data << 16);
+	vfd_refresh();
 }
 
 uint8_t mpf1p_state::ppi2_pc_r()
@@ -278,7 +271,7 @@ uint8_t mpf1p_state::ppi2_pc_r()
 
 	// bit 0 to 2, keyboard rows 0 to 20
 	for (int row = 0; row < 20; row++)
-		if (!BIT(m_lednum, row))
+		if (!BIT(m_select, row))
 			data &= m_key[row]->read();
 
 	// bit 3, tape input
@@ -289,7 +282,8 @@ uint8_t mpf1p_state::ppi2_pc_r()
 
 void mpf1p_state::ppi2_pa_w(uint8_t data)
 {
-	m_led_data = (m_led_data & 0xff00) | data;
+	m_vfd_data = (m_vfd_data & 0xff00) | data;
+	vfd_refresh();
 }
 
 void mpf1p_state::ppi2_pb_w(uint8_t data)
@@ -297,7 +291,8 @@ void mpf1p_state::ppi2_pb_w(uint8_t data)
 	// swap bits around for the 14-segment emulation
 	data = bitswap<8>(data, 7, 6, 4, 2, 3, 5, 1, 0);
 
-	m_led_data = (m_led_data & 0x00ff) | (data << 8);
+	m_vfd_data = (m_vfd_data & 0x00ff) | (data << 8);
+	vfd_refresh();
 }
 
 void mpf1p_state::ppi2_pc_w(uint8_t data)
@@ -334,13 +329,12 @@ uint8_t mpf1p_state::step_r(offs_t offset)
 
 void mpf1p_state::machine_start()
 {
-	m_digits.resolve();
 	m_leds.resolve();
 
 	// register for state saving */
 	save_item(NAME(m_break));
 	save_item(NAME(m_m1));
-	save_item(NAME(m_lednum));
+	save_item(NAME(m_select));
 }
 
 
@@ -365,6 +359,9 @@ void mpf1p_state::mpf1p(machine_config &config)
 	ppi_2.out_pb_callback().set(FUNC(mpf1p_state::ppi2_pb_w));
 	ppi_2.out_pc_callback().set(FUNC(mpf1p_state::ppi2_pc_w));
 	ppi_2.in_pc_callback().set(FUNC(mpf1p_state::ppi2_pc_r));
+
+	PWM_DISPLAY(config, m_vfd_pwm).set_size(20, 16);
+	m_vfd_pwm->set_segmask(0xfffff, 0xffff);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);

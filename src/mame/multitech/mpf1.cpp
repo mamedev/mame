@@ -45,11 +45,11 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
@@ -73,12 +73,12 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
+		, m_7seg_pwm(*this, "7seg_pwm")
 		, m_cassette(*this, "cassette")
 		, m_rom_region(*this, "maincpu")
 		, m_rom_u7(*this, "rom_u7")
 		, m_pc(*this, "PC%u", 0U)
 		, m_special(*this, "SPECIAL")
-		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
@@ -95,12 +95,12 @@ protected:
 private:
 	required_device<z80_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<pwm_display_device> m_7seg_pwm;
 	required_device<cassette_image_device> m_cassette;
 	required_region_ptr<uint8_t> m_rom_region;
 	required_device<generic_slot_device> m_rom_u7;
 	required_ioport_array<6> m_pc;
 	required_ioport m_special;
-	output_finder<6> m_digits;
 	output_finder<2> m_leds;
 
 	void mpf1_io_map(address_map &map);
@@ -116,11 +116,7 @@ private:
 	int m_break = 0;
 	int m_m1 = 0;
 
-	uint8_t m_lednum = 0;
-
-	emu_timer *m_led_refresh_timer = nullptr;
-
-	TIMER_CALLBACK_MEMBER(led_refresh);
+	uint8_t m_select = 0;
 };
 
 /* Address Maps */
@@ -339,20 +335,13 @@ INPUT_PORTS_END
 
 /* Intel 8255A Interface */
 
-TIMER_CALLBACK_MEMBER(mpf1_state::led_refresh)
-{
-	for (int digit = 0; digit < 6; digit++)
-		if (BIT(m_lednum, 5 - digit))
-			m_digits[digit] = param;
-}
-
 uint8_t mpf1_state::ppi_pa_r()
 {
 	uint8_t data = 0x7f;
 
 	/* bit 0 to 5, keyboard rows 0 to 5 */
 	for (int row = 0; row < 6; row++)
-		if (!BIT(m_lednum, row))
+		if (!BIT(m_select, row))
 			data &= m_pc[row]->read();
 
 	/* bit 6, user key */
@@ -367,17 +356,14 @@ uint8_t mpf1_state::ppi_pa_r()
 void mpf1_state::ppi_pb_w(uint8_t data)
 {
 	/* swap bits around for the 7-segment emulation */
-	uint8_t led_data = bitswap<8>(data, 6, 1, 2, 0, 7, 5, 4, 3);
-
-	/* timer to update segments */
-	m_led_refresh_timer->adjust(attotime::from_usec(70), led_data);
+	m_7seg_pwm->write_mx(bitswap<8>(data, 6, 1, 2, 0, 7, 5, 4, 3));
 }
 
 void mpf1_state::ppi_pc_w(uint8_t data)
 {
 	/* bits 0-5, led select and keyboard latch */
-	m_lednum = data & 0x3f;
-	m_led_refresh_timer->adjust(attotime::never);
+	m_select = data & 0x3f;
+	m_7seg_pwm->write_my(m_select);
 
 	/* bit 6, monitor break control */
 	m_break = BIT(data, 6);
@@ -422,19 +408,17 @@ static const z80_daisy_config mpf1_daisy_chain[] =
 
 void mpf1_state::machine_start()
 {
-	m_led_refresh_timer = timer_alloc(FUNC(mpf1_state::led_refresh), this);
-	m_digits.resolve();
 	m_leds.resolve();
 
 	/* register for state saving */
 	save_item(NAME(m_break));
 	save_item(NAME(m_m1));
-	save_item(NAME(m_lednum));
+	save_item(NAME(m_select));
 }
 
 void mpf1_state::machine_reset()
 {
-	m_lednum = 0;
+	m_select = 0;
 }
 
 
@@ -466,6 +450,9 @@ void mpf1_state::mpf1(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 
 	/* video hardware */
+	PWM_DISPLAY(config, m_7seg_pwm).set_size(6, 8);
+	m_7seg_pwm->set_segmask(0x3f, 0xff);
+
 	config.set_default_layout(layout_mpf1);
 
 	/* sound hardware */

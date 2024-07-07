@@ -5,6 +5,22 @@
 Mephisto Berlin 68000 / Berlin Professional 68020
 Berlin Professional has the same engine as Mephisto Genius.
 
+Hardware notes:
+
+Berlin 68000:
+- MC68HC000FN12 @ 12.288MHz
+- 128KB ROM (2*M27C512-15XF1)
+- 512KB DRAM (4*TC514256AP-80)
+- 8KB SRAM (HM6264ALP-12 or equivalent), CR2032 battery
+- HD44780, 2-line LCD display (small daughterboard)
+- 8*8 chessboard buttons, 64 leds, piezo
+
+Berlin Professional 68020:
+- MC68EC020RP25 @ 24.576MHz
+- 256KB ROM (D27C020-200V10)
+- 1MB DRAM (8*MCM514256AP70)
+- rest is similar to Berlin 68000
+
 Undocumented buttons:
 - holding ENTER and LEFT cursor on boot runs diagnostics
 - holding CLEAR on boot clears battery backed RAM
