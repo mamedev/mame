@@ -1395,7 +1395,6 @@ void lhzb4_decrypt(running_machine &machine)
 
 
 //////////////////////////////////////////////////////////////////////
-// should fearless and superkds be using the same decrypt? fearless will fail ROM check with superkds function at the moment
 
 static const uint8_t superkds_tab[256] = {
 	0x49, 0x47, 0x53, 0x30, 0x32, 0x30, 0x32, 0x52, 0x44, 0x32, 0x30, 0x35, 0x30, 0x31, 0x30, 0x33,
@@ -1453,13 +1452,12 @@ void fearless_decrypt(running_machine &machine)
 	{
 		uint16_t x = src[i];
 
-		// might not be 100% correct...
 		IGS27_CRYPT1
-		// IGS27_CRYPT2
-		IGS27_CRYPT3_ALT2
+		IGS27_CRYPT2_ALT
+		IGS27_CRYPT3
 		IGS27_CRYPT4
 		// IGS27_CRYPT5
-		IGS27_CRYPT6_ALT
+		IGS27_CRYPT6
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
