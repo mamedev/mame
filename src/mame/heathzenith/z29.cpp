@@ -74,11 +74,30 @@ void z29_state::keyin_w(int state)
 	m_keyin = state;
 }
 
+/**
+ * Port 1 (based on ROM listing)
+ * 
+ * bit 0 - KB output line
+ * bit 1 - KB input line
+ * bit 2 - 0 = normal video       1 = suppressed
+ * bit 3 - 0 = setup mode locked  1 = normal
+ * bit 4 - Data Terminal Ready
+ * bit 5 - Ready to Send
+ * bit 6 - Expansion socket
+ * bit 7 - Clock run for CRT controller
+ */
 u8 z29_state::p1_r()
 {
 	return m_keyin ? 0xfd : 0xff;
 }
 
+/**
+ * Port 3 (based on ROM listing)
+ * 
+ * bit 1 - predefined serial port transmit pin
+ * bit 4 - 0 = clear memory  1 = DMA CRTC
+ * bit 5 - Clear to Send
+ */
 void z29_state::p3_w(u8 data)
 {
 	m_dmatype = BIT(data, 4);
