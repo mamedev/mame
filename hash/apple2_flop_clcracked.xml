@@ -2795,80 +2795,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="animate">
-		<description>Animate (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Broderbund Software</publisher>
-		<info name="release" value="2017-06-28"/>
-		<!-- "Animate" is a 1986 graphics program created by Steven Ohmert and distributed by Broderbund Software. -->
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="143360">
-				<rom name="animate (4am crack) disk 1.dsk" size="143360" crc="4b89c917" sha1="46a77dfe78c3516362666699542433293aa03260" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="143360">
-				<rom name="animate (4am crack) disk 2.dsk" size="143360" crc="c16d5674" sha1="b4b4f800338b0c87fab7c8df5fba53decc396cfe" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3 - Character Library"/>
-			<dataarea name="flop" size="143360">
-				<rom name="animate (4am crack) disk 3 - character library.dsk" size="143360" crc="6491c465" sha1="403b8534858b9cb74564ea5832e5b72cd055b846" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4 - Background Library"/>
-			<dataarea name="flop" size="143360">
-				<rom name="animate (4am crack) disk 4 - background library.dsk" size="143360" crc="e32a2cd4" sha1="d469e03996f33e2bbe237993e1cb29652e4bd5a2" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="animateb" cloneof="animate">
-		<description>Animate (imperfect clean crack)</description>
-		<year>1986</year>
-		<publisher>Broderbund Software</publisher>
-		<info name="release" value="2017-06-28"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="143360">
-				<rom name="animate (imperfect 4am crack) disk 1.dsk" size="143360" crc="ad7eb4c2" sha1="034ac6879ae76c2b26b674718f002ad8eb754b6b" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="143360">
-				<rom name="animate (imperfect 4am crack) disk 2.dsk" size="143360" crc="279a2ba1" sha1="86c74c50ac197ac4aed10ab67cd0c2aae4ba9bec" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3 - Character Library"/>
-			<dataarea name="flop" size="143360">
-				<rom name="animate (imperfect 4am crack) disk 3 - character library.dsk" size="143360" crc="6491c465" sha1="403b8534858b9cb74564ea5832e5b72cd055b846" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4 - Background Library"/>
-			<dataarea name="flop" size="143360">
-				<rom name="animate (imperfect 4am crack) disk 4 - background library.dsk" size="143360" crc="e32a2cd4" sha1="d469e03996f33e2bbe237993e1cb29652e4bd5a2" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ankh">
 		<description>Ankh (cleanly cracked)</description>
 		<year>1983</year>
@@ -4909,19 +4835,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="commnwin">
-		<description>Persona's Communicate and Win (cleanly cracked)</description>
-		<year>????</year>
-		<publisher>Phoenix Software</publisher>
-		<info name="release" value="2018-10-07"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="communicate and win (4am crack).dsk" size="143360" crc="0e983c2d" sha1="a95ce215249c05d37727114f887285ecdf9b854e" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="compnumb">
 		<description>Comparing Numbers (cleanly cracked)</description>
 		<year>1984</year>
@@ -6713,26 +6626,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="early emerging rules - plurals (4am crack).dsk" size="143360" crc="1fe05fda" sha1="801e84cefecca5257bf797cbfae4db30a020c3d8" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ehbible">
-		<description>Early Heroes of the Bible (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Baker Book House</publisher>
-		<info name="release" value="2016-07-13"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="early heroes of the bible (4am crack) side a.dsk" size="143360" crc="ee55836a" sha1="a6b2eabf4a3eca66c040e61893342381819161a2" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="early heroes of the bible (4am crack) side b.dsk" size="143360" crc="65c85c93" sha1="f3acacc26c8c57ca0c68dab3615865c7f2e0222f" />
 			</dataarea>
 		</part>
 	</software>
@@ -17142,26 +17035,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="masqrde">
-		<description>Masquerade (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Phoenix Software</publisher>
-		<info name="release" value="2019-05-08"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="masquerade (4am crack) side a.dsk" size="143360" crc="1b8efa1a" sha1="dc664d1d62151b1e3de2bcebf27ce121527d331b" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="masquerade (4am crack) side b.dsk" size="143360" crc="c2ee6855" sha1="333418548a0e59b6e1221a60485d4b8a5a42e890" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mathstgy">
 		<description>Math Strategy (cleanly cracked)</description>
 		<year>1981</year>
@@ -17554,21 +17427,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="zgfx0583">
-		<description>Zoom Grafix (Revision 25-MAY-83) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Phoenix Software</publisher>
-		<info name="release" value="2019-05-05"/>
-		<!-- This version is dated 25-MAY-83 according to comments within the
-		program itself. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="zoom grafix 25-may-83 (4am crack).dsk" size="143360" crc="6692bf9f" sha1="043a588c7fb800b6e913da008ed0327db0046d04" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="apoaresp">
 		<description>A Puff of Air: The Respiratory System (cleanly cracked)</description>
 		<year>1983</year>
@@ -17578,39 +17436,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="a puff of air (4am crack).dsk" size="143360" crc="8aa66382" sha1="4fe290084395bc61b58bc4fd61f5e83815a451b5" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="weekchng">
-		<description>A Week That Changed The World (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Educational Publishing Concepts</publisher>
-		<info name="release" value="2019-02-02"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="a week that changed the world (4am crack) side a.dsk" size="143360" crc="d4ed4dfa" sha1="6e434634f0f8911af19edb00e0bb9bca01b3cde7" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="a week that changed the world (4am crack) side b.dsk" size="143360" crc="5de32c03" sha1="9da24d2da6528248f40ffb7e625e6495f0b862e7" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="batsblfr">
-		<description>Bats in the Belfry (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Phoenix Software</publisher>
-		<info name="release" value="2019-02-11"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="bats in the belfry (4am crack).dsk" size="143360" crc="6109dac9" sha1="d19344e23610bf6b448fbbc4098a9dbd450ba713" />
 			</dataarea>
 		</part>
 	</software>
@@ -17996,46 +17821,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="moseslhp">
-		<description>Moses Leads His People (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Educational Publishing Concepts</publisher>
-		<info name="release" value="2019-02-02"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="moses leads his people (4am crack) side a.dsk" size="143360" crc="41a67e27" sha1="e8209f454c1be968d55f597425dbb3bdc1d460b7" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="moses leads his people (4am crack) side b.dsk" size="143360" crc="360080a2" sha1="f657b886134ace87161399f228e82bd4b348da39" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="paulmsj">
-		<description>Paul's Missionary Journeys (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Educational Publishing Concepts</publisher>
-		<info name="release" value="2019-02-02"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="paul's missionary journeys (4am crack) side a.dsk" size="143360" crc="752993ed" sha1="14ddbe52b978cd5d6a2e855ce38ce3093aa32b25" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="paul's missionary journeys (4am crack) side b.dsk" size="143360" crc="41c4584a" sha1="148d0ec4865cabc3cfa70b83658b2ded699b030c" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="photar">
 		<description>Photar (cleanly cracked)</description>
 		<year>1981</year>
@@ -18282,36 +18067,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="world war iii (4am crack).dsk" size="143360" crc="c10acf2d" sha1="7bff2f75a2784a1ad1bd70b13ec5aa2999226b86" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zgfx0182">
-		<description>Zoom Grafix (version 26-JAN-82) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Phoenix Software</publisher>
-		<info name="release" value="2019-04-08"/>
-		<!-- This version is dated 26-JAN-82 according to comments within the
-		program itself. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="zoom grafix 26-jan-82 (4am crack).dsk" size="143360" crc="789d302a" sha1="c3c457bc13a2eb4061b9843c54adbc6a3e50644f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zgfx0482">
-		<description>Zoom Grafix (version 29-APR-82) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Phoenix Software</publisher>
-		<info name="release" value="2019-04-08"/>
-		<!-- This version is dated 29-APR-82 according to comments within the
-		program itself. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="zoom grafix 29-apr-82 (4am crack).dsk" size="143360" crc="dc92bdae" sha1="8cfa992832dcb9abe5b44ce4e2e51bb5bc4491d8" />
 			</dataarea>
 		</part>
 	</software>
@@ -19256,19 +19011,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Utilities"/>
 			<dataarea name="flop" size="143360">
 				<rom name="terrapin logo 1.2 (4am crack) disk 2 - utilities.dsk" size="143360" crc="a1ffc148" sha1="4a504374ec654fdbe26f5e6fbb6f1f780734505a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zgfxse">
-		<description>Zoom Grafix Second Edition (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Phoenix Software</publisher>
-		<info name="release" value="2014-12-08"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="zoom grafix second edition (4am crack).dsk" size="143360" crc="5db0f70f" sha1="d7496eba65e8321ce02223c9dae66a6f51d8601a" />
 			</dataarea>
 		</part>
 	</software>
@@ -22186,46 +21928,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="earlychr">
-		<description>The Early Church (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Baker Book House</publisher>
-		<info name="release" value="2016-07-13"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the early church (4am crack) side a.dsk" size="143360" crc="ff674e0a" sha1="34f3d0df13e45ef4f9b9725f3a6223118f5218f8" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the early church (4am crack) side b.dsk" size="143360" crc="43d77d07" sha1="7f5c397fe3f1878acedc0dbd46d44061825d705e" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="srchking">
-		<description>Searching for a King (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Baker Book House</publisher>
-		<info name="release" value="2016-07-13"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="searching for a king (4am crack) side a.dsk" size="143360" crc="1e408ef1" sha1="1a3ec7f6aefb5c4e1052fa4aeb0240d16183f493" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="searching for a king (4am crack) side b.dsk" size="143360" crc="7c95ce05" sha1="ee6564179ef110a37cc9737a4a72c5899f104348" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wndrqst">
 		<description>WonderQuest (cleanly cracked)</description>
 		<year>1984</year>
@@ -23655,19 +23357,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="verbal item banks 1-14 (4am crack).dsk" size="143360" crc="1eb53f4e" sha1="a9db9c718ab543d32488d91fa71eaae50fdad104" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rtnherac">
-		<description>Return of Heracles (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="release" value="2017-03-02"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="return of heracles (4am and san inc crack).dsk" size="143360" crc="87654cb4" sha1="aa3e9ca5e70e5f5f81ece532b8878e60549b354e" />
 			</dataarea>
 		</part>
 	</software>
@@ -26291,19 +25980,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="usurp3">
-		<description>The Usurper Book Three: The Mines of Qyntarr (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Sir-Tech</publisher>
-		<info name="release" value="2017-11-26"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the usurper book three - the mines of qyntarr (4am crack).dsk" size="143360" crc="c074f3fd" sha1="6b92b4d1ffaefc44a97121a793948901c9f2ed0b" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hmact200">
 		<description>The Home Accountant (version 2.0) (cleanly cracked)</description>
 		<year>1981</year>
@@ -27500,19 +27176,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="submarine commander (4am crack).dsk" size="143360" crc="eb046f47" sha1="ea4d2fc1ad7f4367b54ec73dd39e3d591cfc3668" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="queenphb">
-		<description>The Queen of Phobos (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Phoenix Software</publisher>
-		<info name="release" value="2018-03-18"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the queen of phobos (4am crack).dsk" size="143360" crc="3a6bafb0" sha1="b22f60f8061dbc8d786d627168172441f8b6a6f5" />
 			</dataarea>
 		</part>
 	</software>
@@ -28781,21 +28444,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the chambers of vocab (4am crack).dsk" size="143360" crc="5f8f490d" sha1="4881cc172005af041890c595b5df87951f1e7f08" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zgfx1083">
-		<description>Zoom Grafix 05-OCT-83 (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Phoenix Software</publisher>
-		<info name="release" value="2019-04-08"/>
-		<!-- This version is dated 05-OCT-83 according to comments within the
-		program itself. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="zoom grafix 05-oct-83 (4am crack).dsk" size="143360" crc="72cd3138" sha1="66a6fa3e0cee04fcc222ad61de3e8d22668b6ebd" />
 			</dataarea>
 		</part>
 	</software>
@@ -30124,26 +29772,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="boyjesus">
-		<description>The Boy Jesus (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Educational Publishing Concepts</publisher>
-		<info name="release" value="2019-11-23"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the boy jesus (4am crack) side a.dsk" size="143360" crc="88c20d44" sha1="17d9afc0952ea153a502768a1316fe33d5bc699c"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the boy jesus (4am crack) side b.dsk" size="143360" crc="7b549ae0" sha1="d75c8e9301b81b50ec101906016e72692ae83674"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mchess20">
 		<description>MicroChess (version 2.0) (cleanly cracked)</description>
 		<year>1978</year>
@@ -30292,19 +29920,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 6 - Verbal preparation 4"/>
 			<dataarea name="flop" size="143360">
 				<rom name="barron's computer sat study program (4am crack) disk 6 - verbal preparation 4.dsk" size="143360" crc="df710598" sha1="a726b79315090a9d471083d92bd7a0b8a5f849cd"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizip201">
-		<description>Wiziprint (version 2.01) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Sir-Tech</publisher>
-		<info name="release" value="2020-01-02"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="wiziprint (4am crack).dsk" size="143360" crc="354fab0c" sha1="00ab6c5edc0fd0985ecbf425bb2a5c850d0c7b87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39936,6 +39551,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="weekchng">
+		<description>A Week That Changed The World (4am crack)</description>
+		<year>1986</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="developer" value="Baker Book House"/>
+		<info name="programmer" value="V. Gilbert Beers and Ronald Beers" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-02-02-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="a week that changed the world (4am crack) side a.dsk" size="143360" crc="d4ed4dfa" sha1="6e434634f0f8911af19edb00e0bb9bca01b3cde7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="a week that changed the world (4am crack) side b.dsk" size="143360" crc="5de32c03" sha1="9da24d2da6528248f40ffb7e625e6495f0b862e7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="acedetr1" cloneof="acedet">
 		<description>Ace Detective (revision 1) (4am crack)</description>
 		<year>1987</year>
@@ -41013,6 +40652,41 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="animate">
+		<description>Animate (4am crack)</description>
+		<year>1986</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="programmer" value="Steven Ohmert" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-06-28. Redumped: 2021-08-28 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines.-->
+		<!--graphics program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animate (4am crack) disk 1.dsk" size="143360" crc="4b89c917" sha1="46a77dfe78c3516362666699542433293aa03260" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animate (4am crack) disk 2.dsk" size="143360" crc="c16d5674" sha1="b4b4f800338b0c87fab7c8df5fba53decc396cfe" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Character Library"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animate (4am crack) disk 3 - character library.dsk" size="143360" crc="6491c465" sha1="403b8534858b9cb74564ea5832e5b72cd055b846" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Background Library"/>
+			<dataarea name="flop" size="143360">
+				<rom name="animate (4am crack) disk 4 - background library.dsk" size="143360" crc="e32a2cd4" sha1="d469e03996f33e2bbe237993e1cb29652e4bd5a2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="adbmastmat">
 		<description>Arcademic Drill Builder: Master Match (4am crack)</description>
 		<year>1983</year>
@@ -41753,6 +41427,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="basic number facts- practice (4am crack).dsk" size="143360" crc="9ef63ad3" sha1="b62c6842a4bd4859e698298b9707fa37abc86c4d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batsblfr">
+		<description>Bats in the Belfry (4am crack)</description>
+		<year>1983</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="programmer" value="Samuel Moore" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-02-11-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bats in the belfry (4am crack).dsk" size="143360" crc="6109dac9" sha1="d19344e23610bf6b448fbbc4098a9dbd450ba713" />
 			</dataarea>
 		</part>
 	</software>
@@ -45028,6 +44718,30 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="piece of cake math (4am crack).dsk" size="143360" crc="b73d1855" sha1="1219efb6057136d3cf22f9e27c24d1e16856192d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ehbible">
+		<description>Early Heroes of the Bible (4am crack)</description>
+		<year>1984</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="developer" value="Baker Book House"/>
+		<info name="programmer" value="V. Gilbert Beers and Ronald Beers" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2016-07-13-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="early heroes of the bible (4am crack) side a.dsk" size="143360" crc="ee55836a" sha1="a6b2eabf4a3eca66c040e61893342381819161a2" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="early heroes of the bible (4am crack) side b.dsk" size="143360" crc="65c85c93" sha1="f3acacc26c8c57ca0c68dab3615865c7f2e0222f" />
 			</dataarea>
 		</part>
 	</software>
@@ -48388,6 +48102,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="masqrde">
+		<description>Masquerade (4am crack)</description>
+		<year>1983</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="programmer" value="Dale Johnson and Rick Incrocci" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-05-08-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="masquerade (4am crack) side a.dsk" size="143360" crc="1b8efa1a" sha1="dc664d1d62151b1e3de2bcebf27ce121527d331b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="masquerade (4am crack) side b.dsk" size="143360" crc="c2ee6855" sha1="333418548a0e59b6e1221a60485d4b8a5a42e890" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mmerlyad10" cloneof="mmerlyad">
 		<description>Mastering Math Series 1: Early Addition (A-788 version 1.0) (4am crack)</description>
 		<year>1983</year>
@@ -49997,6 +49734,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="moseslhp">
+		<description>Moses Leads His People (4am crack)</description>
+		<year>1986</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="developer" value="Baker Book House" />
+		<info name="programmer" value="V. Gilbert Beers and Ronald Beers" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-02-02-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="moses leads his people (4am crack) side a.dsk" size="143360" crc="41a67e27" sha1="e8209f454c1be968d55f597425dbb3bdc1d460b7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="moses leads his people (4am crack) side b.dsk" size="143360" crc="360080a2" sha1="f657b886134ace87161399f228e82bd4b348da39" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mulperev">
 		<description>Multidimensional Personality Evaluation (4am crack)</description>
 		<year>1983</year>
@@ -50367,6 +50128,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="paulmsj">
+		<description>Paul's Missionary Journeys (4am crack)</description>
+		<year>1986</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="developer" value="Baker Book House" />
+		<info name="programmer" value="V. Gilbert Beers and Ronald Beers" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-02-02-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="paul's missionary journeys (4am crack) side a.dsk" size="143360" crc="752993ed" sha1="14ddbe52b978cd5d6a2e855ce38ce3093aa32b25" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="paul's missionary journeys (4am crack) side b.dsk" size="143360" crc="41c4584a" sha1="148d0ec4865cabc3cfa70b83658b2ded699b030c" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pmathmat">
 		<description>Peanuts Math Matcher (4am crack)</description>
 		<year>1985</year>
@@ -50543,6 +50328,21 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="perplexing puzzles (4am crack).dsk" size="143360" crc="4860446c" sha1="3052c8cf0e6416b64988ea351f20769f766abbb7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcommnwin">
+		<description>Persona's Communicate and Win (4am crack)</description>
+		<year>????</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-07-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="communicate and win (4am crack).dsk" size="143360" crc="0e983c2d" sha1="a95ce215249c05d37727114f887285ecdf9b854e" />
 			</dataarea>
 		</part>
 	</software>
@@ -52057,6 +51857,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="rtnherac">
+		<description>Return of Heracles (Electronic Arts) (4am and san inc crack)</description>
+		<year>1983</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="original_publisher" value="Quality Software" />
+		<!--Electronic Arts re-release-->
+		<info name="programmer" value="Stuart Smith" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-03-02-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="return of heracles (4am and san inc crack).dsk" size="143360" crc="87654cb4" sha1="aa3e9ca5e70e5f5f81ece532b8878e60549b354e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rtrchrlw">
 		<description>Return to Reading: Charlotte's Web (4am crack)</description>
 		<year>1986</year>
@@ -52649,6 +52467,30 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="scramble (4am crack).dsk" size="143360" crc="d4931983" sha1="7084a4fec4c4705cda0f8e3c5a8d255ce431912a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srchking">
+		<description>Searching for a King (4am crack)</description>
+		<year>1984</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="developer" value="Baker Book House" />
+		<info name="programmer" value="V. Gilbert Beers and Ronald Beers" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2016-07-13-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="searching for a king (4am crack) side a.dsk" size="143360" crc="1e408ef1" sha1="1a3ec7f6aefb5c4e1052fa4aeb0240d16183f493" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="searching for a king (4am crack) side b.dsk" size="143360" crc="7c95ce05" sha1="ee6564179ef110a37cc9737a4a72c5899f104348" />
 			</dataarea>
 		</part>
 	</software>
@@ -54830,6 +54672,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="boyjesus">
+		<description>The Boy Jesus (4am crack)</description>
+		<year>1984</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="developer" value="Baker Book House" />
+		<info name="programmer" value="V. Gilbert Beers and Ronald Beers" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-11-23-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the boy jesus (4am crack) side a.dsk" size="143360" crc="88c20d44" sha1="17d9afc0952ea153a502768a1316fe33d5bc699c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the boy jesus (4am crack) side b.dsk" size="143360" crc="7b549ae0" sha1="d75c8e9301b81b50ec101906016e72692ae83674"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tcntbee11" cloneof="tcntbee">
 		<description>The Counting Bee (version 1.1, 26-FEB-82) (4am crack)</description>
 		<year>1981</year>
@@ -54899,6 +54765,30 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="143360">
 				<rom name="the dream machine (4am crack) side b.dsk" size="143360" crc="adfe645e" sha1="ab1e0027f723534a20fb3d2bcb228fd16a5f79f8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="earlychr">
+		<description>The Early Church (4am crack)</description>
+		<year>1984</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="developer" value="Baker Book House" />
+		<info name="programmer" value="V. Gilbert Beers and Ronald Beers" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2016-07-13-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the early church (4am crack) side a.dsk" size="143360" crc="ff674e0a" sha1="34f3d0df13e45ef4f9b9725f3a6223118f5218f8" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the early church (4am crack) side b.dsk" size="143360" crc="43d77d07" sha1="7f5c397fe3f1878acedc0dbd46d44061825d705e" />
 			</dataarea>
 		</part>
 	</software>
@@ -55262,6 +55152,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the newsroom self-running demo (4am crack).dsk" size="143360" crc="14b1d110" sha1="b4e23d018ca83d24e66ac1f63d55cad2df8b1ed7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="queenphb">
+		<description>The Queen of Phobos (4am crack)</description>
+		<year>1982</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="programmer" value="William R. Crawford, Paul L. Berker, Dav Holle and Adrian Ferret" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-03-18-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the queen of phobos (4am crack).dsk" size="143360" crc="3a6bafb0" sha1="b22f60f8061dbc8d786d627168172441f8b6a6f5" />
 			</dataarea>
 		</part>
 	</software>
@@ -55740,6 +55646,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 Side B" />
 			<dataarea name="flop" size="143360">
 				<rom name="the trivia arcade (4am crack) disk 2b.dsk" size="143360" crc="9e03d200" sha1="e76db146d770c2c751d0cc9da73feaec3f5673df" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="usurp3">
+		<description>The Usurper Book Three: The Mines of Qyntarr (4am crack)</description>
+		<year>1985</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Scott Thoman" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-11-26-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the usurper book three - the mines of qyntarr (4am crack).dsk" size="143360" crc="c074f3fd" sha1="6b92b4d1ffaefc44a97121a793948901c9f2ed0b" />
 			</dataarea>
 		</part>
 	</software>
@@ -57138,6 +57060,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="wiziprint">
+		<description>Wiziprint (version 2.01 20-AUG-83) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="2.01 20-AUG-83" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-01-02-->
+		<!--game utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="wiziprint (4am crack).dsk" size="143360" crc="354fab0c" sha1="00ab6c5edc0fd0985ecbf425bb2a5c850d0c7b87"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wordplc">
 		<description>Word Problems Level C (version 3.1.6) (4am crack)</description>
 		<year>1989</year>
@@ -57396,6 +57335,96 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="zoo master rev. 2 (4am crack).dsk" size="143360" crc="c8a682f4" sha1="79534d2e394a16cddf8e68d77cf66e128ac48f68" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoomgrafv0182" cloneof="zoomgraf">
+		<description>Zoom Grafix (version 26-JAN-82) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="programmer" value="Dav Holle" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="26-JAN-82" />
+		<!-- This version is dated 26-JAN-82 according to comments within the program itself. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-04-08-->
+		<!--graphics program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zoom grafix 26-jan-82 (4am crack).dsk" size="143360" crc="789d302a" sha1="c3c457bc13a2eb4061b9843c54adbc6a3e50644f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoomgraf0482" cloneof="zoomgraf">
+		<description>Zoom Grafix (version 29-APR-82) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="programmer" value="Dav Holle" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="29-APR-82" />
+		<!-- This version is dated 29-APR-82 according to comments within the program itself. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-04-08-->
+		<!--graphics program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zoom grafix 29-apr-82 (4am crack).dsk" size="143360" crc="dc92bdae" sha1="8cfa992832dcb9abe5b44ce4e2e51bb5bc4491d8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoomgraf0583" cloneof="zoomgraf">
+		<description>Zoom Grafix (version 25-MAY-83) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="programmer" value="Dav Holle" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="25-MAY-83" />
+		<!-- This version is dated 25-MAY-83 according to comments within the program itself. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-05-05-->
+		<!--graphics program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zoom grafix 25-may-83 (4am crack).dsk" size="143360" crc="6692bf9f" sha1="043a588c7fb800b6e913da008ed0327db0046d04" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoomgraf">
+		<description>Zoom Grafix (version 05-OCT-83) (4am crack)</description>
+		<year>1983</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="programmer" value="Dav Holle" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="05-OCT-83" />
+		<!-- This version is dated 05-OCT-83 according to comments within the program itself. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-04-08-->
+		<!--graphics program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zoom grafix 05-oct-83 (4am crack).dsk" size="143360" crc="72cd3138" sha1="66a6fa3e0cee04fcc222ad61de3e8d22668b6ebd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zgfxse">
+		<description>Zoom Grafix Second Edition (version 05-MAY-83) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="programmer" value="Dav Holle" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="05-MAY-83" />
+		<!-- This version is dated 05-MAY-83 according to comments within the program itself. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2014-12-08-->
+		<!--graphics program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zoom grafix second edition (4am crack).dsk" size="143360" crc="5db0f70f" sha1="d7496eba65e8321ce02223c9dae66a6f51d8601a" />
 			</dataarea>
 		</part>
 	</software>
