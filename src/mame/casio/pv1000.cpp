@@ -263,7 +263,7 @@ void pv1000_state::io_w(offs_t offset, uint8_t data)
 //  case 0x06 VRAM + PCG location, always fixed at 0xb8xx
 	case 0x07:
 		/* ---- -xxx unknown, border color? */
-		m_pcg_bank = (data & 0x20) >> 5;
+		m_pcg_bank = (data & 0xe0) >> 5;
 		m_force_pattern = ((data & 0x10) >> 4); /* Dig Dug relies on this */
 		m_render_disable = ((data & 0x08) >> 3);
 		m_border_col = data & 7;
@@ -513,7 +513,7 @@ void pv1000_state::pv1000(machine_config &config)
 
 
 ROM_START( pv1000 )
-	ROM_REGION( 0x4000, "gfxrom", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "gfxrom", ROMREGION_ERASE00 )
 	ROM_REGION( 0x400, "gfxram", ROMREGION_ERASE00 )
 ROM_END
 
