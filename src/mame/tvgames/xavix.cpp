@@ -2286,4 +2286,3 @@ CONS( 2003, epo_tfp2,  0,          0,  xavix_i2c_24c08,  epo_tfp2, xavix_i2c_sta
 CONS( 2005, tvpc_tom,  0,          0,  xavix_i2c_24c16,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Thomas & Friends (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS( 2003, tvpc_dor,  0,          0,  xavix_i2c_24c16,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Doraemon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // A Hamtaro TV-PC also exists
-
