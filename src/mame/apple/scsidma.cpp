@@ -110,7 +110,7 @@ void scsidma_device::control_w(u32 data)
 	// check for unemulated features
 	if (data & CTRL_DMAEN)
 	{
-		fatalerror("%s: DMA mode enabled, but not supported!\n", tag);
+		fatalerror("%s: DMA mode enabled, but not supported!\n", tag());
 	}
 	if (data & CTRL_ARBEN)
 	{
