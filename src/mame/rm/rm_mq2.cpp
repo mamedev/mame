@@ -54,6 +54,7 @@ void rmMQ2_device::rmMQ2_mem(address_map &map)
 void rmMQ2_device::rmMQ2_io(address_map &map)
 {
 	map(0x00, 0x03).mirror(0xff00).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x04, 0x04).mirror(0xff00).r(FUNC(rmMQ2_device::drive_status_r));
 	map(0x07, 0x07).mirror(0xff00).r(FUNC(rmMQ2_device::status_r));
 	map(0x0d, 0x0d).mirror(0xff00).w(FUNC(rmMQ2_device::port1_w));
 	map(0x0e, 0x0e).mirror(0xff00).w(FUNC(rmMQ2_device::port0_w));
@@ -135,9 +136,13 @@ void rmMQ2_device::input_rts(int state)
 {
 	if (started())
 	{
-	m_sio->dcdb_w(state);
-	// NMI generated to reset baud rate to 9600
-	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+		m_sio->dcdb_w(state);
+		// give firmware ~50ms to finish initialisation before allowing first NMI
+		if (m_maincpu->total_cycles() > 200'000)
+		{
+			// NMI generated to reset baud rate to 9600
+			m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+		}
 	}
 }
 
@@ -181,6 +186,11 @@ uint8_t rmMQ2_device::status_r()
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 	}
 	return 0;
+}
+
+uint8_t rmMQ2_device::drive_status_r()
+{
+	return 0xff;
 }
 
 void rmMQ2_device::fdc_intrq_w(int state)

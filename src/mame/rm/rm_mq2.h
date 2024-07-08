@@ -42,6 +42,7 @@ private:
 	void port0_w(uint8_t data);
 	void port1_w(uint8_t data);
 	uint8_t status_r();
+	uint8_t drive_status_r();
 	void fdc_intrq_w(int state);
 	void fdc_drq_w(int state);
 };
