@@ -485,6 +485,13 @@ void pv1000_state::pv1000(machine_config &config)
 	/* D65010G031 - Video & sound chip */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(17897725/4, 288, 0, 224, 262, 0, 244);
+	// Pixel aspect is 48/35.
+	// Display aspect is MAME's 4:3 default.
+
+	// Note that this value is overridden by the user's pv1000.cfg, if present.
+	// 206px x 48/35(PAR) / 4/3(DAR) = 212sl
+	m_screen->set_default_position(216/206.0,0, //216 px in storage aspect; cropped to 206 px
+	                               244/212.0,0); //244 sl in storage aspect; cropped to 212 sl
 	m_screen->set_screen_update(FUNC(pv1000_state::screen_update_pv1000));
 	m_screen->set_palette(m_palette);
 
