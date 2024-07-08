@@ -200,6 +200,7 @@ private:
 	uint8_t m_force_pattern = 0;
 	uint8_t m_fd_buffer_flag = 0;
 	uint8_t m_border_col = 0;
+	uint8_t m_render_disable = 0;
 
 	uint8_t * m_gfxram = nullptr;
 	void pv1000_postload();
@@ -264,6 +265,7 @@ void pv1000_state::io_w(offs_t offset, uint8_t data)
 		/* ---- -xxx unknown, border color? */
 		m_pcg_bank = (data & 0x20) >> 5;
 		m_force_pattern = ((data & 0x10) >> 4); /* Dig Dug relies on this */
+		m_render_disable = ((data & 0x08) >> 3);
 		m_border_col = data & 7;
 		break;
 	}
@@ -355,6 +357,9 @@ uint32_t pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 
 {
 	bitmap.fill(m_border_col); // border is on top and bottom
 
+	if (m_render_disable)
+		return 0;
+
 	for (int y = 0; y < 24; y++)
 	{
 		for (int x = 2; x < 30; x++) // left-right most columns never even drawn, black instead
@@ -438,6 +443,7 @@ void pv1000_state::machine_start()
 	save_item(NAME(m_force_pattern));
 	save_item(NAME(m_fd_buffer_flag));
 	save_item(NAME(m_border_col));
+	save_item(NAME(m_render_disable));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(pv1000_state::pv1000_postload), this));
 }
