@@ -259,6 +259,7 @@ private:
 	emu_timer* m_towns_wait_timer = nullptr;
 	emu_timer* m_towns_status_timer = nullptr;
 	emu_timer* m_towns_cdda_timer = nullptr;
+	emu_timer* m_towns_seek_timer = nullptr;
 	struct towns_cdrom_controller m_towns_cd;
 	struct towns_video_controller m_video;
 
@@ -375,6 +376,7 @@ private:
 	void towns_cdrom_read(cdrom_image_device* device);
 	TIMER_CALLBACK_MEMBER(towns_cd_status_ready);
 	TIMER_CALLBACK_MEMBER(towns_delay_cdda);
+	TIMER_CALLBACK_MEMBER(towns_delay_seek);
 
 	u8 m_rtc_d = 0;
 	bool m_rtc_busy = false;

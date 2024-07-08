@@ -1353,9 +1353,16 @@ TIMER_CALLBACK_MEMBER(towns_state::towns_delay_cdda)
 	towns_cdrom_play_cdda(m_cdrom.target());
 }
 
+TIMER_CALLBACK_MEMBER(towns_state::towns_delay_seek)
+{
+	m_towns_cd.extra_status = 0;
+	towns_cd_set_status(0x04,0x00,0x00,0x00);
+}
+
 void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 {
 	towns_cdrom_set_irq(TOWNS_CD_IRQ_MPU,0); // TODO: this isn't sufficiently tested
+	m_towns_seek_timer->adjust(attotime::never);
 	if(!device->exists() && (m_towns_cd.command != 0xa0))
 	{  // No CD in drive
 		if(m_towns_cd.command & 0x20)
@@ -1372,8 +1379,9 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 			case 0x00:  // Seek
 				if(m_towns_cd.command & 0x20)
 				{
-					m_towns_cd.extra_status = 1;
+					m_towns_cd.extra_status = 0;
 					towns_cd_set_status(0x00,0x00,0x00,0x00);
+					m_towns_seek_timer->adjust(attotime::from_msec(500));
 				}
 				LOGMASKED(LOG_CD, "CD: Command 0x00: SEEK\n");
 				break;
@@ -1500,10 +1508,6 @@ uint8_t towns_state::towns_cdrom_r(offs_t offset)
 				{
 					switch(m_towns_cd.command & 0x9f)
 					{
-						case 0x00:  // seek
-							towns_cd_set_status(0x04,0x00,0x00,0x00);
-							m_towns_cd.extra_status = 0;
-							break;
 						case 0x02:  // read
 							if(m_towns_cd.extra_status == 2)
 								towns_cd_set_status(0x22,0x00,0x00,0x00);
@@ -2356,12 +2360,116 @@ void towns_state::driver_start()
 	m_towns_intervaltimer2 = timer_alloc(FUNC(towns_state::intervaltimer2_timeout), this);
 	m_towns_status_timer = timer_alloc(FUNC(towns_state::towns_cd_status_ready), this);
 	m_towns_cdda_timer = timer_alloc(FUNC(towns_state::towns_delay_cdda), this);
+	m_towns_seek_timer = timer_alloc(FUNC(towns_state::towns_delay_seek), this);
 
 	m_video = towns_video_controller();
 	m_towns_cd = towns_cdrom_controller();
 	m_towns_cd.status = 0x01;  // CDROM controller ready
 	m_towns_cd.buffer_ptr = -1;
 	m_towns_cd.read_timer = timer_alloc(FUNC(towns_state::towns_cdrom_read_byte), this);
+
+	save_item(NAME(m_ftimer));
+	save_item(NAME(m_freerun_timer));
+	save_item(NAME(m_intervaltimer2_period));
+	save_item(NAME(m_intervaltimer2_irqmask));
+	save_item(NAME(m_intervaltimer2_timeout_flag));
+	save_item(NAME(m_intervaltimer2_timeout_flag2));
+	save_item(NAME(m_nmi_mask));
+	save_item(NAME(m_compat_mode));
+	save_item(NAME(m_towns_system_port));
+	save_item(NAME(m_towns_ankcg_enable));
+	save_item(NAME(m_towns_mainmem_enable));
+	save_item(NAME(m_towns_ram_enable));
+	save_pointer(NAME(m_towns_vram), 0x20000);
+	save_pointer(NAME(m_towns_gfxvram), 0x80000);
+	save_pointer(NAME(m_towns_txtvram), 0x20000);;
+	save_item(NAME(m_towns_selected_drive));
+	save_item(NAME(m_towns_fdc_irq6mask));
+	save_pointer(NAME(m_towns_serial_rom), 256/8);
+	save_item(NAME(m_towns_srom_position));
+	save_item(NAME(m_towns_srom_clk));
+	save_item(NAME(m_towns_srom_reset));
+	save_item(NAME(m_towns_rtc_select));
+	save_item(NAME(m_towns_rtc_data));
+	save_item(NAME(m_towns_timer_mask));
+	save_item(NAME(m_towns_kb_status));
+	save_item(NAME(m_towns_kb_irq1_enable));
+	save_item(NAME(m_towns_kb_output));  // key output
+	save_item(NAME(m_towns_kb_extend));  // extended key output
+	save_item(NAME(m_towns_fm_irq_flag));
+	save_item(NAME(m_towns_pcm_irq_flag));
+	save_item(NAME(m_towns_pcm_channel_flag));
+	save_item(NAME(m_towns_pcm_channel_mask));
+	save_item(NAME(m_towns_pad_mask));
+	save_item(NAME(m_towns_volume));  // volume ports
+	save_item(NAME(m_towns_volume_select));
+	save_item(NAME(m_towns_scsi_control));
+	save_item(NAME(m_towns_scsi_status));
+	save_item(NAME(m_towns_spkrdata));
+	save_item(NAME(m_pit_out0));
+	save_item(NAME(m_pit_out1));
+	save_item(NAME(m_pit_out2));
+	save_item(NAME(m_serial_irq_source));
+
+	save_item(NAME(m_kb_prev));
+	save_item(NAME(m_prev_pad_mask));
+	save_item(NAME(m_prev_x));
+	save_item(NAME(m_prev_y));
+	save_item(NAME(m_rtc_d));
+	save_item(NAME(m_rtc_busy));
+	save_item(NAME(m_vram_mask));
+	save_item(NAME(m_vram_mask_addr));
+
+	save_item(STRUCT_MEMBER(m_towns_cd, command));
+	save_item(STRUCT_MEMBER(m_towns_cd, status));
+	save_item(STRUCT_MEMBER(m_towns_cd, cmd_status));
+	save_item(STRUCT_MEMBER(m_towns_cd, cmd_status_ptr));
+	save_item(STRUCT_MEMBER(m_towns_cd, extra_status));
+	save_item(STRUCT_MEMBER(m_towns_cd, parameter));
+	save_item(STRUCT_MEMBER(m_towns_cd, mpu_irq_enable));
+	save_item(STRUCT_MEMBER(m_towns_cd, dma_irq_enable));
+	save_item(STRUCT_MEMBER(m_towns_cd, buffer));
+	save_item(STRUCT_MEMBER(m_towns_cd, buffer_ptr));
+	save_item(STRUCT_MEMBER(m_towns_cd, lba_current));
+	save_item(STRUCT_MEMBER(m_towns_cd, lba_last));
+	save_item(STRUCT_MEMBER(m_towns_cd, cdda_current));
+	save_item(STRUCT_MEMBER(m_towns_cd, cdda_length));
+	save_item(STRUCT_MEMBER(m_towns_cd, software_tx));
+
+	save_item(STRUCT_MEMBER(m_video, towns_vram_wplane));
+	save_item(STRUCT_MEMBER(m_video, towns_vram_rplane));
+	save_item(STRUCT_MEMBER(m_video, towns_vram_page_sel));
+	save_item(STRUCT_MEMBER(m_video, towns_palette_select));
+	save_item(STRUCT_MEMBER(m_video, towns_palette_r));
+	save_item(STRUCT_MEMBER(m_video, towns_palette_g));
+	save_item(STRUCT_MEMBER(m_video, towns_palette_b));
+	save_item(STRUCT_MEMBER(m_video, towns_degipal));
+	save_item(STRUCT_MEMBER(m_video, towns_dpmd_flag));
+	save_item(STRUCT_MEMBER(m_video, towns_crtc_mix));
+	save_item(STRUCT_MEMBER(m_video, towns_crtc_sel));
+	save_item(STRUCT_MEMBER(m_video, towns_crtc_reg));
+	save_item(STRUCT_MEMBER(m_video, towns_video_sel));
+	save_item(STRUCT_MEMBER(m_video, towns_video_reg));
+	save_item(STRUCT_MEMBER(m_video, towns_sprite_sel));
+	save_item(STRUCT_MEMBER(m_video, towns_sprite_reg));
+	save_item(STRUCT_MEMBER(m_video, towns_sprite_flag));
+	save_item(STRUCT_MEMBER(m_video, towns_sprite_page));
+	save_item(STRUCT_MEMBER(m_video, towns_tvram_enable));
+	save_item(STRUCT_MEMBER(m_video, towns_kanji_offset));
+	save_item(STRUCT_MEMBER(m_video, towns_kanji_code_h));
+	save_item(STRUCT_MEMBER(m_video, towns_kanji_code_l));
+	save_item(STRUCT_MEMBER(m_video, towns_display_plane));
+	save_item(STRUCT_MEMBER(m_video, towns_display_page_sel));
+	save_item(STRUCT_MEMBER(m_video, towns_vblank_flag));
+	save_item(STRUCT_MEMBER(m_video, towns_layer_ctrl));
+	save_item(NAME(m_video.towns_crtc_layerscr[0].min_x));
+	save_item(NAME(m_video.towns_crtc_layerscr[0].max_x));
+	save_item(NAME(m_video.towns_crtc_layerscr[0].min_y));
+	save_item(NAME(m_video.towns_crtc_layerscr[0].max_y));
+	save_item(NAME(m_video.towns_crtc_layerscr[1].min_x));
+	save_item(NAME(m_video.towns_crtc_layerscr[1].max_x));
+	save_item(NAME(m_video.towns_crtc_layerscr[1].min_y));
+	save_item(NAME(m_video.towns_crtc_layerscr[1].max_y));
 
 	save_pointer(m_video.towns_crtc_reg,"CRTC registers",32);
 	save_pointer(m_video.towns_video_reg,"Video registers",2);
