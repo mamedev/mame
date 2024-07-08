@@ -328,8 +328,8 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	// Lightgun / pen 1 control
 	// map(0x6ffc, 0x6fff)
 
-	// Sound RAM
-	// map(0x7400, 0x757f)
+	// Sound RAM (tested by Gun Gun Revolution, games don't write here, so it's probably just RAM the sound hardware makes use of directly when mixing)
+	map(0x7400, 0x757f).ram();
 
 	// Sound Control
 	map(0x75f0, 0x75f1).rw(FUNC(xavix_state::sound_startstop_r), FUNC(xavix_state::sound_startstop_w)); // r/w tested read/written 8 times in a row
@@ -543,7 +543,12 @@ static INPUT_PORTS_START( xavix_i2c )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( gungunrv )
+	PORT_INCLUDE(xavix_i2c)
 
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // needed to boot
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( tomcpin )
 	PORT_INCLUDE(xavix_i2c)
@@ -1898,6 +1903,12 @@ ROM_START( epo_eppk )
 	ROM_LOAD("sonokongpingpong.bin", 0x000000, 0x100000, CRC(ea81ced6) SHA1(ef8961d3670148501a478c17cd09f5088e32ad41) )
 ROM_END
 
+ROM_START( epo_epp2 )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	// there are some corrupt graphics here, reads were consistent so needs verifying against another unit
+	ROM_LOAD("excitepingpong2.u3", 0x000000, 0x200000, BAD_DUMP CRC(06665866) SHA1(96f6cdf10ee0f3a748960cc3346bb3114d1318f6) )
+ROM_END
+
 ROM_START( epo_epp3 )
 	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitepingpong3.bin", 0x000000, 0x200000, CRC(a2ee8bff) SHA1(6e16dbaac9680e1f311c08e3f573d0cf8708b446))
@@ -1940,6 +1951,10 @@ ROM_START( ltv_tam )
 	ROM_LOAD("letstvtamagotchi.bin", 0x000000, 0x400000, CRC(e3723272) SHA1(e72e128a7a24afb96baafe5f13e13a0d74db4033) )
 ROM_END
 
+ROM_START( epo_crok )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("sgm3244.u2", 0x000000, 0x400000, CRC(a801779b) SHA1(e6e4235dc7c7db3073737b10ba4bc5b00deca2c3) )
+ROM_END
 
 ROM_START( tak_geig )
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
@@ -1949,6 +1964,11 @@ ROM_END
 ROM_START( jarajal )
 	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("takaraslots.bin", 0x000000, 0x200000, CRC(afae0b72) SHA1(b1c5d80a8dc8466982efd79d54cd82a58f0ff997) )
+ROM_END
+
+ROM_START( tomshoot )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("airgun.u4", 0x000000, 0x200000, CRC(3e4f7b65) SHA1(4e1660d4952c498e250526c2c3f027253e1fcbe1) )
 ROM_END
 
 ROM_START( tcarnavi )
@@ -1979,6 +1999,13 @@ ROM_START( gungunad )
 	ROM_CONTINUE(0x140000,0x040000)
 	ROM_CONTINUE(0x1c0000,0x040000)
 ROM_END
+
+
+ROM_START( gungunrv )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("gungunrevolution.u1", 0x000000, 0x400000, CRC(4e34f624) SHA1(7acdd0991df78ecffd156381817ed4f85f6aef09) )
+ROM_END
+
 
 /*
     The e-kara cartridges require the BIOS rom to map into 2nd external bus space as they fetch palette data from
@@ -2187,15 +2214,17 @@ CONS( 2002, epo_tenn,  0,          0,  xavix,            epo_epp,  xavix_state, 
 CONS( 2000, epo_epp,   0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2000, epo_eppk,  epo_epp,    0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD / Sonokong",           "Real Ping Pong (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// Excite Ping Pong 2 is from 2003
+CONS( 2003, epo_epp2,   0,         0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Excite Ping Pong 2 (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2006, epo_epp3,   0,         0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                     "Challenge Ai-chan! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, epo_epp3,   0,         0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Challenge Ai-chan! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2003, epo_efdx,  0,          0,  xavix_i2c_24c08,  epo_efdx, xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2005, epo_guru,  0,          0,  xavix_guru,       epo_guru, xavix_guru_state,     init_xavix,    "Epoch / SSD Company LTD",                      "Gururin World (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2002, epo_dmon, 0,           0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Doraemon Wakuwaku Kuukihou (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // full / proper title?
+
+CONS( 2003, epo_crok,  0,          0,  xavix_i2c_24lc04, xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Croket! Itada Kinka! Banker Battle!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2005, has_wamg,  0,          0,  xavix,            has_wamg, xavix_state,          init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
@@ -2204,6 +2233,8 @@ CONS( 2002, tak_geig,  0,          0,  xavix_nv,         tak_geig, xavix_state, 
 // was also distributed by Atlus as an arcade cabinet in 2005, ROM almost certainly different (this one will auto-power off after inactivity, an arcade wouldn't do that)
 CONS( 2003, jarajal,   0,          0,  xavix_nv,         jarajal,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Jara-Ja Land (Japan, home version)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
+CONS( 2002, tomshoot, 0,           0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Tomy / SSD Company LTD",                       "Shooting King (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 CONS( 2003, tcarnavi,  0,          0,  xavix_nv,         tcarnavi, xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Tomica Carnavi Drive (Japan)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08,  tomcpin,  xavix_i2c_state,      init_xavix,    "Tomy / SSD Company LTD",                       "Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -2211,6 +2242,8 @@ CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08,  tomcpin,  xavix_i2c_sta
 CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02_43mhz,tomplc,xavix_i2c_state,     init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2001, gungunad,  0,          0,  xavix_nv,         xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2004, gungunrv,  0,          0,  xavix_i2c_24lc04, gungunrv, xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Revolution (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 /* Music titles: Emulation note:
    Timers might not be 100%, PAL stuff uses different ways to do timing.

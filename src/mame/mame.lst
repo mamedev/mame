@@ -45498,9 +45498,11 @@ ekaramix                        //
 ekaraphs                        //
 ekaras                          //
 epitch                          //
+epo_crok
 epo_dmon                        //
 epo_efdx                        //
 epo_epp                         //
+epo_epp2
 epo_epp3                        //
 epo_eppk                        //
 epo_esdx                        //
@@ -45510,6 +45512,7 @@ epo_tfp2                        //
 evio                            //
 gcslottv                        //
 gungunad                        //
+gungunrv
 has_wamg                        //
 hikara                          //
 jarajal                         //
@@ -45551,6 +45554,7 @@ taitons2                        //
 tak_geig                        //
 tcarnavi                        //
 tomcpin                         //
+tomshoot                        //
 tomplc                          //
 tvpc_dor
 tvpc_tom
