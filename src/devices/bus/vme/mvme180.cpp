@@ -67,14 +67,11 @@ void vme_mvme180_card_device::device_add_mconfig(machine_config &config)
 {
 	MC88100(config, m_cpu, 40_MHz_XTAL / 2);
 	m_cpu->set_addrmap(AS_PROGRAM, &vme_mvme180_card_device::cpu_mem);
+	m_cpu->set_cmmu_code([this](u32 const address) -> mc88200_device & { return *m_mmu[0]; });
+	m_cpu->set_cmmu_data([this](u32 const address) -> mc88200_device & { return *m_mmu[1]; });
 
-	MC88200(config, m_mmu[0], 40_MHz_XTAL / 2, 0x7e);
-	m_mmu[0]->set_mbus(m_cpu, AS_PROGRAM);
-	m_cpu->set_cmmu_i(m_mmu[0]);
-
-	MC88200(config, m_mmu[1], 40_MHz_XTAL / 2, 0x7f);
-	m_mmu[1]->set_mbus(m_cpu, AS_PROGRAM);
-	m_cpu->set_cmmu_d(m_mmu[1]);
+	MC88200(config, m_mmu[0], 40_MHz_XTAL / 2, 0x7e).set_mbus(m_cpu, AS_PROGRAM);
+	MC88200(config, m_mmu[1], 40_MHz_XTAL / 2, 0x7f).set_mbus(m_cpu, AS_PROGRAM);
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
 	m_duart->irq_cb().set(FUNC(vme_mvme180_card_device::irq_w<6>));
