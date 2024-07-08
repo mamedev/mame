@@ -19,8 +19,8 @@
 
 #include "macadb.h"
 #include "macrtc.h"
-#include "macscsi.h"
 #include "mactoolbox.h"
+#include "scsidma.h"
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
@@ -59,11 +59,9 @@ public:
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
 		m_rtc(*this, "rtc"),
+		m_scsidma(*this, "scsidma"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
-		m_scsibus1(*this, "scsi"),
-		m_ncr5380(*this, "scsi:7:ncr5380"),
-		m_scsihelp(*this, "scsihelp"),
 		m_scc(*this, "scc"),
 		m_asc(*this, "asc"),
 		m_cur_floppy(nullptr),
@@ -89,11 +87,9 @@ private:
 	required_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	required_device<rtc3430042_device> m_rtc;
+	required_device<scsidma_device> m_scsidma;
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
-	required_device<nscsi_bus_device> m_scsibus1;
-	required_device<ncr5380_device> m_ncr5380;
-	required_device<mac_scsi_helper_device> m_scsihelp;
 	required_device<z80scc_device> m_scc;
 	required_device<asc_device> m_asc;
 
@@ -110,16 +106,6 @@ private:
 
 	int m_adb_in;
 
-	u16 scsi_r(offs_t offset, u16 mem_mask = ~0);
-	void scsi_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u32 scsi_drq_r(offs_t offset, u32 mem_mask = ~0);
-	void scsi_drq_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-
-	void scsi_berr_w(u8 data)
-	{
-		m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
-	}
-
 	void phases_w(uint8_t phases);
 	void devsel_w(uint8_t devsel);
 	void fdc_hdsel(int state);
@@ -132,8 +118,6 @@ private:
 	uint8_t oss_r(offs_t offset);
 	void oss_w(offs_t offset, uint8_t data);
 	uint32_t buserror_r();
-	uint8_t maciifx_8010_r();
-	uint8_t maciifx_8040_r();
 
 	uint16_t via_r(offs_t offset);
 	void via_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -209,12 +193,7 @@ void maciifx_state::maciifx_map(address_map &map)
 	map(0x50000000, 0x50001fff).rw(FUNC(maciifx_state::via_r), FUNC(maciifx_state::via_w)).mirror(0x00f00000);
 	map(0x50004000, 0x50005fff).rw("sccpic", FUNC(applepic_device::host_r), FUNC(applepic_device::host_w)).mirror(0x00f00000).umask32(0xff00ff00);
 	map(0x50004000, 0x50005fff).rw("sccpic", FUNC(applepic_device::host_r), FUNC(applepic_device::host_w)).mirror(0x00f00000).umask32(0x00ff00ff);
-	map(0x50008010, 0x50008010).r(FUNC(maciifx_state::maciifx_8010_r)).mirror(0x00f00000);
-	map(0x50008040, 0x50008040).r(FUNC(maciifx_state::maciifx_8040_r)).mirror(0x00f00000);
-	map(0x5000a000, 0x5000bfff).rw(FUNC(maciifx_state::scsi_r), FUNC(maciifx_state::scsi_w)).mirror(0x00f00000);
-	map(0x5000c060, 0x5000c063).r(FUNC(maciifx_state::scsi_drq_r)).mirror(0x00f00000);
-	map(0x5000d000, 0x5000d003).w(FUNC(maciifx_state::scsi_drq_w)).mirror(0x00f00000);
-	map(0x5000d060, 0x5000d063).r(FUNC(maciifx_state::scsi_drq_r)).mirror(0x00f00000);
+	map(0x50008000, 0x50009fff).m(m_scsidma, FUNC(scsidma_device::map)).mirror(0x0ff80000);
 	map(0x50010000, 0x50011fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
 	map(0x50012000, 0x50013fff).rw("swimpic", FUNC(applepic_device::host_r), FUNC(applepic_device::host_w)).mirror(0x00f00000).umask32(0xff00ff00);
 	map(0x50012000, 0x50013fff).rw("swimpic", FUNC(applepic_device::host_r), FUNC(applepic_device::host_w)).mirror(0x00f00000).umask32(0x00ff00ff);
@@ -294,68 +273,6 @@ void maciifx_state::via_out_b(uint8_t data)
 	m_rtc->ce_w((data & 0x04) >> 2);
 	m_rtc->data_w(data & 0x01);
 	m_rtc->clk_w((data >> 1) & 0x01);
-}
-
-u16 maciifx_state::scsi_r(offs_t offset, u16 mem_mask)
-{
-	const int reg = (offset >> 3) & 0xf;
-	const bool pseudo_dma = (reg == 6) && (offset == 0x130);
-
-	return m_scsihelp->read_wrapper(pseudo_dma, reg) << 8;
-}
-
-void maciifx_state::scsi_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	const int reg = (offset >> 3) & 0xf;
-	const bool pseudo_dma = (reg == 0) && (offset == 0x100);
-
-	m_scsihelp->write_wrapper(pseudo_dma, reg, data >> 8);
-}
-
-u32 maciifx_state::scsi_drq_r(offs_t offset, u32 mem_mask)
-{
-	switch (mem_mask)
-	{
-	case 0xff000000:
-		return m_scsihelp->read_wrapper(true, 6) << 24;
-
-	case 0xffff0000:
-		return (m_scsihelp->read_wrapper(true, 6) << 24) | (m_scsihelp->read_wrapper(true, 6) << 16);
-
-	case 0xffffffff:
-		return (m_scsihelp->read_wrapper(true, 6) << 24) | (m_scsihelp->read_wrapper(true, 6) << 16) | (m_scsihelp->read_wrapper(true, 6) << 8) | m_scsihelp->read_wrapper(true, 6);
-
-	default:
-		logerror("scsi_drq_r: unknown mem_mask %08x\n", mem_mask);
-	}
-
-	return 0;
-}
-
-void maciifx_state::scsi_drq_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	switch (mem_mask)
-	{
-	case 0xff000000:
-		m_scsihelp->write_wrapper(true, 0, data >> 24);
-		break;
-
-	case 0xffff0000:
-		m_scsihelp->write_wrapper(true, 0, data >> 24);
-		m_scsihelp->write_wrapper(true, 0, data >> 16);
-		break;
-
-	case 0xffffffff:
-		m_scsihelp->write_wrapper(true, 0, data >> 24);
-		m_scsihelp->write_wrapper(true, 0, data >> 16);
-		m_scsihelp->write_wrapper(true, 0, data >> 8);
-		m_scsihelp->write_wrapper(true, 0, data & 0xff);
-		break;
-
-	default:
-		logerror("scsi_drq_w: unknown mem_mask %08x\n", mem_mask);
-		break;
-	}
 }
 
 void maciifx_state::phases_w(uint8_t phases)
@@ -485,16 +402,6 @@ uint32_t maciifx_state::buserror_r()
 	return 0;
 }
 
-uint8_t maciifx_state::maciifx_8010_r()
-{
-	return 0x40;
-}
-
-uint8_t maciifx_state::maciifx_8040_r()
-{
-	return 0;
-}
-
 /***************************************************************************
     DEVICE CONFIG
 ***************************************************************************/
@@ -524,7 +431,7 @@ void maciifx_state::maciifx(machine_config &config)
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
-	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68030");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
 
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
@@ -541,33 +448,9 @@ void maciifx_state::maciifx(machine_config &config)
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
-	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
-		[](device_t *device)
-		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
-		});
-	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device)
-	{
-		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
-		adapter.irq_handler().set(*this, FUNC(maciifx_state::oss_interrupt<9>));
-		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
-	});
-
-	MAC_SCSI_HELPER(config, m_scsihelp);
-	m_scsihelp->scsi_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::read));
-	m_scsihelp->scsi_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::write));
-	m_scsihelp->scsi_dma_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_r));
-	m_scsihelp->scsi_dma_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_w));
-	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	m_scsihelp->timeout_error_callback().set(FUNC(maciifx_state::scsi_berr_w));
+	SCSIDMA(config, m_scsidma, C15M);
+	m_scsidma->set_maincpu_tag("maincpu");
+	m_scsidma->write_irq().set(FUNC(maciifx_state::oss_interrupt<9>));
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 
@@ -638,4 +521,4 @@ ROM_END
 
 }   // anonymous namespace
 
-COMP(1990, maciifx, 0, 0, maciifx, maciifx, maciifx_state, empty_init, "Apple Computer", "Macintosh IIfx", MACHINE_NOT_WORKING)
+COMP(1990, maciifx, 0, 0, maciifx, maciifx, maciifx_state, empty_init, "Apple Computer", "Macintosh IIfx", MACHINE_SUPPORTS_SAVE)
