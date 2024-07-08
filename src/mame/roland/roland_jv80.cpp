@@ -37,7 +37,7 @@ private:
 
 void roland_jv80_state::jv880_mem_map(address_map &map)
 {
-	map(0x00000, 0x08000).rom().region("maincpu", 0);
+	map(0x00000, 0x07fff).rom().region("maincpu", 0);
 	map(0x08000, 0x0dfff).ram().mirror(0xa0000);
 	map(0x0f000, 0x0f3ff).rw(m_pcm, FUNC(tc6116_device::read), FUNC(tc6116_device::write));
 	map(0x10000, 0x3ffff).rom().region("progrom", 0x10000);
