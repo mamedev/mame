@@ -45,6 +45,7 @@ It only contains a 27C512 or 27C1024 and a X24C04.
 #include "machine/6522via.h"
 #include "machine/i2cmem.h"
 #include "machine/msm6242.h"
+#include "machine/r65c52.h"
 #include "sound/ay8910.h"
 
 #include "emupal.h"
@@ -165,7 +166,7 @@ void ramstar_state::ramstar(machine_config &config)
 
 	R65C22(config, "via", 3.6864_MHz_XTAL / 2); // divider not verified
 
-	// TODO: R65C52 DACIA
+	R65C52(config, "dacia", 3.6864_MHz_XTAL / 2); // divider not verified
 
 	I80C31(config, m_cartcpu, 6_MHz_XTAL); // (absence of) divider not verified
 	m_cartcpu->set_addrmap(AS_PROGRAM, &ramstar_state::cart_program_map);

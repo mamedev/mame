@@ -1439,7 +1439,6 @@ protected:
 	void seta_vregs_w(u8 data);
 	u16 seta_dsw_r(offs_t offset);
 
-	u16 zingzipbl_unknown_r();
 	void blockcar_interrupt_w(u8 data);
 	u16 extdwnhl_watchdog_r();
 	void utoukond_sound_control_w(u8 data);
@@ -2497,41 +2496,36 @@ void zombraid_state::zombraid_x1_map(address_map &map)
 	map(0x80000, 0xfffff).bankr("x1_bank");
 }
 
-u16 seta_state::zingzipbl_unknown_r()
-{
-	return 0x0000;
-}
-
 void seta_state::zingzipbl_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                             // ROM (up to 2MB)
-	map(0x200000, 0x20ffff).ram().share("workram");       // RAM (pointer for zombraid crosshair hack)
-//  map(0x400000, 0x400001).port_r("P1");                 // P1
-//  map(0x400002, 0x400003).port_r("P2");                 // P2
-	map(0x400002, 0x400003).r(FUNC(seta_state::zingzipbl_unknown_r));       // P2
-//  map(0x400004, 0x400005).port_r("COINS");              // Coins
-	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
-	map(0x500003, 0x500003).w(FUNC(seta_state::seta_vregs_w));              // Video Registers
-	map(0x500004, 0x500005).nopw();
-	//map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));              // DSW
-	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
-	map(0x800000, 0x803fff).ram().w(m_layers[0], FUNC(x1_012_device::vram_w)).share("layer1"); // VRAM 0&1
-	map(0x880000, 0x883fff).ram().w(m_layers[1], FUNC(x1_012_device::vram_w)).share("layer2"); // VRAM 2&3
-	map(0x900000, 0x900005).rw(m_layers[0], FUNC(x1_012_device::vctrl_r), FUNC(x1_012_device::vctrl_w));     // VRAM 0&1 Ctrl
+	map(0x000000, 0x07ffff).rom(); // ok
+	map(0x200000, 0x20ffff).ram(); // ok
+	// TODO: coins (possibly 0x400000). For now only free-play 'works'.
+	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_lockout_w)); // ok
+	map(0x500003, 0x500003).w(FUNC(seta_state::seta_vregs_w)); // maybe?
+	map(0x700400, 0x700fff).ram().share("paletteram1"); // ok
+	map(0x800000, 0x803fff).ram().w(m_layers[0], FUNC(x1_012_device::vram_w)).share("layer1"); // ok
+	map(0x880000, 0x883fff).ram().w(m_layers[1], FUNC(x1_012_device::vram_w)).share("layer2"); // ok
+	map(0x902001, 0x902001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // should be ok, but bad ROM
+	// the following appear to be video registers, but laid out differently than in the original. Trampoline galore for now. TODO: verify
+	map(0x902004, 0x902005).lw16(NAME([this] (offs_t offset, uint16_t data, uint16_t mem_mask) { m_layers[1]->vctrl_w(1, data, mem_mask); }));
+	map(0x902006, 0x902007).lw16(NAME([this] (offs_t offset, uint16_t data, uint16_t mem_mask) { m_layers[1]->vctrl_w(0, data, mem_mask); }));
+	map(0x902008, 0x902009).lw16(NAME([this] (offs_t offset, uint16_t data, uint16_t mem_mask) { m_layers[0]->vctrl_w(1, data, mem_mask); }));
+	map(0x90200a, 0x90200b).lw16(NAME([this] (offs_t offset, uint16_t data, uint16_t mem_mask) { m_layers[0]->vctrl_w(0, data, mem_mask); }));
+	map(0x900004, 0x900005).lw16(NAME([this] (offs_t offset, uint16_t data, uint16_t mem_mask) { m_layers[0]->vctrl_w(2, data, mem_mask); }));
+	map(0x980004, 0x980005).lw16(NAME([this] (offs_t offset, uint16_t data, uint16_t mem_mask) { m_layers[1]->vctrl_w(2, data, mem_mask); }));
+	map(0x902010, 0x902013).r(FUNC(seta_state::seta_dsw_r)); // ok
+	map(0x902014, 0x902015).portr("P1"); // ok
+	map(0x902016, 0x902017).portr("P2"); // ok
 
-	//map(0x902006, 0x902007).w // writes 0 here on start up
-	map(0x902010, 0x902013).r(FUNC(seta_state::zingzipbl_unknown_r));
-
-	map(0x980000, 0x980005).rw(m_layers[1], FUNC(x1_012_device::vctrl_r), FUNC(x1_012_device::vctrl_w));     // VRAM 2&3 Ctrl
+	// TODO: sprites also seem to have different registers, need correct implementation
 	map(0xa00000, 0xa005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16));     // Sprites Y
 	map(0xa00600, 0xa00607).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r16), FUNC(x1_001_device::spritectrl_w16));
 	map(0xa00608, 0xa00fff).ram(); // zeroed on start up
-	map(0xa00600, 0xa00607).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r16), FUNC(x1_001_device::spritectrl_w16));
-	map(0xa80000, 0xa80001).ram();                             // ? 0x4000
 	map(0xb00000, 0xb03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xc00000, 0xc000ff).ram(); // zeroed on startup
-	map(0xe00000, 0xe00001).nopw();                        // ? VBlank IRQ Ack
-	map(0xf00000, 0xf00001).nopw();                        // ? Sound  IRQ Ack
+
+	map(0xc00000, 0xc000ff).ram(); // zeroed on startup, doesn't seem to be used later
+	map(0xe00000, 0xe00001).w(m_watchdog, FUNC(watchdog_timer_device::reset16_w));
 }
 
 void seta_state::jjsquawb_map(address_map &map)
@@ -9016,8 +9010,8 @@ void seta_state::zingzipbl(machine_config &config)
 
 	M68000(config.replace(), m_maincpu, 16000000);   // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::zingzipbl_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
-	subdevice<screen_device>("screen")->screen_vblank().set_nop();
+
+	subdevice<screen_device>("screen")->screen_vblank().set_inputline(m_maincpu, 6, HOLD_LINE); // TODO: there's probably more then this
 
 	config.device_remove("x1snd");
 
@@ -9731,8 +9725,8 @@ ROM_START( zingzipbl )
 	ROM_COPY( "gfxtemp", 0x080000, 0x000000, 0x80000 )
 	ROM_COPY( "gfxtemp", 0x180000, 0x080000, 0x80000 )
 
-	ROM_REGION( 0x100000, "oki", 0 )    // OKI Samples - Not Seta
-	ROM_LOAD( "8",  0x000000, 0x40000, CRC(7927a200) SHA1(fd6163d2867959ec14b418d6207ae024afd3b654) )
+	ROM_REGION( 0x40000, "oki", 0 )    // OKI Samples - Not Seta
+	ROM_LOAD( "8", 0x00000, 0x40000, BAD_DUMP CRC(7927a200) SHA1(fd6163d2867959ec14b418d6207ae024afd3b654) ) // BADADDR      xxxxxxxxxxxxxxx-xx
 ROM_END
 
 ROM_START( atehate )
@@ -11346,7 +11340,7 @@ GAME( 1992, neobattl,  0,        umanclub,  neobattl,  seta_state,     empty_ini
 GAME( 1992, umanclub,  0,        umanclub,  umanclub,  seta_state,     empty_init,     ROT0,   "Banpresto",                 "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
 
 GAME( 1992, zingzip,   0,        zingzip,   zingzip,   seta_state,     empty_init,     ROT270, "Allumer / Tecmo",           "Zing Zing Zip (World) / Zhen Zhen Ji Pao (China?)", 0 ) // This set has Chinese Characters in Title screen, it distributed for Chinese market/or Title: DSW?
-GAME( 1992, zingzipbl, zingzip,  zingzipbl, zingzip,   seta_state,     empty_init,     ROT270, "bootleg",                   "Zing Zing Zip (bootleg)", MACHINE_NOT_WORKING )
+GAME( 1992, zingzipbl, zingzip,  zingzipbl, zingzip,   seta_state,     empty_init,     ROT270, "bootleg",                   "Zing Zing Zip (bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // different video registers, bad Oki ROM dump
 
 GAME( 1993, atehate,   0,        atehate,   atehate,   seta_state,     empty_init,     ROT0,   "Athena",                    "Athena no Hatena?", 0 )
 

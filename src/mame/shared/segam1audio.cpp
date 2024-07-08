@@ -52,33 +52,37 @@ DEFINE_DEVICE_TYPE(SEGAM1AUDIO, segam1audio_device, "segam1audio", "Sega Model 1
 
 void segam1audio_device::device_add_mconfig(machine_config &config)
 {
-	M68000(config, m_audiocpu, 10000000);  // verified on real h/w
+	M68000(config, m_audiocpu, 20_MHz_XTAL / 2);  // verified on real h/w
 	m_audiocpu->set_addrmap(AS_PROGRAM, &segam1audio_device::segam1audio_map);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM3438(config, m_ym, 8_MHz_XTAL);
+	YM3438(config, m_ym, 16_MHz_XTAL / 2);
 	m_ym->add_route(0, "lspeaker", 0.30);
 	m_ym->add_route(1, "rspeaker", 0.30);
 
-	MULTIPCM(config, m_multipcm_1, 10_MHz_XTAL);
+	MULTIPCM(config, m_multipcm_1, 20_MHz_XTAL / 2);
 	m_multipcm_1->set_addrmap(0, &segam1audio_device::mpcm1_map);
 	m_multipcm_1->add_route(0, "lspeaker", 0.5);
 	m_multipcm_1->add_route(1, "rspeaker", 0.5);
 
-	MULTIPCM(config, m_multipcm_2, 10_MHz_XTAL);
+	MULTIPCM(config, m_multipcm_2, 20_MHz_XTAL / 2);
 	m_multipcm_2->set_addrmap(0, &segam1audio_device::mpcm2_map);
 	m_multipcm_2->add_route(0, "lspeaker", 0.5);
 	m_multipcm_2->add_route(1, "rspeaker", 0.5);
 
-	I8251(config, m_uart, 8_MHz_XTAL); // T82C51, clock unknown
+	I8251(config, m_uart, 16_MHz_XTAL / 2); // T82C51
 	m_uart->rxrdy_handler().set_inputline(m_audiocpu, M68K_IRQ_2);
 	m_uart->txd_handler().set(FUNC(segam1audio_device::output_txd));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 16_MHz_XTAL / 2 / 16)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
+
+	// DAC output clocks measures:
+	// BYTECLK = 10/8 (1.25MHz)
+	// WORDCLK = 10/8/28 (44.642857kHz)
 }
 
 //**************************************************************************

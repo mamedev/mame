@@ -851,7 +851,12 @@ static INPUT_PORTS_START( rivierab )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mosdraw )
-	PORT_INCLUDE( riviera )
+	PORT_INCLUDE( meritpoker )
+
+	PORT_MODIFY("DSW") // DSW affects only points per coins, everything seems hard coded values
+	PORT_DIPNAME( 0x10, 0x00, "Points Per Coin" )   PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x10, "1" )
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // to bypass printer check TODO: proper emulation
@@ -1995,7 +2000,6 @@ ROM_END
 
 // Sub board CRT-203 includes 2 P8255A, parallel printer connection & MM58174AN RTC that plugs in through the CRT-200's P8255 socket.
 // There is a battery that connects to the PCB to keep the CRT-200's Mosel MS6264L-10PC RAM active and also runs to the CRT-203 for the RTC (guess)
-// Currently the game starts with an error, press F2 to configure RTC then press Deal (2)
 ROM_START( mosdraw )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "4436-05_u5-0.u5", 0x0000, 0x8000, CRC(d0194059) SHA1(4e106c7e38fd92e005f5e1899b6fbca4ab62ce6d) ) // 4436-05 U5-0  041790
@@ -2007,6 +2011,9 @@ ROM_START( mosdraw )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "tana_u40.u40", 0x00000, 0x2000, CRC(a45cae66) SHA1(499759badc006fa09706d349e252284949d20a2d) )
+
+	ROM_REGION( 0x2000, "nvram", 0 )
+	ROM_LOAD( "nvram",  0x0000, 0x2000, CRC(61351962) SHA1(b2a18563c41b58385d6b0ccbc621fddd0d82f1b5) ) // preconfigured NVRAM to avoid error on boot
 ROM_END
 
 ROM_START( bigappg )
@@ -2989,7 +2996,7 @@ GAME( 1984, chkndrawa,  chkndraw, pitboss, chkndraw,  merit_state,        empty_
 GAME( 1987, riviera,    0,        riviera, riviera,   merit_state,        empty_init,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1986, rivieraa,   riviera,  riviera, riviera,   merit_state,        empty_init,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1986, rivierab,   riviera,  riviera, rivierab,  merit_state,        empty_init,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1990, mosdraw,    0,        mosdraw, mosdraw,   merit_state,        empty_init,   ROT0,  "Merit", "Montana Super Draw (4436-05, U5-0)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // needs printer and RTC hook up
+GAME( 1990, mosdraw,    0,        mosdraw, mosdraw,   merit_state,        empty_init,   ROT0,  "Merit", "Montana Super Draw (4436-05, U5-0)", MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // needs printer and RTC hook up
 
 GAME( 1986, bigappg,    0,        bigappg, bigappg,   merit_state,        empty_init,   ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1986, misdraw,    0,        misdraw, bigappg,   merit_state,        empty_init,   ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
@@ -3008,33 +3015,33 @@ GAME( 1985, trvwza,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_
 GAME( 1985, trvwzb,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-00, Alt Gen trivia)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1985, trvwzv,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT90, "Merit", "Trivia ? Whiz (6221-02, Vertical)",                        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, trvwz2,     0,        trvwhiz,  trivia,   merit_quiz_state,   init_key<2>,  ROT90, "Merit", "Trivia ? Whiz (6221-05, Edition 2)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz2a,    trvwz2,   trvwhiz,  trivia,   merit_quiz_state,   init_key<2>,  ROT90, "Merit", "Trivia ? Whiz (6221-05, Edition 2 Alt Sex trivia)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz2,     0,        trvwhiz,  trivia,   merit_quiz_state,   init_key<2>,  ROT90, "Merit", "Trivia ? Whiz Edition 2 (6221-05)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz2a,    trvwz2,   trvwhiz,  trivia,   merit_quiz_state,   init_key<2>,  ROT90, "Merit", "Trivia ? Whiz Edition 2 (6221-05, Alt Sex trivia)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, trvwz3,     0,        trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-05, U5-0D, Edition 3)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz3a,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-05, U5-0C, Edition 3)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz3b,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-05, Edition 3 Sex trivia III)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz3v,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT90, "Merit", "Trivia ? Whiz (6221-04, U5-0E, Edition 3 Vertical)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz3,     0,        trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz Edition 3 (6221-05, U5-0D)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz3a,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz Edition 3 (6221-05, U5-0C)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz3b,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz Edition 3 (6221-05, with Sex trivia III)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz3v,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT90, "Merit", "Trivia ? Whiz Edition 3 (6221-04, U5-0E, Vertical)",       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, trvwz4,     0,        trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT0,  "Merit", "Trivia ? Whiz (6221-10, U5-0A, Edition 4)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz4v,    trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT90, "Merit", "Trivia ? Whiz (6221-13, U5-0B, Edition 4 Vertical)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz4va,   trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT90, "Merit", "Trivia ? Whiz (6221-13, U5-0B, Edition 4 Vertical Alt Sex trivia)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz4,     0,        trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT0,  "Merit", "Trivia ? Whiz Edition 4 (6221-10, U5-0A)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz4v,    trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT90, "Merit", "Trivia ? Whiz Edition 4 (6221-13, U5-0B, Vertical)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz4va,   trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT90, "Merit", "Trivia ? Whiz Edition 4 (6221-13, U5-0B, alt Sex trivia)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, tictac,     0,        tictac,   tictac,   merit_quiz_state,   init_key<8>,  ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C, 07/07/86)",                MACHINE_SUPPORTS_SAVE ) // all new trivia categories
 GAME( 1985, tictaca,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>,  ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C, 02/11/86)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tictacv,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>,  ROT90, "Merit", "Tic Tac Trivia (6221-22, U5-0 Vertical)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tictacv,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>,  ROT90, "Merit", "Tic Tac Trivia (6221-22, U5-0, Vertical)",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, phrcraze,   0,        phrcraze, phrcrazs, merit_quiz_state,   init_key<7>,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-3A Expanded Questions)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1986, phrcrazea,  phrcraze, phrcraze, phrcrazs, merit_quiz_state,   init_key<7>,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-3 Expanded Questions)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1986, phrcraze,   0,        phrcraze, phrcrazs, merit_quiz_state,   init_key<7>,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-3A, Expanded Questions)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, phrcrazea,  phrcraze, phrcraze, phrcrazs, merit_quiz_state,   init_key<7>,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-3, Expanded Questions)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1986, phrcrazeb,  phrcraze, phrcraze, phrcraze, merit_quiz_state,   init_key<7>,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-0A)",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1986, phrcrazec,  phrcraze, phrcraze, phrcraza, merit_quiz_state,   init_key<7>,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-0)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, phrcrazev,  phrcraze, phrcraze, phrcrazs, merit_quiz_state,   init_key<7>,  ROT90, "Merit", "Phraze Craze (6221-45, U5-2 Vertical)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, phrcrazev,  phrcraze, phrcraze, phrcrazs, merit_quiz_state,   init_key<7>,  ROT90, "Merit", "Phraze Craze (6221-45, U5-2, Vertical)",                   MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, dtrvwz5,   0,         dtrvwz5,  dtrvwz5,  merit_quiz_state,   init_dtrvwz5, ROT0,  "Merit", "Deluxe Trivia ? Whiz (6221-70, U5-0A Edition 5)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1987, dtrvwz5v,  dtrvwz5,   dtrvwz5,  dtrvwz5,  merit_quiz_state,   init_dtrvwz5, ROT90, "Merit", "Deluxe Trivia ? Whiz (6221-75, U5-0 Edition 5 Vertical)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, dtrvwz5,   0,         dtrvwz5,  dtrvwz5,  merit_quiz_state,   init_dtrvwz5, ROT0,  "Merit", "Deluxe Trivia ? Whiz Edition 5 (6221-70, U5-0A)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, dtrvwz5v,  dtrvwz5,   dtrvwz5,  dtrvwz5,  merit_quiz_state,   init_dtrvwz5, ROT90, "Merit", "Deluxe Trivia ? Whiz Edition 5 (6221-75, U5-0, Vertical)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, matchem,   0,         couple,   matchem,  merit_state,        init_crt209,  ROT0,  "Merit",   "Match'em Up (6221-51, U5-1)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1986, matchemg,  matchem,   couple,   matchemg, merit_state,        init_crt209,  ROT0,  "Merit",   "Match'em Up (6221-55, U5-1 German)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, matchemg,  matchem,   couple,   matchemg, merit_state,        init_crt209,  ROT0,  "Merit",   "Match'em Up (6221-55, U5-1, German)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1988, couple,    matchem,   couple,   couple,   merit_state,        init_crt209,  ROT0,  "bootleg", "The Couples (set 1)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1988, couplep,   matchem,   couple,   couplep,  merit_state,        init_crt209,  ROT0,  "bootleg", "The Couples (set 2)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1988, couplei,   matchem,   couple,   couple,   merit_state,        init_crt209,  ROT0,  "bootleg", "The Couples (set 3)",                                    MACHINE_SUPPORTS_SAVE )

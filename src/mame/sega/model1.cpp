@@ -14,6 +14,7 @@ Known functional issues:
 
 Sega Model 1 Hardware Overview
 ------------------------------
+Documented by Guru
 
 Note! This document is a Work-In-Progress and covers all the dumped Sega Model 1 games, including...
 
@@ -1752,7 +1753,7 @@ void model1_state::model1(machine_config &config)
 	I8251(config, m_m1uart, 8000000); // uPD71051C, clock unknown
 	m_m1uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
 
-	clock_device &m1uart_clock(CLOCK(config, "m1uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	clock_device &m1uart_clock(CLOCK(config, "m1uart_clock", 16_MHz_XTAL / 2 / 16)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
 	m1uart_clock.signal_handler().set(m_m1uart, FUNC(i8251_device::write_txc));
 	m1uart_clock.signal_handler().append(m_m1uart, FUNC(i8251_device::write_rxc));
 }

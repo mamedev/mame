@@ -20,8 +20,8 @@ TODO:
 - ma6710 hangs at UART device check (PC=5e44). Bypassing it, game stops with 'TOD CLOCK ERROR';
 - Never initializes RAMDAC;
 - Never initializes CRTC on CRT-352 games;
-- Map secondary NVRAM moduleM
-- Map / connect up Dallas DS1216 RTCM
+- Map secondary NVRAM module;
+- Map / connect up Dallas DS1216 RTC;
 - ma6710a/ma9800 start with game malfunction message. It can be started by switching IN2:2 on,
   then pressing discard 3. Games 'Super Eight' and 'Black Jack' show GFX banking logic isn't correct.
   'Black Jack' GFX are over 0x8000 in ROM but proper GFX bank bit hasn't been identified.
@@ -762,11 +762,11 @@ lamps for control panel buttons
 */
 static INPUT_PORTS_START( merit3xx )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1") // "Double Down" button in Blackjack
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Discard 2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Discard 4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3") // "Split" button in Blackjack
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Discard 4") // "Stand" button in Blackjack
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5") // "Hit" button in Blackjack
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
@@ -836,10 +836,27 @@ static INPUT_PORTS_START( merit3xx )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
+/*
+Translations of on screen messages for ma9800:
+Bedobott Ermek = Inserted Coins
+Hivja A Gepkezelot = Call Attendant
+Feketedoboz Hiba  = Blackbox Error
+
+Button labels:
+             TET = Bet
+            OSZT = Deal
+         KIFIZET = Collect
+         BEFEJEZ = Stand
+ELDOB/VISSZAVESZ = Discard/Recover
+
+It seems that this set uses a hopper instead of a printer like other sets.
+*/
+
 static INPUT_PORTS_START( ma9800 )
 	PORT_INCLUDE( merit3xx )
 
-//  PORT_START("IN1")
+//  PORT_MODIFY("IN1")
 //  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) // Button labeled ELDOB/VISSZAVESZ
 //  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) // Button labeled ELDOB/VISSZAVESZ
 //  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) // Button labeled ELDOB/VISSZAVESZ
@@ -853,12 +870,8 @@ static INPUT_PORTS_START( ma9800 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) // gives 1 credit at a time (25 cents)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) // gives 4 credits at a time ($1.00)
 //  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) // Button labeled BEFEJEZ
-	PORT_DIPNAME( 0x20, 0x20, "IN1.6 Door" ) PORT_TOGGLE // <-- for ma9800 set, ON results in DOOR OPEN error
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "IN1.7 Door" ) PORT_TOGGLE // <-- for ma9800 set, ON results in DOOR OPEN error
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 2") PORT_CODE(KEYCODE_U) PORT_TOGGLE // Unknown what these 2 are but will give DOOR OPEN errors
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 3") PORT_CODE(KEYCODE_Y) PORT_TOGGLE // Unknown what these 2 are but will give DOOR OPEN errors
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) // gives 4 credits at a time ($1.00)
 INPUT_PORTS_END
 
