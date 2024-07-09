@@ -38,7 +38,7 @@ UNIMPLEMENTED FEATURES :
 #include "emu.h"
 #include "wd2010.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 #include <cmath>
@@ -231,10 +231,10 @@ uint8_t wd2010_device::read(offs_t offset)
 
 		if (offset == TASK_FILE_SDH_REGISTER)
 		{
-			logerror("(READ) %s WD2010 SDH: %u\n", machine().describe_context(), data);
-			logerror("(READ) %s WD2010 Head: %u\n", machine().describe_context(), HEAD);
-			logerror("(READ) %s WD2010 Drive: %u\n", machine().describe_context(), DRIVE);
-			logerror("(READ) %s WD2010 Sector Size: %u\n", machine().describe_context(), SECTOR_SIZE);
+			LOG("(READ) %s WD2010 SDH: %u\n", machine().describe_context(), data);
+			LOG("(READ) %s WD2010 Head: %u\n", machine().describe_context(), HEAD);
+			LOG("(READ) %s WD2010 Drive: %u\n", machine().describe_context(), DRIVE);
+			LOG("(READ) %s WD2010 Sector Size: %u\n", machine().describe_context(), SECTOR_SIZE);
 		}
 
 		break;
