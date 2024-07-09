@@ -1,12 +1,14 @@
-// license:BSD-3-Clause
-// copyright-holders:Angelo Salese
-/***************************************************************************
+// license: BSD-3-Clause
+// copyright-holders: Angelo Salese, Curt Coder, AJR
+/**************************************************************************************************
 
-    ACT Apricot F1 series
+ACT Apricot F1 series
 
-    preliminary driver by Angelo Salese
+TODO:
+- Need software dumps to go further;
+- Convert workram pointer to ram_device (needs documented range of available configs);
 
-****************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "bus/centronics/ctronics.h"
@@ -44,6 +46,27 @@ protected:
 	virtual void device_start() override;
 };
 
+DEFINE_DEVICE_TYPE(F1_DAISY, f1_daisy_device, "f1_daisy", "F1 daisy chain abstraction")
+
+f1_daisy_device::f1_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, F1_DAISY, tag, owner, clock)
+	, z80_daisy_chain_interface(mconfig, *this)
+{
+}
+
+void f1_daisy_device::device_start()
+{
+}
+
+IRQ_CALLBACK_MEMBER(f1_daisy_device::inta_cb)
+{
+	device_z80daisy_interface *intf = daisy_get_irq_device();
+	if (intf != nullptr)
+		return intf->z80daisy_irq_ack();
+	else
+		return 0xff;
+}
+
 // ======================> f1_state
 
 class f1_state : public driver_device
@@ -59,8 +82,8 @@ public:
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_irqs(*this, "irqs")
-		, m_p_scrollram(*this, "scrollram")
-		, m_p_paletteram(*this, "paletteram")
+		, m_workram(*this, "workram")
+		, m_paletteram(*this, "paletteram")
 		, m_palette(*this, "palette")
 	{ }
 
@@ -79,8 +102,8 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<input_merger_device> m_irqs;
-	required_shared_ptr<u16> m_p_scrollram;
-	required_shared_ptr<u16> m_p_paletteram;
+	required_shared_ptr<u16> m_workram;
+	required_shared_ptr<u16> m_paletteram;
 	required_device<palette_device> m_palette;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -98,11 +121,11 @@ private:
 
 	void m1_w(u8 data);
 
-	int m_40_80 = 0;
-	int m_200_256 = 0;
+	int m_width80 = 0;
+	int m_lines200 = 0;
 
-	void act_f1_io(address_map &map);
-	void act_f1_mem(address_map &map);
+	void main_io(address_map &map);
+	void main_map(address_map &map);
 };
 
 
@@ -112,18 +135,21 @@ private:
 
 u32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	int lines = m_200_256 ? 200 : 256;
+	int lines = m_lines200 ? 200 : 256;
+	// start bases are per line, in a dedicated buffer
+	// TODO: is this configurable?
+	const u32 vram_table = 0x1e00 >> 1;
+	const u32 vram_mask = 0x3ffff >> 1;
 
 	for (int y = 0; y < lines; y++)
 	{
-		offs_t addr = m_p_scrollram[y] << 1;
+		offs_t base_offs = m_workram[(y + vram_table) & vram_mask];
 
 		for (int sx = 0; sx < 80; sx++)
 		{
-			u16 data = program.read_word(addr);
+			u16 data = m_workram[(base_offs + sx) & vram_mask];
 
-			if (m_40_80)
+			if (m_width80)
 			{
 				for (int x = 0; x < 8; x++)
 				{
@@ -146,8 +172,6 @@ u32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const r
 					data <<= 2;
 				}
 			}
-
-			addr += 2;
 		}
 	}
 
@@ -156,20 +180,24 @@ u32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 u16 f1_state::palette_r(offs_t offset)
 {
-	return m_p_paletteram[offset];
+	return m_paletteram[offset];
 }
 
 void f1_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	u8 i,r,g,b;
-	COMBINE_DATA(&m_p_paletteram[offset]);
+	COMBINE_DATA(&m_paletteram[offset]);
 
-	if(ACCESSING_BITS_0_7 && offset) //TODO: offset 0 looks bogus
+	//TODO: we discard offset 0 because all BIOSes sets white there (0xf).
+	// Either routed to border or genlock.
+	if(ACCESSING_BITS_0_7 && offset)
 	{
-		i = m_p_paletteram[offset] & 1;
-		r = ((m_p_paletteram[offset] & 2)>>0) | i;
-		g = ((m_p_paletteram[offset] & 4)>>1) | i;
-		b = ((m_p_paletteram[offset] & 8)>>2) | i;
+		u8 i = 0, r = 0, g = 0, b = 0;
+
+		const u16 datax = m_paletteram[offset];
+		i = BIT(datax, 0);
+		r = (BIT(datax, 1) << 1) | i;
+		g = (BIT(datax, 2) << 1) | i;
+		b = (BIT(datax, 3) << 1) | i;
 
 		m_palette->set_pen_color(offset, pal2bit(r), pal2bit(g), pal2bit(b));
 	}
@@ -192,6 +220,9 @@ static GFXDECODE_START( gfx_act_f1 )
 	GFXDECODE_ENTRY( "maincpu", 0x0800, charset_8x8, 0, 1 )
 GFXDECODE_END
 
+//**************************************************************************
+//  I/Os
+//**************************************************************************
 
 void f1_state::drive_select_w(int state)
 {
@@ -212,13 +243,13 @@ void f1_state::motor_on_w(int state)
 void f1_state::video_lines_w(int state)
 {
 	// video lines (1=200, 0=256)
-	m_200_256 = state;
+	m_lines200 = state;
 }
 
 void f1_state::video_columns_w(int state)
 {
 	// video columns (1=80, 0=40)
-	m_40_80 = state;
+	m_width80 = state;
 }
 
 void f1_state::led0_enable_w(int state)
@@ -234,6 +265,8 @@ void f1_state::led1_enable_w(int state)
 
 void f1_state::machine_start()
 {
+	save_item(NAME(m_width80));
+	save_item(NAME(m_lines200));
 }
 
 
@@ -243,25 +276,23 @@ void f1_state::machine_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  ADDRESS_MAP( act_f1_mem )
+//  ADDRESS_MAP( main_map )
 //-------------------------------------------------
 
-void f1_state::act_f1_mem(address_map &map)
+void f1_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000, 0x01dff).ram();
-	map(0x01e00, 0x01fff).ram().share("scrollram");
-	map(0x02000, 0x3ffff).ram();
+	map(0x00000, 0x3ffff).ram().share("workram");
 	map(0xe0000, 0xe001f).rw(FUNC(f1_state::palette_r), FUNC(f1_state::palette_w)).share("paletteram");
 	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
 }
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( act_f1_io )
+//  ADDRESS_MAP( main_io )
 //-------------------------------------------------
 
-void f1_state::act_f1_io(address_map &map)
+void f1_state::main_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0000).w(m_cent_data_out, FUNC(output_latch_device::write));
@@ -283,7 +314,7 @@ void f1_state::act_f1_io(address_map &map)
 //-------------------------------------------------
 
 static INPUT_PORTS_START( act )
-	// defined in machine/apricotkb.c
+	// defined in act/apricotkb.cpp
 INPUT_PORTS_END
 
 
@@ -319,28 +350,6 @@ void apricotf_floppies(device_slot_interface &device)
 	device.option_add("d32w", SONY_OA_D32W);
 }
 
-
-DEFINE_DEVICE_TYPE(F1_DAISY, f1_daisy_device, "f1_daisy", "F1 daisy chain abstraction")
-
-f1_daisy_device::f1_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, F1_DAISY, tag, owner, clock)
-	, z80_daisy_chain_interface(mconfig, *this)
-{
-}
-
-void f1_daisy_device::device_start()
-{
-}
-
-IRQ_CALLBACK_MEMBER(f1_daisy_device::inta_cb)
-{
-	device_z80daisy_interface *intf = daisy_get_irq_device();
-	if (intf != nullptr)
-		return intf->z80daisy_irq_ack();
-	else
-		return 0xff;
-}
-
 static const z80_daisy_config f1_daisy_config[] =
 {
 	{ "sio" },
@@ -364,8 +373,8 @@ void f1_state::act_f1(machine_config &config)
 
 	/* basic machine hardware */
 	I8086(config, m_maincpu, CLK5); // @ 10D
-	m_maincpu->set_addrmap(AS_PROGRAM, &f1_state::act_f1_mem);
-	m_maincpu->set_addrmap(AS_IO, &f1_state::act_f1_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &f1_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &f1_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("daisy", FUNC(f1_daisy_device::inta_cb));
 
 	F1_DAISY(config, "daisy").set_daisy_config(f1_daisy_config);
@@ -441,7 +450,7 @@ void f1_state::act_f1(machine_config &config)
 
 
 //**************************************************************************
-//  ROMS
+//  ROM definitions
 //**************************************************************************
 
 //-------------------------------------------------
@@ -469,12 +478,6 @@ ROM_START( f10 )
 ROM_END
 
 
-
-//**************************************************************************
-//  SYSTEM DRIVERS
-//**************************************************************************
-
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS     INIT        COMPANY  FULLNAME       FLAGS
 COMP( 1984, f1,   0,      0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F1",  MACHINE_NOT_WORKING )
 COMP( 1984, f1e,  f1,     0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F1e", MACHINE_NOT_WORKING )
 COMP( 1984, f2,   f1,     0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F2",  MACHINE_NOT_WORKING )

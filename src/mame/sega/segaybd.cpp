@@ -23,7 +23,7 @@
 
     Known bugs:
         * pdrift & clones lock up issues after m68k rewrite, TAS opcode?
-		  Perfect quantum or changing IRQ2 timing won't fix it, see MT8783.
+          Perfect quantum or changing IRQ2 timing won't fix it, see MT8783.
         * pdriftl's comms don't work
 
 ****************************************************************************

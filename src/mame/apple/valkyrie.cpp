@@ -1,25 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 /*
-	Apple "Valkyrie" - very low-cost video framebuffer
-	Emulation by R. Belmont
+    Apple "Valkyrie" - very low-cost video framebuffer
+    Emulation by R. Belmont
 
-	This was the bonus awfulness in the Quadra 630/LC 580 machines.  While the
-	ROM software and MacOS don't support many monitor types, the Linux driver indicates
-	that's more of a software problem.
+    This was the bonus awfulness in the Quadra 630/LC 580 machines.  While the
+    ROM software and MacOS don't support many monitor types, the Linux driver indicates
+    that's more of a software problem.
 
-	https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/drivers/video/fbdev/valkyriefb.c?h=v6.2.10
+    https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/drivers/video/fbdev/valkyriefb.c?h=v6.2.10
 
-	Also valkyrie.c in the Marathon Infinity open source release from Bungie.  (They use Valkyrie's video upscaler
-	to only have to render 320x240!)
+    Also valkyrie.c in the Marathon Infinity open source release from Bungie.  (They use Valkyrie's video upscaler
+    to only have to render 320x240!)
 
-	TODO:
-		- YUV video-in support
-		- Determine if the I2C clock is internal or external
+    TODO:
+        - YUV video-in support
+        - Determine if the I2C clock is internal or external
 
-	Video in buffer 0 is at 0xf9300000
-	Video in buffer 1 is at 0xf9340000
-	Both buffers are 320x240 with a stride of 1024 bytes, data is 16 bits per pixel (YUV?)
+    Video in buffer 0 is at 0xf9300000
+    Video in buffer 1 is at 0xf9340000
+    Both buffers are 320x240 with a stride of 1024 bytes, data is 16 bits per pixel (YUV?)
 
 */
 
@@ -29,7 +29,7 @@
 #define LOG_MODE        (1U << 1)
 #define LOG_MONSENSE    (1U << 2)
 #define LOG_RAMDAC      (1U << 3)
-#define LOG_CLOCKGEN	(1U << 4)
+#define LOG_CLOCKGEN    (1U << 4)
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -128,7 +128,7 @@ static INPUT_PORTS_START(monitor_config)
 	PORT_CONFNAME(0x7f, 6, "Monitor type")
 	PORT_CONFSETTING(0x02, u8"Mac RGB Display (12\" 512\u00d7384)")             // "Rubik" (modified IIgs AppleColor RGB)
 	PORT_CONFSETTING(0x06, u8"Mac Hi-Res Display (12-14\" 640\u00d7480)")       // "High Res" 640x480 @ 67 Hz
-	PORT_CONFSETTING(ext(1, 1, 3), "640x480 VGA")								// VGA 640x480 @ 60 Hz
+	PORT_CONFSETTING(ext(1, 1, 3), "640x480 VGA")                               // VGA 640x480 @ 60 Hz
 	PORT_CONFSETTING(ext(2, 3, 1), "832x624 16\" RGB")                          // "Goldfish" or "16 inch RGB"
 
 INPUT_PORTS_END
@@ -464,7 +464,7 @@ void valkyrie_device::recalc_mode()
 
 	switch (m_video_timing & 0x7f)
 	{
-		case 2:	// Rubik 512x384
+		case 2: // Rubik 512x384
 			m_hres = 512;
 			m_vres = 384;
 			m_htotal = 640;

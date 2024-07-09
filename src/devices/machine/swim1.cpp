@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "swim1.h"
 
-#define VERBOSE 0
+#define VERBOSE (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SWIM1, swim1_device, "swim1", "Apple SWIM1 (Sander/Wozniak Integrated Machine) version 1 floppy controller")
@@ -26,6 +26,8 @@ void swim1_device::device_start()
 	applefdintf_device::device_start();
 
 	m_timer = timer_alloc(FUNC(swim1_device::update), this);
+	m_sync_timer = timer_alloc(FUNC(swim1_device::ism_periodic_sync), this);
+
 	save_item(NAME(m_last_sync));
 	save_item(NAME(m_flux_write_start));
 	save_item(NAME(m_flux_write));
@@ -104,7 +106,7 @@ void swim1_device::device_reset()
 	m_devsel_cb(0);
 	m_sel35_cb(true);
 	m_hdsel_cb(false);
-	m_dat1byte_cb(0);
+	m_dat1byte_cb(CLEAR_LINE);
 }
 
 void swim1_device::set_floppy(floppy_image_device *floppy)
@@ -174,11 +176,11 @@ u8 swim1_device::ism_read(offs_t offset)
 {
 	ism_sync();
 
-	//  static const char *const names[] = {
-	//      "data", "mark", "crc", "param", "phases", "setup", "status", "handshake"
-	//  };
+	  static const char *const names[] = {
+		  "data", "mark", "crc", "param", "phases", "setup", "status", "handshake"
+	  };
 
-	//  LOG("read ism %s\n", names[offset & 7]);
+	LOG("read ism %s\n", names[offset & 7]);
 	switch(offset & 7) {
 	case 0x0: { // data
 		u16 r = ism_fifo_pop();
@@ -227,9 +229,9 @@ u8 swim1_device::ism_read(offs_t offset)
 			if(!(m_ism_fifo[m_ism_fifo_pos - 1] & M_CRC0))
 				h |= 0x02;
 		}
-		// rddata on 4
+		// rddata on 3
 		if(!m_floppy || m_floppy->wpt_r())
-			h |= 0x08;
+			h |= 0x0c;
 		if(m_ism_error)
 			h |= 0x20;
 		if(m_ism_mode & 0x10) {
@@ -249,7 +251,7 @@ u8 swim1_device::ism_read(offs_t offset)
 	}
 
 	default:
-		//      logerror("read %s\n", names[offset & 7]);
+			  logerror("read %s\n", names[offset & 7]);
 		break;
 	}
 	return 0xff;
@@ -315,8 +317,7 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 		m_ism_mode &= ~data;
 		m_ism_param_idx = 0;
 		ism_show_mode();
-		if(data & 0x10)
-			m_dat1byte_cb((m_ism_fifo_pos != 0) ? 1 : 0);
+		ism_update_dat1byte();
 		if(!(m_ism_mode & 0x40)) {
 			LOG("switch to iwm\n");
 			u8 ism_devsel = m_ism_mode & 0x80 ? (m_ism_mode >> 1) & 3 : 0;
@@ -328,8 +329,7 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 	case 0x7:
 		m_ism_mode |= data;
 		ism_show_mode();
-		if(data & 0x10)
-			m_dat1byte_cb((m_ism_fifo_pos != 2) ? 1 : 0);
+		ism_update_dat1byte();
 		break;
 
 	default:
@@ -344,6 +344,13 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 		m_devsel_cb(m_ism_mode & 0x80 ? (m_ism_mode >> 1) & 3 : 0);
 	if((m_ism_mode ^ prev_mode) & 0x20)
 		m_hdsel_cb((m_ism_mode >> 5) & 1);
+
+	if ((m_ism_mode ^ prev_mode) & 0x40) {
+		if (m_ism_mode & 0x40)
+			m_sync_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()/16));
+		else
+			m_sync_timer->adjust(attotime::never);
+	}
 
 	if((m_ism_mode & 0x18) == 0x18 && ((prev_mode & 0x18) != 0x18)) {
 		// Entering write mode
@@ -558,9 +565,12 @@ void swim1_device::iwm_control(int offset, u8 data)
 			if(data & 0x40) {
 				m_ism_mode |= 0x40;
 				LOG("switch to ism\n");
+
 				u8 ism_devsel = m_ism_mode & 0x80 ? (m_ism_mode >> 1) & 3 : 0;
 				if(ism_devsel != m_iwm_devsel)
 					m_devsel_cb(ism_devsel);
+
+				m_sync_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()/16));
 			}
 			break;
 		}
@@ -607,24 +617,18 @@ attotime swim1_device::cycles_to_time(u64 cycles) const
 void swim1_device::ism_fifo_clear()
 {
 	m_ism_fifo_pos = 0;
-	m_dat1byte_cb((m_ism_mode & 0x10) ? 1 : 0);
+	ism_update_dat1byte();
 	ism_crc_clear();
 }
 
 bool swim1_device::ism_fifo_push(u16 data)
 {
 	if(m_ism_fifo_pos == 2)
+	{
 		return true;
-	m_ism_fifo[m_ism_fifo_pos ++] = data;
-	if(m_ism_mode & 0x10) {
-		// write
-		if(m_ism_fifo_pos == 2)
-			m_dat1byte_cb(0);
-	} else {
-		// read
-		if(m_ism_fifo_pos == 1)
-			m_dat1byte_cb(1);
 	}
+	m_ism_fifo[m_ism_fifo_pos ++] = data;
+	ism_update_dat1byte();
 	return false;
 }
 
@@ -635,15 +639,7 @@ u16 swim1_device::ism_fifo_pop()
 	u16 r = m_ism_fifo[0];
 	m_ism_fifo[0] = m_ism_fifo[1];
 	m_ism_fifo_pos --;
-	if(m_ism_mode & 0x10) {
-		// write
-		if(m_ism_fifo_pos == 1)
-			m_dat1byte_cb(1);
-	} else {
-		// read
-		if(m_ism_fifo_pos == 0)
-			m_dat1byte_cb(0);
-	}
+	ism_update_dat1byte();
 	return r;
 }
 
@@ -858,6 +854,14 @@ void swim1_device::iwm_sync()
 		}
 		break;
 	}
+	}
+}
+
+TIMER_CALLBACK_MEMBER(swim1_device::ism_periodic_sync)
+{
+	if (m_ism_mode & 0x40)
+	{
+		ism_sync();
 	}
 }
 
@@ -1209,4 +1213,18 @@ void swim1_device::sync()
 		return ism_sync();
 	else
 		return iwm_sync();
+}
+
+void swim1_device::ism_update_dat1byte()
+{
+	if (m_ism_mode & 0x10)
+	{
+		// write: Does FIFO have room?
+		m_dat1byte_cb((m_ism_fifo_pos < 2) ? ASSERT_LINE : CLEAR_LINE);
+	}
+	else
+	{
+		// read: is FIFO not empty?
+		m_dat1byte_cb((m_ism_fifo_pos > 0) ? ASSERT_LINE : CLEAR_LINE);
+	}
 }

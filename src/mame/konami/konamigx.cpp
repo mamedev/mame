@@ -1267,8 +1267,17 @@ static INPUT_PORTS_START( common )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( racinfrc )
-	/* racin force needs Player 2 Button 1 ("IN3" & 0x10) set to get past the calibration screen */
 	PORT_INCLUDE( common )
+
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x000fffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	// FIXME: this maps to nowhere according to service mode, verify
+	// Old note: needs Player 2 Button 1 ("IN3" & 0x10) set to get past the calibration screen
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Calibration skip?")
+	PORT_BIT( 0x03e00000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Gear Shift") PORT_TOGGLE
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Brake")
+	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ADC-WRPORT")
 	PORT_BIT( 0x1000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0834", adc083x_device, clk_write)
@@ -1307,7 +1316,7 @@ static INPUT_PORTS_START( racinfrc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( opengolf )
-	PORT_INCLUDE( racinfrc )
+	PORT_INCLUDE( common )
 
 	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Shoot")
@@ -1319,10 +1328,18 @@ static INPUT_PORTS_START( opengolf )
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shoot")
 	PORT_BIT( 0x60000000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("AN0")
+	PORT_START("ADC-WRPORT")
+	PORT_BIT( 0x1000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0834", adc083x_device, clk_write)
+	PORT_BIT( 0x2000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0834", adc083x_device, di_write)
+	PORT_BIT( 0x4000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0834", adc083x_device, cs_write)
+
+	PORT_START("ADC-RDPORT")
+	PORT_BIT( 0x1000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc0834", adc083x_device, do_read)
+
+	PORT_START("AN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("AN1")
+	PORT_START("AN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SYSTEM_DSW")
@@ -1602,7 +1619,7 @@ static const gfx_layout t1_charlayout6 =
 	16, 16,
 	RGN_FRAC(1,1),
 	6,
-	{ 20, 16, 12, 8, 4, 0 },
+	{ 16, 20, 8, 12, 0, 4 },
 	{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7,
 		12*8*8, 12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
 	{ 3, 2, 1, 0, 27, 26, 25, 24, 51, 50, 49, 48, 75, 74, 73, 72 },
@@ -1614,7 +1631,7 @@ static const gfx_layout t1_charlayout8 =
 	16, 16,
 	RGN_FRAC(1,1),
 	8,
-	{ 28, 24, 20, 16, 12, 8, 4, 0 },
+	{ 24, 28, 16, 20, 8, 12, 0, 4 },
 	{ 0, 16*8, 16*8*2, 16*8*3, 16*8*4, 16*8*5, 16*8*6, 16*8*7,
 		16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
 	{ 3, 2, 1, 0, 35, 34, 33, 32, 67, 66, 65, 64, 99, 98, 97, 96 },
@@ -1622,14 +1639,15 @@ static const gfx_layout t1_charlayout8 =
 };
 
 /* type 1 (opengolf + racinfrc) use 6 and 8 bpp planar layouts for the 53936 */
+// TODO: pinpoint color size
 static GFXDECODE_START( gfx_opengolf )
-	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout8, 0x0000, 8 )
-	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 8 )
+	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout8, 0x0000, 32 )
+	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 128 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_racinfrc )
-	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout6, 0x0000, 8 )
-	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 8 )
+	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout6, 0x0000, 128 )
+	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 128 )
 GFXDECODE_END
 
 /* type 3 & 4 games use a simple 8bpp decode for the 53936 */

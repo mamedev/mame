@@ -32,7 +32,7 @@ Open Computer Chess Championship.
 
 MM IV TurboKit 18MHz - (mm4tk)
 This is a replacement ROM combining the TurboKit initial ROM with the original MM IV.
-The TurboKit powers up to it's tiny ROM, copies itself to RAM, banks in normal ROM,
+The TurboKit powers up to its tiny ROM, copies itself to RAM, banks in normal ROM,
 copies that to faster SRAM, then patches the checksum and the LED blink delays.
 
 There is an undumped MM V TurboKit, which will be the exact same except for location

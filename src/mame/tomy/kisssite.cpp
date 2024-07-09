@@ -45,10 +45,11 @@ fnn0040L
 
 #include "emu.h"
 
-#include "softlist_dev.h"
-
 #include "bus/ata/atapicdr.h"
 #include "cpu/mipsx/mipsx.h"
+
+#include "softlist_dev.h"
+
 
 namespace {
 

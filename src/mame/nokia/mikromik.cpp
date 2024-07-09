@@ -37,21 +37,21 @@
     RST6.5  8212 INT
     RST7.5  DMA EOP
 
-	Models:
+    Models:
 
-	M1: 1x 160KB floppy
-	M2: 2x 160KB floppy
-	M3: 1x 320KB floppy (96 tpi, single sided)
-	M4: 2x 320KB floppy
-	M5: 1x 640KB floppy (96 tpi, double sided)
-	M6: 2x 640KB floppy
-	M7: 1x 640KB floppy + 5MB hard disk
-	M4G: 2x 320KB floppy + GDC
-	M6G: 2x 640KB floppy + GDC
-	M7G: 1x 640KB floppy + 5MB hard disk + GDC
+    M1: 1x 160KB floppy
+    M2: 2x 160KB floppy
+    M3: 1x 320KB floppy (96 tpi, single sided)
+    M4: 2x 320KB floppy
+    M5: 1x 640KB floppy (96 tpi, double sided)
+    M6: 2x 640KB floppy
+    M7: 1x 640KB floppy + 5MB hard disk
+    M4G: 2x 320KB floppy + GDC
+    M6G: 2x 640KB floppy + GDC
+    M7G: 1x 640KB floppy + 5MB hard disk + GDC
 
 
-	./chdman createhd -chs 306,2,32 -ss 256 -o st406.chd
+    ./chdman createhd -chs 306,2,32 -ss 256 -o st406.chd
 
 */
 
@@ -59,7 +59,7 @@
 
     TODO:
 
-	- M7 boot floppy
+    - M7 boot floppy
     - accurate video timing
     - PCB layouts
     - NEC uPD7201 MPSC
@@ -214,7 +214,7 @@ uint8_t mm1_state::sasi_status_r(offs_t offset)
 	data |= m_sasi->cd_r() << 3;
 	data |= m_sasi->req_r() << 4;
 	data |= m_sasi->io_r() << 5;
-	
+
 	//LOG("%s SASI STATUS %02x\n",machine().describe_context(),data);
 
 	return data;
@@ -271,7 +271,7 @@ uint8_t mm1_state::sasi_ior3_r(offs_t offset)
 	{
 		data = m_fdc->dma_r();
 	}
-	
+
 	return data;
 }
 
@@ -298,7 +298,7 @@ void mm1_state::sasi_bsy_w(int state)
 void mm1_state::sasi_req_w(int state)
 {
 	if (!state)
-	{		
+	{
 		m_sasi->ack_w(0);
 	}
 
@@ -692,7 +692,7 @@ ROM_START( mm1m4 )
 	ROM_LOAD( "9081b.ic43", 0x0000, 0x2000, CRC(60841940) SHA1(d755e9be53f27f41d1e93b4c1793f9ea6a3e1229) )
 
 	ROM_REGION( 0x200, "address", 0 ) // address decoder
-	ROM_LOAD( "720793a.ic24", 0x0000, 0x0200, CRC(deea87a6) SHA1(8f19e43252c9a0b1befd02fc9d34fe1437477f3a) )
+	ROM_LOAD( "720793a.ic24", 0x000, 0x200, CRC(deea87a6) SHA1(8f19e43252c9a0b1befd02fc9d34fe1437477f3a) )
 
 	ROM_REGION( 0x1000, "chargen", 0 ) // character generator
 	ROM_LOAD( "6807b.ic61", 0x0000, 0x1000, CRC(32b36220) SHA1(8fe7a181badea3f7e656dfaea21ee9e4c9baf0f1) )
@@ -710,7 +710,7 @@ ROM_START( mm1m6 )
 	ROM_LOAD( "9081b.ic2", 0x0000, 0x2000, CRC(2955feb3) SHA1(946a6b0b8fb898be3f480c04da33d7aaa781152b) )
 
 	ROM_REGION( 0x200, "address", 0 ) // address decoder
-	ROM_LOAD( "720793a.ic24", 0x0000, 0x0200, CRC(deea87a6) SHA1(8f19e43252c9a0b1befd02fc9d34fe1437477f3a) )
+	ROM_LOAD( "720793a.ic24", 0x000, 0x200, CRC(deea87a6) SHA1(8f19e43252c9a0b1befd02fc9d34fe1437477f3a) )
 
 	ROM_REGION( 0x1000, "chargen", 0 ) // character generator
 	ROM_LOAD( "6807b.ic61", 0x0000, 0x1000, CRC(32b36220) SHA1(8fe7a181badea3f7e656dfaea21ee9e4c9baf0f1) )
@@ -728,7 +728,7 @@ ROM_START( mm1m7 )
 	ROM_LOAD( "9057c.ic2", 0x0000, 0x2000, CRC(89bbc042) SHA1(7e8800c94934b81ce08b7af862e1159e0517684d) )
 
 	ROM_REGION( 0x200, "address", 0 ) // address decoder
-	ROM_LOAD( "726972b.ic24", 0x0000, 0x0200, BAD_DUMP CRC(2487d4ca) SHA1(e883a2e9540c31abba3d7f3bc23a48941f655ea0) )
+	ROM_LOAD( "726972b.ic24", 0x000, 0x200, CRC(2487d4ca) SHA1(e883a2e9540c31abba3d7f3bc23a48941f655ea0) )
 
 	ROM_REGION( 0x1000, "chargen", 0 ) // character generator
 	ROM_LOAD( "6807b.ic61", 0x0000, 0x1000, CRC(32b36220) SHA1(8fe7a181badea3f7e656dfaea21ee9e4c9baf0f1) )

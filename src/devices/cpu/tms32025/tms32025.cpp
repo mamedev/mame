@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Tony La Porta
 	/**************************************************************************\
-	*                Texas Instruments TMS320x25 DSP Emulator                  *
+	*                Texas Instruments TMS320x2x DSP Emulator                  *
 	*                                                                          *
 	*                 Copyright Tony La Porta                                  *
 	*                      Written for the MAME project.                       *
 	*                                                                          *
 	*                                                                          *
-	*  Three versions of the chip are available, and they are:                 *
+	*  Four versions of the chip are available, and they are:                  *
+	*  TMS32020    Internal ROM does not exist                                 *
 	*  TMS320C25   Internal ROM one time programmed at TI                      *
 	*  TMS320E25   Internal ROM programmable as a normal EPROM                 *
 	*  TMS320P25   Internal ROM programmable once as a normal EPROM only       *
@@ -50,6 +51,9 @@
  To fix, or currently lacking from this emulator are:
 
  Fix the levels for S_IN and S_OUT - use assert/release line
+
+ #  Architecture difference between TMS32020 and TMS320C25/6 is only
+    partially implemented.
 
  #  Support for the built in Timer/Counter Page 91
     When idling, Counter must still be activly counting down. When counter
@@ -191,30 +195,31 @@ Table 3-2.  TMS32025/26 Memory Blocks
 
    use set_mp_mc in the device configuration to set the pin for internal ROM mode
 */
+DEFINE_DEVICE_TYPE(TMS32020, tms32020_device, "tms32020", "Texas Instruments TMS32020")
 DEFINE_DEVICE_TYPE(TMS32025, tms32025_device, "tms32025", "Texas Instruments TMS32025")
 DEFINE_DEVICE_TYPE(TMS32026, tms32026_device, "tms32026", "Texas Instruments TMS32026")
 
-void tms32025_device::tms32025_data(address_map &map)
+void tms3202x_device::tms3202x_data(address_map &map)
 {
-	map(0x0000, 0x0000).rw(FUNC(tms32025_device::drr_r), FUNC(tms32025_device::drr_w));
-	map(0x0001, 0x0001).rw(FUNC(tms32025_device::dxr_r), FUNC(tms32025_device::dxr_w));
-	map(0x0002, 0x0002).rw(FUNC(tms32025_device::tim_r), FUNC(tms32025_device::tim_w));
-	map(0x0003, 0x0003).rw(FUNC(tms32025_device::prd_r), FUNC(tms32025_device::prd_w));
-	map(0x0004, 0x0004).rw(FUNC(tms32025_device::imr_r), FUNC(tms32025_device::imr_w));
-	map(0x0005, 0x0005).rw(FUNC(tms32025_device::greg_r), FUNC(tms32025_device::greg_w));
+	map(0x0000, 0x0000).rw(FUNC(tms3202x_device::drr_r), FUNC(tms3202x_device::drr_w));
+	map(0x0001, 0x0001).rw(FUNC(tms3202x_device::dxr_r), FUNC(tms3202x_device::dxr_w));
+	map(0x0002, 0x0002).rw(FUNC(tms3202x_device::tim_r), FUNC(tms3202x_device::tim_w));
+	map(0x0003, 0x0003).rw(FUNC(tms3202x_device::prd_r), FUNC(tms3202x_device::prd_w));
+	map(0x0004, 0x0004).rw(FUNC(tms3202x_device::imr_r), FUNC(tms3202x_device::imr_w));
+	map(0x0005, 0x0005).rw(FUNC(tms3202x_device::greg_r), FUNC(tms3202x_device::greg_w));
 	map(0x0060, 0x007f).ram().share("b2");
 	map(0x0200, 0x02ff).ram().share("b0");
 	map(0x0300, 0x03ff).ram().share("b1");
 }
 
-void tms32025_device::tms32026_data(address_map &map)
+void tms3202x_device::tms32026_data(address_map &map)
 {
-	map(0x0000, 0x0000).rw(FUNC(tms32025_device::drr_r), FUNC(tms32025_device::drr_w));
-	map(0x0001, 0x0001).rw(FUNC(tms32025_device::dxr_r), FUNC(tms32025_device::dxr_w));
-	map(0x0002, 0x0002).rw(FUNC(tms32025_device::tim_r), FUNC(tms32025_device::tim_w));
-	map(0x0003, 0x0003).rw(FUNC(tms32025_device::prd_r), FUNC(tms32025_device::prd_w));
-	map(0x0004, 0x0004).rw(FUNC(tms32025_device::imr_r), FUNC(tms32025_device::imr_w));
-	map(0x0005, 0x0005).rw(FUNC(tms32025_device::greg_r), FUNC(tms32025_device::greg_w));
+	map(0x0000, 0x0000).rw(FUNC(tms3202x_device::drr_r), FUNC(tms3202x_device::drr_w));
+	map(0x0001, 0x0001).rw(FUNC(tms3202x_device::dxr_r), FUNC(tms3202x_device::dxr_w));
+	map(0x0002, 0x0002).rw(FUNC(tms3202x_device::tim_r), FUNC(tms3202x_device::tim_w));
+	map(0x0003, 0x0003).rw(FUNC(tms3202x_device::prd_r), FUNC(tms3202x_device::prd_w));
+	map(0x0004, 0x0004).rw(FUNC(tms3202x_device::imr_r), FUNC(tms3202x_device::imr_w));
+	map(0x0005, 0x0005).rw(FUNC(tms3202x_device::greg_r), FUNC(tms3202x_device::greg_w));
 	map(0x0060, 0x007f).ram().share("b2");
 	map(0x0200, 0x03ff).ram().share("b0");
 	map(0x0400, 0x05ff).ram().share("b1");
@@ -223,7 +228,7 @@ void tms32025_device::tms32026_data(address_map &map)
 
 #if 0
 // Instead of using the map here we install the ROM depending on the MP/MC pin set in the config
-void tms32025_device::tms32025_program(address_map &map)
+void tms3202x_device::tms32025_program(address_map &map)
 {
 	map(0x0000, 0x0fff).rom().region("internal", 0); // 4K Words Internal ROM / EPROM
 }
@@ -240,7 +245,15 @@ const tiny_rom_entry *tms32025_device::device_rom_region() const
 }
 
 
-tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap)
+tms3202x_device::tms3202x_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		unsigned stack_depth,
+		address_map_constructor prgmap,
+		address_map_constructor datamap)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1, prgmap)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1, datamap)
@@ -255,20 +268,31 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 	, m_xf_out(*this)
 	, m_dr_in(*this, 0xffff)
 	, m_dx_out(*this)
+	, m_stack_limit(stack_depth - 1)
+{
+}
+
+tms32020_device::tms32020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms3202x_device(mconfig, TMS32020, tag, owner, clock, 4, address_map_constructor(), address_map_constructor(FUNC(tms3202x_device::tms3202x_data), this))
+{
+	m_fixed_STR1 = 0x0180;
+}
+
+tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap)
+	: tms3202x_device(mconfig, type, tag, owner, clock, 8, prgmap, datamap)
 	, m_mp_mc(true)
 {
 }
 
-tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32025_device(mconfig, TMS32025, tag, owner, clock, address_map_constructor(), address_map_constructor(FUNC(tms32025_device::tms32025_data), this))
+tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: tms32025_device(mconfig, type, tag, owner, clock, address_map_constructor(), address_map_constructor(FUNC(tms3202x_device::tms3202x_data), this))
 {
 	m_fixed_STR1 = 0x0180;
 }
 
-tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: tms32025_device(mconfig, type, tag, owner, clock, address_map_constructor(), address_map_constructor(FUNC(tms32025_device::tms32025_data), this))
+tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms32025_device(mconfig, TMS32025, tag, owner, clock)
 {
-	m_fixed_STR1 = 0x0180;
 }
 
 tms32026_device::tms32026_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -277,7 +301,7 @@ tms32026_device::tms32026_device(const machine_config &mconfig, const char *tag,
 	m_fixed_STR1 = 0x0100;
 }
 
-device_memory_interface::space_config_vector tms32025_device::memory_space_config() const
+device_memory_interface::space_config_vector tms3202x_device::memory_space_config() const
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
@@ -286,27 +310,27 @@ device_memory_interface::space_config_vector tms32025_device::memory_space_confi
 	};
 }
 
-std::unique_ptr<util::disasm_interface> tms32025_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms3202x_device::create_disassembler()
 {
 	return std::make_unique<tms32025_disassembler>();
 }
 
-uint16_t tms32025_device::drr_r()
+uint16_t tms3202x_device::drr_r()
 {
 	return m_drr;
 }
 
-void tms32025_device::drr_w(uint16_t data)
+void tms3202x_device::drr_w(uint16_t data)
 {
 	m_drr = data;
 }
 
-uint16_t tms32025_device::dxr_r()
+uint16_t tms3202x_device::dxr_r()
 {
 	return m_dxr;
 }
 
-void tms32025_device::dxr_w(uint16_t data)
+void tms3202x_device::dxr_w(uint16_t data)
 {
 	m_dxr = data;
 
@@ -318,65 +342,65 @@ void tms32025_device::dxr_w(uint16_t data)
 	}
 }
 
-uint16_t tms32025_device::tim_r()
+uint16_t tms3202x_device::tim_r()
 {
 	return m_tim;
 }
 
-void tms32025_device::tim_w(uint16_t data)
+void tms3202x_device::tim_w(uint16_t data)
 {
 	m_tim = data;
 }
 
-uint16_t tms32025_device::prd_r()
+uint16_t tms3202x_device::prd_r()
 {
 	return m_prd;
 }
 
-void tms32025_device::prd_w(uint16_t data)
+void tms3202x_device::prd_w(uint16_t data)
 {
 	m_prd = data;
 }
 
-uint16_t tms32025_device::imr_r()
+uint16_t tms3202x_device::imr_r()
 {
 	return m_imr;
 }
 
-void tms32025_device::imr_w(uint16_t data)
+void tms3202x_device::imr_w(uint16_t data)
 {
 	m_imr = data;
 }
 
-uint16_t tms32025_device::greg_r()
+uint16_t tms3202x_device::greg_r()
 {
 	return m_greg;
 }
 
-void tms32025_device::greg_w(uint16_t data)
+void tms3202x_device::greg_w(uint16_t data)
 {
 	m_greg = data;
 }
 
 
-void tms32025_device::CLR0(uint16_t flag) { m_STR0 &= ~flag; m_STR0 |= 0x0400; }
-void tms32025_device::SET0(uint16_t flag) { m_STR0 |=  flag; m_STR0 |= 0x0400; }
-void tms32025_device::CLR1(uint16_t flag) { m_STR1 &= ~flag; m_STR1 |= m_fixed_STR1; }
-void tms32025_device::SET1(uint16_t flag) { m_STR1 |=  flag; m_STR1 |= m_fixed_STR1; }
+inline void tms3202x_device::CLR0(uint16_t flag) { m_STR0 &= ~flag; m_STR0 |= 0x0400; }
+inline void tms3202x_device::SET0(uint16_t flag) { m_STR0 |=  flag; m_STR0 |= 0x0400; }
+inline void tms3202x_device::CLR1(uint16_t flag) { m_STR1 &= ~flag; m_STR1 |= m_fixed_STR1; }
+inline void tms3202x_device::SET1(uint16_t flag) { m_STR1 |=  flag; m_STR1 |= m_fixed_STR1; }
 
-void tms32025_device::MODIFY_DP(int data)
+inline void tms3202x_device::MODIFY_DP(int data)
 {
 	m_STR0 &= ~DP_REG;
 	m_STR0 |= (data & DP_REG);
 	m_STR0 |= 0x0400;
 }
-void tms32025_device::MODIFY_PM(int data)
+inline void tms3202x_device::MODIFY_PM(int data)
 {
 	m_STR1 &= ~PM_REG;
 	m_STR1 |= (data & PM_REG);
 	m_STR1 |= m_fixed_STR1;
 }
-void tms32025_device::MODIFY_ARP(int data)
+inline void tms3202x_device::MODIFY_ARP(int data)
 {
 	m_STR1 &= ~ARB_REG;
 	m_STR1 |= (m_STR0 & ARP_REG);
@@ -386,23 +410,23 @@ void tms32025_device::MODIFY_ARP(int data)
 	m_STR0 |= 0x0400;
 }
 
-uint16_t tms32025_device::reverse_carry_add(uint16_t arg0, uint16_t arg1 )
+uint16_t tms3202x_device::reverse_carry_add(uint16_t arg0, uint16_t arg1 )
 {
 	uint16_t result = 0;
 	int carry = 0;
 	int count;
-	for( count=0; count<16; count++ )
+	for (count = 0; count < 16; count++)
 	{
-		int sum = (arg0>>15)+(arg1>>15)+carry;
-		result = (result<<1)|(sum&1);
-		carry = sum>>1;
-		arg0<<=1;
-		arg1<<=1;
+		int sum = (arg0 >> 15) + (arg1 >> 15) + carry;
+		result = (result << 1) | (sum & 1);
+		carry = sum >> 1;
+		arg0 <<= 1;
+		arg1 <<= 1;
 	}
 	return result;
 }
 
-void tms32025_device::MODIFY_AR_ARP()
+inline void tms3202x_device::MODIFY_AR_ARP()
 { /* modify address register referenced by ARP */
 	switch (m_opcode.b.l & 0x70)        /* Cases ordered by predicted useage */
 	{
@@ -437,7 +461,7 @@ void tms32025_device::MODIFY_AR_ARP()
 			break;
 	}
 
-	if( !m_mHackIgnoreARP )
+	if (!m_mHackIgnoreARP)
 	{
 		if (m_opcode.b.l & 8)
 		{ /* bit 3 determines if new value is loaded into ARP */
@@ -446,76 +470,71 @@ void tms32025_device::MODIFY_AR_ARP()
 	}
 }
 
-void tms32025_device::CALCULATE_ADD_CARRY()
+inline void tms3202x_device::CALCULATE_ADD_CARRY()
 {
-	if ( (uint32_t)(m_oldacc.d) > (uint32_t)(m_ACC.d) ) {
+	if (uint32_t(m_oldacc.d) > uint32_t(m_ACC.d))
+	{
 		SET1(C_FLAG);
 	}
-	else {
+	else
+	{
 		CLR1(C_FLAG);
 	}
 }
 
-void tms32025_device::CALCULATE_SUB_CARRY()
+inline void tms3202x_device::CALCULATE_SUB_CARRY()
 {
-	if ( (uint32_t)(m_oldacc.d) < (uint32_t)(m_ACC.d) ) {
+	if (uint32_t(m_oldacc.d) < uint32_t(m_ACC.d))
+	{
 		CLR1(C_FLAG);
 	}
-	else {
+	else
+	{
 		SET1(C_FLAG);
 	}
 }
 
-void tms32025_device::CALCULATE_ADD_OVERFLOW(int32_t addval)
+inline void tms3202x_device::CALCULATE_ADD_OVERFLOW(int32_t addval)
 {
-	if ((int32_t)((m_ACC.d ^ addval) & (m_oldacc.d ^ m_ACC.d)) < 0)
+	if (int32_t((m_ACC.d ^ addval) & (m_oldacc.d ^ m_ACC.d)) < 0)
 	{
 		SET0(OV_FLAG);
 		if (OVM)
 		{
-			m_ACC.d = ((int32_t)m_oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
+			m_ACC.d = (int32_t(m_oldacc.d) < 0) ? 0x80000000 : 0x7fffffff;
 		}
 	}
 }
-void tms32025_device::CALCULATE_SUB_OVERFLOW(int32_t subval)
+
+inline void tms3202x_device::CALCULATE_SUB_OVERFLOW(int32_t subval)
 {
 	if ((int32_t)((m_oldacc.d ^ subval) & (m_oldacc.d ^ m_ACC.d)) < 0)
 	{
 		SET0(OV_FLAG);
 		if (OVM)
 		{
-			m_ACC.d = ((int32_t)m_oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
+			m_ACC.d = (int32_t(m_oldacc.d) < 0) ? 0x80000000 : 0x7fffffff;
 		}
 	}
 }
 
-uint16_t tms32025_device::POP_STACK()
+inline uint16_t tms3202x_device::POP_STACK()
 {
-	uint16_t data = m_STACK[7];
-	m_STACK[7] = m_STACK[6];
-	m_STACK[6] = m_STACK[5];
-	m_STACK[5] = m_STACK[4];
-	m_STACK[4] = m_STACK[3];
-	m_STACK[3] = m_STACK[2];
-	m_STACK[2] = m_STACK[1];
-	m_STACK[1] = m_STACK[0];
+	uint16_t const data = m_STACK[m_stack_limit];
+	for (unsigned i = m_stack_limit; 0 < i; --i)
+		m_STACK[i] = m_STACK[i - 1];
 	return data;
 }
-void tms32025_device::PUSH_STACK(uint16_t data)
+inline void tms3202x_device::PUSH_STACK(uint16_t data)
 {
-	m_STACK[0] = m_STACK[1];
-	m_STACK[1] = m_STACK[2];
-	m_STACK[2] = m_STACK[3];
-	m_STACK[3] = m_STACK[4];
-	m_STACK[4] = m_STACK[5];
-	m_STACK[5] = m_STACK[6];
-	m_STACK[6] = m_STACK[7];
-	m_STACK[7] = data;
+	for (unsigned i = 0; m_stack_limit > i; ++i)
+		m_STACK[i] = m_STACK[i + 1];
+	m_STACK[m_stack_limit] = data;
 }
 
-void tms32025_device::SHIFT_Preg_TO_ALU()
+inline void tms3202x_device::SHIFT_Preg_TO_ALU()
 {
-	switch(PM)      /* PM (in STR1) is the shift mode for Preg */
+	switch (PM)      /* PM (in STR1) is the shift mode for Preg */
 	{
 		case 0:     m_ALU.d = m_Preg.d; break;
 		case 1:     m_ALU.d = (m_Preg.d << 1); break;
@@ -525,7 +544,7 @@ void tms32025_device::SHIFT_Preg_TO_ALU()
 	}
 }
 
-void tms32025_device::GETDATA(int shift,int signext)
+inline void tms3202x_device::GETDATA(int shift,int signext)
 {
 	if (m_opcode.b.l & 0x80)
 	{ /* indirect memory access */
@@ -553,23 +572,25 @@ void tms32025_device::GETDATA(int shift,int signext)
 	if (m_opcode.b.l & 0x80) MODIFY_AR_ARP();
 }
 
-void tms32025_device::PUTDATA(uint16_t data)
+inline void tms3202x_device::PUTDATA(uint16_t data)
 {
-	if (m_opcode.b.l & 0x80) {
+	if (m_opcode.b.l & 0x80)
+	{
 		if (m_memaccess >= 0x800) m_external_mem_access = 1;    /* Pause if hold pin is active */
 		else m_external_mem_access = 0;
 
 		m_data.write_word(IND, data);
 		MODIFY_AR_ARP();
 	}
-	else {
+	else
+	{
 		if (m_memaccess >= 0x800) m_external_mem_access = 1;    /* Pause if hold pin is active */
 		else m_external_mem_access = 0;
 
 		m_data.write_word(DMA, data);
 	}
 }
-void tms32025_device::PUTDATA_SST(uint16_t data)
+inline void tms3202x_device::PUTDATA_SST(uint16_t data)
 {
 	if (m_opcode.b.l & 0x80) m_memaccess = IND;
 	else m_memaccess = DMApg0;
@@ -592,15 +613,15 @@ void tms32025_device::PUTDATA_SST(uint16_t data)
 
 /* The following functions are here to fill the void for the */
 /* opcode call functions. These functions are never actually called. */
-void tms32025_device::opcodes_CE() { fatalerror("Should never get here!\n"); }
-void tms32025_device::opcodes_Dx() { fatalerror("Should never get here!\n"); }
+void tms3202x_device::opcodes_CE() { fatalerror("Should never get here!\n"); }
+void tms3202x_device::opcodes_Dx() { fatalerror("Should never get here!\n"); }
 
-void tms32025_device::illegal()
+void tms3202x_device::illegal()
 {
-	logerror("TMS32025:  PC = %04x,  Illegal opcode = %04x\n", (m_PC-1), m_opcode.w.l);
+	logerror("TMS3202x:  PC = %04x,  Illegal opcode = %04x\n", (m_PC-1), m_opcode.w.l);
 }
 
-void tms32025_device::abst()
+void tms3202x_device::abst()
 {
 	if ( (int32_t)(m_ACC.d) < 0 ) {
 		m_ACC.d = -m_ACC.d;
@@ -611,7 +632,7 @@ void tms32025_device::abst()
 	}
 	CLR1(C_FLAG);
 }
-void tms32025_device::add()
+void tms3202x_device::add()
 {
 	m_oldacc.d = m_ACC.d;
 	GETDATA((m_opcode.b.h & 0xf), SXM);
@@ -619,7 +640,7 @@ void tms32025_device::add()
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 	CALCULATE_ADD_CARRY();
 }
-void tms32025_device::addc()
+void tms3202x_device::addc()
 {
 	m_oldacc.d = m_ACC.d;
 	GETDATA(0, 0);
@@ -629,7 +650,7 @@ void tms32025_device::addc()
 	if (m_ACC.d == m_oldacc.d) {}   /* edge case, carry remains same */
 	else CALCULATE_ADD_CARRY();
 }
-void tms32025_device::addh()
+void tms3202x_device::addh()
 {
 	m_oldacc.d = m_ACC.d;
 	GETDATA(0, 0);
@@ -642,7 +663,7 @@ void tms32025_device::addh()
 		if (OVM) m_ACC.w.h = ((int16_t)m_oldacc.w.h < 0) ? 0x8000 : 0x7fff;
 	}
 }
-void tms32025_device::addk()
+void tms3202x_device::addk()
 {
 	m_oldacc.d = m_ACC.d;
 	m_ALU.d = (uint8_t)m_opcode.b.l;
@@ -650,7 +671,7 @@ void tms32025_device::addk()
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 	CALCULATE_ADD_CARRY();
 }
-void tms32025_device::adds()
+void tms3202x_device::adds()
 {
 	m_oldacc.d = m_ACC.d;
 	GETDATA(0, 0);
@@ -658,7 +679,7 @@ void tms32025_device::adds()
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 	CALCULATE_ADD_CARRY();
 }
-void tms32025_device::addt()
+void tms3202x_device::addt()
 {
 	m_oldacc.d = m_ACC.d;
 	GETDATA((m_Treg & 0xf), SXM);
@@ -666,7 +687,7 @@ void tms32025_device::addt()
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 	CALCULATE_ADD_CARRY();
 }
-void tms32025_device::adlk()
+void tms3202x_device::adlk()
 {
 	m_oldacc.d = m_ACC.d;
 	if (SXM) m_ALU.d =  (int16_t)m_cache.read_word(m_PC);
@@ -677,16 +698,16 @@ void tms32025_device::adlk()
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 	CALCULATE_ADD_CARRY();
 }
-void tms32025_device::adrk()
+void tms3202x_device::adrk()
 {
 	m_AR[ARP] += m_opcode.b.l;
 }
-void tms32025_device::and_()
+void tms3202x_device::and_()
 {
 	GETDATA(0, 0);
 	m_ACC.d &= m_ALU.d;
 }
-void tms32025_device::andk()
+void tms3202x_device::andk()
 {
 	m_oldacc.d = m_ACC.d;
 	m_ALU.d = (uint16_t)m_cache.read_word(m_PC);
@@ -694,7 +715,7 @@ void tms32025_device::andk()
 	m_ALU.d <<= (m_opcode.b.h & 0xf);
 	m_ACC.d &= m_ALU.d;
 }
-void tms32025_device::apac()
+void tms3202x_device::apac()
 {
 	m_oldacc.d = m_ACC.d;
 	SHIFT_Preg_TO_ALU();
@@ -702,76 +723,76 @@ void tms32025_device::apac()
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 	CALCULATE_ADD_CARRY();
 }
-void tms32025_device::br()
+void tms3202x_device::br()
 {
 	m_PC = m_cache.read_word(m_PC);
 	MODIFY_AR_ARP();
 }
-void tms32025_device::bacc()
+void tms3202x_device::bacc()
 {
 	m_PC = m_ACC.w.l;
 }
-void tms32025_device::banz()
+void tms3202x_device::banz()
 {
 	if (m_AR[ARP]) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
-void tms32025_device::bbnz()
+void tms3202x_device::bbnz()
 {
 	if (TC) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
-void tms32025_device::bbz()
+void tms3202x_device::bbz()
 {
 	if (TC == 0) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
-void tms32025_device::bc()
+void tms3202x_device::bc()
 {
 	if (CARRY) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
-void tms32025_device::bgez()
+void tms3202x_device::bgez()
 {
 	if ( (int32_t)(m_ACC.d) >= 0 ) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
-void tms32025_device::bgz()
+void tms3202x_device::bgz()
 {
 	if ( (int32_t)(m_ACC.d) > 0 ) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
-void tms32025_device::bioz()
+void tms3202x_device::bioz()
 {
 	if (m_bio_in() != CLEAR_LINE) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
-void tms32025_device::bit()
+void tms3202x_device::bit()
 {
 	GETDATA(0, 0);
 	if (m_ALU.d & (0x8000 >> (m_opcode.b.h & 0xf))) SET1(TC_FLAG);
 	else CLR1(TC_FLAG);
 }
-void tms32025_device::bitt()
+void tms3202x_device::bitt()
 {
 	GETDATA(0, 0);
 	if (m_ALU.d & (0x8000 >> (m_Treg & 0xf))) SET1(TC_FLAG);
 	else CLR1(TC_FLAG);
 }
-void tms32025_device::blez()
+void tms3202x_device::blez()
 {
 	if ( (int32_t)(m_ACC.d) <= 0 ) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
-void tms32025_device::blkd()
+void tms3202x_device::blkd()
 {                                       /** Fix cycle timing **/
 	if (m_init_load_addr) {
 		m_PFC = m_cache.read_word(m_PC);
@@ -782,7 +803,7 @@ void tms32025_device::blkd()
 	m_PFC++;
 	m_tms32025_dec_cycles += (1*CLK);
 }
-void tms32025_device::blkp()
+void tms3202x_device::blkp()
 {                                       /** Fix cycle timing **/
 	if (m_init_load_addr) {
 		m_PFC = m_cache.read_word(m_PC);
@@ -793,19 +814,19 @@ void tms32025_device::blkp()
 	m_PFC++;
 	m_tms32025_dec_cycles += (2*CLK);
 }
-void tms32025_device::blz()
+void tms3202x_device::blz()
 {
 	if ( (int32_t)(m_ACC.d) < 0 ) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
-void tms32025_device::bnc()
+void tms3202x_device::bnc()
 {
 	if (CARRY == 0) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
-void tms32025_device::bnv()
+void tms3202x_device::bnv()
 {
 	if (OV == 0) m_PC = m_cache.read_word(m_PC);
 	else {
@@ -814,13 +835,13 @@ void tms32025_device::bnv()
 	}
 	MODIFY_AR_ARP();
 }
-void tms32025_device::bnz()
+void tms3202x_device::bnz()
 {
 	if (m_ACC.d != 0) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
-void tms32025_device::bv()
+void tms3202x_device::bv()
 {
 	if (OV) {
 		m_PC = m_cache.read_word(m_PC);
@@ -829,29 +850,29 @@ void tms32025_device::bv()
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
-void tms32025_device::bz()
+void tms3202x_device::bz()
 {
 	if (m_ACC.d == 0) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
-void tms32025_device::cala()
+void tms3202x_device::cala()
 {
 	PUSH_STACK(m_PC);
 	m_PC = m_ACC.w.l;
 }
-void tms32025_device::call()
+void tms3202x_device::call()
 {
 	m_PC++;
 	PUSH_STACK(m_PC);
 	m_PC = m_cache.read_word(m_PC - 1);
 	MODIFY_AR_ARP();
 }
-void tms32025_device::cmpl()
+void tms3202x_device::cmpl()
 {
 	m_ACC.d = (~m_ACC.d);
 }
-void tms32025_device::cmpr()
+void tms3202x_device::cmpr()
 {
 	switch (m_opcode.b.l & 3)
 	{
@@ -873,7 +894,7 @@ void tms32025_device::cmpr()
 			break;
 	}
 }
-void tms32025_device::cnfd()  /** next two fetches need to use previous CNF value ! **/
+void tms3202x_device::cnfd()  /** next two fetches need to use previous CNF value ! **/
 {
 	if(m_STR1 & CNF0_REG) {
 		space(AS_PROGRAM).unmap_readwrite(0xff00, 0xffff);
@@ -881,7 +902,7 @@ void tms32025_device::cnfd()  /** next two fetches need to use previous CNF valu
 		CLR1(CNF0_REG);
 	}
 }
-void tms32025_device::cnfp()  /** next two fetches need to use previous CNF value ! **/
+void tms3202x_device::cnfp()  /** next two fetches need to use previous CNF value ! **/
 {
 	if(!(m_STR1 & CNF0_REG)) {
 		space(AS_PROGRAM).install_ram(0xff00, 0xffff, m_b0);
@@ -890,7 +911,7 @@ void tms32025_device::cnfp()  /** next two fetches need to use previous CNF valu
 	}
 }
 
-void tms32025_device::conf()
+void tms3202x_device::conf()
 {
 	// Disabled on tms32025
 }
@@ -944,49 +965,49 @@ void tms32026_device::conf()  /** Need to reconfigure the memory blocks */
 		space(AS_DATA).unmap_readwrite(0x0600, 0x07ff);
 	}
 }
-void tms32025_device::dint()
+void tms3202x_device::dint()
 {
 	SET0(INTM_FLAG);
 }
-void tms32025_device::dmov()  /** Careful with how memory is configured !! */
+void tms3202x_device::dmov()  /** Careful with how memory is configured !! */
 {
 	GETDATA(0, 0);
 	m_data.write_word(m_memaccess + 1, m_ALU.w.l);
 }
-void tms32025_device::eint()
+void tms3202x_device::eint()
 {
 	CLR0(INTM_FLAG);
 }
-void tms32025_device::fort()
+void tms3202x_device::fort()
 {
 	if (m_opcode.b.l & 1) SET1(FO_FLAG);
 	else CLR1(FO_FLAG);
 }
-void tms32025_device::idle()
+void tms3202x_device::idle()
 {
 	CLR0(INTM_FLAG);
 	m_idle = 1;
 }
-void tms32025_device::in()
+void tms3202x_device::in()
 {
 	m_ALU.w.l = m_io.read_word(m_opcode.b.h & 0xf);
 	PUTDATA(m_ALU.w.l);
 }
-void tms32025_device::lac()
+void tms3202x_device::lac()
 {
 	GETDATA((m_opcode.b.h & 0xf), SXM);
 	m_ACC.d = m_ALU.d;
 }
-void tms32025_device::lack()      /* ZAC is a subset of this instruction */
+void tms3202x_device::lack()      /* ZAC is a subset of this instruction */
 {
 	m_ACC.d = (uint8_t)m_opcode.b.l;
 }
-void tms32025_device::lact()
+void tms3202x_device::lact()
 {
 	GETDATA((m_Treg & 0xf), SXM);
 	m_ACC.d = m_ALU.d;
 }
-void tms32025_device::lalk()
+void tms3202x_device::lalk()
 {
 	if (SXM) m_ALU.d =  (int16_t)m_cache.read_word(m_PC);
 	else     m_ALU.d = (uint16_t)m_cache.read_word(m_PC);
@@ -994,43 +1015,43 @@ void tms32025_device::lalk()
 	m_ALU.d <<= (m_opcode.b.h & 0xf);
 	m_ACC.d = m_ALU.d;
 }
-void tms32025_device::lar_ar0()   { GETDATA(0, 0); m_AR[0] = m_ALU.w.l; }
-void tms32025_device::lar_ar1()   { GETDATA(0, 0); m_AR[1] = m_ALU.w.l; }
-void tms32025_device::lar_ar2()   { GETDATA(0, 0); m_AR[2] = m_ALU.w.l; }
-void tms32025_device::lar_ar3()   { GETDATA(0, 0); m_AR[3] = m_ALU.w.l; }
-void tms32025_device::lar_ar4()   { GETDATA(0, 0); m_AR[4] = m_ALU.w.l; }
-void tms32025_device::lar_ar5()   { GETDATA(0, 0); m_AR[5] = m_ALU.w.l; }
-void tms32025_device::lar_ar6()   { GETDATA(0, 0); m_AR[6] = m_ALU.w.l; }
-void tms32025_device::lar_ar7()   { GETDATA(0, 0); m_AR[7] = m_ALU.w.l; }
-void tms32025_device::lark_ar0()  { m_AR[0] = m_opcode.b.l; }
-void tms32025_device::lark_ar1()  { m_AR[1] = m_opcode.b.l; }
-void tms32025_device::lark_ar2()  { m_AR[2] = m_opcode.b.l; }
-void tms32025_device::lark_ar3()  { m_AR[3] = m_opcode.b.l; }
-void tms32025_device::lark_ar4()  { m_AR[4] = m_opcode.b.l; }
-void tms32025_device::lark_ar5()  { m_AR[5] = m_opcode.b.l; }
-void tms32025_device::lark_ar6()  { m_AR[6] = m_opcode.b.l; }
-void tms32025_device::lark_ar7()  { m_AR[7] = m_opcode.b.l; }
-void tms32025_device::ldp()
+void tms3202x_device::lar_ar0()   { GETDATA(0, 0); m_AR[0] = m_ALU.w.l; }
+void tms3202x_device::lar_ar1()   { GETDATA(0, 0); m_AR[1] = m_ALU.w.l; }
+void tms3202x_device::lar_ar2()   { GETDATA(0, 0); m_AR[2] = m_ALU.w.l; }
+void tms3202x_device::lar_ar3()   { GETDATA(0, 0); m_AR[3] = m_ALU.w.l; }
+void tms3202x_device::lar_ar4()   { GETDATA(0, 0); m_AR[4] = m_ALU.w.l; }
+void tms3202x_device::lar_ar5()   { GETDATA(0, 0); m_AR[5] = m_ALU.w.l; }
+void tms3202x_device::lar_ar6()   { GETDATA(0, 0); m_AR[6] = m_ALU.w.l; }
+void tms3202x_device::lar_ar7()   { GETDATA(0, 0); m_AR[7] = m_ALU.w.l; }
+void tms3202x_device::lark_ar0()  { m_AR[0] = m_opcode.b.l; }
+void tms3202x_device::lark_ar1()  { m_AR[1] = m_opcode.b.l; }
+void tms3202x_device::lark_ar2()  { m_AR[2] = m_opcode.b.l; }
+void tms3202x_device::lark_ar3()  { m_AR[3] = m_opcode.b.l; }
+void tms3202x_device::lark_ar4()  { m_AR[4] = m_opcode.b.l; }
+void tms3202x_device::lark_ar5()  { m_AR[5] = m_opcode.b.l; }
+void tms3202x_device::lark_ar6()  { m_AR[6] = m_opcode.b.l; }
+void tms3202x_device::lark_ar7()  { m_AR[7] = m_opcode.b.l; }
+void tms3202x_device::ldp()
 {
 	GETDATA(0, 0);
 	MODIFY_DP(m_ALU.d & 0x1ff);
 }
-void tms32025_device::ldpk()
+void tms3202x_device::ldpk()
 {
 	MODIFY_DP(m_opcode.w.l & 0x1ff);
 }
-void tms32025_device::lph()
+void tms3202x_device::lph()
 {
 	GETDATA(0, 0);
 	m_Preg.w.h = m_ALU.w.l;
 }
-void tms32025_device::lrlk()
+void tms3202x_device::lrlk()
 {
 	m_ALU.d = (uint16_t)m_cache.read_word(m_PC);
 	m_PC++;
 	m_AR[m_opcode.b.h & 7] = m_ALU.w.l;
 }
-void tms32025_device::lst()
+void tms3202x_device::lst()
 {
 	m_mHackIgnoreARP = 1;
 	GETDATA(0, 0);
@@ -1041,7 +1062,7 @@ void tms32025_device::lst()
 	m_STR0 |= m_ALU.w.l;        /* Must not affect INTM */
 	m_STR0 |= 0x0400;
 }
-void tms32025_device::lst1()
+void tms3202x_device::lst1()
 {
 	m_mHackIgnoreARP = 1;
 	GETDATA(0, 0);
@@ -1051,12 +1072,12 @@ void tms32025_device::lst1()
 	m_STR0 &= (~ARP_REG);       /* ARB also gets copied to ARP */
 	m_STR0 |= (m_STR1 & ARB_REG);
 }
-void tms32025_device::lt()
+void tms3202x_device::lt()
 {
 	GETDATA(0, 0);
 	m_Treg = m_ALU.w.l;
 }
-void tms32025_device::lta()
+void tms3202x_device::lta()
 {
 	m_oldacc.d = m_ACC.d;
 	GETDATA(0, 0);
@@ -1066,7 +1087,7 @@ void tms32025_device::lta()
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 	CALCULATE_ADD_CARRY();
 }
-void tms32025_device::ltd()   /** Careful with how memory is configured !! */
+void tms3202x_device::ltd()   /** Careful with how memory is configured !! */
 {
 	m_oldacc.d = m_ACC.d;
 	GETDATA(0, 0);
@@ -1077,7 +1098,7 @@ void tms32025_device::ltd()   /** Careful with how memory is configured !! */
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 	CALCULATE_ADD_CARRY();
 }
-void tms32025_device::ltp()
+void tms3202x_device::ltp()
 {
 	m_oldacc.d = m_ACC.d;
 	GETDATA(0, 0);
@@ -1085,7 +1106,7 @@ void tms32025_device::ltp()
 	SHIFT_Preg_TO_ALU();
 	m_ACC.d = m_ALU.d;
 }
-void tms32025_device::lts()
+void tms3202x_device::lts()
 {
 	m_oldacc.d = m_ACC.d;
 	GETDATA(0, 0);
@@ -1095,7 +1116,7 @@ void tms32025_device::lts()
 	CALCULATE_SUB_OVERFLOW(m_ALU.d);
 	CALCULATE_SUB_CARRY();
 }
-void tms32025_device::mac()           /** RAM blocks B0,B1,B2 may be important ! */
+void tms3202x_device::mac()           /** RAM blocks B0,B1,B2 may be important ! */
 {                               /** Fix cycle timing **/
 	m_oldacc.d = m_ACC.d;
 	if (m_init_load_addr) {
@@ -1112,7 +1133,7 @@ void tms32025_device::mac()           /** RAM blocks B0,B1,B2 may be important !
 	m_PFC++;
 	m_tms32025_dec_cycles += (2*CLK);
 }
-void tms32025_device::macd()          /** RAM blocks B0,B1,B2 may be important ! */
+void tms3202x_device::macd()          /** RAM blocks B0,B1,B2 may be important ! */
 {                                                   /** Fix cycle timing **/
 	m_oldacc.d = m_ACC.d;
 	if (m_init_load_addr) {
@@ -1132,16 +1153,16 @@ void tms32025_device::macd()          /** RAM blocks B0,B1,B2 may be important !
 	m_PFC++;
 	m_tms32025_dec_cycles += (2*CLK);
 }
-void tms32025_device::mar()       /* LARP and NOP are a subset of this instruction */
+void tms3202x_device::mar()       /* LARP and NOP are a subset of this instruction */
 {
 	if (m_opcode.b.l & 0x80) MODIFY_AR_ARP();
 }
-void tms32025_device::mpy()
+void tms3202x_device::mpy()
 {
 	GETDATA(0, 0);
 	m_Preg.d = (int16_t)(m_ALU.w.l) * (int16_t)(m_Treg);
 }
-void tms32025_device::mpya()
+void tms3202x_device::mpya()
 {
 	m_oldacc.d = m_ACC.d;
 	SHIFT_Preg_TO_ALU();
@@ -1151,12 +1172,12 @@ void tms32025_device::mpya()
 	GETDATA(0, 0);
 	m_Preg.d = (int16_t)(m_ALU.w.l) * (int16_t)(m_Treg);
 }
-void tms32025_device::mpyk()
+void tms3202x_device::mpyk()
 {
 	m_Preg.d = (int16_t)m_Treg * ((int16_t)(m_opcode.w.l << 3) >> 3);
 
 }
-void tms32025_device::mpys()
+void tms3202x_device::mpys()
 {
 	m_oldacc.d = m_ACC.d;
 	SHIFT_Preg_TO_ALU();
@@ -1166,12 +1187,12 @@ void tms32025_device::mpys()
 	GETDATA(0, 0);
 	m_Preg.d = (int16_t)(m_ALU.w.l) * (int16_t)(m_Treg);
 }
-void tms32025_device::mpyu()
+void tms3202x_device::mpyu()
 {
 	GETDATA(0, 0);
 	m_Preg.d = (uint16_t)(m_ALU.w.l) * (uint16_t)(m_Treg);
 }
-void tms32025_device::neg()
+void tms3202x_device::neg()
 {
 	if (m_ACC.d == 0x80000000) {
 		SET0(OV_FLAG);
@@ -1182,9 +1203,9 @@ void tms32025_device::neg()
 	else SET1(C_FLAG);
 }
 /*
-void tms32025_device::nop() { }   // NOP is a subset of the MAR instruction
+void tms3202x_device::nop() { }   // NOP is a subset of the MAR instruction
 */
-void tms32025_device::norm()
+void tms3202x_device::norm()
 {
 	if (m_ACC.d !=0 && (int32_t)(m_ACC.d ^ (m_ACC.d << 1)) >= 0)
 	{
@@ -1194,63 +1215,63 @@ void tms32025_device::norm()
 	}
 	else SET1(TC_FLAG);
 }
-void tms32025_device::or_()
+void tms3202x_device::or_()
 {
 	GETDATA(0, 0);
 	m_ACC.w.l |= m_ALU.w.l;
 }
-void tms32025_device::ork()
+void tms3202x_device::ork()
 {
 	m_ALU.d = (uint16_t)m_cache.read_word(m_PC);
 	m_PC++;
 	m_ALU.d <<= (m_opcode.b.h & 0xf);
 	m_ACC.d |=  (m_ALU.d);
 }
-void tms32025_device::out()
+void tms3202x_device::out()
 {
 	GETDATA(0, 0);
 	m_io.write_word(m_opcode.b.h & 0xf, m_ALU.w.l );
 }
-void tms32025_device::pac()
+void tms3202x_device::pac()
 {
 	SHIFT_Preg_TO_ALU();
 	m_ACC.d = m_ALU.d;
 }
-void tms32025_device::pop()
+void tms3202x_device::pop()
 {
 	m_ACC.d = (uint16_t)POP_STACK();
 }
-void tms32025_device::popd()
+void tms3202x_device::popd()
 {
 	m_ALU.d = (uint16_t)POP_STACK();
 	PUTDATA(m_ALU.w.l);
 }
-void tms32025_device::pshd()
+void tms3202x_device::pshd()
 {
 	GETDATA(0, 0);
 	PUSH_STACK(m_ALU.w.l);
 }
-void tms32025_device::push()
+void tms3202x_device::push()
 {
 	PUSH_STACK(m_ACC.w.l);
 }
-void tms32025_device::rc()
+void tms3202x_device::rc()
 {
 	CLR1(C_FLAG);
 }
-void tms32025_device::ret()
+void tms3202x_device::ret()
 {
 	m_PC = POP_STACK();
 }
-void tms32025_device::rfsm()              /** serial port mode */
+void tms3202x_device::rfsm()              /** serial port mode */
 {
 	CLR1(FSM_FLAG);
 }
-void tms32025_device::rhm()
+void tms3202x_device::rhm()
 {
 	CLR1(HM_FLAG);
 }
-void tms32025_device::rol()
+void tms3202x_device::rol()
 {
 	m_ALU.d = m_ACC.d;
 	m_ACC.d <<= 1;
@@ -1258,7 +1279,7 @@ void tms32025_device::rol()
 	if (m_ALU.d & 0x80000000) SET1(C_FLAG);
 	else CLR1(C_FLAG);
 }
-void tms32025_device::ror()
+void tms3202x_device::ror()
 {
 	m_ALU.d = m_ACC.d;
 	m_ACC.d >>= 1;
@@ -1266,58 +1287,58 @@ void tms32025_device::ror()
 	if (m_ALU.d & 1) SET1(C_FLAG);
 	else CLR1(C_FLAG);
 }
-void tms32025_device::rovm()
+void tms3202x_device::rovm()
 {
 	CLR0(OVM_FLAG);
 }
-void tms32025_device::rpt()
+void tms3202x_device::rpt()
 {
 	GETDATA(0, 0);
 	m_RPTC = m_ALU.b.l;
 	m_init_load_addr = 2;       /* Initiate repeat mode */
 }
-void tms32025_device::rptk()
+void tms3202x_device::rptk()
 {
 	m_RPTC = m_opcode.b.l;
 	m_init_load_addr = 2;       /* Initiate repeat mode */
 }
-void tms32025_device::rsxm()
+void tms3202x_device::rsxm()
 {
 	CLR1(SXM_FLAG);
 }
-void tms32025_device::rtc()
+void tms3202x_device::rtc()
 {
 	CLR1(TC_FLAG);
 }
-void tms32025_device::rtxm()  /** Serial port stuff */
+void tms3202x_device::rtxm()  /** Serial port stuff */
 {
 	CLR1(TXM_FLAG);
 }
-void tms32025_device::rxf()
+void tms3202x_device::rxf()
 {
 	CLR1(XF_FLAG);
 	m_xf_out(CLEAR_LINE);
 }
-void tms32025_device::sach()
+void tms3202x_device::sach()
 {
 	m_ALU.d = (m_ACC.d << (m_opcode.b.h & 7));
 	PUTDATA(m_ALU.w.h);
 }
-void tms32025_device::sacl()
+void tms3202x_device::sacl()
 {
 	m_ALU.d = (m_ACC.d << (m_opcode.b.h & 7));
 	PUTDATA(m_ALU.w.l);
 }
-void tms32025_device::sar_ar0()   { PUTDATA(m_AR[0]); }
-void tms32025_device::sar_ar1()   { PUTDATA(m_AR[1]); }
-void tms32025_device::sar_ar2()   { PUTDATA(m_AR[2]); }
-void tms32025_device::sar_ar3()   { PUTDATA(m_AR[3]); }
-void tms32025_device::sar_ar4()   { PUTDATA(m_AR[4]); }
-void tms32025_device::sar_ar5()   { PUTDATA(m_AR[5]); }
-void tms32025_device::sar_ar6()   { PUTDATA(m_AR[6]); }
-void tms32025_device::sar_ar7()   { PUTDATA(m_AR[7]); }
+void tms3202x_device::sar_ar0()   { PUTDATA(m_AR[0]); }
+void tms3202x_device::sar_ar1()   { PUTDATA(m_AR[1]); }
+void tms3202x_device::sar_ar2()   { PUTDATA(m_AR[2]); }
+void tms3202x_device::sar_ar3()   { PUTDATA(m_AR[3]); }
+void tms3202x_device::sar_ar4()   { PUTDATA(m_AR[4]); }
+void tms3202x_device::sar_ar5()   { PUTDATA(m_AR[5]); }
+void tms3202x_device::sar_ar6()   { PUTDATA(m_AR[6]); }
+void tms3202x_device::sar_ar7()   { PUTDATA(m_AR[7]); }
 
-void tms32025_device::sblk()
+void tms3202x_device::sblk()
 {
 	m_oldacc.d = m_ACC.d;
 	if (SXM) m_ALU.d =  (int16_t)m_cache.read_word(m_PC);
@@ -1328,22 +1349,22 @@ void tms32025_device::sblk()
 	CALCULATE_SUB_OVERFLOW(m_ALU.d);
 	CALCULATE_SUB_CARRY();
 }
-void tms32025_device::sbrk_ar()
+void tms3202x_device::sbrk_ar()
 {
 	m_AR[ARP] -= m_opcode.b.l;
 }
-void tms32025_device::sc()
+void tms3202x_device::sc()
 {
 	SET1(C_FLAG);
 }
-void tms32025_device::sfl()
+void tms3202x_device::sfl()
 {
 	m_ALU.d = m_ACC.d;
 	m_ACC.d <<= 1;
 	if (m_ALU.d & 0x80000000) SET1(C_FLAG);
 	else CLR1(C_FLAG);
 }
-void tms32025_device::sfr()
+void tms3202x_device::sfr()
 {
 	m_ALU.d = m_ACC.d;
 	m_ACC.d >>= 1;
@@ -1353,19 +1374,19 @@ void tms32025_device::sfr()
 	if (m_ALU.d & 1) SET1(C_FLAG);
 	else CLR1(C_FLAG);
 }
-void tms32025_device::sfsm()  /** Serial port mode */
+void tms3202x_device::sfsm()  /** Serial port mode */
 {
 	SET1(FSM_FLAG);
 }
-void tms32025_device::shm()
+void tms3202x_device::shm()
 {
 	SET1(HM_FLAG);
 }
-void tms32025_device::sovm()
+void tms3202x_device::sovm()
 {
 	SET0(OVM_FLAG);
 }
-void tms32025_device::spac()
+void tms3202x_device::spac()
 {
 	m_oldacc.d = m_ACC.d;
 	SHIFT_Preg_TO_ALU();
@@ -1373,21 +1394,21 @@ void tms32025_device::spac()
 	CALCULATE_SUB_OVERFLOW(m_ALU.d);
 	CALCULATE_SUB_CARRY();
 }
-void tms32025_device::sph()
+void tms3202x_device::sph()
 {
 	SHIFT_Preg_TO_ALU();
 	PUTDATA(m_ALU.w.h);
 }
-void tms32025_device::spl()
+void tms3202x_device::spl()
 {
 	SHIFT_Preg_TO_ALU();
 	PUTDATA(m_ALU.w.l);
 }
-void tms32025_device::spm()
+void tms3202x_device::spm()
 {
 	MODIFY_PM((m_opcode.b.l & 3) );
 }
-void tms32025_device::sqra()
+void tms3202x_device::sqra()
 {
 	m_oldacc.d = m_ACC.d;
 	SHIFT_Preg_TO_ALU();
@@ -1398,7 +1419,7 @@ void tms32025_device::sqra()
 	m_Treg = m_ALU.w.l;
 	m_Preg.d = ((int16_t)m_ALU.w.l * (int16_t)m_ALU.w.l);
 }
-void tms32025_device::sqrs()
+void tms3202x_device::sqrs()
 {
 	m_oldacc.d = m_ACC.d;
 	SHIFT_Preg_TO_ALU();
@@ -1409,27 +1430,27 @@ void tms32025_device::sqrs()
 	m_Treg = m_ALU.w.l;
 	m_Preg.d = ((int16_t)m_ALU.w.l * (int16_t)m_ALU.w.l);
 }
-void tms32025_device::sst()
+void tms3202x_device::sst()
 {
 	PUTDATA_SST(m_STR0);
 }
-void tms32025_device::sst1()
+void tms3202x_device::sst1()
 {
 	PUTDATA_SST(m_STR1);
 }
-void tms32025_device::ssxm()
+void tms3202x_device::ssxm()
 {
 	SET1(SXM_FLAG);
 }
-void tms32025_device::stc()
+void tms3202x_device::stc()
 {
 	SET1(TC_FLAG);
 }
-void tms32025_device::stxm()      /** Serial port stuff */
+void tms3202x_device::stxm()      /** Serial port stuff */
 {
 	SET1(TXM_FLAG);
 }
-void tms32025_device::sub()
+void tms3202x_device::sub()
 {
 	m_oldacc.d = m_ACC.d;
 	GETDATA((m_opcode.b.h & 0xf), SXM);
@@ -1437,7 +1458,7 @@ void tms32025_device::sub()
 	CALCULATE_SUB_OVERFLOW(m_ALU.d);
 	CALCULATE_SUB_CARRY();
 }
-void tms32025_device::subb()
+void tms3202x_device::subb()
 {
 	m_oldacc.d = m_ACC.d;
 	GETDATA(0, 0);
@@ -1447,7 +1468,7 @@ void tms32025_device::subb()
 	if (m_ACC.d == m_oldacc.d) {}   /* edge case, carry remains same */
 	else CALCULATE_SUB_CARRY();
 }
-void tms32025_device::subc()
+void tms3202x_device::subc()
 {
 	m_oldacc.d = m_ACC.d;
 	GETDATA(15, SXM);
@@ -1465,7 +1486,7 @@ void tms32025_device::subc()
 		m_ACC.d = m_oldacc.d << 1;
 	}
 }
-void tms32025_device::subh()
+void tms3202x_device::subh()
 {
 	m_oldacc.d = m_ACC.d;
 	GETDATA(0, 0);
@@ -1478,7 +1499,7 @@ void tms32025_device::subh()
 		if (OVM) m_ACC.w.h = ((int16_t)m_oldacc.w.h < 0) ? 0x8000 : 0x7fff;
 	}
 }
-void tms32025_device::subk()
+void tms3202x_device::subk()
 {
 	m_oldacc.d = m_ACC.d;
 	m_ALU.d = (uint8_t)m_opcode.b.l;
@@ -1486,7 +1507,7 @@ void tms32025_device::subk()
 	CALCULATE_SUB_OVERFLOW(m_ALU.d);
 	CALCULATE_SUB_CARRY();
 }
-void tms32025_device::subs()
+void tms3202x_device::subs()
 {
 	m_oldacc.d = m_ACC.d;
 	GETDATA(0, 0);
@@ -1494,7 +1515,7 @@ void tms32025_device::subs()
 	CALCULATE_SUB_OVERFLOW(m_ALU.d);
 	CALCULATE_SUB_CARRY();
 }
-void tms32025_device::subt()
+void tms3202x_device::subt()
 {
 	m_oldacc.d = m_ACC.d;
 	GETDATA((m_Treg & 0xf), SXM);
@@ -1502,12 +1523,12 @@ void tms32025_device::subt()
 	CALCULATE_SUB_OVERFLOW(m_ALU.d);
 	CALCULATE_SUB_CARRY();
 }
-void tms32025_device::sxf()
+void tms3202x_device::sxf()
 {
 	SET1(XF_FLAG);
 	m_xf_out(ASSERT_LINE);
 }
-void tms32025_device::tblr()
+void tms3202x_device::tblr()
 {
 	if (m_init_load_addr) {
 		m_PFC = m_ACC.w.l;
@@ -1518,7 +1539,7 @@ void tms32025_device::tblr()
 	PUTDATA(m_ALU.w.l);
 	m_PFC++;
 }
-void tms32025_device::tblw()
+void tms3202x_device::tblw()
 {
 	if (m_init_load_addr) {
 		m_PFC = m_ACC.w.l;
@@ -1529,36 +1550,36 @@ void tms32025_device::tblw()
 	m_program.write_word(m_PFC, m_ALU.w.l);
 	m_PFC++;
 }
-void tms32025_device::trap()
+void tms3202x_device::trap()
 {
 	PUSH_STACK(m_PC);
 	m_PC = 0x001E;     /* Trap vector */
 }
-void tms32025_device::xor_()
+void tms3202x_device::xor_()
 {
 	GETDATA(0, 0);
 	m_ACC.w.l ^= m_ALU.w.l;
 }
-void tms32025_device::xork()
+void tms3202x_device::xork()
 {
 	m_ALU.d = m_cache.read_word(m_PC);
 	m_PC++;
 	m_ALU.d <<= (m_opcode.b.h & 0xf);
 	m_ACC.d ^= m_ALU.d;
 }
-void tms32025_device::zalh()
+void tms3202x_device::zalh()
 {
 	GETDATA(0, 0);
 	m_ACC.w.h = m_ALU.w.l;
 	m_ACC.w.l = 0x0000;
 }
-void tms32025_device::zalr()
+void tms3202x_device::zalr()
 {
 	GETDATA(0, 0);
 	m_ACC.w.h = m_ALU.w.l;
 	m_ACC.w.l = 0x8000;
 }
-void tms32025_device::zals()
+void tms3202x_device::zals()
 {
 	GETDATA(0, 0);
 	m_ACC.w.l = m_ALU.w.l;
@@ -1570,81 +1591,81 @@ void tms32025_device::zals()
  *  Opcode Table (Cycles, Instruction)
  ***********************************************************************/
 
-const tms32025_device::tms32025_opcode tms32025_device::s_opcode_main[256]=
+const tms3202x_device::tms32025_opcode tms3202x_device::s_opcode_main[256]=
 {
-/*00*/ {1*CLK, &tms32025_device::add      },{1*CLK, &tms32025_device::add       },{1*CLK, &tms32025_device::add       },{1*CLK, &tms32025_device::add       },{1*CLK, &tms32025_device::add       },{1*CLK, &tms32025_device::add       },{1*CLK, &tms32025_device::add       },{1*CLK, &tms32025_device::add       },
-/*08*/ {1*CLK, &tms32025_device::add      },{1*CLK, &tms32025_device::add       },{1*CLK, &tms32025_device::add       },{1*CLK, &tms32025_device::add       },{1*CLK, &tms32025_device::add       },{1*CLK, &tms32025_device::add       },{1*CLK, &tms32025_device::add       },{1*CLK, &tms32025_device::add       },
-/*10*/ {1*CLK, &tms32025_device::sub      },{1*CLK, &tms32025_device::sub       },{1*CLK, &tms32025_device::sub       },{1*CLK, &tms32025_device::sub       },{1*CLK, &tms32025_device::sub       },{1*CLK, &tms32025_device::sub       },{1*CLK, &tms32025_device::sub       },{1*CLK, &tms32025_device::sub       },
-/*18*/ {1*CLK, &tms32025_device::sub      },{1*CLK, &tms32025_device::sub       },{1*CLK, &tms32025_device::sub       },{1*CLK, &tms32025_device::sub       },{1*CLK, &tms32025_device::sub       },{1*CLK, &tms32025_device::sub       },{1*CLK, &tms32025_device::sub       },{1*CLK, &tms32025_device::sub       },
-/*20*/ {1*CLK, &tms32025_device::lac      },{1*CLK, &tms32025_device::lac       },{1*CLK, &tms32025_device::lac       },{1*CLK, &tms32025_device::lac       },{1*CLK, &tms32025_device::lac       },{1*CLK, &tms32025_device::lac       },{1*CLK, &tms32025_device::lac       },{1*CLK, &tms32025_device::lac       },
-/*28*/ {1*CLK, &tms32025_device::lac      },{1*CLK, &tms32025_device::lac       },{1*CLK, &tms32025_device::lac       },{1*CLK, &tms32025_device::lac       },{1*CLK, &tms32025_device::lac       },{1*CLK, &tms32025_device::lac       },{1*CLK, &tms32025_device::lac       },{1*CLK, &tms32025_device::lac       },
-/*30*/ {1*CLK, &tms32025_device::lar_ar0  },{1*CLK, &tms32025_device::lar_ar1   },{1*CLK, &tms32025_device::lar_ar2   },{1*CLK, &tms32025_device::lar_ar3   },{1*CLK, &tms32025_device::lar_ar4   },{1*CLK, &tms32025_device::lar_ar5   },{1*CLK, &tms32025_device::lar_ar6   },{1*CLK, &tms32025_device::lar_ar7   },
-/*38*/ {1*CLK, &tms32025_device::mpy      },{1*CLK, &tms32025_device::sqra      },{1*CLK, &tms32025_device::mpya      },{1*CLK, &tms32025_device::mpys      },{1*CLK, &tms32025_device::lt        },{1*CLK, &tms32025_device::lta       },{1*CLK, &tms32025_device::ltp       },{1*CLK, &tms32025_device::ltd       },
-/*40*/ {1*CLK, &tms32025_device::zalh     },{1*CLK, &tms32025_device::zals      },{1*CLK, &tms32025_device::lact      },{1*CLK, &tms32025_device::addc      },{1*CLK, &tms32025_device::subh      },{1*CLK, &tms32025_device::subs      },{1*CLK, &tms32025_device::subt      },{1*CLK, &tms32025_device::subc      },
-/*48*/ {1*CLK, &tms32025_device::addh     },{1*CLK, &tms32025_device::adds      },{1*CLK, &tms32025_device::addt      },{1*CLK, &tms32025_device::rpt       },{1*CLK, &tms32025_device::xor_      },{1*CLK, &tms32025_device::or_       },{1*CLK, &tms32025_device::and_      },{1*CLK, &tms32025_device::subb      },
-/*50*/ {1*CLK, &tms32025_device::lst      },{1*CLK, &tms32025_device::lst1      },{1*CLK, &tms32025_device::ldp       },{1*CLK, &tms32025_device::lph       },{1*CLK, &tms32025_device::pshd      },{1*CLK, &tms32025_device::mar       },{1*CLK, &tms32025_device::dmov      },{1*CLK, &tms32025_device::bitt      },
-/*58*/ {3*CLK, &tms32025_device::tblr     },{2*CLK, &tms32025_device::tblw      },{1*CLK, &tms32025_device::sqrs      },{1*CLK, &tms32025_device::lts       },{2*CLK, &tms32025_device::macd      },{2*CLK, &tms32025_device::mac       },{2*CLK, &tms32025_device::bc        },{2*CLK, &tms32025_device::bnc       },
-/*60*/ {1*CLK, &tms32025_device::sacl     },{1*CLK, &tms32025_device::sacl      },{1*CLK, &tms32025_device::sacl      },{1*CLK, &tms32025_device::sacl      },{1*CLK, &tms32025_device::sacl      },{1*CLK, &tms32025_device::sacl      },{1*CLK, &tms32025_device::sacl      },{1*CLK, &tms32025_device::sacl      },
-/*68*/ {1*CLK, &tms32025_device::sach     },{1*CLK, &tms32025_device::sach      },{1*CLK, &tms32025_device::sach      },{1*CLK, &tms32025_device::sach      },{1*CLK, &tms32025_device::sach      },{1*CLK, &tms32025_device::sach      },{1*CLK, &tms32025_device::sach      },{1*CLK, &tms32025_device::sach      },
-/*70*/ {1*CLK, &tms32025_device::sar_ar0  },{1*CLK, &tms32025_device::sar_ar1   },{1*CLK, &tms32025_device::sar_ar2   },{1*CLK, &tms32025_device::sar_ar3   },{1*CLK, &tms32025_device::sar_ar4   },{1*CLK, &tms32025_device::sar_ar5   },{1*CLK, &tms32025_device::sar_ar6   },{1*CLK, &tms32025_device::sar_ar7   },
-/*78*/ {1*CLK, &tms32025_device::sst      },{1*CLK, &tms32025_device::sst1      },{1*CLK, &tms32025_device::popd      },{1*CLK, &tms32025_device::zalr      },{1*CLK, &tms32025_device::spl       },{1*CLK, &tms32025_device::sph       },{1*CLK, &tms32025_device::adrk      },{1*CLK, &tms32025_device::sbrk_ar   },
-/*80*/ {2*CLK, &tms32025_device::in       },{2*CLK, &tms32025_device::in        },{2*CLK, &tms32025_device::in        },{2*CLK, &tms32025_device::in        },{2*CLK, &tms32025_device::in        },{2*CLK, &tms32025_device::in        },{2*CLK, &tms32025_device::in        },{2*CLK, &tms32025_device::in        },
-/*88*/ {2*CLK, &tms32025_device::in       },{2*CLK, &tms32025_device::in        },{2*CLK, &tms32025_device::in        },{2*CLK, &tms32025_device::in        },{2*CLK, &tms32025_device::in        },{2*CLK, &tms32025_device::in        },{2*CLK, &tms32025_device::in        },{2*CLK, &tms32025_device::in        },
-/*90*/ {1*CLK, &tms32025_device::bit      },{1*CLK, &tms32025_device::bit       },{1*CLK, &tms32025_device::bit       },{1*CLK, &tms32025_device::bit       },{1*CLK, &tms32025_device::bit       },{1*CLK, &tms32025_device::bit       },{1*CLK, &tms32025_device::bit       },{1*CLK, &tms32025_device::bit       },
-/*98*/ {1*CLK, &tms32025_device::bit      },{1*CLK, &tms32025_device::bit       },{1*CLK, &tms32025_device::bit       },{1*CLK, &tms32025_device::bit       },{1*CLK, &tms32025_device::bit       },{1*CLK, &tms32025_device::bit       },{1*CLK, &tms32025_device::bit       },{1*CLK, &tms32025_device::bit       },
-/*A0*/ {1*CLK, &tms32025_device::mpyk     },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },
-/*A8*/ {1*CLK, &tms32025_device::mpyk     },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },
-/*B0*/ {1*CLK, &tms32025_device::mpyk     },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },
-/*B8*/ {1*CLK, &tms32025_device::mpyk     },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },{1*CLK, &tms32025_device::mpyk      },
-/*C0*/ {1*CLK, &tms32025_device::lark_ar0 },{1*CLK, &tms32025_device::lark_ar1  },{1*CLK, &tms32025_device::lark_ar2  },{1*CLK, &tms32025_device::lark_ar3  },{1*CLK, &tms32025_device::lark_ar4  },{1*CLK, &tms32025_device::lark_ar5  },{1*CLK, &tms32025_device::lark_ar6  },{1*CLK, &tms32025_device::lark_ar7  },
-/*C8*/ {1*CLK, &tms32025_device::ldpk     },{1*CLK, &tms32025_device::ldpk      },{1*CLK, &tms32025_device::lack      },{1*CLK, &tms32025_device::rptk      },{1*CLK, &tms32025_device::addk      },{1*CLK, &tms32025_device::subk      },{1*CLK, &tms32025_device::opcodes_CE},{1*CLK, &tms32025_device::mpyu      },
-/*D0*/ {1*CLK, &tms32025_device::opcodes_Dx},{1*CLK, &tms32025_device::opcodes_Dx},{1*CLK, &tms32025_device::opcodes_Dx},{1*CLK, &tms32025_device::opcodes_Dx},{1*CLK, &tms32025_device::opcodes_Dx},{1*CLK, &tms32025_device::opcodes_Dx},{1*CLK, &tms32025_device::opcodes_Dx},{0*CLK, &tms32025_device::opcodes_Dx},
-/*D8*/ {1*CLK, &tms32025_device::opcodes_Dx},{1*CLK, &tms32025_device::opcodes_Dx},{1*CLK, &tms32025_device::opcodes_Dx},{1*CLK, &tms32025_device::opcodes_Dx},{1*CLK, &tms32025_device::opcodes_Dx},{1*CLK, &tms32025_device::opcodes_Dx},{1*CLK, &tms32025_device::opcodes_Dx},{1*CLK, &tms32025_device::opcodes_Dx},
-/*E0*/ {2*CLK, &tms32025_device::out      },{2*CLK, &tms32025_device::out       },{2*CLK, &tms32025_device::out       },{2*CLK, &tms32025_device::out       },{2*CLK, &tms32025_device::out       },{2*CLK, &tms32025_device::out       },{2*CLK, &tms32025_device::out       },{2*CLK, &tms32025_device::out       },
-/*E8*/ {2*CLK, &tms32025_device::out      },{2*CLK, &tms32025_device::out       },{2*CLK, &tms32025_device::out       },{2*CLK, &tms32025_device::out       },{2*CLK, &tms32025_device::out       },{2*CLK, &tms32025_device::out       },{2*CLK, &tms32025_device::out       },{2*CLK, &tms32025_device::out       },
-/*F0*/ {2*CLK, &tms32025_device::bv       },{2*CLK, &tms32025_device::bgz       },{2*CLK, &tms32025_device::blez      },{2*CLK, &tms32025_device::blz       },{2*CLK, &tms32025_device::bgez      },{2*CLK, &tms32025_device::bnz       },{2*CLK, &tms32025_device::bz        },{2*CLK, &tms32025_device::bnv       },
-/*F8*/ {2*CLK, &tms32025_device::bbz      },{2*CLK, &tms32025_device::bbnz      },{2*CLK, &tms32025_device::bioz      },{2*CLK, &tms32025_device::banz      },{2*CLK, &tms32025_device::blkp      },{2*CLK, &tms32025_device::blkd      },{2*CLK, &tms32025_device::call      },{2*CLK, &tms32025_device::br        }
+/*00*/ {1*CLK, &tms3202x_device::add      },{1*CLK, &tms3202x_device::add       },{1*CLK, &tms3202x_device::add       },{1*CLK, &tms3202x_device::add       },{1*CLK, &tms3202x_device::add       },{1*CLK, &tms3202x_device::add       },{1*CLK, &tms3202x_device::add       },{1*CLK, &tms3202x_device::add       },
+/*08*/ {1*CLK, &tms3202x_device::add      },{1*CLK, &tms3202x_device::add       },{1*CLK, &tms3202x_device::add       },{1*CLK, &tms3202x_device::add       },{1*CLK, &tms3202x_device::add       },{1*CLK, &tms3202x_device::add       },{1*CLK, &tms3202x_device::add       },{1*CLK, &tms3202x_device::add       },
+/*10*/ {1*CLK, &tms3202x_device::sub      },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },
+/*18*/ {1*CLK, &tms3202x_device::sub      },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },
+/*20*/ {1*CLK, &tms3202x_device::lac      },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },
+/*28*/ {1*CLK, &tms3202x_device::lac      },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },
+/*30*/ {1*CLK, &tms3202x_device::lar_ar0  },{1*CLK, &tms3202x_device::lar_ar1   },{1*CLK, &tms3202x_device::lar_ar2   },{1*CLK, &tms3202x_device::lar_ar3   },{1*CLK, &tms3202x_device::lar_ar4   },{1*CLK, &tms3202x_device::lar_ar5   },{1*CLK, &tms3202x_device::lar_ar6   },{1*CLK, &tms3202x_device::lar_ar7   },
+/*38*/ {1*CLK, &tms3202x_device::mpy      },{1*CLK, &tms3202x_device::sqra      },{1*CLK, &tms3202x_device::mpya      },{1*CLK, &tms3202x_device::mpys      },{1*CLK, &tms3202x_device::lt        },{1*CLK, &tms3202x_device::lta       },{1*CLK, &tms3202x_device::ltp       },{1*CLK, &tms3202x_device::ltd       },
+/*40*/ {1*CLK, &tms3202x_device::zalh     },{1*CLK, &tms3202x_device::zals      },{1*CLK, &tms3202x_device::lact      },{1*CLK, &tms3202x_device::addc      },{1*CLK, &tms3202x_device::subh      },{1*CLK, &tms3202x_device::subs      },{1*CLK, &tms3202x_device::subt      },{1*CLK, &tms3202x_device::subc      },
+/*48*/ {1*CLK, &tms3202x_device::addh     },{1*CLK, &tms3202x_device::adds      },{1*CLK, &tms3202x_device::addt      },{1*CLK, &tms3202x_device::rpt       },{1*CLK, &tms3202x_device::xor_      },{1*CLK, &tms3202x_device::or_       },{1*CLK, &tms3202x_device::and_      },{1*CLK, &tms3202x_device::subb      },
+/*50*/ {1*CLK, &tms3202x_device::lst      },{1*CLK, &tms3202x_device::lst1      },{1*CLK, &tms3202x_device::ldp       },{1*CLK, &tms3202x_device::lph       },{1*CLK, &tms3202x_device::pshd      },{1*CLK, &tms3202x_device::mar       },{1*CLK, &tms3202x_device::dmov      },{1*CLK, &tms3202x_device::bitt      },
+/*58*/ {3*CLK, &tms3202x_device::tblr     },{2*CLK, &tms3202x_device::tblw      },{1*CLK, &tms3202x_device::sqrs      },{1*CLK, &tms3202x_device::lts       },{2*CLK, &tms3202x_device::macd      },{2*CLK, &tms3202x_device::mac       },{2*CLK, &tms3202x_device::bc        },{2*CLK, &tms3202x_device::bnc       },
+/*60*/ {1*CLK, &tms3202x_device::sacl     },{1*CLK, &tms3202x_device::sacl      },{1*CLK, &tms3202x_device::sacl      },{1*CLK, &tms3202x_device::sacl      },{1*CLK, &tms3202x_device::sacl      },{1*CLK, &tms3202x_device::sacl      },{1*CLK, &tms3202x_device::sacl      },{1*CLK, &tms3202x_device::sacl      },
+/*68*/ {1*CLK, &tms3202x_device::sach     },{1*CLK, &tms3202x_device::sach      },{1*CLK, &tms3202x_device::sach      },{1*CLK, &tms3202x_device::sach      },{1*CLK, &tms3202x_device::sach      },{1*CLK, &tms3202x_device::sach      },{1*CLK, &tms3202x_device::sach      },{1*CLK, &tms3202x_device::sach      },
+/*70*/ {1*CLK, &tms3202x_device::sar_ar0  },{1*CLK, &tms3202x_device::sar_ar1   },{1*CLK, &tms3202x_device::sar_ar2   },{1*CLK, &tms3202x_device::sar_ar3   },{1*CLK, &tms3202x_device::sar_ar4   },{1*CLK, &tms3202x_device::sar_ar5   },{1*CLK, &tms3202x_device::sar_ar6   },{1*CLK, &tms3202x_device::sar_ar7   },
+/*78*/ {1*CLK, &tms3202x_device::sst      },{1*CLK, &tms3202x_device::sst1      },{1*CLK, &tms3202x_device::popd      },{1*CLK, &tms3202x_device::zalr      },{1*CLK, &tms3202x_device::spl       },{1*CLK, &tms3202x_device::sph       },{1*CLK, &tms3202x_device::adrk      },{1*CLK, &tms3202x_device::sbrk_ar   },
+/*80*/ {2*CLK, &tms3202x_device::in       },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },
+/*88*/ {2*CLK, &tms3202x_device::in       },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },
+/*90*/ {1*CLK, &tms3202x_device::bit      },{1*CLK, &tms3202x_device::bit       },{1*CLK, &tms3202x_device::bit       },{1*CLK, &tms3202x_device::bit       },{1*CLK, &tms3202x_device::bit       },{1*CLK, &tms3202x_device::bit       },{1*CLK, &tms3202x_device::bit       },{1*CLK, &tms3202x_device::bit       },
+/*98*/ {1*CLK, &tms3202x_device::bit      },{1*CLK, &tms3202x_device::bit       },{1*CLK, &tms3202x_device::bit       },{1*CLK, &tms3202x_device::bit       },{1*CLK, &tms3202x_device::bit       },{1*CLK, &tms3202x_device::bit       },{1*CLK, &tms3202x_device::bit       },{1*CLK, &tms3202x_device::bit       },
+/*A0*/ {1*CLK, &tms3202x_device::mpyk     },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },
+/*A8*/ {1*CLK, &tms3202x_device::mpyk     },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },
+/*B0*/ {1*CLK, &tms3202x_device::mpyk     },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },
+/*B8*/ {1*CLK, &tms3202x_device::mpyk     },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },
+/*C0*/ {1*CLK, &tms3202x_device::lark_ar0 },{1*CLK, &tms3202x_device::lark_ar1  },{1*CLK, &tms3202x_device::lark_ar2  },{1*CLK, &tms3202x_device::lark_ar3  },{1*CLK, &tms3202x_device::lark_ar4  },{1*CLK, &tms3202x_device::lark_ar5  },{1*CLK, &tms3202x_device::lark_ar6  },{1*CLK, &tms3202x_device::lark_ar7  },
+/*C8*/ {1*CLK, &tms3202x_device::ldpk     },{1*CLK, &tms3202x_device::ldpk      },{1*CLK, &tms3202x_device::lack      },{1*CLK, &tms3202x_device::rptk      },{1*CLK, &tms3202x_device::addk      },{1*CLK, &tms3202x_device::subk      },{1*CLK, &tms3202x_device::opcodes_CE},{1*CLK, &tms3202x_device::mpyu      },
+/*D0*/ {1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{0*CLK, &tms3202x_device::opcodes_Dx},
+/*D8*/ {1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},
+/*E0*/ {2*CLK, &tms3202x_device::out      },{2*CLK, &tms3202x_device::out       },{2*CLK, &tms3202x_device::out       },{2*CLK, &tms3202x_device::out       },{2*CLK, &tms3202x_device::out       },{2*CLK, &tms3202x_device::out       },{2*CLK, &tms3202x_device::out       },{2*CLK, &tms3202x_device::out       },
+/*E8*/ {2*CLK, &tms3202x_device::out      },{2*CLK, &tms3202x_device::out       },{2*CLK, &tms3202x_device::out       },{2*CLK, &tms3202x_device::out       },{2*CLK, &tms3202x_device::out       },{2*CLK, &tms3202x_device::out       },{2*CLK, &tms3202x_device::out       },{2*CLK, &tms3202x_device::out       },
+/*F0*/ {2*CLK, &tms3202x_device::bv       },{2*CLK, &tms3202x_device::bgz       },{2*CLK, &tms3202x_device::blez      },{2*CLK, &tms3202x_device::blz       },{2*CLK, &tms3202x_device::bgez      },{2*CLK, &tms3202x_device::bnz       },{2*CLK, &tms3202x_device::bz        },{2*CLK, &tms3202x_device::bnv       },
+/*F8*/ {2*CLK, &tms3202x_device::bbz      },{2*CLK, &tms3202x_device::bbnz      },{2*CLK, &tms3202x_device::bioz      },{2*CLK, &tms3202x_device::banz      },{2*CLK, &tms3202x_device::blkp      },{2*CLK, &tms3202x_device::blkd      },{2*CLK, &tms3202x_device::call      },{2*CLK, &tms3202x_device::br        }
 };
 
-const tms32025_device::tms32025_opcode tms32025_device::s_opcode_CE_subset[256]=  /* Instructions living under the CExx opcode */
+const tms3202x_device::tms32025_opcode tms3202x_device::s_opcode_CE_subset[256]=  /* Instructions living under the CExx opcode */
 {
-/*00*/ {1*CLK, &tms32025_device::eint     },{1*CLK, &tms32025_device::dint      },{1*CLK, &tms32025_device::rovm      },{1*CLK, &tms32025_device::sovm      },{1*CLK, &tms32025_device::cnfd      },{1*CLK, &tms32025_device::cnfp      },{1*CLK, &tms32025_device::rsxm      },{1*CLK, &tms32025_device::ssxm      },
-/*08*/ {1*CLK, &tms32025_device::spm      },{1*CLK, &tms32025_device::spm       },{1*CLK, &tms32025_device::spm       },{1*CLK, &tms32025_device::spm       },{1*CLK, &tms32025_device::rxf       },{1*CLK, &tms32025_device::sxf       },{1*CLK, &tms32025_device::fort      },{1*CLK, &tms32025_device::fort      },
-/*10*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{1*CLK, &tms32025_device::pac       },{1*CLK, &tms32025_device::apac      },{1*CLK, &tms32025_device::spac      },{0*CLK, &tms32025_device::illegal   },
-/*18*/ {1*CLK, &tms32025_device::sfl      },{1*CLK, &tms32025_device::sfr       },{0*CLK, &tms32025_device::illegal   },{1*CLK, &tms32025_device::abst      },{1*CLK, &tms32025_device::push      },{1*CLK, &tms32025_device::pop       },{2*CLK, &tms32025_device::trap      },{3*CLK, &tms32025_device::idle      },
-/*20*/ {1*CLK, &tms32025_device::rtxm     },{1*CLK, &tms32025_device::stxm      },{0*CLK, &tms32025_device::illegal   },{1*CLK, &tms32025_device::neg       },{2*CLK, &tms32025_device::cala      },{2*CLK, &tms32025_device::bacc      },{2*CLK, &tms32025_device::ret       },{1*CLK, &tms32025_device::cmpl      },
-/*28*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*30*/ {1*CLK, &tms32025_device::rc       },{1*CLK, &tms32025_device::sc        },{1*CLK, &tms32025_device::rtc       },{1*CLK, &tms32025_device::stc       },{1*CLK, &tms32025_device::rol       },{1*CLK, &tms32025_device::ror       },{1*CLK, &tms32025_device::rfsm      },{1*CLK, &tms32025_device::sfsm      },
-/*38*/ {1*CLK, &tms32025_device::rhm      },{1*CLK, &tms32025_device::shm       },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{1*CLK, &tms32025_device::conf      },{1*CLK, &tms32025_device::conf      },{1*CLK, &tms32025_device::conf      },{1*CLK, &tms32025_device::conf      },
-/*40*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*48*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*50*/ {1*CLK, &tms32025_device::cmpr     },{1*CLK, &tms32025_device::cmpr      },{1*CLK, &tms32025_device::cmpr      },{1*CLK, &tms32025_device::cmpr      },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*58*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*60*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*68*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*70*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*78*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*80*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{1*CLK, &tms32025_device::norm      },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*88*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*90*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{1*CLK, &tms32025_device::norm      },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*98*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*A0*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{1*CLK, &tms32025_device::norm      },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*A8*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*B0*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{1*CLK, &tms32025_device::norm      },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*B8*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*C0*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{1*CLK, &tms32025_device::norm      },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*C8*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*D0*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{1*CLK, &tms32025_device::norm      },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*D8*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*E0*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{1*CLK, &tms32025_device::norm      },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*E8*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*F0*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{1*CLK, &tms32025_device::norm      },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },
-/*F8*/ {0*CLK, &tms32025_device::illegal  },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   },{0*CLK, &tms32025_device::illegal   }
+/*00*/ {1*CLK, &tms3202x_device::eint     },{1*CLK, &tms3202x_device::dint      },{1*CLK, &tms3202x_device::rovm      },{1*CLK, &tms3202x_device::sovm      },{1*CLK, &tms3202x_device::cnfd      },{1*CLK, &tms3202x_device::cnfp      },{1*CLK, &tms3202x_device::rsxm      },{1*CLK, &tms3202x_device::ssxm      },
+/*08*/ {1*CLK, &tms3202x_device::spm      },{1*CLK, &tms3202x_device::spm       },{1*CLK, &tms3202x_device::spm       },{1*CLK, &tms3202x_device::spm       },{1*CLK, &tms3202x_device::rxf       },{1*CLK, &tms3202x_device::sxf       },{1*CLK, &tms3202x_device::fort      },{1*CLK, &tms3202x_device::fort      },
+/*10*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{1*CLK, &tms3202x_device::pac       },{1*CLK, &tms3202x_device::apac      },{1*CLK, &tms3202x_device::spac      },{0*CLK, &tms3202x_device::illegal   },
+/*18*/ {1*CLK, &tms3202x_device::sfl      },{1*CLK, &tms3202x_device::sfr       },{0*CLK, &tms3202x_device::illegal   },{1*CLK, &tms3202x_device::abst      },{1*CLK, &tms3202x_device::push      },{1*CLK, &tms3202x_device::pop       },{2*CLK, &tms3202x_device::trap      },{3*CLK, &tms3202x_device::idle      },
+/*20*/ {1*CLK, &tms3202x_device::rtxm     },{1*CLK, &tms3202x_device::stxm      },{0*CLK, &tms3202x_device::illegal   },{1*CLK, &tms3202x_device::neg       },{2*CLK, &tms3202x_device::cala      },{2*CLK, &tms3202x_device::bacc      },{2*CLK, &tms3202x_device::ret       },{1*CLK, &tms3202x_device::cmpl      },
+/*28*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*30*/ {1*CLK, &tms3202x_device::rc       },{1*CLK, &tms3202x_device::sc        },{1*CLK, &tms3202x_device::rtc       },{1*CLK, &tms3202x_device::stc       },{1*CLK, &tms3202x_device::rol       },{1*CLK, &tms3202x_device::ror       },{1*CLK, &tms3202x_device::rfsm      },{1*CLK, &tms3202x_device::sfsm      },
+/*38*/ {1*CLK, &tms3202x_device::rhm      },{1*CLK, &tms3202x_device::shm       },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{1*CLK, &tms3202x_device::conf      },{1*CLK, &tms3202x_device::conf      },{1*CLK, &tms3202x_device::conf      },{1*CLK, &tms3202x_device::conf      },
+/*40*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*48*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*50*/ {1*CLK, &tms3202x_device::cmpr     },{1*CLK, &tms3202x_device::cmpr      },{1*CLK, &tms3202x_device::cmpr      },{1*CLK, &tms3202x_device::cmpr      },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*58*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*60*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*68*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*70*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*78*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*80*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{1*CLK, &tms3202x_device::norm      },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*88*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*90*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{1*CLK, &tms3202x_device::norm      },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*98*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*A0*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{1*CLK, &tms3202x_device::norm      },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*A8*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*B0*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{1*CLK, &tms3202x_device::norm      },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*B8*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*C0*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{1*CLK, &tms3202x_device::norm      },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*C8*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*D0*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{1*CLK, &tms3202x_device::norm      },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*D8*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*E0*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{1*CLK, &tms3202x_device::norm      },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*E8*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*F0*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{1*CLK, &tms3202x_device::norm      },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },
+/*F8*/ {0*CLK, &tms3202x_device::illegal  },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   },{0*CLK, &tms3202x_device::illegal   }
 };
 
-const tms32025_device::tms32025_opcode tms32025_device::s_opcode_Dx_subset[8]=    /* Instructions living under the Dxxx opcode */
+const tms3202x_device::tms32025_opcode tms3202x_device::s_opcode_Dx_subset[8]=    /* Instructions living under the Dxxx opcode */
 {
-/*00*/ {2*CLK, &tms32025_device::lrlk     },{2*CLK, &tms32025_device::lalk      },{2*CLK, &tms32025_device::adlk      },{2*CLK, &tms32025_device::sblk      },{2*CLK, &tms32025_device::andk      },{2*CLK, &tms32025_device::ork       },{2*CLK, &tms32025_device::xork      },{0*CLK, &tms32025_device::illegal   }
+/*00*/ {2*CLK, &tms3202x_device::lrlk     },{2*CLK, &tms3202x_device::lalk      },{2*CLK, &tms3202x_device::adlk      },{2*CLK, &tms3202x_device::sblk      },{2*CLK, &tms3202x_device::andk      },{2*CLK, &tms3202x_device::ork       },{2*CLK, &tms3202x_device::xork      },{0*CLK, &tms3202x_device::illegal   }
 };
 
 
@@ -1652,17 +1673,12 @@ const tms32025_device::tms32025_opcode tms32025_device::s_opcode_Dx_subset[8]=  
 /****************************************************************************
  *  Initialise the CPU emulation
  ****************************************************************************/
-void tms32025_device::device_start()
+void tms3202x_device::device_start()
 {
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_DATA).specific(m_data);
 	space(AS_IO).specific(m_io);
-
-	if (!m_mp_mc) // if pin 1 is 0 then we're using internal ROM
-	{
-		m_program.space().install_rom(0x0000, 0x0fff, memregion("internal")->base());
-	}
 
 	m_PREVPC = 0;
 	m_PFC = 0;
@@ -1715,7 +1731,6 @@ void tms32025_device::device_start()
 	save_item(NAME(m_oldacc.d));
 	save_item(NAME(m_memaccess));
 	save_item(NAME(m_waiting_for_serial_frame));
-	save_item(NAME(m_mp_mc));
 
 	state_add( TMS32025_PC,   "PC",   m_PC).formatstr("%04X");
 	state_add( TMS32025_STR0, "STR0", m_STR0).formatstr("%04X");
@@ -1755,8 +1770,20 @@ void tms32025_device::device_start()
 	set_icountptr(m_icount);
 }
 
+void tms32025_device::device_start()
+{
+	tms3202x_device::device_start();
 
-void tms32025_device::state_string_export(const device_state_entry &entry, std::string &str) const
+	if (!m_mp_mc) // if pin 1 is 0 then we're using internal ROM
+	{
+		m_program.space().install_rom(0x0000, 0x0fff, memregion("internal")->base());
+	}
+
+	save_item(NAME(m_mp_mc));
+}
+
+
+void tms3202x_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -1791,7 +1818,7 @@ void tms32025_device::state_string_export(const device_state_entry &entry, std::
 /****************************************************************************
  *  Reset registers to their initial values
  ****************************************************************************/
-void tms32025_device::common_reset()
+void tms3202x_device::common_reset()
 {
 	m_PC = 0;                          /* Starting address on a reset */
 	m_STR0 |= 0x0600;                  /* INTM and unused bit set to 1 */
@@ -1814,7 +1841,7 @@ void tms32025_device::common_reset()
 	m_init_load_addr = 1;
 }
 
-void tms32025_device::device_reset()
+void tms3202x_device::device_reset()
 {
 	if(m_STR1 & CNF0_REG) {
 		m_program.space().unmap_readwrite(0xff00, 0xffff);
@@ -1833,7 +1860,7 @@ void tms32026_device::device_reset()
 /****************************************************************************
  *  Issue an interrupt if necessary
  ****************************************************************************/
-int tms32025_device::process_IRQs()
+inline int tms3202x_device::process_IRQs()
 {
 	/********** Interrupt Flag Register (IFR) **********
 	    |  5  |  4  |  3  |  2  |  1  |  0  |
@@ -1850,7 +1877,7 @@ int tms32025_device::process_IRQs()
 		PUSH_STACK(m_PC);
 
 		if ((m_IFR & 0x01) && (m_imr & 0x01)) {       /* IRQ line 0 */
-			//logerror("TMS32025:  Active INT0\n");
+			//logerror("TMS3202x:  Active INT0\n");
 			standard_irq_callback(0, m_PC);
 			m_PC = 0x0002;
 			m_idle = 0;
@@ -1859,7 +1886,7 @@ int tms32025_device::process_IRQs()
 			return m_tms32025_irq_cycles;
 		}
 		if ((m_IFR & 0x02) && (m_imr & 0x02)) {       /* IRQ line 1 */
-			//logerror("TMS32025:  Active INT1\n");
+			//logerror("TMS3202x:  Active INT1\n");
 			standard_irq_callback(1, m_PC);
 			m_PC = 0x0004;
 			m_idle = 0;
@@ -1868,7 +1895,7 @@ int tms32025_device::process_IRQs()
 			return m_tms32025_irq_cycles;
 		}
 		if ((m_IFR & 0x04) && (m_imr & 0x04)) {       /* IRQ line 2 */
-			//logerror("TMS32025:  Active INT2\n");
+			//logerror("TMS3202x:  Active INT2\n");
 			standard_irq_callback(2, m_PC);
 			m_PC = 0x0006;
 			m_idle = 0;
@@ -1877,7 +1904,7 @@ int tms32025_device::process_IRQs()
 			return m_tms32025_irq_cycles;
 		}
 		if ((m_IFR & 0x08) && (m_imr & 0x08)) {       /* Timer IRQ (internal) */
-//          logerror("TMS32025:  Active TINT (Timer)\n");
+//          logerror("TMS3202x:  Active TINT (Timer)\n");
 			m_PC = 0x0018;
 			m_idle = 0;
 			m_IFR &= (~0x08);
@@ -1885,7 +1912,7 @@ int tms32025_device::process_IRQs()
 			return m_tms32025_irq_cycles;
 		}
 		if ((m_IFR & 0x10) && (m_imr & 0x10)) {       /* Serial port receive IRQ (internal) */
-//          logerror("TMS32025:  Active RINT (Serial receive)\n");
+//          logerror("TMS3202x:  Active RINT (Serial receive)\n");
 			m_drr = m_dr_in();
 			m_PC = 0x001A;
 			m_idle = 0;
@@ -1894,7 +1921,7 @@ int tms32025_device::process_IRQs()
 			return m_tms32025_irq_cycles;
 		}
 		if ((m_IFR & 0x20) && (m_imr & 0x20)) {       /* Serial port transmit IRQ (internal) */
-//          logerror("TMS32025:  Active XINT (Serial transmit)\n");
+//          logerror("TMS3202x:  Active XINT (Serial transmit)\n");
 			m_dx_out(m_dxr);
 			m_PC = 0x001C;
 			m_idle = 0;
@@ -1907,39 +1934,36 @@ int tms32025_device::process_IRQs()
 }
 
 
-void tms32025_device::process_timer(int clocks)
+inline void tms3202x_device::process_timer(int clocks)
 {
-	int preclocks, ticks;
-
-	/* easy case: no actual ticks */
-again:
-	preclocks = CLK - m_timerover;
-	if (clocks < preclocks)
+	while (true)
 	{
-		m_timerover += clocks;
-		m_icount -= clocks;
-		return;
-	}
+		int const preclocks = CLK - m_timerover;
+		if (clocks < preclocks)
+		{
+			/* easy case: no actual ticks */
+			m_timerover += clocks;
+			m_icount -= clocks;
+			break;
+		}
 
-	/* if we're not going to overflow the timer, just count the clocks */
-	ticks = 1 + (clocks - preclocks) / CLK;
-	if (ticks <= m_tim)
-	{
-		m_icount -= clocks;
-		m_timerover = clocks - (ticks - 1) * CLK - preclocks;
-		m_tim -= ticks;
-	}
+		int const ticks = 1 + (clocks - preclocks) / CLK;
+		if (ticks <= m_tim)
+		{
+			/* if we're not going to overflow the timer, just count the clocks */
+			m_icount -= clocks;
+			m_timerover = clocks - (ticks - 1) * CLK - preclocks;
+			m_tim -= ticks;
+			break;
+		}
 
-	/* otherwise, overflow the timer and signal an interrupt */
-	else
-	{
+		/* otherwise, overflow the timer and signal an interrupt */
 		m_icount -= preclocks + CLK * m_tim;
 		m_timerover = 0;
 		m_tim = m_prd;
 
 		m_IFR |= 0x08;
 		clocks = process_IRQs();        /* Handle Timer IRQ */
-		goto again;
 	}
 }
 
@@ -1947,7 +1971,7 @@ again:
 /****************************************************************************
  *  Execute ICount cycles. Exit when 0 or less
  ****************************************************************************/
-void tms32025_device::execute_run()
+void tms3202x_device::execute_run()
 {
 	/**** Respond to external hold signal */
 	if (m_hold_in() == ASSERT_LINE) {
@@ -2084,7 +2108,7 @@ void tms32025_device::execute_run()
 /****************************************************************************
  *  Set IRQ line state
  ****************************************************************************/
-void tms32025_device::execute_set_input(int irqline, int state)
+void tms3202x_device::execute_set_input(int irqline, int state)
 {
 	if ( irqline == TMS32025_FSX ) {
 		if (state != CLEAR_LINE && m_waiting_for_serial_frame)

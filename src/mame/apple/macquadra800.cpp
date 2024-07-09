@@ -20,6 +20,7 @@
 #include "emu.h"
 
 #include "adbmodem.h"
+#include "dfac.h"
 #include "djmemc.h"
 #include "iosb.h"
 #include "macadb.h"
@@ -54,6 +55,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_djmemc(*this, "djmemc"),
 		m_iosb(*this, "iosb"),
+		m_dfac(*this, "dfac"),
 		m_macadb(*this, "macadb"),
 		m_adbmodem(*this, "adbmodem"),
 		m_scc(*this, "scc"),
@@ -78,6 +80,7 @@ private:
 	required_device<m68040_device> m_maincpu;
 	required_device<djmemc_device> m_djmemc;
 	required_device<iosb_device> m_iosb;
+	required_device<dfac_device> m_dfac;
 	required_device<macadb_device> m_macadb;
 	required_device<adbmodem_device> m_adbmodem;
 	required_device<z80scc_device> m_scc;
@@ -192,6 +195,11 @@ void quadra800_state::macqd800(machine_config &config)
 	m_iosb->read_pa2().set_constant(0);
 	m_iosb->read_pa4().set_constant(1);
 	m_iosb->read_pa6().set_constant(0);
+
+	APPLE_DFAC(config, m_dfac, 22257);
+	m_iosb->write_dfac_clock().set(m_dfac, FUNC(dfac_device::clock_write));
+	m_iosb->write_dfac_data().set(m_dfac, FUNC(dfac_device::data_write));
+	m_iosb->write_dfac_latch().set(m_dfac, FUNC(dfac_device::latch_write));
 
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);

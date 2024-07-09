@@ -427,6 +427,9 @@ skattva                         // (c) 1995
 backgamn                        // (c) 1990
 manohman                        // 199?, Merkur.
 
+@source:adp/stella8085.cpp
+dicemstr
+
 @source:adp/stellafr.cpp
 st_ohla                         //
 st_vulkn                        //
@@ -933,6 +936,8 @@ maclc580                        // April 3, 1995 Apple Macintosh LC/Performa 580
 
 @source:apple/macquadra700.cpp
 macqd700                        // 1991 Apple Macintosh Quadra 700
+macqd900                        // 1991 Apple Macintosh Quadra 900
+macqd950                        // 1992 Apple Macintosh Quadra 950
 
 @source:apple/macquadra800.cpp
 macqd800                        // 1993 Apple Macintosh Quadra 800
@@ -1411,6 +1416,7 @@ arcadecl                        // (proto)          (c) 1992
 sparkz                          // (proto)          (c) 1992
 
 @source:atari/asteroid.cpp
+aerolitol                       // Pasatiempos Laguna bootleg
 aerolitos                       // Rodmar Elec. bootleg
 astdelux                        // 0351xx           (c) 1980
 astdelux1                       // 0351xx           (c) 1980
@@ -1643,6 +1649,7 @@ atetb5205                       // (bootleg, with OKI M5205)
 atetrisbp                       //
 atetrisc                        // 136066           (c) 1989
 atetrisc2                       // 136066           (c) 1989
+link                            // (bootleg)
 
 @source:atari/avalnche.cpp
 avalnche                        // 030574           1978/04 [6502]
@@ -2371,6 +2378,7 @@ sv8000                          // Super Vision 8000
 tama                            // Bandai
 
 @source:bandai/wswan.cpp
+pockchv2                        // Benesse Pocket Challenge V2
 wscolor                         // Bandai WonderSwan Color Handheld
 wswan                           // Bandai WonderSwan Handheld
 
@@ -9152,6 +9160,12 @@ bebox2                          // BeBox Dual603-133
 @source:beehive/microb.cpp
 dm3270                          //
 
+@source:benesse/challenge_gear.cpp
+chalgear
+
+@source:benesse/pockchal.cpp
+pockchal
+
 @source:bfm/bfcobra.cpp
 beeline                         // 1991 BFM
 brkball                         // 1994 BFM / ATOD
@@ -9220,11 +9234,11 @@ ad5crsce                        //
 ad5crscf                        //
 ad5crscg                        //
 ad5crsch                        //
-ad5dnd                          // Deal Or No Deal (Bellfruit) (AD5)
+ad5dnd                          // Deal or No Deal (Bellfruit) (AD5)
 ad5dnda                         //
 ad5dndb                         //
 ad5dndc                         //
-ad5dndcl                        // Deal Or No Deal Club (Bellfruit) (AD5)
+ad5dndcl                        // Deal or No Deal Club (Bellfruit) (AD5)
 ad5dndcla                       //
 ad5dndclb                       //
 ad5dndclc                       //
@@ -9233,7 +9247,7 @@ ad5dndcle                       //
 ad5dndclf                       //
 ad5dndclg                       //
 ad5dndd                         //
-ad5dnddd                        // Deal Or No Deal Double Deal Or No Deal (Bellfruit) (AD5)
+ad5dnddd                        // Deal or No Deal Double Deal or No Deal (Bellfruit) (AD5)
 ad5dnddda                       //
 ad5dnde                         //
 ad5dndf                         //
@@ -9247,11 +9261,11 @@ ad5dndm                         //
 ad5dndn                         //
 ad5dndo                         //
 ad5dndp                         //
-ad5dndpg                        // Deal Or No Deal The Perfect Game (Bellfruit)
+ad5dndpg                        // Deal or No Deal The Perfect Game (Bellfruit)
 ad5dndpga                       //
 ad5dndpgb                       //
 ad5dndpgc                       //
-ad5dndpl                        // Deal Or No Deal Platinum (Bellfruit)
+ad5dndpl                        // Deal or No Deal Platinum (Bellfruit)
 ad5dndpla                       //
 ad5dndplb                       //
 ad5dndplc                       //
@@ -11038,10 +11052,10 @@ sc4dmineb                       //
 sc4dminec                       //
 sc4dmined                       //
 sc4dminee                       //
-sc4dnd                          // Deal Or No Deal (Bellfruit)
+sc4dnd                          // Deal or No Deal (Bellfruit)
 sc4dnda                         //
 sc4dndb                         //
-sc4dndbb                        // Deal Or No Deal Break The Bank (Bellfruit)
+sc4dndbb                        // Deal or No Deal Break The Bank (Bellfruit)
 sc4dndbba                       //
 sc4dndbbb                       //
 sc4dndbbc                       //
@@ -11051,15 +11065,15 @@ sc4dndbbf                       //
 sc4dndbbg                       //
 sc4dndbbh                       //
 sc4dndbbi                       //
-sc4dndbc                        // Deal Or No Deal Box Clever (Bellfruit)
+sc4dndbc                        // Deal or No Deal Box Clever (Bellfruit)
 sc4dndbca                       //
-sc4dndbd                        // Deal Or No Deal The Big Deal (Bellfruit)
+sc4dndbd                        // Deal or No Deal The Big Deal (Bellfruit)
 sc4dndbda                       //
 sc4dndbdb                       //
 sc4dndbdc                       //
 sc4dndbdd                       //
 sc4dndbde                       //
-sc4dndbe                        // Deal Or No Deal Beat The Banker (Bellfruit)
+sc4dndbe                        // Deal or No Deal Beat The Banker (Bellfruit)
 sc4dndbeb                       //
 sc4dndbec                       //
 sc4dndbed                       //
@@ -11073,7 +11087,7 @@ sc4dndbek                       //
 sc4dndbel                       //
 sc4dndbem                       //
 sc4dndben                       //
-sc4dndbr                        // Deal Or No Deal The Big Reds (Bellfruit)
+sc4dndbr                        // Deal or No Deal The Big Reds (Bellfruit)
 sc4dndbra                       //
 sc4dndbrb                       //
 sc4dndbrc                       //
@@ -11082,14 +11096,14 @@ sc4dndbre                       //
 sc4dndbrf                       //
 sc4dndbrg                       //
 sc4dndc                         //
-sc4dndcc                        // Deal Or No Deal The Crazy Chair (Bellfruit)
+sc4dndcc                        // Deal or No Deal The Crazy Chair (Bellfruit)
 sc4dndcca                       //
 sc4dndccb                       //
 sc4dndccc                       //
 sc4dndccd                       //
 sc4dndcce                       //
 sc4dndccf                       //
-sc4dndcl                        // Deal Or No Deal Club (Bellfruit)
+sc4dndcl                        // Deal or No Deal Club (Bellfruit)
 sc4dndcla                       //
 sc4dndclb                       //
 sc4dndclc                       //
@@ -11097,18 +11111,18 @@ sc4dndcld                       //
 sc4dndcle                       //
 sc4dndclf                       //
 sc4dndclg                       //
-sc4dndcs                        // Deal Or No Deal Classic (Bellfruit)
+sc4dndcs                        // Deal or No Deal Classic (Bellfruit)
 sc4dndcsa                       //
 sc4dndcsb                       //
 sc4dndcsc                       //
 sc4dndcsd                       //
 sc4dndcse                       //
-sc4dndcw                        // Deal Or No Deal The Walk Of Wealth Classic (Bellfruit)
+sc4dndcw                        // Deal or No Deal The Walk Of Wealth Classic (Bellfruit)
 sc4dndcwa                       //
 sc4dndcwb                       //
 sc4dndcwc                       //
 sc4dndd                         //
-sc4dnddd                        // Deal Or No Deal Double Deal Or No Deal (Bellfruit)
+sc4dnddd                        // Deal or No Deal Double Deal or No Deal (Bellfruit)
 sc4dnddda                       //
 sc4dndddb                       //
 sc4dndddc                       //
@@ -11116,13 +11130,13 @@ sc4dndddd                       //
 sc4dnddde                       //
 sc4dndddf                       //
 sc4dndddg                       //
-sc4dnddf                        // Deal Or No Deal The Dream Factory (Bellfruit)
+sc4dnddf                        // Deal or No Deal The Dream Factory (Bellfruit)
 sc4dnddfa                       //
 sc4dnddfb                       //
 sc4dnddfc                       //
 sc4dnddfd                       //
 sc4dnddfe                       //
-sc4dnddw                        // Deal Or No Deal The Deal Wheel (Bellfruit)
+sc4dnddw                        // Deal or No Deal The Deal Wheel (Bellfruit)
 sc4dnddwa                       //
 sc4dnddwb                       //
 sc4dnddwc                       //
@@ -11134,7 +11148,7 @@ sc4dnde                         //
 sc4dndf                         //
 sc4dndg                         //
 sc4dndh                         //
-sc4dndhf                        // Deal Or No Deal Hall Of Fame (Bellfruit)
+sc4dndhf                        // Deal or No Deal Hall Of Fame (Bellfruit)
 sc4dndhfa                       //
 sc4dndhfb                       //
 sc4dndhfc                       //
@@ -11151,7 +11165,7 @@ sc4dndi                         //
 sc4dndj                         //
 sc4dndk                         //
 sc4dndl                         //
-sc4dndlp                        // Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit)
+sc4dndlp                        // Deal or No Deal Let's Play Deal or No Deal (Bellfruit)
 sc4dndlpa                       //
 sc4dndlpb                       //
 sc4dndlpc                       //
@@ -11160,19 +11174,19 @@ sc4dndlpe                       //
 sc4dndm                         //
 sc4dndn                         //
 sc4dndo                         //
-sc4dndpg                        // Deal Or No Deal The Perfect Game (Bellfruit)
+sc4dndpg                        // Deal or No Deal The Perfect Game (Bellfruit)
 sc4dndpga                       //
 sc4dndpgb                       //
 sc4dndpgc                       //
 sc4dndpgd                       //
 sc4dndpge                       //
-sc4dndra                        // Deal Or No Deal Red Alert (Bellfruit)
+sc4dndra                        // Deal or No Deal Red Alert (Bellfruit)
 sc4dndraa                       //
 sc4dndrab                       //
 sc4dndrac                       //
 sc4dndrad                       //
 sc4dndrae                       //
-sc4dndtp                        // Deal Or No Deal The Power (Bellfruit)
+sc4dndtp                        // Deal or No Deal The Power (Bellfruit)
 sc4dndtpa                       //
 sc4dndtpb                       //
 sc4dndtpc                       //
@@ -11186,9 +11200,9 @@ sc4dndtpj                       //
 sc4dndtpk                       //
 sc4dndtpl                       //
 sc4dndtpm                       //
-sc4dndtr                        // Deal Or No Deal Think Red (Bellfruit)
+sc4dndtr                        // Deal or No Deal Think Red (Bellfruit)
 sc4dndtra                       //
-sc4dndwb                        // Deal Or No Deal What's In Your Box (Bellfruit)
+sc4dndwb                        // Deal or No Deal What's In Your Box (Bellfruit)
 sc4dndwba                       //
 sc4dndwbb                       //
 sc4dndwbc                       //
@@ -11196,13 +11210,13 @@ sc4dndwbd                       //
 sc4dndwbe                       //
 sc4dndwbf                       //
 sc4dndwbg                       //
-sc4dndww                        // Deal Or No Deal The Walk Of Wealth (Bellfruit)
+sc4dndww                        // Deal or No Deal The Walk Of Wealth (Bellfruit)
 sc4dndwwa                       //
 sc4dndwwb                       //
 sc4dndwwc                       //
 sc4dndwwd                       //
 sc4dndwwe                       //
-sc4dndys                        // Deal Or No Deal It's Your Show (Bellfruit)
+sc4dndys                        // Deal or No Deal It's Your Show (Bellfruit)
 sc4dndysa                       //
 sc4dndysb                       //
 sc4dndysc                       //
@@ -13678,9 +13692,9 @@ sc5ddbbcf                       //
 sc5ddbbcg                       //
 sc5ddosh                        // Doctor Dosh (Bellfruit)
 sc5ddosha                       //
-sc5ddply                        // Deal Or No Deal Player's Choice (Bellfruit)
+sc5ddply                        // Deal or No Deal Player's Choice (Bellfruit)
 sc5ddplya                       //
-sc5ddptg                        // Deal Or No Deal Play The Game (Bellfruit)
+sc5ddptg                        // Deal or No Deal Play The Game (Bellfruit)
 sc5ddptga                       //
 sc5ddptgb                       //
 sc5ddptgc                       //
@@ -13709,10 +13723,10 @@ sc5dminei                       //
 sc5dminej                       //
 sc5dminek                       //
 sc5dminel                       //
-sc5dnd                          // Deal Or No Deal (Bellfruit)
+sc5dnd                          // Deal or No Deal (Bellfruit)
 sc5dnda                         //
 sc5dndb                         //
-sc5dndbb                        // Deal Or No Deal Break The Bank (Bellfruit)
+sc5dndbb                        // Deal or No Deal Break The Bank (Bellfruit)
 sc5dndbba                       //
 sc5dndbbb                       //
 sc5dndbbc                       //
@@ -13720,7 +13734,7 @@ sc5dndbbd                       //
 sc5dndbbe                       //
 sc5dndbbf                       //
 sc5dndbbg                       //
-sc5dndbc                        // Deal Or No Deal Box Clever (Bellfruit)
+sc5dndbc                        // Deal or No Deal Box Clever (Bellfruit)
 sc5dndbca                       //
 sc5dndbcb                       //
 sc5dndbcc                       //
@@ -13732,7 +13746,7 @@ sc5dndbch                       //
 sc5dndbci                       //
 sc5dndbcj                       //
 sc5dndbck                       //
-sc5dndbd                        // Deal Or No Deal The Big Deal (Bellfruit)
+sc5dndbd                        // Deal or No Deal The Big Deal (Bellfruit)
 sc5dndbda                       //
 sc5dndbdb                       //
 sc5dndbdc                       //
@@ -13742,7 +13756,7 @@ sc5dndbdf                       //
 sc5dndbdg                       //
 sc5dndbdh                       //
 sc5dndbdi                       //
-sc5dndbe                        // Deal Or No Deal Beat The Banker (Bellfruit)
+sc5dndbe                        // Deal or No Deal Beat The Banker (Bellfruit)
 sc5dndbea                       //
 sc5dndbeb                       //
 sc5dndbec                       //
@@ -13757,7 +13771,7 @@ sc5dndbek                       //
 sc5dndbel                       //
 sc5dndbem                       //
 sc5dndben                       //
-sc5dndbl                        // Deal Or No Deal Beat The Banker Club (Bellfruit)
+sc5dndbl                        // Deal or No Deal Beat The Banker Club (Bellfruit)
 sc5dndbla                       //
 sc5dndblb                       //
 sc5dndblc                       //
@@ -13777,7 +13791,7 @@ sc5dndblp                       //
 sc5dndblq                       //
 sc5dndblr                       //
 sc5dndbls                       //
-sc5dndbo                        // Deal Or No Deal Banker's Bonus (Bellfruit)
+sc5dndbo                        // Deal or No Deal Banker's Bonus (Bellfruit)
 sc5dndboa                       //
 sc5dndbob                       //
 sc5dndboc                       //
@@ -13791,13 +13805,13 @@ sc5dndboj                       //
 sc5dndbok                       //
 sc5dndbol                       //
 sc5dndbom                       //
-sc5dndbq                        // Deal Or No Deal Beat The Banker (Qps)
+sc5dndbq                        // Deal or No Deal Beat The Banker (Qps)
 sc5dndbqa                       //
 sc5dndbqb                       //
 sc5dndbqc                       //
 sc5dndbqd                       //
 sc5dndbqe                       //
-sc5dndbr                        // Deal Or No Deal The Big Reds (Bellfruit)
+sc5dndbr                        // Deal or No Deal The Big Reds (Bellfruit)
 sc5dndbra                       //
 sc5dndbrb                       //
 sc5dndbrc                       //
@@ -13858,7 +13872,7 @@ sc5dndcad                       //
 sc5dndcae                       //
 sc5dndcb                        //
 sc5dndcba                       //
-sc5dndcc                        // Deal Or No Deal The Crazy Chair (Bellfruit)
+sc5dndcc                        // Deal or No Deal The Crazy Chair (Bellfruit)
 sc5dndcca                       //
 sc5dndccb                       //
 sc5dndccc                       //
@@ -13877,9 +13891,9 @@ sc5dndcco                       //
 sc5dndccp                       //
 sc5dndccq                       //
 sc5dndccr                       //
-sc5dndcl                        // Deal Or No Deal Club (Bellfruit)
+sc5dndcl                        // Deal or No Deal Club (Bellfruit)
 sc5dndcla                       //
-sc5dndcr                        // Deal Or No Deal Cops 'n' Robbers (Bellfruit)
+sc5dndcr                        // Deal or No Deal Cops 'n' Robbers (Bellfruit)
 sc5dndcra                       //
 sc5dndcrb                       //
 sc5dndcrc                       //
@@ -13900,7 +13914,7 @@ sc5dndcsk                       //
 sc5dndcsl                       //
 sc5dndcsm                       //
 sc5dndd                         //
-sc5dnddd                        // Deal Or No Deal Double Deal Or No Deal (Bellfruit)
+sc5dnddd                        // Deal or No Deal Double Deal or No Deal (Bellfruit)
 sc5dnddda                       //
 sc5dndddb                       //
 sc5dndddc                       //
@@ -13910,7 +13924,7 @@ sc5dndddf                       //
 sc5dndddg                       //
 sc5dndddh                       //
 sc5dndddi                       //
-sc5dndde                        // Deal Or No Deal Desert Island Deal (Bellfruit)
+sc5dndde                        // Deal or No Deal Desert Island Deal (Bellfruit)
 sc5dnddea                       //
 sc5dnddeb                       //
 sc5dnddec                       //
@@ -13918,7 +13932,7 @@ sc5dndded                       //
 sc5dnddee                       //
 sc5dnddef                       //
 sc5dnddeg                       //
-sc5dnddf                        // Deal Or No Deal The Dream Factory (Bellfruit)
+sc5dnddf                        // Deal or No Deal The Dream Factory (Bellfruit)
 sc5dnddfa                       //
 sc5dnddfb                       //
 sc5dnddfc                       //
@@ -13933,22 +13947,22 @@ sc5dnddfk                       //
 sc5dnddfl                       //
 sc5dnddfm                       //
 sc5dnddfn                       //
-sc5dnddi                        // Deal Or No Deal Diamond (Bellfruit)
+sc5dnddi                        // Deal or No Deal Diamond (Bellfruit)
 sc5dnddia                       //
 sc5dnddib                       //
 sc5dnddic                       //
-sc5dnddo                        // Deal Or No Deal Dream Offer (Bellfruit)
+sc5dnddo                        // Deal or No Deal Dream Offer (Bellfruit)
 sc5dnddoa                       //
 sc5dnddob                       //
 sc5dnddoc                       //
-sc5dnddt                        // Deal Or No Deal Double Take (Bellfruit)
+sc5dnddt                        // Deal or No Deal Double Take (Bellfruit)
 sc5dnddta                       //
 sc5dnddtb                       //
 sc5dnddtc                       //
 sc5dnddtd                       //
 sc5dnddte                       //
 sc5dnddtf                       //
-sc5dnddw                        // Deal Or No Deal The Deal Wheel (Bellfruit)
+sc5dnddw                        // Deal or No Deal The Deal Wheel (Bellfruit)
 sc5dnddwa                       //
 sc5dnddwb                       //
 sc5dnddwc                       //
@@ -13961,14 +13975,14 @@ sc5dnddwi                       //
 sc5dnddwj                       //
 sc5dnde                         //
 sc5dndf                         //
-sc5dndfl                        // Deal Or No Deal Feeling Lucky (Bellfruit)
+sc5dndfl                        // Deal or No Deal Feeling Lucky (Bellfruit)
 sc5dndfla                       //
 sc5dndflb                       //
 sc5dndflc                       //
 sc5dndfld                       //
 sc5dndfle                       //
 sc5dndg                         //
-sc5dndgl                        // Deal Or No Deal Gold (Bellfruit)
+sc5dndgl                        // Deal or No Deal Gold (Bellfruit)
 sc5dndgla                       //
 sc5dndglb                       //
 sc5dndglc                       //
@@ -13980,10 +13994,10 @@ sc5dndglh                       //
 sc5dndgli                       //
 sc5dndglj                       //
 sc5dndglk                       //
-sc5dndgo                        // Deal Or No Deal Game On (Bellfruit)
+sc5dndgo                        // Deal or No Deal Game On (Bellfruit)
 sc5dndgoa                       //
 sc5dndh                         //
-sc5dndhf                        // Deal Or No Deal Hall Of Fame (Bellfruit)
+sc5dndhf                        // Deal or No Deal Hall Of Fame (Bellfruit)
 sc5dndhfa                       //
 sc5dndhfb                       //
 sc5dndhfc                       //
@@ -14009,11 +14023,11 @@ sc5dndi                         //
 sc5dndj                         //
 sc5dndk                         //
 sc5dndl                         //
-sc5dndld                        // Deal Or No Deal Live The Dream (Bellfruit)
+sc5dndld                        // Deal or No Deal Live The Dream (Bellfruit)
 sc5dndlda                       //
 sc5dndldb                       //
 sc5dndldc                       //
-sc5dndlp                        // Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit)
+sc5dndlp                        // Deal or No Deal Let's Play Deal or No Deal (Bellfruit)
 sc5dndlpa                       //
 sc5dndlpb                       //
 sc5dndlpc                       //
@@ -14036,7 +14050,7 @@ sc5dndlps                       //
 sc5dndlpt                       //
 sc5dndlpu                       //
 sc5dndm                         //
-sc5dndmb                        // Deal Or No Deal Make Or Break (Bellfruit)
+sc5dndmb                        // Deal or No Deal Make Or Break (Bellfruit)
 sc5dndmba                       //
 sc5dndmbb                       //
 sc5dndmbc                       //
@@ -14048,7 +14062,7 @@ sc5dndmbh                       //
 sc5dndmbi                       //
 sc5dndmbj                       //
 sc5dndmbk                       //
-sc5dndmd                        // Deal Or No Deal Mega Deal Or No Deal (Bellfruit)
+sc5dndmd                        // Deal or No Deal Mega Deal or No Deal (Bellfruit)
 sc5dndmda                       //
 sc5dndmdb                       //
 sc5dndmdc                       //
@@ -14063,19 +14077,19 @@ sc5dndmdk                       //
 sc5dndn                         //
 sc5dndo                         //
 sc5dndp                         //
-sc5dndpa                        // Deal Or No Deal Play It Again (Bellfruit)
+sc5dndpa                        // Deal or No Deal Play It Again (Bellfruit)
 sc5dndpaa                       //
 sc5dndpab                       //
 sc5dndpac                       //
-sc5dndpc                        // Deal Or No Deal The Players Choice (Bellfruit)
+sc5dndpc                        // Deal or No Deal The Players Choice (Bellfruit)
 sc5dndpca                       //
-sc5dndpd                        // Deal Or No Deal The Perfect Deal (Bellfruit)
+sc5dndpd                        // Deal or No Deal The Perfect Deal (Bellfruit)
 sc5dndpda                       //
 sc5dndpdb                       //
 sc5dndpdc                       //
 sc5dndpdd                       //
 sc5dndpde                       //
-sc5dndpg                        // Deal Or No Deal The Perfect Game (Bellfruit)
+sc5dndpg                        // Deal or No Deal The Perfect Game (Bellfruit)
 sc5dndpga                       //
 sc5dndpgb                       //
 sc5dndpgc                       //
@@ -14099,13 +14113,13 @@ sc5dndpgt                       //
 sc5dndpgu                       //
 sc5dndpgv                       //
 sc5dndpgw                       //
-sc5dndpl                        // Deal Or No Deal The Perfect Game Classic (Bellfruit)
+sc5dndpl                        // Deal or No Deal The Perfect Game Classic (Bellfruit)
 sc5dndpla                       //
 sc5dndplb                       //
 sc5dndplc                       //
 sc5dndq                         //
 sc5dndr                         //
-sc5dndra                        // Deal Or No Deal Red Alert (Bellfruit)
+sc5dndra                        // Deal or No Deal Red Alert (Bellfruit)
 sc5dndraa                       //
 sc5dndrab                       //
 sc5dndrac                       //
@@ -14117,28 +14131,28 @@ sc5dndrah                       //
 sc5dndrai                       //
 sc5dndraj                       //
 sc5dndrak                       //
-sc5dndrr                        // Deal Or No Deal Road To Riches (Bellfruit)
+sc5dndrr                        // Deal or No Deal Road To Riches (Bellfruit)
 sc5dndrra                       //
 sc5dndrrb                       //
 sc5dndrrc                       //
 sc5dndrrd                       //
 sc5dndrre                       //
-sc5dndrt                        // Deal Or No Deal The Banker Rings Twice (Bellfruit)
+sc5dndrt                        // Deal or No Deal The Banker Rings Twice (Bellfruit)
 sc5dndrta                       //
 sc5dndrtb                       //
 sc5dndrtc                       //
 sc5dndrtd                       //
 sc5dndrte                       //
 sc5dnds                         //
-sc5dndsi                        // Deal Or No Deal Simply Deal Or No Deal (Bellfruit)
+sc5dndsi                        // Deal or No Deal Simply Deal or No Deal (Bellfruit)
 sc5dndsia                       //
 sc5dndsib                       //
 sc5dndsic                       //
 sc5dndsid                       //
 sc5dndt                         //
-sc5dndtb                        // Deal Or No Deal Think Big (Bellfruit)
+sc5dndtb                        // Deal or No Deal Think Big (Bellfruit)
 sc5dndtba                       //
-sc5dndtp                        // Deal Or No Deal The Power (Bellfruit)
+sc5dndtp                        // Deal or No Deal The Power (Bellfruit)
 sc5dndtpa                       //
 sc5dndtpb                       //
 sc5dndtpc                       //
@@ -14161,7 +14175,7 @@ sc5dndtps                       //
 sc5dndtpt                       //
 sc5dndtpu                       //
 sc5dndtpv                       //
-sc5dndtr                        // Deal Or No Deal Think Red (Bellfruit)
+sc5dndtr                        // Deal or No Deal Think Red (Bellfruit)
 sc5dndtra                       //
 sc5dndtrb                       //
 sc5dndtrc                       //
@@ -14173,7 +14187,7 @@ sc5dndtrh                       //
 sc5dndtri                       //
 sc5dndtrj                       //
 sc5dndtrk                       //
-sc5dndwb                        // Deal Or No Deal What's In Your Box (Bellfruit)
+sc5dndwb                        // Deal or No Deal What's In Your Box (Bellfruit)
 sc5dndwba                       //
 sc5dndwbb                       //
 sc5dndwbc                       //
@@ -14201,7 +14215,7 @@ sc5dndwcd                       //
 sc5dndwce                       //
 sc5dndwcf                       //
 sc5dndwcg                       //
-sc5dndwi                        // Deal Or No Deal What's In Your Box Casino (Bellfruit)
+sc5dndwi                        // Deal or No Deal What's In Your Box Casino (Bellfruit)
 sc5dndwia                       //
 sc5dndwib                       //
 sc5dndwic                       //
@@ -14209,7 +14223,7 @@ sc5dndwid                       //
 sc5dndwie                       //
 sc5dndwif                       //
 sc5dndwig                       //
-sc5dndww                        // Deal Or No Deal The Walk Of Wealth (Bellfruit)
+sc5dndww                        // Deal or No Deal The Walk Of Wealth (Bellfruit)
 sc5dndwwa                       //
 sc5dndwwb                       //
 sc5dndwwc                       //
@@ -14229,7 +14243,7 @@ sc5dndwwp                       //
 sc5dndwwq                       //
 sc5dndwwr                       //
 sc5dndwws                       //
-sc5dndys                        // Deal Or No Deal It's Your Show (Bellfruit)
+sc5dndys                        // Deal or No Deal It's Your Show (Bellfruit)
 sc5dndysa                       //
 sc5dndysb                       //
 sc5dndysc                       //
@@ -16146,6 +16160,9 @@ cncchess2
 @source:chess/conic_cchess3.cpp
 cncchess3
 
+@source:chess/krypton_regency.cpp
+regency
+
 @source:chess/regence.cpp
 regence
 
@@ -18020,7 +18037,11 @@ feagv5                          //
 feagv7                          //
 feagv7a                         //
 feagv7b                         //
+feagv7c                         //
 feagv9                          //
+feagv9a                         //
+feagv9b                         //
+feagv9c                         //
 fex68k                          //
 fex68ka                         //
 fex68kb                         //
@@ -18036,15 +18057,16 @@ premiere                        //
 feldo
 
 @source:fidelity/elite.cpp
+feag                            //
+feag2100                        //
+feag2100a                       //
 feas                            //
 feasbu                          //
 feasbua                         //
 feasgla                         //
 feasglaa                        //
 feasglab                        //
-feag                            //
-feag2100                        //
-feag2100a                       //
+feasx                           //
 fpres                           //
 fpresa                          //
 fpresb                          //
@@ -19419,19 +19441,33 @@ wildfire                        // Parker Bros
 @source:hds/hds200.cpp
 hds200                          // (c) Human Designed Systems
 
-@source:heathkit/et3400.cpp
+@source:heathzenith/et3400.cpp
 et3400                          //
 
-@source:heathkit/h8.cpp
+@source:heathzenith/h8.cpp
 h8                              //
 
-@source:heathkit/h19.cpp
-h19                             // Heath H19 (Zenith Z-19)
+@source:heathzenith/h19.cpp
+h19                             // Heath H19
 
-@source:heathkit/h89.cpp
-h89                             // Heath H89 (WH89, Zenith Z-89, Z-90)
+@source:heathzenith/h89.cpp
+h89                             // Heath H89 (WH89)
 h88                             // Heath H88 (with cassette tape)
+h89_mms                         // Heath H89 with Magnolia MicroSystems(MMS) hardware
 h89_sigmasoft                   // H89 with the SigmaSoft IGC card
+z90                             // Zenith Z-90
+
+@source:heathzenith/mdt60.cpp
+mdt60                           //
+
+@source:heathzenith/z22.cpp
+z22                             //
+
+@source:heathzenith/z29.cpp
+z29                             //
+
+@source:heathzenith/z100.cpp
+z100                            //
 
 @source:hec2hrp/hec2hrp.cpp
 hec2hr                          //
@@ -19472,11 +19508,13 @@ mephisto
 mephisto1x
 mephisto2
 mephisto2a
-mephisto2e
+mephisto2b
 mephisto3
 mephisto3a
 mephisto3b
 mephisto3c
+mephistoe2
+mephistoe2a
 mephistoj
 
 @source:hegenerglaser/europa.cpp
@@ -19495,7 +19533,7 @@ nshort                          // 1993 Mephisto Nigel Short
 
 @source:hegenerglaser/mm1.cpp
 mm1
-mm1b
+mm1a
 mmirage
 
 @source:hegenerglaser/mm2.cpp
@@ -19787,6 +19825,9 @@ hp9845b_de                      //
 hp9845c_de                      //
 hp9845t_de                      //
 
+@source:hp/hp98x6.cpp
+hp9816a                         //
+
 @source:hp/hp9k.cpp
 hp9816                          //
 
@@ -19937,6 +19978,7 @@ cmast91                         // (c) 1991 Dyna Electronics
 cmast92                         // (c) 1992 Dyna Electronics
 cmast92a                        // (c) 1992 Dyna Electronics
 cmast97                         // (c) 1996 Dyna Electronics
+cmast97i                        // (c) 1996 Dyna Electronics
 cmast99                         // (c) 1999 Dyna Electronics
 cmast99b                        // bootleg
 cmaster                         // (c) 1991 Dyna Electronics
@@ -19962,8 +20004,11 @@ cmtetrisa                       //
 cmtetrisb                       //
 cmtetrisc                       //
 cmtetrisd                       //
+cmtetriskr                      //
 cmv4                            // (c) 1992 Dyna Electronics
 cmv4a                           // (c) 1992 Dyna Electronics
+cmv4zg                          // hack
+cmv4zga                         // hack
 cmv801                          // (c) 198? Corsica
 cmwm                            // (c) 199? Dyna Electronics
 crazybon                        // (c) 199? Sang Ho
@@ -20149,6 +20194,7 @@ tjsb                            // (c) 1997
 
 @source:igs/igs_fear.cpp
 fearless                        // (c) 2006
+superkds
 
 @source:igs/igs_m027.cpp
 amazoni2                        // (c) 2002
@@ -20166,6 +20212,8 @@ lhzb4                           // (c) 200?
 mgcs3                           // (c) 200?
 mgfx                            // (c) 200?
 mgzz                            // (c) 2003
+oceanpar                        //
+oceanpara                       //
 qlgs                            // (c) 1999
 sddz                            // (c) 200?
 sdwx                            // (c) 2002
@@ -21310,6 +21358,14 @@ xmultiplm72                     // (c) 1989 (Japan)
 @source:irem/m78.cpp
 bj92
 
+@source:irem/m80.cpp
+matchit                         // (c) 1989 Tamtex
+matchitb                        // bootleg
+shisen                          // (c) 1989 Tamtex
+shisena                         // (c) 1989 Tamtex
+sichuan2                        // bootleg
+sichuan2a                       // bootleg
+
 @source:irem/m90.cpp
 atompunk                        // (c) 1991 Irem America (licensed from Hudson Soft)
 bbmanw                          // (c) 1992 Irem (World)
@@ -21394,12 +21450,6 @@ demoneye                        // M27 (c) 1981
 panther                         // M27 no copyright notice
 redalert                        // M27 (c) 1981 + "GDI presents"
 ww3                             // M27 (c) 1981
-
-@source:irem/shisen.cpp
-matchit                         // (c) 1989 Tamtex
-shisen                          // (c) 1989 Tamtex
-sichuan2                        // (c) 1989 Tamtex
-sichuan2a                       // (c) 1989 Tamtex
 
 @source:irem/spartanxtec.cpp
 spartanxtec
@@ -23368,7 +23418,8 @@ galsnewt                        // (c) 1990 Kaneko (Taiwan)
 galsnewu                        // (c) 1990 Kaneko (US)
 hotnight                        // (c) 1994 Bulldog Amusements Inc.
 missmw96                        // (c) 1996 Comad
-missw02                         // (c) 2002 Daigom
+missw02                         // (c) 2002 Comad
+missw02d                        // (c) 2002 Daigom
 missw96                         // (c) 1996 Comad
 missw96a                        // (c) 1996 Comad
 missw96b                        // (c) 1996 Comad
@@ -23381,6 +23432,7 @@ smissw                          //
 supmodel                        // (c) 1994 Comad & New Japan System
 supmodl2                        // (c) 1997 Comad
 wownfant                        // (c) 2002 Comad
+wownfanta                       // (c) 2002 Comad
 zipzap                          // (c) 1995 Barko Corp
 zipzapa                         // (c) 1995 Barko Corp
 
@@ -23447,6 +23499,7 @@ gtmr                            // (c) 1994 Kaneko
 gtmr2                           // (c) 1995 Kaneko
 gtmr2a                          // (c) 1995 Kaneko
 gtmr2u                          // (c) 1995 Kaneko
+gtmr2ua                         // (c) 1995 Kaneko
 gtmra                           // (c) 1994 Kaneko
 gtmrb                           // (c) 1994 Kaneko
 gtmre                           // (c) 1994 Kaneko
@@ -23776,8 +23829,10 @@ popnmt                          // GQ976 (c) 2000 (Japan)
 popnmt2                         // GQ976 (c) 2000 (Japan)
 popnanm                         // GQ987 (c) 2000 (Japan)
 popnanma                        // GQ987 (c) 2000 (Japan)
-popnanm2                        // GEA02 (c) 2001 (Japan)
-popnanm2a                       // GEA02 (c) 2001 (Japan)
+popnanm2                        // GEA02 (c) 2001 (Japan JAC)
+popnanm2a                       // GEA02 (c) 2001 (Japan JAC)
+popnanm2ja                      // GEA02 (c) 2001 (Japan JAA)
+popnanm2jaa                     // GEA02 (c) 2001 (Japan JAA)
 ppd                             // GQ977 (c) 2000 (Korea)
 ppp                             // GQ977 (c) 2000 (Japan)
 ppp11                           // GQ977 (c) 2000 (Japan)
@@ -24415,6 +24470,7 @@ nyanpani                        // GX712 (c) 1988 (Japan)
 rf2                             // GX561 (c) 1985
 salamand                        // GX587 (c) 1986
 salamandj                       // GX587 (c) 1986
+salamandt                       // GX597 (c) 1986 (Tecfri)
 twinbee                         // GX412 (c) 1985
 twinbeeb                        // Bubble System
 
@@ -26982,9 +27038,9 @@ chkndrawa                       // (c) 1984 Merit
 couple                          // (c) 1988 Merit
 couplei                         // (c) 1988 Merit
 couplep                         // (c) 1988 Merit
-dodgectya                       // (c) 1986 Merit
-dodgectyb                       // (c) 1986 Merit
-dodgectyc                       // (c) 1986 Merit
+dodgectya                       // (c) 1988 Merit
+dodgectyb                       // (c) 1989 Merit
+dodgectyc                       // (c) 1989 Merit
 dtrvwz5                         // (c) 1987 Merit
 dtrvwz5v                        // (c) 1987 Merit
 housecard                       // (c) 1983 Merit
@@ -26997,6 +27053,7 @@ mdchoice                        // (c) 1983 Merit
 mpchoice                        // (c) 1983 Merit
 mpchoicea                       // (c) 1983 Merit
 mroundup                        // (c) 1984 Merit
+msupstar                        // (c) 1989 Merit
 phrcraze                        // (c) 1986 Merit
 phrcrazea                       // (c) 1986 Merit
 phrcrazeb                       // (c) 1986 Merit
@@ -27029,7 +27086,6 @@ trvwz4va                        // (c) 1985 Merit
 trvwza                          // (c) 1985 Merit
 trvwzb                          // (c) 1985 Merit
 trvwzv                          // (c) 1985 Merit
-unkmerit                        // (c) 1989 Merit
 
 @source:merit/merit3xx.cpp
 ma6710                          // (c) 1989 Merit
@@ -27039,6 +27095,7 @@ ma7551t                         // (c) 199? Merit
 ma7556                          // (c) 199? Merit
 ma7558                          // (c) 199? Merit
 ma8350                          // (c) 199? Merit
+ma9800                          // (c) 199? Merit
 
 @source:merit/meritm.cpp
 americna                        // (c) 1987 Merit
@@ -30146,6 +30203,7 @@ gtsers3                         // (c) 1984 Greyhound Electronics
 gtsers4                         // (c) 1984 Greyhound Electronics
 gtsers5                         // (c) 1985 Greyhound Electronics
 gtsers7                         // (c) 1985 Greyhound Electronics
+gtsers7a                        // (c) 1985 Greyhound Electronics
 gtsers8                         // (c) 1984 Greyhound Electronics
 gtsers8a                        // (c) 1984 Greyhound Electronics
 gtsers9                         // (c) 1984 Greyhound Electronics
@@ -30586,14 +30644,12 @@ jackpota
 @source:misc/jaminator.cpp
 jaminator                       // 1990 Noise Toys Inc.
 
-@source:misc/jankenmn.cpp
-jankenmn                        // (c) 1985 Sunwise
-
 @source:misc/jokrwild.cpp
 jokrwild                        // (c) 1988 Sigma
 
 @source:misc/joystand.cpp
 joystand                        // 1997 Yuvo
+x180                            // 1997 Yuvo
 x180ii                          // 1997 Yuvo
 
 @source:misc/jubilee.cpp
@@ -30649,7 +30705,9 @@ spotty                          // (c) 2001 Prince Co.
 @source:misc/ltcasino.cpp
 ltcasin2                        // (c) 1984 Digital Controls Inc
 ltcasin2a                       // (c) 1984 Digital Controls Inc
+ltcasin2b                       // (c) 1984 Digital Controls Inc
 ltcasino                        // (c) 1982 Digital Controls Inc
+ltcasinoa                       // (c) 1982 Digital Controls Inc
 mv4in1                          // (c) 1983 Entertainment Enterprises
 
 @source:misc/luckybal.cpp
@@ -32636,9 +32694,13 @@ mkit09                          //
 mkit09a                         //
 
 @source:multitech/mpf1.cpp
-mpf1                            // 1979 Multitech Micro Professor 1
-mpf1b                           // 1979 Multitech Micro Professor 1B
-mpf1p                           //
+cs113                           // 198? Sciento Robot Arm
+mpf1                            // 1981 Multitech Micro-Professor 1
+mpf1b                           // 1982 Multitech Micro-Professor 1B
+mt80z                           // 1982 MT-80Z
+
+@source:multitech/mpf1p.cpp
+mpf1p                           // 1983 Multitech Micro-Professor 1P
 
 @source:multitech/mpf1_88.cpp
 mpf1_88                         // 1985 Multitech Micro-Professor I/88
@@ -32830,6 +32892,7 @@ abcheck                         // (c) 1996 (Japan)
 
 @source:namco/namcops2.cpp
 acedriv3                        //
+batlgr3                         //
 bldyr3b                         //
 cobrata                         //
 dragchrn                        //
@@ -33845,6 +33908,7 @@ terrafu                         // (c) 1987 Nichibutsu USA
 terrafua                        // (c) 1987 Nichibutsu USA
 
 @source:nichibutsu/cclimber.cpp
+au                              // hack
 bagmanf                         // bootleg on Falcon FCK-00 (Falcon Crazy Kong) PCB
 bigkong                         // bootleg
 cannonb                         // (c) 1985 Soft
@@ -34795,6 +34859,7 @@ bubl2000                        // (c) 1998 Tuning
 bubl2000a                       // (c) 1998 Tuning
 cactus                          // bootleg
 dolmen                          // (c) 1995
+dolmenk                         // (c) 1995
 firehawk                        // (c) 2001 ESD
 firehawkv                       // (c) 2001 ESD
 grdnstrm                        // (c) 1998 Apples Industries license
@@ -34874,6 +34939,7 @@ hpierrot                        // NTC / NMK
 omatsuri                        // NMK
 pldoraemon                      // NMK
 plpittashi                      // NMK
+sluster2                        // NMK
 sweethrt                        // NMK
 trocana                         // NTC / NMK
 
@@ -35012,6 +35078,9 @@ nsvipa
 nsvipb
 nsvipc
 nvip
+
+@source:novag/zircon2.cpp
+zircon2
 
 @source:novation/basssta.cpp
 bassstr                         //
@@ -35276,6 +35345,8 @@ mspacmanbi                      // bootleg
 mspacmanblt                     // bootleg
 mspacmanblt2                    // bootleg
 mspacmancr                      // bootleg on Crush Roller board
+mspacmane                       // bootleg
+mspacmane2                      // bootleg
 mspacmanhnc                     // hack
 mspacmanlai                     // bootleg
 mspacmat                        // hack
@@ -35300,6 +35371,7 @@ pacman                          // (c) 1980 Midway
 pacmanf                         // hack
 pacmanfm                        // bootleg (FAMARE S.A.)
 pacmanjpm                       // bootleg
+pacmanmr                        // bootleg
 pacmanpe                        //
 pacmanso                        //
 pacmansp                        // hack (Video Game SA)
@@ -35772,6 +35844,9 @@ onlinertp                       // (c) 200? Comatel / Atata Systems
 @source:pc/ct486.cpp
 ct486                           // 1993? 486 with CS4031
 
+@source:pc/cuttherope.cpp
+cuttherope                      // (c) 2003 ICE
+
 @source:pc/dawg.cpp
 dawg
 
@@ -36105,6 +36180,7 @@ pleiadbl                        // bootleg
 pleiadce                        // (c) 1981 Centuri + Tehkan
 pleiads                         // (c) 1981 Tehkan
 pleiadsb2                       // bootleg
+pleiadsgmp                      // bootleg
 pleiadsi                        // bootleg (Irecsa)
 pleiadsia                       // bootleg (Irecsa)
 pleiadsn                        // bootleg (Niemer S.A.)
@@ -36367,16 +36443,17 @@ mnfb_c27                        //
 mnfb_c29                        //
 play_a24                        //
 poto_a29                        //
-poto_a32                        //
 poto_a31                        //
+poto_a32                        //
 robo_a29                        //
 robo_a30                        //
 robo_a34                        //
 simp_a20                        //
 simp_a27                        //
 ssvc_a26                        //
-ssvc_b26                        //
 ssvc_a42                        //
+ssvc_b26                        //
+ssvc_e40                        //
 tmac_a18                        //
 tmac_a24                        //
 tmac_g18                        //
@@ -36771,6 +36848,7 @@ ind250cc                        //
 indunkgam                       //
 lapbylap                        //
 larana                          //
+larana2                         //
 mundial                         //
 pinclown                        //
 pinmoonl                        //
@@ -37058,6 +37136,7 @@ sshtl_l3                        //
 sshtl_l7                        //
 
 @source:pinball/s11.cpp
+grand_l1                        //
 grand_l3                        //
 grand_l4                        //
 hs_l3                           //
@@ -38482,6 +38561,8 @@ vp111                           // 1977 Cosmac VIP VP-111
 
 @source:recfranco/rf51w14cg.cpp
 rf51w14cg                       // (c) 2003 Recreativos Franco
+rfsantafem                      // (c) 1995 Recreativos Franco
+rfsantafema                     // (c) 1995 Recreativos Franco
 
 @source:recfranco/rfjailbrk.cpp
 rfjailbrk                       // (c) 2000 Recreativos Franco
@@ -38505,10 +38586,12 @@ rc702                           // 1979 RC702
 rc759                           // 1984 RC759
 
 @source:rm/rm380z.cpp
-rm380z                          // 1978 RM380z with COS 4.0 firmware
-rm380zhrg                       // 1978 RM380z with COS 4.0 and HRG
-rm380z34d                       // 1978 RM380z with COS 3.4 firmware and casette
-rm380z34e                       // 1978 RM380z with COS 3.4 firmware and casette
+rm380z                          // 1978 RM380z with COS 4.0/M firmware
+rm380zhrg                       // 1978 RM380z with COS 4.0/M and HRG
+rm380zf                         // 1978 RM380z with COS 4.0/F firmware
+rm380zfhrg                      // 1978 RM380z with COS 4.0/F and HRG
+rm380z34d                       // 1978 RM380z with COS 3.4/F firmware and casette
+rm380z34e                       // 1978 RM380z with COS 3.4/M firmware and casette
 rm480z                          // 1981 RM480z
 rm480za                         // 1981 RM480z
 
@@ -38726,7 +38809,10 @@ edames
 exechess
 
 @source:saitek/gk2000.cpp
+centurion
+cougar
 gk2000
+gk2100
 
 @source:saitek/intchess.cpp
 intchess
@@ -38783,6 +38869,10 @@ sstar28k
 tstar432
 tstar432a
 tstar432b
+
+@source:saitek/tatrain.cpp
+tatrain
+tatraina
 
 @source:saitek/turbo16k.cpp
 compan3
@@ -38889,10 +38979,6 @@ mineswpr4                       // [1977 Amutech]
 
 @source:sega/calcune.cpp
 calcune
-
-@source:sega/calorie.cpp
-calorie                         // (c) 1986 Sega
-calorieb                        // (c) 1986 Sega (but bootleg)
 
 @source:sega/chihiro.cpp
 ccfboxa                         // 2009.03.31 Firmware Update For Compact Flash Box (Rev A)
@@ -39498,7 +39584,12 @@ meltyb                          // 2007.03 Melty Blood Act Cadenza Version B2 (R
 meltybld                        // 2005.08 Melty Blood Act Cadenza Ver. A (Rev C)
 meltyblo                        // 2005.03 Melty Blood Act Cadenza
 meltybo                         // 2006.12 Melty Blood Act Cadenza Version B
-mj1                             // 2002.10 Sega Yonin Uchi Mahjong MJ (Update Disc Ver.1.008) (CDP-10002B)
+mj1a                            // 2002.09 Sega Yonin Uchi Mahjong MJ (Update Disc Ver.1.007) (CDP-10002A)
+mj1b                            // 2002.10 Sega Yonin Uchi Mahjong MJ (Update Disc Ver.1.008) (CDP-10002B)
+mj1c                            // 2003.01 Sega Yonin Uchi Mahjong MJ (Update Disc Ver.1.011) (CDP-10002C)
+mj1d                            // 2003.02 Sega Yonin Uchi Mahjong MJ Network Taisen Ver. (Update Disc Ver.2.000, Japan) (CDP-10002D)
+mj1e                            // 2003.05 Sega Yonin Uchi Mahjong MJ Network Taisen Ver. (Update Disc Ver.2.002, Japan) (CDP-10002E)
+mj1                             // 2003.06 Sega Yonin Uchi Mahjong MJ Network Taisen Ver. (Update Disc Ver.3.000, Japan) (CDP-10002F)
 moeru                           // 2002.12 Moeru Casinyo
 mok                             // 2002.03.06 The Maze of the Kings
 monkeyba                        // 2001.05 Monkey Ball
@@ -39691,6 +39782,7 @@ sderby2                         // (c) 1985
 @source:sega/sega_beena.cpp
 beena                           //
 tvochken                        //
+carbeena                        //
 
 @source:sega/sega_sawatte.cpp
 sawatte                         //
@@ -39724,6 +39816,7 @@ ooparts                         // (c) 1992 Success
 pclubj                          //
 pclubjv2                        //
 pclub                           //
+pclubjv3                        //
 pclubjv4                        //
 pclubjv5                        //
 potopoto                        // (c) 1994 Sega
@@ -40449,7 +40542,8 @@ pclubor                         // 1999.11 Print Club Goukakenran
 pclubpok                        // 1999.11 Print Club Pokemon
 pcpooh2                         // 1997.12 Print Club Winnie-the-Pooh Vol. 2
 pcpooh3                         // 1998.04 Print Club Winnie-the-Pooh Vol. 3
-pclubyo2                        // 1997.04 Print Club Yoshimoto
+pclubyo                         // 1997.02 Print Club Yoshimoto V1
+pclubyo2                        // 1997.04 Print Club Yoshimoto V2
 prc28su                         // 1997.06 Print Club 2 Vol. 8 Summer 97
 prc29au                         // 1997.10 Print Club 2 Vol. 9 Autumn 97
 prc297wi                        // 1997.10 Print Club 2 '97 Winter Ver
@@ -41480,9 +41574,11 @@ dashhero                        // b9811 (c) 1999 Sigma
 dodghero                        // b9802 (c) 1997 Sigma
 gegege                          // b9804 (c) 1997 Sigma / Banpresto
 gocowboy                        // (c) 2003 Sammy
+gunkids                         // (c) 2002 Sammy
 haekaka                         // (c) 2001 Sammy
 itazuram                        // (c) 2000 Sammy
 lufykzku                        // (c) 2001 Banpresto
+mnrockman                       // (c) 2002 Banpresto
 pepsiman                        // b9806 (c) 1997 Sigma
 pyenaget                        // (c) 2000 Sammy
 sammymdl                        // (c) 2000-2003 Sammy
@@ -41501,6 +41597,9 @@ spinner                         // bootleg
 atm                             //
 atmtb2                          //
 atmtb2plus                      //
+
+@source:sinclair/chloe.cpp
+chloe                           // 1999 Chloe Corporation
 
 @source:sinclair/elwro800.cpp
 elwro800                        //
@@ -41606,6 +41705,9 @@ ts1500                          // Timex Sinclair 1500
 zx80                            // 1980 Sinclair ZX-80
 zx81                            // 1981 Sinclair ZX-81
 zx97                            //
+
+@source:sinclair/specnext.cpp
+tbblue                          // ZX Spectrum Next: TBBlue
 
 @source:skeleton/600cat.cpp
 600cat                          //
@@ -41760,6 +41862,11 @@ ds348                           // Sigtron Daruma
 datacast                        //
 
 @source:skeleton/design.cpp
+azkoyent12                      // (c) Azkoyen
+azkoyent6                       // (c) Azkoyen
+azkoyent61                      // (c) Azkoyen
+azkoyent61a                     // (c) Azkoyen
+azkoyent8                       // (c) Azkoyen
 design6                         // (c) Azkoyen
 designe                         // (c) Azkoyen
 
@@ -41808,9 +41915,12 @@ dual68                          //
 e100                            //
 
 @source:skeleton/easy_karaoke.cpp
+bkarast
 easykara
 karams
 karatvst
+karatvsta
+mks4001
 
 @source:skeleton/elcirculo.cpp
 elcirculo                       // (c) 1980 Inder
@@ -41983,6 +42093,9 @@ lilith                          //
 @source:skeleton/lms46.cpp
 lms46                           //
 
+@source:skeleton/madmoney2.cpp
+madmoney2                       // (c) 1988 Picmatic
+
 @source:skeleton/mes.cpp
 mes                             //
 
@@ -42065,7 +42178,10 @@ mtd1256                         //
 mw4pole                         // (c) 1995 Waldorf Electronics GmbH Germany
 
 @source:skeleton/mx2178.cpp
-mx2178                          //
+mx2178                          // (c) 1984 Memorex
+
+@source:skeleton/mx3210.cpp
+mx3210                          // (c) 1994 Xyplex Inc.
 
 @source:skeleton/mycom.cpp
 mycom                           //
@@ -42113,9 +42229,6 @@ plan80                          //
 
 @source:skeleton/pm68k.cpp
 pm68k                           //
-
-@source:skeleton/pockchal.cpp
-pockchal
 
 @source:skeleton/proteus3.cpp
 proteus3                        //
@@ -42519,6 +42632,9 @@ dfs500                          // 1994 Sony DFS-500 Video Mixer
 @source:sony/dpsv55.cpp
 dpsv55                          //
 
+@source:sony/librie.cpp
+librie                          // Sony Librie EBR 1000
+
 @source:sony/news_38xx.cpp
 nws3860                         // Sony NEWS NWS-3860
 
@@ -42809,6 +42925,7 @@ treamary
 wtrnymph                        // (c) 1996 Subsino
 xiaoao
 xplan                           // (c) 2006 Subsino
+xreel
 xtrain                          // (c) 1999 Subsino
 
 @source:sun/sun1.cpp
@@ -42957,6 +43074,12 @@ shanghaij                       // (c) 1988 Sunsoft (Sun Electronics)
 @source:sunelectronics/tonton.cpp
 tonton                          // (c) 199? Success / Taiyo Jidoki.
 
+@source:sunwise/anoworld.cpp
+anoworld
+
+@source:sunwise/jankenmn.cpp
+jankenmn                        // (c) 1985 Sunwise
+
 @source:svi/svi318.cpp
 svi318                          // SVI-318 (PAL)
 svi318n                         // SVI-318 (NTSC)
@@ -43085,6 +43208,7 @@ eto                             // (c) 1994 Visco (Japan)
 etoa                            // (c) 1994 Visco (Japan)
 galmedes                        // (c) 1992 Visco (Japan)
 jigkmgri                        // B41 (c) 1988 Taito Corporation (Japan)
+jigkmgria
 mofflott                        // C17 (c) 1989 Taito Corporation (Japan)
 
 @source:taito/bigevglf.cpp
@@ -43263,13 +43387,13 @@ lgpalt                          // (c) 1983 Taito
 @source:taito/lkage.cpp
 bygone                          // A53 (c) 1985 Taito Corporation - prototype ?
 lkage                           // A54 (c) 1984 Taito Corporation
-lkageb                          // bootleg
-lkageb2                         // bootleg
-lkageb3                         // bootleg
-lkageb4                         // bootleg
+lkagea                          // A54 (c) 1984 Taito Corporation
+lkageb                          // A54 (c) 1984 Taito Corporation
+lkagebl1                        // bootleg
+lkagebl2                        // bootleg
+lkagebl3                        // bootleg
+lkagebl4                        // bootleg
 lkagem                          //
-lkageo                          // A54 (c) 1984 Taito Corporation
-lkageo2                         // A54 (c) 1984 Taito Corporation
 
 @source:taito/lsasquad.cpp
 daikaiju                        // A74 (c) 1986 Taito
@@ -43322,7 +43446,7 @@ othunderj                       // B67 (c) 1988 Taito Corporation (Japan)
 othunderjsc                     // B67 (c) 1988 Taito Corporation (Japan)
 othundero                       // B67 (c) 1988 Taito Corporation Japan (World)
 othunderu                       // B67 (c) 1988 Taito America Corporation (US, rev 1)
-othunderuo                      // B67 (c) 1988 Taito America Corporation (US)
+othunderua                      // B67 (c) 1988 Taito America Corporation (US)
 
 @source:taito/pitnrun.cpp
 jumpkun                         // prototype
@@ -43332,14 +43456,15 @@ pitnrunb                        // PR  (c) 1984 Taito Corporation
 
 @source:taito/pkspirit.cpp
 pkspirit                        // D41
+shun                            // D43
 
 @source:taito/qix.cpp
 complexx                        // CX  (c) 1984 Taito America Corporation
 elecyoyo                        // YY  (c) 1982 Taito America Corporation
-elecyoyo2                       // YY  (c) 1982 Taito America Corporation
+elecyoyoa                       // YY  (c) 1982 Taito America Corporation
 kram                            // KS  (c) 1982 Taito America Corporation
-kram2                           // KS  (c) 1982 Taito America Corporation
-kram3                           // KS  (c) 1982 Taito America Corporation
+krama                           // KS  (c) 1982 Taito America Corporation
+krame                           // KS  (c) 1982 Taito America Corporation
 qix                             // LK  (c) 1981 Taito America Corporation
 qix2                            // ??  (c) 1981 Taito America Corporation
 qixa                            // LK  (c) 1981 Taito America Corporation
@@ -43901,16 +44026,16 @@ topspeedu                       // B14 (c) 1987 Taito America Corporation (US)
 @source:taito/tsamurai.cpp
 alphaxz                         // AZ  (c) 1986 Ed/Wood Place
 ladymstr                        // A49 (c) 1985 Taito
-ladymstr2                       // A49 (c) 1985 Taito
+ladymstra                       // A49 (c) 1985 Taito
 m660                            // ??? (c) 1986 Taito America Corporation
 m660b                           // bootleg
 m660j                           // ??? (c) 1986 Taito Corporation (Japan)
 nunchaku                        // ??? (c) 1985 Taito
 ringfgt                         // (c) 1984 Taito
-ringfgt2                        // (c) 1984 Taito
+ringfgta                        // (c) 1984 Taito
 the26thz                        // A72 (c) 1986 Taito
 tsamurai                        // A35 (c) 1985 Taito
-tsamurai2                       // A35 (c) 1985 Taito
+tsamuraia                       // A35 (c) 1985 Taito
 tsamuraih                       // bootleg
 vsgongf                         // (c) 1984 Kaneko
 yamagchi                        // A38 (c) 1985 Taito
@@ -44206,6 +44331,8 @@ bombjack                        // (c) 1984 Tehkan
 bombjack2                       // (c) 1984 Tehkan
 bombjackbl                      // bootleg
 bombjackt                       // (c) 1984 Tehkan + Tecfri license
+calorie                         // (c) 1986 Sega
+calorieb                        // (c) 1986 Sega (but bootleg)
 
 @source:tecmo/gaiden.cpp
 drgnbowl                        // (c) 1992 Nics
@@ -44220,7 +44347,6 @@ shadowwa                        // 6215 - (c) 1988 Tecmo (World)
 stratof                         // (c) 1991 Tecmo
 tknight                         // (c) 1989 Tecmo
 wildfang                        // (c) 1989 Tecmo
-wildfangh                       // (c) 1991? Tecmo?
 wildfangs                       // (c) 1989 Tecmo
 
 @source:tecmo/lvcards.cpp
@@ -44339,6 +44465,9 @@ tek6130                         // Tektronix 6130
 
 @source:tektronix/tekxp33x.cpp
 tekxp330                        //
+
+@source:tektronix/xd88.cpp
+xd88_01
 
 @source:telenova/compis.cpp
 compis                          // 1985 Telenova Compis
@@ -44799,8 +44928,9 @@ wardnerjb                       // bootleg
 kisssite
 
 @source:tomy/tomy_princ.cpp
-princ                           // Tomy Prin-C (Japan)
-princnt                         // Tomy Prin-C (without touch-pad)
+princnt                         // Tomy Prin-C (Japan) Rev 1
+princnt3                        // Tomy Prin-C (Japan) Rev 3
+princ                           // Tomy Prin-C Tablet (Japan)
 
 @source:tomy/tutor.cpp
 pyuuta                          // 1982 Tomy Pyuuta
@@ -44844,6 +44974,10 @@ instruct                        //
 @source:trainer/mk14.cpp
 mk14                            //
 mk14vdu                         //
+
+@source:trainer/thaler.cpp
+ct65                            // 1982 Thaler CT-65
+mps65                           // 1984 Thaler MPS-65
 
 @source:trainer/pro80.cpp
 pro80                           //
@@ -45168,6 +45302,8 @@ tmntbftc
 tmntmutm
 totspies
 tvsprt10                        //
+virtbb
+virtten
 vtechtvsgr                      // (c) 2006 VTech
 vtechtvssp                      // (c) 2006 VTech
 wfcentro
@@ -45362,9 +45498,11 @@ ekaramix                        //
 ekaraphs                        //
 ekaras                          //
 epitch                          //
+epo_crok
 epo_dmon                        //
 epo_efdx                        //
 epo_epp                         //
+epo_epp2
 epo_epp3                        //
 epo_eppk                        //
 epo_esdx                        //
@@ -45374,6 +45512,7 @@ epo_tfp2                        //
 evio                            //
 gcslottv                        //
 gungunad                        //
+gungunrv
 has_wamg                        //
 hikara                          //
 jarajal                         //
@@ -45415,6 +45554,7 @@ taitons2                        //
 tak_geig                        //
 tcarnavi                        //
 tomcpin                         //
+tomshoot                        //
 tomplc                          //
 tvpc_dor
 tvpc_tom
@@ -45878,37 +46018,7 @@ votrpss                         // 1982 Votrax Personal Speech System
 votrtnt                         // 1980 Votrax Type-'N-Talk
 
 @source:vsystem/aerofgt.cpp
-aerfboo2                        // bootleg
-aerfboot                        // bootleg
 aerofgt                         // (c) 1992 Video System Co.
-aerofgtb                        // (c) 1992 Video System Co.
-aerofgtc                        // (c) 1992 Video System Co.
-karatblz                        // (c) 1991 Video System Co.
-karatblza                       // (c) 1991 Video System Co.
-karatblzbl                      // bootleg
-karatblzj                       // (c) 1991 Video System / Tecmo (Japan)
-karatblzt                       // (c) 1991 Video System Co. / Tecmo
-karatblzu                       // (c) 1991 Video System Co. (US)
-kickball                        // (c) 1998 Seoung Youn
-pspikes                         // (c) 1991 Video System Co. (World)
-pspikesb                        // bootleg
-pspikesba                       // bootleg
-pspikesc                        // bootleg
-pspikesk                        // (c) 1991 Video System Co. (Korea)
-pspikesu                        // (c) 1991 Video System Co. (US)
-sonicwi                         // (c) 1992 Video System Co. (Japan)
-spikes91                        // bootleg
-spikes91b                       // bootleg
-spinlbrk                        // (c) 1990 V-System Co. (World)
-spinlbrkj                       // (c) 1990 V-System Co. (Japan)
-spinlbrku                       // (c) 1990 V-System Co. (US)
-spinlbrkup                      // (c) 1990 V-System Co. (US, prototype)
-svolly91                        // (c) 1991 Video System Co. (Japan)
-turbofrc                        // (c) 1991 Video System Co.
-turbofrco                       // (c) 1991 Video System Co.
-turbofrcu                       // (c) 1991 Video System Co. (US)
-turbofrcua                      // (c) 1991 Video System Co. (US)
-wbbc97                          // (c) 1997 Comad
 
 @source:vsystem/crshrace.cpp
 crshrace                        // (c) 1993 Video System Co.
@@ -45969,6 +46079,38 @@ pipedrm                         // (c) 1990 Video System Co. (World)
 pipedrmj                        // (c) 1990 Video System Co. (Japan)
 pipedrmt                        // (c) 1990 Video System Co. (Taiwan)
 pipedrmu                        // (c) 1990 Video System Co. (US)
+
+@source:vsystem/pspikes.cpp
+aerfboo2                        // bootleg
+aerfboot                        // bootleg
+aerofgtb                        // (c) 1992 Video System Co.
+aerofgtc                        // (c) 1992 Video System Co.
+karatblz                        // (c) 1991 Video System Co.
+karatblza                       // (c) 1991 Video System Co.
+karatblzbl                      // bootleg
+karatblzj                       // (c) 1991 Video System / Tecmo (Japan)
+karatblzt                       // (c) 1991 Video System Co. / Tecmo
+karatblzu                       // (c) 1991 Video System Co. (US)
+kickball                        // (c) 1998 Seoung Youn
+pspikes                         // (c) 1991 Video System Co. (World)
+pspikesb                        // bootleg
+pspikesba                       // bootleg
+pspikesc                        // bootleg
+pspikesk                        // (c) 1991 Video System Co. (Korea)
+pspikesu                        // (c) 1991 Video System Co. (US)
+sonicwi                         // (c) 1992 Video System Co. (Japan)
+spikes91                        // bootleg
+spikes91b                       // bootleg
+spinlbrk                        // (c) 1990 V-System Co. (World)
+spinlbrkj                       // (c) 1990 V-System Co. (Japan)
+spinlbrku                       // (c) 1990 V-System Co. (US)
+spinlbrkup                      // (c) 1990 V-System Co. (US, prototype)
+svolly91                        // (c) 1991 Video System Co. (Japan)
+turbofrc                        // (c) 1991 Video System Co.
+turbofrco                       // (c) 1991 Video System Co.
+turbofrcu                       // (c) 1991 Video System Co. (US)
+turbofrcua                      // (c) 1991 Video System Co. (US)
+wbbc97                          // (c) 1997 Comad
 
 @source:vsystem/rpunch.cpp
 rabiolep                        // (c) 1987 V-System Co. (Japan)
@@ -46059,6 +46201,9 @@ inteladv
 @source:vtech/iqunlim.cpp
 iqunlim                         // (c) 1995 Vtech / Integrated Systems Inc.
 iqunlimgr                       // (c) 1995 VTech / Integrated Systems Inc.
+
+@source:vtech/kidsupstar.cpp
+kidsupstar                      // (c) 2016 VTech
 
 @source:vtech/laser3k.cpp
 las3000                         // 1983 Laser 3000
@@ -46478,18 +46623,6 @@ jackrabt2                       // (c) 1984
 jackrabts                       // (c) 1984
 monymony                        // (c) 1983
 monymony2                       // (c) 1983
-
-@source:zenith/mdt60.cpp
-mdt60                           //
-
-@source:zenith/z22.cpp
-z22                             //
-
-@source:zenith/z29.cpp
-z29                             //
-
-@source:zenith/z100.cpp
-z100                            //
 
 @source:zpa/iq151.cpp
 iq151                           //

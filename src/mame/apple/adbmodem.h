@@ -38,10 +38,8 @@ public:
 #endif
 
 	// interface routines
-	u8 get_via_data() { return via_data; }
-	void set_via_data(uint8_t dat) { via_data = dat; }
-	u8 get_via_clock() { return via_clock; }
-	void set_adb_line(int linestate) { adb_in = (linestate == ASSERT_LINE) ? true : false; }
+	void set_via_data(u8 dat);
+	void set_adb_line(int linestate) { m_adb_in = (linestate == ASSERT_LINE) ? true : false; }
 	void set_via_state(u8 state) { m_via_state = state; }
 
 	int rom_offset;
@@ -72,14 +70,15 @@ private:
 	u8 portb_r();
 	void portb_w(u8 data);
 
-	u8 via_data = 0;
-	u8 via_clock = 0;
-	u8 last_adb = 0;
-	u8 m_via_state = 0;
-	u64 last_adb_time = 0;
-	bool adb_in = false;
-	int reset_line = 0;
-	int m_adb_dtime = 0;
+	u8 m_via_data;
+	u8 m_via_clock;
+	u8 m_last_adb;
+	u8 m_via_state;
+	u64 m_last_adb_time;
+	bool m_adb_in;
+	int m_reset_line;
+	int m_adb_dtime;
+	int m_last_via_clock;
 
 	#if USE_BUS_ADB
 	optional_device <adb_connector> m_adb_connector[2];

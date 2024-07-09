@@ -2084,6 +2084,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ldp1450hle.h,MACHINES["LDP1450HLE"] = true
+---------------------------------------------------
+
+if (MACHINES["LDP1450HLE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ldp1450hle.cpp",
+		MAME_DIR .. "src/devices/machine/ldp1450hle.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ldvp931.h,MACHINES["LDVP931"] = true
 ---------------------------------------------------
 
@@ -3032,6 +3044,18 @@ if (MACHINES["R10788"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/r10788.cpp",
 		MAME_DIR .. "src/devices/machine/r10788.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/r65c52.h,MACHINES["R65C52"] = true
+---------------------------------------------------
+
+if (MACHINES["R65C52"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/r65c52.cpp",
+		MAME_DIR .. "src/devices/machine/r65c52.h",
 	}
 end
 

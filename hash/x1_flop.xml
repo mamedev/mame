@@ -6,38 +6,30 @@ license:CC0-1.0
 TODO:
 - Move x1turbo only games as sharedfeat;
 - Add feature disk labels;
+- Several games tends to draw wrong in interlace mode, this is unreported for the time being;
+
+Notes:
+- Drive numbers in X1 starts from 0;
 
 Titles, publishers and release dates taken from:
   - X1 Soft Database ( http://www2s.biglobe.ne.jp/~ITTO/x1/softdb.html )
 but the website only covers post 1985 titles...
 
 Games I haven't managed to start (possibly due to my mistakes):
-* mule, mulea: waits for something to happen
 * mugen2: waits for something to happen
-* lastarma: sits forever at the first intro screen
 * hajafuin: waits for something to happen
 * gatlabyr: how to start a game?
-* gambler2: how to pass the first menu?
-* crimson, crimsona: which disk combination is expected?
 
 Games with possible issues (either in emulation or in dump):
 * wizardry->4: can't add character name. also how to create a duplicate disk (in pc8801 they were in the disk set)?
-* profmj: true 400 lines mode not implemented?
 * hydlide2b has no saved data, while hydlide2 &amp; hydlide2a have characters in them
 * hydlide3b: fails to see the user disk + the set contains at least 1 hydlide disk (check crc16)
 * frontlin: input issue?
 * dione: does not display text correctly
 * blckonyx: is it missing a data disk?
 * bastard: does not start. input issue?
-* aokiooka: glitches (chars cut in half)
 * ys: character sprite is glitched until you enter a new area
-
-Games which start loading but never reach the program:
-* turbobas (but not the clone turbobasa)
-* turbzbas
-* hydlide3, hydlide3a (invalid disks 2?)
-
-Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
+* sorcer: some sets crash MAME at exit
 
 -->
 
@@ -47,6 +39,10 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<description>177</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<notes><![CDATA[
+Unresponsive [KBD] inputs beyond space (regression)
+]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="177 (1986)(macadamia).2d" size="327680" crc="ec0a7d2f" sha1="c7f99f04a720ad4f7aeba52ab806efb30be5ffbf"/>
@@ -54,7 +50,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="1942">
+	<software name="1942" supported="yes">
 		<description>1942</description>
 		<year>1987</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -66,7 +62,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="4thunit">
+	<software name="4thunit" supported="yes">
 		<description>Dai4 no Unit - The 4th Unit</description>
 		<year>1988</year>
 		<publisher>データウエスト (Data West)</publisher>
@@ -84,7 +80,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="aressha">
+	<software name="aressha" supported="yes">
 		<description>A-Ressha de Ikou</description>
 		<year>1986</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -128,7 +124,7 @@ Cannot select other options in main menu, including user disk creation [KBD]
 		</part>
 	</software>
 
-	<software name="alpha" supported="partial">
+	<software name="alpha" supported="no">
 		<description>Alpha</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
@@ -146,7 +142,7 @@ Corrupt space ship GFX on first gameplay screen, [z80dma] or [FDC]
 		</part>
 	</software>
 
-	<software name="amtruck">
+	<software name="amtruck" supported="yes">
 		<description>American Truck</description>
 		<year>1985</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -159,10 +155,14 @@ Corrupt space ship GFX on first gameplay screen, [z80dma] or [FDC]
 		</part>
 	</software>
 
-	<software name="aokiooka">
+	<software name="aokiooka" supported="no">
 		<description>Aoki Ookami to Shiroki Mejika</description>
 		<year>1986</year>
 		<publisher>光栄 (Koei)</publisher>
+		<notes><![CDATA[
+Cuts off [6845] text layer height, regardless of interlace mode enabled
+]]></notes>
+
 		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198606xx"/>
 		<info name="alt_title" value="蒼き狼と白き牝鹿"/>
@@ -178,7 +178,8 @@ Corrupt space ship GFX on first gameplay screen, [z80dma] or [FDC]
 		<year>1988</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
 		<notes><![CDATA[
-Black screen after WolfTeam logo
+Black screen after WolfTeam logo [z80dma]
+[SCRN] mode $43
 ]]></notes>
 
 		<info name="release" value="198808xx"/>
@@ -210,10 +211,14 @@ Black screen after WolfTeam logo
 		</part>
 	</software>
 
-	<software name="argo">
+	<software name="argo" supported="partial">
 		<description>Argo</description>
 		<year>1987</year>
 		<publisher>呉ソフトウェア工房 (Kure Software Koubou)</publisher>
+		<notes><![CDATA[
+Reads [KBD] tenkey from non-tenkey digits
+]]></notes>
+
 		<info name="release" value="198707xx"/>
 		<info name="alt_title" value="アルゴー"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -228,10 +233,14 @@ Black screen after WolfTeam logo
 		</part>
 	</software>
 
-	<software name="arion">
+	<software name="arion" supported="partial">
 		<description>Arion</description>
 		<year>1986</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+Reads [KBD] tenkey from non-tenkey digits
+]]></notes>
+
 		<info name="release" value="198606xx"/>
 		<info name="alt_title" value="アリオン"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -246,20 +255,27 @@ Black screen after WolfTeam logo
 		</part>
 	</software>
 
-	<software name="aspicsp">
+	<software name="aspicsp" supported="partial">
 		<description>Aspic Special</description>
 		<year>1987</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<notes><![CDATA[
+[SCRN] mode $43
+Reads [KBD] tenkey from non-tenkey digits
+omake: press F2 during title screen for sound test
+]]></notes>
+
 		<info name="release" value="198705xx"/>
 		<info name="alt_title" value="アスピックスペシャル"/>
+		<!-- baddump: non-factory default save -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
-				<rom name="aspic_np.2d" size="327680" crc="c56d230b" sha1="5d2e11e7e5234ee11076ab13f87a8f42684197d6"/>
+				<rom name="aspic_np.2d" size="327680" crc="c56d230b" sha1="5d2e11e7e5234ee11076ab13f87a8f42684197d6" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="aztec">
+	<software name="aztec" supported="yes">
 		<description>Aztec</description>
 		<year>1985</year>
 		<publisher>コンプティーク (Comptiq)</publisher>
@@ -272,7 +288,7 @@ Black screen after WolfTeam logo
 		</part>
 	</software>
 
-	<software name="batlcity">
+	<software name="batlcity" supported="yes">
 		<description>Battle City</description>
 		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -303,10 +319,14 @@ Black screen after WolfTeam logo
 		</part>
 	</software>
 
-	<software name="bokensha">
+	<software name="bokensha" supported="no">
 		<description>Bokensha-tachi - Kenja no Yuigon</description>
 		<year>1987</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+[D88] Incorrect layout on track 32 head 1, expected_size=100000, current_size=281344
+]]></notes>
+
 		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="冒険者達・賢者の遺言"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -321,7 +341,7 @@ Black screen after WolfTeam logo
 		</part>
 	</software>
 
-	<software name="bosco">
+	<software name="bosco" supported="yes">
 		<description>Bosconian</description>
 		<year>1987</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -334,10 +354,14 @@ Black screen after WolfTeam logo
 		</part>
 	</software>
 
-	<software name="bbreaker">
+	<software name="bbreaker" supported="partial">
 		<description>Brain Breaker</description>
 		<year>1986</year>
 		<publisher>エニックス (Enix)</publisher>
+		<notes><![CDATA[
+x1turbo: heavy [PCG] corruption (verify)
+]]></notes>
+
 		<info name="release" value="198602xx"/>
 		<info name="alt_title" value="ブレインブレイカー"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -365,10 +389,15 @@ Black screen after WolfTeam logo
 		</part>
 	</software>
 
-	<software name="chackn">
+	<software name="chackn" supported="no">
 		<description>Chack'n Pop</description>
 		<year>1985</year>
 		<publisher>ニデコム (Nidecom)</publisher>
+		<notes><![CDATA[
+[KBD] inputs don't work
+Runs too fast
+]]></notes>
+
 		<info name="release" value="198507xx"/>
 		<info name="alt_title" value="ちゃっくんぽっぷ"/>
 		<info name="usage" value="Type FILES then move the cursor to the line of the game and type LOAD (to load) and type RUN when loaded"/>
@@ -379,7 +408,7 @@ Black screen after WolfTeam logo
 		</part>
 	</software>
 
-	<software name="cprowsp">
+	<software name="cprowsp" supported="yes">
 		<description>Champion ProWres Special</description>
 		<year>1985</year>
 		<publisher>マイクロネット (Micronet)</publisher>
@@ -397,12 +426,17 @@ Black screen after WolfTeam logo
     <rom name="crimsons.d88" size="348848" crc="d3cd8490" sha1="24054ba0c57b14cdaf1fa2fd4c5c8d1d874198d8"/>
     <rom name="crimsonu.d88" size="348848" crc="3eeaae89" sha1="460e405c18beac1593ee851d86a2d1dfe4315b34"/>
 -->
-	<software name="crimson">
+	<software name="crimson" supported="no">
 		<description>Crimson</description>
 		<year>1988</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
+		<notes><![CDATA[
+"DISK R/W ERROR" on title screen [FDC]
+]]></notes>
+
 		<info name="release" value="198804xx"/>
 		<info name="alt_title" value="クリムゾン"/>
+		<!-- TODO: filenames above implies disk labels -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="crimson (1988)(xtalsoft)(jp)(disk 1 of 3).d88" size="348848" crc="050b0fe6" sha1="05eb7831b328890291e79e9325009ea0415fb31d"/>
@@ -420,10 +454,14 @@ Black screen after WolfTeam logo
 		</part>
 	</software>
 
-	<software name="crimsona" cloneof="crimson">
+	<software name="crimsona" cloneof="crimson" supported="no">
 		<description>Crimson (alt Disk 1)</description>
 		<year>1988</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
+		<notes><![CDATA[
+"DISK R/W ERROR" on title screen [FDC]
+]]></notes>
+
 		<info name="release" value="198804xx"/>
 		<info name="alt_title" value="クリムゾン"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -516,6 +554,10 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		<description>Daiva Story 3: Trial of Nirvana</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+[SCRN] mode $43
+]]></notes>
+
 		<info name="release" value="198703xx"/>
 		<info name="alt_title" value="ディーヴァ ストーリー3·ニルヴァーナの試練"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -565,6 +607,10 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		<description>Diablo</description>
 		<year>1988</year>
 		<publisher>ブローダーバンドジャパン (Brøderbund Japan)</publisher>
+		<notes><![CDATA[
+[SCRN] mode $03
+]]></notes>
+
 		<info name="release" value="198809xx"/>
 		<info name="alt_title" value="ディアプロ"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -578,6 +624,10 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		<description>Digital Devil Monogatari - Megami Tensei</description>
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<notes><![CDATA[
+[SCRN] mode $02
+]]></notes>
+
 		<info name="release" value="198705xx"/>
 		<info name="alt_title" value="デジタル・デビル・物語 女神転生"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -654,10 +704,14 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="euphory">
+	<software name="euphory" supported="partial">
 		<description>Euphory</description>
 		<year>1988</year>
 		<publisher>システムサコム (System Sacom)</publisher>
+		<notes><![CDATA[
+[SCRN] mode $03 in interlace mode (broken text and colors)
+]]></notes>
+
 		<info name="release" value="198804xx"/>
 		<info name="alt_title" value="ユーフォリー"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -676,6 +730,10 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		<description>Exoa II - Warroid</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+Abuses [6845] with double height invalidation on first char
+]]></notes>
+
 		<info name="release" value="198508xx"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -684,10 +742,15 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="fantsian">
+	<software name="fantsian" supported="partial">
 		<description>Fantasian X1</description>
 		<year>1985</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<notes><![CDATA[
+Reads [KBD] tenkey from non-tenkey digits
+Not extensively tested
+]]></notes>
+
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ファンタジアン"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -720,10 +783,14 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="fzone">
+	<software name="fzone" supported="no">
 		<description>Final Zone</description>
 		<year>1986</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<notes><![CDATA[
+[D88] Incorrect layout on track 0 head 0, expected_size=100000, current_size=104096
+]]></notes>
+
 		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="ファイナルゾーン"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -738,7 +805,7 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="fzonea" cloneof="fzone">
+	<software name="fzonea" cloneof="fzone" supported="yes">
 		<description>Final Zone (alt)</description>
 		<year>1986</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -756,10 +823,14 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="gaiamons">
+	<software name="gaiamons" supported="partial">
 		<description>Gaia no Monshou</description>
 		<year>1987</year>
 		<publisher>NCS</publisher>
+		<notes><![CDATA[
+Reads [KBD] tenkey from non-tenkey digits
+]]></notes>
+
 		<info name="release" value="198708xx"/>
 		<info name="alt_title" value="ガイアの紋章"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -774,10 +845,14 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="gaiflame">
+	<software name="gaiflame" supported="partial">
 		<description>Gai Flame</description>
 		<year>1988</year>
 		<publisher>NCS</publisher>
+		<notes><![CDATA[
+Reads [KBD] tenkey from non-tenkey digits
+]]></notes>
+
 		<info name="release" value="198801xx"/>
 		<info name="alt_title" value="ガイフレーム"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -792,10 +867,14 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="galforce">
+	<software name="galforce" supported="no">
 		<description>Gall Force - Eternal Story</description>
 		<year>1987</year>
 		<publisher>スキャップトラスト (Scap Trust)</publisher>
+		<notes><![CDATA[
+[D88] unable to identify image file format
+]]></notes>
+
 		<info name="release" value="198703xx"/>
 		<info name="alt_title" value="ガルフォース"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -815,10 +894,14 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="gambler">
+	<software name="gambler" supported="partial">
 		<description>Gambler Jikochuushinha</description>
 		<year>1987</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
+		<notes><![CDATA[
+Reads [KBD] tenkey from non-tenkey digits
+]]></notes>
+
 		<info name="release" value="198709xx"/>
 		<info name="alt_title" value="ぎゅわんぶらあ自己中心派"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -828,10 +911,14 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="gambler2">
+	<software name="gambler2" supported="partial">
 		<description>Gambler Jikochuushinha 2</description>
 		<year>1987</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
+		<notes><![CDATA[
+Reads [KBD] tenkey from non-tenkey digits
+]]></notes>
+
 		<info name="release" value="198711xx"/>
 		<info name="alt_title" value="ぎゅわんぶらあ自己中心派2"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -841,7 +928,7 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="gamma5">
+	<software name="gamma5" supported="yes">
 		<description>Gamma 5</description>
 		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -854,10 +941,14 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="gandhara">
+	<software name="gandhara" supported="yes">
 		<description>Gandhara</description>
 		<year>1987</year>
 		<publisher>エニックス (Enix)</publisher>
+		<notes><![CDATA[
+[SCRN] mode $40
+]]></notes>
+
 		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198712xx"/>
 		<info name="alt_title" value="ガンダーラ"/>
@@ -873,10 +964,14 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="goonies">
+	<software name="goonies" supported="partial">
 		<description>The Goonies</description>
 		<year>1986</year>
 		<publisher>コナミ (Konami)</publisher>
+		<notes><![CDATA[
+x1: goes offsync with [PCG] charset (works with x1turbo40)
+]]></notes>
+
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="グーニーズ"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -890,6 +985,10 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		<description>Gradius</description>
 		<year>1987</year>
 		<publisher>コナミ (Konami)</publisher>
+		<notes><![CDATA[
+x1turbo: Uses [z80dma]
+]]></notes>
+
 		<info name="release" value="198702xx"/>
 		<info name="alt_title" value="グラディウス"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -976,10 +1075,14 @@ Shows a random bitmap graphic then returns "program load error", wants [FDC] wri
 		</part>
 	</software>
 
-	<software name="herzog">
+	<software name="herzog" supported="partial">
 		<description>Herzog</description>
 		<year>1988</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
+		<notes><![CDATA[
+Garbage GFXs on [6845] rightmost column during intro
+]]></notes>
+
 		<info name="release" value="198808xx"/>
 		<info name="alt_title" value="ヘルツォーク"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -989,10 +1092,14 @@ Shows a random bitmap graphic then returns "program load error", wants [FDC] wri
 		</part>
 	</software>
 
-	<software name="hokuto">
+	<software name="hokuto" supported="no">
 		<description>Hokuto no Ken</description>
 		<year>1986</year>
 		<publisher>エニックス (Enix)</publisher>
+		<notes><![CDATA[
+[D88] Incorrect layout on track 31 head 1, expected_size=100000, current_size=160064
+]]></notes>
+
 		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="北斗の拳"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1051,7 +1158,7 @@ Shows a random bitmap graphic then returns "program load error", wants [FDC] wri
 		</part>
 	</software>
 
-	<software name="hydlide">
+	<software name="hydlide" supported="yes">
 		<description>Hydlide</description>
 		<year>1985</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -1088,9 +1195,10 @@ Shows a random bitmap graphic then returns "program load error", wants [FDC] wri
 				<rom name="hydlide2.d88" size="348848" crc="e5127048" sha1="6e9b8ad2b6ef674d5a03a5f2bd1ccd238765a3ca"/>
 			</dataarea>
 		</part>
+		<!-- baddump: non-factory default save "OUZI" -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="hydlide2u.d88" size="348848" crc="fb0cd3a5" sha1="05026c6cd41d4a867eb3e901740e0d19fb8ddf32"/>
+				<rom name="hydlide2u.d88" size="348848" crc="fb0cd3a5" sha1="05026c6cd41d4a867eb3e901740e0d19fb8ddf32" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1106,9 +1214,10 @@ Shows a random bitmap graphic then returns "program load error", wants [FDC] wri
 				<rom name="game.d88" size="348848" crc="aba63500" sha1="7ec04863fb6b7659348e0f3bbeccfe2d35db169b"/>
 			</dataarea>
 		</part>
+		<!-- baddump: non-factory default save "SASAKI" -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="user.d88" size="348848" crc="8349e963" sha1="77bef6b513f8f7109a35774bacd1365e194b112e"/>
+				<rom name="user.d88" size="348848" crc="8349e963" sha1="77bef6b513f8f7109a35774bacd1365e194b112e" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1119,11 +1228,13 @@ Shows a random bitmap graphic then returns "program load error", wants [FDC] wri
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198512xx"/>
 		<info name="alt_title" value="ハイドライド2"/>
+		<!-- TODO: document how to create an user disk -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="hydlide2.d88" size="348848" crc="e5127048" sha1="6e9b8ad2b6ef674d5a03a5f2bd1ccd238765a3ca"/>
 			</dataarea>
 		</part>
+		<!-- Pristine factory save -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="hydlide2bu.d88" size="348848" crc="c18dea85" sha1="db11c27c85c758c0ac12287826d9667c88851415"/>
@@ -1131,10 +1242,14 @@ Shows a random bitmap graphic then returns "program load error", wants [FDC] wri
 		</part>
 	</software>
 
-	<software name="hydlide3">
+	<software name="hydlide3" supported="no">
 		<description>Hydlide 3 - The Space Memories</description>
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+[D88] unable to identify image file format
+]]></notes>
+
 		<info name="release" value="198807xx"/>
 		<info name="alt_title" value="ハイドライド3"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1154,10 +1269,14 @@ Shows a random bitmap graphic then returns "program load error", wants [FDC] wri
 		</part>
 	</software>
 
-	<software name="hydlide3a" cloneof="hydlide3">
+	<software name="hydlide3a" cloneof="hydlide3" supported="no">
 		<description>Hydlide 3 - The Space Memories (alt)</description>
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+[D88] unable to identify image file format
+]]></notes>
+
 		<info name="release" value="198807xx"/>
 		<info name="alt_title" value="ハイドライド3"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1178,10 +1297,14 @@ Shows a random bitmap graphic then returns "program load error", wants [FDC] wri
 	</software>
 
 <!-- is this correct? it mixes hydlide 1 and 3 -->
-	<software name="hydlide3b" cloneof="hydlide3">
+	<software name="hydlide3b" cloneof="hydlide3" supported="no">
 		<description>Hydlide 3 - The Space Memories (alt 2)</description>
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+[D88] unable to identify image file format
+]]></notes>
+
 		<info name="release" value="198807xx"/>
 		<info name="alt_title" value="ハイドライド3"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1212,7 +1335,6 @@ Shows a random bitmap graphic then returns "program load error", wants [FDC] wri
 		<publisher>エニックス (Enix)</publisher>
 		<notes><![CDATA[
 Expects [KBD] number presses with shift held
-Not extensively tested
 ]]></notes>
 
 		<info name="usage" value="x1turbo only" />
@@ -1242,7 +1364,6 @@ Not extensively tested
 		<publisher>エニックス (Enix)</publisher>
 		<notes><![CDATA[
 Expects [KBD] number presses with shift held
-Not extensively tested
 Doesn't really seem an auto demo?
 ]]></notes>
 
@@ -1260,10 +1381,15 @@ Doesn't really seem an auto demo?
 		</part>
 	</software>
 
-	<software name="legkage">
+	<software name="legkage" supported="no">
 		<description>Kage no Densetsu - The Legend of Kage</description>
 		<year>1987</year>
 		<publisher>ニデコム (Nidecom)</publisher>
+		<notes><![CDATA[
+Uses [z80dma] during gameplay
+Throws "FILE NOT FOUND" during boot (regression)
+]]></notes>
+
 		<info name="release" value="198702xx"/>
 		<info name="alt_title" value="影の伝説"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1286,13 +1412,10 @@ Doesn't really seem an auto demo?
 		</part>
 	</software>
 
-	<software name="kingkngt" supported="partial">
+	<software name="kingkngt">
 		<description>King's Knight Special</description>
 		<year>1987</year>
 		<publisher>スクウェア (Square)</publisher>
-		<notes><![CDATA[
-Not extensively tested
-]]></notes>
 		<info name="usage" value="x1turbo: Needs OPM Sound Setting to be ON" />
 		<info name="release" value="198702xx"/>
 		<info name="alt_title" value="キングスナイトスペシャル"/>
@@ -1308,14 +1431,10 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="powermj" supported="partial">
+	<software name="powermj">
 		<description>Kon'yamo Asamade Powerful Mahjong</description>
 		<year>1988</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
-		<notes><![CDATA[
-Not extensively tested
-]]></notes>
-
 		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198804xx"/>
 		<info name="alt_title" value="今夜も朝までパワフルまぁじゃん"/>
@@ -1335,11 +1454,16 @@ Not extensively tested
 		<description>Kugyokuden</description>
 		<year>1986</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
+		<notes><![CDATA[
+Requires [KBD] f keys to be held a bit longer than necessary (verify)
+]]></notes>
+
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="九玉伝"/>
+		<!-- baddump: non-factory save "4 BOGY" -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="ku gyoku den a.d88" size="348848" crc="53de7ada" sha1="ecd020fce0f35fc11f5d11d21a0537dc19a6aaa7"/>
+				<rom name="ku gyoku den a.d88" size="348848" crc="53de7ada" sha1="ecd020fce0f35fc11f5d11d21a0537dc19a6aaa7" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -1355,9 +1479,10 @@ Not extensively tested
 		<publisher>テクノソフト (Techno Soft)</publisher>
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="九玉伝"/>
+		<!-- baddump: non-factory save "2 BOGY" -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="kugyokuda.d88" size="348848" crc="5731aeaa" sha1="a2572e660319c7744dcfada26b8e0d79ccb2d1f1"/>
+				<rom name="kugyokuda.d88" size="348848" crc="5731aeaa" sha1="a2572e660319c7744dcfada26b8e0d79ccb2d1f1" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -1387,19 +1512,27 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		<description>Laplace no Ma</description>
 		<year>1987</year>
 		<publisher>ハミングバード (HummingBird)</publisher>
+		<notes><![CDATA[
+Triggers a bunch of blink cursors on [6845] rightmost column during character creation (verify)
+[AY] town BGM sounds way too uptempo (verify)
+]]></notes>
+
 		<info name="release" value="198707xx"/>
 		<info name="alt_title" value="ラプラスの魔"/>
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="421040">
 				<rom name="disk1.d88" size="421040" crc="1bd1fcee" sha1="79d71844a34aed3e88f8fed8e2ea87b7c2a37e8c"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="415840">
 				<rom name="disk2.d88" size="415840" crc="42670edc" sha1="98ec24213a6c170b79136150006c2b93db0b3fe8"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="416688">
 				<rom name="disk3.d88" size="416688" crc="7aa2c5b4" sha1="e7263df70443790965e70b8df38b8119e9442944"/>
 			</dataarea>
@@ -1429,53 +1562,71 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="lastarmg">
+	<software name="lastarmg" supported="no">
 		<description>Last Armageddon</description>
 		<year>1988</year>
 		<publisher>ブレイングレイ (Brain Gray)</publisher>
+		<notes><![CDATA[
+Hangs after intro, [z80dma] or [FDC]
+[SCRN] mode 0x03
+]]></notes>
+
+		<info name="usage" value="x1turbo: Needs OPM Sound Setting to be ON. Boot from Disk G for monster encyclopedia" />
 		<info name="release" value="198808xx"/>
 		<info name="alt_title" value="ラストハルマゲドン"/>
+
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="425392">
 				<rom name="diska.d88" size="425392" crc="6c238b5c" sha1="932b71419f859553a28ad2dd0f924bb97349dd49"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="425392">
 				<rom name="diskb.d88" size="425392" crc="ff80f144" sha1="fbd0ebbcc5447124b889ab0076340c69c79e510f"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="425392">
 				<rom name="diskc.d88" size="425392" crc="f784b936" sha1="72a2fe351c5df26e67e6aaa99293123f07c65afb"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="425392">
 				<rom name="diskd.d88" size="425392" crc="0b6b0a54" sha1="cd3974c218d52344d982c1bf134810a6276bc468"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="425392">
 				<rom name="diske.d88" size="425392" crc="a2231d69" sha1="562d6d2fd64af5fe7b7ee22b51108fbe413fb625"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk F" />
 			<dataarea name="flop" size="425392">
 				<rom name="diskf.d88" size="425392" crc="82cb86f5" sha1="f53c570465972232033d4e335f2a4562fc634f04"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk G" />
 			<dataarea name="flop" size="425392">
 				<rom name="diskg.d88" size="425392" crc="68ae46aa" sha1="67278343a1c78f46b0f49d566897eb5ad419afdd"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ldrun">
+	<software name="ldrun" supported="no">
 		<description>Lode Runner</description>
 		<year>1985</year>
 		<publisher>ソフトプロ (Soft Pro)</publisher>
+		<notes><![CDATA[
+[D88] Incorrect layout on track 7 head 0, expected_size=100000, current_size=534560
+]]></notes>
+
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ロードランナー"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1485,10 +1636,15 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="lostpow">
+	<software name="lostpow" supported="no">
 		<description>Lost Power</description>
 		<year>1986</year>
 		<publisher>ウィンキーソフト (Winky Soft)</publisher>
+		<notes><![CDATA[
+Reads [KBD] tenkey from non-tenkey digits
+[KBD] key repeat doesn't work
+]]></notes>
+
 		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="ロストパワー"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1503,10 +1659,11 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="lunacity">
+	<software name="lunacity" supported="partial">
 		<description>Luna City Satsujin Jiken</description>
 		<year>1987</year>
 		<publisher>ボンドソフト (Bond Soft)</publisher>
+		<!-- TODO: save to disk unchecked -->
 		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="ルナシティ殺人事件"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1516,10 +1673,14 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="lupin">
+	<software name="lupin" supported="partial">
 		<description>Lupin the Third - Cagliostro no Shiro</description>
 		<year>1986</year>
 		<publisher>東宝 (Toho)</publisher>
+		<notes><![CDATA[
+Moans about needing [kbd] caps lock enabled in main menu
+]]></notes>
+
 		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="ルパン三世 カリオストロの城"/>
@@ -1535,10 +1696,14 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="luxsor">
+	<software name="luxsor" supported="yes">
 		<description>Luxsor</description>
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<notes><![CDATA[
+[SCRN] mode 0x42 (in gameplay)
+]]></notes>
+
 		<info name="release" value="198710xx"/>
 		<info name="alt_title" value="ルクソール"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1553,10 +1718,14 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="mule">
+	<software name="mule" supported="no">
 		<description>M.U.L.E.</description>
 		<year>1988</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
+		<notes><![CDATA[
+Expects a [KBD] key press to start (TODO: pinpoint which), eventually goes autoplay
+]]></notes>
+
 		<info name="release" value="198808xx"/>
 		<info name="alt_title" value="ミュール"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1566,10 +1735,14 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="mulea" cloneof="mule">
+	<software name="mulea" cloneof="mule" supported="no">
 		<description>M.U.L.E. (alt)</description>
 		<year>1988</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
+		<notes><![CDATA[
+Expects a [KBD] key press to start (TODO: pinpoint which), eventually goes autoplay
+]]></notes>
+
 		<info name="release" value="198808xx"/>
 		<info name="alt_title" value="ミュール"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1579,7 +1752,7 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="mjkyojs">
+	<software name="mjkyojs" supported="yes">
 		<description>Mahjong Kyo Jidai Special</description>
 		<year>1988</year>
 		<publisher>マイクロネット (Micronet)</publisher>
@@ -1599,10 +1772,14 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="maidum">
+	<software name="maidum" supported="no">
 		<description>Maidum</description>
 		<year>1986</year>
 		<publisher>NCS</publisher>
+		<notes><![CDATA[
+Entering Rosetta (to the right of starting point) has corrupt tileset, [FDC] copy protection?
+]]></notes>
+
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="メイドゥム"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1617,7 +1794,8 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="maiduma" cloneof="maidum">
+	<software name="maiduma" cloneof="maidum" supported="yes">
+		<!-- Cracked? -->
 		<description>Maidum (alt)</description>
 		<year>1986</year>
 		<publisher>NCS</publisher>
@@ -1639,6 +1817,10 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		<description>Maison Ikkoku - Omoide no Photograph</description>
 		<year>1987</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<notes><![CDATA[
+[SCRN] mode $40
+]]></notes>
+
 		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="めぞん一刻 -想いでのフォトグラフ-"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1658,10 +1840,14 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="mikkokuk">
+	<software name="mikkokuk" supported="partial">
 		<description>Maison Ikkoku Kanketsu Hen - Sayonara Soshite</description>
 		<year>1988</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<notes><![CDATA[
+Garbage GFXs on [6845] rightmost column
+]]></notes>
+
 		<info name="release" value="198807xx"/>
 		<info name="alt_title" value="めぞん一刻 完結編 -さよなら そして-"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1704,8 +1890,7 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<!-- is this correct or is it "Makai-wo" by Bond Soft (198603) [disk is broken in current svn] -->
-	<software name="makaifuk">
+	<software name="makaifuk" supported="yes">
 		<description>Makai Fukkatsu</description>
 		<year>1987</year>
 		<publisher>ソフトスタジオWING (Soft Studio Wing)</publisher>
@@ -1745,7 +1930,7 @@ Prompts user for a System Disk, Data Disk for Lagrange L-2?
 		</part>
 	</software>
 
-	<software name="mappy">
+	<software name="mappy" supported="yes">
 		<description>Mappy</description>
 		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -1790,11 +1975,14 @@ Broken [kanji]
 		</part>
 	</software>
 
-	<!-- This is just a data disk, system disks are undumped -->
-	<software name="mrproy88">
+	<software name="mrproy88" supported="no">
 		<description>Mr. Pro Yakyu '88 Data Shuu</description>
 		<year>1987</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<notes><![CDATA[
+Prints "error" in Japanese when booted. This is just a data disk, system disks are undumped.
+]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="mr. pro yakyuu 88.d88" size="348848" crc="74c034a4" sha1="571c5cc7307c13821b7a3df337676b020e637fbf"/>
@@ -1825,7 +2013,7 @@ Broken [kanji]
 		</part>
 	</software>
 
-	<software name="valis">
+	<software name="valis" supported="yes">
 		<description>Mugen Senshi Valis</description>
 		<year>1986</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -1843,7 +2031,7 @@ Broken [kanji]
 		</part>
 	</software>
 
-	<software name="nobunaga" supported="no">
+	<software name="nobunaga" supported="yes">
 		<description>Nobunaga no Yabou</description>
 		<year>1987</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -2020,6 +2208,10 @@ Fails [FDC] disk swap after title screen
 		<description>Professional Mahjong</description>
 		<year>1985</year>
 		<publisher>シャノアール (Chat Noir)</publisher>
+		<notes><![CDATA[
+[SCRN] mode 0x41 (broken graphics layer)
+]]></notes>
+
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="プロフェッショナル麻雀"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2892,7 +3084,7 @@ Expects [KBD] name entry presses with shift held
 		</part>
 	</software>
 
-	<!-- TODO: pending removal, Muteki -> Invincibility -->
+	<!-- TODO: pending removal, Muteki == Invincibility -->
 	<software name="slaydocm" cloneof="slaydock" supported="partial">
 		<description>Super Laydock - Mission Striker (Muteki hack)</description>
 		<year>19??</year>
@@ -3333,6 +3525,17 @@ Hangs on [FDC] check on initial boot PC=1e18 bit 7
 		</part>
 	</software>
 
+	<software name="wizardr3">
+		<description>Wizardry 3 - The Legacy of Llylgamyn</description>
+		<year>1987?</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="380048">
+				<rom name="wiz3.d88" size="380048" crc="df710fae" sha1="00a9c50a16a8cd31133e0d5535c919dd8eacdf09"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wizardr4">
 		<description>Wizardry 4 - The Return of Werdna</description>
 		<year>1989</year>
@@ -3533,6 +3736,7 @@ Hangs on [FDC] check on initial boot PC=1e18 bit 7
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
 Desyncs during Game Arts logo [YM] speech synth, proceeds booting.
+omake: Broken [kanji] when booting with disk 2 in, cfr. https://tcrf.net/Zeliard_(Sharp_X1)
 ]]></notes>
 
 		<info name="usage" value="x1turbo only" />
@@ -3984,10 +4188,17 @@ Save to disk untested
 		</part>
 	</software>
 
-	<software name="newtype">
+	<software name="newtype" supported="partial">
 		<description>Newtype X-1</description>
 		<year>1986?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Floppy analyzer
+Blanks [6845] rightmost char in box when inserting params to analyze
+Trips a [z80dma] assert, worked around for now
+Requires space key to be pressed to move to next track in analyze mode (verify)
+]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="newtype x1.2d" size="327680" crc="3b55231a" sha1="537f7332e9179f664ca733bd5a9ef6d19a8584c7"/>
@@ -4215,17 +4426,6 @@ Throws segmentation fault when mounted [D88]
 		</part>
 	</software>
 
-	<software name="wizardr3">
-		<description>Wizardry 3 - The Legacy of Llylgamyn</description>
-		<year>1987?</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="380048">
-				<rom name="wiz3.d88" size="380048" crc="df710fae" sha1="00a9c50a16a8cd31133e0d5535c919dd8eacdf09"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="xevious">
 		<description>Xevious</description>
 		<year>19??</year>
@@ -4255,7 +4455,7 @@ Throws segmentation fault when mounted [D88]
 		<year>1989?</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<notes><![CDATA[
-Unhappy about [6845] de readback in $1a01 (black screen)
+Unhappy about [6845] de reg readback in $1a01 (black screen)
 Black screens after intro anyway, [FDC] or [z80dma]
 Is this actually a x1turboz only game?
 ]]></notes>
@@ -4377,7 +4577,7 @@ Is this actually a x1turboz only game?
 		</part>
 	</software>
 
-	<software name="sayaka">
+	<software name="sayaka" supported="yes">
 		<description>Yumeshojo Sayaka</description>
 		<year>1988?</year>
 		<publisher>パスカル2 (Pascal2)</publisher>
@@ -4625,10 +4825,14 @@ Is this actually a x1turboz only game?
 	</software>
 
 
-	<software name="casablan" supported="partial">
+	<software name="casablan" supported="no">
 		<description>Casablanca</description>
 		<year>1986</year>
 		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
+		<notes><![CDATA[
+[SCRN] mode 0x01 (doubled graphic layer)
+]]></notes>
+
 		<info name="usage" value="x1turbo only" />
 		<info name="alt_title" value="カサブランカに愛を"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -4871,11 +5075,15 @@ Is this actually a x1turboz only game?
 		</part>
 	</software>
 
-	<!-- Uses extended TurboZ color mode -->
 	<software name="kohakuir" supported="no">
 		<description>Kohakuiro no Yuigon - Seiyou Karuta Renzoku Satsujin Jiken</description>
 		<year>1988</year>
 		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
+		<notes><![CDATA[
+[SCRN] mode $41
+Uses extended TurboZ color mode
+]]></notes>
+
 		<info name="usage" value="X1 TurboZ only" />
 		<info name="alt_title" value="琥珀色の遺言"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -4964,9 +5172,11 @@ Is this actually a x1turboz only game?
 
 	<software name="melonsod" supported="no">
 		<description>Melon Soda</description>
-		<year>1987</year>
+		<year>1988</year>
+		<!-- Bond Soft -->
 		<publisher>パスカル2 (Pascal2)</publisher>
-		<info name="usage" value="x1turbo only" />
+		<!-- TODO: pinpoint how to load, errors out too often -->
+		<info name="usage" value="x1turbo only, requires turbobasa preloaded" />
 		<info name="alt_title" value="メロンソーダ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -5039,6 +5249,10 @@ Is this actually a x1turboz only game?
 		<description>Produce</description>
 		<year>1987</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
+		<notes><![CDATA[
+Reads [KBD] tenkey from non-tenkey digits
+]]></notes>
+
 		<info name="usage" value="x1turbo only" />
 		<info name="alt_title" value="プロデュース"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -5048,11 +5262,16 @@ Is this actually a x1turboz only game?
 		</part>
 	</software>
 
-	<software name="rebirth" supported="no">
+	<software name="rebirth" supported="partial">
 		<description>Re-Birth</description>
 		<year>1986</year>
 		<publisher>SPS</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
 		<info name="alt_title" value="リバース"/>
+		<info name="usage" value="x1turbo: Needs OPM Sound Setting to be ON" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="416112">
 				<rom name="rebirth1.d88" size="416112" crc="ce4cce01" sha1="83a95b1704ae933c34cf49b4e13db2c543ac41a7"/>
@@ -5127,10 +5346,15 @@ Is this actually a x1turboz only game?
 		</part>
 	</software>
 
+	<!-- TODO: looks working ... -->
 	<software name="satsujin" supported="no">
 		<description>Satsujin wa Tegami ni Notte</description>
 		<year>1988</year>
 		<publisher>ツインソフト (Twin Soft)</publisher>
+		<notes><![CDATA[
+[SCRN] mode $03
+]]></notes>
+
 		<info name="usage" value="x1turbo only" />
 		<info name="alt_title" value="殺人は手紙にのって"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -5272,10 +5496,10 @@ Is this actually a x1turboz only game?
 
 <!-- Utilities and Tech Demos -->
 
-	<software name="x1demo">
+	<software name="x1demo" supported="yes">
 		<description>X1 Demo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983?</year>
+		<publisher>シャープ (Sharp)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="x1_demo.d88" size="348848" crc="e20e2d4f" sha1="6643931a25c8875aa61d5f9e6672d04af2e2e015"/>
@@ -5283,10 +5507,14 @@ Is this actually a x1turboz only game?
 		</part>
 	</software>
 
-	<software name="x1cdemo">
-		<description>X1c Demo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="x1cdemo" supported="no">
+		<description>X1C Demo</description>
+		<year>1984?</year>
+		<publisher>シャープ (Sharp)</publisher>
+		<notes><![CDATA[
+[D88] Incorrect layout on track 17 head 1, expected_size=100000, current_size=221120
+]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="178304">
 				<rom name="d_x1c.d88" size="178304" crc="b2d606fd" sha1="5fe86856d1bc6265ec7b6e3ac3a0d243a4804014"/>
@@ -5294,21 +5522,15 @@ Is this actually a x1turboz only game?
 		</part>
 	</software>
 
-	<software name="x1demoa" supported="no">
-		<description>X1 Demo (alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="327680">
-				<rom name="x1demo.2d" size="327680" crc="25aed298" sha1="2029d60b44cd615906f25e39ac7b1dafcf8e72aa"/>
-			</dataarea>
-		</part>
-	</software>
+	<software name="x1fdemo" supported="no">
+		<!-- New X1 Demo -->
+		<description>X1F Demo</description>
+		<year>1985?</year>
+		<publisher>シャープ (Sharp)</publisher>
+		<notes><![CDATA[
+Needs [6845] partial updates for first item
+]]></notes>
 
-	<software name="x1fdemo">
-		<description>X1f Demo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="d_x1f.d88" size="348848" crc="71c6389d" sha1="a105c7fb5605133e89d16d830af6a29b9ac5292a"/>
@@ -5316,10 +5538,10 @@ Is this actually a x1turboz only game?
 		</part>
 	</software>
 
-	<software name="x1gdemo">
-		<description>X1g Demo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="x1gdemo" supported="yes">
+		<description>X1G Demo</description>
+		<year>1986?</year>
+		<publisher>シャープ (Sharp)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="d_x1g.d88" size="348848" crc="2d54731b" sha1="84c549f64245d307ce534f42255b4a990d2a07e9"/>
@@ -5327,10 +5549,10 @@ Is this actually a x1turboz only game?
 		</part>
 	</software>
 
-	<software name="x1gdemoa">
-		<description>X1g Demo (alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="x1gdemoa" supported="yes">
+		<description>X1G Demo (alt)</description>
+		<year>1986?</year>
+		<publisher>シャープ (Sharp)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="x1g_demo.2d" size="327680" crc="cc491eb4" sha1="10c934d2dc40793ca119c782dce326041f0742a4"/>
@@ -5338,13 +5560,32 @@ Is this actually a x1turboz only game?
 		</part>
 	</software>
 
-	<software name="x1tdemo">
+	<software name="x1tdemo" supported="no">
 		<description>X1 TurboII Demo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985?</year>
+		<publisher>シャープ (Sharp)</publisher>
+		<notes><![CDATA[
+[SCRN] mode $03 on parrot item (broken graphics layer)
+]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="d_x1t2.d88" size="348848" crc="59a8bb12" sha1="44c0c729ec13ecbc39fbed82fa991baf59ab4c9f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="x1demoa" cloneof="x1tdemo" supported="no">
+		<description>X1 TurboII Demo (alternate set)</description>
+		<year>1985?</year>
+		<publisher>シャープ (Sharp)</publisher>
+		<notes><![CDATA[
+[SCRN] mode $03 on parrot item (broken graphics layer)
+]]></notes>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="x1demo.2d" size="327680" crc="25aed298" sha1="2029d60b44cd615906f25e39ac7b1dafcf8e72aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5375,6 +5616,10 @@ Is this actually a x1turboz only game?
 		<description>Turbo BASIC CZ-8FB02</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[FDC] 2HD disk
+]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089776">
 				<rom name="cz-8fb02 turbo basic.d88" size="1089776" crc="228f1da3" sha1="6a4cbaf9be49b8b5433a4cb453a15929f2fd30cd"/>
@@ -5397,6 +5642,10 @@ Is this actually a x1turboz only game?
 		<description>Turbo-Z BASIC CZ-8FB03</description>
 		<year>19??</year>
 		<publisher>シャープ (Sharp)</publisher>
+		<notes><![CDATA[
+[FDC] 2HD disk
+]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089776">
 				<rom name="cz-8fb03 turboz basic.d88" size="1089776" crc="01215aa3" sha1="cc15f2d6dfe561e53f3ee642034e412f5a321264"/>
@@ -5580,10 +5829,15 @@ CDOSというMS-DOSと同様なコマンドライン作動させることが出�
 		</part>
 	</software>
 
-	<software name="graphtol">
+	<software name="graphtol" supported="no">
 		<description>Graphic Tool</description>
 		<year>19??</year>
 		<publisher>シャープ (Sharp) ~ Zeit</publisher>
+		<notes><![CDATA[
+[D88] segmentation fault in floppy_image_format_t::generate_track_from_levels
+Accesses TurboZ features
+]]></notes>
+
 		<info name="alt_title" value="グラフィックツール"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089776">
@@ -5646,7 +5900,7 @@ CDOSというMS-DOSと同様なコマンドライン作動させることが出�
 		<year>1986?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Contains .VMD/.VTD BASIC files
+Contains .VMD/.VTD BASIC files for an unknown player
 ]]></notes>
 
 		<part name="flop1" interface="floppy_5_25">

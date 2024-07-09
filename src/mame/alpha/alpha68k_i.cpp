@@ -76,12 +76,13 @@ u32 alpha68k_I_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	/* This appears to be correct priority */
+	// This appears to be correct priority
 	draw_sprites(bitmap, cliprect, 2, 0x0800);
 	draw_sprites(bitmap, cliprect, 3, 0x0c00);
 	draw_sprites(bitmap, cliprect, 1, 0x0400);
 	return 0;
 }
+
 
 /*
  *
@@ -108,7 +109,7 @@ void thenextspace_state::tnextspc_unknown_w(offs_t offset, u16 data)
 }
 
 // TODO: check me
-u16 thenextspace_state::sound_cpu_r(){ return 1; }
+u16 thenextspace_state::sound_cpu_r() { return 1; }
 
 
 /*
@@ -119,13 +120,13 @@ u16 thenextspace_state::sound_cpu_r(){ return 1; }
 
 void paddlemania_state::main_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                         // main program
-	map(0x080000, 0x083fff).ram();                         // work RAM
-	map(0x100000, 0x103fff).ram().share("spriteram");   // video RAM
-	map(0x180000, 0x180001).portr("IN3").nopw(); // LSB: DSW0, MSB: watchdog(?)
-	map(0x180008, 0x180009).portr("IN4");            // LSB: DSW1
-	map(0x300000, 0x300001).portr("IN0");            // joy1, joy2
-	map(0x340000, 0x340001).portr("IN1");            // coin, start, service
+	map(0x000000, 0x03ffff).rom();                    // main program
+	map(0x080000, 0x083fff).ram();                    // work RAM
+	map(0x100000, 0x103fff).ram().share("spriteram"); // video RAM
+	map(0x180000, 0x180001).portr("IN3").nopw();      // LSB: DSW0, MSB: watchdog(?)
+	map(0x180008, 0x180009).portr("IN4");             // LSB: DSW1
+	map(0x300000, 0x300001).portr("IN0");             // joy1, joy2
+	map(0x340000, 0x340001).portr("IN1");             // coin, start, service
 	map(0x380000, 0x380001).portr("IN2");
 	map(0x380001, 0x380001).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // LSB: sound latch write and RST38 trigger, joy3, joy4
 }
@@ -176,6 +177,7 @@ void thenextspace_state::sound_iomap(address_map &map)
 	map(0x7b, 0x7b).nopr(); // unknown read port
 }
 
+
 /*
  *
  * Gfx layout Defs
@@ -185,18 +187,19 @@ void thenextspace_state::sound_iomap(address_map &map)
 // TODO: merge with base driver somehow
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8x8 */
+	8,8,
 	RGN_FRAC(1,1),
-	4,      /* 4 bits per pixel */
+	4,
 	{ STEP4(0,4) },
 	{ STEP4(8*4*4+3,-1), STEP4(3,-1) },
 	{ STEP8(0,4*4) },
-	32*8 /* every char takes 32 consecutive bytes */
+	32*8
 };
 
 static GFXDECODE_START( gfx_alpha68k_I )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 64 )
 GFXDECODE_END
+
 
 /*
  *
@@ -230,7 +233,7 @@ GFXDECODE_END
 #endif
 
 static INPUT_PORTS_START( paddlema )
-	PORT_START("IN0")   // (bottom players)
+	PORT_START("IN0") // (bottom players)
 	ALPHA68K_PLAYER_INPUT_LSB( 1, IPT_UNKNOWN, IPT_UNKNOWN, IP_ACTIVE_LOW )
 	ALPHA68K_PLAYER_INPUT_MSB( 2, IPT_UNKNOWN, IPT_UNKNOWN, IP_ACTIVE_LOW )
 
@@ -248,50 +251,50 @@ static INPUT_PORTS_START( paddlema )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // "Test" ?
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE2 ) // "Test" ?
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")   // (top players)
+	PORT_START("IN2") // (top players)
 	ALPHA68K_PLAYER_INPUT_LSB( 3, IPT_UNKNOWN, IPT_UNKNOWN, IP_ACTIVE_LOW )
 	ALPHA68K_PLAYER_INPUT_MSB( 4, IPT_UNKNOWN, IPT_UNKNOWN, IP_ACTIVE_LOW )
 
-	PORT_START("IN3") //DSW0
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:8,7")
+	PORT_START("IN3") // DSW0
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )            PORT_DIPLOCATION("SW1:8,7")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )            PORT_DIPLOCATION("SW1:6,5")
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:4,3") /* See notes for Game Time / Match Type combos */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Game_Time ) )         PORT_DIPLOCATION("SW1:4,3") // See notes for Game Time / Match Type combos
 	PORT_DIPSETTING(    0x00, "Default Time" )
 	PORT_DIPSETTING(    0x20, "+10 Seconds" )
 	PORT_DIPSETTING(    0x10, "+20 Seconds" )
 	PORT_DIPSETTING(    0x30, "+30 Seconds" )
-	PORT_DIPNAME( 0xc0, 0x40, "Match Type" )        PORT_DIPLOCATION("SW1:2,1") /* Styles are for Upright/Table & Single/Dual controls???? */
-	PORT_DIPSETTING(    0x80, "A to B" )    /* Manual shows "Upright Sytle B" */
-	PORT_DIPSETTING(    0x00, "A to C" )    /* Manual shows "Upright Sytle A" */
-	PORT_DIPSETTING(    0x40, "A to E" )    /* Manual shows "Table Sytle C"   */
-//  PORT_DIPSETTING(    0xc0, "A to B" )    /* Manual shows "Table Sytle D"   */
+	PORT_DIPNAME( 0xc0, 0x40, "Match Type" )                 PORT_DIPLOCATION("SW1:2,1") // Styles are for Upright/Table & Single/Dual controls????
+	PORT_DIPSETTING(    0x80, "A to B" )                     // Manual shows "Upright Sytle B"
+	PORT_DIPSETTING(    0x00, "A to C" )                     // Manual shows "Upright Sytle A"
+	PORT_DIPSETTING(    0x40, "A to E" )                     // Manual shows "Table Sytle C"
+//  PORT_DIPSETTING(    0xc0, "A to B" )                     // Manual shows "Table Sytle D"
 
-	PORT_START("IN4")   // DSW1
+	PORT_START("IN4") // DSW1
 	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_HIGH, "SW2:8" )
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x01, "SW2:7" )        /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x01, "SW2:6" )        /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x01, "SW2:5" )        /* Listed as "Unused" */
-	PORT_DIPNAME( 0x30, 0x00, "Game Mode" )         PORT_DIPLOCATION("SW2:4,3")
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x01, "SW2:7" )             // Listed as "Unused"
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x01, "SW2:6" )             // Listed as "Unused"
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x01, "SW2:5" )             // Listed as "Unused"
+	PORT_DIPNAME( 0x30, 0x00, "Game Mode" )                  PORT_DIPLOCATION("SW2:4,3")
 	PORT_DIPSETTING(    0x20, "Demo Sounds Off" )
 	PORT_DIPSETTING(    0x00, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x10, "Win Match Against CPU (Cheat)")
 	PORT_DIPSETTING(    0x30, "Freeze" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("SW2:2") /* Manual shows "Off" for this dipswitch */
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Language ) )          PORT_DIPLOCATION("SW2:2") // Manual shows "Off" for this dipswitch
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )    PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -314,50 +317,51 @@ static INPUT_PORTS_START( tnextspc )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )       PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:2" )             /* Listed as "Unused" */
-	PORT_DIPNAME( 0x04, 0x04, "Additional Bonus Life" )     PORT_DIPLOCATION("SW1:3")
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:2" )             // Listed as "Unused"
+	PORT_DIPNAME( 0x04, 0x04, "Additional Bonus Life" )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, "2nd Extend ONLY" )
 	PORT_DIPSETTING(    0x00, "Every Extend" )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW1:4" )             /* Listed as "Unused" */
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW1:4" )             // Listed as "Unused"
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )           PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x30, "A 1C/1C B 1C/2C" )
 	PORT_DIPSETTING(    0x20, "A 2C/1C B 1C/3C" )
 	PORT_DIPSETTING(    0x10, "A 3C/1C B 1C/5C" )
 	PORT_DIPSETTING(    0x00, "A 4C/1C B 1C/6C" )
-	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Lives ) )             PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, "2" )
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x40, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,EQUALS,0x08)
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )       PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,EQUALS,0x08)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Game Mode" )             PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,EQUALS,0x00)
+	PORT_DIPNAME( 0x04, 0x04, "Game Mode" )                  PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,EQUALS,0x00)
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x08, 0x08, "SW2:3 Demo Sound/Game Mode" )    PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "SW2:3 Demo Sound/Game Mode" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, "Game Mode" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "100000 200000" )
 	PORT_DIPSETTING(    0x20, "150000 300000" )
 	PORT_DIPSETTING(    0x10, "300000 500000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )    PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
+
 
 /*
  *
@@ -370,19 +374,19 @@ void alpha68k_I_state::base_config(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_I_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_I_state,common)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(24'000'000)/6)); // 4MHz (24MHz/6) verified
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 24_MHz_XTAL/6)); // 4MHz (24MHz/6) verified
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void alpha68k_I_state::video_config(machine_config &config, int yshift)
 {
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(alpha68k_I_state::screen_update));
@@ -398,12 +402,13 @@ void alpha68k_I_state::video_config(machine_config &config, int yshift)
 void paddlemania_state::paddlema(machine_config &config)
 {
 	base_config(config);
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000)/4); // 6MHz (24MHz/4) verified
-	m_maincpu->set_addrmap(AS_PROGRAM, &paddlemania_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(paddlemania_state::irq1_line_hold)); /* VBL */
 
-	Z80(config, m_audiocpu, XTAL(24'000'000)/6); // 4MHz (24MHz/6) verified
+	// basic machine hardware
+	M68000(config, m_maincpu, 24_MHz_XTAL/4); // 6MHz (24MHz/4) verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &paddlemania_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(paddlemania_state::irq1_line_hold)); // VBL
+
+	Z80(config, m_audiocpu, 24_MHz_XTAL/6); // 4MHz (24MHz/6) verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &paddlemania_state::sound_map);
 
 	video_config(config, 0);
@@ -414,12 +419,13 @@ void paddlemania_state::paddlema(machine_config &config)
 void thenextspace_state::tnextspc(machine_config &config)
 {
 	base_config(config);
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(18'000'000)/2); // 9MHz (18MHz/2) verified
-	m_maincpu->set_addrmap(AS_PROGRAM, &thenextspace_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(thenextspace_state::irq1_line_hold)); /* VBL */
 
-	Z80(config, m_audiocpu, XTAL(4'000'000)); // 4Mhz verified
+	// basic machine hardware
+	M68000(config, m_maincpu, 18_MHz_XTAL/2); // 9MHz (18MHz/2) verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &thenextspace_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(thenextspace_state::irq1_line_hold)); // VBL
+
+	Z80(config, m_audiocpu, 4_MHz_XTAL); // 4MHz verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &thenextspace_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &thenextspace_state::sound_iomap);
 
@@ -441,7 +447,7 @@ ROM_START( paddlema )
 	ROM_LOAD16_BYTE( "padlem.6h",  0x20000, 0x10000, CRC(8897555f) SHA1(7d30aa56a727700a6e02af92b065ed982a39ccc2) )
 	ROM_LOAD16_BYTE( "padlem.3h",  0x20001, 0x10000, CRC(f0fe9b9d) SHA1(2e7a80dc25c549e57b7698052f53562a9a608205) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )   // Sound CPU
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
 	ROM_LOAD( "padlem.18c", 0x000000, 0x10000, CRC(9269778d) SHA1(bdc9100827f2e018db943d9f7d81b7936c155bf0) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -473,7 +479,7 @@ ROM_START( tnextspc )
 	ROM_LOAD16_BYTE( "ns_4.4", 0x00000, 0x20000, CRC(4617cba3) SHA1(615a1e67fc1c76d2be004b19a965f423b8daaf5c) ) // Silkscreened "4" @ 14L
 	ROM_LOAD16_BYTE( "ns_3.3", 0x00001, 0x20000, CRC(a6c47fef) SHA1(b7e4a0fffd5c44ed0b138c1ad04c3b6644ec463b) ) // Silkscreened "3" @ 11L
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )   // Sound CPU
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
 	ROM_LOAD( "ns_1.1", 0x000000, 0x10000, CRC(fc26853c) SHA1(0118b048046a6125bba20dec081b936486eb1597) ) // Silkscreened "1" @ 18B
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -497,10 +503,10 @@ ROM_START( tnextspc2 ) // two bootleg PCBs have been found with the same ROMs as
 	ROM_LOAD16_BYTE( "ns_4.4", 0x00000, 0x20000, CRC(4617cba3) SHA1(615a1e67fc1c76d2be004b19a965f423b8daaf5c) ) // == b18.ic13
 	ROM_LOAD16_BYTE( "ns_3.3", 0x00001, 0x20000, CRC(a6c47fef) SHA1(b7e4a0fffd5c44ed0b138c1ad04c3b6644ec463b) ) // == b17.ic11
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )   // Sound CPU
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
 	ROM_LOAD( "ns_1.1",    0x000000, 0x10000, CRC(fc26853c) SHA1(0118b048046a6125bba20dec081b936486eb1597) ) // == b1.ic129
 
-	ROM_REGION( 0x080000, "gfx1", 0 )   // EPROMs, graphics are odd/even interleaved
+	ROM_REGION( 0x080000, "gfx1", 0 ) // EPROMs, graphics are odd/even interleaved
 	ROM_LOAD16_BYTE( "b3.ic49",  0x00001, 0x10000, CRC(2bddf94d) SHA1(e064f48d0e3bb089753c1b59c863bb46bfa2bcee) )
 	ROM_LOAD16_BYTE( "b7.ic53",  0x00000, 0x10000, CRC(a8b13a9a) SHA1(2f808c17e97a272be14099c53b287e665dd90b14) )
 	ROM_LOAD16_BYTE( "b4.ic50",  0x20001, 0x10000, CRC(80c6c841) SHA1(ab0aa4cad6dcadae62f849e53c3c5cd909f77971) )
@@ -528,7 +534,7 @@ ROM_START( tnextspcj )
 	ROM_LOAD16_BYTE( "ns_ver1_j4.4", 0x00000, 0x20000, CRC(5cdf710d) SHA1(c744e532f2f5a248d7b50a2e62cc77a0888d8dff) ) // Silkscreened "4" @ 14L
 	ROM_LOAD16_BYTE( "ns_ver1_j3.3", 0x00001, 0x20000, CRC(cd9532d0) SHA1(dbd7ced8f015334f0acb8d760f4d9d0299feef70) ) // Silkscreened "3" @ 11L
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )   // Sound CPU
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
 	ROM_LOAD( "ns_1.1", 0x000000, 0x10000, CRC(fc26853c) SHA1(0118b048046a6125bba20dec081b936486eb1597) ) // Silkscreened "1" @ 18B
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -561,9 +567,8 @@ void thenextspace_state::init_tnextspc()
 	m_game_id = 0;
 }
 
-GAME( 1988, paddlema,   0,       paddlema,       paddlema,  paddlemania_state,  init_paddlema,  ROT90, "SNK",                                        "Paddle Mania", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, paddlema,  0,        paddlema,       paddlema,  paddlemania_state,  init_paddlema,  ROT90, "SNK",                                        "Paddle Mania", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, tnextspc,  0,        tnextspc,       tnextspc,  thenextspace_state, init_tnextspc,  ROT90, "SNK",                                        "The Next Space (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1989, tnextspc2, tnextspc, tnextspc,       tnextspc,  thenextspace_state, init_tnextspc,  ROT90, "SNK",                                        "The Next Space (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1989, tnextspcj, tnextspc, tnextspc,       tnextspc,  thenextspace_state, init_tnextspc,  ROT90, "SNK (Pasadena International Corp. license)", "The Next Space (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-

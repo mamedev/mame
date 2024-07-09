@@ -16,7 +16,7 @@
 #include "cpu/mcs96/i8x9x.h"
 #include "cpu/mcs96/i8xc196.h"
 #include "machine/timer.h"
-#include "sound/rolandpcm.h"
+#include "sound/roland_lp.h"
 #include "video/t6963c.h"
 
 #include "emupal.h"
@@ -352,12 +352,12 @@ void roland_d70_state::dsp_io_w(offs_t offset, u8 data) {
 }
 
 u8 roland_d70_state::tvf_io_r(offs_t offset) {
-	logerror("tvf read %x\n", offset);
+	logerror("tvf read %04x\n", offset);
 	return 0;
 }
 
 void roland_d70_state::tvf_io_w(offs_t offset, u8 data) {
-	logerror("twf write $x= %x\n", offset, data);
+	logerror("tvf write %04x= %02x\n", offset, data);
 }
 
 u8 roland_d70_state::snd_io_r(offs_t offset) {
@@ -494,11 +494,11 @@ void roland_d70_state::init_d70() {
 	u8 *dst = reinterpret_cast<u8 *>(memregion("pcm")->base());
 	// descramble internal ROMs
 	descramble_rom_internal(&dst[0x000000], &src[0x000000]);
+	descramble_rom_internal(&dst[0x080000], &src[0x080000]);
 	descramble_rom_internal(&dst[0x100000], &src[0x100000]);
+	descramble_rom_internal(&dst[0x180000], &src[0x180000]);
 	descramble_rom_internal(&dst[0x200000], &src[0x200000]);
 	descramble_rom_internal(&dst[0x300000], &src[0x300000]);
-	descramble_rom_internal(&dst[0x400000], &src[0x400000]);
-	descramble_rom_internal(&dst[0x500000], &src[0x500000]);
 }
 
 void roland_d70_state::descramble_rom_internal(u8 *dst, const u8 *src) {
@@ -515,11 +515,11 @@ ROM_START(d70)
 
 	ROM_REGION(0x600000, "pcmorg", 0) // ROMs before descrambling
 	ROM_LOAD("roland_d70_waverom-a.bin", 0x000000, 0x80000, CRC(8e53b2a3) SHA1(4872530870d5079776e80e477febe425dc0ec1df))
+	ROM_LOAD("roland_d70_waverom-e.bin", 0x080000, 0x80000, CRC(d46cc7a4) SHA1(d378ac89a5963e37f7c157b3c8e71892c334fd7b))
 	ROM_LOAD("roland_d70_waverom-b.bin", 0x100000, 0x80000, CRC(c8220761) SHA1(49e55fa672020f95fd9c858ceaae94d6db93df7d))
+	ROM_LOAD("roland_d70_waverom-f.bin", 0x180000, 0x80000, CRC(d4b01f5e) SHA1(acd867d68e49e5f59f1006ed14a7ca197b6dc4af))
 	ROM_LOAD("roland_d70_waverom-c.bin", 0x200000, 0x80000, CRC(733c4054) SHA1(9b6b59ab74e5bf838702abb087c408aaa85b7b1f))
 	ROM_LOAD("roland_d70_waverom-d.bin", 0x300000, 0x80000, CRC(b6c662d2) SHA1(3fcbcfd0d8d0fa419c710304c12482e2f79a907f))
-	ROM_LOAD("roland_d70_waverom-e.bin", 0x400000, 0x80000, CRC(d46cc7a4) SHA1(d378ac89a5963e37f7c157b3c8e71892c334fd7b))
-	ROM_LOAD("roland_d70_waverom-f.bin", 0x500000, 0x80000, CRC(d4b01f5e) SHA1(acd867d68e49e5f59f1006ed14a7ca197b6dc4af))
 	ROM_REGION(0x600000, "pcm", ROMREGION_ERASEFF) // ROMs after descrambling
 
 	ROM_REGION(0x400, "lcd:cgrom", 0)

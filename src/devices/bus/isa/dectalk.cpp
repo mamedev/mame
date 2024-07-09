@@ -53,14 +53,11 @@ uint16_t dectalk_isa_device::host_irq_r()
 
 uint8_t dectalk_isa_device::dma_r()
 {
-	if (!machine().side_effects_disabled())
-		m_cpu->drq1_w(0);
 	return m_dma;
 }
 
 void dectalk_isa_device::dma_w(uint8_t data)
 {
-	m_cpu->drq1_w(0);
 	m_dma = data;
 }
 
@@ -88,7 +85,6 @@ void dectalk_isa_device::output_ctl_w(uint16_t data)
 uint16_t dectalk_isa_device::dsp_dma_r()
 {
 	m_bio = ASSERT_LINE;
-	m_cpu->drq1_w(0);
 	return m_dsp_dma;
 }
 
@@ -102,7 +98,7 @@ int dectalk_isa_device::bio_line_r()
 {
 	// TODO: reading the bio line doesn't cause any direct external effects so this is wrong
 	if(m_bio == ASSERT_LINE)
-		m_cpu->drq0_w(1);
+		m_cpu->dma_sync_req(0);
 	return m_bio;
 }
 
@@ -191,7 +187,7 @@ void dectalk_isa_device::write(offs_t offset, uint8_t data)
 			break;
 		case 4:
 			m_dma = data;
-			m_cpu->drq1_w(1);
+			m_cpu->dma_sync_req(1);
 			break;
 		case 6:
 			m_cpu->int1_w(1);
@@ -213,7 +209,7 @@ uint8_t dectalk_isa_device::read(offs_t offset)
 			return m_data >> 8;
 		case 4:
 			if (!machine().side_effects_disabled())
-				m_cpu->drq1_w(1);
+				m_cpu->dma_sync_req(1);
 			return m_dma;
 	}
 	return 0;

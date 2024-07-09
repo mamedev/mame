@@ -686,6 +686,8 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		m_beta->param_w(data);
 		break;
 	case 0x16:
+	case 0x17:
+		m_beta->turbo_w(dcpp & 1);
 		if (data & 2)
 			m_beta->disable();
 		else
@@ -1200,8 +1202,7 @@ u8 sprinter_state::m1_r(offs_t offset)
 
 	if (!machine().side_effects_disabled())
 	{
-		if (!m_prf_d)
-			m_in_out_cmd = (data & 0xf7) == 0xd3; // d3/db
+		m_in_out_cmd = !m_prf_d && (data & 0xf7) == 0xd3; // d3/db - only non-prefixed
 		accel_control_r(data);
 	}
 
@@ -1262,8 +1263,12 @@ void sprinter_state::init_taps()
 	{
 		if (!machine().side_effects_disabled())
 		{
-			if (!m_z80_m1 && m_in_out_cmd && data == 0x1f)
-				data = 0x0f;
+			if (m_in_out_cmd && !m_z80_m1)
+			{
+				if (data == 0x1f && (m_pages[BIT(offset, 14, 2)] & BANK_RAM_MASK))
+					data = 0x0f;
+				m_in_out_cmd = false;
+			}
 			if (!(m_pages[BIT(offset, 14, 2)] & (BANK_FASTRAM_MASK | BANK_ISA_MASK))) // ROM+RAM
 				do_cpu_wait();
 			if(!m_z80_m1 && acc_ena() && (m_acc_dir != OFF))
@@ -1272,8 +1277,12 @@ void sprinter_state::init_taps()
 	});
 	prg.install_write_tap(0x10000, 0x1ffff, "accel_write", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
-		if (!m_z80_m1 && m_in_out_cmd && data == 0x1f)
-			data = 0x0f;
+		if (m_in_out_cmd && !m_z80_m1)
+		{
+			if (data == 0x1f && (m_pages[BIT(offset, 14, 2)] & BANK_RAM_MASK))
+				data = 0x0f;
+			m_in_out_cmd = false;
+		}
 		if (!(m_pages[BIT(offset, 14, 2)] & 0xff00)) // ROM only, RAM(w) applies waits manually
 			do_cpu_wait();
 		if (!m_z80_m1 && acc_ena() && (m_acc_dir != OFF))

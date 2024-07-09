@@ -1,12 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
+/**************************************************************************************************
 
-/*
 Irem M78
 
 Black Jack (1992)
 Flyers show this game has a main screen and 5 user screens.
 Is this the main unit or the satellite one?
+
+===================================================================================================
 
 2-PCB stack with IREM markings
 
@@ -33,7 +35,7 @@ TODO:
   Copied over sound handling from there for now;
 - comms;
 
-*/
+**************************************************************************************************/
 
 #include "emu.h"
 
@@ -200,11 +202,11 @@ void m78_state::main_io_map(address_map &map)
 	map(0x8000, 0x8fff).ram().w(FUNC(m78_state::tileram_w<1>)).share(m_tileram[1]);
 	map(0x9000, 0x9fff).ram().w(FUNC(m78_state::attrram_w<1>)).share(m_attrram[1]);
 	map(0xa000, 0xafff).ram().w(FUNC(m78_state::colorram_w<1>)).share(m_colorram[1]);
-//	map(0xb000, 0xbfff).ram(); // vregs, $b000, $b400, $b800, $bc00
+	//map(0xb000, 0xbfff).ram(); // vregs, $b000, $b400, $b800, $bc00
 	map(0xc000, 0xcfff).ram().w(FUNC(m78_state::tileram_w<0>)).share(m_tileram[0]);
 	map(0xd000, 0xdfff).ram().w(FUNC(m78_state::attrram_w<0>)).share(m_attrram[0]);
 	map(0xe000, 0xefff).ram().w(FUNC(m78_state::colorram_w<0>)).share(m_colorram[0]);
-//	map(0xf000, 0xffff).ram(); // layer control at $f000?
+	//map(0xf000, 0xffff).ram(); // layer control at $f000?
 }
 
 void m78_state::audio_program_map(address_map &map)

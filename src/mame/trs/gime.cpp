@@ -79,6 +79,8 @@
 
     POP*STAR PILOT: Timer is synchronized with scanlines.
 
+	Cloud Kingdoms: 512K bank switch on scanline.
+
 **********************************************************************/
 
 
@@ -1217,8 +1219,7 @@ inline offs_t gime_device::get_video_base()
 	}
 
 	result += ((offs_t) (m_gime_registers[0x0E] & ff9e_mask)    * 0x00008)
-			| ((offs_t) (m_gime_registers[0x0D] & ff9d_mask)    * 0x00800)
-			| ((offs_t) (m_gime_registers[0x0B] & 0x0F)         * 0x80000);
+			| ((offs_t) (m_gime_registers[0x0D] & ff9d_mask)    * 0x00800);
 	return result;
 }
 
@@ -1409,6 +1410,8 @@ template<uint8_t xres, gime_device::get_data_func get_data, bool record_mode>
 inline uint32_t gime_device::record_scanline_res(int scanline)
 {
 	int column;
+	/* capture 512K memory bank per scan line */
+	uint32_t bank_512k = (m_gime_registers[0x0B] & 0x0F) * 0x80000;
 	uint32_t base_offset = m_legacy_video ? 0 : (m_gime_registers[0x0F] & 0x7F) * 2;
 	uint32_t offset = 0;
 
@@ -1417,7 +1420,7 @@ inline uint32_t gime_device::record_scanline_res(int scanline)
 	{
 		/* input data */
 		uint8_t data, mode;
-		offset += ((*this).*(get_data))(m_video_position + ((base_offset + offset) & 0xFF), &data, &mode);
+		offset += ((*this).*(get_data))((m_video_position + ((base_offset + offset) & 0xFF)) | bank_512k, &data, &mode);
 
 		/* and record the pertinent values */
 		if (record_mode)

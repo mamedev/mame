@@ -796,7 +796,7 @@ GAME(1990,  radcl_g1,   radcl_l1,   s11c,   s11c, s11c_state, init_s11c,  ROT0, 
 GAME(1990,  radcl_p3,   radcl_l1,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Radical! (P-3)",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  rvrbt_l3,   0,          s11c,   s11c, s11c_state, init_s11c7, ROT0,   "Williams",             "Riverboat Gambler (L-3)",                      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  rvrbt_p7,   rvrbt_l3,   s11c,   s11c, s11c_state, init_s11c7, ROT0,   "Williams",             "Riverboat Gambler (PA-7)",                     MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  rollr_l2,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (L-2)",                            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  rollr_l2,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LA-2)",                           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1991,  rollr_ex,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (EXPERIMENTAL)",                   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1991,  rollr_e1,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (PU-1)",                           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1991,  rollr_p2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (PA-2 / PA-1 Sound)",              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

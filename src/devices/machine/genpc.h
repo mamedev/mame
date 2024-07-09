@@ -33,8 +33,9 @@ public:
 	template <typename T> void set_cputag(T &&tag)
 	{
 		m_maincpu.set_tag(std::forward<T>(tag));
-		m_isabus.lookup()->set_memspace(std::forward<T>(tag), AS_PROGRAM);
-		m_isabus.lookup()->set_iospace(std::forward<T>(tag), AS_IO);
+		m_isabus.lookup()->set_memspace(m_maincpu, AS_PROGRAM);
+		m_isabus.lookup()->set_iospace(m_maincpu, AS_IO);
+		m_isabus.lookup()->iochrdy_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	}
 
 	auto int_callback() { return m_int_callback.bind(); }

@@ -431,6 +431,7 @@ The golf club acts like a LED gun. PCB power input is 12V.
 #include "bus/ata/hdd.h"
 #include "machine/ds2430a.h"
 #include "machine/ins8250.h"
+#include "machine/k056230.h"
 #include "machine/lpci.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
@@ -471,6 +472,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_duart_com(*this, "duart_com"),
+		m_lanc(*this, "lanc"),
 		m_ata(*this, "ata"),
 		m_lpci(*this, "pcibus"),
 		m_ds2430(*this, "ds2430"),
@@ -537,6 +539,7 @@ private:
 
 	uint16_t ppp_sensor_r(offs_t offset);
 
+	void lanc_int(int state);
 	void uart_int(int state);
 
 	void voodoo_vblank(int state);
@@ -657,6 +660,7 @@ private:
 	required_device<ppc_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<pc16552_device> m_duart_com;
+	required_device<k056230_device> m_lanc;
 	required_device<ata_interface_device> m_ata;
 	required_device<pci_bus_legacy_device> m_lpci;
 	required_device<ds2430a_device> m_ds2430;
@@ -1863,8 +1867,8 @@ void viper_state::viper_map(address_map &map)
 	map(0xffe78000, 0xffe78000).rw(FUNC(viper_state::ds2430_ext_r), FUNC(viper_state::ds2430_ext_w));
 	map(0xffe80000, 0xffe80007).w(FUNC(viper_state::unk1a_w));
 	map(0xffe88000, 0xffe88007).w(FUNC(viper_state::unk1b_w));
-	map(0xffe98000, 0xffe98007).noprw(); // network?
-	map(0xffe9a000, 0xffe9bfff).ram();   // wcombat uses this
+	map(0xffe98000, 0xffe98007).m(m_lanc, FUNC(k056230_viper_device::regs_map));
+	map(0xffe9a000, 0xffe9bfff).rw(m_lanc, FUNC(k056230_viper_device::ram_r), FUNC(k056230_viper_device::ram_w));
 	map(0xffea0000, 0xffea0007).lr8(
 		NAME([this] (offs_t offset) {
 			const u8 res = m_gun_input[offset >> 1]->read() >> ((offset & 1) ? 0 : 8);
@@ -2444,6 +2448,12 @@ INPUT_PORTS_END
 
 /*****************************************************************************/
 
+void viper_state::lanc_int(int state)
+{
+	if (state)
+		mpc8240_interrupt(MPC8240_IRQ1);
+}
+
 void viper_state::uart_int(int state)
 {
 	if (state)
@@ -2588,6 +2598,9 @@ void viper_state::viper(machine_config &config)
 	// TODO: unverified clocks and channel types, likely connects to sensor motion based games
 	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
 	NS16550(config, "duart_com:chan1", XTAL(19'660'800)).out_int_callback().set(FUNC(viper_state::uart_int));
+
+	K056230_VIPER(config, m_lanc);
+	m_lanc->irq_cb().set(FUNC(viper_state::lanc_int));
 
 	VOODOO_3(config, m_voodoo, voodoo_3_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(8); // TODO: should be 16, implement VMI_DATA_5 strapping pin in Voodoo 3 core instead

@@ -37,6 +37,9 @@ public:
 	void int2_w(int state) { external_int(2, state); }
 	void int3_w(int state) { external_int(3, state); }
 
+	// This a hack, only use if there are sync problems with another cpu
+	void dma_sync_req(int which) { drq_callback(which); }
+
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 

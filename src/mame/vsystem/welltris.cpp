@@ -485,7 +485,7 @@ uint32_t welltris_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	draw_background(bitmap, cliprect);
 	m_char_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_spr_old->turbofrc_draw_sprites(m_spriteram, m_spriteram.bytes(), m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
+	m_spr_old->draw_sprites(m_spriteram, m_spriteram.bytes(), m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
 	return 0;
 }
 
@@ -522,7 +522,7 @@ void welltris_state::main_map(address_map &map)
 	map(0xfff004, 0xfff005).portr("P3");                 // left side controls
 	map(0xfff004, 0xfff007).w(FUNC(welltris_state::scrollreg_w));
 	map(0xfff006, 0xfff007).portr("P4");                 // right side controls
-	map(0xfff008, 0xfff009).portr("SYSTEM");             // bit 5 tested at start of IRQ 1 */
+	map(0xfff008, 0xfff009).portr("SYSTEM");             // bit 5 tested at start of IRQ 1
 	map(0xfff009, 0xfff009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xfff00a, 0xfff00b).portr("EXTRA");              // P3+P4 coin + start buttons
 	map(0xfff00c, 0xfff00d).portr("DSW1");
@@ -800,22 +800,12 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,2),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, RGN_FRAC(1,2)+1*4, RGN_FRAC(1,2)+0*4, RGN_FRAC(1,2)+3*4, RGN_FRAC(1,2)+2*4,
-			5*4, 4*4, 7*4, 6*4, RGN_FRAC(1,2)+5*4, RGN_FRAC(1,2)+4*4, RGN_FRAC(1,2)+7*4, RGN_FRAC(1,2)+6*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	64*8
-};
-
 static GFXDECODE_START( gfx_welltris )
 	GFXDECODE_ENTRY( "chars", 0, gfx_8x8x4_packed_lsb, 16* 0, 4*16 )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 16*96, 2*16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_welltris_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb, 16*96, 2*16 )
 GFXDECODE_END
 
 
@@ -859,10 +849,8 @@ void welltris_state::welltris(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	VSYSTEM_SPR2(config, m_spr_old, 0);
-	m_spr_old->set_gfx_region(1);
+	VSYSTEM_SPR2(config, m_spr_old, 0, "palette", gfx_welltris_spr);
 	m_spr_old->set_pritype(-1);
-	m_spr_old->set_gfxdecode_tag(m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -905,8 +893,8 @@ ROM_START( welltris )
 	ROM_LOAD( "lh534j12.77", 0x000000, 0x80000, CRC(b61a8b74) SHA1(e17f7355375bdc166ef8131f7de9dbda5453f570) )
 
 	ROM_REGION( 0x80000, "sprites", 0 )
-	ROM_LOAD( "046.93", 0x000000, 0x40000, CRC(31d96d77) SHA1(5613ef9e9e38406b4e64fc8983ea50b57613923e) )
-	ROM_LOAD( "048.94", 0x040000, 0x40000, CRC(bb4643da) SHA1(38d54f8c3dba09b528df05d748ab5bdf5d028453) )
+	ROM_LOAD32_WORD( "046.93", 0x000000, 0x40000, CRC(31d96d77) SHA1(5613ef9e9e38406b4e64fc8983ea50b57613923e) )
+	ROM_LOAD32_WORD( "048.94", 0x000002, 0x40000, CRC(bb4643da) SHA1(38d54f8c3dba09b528df05d748ab5bdf5d028453) )
 
 	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "lh534j09.123", 0x00000, 0x80000, CRC(6c2ce9a5) SHA1(a4011ecfb505191c9934ba374933cd11b331d55a) )
@@ -931,8 +919,8 @@ ROM_START( welltrisj )
 	ROM_LOAD( "lh534j12.77", 0x000000, 0x80000, CRC(b61a8b74) SHA1(e17f7355375bdc166ef8131f7de9dbda5453f570) )
 
 	ROM_REGION( 0x80000, "sprites", 0 )
-	ROM_LOAD( "046.93", 0x000000, 0x40000, CRC(31d96d77) SHA1(5613ef9e9e38406b4e64fc8983ea50b57613923e) )
-	ROM_LOAD( "048.94", 0x040000, 0x40000, CRC(bb4643da) SHA1(38d54f8c3dba09b528df05d748ab5bdf5d028453) )
+	ROM_LOAD32_WORD( "046.93", 0x000000, 0x40000, CRC(31d96d77) SHA1(5613ef9e9e38406b4e64fc8983ea50b57613923e) )
+	ROM_LOAD32_WORD( "048.94", 0x000002, 0x40000, CRC(bb4643da) SHA1(38d54f8c3dba09b528df05d748ab5bdf5d028453) )
 
 	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "lh534j09.123", 0x00000, 0x80000, CRC(6c2ce9a5) SHA1(a4011ecfb505191c9934ba374933cd11b331d55a) )
@@ -959,8 +947,8 @@ ROM_START( quiz18k )
 	ROM_LOAD( "ic79.bin", 0x100000, 0x80000, CRC(d721e169) SHA1(33ec819c4e7b4dbab41756af9eca857107d96c8b) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD( "ic93.bin", 0x000000, 0x80000, CRC(4d387c5e) SHA1(e77aea06b9b2dc8ada5618aaf83bb80f63670363) )
-	ROM_LOAD( "ic94.bin", 0x080000, 0x80000, CRC(6be2f164) SHA1(6a3ca63d6238d587a50718d2a6c76f01932c76c3) )
+	ROM_LOAD32_WORD( "ic93.bin", 0x000000, 0x80000, CRC(4d387c5e) SHA1(e77aea06b9b2dc8ada5618aaf83bb80f63670363) )
+	ROM_LOAD32_WORD( "ic94.bin", 0x000002, 0x80000, CRC(6be2f164) SHA1(6a3ca63d6238d587a50718d2a6c76f01932c76c3) )
 
 	ROM_REGION( 0x140000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "ic123.bin", 0x00000, 0x80000, CRC(ee4995cf) SHA1(1b47938ddc87709f8d118b86fe62602972c77ced) )

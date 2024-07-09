@@ -168,7 +168,7 @@ void spectrum_128_state::video_start()
 {
 	spectrum_state::video_start();
 	m_screen_location = m_ram->pointer() + (5 << 14);
-	m_border4t_render_at = 5;
+	m_border4t_render_at = 3;
 }
 
 uint8_t spectrum_128_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)

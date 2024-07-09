@@ -304,10 +304,10 @@ license:CC0-1.0
 	Japanese cart listing (by KD code)
 	 * = dumped
 
-	*KD-1  Kids 20 - Volume 1
-	*KD-2  Kids 20 - Volume 2
-	*KD-3  Kids 20 - Volume 3
-	 KD-4  Kids 20 - Volume 4
+	*KD-1  Kids' Song 20 - Volume 1
+	*KD-2  Kids' Song 20 - Volume 2
+	*KD-3  Kids' Song 20 - Volume 3
+	 KD-4  Kids' Song 20 - Volume 4
 
 	***********************************************************************************
 
@@ -318,15 +318,15 @@ license:CC0-1.0
 	M-2  *MC0002-ATM  Artist Mini Volume 2 (PIKA☆NCHI, A·RA·SHI, etc.)
 	M-3  *MC0003-ATM  Artist Mini Volume 3 (Morning Musume)
 	M-4  *MC0004-ATM  Artist Mini Volume 4 (w-inds)
-	M-5  *MC0005-KSM  Kids Song Mini Volume 1 (TV Song)
-	M-6  *MC0006-KSM  Kids Song Mini Volume 2 (TV Hero)
+	M-5  *MC0005-KSM  Kids' Song Mini Volume 1 (TV Song)
+	M-6  *MC0006-KSM  Kids' Song Mini Volume 2 (TV Hero)
 	M-7  *MC0007-ATM  Artist Mini Volume 5 (SMAP, KinKi Kids, ARASHI, TOKIO)
-	M-8  *MC0008-KSM  Kids Song Mini Volume 3
+	M-8  *MC0008-KSM  Kids' Song Mini Volume 3
 	M-9  *MC0009-JPM  J-Pop Mix Mini Volume 1
 	M-10 *MC0010-ATM  Artist Mini Volume 6 (Utada Hikaru)
-	M-11 *MC0011-KSM  Kids Song Mini Volume 4 (Micky Mouse March, Hoshi ni Negai O, etc.)
+	M-11 *MC0011-KSM  Kids' Song Mini Volume 4 (Micky Mouse March, Hoshi ni Negai o, etc.)
 	M-12 *MC0012-ATM  Artist Mini Volume 7 (Ayumi Hamasaki)
-	M-13 *MC0013-KSM  Kids Song Mini Volume 5
+	M-13 *MC0013-KSM  Kids' Song Mini Volume 5
 	M-14 *MC0014-ATM  Artist Mini Volume 8 (BoA)
 	M-15 *MC0015-TPM  TV Pop Mini Volume 1
 	M-16 *MC0016-ATM  Artist Mini Volume 9  (Yamaguchi Momoe)
@@ -419,7 +419,7 @@ license:CC0-1.0
 
 	*KR-1      Kirarin Revolution (comes in kira kara Starter Set bundled with Kirarin Revolution microphone) (inside cart is marked AC0009-KIR)
 	*BX01-MOR  Morning Musume Special (sticker inside cart is marked CS019-004A)
-	*PR-01 MNG  (c)2002   Premium Cartridge Koko ni Iru Zee! Morning Musume (single song 'not for sale' cartridge)
+	*PR-01 MNG  (c)2002   Premium Cartridge Koko ni Iruzee! Morning Musume (single song 'not for sale' cartridge)
 	 PR-02 AYY  (c)2003   Aya Matsuura - Prairies Man (single song 'not for sale' cartridge)
 	*PR-06     Misora Hibari (inside cart is marked AC0009)
 
@@ -2337,7 +2337,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mc0005">
-		<description>Kids Song Mini Volume 1 (TV Song) (Japan) (MC0005-KSM)</description>
+		<description>Kids' Song Mini Volume 1 (TV Song) (Japan) (MC0005-KSM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソングミニ mini vol.1 (TVソング)"/>
@@ -2350,7 +2350,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mc0006">
-		<description>Kids Song Mini Volume 2 (TV Hero) (Japan) (MC0006-KSM)</description>
+		<description>Kids' Song Mini Volume 2 (TV Hero) (Japan) (MC0006-KSM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソングミニ mini vol.2 (TVヒーロー)"/>
@@ -2376,7 +2376,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mc0008">
-		<description>Kids Song Mini Volume 2 (Japan) (MC0008-KSM)</description>
+		<description>Kids' Song Mini Volume 2 (Japan) (MC0008-KSM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソングミニ mini vol.3"/>
@@ -2415,7 +2415,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mc0011">
-		<description>Kids Song Mini Volume 4 (Micky Mouse March, Hoshi ni Negai O, etc.) (Japan) (MC0011-KSM)</description>
+		<description>Kids' Song Mini Volume 4 (Micky Mouse March, Hoshi ni Negai o, etc.) (Japan) (MC0011-KSM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストミニ mini vol.4 (ミッキーマウス・マーチ／星に願いを／他)"/>
@@ -2442,7 +2442,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mc0013">
-		<description>Kids Song Mini Volume 5 (Japan) (MC0013-KSM)</description>
+		<description>Kids' Song Mini Volume 5 (Japan) (MC0013-KSM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソングミニ mini vol.5"/>
@@ -2957,7 +2957,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pr01">
-		<description>PR-01 Premium Cartridge Koko ni Iru Zee! Morning Musume (Not for Sale, Japan)</description>
+		<description>PR-01 Premium Cartridge Koko ni Iruzee! Morning Musume (Not for Sale, Japan)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="プレミアムカートリッジ ここにいるぜえ！ モーニング娘。" />

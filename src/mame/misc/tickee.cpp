@@ -1204,13 +1204,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, tickee,    0,        tickee,   tickee,   tickee_gun_state, empty_init, ROT0, "Raster Elite",                  "Tickee Tickats",              MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Ghost Hunter",                MACHINE_SUPPORTS_SAVE )
-GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, tickee_gun_state, empty_init, ROT0, "Island Design",                 "Tut's Tomb",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, tickee,    0,        tickee,   tickee,   tickee_gun_state, empty_init, ROT0, "Raster Elite",                  "Tickee Tickats",               MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Ghost Hunter",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, tickee_gun_state, empty_init, ROT0, "Island Design",                 "Tut's Tomb",                   MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, tickee_state,     empty_init, ROT0, "ICE",                           "Mouse Attack",                MACHINE_SUPPORTS_SAVE )
+GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, tickee_state,     empty_init, ROT0, "ICE",                           "Mouse Attack",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire v1.1 (Build 239)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire v1.1 (Build 238)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire v1.0 (Build 236)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, maletmad,  0,        maletmad, maletmad, tickee_gun_state, empty_init, ROT0, "Hanaho Games (Capcom license)", "Mallet Madness v2.1",         MACHINE_SUPPORTS_SAVE )
+GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire (v1.1, Build 239)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire (v1.1, Build 238)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire (v1.0, Build 236)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, maletmad,  0,        maletmad, maletmad, tickee_gun_state, empty_init, ROT0, "Hanaho Games (Capcom license)", "Mallet Madness (v2.1)",        MACHINE_SUPPORTS_SAVE )

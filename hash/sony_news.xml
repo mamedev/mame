@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="sony_news" description="Sony NEWS software">
+
+	<software name="nwf_672rb" supported="partial">
+		<description>NEWS-OS Release 4.1R Version Up Kit</description>
+		<year>1991</year>
+		<publisher>Sony</publisher>
+		<notes>The floppies can boot on both CISC and RISC systems due to some bootloader magic, but the MO image is only for the first wave of RISC NEWS machines (NWS-3000 series)</notes>
+		<sharedfeat name="compatibility" value="NWS3000" />
+		<!--
+		The installation floppy and MO disk work, but the format disk hangs after printing a few messages on RISC systems.
+		Therefore, use of this kit requires use of a pre-formatted hard disk image for now.
+		The disk image loads on the CISC NEWS driver, so it is most likely an emulation issue, not a disk image issue.
+		-->
+
+		<!-- Source: archive.org -->
+		<!-- The "STAMP" file has the build date of 07/23/91 -->
+		<part name="hdd" interface="scsi_hdd">
+			<feature name="part_id" value="NEWS-OS Install Kit NWF-672R Vol.1" />
+			<diskarea name="harddriv">
+				<disk name="nwf_672rb_mo" sha1="b1c3b2e28d5695385b88f7415ce1e53d647333e4" />
+			</diskarea>
+		</part>
+		<part name="install" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Program" />
+			<dataarea name="flop" size="1474560">
+				<rom name="nwf_672rb_installation_program.img" size="1474560" crc="4fda104d" sha1="ed9499211ccf133570defa136199f331a38368f5" />
+			</dataarea>
+		</part>
+		<part name="format" interface="floppy_3_5">
+			<feature name="part_id" value="Format Program" />
+			<dataarea name="flop" size="1474560">
+				<rom name="nwf_672rb_format_program.img" size="1474560" crc="690016ec" sha1="64ff03dace6e8b91569bef6f2f8855fa59c39abe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nwf_683rd1" supported="yes">
+		<description>NEWS-OS Release 4.2.1aRD Installation Kit</description>
+		<year>1993</year>
+		<publisher>Sony</publisher>
+		<notes>Usable only on NWS-5000 series computers</notes>
+		<sharedfeat name="compatibility" value="NWS5000" />
+
+		<!-- Source: WinWorld -->
+		<!-- The "STAMP" file has the build date of 05/05/93 -->
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_id" value="NEWS-OS Install Kit NWF-683RD1 Vol.1" />
+			<diskarea name="cdrom">
+				<disk name="nwf_683rd1" sha1="84ade11109e676eaaf20e999c1aa4b5d48d40555" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

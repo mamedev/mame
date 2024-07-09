@@ -16,20 +16,22 @@
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
+
 class psr540_state : public driver_device {
 public:
-	psr540_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_swx00(*this, "swx00"),
-		  m_lcdc(*this, "ks0066"),
-		  m_floppy(*this, "fdc:0"),
-		  m_fdc(*this, "fdc"),
-		  m_nvram(*this, "ram"),
-		  m_inputs(*this, "B%u", 1U),
-		  m_outputs(*this, "%02d.%x.%x", 0U, 0U, 0U),
-		  m_sustain(*this, "SUSTAIN"),
-		  m_pitch_bend(*this, "PITCH_BEND")
+	psr540_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_swx00(*this, "swx00"),
+		m_lcdc(*this, "ks0066"),
+		m_floppy(*this, "fdc:0"),
+		m_fdc(*this, "fdc"),
+		m_nvram(*this, "ram"),
+		m_inputs(*this, "B%u", 1U),
+		m_outputs(*this, "%02d.%x.%x", 0U, 0U, 0U),
+		m_sustain(*this, "SUSTAIN"),
+		m_pitch_bend(*this, "PITCH_BEND")
 	{ }
 
 	void psr540(machine_config &config);
@@ -82,7 +84,7 @@ void psr540_state::render_w(int state)
 void psr540_state::machine_start()
 {
 	m_outputs.resolve();
- 
+
 	save_item(NAME(m_pe));
 	save_item(NAME(m_led));
 	save_item(NAME(m_scan));
@@ -136,7 +138,7 @@ void psr540_state::psr540(machine_config &config)
 	m_lcdc->set_lcd_size(2, 40);
 
 	HD63266F(config, m_fdc, 16_MHz_XTAL);
-	//	m_fdc->drq_wr_callback().set([this](int state){ fdc_drq = state; maincpu->set_input_line(Z180_INPUT_LINE_DREQ0, state); });
+	//m_fdc->drq_wr_callback().set([this](int state){ fdc_drq = state; maincpu->set_input_line(Z180_INPUT_LINE_DREQ0, state); });
 	m_fdc->set_ready_line_connected(false);
 	m_fdc->set_select_lines_connected(false);
 	m_fdc->inp_rd_callback().set([this](){ return m_floppy->get_device()->dskchg_r(); });
@@ -194,7 +196,7 @@ u8 psr540_state::pf_r()
 void psr540_state::pe_w(u16 data)
 {
 	m_pe = data;
-	//	logerror("pe lcd_rs=%x lcd_en=%x rdens=%d ldcic=%d fdcic=%d (%s)\n", BIT(m_pe, 11), BIT(m_pe, 9), BIT(m_pe, 8), BIT(m_pe, 4), BIT(m_pe, 3), machine().describe_context());
+	//logerror("pe lcd_rs=%x lcd_en=%x rdens=%d ldcic=%d fdcic=%d (%s)\n", BIT(m_pe, 11), BIT(m_pe, 9), BIT(m_pe, 8), BIT(m_pe, 4), BIT(m_pe, 3), machine().describe_context());
 	m_lcdc->rs_w(BIT(m_pe, 11));
 	m_lcdc->e_w(BIT(m_pe, 9));
 	m_fdc->rate_w(!BIT(m_pe, 8));
@@ -359,5 +361,7 @@ ROM_START( psr540 )
 	ROM_REGION(634772, "screen", ROMREGION_ERASE00)
 	ROM_LOAD("psr540-lcd.svg", 0, 634772, CRC(606d85ab) SHA1(6eff1f028c531cdcd070b21949e4624af0a586a1))
 ROM_END
+
+} // anonymous namespace
 
 SYST( 1999, psr540, 0, 0, psr540, psr540, psr540_state, empty_init, "Yamaha", "PSR540", MACHINE_IS_SKELETON )

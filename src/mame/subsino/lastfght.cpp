@@ -92,11 +92,9 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
-		{ }
+	{ }
 
 	void lastfght(machine_config &config);
-
-	void init_lastfght();
 
 protected:
 	virtual void machine_start() override;
@@ -164,8 +162,7 @@ private:
 
 void lastfght_state::video_start()
 {
-	int i;
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 		m_screen->register_screen_bitmap(m_bitmap[i]);
 
 	save_item(NAME(m_bitmap[0]));
@@ -417,8 +414,8 @@ void lastfght_state::lastfght_map(address_map &map)
 {
 	map.global_mask(0xffffff);
 
-	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
-	map(0x080000, 0x0fffff).rom().region("maincpu", 0);
+	map(0x000000, 0x007fff).rom();
+	map(0x080000, 0x0fffff).rom();
 
 	map(0x200000, 0x20ffff).ram().share("nvram"); // battery
 
@@ -581,31 +578,24 @@ void lastfght_state::lastfght(machine_config &config)
 ***************************************************************************/
 
 ROM_START( lastfght )
-	ROM_REGION( 0x100000, "maincpu", 0 )        // H8/3044 program
-	ROM_LOAD( "v106.u16", 0x000000, 0x080000, CRC(7aec89f4) SHA1(7cff00844ad82a0f8d19b1bd07ba3a2bced69d66) )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044 program
+	ROM_LOAD( "ss9689_6433044a22f.u12", 0x000000, 0x008000, CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "v106.u16",               0x080000, 0x080000, CRC(7aec89f4) SHA1(7cff00844ad82a0f8d19b1bd07ba3a2bced69d66) )
 
-	ROM_REGION( 0x800000, "gfx1", 0 )       // Blitter data
+	ROM_REGION( 0x800000, "gfx1", 0 ) // Blitter data
 	ROM_LOAD( "1.b1", 0x000000, 0x200000, CRC(6c438136) SHA1(138934e948bbd6bd80f354f037badedef6cd8cb1) )
 	ROM_LOAD( "2.b2", 0x200000, 0x200000, CRC(9710bcff) SHA1(0291385489a065ed895c99ae7197fdeac0a0e2a0) )
 	ROM_LOAD( "3.b3", 0x400000, 0x200000, CRC(4236c79a) SHA1(94f093d12c096d38d1e7278796f6d58e4ba14e2e) )
 	ROM_LOAD( "4.b4", 0x600000, 0x200000, CRC(68153b0f) SHA1(46ddf37d5885f411e0e6de9c7e8969ba3a00f17f) )
 
-	ROM_REGION( 0x100000, "samples", 0 )    // Samples
+	ROM_REGION( 0x100000, "samples", 0 ) // Samples
 	ROM_LOAD( "v100.u7", 0x000000, 0x100000, CRC(c134378c) SHA1(999c75f3a7890421cfd904a926ca377ee43a6825) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
 	ROM_LOAD( "ds2430a.q3", 0x00, 0x28, CRC(af461d83) SHA1(bb8d25e9bb60e00e460e4b7e1855c735becaaa6d) )
 ROM_END
 
-void lastfght_state::init_lastfght()
-{
-	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
-
-	// rts -> rte
-	rom[0x01b86 / 2] = 0x5670;
-}
-
 } // anonymous namespace
 
 
-GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, init_lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, empty_init, ROT0, "Subsino", "Last Fighting", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )

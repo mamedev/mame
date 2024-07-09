@@ -77,7 +77,7 @@ void clie_db_state::t650c(machine_config &config)
 
 ROM_START( t650c )
 	ROM_REGION16_BE( 0x800000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "sony_clie_peg_t650c_flashrom.bin", 0x000000, 0x800000, CRC(60855a64) SHA1(e08350e64438c62401041aaa335def08aa0decb7) ) // TODO: factory-reset
+	ROM_LOAD16_WORD_SWAP( "sony_clie_peg_t650c_flashrom.bin", 0x000000, 0x800000, CRC(60855a64) SHA1(e08350e64438c62401041aaa335def08aa0decb7) ) // verified factory defaulted image
 ROM_END
 
 } // anonymous namespace

@@ -256,7 +256,7 @@ Some routine locations
 #include "cpu/mcs96/i8x9x.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
-#include "sound/rolandpcm.h"
+#include "sound/roland_lp.h"
 #include "video/msm6222b.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

@@ -10,8 +10,8 @@ authors:hap
 	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
 
 	<element name="led" defstate="0">
-		<rect state="0"><color red="0.014" green="0.14" blue="0.02" /></rect>
-		<rect state="1"><color red="0.1" green="1.0" blue="0.15" /></rect>
+		<rect state="0"><color red="0.15" green="1.0" blue="0.1" alpha="0.13" /></rect>
+		<rect state="1"><color red="0.15" green="1.0" blue="0.1" /></rect>
 	</element>
 
 	<element name="ledo">

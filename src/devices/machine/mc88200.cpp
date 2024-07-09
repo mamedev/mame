@@ -10,7 +10,6 @@
  * TODO:
  *  - probe commands
  *  - mbus snooping
- *  - multiple cmmus per pbus
  *  - cycle counting
  *  - cache inhibited accesses invalidate matching cache tags (no writeback)
  *  - mc88204 64k variant
@@ -798,7 +797,7 @@ template <typename T> std::optional<T> mc88200_device::read(u32 virtual_address,
 			// copy back modified line
 			if (cs.modified(l.value()))
 				if (!cs.line[l.value()].copy_back(*this, cs.line[l.value()].tag | (s << 4)))
-					return false;
+					return std::nullopt;
 
 			// mark line invalid
 			cs.set_invalid(l.value());
@@ -808,7 +807,7 @@ template <typename T> std::optional<T> mc88200_device::read(u32 virtual_address,
 
 			// load line from memory
 			if (!cs.line[l.value()].load_line(*this, physical_address & 0xfffffff0U))
-				return false;
+				return std::nullopt;
 
 			// mark line shared unmodified
 			cs.set_shared(l.value());
@@ -941,6 +940,8 @@ template <typename T> std::optional<T> mc88200_device::mbus_read(u32 address)
 {
 	std::optional<T> data;
 
+	m_bus_error = false;
+
 	switch (sizeof(T))
 	{
 	case 1: data = m_mbus->read_byte(address); break;
@@ -952,7 +953,6 @@ template <typename T> std::optional<T> mc88200_device::mbus_read(u32 address)
 	{
 		if (!machine().side_effects_disabled())
 		{
-			m_bus_error = false;
 			m_pfar = address;
 			m_pfsr = PFSR_BE;
 		}
@@ -964,6 +964,8 @@ template <typename T> std::optional<T> mc88200_device::mbus_read(u32 address)
 
 template <typename T> bool mc88200_device::mbus_write(u32 address, T data, bool flush)
 {
+	m_bus_error = false;
+
 	switch (sizeof(T))
 	{
 	case 1: m_mbus->write_byte(address, data); break;
@@ -973,7 +975,6 @@ template <typename T> bool mc88200_device::mbus_write(u32 address, T data, bool 
 
 	if (m_bus_error)
 	{
-		m_bus_error = false;
 		if (!flush)
 		{
 			m_pfar = address;

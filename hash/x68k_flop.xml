@@ -24258,7 +24258,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="chorensa100" cloneof="chorensa">
+	<software name="chorensa100" cloneof="chorensa"> <!-- has 1.00 on title screen, but some files on disk reference 1.01 -->
 		<description>Chourensha 68k (v1.00)</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -24267,6 +24267,19 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1261824">
 				<rom name="chourensha 68k v1.00.dim" size="1261824" crc="7ffdadb8" sha1="8bf616f9fead4a776afa9ebc3c8c14f79f69a35f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chorensa100a" cloneof="chorensa"> <!-- has 1.00 on title screen and on files on disk -->
+		<description>Chourensha 68k (v1.00, alt)</description>
+		<year>1995</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="超連射68K" />
+		<info name="developer" value="Famibe no Yosshin" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1278208">
+				<rom name="crs_1_00.dim" size="1278208" crc="3f2969cc" sha1="49201e2099469bcd6371a41f9533d425f09b0f97" />
 			</dataarea>
 		</part>
 	</software>

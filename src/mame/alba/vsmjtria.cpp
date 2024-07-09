@@ -14,10 +14,10 @@ I/O:    2x 8255, 4x 8-dip banks, 1x single dip switch (at position 11m)
 OSC:    20MHz
 
 Notes:
-- Loosely based off rmhaihai.cpp.
-  Changes needed for merging both implementations seems too trivial to warrant a
+- Loosely based off alba/rmhaihai.cpp.
+  Changes needed for merging both implementations seems too non-trivial to warrant a
   driver merge, basically just the video HW, the CRTC (448x224 clocked at 20 MHz?)
-  and a few I/O bits looks very similar, the odd screen size is also a thing in srmp2.cpp
+  and a few I/O bits looks similar, the odd screen size is also a thing in srmp2.cpp
   and probably other Seta HWs.
 - CPU seems a bit too slow when deciding about what tile to discard,
   it also takes a bit too much to sync when a player takes a tile from the pond in

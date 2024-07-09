@@ -28,6 +28,9 @@ public:
 	auto write_adb_st() { return m_adb_st.bind(); } // ADB state
 	auto write_cb1() { return m_cb1.bind(); }   // ADB clock
 	auto write_cb2() { return m_cb2.bind(); }   // ADB data
+	auto write_dfac_clock() { return m_dfac_clock_w.bind(); }
+	auto write_dfac_data() { return m_dfac_data_w.bind(); }
+	auto write_dfac_latch() { return m_dfac_latch_w.bind(); }
 
 	auto read_pa1()  { return m_pa1.bind(); }   // ID bits
 	auto read_pa2()  { return m_pa2.bind(); }
@@ -69,7 +72,7 @@ protected:
 	virtual void iosb_regs_w(offs_t offset, u16 data, u16 mem_mask);
 
 	devcb_write8 m_adb_st;
-	devcb_write_line m_cb1, m_cb2;
+	devcb_write_line m_cb1, m_cb2, m_dfac_clock_w, m_dfac_data_w, m_dfac_latch_w;
 	devcb_read_line m_pa1, m_pa2, m_pa4, m_pa6;
 
 	required_device<m68000_musashi_device> m_maincpu;
@@ -107,6 +110,7 @@ private:
 	void field_interrupts();
 	void via_out_cb1(int state);
 	void via_out_cb2(int state);
+	void via2_out_b(uint8_t data);
 	void via1_irq(int state);
 	void via2_irq(int state);
 	void asc_irq(int state);

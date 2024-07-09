@@ -386,13 +386,11 @@ void luna_88k_state_base::common_config(machine_config &config, XTAL clock)
 {
 	MC88100(config, m_cpu, clock.value());
 	m_cpu->set_addrmap(AS_PROGRAM, &luna_88k_state_base::cpu_map);
+	m_cpu->set_cmmu_code([this](u32 const address) -> mc88200_device & { return *m_cmmu[0]; });
+	m_cpu->set_cmmu_data([this](u32 const address) -> mc88200_device & { return *m_cmmu[1]; });
 
-	MC88200(config, m_cmmu[0], clock.value(), 0x07); // cpu0 cmmu i0
-	m_cmmu[0]->set_mbus(m_cpu, AS_PROGRAM);
-	m_cpu->set_cmmu_i(m_cmmu[0]);
-	MC88200(config, m_cmmu[1], clock.value(), 0x06); // cpu0 cmmu d0
-	m_cmmu[1]->set_mbus(m_cpu, AS_PROGRAM);
-	m_cpu->set_cmmu_d(m_cmmu[1]);
+	MC88200(config, m_cmmu[0], clock.value(), 0x07).set_mbus(m_cpu, AS_PROGRAM); // cpu0 cmmu i0
+	MC88200(config, m_cmmu[1], clock.value(), 0x06).set_mbus(m_cpu, AS_PROGRAM); // cpu0 cmmu d0
 
 	// 6 SIMMs for RAM arranged as three groups of 2?
 	RAM(config, m_ram);

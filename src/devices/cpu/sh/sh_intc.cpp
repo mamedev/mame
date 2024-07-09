@@ -64,7 +64,7 @@ void sh_intc_device::interrupt_taken(int irqline, int vector)
 	// Don't clear an external interrupt which is level and still active
 	if(vector < 64 || vector >= 72 || BIT(m_icr, 7-(vector & 7)) || !BIT(m_lines, vector & 7))
 		m_pending[vector >> 5] &= ~(1 << (vector & 31));
-		
+
 	update_irq();
 }
 

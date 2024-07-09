@@ -165,14 +165,14 @@ MODRM_TABLE i386_MODRM_table[256];
 
 /*************************************************************************/
 
-uint32_t i386_device::i386_translate(int segment, uint32_t ip, int rwn)
+uint32_t i386_device::i386_translate(int segment, uint32_t ip, int rwn, int size)
 {
 	// TODO: segment limit access size, execution permission, handle exception thrown from exception handler
 	if (PROTECTED_MODE && !V8086_MODE && (rwn != -1))
 	{
 		if (!(m_sreg[segment].valid))
 			FAULT_THROW((segment == SS) ? FAULT_SS : FAULT_GP, 0);
-		if (i386_limit_check(segment, ip))
+		if (i386_limit_check(segment, ip, size))
 			FAULT_THROW((segment == SS) ? FAULT_SS : FAULT_GP, 0);
 		if ((rwn == 0) && ((m_sreg[segment].flags & 8) && !(m_sreg[segment].flags & 2)))
 			FAULT_THROW(FAULT_GP, 0);

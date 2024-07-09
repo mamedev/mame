@@ -6,6 +6,9 @@
 
     Driver by Ville Linde
 
+    TODO:
+    - segfaults on soft reset;
+    - jetwave: fix debug mode;
 
     Hardware overview:
 
@@ -494,7 +497,7 @@ void midnrun_state::main_memmap(address_map &map)
 	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0007).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(midnrun_state::sysreg_r), FUNC(midnrun_state::sysreg_w));
-	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::regs_r), FUNC(k056230_device::regs_w));  // LANC registers
+	map(0x7e008000, 0x7e009fff).m(m_k056230, FUNC(k056230_device::regs_map));  // LANC registers
 	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));    // LANC Buffer RAM (27E)
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f800000, 0x7f9fffff).rom().region("prgrom", 0);
@@ -515,7 +518,7 @@ void jetwave_state::main_memmap(address_map &map)
 	map(0x78080000, 0x7808000f).rw(m_k001006_2, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0007).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(jetwave_state::sysreg_r), FUNC(jetwave_state::sysreg_w));
-	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::regs_r), FUNC(k056230_device::regs_w));  // LANC registers
+	map(0x7e008000, 0x7e009fff).m(m_k056230, FUNC(k056230_device::regs_map));  // LANC registers
 	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));    // LANC Buffer RAM (27E)
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f000000, 0x7f3fffff).rom().region("datarom", 0);
@@ -644,9 +647,10 @@ static INPUT_PORTS_START( jetwave )
 	PORT_DIPSETTING( 0x08, "2" )
 	PORT_DIPSETTING( 0x04, "3" )
 	PORT_DIPSETTING( 0x00, "4" )
+	// TODO: make these two less confusing
 	PORT_DIPNAME( 0x02, 0x00, "Drive System" ) PORT_DIPLOCATION("SW:2") //Sensors for force feedback. Todo: "Disable" the sensors so this switch can be set to off without errors.
-	PORT_DIPSETTING( 0x02, "On" ) // Enables the sensors/normal use.
-	PORT_DIPSETTING( 0x00, "Off" ) //Disables and bypasses all sensor checks. This disables the force feedback on actual hardware.
+	PORT_DIPSETTING( 0x02, DEF_STR( On ) ) // Enables the sensors/normal use.
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) ) //Disables and bypasses all sensor checks. This disables the force feedback on actual hardware.
 	PORT_DIPNAME( 0x01, 0x01, "Running Mode" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x01, "Product" ) //Enables the analog inputs; normal usage
 	PORT_DIPSETTING( 0x00, "Check" ) //Disables them for use with a JAMMA interface; intended for development purposes.

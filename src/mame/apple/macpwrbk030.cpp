@@ -282,15 +282,13 @@ private:
 	void mac_gsc_w(uint8_t data);
 	void macgsc_palette(palette_device &palette) const;
 
-	u8 m_pmu_via_bus = 0, m_pmu_ack = 0, m_pmu_req = 0;
-	u8 pmu_data_r() { return m_pmu_via_bus; }
+	u8 m_pmu_from_via = 0, m_pmu_to_via = 0, m_pmu_ack = 0, m_pmu_req = 0;
+
+	u8 pmu_p1_r() { return 0; }
+	u8 pmu_data_r() { return m_pmu_from_via; }
 	void pmu_data_w(u8 data)
 	{
-			// if the 68k has valid data on the bus, don't overwrite it
-			if (m_pmu_req)
-			{
-				m_pmu_via_bus = data;
-			}
+		m_pmu_to_via = data;
 	}
 	u8 pmu_comms_r() { return (m_pmu_req<<7); }
 	void pmu_comms_w(u8 data)
@@ -312,6 +310,8 @@ private:
 	}
 
 	u8 pmu_in_r() { return 0x20; }  // bit 5 is 0 if the Target Disk Mode should be enabled
+
+	u8 battery_r() { return 0x7f; }
 };
 
 // 4-level grayscale
@@ -790,7 +790,7 @@ void macpb030_state::mac_via_out_b(u8 data)
 
 u8 macpb030_state::mac_via2_in_a()
 {
-	return m_pmu_via_bus;
+	return m_pmu_to_via;
 }
 
 u8 macpb030_state::mac_via2_in_b()
@@ -800,7 +800,7 @@ u8 macpb030_state::mac_via2_in_b()
 
 void macpb030_state::mac_via2_out_a(u8 data)
 {
-	m_pmu_via_bus = data;
+	m_pmu_from_via = data;
 }
 
 void macpb030_state::mac_via2_out_b(u8 data)
@@ -826,6 +826,7 @@ void macpb030_state::macpb140(machine_config &config)
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	M50753(config, m_pmu, 3.93216_MHz_XTAL);
+	m_pmu->read_p<1>().set(FUNC(macpb030_state::pmu_p1_r));
 	m_pmu->read_p<2>().set(FUNC(macpb030_state::pmu_data_r));
 	m_pmu->write_p<2>().set(FUNC(macpb030_state::pmu_data_w));
 	m_pmu->read_p<3>().set(FUNC(macpb030_state::pmu_comms_r));
@@ -833,6 +834,7 @@ void macpb030_state::macpb140(machine_config &config)
 	m_pmu->read_p<4>().set(FUNC(macpb030_state::pmu_adb_r));
 	m_pmu->write_p<4>().set(FUNC(macpb030_state::pmu_adb_w));
 	m_pmu->read_in_p().set(FUNC(macpb030_state::pmu_in_r));
+	m_pmu->ad_in<1>().set(FUNC(macpb030_state::battery_r));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.15);

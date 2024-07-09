@@ -20,9 +20,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "cpu/mcs48/mcs48.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/74259.h"
 #include "machine/bankdev.h"
+#include "machine/i8279.h"
+#include "machine/msm5832.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "machine/roc10937.h"
@@ -68,6 +71,21 @@ private:
 	uint8_t in2_r();
 
 	uint8_t m_input_sel;
+};
+
+class azkoyent_state : public driver_device
+{
+public:
+	azkoyent_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+	{ }
+
+	void azkoyent(machine_config &config);
+	void azkoyent61(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -216,6 +234,9 @@ static INPUT_PORTS_START( designe )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_M) PORT_NAME("Canal 19")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(azkoyent)
+INPUT_PORTS_END
+
 
 //**************************************************************************
 //  MACHINE EMULATION
@@ -298,6 +319,19 @@ void design6_state::design6(machine_config &config)
 	config.set_default_layout(layout_design6);
 }
 
+void azkoyent_state::azkoyent(machine_config &config)
+{
+	I8039(config, m_maincpu, 6.144_MHz_XTAL);
+	I8279(config, "i8279", 6.144_MHz_XTAL); // Unknown clock
+}
+
+void azkoyent_state::azkoyent61(machine_config &config)
+{
+	I8051(config, m_maincpu, 6_MHz_XTAL);
+	I8279(config, "i8279", 6_MHz_XTAL); // Unknown clock
+	MSM5832(config, "rtc", 6_MHz_XTAL); // Unknown clock, has its own oscillator (unknown frequency)
+}
+
 
 //**************************************************************************
 //  ROM DEFINITIONS
@@ -319,6 +353,94 @@ ROM_START( designe )
 	ROM_LOAD("pic16x76_l56s-l66s.bin", 0x0000, 0x4000, NO_DUMP)
 ROM_END
 
+
+// Different Azkoyen vending machines on similar hardware
+
+/* Azkoyen models T6, T8, and T12 (Azkoyen PCB 104-4455-02-80/1). MCS-48-based. Unknown display.
+  ___________________________________________________________
+ |                                       __________         |
+_|_           ___                       | BATT    |        _|_
+_|_         LM555CN                     |_________|        _|_
+ |   ___          ____________________                     _|_
+ |  BDX53A  Xtal | PCB 80C39 11P     |    __________       _|_
+ |     6.144 MHz |___________________|   |_MC14069U|       _|_
+_|_                                          _____________ _|_
+_|_               ____________________      | EPROM      |  |
+_|_              | NEC D8279C-5      |      |____________| =|
+ |        ___    |___________________|       __________    =|
+ |=      |..|                               |M74HC373B1    =|
+ |=      |..|                                _________     =|
+ |=      |..|                               |TC4011BP|     =|
+ |=      |..|                        ___     ___            |
+ |       |..|              TC4011BP->|  |    |  |          =|
+ |=      |..|                        |  |    |  <-TC4011BP =|
+ |=      |..|                        |  |    |  |          =|
+ |                                   |__|    |__|          =|
+ |__________________________________________________________|
+*/
+
+ROM_START( azkoyent6 )
+	ROM_REGION(0x2000, "maincpu", 0)
+	ROM_LOAD("43504560-0_t-6.u04",   0x0000, 0x2000, CRC(a4289b26) SHA1(40587094b11c6cf9308673ffac2ed9d445d458e9))
+ROM_END
+
+ROM_START( azkoyent8 )
+	ROM_REGION(0x2000, "maincpu", 0)
+	ROM_LOAD("43504570-2_t8_3.u04",  0x0000, 0x2000, CRC(76ac54bf) SHA1(da4c4a9f1c9c85d59169d62682bb7b73a9dd133b))
+ROM_END
+
+ROM_START( azkoyent12 )
+	ROM_REGION(0x2000, "maincpu", 0)
+	ROM_LOAD("43504580-0_t12-17.u04", 0x0000, 0x2000, CRC(10d4d4a7) SHA1(96804bc173abf2d51de7e7f84decba286916eba7))
+ROM_END
+
+/* Azkoyen model T61 (with OKI M5832 RTC, Azkoyen PCB 131000060-1). MCS-51-based. Unknown display.
+
+  ___|||_||||||||||____________________________________
+ |   ||| ||||||||||          ||||||||   |||||||||||   |
+ | _____________                    _____             |
+ ||::::::::::::|     __________     ·····             |
+ |                  |ULN2803A_|                       |
+ |      __________   __________   __________         =|
+ |     |CD4099BCN|  |CD4099BCN|  |CF74HC240E         =|
+ |                                                   =|
+ |  L7805CV          __________                      =|
+ |                  |_UM6104__|                      =|
+ |      __________   __________   __________          |
+ |     |_TC4011BP|  |_TC4071BP|  |CD4099BCN|          |
+ |      __________   __________   __________          |
+ |     |_TC4011BP|  |GD74HC138|  |TC4099BP_|<-Not present on some versions
+ |            ______________      __________         =|
+ |           | EPROM       |     |TC4099BP_|<-Not present on some versions
+ |           |_____________|                         =|
+ |          ___   __________                         =|
+ |       LM555CN |TC4069UBP|                         =|
+ | ______        ___________           ___________    |
+ || BATT|       |MM74HC373N|          |TD62083AP_|    |
+ ||_____|        ___________                          |
+ |              |MM74HC373N|    _____________         |
+ | Osc                         |::::::::::::|         |
+ | xxx MHz      _________________   _________________ |
+ | __________  | Intel P80C51AH |  | NEC D8279C-2   | |
+ ||OKI_M5832|  |________________|  |________________| |
+ |                ____     Xtal     __________        |
+ |                BDX53  6.000 MHz |SN74HC240N        |
+ |                                                    |
+ |_____________|_|____|_|__|__|||_|||||||||___||||____|
+
+*/
+
+ROM_START( azkoyent61 )
+	ROM_REGION(0x1000, "maincpu", 0)
+	ROM_LOAD("t-61.u4",       0x0000, 0x1000, CRC(16d9b843) SHA1(7c6f177eca9163b5284d2cbe1bdeb3b0bf1a6698))
+ROM_END
+
+ROM_START( azkoyent61a )
+	ROM_REGION(0x1000, "maincpu", 0)
+	ROM_LOAD("t-61-6_t-m.u4", 0x0000, 0x1000, CRC(ce1ed720) SHA1(42cb78ddd8d06764599e97b72b557d164940f7df))
+ROM_END
+
+
 } // anonymous namespace
 
 
@@ -326,6 +448,12 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR   NAME     PARENT  MACHINE  INPUT    CLASS          INIT        ROTATION  COMPANY    FULLNAME         FLAGS
-GAME( 1995?, design6, 0,      design6, design6, design6_state, empty_init, ROT0,     "Azkoyen", "Design D6",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-GAME( 1995?, designe, 0,      design6, designe, design6_state, empty_init, ROT0,     "Azkoyen", "Design (Euro)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+//    YEAR   NAME         PARENT      MACHINE     INPUT     CLASS           INIT        ROT   COMPANY    FULLNAME                             FLAGS
+GAME( 1995?, design6,     0,          design6,    design6,  design6_state,  empty_init, ROT0, "Azkoyen", "Design D6",                         MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+GAME( 1995?, designe,     0,          design6,    designe,  design6_state,  empty_init, ROT0, "Azkoyen", "Design (Euro)",                     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+
+GAME( 19??,  azkoyent6,   0,          azkoyent,   azkoyent, azkoyent_state, empty_init, ROT0, "Azkoyen", "Vending machine model T6",          MACHINE_IS_SKELETON )
+GAME( 19??,  azkoyent8,   0,          azkoyent,   azkoyent, azkoyent_state, empty_init, ROT0, "Azkoyen", "Vending machine model T8",          MACHINE_IS_SKELETON )
+GAME( 19??,  azkoyent12,  0,          azkoyent,   azkoyent, azkoyent_state, empty_init, ROT0, "Azkoyen", "Vending machine model T12",         MACHINE_IS_SKELETON )
+GAME( 19??,  azkoyent61,  0,          azkoyent61, azkoyent, azkoyent_state, empty_init, ROT0, "Azkoyen", "Vending machine model T61 (set 1)", MACHINE_IS_SKELETON )
+GAME( 19??,  azkoyent61a, azkoyent61, azkoyent61, azkoyent, azkoyent_state, empty_init, ROT0, "Azkoyen", "Vending machine model T61 (set 2)", MACHINE_IS_SKELETON )

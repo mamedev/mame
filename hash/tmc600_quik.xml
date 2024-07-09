@@ -10,8 +10,8 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Telercas</publisher>
 		<info name="usage" value="W, RUN" />
-		
-        <part name="quik" interface="tmc600_quik">
+
+		<part name="quik" interface="tmc600_quik">
 			<dataarea name="quik" size="4672">
 				<rom name="demo.tmc600" size="4672" crc="fce7ad03" sha1="fada958bb9648619eb5ce04dc4c829091e34b665"/>
 			</dataarea>
@@ -23,8 +23,8 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Telercas</publisher>
 		<info name="usage" value="W, RUN" />
-		
-        <part name="quik" interface="tmc600_quik">
+
+		<part name="quik" interface="tmc600_quik">
 			<dataarea name="quik" size="2025">
 				<rom name="demo2.tmc600" size="2025" crc="592e97c7" sha1="8f92f0dd7aee3b3aae56a06a4117796ff4643811"/>
 			</dataarea>
@@ -36,8 +36,8 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Telercas</publisher>
 		<info name="usage" value="W, RUN" />
-		
-        <part name="quik" interface="tmc600_quik">
+
+		<part name="quik" interface="tmc600_quik">
 			<dataarea name="quik" size="817">
 				<rom name="snoopy.tmc600" size="817" crc="884976b0" sha1="0c2dc1a0fef94ac359313414b43a281b909bc7f2"/>
 			</dataarea>

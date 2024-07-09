@@ -58,13 +58,9 @@ enum
  */
 
 
-class tms32025_device : public cpu_device
+class tms3202x_device : public cpu_device
 {
 public:
-	// construction/destruction
-	tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
 	// configuration helpers
 	auto bio_in_cb() { return m_bio_in.bind(); }
 	auto hold_in_cb() { return m_hold_in.bind(); }
@@ -73,35 +69,33 @@ public:
 	auto dr_in_cb() { return m_dr_in.bind(); }
 	auto dx_out_cb() { return m_dx_out.bind(); }
 
-	void set_mp_mc(bool state) { m_mp_mc = state; }
-
 	//void tms32025_program(address_map &map);
-	void tms32025_data(address_map &map);
+	void tms3202x_data(address_map &map);
 	void tms32026_data(address_map &map);
-protected:
-	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap);
 
-	// device-level overrides
+protected:
+	// construction/destruction
+	tms3202x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, unsigned stack_depth, address_map_constructor prgmap, address_map_constructor datamap);
+
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual uint32_t execute_min_cycles() const noexcept override { return 4; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 20; }
 	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
-	// device_state_interface overrides
+	// device_state_interface implementation
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-
-	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	void common_reset();
 
@@ -119,7 +113,7 @@ protected:
 	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_data;
 	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_io;
 
-	typedef void ( tms32025_device::*opcode_func ) ();
+	typedef void ( tms3202x_device::*opcode_func ) ();
 	struct tms32025_opcode
 	{
 		uint8_t       cycles;
@@ -136,6 +130,8 @@ protected:
 	devcb_read16 m_dr_in;
 	devcb_write16 m_dx_out;
 
+	unsigned const m_stack_limit;
+
 
 	/******************** CPU Internal Registers *******************/
 	uint16_t  m_PREVPC;     /* previous program counter */
@@ -147,8 +143,8 @@ protected:
 	PAIR    m_ACC;
 	PAIR    m_Preg;
 	uint16_t  m_Treg;
-	uint16_t  m_AR[8];
-	uint16_t  m_STACK[8];
+	uint16_t  m_AR[8]; // 5 for TMS32020, 8 for rest
+	uint16_t  m_STACK[8]; // 4 level for TMS32020, 8 level for rest
 	PAIR    m_ALU;
 	uint16_t  m_drr, m_dxr, m_tim, m_prd, m_imr, m_greg;
 
@@ -170,7 +166,6 @@ protected:
 	int     m_icount;
 	int     m_mHackIgnoreARP;          /* special handling for lst, lst1 instructions */
 	int     m_waiting_for_serial_frame;
-	bool    m_mp_mc;
 
 	uint16_t drr_r();
 	void drr_w(uint16_t data);
@@ -185,25 +180,25 @@ protected:
 	uint16_t greg_r();
 	void greg_w(uint16_t data);
 
-	inline void CLR0(uint16_t flag);
-	inline void SET0(uint16_t flag);
-	inline void CLR1(uint16_t flag);
-	inline void SET1(uint16_t flag);
-	inline void MODIFY_DP(int data);
-	inline void MODIFY_PM(int data);
-	inline void MODIFY_ARP(int data);
+	void CLR0(uint16_t flag);
+	void SET0(uint16_t flag);
+	void CLR1(uint16_t flag);
+	void SET1(uint16_t flag);
+	void MODIFY_DP(int data);
+	void MODIFY_PM(int data);
+	void MODIFY_ARP(int data);
 	uint16_t reverse_carry_add(uint16_t arg0, uint16_t arg1 );
-	inline void MODIFY_AR_ARP();
-	inline void CALCULATE_ADD_CARRY();
-	inline void CALCULATE_SUB_CARRY();
-	inline void CALCULATE_ADD_OVERFLOW(int32_t addval);
-	inline void CALCULATE_SUB_OVERFLOW(int32_t subval);
-	inline uint16_t POP_STACK();
-	inline void PUSH_STACK(uint16_t data);
-	inline void SHIFT_Preg_TO_ALU();
-	inline void GETDATA(int shift,int signext);
-	inline void PUTDATA(uint16_t data);
-	inline void PUTDATA_SST(uint16_t data);
+	void MODIFY_AR_ARP();
+	void CALCULATE_ADD_CARRY();
+	void CALCULATE_SUB_CARRY();
+	void CALCULATE_ADD_OVERFLOW(int32_t addval);
+	void CALCULATE_SUB_OVERFLOW(int32_t subval);
+	uint16_t POP_STACK();
+	void PUSH_STACK(uint16_t data);
+	void SHIFT_Preg_TO_ALU();
+	void GETDATA(int shift,int signext);
+	void PUTDATA(uint16_t data);
+	void PUTDATA_SST(uint16_t data);
 	void opcodes_CE();
 	void opcodes_Dx();
 	void illegal();
@@ -359,10 +354,39 @@ protected:
 	void zalh();
 	void zalr();
 	void zals();
-	inline int process_IRQs();
-	inline void process_timer(int clocks);
+	int process_IRQs();
+	void process_timer(int clocks);
 };
 
+
+class tms32020_device : public tms3202x_device
+{
+public:
+	// construction/destruction
+	tms32020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class tms32025_device : public tms3202x_device
+{
+public:
+	// construction/destruction
+	tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// configuration helpers
+	void set_mp_mc(bool state) { m_mp_mc = state; }
+
+protected:
+	// construction/destruction
+	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap);
+
+	// device_t implementation
+	virtual void device_start() override;
+
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	bool    m_mp_mc;
+};
 
 class tms32026_device : public tms32025_device
 {
@@ -377,6 +401,7 @@ protected:
 	virtual void conf() override;
 };
 
+DECLARE_DEVICE_TYPE(TMS32020, tms32020_device)
 DECLARE_DEVICE_TYPE(TMS32025, tms32025_device)
 DECLARE_DEVICE_TYPE(TMS32026, tms32026_device)
 
