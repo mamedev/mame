@@ -188,6 +188,7 @@ void wd2010_device::device_start()
 	m_complete_write_timer = timer_alloc(FUNC(wd2010_device::complete_write), this);
 	m_deassert_write_timer = timer_alloc(FUNC(wd2010_device::deassert_write), this);
 	m_deassert_read_timer = timer_alloc(FUNC(wd2010_device::deassert_read), this);
+	m_present_cylinder = 0; // start somewhere
 }
 
 
@@ -200,8 +201,6 @@ void wd2010_device::device_reset()
 	m_out_intrq_cb(CLEAR_LINE);
 
 	buffer_ready(false);
-
-	m_present_cylinder = 0; // start somewhere
 }
 
 
