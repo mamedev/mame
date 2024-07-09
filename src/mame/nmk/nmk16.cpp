@@ -3886,7 +3886,7 @@ void nmk16_state::set_hacky_screen_hires(machine_config &config)
 
 	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(16'000'000)/2);
 	m_spritegen->set_screen_size(28+412, 16+240);
-	m_spritegen->set_max_sprite_clock(384 * 263); // not verified?
+	m_spritegen->set_max_sprite_clock(512 * 263); // not verified?
 	m_spritegen->set_videoshift(28+64);
 }
 
