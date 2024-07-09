@@ -57,7 +57,8 @@ UNIMPLEMENTED FEATURES :
 // #define CYLINDER_HIGH_MASK 0x03
 
 // --------------------------------------------------------
-#define MAX_MFM_SECTORS 17      // STANDARD MFM SECTORS/TRACK
+// Maximum sector number before ID not found is returned.
+#define MAX_MFM_SECTORS 32
 // --------------------------------------------------------
 
 // Typical access times for MFM drives (as listed in ST412_OEM Manual_Apr82)
