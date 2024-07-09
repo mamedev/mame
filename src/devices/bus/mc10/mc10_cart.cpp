@@ -213,7 +213,7 @@ void mc10_cart_add_basic_devices(device_slot_interface &device)
 void alice_cart_add_basic_devices(device_slot_interface &device)
 {
 	// basic devices
-	device.option_add("alice128", ALICE_PAK_MCX128);
+	device.option_add("mcx128", MC10_PAK_MCX128);
 	device.option_add("pak", MC10_PAK);
 	device.option_add("ram", MC10_PAK_RAM);
 	device.option_add("multi", ALICE_MULTIPORTS_EXT);
