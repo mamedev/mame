@@ -1453,8 +1453,8 @@ void fearless_decrypt(running_machine &machine)
 		uint16_t x = src[i];
 
 		IGS27_CRYPT1
-		IGS27_CRYPT2_ALT
-		IGS27_CRYPT3
+		// IGS27_CRYPT2
+		IGS27_CRYPT3_ALT2
 		IGS27_CRYPT4
 		// IGS27_CRYPT5
 		IGS27_CRYPT6
