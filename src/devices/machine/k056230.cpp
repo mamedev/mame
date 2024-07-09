@@ -47,42 +47,28 @@ void k056230_device::device_start()
 	save_item(NAME(m_irq_state));
 }
 
-u8 k056230_device::regs_r(offs_t offset)
+void k056230_device::regs_map(address_map &map)
 {
-	u8 data = 0;
-
-	switch (offset)
-	{
-		case 0:     // Status register
-			data = 0x08;
-			LOGMASKED(LOG_REG_READS, "%s: regs_r: Status Register: %02x\n", machine().describe_context(), data);
-			break;
-
-		case 1:     // CRC Error register
-			data = 0x00;
-			LOGMASKED(LOG_REG_READS, "%s: regs_r: CRC Error Register: %02x\n", machine().describe_context(), data);
-			break;
-
-		default:
-			LOGMASKED(LOG_REG_READS, "%s: regs_r: Unknown Register [%02x]: %02x\n", machine().describe_context(), offset, data);
-			break;
-	}
-
-	return data;
-}
-
-void k056230_device::regs_w(offs_t offset, u8 data)
-{
-	switch (offset)
-	{
-		case 0:     // Mode register
+	map(0x00, 0x00).lrw8(
+		NAME([this] (offs_t offset) {
+			const u8 res = 0x08;
+			LOGMASKED(LOG_REG_READS, "%s: regs_r: Status Register: %02x\n", machine().describe_context(), res);
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
 			LOGMASKED(LOG_REG_WRITES, "%s: regs_w: Mode Register = %02x\n", machine().describe_context(), data);
-			break;
-
-		case 1:     // Control register
-		{
+		})
+	),
+	map(0x01, 0x01).lrw8(
+		NAME([this] (offs_t offset) {
+			const u8 res = 0x00;
+			LOGMASKED(LOG_REG_READS, "%s: regs_r: CRC Error Register: %02x\n", machine().describe_context(), res);
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
 			LOGMASKED(LOG_REG_WRITES, "%s: regs_w: Control Register = %02x\n", machine().describe_context(), data);
-			// TODO: This is a literal translation of the previous device behaviour, and seems pretty likely to be incorrect.
+			// TODO: This is a literal translation of the previous device behaviour, and is incorrect.
+			// Namely it can't possibly ping irq state on the fly, needs some transaction from the receiver.
 			const int old_state = m_irq_state;
 			if (BIT(data, 5))
 			{
@@ -98,17 +84,13 @@ void k056230_device::regs_w(offs_t offset, u8 data)
 			{
 				m_irq_cb(m_irq_state);
 			}
-			break;
-		}
-
-		case 2:     // Sub ID register
+		})
+	);
+	map(0x02, 0x02).lw8(
+		NAME([this] (offs_t offset, u8 data) {
 			LOGMASKED(LOG_REG_WRITES, "%s: regs_w: Sub ID Register = %02x\n", machine().describe_context(), data);
-			break;
-
-		default:
-			LOGMASKED(LOG_REG_WRITES | LOG_UNKNOWNS, "%s: regs_w: Unknown Register [%02x] = %02x\n", machine().describe_context(), offset, data);
-			break;
-	}
+		})
+	);
 }
 
 u32 k056230_device::ram_r(offs_t offset, u32 mem_mask)

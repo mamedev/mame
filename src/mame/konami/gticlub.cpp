@@ -518,7 +518,7 @@ void gticlub_state::gticlub_map(address_map &map)
 	map(0x78080000, 0x7808000f).rw(m_k001006[1], FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(gticlub_state::sysreg_r), FUNC(gticlub_state::sysreg_w));
-	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::regs_r), FUNC(k056230_device::regs_w));
+	map(0x7e008000, 0x7e009fff).m(m_k056230, FUNC(k056230_device::regs_map));
 	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f000000, 0x7f3fffff).rom().region("datarom", 0);
@@ -541,7 +541,7 @@ void hangplt_state::hangplt_map(address_map &map)
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(hangplt_state::sysreg_r), FUNC(hangplt_state::sysreg_w));
-	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::regs_r), FUNC(k056230_device::regs_w));
+	map(0x7e008000, 0x7e009fff).m(m_k056230, FUNC(k056230_device::regs_map));
 	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f000000, 0x7f3fffff).rom().region("datarom", 0);
@@ -763,7 +763,9 @@ static INPUT_PORTS_START( hangplt )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Push limit switch")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Pull limit switch")
 
-	PORT_MODIFY("IN3") //Todo: The test mode for this game shows eight dip switches.
+	// TODO: The test mode for this game shows 8 dip switches
+	// verify if they are read anywhere (or physically mapped for that matter).
+	PORT_MODIFY("IN3")
 	PORT_DIPNAME( 0x01, 0x01, "Disable Machine Init" ) PORT_DIPLOCATION("SW:1") // NOTE: Disabling Machine Init also disables analog controls
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -946,11 +948,13 @@ void gticlub_state::gticlub(machine_config &config)
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
 }
 
-void thunderh_state::thunderh(machine_config &config) // Todo: K056230 from the I/O board
+void thunderh_state::thunderh(machine_config &config)
 {
 	gticlub(config);
 
 	m_adc1038->set_gti_club_hack(false);
+
+	// TODO: replace K056230 from main gticlub config with a LANC tied to gn680 I/O board
 
 	M68000(config, m_gn680, XTAL(32'000'000) / 2); // 16MHz
 	m_gn680->set_addrmap(AS_PROGRAM, &thunderh_state::gn680_memmap);

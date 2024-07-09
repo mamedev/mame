@@ -22,8 +22,7 @@ public:
 	u32 ram_r(offs_t offset, u32 mem_mask = ~0);
 	void ram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	u8 regs_r(offs_t offset);
-	void regs_w(offs_t offset, u8 data);
+	void regs_map(address_map &map);
 
 protected:
 	// device-level overrides
