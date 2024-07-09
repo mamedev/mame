@@ -820,7 +820,7 @@ ROM_START( link )
 	ROM_LOAD( "prg.bin",    0x0000, 0x10000, CRC(2bcab107) SHA1(3cfb8df8cd3782f3ff7f6b32ff15c461352061ee) )
 
 	ROM_REGION( 0x10000, "tiles", 0 )
-	ROM_LOAD( "a2.bin",     0x0000, 0x10000, BAD_DUMP CRC(49fa3d01) SHA1(af4c646b9c8fbe2803c17b90d3a7e4f6523f2745) ) // Damaged ROM
+	ROM_LOAD( "a2.bin",     0x0000, 0x10000, CRC(f811a82e) SHA1(a9e61c27ada4bdedc35d339bb88debb9ff1a4a7e) )
 
 	// 8749 (11 MHz OSC) emulates POKEYs
 	ROM_REGION( 0x0800, "mcu", 0 )
@@ -842,7 +842,7 @@ ROM_END
 
 ROM_START( atetrisb4 ) // bootleg on an unusually big PCB for this game
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.bin",    0x0000, 0x10000, CRC(56589096) SHA1(df0ff776f3e3506c86d703d2283db59a576abea6) ) // only difference is the credits for 'video graphics' where changed
+	ROM_LOAD( "1.bin", 0x0000, 0x10000, CRC(56589096) SHA1(df0ff776f3e3506c86d703d2283db59a576abea6) ) // only difference is the credits for 'video graphics' where changed
 
 	ROM_REGION( 0x10000, "tiles", 0 )
 	ROM_LOAD( "2.bin", 0x0000, 0x10000, CRC(70859030) SHA1(bb6bf88b75be3a81672e0aa30a8cbd7181bc87d0) ) // unique, but extremely similar to the one of the original
@@ -1067,7 +1067,7 @@ GAME( 1988, atetrisb4, atetris, atetris,         atetris,  atetris_state,       
 GAME( 1988, atetrisb5, atetris, atetrisb5,       atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 5)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, atetb3482, atetris, atetris,         atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 6, with UM3482)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1988, atetb5205, atetris, atetb5205,       atetris,  atetris_m5205_state,  empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 7, with OKI M5205)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1988, link,      atetris, atetrisb3_11mhz, atetris,  atetris_mcu_state,    empty_init, ROT0,   "bootleg",     "Link (Korean bootleg of Atari Tetris)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // Bad gfx ROM
+GAME( 1988, link,      atetris, atetrisb3_11mhz, atetris,  atetris_mcu_state,    empty_init, ROT0,   "bootleg",     "Link (Korean bootleg of Atari Tetris)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1989, atetrisbp, atetris, atetrisbp,       atetris,  atetris_bartop_state, empty_init, ROT0,   "Atari Games", "Tetris (bartop, prototype)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1989, atetrisc,  atetris, atetris,         atetrisc, atetris_state,        empty_init, ROT270, "Atari Games", "Tetris (cocktail set 1)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1989, atetrisc2, atetris, atetris,         atetrisc, atetris_state,        empty_init, ROT270, "Atari Games", "Tetris (cocktail set 2)",                MACHINE_SUPPORTS_SAVE )
