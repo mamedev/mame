@@ -364,7 +364,7 @@ static INPUT_PORTS_START( goal92 )
 
 	// NOTE: It should be the screen flip DIP, but isn't working
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8") 
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	// Match actual playing time is correctly set with these DIP, but the on-screen counter start always from 90.
@@ -457,27 +457,6 @@ static INPUT_PORTS_START( goal92 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_START3 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_START4 )
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // unused?
-
-	// PORT_START("DSW2")
-	// PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
-	// PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
-	// PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
-	// PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
-	// PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	// PORT_DIPNAME( 0x000c, 0x0000, "Players / Coin Mode" )
-	// PORT_DIPSETTING(      0x0000, "4 Players / 1 Coin Slot" )
-	// PORT_DIPSETTING(      0x0004, "4 Players / 4 Coin Slots" )
-	// PORT_DIPSETTING(      0x0008, "4 Players / 2 Coin Slots" )
-	// PORT_DIPSETTING(      0x000c, "2 Players" )
-	// PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )
-	// PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	// PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	// PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Service_Mode ) )
-	// PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	// PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	// PORT_DIPNAME( 0xffc0, 0xffc0, DEF_STR( Unused ) )
-	// PORT_DIPSETTING(      0xffc0, DEF_STR( Off ) )
-	// PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 // handler called by the 2203 emulator when the internal timers cause an IRQ
