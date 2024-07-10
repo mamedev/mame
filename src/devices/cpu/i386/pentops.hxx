@@ -2808,7 +2808,7 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 				WRITE16(ea + 0, m_x87_cw);
 				WRITE16(ea + 2, m_x87_sw);
 				for(int i = 0; i < 8; i++)
-					if((m_x87_tw & (3 << i)) != 3) atag |= 1 << i;
+					if (((m_x87_tw >> (i * 2)) & 3) != X87_TW_EMPTY) atag |= 1 << i;
 				WRITE16(ea + 4, atag);
 				WRITE16(ea + 6, m_x87_opcode);
 				WRITE32(ea + 8, m_x87_inst_ptr);
@@ -2850,7 +2850,7 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 					m_x87_reg[i].high = READ16(ea + i*16 + 40);
 					if(!(atag & (1 << i)))
 						tag = X87_TW_EMPTY;
-					if(floatx80_is_zero(m_x87_reg[i]))
+					else if(floatx80_is_zero(m_x87_reg[i]))
 						tag = X87_TW_ZERO;
 					else if(floatx80_is_inf(m_x87_reg[i]) || floatx80_is_nan(m_x87_reg[i]))
 						tag = X87_TW_SPECIAL;
