@@ -1,41 +1,43 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
-    Casio FP-1100
+Casio FP-1100 (GX-205)
 
-    Info found at various sites:
+TODO:
+- Understand how to enter Test Mode, if possible at all from available romsets
+  (cfr. page 94 of service manual)
+- Memory maps and machine configuration for FP-1000 with reduced VRAM;
+- Unimplemented instruction PER triggered in sub CPU;
+- SCREEN 1 mode has heavy corrupted GFXs and runs at half speed, interlace mode?
+- Cassette Load is untested and probably not working, uses a complex 6 pin discrete circuitry;
+- Sub CPU is supposed to be in WAIT except in horizontal blanking period, WAIT is not emulated.
+- Keyboard not working, should trigger INTF0 on key pressed but that doesn't really work even if
+  hooked up.
+- bus slots (uPD765 FDC, ROMPACK, RAMPACK)
 
-    Casio FP-1000 and FP-1100 are "pre-PC" personal computers, with
-    Cassette, Floppy Disk, Printer and two cartridge/expansion slots.  They
-    had 32K ROM, 64K main RAM, 80x25 text display, 320x200, 640x200, 640x400
-    graphics display.  Floppy disk is 2x 5 1/4.
+===================================================================================================
 
-    The FP-1000 had 16K videoram and monochrome only.  The monitor had a
-    switch to invert the display (swap foreground and background colours).
+Info found at various sites:
 
-    The FP-1100 had 48K videoram and 8 colours.
+Casio FP-1000 and FP-1100 are "pre-PC" personal computers, with
+Cassette, Floppy Disk, Printer and two cartridge/expansion slots.  They
+had 32K ROM, 64K main RAM, 80x25 text display, 320x200, 640x200, 640x400
+graphics display.  Floppy disk is 2x 5 1/4.
 
-    Processors: Z80 @ 4MHz, uPD7801G @ 2MHz
+The FP-1000 had 16K videoram and monochrome only.  The monitor had a
+switch to invert the display (swap foreground and background colours).
 
-    Came with BASIC built in, and you could run CP/M 2.2 from the floppy
-    disk.
+The FP-1100 had 48K videoram and 8 colours.
 
-    The keyboard is a separate unit.  It contains a beeper.
+Processors: Z80 @ 4MHz, uPD7801G @ 2MHz
 
-    TODO:
-    - Memory maps and machine configuration for FP-1000 with reduced VRAM.
-    - Unimplemented instruction PER triggered (can be ignored)
-    - Display can be interlaced or non-interlaced.  Interlaced not emulated.
-    - Cassette Load is quite complex, using 6 pins of the sub-CPU.  Not
-      done.
-    - Sub CPU is supposed to be in WAIT except in horizontal blanking
-      period.  WAIT is not emulated in our cpu.
-    - Keyboard not working.
-    - FDC not done.
+Came with BASIC built in, and you could run CP/M 2.2 from the floppy
+disk.
 
+The keyboard is a separate unit.  It contains a beeper.
 
-****************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 
@@ -114,13 +116,10 @@ private:
 	u8 portc_r();
 	void portc_w(u8 data);
 	void centronics_busy_w(int state);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 
-	void handle_int_to_main();
-
-	u8 m_irq_mask = 0;
 	u8 m_slot_num = 0;
 	u8 m_kbd_row = 0;
 	u8 m_col_border = 0;
@@ -129,7 +128,6 @@ private:
 	u8 m_centronics_busy = 0;
 	u8 m_cass_data[4]{};
 	bool m_bank_sel = false;
-	bool m_main_irq_status = false;
 	bool m_sub_irq_status = false;
 	bool m_cassbit = false;
 	bool m_cassold = false;
@@ -143,6 +141,14 @@ private:
 		u8 portb = 0;
 		u8 portc = 0;
 	}m_upd7801;
+
+	u8 m_pending_interrupts = 0;
+	u8 m_active_interrupts = 0;
+	u8 m_interrupt_mask = 0;
+
+	template<int Line> void int_w(int state);
+	TIMER_CALLBACK_MEMBER(update_interrupts);
+	IRQ_CALLBACK_MEMBER(restart_cb);
 };
 
 MC6845_UPDATE_ROW( fp1100_state::crtc_update_row )
@@ -197,12 +203,20 @@ void fp1100_state::main_bank_w(u8 data)
 	m_slot_num = (m_slot_num & 3) | ((data & 1) << 2); //??
 }
 
-// tell sub that latch has a byte
+/*
+ * x--- ---- mask for main to sub (INTF2)
+ * ---x ---- INTS (sub to main)
+ * ---- x--- INTD
+ * ---- -x-- INTC
+ * ---- --x- INTB (FDC bus slot irq)
+ * ---- ---x INTA (FDC bus slot drq)
+ */
 void fp1100_state::irq_mask_w(u8 data)
 {
-	m_irq_mask = data;
-	handle_int_to_main();
+	m_interrupt_mask = data;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(fp1100_state::update_interrupts), this));
 
+	// TODO: this handling doesn't seem enough
 	if (BIT(data, 7) && !m_sub_irq_status)
 	{
 		m_subcpu->set_input_line(UPD7810_INTF2, ASSERT_LINE);
@@ -377,43 +391,52 @@ d6 - Centronics strobe
 void fp1100_state::portc_w(u8 data)
 {
 	u8 const bits = data ^ m_upd7801.portc;
+	const int main_int_state = BIT(data, 3);
+	if (BIT(m_upd7801.portc, 3) != main_int_state)
+		int_w<4>(main_int_state);
 	m_upd7801.portc = data;
 
-	if (BIT(bits, 3))
-	{
-		LOG("%s: PortC:%X\n",machine().describe_context(),data);
-		handle_int_to_main();
-	}
 	if (BIT(bits, 5))
 		m_cass->change_state(BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 	if (BIT(bits, 6))
 		m_centronics->write_strobe(BIT(data, 6));
 }
 
-// HOLD_LINE used because the interrupt is set and cleared by successive instructions, too fast for the maincpu to notice
-void fp1100_state::handle_int_to_main()
+// IRQ section (main)
+// TODO: merge with skeleton/cdc721.cpp (reuses SN74LS148N)
+
+template <int Line> void fp1100_state::int_w(int state)
 {
-	// IRQ is on if bit 4 of mask AND bit 3 portC
-	if (BIT(m_upd7801.portc, 3) && BIT(m_irq_mask, 4))
-	{
-		if (!m_main_irq_status)
-		{
-			m_maincpu->set_input_line(0, HOLD_LINE);
-			LOG("%s: Main IRQ asserted\n",machine().describe_context());
-//          m_main_irq_status = true;
-		}
-	}
+	if (BIT(m_pending_interrupts, Line) == state)
+		return;
+
+	if (state)
+		m_pending_interrupts |= 0x01 << Line;
 	else
-	{
-		if (m_main_irq_status)
-		{
-//          m_maincpu->set_input_line(0, CLEAR_LINE);
-//          LOG("%s: Main IRQ cleared\n",machine().describe_context());
-			m_main_irq_status = false;
-		}
-	}
+		m_pending_interrupts &= ~(0x01 << Line);
+
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(fp1100_state::update_interrupts), this));
 }
 
+TIMER_CALLBACK_MEMBER(fp1100_state::update_interrupts)
+{
+	m_active_interrupts = m_pending_interrupts & m_interrupt_mask;
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_active_interrupts != 0 ? ASSERT_LINE : CLEAR_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(fp1100_state::restart_cb)
+{
+	u8 vector = 0xf0;
+	// INTS > INTA > INTB > INTC > INTD priority order
+	// INTS uses 0xf0, INTA 0xf2 and so on.
+	u8 active = bitswap<5>(m_active_interrupts, 3, 2, 1, 0, 4);
+	while (vector < 0xfa && !BIT(active, 0))
+	{
+		active >>= 1;
+		vector += 0x02;
+	}
+	return vector;
+}
 
 static INPUT_PORTS_START( fp1100 )
 	PORT_START("KEY.0")
@@ -648,15 +671,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( fp1100_state::kansas_w )
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-INTERRUPT_GEN_MEMBER( fp1100_state::vblank_irq )
-{
-//  if (BIT(m_irq_mask, 4))
-//      m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8); // Z80
-}
-
 void fp1100_state::machine_reset()
 {
-	m_main_irq_status = false;
 	m_sub_irq_status = false;
 	int i;
 	u8 slot_type;
@@ -671,7 +687,7 @@ void fp1100_state::machine_reset()
 
 	m_bank_sel = false; // point at rom
 
-	m_irq_mask = 0;
+	m_interrupt_mask = 0;
 	m_slot_num = 0;
 	m_kbd_row = 0;
 	m_col_border = 0;
@@ -680,7 +696,6 @@ void fp1100_state::machine_reset()
 	m_upd7801.porta = 0;
 	m_upd7801.portb = 0;
 	m_upd7801.portc = 0;
-	m_maincpu->set_input_line_vector(0, 0xF0);
 }
 
 void fp1100_state::fp1100(machine_config &config)
@@ -688,7 +703,7 @@ void fp1100_state::fp1100(machine_config &config)
 	Z80(config, m_maincpu, MAIN_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fp1100_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &fp1100_state::io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(fp1100_state::vblank_irq));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(fp1100_state::restart_cb));
 
 	UPD7801(config, m_subcpu, MAIN_CLOCK/4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &fp1100_state::sub_map);
@@ -701,6 +716,9 @@ void fp1100_state::fp1100(machine_config &config)
 
 	GENERIC_LATCH_8(config, "main2sub");
 	GENERIC_LATCH_8(config, "sub2main");
+	// NOTE: Needs some sync otherwise it outright refuses to boot
+	config.set_perfect_quantum("maincpu");
+	config.set_perfect_quantum("sub");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(fp1100_state::centronics_busy_w));
