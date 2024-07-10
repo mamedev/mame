@@ -44,6 +44,7 @@ public:
 		m_tilemap_rom(*this, "tilerom"),
 		m_audiobank(*this, "audiobank"),
 		m_okibank(*this, "okibank%u", 1U),
+		m_vtiming_prom(*this, "vtiming"),
 		m_dsw_io(*this, "DSW%u", 1U),
 		m_in_io(*this, "IN%u", 0U),
 		m_sprdma_base(0x8000)
@@ -137,6 +138,7 @@ protected:
 	optional_region_ptr<u16> m_tilemap_rom;
 	optional_memory_bank m_audiobank;
 	optional_memory_bank_array<2> m_okibank;
+	optional_memory_region m_vtiming_prom;
 
 	optional_ioport_array<2> m_dsw_io;
 	optional_ioport_array<3> m_in_io;

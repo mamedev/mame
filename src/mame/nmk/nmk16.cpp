@@ -4168,44 +4168,48 @@ void nmk16_state::set_screen_hires(machine_config &config)
 */
 TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 {
-//	const int SPRDMA_INDEX = 0;  // not used in emulation TODO: check if it could be used to trigger the sprite DMA instead of setting it 4 lines after VBOUT
-//	const int VSYNC_INDEX  = 1;  // not used in emulation
-//	const int VBLANK_INDEX = 2;  // not used in emulation
-//	const int NOT_USED     = 3;  // not used in emulation
-	const int IPL0_INDEX   = 4;
-	const int IPL1_INDEX   = 5;
-	const int IPL2_INDEX   = 6;
-	const int TRIGG_INDEX  = 7;
+//	constexpr int SPRDMA_INDEX = 0;  // not used in emulation TODO: check if it could be used to trigger the sprite DMA instead of setting it 4 lines after VBOUT
+//	constexpr int VSYNC_INDEX  = 1;  // not used in emulation
+//	constexpr int VBLANK_INDEX = 2;  // not used in emulation
+//	constexpr int NOT_USED     = 3;  // not used in emulation
+	constexpr int IPL0_INDEX   = 4;
+	constexpr int IPL1_INDEX   = 5;
+	constexpr int IPL2_INDEX   = 6;
+	constexpr int TRIGG_INDEX  = 7;
 
-	const int PROM_START_OFFSET = 0x75;  // previous entries are never addressed
-	const int PROM_FRAME_OFFSET = 0x0b;  // first 11 "used" entries (from 0x75 to 0x7f: 0xb entries) are prior to start of frame, which occurs on 0x80 address (128 entry)
+	constexpr int PROM_START_OFFSET = 0x75;  // previous entries are never addressed
+	constexpr int PROM_FRAME_OFFSET = 0x0b;  // first 11 "used" entries (from 0x75 to 0x7f: 0xb entries) are prior to start of frame, which occurs on 0x80 address (128 entry)
 
-	u8 *prom = memregion("vtiming")->base();
-	int len = memregion("vtiming")->bytes();
+	u8 *prom = m_vtiming_prom->base();
+	int len = m_vtiming_prom->bytes();
 
 	int scanline = param;
 
 	// every PROM entry is addressed each 2 scanlines, so only even lines are actually addressing it:
-	if ((scanline & 0x1) == 0x0) {
+	if ((scanline & 0x1) == 0x0)
+	{
 
 		int promAddress = (((scanline / 2) + PROM_FRAME_OFFSET) % (len - PROM_START_OFFSET)) + PROM_START_OFFSET;
 
-		LOG("%s: nmk16_scanline: Scanline: %03d - Current PROM entry: %03d\n", machine().describe_context(), scanline, promAddress);
+		LOG("nmk16_scanline: Scanline: %03d - Current PROM entry: %03d\n", scanline, promAddress);
 
 		u8 val = prom[promAddress];
 
 		// Interrupt requests are triggered at raising edge of bit 7:
 		u8 trigger = BIT(val, TRIGG_INDEX);
-		if (m_interrupt_trigger == 0 && trigger == 1) {
+		if (m_interrupt_trigger == 0 && trigger == 1)
+		{
 
-			u8 int_level = (BIT(val, IPL2_INDEX) << 2) + (BIT(val, IPL1_INDEX) << 1) + (BIT(val, IPL0_INDEX) << 0);
-			if (int_level > 0) {
-				LOG("%s: nmk16_scanline: Triggered interrupt: IRQ%d at scanline: %03d\n", machine().describe_context(), int_level, scanline);
+			u8 int_level = bitswap<3>(val, IPL2_INDEX, IPL1_INDEX, IPL0_INDEX);
+			if (int_level > 0)
+			{
+				LOG("nmk16_scanline: Triggered interrupt: IRQ%d at scanline: %03d\n", int_level, scanline);
 				m_maincpu->set_input_line(int_level, HOLD_LINE);
 			}
 
 			// Triggered at VBOUT. TODO: check if this could be triggered using SPRDMA_INDEX instead
-			if (int_level == 4) {
+			if (int_level == 4)
+			{
 				m_dma_timer->adjust(m_screen->time_until_pos(scanline + 4)); // as per UPL docs, 256 usec after VBOUT = 4 lines, but index on the PROM says otherwise.
 			}
 		}
