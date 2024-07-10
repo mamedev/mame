@@ -430,9 +430,6 @@ void maciifx_state::maciifx(machine_config &config)
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
-	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
-	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
-
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
@@ -451,8 +448,6 @@ void maciifx_state::maciifx(machine_config &config)
 	SCSIDMA(config, m_scsidma, C15M);
 	m_scsidma->set_maincpu_tag("maincpu");
 	m_scsidma->write_irq().set(FUNC(maciifx_state::oss_interrupt<9>));
-
-	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -493,6 +488,9 @@ void maciifx_state::maciifx(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("8M,16M,32M,64M,96M,128M");
 
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
+	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");

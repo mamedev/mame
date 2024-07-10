@@ -48,6 +48,7 @@ private:
 	u32 m_control;
 	u32 m_holding;
 	u8 m_holding_remaining;
+	bool m_is_write, m_drq_completed;
 };
 
 // device type definition
