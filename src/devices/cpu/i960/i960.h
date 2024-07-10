@@ -4,7 +4,9 @@
 #define MAME_CPU_I960_I960_H
 
 #pragma once
-
+#include <cstdint>
+#include <type_traits>
+#include "softfloat3/source/include/softfloat.h"
 
 enum
 {
@@ -63,10 +65,12 @@ enum
 };
 
 
+
 class i960_cpu_device :  public cpu_device
 {
 public:
 	static constexpr uint16_t BURST = 0x0001;
+
 
 	// construction/destruction
 	i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -119,8 +123,17 @@ private:
 	// rcache_pos = how deep in the stack we are.  0-(I960_RCACHE_SIZE-1) means in-cache.
 	// I960_RCACHE_SIZE or greater means out of cache, must save to memory.
 	int32_t m_rcache_pos;
-
-	double m_fp[4];
+	// TODO: redefine RawExtendedReal to use an extFloat80_t once sin/cos/tan/log/etc support is reliabily implemented in softfloat3
+	using raw_extended_real = double;
+	union extended_real {
+		raw_extended_real m_float_value;
+		uint32_t m_ordinals[3];
+		extended_real& operator=(const int value) noexcept {
+			m_float_value = value;
+			return *this;
+		}
+	};
+	extended_real m_fp[4];
 
 	uint32_t m_SAT;
 	uint32_t m_PRCB;
@@ -179,6 +192,8 @@ private:
 	void do_call(uint32_t adr, int type, uint32_t stack);
 	void do_ret_0();
 	void do_ret();
+private:
+	void movre(uint32_t opcode);
 };
 
 
