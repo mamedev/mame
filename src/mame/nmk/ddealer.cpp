@@ -57,6 +57,7 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_mcu_shared_ram(*this, "mcu_shared_ram"),
 		m_in0_io(*this, "IN0"),
+		m_vtiming_prom(*this, "vtiming"),
 		m_maincpu(*this, "maincpu"),
 		m_protcpu(*this, "protcpu"),
 		m_screen(*this, "screen"),
@@ -102,6 +103,7 @@ private:
 	required_shared_ptr<u16> m_work_ram;
 	required_shared_ptr<u16> m_mcu_shared_ram;
 	required_ioport m_in0_io;
+	required_memory_region m_vtiming_prom;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -445,39 +447,42 @@ GFXDECODE_END
 */
 TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::ddealer_scanline)
 {
-//	const int SPRDMA_INDEX = 0;  // not used in emulation
-//	const int VSYNC_INDEX  = 1;  // not used in emulation
-//	const int VBLANK_INDEX = 2;  // not used in emulation
-//	const int NOT_USED     = 3;  // not used in emulation
-	const int IPL0_INDEX   = 4;
-	const int IPL1_INDEX   = 5;
-	const int IPL2_INDEX   = 6;
-	const int TRIGG_INDEX  = 7;
+//	constexpr int SPRDMA_INDEX = 0;  // not used in emulation
+//	constexpr int VSYNC_INDEX  = 1;  // not used in emulation
+//	constexpr int VBLANK_INDEX = 2;  // not used in emulation
+//	constexpr int NOT_USED     = 3;  // not used in emulation
+	constexpr int IPL0_INDEX   = 4;
+	constexpr int IPL1_INDEX   = 5;
+	constexpr int IPL2_INDEX   = 6;
+	constexpr int TRIGG_INDEX  = 7;
 
-	const int PROM_START_OFFSET = 0x75;  // previous entries are never addressed
-	const int PROM_FRAME_OFFSET = 0x0b;  // first 11 "used" entries (from 0x75 to 0x7f: 0xb entries) are prior to start of frame, which occurs on 0x80 address (128 entry)
+	constexpr int PROM_START_OFFSET = 0x75;  // previous entries are never addressed
+	constexpr int PROM_FRAME_OFFSET = 0x0b;  // first 11 "used" entries (from 0x75 to 0x7f: 0xb entries) are prior to start of frame, which occurs on 0x80 address (128 entry)
 
-	u8 *prom = memregion("vtiming")->base();
-	int len = memregion("vtiming")->bytes();
+	u8 *prom = m_vtiming_prom->base();
+	int len = m_vtiming_prom->bytes();
 
 	int scanline = param;
 
 	// every PROM entry is addressed each 2 scanlines, so only even lines are actually addressing it:
-	if ((scanline & 0x1) == 0x0) {
+	if ((scanline & 0x1) == 0x0)
+	{
 
 		int promAddress = (((scanline / 2) + PROM_FRAME_OFFSET) % (len - PROM_START_OFFSET)) + PROM_START_OFFSET;
 
-		LOG("%s: ddealer_scanline: Scanline: %03d - Current PROM entry: %03d\n", machine().describe_context(), scanline, promAddress);
+		LOG("ddealer_scanline: Scanline: %03d - Current PROM entry: %03d\n", scanline, promAddress);
 
 		u8 val = prom[promAddress];
 
 		// Interrupt requests are triggered at raising edge of bit 7:
 		u8 trigger = BIT(val, TRIGG_INDEX);
-		if (m_interrupt_trigger == 0 && trigger == 1) {
+		if (m_interrupt_trigger == 0 && trigger == 1)
+		{
 
-			u8 int_level = (BIT(val, IPL2_INDEX) << 2) + (BIT(val, IPL1_INDEX) << 1) + (BIT(val, IPL0_INDEX) << 0);
-			if (int_level > 0) {
-				LOG("%s: ddealer_scanline: Triggered interrupt: IRQ%d at scanline: %03d\n", machine().describe_context(), int_level, scanline);
+			u8 int_level = bitswap<3>(val, IPL2_INDEX, IPL1_INDEX, IPL0_INDEX);
+			if (int_level > 0)
+			{
+				LOG("ddealer_scanline: Triggered interrupt: IRQ%d at scanline: %03d\n", int_level, scanline);
 				m_maincpu->set_input_line(int_level, HOLD_LINE);
 			}
 		}
