@@ -15,6 +15,7 @@ TODO:
 
 #include "bus/rs232/rs232.h"
 #include "cpu/h8/h8325.h"
+#include "machine/nvram.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
 
@@ -34,11 +35,13 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_memory(*this, "memory"),
-		m_banked_ram(*this, "banked_ram", 0x20000, ENDIANNESS_BIG),
+		m_nvram(*this, "nvram", 0x20000, ENDIANNESS_BIG),
 		m_rambank(*this, "rambank"),
+		m_lcd_pwm(*this, "lcd_pwm"),
 		m_dac(*this, "dac"),
 		m_rs232(*this, "rs232"),
-		m_inputs(*this, "IN.%u", 0)
+		m_inputs(*this, "IN.%u", 0),
+		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
 	void sapphire(machine_config &config);
@@ -50,17 +53,26 @@ private:
 	// devices/pointers
 	required_device<h8325_device> m_maincpu;
 	memory_view m_memory;
-	memory_share_creator<u8> m_banked_ram;
+	memory_share_creator<u8> m_nvram;
 	required_memory_bank m_rambank;
+	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<dac_1bit_device> m_dac;
 	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<2> m_inputs;
+	output_finder<4, 10> m_out_lcd;
 
 	u8 m_inp_mux = 0;
+	u8 m_lcd_sclk = 0;
+	u16 m_lcd_data = 0;
+	u8 m_lcd_segs2 = 0;
 
 	void main_map(address_map &map);
 
 	// I/O handlers
+	void lcd_pwm_w(offs_t offset, u8 data);
+	void update_lcd();
+	void lcd_data_w(u8 data);
+
 	u8 p1_r();
 	void p1_w(u8 data);
 
@@ -85,11 +97,16 @@ private:
 
 void sapphire_state::machine_start()
 {
-	m_rambank->configure_entries(0, 4, m_banked_ram, 0x8000);
+	m_out_lcd.resolve();
+
+	m_rambank->configure_entries(0, 4, m_nvram, 0x8000);
 	m_memory.select(0);
 
 	// register for savestates
 	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_lcd_sclk));
+	save_item(NAME(m_lcd_data));
+	save_item(NAME(m_lcd_segs2));
 }
 
 
@@ -106,7 +123,59 @@ void sapphire_state::machine_start()
 [:maincpu:port4] ddr_w 3f
 [:maincpu:port6] ddr_w 3f
 
+01 01 01 00 00000000
+01 01 00 01 00000000
+01 00 01 01 00000000
+00 01 01 01 00000000
+
+01 01 01 11 11111111
+01 01 11 01 11111111
+01 11 01 01 11111111
+11 01 01 01 11111111
+
 */
+
+// LCD
+
+void sapphire_state::lcd_pwm_w(offs_t offset, u8 data)
+{
+	m_out_lcd[offset & 0x3f][offset >> 6] = data;
+}
+
+void sapphire_state::update_lcd()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		// LCD common is analog (voltage level)
+		const u8 com = population_count_32(m_lcd_data >> (8 + (i * 2)) & 3);
+		u16 segs = (m_lcd_data & 0xff) | (m_lcd_segs2 << 8 & 0x300);
+		segs = (com == 0) ? segs : (com == 2) ? ~segs : 0;
+
+		m_lcd_pwm->write_row(i, segs);
+	}
+}
+
+void sapphire_state::lcd_data_w(u8 data)
+{
+	// P62: 2*14015B R
+	if (data & 4)
+		m_lcd_data = 0;
+
+	// P60: 2*14015B C (chained)
+	else if (data & 1 && !m_lcd_sclk)
+	{
+		// P61: 14015B D, outputs to LCD
+		m_lcd_data = m_lcd_data << 1 | BIT(data, 1);
+	}
+	m_lcd_sclk = data & 1;
+
+	// P64,P65: 2 more LCD segments
+	m_lcd_segs2 = data >> 4 & 3;
+	update_lcd();
+}
+
+
+// misc
 
 u8 sapphire_state::p1_r()
 {
@@ -122,7 +191,7 @@ void sapphire_state::p1_w(u8 data)
 u8 sapphire_state::p2_r()
 {
 	//printf("r2 ");
-	return 0xff;
+	return 0xff ^ 0x80;
 }
 
 void sapphire_state::p2_w(u8 data)
@@ -177,8 +246,6 @@ u8 sapphire_state::p6_r()
 
 void sapphire_state::p6_w(u8 data)
 {
-	//printf("w6_%X ",data);
-
 	// P63: RAM/ROM CS
 	m_memory.select(BIT(data, 3));
 }
@@ -269,18 +336,21 @@ void sapphire_state::sapphire(machine_config &config)
 
 	m_maincpu->read_port6().set(FUNC(sapphire_state::p6_r));
 	m_maincpu->write_port6().set(FUNC(sapphire_state::p6_w));
+	m_maincpu->write_port6().append(FUNC(sapphire_state::lcd_data_w));
 
 	m_maincpu->read_port7().set(FUNC(sapphire_state::p7_r));
 	m_maincpu->write_port7().set(FUNC(sapphire_state::p7_w));
 
-	// video hardware
-	//PWM_DISPLAY(config, m_lcd_pwm).set_size(4, 10);
-	//m_lcd_pwm->output_x().set(FUNC(sapphire_state::lcd_pwm_w));
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	//screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	//screen.set_refresh_hz(60);
-	//screen.set_size(1920/2.5, 606/2.5);
-	//screen.set_visarea_full();
+	// video hardware
+	PWM_DISPLAY(config, m_lcd_pwm).set_size(4, 10);
+	m_lcd_pwm->output_x().set(FUNC(sapphire_state::lcd_pwm_w));
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920/2.5, 606/2.5);
+	screen.set_visarea_full();
 
 	//config.set_default_layout(layout_novag_sapphire);
 
