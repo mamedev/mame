@@ -66,7 +66,8 @@ public:
 	void do_sci_tx(int sci, int state) { m_sci_tx[sci](state); }
 	void do_sci_clk(int sci, int state) { m_sci_clk[sci](state); }
 
-	u64 now_as_cycles() const { return machine().time().as_ticks(clock()) - m_cycles_base; }
+	u64 system_clock() const { return execute_clocks_to_cycles(clock()); }
+	u64 now_as_cycles() const { return machine().time().as_ticks(system_clock()) - m_cycles_base; }
 
 protected:
 	enum {
