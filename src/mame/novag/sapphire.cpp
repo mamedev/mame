@@ -5,9 +5,23 @@
 
 Novag Sapphire
 
+Hardware notes:
+- PCB label: 100168 REV A
+- Hitachi H8/325 MCU, 26.601712MHz XTAL
+- 32KB EPROM (M27C256B-12F1), 128KB SRAM (KM681000ALG-10)
+- LCD with 4 7segs and custom segments, same as Novag VIP
+- RJ-12 port for Novag Super System (always 57600 baud)
+- 24 buttons, piezo
+
 TODO:
 - currently hardlocks MAME, suspect problem with h8_sci
-- everything else
+- internal artwork
+- it does a cold boot at every reset, so nvram won't work properly unless MAME
+  adds some kind of auxillary autosave state feature at power-off
+
+BTANB:
+- Average Time level (AT) does not work properly after a few moves, this is
+  mentioned in the manual and it suggests to set user programmable time control
 
 *******************************************************************************/
 
@@ -46,8 +60,11 @@ public:
 
 	void sapphire(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
+
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override { set_power(true); }
 
 private:
 	// devices/pointers
@@ -58,9 +75,10 @@ private:
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<dac_1bit_device> m_dac;
 	required_device<rs232_port_device> m_rs232;
-	required_ioport_array<2> m_inputs;
+	required_ioport_array<3> m_inputs;
 	output_finder<4, 10> m_out_lcd;
 
+	bool m_power = false;
 	u8 m_inp_mux = 0;
 	u8 m_lcd_sclk = 0;
 	u16 m_lcd_data = 0;
@@ -69,30 +87,18 @@ private:
 	void main_map(address_map &map);
 
 	// I/O handlers
+	void set_power(bool power);
+	u8 power_r();
+
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void update_lcd();
 	void lcd_data_w(u8 data);
 
-	u8 p1_r();
-	void p1_w(u8 data);
-
-	u8 p2_r();
-	void p2_w(u8 data);
-
-	u8 p3_r();
-	void p3_w(u8 data);
-
-	u8 p4_r();
+	u8 read_inputs();
 	void p4_w(u8 data);
-
 	u8 p5_r();
-	void p5_w(u8 data);
-
-	u8 p6_r();
 	void p6_w(u8 data);
-
 	u8 p7_r();
-	void p7_w(u8 data);
 };
 
 void sapphire_state::machine_start()
@@ -103,6 +109,7 @@ void sapphire_state::machine_start()
 	m_memory.select(0);
 
 	// register for savestates
+	save_item(NAME(m_power));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_sclk));
 	save_item(NAME(m_lcd_data));
@@ -115,25 +122,27 @@ void sapphire_state::machine_start()
     I/O
 *******************************************************************************/
 
-/*
+// power
 
-[:maincpu:port1] ddr_w ff
-[:maincpu:port3] ddr_w ff
-[:maincpu:port2] ddr_w 7f
-[:maincpu:port4] ddr_w 3f
-[:maincpu:port6] ddr_w 3f
+void sapphire_state::set_power(bool power)
+{
+	// power switch is tied to IRQ2
+	m_maincpu->set_input_line(INPUT_LINE_IRQ2, power ? ASSERT_LINE : CLEAR_LINE);
+	m_power = power;
+}
 
-01 01 01 00 00000000
-01 01 00 01 00000000
-01 00 01 01 00000000
-00 01 01 01 00000000
+INPUT_CHANGED_MEMBER(sapphire_state::power_switch)
+{
+	if (newval)
+		set_power(bool(param));
+}
 
-01 01 01 11 11111111
-01 01 11 01 11111111
-01 11 01 01 11111111
-11 01 01 01 11111111
+u8 sapphire_state::power_r()
+{
+	// P66: power switch (IRQ2)
+	return m_power ? 0xbf : 0xff;
+}
 
-*/
 
 // LCD
 
@@ -177,71 +186,33 @@ void sapphire_state::lcd_data_w(u8 data)
 
 // misc
 
-u8 sapphire_state::p1_r()
+u8 sapphire_state::read_inputs()
 {
-	//printf("r1 ");
-	return 0xff;
-}
+	u8 data = 0;
 
-void sapphire_state::p1_w(u8 data)
-{
-	//printf("w1_%X ",data);
-}
+	for (int i = 0; i < 3; i++)
+		if (BIT(m_inp_mux, i))
+			data |= m_inputs[i]->read();
 
-u8 sapphire_state::p2_r()
-{
-	//printf("r2 ");
-	return 0xff ^ 0x80;
-}
-
-void sapphire_state::p2_w(u8 data)
-{
-	//printf("w2_%X ",data);
-}
-
-u8 sapphire_state::p3_r()
-{
-	//printf("r3 ");
-	return 0xff;
-}
-
-void sapphire_state::p3_w(u8 data)
-{
-	//printf("w3_%X ",data);
-}
-
-u8 sapphire_state::p4_r()
-{
-	//printf("r4 ");
-	return 0xff ^ 0xc0;
+	return ~data;
 }
 
 void sapphire_state::p4_w(u8 data)
 {
-	//printf("w4_%X ",data);
-
 	// P40: speaker out
 	m_dac->write(data & 1);
 
 	// P41,P42: RAM bank
 	m_rambank->set_entry(data >> 1 & 3);
+
+	// P43-P45: input mux
+	m_inp_mux = ~data >> 3 & 7;
 }
 
 u8 sapphire_state::p5_r()
 {
-	//printf("r5 ");
-	return 0xff;
-}
-
-void sapphire_state::p5_w(u8 data)
-{
-	//printf("w5_%X ",data);
-}
-
-u8 sapphire_state::p6_r()
-{
-	//printf("r6 ");
-	return 0xff ^ 0x40;
+	// P52-P55: read buttons (low)
+	return read_inputs() << 2 | 0xc3;
 }
 
 void sapphire_state::p6_w(u8 data)
@@ -252,13 +223,8 @@ void sapphire_state::p6_w(u8 data)
 
 u8 sapphire_state::p7_r()
 {
-	//printf("r7 ");
-	return 0xff;
-}
-
-void sapphire_state::p7_w(u8 data)
-{
-	//printf("w7_%X ",data);
+	// P70-P73: read buttons (high)
+	return read_inputs() >> 4 | 0xf0;
 }
 
 
@@ -285,24 +251,50 @@ void sapphire_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( sapphire )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("NG")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("C/CB")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Option 1/2 / Random")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COLON) PORT_NAME("Level")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("Hint / Analyze")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Ver/Set")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_STOP) PORT_NAME("Right / Easy")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SLASH) PORT_NAME("GO")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Pawn / Load Game / ProDelete")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Knight / Save Game / ProSave")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Bishop / Training / ProPrior")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Rook / Referee / ProPrint")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("Queen / Sound / BkSelect")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("King / Info / Restore")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA) PORT_NAME("Left / Next Best")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("Color")
+
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H 8")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("G 7")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("F 6")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("E 5")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("D 4")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("C 3")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("B 2")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("A 1")
+
+	PORT_START("BATT")
+	PORT_CONFNAME( 0x80, 0x80, "Battery Status" )
+	PORT_CONFSETTING(    0x00, "Low" )
+	PORT_CONFSETTING(    0x80, DEF_STR( Normal ) )
+	PORT_BIT(0x7f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("LOCK")
+	PORT_CONFNAME( 0x80, 0x00, "Keyboard Lock")
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT(0x7f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("POWER")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, sapphire_state, power_switch, 1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, sapphire_state, power_switch, 0)
 INPUT_PORTS_END
 
 
@@ -317,29 +309,18 @@ void sapphire_state::sapphire(machine_config &config)
 	H8325(config, m_maincpu, 26.601712_MHz_XTAL);
 	m_maincpu->set_mode(2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sapphire_state::main_map);
+	m_maincpu->nvram_enable_backup(true);
+	m_maincpu->standby_cb().set(m_maincpu, FUNC(h8325_device::nvram_set_battery));
+	m_maincpu->standby_cb().append([this](int state) { if (state) m_lcd_pwm->clear(); });
 	m_maincpu->write_sci_tx<0>().set(m_rs232, FUNC(rs232_port_device::write_txd));
-
-	m_maincpu->read_port1().set(FUNC(sapphire_state::p1_r));
-	m_maincpu->write_port1().set(FUNC(sapphire_state::p1_w));
-
-	m_maincpu->read_port2().set(FUNC(sapphire_state::p2_r));
-	m_maincpu->write_port2().set(FUNC(sapphire_state::p2_w));
-
-	m_maincpu->read_port3().set(FUNC(sapphire_state::p3_r));
-	m_maincpu->write_port3().set(FUNC(sapphire_state::p3_w));
-
-	m_maincpu->read_port4().set(FUNC(sapphire_state::p4_r));
+	m_maincpu->read_port2().set_ioport("BATT").invert();
+	m_maincpu->read_port4().set_ioport("LOCK").invert();
 	m_maincpu->write_port4().set(FUNC(sapphire_state::p4_w));
-
 	m_maincpu->read_port5().set(FUNC(sapphire_state::p5_r));
-	m_maincpu->write_port5().set(FUNC(sapphire_state::p5_w));
-
-	m_maincpu->read_port6().set(FUNC(sapphire_state::p6_r));
+	m_maincpu->read_port6().set(FUNC(sapphire_state::power_r));
 	m_maincpu->write_port6().set(FUNC(sapphire_state::p6_w));
 	m_maincpu->write_port6().append(FUNC(sapphire_state::lcd_data_w));
-
 	m_maincpu->read_port7().set(FUNC(sapphire_state::p7_r));
-	m_maincpu->write_port7().set(FUNC(sapphire_state::p7_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

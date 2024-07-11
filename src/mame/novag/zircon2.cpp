@@ -86,6 +86,7 @@ private:
 	// I/O handlers
 	void standby(int state);
 	void set_power(bool power);
+	u8 power_r();
 
 	void lcd_pwm_raw_w(offs_t offset, u8 data);
 	void lcd_pwm_digit_w(offs_t offset, u64 data);
@@ -96,7 +97,6 @@ private:
 	void p1_w(u8 data);
 	u8 p4_r();
 	u8 p5_r();
-	u8 p6_r();
 	void p6_w(u8 data);
 };
 
@@ -141,6 +141,12 @@ INPUT_CHANGED_MEMBER(zircon2_state::power_switch)
 {
 	if (newval)
 		set_power(bool(param));
+}
+
+u8 zircon2_state::power_r()
+{
+	// P64: power switch (IRQ0)
+	return m_power ? 0xef : 0xff;
 }
 
 
@@ -223,12 +229,6 @@ u8 zircon2_state::p5_r()
 	return ~data;
 }
 
-u8 zircon2_state::p6_r()
-{
-	// P64: power switch (IRQ0)
-	return m_power ? 0xef : 0xff;
-}
-
 void zircon2_state::p6_w(u8 data)
 {
 	// P61,P62: speaker out
@@ -288,7 +288,7 @@ void zircon2_state::zircon2(machine_config &config)
 	m_maincpu->write_port3().set(FUNC(zircon2_state::lcd_segs_w<0>));
 	m_maincpu->read_port4().set(FUNC(zircon2_state::p4_r));
 	m_maincpu->read_port5().set(FUNC(zircon2_state::p5_r));
-	m_maincpu->read_port6().set(FUNC(zircon2_state::p6_r));
+	m_maincpu->read_port6().set(FUNC(zircon2_state::power_r));
 	m_maincpu->write_port6().set(FUNC(zircon2_state::p6_w));
 	m_maincpu->write_port7().set(FUNC(zircon2_state::lcd_segs_w<1>));
 
