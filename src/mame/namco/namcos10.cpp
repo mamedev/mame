@@ -13,61 +13,61 @@ Guru Readme for Namco System 10 Hardware
 Note! This document is a Work-In-Progress and will be updated from time to time when more dumps are available.
 
 This document covers all the known Namco System 10 games, including....
-*Aim For Cash (AFC2 Ver.A)                                       (C) Namco, 2004
-Ball Pom Line  (no sticker, ROM VER. B0 FEB 09 2005 15:29:02)    (C) Namco, 2005
-*Dice ROM                                                        (C) Namco, 2004
-*Dokidoki! Flower                                                (C) Namco, 2004
-***Drum Master                                                   (C) Namco, 2001
-***Drum Master 2                                                 (C) Namco, 2001
-***Drum Master 3                                                 (C) Namco, 2002
-***Drum Master 4                                                 (C) Namco, 2003
-***Drum Master 5                                                 (C) Namco, 2003
-***Drum Master 6                                                 (C) Namco, 2004
-GAHAHA Ippatsu-dou (GID2 Ver.A)                                  (C) Namco/Metro, 2000
-GAHAHA Ippatsu-dou 2 (GIS1 Ver.A)                                (C) Namco/Metro, 2001
-Gamshara (10021 Ver.A)                                           (C) Mitchell, 2003
-Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A) (C) Namco, 2007
-GekiToride-Jong Space (10011 Ver.A)                              (C) Namco/Metro, 2001
-Golgo 13 Juusei no Requiem (GLT1 Ver.A)                          (C) Namco/8ing/Raizing, 2001
-Gunbalina (GNN1 Ver. A)                                          (C) Namco, 2000
-*Hard Puncher Hajime no Ippo: The Fighting                       (C) Namco/Taito, 2001
-*Hard Puncher Hajime no Ippo 2: The Fighting Round 2 (VER.2.00J) (C) Namco/Taito, 2002
-*Honne Hakkenki                                                  (C) Namco, 2001
-Keroro Gunsou Pekopon Shinryaku Shirei De Arimasu! (KRG1 Ver.A)  (C) Namco, 2006
-**Knock Down 2001 / KO2001 (KD11 Ver.B)                          (C) Namco, 2001
-Kono e Tako (RAN Ver.A, 10021 Ver.A reprogrammed Gamshara PCB)   (C) Mitchell 2003
-Kotoba no Puzzle Mojipittan (KPM1 Ver.A)                         (C) Namco, 2001
-Medal no Tatsujin (MTL1 SPR0B)                                   (C) Namco, 2005
-Medal no Tatsujin 2 (MTA1001 STMPR0A)                            (C) Namco, 2007
-Mr Driller 2 (DR21 Ver.A)                                        (C) Namco, 2000
-Mr Driller 2 (DR22 Ver.A)                                        (C) Namco, 2000
-Mr Driller 2 (DR23 Ver.A)                                        (C) Namco, 2000
-Mr Driller G (DRG1 Ver.A)                                        (C) Namco, 2001
-NFL Classic Football (NCF3 Ver.A)                                (C) Namco, 2003
-Pacman Ball (PMB2 Ver.A)                                         (C) Namco, 2003
-Panikuru Panekuru (PPA1 Ver.A)                                   (C) Namco, 2001
-*Peter The Shepherd                                              (C) Namco, 2003
-*Photo Battle (PBT1 Ver.B)                                       (C) Namco, 2001
-Point Blank 3 (GNN2 Ver. A)                                      (C) Namco, 2000
-Puzz Ball (PZB1 Ver. A)                                          (C) Namco, 2002
-Puzz Ball (PZB1 Ver. C)                                          (C) Namco, 2002
-*Puzz Cube                                                       (C) Namco, 2005
-Seishun-Quiz Colorful High School (CHS1 Ver.A)                   (C) Namco, 2002
-Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                          (C) Namco, 2004
-*Shamisen Brothers (KT-SB2 Ver.A + CDROM)                        (C) Kato/Konami, 2003
-*Slot no Oujisama / Slot Prince (SLO1 Ver.A)                     (C) Namco, 2003
-Slot no Oujisama / Slot Prince (SLO1 Ver.B)                      (C) Namco, 2003
-Star Trigon (STT1 Ver.A)                                         (C) Namco, 2002
-Sugorotic JAPAN (STJ1 Ver.A)                                     (C) Namco, 2002
-Sugorotic JAPAN (STJ1 Ver.C)                                     (C) Namco, 2002
-*Taiko no Tatsujin  (with CDROM?)                                (C) Namco, 2001
-Taiko no Tatsujin 2 (TK21 Ver.C & CDROM NM-002 TK21-A)           (C) Namco, 2001
-Taiko no Tatsujin 3 (TK31 Ver.A & CDROM NM-003 TK31-A)           (C) Namco, 2002
-Taiko no Tatsujin 4 (TK41 Ver.A & CDROM TK-4)                    (C) Namco, 2003
-Taiko no Tatsujin 5 (TK51 Ver.A & CDROM TK-5)                    (C) Namco, 2003
-Taiko no Tatsujin 6 (TK61 Ver.A & CDROM TK-6)                    (C) Namco, 2004
-Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)                  (C) Namco/Metro, 2002
-Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A)               (C) Namco, 2002
+*Aim For Cash (AFC2 Ver.A)                                                    (C) Namco, 2004
+Ball Pom Line  (no sticker, ROM VER. B0 FEB 09 2005 15:29:02)                 (C) Namco, 2005
+*Dice ROM                                                                     (C) Namco, 2004
+*Dokidoki! Flower                                                             (C) Namco, 2004
+***Drum Master                                                                (C) Namco, 2001
+***Drum Master 2                                                              (C) Namco, 2001
+***Drum Master 3                                                              (C) Namco, 2002
+***Drum Master 4                                                              (C) Namco, 2003
+***Drum Master 5                                                              (C) Namco, 2003
+***Drum Master 6                                                              (C) Namco, 2004
+GAHAHA Ippatsu-dou (GID2 Ver.A)                                               (C) Namco/Metro, 2000
+GAHAHA Ippatsu-dou 2 (GIS1 Ver.A)                                             (C) Namco/Metro, 2001
+Gamshara (10021 Ver.A)                                                        (C) Mitchell, 2003
+Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)              (C) Namco, 2007
+GekiToride-Jong Space (10011 Ver.A)                                           (C) Namco/Metro, 2001
+Golgo 13 Juusei no Requiem (GLT1 Ver.A)                                       (C) Namco/8ing/Raizing, 2001
+Gunbalina (GNN1 Ver. A)                                                       (C) Namco, 2000
+*Hard Puncher Hajime no Ippo: The Fighting                                    (C) Namco/Taito, 2001
+Hard Puncher Hajime no Ippo 2 - The Fighting - Ouja e no chousen (VER.2.00J)  (C) Namco/Taito, 2002
+*Honne Hakkenki                                                               (C) Namco, 2001
+Keroro Gunsou Pekopon Shinryaku Shirei De Arimasu! (KRG1 Ver.A)               (C) Namco, 2006
+**Knock Down 2001 / KO2001 (KD11 Ver.B)                                       (C) Namco, 2001
+Kono e Tako (RAN Ver.A, 10021 Ver.A reprogrammed Gamshara PCB)                (C) Mitchell 2003
+Kotoba no Puzzle Mojipittan (KPM1 Ver.A)                                      (C) Namco, 2001
+Medal no Tatsujin (MTL1 SPR0B)                                                (C) Namco, 2005
+Medal no Tatsujin 2 (MTA1001 STMPR0A)                                         (C) Namco, 2007
+Mr Driller 2 (DR21 Ver.A)                                                     (C) Namco, 2000
+Mr Driller 2 (DR22 Ver.A)                                                     (C) Namco, 2000
+Mr Driller 2 (DR23 Ver.A)                                                     (C) Namco, 2000
+Mr Driller G (DRG1 Ver.A)                                                     (C) Namco, 2001
+NFL Classic Football (NCF3 Ver.A)                                             (C) Namco, 2003
+Pacman Ball (PMB2 Ver.A)                                                      (C) Namco, 2003
+Panikuru Panekuru (PPA1 Ver.A)                                                (C) Namco, 2001
+*Peter The Shepherd                                                           (C) Namco, 2003
+*Photo Battle (PBT1 Ver.B)                                                    (C) Namco, 2001
+Point Blank 3 (GNN2 Ver. A)                                                   (C) Namco, 2000
+Puzz Ball (PZB1 Ver. A)                                                       (C) Namco, 2002
+Puzz Ball (PZB1 Ver. C)                                                       (C) Namco, 2002
+*Puzz Cube                                                                    (C) Namco, 2005
+Seishun-Quiz Colorful High School (CHS1 Ver.A)                                (C) Namco, 2002
+Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                                       (C) Namco, 2004
+*Shamisen Brothers (KT-SB2 Ver.A + CDROM)                                     (C) Kato/Konami, 2003
+*Slot no Oujisama / Slot Prince (SLO1 Ver.A)                                  (C) Namco, 2003
+Slot no Oujisama / Slot Prince (SLO1 Ver.B)                                   (C) Namco, 2003
+Star Trigon (STT1 Ver.A)                                                      (C) Namco, 2002
+Sugorotic JAPAN (STJ1 Ver.A)                                                  (C) Namco, 2002
+Sugorotic JAPAN (STJ1 Ver.C)                                                  (C) Namco, 2002
+*Taiko no Tatsujin  (with CDROM?)                                             (C) Namco, 2001
+Taiko no Tatsujin 2 (TK21 Ver.C & CDROM NM-002 TK21-A)                        (C) Namco, 2001
+Taiko no Tatsujin 3 (TK31 Ver.A & CDROM NM-003 TK31-A)                        (C) Namco, 2002
+Taiko no Tatsujin 4 (TK41 Ver.A & CDROM TK-4)                                 (C) Namco, 2003
+Taiko no Tatsujin 5 (TK51 Ver.A & CDROM TK-5)                                 (C) Namco, 2003
+Taiko no Tatsujin 6 (TK61 Ver.A & CDROM TK-6)                                 (C) Namco, 2004
+Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)                               (C) Namco/Metro, 2002
+Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A)                            (C) Namco, 2002
 
 * - denotes not dumped yet. If a game code is listed a PCB has been seen.
 ** - denotes incomplete dump due to damaged ROMs. A redump is required.
@@ -443,7 +443,9 @@ Notes:
 
 This PCB is used on..
 Hajime no Ippo Hard Puncher   - CPLD marked F06-01. I/O board = none
-Hajime no Ippo Hard Puncher 2 - sticker HAZIMENO IPPO2 K91J0893A, HAZIME'NO IPPO2 VER.2.00J. CPLD marked F06-03. I/O board = none
+Hajime no Ippo Hard Puncher 2 - sticker HAZIMENO IPPO2 K91J0893A, HAZIME'NO IPPO2 VER.2.00J. CPLD marked F06-03. I/O board = unknown sensor board
+
+Notes: There is a hidden "MEM(N)DATA CHECK SUM DISP" menu available in ippo2 that can be accessed by holding Speed Sensor Up + Start + Select during boot.
 
 
 Expansion Daughterboards
@@ -835,6 +837,7 @@ public:
 	namcos10_memn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos10_state(mconfig, type, tag)
 		, m_nand(*this, "nand%u", 0U)
+		, m_data_xor(0xaaaa)
 	{ }
 
 	void ns10_ballpom(machine_config &config);
@@ -884,6 +887,11 @@ protected:
 	void pio_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
 	void pio_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
 
+	optional_device_array<nand_device, 16> m_nand;
+
+	uint16_t m_data_xor;
+	uint8_t m_nand_rnb_state[16];
+
 private:
 	void namcos10_memn_map_inner(address_map &map);
 
@@ -902,11 +910,8 @@ private:
 	void nand_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void nand_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	optional_device_array<nand_device, 16> m_nand;
-
 	uint32_t m_ctrl_reg;
 	uint32_t m_nand_device_idx;
-	uint8_t m_nand_rnb_state[16];
 	uint32_t m_nand_address;
 };
 
@@ -986,6 +991,30 @@ private:
 	uint8_t m_mp3_porta_data;
 	bool m_mp3_stream_available;
 	bool m_mp3_received_byte;
+};
+
+class namcos10_memio_state : public namcos10_memn_state
+{
+public:
+	namcos10_memio_state(const machine_config &mconfig, device_type type, const char *tag)
+		: namcos10_memn_state(mconfig, type, tag)
+	{
+		m_data_xor = 0x5300; // TODO: does the default value change depending on the game?
+	}
+
+	void ns10_ippo2(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	void namcos10_memio_base(machine_config &config);
+	void namcos10_memio_map(address_map &map);
+	void namcos10_memio_map_inner(address_map &map);
+
+	void namcos10_nand_tc58256aft(machine_config &config, int nand_count);
+
+	void nand_dataxor_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1714,7 +1743,7 @@ uint16_t namcos10_memn_state::nand_data_r()
 	if (m_nand_device_idx == 0 && (BIT(m_nand_address, 8, 16) >> 5) < 2)
 		return data;
 
-	return m_unscrambler(data ^ 0xaaaa);
+	return m_unscrambler(data ^ m_data_xor);
 }
 
 void namcos10_memn_state::nand_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -1819,7 +1848,7 @@ void namcos10_memn_state::nand_copy(uint8_t *nand_base, uint16_t *dst, uint32_t 
 
 		for (int i = 0; i < 0x200; i += 2) {
 			uint16_t data = nand_base[address + i + 1] | (nand_base[address + i] << 8);
-			*dst = m_unscrambler(data ^ 0xaaaa);
+			*dst = m_unscrambler(data ^ m_data_xor);
 			dst++;
 		}
 	}
@@ -2998,6 +3027,58 @@ void namcos10_memp3_state::ns10_squizchs(machine_config &config)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
+// MEM/IO TODO!
+
+void namcos10_memio_state::namcos10_memio_base(machine_config &config)
+{
+	namcos10_memn_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos10_memio_state::namcos10_memio_map);
+}
+
+void namcos10_memio_state::machine_reset()
+{
+	namcos10_memn_state::machine_reset();
+	m_data_xor = 0x5300;
+}
+
+void namcos10_memio_state::namcos10_memio_map_inner(address_map &map)
+{
+	map(0xf468000, 0xf468001).w(FUNC(namcos10_memio_state::nand_dataxor_w));
+}
+
+void namcos10_memio_state::namcos10_memio_map(address_map &map)
+{
+	namcos10_memn_map(map);
+
+	map(0x10000000, 0x1fffffff).m(FUNC(namcos10_memio_state::namcos10_memio_map_inner));
+	map(0x90000000, 0x9fffffff).m(FUNC(namcos10_memio_state::namcos10_memio_map_inner));
+	map(0xb0000000, 0xbfffffff).m(FUNC(namcos10_memio_state::namcos10_memio_map_inner));
+}
+
+void namcos10_memio_state::namcos10_nand_tc58256aft(machine_config &config, int nand_count)
+{
+	for (int i = 0; i < nand_count; i++) {
+		TOSHIBA_TC58256AFT(config, m_nand[i], 0);
+		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
+	}
+}
+
+void namcos10_memio_state::nand_dataxor_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// logerror("%s: nand_dataxor_w: %04x\n", machine().describe_context(), data);
+	m_data_xor = ((data & 0xff) << 8) | (data >> 8);
+}
+
+void namcos10_memio_state::ns10_ippo2(machine_config &config)
+{
+	namcos10_memio_base(config);
+	namcos10_nand_tc58256aft(config, 6);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xf, 0xe, 0xd, 0xc, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1, 0x0); };
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 static INPUT_PORTS_START( namcos10 )
 	PORT_START("SYSTEM")
@@ -3370,6 +3451,26 @@ static INPUT_PORTS_START( ptblank3 )
 	PORT_START("EXIO_LIGHTGUN4") // P2 Y
 	PORT_BIT( 0x3fffff, 0x78, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x000,0xef) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ippo2 )
+	PORT_INCLUDE(namcos10)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x1ff33f61, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SELECT )
+
+	// TODO: These sensors must match what the game is expecting based on when it's trying to raise the punch pad or else it will throw a speed error
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Speed Sensor Down")
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Speed Sensor Mid")
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Speed Sensor Up")
+
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Human Sensor 1")
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Human Sensor 2")
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Human Sensor 3")
+
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Safety Sensor")
 INPUT_PORTS_END
 
 // MEM(M)
@@ -3991,7 +4092,33 @@ ROM_START( squizchs )
 	ROM_LOAD( "chs1vera_13.1b", 0x0000000, 0x1080000, CRC(739e3b1e) SHA1(d7a25984d939d69de11b0fea000e51fdb4759163) )
 ROM_END
 
-} // Anonymous namespace
+ROM_START( ippo2 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x2100000, "nand0", 0 )
+	ROM_LOAD( "tc58256aft.ic4", 0x0000000, 0x2100000, CRC(1fdb4a2d) SHA1(0712f8256330098a6ad0b5c3d5d99f771c19669c) )
+
+	ROM_REGION32_LE( 0x2100000, "nand1", 0 )
+	ROM_LOAD( "tc58256aft.ic8", 0x0000000, 0x2100000, CRC(f6d97189) SHA1(9cb145ea35ea7e5d36e124f3d5ed6dfea4ecc252) )
+
+	ROM_REGION32_LE( 0x2100000, "nand2", 0 )
+	ROM_LOAD( "tc58256aft.ic5", 0x0000000, 0x2100000, CRC(47e970cc) SHA1(e884d259448ad258a19fad466bf664c4052555e7) )
+
+	ROM_REGION32_LE( 0x2100000, "nand3", 0 )
+	ROM_LOAD( "tc58256aft.ic9", 0x0000000, 0x2100000, CRC(8158e228) SHA1(ea82f4ee6aa98c734c035465a5543ecb34fd5d38) )
+
+	ROM_REGION32_LE( 0x2100000, "nand4", 0 )
+	ROM_LOAD( "tc58256aft.ic6", 0x0000000, 0x2100000, CRC(ab84f5fd) SHA1(b5f41b4cff7741d6af4490b1ce32b2d9eeb09625) )
+
+	ROM_REGION32_LE( 0x2100000, "nand5", 0 )
+	ROM_LOAD( "tc58256aft.ic10", 0x0000000, 0x2100000, CRC(2a084db7) SHA1(67b0922aa92255b8ce60feda87f2937d94336c09) )
+
+	ROM_REGION( 0x157, "plds", 0 )
+	ROM_LOAD( "f06-02.ic15", 0x000, 0x157, NO_DUMP ) // PAL20V8
+ROM_END
+
+} // anonymous namespace
 
 
 // MEM(M)
@@ -4041,3 +4168,6 @@ GAME( 2004, taikort,   0,        ns10_taikort,   taiko,        namcos10_memn_sta
 GAME( 2001, g13jnr,    0,        ns10_g13jnr,    g13jnr,       namcos10_memp3_state, memn_driver_init, ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, nicetsuk,  0,        ns10_nicetsuk,  nicetsuk,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco / Metro",              "Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, squizchs,  0,        ns10_squizchs,  squizchs,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco",                      "Seishun-Quiz Colorful High School (CHS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+
+// MEM/IO
+GAME( 2002, ippo2,     0,        ns10_ippo2,     ippo2,        namcos10_memio_state, memn_driver_init, ROT0, "Taito",             "Hard Puncher Hajime no Ippo 2 - The Fighting - Ouja e no chousen (VER.2.00J)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // 2002/01/20 18:27:18
