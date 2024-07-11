@@ -18,6 +18,7 @@
 
 #include "cdrom.h"
 
+#include "corefile.h"
 #include "corestr.h"
 #include "multibyte.h"
 #include "osdfile.h"
@@ -1766,58 +1767,58 @@ uint32_t cdrom_file::parse_wav_sample(std::string_view filename, uint32_t *datao
 }
 
 /**
- * @fn  uint16_t read_uint16(FILE *infile)
+ * @fn  uint16_t read_uint16(util::read_stream &infile)
  *
  * @brief   Reads uint 16.
  *
- * @param [in,out]  infile  If non-null, the infile.
+ * @param [in,out]  infile  The infile.
  *
  * @return  The uint 16.
  */
 
-uint16_t cdrom_file::read_uint16(FILE *infile)
+uint16_t cdrom_file::read_uint16(util::read_stream &infile)
 {
 	unsigned char buffer[2];
 
-	fread(buffer, 2, 1, infile);
+	read(infile, buffer, 2);
 
 	return get_u16be(buffer);
 }
 
 /**
- * @fn  uint32_t read_uint32(FILE *infile)
+ * @fn  uint32_t read_uint32(util::read_stream &infile)
  *
  * @brief   Reads uint 32.
  *
- * @param [in,out]  infile  If non-null, the infile.
+ * @param [in,out]  infile  The infile.
  *
  * @return  The uint 32.
  */
 
-uint32_t cdrom_file::read_uint32(FILE *infile)
+uint32_t cdrom_file::read_uint32(util::read_stream &infile)
 {
 	unsigned char buffer[4];
 
-	fread(buffer, 4, 1, infile);
+	read(infile, buffer, 4);
 
 	return get_u32be(buffer);
 }
 
 /**
- * @fn  uint64_t read_uint64(FILE *infile)
+ * @fn  uint64_t read_uint64(util::read_stream &infile)
  *
  * @brief   Reads uint 64.
  *
- * @param [in,out]  infile  If non-null, the infile.
+ * @param [in,out]  infile  The infile.
  *
  * @return  The uint 64.
  */
 
-uint64_t cdrom_file::read_uint64(FILE *infile)
+uint64_t cdrom_file::read_uint64(util::read_stream &infile)
 {
 	unsigned char buffer[8];
 
-	fread(buffer, 8, 1, infile);
+	read(infile, buffer, 8);
 
 	return get_u64be(buffer);
 }
@@ -1846,10 +1847,11 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 
 	std::string path = std::string(tocfname);
 
-	FILE *infile = fopen(path.c_str(), "rb");
-	if (!infile)
+	util::core_file::ptr infile;
+	const std::error_condition err = util::core_file::open(path, OPEN_FLAG_READ, infile);
+	if (err)
 	{
-		return std::error_condition(errno, std::generic_category());
+		return err;
 	}
 
 	path = get_file_path(path);
@@ -1861,13 +1863,13 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 	outtoc.numsessions = 1;
 
 	// seek to 12 bytes before the end
-	fseek(infile, -12, SEEK_END);
-	fread(buffer, 12, 1, infile);
+	infile->seek(-12, SEEK_END);
+	read(*infile, buffer, 12);
 
 	if (memcmp(buffer, "NER5", 4))
 	{
 		printf("ERROR: Not a Nero 5.5 or later image!\n");
-		fclose(infile);
+		infile.reset();
 		return chd_file::error::UNSUPPORTED_FORMAT;
 	}
 
@@ -1876,7 +1878,7 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 	if ((buffer[7] != 0) || (buffer[6] != 0) || (buffer[5] != 0) || (buffer[4] != 0))
 	{
 		printf("ERROR: File size is > 4GB, this version of CHDMAN cannot handle it.");
-		fclose(infile);
+		infile.reset();
 		return chd_file::error::UNSUPPORTED_FORMAT;
 	}
 
@@ -1884,8 +1886,8 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 
 	while (!done)
 	{
-		fseek(infile, chain_offs, SEEK_SET);
-		fread(buffer, 8, 1, infile);
+		infile->seek(chain_offs, SEEK_SET);
+		read(*infile, buffer, 8);
 
 		chunk_size = get_u32be(&buffer[4]);
 
@@ -1895,11 +1897,11 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 		if (!memcmp(buffer, "DAOX", 4))
 		{
 			// skip second chunk size and UPC code
-			fseek(infile, 20, SEEK_CUR);
+			infile->seek(20, SEEK_CUR);
 
 			uint8_t start, end;
-			fread(&start, 1, 1, infile);
-			fread(&end, 1, 1, infile);
+			read(*infile, &start, 1);
+			read(*infile, &end, 1);
 
 //          printf("Start track %d  End track: %d\n", start, end);
 
@@ -1911,13 +1913,13 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 				uint32_t size, mode;
 				uint64_t index0, index1, track_end;
 
-				fseek(infile, 12, SEEK_CUR);    // skip ISRC code
-				size = read_uint16(infile);
-				mode = read_uint16(infile);
-				fseek(infile, 2, SEEK_CUR);
-				index0 = read_uint64(infile);
-				index1 = read_uint64(infile);
-				track_end = read_uint64(infile);
+				infile->seek(12, SEEK_CUR);    // skip ISRC code
+				size = read_uint16(*infile);
+				mode = read_uint16(*infile);
+				infile->seek(2, SEEK_CUR);
+				index0 = read_uint64(*infile);
+				index1 = read_uint64(*infile);
+				track_end = read_uint64(*infile);
 
 //              printf("Track %d: sector size %d mode %x index0 %llx index1 %llx track_end %llx (pregap %d sectors, length %d sectors)\n", track, size, mode, index0, index1, track_end, (uint32_t)(index1-index0)/size, (uint32_t)(track_end-index1)/size);
 				outinfo.track[track-1].fname.assign(tocfname);
@@ -1933,12 +1935,12 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 
 					case 0x0300:    // Mode 2 Form 1
 						printf("ERROR: Mode 2 Form 1 tracks not supported\n");
-						fclose(infile);
+						infile.reset();
 						return chd_file::error::UNSUPPORTED_FORMAT;
 
 					case 0x0500:    // raw data
 						printf("ERROR: Raw data tracks not supported\n");
-						fclose(infile);
+						infile.reset();
 						return chd_file::error::UNSUPPORTED_FORMAT;
 
 					case 0x0600:    // 2352 byte mode 2 raw
@@ -1953,22 +1955,22 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 
 					case 0x0f00:    // raw data with sub-channel
 						printf("ERROR: Raw data tracks with sub-channel not supported\n");
-						fclose(infile);
+						infile.reset();
 						return chd_file::error::UNSUPPORTED_FORMAT;
 
 					case 0x1000:    // audio with sub-channel
 						printf("ERROR: Audio tracks with sub-channel not supported\n");
-						fclose(infile);
+						infile.reset();
 						return chd_file::error::UNSUPPORTED_FORMAT;
 
 					case 0x1100:    // raw Mode 2 Form 1 with sub-channel
 						printf("ERROR: Raw Mode 2 Form 1 tracks with sub-channel not supported\n");
-						fclose(infile);
+						infile.reset();
 						return chd_file::error::UNSUPPORTED_FORMAT;
 
 					default:
 						printf("ERROR: Unknown track type %x, contact MAMEDEV!\n", mode);
-						fclose(infile);
+						infile.reset();
 						return chd_file::error::UNSUPPORTED_FORMAT;
 				}
 
@@ -2000,7 +2002,7 @@ std::error_condition cdrom_file::parse_nero(std::string_view tocfname, toc &outt
 		}
 	}
 
-	fclose(infile);
+	infile.reset();
 
 	return std::error_condition();
 }
@@ -2025,10 +2027,11 @@ std::error_condition cdrom_file::parse_iso(std::string_view tocfname, toc &outto
 {
 	std::string path = std::string(tocfname);
 
-	FILE *infile = fopen(path.c_str(), "rb");
-	if (!infile)
+	util::core_file::ptr infile;
+	const std::error_condition err = util::core_file::open(path, OPEN_FLAG_READ, infile);
+	if (err)
 	{
-		return std::error_condition(errno, std::generic_category());
+		return err;
 	}
 
 	path = get_file_path(path);
@@ -2038,7 +2041,7 @@ std::error_condition cdrom_file::parse_iso(std::string_view tocfname, toc &outto
 	outinfo.reset();
 
 	uint64_t size = get_file_size(tocfname);
-	fclose(infile);
+	infile.reset();
 
 
 	outtoc.numtrks = 1;
@@ -2108,10 +2111,11 @@ std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outto
 
 	std::string path = std::string(tocfname);
 
-	FILE *infile = fopen(path.c_str(), "rt");
-	if (!infile)
+	util::core_file::ptr infile;
+	const std::error_condition err = util::core_file::open(path, OPEN_FLAG_READ, infile);
+	if (err)
 	{
-		return std::error_condition(errno, std::generic_category());
+		return err;
 	}
 
 	path = get_file_path(path);
@@ -2125,7 +2129,7 @@ std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outto
 	char linebuffer[512];
 	memset(linebuffer, 0, sizeof(linebuffer));
 
-	fgets(linebuffer,511,infile);
+	infile->gets(linebuffer,511);
 	numtracks=atoi(linebuffer);
 
 	for(i=0;i<numtracks;++i)
@@ -2135,7 +2139,7 @@ std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outto
 		int trksize,trktype;
 		int sz;
 
-		fgets(linebuffer,511,infile);
+		infile->gets(linebuffer,511);
 
 		tok=strtok(linebuffer," ");
 
@@ -2211,7 +2215,7 @@ std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outto
 		}
 
 	/* close the input TOC */
-	fclose(infile);
+	infile.reset();
 
 	/* store the number of tracks found */
 	outtoc.numtrks = numtracks;
@@ -2252,10 +2256,11 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 	bool is_multibin = false;
 	int leadin = -1;
 
-	FILE *infile = fopen(path.c_str(), "rt");
-	if (!infile)
+	util::core_file::ptr infile;
+	const std::error_condition err = util::core_file::open(path, OPEN_FLAG_READ, infile);
+	if (err)
 	{
-		return std::error_condition(errno, std::generic_category());
+		return err;
 	}
 
 	path = get_file_path(path);
@@ -2277,14 +2282,14 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 	char linebuffer[512];
 	memset(linebuffer, 0, sizeof(linebuffer));
 
-	while (!feof(infile))
+	while (!infile->eof())
 	{
 		/* get the next line */
-		if (!fgets(linebuffer, 511, infile))
+		if (!infile->gets(linebuffer, 511))
 			break;
 
 		/* if EOF didn't hit, keep going */
-		if (!feof(infile))
+		if (!infile->eof())
 		{
 			i = 0;
 
@@ -2388,14 +2393,14 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 					wavlen = parse_wav_sample(lastfname, &wavoffs);
 					if (!wavlen)
 					{
-						fclose(infile);
+						infile.reset();
 						printf("ERROR: couldn't read [%s] or not a valid .WAV\n", lastfname.c_str());
 						return chd_file::error::INVALID_DATA;
 					}
 				}
 				else
 				{
-					fclose(infile);
+					infile.reset();
 					printf("ERROR: Unhandled track type %s\n", token);
 					return chd_file::error::UNSUPPORTED_FORMAT;
 				}
@@ -2462,7 +2467,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 				convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
 				if (outtoc.tracks[trknum].datasize == 0)
 				{
-					fclose(infile);
+					infile.reset();
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
 					return chd_file::error::UNSUPPORTED_FORMAT;
 				}
@@ -2552,7 +2557,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 	}
 
 	/* close the input CUE */
-	fclose(infile);
+	infile.reset();
 
 	/* store the number of tracks found */
 	outtoc.numtrks = trknum + 1;
@@ -2769,8 +2774,9 @@ bool cdrom_file::is_gdicue(std::string_view tocfname)
 	bool has_rem_highdensity = false;
 	std::string path = std::string(tocfname);
 
-	FILE *infile = fopen(path.c_str(), "rt");
-	if (!infile)
+	util::core_file::ptr infile;
+	const std::error_condition err = util::core_file::open(path, OPEN_FLAG_READ, infile);
+	if (err)
 	{
 		return false;
 	}
@@ -2780,13 +2786,13 @@ bool cdrom_file::is_gdicue(std::string_view tocfname)
 	char linebuffer[512];
 	memset(linebuffer, 0, sizeof(linebuffer));
 
-	while (!feof(infile))
+	while (!infile->eof())
 	{
-		if (!fgets(linebuffer, 511, infile))
+		if (!infile->gets(linebuffer, 511))
 			break;
 
 		/* if EOF didn't hit, keep going */
-		if (!feof(infile))
+		if (!infile->eof())
 		{
 			int i = 0;
 
@@ -2806,7 +2812,7 @@ bool cdrom_file::is_gdicue(std::string_view tocfname)
 		}
 	}
 
-	fclose(infile);
+	infile.reset();
 
 	return has_rem_singledensity && has_rem_highdensity;
 }
@@ -2856,10 +2862,11 @@ std::error_condition cdrom_file::parse_toc(std::string_view tocfname, toc &outto
 
 	std::string path = std::string(tocfname);
 
-	FILE *infile = fopen(path.c_str(), "rt");
-	if (!infile)
+	util::core_file::ptr infile;
+	const std::error_condition err = util::core_file::open(path, OPEN_FLAG_READ, infile);
+	if (err)
 	{
-		return std::error_condition(errno, std::generic_category());
+		return err;
 	}
 
 	path = get_file_path(path);
@@ -2873,14 +2880,14 @@ std::error_condition cdrom_file::parse_toc(std::string_view tocfname, toc &outto
 	char linebuffer[512];
 	memset(linebuffer, 0, sizeof(linebuffer));
 
-	while (!feof(infile))
+	while (!infile->eof())
 	{
 		/* get the next line */
-		if (!fgets(linebuffer, 511, infile))
+		if (!infile->gets(linebuffer, 511))
 			break;
 
 		/* if EOF didn't hit, keep going */
-		if (!feof(infile))
+		if (!infile->eof())
 		{
 			int i = 0;
 
@@ -2980,7 +2987,7 @@ std::error_condition cdrom_file::parse_toc(std::string_view tocfname, toc &outto
 				convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
 				if (outtoc.tracks[trknum].datasize == 0)
 				{
-					fclose(infile);
+					infile.reset();
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
 					return chd_file::error::UNSUPPORTED_FORMAT;
 				}
@@ -3004,7 +3011,7 @@ std::error_condition cdrom_file::parse_toc(std::string_view tocfname, toc &outto
 	}
 
 	/* close the input TOC */
-	fclose(infile);
+	infile.reset();
 
 	/* store the number of tracks found */
 	outtoc.numtrks = trknum + 1;
