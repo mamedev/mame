@@ -25,6 +25,7 @@ authors:hap
 		<disk state="1"><color red="0.1" green="0.1" blue="0.1" /></disk>
 	</element>
 	<element name="hlb2" defstate="0">
+		<rect><color red="1" green="1" blue="1" /></rect>
 		<disk state="1"><color red="0.77" green="0.77" blue="0.77" /></disk>
 	</element>
 
