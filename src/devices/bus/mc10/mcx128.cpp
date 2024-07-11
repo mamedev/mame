@@ -114,11 +114,6 @@ mc10_pak_mcx128_device::mc10_pak_mcx128_device(const machine_config &mconfig, co
 	, m_view(*this, "mcx_view")
 	, m_bank(*this, "bank%u", 0U)
 {
-	const char *driver_name = mconfig.gamedrv().name;
-	if (strcmp(driver_name, "alice") == 0)
-	 	set_default_bios_tag("alice");
-	else
-		set_default_bios_tag("mc10");
 }
 
 const tiny_rom_entry * mc10_pak_mcx128_device::device_rom_region() const
