@@ -5524,7 +5524,6 @@ void nmk16_state::powerinsb(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::powerins_map);
-	set_interrupt_timing(config);
 
 	Z80(config, m_audiocpu, XTAL(12'000'000) / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::powerins_sound_map);
