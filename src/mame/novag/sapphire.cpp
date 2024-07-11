@@ -3,19 +3,18 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-Novag Sapphire
+Novag Sapphire (model 9304)
 
 Hardware notes:
 - PCB label: 100168 REV A
 - Hitachi H8/325 MCU, 26.601712MHz XTAL
 - 32KB EPROM (M27C256B-12F1), 128KB SRAM (KM681000ALG-10)
 - LCD with 4 7segs and custom segments, same as Novag VIP
-- RJ-12 port for Novag Super System (always 57600 baud)
+- RJ-12 port for Novag Super System (always 9600 baud)
 - 24 buttons, piezo
 
 TODO:
-- currently hardlocks MAME, suspect problem with h8_sci
-- internal artwork
+- rs232 nss_tvi (Novag TV Interface) doesn't work
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
 
@@ -37,7 +36,7 @@ BTANB:
 #include "speaker.h"
 
 // internal artwork
-//#include "novag_sapphire.lh"
+#include "novag_sapphire.lh"
 
 
 namespace {
@@ -333,7 +332,7 @@ void sapphire_state::sapphire(machine_config &config)
 	screen.set_size(1920/2.5, 606/2.5);
 	screen.set_visarea_full();
 
-	//config.set_default_layout(layout_novag_sapphire);
+	config.set_default_layout(layout_novag_sapphire);
 
 	// rs232 (configure after video)
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
@@ -350,7 +349,7 @@ void sapphire_state::sapphire(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( sapphire )
+ROM_START( sapphire ) // ID = SAPPHIRE V1.01
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD("novag_9304-010053_6433258b46f.u1", 0x0000, 0x8000, CRC(bfc39f4b) SHA1(dc96440c070e903772f4485757443dd690e92120) )
 	ROM_LOAD("bk301_26601.u2", 0x8000, 0x8000, CRC(648ebe8f) SHA1(2883f962a0bf17426fd809b9f2c01ce3dec0df1b) )
@@ -368,4 +367,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1994, sapphire, 0,      0,      sapphire, sapphire, sapphire_state, empty_init, "Novag Industries", "Sapphire (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1994, sapphire, 0,      0,      sapphire, sapphire, sapphire_state, empty_init, "Novag Industries", "Sapphire (Novag)", MACHINE_SUPPORTS_SAVE )
