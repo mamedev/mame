@@ -9,6 +9,8 @@
 #include "cpu/arm7/arm7core.h"
 #include "cpu/xa/xa.h"
 #include "machine/nvram.h"
+#include "machine/v3021.h"
+#include "machine/ticket.h"
 #include "sound/ics2115.h"
 
 #include "emupal.h"
@@ -27,7 +29,10 @@ public:
 		m_xa(*this, "xa"),
 		m_videoram(*this, "videoram"),
 		m_palette(*this, "palette"),
-		m_gfxrom(*this, "gfx1")
+		m_gfxrom(*this, "gfx1"),
+		m_ticket(*this, "ticket"),
+		m_io_dsw(*this, "DSW%u", 1U),
+		m_io_trackball(*this, "AN%u", 0)
 	{ }
 
 	void igs_fear(machine_config &config);
@@ -39,48 +44,82 @@ protected:
 	virtual void video_start() override;
 
 private:
+	void main_map(address_map &map);
+
+	void sound_irq(int state);
+	void vblank_irq(int state);
+
+	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int height, int width, int palette, int flipx, int romoffset);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	uint32_t igs027_gpio_r(offs_t offset);
+	void igs027_gpio_w(offs_t offset, u32 data, u32 mem_mask);
+
+	TIMER_CALLBACK_MEMBER(igs027_timer0);
+	TIMER_CALLBACK_MEMBER(igs027_timer1);
+
+	void igs027_periph_init(void);
+	void igs027_trigger_irq(int num);
+	uint32_t igs027_periph_r(offs_t offset);
+	void igs027_periph_w(offs_t offset, u32 data, u32 mem_mask);
+
+	uint32_t xa_r(offs_t offset);
+	void xa_w(offs_t offset, u32 data, u32 mem_mask);
+	void cpld_w(offs_t offset, u32 data, u32 mem_mask);
+
+	uint32_t m_gpio_o;
+	uint32_t m_irq_enable;
+	uint32_t m_irq_pending;
+	emu_timer *m_timer0;
+	emu_timer *m_timer1;
+
+	uint32_t m_xa_cmd;
+	int m_trackball_cnt;
+	int m_trackball_axis[2], m_trackball_axis_pre[2], m_trackball_axis_diff[2];
+
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<xa_cpu_device> m_xa;
 	required_shared_ptr<uint32_t> m_videoram;
 	required_device<palette_device> m_palette;
 	required_region_ptr<uint8_t> m_gfxrom;
 
-	void main_map(address_map &map);
-
-	void sound_irq(int state);
-	void vblank_irq(int state);
-
-	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int height, int width, int palette, int romoffset);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<ticket_dispenser_device> m_ticket;
+	required_ioport_array<2> m_io_dsw;
+	required_ioport_array<2> m_io_trackball;
 };
 
 
 void igs_fear_state::video_start()
 {
+	igs027_periph_init();
 }
 
-void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int height, int width, int palette, int romoffset)
+void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int height, int width, int palette, int flipx, int romoffset)
 {
 	if ((romoffset != 0) && (romoffset != 0xffffffff))
 	{
 		//logerror("x=%d, y=%d, w=%d pix, h=%d pix, c=0x%02x, romoffset=0x%08x\n", xpos, ypos, width, height, palette, romoffset << 2);
 		const uint8_t *gfxrom = &m_gfxrom[romoffset << 2];
+		const int x_base = flipx ? (xpos + width - 1) : xpos;
+		const int x_inc = flipx ? (-1) : 1;
 		palette = (palette & 0x3f) << 7;
 
 		for (int y = 0; y < height; y++)
 		{
 			uint16_t *dest = &bitmap.pix(ypos + y);
+			int x_index = x_base;
 			for (int x = 0; x < width; x++)
 			{
 				uint8_t pix = *gfxrom++;
 				if (pix)
 				{
-					if (cliprect.contains(xpos + x, ypos + y))
-						dest[xpos + x] = pix | palette;
+					if (cliprect.contains(x_index, ypos + y))
+						dest[x_index] = pix | palette;
 				}
+				x_index += x_inc;
 			}
-
 		}
 	}
 }
@@ -91,20 +130,25 @@ uint32_t igs_fear_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	for (int i = 0; i < 0x2000 / 0x10; i++)
 	{
-		const int xpos    = (m_videoram[(i * 4) + 0] & 0x0000ffff) >> 0;
-		const int ypos    = (m_videoram[(i * 4) + 0] & 0xffff0000) >> 16;
+		int       xpos    = (m_videoram[(i * 4) + 0] & 0x0000ffff) >> 0;
+		int       ypos    = (m_videoram[(i * 4) + 0] & 0xffff0000) >> 16;
 		int       height  = (m_videoram[(i * 4) + 1] & 0x0000ffff) >> 0;
 		int       width   = (m_videoram[(i * 4) + 1] & 0xffff0000) >> 16;
-		const int palette = (m_videoram[(i * 4) + 2] & 0x0000ffff) >> 0;
+		const int palette = (m_videoram[(i * 4) + 2] & 0x000000ff) >> 0;
+		const int flipx   = (m_videoram[(i * 4) + 2] & 0x00000100) == 0;
 		const int rom_msb = (m_videoram[(i * 4) + 2] & 0xffff0000) >> 16;
 		const int rom_lsb = (m_videoram[(i * 4) + 3] & 0x0000ffff) >> 0;
 
 		const int romoffset = rom_msb + (rom_lsb << 16);
 
+		if (xpos & 0x8000)
+			xpos -= 0x10000;
+		if (ypos & 0x8000)
+			ypos -= 0x10000;
 		width = (width + 1) << 2;
 		height = height + 1;
 
-		draw_sprite(bitmap, cliprect, xpos, ypos, height, width, palette, romoffset);
+		draw_sprite(bitmap, cliprect, xpos, ypos, height, width, palette, flipx, romoffset);
 	}
 
 	return 0;
@@ -116,12 +160,146 @@ void igs_fear_state::main_map(address_map &map)
 	map(0x08000000, 0x0807ffff).rom().region("user1", 0);/* Game ROM */
 	map(0x10000000, 0x100003ff).ram().share("iram");
 	map(0x18000000, 0x1800ffff).ram().share("sram");
+	map(0x40000000, 0x400003ff).rw(FUNC(igs_fear_state::igs027_gpio_r), FUNC(igs_fear_state::igs027_gpio_w));
 	map(0x50000000, 0x500003ff).ram().share("xortab");
+	map(0x70000000, 0x700003ff).rw(FUNC(igs_fear_state::igs027_periph_r), FUNC(igs_fear_state::igs027_periph_w));
+
+	map(0x28000000, 0x28000003).rw("rtc", FUNC(v3021_device::read), FUNC(v3021_device::write));
 	map(0x38000000, 0x38001fff).ram().share("videoram");
 	map(0x38004000, 0x38007fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x38008500, 0x380085ff).rw(FUNC(igs_fear_state::xa_r), FUNC(igs_fear_state::xa_w));
+	map(0x58000000, 0x58000003).portr("IN0");
+	map(0x58100000, 0x58100003).portr("IN1");
+	map(0x68000000, 0x6800000f).w(FUNC(igs_fear_state::cpld_w));
+
 }
 
 static INPUT_PORTS_START( fear )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "SW1:7")
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "SW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "SW2:7")
+
+	PORT_START("AN0")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(20)
+
+	PORT_START("AN1")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(20)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( superkds )
+	PORT_INCLUDE ( fear )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x00, "Scene" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "Volcano" )
+	PORT_DIPSETTING(    0x02, "Jungle" )
+	PORT_DIPSETTING(    0x01, "Ice Field" )
+	PORT_DIPSETTING(    0x00, "Ice Field" )
+	PORT_DIPNAME( 0x04, 0x00, "Ticket" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0xf8, 0x00, "Ticket Table" ) PORT_DIPLOCATION("SW1:4,5,6,7,8")
+	PORT_DIPSETTING(    0xf8, "Table1" )
+	PORT_DIPSETTING(    0xf0, "Table2" )
+	PORT_DIPSETTING(    0xe8, "Table3" )
+	PORT_DIPSETTING(    0xe0, "Table4" )
+	PORT_DIPSETTING(    0xd8, "Table5" )
+	PORT_DIPSETTING(    0xd0, "Table6" )
+	PORT_DIPSETTING(    0xc8, "Table7" )
+	PORT_DIPSETTING(    0xc0, "Table8" )
+	PORT_DIPSETTING(    0xb8, "Table9" )
+	PORT_DIPSETTING(    0xb0, "Table10" )
+	PORT_DIPSETTING(    0xa8, "Table11" )
+	PORT_DIPSETTING(    0xa0, "Table12" )
+	PORT_DIPSETTING(    0x98, "Table13" )
+	PORT_DIPSETTING(    0x90, "Table14" )
+	PORT_DIPSETTING(    0x88, "Table15" )
+	PORT_DIPSETTING(    0x80, "Table16" )
+	PORT_DIPSETTING(    0x78, "Table17" )
+	PORT_DIPSETTING(    0x70, "Table18" )
+	PORT_DIPSETTING(    0x68, "Table19" )
+	PORT_DIPSETTING(    0x60, "Table20" )
+	PORT_DIPSETTING(    0x58, "Table21" )
+	PORT_DIPSETTING(    0x50, "Table22" )
+	PORT_DIPSETTING(    0x48, "Table23" )
+	PORT_DIPSETTING(    0x40, "Table24" )
+	PORT_DIPSETTING(    0x38, "Table25" )
+	PORT_DIPSETTING(    0x30, "Table26" )
+	PORT_DIPSETTING(    0x28, "Table27" )
+	PORT_DIPSETTING(    0x20, "Table28" )
+	PORT_DIPSETTING(    0x18, "Table29" )
+	PORT_DIPSETTING(    0x10, "Table30" )
+	PORT_DIPSETTING(    0x08, "Table31" )
+	PORT_DIPSETTING(    0x00, "Table32" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "Free Play" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x06, 0x06, "Coin/Credit" ) PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x08, 0x08, "Demo BGM" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x70, 0x00, "Slave" ) PORT_DIPLOCATION("SW2:5,6,7")
+	PORT_DIPSETTING(    0x70, "0" )
+	PORT_DIPSETTING(    0x60, "1" )
+	PORT_DIPSETTING(    0x50, "2" )
+	PORT_DIPSETTING(    0x40, "3" )
+	PORT_DIPSETTING(    0x30, "4" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPSETTING(    0x10, "6" )
+	PORT_DIPSETTING(    0x00, "Single" )
+	PORT_DIPNAME( 0x80, 0x00, "Language" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, "Chinese" )
+	PORT_DIPSETTING(    0x00, "English" )
 INPUT_PORTS_END
 
 void igs_fear_state::sound_irq(int state)
@@ -132,6 +310,160 @@ void igs_fear_state::vblank_irq(int state)
 {
 	if (state)
 		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+}
+
+uint32_t igs_fear_state::igs027_gpio_r(offs_t offset)
+{
+	uint32_t data = -1;
+	switch (offset * 4)
+	{
+	case 0xc:
+		uint8_t ret = 0xff;
+		if (!BIT(m_gpio_o, 0)) ret &= m_io_dsw[0]->read();
+		if (!BIT(m_gpio_o, 1)) ret &= m_io_dsw[1]->read();
+		data = 0x2000 | (ret << 3);
+		break;
+	}
+	return data;
+}
+
+void igs_fear_state::igs027_gpio_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	switch (offset * 4)
+	{
+	case 0x18:
+		m_gpio_o = data;
+		break;
+	}
+}
+
+void igs_fear_state::igs027_periph_init()
+{
+	m_irq_enable = 0xFF;
+	m_irq_pending = 0xFF;
+	m_timer0 = timer_alloc(FUNC(igs_fear_state::igs027_timer0), this);
+	m_timer1 = timer_alloc(FUNC(igs_fear_state::igs027_timer1), this);
+}
+
+void igs_fear_state::igs027_trigger_irq(int num)
+{
+	if ((m_irq_enable & (1 << num)) == 0)
+	{
+		m_irq_pending &= ~(1 << num);
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
+	}
+}
+
+TIMER_CALLBACK_MEMBER(igs_fear_state::igs027_timer0)
+{
+	igs027_trigger_irq(0);
+}
+
+TIMER_CALLBACK_MEMBER(igs_fear_state::igs027_timer1)
+{
+	igs027_trigger_irq(1);
+}
+
+void igs_fear_state::igs027_periph_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	switch (offset * 4)
+	{
+	case 0x100:
+		// TODO: verify the timer interval
+		m_timer0->adjust(attotime::from_hz(data), 0, attotime::from_hz(data));
+		break;
+
+	case 0x104:
+		m_timer1->adjust(attotime::from_hz(data), 0, attotime::from_hz(data));
+		break;
+
+	case 0x200:
+		m_irq_enable = data;
+		break;
+	}
+}
+
+uint32_t igs_fear_state::igs027_periph_r(offs_t offset)
+{
+	uint32_t data = -1;
+	switch (offset * 4)
+	{
+	case 0x200:
+		data = m_irq_pending;
+		m_irq_pending = 0xFF;
+		break;
+	}
+	return data;
+}
+
+// TODO: ICS2115 & trackball support in XA
+uint32_t igs_fear_state::xa_r(offs_t offset)
+{
+	uint32_t data = -1;
+
+	switch (offset * 4)
+	{
+	case 0:
+	{
+		if (m_xa_cmd == 0xa301)
+		{
+			switch (m_trackball_cnt++)
+			{
+			case 0:
+				data = 0x80;
+				for (int i = 0; i < 2; i++)
+				{
+					m_trackball_axis_pre[i] = m_trackball_axis[i];
+					m_trackball_axis[i] = m_io_trackball[i]->read();
+					if (m_trackball_axis[i] & 0x80)
+						m_trackball_axis[i] -= 0x100;
+					m_trackball_axis_diff[i] = m_trackball_axis[i] - m_trackball_axis_pre[i];
+					if (m_trackball_axis_diff[i] >= 128)
+						m_trackball_axis_diff[i] -= 256;
+					if (m_trackball_axis_diff[i] <= -128)
+						m_trackball_axis_diff[i] += 256;
+				}
+				break;
+			case 1:
+				data = 0x80;
+				break;
+			case 2:
+				data = (m_trackball_axis_diff[0] - m_trackball_axis_diff[1]) / 2;
+				break;
+			case 3:
+				data = (m_trackball_axis_diff[0] + m_trackball_axis_diff[1]) / 2;
+				break;
+			default:
+				m_trackball_cnt = 0;
+				break;
+			}
+		}
+		break;
+	}
+	case 0x80:
+		data = 0;
+		break;
+	}
+	return data;
+}
+
+void igs_fear_state::xa_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (offset == 0)
+	{
+		m_xa_cmd = data;
+		igs027_trigger_irq(3);
+	}
+}
+
+void igs_fear_state::cpld_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	switch (offset * 4)
+	{
+	case 0x8:
+		m_ticket->motor_w(BIT(data, 7));
+		break;
+	}
 }
 
 void igs_fear_state::igs_fear(machine_config &config)
@@ -150,7 +482,11 @@ void igs_fear_state::igs_fear(machine_config &config)
 	screen.screen_vblank().set(FUNC(igs_fear_state::vblank_irq));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xGBR_555, 0x4000/2);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 0x4000/2);
+
+	V3021(config, "rtc");
+
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -206,25 +542,15 @@ ROM_END
 
 void igs_fear_state::init_igs_fear()
 {
-	/*
-	bp 8002A3C,1,{r0=1;g;}
-	*/
 	fearless_decrypt(machine());
 }
 
 void igs_fear_state::init_igs_superkds()
 {
-	/*
-	bp 5b4,1,{r0=0;g;}
-	bp 8001EAC,1,{r0=1;g;}
-	bp 8002450,1,{r3=0;g;}
-	bp 964,1,{r0=0;g;}
-	bp 698,1,{r0=0;g;}
-	*/
 	superkds_decrypt(machine());
 }
 
 } // anonymous namespace
 
-GAME( 2005, superkds, 0, igs_fear, fear, igs_fear_state, init_igs_superkds, ROT0, "IGS", "Super Kids (V019CN)",           MACHINE_IS_SKELETON )
+GAME( 2005, superkds, 0, igs_fear, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS", "Super Kids (S019CN)",           MACHINE_IS_SKELETON )
 GAME( 2006, fearless, 0, igs_fear, fear, igs_fear_state, init_igs_fear,     ROT0, "IGS", "Fearless Pinocchio (V101US)",   MACHINE_IS_SKELETON )
