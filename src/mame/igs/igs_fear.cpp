@@ -44,16 +44,6 @@ protected:
 	virtual void video_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<xa_cpu_device> m_xa;
-	required_shared_ptr<uint32_t> m_videoram;
-	required_device<palette_device> m_palette;
-	required_region_ptr<uint8_t> m_gfxrom;
-
-	required_device<ticket_dispenser_device> m_ticket;
-	required_ioport_array<2> m_io_dsw;
-	required_ioport_array<2> m_io_trackball;
-
 	void main_map(address_map &map);
 
 	void sound_irq(int state);
@@ -63,14 +53,9 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint32_t m_gpio_o;
 	uint32_t igs027_gpio_r(offs_t offset);
 	void igs027_gpio_w(offs_t offset, u32 data, u32 mem_mask);
 
-	uint32_t m_irq_enable;
-	uint32_t m_irq_pending;
-	emu_timer *m_timer0;
-	emu_timer *m_timer1;
 	TIMER_CALLBACK_MEMBER(igs027_timer0);
 	TIMER_CALLBACK_MEMBER(igs027_timer1);
 
@@ -79,14 +64,30 @@ private:
 	uint32_t igs027_periph_r(offs_t offset);
 	void igs027_periph_w(offs_t offset, u32 data, u32 mem_mask);
 
+	uint32_t xa_r(offs_t offset);
+	void xa_w(offs_t offset, u32 data, u32 mem_mask);
+	void cpld_w(offs_t offset, u32 data, u32 mem_mask);
+
+	uint32_t m_gpio_o;
+	uint32_t m_irq_enable;
+	uint32_t m_irq_pending;
+	emu_timer *m_timer0;
+	emu_timer *m_timer1;
+
 	uint32_t m_xa_cmd;
 	int m_trackball_cnt;
 	int m_trackball_axis[2], m_trackball_axis_pre[2], m_trackball_axis_diff[2];
-	uint32_t xa_r(offs_t offset);
-	void xa_w(offs_t offset, u32 data, u32 mem_mask);
 
-	void cpld_w(offs_t offset, u32 data, u32 mem_mask);
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<xa_cpu_device> m_xa;
+	required_shared_ptr<uint32_t> m_videoram;
+	required_device<palette_device> m_palette;
+	required_region_ptr<uint8_t> m_gfxrom;
 
+	required_device<ticket_dispenser_device> m_ticket;
+	required_ioport_array<2> m_io_dsw;
+	required_ioport_array<2> m_io_trackball;
 };
 
 
