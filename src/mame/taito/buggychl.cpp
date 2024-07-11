@@ -649,6 +649,7 @@ CUSTOM_INPUT_MEMBER( buggychl_state::pedal_in_r )
 }
 
 
+// defaults verified with manual, and yes: all ON for bank 2 while all OFF for banks 1/3
 static INPUT_PORTS_START( buggychl )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Game Over Bonus" ) PORT_DIPLOCATION("SW1:1,2")   // Arks/Flags/Fuel
@@ -668,7 +669,7 @@ static INPUT_PORTS_START( buggychl )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )        // Only listed as OFF in the manual
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )        // Only listed as OFF in the manual
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2,3,4")
