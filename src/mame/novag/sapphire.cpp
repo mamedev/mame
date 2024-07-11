@@ -5,6 +5,9 @@
 
 Novag Sapphire (model 9304)
 
+It's the successor to Novag VIP / Super VIP, the chess engine is again by
+David Kittinger.
+
 Hardware notes:
 - PCB label: 100168 REV A
 - Hitachi H8/325 MCU, 26.601712MHz XTAL
@@ -326,6 +329,7 @@ void sapphire_state::sapphire(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(4, 10);
 	m_lcd_pwm->output_x().set(FUNC(sapphire_state::lcd_pwm_w));
+	m_lcd_pwm->set_bri_levels(0.05);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
