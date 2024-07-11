@@ -47,12 +47,12 @@ namespace {
 
 ROM_START(mcx128)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_DEFAULT_BIOS("mc10_mcx128")
+	ROM_DEFAULT_BIOS("mc10")
 
-	ROM_SYSTEM_BIOS(0, "mc10_mcx128", "Darren Atkinson's MCX-128 cartridge")
+	ROM_SYSTEM_BIOS(0, "mc10", "Darren Atkinson's MCX-128 cartridge")
 	ROMX_LOAD("mcx128bas.rom", 0x0000, 0x4000, CRC(11202e4b) SHA1(36c30d0f198a1bffee88ef29d92f2401447a91f4), ROM_BIOS(0))
 
-	ROM_SYSTEM_BIOS(1, "alice_mcx128", "Darren Atkinson's MCX-128 cartridge for Alice")
+	ROM_SYSTEM_BIOS(1, "alice", "Darren Atkinson's MCX-128 cartridge for Alice")
 	ROMX_LOAD("alice128bas.rom", 0x0000, 0x4000, CRC(a737544a) SHA1(c8fd92705fc42deb6a0ffac6274e27fd61ecd4cc), ROM_BIOS(1))	
 ROM_END
 
@@ -116,9 +116,9 @@ mc10_pak_mcx128_device::mc10_pak_mcx128_device(const machine_config &mconfig, co
 {
 	const char *driver_name = mconfig.gamedrv().name;
 	if (strcmp(driver_name, "alice") == 0)
-	 	set_default_bios_tag("alice_mcx128");
+	 	set_default_bios_tag("alice");
 	else
-		set_default_bios_tag("mc10_mcx128");
+		set_default_bios_tag("mc10");
 }
 
 const tiny_rom_entry * mc10_pak_mcx128_device::device_rom_region() const
