@@ -413,7 +413,8 @@ u64 h8_sci_device::internal_update(u64 current_time)
 			m_clock_event = 0;
 
 		if(m_clock_event) {
-			m_sync_timer->adjust(attotime::from_ticks(m_clock_event - m_cpu->now_as_cycles(), m_cpu->system_clock()));
+			if(s64 ticks = m_clock_event - m_cpu->now_as_cycles(); ticks >= 0LL)
+				m_sync_timer->adjust(attotime::from_ticks(ticks, m_cpu->system_clock()));
 			m_cpu->internal_update();
 		}
 
