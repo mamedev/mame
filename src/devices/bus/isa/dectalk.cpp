@@ -63,7 +63,7 @@ void dectalk_isa_device::dma_w(uint8_t data)
 
 void dectalk_isa_device::dac_w(uint16_t data)
 {
-	m_dac->write(data >> 4);
+	m_dac->write(data);
 }
 
 void dectalk_isa_device::output_ctl_w(uint16_t data)
@@ -166,7 +166,7 @@ void dectalk_isa_device::device_add_mconfig(machine_config &config)
 	m_dsp->bio().set(FUNC(dectalk_isa_device::bio_line_r));
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_12BIT_R2R(config, m_dac, 0).add_route(0, "speaker", 1.0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(0, "speaker", 1.0); // unknown DAC
 }
 
 void dectalk_isa_device::write(offs_t offset, uint8_t data)
