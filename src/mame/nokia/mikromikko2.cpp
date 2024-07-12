@@ -43,7 +43,7 @@ void mm2_state::novram_store(offs_t offset, uint8_t data)
 
 void mm2_state::novram_recall(offs_t offset, uint8_t data)
 {
-	m_novram->recall(BIT(data, 0));
+	m_novram->recall(!BIT(data, 0));
 }
 
 uint8_t mm2_state::videoram_r(offs_t offset)
@@ -59,6 +59,15 @@ uint8_t mm2_state::videoram_r(offs_t offset)
 	m_drb1->write(data >> 8);
 
 	return data & 0xff;
+}
+
+uint8_t mm2_state::status_r(offs_t offset)
+{
+	uint8_t data = 0x80;
+
+	data |= !m_rs232a->dsr_r() << 4;
+	
+	return data;
 }
 
 void mm2_state::mm2_map(address_map &map)
@@ -77,24 +86,24 @@ void mm2_state::mm2_io_map(address_map &map)
 {
 	// SBC16
 	map(0xf800, 0xf803).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0xf880, 0xf887).rw(m_mpsc, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0xff00);
-	//map(0xf885, 0xf885) STATUS INPUT PORT
+	map(0xf880, 0xf887).rw(m_mpsc, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
+	map(0xf884, 0xf885).r(FUNC(mm2_state::status_r)).umask16(0xff00);
 	map(0xf900, 0xf901).w(FUNC(mm2_state::novram_store)).umask16(0x00ff);
 	map(0xf97e, 0xf97f).w(FUNC(mm2_state::novram_recall)).umask16(0xff00);
 	map(0xf930, 0xf937).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
-	//map(0xf941, 0xf941) TIMER INTERRUPT CLEAR LATCH
+	map(0xf940, 0xf941).w(FUNC(mm2_state::tcl_w)).umask16(0xff00);
 	map(0xf950, 0xf951).w(FUNC(mm2_state::diag_w)).umask16(0xff00);
-	//map(0xf961, 0xf961) CLOCK SELECT CLS0
-	//map(0xf963, 0xf963) CLOCK SELECT CLS1
+	map(0xf960, 0xf961).w(FUNC(mm2_state::cls0_w)).umask16(0xff00);
+	map(0xf962, 0xf963).w(FUNC(mm2_state::cls1_w)).umask16(0xff00);
 	//map(0xf965, 0xf965) LOOPBACK LLBA
 	//map(0xf967, 0xf967) LOOPBACK LLBB
 	//map(0xf969, 0xf969) DATA CODING NRZI
 	//map(0xf96b, 0xf96b) SIGNAL LEVELS V24
 	//map(0xf96d, 0xf96d) SIGNAL LEVELS X27
-	//map(0xf96f, 0xf96f) V24 SIGNAL DTRA
+	map(0xf96e, 0xf96f).w(FUNC(mm2_state::dtra_w)).umask16(0xff00);
 	//map(0xf971, 0xf971) V24 SIGNAL TSTA
 	//map(0xf973, 0xf973) V24 SIGNAL SRSA
-	//map(0xf975, 0xf975) V24 SIGNAL DTRB
+	map(0xf974, 0xf975).w(FUNC(mm2_state::dtrb_w)).umask16(0xff00);
 
 	// CRTC186
 	map(0xf980, 0xf9ff).rw(m_vpac, FUNC(crt9007_device::read), FUNC(crt9007_device::write)).umask16(0x00ff);
@@ -220,6 +229,8 @@ void mm2_state::mm2(machine_config &config)
 	I80186(config, m_maincpu, 16_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::mm2_map);
 	m_maincpu->set_addrmap(AS_IO, &mm2_state::mm2_io_map);
+	m_maincpu->tmrout0_handler().set(FUNC(mm2_state::tmrout0_w));
+	m_maincpu->tmrout1_handler().set(FUNC(mm2_state::tmrout1_w));
 
 	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
@@ -228,12 +239,25 @@ void mm2_state::mm2(machine_config &config)
 	m_pit->set_clk<0>(16_MHz_XTAL/8);
 	m_pit->set_clk<1>(16_MHz_XTAL/8);
 	m_pit->set_clk<2>(16_MHz_XTAL/8);
-	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
-	//m_pit->out_handler<1>().set()); MPSC ch B line clock
+	m_pit->out_handler<0>().set(FUNC(mm2_state::ir0_w));
+	m_pit->out_handler<1>().set(m_mpsc, FUNC(i8274_device::rxtxcb_w));
 	m_pit->out_handler<2>().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	I8274(config, m_mpsc, 16_MHz_XTAL/4);
+	m_mpsc->out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_rtsa_callback().set(m_rs232a, FUNC(rs232_port_device::write_rts));
+	m_mpsc->out_txdb_callback().set(m_rs232b, FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_rtsb_callback().set(m_rs232b, FUNC(rs232_port_device::write_rts));
 	m_mpsc->out_int_callback().set(m_pic, FUNC(pic8259_device::ir1_w));
+	
+	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
+	m_rs232a->rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
+	m_rs232a->dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcda_w));
+	m_rs232a->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsa_w));
+	
+	RS232_PORT(config, m_rs232b, default_rs232_devices, "terminal");
+	m_rs232b->rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxb_w));
+	m_rs232b->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
 
 	X2212(config, m_novram);
 
