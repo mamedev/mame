@@ -19,6 +19,9 @@
 #include "emu.h"
 #include "pgmcrypt.h"
 
+#include "endianness.h"
+
+
 // a common set of these are used, selectable in the real scheme by an uploaded bitfield
 // some may be duplicates simply due to differing ROM sizes
 
@@ -1417,8 +1420,7 @@ static const uint8_t superkds_tab[256] = {
 
 void superkds_decrypt(running_machine &machine)
 {
-	// FIXME: Endianness bug - casting a 32-bit ROM region to u16
-	auto const src = reinterpret_cast<u16 *>(machine.root_device().memregion("user1")->base());
+	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(machine.root_device().memregion("user1")->base()));
 
 	int const rom_size = 0x80000;
 
@@ -1443,8 +1445,7 @@ void superkds_decrypt(running_machine &machine)
 
 void fearless_decrypt(running_machine &machine)
 {
-	// FIXME: Endianness bug - casting a 32-bit ROM region to u16
-	auto const src = reinterpret_cast<u16 *>(machine.root_device().memregion("user1")->base());
+	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(machine.root_device().memregion("user1")->base()));
 
 	int const rom_size = 0x80000;
 

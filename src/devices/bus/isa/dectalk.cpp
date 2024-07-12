@@ -155,12 +155,12 @@ const tiny_rom_entry* dectalk_isa_device::device_rom_region() const
 
 void dectalk_isa_device::device_add_mconfig(machine_config &config)
 {
-	I80186(config, m_cpu, XTAL(20'000'000));
+	I80186(config, m_cpu, 20_MHz_XTAL);
 	m_cpu->set_addrmap(AS_PROGRAM, &dectalk_isa_device::dectalk_cpu_map);
 	m_cpu->set_addrmap(AS_IO, &dectalk_isa_device::dectalk_cpu_io);
 	m_cpu->tmrout0_handler().set(FUNC(dectalk_isa_device::clock_w));
 
-	TMS32015(config, m_dsp, XTAL(80'000'000)); // this is wrong, but it works
+	TMS32015(config, m_dsp, 80'000'000); // the a 20MHz oscillator is present - clock frequency hacked to make it "work"
 	m_dsp->set_addrmap(AS_PROGRAM, &dectalk_isa_device::dectalk_dsp_map);
 	m_dsp->set_addrmap(AS_IO, &dectalk_isa_device::dectalk_dsp_io);
 	m_dsp->bio().set(FUNC(dectalk_isa_device::bio_line_r));

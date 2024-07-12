@@ -9,8 +9,8 @@
 #include "cpu/arm7/arm7core.h"
 #include "cpu/xa/xa.h"
 #include "machine/nvram.h"
-#include "machine/v3021.h"
 #include "machine/ticket.h"
+#include "machine/v3021.h"
 #include "sound/ics2115.h"
 
 #include "emupal.h"
@@ -51,9 +51,9 @@ private:
 
 	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int height, int width, int palette, int flipx, int romoffset);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint32_t igs027_gpio_r(offs_t offset);
+	u32 igs027_gpio_r(offs_t offset);
 	void igs027_gpio_w(offs_t offset, u32 data, u32 mem_mask);
 
 	TIMER_CALLBACK_MEMBER(igs027_timer0);
@@ -61,29 +61,29 @@ private:
 
 	void igs027_periph_init(void);
 	void igs027_trigger_irq(int num);
-	uint32_t igs027_periph_r(offs_t offset);
+	u32 igs027_periph_r(offs_t offset);
 	void igs027_periph_w(offs_t offset, u32 data, u32 mem_mask);
 
-	uint32_t xa_r(offs_t offset);
+	u32 xa_r(offs_t offset);
 	void xa_w(offs_t offset, u32 data, u32 mem_mask);
 	void cpld_w(offs_t offset, u32 data, u32 mem_mask);
 
-	uint32_t m_gpio_o;
-	uint32_t m_irq_enable;
-	uint32_t m_irq_pending;
+	u32 m_gpio_o;
+	u32 m_irq_enable;
+	u32 m_irq_pending;
 	emu_timer *m_timer0;
 	emu_timer *m_timer1;
 
-	uint32_t m_xa_cmd;
+	u32 m_xa_cmd;
 	int m_trackball_cnt;
 	int m_trackball_axis[2], m_trackball_axis_pre[2], m_trackball_axis_diff[2];
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<xa_cpu_device> m_xa;
-	required_shared_ptr<uint32_t> m_videoram;
+	required_shared_ptr<u32> m_videoram;
 	required_device<palette_device> m_palette;
-	required_region_ptr<uint8_t> m_gfxrom;
+	required_region_ptr<u8> m_gfxrom;
 
 	required_device<ticket_dispenser_device> m_ticket;
 	required_ioport_array<2> m_io_dsw;
@@ -101,18 +101,18 @@ void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect
 	if ((romoffset != 0) && (romoffset != 0xffffffff))
 	{
 		//logerror("x=%d, y=%d, w=%d pix, h=%d pix, c=0x%02x, romoffset=0x%08x\n", xpos, ypos, width, height, palette, romoffset << 2);
-		const uint8_t *gfxrom = &m_gfxrom[romoffset << 2];
+		const u8 *gfxrom = &m_gfxrom[romoffset << 2];
 		const int x_base = flipx ? (xpos + width - 1) : xpos;
 		const int x_inc = flipx ? (-1) : 1;
 		palette = (palette & 0x3f) << 7;
 
 		for (int y = 0; y < height; y++)
 		{
-			uint16_t *dest = &bitmap.pix(ypos + y);
+			u16 *dest = &bitmap.pix(ypos + y);
 			int x_index = x_base;
 			for (int x = 0; x < width; x++)
 			{
-				uint8_t pix = *gfxrom++;
+				u8 pix = *gfxrom++;
 				if (pix)
 				{
 					if (cliprect.contains(x_index, ypos + y))
@@ -124,7 +124,7 @@ void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
-uint32_t igs_fear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 igs_fear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x3ff, cliprect);
 
@@ -312,16 +312,18 @@ void igs_fear_state::vblank_irq(int state)
 		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 }
 
-uint32_t igs_fear_state::igs027_gpio_r(offs_t offset)
+u32 igs_fear_state::igs027_gpio_r(offs_t offset)
 {
-	uint32_t data = -1;
+	u32 data = ~u32(0);
 	switch (offset * 4)
 	{
 	case 0xc:
-		uint8_t ret = 0xff;
-		if (!BIT(m_gpio_o, 0)) ret &= m_io_dsw[0]->read();
-		if (!BIT(m_gpio_o, 1)) ret &= m_io_dsw[1]->read();
-		data = 0x2000 | (ret << 3);
+		{
+			u8 ret = 0xff;
+			if (!BIT(m_gpio_o, 0)) ret &= m_io_dsw[0]->read();
+			if (!BIT(m_gpio_o, 1)) ret &= m_io_dsw[1]->read();
+			data = 0x2000 | (u32(ret) << 3);
+		}
 		break;
 	}
 	return data;
@@ -339,17 +341,17 @@ void igs_fear_state::igs027_gpio_w(offs_t offset, u32 data, u32 mem_mask)
 
 void igs_fear_state::igs027_periph_init()
 {
-	m_irq_enable = 0xFF;
-	m_irq_pending = 0xFF;
+	m_irq_enable = 0xff;
+	m_irq_pending = 0xff;
 	m_timer0 = timer_alloc(FUNC(igs_fear_state::igs027_timer0), this);
 	m_timer1 = timer_alloc(FUNC(igs_fear_state::igs027_timer1), this);
 }
 
 void igs_fear_state::igs027_trigger_irq(int num)
 {
-	if ((m_irq_enable & (1 << num)) == 0)
+	if (!BIT(m_irq_enable, num))
 	{
-		m_irq_pending &= ~(1 << num);
+		m_irq_pending &= ~(u32(1) << num);
 		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 }
@@ -383,23 +385,23 @@ void igs_fear_state::igs027_periph_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 }
 
-uint32_t igs_fear_state::igs027_periph_r(offs_t offset)
+u32 igs_fear_state::igs027_periph_r(offs_t offset)
 {
-	uint32_t data = -1;
+	u32 data = ~u32(0);
 	switch (offset * 4)
 	{
 	case 0x200:
 		data = m_irq_pending;
-		m_irq_pending = 0xFF;
+		m_irq_pending = 0xff;
 		break;
 	}
 	return data;
 }
 
 // TODO: ICS2115 & trackball support in XA
-uint32_t igs_fear_state::xa_r(offs_t offset)
+u32 igs_fear_state::xa_r(offs_t offset)
 {
-	uint32_t data = -1;
+	u32 data = ~u32(0);
 
 	switch (offset * 4)
 	{
@@ -553,4 +555,4 @@ void igs_fear_state::init_igs_superkds()
 } // anonymous namespace
 
 GAME( 2005, superkds, 0, igs_fear, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS", "Super Kids (S019CN)",           MACHINE_IS_SKELETON )
-GAME( 2006, fearless, 0, igs_fear, fear, igs_fear_state, init_igs_fear,     ROT0, "IGS", "Fearless Pinocchio (V101US)",   MACHINE_IS_SKELETON )
+GAME( 2006, fearless, 0, igs_fear, fear,     igs_fear_state, init_igs_fear,     ROT0, "IGS", "Fearless Pinocchio (V101US)",   MACHINE_IS_SKELETON )
