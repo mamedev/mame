@@ -8,7 +8,11 @@ Tiger Electronics K-2-8: Talking Learning Computer (model 7-230/7-231)
 3 models exist:
 - 7-230: darkblue case, toy-ish looks
 - 7-231: gray case, hardware is the same
-- 7-232: this one is completely different hw --> driver k28m2.cpp
+- 7-232: this one is on completely different hardware*
+
+*: Considering the different look and feel and the 4 year difference, k28o is not
+a MAME clone set of k28. It's more like a predecessor instead of an older revision.
+See k28.cpp for the newer version.
 
 Hardware notes:
 - PCB label: PB-123 WIZARD, TIGER
@@ -18,8 +22,8 @@ Hardware notes:
 - SC-01-A speech chip
 - module slot
 
-6 modules were announced (see back of the box), but it's not known if they
-were actually released.
+6 modules were announced (see back of the box), but it's not known if they were
+actually released.
 
 TODO:
 - plosive consonants are very difficult to hear, it's an issue in votrax.cpp
@@ -38,15 +42,15 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "k28.lh"
+#include "k28o.lh"
 
 
 namespace {
 
-class k28_state : public driver_device
+class k28o_state : public driver_device
 {
 public:
-	k28_state(const machine_config &mconfig, device_type type, const char *tag) :
+	k28o_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vfd(*this, "vfd"),
@@ -56,7 +60,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	void k28(machine_config &config);
+	void k28o(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_on);
 
@@ -89,7 +93,7 @@ private:
 	void power_off();
 };
 
-void k28_state::machine_start()
+void k28o_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_power_on));
@@ -106,7 +110,7 @@ void k28_state::machine_start()
     Power
 *******************************************************************************/
 
-void k28_state::machine_reset()
+void k28o_state::machine_reset()
 {
 	m_vfd_data = 0;
 	m_power_on = true;
@@ -116,13 +120,13 @@ void k28_state::machine_reset()
 	m_onbutton_time = machine().time() + attotime::from_msec(250);
 }
 
-INPUT_CHANGED_MEMBER(k28_state::power_on)
+INPUT_CHANGED_MEMBER(k28o_state::power_on)
 {
 	if (newval && !m_power_on)
 		machine_reset();
 }
 
-void k28_state::power_off()
+void k28o_state::power_off()
 {
 	m_power_on = false;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -137,7 +141,7 @@ void k28_state::power_off()
 
 // MM5445 VFD
 
-void k28_state::vfd_output_w(u64 data)
+void k28o_state::vfd_output_w(u64 data)
 {
 	// O1-O16: digit segment data
 	// O17-O25: digit select
@@ -153,7 +157,7 @@ void k28_state::vfd_output_w(u64 data)
 
 // I8021 ports
 
-void k28_state::mcu_p0_w(u8 data)
+void k28o_state::mcu_p0_w(u8 data)
 {
 	// d0,d1: phoneme high bits
 	// d0-d2: input mux high bits
@@ -179,7 +183,7 @@ void k28_state::mcu_p0_w(u8 data)
 	m_tms6100->clk_w(0);
 }
 
-u8 k28_state::mcu_p1_r()
+u8 k28o_state::mcu_p1_r()
 {
 	u8 data = 0;
 
@@ -197,13 +201,13 @@ u8 k28_state::mcu_p1_r()
 	return data ^ 0xff;
 }
 
-u8 k28_state::mcu_p2_r()
+u8 k28o_state::mcu_p2_r()
 {
 	// d3: VSM data
 	return (m_tms6100->data_line_r()) ? 8 : 0;
 }
 
-void k28_state::mcu_p2_w(u8 data)
+void k28o_state::mcu_p2_w(u8 data)
 {
 	// d0: VFD driver serial data
 	m_vfd->data_w(data & 1);
@@ -220,7 +224,7 @@ void k28_state::mcu_p2_w(u8 data)
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( k28 )
+static INPUT_PORTS_START( k28o )
 	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("Yes/True")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
@@ -272,7 +276,7 @@ static INPUT_PORTS_START( k28 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 
 	PORT_START("IN.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, k28_state, power_on, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, k28o_state, power_on, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
@@ -298,24 +302,25 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void k28_state::k28(machine_config &config)
+void k28o_state::k28o(machine_config &config)
 {
 	// basic machine hardware
 	I8021(config, m_maincpu, 3.579545_MHz_XTAL);
-	m_maincpu->bus_out_cb().set(FUNC(k28_state::mcu_p0_w));
-	m_maincpu->p1_in_cb().set(FUNC(k28_state::mcu_p1_r));
-	m_maincpu->p2_in_cb().set(FUNC(k28_state::mcu_p2_r));
-	m_maincpu->p2_out_cb().set(FUNC(k28_state::mcu_p2_w));
+	m_maincpu->bus_out_cb().set(FUNC(k28o_state::mcu_p0_w));
+	m_maincpu->p1_in_cb().set(FUNC(k28o_state::mcu_p1_r));
+	m_maincpu->p2_in_cb().set(FUNC(k28o_state::mcu_p2_r));
+	m_maincpu->p2_out_cb().set(FUNC(k28o_state::mcu_p2_w));
 	m_maincpu->prog_out_cb().set("vfd", FUNC(mm5445_device::clock_w));
 	m_maincpu->t1_in_cb().set("speech", FUNC(votrax_sc01_device::request));
 
 	TMS6100(config, m_tms6100, 3.579545_MHz_XTAL / 15); // CLK tied to 8021 ALE pin
 
 	// video hardware
-	MM5445(config, m_vfd).output_cb().set(FUNC(k28_state::vfd_output_w));
+	MM5445(config, m_vfd).output_cb().set(FUNC(k28o_state::vfd_output_w));
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	m_display->set_segmask(0x1ff, 0x3fff);
-	config.set_default_layout(layout_k28);
+
+	config.set_default_layout(layout_k28o);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -328,7 +333,7 @@ void k28_state::k28(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( k28 )
+ROM_START( k28o )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "p8021_7-230-itl", 0x0000, 0x0400, CRC(15536d20) SHA1(fac98ce652340ffb2d00952697c3a9ce75393fa4) )
 
@@ -345,5 +350,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, k28,  0,      0,      k28,     k28,   k28_state, empty_init, "Tiger Electronics", "K-2-8: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, k28o,  0,      0,      k28o,    k28o,  k28o_state, empty_init, "Tiger Electronics", "K-2-8: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
