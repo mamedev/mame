@@ -33340,6 +33340,7 @@ commsega                        // (c) 1983 Sega
 cottong                         // bootleg
 dngrtrck                        // Petaco bootleg
 gutangtn                        // GX359 (c) 1982 Konami + Sega license
+gutangtnk                       // GX359 (c) 1982 Konami
 jackler                         // 1 9 8 2 (Jungler Bootleg)
 jungler                         // GX327 (c) 1981 Konami
 junglero                        // Olympia license
@@ -42615,7 +42616,7 @@ ikari3u                         // A7007 'IK3'(c) 1989
 ikari3w                         // A7007 'IK3'(c) 1989
 pow                             // A7008 'DG' (c) 1988
 powa                            // A7008 'DG' (c) 1988
-powb                            // bootleg
+powbl                           // bootleg
 powj                            // A7008 'DG' (c) 1988
 searchar                        // A8007 'BH' (c) 1989
 searcharj                       // A8007 'BH' (c) 1989
@@ -42624,6 +42625,7 @@ streetsm                        // A8007 'S2' (c) 1989
 streetsm1                       // A7008 'S2' (c) 1989
 streetsmj                       // A8007 'S2' (c) 1989
 streetsmw                       // (c) 1989
+streetsmwbl                     // bootleg
 
 @source:sony/betacam.cpp
 uvw1200                         // 199? Sony Betacam-SP UVW-1200

@@ -35,9 +35,9 @@ public:
 
 	void streetsm(machine_config &config);
 	void pow(machine_config &config);
-	void powb(machine_config &config);
+	void powbl(machine_config &config);
 
-	void init_powb();
+	void init_powbl();
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -86,7 +86,7 @@ private:
 	void tile_callback_pow(int &tile, int& fx, int& fy, int& region);
 
 	void pow_map(address_map &map);
-	void powb_sound_io_map(address_map &map);
+	void powbl_sound_io_map(address_map &map);
 };
 
 class searchar_state : public snk68_state
