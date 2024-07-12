@@ -55,7 +55,7 @@ private:
 	uint16_t m_winrun_dspcomram_control[8]{};
 	std::unique_ptr<uint16_t[]> m_winrun_dspcomram;
 	uint16_t m_winrun_poly_buf[WINRUN_MAX_POLY_PARAM]{};
-	int m_winrun_poly_index = 0;
+	unsigned m_winrun_poly_index = 0;
 	uint32_t m_winrun_pointrom_addr = 0;
 	int m_winrun_dsp_alive = 0;
 
