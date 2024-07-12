@@ -8,7 +8,7 @@ Tiger Electronics K-2-8 (model 7-232) Sold in Hong Kong, distributed in US as:
 - Sears: Talkatron: Learning Computer
 
 1981 K-2-8 models 7-230 and 7-231 are on different hardware, having a different
-keyboard, VFD, and the SC-01-A speech chip. --> driver k28.cpp
+keyboard, VFD, and the SC-01-A speech chip, emulated in k28o.cpp.
 
 Hardware notes:
 - PCB label: 201223A (main), REV0 ET828D (LCD)
@@ -35,15 +35,15 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "k28m2.lh"
+#include "k28.lh"
 
 
 namespace {
 
-class k28m2_state : public driver_device
+class k28_state : public driver_device
 {
 public:
-	k28m2_state(const machine_config &mconfig, device_type type, const char *tag) :
+	k28_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
@@ -54,7 +54,7 @@ public:
 		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void k28m2(machine_config &config);
+	void k28(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_on);
 
@@ -88,7 +88,7 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 };
 
-void k28m2_state::machine_start()
+void k28_state::machine_start()
 {
 	m_digits.resolve();
 
@@ -105,20 +105,20 @@ void k28m2_state::machine_start()
     Power
 *******************************************************************************/
 
-void k28m2_state::machine_reset()
+void k28_state::machine_reset()
 {
 	m_power_on = true;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-INPUT_CHANGED_MEMBER(k28m2_state::power_on)
+INPUT_CHANGED_MEMBER(k28_state::power_on)
 {
 	if (newval && !m_power_on)
 		machine_reset();
 }
 
-void k28m2_state::power_off()
+void k28_state::power_off()
 {
 	m_power_on = false;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -135,7 +135,7 @@ void k28m2_state::power_off()
     Cartridge
 *******************************************************************************/
 
-DEVICE_IMAGE_LOAD_MEMBER(k28m2_state::cart_load)
+DEVICE_IMAGE_LOAD_MEMBER(k28_state::cart_load)
 {
 	u32 const size = m_cart->common_get_size("rom");
 
@@ -156,7 +156,7 @@ DEVICE_IMAGE_LOAD_MEMBER(k28m2_state::cart_load)
 
 // maincpu side
 
-void k28m2_state::write_r(u32 data)
+void k28_state::write_r(u32 data)
 {
 	// R1234: TMS5100 CTL8421
 	u32 r = bitswap<5>(data,0,1,2,3,4) | (data & ~0x1f);
@@ -178,13 +178,13 @@ void k28m2_state::write_r(u32 data)
 	m_r = r;
 }
 
-void k28m2_state::write_o(u16 data)
+void k28_state::write_o(u16 data)
 {
 	// O0-O7: input mux low
 	m_inp_mux = (m_inp_mux & ~0xff) | data;
 }
 
-u8 k28m2_state::read_k()
+u8 k28_state::read_k()
 {
 	u8 data = 0;
 
@@ -200,7 +200,7 @@ u8 k28m2_state::read_k()
 
 // subcpu side
 
-void k28m2_state::write_segs(offs_t offset, u32 data)
+void k28_state::write_segs(offs_t offset, u32 data)
 {
 	m_digit_data[offset & 3] = data;
 
@@ -215,7 +215,7 @@ void k28m2_state::write_segs(offs_t offset, u32 data)
 	}
 }
 
-u8 k28m2_state::sub_read_k()
+u8 k28_state::sub_read_k()
 {
 	// K: maincpu R7-R10
 	return m_r >> 7 & 0xf;
@@ -227,7 +227,7 @@ u8 k28m2_state::sub_read_k()
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( k28m2 )
+static INPUT_PORTS_START( k28 )
 	PORT_START("IN.0") // O0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") // -> auto_power_off
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('A') PORT_NAME("A/1")
@@ -235,7 +235,7 @@ static INPUT_PORTS_START( k28m2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
 
 	PORT_START("IN.1") // O1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, k28m2_state, power_on, 0) PORT_NAME("On")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, k28_state, power_on, 0) PORT_NAME("On")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('B') PORT_NAME("B/2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('K') PORT_NAME("K/+")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
@@ -289,23 +289,23 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void k28m2_state::k28m2(machine_config &config)
+void k28_state::k28(machine_config &config)
 {
 	constexpr u32 MASTER_CLOCK = 640'000; // approximation
 
 	// basic machine hardware
 	TMS1400(config, m_maincpu, MASTER_CLOCK/2);
-	m_maincpu->read_k().set(FUNC(k28m2_state::read_k));
-	m_maincpu->write_o().set(FUNC(k28m2_state::write_o));
-	m_maincpu->write_r().set(FUNC(k28m2_state::write_r));
+	m_maincpu->read_k().set(FUNC(k28_state::read_k));
+	m_maincpu->write_o().set(FUNC(k28_state::write_o));
+	m_maincpu->write_r().set(FUNC(k28_state::write_r));
 
 	SMC1112(config, m_subcpu, 32.768_kHz_XTAL);
-	m_subcpu->read_k().set(FUNC(k28m2_state::sub_read_k));
-	m_subcpu->write_segs().set(FUNC(k28m2_state::write_segs));
+	m_subcpu->read_k().set(FUNC(k28_state::sub_read_k));
+	m_subcpu->write_segs().set(FUNC(k28_state::write_segs));
 
 	config.set_perfect_quantum(m_subcpu);
 
-	config.set_default_layout(layout_k28m2);
+	config.set_default_layout(layout_k28);
 
 	// sound hardware
 	TMS6100(config, m_tms6100, MASTER_CLOCK/4);
@@ -320,10 +320,10 @@ void k28m2_state::k28m2(machine_config &config)
 	m_tms5100->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	// cartridge
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "k28m2", "vsm,bin");
-	m_cart->set_device_load(FUNC(k28m2_state::cart_load));
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "k28", "vsm,bin");
+	m_cart->set_device_load(FUNC(k28_state::cart_load));
 
-	SOFTWARE_LIST(config, "cart_list").set_original("k28m2");
+	SOFTWARE_LIST(config, "cart_list").set_original("k28");
 }
 
 
@@ -332,14 +332,14 @@ void k28m2_state::k28m2(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( k28m2 )
+ROM_START( k28 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mp7324", 0x0000, 0x1000, CRC(8d304cf2) SHA1(d649b6477ea8634b3a3ba34dde7e5e913855801f) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_k28m2_output.pla", 0, 557, CRC(3a5c7005) SHA1(3fe5819c138a90e7fc12817415f2622ca81b40b2) )
+	ROM_LOAD( "tms1400_k28_output.pla", 0, 557, CRC(3a5c7005) SHA1(3fe5819c138a90e7fc12817415f2622ca81b40b2) )
 
 	ROM_REGION( 0x0800, "subcpu", 0 )
 	ROM_LOAD( "smc1112_d2n0", 0x0000, 0x0800, CRC(e985fd67) SHA1(a0b0280920bf0ac02a1aaf02d534dddbae829433) )
@@ -356,5 +356,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, k28m2,  0,      0,      k28m2,   k28m2, k28m2_state, empty_init, "Tiger Electronics", "K-2-8: Talking Learning Computer (model 7-232)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1985, k28,  0,      0,      k28,     k28,   k28_state, empty_init, "Tiger Electronics", "K-2-8: Talking Learning Computer (model 7-232)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

@@ -31,14 +31,14 @@ modules. CM62215 was confirmed to be the same as CM62087.
 
 -->
 
-<softwarelist name="k28m2" description="K-2-8 (model 7-232) modules">
+<softwarelist name="k28" description="K-2-8 (model 7-232) modules">
 
 	<software name="spell1">
 		<description>Spelling 1 (Expansion Module 1)</description>
 		<year>1985</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="8111"/>
-		<part name="cart" interface="k28m2">
+		<part name="cart" interface="k28">
 			<dataarea name="rom" size="0x4000">
 				<rom name="cm62086" size="0x4000" crc="0349798b" sha1="afdad242f9c7dec0c5fd83670e3d8f1637140e76" />
 			</dataarea>
@@ -50,7 +50,7 @@ modules. CM62215 was confirmed to be the same as CM62087.
 		<year>1985</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="8112"/>
-		<part name="cart" interface="k28m2">
+		<part name="cart" interface="k28">
 			<dataarea name="rom" size="0x4000">
 				<rom name="cm62216" size="0x4000" crc="1c99306f" sha1="7bfadeec79bdc231c4e3447149e2f6542cfe077d" />
 			</dataarea>
@@ -62,7 +62,7 @@ modules. CM62215 was confirmed to be the same as CM62087.
 		<year>1985</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="8113"/>
-		<part name="cart" interface="k28m2">
+		<part name="cart" interface="k28">
 			<dataarea name="rom" size="0x4000">
 				<rom name="cm62215" size="0x4000" crc="f2deb9a2" sha1="9fb264b869d1298ebd76811931bed83ac122fe4b" />
 			</dataarea>
@@ -74,7 +74,7 @@ modules. CM62215 was confirmed to be the same as CM62087.
 		<year>1985</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="8114"/>
-		<part name="cart" interface="k28m2">
+		<part name="cart" interface="k28">
 			<dataarea name="rom" size="0x4000">
 				<rom name="cm62217" size="0x4000" crc="995936b2" sha1="8bd0fea4ade9972d1d6cb521f9367c971c7eead6" />
 			</dataarea>
@@ -86,7 +86,7 @@ modules. CM62215 was confirmed to be the same as CM62087.
 		<year>1987</year>
 		<publisher>Coleco</publisher>
 		<info name="serial" value="8116"/>
-		<part name="cart" interface="k28m2">
+		<part name="cart" interface="k28">
 			<dataarea name="rom" size="0x4000">
 				<rom name="cm62219" size="0x4000" crc="177b5cb5" sha1="2ed44fea8f931fc8aa46dafdda1c6c30b8c9dc01" />
 			</dataarea>

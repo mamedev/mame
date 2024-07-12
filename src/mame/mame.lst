@@ -44749,8 +44749,8 @@ monkmonk
 @source:tiger/gamecom.cpp
 gamecom                         // Tiger Game.com
 
-@source:tiger/k28m2.cpp
-k28m2
+@source:tiger/k28.cpp
+k28
 
 @source:tiger/k28o.cpp
 k28o
