@@ -65,7 +65,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override { m_dac->write(0x80); }
 
 private:
 	// devices/pointers
@@ -117,11 +117,6 @@ void ivanto_state::machine_start()
 	save_item(NAME(m_latch));
 	save_item(NAME(m_lcd_segs));
 	save_item(NAME(m_lcd_com));
-}
-
-void ivanto_state::machine_reset()
-{
-	m_dac->write(0x80);
 }
 
 

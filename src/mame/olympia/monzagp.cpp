@@ -575,8 +575,8 @@ ROM_START( monzagp )
 	ROM_LOAD( "74s287.7",    0x0600, 0x0100, CRC(3248ba56) SHA1(d449f4be8df1b4189afca55a4cf0cc2e19eb4dd4) )
 ROM_END
 
-// bootleg hardware seems identical, just bad quality PCB. Same set also found on original PCB.
-ROM_START( monzagpb )
+// Dumped from an original PCB. Also seen on a bootleg that appears to have identical hardware, just bad quality PCB.
+ROM_START( monzagpa )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "m12c.6a",     0x0000, 0x0400, CRC(35715718) SHA1(aa64cedf1f5898b109f643975722cf15a1c752ba) )
 	ROM_LOAD( "m13c.7a",     0x0400, 0x0400, CRC(4e16bb68) SHA1(fb1d311a40145b3dccbd3d003a683c12898f43ff) )
@@ -616,4 +616,4 @@ ROM_END
 
 
 GAMEL( 1981, monzagp,  0,       monzagp, monzagp, monzagp_state, empty_init, ROT270, "Olympia", "Monza GP (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND, layout_monzagp )
-GAMEL( 1981, monzagpb, monzagp, monzagp, monzagp, monzagp_state, empty_init, ROT270, "bootleg", "Monza GP (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND, layout_monzagp )
+GAMEL( 1981, monzagpa, monzagp, monzagp, monzagp, monzagp_state, empty_init, ROT270, "Olympia", "Monza GP (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND, layout_monzagp )

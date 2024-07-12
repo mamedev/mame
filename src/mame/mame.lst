@@ -35118,7 +35118,7 @@ speedrs
 
 @source:olympia/monzagp.cpp
 monzagp                         // (c) 1981 Olympia
-monzagpb                        // bootleg
+monzagpa                        // (c) 1981 Olympia
 
 @source:olympia/portrait.cpp
 portrait                        // (c) 1983 Olympia

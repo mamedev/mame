@@ -10,9 +10,9 @@ Tiger Electronics K-2-8: Talking Learning Computer (model 7-230/7-231)
 - 7-231: gray case, hardware is the same
 - 7-232: this one is on completely different hardware*
 
-*: Considering the different look and feel and the 4 year difference, k28o is not
-a MAME clone set of k28. It's more like a predecessor instead of an older revision.
-See k28.cpp for the newer version.
+*: See k28.cpp for the newer version. Considering the different look and feel
+and the 4 year difference, k28o is not a MAME clone set of k28. It's more like
+a predecessor instead of an older revision.
 
 Hardware notes:
 - PCB label: PB-123 WIZARD, TIGER
