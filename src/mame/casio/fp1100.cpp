@@ -73,8 +73,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "sub")
 		, m_crtc(*this, "crtc")
-		, m_ipl(*this, "ipl")
-		, m_wram(*this, "wram")
+		, m_iplview(*this, "iplview")
+		, m_workram(*this, "workram")
 		, m_videoram(*this, "videoram.%u", 0)
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "KEY.%u", 0)
@@ -93,8 +93,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7801_device> m_subcpu;
 	required_device<mc6845_device> m_crtc;
-	required_region_ptr<u8> m_ipl;
-	required_shared_ptr<u8> m_wram;
+	memory_view m_iplview;
+	required_shared_ptr<u8> m_workram;
 	required_shared_ptr_array<u8, 3> m_videoram;
 	required_device<palette_device> m_palette;
 	required_ioport_array<16> m_keyboard;
@@ -108,7 +108,6 @@ private:
 
 	void main_bank_w(u8 data);
 	void irq_mask_w(u8 data);
-	u8 memory_r(offs_t offset);
 	void colour_control_w(u8 data);
 	template <unsigned N> u8 vram_r(offs_t offset);
 	template <unsigned N> void vram_w(offs_t offset, u8 data);
@@ -128,17 +127,12 @@ private:
 	u8 m_col_display = 0;
 	u8 m_centronics_busy = 0;
 	u8 m_cassette_data[4]{};
-	bool m_bank_sel = false;
 	bool m_sub_irq_status = false;
 	bool m_cassettebit = false;
 	bool m_cassetteold = false;
 
-	// TODO: descramble
-	struct {
-		u8 porta = 0;
-		u8 portb = 0;
-		u8 portc = 0;
-	}m_upd7801;
+	u8 m_sub_porta = 0;
+	u8 m_sub_portc = 0;
 
 	u8 m_pending_interrupts = 0;
 	u8 m_active_interrupts = 0;
@@ -159,7 +153,7 @@ MC6845_UPDATE_ROW( fp1100_state::crtc_update_row )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u32 *p = &bitmap.pix(y);
-	const u8 porta = m_upd7801.porta;
+	const u8 porta = m_sub_porta;
 
 	if (BIT(porta, 4))
 	{ // green screen
@@ -203,15 +197,15 @@ other bits not used
 */
 void fp1100_state::main_bank_w(u8 data)
 {
-	m_bank_sel = BIT(data, 1);
-//	m_slot_num = (m_slot_num & 3) | ((data & 1) << 2); //??
+	m_iplview.select(BIT(data, 1));
+//  m_slot_num = (m_slot_num & 3) | ((data & 1) << 2); //??
 }
 
 /*
  * x--- ---- mask for main to sub (INTF2)
  * ---x ---- INTS (sub to main)
  * ---- x--- INTD
- * ---- -x-- INTC
+ * ---- -x-- INTC (RS-232C)
  * ---- --x- INTB (FDC bus slot irq)
  * ---- ---x INTA (FDC bus slot drq)
  */
@@ -237,28 +231,23 @@ void fp1100_state::irq_mask_w(u8 data)
 	LOG("%s: IRQmask=%X\n",machine().describe_context(),data);
 }
 
-// TODO: convert to `memory_view`
-u8 fp1100_state::memory_r(offs_t offset)
-{
-	// TODO: verify this odd range
-	if (offset < 0x9000 && !m_bank_sel)
-		return m_ipl[offset];
-	else
-		return m_wram[offset];
-}
-
 void fp1100_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).r(FUNC(fp1100_state::memory_r));
-	map(0x0000, 0xffff).writeonly().share(m_wram); // always write to ram
+	map(0x0000, 0xffff).view(m_iplview);
+	m_iplview[0](0x0000, 0x7fff).rom().region("ipl", 0);
+	m_iplview[0](0x8000, 0x8fff).rom().region("basic", 0);
+	m_iplview[0](0x9000, 0xffff).lr8(NAME([this] (offs_t offset) { return m_workram[offset + 0x9000]; }));
+	// writes always goes to work RAM
+	m_iplview[0](0x0000, 0xffff).writeonly().share(m_workram);
+	m_iplview[1](0x0000, 0xffff).ram().share(m_workram);
 }
 
 void fp1100_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	//map(0x0000, 0xfeff) slot memory area
-//	map(0xff00, 0xff00).mirror(0x7f).rw(FUNC(fp1100_state::slot_id_r), FUNC(fp1100_state::slot_bank_w));
+//  map(0xff00, 0xff00).mirror(0x7f).rw(FUNC(fp1100_state::slot_id_r), FUNC(fp1100_state::slot_bank_w));
 	map(0xff80, 0xff80).mirror(0x7f).r("sub2main", FUNC(generic_latch_8_device::read));
 	map(0xff80, 0xff80).mirror(0x1f).w(FUNC(fp1100_state::irq_mask_w));
 	map(0xffa0, 0xffa0).mirror(0x1f).w(FUNC(fp1100_state::main_bank_w));
@@ -360,7 +349,7 @@ The SO pin is Serial Output to CMT (1=2400Hz; 0=1200Hz)
 */
 void fp1100_state::porta_w(u8 data)
 {
-	if (BIT(m_upd7801.porta, 5) && !BIT(data, 5))
+	if (BIT(m_sub_porta, 5) && !BIT(data, 5))
 	{
 		for (int i = 0; i < 3; i++)
 		{
@@ -372,7 +361,7 @@ void fp1100_state::porta_w(u8 data)
 	const u8 crtc_divider = BIT(data, 3) ? 16 : 8;
 	m_crtc->set_unscaled_clock(MAIN_CLOCK / crtc_divider);
 
-	m_upd7801.porta = data;
+	m_sub_porta = data;
 }
 
 u8 fp1100_state::portb_r()
@@ -394,7 +383,7 @@ d7 - CMT load serial data
 */
 u8 fp1100_state::portc_r()
 {
-	return (m_upd7801.portc & 0x78) | m_centronics_busy;
+	return (m_sub_portc & 0x78) | m_centronics_busy;
 }
 
 /*
@@ -405,11 +394,11 @@ d6 - Centronics strobe
 */
 void fp1100_state::portc_w(u8 data)
 {
-	u8 const bits = data ^ m_upd7801.portc;
+	u8 const bits = data ^ m_sub_portc;
 	const int main_int_state = BIT(data, 3);
-	if (BIT(m_upd7801.portc, 3) != main_int_state)
+	if (BIT(m_sub_portc, 3) != main_int_state)
 		int_w<4>(main_int_state);
-	m_upd7801.portc = data;
+	m_sub_portc = data;
 
 	if (BIT(bits, 5))
 		m_cassette->change_state(BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -621,6 +610,7 @@ static INPUT_PORTS_START( fp1100 )
 INPUT_PORTS_END
 
 
+// debugging only
 static const gfx_layout chars_8x8 =
 {
 	8,8,
@@ -659,8 +649,25 @@ TIMER_DEVICE_CALLBACK_MEMBER( fp1100_state::kansas_w )
 
 void fp1100_state::machine_start()
 {
+	save_item(NAME(m_sub_wait));
+	save_item(NAME(m_sub_irq_status));
+	save_item(NAME(m_kbd_row));
+	save_item(NAME(m_col_border));
+	save_item(NAME(m_col_cursor));
+	save_item(NAME(m_col_display));
+	save_item(NAME(m_centronics_busy));
+
+	save_item(NAME(m_sub_porta));
+	save_item(NAME(m_sub_portc));
+
+	save_item(NAME(m_pending_interrupts));
+	save_item(NAME(m_active_interrupts));
+	save_item(NAME(m_interrupt_mask));
+
 	save_item(NAME(m_caps_led_state));
 	save_item(NAME(m_shift_led_state));
+
+	// FIXME: cassette state intentionally not saved for now
 }
 
 void fp1100_state::machine_reset()
@@ -670,17 +677,16 @@ void fp1100_state::machine_reset()
 
 	m_beep->set_state(0);
 
-	m_bank_sel = false; // point at rom
-
-	m_interrupt_mask = 0;
+	m_interrupt_mask = m_active_interrupts = m_pending_interrupts = 0;
 	m_kbd_row = 0;
 	m_caps_led_state = m_shift_led_state = 0;
 	m_col_border = 0;
 	m_col_cursor = 0;
 	m_col_display = 0;
-	m_upd7801.porta = 0;
-	m_upd7801.portb = 0;
-	m_upd7801.portc = 0;
+	m_sub_porta = 0;
+	m_sub_portc = 0;
+
+	m_iplview.select(0);
 }
 
 void fp1100_state::fp1100(machine_config &config)
@@ -745,8 +751,15 @@ void fp1100_state::fp1100(machine_config &config)
 // ROM definitions
 
 ROM_START( fp1100 )
-	ROM_REGION( 0x9000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION( 0x9000, "bios", ROMREGION_ERASEFF )
+	// TODO: split into two roms
 	ROM_LOAD( "basic.rom", 0x0000, 0x9000, BAD_DUMP CRC(7c7dd17c) SHA1(985757b9c62abd17b0bd77db751d7782f2710ec3))
+
+	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
+	ROM_COPY( "bios", 0x0000, 0x0000, 0x8000 )
+
+	ROM_REGION( 0x1000, "basic", ROMREGION_ERASEFF )
+	ROM_COPY( "bios", 0x8000, 0x0000, 0x1000 )
 
 	ROM_REGION( 0x3000, "sub_ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "sub1.rom", 0x0000, 0x1000, CRC(8feda489) SHA1(917d5b398b9e7b9a6bfa5e2f88c5b99923c3c2a3))
@@ -757,7 +770,10 @@ ROM_END
 /* FP-1000 has video RAM locations RAM9 to RAM24 unpopulated (only RAM1 to RAM8 are populated) - needs its own machine configuration.
    PCB parts overlay silkscreen for sub-CPU shows "µPD7801G-101", but all examples seen have chips silksreened "D7108G 118". */
 ROM_START( fp1000 )
-	ROM_REGION( 0x9000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASE00 )
+	ROM_LOAD( "ipl.rom", 0x0000, 0x8000, NO_DUMP)
+
+	ROM_REGION( 0x1000, "basic", ROMREGION_ERASEFF )
 	ROM_LOAD( "2l_a10_kkk_fp1000_basic.c1", 0x0000, 0x1000, CRC(9322dedd) SHA1(40a00684ced2b7ead53ca15a915d98f3fe00d3ba))
 
 	ROM_REGION( 0x3000, "sub_ipl", ROMREGION_ERASEFF )
