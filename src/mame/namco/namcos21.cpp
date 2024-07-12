@@ -416,7 +416,7 @@ uint16_t namcos21_state::winrun_gpu_color_r()
 
 void namcos21_state::winrun_gpu_color_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA( &m_winrun_color );
+	COMBINE_DATA(&m_winrun_color);
 }
 
 uint16_t namcos21_state::winrun_gpu_register_r(offs_t offset)
@@ -426,28 +426,28 @@ uint16_t namcos21_state::winrun_gpu_register_r(offs_t offset)
 
 void namcos21_state::winrun_gpu_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA( &m_winrun_gpu_register[offset] );
+	COMBINE_DATA(&m_winrun_gpu_register[offset]);
 	m_screen->update_partial(m_screen->vpos());
 }
 
 void namcos21_state::winrun_gpu_videoram_w(offs_t offset, uint16_t data)
 {
-	uint8_t color = data>>8;
-	uint8_t mask  = data&0xff;
+	uint8_t color = data >> 8;
+	uint8_t mask  = data & 0xff;
 
 	for (int i=0; i<8; i++)
 	{
 		if (BIT(mask, i))
 		{
-			m_gpu_videoram[(offset+i)&0x7ffff] = color;
-			m_gpu_maskram[(offset+i)&0x7ffff] = mask;
+			m_gpu_videoram[(offset+i) & 0x7ffff] = color;
+			m_gpu_maskram[(offset+i) & 0x7ffff] = mask;
 		}
 	}
 }
 
 uint16_t namcos21_state::winrun_gpu_videoram_r(offs_t offset)
 {
-	return (m_gpu_videoram[offset]<<8) | m_gpu_maskram[offset];
+	return (m_gpu_videoram[offset] << 8) | m_gpu_maskram[offset];
 }
 
 void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -457,18 +457,15 @@ void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &c
 
 	int const yscroll = -cliprect.top() + (int16_t)m_winrun_gpu_register[0x2/2];
 	int const xscroll = 0; //m_winrun_gpu_register[0xc/2] >> 7;
-	int const base = 0x1000 + 0x100 * (m_winrun_color&0xf);
-
+	int const base = 0x1000 + 0x100 * (m_winrun_color & 0xf);
 	for (int sy=cliprect.top(); sy<=cliprect.bottom(); sy++)
 	{
 		uint8_t const *const pSource = &videoram[((yscroll+sy) & 0x3ff) * 0x200];
 		uint16_t *const pDest = &bitmap.pix(sy);
-
 		for (int sx=cliprect.left(); sx<=cliprect.right(); sx++)
 		{
 			int const pen = pSource[(sx+xscroll) & 0x1ff];
-
-			switch( pen )
+			switch (pen)
 			{
 			case 0xff:
 				break;
@@ -490,12 +487,11 @@ void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &c
 
 uint32_t namcos21_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0xff, cliprect );
+	bitmap.fill(0xff, cliprect);
 
 	m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, 0x7fc0, 0x7ffe);
 	m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7fbf);
-
-	winrun_bitmap_draw(bitmap,cliprect);
+	winrun_bitmap_draw(bitmap, cliprect);
 
 	//popmessage("%04x %04x %04x|%04x %04x",m_winrun_gpu_register[0],m_winrun_gpu_register[2/2],m_winrun_gpu_register[4/2],m_winrun_gpu_register[0xa/2],m_winrun_gpu_register[0xc/2]);
 
@@ -511,10 +507,10 @@ uint32_t namcos21_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 [[maybe_unused]] void namcos21_state::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA( &m_video_enable ); /* 0x40 = enable */
+	COMBINE_DATA(&m_video_enable); /* 0x40 = enable */
 
 	if (m_video_enable!=0 && m_video_enable!=0x40)
-		logerror( "unexpected video_enable_w=0x%x\n", m_video_enable );
+		logerror("unexpected video_enable_w=0x%x\n", m_video_enable);
 }
 
 /***********************************************************/
@@ -528,9 +524,9 @@ uint16_t namcos21_state::dpram_word_r(offs_t offset)
 
 void namcos21_state::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if( ACCESSING_BITS_0_7 )
+	if (ACCESSING_BITS_0_7)
 	{
-		m_dpram[offset] = data&0xff;
+		m_dpram[offset] = data & 0xff;
 	}
 }
 
@@ -635,7 +631,6 @@ void namcos21_state::c140_map(address_map &map)
 void namcos21_state::configure_c65_namcos21(machine_config &config)
 {
 	NAMCOC65(config, m_c65, 2048000);
-
 	m_c65->in_pb_callback().set_ioport("MCUB");
 	m_c65->in_pc_callback().set_ioport("MCUC");
 	m_c65->in_ph_callback().set_ioport("MCUH");

@@ -165,7 +165,7 @@ uint16_t namcos21_dsp_c67_device::dspcuskey_r()
 		case 0x8067: result = 0xffff; break;
 		case 0x806e: result = 0x0145; break;
 		default:
-			logerror( "unk cuskey_r; pc=0x%x\n", m_c67master->pc() );
+			logerror("unk cuskey_r; pc=0x%x\n", m_c67master->pc());
 			break;
 		}
 	}
@@ -207,7 +207,7 @@ void namcos21_dsp_c67_device::transmit_word_to_slave(uint16_t data)
 	m_mpDspState->slaveActive = 1;
 
 	if (m_mpDspState->slaveBytesAvailable >= DSP_BUF_MAX)
-		fatalerror( "IDC overflow\n" );
+		fatalerror("IDC overflow\n");
 }
 
 void namcos21_dsp_c67_device::transfer_dsp_data()
@@ -376,7 +376,7 @@ uint16_t namcos21_dsp_c67_device::read_word_from_slave_input()
 			m_mpDspState->slaveBytesAdvertised--;
 
 		if (ENABLE_LOGGING)
-			logerror( "%s:-%04x(0x%04x)\n", machine().describe_context(), data, m_mpDspState->slaveBytesAvailable );
+			logerror("%s:-%04x(0x%04x)\n", machine().describe_context(), data, m_mpDspState->slaveBytesAvailable);
 	}
 
 	return data;
@@ -584,7 +584,7 @@ void namcos21_dsp_c67_device::dsp_portc_w(uint16_t data)
 	}
 	else
 	{
-		logerror( "portc overflow\n" );
+		logerror("portc overflow\n");
 	}
 }
 
@@ -650,33 +650,32 @@ void namcos21_dsp_c67_device::render_slave_output(uint16_t data)
 
 			for(int j=0; j<4; j++)
 			{
-				sx[j] = m_poly_frame_width/2 + (int16_t)pSource[3*j+0];
-				sy[j] = m_poly_frame_height/2 + (int16_t)pSource[3*j+1];
-				zcode[j] = pSource[3*j+2];
+				sx[j] = m_poly_frame_width/2 + (int16_t)pSource[j*3 + 0];
+				sy[j] = m_poly_frame_height/2 + (int16_t)pSource[j*3 + 1];
+				zcode[j] = pSource[j*3 + 2];
 			}
 
-			m_renderer->draw_quad(sx, sy, zcode, color&0x7fff);
+			m_renderer->draw_quad(sx, sy, zcode, color & 0x7fff);
 		}
 		else
 		{
 			uint8_t code;
-			int quad_idx = color*6;
+			int quad_idx = color * 6;
 
 			do
 			{
 				code = m_pointram[quad_idx++];
-				color = m_pointram[quad_idx++] | (code<<8);
+				color = m_pointram[quad_idx++] | (code << 8);
 
 				for(int j=0; j<4; j++)
 				{
 					uint8_t vi = m_pointram[quad_idx++];
-
-					sx[j] = m_poly_frame_width/2  + (int16_t)pSource[vi*3+0];
-					sy[j] = m_poly_frame_height/2 + (int16_t)pSource[vi*3+1];
-					zcode[j] = pSource[vi*3+2];
+					sx[j] = m_poly_frame_width/2  + (int16_t)pSource[vi*3 + 0];
+					sy[j] = m_poly_frame_height/2 + (int16_t)pSource[vi*3 + 1];
+					zcode[j] = pSource[vi*3 + 2];
 				}
 
-				m_renderer->draw_quad(sx, sy, zcode, color&0x7fff);
+				m_renderer->draw_quad(sx, sy, zcode, color & 0x7fff);
 			} while (!BIT(code, 7)); //Reached end-of-quadlist marker?
 		}
 
@@ -684,7 +683,7 @@ void namcos21_dsp_c67_device::render_slave_output(uint16_t data)
 	}
 	else if (count == 0)
 	{
-		fatalerror( "RenderSlaveOutput\n" );
+		fatalerror("RenderSlaveOutput\n");
 	}
 }
 
@@ -766,7 +765,7 @@ void namcos21_dsp_c67_device::slave_dsp_io(address_map &map)
 void namcos21_dsp_c67_device::pointram_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  uint16_t prev = m_pointram_control;
-	COMBINE_DATA( &m_pointram_control );
+	COMBINE_DATA(&m_pointram_control);
 
 	/* m_pointram_control&0x20 : bank for depthcue data */
 #if 0
@@ -804,12 +803,12 @@ uint16_t namcos21_dsp_c67_device::pointram_data_r()
 
 void namcos21_dsp_c67_device::pointram_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if( ACCESSING_BITS_0_7 )
+	if (ACCESSING_BITS_0_7)
 	{
 //      if( (m_pointram_idx%6)==0 ) logerror("\n" );
 //      logerror( " %02x", data );
 		m_pointram[m_pointram_idx++] = data;
-		m_pointram_idx &= (PTRAM_SIZE-1);
+		m_pointram_idx &= (PTRAM_SIZE - 1);
 	}
 }
 

@@ -400,10 +400,10 @@ uint16_t namcos21_c67_state::video_enable_r()
 
 void namcos21_c67_state::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA( &m_video_enable ); /* 0x40 = enable */
+	COMBINE_DATA(&m_video_enable); /* 0x40 = enable */
 
 	if (m_video_enable!=0 && m_video_enable!=0x40)
-		logerror( "unexpected video_enable_w=0x%x\n", m_video_enable );
+		logerror("unexpected video_enable_w=0x%x\n", m_video_enable);
 }
 
 /***********************************************************/
@@ -417,7 +417,7 @@ uint16_t namcos21_c67_state::dpram_word_r(offs_t offset)
 
 void namcos21_c67_state::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if( ACCESSING_BITS_0_7 )
+	if (ACCESSING_BITS_0_7 )
 	{
 		m_dpram[offset] = data&0xff;
 	}

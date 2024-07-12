@@ -31,7 +31,7 @@ void namcos21_3d_device::device_reset()
 
 void namcos21_3d_device::allocate_poly_framebuffer()
 {
-	unsigned framebuffer_size = m_poly_frame_width*m_poly_frame_height;
+	unsigned framebuffer_size = m_poly_frame_width * m_poly_frame_height;
 
 	if (framebuffer_size == 0)
 		fatalerror("framebuffer_size == 0\n");
@@ -71,15 +71,12 @@ void namcos21_3d_device::copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, con
 		uint16_t *const dest = &bitmap.pix(sy);
 		uint16_t const *const pPen = m_mpPolyFrameBufferPens2.get() + m_poly_frame_width * sy;
 		uint16_t const *const pZ = m_mpPolyFrameBufferZ2.get() + m_poly_frame_width * sy;
-
 		for (int sx = clip.left(); sx <= clip.right(); sx++)
 		{
 			int z = pZ[sx];
 			//if( pZ[sx]!=0x7fff )
 			if (z >= zlo && z <= zhi)
-			{
 				dest[sx] = pPen[sx];
-			}
 		}
 	}
 }
@@ -112,7 +109,6 @@ void namcos21_3d_device::renderscanline_flat(const edge *e1, const edge *e2, uns
 
 	uint16_t *pDest = m_mpPolyFrameBufferPens.get() + sy * m_poly_frame_width;
 	uint16_t *pZBuf = m_mpPolyFrameBufferZ.get() + sy * m_poly_frame_width;
-
 	for (int x = x0; x < x1; x++)
 	{
 		uint16_t zz = (uint16_t)z;
@@ -123,7 +119,7 @@ void namcos21_3d_device::renderscanline_flat(const edge *e1, const edge *e2, uns
 
 			if (depthcueenable && zz > 0)
 			{
-				const unsigned depth = (zz >> m_zz_shift)*m_zzmult;
+				const unsigned depth = (zz >> m_zz_shift) * m_zzmult;
 
 				if (m_depth_reverse)
 					pen += depth;
@@ -170,7 +166,6 @@ void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, c
 
 		e2.x = v0->x;
 		e2.z = v0->z;
-
 		if (ystart < 0)
 		{
 			e2.x += dx2dy * -ystart;
@@ -213,9 +208,7 @@ void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, c
 				e1.x += dx1dy;
 				e1.z += dz1dy;
 			}
-
 		}
-
 	}
 }
 
@@ -238,7 +231,7 @@ void namcos21_3d_device::draw_quad(int sx[4], int sy[4], int zcode[4], unsigned 
 	else
 	{ /* map color code to hardware pen */
 		unsigned code = color >> 8;
-		if (code & 0x80)
+		if (BIT(code, 7))
 		{
 			color = 0x2100 | (color & 0xff);
 			// color = 0x3e00|color;
@@ -248,7 +241,7 @@ void namcos21_3d_device::draw_quad(int sx[4], int sy[4], int zcode[4], unsigned 
 		{
 			color = 0x3e00 | (color & 0xff);
 
-			if ((code & 0x02) == 0)
+			if (!BIT(code, 1))
 				color |= 0x100;
 		}
 	}
