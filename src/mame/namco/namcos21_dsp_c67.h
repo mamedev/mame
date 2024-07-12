@@ -112,7 +112,7 @@ private:
 	uint16_t get_input_bytes_advertised_for_slave();
 	void render_slave_output(uint16_t data);
 
-	void namcos21_kickstart_hacks(int internal);
+	void namcos21_kickstart_hacks(bool internal);
 
 	void dspcuskey_w(uint16_t data);
 	uint16_t dspcuskey_r();

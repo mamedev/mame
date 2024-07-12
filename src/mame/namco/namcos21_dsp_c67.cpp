@@ -71,11 +71,7 @@ void namcos21_dsp_c67_device::device_reset()
 	m_poly_frame_height = m_renderer->get_height();
 
 	/* DSP startup hacks */
-	m_mbNeedsKickstart = 20;
-	if (m_gametype == NAMCOS21_CYBERSLED)
-	{
-		m_mbNeedsKickstart = 200;
-	}
+	m_mbNeedsKickstart = (m_gametype == NAMCOS21_CYBERSLED) ? 200 : 20;
 
 	/* Wipe the framebuffers */
 	m_renderer->swap_and_clear_poly_framebuffer();
@@ -120,12 +116,12 @@ void namcos21_dsp_c67_device::reset_dsps(int state)
 void namcos21_dsp_c67_device::reset_kickstart()
 {
 	//printf( "dspkick=0x%x\n", data );
-	namcos21_kickstart_hacks(1);
+	namcos21_kickstart_hacks(true);
 }
 
 void namcos21_dsp_c67_device::device_add_mconfig(machine_config &config)
 {
-	namco_c67_device& dspmaster(NAMCO_C67(config, m_c67master, 24000000)); /* 24 MHz? overclocked */
+	namco_c67_device& dspmaster(NAMCO_C67(config, m_c67master, 24'000'000)); /* 24 MHz? overclocked */
 	dspmaster.set_addrmap(AS_PROGRAM, &namcos21_dsp_c67_device::master_dsp_program);
 	dspmaster.set_addrmap(AS_DATA, &namcos21_dsp_c67_device::master_dsp_data);
 	dspmaster.set_addrmap(AS_IO, &namcos21_dsp_c67_device::master_dsp_io);
@@ -135,7 +131,7 @@ void namcos21_dsp_c67_device::device_add_mconfig(machine_config &config)
 
 	for (int i = 0; i < 4; i++)
 	{
-		namco_c67_device& dspslave(NAMCO_C67(config, m_c67slave[i], 24000000)); /* 24 MHz? overclocked */
+		namco_c67_device& dspslave(NAMCO_C67(config, m_c67slave[i], 24'000'000)); /* 24 MHz? overclocked */
 		dspslave.set_addrmap(AS_PROGRAM, &namcos21_dsp_c67_device::slave_dsp_program);
 		dspslave.set_addrmap(AS_DATA, &namcos21_dsp_c67_device::slave_dsp_data);
 		dspslave.set_addrmap(AS_IO, &namcos21_dsp_c67_device::slave_dsp_io);
@@ -144,10 +140,10 @@ void namcos21_dsp_c67_device::device_add_mconfig(machine_config &config)
 		dspslave.xf_out_cb().set(FUNC(namcos21_dsp_c67_device::slave_XF_output_w));
 
 		// the emulation currently only uses one slave DSP clocked at 4x the normal rate instead of the master splitting the workload across the 4 slaves
-		if (i!=0)
+		if (i != 0)
 			dspslave.set_disable();
 		else
-			dspslave.set_clock(24000000*4);
+			dspslave.set_clock(24'000'000*4);
 	}
 }
 
@@ -159,9 +155,10 @@ void namcos21_dsp_c67_device::dspcuskey_w(uint16_t data)
 uint16_t namcos21_dsp_c67_device::dspcuskey_r()
 {
 	uint16_t result = 0;
-	if( m_gametype == NAMCOS21_SOLVALOU )
+
+	if (m_gametype == NAMCOS21_SOLVALOU)
 	{
-		switch( m_c67master->pc() )
+		switch (m_c67master->pc())
 		{
 		case 0x805e: result = 0x0000; break;
 		case 0x805f: result = 0xfeba; break;
@@ -172,9 +169,9 @@ uint16_t namcos21_dsp_c67_device::dspcuskey_r()
 			break;
 		}
 	}
-	else if( m_gametype == NAMCOS21_CYBERSLED )
+	else if (m_gametype == NAMCOS21_CYBERSLED)
 	{
-		switch( m_c67master->pc() )
+		switch (m_c67master->pc())
 		{
 		case 0x8061: result = 0xfe95; break;
 		case 0x8069: result = 0xffff; break;
@@ -183,9 +180,9 @@ uint16_t namcos21_dsp_c67_device::dspcuskey_r()
 			break;
 		}
 	}
-	else if( m_gametype == NAMCOS21_AIRCOMBAT )
+	else if (m_gametype == NAMCOS21_AIRCOMBAT)
 	{
-		switch( m_c67master->pc() )
+		switch (m_c67master->pc())
 		{
 		case 0x8062: result = 0xfeb9; break;
 		case 0x806a: result = 0xffff; break;
@@ -194,121 +191,138 @@ uint16_t namcos21_dsp_c67_device::dspcuskey_r()
 			break;
 		}
 	}
+
 	return result;
 }
 
 void namcos21_dsp_c67_device::transmit_word_to_slave(uint16_t data)
 {
 	unsigned offs = m_mpDspState->slaveInputStart+m_mpDspState->slaveBytesAvailable++;
+
 	m_mpDspState->slaveInputBuffer[offs%DSP_BUF_MAX] = data;
-	if (ENABLE_LOGGING) logerror( "+%04x(#%04x)\n", data, m_mpDspState->slaveBytesAvailable );
+
+	if (ENABLE_LOGGING)
+		logerror("+%04x(#%04x)\n", data, m_mpDspState->slaveBytesAvailable);
+
 	m_mpDspState->slaveActive = 1;
-	if( m_mpDspState->slaveBytesAvailable >= DSP_BUF_MAX )
-	{
+
+	if (m_mpDspState->slaveBytesAvailable >= DSP_BUF_MAX)
 		fatalerror( "IDC overflow\n" );
-	}
 }
 
 void namcos21_dsp_c67_device::transfer_dsp_data()
 {
 	uint16_t addr = m_mpDspState->masterSourceAddr;
 	bool const mode = BIT(addr, 15);
+
 	addr &= 0x7fff;
-	if (addr)
+	if (!addr)
+		return;
+
+	while (true)
 	{
-		for (;;)
+		uint16_t const old = addr;
+		uint16_t const code = m_dspram16[addr++];
+
+		if (code == 0xffff)
 		{
-			uint16_t const old = addr;
-			uint16_t const code = m_dspram16[addr++];
-			if (code == 0xffff)
+			if (mode)
 			{
-				if (mode)
-				{
-					addr = m_dspram16[addr];
-					m_mpDspState->masterSourceAddr = addr;
-					if (ENABLE_LOGGING) logerror("LOOP:0x%04x\n", addr);
-					addr &= 0x7fff;
-					if (old == addr)
-					{
-						return;
-					}
-				}
-				else
-				{
-					m_mpDspState->masterSourceAddr = 0;
+				addr = m_dspram16[addr];
+				m_mpDspState->masterSourceAddr = addr;
+
+				if (ENABLE_LOGGING)
+					logerror("LOOP:0x%04x\n", addr);
+
+				addr &= 0x7fff;
+				if (old == addr)
 					return;
-				}
-			}
-			else if (!mode)
-			{
-				// direct data transfer
-				if (ENABLE_LOGGING) logerror("DATA TFR(0x%x)\n", code);
-				transmit_word_to_slave(code);
-				for (int i = 0; i < code; i++)
-				{
-					uint16_t const data = m_dspram16[addr++];
-					transmit_word_to_slave(data);
-				}
-			}
-			else if (code == 0x18 || code == 0x1a)
-			{
-				if (ENABLE_LOGGING) logerror("HEADER TFR(0x%x)\n", code);
-				transmit_word_to_slave(code + 1);
-				for (int i = 0; i < code; i++)
-				{
-					uint16_t const data = m_dspram16[addr++];
-					transmit_word_to_slave(data);
-				}
 			}
 			else
 			{
-				if (ENABLE_LOGGING) logerror("OBJ TFR(0x%x)\n", code);
-				int32_t masterAddr = read_pointrom_data(code);
-				uint16_t const len = m_dspram16[addr++];
-				for (;;)
-				{
-					int subAddr = read_pointrom_data(masterAddr++);
-					if (subAddr == 0xffffff)
-					{
-						break;
-					}
-					else
-					{
-						int const primWords = (uint16_t)read_pointrom_data(subAddr++);
-						// TODO: this function causes an IDC overflow in Solvalou, something else failed prior to that?
-						// In Header TFR when bad parameters happens there's a suspicious 0x000f 0x0003 as first two words,
-						// maybe it's supposed to have a different length there ...
-						// cfr: object code 0x17 in service mode
-						if (primWords > 2)
-						{
-							transmit_word_to_slave(0); // pad1
-							transmit_word_to_slave(len + 1);
-							for (int i = 0; i < len; i++)
-							{ // transform
-								transmit_word_to_slave(m_dspram16[addr + i]);
-							}
-							transmit_word_to_slave(0); // pad2
-							transmit_word_to_slave(primWords + 1);
-							for (int i = 0; i < primWords; i++)
-							{
-								transmit_word_to_slave((uint16_t)read_pointrom_data(subAddr + i));
-							}
-						}
-						else
-						{
-							if (ENABLE_LOGGING) logerror("TFR NOP?\n");
-						}
-					}
-				} // for (;;)
-				addr += len;
+				m_mpDspState->masterSourceAddr = 0;
+				return;
 			}
-		} // for(;;)
+		}
+		else if (!mode)
+		{
+			// direct data transfer
+			if (ENABLE_LOGGING)
+				logerror("DATA TFR(0x%x)\n", code);
+
+			transmit_word_to_slave(code);
+
+			for (int i = 0; i < code; i++)
+			{
+				uint16_t const data = m_dspram16[addr++];
+				transmit_word_to_slave(data);
+			}
+		}
+		else if (code == 0x18 || code == 0x1a)
+		{
+			if (ENABLE_LOGGING)
+				logerror("HEADER TFR(0x%x)\n", code);
+
+			transmit_word_to_slave(code + 1);
+
+			for (int i = 0; i < code; i++)
+			{
+				uint16_t const data = m_dspram16[addr++];
+				transmit_word_to_slave(data);
+			}
+		}
+		else
+		{
+			if (ENABLE_LOGGING)
+				logerror("OBJ TFR(0x%x)\n", code);
+
+			int32_t masterAddr = read_pointrom_data(code);
+			uint16_t const len = m_dspram16[addr++];
+
+			while (true)
+			{
+				int subAddr = read_pointrom_data(masterAddr++);
+
+				if (subAddr == 0xffffff)
+					break;
+
+				uint16_t const primWords = (uint16_t)read_pointrom_data(subAddr++);
+				// TODO: this function causes an IDC overflow in Solvalou, something else failed prior to that?
+				// In Header TFR when bad parameters happens there's a suspicious 0x000f 0x0003 as first two words,
+				// maybe it's supposed to have a different length there ...
+				// cfr: object code 0x17 in service mode
+				if (primWords > 2)
+				{
+					transmit_word_to_slave(0); // pad1
+					transmit_word_to_slave(len + 1);
+
+					for (int i = 0; i < len; i++)
+					{ // transform
+						transmit_word_to_slave(m_dspram16[addr + i]);
+					}
+
+					transmit_word_to_slave(0); // pad2
+					transmit_word_to_slave(primWords + 1);
+					
+					for (int i = 0; i < primWords; i++)
+					{
+						transmit_word_to_slave((uint16_t)read_pointrom_data(subAddr + i));
+					}
+				}
+				else if (ENABLE_LOGGING)
+				{
+					logerror("TFR NOP?\n");
+				}
+			}
+
+			addr += len;
+		}
 	}
 }
 
 
 
-void namcos21_dsp_c67_device::namcos21_kickstart_hacks(int internal)
+void namcos21_dsp_c67_device::namcos21_kickstart_hacks(bool internal)
 {
 	/* patch dsp watchdog */
 	switch (m_gametype)
@@ -316,24 +330,33 @@ void namcos21_dsp_c67_device::namcos21_kickstart_hacks(int internal)
 	case namcos21_dsp_c67_device::NAMCOS21_AIRCOMBAT:
 		m_master_dsp_ram[0x008e] = 0x808f;
 		break;
+
 	case namcos21_dsp_c67_device::NAMCOS21_SOLVALOU:
 		m_master_dsp_ram[0x008b] = 0x808c;
 		break;
+
 	default:
 		break;
 	}
+
 	if (internal)
 	{
-		if (m_mbNeedsKickstart == 0) return;
+		if (m_mbNeedsKickstart == 0)
+			return;
+
 		m_mbNeedsKickstart--;
-		if (m_mbNeedsKickstart) return;
+		
+		if (m_mbNeedsKickstart)
+			return;
 	}
 
 	m_renderer->swap_and_clear_poly_framebuffer();
+
 	m_mpDspState->masterSourceAddr = 0;
 	m_mpDspState->slaveOutputSize = 0;
 	m_mpDspState->masterFinished = 0;
 	m_mpDspState->slaveActive = 0;
+	
 	m_c67master->set_input_line(0, HOLD_LINE);
 	m_c67slave[0]->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
@@ -341,30 +364,35 @@ void namcos21_dsp_c67_device::namcos21_kickstart_hacks(int internal)
 uint16_t namcos21_dsp_c67_device::read_word_from_slave_input()
 {
 	uint16_t data = 0;
-	if( m_mpDspState->slaveBytesAvailable>0 )
+
+	if (m_mpDspState->slaveBytesAvailable > 0)
 	{
 		data = m_mpDspState->slaveInputBuffer[m_mpDspState->slaveInputStart++];
+
 		m_mpDspState->slaveInputStart %= DSP_BUF_MAX;
 		m_mpDspState->slaveBytesAvailable--;
-		if( m_mpDspState->slaveBytesAdvertised>0 )
-		{
+		
+		if (m_mpDspState->slaveBytesAdvertised > 0)
 			m_mpDspState->slaveBytesAdvertised--;
-		}
-		if (ENABLE_LOGGING) logerror( "%s:-%04x(0x%04x)\n", machine().describe_context(), data, m_mpDspState->slaveBytesAvailable );
+
+		if (ENABLE_LOGGING)
+			logerror( "%s:-%04x(0x%04x)\n", machine().describe_context(), data, m_mpDspState->slaveBytesAvailable );
 	}
+
 	return data;
 }
 
 uint16_t namcos21_dsp_c67_device::get_input_bytes_advertised_for_slave()
 {
-	if( m_mpDspState->slaveBytesAdvertised < m_mpDspState->slaveBytesAvailable )
+	if (m_mpDspState->slaveBytesAdvertised < m_mpDspState->slaveBytesAvailable)
 	{
 		m_mpDspState->slaveBytesAdvertised++;
 	}
-	else if( m_mpDspState->slaveActive && m_mpDspState->masterFinished && m_mpDspState->masterSourceAddr )
+	else if(m_mpDspState->slaveActive && m_mpDspState->masterFinished && m_mpDspState->masterSourceAddr)
 	{
-		namcos21_kickstart_hacks(0);
+		namcos21_kickstart_hacks(false);
 	}
+
 	return m_mpDspState->slaveBytesAdvertised;
 }
 
@@ -379,7 +407,9 @@ void namcos21_dsp_c67_device::dspram16_hack_w(offs_t offset, uint16_t data, uint
 
 	if (m_mpDspState->masterSourceAddr && offset == 1 + (m_mpDspState->masterSourceAddr & 0x7fff))
 	{
-		if (ENABLE_LOGGING) logerror("IDC-CONTINUE\n");
+		if (ENABLE_LOGGING)
+			logerror("IDC-CONTINUE\n");
+
 		transfer_dsp_data();
 	}
 	else if (m_gametype == NAMCOS21_SOLVALOU && offset == 0x103)
@@ -395,7 +425,9 @@ void namcos21_dsp_c67_device::dspram16_w(offs_t offset, uint16_t data, uint16_t 
 
 	if (m_mpDspState->masterSourceAddr && offset == 1 + (m_mpDspState->masterSourceAddr & 0x7fff))
 	{
-		if (ENABLE_LOGGING) logerror("IDC-CONTINUE\n");
+		if (ENABLE_LOGGING)
+			logerror("IDC-CONTINUE\n");
+
 		transfer_dsp_data();
 	}
 }
@@ -411,29 +443,34 @@ int32_t namcos21_dsp_c67_device::read_pointrom_data(unsigned offset)
 uint16_t namcos21_dsp_c67_device::dsp_port0_r()
 {
 	int32_t data = read_pointrom_data(m_pointrom_idx++);
+
 	m_mPointRomMSB = (uint8_t)(data>>16);
 	m_mbPointRomDataAvailable = 1;
+
 	return (uint16_t)data;
 }
 
 void namcos21_dsp_c67_device::dsp_port0_w(uint16_t data)
 { /* unused? */
-	if (ENABLE_LOGGING) logerror( "PTRAM_LO(0x%04x)\n", data );
+	if (ENABLE_LOGGING)
+		logerror("PTRAM_LO(0x%04x)\n", data);
 }
 
 uint16_t namcos21_dsp_c67_device::dsp_port1_r()
 {
-	if( m_mbPointRomDataAvailable )
+	if (m_mbPointRomDataAvailable)
 	{
 		m_mbPointRomDataAvailable = 0;
 		return m_mPointRomMSB;
 	}
+
 	return 0x8000; /* IDC ack? */
 }
 
 void namcos21_dsp_c67_device::dsp_port1_w(uint16_t data)
 { /* unused? */
-	if (ENABLE_LOGGING) logerror( "PTRAM_HI(0x%04x)\n", data );
+	if (ENABLE_LOGGING)
+		logerror("PTRAM_HI(0x%04x)\n", data);
 }
 
 uint16_t namcos21_dsp_c67_device::dsp_port2_r()
@@ -443,7 +480,9 @@ uint16_t namcos21_dsp_c67_device::dsp_port2_r()
 
 void namcos21_dsp_c67_device::dsp_port2_w(uint16_t data)
 {
-	if (ENABLE_LOGGING) logerror( "IDC ADDR INIT(0x%04x)\n", data );
+	if (ENABLE_LOGGING)
+		logerror("IDC ADDR INIT(0x%04x)\n", data);
+
 	m_mpDspState->masterSourceAddr = data;
 	transfer_dsp_data();
 }
@@ -455,8 +494,8 @@ uint16_t namcos21_dsp_c67_device::dsp_port3_idc_rcv_enable_r()
 
 void namcos21_dsp_c67_device::dsp_port3_w(uint16_t data)
 {
-	m_pointrom_idx<<=16;
-	m_pointrom_idx|=data;
+	m_pointrom_idx <<= 16;
+	m_pointrom_idx |= data;
 }
 
 void namcos21_dsp_c67_device::dsp_port4_w(uint16_t data)
@@ -471,11 +510,12 @@ uint16_t namcos21_dsp_c67_device::dsp_port8_r()
 
 void namcos21_dsp_c67_device::dsp_port8_w(uint16_t data)
 {
-	if (ENABLE_LOGGING) logerror( "port8_w(%d)\n", data );
-	if( data )
-	{
+	if (ENABLE_LOGGING)
+		logerror("port8_w(%d)\n", data);
+
+	if (data)
 		m_mpDspState->masterFinished = 1;
-	}
+
 	m_irq_enable = data;
 }
 
@@ -506,40 +546,39 @@ uint16_t namcos21_dsp_c67_device::dsp_portb_r()
 
 void namcos21_dsp_c67_device::dsp_portb_w(uint16_t data)
 {
-	if( data==0 )
+	if (data==0)
 	{ /* only 0->1 transition triggers */
 		return;
 	}
-	if( m_mpDspState->masterDirectDrawSize == 13 )
+
+	if (m_mpDspState->masterDirectDrawSize == 13)
 	{
-		int i;
 		int sx[4], sy[4], zcode[4];
-		int color  = m_mpDspState->masterDirectDrawBuffer[0];
-		for( i=0; i<4; i++ )
+		uint16_t color  = m_mpDspState->masterDirectDrawBuffer[0];
+
+		for (int i=0; i<4; i++)
 		{
 			sx[i] = m_poly_frame_width/2 + (int16_t)m_mpDspState->masterDirectDrawBuffer[i*3+1];
 			sy[i] = m_poly_frame_height/2 + (int16_t)m_mpDspState->masterDirectDrawBuffer[i*3+2];
 			zcode[i] = m_mpDspState->masterDirectDrawBuffer[i*3+3];
 		}
-		if( color&0x8000 )
-		{
+
+		if (BIT(color, 15))
 			m_renderer->draw_quad(sx, sy, zcode, color);
-		}
 		else
-		{
-			logerror( "indirection used w/ direct draw?\n" );
-		}
+			logerror("indirection used w/ direct draw?\n");
 	}
-	else if( m_mpDspState->masterDirectDrawSize )
+	else if (m_mpDspState->masterDirectDrawSize)
 	{
-		logerror( "unexpected masterDirectDrawSize=%d!\n",m_mpDspState->masterDirectDrawSize );
+		logerror("unexpected masterDirectDrawSize=%d!\n", m_mpDspState->masterDirectDrawSize);
 	}
+
 	m_mpDspState->masterDirectDrawSize = 0;
 }
 
 void namcos21_dsp_c67_device::dsp_portc_w(uint16_t data)
 {
-	if( m_mpDspState->masterDirectDrawSize < DSP_BUF_MAX )
+	if (m_mpDspState->masterDirectDrawSize < DSP_BUF_MAX)
 	{
 		m_mpDspState->masterDirectDrawBuffer[m_mpDspState->masterDirectDrawSize++] = data;
 	}
@@ -556,7 +595,8 @@ uint16_t namcos21_dsp_c67_device::dsp_portf_r()
 
 void namcos21_dsp_c67_device::dsp_xf_w(uint16_t data)
 {
-	if (ENABLE_LOGGING) logerror("xf(%d)\n",data);
+	if (ENABLE_LOGGING)
+		logerror("xf(%d)\n",data);
 }
 
 void namcos21_dsp_c67_device::master_dsp_program(address_map &map)
@@ -589,60 +629,62 @@ void namcos21_dsp_c67_device::master_dsp_io(address_map &map)
 
 void namcos21_dsp_c67_device::render_slave_output(uint16_t data)
 {
-	if( m_mpDspState->slaveOutputSize >= 4096 )
-	{
-		fatalerror( "SLAVE OVERFLOW (0x%x)\n",m_mpDspState->slaveOutputBuffer[0]  );
-	}
+	if (m_mpDspState->slaveOutputSize >= 4096)
+		fatalerror("SLAVE OVERFLOW (0x%x)\n", m_mpDspState->slaveOutputBuffer[0]);
 
 	/* append word to slave output buffer */
 	m_mpDspState->slaveOutputBuffer[m_mpDspState->slaveOutputSize++] = data;
 
+	uint16_t *pSource = m_mpDspState->slaveOutputBuffer;
+	uint16_t count = *pSource++;
+
+	if (count && m_mpDspState->slaveOutputSize > count)
 	{
-		uint16_t *pSource = m_mpDspState->slaveOutputBuffer;
-		uint16_t count = *pSource++;
-		if( count && m_mpDspState->slaveOutputSize > count )
+		uint16_t color = *pSource++;
+		int sx[4], sy[4], zcode[4];
+
+		if (BIT(color, 15))
 		{
-			uint16_t color = *pSource++;
-			int sx[4], sy[4],zcode[4];
-			int j;
-			if( color&0x8000 )
+			if (count != 13) 
+				logerror("?!direct-draw(%d)\n", count);
+
+			for(int j=0; j<4; j++)
 			{
-				if( count!=13 ) logerror( "?!direct-draw(%d)\n", count );
-				for( j=0; j<4; j++ )
+				sx[j] = m_poly_frame_width/2 + (int16_t)pSource[3*j+0];
+				sy[j] = m_poly_frame_height/2 + (int16_t)pSource[3*j+1];
+				zcode[j] = pSource[3*j+2];
+			}
+
+			m_renderer->draw_quad(sx, sy, zcode, color&0x7fff);
+		}
+		else
+		{
+			uint8_t code;
+			int quad_idx = color*6;
+
+			do
+			{
+				code = m_pointram[quad_idx++];
+				color = m_pointram[quad_idx++] | (code<<8);
+
+				for(int j=0; j<4; j++)
 				{
-					sx[j] = m_poly_frame_width/2 + (int16_t)pSource[3*j+0];
-					sy[j] = m_poly_frame_height/2 + (int16_t)pSource[3*j+1];
-					zcode[j] = pSource[3*j+2];
+					uint8_t vi = m_pointram[quad_idx++];
+
+					sx[j] = m_poly_frame_width/2  + (int16_t)pSource[vi*3+0];
+					sy[j] = m_poly_frame_height/2 + (int16_t)pSource[vi*3+1];
+					zcode[j] = pSource[vi*3+2];
 				}
+
 				m_renderer->draw_quad(sx, sy, zcode, color&0x7fff);
-			}
-			else
-			{
-				int quad_idx = color*6;
-				for(;;)
-				{
-					uint8_t code = m_pointram[quad_idx++];
-					color = m_pointram[quad_idx++]|(code<<8);
-					for( j=0; j<4; j++ )
-					{
-						uint8_t vi = m_pointram[quad_idx++];
-						sx[j] = m_poly_frame_width/2  + (int16_t)pSource[vi*3+0];
-						sy[j] = m_poly_frame_height/2 + (int16_t)pSource[vi*3+1];
-						zcode[j] = pSource[vi*3+2];
-					}
-					m_renderer->draw_quad(sx, sy, zcode, color&0x7fff);
-					if( code&0x80 )
-					{ /* end-of-quadlist marker */
-						break;
-					}
-				}
-			}
-			m_mpDspState->slaveOutputSize = 0;
+			} while (!BIT(code, 7)); //Reached end-of-quadlist marker?
 		}
-		else if( count==0 )
-		{
-			fatalerror( "RenderSlaveOutput\n" );
-		}
+
+		m_mpDspState->slaveOutputSize = 0;
+	}
+	else if (count == 0)
+	{
+		fatalerror( "RenderSlaveOutput\n" );
 	}
 }
 
@@ -675,7 +717,8 @@ void namcos21_dsp_c67_device::slave_port3_w(uint16_t data)
 
 void namcos21_dsp_c67_device::slave_XF_output_w(uint16_t data)
 {
-	if (ENABLE_LOGGING) logerror( "%s :slaveXF(%d)\n", machine().describe_context(), data );
+	if (ENABLE_LOGGING)
+		logerror("%s :slaveXF(%d)\n", machine().describe_context(), data);
 }
 
 uint16_t namcos21_dsp_c67_device::slave_portf_r()
@@ -773,14 +816,14 @@ void namcos21_dsp_c67_device::pointram_data_w(offs_t offset, uint16_t data, uint
 
 uint16_t namcos21_dsp_c67_device::namcos21_depthcue_r(offs_t offset)
 {
-	int bank = (m_pointram_control&0x20)?1:0;
+	unsigned bank = BIT(m_pointram_control, 5);
 	return m_depthcue[bank][offset];
 }
 void namcos21_dsp_c67_device::namcos21_depthcue_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if( ACCESSING_BITS_0_7 )
+	if (ACCESSING_BITS_0_7)
 	{
-		int bank = (m_pointram_control&0x20)?1:0;
+		unsigned bank = BIT(m_pointram_control, 5);
 		m_depthcue[bank][offset] = data;
 //      if( (offset&0xf)==0 ) logerror( "\n depthcue: " );
 //      logerror( " %02x", data );
