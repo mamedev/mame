@@ -31,7 +31,7 @@ GekiToride-Jong Space (10011 Ver.A)                                           (C
 Golgo 13 Juusei no Requiem (GLT1 Ver.A)                                       (C) Namco/8ing/Raizing, 2001
 Gunbalina (GNN1 Ver. A)                                                       (C) Namco, 2000
 *Hard Puncher Hajime no Ippo: The Fighting                                    (C) Namco/Taito, 2001
-Hard Puncher Hajime no Ippo 2 - The Fighting - Ouja e no chousen (VER.2.00J)  (C) Namco/Taito, 2002
+Hard Puncher Hajime no Ippo 2 - The Fighting! - Ouja e no chousen (VER.2.00J) (C) Namco/Taito, 2002
 *Honne Hakkenki                                                               (C) Namco, 2001
 Keroro Gunsou Pekopon Shinryaku Shirei De Arimasu! (KRG1 Ver.A)               (C) Namco, 2006
 **Knock Down 2001 / KO2001 (KD11 Ver.B)                                       (C) Namco, 2001
@@ -4170,4 +4170,4 @@ GAME( 2002, nicetsuk,  0,        ns10_nicetsuk,  nicetsuk,     namcos10_memp3_st
 GAME( 2003, squizchs,  0,        ns10_squizchs,  squizchs,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco",                      "Seishun-Quiz Colorful High School (CHS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 
 // MEM/IO
-GAME( 2002, ippo2,     0,        ns10_ippo2,     ippo2,        namcos10_memio_state, memn_driver_init, ROT0, "Taito",             "Hard Puncher Hajime no Ippo 2 - The Fighting - Ouja e no chousen (VER.2.00J)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // 2002/01/20 18:27:18
+GAME( 2002, ippo2,     0,        ns10_ippo2,     ippo2,        namcos10_memio_state, memn_driver_init, ROT0, "Taito",             "Hard Puncher Hajime no Ippo 2 - The Fighting! - Ouja e no chousen (VER.2.00J)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // copyright 2001 but 2002/01/20 18:27:18 in ROM e 2002 on flyer
