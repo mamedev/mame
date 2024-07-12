@@ -10,7 +10,7 @@ David Kittinger.
 
 Hardware notes:
 - PCB label: 100168 REV A
-- Hitachi H8/325 MCU, 26.601712MHz XTAL
+- Hitachi H8/325 MCU (mode 2), 26.601712MHz XTAL
 - 32KB EPROM (M27C256B-12F1), 128KB SRAM (KM681000ALG-10)
 - LCD with 4 7segs and custom segments, same as Novag VIP
 - RJ-12 port for Novag Super System (always 9600 baud)

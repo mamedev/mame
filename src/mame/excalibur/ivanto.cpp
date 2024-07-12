@@ -4,7 +4,10 @@
 /*******************************************************************************
 
 Excalibur Ivan The Terrible (model 701E, H8/3256 version)
-This is the first version (see ivant.cpp for the newer version).
+
+This is the first version, see ivant.cpp for the newer version. It was produced
+in a factory owned by Eric White's company (ex-CXG), hence it's not that strange
+that the LCD is the same as the one in CXG Sphinx Legend and Krypton Challenge.
 
 Hardware notes:
 - PCB label: EXCALIBUR ELECTRONICS, INC. 6/28/96, IVANT
@@ -13,19 +16,18 @@ Hardware notes:
 - LCD with 5 7segs and custom segments
 - no LEDs, button sensors chessboard
 
-It was produced in a factory owned by Eric White's company (ex-CXG), hence it's
-not that strange that the LCD is the same as the one in CXG Sphinx Legend and
-Krypton Challenge/Regency. The MCU used here is a HD6433256A33P from Excalibur
-Mirage, the internal ROM was disabled.
+The MCU used here is a HD6433256A33P from Excalibur Mirage, the internal ROM
+was disabled. It runs at a higher frequency than the H8/3216 version, but
+is actually a bit slower due to the H8/325 /2 clock divider.
 
 TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
 
 BTANB:
-- sound is scratchy like a tape recorder and has spikes here and there, verified
-  with a digital capture, final (analog) output on the real thing sounds a bit
-  better than MAME though
+- speech sound is scratchy (worse than ivant), it has spikes here and there,
+  verified with a digital capture, final (analog) output on the real thing
+  sounds a bit better than MAME though
 
 *******************************************************************************/
 
@@ -346,4 +348,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1996, ivanto, 0,      0,      ivanto,  ivanto, ivanto_state, empty_init, "Excalibur Electronics", "Ivan The Terrible (H8/3256 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1996, ivanto, ivant,  0,      ivanto,  ivanto, ivanto_state, empty_init, "Excalibur Electronics", "Ivan The Terrible (H8/3256 version)", MACHINE_SUPPORTS_SAVE )
