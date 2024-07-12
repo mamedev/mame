@@ -5,15 +5,16 @@
 extern flag float32_is_nan( float32 a ); // since its not defined in softfloat.h
 extern flag float64_is_nan( float64 a ); // since its not defined in softfloat.h
 
-void i386_device::MMXPROLOG()
+bool i386_device::MMXPROLOG()
 {
 	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
 		i386_trap(FAULT_NM, 0, 0);
-		return;
+		return true;
 	}
 	//m_x87_sw &= ~(X87_SW_TOP_MASK << X87_SW_TOP_SHIFT); // top = 0
 	m_x87_tw = 0; // tag word = 0
+	return false;
 }
 
 void i386_device::READMMX(uint32_t ea,MMX_REG &r)
@@ -1042,7 +1043,7 @@ void i386_device::pentium_cmpxchg8b_m64()  // Opcode 0x0f c7
 
 void i386_device::pentium_movntq_m64_r64() // Opcode 0f e7
 {
-	//MMXPROLOG(); // TODO: check if needed
+	//if(MMXPROLOG()) return; // TODO: check if needed
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		CYCLES(1);     // unsupported
@@ -1059,7 +1060,7 @@ void i386_device::pentium_maskmovq_r64_r64()  // Opcode 0f f7
 	int s,m,n;
 	uint8_t modm = FETCH();
 	uint32_t ea = GetEA(7, 0); // ds:di/edi/rdi register
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	s=(modm >> 3) & 7;
 	m=modm & 7;
 	for (n=0;n <= 7;n++)
@@ -1175,7 +1176,7 @@ void i386_device::mmx_group_0f71()  // Opcode 0f 71
 {
 	uint8_t modm = FETCH();
 	uint8_t imm8 = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modm >= 0xc0 ) {
 		switch ( (modm & 0x38) >> 3 )
 		{
@@ -1232,7 +1233,7 @@ void i386_device::mmx_group_0f72()  // Opcode 0f 72
 {
 	uint8_t modm = FETCH();
 	uint8_t imm8 = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modm >= 0xc0 ) {
 		switch ( (modm & 0x38) >> 3 )
 		{
@@ -1283,7 +1284,7 @@ void i386_device::mmx_group_0f73()  // Opcode 0f 73
 {
 	uint8_t modm = FETCH();
 	uint8_t imm8 = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modm >= 0xc0 ) {
 		switch ( (modm & 0x38) >> 3 )
 		{
@@ -1362,7 +1363,7 @@ void i386_device::sse_group_660f73()  // Opcode 66 0f 73
 
 void i386_device::mmx_psrlw_r64_rm64()  // Opcode 0f d1
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1385,7 +1386,7 @@ void i386_device::mmx_psrlw_r64_rm64()  // Opcode 0f d1
 
 void i386_device::mmx_psrld_r64_rm64()  // Opcode 0f d2
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1404,7 +1405,7 @@ void i386_device::mmx_psrld_r64_rm64()  // Opcode 0f d2
 
 void i386_device::mmx_psrlq_r64_rm64()  // Opcode 0f d3
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1421,7 +1422,7 @@ void i386_device::mmx_psrlq_r64_rm64()  // Opcode 0f d3
 
 void i386_device::mmx_paddq_r64_rm64()  // Opcode 0f d4
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q=MMX((modrm >> 3) & 0x7).q+MMX(modrm & 7).q;
@@ -1436,7 +1437,7 @@ void i386_device::mmx_paddq_r64_rm64()  // Opcode 0f d4
 
 void i386_device::mmx_pmullw_r64_rm64()  // Opcode 0f d5
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).w[0]=(uint32_t)((int32_t)MMX((modrm >> 3) & 0x7).s[0]*(int32_t)MMX(modrm & 7).s[0]) & 0xffff;
@@ -1458,7 +1459,7 @@ void i386_device::mmx_pmullw_r64_rm64()  // Opcode 0f d5
 void i386_device::mmx_psubusb_r64_rm64()  // Opcode 0f d8
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -1476,7 +1477,7 @@ void i386_device::mmx_psubusb_r64_rm64()  // Opcode 0f d8
 void i386_device::mmx_psubusw_r64_rm64()  // Opcode 0f d9
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -1493,7 +1494,7 @@ void i386_device::mmx_psubusw_r64_rm64()  // Opcode 0f d9
 
 void i386_device::mmx_pand_r64_rm64()  // Opcode 0f db
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q=MMX((modrm >> 3) & 0x7).q & MMX(modrm & 7).q;
@@ -1509,7 +1510,7 @@ void i386_device::mmx_pand_r64_rm64()  // Opcode 0f db
 void i386_device::mmx_paddusb_r64_rm64()  // Opcode 0f dc
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -1527,7 +1528,7 @@ void i386_device::mmx_paddusb_r64_rm64()  // Opcode 0f dc
 void i386_device::mmx_paddusw_r64_rm64()  // Opcode 0f dd
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -1544,7 +1545,7 @@ void i386_device::mmx_paddusw_r64_rm64()  // Opcode 0f dd
 
 void i386_device::mmx_pandn_r64_rm64()  // Opcode 0f df
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q=(~MMX((modrm >> 3) & 0x7).q) & MMX(modrm & 7).q;
@@ -1559,7 +1560,7 @@ void i386_device::mmx_pandn_r64_rm64()  // Opcode 0f df
 
 void i386_device::mmx_psraw_r64_rm64()  // Opcode 0f e1
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1582,7 +1583,7 @@ void i386_device::mmx_psraw_r64_rm64()  // Opcode 0f e1
 
 void i386_device::mmx_psrad_r64_rm64()  // Opcode 0f e2
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1601,7 +1602,7 @@ void i386_device::mmx_psrad_r64_rm64()  // Opcode 0f e2
 
 void i386_device::mmx_pmulhw_r64_rm64()  // Opcode 0f e5
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).w[0]=(uint32_t)((int32_t)MMX((modrm >> 3) & 0x7).s[0]*(int32_t)MMX(modrm & 7).s[0]) >> 16;
@@ -1623,7 +1624,7 @@ void i386_device::mmx_pmulhw_r64_rm64()  // Opcode 0f e5
 void i386_device::mmx_psubsb_r64_rm64()  // Opcode 0f e8
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -1641,7 +1642,7 @@ void i386_device::mmx_psubsb_r64_rm64()  // Opcode 0f e8
 void i386_device::mmx_psubsw_r64_rm64()  // Opcode 0f e9
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -1658,7 +1659,7 @@ void i386_device::mmx_psubsw_r64_rm64()  // Opcode 0f e9
 
 void i386_device::mmx_por_r64_rm64()  // Opcode 0f eb
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q=MMX((modrm >> 3) & 0x7).q | MMX(modrm & 7).q;
@@ -1674,7 +1675,7 @@ void i386_device::mmx_por_r64_rm64()  // Opcode 0f eb
 void i386_device::mmx_paddsb_r64_rm64()  // Opcode 0f ec
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -1692,7 +1693,7 @@ void i386_device::mmx_paddsb_r64_rm64()  // Opcode 0f ec
 void i386_device::mmx_paddsw_r64_rm64()  // Opcode 0f ed
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -1709,7 +1710,7 @@ void i386_device::mmx_paddsw_r64_rm64()  // Opcode 0f ed
 
 void i386_device::mmx_pxor_r64_rm64()  // Opcode 0f ef
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q=MMX((modrm >> 3) & 0x7).q ^ MMX(modrm & 7).q;
@@ -1724,7 +1725,7 @@ void i386_device::mmx_pxor_r64_rm64()  // Opcode 0f ef
 
 void i386_device::mmx_psllw_r64_rm64()  // Opcode 0f f1
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1747,7 +1748,7 @@ void i386_device::mmx_psllw_r64_rm64()  // Opcode 0f f1
 
 void i386_device::mmx_pslld_r64_rm64()  // Opcode 0f f2
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1766,7 +1767,7 @@ void i386_device::mmx_pslld_r64_rm64()  // Opcode 0f f2
 
 void i386_device::mmx_psllq_r64_rm64()  // Opcode 0f f3
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1783,7 +1784,7 @@ void i386_device::mmx_psllq_r64_rm64()  // Opcode 0f f3
 
 void i386_device::mmx_pmaddwd_r64_rm64()  // Opcode 0f f5
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).i[0]=(int32_t)MMX((modrm >> 3) & 0x7).s[0]*(int32_t)MMX(modrm & 7).s[0]+
@@ -1805,7 +1806,7 @@ void i386_device::mmx_pmaddwd_r64_rm64()  // Opcode 0f f5
 void i386_device::mmx_psubb_r64_rm64()  // Opcode 0f f8
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -1823,7 +1824,7 @@ void i386_device::mmx_psubb_r64_rm64()  // Opcode 0f f8
 void i386_device::mmx_psubw_r64_rm64()  // Opcode 0f f9
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -1841,7 +1842,7 @@ void i386_device::mmx_psubw_r64_rm64()  // Opcode 0f f9
 void i386_device::mmx_psubd_r64_rm64()  // Opcode 0f fa
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 2;n++)
@@ -1859,7 +1860,7 @@ void i386_device::mmx_psubd_r64_rm64()  // Opcode 0f fa
 void i386_device::mmx_paddb_r64_rm64()  // Opcode 0f fc
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -1877,7 +1878,7 @@ void i386_device::mmx_paddb_r64_rm64()  // Opcode 0f fc
 void i386_device::mmx_paddw_r64_rm64()  // Opcode 0f fd
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -1895,7 +1896,7 @@ void i386_device::mmx_paddw_r64_rm64()  // Opcode 0f fd
 void i386_device::mmx_paddd_r64_rm64()  // Opcode 0f fe
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 2;n++)
@@ -2180,7 +2181,7 @@ void i386_device::i386_cyrix_rsts() // Opcode 0f 7d
 
 void i386_device::mmx_movd_r64_rm32() // Opcode 0f 6e
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).d[0]=LOAD_RM32(modrm);
@@ -2194,7 +2195,7 @@ void i386_device::mmx_movd_r64_rm32() // Opcode 0f 6e
 
 void i386_device::mmx_movq_r64_rm64() // Opcode 0f 6f
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).l=MMX(modrm & 0x7).l;
@@ -2207,7 +2208,7 @@ void i386_device::mmx_movq_r64_rm64() // Opcode 0f 6f
 
 void i386_device::mmx_movd_rm32_r64() // Opcode 0f 7e
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		STORE_RM32(modrm, MMX((modrm >> 3) & 0x7).d[0]);
@@ -2220,7 +2221,7 @@ void i386_device::mmx_movd_rm32_r64() // Opcode 0f 7e
 
 void i386_device::mmx_movq_rm64_r64() // Opcode 0f 7f
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX(modrm & 0x7)=MMX((modrm >> 3) & 0x7);
@@ -2234,7 +2235,7 @@ void i386_device::mmx_movq_rm64_r64() // Opcode 0f 7f
 void i386_device::mmx_pcmpeqb_r64_rm64() // Opcode 0f 74
 {
 	int c;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2255,7 +2256,7 @@ void i386_device::mmx_pcmpeqb_r64_rm64() // Opcode 0f 74
 
 void i386_device::mmx_pcmpeqw_r64_rm64() // Opcode 0f 75
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2280,7 +2281,7 @@ void i386_device::mmx_pcmpeqw_r64_rm64() // Opcode 0f 75
 
 void i386_device::mmx_pcmpeqd_r64_rm64() // Opcode 0f 76
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2301,7 +2302,7 @@ void i386_device::mmx_pcmpeqd_r64_rm64() // Opcode 0f 76
 
 void i386_device::mmx_pshufw_r64_rm64_i8() // Opcode 0f 70
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX_REG t;
@@ -2454,7 +2455,7 @@ void i386_device::sse_punpcklqdq_r128_rm128()
 
 void i386_device::mmx_punpcklbw_r64_r64m32() // Opcode 0f 60
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		uint32_t t;
@@ -2490,7 +2491,7 @@ void i386_device::mmx_punpcklbw_r64_r64m32() // Opcode 0f 60
 
 void i386_device::mmx_punpcklwd_r64_r64m32() // Opcode 0f 61
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		uint16_t t;
@@ -2519,7 +2520,7 @@ void i386_device::mmx_punpcklwd_r64_r64m32() // Opcode 0f 61
 
 void i386_device::mmx_punpckldq_r64_r64m32() // Opcode 0f 62
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2540,7 +2541,7 @@ void i386_device::mmx_punpckldq_r64_r64m32() // Opcode 0f 62
 
 void i386_device::mmx_packsswb_r64_rm64() // Opcode 0f 63
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2574,7 +2575,7 @@ void i386_device::mmx_packsswb_r64_rm64() // Opcode 0f 63
 void i386_device::mmx_pcmpgtb_r64_rm64() // Opcode 0f 64
 {
 	int c;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2596,7 +2597,7 @@ void i386_device::mmx_pcmpgtb_r64_rm64() // Opcode 0f 64
 void i386_device::mmx_pcmpgtw_r64_rm64() // Opcode 0f 65
 {
 	int c;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2618,7 +2619,7 @@ void i386_device::mmx_pcmpgtw_r64_rm64() // Opcode 0f 65
 void i386_device::mmx_pcmpgtd_r64_rm64() // Opcode 0f 66
 {
 	int c;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2639,7 +2640,7 @@ void i386_device::mmx_pcmpgtd_r64_rm64() // Opcode 0f 66
 
 void i386_device::mmx_packuswb_r64_rm64() // Opcode 0f 67
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX_REG ds, sd;
@@ -2676,7 +2677,7 @@ void i386_device::mmx_packuswb_r64_rm64() // Opcode 0f 67
 
 void i386_device::mmx_punpckhbw_r64_rm64() // Opcode 0f 68
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2709,7 +2710,7 @@ void i386_device::mmx_punpckhbw_r64_rm64() // Opcode 0f 68
 
 void i386_device::mmx_punpckhwd_r64_rm64() // Opcode 0f 69
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2734,7 +2735,7 @@ void i386_device::mmx_punpckhwd_r64_rm64() // Opcode 0f 69
 
 void i386_device::mmx_punpckhdq_r64_rm64() // Opcode 0f 6a
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2755,7 +2756,7 @@ void i386_device::mmx_punpckhdq_r64_rm64() // Opcode 0f 6a
 
 void i386_device::mmx_packssdw_r64_rm64() // Opcode 0f 6b
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2965,7 +2966,7 @@ void i386_device::sse_cvtsi2ss_r128_rm32() // Opcode f3 0f 2a
 void i386_device::sse_cvtpi2ps_r128_rm64() // Opcode 0f 2a
 {
 	uint8_t modrm = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = (float)MMX(modrm & 0x7).i[0];
 		XMM((modrm >> 3) & 0x7).f[1] = (float)MMX(modrm & 0x7).i[1];
@@ -2982,7 +2983,7 @@ void i386_device::sse_cvtpi2ps_r128_rm64() // Opcode 0f 2a
 void i386_device::sse_cvttps2pi_r64_r128m64() // Opcode 0f 2c
 {
 	uint8_t modrm = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).i[0] = XMM(modrm & 0x7).f[0];
 		MMX((modrm >> 3) & 0x7).i[1] = XMM(modrm & 0x7).f[1];
@@ -2999,7 +3000,7 @@ void i386_device::sse_cvttps2pi_r64_r128m64() // Opcode 0f 2c
 void i386_device::sse_cvtps2pi_r64_r128m64() // Opcode 0f 2d
 {
 	uint8_t modrm = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).i[0] = XMM(modrm & 0x7).f[0];
 		MMX((modrm >> 3) & 0x7).i[1] = XMM(modrm & 0x7).f[1];
@@ -3366,7 +3367,7 @@ void i386_device::sse_movmskpd_r32_r128() // Opcode 66 0f 50
 
 void i386_device::sse_movq2dq_r128_r64() // Opcode f3 0f d6
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = MMX(modrm & 7).q;
@@ -3377,7 +3378,7 @@ void i386_device::sse_movq2dq_r128_r64() // Opcode f3 0f d6
 
 void i386_device::sse_movdqu_r128_rm128() // Opcode f3 0f 6f
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = XMM(modrm & 0x7).q[0];
@@ -3391,7 +3392,7 @@ void i386_device::sse_movdqu_r128_rm128() // Opcode f3 0f 6f
 
 void i386_device::sse_movdqu_rm128_r128() // Opcode f3 0f 7f
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		XMM(modrm & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0];
@@ -3434,7 +3435,7 @@ void i386_device::sse_movdqa_m128_rm128() // Opcode 66 0f 6f
 
 void i386_device::sse_movq_r128_r128m64() // Opcode f3 0f 7e
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = XMM(modrm & 0x7).q[0];
@@ -3476,7 +3477,7 @@ void i386_device::sse_movdqa_rm128_r128() // Opcode 66 0f 7f
 
 void i386_device::sse_pmovmskb_r16_r64() // Opcode 0f d7
 {
-	//MMXPROLOG();
+	//if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int b;
@@ -3495,7 +3496,7 @@ void i386_device::sse_pmovmskb_r16_r64() // Opcode 0f d7
 
 void i386_device::sse_pmovmskb_r32_r64() // Opcode 0f d7
 {
-	//MMXPROLOG();
+	//if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int b;
@@ -4582,7 +4583,7 @@ void i386_device::sse_cmpss_r128_r128m32_i8() // Opcode f3 0f c2
 
 void i386_device::sse_pinsrw_r64_r16m16_i8() // Opcode 0f c4, 16bit register
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		uint8_t imm8 = FETCH();
@@ -4605,7 +4606,7 @@ void i386_device::sse_pinsrw_r64_r16m16_i8() // Opcode 0f c4, 16bit register
 
 void i386_device::sse_pinsrw_r64_r32m16_i8() // Opcode 0f c4, 32bit register
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		uint8_t imm8 = FETCH();
@@ -4639,7 +4640,7 @@ void i386_device::sse_pinsrw_r128_r32m16_i8() // Opcode 66 0f c4
 
 void i386_device::sse_pextrw_r16_r64_i8() // Opcode 0f c5
 {
-	//MMXPROLOG();
+	//if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		uint8_t imm8 = FETCH();
@@ -4656,7 +4657,7 @@ void i386_device::sse_pextrw_r16_r64_i8() // Opcode 0f c5
 
 void i386_device::sse_pextrw_r32_r64_i8() // Opcode 0f c5
 {
-	//MMXPROLOG();
+	//if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		uint8_t imm8 = FETCH();
@@ -4685,7 +4686,7 @@ void i386_device::sse_pextrw_reg_r128_i8() // Opcode 66 0f c5
 void i386_device::sse_pminub_r64_rm64() // Opcode 0f da
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -4719,7 +4720,7 @@ void i386_device::sse_pminub_r128_rm128() // Opcode 66 0f da
 void i386_device::sse_pmaxub_r64_rm64() // Opcode 0f de
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -4737,7 +4738,7 @@ void i386_device::sse_pmaxub_r64_rm64() // Opcode 0f de
 void i386_device::sse_pavgb_r64_rm64() // Opcode 0f e0
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -4755,7 +4756,7 @@ void i386_device::sse_pavgb_r64_rm64() // Opcode 0f e0
 void i386_device::sse_pavgw_r64_rm64() // Opcode 0f e3
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -4772,7 +4773,7 @@ void i386_device::sse_pavgw_r64_rm64() // Opcode 0f e3
 
 void i386_device::sse_pmulhuw_r64_rm64()  // Opcode 0f e4
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).w[0]=((uint32_t)MMX((modrm >> 3) & 0x7).w[0]*(uint32_t)MMX(modrm & 7).w[0]) >> 16;
@@ -4794,7 +4795,7 @@ void i386_device::sse_pmulhuw_r64_rm64()  // Opcode 0f e4
 void i386_device::sse_pminsw_r64_rm64() // Opcode 0f ea
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -4812,7 +4813,7 @@ void i386_device::sse_pminsw_r64_rm64() // Opcode 0f ea
 void i386_device::sse_pmaxsw_r64_rm64() // Opcode 0f ee
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -4829,7 +4830,7 @@ void i386_device::sse_pmaxsw_r64_rm64() // Opcode 0f ee
 
 void i386_device::sse_pmuludq_r64_rm64() // Opcode 0f f4
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q = (uint64_t)MMX((modrm >> 3) & 0x7).d[0] * (uint64_t)MMX(modrm & 0x7).d[0];
@@ -4862,7 +4863,7 @@ void i386_device::sse_psadbw_r64_rm64() // Opcode 0f f6
 {
 	int n;
 	int32_t temp;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		temp=0;
@@ -4883,7 +4884,7 @@ void i386_device::sse_psadbw_r64_rm64() // Opcode 0f f6
 
 void i386_device::sse_psubq_r64_rm64()  // Opcode 0f fb
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q=MMX((modrm >> 3) & 0x7).q - MMX(modrm & 7).q;
@@ -6088,7 +6089,7 @@ void i386_device::sse_cvtpi2pd_r128_rm64()  // Opcode 66 0f 2a
 {
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		MMXPROLOG();
+		if(MMXPROLOG()) return;
 		XMM((modrm >> 3) & 0x7).f64[0] = (double)MMX(modrm & 0x7).i[0];
 		XMM((modrm >> 3) & 0x7).f64[1] = (double)MMX(modrm & 0x7).i[1];
 	} else {
@@ -6104,7 +6105,7 @@ void i386_device::sse_cvtpi2pd_r128_rm64()  // Opcode 66 0f 2a
 void i386_device::sse_cvttpd2pi_r64_rm128()  // Opcode 66 0f 2c
 {
 	uint8_t modrm = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).i[0] = XMM(modrm & 0x7).f64[0];
 		MMX((modrm >> 3) & 0x7).i[1] = XMM(modrm & 0x7).f64[1];
@@ -6121,7 +6122,7 @@ void i386_device::sse_cvttpd2pi_r64_rm128()  // Opcode 66 0f 2c
 void i386_device::sse_cvtpd2pi_r64_rm128()  // Opcode 66 0f 2d
 {
 	uint8_t modrm = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).i[0] = XMM(modrm & 0x7).f64[0];
 		MMX((modrm >> 3) & 0x7).i[1] = XMM(modrm & 0x7).f64[1];
@@ -6617,7 +6618,7 @@ void i386_device::sse_addsubps_r128_rm128() // Opcode f2 0f d0
 void i386_device::sse_movdq2q_r64_r128() // Opcode f2 0f d6
 {
 	uint8_t modrm = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q = XMM(modrm & 0x7).q[0];
 		CYCLES(1);     // TODO: correct cycle count
