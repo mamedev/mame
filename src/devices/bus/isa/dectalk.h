@@ -54,7 +54,7 @@ private:
 	uint8_t m_dma, m_vol, m_bio;
 
 	required_device<i80186_cpu_device> m_cpu;
-	required_device<dac_12bit_r2r_device> m_dac;
+	required_device<dac_12bit_r2r_twos_complement_device> m_dac;
 	required_device<tms32015_device> m_dsp;
 };
 

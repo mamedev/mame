@@ -160,13 +160,13 @@ void dectalk_isa_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_IO, &dectalk_isa_device::dectalk_cpu_io);
 	m_cpu->tmrout0_handler().set(FUNC(dectalk_isa_device::clock_w));
 
-	TMS32015(config, m_dsp, XTAL(20'000'000));
+	TMS32015(config, m_dsp, XTAL(80'000'000)); // this is wrong, but it works
 	m_dsp->set_addrmap(AS_PROGRAM, &dectalk_isa_device::dectalk_dsp_map);
 	m_dsp->set_addrmap(AS_IO, &dectalk_isa_device::dectalk_dsp_io);
 	m_dsp->bio().set(FUNC(dectalk_isa_device::bio_line_r));
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_12BIT_R2R(config, m_dac, 0).add_route(0, "speaker", 1.0); // unknown DAC
+	DAC_12BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(0, "speaker", 1.0); // AD7541 DAC
 }
 
 void dectalk_isa_device::write(offs_t offset, uint8_t data)
