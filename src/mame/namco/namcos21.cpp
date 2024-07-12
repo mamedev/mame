@@ -432,11 +432,12 @@ void namcos21_state::winrun_gpu_register_w(offs_t offset, uint16_t data, uint16_
 
 void namcos21_state::winrun_gpu_videoram_w(offs_t offset, uint16_t data)
 {
-	int color = data>>8;
-	int mask  = data&0xff;
-	for( int i=0; i<8; i++ )
+	uint8_t color = data>>8;
+	uint8_t mask  = data&0xff;
+
+	for (int i=0; i<8; i++)
 	{
-		if( mask&(0x01<<i) )
+		if (BIT(mask, i))
 		{
 			m_gpu_videoram[(offset+i)&0x7ffff] = color;
 			m_gpu_maskram[(offset+i)&0x7ffff] = mask;
@@ -454,29 +455,32 @@ void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &c
 	uint8_t const *const videoram = m_gpu_videoram.get();
 	//printf("%d %d (%d %d) - %04x %04x %04x|%04x %04x\n",cliprect.top(),cliprect.bottom(),m_screen->vpos(),m_gpu_intc->get_posirq_line(),m_winrun_gpu_register[0],m_winrun_gpu_register[2/2],m_winrun_gpu_register[4/2],m_winrun_gpu_register[0xa/2],m_winrun_gpu_register[0xc/2]);
 
-	int const yscroll = -cliprect.top()+(int16_t)m_winrun_gpu_register[0x2/2];
-	int const xscroll = 0;//m_winrun_gpu_register[0xc/2] >> 7;
-	int const base = 0x1000+0x100*(m_winrun_color&0xf);
-	for( int sy=cliprect.top(); sy<=cliprect.bottom(); sy++ )
+	int const yscroll = -cliprect.top() + (int16_t)m_winrun_gpu_register[0x2/2];
+	int const xscroll = 0; //m_winrun_gpu_register[0xc/2] >> 7;
+	int const base = 0x1000 + 0x100 * (m_winrun_color&0xf);
+
+	for (int sy=cliprect.top(); sy<=cliprect.bottom(); sy++)
 	{
-		uint8_t const *const pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
+		uint8_t const *const pSource = &videoram[((yscroll+sy) & 0x3ff) * 0x200];
 		uint16_t *const pDest = &bitmap.pix(sy);
-		for( int sx=cliprect.left(); sx<=cliprect.right(); sx++ )
+
+		for (int sx=cliprect.left(); sx<=cliprect.right(); sx++)
 		{
 			int const pen = pSource[(sx+xscroll) & 0x1ff];
+
 			switch( pen )
 			{
 			case 0xff:
 				break;
 			// TODO: additive blending? winrun car select uses register [0xc] for a xscroll value
 			case 0x00:
-				pDest[sx] = (pDest[sx]&0x1fff)+0x4000;
+				pDest[sx] = (pDest[sx] & 0x1fff) + 0x4000;
 				break;
 			case 0x01:
-				pDest[sx] = (pDest[sx]&0x1fff)+0x6000;
+				pDest[sx] = (pDest[sx] & 0x1fff) + 0x6000;
 				break;
 			default:
-				pDest[sx] = base|pen;
+				pDest[sx] = base | pen;
 				break;
 			}
 		}
@@ -490,6 +494,7 @@ uint32_t namcos21_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, 0x7fc0, 0x7ffe);
 	m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7fbf);
+
 	winrun_bitmap_draw(bitmap,cliprect);
 
 	//popmessage("%04x %04x %04x|%04x %04x",m_winrun_gpu_register[0],m_winrun_gpu_register[2/2],m_winrun_gpu_register[4/2],m_winrun_gpu_register[0xa/2],m_winrun_gpu_register[0xc/2]);
@@ -507,10 +512,9 @@ uint32_t namcos21_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 [[maybe_unused]] void namcos21_state::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_video_enable ); /* 0x40 = enable */
-	if( m_video_enable!=0 && m_video_enable!=0x40 )
-	{
+
+	if (m_video_enable!=0 && m_video_enable!=0x40)
 		logerror( "unexpected video_enable_w=0x%x\n", m_video_enable );
-	}
 }
 
 /***********************************************************/
@@ -631,6 +635,7 @@ void namcos21_state::c140_map(address_map &map)
 void namcos21_state::configure_c65_namcos21(machine_config &config)
 {
 	NAMCOC65(config, m_c65, 2048000);
+
 	m_c65->in_pb_callback().set_ioport("MCUB");
 	m_c65->in_pc_callback().set_ioport("MCUC");
 	m_c65->in_ph_callback().set_ioport("MCUH");
@@ -788,7 +793,7 @@ void namcos21_state::sound_bankselect_w(uint8_t data)
 
 void namcos21_state::sound_reset_w(uint8_t data)
 {
-	if (data & 0x01)
+	if (BIT(data, 0))
 	{
 		/* Resume execution */
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -803,9 +808,9 @@ void namcos21_state::sound_reset_w(uint8_t data)
 
 void namcos21_state::system_reset_w(uint8_t data)
 {
-	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	reset_all_subcpus(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 
-	if (data & 0x01)
+	if (BIT(data, 0))
 		m_maincpu->yield();
 }
 
@@ -857,7 +862,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 	int scanline = param;
 	//  int cur_posirq = get_posirq_scanline()*2;
 
-	if (scanline == 240 * 2)
+	if (scanline == (240 * 2))
 	{
 		m_master_intc->vblank_irq_trigger();
 		m_slave_intc->vblank_irq_trigger();
