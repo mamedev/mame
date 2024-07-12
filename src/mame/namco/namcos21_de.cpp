@@ -249,10 +249,10 @@ uint16_t namco_de_pcbstack_device::video_enable_r()
 
 void namco_de_pcbstack_device::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA( &m_video_enable ); /* 0x40 = enable */
+	COMBINE_DATA(&m_video_enable); /* 0x40 = enable */
 
 	if (m_video_enable!=0 && m_video_enable!=0x40)
-		logerror( "unexpected video_enable_w=0x%x\n", m_video_enable);
+		logerror("unexpected video_enable_w=0x%x\n", m_video_enable);
 }
 
 /***********************************************************/
@@ -382,7 +382,7 @@ void namco_de_pcbstack_device::driveyes_slave_map(address_map &map)
 
 void namco_de_pcbstack_device::sound_bankselect_w(uint8_t data)
 {
-	m_audiobank->set_entry(data>>4);
+	m_audiobank->set_entry(data >> 4);
 }
 
 void namco_de_pcbstack_device::sound_reset_w(uint8_t data)
