@@ -12,9 +12,10 @@ TODO:
 - Memory maps and machine configuration for FP-1000 with reduced VRAM;
 - Unimplemented instruction PER triggered in sub CPU;
 - SCREEN 1 mode has heavy corrupted GFXs and runs at half speed, interlace mode?
-- Cassette Load is untested and probably not working, uses a complex 6 pin discrete circuitry;
-- Sub CPU is supposed to be in WAIT except in horizontal blanking period, WAIT is not emulated.
-- bus slots (uPD765 FDC, ROMPACK, RAMPACK)
+- Cassette Load is really not working, uses a complex 6 pin discrete circuitry;
+- Sub CPU needs proper WAIT line from uPD7801;
+- Main CPU waitstates;
+- bus slots (uPD765 FDC, ROMPACK, RAMPACK), rewrite
 
 ===================================================================================================
 
@@ -137,6 +138,7 @@ private:
 		u8 id = 0;
 	}m_slot[8];
 
+	// TODO: descramble
 	struct {
 		u8 porta = 0;
 		u8 portb = 0;
@@ -152,6 +154,10 @@ private:
 	template<int Line> void int_w(int state);
 	TIMER_CALLBACK_MEMBER(update_interrupts);
 	IRQ_CALLBACK_MEMBER(restart_cb);
+
+	int m_hsync_state = 0;
+	bool m_sub_wait = false;
+	void hsync_cb(int state);
 };
 
 MC6845_UPDATE_ROW( fp1100_state::crtc_update_row )
@@ -250,6 +256,7 @@ u8 fp1100_state::slot_id_r()
 // TODO: convert to `memory_view`
 u8 fp1100_state::memory_r(offs_t offset)
 {
+	// TODO: verify this odd range
 	if (offset < 0x9000 && !m_bank_sel)
 		return m_ipl[offset];
 	else
@@ -304,6 +311,16 @@ template <unsigned N> void fp1100_state::vram_w(offs_t offset, u8 data)
 {
 	// NOTE: POST makes sure to punt in FP-1000 mode if this don't XOR the value
 	m_videoram[N][offset] = ~data;
+
+	if (!machine().side_effects_disabled())
+	{
+		if (!m_sub_wait && m_hsync_state)
+		{
+			// TODO: actual uPD7801 WAIT line
+			m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			m_sub_wait = true;
+		}
+	}
 }
 
 /*
@@ -381,8 +398,8 @@ u8 fp1100_state::portb_r()
 	//m_subcpu->set_input_line(UPD7810_INTF0, BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
 	if (BIT(m_kbd_row, 5))
 		return data;
-	else
-		return 0;
+
+	return 0;
 }
 
 /*
@@ -451,6 +468,19 @@ IRQ_CALLBACK_MEMBER(fp1100_state::restart_cb)
 	}
 	return vector;
 }
+
+// IRQ section (sub)
+
+void fp1100_state::hsync_cb(int state)
+{
+	m_hsync_state = state;
+	if (m_sub_wait && !state)
+	{
+		m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_sub_wait = false;
+	}
+}
+
 
 static INPUT_PORTS_START( fp1100 )
 	PORT_START("KEY.0")
@@ -693,13 +723,14 @@ void fp1100_state::machine_start()
 
 void fp1100_state::machine_reset()
 {
+	m_sub_wait = false;
 	m_sub_irq_status = false;
-	int i;
-	u8 slot_type;
+
+	// TODO: move and refactor
 	const u8 id_type[4] = { 0xff, 0x00, 0x01, 0x04};
-	for(i=0;i<8;i++)
+	for(int i = 0; i < 8; i++)
 	{
-		slot_type = (ioport("SLOTS")->read() >> i*2) & 3;
+		const u8 slot_type = (ioport("SLOTS")->read() >> i*2) & 3;
 		m_slot[i].id = id_type[slot_type];
 	}
 
@@ -739,7 +770,7 @@ void fp1100_state::fp1100(machine_config &config)
 	GENERIC_LATCH_8(config, "sub2main");
 	// NOTE: Needs some sync otherwise it outright refuses to boot
 	config.set_perfect_quantum("maincpu");
-	config.set_perfect_quantum("sub");
+//  config.set_perfect_quantum("sub");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(fp1100_state::centronics_busy_w));
@@ -753,8 +784,9 @@ void fp1100_state::fp1100(machine_config &config)
 	TIMER(config, "kansas_w").configure_periodic(FUNC(fp1100_state::kansas_w), attotime::from_hz(4800));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	// doesn't matter, will be reset by 6845 anyway
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(640, 480);
 	screen.set_visarea_full();
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
@@ -766,6 +798,7 @@ void fp1100_state::fp1100(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(fp1100_state::crtc_update_row));
+	m_crtc->out_hsync_callback().set(FUNC(fp1100_state::hsync_cb));
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 950) // guess
