@@ -55,6 +55,8 @@ The keyboard is a separate unit.  It contains a beeper.
 #include "screen.h"
 #include "speaker.h"
 
+#include "softlist_dev.h"
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -78,7 +80,7 @@ public:
 		, m_keyboard(*this, "KEY.%u", 0)
 		, m_beep(*this, "beeper")
 		, m_centronics(*this, "centronics")
-		, m_cass(*this, "cassette")
+		, m_cassette(*this, "cassette")
 	{ }
 
 	void fp1100(machine_config &config);
@@ -98,7 +100,7 @@ private:
 	required_ioport_array<16> m_keyboard;
 	required_device<beep_device> m_beep;
 	required_device<centronics_device> m_centronics;
-	required_device<cassette_image_device> m_cass;
+	required_device<cassette_image_device> m_cassette;
 
 	void main_map(address_map &map);
 	void io_map(address_map &map);
@@ -125,11 +127,11 @@ private:
 	u8 m_col_cursor = 0;
 	u8 m_col_display = 0;
 	u8 m_centronics_busy = 0;
-	u8 m_cass_data[4]{};
+	u8 m_cassette_data[4]{};
 	bool m_bank_sel = false;
 	bool m_sub_irq_status = false;
-	bool m_cassbit = false;
-	bool m_cassold = false;
+	bool m_cassettebit = false;
+	bool m_cassetteold = false;
 
 	// TODO: descramble
 	struct {
@@ -410,7 +412,7 @@ void fp1100_state::portc_w(u8 data)
 	m_upd7801.portc = data;
 
 	if (BIT(bits, 5))
-		m_cass->change_state(BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		m_cassette->change_state(BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 	if (BIT(bits, 6))
 		m_centronics->write_strobe(BIT(data, 6));
 }
@@ -641,18 +643,18 @@ void fp1100_state::centronics_busy_w(int state)
 
 TIMER_DEVICE_CALLBACK_MEMBER( fp1100_state::kansas_w )
 {
-	m_cass_data[3]++;
+	m_cassette_data[3]++;
 
-	if (m_cassbit != m_cassold)
+	if (m_cassettebit != m_cassetteold)
 	{
-		m_cass_data[3] = 0;
-		m_cassold = m_cassbit;
+		m_cassette_data[3] = 0;
+		m_cassetteold = m_cassettebit;
 	}
 
-	if (m_cassbit)
-		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
+	if (m_cassettebit)
+		m_cassette->output(BIT(m_cassette_data[3], 0) ? -1.0 : +1.0); // 2400Hz
 	else
-		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
+		m_cassette->output(BIT(m_cassette_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
 void fp1100_state::machine_start()
@@ -695,7 +697,7 @@ void fp1100_state::fp1100(machine_config &config)
 	m_subcpu->pb_out_cb().set("cent_data_out", FUNC(output_latch_device::write));
 	m_subcpu->pc_in_cb().set(FUNC(fp1100_state::portc_r));
 	m_subcpu->pc_out_cb().set(FUNC(fp1100_state::portc_w));
-	m_subcpu->txd_func().set([this] (bool state) { m_cassbit = state; });
+	m_subcpu->txd_func().set([this] (bool state) { m_cassettebit = state; });
 
 	GENERIC_LATCH_8(config, "main2sub");
 	GENERIC_LATCH_8(config, "sub2main");
@@ -709,10 +711,14 @@ void fp1100_state::fp1100(machine_config &config)
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(latch);
 
-	CASSETTE(config, m_cass);
-	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("fp1100_cass");
+
 	TIMER(config, "kansas_w").configure_periodic(FUNC(fp1100_state::kansas_w), attotime::from_hz(4800));
+
+	SOFTWARE_LIST(config, "cass_list").set_original("fp1100_cass");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	// doesn't matter, will be reset by 6845 anyway
