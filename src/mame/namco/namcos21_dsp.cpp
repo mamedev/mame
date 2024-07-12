@@ -163,7 +163,7 @@ void namcos21_dsp_device::winrun_dsp_render_w(uint16_t data)
 
 void namcos21_dsp_device::winrun_dsp_pointrom_addr_w(offs_t offset, uint16_t data)
 {
-	if(offset==0)
+	if (offset==0)
 	{ /* port 8 */
 		m_winrun_pointrom_addr = data;
 	}
@@ -261,7 +261,6 @@ void namcos21_dsp_device::winrun_dsp_io(address_map &map)
 void namcos21_dsp_device::device_add_mconfig(machine_config &config)
 {
 	tms32025_device& dsp(TMS32025(config, m_dsp, 24000000*2)); /* 48 MHz? overclocked */
-
 	dsp.set_addrmap(AS_PROGRAM, &namcos21_dsp_device::winrun_dsp_program);
 	dsp.set_addrmap(AS_DATA, &namcos21_dsp_device::winrun_dsp_data);
 	dsp.set_addrmap(AS_IO, &namcos21_dsp_device::winrun_dsp_io);
