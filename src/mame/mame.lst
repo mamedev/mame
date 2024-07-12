@@ -18434,19 +18434,22 @@ mastboyoa                       // (c) 1987 - No Ref on the PCB
 mastboyob
 mastboyoc
 
+@source:gaelco/radikaldarts.cpp
+radikaldrt                      // (c) 2011? Gaelco Darts
+
 @source:gaelco/rollext.cpp
 rollext                         // (c) 1999 - Ref 991015
 
 @source:gaelco/splash.cpp
-funystrp                        // not a gaelco game but on similar hw to splash
+funystrp                        // not a Gaelco game but on similar hw to splash
 paintlad                        // (c) 1992 - ver 1.3
-puckpepl                        // not a gaelco game but on similar hw to splash
-rebus                           // not a gaelco game but on similar hw to splash
-roldfrog                        // not a gaelco game but based on splash code
-roldfroga                       // not a gaelco game but based on splash code
+puckpepl                        // not a Gaelco game but on similar hw to splash
+rebus                           // not a Gaelco game but on similar hw to splash
+roldfrog                        // not a Gaelco game but based on splash code
+roldfroga                       // not a Gaelco game but based on splash code
 splash                          // (c) 1992 - Ref 922804
 splash10                        // (c) 1992 - Ref 922804
-ringball                        // not a gaelco game but based on splash code
+ringball                        // not a Gaelco game but based on splash code
 
 @source:gaelco/splash_ms.cpp
 splashms
@@ -31604,9 +31607,6 @@ quizoa                          // (c) 1985 Seoul Coin Corp.
 quizpun                         // (c) 1989 Space Computer System of Korea
 quizpun2                        // (c) 1989 Space Computer System of Korea
 
-@source:misc/radikaldarts.cpp
-radikaldrt                      // (c) 2011? Gaelco Darts
-
 @source:misc/rawthrillspc.cpp
 doodlejmp                       // (c) 2013 ICE / Raw Thrills / Lima Sky
 fnf                             // (c) 2004 Raw Thrills
@@ -42463,6 +42463,10 @@ zorba                           //
 
 @source:skeleton/zt8802.cpp
 zt8802                          // (c) 19?? Olympia?
+
+@source:skeleton/zvenezia.cpp
+zunknecta                       // (c) 1992 Zanussi / Necta
+zvenezia                        // (c) 1995 Zanussi / Necta
 
 @source:slicer/slicer.cpp
 slicer                          // 1983 Slicer Computers
