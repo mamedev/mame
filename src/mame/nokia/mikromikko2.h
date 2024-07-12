@@ -48,6 +48,7 @@ public:
 		m_sio(*this, "i8251"),
 		m_dmac(*this, "am9517a"),
 		m_fdc(*this, UPD765_TAG),
+		m_floppy(*this, UPD765_TAG ":%u:525qd", 0U),
 		m_speaker(*this, "speaker"),
 		m_sasi(*this, "sasi:7:scsicb"),
 		m_rs232a(*this, "rs232a"),
@@ -73,6 +74,7 @@ private:
 	required_device<i8251_device> m_sio;
 	required_device<am9517a_device> m_dmac;
 	required_device<upd765a_device> m_fdc;
+	optional_device_array<floppy_image_device, 2> m_floppy;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<nscsi_callback_device> m_sasi;
 	required_device<rs232_port_device> m_rs232a;
@@ -113,6 +115,23 @@ private:
 	void cls1_w(offs_t offset, uint8_t data) { m_cls = (BIT(data, 0) << 1) | (m_cls & 0x1); }
 	void tmrout0_w(int state) { if (m_cls == 0) { m_mpsc->rxca_w(state); m_mpsc->txca_w(state); } };
 	void tmrout1_w(int state) { if (m_cls == 1) { m_mpsc->rxca_w(state); m_mpsc->txca_w(state); } };
+
+	uint8_t m_dma_hi;
+	uint8_t m_sasi_data;
+
+	uint8_t dmac_mem_r(offs_t offset);
+	void dmac_mem_w(offs_t offset, uint8_t data);
+
+	void dma_hi_w(offs_t offset, uint8_t data) { m_dma_hi = data & 0x0f; }
+	uint8_t sasi_status_r(offs_t offset);
+	void sasi_cmd_w(offs_t offset, uint8_t data);
+	uint8_t sasi_data_r(offs_t offset);
+	void sasi_data_w(offs_t offset, uint8_t data);
+	void sasi_bsy_w(int state);
+	void sasi_req_w(int state);
+	void sasi_io_w(int state);
+	void fdc_reset_w(offs_t offset, uint8_t data) { m_fdc->reset_w(BIT(data, 0)); }
+	void motor_on_w(offs_t offset, uint8_t data) { m_floppy[0]->mon_w(BIT(data, 0)); }
 
 	bool m_cpl;
 	bool m_blc;
