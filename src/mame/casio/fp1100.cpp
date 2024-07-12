@@ -106,8 +106,6 @@ private:
 
 	void main_bank_w(u8 data);
 	void irq_mask_w(u8 data);
-	void slot_bank_w(u8 data);
-	u8 slot_id_r();
 	u8 memory_r(offs_t offset);
 	void colour_control_w(u8 data);
 	template <unsigned N> u8 vram_r(offs_t offset);
@@ -122,7 +120,6 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 
-	u8 m_slot_num = 0;
 	u8 m_kbd_row = 0;
 	u8 m_col_border = 0;
 	u8 m_col_cursor = 0;
@@ -133,10 +130,6 @@ private:
 	bool m_sub_irq_status = false;
 	bool m_cassbit = false;
 	bool m_cassold = false;
-
-	struct {
-		u8 id = 0;
-	}m_slot[8];
 
 	// TODO: descramble
 	struct {
@@ -209,7 +202,7 @@ other bits not used
 void fp1100_state::main_bank_w(u8 data)
 {
 	m_bank_sel = BIT(data, 1);
-	m_slot_num = (m_slot_num & 3) | ((data & 1) << 2); //??
+//	m_slot_num = (m_slot_num & 3) | ((data & 1) << 2); //??
 }
 
 /*
@@ -242,17 +235,6 @@ void fp1100_state::irq_mask_w(u8 data)
 	LOG("%s: IRQmask=%X\n",machine().describe_context(),data);
 }
 
-void fp1100_state::slot_bank_w(u8 data)
-{
-	m_slot_num = (data & 3) | (m_slot_num & 4);
-}
-
-u8 fp1100_state::slot_id_r()
-{
-	//return 0xff;
-	return m_slot[m_slot_num & 7].id;
-}
-
 // TODO: convert to `memory_view`
 u8 fp1100_state::memory_r(offs_t offset)
 {
@@ -274,7 +256,7 @@ void fp1100_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	//map(0x0000, 0xfeff) slot memory area
-	map(0xff00, 0xff00).mirror(0x7f).rw(FUNC(fp1100_state::slot_id_r), FUNC(fp1100_state::slot_bank_w));
+//	map(0xff00, 0xff00).mirror(0x7f).rw(FUNC(fp1100_state::slot_id_r), FUNC(fp1100_state::slot_bank_w));
 	map(0xff80, 0xff80).mirror(0x7f).r("sub2main", FUNC(generic_latch_8_device::read));
 	map(0xff80, 0xff80).mirror(0x1f).w(FUNC(fp1100_state::irq_mask_w));
 	map(0xffa0, 0xffa0).mirror(0x1f).w(FUNC(fp1100_state::main_bank_w));
@@ -634,48 +616,6 @@ static INPUT_PORTS_START( fp1100 )
 	PORT_DIPSETTING(    0x00, "<undefined>" )
 	PORT_DIPSETTING(    0x20, "Normal" )
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("SLOTS")
-	PORT_CONFNAME( 0x0003, 0x0002, "Slot #0" )
-	PORT_CONFSETTING(    0x0000, "(null)" )
-	PORT_CONFSETTING(    0x0001, "ROM" )
-	PORT_CONFSETTING(    0x0002, "RAM" )
-	PORT_CONFSETTING(    0x0003, "FDC" )
-	PORT_CONFNAME( 0x000c, 0x0008, "Slot #1" )
-	PORT_CONFSETTING(    0x0000, "(null)" )
-	PORT_CONFSETTING(    0x0004, "ROM" )
-	PORT_CONFSETTING(    0x0008, "RAM" )
-	PORT_CONFSETTING(    0x000c, "FDC" )
-	PORT_CONFNAME( 0x0030, 0x0020, "Slot #2" )
-	PORT_CONFSETTING(    0x0000, "(null)" )
-	PORT_CONFSETTING(    0x0010, "ROM" )
-	PORT_CONFSETTING(    0x0020, "RAM" )
-	PORT_CONFSETTING(    0x0030, "FDC" )
-	PORT_CONFNAME( 0x00c0, 0x0080, "Slot #3" )
-	PORT_CONFSETTING(    0x0000, "(null)" )
-	PORT_CONFSETTING(    0x0040, "ROM" )
-	PORT_CONFSETTING(    0x0080, "RAM" )
-	PORT_CONFSETTING(    0x00c0, "FDC" )
-	PORT_CONFNAME( 0x0300, 0x0200, "Slot #4" )
-	PORT_CONFSETTING(    0x0000, "(null)" )
-	PORT_CONFSETTING(    0x0100, "ROM" )
-	PORT_CONFSETTING(    0x0200, "RAM" )
-	PORT_CONFSETTING(    0x0300, "FDC" )
-	PORT_CONFNAME( 0x0c00, 0x0800, "Slot #5" )
-	PORT_CONFSETTING(    0x0000, "(null)" )
-	PORT_CONFSETTING(    0x0400, "ROM" )
-	PORT_CONFSETTING(    0x0800, "RAM" )
-	PORT_CONFSETTING(    0x0c00, "FDC" )
-	PORT_CONFNAME( 0x3000, 0x2000, "Slot #6" )
-	PORT_CONFSETTING(    0x0000, "(null)" )
-	PORT_CONFSETTING(    0x1000, "ROM" )
-	PORT_CONFSETTING(    0x2000, "RAM" )
-	PORT_CONFSETTING(    0x3000, "FDC" )
-	PORT_CONFNAME( 0xc000, 0x8000, "Slot #7" )
-	PORT_CONFSETTING(    0x0000, "(null)" )
-	PORT_CONFSETTING(    0x4000, "ROM" )
-	PORT_CONFSETTING(    0x8000, "RAM" )
-	PORT_CONFSETTING(    0xc000, "FDC" )
 INPUT_PORTS_END
 
 
@@ -726,20 +666,11 @@ void fp1100_state::machine_reset()
 	m_sub_wait = false;
 	m_sub_irq_status = false;
 
-	// TODO: move and refactor
-	const u8 id_type[4] = { 0xff, 0x00, 0x01, 0x04};
-	for(int i = 0; i < 8; i++)
-	{
-		const u8 slot_type = (ioport("SLOTS")->read() >> i*2) & 3;
-		m_slot[i].id = id_type[slot_type];
-	}
-
 	m_beep->set_state(0);
 
 	m_bank_sel = false; // point at rom
 
 	m_interrupt_mask = 0;
-	m_slot_num = 0;
 	m_kbd_row = 0;
 	m_caps_led_state = m_shift_led_state = 0;
 	m_col_border = 0;
