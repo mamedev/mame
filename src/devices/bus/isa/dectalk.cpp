@@ -166,7 +166,7 @@ void dectalk_isa_device::device_add_mconfig(machine_config &config)
 	m_dsp->bio().set(FUNC(dectalk_isa_device::bio_line_r));
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_12BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(0, "speaker", 1.0); // unknown DAC
+	DAC_12BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(0, "speaker", 1.0); // AD7541 DAC
 }
 
 void dectalk_isa_device::write(offs_t offset, uint8_t data)
