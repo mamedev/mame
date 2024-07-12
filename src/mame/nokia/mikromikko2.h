@@ -7,6 +7,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 #include "bus/nscsi/devices.h"
 #include "bus/scsi/s1410.h"
 #include "bus/scsi/scsihd.h"
@@ -22,6 +23,7 @@
 #include "machine/upd765.h"
 #include "machine/z80sio.h"
 #include "machine/x2212.h"
+#include "sound/spkrdev.h"
 #include "video/crt9007.h"
 #include "video/crt9212.h"
 
@@ -45,6 +47,7 @@ public:
 		m_sio(*this, "i8251"),
 		m_dmac(*this, "am9517a"),
 		m_fdc(*this, UPD765_TAG),
+		m_speaker(*this, "speaker"),
 		m_sasi(*this, "sasi:7:scsicb"),
 		m_palette(*this, "palette")
 	{ }
@@ -67,6 +70,7 @@ private:
 	required_device<i8251_device> m_sio;
 	required_device<am9517a_device> m_dmac;
 	required_device<upd765a_device> m_fdc;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<nscsi_callback_device> m_sasi;
 	required_device<palette_device> m_palette;
 
@@ -78,6 +82,7 @@ private:
 
 	static void floppy_formats(format_registration &fr);
 
+	void diag_w(offs_t offset, uint8_t data) { popmessage("%02x", data); }
 	void novram_store(offs_t offset, uint8_t data);
 	void novram_recall(offs_t offset, uint8_t data);
 	uint8_t videoram_r(offs_t offset);

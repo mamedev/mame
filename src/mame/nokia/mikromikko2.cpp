@@ -81,9 +81,9 @@ void mm2_state::mm2_io_map(address_map &map)
 	//map(0xf885, 0xf885) STATUS INPUT PORT
 	map(0xf900, 0xf901).w(FUNC(mm2_state::novram_store)).umask16(0x00ff);
 	map(0xf97e, 0xf97f).w(FUNC(mm2_state::novram_recall)).umask16(0xff00);
-	map(0xf930, 0xf937).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0xf930, 0xf937).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 	//map(0xf941, 0xf941) TIMER INTERRUPT CLEAR LATCH
-	//map(0xf951, 0xf951) DIAGNOSTIC DISPLAY
+	map(0xf950, 0xf951).w(FUNC(mm2_state::diag_w)).umask16(0xff00);
 	//map(0xf961, 0xf961) CLOCK SELECT CLS0
 	//map(0xf963, 0xf963) CLOCK SELECT CLS1
 	//map(0xf965, 0xf965) LOOPBACK LLBA
@@ -230,12 +230,15 @@ void mm2_state::mm2(machine_config &config)
 	m_pit->set_clk<2>(16_MHz_XTAL/8);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	//m_pit->out_handler<1>().set()); MPSC ch B line clock
-	//m_pit->out_handler<2>().set()); Beep control
+	m_pit->out_handler<2>().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	I8274(config, m_mpsc, 16_MHz_XTAL/4);
 	m_mpsc->out_int_callback().set(m_pic, FUNC(pic8259_device::ir1_w));
 
 	X2212(config, m_novram);
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// CRTC186
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
