@@ -32,6 +32,18 @@ Notes:
 - There is also a 4-channel version of the sound board for the cockpit
   cabinet (ROMs not dumped)
 
+Other known undumped versions:
+- Another ranking song version - ported to PS2 "Taito Memories".
+  https://youtu.be/JXIvaM5508c?si=wCojMales2Kg9L7u&t=270 (Ranking 1st song)
+  https://youtu.be/Btnl9FYTiL8?si=rrGTblIfOlIQo6NJ&t=308 (Ranking 2nd song)
+- 2 player joystick version - after inserting a coin, 
+  instead of "START YOUR ENGINE", it displays "PUSH ONLY 1-PLAYER BUTTON".
+  https://youtu.be/iE9-q4IruS4?si=eYL5_iXDZDyH9TS_&t=31
+  (The title of this video states that this is the joystick version)
+- Japanese version - after inserting a coin, instead of "START YOUR ENGINE", 
+  it displays "セレクトボタンをおしてね！！(Press select button!!)" 
+  and "クレジット(Credit)" instead of "CREDIT".
+  https://youtu.be/gmC8Al1oCpo?si=JTO6eJ5Q_6-bj_NQ&t=6
 
 Memory Map
 ----------
