@@ -43,15 +43,17 @@
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
+namespace {
 
-ROM_START(mc10_mcx128)
+ROM_START(mcx128)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD("mcx128bas.rom", 0x0000, 0x4000, CRC(11202e4b) SHA1(36c30d0f198a1bffee88ef29d92f2401447a91f4))
-ROM_END
+	ROM_DEFAULT_BIOS("mc10")
 
-ROM_START(alice_mcx128)
-	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD("alice128bas.rom", 0x0000, 0x4000, CRC(a737544a) SHA1(c8fd92705fc42deb6a0ffac6274e27fd61ecd4cc))
+	ROM_SYSTEM_BIOS(0, "mc10", "Darren Atkinson's MCX-128 cartridge")
+	ROMX_LOAD("mcx128bas.rom", 0x0000, 0x4000, CRC(11202e4b) SHA1(36c30d0f198a1bffee88ef29d92f2401447a91f4), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "alice", "Darren Atkinson's MCX-128 cartridge for Alice")
+	ROMX_LOAD("alice128bas.rom", 0x0000, 0x4000, CRC(a737544a) SHA1(c8fd92705fc42deb6a0ffac6274e27fd61ecd4cc), ROM_BIOS(1))	
 ROM_END
 
 //**************************************************************************
@@ -69,18 +71,11 @@ public:
 	mc10_pak_mcx128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// construction/destruction
-	mc10_pak_mcx128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-
 	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 
-	virtual const tiny_rom_entry *device_rom_region() const override
-	{
-		return ROM_NAME(mc10_mcx128);
-	}
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	u8 control_register_read(offs_t offset);
 	void control_register_write(offs_t offset, u8 data);
@@ -108,25 +103,24 @@ private:
 
 };
 
-DEFINE_DEVICE_TYPE_PRIVATE(MC10_PAK_MCX128, device_mc10cart_interface, mc10_pak_mcx128_device, "mc10_mcx128", "Darren Atkinson's MCX-128 cartridge")
-
 //-------------------------------------------------
 //  mc10_pak_device - constructor
 //-------------------------------------------------
 
 mc10_pak_mcx128_device::mc10_pak_mcx128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	:mc10_pak_mcx128_device(mconfig, MC10_PAK_MCX128, tag, owner, clock)
-{
-}
-
-mc10_pak_mcx128_device::mc10_pak_mcx128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock)
+	: device_t(mconfig, MC10_PAK_MCX128, tag, owner, clock)
 	, device_mc10cart_interface(mconfig, *this)
 	, m_share(*this, "ext_ram", 1024*128, ENDIANNESS_BIG)
 	, m_view(*this, "mcx_view")
 	, m_bank(*this, "bank%u", 0U)
 {
 }
+
+const tiny_rom_entry * mc10_pak_mcx128_device::device_rom_region() const
+{
+	return ROM_NAME(mcx128);
+}
+
 
 void mc10_pak_mcx128_device::view_map0(address_map &map)
 {
@@ -290,11 +284,6 @@ void mc10_pak_mcx128_device::device_reset()
 	update_banks();
 }
 
-void mc10_pak_mcx128_device::device_post_load()
-{
-	update_banks();
-}
-
 void mc10_pak_mcx128_device::write_ram_mirror(address_space &space, offs_t offset, u8 data)
 {
 	std::optional<int> cur_slot = m_view.entry();
@@ -345,27 +334,6 @@ void mc10_pak_mcx128_device::update_banks()
 	LOG("view select: %d, bank cr: %d\n", (bank1 << 2) | (rom_map_cr & 0x03), ram_bank_cr & 0x03 );
 }
 
-class alice_pak_mcx128_device : public mc10_pak_mcx128_device
-{
-public:
-	// construction/destruction
-	alice_pak_mcx128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+} // anonymous namespace
 
-protected:
-	// device-level overrides
-	virtual const tiny_rom_entry *device_rom_region() const override
-	{
-		return ROM_NAME(alice_mcx128);
-	}
-};
-
-//-------------------------------------------------
-//  mc10_pak_device - constructor
-//-------------------------------------------------
-
-alice_pak_mcx128_device::alice_pak_mcx128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mc10_pak_mcx128_device(mconfig, ALICE_PAK_MCX128, tag, owner, clock)
-{
-}
-
-DEFINE_DEVICE_TYPE_PRIVATE(ALICE_PAK_MCX128, device_mc10cart_interface, alice_pak_mcx128_device, "alice_mcx128", "Darren Atkinson's MCX-128 cartridge (Alice ROM)")
+DEFINE_DEVICE_TYPE_PRIVATE(MC10_PAK_MCX128, device_mc10cart_interface, mc10_pak_mcx128_device, "mcx128", "Darren Atkinson's MCX-128 cartridge")
