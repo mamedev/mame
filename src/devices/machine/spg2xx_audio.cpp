@@ -449,7 +449,9 @@ void spg2xx_audio_device::audio_ctrl_w(offs_t offset, uint16_t data)
 	case AUDIO_CHANNEL_ENABLE:
 	{
 		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Channel Enable: %04x\n", data);
-		const uint16_t changed = m_audio_ctrl_regs[AUDIO_CHANNEL_ENABLE] ^ data;
+		const uint16_t old = m_audio_ctrl_regs[offset];
+		m_audio_ctrl_regs[offset] = data;
+		const uint16_t changed = old ^ m_audio_ctrl_regs[offset];
 		for (uint32_t channel_bit = 0; channel_bit < 16; channel_bit++)
 		{
 			const uint16_t mask = 1 << channel_bit;
@@ -458,44 +460,23 @@ void spg2xx_audio_device::audio_ctrl_w(offs_t offset, uint16_t data)
 
 			if (data & mask)
 			{
+				LOGMASKED(LOG_SPU_WRITES, "Enabling channel %d, rate %f\n", channel_bit, m_channel_rate[channel_bit]);
+				if (m_audio_ctrl_regs[AUDIO_CHANNEL_STOP] & mask)
+					continue;
+
 				if (!(m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] & mask))
 				{
-					LOGMASKED(LOG_SPU_WRITES, "Enabling channel %d, rate %f\n", channel_bit, m_channel_rate[channel_bit]);
-					m_audio_ctrl_regs[offset] |= mask;
-					if (BIT(m_audio_ctrl_regs[AUDIO_CHANNEL_FIQ_ENABLE], channel_bit))
-					{
-						m_channel_irq[channel_bit]->adjust(attotime::from_hz(m_channel_rate[channel_bit]), channel_bit, attotime::from_hz(m_channel_rate[channel_bit]));
-					}
-					else
-					{
-						m_channel_irq[channel_bit]->adjust(attotime::never);
-					}
-
-					if (!(m_audio_ctrl_regs[AUDIO_CHANNEL_STOP] & mask))
-					{
-						LOGMASKED(LOG_SPU_WRITES, "Stop not set, starting playback on channel %d, mask %04x\n", channel_bit, mask);
-						m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] |= mask;
-						m_sample_addr[channel_bit] = get_wave_addr(channel_bit);
-						m_envelope_addr[channel_bit] = get_envelope_addr(channel_bit);
-						set_envelope_count(channel_bit, get_envelope_load(channel_bit));
-					}
-					m_adpcm[channel_bit].reset();
-					m_sample_shift[channel_bit] = 0;
-					m_sample_count[channel_bit] = 0;
-
-					if (get_adpcm36_bit(channel_bit))
-					{
-						memset(m_adpcm36_state + channel_bit, 0, sizeof(adpcm36_state));
-					}
+					LOGMASKED(LOG_SPU_WRITES, "Stop not set, starting playback on channel %d, mask %04x\n", channel_bit, mask);
+					start_channel(channel_bit);
 				}
 			}
 			else
 			{
-				stop_channel(channel_bit);
-				//m_audio_ctrl_regs[offset] &= ~mask;
-				//m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] &= ~mask;
-				//m_audio_ctrl_regs[AUDIO_CHANNEL_STOP] |= mask;
-				//m_audio_ctrl_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~mask;
+				LOGMASKED(LOG_SPU_WRITES, "Disabling channel %d\n", channel_bit);
+				if (m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] & mask) {
+					LOGMASKED(LOG_SPU_WRITES, "Stopping channel %d\n", channel_bit);
+					stop_channel(channel_bit);
+				}
 			}
 		}
 		break;
@@ -612,9 +593,29 @@ void spg2xx_audio_device::audio_ctrl_w(offs_t offset, uint16_t data)
 	}
 
 	case AUDIO_CHANNEL_STOP:
+	{
 		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Channel Stop Status: %04x\n", data);
+		const uint16_t old = m_audio_ctrl_regs[offset];
 		m_audio_ctrl_regs[offset] &= ~data;
+		const uint16_t changed = old ^ m_audio_ctrl_regs[offset];
+		for (uint32_t channel_bit = 0; channel_bit < 16; channel_bit++)
+		{
+			const uint16_t mask = 1 << channel_bit;
+			if (!(changed & mask))
+				continue;
+
+			LOGMASKED(LOG_SPU_WRITES, "Clearing stop status of channel %d, rate %f\n", channel_bit, m_channel_rate[channel_bit]);
+			if (!(m_audio_ctrl_regs[AUDIO_CHANNEL_ENABLE] & mask))
+				continue;
+
+			if (!(m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] & mask))
+			{
+				LOGMASKED(LOG_SPU_WRITES, "Enable set, starting playback on channel %d, mask %04x\n", channel_bit, mask);
+				start_channel(channel_bit);
+			}
+		}
 		break;
+	}
 
 	case AUDIO_CHANNEL_ZERO_CROSS:
 		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Channel Zero-Cross Enable: %04x\n", data);
@@ -981,9 +982,34 @@ void spg2xx_audio_device::sound_stream_update(sound_stream &stream, std::vector<
 	}
 }
 
+inline void spg2xx_audio_device::start_channel(const uint32_t channel)
+{
+	if (BIT(m_audio_ctrl_regs[AUDIO_CHANNEL_FIQ_ENABLE], channel))
+	{
+		m_channel_irq[channel]->adjust(attotime::from_hz(m_channel_rate[channel]), channel, attotime::from_hz(m_channel_rate[channel]));
+	}
+	else
+	{
+		m_channel_irq[channel]->adjust(attotime::never);
+	}
+
+	m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] |= (1 << channel);
+	m_sample_addr[channel] = get_wave_addr(channel);
+	m_envelope_addr[channel] = get_envelope_addr(channel);
+	set_envelope_count(channel, get_envelope_load(channel));
+
+	m_adpcm[channel].reset();
+	m_sample_shift[channel] = 0;
+	m_sample_count[channel] = 0;
+
+	if (get_adpcm36_bit(channel))
+	{
+		memset(m_adpcm36_state + channel, 0, sizeof(adpcm36_state));
+	}
+}
+
 inline void spg2xx_audio_device::stop_channel(const uint32_t channel)
 {
-	m_audio_ctrl_regs[AUDIO_CHANNEL_ENABLE] &= ~(1 << channel);
 	m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] &= ~(1 << channel);
 	m_audio_regs[(channel << 4) | AUDIO_MODE] &= ~AUDIO_ADPCM_MASK;
 	m_audio_ctrl_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~(1 << channel);
@@ -1140,6 +1166,7 @@ bool spg2xx_audio_device::fetch_sample(const uint32_t channel)
 			{
 				LOGMASKED(LOG_SAMPLES, "ADPCM stopped after %d samples\n", m_sample_count[channel]);
 				m_sample_count[channel] = 0;
+				m_audio_ctrl_regs[AUDIO_CHANNEL_STOP] |= (1 << channel);
 				stop_channel(channel);
 				return false;
 			}
@@ -1206,6 +1233,7 @@ bool spg2xx_audio_device::fetch_sample(const uint32_t channel)
 				{
 					LOGMASKED(LOG_SAMPLES, "Channel %d: 8-bit PCM stopped after %d samples\n", channel, m_sample_count[channel]);
 					m_sample_count[channel] = 0;
+					m_audio_ctrl_regs[AUDIO_CHANNEL_STOP] |= (1 << channel);
 					stop_channel(channel);
 					return false;
 				}
@@ -1289,11 +1317,8 @@ void spg2xx_audio_device::audio_rampdown_tick(const uint32_t channel)
 	{
 		LOGMASKED(LOG_RAMPDOWN, "Stopping channel %d due to rampdown\n", channel);
 		const uint16_t channel_mask = 1 << channel;
-		m_audio_ctrl_regs[AUDIO_CHANNEL_ENABLE] &= ~channel_mask;
-		m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] &= ~channel_mask;
 		m_audio_ctrl_regs[AUDIO_CHANNEL_STOP] |= channel_mask;
-		m_audio_ctrl_regs[AUDIO_ENV_RAMP_DOWN] &= ~channel_mask;
-		m_audio_ctrl_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~channel_mask;
+		stop_channel(channel);
 	}
 }
 
@@ -1362,6 +1387,7 @@ bool spg2xx_audio_device::audio_envelope_tick(const uint32_t channel)
 				if (new_edd == 0)
 				{
 					LOGMASKED(LOG_ENVELOPES, "Envelope %d at 0, stopping channel\n", channel);
+					m_audio_ctrl_regs[AUDIO_CHANNEL_STOP] |= (1 << channel);
 					stop_channel(channel);
 					return true;
 				}
