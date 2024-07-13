@@ -7,12 +7,12 @@ extern flag float64_is_nan( float64 a ); // since its not defined in softfloat.h
 
 bool i386_device::MMXPROLOG()
 {
-	if (m_cr[0] & (CR0_TS | CR0_EM))
+	if (m_cr[0] & CR0_TS)
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return true;
 	}
-	//m_x87_sw &= ~(X87_SW_TOP_MASK << X87_SW_TOP_SHIFT); // top = 0
+	x87_set_stack_top(0);
 	m_x87_tw = 0; // tag word = 0
 	return false;
 }
@@ -1913,13 +1913,17 @@ void i386_device::mmx_paddd_r64_rm64()  // Opcode 0f fe
 
 void i386_device::mmx_emms() // Opcode 0f 77
 {
-	if (m_cr[0] & (CR0_TS | CR0_EM))
+	if (m_cr[0] & CR0_TS)
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;
 	}
+	if (m_cr[0] & CR0_EM)
+	{
+		i386_trap(FAULT_UD, 0, 0);
+		return;
+	}
 	m_x87_tw = 0xffff; // tag word = 0xffff
-	// TODO
 	CYCLES(1);     // TODO: correct cycle count
 }
 
