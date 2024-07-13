@@ -2061,7 +2061,7 @@ ROM_START( iowapp )
 	ROM_LOAD( "iowa_u40.u40", 0x0000, 0x2000, CRC(6d2a1ca8) SHA1(96ef3e0914c2b213ed9c9082fa3e27d75d52a8ec) )
 ROM_END
 
-ROM_START( dodgectya )
+ROM_START( dodgectyba )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2131-82_u5-0d.u5", 0x0000, 0x8000, CRC(ef71b268) SHA1(c85f2c8e7e9cd89b4720699814d8fcfbecf4dc1b) ) // 2131-82 U5-0D 884111 2131 820
 
@@ -2077,7 +2077,7 @@ ROM_START( dodgectya )
 	ROM_LOAD( "crt-209_2131-82", 0x0000, 0x0800, CRC(ec540d8a) SHA1(fbc64d4cc56f418bc090b47bb6798e3a90282f56) )
 ROM_END
 
-ROM_START( dodgectyb )
+ROM_START( dodgectybb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2131-82_u5-50.u5", 0x0000, 0x8000, CRC(eb82515d) SHA1(d2c15bd633472f50b621ba90598559e345246d01) ) // 2131-82 U5-50 987130 2131 825
 
@@ -2096,7 +2096,7 @@ ROM_START( dodgectyb )
 	ROM_LOAD( "crt-209_pal16l8.bin", 0x000, 0x117, CRC(e916c56f) SHA1(1517091ff1791d923e5bd62d18d1428b6a3a8c72) ) // SC3339 20-pin 16L8 type PAL
 ROM_END
 
-ROM_START( dodgectyc )
+ROM_START( dodgectybc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2131-82_u5-0_gt.u5", 0x0000, 0x8000, CRC(3858cd50) SHA1(1b1e208076df964afd68d01aa8d5489d36a934a5) ) // 2131-82 U5-0 GT 982050 2131 820
 
@@ -3002,9 +3002,9 @@ GAME( 1986, bigappg,    0,        bigappg, bigappg,   merit_state,        empty_
 GAME( 1986, misdraw,    0,        misdraw, bigappg,   merit_state,        empty_init,   ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1990, iowapp,     0,        riviera, iowapp,    merit_state,        empty_init,   ROT0,  "Merit",                   "Iowa Premium Player (2131-21, U5-1)",   MACHINE_SUPPORTS_SAVE ) // Copyright year based on ROM label
 
-GAME( 1988, dodgectya,  dodgecty, no_u40,  dodge,     merit_state,        init_crt209,  ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1989, dodgectyb,  dodgecty, no_u40,  dodge,     merit_state,        init_crt209,  ROT0,  "Merit", "Dodge City (2131-82, U5-50)",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1989, dodgectyc,  dodgecty, no_u40,  dodge,     merit_state,        init_crt209,  ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, dodgectyba, dodgecty, no_u40,  dodge,     merit_state,        init_crt209,  ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1989, dodgectybb, dodgecty, no_u40,  dodge,     merit_state,        init_crt209,  ROT0,  "Merit", "Dodge City (2131-82, U5-50)",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1989, dodgectybc, dodgecty, no_u40,  dodge,     merit_state,        init_crt209,  ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1989, msupstar,   0,        no_u40,  msupstar,  merit_state,        init_crt209,  ROT0,  "Merit", "Superstar (4435-81, U5-1)",          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_PRINTER )
 
@@ -3025,7 +3025,7 @@ GAME( 1985, trvwz3v,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_
 
 GAME( 1985, trvwz4,     0,        trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT0,  "Merit", "Trivia ? Whiz Edition 4 (6221-10, U5-0A)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1985, trvwz4v,    trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT90, "Merit", "Trivia ? Whiz Edition 4 (6221-13, U5-0B, Vertical)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz4va,   trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT90, "Merit", "Trivia ? Whiz Edition 4 (6221-13, U5-0B, alt Sex trivia)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz4va,   trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT90, "Merit", "Trivia ? Whiz Edition 4 (6221-13, U5-0B, Vertical, Alt Sex trivia)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, tictac,     0,        tictac,   tictac,   merit_quiz_state,   init_key<8>,  ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C, 07/07/86)",                MACHINE_SUPPORTS_SAVE ) // all new trivia categories
 GAME( 1985, tictaca,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>,  ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C, 02/11/86)",                MACHINE_SUPPORTS_SAVE )
