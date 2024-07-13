@@ -7,15 +7,18 @@ Casio FP-1100 (GX-205)
 TODO:
 - Keyboard not working, should trigger INTF0 on key pressed (for PF only), main CPU receives
   garbage from sub (command protocol 0x04 -> <scancode> -> 0x00 -> 0x00)
-- Understand how to enter Test Mode, if possible at all from available romsets
-  (cfr. page 94 of service manual)
 - Memory maps and machine configuration for FP-1000 with reduced VRAM;
 - Unimplemented instruction PER triggered in sub CPU;
 - SCREEN 1 mode has heavy corrupted GFXs and runs at half speed, interlace mode?
 - Cassette Load is really not working, uses a complex 6 pin discrete circuitry;
 - Sub CPU needs proper WAIT line from uPD7801;
 - Main CPU waitstates;
-- bus slots (uPD765 FDC, ROMPACK, RAMPACK), rewrite
+- bus slots (FP-1060I/O, 1 slot can take up to 4 sub slots below):
+  - FP-1020FD (FDC uPD765, 2x 5.25 floppy DSDD, id = 0x04)
+  - FP-1030 (RAMPACK, id = 0x01)
+  - FP-1031 (ROMPACK, id = 0x00)
+  - FP-1035RS (RS-232C, id = 0x02)
+  - One of the ROMPACKs has undumped Test Mode (cfr. page 94 of service manual)
 
 ===================================================================================================
 
@@ -231,6 +234,8 @@ void fp1100_state::irq_mask_w(u8 data)
 	LOG("%s: IRQmask=%X\n",machine().describe_context(),data);
 }
 
+// NOTE: BASIC is very picky if it doesn't find a configuration akin to this
+// Disregard the "NOT USABLE" for page 0 from service manual (definitely wants offset + 0x9000 there)
 void fp1100_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -336,6 +341,7 @@ void fp1100_state::sub_map(address_map &map)
 	map(0xec00, 0xec00).mirror(0x3ff).lw8(NAME([this] (u8 data) { m_subcpu->set_input_line(UPD7810_INTF0, CLEAR_LINE); }));
 	map(0xf000, 0xf000).mirror(0x3ff).w(FUNC(fp1100_state::colour_control_w));
 	map(0xf400, 0xff7f).rom().region("sub_ipl", 0x2400);
+//  map(0xff80, 0xffff) internal 7801 RAM
 }
 
 /*
