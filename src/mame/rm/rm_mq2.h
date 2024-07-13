@@ -30,6 +30,8 @@ protected:
 	void device_start() override;
 
 private:
+	bool m_8inch_sel = false;
+
 	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80sio_device> m_sio;
@@ -45,6 +47,7 @@ private:
 	uint8_t drive_status_r();
 	void fdc_intrq_w(int state);
 	void fdc_drq_w(int state);
+	uint8_t fdc_read(offs_t offset);
 };
 
 DECLARE_DEVICE_TYPE(RM_MQ2, rmMQ2_device)

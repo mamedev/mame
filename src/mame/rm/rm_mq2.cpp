@@ -43,7 +43,6 @@ const tiny_rom_entry *rmMQ2_device::device_rom_region() const
 void rmMQ2_device::rmMQ2_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("idc_rom", 0);
-	//map(0xe000, 0xffff).ram(); // 8K RAM
 	map(0xe000, 0xe7ff).mirror(0x1800).ram(); // 2K RAM mirrored at 0xe800, 0xf000 and 0xf800
 }
 
@@ -53,7 +52,7 @@ void rmMQ2_device::rmMQ2_mem(address_map &map)
 
 void rmMQ2_device::rmMQ2_io(address_map &map)
 {
-	map(0x00, 0x03).mirror(0xff00).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x00, 0x03).mirror(0xff00).r(FUNC(rmMQ2_device::fdc_read)).w(m_fdc, FUNC(fd1793_device::write));
 	map(0x04, 0x04).mirror(0xff00).r(FUNC(rmMQ2_device::drive_status_r));
 	map(0x07, 0x07).mirror(0xff00).r(FUNC(rmMQ2_device::status_r));
 	map(0x0d, 0x0d).mirror(0xff00).w(FUNC(rmMQ2_device::port1_w));
@@ -177,6 +176,7 @@ void rmMQ2_device::port1_w(uint8_t data)
 {
 	// bit 1 is set for DD (MFM encoding), and cleared for SD (FM encoding)
 	m_fdc->dden_w(!BIT(data, 1));
+	m_8inch_sel = BIT(data, 0);
 }
 
 uint8_t rmMQ2_device::status_r()
@@ -208,4 +208,22 @@ void rmMQ2_device::fdc_drq_w(int state)
 	{
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 	}
+}
+
+uint8_t rmMQ2_device::fdc_read(offs_t offset)
+{
+	uint8_t data = m_fdc->read(offset);
+
+	/* When the 8INCH line is high the Index Pulse FDC input is connected to pin 4 of the 
+	   floppy connector, which is unused by 5.25" drives.  This fact is used by the firmware
+	   to detect the drive type being used, i.e. it sets 8INCH high and checks to see if the IP
+	   is received within a set time.  We must therefore ensure that the INDEX bit of the
+	   FDC status byte remains low during this detection period to prevent 8" drive parameters
+	   from being mistakenly used. */
+	if ((offset == 0) && m_8inch_sel)
+	{
+		data &= 0xfd;
+	}
+
+	return data;
 }
