@@ -246,6 +246,9 @@ u8 ncr5385_device::aux_status_r()
 
 	if (!m_int_status)
 	{
+		// AB mask out any bits
+		data &= ~(AUX_STATUS_MSG | AUX_STATUS_CD | AUX_STATUS_IO);
+
 		// return current phase
 		u32 const ctrl = scsi_bus->ctrl_r();
 		if (ctrl & S_MSG)
@@ -353,6 +356,9 @@ void ncr5385_device::cmd_w(u8 data)
 	}
 	else
 	{
+		// we assume everything here generates an IRQ?
+		// assert(data & CMD_INT);
+
 		// interrupting commands
 		m_aux_status &= ~AUX_STATUS_DATA_FULL;
 		m_cmd = data;
@@ -718,6 +724,7 @@ int ncr5385_device::state_step()
 			else
 			{
 				LOGMASKED(LOG_STATE, "xfi_out: %s\n", remaining() ? "phase change" : "transfer complete");
+
 				m_int_status |= INT_BUS_SERVICE;
 				m_state = IDLE;
 
@@ -839,8 +846,7 @@ void ncr5385_device::set_dreq(bool dreq)
 void ncr5385_device::update_int()
 {
 	bool const int_state = m_int_status & (INT_FUNC_COMPLETE | INT_BUS_SERVICE |
-																				INT_DISCONNECTED | INT_SELECTED |
-																				INT_RESELECTED |INT_INVALID_CMD);
+			INT_DISCONNECTED | INT_SELECTED | INT_RESELECTED | INT_INVALID_CMD);
 
 	if (m_int_state != int_state)
 	{
