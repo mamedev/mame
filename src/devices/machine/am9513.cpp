@@ -35,7 +35,6 @@
 #define LOG_WARN    (1U << 4)
 
 //#define VERBOSE (LOG_GENERAL | LOG_MODE)
-#define VERBOSE -1
 
 #include "logmacro.h"
 
