@@ -338,6 +338,7 @@ protected:
 
 	uint16_t read_space(offs_t offset);
 
+	void start_channel(const uint32_t channel);
 	void stop_channel(const uint32_t channel);
 	bool advance_channel(const uint32_t channel);
 	bool fetch_sample(const uint32_t channel);
