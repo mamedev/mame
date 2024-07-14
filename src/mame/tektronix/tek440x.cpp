@@ -385,7 +385,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 
 			m_map_control |= (1 << MAP_BLOCK_ACCESS);
 
-			LOG("memory_r: bus error: PID(%d) != %d %08x fc(%d)\n", BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
+			LOG("memory_r: bus error: PID(%d) != %d %08x fc(%d) pc(%08x)\n", BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), OFF16_TO_OFF8(offset), m_maincpu->pc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
@@ -399,7 +399,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	// NB byte memory limit, offset is *word* offset
 	if (offset < OFF8_TO_OFF16(0x600000) && offset >= OFF8_TO_OFF16(MAXRAM) && !machine().side_effects_disabled())
 	{
-		LOG("memory_r: bus error: %08x fc(%d)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
+		LOG("memory_r: bus error: %08x fc(%d) pc(%08x)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_maincpu->set_buserror_details(offset0 << 1, 1, m_maincpu->get_fc());
@@ -480,7 +480,7 @@ u16 tek440x_state::map_r(offs_t offset)
 	// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
 	if (!BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
-			LOG("map_r: bus error: PID(%d) %08x fc(%d)\n", BIT(m_map[(offset >> 11) & 0x7ff], 11, 3), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
+			LOG("map_r: bus error: PID(%d) %08x fc(%d) pc(%08x)\n", BIT(m_map[(offset >> 11) & 0x7ff], 11, 3), OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset, 0, m_maincpu->get_fc());
@@ -520,11 +520,12 @@ u8 tek440x_state::mapcntl_r()
 
 void tek440x_state::mapcntl_w(u8 data)
 {
-#if 0
-	LOG("mapcntl_w mmu_enable   %2d\n", BIT(data, MAP_VM_ENABLE));
-	LOG("mapcntl_w write_enable %2d\n", BIT(data, MAP_SYS_WR_ENABLE));
-	LOG("mapcntl_w pte PID    0x%02x\n", data & 15);
-#endif
+	if (m_map_control != (data & 0x3f))
+	{
+		LOG("mapcntl_w mmu_enable   %2d\n", BIT(data, MAP_VM_ENABLE));
+		LOG("mapcntl_w write_enable %2d\n", BIT(data, MAP_SYS_WR_ENABLE));
+		LOG("mapcntl_w pte PID    0x%02x\n", data & 15);
+	}
 
 	// NB bit 6 & 7 is not used
 	m_map_control = data & 0x3f;
@@ -975,7 +976,7 @@ m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks 
 	m_keyboard->tdata_callback().set(FUNC(tek440x_state::kb_tdata_w));
 	m_keyboard->rdata_callback().set(FUNC(tek440x_state::kb_rdata_w));
 
-	AM9513(config, m_timer, 40_MHz_XTAL / 4 / 10); // from CPU E output
+	AM9513(config, m_timer, 40_MHz_XTAL / 4 / 10 ); // from CPU E output
 
 	// see diagram page 2.2-6
 	INPUT_MERGER_ALL_HIGH(config, "irq1").output_handler().set(FUNC(tek440x_state::irq1_raise));
