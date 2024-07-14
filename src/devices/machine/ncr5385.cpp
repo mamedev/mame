@@ -24,6 +24,7 @@
 #define LOG_COMMAND  (1U << 5)
 
 //#define VERBOSE (LOG_GENERAL|LOG_REGW|LOG_REGR|LOG_STATE|LOG_DMA|LOG_COMMAND)
+#define VERBOSE -1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NCR5385, ncr5385_device, "ncr5385", "NCR 5385 SCSI Protocol Controller")
@@ -759,9 +760,29 @@ int ncr5385_device::state_step()
 			else
 				m_sbx = false;
 
+#if 0
 			// clear data and ACK
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+#else
+			// clear ACK except after last byte of message output phase
+			if (!remaining() && (ctrl & S_PHASE_MASK) == S_PHASE_MSG_OUT)
+			{
+			
+				LOGMASKED(LOG_STATE, "xfi_out: INT_FUNC_COMPLETE\n" );
+			
+				m_int_status |= INT_FUNC_COMPLETE;
+				m_state = IDLE;
+
+				update_int();
+			}
+			else
+			{
+				scsi_bus->data_w(scsi_refid, 0);
+				scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			}
+#endif
+
 		}
 		else
 			delay = -1;
@@ -839,6 +860,8 @@ void ncr5385_device::update_int()
 			if (ctrl & S_INP)
 				m_aux_status |= AUX_STATUS_IO;
 		}
+
+LOGMASKED(LOG_COMMAND,"update_int %d  pc(%s)\n", int_state, machine().describe_context());
 
 		m_int_state = int_state;
 		m_int(m_int_state);
