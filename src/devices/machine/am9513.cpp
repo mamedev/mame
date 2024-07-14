@@ -35,7 +35,6 @@
 #define LOG_WARN    (1U << 4)
 
 //#define VERBOSE (LOG_GENERAL | LOG_MODE)
-#define VERBOSE -1
 
 #include "logmacro.h"
 
@@ -453,7 +452,7 @@ void am9513_device::set_counter_mode(int c, u16 data)
 	}
 
 	if ((data & 0x0018) != (m_counter_mode[c] & 0x0018))
-		LOGMASKED(LOG_MODE, "Counter %d: %s %s count\n", c + 1, BIT(data, 4) ? "BCD" : "Binary", BIT(data, 3) ? "up" : "down");
+		LOGMASKED(LOG_MODE, "Counter %d: %s %s count %s\n", c + 1, BIT(data, 4) ? "BCD" : "Binary", BIT(data, 3) ? "up" : "down", BIT(data, 5) ? "repetitively" : "once");
 
 	if ((data & 0x0007) != (m_counter_mode[c] & 0x0007))
 	{
@@ -625,8 +624,13 @@ void am9513_device::set_tc(int c, bool state)
 
 	// TC cascading
 	if ((m_counter_mode[d] & 0x1f00) == (state ? 0x0000 : 0x1000))
+	{
+		LOGMASKED(LOG_TC, "Counter %d: TC cascade Next Count %u \n", c + 1, m_count[d]);
+	
 		count_edge(d);
 
+	}
+	
 	// TC gating
 	if ((m_counter_mode[d] & 0xe000) == 0x2000)
 		gate_count(d, state && (bus_is_16_bit() || m_gate_alt[d]));
@@ -1243,7 +1247,10 @@ void am9513_device::command_write(u8 data)
 				if (BIT(data, 6))
 					step_counter(c, true);
 				if (BIT(data, 5))
+				{
+					LOGMASKED(LOG_MODE, "Arm Counter %d\n", c + 1);
 					arm_counter(c);
+				}
 			}
 		}
 		break;
@@ -1281,6 +1288,7 @@ void am9513_device::command_write(u8 data)
 		case 0xe3: case 0xeb: // Clear/set toggle out for counter 3
 		case 0xe4: case 0xec: // Clear/set toggle out for counter 4
 		case 0xe5: case 0xed: // Clear/set toggle out for counter 5
+			LOGMASKED(LOG_MODE, "Counter %d: %s output\n", data & 7, BIT(data, 3) ? "Set" : "Clear");
 			set_toggle((data & 7) - 1, BIT(data, 3));
 			break;
 		case 0xe6: case 0xee: // Clear/set MM12 (FOUT gate on/FOUT gate off)
@@ -1296,6 +1304,7 @@ void am9513_device::command_write(u8 data)
 		case 0xf3: // Step counter 3
 		case 0xf4: // Step counter 4
 		case 0xf5: // Step counter 5
+			LOGMASKED(LOG_MODE, "Counter %d: Step\n", data & 7);
 			step_counter((data & 7) - 1, false);
 			break;
 		case 0xff: // Master reset
