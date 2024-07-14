@@ -1,46 +1,46 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/***************************************************************************
+/*******************************************************************************
 
-  Sega UFO Catcher, Z80 type hardware
-  The list underneath is not complete. A # before the name means it's not dumped yet.
+Sega UFO Catcher, Z80 type hardware
+The list underneath is not complete. A # before the name means it's not dumped yet.
 
-  1st gen
-    * ?
-  - # UFO Catcher (1985)
+1st gen
+* ?
+- # UFO Catcher (1985)
 
-  2nd gen:
-    * ?
-  - # UFO Catcher DX (1987)
-  - # UFO Catcher DX II (1987)
+2nd gen:
+* ?
+- # UFO Catcher DX (1987)
+- # UFO Catcher DX II (1987)
 
-  3rd gen - UFO brd
-    * Z80 (sticker obscures label), 16MHz XTAL, 2 Sega 315-5296(I/O), YM3438, NEC uPD71054C
-  - # Dream Town (1990)
-  - New UFO Catcher (1991) (2P) - probably the most popular cabinet of all UFO Catcher series
-  - UFO Catcher Mini (1991) (1P)
-  - # UFO Catcher Sega Sonic (1991)
-  - # School Kids (1993)
+3rd gen - UFO brd
+* Z80 (sticker obscures label), 16MHz XTAL, 2 Sega 315-5296(I/O), YM3438, NEC uPD71054C
+- # Dream Town (1990)
+- New UFO Catcher (1991) (2P) - probably the most popular cabinet of all UFO Catcher series
+- UFO Catcher Mini (1991) (1P)
+- # UFO Catcher Sega Sonic (1991)
+- # School Kids (1993)
 
-  4th gen - EX brd
-    * Z80 Z0840008PSC, 8MHz XTAL, 32MHz XTAL, 2 Sega 315-5296(I/O), 315-5338A, YM3438,
-      NEC uPD71054C, optional NEC uPD7759C
-  - # Dream Palace (1992)
-  - # Dream Kitchen (1994)
-  - # UFO Catcher Excellent (1994)
-  - # UFO A La Carte (1996)
-  - UFO Catcher 21 (1996) (2P)
-  - UFO Catcher 800 (1998) (1P)
-  - # Baby UFO (1998)
-  - # Prize Sensor (1998)
+4th gen - EX brd
+* Z80 Z0840008PSC, 8MHz XTAL, 32MHz XTAL, 2 Sega 315-5296(I/O), YM3438, NEC uPD71054C,
+  optional 315-5338A, optional NEC uPD7759C
+- # Dream Palace (1992)
+- # Dream Kitchen (1994)
+- # UFO Catcher Excellent (1994)
+- # UFO A La Carte (1996) (2P)
+- UFO Catcher 21 (1996) (2P)
+- UFO Catcher 800 (1998) (1P)
+- # Baby UFO (1998)
+- # Prize Sensor (1998)
 
-  More games were released after 2000, assumed to be on more modern hardware.
+More games were released after 2000, assumed to be on more modern hardware.
 
-  TODO:
-  - add dipswitches
-  - prize sensor for ufo21/ufo800
+TODO:
+- add dipswitches
+- prize sensor for ufo21/ufo800
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -49,7 +49,6 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/pit8253.h"
-#include "machine/timer.h"
 #include "sound/upd7759.h"
 #include "sound/ymopn.h"
 
@@ -67,7 +66,8 @@
 
 namespace {
 
-/* simulation parameters */
+// simulation parameters
+
 // x/y/z cabinet dimensions per player (motor range)
 #define CABINET_WIDTH   400
 #define CABINET_DEPTH   400
@@ -81,83 +81,132 @@ namespace {
 #define CRANE_SIZE      350
 
 
-
 class ufo_state : public driver_device
 {
 public:
 	ufo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_io1(*this, "io1"),
-		m_io2(*this, "io2"),
+		m_io(*this, "io%u", 1),
 		m_upd(*this, "upd"),
+		m_inputs(*this, "IN%u", 1),
 		m_counters(*this, "counter%u", 0U),
 		m_digits(*this, "digit%u", 0U),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	// machine configs
 	void ufomini(machine_config &config);
 	void ufo21(machine_config &config);
 	void newufo(machine_config &config);
 	void ufo800(machine_config &config);
 
-private:
-	void motor_tick(int p, int m);
-
-	void pit_out0(int state);
-	void pit_out1(int state);
-	void pit_out2(int state);
-	uint8_t crane_limits_r(offs_t offset);
-	void stepper_w(uint8_t data);
-	void cp_lamps_w(uint8_t data);
-	void cp_digits_w(offs_t offset, uint8_t data);
-	void crane_xyz_w(offs_t offset, uint8_t data);
-	void ufo_lamps_w(uint8_t data);
-
-	uint8_t ex_crane_limits_r(offs_t offset);
-	uint8_t ex_crane_open_r();
-	void ex_stepper_w(uint8_t data);
-	void ex_cp_lamps_w(uint8_t data);
-	void ex_crane_xyz_w(offs_t offset, uint8_t data);
-	void ex_ufo21_lamps1_w(uint8_t data);
-	void ex_ufo21_lamps2_w(uint8_t data);
-	void ex_ufo800_lamps_w(uint8_t data);
-	uint8_t ex_upd_busy_r();
-	void ex_upd_start_w(uint8_t data);
-
-	virtual void machine_reset() override;
+protected:
 	virtual void machine_start() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(simulate_xyz);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_info);
+	virtual void machine_reset() override { m_nmi_enable = false; }
 
-	void ufo_map(address_map &map);
-	void ufo_portmap(address_map &map);
-	void ex_ufo21_portmap(address_map &map);
-	void ex_ufo800_portmap(address_map &map);
+private:
+	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device_array<sega_315_5296_device, 2> m_io;
+	optional_device<upd7759_device> m_upd;
+	optional_ioport_array<2> m_inputs;
+	output_finder<2 * 4> m_counters;
+	output_finder<2> m_digits;
+	output_finder<28> m_lamps;
 
 	struct Player
 	{
 		struct Motor
 		{
-			uint8_t running = 0;
-			uint8_t direction = 0;
-			float position = 0;
-			float speed = 0;
+			u8 running = 0;
+			u8 direction = 0;
+			float position = 0.5f;
+			float speed = 0.0f;
 		} motor[4];
 	} m_player[2];
 
-	uint8_t m_stepper = 0;
+	bool m_nmi_enable = false;
+	u8 m_stepper = 0;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<sega_315_5296_device> m_io1;
-	required_device<sega_315_5296_device> m_io2;
-	optional_device<upd7759_device> m_upd;
-	output_finder<2 * 4> m_counters;
-	output_finder<2> m_digits;
-	output_finder<28> m_lamps;
+	emu_timer *m_motor_timer;
+
+	void init_motors();
+	void motor_tick(int p, int m);
+	TIMER_CALLBACK_MEMBER(simulate_xyz);
+
+	// address maps
+	void ufo_map(address_map &map);
+	void ufo_portmap(address_map &map);
+	void ex_ufo21_portmap(address_map &map);
+
+	// I/O handlers
+	void pit_out0(int state);
+	void pit_out1(int state);
+	void pit_out2(int state);
+
+	void nmi_enable_w(int state) { m_nmi_enable = bool(state); }
+	template<int P> u8 crane_limits_r();
+	void stepper_w(u8 data);
+	void cp_lamps_w(u8 data);
+	template<int P> void cp_digits_w(u8 data);
+	template<int P> void crane_xyz_w(u8 data);
+	void ufo_lamps_w(u8 data);
+
+	template<int P> u8 ex_crane_limits_r();
+	u8 ex_crane_open_r();
+	void ex_stepper_w(u8 data);
+	void ex_cp_lamps_w(u8 data);
+	template<int P> void ex_crane_xyz_w(u8 data);
+	void ex_ufo21_lamps1_w(u8 data);
+	void ex_ufo21_lamps2_w(u8 data);
+	void ex_ufo800_lamps_w(u8 data);
+	u8 ex_upd_busy_r();
+	void ex_upd_start_w(u8 data);
 };
 
+void ufo_state::machine_start()
+{
+	// resolve outputs
+	m_counters.resolve();
+	m_digits.resolve();
+	m_lamps.resolve();
 
+	// register for savestates
+	save_item(NAME(m_stepper));
+	save_item(NAME(m_nmi_enable));
+
+	init_motors();
+}
+
+
+
+/*******************************************************************************
+    Motors
+*******************************************************************************/
+
+void ufo_state::init_motors()
+{
+	m_motor_timer = timer_alloc(FUNC(ufo_state::simulate_xyz), this);
+	m_motor_timer->adjust(attotime::from_hz(MOTOR_SPEED), 0, attotime::from_hz(MOTOR_SPEED));
+
+	static const float motor_speeds[4] =
+		{ 1.0f/CABINET_WIDTH, 1.0f/CABINET_DEPTH, 1.0f/CABINET_HEIGHT, 1.0f/CRANE_SIZE };
+
+	for (int m = 0; m < 4; m++)
+	{
+		for (auto & elem : m_player)
+			elem.motor[m].speed = motor_speeds[m];
+
+		save_item(NAME(m_player[0].motor[m].running), m);
+		save_item(NAME(m_player[0].motor[m].direction), m);
+		save_item(NAME(m_player[0].motor[m].position), m);
+
+		save_item(NAME(m_player[1].motor[m].running), m);
+		save_item(NAME(m_player[1].motor[m].direction), m);
+		save_item(NAME(m_player[1].motor[m].position), m);
+	}
+}
 
 void ufo_state::motor_tick(int p, int m)
 {
@@ -174,16 +223,12 @@ void ufo_state::motor_tick(int p, int m)
 		m_player[p].motor[m].position = 1;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::simulate_xyz)
+TIMER_CALLBACK_MEMBER(ufo_state::simulate_xyz)
 {
 	for (int p = 0; p < 2; p++)
 		for (int m = 0; m < 3; m++)
 			motor_tick(p, m);
-}
 
-
-TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::update_info)
-{
 	// output ufo motor positions
 	// 0 X: 000 = right,  100 = left (player 1)
 	// 1 Y: 000 = front,  100 = back
@@ -192,25 +237,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::update_info)
 	for (int p = 0; p < 2; p++)
 	{
 		for (int m = 0; m < 4; m++)
-			m_counters[(p << 2) | m] = uint8_t(m_player[p].motor[m].position * 100);
+			m_counters[(p << 2) | m] = u8(m_player[p].motor[m].position * 100);
 	}
 
 #if 0
+	// show io2 outputs
 	std::ostringstream msg;
-	msg << std::hex << std::setfill('0');
 	for (int i = 0; i < 8; i++)
-		msg << std::setw(2) << m_io2->debug_peek_output(i);
+	{
+		msg << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << +m_io[1]->debug_peek_output(i);
+		if (i != 7) msg << " ";
+	}
 	popmessage("%s", std::move(msg).str());
 #endif
 }
 
 
 
-/***************************************************************************
-
-  I/O
-
-***************************************************************************/
+/*******************************************************************************
+    I/O
+*******************************************************************************/
 
 void ufo_state::pit_out0(int state)
 {
@@ -220,7 +266,7 @@ void ufo_state::pit_out0(int state)
 void ufo_state::pit_out1(int state)
 {
 	// NMI?
-	if (state)
+	if (state && m_nmi_enable)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -230,14 +276,14 @@ void ufo_state::pit_out2(int state)
 }
 
 
-/* generic / UFO board handlers */
+// generic / UFO board handlers
 
-/* io1 */
+// 315-5296 #1
 
-uint8_t ufo_state::crane_limits_r(offs_t offset)
+template<int P>
+u8 ufo_state::crane_limits_r()
 {
-	int p = offset & 1;
-	uint8_t ret = 0x7f;
+	u8 ret = 0x7f;
 
 	// d0: left limit sw (right for p2)
 	// d1: right limit sw (left for p2)
@@ -247,23 +293,24 @@ uint8_t ufo_state::crane_limits_r(offs_t offset)
 	// d5: up limit sw
 	for (int m = 0; m < 3; m++)
 	{
-		ret ^= (m_player[p].motor[m].position >= 1) << (m*2 + 0);
-		ret ^= (m_player[p].motor[m].position <= 0) << (m*2 + 1);
+		ret ^= (m_player[P].motor[m].position >= 1) << (m*2 + 0);
+		ret ^= (m_player[P].motor[m].position <= 0) << (m*2 + 1);
 	}
 
 	// d6: crane open sensor (reflective sticker on the stepper motor rotation disc)
-	if (m_player[p].motor[3].position >= 0.97f)
+	if (m_player[P].motor[3].position >= 0.97f)
 		ret ^= 0x40;
 
 	// d7: prize sensor (mirror?)
-	ret |= (ioport(p ? "IN2" : "IN1")->read() & 0x80);
+	ret |= m_inputs[P]->read() & 0x80;
 
 	return ret;
 }
 
-/* io2 */
 
-void ufo_state::stepper_w(uint8_t data)
+// 315-5296 #2
+
+void ufo_state::stepper_w(u8 data)
 {
 	for (int p = 0; p < 2; p++)
 	{
@@ -271,12 +318,12 @@ void ufo_state::stepper_w(uint8_t data)
 		// controlled with 4 output bits connected to a Toshiba TB6560AHQ motor driver.
 		// I don't know which bits connect to which pins specifically.
 		// To run it, the game writes a continuous sequence of $5, $9, $a, $6, ..
-		static const uint8_t sequence[4] =
+		static const u8 sequence[4] =
 			{ 0x5, 0x9, 0xa, 0x6 };
 
 		// d0-d3: p1, d4-d7: p2
-		uint8_t cur = data >> (p*4) & 0xf;
-		uint8_t prev = m_stepper >> (p*4) & 0xf;
+		u8 cur = data >> (p*4) & 0xf;
+		u8 prev = m_stepper >> (p*4) & 0xf;
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -297,7 +344,7 @@ void ufo_state::stepper_w(uint8_t data)
 	m_stepper = data;
 }
 
-void ufo_state::cp_lamps_w(uint8_t data)
+void ufo_state::cp_lamps_w(u8 data)
 {
 	// d0-d3: p1/p2 button lamps
 	// other bits: ?
@@ -305,35 +352,35 @@ void ufo_state::cp_lamps_w(uint8_t data)
 		m_lamps[i] = BIT(~data, i);
 }
 
-void ufo_state::cp_digits_w(offs_t offset, uint8_t data)
+template<int P>
+void ufo_state::cp_digits_w(u8 data)
 {
-	static constexpr uint8_t lut_7448[0x10] =
-			{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
+	static constexpr u8 lut_7448[0x10] =
+		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	// d0-d3: cpanel digit
 	// other bits: ?
-	m_digits[offset & 1] = lut_7448[data & 0xf];
+	m_digits[P] = lut_7448[data & 0xf];
 }
 
-void ufo_state::crane_xyz_w(offs_t offset, uint8_t data)
+template<int P>
+void ufo_state::crane_xyz_w(u8 data)
 {
-	int p = offset & 1;
-
 	// d0: x/z axis (0:x, 1:z + halt x/y)
 	// d1: x/z direction
 	// d2: y direction
 	// d3: x/z running
 	// d4: y running
 	// other bits: ?
-	m_player[p].motor[0].running = (data & 9) == 8;
-	m_player[p].motor[0].direction = data & 2;
-	m_player[p].motor[1].running = (data & 0x11) == 0x10;
-	m_player[p].motor[1].direction = data & 4;
-	m_player[p].motor[2].running = (data & 9) == 9;
-	m_player[p].motor[2].direction = data & 2;
+	m_player[P].motor[0].running = (data & 9) == 8;
+	m_player[P].motor[0].direction = data & 2;
+	m_player[P].motor[1].running = (data & 0x11) == 0x10;
+	m_player[P].motor[1].direction = data & 4;
+	m_player[P].motor[2].running = (data & 9) == 9;
+	m_player[P].motor[2].direction = data & 2;
 }
 
-void ufo_state::ufo_lamps_w(uint8_t data)
+void ufo_state::ufo_lamps_w(u8 data)
 {
 	// d0-d3: ufo leds (2 bits per player)
 	// 3 sets of two red/green leds, each set is wired to the same control 2 bits
@@ -351,14 +398,14 @@ void ufo_state::ufo_lamps_w(uint8_t data)
 }
 
 
-/* EX board specific handlers */
+// EX board specific handlers
 
-/* io1 */
+// 315-5296 #1
 
-uint8_t ufo_state::ex_crane_limits_r(offs_t offset)
+template<int P>
+u8 ufo_state::ex_crane_limits_r()
 {
-	int p = offset & 1;
-	uint8_t ret = 0xf0;
+	u8 ret = 0xf0;
 
 	// d0: left limit sw (invert)
 	// d1: right limit sw (invert)
@@ -371,17 +418,17 @@ uint8_t ufo_state::ex_crane_limits_r(offs_t offset)
 	for (int m = 0; m < 3; m++)
 	{
 		int shift = (m*2) + (m == 2);
-		ret ^= (m_player[p].motor[m].position >= 1) << shift;
-		ret ^= (m_player[p].motor[m].position <= 0) << (shift+1);
+		ret ^= (m_player[P].motor[m].position >= 1) << shift;
+		ret ^= (m_player[P].motor[m].position <= 0) << (shift+1);
 	}
 
 	return ret;
 }
 
-uint8_t ufo_state::ex_crane_open_r()
+u8 ufo_state::ex_crane_open_r()
 {
 	// d0-d3: p1, d4-d7: p2
-	uint8_t ret = 0xff;
+	u8 ret = 0xff;
 
 	for (int p = 0; p < 2; p++)
 	{
@@ -396,16 +443,17 @@ uint8_t ufo_state::ex_crane_open_r()
 	return ret;
 }
 
-/* io2 */
 
-void ufo_state::ex_stepper_w(uint8_t data)
+// 315-5296 #2
+
+void ufo_state::ex_stepper_w(u8 data)
 {
 	// stepper motor sequence is: 6 c 9 3 6 c 9 3..
 	// which means d0 and d3 are swapped when compared with UFO board hardware
 	stepper_w(bitswap<8>(data,4,6,5,7,0,2,1,3));
 }
 
-void ufo_state::ex_cp_lamps_w(uint8_t data)
+void ufo_state::ex_cp_lamps_w(u8 data)
 {
 	// d0,d1,d4,d5: p1/p2 button lamps
 	for (int i = 0; i < 4; i++)
@@ -416,10 +464,9 @@ void ufo_state::ex_cp_lamps_w(uint8_t data)
 		machine().bookkeeping().coin_counter_w(i, data >> (2 + (i&1) + (i&2) * 2) & 1);
 }
 
-void ufo_state::ex_crane_xyz_w(offs_t offset, uint8_t data)
+template<int P>
+void ufo_state::ex_crane_xyz_w(u8 data)
 {
-	int p = offset & 1;
-
 	// more straightforward setup than on UFO board hardware
 	// d0: move left
 	// d1: move right
@@ -430,12 +477,12 @@ void ufo_state::ex_crane_xyz_w(offs_t offset, uint8_t data)
 	for (int m = 0; m < 3; m++)
 	{
 		int bits = data >> (m*2) & 3;
-		m_player[p].motor[m].running = (bits == 1 || bits == 2) ? 1 : 0;
-		m_player[p].motor[m].direction = bits & 2;
+		m_player[P].motor[m].running = (bits == 1 || bits == 2) ? 1 : 0;
+		m_player[P].motor[m].direction = bits & 2;
 	}
 }
 
-void ufo_state::ex_ufo800_lamps_w(uint8_t data)
+void ufo_state::ex_ufo800_lamps_w(u8 data)
 {
 	// d0-d4: 5 red leds on ufo
 	// other bits: ?
@@ -443,9 +490,10 @@ void ufo_state::ex_ufo800_lamps_w(uint8_t data)
 		m_lamps[10 + i] = BIT(data, i);
 }
 
-/* 315-5338A */
 
-void ufo_state::ex_ufo21_lamps1_w(uint8_t data)
+// 315-5338A
+
+void ufo_state::ex_ufo21_lamps1_w(u8 data)
 {
 	// d0: ? (ufo21 reads from it too, but value is discarded)
 	// d1-d6 are the 6 red leds on each ufo
@@ -454,20 +502,20 @@ void ufo_state::ex_ufo21_lamps1_w(uint8_t data)
 		m_lamps[10 + i] = BIT(data, i);
 }
 
-void ufo_state::ex_ufo21_lamps2_w(uint8_t data)
+void ufo_state::ex_ufo21_lamps2_w(u8 data)
 {
 	for (int i = 1; i < 7; i++)
 		m_lamps[20 + i] = BIT(data, i);
 }
 
-void ufo_state::ex_upd_start_w(uint8_t data)
+void ufo_state::ex_upd_start_w(u8 data)
 {
 	// d0: upd7759c start sample
 	// other bits: unused?
 	m_upd->start_w(~data & 1);
 }
 
-uint8_t ufo_state::ex_upd_busy_r()
+u8 ufo_state::ex_upd_busy_r()
 {
 	// d0: upd7759c busy
 	// other bits: unused?
@@ -476,7 +524,10 @@ uint8_t ufo_state::ex_upd_busy_r()
 }
 
 
-/* Memory maps */
+
+/*******************************************************************************
+    Address Maps
+*******************************************************************************/
 
 void ufo_state::ufo_map(address_map &map)
 {
@@ -490,8 +541,8 @@ void ufo_state::ufo_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x40, 0x43).rw("ym", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
-	map(0x80, 0xbf).rw(m_io1, FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write));
-	map(0xc0, 0xff).rw(m_io2, FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write));
+	map(0x80, 0xbf).rw(m_io[0], FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write));
+	map(0xc0, 0xff).rw(m_io[1], FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write));
 }
 
 void ufo_state::ex_ufo21_portmap(address_map &map)
@@ -501,20 +552,11 @@ void ufo_state::ex_ufo21_portmap(address_map &map)
 	map(0x60, 0x6f).rw("io3", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write));
 }
 
-void ufo_state::ex_ufo800_portmap(address_map &map)
-{
-	ufo_portmap(map);
-//  map(0x60, 0x67).noprw(); // unused?
-//  map(0x68, 0x68).nopw(); // ?
-}
 
 
-
-/***************************************************************************
-
-  Inputs
-
-***************************************************************************/
+/*******************************************************************************
+    Input Ports
+*******************************************************************************/
 
 static INPUT_PORTS_START( newufo )
 	PORT_START("IN1")
@@ -622,7 +664,8 @@ static INPUT_PORTS_START( newufo )
 	PORT_DIPSETTING(    0x08, "Setting 1" )
 	PORT_DIPSETTING(    0x00, "Setting 2" )
 	// Manual states "5 ~ 8 must be set OFF."
-	PORT_DIPNAME( 0x10, 0x10, "Ignore Prize Sensor" )               PORT_DIPLOCATION("SW2:5") // "When DIP SW 2 #5 is set to ON, the game can be played normally without error even if the prize sensor is malfunctioning."
+	// "When DIP SW 2 #5 is set to ON, the game can be played normally without error even if the prize sensor is malfunctioning."
+	PORT_DIPNAME( 0x10, 0x10, "Ignore Prize Sensor" )               PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) ) // Manual states "Fanfare and CPanel Digit will not work though."
 	PORT_DIPUNKNOWN( 0x20, IP_ACTIVE_LOW )                          PORT_DIPLOCATION("SW2:6")
@@ -782,92 +825,47 @@ INPUT_PORTS_END
 
 
 
-/***************************************************************************
-
-  Machine Config
-
-***************************************************************************/
-
-void ufo_state::machine_reset()
-{
-}
-
-void ufo_state::machine_start()
-{
-	m_counters.resolve();
-	m_digits.resolve();
-	m_lamps.resolve();
-
-	// init/zerofill/register for savestates
-	static const float motor_speeds[4] =
-		{ 1.0f/CABINET_WIDTH, 1.0f/CABINET_DEPTH, 1.0f/CABINET_HEIGHT, 1.0f/CRANE_SIZE };
-
-	for (int m = 0; m < 4; m++)
-	{
-		for (auto & elem : m_player)
-		{
-			elem.motor[m].running = 0;
-			elem.motor[m].direction = 0;
-			elem.motor[m].position = 0.5;
-			elem.motor[m].speed = motor_speeds[m];
-		}
-
-		save_item(NAME(m_player[0].motor[m].running), m);
-		save_item(NAME(m_player[0].motor[m].direction), m);
-		save_item(NAME(m_player[0].motor[m].position), m);
-
-		save_item(NAME(m_player[1].motor[m].running), m);
-		save_item(NAME(m_player[1].motor[m].direction), m);
-		save_item(NAME(m_player[1].motor[m].position), m);
-	}
-
-	m_stepper = 0;
-	save_item(NAME(m_stepper));
-}
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
 
 void ufo_state::newufo(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(16'000'000)/2);
+	// basic machine hardware
+	Z80(config, m_maincpu, 16_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ufo_state::ufo_map);
 	m_maincpu->set_addrmap(AS_IO, &ufo_state::ufo_portmap);
 
-	TIMER(config, "motor_timer").configure_periodic(FUNC(ufo_state::simulate_xyz), attotime::from_hz(MOTOR_SPEED));
-	TIMER(config, "update_timer").configure_periodic(FUNC(ufo_state::update_info), attotime::from_hz(60));
+	SEGA_315_5296(config, m_io[0], 16_MHz_XTAL); // all ports set to input
+	m_io[0]->in_pa_callback().set(FUNC(ufo_state::crane_limits_r<0>));
+	m_io[0]->in_pb_callback().set(FUNC(ufo_state::crane_limits_r<1>));
+	m_io[0]->in_pe_callback().set_ioport("IN1");
+	m_io[0]->in_pf_callback().set_ioport("DSW1");
+	m_io[0]->in_pg_callback().set_ioport("DSW2");
+	m_io[0]->in_ph_callback().set_ioport("IN2");
 
-	SEGA_315_5296(config, m_io1, XTAL(16'000'000));
-	// all ports set to input
-	m_io1->in_pa_callback().set(FUNC(ufo_state::crane_limits_r));
-	m_io1->in_pb_callback().set(FUNC(ufo_state::crane_limits_r));
-	m_io1->in_pe_callback().set_ioport("IN1");
-	m_io1->in_pf_callback().set_ioport("DSW1");
-	m_io1->in_pg_callback().set_ioport("DSW2");
-	m_io1->in_ph_callback().set_ioport("IN2");
+	SEGA_315_5296(config, m_io[1], 16_MHz_XTAL); // all ports set to output
+	m_io[1]->out_pa_callback().set(FUNC(ufo_state::stepper_w));
+	m_io[1]->out_pb_callback().set(FUNC(ufo_state::cp_lamps_w));
+	m_io[1]->out_pc_callback().set(FUNC(ufo_state::cp_digits_w<0>));
+	m_io[1]->out_pd_callback().set(FUNC(ufo_state::cp_digits_w<1>));
+	m_io[1]->out_pe_callback().set(FUNC(ufo_state::crane_xyz_w<0>));
+	m_io[1]->out_pf_callback().set(FUNC(ufo_state::crane_xyz_w<1>));
+	m_io[1]->out_pg_callback().set(FUNC(ufo_state::ufo_lamps_w));
+	m_io[1]->out_cnt1_callback().set(FUNC(ufo_state::nmi_enable_w));
 
-	SEGA_315_5296(config, m_io2, XTAL(16'000'000));
-	// all ports set to output
-	m_io2->out_pa_callback().set(FUNC(ufo_state::stepper_w));
-	m_io2->out_pb_callback().set(FUNC(ufo_state::cp_lamps_w));
-	m_io2->out_pc_callback().set(FUNC(ufo_state::cp_digits_w));
-	m_io2->out_pd_callback().set(FUNC(ufo_state::cp_digits_w));
-	m_io2->out_pe_callback().set(FUNC(ufo_state::crane_xyz_w));
-	m_io2->out_pf_callback().set(FUNC(ufo_state::crane_xyz_w));
-	m_io2->out_pg_callback().set(FUNC(ufo_state::ufo_lamps_w));
-
-	pit8254_device &pit(PIT8254(config, "pit", XTAL(16'000'000)/2)); // uPD71054C, configuration is unknown
-	pit.set_clk<0>(XTAL(16'000'000)/2/256);
+	pit8254_device &pit(PIT8254(config, "pit", 16_MHz_XTAL/2)); // uPD71054C, configuration is unknown
+	pit.set_clk<0>(16_MHz_XTAL/2/256);
 	pit.out_handler<0>().set(FUNC(ufo_state::pit_out0));
-	pit.set_clk<1>(XTAL(16'000'000)/2/256);
+	pit.set_clk<1>(16_MHz_XTAL/2/256);
 	pit.out_handler<1>().set(FUNC(ufo_state::pit_out1));
-	pit.set_clk<2>(XTAL(16'000'000)/2/256);
+	pit.set_clk<2>(16_MHz_XTAL/2/256);
 	pit.out_handler<2>().set(FUNC(ufo_state::pit_out2));
 
-	/* no video! */
-
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym3438_device &ym(YM3438(config, "ym", XTAL(16'000'000)/2));
+	ym3438_device &ym(YM3438(config, "ym", 16_MHz_XTAL/2));
 	ym.irq_handler().set_inputline("maincpu", 0);
 	ym.add_route(0, "mono", 0.40);
 	ym.add_route(1, "mono", 0.40);
@@ -877,10 +875,10 @@ void ufo_state::ufomini(machine_config &config)
 {
 	newufo(config);
 
-	/* basic machine hardware */
-	m_io1->in_pc_callback().set_ioport("IN1");
-	m_io1->in_pe_callback().set_constant(0);
-	m_io1->in_ph_callback().set_constant(0);
+	// basic machine hardware
+	m_io[0]->in_pc_callback().set_ioport("IN1");
+	m_io[0]->in_pe_callback().set_constant(0);
+	m_io[0]->in_ph_callback().set_constant(0);
 }
 
 
@@ -888,18 +886,18 @@ void ufo_state::ufo21(machine_config &config)
 {
 	newufo(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &ufo_state::ex_ufo21_portmap);
 
-	m_io1->in_pa_callback().set(FUNC(ufo_state::ex_crane_limits_r));
-	m_io1->in_pb_callback().set(FUNC(ufo_state::ex_crane_limits_r));
-	m_io1->in_pc_callback().set(FUNC(ufo_state::ex_crane_open_r));
+	m_io[0]->in_pa_callback().set(FUNC(ufo_state::ex_crane_limits_r<0>));
+	m_io[0]->in_pb_callback().set(FUNC(ufo_state::ex_crane_limits_r<1>));
+	m_io[0]->in_pc_callback().set(FUNC(ufo_state::ex_crane_open_r));
 
-	m_io2->out_pa_callback().set(FUNC(ufo_state::ex_stepper_w));
-	m_io2->out_pb_callback().set(FUNC(ufo_state::ex_cp_lamps_w));
-	m_io2->out_pe_callback().set(FUNC(ufo_state::ex_crane_xyz_w));
-	m_io2->out_pf_callback().set(FUNC(ufo_state::ex_crane_xyz_w));
-	m_io2->out_pg_callback().set_nop();
+	m_io[1]->out_pa_callback().set(FUNC(ufo_state::ex_stepper_w));
+	m_io[1]->out_pb_callback().set(FUNC(ufo_state::ex_cp_lamps_w));
+	m_io[1]->out_pe_callback().set(FUNC(ufo_state::ex_crane_xyz_w<0>));
+	m_io[1]->out_pf_callback().set(FUNC(ufo_state::ex_crane_xyz_w<1>));
+	m_io[1]->out_pg_callback().set_nop();
 
 	sega_315_5338a_device &io3(SEGA_315_5338A(config, "io3", 0));
 	io3.out_pa_callback().set(FUNC(ufo_state::ex_upd_start_w));
@@ -907,7 +905,7 @@ void ufo_state::ufo21(machine_config &config)
 	io3.out_pe_callback().set(FUNC(ufo_state::ex_ufo21_lamps1_w));
 	io3.out_pf_callback().set(FUNC(ufo_state::ex_ufo21_lamps2_w));
 
-	/* sound hardware */
+	// sound hardware
 	UPD7759(config, m_upd);
 	m_upd->add_route(ALL_OUTPUTS, "mono", 0.75);
 }
@@ -916,30 +914,26 @@ void ufo_state::ufo800(machine_config &config)
 {
 	newufo(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &ufo_state::ex_ufo800_portmap);
+	// basic machine hardware
+	m_io[0]->in_pa_callback().set(FUNC(ufo_state::ex_crane_limits_r<0>));
+	m_io[0]->in_pb_callback().set_ioport("IN2");
+	m_io[0]->in_pc_callback().set(FUNC(ufo_state::ex_crane_open_r));
+	m_io[0]->in_pd_callback().set_ioport("IN1");
+	m_io[0]->in_pe_callback().set_constant(0);
+	m_io[0]->in_ph_callback().set_constant(0);
 
-	m_io1->in_pa_callback().set(FUNC(ufo_state::ex_crane_limits_r));
-	m_io1->in_pb_callback().set_ioport("IN2");
-	m_io1->in_pc_callback().set(FUNC(ufo_state::ex_crane_open_r));
-	m_io1->in_pd_callback().set_ioport("IN1");
-	m_io1->in_pe_callback().set_constant(0);
-	m_io1->in_ph_callback().set_constant(0);
-
-	m_io2->out_pa_callback().set(FUNC(ufo_state::ex_stepper_w));
-	m_io2->out_pb_callback().set(FUNC(ufo_state::ex_cp_lamps_w));
-	m_io2->out_pe_callback().set(FUNC(ufo_state::ex_crane_xyz_w));
-	m_io2->out_pf_callback().set(FUNC(ufo_state::ex_ufo800_lamps_w));
-	m_io2->out_pg_callback().set_nop();
+	m_io[1]->out_pa_callback().set(FUNC(ufo_state::ex_stepper_w));
+	m_io[1]->out_pb_callback().set(FUNC(ufo_state::ex_cp_lamps_w));
+	m_io[1]->out_pe_callback().set(FUNC(ufo_state::ex_crane_xyz_w<0>));
+	m_io[1]->out_pf_callback().set(FUNC(ufo_state::ex_ufo800_lamps_w));
+	m_io[1]->out_pg_callback().set_nop();
 }
 
 
 
-/***************************************************************************
-
-  Game drivers
-
-***************************************************************************/
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( newufo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -987,10 +981,18 @@ ROM_END
 } // anonymous namespace
 
 
+
+/*******************************************************************************
+    Drivers
+*******************************************************************************/
+
+//     YEAR  NAME          PARENT  MACHINE  INPUT    CLASS      INIT        MNTR  COMPANY, FULLNAME, FLAGS, LAYOUT
 GAMEL( 1991, newufo,       0,      newufo,  newufo,  ufo_state, empty_init, ROT0, "Sega", "New UFO Catcher (standard)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
 GAMEL( 1991, newufo_sonic, newufo, newufo,  newufo,  ufo_state, empty_init, ROT0, "Sega", "New UFO Catcher (Sonic The Hedgehog)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
 GAMEL( 1991, newufo_nfl,   newufo, newufo,  newufo,  ufo_state, empty_init, ROT0, "Sega", "New UFO Catcher (Team NFL)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
 GAMEL( 1991, newufo_xmas,  newufo, newufo,  newufo,  ufo_state, empty_init, ROT0, "Sega", "New UFO Catcher (Christmas season ROM kit)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+
 GAMEL( 1991, ufomini,      0,      ufomini, ufomini, ufo_state, empty_init, ROT0, "Sega", "UFO Catcher Mini", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufomini )
+
 GAMEL( 1996, ufo21,        0,      ufo21,   ufo21,   ufo_state, empty_init, ROT0, "Sega", "UFO Catcher 21", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo21 )
 GAMEL( 1998, ufo800,       0,      ufo800,  ufo800,  ufo_state, empty_init, ROT0, "Sega", "UFO Catcher 800", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo800 )

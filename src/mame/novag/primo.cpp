@@ -10,8 +10,8 @@ properly.
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
-- super system peripherals don't work on nsnova due to serial clock drift, baud
-  rate differs a bit between host and client, m6801 serial emulation issue
+- Novag Super System peripherals don't work on nsnova due to serial clock drift,
+  baud rate differs a bit between host and client, m6801 serial emulation issue
 - unmapped reads from 0x3c/0x3d (primo/supremo) or 0x33/0x34 (nsnova)
 - supremo unmapped writes to 0x2000/0x6000, always 0?
 - is the 1st version of supremo(black plastic) the same ROM?

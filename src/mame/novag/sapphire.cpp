@@ -5,8 +5,8 @@
 
 Novag Sapphire (model 9304)
 
-It's the successor to Novag VIP / Super VIP, the chess engine is again by
-David Kittinger.
+Handheld chess computer. It's the successor to Novag Super VIP, whereas Ruby is
+the successor to Novag VIP. The chess engine is by David Kittinger again.
 
 Hardware notes:
 - PCB label: 100168 REV A
@@ -17,7 +17,9 @@ Hardware notes:
 - 24 buttons, piezo
 
 TODO:
-- rs232 nss_tvi (Novag TV Interface) doesn't work
+- Novag Super System peripherals don't work due to serial clock drift, baud rate
+  differs a bit between host and client, m6801 serial emulation issue (to work
+  around it, underclock sapphire to exactly 26.4192MHz)
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
 

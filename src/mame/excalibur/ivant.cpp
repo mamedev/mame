@@ -8,14 +8,12 @@ Excalibur Igor (model 711E)
 
 This is the newer version of Ivan, see ivanto.cpp for the first version. It's
 on very different hardware. Manufacturing was moved to Ewig. Ivan's model number
-is the same as the first version, but it's easy to distinguish them.
+is the same as the first version, but it's easy to distinguish between them.
 
 The chess engine is by Ron Nelson, similar to the one in Excalibur Mirage. It
 has speech, and also sound effects that are reminiscent of Battle Chess.
 
 Hardware notes:
-
-Ivan The Terrible:
 - PCB label: EXCALIBUR ELECTRONICS, INC. 4/18/97, IVANT2, 00-33352-000
 - Hitachi H8/3216 MCU (only 32KB out of 48KB internal ROM used), 12MHz XTAL
 - small daughterboard (27C080 pinout) with an 1MB ROM under epoxy, contents is
@@ -24,11 +22,9 @@ Ivan The Terrible:
 - LCD with 5 7segs and custom segments
 - no LEDs, button sensors chessboard
 
-Igor:
-- PCB label: EXCALIBUR ELECTRONICS, INC. 510-1005A01, 5/28/97 IGOR
-- Hitachi H8/3214 MCU, 12MHz XTAL
-- sound ROM under epoxy 128KB instead of 1MB
-- rest is same as Ivan
+Igor is on the same base hardware. The PCB (label: EXCALIBUR ELECTRONICS, INC.
+510-1005A01, 5/28/97 IGOR) looks a bit different, but the connections are the
+same as Ivan. It has a H8/3214 MCU and the sound ROM is 128KB instead of 1MB.
 
 There's also a newer version of Igor from 2000 (model 711E-2) on much weaker
 hardware, it has a Samsung KS57C2308 MCU instead.

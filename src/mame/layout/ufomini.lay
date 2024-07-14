@@ -5,7 +5,6 @@ authors:hap
 -->
 <mamelayout version="2">
 
-
 <!-- define elements -->
 
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
@@ -125,8 +124,7 @@ authors:hap
 			<bounds left="0" right="100" top="0" bottom="90" />
 		</element>
 
-	<!-- control panel -->
-
+		<!-- control panel -->
 		<element ref="static_pink">
 			<bounds x="0" y="60" width="100" height="30" />
 		</element>
@@ -145,9 +143,7 @@ authors:hap
 			<bounds x="61" y="71" width="10" height="15" />
 		</element>
 
-
-	<!-- left ufo info -->
-
+		<!-- left ufo info -->
 		<element ref="text_x">
 			<bounds x="5" y="5" width="10" height="4" />
 		</element>
@@ -196,7 +192,6 @@ authors:hap
 		<element name="lamp10" ref="lamp_rg1">
 			<bounds x="66" y="44" width="3" height="3" />
 		</element>
-
 
 	</view>
 </mamelayout>
