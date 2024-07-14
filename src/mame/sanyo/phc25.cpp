@@ -4,13 +4,12 @@
 
         Sanyo PHC-25
 
-
     https://web.archive.org/web/20180107213100/http://www.geocities.jp/sanyo_phc_25/
     http://www.phc25.com/
 
     Z80 @ 4 MHz
     MC6847 video
-    3x 8KB bios ROM
+    3x 8KB BIOS ROM
     1x 4KB chargen ROM
     16KB RAM
     6KB video RAM
@@ -19,14 +18,13 @@
     (phc25), and selects hiragana/upper-case on Japanese version (phc25j).
 
 
-
     TODO:
-
     - sound is strange, volume is often low to non-existent.
     - colours and graphics are different to those shown at
       http://www.phc25.com/collection.htm - who is correct?
     - screen attribute bit 7 is unknown
-
+    - cursor flashes too rapidly, maybe VDG FSYNC issue?
+    - Japanese keyboard labels for phc25j.
 
 
 10 SCREEN3,1,1:COLOR,,1:CLS
@@ -40,13 +38,58 @@ RUN
 *****************************************************************************/
 
 #include "emu.h"
-#include "phc25.h"
+#include "cpu/z80/z80.h"
+#include "sound/ay8910.h"
+#include "video/mc6847.h"
 
+#include "bus/centronics/ctronics.h"
+#include "formats/phc25_cas.h"
+#include "imagedev/cassette.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#include "utf8.h"
 
+namespace {
+
+class phc25_state : public driver_device
+{
+public:
+	phc25_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_vram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_chargen(*this, "chargen")
+		, m_vdg(*this, "mc6847")
+		, m_centronics(*this, "centronics")
+		, m_cassette(*this, "cassette")
+	{ }
+
+	void phc25(machine_config &config);
+	void phc25j(machine_config &config);
+
+protected:
+	void machine_start() override;
+	void machine_reset() override;
+
+private:
+	required_shared_ptr<uint8_t> m_vram;
+	required_device<cpu_device> m_maincpu;
+	required_region_ptr<uint8_t> m_chargen;
+	required_device<mc6847_base_device> m_vdg;
+	required_device<centronics_device> m_centronics;
+	required_device<cassette_image_device> m_cassette;
+
+	void phc25_mem(address_map &map);
+	void phc25_io(address_map &map);
+
+	uint8_t port40_r();
+	void port40_w(uint8_t data);
+	uint8_t video_ram_r(offs_t offset);
+	MC6847_GET_CHARROM_MEMBER(char_rom_r);
+
+	uint8_t m_port40 = 0U;
+	int m_centronics_busy = 0;
+};
 
 /* Read/Write Handlers */
 
@@ -73,7 +116,7 @@ uint8_t phc25_state::port40_r()
 	data |= !m_vdg->fs_r() << 4;
 
 	/* cassette read */
-	data |= ((m_cassette)->input() < +0.3) << 5;
+	data |= (m_cassette->input() < +0.3) << 5;
 
 	/* centronics busy */
 	data |= m_centronics_busy << 6;
@@ -117,22 +160,17 @@ void phc25_state::port40_w(uint8_t data)
 	m_port40 = data;
 }
 
-void phc25_state::write_centronics_busy(int state)
-{
-	m_centronics_busy = state;
-}
-
 /* Memory Maps */
 
-void phc25_state::mem_map(address_map &map)
+void phc25_state::phc25_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x5fff).rom().region(Z80_TAG, 0);
+	map(0x0000, 0x5fff).rom().region("maincpu", 0);
 	map(0x6000, 0x77ff).ram().share("videoram");
 	map(0xc000, 0xffff).ram();
 }
 
-void phc25_state::io_map(address_map &map)
+void phc25_state::phc25_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -147,8 +185,8 @@ void phc25_state::io_map(address_map &map)
 	map(0x86, 0x86).portr("KEY6");
 	map(0x87, 0x87).portr("KEY7");
 	map(0x88, 0x88).portr("KEY8");
-	map(0xc0, 0xc0).w(AY8910_TAG, FUNC(ay8910_device::data_w));
-	map(0xc1, 0xc1).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0xc0, 0xc0).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0xc1, 0xc1).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 }
 
 /* Input Ports */
@@ -159,7 +197,7 @@ static INPUT_PORTS_START( phc25 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2191") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) // U+2191 = ↑
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INS DEL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) // unlabeled key
@@ -169,7 +207,7 @@ static INPUT_PORTS_START( phc25 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2193") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) // U+2193 = ↓
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
@@ -179,7 +217,7 @@ static INPUT_PORTS_START( phc25 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2190") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) // U+2190 = ←
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^') PORT_CHAR('~')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -189,7 +227,7 @@ static INPUT_PORTS_START( phc25 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2192") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) // U+2192 = →
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
@@ -281,27 +319,16 @@ uint8_t phc25_state::video_ram_r(offs_t offset)
 	{
 		offset &= 0x7ff;
 		m_vdg->inv_w(BIT(m_vram[offset | 0x800], 0)); // cursor attribute
-		m_vdg->as_w(BIT(m_vram[offset | 0x800], 1)); // screen2 lores attribute
+		m_vdg->as_w(BIT(m_vram[offset | 0x800], 1));  // screen2 lores attribute
 		m_vdg->css_w(BIT(m_vram[offset | 0x800], 2)); // css attribute
 		// bit 7 is set for all text (not spaces), meaning is unknown
 		return m_vram[offset];
 	}
 }
 
-MC6847_GET_CHARROM_MEMBER(phc25_state::pal_char_rom_r)
+MC6847_GET_CHARROM_MEMBER(phc25_state::char_rom_r)
 {
-	return m_char_rom[(((ch - 2) * 12) + line + 4) & 0xfff];
-}
-
-// irq is inverted in emulation, so we need this trampoline
-void phc25_state::irq_w(int state)
-{
-	m_maincpu->set_input_line(0, state ? CLEAR_LINE : ASSERT_LINE);
-}
-
-MC6847_GET_CHARROM_MEMBER(phc25_state::ntsc_char_rom_r)
-{
-	return m_char_rom[(ch * 16 + line) & 0xfff];
+	return m_chargen[(ch * 16 + line) & 0xfff];
 }
 
 void phc25_state::machine_reset()
@@ -311,8 +338,6 @@ void phc25_state::machine_reset()
 
 void phc25_state::machine_start()
 {
-	/* find memory regions */
-	m_char_rom = memregion(Z80_TAG)->base() + 0x5000;
 	save_item(NAME(m_port40));
 	save_item(NAME(m_centronics_busy));
 }
@@ -322,13 +347,24 @@ void phc25_state::machine_start()
 void phc25_state::phc25(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &phc25_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &phc25_state::io_map);
+	Z80(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &phc25_state::phc25_mem);
+	m_maincpu->set_addrmap(AS_IO, &phc25_state::phc25_io);
 
-	/* sound hardware */
+	/* video hardware */
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+
+	MC6847_PAL(config, m_vdg, XTAL(4'433'619));
+	m_vdg->set_screen("screen");
+	m_vdg->fsync_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0).invert();
+	m_vdg->input_callback().set(FUNC(phc25_state::video_ram_r));
+	m_vdg->set_get_char_rom(FUNC(phc25_state::char_rom_r));
+	m_vdg->set_get_fixed_mode(mc6847_pal_device::MODE_GM2 | mc6847_pal_device::MODE_GM1 | mc6847_pal_device::MODE_INTEXT);
+	// other lines not connected
+
+	/* sound hardware (Synthesizer PSG-01 add-on) */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &psg(AY8910(config, AY8910_TAG, 1'000'000));
+	ay8910_device &psg(AY8910(config, "ay8910", 1'000'000));
 	psg.port_a_read_callback().set_ioport("JOY0");
 	psg.port_b_read_callback().set_ioport("JOY1");
 	psg.add_route(ALL_OUTPUTS, "mono", 2.00);
@@ -341,44 +377,24 @@ void phc25_state::phc25(machine_config &config)
 	m_cassette->set_interface("phc25_cass");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->busy_handler().set(FUNC(phc25_state::write_centronics_busy));
+	m_centronics->busy_handler().set([this](int state) { m_centronics_busy = state; });
 
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
-
-	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("16K");
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("phc25_cass");
 }
 
-void phc25_state::pal(machine_config &config)
+void phc25_state::phc25j(machine_config &config)
 {
 	phc25(config);
-	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MC6847_PAL(config, m_vdg, XTAL(4'433'619));
+	MC6847_NTSC(config.replace(), m_vdg, XTAL(3'579'545));
 	m_vdg->set_screen("screen");
-	m_vdg->fsync_wr_callback().set(FUNC(phc25_state::irq_w));
+	m_vdg->fsync_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0).invert();
 	m_vdg->input_callback().set(FUNC(phc25_state::video_ram_r));
-	m_vdg->set_get_char_rom(FUNC(phc25_state::pal_char_rom_r));
-	m_vdg->set_get_fixed_mode(mc6847_pal_device::MODE_GM2 | mc6847_pal_device::MODE_GM1 | mc6847_pal_device::MODE_INTEXT);
-	// other lines not connected
-}
-
-void phc25_state::ntsc(machine_config &config)
-{
-	phc25(config);
-	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
-
-	MC6847_NTSC(config, m_vdg, XTAL(3'579'545));
-	m_vdg->set_screen("screen");
-	m_vdg->fsync_wr_callback().set(FUNC(phc25_state::irq_w));
-	m_vdg->input_callback().set(FUNC(phc25_state::video_ram_r));
-	m_vdg->set_get_char_rom(FUNC(phc25_state::ntsc_char_rom_r));
+	m_vdg->set_get_char_rom(FUNC(phc25_state::char_rom_r));
 	m_vdg->set_get_fixed_mode(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1 | mc6847_ntsc_device::MODE_INTEXT);
 	// other lines not connected
 }
@@ -386,7 +402,7 @@ void phc25_state::ntsc(machine_config &config)
 /* ROMs */
 
 ROM_START( phc25 )
-	ROM_REGION( 0x6000, Z80_TAG, 0 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "phc25rom.0", 0x0000, 0x2000, CRC(fa28336b) SHA1(582376bee455e124de24ba4ac02326c8a592fa5a)) // 031_00aa.ic13 ?
 	ROM_LOAD( "phc25rom.1", 0x2000, 0x2000, CRC(38fd578b) SHA1(dc3db78c0cdc89f1605200d39535be65a4091705)) // 031_01a.ic14 ?
 	ROM_LOAD( "phc25rom.2", 0x4000, 0x2000, CRC(54392b27) SHA1(1587827fe9438780b50164727ce3fdea1b98078a)) // 031_02a.ic15 ?
@@ -396,7 +412,7 @@ ROM_START( phc25 )
 ROM_END
 
 ROM_START( phc25j )
-	ROM_REGION( 0x6000, Z80_TAG, 0 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "phc25-11.0", 0x0000, 0x2000, CRC(287e83b0) SHA1(9fe960a8245f28efc04defeeeaceb1e5ec6793b8))
 	ROM_LOAD( "phc25-11.1", 0x2000, 0x2000, CRC(6223f945) SHA1(5d44b883b6264cb5d2e21b2269308630c62e0e56))
 	ROM_LOAD( "phc25-11.2", 0x4000, 0x2000, CRC(da859ae4) SHA1(6121e85947921e434d0157c378de3d81537f6b9f))
@@ -404,12 +420,14 @@ ROM_START( phc25j )
 	//ROM_LOAD( "022 01aa.ic", 0x2000, 0x2000, NO_DUMP )
 	//ROM_LOAD( "022 02aa.ic", 0x4000, 0x2000, NO_DUMP )
 
-	//ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_REGION( 0x1000, "chargen", 0 )
 	//ROM_LOAD( "022 04a.ic", 0x0000, 0x1000, NO_DUMP )
+	ROM_COPY( "maincpu", 0x5000, 0x0000, 0x1000 ) // this is likely exact copy of undumped ROM.
 ROM_END
 
-/* Driver */
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY  FULLNAME           FLAGS
-COMP( 1983, phc25,  0,      0,      pal,     phc25,  phc25_state, empty_init, "Sanyo", "PHC-25 (Europe)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, phc25j, phc25,  0,      ntsc,    phc25j, phc25_state, empty_init, "Sanyo", "PHC-25 (Japan)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, phc25,  0,      0,      phc25,   phc25,  phc25_state, empty_init, "Sanyo", "PHC-25 (Europe)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, phc25j, phc25,  0,      phc25j,  phc25j, phc25_state, empty_init, "Sanyo", "PHC-25 (Japan)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
