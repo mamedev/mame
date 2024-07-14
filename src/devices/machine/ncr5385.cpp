@@ -355,6 +355,9 @@ void ncr5385_device::cmd_w(u8 data)
 	}
 	else
 	{
+		// we assume everything here generates an IRQ?
+		// assert(data & CMD_INT);
+
 		// interrupting commands
 		m_aux_status &= ~AUX_STATUS_DATA_FULL;
 		m_cmd = data;
