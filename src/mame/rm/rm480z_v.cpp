@@ -81,18 +81,27 @@ int rm480z_state::calculate_hrg_vram_index() const
 
 uint8_t rm480z_state::videoram_read(offs_t offset)
 {
-	int row = offset & 0xff;
-	int col = offset >> 8;
+	uint8_t data = 0;
+	const int row = offset & 0xff;
+	const int col = offset >> 8;
 
-	return m_vram.get_char(row, col);
+	if (col < RM480Z_SCREENCOLS)
+	{
+		data = m_vram.get_char(row, col);
+	}
+
+	return data;
 }
 
 void rm480z_state::videoram_write(offs_t offset, uint8_t data)
 {
-	int row = offset & 0xff;
-	int col = offset >> 8;
+	const int row = offset & 0xff;
+	const int col = offset >> 8;
 
-	m_vram.set_char(row, col, data);
+	if (col < RM480Z_SCREENCOLS)
+	{
+		m_vram.set_char(row, col, data);
+	}
 }
 
 void rm480z_state::putChar(int charnum, int x, int y, bitmap_ind16 &bitmap, bool bMonochrome) const

@@ -2,7 +2,31 @@
 // copyright-holders:Robin Sergeant
 /**********************************************************************
 
-    Research Machines MQ2 dual Disk Drive emulation
+    Research Machines MQ2 dual floppy drive
+
+An RS232 serial communication protocol is used for communcation between the MQ2 and 480Z.
+
+Initial requests are sent to the drive at 9600 baud, and the drive's response to this upgrades
+the connection to 125000 baud.  The RTS output line is used by the 480Z to reset the baud rate
+back to 9600 baud prior to issuing a new request.  When this line is high an NMI is generated
+to achieve this.
+
+On first boot the 480Z requests disk handling code which is downloaded from the MQ2 and used
+to supplement the 480Z firmware (hence most of the disk handling code is actually contained
+in the MQ2 itself).
+
+The RS232 cable is connected as follows:
+
+480Z    MQ2
+RxD <-- TxD
+TxD --> RxD
+DCD <-- RTS
+RTS --> DCD
+CTS <-- DTR
+DTR --> CTS
+GND --- GND
+
+Interrupt mode 1 is used and only the FDC generates interrupts.
 
 **********************************************************************/
 
@@ -91,8 +115,8 @@ void rmMQ2_device::device_add_mconfig(machine_config &config)
 	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(rmMQ2_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(rmMQ2_device::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, m_floppy0, rmMQ2_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, rmMQ2_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, rmMQ2_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, rmMQ2_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 }
 
 //-------------------------------------------------
@@ -166,7 +190,7 @@ void rmMQ2_device::port0_w(uint8_t data)
 	if (floppy)
 	{
 		m_fdc->set_floppy(floppy);
-		// motor should be controlled by bit 4, but it only seems to work if always on
+		// motor should be controlled by bit 4, but it changes state too frequently so keep on instead
 		floppy->mon_w(0);
 		floppy->ss_w(BIT(data, 5));
 	}
@@ -183,6 +207,8 @@ uint8_t rmMQ2_device::status_r()
 {
 	if (!m_fdc->intrq_r() && !m_fdc->drq_r())
 	{
+		/* this port is read by the firmware to syncronize access to the FDC.  If
+		   neither the DRQ or INTRQ lines are active it suspends the CPU. */
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 	}
 	return 0;
@@ -190,6 +216,7 @@ uint8_t rmMQ2_device::status_r()
 
 uint8_t rmMQ2_device::drive_status_r()
 {
+	// return high bits to indicate that the drives are ok
 	return 0xff;
 }
 

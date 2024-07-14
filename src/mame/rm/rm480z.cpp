@@ -2,42 +2,16 @@
 // copyright-holders:Robin Sergeant
 /*
 
-Research Machines 380Z (aka "RML 380Z" or "RM 380Z")
+Research Machines 480Z (aka "RML 480Z" or "Link 480Z")
 Microcomputer produced by Research Machines Limited, Oxford, UK
-1978-1985
-MESS driver by Wilbert Pol and friol (dantonag (at) gmail.com)
-Driver started on 22/12/2011
-
-Stefano Bodrato, 09/12/2016 - skeleton for cassette support
-True tape samples are needed to continue !
+1982-1985
 
 ===
 
 From the Firmware Manual:
 
 List of known firmware revisions by sign-on message:
-*** RM380Z ***
-COS 3.0/C
-COS 3.0/F
-COS 3.0/M
-COS 3.4C/C
-COS 3.4C/F
-COS 3.4C/M
-COS 3.4D/C
-COS 3.4D/M
-COS 3.4E/F
-COS 4.0/F
-COS 4.0A/F
-COS 4.0A/M
-COS 4.0B/M
-COS 4.2 A
 
-/C = Cassette
-/F = 8 inch single density floppy
-/M = 5.25 inch single density floppy
-Ver 4.2 can have either floppy type
-
-*** RM480Z ***
 RML 40-Character LINK 480Z V1.0
 RML 80-Character LINK 480Z V1.0
 RML 40-Character LINK 480Z V1.1 A
@@ -50,26 +24,28 @@ RML 80-Character LINK 480Z V1.2 C
 RML 80-Character LINK 480Z V1.2 D
 RML 80-Character LINK 480Z V2.2 B
 
-V1.0 refers to ROS 1.0
+V1.0 refers to ROS 1.0 (Mk1 harwdare)
 V1.1 refers to ROS 1.1
 V1.2 refers to ROS 1.2
-V2.2 refers to ROS 2.2
+V2.2 refers to ROS 2.2 (Mk2 hardware)
+
+The Mk1 hardware uses 4 x 8K EEPROMs, whereas Mk2 has 2 x 16K
+(memory maps differ slighly due to these differences).
 
 Monitor commands:
-B - Boot CP/M  (COS /F, COS /M, ROS 1.2, ROS 2.2)
+B - Boot CP/M  (ROS 1.2, ROS 2.2)
 X - Boot CP/M from another drive (as above)
-N - Boot network (ROS)
-T - Enter terminal mode (ROS)
-L - Load program from cassette (COS /C, ROS)
-D - Dump memory to cassette (as above)
-C - Continue program at restart address (as above)
+N - Boot network
+T - Enter terminal mode
+L - Load program from cassette
+D - Dump memory to cassette
+C - Continue program at restart address
 J - Go to address
-O - Select printer option (and cassette speed for COS /C, ROS)
-M - Enable HRG board as memory (COS 3.4, COS 4.0)
+O - Select printer option and cassette speed
 W - Select 40 or 80 characters per line (All 80-column machines)
 R - Start ROM BASIC (ROS 1.1, ROS 1.2, ROS 2.2)
-Ctrl+Shift+8 - Break and return to current OS (ROS)
-Ctrl+Shift+9 - Break and return to front panel (ROS)
+Ctrl+Shift+8 - Break and return to current OS
+Ctrl+Shift+9 - Break and return to front panel
 Ctrl+F - Enter Front Panel (=the debugger)
 Ctrl+T - Enter Typewriter mode
 Ctrl+S - Autopaging on
@@ -77,97 +53,65 @@ Ctrl+Q - Autopaging off
 Ctrl+A - Toggle autopaging
 
 Graphics characters: These are low-res (2x3 TRS80-style) from 80-BF, repeated at C0-FF.
-80-BF will be low-intensity, except for a RM480Z if using a colour monitor.
+80-BF will be low-intensity, except if using a colour monitor.
 The characters 00-1F have one set for COS 3.4 and COS 4.0, and a different set for the others.
-COS 4.0 and 4.2 allow one to redefine the 80-FF character range, and to have attributes.
 ROS 2.2 allows an alternate character set.
 
 Sound:
-RM380Z has a connector for a speaker
 RM480Z has the speaker fitted
 
 ===
 
-Memory map from service manual:
+4 different memory maps are used (see memory map functions for layout):
 
-PAGE SEL bit in PORT0 set to 0:
+Page 0 is used for start-up and some ROS functions
+Page 1 is designed for running CP/M
+Page 2 is used to run BIR (Basic In Rom)
+Page 3 contains only RAM (no known uses)
 
-  0000-3BFF - CPU RAM row 1 (15KB!)
-  3C00-7BFF - CPU RAM row 2 (16KB)
-  7C00-BBFF - Add-on RAM row 1 or HRG RAM (16KB)
-  BC00-DFFF - Add-on RAM row 2 (9KB!)
-  E000-EFFF - ROM (COS)
-  F000-F5FF - VDU and HRG Video RAM
-  F600-F9FF - ROM (monitor extension)
-  FA00-FAFF - Reserved, RAM?
-  FB00-FBFF - Memory-mapped ports (FBFC-FBFF)
-  FC00-FFFF - RAM
+Up to 256K of RAM can be used with bank switching
+The 64K address space is divided into 4 banks, each of which can be configured to
+address a particular 16K chunk of physical RAM.
 
-PAGE SEL bit in PORT0 set to 1:
-  0000-0FFF - ROM (COS mirror from E000)
-  1B00-1BFF - Memory-mapped ports (1BFC-1BFF)
-  1C00-1DFF - ROM
-  4000-7FFF - CPU RAM row 1 (16KB!, this RAM normally appears at 0000)
-  8000-BFFF - ???
-  C000-DFFF - ???
-  E000-EFFF - ROM (COS)
-  F000-F5FF - VDU and HRG Video RAM
-  F600-F9FF - ROM (monitor extension)
-  FA00-FAFF - Reserved, RAM?
-  FB00-FBFF - Memory-mapped ports (FBFC-FBFF)
-  FC00-FFFF - RAM
+Page selection and bank switching is performed by writes to control ports.
 
-Video resolution (not confirmed):
-80x24 - 6 pixels wide (5 + spacing), 10 pixels high (9 + spacing) = 480x240
+Video resolution:
+80x24 - 8 pixels wide, 10 pixels high = 640x240
 Video input clock is 16MHz
 
-According to the manuals, VDU-1 chargen is Texas 74LS262.
+Additional HRG video modes:
+
+640 x 192 (1 bit per pixel, monochrome)
+320 x 192 (2 bits per pixel, colour)
+160 x 96 (4 bits per pixel, colour)
+
+HRG occupies the top portion of the screen, with 4 lines of video (text) output below.
+The video (text) display is drawn over any HRG output (text can overlay graphics).
 
 ===
 
-Notes on COS 4.0 disassembly:
+Interrupt driven keyboard, with repeat key (non ASCII scan codes).
 
-- routine at 0xe438 is called at startup in COS 4.0 and it sets the RST vectors in RAM
-- routine at 0xe487 finds "top" of system RAM and stores it in 0x0006 and 0x000E
-- 0xeca0 - outputs a string (null terminated) to screen (?)
-- 0xff18 - does char output to screen (char in A?)
+No built in FDC, but external floppy drives can be connected via RS232 port.
+
+Could also network boot if connected to a CHAIN LAN, where a 380Z would act as a file server.
+
+Programs could also be loaded from Cassette and rompacks.
 
 ===
 
 TODO:
 
-- Properly implement dimming and graphic chars (>0x80)
-- Understand why any write to disk command fails with "bad sector"
-- Understand why ctrl-U (blinking cursor) in COS 4.0 stops keyboard input from working
-- Get a reliable ROM dump and charset ROM dump
-
-
-Attempt to register save state entry after state registration is closed!
-Module timer tag static_vblank_timer name m_param
-Attempt to register save state entry after state registration is closed!
-Module timer tag static_vblank_timer name m_enabled
-Attempt to register save state entry after state registration is closed!
-Module timer tag static_vblank_timer name m_period.attoseconds
-Attempt to register save state entry after state registration is closed!
-Module timer tag static_vblank_timer name m_period.seconds
-Attempt to register save state entry after state registration is closed!
-Module timer tag static_vblank_timer name m_start.attoseconds
-Attempt to register save state entry after state registration is closed!
-Module timer tag static_vblank_timer name m_start.seconds
-Attempt to register save state entry after state registration is closed!
-Module timer tag static_vblank_timer name m_expire.attoseconds
-Attempt to register save state entry after state registration is closed!
-Module timer tag static_vblank_timer name m_expire.seconds
-':maincpu' (E48B): unmapped program memory write to E000 = C1 & FF
-':maincpu' (E48E): unmapped program memory write to E000 = 3E & FF
+- Add cassette support
+- Add rompack support (parallel port EEPROM cartridges)
+- Add support for option hardware (if software supporting it is available).
+- Save states
 
 */
 
 #include "emu.h"
 #include "rm480z.h"
 #include "rm_mq2.h"
-#include "bus/rs232/loopback.h"
-#include "bus/rs232/terminal.h"
 #include "machine/clock.h"
 #include "speaker.h"
 #include "screen.h"
@@ -181,15 +125,15 @@ void rm480z_state::rm480z_MK1_mem(address_map &map)
 	map(0xc000, 0xffff).bankrw(m_bank[3]);
 
 	map(0x0000, 0xf7ff).view(m_view);
-	// page 0
+	// page 0 (for start-up)
 	m_view[0](0x0000, 0x07ff).rom().region("ros", 0x0000);
 	m_view[0](0x0800, 0x17ff).rom().region("bir0", 0x0800);
 	m_view[0](0x1800, 0x1fff).rom().region("bir1", 0x1800);
 	m_view[0](0x3800, 0x3fff).rom().region("ros", 0x1800);
 	m_view[0](0xe800, 0xf7ff).rom().region("ros", 0x0800);
-	// page 1
+	// page 1 (for running CP/M)
 	m_view[1](0xe800, 0xf7ff).rom().region("ros", 0x0800);
-	//page 2
+	//page 2 (for running BIR)
 	m_view[2](0x9800, 0x9fff).rom().region("bir1", 0x1800);
 	m_view[2](0xa000, 0xbfff).rom().region("bir2", 0x0000);	
 	m_view[2](0xc000, 0xd7ff).rom().region("bir1", 0x0000);
@@ -206,14 +150,14 @@ void rm480z_state::rm480z_MK2_mem(address_map &map)
 	map(0xc000, 0xffff).bankrw(m_bank[3]);
 
 	map(0x0000, 0xf7ff).view(m_view);
-	// page 0
+	// page 0 (for start-up)
 	m_view[0](0x0000, 0x07ff).rom().region("rom0", 0x0000);
 	m_view[0](0x0800, 0x1fff).rom().region("rom1", 0x0800);
 	m_view[0](0x7800, 0x7fff).rom().region("rom0", 0x3800);
 	m_view[0](0xe800, 0xf7ff).rom().region("rom0", 0x2800);
-	// page 1
+	// page 1 (for running CP/M)
 	m_view[1](0xe800, 0xf7ff).rom().region("rom0", 0x2800);
-	//page 2
+	//page 2 (for running BIR)
 	m_view[2](0x9800, 0xbfff).rom().region("rom1", 0x1800);
 	m_view[2](0xc000, 0xc7ff).rom().region("rom1", 0x0000);
 	m_view[2](0xc800, 0xe7ff).rom().region("rom0", 0x0800);
@@ -227,8 +171,6 @@ void rm480z_state::rm480z_io(address_map &map)
 	map(0x20, 0x23).mirror(0xff00).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x24, 0x27).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x38, 0x3b).mirror(0xff00).rw(FUNC(rm480z_state::hrg_port_read), FUNC(rm480z_state::hrg_port_write));
-	//map(0x20, 0x23).mirror(0xff00); // system CTC - 0=SIO4&cassin, 1=SIO2&cassio, 2=keybd int, 3=50Hz int for repeat key
-	//map(0x24, 0x27).mirror(0xff00); // system SIO - 0=chA network data, 1=chB SIO4 data, 2=ChA control, 3=ChB control
 	//map(0x28, 0x29).mirror(0xff02); // am9511/am9512 maths chip // option
 	//map(0x2c, 0x2f).mirror(0xff00); // z80ctc IEEE int, Maths int, RTC, RTC // option
 	//map(0x30, 0x37).mirror(0xff00); // IEEE chip // option
@@ -331,11 +273,9 @@ uint32_t rm480z_state::screen_update_rm480z(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-void rm480z_default_rs232_devices(device_slot_interface &device)
+static void rm480z_default_rs232_devices(device_slot_interface &device)
 {
-	device.option_add("rm_mq2",        RM_MQ2);
-	device.option_add("loopback",      RS232_LOOPBACK);
-	device.option_add("terminal",      SERIAL_TERMINAL);
+	device.option_add("rm_mq2", RM_MQ2);
 }
 
 static const z80_daisy_config daisy_chain[] =
@@ -359,7 +299,7 @@ void rm480z_state::rm480z(machine_config &config)
 	m_sio->out_dtrb_callback().set(m_rs232, FUNC(rs232_port_device::write_dtr));
 	m_sio->out_rtsb_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
 
-	// rs232 port
+	// rs232 port for floppy drive
 	RS232_PORT(config, m_rs232, rm480z_default_rs232_devices, "rm_mq2");
 	m_rs232->rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
 	m_rs232->dcd_handler().set(m_sio, FUNC(z80sio_device::dcdb_w));
@@ -428,5 +368,5 @@ ROM_END
 
 /* Driver */
 //   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT                       COMPANY              FULLNAME                FLAGS
-COMP(1981, rm480z,  0,      0,      rm480z,  rm480z, rm480z_state, driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 1)", MACHINE_NOT_WORKING)
-COMP(1981, rm480za, rm480z, 0,      rm480za, rm480z, rm480z_state, driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 2)", MACHINE_NOT_WORKING)
+COMP(1981, rm480z,  0,      0,      rm480z,  rm480z, rm480z_state, driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 1)", 0)
+COMP(1981, rm480za, rm480z, 0,      rm480za, rm480z, rm480z_state, driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 2)", 0)

@@ -19,16 +19,6 @@ class rmMQ2_device : public device_t, public device_rs232_port_interface
 public:
 	rmMQ2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	const tiny_rom_entry *device_rom_region() const override;
-	void device_add_mconfig(machine_config &config) override;
-
-	void input_txd(int state) override;
-	void input_rts(int state) override;
-	void input_dtr(int state) override;
-
-protected:
-	void device_start() override;
-
 private:
 	bool m_8inch_sel = false;
 
@@ -38,6 +28,14 @@ private:
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+
+	const tiny_rom_entry *device_rom_region() const override;
+	void device_add_mconfig(machine_config &config) override;
+	void device_start() override;
+
+	void input_txd(int state) override;
+	void input_rts(int state) override;
+	void input_dtr(int state) override;
 
 	void rmMQ2_mem(address_map &map);
 	void rmMQ2_io(address_map &map);

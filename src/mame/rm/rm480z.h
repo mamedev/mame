@@ -92,24 +92,24 @@ private:
 
 	memory_view m_view;
 
-	bool m_kbd_reset = true;
-	bool m_kbd_ready = false;
-	uint8_t m_kbd_code = 0;
-	uint8_t m_kbd_scan_pos = 0;
-	uint8_t m_kbd_state[8] = {0};
+	bool m_kbd_reset = true;        // cleared by firmware when it is ready to receive keyboard interrupts
+	bool m_kbd_ready = false;       // set when new key code is available (on key press or release)
+	uint8_t m_kbd_code = 0;         // scan code of last keyboard event (bit 7 set on key release)
+	uint8_t m_kbd_scan_pos = 0;     // current keyboard matrix scanning position
+	uint8_t m_kbd_state[8] = {0};   // keyboard matrix state (bits set when keys held down).
 
 	rm480z_vram<RM480Z_SCREENROWS, RM480Z_SCREENCOLS> m_vram;
 	int m_videomode = RM480Z_VIDEOMODE_80COL;
-	bool m_alt_char_set = false;
+	bool m_alt_char_set = false;    // replace teletext characters with inverse ASCII characters
 
 	uint8_t m_hrg_ram[RM480Z_HRG_RAM_SIZE];
 	uint8_t m_hrg_scratchpad[RM480Z_HRG_SCRATCHPAD_SIZE];
 	hrg_display_mode m_hrg_display_mode = hrg_display_mode::none;
-	uint8_t m_hrg_port0 = 0;
-	uint8_t m_hrg_port1 = 0;
-	bool m_hrg_mem_open = false;
-	bool m_video_inhibit = false;
-	bool m_hrg_inhibit = false;
+	uint8_t m_hrg_port0 = 0;        // HRG port 0 value (various uses)
+	uint8_t m_hrg_port1 = 0;        // HRG port 1 value (various uses)
+	bool m_hrg_mem_open = false;    // when HRG memory is open the display in blanked (used when clearing screen)
+	bool m_video_inhibit = false;   // inhibits text output on a colour display
+	bool m_hrg_inhibit = false;     // inhibits graphics output on a monocrhome display
 
 	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;

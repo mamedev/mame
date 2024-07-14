@@ -11,6 +11,9 @@ Driver started on 22/12/2011
 Stefano Bodrato, 09/12/2016 - skeleton for cassette support
 True tape samples are needed to continue !
 
+Robin Sergeant, 2024 - h/w scrolling, HRG, sound, 8" disk support
+and various bug fixes.
+
 ===
 
 From the Firmware Manual:
@@ -37,39 +40,16 @@ COS 4.2 A
 /M = 5.25 inch single density floppy
 Ver 4.2 can have either floppy type
 
-*** RM480Z ***
-RML 40-Character LINK 480Z V1.0
-RML 80-Character LINK 480Z V1.0
-RML 40-Character LINK 480Z V1.1 A
-RML 40-Character LINK 480Z V1.1 B
-RML 80-Character LINK 480Z V1.1 A
-RML 80-Character LINK 480Z V1.1 B
-RML 80-Character LINK 480Z V1.2 A
-RML 80-Character LINK 480Z V1.2 B
-RML 80-Character LINK 480Z V1.2 C
-RML 80-Character LINK 480Z V1.2 D
-RML 80-Character LINK 480Z V2.2 B
-
-V1.0 refers to ROS 1.0
-V1.1 refers to ROS 1.1
-V1.2 refers to ROS 1.2
-V2.2 refers to ROS 2.2
-
 Monitor commands:
-B - Boot CP/M  (COS /F, COS /M, ROS 1.2, ROS 2.2)
+B - Boot CP/M  (COS /F, COS /M)
 X - Boot CP/M from another drive (as above)
-N - Boot network (ROS)
-T - Enter terminal mode (ROS)
-L - Load program from cassette (COS /C, ROS)
+L - Load program from cassette (COS /C)
 D - Dump memory to cassette (as above)
 C - Continue program at restart address (as above)
 J - Go to address
-O - Select printer option (and cassette speed for COS /C, ROS)
+O - Select printer option (and cassette speed for COS /C)
 M - Enable HRG board as memory (COS 3.4, COS 4.0)
 W - Select 40 or 80 characters per line (All 80-column machines)
-R - Start ROM BASIC (ROS 1.1, ROS 1.2, ROS 2.2)
-Ctrl+Shift+8 - Break and return to current OS (ROS)
-Ctrl+Shift+9 - Break and return to front panel (ROS)
 Ctrl+F - Enter Front Panel (=the debugger)
 Ctrl+T - Enter Typewriter mode
 Ctrl+S - Autopaging on
@@ -77,14 +57,13 @@ Ctrl+Q - Autopaging off
 Ctrl+A - Toggle autopaging
 
 Graphics characters: These are low-res (2x3 TRS80-style) from 80-BF, repeated at C0-FF.
-80-BF will be low-intensity, except for a RM480Z if using a colour monitor.
+80-BF will be low-intensity.
 The characters 00-1F have one set for COS 3.4 and COS 4.0, and a different set for the others.
 COS 4.0 and 4.2 allow one to redefine the 80-FF character range, and to have attributes.
 ROS 2.2 allows an alternate character set.
 
 Sound:
 RM380Z has a connector for a speaker
-RM480Z has the speaker fitted
 
 ===
 
@@ -117,8 +96,8 @@ PAGE SEL bit in PORT0 set to 1:
   FB00-FBFF - Memory-mapped ports (FBFC-FBFF)
   FC00-FFFF - RAM
 
-Video resolution (not confirmed):
-80x24 - 6 pixels wide (5 + spacing), 10 pixels high (9 + spacing) = 480x240
+Video resolution:
+80x24 - 8 pixels wide, 10 pixels high = 640x240
 Video input clock is 16MHz
 
 According to the manuals, VDU-1 chargen is Texas 74LS262.
@@ -136,10 +115,7 @@ Notes on COS 4.0 disassembly:
 
 TODO:
 
-- Properly implement dimming and graphic chars (>0x80)
-- Understand why any write to disk command fails with "bad sector"
-- Understand why ctrl-U (blinking cursor) in COS 4.0 stops keyboard input from working
-- Get a reliable ROM dump and charset ROM dump
+- Make cassette interface work.
 
 
 Attempt to register save state entry after state registration is closed!
