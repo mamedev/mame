@@ -240,6 +240,7 @@ private:
 	void start_diagnostic();
 	void finished_diagnostic();
 	void finished_busy(int32_t param);
+	void clear_dma_modes();
 	bool set_dma_mode(int word);
 
 	int m_csel;
