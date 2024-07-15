@@ -8,7 +8,6 @@ authors:hap
 <!-- define elements -->
 
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
-	<element name="static_grey"><rect><color red="0.6" green="0.6" blue="0.6" /></rect></element>
 	<element name="static_pink"><rect><color red="0.9" green="0.55" blue="0.75" /></rect></element>
 
 	<element name="text_ufored">

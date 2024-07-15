@@ -8,18 +8,8 @@ authors:hap
 <!-- define elements -->
 
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
-	<element name="static_pink"><rect><color red="0.9" green="0.55" blue="0.75" /></rect></element>
-
-	<element name="text_ufored">
-		<text string="~UFO~">
-			<color red="1.0" green="0.3" blue="0.2" />
-		</text>
-	</element>
-	<element name="text_ufoblue">
-		<text string="~UFO~">
-			<color red="0.2" green="0.3" blue="1.0" />
-		</text>
-	</element>
+	<element name="static_gray"><rect><color red="0.6" green="0.6" blue="0.6" /></rect></element>
+	<element name="static_green"><rect><color red="0.2" green="0.8" blue="0.4" /></rect></element>
 
 	<element name="text_x">
 		<text string="X:" align="1">
@@ -31,13 +21,8 @@ authors:hap
 			<color red="0.85" green="0.85" blue="0.85" />
 		</text>
 	</element>
-	<element name="text_z">
-		<text string="Z:" align="1">
-			<color red="0.85" green="0.85" blue="0.85" />
-		</text>
-	</element>
-	<element name="text_c">
-		<text string="C:" align="1">
+	<element name="text_a">
+		<text string="A:" align="1">
 			<color red="0.85" green="0.85" blue="0.85" />
 		</text>
 	</element>
@@ -85,54 +70,36 @@ authors:hap
 		</text>
 	</element>
 
-	<element name="lamp_rg0" defstate="0">
-		<disk state="0">
-			<color red="0.2" green="0.05" blue="0.0" />
-		</disk>
-		<disk state="1">
-			<color red="0.4" green="1.0" blue="0.3" />
-		</disk>
-		<disk state="2">
-			<color red="1.0" green="0.4" blue="0.3" />
-		</disk>
-		<disk state="3">
-			<color red="1.0" green="0.4" blue="0.3" />
-		</disk>
-	</element>
-	<element name="lamp_rg1" defstate="0">
-		<disk state="0">
-			<color red="0.2" green="0.05" blue="0.0" />
-		</disk>
-		<disk state="1">
-			<color red="1.0" green="0.4" blue="0.3" />
-		</disk>
-		<disk state="2">
-			<color red="0.4" green="1.0" blue="0.3" />
-		</disk>
-		<disk state="3">
-			<color red="1.0" green="0.4" blue="0.3" />
-		</disk>
-	</element>
-
 
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="0" right="100" top="0" bottom="90" />
+		<bounds left="0" right="200" top="0" bottom="90" />
 		<element ref="static_black">
-			<bounds left="0" right="100" top="0" bottom="90" />
+			<bounds left="0" right="200" top="0" bottom="90" />
+		</element>
+
+		<element ref="static_gray">
+			<bounds x="99" y="0" width="2" height="80" />
 		</element>
 
 		<!-- control panel -->
-		<element ref="static_pink">
-			<bounds x="0" y="60" width="100" height="30" />
+		<element ref="static_green">
+			<bounds x="0" y="60" width="200" height="30" />
 		</element>
 
-		<element name="lamp0" ref="lamp_b1" inputtag="IN1" inputmask="0x20" >
+		<element name="lamp0" ref="lamp_b1" inputtag="IN1" inputmask="0x01" >
 			<bounds x="30" y="70" width="10" height="10"/>
 		</element>
-		<element name="lamp1" ref="lamp_b2" inputtag="IN1" inputmask="0x40" >
+		<element name="lamp1" ref="lamp_b2" inputtag="IN1" inputmask="0x02" >
 			<bounds x="43" y="70" width="10" height="10"/>
+		</element>
+
+		<element name="lamp3" ref="lamp_b2" inputtag="IN2" inputmask="0x02" >
+			<bounds x="147" y="70" width="10" height="10"/>
+		</element>
+		<element name="lamp2" ref="lamp_b1" inputtag="IN2" inputmask="0x01" >
+			<bounds x="160" y="70" width="10" height="10"/>
 		</element>
 
 		<element ref="static_black">
@@ -142,18 +109,22 @@ authors:hap
 			<bounds x="61" y="71" width="10" height="15" />
 		</element>
 
-		<!-- left ufo info -->
+		<element ref="static_black">
+			<bounds x="128" y="70" width="12" height="17" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds x="129" y="71" width="10" height="15" />
+		</element>
+
+		<!-- left ufo info (no lamps) -->
 		<element ref="text_x">
 			<bounds x="5" y="5" width="10" height="4" />
 		</element>
 		<element ref="text_y">
 			<bounds x="5" y="10" width="10" height="4" />
 		</element>
-		<element ref="text_z">
+		<element ref="text_a">
 			<bounds x="5" y="15" width="10" height="4" />
-		</element>
-		<element ref="text_c">
-			<bounds x="5" y="20" width="10" height="4" />
 		</element>
 
 		<element name="counter0" ref="counter">
@@ -165,31 +136,26 @@ authors:hap
 		<element name="counter2" ref="counter">
 			<bounds x="12" y="15" width="20" height="4" />
 		</element>
-		<element name="counter3" ref="counter">
-			<bounds x="12" y="20" width="20" height="4" />
+
+		<!-- right ufo info (no lamps) -->
+		<element ref="text_x">
+			<bounds x="105" y="5" width="10" height="4" />
+		</element>
+		<element ref="text_y">
+			<bounds x="105" y="10" width="10" height="4" />
+		</element>
+		<element ref="text_a">
+			<bounds x="105" y="15" width="10" height="4" />
 		</element>
 
-		<element ref="text_ufored">
-			<bounds x="25" y="25" width="50" height="14" />
+		<element name="counter4" ref="counter">
+			<bounds x="112" y="5" width="20" height="4" />
 		</element>
-
-		<element name="lamp10" ref="lamp_rg0">
-			<bounds x="31" y="44" width="3" height="3" />
+		<element name="counter5" ref="counter">
+			<bounds x="112" y="10" width="20" height="4" />
 		</element>
-		<element name="lamp10" ref="lamp_rg1">
-			<bounds x="38" y="44" width="3" height="3" />
-		</element>
-		<element name="lamp10" ref="lamp_rg0">
-			<bounds x="45" y="44" width="3" height="3" />
-		</element>
-		<element name="lamp10" ref="lamp_rg1">
-			<bounds x="52" y="44" width="3" height="3" />
-		</element>
-		<element name="lamp10" ref="lamp_rg0">
-			<bounds x="59" y="44" width="3" height="3" />
-		</element>
-		<element name="lamp10" ref="lamp_rg1">
-			<bounds x="66" y="44" width="3" height="3" />
+		<element name="counter6" ref="counter">
+			<bounds x="112" y="15" width="20" height="4" />
 		</element>
 
 	</view>

@@ -40371,6 +40371,7 @@ newufo_sonic                    //
 newufo_xmas                     //
 ufo21                           //
 ufo800                          //
+ufoalac                         //
 ufomini                         //
 
 @source:sega/segaufoh8.cpp

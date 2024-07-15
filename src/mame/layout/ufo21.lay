@@ -8,7 +8,7 @@ authors:hap
 <!-- define elements -->
 
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
-	<element name="static_grey"><rect><color red="0.6" green="0.6" blue="0.6" /></rect></element>
+	<element name="static_gray"><rect><color red="0.6" green="0.6" blue="0.6" /></rect></element>
 	<element name="static_pink"><rect><color red="0.9" green="0.55" blue="0.75" /></rect></element>
 
 	<element name="text_ufored">
@@ -104,7 +104,7 @@ authors:hap
 			<bounds left="0" right="200" top="0" bottom="90" />
 		</element>
 
-		<element ref="static_grey">
+		<element ref="static_gray">
 			<bounds x="99" y="0" width="2" height="80" />
 		</element>
 

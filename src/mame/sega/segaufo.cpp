@@ -3,6 +3,11 @@
 /*******************************************************************************
 
 Sega UFO Catcher, Z80 type hardware
+
+They are more or less playable within MAME's constraints. The UFO position is
+represented by coordinates, and the fact that the player can't win any physical
+prize takes away the fun. It does a long self-test at boot.
+
 The list underneath is not complete. A # before the name means it's not dumped yet.
 
 1st gen
@@ -23,22 +28,27 @@ The list underneath is not complete. A # before the name means it's not dumped y
 - # School Kids (1993)
 
 4th gen - EX brd
-* Z80 Z0840008PSC, 8MHz XTAL, 32MHz XTAL, 2 Sega 315-5296(I/O), YM3438, NEC uPD71054C,
-  optional 315-5338A, optional NEC uPD7759C
+* Z80 Z0840008PSC, 8MHz XTAL, 2 Sega 315-5296(I/O), YM3438, NEC uPD71054C, optional
+  315-5338A with 32MHz XTAL, optional NEC uPD7759C
 - # Dream Palace (1992)
 - # Dream Kitchen (1994)
 - # UFO Catcher Excellent (1994)
-- # UFO A La Carte (1996) (2P)
+- UFO A La Carte (1996) (2P)
 - UFO Catcher 21 (1996) (2P)
 - UFO Catcher 800 (1998) (1P)
 - # Baby UFO (1998)
 - # Prize Sensor (1998)
 
-More games were released after 2000, assumed to be on more modern hardware.
+The A La Carte games are vertical cabinets. The UFO doesn't have a crane or lamps.
+Instead, it has a tiny arm that extends and pulls down a rope from which the prize
+is hanging on.
+
+More games were released after 2000, they are on more modern hardware, see
+segaufoh8.cpp for example.
 
 TODO:
 - add dipswitches
-- prize sensor for ufo21/ufo800
+- prize sensor for ufo21/ufo800/ufoalac?
 
 *******************************************************************************/
 
@@ -59,9 +69,10 @@ TODO:
 
 // the layouts are very similar to eachother
 #include "newufo.lh"
-#include "ufomini.lh"
 #include "ufo21.lh"
 #include "ufo800.lh"
+#include "ufoalac.lh"
+#include "ufomini.lh"
 
 
 namespace {
@@ -96,9 +107,10 @@ public:
 	{ }
 
 	// machine configs
+	void newufo(machine_config &config);
 	void ufomini(machine_config &config);
 	void ufo21(machine_config &config);
-	void newufo(machine_config &config);
+	void ufoalac(machine_config &config);
 	void ufo800(machine_config &config);
 
 protected:
@@ -154,10 +166,13 @@ private:
 	void ufo_lamps_w(u8 data);
 
 	template<int P> u8 ex_crane_limits_r();
+	template<int P> u8 ex_ufoalac_limits_r();
 	u8 ex_crane_open_r();
 	void ex_stepper_w(u8 data);
 	void ex_cp_lamps_w(u8 data);
 	template<int P> void ex_crane_xyz_w(u8 data);
+	void ex_ufoalac_xz_w(u8 data);
+	template<int P> void ex_ufoalac_y_w(u8 data);
 	void ex_ufo21_lamps1_w(u8 data);
 	void ex_ufo21_lamps2_w(u8 data);
 	void ex_ufo800_lamps_w(u8 data);
@@ -191,7 +206,7 @@ void ufo_state::init_motors()
 	m_motor_timer->adjust(attotime::from_hz(MOTOR_SPEED), 0, attotime::from_hz(MOTOR_SPEED));
 
 	static const float motor_speeds[4] =
-		{ 1.0f/CABINET_WIDTH, 1.0f/CABINET_DEPTH, 1.0f/CABINET_HEIGHT, 1.0f/CRANE_SIZE };
+		{ 1.0f / CABINET_WIDTH, 1.0f / CABINET_DEPTH, 1.0f / CABINET_HEIGHT, 1.0f / CRANE_SIZE };
 
 	for (int m = 0; m < 4; m++)
 	{
@@ -283,7 +298,7 @@ void ufo_state::pit_out2(int state)
 template<int P>
 u8 ufo_state::crane_limits_r()
 {
-	u8 ret = 0x7f;
+	u8 data = 0;
 
 	// d0: left limit sw (right for p2)
 	// d1: right limit sw (left for p2)
@@ -293,18 +308,18 @@ u8 ufo_state::crane_limits_r()
 	// d5: up limit sw
 	for (int m = 0; m < 3; m++)
 	{
-		ret ^= (m_player[P].motor[m].position >= 1) << (m*2 + 0);
-		ret ^= (m_player[P].motor[m].position <= 0) << (m*2 + 1);
+		data |= (m_player[P].motor[m].position >= 1) << (m * 2);
+		data |= (m_player[P].motor[m].position <= 0) << (m * 2 + 1);
 	}
 
 	// d6: crane open sensor (reflective sticker on the stepper motor rotation disc)
 	if (m_player[P].motor[3].position >= 0.97f)
-		ret ^= 0x40;
+		data |= 0x40;
 
 	// d7: prize sensor (mirror?)
-	ret |= m_inputs[P]->read() & 0x80;
+	data |= m_inputs[P]->read() & 0x80;
 
-	return ret;
+	return data ^ 0x7f;
 }
 
 
@@ -322,12 +337,12 @@ void ufo_state::stepper_w(u8 data)
 			{ 0x5, 0x9, 0xa, 0x6 };
 
 		// d0-d3: p1, d4-d7: p2
-		u8 cur = data >> (p*4) & 0xf;
-		u8 prev = m_stepper >> (p*4) & 0xf;
+		u8 cur = data >> (p * 4) & 0xf;
+		u8 prev = m_stepper >> (p * 4) & 0xf;
 
 		for (int i = 0; i < 4; i++)
 		{
-			if (sequence[i] == prev && sequence[(i+1) & 3] == cur)
+			if (sequence[i] == prev && sequence[(i + 1) & 3] == cur)
 			{
 				m_player[p].motor[3].running = 1;
 				motor_tick(p, 3);
@@ -374,8 +389,10 @@ void ufo_state::crane_xyz_w(u8 data)
 	// other bits: ?
 	m_player[P].motor[0].running = (data & 9) == 8;
 	m_player[P].motor[0].direction = data & 2;
+
 	m_player[P].motor[1].running = (data & 0x11) == 0x10;
 	m_player[P].motor[1].direction = data & 4;
+
 	m_player[P].motor[2].running = (data & 9) == 9;
 	m_player[P].motor[2].direction = data & 2;
 }
@@ -405,7 +422,7 @@ void ufo_state::ufo_lamps_w(u8 data)
 template<int P>
 u8 ufo_state::ex_crane_limits_r()
 {
-	u8 ret = 0xf0;
+	u8 data = 0;
 
 	// d0: left limit sw (invert)
 	// d1: right limit sw (invert)
@@ -417,30 +434,52 @@ u8 ufo_state::ex_crane_limits_r()
 	// d7: ?
 	for (int m = 0; m < 3; m++)
 	{
-		int shift = (m*2) + (m == 2);
-		ret ^= (m_player[P].motor[m].position >= 1) << shift;
-		ret ^= (m_player[P].motor[m].position <= 0) << (shift+1);
+		data |= (m_player[P].motor[m].position >= 1) << (m * 2);
+		data |= (m_player[P].motor[m].position <= 0) << (m * 2 + 1);
 	}
 
-	return ret;
+	data = (data & 0xf) | (data << 1 & 0x60);
+	return data ^ 0xf0;
 }
 
 u8 ufo_state::ex_crane_open_r()
 {
 	// d0-d3: p1, d4-d7: p2
-	u8 ret = 0xff;
+	u8 data = 0;
 
 	for (int p = 0; p < 2; p++)
 	{
 		// d0: crane open sensor
 		if (m_player[p].motor[3].position >= 0.97f)
-			ret ^= (1 << (p*4));
+			data |= (1 << (p * 4));
 
 		// d1: coincounter is plugged in (ufo800 gives error 14 otherwise)
 		// d2,d3: ?
 	}
 
-	return ret;
+	return ~data;
+}
+
+template<int P>
+u8 ufo_state::ex_ufoalac_limits_r()
+{
+	u8 data = 0;
+
+	// d0: down limit sw
+	// d1: arm out limit sw
+	// d2: arm in limit sw
+	// d3: left limit sw
+	// d4: right limit sw
+	// other: ?
+	if (m_player[P].motor[1].position <= 0) data |= 0x01;
+
+	if (m_player[P].motor[2].position >= 1) data |= 0x02;
+	if (m_player[P].motor[2].position <= 0) data |= 0x04;
+
+	if (m_player[P].motor[0].position <= 0) data |= 0x08;
+	if (m_player[P].motor[0].position >= 1) data |= 0x10;
+
+	return data;
 }
 
 
@@ -457,11 +496,11 @@ void ufo_state::ex_cp_lamps_w(u8 data)
 {
 	// d0,d1,d4,d5: p1/p2 button lamps
 	for (int i = 0; i < 4; i++)
-		m_lamps[i] = BIT(~data, ((i&1) + (i&2) * 2));
+		m_lamps[i] = BIT(~data, ((i & 1) + (i & 2) * 2));
 
 	// d2,d3,d6,d7: p1/p2 coincounters
 	for (int i = 0; i < 4; i++)
-		machine().bookkeeping().coin_counter_w(i, data >> (2 + (i&1) + (i&2) * 2) & 1);
+		machine().bookkeeping().coin_counter_w(i, data >> (2 + (i & 1) + (i & 2) * 2) & 1);
 }
 
 template<int P>
@@ -476,10 +515,44 @@ void ufo_state::ex_crane_xyz_w(u8 data)
 	// d5: move up
 	for (int m = 0; m < 3; m++)
 	{
-		int bits = data >> (m*2) & 3;
-		m_player[P].motor[m].running = (bits == 1 || bits == 2) ? 1 : 0;
+		int bits = data >> (m * 2) & 3;
+		m_player[P].motor[m].running = population_count_32(bits) & 1;
 		m_player[P].motor[m].direction = bits & 2;
 	}
+}
+
+void ufo_state::ex_ufoalac_xz_w(u8 data)
+{
+	// d0: p1 move right
+	// d1: p1 move left
+	// d2: p2 move right
+	// d3: p2 move left
+	// d4: p1 move arm out
+	// d5: p1 move arm in
+	// d6: p2 move arm in
+	// d7: p2 move arm out
+	for (int i = 0; i < 4; i++)
+	{
+		int bits = data >> (i * 2) & 3;
+		m_player[i & 1].motor[i & 2].running = population_count_32(bits) & 1;
+		m_player[i & 1].motor[i & 2].direction = bits & 1;
+	}
+
+	m_player[0].motor[2].direction = !m_player[0].motor[2].direction;
+}
+
+template<int P>
+void ufo_state::ex_ufoalac_y_w(u8 data)
+{
+	// d0: y normal speed
+	// d1: y slow speed
+	// d2: y direction
+	m_player[P].motor[1].running = population_count_32(data & 3) & 1;
+	m_player[P].motor[1].direction = data & 4;
+
+	m_player[P].motor[1].speed = 1.0f / CABINET_DEPTH;
+	if (data & 2)
+		m_player[P].motor[1].speed *= 0.05f;
 }
 
 void ufo_state::ex_ufo800_lamps_w(u8 data)
@@ -699,8 +772,8 @@ static INPUT_PORTS_START( ufo21 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1") // coinage
 	PORT_DIPNAME( 0x01, 0x01, "UNK1-01" )
@@ -739,6 +812,80 @@ static INPUT_PORTS_START( ufo21 )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "UNK2-08 Demo Music On" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "UNK2-10" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "UNK2-20" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "UNK2-40" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "UNK2-80" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ufoalac )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("P1 Coin 1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("P1 Test")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P1 Service Coin")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("P2 Coin 1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Test") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("P2 Service Coin")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1") // coinage
+	PORT_DIPNAME( 0x01, 0x01, "UNK1-01" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "UNK1-02" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "UNK1-04" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "UNK1-08" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "UNK1-10" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "UNK1-20" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "UNK1-40" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "UNK1-80" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "UNK2-01" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "UNK2-02" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "UNK2-04" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "UNK2-08" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "UNK2-10" )
@@ -910,6 +1057,29 @@ void ufo_state::ufo21(machine_config &config)
 	m_upd->add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
+void ufo_state::ufoalac(machine_config &config)
+{
+	newufo(config);
+
+	// basic machine hardware
+	m_io[0]->in_pa_callback().set_ioport("IN1");
+	m_io[0]->in_pb_callback().set(FUNC(ufo_state::ex_ufoalac_limits_r<0>));
+	m_io[0]->in_pc_callback().set_ioport("IN2");
+	m_io[0]->in_pd_callback().set(FUNC(ufo_state::ex_ufoalac_limits_r<1>));
+	m_io[0]->in_pe_callback().set_constant(0);
+	m_io[0]->in_ph_callback().set_constant(0);
+
+	m_io[1]->out_pa_callback().set(FUNC(ufo_state::ex_ufoalac_xz_w));
+	m_io[1]->out_pb_callback().set(FUNC(ufo_state::cp_lamps_w));
+	m_io[1]->out_pc_callback().set(FUNC(ufo_state::ex_ufoalac_y_w<0>));
+	m_io[1]->out_pd_callback().set(FUNC(ufo_state::ex_ufoalac_y_w<1>));
+	m_io[1]->out_pe_callback().set([this](u8 data) { machine().bookkeeping().coin_counter_w(0, data & 1); });
+	m_io[1]->out_pf_callback().set_nop();
+	m_io[1]->out_pg_callback().set_nop();
+	m_io[1]->out_ph_callback().set(FUNC(ufo_state::cp_digits_w<0>));
+	m_io[1]->out_ph_callback().append(FUNC(ufo_state::cp_digits_w<1>)).rshift(4);
+}
+
 void ufo_state::ufo800(machine_config &config)
 {
 	newufo(config);
@@ -973,6 +1143,11 @@ ROM_START( ufo21 )
 	ROM_LOAD( "315-5766.ic40.jed", 0, 0x359, CRC(cb7a531f) SHA1(ef80f2701781a180e9087ca52c887d96a23127cc) ) // GAL16V8D
 ROM_END
 
+ROM_START( ufoalac )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-19065a.ic33",  0x000000, 0x010000, CRC(43354cff) SHA1(32c1e03b8c70430a627fc5b9d45302c90bac2227) )
+ROM_END
+
 ROM_START( ufo800 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-20413a.ic33",  0x000000, 0x010000, CRC(36e9da6d) SHA1(8e1dbf8b24bc31be7de28f4d562838c291af7c7b) )
@@ -995,4 +1170,5 @@ GAMEL( 1991, newufo_xmas,  newufo, newufo,  newufo,  ufo_state, empty_init, ROT0
 GAMEL( 1991, ufomini,      0,      ufomini, ufomini, ufo_state, empty_init, ROT0, "Sega", "UFO Catcher Mini", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufomini )
 
 GAMEL( 1996, ufo21,        0,      ufo21,   ufo21,   ufo_state, empty_init, ROT0, "Sega", "UFO Catcher 21", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo21 )
+GAMEL( 1996, ufoalac,      0,      ufoalac, ufoalac, ufo_state, empty_init, ROT0, "Sega", "UFO A La Carte", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufoalac )
 GAMEL( 1998, ufo800,       0,      ufo800,  ufo800,  ufo_state, empty_init, ROT0, "Sega", "UFO Catcher 800", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo800 )
