@@ -4,17 +4,17 @@
 license:CC0-1.0
 -->
 <softwarelist name="xbox_hdd" description="XBOX hard disk images">
-    <software name="oemdash" supported="partial">
-        <!-- TODO: add version -->
+	<software name="oemdash" supported="no">
+		<!-- TODO: add version -->
 		<description>OEM Dashboard</description>
 		<year>2001</year>
 		<publisher>Microsoft</publisher>
-    	<notes><![CDATA[
-Original Dashboard
+		<notes><![CDATA[
+Menu is navigable, eventually cannot boot Xbox Game Discs
 Converted to .raw thru qemu-img then back into .chd format.
 At the time of this writing chdman v5 fumbles with -chs (tries to convert it to 32k cylinders) assume standard Seagate -chs 16383,16,63 was used instead, cfr. https://xboxdevwiki.net/Xbox_Hard_Disk_Technical_Details
 Expects to be writable straight off the bat
--debug has custom options, particularly the "xbox nv2a_combiners", cfr. "xbox help" for details.
+-debug has custom video options, particularly the "xbox nv2a_combiners", cfr. "xbox help" for details.
 ]]></notes>
 		<part name="hdd" interface="ide_hdd">
 			<diskarea name="harddriv">
