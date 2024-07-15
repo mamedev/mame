@@ -84,41 +84,6 @@
 #define MAXRAM 0x200000	// +1MB
 //#define MAXRAM 0x400000	// +3MB (which was never a Thing)
 
-class led_ncr5385_device : public ncr5385_device
-{
-	output_finder<> *m_disk_led = nullptr;
-	
-	void led_cmd_w(u8 data)
-	{
-		ncr5385_device::cmd_w(data);
-
-		// blinky blinky
-		if (m_disk_led)
-			*m_disk_led = !BIT(data, 3);
-	}
-
-	public:
-	
-	using ncr5385_device::ncr5385_device;
-	
-	void map(address_map &map)
-	{
-		ncr5385_device::map(map);
-		
-		// hook one so we can show activity
-		map(0x1, 0x1).rw(FUNC(led_ncr5385_device::cmd_r), FUNC(led_ncr5385_device::led_cmd_w));
-		
-	}
-	
-	void attachLED(output_finder<> *led)
-	{
-		m_disk_led = led;
-	}
-
-};
-DECLARE_DEVICE_TYPE(LED_NCR5385, led_ncr5385_device)
-
-DEFINE_DEVICE_TYPE(LED_NCR5385, led_ncr5385_device, "led_ncr5385", "NCR 5385 SCSI Protocol Controller with LED")
 
 namespace {
 
@@ -141,7 +106,7 @@ public:
 		m_snsnd(*this, "snsnd"),
 		m_timer(*this, "timer"),
 		m_rtc(*this, "rtc"),
-		m_scsi(*this, "scsi:7:led_ncr5385"),
+		m_scsi(*this, "scsi:7:ncr5385"),
 		m_vint(*this, "vint"),
 		m_screen(*this, "screen"),
 		m_acia(*this, "acia"),
@@ -234,7 +199,7 @@ private:
 	required_device<sn76496_device> m_snsnd;
 	required_device<am9513_device> m_timer;
 	required_device<mc146818_device> m_rtc;
-	required_device<led_ncr5385_device> m_scsi;
+	required_device<ncr5385_device> m_scsi;
 	required_device<input_merger_all_high_device> m_vint;
 	required_device<screen_device> m_screen;
 	required_device<mos6551_device> m_acia;
@@ -297,7 +262,8 @@ void tek440x_state::machine_start()
 	m_led_8.resolve();
 	
 	m_led_disk.resolve();
-	m_scsi->attachLED(&m_led_disk);
+	m_maincpu->space(AS_PROGRAM).install_write_tap(0x7be002, 0x7be003, "led_tap", [this](offs_t offset, u16 &data, u16 mem_mask) { m_led_disk = !BIT(data, 3);});
+
 	
 	m_vint->in_w<0>(0);		// VBL enable
 	m_vint->in_w<1>(0);		// VBL
@@ -885,7 +851,7 @@ void tek440x_state::physical_map(address_map &map)
 			LOG("scsi bus reset %d\n", BIT(data, 7));
 			
 		}, "scsi_addr"); // 7bc000-7bdfff: SCSI bus address registers
-	map(0x7be000, 0x7be01f).m(m_scsi, FUNC(led_ncr5385_device::map)).umask16(0xff00); //.mirror(0x1fe0) .cswidth(16);
+	map(0x7be000, 0x7be01f).m(m_scsi, FUNC(ncr5385_device::map)).umask16(0xff00); //.mirror(0x1fe0) .cswidth(16);
 
 	// 7c0000-7fffff EPROM application space
 	map(0x7c0000, 0x7fffff).nopr();
@@ -995,10 +961,10 @@ m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks 
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("led_ncr5385", LED_NCR5385).clock(40_MHz_XTAL / 4).machine_config(
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5385", NCR5385).clock(40_MHz_XTAL / 4).machine_config(
 		[this](device_t *device)
 		{
-			led_ncr5385_device &adapter = downcast<led_ncr5385_device &>(*device);
+			ncr5385_device &adapter = downcast<ncr5385_device &>(*device);
 
 			adapter.irq().set_inputline(m_maincpu, M68K_IRQ_3);
 		});
