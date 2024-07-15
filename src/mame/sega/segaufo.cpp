@@ -33,13 +33,13 @@ The list underneath is not complete. A # before the name means it's not dumped y
 - # Dream Palace (1992)
 - # Dream Kitchen (1994)
 - # UFO Catcher Excellent (1994)
-- UFO A La Carte (1996) (2P)
+- UFO À La Carte (1996) (2P)
 - UFO Catcher 21 (1996) (2P)
 - UFO Catcher 800 (1998) (1P)
 - # Baby UFO (1998)
 - # Prize Sensor (1998)
 
-The A La Carte games are vertical cabinets. The UFO doesn't have a crane or lamps.
+The À La Carte games are vertical cabinets. The UFO doesn't have a crane or lamps.
 Instead, it has a tiny arm that extends and pulls down a rope from which the prize
 is hanging on.
 
@@ -1170,5 +1170,5 @@ GAMEL( 1991, newufo_xmas,  newufo, newufo,  newufo,  ufo_state, empty_init, ROT0
 GAMEL( 1991, ufomini,      0,      ufomini, ufomini, ufo_state, empty_init, ROT0, "Sega", "UFO Catcher Mini", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufomini )
 
 GAMEL( 1996, ufo21,        0,      ufo21,   ufo21,   ufo_state, empty_init, ROT0, "Sega", "UFO Catcher 21", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo21 )
-GAMEL( 1996, ufoalac,      0,      ufoalac, ufoalac, ufo_state, empty_init, ROT0, "Sega", "UFO A La Carte", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufoalac )
+GAMEL( 1996, ufoalac,      0,      ufoalac, ufoalac, ufo_state, empty_init, ROT0, "Sega", u8"UFO À La Carte", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufoalac )
 GAMEL( 1998, ufo800,       0,      ufo800,  ufo800,  ufo_state, empty_init, ROT0, "Sega", "UFO Catcher 800", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo800 )

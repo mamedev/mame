@@ -12,13 +12,6 @@ TODO:
   correct.
 - Tilemap and sprite placement might not be accurate, there aren't many
   references.
-- The gradient sky is completely wrong - it's more of a placeholder to show
-  that it's supposed to be there. It is supposed to skew along with the
-  background, and the gradient can move around (the latter doesn't seem to
-  be used except for making it cover the whole screen on the title screen,
-  and start at the middle during gameplay)
-  Update: stage 2 is supposed to have a different gradient, how/where
-  this is located is unknown (pen 0x20?)
 - Video driver is largely unoptimized
 - Support for the 7630's controlling the sound chip outputs (bass/treble,
   volume) is completely missing.
@@ -36,12 +29,12 @@ Other known undumped versions:
 - Another ranking song version - ported to PS2 "Taito Memories".
   https://youtu.be/JXIvaM5508c?si=wCojMales2Kg9L7u&t=270 (Ranking 1st song)
   https://youtu.be/Btnl9FYTiL8?si=rrGTblIfOlIQo6NJ&t=308 (Ranking 2nd song)
-- 2 player joystick version - after inserting a coin, 
+- 2 player joystick version - after inserting a coin,
   instead of "START YOUR ENGINE", it displays "PUSH ONLY 1-PLAYER BUTTON".
   https://youtu.be/iE9-q4IruS4?si=eYL5_iXDZDyH9TS_&t=31
   (The title of this video states that this is the joystick version)
-- Japanese version - after inserting a coin, instead of "START YOUR ENGINE", 
-  it displays "セレクトボタンをおしてね！！(Press select button!!)" 
+- Japanese version - after inserting a coin, instead of "START YOUR ENGINE",
+  it displays "セレクトボタンをおしてね！！(Press select button!!)"
   and "クレジット(Credit)" instead of "CREDIT".
   https://youtu.be/gmC8Al1oCpo?si=JTO6eJ5Q_6-bj_NQ&t=6
 
@@ -99,8 +92,8 @@ QB output = "1/2CLK" = 12mhz
 QC output = "CLK" = 6mhz
 "1/2phi" = 24M / 3 = 8mhz
 
-The z80B main CPU is clocked by (depending on a jumper) either "1/2CLK"/2 OR "1/2PHI"/2, so either 6mhz or 4mhz.
-Schematics show the jumper set to the 6mhz setting.
+The z80B main CPU is clocked by (depending on a jumper) either "1/2CLK"/2 OR "1/2PHI"/2,
+so either 6mhz or 4mhz. Schematics show the jumper set to the 6mhz setting.
 
 ***************************************************************************/
 
@@ -159,7 +152,6 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 private:
@@ -189,12 +181,13 @@ private:
 	output_finder<1> m_led;
 
 	// video-related
+	bitmap_ind16 m_dest_bitmap;
 	bitmap_ind16 m_tmp_bitmap[2];
-	uint16_t m_sl_bank;
-	uint8_t m_bg_clip_on;
-	uint8_t m_sky_on;
-	uint8_t m_sprite_color_base;
-	int32_t m_bg_scrollx;
+	uint16_t m_sl_bank = 0;
+	uint8_t m_bg_clip_on = 0;
+	uint8_t m_sky_on = 0;
+	uint8_t m_sprite_color_base = 0;
+	uint8_t m_bg_scrollx = 0;
 	uint8_t m_sprite_lookup[0x2000];
 
 	void bankswitch_w(uint8_t data);
@@ -210,9 +203,7 @@ private:
 	template <uint8_t Which> void ta7630_volbal_ay_w(uint8_t data);
 	template <uint8_t Which> void port_b_w(uint8_t data);
 	void ta7630_volbal_msm_w(uint8_t data);
-	void palette(palette_device &palette) const;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sky(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_bg(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -222,20 +213,11 @@ private:
 };
 
 
-void buggychl_state::palette(palette_device &palette) const
-{
-	// arbitrary blue shading for the sky, estimation
-	for (int i = 0; i < 128; i++)
-		palette.set_pen_color(i + 128, rgb_t(0, 240 - i, 255));
-}
-
 void buggychl_state::video_start()
 {
+	m_screen->register_screen_bitmap(m_dest_bitmap);
 	m_screen->register_screen_bitmap(m_tmp_bitmap[0]);
 	m_screen->register_screen_bitmap(m_tmp_bitmap[1]);
-
-	save_item(NAME(m_tmp_bitmap[0]));
-	save_item(NAME(m_tmp_bitmap[1]));
 }
 
 void buggychl_state::chargen_w(offs_t offset, uint8_t data)
@@ -259,15 +241,13 @@ void buggychl_state::sprite_lookup_w(offs_t offset, uint8_t data)
 
 void buggychl_state::ctrl_w(uint8_t data)
 {
-/*
-    bit7 = lamp
-    bit6 = lockout
-    bit4 = OJMODE
-    bit3 = SKY OFF
-    bit2 = /SN3OFF
-    bit1 = HINV
-    bit0 = VINV
-*/
+    // bit0 = VINV
+    // bit1 = HINV
+    // bit2 = /SN3OFF
+    // bit3 = SKY OFF
+    // bit4 = OJMODE
+    // bit6 = lockout
+    // bit7 = lamp
 
 	flip_screen_y_set(data & 0x01);
 	flip_screen_x_set(data & 0x02);
@@ -275,7 +255,7 @@ void buggychl_state::ctrl_w(uint8_t data)
 	m_bg_clip_on = data & 0x04;
 	m_sky_on = data & 0x08;
 
-	m_sprite_color_base = (data & 0x10) ? 1 * 16 : 3 * 16;
+	m_sprite_color_base = (data & 0x10) ? 0x10 : 0x30;
 
 	machine().bookkeeping().coin_lockout_global_w((~data & 0x40) >> 6);
 	m_led[0] = BIT(~data, 7);
@@ -283,15 +263,7 @@ void buggychl_state::ctrl_w(uint8_t data)
 
 void buggychl_state::bg_scrollx_w(uint8_t data)
 {
-	m_bg_scrollx = -(data - 0x12);
-}
-
-
-void buggychl_state::draw_sky(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	for (int y = 0; y < 256; y++)
-		for (int x = 0; x < 256; x++)
-			bitmap.pix(y, x) = 128 + x / 2;
+	m_bg_scrollx = data;
 }
 
 
@@ -303,8 +275,12 @@ void buggychl_state::draw_bg(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	// enable clipping if on (title screen disables this to cover all of the area)
 	if (m_bg_clip_on)
 	{
-		if (flip_screen_x()) clip.min_x += 8 * 8;
-		else clip.max_x -= 8 * 8;
+		if (flip_screen_x())
+			clip.min_x += 8 * 8;
+		else
+			clip.max_x -= 8 * 8;
+
+		clip &= cliprect;
 	}
 
 	for (int offs = 0; offs < 0x400; offs++)
@@ -326,19 +302,21 @@ void buggychl_state::draw_bg(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				8 * sx, 8 * sy);
 	}
 
-	int scroll[256];
+	int32_t scroll[256];
 
 	// first copy to a temp bitmap doing column scroll
 	for (int offs = 0; offs < 256; offs++)
 		scroll[offs] = -m_scrollv[offs / 8];
 
-	copyscrollbitmap(m_tmp_bitmap[1], m_tmp_bitmap[0], 1, &m_bg_scrollx, 256, scroll, m_tmp_bitmap[1].cliprect());
+	int32_t scrollx = -(m_bg_scrollx - 0x12);
 
-	// then copy to the screen doing row scroll
+	copyscrollbitmap(m_tmp_bitmap[1], m_tmp_bitmap[0], 1, &scrollx, 256, scroll, m_tmp_bitmap[1].cliprect());
+
+	// then copy to the destination bitmap doing row scroll
 	for (int offs = 0; offs < 256; offs++)
 		scroll[offs] = -m_scrollh[offs];
 
-	copyscrollbitmap_trans(bitmap, m_tmp_bitmap[1], 256, scroll, 0, nullptr, clip, 32);
+	copyscrollbitmap_trans(bitmap, m_tmp_bitmap[1], 256, scroll, 0, nullptr, clip, 0x20);
 }
 
 
@@ -387,7 +365,7 @@ void buggychl_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			int dy = flip_screen_y() ? (255 - sy - y) : (sy + y);
 
-			if ((dy & ~0xff) == 0)
+			if (dy >= cliprect.min_y && dy <= cliprect.max_y)
 			{
 				int charline = zoomy_rom[y] & 0x07;
 				int base_pos = zoomy_rom[y] & 0x38;
@@ -409,7 +387,7 @@ void buggychl_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 						if (col)
 						{
 							int dx = flip_screen_x() ? (255 - sx - px) : (sx + px);
-							if ((dx & ~0xff) == 0)
+							if (cliprect.contains(dx, dy))
 								bitmap.pix(dy, dx) = m_sprite_color_base + col;
 						}
 
@@ -424,18 +402,35 @@ void buggychl_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-uint32_t buggychl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t buggychl_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_sky_on)
-		draw_sky(bitmap, cliprect);
-	else
-		bitmap.fill(0x20, cliprect); // stage 3 disables sky, wants background pen to be blue
+	constexpr pen_t bgpen = 0x20;
+	m_dest_bitmap.fill(bgpen, cliprect);
 
-	draw_bg(bitmap, cliprect);
+	draw_bg(m_dest_bitmap, cliprect);
+	draw_sprites(m_dest_bitmap, cliprect);
+	draw_fg(m_dest_bitmap, cliprect);
 
-	draw_sprites(bitmap, cliprect);
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			const pen_t pen = m_dest_bitmap.pix(y, x);
+			uint32_t color = m_palette->pen(pen);
 
-	draw_fg(bitmap, cliprect);
+			// blend the sky gradient in
+			if (m_sky_on && pen == bgpen)
+			{
+				int g = (color >> 8 & 0xff) + 0x200;
+				g -= int8_t(m_scrollh[y]) + int8_t(m_bg_scrollx) + x;
+				g = std::clamp(g / 2, 0, 0xff);
+
+				color = (color & 0xff0000) | g << 8 | 0xff;
+			}
+
+			bitmap.pix(y, x) = color;
+		}
+	}
 
 	return 0;
 }
@@ -443,7 +438,7 @@ uint32_t buggychl_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void buggychl_state::bankswitch_w(uint8_t data)
 {
-	m_mainbank->set_entry(data & 0x07);   // shall we check if data & 7 < # banks?
+	m_mainbank->set_entry(data & 0x07); // shall we check if data & 7 < # banks?
 }
 
 void buggychl_state::sound_enable_w(uint8_t data)
@@ -507,7 +502,8 @@ uint8_t buggychl_state::sound_status_sound_r()
  1  1  0  1  0  0  1  1  x  x  x  x  x  1  0  1   W  SCCON2
  1  1  0  1  0  0  1  1  x  x  x  x  x  1  1  0   W  SCCON3
  1  1  0  1  0  0  1  1  x  x  x  x  x  1  1  1   W  SCCON4
- (the four ports above are probably for connecting to a bezel score display, almost identical to that of Grand Champion; see https://ia800501.us.archive.org/16/items/ArcadeGameManualGrandchampion/grandchampion.pdf pdf pages 54 and 55)
+ (the four ports above are probably for connecting to a bezel score display, almost identical to that of Grand Champion; see
+ https://ia800501.us.archive.org/16/items/ArcadeGameManualGrandchampion/grandchampion.pdf pdf pages 54 and 55)
  1  1  0  1  0  1  0  0  x  x  x  x  x  x  *  *   RW  SEQRQ 74ls155 @ ic42
  1  1  0  1  0  1  0  0  x  x  x  x  x  x  0  0   W  Write to MCU in latch and set ic43.1  semaphore
  1  1  0  1  0  1  0  0  x  x  x  x  x  x  0  0   R  Read from MCU out latch and clear ic43.2 semaphore
@@ -526,7 +522,8 @@ uint8_t buggychl_state::sound_status_sound_r()
  1  1  0  1  0  1  1  0  x  x  x  1  0  x  0  0   W  Write to Sound in latch, set s-ic12.2
  1  1  0  1  0  1  1  0  x  x  x  1  0  x  0  1   W  OPEN BUS
  1  1  0  1  0  1  1  0  x  x  x  1  0  x  1  0   W  OPEN BUS
- 1  1  0  1  0  1  1  0  x  x  x  1  0  x  1  1   W  SNDRESET (value of d0 latched; if high, this sets s-ic12.1, clears s-ic12.2, clears soundnmi enable, clears sound control latch, resets sound z80(s), zeroes all dac input latches, resets ay-3-8910 chips, and resets the waitstate request)
+ 1  1  0  1  0  1  1  0  x  x  x  1  0  x  1  1   W  SNDRESET (value of d0 latched; if high, this sets s-ic12.1, clears s-ic12.2, clears soundnmi enable,
+ clears sound control latch, resets sound z80(s), zeroes all dac input latches, resets ay-3-8910 chips, and resets the waitstate request)
  1  1  0  1  0  1  1  0  x  x  x  1  1  x  x  x   W  ACCELCL
  1  1  0  1  0  1  1  1  x  x  *  *  *  *  *  *   RW /VCRRQ
  (TODO: palette sram)
@@ -558,16 +555,16 @@ void buggychl_state::main_map(address_map &map)
 	map(0xd600, 0xd600).mirror(0x00e4).portr("DSW1");
 	map(0xd601, 0xd601).mirror(0x00e4).portr("DSW2");
 	map(0xd602, 0xd602).mirror(0x00e4).portr("DSW3");
-	map(0xd603, 0xd603).mirror(0x00e4).portr("IN0");    // player inputs
+	map(0xd603, 0xd603).mirror(0x00e4).portr("IN0"); // player inputs
 	map(0xd608, 0xd608).mirror(0x00e4).portr("WHEEL");
-	map(0xd609, 0xd609).mirror(0x00e4).portr("IN1");    // coin + accelerator
+	map(0xd609, 0xd609).mirror(0x00e4).portr("IN1"); // coin + accelerator
 //  map(0xd60a, 0xd60a).mirror(0x00e4); // other inputs, not used?
 //  map(0xd60b, 0xd60b).mirror(0x00e4); // other inputs, not used?
 	map(0xd610, 0xd610).mirror(0x00e4).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0xd611, 0xd611).mirror(0x00e4).r(FUNC(buggychl_state::sound_status_main_r));
 //  map(0xd613, 0xd613).mirror(0x00e4).w(FUNC(buggychl_state::sound_reset_w));
-	map(0xd618, 0xd618).mirror(0x00e7).nopw();    // accelerator clear; TODO: should we emulate the proper quadrature counter here?
-	map(0xd700, 0xd7ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xd618, 0xd618).mirror(0x00e7).nopw(); // accelerator clear; TODO: should we emulate the proper quadrature counter here?
+	map(0xd700, 0xd77f).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xd820, 0xd83f).ram(); // TODO
 	map(0xd840, 0xd85f).writeonly().share(m_scrollv);
 	map(0xdb00, 0xdbff).writeonly().share(m_scrollh);
@@ -792,8 +789,7 @@ static const gfx_layout spritelayout =
 
 static GFXDECODE_START( gfx_buggychl )
 	GFXDECODE_RAM(   "charram", 0, charlayout,   0, 8 ) // decoded at runtime
-	// sprites are drawn pixel by pixel by draw_sprites()
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0, 8 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0, 8 ) // sprites are drawn pixel by pixel by draw_sprites()
 GFXDECODE_END
 
 
@@ -805,7 +801,7 @@ void buggychl_state::ta7630_volbal_msm_w(uint8_t data)
 template <uint8_t Which>
 void buggychl_state::ta7630_volbal_ay_w(uint8_t data)
 {
-	// VOL/BAL   for the 7630 on this 8910 output
+	// VOL/BAL for the 7630 on this 8910 output
 	m_ta7630->set_device_volume(m_ay[Which], data >> 4);
 }
 
@@ -819,8 +815,9 @@ void buggychl_state::port_b_w(uint8_t data)
 void buggychl_state::machine_start()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-
 	m_mainbank->configure_entries(0, 6, &ROM[0x10000], 0x2000);
+
+	memset(m_sprite_lookup, 0, sizeof(m_sprite_lookup));
 
 	save_item(NAME(m_sprite_lookup));
 	save_item(NAME(m_sl_bank));
@@ -830,15 +827,6 @@ void buggychl_state::machine_start()
 	save_item(NAME(m_bg_scrollx));
 
 	m_led.resolve();
-}
-
-void buggychl_state::machine_reset()
-{
-	m_sl_bank = 0;
-	m_bg_clip_on = 0;
-	m_sky_on = 0;
-	m_sprite_color_base = 0;
-	m_bg_scrollx = 0;
 }
 
 void buggychl_state::buggychl(machine_config &config)
@@ -851,6 +839,7 @@ void buggychl_state::buggychl(machine_config &config)
 	Z80(config, m_audiocpu, 8_MHz_XTAL / 2); // 4 MHz according to schematics
 	m_audiocpu->set_addrmap(AS_PROGRAM, &buggychl_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(buggychl_state::irq0_line_hold), attotime::from_hz(8_MHz_XTAL / 2 / 2 / 256 / 64)); // timer IRQ
+
 	//TIMER(config, "soundirq").configure_periodic(m_audiocpu, FUNC(buggychl_state::irq0_line_hold), 8_MHz_XTAL / 2 / 2 / 256 / 64);
 	// The schematics (which are at least partly for the wrong sound board) show a configurable timer with rates of
 	// 61.035Hz (8_MHz_XTAL / 2 / 2 / 256 / 128)
@@ -872,12 +861,11 @@ void buggychl_state::buggychl(machine_config &config)
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	// derived from ladyfrog.cpp, causes glitches?
-//  m_screen->set_raw(8_MHz_XTAL, 510, 0, 256, 262, 2*8, 30*8); // pixel clock appears to run at 8 MHz
+	//m_screen->set_raw(8_MHz_XTAL, 510, 0, 256, 262, 2*8, 30*8); // pixel clock appears to run at 8 MHz
 	m_screen->set_screen_update(FUNC(buggychl_state::screen_update));
-	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_buggychl);
-	PALETTE(config, m_palette, FUNC(buggychl_state::palette)).set_format(palette_device::xRGB_444, 128 + 128);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 64);
 	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	// sound hardware
