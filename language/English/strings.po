@@ -410,6 +410,10 @@ msgstr ""
 msgid "Hide romless machine from available list"
 msgstr ""
 
+#: src/frontend/mame/ui/submenu.cpp:47
+msgid "Pause game on menu"
+msgstr ""
+
 #: src/frontend/mame/ui/submenu.cpp:52
 msgid "Advanced Options"
 msgstr ""
