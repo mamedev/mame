@@ -766,7 +766,18 @@ void fp1100_state::fp1100(machine_config &config)
 		.add_route(ALL_OUTPUTS, "mono", 0.50); // inside the keyboard
 }
 
-// ROM definitions
+// TODO: chargen, keyboard ROM and key tops can be substituted on actual FP-1000/FP-1100
+// HN462732G-JKA to position E8 ("common for all languages")
+// HN462532G-G?? to position E21 (chargen)
+// - GKA Spain
+// - GLA Italy
+// - GMA France
+// - GNA Germany
+// - GPA UK
+// - GQA Netherlands
+// - GRA Norway/Denmark
+// - GSA Sweden/Finland
+// - GTA <default chargen, Japan?>
 
 ROM_START( fp1100 )
 	ROM_REGION( 0x9000, "bios", ROMREGION_ERASEFF )
@@ -782,6 +793,7 @@ ROM_START( fp1100 )
 	ROM_REGION( 0x3000, "sub_ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "sub1.rom", 0x0000, 0x1000, CRC(8feda489) SHA1(917d5b398b9e7b9a6bfa5e2f88c5b99923c3c2a3))
 	ROM_LOAD( "sub2.rom", 0x1000, 0x1000, CRC(359f007e) SHA1(0188d5a7b859075cb156ee55318611bd004128d7))
+	// Japan chargen ROM (GTA?)
 	ROM_LOAD( "sub3.rom", 0x2000, 0xf80, BAD_DUMP CRC(fb2b577a) SHA1(a9ae6b03e06ea2f5db30dfd51ebf5aede01d9672))
 ROM_END
 
@@ -795,15 +807,14 @@ ROM_START( fp1000 )
 	ROM_LOAD( "2l_a10_kkk_fp1000_basic.c1", 0x0000, 0x1000, CRC(9322dedd) SHA1(40a00684ced2b7ead53ca15a915d98f3fe00d3ba))
 
 	ROM_REGION( 0x3000, "sub_ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "jka_fp1000.e8",    0x0000, 0x1000, CRC(2aefa4e4) SHA1(b3cc5484426c19a7266d17ea5c4d55441b4e3be8))
-	ROM_LOAD( "jkc_fp1000.e21",   0x1000, 0x1000, CRC(67a668a9) SHA1(37fb9308505b47db36f8c341144ca3fe3fec64af))
-	ROM_LOAD( "upd7801g_118.bin", 0x2000, 0xf80, BAD_DUMP CRC(fb2b577a) SHA1(a9ae6b03e06ea2f5db30dfd51ebf5aede01d9672)) // Not dumped, borrowed from 'fp1100'
+	ROM_LOAD( "sub1.rom", 0x0000, 0x1000, BAD_DUMP CRC(8feda489) SHA1(917d5b398b9e7b9a6bfa5e2f88c5b99923c3c2a3)) // Not dumped, borrowed from 'fp1100'
+	ROM_LOAD( "jka_fp1000.e8",    0x1000, 0x1000, CRC(2aefa4e4) SHA1(b3cc5484426c19a7266d17ea5c4d55441b4e3be8))
+	// Spain chargen ROM (GKA really?)
+	ROM_LOAD( "jkc_fp1000.e21",   0x2000, 0x1000, CRC(67a668a9) SHA1(37fb9308505b47db36f8c341144ca3fe3fec64af))
 ROM_END
 
 } // anonymous namespace
 
-
-// Drivers
 
 COMP( 1983, fp1100, 0,      0, fp1100, fp1100, fp1100_state, empty_init, "Casio", "FP-1100", MACHINE_NOT_WORKING)
 COMP( 1982, fp1000, 0, fp1100, fp1100, fp1100, fp1100_state, empty_init, "Casio", "FP-1000", MACHINE_NOT_WORKING)
