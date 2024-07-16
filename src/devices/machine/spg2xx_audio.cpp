@@ -473,7 +473,8 @@ void spg2xx_audio_device::audio_ctrl_w(offs_t offset, uint16_t data)
 			else
 			{
 				LOGMASKED(LOG_SPU_WRITES, "Disabling channel %d\n", channel_bit);
-				if (m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] & mask) {
+				if (m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] & mask)
+				{
 					LOGMASKED(LOG_SPU_WRITES, "Stopping channel %d\n", channel_bit);
 					stop_channel(channel_bit);
 				}

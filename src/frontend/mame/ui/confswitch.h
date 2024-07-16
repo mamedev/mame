@@ -72,6 +72,7 @@ private:
 	switch_group_vector m_switch_groups;
 	unsigned m_active_switch_groups;
 	int const m_type;
+	bool m_changed;
 };
 
 
