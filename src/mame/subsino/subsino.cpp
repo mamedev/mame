@@ -2973,7 +2973,7 @@ void subsino_state::tisub(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);   // Unknown clock
+	YM3812(config, "ymsnd", XTAL(12'000'000) / 3).add_route(ALL_OUTPUTS, "mono", 1.0);   // Divisor guessed. Unknown clock
 }
 
 void subsino_state::newhunterb(machine_config &config)
@@ -3032,7 +3032,7 @@ void subsino_state::stbsub(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM3812(config, "ymsnd", XTAL(12'000'000) / 3).add_route(ALL_OUTPUTS, "mono", 1.0);   // Divisor guessed.
 }
 
 void subsino_state::mtrainnv(machine_config &config)
