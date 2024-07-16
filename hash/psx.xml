@@ -29414,6 +29414,31 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
+	<software name="vribbon">
+		<!--
+		Original images (Redump)
+		<rom name="Vib-Ribbon (Japan, Asia).cue" size="926" crc="8b4a6f0d" md5="2a4ef4503de637bf2d36e6a75f74a9af" sha1="751d0556710abca84f32718f8898ca863348ce4f"/>
+		<rom name="Vib-Ribbon (Japan, Asia) (Track 1).bin" size="8104992" crc="99111642" md5="e116bccbc0828e45d7b3f19234cd3670" sha1="1afb6ccb164627aafb290f88cef0270648b03b75"/>
+		<rom name="Vib-Ribbon (Japan, Asia) (Track 2).bin" size="28402752" crc="bb75f4b6" md5="e7c106e648f1bcd50c4cb30bbbe090fc" sha1="f5df84834bcde12a138cd4caf7357a93187d3c60"/>
+		<rom name="Vib-Ribbon (Japan, Asia) (Track 3).bin" size="27099744" crc="7aad0868" md5="cd0d6d210a4205467a59239e66272684" sha1="345d95e6a19d7f08f6d0446fd54dce2a5769dda0"/>
+		<rom name="Vib-Ribbon (Japan, Asia) (Track 4).bin" size="26885712" crc="465bc832" md5="d792e7f953eeb38d4e55a8fc7a8e8341" sha1="79ed83f13674adb78432d2162c186ec3426b1749"/>
+		<rom name="Vib-Ribbon (Japan, Asia) (Track 5).bin" size="27299664" crc="65669a7d" md5="886a6dc752e845cea019c2e9a68e46d4" sha1="39a2a57f8c0315dd8af218da96d3c64dfc0b470a"/>
+		<rom name="Vib-Ribbon (Japan, Asia) (Track 6).bin" size="29345904" crc="fb5d0fc6" md5="d69c085840ba91c51addd965b2de2cc7" sha1="0bdacd95eb01fe815cba382dcb7c02f2dffc1d32"/>
+		<rom name="Vib-Ribbon (Japan, Asia) (Track 7).bin" size="27000960" crc="b25112d4" md5="2b4ed43ffc86b070b54109f0dfb43b8e" sha1="7fd2790acbc48eed500ea88c27e3e35246ce5ab8"/>
+		<rom name="Vib-Ribbon (Japan, Asia) (Track 8).bin" size="32403504" crc="5534d35d" md5="d9e0cad17a65497509f346fb0a63735b" sha1="02e7fc3064bed5afbc88cb911882bcbdb37e4a76"/>
+		-->
+		<description>Vib-Ribbon (Japan, Asia)</description>
+		<year>1999</year>
+		<publisher>SCEI</publisher>
+		<info name="serial" value="SCPS-18012"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="vib-ribbon (japan, asia)" sha1="237b18f126e60e869e9a1b7c4f4ad5329848104c"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="vrpboat">
 		<!-- Original images (Redump)
 		<rom name="VR Sports Powerboat Racing (USA).cue" size="2649" crc="3cb06d7a" sha1="da94e73f77b9a9cca5c0345536466983b5612709"/>
