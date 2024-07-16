@@ -502,7 +502,7 @@ uint8_t buggychl_state::sound_status_sound_r()
  1  1  0  1  0  0  1  1  x  x  x  x  x  1  1  0   W  SCCON3
  1  1  0  1  0  0  1  1  x  x  x  x  x  1  1  1   W  SCCON4
  (the four ports above are probably for connecting to a bezel score display, almost identical to that of Grand Champion; see
- https://ia800501.us.archive.org/16/items/ArcadeGameManualGrandchampion/grandchampion.pdf pdf pages 54 and 55)
+ https://archive.org/download/ArcadeGameManualGrandchampion/grandchampion.pdf pdf pages 54 and 55)
  1  1  0  1  0  1  0  0  x  x  x  x  x  x  *  *   RW  SEQRQ 74ls155 @ ic42
  1  1  0  1  0  1  0  0  x  x  x  x  x  x  0  0   W  Write to MCU in latch and set ic43.1  semaphore
  1  1  0  1  0  1  0  0  x  x  x  x  x  x  0  0   R  Read from MCU out latch and clear ic43.2 semaphore
