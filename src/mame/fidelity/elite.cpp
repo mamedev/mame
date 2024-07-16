@@ -20,7 +20,7 @@ Elite A/S Challenger (EAS)
 ---------------------------------
 This came out in 1983. 2 program updates were released in 1983 and 1984,
 named Budapest and Glasgow, places where Fidelity competed in chess computer
-matches (they won it in 1983). A/S stands for auto sensory, it's the 1st
+matches (they won it in 1983). A/S stands for Auto Sensory, it's the 1st
 Fidelity board with magnet sensors. The magnetic chessboard was licensed from
 AVE Micro Systems, in fact, the PC model board is the same one as in AVE's ARB.
 
@@ -33,7 +33,7 @@ Hardware notes:
 - 8*8 magnet sensors, 11 buttons, 8*(8+1) LEDs + 4*7seg LEDs
 - module slot and printer port
 
-*In West Germany, some distributors released it with overclocked CPUs,
+*: In West Germany, some distributors released it with overclocked CPUs,
 advertised as 3.2, 3.6, or 4MHz. Unmodified EAS PCB photos show only a 3MHz XTAL.
 Though model EWC(improved Budapest) had a 3.57MHz XTAL and EAS-C(Glasgow) had
 a 4MHz XTAL. Model E4.0 is also assumed to be 4MHz.
@@ -104,8 +104,6 @@ namespace {
 
 // note: sub-class of fidel_clockdiv_state (see clockdiv.*)
 
-// EAS / shared
-
 class elite_state : public fidel_clockdiv_state
 {
 public:
@@ -128,12 +126,16 @@ public:
 	void ewc(machine_config &config);
 	void easc(machine_config &config);
 	void easx(machine_config &config);
+	void eag(machine_config &config);
+	void eag2100(machine_config &config);
+
+	void init_eag() { m_rotate = true; }
 
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override { fidel_clockdiv_state::machine_reset(); }
+	virtual void machine_reset() override;
 
 	// devices/pointers
 	optional_device<i8255_device> m_ppi8255;
@@ -146,15 +148,17 @@ protected:
 	required_region_ptr<u8> m_language;
 	required_ioport_array<2> m_inputs;
 
+	bool m_rotate = false;
 	u8 m_led_data = 0;
 	u8 m_7seg_data = 0;
 	u8 m_inp_mux = 0;
 	u8 m_speech_bank = 0;
 
 	// address maps
+	void pc_map(address_map &map);
 	void eas_map(address_map &map);
 	void eag_map(address_map &map);
-	void pc_map(address_map &map);
+	void eag2100_map(address_map &map);
 
 	// I/O handlers
 	void update_display();
@@ -162,7 +166,6 @@ protected:
 	void segment_w(offs_t offset, u8 data);
 	void led_w(offs_t offset, u8 data);
 	u8 input_r();
-	virtual u8 board_r() { return m_board->read_file(m_inp_mux, true); }
 	void ppi_porta_w(u8 data);
 	u8 ppi_portb_r();
 	void ppi_portc_w(u8 data);
@@ -172,6 +175,9 @@ void elite_state::machine_start()
 {
 	fidel_clockdiv_state::machine_start();
 
+	if (m_rombank != nullptr)
+		m_rombank->configure_entries(0, 4, memregion("rombank")->base(), 0x2000);
+
 	// register for savestates
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_7seg_data));
@@ -179,50 +185,19 @@ void elite_state::machine_start()
 	save_item(NAME(m_speech_bank));
 }
 
+void elite_state::machine_reset()
+{
+	fidel_clockdiv_state::machine_reset();
+
+	if (m_rombank != nullptr)
+		m_rombank->set_entry(0);
+}
+
 INPUT_CHANGED_MEMBER(elite_state::change_cpu_freq)
 {
 	// known official CPU speeds: 3MHz(EAS), 3.57MHz(PC/EWC/Privat), 4MHz(PC/EAS-C)
 	static const XTAL xtal[3] = { 3_MHz_XTAL, 3.579545_MHz_XTAL, 4_MHz_XTAL };
 	m_maincpu->set_unscaled_clock(xtal[newval % 3]);
-}
-
-
-// EAG
-
-class eag_state : public elite_state
-{
-public:
-	eag_state(const machine_config &mconfig, device_type type, const char *tag) :
-		elite_state(mconfig, type, tag)
-	{ }
-
-	// machine configs
-	void eag(machine_config &config);
-	void eag2100(machine_config &config);
-
-	void init_eag2100();
-
-protected:
-	virtual void machine_reset() override;
-
-private:
-	void eag2100_map(address_map &map);
-
-	// board is rotated 90 degrees
-	virtual u8 board_r() override { return m_board->read_rank(m_inp_mux); }
-};
-
-void eag_state::init_eag2100()
-{
-	m_rombank->configure_entries(0, 4, memregion("rombank")->base(), 0x2000);
-}
-
-void eag_state::machine_reset()
-{
-	elite_state::machine_reset();
-
-	if (m_rombank != nullptr)
-		m_rombank->set_entry(0);
 }
 
 
@@ -267,7 +242,13 @@ u8 elite_state::input_r()
 	// multiplexed inputs (active low)
 	// read chessboard sensors
 	if (m_inp_mux < 8)
-		data = board_r();
+	{
+		// EAG chessboard is rotated 90 degrees
+		if (m_rotate)
+			data = m_board->read_rank(m_inp_mux);
+		else
+			data = m_board->read_file(m_inp_mux, true);
+	}
 
 	// read button panel
 	else if (m_inp_mux == 8)
@@ -377,7 +358,7 @@ void elite_state::eag_map(address_map &map)
 	map(0xa000, 0xffff).rom();
 }
 
-void eag_state::eag2100_map(address_map &map)
+void elite_state::eag2100_map(address_map &map)
 {
 	eag_map(map);
 	map(0xa000, 0xbfff).bankr(m_rombank);
@@ -555,7 +536,7 @@ void elite_state::easx(machine_config &config)
 	NVRAM(config, "nvram.ic6", nvram_device::DEFAULT_ALL_0);
 }
 
-void eag_state::eag(machine_config &config)
+void elite_state::eag(machine_config &config)
 {
 	easx(config);
 
@@ -564,12 +545,12 @@ void eag_state::eag(machine_config &config)
 	config.set_default_layout(layout_fidel_eag);
 }
 
-void eag_state::eag2100(machine_config &config)
+void elite_state::eag2100(machine_config &config)
 {
 	eag(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eag2100_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &elite_state::eag2100_map);
 }
 
 
@@ -1136,24 +1117,24 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT          COMPANY, FULLNAME, FLAGS
-SYST( 1983, feas,      0,      0,      eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (original program)", MACHINE_SUPPORTS_SAVE )
-SYST( 1983, feasbu,    feas,   0,      eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EAS)", MACHINE_SUPPORTS_SAVE )
-SYST( 1983, feasbua,   feas,   0,      ewc,      ewc,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EWC)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, feasgla,   feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, feasglaa,  feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 2)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, feasglab,  feas,   0,      easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 3)", MACHINE_SUPPORTS_SAVE )
-SYST( 1985, feasx,     feas,   0,      easx,     easx,  elite_state, empty_init,   "Fidelity Computer Products", "Elite A/S Challenger (experimental)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1983, feas,      0,      0,      eas,      eas,   elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (original program)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, feasbu,    feas,   0,      eas,      eas,   elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EAS)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, feasbua,   feas,   0,      ewc,      ewc,   elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EWC)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, feasgla,   feas,   0,      easc,     easc,  elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, feasglaa,  feas,   0,      easc,     easc,  elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, feasglab,  feas,   0,      easc,     easc,  elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, feasx,     feas,   0,      easx,     easx,  elite_state, empty_init, "Fidelity Computer Products", "Elite A/S Challenger (experimental)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1982, fpres,     0,      0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1982, fpresa,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 2)", MACHINE_SUPPORTS_SAVE )
-SYST( 1982, fpresb,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 3)", MACHINE_SUPPORTS_SAVE )
-SYST( 1982, fpresc,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 4)", MACHINE_SUPPORTS_SAVE )
-SYST( 1982, fpresd,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 5)", MACHINE_SUPPORTS_SAVE )
-SYST( 1982, fprese,    fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program, set 6)", MACHINE_SUPPORTS_SAVE )
-SYST( 1983, fpresbu,   fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, fpresgla,  fpres,  0,      pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Glasgow program)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, fpres,     0,      0,      pc,       pc,    elite_state, empty_init, "Fidelity Electronics", "Prestige Challenger (original program, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, fpresa,    fpres,  0,      pc,       pc,    elite_state, empty_init, "Fidelity Electronics", "Prestige Challenger (original program, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, fpresb,    fpres,  0,      pc,       pc,    elite_state, empty_init, "Fidelity Electronics", "Prestige Challenger (original program, set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, fpresc,    fpres,  0,      pc,       pc,    elite_state, empty_init, "Fidelity Electronics", "Prestige Challenger (original program, set 4)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, fpresd,    fpres,  0,      pc,       pc,    elite_state, empty_init, "Fidelity Electronics", "Prestige Challenger (original program, set 5)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, fprese,    fpres,  0,      pc,       pc,    elite_state, empty_init, "Fidelity Electronics", "Prestige Challenger (original program, set 6)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, fpresbu,   fpres,  0,      pc,       pc,    elite_state, empty_init, "Fidelity Electronics", "Prestige Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, fpresgla,  fpres,  0,      pc,       pc,    elite_state, empty_init, "Fidelity Electronics", "Prestige Challenger (Glasgow program)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1986, feag,      0,      0,      eag,      eag,   eag_state,   empty_init,   "Fidelity International", "Elite Avant Garde (model 6081)", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, feag2100,  feag,   0,      eag2100,  eag,   eag_state,   init_eag2100, "Fidelity International", "Elite Avant Garde 2100 (set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, feag2100a, feag,   0,      eag2100,  eag,   eag_state,   init_eag2100, "Fidelity International", "Elite Avant Garde 2100 (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, feag,      0,      0,      eag,      eag,   elite_state, init_eag,   "Fidelity International", "Elite Avant Garde (model 6081)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, feag2100,  feag,   0,      eag2100,  eag,   elite_state, init_eag,   "Fidelity International", "Elite Avant Garde 2100 (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, feag2100a, feag,   0,      eag2100,  eag,   elite_state, init_eag,   "Fidelity International", "Elite Avant Garde 2100 (set 2)", MACHINE_SUPPORTS_SAVE )
