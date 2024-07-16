@@ -276,8 +276,10 @@ public:
 	void victor21(machine_config &config);
 	void sharkpy(machine_config &config);
 	void victor5(machine_config &config);
-	void newhunterb(machine_config &config);
+	void newhunter(machine_config &config);
+    void newhunterb(machine_config &config);
 	void newhunterd(machine_config &config);
+    void sevenlnd(machine_config &config);
 
 	void init_stbsub();
 	void init_stisub();
@@ -2973,7 +2975,16 @@ void subsino_state::tisub(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, "ymsnd", XTAL(12'000'000) / 3).add_route(ALL_OUTPUTS, "mono", 1.0);   // Divisor guessed. Unknown clock
+	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);   // Unknown clock
+}
+void subsino_state::newhunter(machine_config &config)
+{
+	tisub(config);
+  	// sound hardware
+
+	SPEAKER(config.replace(), "mono").front_center();
+    
+	YM3812(config.replace(), "ymsnd", XTAL(12'000'000) / 3).add_route(ALL_OUTPUTS, "mono", 1.0);   // Divisor guessed. Unknown clock
 }
 
 void subsino_state::newhunterb(machine_config &config)
@@ -2981,6 +2992,11 @@ void subsino_state::newhunterb(machine_config &config)
 	tisub(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::newhunterb_map);
+	// sound hardware
+
+    SPEAKER(config.replace(), "mono").front_center();
+
+	YM3812(config.replace(), "ymsnd", XTAL(12'000'000) / 3).add_route(ALL_OUTPUTS, "mono", 1.0);   // Divisor guessed. Unknown clock
 }
 
 void subsino_state::newhunterd(machine_config &config)
@@ -3032,7 +3048,7 @@ void subsino_state::stbsub(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, "ymsnd", XTAL(12'000'000) / 3).add_route(ALL_OUTPUTS, "mono", 1.0);   // Divisor guessed.
+	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void subsino_state::mtrainnv(machine_config &config)
@@ -3042,7 +3058,15 @@ void subsino_state::mtrainnv(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::mtrainnv_map);
 }
+void subsino_state::sevenlnd(machine_config &config)
+{
+	mtrainnv(config);
+  	// sound hardware
 
+	SPEAKER(config.replace(), "mono").front_center();
+    
+	YM3812(config.replace(), "ymsnd", XTAL(12'000'000) / 3).add_route(ALL_OUTPUTS, "mono", 1.0);   // Divisor guessed. Unknown clock
+}
 
 /***************************************************************************
 *                               ROMs Loading                               *
@@ -4452,7 +4476,7 @@ GAMEL( 1992, tisuba,      tisub,   tisub,      tisub,    subsino_state, init_tis
 GAMEL( 1992, tisubb,      tisub,   tisub,      tisubb,   subsino_state, init_tisubb,      ROT0, "American Alpha",  "Treasure Island (American Alpha, v3.0N)",     0,                   layout_tisubb   )
 
 // tilemaps, lamps and inputs troubles.
-GAMEL( 1992, newhunter,   tisub,   tisub,      tisub,    subsino_state, init_tisubb,      ROT0, "Karam",           "New HUNTer",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but this bootleg is from 1992
+GAMEL( 1992, newhunter,   tisub,   newhunter,      tisub,    subsino_state, init_tisubb,      ROT0, "Karam",           "New HUNTer",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but this bootleg is from 1992
 GAMEL( 1993, newhunterb,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterb,  ROT0, "bootleg",         "New HUNTer (bootleg, set 1)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_tisubb   )
 
 GAMEL( 1993, newhunterc,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",         "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
@@ -4470,8 +4494,8 @@ GAMEL( 1995, stisub,      stbsub,  stbsub,     stbsub,   subsino_state, init_sti
 GAMEL( 1995, tesorone,    stbsub,  stbsub,     tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.41)",          0,                   layout_stisub   )
 GAMEL( 1995, tesorone240, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.40)",          0,                   layout_stisub   )
 GAMEL( 1995, tesorone230, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone230, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.30)",          0,                   layout_stisub   )
-GAMEL( 1995, sevenlnd,    stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Seven Land",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   )
-GAMEL( 1995, luckyseven,  stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Lucky Seven",                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   )
+GAMEL( 1995, sevenlnd,    stbsub,  sevenlnd,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Seven Land",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   )
+GAMEL( 1995, luckyseven,  stbsub,  sevenlnd,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",         "Lucky Seven",                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   )
 
 GAMEL( 1996, sharkpy,     0,       sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.3)",                   0,                   layout_sharkpy  ) // missing POST messages?
 GAMEL( 1996, sharkpya,    sharkpy, sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.6)",                   0,                   layout_sharkpy  ) // missing POST messages?
