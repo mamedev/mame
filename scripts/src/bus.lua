@@ -1582,6 +1582,8 @@ if (BUSES["IEEE488"]~=null) then
 		MAME_DIR .. "src/devices/bus/ieee488/shark.h",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9122c.cpp",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9122c.h",
+		MAME_DIR .. "src/devices/bus/ieee488/hp9133.cpp",
+		MAME_DIR .. "src/devices/bus/ieee488/hp9133.h",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9895.cpp",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9895.h",
 		MAME_DIR .. "src/devices/bus/ieee488/remote488.cpp",
