@@ -226,4 +226,5 @@ void dectalk_isa_device::device_reset()
 	m_ctl = 0;
 	m_vol = 63;
 	m_bio = ASSERT_LINE;
+	m_dac->set_sample_rate(10000); // the DSP generates audio with a 10 kHz sample rate
 }

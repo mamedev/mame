@@ -108,6 +108,12 @@ public:
 	}
 	dac_device_base &set_output_range(stream_buffer::sample_t vref) { return set_output_range(-vref, vref); }
 
+	// set the sample rate
+	void set_sample_rate(u32 rate)
+	{
+		m_stream->set_sample_rate(rate);
+	}
+
 private:
 	// internal state
 	sound_stream *m_stream;
