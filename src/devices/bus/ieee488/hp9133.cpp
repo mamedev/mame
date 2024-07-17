@@ -10,13 +10,17 @@
 
 #include "emu.h"
 #include "hp9133.h"
+
+#include "ieee488.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/i8291a.h"
 #include "machine/wd2010.h"
 #include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
-#include "ieee488.h"
+
+#include <algorithm>
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -31,15 +35,14 @@ public:
 	hp9133_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	// device_ieee488_interface overrides
+	// device_ieee488_interface implementation
 	virtual void ieee488_eoi(int state) override;
 	virtual void ieee488_dav(int state) override;
 	virtual void ieee488_nrfd(int state) override;
@@ -50,7 +53,6 @@ protected:
 	virtual void ieee488_ren(int state) override;
 
 private:
-
 	static constexpr int IO1_R_BCS_N = 0x10;
 	static constexpr int IO1_R_BDRQ = 0x20;
 	static constexpr int IO1_R_HDINT = 0x40;
@@ -168,20 +170,20 @@ private:
 	uint8_t m_hdc_cmd;
 };
 
-hp9133_device::hp9133_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t{mconfig, HP9133, tag, owner, clock},
-	  device_ieee488_interface{mconfig, *this},
-	  m_cpu{*this , "cpu"},
-	  m_gpib{*this, "i8291a"},
-	  m_hdc{*this, "wd2010"},
-	  m_harddisk{*this, "harddisk"},
-	  m_fdc{*this, "wd2793"},
-	  m_floppy{*this, "floppy0"},
-	  m_hpib_addr{*this , "ADDRESS"},
-	  m_selftest{*this, "SELFTEST"},
-	  m_selftesten{*this, "SELFTESTEN"},
-	  m_volcfg{*this, "VOLCFG"},
-	  m_model{*this, "MODEL"}
+hp9133_device::hp9133_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t{mconfig, HP9133, tag, owner, clock},
+	device_ieee488_interface{mconfig, *this},
+	m_cpu{*this, "cpu"},
+	m_gpib{*this, "i8291a"},
+	m_hdc{*this, "wd2010"},
+	m_harddisk{*this, "harddisk"},
+	m_fdc{*this, "wd2793"},
+	m_floppy{*this, "floppy0"},
+	m_hpib_addr{*this, "ADDRESS"},
+	m_selftest{*this, "SELFTEST"},
+	m_selftesten{*this, "SELFTESTEN"},
+	m_volcfg{*this, "VOLCFG"},
+	m_model{*this, "MODEL"}
 {
 }
 
@@ -260,6 +262,7 @@ TIMER_CALLBACK_MEMBER(hp9133_device::floppy_motor_timeout)
 
 	floppy->mon_w(1);
 }
+
 void hp9133_device::device_start()
 {
 	save_item(NAME(m_dma_ram));
@@ -307,7 +310,7 @@ void hp9133_device::device_start()
 
 void hp9133_device::device_reset()
 {
-	memset(m_dma_ram, 0, sizeof(m_dma_ram));
+	std::fill(std::begin(m_dma_ram), std::end(m_dma_ram), 0);
 	m_dma_addr = 0;
 	m_intsel = 0;
 	m_head = 0;
@@ -436,8 +439,6 @@ TIMER_CALLBACK_MEMBER(hp9133_device::index_timer)
 
 void hp9133_device::cpu_sync_ack(int state)
 {
-	uint8_t data;
-
 	LOG("%s: %d: enabled %d\n", __func__, state, m_dmaenable);
 	if (!m_dmaenable)
 		return;
@@ -445,6 +446,7 @@ void hp9133_device::cpu_sync_ack(int state)
 		if (m_gpib_drq)
 			m_cpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 	} else {
+		uint8_t data;
 		if (!m_dma_rwn) {
 			data = dma_ram_r(0);
 			m_gpib->dout_w(data);
@@ -532,11 +534,11 @@ void hp9133_device::io1_w(uint8_t data)
 	// 0 - Fault LED#
 	m_head = (data >> 2) & 7;
 	LOG("%s: %02x Head %d %s%s%s%s\n", __func__,
-	    data, m_head,
-	    data & IO1_W_BRDY ? "BRDY " : "",
-	    data & IO1_W_WDRESET_N ? "" : "HDCRESET ",
-	    data & IO1_W_DS1 ? "ACTIVE " : "",
-	    data & IO1_W_FLT_N ? "" : "FAULT ");
+	    	data, m_head,
+	    	(data & IO1_W_BRDY) ? "BRDY " : "",
+	    	(data & IO1_W_WDRESET_N) ? "" : "HDCRESET ",
+	    	(data & IO1_W_DS1) ? "ACTIVE " : "",
+	    	(data & IO1_W_FLT_N) ? "" : "FAULT ");
 	if (!(data & IO1_W_WDRESET_N))
 		m_hdc->reset();
 	m_hdc->buffer_ready(data & IO1_W_BRDY);
@@ -588,8 +590,8 @@ void hp9133_device::io3_w(uint8_t data)
 	m_intsel = data & IO3_W_INTSEL_MASK;
 
 	LOG("%s: %02x = INTSEL %d, INT %d DMA %d DMA start %d DMA ACK %s\n", __func__,
-	    data, m_intsel, m_intenable, m_dmaenable, (data >> 4) & 1,
-	    m_dmaack_switch ? "GPIB" : "FDC");
+	    	data, m_intsel, m_intenable, m_dmaenable, BIT(data, 4),
+	    	m_dmaack_switch ? "GPIB" : "FDC");
 	update_intsel();
 	if (m_fast)
 		m_fast_timer->adjust(attotime::from_usec(1000));
@@ -687,7 +689,7 @@ uint8_t hp9133_device::dma_ram_r(offs_t offset)
 
 static int sdh_sector_size(uint8_t sdh)
 {
-	const int sizes[4] = { 256, 512, 1024, 128 };
+	constexpr int sizes[4] = { 256, 512, 1024, 128 };
 
 	return sizes[(sdh >> 5) & 3];
 }
@@ -762,7 +764,7 @@ void hp9133_device::hdc_bdrq_cb(int state)
 
 void hp9133_device::hdc_wg_cb(int state)
 {
-	bool is_write = m_hdc_cmd >> 4 == 3;
+	bool is_write = (m_hdc_cmd >> 4) == 3;
 
 	m_hdc_wg = state;
 	if (state && is_write)
@@ -824,7 +826,7 @@ void hp9133_device::cpu_map(address_map &map)
 
 static void hp9133_floppies(device_slot_interface &device)
 {
-	device.option_add("d32w" , SONY_OA_D32W);
+	device.option_add("d32w", SONY_OA_D32W);
 }
 
 void hp9133_device::device_add_mconfig(machine_config &config)
@@ -857,14 +859,14 @@ void hp9133_device::device_add_mconfig(machine_config &config)
 	WD2793(config, m_fdc, XTAL(2'000'000));
 	m_fdc->intrq_wr_callback().set(FUNC(hp9133_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(hp9133_device::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "floppy0" , hp9133_floppies , "d32w" ,
+	FLOPPY_CONNECTOR(config, "floppy0", hp9133_floppies, "d32w",
 			 floppy_image_device::default_mfm_floppy_formats, true).enable_sound(true);
 }
 
 ROM_START(hp9133)
-	ROM_REGION(0x8000 , "cpu" , 0)
-	ROM_LOAD("09133-89110_9133.bin" , 0x0000, 0x4000 , CRC(d7ff6b3e) SHA1(aeeae063fa43c3b163ba5c176f31df6ec1b73d0d))
-	ROM_LOAD("09133-89210_9133.bin" , 0x4000, 0x4000 , CRC(08f825e2) SHA1(61766b1f64473c17f01cbc97bd817f6076827d6a))
+	ROM_REGION(0x8000, "cpu", 0)
+	ROM_LOAD("09133-89110_9133.bin", 0x0000, 0x4000, CRC(d7ff6b3e) SHA1(aeeae063fa43c3b163ba5c176f31df6ec1b73d0d))
+	ROM_LOAD("09133-89210_9133.bin", 0x4000, 0x4000, CRC(08f825e2) SHA1(61766b1f64473c17f01cbc97bd817f6076827d6a))
 ROM_END
 
 const tiny_rom_entry *hp9133_device::device_rom_region() const
