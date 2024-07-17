@@ -2035,6 +2035,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/cart/hfox.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/holy_quran.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/holy_quran.h",
+		MAME_DIR .. "src/devices/bus/msx/cart/ide.cpp",
+		MAME_DIR .. "src/devices/bus/msx/cart/ide.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/ink.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/ink.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/kanji.cpp",
