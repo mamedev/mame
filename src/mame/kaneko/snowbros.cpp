@@ -3153,7 +3153,7 @@ void snowbros_state::init_sutjarod()
 	rom[0xb994 / 2] = 0x434b;
 	rom[0xb996 / 2] = 0x3345;
 
-	// anti-tamper checksum - keep checksum the same by putting a value in an used area at the start of ROM
+	// anti-tamper checksum - keep checksum the same by putting a value in an unused area at the start of ROM
 	// (the game does a ROM checksum between scenes, expects result to be 0, or goes off the rails)
 	rom[0x54 / 2] = 0x2508;
 }
