@@ -615,13 +615,13 @@ void z80_device::device_start()
 	m_im = 0;
 	m_i = 0;
 	m_nmi_state = 0;
-	m_nmi_pending = 0;
+	m_nmi_pending = false;
 	m_irq_state = 0;
 	m_wait_state = 0;
 	m_busrq_state = 0;
 	m_busack_state = 0;
-	m_after_ei = 0;
-	m_after_ldair = 0;
+	m_after_ei = false;
+	m_after_ldair = false;
 	m_ea = 0;
 
 	space(AS_PROGRAM).cache(m_args);
@@ -789,12 +789,14 @@ void z80_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-	case STATE_GENPC:
-		m_prvpc = m_pc;
-		break;
-
 	case STATE_GENPCBASE:
 		m_pc = m_prvpc;
+		[[fallthrough]];
+	case STATE_GENPC:
+		m_prvpc = m_pc;
+		m_ref = 0xffff00;
+		m_after_ei = false;
+		m_after_ldair = false;
 		break;
 
 	case Z80_R:

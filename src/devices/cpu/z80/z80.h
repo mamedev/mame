@@ -160,13 +160,13 @@ protected:
 	u8           m_im;
 	u8           m_i;
 	u8           m_nmi_state;          // nmi pin state
-	u8           m_nmi_pending;        // nmi pending
+	bool         m_nmi_pending;        // nmi pending
 	u8           m_irq_state;          // irq pin state
 	int          m_wait_state;         // wait pin state
 	int          m_busrq_state;        // bus request pin state
 	u8           m_busack_state;       // bus acknowledge pin state
-	u8           m_after_ei;           // are we in the EI shadow?
-	u8           m_after_ldair;        // same, but for LD A,I or LD A,R
+	bool         m_after_ei;           // are we in the EI shadow?
+	bool         m_after_ldair;        // same, but for LD A,I or LD A,R
 	u32          m_ea;
 
 	int          m_icount;
