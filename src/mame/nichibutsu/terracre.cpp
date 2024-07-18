@@ -818,6 +818,7 @@ void terracre_state::ym2203(machine_config &config)
 	// The YM2203's 3 SSG analog channels each have a vpp of about 1.15v
 	//  (i.e. midway between 0.95 and 1.35v on datasheet), before mixing.
 	//  (we assume mixing is perfectly additive, which probably isn't 100% true)
+	//  hence 0.23 of the range between 0v and 5v, per channel.
 	// The R2R dacs are full range, min of 0v and max of (almost) 5v, vpp of ~5.0v
 	// Because of this, we have to compensate as MAME's ymfm core outputs full range.
 	// Math: (assuming a constant current for each component)
@@ -836,10 +837,16 @@ void terracre_state::ym2203(machine_config &config)
 	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R16, R15, nothing(infinite resistance), wire(short), C18, C21
 	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	// This filter is a simple first order inverting op-amp lowpass circuit with a gain of
-	//  -4.54545 and a cutoff at effectively infinity, as it has nothing but parasitic
-	//  capacitance as the capacitor part of said circuit. (YR12, YR15).
-	// Technically there may be some capacitance from YC3, although that is intended to be part of the SK filter below.
+	//TODO: the ym2203 sub-board has a complicated and convoluted enough set of analog
+	// filters, differential amplifiers, etc fed by a deeply lowpassed mixed signal,
+	// that this entire circuit below should really be replaced by a netlist instead.
+	// We're currently not emulating the differential part of the amplifiers, which the
+	// other ends of are both fed by a deeply RC-lowpassed (cutoff around 0.7Hz) mixed
+	// signal of both the SSGA+B and the SSGC channels. This acts as a sort of global
+	// highpass on the entire SSG board signal (not the FM portion), but in an
+	// unconventional way.
+
+	// This filter is a differential amplifier, with no real cutoff, and a gain of -2.127
 	FILTER_BIQUAD(config, m_ssgfilter_cgain).opamp_mfb_lowpass_setup(RES_K(4.7), 0.0, RES_K(10), 0.0, CAP_N(22)/100.0); // YR12, N/A(short), YR15, N/A(unpopulated), (parasitic capacitance from YC3)
 	m_ssgfilter_cgain->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
@@ -847,23 +854,24 @@ void terracre_state::ym2203(machine_config &config)
 	FILTER_BIQUAD(config, m_ssgfilter_cfilt).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(22), CAP_N(10)); // YR3, YR5, nothing(infinite resistance), wire(short), YC3, YC6
 	m_ssgfilter_cfilt->add_route(ALL_OUTPUTS, m_ssgfilter_cgain, 1.0);
 
-	// This filter is a first order inverting op-amp lowpass circuit with a gain of -4.54545 and a
-	//  cutoff at 10.1hz (YR8, YR7, YC1).
+	// This filter is a differential amplifier, with no real cutoff, and a gain of -4.5454
 	// Technically it was probably intended as first order MFB lowpass, but the cap ("YC0")
 	//  near/bypassing YR7 was left unpopulated.
-	// It turns out this cap is mathematically redundant vs the cap at YC1, and serves the
-	//  exact same purpose for calculating the cutoff.
-	FILTER_BIQUAD(config, m_ssgfilter_abgain).opamp_mfb_lowpass_setup(RES_K(33), 0.0, RES_K(150), 0.0, CAP_N(100)); // YR8, N/A(short), YR7, N/A(unpopulated), YC1
+	FILTER_BIQUAD(config, m_ssgfilter_abgain).opamp_mfb_lowpass_setup(RES_K(33), 0.0, RES_K(150), 0.0, CAP_N(100)/10000.0); // YR8, N/A(short), YR7, N/A(unpopulated), (parasitic capacitance from YC1)
 	m_ssgfilter_abgain->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	MIXER(config, m_ssgmixer);
-	m_ssgmixer->add_route(0, m_ssgfilter_cfilt, 0.033666);
+	m_ssgmixer->add_route(0, m_ssgfilter_abgain, 0.022219);
 
+	// HACK: there is still something not right about the volumes of the SSG channels
+	// from the YM2203 relative to the others, so I'm multiplying them by a factor here.
+	// Once this is converted to a netlist, this can likely be removed.
+	double constexpr ssg_hack_factor = 1.333;
 	ym2203_device &ym1(YM2203(config, "ym1", XTAL(16'000'000) / 4)); // 4MHz verified on PCB
-	ym1.add_route(0, m_ssgmixer, 1.0);
-	ym1.add_route(1, m_ssgmixer, 1.0);
-	ym1.add_route(2, m_ssgfilter_abgain, 0.022219);
-	ym1.add_route(3, m_ymfilter, 0.241517);
+	ym1.add_route(0, m_ssgmixer, 1.0 * ssg_hack_factor); // SSG A
+	ym1.add_route(1, m_ssgmixer, 1.0 * ssg_hack_factor); // SSG B
+	ym1.add_route(2, m_ssgfilter_cfilt, 0.033666 * ssg_hack_factor); // SSG C
+	ym1.add_route(3, m_ymfilter, 0.241517); // FM
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.219561); // SIP R2R DAC @ RA-1 with 74HC374P latch
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.483035); // SIP R2R DAC @ RA-2 with 74HC374P latch
