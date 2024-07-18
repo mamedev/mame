@@ -1417,6 +1417,25 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/fp1000/fp1000_exp.h,BUSES["FP1000"] = true
+---------------------------------------------------
+
+if (BUSES["FP1000"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/fp1000/fp1000_exp.cpp",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1000_exp.h",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1030_rampack.cpp",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1030_rampack.h",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1060io.cpp",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1060io.h",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1060io_exp.cpp",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1060io_exp.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/gamate/slot.h,BUSES["GAMATE"] = true
 ---------------------------------------------------
 

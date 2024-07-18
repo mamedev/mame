@@ -2,23 +2,24 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-Casio FP-1100 (GX-205)
+Casio FP-1000 / FP-1100 (GX-205)
 
 TODO:
 - Keyboard not working, should trigger INTF0 on key pressed (for PF only), main CPU receives
   garbage from sub (command protocol 0x04 -> <scancode> -> 0x00 -> 0x00)
+  As a _ugly_ workaround you can intercept ASCII scancodes from main CPU with bp d18 A=<value> with
+  any emu::keypost trigger.
 - Memory maps and machine configuration for FP-1000 with reduced VRAM;
 - Unimplemented instruction PER triggered in sub CPU;
 - SCREEN 1 mode has heavy corrupted GFXs and runs at half speed, interlace mode?
 - Cassette Load is really not working, uses a complex 6 pin discrete circuitry;
 - Sub CPU needs proper WAIT line from uPD7801;
 - Main CPU waitstates;
-- bus slots (FP-1060I/O, 1 slot can take up to 4 sub slots below):
-  - FP-1020FD (FDC uPD765, 2x 5.25 floppy DSDD, id = 0x04)
-  - FP-1030 (RAMPACK, id = 0x01)
-  - FP-1031 (ROMPACK, id = 0x00)
-  - FP-1035RS (RS-232C, id = 0x02)
-  - One of the ROMPACKs has undumped Test Mode (cfr. page 94 of service manual)
+- centronics options (likely):
+  - FP-1011PL (plotter)
+  - FP-1012PR (OEM Epson MX-80)
+  - FP-1014PRK (Kanji printer)
+  - FP-1017PR (OEM Epson MX-160)
 
 ===================================================================================================
 
@@ -46,6 +47,7 @@ The keyboard is a separate unit.  It contains a beeper.
 #include "emu.h"
 
 #include "bus/centronics/ctronics.h"
+#include "bus/fp1000/fp1000_exp.h"
 #include "cpu/upd7810/upd7810.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
@@ -84,6 +86,7 @@ public:
 		, m_beep(*this, "beeper")
 		, m_centronics(*this, "centronics")
 		, m_cassette(*this, "cassette")
+		, m_slot(*this, "slot.%u", 0)
 	{ }
 
 	void fp1100(machine_config &config);
@@ -105,6 +108,7 @@ private:
 	required_device<beep_device> m_beep;
 	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_cassette;
+	required_device_array<fp1000_exp_slot_device, 2> m_slot;
 
 	void main_map(address_map &map);
 	void io_map(address_map &map);
@@ -202,7 +206,9 @@ other bits not used
 void fp1100_state::main_bank_w(u8 data)
 {
 	m_iplview.select(BIT(data, 1));
-//  m_slot_num = (m_slot_num & 3) | ((data & 1) << 2); //??
+	const u8 slot_select = BIT(data, 0);
+	m_slot[slot_select ^ 1]->select_w(false);
+	m_slot[slot_select]->select_w(true);
 }
 
 /*
@@ -764,6 +770,12 @@ void fp1100_state::fp1100(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 950) // guess
 		.add_route(ALL_OUTPUTS, "mono", 0.50); // inside the keyboard
+
+	for (auto slot : m_slot)
+	{
+		FP1000_EXP_SLOT(config, slot, fp1000_exp_devices, nullptr);
+		slot->set_iospace(m_maincpu, AS_IO);
+	}
 }
 
 // TODO: chargen, keyboard ROM and key tops can be substituted on actual FP-1000/FP-1100
