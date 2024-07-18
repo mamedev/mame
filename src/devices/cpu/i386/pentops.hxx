@@ -998,25 +998,6 @@ void i386_device::pentium_movnti_m32_r32() // Opcode 0f c3
 	}
 }
 
-void i386_device::i386_cyrix_special()     // Opcode 0x0f 3a-3d
-{
-/*
-0f 3a       BB0_RESET (set BB0 pointer = base)
-0f 3b       BB1_RESET (set BB1 pointer = base)
-0f 3c       CPU_WRITE (write special CPU memory-mapped register, [ebx] = eax)
-0f 3d       CPU_READ (read special CPU memory-mapped register, eax, = [ebx])
-*/
-
-	CYCLES(1);
-}
-
-void i386_device::i386_cyrix_unknown()     // Opcode 0x0f 74
-{
-	LOGMASKED(LOG_UNEMULATED, "Unemulated 0x0f 0x74 opcode called\n");
-
-	CYCLES(1);
-}
-
 void i386_device::pentium_cmpxchg8b_m64()  // Opcode 0x0f c7
 {
 	uint8_t modm = FETCH();
@@ -1043,7 +1024,7 @@ void i386_device::pentium_cmpxchg8b_m64()  // Opcode 0x0f c7
 
 void i386_device::pentium_movntq_m64_r64() // Opcode 0f e7
 {
-	//if(MMXPROLOG()) return; // TODO: check if needed
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		CYCLES(1);     // unsupported
@@ -1927,6 +1908,25 @@ void i386_device::mmx_emms() // Opcode 0f 77
 	CYCLES(1);     // TODO: correct cycle count
 }
 
+void i386_device::i386_cyrix_special()     // Opcode 0x0f 3a-3d
+{
+	/*
+	0f 3a       BB0_RESET (set BB0 pointer = base)
+	0f 3b       BB1_RESET (set BB1 pointer = base)
+	0f 3c       CPU_WRITE (write special CPU memory-mapped register, [ebx] = eax)
+	0f 3d       CPU_READ (read special CPU memory-mapped register, eax, = [ebx])
+	*/
+
+	CYCLES(1);
+}
+
+void i386_device::i386_cyrix_unknown()     // Opcode 0x0f 74
+{
+	LOGMASKED(LOG_UNEMULATED, "Unemulated 0x0f 0x74 opcode called\n");
+
+	CYCLES(1);
+}
+
 void i386_device::i386_cyrix_svdc() // Opcode 0f 78
 {
 	uint8_t modrm = FETCH();
@@ -2462,33 +2462,30 @@ void i386_device::mmx_punpcklbw_r64_r64m32() // Opcode 0f 60
 	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		uint32_t t;
-		int s,d;
-		s=modrm & 0x7;
-		d=(modrm >> 3) & 0x7;
-		t=MMX(d).d[0];
-		MMX(d).b[0]=t & 0xff;
-		MMX(d).b[1]=MMX(s).b[0];
-		MMX(d).b[2]=(t >> 8) & 0xff;
-		MMX(d).b[3]=MMX(s).b[1];
-		MMX(d).b[4]=(t >> 16) & 0xff;
-		MMX(d).b[5]=MMX(s).b[2];
-		MMX(d).b[6]=(t >> 24) & 0xff;
-		MMX(d).b[7]=MMX(s).b[3];
+		int s, d;
+		s = modrm & 0x7;
+		d = (modrm >> 3) & 0x7;
+		MMX(d).b[7] = MMX(s).b[3];
+		MMX(d).b[6] = MMX(d).b[3];
+		MMX(d).b[5] = MMX(s).b[2];
+		MMX(d).b[4] = MMX(d).b[2];
+		MMX(d).b[3] = MMX(s).b[1];
+		MMX(d).b[2] = MMX(d).b[1];
+		MMX(d).b[1] = MMX(s).b[0];
+		MMX(d).b[0] = MMX(d).b[0];
 	} else {
-		uint32_t s,t;
-		int d=(modrm >> 3) & 0x7;
+		uint32_t s;
+		int d = (modrm >> 3) & 0x7;
 		uint32_t ea = GetEA(modrm, 0);
 		s = READ32(ea);
-		t=MMX(d).d[0];
-		MMX(d).b[0]=t & 0xff;
-		MMX(d).b[1]=s & 0xff;
-		MMX(d).b[2]=(t >> 8) & 0xff;
-		MMX(d).b[3]=(s >> 8) & 0xff;
-		MMX(d).b[4]=(t >> 16) & 0xff;
-		MMX(d).b[5]=(s >> 16) & 0xff;
-		MMX(d).b[6]=(t >> 24) & 0xff;
-		MMX(d).b[7]=(s >> 24) & 0xff;
+		MMX(d).b[7] = (s >> 24) & 0xff;
+		MMX(d).b[6] = MMX(d).b[3];
+		MMX(d).b[5] = (s >> 16) & 0xff;
+		MMX(d).b[4] = MMX(d).b[2];
+		MMX(d).b[3] = (s >> 8) & 0xff;
+		MMX(d).b[2] = MMX(d).b[1];
+		MMX(d).b[1] = s & 0xff;
+		MMX(d).b[0] = MMX(d).b[0];
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -2498,26 +2495,22 @@ void i386_device::mmx_punpcklwd_r64_r64m32() // Opcode 0f 61
 	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		uint16_t t;
-		int s,d;
-		s=modrm & 0x7;
-		d=(modrm >> 3) & 0x7;
-		t=MMX(d).w[1];
-		MMX(d).w[0]=MMX(d).w[0];
-		MMX(d).w[1]=MMX(s).w[0];
-		MMX(d).w[2]=t;
-		MMX(d).w[3]=MMX(s).w[1];
+		int s, d;
+		s = modrm & 0x7;
+		d = (modrm >> 3) & 0x7;
+		MMX(d).w[3] = MMX(s).w[1];
+		MMX(d).w[2] = MMX(d).w[1];
+		MMX(d).w[1] = MMX(s).w[0];
+		MMX(d).w[0] = MMX(d).w[0];
 	} else {
 		uint32_t s;
-		uint16_t t;
-		int d=(modrm >> 3) & 0x7;
+		int d = (modrm >> 3) & 0x7;
 		uint32_t ea = GetEA(modrm, 0);
 		s = READ32(ea);
-		t=MMX(d).w[1];
-		MMX(d).w[0]=MMX(d).w[0];
-		MMX(d).w[1]=s & 0xffff;
-		MMX(d).w[2]=t;
-		MMX(d).w[3]=(s >> 16) & 0xffff;
+		MMX(d).w[3] = (s >> 16) & 0xffff;
+		MMX(d).w[2] = MMX(d).w[1];
+		MMX(d).w[1] = s & 0xffff;
+		MMX(d).w[0] = MMX(d).w[0];
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -2527,18 +2520,18 @@ void i386_device::mmx_punpckldq_r64_r64m32() // Opcode 0f 62
 	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		int s,d;
-		s=modrm & 0x7;
-		d=(modrm >> 3) & 0x7;
-		MMX(d).d[0]=MMX(d).d[0];
-		MMX(d).d[1]=MMX(s).d[0];
+		int s, d;
+		s = modrm & 0x7;
+		d = (modrm >> 3) & 0x7;
+		MMX(d).d[1] = MMX(s).d[0];
+		MMX(d).d[0] = MMX(d).d[0];
 	} else {
 		uint32_t s;
-		int d=(modrm >> 3) & 0x7;
+		int d = (modrm >> 3) & 0x7;
 		uint32_t ea = GetEA(modrm, 0);
 		s = READ32(ea);
-		MMX(d).d[0]=MMX(d).d[0];
-		MMX(d).d[1]=s;
+		MMX(d).d[1] = s;
+		MMX(d).d[0] = MMX(d).d[0];
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -2548,30 +2541,34 @@ void i386_device::mmx_packsswb_r64_rm64() // Opcode 0f 63
 	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		int s,d;
-		s=modrm & 0x7;
-		d=(modrm >> 3) & 0x7;
-		MMX(d).c[0]=SaturatedSignedWordToSignedByte(MMX(d).s[0]);
-		MMX(d).c[1]=SaturatedSignedWordToSignedByte(MMX(d).s[1]);
-		MMX(d).c[2]=SaturatedSignedWordToSignedByte(MMX(d).s[2]);
-		MMX(d).c[3]=SaturatedSignedWordToSignedByte(MMX(d).s[3]);
-		MMX(d).c[4]=SaturatedSignedWordToSignedByte(MMX(s).s[0]);
-		MMX(d).c[5]=SaturatedSignedWordToSignedByte(MMX(s).s[1]);
-		MMX(d).c[6]=SaturatedSignedWordToSignedByte(MMX(s).s[2]);
-		MMX(d).c[7]=SaturatedSignedWordToSignedByte(MMX(s).s[3]);
+		MMX_REG ds, sd;
+		int s, d;
+		s = modrm & 0x7;
+		d = (modrm >> 3) & 0x7;
+		ds.q = MMX(d).q;
+		sd.q = MMX(s).q;
+		MMX(d).c[0] = SaturatedSignedWordToSignedByte(ds.s[0]);
+		MMX(d).c[1] = SaturatedSignedWordToSignedByte(ds.s[1]);
+		MMX(d).c[2] = SaturatedSignedWordToSignedByte(ds.s[2]);
+		MMX(d).c[3] = SaturatedSignedWordToSignedByte(ds.s[3]);
+		MMX(d).c[4] = SaturatedSignedWordToSignedByte(sd.s[0]);
+		MMX(d).c[5] = SaturatedSignedWordToSignedByte(sd.s[1]);
+		MMX(d).c[6] = SaturatedSignedWordToSignedByte(sd.s[2]);
+		MMX(d).c[7] = SaturatedSignedWordToSignedByte(sd.s[3]);
 	} else {
-		MMX_REG s;
-		int d=(modrm >> 3) & 0x7;
+		MMX_REG s, t;
+		int d = (modrm >> 3) & 0x7;
 		uint32_t ea = GetEA(modrm, 0);
 		READMMX(ea, s);
-		MMX(d).c[0]=SaturatedSignedWordToSignedByte(MMX(d).s[0]);
-		MMX(d).c[1]=SaturatedSignedWordToSignedByte(MMX(d).s[1]);
-		MMX(d).c[2]=SaturatedSignedWordToSignedByte(MMX(d).s[2]);
-		MMX(d).c[3]=SaturatedSignedWordToSignedByte(MMX(d).s[3]);
-		MMX(d).c[4]=SaturatedSignedWordToSignedByte(s.s[0]);
-		MMX(d).c[5]=SaturatedSignedWordToSignedByte(s.s[1]);
-		MMX(d).c[6]=SaturatedSignedWordToSignedByte(s.s[2]);
-		MMX(d).c[7]=SaturatedSignedWordToSignedByte(s.s[3]);
+		t.q = MMX(d).q;
+		MMX(d).c[0] = SaturatedSignedWordToSignedByte(t.s[0]);
+		MMX(d).c[1] = SaturatedSignedWordToSignedByte(t.s[1]);
+		MMX(d).c[2] = SaturatedSignedWordToSignedByte(t.s[2]);
+		MMX(d).c[3] = SaturatedSignedWordToSignedByte(t.s[3]);
+		MMX(d).c[4] = SaturatedSignedWordToSignedByte(s.s[0]);
+		MMX(d).c[5] = SaturatedSignedWordToSignedByte(s.s[1]);
+		MMX(d).c[6] = SaturatedSignedWordToSignedByte(s.s[2]);
+		MMX(d).c[7] = SaturatedSignedWordToSignedByte(s.s[3]);
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -4587,23 +4584,26 @@ void i386_device::sse_cmpss_r128_r128m32_i8() // Opcode f3 0f c2
 
 void i386_device::sse_pinsrw_r64_r16m16_i8() // Opcode 0f c4, 16bit register
 {
-	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		uint8_t imm8 = FETCH();
 		uint16_t v = LOAD_RM16(modrm);
 		if (m_xmm_operand_size)
 			XMM((modrm >> 3) & 0x7).w[imm8 & 7] = v;
-		else
+		else {
+			if(MMXPROLOG()) return;
 			MMX((modrm >> 3) & 0x7).w[imm8 & 3] = v;
+		}
 	} else {
 		uint32_t ea = GetEA(modrm, 0);
 		uint8_t imm8 = FETCH();
 		uint16_t v = READ16(ea);
 		if (m_xmm_operand_size)
 			XMM((modrm >> 3) & 0x7).w[imm8 & 7] = v;
-		else
+		else {
+			if(MMXPROLOG()) return;
 			MMX((modrm >> 3) & 0x7).w[imm8 & 3] = v;
+		}
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -5682,16 +5682,18 @@ void i386_device::sse_pmaddwd_r128_rm128()  // Opcode 66 0f f5
 {
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
+		int s, d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
 		for (int n=0;n < 4;n++)
-			XMM((modrm >> 3) & 0x7).i[n]=(int32_t)XMM((modrm >> 3) & 0x7).s[n]*(int32_t)XMM(modrm & 7).s[n]+
-										(int32_t)XMM((modrm >> 3) & 0x7).s[n]*(int32_t)XMM(modrm & 7).s[n];
+			XMM(d).i[n]=(int32_t)XMM(d).s[n << 1]*(int32_t)XMM(s).s[n << 1]+(int32_t)XMM(d).s[(n << 1) + 1]*(int32_t)XMM(s).s[(n << 1) + 1];
 	} else {
+		int d = (modrm >> 3) & 0x7;
 		XMM_REG s;
 		uint32_t ea = GetEA(modrm, 0);
 		READXMM(ea, s);
 		for (int n=0;n < 4;n++)
-			XMM((modrm >> 3) & 0x7).i[n]=(int32_t)XMM((modrm >> 3) & 0x7).s[n]*(int32_t)s.s[n]+
-										(int32_t)XMM((modrm >> 3) & 0x7).s[n]*(int32_t)s.s[n];
+			XMM(d).i[n]=(int32_t)XMM(d).s[n << 1]*(int32_t)s.s[n << 1]+(int32_t)XMM(d).s[(n << 1) + 1]*(int32_t)s.s[(n << 1) + 1];
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -6030,11 +6032,14 @@ void i386_device::sse_haddpd_r128_rm128()  // Opcode 66 0f 7c
 {
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
+		XMM_REG t;
 		int s, d;
 		s=modrm & 0x7;
 		d=(modrm >> 3) & 0x7;
-		XMM(d).f64[0]=XMM(d).f64[0]+XMM(d).f64[1];
-		XMM(d).f64[1]=XMM(s).f64[0]+XMM(s).f64[1];
+		t.f64[0]=XMM(d).f64[0]+XMM(d).f64[1];
+		t.f64[1]=XMM(s).f64[0]+XMM(s).f64[1];
+		XMM(d).f64[0]=t.f64[0];
+		XMM(d).f64[1]=t.f64[1];
 	} else {
 		XMM_REG src;
 		int d;
@@ -6051,11 +6056,14 @@ void i386_device::sse_hsubpd_r128_rm128()  // Opcode 66 0f 7d
 {
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
+		XMM_REG t;
 		int s, d;
 		s=modrm & 0x7;
 		d=(modrm >> 3) & 0x7;
-		XMM(d).f64[0]=XMM(d).f64[0]-XMM(d).f64[1];
-		XMM(d).f64[1]=XMM(s).f64[0]-XMM(s).f64[1];
+		t.f64[0]=XMM(d).f64[0]-XMM(d).f64[1];
+		t.f64[1]=XMM(s).f64[0]-XMM(s).f64[1];
+		XMM(d).f64[0]=t.f64[0];
+		XMM(d).f64[1]=t.f64[1];
 	} else {
 		XMM_REG src;
 		int d;
@@ -6093,7 +6101,7 @@ void i386_device::sse_cvtpi2pd_r128_rm64()  // Opcode 66 0f 2a
 {
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		if(MMXPROLOG()) return;
+		if(MMXPROLOG()) return; // only when using mmx register operands
 		XMM((modrm >> 3) & 0x7).f64[0] = (double)MMX(modrm & 0x7).i[0];
 		XMM((modrm >> 3) & 0x7).f64[1] = (double)MMX(modrm & 0x7).i[1];
 	} else {
@@ -6110,6 +6118,7 @@ void i386_device::sse_cvttpd2pi_r64_rm128()  // Opcode 66 0f 2c
 {
 	uint8_t modrm = FETCH();
 	if(MMXPROLOG()) return;
+	// TODO: manage inexact conversion to integer
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).i[0] = XMM(modrm & 0x7).f64[0];
 		MMX((modrm >> 3) & 0x7).i[1] = XMM(modrm & 0x7).f64[1];
@@ -6127,6 +6136,7 @@ void i386_device::sse_cvtpd2pi_r64_rm128()  // Opcode 66 0f 2d
 {
 	uint8_t modrm = FETCH();
 	if(MMXPROLOG()) return;
+	// TODO: manage inexact conversion to integer
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).i[0] = XMM(modrm & 0x7).f64[0];
 		MMX((modrm >> 3) & 0x7).i[1] = XMM(modrm & 0x7).f64[1];
