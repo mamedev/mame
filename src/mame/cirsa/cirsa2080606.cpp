@@ -82,6 +82,7 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -143,6 +144,9 @@ void cirsa2080606_state::maquinati(machine_config &config)
 	screen.set_screen_update(FUNC(cirsa2080606_state::screen_update));
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette").set_entries(512);
 
 	// Sound hardware
 	ARM9(config, m_soundcpu, 8_MHz_XTAL);
