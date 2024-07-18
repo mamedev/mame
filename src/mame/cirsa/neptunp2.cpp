@@ -643,7 +643,6 @@ ROM_END
 
 } // Anonymous namespace
 
-//    YEAR   NAME        PARENT COMPAT             MACHINE   INPUT           CLASS       INIT  COMPANY                  FULLNAME                                  FLAGS
 
 // Video games on Cirsa "960606-5" CPU PCB + "IS040302-3" VGA SOC-Legacy PCB (or similar video PCB)
 GAME( 2003,  neptunp2,   0,         neptunp2_video,    neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Neptune's Pearls 2",                                MACHINE_IS_SKELETON ) // Year from legal registry date

@@ -16307,6 +16307,9 @@ indyheat                        // (c) 1991 Leland
 wsf                             // (c) 1990 Leland
 wsf3                            // (c) 1990 Leland
 
+@source:cirsa/cirsa2080606.cpp
+maquinati                       // (c) 2015 Cirsa / Unidesa
+
 @source:cirsa/cirsa820xxx.cpp
 unk820501
 
