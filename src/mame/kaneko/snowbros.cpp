@@ -2468,7 +2468,7 @@ ROM_START( twinkle )
 	ROM_LOAD( "u1.bin", 0x00000, 0x10000 , CRC(e40481da) SHA1(1c1fabcb67693235eaa6ff59ae12a35854b5564a) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2513,7 +2513,7 @@ ROM_START( pzlbreak )
 	ROM_LOAD( "0.u1", 0x00000, 0x10000 , CRC(1ad646b7) SHA1(0132baa097e48df2450afdcd316375dc546ea4d0) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", ROMREGION_ERASEFF ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2561,7 +2561,7 @@ ROM_START( toppyrap )
 	ROM_LOAD( "u1.bin", 0x00000, 0x10000 , CRC(07f50947) SHA1(83740655ab5f677bd009191bb0de60e237aaa11c) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this contains the code for 2 of the IRQ functions, but the game only uses one of them, the other is
@@ -2588,7 +2588,7 @@ ROM_START( moremore )
 	ROM_LOAD( "u35.bin", 0x00000, 0x10000 , CRC(92dc95fc) SHA1(f04e63cc680835458246989532faf5657e28db13) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2614,7 +2614,7 @@ ROM_START( moremorp )
 	ROM_LOAD( "mmp_u35.bin", 0x00000, 0x10000 , CRC(4d098cad) SHA1(a79d417e7525a25dd6697da9f3d1de269e759d2e) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2640,7 +2640,7 @@ ROM_START( 3in1semi ) /* SemiCom Ser-4331-4 PCB */
 	ROM_LOAD( "u35", 0x00000, 0x10000 , CRC(e40481da) SHA1(1c1fabcb67693235eaa6ff59ae12a35854b5564a) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2711,7 +2711,7 @@ ROM_START( mcheonru ) /* SemiCom Ser-4331-4 PCB */
 	ROM_LOAD( "u35", 0x00000, 0x10000 , CRC(79e965b4) SHA1(268df67ec6ea828ae01a6e4d2da9ad2a08a837f1) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2849,7 +2849,7 @@ ROM_START( cookbib3 )
 	ROM_CONTINUE(0x0000,0x4000)
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2964,7 +2964,7 @@ ROM_START( finalttr )
 	ROM_LOAD( "12.5r",    0x00000, 0x10000, CRC(4bc21361) SHA1(dab9bea665c0f2fd7cee8ab7f3762e427911bcca) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2996,7 +2996,7 @@ ROM_START( suhosong )
 	ROM_LOAD( "su_ho_sung.u1", 0x00000, 0x10000 ,  CRC(509ce74e) SHA1(a93add5ab674671078b55128281dcf9b0db46617) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", ROMREGION_ERASE00 ) /* Data from Shared RAM */
 	ROM_LOAD16_WORD( "protdata.bin", 0x000, 0x200 , CRC(4478e251) SHA1(08489d6bfe5503c8eb62909e56a07193a922b4c1) )
@@ -3038,6 +3038,9 @@ ROM_START( sutjarod )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "u1_am27c512.bin",    0x00000, 0x10000, CRC(c6e31c4a) SHA1(178e10432d9d1096ac0d11b0da9e5441279f5ffe) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
