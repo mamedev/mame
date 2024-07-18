@@ -55,6 +55,7 @@ public:
 	void init_toto();
 	void init_hyperpac();
 	void init_yutnori();
+	void init_sutjarod();
 
 private:
 	required_device<cpu_device> m_maincpu;
