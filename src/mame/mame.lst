@@ -41169,6 +41169,11 @@ prpht600                        // 1983 Sequential Circuits
 @source:seta/albazc.cpp
 hanaroku                        // (c) 1988 Alba
 
+@source:seta/champbwl.cpp
+champbwl                        // (c)1989 Romstar
+champbwla                       // (c)1989 Romstar
+doraemon                        // Sunsoft / Epoch / Fujiko - Shogakukan - TV Asahi (prototype)
+
 @source:seta/downtown.cpp
 arbalest                        // UK   (c) 1989 + Jordan, Romstar or Taito license (DSW)
 calibr50                        // UH   (c) 1989 + Romstar or Taito license (DSW)
@@ -43284,11 +43289,6 @@ cchance                         // (c)1987 Taito?
 
 @source:taito/chaknpop.cpp
 chaknpop                        // AO4 (c) 1983 Taito Corporation
-
-@source:taito/champbwl.cpp
-champbwl                        // (c)1989 Romstar.  not Taito, but the same Seta video chips
-champbwla                       // (c)1989 Romstar.  not Taito, but the same Seta video chips
-doraemon                        // Sunsoft / Epoch / Fujiko - Shogakukan - TV Asahi (prototype)
 
 @source:taito/changela.cpp
 changela                        // ??? (c) 1983 Taito Corporation

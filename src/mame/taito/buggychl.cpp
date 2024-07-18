@@ -73,7 +73,7 @@ d304 - d307 = SCCON1 to SCCON4
 
 d613 = /SoundCS = /RESET line on all audio CPUs
 
-d700 - d7ff = ( /VCRRQ - palette ram )
+d700 - d77f = ( /VCRRQ - palette ram )
 
 d800 - d8ff /ScrollRQ (S37)
 da00 - daff /ScrollRQ (S37)

@@ -217,8 +217,8 @@ private:
 	required_ioport_array<2> m_fakex;
 	required_ioport_array<2> m_fakey;
 
-	bool m_input_select;
-	uint8_t m_last_trackball_val[2][2];
+	uint8_t m_input_select = 0;
+	uint8_t m_last_trackball_val[2][2] = { };
 };
 
 class doraemon_state : public champbwl_base_state
@@ -522,7 +522,7 @@ void champbwl_state::machine_start()
 
 void champbwl_state::machine_reset()
 {
-	m_input_select = false;
+	m_input_select = 0;
 	m_last_trackball_val[0][0] = 0;
 	m_last_trackball_val[0][1] = 0;
 	m_last_trackball_val[1][0] = 0;
@@ -767,6 +767,7 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1993?, doraemon,  0,        doraemon, doraemon, doraemon_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
 GAME( 1989,  champbwl,  0,        champbwl, champbwl, champbwl_state, empty_init, ROT270, "Seta / Romstar Inc.", "Championship Bowling",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1989,  champbwla, champbwl, champbwl, champbwl, champbwl_state, empty_init, ROT270, "Seta / Romstar Inc.", "Championship Bowling (location test)",   MACHINE_SUPPORTS_SAVE )
+
+GAME( 1993?, doraemon,  0,        doraemon, doraemon, doraemon_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
