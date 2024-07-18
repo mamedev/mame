@@ -33,6 +33,7 @@ beep_device::beep_device(const machine_config &mconfig, const char *tag, device_
 
 void beep_device::device_start()
 {
+	// large stream buffer to favour emu/sound.cpp resample quality
 	m_stream = stream_alloc(0, 1, 48000 * 32);
 
 	m_enable = false;

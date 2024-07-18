@@ -93,7 +93,7 @@ void dac_device_base::device_start()
 	// determine the number of inputs
 	int inputs = (m_specified_inputs_mask == 0) ? 0 : 2;
 
-	// create the stream
+	// large stream buffer to favour emu/sound.cpp resample quality
 	m_stream = stream_alloc(inputs, 1, 48000 * 32);
 
 	// save data
