@@ -179,7 +179,7 @@ ROM_START( maquinati )
 	// Sound PCB 2100125-2
 
 	// Sound ARM internal ROM
-        ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD( "sn_2.00_22-09-15_stm32f103rct6.u1", 0x00000, 0x40000, NO_DUMP ) // 256KB internal ROM, undumped
 
 	// Sound MicroSD card. Contains just an ARM ROM image file.
