@@ -40879,9 +40879,10 @@ cshooter                        // (c) 1987 JKH (bootleg)
 failgate                        // (c) 1991 Seibu Kaihatsu
 
 @source:seibu/banprestoms.cpp
-marioun                         //
-tvdenwad                        //
-tvdenwam                        //
+marioun                         // (c) 1993
+tvdenwad                        // (c) 1991
+tvdenwam                        // (c) 1992
+tvdenwat                        // (c) 1992
 
 @source:seibu/bloodbro.cpp
 bloodbro                        // (c) 1990 Tad
