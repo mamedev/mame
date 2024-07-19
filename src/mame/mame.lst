@@ -42110,6 +42110,10 @@ lms46                           //
 @source:skeleton/madmoney2.cpp
 madmoney2                       // (c) 1988 Picmatic
 
+@source:skeleton/marsvending.cpp
+apvm110                         // (c) 1990 Mars Electronics
+apvm110a                        // (c) 1990 Mars Electronics
+
 @source:skeleton/mes.cpp
 mes                             //
 
