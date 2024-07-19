@@ -1424,6 +1424,8 @@ if (BUSES["FP1000"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/fp1000/fp1000_exp.cpp",
 		MAME_DIR .. "src/devices/bus/fp1000/fp1000_exp.h",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1020fd.cpp",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1020fd.h",
 		MAME_DIR .. "src/devices/bus/fp1000/fp1030_rampack.cpp",
 		MAME_DIR .. "src/devices/bus/fp1000/fp1030_rampack.h",
 		MAME_DIR .. "src/devices/bus/fp1000/fp1060io.cpp",

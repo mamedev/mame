@@ -4,6 +4,10 @@
 #include "emu.h"
 #include "fp1060io.h"
 
+#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(FP1060IO, fp1060io_device, "fp1060io", "FP-1060I/O Expansion Box")
 
 fp1060io_device::fp1060io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -32,11 +36,11 @@ void fp1060io_device::device_reset()
 
 u8 fp1060io_device::id_r(offs_t offset)
 {
-	logerror("%s: ID select %02x\n", machine().describe_context(), m_slot_select);
+	LOG("ID select %02x\n", m_slot_select);
 	if (m_slot_select & 0xc)
 		return 0xff;
 	const auto dev = m_subslot[m_slot_select]->m_dev;
-	//logerror("\texists: %d\n", dev != nullptr);
+	//LOG("\texists: %d\n", dev != nullptr);
 
 	if (dev == nullptr)
 		return 0xff;
@@ -51,13 +55,13 @@ void fp1060io_device::cs_w(offs_t offset, u8 data)
 
 void fp1060io_device::remap_cb()
 {
-	logerror("%s: remap_cb %02x\n", machine().describe_context(), m_slot_select);
+	LOG("remap_cb %02x\n", m_slot_select);
 	if (m_slot_select & 0xc)
 		m_slot->iospace().unmap_readwrite(0x0000, 0xfeff);
 	else
 	{
 		const auto dev = m_subslot[m_slot_select]->m_dev;
-		//logerror("\texists %d\n", dev != nullptr);
+		//LOG("\texists %d\n", dev != nullptr);
 		if (dev == nullptr)
 			m_slot->iospace().unmap_readwrite(0x0000, 0xfeff);
 		else

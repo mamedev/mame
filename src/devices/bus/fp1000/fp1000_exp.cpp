@@ -4,6 +4,10 @@
 #include "emu.h"
 #include "fp1000_exp.h"
 
+#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(FP1000_EXP_SLOT, fp1000_exp_slot_device, "fp1000_exp_slot", "FP-1000/FP-1100 Expansion Slot")
 
 fp1000_exp_slot_device::fp1000_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -45,7 +49,6 @@ void device_fp1000_exp_interface::interface_pre_start()
 
 void device_fp1000_exp_interface::interface_post_start()
 {
-//  m_slot->install_io_device(*this, &device_fp1000_exp_interface::io_map);
 	m_slot->select_w(false);
 }
 
@@ -53,13 +56,13 @@ void fp1000_exp_slot_device::remap_cb()
 {
 	if (!m_main_enable || m_dev == nullptr)
 	{
-		logerror("%s: unmap\n", machine().describe_context());
+		LOG("%s: unmap\n", machine().describe_context());
 		m_iospace->unmap_readwrite(0x0000, 0xfeff);
 		m_iospace->unmap_readwrite(0xff00, 0xff7f);
 	}
 	else
 	{
-		logerror("%s: map\n", machine().describe_context());
+		LOG("%s: map\n", machine().describe_context());
 		m_iospace->install_readwrite_handler(0xff00, 0xff7f, read8sm_delegate(*m_dev, FUNC(device_fp1000_exp_interface::id_r)), write8sm_delegate(*this, FUNC(fp1000_exp_slot_device::main_cs_w)));
 		m_dev->remap_cb();
 	}

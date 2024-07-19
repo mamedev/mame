@@ -7,6 +7,7 @@ FP-1030 RAMPACK
 FILES"PACK<x>:" where <x> is the designated slot number 0-7
 LOAD"PACKx:<filename>"
 RUN
+FORMAT"PACK<x>:" to use it in BASIC as a writable buffer
 
 **************************************************************************************************/
 
@@ -23,6 +24,7 @@ fp1030_rampack_device::fp1030_rampack_device(const machine_config &mconfig, cons
 
 void fp1030_rampack_device::io_map(address_map &map)
 {
+	// TODO: verify mirror/unmap
 	map(0x0000, 0x3fff).lrw8(
 		NAME([this](offs_t offset) { return m_nvram_ptr[offset & 0x3fff]; }),
 		NAME([this](offs_t offset, uint8_t data) { m_nvram_ptr[offset & 0x3fff] = data; })

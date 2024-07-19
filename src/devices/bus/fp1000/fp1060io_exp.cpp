@@ -62,8 +62,7 @@ void device_fp1060io_exp_interface::interface_pre_start()
 
 void device_fp1060io_exp_interface::interface_post_start()
 {
-//  m_slot->install_io_device(*this, &device_fp1000_exp_interface::io_map);
-//    m_slot->select_w(false);
+	// Dynamic mapping, shouldn't need anything from here
 }
 
 fp1060io_exp_device::fp1060io_exp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -78,10 +77,12 @@ void fp1060io_exp_device::device_start()
 }
 
 
+#include "fp1020fd.h"
 #include "fp1030_rampack.h"
 
 void fp1060io_slot_devices(device_slot_interface &device)
 {
+	device.option_add("fdcpack", FP1020FD);
 	device.option_add("rampack", FP1030_RAMPACK);
 }
 
