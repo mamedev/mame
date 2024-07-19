@@ -15,6 +15,7 @@ http://www.bitsavers.org/pdf/micropolis/metafloppy/1084-01_1040_1050_Users_Manua
 
 #include "vgi_dsk.h"
 #include "ioprocs.h"
+#include "imageutl.h"
 
 #include <cstring>
 
@@ -32,10 +33,10 @@ struct format {
 };
 
 static const format formats[] = {
-	{1, 35, floppy_image::SSDD}, // MOD-I
-	{2, 35, floppy_image::DSDD},
-	{1, 77, floppy_image::SSQD}, // MOD-II
-	{2, 77, floppy_image::DSQD},
+	{1, 35, floppy_image::SD16}, // MOD-I
+	{2, 35, floppy_image::DD16},
+	{1, 77, floppy_image::SQ16}, // MOD-II
+	{2, 77, floppy_image::DQ16},
 	{}
 };
 
@@ -85,6 +86,8 @@ bool micropolis_vgi_format::load(util::random_read &io, uint32_t form_factor, co
 				while (buf.size() < TRACK_SIZE/16 * (sector+1))
 					mfm_w(buf, 8, 0, HALF_BITCELL_SIZE);
 			}
+			LOG_FORMATS("loading disk: head: %d, track: %d, size: %ld\n", head, track, buf.size());
+			std::rotate(buf.rbegin(), buf.rbegin() + (buf.size()/32), buf.rend());
 			generate_track_from_levels(track, head, buf, 0, image);
 			buf.clear();
 		}
