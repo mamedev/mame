@@ -3,12 +3,14 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-Novag Sapphire (model 9304)
+Novag Sapphire (model 9304) / Sapphire II (model 38601)
 
 Handheld chess computer. It's the successor to Novag Super VIP, whereas Ruby is
 the successor to Novag VIP. The chess engine is by David Kittinger again.
 
 Hardware notes:
+
+Sapphire:
 - PCB label: 100168 REV A
 - Hitachi H8/325 MCU (mode 2), 26.601712MHz XTAL
 - 32KB EPROM (M27C256B-12F1), 128KB SRAM (KM681000ALG-10)
@@ -16,16 +18,26 @@ Hardware notes:
 - RJ-12 port for Novag Super System (always 9600 baud)
 - 24 buttons, piezo
 
+Sapphire II:
+- PCB label: 100209 REV A
+- Hitachi H8/325 MCU (mode 2), 32MHz XTAL
+- 128KB EPROM (27C010), 128KB SRAM (KM681000CLG-7)
+- LCD has more segments, the rest is the same as Sapphire
+
+Sapphire II MCU and EPROM are the same as Diamond II. MCU pin P62 determines
+which hardware it runs on, see diamond2.cpp for Diamond II.
+
 TODO:
 - Novag Super System peripherals don't work due to serial clock drift, baud rate
   differs a bit between host and client, m6801 serial emulation issue (to work
-  around it, underclock sapphire to exactly 26.4192MHz)
+  around it, underclock sapphire to exactly 26.4192MHz, sapphire2 to 31.9488MHz)
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
 
 BTANB:
-- Average Time level (AT) does not work properly after a few moves, this is
-  mentioned in the manual and it suggests to set user programmable time control
+- Average Time level (AT) does not work properly after a few moves on sapphire,
+  this is mentioned in the manual and it suggests to set user programmable time
+  control
 
 *******************************************************************************/
 
@@ -42,6 +54,7 @@ BTANB:
 
 // internal artwork
 #include "novag_sapphire.lh"
+#include "novag_sapphire2.lh"
 
 
 namespace {
@@ -55,6 +68,7 @@ public:
 		m_memory(*this, "memory"),
 		m_nvram(*this, "nvram", 0x20000, ENDIANNESS_BIG),
 		m_rambank(*this, "rambank"),
+		m_rombank(*this, "rombank"),
 		m_lcd_pwm(*this, "lcd_pwm"),
 		m_dac(*this, "dac"),
 		m_rs232(*this, "rs232"),
@@ -63,6 +77,7 @@ public:
 	{ }
 
 	void sapphire(machine_config &config);
+	void sapphire2(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
@@ -76,19 +91,21 @@ private:
 	memory_view m_memory;
 	memory_share_creator<u8> m_nvram;
 	required_memory_bank m_rambank;
+	optional_memory_bank m_rombank;
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<dac_1bit_device> m_dac;
 	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<3> m_inputs;
-	output_finder<4, 10> m_out_lcd;
+	output_finder<4, 10+6> m_out_lcd;
 
 	bool m_power = false;
 	u8 m_inp_mux = 0;
 	u8 m_lcd_sclk = 0;
-	u16 m_lcd_data = 0;
+	u32 m_lcd_data = 0;
 	u8 m_lcd_segs2 = 0;
 
-	void main_map(address_map &map);
+	void sapphire_map(address_map &map);
+	void sapphire2_map(address_map &map);
 
 	// I/O handlers
 	void set_power(bool power);
@@ -96,9 +113,11 @@ private:
 
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void update_lcd();
-	void lcd_data_w(u8 data);
+	void s1_lcd_data_w(u8 data);
+	void s2_lcd_data_w(u8 data);
 
-	u8 read_inputs();
+	u8 read_buttons();
+	void bank_w(u8 data);
 	void p4_w(u8 data);
 	u8 p5_r();
 	void p6_w(u8 data);
@@ -108,6 +127,9 @@ private:
 void sapphire_state::machine_start()
 {
 	m_out_lcd.resolve();
+
+	if (m_rombank)
+		m_rombank->configure_entries(0, 4, memregion("eprom")->base(), 0x8000);
 
 	m_rambank->configure_entries(0, 4, m_nvram, 0x8000);
 	m_memory.select(0);
@@ -159,38 +181,48 @@ void sapphire_state::update_lcd()
 {
 	for (int i = 0; i < 4; i++)
 	{
+		const u8 shift = m_lcd_pwm->width() & 0x18;
+
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_data >> (8 + (i * 2)) & 3);
-		u16 segs = (m_lcd_data & 0xff) | (m_lcd_segs2 << 8 & 0x300);
+		const u8 com = population_count_32(m_lcd_data >> (shift + (i * 2)) & 3);
+		u16 segs = m_lcd_data & ((1 << shift) - 1);
+		segs |= m_lcd_segs2 << shift; // sapphire
 		segs = (com == 0) ? segs : (com == 2) ? ~segs : 0;
 
 		m_lcd_pwm->write_row(i, segs);
 	}
 }
 
-void sapphire_state::lcd_data_w(u8 data)
+void sapphire_state::s1_lcd_data_w(u8 data)
 {
+	// P60,P61: same as sapphire2
+	s2_lcd_data_w(data);
+
 	// P62: 2*14015B R
 	if (data & 4)
 		m_lcd_data = 0;
-
-	// P60: 2*14015B C (chained)
-	else if (data & 1 && !m_lcd_sclk)
-	{
-		// P61: 14015B D, outputs to LCD
-		m_lcd_data = m_lcd_data << 1 | BIT(data, 1);
-	}
-	m_lcd_sclk = data & 1;
 
 	// P64,P65: 2 more LCD segments
 	m_lcd_segs2 = data >> 4 & 3;
 	update_lcd();
 }
 
+void sapphire_state::s2_lcd_data_w(u8 data)
+{
+	// P60: 2/3*14015B C (chained)
+	if (data & 1 && !m_lcd_sclk)
+	{
+		// P61: 14015B D, outputs to LCD
+		m_lcd_data = m_lcd_data << 1 | BIT(data, 1);
+		update_lcd();
+	}
+	m_lcd_sclk = data & 1;
+}
+
 
 // misc
 
-u8 sapphire_state::read_inputs()
+u8 sapphire_state::read_buttons()
 {
 	u8 data = 0;
 
@@ -201,13 +233,22 @@ u8 sapphire_state::read_inputs()
 	return ~data;
 }
 
+void sapphire_state::bank_w(u8 data)
+{
+	// ROM/RAM bankswitch
+	const u8 bank = data & 3;
+
+	// only sapphire2 has ROM banks
+	if (m_rombank)
+		m_rombank->set_entry(bank);
+
+	m_rambank->set_entry(bank);
+}
+
 void sapphire_state::p4_w(u8 data)
 {
 	// P40: speaker out
 	m_dac->write(data & 1);
-
-	// P41,P42: RAM bank
-	m_rambank->set_entry(data >> 1 & 3);
 
 	// P43-P45: input mux
 	m_inp_mux = ~data >> 3 & 7;
@@ -216,19 +257,21 @@ void sapphire_state::p4_w(u8 data)
 u8 sapphire_state::p5_r()
 {
 	// P52-P55: read buttons (low)
-	return read_inputs() << 2 | 0xc3;
+	return read_buttons() << 2 | 0xc3;
 }
 
 void sapphire_state::p6_w(u8 data)
 {
-	// P63: RAM/ROM CS
+	// P63: ROM/RAM CS
 	m_memory.select(BIT(data, 3));
+
+	// other: LCD (see above)
 }
 
 u8 sapphire_state::p7_r()
 {
 	// P70-P73: read buttons (high)
-	return read_inputs() >> 4 | 0xf0;
+	return read_buttons() >> 4 | 0xf0;
 }
 
 
@@ -237,14 +280,20 @@ u8 sapphire_state::p7_r()
     Address Maps
 *******************************************************************************/
 
-void sapphire_state::main_map(address_map &map)
+void sapphire_state::sapphire_map(address_map &map)
 {
 	map(0x8000, 0xffff).view(m_memory);
-	m_memory[0](0x8000, 0xffff).rom().region("maincpu", 0x8000);
+	m_memory[0](0x8000, 0xffff).rom().region("eprom", 0);
 	m_memory[1](0x8000, 0xffff).bankrw(m_rambank);
 
 	map(0xff90, 0xff9f).unmaprw(); // reserved for H8 registers
 	map(0xffb0, 0xffff).unmaprw(); // "
+}
+
+void sapphire_state::sapphire2_map(address_map &map)
+{
+	sapphire_map(map);
+	m_memory[0](0x8000, 0xffff).bankr(m_rombank);
 }
 
 
@@ -312,7 +361,7 @@ void sapphire_state::sapphire(machine_config &config)
 	// basic machine hardware
 	H8325(config, m_maincpu, 26.601712_MHz_XTAL);
 	m_maincpu->set_mode(2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sapphire_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapphire_state::sapphire_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(h8325_device::nvram_set_battery));
 	m_maincpu->standby_cb().append([this](int state) { if (state) m_lcd_pwm->clear(); });
@@ -320,10 +369,11 @@ void sapphire_state::sapphire(machine_config &config)
 	m_maincpu->read_port2().set_ioport("BATT").invert();
 	m_maincpu->read_port4().set_ioport("LOCK").invert();
 	m_maincpu->write_port4().set(FUNC(sapphire_state::p4_w));
+	m_maincpu->write_port4().append(FUNC(sapphire_state::bank_w)).rshift(1);
 	m_maincpu->read_port5().set(FUNC(sapphire_state::p5_r));
 	m_maincpu->read_port6().set(FUNC(sapphire_state::power_r));
 	m_maincpu->write_port6().set(FUNC(sapphire_state::p6_w));
-	m_maincpu->write_port6().append(FUNC(sapphire_state::lcd_data_w));
+	m_maincpu->write_port6().append(FUNC(sapphire_state::s1_lcd_data_w));
 	m_maincpu->read_port7().set(FUNC(sapphire_state::p7_r));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -335,7 +385,7 @@ void sapphire_state::sapphire(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1920/2.5, 606/2.5);
+	screen.set_size(1920/3, 606/3);
 	screen.set_visarea_full();
 
 	config.set_default_layout(layout_novag_sapphire);
@@ -349,6 +399,28 @@ void sapphire_state::sapphire(machine_config &config)
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
+void sapphire_state::sapphire2(machine_config &config)
+{
+	sapphire(config);
+
+	// basic machine hardware
+	m_maincpu->set_clock(32_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapphire_state::sapphire2_map);
+	m_maincpu->write_port4().set(FUNC(sapphire_state::p4_w)); // bankswitch is on port 6
+	m_maincpu->write_port6().set(FUNC(sapphire_state::p6_w));
+	m_maincpu->write_port6().append(FUNC(sapphire_state::bank_w)).rshift(4);
+	m_maincpu->write_port6().append(FUNC(sapphire_state::s2_lcd_data_w));
+
+	// video hardware
+	m_lcd_pwm->set_width(16);
+
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(1920/3, 671/3);
+	screen.set_visarea_full();
+
+	config.set_default_layout(layout_novag_sapphire2);
+}
+
 
 
 /*******************************************************************************
@@ -356,12 +428,25 @@ void sapphire_state::sapphire(machine_config &config)
 *******************************************************************************/
 
 ROM_START( sapphire ) // ID = SAPPHIRE V1.01
-	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x8000, "maincpu", 0 )
 	ROM_LOAD("novag_9304-010053_6433258b46f.u1", 0x0000, 0x8000, CRC(bfc39f4b) SHA1(dc96440c070e903772f4485757443dd690e92120) )
-	ROM_LOAD("bk301_26601.u2", 0x8000, 0x8000, CRC(648ebe8f) SHA1(2883f962a0bf17426fd809b9f2c01ce3dec0df1b) )
+
+	ROM_REGION16_BE( 0x8000, "eprom", 0 )
+	ROM_LOAD("bk301_26601.u2", 0x0000, 0x8000, CRC(648ebe8f) SHA1(2883f962a0bf17426fd809b9f2c01ce3dec0df1b) )
 
 	ROM_REGION( 36256, "screen", 0 )
 	ROM_LOAD("nvip.svg", 0, 36256, CRC(3373e0d5) SHA1(25bfbf0405017388c30f4529106baccb4723bc6b) )
+ROM_END
+
+ROM_START( sapphire2 ) // ID = SAPPHIRE II V1.02
+	ROM_REGION16_BE( 0x8000, "maincpu", 0 )
+	ROM_LOAD("ihp_7600109_hd6433258c67f.u1", 0x0000, 0x8000, CRC(10970123) SHA1(8f72e756915de6569c3936140c775d24730e9065) )
+
+	ROM_REGION16_BE( 0x20000, "eprom", 0 )
+	ROM_LOAD("32dsii_060597.u3", 0x00000, 0x20000, CRC(c1be39c6) SHA1(e33ee655bd342fed736c2b2093a89752e695aff3) )
+
+	ROM_REGION( 72533, "screen", 0 )
+	ROM_LOAD("sapphire2.svg", 0, 72533, CRC(34944b61) SHA1(4a0536ac07790cced9f9bf15522b17ebc375ff8a) )
 ROM_END
 
 } // anonymous namespace
@@ -372,5 +457,7 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1994, sapphire, 0,      0,      sapphire, sapphire, sapphire_state, empty_init, "Novag Industries", "Sapphire (Novag)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1994, sapphire,  0,      0,      sapphire,  sapphire, sapphire_state, empty_init, "Novag Industries", "Sapphire", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1997, sapphire2, 0,      0,      sapphire2, sapphire, sapphire_state, empty_init, "Novag Industries", "Sapphire II", MACHINE_SUPPORTS_SAVE )

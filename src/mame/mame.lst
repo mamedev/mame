@@ -35034,6 +35034,9 @@ diablo68
 diablo68a
 scorpio68
 
+@source:novag/diamond2.cpp
+diamond2
+
 @source:novag/mentor16.cpp
 mentor16
 
@@ -35054,6 +35057,7 @@ robotadv
 
 @source:novag/sapphire.cpp
 sapphire
+sapphire2
 
 @source:novag/savant.cpp
 savant                          //
