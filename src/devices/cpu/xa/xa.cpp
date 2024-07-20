@@ -69,6 +69,7 @@ void xa_cpu::sfr_PSWL_w(u8 data)
 {
 	// PSWL  C AC - - - V N Z
 	logerror("write %02x to PSWL\n", data);
+	m_PSWL = data;
 }
 
 
@@ -77,12 +78,24 @@ void xa_cpu::sfr_PSWH_w(u8 data)
 {
 	// PSWH  SM TM RS1 RS0 IM3 IM2 IM1 IM0
 	logerror("write %02x to PSWH\n", data);
+	m_PSWH = data;
 }
 
 void xa_cpu::sfr_PSW51_w(u8 data)
 {
 	// PSW51  C AC F0 RS1 RS0 OV F1 P
 
+}
+
+u8 xa_cpu::sfr_IEL_r()
+{
+	return m_IEL;
+}
+
+void xa_cpu::sfr_IEL_w(u8 data)
+{
+	m_IEL = data;
+	logerror("write to m_IEL %02x\n", data);
 }
 
 void xa_cpu::sfr_SCR_w(u8 data)
@@ -123,6 +136,8 @@ void xa_cpu::sfr_map(address_map &map)
 	map(0x000, 0x000).w(FUNC(xa_cpu::sfr_PSWL_w));
 	map(0x001, 0x001).w(FUNC(xa_cpu::sfr_PSWH_w));
 	map(0x002, 0x002).w(FUNC(xa_cpu::sfr_PSW51_w));
+
+	map(0x026, 0x026).rw(FUNC(xa_cpu::sfr_IEL_r), FUNC(xa_cpu::sfr_IEL_w));
 
 	map(0x01f, 0x01f).r(FUNC(xa_cpu::sfr_WDCON_r));
 	map(0x040, 0x040).w(FUNC(xa_cpu::sfr_SCR_w));
@@ -624,6 +639,20 @@ void xa_cpu::write_direct8(u16 addr, u8 data)
 	{
 		m_sfr->write_byte(addr - 0x400, data);
 	}
+}
+
+u16 xa_cpu::read_direct16(u16 addr)
+{
+	if (addr < 0x400)
+	{
+		return m_data->read_word(addr);
+	}
+	else
+	{
+		fatalerror("read_direct16 on sfr %03x\n", addr);
+		return 0;
+	}
+	return 0;
 }
 
 u8 xa_cpu::read_direct8(u16 addr)
@@ -2384,7 +2413,10 @@ void xa_cpu::device_start()
 	save_item(NAME(m_SSP));
 	save_item(NAME(m_WDCON));
 	save_item(NAME(m_SCR));
+	save_item(NAME(m_IEL));
 	save_item(NAME(m_regs));
+	save_item(NAME(m_PSWL));
+	save_item(NAME(m_PSWH));
 
 }
 
@@ -2397,6 +2429,7 @@ void xa_cpu::device_reset()
 
 	m_WDCON = 0x00;
 	m_SCR = 0x00;
+	m_IEL = 0x00;
 
 	m_USP = 0x0100;
 	m_SSP = 0x0100;
@@ -2418,6 +2451,26 @@ void xa_cpu::device_reset()
 }
 
 /*****************************************************************************/
+
+void xa_cpu::execute_set_input(int inputnum, int state)
+{
+	// This is not accurate, just test code for fearless/superkds
+	if (inputnum == XA_EXT_IRQ0)
+	{
+		if (m_IEL & 0x81)
+		{
+			push_word_to_system_stack(m_PSWH);
+			push_word_to_system_stack(m_PSWL);
+			push_word_to_system_stack(m_pc);
+
+			u16 temppsw = m_program->read_word(0x80);
+			sfr_PSWL_w(temppsw & 0xff);
+			sfr_PSWH_w((temppsw >> 8) & 0xff);
+			m_pc = m_program->read_word(0x82);
+
+		}
+	}
+}
 
 void xa_cpu::execute_run()
 {

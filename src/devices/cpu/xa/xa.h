@@ -10,6 +10,10 @@
 #define XA_EXECUTE_CALL_PARAMS op
 
 enum {
+	XA_EXT_IRQ0,
+};
+
+enum {
 	XA_BANK0_R0,
 	XA_BANK0_R1,
 	XA_BANK0_R2,
@@ -37,7 +41,6 @@ enum {
 
 	XA_USP,
 	XA_SSP,
-
 };
 
 
@@ -56,6 +59,7 @@ protected:
 	virtual uint32_t execute_max_cycles() const noexcept override { return 5; }
 	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -171,6 +175,10 @@ private:
 	void sfr_WFEED1_w(u8 data);
 	void sfr_WFEED2_w(u8 data);
 
+	u8 sfr_IEL_r();
+	void sfr_IEL_w(u8 data);
+
+
 	void set_bit_8_helper(u16 bit, u8 val);
 
 	u32 asl32_helper(u32 fullreg, u8 amount);
@@ -179,9 +187,11 @@ private:
 
 	u32 get_reg32(u8 reg);
 
-	void write_direct16(u16 addr, u16 data);
 	u8 read_direct8(u16 addr);
+	u16 read_direct16(u16 addr);
+
 	void write_direct8(u16 addr, u8 data);
+	void write_direct16(u16 addr, u16 data);
 
 	u16 do_subb_16(u16 val1, u16 val2);
 	u16 do_sub_16(u16 val1, u16 val2);
@@ -894,6 +904,9 @@ private:
 
 	u8 m_WDCON;
 	u8 m_SCR;
+	u8 m_IEL;
+	u8 m_PSWL;
+	u8 m_PSWH;
 
 	// 16-bit regs R0-R3 can have 4 selectable banks, R4-R7 are global
 	// for 8-bit use each register can be seen as High and Low parts
