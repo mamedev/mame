@@ -80,7 +80,7 @@ private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<xa_cpu_device> m_xa;
+	required_device<mx10exa_cpu_device> m_xa;
 	required_shared_ptr<u32> m_videoram;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_gfxrom;
