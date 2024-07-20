@@ -68,6 +68,15 @@ private:
 	void xa_w(offs_t offset, u32 data, u32 mem_mask);
 	void cpld_w(offs_t offset, u32 data, u32 mem_mask);
 
+	u8 mcu_p0_r();
+	u8 mcu_p1_r();
+	u8 mcu_p2_r();
+	u8 mcu_p3_r();
+	void mcu_p0_w(uint8_t data);
+	void mcu_p1_w(uint8_t data);
+	void mcu_p2_w(uint8_t data);
+	void mcu_p3_w(uint8_t data);
+
 	u32 m_gpio_o;
 	u32 m_irq_enable;
 	u32 m_irq_pending;
@@ -468,7 +477,6 @@ void igs_fear_state::xa_w(offs_t offset, u32 data, u32 mem_mask)
 			logerror("param %04x\n", data & 0xffff);
 		}
 		m_xa->set_input_line(XA_EXT_IRQ0, ASSERT_LINE);
-		igs027_trigger_irq(3); // this should be triggered by the XA so that the next part of the command can be sent after it has finished processing?
 	}
 	else
 	{
@@ -487,12 +495,69 @@ void igs_fear_state::cpld_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 }
 
+u8 igs_fear_state::mcu_p0_r()
+{
+	logerror("%s: mcu_p0_r()\n", machine().describe_context());
+	return 0x00;
+}
+
+u8 igs_fear_state::mcu_p1_r()
+{
+	logerror("%s: mcu_p1_r()\n", machine().describe_context());
+	return 0x00;
+}
+
+u8 igs_fear_state::mcu_p2_r()
+{
+	logerror("%s: mcu_p2_r()\n", machine().describe_context());
+	return 0x00;
+}
+
+u8 igs_fear_state::mcu_p3_r()
+{
+	logerror("%s: mcu_p3_r()\n", machine().describe_context());
+	return 0x00;
+}
+
+void igs_fear_state::mcu_p0_w(uint8_t data)
+{
+	logerror("%s: mcu_p0_w() %02x\n", machine().describe_context(), data);
+}
+
+void igs_fear_state::mcu_p1_w(uint8_t data)
+{
+	logerror("%s: mcu_p1_w() %02x\n", machine().describe_context(), data);
+
+	// this is wrong but the XA must trigger this irq when it's finished processing, so it's likely tied to one of the port bits
+	if ((data == 0x08) || (data == 0x0a))
+		igs027_trigger_irq(3); 
+
+}
+
+void igs_fear_state::mcu_p2_w(uint8_t data)
+{
+	logerror("%s: mcu_p2_w() %02x\n", machine().describe_context(), data);
+}
+
+void igs_fear_state::mcu_p3_w(uint8_t data)
+{
+	logerror("%s: mcu_p3_w() %02x\n", machine().describe_context(), data);
+}
+
 void igs_fear_state::igs_fear(machine_config &config)
 {
 	ARM7(config, m_maincpu, 50000000/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::main_map);
 
 	MX10EXA(config, m_xa, 50000000/3); // MX10EXAQC (Philips 80C51 XA)
+	m_xa->port_in_cb<0>().set(FUNC(igs_fear_state::mcu_p0_r));
+	m_xa->port_in_cb<1>().set(FUNC(igs_fear_state::mcu_p1_r));
+	m_xa->port_in_cb<2>().set(FUNC(igs_fear_state::mcu_p2_r));
+	m_xa->port_in_cb<3>().set(FUNC(igs_fear_state::mcu_p3_r));
+	m_xa->port_out_cb<0>().set(FUNC(igs_fear_state::mcu_p0_w));
+	m_xa->port_out_cb<1>().set(FUNC(igs_fear_state::mcu_p1_w));
+	m_xa->port_out_cb<2>().set(FUNC(igs_fear_state::mcu_p2_w));
+	m_xa->port_out_cb<3>().set(FUNC(igs_fear_state::mcu_p3_w));
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 

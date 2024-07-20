@@ -30,6 +30,8 @@ xa_cpu::xa_cpu(const machine_config &mconfig, device_type type, const char *tag,
 	, m_data(nullptr)
 	, m_sfr(nullptr)
 	, m_icount(0)
+	, m_port_in_cb(*this, 0xff)
+	, m_port_out_cb(*this)
 {
 	add_names(default_names);
 }
@@ -52,7 +54,15 @@ std::unique_ptr<util::disasm_interface> xa_cpu::create_disassembler()
 
 /*****************************************************************************/
 
+u8 xa_cpu::sfr_port_r(offs_t offset)
+{
+	return m_port_in_cb[offset]();
+}
 
+void xa_cpu::sfr_port_w(offs_t offset, u8 data)
+{
+	m_port_out_cb[offset](data);
+}
 
 
 void xa_cpu::set_pc_in_current_page(u16 addr)
@@ -137,9 +147,12 @@ void xa_cpu::sfr_map(address_map &map)
 	map(0x001, 0x001).w(FUNC(xa_cpu::sfr_PSWH_w));
 	map(0x002, 0x002).w(FUNC(xa_cpu::sfr_PSW51_w));
 
+	map(0x01f, 0x01f).r(FUNC(xa_cpu::sfr_WDCON_r));
+
 	map(0x026, 0x026).rw(FUNC(xa_cpu::sfr_IEL_r), FUNC(xa_cpu::sfr_IEL_w));
 
-	map(0x01f, 0x01f).r(FUNC(xa_cpu::sfr_WDCON_r));
+	map(0x030, 0x033).rw(FUNC(xa_cpu::sfr_port_r), FUNC(xa_cpu::sfr_port_w));
+
 	map(0x040, 0x040).w(FUNC(xa_cpu::sfr_SCR_w));
 	map(0x05d, 0x05d).w(FUNC(xa_cpu::sfr_WFEED1_w));
 	map(0x05e, 0x05e).w(FUNC(xa_cpu::sfr_WFEED2_w));

@@ -49,6 +49,9 @@ class xa_cpu : public cpu_device
 public:
 	xa_cpu(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <unsigned N> auto port_in_cb() { return m_port_in_cb[N].bind(); }
+	template <unsigned N> auto port_out_cb() { return m_port_out_cb[N].bind(); }
+
 protected:
 	xa_cpu(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor prg_map, address_map_constructor dat_map);
 
@@ -99,8 +102,6 @@ private:
 	std::string get_byte_reglist(u8 op2, int h);
 
 	void check_interrupts();
-
-	u8 sfr_WDCON_r();
 
 	u16 expand_rel16(u16 rel16);
 	u16 expand_rel8(u8 rel8);
@@ -169,6 +170,8 @@ private:
 	u8 rdat8(int address);
 	u16 rdat16(int address);
 
+	u8 sfr_WDCON_r();
+
 	void sfr_PSWL_w(u8 data);
 	void sfr_PSWH_w(u8 data);
 	void sfr_PSW51_w(u8 data);
@@ -179,6 +182,9 @@ private:
 
 	u8 sfr_IEL_r();
 	void sfr_IEL_w(u8 data);
+
+	u8 sfr_port_r(offs_t offset);
+	void sfr_port_w(offs_t offset, u8 data);
 
 
 	void set_bit_8_helper(u16 bit, u8 val);
@@ -925,6 +931,9 @@ private:
 	address_space *m_data;
 	address_space *m_sfr;
 	int m_icount;
+
+	devcb_read8::array<4> m_port_in_cb;
+	devcb_write8::array<4> m_port_out_cb;
 };
 
 class mx10exa_cpu_device : public xa_cpu
