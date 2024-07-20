@@ -527,7 +527,8 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 		case SEQ_TRANS1_WRITE_DEST:
 			if (!m_wait)
 			{
-				const bool is_final = m_byte_counter == m_count;
+				// hack?: count=0 cause infinite loop in 'x1turbo40 suikoden' and makes it work.
+				const bool is_final = m_count && m_byte_counter == m_count;
 
 				do_write();
 
@@ -746,7 +747,7 @@ void z80dma_device::write(u8 data)
 					m_status = 0x38;
 					break;
 				case COMMAND_LOAD:
-					//m_force_ready = 0;
+					m_force_ready = 0;
 					m_addressA = PORTA_ADDRESS;
 					m_addressB = PORTB_ADDRESS;
 					m_count = BLOCKLEN;
