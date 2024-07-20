@@ -29,7 +29,6 @@ public:
 		, msx_cart_interface(mconfig, *this)
 		, m_flash(*this, "flash")
 		, m_ata(*this, "ata")
-		, m_rombank(*this, "rombank")
 		, m_view(*this, "view")
 		, m_activity_led(*this, "activity_led")
 		, m_control(0)
@@ -41,12 +40,10 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void interface_pre_start() override;
 
 private:
 	required_device<amd_29f010_device> m_flash;
 	required_device<ata_interface_device> m_ata;
-	memory_bank_creator m_rombank;
 	memory_view m_view;
 	output_finder<> m_activity_led;
 	u8 m_control;
@@ -107,13 +104,6 @@ const tiny_rom_entry *msx_cart_sunrise_ataide_device::device_rom_region() const
 }
 
 
-void msx_cart_sunrise_ataide_device::interface_pre_start()
-{
-	if (!m_flash->started())
-		throw device_missing_dependencies();
-}
-
-
 void msx_cart_sunrise_ataide_device::device_start()
 {
 	m_activity_led.resolve();
@@ -121,8 +111,6 @@ void msx_cart_sunrise_ataide_device::device_start()
 	save_item(NAME(m_control));
 	save_item(NAME(m_bank_base));
 	save_item(NAME(m_data));
-
-	m_rombank->configure_entries(0, 8, m_flash->base(), 0x4000);
 
 	page(1)->install_read_handler(0x4000, 0x7fff, read8sm_delegate(*this, [this] (offs_t offset)
 		{
@@ -134,7 +122,6 @@ void msx_cart_sunrise_ataide_device::device_start()
 		{
 			m_control = data;
 			m_bank_base = bitswap(m_control, 5, 6, 7) * 0x4000;
-			m_rombank->set_entry(bitswap(data, 5, 6, 7));
 			m_view.select(BIT(m_control, 0));
 		}, "control")
 	);
@@ -198,7 +185,6 @@ void msx_cart_sunrise_ataide_device::device_start()
 
 void msx_cart_sunrise_ataide_device::device_reset()
 {
-	m_rombank->set_entry(0);
 	m_control = 0;
 	m_bank_base = 0;
 	m_data = 0;
