@@ -48,7 +48,7 @@ namespace bx
 		void reset();
 
 		///
-		void setError(ErrorResult _errorResult, const StringView& _msg);
+		void setError(ErrorResult _errorResult, const StringLiteral& _msg, const Location& _location = Location::current() );
 
 		///
 		bool isOk() const;
@@ -57,7 +57,10 @@ namespace bx
 		ErrorResult get() const;
 
 		///
-		const StringView& getMessage() const;
+		const StringLiteral& getMessage() const;
+
+		///
+		const Location& getLocation() const;
 
 		///
 		bool operator==(const ErrorResult& _rhs) const;
@@ -66,8 +69,9 @@ namespace bx
 		bool operator!=(const ErrorResult& _rhs) const;
 
 	private:
-		StringView m_msg;
-		uint32_t   m_code;
+		Location      m_location;
+		StringLiteral m_msg;
+		uint32_t      m_code;
 	};
 
 	/// Do nothing even if error is set.
@@ -110,17 +114,17 @@ namespace bx
 
 	public:
 		///
-		ErrorScope(Error* _err, const StringView& _name);
+		ErrorScope(Error* _err, const StringLiteral& _name);
 
 		///
 		~ErrorScope();
 
 		///
-		const StringView& getName() const;
+		const StringLiteral& getName() const;
 
 	private:
 		Error* m_err;
-		const StringView m_name;
+		const StringLiteral m_name;
 	};
 
 } // namespace bx

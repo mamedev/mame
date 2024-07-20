@@ -22,7 +22,7 @@ namespace bx
 		m_msg.clear();
 	}
 
-	inline void Error::setError(ErrorResult _errorResult, const StringView& _msg)
+	inline void Error::setError(ErrorResult _errorResult, const StringLiteral& _msg, const Location& _location)
 	{
 		BX_ASSERT(0 != _errorResult.code, "Invalid ErrorResult passed to setError!");
 
@@ -31,8 +31,9 @@ namespace bx
 			return;
 		}
 
-		m_code = _errorResult.code;
-		m_msg  = _msg;
+		m_location = _location;
+		m_code     = _errorResult.code;
+		m_msg      = _msg;
 	}
 
 	inline bool Error::isOk() const
@@ -46,9 +47,14 @@ namespace bx
 		return result;
 	}
 
-	inline const StringView& Error::getMessage() const
+	inline const StringLiteral& Error::getMessage() const
 	{
 		return m_msg;
+	}
+
+	inline const Location& Error::getLocation() const
+	{
+		return m_location;
 	}
 
 	inline bool Error::operator==(const ErrorResult& _rhs) const
@@ -68,7 +74,7 @@ namespace bx
 
 	inline ErrorAssert::~ErrorAssert()
 	{
-		BX_ASSERT(isOk(), "ErrorAssert: 0x%08x `%S`"
+		BX_ASSERT_LOC(getLocation(), isOk(), "ErrorAssert: 0x%08x `%S`"
 			, get().code
 			, &getMessage()
 			);
@@ -81,7 +87,7 @@ namespace bx
 
 	inline ErrorFatal::~ErrorFatal()
 	{
-		_BX_ASSERT(isOk(), "ErrorFatal: 0x%08x `%S`"
+		_BX_ASSERT_LOC(getLocation(), isOk(), "ErrorFatal: 0x%08x `%S`"
 			, get().code
 			, &getMessage()
 			);
@@ -92,7 +98,7 @@ namespace bx
 		return this;
 	}
 
-	inline ErrorScope::ErrorScope(Error* _err, const StringView& _name)
+	inline ErrorScope::ErrorScope(Error* _err, const StringLiteral& _name)
 		: m_err(_err)
 		, m_name(_name)
 	{
@@ -104,14 +110,20 @@ namespace bx
 	{
 		if (m_name.isEmpty() )
 		{
-			BX_ASSERT(m_err->isOk(), "Error: 0x%08x `%S`"
+			BX_ASSERT_LOC(
+				  m_err->getLocation()
+				, m_err->isOk()
+				, "ErrorScope: 0x%08x `%S`"
 				, m_err->get().code
 				, &m_err->getMessage()
 				);
 		}
 		else
 		{
-			BX_ASSERT(m_err->isOk(), "Error: %S - 0x%08x `%S`"
+			BX_ASSERT_LOC(
+				  m_err->getLocation()
+				, m_err->isOk()
+				, "ErrorScope: %S - 0x%08x `%S`"
 				, &m_name
 				, m_err->get().code
 				, &m_err->getMessage()
@@ -119,7 +131,7 @@ namespace bx
 		}
 	}
 
-	inline const StringView& ErrorScope::getName() const
+	inline const StringLiteral& ErrorScope::getName() const
 	{
 		return m_name;
 	}

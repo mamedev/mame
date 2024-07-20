@@ -61,6 +61,17 @@ namespace bx
 		return m_ptr;
 	}
 
+	inline void StringLiteral::clear()
+	{
+		m_ptr = "";
+		m_len = 0;
+	}
+
+	inline bool StringLiteral::isEmpty() const
+	{
+		return 0 == m_len;
+	}
+
 	inline StringView::StringView()
 	{
 		clear();
