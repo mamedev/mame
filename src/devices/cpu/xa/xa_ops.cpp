@@ -668,7 +668,7 @@ void xa_cpu::cmp_word_indrdoff8_data16(u8 rd, u8 offset8, u16 data16) { u16 full
 void xa_cpu::and_word_indrdoff8_data16(u8 rd, u8 offset8, u16 data16) { fatalerror( "AND.w [%s+#$%02x], #$%04x ([RD+offs8], DATA16)", m_regnames16[rd], offset8, data16); }
 void xa_cpu::or_word_indrdoff8_data16(u8 rd, u8 offset8, u16 data16)  { fatalerror( "OR.w [%s+#$%02x], #$%04x ([RD+offs8], DATA16)", m_regnames16[rd], offset8, data16); }
 void xa_cpu::xor_word_indrdoff8_data16(u8 rd, u8 offset8, u16 data16) { fatalerror( "XOR.w [%s+#$%02x], #$%04x ([RD+offs8], DATA16)", m_regnames16[rd], offset8, data16); }
-void xa_cpu::mov_word_indrdoff8_data16(u8 rd, u8 offset8, u16 data16) { fatalerror( "MOV.w [%s+#$%02x], #$%04x ([RD+offs8], DATA16)", m_regnames16[rd], offset8, data16); }
+void xa_cpu::mov_word_indrdoff8_data16(u8 rd, u8 offset8, u16 data16) { u16 fulloffset = util::sext(offset8, 8); u16 address = get_addr(rd) + fulloffset; do_nz_flags_16(data16); wdat16(address, data16); cy(5);  }
 
 // ALUOP.w [Rd+offs16], data16
 // ADD [Rd+offset16], #data16  Add 16-bit imm data to reg-ind w/ 16-bit offs                           6 6         1001 1101  0ddd 0000  oooo oooo  oooo oooo  iiii iiii  iiii iiii

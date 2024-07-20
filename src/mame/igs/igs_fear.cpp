@@ -462,13 +462,14 @@ u32 igs_fear_state::xa_r(offs_t offset)
 
 void igs_fear_state::xa_w(offs_t offset, u32 data, u32 mem_mask)
 {
+	m_xa_cmd = data;
+
 	if (offset == 0)
 	{
 		m_num_params--;
 
 		if (m_num_params <= 0)
 		{
-			m_xa_cmd = data;
 			logerror("---------------m_xa_cmd is %02x size %02x\n", (data & 0xff00)>>8, data & 0xff);
 			m_num_params = data & 0xff;
 		}
@@ -498,6 +499,8 @@ void igs_fear_state::cpld_w(offs_t offset, u32 data, u32 mem_mask)
 u8 igs_fear_state::mcu_p0_r()
 {
 	logerror("%s: mcu_p0_r()\n", machine().describe_context());
+	// appears to read the bottom part of the command here
+	// return (m_xa_cmd & 0x00ff);
 	return 0x00;
 }
 
@@ -510,6 +513,8 @@ u8 igs_fear_state::mcu_p1_r()
 u8 igs_fear_state::mcu_p2_r()
 {
 	logerror("%s: mcu_p2_r()\n", machine().describe_context());
+	// appears to read the top part of the command here
+	// return (m_xa_cmd & 0xff00) >> 8;
 	return 0x00;
 }
 
