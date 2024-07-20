@@ -93,17 +93,16 @@ namespace bimg
 		uint32_t width  = 0;
 		uint32_t height = 0;
 
-		unsigned error;
 		LodePNGState state;
 		lodepng_state_init(&state);
 		state.decoder.color_convert = 0;
 
 		uint8_t* data = NULL;
-		error = lodepng_decode(&data, &width, &height, &state, (uint8_t*)_data, _size);
+		const uint32_t lodePngError = lodepng_decode(&data, &width, &height, &state, (uint8_t*)_data, _size);
 
-		if (0 != error)
+		if (0 != lodePngError)
 		{
-			_err->setError(BIMG_ERROR, "lodepng_decode failed.");
+			BX_ERROR_SET(_err, BIMG_ERROR, "lodepng_decode failed.");
 		}
 		else
 		{
@@ -249,7 +248,8 @@ namespace bimg
 
 				if (palette)
 				{
-					if (1 == state.info_raw.bitdepth) {
+					if (1 == state.info_raw.bitdepth)
+					{
 						for (uint32_t ii = 0, num = width*height/8; ii < num; ++ii)
 						{
 							uint8_t* dst = (uint8_t*)output->m_data + ii*32;
@@ -263,7 +263,8 @@ namespace bimg
 							bx::memCopy(dst + 28, state.info_raw.palette + (  data[ii]    &0x1)*4, 4);
 						}
 					}
-					else if (2 == state.info_raw.bitdepth) {
+					else if (2 == state.info_raw.bitdepth)
+					{
 						for (uint32_t ii = 0, num = width*height/4; ii < num; ++ii)
 						{
 							uint8_t* dst = (uint8_t*)output->m_data + ii*16;
@@ -273,7 +274,8 @@ namespace bimg
 							bx::memCopy(dst + 12, state.info_raw.palette + (  data[ii]    &0x3)*4, 4);
 						}
 					}
-					else if (4 == state.info_raw.bitdepth) {
+					else if (4 == state.info_raw.bitdepth)
+					{
 						for (uint32_t ii = 0, num = width*height/2; ii < num; ++ii)
 						{
 							uint8_t* dst = (uint8_t*)output->m_data + ii*8;
@@ -281,7 +283,8 @@ namespace bimg
 							bx::memCopy(dst +  4, state.info_raw.palette + (  data[ii]    &0xf)*4, 4);
 						}
 					}
-					else {
+					else
+					{
 						for (uint32_t ii = 0, num = width*height; ii < num; ++ii)
 						{
 							bx::memCopy( (uint8_t*)output->m_data + ii*4, state.info_raw.palette + data[ii]*4, 4);
@@ -317,10 +320,10 @@ namespace bimg
 						uint8_t* dst = (uint8_t*)output->m_data + ii*4;
 						// Note: not exactly precise.
 						// Correct way: dst[0] = uint8_t(float( (eightBits>>6)&0x3)*(255.0f/4.0f) );
-						dst[0] = uint8_t(uint32_t(((eightBits>>6)&0x3)*64)&0xff);
-						dst[1] = uint8_t(uint32_t(((eightBits>>4)&0x3)*64)&0xff);
-						dst[2] = uint8_t(uint32_t(((eightBits>>2)&0x3)*64)&0xff);
-						dst[3] = uint8_t(uint32_t(((eightBits   )&0x3)*64)&0xff);
+						dst[0] = uint8_t(uint32_t( ( (eightBits>>6)&0x3)*64)&0xff);
+						dst[1] = uint8_t(uint32_t( ( (eightBits>>4)&0x3)*64)&0xff);
+						dst[2] = uint8_t(uint32_t( ( (eightBits>>2)&0x3)*64)&0xff);
+						dst[3] = uint8_t(uint32_t( ( (eightBits   )&0x3)*64)&0xff);
 					}
 				}
 				else if (4 == state.info_raw.bitdepth)
@@ -333,8 +336,8 @@ namespace bimg
 						uint8_t* dst = (uint8_t*)output->m_data + ii*2;
 						// Note: not exactly precise.
 						// Correct way: dst[0] = uint8_t(float( (eightBits>>4)&0xf)*(255.0f/16.0f) );
-						dst[0] = uint8_t(uint32_t(((eightBits>>4)&0xf)*16)&0xff);
-						dst[1] = uint8_t(uint32_t(((eightBits   )&0xf)*16)&0xff);
+						dst[0] = uint8_t(uint32_t( ( (eightBits>>4)&0xf)*16)&0xff);
+						dst[1] = uint8_t(uint32_t( ( (eightBits   )&0xf)*16)&0xff);
 					}
 				}
 				else if (16      == state.info_raw.bitdepth
@@ -371,7 +374,7 @@ namespace bimg
 								}
 							}
 						}
-						else if(16 == state.info_raw.bitdepth)
+						else if (16 == state.info_raw.bitdepth)
 						{
 							for (uint32_t ii = 0, num = width * height; ii < num; ++ii)
 							{
