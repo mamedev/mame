@@ -203,7 +203,7 @@
 #	if BX_CONFIG_DEBUG
 #		define BX_ASSERT _BX_ASSERT
 #	else
-#		define BX_ASSERT(_condition, ...) BX_NOOP()
+#		define BX_ASSERT(...) BX_NOOP()
 #	endif // BX_CONFIG_DEBUG
 #endif // BX_ASSERT
 
@@ -235,7 +235,7 @@
 #	if BX_CONFIG_DEBUG
 #		define BX_WARN _BX_WARN
 #	else
-#		define BX_WARN(_condition, ...) BX_NOOP()
+#		define BX_WARN(...) BX_NOOP()
 #	endif // BX_CONFIG_DEBUG
 #endif // BX_ASSERT
 

@@ -68,7 +68,7 @@ namespace bx
 
 	inline ErrorAssert::~ErrorAssert()
 	{
-		BX_ASSERT(isOk(), "Error: 0x%08x `%S`"
+		BX_ASSERT(isOk(), "ErrorAssert: 0x%08x `%S`"
 			, get().code
 			, &getMessage()
 			);
@@ -81,15 +81,10 @@ namespace bx
 
 	inline ErrorFatal::~ErrorFatal()
 	{
-		if (!isOk() )
-		{
-			printf("Error: 0x%08x `%S`"
-				, get().code
-				, &getMessage()
-				);
-
-			exit(kExitFailure);
-		}
+		_BX_ASSERT(isOk(), "ErrorFatal: 0x%08x `%S`"
+			, get().code
+			, &getMessage()
+			);
 	}
 
 	inline ErrorAssert::operator Error*()

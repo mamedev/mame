@@ -71,7 +71,7 @@ namespace bx
 	};
 
 	/// Do nothing even if error is set.
-	class ErrorIgnore : public Error
+	class ErrorIgnore final : public Error
 	{
 	public:
 		///
@@ -79,7 +79,7 @@ namespace bx
 	};
 
 	/// In debug build assert if error is set.
-	class ErrorAssert : public Error
+	class ErrorAssert final : public Error
 	{
 	public:
 		///
@@ -90,7 +90,7 @@ namespace bx
 	};
 
 	/// Exit application if error is set.
-	class ErrorFatal : public Error
+	class ErrorFatal final : public Error
 	{
 	public:
 		///
