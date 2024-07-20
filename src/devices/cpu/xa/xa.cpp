@@ -2063,8 +2063,6 @@ void xa_cpu::e_djnz_cjne(XA_EXECUTE_PARAMS)
 	const u8 op4 = m_program->read_byte(m_pc++);
 	int size = op & 0x08;
 
-	int address = m_pc + ((s8)op4)*2;
-	address &= ~1; // must be word aligned
 	const u16 direct = ((op2 & 0x07) << 8) | op3;
 	if (op2 & 0x08)
 	{
