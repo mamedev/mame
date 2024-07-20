@@ -3031,6 +3031,7 @@ ROM_START( yutnori )
 	ROM_LOAD("voice_rom", 0x000000, 0x040000, CRC(25e85201) SHA1(6c0001e2942f49b62e1bbf3a68c59abad1e2f94c) )
 ROM_END
 
+
 ROM_START( sutjarod )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ul12_am27c512.bin",    0x00000, 0x10000, CRC(50e2563c) SHA1(d02e0805ae5aa5058e8c096f4265603006de2a6d) )
@@ -3043,15 +3044,14 @@ ROM_START( sutjarod )
 	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
-	/* this is not a real rom but instead the data extracted from
-	   shared ram, the MCU puts it there
+	/* this is not a real ROM but instead the data extracted from
+	   shared RAM - the MCU puts it there
 
 	   this is taken from cookbib3, the key in the program ROM is
 	   patched in our init function to decrypt it, real data is
 	   still needed.
 	   */
 	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200, BAD_DUMP CRC(c819b9a8) SHA1(1d425e8c9940c0e691149e5406dd71808bd73832) )
-
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "uj15_tms27c010a.bin",    0x00000, 0x20000, CRC(da9dea73) SHA1(b72da82686054dbbe423724fecf0e58966b0ea45) )
@@ -3062,12 +3062,14 @@ ROM_START( sutjarod )
 ROM_END
 
 
+
 void snowbros_state::init_cookbib2()
 {
 	save_item(NAME(m_semicom_prot_offset));
 
 	m_semicom_prot_base = 0xf000 / 2;
 }
+
 
 uint16_t snowbros_state::_4in1_02_read()
 {
@@ -3135,6 +3137,7 @@ void snowbros_state::init_3in1semi()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16smo_delegate(*this, FUNC(snowbros_state::_3in1_read)));
 }
+
 
 uint16_t snowbros_state::cookbib3_read()
 {
@@ -3209,6 +3212,7 @@ void snowbros_state::init_yutnori()
 	m_pandora->set_bg_pen(0xf0);
 	save_item(NAME(m_yutnori_prot_val));
 }
+
 
 GAME( 1990, snowbros,   0,        snowbros,    snowbros, snowbros_state, empty_init,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, snowbrosa,  snowbros, snowbros,    snowbros, snowbros_state, empty_init,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 2)", MACHINE_SUPPORTS_SAVE )
