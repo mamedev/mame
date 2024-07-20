@@ -75,6 +75,8 @@ private:
 	emu_timer *m_timer1;
 
 	u32 m_xa_cmd;
+	int m_num_params = 0;;
+
 	int m_trackball_cnt;
 	int m_trackball_axis[2], m_trackball_axis_pre[2], m_trackball_axis_diff[2];
 
@@ -453,8 +455,25 @@ void igs_fear_state::xa_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (offset == 0)
 	{
-		m_xa_cmd = data;
-		igs027_trigger_irq(3);
+		m_num_params--;
+
+		if (m_num_params <= 0)
+		{
+			m_xa_cmd = data;
+			logerror("---------------m_xa_cmd is %02x size %02x\n", (data & 0xff00)>>8, data & 0xff);
+			m_num_params = data & 0xff;
+		}
+		else
+		{
+			logerror("param %04x\n", data & 0xffff);
+		}
+		m_xa->set_input_line(XA_EXT_IRQ0, ASSERT_LINE);
+		igs027_trigger_irq(3); // this should be triggered by the XA so that the next part of the command can be sent after it has finished processing?
+	}
+	else
+	{
+		fatalerror("xa write %04x is %08x\n", offset, data);
+
 	}
 }
 
@@ -474,6 +493,8 @@ void igs_fear_state::igs_fear(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::main_map);
 
 	MX10EXA(config, m_xa, 50000000/3); // MX10EXAQC (Philips 80C51 XA)
+
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

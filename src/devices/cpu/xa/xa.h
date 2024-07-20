@@ -98,6 +98,8 @@ private:
 	std::string get_word_reglist(u8 op2);
 	std::string get_byte_reglist(u8 op2, int h);
 
+	void check_interrupts();
+
 	u8 sfr_WDCON_r();
 
 	u16 expand_rel16(u16 rel16);
@@ -907,6 +909,11 @@ private:
 	u8 m_IEL;
 	u8 m_PSWL;
 	u8 m_PSWH;
+
+	// hacks for IRQ testing
+	u8 m_in_interrupt;
+	u8 m_irq_pending;
+
 
 	// 16-bit regs R0-R3 can have 4 selectable banks, R4-R7 are global
 	// for 8-bit use each register can be seen as High and Low parts

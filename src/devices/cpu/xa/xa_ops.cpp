@@ -1315,7 +1315,7 @@ void xa_cpu::cmp_word_rdoff16_rs(u8 rd, u16 offset16, u8 rs) { fatalerror("CMP.w
 void xa_cpu::and_word_rdoff16_rs(u8 rd, u16 offset16, u8 rs) { fatalerror("AND.w [%s+#$%04x], %s", m_regnames16[rd], offset16, m_regnames16[rs]);}
 void xa_cpu::or_word_rdoff16_rs(u8 rd, u16 offset16, u8 rs)  { fatalerror("OR.w [%s+#$%04x], %s", m_regnames16[rd], offset16, m_regnames16[rs]);}
 void xa_cpu::xor_word_rdoff16_rs(u8 rd, u16 offset16, u8 rs) { fatalerror("XOR.w [%s+#$%04x], %s", m_regnames16[rd], offset16, m_regnames16[rs]);}
-void xa_cpu::mov_word_rdoff16_rs(u8 rd, u16 offset16, u8 rs) { fatalerror("MOV.w [%s+#$%04x], %s", m_regnames16[rd], offset16, m_regnames16[rs]);}
+void xa_cpu::mov_word_rdoff16_rs(u8 rd, u16 offset16, u8 rs) {  u16 val = gr16(rs); u16 fulloffset = offset16; u16 address = get_addr(rd) + fulloffset; do_nz_flags_16(val); wdat16(address, val); cy(5); }
 
 void xa_cpu::add_byte_rdoff16_rs(u8 rd, u16 offset16, u8 rs) { fatalerror("ADD.b [%s+#$%04x], %s", m_regnames16[rd], offset16, m_regnames8[rs]);}
 void xa_cpu::addc_byte_rdoff16_rs(u8 rd, u16 offset16, u8 rs){ fatalerror("ADDC.b [%s+#$%04x], %s", m_regnames16[rd], offset16, m_regnames8[rs]);}
@@ -1377,7 +1377,7 @@ void xa_cpu::addc_word_rd_direct(u8 rd, u16 direct){ fatalerror("ADDC.w %s, %s",
 void xa_cpu::sub_word_rd_direct(u8 rd, u16 direct) { fatalerror("SUB.w %s, %s", m_regnames16[rd], get_directtext(direct));}
 void xa_cpu::subb_word_rd_direct(u8 rd, u16 direct){ fatalerror("SUBB.w %s, %s", m_regnames16[rd], get_directtext(direct));}
 void xa_cpu::cmp_word_rd_direct(u8 rd, u16 direct) { fatalerror("CMP.w %s, %s", m_regnames16[rd], get_directtext(direct));}
-void xa_cpu::and_word_rd_direct(u8 rd, u16 direct) { fatalerror("AND.w %s, %s", m_regnames16[rd], get_directtext(direct));}
+void xa_cpu::and_word_rd_direct(u8 rd, u16 direct) { u16 rdval = gr16(rd); u16 val = read_direct16(direct); u16 result = do_and_16(rdval, val); sr16(rd, result); cy(4); }
 void xa_cpu::or_word_rd_direct(u8 rd, u16 direct)  { fatalerror("OR.w %s, %s", m_regnames16[rd], get_directtext(direct));}
 void xa_cpu::xor_word_rd_direct(u8 rd, u16 direct) { fatalerror("XOR.w %s, %s", m_regnames16[rd], get_directtext(direct));}
 void xa_cpu::mov_word_rd_direct(u8 rd, u16 direct) { u16 val = read_direct16(direct); do_nz_flags_16(val); sr16(rd, val); cy(4);}
@@ -1850,6 +1850,8 @@ void xa_cpu::reti()
 		m_PSWL = pull_word_from_system_stack();
 		m_PSWH = pull_word_from_system_stack();
 		cy(8);
+		m_in_interrupt = 0;
+
 	}
 	else
 	{

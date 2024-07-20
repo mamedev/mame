@@ -2418,6 +2418,9 @@ void xa_cpu::device_start()
 	save_item(NAME(m_PSWL));
 	save_item(NAME(m_PSWH));
 
+	save_item(NAME(m_in_interrupt));
+	save_item(NAME(m_irq_pending));
+
 }
 
 void xa_cpu::device_reset()
@@ -2448,27 +2451,46 @@ void xa_cpu::device_reset()
 	m_acflag = 0;
 
 	m_pagezeromode = 1;
+
+	m_in_interrupt = 0;
+	m_irq_pending = 0;
 }
 
 /*****************************************************************************/
+
+void xa_cpu::check_interrupts()
+{
+	if (m_irq_pending)
+	{
+		if (!m_in_interrupt)
+		{
+			if (m_IEL & 0x81)
+			{
+				logerror("irq\n");
+
+				push_word_to_system_stack(m_PSWH);
+				push_word_to_system_stack(m_PSWL);
+				push_word_to_system_stack(m_pc);
+
+				u16 temppsw = m_program->read_word(0x80);
+				sfr_PSWL_w(temppsw & 0xff);
+				sfr_PSWH_w((temppsw >> 8) & 0xff);
+				m_pc = m_program->read_word(0x82);
+				m_in_interrupt = 1;
+				m_irq_pending = 0;
+
+			}
+		}
+	}
+
+}
 
 void xa_cpu::execute_set_input(int inputnum, int state)
 {
 	// This is not accurate, just test code for fearless/superkds
 	if (inputnum == XA_EXT_IRQ0)
 	{
-		if (m_IEL & 0x81)
-		{
-			push_word_to_system_stack(m_PSWH);
-			push_word_to_system_stack(m_PSWL);
-			push_word_to_system_stack(m_pc);
-
-			u16 temppsw = m_program->read_word(0x80);
-			sfr_PSWL_w(temppsw & 0xff);
-			sfr_PSWH_w((temppsw >> 8) & 0xff);
-			m_pc = m_program->read_word(0x82);
-
-		}
+		m_irq_pending = 1;
 	}
 }
 
@@ -2476,6 +2498,8 @@ void xa_cpu::execute_run()
 {
 	while (m_icount > 0)
 	{
+		check_interrupts();
+
 		debugger_instruction_hook(m_pc);
 		u32 oldpc = m_pc;
 		u8 op = m_program->read_byte(m_pc++);
