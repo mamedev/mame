@@ -3032,7 +3032,7 @@ ROM_START( yutnori )
 ROM_END
 
 
-ROM_START( sutjarod )
+ROM_START( sutjarod ) // 숫자로 해요 Deluxe
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ul12_am27c512.bin",    0x00000, 0x10000, CRC(50e2563c) SHA1(d02e0805ae5aa5058e8c096f4265603006de2a6d) )
 	ROM_LOAD16_BYTE( "uh12_am27c512.bin",    0x00001, 0x10000, CRC(dc7e036c) SHA1(90a9b29b3f776e26303ccfa74800501152e05ceb) )
