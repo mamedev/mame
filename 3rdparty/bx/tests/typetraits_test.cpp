@@ -6,6 +6,8 @@
 #include "test.h"
 #include <bx/typetraits.h>
 
+BX_PRAGMA_DIAGNOSTIC_PUSH();
+BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wunused-private-field");
 struct TestClass                {                                                                        };
 struct TestClassFinal final     {                                                                        };
 struct TestClassMember          { int32_t x;                                                             };
@@ -27,6 +29,7 @@ union  TestUnionEmpty           {                                               
 union  TestUnion                { int32_t x; float y;                                                    };
 enum   TestEnumEmpty            {                                                                        };
 enum   TestEnum                 { Enum                                                                   };
+BX_PRAGMA_DIAGNOSTIC_POP();
 
 TEST_CASE("type-traits isReference", "")
 {
