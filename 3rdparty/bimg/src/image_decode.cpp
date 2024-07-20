@@ -103,7 +103,7 @@ namespace bimg
 
 		if (0 != error)
 		{
-			_err->setError(BIMG_ERROR, lodepng_error_text(error) );
+			_err->setError(BIMG_ERROR, "lodepng_decode failed.");
 		}
 		else
 		{
