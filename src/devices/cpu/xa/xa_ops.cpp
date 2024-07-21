@@ -1315,7 +1315,7 @@ void xa_cpu::cmp_word_rdoff16_rs(u8 rd, u16 offset16, u8 rs) { fatalerror("CMP.w
 void xa_cpu::and_word_rdoff16_rs(u8 rd, u16 offset16, u8 rs) { fatalerror("AND.w [%s+#$%04x], %s", m_regnames16[rd], offset16, m_regnames16[rs]);}
 void xa_cpu::or_word_rdoff16_rs(u8 rd, u16 offset16, u8 rs)  { fatalerror("OR.w [%s+#$%04x], %s", m_regnames16[rd], offset16, m_regnames16[rs]);}
 void xa_cpu::xor_word_rdoff16_rs(u8 rd, u16 offset16, u8 rs) { fatalerror("XOR.w [%s+#$%04x], %s", m_regnames16[rd], offset16, m_regnames16[rs]);}
-void xa_cpu::mov_word_rdoff16_rs(u8 rd, u16 offset16, u8 rs) {  u16 val = gr16(rs); u16 fulloffset = offset16; u16 address = get_addr(rd) + fulloffset; do_nz_flags_16(val); wdat16(address, val); cy(5); }
+void xa_cpu::mov_word_rdoff16_rs(u8 rd, u16 offset16, u8 rs) { u16 val = gr16(rs); u16 fulloffset = offset16; u16 address = get_addr(rd) + fulloffset; do_nz_flags_16(val); wdat16(address, val); cy(5); }
 
 void xa_cpu::add_byte_rdoff16_rs(u8 rd, u16 offset16, u8 rs) { fatalerror("ADD.b [%s+#$%04x], %s", m_regnames16[rd], offset16, m_regnames8[rs]);}
 void xa_cpu::addc_byte_rdoff16_rs(u8 rd, u16 offset16, u8 rs){ fatalerror("ADDC.b [%s+#$%04x], %s", m_regnames16[rd], offset16, m_regnames8[rs]);}
@@ -1325,7 +1325,7 @@ void xa_cpu::cmp_byte_rdoff16_rs(u8 rd, u16 offset16, u8 rs) { fatalerror("CMP.b
 void xa_cpu::and_byte_rdoff16_rs(u8 rd, u16 offset16, u8 rs) { fatalerror("AND.b [%s+#$%04x], %s", m_regnames16[rd], offset16, m_regnames8[rs]);}
 void xa_cpu::or_byte_rdoff16_rs(u8 rd, u16 offset16, u8 rs)  { fatalerror("OR.b [%s+#$%04x], %s", m_regnames16[rd], offset16, m_regnames8[rs]);}
 void xa_cpu::xor_byte_rdoff16_rs(u8 rd, u16 offset16, u8 rs) { fatalerror("XOR.b [%s+#$%04x], %s", m_regnames16[rd], offset16, m_regnames8[rs]);}
-void xa_cpu::mov_byte_rdoff16_rs(u8 rd, u16 offset16, u8 rs) { fatalerror("MOV.b [%s+#$%04x], %s", m_regnames16[rd], offset16, m_regnames8[rs]);}
+void xa_cpu::mov_byte_rdoff16_rs(u8 rd, u16 offset16, u8 rs) { u8 val = gr16(rs); u16 fulloffset = offset16; u16 address = get_addr(rd) + fulloffset; do_nz_flags_8(val); wdat8(address, val); cy(5); }
 
 // ALUOP.w Rd, Direct
 // ALUOP.b Rd, Direct
@@ -1386,7 +1386,7 @@ void xa_cpu::add_byte_rd_direct(u8 rd, u16 direct) { fatalerror("ADD.b %s, %s", 
 void xa_cpu::addc_byte_rd_direct(u8 rd, u16 direct){ fatalerror("ADDC.b %s, %s", m_regnames8[rd], get_directtext(direct));}
 void xa_cpu::sub_byte_rd_direct(u8 rd, u16 direct) { fatalerror("SUB.b %s, %s", m_regnames8[rd], get_directtext(direct));}
 void xa_cpu::subb_byte_rd_direct(u8 rd, u16 direct){ fatalerror("SUBB.b %s, %s", m_regnames8[rd], get_directtext(direct));}
-void xa_cpu::cmp_byte_rd_direct(u8 rd, u16 direct) { fatalerror("CMP.b %s, %s", m_regnames8[rd], get_directtext(direct));}
+void xa_cpu::cmp_byte_rd_direct(u8 rd, u16 direct) { u8 rdval = gr8(rd); u8 val = read_direct8(direct); do_sub_8(rdval, val); cy(4); }
 void xa_cpu::and_byte_rd_direct(u8 rd, u16 direct) { fatalerror("AND.b %s, %s", m_regnames8[rd], get_directtext(direct));}
 void xa_cpu::or_byte_rd_direct(u8 rd, u16 direct)  { fatalerror("OR.b %s, %s", m_regnames8[rd], get_directtext(direct));}
 void xa_cpu::xor_byte_rd_direct(u8 rd, u16 direct) { fatalerror("XOR.b %s, %s", m_regnames8[rd], get_directtext(direct));}
@@ -1452,7 +1452,7 @@ void xa_cpu::add_byte_direct_rs(u16 direct, u8 rs) { fatalerror("ADD.b %s, %s", 
 void xa_cpu::addc_byte_direct_rs(u16 direct, u8 rs){ fatalerror("ADDC.b %s, %s", get_directtext(direct), m_regnames8[rs]);}
 void xa_cpu::sub_byte_direct_rs(u16 direct, u8 rs) { fatalerror("SUB.b %s, %s", get_directtext(direct), m_regnames8[rs]);}
 void xa_cpu::subb_byte_direct_rs(u16 direct, u8 rs){ fatalerror("SUBB.b %s, %s", get_directtext(direct), m_regnames8[rs]);}
-void xa_cpu::cmp_byte_direct_rs(u16 direct, u8 rs) { fatalerror("CMP.b %s, %s", get_directtext(direct), m_regnames8[rs]);}
+void xa_cpu::cmp_byte_direct_rs(u16 direct, u8 rs) { u8 directval = read_direct8(direct); u8 val = gr8(rs); do_sub_8(directval, val); cy(4); }
 void xa_cpu::and_byte_direct_rs(u16 direct, u8 rs) { fatalerror("AND.b %s, %s", get_directtext(direct), m_regnames8[rs]);}
 void xa_cpu::or_byte_direct_rs(u16 direct, u8 rs)  { fatalerror("OR.b %s, %s", get_directtext(direct), m_regnames8[rs]);}
 void xa_cpu::xor_byte_direct_rs(u16 direct, u8 rs) { fatalerror("XOR.b %s, %s", get_directtext(direct), m_regnames8[rs]);}
@@ -1500,7 +1500,7 @@ void xa_cpu::movs_word_direct_data4(u16 direct, u8 data4) { u16 data = util::sex
 void xa_cpu::movs_byte_direct_data4(u16 direct, u8 data4) { u8  data = util::sext(data4, 4); do_nz_flags_8(data);  write_direct8(direct, data); cy(3); }
 // ADDS direct, #data4         Add 4-bit signed imm data to mem                                        3 4         1010 S110  0DDD iiii  DDDD DDDD
 void xa_cpu::adds_word_direct_data4(u16 direct, u8 data4){ fatalerror("ADDS.w %s, %s\n", get_directtext(direct), show_expanded_data4(data4, 0)); }
-void xa_cpu::adds_byte_direct_data4(u16 direct, u8 data4){ fatalerror("ADDS.b %s, %s\n", get_directtext(direct), show_expanded_data4(data4, 0)); }
+void xa_cpu::adds_byte_direct_data4(u16 direct, u8 data4){ u8 directval = read_direct8(direct); u8 data = util::sext(data4, 4); directval += data; do_nz_flags_8(directval); write_direct8(direct, directval); cy(4); }
 
 // CALL rel16                  Relative call (range +/- 64K)                                           3 7/4(PZ)   1100 0101  rrrr rrrr  rrrr rrrr
 void xa_cpu::call_rel16(u16 rel16) { if (m_pagezeromode) { push_word_to_stack(m_pc); set_pc_in_current_page(expand_rel16(rel16)); cy(4); } else { cy(7); fatalerror("CALL rel16 not in pagezero mode"); } }
@@ -1508,7 +1508,7 @@ void xa_cpu::call_rel16(u16 rel16) { if (m_pagezeromode) { push_word_to_stack(m_
 // BCC rel8                    Branch if the carry flag is clear                                       2 6t/3nt    1111 0000  rrrr rrrr
 void xa_cpu::bcc_rel8(u8 rel8) { if (get_c_flag() == 0) { set_pc_in_current_page(expand_rel8(rel8)); cy(6); } else { cy(3); } }
 // BCS rel8                    Branch if the carry flag is set                                         2 6t/3nt    1111 0001  rrrr rrrr
-void xa_cpu::bcs_rel8(u8 rel8) { fatalerror("BCS %04x\n", expand_rel8(rel8)); }
+void xa_cpu::bcs_rel8(u8 rel8) { if (get_c_flag()) { set_pc_in_current_page(expand_rel8(rel8)); cy(6); } else { cy(3); } }
 // BNE rel8                    Branch if the zero flag is not set                                      2 6t/3nt    1111 0010  rrrr rrrr
 void xa_cpu::bne_rel8(u8 rel8) { if (get_z_flag() == 0) { set_pc_in_current_page(expand_rel8(rel8)); cy(6); } else { cy(3); } }
 // BEQ rel8                    Branch if the zero flag is set                                          2 6t/3nt    1111 0011  rrrr rrrr
@@ -1687,7 +1687,7 @@ void xa_cpu::xch_word_rd_rs(u8 rd, u8 rs) { u16 rdval = gr16(rd); u16 rsval = gr
 void xa_cpu::xch_byte_rd_rs(u8 rd, u8 rs) { fatalerror("XCH.b %s, %s", m_regnames8[rd], m_regnames8[rs]); }
 
 // MOVC Rd, [Rs+]              Move data from WS:Rs address of code mem to reg w/ autoinc              2 4         1000 S000  dddd 0sss
-void xa_cpu::movc_word_rd_indrsinc(u8 rd, u8 rs) { fatalerror("MOVC.w %s, [%s+]\n", m_regnames16[rd], m_regnames16[rs]); }
+void xa_cpu::movc_word_rd_indrsinc(u8 rd, u8 rs) { u16 address = get_addr(rs); u16 data = m_program->read_word(address); address+=2; set_addr(rs, address); do_nz_flags_16(data); sr16(rd, data); cy(4); }
 void xa_cpu::movc_byte_rd_indrsinc(u8 rd, u8 rs) { u16 address = get_addr(rs); u8 data = m_program->read_byte(address); address++; set_addr(rs, address); do_nz_flags_8(data); sr8(rd, data); cy(4); }
 
 // DJNZ Rd,rel8                Decrement reg and jump if not zero                                      3 8t/5nt    1000 S111  dddd 1000  rrrr rrrr
