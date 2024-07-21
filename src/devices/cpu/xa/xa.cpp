@@ -64,6 +64,29 @@ void xa_cpu::sfr_port_w(offs_t offset, u8 data)
 	m_port_out_cb[offset](data);
 }
 
+u8 xa_cpu::sfr_PxCFGA_r(offs_t offset)
+{
+	return m_PxCFGA[offset];
+}
+
+void xa_cpu::sfr_PxCFGA_w(offs_t offset, u8 data)
+{
+	logerror("P%d CFGA - Port Configuration A write %02x\n", data);
+	m_PxCFGA[offset] = data;
+}
+
+u8 xa_cpu::sfr_PxCFGB_r(offs_t offset)
+{
+	return m_PxCFGB[offset];
+}
+
+void xa_cpu::sfr_PxCFGB_w(offs_t offset, u8 data)
+{
+	logerror("P%d CFGB - Port Configuration B write %02x\n", data);
+	m_PxCFGB[offset] = data;
+}
+
+
 
 void xa_cpu::set_pc_in_current_page(u16 addr)
 {
@@ -156,6 +179,9 @@ void xa_cpu::sfr_map(address_map &map)
 	map(0x040, 0x040).w(FUNC(xa_cpu::sfr_SCR_w));
 	map(0x05d, 0x05d).w(FUNC(xa_cpu::sfr_WFEED1_w));
 	map(0x05e, 0x05e).w(FUNC(xa_cpu::sfr_WFEED2_w));
+
+	map(0x070, 0x073).rw(FUNC(xa_cpu::sfr_PxCFGA_r), FUNC(xa_cpu::sfr_PxCFGA_w));
+	map(0x0f0, 0x0f3).rw(FUNC(xa_cpu::sfr_PxCFGB_r), FUNC(xa_cpu::sfr_PxCFGB_w));
 }
 
 
@@ -2431,6 +2457,9 @@ void xa_cpu::device_start()
 	save_item(NAME(m_PSWL));
 	save_item(NAME(m_PSWH));
 
+	save_item(NAME(m_PxCFGA));
+	save_item(NAME(m_PxCFGB));
+
 	save_item(NAME(m_in_interrupt));
 	save_item(NAME(m_irq_pending));
 
@@ -2467,6 +2496,12 @@ void xa_cpu::device_reset()
 
 	m_in_interrupt = 0;
 	m_irq_pending = 0;
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_PxCFGA[i] = 0;
+		m_PxCFGB[i] = 0;
+	}
 }
 
 /*****************************************************************************/

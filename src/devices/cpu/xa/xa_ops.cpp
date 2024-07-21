@@ -1443,8 +1443,8 @@ void xa_cpu::addc_word_direct_rs(u16 direct, u8 rs){ fatalerror("ADDC.w %s, %s",
 void xa_cpu::sub_word_direct_rs(u16 direct, u8 rs) { fatalerror("SUB.w %s, %s", get_directtext(direct), m_regnames16[rs]);}
 void xa_cpu::subb_word_direct_rs(u16 direct, u8 rs){ fatalerror("SUBB.w %s, %s", get_directtext(direct), m_regnames16[rs]);}
 void xa_cpu::cmp_word_direct_rs(u16 direct, u8 rs) { fatalerror("CMP.w %s, %s", get_directtext(direct), m_regnames16[rs]);}
-void xa_cpu::and_word_direct_rs(u16 direct, u8 rs) { fatalerror("AND.w %s, %s", get_directtext(direct), m_regnames16[rs]);}
-void xa_cpu::or_word_direct_rs(u16 direct, u8 rs)  { fatalerror("OR.w %s, %s", get_directtext(direct), m_regnames16[rs]);}
+void xa_cpu::and_word_direct_rs(u16 direct, u8 rs) { u16 directval = read_direct16(direct); u16 val = gr16(rs); u16 result = do_and_16(directval, val); write_direct16(direct, result); cy(4); }
+void xa_cpu::or_word_direct_rs(u16 direct, u8 rs)  { u16 directval = read_direct16(direct); u16 val = gr16(rs); u16 result = do_or_16(directval, val); write_direct16(direct, result); cy(4); }
 void xa_cpu::xor_word_direct_rs(u16 direct, u8 rs) { fatalerror("XOR.w %s, %s", get_directtext(direct), m_regnames16[rs]);}
 void xa_cpu::mov_word_direct_rs(u16 direct, u8 rs) { fatalerror("MOV.w %s, %s", get_directtext(direct), m_regnames16[rs]);}
 
@@ -1645,7 +1645,7 @@ void xa_cpu::divu_dword_rd_rs(u8 rd, u8 rs)
 	else
 	{
 		set_v_flag();
-		fatalerror("divide by zero\n");
+		logerror("%s divide by zero\n", machine().describe_context());
 	}
 
 	clear_c_flag();
@@ -1717,7 +1717,7 @@ void xa_cpu::da_rd(u8 rd) { fatalerror( "DA %s", m_regnames8[rd]); }
 void xa_cpu::sext_word_rd(u8 rd) { fatalerror("SEXT.w %s", m_regnames16[rd]); }
 void xa_cpu::sext_byte_rd(u8 rd) { fatalerror("SEXT.b %s", m_regnames8[rd]); }
 // CPL Rd                      Complement (ones complement) reg                                        2 3         1001 S000  dddd 1010
-void xa_cpu::cpl_word_rd(u8 rd) { fatalerror("CPL.w %s", m_regnames16[rd]); }
+void xa_cpu::cpl_word_rd(u8 rd) { u16 rdval = gr16(rd); u16 result = rdval ^ 0xffff; do_nz_flags_16(result); sr16(rd, result); cy(3); }
 void xa_cpu::cpl_byte_rd(u8 rd) { fatalerror("CPL.b %s", m_regnames8[rd]); }
 // NEG Rd                      Negate (twos complement) reg                                            2 3         1001 S000  dddd 1011
 void xa_cpu::neg_word_rd(u8 rd) { fatalerror("NEG.w %sx", m_regnames16[rd]); }

@@ -186,6 +186,11 @@ private:
 	u8 sfr_port_r(offs_t offset);
 	void sfr_port_w(offs_t offset, u8 data);
 
+	u8 sfr_PxCFGA_r(offs_t offset);
+	void sfr_PxCFGA_w(offs_t offset, u8 data);
+
+	u8 sfr_PxCFGB_r(offs_t offset);
+	void sfr_PxCFGB_w(offs_t offset, u8 data);
 
 	void set_bit_8_helper(u16 bit, u8 val);
 
@@ -915,6 +920,9 @@ private:
 	u8 m_IEL;
 	u8 m_PSWL;
 	u8 m_PSWH;
+
+	u8 m_PxCFGA[4];
+	u8 m_PxCFGB[4];
 
 	// hacks for IRQ testing
 	u8 m_in_interrupt;

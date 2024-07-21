@@ -477,7 +477,7 @@ void igs_fear_state::xa_w(offs_t offset, u32 data, u32 mem_mask)
 		}
 		else
 		{
-			logerror("param %04x\n", data & 0xffff);
+			logerror("-------------------------- param %04x\n", data & 0xffff);
 		}
 		m_xa->set_input_line(XA_EXT_IRQ0, ASSERT_LINE);
 	}
@@ -503,9 +503,12 @@ u8 igs_fear_state::mcu_p0_r()
 	u8 ret = m_xa_cmd & 0x00ff;
 	logerror("%s: mcu_p0_r() returning %02x\n", machine().describe_context(), ret);
 	// returns the bottom part of the command here, read at 0x311 in the fearless XA code, used
-	// to indicate the number of extra parameter words that should be read before the 
-	//return ret;
-	return 0x00;
+	// to indicate the number of extra parameter words that should be read before the command
+	// is executed
+
+	// this port might also be multiplexed, depending on other port values to either access the latch or other chips
+	return ret;
+//	return 0x00;
 }
 
 u8 igs_fear_state::mcu_p1_r()
@@ -520,8 +523,10 @@ u8 igs_fear_state::mcu_p2_r()
 	logerror("%s: mcu_p2_r() returning %02x\n", machine().describe_context(), ret);
 	// returns the top part of the command here, this is read at 0x300 in the fearless XA code
 	// and used in the jump list at 0x1f6a
-	//return ret;
-	return 0x00;
+
+	// this port might also be multiplexed, depending on other port values to either access the latch or other chips
+	return ret;
+//	return 0x00;
 }
 
 u8 igs_fear_state::mcu_p3_r()
@@ -532,6 +537,8 @@ u8 igs_fear_state::mcu_p3_r()
 
 void igs_fear_state::mcu_p0_w(uint8_t data)
 {
+	m_xa_cmd = (m_xa_cmd & 0xff00) | data;
+
 	logerror("%s: mcu_p0_w() %02x\n", machine().describe_context(), data);
 }
 
@@ -643,8 +650,11 @@ ROM_END
 
 u16 igs_fear_state::xa_wait_r(offs_t offset)
 {
-//	logerror("XA reached wait loop\n");
-//	m_xa->spin_until_interrupt();
+	if (!machine().side_effects_disabled())
+	{
+		//	logerror("XA reached wait loop\n");
+		//	m_xa->spin_until_interrupt();
+	}
 	return 0xfffe;
 }
 
@@ -657,7 +667,7 @@ void igs_fear_state::init_igs_fear()
 void igs_fear_state::init_igs_superkds()
 {
 	superkds_decrypt(machine());
-	m_xa->space(AS_PROGRAM).install_read_handler(0x762, 0x762, read16sm_delegate(*this, FUNC(igs_fear_state::xa_wait_r)));
+	m_xa->space(AS_PROGRAM).install_read_handler(0x762, 0x763, read16sm_delegate(*this, FUNC(igs_fear_state::xa_wait_r)));
 }
 
 } // anonymous namespace
