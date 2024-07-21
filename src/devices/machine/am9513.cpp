@@ -32,9 +32,13 @@
 #define LOG_MODE  (1U << 1)
 #define LOG_INPUT (1U << 2)
 #define LOG_TC    (1U << 3)
+#define LOG_WARN    (1U << 4)
+
 //#define VERBOSE (LOG_GENERAL | LOG_MODE)
 
 #include "logmacro.h"
+
+#define LOGWARN(...)	LOGMASKED(LOG_WARN, "WARNING: " __VA_ARGS__)
 
 
 //**************************************************************************
@@ -976,7 +980,7 @@ void am9513_device::write_gate_alt(int c, bool level)
 {
 	if (bus_is_16_bit())
 	{
-		logerror("Gate %dA written when configured as DB%d\n", c + 1, c + 8);
+		LOGWARN("Gate %dA written when configured as DB%d\n", c + 1, c + 8);
 		return;
 	}
 
@@ -1102,7 +1106,7 @@ void am9513_device::internal_write(u16 data)
 		set_master_mode(data);
 		break;
 	case 0x1f: // Status register (read only?)
-		logerror("Writing %04X to status register\n", data);
+		LOGWARN("Writing %04X to status register\n", data);
 		break;
 	case 0x07: // Alarm 1 register
 	case 0x0f: // Alarm 2 register
@@ -1138,7 +1142,7 @@ void am9513_device::internal_write(u16 data)
 		m_counter_hold[(m_dpr & 7) - 1] = data;
 		break;
 	default: // Invalid register
-		logerror("Writing %04X to register %02X\n", data, m_dpr);
+		LOGWARN("Writing %04X to register %02X\n", data, m_dpr);
 		break;
 	}
 }
@@ -1217,7 +1221,7 @@ void am9513_device::command_write(u8 data)
 	case 0x00:
 		if ((data & 0x07) == 0x00 || (data & 0x07) == 0x06)
 		{
-			logerror("Invalid register selected: %02X\n", data);
+			LOGWARN("Invalid register selected: %02X\n", data);
 			break;
 		}
 
@@ -1251,9 +1255,15 @@ void am9513_device::command_write(u8 data)
 			if (BIT(data, c))
 			{
 				if (!BIT(data, 5))
+				{
+					LOGMASKED(LOG_MODE, "Disarm Counter %d\n", c + 1);
 					disarm_counter(c);
+				}
 				if (!BIT(data, 6))
+				{
+					LOGMASKED(LOG_MODE, "Save Counter %d\n", c + 1);
 					save_counter(c);
+				}
 			}
 		}
 		break;
@@ -1277,6 +1287,7 @@ void am9513_device::command_write(u8 data)
 			m_mmr = ((m_mmr & ~(1 << 12)) | BIT(data, 3) << 12);
 			break;
 		case 0xe7: case 0xef: // Clear/set MM13 (8-bit bus/16-bit bus)
+			LOGMASKED(LOG_MODE, "Data Bus Width = %d-Bit\n", BIT(data, 3) ? 16 : 8);
 			m_mmr = ((m_mmr & ~(1 << 13)) | BIT(data, 3) << 13);
 			break;
 		case 0xf1: // Step counter 1
@@ -1298,7 +1309,7 @@ void am9513_device::command_write(u8 data)
 			}
 			[[fallthrough]];
 		default:
-			logerror("Invalid command: %02X\n", data);
+			LOGWARN("Invalid command: %02X\n", data);
 			break;
 		}
 		break;
@@ -1391,7 +1402,7 @@ void am9513_device::write8(offs_t offset, u8 data)
 	if (BIT(offset, 0))
 	{
 		if (data == 0xef)
-			logerror("16-bit data bus selected with 8-bit write\n");
+			LOGWARN("16-bit data bus selected with 8-bit write\n");
 		command_write(data);
 	}
 	else
@@ -1410,7 +1421,7 @@ u16 am9513_device::read16(offs_t offset)
 	else
 	{
 		if (!bus_is_16_bit())
-			logerror("16-bit data read in 8-bit bus mode\n");
+			LOGWARN("16-bit data read in 8-bit bus mode\n");
 		return data_read();
 	}
 }
@@ -1423,19 +1434,20 @@ u16 am9513_device::read16(offs_t offset)
 void am9513_device::write16(offs_t offset, u16 data)
 {
 	if ((!bus_is_16_bit() || BIT(offset, 0)) && (data & 0xff00) != 0xff00)
-		logerror("Errant write of %02X to upper byte of %s register in %d-bit bus mode\n",
+		LOGWARN("Errant write of %02X to upper byte of %s register in %d-bit bus mode\n",
 				(data & 0xff00) >> 8,
 				BIT(offset, 0) ? "control" : "data",
 				bus_is_16_bit() ? 16 : 8);
 
 	if (BIT(offset, 0))
 	{
-		if ((data & 0x00ff) == 0x00e7)
-			logerror("8-bit data bus selected with 16-bit write\n");
-		else if ((data & 0x00ff) == 0x00ef && !bus_is_16_bit())
-			logerror("16-bit data bus selected\n");
-
 		command_write(data & 0x00ff);
+
+		// NB testing afterwards because this command may have been changing bus width
+		if ((data & 0x00ff) == 0x00e7)
+			LOGWARN("8-bit data bus selected with 16-bit write\n");
+		else if ((data & 0x00ff) == 0x00ef && !bus_is_16_bit())
+			LOGWARN("16-bit data bus selected\n");
 	}
 	else
 		data_write(data);
