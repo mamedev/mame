@@ -86,7 +86,10 @@ private:
 	emu_timer *m_timer1;
 
 	u32 m_xa_cmd;
-	int m_num_params = 0;;
+	int m_num_params = 0;
+
+	u8 m_port1_dat = 0;
+	u8 m_port3_dat = 0;
 
 	int m_trackball_cnt;
 	int m_trackball_axis[2], m_trackball_axis_pre[2], m_trackball_axis_diff[2];
@@ -500,8 +503,18 @@ void igs_fear_state::cpld_w(offs_t offset, u32 data, u32 mem_mask)
 
 u8 igs_fear_state::mcu_p0_r()
 {
-	u8 ret = m_xa_cmd & 0x00ff;
-	logerror("%s: mcu_p0_r() returning %02x\n", machine().describe_context(), ret);
+	u8 ret;
+
+	if (m_port3_dat == 0x50)
+	{
+		ret = m_xa_cmd & 0x00ff;
+	}
+	else
+	{
+		ret = 0x01;
+	}
+
+	logerror("%s: mcu_p0_r() returning %02x with port 3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
 	// returns the bottom part of the command here, read at 0x311 in the fearless XA code, used
 	// to indicate the number of extra parameter words that should be read before the command
 	// is executed
@@ -514,13 +527,23 @@ u8 igs_fear_state::mcu_p0_r()
 u8 igs_fear_state::mcu_p1_r()
 {
 	logerror("%s: mcu_p1_r()\n", machine().describe_context());
-	return 0x00;
+	return m_port1_dat;
 }
 
 u8 igs_fear_state::mcu_p2_r()
 {
-	u8 ret = (m_xa_cmd & 0xff00) >> 8;
-	logerror("%s: mcu_p2_r() returning %02x\n", machine().describe_context(), ret);
+	u8 ret;
+
+	if (m_port3_dat == 0x50)
+	{
+		ret = (m_xa_cmd & 0xff00) >> 8;
+	}
+	else
+	{
+		ret = 0x00;
+	}
+	
+	logerror("%s: mcu_p2_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
 	// returns the top part of the command here, this is read at 0x300 in the fearless XA code
 	// and used in the jump list at 0x1f6a
 
@@ -532,19 +555,20 @@ u8 igs_fear_state::mcu_p2_r()
 u8 igs_fear_state::mcu_p3_r()
 {
 	logerror("%s: mcu_p3_r()\n", machine().describe_context());
-	return 0x00;
+	return m_port3_dat;
 }
 
 void igs_fear_state::mcu_p0_w(uint8_t data)
 {
-	m_xa_cmd = (m_xa_cmd & 0xff00) | data;
+	//m_xa_cmd = (m_xa_cmd & 0xff00) | data;
 
-	logerror("%s: mcu_p0_w() %02x\n", machine().describe_context(), data);
+	logerror("%s: mcu_p0_w() %02x with port 3 as %02x\n", machine().describe_context(), data, m_port3_dat);
 }
 
 void igs_fear_state::mcu_p1_w(uint8_t data)
 {
 	logerror("%s: mcu_p1_w() %02x\n", machine().describe_context(), data);
+	m_port1_dat = data;
 
 	// this is wrong but the XA must trigger this irq when it's finished processing, so it's likely tied to one of the port bits
 	if ((data == 0x08) || (data == 0x0a))
@@ -556,11 +580,12 @@ void igs_fear_state::mcu_p1_w(uint8_t data)
 
 void igs_fear_state::mcu_p2_w(uint8_t data)
 {
-	logerror("%s: mcu_p2_w() %02x\n", machine().describe_context(), data);
+	logerror("%s: mcu_p2_w() %02x with port 3 as %02x\n", machine().describe_context(), data, m_port3_dat);
 }
 
 void igs_fear_state::mcu_p3_w(uint8_t data)
 {
+	m_port3_dat = data;
 	logerror("%s: mcu_p3_w() %02x\n", machine().describe_context(), data);
 }
 
