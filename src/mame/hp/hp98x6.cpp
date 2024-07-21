@@ -70,7 +70,7 @@
 #define LOG_FDC_DATA_MASK   (LOG_FDC_MASK << 1)
 #define LOG_FDC_DATA(...)   LOGMASKED(LOG_FDC_DATA_MASK, __VA_ARGS__)
 #undef VERBOSE
-#define VERBOSE LOG_GENERAL
+#define VERBOSE 0
 #include "logmacro.h"
 
 namespace {
@@ -126,7 +126,7 @@ template<typename T> void BIT_SET(T& w , unsigned n)
 // +--------------+  +--------------+  +---------------+
 class hp98x6_base_state : public driver_device
 {
-public:
+protected:
 	hp98x6_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "cpu")
@@ -137,11 +137,9 @@ public:
 		, m_upi(*this, "upi")
 		, m_hpib(*this, "hpib")
 		, m_chargen(*this, "chargen")
-		, m_idprom(*this, "idprom")
 	{
 	}
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -155,9 +153,6 @@ protected:
 
 	// Character generator
 	required_region_ptr<uint8_t> m_chargen;
-
-	// ID PROM
-	optional_region_ptr<uint8_t> m_idprom;
 
 	void hp98x6_base(machine_config &mconfig, unsigned dot_clock, int char_width);
 	virtual void cpu_mem_map(address_map &map);
@@ -381,8 +376,6 @@ void hp9816_state::machine_start()
 	save_item(NAME(m_uart_int_en));
 	save_item(NAME(m_uart_ocd3));
 	save_item(NAME(m_uart_ocd4));
-
-	m_upi->set_id_prom(m_idprom.target());
 }
 
 void hp9816_state::machine_reset()
@@ -807,7 +800,7 @@ ROM_START(hp9816a)
 	ROM_REGION(0x2000, "chargen", 0)
 	ROM_LOAD("1818-3171.bin", 0, 0x2000, CRC(9cf4d4e1) SHA1(228484fd7ba7a4b59a051af083858383afe30179))
 
-	ROM_REGION(0x100, "idprom", 0)
+	ROM_REGION(0x100, "upi:idprom", 0)
 	ROM_LOAD("prom9816.bin", 0, 0x100, CRC(f2e57a04) SHA1(7436c1334f30e6de3cf1a7c30f714c9f203cb4d3))
 
 	ROM_REGION(0x10000, "cpu", 0)
@@ -833,6 +826,7 @@ public:
 		, m_fdc_timer(*this, "fdc_tmr")
 		, m_sw1(*this, "sw1")
 		, m_sys_ctrl_sw(*this, "sys_ctrl_sw")
+		, m_idprom(*this, "idprom")
 	{
 	}
 
@@ -847,6 +841,7 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_post_load() override;
 
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_drive0;
@@ -855,6 +850,9 @@ protected:
 	required_device<timer_device> m_fdc_timer;
 	required_ioport m_sw1;
 	required_ioport m_sys_ctrl_sw;
+
+	// ID PROM
+	required_region_ptr<uint8_t> m_idprom;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(fdc_ram_io);
 
@@ -917,6 +915,13 @@ void hp9826_36_state::machine_reset()
 	hp98x6_base_state::machine_reset();
 	m_curr_floppy = nullptr;
 	floppy_reset();
+}
+
+void hp9826_36_state::device_post_load()
+{
+	m_curr_floppy = nullptr;
+	// Bring m_curr_floppy in synch
+	floppy_update_sel();
 }
 
 static void floppies(device_slot_interface &device)
@@ -1015,8 +1020,7 @@ void hp9826_36_state::floppy_reset()
 
 void hp9826_36_state::floppy_update_sel()
 {
-	floppy_image_device *drives[2] = { get_drive(0), get_drive(1) };
-	floppy_image_device *new_floppy = drives[get_sel_floppy()];
+	floppy_image_device *new_floppy = get_drive(get_sel_floppy());
 
 	if (new_floppy != m_curr_floppy) {
 		m_curr_floppy = new_floppy;
@@ -1193,11 +1197,9 @@ void hp9826_36_state::hpib_w(offs_t offset, uint8_t data)
 
 uint16_t hp9826_36_state::id_prom_r(offs_t offset)
 {
-	uint16_t res = 0;
+	uint16_t res;
 
-	if (bool(m_idprom)) {
-		res |= m_idprom[offset & 0xff];
-	}
+	res = m_idprom[offset & 0xff];
 	res |= (m_sw1->read() << 8);
 
 	return res;

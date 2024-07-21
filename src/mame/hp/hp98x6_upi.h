@@ -24,8 +24,6 @@ public:
 	// construction/destruction
 	hp98x6_upi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_id_prom(const uint8_t *ptr) { m_idprom = ptr; }
-
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
@@ -57,6 +55,9 @@ private:
 	required_device<timer_device> m_delay_timer;
 	required_device<timer_device> m_input_delay_timer;
 
+	// ID PROM
+	optional_region_ptr<uint8_t> m_idprom;
+
 	devcb_write_line m_irq1_write_func;
 	devcb_write_line m_irq7_write_func;
 	uint8_t m_ram[64];
@@ -65,7 +66,6 @@ private:
 	uint8_t m_status;
 	bool m_ready;
 	ioport_value m_last_dial;
-	const uint8_t *m_idprom;
 
 	fsm_st m_fsm_state;
 

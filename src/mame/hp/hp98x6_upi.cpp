@@ -34,7 +34,7 @@
 #include "speaker.h"
 
 // Debugging
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 
@@ -207,9 +207,9 @@ hp98x6_upi_device::hp98x6_upi_device(const machine_config &mconfig, const char *
 	, m_10ms_timer(*this, "timer")
 	, m_delay_timer(*this, "dly")
 	, m_input_delay_timer(*this, "inp_dly")
+	, m_idprom(*this, "idprom")
 	, m_irq1_write_func(*this)
 	, m_irq7_write_func(*this)
-	, m_idprom(nullptr)
 {
 }
 
@@ -437,8 +437,7 @@ void hp98x6_upi_device::device_reset()
 	// Assume RESET key is down
 	m_ram[RAM_POS_RST_DEB_CNT] = R2_FLAGS1_DEB_INIT;
 	// PROM is present if m_idprom != nullptr
-	m_ram[RAM_POS_CFG_JUMPERS] = (m_idprom == nullptr) ? 0 :
-		BIT_MASK<uint8_t>(CFG_JUMPERS_PROM_BIT);
+	m_ram[RAM_POS_CFG_JUMPERS] = bool(m_idprom) ? BIT_MASK<uint8_t>(CFG_JUMPERS_PROM_BIT) : 0;
 	// Assume US English
 	m_ram[RAM_POS_LNG_JUMPERS] = 0;
 	m_ram[RAM_POS_1_R3_TIMER_STS] = 0;
@@ -640,7 +639,7 @@ void hp98x6_upi_device::decode_cmd(uint8_t cmd)
 		case CMD_RD_PROM_START:
 			// 1100'0001
 			// Start reading ID PROM
-			if (m_idprom != nullptr) {
+			if (bool(m_idprom)) {
 				LOG("Start PROM read\n");
 				m_ram[RAM_POS_READING_PROM] = 1;
 				m_ram[RAM_POS_PROM_ADDR] = 0;
