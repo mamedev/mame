@@ -5499,11 +5499,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/pc8801/pc8801_31.h,BUSES["PC8801"] = true
+--@src/devices/bus/pc8801/pc8801_exp.h,BUSES["PC8801"] = true
 ---------------------------------------------------
 
 if (BUSES["PC8801"]~=null) then
 	files {
+        MAME_DIR .. "src/devices/bus/pc8801/gsx8800.cpp",
+        MAME_DIR .. "src/devices/bus/pc8801/gsx8800.h",
 		MAME_DIR .. "src/devices/bus/pc8801/pc8801_23.cpp",
 		MAME_DIR .. "src/devices/bus/pc8801/pc8801_23.h",
 		MAME_DIR .. "src/devices/bus/pc8801/pc8801_31.cpp",
