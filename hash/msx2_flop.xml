@@ -22148,27 +22148,27 @@ HOMEBREW
 	</software>
 
 	<software name="nvmg1">
-		<description>NV Magazine 1 (Japan)</description>
+		<description>NV Magazine 1-gou (Japan)</description>
 		<year>1992</year>
 		<publisher>Syntax</publisher>
 		<info name="alt_title" value="NVマガジン1号"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 1 - syntax.dsk" size="737280" crc="7fe2b042" sha1="397ac3feed7da3c58145f362aea3ffbb001f9860"/>
+				<rom name="nv magazine 1-gou - syntax.dsk" size="737280" crc="7fe2b042" sha1="397ac3feed7da3c58145f362aea3ffbb001f9860"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nvmg2">
-		<description>NV Magazine 2 (Japan)</description>
+		<description>NV Magazine 2-gou (Japan)</description>
 		<year>1992</year>
 		<publisher>Syntax</publisher>
 		<info name="alt_title" value="NVマガジン2号"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine 2 - syntax.dsk" size="737280" crc="656259a0" sha1="2b707101e0afd063f17eb67ae6e5d54772a81890"/>
+				<rom name="nv magazine 2-gou - syntax.dsk" size="737280" crc="656259a0" sha1="2b707101e0afd063f17eb67ae6e5d54772a81890"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22190,7 +22190,7 @@ HOMEBREW
 		<description>NV Magazine 4 (Japan)</description>
 		<year>1992</year>
 		<publisher>Syntax</publisher>
-		<info name="alt_title" value="NVマガジン#3"/>
+		<info name="alt_title" value="NVマガジン#4"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -23627,7 +23627,7 @@ HOMEBREW
 	</software>
 
 	<software name="nvmgsp3">
-		<description>NV Magazine Special #3 (Japan)</description>
+		<description>NV Magazine Zoukan-gou #3 (Japan)</description>
 		<year>1994</year>
 		<publisher>Syntax</publisher>
 		<info name="alt_title" value="NVマガジン増刊号#3"/>
@@ -23635,25 +23635,25 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine special 3 - syntax (disk a).dsk" size="737280" crc="be5237b2" sha1="5c163ab02d9f3d494805f897d82b0ea3cbea0c6c"/>
+				<rom name="nv magazine zoukan-gou 3 - syntax (disk a).dsk" size="737280" crc="be5237b2" sha1="5c163ab02d9f3d494805f897d82b0ea3cbea0c6c"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine special 3 - syntax (disk b).dsk" size="737280" crc="093fcef0" sha1="4727688aa92bc74a28753dd5cde2f084206453d6"/>
+				<rom name="nv magazine zoukan-gou 3 - syntax (disk b).dsk" size="737280" crc="093fcef0" sha1="4727688aa92bc74a28753dd5cde2f084206453d6"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine special 3 - syntax (disk c).dsk" size="737280" crc="75bb03ff" sha1="00ec48ed3959471d0788fa7baa424c562457be35"/>
+				<rom name="nv magazine zoukan-gou 3 - syntax (disk c).dsk" size="737280" crc="75bb03ff" sha1="00ec48ed3959471d0788fa7baa424c562457be35"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nvmgsp4">
-		<description>NV Magazine Special #4 (Japan)</description>
+		<description>NV Magazine Zoukan-gou #4 (Japan)</description>
 		<year>1995</year>
 		<publisher>Syntax</publisher>
 		<info name="alt_title" value="NVマガジン増刊号#4"/>
@@ -23661,25 +23661,25 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine special 4 - syntax (disk a).dsk" size="737280" crc="569577b5" sha1="3f24c4f47b1a653caf3c8a0d9cca3cde5c2db751"/>
+				<rom name="nv magazine zoukan-gou 4 - syntax (disk a).dsk" size="737280" crc="569577b5" sha1="3f24c4f47b1a653caf3c8a0d9cca3cde5c2db751"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine special 4 - syntax (disk b).dsk" size="737280" crc="39ccd684" sha1="0191a460290beef33c83a01fbbac78cb3162f158"/>
+				<rom name="nv magazine zoukan-gou 4 - syntax (disk b).dsk" size="737280" crc="39ccd684" sha1="0191a460290beef33c83a01fbbac78cb3162f158"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine special 4 - syntax (disk c).dsk" size="737280" crc="ad4f2dbd" sha1="408d7ef0837925506c915b10c963b25c2f7abc1e"/>
+				<rom name="nv magazine zoukan-gou 4 - syntax (disk c).dsk" size="737280" crc="ad4f2dbd" sha1="408d7ef0837925506c915b10c963b25c2f7abc1e"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nvmgsp6">
-		<description>NV Magazine Special #6 (Japan)</description>
+		<description>NV Magazine Zoukan-gou #6 (Japan)</description>
 		<year>1996</year>
 		<publisher>Syntax</publisher>
 		<info name="alt_title" value="NVマガジン増刊号#6"/>
@@ -23687,19 +23687,19 @@ HOMEBREW
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine special 6 - syntax (disk a).dsk" size="737280" crc="b04bfe0b" sha1="5cf0f834657822bdee08d8dd9da3723979281b18"/>
+				<rom name="nv magazine zoukan-gou 6 - syntax (disk a).dsk" size="737280" crc="b04bfe0b" sha1="5cf0f834657822bdee08d8dd9da3723979281b18"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine special 6 - syntax (disk b).dsk" size="737280" crc="01c9d95d" sha1="49309ac340674f8bb0ad7d8a0c36c7e957aa79e8"/>
+				<rom name="nv magazine zoukan-gou 6 - syntax (disk b).dsk" size="737280" crc="01c9d95d" sha1="49309ac340674f8bb0ad7d8a0c36c7e957aa79e8"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="737280">
-				<rom name="nv magazine special 6 - syntax (disk c).dsk" size="737280" crc="5f1051ee" sha1="2a47bf0581706429488a09eb39c35274f9df574d"/>
+				<rom name="nv magazine zoukan-gou 6 - syntax (disk c).dsk" size="737280" crc="5f1051ee" sha1="2a47bf0581706429488a09eb39c35274f9df574d"/>
 			</dataarea>
 		</part>
 	</software>
