@@ -444,8 +444,8 @@ void xa_cpu::addc_byte_indrdoff8_data8(u8 rd, u8 offset8, u8 data8){ fatalerror(
 void xa_cpu::sub_byte_indrdoff8_data8(u8 rd, u8 offset8, u8 data8) { fatalerror( "SUB.b [%s+#$%02x], #$%02x ([RD+offs8], DATA8)", m_regnames16[rd], offset8, data8 ); }
 void xa_cpu::subb_byte_indrdoff8_data8(u8 rd, u8 offset8, u8 data8){ fatalerror( "SUBB.b [%s+#$%02x], #$%02x ([RD+offs8], DATA8)", m_regnames16[rd], offset8, data8 ); }
 void xa_cpu::cmp_byte_indrdoff8_data8(u8 rd, u8 offset8, u8 data8) { fatalerror( "CMP.b [%s+#$%02x], #$%02x ([RD+offs8], DATA8)", m_regnames16[rd], offset8, data8 ); }
-void xa_cpu::and_byte_indrdoff8_data8(u8 rd, u8 offset8, u8 data8) { fatalerror( "AND.b [%s+#$%02x], #$%02x ([RD+offs8], DATA8)", m_regnames16[rd], offset8, data8 ); }
-void xa_cpu::or_byte_indrdoff8_data8(u8 rd, u8 offset8, u8 data8)  { fatalerror( "OR.b [%s+#$%02x], #$%02x ([RD+offs8], DATA8)", m_regnames16[rd], offset8, data8 ); }
+void xa_cpu::and_byte_indrdoff8_data8(u8 rd, u8 offset8, u8 data8) { u16 fulloffset = util::sext(offset8, 8); u16 address = get_addr(rd) + fulloffset; u8 val = rdat8(address); u8 result = do_and_8(val, data8); wdat8(address, result); cy(6); }
+void xa_cpu::or_byte_indrdoff8_data8(u8 rd, u8 offset8, u8 data8)  { u16 fulloffset = util::sext(offset8, 8); u16 address = get_addr(rd) + fulloffset; u8 val = rdat8(address); u8 result = do_or_8(val, data8); wdat8(address, result); cy(6);  }
 void xa_cpu::xor_byte_indrdoff8_data8(u8 rd, u8 offset8, u8 data8) { fatalerror( "XOR.b [%s+#$%02x], #$%02x ([RD+offs8], DATA8)", m_regnames16[rd], offset8, data8 ); }
 void xa_cpu::mov_byte_indrdoff8_data8(u8 rd, u8 offset8, u8 data8) { fatalerror( "MOV.b [%s+#$%02x], #$%02x ([RD+offs8], DATA8)", m_regnames16[rd], offset8, data8 ); }
 
@@ -1843,6 +1843,8 @@ void xa_cpu::ret() {
 // RETI                        Return from interrupt                                                   2 10/8(PZ)  1101 0110  1001 0000
 void xa_cpu::reti()
 {
+	logerror("reti\n");
+
 	if (m_pagezeromode)
 	{
 		// probably wrong order

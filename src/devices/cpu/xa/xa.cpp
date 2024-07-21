@@ -2491,7 +2491,7 @@ void xa_cpu::check_interrupts()
 				m_pc = m_program->read_word(0x82);
 				m_in_interrupt = 1;
 				m_irq_pending = 0;
-
+				standard_irq_callback(0, m_pc);
 			}
 		}
 	}
@@ -2505,6 +2505,7 @@ void xa_cpu::execute_set_input(int inputnum, int state)
 	{
 		m_irq_pending = 1;
 	}
+	check_interrupts();
 }
 
 void xa_cpu::execute_run()

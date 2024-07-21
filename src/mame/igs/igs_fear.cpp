@@ -77,6 +77,8 @@ private:
 	void mcu_p2_w(uint8_t data);
 	void mcu_p3_w(uint8_t data);
 
+	u16 xa_wait_r(offs_t offset);
+
 	u32 m_gpio_o;
 	u32 m_irq_enable;
 	u32 m_irq_pending;
@@ -498,9 +500,11 @@ void igs_fear_state::cpld_w(offs_t offset, u32 data, u32 mem_mask)
 
 u8 igs_fear_state::mcu_p0_r()
 {
-	logerror("%s: mcu_p0_r()\n", machine().describe_context());
-	// appears to read the bottom part of the command here
-	// return (m_xa_cmd & 0x00ff);
+	u8 ret = m_xa_cmd & 0x00ff;
+	logerror("%s: mcu_p0_r() returning %02x\n", machine().describe_context(), ret);
+	// returns the bottom part of the command here, read at 0x311 in the fearless XA code, used
+	// to indicate the number of extra parameter words that should be read before the 
+	//return ret;
 	return 0x00;
 }
 
@@ -512,9 +516,11 @@ u8 igs_fear_state::mcu_p1_r()
 
 u8 igs_fear_state::mcu_p2_r()
 {
-	logerror("%s: mcu_p2_r()\n", machine().describe_context());
-	// appears to read the top part of the command here
-	// return (m_xa_cmd & 0xff00) >> 8;
+	u8 ret = (m_xa_cmd & 0xff00) >> 8;
+	logerror("%s: mcu_p2_r() returning %02x\n", machine().describe_context(), ret);
+	// returns the top part of the command here, this is read at 0x300 in the fearless XA code
+	// and used in the jump list at 0x1f6a
+	//return ret;
 	return 0x00;
 }
 
@@ -535,7 +541,9 @@ void igs_fear_state::mcu_p1_w(uint8_t data)
 
 	// this is wrong but the XA must trigger this irq when it's finished processing, so it's likely tied to one of the port bits
 	if ((data == 0x08) || (data == 0x0a))
-		igs027_trigger_irq(3); 
+	{
+		igs027_trigger_irq(3);
+	}
 
 }
 
@@ -633,14 +641,23 @@ ROM_START( superkds )
 	ROM_LOAD( "superkids_music1.u26", 0x400000, 0x400000, CRC(5f080dbf) SHA1(f02330db3336f6606aae9f5a9eca819701caa3bf) )
 ROM_END
 
+u16 igs_fear_state::xa_wait_r(offs_t offset)
+{
+//	logerror("XA reached wait loop\n");
+//	m_xa->spin_until_interrupt();
+	return 0xfffe;
+}
+
 void igs_fear_state::init_igs_fear()
 {
 	fearless_decrypt(machine());
+	m_xa->space(AS_PROGRAM).install_read_handler(0x9a0, 0x9a1, read16sm_delegate(*this, FUNC(igs_fear_state::xa_wait_r)));
 }
 
 void igs_fear_state::init_igs_superkds()
 {
 	superkds_decrypt(machine());
+	m_xa->space(AS_PROGRAM).install_read_handler(0x762, 0x762, read16sm_delegate(*this, FUNC(igs_fear_state::xa_wait_r)));
 }
 
 } // anonymous namespace
