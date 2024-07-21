@@ -8,6 +8,7 @@
 
 #include "fp1000_exp.h"
 #include "fp1060io_exp.h"
+#include "machine/input_merger.h"
 
 class fp1060io_device : public fp1000_exp_device
 //, public device_single_card_slot_interface<device_fp1060io_slot_interface>
@@ -26,6 +27,7 @@ protected:
 private:
 	virtual void device_add_mconfig(machine_config &config) override;
 	required_device_array<fp1060io_exp_slot_device, 4> m_subslot;
+	required_device_array<input_merger_device, 4> m_irqs_int;
 
 	u8 m_slot_select = 0;
 };

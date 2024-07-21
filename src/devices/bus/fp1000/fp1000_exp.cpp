@@ -14,6 +14,10 @@ fp1000_exp_slot_device::fp1000_exp_slot_device(const machine_config &mconfig, co
 	: device_t(mconfig, FP1000_EXP_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_fp1000_exp_interface>(mconfig, *this)
 	, m_iospace(*this, finder_base::DUMMY_TAG, -1)
+	, m_inta_cb(*this)
+	, m_intb_cb(*this)
+	, m_intc_cb(*this)
+	, m_intd_cb(*this)
 {
 }
 
@@ -28,28 +32,6 @@ void fp1000_exp_slot_device::device_start()
 void fp1000_exp_slot_device::device_config_complete()
 {
 	m_dev = get_card_device();
-}
-
-
-device_fp1000_exp_interface::device_fp1000_exp_interface(const machine_config &mconfig, device_t &device)
-   : device_interface(device, "fp1000exp")
-{
-	m_slot = dynamic_cast<fp1000_exp_slot_device *>(device.owner());
-}
-
-device_fp1000_exp_interface::~device_fp1000_exp_interface()
-{
-}
-
-void device_fp1000_exp_interface::interface_pre_start()
-{
-	if (!m_slot->started())
-		throw device_missing_dependencies();
-}
-
-void device_fp1000_exp_interface::interface_post_start()
-{
-	m_slot->select_w(false);
 }
 
 void fp1000_exp_slot_device::remap_cb()
@@ -79,6 +61,36 @@ void fp1000_exp_slot_device::main_cs_w(offs_t offset, u8 data)
 	m_dev->cs_w(offset, data);
 	m_dev->remap_cb();
 }
+
+
+
+device_fp1000_exp_interface::device_fp1000_exp_interface(const machine_config &mconfig, device_t &device)
+   : device_interface(device, "fp1000exp")
+{
+	m_slot = dynamic_cast<fp1000_exp_slot_device *>(device.owner());
+}
+
+device_fp1000_exp_interface::~device_fp1000_exp_interface()
+{
+}
+
+void device_fp1000_exp_interface::interface_pre_start()
+{
+	if (!m_slot->started())
+		throw device_missing_dependencies();
+}
+
+void device_fp1000_exp_interface::interface_post_start()
+{
+	m_slot->select_w(false);
+}
+
+// generic passthroughs
+void device_fp1000_exp_interface::inta_w(int state) { m_slot->m_inta_cb(state); }
+void device_fp1000_exp_interface::intb_w(int state) { m_slot->m_intb_cb(state); }
+void device_fp1000_exp_interface::intc_w(int state) { m_slot->m_intc_cb(state); }
+void device_fp1000_exp_interface::intd_w(int state) { m_slot->m_intd_cb(state); }
+
 
 fp1000_exp_device::fp1000_exp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)

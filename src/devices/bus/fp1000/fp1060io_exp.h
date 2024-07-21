@@ -28,11 +28,19 @@ public:
 
 	device_fp1060io_exp_interface *m_dev;
 
+	auto inta_callback() { return m_inta_cb.bind(); }
+	auto intb_callback() { return m_intb_cb.bind(); }
+	auto intc_callback() { return m_intc_cb.bind(); }
+	auto intd_callback() { return m_intd_cb.bind(); }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 
-//private:
+	devcb_write_line m_inta_cb;
+	devcb_write_line m_intb_cb;
+	devcb_write_line m_intc_cb;
+	devcb_write_line m_intd_cb;
 };
 
 
@@ -52,6 +60,11 @@ protected:
 	virtual void interface_post_start() override;
 
 	fp1060io_exp_slot_device *m_slot;
+
+	void inta_w(int state);
+	void intb_w(int state);
+	void intc_w(int state);
+	void intd_w(int state);
 };
 
 class fp1060io_exp_device : public device_t, public device_fp1060io_exp_interface

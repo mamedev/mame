@@ -53,18 +53,21 @@ static void fd1020fd_floppies(device_slot_interface &device)
 
 void fp1020fd_device::intrq_w(int state)
 {
-	LOG("intrq_w %d\n",state);
+//  LOG("intrq_w %d\n",state);
+	fp1060io_exp_device::intb_w(state);
 }
 
 void fp1020fd_device::drq_w(int state)
 {
-	LOG("drq_w %d\n",state);
+//  LOG("drq_w %d\n",state);
+	fp1060io_exp_device::inta_w(state);
 }
 
 void fp1020fd_device::device_add_mconfig(machine_config &config)
 {
 	// UPD765AC
-	// TODO: verify clock and parameters
+	// TODO: verify clock
+	// ready and select lines = true verified (pukes any floppy bootstrap if either is false)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(fp1020fd_device::intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(fp1020fd_device::drq_w));
