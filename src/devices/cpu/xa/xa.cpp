@@ -71,7 +71,7 @@ u8 xa_cpu::sfr_PxCFGA_r(offs_t offset)
 
 void xa_cpu::sfr_PxCFGA_w(offs_t offset, u8 data)
 {
-	logerror("P%d CFGA - Port Configuration A write %02x\n", data);
+	logerror("P%d CFGA - Port Configuration A write %02x\n", offset, data);
 	m_PxCFGA[offset] = data;
 }
 
@@ -82,7 +82,7 @@ u8 xa_cpu::sfr_PxCFGB_r(offs_t offset)
 
 void xa_cpu::sfr_PxCFGB_w(offs_t offset, u8 data)
 {
-	logerror("P%d CFGB - Port Configuration B write %02x\n", data);
+	logerror("P%d CFGB - Port Configuration B write %02x\n", offset, data);
 	m_PxCFGB[offset] = data;
 }
 
@@ -170,22 +170,73 @@ void xa_cpu::sfr_map(address_map &map)
 	map(0x001, 0x001).w(FUNC(xa_cpu::sfr_PSWH_w));
 	map(0x002, 0x002).w(FUNC(xa_cpu::sfr_PSW51_w));
 
+	//0x003, "SSEL"
+	//0x004, "PCON"
+	//0x010, "TCON"
+	//0x011, "TSTAT"
+	//0x018, "T2CON"
+	//0x019, "T2MOD"
+
 	map(0x01f, 0x01f).r(FUNC(xa_cpu::sfr_WDCON_r));
 
+	//0x020, "S0CON"
+	//0x021, "S0STAT"
+	//0x024, "S1CON"
+	//0x025, "S1STAT"
+
 	map(0x026, 0x026).rw(FUNC(xa_cpu::sfr_IEL_r), FUNC(xa_cpu::sfr_IEL_w));
+
+	//0x027, "IEH"
+	//0x02A, "SWR"
 
 	map(0x030, 0x033).rw(FUNC(xa_cpu::sfr_port_r), FUNC(xa_cpu::sfr_port_w));
 
 	map(0x040, 0x040).w(FUNC(xa_cpu::sfr_SCR_w));
+
+	//0x041, "DS"
+	//0x042, "ES"
+	//0x043, "CS"
+
+	//0x050, "TL0"
+	//0x051, "TH0"
+	//0x052, "TL1"
+	//0x053, "TH1"
+	//0x054, "RTL0"
+	//0x055, "RTH0"
+	//0x056, "RTL1"
+	//0x057, "RTH1"
+	//0x058, "TL2"
+	//0x059, "TH2"
+	//0x05A, "T2CAPL"
+	//0x05B, "T2CAPH"
+	//0x05C, "TMOD"
+
 	map(0x05d, 0x05d).w(FUNC(xa_cpu::sfr_WFEED1_w));
 	map(0x05e, 0x05e).w(FUNC(xa_cpu::sfr_WFEED2_w));
 
+	//0x05F, "WDL"
+	//0x060, "S0BUF"
+	//0x061, "S0ADDR"
+	//0x062, "S0ADEN"
+	//0x064, "S1BUF"
+	//0x065, "S1ADDR"
+	//0x066, "S1ADEN"
+	//0x068, "BTRL"
+	//0x069, "BTRH"
+	//0x06A, "BCR"
+
 	map(0x070, 0x073).rw(FUNC(xa_cpu::sfr_PxCFGA_r), FUNC(xa_cpu::sfr_PxCFGA_w));
+
+	//0x07A, "SWE"
+	//0x0A0, "IPA0"
+	//0x0A1, "IPA1"
+	//0x0A2, "IPA2"
+	//0x0A3, "IPA3"
+	//0x0A4, "IPA4"
+	//0x0A5, "IPA5"
+
 	map(0x0f0, 0x0f3).rw(FUNC(xa_cpu::sfr_PxCFGB_r), FUNC(xa_cpu::sfr_PxCFGB_w));
 }
-
-
-
 
 void xa_cpu::internal_map(address_map &map)
 {
