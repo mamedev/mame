@@ -614,7 +614,7 @@ void igs_fear_state::mcu_p3_w(uint8_t data)
 			if (m_port3_dat & 0x20)
 			{
 				logerror("latching ics\n");
-				m_port0_latch = m_ics->read(m_port1_dat & 0x03);
+				m_port0_latch = m_ics->read(m_port1_dat);
 			}
 			else
 			{
@@ -632,7 +632,7 @@ void igs_fear_state::mcu_p3_w(uint8_t data)
 			if (m_port3_dat & 0x20)
 			{
 				logerror("sending latch to ics\n");
-				m_ics->write(m_port1_dat & 0x03, m_port0_dat);
+				m_ics->write(m_port1_dat, m_port0_dat);
 			}
 			else
 			{
