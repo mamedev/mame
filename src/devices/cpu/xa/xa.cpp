@@ -112,6 +112,14 @@ void xa_cpu::sfr_PSWH_w(u8 data)
 	// PSWH  SM TM RS1 RS0 IM3 IM2 IM1 IM0
 	logerror("write %02x to PSWH\n", data);
 	m_PSWH = data;
+
+	if (m_PSWH & 0x80)
+		m_usermode = false;
+	else
+		m_usermode = true;
+
+	m_regbank = (m_PSWH & 0x30) >> 4;
+
 }
 
 void xa_cpu::sfr_PSW51_w(u8 data)
@@ -555,7 +563,7 @@ u8 xa_cpu::gr8(int reg)
 	if (reg < 4)
 	{
 		// banked regs
-		int regbank = 0;
+		int regbank = m_regbank;
 
 		if (high)
 			return (m_regs[(regbank * 4) + reg] & 0xff00) >> 8;
@@ -587,7 +595,7 @@ void xa_cpu::sr8(int reg, u8 data)
 	if (reg < 4)
 	{
 		// banked regs
-		int regbank = 0;
+		int regbank = m_regbank;
 
 		if (high)
 			m_regs[(regbank * 4) + reg] = (m_regs[(regbank * 4) + reg] & 0x00ff) | (data << 8);
@@ -615,7 +623,7 @@ void xa_cpu::sr16(int reg, u16 data)
 	if (reg < 4)
 	{
 		// banked regs
-		int regbank = 0;
+		int regbank = m_regbank;
 		m_regs[(regbank * 4) + reg] = data;
 
 	}
@@ -648,7 +656,7 @@ u16 xa_cpu::gr16(int reg)
 	if (reg < 4)
 	{
 		// banked regs
-		int regbank = 0;
+		int regbank = m_regbank;
 		return m_regs[(regbank * 4) + reg];
 
 	}
@@ -2507,6 +2515,7 @@ void xa_cpu::device_start()
 	save_item(NAME(m_regs));
 	save_item(NAME(m_PSWL));
 	save_item(NAME(m_PSWH));
+	save_item(NAME(m_regbank));
 
 	save_item(NAME(m_PxCFGA));
 	save_item(NAME(m_PxCFGB));
@@ -2563,21 +2572,37 @@ void xa_cpu::check_interrupts()
 	{
 		if (!m_in_interrupt)
 		{
-			if (m_IEL & 0x81)
+			if ((m_IEL & 0x81) && (m_irq_pending & 1))
 			{
-				logerror("irq\n");
-
+				logerror("comms irq\n");
+				int vector = 0x20;
 				push_word_to_system_stack(m_PSWH);
 				push_word_to_system_stack(m_PSWL);
 				push_word_to_system_stack(m_pc);
 
-				u16 temppsw = m_program->read_word(0x80);
+				u16 temppsw = m_program->read_word(vector*4);
 				sfr_PSWL_w(temppsw & 0xff);
 				sfr_PSWH_w((temppsw >> 8) & 0xff);
-				m_pc = m_program->read_word(0x82);
+				m_pc = m_program->read_word((vector*4)+2);
 				m_in_interrupt = 1;
-				m_irq_pending = 0;
+				m_irq_pending &= ~1;
 				standard_irq_callback(0, m_pc);
+			}
+			else if ((m_IEL & 0x82) && (m_irq_pending & 2))
+			{
+				logerror("ics irq\n");
+				int vector = 0x21;
+				push_word_to_system_stack(m_PSWH);
+				push_word_to_system_stack(m_PSWL);
+				push_word_to_system_stack(m_pc);
+
+				u16 temppsw = m_program->read_word(vector*4);
+				sfr_PSWL_w(temppsw & 0xff);
+				sfr_PSWH_w((temppsw >> 8) & 0xff);
+				m_pc = m_program->read_word((vector*4)+2);
+				m_in_interrupt = 1;
+				m_irq_pending &= ~2;
+				standard_irq_callback(1, m_pc);
 			}
 		}
 	}
@@ -2589,7 +2614,11 @@ void xa_cpu::execute_set_input(int inputnum, int state)
 	// This is not accurate, just test code for fearless/superkds
 	if (inputnum == XA_EXT_IRQ0)
 	{
-		m_irq_pending = 1;
+		m_irq_pending |= 1;
+	}
+	else if (inputnum == XA_EXT_IRQ1)
+	{
+		m_irq_pending |= 2;
 	}
 	check_interrupts();
 }

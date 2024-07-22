@@ -11,6 +11,7 @@
 
 enum {
 	XA_EXT_IRQ0,
+	XA_EXT_IRQ1,
 };
 
 enum {
@@ -920,6 +921,8 @@ private:
 	u8 m_IEL;
 	u8 m_PSWL;
 	u8 m_PSWH;
+
+	u8 m_regbank;
 
 	u8 m_PxCFGA[4];
 	u8 m_PxCFGB[4];

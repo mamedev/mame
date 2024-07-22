@@ -364,6 +364,9 @@ INPUT_PORTS_END
 
 void igs_fear_state::sound_irq(int state)
 {
+	logerror("sound irq\n");
+
+	m_xa->set_input_line(XA_EXT_IRQ1, ASSERT_LINE);
 }
 
 void igs_fear_state::vblank_irq(int state)
@@ -554,7 +557,7 @@ u8 igs_fear_state::mcu_p0_r()
 u8 igs_fear_state::mcu_p1_r()
 {
 	logerror("%s: mcu_p1_r()\n", machine().describe_context());
-	return 0x00;// m_port1_dat; superkds XA will end up failing returning port1 dat for now, but not attempt to play any sounds otherwise?
+	return m_port1_dat; // superkds XA will end up failing returning port1 dat for now, but not attempt to play any sounds otherwise?
 }
 
 u8 igs_fear_state::mcu_p2_r()
@@ -578,13 +581,15 @@ void igs_fear_state::mcu_p0_w(uint8_t data)
 
 void igs_fear_state::mcu_p1_w(uint8_t data)
 {
+	u8 olddata = m_port1_dat;
 	logerror("%s: mcu_p1_w() %02x\n", machine().describe_context(), data);
 	m_port1_dat = data;
 
-	// this is wrong but the XA must trigger this irq when it's finished processing, so it's likely tied to one of the port bits
-	if ((data == 0x08) || (data == 0x0a))
+	// this is might be wrong but the XA must trigger this irq when it's finished processing, so it's likely tied to one of the port bits
+	if ((olddata & 0x08) != (m_port1_dat & 0x08))
 	{
-		igs027_trigger_irq(3);
+		if (m_port1_dat & 0x08)
+			igs027_trigger_irq(3);
 	}
 
 }
@@ -598,39 +603,40 @@ void igs_fear_state::mcu_p3_w(uint8_t data)
 {
 	u8 oldport3 = m_port3_dat;
 	m_port3_dat = data;
-	logerror("%s: mcu_p3_w() %02x\n", machine().describe_context(), data);
+	logerror("%s: mcu_p3_w() %02x - do latches oldport3 %02x newport3 %02x\n", machine().describe_context(), data, oldport3, m_port3_dat);
 
 	if ((oldport3 & 0x80) != (m_port3_dat & 0x80))
 	{
-		if ((oldport3 & 0x80) == 0) // high->low transition on bit 0x80 must read into latches!
+		if ((m_port3_dat & 0x80) == 0) // high->low transition on bit 0x80 must read into latches!
 		{
-			switch (m_port1_dat)
-			{
-			case 0x01:
-			case 0x02:
-			case 0x03:
-				m_port0_latch = m_ics->read(m_port1_dat);
-				break;
+			logerror("latching data from with m_port3_dat as %02x and m_port1_dat as %02x\n", m_port3_dat, m_port1_dat);
 
-			case 0x06:
+			if (m_port3_dat & 0x20)
+			{
+				logerror("latching ics\n");
+				m_port0_latch = m_ics->read(m_port1_dat & 0x03);
+			}
+			else
+			{
+				logerror("latching command\n");
 				m_port2_latch = (m_xa_cmd & 0xff00) >> 8;
 				m_port0_latch = m_xa_cmd & 0x00ff;
-				break;
 			}
 		}
 	}
 
 	if ((oldport3 & 0x40) != (m_port3_dat & 0x40))
 	{
-		if ((oldport3 & 0x40) == 0) // high->low transition on bit 0x40 must write latch content to devices
+		if ((m_port3_dat & 0x40) == 0) // high->low transition on bit 0x40 must write latch content to devices
 		{
-			switch (m_port1_dat)
+			if (m_port3_dat & 0x20)
 			{
-			case 0x01:
-			case 0x02:
-			case 0x03:
-				m_ics->write(m_port1_dat, m_port0_dat);
-				break;
+				logerror("sending latch to ics\n");
+				m_ics->write(m_port1_dat & 0x03, m_port0_dat);
+			}
+			else
+			{
+				logerror("sending latch to unknown\n");
 			}
 		}
 	}
