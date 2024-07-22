@@ -517,7 +517,7 @@ u8 igs_fear_state::mcu_p0_r()
 u8 igs_fear_state::mcu_p1_r()
 {
 	logerror("%s: mcu_p1_r()\n", machine().describe_context());
-	return m_port1_dat;
+	return 0x00;// m_port1_dat; superkds XA will end up failing returning port1 dat for now, but not attempt to play any sounds otherwise?
 }
 
 u8 igs_fear_state::mcu_p2_r()
