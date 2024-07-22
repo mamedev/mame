@@ -21434,6 +21434,9 @@ uccopsaru                       // (c) 1992 Irem America (US)
 uccopsj                         // (c) 1992 Irem (Japan)
 uccopsu                         // (c) 1992 Irem America (US)
 
+@source:irem/m102.cpp
+hclimber                        // (c) 1992 Irem
+
 @source:irem/m107.cpp
 airass                          // (c) 1993 Irem (World)
 dsoccr94                        // (c) 1994 Irem (Data East Corporation license)
@@ -35417,6 +35420,7 @@ rocktrv2                        // (c) 1986 Triumph Software Inc
 shootbul                        // (c) 1985 Bally Midway
 sprglbpg                        // German bootleg
 sprglobp                        // (c) 1983 Epos Corporation
+sprglobp2                       // (c) 1983 Epos Corporation
 superabc                        // hack
 superabco                       // hack
 theglobme                       // (c) 1983 Magic Electronics

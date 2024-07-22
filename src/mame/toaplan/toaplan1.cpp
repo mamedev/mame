@@ -3236,5 +3236,5 @@ GAME( 1990, outzonecv,  outzone,  outzonecv,outzone,   toaplan1_state,          
 
 // has various licenses / regions depending on jumpers, including Tecmo
 GAME( 1991, vimana,     0,        vimana,   vimana,    toaplan1_state,          empty_init, ROT270, "Toaplan",                                    "Vimana (World, rev A)", 0 )
-GAME( 1991, vimanan,    vimana,   vimana,   vimanan,   toaplan1_state,          empty_init, ROT270, "Toaplan",                                    "Vimana (World",         0 )
+GAME( 1991, vimanan,    vimana,   vimana,   vimanan,   toaplan1_state,          empty_init, ROT270, "Toaplan",                                    "Vimana (World)",        0 )
 GAME( 1991, vimanaj,    vimana,   vimana,   vimanaj,   toaplan1_state,          empty_init, ROT270, "Toaplan",                                    "Vimana (Japan)",        0 )

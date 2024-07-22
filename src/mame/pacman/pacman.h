@@ -242,11 +242,11 @@ public:
 	void piranha(machine_config &config);
 
 private:
-	// pacplus.c
+	// pacplus.cpp
 	uint8_t pacplus_decrypt(int addr, uint8_t e);
 	void pacplus_decode();
 
-	// jumpshot.c
+	// jumpshot.cpp
 	uint8_t jumpshot_decrypt(int addr, uint8_t e);
 	void jumpshot_decode();
 };
@@ -261,7 +261,9 @@ public:
 	void theglobp(machine_config &config);
 	void eeekkp(machine_config &config);
 
-protected:
+	void init_sprglobp2();
+
+private:
 	uint8_t epos_decryption_w(offs_t offset);
 	DECLARE_MACHINE_START(theglobp);
 	DECLARE_MACHINE_RESET(theglobp);
