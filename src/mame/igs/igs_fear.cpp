@@ -44,6 +44,9 @@ public:
 protected:
 	virtual void video_start() override;
 
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	void main_map(address_map &map);
 
@@ -86,18 +89,19 @@ private:
 	u32 m_gpio_o;
 	u32 m_irq_enable;
 	u32 m_irq_pending;
-	emu_timer *m_timer0;
-	emu_timer *m_timer1;
 
 	u32 m_xa_cmd;
-	int m_num_params = 0;
+	u8 m_num_params;
 
-	u8 m_port1_dat = 0;
-	u8 m_port3_dat = 0;
-	u8 m_port0_dat = 0;
+	u8 m_port1_dat;
+	u8 m_port3_dat;
+	u8 m_port0_dat;
 
 	int m_trackball_cnt;
 	int m_trackball_axis[2], m_trackball_axis_pre[2], m_trackball_axis_diff[2];
+
+	emu_timer *m_timer0;
+	emu_timer *m_timer1;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -116,6 +120,40 @@ private:
 void igs_fear_state::video_start()
 {
 	igs027_periph_init();
+}
+
+void igs_fear_state::machine_start()
+{
+	save_item(NAME(m_port2_latch));
+	save_item(NAME(m_port0_latch));
+
+	save_item(NAME(m_gpio_o));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_pending));
+
+	save_item(NAME(m_xa_cmd));
+	save_item(NAME(m_num_params));
+
+	save_item(NAME(m_port1_dat));
+	save_item(NAME(m_port3_dat));
+	save_item(NAME(m_port0_dat));
+}
+
+void igs_fear_state::machine_reset()
+{
+	m_port2_latch = 0;
+	m_port0_latch = 0;
+
+	m_gpio_o = 0;
+	m_irq_enable = 0;
+	m_irq_pending = 0;
+
+	m_xa_cmd = 0;
+	m_num_params = 0;
+
+	m_port1_dat = 0;
+	m_port3_dat = 0;
+	m_port0_dat = 0;
 }
 
 void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int height, int width, int palette, int flipx, int romoffset)
@@ -493,7 +531,6 @@ void igs_fear_state::xa_w(offs_t offset, u32 data, u32 mem_mask)
 	else
 	{
 		fatalerror("xa write %04x is %08x\n", offset, data);
-
 	}
 }
 
