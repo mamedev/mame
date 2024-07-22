@@ -27,6 +27,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_xa(*this, "xa"),
+		m_ics(*this, "ics"),
 		m_videoram(*this, "videoram"),
 		m_palette(*this, "palette"),
 		m_gfxrom(*this, "gfx1"),
@@ -79,6 +80,9 @@ private:
 
 	u16 xa_wait_r(offs_t offset);
 
+	u8 m_port2_latch;
+	u8 m_port0_latch;
+
 	u32 m_gpio_o;
 	u32 m_irq_enable;
 	u32 m_irq_pending;
@@ -90,6 +94,7 @@ private:
 
 	u8 m_port1_dat = 0;
 	u8 m_port3_dat = 0;
+	u8 m_port0_dat = 0;
 
 	int m_trackball_cnt;
 	int m_trackball_axis[2], m_trackball_axis_pre[2], m_trackball_axis_diff[2];
@@ -97,6 +102,7 @@ private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<mx10exa_cpu_device> m_xa;
+	required_device<ics2115_device> m_ics;
 	required_shared_ptr<u32> m_videoram;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_gfxrom;
@@ -503,25 +509,9 @@ void igs_fear_state::cpld_w(offs_t offset, u32 data, u32 mem_mask)
 
 u8 igs_fear_state::mcu_p0_r()
 {
-	u8 ret;
-
-	if (m_port3_dat == 0x50)
-	{
-		ret = m_xa_cmd & 0x00ff;
-	}
-	else
-	{
-		ret = 0x01;
-	}
-
-	logerror("%s: mcu_p0_r() returning %02x with port 3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
-	// returns the bottom part of the command here, read at 0x311 in the fearless XA code, used
-	// to indicate the number of extra parameter words that should be read before the command
-	// is executed
-
-	// this port might also be multiplexed, depending on other port values to either access the latch or other chips
+	u8 ret = m_port0_latch;
+	logerror("%s: COMMAND READ LOWER mcu_p0_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
 	return ret;
-//	return 0x00;
 }
 
 u8 igs_fear_state::mcu_p1_r()
@@ -532,24 +522,9 @@ u8 igs_fear_state::mcu_p1_r()
 
 u8 igs_fear_state::mcu_p2_r()
 {
-	u8 ret;
-
-	if (m_port3_dat == 0x50)
-	{
-		ret = (m_xa_cmd & 0xff00) >> 8;
-	}
-	else
-	{
-		ret = 0x00;
-	}
-	
-	logerror("%s: mcu_p2_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
-	// returns the top part of the command here, this is read at 0x300 in the fearless XA code
-	// and used in the jump list at 0x1f6a
-
-	// this port might also be multiplexed, depending on other port values to either access the latch or other chips
-	return ret;
-//	return 0x00;
+	u8 ret = m_port2_latch;
+	logerror("%s: COMMAND READ mcu_p2_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
+	return m_port2_latch;
 }
 
 u8 igs_fear_state::mcu_p3_r()
@@ -560,9 +535,8 @@ u8 igs_fear_state::mcu_p3_r()
 
 void igs_fear_state::mcu_p0_w(uint8_t data)
 {
-	//m_xa_cmd = (m_xa_cmd & 0xff00) | data;
-
-	logerror("%s: mcu_p0_w() %02x with port 3 as %02x\n", machine().describe_context(), data, m_port3_dat);
+	logerror("%s: mcu_p0_w() %02x with port 3 as %02x and port 1 as %02x\n", machine().describe_context(), data, m_port3_dat, m_port1_dat);
+	m_port0_dat = data;
 }
 
 void igs_fear_state::mcu_p1_w(uint8_t data)
@@ -585,8 +559,44 @@ void igs_fear_state::mcu_p2_w(uint8_t data)
 
 void igs_fear_state::mcu_p3_w(uint8_t data)
 {
+	u8 oldport3 = m_port3_dat;
 	m_port3_dat = data;
 	logerror("%s: mcu_p3_w() %02x\n", machine().describe_context(), data);
+
+	if ((oldport3 & 0x80) != (m_port3_dat & 0x80))
+	{
+		if ((oldport3 & 0x80) == 0) // high->low transition on bit 0x80 must read into latches!
+		{
+			switch (m_port1_dat)
+			{
+			case 0x01:
+			case 0x02:
+			case 0x03:
+				m_port0_latch = m_ics->read(m_port1_dat);
+				break;
+
+			case 0x06:
+				m_port2_latch = (m_xa_cmd & 0xff00) >> 8;
+				m_port0_latch = m_xa_cmd & 0x00ff;
+				break;
+			}
+		}
+	}
+
+	if ((oldport3 & 0x40) != (m_port3_dat & 0x40))
+	{
+		if ((oldport3 & 0x40) == 0) // high->low transition on bit 0x40 must write latch content to devices
+		{
+			switch (m_port1_dat)
+			{
+			case 0x01:
+			case 0x02:
+			case 0x03:
+				m_ics->write(m_port1_dat, m_port0_dat);
+				break;
+			}
+		}
+	}
 }
 
 void igs_fear_state::igs_fear(machine_config &config)
@@ -623,9 +633,10 @@ void igs_fear_state::igs_fear(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ics2115_device &ics(ICS2115(config, "ics", 33.8688_MHz_XTAL)); // TODO : Correct?
-	ics.irq().set(FUNC(igs_fear_state::sound_irq));
-	ics.add_route(ALL_OUTPUTS, "mono", 5.0);
+
+	ICS2115(config, m_ics, 33.8688_MHz_XTAL); // TODO : Correct?
+	m_ics->irq().set(FUNC(igs_fear_state::sound_irq));
+	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
 }
 
 
