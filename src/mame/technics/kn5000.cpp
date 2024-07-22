@@ -18,7 +18,10 @@
 #include "video/pc_vga.h"
 #include "kn5000.lh"
 
-#define EXTENSION_VIEW  // This needs further debugging to avoid a segfault.
+// #define EXTENSION_VIEW
+// FIXME: This needs further debugging to avoid a segfault.
+//        A more detailed description of the problem is available at:
+//        https://github.com/mamedev/mame/pull/11835#issuecomment-1874728906
 
 class mn89304_vga_device : public svga_device
 {
