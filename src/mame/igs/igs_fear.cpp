@@ -366,7 +366,7 @@ void igs_fear_state::sound_irq(int state)
 {
 	logerror("sound irq\n");
 
-	m_xa->set_input_line(XA_EXT_IRQ1, ASSERT_LINE);
+	m_xa->set_input_line(XA_EXT_IRQ2, ASSERT_LINE);
 }
 
 void igs_fear_state::vblank_irq(int state)

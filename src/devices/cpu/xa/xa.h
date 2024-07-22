@@ -12,6 +12,8 @@
 enum {
 	XA_EXT_IRQ0,
 	XA_EXT_IRQ1,
+	XA_EXT_IRQ2,
+	XA_EXT_IRQ3,
 };
 
 enum {
@@ -102,6 +104,7 @@ private:
 	std::string get_word_reglist(u8 op2);
 	std::string get_byte_reglist(u8 op2, int h);
 
+	void check_external_irq_level(int level);
 	void check_interrupts();
 
 	u16 expand_rel16(u16 rel16);

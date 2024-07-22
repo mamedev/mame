@@ -1483,7 +1483,7 @@ void xa_cpu::adds_byte_indrdinc_data4(u8 rd, u8 data4){ fatalerror("ADDS.b [%s+]
 
 // MOVS [Rd+offset8], #data4   Move reg-ind w/ 8-bit offs to 4-bit sign-extended imm data              3 5         1011 S100  0ddd iiii  oooo oooo
 void xa_cpu::movs_word_indrdoff8_data4(u8 rd, u8 off8, u8 data4) { u16 data = util::sext(data4, 4); u16 fulloffset = util::sext(off8, 8); u16 address = get_addr(rd) + fulloffset; wdat16(address, data); do_nz_flags_16(data); cy(5); }
-void xa_cpu::movs_byte_indrdoff8_data4(u8 rd, u8 off8, u8 data4){ fatalerror("MOVS.b [%s+$%02x], %s", m_regnames16[rd], off8, show_expanded_data4(data4, 0));  }
+void xa_cpu::movs_byte_indrdoff8_data4(u8 rd, u8 off8, u8 data4){ u8 data = util::sext(data4, 4); u16 fulloffset = util::sext(off8, 8); u16 address = get_addr(rd) + fulloffset; wdat8(address, data); do_nz_flags_8(data); cy(5);  }
 // ADDS [Rd+offset8], #data4   Add reg-ind w/ 8-bit offs to 4-bit signed imm data                      3 6         1010 S100  0ddd iiii  oooo oooo
 void xa_cpu::adds_word_indrdoff8_data4(u8 rd, u8 off8, u8 data4){ fatalerror("ADDS.w [%s+$%02x], %s", m_regnames16[rd], off8, show_expanded_data4(data4, 1)); }
 void xa_cpu::adds_byte_indrdoff8_data4(u8 rd, u8 off8, u8 data4){ fatalerror("ADDS.b [%s+$%02x], %s", m_regnames16[rd], off8, show_expanded_data4(data4, 0));  }

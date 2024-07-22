@@ -2566,44 +2566,40 @@ void xa_cpu::device_reset()
 
 /*****************************************************************************/
 
+void xa_cpu::check_external_irq_level(int level)
+{
+	if (m_IEL & 0x80)
+	{
+		if (m_IEL & (1 << level))
+		{
+			if (m_irq_pending & (1 << level))
+			{
+				logerror("testing irq %d\n", level);
+				int vector = 0x20 + level;
+				push_word_to_system_stack(m_PSWH);
+				push_word_to_system_stack(m_PSWL);
+				push_word_to_system_stack(m_pc);
+
+				u16 temppsw = m_program->read_word(vector*4);
+				sfr_PSWL_w(temppsw & 0xff);
+				sfr_PSWH_w((temppsw >> 8) & 0xff);
+				m_pc = m_program->read_word((vector*4)+2);
+				m_in_interrupt = 1;
+				m_irq_pending &= ~(1 << level);
+				standard_irq_callback(level, m_pc);
+			}
+		}
+	}
+}
+
 void xa_cpu::check_interrupts()
 {
 	if (m_irq_pending)
 	{
 		if (!m_in_interrupt)
 		{
-			if ((m_IEL & 0x81) && (m_irq_pending & 1))
-			{
-				logerror("comms irq\n");
-				int vector = 0x20;
-				push_word_to_system_stack(m_PSWH);
-				push_word_to_system_stack(m_PSWL);
-				push_word_to_system_stack(m_pc);
-
-				u16 temppsw = m_program->read_word(vector*4);
-				sfr_PSWL_w(temppsw & 0xff);
-				sfr_PSWH_w((temppsw >> 8) & 0xff);
-				m_pc = m_program->read_word((vector*4)+2);
-				m_in_interrupt = 1;
-				m_irq_pending &= ~1;
-				standard_irq_callback(0, m_pc);
-			}
-			else if ((m_IEL & 0x82) && (m_irq_pending & 2))
-			{
-				logerror("ics irq\n");
-				int vector = 0x21;
-				push_word_to_system_stack(m_PSWH);
-				push_word_to_system_stack(m_PSWL);
-				push_word_to_system_stack(m_pc);
-
-				u16 temppsw = m_program->read_word(vector*4);
-				sfr_PSWL_w(temppsw & 0xff);
-				sfr_PSWH_w((temppsw >> 8) & 0xff);
-				m_pc = m_program->read_word((vector*4)+2);
-				m_in_interrupt = 1;
-				m_irq_pending &= ~2;
-				standard_irq_callback(1, m_pc);
-			}
+			for (int i = 0; i < 4; i++)
+				check_external_irq_level(i);
 		}
 	}
 
@@ -2612,14 +2608,7 @@ void xa_cpu::check_interrupts()
 void xa_cpu::execute_set_input(int inputnum, int state)
 {
 	// This is not accurate, just test code for fearless/superkds
-	if (inputnum == XA_EXT_IRQ0)
-	{
-		m_irq_pending |= 1;
-	}
-	else if (inputnum == XA_EXT_IRQ1)
-	{
-		m_irq_pending |= 2;
-	}
+	m_irq_pending |= 1 << inputnum;
 	check_interrupts();
 }
 
