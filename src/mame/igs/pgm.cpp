@@ -5399,7 +5399,8 @@ ROM_END
 // Rock Fever 1
 ROM_START( rf1 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_WORD_SWAP( "sys.bin",  0x000000, 0x100000, CRC(f1bf26a7) SHA1(c40729b6f25f0df95ee50c0e2d07d68f2e9ab031) )
+	ROM_LOAD16_BYTE ( "rf1_sys_h.u32", 0x00000, 0x80000, CRC(e5e1e5f9) SHA1(1e8e4b7e53fcab68d14f36f9c8d85047f308bc93) )
+	ROM_LOAD16_BYTE ( "rf1_sys_l.u31", 0x00001, 0x80000, CRC(ee2c3817) SHA1(490e879f347ac38feaad80666d28fac9e2154188) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 
@@ -5410,7 +5411,6 @@ ROM_START( rf1 )
 	ROM_REGION16_LE( 0x1000000, "sprmask", ROMREGION_ERASEFF ) /* Sprite Masks + Colour Indexes */
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
-
 ROM_END
 
 /*** Init Stuff **************************************************************/
