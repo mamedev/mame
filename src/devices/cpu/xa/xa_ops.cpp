@@ -8,15 +8,24 @@
 #define get_addr gr16
 #define set_addr sr16
 
-u32 xa_cpu::get_reg32(u8 reg)
+u32 xa_cpu::gr32(int reg)
 {
 	if (reg & 1)
-		fatalerror("get_reg32 with low bit set\n");
+		fatalerror("gr32 with low bit set\n");
 
 	u16 reg1 = gr16(reg);
 	u16 reg2 = gr16(reg + 1);
 
-	return (reg1 << 16) | reg2;
+	return (reg2 << 16) | reg1;
+}
+
+void xa_cpu::sr32(int reg, u32 data)
+{
+	if (reg & 1)
+		fatalerror("sr32 with low bit set\n");
+
+	sr16(reg, data & 0xffff);
+	sr16(reg + 1, (data >> 16) & 0xffff);
 }
 
 u16 xa_cpu::do_subb_16(u16 val1, u16 val2)
@@ -370,7 +379,7 @@ void xa_cpu::addc_byte_indrd_data8(u8 rd, u8 data8){ fatalerror( "ADDC.b [%s], #
 void xa_cpu::sub_byte_indrd_data8(u8 rd, u8 data8) { fatalerror( "SUB.b [%s], #$%02x ([RD], DATA8)", m_regnames16[rd], data8 ); }
 void xa_cpu::subb_byte_indrd_data8(u8 rd, u8 data8){ fatalerror( "SUBB.b [%s], #$%02x ([RD], DATA8)", m_regnames16[rd], data8 ); }
 void xa_cpu::cmp_byte_indrd_data8(u8 rd, u8 data8) { fatalerror( "CMP.b [%s], #$%02x ([RD], DATA8)", m_regnames16[rd], data8 ); }
-void xa_cpu::and_byte_indrd_data8(u8 rd, u8 data8) { fatalerror( "AND.b [%s], #$%02x ([RD], DATA8)", m_regnames16[rd], data8 ); }
+void xa_cpu::and_byte_indrd_data8(u8 rd, u8 data8) { u16 address = get_addr(rd); u8 rdval = rdat8(address); u8 result = do_and_8(rdval, data8); wdat8(address, result); cy(3); }
 void xa_cpu::or_byte_indrd_data8(u8 rd, u8 data8)  { fatalerror( "OR.b [%s], #$%02x ([RD], DATA8)", m_regnames16[rd], data8 ); }
 void xa_cpu::xor_byte_indrd_data8(u8 rd, u8 data8) { fatalerror( "XOR.b [%s], #$%02x ([RD], DATA8)", m_regnames16[rd], data8 ); }
 void xa_cpu::mov_byte_indrd_data8(u8 rd, u8 data8) { fatalerror( "MOV.b [%s], #$%02x ([RD], DATA8)", m_regnames16[rd], data8 ); }
@@ -1469,10 +1478,10 @@ void xa_cpu::adds_byte_rd_data4(u8 rd, u8 data4) { u8 data  = util::sext(data4, 
 
 // MOVS [Rd], #data4           Move 4-bit sign-extended imm data to reg-ind                            2 3         1011 S010  0ddd iiii
 void xa_cpu::movs_word_indrd_data4(u8 rd, u8 data4){ u16 data = util::sext(data4, 4); u16 address = get_addr(rd); wdat16(address, data); do_nz_flags_16(data); cy(3); }
-void xa_cpu::movs_byte_indrd_data4(u8 rd, u8 data4){ fatalerror("MOVS.b [%s], %s", m_regnames16[rd], show_expanded_data4(data4, 0)); }
+void xa_cpu::movs_byte_indrd_data4(u8 rd, u8 data4){ u8 data = util::sext(data4, 4); u16 address = get_addr(rd); wdat8(address, data); do_nz_flags_8(data); cy(3); }
 // ADDS [Rd], #data4           Add 4-bit signed imm data to reg-ind                                    2 4         1010 S010  0ddd iiii
-void xa_cpu::adds_word_indrd_data4(u8 rd, u8 data4){ fatalerror("ADDS.w [%s], %s", m_regnames16[rd], show_expanded_data4(data4, 1)); }
-void xa_cpu::adds_byte_indrd_data4(u8 rd, u8 data4){ fatalerror("ADDS.b [%s], %s", m_regnames16[rd], show_expanded_data4(data4, 0)); }
+void xa_cpu::adds_word_indrd_data4(u8 rd, u8 data4){ u16 data = util::sext(data4, 4); u16 address = get_addr(rd); u16 rdval = rdat16(address); u16 result = do_add_16(rdval, data); wdat16(address, result); cy(4); }
+void xa_cpu::adds_byte_indrd_data4(u8 rd, u8 data4){ u8 data = util::sext(data4, 4); u16 address = get_addr(rd); u8 rdval = rdat8(address); u8 result = do_add_8(rdval, data); wdat8(address, result); cy(4); }
 
 // MOVS [Rd+], #data4          Move 4-bit sign-extended imm data to reg-ind w/ autoinc                 2 4         1011 S011  0ddd iiii
 void xa_cpu::movs_word_indrdinc_data4(u8 rd, u8 data4) { u16 data = util::sext(data4, 4); u16 address = get_addr(rd); wdat16(address, data); address += 2; do_nz_flags_16(data); set_addr(rd, address); cy(4); }
@@ -1485,8 +1494,8 @@ void xa_cpu::adds_byte_indrdinc_data4(u8 rd, u8 data4){ fatalerror("ADDS.b [%s+]
 void xa_cpu::movs_word_indrdoff8_data4(u8 rd, u8 off8, u8 data4) { u16 data = util::sext(data4, 4); u16 fulloffset = util::sext(off8, 8); u16 address = get_addr(rd) + fulloffset; wdat16(address, data); do_nz_flags_16(data); cy(5); }
 void xa_cpu::movs_byte_indrdoff8_data4(u8 rd, u8 off8, u8 data4){ u8 data = util::sext(data4, 4); u16 fulloffset = util::sext(off8, 8); u16 address = get_addr(rd) + fulloffset; wdat8(address, data); do_nz_flags_8(data); cy(5);  }
 // ADDS [Rd+offset8], #data4   Add reg-ind w/ 8-bit offs to 4-bit signed imm data                      3 6         1010 S100  0ddd iiii  oooo oooo
-void xa_cpu::adds_word_indrdoff8_data4(u8 rd, u8 off8, u8 data4){ fatalerror("ADDS.w [%s+$%02x], %s", m_regnames16[rd], off8, show_expanded_data4(data4, 1)); }
-void xa_cpu::adds_byte_indrdoff8_data4(u8 rd, u8 off8, u8 data4){ fatalerror("ADDS.b [%s+$%02x], %s", m_regnames16[rd], off8, show_expanded_data4(data4, 0));  }
+void xa_cpu::adds_word_indrdoff8_data4(u8 rd, u8 off8, u8 data4){ u16 data = util::sext(data4, 4); u16 fulloffset = util::sext(off8, 8); u16 address = get_addr(rd) + fulloffset; u16 rdval = rdat16(address); u16 result = do_add_16(rdval, data); wdat16(address, result); cy(4); }
+void xa_cpu::adds_byte_indrdoff8_data4(u8 rd, u8 off8, u8 data4){ u8 data = util::sext(data4, 4); u16 fulloffset = util::sext(off8, 8); u16 address = get_addr(rd) + fulloffset; u8 rdval = rdat8(address); u8 result = do_add_8(rdval, data); wdat8(address, result); cy(4); }
 
 // MOVS [Rd+offset16], #data4  Move reg-ind w/ 16-bit offs to 4-bit sign-extended imm data             4 5         1011 S101  0ddd iiii  oooo oooo  oooo oooo
 void xa_cpu::movs_word_indrdoff16_data4(u8 rd, u16 off16, u8 data4){ fatalerror("MOVS.w [%s+$%04x], %s", m_regnames16[rd], off16, show_expanded_data4(data4, 1)); }
@@ -1542,7 +1551,7 @@ void xa_cpu::br_rel8(u8 rel8) { set_pc_in_current_page(expand_rel8(rel8)); cy(6)
 void xa_cpu::asl_byte_rd_imm4(u8 rd, u8 amount) { fatalerror("ASL.b %s, %d", m_regnames8[rd], amount); }
 void xa_cpu::asl_word_rd_imm4(u8 rd, u8 amount) { u16 fullreg = gr16(rd); fullreg = asl32_helper(fullreg, amount); sr16(rd, fullreg); }
 // ASL Rd, #data5              Logical left shift reg by the 5-bit imm value                           2 a*        1101 1101  dddi iiii
-void xa_cpu::asl_dword_rd_imm5(u8 rd, u8 amount) { u32 fullreg = (gr16(rd) << 16) | gr16(rd + 1); fullreg = asl32_helper(fullreg, amount); sr16(rd, (fullreg >> 16) & 0xffff); sr16(rd + 1, fullreg & 0xffff); }
+void xa_cpu::asl_dword_rd_imm5(u8 rd, u8 amount) { u32 fullreg = gr32(rd); fullreg = asl32_helper(fullreg, amount); sr32(rd, fullreg); }
 
 // ASR Rd, #data4              Arithmetic shift right reg by the 4-bit imm count                       2 a*        1101 SS10  dddd iiii
 void xa_cpu::asr_byte_rd_imm4(u8 rd, u8 amount) { fatalerror("ASR.b %s, %d", m_regnames8[rd], amount); }
@@ -1554,7 +1563,7 @@ void xa_cpu::asr_dword_rd_imm5(u8 rd, u8 amount) { fatalerror("ASR.dw %s, %d", m
 void xa_cpu::lsr_byte_rd_imm4(u8 rd, u8 amount) { fatalerror("LSR.b %s, %d", m_regnames8[rd], amount); }
 void xa_cpu::lsr_word_rd_imm4(u8 rd, u8 amount) { u16 fullreg = gr16(rd); fullreg = lsr32_helper(fullreg, amount); sr16(rd, fullreg); }
 // LSR Rd, #data5              Logical right shift reg by the 4-bit imm value                          2 a*        1101 1100  dddi iiii
-void xa_cpu::lsr_dword_rd_imm5(u8 rd, u8 amount) { u32 fullreg = (gr16(rd) << 16) | gr16(rd + 1); fullreg = lsr32_helper(fullreg, amount); sr16(rd, (fullreg >> 16) & 0xffff); sr16(rd + 1, fullreg & 0xffff); }
+void xa_cpu::lsr_dword_rd_imm5(u8 rd, u8 amount) { u32 fullreg = gr32(rd); fullreg = lsr32_helper(fullreg, amount); sr32(rd, fullreg); }
 
 // register form shifts
 
@@ -1613,13 +1622,13 @@ void xa_cpu::div_dword_rd_data16(u8 rd, u16 data16) { fatalerror( "DIV.d %s, #$%
 // DIVU.d Rd, Rs               32X16 unsigned double reg divide                                        2 22        1110 1101  ddd0 ssss
 void xa_cpu::divu_dword_rd_rs(u8 rd, u8 rs)
 {
-	u32 fullval = get_reg32(rd);
+	u32 fullval = gr32(rd);
 	u16 rsval = gr16(rs);
 
 	if (rsval)
 	{
 		u32 result = fullval / rsval;
-		u32 remainder = fullval & rsval;
+		u32 remainder = fullval % rsval;
 
 		if (result & 0xffff0000)
 			set_v_flag();
@@ -1714,8 +1723,8 @@ void xa_cpu::mov_byte_indrdinc_indrsinc(u8 rd, u8 rs) { fatalerror("MOV.b [%s+],
 // DA Rd                       Decimal Adjust byte reg                                                 2 4         1001 0000  dddd 1000
 void xa_cpu::da_rd(u8 rd) { fatalerror( "DA %s", m_regnames8[rd]); }
 // SEXT Rd                     Sign extend last operation to reg                                       2 3         1001 S000  dddd 1001
-void xa_cpu::sext_word_rd(u8 rd) { fatalerror("SEXT.w %s", m_regnames16[rd]); }
-void xa_cpu::sext_byte_rd(u8 rd) { fatalerror("SEXT.b %s", m_regnames8[rd]); }
+void xa_cpu::sext_word_rd(u8 rd) { if(m_nflag) sr16(rd, 0xffff); else sr16(rd, 0); cy(2); }
+void xa_cpu::sext_byte_rd(u8 rd) { if(m_nflag) sr8(rd, 0xff); else sr8(rd, 0); cy(2);  }
 // CPL Rd                      Complement (ones complement) reg                                        2 3         1001 S000  dddd 1010
 void xa_cpu::cpl_word_rd(u8 rd) { u16 rdval = gr16(rd); u16 result = rdval ^ 0xffff; do_nz_flags_16(result); sr16(rd, result); cy(3); }
 void xa_cpu::cpl_byte_rd(u8 rd) { fatalerror("CPL.b %s", m_regnames8[rd]); }
@@ -1851,6 +1860,8 @@ void xa_cpu::reti()
 		m_pc = pull_word_from_system_stack();
 		m_PSWL = pull_word_from_system_stack();
 		m_PSWH = pull_word_from_system_stack();
+		// could be wrong, but superkids enable SM bit in main function?
+		m_usermode = true;
 		cy(8);
 		m_in_interrupt = 0;
 

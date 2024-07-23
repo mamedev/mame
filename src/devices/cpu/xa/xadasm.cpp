@@ -563,7 +563,7 @@ int xa_dasm::handle_pushpop_rlist(XA_DASM_PARAMS, int type)
 
 			if (bit)
 			{
-				util::stream_format(stream, "%s%s", firstbit ? "" : ",", m_regnames8[i + h ? 8 : 0]);
+				util::stream_format(stream, "%s%s", firstbit ? "" : ",", m_regnames8[i + (h ? 8 : 0)]);
 				firstbit = false;
 			}
 		}

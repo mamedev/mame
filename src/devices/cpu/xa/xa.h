@@ -145,6 +145,9 @@ private:
 	u16 gr16(int reg);
 	void sr16(int reg, u16 data);
 
+	u32 gr32(int reg);
+	void sr32(int reg, u32 data);
+
 	void set_pc_in_current_page(u16 addr);
 
 	void push_word_reglist(u8 op2, int h, bool force_user);
@@ -201,8 +204,6 @@ private:
 	u32 asl32_helper(u32 fullreg, u8 amount);
 	u32 lsr32_helper(u32 fullreg, u8 amount);
 	u16 lsr16_helper(u16 fullreg, u8 amount);
-
-	u32 get_reg32(u8 reg);
 
 	u8 read_direct8(u16 addr);
 	u16 read_direct16(u16 addr);
