@@ -506,6 +506,7 @@ public:
 		m_address_space(nullptr),
 		m_debugger_cpu(nullptr),
 		m_debugger_console(nullptr),
+		m_debugger_host(nullptr),
 		m_debugger_port(0),
 		m_socket(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE),
 		m_is_be(false),
@@ -600,6 +601,7 @@ private:
 	address_space *m_address_space;
 	debugger_cpu *m_debugger_cpu;
 	debugger_console *m_debugger_console;
+	const char *m_debugger_host;
 	int m_debugger_port;
 	emu_file m_socket;
 	bool m_is_be;
@@ -642,6 +644,7 @@ private:
 //-------------------------------------------------------------------------
 int debug_gdbstub::init(osd_interface &osd, const osd_options &options)
 {
+	m_debugger_host = options.debugger_host();
 	m_debugger_port = options.debugger_port();
 	return 0;
 }
@@ -789,11 +792,11 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 			osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name);
 #endif
 
-		std::string socket_name = string_format("socket.localhost:%d", m_debugger_port);
+		std::string socket_name = string_format("socket.%s:%d", m_debugger_host, m_debugger_port);
 		std::error_condition const filerr = m_socket.open(socket_name);
 		if ( filerr )
-			fatalerror("gdbstub: failed to start listening on port %d\n", m_debugger_port);
-		osd_printf_info("gdbstub: listening on port %d\n", m_debugger_port);
+			fatalerror("gdbstub: failed to start listening on host %s port %d\n", m_debugger_host, m_debugger_port);
+		osd_printf_info("gdbstub: listening on host %s port %d\n", m_debugger_host, m_debugger_port);
 
 		m_initialized = true;
 	}
