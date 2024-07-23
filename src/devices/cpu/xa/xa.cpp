@@ -103,6 +103,12 @@ void xa_cpu::sfr_PSWL_w(u8 data)
 	// PSWL  C AC - - - V N Z
 	logerror("write %02x to PSWL\n", data);
 	m_PSWL = data;
+
+	if (data & 0x01) set_z_flag(); else clear_z_flag();
+	if (data & 0x02) set_n_flag(); else clear_n_flag();
+	if (data & 0x04) set_v_flag(); else clear_v_flag();
+	if (data & 0x40) set_ac_flag(); else clear_ac_flag();
+	if (data & 0x80) set_c_flag(); else clear_c_flag();
 }
 
 
