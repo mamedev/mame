@@ -5396,6 +5396,22 @@ ROM_START( ddpdojblkbl )
 	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, CRC(5a0dbd76) SHA1(06ab202f6bd5ebfb35b9d8cc7a8fb83ec8840659) ) //music-1
 ROM_END
 
+// Rock Fever 1
+ROM_START( rf1 )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "sys.bin",  0x000000, 0x100000, CRC(f1bf26a7) SHA1(c40729b6f25f0df95ee50c0e2d07d68f2e9ab031) )
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+
+	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+
+	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+
+	ROM_REGION16_LE( 0x1000000, "sprmask", ROMREGION_ERASEFF ) /* Sprite Masks + Colour Indexes */
+
+	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+
+ROM_END
 
 /*** Init Stuff **************************************************************/
 
@@ -5721,3 +5737,6 @@ GAME( 200?, kovlsqh2,     kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_
 //乱世街霸/Luànshì jiē bà
 GAME( 200?, kovlsjb,      kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 200?, kovlsjba,     kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+
+// Rock Fever 1
+GAME ( 1999, rf1, pgm, pgm_arm_type1_rf, pgm, pgm_arm_type1_state, init_rf1, ROT0, "IGS", "Rock Fever 1", MACHINE_IS_SKELETON ) /* need internal rom of IGS027A */

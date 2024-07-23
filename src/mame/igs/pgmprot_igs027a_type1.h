@@ -30,9 +30,11 @@ public:
 	void init_kov();
 	void init_kovboot();
 	void init_oldsplus();
+	void init_rf1();
 
 	void pgm_arm_type1_sim(machine_config &config);
 	void pgm_arm_type1_cave(machine_config &config);
+	void pgm_arm_type1_rf(machine_config &config);
 	void pgm_arm_type1(machine_config &config);
 
 protected:
@@ -100,6 +102,7 @@ private:
 	void arm7_type1_sim_w(offs_t offset, u16 data);
 	u16 arm7_type1_sim_protram_r(offs_t offset);
 	u16 pstars_arm7_type1_sim_protram_r(offs_t offset);
+	u16 unk_r_rf(offs_t offset);
 	int m_simregion = 0;
 
 	/* puzzli2 protection internal state stuff */
@@ -140,6 +143,7 @@ private:
 	void cavepgm_mem(address_map &map);
 	void kov_map(address_map &map);
 	void kov_sim_map(address_map &map);
+	void rf1_sim_map(address_map &map);
 };
 
 INPUT_PORTS_EXTERN( sango );
