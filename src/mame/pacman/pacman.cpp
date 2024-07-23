@@ -8703,6 +8703,7 @@ void epospm_state::init_sprglobp2()
 {
 	// this set is very similar to the unencrypted sprglbpg set
 	// for some reason the following doesn't work for some ranges
+	// (opcodes are unencrypted there).
 
 	static const uint8_t data_xortable[16][8] =
 	{
@@ -8899,7 +8900,7 @@ GAME( 1983, acitya,   bwcasino, acitya,   acitya,   epospm_state,  empty_init,  
 GAME( 1983, theglobp, suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "The Glob (Pac-Man hardware, set 1)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglobpa,suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "The Glob (Pac-Man hardware, set 2)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1983, sprglobp, suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "Super Glob (Pac-Man hardware)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1983, sprglobp2,suprglob, pacman,   theglobp, epospm_state,  init_sprglobp2,ROT90,  "bootleg",                  "Super Glob (Pac-Man hardware, bootleg)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // encrypted
+GAME( 1985, sprglobp2,suprglob, pacman,   theglobp, epospm_state,  init_sprglobp2,ROT90,  "bootleg (Elsys Software)", "Super Glob (Pac-Man hardware, bootleg)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // encrypted
 GAME( 1984, sprglbpg, suprglob, pacman,   theglobp, epospm_state,  empty_init,    ROT90,  "bootleg (Software Labor)", "Super Glob (Pac-Man hardware, German bootleg)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglobme,suprglob, woodpek,  theglobp, epospm_state,  empty_init,    ROT90,  "Magic Electronics Inc.",   "The Glob (Pacman hardware, Magic Electronics Inc. license)", MACHINE_SUPPORTS_SAVE )
 
