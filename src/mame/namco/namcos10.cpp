@@ -3078,6 +3078,7 @@ void namcos10_memio_state::ns10_ippo2(machine_config &config)
 	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xf, 0xe, 0xd, 0xc, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1, 0x0); };
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 static INPUT_PORTS_START( namcos10 )
