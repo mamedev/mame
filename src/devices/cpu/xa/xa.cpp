@@ -1197,7 +1197,7 @@ std::string xa_cpu::get_byte_reglist(u8 op2, int h)
 
 		if (bit)
 		{
-			temp += util::string_format("%s%s", firstbit ? "" : ",", m_regnames8[i + h ? 8 : 0]);
+			temp += util::string_format("%s%s", firstbit ? "" : ",", m_regnames8[i + (h ? 8 : 0)]);
 			firstbit = false;
 		}
 	}
@@ -1211,7 +1211,7 @@ void xa_cpu::push_byte_reglist(u8 op2, int h, bool force_user)
 		int bit = (op2 & (1 << i));
 		if (bit)
 		{
-			u8 regval = gr8(i + h ? 8 : 0);
+			u8 regval = gr8(i + (h ? 8 : 0));
 			if (force_user)
 				push_byte_to_user_stack(regval);
 			else
@@ -1252,7 +1252,7 @@ void xa_cpu::pull_byte_reglist(u8 op2, int h, bool force_user)
 			else
 				stackval = pull_byte_from_stack();
 
-			sr8(i + h ? 8 : 0, stackval);
+			sr8(i + (h ? 8 : 0), stackval);
 			cy(2);
 		}
 	}

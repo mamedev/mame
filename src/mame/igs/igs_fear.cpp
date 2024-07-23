@@ -91,11 +91,15 @@ private:
 	u32 m_irq_pending;
 
 	u32 m_xa_cmd;
+	u32 m_xa_ret0;
+	u32 m_xa_ret1;
 	u8 m_num_params;
 
-	u8 m_port1_dat;
-	u8 m_port3_dat;
 	u8 m_port0_dat;
+	u8 m_port1_dat;
+	u8 m_port2_dat;
+	u8 m_port3_dat;
+
 
 	int m_trackball_cnt;
 	int m_trackball_axis[2], m_trackball_axis_pre[2], m_trackball_axis_diff[2];
@@ -132,11 +136,14 @@ void igs_fear_state::machine_start()
 	save_item(NAME(m_irq_pending));
 
 	save_item(NAME(m_xa_cmd));
+	save_item(NAME(m_xa_ret0));
+	save_item(NAME(m_xa_ret1));
 	save_item(NAME(m_num_params));
 
-	save_item(NAME(m_port1_dat));
-	save_item(NAME(m_port3_dat));
 	save_item(NAME(m_port0_dat));
+	save_item(NAME(m_port1_dat));
+	save_item(NAME(m_port2_dat));
+	save_item(NAME(m_port3_dat));
 }
 
 void igs_fear_state::machine_reset()
@@ -149,11 +156,15 @@ void igs_fear_state::machine_reset()
 	m_irq_pending = 0;
 
 	m_xa_cmd = 0;
+	m_xa_ret0 = 0;
+	m_xa_ret1 = 0;
 	m_num_params = 0;
 
-	m_port1_dat = 0;
-	m_port3_dat = 0;
 	m_port0_dat = 0;
+	m_port1_dat = 0;
+	m_port2_dat = 0;
+	m_port3_dat = 0;
+
 }
 
 void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int height, int width, int palette, int flipx, int romoffset)
@@ -470,6 +481,8 @@ u32 igs_fear_state::xa_r(offs_t offset)
 	{
 	case 0:
 	{
+		data = m_xa_ret0;
+		// TODO: This should be remove if we implement serial trackball support in XA
 		if (m_xa_cmd == 0xa301)
 		{
 			switch (m_trackball_cnt++)
@@ -506,7 +519,7 @@ u32 igs_fear_state::xa_r(offs_t offset)
 		break;
 	}
 	case 0x80:
-		data = 0;
+		data = m_xa_ret1 << 16;
 		break;
 	}
 	return data;
@@ -573,6 +586,16 @@ u8 igs_fear_state::mcu_p3_r()
 	return m_port3_dat;
 }
 
+static int posedge(uint32_t oldval, uint32_t val, int bit)
+{
+	return (!BIT(oldval, bit)) && (BIT(val, bit));
+}
+
+static int negedge(uint32_t oldval, uint32_t val, int bit)
+{
+	return (BIT(oldval, bit)) && (!BIT(val, bit));
+}
+
 void igs_fear_state::mcu_p0_w(uint8_t data)
 {
 	logerror("%s: mcu_p0_w() %02x with port 3 as %02x and port 1 as %02x\n", machine().describe_context(), data, m_port3_dat, m_port1_dat);
@@ -586,16 +609,15 @@ void igs_fear_state::mcu_p1_w(uint8_t data)
 	m_port1_dat = data;
 
 	// this is might be wrong but the XA must trigger this irq when it's finished processing, so it's likely tied to one of the port bits
-	if ((olddata & 0x08) != (m_port1_dat & 0x08))
+	if (posedge(olddata, m_port1_dat, 3))
 	{
-		if (m_port1_dat & 0x08)
-			igs027_trigger_irq(3);
+		igs027_trigger_irq(3);
 	}
-
 }
 
 void igs_fear_state::mcu_p2_w(uint8_t data)
 {
+	m_port2_dat = data;
 	logerror("%s: mcu_p2_w() %02x with port 3 as %02x\n", machine().describe_context(), data, m_port3_dat);
 }
 
@@ -605,38 +627,41 @@ void igs_fear_state::mcu_p3_w(uint8_t data)
 	m_port3_dat = data;
 	logerror("%s: mcu_p3_w() %02x - do latches oldport3 %02x newport3 %02x\n", machine().describe_context(), data, oldport3, m_port3_dat);
 
-	if ((oldport3 & 0x80) != (m_port3_dat & 0x80))
+	// high->low transition on bit 0x80 must read into latches!
+	if (negedge(oldport3, m_port3_dat, 7))
 	{
-		if ((m_port3_dat & 0x80) == 0) // high->low transition on bit 0x80 must read into latches!
+		if (!BIT(m_port3_dat, 4))
 		{
-			logerror("latching data from with m_port3_dat as %02x and m_port1_dat as %02x\n", m_port3_dat, m_port1_dat);
-
-			if (m_port3_dat & 0x20)
-			{
-				logerror("latching ics\n");
-				m_port0_latch = m_ics->read(m_port1_dat);
-			}
-			else
-			{
-				logerror("latching command\n");
-				m_port2_latch = (m_xa_cmd & 0xff00) >> 8;
-				m_port0_latch = m_xa_cmd & 0x00ff;
-			}
+			m_port0_latch = m_ics->read(m_port1_dat & 7);
+			logerror("read from ics [%d] = [%02x]\n", m_port1_dat & 7, m_port0_latch);
+		}
+		else if (!BIT(m_port3_dat, 5))
+		{
+			logerror("read command [%d] = [%04x]\n", m_port1_dat & 7, m_xa_cmd);
+			m_port2_latch = (m_xa_cmd & 0xff00) >> 8;
+			m_port0_latch = m_xa_cmd & 0x00ff;
 		}
 	}
 
-	if ((oldport3 & 0x40) != (m_port3_dat & 0x40))
+	if (negedge(oldport3, m_port3_dat, 6))
 	{
-		if ((m_port3_dat & 0x40) == 0) // high->low transition on bit 0x40 must write latch content to devices
+		if (!BIT(m_port3_dat, 4))
 		{
-			if (m_port3_dat & 0x20)
+			logerror("write to ics [%d] = [%02x]\n", m_port1_dat & 7, m_port0_dat);
+			m_ics->write(m_port1_dat & 7, m_port0_dat);
+		}
+		else if (!BIT(m_port3_dat, 5))
+		{
+			uint32_t dat = (m_port2_dat << 8) | m_port0_dat;
+			logerror("write command [%d] = [%04x]\n", m_port1_dat & 7, dat);
+			switch (m_port1_dat & 7)
 			{
-				logerror("sending latch to ics\n");
-				m_ics->write(m_port1_dat, m_port0_dat);
-			}
-			else
-			{
-				logerror("sending latch to unknown\n");
+			case 1:
+				m_xa_ret1 = dat;
+				break;
+			case 2:
+				m_xa_ret0 = dat;
+				break;
 			}
 		}
 	}
@@ -727,26 +752,14 @@ ROM_START( superkds )
 	ROM_LOAD( "superkids_music1.u26", 0x400000, 0x400000, CRC(5f080dbf) SHA1(f02330db3336f6606aae9f5a9eca819701caa3bf) )
 ROM_END
 
-u16 igs_fear_state::xa_wait_r(offs_t offset)
-{
-	if (!machine().side_effects_disabled())
-	{
-		//	logerror("XA reached wait loop\n");
-		//	m_xa->spin_until_interrupt();
-	}
-	return 0xfffe;
-}
-
 void igs_fear_state::init_igs_fear()
 {
 	fearless_decrypt(machine());
-	m_xa->space(AS_PROGRAM).install_read_handler(0x9a0, 0x9a1, read16sm_delegate(*this, FUNC(igs_fear_state::xa_wait_r)));
 }
 
 void igs_fear_state::init_igs_superkds()
 {
 	superkds_decrypt(machine());
-	m_xa->space(AS_PROGRAM).install_read_handler(0x762, 0x763, read16sm_delegate(*this, FUNC(igs_fear_state::xa_wait_r)));
 }
 
 } // anonymous namespace
