@@ -98,12 +98,23 @@ u8 xa_cpu::sfr_WDCON_r()
 	return m_WDCON;
 }
 
+// PSWL  C AC - - - V N Z
+u8 xa_cpu::sfr_PSWL_r()
+{
+	u8 ret = m_PSWL & 0x38;
+	if (get_z_flag()) ret |= 0x01;
+	if (get_n_flag()) ret |= 0x02;
+	if (get_v_flag()) ret |= 0x04;
+	if (get_ac_flag()) ret |= 0x40;
+	if (get_c_flag()) ret |= 0x80;
+	logerror("read %02x from PSWL\n", ret);
+	return ret;
+}
+
 void xa_cpu::sfr_PSWL_w(u8 data)
 {
-	// PSWL  C AC - - - V N Z
 	logerror("write %02x to PSWL\n", data);
 	m_PSWL = data;
-
 	if (data & 0x01) set_z_flag(); else clear_z_flag();
 	if (data & 0x02) set_n_flag(); else clear_n_flag();
 	if (data & 0x04) set_v_flag(); else clear_v_flag();
@@ -111,7 +122,12 @@ void xa_cpu::sfr_PSWL_w(u8 data)
 	if (data & 0x80) set_c_flag(); else clear_c_flag();
 }
 
-
+u8 xa_cpu::sfr_PSWH_r()
+{
+	u8 ret = m_PSWH;
+	logerror("read %02x from PSWH\n", ret);
+	return 0x00;// m_PSWH; // why does returning the value here cause issues?
+}
 
 void xa_cpu::sfr_PSWH_w(u8 data)
 {
@@ -180,8 +196,8 @@ void xa_cpu::data_map(address_map &map)
 
 void xa_cpu::sfr_map(address_map &map)
 {
-	map(0x000, 0x000).w(FUNC(xa_cpu::sfr_PSWL_w));
-	map(0x001, 0x001).w(FUNC(xa_cpu::sfr_PSWH_w));
+	map(0x000, 0x000).rw(FUNC(xa_cpu::sfr_PSWL_r), FUNC(xa_cpu::sfr_PSWL_w));
+	map(0x001, 0x001).rw(FUNC(xa_cpu::sfr_PSWH_r), FUNC(xa_cpu::sfr_PSWH_w));
 	map(0x002, 0x002).w(FUNC(xa_cpu::sfr_PSW51_w));
 
 	//0x003, "SSEL"
@@ -2582,8 +2598,8 @@ void xa_cpu::check_external_irq_level(int level)
 			{
 				logerror("testing irq %d\n", level);
 				int vector = 0x20 + level;
-				push_word_to_system_stack(m_PSWH);
-				push_word_to_system_stack(m_PSWL);
+				push_word_to_system_stack(sfr_PSWH_r());
+				push_word_to_system_stack(sfr_PSWL_r());
 				push_word_to_system_stack(m_pc);
 
 				u16 temppsw = m_program->read_word(vector*4);

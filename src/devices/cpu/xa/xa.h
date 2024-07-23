@@ -179,7 +179,10 @@ private:
 
 	u8 sfr_WDCON_r();
 
+	u8 sfr_PSWL_r();
 	void sfr_PSWL_w(u8 data);
+
+	u8 sfr_PSWH_r();
 	void sfr_PSWH_w(u8 data);
 	void sfr_PSW51_w(u8 data);
 
