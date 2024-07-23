@@ -7655,7 +7655,7 @@ NB: disk geometry makes it likely to have further copy protection checks later o
 		</part>
 	</software>
 
-	<software name="ddasha" supported="no">
+	<software name="ddasha" cloneof="ddash" supported="no">
 		<description>D' (alt)</description>
 		<year>1988</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
@@ -7692,7 +7692,7 @@ NB: disk geometry makes it likely to have further copy protection checks later o
 		</part>
 	</software>
 
-	<software name="ddashb" supported="partial">
+	<software name="ddashb" cloneof="ddash" supported="partial">
 		<description>D' (cracked)</description>
 		<year>1988</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
