@@ -147,7 +147,7 @@ void pgm_arm_type1_state::arm7_type1_shareram_w(offs_t offset, u32 data, u32 mem
 
 u16 pgm_arm_type1_state::unk_r_rf(offs_t offset)
 {
-	return 0xFFFF;
+	return 0xffff;
 }
 
 /* 55857E? */
@@ -192,7 +192,7 @@ void pgm_arm_type1_state::cavepgm_mem(address_map &map)
 void pgm_arm_type1_state::rf1_sim_map(address_map &map)
 {
 	pgm_mem(map);
-	map(0xC00040, 0xC00041).r(FUNC(pgm_arm_type1_state::unk_r_rf));
+	map(0xc00040, 0xc00041).r(FUNC(pgm_arm_type1_state::unk_r_rf));
 }
 
 
