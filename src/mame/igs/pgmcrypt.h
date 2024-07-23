@@ -45,3 +45,6 @@ void mgzz_decrypt(running_machine &machine);
 void mgcs3_decrypt(running_machine &machine);
 void crzybugs_decrypt(running_machine &machine);
 void qlgs_decrypt(running_machine &machine);
+void jking02_decrypt(running_machine &machine);
+void luckycrs_decrypt(running_machine &machine);
+void olympic5_decrypt(running_machine &machine);

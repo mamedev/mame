@@ -71,6 +71,9 @@ public:
 	void init_mgzz();
 	void init_mgcs3();
 	void init_crzybugs();
+	void init_jking02();
+	void init_luckycrs();
+	void init_olympic5();
 	[[maybe_unused]] void init_no_dec();
 
 protected:
@@ -1340,6 +1343,27 @@ void igs_m027_state::init_crzybugs()
 	pgm_create_dummy_internal_arm_region();
 }
 
+void igs_m027_state::init_jking02()
+{
+	jking02_decrypt(machine());
+	//qlgs_gfx_decrypt(machine());
+	pgm_create_dummy_internal_arm_region();
+}
+
+void igs_m027_state::init_luckycrs()
+{
+	luckycrs_decrypt(machine());
+	//qlgs_gfx_decrypt(machine());
+	pgm_create_dummy_internal_arm_region();
+}
+
+void igs_m027_state::init_olympic5()
+{
+	olympic5_decrypt(machine());
+	//qlgs_gfx_decrypt(machine());
+	pgm_create_dummy_internal_arm_region();
+}
+
 } // anonymous namespace
 
 
@@ -1356,11 +1380,11 @@ GAME( 1999, amazonkp,  amazonia, igs_mahjong, amazonia, igs_m027_state, init_ama
 GAME( 1999, fruitpar,  0,        igs_mahjong, sdwx,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_IS_SKELETON )
 GAME( 1999, oceanpar,  0,        igs_mahjong, sdwx,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_IS_SKELETON ) // 1999 copyright in ROM
 GAME( 1999, oceanpara, oceanpar, igs_mahjong, sdwx,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_IS_SKELETON ) // 1999 copyright in ROM
-GAME( 200?, luckycrs,  0,        igs_mahjong, sdwx,     igs_m027_state, init_no_dec,   ROT0, "IGS", "Lucky Cross (V106SA)", MACHINE_IS_SKELETON )
+GAME( 200?, luckycrs,  0,        igs_mahjong, sdwx,     igs_m027_state, init_luckycrs, ROT0, "IGS", "Lucky Cross (V106SA)", MACHINE_IS_SKELETON )
 GAME( 2002, sdwx,      0,        igs_mahjong, sdwx,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
-GAME( 200?, jking02,   0,        igs_mahjong, sdwx,     igs_m027_state, init_no_dec,   ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_IS_SKELETON )
-GAME( 200?, olympic5,  0,        igs_mahjong, sdwx,     igs_m027_state, init_no_dec,   ROT0, "IGS", "Olympic 5 (V112US)", MACHINE_IS_SKELETON )
-GAME( 200?, olympic5a, 0,        igs_mahjong, sdwx,     igs_m027_state, init_no_dec,   ROT0, "IGS", "Olympic 5 (V107US)", MACHINE_IS_SKELETON )
+GAME( 200?, jking02,   0,        igs_mahjong, sdwx,     igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_IS_SKELETON )
+GAME( 2005, olympic5,  0,        igs_mahjong, sdwx,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V112US)", MACHINE_IS_SKELETON ) // IGS FOR V112US 2005 02 14
+GAME( 2003, olympic5a, olympic5, igs_mahjong, sdwx,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V107US)", MACHINE_IS_SKELETON ) // IGS FOR V107US 2003 10 2
 GAME( 2003, amazoni2,  0,        igs_mahjong, sdwx,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_IS_SKELETON )
 GAME( 200?, sddz,      0,        igs_mahjong, sdwx,     igs_m027_state, init_sddz,     ROT0, "IGS", "Super Dou Di Zhu",  MACHINE_IS_SKELETON )
 GAME( 2000, zhongguo,  0,        igs_mahjong, sdwx,     igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhong Guo Chu Da D",  MACHINE_IS_SKELETON )
