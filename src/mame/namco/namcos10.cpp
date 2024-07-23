@@ -3044,6 +3044,7 @@ void namcos10_memio_state::machine_reset()
 void namcos10_memio_state::namcos10_memio_map_inner(address_map &map)
 {
 	map(0xf468000, 0xf468001).w(FUNC(namcos10_memio_state::nand_dataxor_w));
+	// map(0xf478000, 0xf478001).w(); // bit 0 = Triggers solenoid when set. This is used to make the punch pad stand up, triggering the speed sensors along the way
 }
 
 void namcos10_memio_state::namcos10_memio_map(address_map &map)
@@ -3457,20 +3458,29 @@ static INPUT_PORTS_START( ippo2 )
 	PORT_INCLUDE(namcos10)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x1ff33f61, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SELECT )
+	PORT_BIT( 0x07ff0f61, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	// TODO: These sensors must match what the game is expecting based on when it's trying to raise the punch pad or else it will throw a speed error
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Speed Sensor Down")
 	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Speed Sensor Mid")
 	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Speed Sensor Up")
 
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Human Sensor 1")
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Human Sensor 2")
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Human Sensor 3")
-
+	// If the safety sensor is still triggered when the speed sensor is at the mid or up position then the game
+	// pauses and displays an message saying that something obstructing the safety sensor
 	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Safety Sensor")
+
+	// If none of the following sensors are set then the game pauses and tells the player to step closer to the machine
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Human Sensor 1")
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Human Sensor 2")
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Human Sensor 3")
+
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SELECT )
+
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_TILT )
+
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+
 INPUT_PORTS_END
 
 // MEM(M)
@@ -4096,6 +4106,19 @@ ROM_START( ippo2 )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
+	/*
+	Verified against real hardware using the "MEM(N) DATA CHECK SUM DISP" in-game checksum tool which can be accessed
+	by holding Speed Sensor Up (punch pad held in upright position) + Start + Select while the game is booting.
+	NOTE: Human sensors must also not be triggered (must be showing OFF in I/O test) for this to work.
+
+	Real hardware checksums:
+	DATA BLOCK0: CA17B6CD
+	DATA BLOCK1: 2D1A56F7
+	DATA BLOCK2: 064F8287
+	DATA BLOCK3: F3416DB4
+	DATA BLOCK4: 7521CB55
+	DATA BLOCK5: 306E5EE6
+	*/
 	ROM_REGION32_LE( 0x2100000, "nand0", 0 )
 	ROM_LOAD( "tc58256aft.ic4", 0x0000000, 0x2100000, CRC(1fdb4a2d) SHA1(0712f8256330098a6ad0b5c3d5d99f771c19669c) )
 
