@@ -126,7 +126,7 @@ u8 xa_cpu::sfr_PSWH_r()
 {
 	u8 ret = m_PSWH;
 	logerror("read %02x from PSWH\n", ret);
-	return 0x00;// m_PSWH; // why does returning the value here cause issues?
+	return m_PSWH;
 }
 
 void xa_cpu::sfr_PSWH_w(u8 data)
@@ -2565,8 +2565,6 @@ void xa_cpu::device_reset()
 	{
 		m_regs[i] = 0x0000;
 	}
-
-	m_usermode = true;
 
 	m_nflag = 0;
 	m_zflag = 0;

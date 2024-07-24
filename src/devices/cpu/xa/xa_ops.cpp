@@ -378,7 +378,7 @@ void xa_cpu::add_byte_indrd_data8(u8 rd, u8 data8) { fatalerror( "ADD.b [%s], #$
 void xa_cpu::addc_byte_indrd_data8(u8 rd, u8 data8){ fatalerror( "ADDC.b [%s], #$%02x ([RD], DATA8)", m_regnames16[rd], data8 ); }
 void xa_cpu::sub_byte_indrd_data8(u8 rd, u8 data8) { fatalerror( "SUB.b [%s], #$%02x ([RD], DATA8)", m_regnames16[rd], data8 ); }
 void xa_cpu::subb_byte_indrd_data8(u8 rd, u8 data8){ fatalerror( "SUBB.b [%s], #$%02x ([RD], DATA8)", m_regnames16[rd], data8 ); }
-void xa_cpu::cmp_byte_indrd_data8(u8 rd, u8 data8) { fatalerror( "CMP.b [%s], #$%02x ([RD], DATA8)", m_regnames16[rd], data8 ); }
+void xa_cpu::cmp_byte_indrd_data8(u8 rd, u8 data8) { u16 address = get_addr(rd); u8 rdval = rdat8(address); do_sub_8(rdval, data8); cy(3); }
 void xa_cpu::and_byte_indrd_data8(u8 rd, u8 data8) { u16 address = get_addr(rd); u8 rdval = rdat8(address); u8 result = do_and_8(rdval, data8); wdat8(address, result); cy(3); }
 void xa_cpu::or_byte_indrd_data8(u8 rd, u8 data8)  { fatalerror( "OR.b [%s], #$%02x ([RD], DATA8)", m_regnames16[rd], data8 ); }
 void xa_cpu::xor_byte_indrd_data8(u8 rd, u8 data8) { fatalerror( "XOR.b [%s], #$%02x ([RD], DATA8)", m_regnames16[rd], data8 ); }
@@ -1570,7 +1570,7 @@ void xa_cpu::lsr_dword_rd_imm5(u8 rd, u8 amount) { u32 fullreg = gr32(rd); fullr
 //ASL Rd, Rs                  Logical left shift dest reg by the value in the src reg                 2 a*        1100 SS01  dddd ssss
 void xa_cpu::asl_byte_rd_rs(u8 rd, u8 rs) { fatalerror("ASL.b %s, %d", m_regnames8[rd], m_regnames8[rs]); }
 void xa_cpu::asl_word_rd_rs(u8 rd, u8 rs) { fatalerror("ASL.w %s, %d", m_regnames16[rd], m_regnames8[rs]); }
-void xa_cpu::asl_dword_rd_rs(u8 rd, u8 rs) { fatalerror("ASL.dw %s, %d", m_regnames16[rd], m_regnames8[rs]); }
+void xa_cpu::asl_dword_rd_rs(u8 rd, u8 rs) { u32 fullreg = gr32(rd); u8 amount = gr8(rs); fullreg = lsr32_helper(fullreg, amount); sr32(rd, fullreg); cy(7); }
 
 // ASR Rd, Rs                  Arithmetic shift right dest reg by the count in the src                 2 a*        1100 SS10  dddd ssss
 void xa_cpu::asr_byte_rd_rs(u8 rd, u8 rs) { fatalerror("ASR.b %s, %d", m_regnames8[rd], m_regnames8[rs]); }
@@ -1860,8 +1860,8 @@ void xa_cpu::reti()
 		m_pc = pull_word_from_system_stack();
 		m_PSWL = pull_word_from_system_stack();
 		m_PSWH = pull_word_from_system_stack();
-		// could be wrong, but superkids enable SM bit in main function?
-		m_usermode = true;
+		sfr_PSWL_w(m_PSWL);
+		sfr_PSWH_w(m_PSWH);
 		cy(8);
 		m_in_interrupt = 0;
 
