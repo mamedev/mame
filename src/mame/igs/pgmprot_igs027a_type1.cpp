@@ -280,7 +280,7 @@ void pgm_arm_type1_state::init_kovsh()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(*this, FUNC(pgm_arm_type1_state::kovsh_fake_region_r)));
 }
 
-void pgm_arm_type1_state::init_rf1()
+void pgm_arm_type1_state::init_rf()
 {
 	pgm_basic_init(false);
 }

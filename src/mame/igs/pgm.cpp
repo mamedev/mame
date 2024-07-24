@@ -5398,7 +5398,7 @@ ROM_END
 
 /*
 
-Rock Fever 1
+Rock Fever
 IGS, 1999
 
 PCB Layout
@@ -5455,7 +5455,7 @@ Notes:
       MAS3607D     - MAS 3507D MPEG 1/2 Layer 2/3 Audio Decoder (PMQFP44)
       MAX23C3210   - Unpopulated
 	  J1/2/3       - Connectors for the ROM Board (Top)
-	  JP10/9/8/4   - IO
+	  JP10/9/8/4   - Connectors for IO/Lighting
 
 
 IGS PCB NO-0274 (ROM Board, Top)
@@ -5496,48 +5496,48 @@ IGS PCB NO-0274 (ROM Board, Top)
 |-------------------------------------------------------------------------------------|
 Notes:
 	  I am not sure what the size of these ROM chips are.
-	  They appear to be similar to other PGM-based games.
+	  They are all SOP44 chips, and appear to be similar to other PGM-based games.
 */
-ROM_START( rf1 )
+ROM_START( rf )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE ( "rf1_sys_h.u32", 0x00000, 0x80000, CRC(e5e1e5f9) SHA1(1e8e4b7e53fcab68d14f36f9c8d85047f308bc93) )
-	ROM_LOAD16_BYTE ( "rf1_sys_l.u31", 0x00001, 0x80000, CRC(ee2c3817) SHA1(490e879f347ac38feaad80666d28fac9e2154188) )
+	ROM_LOAD16_BYTE ( "rf_sys_h.u32", 0x00000, 0x80000, CRC(e5e1e5f9) SHA1(1e8e4b7e53fcab68d14f36f9c8d85047f308bc93) )
+	ROM_LOAD16_BYTE ( "rf_sys_l.u31", 0x00001, 0x80000, CRC(ee2c3817) SHA1(490e879f347ac38feaad80666d28fac9e2154188) )
 
 	ROM_REGION( 0x4000, "prot", ROMREGION_ERASE00 ) /* ARM protection ASIC - internal rom */
-	// ROM_LOAD( "rf1_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+	ROM_LOAD( "rf_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "tiles", ROMREGION_ERASE00 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
-	// ROM_LOAD( "rf1_t2801.u26",     0x0000000, 0x0800000, NO_DUMP )
+	ROM_LOAD( "rf_t2801.u26",     0x0000000, 0x0800000, NO_DUMP )
 
 	ROM_REGION16_LE( 0x2000000, "sprcol", ROMREGION_ERASE00 ) /* Sprite Colour Data */
-	// ROM_LOAD( "rf1_a2801.u6",     0x0000000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "rf1_a2802.u7",     0x0800000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "rf1_a2803.u8",     0x1000000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "rf1_a2804.u9",     0x1800000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "rf1_a2805.u16",    0x2000000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "rf1_a2806.u17",    0x2800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_a2801.u6",     0x0000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_a2802.u7",     0x0800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_a2803.u8",     0x1000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_a2804.u9",     0x1800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_a2805.u16",    0x2000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_a2806.u17",    0x2800000, 0x0800000, NO_DUMP )
 
 	ROM_REGION16_LE( 0x1000000, "sprmask", ROMREGION_ERASE00 ) /* Sprite Masks + Colour Indexes */
-	// ROM_LOAD( "rf1_b2801.u35",     0x0000000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "rf1_b2802.u36",     0x0800000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "rf1_b2803.u37",     0x1000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_b2801.u35",     0x0000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_b2802.u36",     0x0800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_b2803.u37",     0x1000000, 0x0800000, NO_DUMP )
 
 	ROM_REGION( 0x1000000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
-	// ROM_LOAD( "rf1_w2801.u21",     0x0800000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "rf1_w2802.u2",      0x1000000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "rf1_w2803.u3",      0x1800000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "rf1_w2804.u4",      0x2000000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "rf1_w2805.u5",      0x2800000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "rf1_w2806.u11",     0x3000000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "rf1_w2807.u12",     0x3800000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "rf1_w2808.u13",     0x4000000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "rf1_w2809.u14",     0x4800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_w2801.u21",     0x0800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_w2802.u2",      0x1000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_w2803.u3",      0x1800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_w2804.u4",      0x2000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_w2805.u5",      0x2800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_w2806.u11",     0x3000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_w2807.u12",     0x3800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_w2808.u13",     0x4000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_w2809.u14",     0x4800000, 0x0800000, NO_DUMP )
 
 	ROM_REGION ( 0x2000000, "mp3", ROMREGION_ERASE00 ) // MP3 Data
-	// ROM_LOAD( "pgm_m2801.u22",     0x0000000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "pgm_m2802.u23",     0x0800000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "pgm_m2803.u24",     0x1000000, 0x0800000, NO_DUMP )
-	// ROM_LOAD( "pgm_m2804.u25",     0x1800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_m2801.u22",     0x0000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_m2802.u23",     0x0800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_m2803.u24",     0x1000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf_m2804.u25",     0x1800000, 0x0800000, NO_DUMP )
 ROM_END
 
 /*** Init Stuff **************************************************************/
@@ -5865,5 +5865,5 @@ GAME( 200?, kovlsqh2,     kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_
 GAME( 200?, kovlsjb,      kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 200?, kovlsjba,     kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-// Rock Fever 1
-GAME ( 1999, rf1, pgm, pgm_arm_type1_rf, pgm, pgm_arm_type1_state, init_rf1, ROT0, "IGS", "Rock Fever 1", MACHINE_IS_SKELETON ) /* need internal rom of IGS027A */
+// Rock Fever
+GAME( 1999, rf, 		  pgm,		 pgm_arm_type1_rf, 		 pgm, 		pgm_arm_type1_state, init_rf, 		ROT0, 	"IGS", 	   "Rock Fever", MACHINE_IS_SKELETON )
