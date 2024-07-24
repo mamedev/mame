@@ -57,7 +57,7 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	u32 igs027_gpio_r(offs_t offset);
+	u32 igs027_gpio_r(offs_t offset, u32 mem_mask);
 	void igs027_gpio_w(offs_t offset, u32 data, u32 mem_mask);
 
 	TIMER_CALLBACK_MEMBER(igs027_timer0);
@@ -65,10 +65,10 @@ private:
 
 	void igs027_periph_init(void);
 	void igs027_trigger_irq(int num);
-	u32 igs027_periph_r(offs_t offset);
+	u32 igs027_periph_r(offs_t offset, u32 mem_mask);
 	void igs027_periph_w(offs_t offset, u32 data, u32 mem_mask);
 
-	u32 xa_r(offs_t offset);
+	u32 xa_r(offs_t offset, u32 mem_mask);
 	void xa_w(offs_t offset, u32 data, u32 mem_mask);
 	void cpld_w(offs_t offset, u32 data, u32 mem_mask);
 
@@ -305,11 +305,11 @@ INPUT_PORTS_START( superkds )
 	PORT_INCLUDE ( fear )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, "Scene" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x01, "Scene" ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "Volcano" )
 	PORT_DIPSETTING(    0x02, "Jungle" )
 	PORT_DIPSETTING(    0x01, "Ice Field" )
-	PORT_DIPSETTING(    0x00, "Ice Field" )
+	PORT_DIPSETTING(    0x00, "Ice Field (duplicate)" )
 	PORT_DIPNAME( 0x04, 0x00, "Ticket" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -348,7 +348,7 @@ INPUT_PORTS_START( superkds )
 	PORT_DIPSETTING(    0x00, "Table32" )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "Free Play" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x01, "Free Play" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x06, 0x06, "Coin/Credit" ) PORT_DIPLOCATION("SW2:2,3")
@@ -386,7 +386,7 @@ void igs_fear_state::vblank_irq(int state)
 		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 }
 
-u32 igs_fear_state::igs027_gpio_r(offs_t offset)
+u32 igs_fear_state::igs027_gpio_r(offs_t offset, u32 mem_mask)
 {
 	u32 data = ~u32(0);
 	switch (offset * 4)
@@ -399,7 +399,12 @@ u32 igs_fear_state::igs027_gpio_r(offs_t offset)
 			data = 0x2000 | (u32(ret) << 3);
 		}
 		break;
+
+	default:
+		logerror("%s: unhandled igs027_gpio_r %04x (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
+		break;
 	}
+
 	return data;
 }
 
@@ -409,6 +414,10 @@ void igs_fear_state::igs027_gpio_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 	case 0x18:
 		m_gpio_o = data;
+		break;
+
+	default:
+		logerror("%s: unhandled igs027_gpio_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
 		break;
 	}
 }
@@ -456,10 +465,14 @@ void igs_fear_state::igs027_periph_w(offs_t offset, u32 data, u32 mem_mask)
 	case 0x200:
 		m_irq_enable = data;
 		break;
+
+	default:
+		logerror("%s: unhandled igs027_periph_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+		break;
 	}
 }
 
-u32 igs_fear_state::igs027_periph_r(offs_t offset)
+u32 igs_fear_state::igs027_periph_r(offs_t offset, u32 mem_mask)
 {
 	u32 data = ~u32(0);
 	switch (offset * 4)
@@ -468,12 +481,17 @@ u32 igs_fear_state::igs027_periph_r(offs_t offset)
 		data = m_irq_pending;
 		m_irq_pending = 0xff;
 		break;
+
+	default:
+		logerror("%s: unhandled igs027_periph_r %04x (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
+		break;
+
 	}
 	return data;
 }
 
-// TODO: ICS2115 & trackball support in XA
-u32 igs_fear_state::xa_r(offs_t offset)
+// TODO: trackball support in XA
+u32 igs_fear_state::xa_r(offs_t offset, u32 mem_mask)
 {
 	u32 data = ~u32(0);
 
@@ -482,7 +500,7 @@ u32 igs_fear_state::xa_r(offs_t offset)
 	case 0:
 	{
 		data = m_xa_ret0;
-		// TODO: This should be remove if we implement serial trackball support in XA
+		// TODO: This should be remove when we implement serial trackball support in XA
 		if (m_xa_cmd == 0xa301)
 		{
 			switch (m_trackball_cnt++)
@@ -546,7 +564,7 @@ void igs_fear_state::xa_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 	else
 	{
-		fatalerror("xa write %04x is %08x\n", offset, data);
+		logerror("%s: unhandled xa_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
 	}
 }
 
@@ -556,6 +574,10 @@ void igs_fear_state::cpld_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 	case 0x8:
 		m_ticket->motor_w(BIT(data, 7));
+		break;
+
+	default:
+		logerror("%s: unhandled cpld_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
 		break;
 	}
 }
@@ -608,7 +630,6 @@ void igs_fear_state::mcu_p1_w(uint8_t data)
 	logerror("%s: mcu_p1_w() %02x\n", machine().describe_context(), data);
 	m_port1_dat = data;
 
-	// this is might be wrong but the XA must trigger this irq when it's finished processing, so it's likely tied to one of the port bits
 	if (posedge(olddata, m_port1_dat, 3))
 	{
 		igs027_trigger_irq(3);
