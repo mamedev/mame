@@ -38,6 +38,7 @@ public:
 	void igs_fear(machine_config &config);
 
 	void init_igs_fear();
+	void init_igs_icescape();
 	void init_igs_superkds();
 
 protected:
@@ -542,6 +543,29 @@ ROM_START( superkds )
 	ROM_LOAD( "superkids_music1.u26", 0x400000, 0x400000, CRC(5f080dbf) SHA1(f02330db3336f6606aae9f5a9eca819701caa3bf) )
 ROM_END
 
+ROM_START( icescape ) // IGS PCB-0433-16-GK (same PCB as Fearless Pinocchio) - Has IGS027A, MX10EXAQC, 2x Actel A54SX32A, ICS2115, 2x 8-DIP banks
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "a7.bin", 0x00000, 0x4000, NO_DUMP ) // sticker marked 'A7', unreadable location
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "icescape_v-104fa.u37", 0x000000, 0x80000, CRC(e3552726) SHA1(bac34ac4fce1519c1bc8020064090e77b5c2a629) ) // TMS27C240
+
+	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU) marked O7
+	ROM_LOAD( "o7.u33", 0x00000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x2000000, "gfx1", 0 ) // FIXED BITS (0xxxxxxx) (graphics are 7bpp)
+	ROM_LOAD32_WORD( "icescape_fa_cg_u7.u7",   0x0000000, 0x800000, NO_DUMP )
+	ROM_LOAD32_WORD( "icescape_fa_cg_u6.u6",   0x0000002, 0x800000, NO_DUMP )
+	ROM_LOAD32_WORD( "icescape_fa_cg_u14.u14", 0x1000000, 0x800000, NO_DUMP )
+	ROM_LOAD32_WORD( "icescape_fa_cg_u13.u13", 0x1000002, 0x800000, NO_DUMP )
+	// u17 and u18 not populated
+
+	ROM_REGION( 0x400000, "ics", 0 )
+	ROM_LOAD( "icescape_fa_sp_u25.u25", 0x000000, 0x200000, CRC(a01febd6) SHA1(6abe8b700c5725909939421e2493940421fc823f) ) // M27C160
+	ROM_LOAD( "icescape_fa_sp_u26.u26", 0x200000, 0x200000, CRC(35085613) SHA1(bdc6ecf5ee6fd095a56e33e8ce893fe05bcb426c) ) // M27C160
+ROM_END
+
 void igs_fear_state::init_igs_fear()
 {
 	fearless_decrypt(machine());
@@ -552,7 +576,13 @@ void igs_fear_state::init_igs_superkds()
 	superkds_decrypt(machine());
 }
 
+void igs_fear_state::init_igs_icescape()
+{
+	icescape_decrypt(machine());
+}
+
 } // anonymous namespace
 
 GAME( 2005, superkds, 0, igs_fear, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS", "Super Kids (S019CN)",           MACHINE_IS_SKELETON )
 GAME( 2006, fearless, 0, igs_fear, fear,     igs_fear_state, init_igs_fear,     ROT0, "IGS", "Fearless Pinocchio (V101US)",   MACHINE_IS_SKELETON )
+GAME( 2006, icescape, 0, igs_fear, fear,     igs_fear_state, init_igs_icescape, ROT0, "IGS", "Icescape (V104FA)",             MACHINE_IS_SKELETON ) // IGS FOR V104FA 2006-11-02
