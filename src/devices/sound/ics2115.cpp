@@ -533,6 +533,14 @@ u16 ics2115_device::reg_read()
 	{
 		case 0x00: // [osc] Oscillator Configuration
 			ret = voice.osc_conf.value;
+			if (voice.state.on)
+			{
+				ret |= 8;
+			}
+			else
+			{
+				ret &= ~8;
+			}
 			ret <<= 8;
 			break;
 
@@ -1078,7 +1086,7 @@ void ics2115_device::recalc_irq()
 	//Suspect
 	bool irq = (m_irq_pending & m_irq_enabled);
 	for (int i = 0; (!irq) && (i < 32); i++)
-		irq |= m_voice[i].vol_ctrl.bitflags.irq_pending && m_voice[i].osc_conf.bitflags.irq_pending;
+		irq |= m_voice[i].vol_ctrl.bitflags.irq_pending || m_voice[i].osc_conf.bitflags.irq_pending;
 	m_irq_on = irq;
 	m_irq_cb(irq ? ASSERT_LINE : CLEAR_LINE);
 }
