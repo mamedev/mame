@@ -9,8 +9,6 @@
 #include "machine/i8251.h"
 #include "sound/mpeg_audio.h"
 
-#define DSBZ80_TAG "dsbz80"
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -23,9 +21,6 @@ public:
 
 	// configuration
 	auto rxd_handler() { return m_rxd_handler.bind(); }
-
-	required_device<cpu_device> m_ourcpu;
-	required_device<i8251_device> m_uart;
 
 	void write_txd(int state);
 
@@ -40,10 +35,14 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	mpeg_audio *decoder;
-	int16_t audio_buf[1152*2];
-	uint32_t mp_start, mp_end, mp_vol, mp_pan, mp_state, lp_start, lp_end, start, end;
-	int mp_pos, audio_pos, audio_avail;
+	required_device<cpu_device> m_ourcpu;
+	required_device<i8251_device> m_uart;
+	required_region_ptr<uint8_t> m_mpeg_rom;
+
+	mpeg_audio *m_decoder;
+	int16_t m_audio_buf[1152*2];
+	uint32_t m_mp_start, m_mp_end, m_mp_vol, m_mp_pan, m_mp_state, m_lp_start, m_lp_end, m_start, m_end;
+	int32_t m_mp_pos, m_audio_pos, m_audio_avail;
 
 	devcb_write_line   m_rxd_handler;
 
