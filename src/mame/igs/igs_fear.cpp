@@ -376,8 +376,8 @@ INPUT_PORTS_END
 void igs_fear_state::sound_irq(int state)
 {
 	logerror("sound irq\n");
-
-	m_xa->set_input_line(XA_EXT_IRQ2, ASSERT_LINE);
+	if (state)
+		m_xa->set_input_line(XA_EXT_IRQ2, ASSERT_LINE);
 }
 
 void igs_fear_state::vblank_irq(int state)
@@ -446,11 +446,11 @@ void igs_fear_state::igs027_periph_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 	case 0x100:
 		// TODO: verify the timer interval
-		m_timer0->adjust(attotime::from_hz(data), 0, attotime::from_hz(data));
+		m_timer0->adjust(attotime::from_hz(data / 2), 0, attotime::from_hz(data / 2));
 		break;
 
 	case 0x104:
-		m_timer1->adjust(attotime::from_hz(data), 0, attotime::from_hz(data));
+		m_timer1->adjust(attotime::from_hz(data / 2), 0, attotime::from_hz(data / 2));
 		break;
 
 	case 0x200:
@@ -685,7 +685,7 @@ void igs_fear_state::igs_fear(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(30);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
