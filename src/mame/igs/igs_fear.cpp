@@ -100,7 +100,6 @@ private:
 	u8 m_port2_dat;
 	u8 m_port3_dat;
 
-
 	int m_trackball_cnt;
 	int m_trackball_axis[2], m_trackball_axis_pre[2], m_trackball_axis_diff[2];
 
@@ -785,5 +784,5 @@ void igs_fear_state::init_igs_superkds()
 
 } // anonymous namespace
 
-GAME( 2005, superkds, 0, igs_fear, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS", "Super Kids (S019CN)",           MACHINE_IS_SKELETON )
-GAME( 2006, fearless, 0, igs_fear, fear,     igs_fear_state, init_igs_fear,     ROT0, "IGS", "Fearless Pinocchio (V101US)",   MACHINE_IS_SKELETON )
+GAME( 2005, superkds, 0, igs_fear, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS", "Super Kids (S019CN)",           0 )
+GAME( 2006, fearless, 0, igs_fear, fear,     igs_fear_state, init_igs_fear,     ROT0, "IGS", "Fearless Pinocchio (V101US)",   0 )
