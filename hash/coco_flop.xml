@@ -424,6 +424,7 @@ license:CC0-1.0
 		<description>Rainbow on Disk 1988-02 issue</description>
 		<year>1988</year>
 		<publisher>Falsoft</publisher>
+                <info name="usage" value="RUN&quot;MENU&quot;" />
 		<sharedfeat name="compatibility" value="COCO,COCO3" />
 		<!-- This disk has a specially partitioned Side B with both Disk Basic and
 		OS9 filesystems. Writing to Side B will damage it. -->
@@ -1798,6 +1799,7 @@ license:CC0-1.0
 		<description>CoCo Max III (Version 3.0)</description>
 		<year>1987</year>
 		<publisher>Colorware</publisher>
+                <info name="usage" value="RUN&quot;CM3&quot;" />
 		<sharedfeat name="compatibility" value="COCO3" />
 
 		<part name="flop0" interface="floppy_5_25">
@@ -1866,6 +1868,7 @@ license:CC0-1.0
 		<description>CoCo Max III (Version 3.1)</description>
 		<year>1987</year>
 		<publisher>Colorware</publisher>
+                <info name="usage" value="RUN&quot;CM3&quot;" />
 		<sharedfeat name="compatibility" value="COCO3" />
 
 		<part name="flop0" interface="floppy_5_25">
@@ -1956,6 +1959,170 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- disk images downloaded from the Color Computer Archive (colorcomputerarchive.com) -->
+
+        <software name="rnbadv1">
+                <description>Rainbow Book of Adventures</description>
+		<year>1983</year>
+                <publisher>Falsoft</publisher>
+                <info name="usage" value="RUN&quot;MENU&quot;" />
+                <sharedfeat name="compatibility" value="COCO,COCO3" />
+                <part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Disk a"/>
+                        <dataarea name="flop" size="161280">
+                                <rom name="RNBADV1a.dsk" size="161280" crc="0daaf724" sha1="64a96c2c4e0f5bf7fab2efd9abc17894ef181f54" />
+                        </dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk b"/>
+                        <dataarea name="flop" size="161280">
+                                <rom name="RNBADV1b.dsk" size="161280" crc="32e758e4" sha1="bbe64bcb6addeb7e7c8a50d49e94b86deb7af3a7" />
+                        </dataarea>
+                </part>
+        </software>
+
+        <software name="rnbadv2">
+                <description>Second Rainbow Book of Adventures</description>
+		<year>1985</year>
+                <publisher>Falsoft</publisher>
+                <info name="usage" value="RUN&quot;MENU&quot;" />
+                <sharedfeat name="compatibility" value="COCO,COCO3" />
+                <part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Disk a"/>
+                        <dataarea name="flop" size="161280">
+                                <rom name="RNBADV2a.dsk" size="161280" crc="6f2ac8a1" sha1="67ad8b5b0d45eeedfe90ada89961b257834d936d" />
+                        </dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk b"/>
+                        <dataarea name="flop" size="161280">
+                                <rom name="RNBADV2b.dsk" size="161280" crc="9fd16201" sha1="769f3cc8869f4694aa263d06d4c9eded5f988dea" />
+                        </dataarea>
+                </part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk c"/>
+                        <dataarea name="flop" size="161280">
+                                <rom name="RNBADV2c.dsk" size="161280" crc="e3aa5709" sha1="9d1db62a3754545971c9e3c962cee499072796be" />
+                        </dataarea>
+                </part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk d"/>
+                        <dataarea name="flop" size="161280">
+                                <rom name="RNBADV2d.dsk" size="161280" crc="abe7f556" sha1="2fba576df9074576f3b01a76dc41e2583cec0bea" />
+                        </dataarea>
+                </part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk e"/>
+                        <dataarea name="flop" size="161280">
+                                <rom name="RNBADV2e.dsk" size="161280" crc="87528a51" sha1="750ae97bf51be80e7e7846f6e28ae96a4874a52e" />
+                        </dataarea>
+                </part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk f"/>
+                        <dataarea name="flop" size="161280">
+                                <rom name="RNBADV2f.dsk" size="161280" crc="5234737e" sha1="2410fc9e76974d83ee47b117fd3068f9b764c101" />
+                        </dataarea>
+                </part>
+        </software>
+
+        <software name="cocozone">
+                <description>Coco Zone (The Rainbow)</description>
+		<year>1986</year>
+                <publisher>Falsoft</publisher>
+                <info name="author" value="Bruce K. Bell, O.D." />
+                <info name="usage" value="RUN&quot;COCOBOOT&quot;" />
+                <sharedfeat name="compatibility" value="COCO,COCO3" />
+                <part name="flop0" interface="floppy_5_25">
+                        <dataarea name="flop" size="161280">
+                                <rom name="cocozone.dsk" size="161280" crc="34000da5" sha1="d953e3f13da1d52000e5adad1364230824e0602b" />
+                        </dataarea>
+                </part>
+        </software>
+
+        <software name="grover">
+                <description>Grover's Number Rover (CCW)</description>
+		<year>1983</year>
+                <publisher>Children's Television Workshop</publisher>
+		<info name="developer" value="Children's Computer Workshop" />
+                <info name="usage" value="LOADM&quot;GROVER&quot;:EXEC" />
+                <sharedfeat name="compatibility" value="COCO,COCO3" />
+                <part name="flop0" interface="floppy_5_25">
+                        <dataarea name="flop" size="161280">
+                                <rom name="GROVER.DSK" size="161280" crc="d8ebe725" sha1="22957bb800de0e677d51f1323e567d71e724ac1c" />
+                        </dataarea>
+                </part>
+        </software>
+
+        <software name="lansford">
+                <description>Lansford Mansion [cracked]</description>
+		<year>1987</year>
+                <publisher>Diecom Products</publisher>
+                <info name="author" value="Steve Hartford" />
+                <info name="usage" value="LOADM&quot;LANSFORD&quot;:EXEC" />
+                <sharedfeat name="compatibility" value="COCO,COCO3" />
+                <part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Program disk"/>
+                        <dataarea name="flop" size="161280">
+                                <rom name="MANSION1.DSK" size="161280" crc="5eeeed50" sha1="44f2321d3bd6b2855530b0c26fb209b1c4aafcf7" />
+                        </dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Picture disk"/>
+                        <dataarea name="flop" size="161280">
+                                <rom name="MANSION2.DSK" size="161280" crc="72ccfd1a" sha1="7656e5a863b52c6c662906a6dd3b30d5f02bf4a3" />
+                        </dataarea>
+                </part>
+        </software>
+
+        <software name="ralpha2">
+                <description>Rescue on Alpha II (The Rainbow)</description>
+		<year>1984</year>
+                <publisher>Falsoft</publisher>
+                <info name="author" value="Stephen C. Mitchell" />
+                <info name="usage" value="RUN&quot;ALPHAII&quot;" />
+                <sharedfeat name="compatibility" value="COCO,COCO3" />
+                <part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Program disk"/>
+                        <dataarea name="flop" size="161280">
+                                <rom name="ALPHAII.DSK" size="161280" crc="e5adcfd3" sha1="9028081494111cf73117d64f6b973a3ccfae1f3f" />
+                        </dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program disk (alt: orig magazine listing)"/>
+                        <dataarea name="flop" size="161280">
+                                <rom name="RESCUE.DSK" size="161280" crc="f4ae8951" sha1="f8b29cee35ead14aeae86cf33e4a3e158525fae0" />
+                        </dataarea>
+                </part>
+        </software>
+
+        <software name="ssleuth">
+                <description>Sam Sleuth (Computerware)</description>
+		<year>1984</year>
+                <publisher>Computerware</publisher>
+                <info name="author" value="Steve Hartford" />
+                <info name="usage" value="LOADM&quot;SLUTHIGH&quot;:EXEC:LOADM&quot;SLUTHLOW&quot;:EXEC &amp;H073F" />
+                <sharedfeat name="compatibility" value="COCO,COCO3" />
+                <part name="flop0" interface="floppy_5_25">
+                        <dataarea name="flop" size="161280">
+                                <rom name="Sam Sleuth.dsk" size="161280" crc="54725d9c" sha1="7342046d34601f95ae32c85cb44a8a88f2582a47" />
+                        </dataarea>
+                </part>
+        </software>
+
+        <software name="zaxxon">
+                <description>Zaxxon (Datasoft)</description>
+		<year>1983</year>
+                <publisher>Datasoft</publisher>
+                <info name="author" value="Steve Bjork" />
+                <info name="usage" value="LOADM&quot;ZAXXON&quot;:EXEC" />
+                <sharedfeat name="compatibility" value="COCO,COCO3" />
+                <part name="flop0" interface="floppy_5_25">
+                        <dataarea name="flop" size="161280">
+                                <rom name="ZAXXON.DSK" size="161280" crc="1cebe7e3" sha1="c0822405cc68df8c3f450b778857d2fb857ff448" />
+                        </dataarea>
+                </part>
+        </software>
 
 	<software name="zonx">
 		<description>Zonx (The Rainbow)</description>
