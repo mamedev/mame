@@ -232,4 +232,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, miniscco, miniscc, 0,      msc,     msc,   msc_state, empty_init, "Fidelity Electronics", "Mini Sensory Chess Challenger (1981 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, miniscco, miniscc, 0,      msc,     msc,   msc_state, empty_init, "Fidelity Electronics", "Mini Sensory Chess Challenger (Z8 version)", MACHINE_SUPPORTS_SAVE )

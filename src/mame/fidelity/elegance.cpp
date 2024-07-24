@@ -46,17 +46,17 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_as12.lh"
+#include "fidel_elegance.lh"
 
 
 namespace {
 
 // note: sub-class of fidel_clockdiv_state (see clockdiv.*)
 
-class as12_state : public fidel_clockdiv_state
+class elegance_state : public fidel_clockdiv_state
 {
 public:
-	as12_state(const machine_config &mconfig, device_type type, const char *tag) :
+	elegance_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidel_clockdiv_state(mconfig, type, tag),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
@@ -93,7 +93,7 @@ private:
 	u8 input_r(offs_t offset);
 };
 
-void as12_state::machine_start()
+void elegance_state::machine_start()
 {
 	fidel_clockdiv_state::machine_start();
 
@@ -102,7 +102,7 @@ void as12_state::machine_start()
 	save_item(NAME(m_led_data));
 }
 
-INPUT_CHANGED_MEMBER(as12_state::change_cpu_freq)
+INPUT_CHANGED_MEMBER(elegance_state::change_cpu_freq)
 {
 	// known official CPU speeds: 3MHz, 3.57MHz, 4MHz
 	static const XTAL xtal[3] = { 3_MHz_XTAL, 3.579545_MHz_XTAL, 4_MHz_XTAL };
@@ -115,13 +115,13 @@ INPUT_CHANGED_MEMBER(as12_state::change_cpu_freq)
     I/O
 *******************************************************************************/
 
-void as12_state::update_display()
+void elegance_state::update_display()
 {
 	// 8*8(+1) chessboard leds
 	m_display->matrix(m_inp_mux, m_led_data);
 }
 
-void as12_state::control_w(u8 data)
+void elegance_state::control_w(u8 data)
 {
 	// d0-d3: 74245 P0-P3
 	// 74245 Q0-Q8: input mux, led select
@@ -136,14 +136,14 @@ void as12_state::control_w(u8 data)
 	// d6,d7: N/C?
 }
 
-void as12_state::led_w(offs_t offset, u8 data)
+void elegance_state::led_w(offs_t offset, u8 data)
 {
 	// a0-a2,d0: led data via NE591N
 	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
 	update_display();
 }
 
-u8 as12_state::input_r(offs_t offset)
+u8 elegance_state::input_r(offs_t offset)
 {
 	u8 data = 0;
 
@@ -167,16 +167,16 @@ u8 as12_state::input_r(offs_t offset)
     Address Maps
 *******************************************************************************/
 
-void as12_state::main_map(address_map &map)
+void elegance_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x0800, 0x0fff).ram();
-	map(0x1800, 0x1807).w(FUNC(as12_state::led_w)).nopr();
+	map(0x1800, 0x1807).w(FUNC(elegance_state::led_w)).nopr();
 	map(0x2000, 0x5fff).r("cartslot", FUNC(generic_slot_device::read_rom));
-	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(as12_state::control_w));
+	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(elegance_state::control_w));
 	map(0x8000, 0x9fff).rom();
-	map(0xa000, 0xa007).mirror(0x1ff8).r(FUNC(as12_state::input_r));
+	map(0xa000, 0xa007).mirror(0x1ff8).r(FUNC(elegance_state::input_r));
 	map(0xc000, 0xcfff).mirror(0x1000).rom();
 	map(0xe000, 0xffff).rom();
 }
@@ -201,7 +201,7 @@ static INPUT_PORTS_START( feleg )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
 
 	PORT_START("CPU")
-	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, as12_state, change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elegance_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (original)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (AS12)" )
 	PORT_CONFSETTING(    0x02, "4MHz (6085)" )
@@ -211,7 +211,7 @@ static INPUT_PORTS_START( felega )
 	PORT_INCLUDE( feleg )
 
 	PORT_MODIFY("CPU") // default to 3.57MHz
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, as12_state, change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elegance_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (original)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (AS12)" )
 	PORT_CONFSETTING(    0x02, "4MHz (6085)" )
@@ -223,11 +223,11 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void as12_state::feleg(machine_config &config)
+void elegance_state::feleg(machine_config &config)
 {
 	// basic machine hardware
 	R65C02(config, m_maincpu, 4_MHz_XTAL); // R65C02P4
-	m_maincpu->set_addrmap(AS_PROGRAM, &as12_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &elegance_state::main_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // from 556 timer (22nF, 110K, 1K), ideal frequency is 600Hz
 	irq_clock.set_pulse_width(attotime::from_usec(17)); // active for 17us
@@ -242,7 +242,7 @@ void as12_state::feleg(machine_config &config)
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
-	config.set_default_layout(layout_fidel_as12);
+	config.set_default_layout(layout_fidel_elegance);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -253,7 +253,7 @@ void as12_state::feleg(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
 
-void as12_state::felega(machine_config &config)
+void elegance_state::felega(machine_config &config)
 {
 	feleg(config);
 
@@ -311,9 +311,9 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, feleg,   0,      0,      feleg,   feleg,   as12_state, empty_init, "Fidelity International", "Elegance Chess Challenger (model 6085)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, felega,  feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Computer Products", "Elegance Chess Challenger (model AS12, set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, felega1, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Computer Products", "Elegance Chess Challenger (model AS12, set 2)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, felega2, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Computer Products", "Elegance Chess Challenger (model AS12, set 3)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, felega3, feleg,  0,      felega,  felega,  as12_state, empty_init, "Fidelity Computer Products", "Elegance Chess Challenger (model AS12, set 4)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1986, feleg,   0,      0,      feleg,   feleg,   elegance_state, empty_init, "Fidelity International", "Elegance Chess Challenger (model 6085)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, felega,  feleg,  0,      felega,  felega,  elegance_state, empty_init, "Fidelity Computer Products", "Elegance Chess Challenger (model AS12, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, felega1, feleg,  0,      felega,  felega,  elegance_state, empty_init, "Fidelity Computer Products", "Elegance Chess Challenger (model AS12, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, felega2, feleg,  0,      felega,  felega,  elegance_state, empty_init, "Fidelity Computer Products", "Elegance Chess Challenger (model AS12, set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, felega3, feleg,  0,      felega,  felega,  elegance_state, empty_init, "Fidelity Computer Products", "Elegance Chess Challenger (model AS12, set 4)", MACHINE_SUPPORTS_SAVE )

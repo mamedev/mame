@@ -12,7 +12,9 @@ This is their 1st original product. MK II was licensed from Peter Jennings, and
 MK I was, to put it bluntly, a bootleg. The chess engine is by Mike Johnson,
 with support from David Levy.
 
-Hardware notes (Master Unit):
+Hardware notes:
+
+Master Unit:
 - PCB label: 201041 (Rev.A to Rev.E)
 - Synertek 6502A @ 2MHz (4MHz XTAL)
 - Synertek 6522 VIA
@@ -50,7 +52,8 @@ TODO:
 - LCD TC pin? connects to the display, source is a 50hz timer(from power supply),
   probably to keep refreshing the LCD when inactive, there is no need to emulate it
 - dump/add printer unit
-- dump/add ssystem3 1980 program revision, were the BTANB fixed?
+- dump/add other ssystem3 program revisions, were the BTANB fixed in the 1980 version?
+  known undumped: C19081 + C19082 (instead of C19081E), C45000 + C45012
 - ssystem4 softwarelist if a prototype cartridge is ever dumped
 
 BTANB (ssystem3):

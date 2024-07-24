@@ -17973,13 +17973,6 @@ ts2624                          // 1982
 @source:falco/falcots28.cpp
 ts28                            // 1983
 
-@source:fidelity/as12.cpp
-feleg
-felega
-felega1
-felega2
-felega3
-
 @source:fidelity/bridgeb.cpp
 bridgeb
 
@@ -18059,6 +18052,13 @@ premiere                        //
 
 @source:fidelity/eldorado.cpp
 feldo
+
+@source:fidelity/elegance.cpp
+feleg
+felega
+felega1
+felega2
+felega3
 
 @source:fidelity/elite.cpp
 feag                            //
