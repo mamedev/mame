@@ -244,7 +244,7 @@ void pgm_arm_type1_state::arm7_type1_latch_init()
 	save_item(NAME(m_arm_type1_counter));
 }
 
-void pgm_arm_type1_state::pgm_arm_type1_rf(machine_config &config)
+void pgm_arm_type1_state::pgm_arm_type1_rfever(machine_config &config)
 {
 	pgm_arm_type1_sim(config);
 //  pgm_arm_type1(config); // When ARM7 ROM is dumped and hooked up
@@ -280,7 +280,7 @@ void pgm_arm_type1_state::init_kovsh()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16smo_delegate(*this, FUNC(pgm_arm_type1_state::kovsh_fake_region_r)));
 }
 
-void pgm_arm_type1_state::init_rf()
+void pgm_arm_type1_state::init_rfever()
 {
 	pgm_basic_init(false);
 }

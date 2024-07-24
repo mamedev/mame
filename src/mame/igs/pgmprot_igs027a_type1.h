@@ -30,11 +30,11 @@ public:
 	void init_kov();
 	void init_kovboot();
 	void init_oldsplus();
-	void init_rf();
+	void init_rfever();
 
 	void pgm_arm_type1_sim(machine_config &config);
 	void pgm_arm_type1_cave(machine_config &config);
-	void pgm_arm_type1_rf(machine_config &config);
+	void pgm_arm_type1_rfever(machine_config &config);
 	void pgm_arm_type1(machine_config &config);
 
 protected:
