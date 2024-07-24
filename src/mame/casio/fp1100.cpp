@@ -52,6 +52,7 @@ The keyboard is a separate unit.  It contains a beeper.
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
@@ -87,6 +88,7 @@ public:
 		, m_centronics(*this, "centronics")
 		, m_cassette(*this, "cassette")
 		, m_slot(*this, "slot.%u", 0)
+		, m_irqs_int(*this, { "irqs_inta", "irqs_intb", "irqs_intc", "irqs_intd"})
 	{ }
 
 	void fp1100(machine_config &config);
@@ -109,6 +111,7 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_cassette;
 	required_device_array<fp1000_exp_slot_device, 2> m_slot;
+	required_device_array<input_merger_device, 4> m_irqs_int;
 
 	void main_map(address_map &map);
 	void io_map(address_map &map);
@@ -771,11 +774,24 @@ void fp1100_state::fp1100(machine_config &config)
 	BEEP(config, "beeper", 950) // guess
 		.add_route(ALL_OUTPUTS, "mono", 0.50); // inside the keyboard
 
-	for (auto slot : m_slot)
-	{
-		FP1000_EXP_SLOT(config, slot, fp1000_exp_devices, nullptr);
-		slot->set_iospace(m_maincpu, AS_IO);
-	}
+	INPUT_MERGER_ANY_HIGH(config, m_irqs_int[0]).output_handler().set(FUNC(fp1100_state::int_w<0>));
+	INPUT_MERGER_ANY_HIGH(config, m_irqs_int[1]).output_handler().set(FUNC(fp1100_state::int_w<1>));
+	INPUT_MERGER_ANY_HIGH(config, m_irqs_int[2]).output_handler().set(FUNC(fp1100_state::int_w<2>));
+	INPUT_MERGER_ANY_HIGH(config, m_irqs_int[3]).output_handler().set(FUNC(fp1100_state::int_w<3>));
+
+	FP1000_EXP_SLOT(config, m_slot[0], fp1000_exp_devices, nullptr);
+	m_slot[0]->set_iospace(m_maincpu, AS_IO);
+	m_slot[0]->inta_callback().set(m_irqs_int[0], FUNC(input_merger_device::in_w<0>));
+	m_slot[0]->intb_callback().set(m_irqs_int[1], FUNC(input_merger_device::in_w<0>));
+	m_slot[0]->intc_callback().set(m_irqs_int[2], FUNC(input_merger_device::in_w<0>));
+	m_slot[0]->intd_callback().set(m_irqs_int[3], FUNC(input_merger_device::in_w<0>));
+
+	FP1000_EXP_SLOT(config, m_slot[1], fp1000_exp_devices, nullptr);
+	m_slot[1]->set_iospace(m_maincpu, AS_IO);
+	m_slot[1]->inta_callback().set(m_irqs_int[0], FUNC(input_merger_device::in_w<1>));
+	m_slot[1]->intb_callback().set(m_irqs_int[1], FUNC(input_merger_device::in_w<1>));
+	m_slot[1]->intc_callback().set(m_irqs_int[2], FUNC(input_merger_device::in_w<1>));
+	m_slot[1]->intd_callback().set(m_irqs_int[3], FUNC(input_merger_device::in_w<1>));
 }
 
 // TODO: chargen, keyboard ROM and key tops can be substituted on actual FP-1000/FP-1100

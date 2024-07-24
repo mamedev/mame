@@ -620,4 +620,5 @@ ROM_END
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1985, ti74,  0,      0,      ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1985, ti74a, ti74,   0,      ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+
 SYST( 1986, ti95,  0,      0,      ti95,    ti95,  ti74_state, empty_init, "Texas Instruments", "TI-95 Procalc", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

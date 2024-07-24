@@ -27,6 +27,10 @@ DEFINE_DEVICE_TYPE(FP1060IO_EXP_SLOT, fp1060io_exp_slot_device, "fp1060io_exp_sl
 fp1060io_exp_slot_device::fp1060io_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, FP1060IO_EXP_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_fp1060io_exp_interface>(mconfig, *this)
+	, m_inta_cb(*this)
+	, m_intb_cb(*this)
+	, m_intc_cb(*this)
+	, m_intd_cb(*this)
 {
 }
 
@@ -64,6 +68,12 @@ void device_fp1060io_exp_interface::interface_post_start()
 {
 	// Dynamic mapping, shouldn't need anything from here
 }
+
+void device_fp1060io_exp_interface::inta_w(int state) { m_slot->m_inta_cb(state); }
+void device_fp1060io_exp_interface::intb_w(int state) { m_slot->m_intb_cb(state); }
+void device_fp1060io_exp_interface::intc_w(int state) { m_slot->m_intc_cb(state); }
+void device_fp1060io_exp_interface::intd_w(int state) { m_slot->m_intd_cb(state); }
+
 
 fp1060io_exp_device::fp1060io_exp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)

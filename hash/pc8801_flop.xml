@@ -7655,7 +7655,7 @@ NB: disk geometry makes it likely to have further copy protection checks later o
 		</part>
 	</software>
 
-	<software name="ddasha" supported="no">
+	<software name="ddasha" cloneof="ddash" supported="no">
 		<description>D' (alt)</description>
 		<year>1988</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
@@ -7692,7 +7692,7 @@ NB: disk geometry makes it likely to have further copy protection checks later o
 		</part>
 	</software>
 
-	<software name="ddashb" supported="partial">
+	<software name="ddashb" cloneof="ddash" supported="partial">
 		<description>D' (cracked)</description>
 		<year>1988</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
@@ -23118,12 +23118,12 @@ Disk 3 fails with [Incorrect layout on track 39 head 1, expected_size=100000, cu
 		</part>
 	</software>
 
-	<software name="midgartsds" cloneof="midgarts" supported="no">
+	<software name="midgartsds" cloneof="midgarts" supported="partial">
 		<description>Mid Garts (Dual Side)</description>
 		<year>1989</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
 		<notes><![CDATA[
-Unsupported [floppy 2HD] image
+Slight desync between video and sound during intro (verify)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198904xx"/>
@@ -23131,6 +23131,7 @@ Unsupported [floppy 2HD] image
 		<!--combined image-->
 		<!--rom name="mid garts dual side.d88" size="6405264" crc="abc08659" sha1="a0c793d3dc5e2dbf8848c1eedc2b65fc4a5115fd"/-->
 
+		<!-- TODO: game shouldn't have V.[isual] Number unlocked by default, non-default factory save? -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1277392">
@@ -48124,24 +48125,15 @@ ExtractDisk  [09]"第4集 B     " -> "jam vol.1 (alt)_09.d88"
 		</part>
 	</software>
 
-	<software name="n88basmr" supported="no">
-		<description>N88-BASIC MR (v2.3)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="fhsyst" supported="partial">
+		<!-- Oct 20, 1986 -->
+		<description>N88-BASIC FH System Disk (v2.3)</description>
+		<year>1986</year>
+		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Unsupported [floppy 2HD] image
+Not extensively tested
 ]]></notes>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1122080">   <!-- Data CRC16: 21513 -->
-				<rom name="n88-basic mr.d88" size="1122080" crc="94595bcb" sha1="f1b6981c2b5bb1b778e4f097f603acbc6b025a02"/>
-			</dataarea>
-		</part>
-	</software>
 
-	<software name="fhsyst">
-		<description>FH System Disk</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="353184">    <!-- Data CRC16: 19900 -->
 				<rom name="pc-8801fh_systemdisk.d88" size="353184" crc="155e38a2" sha1="dd310bf1a7c95a805999ac0a697fefc666b0fc32"/>
@@ -48150,11 +48142,13 @@ Unsupported [floppy 2HD] image
 	</software>
 
 	<software name="masyst" supported="no">
-		<description>MA System Disk</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<!-- Oct 20, 1986 -->
+		<description>N88-BASIC MA System Disk (v2.3)</description>
+		<year>1986</year>
+		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Unsupported [floppy 2HD] image
+Main CPU stalls during "demoma" loading
+Not extensively tested
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1128880">   <!-- Data CRC16: 49816 -->
@@ -48163,68 +48157,13 @@ Unsupported [floppy 2HD] image
 		</part>
 	</software>
 
-	<software name="mc2syst" supported="no">
-		<description>MC2 System Disk</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="pc88mad" cloneof="masyst" supported="no">
+		<description>N88-BASIC MA System Disk (v2.3, alt)</description>
+		<year>1986</year>
+		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Unsupported [floppy 2HD] image
-]]></notes>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1135952">
-				<rom name="pc-88mc2 system disk.d88" size="1135952" crc="dd66982c" sha1="70b2400fd62a10a3171ed15bf5d5e9b4a2c4cbb0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mhsyst" supported="no">
-		<description>MH System Disk</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<notes><![CDATA[
-Unsupported [floppy 2HD] image
-]]></notes>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1135952">   <!-- Data CRC16: 7269 -->
-				<rom name="mh system disk.d88" size="1135952" crc="41f8e402" sha1="326349c55017bf750174debfb180f459bfd5bc32"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mhsysta" cloneof="mhsyst" supported="no">
-		<description>MH System Disk (alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<notes><![CDATA[
-Unsupported [floppy 2HD] image
-]]></notes>
-		<part name="disk" interface="floppy_5_25">
-			<dataarea name="flop" size="1128864">   <!-- Data CRC16: 64726 -->
-				<rom name="pc-8801mh_systemdisk.d88" size="1128864" crc="f8b5d2f5" sha1="3ea0b6b574f8df2da597eff19796b8d0181ab2c8"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mrsyst" supported="no">
-		<description>MR System Disk</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<notes><![CDATA[
-Unsupported [floppy 2HD] image
-]]></notes>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1135952">
-				<rom name="mr system disk.d88" size="1135952" crc="02ae3a37" sha1="2ec7cc7c979b908c3f4592b06e1698b7b5a6fe1e"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pc88mad" supported="no">
-		<description>PC-8801MA Demo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<notes><![CDATA[
-Unsupported [floppy 2HD] image
+Main CPU stalls during "demoma" loading
+Not extensively tested
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1135952">   <!-- Data CRC16: 40038 -->
@@ -48233,12 +48172,13 @@ Unsupported [floppy 2HD] image
 		</part>
 	</software>
 
-	<software name="pc88mada" cloneof="pc88mad" supported="no">
-		<description>PC-8801MA Demo (alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="pc88mada" cloneof="masyst" supported="no">
+		<description>N88-BASIC MA System Disk (v2.3, alt 2)</description>
+		<year>1986</year>
+		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Unsupported [floppy 2HD] image
+Main CPU stalls during "demoma" loading
+Not extensively tested
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1128880">   <!-- Data CRC16: 51864 -->
@@ -48247,13 +48187,92 @@ Unsupported [floppy 2HD] image
 		</part>
 	</software>
 
-	<software name="pc88mas" supported="no">
-		<description>PC-8801MA System Disk</description>
+	<software name="mhsyst" supported="partial">
+		<!-- Oct 20,1986-->
+		<description>N88 BASIC MH System Disk (v2.3)</description>
+		<year>1986</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1135952">   <!-- Data CRC16: 7269 -->
+				<rom name="mh system disk.d88" size="1135952" crc="41f8e402" sha1="326349c55017bf750174debfb180f459bfd5bc32"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: verify being a clone of mhsyst, fill in data -->
+	<software name="mhsysta" cloneof="mhsyst" supported="no">
+		<description>N88 BASIC MH System Disk (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Unsupported [floppy 2HD] image
+[SIGSEGV in d88 loading]
 ]]></notes>
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="1128864">   <!-- Data CRC16: 64726 -->
+				<rom name="pc-8801mh_systemdisk.d88" size="1128864" crc="f8b5d2f5" sha1="3ea0b6b574f8df2da597eff19796b8d0181ab2c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrsyst" supported="partial">
+		<!-- July 22,1985 -->
+		<description>N88-BASIC mkIIMR System Disk (v2.3)</description>
+		<year>1985</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+"demomr" auto reel demo loops by cutting off last item abruptly (verify)
+Not extensively tested
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1135952">
+				<rom name="mr system disk.d88" size="1135952" crc="02ae3a37" sha1="2ec7cc7c979b908c3f4592b06e1698b7b5a6fe1e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc88mrd" cloneof="mrsyst" supported="partial">
+		<!-- July 22, 1985 -->
+		<description>N88-BASIC mkIIMR System Disk (v2.3, alt)</description>
+		<year>1985</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+"demomr" auto reel demo loops by cutting off last item abruptly (verify)
+Not extensively tested
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1128880">   <!-- Data CRC16: 65382 -->
+				<rom name="pc8801mkii mr demo.d88" size="1128880" crc="f1f00b50" sha1="cf7ae79e635ba6c70c3f9126a8e5b1060404a16a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n88basmr" cloneof="mrsyst" supported="partial">
+		<!-- July 22, 1985 -->
+		<description>N88-BASIC mkIIMR System Disk (v2.3, alt 2)</description>
+		<year>1985</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+"demomr" auto reel demo loops by cutting off last item abruptly (verify)
+Not extensively tested
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1122080">   <!-- Data CRC16: 21513 -->
+				<rom name="n88-basic mr.d88" size="1122080" crc="94595bcb" sha1="f1b6981c2b5bb1b778e4f097f603acbc6b025a02"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc88mas" supported="partial">
+		<description>N88-Nihongo BASIC MA System Disk (v2.1)</description>
+		<year>1987</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1135952">   <!-- Data CRC16: 42116 -->
 				<rom name="pc-8801ma [sysdisk].d88" size="1135952" crc="11833504" sha1="f4041c1548c76bda86bf0bf22ab694498436fe81"/>
@@ -48261,13 +48280,15 @@ Unsupported [floppy 2HD] image
 		</part>
 	</software>
 
-	<software name="pc88ma2d" supported="no">
-		<description>PC-8801MA2 System Disk &amp; Demo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="pc88ma2d" supported="partial">
+		<!-- Oct 8,1988 -->
+		<description>N88-Nihongo BASIC MA2 System Disk (v2.2)</description>
+		<year>1988</year>
+		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Unsupported [floppy 2HD] image
+Not extensively tested
 ]]></notes>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1135952">   <!-- Data CRC16: 7285 -->
 				<rom name="pc-8801ma2 [sys &amp; demo].d88" size="1135952" crc="3bad9126" sha1="fe234fe46f8474cebc0f74675369e639f13246cf"/>
@@ -48275,16 +48296,20 @@ Unsupported [floppy 2HD] image
 		</part>
 	</software>
 
-	<software name="pc88mrd" supported="no">
-		<description>PC8801mkII MR Demo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="mc2syst" supported="partial">
+		<!-- Sep 27,1989 -->
+		<!-- v2.2 for Nihongo BASIC, still v2.3 for regular basic -->
+		<description>N88-Nihongo BASIC MC System Disk (v2.2)</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Unsupported [floppy 2HD] image
+Has a bunch of MC specific files
+Not extensively tested
+"game" hangs when hitting ball with paddle, doesn't happen with pc88ma2d
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1128880">   <!-- Data CRC16: 65382 -->
-				<rom name="pc8801mkii mr demo.d88" size="1128880" crc="f1f00b50" sha1="cf7ae79e635ba6c70c3f9126a8e5b1060404a16a"/>
+			<dataarea name="flop" size="1135952">
+				<rom name="pc-88mc2 system disk.d88" size="1135952" crc="dd66982c" sha1="70b2400fd62a10a3171ed15bf5d5e9b4a2c4cbb0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -48294,7 +48319,7 @@ Unsupported [floppy 2HD] image
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Unsupported [floppy 2HD] image
+Throws "PLEASE CHECK I/F" on boot, accesses ports $a0 and $a1 for a [MIDI] serial port?
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1100592">
@@ -48308,7 +48333,7 @@ Unsupported [floppy 2HD] image
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Unsupported [floppy 2HD] image
+Hangs at [FDC] bootstrap
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
@@ -48317,12 +48342,12 @@ Unsupported [floppy 2HD] image
 		</part>
 	</software>
 
-	<software name="yukarmin" supported="no">
+	<software name="yukarmin" supported="partial">
 		<description>Yukar Mini</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Unsupported [floppy 2HD] image
+Not extensively tested
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1086448">

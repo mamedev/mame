@@ -219,6 +219,7 @@ void ps2_fdc_device::set_mode(mode_t _mode)
 void upd765_family_device::device_start()
 {
 	save_item(NAME(selected_drive));
+	save_item(NAME(drive_busy));
 
 	for(int i=0; i != 4; i++) {
 		char name[2];
@@ -505,11 +506,12 @@ uint8_t upd765_family_device::msr_r()
 		msr |= MSR_RQM|MSR_DIO|MSR_CB;
 		break;
 	}
-	for(int i=0; i<4; i++)
+	for(int i=0; i<4; i++) {
 		if(flopi[i].main_state == RECALIBRATE || flopi[i].main_state == SEEK) {
 			msr |= 1<<i;
 			//msr |= MSR_CB;
 		}
+	}
 	msr |= get_drive_busy();
 
 	return msr;
@@ -1585,8 +1587,10 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 	LOGDONE("command done (%s) - %s\n", data_completion ? "data" : "seek", results());
 	fi.main_state = fi.sub_state = IDLE;
 	irq = true;
-	if(!data_completion)
+	if(!data_completion) {
 		fi.st0_filled = true;
+		drive_busy |= (1 << fi.id);
+	}
 	check_irq();
 }
 
@@ -2811,7 +2815,6 @@ void i82072_device::device_start()
 	save_item(NAME(motorcfg));
 	save_item(NAME(motor_off_counter));
 	save_item(NAME(motor_on_counter));
-	save_item(NAME(drive_busy));
 	save_item(NAME(delayed_command));
 }
 
@@ -2975,31 +2978,16 @@ void i82072_device::execute_command(int cmd)
 	}
 }
 
-/*
- * The Intel datasheet says that the drive busy bits in the MSR are supposed to remain
- * set after a seek or recalibrate until a sense interrupt status status command is
- * executed. The InterPro 2000 diagnostic routine goes further, and tests the drive
- * status bits before and after the first sense interrupt status result byte is read,
- * and expects the drive busy bit to clear only after.
- *
- * The Amstrad CPC6128 uses a upd765a and seems to expect the busy bits to be cleared
- * immediately after the seek/recalibrate interrupt is generated.
- *
- * Special casing the i82072 here seems the only way to reconcile this apparently
- * different behaviour for now.
- */
 void i82072_device::command_end(floppy_info &fi, bool data_completion)
 {
-	if(!data_completion)
-		drive_busy |= (1 << fi.id);
-
 	// set motor off counter
 	if(motorcfg)
 		motor_off_counter = (2 + ((motorcfg & MOFF) >> 4)) << (motorcfg & HSDA ? 1 : 0);
 
 	// clear existing interrupt sense data
-	for(floppy_info &fi : flopi)
+	for(floppy_info &fi : flopi) {
 		fi.st0_filled = false;
+	}
 
 	upd765_family_device::command_end(fi, data_completion);
 }

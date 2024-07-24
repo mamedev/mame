@@ -13,17 +13,42 @@ DEFINE_DEVICE_TYPE(FP1060IO, fp1060io_device, "fp1060io", "FP-1060I/O Expansion 
 fp1060io_device::fp1060io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: fp1000_exp_device(mconfig, FP1060IO, tag, owner, clock)
 	, m_subslot(*this, "%u", 0U)
+	, m_irqs_int(*this, { "irqs_inta", "irqs_intb", "irqs_intc", "irqs_intd"})
 {
 }
 
 
 void fp1060io_device::device_add_mconfig(machine_config &config)
 {
-	for (auto slot : m_subslot)
-	{
-		// default is just for CLI usability, what a retail '1060 gives back on its own is unconfirmed.
-		FP1060IO_EXP_SLOT(config, slot, fp1060io_slot_devices, "rampack");
-	}
+	INPUT_MERGER_ANY_HIGH(config, m_irqs_int[0]).output_handler().set(FUNC(fp1060io_device::inta_w));
+	INPUT_MERGER_ANY_HIGH(config, m_irqs_int[1]).output_handler().set(FUNC(fp1060io_device::intb_w));
+	INPUT_MERGER_ANY_HIGH(config, m_irqs_int[2]).output_handler().set(FUNC(fp1060io_device::intc_w));
+	INPUT_MERGER_ANY_HIGH(config, m_irqs_int[3]).output_handler().set(FUNC(fp1060io_device::intd_w));
+
+	// default is just for CLI usability, what a retail '1060 gives back on its own is unconfirmed.
+	FP1060IO_EXP_SLOT(config, m_subslot[0], fp1060io_slot_devices, "rampack");
+	m_subslot[0]->inta_callback().set(m_irqs_int[0], FUNC(input_merger_device::in_w<0>));
+	m_subslot[0]->intb_callback().set(m_irqs_int[1], FUNC(input_merger_device::in_w<0>));
+	m_subslot[0]->intc_callback().set(m_irqs_int[2], FUNC(input_merger_device::in_w<0>));
+	m_subslot[0]->intd_callback().set(m_irqs_int[3], FUNC(input_merger_device::in_w<0>));
+
+	FP1060IO_EXP_SLOT(config, m_subslot[1], fp1060io_slot_devices, "rampack");
+	m_subslot[1]->inta_callback().set(m_irqs_int[0], FUNC(input_merger_device::in_w<1>));
+	m_subslot[1]->intb_callback().set(m_irqs_int[1], FUNC(input_merger_device::in_w<1>));
+	m_subslot[1]->intc_callback().set(m_irqs_int[2], FUNC(input_merger_device::in_w<1>));
+	m_subslot[1]->intd_callback().set(m_irqs_int[3], FUNC(input_merger_device::in_w<1>));
+
+	FP1060IO_EXP_SLOT(config, m_subslot[2], fp1060io_slot_devices, "rampack");
+	m_subslot[2]->inta_callback().set(m_irqs_int[0], FUNC(input_merger_device::in_w<2>));
+	m_subslot[2]->intb_callback().set(m_irqs_int[1], FUNC(input_merger_device::in_w<2>));
+	m_subslot[2]->intc_callback().set(m_irqs_int[2], FUNC(input_merger_device::in_w<2>));
+	m_subslot[2]->intd_callback().set(m_irqs_int[3], FUNC(input_merger_device::in_w<2>));
+
+	FP1060IO_EXP_SLOT(config, m_subslot[3], fp1060io_slot_devices, "rampack");
+	m_subslot[3]->inta_callback().set(m_irqs_int[0], FUNC(input_merger_device::in_w<3>));
+	m_subslot[3]->intb_callback().set(m_irqs_int[1], FUNC(input_merger_device::in_w<3>));
+	m_subslot[3]->intc_callback().set(m_irqs_int[2], FUNC(input_merger_device::in_w<3>));
+	m_subslot[3]->intd_callback().set(m_irqs_int[3], FUNC(input_merger_device::in_w<3>));
 }
 
 void fp1060io_device::device_start()

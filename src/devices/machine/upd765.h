@@ -253,6 +253,7 @@ protected:
 	int sector_size;
 	int cur_rate;
 	int selected_drive;
+	u8 drive_busy;
 
 	emu_timer *poll_timer;
 
@@ -349,8 +350,8 @@ protected:
 	bool read_one_bit(const attotime &limit);
 	bool write_one_bit(const attotime &limit);
 
-	virtual u8 get_drive_busy() const { return 0; }
-	virtual void clr_drive_busy() { }
+	u8 get_drive_busy() const { return drive_busy; }
+	void clr_drive_busy() { drive_busy = 0; }
 };
 
 class upd765a_device : public upd765_family_device {
@@ -418,8 +419,6 @@ protected:
 	virtual void execute_command(int cmd) override;
 	virtual void command_end(floppy_info &fi, bool data_completion) override;
 	virtual void index_callback(floppy_image_device *floppy, int state) override;
-	virtual u8 get_drive_busy() const override { return drive_busy; }
-	virtual void clr_drive_busy() override { drive_busy = 0; }
 
 	void motor_control(int fid, bool start_motor);
 
@@ -427,7 +426,6 @@ private:
 	u8 motorcfg;
 	u8 motor_off_counter;
 	u8 motor_on_counter;
-	u8 drive_busy;
 	int delayed_command;
 };
 

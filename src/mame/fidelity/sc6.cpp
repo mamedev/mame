@@ -10,13 +10,13 @@ Fidelity The Gambit (model 6084)
 TODO:
 - MSC MCU is currently emulated as I8039, due to missing EA pin emulation
 - different button panel for fidel_msc_v2 artwork
-- add the older versions of gambit(assuming different ROM): 1st version is
-  probably the same as "The Classic", and 2nd version has voice capability
+- verify if the 1985 version of The Classic the same ROM
+- dump/add Gambit Voice MCU
 
 --------------------------------------------------------------------------------
 
 SC6 hardware notes:
-- PCB label 510-1045B01
+- PCB label: 510-1045B01
 - INS8040N-11 MCU, 11MHz XTAL
 - external 4KB ROM 2332 101-1035A01, in module slot
 - buzzer, 2 7seg LEDs, 8*8 chessboard buttons
@@ -31,7 +31,7 @@ SC6 program is contained in BO6 and CG6.
 --------------------------------------------------------------------------------
 
 MSC hardware notes:
-- PCB label 510-1044B01
+- PCB label: 510-1044B01
 - P8049H MCU, 2KB internal ROM, 11MHz XTAL
 - buzzer, 18 leds, 8*8 chessboard buttons, module slot
 
@@ -42,10 +42,13 @@ The module overrides the internal ROM, by asserting the EA pin.
 
 --------------------------------------------------------------------------------
 
-Gambit(v3) hardware notes:
-- PCB label 510-1115A01 (1986 PCB, but chips from 1989)
+The Gambit(v3) hardware notes:
+- PCB label: 510-1115A01 (1986 PCB, but chips from 1989)
 - TMP80C50AP-6-9311 MCU, 4KB internal ROM, 6MHz XTAL
 - buzzer, 16 leds, 8*8 chessboard buttons
+
+The Gambit either has a black/white button panel color theme, or black/red/white,
+more commonly seen on newer versions, and Gambit Voice.
 
 MCU ports I/O again identical to SC6.
 The same MCU+ROM was also used in Designer 1500(PCB label 510.1131A01).
@@ -64,9 +67,10 @@ Silver Bullet hardware notes:
 - buzzer, 16 leds, 8*8 chessboard buttons, module slot
 
 To summarize, known MCU chip ROM serials+year:
+- [no label]  (1985), The Classic (model CC8)
 - 100-1020B01 (1989), The Gambit, Designer 1500, Peri Beta
-- 100-1020B02 (1986), Silver Bullet
-- 100-1020B02 (1987), The Classic
+- 100-1020B02 (1986), The Gambit, Silver Bullet
+- 100-1020B02 (1987), The Classic (model 6079)
 - 100-1020C01 (1987), Gambit Voice
 
 *******************************************************************************/
@@ -361,7 +365,7 @@ ROM_END
 
 ROM_START( gambit )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD("100-1020b01", 0x0000, 0x1000, CRC(ba41b5ba) SHA1(1a5c5b2e990a07b9ff51eecfa952a4b890107797) ) // internal ROM
+	ROM_LOAD("100-1020b02", 0x0000, 0x1000, CRC(ba41b5ba) SHA1(1a5c5b2e990a07b9ff51eecfa952a4b890107797) ) // internal ROM
 ROM_END
 
 } // anonymous namespace
@@ -374,6 +378,6 @@ ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS      INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1982, fscc6,   0,      0,      sc6,     sc6,    sc6_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"6\"", MACHINE_SUPPORTS_SAVE )
-SYST( 1982, miniscc, 0,      0,      msc,     msc,    sc6_state, empty_init, "Fidelity Electronics", "Mini Sensory Chess Challenger (1982 version)", MACHINE_SUPPORTS_SAVE ) // aka "Mini Sensory II"
+SYST( 1982, miniscc, 0,      0,      msc,     msc,    sc6_state, empty_init, "Fidelity Electronics", "Mini Sensory Chess Challenger (MCS-48 version)", MACHINE_SUPPORTS_SAVE ) // aka "Mini Sensory II"
 
-SYST( 1989, gambit,  0,      0,      gambit,  gambit, sc6_state, empty_init, "Fidelity International", "The Gambit (1989 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, gambit,  0,      0,      gambit,  gambit, sc6_state, empty_init, "Fidelity International", "The Gambit", MACHINE_SUPPORTS_SAVE )

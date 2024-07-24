@@ -30,7 +30,7 @@ GK 2000 (H8/323 version):
 - piezo, 16 LEDs, button sensors chessboard
 
 Saitek GK 2100 is on the same hardware, but has a H8/325 instead of H8/323.
-Travel Champion 2100 has the same MCU.
+Travel Champion 2100 has the same MCU as GK 2100.
 
 H8/323 A13 MCU is used in:
 - Saitek GK 2000 (86071220X12)
