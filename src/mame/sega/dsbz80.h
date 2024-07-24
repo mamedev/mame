@@ -9,6 +9,9 @@
 #include "machine/i8251.h"
 #include "sound/mpeg_audio.h"
 
+#include <memory>
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -24,14 +27,14 @@ public:
 
 	void write_txd(int state);
 
-	void dsbz80_map(address_map &map);
-	void dsbz80io_map(address_map &map);
-
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_stop() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
@@ -39,12 +42,12 @@ private:
 	required_device<i8251_device> m_uart;
 	required_region_ptr<uint8_t> m_mpeg_rom;
 
-	mpeg_audio *m_decoder;
+	devcb_write_line m_rxd_handler;
+
+	std::unique_ptr<mpeg_audio> m_decoder;
 	int16_t m_audio_buf[1152*2];
 	uint32_t m_mp_start, m_mp_end, m_mp_vol, m_mp_pan, m_mp_state, m_lp_start, m_lp_end, m_start, m_end;
 	int32_t m_mp_pos, m_audio_pos, m_audio_avail;
-
-	devcb_write_line   m_rxd_handler;
 
 	void output_txd(int state);
 
@@ -54,6 +57,9 @@ private:
 	void mpeg_volume_w(uint8_t data);
 	void mpeg_stereo_w(uint8_t data);
 	uint8_t mpeg_pos_r(offs_t offset);
+
+	void dsbz80_map(address_map &map);
+	void dsbz80io_map(address_map &map);
 };
 
 

@@ -73,6 +73,7 @@ dsbz80_device::dsbz80_device(const machine_config &mconfig, const char *tag, dev
 	m_ourcpu(*this, "mpegcpu"),
 	m_uart(*this, "uart"),
 	m_mpeg_rom(*this, "mpeg"),
+	m_rxd_handler(*this),
 	m_mp_start(0),
 	m_mp_end(0),
 	m_mp_vol(0x7f),
@@ -84,10 +85,8 @@ dsbz80_device::dsbz80_device(const machine_config &mconfig, const char *tag, dev
 	m_end(0),
 	m_mp_pos(0),
 	m_audio_pos(0),
-	m_audio_avail(0),
-	m_rxd_handler(*this)
+	m_audio_avail(0)
 {
-	std::fill(std::begin(m_audio_buf), std::end(m_audio_buf), 0);
 }
 
 //-------------------------------------------------
@@ -96,7 +95,7 @@ dsbz80_device::dsbz80_device(const machine_config &mconfig, const char *tag, dev
 
 void dsbz80_device::device_start()
 {
-	m_decoder = new mpeg_audio(&m_mpeg_rom[0], mpeg_audio::L2, false, 0);
+	m_decoder.reset(new mpeg_audio(&m_mpeg_rom[0], mpeg_audio::L2, false, 0));
 	stream_alloc(0, 2, 32000);
 
 	save_item(NAME(m_mp_start));
@@ -126,6 +125,15 @@ void dsbz80_device::device_reset()
 	m_mp_state = 0;
 
 	m_uart->write_cts(0);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific cleanup
+//-------------------------------------------------
+
+void dsbz80_device::device_stop()
+{
+	m_decoder.reset();
 }
 
 void dsbz80_device::write_txd(int state)
@@ -251,7 +259,7 @@ void dsbz80_device::mpeg_end_w(offs_t offset, uint8_t data)
 void dsbz80_device::mpeg_volume_w(uint8_t data)
 {
 	// TODO: MSB used but unknown purpose
-	m_mp_vol = 0x7f - (data & 0x7f);
+	m_mp_vol = ~data & 0x7f;
 }
 
 void dsbz80_device::mpeg_stereo_w(uint8_t data)
@@ -268,7 +276,7 @@ void dsbz80_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	int sampindex = 0;
 	for (;;)
 	{
-		while (samples && m_audio_pos < m_audio_avail)
+		while (samples && (m_audio_pos < m_audio_avail))
 		{
 			switch (m_mp_pan)
 			{
@@ -319,12 +327,12 @@ void dsbz80_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 			{
 				if (m_mp_state == 2)
 				{
-					if (m_mp_pos == m_lp_start*8)
+					if (m_mp_pos == m_lp_start * 8)
 					{
 						// We're looping on un-decodable crap, abort abort abort
 						m_mp_state = 0;
 					}
-					m_mp_pos = m_lp_start*8;
+					m_mp_pos = m_lp_start * 8;
 
 					if (m_lp_end)
 					{

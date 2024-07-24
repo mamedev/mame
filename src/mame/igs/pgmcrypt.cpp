@@ -2161,7 +2161,7 @@ static const uint8_t icescape_tab[0x100] = {
 
 void icescape_decrypt(running_machine &machine)
 {
-	auto const src = reinterpret_cast<u16 *>(machine.root_device().memregion("user1")->base());
+	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(machine.root_device().memregion("user1")->base()));
 
 	int const rom_size = 0x80000;
 
