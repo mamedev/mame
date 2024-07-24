@@ -2057,7 +2057,7 @@ Prints a "Warning: [Rumble Pak] is malfunctioning. [Controller Pak] is not desig
 	</software>
 
 	<software name="chtwistu" cloneof="chtwist" supported="no">
-		<description>Chameleon Twist (USA, Rev. A)</description>
+		<description>Chameleon Twist (USA, rev. A)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="NUS-NCTE-USA"/>
@@ -14142,7 +14142,7 @@ Occasionally sky background flickers with wrong colors
 	</software>
 
 	<software name="vpointp" supported="no">
-		<description>Viewpoint 2064 (Prototype)</description>
+		<description>Viewpoint 2064 (prototype)</description>
 		<year>1999</year>
 		<publisher>Sammy</publisher>
 		<part name="cart" interface="n64_cart">
