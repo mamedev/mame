@@ -28,6 +28,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_xa(*this, "xa"),
 		m_ics(*this, "ics"),
+		m_screen(*this, "screen"),
 		m_videoram(*this, "videoram"),
 		m_palette(*this, "palette"),
 		m_gfxrom(*this, "gfx1"),
@@ -110,6 +111,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mx10exa_cpu_device> m_xa;
 	required_device<ics2115_device> m_ics;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<u32> m_videoram;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_gfxrom;
@@ -382,7 +384,8 @@ void igs_fear_state::sound_irq(int state)
 void igs_fear_state::vblank_irq(int state)
 {
 	if (state)
-		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+		if (m_screen->frame_number() & 1)
+			m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 }
 
 u32 igs_fear_state::igs027_gpio_r(offs_t offset, u32 mem_mask)
@@ -704,14 +707,14 @@ void igs_fear_state::igs_fear(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(30);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(igs_fear_state::screen_update));
-	screen.screen_vblank().set(FUNC(igs_fear_state::vblank_irq));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_screen->set_screen_update(FUNC(igs_fear_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(igs_fear_state::vblank_irq));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 0x4000/2);
 
