@@ -102,7 +102,7 @@ private:
 	void arm7_type1_sim_w(offs_t offset, u16 data);
 	u16 arm7_type1_sim_protram_r(offs_t offset);
 	u16 pstars_arm7_type1_sim_protram_r(offs_t offset);
-	u16 unk_r_rf(offs_t offset);
+	u16 unk_r_rfever(offs_t offset);
 	int m_simregion = 0;
 
 	/* puzzli2 protection internal state stuff */
