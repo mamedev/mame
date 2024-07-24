@@ -5396,21 +5396,148 @@ ROM_START( ddpdojblkbl )
 	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, CRC(5a0dbd76) SHA1(06ab202f6bd5ebfb35b9d8cc7a8fb83ec8840659) ) //music-1
 ROM_END
 
-// Rock Fever 1
+/*
+
+Rock Fever 1
+IGS, 1999
+
+PCB Layout
+----------
+
+IGS PCB NO-0243 (Main Board, Bottom)
+|-------------------------------------------------------------------------------------|
+|   |----------------------------|   |----------------------------|                   |
+|   |----------------------------|   |----------------------------|                   |
+|   |----------------------------|   |----------------------------|                   |
+|               J2                                J3                                  |
+| |---|                                                                               |
+| | | |   |-----------------| 22MHz         |-----------|      LP61256GS              |
+| | | |   |                 |               |  L8A0290  |                        JP10 |
+| | | |   |     IGS027      |        50MHz  |  IGS023   |          20MHz              |
+| | | |   |                 |               |  (QFP256) |       |----------|          |
+| | | |   |-----------------|               |-----------|       |MC68HC000 |          |
+| | | |                                                         |  FN20    |      JP9 |
+| | | |                                                         | (PLCC68) |          |
+| | | |                                                         |----------|          |
+| | | |                     |---| |---|     |---| |---|    |---| |---|                |
+| |---|                     |   | |   |     |   | |   |    |   | |   |            JP8 |
+|  J1         |---------|   |U29| |U30|     |U35| |U36|    |SYS| |SYS|                |
+|             |WAVEFRONT|   |   | |   |     |   | |   |    | L | | H |                |
+|             |ICS2115V |   |---| |---|     |---| |---|    |U31| |U32|                |
+|             |(PLCC84) |                                  |---| |---|                |
+|             |---------|  33.8868MHz                                                 |
+|                                                                                     |
+|  |---------|                              |---| |---|         |---| |---| |---|     |
+|  |MAS3607D |                              |LP | |LP |         |SRM| |LP | |   |     |
+|  |(PMQFP44)|                              |61 | |61 |         |2B | |61 | | M |     |
+|  |---------|                              |256| |256|         |256| |256| | X | JP4 |
+|  14.31818MHz                              |GS | |GS |         |   | |GS | | 2 |     |
+|                                           |---| |---|         |---| |---| | 3 |     |
+|                                                                           | C |     |
+|                                                               |---| |---| | 3 |     |
+|                                                 |--------|    |SRM| |LP | | 2 |     |
+|     uPC844C          uPC844C                    |IGS026  |    |2B | |61 | | 1 |     |
+|                                                 |(QFP144)|    |256| |256| | 0 |     |
+|              PT2389                             |        |    |   | |GS | |   |     |
+|                                                 |--------|    |---| |---| |---|     |
+|                                                                                     |
+|                                                                               3.6V  |
+|              |----|                                           |-----|  SW1    BATT  |
+|     PWR      |    |               J  A  M  M  A               |     |               |
+|--------------|    |-------------------------------------------|     |---------------|
+Notes:
+      IGS023       - Custom IGS IC (QFP256)
+      IGS026       - Custom IGS IC (QFP144)
+      IGS027       - Custom IGS IC on a daughterboard
+      U29/30/35/36 - PALs (DIP24)
+      SYS L/H      - MX27C4000DC-90 (DIP32)
+      uPC844C      - NEC Quad High Speed Wide Band Operational Amplifier (DIP14)
+      MAS3607D     - MAS 3507D MPEG 1/2 Layer 2/3 Audio Decoder (PMQFP44)
+      MAX23C3210   - Unpopulated
+	  J1/2/3       - Connectors for the ROM Board (Top)
+	  JP10/9/8/4   - IO
+
+
+IGS PCB NO-0274 (ROM Board, Top)
+|-------------------------------------------------------------------------------------|
+|   |----------------------------|   |----------------------------|                   |
+|   |                            |   |                            |                   |
+|   |----------------------------|   |----------------------------|                   |
+| |---|                                                                               |
+| |   |              |------|   |------|   |------|                                   |
+| |   |              |      |   |      |   |      |                                   |
+| |   |              | MAP0 |   | MAP1 |   | MAP2 |                                   |
+| |   |              | U35  |   | U36  |   | U37  |                                   |
+| |   |              |      |   |      |   |      |                                   |
+| |   |              |------|   |------|   |------|                                   |
+| |   |                                                                               |
+| |   |              |------|   |------|   |------|   |------|   |------|   |------|  |
+| |   |              |      |   |      |   |      |   |      |   |      |   |      |  |
+| |---|              | COMM |   | MP3  |   | MP3  |   | MP3  |   | MP3  |   | FONT |  |
+|                    | U21  |   | 0-0  |   | 0-1  |   | 1-0  |   | 1-1  |   | CG   |  |
+|                    |      |   | U22  |   | U23  |   | U24  |   | U25  |   | U26  |  |
+|                    |------|   |------|   |------|   |------|   |------|   |------|  |
+|                                                                                     |
+|          |------|  |------|   |------|   |------|   |------|   |------|   |------|  |
+|          |      |  |      |   |      |   |      |   |      |   |      |   |      |  |
+|          | BANK |  | BANK |   | BANK |   | BANK |   | CG-3 |   | CG-4 |   | CG-5 |  |
+|          | 1-0  |  | 1-1  |   | 1-2  |   | 1-3  |   | U15  |   | U16  |   | U17  |  |
+|          | U11  |  | U12  |   | U13  |   | U14  |   |      |   |      |   |      |  |
+|          |------|  |------|   |------|   |------|   |------|   |------|   |------|  |
+|                                                                                     |
+|          |------|  |------|   |------|   |------|   |------|   |------|   |------|  |
+|          |      |  |      |   |      |   |      |   |      |   |      |   |      |  |
+|          | BANK |  | BANK |   | BANK |   | BANK |   | CG-0 |   | CG-1 |   | CG-2 |  |
+|          | 0-0  |  | 0-1  |   | 0-2  |   | 0-3  |   | U6   |   | U7   |   | U8   |  |
+|          | U2   |  | U3   |   | U4   |   | U5   |   |      |   |      |   |      |  |
+|          |------|  |------|   |------|   |------|   |------|   |------|   |------|  |
+|                                                                                     |
+|                                                                                     |
+|-------------------------------------------------------------------------------------|
+Notes:
+	  I am not sure what the size of these ROM chips are.
+	  They appear to be similar to other PGM-based games.
+*/
 ROM_START( rf1 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE ( "rf1_sys_h.u32", 0x00000, 0x80000, CRC(e5e1e5f9) SHA1(1e8e4b7e53fcab68d14f36f9c8d85047f308bc93) )
 	ROM_LOAD16_BYTE ( "rf1_sys_l.u31", 0x00001, 0x80000, CRC(ee2c3817) SHA1(490e879f347ac38feaad80666d28fac9e2154188) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION( 0x4000, "prot", ROMREGION_ERASE00 ) /* ARM protection ASIC - internal rom */
+	// ROM_LOAD( "rf1_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x800000, "tiles", ROMREGION_ERASE00 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	// ROM_LOAD( "rf1_t2801.u26",     0x0000000, 0x0800000, NO_DUMP )
 
-	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_REGION16_LE( 0x2000000, "sprcol", ROMREGION_ERASE00 ) /* Sprite Colour Data */
+	// ROM_LOAD( "rf1_a2801.u6",     0x0000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf1_a2802.u7",     0x0800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf1_a2803.u8",     0x1000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf1_a2804.u9",     0x1800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf1_a2805.u16",    0x2000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf1_a2806.u17",    0x2800000, 0x0800000, NO_DUMP )
 
-	ROM_REGION16_LE( 0x1000000, "sprmask", ROMREGION_ERASEFF ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION16_LE( 0x1000000, "sprmask", ROMREGION_ERASE00 ) /* Sprite Masks + Colour Indexes */
+	// ROM_LOAD( "rf1_b2801.u35",     0x0000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf1_b2802.u36",     0x0800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf1_b2803.u37",     0x1000000, 0x0800000, NO_DUMP )
 
-	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	ROM_REGION( 0x1000000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
+	// ROM_LOAD( "rf1_w2801.u21",     0x0800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf1_w2802.u2",      0x1000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf1_w2803.u3",      0x1800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf1_w2804.u4",      0x2000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf1_w2805.u5",      0x2800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf1_w2806.u11",     0x3000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf1_w2807.u12",     0x3800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf1_w2808.u13",     0x4000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "rf1_w2809.u14",     0x4800000, 0x0800000, NO_DUMP )
+
+	ROM_REGION ( 0x2000000, "mp3", ROMREGION_ERASE00 ) // MP3 Data
+	// ROM_LOAD( "pgm_m2801.u22",     0x0000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "pgm_m2802.u23",     0x0800000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "pgm_m2803.u24",     0x1000000, 0x0800000, NO_DUMP )
+	// ROM_LOAD( "pgm_m2804.u25",     0x1800000, 0x0800000, NO_DUMP )
 ROM_END
 
 /*** Init Stuff **************************************************************/
