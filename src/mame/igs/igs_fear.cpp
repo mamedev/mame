@@ -17,6 +17,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_DEBUG       (1U << 1)
+#define VERBOSE         (0)
+#include "logmacro.h"
 
 namespace {
 
@@ -172,7 +175,7 @@ void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect
 {
 	if ((romoffset != 0) && (romoffset != 0xffffffff))
 	{
-		//logerror("x=%d, y=%d, w=%d pix, h=%d pix, c=0x%02x, romoffset=0x%08x\n", xpos, ypos, width, height, palette, romoffset << 2);
+		//LOGMASKED(LOG_DEBUG, "x=%d, y=%d, w=%d pix, h=%d pix, c=0x%02x, romoffset=0x%08x\n", xpos, ypos, width, height, palette, romoffset << 2);
 		const u8 *gfxrom = &m_gfxrom[romoffset << 2];
 		const int x_base = flipx ? (xpos + width - 1) : xpos;
 		const int x_inc = flipx ? (-1) : 1;
@@ -376,7 +379,7 @@ INPUT_PORTS_END
 
 void igs_fear_state::sound_irq(int state)
 {
-	logerror("sound irq\n");
+	LOGMASKED(LOG_DEBUG, "sound irq\n");
 	if (state)
 		m_xa->set_input_line(XA_EXT_IRQ2, ASSERT_LINE);
 }
@@ -403,7 +406,7 @@ u32 igs_fear_state::igs027_gpio_r(offs_t offset, u32 mem_mask)
 		break;
 
 	default:
-		logerror("%s: unhandled igs027_gpio_r %04x (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
+		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_gpio_r %04x (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
 		break;
 	}
 
@@ -419,7 +422,7 @@ void igs_fear_state::igs027_gpio_w(offs_t offset, u32 data, u32 mem_mask)
 		break;
 
 	default:
-		logerror("%s: unhandled igs027_gpio_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_gpio_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
 		break;
 	}
 }
@@ -469,7 +472,7 @@ void igs_fear_state::igs027_periph_w(offs_t offset, u32 data, u32 mem_mask)
 		break;
 
 	default:
-		logerror("%s: unhandled igs027_periph_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_periph_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
 		break;
 	}
 }
@@ -485,7 +488,7 @@ u32 igs_fear_state::igs027_periph_r(offs_t offset, u32 mem_mask)
 		break;
 
 	default:
-		logerror("%s: unhandled igs027_periph_r %04x (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
+		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_periph_r %04x (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
 		break;
 
 	}
@@ -555,18 +558,18 @@ void igs_fear_state::xa_w(offs_t offset, u32 data, u32 mem_mask)
 
 		if (m_num_params <= 0)
 		{
-			logerror("---------------m_xa_cmd is %02x size %02x\n", (data & 0xff00)>>8, data & 0xff);
+			LOGMASKED(LOG_DEBUG, "---------------m_xa_cmd is %02x size %02x\n", (data & 0xff00)>>8, data & 0xff);
 			m_num_params = data & 0xff;
 		}
 		else
 		{
-			logerror("-------------------------- param %04x\n", data & 0xffff);
+			LOGMASKED(LOG_DEBUG, "-------------------------- param %04x\n", data & 0xffff);
 		}
 		m_xa->set_input_line(XA_EXT_IRQ0, ASSERT_LINE);
 	}
 	else
 	{
-		logerror("%s: unhandled xa_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+		LOGMASKED(LOG_DEBUG, "%s: unhandled xa_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
 	}
 }
 
@@ -579,7 +582,7 @@ void igs_fear_state::cpld_w(offs_t offset, u32 data, u32 mem_mask)
 		break;
 
 	default:
-		logerror("%s: unhandled cpld_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+		LOGMASKED(LOG_DEBUG, "%s: unhandled cpld_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
 		break;
 	}
 }
@@ -587,26 +590,26 @@ void igs_fear_state::cpld_w(offs_t offset, u32 data, u32 mem_mask)
 u8 igs_fear_state::mcu_p0_r()
 {
 	u8 ret = m_port0_latch;
-	logerror("%s: COMMAND READ LOWER mcu_p0_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
+	LOGMASKED(LOG_DEBUG, "%s: COMMAND READ LOWER mcu_p0_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
 	return ret;
 }
 
 u8 igs_fear_state::mcu_p1_r()
 {
-	logerror("%s: mcu_p1_r()\n", machine().describe_context());
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p1_r()\n", machine().describe_context());
 	return m_port1_dat; // superkds XA will end up failing returning port1 dat for now, but not attempt to play any sounds otherwise?
 }
 
 u8 igs_fear_state::mcu_p2_r()
 {
 	u8 ret = m_port2_latch;
-	logerror("%s: COMMAND READ mcu_p2_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
+	LOGMASKED(LOG_DEBUG, "%s: COMMAND READ mcu_p2_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
 	return m_port2_latch;
 }
 
 u8 igs_fear_state::mcu_p3_r()
 {
-	logerror("%s: mcu_p3_r()\n", machine().describe_context());
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p3_r()\n", machine().describe_context());
 	return m_port3_dat;
 }
 
@@ -622,14 +625,14 @@ static int negedge(uint32_t oldval, uint32_t val, int bit)
 
 void igs_fear_state::mcu_p0_w(uint8_t data)
 {
-	logerror("%s: mcu_p0_w() %02x with port 3 as %02x and port 1 as %02x\n", machine().describe_context(), data, m_port3_dat, m_port1_dat);
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p0_w() %02x with port 3 as %02x and port 1 as %02x\n", machine().describe_context(), data, m_port3_dat, m_port1_dat);
 	m_port0_dat = data;
 }
 
 void igs_fear_state::mcu_p1_w(uint8_t data)
 {
 	u8 olddata = m_port1_dat;
-	logerror("%s: mcu_p1_w() %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p1_w() %02x\n", machine().describe_context(), data);
 	m_port1_dat = data;
 
 	if (posedge(olddata, m_port1_dat, 3))
@@ -641,14 +644,14 @@ void igs_fear_state::mcu_p1_w(uint8_t data)
 void igs_fear_state::mcu_p2_w(uint8_t data)
 {
 	m_port2_dat = data;
-	logerror("%s: mcu_p2_w() %02x with port 3 as %02x\n", machine().describe_context(), data, m_port3_dat);
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p2_w() %02x with port 3 as %02x\n", machine().describe_context(), data, m_port3_dat);
 }
 
 void igs_fear_state::mcu_p3_w(uint8_t data)
 {
 	u8 oldport3 = m_port3_dat;
 	m_port3_dat = data;
-	logerror("%s: mcu_p3_w() %02x - do latches oldport3 %02x newport3 %02x\n", machine().describe_context(), data, oldport3, m_port3_dat);
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p3_w() %02x - do latches oldport3 %02x newport3 %02x\n", machine().describe_context(), data, oldport3, m_port3_dat);
 
 	// high->low transition on bit 0x80 must read into latches!
 	if (negedge(oldport3, m_port3_dat, 7))
@@ -656,11 +659,11 @@ void igs_fear_state::mcu_p3_w(uint8_t data)
 		if (!BIT(m_port3_dat, 4))
 		{
 			m_port0_latch = m_ics->read(m_port1_dat & 7);
-			logerror("read from ics [%d] = [%02x]\n", m_port1_dat & 7, m_port0_latch);
+			LOGMASKED(LOG_DEBUG, "read from ics [%d] = [%02x]\n", m_port1_dat & 7, m_port0_latch);
 		}
 		else if (!BIT(m_port3_dat, 5))
 		{
-			logerror("read command [%d] = [%04x]\n", m_port1_dat & 7, m_xa_cmd);
+			LOGMASKED(LOG_DEBUG, "read command [%d] = [%04x]\n", m_port1_dat & 7, m_xa_cmd);
 			m_port2_latch = (m_xa_cmd & 0xff00) >> 8;
 			m_port0_latch = m_xa_cmd & 0x00ff;
 		}
@@ -670,13 +673,13 @@ void igs_fear_state::mcu_p3_w(uint8_t data)
 	{
 		if (!BIT(m_port3_dat, 4))
 		{
-			logerror("write to ics [%d] = [%02x]\n", m_port1_dat & 7, m_port0_dat);
+			LOGMASKED(LOG_DEBUG, "write to ics [%d] = [%02x]\n", m_port1_dat & 7, m_port0_dat);
 			m_ics->write(m_port1_dat & 7, m_port0_dat);
 		}
 		else if (!BIT(m_port3_dat, 5))
 		{
 			uint32_t dat = (m_port2_dat << 8) | m_port0_dat;
-			logerror("write command [%d] = [%04x]\n", m_port1_dat & 7, dat);
+			LOGMASKED(LOG_DEBUG, "write command [%d] = [%04x]\n", m_port1_dat & 7, dat);
 			switch (m_port1_dat & 7)
 			{
 			case 1:

@@ -14,11 +14,12 @@
 #include "xa.h"
 #include "xadasm.h"
 
+#define LOG_DEBUG       (1U << 1)
+#define VERBOSE         (0)
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(XA, xa_cpu, "xa", "Philips 80c51 XA")
 DEFINE_DEVICE_TYPE(MX10EXA, mx10exa_cpu_device, "mx10exa", "Philips MX10EXA")
-
-
-
 
 xa_cpu::xa_cpu(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prg_map, address_map_constructor dat_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -71,7 +72,7 @@ u8 xa_cpu::sfr_PxCFGA_r(offs_t offset)
 
 void xa_cpu::sfr_PxCFGA_w(offs_t offset, u8 data)
 {
-	logerror("P%d CFGA - Port Configuration A write %02x\n", offset, data);
+	LOGMASKED(LOG_DEBUG, "P%d CFGA - Port Configuration A write %02x\n", offset, data);
 	m_PxCFGA[offset] = data;
 }
 
@@ -82,7 +83,7 @@ u8 xa_cpu::sfr_PxCFGB_r(offs_t offset)
 
 void xa_cpu::sfr_PxCFGB_w(offs_t offset, u8 data)
 {
-	logerror("P%d CFGB - Port Configuration B write %02x\n", offset, data);
+	LOGMASKED(LOG_DEBUG, "P%d CFGB - Port Configuration B write %02x\n", offset, data);
 	m_PxCFGB[offset] = data;
 }
 
@@ -107,13 +108,13 @@ u8 xa_cpu::sfr_PSWL_r()
 	if (get_v_flag()) ret |= 0x04;
 	if (get_ac_flag()) ret |= 0x40;
 	if (get_c_flag()) ret |= 0x80;
-	logerror("read %02x from PSWL\n", ret);
+	LOGMASKED(LOG_DEBUG, "read %02x from PSWL\n", ret);
 	return ret;
 }
 
 void xa_cpu::sfr_PSWL_w(u8 data)
 {
-	logerror("write %02x to PSWL\n", data);
+	LOGMASKED(LOG_DEBUG, "write %02x to PSWL\n", data);
 	m_PSWL = data;
 	if (data & 0x01) set_z_flag(); else clear_z_flag();
 	if (data & 0x02) set_n_flag(); else clear_n_flag();
@@ -125,14 +126,14 @@ void xa_cpu::sfr_PSWL_w(u8 data)
 u8 xa_cpu::sfr_PSWH_r()
 {
 	u8 ret = m_PSWH;
-	logerror("read %02x from PSWH\n", ret);
+	LOGMASKED(LOG_DEBUG, "read %02x from PSWH\n", ret);
 	return m_PSWH;
 }
 
 void xa_cpu::sfr_PSWH_w(u8 data)
 {
 	// PSWH  SM TM RS1 RS0 IM3 IM2 IM1 IM0
-	logerror("write %02x to PSWH\n", data);
+	LOGMASKED(LOG_DEBUG, "write %02x to PSWH\n", data);
 	m_PSWH = data;
 
 	if (m_PSWH & 0x80)
@@ -158,7 +159,7 @@ u8 xa_cpu::sfr_IEL_r()
 void xa_cpu::sfr_IEL_w(u8 data)
 {
 	m_IEL = data;
-	logerror("write to m_IEL %02x\n", data);
+	LOGMASKED(LOG_DEBUG, "write to m_IEL %02x\n", data);
 }
 
 void xa_cpu::sfr_SCR_w(u8 data)
@@ -173,19 +174,19 @@ void xa_cpu::sfr_SCR_w(u8 data)
 
 	*/
 
-	logerror("write %02x to SCR\n", data);
+	LOGMASKED(LOG_DEBUG, "write %02x to SCR\n", data);
 	m_SCR = data;
 	m_pagezeromode = (data & 1);
 }
 
 void xa_cpu::sfr_WFEED1_w(u8 data)
 {
-	logerror("write %02x to WFEED1\n", data);
+	LOGMASKED(LOG_DEBUG, "write %02x to WFEED1\n", data);
 }
 
 void xa_cpu::sfr_WFEED2_w(u8 data)
 {
-	logerror("write %02x to WFEED2\n", data);
+	LOGMASKED(LOG_DEBUG, "write %02x to WFEED2\n", data);
 }
 
 /*****************************************************************************/
@@ -1371,7 +1372,7 @@ void xa_cpu::e_bitgroup(XA_EXECUTE_PARAMS)
 	case 0x50: anl_c_notbit(bit); break;
 	case 0x60: orl_c_bit(bit); break;
 	case 0x70: orl_c_notbit(bit); break;
-	default:   logerror( "illegal bit op %s", get_bittext(bit) ); do_nop(); break;
+	default:   LOGMASKED(LOG_DEBUG,  "illegal bit op %s", get_bittext(bit) ); do_nop(); break;
 	}
 	return;
 }
@@ -1684,7 +1685,7 @@ void xa_cpu::e_pushpop_djnz_subgroup(XA_EXECUTE_PARAMS)
 		case 0x10: { if (size) { pop_word_direct(direct); } else { pop_byte_direct(direct); } break; }
 		case 0x20: { if (size) { pushu_word_direct(direct); } else { pushu_byte_direct(direct); } break; }
 		case 0x30: { if (size) { push_word_direct(direct); } else { push_byte_direct(direct); } break; }
-		default: logerror("illegal push/pop"); do_nop(); break;
+		default: LOGMASKED(LOG_DEBUG, "illegal push/pop"); do_nop(); break;
 		}
 	}
 }
@@ -1725,7 +1726,7 @@ void xa_cpu::e_g9_subgroup(XA_EXECUTE_PARAMS)
 		case 0x0c: { movc_a_apc(); break; }
 		case 0x0e: { movc_a_adptr(); break; }
 		case 0x0f: { int reg = (op2 & 0xf0) >> 4; if (!size)    { mov_rd_usp(reg); } else { mov_usp_rs(reg); } break; }
-		default: { logerror("illegal %02x", op2); do_nop(); break; }
+		default: { LOGMASKED(LOG_DEBUG, "illegal %02x", op2); do_nop(); break; }
 		}
 	}
 }
@@ -1874,7 +1875,7 @@ void xa_cpu::e_jb_mov_subgroup(XA_EXECUTE_PARAMS)
 		case 0x00: jb_bit_rel8(bit, op4); break;
 		case 0x20: jnb_bit_rel8(bit, op4); break;
 		case 0x40: jbc_bit_rel8(bit, op4); break;
-		default:   logerror( "illegal conditional jump %s $%02x", get_bittext(bit), expand_rel8(op4) ); break;
+		default:   LOGMASKED(LOG_DEBUG,  "illegal conditional jump %s $%02x", get_bittext(bit), expand_rel8(op4) ); break;
 		}
 	}
 	else
@@ -2082,7 +2083,7 @@ void xa_cpu::e_norm(XA_EXECUTE_PARAMS)
 	if (size == 0x01)
 	{
 		const u8 op2 = m_program->read_byte(m_pc++);
-		logerror("illegal %02x", op2); do_nop();
+		LOGMASKED(LOG_DEBUG, "illegal %02x", op2); do_nop();
 	}
 	else
 	{
@@ -2166,7 +2167,7 @@ void xa_cpu::e_asr_j(XA_EXECUTE_PARAMS)
 		case 0x70: jmp_indrs(op2 & 0x07); break;
 		case 0x80: ret(); break;
 		case 0x90: reti(); break;
-		default:   logerror("illegal"); do_nop(); break;
+		default:   LOGMASKED(LOG_DEBUG, "illegal"); do_nop(); break;
 		}
 	}
 	else
@@ -2309,7 +2310,7 @@ void xa_cpu::e_div_data8(XA_EXECUTE_PARAMS)
 	case 0x01: { divu_byte_rd_data8(rd, data8); break; }
 	case 0x03: { divu_word_rd_data8(rd, data8); break; }
 	case 0x0b: { div_word_rd_data8(rd, data8);break; }
-	default:   { logerror("illegal mul/div data8 %s #$%02x", m_regnames8[rd], data8); do_nop(); break; }
+	default:   { LOGMASKED(LOG_DEBUG, "illegal mul/div data8 %s #$%02x", m_regnames8[rd], data8); do_nop(); break; }
 	}
 }
 
@@ -2331,7 +2332,7 @@ void xa_cpu::e_div_d16(XA_EXECUTE_PARAMS)
 	case 0x01: { const u8 rd = (op2 & 0xe0) >> 4; divu_dword_rd_data16(rd, data16); break; }
 	case 0x08: { const u8 rd = (op2 & 0xf0) >> 4; mul_word_rd_data16(rd, data16); break; }
 	case 0x09: { const u8 rd = (op2 & 0xe0) >> 4; div_dword_rd_data16(rd, data16); break; }
-	default:   { const u8 rd = (op2 & 0xf0) >> 4; logerror("illegal mul/div data16 %s, #$%04x", m_regnames16[rd], data16); do_nop();  break; }
+	default:   { const u8 rd = (op2 & 0xf0) >> 4; LOGMASKED(LOG_DEBUG, "illegal mul/div data16 %s, #$%04x", m_regnames16[rd], data16); do_nop();  break; }
 	}
 }
 
@@ -2460,7 +2461,7 @@ void xa_cpu::e_branch(XA_EXECUTE_PARAMS)
 	case 0x0c: bgt_rel8(rel8); break;
 	case 0x0d: ble_rel8(rel8); break;
 	case 0x0e: br_rel8(rel8); break;
-	case 0x0f: logerror("Illegal branch type"); do_nop(); break; // probably acts as 'branch never'
+	case 0x0f: LOGMASKED(LOG_DEBUG, "Illegal branch type"); do_nop(); break; // probably acts as 'branch never'
 	}
 }
 
@@ -2594,7 +2595,7 @@ void xa_cpu::check_external_irq_level(int level)
 		{
 			if (m_irq_pending & (1 << level))
 			{
-				logerror("testing irq %d\n", level);
+				LOGMASKED(LOG_DEBUG, "testing irq %d\n", level);
 				int vector = 0x20 + level;
 				push_word_to_system_stack(sfr_PSWH_r());
 				push_word_to_system_stack(sfr_PSWL_r());

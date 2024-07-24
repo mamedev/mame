@@ -1852,8 +1852,6 @@ void xa_cpu::ret() {
 // RETI                        Return from interrupt                                                   2 10/8(PZ)  1101 0110  1001 0000
 void xa_cpu::reti()
 {
-	logerror("reti\n");
-
 	if (m_pagezeromode)
 	{
 		// probably wrong order
