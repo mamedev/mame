@@ -13,11 +13,12 @@ MK I was, to put it bluntly, a bootleg. The chess engine is by Mike Johnson,
 with support from David Levy.
 
 Hardware notes (Master Unit):
+- PCB label: 201041 (Rev.A to Rev.E)
 - Synertek 6502A @ 2MHz (4MHz XTAL)
 - Synertek 6522 VIA
 - 8KB ROM (2*Synertek 2332)
 - 1KB RAM (2*HM472114P-3)
-- MD4332BE + a bunch of TTL for the LCD
+- MD4332BE or HLCD0438 + a bunch of TTL for the LCD
 - 13 buttons, 4 switches, no leds or sensorboard
 - connectors for: PSU, Power Pack, Chess Unit, Printer Unit
 
