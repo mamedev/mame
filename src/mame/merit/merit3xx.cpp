@@ -46,7 +46,7 @@ NOTE: From ma7558r4 set, U12 contains:
  "PERIOD RESET TO TEST TOUCHSCREEN"
  "BOOKS - TO CALIBRATE TOUCHSCREEN"
  "AUDIT KEY - TO EXIT" (another internal and unmapped button??)
- The touchscreen is controlled through the Maxim MAX232CPE RS-232 on the CRT-352 rom board?
+ The touchscreen is controlled through the Maxim MAX232CPE RS-232 on the CRT-352 ROM board?
 
 ===================================================================================================
 
@@ -245,7 +245,7 @@ Other: Dallas DS1225Y-200 8Kx8 NVRAM
        Dallas DS1230Y-200 32Kx8 NVRAM
        Dallas DS1216 2Kx8 SmartWatch RTC
        PC16550DN UART with FIFO clocked @ 1.84MHz
-       Maxim MAX232CPE RS-232 Line Transmitter/Reciver
+       Maxim MAX232CPE RS-232 Line Transmitter/Receiver
        8 switch DIP switch block labeled SW1 (enable/disable games)
 
 Connectors:
@@ -986,9 +986,8 @@ void merit3xx_state::main_map(address_map &map)
 {
 //  map.unmap_value_high();
 	map(0x0000, 0x7fff).bankr("rombank");
-	map(0x8000, 0x9fff).ram().share("nvram"); // TODO: reenable NVRAM, currently m6710a doesn't like it at all
-	// definitely accesses RAM here, would drop to "RAM error" with unmap high
-	map(0xa000, 0xbfff).ram();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xbfff).ram().share("nvram");
 	map(0xc000, 0xdfff).ram().share("charram");
 	map(0xe000, 0xffff).ram().share("attrram");
 }
@@ -1020,7 +1019,7 @@ void merit3xx_state::crt352_io_map(address_map &map)
 	map(0x20, 0x20).w(FUNC(merit3xx_state::crt352_rombank_w));
 }
 
-// currently geared towards 'Joker Poker' in ma6710a
+// currently geared towards 'Video Poker' in general and also the m6710 "family" sets
 
 static INPUT_PORTS_START( merit3xx )
 	PORT_START("IN0")
@@ -1101,7 +1100,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ma6711 )
 	PORT_INCLUDE( merit3xx )
 
-  PORT_MODIFY("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1 / Double")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Discard 2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3 / Split")
@@ -1111,8 +1110,8 @@ static INPUT_PORTS_START( ma6711 )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) // gives 1 credit at a time (25 cents)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) // gives 4 credits at a time ($1.00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 2") PORT_CODE(KEYCODE_U) PORT_TOGGLE // Uknown what these 2 are but will give DOOR OPEN errors
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 3") PORT_CODE(KEYCODE_Y) PORT_TOGGLE // Uknown what these 2 are but will give DOOR OPEN errors
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 2") PORT_CODE(KEYCODE_U) PORT_TOGGLE // Unknown what these 2 are but will give DOOR OPEN errors
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 3") PORT_CODE(KEYCODE_Y) PORT_TOGGLE // Unknown what these 2 are but will give DOOR OPEN errors
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) // gives 4 credits at a time ($1.00)
 INPUT_PORTS_END
 
@@ -1133,8 +1132,8 @@ static INPUT_PORTS_START( ma9800 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) // gives 1 credit at a time (25 cents)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) // gives 4 credits at a time ($1.00)
 //  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) // Button labeled BEFEJEZ
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 2") PORT_CODE(KEYCODE_U) PORT_TOGGLE // Uknown what these 2 are but will give DOOR OPEN errors
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 3") PORT_CODE(KEYCODE_Y) PORT_TOGGLE // Uknown what these 2 are but will give DOOR OPEN errors
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 2") PORT_CODE(KEYCODE_U) PORT_TOGGLE // Unknown what these 2 are but will give DOOR OPEN errors
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 3") PORT_CODE(KEYCODE_Y) PORT_TOGGLE // Unknown what these 2 are but will give DOOR OPEN errors
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) // gives 4 credits at a time ($1.00)
 INPUT_PORTS_END
 
@@ -1173,8 +1172,7 @@ void merit3xx_state::crt307(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &merit3xx_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &merit3xx_state::crt307_io_map);
 
-	 // TODO: reenable NVRAM, currently m6710a doesn't like it at all
-	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	 NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	i8255_device &ppi0(I8255(config, "ppi0"));
 	ppi0.in_pa_callback().set_ioport("IN0");
@@ -1273,7 +1271,7 @@ ROM_END
 ROM_START( ma6711 ) // CRT-350 mainboard + CRT-307 rev A, coin hopper - no printer
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD( "6711-14_r0a.u1", 0x00000, 0x10000, CRC(cfb47c33) SHA1(d1638dbc9f6cec159b1f638f92974798e7e93f0b) ) // English / French set
-	ROM_LOAD( "6711-14_r0a.u2", 0x10000, 0x10000, CRC(46d11f57) SHA1(ef5f45812429a662cd89df1d9b94dc96cbb2c531) ) // 6710-14 R0A  100692
+	ROM_LOAD( "6711-14_r0a.u2", 0x10000, 0x10000, CRC(46d11f57) SHA1(ef5f45812429a662cd89df1d9b94dc96cbb2c531) ) // 6711-14 R0A  100692
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "mltp_u46.u46", 0x00000, 0x10000, CRC(77d89071) SHA1(bf5207aaca2831cbc45734f8cd4ef2468cfd7191) )
@@ -1304,10 +1302,10 @@ ROM_START( ma9800 ) // CRT-350 mainboard + CRT-307 rev A, coin hopper - no print
 	ROM_LOAD( "mltp_u47.u47", 0x10000, 0x10000, CRC(efdfad6a) SHA1(2f6d2a601f60351d3b5ff735a96bde1e11f2bb74) )
 	ROM_LOAD( "mltp_u48.u48", 0x20000, 0x10000, CRC(daeb9a0e) SHA1(d209ae3f802a5ceeb92e41ed71415629892bce91) )
 
-	ROM_REGION( 0x2000, "nvram", 0 )
+	ROM_REGION( 0x2000, "nvram", ROMREGION_ERASE00 )
 	ROM_LOAD( "dallas_ds1225y.u7", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x8000, "nvram2", 0 )
+	ROM_REGION( 0x8000, "nvram2", ROMREGION_ERASE00 )
 	ROM_LOAD( "dallas_ds1235yw.u6", 0x0000, 0x8000, NO_DUMP )
 ROM_END
 

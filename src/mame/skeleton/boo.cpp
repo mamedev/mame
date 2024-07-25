@@ -4,13 +4,14 @@
 /*
 Boo 1000 by JK Amusement
 
-PCB pic is very blurry. Components which could be identified:
+Components which could be identified:
 
 Motorola MC68HC11A1 CPU
 Winbond WF19054 sound chip (AY-8910 compatible)
-12 (?) MHz XTAL
-Altera Max (exact type unreadable)
-Altera Acex (exact type unreadable)
+HM6264ALP-12 SRAM
+16 MHz XTAL
+Altera Max EPM7064
+Altera Acex EP1K50QC208-3
 3x 8-DIP banks
 4-DIP bank
 */
@@ -128,7 +129,7 @@ GFXDECODE_END
 
 void boo_state::boo(machine_config &config)
 {
-	MC68HC11A1(config, m_maincpu, 12_MHz_XTAL); // TODO: verify XTAL if better pics appear
+	MC68HC11A1(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &boo_state::program_map);
 
 	// TODO: everything
@@ -145,7 +146,7 @@ void boo_state::boo(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay", 12_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.30); // clock and divisor not verified
+	AY8910(config, "ay", 16_MHz_XTAL / 16).add_route(ALL_OUTPUTS, "mono", 0.30); // divisor not verified
 }
 
 
