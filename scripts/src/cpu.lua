@@ -1209,6 +1209,7 @@ end
 if CPUS["XA"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/xa/xa.cpp",
+		MAME_DIR .. "src/devices/cpu/xa/xa_ops.cpp",
 		MAME_DIR .. "src/devices/cpu/xa/xa.h",
 	}
 end

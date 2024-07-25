@@ -85,7 +85,7 @@ protected:
 private:
 	optional_shared_ptr<u32> m_igs_mainram;
 	required_device<cpu_device> m_maincpu;
-	optional_device<xa_cpu_device> m_xa;
+	optional_device<mx10exa_cpu_device> m_xa;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 
 	void vblank_irq(int state);
