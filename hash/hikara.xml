@@ -60,7 +60,7 @@ license:CC0-1.0
 
 	        4 User Cartridge (5 Capacity)                   n/a         Translucent Grey/White
 	        2 User Cartridge (10 Capacity)                  n/a         Translucent Pink
-	        1 User Cartridge (20 Capacity)                  n/a         Translucent Blue
+	        2 User Cartridge (20 Capacity)                  n/a         Translucent Blue
 	-->
 
 	<!-- this one has some songs programmed into it:
@@ -173,7 +173,7 @@ license:CC0-1.0
 	    情熱の薔薇              THE BLUE HEARTS     Jōnetsu no Bara             THE BLUE HEARTS
 	    ありがとう              いきものがかり      Arigatō                     Ikimonogakari -->
 	<software name="user20" supported="no">
-		<description>Hi-kara 20-song capacity user cartridge (used, with 20 songs) (Japan)</description>
+		<description>Hi-kara 20-song capacity user cartridge (used, with 20 songs, set 1) (Japan)</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -182,6 +182,17 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="user20a" cloneof="user20" supported="no">
+		<description>Hi-kara 20-song capacity user cartridge (used, with 20 songs, set 2) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="usercart_20.u1" size="0x200000" crc="e047d928" sha1="a75ca2035d74bf4292562576872389e012ceb1ad"/>
+			</dataarea>
+		</part>
+	</software>	
 
 	<software name="bh1jpop1" supported="no">
 		<description>Best Hit Collection Volume 1: J-Pop 1 (Japan)</description>
