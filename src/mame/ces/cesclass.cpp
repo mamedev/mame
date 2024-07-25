@@ -159,6 +159,7 @@ void cesclassic_state::outputs_w(uint16_t data)
 void cesclassic_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
+	// MK48Z08
 	map(0x400000, 0x40ffff).ram().share("work_ram");
 	// xC5202 FPGA
 	map(0x410000, 0x410001).portr("VBLANK");
@@ -221,7 +222,7 @@ static INPUT_PORTS_START( cesclassic )
 	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) // hit strobe
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, "DSW" )
+	PORT_DIPNAME( 0x0001, 0x0001, "DSW1" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -245,7 +246,8 @@ static INPUT_PORTS_START( cesclassic )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "SYSTEM" )
+	// TODO: schematics shows 1x DIPSW bank only, are (some of) these debug jumpers?
+	PORT_DIPNAME( 0x0100, 0x0100, "DSW2" )
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
@@ -263,10 +265,10 @@ static INPUT_PORTS_START( cesclassic )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) // LCD test
+	PORT_DIPNAME( 0x8000, 0x8000, "LCD test" )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
@@ -276,11 +278,11 @@ INPUT_PORTS_END
 
 void cesclassic_state::palette_init(palette_device &palette) const
 {
-	for (int i = 0; i < 4; i++)
-		palette.set_pen_color(i, pal2bit(i), 0, 0);
+	// amber approximation, borrowed from pinball/de_3.cpp
+	// red *seems* more charged in motion with the 240p video refs, just camera artifact?
+	for (int idx = 0; idx < 4; idx++)
+		palette.set_pen_color(idx, 0x3f * idx, 0x2a * idx, 0);
 }
-
-
 
 void cesclassic_state::cesclassic(machine_config &config)
 {
@@ -291,7 +293,8 @@ void cesclassic_state::cesclassic(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// DS1232 MicroMonitor
+
 	screen_device &l_screen(SCREEN(config, "l_lcd", SCREEN_TYPE_LCD));
 	l_screen.set_refresh_hz(60);
 	l_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
