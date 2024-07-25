@@ -49,25 +49,25 @@ private:
 		uint8_t cutoff;
 		uint8_t cutoff_speed;
 
-    bool irq_enable; // 0
-    bool filter_mode; // 1 (0:lpf, 1:hpf)
-    uint8_t resonance_flags; // 8-15
+		bool irq_enable; // 0
+		bool filter_mode; // 1 (0:lpf, 1:hpf)
+		uint8_t resonance_flags; // 8-15
 
-    uint8_t sub_phase_addr; // 0-4
+		uint8_t sub_phase_addr; // 0-4
 		bool key; // 5
 		bool alt_loop; // 6
 		bool reverse_play; // 7
-    uint8_t hiaddr; // 8-11
-    uint8_t nibble; // 2-15
-    
+		uint8_t hiaddr; // 8-11
+		uint8_t nibble; // 2-15
+
 		// work variables
-    uint16_t sub_phase_state; // 0-13
+		uint16_t sub_phase_state; // 0-13
 		bool irq_disable; // 14
 		bool alt_loop_state; // 15
 
-    uint16_t volume1_tv;
-    uint16_t volume2_tv;
-    uint16_t cutoff_tv;
+		uint16_t volume1_tv;
+		uint16_t volume2_tv;
+		uint16_t cutoff_tv;
 	};
 
 	devcb_write_line m_int_callback;
@@ -76,7 +76,7 @@ private:
 	uint32_t m_rate;                    // sample rate (usually 32000 Hz)
 	sound_stream* m_stream;             // stream handle
 	pcm_channel m_chns[NUM_CHANNELS];   // channel memory
-	[[maybe_unused]] uint8_t m_sel_chn;                  // selected channel
+	[[maybe_unused]] uint8_t m_sel_chn; // selected channel
 };
 
 DECLARE_DEVICE_TYPE(TC6116, tc6116_device)

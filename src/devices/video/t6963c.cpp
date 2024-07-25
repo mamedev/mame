@@ -5,11 +5,11 @@
     Toshiba T6963C Dot Matrix LCD Controller
     Sharp LM24014H Dot Matrix LCD Unit
 
-		TODO:
-		- cursor
-		- screen peek
-		- screen copy
-		- auto read mode
+    TODO:
+    - cursor
+    - screen peek
+    - screen copy
+    - auto read mode
 
 **********************************************************************/
 
@@ -259,6 +259,7 @@ void t6963c_device::do_command(u8 cmd)
 					: (cmd & 0x0e) == 0x02 ? "decrement"
 					: (cmd & 0x0e) == 0x04 ? "nonvariable"
 					: "invalid");
+
 			m_read_data = m_display_ram->read_byte(m_adp);
 		}
 		else
