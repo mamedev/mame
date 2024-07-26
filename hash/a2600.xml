@@ -14787,7 +14787,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="spacecave" cloneof="spacecav">
-		<description>Space Cavern - Les Guerriers de l'Espace (PAL)</description>
+		<description>Space Cavern - Les guerriers de l'espace (PAL)</description>
 		<year>1981</year>
 		<publisher>Apollo</publisher>
 		<part name="cart" interface="a2600_cart">
