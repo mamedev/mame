@@ -196,6 +196,8 @@ private:
 
 	emu_timer *m_irq_on_timer = nullptr;
 	emu_timer *m_irq_off_timer = nullptr;
+	emu_timer *m_busrq_on_timer = nullptr;
+	emu_timer *m_busrq_off_timer = nullptr;
 	uint8_t m_pcg_bank = 0;
 	uint8_t m_force_pattern = 0;
 	uint8_t m_fd_buffer_flag = 0;
@@ -212,6 +214,8 @@ private:
 	uint32_t screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(d65010_irq_on_cb);
 	TIMER_CALLBACK_MEMBER(d65010_irq_off_cb);
+	TIMER_CALLBACK_MEMBER(d65010_busrq_on_cb);
+	TIMER_CALLBACK_MEMBER(d65010_busrq_off_cb);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -266,6 +270,17 @@ void pv1000_state::io_w(offs_t offset, uint8_t data)
 		m_pcg_bank = (data & 0xe0) >> 5;
 		m_force_pattern = ((data & 0x10) >> 4); /* Dig Dug relies on this */
 		m_render_disable = ((data & 0x08) >> 3);
+		if (m_render_disable == 0) // If we're enabling rendering mid-scanline...
+		{
+			int hpos = m_screen->hpos(); // set_raw configured so that BUSREQ is asserted from 0 to 248
+			int vpos = m_screen->vpos();
+			if (hpos < 248 && vpos >= 26 && vpos < 192+26)
+			{
+				m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, ASSERT_LINE);
+				// The de-assertion is always automatically scheduled
+			}
+		}
+
 		m_border_col = data & 7;
 		break;
 	}
@@ -369,12 +384,13 @@ uint32_t pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 
 			if (tile < 0xe0 || m_force_pattern)
 			{
 				tile += (m_pcg_bank << 8);
-				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8-16, y*8+26);
+				//When we adjusted timing in set_raw so that BUSREQ is asserted during a clean rectangle, we need to compensate for that here
+				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8+16, y*8+26);
 			}
 			else
 			{
 				tile -= 0xe0;
-				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8-16, y*8+26);
+				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8+16, y*8+26);
 			}
 		}
 	}
@@ -416,6 +432,31 @@ TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_off_cb)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
+/* if 0,0 is the top left corner of non-black pixels,
+   then busreq is asserted at X=288-32 = 256 */
+TIMER_CALLBACK_MEMBER(pv1000_state::d65010_busrq_on_cb)
+{
+	int vpos = m_screen->vpos();
+	int next_vpos = vpos + 1;
+
+	if (m_render_disable == 0) {
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, ASSERT_LINE);
+	}
+
+	// schedule the de-assertion of Busreq that corresponds to the current assertion
+	m_busrq_off_timer->adjust(m_screen->time_until_pos(vpos,248));
+
+	if (vpos >= 192 + 26)
+	{
+		next_vpos = 26;
+	}
+	m_busrq_on_timer->adjust(m_screen->time_until_pos(next_vpos,0));
+}
+
+TIMER_CALLBACK_MEMBER(pv1000_state::d65010_busrq_off_cb)
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, CLEAR_LINE);
+}
 
 void pv1000_state::pv1000_postload()
 {
@@ -428,6 +469,8 @@ void pv1000_state::machine_start()
 {
 	m_irq_on_timer = timer_alloc(FUNC(pv1000_state::d65010_irq_on_cb), this);
 	m_irq_off_timer = timer_alloc(FUNC(pv1000_state::d65010_irq_off_cb), this);
+	m_busrq_on_timer = timer_alloc(FUNC(pv1000_state::d65010_busrq_on_cb), this);
+	m_busrq_off_timer = timer_alloc(FUNC(pv1000_state::d65010_busrq_off_cb), this);
 
 	m_gfxram = memregion("gfxram")->base();
 	save_pointer(NAME(m_gfxram), 0x400);
@@ -459,6 +502,8 @@ void pv1000_state::machine_reset()
 	m_fd_data = 0;
 	m_irq_on_timer->adjust(m_screen->time_until_pos(195, 0));
 	m_irq_off_timer->adjust(attotime::never);
+	m_busrq_on_timer->adjust(m_screen->time_until_pos(26, 0));
+	m_busrq_off_timer->adjust(m_screen->time_until_pos(26, 248));
 }
 
 
@@ -488,7 +533,7 @@ void pv1000_state::pv1000(machine_config &config)
 
 	/* D65010G031 - Video & sound chip */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(17897725/4, 288, 0, 224, 262, 0, 244);
+	m_screen->set_raw(17897725/4, 288, 32, 32+224, 262, 0, 244);
 	// Pixel aspect is 48/35.
 	// Display aspect is MAME's 4:3 default.
 
