@@ -6,9 +6,6 @@
 
 #pragma once
 
-#define XA_EXECUTE_PARAMS u8 op
-#define XA_EXECUTE_CALL_PARAMS op
-
 enum {
 	XA_EXT_IRQ0,
 	XA_EXT_IRQ1,
@@ -92,7 +89,7 @@ private:
 
 	std::string get_data_address(u16 arg) const;
 
-	typedef void (xa_cpu::*op_func) (XA_EXECUTE_PARAMS);
+	typedef void (xa_cpu::*op_func) (u8 op);
 	static const op_func s_instruction[256];
 
 	const char* m_regnames16[16] = { "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "illegal", "illegal", "illegal", "illegal", "illegal", "illegal", "illegal", "illegal" };
@@ -240,73 +237,73 @@ private:
 
 	u8 do_cjne_8_helper(u8 val1, u8 val2);
 
-	void handle_alu_type0(XA_EXECUTE_PARAMS, int alu_op);
-	void handle_alu_type1(XA_EXECUTE_PARAMS, u8 op2);
-	void handle_push_rlist(XA_EXECUTE_PARAMS);
-	void handle_pushu_rlist(XA_EXECUTE_PARAMS);
-	void handle_pop_rlist(XA_EXECUTE_PARAMS);
-	void handle_popu_rlist(XA_EXECUTE_PARAMS);
-	void handle_adds_movs(XA_EXECUTE_PARAMS, int which);
-	void handle_shift(XA_EXECUTE_PARAMS, int shift_type);
+	void handle_alu_type0(u8 op, int alu_op);
+	void handle_alu_type1(u8 op, u8 op2);
+	void handle_push_rlist(u8 op);
+	void handle_pushu_rlist(u8 op);
+	void handle_pop_rlist(u8 op);
+	void handle_popu_rlist(u8 op);
+	void handle_adds_movs(u8 op, int which);
+	void handle_shift(u8 op, int shift_type);
 
-	void e_illegal(XA_EXECUTE_PARAMS);
+	void e_illegal(u8 op);
 
-	void e_nop(XA_EXECUTE_PARAMS);
-	void e_bitgroup(XA_EXECUTE_PARAMS);
-	void e_add(XA_EXECUTE_PARAMS);
-	void e_push_rlist(XA_EXECUTE_PARAMS);
-	void e_addc(XA_EXECUTE_PARAMS);
-	void e_pushu_rlist(XA_EXECUTE_PARAMS);
-	void e_sub(XA_EXECUTE_PARAMS);
-	void e_pop_rlist(XA_EXECUTE_PARAMS);
-	void e_subb(XA_EXECUTE_PARAMS);
-	void e_popu_rlist(XA_EXECUTE_PARAMS);
-	void e_lea_offset8(XA_EXECUTE_PARAMS);
-	void e_lea_offset16(XA_EXECUTE_PARAMS);
-	void e_cmp(XA_EXECUTE_PARAMS);
-	void e_xch_type1(XA_EXECUTE_PARAMS);
-	void e_and(XA_EXECUTE_PARAMS);
-	void e_xch_type2(XA_EXECUTE_PARAMS);
-	void e_or(XA_EXECUTE_PARAMS);
-	void e_xor(XA_EXECUTE_PARAMS);
-	void e_movc_rd_rsinc(XA_EXECUTE_PARAMS);
-	void e_mov(XA_EXECUTE_PARAMS);
-	void e_pushpop_djnz_subgroup(XA_EXECUTE_PARAMS);
-	void e_g9_subgroup(XA_EXECUTE_PARAMS);
-	void e_alu(XA_EXECUTE_PARAMS);
-	void e_jb_mov_subgroup(XA_EXECUTE_PARAMS);
-	void e_movdir(XA_EXECUTE_PARAMS);
-	void e_adds(XA_EXECUTE_PARAMS);
-	void e_movx_subgroup(XA_EXECUTE_PARAMS);
-	void e_rr(XA_EXECUTE_PARAMS);
-	void e_movs(XA_EXECUTE_PARAMS);
-	void e_rrc(XA_EXECUTE_PARAMS);
-	void e_lsr_fc(XA_EXECUTE_PARAMS);
-	void e_asl_c(XA_EXECUTE_PARAMS);
-	void e_asr_c(XA_EXECUTE_PARAMS);
-	void e_norm(XA_EXECUTE_PARAMS);
-	void e_lsr_fj(XA_EXECUTE_PARAMS);
-	void e_asl_j(XA_EXECUTE_PARAMS);
-	void e_asr_j(XA_EXECUTE_PARAMS);
-	void e_rl(XA_EXECUTE_PARAMS);
-	void e_rlc(XA_EXECUTE_PARAMS);
-	void e_djnz_cjne(XA_EXECUTE_PARAMS);
-	void e_mulu_b(XA_EXECUTE_PARAMS);
-	void e_divu_b(XA_EXECUTE_PARAMS);
-	void e_mulu_w(XA_EXECUTE_PARAMS);
-	void e_divu_w(XA_EXECUTE_PARAMS);
-	void e_mul_w(XA_EXECUTE_PARAMS);
-	void e_div_w(XA_EXECUTE_PARAMS);
-	void e_div_data8(XA_EXECUTE_PARAMS);
-	void e_div_d16(XA_EXECUTE_PARAMS);
-	void e_divu_d(XA_EXECUTE_PARAMS);
-	void e_div_d(XA_EXECUTE_PARAMS);
-	void e_cjne_d8(XA_EXECUTE_PARAMS);
-	void e_cjne_d16(XA_EXECUTE_PARAMS);
-	void e_jz_rel8(XA_EXECUTE_PARAMS);
-	void e_jnz_rel8(XA_EXECUTE_PARAMS);
-	void e_branch(XA_EXECUTE_PARAMS);
-	void e_bkpt(XA_EXECUTE_PARAMS);
+	void e_nop(u8 op);
+	void e_bitgroup(u8 op);
+	void e_add(u8 op);
+	void e_push_rlist(u8 op);
+	void e_addc(u8 op);
+	void e_pushu_rlist(u8 op);
+	void e_sub(u8 op);
+	void e_pop_rlist(u8 op);
+	void e_subb(u8 op);
+	void e_popu_rlist(u8 op);
+	void e_lea_offset8(u8 op);
+	void e_lea_offset16(u8 op);
+	void e_cmp(u8 op);
+	void e_xch_type1(u8 op);
+	void e_and(u8 op);
+	void e_xch_type2(u8 op);
+	void e_or(u8 op);
+	void e_xor(u8 op);
+	void e_movc_rd_rsinc(u8 op);
+	void e_mov(u8 op);
+	void e_pushpop_djnz_subgroup(u8 op);
+	void e_g9_subgroup(u8 op);
+	void e_alu(u8 op);
+	void e_jb_mov_subgroup(u8 op);
+	void e_movdir(u8 op);
+	void e_adds(u8 op);
+	void e_movx_subgroup(u8 op);
+	void e_rr(u8 op);
+	void e_movs(u8 op);
+	void e_rrc(u8 op);
+	void e_lsr_fc(u8 op);
+	void e_asl_c(u8 op);
+	void e_asr_c(u8 op);
+	void e_norm(u8 op);
+	void e_lsr_fj(u8 op);
+	void e_asl_j(u8 op);
+	void e_asr_j(u8 op);
+	void e_rl(u8 op);
+	void e_rlc(u8 op);
+	void e_djnz_cjne(u8 op);
+	void e_mulu_b(u8 op);
+	void e_divu_b(u8 op);
+	void e_mulu_w(u8 op);
+	void e_divu_w(u8 op);
+	void e_mul_w(u8 op);
+	void e_div_w(u8 op);
+	void e_div_data8(u8 op);
+	void e_div_d16(u8 op);
+	void e_divu_d(u8 op);
+	void e_div_d(u8 op);
+	void e_cjne_d8(u8 op);
+	void e_cjne_d16(u8 op);
+	void e_jz_rel8(u8 op);
+	void e_jnz_rel8(u8 op);
+	void e_branch(u8 op);
+	void e_bkpt(u8 op);
 
 	void do_nop();
 
