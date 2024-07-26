@@ -17,6 +17,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_DEBUG       (1U << 1)
+#define VERBOSE         (0)
+#include "logmacro.h"
 
 namespace {
 
@@ -27,6 +30,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_xa(*this, "xa"),
+		m_ics(*this, "ics"),
+		m_screen(*this, "screen"),
 		m_videoram(*this, "videoram"),
 		m_palette(*this, "palette"),
 		m_gfxrom(*this, "gfx1"),
@@ -44,6 +49,9 @@ public:
 protected:
 	virtual void video_start() override;
 
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	void main_map(address_map &map);
 
@@ -54,7 +62,7 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	u32 igs027_gpio_r(offs_t offset);
+	u32 igs027_gpio_r(offs_t offset, u32 mem_mask);
 	void igs027_gpio_w(offs_t offset, u32 data, u32 mem_mask);
 
 	TIMER_CALLBACK_MEMBER(igs027_timer0);
@@ -62,26 +70,52 @@ private:
 
 	void igs027_periph_init(void);
 	void igs027_trigger_irq(int num);
-	u32 igs027_periph_r(offs_t offset);
+	u32 igs027_periph_r(offs_t offset, u32 mem_mask);
 	void igs027_periph_w(offs_t offset, u32 data, u32 mem_mask);
 
-	u32 xa_r(offs_t offset);
+	u32 xa_r(offs_t offset, u32 mem_mask);
 	void xa_w(offs_t offset, u32 data, u32 mem_mask);
 	void cpld_w(offs_t offset, u32 data, u32 mem_mask);
+
+	u8 mcu_p0_r();
+	u8 mcu_p1_r();
+	u8 mcu_p2_r();
+	u8 mcu_p3_r();
+	void mcu_p0_w(uint8_t data);
+	void mcu_p1_w(uint8_t data);
+	void mcu_p2_w(uint8_t data);
+	void mcu_p3_w(uint8_t data);
+
+	u16 xa_wait_r(offs_t offset);
+
+	u8 m_port2_latch;
+	u8 m_port0_latch;
 
 	u32 m_gpio_o;
 	u32 m_irq_enable;
 	u32 m_irq_pending;
-	emu_timer *m_timer0;
-	emu_timer *m_timer1;
 
 	u32 m_xa_cmd;
+	u32 m_xa_ret0;
+	u32 m_xa_ret1;
+	u8 m_num_params;
+
+	u8 m_port0_dat;
+	u8 m_port1_dat;
+	u8 m_port2_dat;
+	u8 m_port3_dat;
+
 	int m_trackball_cnt;
 	int m_trackball_axis[2], m_trackball_axis_pre[2], m_trackball_axis_diff[2];
 
+	emu_timer *m_timer0;
+	emu_timer *m_timer1;
+
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<xa_cpu_device> m_xa;
+	required_device<mx10exa_cpu_device> m_xa;
+	required_device<ics2115_device> m_ics;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<u32> m_videoram;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_gfxrom;
@@ -97,11 +131,52 @@ void igs_fear_state::video_start()
 	igs027_periph_init();
 }
 
+void igs_fear_state::machine_start()
+{
+	save_item(NAME(m_port2_latch));
+	save_item(NAME(m_port0_latch));
+
+	save_item(NAME(m_gpio_o));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_pending));
+
+	save_item(NAME(m_xa_cmd));
+	save_item(NAME(m_xa_ret0));
+	save_item(NAME(m_xa_ret1));
+	save_item(NAME(m_num_params));
+
+	save_item(NAME(m_port0_dat));
+	save_item(NAME(m_port1_dat));
+	save_item(NAME(m_port2_dat));
+	save_item(NAME(m_port3_dat));
+}
+
+void igs_fear_state::machine_reset()
+{
+	m_port2_latch = 0;
+	m_port0_latch = 0;
+
+	m_gpio_o = 0;
+	m_irq_enable = 0;
+	m_irq_pending = 0;
+
+	m_xa_cmd = 0;
+	m_xa_ret0 = 0;
+	m_xa_ret1 = 0;
+	m_num_params = 0;
+
+	m_port0_dat = 0;
+	m_port1_dat = 0;
+	m_port2_dat = 0;
+	m_port3_dat = 0;
+
+}
+
 void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int height, int width, int palette, int flipx, int romoffset)
 {
 	if ((romoffset != 0) && (romoffset != 0xffffffff))
 	{
-		//logerror("x=%d, y=%d, w=%d pix, h=%d pix, c=0x%02x, romoffset=0x%08x\n", xpos, ypos, width, height, palette, romoffset << 2);
+		//LOGMASKED(LOG_DEBUG, "x=%d, y=%d, w=%d pix, h=%d pix, c=0x%02x, romoffset=0x%08x\n", xpos, ypos, width, height, palette, romoffset << 2);
 		const u8 *gfxrom = &m_gfxrom[romoffset << 2];
 		const int x_base = flipx ? (xpos + width - 1) : xpos;
 		const int x_inc = flipx ? (-1) : 1;
@@ -235,11 +310,11 @@ INPUT_PORTS_START( superkds )
 	PORT_INCLUDE ( fear )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, "Scene" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x01, "Scene" ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "Volcano" )
 	PORT_DIPSETTING(    0x02, "Jungle" )
 	PORT_DIPSETTING(    0x01, "Ice Field" )
-	PORT_DIPSETTING(    0x00, "Ice Field" )
+	PORT_DIPSETTING(    0x00, "Ice Field (duplicate)" )
 	PORT_DIPNAME( 0x04, 0x00, "Ticket" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -278,7 +353,7 @@ INPUT_PORTS_START( superkds )
 	PORT_DIPSETTING(    0x00, "Table32" )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "Free Play" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x01, "Free Play" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x06, 0x06, "Coin/Credit" ) PORT_DIPLOCATION("SW2:2,3")
@@ -305,15 +380,19 @@ INPUT_PORTS_END
 
 void igs_fear_state::sound_irq(int state)
 {
+	LOGMASKED(LOG_DEBUG, "sound irq\n");
+	if (state)
+		m_xa->set_input_line(XA_EXT_IRQ2, ASSERT_LINE);
 }
 
 void igs_fear_state::vblank_irq(int state)
 {
 	if (state)
-		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+		if (m_screen->frame_number() & 1)
+			m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 }
 
-u32 igs_fear_state::igs027_gpio_r(offs_t offset)
+u32 igs_fear_state::igs027_gpio_r(offs_t offset, u32 mem_mask)
 {
 	u32 data = ~u32(0);
 	switch (offset * 4)
@@ -326,7 +405,12 @@ u32 igs_fear_state::igs027_gpio_r(offs_t offset)
 			data = 0x2000 | (u32(ret) << 3);
 		}
 		break;
+
+	default:
+		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_gpio_r %04x (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
+		break;
 	}
+
 	return data;
 }
 
@@ -336,6 +420,10 @@ void igs_fear_state::igs027_gpio_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 	case 0x18:
 		m_gpio_o = data;
+		break;
+
+	default:
+		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_gpio_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
 		break;
 	}
 }
@@ -373,20 +461,24 @@ void igs_fear_state::igs027_periph_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 	case 0x100:
 		// TODO: verify the timer interval
-		m_timer0->adjust(attotime::from_hz(data), 0, attotime::from_hz(data));
+		m_timer0->adjust(attotime::from_hz(data / 2), 0, attotime::from_hz(data / 2));
 		break;
 
 	case 0x104:
-		m_timer1->adjust(attotime::from_hz(data), 0, attotime::from_hz(data));
+		m_timer1->adjust(attotime::from_hz(data / 2), 0, attotime::from_hz(data / 2));
 		break;
 
 	case 0x200:
 		m_irq_enable = data;
 		break;
+
+	default:
+		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_periph_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+		break;
 	}
 }
 
-u32 igs_fear_state::igs027_periph_r(offs_t offset)
+u32 igs_fear_state::igs027_periph_r(offs_t offset, u32 mem_mask)
 {
 	u32 data = ~u32(0);
 	switch (offset * 4)
@@ -395,12 +487,17 @@ u32 igs_fear_state::igs027_periph_r(offs_t offset)
 		data = m_irq_pending;
 		m_irq_pending = 0xff;
 		break;
+
+	default:
+		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_periph_r %04x (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
+		break;
+
 	}
 	return data;
 }
 
-// TODO: ICS2115 & trackball support in XA
-u32 igs_fear_state::xa_r(offs_t offset)
+// TODO: trackball support in XA
+u32 igs_fear_state::xa_r(offs_t offset, u32 mem_mask)
 {
 	u32 data = ~u32(0);
 
@@ -408,6 +505,8 @@ u32 igs_fear_state::xa_r(offs_t offset)
 	{
 	case 0:
 	{
+		data = m_xa_ret0;
+		// TODO: This should be remove when we implement serial trackball support in XA
 		if (m_xa_cmd == 0xa301)
 		{
 			switch (m_trackball_cnt++)
@@ -444,7 +543,7 @@ u32 igs_fear_state::xa_r(offs_t offset)
 		break;
 	}
 	case 0x80:
-		data = 0;
+		data = m_xa_ret1 << 16;
 		break;
 	}
 	return data;
@@ -452,10 +551,26 @@ u32 igs_fear_state::xa_r(offs_t offset)
 
 void igs_fear_state::xa_w(offs_t offset, u32 data, u32 mem_mask)
 {
+	m_xa_cmd = data;
+
 	if (offset == 0)
 	{
-		m_xa_cmd = data;
-		igs027_trigger_irq(3);
+		m_num_params--;
+
+		if (m_num_params <= 0)
+		{
+			LOGMASKED(LOG_DEBUG, "---------------m_xa_cmd is %02x size %02x\n", (data & 0xff00)>>8, data & 0xff);
+			m_num_params = data & 0xff;
+		}
+		else
+		{
+			LOGMASKED(LOG_DEBUG, "-------------------------- param %04x\n", data & 0xffff);
+		}
+		m_xa->set_input_line(XA_EXT_IRQ0, ASSERT_LINE);
+	}
+	else
+	{
+		LOGMASKED(LOG_DEBUG, "%s: unhandled xa_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
 	}
 }
 
@@ -466,6 +581,116 @@ void igs_fear_state::cpld_w(offs_t offset, u32 data, u32 mem_mask)
 	case 0x8:
 		m_ticket->motor_w(BIT(data, 7));
 		break;
+
+	default:
+		LOGMASKED(LOG_DEBUG, "%s: unhandled cpld_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+		break;
+	}
+}
+
+u8 igs_fear_state::mcu_p0_r()
+{
+	u8 ret = m_port0_latch;
+	LOGMASKED(LOG_DEBUG, "%s: COMMAND READ LOWER mcu_p0_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
+	return ret;
+}
+
+u8 igs_fear_state::mcu_p1_r()
+{
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p1_r()\n", machine().describe_context());
+	return m_port1_dat; // superkds XA will end up failing returning port1 dat for now, but not attempt to play any sounds otherwise?
+}
+
+u8 igs_fear_state::mcu_p2_r()
+{
+	u8 ret = m_port2_latch;
+	LOGMASKED(LOG_DEBUG, "%s: COMMAND READ mcu_p2_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
+	return m_port2_latch;
+}
+
+u8 igs_fear_state::mcu_p3_r()
+{
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p3_r()\n", machine().describe_context());
+	return m_port3_dat;
+}
+
+static int posedge(uint32_t oldval, uint32_t val, int bit)
+{
+	return (!BIT(oldval, bit)) && (BIT(val, bit));
+}
+
+static int negedge(uint32_t oldval, uint32_t val, int bit)
+{
+	return (BIT(oldval, bit)) && (!BIT(val, bit));
+}
+
+void igs_fear_state::mcu_p0_w(uint8_t data)
+{
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p0_w() %02x with port 3 as %02x and port 1 as %02x\n", machine().describe_context(), data, m_port3_dat, m_port1_dat);
+	m_port0_dat = data;
+}
+
+void igs_fear_state::mcu_p1_w(uint8_t data)
+{
+	u8 olddata = m_port1_dat;
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p1_w() %02x\n", machine().describe_context(), data);
+	m_port1_dat = data;
+
+	if (posedge(olddata, m_port1_dat, 3))
+	{
+		igs027_trigger_irq(3);
+	}
+}
+
+void igs_fear_state::mcu_p2_w(uint8_t data)
+{
+	m_port2_dat = data;
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p2_w() %02x with port 3 as %02x\n", machine().describe_context(), data, m_port3_dat);
+}
+
+void igs_fear_state::mcu_p3_w(uint8_t data)
+{
+	u8 oldport3 = m_port3_dat;
+	m_port3_dat = data;
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p3_w() %02x - do latches oldport3 %02x newport3 %02x\n", machine().describe_context(), data, oldport3, m_port3_dat);
+
+	// high->low transition on bit 0x80 must read into latches!
+	if (negedge(oldport3, m_port3_dat, 7))
+	{
+		if (!BIT(m_port3_dat, 4))
+		{
+			m_port0_latch = m_ics->read(m_port1_dat & 7);
+			LOGMASKED(LOG_DEBUG, "read from ics [%d] = [%02x]\n", m_port1_dat & 7, m_port0_latch);
+		}
+		else if (!BIT(m_port3_dat, 5))
+		{
+			LOGMASKED(LOG_DEBUG, "read command [%d] = [%04x]\n", m_port1_dat & 7, m_xa_cmd);
+			m_port2_latch = (m_xa_cmd & 0xff00) >> 8;
+			m_port0_latch = m_xa_cmd & 0x00ff;
+		}
+	}
+
+	if (negedge(oldport3, m_port3_dat, 6))
+	{
+		if (!BIT(m_port3_dat, 4))
+		{
+			LOGMASKED(LOG_DEBUG, "write to ics [%d] = [%02x]\n", m_port1_dat & 7, m_port0_dat);
+			m_ics->write(m_port1_dat & 7, m_port0_dat);
+		}
+		else if (!BIT(m_port3_dat, 5))
+		{
+			uint32_t dat = (m_port2_dat << 8) | m_port0_dat;
+			LOGMASKED(LOG_DEBUG, "write command [%d] = [%04x]\n", m_port1_dat & 7, dat);
+			switch (m_port1_dat & 7)
+			{
+			case 1:
+				m_xa_ret1 = dat;
+				break;
+			case 2:
+				m_xa_ret0 = dat;
+				break;
+			}
+		}
 	}
 }
 
@@ -475,15 +700,25 @@ void igs_fear_state::igs_fear(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::main_map);
 
 	MX10EXA(config, m_xa, 50000000/3); // MX10EXAQC (Philips 80C51 XA)
+	m_xa->port_in_cb<0>().set(FUNC(igs_fear_state::mcu_p0_r));
+	m_xa->port_in_cb<1>().set(FUNC(igs_fear_state::mcu_p1_r));
+	m_xa->port_in_cb<2>().set(FUNC(igs_fear_state::mcu_p2_r));
+	m_xa->port_in_cb<3>().set(FUNC(igs_fear_state::mcu_p3_r));
+	m_xa->port_out_cb<0>().set(FUNC(igs_fear_state::mcu_p0_w));
+	m_xa->port_out_cb<1>().set(FUNC(igs_fear_state::mcu_p1_w));
+	m_xa->port_out_cb<2>().set(FUNC(igs_fear_state::mcu_p2_w));
+	m_xa->port_out_cb<3>().set(FUNC(igs_fear_state::mcu_p3_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(igs_fear_state::screen_update));
-	screen.screen_vblank().set(FUNC(igs_fear_state::vblank_irq));
-	screen.set_palette(m_palette);
+	config.set_maximum_quantum(attotime::from_hz(600));
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_screen->set_screen_update(FUNC(igs_fear_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(igs_fear_state::vblank_irq));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 0x4000/2);
 
@@ -493,9 +728,10 @@ void igs_fear_state::igs_fear(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ics2115_device &ics(ICS2115(config, "ics", 33.8688_MHz_XTAL)); // TODO : Correct?
-	ics.irq().set(FUNC(igs_fear_state::sound_irq));
-	ics.add_route(ALL_OUTPUTS, "mono", 5.0);
+
+	ICS2115(config, m_ics, 33.8688_MHz_XTAL); // TODO : Correct?
+	m_ics->irq().set(FUNC(igs_fear_state::sound_irq));
+	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
 }
 
 
@@ -583,6 +819,6 @@ void igs_fear_state::init_igs_icescape()
 
 } // anonymous namespace
 
-GAME( 2005, superkds, 0, igs_fear, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS", "Super Kids (S019CN)",           MACHINE_IS_SKELETON )
-GAME( 2006, fearless, 0, igs_fear, fear,     igs_fear_state, init_igs_fear,     ROT0, "IGS", "Fearless Pinocchio (V101US)",   MACHINE_IS_SKELETON )
+GAME( 2005, superkds, 0, igs_fear, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS", "Super Kids (S019CN)",           0 )
+GAME( 2006, fearless, 0, igs_fear, fear,     igs_fear_state, init_igs_fear,     ROT0, "IGS", "Fearless Pinocchio (V101US)",   0 )
 GAME( 2006, icescape, 0, igs_fear, fear,     igs_fear_state, init_igs_icescape, ROT0, "IGS", "Icescape (V104FA)",             MACHINE_IS_SKELETON ) // IGS FOR V104FA 2006-11-02
