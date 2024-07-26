@@ -511,6 +511,18 @@ authors:hap
 
 <!-- build screen -->
 
+	<view name="Internal Layout (LCD H)">
+		<bounds left="-13" right="111.5" top="0.5" bottom="93" />
+		<group ref="common"><bounds left="-13" right="111.5" top="0.5" bottom="93" /></group>
+
+		<!-- lcd panels (actually they're above eachother instead of side by side, but it looks better this way) -->
+		<element ref="text_black"><bounds xc="91" y="86.25" width="5" height="1.5" /></element>
+		<group ref="lcd1"><bounds xc="91" y="88" width="7.5" height="3.14" /></group>
+
+		<element ref="text_white"><bounds xc="100" y="86.25" width="5" height="1.5" /></element>
+		<group ref="lcd2"><bounds xc="100" y="88" width="7.5" height="3.14" /></group>
+	</view>
+
 	<view name="Internal Layout (LCD V)">
 		<bounds left="-13" right="111.5" top="0.5" bottom="98.75" />
 		<group ref="common"><bounds left="-13" right="111.5" top="0.5" bottom="93" /></group>
@@ -524,18 +536,6 @@ authors:hap
 
 		<group ref="lcd2"><bounds xc="88.9" y="93.75" width="7.5" height="3.14" /></group>
 		<element ref="text_white"><bounds xc="88.9" y="97.1" width="5" height="1.5" /></element>
-	</view>
-
-	<view name="Internal Layout (LCD H)">
-		<bounds left="-13" right="111.5" top="0.5" bottom="93" />
-		<group ref="common"><bounds left="-13" right="111.5" top="0.5" bottom="93" /></group>
-
-		<!-- lcd panels (actually they're above eachother instead of side by side, but it looks better this way) -->
-		<element ref="text_black"><bounds xc="91" y="86.25" width="5" height="1.5" /></element>
-		<group ref="lcd1"><bounds xc="91" y="88" width="7.5" height="3.14" /></group>
-
-		<element ref="text_white"><bounds xc="100" y="86.25" width="5" height="1.5" /></element>
-		<group ref="lcd2"><bounds xc="100" y="88" width="7.5" height="3.14" /></group>
 	</view>
 
 </mamelayout>

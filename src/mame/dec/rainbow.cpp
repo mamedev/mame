@@ -3301,7 +3301,6 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 
 	m_comm_port->option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
 	m_comm_port->option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
-	m_comm_port->option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 	m_comm_port->set_default_option("logitech_mouse");
 
 	printer.set_default_option("printer");

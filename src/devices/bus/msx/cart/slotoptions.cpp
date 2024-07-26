@@ -83,6 +83,7 @@ char const *const SLOTEXP         = "slotexp";
 char const *const SOFTCARD        = "softcard";
 char const *const SOUND_SNATCHER  = "sound_snatcher";
 char const *const SOUND_SDSNATCH  = "sound_sdsnatch";
+char const *const SUNRISE_ATAIDE  = "sunrise_ataide";
 char const *const SUNRISE_SCC     = "sunrise_scc";
 char const *const SUPER_SWANGI    = "super_swangi";
 char const *const SUPERLODERUNNER = "superloderunner";

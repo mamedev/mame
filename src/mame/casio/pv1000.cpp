@@ -200,6 +200,7 @@ private:
 	uint8_t m_force_pattern = 0;
 	uint8_t m_fd_buffer_flag = 0;
 	uint8_t m_border_col = 0;
+	uint8_t m_render_disable = 0;
 
 	uint8_t * m_gfxram = nullptr;
 	void pv1000_postload();
@@ -262,8 +263,9 @@ void pv1000_state::io_w(offs_t offset, uint8_t data)
 //  case 0x06 VRAM + PCG location, always fixed at 0xb8xx
 	case 0x07:
 		/* ---- -xxx unknown, border color? */
-		m_pcg_bank = (data & 0x20) >> 5;
+		m_pcg_bank = (data & 0xe0) >> 5;
 		m_force_pattern = ((data & 0x10) >> 4); /* Dig Dug relies on this */
+		m_render_disable = ((data & 0x08) >> 3);
 		m_border_col = data & 7;
 		break;
 	}
@@ -355,6 +357,9 @@ uint32_t pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 
 {
 	bitmap.fill(m_border_col); // border is on top and bottom
 
+	if (m_render_disable)
+		return 0;
+
 	for (int y = 0; y < 24; y++)
 	{
 		for (int x = 2; x < 30; x++) // left-right most columns never even drawn, black instead
@@ -438,6 +443,7 @@ void pv1000_state::machine_start()
 	save_item(NAME(m_force_pattern));
 	save_item(NAME(m_fd_buffer_flag));
 	save_item(NAME(m_border_col));
+	save_item(NAME(m_render_disable));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(pv1000_state::pv1000_postload), this));
 }
@@ -479,6 +485,13 @@ void pv1000_state::pv1000(machine_config &config)
 	/* D65010G031 - Video & sound chip */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(17897725/4, 288, 0, 224, 262, 0, 244);
+	// Pixel aspect is 48/35.
+	// Display aspect is MAME's 4:3 default.
+
+	// Note that this value is overridden by the user's pv1000.cfg, if present.
+	// 206px x 48/35(PAR) / 4/3(DAR) = 212sl
+	m_screen->set_default_position(216/206.0,0, //216 px in storage aspect; cropped to 206 px
+	                               244/212.0,0); //244 sl in storage aspect; cropped to 212 sl
 	m_screen->set_screen_update(FUNC(pv1000_state::screen_update_pv1000));
 	m_screen->set_palette(m_palette);
 
@@ -500,7 +513,7 @@ void pv1000_state::pv1000(machine_config &config)
 
 
 ROM_START( pv1000 )
-	ROM_REGION( 0x4000, "gfxrom", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "gfxrom", ROMREGION_ERASE00 )
 	ROM_REGION( 0x400, "gfxram", ROMREGION_ERASE00 )
 ROM_END
 

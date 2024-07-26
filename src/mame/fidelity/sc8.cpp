@@ -15,10 +15,10 @@ It was also rereleased in 1983 as "Poppy", marketed for children, the housing
 was in bright red color.
 
 Hardware notes:
+- PCB label: 510-1011 REV.2
 - Z80A CPU @ 3.9MHz
 - 4KB ROM(MOS 2732), 256 bytes RAM(35391CP)
 - chessboard buttons, 8*8+1 leds
-- PCB label 510-1011 REV.2
 
 *******************************************************************************/
 

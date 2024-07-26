@@ -609,13 +609,11 @@ void falco500_state::falco500(machine_config &config)
 	porta.rxd_handler().set("sio", FUNC(z80sio_device::rxa_w));
 	porta.cts_handler().set("sio", FUNC(z80sio_device::ctsa_w));
 	porta.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
-	porta.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 
 	rs232_port_device &portb(RS232_PORT(config, "portb", default_rs232_devices, nullptr));
 	portb.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
 	portb.cts_handler().set("sio", FUNC(z80sio_device::ctsb_w));
 	portb.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
-	portb.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 
 	SPEAKER(config, "mono").front_center();
 

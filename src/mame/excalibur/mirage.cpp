@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*******************************************************************************
 
-Excalibur Mirage
+Excalibur Mirage (model 702E)
 
 It's Excalibur's first chess computer, and also Ron Nelson's official return to
 chess programming. The x/y motorized magnet is similar to the one used in

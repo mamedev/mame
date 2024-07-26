@@ -1417,6 +1417,27 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/fp1000/fp1000_exp.h,BUSES["FP1000"] = true
+---------------------------------------------------
+
+if (BUSES["FP1000"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/fp1000/fp1000_exp.cpp",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1000_exp.h",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1020fd.cpp",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1020fd.h",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1030_rampack.cpp",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1030_rampack.h",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1060io.cpp",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1060io.h",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1060io_exp.cpp",
+		MAME_DIR .. "src/devices/bus/fp1000/fp1060io_exp.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/gamate/slot.h,BUSES["GAMATE"] = true
 ---------------------------------------------------
 
@@ -1582,6 +1603,8 @@ if (BUSES["IEEE488"]~=null) then
 		MAME_DIR .. "src/devices/bus/ieee488/shark.h",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9122c.cpp",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9122c.h",
+		MAME_DIR .. "src/devices/bus/ieee488/hp9133.cpp",
+		MAME_DIR .. "src/devices/bus/ieee488/hp9133.h",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9895.cpp",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9895.h",
 		MAME_DIR .. "src/devices/bus/ieee488/remote488.cpp",
@@ -2035,6 +2058,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/cart/hfox.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/holy_quran.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/holy_quran.h",
+		MAME_DIR .. "src/devices/bus/msx/cart/ide.cpp",
+		MAME_DIR .. "src/devices/bus/msx/cart/ide.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/ink.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/ink.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/kanji.cpp",
@@ -5474,11 +5499,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/pc8801/pc8801_31.h,BUSES["PC8801"] = true
+--@src/devices/bus/pc8801/pc8801_exp.h,BUSES["PC8801"] = true
 ---------------------------------------------------
 
 if (BUSES["PC8801"]~=null) then
 	files {
+        MAME_DIR .. "src/devices/bus/pc8801/gsx8800.cpp",
+        MAME_DIR .. "src/devices/bus/pc8801/gsx8800.h",
 		MAME_DIR .. "src/devices/bus/pc8801/pc8801_23.cpp",
 		MAME_DIR .. "src/devices/bus/pc8801/pc8801_23.h",
 		MAME_DIR .. "src/devices/bus/pc8801/pc8801_31.cpp",

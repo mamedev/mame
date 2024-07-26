@@ -86,6 +86,7 @@ extern char const *const SLOTEXP;
 extern char const *const SOFTCARD;
 extern char const *const SOUND_SNATCHER;
 extern char const *const SOUND_SDSNATCH;
+extern char const *const SUNRISE_ATAIDE;
 extern char const *const SUNRISE_SCC;
 extern char const *const SUPER_SWANGI;
 extern char const *const SUPERLODERUNNER;

@@ -64,8 +64,10 @@ protected:
 
 	virtual bool get_interlace_mode() override { return m_interlace_mode; }
 
-	memory_view m_ext_crtc_view;
 private:
+	virtual u8 crtc_data_r(offs_t offset) override;
+	virtual void crtc_data_w(offs_t offset, u8 data) override;
+
 	u8 ext_crtc_status_r(offs_t offset);
 	void ext_crtc_unlock_w(offs_t offset, u8 data);
 	u8 egasw_r(offs_t offset);
@@ -75,6 +77,7 @@ private:
 	u8 misc_control_1_r(offs_t offset);
 	void misc_control_1_w(offs_t offset, u8 data);
 
+	bool m_ext_crtc_read_unlock = false;
 	bool m_ext_crtc_write_unlock = false;
 	u8 m_pr10_scratch = 0;
 	u8 m_egasw = 0;

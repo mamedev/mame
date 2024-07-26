@@ -35,7 +35,7 @@ public:
 		, m_m1audio(*this, M1AUDIO_TAG)
 		, m_m1uart(*this, "m1uart")
 		, m_m1comm(*this, "m1comm")
-		, m_dsbz80(*this, DSBZ80_TAG)
+		, m_dsbz80(*this, "dsbz80")
 		, m_tgp_copro(*this, "tgp_copro")
 		, m_screen(*this, "screen")
 		, m_copro_fifo_in(*this, "copro_fifo_in")

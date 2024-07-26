@@ -1062,7 +1062,7 @@ protected:
 	void i486_bswap_esi();
 	void i486_bswap_edi();
 	void i486_mov_cr_r32();
-	inline void MMXPROLOG();
+	inline bool MMXPROLOG();
 	inline void READMMX(uint32_t ea,MMX_REG &r);
 	inline void WRITEMMX(uint32_t ea,MMX_REG &r);
 	inline void READXMM(uint32_t ea,XMM_REG &r);

@@ -11,11 +11,33 @@
 #include "emu.h"
 #include "pak.h"
 
+
+namespace {
+
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(MC10_PAK, mc10_pak_device, "mc10pak", "MC-10 Program PAK")
+// ======================> mc10_pak_device
+
+class mc10_pak_device :
+		public device_t,
+		public device_mc10cart_interface
+{
+public:
+	// construction/destruction
+	mc10_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual int max_rom_length() const override;
+
+	virtual std::pair<std::error_condition, std::string> load() override;
+
+protected:
+	mc10_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// device_t implementation
+	virtual void device_start() override;
+};
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -36,7 +58,7 @@ mc10_pak_device::mc10_pak_device(const machine_config &mconfig, const char *tag,
 }
 
 //-------------------------------------------------
-//  max_rom_length - device-specific startup
+//  rom constraints
 //-------------------------------------------------
 
 int mc10_pak_device::max_rom_length() const
@@ -59,11 +81,14 @@ void mc10_pak_device::device_start()
 std::pair<std::error_condition, std::string> mc10_pak_device::load()
 {
 	memory_region *const romregion(memregion("^rom"));
-	if (!romregion)
-		return std::make_pair(image_error::BADSOFTWARE, "Software item lacks 'rom' data area");
+	assert(romregion != nullptr);
 
 	// if the host has supplied a ROM space, install it
 	owning_slot().memspace().install_rom(0x5000, 0x5000 + romregion->bytes(), romregion->base());
 
 	return std::make_pair(std::error_condition(), std::string());
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MC10_PAK, device_mc10cart_interface, mc10_pak_device, "mc10pak", "MC-10 Program PAK")

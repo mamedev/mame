@@ -103,6 +103,8 @@ Notes:
       U70     : 16M mask ROM (DIP42, PCB labelled 'ZPRO0')
       *       : Unpopulated position for 16M DIP42 mask ROM (PCB labelled 'ZPRO1')
 
+TODO:
+- Transparent color is wrong at title screen animation
 */
 
 #include "emu.h"

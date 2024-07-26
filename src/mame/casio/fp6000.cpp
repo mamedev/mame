@@ -531,3 +531,4 @@ ROM_END
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT         COMPANY  FULLNAME   FLAGS
 COMP( 1985, fp6000, 0,      0,      fp6000,  fp6000, fp6000_state, empty_init, "Casio", "FP-6000", MACHINE_NOT_WORKING )
+// Reportedly released as FP-6000 Jr in Scandinavia

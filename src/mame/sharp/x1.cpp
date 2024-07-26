@@ -2214,6 +2214,8 @@ void x1_state::x1(machine_config &config)
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
 	m_screen->set_screen_update(FUNC(x1_state::screen_update_x1));
+	// add a saner default for both interlace and progressive modes
+	m_screen->set_default_position(1.100, 0.050, 1.100, 0.050);
 
 	HD6845S(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
 	m_crtc->set_screen(m_screen);

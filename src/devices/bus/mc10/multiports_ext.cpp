@@ -1,3 +1,6 @@
+// license:BSD-3-Clause
+// copyright-holders:S. Glaize
+
 /***************************************************************************
 
     multiports_ext.cpp
@@ -37,6 +40,7 @@ public:
 	mc10_multiports_ext_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual int max_rom_length() const override;
+
 	virtual std::pair<std::error_condition, std::string> load() override;
 
 protected:
@@ -49,11 +53,9 @@ protected:
 	void control_register_write(offs_t offset, u8 data);
 
 	void multiports_mem(address_map &map);
-	void update_bank();
 
 private:
 	memory_bank_creator m_bank;
-	uint8_t rom_bank_index;
 	memory_share_creator<u8> m_extention_ram;
 };
 
@@ -70,7 +72,6 @@ mc10_multiports_ext_device::mc10_multiports_ext_device(const machine_config &mco
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_mc10cart_interface(mconfig, *this)
 	, m_bank(*this, "cart_bank")
-	, rom_bank_index(0)
 	, m_extention_ram(*this, "ext_ram", 1024 * 16, ENDIANNESS_BIG)
 {
 }
@@ -103,14 +104,32 @@ void mc10_multiports_ext_device::device_reset()
 void mc10_multiports_ext_device::control_register_write(offs_t offset, u8 data)
 {
 	if (offset < 0x1000)
+	{
 		m_bank->set_entry(data & 0x07);
+	}
 }
 
 std::pair<std::error_condition, std::string> mc10_multiports_ext_device::load()
 {
 	memory_region *const romregion(memregion("^rom"));
-	if (romregion->bytes() < (0x2000 * 8))
-		return std::make_pair(image_error::INVALIDLENGTH, "Cartridge ROM must be at least 64KB");
+	assert(romregion != nullptr);
+
+	const u32 min_rom_length = 8 * 1024;
+	const u32 block_rom_length = 8 * 1024;
+	const u32 len = romregion->bytes();
+
+	if (len < min_rom_length)
+	{
+		return std::make_pair(
+			image_error::INVALIDLENGTH,
+			util::string_format("Unsupported cartridge size (must be at least %u bytes)", min_rom_length));
+	}
+	else if (len % block_rom_length != 0)
+	{
+		return std::make_pair(
+			image_error::INVALIDLENGTH,
+			util::string_format("Unsupported cartridge size (must be a multiple of %u bytes)", block_rom_length));
+	}
 
 	m_bank->configure_entries(0, 8, romregion->base(), 0x2000);
 

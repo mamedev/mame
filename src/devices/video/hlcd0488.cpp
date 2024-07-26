@@ -6,7 +6,6 @@ Hughes HLCD 0488 LCD Driver
 16*16 segment outputs, direct drive
 
 TODO:
-- should all control be edge-triggered?
 - output polarity flip
 
 */
@@ -42,6 +41,7 @@ void hlcd0488_device::device_start()
 	m_data_clk_prev = 0;
 	m_data = 0;
 	m_count = 0;
+
 	std::fill_n(m_latch, std::size(m_latch), 0);
 	std::fill_n(m_hold, std::size(m_hold), 0);
 

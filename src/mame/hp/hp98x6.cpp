@@ -202,6 +202,7 @@ void hp9816_state::hp9816(machine_config &config)
 	ieee.atn_callback().set(m_hpib , FUNC(tms9914_device::atn_w));
 	ieee.ren_callback().set(m_hpib , FUNC(tms9914_device::ren_w));
 	IEEE488_SLOT(config, "ieee_rem", 0, remote488_devices, nullptr);
+	IEEE488_SLOT(config, "ieee0", 0, hp_ieee488_devices, nullptr);
 
 	INS8250(config, m_uart, UART_CLOCK);
 	m_uart->out_int_callback().set(FUNC(hp9816_state::uart_irq_w));

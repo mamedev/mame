@@ -27,15 +27,10 @@ TODO:
  - kinstb   : fix gfx glitches, missing texts
  - ffight2b : remove hack for starting credits (RAM - mainly 0x7eadce where credits are stored - is filled with 0x55,
    so you are awarded 55 credits on a hard reset)
- - sblast2b : dipswitches
  - sblast2b : pressing start during gameplay changes the character used. Intentional?
  - denseib,2: fix gfx glitches, missing texts
- - legendsb : unknown dipswitches
- - rushbets : dipswitches (stored at memory locations $785006 and $785008)
  - venom    : gfx glitches on second level
- - wldgunsb : dipswitches
- - wldgunsb : sometimes continue counter doesn't start from '9', verify if protection is involved.
- - tmntmwb  : dipswitches
+ - wldgunsb : remove hack for continue counter (values at 0x781010 and 0x781012 are expected to be initialized on reset/boot)
 
 ***************************************************************************
 
@@ -214,6 +209,7 @@ private:
 	uint8_t tmntmwb_7132cc_r(offs_t offset);
 
 	DECLARE_MACHINE_RESET(ffight2b);
+	DECLARE_MACHINE_RESET(wldgunsb);
 	void snesb_map(address_map &map);
 	void spc_map(address_map &map);
 	void endless_map(address_map &map);
@@ -230,7 +226,9 @@ private:
 uint8_t snesb_state::prot_cnt_r()
 {
 	// protection check
-	return ++m_cnt;
+	if (!machine().side_effects_disabled())
+		m_cnt++;
+	return m_cnt;
 }
 
 
@@ -359,8 +357,11 @@ void snesb_state::extrainp_map(address_map &map)
 	snesb_map(map);
 
 	map(0x770071, 0x770071).portr("DSW1");
+	map(0x770072, 0x770072).nopr();
 	map(0x770073, 0x770073).portr("DSW2");
+	map(0x770074, 0x770074).nopr();
 	map(0x770079, 0x770079).portr("COIN");
+	map(0x77007a, 0x77007a).nopr();
 }
 
 void snesb_state::kinstb_map(address_map &map)
@@ -409,16 +410,13 @@ void snesb_state::venom_map(address_map &map)
 
 void snesb_state::wldgunsb_map(address_map &map)
 {
-	snesb_map(map);
+	extrainp_map(map);
 
 	map(0x721197, 0x721197).r(FUNC(snesb_state::wldgunsb_721197_r));
 	map(0x722262, 0x722262).r(FUNC(snesb_state::wldgunsb_722262_r));
 	map(0x723363, 0x723363).r(FUNC(snesb_state::wldgunsb_723364_r));
 	map(0x72443a, 0x72443a).r(FUNC(snesb_state::wldgunsb_72443a_r));
 	map(0x72553b, 0x72553b).r(FUNC(snesb_state::wldgunsb_72553b_r));
-	map(0x770071, 0x770071).portr("DSW1");
-	map(0x770072, 0x770072).portr("DSW2");
-	map(0x770079, 0x770079).portr("COIN");
 	map(0x781000, 0x781021).ram().share(m_shared_ram[0]);
 	map(0x7bf45b, 0x7bf45b).r(FUNC(snesb_state::prot_cnt_r));
 }
@@ -445,11 +443,7 @@ uint8_t snesb_state::tmntmwb_7010f1_r(offs_t offset)
 
 void snesb_state::tmntmwb_map(address_map &map)
 {
-	snesb_map(map);
-
-	map(0x770071, 0x770072).portr("DSW1");
-	map(0x770073, 0x770074).portr("DSW2");
-	map(0x770079, 0x770079).portr("COIN");
+	extrainp_map(map);
 
 	map(0x7103cd, 0x7103ce).r(FUNC(snesb_state::tmntmwb_7103cd_r));
 	map(0x7065f0, 0x7065f1).r(FUNC(snesb_state::tmntmwb_7065f0_r));
@@ -814,7 +808,7 @@ static INPUT_PORTS_START( endless )
 	PORT_DIPSETTING(    0xc0, "99" )                        // "LIMIT"
 	PORT_DIPSETTING(    0x80, "60" )                        // undefined
 	PORT_DIPSETTING(    0x40, "30" )                        // undefined
-	PORT_DIPSETTING(    0x00, "Infinite" )                  // "NO LIMIT"
+	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) )         // "NO LIMIT"
 
 	PORT_START("DSW2")
 	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
@@ -831,7 +825,7 @@ static INPUT_PORTS_START( endless )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( rushbets )
+static INPUT_PORTS_START( legendsb )
 	PORT_INCLUDE(snes_common)
 
 	PORT_START("DSW1")
@@ -844,20 +838,25 @@ static INPUT_PORTS_START( rushbets )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x38, "0" )
-	PORT_DIPSETTING(    0x30, "1" )
-	PORT_DIPSETTING(    0x28, "2" )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x18, "2" )
-	PORT_DIPSETTING(    0x10, "2" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0xc0, "0" )
-	PORT_DIPSETTING(    0x80, "1" )
-	PORT_DIPSETTING(    0x40, "2" )
-	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPNAME( 0x38, 0x30, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( Easy ))
+	PORT_DIPSETTING(    0x30, DEF_STR( Normal ))
+	PORT_DIPSETTING(    0x28, DEF_STR( Hard )) // all other values are equivalent to this
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0xc0, "1" )
+	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPSETTING(    0x40, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+
+	PORT_START("DSW2")
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -880,8 +879,11 @@ static INPUT_PORTS_START( venom )
 	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0xc0, "1" )
+	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPSETTING(    0x40, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
 
 	PORT_START("DSW2")
 	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
@@ -923,7 +925,22 @@ static INPUT_PORTS_START( wldgunsb )
 	PORT_INCLUDE( venom )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x38, 0x30, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( Easy ))
+	PORT_DIPSETTING(    0x30, DEF_STR( Normal ))
+	PORT_DIPSETTING(    0x28, DEF_STR( Hard )) // all other values are equivalent to this
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x38, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x38, "Every 360k")
+	PORT_DIPSETTING(    0x30, "Every 400k")
+	PORT_DIPSETTING(    0x28, "Every 450k")
+	PORT_DIPSETTING(    0x20, "Every 480k")
+	PORT_DIPSETTING(    0x18, "Every 500k")
+	PORT_DIPSETTING(    0x10, "Every 550k")
+	PORT_DIPSETTING(    0x08, "Every 580k")
+	PORT_DIPSETTING(    0x00, "Every 600k")
+	PORT_DIPNAME( 0xc0, 0x40, "Bombs" )
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "2" )
 	PORT_DIPSETTING(    0x40, "3" )
@@ -943,39 +960,31 @@ static INPUT_PORTS_START( tmntmwb )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x38, "0" )
-	PORT_DIPSETTING(    0x30, "1" )
-	PORT_DIPSETTING(    0x28, "2" )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x18, "2" )
-	PORT_DIPSETTING(    0x10, "2" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0xc0, "0" )
-	PORT_DIPSETTING(    0x80, "1" )
-	PORT_DIPSETTING(    0x40, "2" )
-	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Difficulty ) ) // corresponds to levels 3-7 on SNES
+	PORT_DIPSETTING(    0x38, DEF_STR( Easier )) // default on SNES
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ))
+	PORT_DIPSETTING(    0x28, DEF_STR( Normal ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ))
+	PORT_DIPSETTING(    0x18, DEF_STR( Harder )) // all other values are equivalent to this
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Game_Time ) )
+	PORT_DIPSETTING(    0xc0, "99" )
+	PORT_DIPSETTING(    0x80, "60" )
+	PORT_DIPSETTING(    0x40, "30" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) )
 
 	PORT_START("DSW2")
 	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x04, "1" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPSETTING(    0x14, "5" )
-	PORT_DIPSETTING(    0x18, "6" )
-	PORT_DIPSETTING(    0x1c, "7" )
+	PORT_DIPNAME( 0x1c, 0x1c, "Unlock Bosses" )
+	PORT_DIPSETTING(    0x1c, DEF_STR( None ) ) // all other values are equivalent to this
+	PORT_DIPSETTING(    0x18, "Rat King" )
+	PORT_DIPSETTING(    0x08, "Both" )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0xc0, "0" )
-	PORT_DIPSETTING(    0x80, "1" )
-	PORT_DIPSETTING(    0x40, "2" )
-	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPNAME( 0xc0, 0x00, "Speed" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0xc0, "Fast" )
+	PORT_DIPSETTING(    0x80, "Faster" )
+	PORT_DIPSETTING(    0x40, "Fastest" )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1074,11 +1083,21 @@ void snesb_state::venom(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::venom_map);
 }
 
+MACHINE_RESET_MEMBER( snesb_state, wldgunsb )
+{
+	snes_state::machine_reset();
+
+	// initialize continue counter
+	m_shared_ram[0][0x10] = 9;
+	m_shared_ram[0][0x12] = 0;
+}
+
 void snesb_state::wldgunsb(machine_config &config)
 {
 	base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::wldgunsb_map);
+	MCFG_MACHINE_RESET_OVERRIDE( snesb_state, wldgunsb )
 }
 
 void snesb_state::tmntmwb(machine_config &config)
@@ -1809,7 +1828,7 @@ GAME( 1997, sblast2b,     0,        sblast2b,     sblast2b, snesb_state, init_sb
 GAME( 1997, tmntmwb,      0,        tmntmwb,      tmntmwb,  snesb_state, init_tmntmwb,   ROT0, "bootleg",  "Teenage Mutant Ninja Turtles - Mutant Warriors (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, endless,      0,        endless,      endless,  snesb_state, init_endless,   ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 1)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, endlessa,     endless,  endless,      endless,  snesb_state, init_endless,   ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 2)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, legendsb,     0,        extrainp,     kinstb,   snesb_state, init_legendsb,  ROT0, "bootleg",  "Legend (SNES bootleg)",                                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rushbets,     0,        rushbets,     rushbets, snesb_state, init_rushbets,  ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, legendsb,     0,        extrainp,     legendsb, snesb_state, init_legendsb,  ROT0, "bootleg",  "Legend (SNES bootleg)",                                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rushbets,     0,        rushbets,     legendsb, snesb_state, init_rushbets,  ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, venom,        0,        venom,        venom,    snesb_state, init_venom,     ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, wldgunsb,     0,        wldgunsb,     wldgunsb, snesb_state, init_wldgunsb,  ROT0, "bootleg",  "Wild Guns (SNES bootleg)",                                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version
+GAME( 1996, wldgunsb,     0,        wldgunsb,     wldgunsb, snesb_state, init_wldgunsb,  ROT0, "bootleg",  "Wild Guns (SNES bootleg)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version

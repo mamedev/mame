@@ -160,13 +160,13 @@ protected:
 	u8           m_im;
 	u8           m_i;
 	u8           m_nmi_state;          // nmi pin state
-	u8           m_nmi_pending;        // nmi pending
+	bool         m_nmi_pending;        // nmi pending
 	u8           m_irq_state;          // irq pin state
 	int          m_wait_state;         // wait pin state
 	int          m_busrq_state;        // bus request pin state
 	u8           m_busack_state;       // bus acknowledge pin state
-	u8           m_after_ei;           // are we in the EI shadow?
-	u8           m_after_ldair;        // same, but for LD A,I or LD A,R
+	bool         m_after_ei;           // are we in the EI shadow?
+	bool         m_after_ldair;        // same, but for LD A,I or LD A,R
 	u32          m_ea;
 
 	int          m_icount;
@@ -181,14 +181,15 @@ protected:
 	u8 m_memrq_cycles;
 	u8 m_iorq_cycles;
 
-	static std::unique_ptr<u8[]> SZ;       // zero and sign flags
-	static std::unique_ptr<u8[]> SZ_BIT;   // zero, sign and parity/overflow (=zero) flags for BIT opcode
-	static std::unique_ptr<u8[]> SZP;      // zero, sign and parity flags
-	static std::unique_ptr<u8[]> SZHV_inc; // zero, sign, half carry and overflow flags INC r8
-	static std::unique_ptr<u8[]> SZHV_dec; // zero, sign, half carry and overflow flags DEC r8
+	static bool tables_initialised;
+	static u8 SZ[0x100];       // zero and sign flags
+	static u8 SZ_BIT[0x100];   // zero, sign and parity/overflow (=zero) flags for BIT opcode
+	static u8 SZP[0x100];      // zero, sign and parity flags
+	static u8 SZHV_inc[0x100]; // zero, sign, half carry and overflow flags INC r8
+	static u8 SZHV_dec[0x100]; // zero, sign, half carry and overflow flags DEC r8
 
-	static std::unique_ptr<u8[]> SZHVC_add;
-	static std::unique_ptr<u8[]> SZHVC_sub;
+	static u8 SZHVC_add[2 * 0x100 * 0x100];
+	static u8 SZHVC_sub[2 * 0x100 * 0x100];
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)

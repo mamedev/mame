@@ -78,7 +78,9 @@ scsidma_device::scsidma_device(const machine_config &mconfig, const char *tag, d
 	m_scsi_irq(0),
 	m_control(0),
 	m_holding(0),
-	m_holding_remaining(0)
+	m_holding_remaining(0),
+	m_is_write(false),
+	m_drq_completed(false)
 {
 }
 
@@ -89,6 +91,8 @@ void scsidma_device::device_start()
 	save_item(NAME(m_control));
 	save_item(NAME(m_holding));
 	save_item(NAME(m_holding_remaining));
+	save_item(NAME(m_is_write));
+	save_item(NAME(m_drq_completed));
 }
 
 void scsidma_device::device_reset()
@@ -96,6 +100,7 @@ void scsidma_device::device_reset()
 	m_control = 0;
 	m_holding = 0;
 	m_holding_remaining = 0;
+	m_drq_completed = false;
 }
 
 u32 scsidma_device::control_r()
@@ -133,6 +138,14 @@ void scsidma_device::scsi_w(offs_t offset, u8 data)
 
 u32 scsidma_device::handshake_r(offs_t offset, u32 mem_mask)
 {
+	// if the DRQ handler completed this transfer while we were out, just return the result now
+	if (m_drq_completed)
+	{
+		LOGMASKED(LOG_HANDSHAKE, "%s: Completed read in DRQ, returning\n", tag());
+		m_drq_completed = false;
+		return m_holding;
+	}
+
 	if (mem_mask == 0xff000000)
 	{
 		if (m_control & CTRL_HNDSHK)
@@ -145,7 +158,7 @@ u32 scsidma_device::handshake_r(offs_t offset, u32 mem_mask)
 			{
 				LOGMASKED(LOG_HANDSHAKE, "Handshaking single byte, no DRQ\n");
 				m_maincpu->restart_this_instruction();
-				m_maincpu->spin_until_time(attotime::from_usec(50));
+				m_maincpu->suspend_until_trigger(1, true);
 				return 0xffffffff;
 			}
 		}
@@ -176,10 +189,11 @@ u32 scsidma_device::handshake_r(offs_t offset, u32 mem_mask)
 			{
 				m_holding_remaining = 2;
 			}
+			m_is_write = false;
 		}
 
 		// is a new byte available?
-		while (m_drq && m_holding_remaining)
+		if (m_drq && m_holding_remaining)
 		{
 			m_holding <<= 8;
 			m_holding |= m_ncr->dma_r();
@@ -194,7 +208,7 @@ u32 scsidma_device::handshake_r(offs_t offset, u32 mem_mask)
 
 		LOGMASKED(LOG_HANDSHAKE, "Handshaking %d byte read\n", m_holding_remaining);
 		m_maincpu->restart_this_instruction();
-		m_maincpu->spin_until_time(attotime::from_usec(50));
+		m_maincpu->suspend_until_trigger(1, true);
 		return 0xffffffff;
 	}
 	fatalerror("%s: Unhandled handshake read mask %08x\n", tag(), mem_mask);
@@ -203,6 +217,14 @@ u32 scsidma_device::handshake_r(offs_t offset, u32 mem_mask)
 
 void scsidma_device::handshake_w(offs_t offset, u32 data, u32 mem_mask)
 {
+	// if the DRQ handler completed this transfer while we were out, we're done
+	if (m_drq_completed)
+	{
+		LOGMASKED(LOG_HANDSHAKE, "%s: Completed write in DRQ, returning\n", tag());
+		m_drq_completed = false;
+		return;
+	}
+
 	if (mem_mask == 0xff000000)
 	{
 		if (m_control & CTRL_HNDSHK)
@@ -216,7 +238,7 @@ void scsidma_device::handshake_w(offs_t offset, u32 data, u32 mem_mask)
 			{
 				LOGMASKED(LOG_HANDSHAKE, "Handshake single byte write\n");
 				m_maincpu->restart_this_instruction();
-				m_maincpu->spin_until_time(attotime::from_usec(50));
+				m_maincpu->suspend_until_trigger(1, true);
 				return;
 			}
 		}
@@ -249,6 +271,7 @@ void scsidma_device::handshake_w(offs_t offset, u32 data, u32 mem_mask)
 			{
 				m_holding_remaining = 2;
 			}
+			m_is_write = true;
 		}
 
 		// is a new byte available?
@@ -265,9 +288,9 @@ void scsidma_device::handshake_w(offs_t offset, u32 data, u32 mem_mask)
 			return;
 		}
 
-		LOGMASKED(LOG_HANDSHAKE, "Handshaking %d byte write\n", m_holding_remaining);
+		LOGMASKED(LOG_HANDSHAKE, "Handshaking %d byte write %08x\n", m_holding_remaining, m_holding);
 		m_maincpu->restart_this_instruction();
-		m_maincpu->spin_until_time(attotime::from_usec(50));
+		m_maincpu->suspend_until_trigger(1, true);
 		return;
 	}
 	fatalerror("%s: Unhandled handshake write mask %08x\n", tag(), mem_mask);
@@ -287,6 +310,29 @@ void scsidma_device::scsi_irq_w(int state)
 
 void scsidma_device::scsi_drq_w(int state)
 {
-	LOGMASKED(LOG_DRQ, "%s: 53C80 DRQ %d (was %d)\n", tag(), state, m_drq);
+	LOGMASKED(LOG_DRQ, "%s: 53C80 DRQ %d (was %d) (remain %d write %d)\n", tag(), state, m_drq, m_holding_remaining, m_is_write);
+	if ((state) && (m_holding_remaining > 0))
+	{
+		if (m_is_write)
+		{
+			m_ncr->dma_w(m_holding >> 24);
+			m_holding <<= 8;
+			m_holding_remaining--;
+			LOGMASKED(LOG_HANDSHAKE, "DRQ: Holding write %08x, remain %d\n", m_holding, m_holding_remaining);
+		}
+		else
+		{
+			m_holding <<= 8;
+			m_holding |= m_ncr->dma_r();
+			m_holding_remaining--;
+			LOGMASKED(LOG_HANDSHAKE, "DRQ: Holding %08x, remain %d\n", m_holding, m_holding_remaining);
+		}
+
+		if (m_holding_remaining == 0)
+		{
+			m_drq_completed = true;
+			m_maincpu->trigger(1);
+		}
+	}
 	m_drq = state;
 }

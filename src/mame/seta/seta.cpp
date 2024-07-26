@@ -9007,11 +9007,12 @@ void seta_state::zingzipbl(machine_config &config)
 	m_spritegen->set_info(gfx_zingzipbl_sprites);
 	m_layers[0]->set_info(gfx_zingzipbl_layer1);
 	m_layers[1]->set_info(gfx_zingzipbl_layer2);
+	// TODO: layers x and y offsets' adjustments
 
 	M68000(config.replace(), m_maincpu, 16000000);   // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::zingzipbl_map);
 
-	subdevice<screen_device>("screen")->screen_vblank().set_inputline(m_maincpu, 6, HOLD_LINE); // TODO: there's probably more then this
+	subdevice<screen_device>("screen")->screen_vblank().set_inputline(m_maincpu, 6, HOLD_LINE); // TODO: there's probably more than this
 
 	config.device_remove("x1snd");
 

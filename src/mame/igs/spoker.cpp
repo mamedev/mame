@@ -135,14 +135,41 @@ public:
 protected:
 	virtual void video_start() override;
 
+	void portmap(address_map &map);
+
 private:
 	void coins_w(uint8_t data);
 	void nmi_video_leds_w(uint8_t data);
 
 	void program_map(address_map &map);
-	void portmap(address_map &map);
 };
 
+class jb_state : public spokeru_state
+{
+public:
+	jb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spokeru_state(mconfig, type, tag),
+		m_reel_ram(*this, "reel_ram.%u", 0U),
+		m_reel_scroll_ram(*this, "reel_scroll_ram.%u", 0U)
+	{ }
+
+	void jb(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	required_shared_ptr_array<uint8_t, 3> m_reel_ram;
+	required_shared_ptr_array<uint8_t, 2> m_reel_scroll_ram;
+
+	tilemap_t *m_reel_tilemap[3]{};
+
+	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
+	template<uint8_t Reel> void reel_ram_w(offs_t offset, uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void portmap(address_map &map);
+};
 
 /***************************************************************************
                                 Video Hardware
@@ -178,6 +205,24 @@ void spoker_state::fg_color_w(offs_t offset, uint8_t data)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
+template<uint8_t Reel>
+TILE_GET_INFO_MEMBER(jb_state::get_reel_tile_info)
+{
+	int const code = m_reel_ram[Reel][tile_index];
+
+	tileinfo.set(1,
+			(code)+ (((tile_index + 1) & 0x3) * 0x100),
+			(code & 0x80) ? 0xc : 0,
+			0);
+}
+
+template<uint8_t Reel>
+void jb_state::reel_ram_w(offs_t offset, uint8_t data)
+{
+	m_reel_ram[Reel][offset] = data;
+	m_reel_tilemap[Reel]->mark_tile_dirty(offset);
+}
+
 void spoker_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spoker_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 128, 8);
@@ -190,6 +235,20 @@ void spokeru_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spokeru_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
+void jb_state::video_start()
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jb_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jb_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jb_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jb_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+
+	m_reel_tilemap[0]->set_scroll_cols(64);
+	m_reel_tilemap[1]->set_scroll_cols(64);
+	m_reel_tilemap[2]->set_scroll_cols(64);
+}
+
 uint32_t spoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
@@ -199,7 +258,51 @@ uint32_t spoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
+uint32_t jb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
+	for (int i = 0; i < 0x40; i++)
+	{
+		m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll_ram[0][i + 0x000]);
+		m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll_ram[0][i + 0x040]);
+		m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll_ram[0][i + 0x080]);
+	}
+
+	int startclipmin = 0;
+	const rectangle &visarea = screen.visible_area();
+
+	for (int j = 0; j < 0x100 - 1; j++)
+	{
+		rectangle clip;
+		int const rowenable = m_reel_scroll_ram[1][j];
+
+		// draw top of screen
+		clip.set(visarea.min_x, visarea.max_x, startclipmin, startclipmin + 1);
+
+		if (rowenable == 0)
+		{
+			m_reel_tilemap[0]->draw(screen, bitmap, clip, 0, 0);
+		}
+		else if (rowenable == 1)
+		{
+			m_reel_tilemap[1]->draw(screen, bitmap, clip, 0, 0);
+		}
+		else if (rowenable == 2)
+		{
+			m_reel_tilemap[2]->draw(screen, bitmap, clip, 0, 0);
+		}
+		else if (rowenable == 3)
+		{
+		}
+
+		startclipmin += 1;
+	}
+
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
 /***************************************************************************
                                Misc Handlers
 ***************************************************************************/
@@ -389,6 +492,19 @@ void spokeru_state::portmap(address_map &map)
 	map(0x50c0, 0x50c0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x7000, 0x77ff).ram().w(FUNC(spokeru_state::fg_tile_w)).share(m_fg_tile_ram);
 	map(0x7800, 0x7fff).ram().w(FUNC(spokeru_state::fg_color_w)).share(m_fg_color_ram);
+}
+
+void jb_state::portmap(address_map &map)
+{
+	spokeru_state::portmap(map);
+
+	map(0x1000, 0x10ff).ram().share(m_reel_scroll_ram[1]);
+	map(0x6000, 0x60ff).ram().share(m_reel_scroll_ram[0]);
+	map(0x6800, 0x69ff).ram().w(FUNC(jb_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0x6a00, 0x6bff).ram().w(FUNC(jb_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0x6c00, 0x6dff).ram().w(FUNC(jb_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0x6e00, 0x6fff).nopw(); // hardware seems to support a 4th reel, unused by the dump game (only writes 0xff)
+	map(0x8000, 0xffff).rom().region("maincpu", 0x10000);
 }
 
 void spoker_state::_3super8_portmap(address_map &map)
@@ -645,6 +761,174 @@ static INPUT_PORTS_START( 3super8 )
 INPUT_PORTS_END
 
 
+// TODO: copied over from older versions in igs/igs009.cpp. Verify if dips are the same. Inputs are verified the same.
+static INPUT_PORTS_START( jb )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "W-Up Bonus" )        PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Min Bet" )           PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPNAME( 0x08, 0x08, "Spin Speed" )        PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, "Slow" )
+	PORT_DIPSETTING(    0x00, "Quick" )
+	PORT_DIPNAME( 0x10, 0x00, "Strip Girl" )        PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Payout Mode" )       PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Auto" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Player's Panel" )    PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(    0x00, "Type A" )
+	PORT_DIPSETTING(    0xc0, "Type A" )
+	PORT_DIPSETTING(    0x80, "Type B" )
+	PORT_DIPSETTING(    0x40, "Type C" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x07, "Main Game Rate (%)" )    PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPSETTING(    0x07, "55" )
+	PORT_DIPSETTING(    0x06, "60" )
+	PORT_DIPSETTING(    0x05, "65" )
+	PORT_DIPSETTING(    0x04, "70" )
+	PORT_DIPSETTING(    0x03, "75" )
+	PORT_DIPSETTING(    0x02, "80" )
+	PORT_DIPSETTING(    0x01, "85" )
+	PORT_DIPSETTING(    0x00, "90" )
+	PORT_DIPNAME( 0x38, 0x38, "W-Up Chance (%)" )   PORT_DIPLOCATION("DSW2:4,5,6")
+	PORT_DIPSETTING(    0x38, "93" )
+	PORT_DIPSETTING(    0x30, "94" )
+	PORT_DIPSETTING(    0x28, "95" )
+	PORT_DIPSETTING(    0x20, "96" )
+	PORT_DIPSETTING(    0x18, "97" )
+	PORT_DIPSETTING(    0x10, "98" )
+	PORT_DIPSETTING(    0x08, "99" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Key In Limit" )      PORT_DIPLOCATION("DSW2:7,8")
+	PORT_DIPSETTING(    0xc0, "1k" )
+	PORT_DIPSETTING(    0x80, "3k" )
+	PORT_DIPSETTING(    0x40, "5k" )
+	PORT_DIPSETTING(    0x00, "10k" )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x07, 0x07, "Key In Rate" )       PORT_DIPLOCATION("DSW3:1,2,3")
+	PORT_DIPSETTING(    0x07, "1" )
+	PORT_DIPSETTING(    0x06, "5" )
+	PORT_DIPSETTING(    0x05, "10" )
+	PORT_DIPSETTING(    0x04, "30" )
+	PORT_DIPSETTING(    0x03, "50" )
+	PORT_DIPSETTING(    0x02, "100" )
+	PORT_DIPSETTING(    0x01, "200" )
+	PORT_DIPSETTING(    0x00, "500" )
+	PORT_DIPNAME( 0x38, 0x38, "Coin 1 Rate" )       PORT_DIPLOCATION("DSW3:4,5,6")
+	PORT_DIPSETTING(    0x38, "1" )
+	PORT_DIPSETTING(    0x30, "2" )
+	PORT_DIPSETTING(    0x28, "5" )
+	PORT_DIPSETTING(    0x20, "10" )
+	PORT_DIPSETTING(    0x18, "20" )
+	PORT_DIPSETTING(    0x10, "25" )
+	PORT_DIPSETTING(    0x08, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0xc0, 0xc0, "System Limit" )      PORT_DIPLOCATION("DSW3:7,8")
+	PORT_DIPSETTING(    0xc0, "5k" )
+	PORT_DIPSETTING(    0x80, "10k" )
+	PORT_DIPSETTING(    0x40, "30k" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, "Min Play For Fever" )    PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPSETTING(    0x01, "8" )
+	PORT_DIPSETTING(    0x00, "16" )
+	PORT_DIPNAME( 0x02, 0x02, "Max Bet" )           PORT_DIPLOCATION("DSW4:2")
+	PORT_DIPSETTING(    0x02, "16" )
+	PORT_DIPSETTING(    0x00, "32" )
+	PORT_DIPNAME( 0x1c, 0x1c, "Coin 2 Rate" )       PORT_DIPLOCATION("DSW4:3,4,5")
+	PORT_DIPSETTING(    0x1c, "1" )
+	PORT_DIPSETTING(    0x18, "2" )
+	PORT_DIPSETTING(    0x14, "5" )
+	PORT_DIPSETTING(    0x10, "10" )
+	PORT_DIPSETTING(    0x0c, "20" )
+	PORT_DIPSETTING(    0x08, "40" )
+	PORT_DIPSETTING(    0x04, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x60, 0x60, "Key Out Rate" )      PORT_DIPLOCATION("DSW4:6,7")
+	PORT_DIPSETTING(    0x60, "1" )
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x20, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x80, 0x80, "Play Line" )         PORT_DIPLOCATION("DSW4:8")
+	PORT_DIPSETTING(    0x80, "8" )
+	PORT_DIPSETTING(    0x00, "16" )
+
+	PORT_START("DSW5")
+	PORT_DIPNAME( 0x03, 0x00, "Maximum Play" )      PORT_DIPLOCATION("DSW5:1,2")
+	PORT_DIPSETTING(    0x00, "64" )
+	PORT_DIPSETTING(    0x01, "32" )
+	PORT_DIPSETTING(    0x02, "16" )
+	PORT_DIPSETTING(    0x03, "8" )
+	PORT_DIPNAME( 0x04, 0x04, "Skill Stop" )        PORT_DIPLOCATION("DSW5:3")
+	PORT_DIPSETTING(    0x04, "On" )
+	PORT_DIPSETTING(    0x00, "Off" )
+	PORT_DIPNAME( 0x08, 0x00, "Hands Count" )       PORT_DIPLOCATION("DSW5:4")
+	PORT_DIPSETTING(    0x08, "No" )
+	PORT_DIPSETTING(    0x00, "Yes" )
+	PORT_DIPNAME( 0x30, 0x00, "Hands Coin Rate" )   PORT_DIPLOCATION("DSW5:5,6")
+	PORT_DIPSETTING(    0x00, "25" )
+	PORT_DIPSETTING(    0x20, "10" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x30, "1" )
+	PORT_DIPNAME( 0x40, 0x40, "Hands Coin Value" )  PORT_DIPLOCATION("DSW5:7")
+	PORT_DIPSETTING(    0x00, "40" )
+	PORT_DIPSETTING(    0x40, "20" )
+	PORT_DIPNAME( 0x80, 0x80, "Unused" )            PORT_DIPLOCATION("DSW5:8")
+	PORT_DIPSETTING(    0x00, "On" )
+	PORT_DIPSETTING(    0x80, "Off" )
+
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Memory Clear")    // stats, memory
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(spoker_state, hopper_r) PORT_NAME("HPSW")   // hopper sensor
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Pay Out")
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )   // test (press during boot)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   PORT_NAME("Records")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1         )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2         )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Down")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("BUTTONS1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP1    )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP2    )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3    )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("BUTTONS2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1      ) PORT_NAME("Start / Half D-Up Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW  ) PORT_NAME("Small")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1     ) PORT_NAME("Left Bet / 2X D-Up Bet")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2     ) PORT_NAME("Right Bet / D-Up Bet")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 /***************************************************************************
                      Graphics Layout & Graphics Decode
 ***************************************************************************/
@@ -699,6 +983,11 @@ static GFXDECODE_START( gfx_3super8 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, layout_8x32x6,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, layout_8x32x6,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x0c000, layout_8x32x6,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, layout_8x32x6,   0, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_jb )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, layout_8x8x6,    0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, layout_8x32x6,   0, 16 )
 GFXDECODE_END
 
@@ -780,6 +1069,18 @@ void spokeru_state::spokeru(machine_config &config)
 
 	config.device_remove("ppi8255_0");
 	config.device_remove("ppi8255_1");
+}
+
+
+void jb_state::jb(machine_config &config)
+{
+	spokeru(config);
+
+	m_maincpu->set_addrmap(AS_IO, &jb_state::portmap);
+
+	m_screen->set_screen_update(FUNC(jb_state::screen_update));
+
+	m_gfxdecode->set_info(gfx_jb);
 }
 
 
@@ -936,6 +1237,25 @@ ROM_START( spk100 ) // no labels on the ROMs
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "u38",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
+ROM_END
+
+ROM_START( jb200us ) // IGS PCB-0308-01, same as the US Super Poker sets
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "jingle_v200us.u27",   0x00000, 0x10000, CRC(831782cb) SHA1(8e903569a0cd34222a7e5fd3e9ab21bf00802bb3) ) // 27C512
+	ROM_LOAD( "jingle_v200us_7.u26", 0x10000, 0x10000, CRC(3160f443) SHA1(2930359961a618cbe356a7f9c8fd63bacba2a6b0) ) // 27C512, 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0xc0000, "gfx1", 0 ) // all 27C020
+	ROM_LOAD( "jingle_v200us_4.u33",  0x00000, 0x40000, CRC(daa56ce5) SHA1(4f14a8efac16b03bd14dd26d586bcb8d5bef65c1) )
+	ROM_LOAD( "jingle_v200us_5.u32",  0x40000, 0x40000, CRC(b10b38e1) SHA1(397b2d899e47c6249fbbb6e6262d0390d9b796e6) )
+	ROM_LOAD( "jingle_v200us_6.u31",  0x80000, 0x40000, CRC(a3304b5a) SHA1(bf51cb1f728758d50ce27275aa19ef649f6b34b9) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 ) // all 27C512
+	ROM_LOAD( "jingle_v200us_1.u23",  0x00000, 0x10000, CRC(cadd7910) SHA1(aa514ddb29c8c9a77478d56bea4ae71995fdd518) )
+	ROM_LOAD( "jingle_v200us_2.u22",  0x10000, 0x10000, CRC(a9e1f5aa) SHA1(68d7f4e9e9a5bbce0904e406ee6fe82e9e52a9ba) )
+	ROM_LOAD( "jingle_v200us_3.u21",  0x20000, 0x10000, CRC(865b7d3a) SHA1(c1dff3a27d747ee499aaee0c4468534f0249a3e5) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "jingle_v200ussp.u34", 0x00000, 0x20000, CRC(a42d73b1) SHA1(93157e9630d5c8bb34c71186415d0aa8c5d51951) ) // 27C010
 ROM_END
 
 /*
@@ -1181,3 +1501,4 @@ GAME( 1993?, spk114it,   spk306us, spoker,   spk114it, spoker_state,  init_spk11
 GAME( 1996,  spk102ua,   spk306us, spokeru,  spoker,   spokeru_state, init_spokeru,  ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk100,     spk306us, spoker,   spk114it, spoker_state,  init_spk100,   ROT0,  "IGS",       "Super Poker (v100)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1993?, 3super8,    0,        _3super8, 3super8,  spoker_state,  init_3super8,  ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
+GAME( 1997,  jb200us,    0,        jb,       jb,       jb_state,      init_spokeru,  ROT0,  "IGS",       "Jingle Bell (v200US)",     MACHINE_SUPPORTS_SAVE )

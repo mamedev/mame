@@ -27,7 +27,20 @@
     M35C: Floppy drive 5.25", 640 KB + hard disk 5.25" Winchester, 15 MB + memory 512 KB
     M35D: Floppy drive 5.25", 640 KB + hard disk 5.25" Winchester, 15 MB + memory 768 KB
 
-    ./chdman createhd -chs 306,2,32 -ss 256 -o st406.chd
+    ./chdman createhd -chs 306,2,17 -ss 512 -o st406.chd
+    ./chdman createhd -chs 306,6,17 -ss 512 -o st412.chd
+
+*/
+
+/*
+	
+	TODO:
+
+	- DMA
+	- floppy
+	- SASI
+	- video
+	- keyboard
 
 */
 
@@ -43,7 +56,7 @@ void mm2_state::novram_store(offs_t offset, uint8_t data)
 
 void mm2_state::novram_recall(offs_t offset, uint8_t data)
 {
-	m_novram->recall(BIT(data, 0));
+	m_novram->recall(!BIT(data, 0));
 }
 
 uint8_t mm2_state::videoram_r(offs_t offset)
@@ -59,6 +72,123 @@ uint8_t mm2_state::videoram_r(offs_t offset)
 	m_drb1->write(data >> 8);
 
 	return data & 0xff;
+}
+
+uint8_t mm2_state::status_r(offs_t offset)
+{
+	uint8_t data = 0x80;
+
+	data |= !m_rs232a->dsr_r() << 4;
+	
+	return data;
+}
+
+uint8_t mm2_state::sasi_status_r(offs_t offset)
+{
+	uint8_t data = 0;
+
+	data |= m_sasi->bsy_r();
+	data |= m_sasi->rst_r() << 1;
+	data |= m_sasi->msg_r() << 2;
+	data |= m_sasi->cd_r() << 3;
+	data |= m_sasi->req_r() << 4;
+	data |= m_sasi->io_r() << 5;
+	data |= m_sasi->ack_r() << 7;
+
+	return data;
+}
+
+void mm2_state::sasi_cmd_w(offs_t offset, uint8_t data)
+{
+	m_sasi->sel_w(BIT(data, 0));
+	m_sasi->rst_w(BIT(data, 1));
+	m_sasi->atn_w(BIT(data, 2));
+}
+
+uint8_t mm2_state::sasi_data_r(offs_t offset)
+{
+	uint8_t data = m_sasi->read();
+
+	if (m_sasi->req_r())
+	{
+		m_sasi->ack_w(1);
+	}
+
+	return data;
+}
+
+void mm2_state::sasi_data_w(offs_t offset, uint8_t data)
+{
+	m_sasi_data = data;
+
+	if (!m_sasi->io_r())
+	{
+		m_sasi->write(data);
+	}
+
+	if (m_sasi->req_r())
+	{
+		m_sasi->ack_w(1);
+	}
+}
+
+void mm2_state::sasi_bsy_w(int state)
+{
+	if (state)
+	{
+		m_sasi->sel_w(0);
+	}
+}
+
+void mm2_state::sasi_req_w(int state)
+{
+	if (!state)
+	{
+		m_sasi->ack_w(0);
+	}
+
+	m_dmac->dreq3_w(state);
+}
+
+void mm2_state::sasi_io_w(int state)
+{
+	if (state)
+	{
+		m_sasi->write(0);
+	}
+	else
+	{
+		m_sasi->write(m_sasi_data);
+	}
+}
+
+uint8_t mm2_state::dmac_mem_r(offs_t offset)
+{
+	uint16_t *mem = (uint16_t *)m_maincpu->space(AS_PROGRAM).get_read_ptr(m_dma_hi << 15);
+
+	if (WORD_ALIGNED(offset))
+	{
+		return mem[offset >> 1] & 0xff;
+	} 
+	else 
+	{
+		return mem[offset >> 1] >> 8;
+	}
+}
+
+void mm2_state::dmac_mem_w(offs_t offset, uint8_t data)
+{
+	uint16_t *mem = (uint16_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(m_dma_hi << 15);
+	uint16_t value = mem[offset >> 1];
+	
+	if (WORD_ALIGNED(offset)) 
+	{
+		mem[offset >> 1] = (value & 0xff00) | data;
+	} 
+	else
+	{
+		mem[offset >> 1] = data << 8 | (value & 0xff);
+	}
 }
 
 void mm2_state::mm2_map(address_map &map)
@@ -77,24 +207,24 @@ void mm2_state::mm2_io_map(address_map &map)
 {
 	// SBC16
 	map(0xf800, 0xf803).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0xf880, 0xf887).rw(m_mpsc, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0xff00);
-	//map(0xf885, 0xf885) STATUS INPUT PORT
+	map(0xf880, 0xf887).rw(m_mpsc, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
+	map(0xf884, 0xf885).r(FUNC(mm2_state::status_r)).umask16(0xff00);
 	map(0xf900, 0xf901).w(FUNC(mm2_state::novram_store)).umask16(0x00ff);
 	map(0xf97e, 0xf97f).w(FUNC(mm2_state::novram_recall)).umask16(0xff00);
-	map(0xf930, 0xf937).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	//map(0xf941, 0xf941) TIMER INTERRUPT CLEAR LATCH
-	//map(0xf951, 0xf951) DIAGNOSTIC DISPLAY
-	//map(0xf961, 0xf961) CLOCK SELECT CLS0
-	//map(0xf963, 0xf963) CLOCK SELECT CLS1
+	map(0xf930, 0xf937).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
+	map(0xf940, 0xf941).w(FUNC(mm2_state::tcl_w)).umask16(0xff00);
+	map(0xf950, 0xf951).w(FUNC(mm2_state::diag_w)).umask16(0xff00);
+	map(0xf960, 0xf961).w(FUNC(mm2_state::cls0_w)).umask16(0xff00);
+	map(0xf962, 0xf963).w(FUNC(mm2_state::cls1_w)).umask16(0xff00);
 	//map(0xf965, 0xf965) LOOPBACK LLBA
 	//map(0xf967, 0xf967) LOOPBACK LLBB
 	//map(0xf969, 0xf969) DATA CODING NRZI
 	//map(0xf96b, 0xf96b) SIGNAL LEVELS V24
 	//map(0xf96d, 0xf96d) SIGNAL LEVELS X27
-	//map(0xf96f, 0xf96f) V24 SIGNAL DTRA
+	map(0xf96e, 0xf96f).w(FUNC(mm2_state::dtra_w)).umask16(0xff00);
 	//map(0xf971, 0xf971) V24 SIGNAL TSTA
 	//map(0xf973, 0xf973) V24 SIGNAL SRSA
-	//map(0xf975, 0xf975) V24 SIGNAL DTRB
+	map(0xf974, 0xf975).w(FUNC(mm2_state::dtrb_w)).umask16(0xff00);
 
 	// CRTC186
 	map(0xf980, 0xf9ff).rw(m_vpac, FUNC(crt9007_device::read), FUNC(crt9007_device::write)).umask16(0x00ff);
@@ -110,12 +240,17 @@ void mm2_state::mm2_io_map(address_map &map)
 
 	// MMC186
 	map(0xfa00, 0xfa1f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
-	// map(0xfa20, 0xfa20) SASI COMMAND/STATUS
-	// map(0xfa22, 0xfa22) SASI DATA
+	map(0xfa20, 0xfa21).rw(FUNC(mm2_state::sasi_status_r), FUNC(mm2_state::sasi_cmd_w)).umask16(0x00ff);
+	map(0xfa22, 0xfa23).rw(FUNC(mm2_state::sasi_data_r), FUNC(mm2_state::sasi_data_w)).umask16(0x00ff);
 	map(0xfa40, 0xfa41).r(m_fdc, FUNC(upd765a_device::msr_r)).umask16(0x00ff);
 	map(0xfa42, 0xfa43).rw(m_fdc, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w)).umask16(0x00ff);
-	// map(0xfa60, 0xfa60) CONTROL
-	// map(0xfa70, 0xfa70) DMA HIGH ADDRESS BITS
+	// map(0xfa60, 0xfa60) CONTROL SASI Select
+	// map(0xfa62, 0xfa62) CONTROL SASI Interrupts Enable
+	map(0xfa66, 0xfa67).w(FUNC(mm2_state::fdc_reset_w)).umask16(0x00ff);
+	// map(0xfa6a, 0xfa6a) CONTROL -Mini/Std Select
+	map(0xfa6c, 0xfa6d).w(FUNC(mm2_state::motor_on_w)).umask16(0x00ff);
+	// map(0xfa6e, 0xfa6e) CONTROL Motor On (Std)
+	map(0xfa70, 0xfa70).mirror(0xe).w(FUNC(mm2_state::dma_hi_w)).umask16(0x00ff);
 }
 
 void mm2_state::vpac_mem(address_map &map)
@@ -217,9 +352,12 @@ static void mm2_floppies(device_slot_interface &device)
 void mm2_state::mm2(machine_config &config)
 {
 	// SBC186
-	I80186(config, m_maincpu, 16_MHz_XTAL/2);
+	I80186(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::mm2_map);
 	m_maincpu->set_addrmap(AS_IO, &mm2_state::mm2_io_map);
+	m_maincpu->irmx_irq_cb().set(m_pic, FUNC(pic8259_device::ir7_w));
+	m_maincpu->tmrout0_handler().set(FUNC(mm2_state::tmrout0_w));
+	m_maincpu->tmrout1_handler().set(FUNC(mm2_state::tmrout1_w));
 
 	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
@@ -228,14 +366,30 @@ void mm2_state::mm2(machine_config &config)
 	m_pit->set_clk<0>(16_MHz_XTAL/8);
 	m_pit->set_clk<1>(16_MHz_XTAL/8);
 	m_pit->set_clk<2>(16_MHz_XTAL/8);
-	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
-	//m_pit->out_handler<1>().set()); MPSC ch B line clock
-	//m_pit->out_handler<2>().set()); Beep control
+	m_pit->out_handler<0>().set(FUNC(mm2_state::ir0_w));
+	m_pit->out_handler<1>().set(m_mpsc, FUNC(i8274_device::rxtxcb_w));
+	m_pit->out_handler<2>().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	I8274(config, m_mpsc, 16_MHz_XTAL/4);
+	m_mpsc->out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_rtsa_callback().set(m_rs232a, FUNC(rs232_port_device::write_rts));
+	m_mpsc->out_txdb_callback().set(m_rs232b, FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_rtsb_callback().set(m_rs232b, FUNC(rs232_port_device::write_rts));
 	m_mpsc->out_int_callback().set(m_pic, FUNC(pic8259_device::ir1_w));
+	
+	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
+	m_rs232a->rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
+	m_rs232a->dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcda_w));
+	m_rs232a->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsa_w));
+	
+	RS232_PORT(config, m_rs232b, default_rs232_devices, "terminal");
+	m_rs232b->rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxb_w));
+	m_rs232b->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
 
 	X2212(config, m_novram);
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// CRTC186
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
@@ -264,16 +418,28 @@ void mm2_state::mm2(machine_config &config)
 
 	// MMC186
 	AM9517A(config, m_dmac, 16_MHz_XTAL/4);
+	m_dmac->in_memr_callback().set(FUNC(mm2_state::dmac_mem_r));
+	m_dmac->out_memw_callback().set(FUNC(mm2_state::dmac_mem_w));
+	m_dmac->in_ior_callback<0>().set(FUNC(mm2_state::sasi_data_r));
+	m_dmac->out_iow_callback<0>().set(FUNC(mm2_state::sasi_data_w));
+	m_dmac->in_ior_callback<1>().set(m_fdc, FUNC(upd765_family_device::dma_r));
+	m_dmac->out_iow_callback<1>().set(m_fdc, FUNC(upd765_family_device::dma_w));
 
 	UPD765A(config, m_fdc, 16_MHz_XTAL/2, true, true);
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
 
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", mm2_floppies, "525qd", mm2_state::floppy_formats).enable_sound(true);
 
 	NSCSI_BUS(config, "sasi");
 	NSCSI_CONNECTOR(config, "sasi:0", default_scsi_devices, "s1410");
 	NSCSI_CONNECTOR(config, "sasi:7", default_scsi_devices, "scsicb", true)
-		.option_add_internal("scsicb", NSCSI_CB);
+		.option_add_internal("scsicb", NSCSI_CB)
+		.machine_config([this](device_t* device) {
+			downcast<nscsi_callback_device&>(*device).bsy_callback().set(*this, FUNC(mm2_state::sasi_bsy_w));
+			downcast<nscsi_callback_device&>(*device).req_callback().set(*this, FUNC(mm2_state::sasi_req_w));
+			downcast<nscsi_callback_device&>(*device).io_callback().set(*this, FUNC(mm2_state::sasi_io_w));
+		});
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("mm2_flop");

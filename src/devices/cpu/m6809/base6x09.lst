@@ -442,6 +442,7 @@ SYNC:
 	// is disabled, execution continues with the next instruction.
 	@dummy_read_opcode_arg(0);
 
+	m_syncack_write_func(1);
 	while(!m_nmi_asserted && !m_firq_line && !m_irq_line)
 	{
 		// massaging the PC this way makes the debugger's behavior more
@@ -453,6 +454,7 @@ SYNC:
 		// unmassage...
 		m_pc.w++;
 	}
+	m_syncack_write_func(0);
 	@eat(1);
 	return;
 

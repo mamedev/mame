@@ -2401,7 +2401,7 @@ void namcos22_state::update_mixer()
 	if (m_is_ss22)
 	{
 		/*
-		        0 1 2 3  4 5 6 7  8 9 a b  c d e f 10       14       18       1c
+		           0 1 2 3  4 5 6 7  8 9 a b  c d e f 10       14       18       1c
 		00824000: ffffff00 00000000 0000007f 00ff006f fe00eded 0f700000 0000037f 00010007 // alpine surfer
 		00824000: ffffff00 00000000 0000007f 00ff0000 1000ff00 0f000000 00ff007f 00010007 // time crisis
 		00824000: ffffff00 00000000 1830407f 00800000 0000007f 0f000000 0000037f 00010007 // trans sprite

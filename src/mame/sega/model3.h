@@ -123,7 +123,7 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_bank_crom(*this, "bank_crom"),
 		m_paletteram64(*this, "paletteram64"),
-		m_dsbz80(*this, DSBZ80_TAG),
+		m_dsbz80(*this, "dsbz80"),
 		m_uart(*this, "uart"),
 		m_soundram(*this, "soundram"),
 		m_gfxdecode(*this, "gfxdecode"),

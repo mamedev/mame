@@ -81,7 +81,7 @@ void h8_timer8_channel_device::update_tcr()
 	case 1: case 2: case 3:
 		m_clock_type = DIV;
 		m_clock_divider = m_div_tab[((m_tcr & TCR_CKS)-1)*2 + m_extra_clock_bit];
-		if(V>=1) util::stream_format(message, "clock %dHz", m_cpu->clock()/m_clock_divider);
+		if(V>=1) util::stream_format(message, "clock %dHz", m_cpu->system_clock()/m_clock_divider);
 		break;
 
 	case 4:

@@ -7,6 +7,13 @@
 #include "emu.h"
 #include "m5074x.h"
 
+#define LOG_ADC         (1U << 1)
+#define LOG_PORTS       (1U << 2)
+#define LOG_TIMER       (1U << 3)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
@@ -147,7 +154,7 @@ TIMER_CALLBACK_MEMBER(m5074x_device::timerx_tick)
 {
 	m_tmrx--;
 
-	if (m_tmrx <= 0)
+	if (m_tmrx == 0)
 	{
 		m_tmrctrl |= TMRC_TMRXREQ;
 		m_tmrx = m_tmrxlatch;
@@ -230,12 +237,14 @@ void m5074x_device::recalc_timer(int timer)
 		case 0:
 			hz = clock() / 16;
 			hz /= (m_tmr12pre + 2);
+			LOGMASKED(LOG_TIMER, "%s: timer 1, prescale %02x, fire at %d Hz\n", machine().describe_context(), m_tmr12pre, hz);
 			m_timers[TIMER_1]->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
 			break;
 
 		case 1:
 			hz = clock() / 16;
 			hz /= (m_tmr12pre + 2);
+			LOGMASKED(LOG_TIMER, "%s: timer 2, prescale %02x, fire at %d Hz\n", machine().describe_context(), m_tmr12pre, hz);
 			m_timers[TIMER_2]->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
 			break;
 
@@ -247,12 +256,14 @@ void m5074x_device::recalc_timer(int timer)
 				// stop bit?
 				if (m_tmrctrl & TMRC_TMRXHLT)
 				{
+					LOGMASKED(LOG_TIMER, "%s: timer X halted\n", machine().describe_context());
 					m_timers[TIMER_X]->adjust(attotime::never, 0, attotime::never);
 				}
 				else
 				{
 					hz = clock() / 16;
 					hz /= (m_tmrxpre + 2);
+					LOGMASKED(LOG_TIMER, "%s: timer X, prescale %02x, fire at %d Hz\n", machine().describe_context(), m_tmrxpre, hz);
 					m_timers[TIMER_X]->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
 				}
 			}
@@ -266,6 +277,9 @@ void m5074x_device::recalc_timer(int timer)
 
 void m5074x_device::send_port(uint8_t offset, uint8_t data)
 {
+	LOGMASKED(LOG_PORTS, "%s: Write port %d, data %02x DDR %02x pull-ups %02x\n", machine().describe_context(), offset,
+			  data, m_ddrs[offset], m_pullups[offset]);
+
 	m_write_p[offset](data);
 }
 
@@ -277,6 +291,9 @@ uint8_t m5074x_device::read_port(uint8_t offset)
 	incoming &= (m_ddrs[offset] ^ 0xff);
 	// OR in ddr-masked version of port writes
 	incoming |= (m_ports[offset] & m_ddrs[offset]);
+
+	LOGMASKED(LOG_PORTS, "%s: Read port %d, incoming %02x DDR %02x output latch %02x\n", machine().describe_context(), offset,
+			m_read_p[offset](), m_ddrs[offset], m_ports[offset]);
 
 	return incoming;
 }
@@ -406,31 +423,34 @@ uint8_t m5074x_device::tmrirq_r(offs_t offset)
 
 void m5074x_device::tmrirq_w(offs_t offset, uint8_t data)
 {
-//  printf("%02x to tmrirq @ %d\n", data, offset);
-
 	switch (offset)
 	{
 		case 0:
 			m_tmr12pre = data;
+			LOGMASKED(LOG_TIMER, "%s: timer 1/2 prescale %02x\n", machine().describe_context(), data);
 			recalc_timer(0);
 			recalc_timer(1);
 			break;
 
 		case 1:
 			m_tmr1 = m_tmr1latch = data;
+			LOGMASKED(LOG_TIMER, "%s: timer 1 latch %02x\n", machine().describe_context(), data);
 			break;
 
 		case 2:
 			m_tmr2 = m_tmr2latch = data;
+			LOGMASKED(LOG_TIMER, "%s: timer 2 latch %02x\n", machine().describe_context(), data);
 			break;
 
 		case 3:
-			m_tmrxpre = m_tmrxlatch = data;
+			m_tmrxpre = data;
+			LOGMASKED(LOG_TIMER, "%s: timer X prescale %02x\n", machine().describe_context(), data);
 			recalc_timer(2);
 			break;
 
 		case 4:
-			m_tmrx = data;
+			m_tmrx = m_tmrxlatch = data;
+			LOGMASKED(LOG_TIMER, "%s: timer X latch %02x\n", machine().describe_context(), data);
 			break;
 
 		case 5:
@@ -548,7 +568,7 @@ uint8_t m50753_device::ad_r()
 
 void m50753_device::ad_start_w(uint8_t data)
 {
-	logerror("%s: A-D start (IN%d)\n", machine().describe_context(), m_ad_control & 0x07);
+	LOGMASKED(LOG_ADC, "%s: A-D start (IN%d)\n", machine().describe_context(), m_ad_control & 0x07);
 
 	// starting a conversion.  M50753 documentation says conversion time is 72 microseconds.
 	m_timers[TIMER_ADC]->adjust(attotime::from_usec(72));
@@ -561,6 +581,7 @@ uint8_t m50753_device::ad_control_r()
 
 void m50753_device::ad_control_w(uint8_t data)
 {
+	LOGMASKED(LOG_ADC, "%s: %02x to A-D control\n", machine().describe_context(), data);
 	m_ad_control = data & 0x0f;
 }
 

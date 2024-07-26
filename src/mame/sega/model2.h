@@ -51,7 +51,7 @@ public:
 		m_bufferram(*this, "bufferram"),
 		m_soundram(*this, "soundram"),
 		m_maincpu(*this,"maincpu"),
-		m_dsbz80(*this, DSBZ80_TAG),
+		m_dsbz80(*this, "dsbz80"),
 		m_m1audio(*this, M1AUDIO_TAG),
 		m_uart(*this, "uart"),
 		m_m2comm(*this, "m2comm"),

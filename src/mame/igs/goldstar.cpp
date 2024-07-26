@@ -452,6 +452,7 @@ public:
 	void init_cmtetriskr();
 	void init_ll3();
 	void init_hamhouse();
+	void init_hamhouse9();
 	void init_cmast91();
 	void init_cll();
 	void init_animalhs();
@@ -13722,7 +13723,7 @@ ROM_START( cmast91 )
 	ROM_LOAD( "4.bin",  0x00000, 0x8000, CRC(0dbabaa2) SHA1(44235b19dac1c996e2166672b03f6e3888ecbefa) )
 	ROM_LOAD( "3.bin",  0x08000, 0x8000, CRC(dc77d04a) SHA1(d8656130cde54d4bb96307899f6d607867e49e6c) )
 	ROM_LOAD( "1.bin",  0x10000, 0x8000, CRC(71bdab69) SHA1(d2c594ed88d6368df15b623c48eecc1c219b839e) )
-	ROM_LOAD( "2.bin",  0x18000, 0x8000, CRC(fccd48d7) SHA1(af564f5ef9ff5b6363897ce6bdf0b21123911fd4) )
+	ROM_LOAD( "2.bin",  0x18000, 0x8000, CRC(201d1e90) SHA1(c3c5224646b777f98ee35d146136788029b1782d) )
 
 	ROM_REGION( 0x40000, "user1", 0 ) // girls GFX
 	ROM_LOAD( "9.bin",  0x00000, 0x40000, CRC(92342276) SHA1(f9436752f2ec67cf873fd01c729c7c113dc18be0) )
@@ -14533,6 +14534,39 @@ ROM_START( hamhouse )
 	ROM_REGION( 0x400, "plds", 0 )
 	ROM_LOAD( "atf16v8b.u15",       0x00000, 0x00117, CRC(9a62f369) SHA1(c027a7e3dc12506ed45ed936b9f650549651be4f) )
 	ROM_LOAD( "atf16v8b.u35",       0x00200, 0x00117, CRC(a883a133) SHA1(d0b1ee535d60bffdc03a8ce94e6a0274ae6621d5) )
+ROM_END
+
+ROM_START( hamhouse9 ) // basically same PCB as above but this has standard PROMs
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "am27c512.u33", 0x00000, 0x10000, CRC(9d0653b6) SHA1(81a015b0b78c75f7c998064fa4eb337da19d0df0) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "m27c256b.u28",  0x00000, 0x08000, CRC(e8d6be2b) SHA1(95ba907e4f969816638d5021606348d69a45fedc) )
+	ROM_LOAD( "tms27c256.u42", 0x08000, 0x08000, CRC(f83d5131) SHA1(3848efd58e3c5a54a947de3a3ea4e96265cd8af8) )
+	ROM_LOAD( "m27256.u43",    0x10000, 0x08000, CRC(a5105928) SHA1(ea3a4fb7a0ca3e14da001beb5aca03bfbd43410d) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "intel27128.u24", 0x00000, 0x02000, CRC(69ce2859) SHA1(68cb0c81a471d09f173d8534d94877f3f5c276f4) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x2000 )
+	ROM_LOAD( "hn4827128g.u26", 0x02000, 0x02000, CRC(6ba11862) SHA1(ce34727190689df8d591147dc342fe7bf230ce26) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x2000 )
+	ROM_LOAD( "am27c128.u10",   0x04000, 0x02000, CRC(69ce2859) SHA1(68cb0c81a471d09f173d8534d94877f3f5c276f4) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x2000 )
+	ROM_LOAD( "tms27c128.u11",  0x06000, 0x02000, CRC(61a17c65) SHA1(b1212c45c9c98aba50aeed6a38e17960f868ccd3) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x2000 )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s21.u55", 0x0000, 0x0100, CRC(161d189e) SHA1(5e13133871522e5d4c295fa7a02727da95d74e44) )
+	ROM_LOAD( "am27s21.u56", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "am27s21.u39", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "atf16v8b.u15", 0x000, 0x117, CRC(9a62f369) SHA1(c027a7e3dc12506ed45ed936b9f650549651be4f) )
+	ROM_LOAD( "atf16v8b.u35", 0x200, 0x117, CRC(a883a133) SHA1(d0b1ee535d60bffdc03a8ce94e6a0274ae6621d5) )
 ROM_END
 
 /*
@@ -20884,6 +20918,19 @@ void cmaster_state::init_hamhouse()
 	m_palette->update();
 }
 
+void cmaster_state::init_hamhouse9()
+{
+	init_cmv4();
+
+	uint8_t *rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(0x10000);
+
+	memcpy(&buffer[0], rom, 0x10000);
+
+	for (int i = 0; i < 0x10000; i++)
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 13, 12, 14, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
+}
+
 void cmaster_state::init_cmpacmanb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -22067,6 +22114,7 @@ GAMEL( 1991, srmagic,    cmv4,     cm,       cmv4,     cmaster_state,  empty_ini
 GAMEL( 1991, cmv4zg,     cmv4,     cmv4zg,   cmv4,     cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 1)",  MACHINE_NOT_WORKING, layout_cmv4 ) // needs correct I/O, maybe slightly protected
 GAMEL( 1991, cmv4zga,    cmv4,     cmv4zg,   cmv4,     cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 2)",  MACHINE_NOT_WORKING, layout_cmv4 ) // needs correct I/O, maybe slightly protected
 GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse,  ROT0, "bootleg",           "Hamburger House",                             MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
+GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING, layout_cmaster ) // bad reel colors, needs correct I/O
 
 GAMEL( 1991, tonypok,    0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
 GAME(  1998, jkrmast,    0,        jkrmast,  jkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V515)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // needs correct FG colors and controls

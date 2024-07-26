@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+TODO:
+- verify type-in patterns, convert to usage node (took from instruction sheets)
+- None of the Compac releases have any copyright year on packages
+
+-->
+<softwarelist name="fp1100_cass" description="Casio FP-1100 cassettes">
+	<software name="aliengya" supported="no">
+		<description>Alien No Gyakushu</description>
+		<year>1983?</year>
+		<publisher>Compac</publisher>
+		<!-- TODO: Denoting wrong snippet -->
+		<notes><![CDATA[
+LOAD"CAS0:(F)
+CLEAR,&HEF00
+LOADM"CAS0:(F)
+RUN
+]]></notes>
+		<info name="alt_title" value="エイリアンの逆襲"/>
+		<info name="serial" value="FP11-785"/>
+		<part name="cass1" interface="fp1100_cass">
+			<dataarea name="cass" size="5038983">
+				<rom name="alien_no_gyakushu.flac" size="5038983" crc="d811a8bd" sha1="f0526965f2eca20cf4f00a75871965840e5e5d10"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atkseam" supported="no">
+		<description>Attack Sea Monster</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+WIDTH 40
+LOADM "CAS0:",R
+]]></notes>
+		<info name="alt_title" value="アタックシーモンスタ"/>
+		<info name="serial" value="C-1001"/>
+		<part name="cass1" interface="fp1100_cass">
+			<dataarea name="cass" size="6191452">
+				<rom name="attack_sea_monster.flac" size="6191452" crc="b141ff99" sha1="79fe0d17dd834becb812576e2d675dd545d826fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backgamn" supported="no">
+		<description>Backgammon</description>
+		<year>1983?</year>
+		<publisher>Compac</publisher>
+		<notes><![CDATA[
+RUN "CAS0:(F)"
+]]></notes>
+		<info name="alt_title" value="バックギャモン"/>
+		<info name="serial" value="FP11-753"/>
+		<part name="cass1" interface="fp1100_cass">
+			<dataarea name="cass" size="10143410">
+				<rom name="backgammon.flac" size="10143410" crc="c7a0198c" sha1="1951b7b2c3a859e1911148c1e11d022058dcf6a8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golf" supported="no">
+		<description>Golf Game</description>
+		<year>1983?</year>
+		<publisher>Compac</publisher>
+		<!-- TODO: Denoting wrong snippet -->
+		<notes><![CDATA[
+LAD"CAS0:(F)"
+RAN
+]]></notes>
+		<info name="alt_title" value="ゴルフゲーム"/>
+		<info name="serial" value="FP11-789"/>
+		<part name="cass1" interface="fp1100_cass">
+			<dataarea name="cass" size="11912054">
+				<rom name="golf_game.flac" size="11912054" crc="6b0873d5" sha1="422df8742ad60a69188e2b9c56b6f67f7c7515d9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kalah" supported="no">
+		<description>Kalah Game</description>
+		<year>1983?</year>
+		<publisher>Compac</publisher>
+		<notes><![CDATA[
+LOAD"CAS0:(F)"
+RUN
+]]></notes>
+		<info name="alt_title" value="カラーゲーム"/>
+		<info name="serial" value="FP11-787"/>
+		<part name="cass1" interface="fp1100_cass">
+			<dataarea name="cass" size="6293088">
+				<rom name="kalah_game.flac" size="6293088" crc="ca9ecf9e" sha1="09510eb05330aa9d803e895f544720c1cf3195ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moo" supported="no">
+		<description>Moo Game</description>
+		<year>1983?</year>
+		<publisher>Compac</publisher>
+		<notes><![CDATA[
+LOAD "CAS0:(F)"
+RUN
+]]></notes>
+		<info name="alt_title" value="ムーゲーム"/>
+		<info name="serial" value="FP11-786"/>
+		<part name="cass1" interface="fp1100_cass">
+			<dataarea name="cass" size="3209415">
+				<rom name="moo_game.flac" size="3209415" crc="c2c4826e" sha1="3cf2953fb9f5caf8afef49cc2b801ffa529fa21f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="renkuzu" supported="no">
+		<description>Renga Kuzushi</description>
+		<year>1983?</year>
+		<publisher>Compac</publisher>
+		<notes><![CDATA[
+LOADM "CAS0:(F)",R
+]]></notes>
+		<info name="alt_title" value="レンガくずし"/>
+		<info name="serial" value="FP11-752"/>
+		<part name="cass1" interface="fp1100_cass">
+			<dataarea name="cass" size="1971347">
+				<rom name="renga_kuzushi.flac" size="1971347" crc="942819ed" sha1="4734622300f3b694ac739aea7be3d4a7229051a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="vegcrush" supported="no">
+		<description>Vegetable Crush</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+WIDTH 40
+LOADM"CAS0:(S)"
+]]></notes>
+		<info name="alt_title" value="ベジタブルクラッシュ"/>
+		<info name="serial" value="C-1002"/>
+		<part name="cass1" interface="fp1100_cass">
+			<dataarea name="cass" size="21642009">
+				<rom name="vegetable_crush.flac" size="21642009" crc="5b1ab7b0" sha1="84c0f1b5c823fb8aa6ff46fbb3cc48bfacde3a26"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

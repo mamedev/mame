@@ -63,7 +63,7 @@ public:
 	{ }
 
 	void gng(machine_config &config);
-	void diamond(machine_config &config);
+	void diamrun(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -90,7 +90,7 @@ private:
 
 	void bankswitch_w(uint8_t data);
 	void ym_reset_w(int state);
-	uint8_t diamond_hack_r();
+	uint8_t diamrun_hack_r();
 	void fgvideoram_w(offs_t offset, uint8_t data);
 	void bgvideoram_w(offs_t offset, uint8_t data);
 	void bgscrollx_w(offs_t offset, uint8_t data);
@@ -100,7 +100,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void diamond_main_map(address_map &map);
+	void diamrun_main_map(address_map &map);
 	void gng_main_map(address_map &map);
 	void sound_map(address_map &map);
 };
@@ -250,7 +250,7 @@ void gng_state::ym_reset_w(int state)
 	}
 }
 
-uint8_t gng_state::diamond_hack_r()
+uint8_t gng_state::diamrun_hack_r()
 {
 	return 0;
 }
@@ -278,7 +278,7 @@ void gng_state::gng_main_map(address_map &map)
 	map(0x6000, 0xffff).rom();
 }
 
-void gng_state::diamond_main_map(address_map &map)
+void gng_state::diamrun_main_map(address_map &map)
 {
 	map(0x0000, 0x1dff).ram();
 	map(0x1e00, 0x1fff).ram().share("spriteram");
@@ -301,7 +301,7 @@ void gng_state::diamond_main_map(address_map &map)
 	map(0x3e00, 0x3e00).w(FUNC(gng_state::bankswitch_w));
 	map(0x4000, 0x5fff).bankr(m_mainbank);
 	map(0x6000, 0xffff).rom();
-	map(0x6000, 0x6000).r(FUNC(gng_state::diamond_hack_r));
+	map(0x6000, 0x6000).r(FUNC(gng_state::diamrun_hack_r));
 	map(0x6048, 0x6048).nopw(); // ?
 }
 
@@ -409,7 +409,7 @@ static INPUT_PORTS_START( makaimur )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( diamond )
+static INPUT_PORTS_START( diamrun )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
@@ -559,31 +559,29 @@ void gng_state::machine_reset()
 	m_scrolly[0] = 0;
 	m_scrolly[1] = 0;
 
+	/* TODO: PCB reference clearly shows that the POST has random/filled data on the paletteram.
+	         For now let's fill everything with white colors until we have better info about it */
+	for(int i = 0 ; i < 0x100; i += 4)
 	{
-		/* TODO: PCB reference clearly shows that the POST has random/filled data on the paletteram.
-		         For now let's fill everything with white colors until we have better info about it */
-		for(int i = 0 ; i < 0x100; i += 4)
-		{
-			m_palette->basemem().write8(i, 0x00); m_palette->extmem().write8(i, 0x00);
-			m_palette->basemem().write8(i + 1, 0x55); m_palette->extmem().write8(i + 1, 0x55);
-			m_palette->basemem().write8(i + 2, 0xaa); m_palette->extmem().write8(i + 2, 0xaa);
-			m_palette->basemem().write8(i + 3, 0xff); m_palette->extmem().write8(i + 3, 0xff);
-			m_palette->set_pen_color(i + 0, 0x00, 0x00, 0x00);
-			m_palette->set_pen_color(i + 1, 0x55, 0x55, 0x55);
-			m_palette->set_pen_color(i + 2, 0xaa, 0xaa, 0xaa);
-			m_palette->set_pen_color(i + 3, 0xff, 0xff, 0xff);
-		}
+		m_palette->basemem().write8(i, 0x00); m_palette->extmem().write8(i, 0x00);
+		m_palette->basemem().write8(i + 1, 0x55); m_palette->extmem().write8(i + 1, 0x55);
+		m_palette->basemem().write8(i + 2, 0xaa); m_palette->extmem().write8(i + 2, 0xaa);
+		m_palette->basemem().write8(i + 3, 0xff); m_palette->extmem().write8(i + 3, 0xff);
+		m_palette->set_pen_color(i + 0, 0x00, 0x00, 0x00);
+		m_palette->set_pen_color(i + 1, 0x55, 0x55, 0x55);
+		m_palette->set_pen_color(i + 2, 0xaa, 0xaa, 0xaa);
+		m_palette->set_pen_color(i + 3, 0xff, 0xff, 0xff);
 	}
 }
 
 void gng_state::gng(machine_config &config)
 {
 	// basic machine hardware
-	MC6809(config, m_maincpu, XTAL(12'000'000) / 2);        // verified on PCB
+	MC6809(config, m_maincpu, XTAL(12'000'000) / 2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &gng_state::gng_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gng_state::irq0_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(12'000'000) / 4));     // verified on PCB
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(12'000'000) / 4)); // verified on PCB
 	audiocpu.set_addrmap(AS_PROGRAM, &gng_state::sound_map);
 	audiocpu.set_periodic_int(FUNC(gng_state::irq0_line_hold), attotime::from_hz(4 * 60));
 
@@ -598,7 +596,7 @@ void gng_state::gng(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(12'000'000) / 2, 384, 128, 0, 262, 22, 246);  // hsync is 50..77, vsync is 257..259
+	screen.set_raw(XTAL(12'000'000) / 2, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(gng_state::screen_update));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
@@ -612,23 +610,23 @@ void gng_state::gng(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2203(config, m_ym[0], XTAL(12'000'000) / 8);     // verified on PCB
+	YM2203(config, m_ym[0], XTAL(12'000'000) / 8); // verified on PCB
 	m_ym[0]->add_route(0, "mono", 0.40);
 	m_ym[0]->add_route(1, "mono", 0.40);
 	m_ym[0]->add_route(2, "mono", 0.40);
 	m_ym[0]->add_route(3, "mono", 0.20);
 
-	YM2203(config, m_ym[1], XTAL(12'000'000) / 8);     // verified on PCB
+	YM2203(config, m_ym[1], XTAL(12'000'000) / 8); // verified on PCB
 	m_ym[1]->add_route(0, "mono", 0.40);
 	m_ym[1]->add_route(1, "mono", 0.40);
 	m_ym[1]->add_route(2, "mono", 0.40);
 	m_ym[1]->add_route(3, "mono", 0.20);
 }
 
-void gng_state::diamond(machine_config &config)
+void gng_state::diamrun(machine_config &config)
 {
 	gng(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gng_state::diamond_main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gng_state::diamrun_main_map);
 
 	config.device_remove("mainlatch");
 }
@@ -1017,7 +1015,7 @@ ROM_START( makaimurg )
 	ROM_LOAD( "63s141.2e",    0x0100, 0x0100, CRC(4a1285a4) SHA1(5018c3950b675af58db499e2883ecbc55419b491) )  // priority (not used)
 ROM_END
 
-ROM_START( diamond )
+ROM_START( diamrun )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "d3o",          0x04000, 0x4000, CRC(ba4bf9f1) SHA1(460e01f5ba9cd0c76d1a2ea1e66e9ad49ef1e13b) ) // 4000-5fff is page 4
 	ROM_LOAD( "d3",           0x08000, 0x8000, CRC(f436d6fa) SHA1(18287ac51e717ea2ba9b307a738f76735120f21b) )
@@ -1061,4 +1059,4 @@ GAME( 1985, makaimur,  gng, gng,     makaimur, gng_state, empty_init, ROT0, "Cap
 GAME( 1985, makaimurb, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan Revision B)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1985, makaimurc, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan Revision C)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1985, makaimurg, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan Revision G)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1989, diamond,   0,   diamond, diamond,  gng_state, empty_init, ROT0, "KH Video", "Diamond Run",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, diamrun,   0,   diamrun, diamrun,  gng_state, empty_init, ROT0, "KH Video", "Diamond Run",                                MACHINE_SUPPORTS_SAVE ) // Kyle Hodgetts
