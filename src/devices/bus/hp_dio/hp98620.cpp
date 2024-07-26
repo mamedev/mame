@@ -17,6 +17,7 @@ namespace {
 
 class dio16_98620_device :
 		public device_t,
+		public device_execute_interface,
 		public bus::hp_dio::device_dio16_card_interface
 {
 public:
@@ -29,12 +30,14 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void execute_run() override;
 
 	uint16_t dma_r(offs_t offset);
 	void dma_w(offs_t offset, uint16_t data);
 
 	void irq_w(int state);
 
+	int m_icount;
 private:
 
 	static constexpr int REG0_RESET_ARM_INT = 0x00;
@@ -96,7 +99,7 @@ private:
 	void dmar0_in(int state) override;
 	void dmar1_in(int state) override;
 
-	void dma_transfer(int channel);
+	bool dma_transfer(int channel);
 	void update_irq();
 	void update_ctrl(const int channel, const uint16_t data, const bool is_1tq4);
 
@@ -134,7 +137,9 @@ dio16_98620_device::dio16_98620_device(const machine_config &mconfig, const char
 
 dio16_98620_device::dio16_98620_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t{mconfig, type, tag, owner, clock},
+	device_execute_interface{mconfig, *this},
 	device_dio16_card_interface{mconfig, *this},
+	m_icount{0},
 	m_installed_io{false},
 	m_control{0},
 	m_data{0},
@@ -143,9 +148,23 @@ dio16_98620_device::dio16_98620_device(const machine_config &mconfig, device_typ
 {
 }
 
+void dio16_98620_device::execute_run()
+{
+	bool busy0, busy1;
+
+	do {
+		busy0 = dma_transfer(0);
+		busy1 = dma_transfer(1);
+		if (!busy0 && !busy1)
+			suspend(SUSPEND_REASON_TRIGGER, 1);
+	} while(--m_icount > 0);
+}
+
 void dio16_98620_device::device_start()
 {
 	m_installed_io = false;
+	set_icountptr(m_icount);
+	set_clock(10_MHz_XTAL);
 
 	save_item(STRUCT_MEMBER(m_regs, address));
 	save_item(STRUCT_MEMBER(m_regs, tc));
@@ -389,6 +408,7 @@ void dio16_98620_device::dma_w(offs_t offset, uint16_t data)
 		LOG("%s: unknown register write: %02X\n", __FUNCTION__, offset << 1);
 		break;
 	}
+	trigger(0);
 }
 
 void dio16_98620_device::update_irq()
@@ -409,16 +429,18 @@ void dio16_98620_device::update_irq()
 			(m_regs[1].irq_level == 7 && m_regs[1].irq && m_regs[1].ie));
 }
 
-void dio16_98620_device::dma_transfer(int channel)
+bool dio16_98620_device::dma_transfer(int channel)
 {
 	assert(channel < 2);
 
 	if (!(m_regs[channel].armed))
-		return;
+		return false;
+
+	if (!m_dmar[channel])
+		return false;
 
 	LOG("dma_transfer %s: tc %d/%d\n", m_regs[channel].dma_out ? "out" : "in",
-			m_regs[channel].tc, m_regs[channel].subcount);
-
+	    m_regs[channel].tc, m_regs[channel].subcount);
 
 	if (m_regs[channel].dma_out) {
 			dmack_w_out(channel, program_space().read_byte(m_regs[channel].address++));
@@ -435,34 +457,27 @@ void dio16_98620_device::dma_transfer(int channel)
 				m_regs[channel].irq = true;
 				update_irq();
 			}
-			return;
+			return false;
 		}
-
 		m_regs[channel].subcount = m_regs[channel].tsz;
 	}
 
 	m_regs[channel].subcount--;
+	return true;
 }
 
 void dio16_98620_device::dmar0_in(int state)
 {
 	LOG("%s: %d\n", __FUNCTION__, state);
 	m_dmar[0] = state;
-	if (!state)
-		return;
-
-	dma_transfer(0);
+	trigger(0);
 }
 
 void dio16_98620_device::dmar1_in(int state)
 {
 	LOG("%s: %d\n", __FUNCTION__, state);
 	m_dmar[1] = state;
-
-	if (!state)
-		return;
-
-	dma_transfer(1);
+	trigger(0);
 }
 
 } // anonymous namespace
