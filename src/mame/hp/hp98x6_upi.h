@@ -55,6 +55,9 @@ private:
 	required_device<timer_device> m_delay_timer;
 	required_device<timer_device> m_input_delay_timer;
 
+	// ID PROM
+	optional_region_ptr<uint8_t> m_idprom;
+
 	devcb_write_line m_irq1_write_func;
 	devcb_write_line m_irq7_write_func;
 	uint8_t m_ram[64];
