@@ -535,6 +535,43 @@ ROM_START( karams )
 	ROM_LOAD( "ics0300-a.u9", 0x000000, 0x800000, CRC(32a7a429) SHA1(ed219bc9201b45f67c5e7dbe3fb3db70823c59f0) )
 ROM_END
 
+/*
+The 'dks7000c' set has the following 25 songs built in.
+
+A Spoonful of Sugar                         Mary Poppins
+A Whole New World                           Disney
+Bare Necessities                            The Jungle Book
+Be Our Guest                                Beauty and the Beast
+Bibbidi-Bobbidi-Boo                         Disney
+Can You Feel The Love Tonight               The Lion King
+Chim Chim Cheree                            Disney
+Circle of Life                              The Lion King
+Colors of the Wind                          Pocahontas
+Cruella De Vil                              101 Dalmations
+Hakuna Matata                               The Lion King
+I Just Can't Wait To Be King                The Lion King
+I Wan'na Be Like You (The Monkey Song)      The Jungle Book
+I Won't Say (I'm In Love)                   Hercules
+I'll Make A Man Out Of You                  Mulan
+If I Didn't Have You                        Monsters Inc.
+It's A Small World                          New York World's Fair
+Kiss The Girl                               The Little Mermaid
+Part Of Your World                          The Little Mermaid
+Supercalifragilisticexpialidocious          Disney
+Yo Ho! (A Pirate's Life For Me)             Pirates of the Caribbean
+You Can Fly! You Can Fly! You Can Fly!      Peter Pan
+You'll Be In My Heart                       Tarzan
+You've Got A Friend In Me                   Toy Story
+Zip-A-Dee-Do-Dah                            Song of the South
+
+*/
+ROM_START( dks7000c )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "dks7000c.bin", 0x000000, 0x400000, CRC(1c03e59e) SHA1(617d13a9b353fb648f10e136bc07c496a424b953) )
+ROM_END
+
+
+
 } // anonymous namespace
 
 // This is the original US release, there's no cartridge slot, but it has a NAND Flash inside, and in addition to 50 built-in songs, advertises
@@ -546,8 +583,10 @@ CONS( 2002, karatvsta,     karatvst,       0,      ivl_karaoke_base, ivl_karaoke
 CONS( 2002, mks4001,       0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Memorex license)", "Star Singer Karaoke (MKS4001)", MACHINE_IS_SKELETON ) // 50 songs built in, appears to have around 54 downloads, including a test download
 
 // Bandai's Japanese release also lacks a cartridge slot, relying on downloads for additional songs. It also comes with a CD containing the PC-side software.  The external microphone design differs slightly.
-CONS( 2002, bkarast,       karatvst,       0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan)", MACHINE_IS_SKELETON )
+CONS( 2002, bkarast,       0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan)", MACHINE_IS_SKELETON )
 
 // The European releases take cartridges rather than relying on a download service
-CONS( 2004, easykara,      karatvst,       0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Easy Karaoke license)", "Easy Karaoke Groove Station (UK)", MACHINE_IS_SKELETON )
-CONS( 2003, karams,        karatvst,       0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook license)",     "KaraokeMicro Star (France)", MACHINE_IS_SKELETON )
+CONS( 2004, easykara,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Easy Karaoke license)", "Easy Karaoke Groove Station (UK)", MACHINE_IS_SKELETON )
+CONS( 2003, karams,        0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook license)",     "KaraokeMicro Star (France)", MACHINE_IS_SKELETON )
+
+CONS( 2003, dks7000c,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Classic Handheld Karaoke Player (DKS7000-C)", MACHINE_IS_SKELETON )
