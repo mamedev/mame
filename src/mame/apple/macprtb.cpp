@@ -113,11 +113,12 @@
 #include "speaker.h"
 
 namespace {
-class macportable_state : public driver_device
+class macportable_state : public driver_device, public device_nvram_interface
 {
 public:
 	macportable_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		device_nvram_interface(mconfig, *this),
 		m_maincpu(*this, "maincpu"),
 		m_pmu(*this, "pmu"),
 		m_via1(*this, "via1"),
@@ -163,6 +164,10 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -235,6 +240,40 @@ private:
 	u8 m_pmu_to_via, m_pmu_from_via, m_pmu_ack, m_pmu_req, m_pmu_p0;
 	s32 m_adb_line;
 };
+
+void macportable_state::nvram_default()
+{
+}
+
+bool macportable_state::nvram_read(util::read_stream &file)
+{
+	// Unlike Egret and Cuda, this PMU doesn't assume RAM contents
+	// are bad on boot.  It checksums the PRAM and RTC and if the checksum
+	// passes it doesn't re-initialize.
+	u8 nvram[0xc0];
+	auto const [err, actual] = read(file, nvram, 0xc0);
+	if (!err && (actual == 0xc0))
+	{
+		for (int i = 0; i < 0xc0; i++)
+		{
+			m_pmu->space(AS_PROGRAM).write_byte(i, nvram[i]);
+		}
+		return true;
+	}
+	return false;
+}
+
+bool macportable_state::nvram_write(util::write_stream &file)
+{
+	u8 nvram[0xc0];
+	for (int i = 0; i < 0xc0; i++)
+	{
+		nvram[i] = m_pmu->space(AS_PROGRAM).read_byte(i);
+	}
+
+	auto const [err, actual] = write(file, nvram, 0xc0);
+	return !err;
+}
 
 u16 macportable_state::scc_r(offs_t offset)
 {
