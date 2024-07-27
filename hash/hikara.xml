@@ -127,16 +127,16 @@ license:CC0-1.0
 	</software>	
 
 	<!-- this one has some songs programmed into it:
-	    雫                      スキマスイッチ      Shizuku                     Sukima Switch
-	    鐘を鳴らして            BONNIE PINK         Kane o Narashite            BONNIE PINK
-	    ホウキ雲                RYTHEM              Houkigumo                   RYTHEM
-	    さくらびと              SunSet Swish        Sakurabito                  SunSet Swish
-	    again                   YUI                 again                       YUI
-	    カルマ                  BUMP OF CHICKEN     Karma                       BUMP OF CHICKEN
-	    創聖のアクエリオン      AKINO               Genesis of AQUARION         AKINO
-	    レイン                  シド                Rain                        SID
-	    きっと伝えて            松たか子            Kitto Tsutaete              Matsu Takako
-	    メリッサ                ポルノグラフィティ  Melissa                     Porno Graffitti -->
+	    雫                              スキマスイッチ                  Shizuku                         Sukima Switch
+	    鐘を鳴らして                    BONNIE PINK                     Kane o Narashite                BONNIE PINK
+	    ホウキ雲                        RYTHEM                          Houkigumo                       RYTHEM
+	    さくらびと                      SunSet Swish                    Sakurabito                      SunSet Swish
+	    again                           YUI                             again                           YUI
+	    カルマ                          BUMP OF CHICKEN                 Karma                           BUMP OF CHICKEN
+	    創聖のアクエリオン              AKINO                           Genesis of AQUARION             AKINO
+	    レイン                          シド                            Rain                            SID
+	    きっと伝えて                    松たか子                        Kitto Tsutaete                  Matsu Takako
+	    メリッサ                        ポルノグラフィティ              Melissa                         Porno Graffitti -->
 	<software name="user10" supported="no">
 		<description>Hi-kara 10-song capacity user cartridge (used, with 10 songs, set 1) (Japan)</description>
 		<year>2008</year>
@@ -170,26 +170,26 @@ license:CC0-1.0
 	</software>	
 
 	<!-- this one has some songs programmed into it:
-	    一番綺麗な私を          中島美嘉            Ichiban Kireina Watashi o   Nakajima Mika
-	    わかれうた              中島みゆき          Wakareuta                   Nakajima Miyuki
-	    地上の星                中島みゆき          Chijō no Hoshi              Nakajima Miyuki
-	    ロビンソン              スピッツ            Robinson                    Spitz
-	    蕾                      コブクロ            Tsubomi                     KOBUKURO
-	    粉雪                    レミオロメン        Konayuki                    Remioromen
-	    木枯しに抱かれて        小泉今日子          Kogarashi ni Dakarete       Koizumi Kyōko
-	    あなたに会えてよかった  小泉今日子          Anata ni Aeteyokatta        Koizumi Kyōko
-	    能動的三分間            東京事変            Nōdōteki Sanpunkan          Tōkyō Jihen
-	    ワンルーム・ディスコ    Perfume             One Room Disco              Perfume
-	    VOICE                   Perfume             VOICE                       Perfume
-	    時をかける少女          原田知世            Toki o Kakeru Shōjo         Harada Tomiyo
-	    アポロ                  ポルノグラフィティ  Apollo                      Porno Graffitti
-	    冬がはじまるよ          槇原敬之            Fuyu ga Hajimaru yo         Makihara Noriyuki
-	    遠く遠く                槇原敬之            Tōku Tōku                   Makihara Noriyuki
-	    もう一度キスしたかった  B'z                 Mō Ichidō Kiss Shitakatta   B'z
-	    LOVE PHANTOM            B'z                 LOVE PHANTOM                B'z
-	    天体観測                BUMP OF CHICKEN     Tentai Kansoku              BUMP OF CHICKEN
-	    情熱の薔薇              THE BLUE HEARTS     Jōnetsu no Bara             THE BLUE HEARTS
-	    ありがとう              いきものがかり      Arigatō                     Ikimonogakari -->
+	    一番綺麗な私を                  中島美嘉                        Ichiban Kireina Watashi o       Nakajima Mika
+	    わかれうた                      中島みゆき                      Wakareuta                       Nakajima Miyuki
+	    地上の星                        中島みゆき                      Chijō no Hoshi                  Nakajima Miyuki
+	    ロビンソン                      スピッツ                        Robinson                        Spitz
+	    蕾                              コブクロ                        Tsubomi                         KOBUKURO
+	    粉雪                            レミオロメン                    Konayuki                        Remioromen
+	    木枯しに抱かれて                小泉今日子                      Kogarashi ni Dakarete           Koizumi Kyōko
+	    あなたに会えてよかった          小泉今日子                      Anata ni Aeteyokatta            Koizumi Kyōko
+	    能動的三分間                    東京事変                        Nōdōteki Sanpunkan              Tōkyō Jihen
+	    ワンルーム・ディスコ            Perfume                         One Room Disco                  Perfume
+	    VOICE                           Perfume                         VOICE                           Perfume
+	    時をかける少女                  原田知世                        Toki o Kakeru Shōjo             Harada Tomiyo
+	    アポロ                          ポルノグラフィティ              Apollo                          Porno Graffitti
+	    冬がはじまるよ                  槇原敬之                        Fuyu ga Hajimaru yo             Makihara Noriyuki
+	    遠く遠く                        槇原敬之                        Tōku Tōku                       Makihara Noriyuki
+	    もう一度キスしたかった          B'z                             Mō Ichidō Kiss Shitakatta       B'z
+	    LOVE PHANTOM                    B'z                             LOVE PHANTOM                    B'z
+	    天体観測                        BUMP OF CHICKEN                 Tentai Kansoku                  BUMP OF CHICKEN
+	    情熱の薔薇                      THE BLUE HEARTS                 Jōnetsu no Bara                 THE BLUE HEARTS
+	    ありがとう                      いきものがかり                  Arigatō                         Ikimonogakari -->
 	<software name="user20" supported="no">
 		<description>Hi-kara 20-song capacity user cartridge (used, with 20 songs, set 1) (Japan)</description>
 		<year>2008</year>
@@ -201,6 +201,27 @@ license:CC0-1.0
 		</part>
 	</software>
 	
+	<!-- this one has some songs programmed into it:
+	    もうすぐクリスマス                      里田まい with 合田兄妹          Mōsugu Christmas                            Satoda Mai with Gōda Kyōdai
+	    ブルーバード                            いきねのがかり                  Blue Bird                                   Ikimonogakari
+	    さくらんぼ                              大塚愛                          Sakuranbo                                   Ōtsuka Ai
+	    千の風になって                          秋川雅史                        Sen no Kaze ni Natte                        Akikawa Masafumi
+	    想い出がいっぱい                        H2O                             Amaide ga Ippai                             H2O
+	    残酷な天使のテーゼ                      高橋洋子                        Sankoku na Tenshi no Thesis                 Takahashi Yōko
+	    青春おでん                              twe'lv                          Seishun Oden                                twe'lv
+	    テルーの唄                              手嶌葵                          Therru no Uta                               Teshima Aoi
+	    ゲゲゲの鬼太郎                          泉谷しげる                      Gegege no Kitarō                            Izumiya Shigeru
+	    気まぐれロマンティック                  いきねのがかり                  Kimagure Romantic                           Ikimonogakari
+	    世界に一つだけの花                      SMAP                            Sekai ni Hitotsu Dake no Hana               SMAP
+	    地上の星                                中島みゆき                      Chijō no Hoshi                              Nakajima Miyuki
+	    碧いうさぎ                              酒井法子                        Aoi Usagi                                   Sakai Noriko
+	    未来へ                                  Kiroro                          Mirai e                                     Kiroro
+	    弱虫サンタ                              羞恥心                          Yowamushi Santa                             Shūchishin
+	    泣かないで                              羞恥心                          Nakanaide                                   Shūchishin
+	    羞恥心                                  羞恥心                          Shūchishin                                  Shūchishin
+	    炎神戦隊ゴーオンジャー                  高橋秀幸(Project.R)             ENGINE SENTAI GO-ONGER                      Takahashi Hideyuki
+	    いつも何度でも                          木村弓                          Itsumo Nandodemo                            Kimura Yumi
+	    ニホンノミカタ-ネバダカラキマシタ-      矢島美容室                      Nihon no Mikata -Nevada kara Kimashita-     Yajima Biyōshitsu -->
 	<software name="user20a" cloneof="user20" supported="no">
 		<description>Hi-kara 20-song capacity user cartridge (used, with 20 songs, set 2) (Japan)</description>
 		<year>2008</year>
@@ -275,8 +296,8 @@ license:CC0-1.0
 	<software name="bh6kids1" supported="no">
 		<description>Best Hit Collection Volume 6: Kids' Song 1</description>
 		<year>2008</year>
-		<info name="alt_title" value="ベストヒットコレクション vol.6 キッズソング①"/>
 		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.6 キッズソング①"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="bh0803001.u1" size="0x200000" crc="2921a2ba" sha1="0708d985784669c4289636a87876163285f8cb97"/>
