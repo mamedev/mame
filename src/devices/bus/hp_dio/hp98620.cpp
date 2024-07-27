@@ -37,7 +37,6 @@ protected:
 
 	void irq_w(int state);
 
-	int m_icount;
 private:
 
 	static constexpr int REG0_RESET_ARM_INT = 0x00;
@@ -104,9 +103,10 @@ private:
 	void update_ctrl(const int channel, const uint16_t data, const bool is_1tq4);
 
 	bool     m_installed_io;
+	int      m_icount;
 	uint8_t  m_control;
 	uint8_t  m_data;
-	bool m_irq_state;
+	bool     m_irq_state;
 
 	struct dma_regs {
 		uint32_t address = 0;
@@ -139,8 +139,8 @@ dio16_98620_device::dio16_98620_device(const machine_config &mconfig, device_typ
 	device_t{mconfig, type, tag, owner, clock},
 	device_execute_interface{mconfig, *this},
 	device_dio16_card_interface{mconfig, *this},
-	m_icount{0},
 	m_installed_io{false},
+	m_icount{0},
 	m_control{0},
 	m_data{0},
 	m_irq_state{false},

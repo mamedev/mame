@@ -143,6 +143,13 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void hp98x6_base(machine_config &mconfig, unsigned dot_clock, int char_width);
+	virtual void cpu_mem_map(address_map &map);
+	void diag_led_w(uint8_t data);
+	virtual void cpu_reset_w(int state);
+	void hpib_irq_w(int state);
+	void upi_irq7_w(int state);
+
 	required_device<m68000_device> m_cpu;
 	required_device<ram_device> m_ram;
 	required_device<mc6845_device> m_crtc;
@@ -153,13 +160,6 @@ protected:
 
 	// Character generator
 	required_region_ptr<uint8_t> m_chargen;
-
-	void hp98x6_base(machine_config &mconfig, unsigned dot_clock, int char_width);
-	virtual void cpu_mem_map(address_map &map);
-	void diag_led_w(uint8_t data);
-	virtual void cpu_reset_w(int state);
-	void hpib_irq_w(int state);
-	void upi_irq7_w(int state);
 
 	bool m_hsync_en;
 	bool m_graphic_en;
@@ -843,17 +843,6 @@ protected:
 	virtual void machine_reset() override;
 	virtual void device_post_load() override;
 
-	required_device<fd1793_device> m_fdc;
-	required_device<floppy_connector> m_drive0;
-	optional_device<floppy_connector> m_drive1;
-	required_device_array<ttl74123_device, 2> m_ss;
-	required_device<timer_device> m_fdc_timer;
-	required_ioport m_sw1;
-	required_ioport m_sys_ctrl_sw;
-
-	// ID PROM
-	required_region_ptr<uint8_t> m_idprom;
-
 	TIMER_DEVICE_CALLBACK_MEMBER(fdc_ram_io);
 
 	void hp9826_36(machine_config &mconfig, unsigned dot_clock, int char_width);
@@ -875,6 +864,17 @@ protected:
 	uint8_t hpib_r(offs_t offset);
 	void hpib_w(offs_t offset, uint8_t data);
 	uint16_t id_prom_r(offs_t offset);
+
+	required_device<fd1793_device> m_fdc;
+	required_device<floppy_connector> m_drive0;
+	optional_device<floppy_connector> m_drive1;
+	required_device_array<ttl74123_device, 2> m_ss;
+	required_device<timer_device> m_fdc_timer;
+	required_ioport m_sw1;
+	required_ioport m_sys_ctrl_sw;
+
+	// ID PROM
+	required_region_ptr<uint8_t> m_idprom;
 
 	uint8_t m_floppy_ctrl;
 	uint8_t m_floppy_buffer[256];
@@ -919,6 +919,8 @@ void hp9826_36_state::machine_reset()
 
 void hp9826_36_state::device_post_load()
 {
+	hp98x6_base_state::device_post_load();
+
 	m_curr_floppy = nullptr;
 	// Bring m_curr_floppy in synch
 	floppy_update_sel();
@@ -1437,8 +1439,6 @@ private:
 	static inline constexpr unsigned TEXT_VRAM_SIZE = 2048;
 	static inline constexpr unsigned GRAPHIC_VRAM_SIZE = 16384;
 
-	required_ioport m_frame_rate_sw;
-
 	virtual void cpu_mem_map(address_map &map) override;
 	uint16_t text_r(offs_t offset, uint16_t mem_mask);
 	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -1446,6 +1446,8 @@ private:
 	void graphic_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
+
+	required_ioport m_frame_rate_sw;
 
 	uint16_t m_text_vram[TEXT_VRAM_SIZE];
 	uint16_t m_graphic_vram[GRAPHIC_VRAM_SIZE];
@@ -1789,9 +1791,6 @@ private:
 	static inline constexpr unsigned TEXT_VRAM_SIZE = 2048;
 	static inline constexpr unsigned GRAPHIC_VRAM_SIZE = 131072;
 
-	required_ioport m_frame_rate_sw;
-	memory_share_creator<uint8_t> m_clut;
-
 	virtual void cpu_mem_map(address_map &map) override;
 	uint16_t text_r(offs_t offset, uint16_t mem_mask);
 	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -1799,6 +1798,9 @@ private:
 	void graphic_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
+
+	required_ioport m_frame_rate_sw;
+	memory_share_creator<uint8_t> m_clut;
 
 	uint16_t m_text_vram[TEXT_VRAM_SIZE];
 	uint16_t m_graphic_vram[GRAPHIC_VRAM_SIZE];

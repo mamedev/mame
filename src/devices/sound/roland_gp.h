@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:giulioz
-#ifndef MAME_SOUND_ROLANDGP_H
-#define MAME_SOUND_ROLANDGP_H
+#ifndef MAME_SOUND_ROLAND_GP_H
+#define MAME_SOUND_ROLAND_GP_H
 
 #pragma once
 
@@ -10,6 +10,8 @@
 class tc6116_device : public device_t, public device_sound_interface, public device_rom_interface<23>
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::SOUND; }
+
 	tc6116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto int_callback() { return m_int_callback.bind(); }
@@ -74,11 +76,11 @@ private:
 
 	uint32_t m_clock;                   // clock
 	uint32_t m_rate;                    // sample rate (usually 32000 Hz)
-	sound_stream* m_stream;             // stream handle
+	sound_stream *m_stream;             // stream handle
 	pcm_channel m_chns[NUM_CHANNELS];   // channel memory
 	[[maybe_unused]] uint8_t m_sel_chn; // selected channel
 };
 
 DECLARE_DEVICE_TYPE(TC6116, tc6116_device)
 
-#endif // MAME_SOUND_ROLANDGP_H
+#endif // MAME_SOUND_ROLAND_GP_H
