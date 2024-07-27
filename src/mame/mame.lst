@@ -34916,6 +34916,13 @@ mustangs                        // UPL-90058 (c) 1990 UPL + Seoul Trading
 nouryoku                        // (c) 1995 Tecmo
 nouryokup                       // (c) 1995 Tecmo
 popspops                        // (c) 1999
+powerins                        // (c) 1993 Atlus (USA)
+powerinsa                       // (c) 1993 Atlus (bootleg of USA version)
+powerinsb                       // (c) 1993 Atlus (bootleg of USA version)
+powerinsc                       // (c) 1993 Atlus (bootleg of USA version)
+powerinsj                       // (c) 1993 Atlus (Japan)
+powerinspj                      // prototype (Japan)
+powerinspu                      // prototype (USA)
 raphero                         // (c) 1994 NMK
 rapheroa                        // (c) 1994 Media Trading Corp
 redfoxwp2                       // (c) 1998 (China)
@@ -34967,15 +34974,6 @@ plpittashi                      // NMK
 sluster2                        // NMK
 sweethrt                        // NMK
 trocana                         // NTC / NMK
-
-@source:nmk/powerins.cpp
-powerins                        // (c) 1993 Atlus (USA)
-powerinsa                       // (c) 1993 Atlus (bootleg of USA version)
-powerinsb                       // (c) 1993 Atlus (bootleg of USA version)
-powerinsc                       // (c) 1993 Atlus (bootleg of USA version)
-powerinsj                       // (c) 1993 Atlus (Japan)
-powerinspj                      // prototype (Japan)
-powerinspu                      // prototype (USA)
 
 @source:nmk/quizdna.cpp
 gakupara                        // (c) 1991 NMK
