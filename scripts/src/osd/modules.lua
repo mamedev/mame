@@ -115,6 +115,9 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/netdev/none.cpp",
 		MAME_DIR .. "src/osd/modules/netdev/pcap.cpp",
 		MAME_DIR .. "src/osd/modules/netdev/taptun.cpp",
+		MAME_DIR .. "src/osd/modules/netdev/vmnet.cpp",
+		MAME_DIR .. "src/osd/modules/netdev/vmnet_helper.cpp",
+		MAME_DIR .. "src/osd/modules/netdev/vmnet_common.cpp",
 		MAME_DIR .. "src/osd/modules/output/console.cpp",
 		MAME_DIR .. "src/osd/modules/output/network.cpp",
 		MAME_DIR .. "src/osd/modules/output/none.cpp",
@@ -529,6 +532,13 @@ function osdmodulestargetconf()
 		end
 	end
 
+	if _OPTIONS["USE_VMNET"]=="1" then
+		links {
+			"vmnet.framework",
+			"Security.framework"
+		}
+	end
+
 	if _OPTIONS["targetos"]=="windows" then
 		links {
 			"gdi32",
@@ -569,6 +579,24 @@ newoption {
 	allowed = {
 		{ "0",  "Don't include pcap network module" },
 		{ "1",  "Include pcap network module" },
+	},
+}
+
+newoption {
+	trigger = "USE_VMNET",
+	description = "Include vmnet network module (macOS).  This builds vmnet support into MAME, so MAME must be run as root to access the network.",
+	allowed = {
+		{ "0",  "Don't include vmnet network module" },
+		{ "1",  "Include vmnet network module" },
+	},
+}
+
+newoption {
+	trigger = "USE_VMNET_HELPER",
+	description = "Include vmnet helper network module (macOS).  This works with the external vmnet_helper program, so that MAME doesn't have to run as root.",
+	allowed = {
+		{ "0",  "Don't include vmnet helper network module" },
+		{ "1",  "Include vmnet network helper module" },
 	},
 }
 
@@ -690,6 +718,22 @@ if not _OPTIONS["USE_PCAP"] then
 		_OPTIONS["USE_PCAP"] = "1"
 	else
 		_OPTIONS["USE_PCAP"] = "0"
+	end
+end
+
+if not _OPTIONS["USE_VMNET"] then
+	if _OPTIONS["targetos"]=="macosx" then
+		_OPTIONS["USE_VMNET"] = "1"
+	else
+		_OPTIONS["USE_VMNET"] = "0"
+	end
+end
+
+if not _OPTIONS["USE_VMNET_HELPER"] then
+	if _OPTIONS["targetos"]=="macosx" then
+		_OPTIONS["USE_VMNET_HELPER"] = "1"
+	else
+		_OPTIONS["USE_VMNET_HELPER"] = "0"
 	end
 end
 
