@@ -229,6 +229,7 @@ void tsconf_state::machine_reset()
 	m_zctl_di = 0xff;
 	m_ay_selected = 0;
 
+	m_sprites_cache.clear();
 	tsconf_update_bank0();
 	tsconf_update_video_mode();
 

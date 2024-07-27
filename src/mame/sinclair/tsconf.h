@@ -136,6 +136,17 @@ private:
 		T1_Y_OFFSET_H = 0x47
 	};
 
+	struct sprite_data
+	{
+		u32 code;
+		u32 color;
+		int flipx;
+		int flipy;
+		s32 destx;
+		s32 desty;
+		u32 pmask;
+	};
+
 	void update_frame_timer();
 	emu_timer *m_frame_irq_timer = nullptr;
 	emu_timer *m_scanline_irq_timer = nullptr;
@@ -222,6 +233,7 @@ private:
 	required_device<ram_device> m_cram;
 	required_device<ram_device> m_sfile;
 	required_device<centronics_device> m_centronics;
+	std::vector<sprite_data> m_sprites_cache;
 
 	required_device_array<ym2149_device, 2> m_ay;
 	u8 m_ay_selected;
