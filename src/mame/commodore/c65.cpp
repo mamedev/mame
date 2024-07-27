@@ -132,7 +132,7 @@ void c65_state::vic4567_map(address_map &map)
 		})
 	);
 	map(0x15, 0x15).lr8(
-		NAME([this] (offs_t offset) {
+		NAME([] (offs_t offset) {
 			return 0xff; // silence log for now
 		})
 	);
