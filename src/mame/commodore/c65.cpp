@@ -1,6 +1,6 @@
 // license:LGPL-2.1+
 // copyright-holders: Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
 C=65 / C=64DX (c) 1991 Commodore
 
@@ -23,8 +23,7 @@ Schematics:
 http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C65%20Rev%202A%20Schematic.pdf
 http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C64DX_aka_C65_System_Specifications_Preliminary_(1991_Mar).pdf
 
-***************************************************************************/
-
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m4510.h"
@@ -226,7 +225,7 @@ uint8_t c65_state::vic4567_dummy_r(offs_t offset)
 	}
 
 	if(!machine().side_effects_disabled())
-		printf("%02x\n",offset); // TODO: PC
+		logerror("%02x\n",offset); // TODO: PC
 	return res;
 }
 
@@ -259,15 +258,15 @@ void c65_state::vic4567_dummy_w(offs_t offset, uint8_t data)
 		//case 0x2f: break;
 		case 0x30:
 			if((data & 0xfe) != 0x64)
-				printf("CONTROL A %02x\n",data);
+				logerror("CONTROL A %02x\n",data);
 			m_VIC3_ControlA = data;
 			break;
 		case 0x31:
-			printf("CONTROL B %02x\n",data);
+			logerror("CONTROL B %02x\n",data);
 			m_VIC3_ControlB = data;
 			break;
 		default:
-			printf("%02x %02x\n", offset, data);
+			logerror("%02x %02x\n", offset, data);
 			break;
 	}
 
@@ -326,7 +325,7 @@ void c65_state::DMAgicExecute(address_space &space,uint32_t address)
 	uint32_t src, dst;
 	static const char *const dma_cmd_string[] =
 	{
-		"COPY",                 // 0
+		"COPY",
 		"MIX",
 		"SWAP",
 		"FILL"
@@ -342,13 +341,13 @@ void c65_state::DMAgicExecute(address_space &space,uint32_t address)
 	dst|=(space.read_byte(address++)<<16);
 
 	if(cmd & 0xfc)
-		printf("%02x\n",cmd & 0xfc);
+		logerror("%02x\n",cmd & 0xfc);
 	switch(cmd & 3)
 	{
 		case 0: // copy - TODO: untested
 		{
 				if(length != 1)
-					printf("DMAgic %s %02x -> %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src,dst,length,cmd & 4 ? "yes" : "no");
+					logerror("DMAgic %s %02x -> %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src,dst,length,cmd & 4 ? "yes" : "no");
 				uint32_t SourceIndex;
 				uint32_t DestIndex;
 				uint16_t SizeIndex;
@@ -366,7 +365,7 @@ void c65_state::DMAgicExecute(address_space &space,uint32_t address)
 		case 3: // fill
 			{
 				/* TODO: upper bits of source */
-				printf("DMAgic %s %02x -> %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src & 0xff,dst,length,cmd & 4 ? "yes" : "no");
+				logerror("DMAgic %s %02x -> %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src & 0xff,dst,length,cmd & 4 ? "yes" : "no");
 				uint8_t FillValue;
 				uint32_t DestIndex;
 				uint16_t SizeIndex;
@@ -381,7 +380,7 @@ void c65_state::DMAgicExecute(address_space &space,uint32_t address)
 			}
 			return;
 	}
-	printf("DMAgic %s %08x %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src,dst,length,cmd & 4 ? "yes" : "no");
+	logerror("DMAgic %s %08x %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src,dst,length,cmd & 4 ? "yes" : "no");
 }
 
 
@@ -406,7 +405,7 @@ uint8_t c65_state::CIASelect_r(offs_t offset)
 			case 0xd00:
 				return m_cia1->read(offset);
 			default:
-				printf("Unknown I/O access read to offset %04x\n",offset);
+				logerror("Unknown I/O access read to offset %04x\n",offset);
 				break;
 		}
 
@@ -432,7 +431,7 @@ void c65_state::CIASelect_w(offs_t offset, uint8_t data)
 				m_cia1->write(offset, data);
 				break;
 			default:
-				printf("Unknown I/O access write to offset %04x data = %02x\n", offset, data);
+				logerror("Unknown I/O access write to offset %04x data = %02x\n", offset, data);
 				break;
 		}
 	}
@@ -473,7 +472,7 @@ uint8_t c65_state::cia0_portb_r()
 void c65_state::cia0_porta_w(uint8_t data)
 {
 	m_keyb_c0_c7 = ~data;
-//  printf("%02x\n",m_keyb_c0_c7);
+//  logerror("%02x\n",m_keyb_c0_c7);
 }
 
 void c65_state::cia0_portb_w(uint8_t data)
@@ -670,7 +669,7 @@ INTERRUPT_GEN_MEMBER(c65_state::vic3_vblank_irq)
 
 void c65_state::cia0_irq(int state)
 {
-	printf("%d IRQ\n",state);
+	logerror("%d IRQ\n",state);
 
 #if 0
 	if(state)
