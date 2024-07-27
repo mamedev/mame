@@ -31196,13 +31196,13 @@ license:CC0-1.0
 		<!--Dump released: 2024-04-19-->
 		<!--educational game-->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk  Side " />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="flop" size="234890">
 				<rom name="where in the world is carmen sandiego v2.1 side a.woz" size="234890" crc="ebb9b426" sha1="a96cc5bef8344c02c5d39115cae165cd69ca9666" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk  Side " />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234890">
 				<rom name="where in the world is carmen sandiego v2.1 side b.woz" size="234890" crc="e66e7010" sha1="afaf0ca540bca34c7c8e53a86ca3c4302441d3f3" />
 			</dataarea>

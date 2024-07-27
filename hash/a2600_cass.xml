@@ -44,7 +44,7 @@ meant to be used when there were problems loading the contents from Side A.
 		</part>
 		<part name="cassb" interface="a2600_cass">
 			<dataarea name="cass" size="13416668">
-				<rom name="communist mutants from space  - arcadia corporation (side b).flac" size="13416668" crc="11ae9530" sha1="a608e395ed2aca8b677046ef6265e93add5d4dd1"/>
+				<rom name="communist mutants from space - arcadia corporation (side b).flac" size="13416668" crc="11ae9530" sha1="a608e395ed2aca8b677046ef6265e93add5d4dd1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -65,7 +65,7 @@ meant to be used when there were problems loading the contents from Side A.
 		</part>
 		<part name="cassb" interface="a2600_cass">
 			<dataarea name="cass" size="23479401">
-				<rom name="communist mutants from space  - arcadia corporation (pal, side b).flac" size="23479401" crc="1e882029" sha1="6f75541d6362da2124ce5ce9388c258ec0061ee0"/>
+				<rom name="communist mutants from space - arcadia corporation (pal, side b).flac" size="23479401" crc="1e882029" sha1="6f75541d6362da2124ce5ce9388c258ec0061ee0"/>
 			</dataarea>
 		</part>
 	</software>
