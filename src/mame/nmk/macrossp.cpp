@@ -343,8 +343,8 @@ private:
 	required_shared_ptr<uint32_t> m_text_linezoom;
 	required_shared_ptr<uint32_t> m_text_videoregs;
 	required_shared_ptr<uint32_t> m_mainram;
-	std::unique_ptr<uint32_t[]>         m_spriteram_old;
-	std::unique_ptr<uint32_t[]>         m_spriteram_old2;
+	std::unique_ptr<uint32_t []> m_spriteram_old;
+	std::unique_ptr<uint32_t []> m_spriteram_old2;
 
 	// video-related
 	tilemap_t  *m_scr_tilemap[3]{};
@@ -428,11 +428,10 @@ void macrossp_state::scr_videoram_w(offs_t offset, uint32_t data, uint32_t mem_m
 template <unsigned Which>
 TILE_GET_INFO_MEMBER(macrossp_state::get_scr_tile_info)
 {
-	uint32_t color;
-
 	uint32_t const attr = m_scr_videoram[Which][tile_index];
 	uint32_t const tileno = attr & 0x0000ffff;
 
+	uint32_t color;
 	switch (m_scr_videoregs[Which][0] & 0x00000c00)
 	{
 		case 0x00000800:
@@ -475,9 +474,9 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_text_tile_info)
 
 void macrossp_state::video_start()
 {
-	uint32_t const sprram_size = m_spriteram.bytes() / 4;
-	m_spriteram_old = make_unique_clear<uint32_t[]>(sprram_size);
-	m_spriteram_old2 = make_unique_clear<uint32_t[]>(sprram_size);
+	uint32_t const sprram_size = m_spriteram.length();
+	m_spriteram_old = make_unique_clear<uint32_t []>(sprram_size);
+	m_spriteram_old2 = make_unique_clear<uint32_t []>(sprram_size);
 
 	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(macrossp_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_scr_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(macrossp_state::get_scr_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
@@ -729,17 +728,17 @@ uint32_t macrossp_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 #if 0
 	popmessage  ("scra - %08x %08x %08x\nscrb - %08x %08x %08x\nscrc - %08x %08x %08x",
-	m_scr_videoregs[0][0]&0xffffffff, // yyyyxxxx
-	m_scr_videoregs[0][1], // ??? more scrolling?
-	m_scr_videoregs[0][2], // 08 - 0b
+			m_scr_videoregs[0][0] & 0xffffffff, // yyyyxxxx
+			m_scr_videoregs[0][1], // ??? more scrolling?
+			m_scr_videoregs[0][2], // 08 - 0b
 
-	m_scr_videoregs[1][0]&0xffffffff, // 00 - 03
-	m_scr_videoregs[1][1], // 04 - 07
-	m_scr_videoregs[1][2], // 08 - 0b
+			m_scr_videoregs[1][0] & 0xffffffff, // 00 - 03
+			m_scr_videoregs[1][1], // 04 - 07
+			m_scr_videoregs[1][2], // 08 - 0b
 
-	m_scr_videoregs[2][0]&0xffffffff, // 00 - 03
-	m_scr_videoregs[2][1], // 04 - 07
-	m_scr_videoregs[2][2]);// 08 - 0b
+			m_scr_videoregs[2][0] & 0xffffffff, // 00 - 03
+			m_scr_videoregs[2][1], // 04 - 07
+			m_scr_videoregs[2][2]);// 08 - 0b
 #endif
 	return 0;
 }
