@@ -124,7 +124,7 @@ license:CC0-1.0
 				<rom name="usercart_5_1.u1" size="0x100000" crc="a2761c33" sha1="957b95983037bedb42759502e0111fd9008cb26f"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<!-- this one has some songs programmed into it:
 	    雫                              スキマスイッチ                  Shizuku                         Sukima Switch
@@ -147,7 +147,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- this one has some songs programmed into it:
 	    陽は、また昇る                  アラジン                        Hi wa, Mata Noboru              Aladdin
 	    ポリリズム                      Perfume                         Polyrhythm                      Perfume
@@ -167,7 +167,7 @@ license:CC0-1.0
 				<rom name="usercart_10.u1" size="0x200000" crc="51e64d8e" sha1="90e5592446101807f47772b0868ce3de5d78b9f9"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<!-- this one has some songs programmed into it:
 	    一番綺麗な私を                  中島美嘉                        Ichiban Kireina Watashi o       Nakajima Mika
@@ -200,7 +200,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- this one has some songs programmed into it:
 	    もうすぐクリスマス                      里田まい with 合田兄妹          Mōsugu Christmas                            Satoda Mai with Gōda Kyōdai
 	    ブルーバード                            いきねのがかり                  Blue Bird                                   Ikimonogakari
@@ -231,7 +231,7 @@ license:CC0-1.0
 				<rom name="usercart_20.u1" size="0x200000" crc="e047d928" sha1="a75ca2035d74bf4292562576872389e012ceb1ad"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="bh1jpop1" supported="no">
 		<description>Best Hit Collection Volume 1: J-Pop 1 (Japan)</description>

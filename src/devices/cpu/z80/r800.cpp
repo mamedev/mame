@@ -48,9 +48,9 @@ DEFINE_DEVICE_TYPE(R800, r800_device, "r800", "ASCII R800")
 r800_device::r800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: z80_device(mconfig, R800, tag, owner, clock)
 {
-    z80_set_m1_cycles(1);
-    z80_set_memrq_cycles(1);
-    z80_set_iorq_cycles(1);
+	z80_set_m1_cycles(1);
+	z80_set_memrq_cycles(1);
+	z80_set_iorq_cycles(1);
 }
 
 std::unique_ptr<util::disasm_interface> r800_device::create_disassembler()

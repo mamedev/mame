@@ -76,7 +76,7 @@ void z29_state::keyin_w(int state)
 
 /**
  * Port 1 (based on ROM listing)
- * 
+ *
  * bit 0 - KB output line
  * bit 1 - KB input line
  * bit 2 - 0 = normal video       1 = suppressed
@@ -93,7 +93,7 @@ u8 z29_state::p1_r()
 
 /**
  * Port 3 (based on ROM listing)
- * 
+ *
  * bit 1 - predefined serial port transmit pin
  * bit 4 - 0 = clear memory  1 = DMA CRTC
  * bit 5 - Clear to Send

@@ -53,7 +53,7 @@ ROM_START(mcx128)
 	ROMX_LOAD("mcx128bas.rom", 0x0000, 0x4000, CRC(11202e4b) SHA1(36c30d0f198a1bffee88ef29d92f2401447a91f4), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "alice", "Darren Atkinson's MCX-128 cartridge for Alice")
-	ROMX_LOAD("alice128bas.rom", 0x0000, 0x4000, CRC(a737544a) SHA1(c8fd92705fc42deb6a0ffac6274e27fd61ecd4cc), ROM_BIOS(1))	
+	ROMX_LOAD("alice128bas.rom", 0x0000, 0x4000, CRC(a737544a) SHA1(c8fd92705fc42deb6a0ffac6274e27fd61ecd4cc), ROM_BIOS(1))
 ROM_END
 
 //**************************************************************************

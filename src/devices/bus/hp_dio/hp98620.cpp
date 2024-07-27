@@ -439,8 +439,9 @@ bool dio16_98620_device::dma_transfer(int channel)
 	if (!m_dmar[channel])
 		return false;
 
-	LOG("dma_transfer %s: tc %d/%d\n", m_regs[channel].dma_out ? "out" : "in",
-	    m_regs[channel].tc, m_regs[channel].subcount);
+	LOG("dma_transfer %s: tc %d/%d\n",
+			m_regs[channel].dma_out ? "out" : "in",
+			m_regs[channel].tc, m_regs[channel].subcount);
 
 	if (m_regs[channel].dma_out) {
 			dmack_w_out(channel, program_space().read_byte(m_regs[channel].address++));

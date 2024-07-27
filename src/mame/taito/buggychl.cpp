@@ -240,13 +240,13 @@ void buggychl_state::sprite_lookup_w(offs_t offset, uint8_t data)
 
 void buggychl_state::ctrl_w(uint8_t data)
 {
-    // bit0 = VINV
-    // bit1 = HINV
-    // bit2 = /SN3OFF
-    // bit3 = SKY OFF
-    // bit4 = OJMODE
-    // bit6 = lockout
-    // bit7 = lamp
+	// bit0 = VINV
+	// bit1 = HINV
+	// bit2 = /SN3OFF
+	// bit3 = SKY OFF
+	// bit4 = OJMODE
+	// bit6 = lockout
+	// bit7 = lamp
 
 	flip_screen_y_set(data & 0x01);
 	flip_screen_x_set(data & 0x02);

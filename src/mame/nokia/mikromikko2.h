@@ -103,7 +103,7 @@ private:
 	void update_pic_ir0() { m_pic->ir0_w(m_ir0); }
 	void ir0_w(int state) { if (state) { m_ir0 = ASSERT_LINE; update_pic_ir0(); } }
 	void tcl_w(offs_t offset, uint8_t data) { m_ir0 = CLEAR_LINE; update_pic_ir0(); }
-	
+
 	void update_pic_ir5() { m_pic->ir5_w(m_vpac_int || m_sio_rxrdy || m_sio_txrdy); }
 	void vpac_int_w(int state) { m_vpac_int = state; update_pic_ir5(); }
 	void sio_rxrdy_w(int state) { m_sio_rxrdy = state; update_pic_ir5(); }

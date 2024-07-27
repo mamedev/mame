@@ -3994,22 +3994,22 @@ void nmk16_state::machine_reset()
   This hardware relies on two counters and the contents of two PROMs for the timing signals generation.
   The counters are implemented inside NMK902 custom chip (except tharrier) for all "low-res" games and are used to
   address the entries on each PROM in a sequential way. On "mid-res" and "hi-res" games, one of the counters is
-  implemented outside the custom chip, due to they decided to boost up the horizontal resolution, and the initial 
+  implemented outside the custom chip, due to they decided to boost up the horizontal resolution, and the initial
   configuration is hardwired inside the chip.
 
   - "Horizontal" signals, such as HBlank, HSync... are generated using one of the counters and a 256x4bit PROM, and
     each step on the counter takes 2 pixel clock cycles:
     - For "low-res" games the counter starts on 0x40 and goes to 0xFF having 192 steps. As each step is 2 px, the total
-	  H-size is 384px wide. PROM entries from 0x00 to 0x39 address are never used.
+      H-size is 384px wide. PROM entries from 0x00 to 0x39 address are never used.
     - For "mid-res" games the counter starts on 0x20 and goes to 0xFF having 224 steps. As each step is 2 px, the total
-	  H-size is 448px wide. PROM entries from 0x00 to 0x19 address are never used.
+      H-size is 448px wide. PROM entries from 0x00 to 0x19 address are never used.
     - For  "hi-res" games the counter starts on 0x00 and goes to 0xFF having 256 steps. As each step is 2 px, the total
-	  H-size is 512px wide. All PROM entries are used.
+      H-size is 512px wide. All PROM entries are used.
 
   - "Vertical" signals, such as VBlank, Interrupt requests... are generated using the other counter and a 256x8bit PROM,
     and each step on the counter takes 2 scanlines.
     - In this case, for all games the counter starts on 0x75 and goes to 0xFF having 139 steps. As each step is 2 lines,
-	  the total V-size is 278 lines high. PROM entries from 0x00 address to 0x74 are never used.
+      the total V-size is 278 lines high. PROM entries from 0x00 address to 0x74 are never used.
 
   Going into more detail:
 
@@ -4022,7 +4022,7 @@ void nmk16_state::machine_reset()
     1       --x-     HSYNC (active low)
     2       -x--     HBLANK (active low)
     3       x---     unused on almost all games (only used in gunnail and raphero, purpose unknown)
-	
+
   Considering that and looking at the contents of the PROMs, the horizontal timings are below:
 
   - For "low-res" (6MHz pixel clock):
@@ -4034,8 +4034,8 @@ void nmk16_state::machine_reset()
                            |
                    'start of line'  (pixel 0)
   Each line: ( 6MHz / 384 pixels per line ) = 15625Hz = 64 usec
-  
-  
+
+
   - For "mid-res" (7MHz pixel clock):
                            0........59..........................................................................380...400...416....447
   /LINE-END (2 px):        ----------------------------------------------------------------------------------------------------------X
@@ -4054,7 +4054,7 @@ void nmk16_state::machine_reset()
   HBLANK (28 + 100 px):    XXXXXX-------------------------------------------384-wide-------------------------XXXXXXXXXXXXXXXXXXXXXXXXX  // HBlank ends 28 pixels after 'start of line'
                            ^
                            |
-                   'start of line'  (pixel 0)	
+                   'start of line'  (pixel 0)
   Each line: ( 8MHz / 512 pixels per line ) = 15625Hz = 64 usec
 
 
@@ -4149,16 +4149,16 @@ void nmk16_state::set_screen_hires(machine_config &config)
 
   - IRQ1:
     - At 68 and 196 scanlines on most games
-	- 'tharrier' only at 146 scanline
-	- 'vandyke', 'bioship' and 'blkheart' only at 102 scanline (also 'ddealer' outside this driver).
-	  'vandyke' permanently inhibits it by software.
-	- 'powerins' only at 16 scanline (looks like it's always inhibited by software)
+    - 'tharrier' only at 146 scanline
+    - 'vandyke', 'bioship' and 'blkheart' only at 102 scanline (also 'ddealer' outside this driver).
+      'vandyke' permanently inhibits it by software.
+    - 'powerins' only at 16 scanline (looks like it's always inhibited by software)
 
   - IRQ2:
     - At 16 scanline on most games (VBIN = end of VBLANK = start of active video)
-	- 'tdragon', 'macross2', 'tdragon2' and 'raphero' lack it
-	- 'tharrier' at 54 scanline
-	- 'powerins' at 128 scanline (looks like it's always inhibited by software)
+    - 'tdragon', 'macross2', 'tdragon2' and 'raphero' lack it
+    - 'tharrier' at 54 scanline
+    - 'powerins' at 128 scanline (looks like it's always inhibited by software)
 
   - IRQ3:
     - Only triggered by 'powerins' at 90 and 166 scanlines (looks like it's always inhibited by software)
@@ -4168,10 +4168,10 @@ void nmk16_state::set_screen_hires(machine_config &config)
 */
 TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 {
-//	constexpr int SPRDMA_INDEX = 0;  // not used in emulation TODO: check if it could be used to trigger the sprite DMA instead of setting it 4 lines after VBOUT
-//	constexpr int VSYNC_INDEX  = 1;  // not used in emulation
-//	constexpr int VBLANK_INDEX = 2;  // not used in emulation
-//	constexpr int NOT_USED     = 3;  // not used in emulation
+//  constexpr int SPRDMA_INDEX = 0;  // not used in emulation TODO: check if it could be used to trigger the sprite DMA instead of setting it 4 lines after VBOUT
+//  constexpr int VSYNC_INDEX  = 1;  // not used in emulation
+//  constexpr int VBLANK_INDEX = 2;  // not used in emulation
+//  constexpr int NOT_USED     = 3;  // not used in emulation
 	constexpr int IPL0_INDEX   = 4;
 	constexpr int IPL1_INDEX   = 5;
 	constexpr int IPL2_INDEX   = 6;
@@ -4252,7 +4252,7 @@ LV4         LV2 LV1        LV1
  - VBlank   =  54 lines * 64 usec =  3456 usec
  - Active   = 224 lines * 64 usec = 14336 usec
  - IRQ1 gap = 128 lines * 64 usec =  8192 usec
- 
+
  The following code is used for bootleg, Afega, Comad and NMK games that PROMs are still undumped, on which the
  interrupt triggering cannot be relied on the PROMs contents.
  */

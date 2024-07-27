@@ -200,13 +200,13 @@ INPUT_CHANGED_MEMBER(brikett_state::change_cpu_freq)
 	if (newval & 8)
 	{
 		/*
-			3rd hardware model has 2 XTALs, it will increase CPU voltage (and speed)
-			when running on mains power, the 3.579545MHz XTAL is still used for IRQ.
+		    3rd hardware model has 2 XTALs, it will increase CPU voltage (and speed)
+		    when running on mains power, the 3.579545MHz XTAL is still used for IRQ.
 
-			Mephisto III could be fitted with a 12MHz XTAL instead of 6.144MHz and
-			a newer CDP1805CE CPU by Hobby Computer Centrale on request. (It is
-			unexpected that the 1805 accepts such a high overclock, but tests show
-			that it is indeed twice faster)
+		    Mephisto III could be fitted with a 12MHz XTAL instead of 6.144MHz and
+		    a newer CDP1805CE CPU by Hobby Computer Centrale on request. (It is
+		    unexpected that the 1805 accepts such a high overclock, but tests show
+		    that it is indeed twice faster)
 		*/
 		static const XTAL freq[3] = { 3.579545_MHz_XTAL, 6.144_MHz_XTAL, 12_MHz_XTAL };
 		m_maincpu->set_unscaled_clock(freq[(newval & 3) % 3]);

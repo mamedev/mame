@@ -7354,7 +7354,7 @@ Wave Studio v3.12
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ultrasnd" supported="partial">
 		<!-- includes Gravis UltraSound (GUS) Installation - V4.11 -->
 		<description>The UltraSound CD</description>

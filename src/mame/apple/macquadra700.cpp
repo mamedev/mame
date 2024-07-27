@@ -830,7 +830,7 @@ void eclipse_state::via2_out_b_q900(u8 data)
 
 		SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 		SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68040");
-	//	SOFTWARE_LIST(config, "cd_apple_dev").set_original("apple_devcd");
+		//SOFTWARE_LIST(config, "cd_apple_dev").set_original("apple_devcd");
 		SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 		SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 		SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");

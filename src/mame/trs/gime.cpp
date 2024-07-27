@@ -79,7 +79,7 @@
 
     POP*STAR PILOT: Timer is synchronized with scanlines.
 
-	Cloud Kingdoms: 512K bank switch on scanline.
+    Cloud Kingdoms: 512K bank switch on scanline.
 
 **********************************************************************/
 

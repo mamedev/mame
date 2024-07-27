@@ -94,7 +94,7 @@
     \- sscopex/sogeki desyncs during gameplay intro, leaves heavy trails in gameplay;
     - ppp2nd: hangs when selecting game mode from service (manages to save);
     - wcombatj: gets stuck on network check;
-    - thrild2c: bad CF dump (blue screens because of it);											
+    - thrild2c: bad CF dump (blue screens because of it);
     - all games needs to be verified against factory settings
       (game options, coin options & sound options often don't match "green colored" defaults)
 
