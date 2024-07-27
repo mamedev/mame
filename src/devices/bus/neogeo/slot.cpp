@@ -430,6 +430,7 @@ int16_t neon_mcu_busy = 0x00;
 int16_t neon_bank = 0;
 int16_t neon_fix_bank = 0;
 int16_t neon_mcu_ram[16];
+uint32_t neon_sw_rng_next = 1;
 bool neon_debug_enabled = false;
 
 void neogeo_cart_slot_device::neon_enable_debug_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
@@ -475,9 +476,9 @@ void neogeo_cart_slot_device::neon_fixbank_w(offs_t offset, uint16_t data, uint1
 }
 
 void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
-	u32 seed;
-	u16 modVal;
-	u16 retVal16;
+	uint32_t seed;
+	uint16_t modVal;
+	uint16_t retVal16;
 
 	//trigger MCU irq - here in mame, just set MCU as busy
 	neon_mcu_busy = 0x01;
@@ -521,7 +522,8 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 
 		case 0x05: //srand(s) - seed rng
 			seed = (neon_mcu_ram[1] << 16) + neon_mcu_ram[2];
-			srand(seed);
+			//srand(seed);
+			neon_sw_rng_next = seed;
 
 			if (neon_debug_enabled) {
 				printf("mcu neo_srand(%d)\n", seed);
@@ -530,8 +532,21 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 
 		case 0x06: //rand(m) - generate random number and do mod m on value
 			modVal = neon_mcu_ram[1];
-			retVal16 = neo_rand() % modVal;
-			neon_mcu_ram[1] = retVal16; //do random call here
+			//retVal16 = neo_rand() % modVal;
+			//neon_mcu_ram[1] = retVal16;
+
+			//New pseudo rnd generator
+			for (uint8_t pass = 0; pass < 19; pass++) {
+                if (neon_sw_rng_next & 0x80000000UL) {
+                    neon_sw_rng_next <<= 1;
+                    neon_sw_rng_next ^= 0xFFFFFFAFUL;
+                } else {
+                    neon_sw_rng_next <<= 1;
+				}
+            }
+
+			retVal16 = (uint16_t)neon_sw_rng_next % modVal;
+			neon_mcu_ram[1] = retVal16;
 
 			if (neon_debug_enabled) {
 				printf("mcu neo_rand(%d) = %d\n", modVal, retVal16);
