@@ -14,6 +14,7 @@
 #include "ess_maestro.h"
 #include "geforce.h"
 #include "mga2064w.h"
+#include "ncr53c825.h"
 #include "opti82c861.h"
 #include "oti_spitfire.h"
 #include "pdc20262.h"
@@ -115,6 +116,7 @@ void pci_cards(device_slot_interface &device)
 
 	// 0x01 - mass storage controllers
 	device.option_add("aha2940au",      AHA2940AU);
+	device.option_add("ncr53c825",      NCR53C825_PCI);
 	device.option_add("pdc20262",       PDC20262);
 
 	// 0x02 - network controllers

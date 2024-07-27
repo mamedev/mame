@@ -5504,8 +5504,8 @@ end
 
 if (BUSES["PC8801"]~=null) then
 	files {
-        MAME_DIR .. "src/devices/bus/pc8801/gsx8800.cpp",
-        MAME_DIR .. "src/devices/bus/pc8801/gsx8800.h",
+		MAME_DIR .. "src/devices/bus/pc8801/gsx8800.cpp",
+		MAME_DIR .. "src/devices/bus/pc8801/gsx8800.h",
 		MAME_DIR .. "src/devices/bus/pc8801/pc8801_23.cpp",
 		MAME_DIR .. "src/devices/bus/pc8801/pc8801_23.h",
 		MAME_DIR .. "src/devices/bus/pc8801/pc8801_31.cpp",
@@ -5617,6 +5617,8 @@ if (BUSES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/bus/pci/geforce.h",
 		MAME_DIR .. "src/devices/bus/pci/mga2064w.cpp",
 		MAME_DIR .. "src/devices/bus/pci/mga2064w.h",
+		MAME_DIR .. "src/devices/bus/pci/ncr53c825.cpp",
+		MAME_DIR .. "src/devices/bus/pci/ncr53c825.h",
 		MAME_DIR .. "src/devices/bus/pci/oti_spitfire.cpp",
 		MAME_DIR .. "src/devices/bus/pci/oti_spitfire.h",
 		MAME_DIR .. "src/devices/bus/pci/opti82c861.cpp",
