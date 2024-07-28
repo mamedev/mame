@@ -22,6 +22,9 @@ Hardware notes:
 In 1992, it was also sold by Tandy as Chess Champion 2150L, still manufactured
 by Saitek. Overall, the hardware is the same, but with a slower CPU (16MHz XTAL).
 
+TODO:
+- are older versions of Prisma on PROM H8/325 just like with Blitz?
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -162,7 +165,7 @@ void prisma_state::lcd_output_w(offs_t offset, u64 data)
 }
 
 
-// MCU ports
+// misc
 
 void prisma_state::update_leds()
 {

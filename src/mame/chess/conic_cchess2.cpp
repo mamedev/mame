@@ -75,7 +75,7 @@ private:
 
 	u8 m_inp_mux = 0;
 	u8 m_led_data = 0;
-	int m_dac_on = 0;
+	u8 m_dac_on = 0;
 
 	// address maps
 	void main_map(address_map &map);

@@ -15,8 +15,8 @@ of the chessboard.
 
 Hardware notes:
 - PCB label: EXCALIBUR ELECTRONICS, INC. 6/5/96, MIRAGE, 00-55052-000
-- Hitachi H8/3256 MCU (only 32KB out of 48KB internal ROM used), either mask ROM
-  or OTP ROM, 20MHz XTAL
+- Hitachi H8/3256 MCU (only 32KB out of 48KB internal ROM used), either Mask ROM
+  or PROM, 20MHz XTAL
 - 2*L293DNE motor drivers, 2 DC motors (like a plotter), electromagnet under the
   chessboard for automatically moving the pieces
 - LCD with 5 7segs and custom segments
@@ -27,7 +27,7 @@ most likely the same hardware.
 
 TODO:
 - like fphantom, sensorboard undo buffer fills up pretty quickly
-- dump/add OTP version, maybe they improved the motor drift issue?
+- dump/add PROM version, maybe they improved the motor drift issue?
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
 
