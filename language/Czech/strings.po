@@ -2886,6 +2886,12 @@ msgctxt "menu-analoginput"
 msgid "%1$s Sensitivity"
 msgstr "%1$s Citlivost"
 
+#: src/frontend/mame/ui/analogipt.cpp:652
+#, c-format
+msgctxt "menu-analoginput"
+msgid "%1$s Single Step Increment/Decrement"
+msgstr ""
+
 #: src/frontend/mame/ui/analogipt.cpp:451
 msgctxt "menu-analoginput"
 msgid "[no analog inputs are enabled]"

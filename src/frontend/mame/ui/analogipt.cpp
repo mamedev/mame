@@ -45,6 +45,7 @@ inline menu_analog::item_data::item_data(ioport_field &f, int t) noexcept
 			(ANALOG_ITEM_CENTERSPEED == t) ? f.centerdelta() :
 			(ANALOG_ITEM_REVERSE == t) ? f.analog_reverse() :
 			(ANALOG_ITEM_SENSITIVITY == t) ? f.sensitivity() :
+			(ANALOG_ITEM_SINGLESTEPINCDEC == t) ? f.analog_singlestepincdec() :
 			-1)
 	, min((ANALOG_ITEM_SENSITIVITY == t) ? 1 : 0)
 	, max((ANALOG_ITEM_REVERSE == t) ? 1 : std::max(defvalue * 4, 255))
@@ -578,10 +579,11 @@ bool menu_analog::handle(event const *ev)
 			data.field.get().get_user_settings(settings);
 			switch (data.type)
 			{
-				case ANALOG_ITEM_KEYSPEED:      settings.delta = newval;        break;
-				case ANALOG_ITEM_CENTERSPEED:   settings.centerdelta = newval;  break;
-				case ANALOG_ITEM_REVERSE:       settings.reverse = newval;      break;
-				case ANALOG_ITEM_SENSITIVITY:   settings.sensitivity = newval;  break;
+				case ANALOG_ITEM_KEYSPEED:          settings.delta = newval;            break;
+				case ANALOG_ITEM_CENTERSPEED:       settings.centerdelta = newval;      break;
+				case ANALOG_ITEM_REVERSE:           settings.reverse = newval;          break;
+				case ANALOG_ITEM_SENSITIVITY:       settings.sensitivity = newval;      break;
+				case ANALOG_ITEM_SINGLESTEPINCDEC:  settings.singlestepincdec = newval; break;
 			}
 			data.field.get().set_user_settings(settings);
 			data.cur = newval;
@@ -649,6 +651,11 @@ void menu_analog::populate()
 		case ANALOG_ITEM_SENSITIVITY:
 			text = string_format(_("menu-analoginput", "%1$s Sensitivity"), field->name());
 			data.cur = settings.sensitivity;
+			break;
+
+		case ANALOG_ITEM_SINGLESTEPINCDEC:
+			text = string_format(_("menu-analoginput", "%1$s Single Step Increment/Decrement"), field->name());
+			data.cur = settings.singlestepincdec;
 			break;
 		}
 
@@ -804,6 +811,9 @@ std::string menu_analog::item_text(int type, int value)
 
 	case ANALOG_ITEM_SENSITIVITY:
 		return string_format("%d", value);
+
+	case ANALOG_ITEM_SINGLESTEPINCDEC:
+		return value ? _("On") : _("Off");
 	}
 }
 

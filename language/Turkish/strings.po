@@ -965,7 +965,7 @@ msgstr ""
 "\n"
 "BU SİSTEM ÇALIŞMIYOR. Bu sistemin emülasyonu(öykünme) henüz tamamlanmadı."
 "Bu sorunu çözmek için geliştiricilerin öykünmeyi geliştirmesini beklemek dışında "
-"yapabileceğiniz hiçbir şey yok.\n"	
+"yapabileceğiniz hiçbir şey yok.\n"
 
 #: src/frontend/mame/ui/info.cpp:145
 msgid ""
@@ -2876,6 +2876,12 @@ msgstr "%1$s Ters"
 msgctxt "menu-analoginput"
 msgid "%1$s Sensitivity"
 msgstr "%1$s Hassaslık"
+
+#: src/frontend/mame/ui/analogipt.cpp:652
+#, c-format
+msgctxt "menu-analoginput"
+msgid "%1$s Single Step Increment/Decrement"
+msgstr ""
 
 #: src/frontend/mame/ui/analogipt.cpp:451
 msgctxt "menu-analoginput"

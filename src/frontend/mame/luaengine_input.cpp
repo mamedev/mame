@@ -361,6 +361,7 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_field_type["toggle"] = sol::property(&ioport_field::toggle);
 	ioport_field_type["rotated"] = sol::property(&ioport_field::rotated);
 	ioport_field_type["analog_reverse"] = sol::property(&ioport_field::analog_reverse);
+	ioport_field_type["analog_singlestepincdec"] = sol::property(&ioport_field::analog_singlestepincdec);
 	ioport_field_type["analog_reset"] = sol::property(&ioport_field::analog_reset);
 	ioport_field_type["analog_wraps"] = sol::property(&ioport_field::analog_wraps);
 	ioport_field_type["analog_invert"] = sol::property(&ioport_field::analog_invert);
