@@ -30,6 +30,139 @@ http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C64DX_aka_C65_System
 
 #define MAIN_CLOCK XTAL(28'375'160)/8
 
+// TODO: move to own file, subclass with f018a, use device_execute_interface
+class dmagic_f018_device : public device_t
+{
+public:
+	// construction/destruction
+	dmagic_f018_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <class T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
+
+	void map(address_map &map);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	required_address_space m_space;
+
+	u32 m_dmalist_address = 0;
+
+	void execute(u32 address);
+};
+
+DEFINE_DEVICE_TYPE(DMAGIC_F018, dmagic_f018_device, "dmagic_f018", "DMAgic F018 Gate Array")
+
+dmagic_f018_device::dmagic_f018_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, DMAGIC_F018, tag, owner, clock)
+	, m_space(*this, finder_base::DUMMY_TAG, -1)
+{
+}
+
+void dmagic_f018_device::device_start()
+{
+	save_item(NAME(m_dmalist_address));
+}
+
+void dmagic_f018_device::device_reset()
+{}
+
+void dmagic_f018_device::execute(u32 address)
+{
+	static const char *const dma_cmd_string[] =
+	{
+		"COPY",
+		"MIX",
+		"SWAP",
+		"FILL"
+	};
+	u8 cmd = m_space->read_byte(address++);
+	u16 length = m_space->read_byte(address++);
+	length    |=(m_space->read_byte(address++)<<8);
+
+	u32 src = m_space->read_byte(address++);
+	src    |=(m_space->read_byte(address++)<<8);
+	src    |=(m_space->read_byte(address++)<<16);
+
+	u32 dst = m_space->read_byte(address++);
+	dst    |=(m_space->read_byte(address++)<<8);
+	dst    |=(m_space->read_byte(address++)<<16);
+
+	if(cmd & 0xfc)
+		logerror("%02x\n",cmd & 0xfc);
+	switch(cmd & 3)
+	{
+		// copy
+		// TODO: untested, is it even implemented in F018?
+		case 0:
+		{
+				if(length != 1)
+					logerror("DMAgic %s %02x -> %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src,dst,length,cmd & 4 ? "yes" : "no");
+				uint32_t SourceIndex;
+				uint32_t DestIndex;
+				uint16_t SizeIndex;
+				SourceIndex = src & 0xfffff;
+				DestIndex = dst & 0xfffff;
+				SizeIndex = length;
+				do
+				{
+					m_space->write_byte(DestIndex++,m_space->read_byte(SourceIndex++));
+					SizeIndex--;
+				}while(SizeIndex != 0);
+
+			return;
+		}
+		// fill
+		case 3:
+		{
+				// TODO: upper bits of source
+				logerror("DMAgic %s %02x -> %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src & 0xff,dst,length,cmd & 4 ? "yes" : "no");
+				uint8_t FillValue;
+				uint32_t DestIndex;
+				uint16_t SizeIndex;
+				FillValue = src & 0xff;
+				DestIndex = dst & 0xfffff;
+				SizeIndex = length;
+				do
+				{
+					m_space->write_byte(DestIndex++,FillValue);
+					SizeIndex--;
+				}while(SizeIndex != 0);
+			return;
+		}
+	}
+	logerror("DMAgic %s %08x %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src,dst,length,cmd & 4 ? "yes" : "no");
+}
+
+
+void dmagic_f018_device::map(address_map &map)
+{
+	map(0, 0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			m_dmalist_address &= 0xffff00;
+			m_dmalist_address |= data;
+			execute(m_dmalist_address);
+		})
+	);
+	map(1, 1).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			m_dmalist_address &= 0xff00ff;
+			m_dmalist_address |= data << 8;
+		})
+	);
+	map(2, 2).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			m_dmalist_address &= 0x00ffff;
+			m_dmalist_address |= data << 16;
+		})
+	);
+// 3 read status
+}
+
+namespace {
+
 class c65_state : public driver_device
 {
 public:
@@ -38,6 +171,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_cia(*this, "cia_%u", 0U)
 		, m_sid(*this, "sid_%u", 0U)
+		, m_dma(*this, "dma")
 		, m_cia_view(*this, "cia_view")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -45,7 +179,6 @@ public:
 		, m_palred(*this, "redpal")
 		, m_palgreen(*this, "greenpal")
 		, m_palblue(*this, "bluepal")
-		, m_dmalist(*this, "dmalist")
 		, m_cram(*this, "cram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_ipl_rom(*this, "ipl")
@@ -55,6 +188,7 @@ public:
 	required_device<m4510_device> m_maincpu;
 	required_device_array<mos6526_device, 2> m_cia;
 	required_device_array<mos6581_device, 2> m_sid;
+	required_device<dmagic_f018_device> m_dma;
 	memory_view m_cia_view;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -62,7 +196,6 @@ public:
 	required_shared_ptr<uint8_t> m_palred;
 	required_shared_ptr<uint8_t> m_palgreen;
 	required_shared_ptr<uint8_t> m_palblue;
-	required_shared_ptr<uint8_t> m_dmalist;
 	required_shared_ptr<uint8_t> m_cram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_memory_region m_ipl_rom;
@@ -77,7 +210,6 @@ public:
 	void PalBlue_w(offs_t offset, uint8_t data);
 	uint8_t uart_r(offs_t offset);
 	void uart_w(offs_t offset, uint8_t data);
-	void DMAgic_w(address_space &space, offs_t offset, uint8_t data);
 	uint8_t cia0_porta_r();
 	void cia0_porta_w(uint8_t data);
 	uint8_t cia0_portb_r();
@@ -110,7 +242,6 @@ private:
 	/* 0x31: video modes */
 	uint8_t m_VIC3_ControlB = 0U;
 	void PalEntryFlush(uint8_t offset);
-	void DMAgicExecute(address_space &space,uint32_t address);
 	void IRQCheck(uint8_t irq_cause);
 };
 
@@ -273,80 +404,6 @@ void c65_state::PalBlue_w(offs_t offset, uint8_t data)
 	PalEntryFlush(offset);
 }
 
-
-void c65_state::DMAgicExecute(address_space &space,uint32_t address)
-{
-	uint8_t cmd;// = space.read_byte(address++);
-	uint16_t length; //= space.read_byte(address++);
-	uint32_t src, dst;
-	static const char *const dma_cmd_string[] =
-	{
-		"COPY",
-		"MIX",
-		"SWAP",
-		"FILL"
-	};
-	cmd = space.read_byte(address++);
-	length = space.read_byte(address++);
-	length|=(space.read_byte(address++)<<8);
-	src = space.read_byte(address++);
-	src|=(space.read_byte(address++)<<8);
-	src|=(space.read_byte(address++)<<16);
-	dst = space.read_byte(address++);
-	dst|=(space.read_byte(address++)<<8);
-	dst|=(space.read_byte(address++)<<16);
-
-	if(cmd & 0xfc)
-		logerror("%02x\n",cmd & 0xfc);
-	switch(cmd & 3)
-	{
-		case 0: // copy - TODO: untested
-		{
-				if(length != 1)
-					logerror("DMAgic %s %02x -> %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src,dst,length,cmd & 4 ? "yes" : "no");
-				uint32_t SourceIndex;
-				uint32_t DestIndex;
-				uint16_t SizeIndex;
-				SourceIndex = src & 0xfffff;
-				DestIndex = dst & 0xfffff;
-				SizeIndex = length;
-				do
-				{
-					space.write_byte(DestIndex++,space.read_byte(SourceIndex++));
-					SizeIndex--;
-				}while(SizeIndex != 0);
-
-			return;
-		}
-		case 3: // fill
-			{
-				/* TODO: upper bits of source */
-				logerror("DMAgic %s %02x -> %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src & 0xff,dst,length,cmd & 4 ? "yes" : "no");
-				uint8_t FillValue;
-				uint32_t DestIndex;
-				uint16_t SizeIndex;
-				FillValue = src & 0xff;
-				DestIndex = dst & 0xfffff;
-				SizeIndex = length;
-				do
-				{
-					space.write_byte(DestIndex++,FillValue);
-					SizeIndex--;
-				}while(SizeIndex != 0);
-			}
-			return;
-	}
-	logerror("DMAgic %s %08x %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src,dst,length,cmd & 4 ? "yes" : "no");
-}
-
-
-void c65_state::DMAgic_w(address_space &space, offs_t offset, uint8_t data)
-{
-	m_dmalist[offset] = data;
-	if(offset == 0)
-		DMAgicExecute(space,(m_dmalist[0])|(m_dmalist[1]<<8)|(m_dmalist[2]<<16));
-}
-
 uint8_t c65_state::uart_r(offs_t offset)
 {
 	switch (offset)
@@ -427,8 +484,8 @@ void c65_state::c65_map(address_map &map)
 	// 0x0d440, 0x0d4*f Left  SID
 	map(0x0d440, 0x0d45f).rw(m_sid[0], FUNC(mos6581_device::read), FUNC(mos6581_device::write));
 	map(0x0d600, 0x0d6ff).rw(FUNC(c65_state::uart_r), FUNC(c65_state::uart_w));
-	map(0x0d700, 0x0d702).w(FUNC(c65_state::DMAgic_w)).share("dmalist"); // 0x0d700, 0x0d7** DMAgic
-	//map(0x0d703, 0x0d703).r(FUNC(c65_state::DMAgic_r));
+	// 0x0d700, 0x0d7** DMAgic
+	map(0x0d700, 0x0d703).m(m_dma, FUNC(dmagic_f018_device::map));
 	// 0x0d800, 0x0d8** Color matrix
 	map(0x0d800, 0x0dfff).view(m_cia_view);
 	// maps lower 1024 bytes regardless of the setting (essentially touches $dc00 as overlay)
@@ -630,6 +687,9 @@ void c65_state::c65(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &c65_state::c65_map);
 	m_maincpu->set_vblank_int("screen", FUNC(c65_state::vic3_vblank_irq));
 
+	DMAGIC_F018(config, m_dma, MAIN_CLOCK);
+	m_dma->set_space(m_maincpu, AS_PROGRAM);
+
 	MOS6526(config, m_cia[0], MAIN_CLOCK);
 	m_cia[0]->set_tod_clock(60);
 	m_cia[0]->irq_wr_callback().set(FUNC(c65_state::cia0_irq));
@@ -717,6 +777,8 @@ void c65_state::init_c65pal()
 //  c65_common_driver_init();
 //  m_pal = 1;
 }
+
+} // anonymous namespace
 
 COMP( 1991, c65,   0,   0, c65, c65, c65_state, init_c65,    "Commodore Business Machines", "Commodore 65 Development System (Prototype, NTSC)",          MACHINE_NOT_WORKING )
 COMP( 1991, c64dx, c65, 0, c65, c65, c65_state, init_c65pal, "Commodore Business Machines", "Commodore 64DX Development System (Prototype, PAL, German)", MACHINE_NOT_WORKING )
