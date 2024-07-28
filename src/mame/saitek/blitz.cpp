@@ -8,7 +8,7 @@ Saitek Kasparov Blitz (model 291)
 NOTE: Turn the power switch off before exiting MAME, otherwise NVRAM won't save
 properly.
 
-This is the last Saitek chess computer with Julio Kaplan's involement (Heuristic
+This is the last Saitek chess computer with Julio Kaplan's involvement (Heuristic
 Software), although Craig Barnes continued working for Saitek. Julio Kaplan kept
 programming his chess engine for a few more years, he stopped altogether after
 the release of Kasparov's Gambit (Socrates II) for MS-DOS in 1993.
@@ -16,6 +16,11 @@ the release of Kasparov's Gambit (Socrates II) for MS-DOS in 1993.
 At first power-on, the chessboard gets calibrated, this is done automatically
 in MAME. Not counting the chessboard, the whole user interface is with 2 vertical
 dials at the right edge. There are no pushbuttons.
+
+If chessboard calibration goes wrong somehow (eg. it wrongly tells you to place
+a piece on a square, thinking the square is empty): clear the sensorboard, go to
+options and select calibration, wait until the "board clr?" message goes away,
+and then reset the sensorboard.
 
 Hardware notes:
 - PCB label: SA9-PE-020 REV3, P/N 51290-02013
