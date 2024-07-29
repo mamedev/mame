@@ -42496,6 +42496,9 @@ xor100                          //
 @source:skeleton/zeebo_qualcomm_adreno130.cpp
 zeebo
 
+@source:skeleton/zevio.cpp
+dbzonep                         //
+
 @source:skeleton/zms8085.cpp
 zephyr                          //
 
