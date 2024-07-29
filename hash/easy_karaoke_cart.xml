@@ -265,6 +265,32 @@ license:CC0-1.0
 	</software>
 
 	<!--
+	A Spoonful of Sugar                         Mary Poppins
+	Beauty And The Beast                        Beauty and the Beast
+	Bella Notte                                 Lady And The Tramp
+	Can You Feel The Love Tonight               The Lion King
+	I I Can't Love Her                          Beauty and the Beast - Musical
+	In A World Of My Own                        Alice In Wonderland
+	It's What's Inside that Counts              Cinderella
+	Les Poissons                                The Little Mermaid
+	The Work Song                               Cinderella
+	Yo Ho! (A Pirate's Life For Me)             Pirates of the Caribbean
+	-->
+	<software name="dkp1" supported="no">
+		<description>Disney Princess 10-Song Karaoke Cartridge I (DK-P1)</description>
+		<year>2003</year>
+		<publisher>IVL Technologies / Memcorp Inc / Disney</publisher>
+		<part name="cart" interface="easy_karaoke_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="dk-p1.bin" size="0x80000" crc="c333148f" sha1="e713e7d41649bf9095a1ea3d4ee9eb175d25413a" />
+			</dataarea>
+			<dataarea name="mcu" size="0x2000">
+				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
 	Bare Necessities                            The Jungle Book
 	Call Me, Beep Me                            Kim Possible
 	Hakuna Matata                               The Lion King

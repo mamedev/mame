@@ -536,6 +536,59 @@ ROM_START( karams )
 ROM_END
 
 /*
+The 'karamsg' set has the following 42 songs built in.
+
+40 παλικάρια
+Alouette                                    Enfant
+Always On My Mind                           Elvis Presley (R)
+Discogirl                                   Σάκης Ρουβάς
+Guantanamera                                Popular
+Kumbaya                                     Popular
+La Cucaracha                                Standard
+Oh, My Darling Clementine                   Children
+Silent Night                                Christmas
+The Greatest Love Of All                    Whitney Houston
+We Wish You A Merry Christmas               Standard
+Έλα να με τελειώσεις                        Αντώνης Ρέμος
+Ένας αϊτός
+Απόψε                                       Αντώνης Ρέμος
+Αρχιμηνιά κι αρχιχρονι
+Αχ κορίτσι μου                              Γιάννης Πλούταρχος
+Αχ κουνελάκι
+Βγαίνει η βαρκούλα
+Γιάννη μου το μαντήλι σ
+Δεν έχω τάσεις αυτοκτον Άννα Βίσση
+Εχω τόσα να σου πω                          One
+Ιτιά ιτιά
+Καλήν εσπέραν άρχοντες
+Κόφτην Ελένη την ελιά
+Μια βοσκοπούλα αγάπησα
+Μια ωραία πεταλούδα
+Μου παρήγγειλε τ'αηδόνι
+Παιδιά της Σαμαρίνας
+Παπάκι πάει στην ποταμι
+Παραδοσιακό Ηπείρου
+Περνά περνά η μέλισσα
+Σήμερα γάμος γίνεται
+Σαμιώτισσα
+Στου Μανώλη την ταβέρνα
+Το φεγγάρι Νατάσσα Θεοδωρίδου
+Το φεγγάρι κάνει κύκλο
+Τρίγωνα κάλαντα
+Χαρωπά τα δυό μου χέρια
+Χιόνια στο καμπαναριό
+Ω έλατο
+Ο Μενούσης
+Ομολογώ                                     Βαλάντης
+
+*/
+ROM_START( karamsg )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "ics0302-a.u9", 0x000000, 0x800000, CRC(9aaeb556) SHA1(c1f9142c15a15c73f249fad229a65580b7a3ad27) )
+ROM_END
+
+
+/*
 The 'dks7000c' set has the following 25 songs built in.
 
 A Spoonful of Sugar                         Mary Poppins
@@ -570,6 +623,35 @@ ROM_START( dks7000c )
 	ROM_LOAD( "dks7000c.bin", 0x000000, 0x400000, CRC(1c03e59e) SHA1(617d13a9b353fb648f10e136bc07c496a424b953) )
 ROM_END
 
+/*
+The 'dks7000p' set has the following 20 songs built in.
+
+A Dream Is a Wish Your Heart Makes          Cinderella
+A Whole New World                           Disney
+Be Our Guest                                Beauty and the Beast
+Bibbidi-Bobbidi-Boo                         Disney
+Chim Chim Cheree                            Disney
+Circle of Life                              The Lion King
+Colors of the Wind                          Pocahontas
+Forget About Love                           The Return of Jafar
+Gaston                                      Beauty and the Beast
+I Just Can't Wait To Be King                The Lion King
+I Won't Say (I'm In Love)                   Hercules
+I'll Make A Man Out Of You                  Mulan
+Just Around The River Bend                  Pocahontas
+Kiss The Girl                               The Little Mermaid
+Once Upon A Dream                           Sleeping Beauty
+Out There                                   The Huntchback of Notre Dame
+Poor Unfortunate Souls                      The Little Mermaid
+Reflection                                  Mulan
+Supercalifragilisticexpialidocious          Disney
+Under The Sea                               Disney
+
+*/
+ROM_START( dks7000p )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "dks7000p.bin", 0x000000, 0x400000, CRC(8ec210fb) SHA1(56337e99f3be57af02e5f7f6e340c3f22deb566d) )
+ROM_END
 
 
 } // anonymous namespace
@@ -587,6 +669,9 @@ CONS( 2002, bkarast,       0,              0,      ivl_karaoke_base, ivl_karaoke
 
 // The European releases take cartridges rather than relying on a download service
 CONS( 2004, easykara,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Easy Karaoke license)", "Easy Karaoke Groove Station (UK)", MACHINE_IS_SKELETON )
-CONS( 2003, karams,        0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook license)",     "KaraokeMicro Star (France)", MACHINE_IS_SKELETON )
+
+CONS( 2003, karams,        0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook license)",             "KaraokeMicro Star (France)", MACHINE_IS_SKELETON )
+CONS( 2003, karamsg,       0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook / Imago license)",     "KaraokeMicro Star (Greece)", MACHINE_IS_SKELETON )
 
 CONS( 2003, dks7000c,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Classic Handheld Karaoke Player (DKS7000-C)", MACHINE_IS_SKELETON )
+CONS( 2003, dks7000p,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Princess Handheld Karaoke Player (DKS7000-P)", MACHINE_IS_SKELETON )

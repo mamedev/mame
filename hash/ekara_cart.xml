@@ -2939,6 +2939,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="sp07">
+		<description>Super Cartridge: Best Hit (Japan) (SP-07)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="スーパーカートリッジ ベストヒット"/>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,JPOPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp07.u1" size="0x200000" crc="5cad2834" sha1="ba384f862897559d2a93f3aa7a7f65622070a461"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- ********************************************************************************************************************************************************************** -->
 
