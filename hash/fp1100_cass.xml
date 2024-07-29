@@ -10,7 +10,7 @@ TODO:
 -->
 <softwarelist name="fp1100_cass" description="Casio FP-1100 cassettes">
 	<software name="aliengya" supported="no">
-		<description>Alien No Gyakushu</description>
+		<description>Alien no Gyakushū</description>
 		<year>1983?</year>
 		<publisher>Compac</publisher>
 		<!-- TODO: Denoting wrong snippet -->
@@ -37,7 +37,7 @@ RUN
 WIDTH 40
 LOADM "CAS0:",R
 ]]></notes>
-		<info name="alt_title" value="アタックシーモンスタ"/>
+		<info name="alt_title" value="アタックシーモンスター"/>
 		<info name="serial" value="C-1001"/>
 		<part name="cass1" interface="fp1100_cass">
 			<dataarea name="cass" size="6191452">
