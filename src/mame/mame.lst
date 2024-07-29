@@ -20149,11 +20149,11 @@ wcherry                         // bootleg
 animalhjb                       // bootleg
 gp98                            // (c) 1998
 gp98a                           // (c) 1998
-jingbell                        // (c) 1997
-jingbella                       // (c) 1997
-jingbellb                       // (c) 1997
-jingbellc                       // (c) 1995
-jingbelli                       // (c) 1995?
+jbell133i                       // (c) 1995?
+jbell141ue                      // (c) 1995
+jbell153ue                      // (c) 1997
+jbell155ue                      // (c) 1997
+jbell157us                      // (c) 1997
 
 @source:igs/igs011.cpp
 dbc                             // (c) 199?
@@ -20476,7 +20476,7 @@ kov3hd101
 
 @source:igs/spoker.cpp
 3super8                         // unknown
-jb200us                         // (c) 1997 IGS
+jbell                           // (c) 1997 IGS
 spk100                          // (c) 1996 IGS
 spk102ua                        // (c) 1996 IGS
 spk114it                        // (c) 199? IGS

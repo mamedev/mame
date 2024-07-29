@@ -816,7 +816,7 @@ void igs009_state::gp98(machine_config &config)
    Original IGS.
    For amusement.
 */
-ROM_START( jingbell )
+ROM_START( jbell157us )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512_v157_us.u44", 0x00000, 0x10000, CRC(37f95b60) SHA1(db2022802ce553ce7a0e8403408f3194b2f10007) )
 
@@ -841,7 +841,7 @@ ROM_END
    Original IGS.
    For amusement.
 */
-ROM_START( jingbella )
+ROM_START( jbell155ue )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512_v155.u44", 0x00000, 0x10000, CRC(0813d12b) SHA1(4c35b656d1e54619bbfd26cbc017eba336e6abda) )
 
@@ -866,7 +866,7 @@ ROM_END
    Original IGS.
    For amusement.
 */
-ROM_START( jingbellb )
+ROM_START( jbell153ue )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512_v153.u44", 0x00000, 0x10000, CRC(fd3bc092) SHA1(a92dc9bc15d7a4816887d66d46cea925d230c5b8) )
 
@@ -891,7 +891,7 @@ ROM_END
    Original IGS.
    For amusement.
 */
-ROM_START( jingbellc )
+ROM_START( jbell141ue )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512_v141.u44", 0x00000, 0x10000, CRC(6997a903) SHA1(991508d85e55a3c6f811070352e06ae6bf65cc2e) )
 
@@ -949,7 +949,7 @@ Notes:
 
 ***************************************************************************/
 
-ROM_START( jingbelli )
+ROM_START( jbell133i )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jinglev133i.u44", 0x00000, 0x10000, CRC(df60dc39) SHA1(ff57afd50c045b621395353fdc50ffd1e1b65e9e) )
 
@@ -1149,12 +1149,12 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR   NAME       PARENT    MACHINE   INPUT     STATE          INIT            ROT   COMPANY           FULLNAME                                 FLAGS
-GAME( 1997,  jingbell,  0,        jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (US, V157US)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V155UE)",              MACHINE_SUPPORTS_SAVE ) // Shows V154UE in test mode!
-GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1995?, animalhjb, jingbell, jingbell, jingbell, igs009_state,  init_animalhjb, ROT0, "bootleg",        "Animal House (bootleg of Jingle Bell)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998,  gp98,      0,        gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1998,  gp98a,     gp98,     gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 2)",         MACHINE_SUPPORTS_SAVE ) // "V100K JINGLEBELL" string on program ROM
+//    YEAR   NAME        PARENT  MACHINE   INPUT     STATE          INIT            ROT   COMPANY           FULLNAME                                 FLAGS
+GAME( 1997,  jbell157us, jbell,  jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (US, V157US)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  jbell155ue, jbell,  jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V155UE)",              MACHINE_SUPPORTS_SAVE ) // Shows V154UE in test mode!
+GAME( 1997,  jbell153ue, jbell,  jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  jbell141ue, jbell,  jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1995?, jbell133i,  jbell,  jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1995?, animalhjb,  jbell,  jingbell, jingbell, igs009_state,  init_animalhjb, ROT0, "bootleg",        "Animal House (bootleg of Jingle Bell)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  gp98,       0,      gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  gp98a,      gp98,   gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 2)",         MACHINE_SUPPORTS_SAVE ) // "V100K JINGLEBELL" string on program ROM

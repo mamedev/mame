@@ -1239,7 +1239,7 @@ ROM_START( spk100 ) // no labels on the ROMs
 	ROM_LOAD( "u38",   0x0000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
 ROM_END
 
-ROM_START( jb200us ) // IGS PCB-0308-01, same as the US Super Poker sets
+ROM_START( jbell ) // IGS PCB-0308-01, same as the US Super Poker sets
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "jingle_v200us.u27",   0x00000, 0x10000, CRC(831782cb) SHA1(8e903569a0cd34222a7e5fd3e9ab21bf00802bb3) ) // 27C512
 	ROM_LOAD( "jingle_v200us_7.u26", 0x10000, 0x10000, CRC(3160f443) SHA1(2930359961a618cbe356a7f9c8fd63bacba2a6b0) ) // 27C512, 1ST AND 2ND HALF IDENTICAL
@@ -1501,4 +1501,4 @@ GAME( 1993?, spk114it,   spk306us, spoker,   spk114it, spoker_state,  init_spk11
 GAME( 1996,  spk102ua,   spk306us, spokeru,  spoker,   spokeru_state, init_spokeru,  ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk100,     spk306us, spoker,   spk114it, spoker_state,  init_spk100,   ROT0,  "IGS",       "Super Poker (v100)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1993?, 3super8,    0,        _3super8, 3super8,  spoker_state,  init_3super8,  ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
-GAME( 1997,  jb200us,    0,        jb,       jb,       jb_state,      init_spokeru,  ROT0,  "IGS",       "Jingle Bell (v200US)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  jbell,      0,        jb,       jb,       jb_state,      init_spokeru,  ROT0,  "IGS",       "Jingle Bell (v200US)",     MACHINE_SUPPORTS_SAVE )
