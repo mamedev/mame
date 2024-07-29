@@ -23,7 +23,7 @@ options and select calibration, wait until the "board clr?" message goes away,
 and then reset the sensorboard.
 
 Hardware notes:
-- PCB label: SA9-PE-020 REV3, P/N 51290-02013
+- PCB label: SA9-PE-020 REV 3/4
 - Hitachi H8/325 MCU (either Mask ROM or PROM), 20MHz XTAL
 - LCD with 10 7segs and custom segments
 - piezo, 64 LEDs, metal sensors chessboard*, 2 dials
@@ -34,7 +34,6 @@ a metal detector. Chess pieces have aluminium washers at the bottom.
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
-- dump/add newer Mask ROM version (might be same ROM contents)
 
 *******************************************************************************/
 
@@ -275,8 +274,8 @@ static const ioport_value shuttle_dial[4] = { 0, 1, 3, 2 };
 
 static INPUT_PORTS_START( blitz )
 	PORT_START("IN.0")
-	PORT_BIT(0x07, 0x00, IPT_POSITIONAL_V) PORT_POSITIONS(6) PORT_WRAPS PORT_REMAP_TABLE(mode_dial) PORT_SENSITIVITY(4) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Mode Dial")
-	PORT_BIT(0x18, 0x00, IPT_POSITIONAL_H) PORT_POSITIONS(4) PORT_WRAPS PORT_REMAP_TABLE(shuttle_dial) PORT_SENSITIVITY(12) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Shuttle Dial")
+	PORT_BIT(0x07, 0x00, IPT_POSITIONAL_V) PORT_POSITIONS(6) PORT_WRAPS PORT_REMAP_TABLE(mode_dial) PORT_SENSITIVITY(5) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Mode Dial")
+	PORT_BIT(0x18, 0x00, IPT_POSITIONAL_H) PORT_POSITIONS(4) PORT_WRAPS PORT_REMAP_TABLE(shuttle_dial) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Shuttle Dial")
 	PORT_BIT(0x60, IP_ACTIVE_HIGH, IPT_CUSTOM) // freq sel
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 
@@ -326,7 +325,7 @@ void blitz_state::blitz(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(8, 8);
-	m_led_pwm->set_bri_levels(0.15);
+	m_led_pwm->set_bri_levels(0.25);
 
 	config.set_default_layout(layout_saitek_blitz);
 
@@ -342,7 +341,15 @@ void blitz_state::blitz(machine_config &config)
 *******************************************************************************/
 
 ROM_START( kblitz )
-	ROM_REGION16_BE( 0x8000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x8000, "maincpu", 0 ) // serial S004184xx
+	ROM_LOAD("90_saitek_86058151sa9_3258a03p.u1", 0x0000, 0x8000, CRC(636ccde5) SHA1(c333ea3260892458a9d0c37db849d7d290674f86) )
+
+	ROM_REGION( 94712, "screen", 0 )
+	ROM_LOAD("kblitz.svg", 0, 94712, CRC(b3bda86b) SHA1(9b64d3d6f6a275acd05a0f78899a5aee48d6b86b) )
+ROM_END
+
+ROM_START( kblitza )
+	ROM_REGION16_BE( 0x8000, "maincpu", 0 ) // serial S003078xx
 	ROM_LOAD("h8_325_hd6473258p10_sa9_702g.u1", 0x0000, 0x8000, CRC(a5d17819) SHA1(e46c0b70aff31809ae02a5c5973935cf118f2324) )
 
 	ROM_REGION( 94712, "screen", 0 )
@@ -357,5 +364,6 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1990, kblitz, 0,      0,      blitz,   blitz, blitz_state, empty_init, "Saitek / Heuristic Software", "Kasparov Blitz", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1990, kblitz,  0,      0,      blitz,   blitz, blitz_state, empty_init, "Saitek / Heuristic Software", "Kasparov Blitz (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, kblitza, kblitz, 0,      blitz,   blitz, blitz_state, empty_init, "Saitek / Heuristic Software", "Kasparov Blitz (set 2)", MACHINE_SUPPORTS_SAVE )

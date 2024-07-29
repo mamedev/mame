@@ -3,7 +3,8 @@
 /******************************************************************************
 
 Videopac C7010 Chess Module emulation
-The chess engine is "Gambiet", written by Wim Rens
+
+The chess engine is Wim Rens's Gambiet, evidently based on the 1980 version.
 
 Hardware notes:
 - NSC800 (Z80-compatible) @ 4.43MHz
