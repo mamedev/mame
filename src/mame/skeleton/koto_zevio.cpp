@@ -84,7 +84,7 @@ void zevio_state::arm_map(address_map &map)
 
 void zevio_state::zevio(machine_config &config)
 {
-	ARM9(config, m_maincpu, 72000000); // ARM 720 core
+	ARM9(config, m_maincpu, 72000000); // unknown ARM core, unknown frequency
 	m_maincpu->set_addrmap(AS_PROGRAM, &zevio_state::arm_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
