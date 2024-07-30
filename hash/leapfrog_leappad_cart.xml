@@ -995,9 +995,10 @@ license:CC0-1.0
 	<!-- CocoPad (Japanese) cartridges -->
 
 	<software name="ecchello1" supported="no">
-		<description>ECC Junior Say Hello 1 (Japan)</description>
+		<description>ECC Junior no hajimete eikaiwa! 1 Eigo de tanoshiku Say Hello! (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
+		<info name="alt_title" value="ECCジュニアのはじめて英会話！１　英語でたのしくSay Hello!" />
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="9p4-0085a.u1" size="0x200000" crc="453d216d" sha1="a5c716dde0269fa7a0d96656f0348d6ef1c3cdf3" />
@@ -1006,9 +1007,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="funtogeth" supported="no">
-		<description>Have Fun Together (Japan)</description>
+		<description>Minna de tanoshiku! CoCoPad (Otameshi soft) (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
+		<info name="alt_title" value="みんなでたのしく！ココパッド　おためしソフト" />
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="9p4-0092b.u1" size="0x200000" crc="3dc3d95d" sha1="0b2adb553b0349f7447778b00e9d2728eed88e64" />
@@ -1017,9 +1019,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="bennyeng2" supported="no">
-		<description>Benny and Friends English Book Volume 2 (Japan)</description>
+		<description>Benny and Friends English Book Vol. 2 -Majo to taiketsu! Daibouken- (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
+		<info name="alt_title" value="Benny and Friends English Book Vol. 2 -魔女と対決！大冒険-" />
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="9p4-0122.u1" size="0x200000" crc="d0491a22" sha1="b37a778028cd6cb5c40843cf429eea2aad41bd57" />
@@ -1028,9 +1031,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="thomasj" supported="no">
-		<description>Thomas and Friends (Japan)</description>
+		<description>Kikansha Thomas to nakamatachi - Kikansha Thomas Yakunitatsu kikansha (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
+		<info name="alt_title" value="きかんしゃトーマスとなかまたち - きかんしゃトーマス　やくにたつきかんしゃ" />
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="9p4-0181.u1" size="0x200000" crc="e31a6683" sha1="5f2896cfea18860c0b7dc73cf5b47f2b35149c7b" />
@@ -1039,9 +1043,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="multy2j" supported="no">
-		<description>Multiplication Year 2 (Japan)</description>
+		<description>Shinkenzemi Challenge 2 nensei Korasho to issho ni kuku o oboeyou! (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
+		<info name="alt_title" value="進研ゼミ・チャレンジ2年生 コラショといっしょに九九をおぼえよう！" />
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="9p4-0190.u1" size="0x200000" crc="041c1679" sha1="593df29aad1103d386c389fd3ede60bb18ac8a1a" />
@@ -1050,9 +1055,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="anpapinj" supported="no">
-		<description>Anpanman's Pinocchio (Japan)</description>
+		<description>Anpanman no CoCoPad de aiueo kyoushitsu Pinocchio (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
+		<info name="alt_title" value="アンパンマンのココパッドであいうえお教室 Pinocchio" />
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="9p4-0105a.u1" size="0x200000" crc="c5a6557b" sha1="167b29deed25a3ceca8c373f9a76e97b474fb95f" />
@@ -1061,9 +1067,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="mozartj" supported="no">
-		<description>Mozart (Japan)</description>
+		<description>Idainaru sakkyokutachi (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
+		<info name="alt_title" value="偉大なる作曲家たち" />
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x400000">
 				<rom name="9p4-0088a.u1" size="0x400000" crc="249a2705" sha1="1faf543902c4c5064777a911b1e914ba695981f1" />
@@ -1072,9 +1079,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="anpanmnj" supported="no">
-		<description>Anpanman (Japan)</description>
+		<description>Yuuki Rinrin Anpunch! (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
+		<info name="alt_title" value="ゆうきリンリンアンパンチ！" />
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="9p4-0114a.u1" size="0x200000" crc="e4e3fa62" sha1="348d54920b146a921b59c50a246a4b1a7adf93ae" />
@@ -1083,9 +1091,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="helkitj" supported="no">
-		<description>Hello Kitty (Japan)</description>
+		<description>Hello Kitty no gakkou no ichinichi (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
+		<info name="alt_title" value="ハローキティのがっこうのいちにち" />
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="9p0-0091a.u1" size="0x200000" crc="1b31d902" sha1="aa48ed1b6bc868fb4b4c4b60ad11f590b0cc026b" />
@@ -1097,6 +1106,7 @@ license:CC0-1.0
 		<description>Disney Princess (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
+		<info name="alt_title" value="" />
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="500-01449.u1" size="0x200000" crc="9f9c9858" sha1="c3ca1290f29a24b6bfa5d815ef9f58ad24f0f0fe" />
@@ -1105,9 +1115,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="poohj" supported="no">
-		<description>Winnie the Pooh (Japan)</description>
+		<description>Kuma no Pooh-san Hachimitsu no tsubo ga ippai Pooh-san to kazu・katachi (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
+		<info name="alt_title" value="くまのプーさん　はちみつのつぼがいっぱい　プーさんとかず・かたち" />
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="500-01453.u1" size="0x200000" crc="233ea836" sha1="ce3fa3fdd84427356e87134b1b1c44140c18d2aa" />
@@ -1116,9 +1127,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="disbf1" supported="no">
-		<description>Disney's World of English - Birthday Fun 1 (Japan)</description>
+		<description>Disney's World of English 1: Birthday Fun (Japan)</description>
 		<year>2002</year>
-		<publisher>LeapFrog</publisher>
+		<publisher>LeapFrog</publisher>	
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="500-10047.u1" size="0x800000" crc="d8c1afd1" sha1="05f9628a24d8fd62d09a3698ff347112d2610955" />
@@ -1127,7 +1138,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dispic2" supported="no">
-		<description>Disney's World of English - The Picnic 2 (Japan)</description>
+		<description>Disney's World of English 2: The Picnic (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="leapfrog_leappad_cart">
@@ -1138,7 +1149,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="discirc3" supported="no">
-		<description>Disney's World of English - The Circus 3 (Japan)</description>
+		<description>Disney's World of English 3: The Circus (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="leapfrog_leappad_cart">
@@ -1149,7 +1160,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="diszoo4" supported="no">
-		<description>Disney's World of English - The Zoo 4 (Japan)</description>
+		<description>Disney's World of English 4: The Zoo (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="leapfrog_leappad_cart">
@@ -1159,10 +1170,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="eatnoodj" supported="no">
-		<description>Please Keep Eating the Noodles - 3 March 2007, 5 May 2007 (Japan)</description>
+	<software name="k3mar07" supported="no">
+		<description>CoCoPad Rom Cassette Kono men o ue ni shiteirete ne! (3 March 2007 - 5 May 2007) (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
+		<info name="alt_title" value="ココパッドロムカッセット　このめんをうえにしていれてね！ (3 March 2007 - 5 May 2007)" />
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-12524.u1" size="0x400000" crc="0b61e024" sha1="51c36c8a199f58983b7979d18b4a5d302d78b4b3" />
@@ -1170,10 +1182,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="noodtopj" supported="no">
-		<description>Keep the Noodles on Top - 7 July 2007, 9 September 2007 (Japan)</description>
+	<software name="k7jul07" supported="no">
+		<description>CoCoPad Rom Cassette Kono men o ue ni shiteirete ne! (7 July 2007, 9 September 2007) (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
+		<info name="alt_title" value="ココパッドロムカッセット　このめんをうえにしていれてね！ (7 July 2007, 9 September 2007)" />
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="500-12789.u1" size="0x200000" crc="445316c9" sha1="9ad7b6a17b9c246ac197ffab034f2e31d8ad74a2" />
@@ -1181,10 +1194,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="eatnod2j" supported="no">
-		<description>Please Keep Eating the Noodles - 11 November 2007, 1 January 2008 (Japan)</description>
+	<software name="k11nov07" supported="no">
+		<description>CoCoPad Rom Cassette Kono men o ue ni shiteirete ne! (11 November 2007, 1 January 2008) (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
+		<info name="alt_title" value="ココパッドロムカッセット　このめんをうえにしていれてね！ (11 November 2007, 1 January 2008)" />
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-12818.u1" size="0x400000" crc="4709b3e3" sha1="972aa48cf5194d902851197c601344d31d825c8c" />
@@ -1193,9 +1207,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="abcj" supported="no">
-		<description>ABC - 3 March 2008,  5 May 2008 (Japan)</description>
+		<description>Kodomo Challenge English CoCoPad Rom Cassette Kono men o ue ni shiteirete ne! (2008/3 March - Shimajirou to Libby no ABC Adventure, 2008/5 May - Shimajirou to Libby no Touch and step game de asobou) (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
+		<info name="alt_title" value="こどもちゃれんじ English ココパッドロムカッセット　このめんをうえにしていれてね！ (2008/3 March - しまじろうとリビーのABCアドベンチャー, 2008/5 May - しまじろうとリビーのタッチアンドステップゲームであそぼう)" />
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-13250.u1" size="0x400000" crc="331df5fc" sha1="ea563ded2223f2e99c89d89c53d19f36497665dc" />
