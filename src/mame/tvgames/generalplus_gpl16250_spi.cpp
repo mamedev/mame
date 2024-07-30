@@ -190,6 +190,6 @@ void generalplus_gpspispi_game_state::init_spi()
 } // anonymous namespace
 
 // ぼくはプラレール運転士 新幹線で行こう！プラス  (I am a Plarail driver Let's go by Shinkansen! Plus)
-CONS(2015, prailpls, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Takara Tomy", "Boku wa Plarail Untenshi Shinkansen de Ikkou! Plus (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // has built-in screen, but can be connected to a TV
+CONS(2015, prailpls, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Takara Tomy", "Boku wa Plarail Untenshi Shinkansen de Ikou! Plus (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // has built-in screen, but can be connected to a TV
 
 CONS(2015, bkrankp,  0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
