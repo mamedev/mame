@@ -151,7 +151,10 @@ u8 mms77316_fdc_device::data_r()
 	{
 		LOGBURST("%s: burst_mode setting wait state\n", FUNCNAME);
 
-		m_wait_cb(ASSERT_LINE);
+		if (!machine().side_effects_disabled())
+		{
+			m_wait_cb(ASSERT_LINE);
+		}
 	}
 	else
 	{
