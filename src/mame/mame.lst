@@ -42120,6 +42120,9 @@ junior80                        //
 @source:skeleton/kkcount.cpp
 kkcount
 
+@source:skeleton/koto_zevio.cpp
+dbzonep                         //
+
 @source:skeleton/kron.cpp
 kron180                         // 1995 Kron Ltd, Ukraine
 
@@ -42495,9 +42498,6 @@ xor100                          //
 
 @source:skeleton/zeebo_qualcomm_adreno130.cpp
 zeebo
-
-@source:skeleton/zevio.cpp
-dbzonep                         //
 
 @source:skeleton/zms8085.cpp
 zephyr                          //

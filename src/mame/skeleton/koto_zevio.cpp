@@ -99,10 +99,14 @@ void zevio_state::zevio(machine_config &config)
 
 
 ROM_START( dbzonep )
-	ROM_REGION( 0x800100, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "MR27T6402L.U1", 0x000000, 0x800100, CRC(9d3020e4) SHA1(bce5d42ecff88b310a43599c9e47cba920c6b6e1) )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mr27t6402l.u1", 0x000000, 0x800000, CRC(57f7c319) SHA1(65118a9c61defc75cefe5e45062c0a4788e2a26c) )
+	// original dump had the first 0x100 bytes repeated again at the end, why?
+
+	ROM_REGION( 0x800, "eeprom", ROMREGION_ERASEFF )
+	ROM_LOAD( "s24cs16a.u6", 0x000000, 0x800, CRC(a1724ea8) SHA1(93a6f73e30f47b6a0c83f62dfd9d8236473518a8) )	
 ROM_END
 
 } // anonymous namespace
 
-CONS( 2008, dbzonep,      0,              0,      zevio, zevio, zevio_state, empty_init, "Bandai / Koto", "Dragonball Z x One Piece", MACHINE_IS_SKELETON )
+CONS( 2008, dbzonep,      0,              0,      zevio, zevio, zevio_state, empty_init, "Bandai / Koto", "Dragonball Z x One Piece (Japan)", MACHINE_IS_SKELETON )
