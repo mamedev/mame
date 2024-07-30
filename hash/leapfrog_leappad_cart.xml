@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad cartridges">
+<softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad / CocoPad cartridges">
 
 	<software name="tiggerbnca" cloneof="tiggerbnc" supported="no">
 		<description>Disney's Bounce, Tigger, Bounce (UK)</description>
@@ -988,6 +988,217 @@ license:CC0-1.0
 			<feature name="u1" value="JS28F320"/>
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-13044 UBL - Sed de Saber - English as a Second Language Edition - Book 6 - How do you say... .bin" size="0x400000" crc="5ed699f6" sha1="902c70e0437525de94a8febab794e46b8a55f5c1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- CocoPad (Japanese) cartridges -->
+
+	<software name="ecchello1" supported="no">
+		<description>ECC Junior Say Hello 1 (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="9p4-0085a.u1" size="0x200000" crc="453d216d" sha1="a5c716dde0269fa7a0d96656f0348d6ef1c3cdf3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="funtogeth" supported="no">
+		<description>Have Fun Together (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="9p4-0092b.u1" size="0x200000" crc="3dc3d95d" sha1="0b2adb553b0349f7447778b00e9d2728eed88e64" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bennyeng2" supported="no">
+		<description>Benny and Friends English Book Volume 2 (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="9p4-0122.u1" size="0x200000" crc="d0491a22" sha1="b37a778028cd6cb5c40843cf429eea2aad41bd57" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomasj" supported="no">
+		<description>Thomas and Friends (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="9p4-0181.u1" size="0x200000" crc="e31a6683" sha1="5f2896cfea18860c0b7dc73cf5b47f2b35149c7b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multy2j" supported="no">
+		<description>Multiplication Year 2 (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="9p4-0190.u1" size="0x200000" crc="041c1679" sha1="593df29aad1103d386c389fd3ede60bb18ac8a1a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpapinj" supported="no">
+		<description>Anpanman's Pinocchio (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="9p4-0105a.u1" size="0x200000" crc="c5a6557b" sha1="167b29deed25a3ceca8c373f9a76e97b474fb95f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mozartj" supported="no">
+		<description>Mozart (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="9p4-0088a.u1" size="0x400000" crc="249a2705" sha1="1faf543902c4c5064777a911b1e914ba695981f1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpanmnj" supported="no">
+		<description>Anpanman (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="9p4-0114a.u1" size="0x200000" crc="e4e3fa62" sha1="348d54920b146a921b59c50a246a4b1a7adf93ae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="helkitj" supported="no">
+		<description>Hello Kitty (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="9p0-0091a.u1" size="0x200000" crc="1b31d902" sha1="aa48ed1b6bc868fb4b4c4b60ad11f590b0cc026b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disprinj" supported="no">
+		<description>Disney Princess (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-01449.u1" size="0x200000" crc="9f9c9858" sha1="c3ca1290f29a24b6bfa5d815ef9f58ad24f0f0fe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohj" supported="no">
+		<description>Winnie the Pooh (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-01453.u1" size="0x200000" crc="233ea836" sha1="ce3fa3fdd84427356e87134b1b1c44140c18d2aa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disbf1" supported="no">
+		<description>Disney's World of English - Birthday Fun 1 (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-10047.u1" size="0x800000" crc="d8c1afd1" sha1="05f9628a24d8fd62d09a3698ff347112d2610955" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dispic2" supported="no">
+		<description>Disney's World of English - The Picnic 2 (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-10504.u1" size="0x800000" crc="e4202417" sha1="d47a21db544354b44cff8d9151b852c36761ca49" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discirc3" supported="no">
+		<description>Disney's World of English - The Circus 3 (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-10765.u1" size="0x800000" crc="555796f6" sha1="c814b736583afbbb1d92c86c62372038a8ca470d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diszoo4" supported="no">
+		<description>Disney's World of English - The Zoo 4 (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-11760.u1" size="0x800000" crc="32a59d3f" sha1="48cedaca3e88f865a032fdfed2fdae966dba7aed" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eatnoodj" supported="no">
+		<description>Please Keep Eating the Noodles - 3 March 2007, 5 May 2007 (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12524.u1" size="0x400000" crc="0b61e024" sha1="51c36c8a199f58983b7979d18b4a5d302d78b4b3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="noodtopj" supported="no">
+		<description>Keep the Noodles on Top - 7 July 2007, 9 September 2007 (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12789.u1" size="0x200000" crc="445316c9" sha1="9ad7b6a17b9c246ac197ffab034f2e31d8ad74a2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eatnod2j" supported="no">
+		<description>Please Keep Eating the Noodles - 11 November 2007, 1 January 2008 (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12818.u1" size="0x400000" crc="4709b3e3" sha1="972aa48cf5194d902851197c601344d31d825c8c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abcj" supported="no">
+		<description>ABC - 3 March 2008,  5 May 2008 (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13250.u1" size="0x400000" crc="331df5fc" sha1="ea563ded2223f2e99c89d89c53d19f36497665dc" />
 			</dataarea>
 		</part>
 	</software>
