@@ -179,124 +179,98 @@ license:CC0-1.0
 	</element>
 
 	<group name="keypad">
-		<bounds x="0" y="0" width="4.35" height="4.275" />
+		<element ref="background">
+			<bounds x="0" y="0" width="4.4" height="4.4" />
+		</element>
 
-		<element ref="btn_7" inputtag="X0" inputmask="0x80"><bounds x="0.20" y="0.125" width="1.0" height="1.0" /></element>
-		<element ref="btn_8" inputtag="X1" inputmask="0x01"><bounds x="1.25" y="0.125" width="1.0" height="1.0" /></element>
-		<element ref="btn_9" inputtag="X1" inputmask="0x02"><bounds x="2.30" y="0.125" width="1.0" height="1.0" /></element>
-		<element ref="btn_a" inputtag="X1" inputmask="0x04"><bounds x="3.35" y="0.125" width="1.0" height="1.0" /></element>
+		<element ref="btn_7" inputtag="X0" inputmask="0x80"><bounds x="0.125" y="0.125" width="1.0" height="1.0" /></element>
+		<element ref="btn_8" inputtag="X1" inputmask="0x01"><bounds x="1.175" y="0.125" width="1.0" height="1.0" /></element>
+		<element ref="btn_9" inputtag="X1" inputmask="0x02"><bounds x="2.225" y="0.125" width="1.0" height="1.0" /></element>
+		<element ref="btn_a" inputtag="X1" inputmask="0x04"><bounds x="3.275" y="0.125" width="1.0" height="1.0" /></element>
 
-		<element ref="btn_4" inputtag="X0" inputmask="0x10"><bounds x="0.20" y="1.175" width="1.0" height="1.0" /></element>
-		<element ref="btn_5" inputtag="X0" inputmask="0x20"><bounds x="1.25" y="1.175" width="1.0" height="1.0" /></element>
-		<element ref="btn_6" inputtag="X0" inputmask="0x40"><bounds x="2.30" y="1.175" width="1.0" height="1.0" /></element>
-		<element ref="btn_b" inputtag="X1" inputmask="0x08"><bounds x="3.35" y="1.175" width="1.0" height="1.0" /></element>
+		<element ref="btn_4" inputtag="X0" inputmask="0x10"><bounds x="0.125" y="1.175" width="1.0" height="1.0" /></element>
+		<element ref="btn_5" inputtag="X0" inputmask="0x20"><bounds x="1.175" y="1.175" width="1.0" height="1.0" /></element>
+		<element ref="btn_6" inputtag="X0" inputmask="0x40"><bounds x="2.225" y="1.175" width="1.0" height="1.0" /></element>
+		<element ref="btn_b" inputtag="X1" inputmask="0x08"><bounds x="3.275" y="1.175" width="1.0" height="1.0" /></element>
 
-		<element ref="btn_1" inputtag="X0" inputmask="0x02"><bounds x="0.20" y="2.225" width="1.0" height="1.0" /></element>
-		<element ref="btn_2" inputtag="X0" inputmask="0x04"><bounds x="1.25" y="2.225" width="1.0" height="1.0" /></element>
-		<element ref="btn_3" inputtag="X0" inputmask="0x08"><bounds x="2.30" y="2.225" width="1.0" height="1.0" /></element>
-		<element ref="btn_c" inputtag="X1" inputmask="0x10"><bounds x="3.35" y="2.225" width="1.0" height="1.0" /></element>
+		<element ref="btn_1" inputtag="X0" inputmask="0x02"><bounds x="0.125" y="2.225" width="1.0" height="1.0" /></element>
+		<element ref="btn_2" inputtag="X0" inputmask="0x04"><bounds x="1.175" y="2.225" width="1.0" height="1.0" /></element>
+		<element ref="btn_3" inputtag="X0" inputmask="0x08"><bounds x="2.225" y="2.225" width="1.0" height="1.0" /></element>
+		<element ref="btn_c" inputtag="X1" inputmask="0x10"><bounds x="3.275" y="2.225" width="1.0" height="1.0" /></element>
 
-		<element ref="btn_0" inputtag="X0" inputmask="0x01"><bounds x="0.20" y="3.275" width="1.0" height="1.0" /></element>
-		<element ref="btn_f" inputtag="X1" inputmask="0x80"><bounds x="1.25" y="3.275" width="1.0" height="1.0" /></element>
-		<element ref="btn_e" inputtag="X1" inputmask="0x40"><bounds x="2.30" y="3.275" width="1.0" height="1.0" /></element>
-		<element ref="btn_d" inputtag="X1" inputmask="0x20"><bounds x="3.35" y="3.275" width="1.0" height="1.0" /></element>
+		<element ref="btn_0" inputtag="X0" inputmask="0x01"><bounds x="0.125" y="3.275" width="1.0" height="1.0" /></element>
+		<element ref="btn_f" inputtag="X1" inputmask="0x80"><bounds x="1.175" y="3.275" width="1.0" height="1.0" /></element>
+		<element ref="btn_e" inputtag="X1" inputmask="0x40"><bounds x="2.225" y="3.275" width="1.0" height="1.0" /></element>
+		<element ref="btn_d" inputtag="X1" inputmask="0x20"><bounds x="3.275" y="3.275" width="1.0" height="1.0" /></element>
 	</group>
 
 	<group name="leds">
-		<!-- Black background -->
 		<element ref="background">
-			<bounds left="1" top="65" right="900" bottom="200" />
+			<bounds x="0" y="0" width="600" height="135" />
 		</element>
-		<element name="digit1" ref="digit">
-			<bounds left="107" top="075" right="154" bottom="146" />
-		</element>
-		<element name="digit2" ref="digit">
-			<bounds left="155" top="075" right="202" bottom="146" />
-		</element>
-		<element name="digit3" ref="digit">
-			<bounds left="203" top="075" right="250" bottom="146" />
-		</element>
-		<element name="digit4" ref="digit">
-			<bounds left="275" top="075" right="322" bottom="146" />
-		</element>
-		<element name="digit5" ref="digit">
-			<bounds left="323" top="075" right="370" bottom="146" />
-		</element>
-		<element name="digit6" ref="digit">
-			<bounds left="371" top="075" right="418" bottom="146" />
-		</element>
-		<element name="digit7" ref="digit">
-			<bounds left="443" top="075" right="490" bottom="146" />
-		</element>
-		<element name="digit8" ref="digit">
-			<bounds left="491" top="075" right="538" bottom="146" />
-		</element>
-		<element name="digit9" ref="digit">
-			<bounds left="539" top="075" right="586" bottom="146" />
-		</element>
-		<element name="ion_led" ref="red_led">
-			<bounds left="5" right="20" top="100" bottom="115" />
-		</element>
-		<element name="mon_led" ref="red_led">
-			<bounds left="5" right="20" top="125" bottom="140" />
-		</element>
-		<element name="run_led" ref="red_led">
-			<bounds left="5" right="20" top="150" bottom="165" />
-		</element>
-		<element name="pwr_led" ref="red_led">
-			<bounds left="5" right="20" top="175" bottom="190" />
-		</element>
-		<element name="ion_txt" ref="ION">
-			<bounds left="25" right="50" top="100" bottom="115" />
-		</element>
-		<element name="mon_txt" ref="MON">
-			<bounds left="25" right="50" top="125" bottom="140" />
-		</element>
-		<element name="run_txt" ref="RUN">
-			<bounds left="25" right="50" top="150" bottom="165" />
-		</element>
-		<element name="pwr_txt" ref="PWR">
-			<bounds left="25" right="50" top="175" bottom="190" />
-		</element>
+
+		<repeat count="9">
+			<param name="digitno" start="1" increment="1" />
+			<param name="x" start="107" increment="48" />
+			<element name="digit~digitno~" ref="digit">
+				<bounds x="~x~" y="10" width="47" height="71" />
+			</element>
+		</repeat>
 		<element name="adr_txt" ref="ADR">
-			<bounds left="100" right="455" top="175" bottom="190" />
+			<bounds x="100" width="355" y="110" height="15" />
 		</element>
 		<element name="pwr_txt" ref="DAT">
-			<bounds left="437" right="593" top="175" bottom="190" />
+			<bounds x="437" width="156" y="110" height="15" />
+		</element>
+
+		<element name="ion_led" ref="red_led">
+			<bounds x="5" width="15" y="35" height="15" />
+		</element>
+		<element name="mon_led" ref="red_led">
+			<bounds x="5" width="15" y="60" height="15" />
+		</element>
+		<element name="run_led" ref="red_led">
+			<bounds x="5" width="15" y="85" height="15" />
+		</element>
+		<element name="pwr_led" ref="red_led">
+			<bounds x="5" width="15" y="110" height="15" />
+		</element>
+		<element name="ion_txt" ref="ION">
+			<bounds x="25" width="25" y="35" height="15" />
+		</element>
+		<element name="mon_txt" ref="MON">
+			<bounds x="25" width="25" y="60" height="15" />
+		</element>
+		<element name="run_txt" ref="RUN">
+			<bounds x="25" width="25" y="85" height="15" />
+		</element>
+		<element name="pwr_txt" ref="PWR">
+			<bounds x="25" width="25" y="110" height="15"/>
 		</element>
 	</group>
 
 	<view name="LEDs and Keypad">
-		<bounds x="0" y="0" width="1000" height="400" />
-		<collection name="LEDs and Keypad">
-			<group ref="leds">
-				<bounds x="5" y="15" width="1000" height="150" />
-			</group>
+		<group ref="leds">
+			<bounds x="0" y="0" width="600" height="135" />
+		</group>
+		<collection name="Keypad">
 			<group ref="keypad">
-				<bounds x="720" y="15" width="220" height="220" />
-			</group>
-		</collection>
-	</view>
-
-	<view name="LEDs">
-		<bounds x="0" y="0" width="600" height="150" />
-		<collection name="LEDs">
-			<group ref="leds">
-				<bounds x="0" y="8" width="900" height="130" />
+				<bounds x="600" y="0" width="200" height="200" />
 			</group>
 		</collection>
 	</view>
 
 	<view name="LEDs, Keypad, and Terminal">
-		<bounds x="0" y="0" width="1000" height="400" />
-		<collection name="LEDs and Keypad">
+		<collection name="LEDs">
 			<group ref="leds">
-				<bounds x="5" y="15" width="1000" height="150" />
-			</group>
-			<group ref="keypad">
-				<bounds x="720" y="15" width="220" height="220" />
+				<bounds x="0" y="0" width="600" height="135" />
 			</group>
 		</collection>
-		<screen index="0"><bounds x="120" y="160" width="400" height="300" /></screen>
+		<collection name="Keypad">
+			<group ref="keypad">
+				<bounds x="400" y="135" width="200" height="200" />
+			</group>
+		</collection>
+		<screen index="0"><bounds x="0" y="135" width="400" height="300" /></screen>
 	</view>
 </mamelayout>
