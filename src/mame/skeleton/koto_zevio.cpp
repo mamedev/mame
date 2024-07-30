@@ -109,4 +109,5 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 2008, dbzonep,      0,              0,      zevio, zevio, zevio_state, empty_init, "Bandai / Koto", "Dragonball Z x One Piece (Japan)", MACHINE_IS_SKELETON )
+// 2007 - Dragon Ball Z: Scouter Battle Taikan Kamehameha: Ora to Omee to Scouter
+CONS( 2008, dbzonep,      0,              0,      zevio, zevio, zevio_state, empty_init, "Bandai / Koto", "Dragon Ball Z x One Piece: Battle Taikan Gum-Gum no Kamehameha: Omee no Koe de Ora o Yobu (Japan)", MACHINE_IS_SKELETON )
