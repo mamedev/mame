@@ -819,6 +819,6 @@ void igs_fear_state::init_igs_icescape()
 
 } // anonymous namespace
 
-GAME( 2005, superkds, 0, igs_fear, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS", "Super Kids (S019CN)",           0 )
-GAME( 2006, fearless, 0, igs_fear, fear,     igs_fear_state, init_igs_fear,     ROT0, "IGS", "Fearless Pinocchio (V101US)",   0 )
-GAME( 2006, icescape, 0, igs_fear, fear,     igs_fear_state, init_igs_icescape, ROT0, "IGS", "Icescape (V104FA)",             MACHINE_IS_SKELETON ) // IGS FOR V104FA 2006-11-02
+GAME( 2005, superkds, 0, igs_fear, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS (Golden Dragon Amusement license)", "Super Kids / Jiu Nan Xiao Yingxiong (S019CN)", 0 )
+GAME( 2006, fearless, 0, igs_fear, fear,     igs_fear_state, init_igs_fear,     ROT0, "IGS (American Alpha license)",          "Fearless Pinocchio (V101US)",                  0 )
+GAME( 2006, icescape, 0, igs_fear, fear,     igs_fear_state, init_igs_icescape, ROT0, "IGS",                                   "Icescape (V104FA)",                            MACHINE_IS_SKELETON ) // IGS FOR V104FA 2006-11-02
