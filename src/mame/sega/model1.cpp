@@ -486,7 +486,8 @@ Notes:
       TMP68000N-10- Toshiba TMP68000N-10 CPU, running at 10.000MHz (SDIP64, clock 20 / 2)
       82C51       - Toshiba 82C51AM-10 Programmable 8-bit I/O Serial Interface (SOP28)
       DSW1        - 4 position Dip Switch
-      MB8464      - Fujitsu MB8464 8k x8 SRAM (DIP28)
+      MB8464      - Fujitsu MB8464 8k x8 SRAM (DIP28). Jumpers JP5 and JP6 next to the RAMs are tied to A13 and A14 on the CPU
+                    buffers to allow larger RAMs to be used but both jumpers are set to VCC so only 8kB RAMs are actually used on the sound board.
       3771        - Fujitsu MB3771 Master Reset IC (DIP8)
       TL062       - ST Microelectronics Dual Low Power Operational Amplifier (DIP8)
       PC910       - Sharp PC910 opto-isolator (DIP8)

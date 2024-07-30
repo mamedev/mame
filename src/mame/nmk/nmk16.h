@@ -90,6 +90,7 @@ public:
 	void init_tharrier();
 	void init_vandykeb();
 	void init_tdragonb();
+	void init_tdragonb2();
 	void init_ssmissin();
 	void init_twinactn();
 	void init_banked_audiocpu();
@@ -257,6 +258,7 @@ protected:
 	void tdragon_map(address_map &map);
 	void tdragonb_map(address_map &map);
 	void tdragonb2_map(address_map &map);
+	void tdragonb2_oki_map(address_map &map);
 	void tdragonb3_map(address_map &map);
 	void tharrier_map(address_map &map);
 	void tharrier_sound_io_map(address_map &map);
