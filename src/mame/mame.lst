@@ -45237,6 +45237,7 @@ wrlshunt                        // Wireless: Hunting Video Game System
 
 @source:tvgames/generalplus_gpl16250_spi.cpp
 bkrankp
+untrain
 
 @source:tvgames/generalplus_gpl16250_spi_direct.cpp
 fixitflx
