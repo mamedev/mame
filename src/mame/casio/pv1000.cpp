@@ -391,7 +391,7 @@ TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_on_cb)
 	int vpos = m_screen->vpos();
 	int next_vpos = vpos + 4;
 
-	if(vpos == 195)
+	if(vpos == 20)
 		m_fd_buffer_flag |= 1; /* TODO: exact timing of this */
 
 	/* Set IRQ line and schedule release of IRQ line */
@@ -399,9 +399,13 @@ TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_on_cb)
 	m_irq_off_timer->adjust(m_screen->time_until_pos(vpos, 380/2));
 
 	/* Schedule next IRQ trigger */
-	if (vpos >= 281)
+	if (vpos >= 258)
 	{
-		next_vpos = 221;
+		next_vpos = 0; // 262=0, 4, 8, 12, 16, 20
+	}
+	else if (vpos >= 20 && vpos < 222)
+	{
+		next_vpos = 222; // 226, 230, 234, 238, 242, 246, 250, 254, 258
 	}
 	m_irq_on_timer->adjust(m_screen->time_until_pos(next_vpos, 224));
 }
