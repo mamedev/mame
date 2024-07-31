@@ -4,6 +4,18 @@
 
 C=65 / C=64DX (c) 1991 Commodore
 
+TODO:
+- Fails interpreting BASIC commands
+\- DMA tries this COPY in ROM space $20200 but should really be in work RAM $206;
+\- PC=f27c stz $03d5 have Z=0 but transfers a 0x02?
+- Complete memory model;
+- Complete interrupts;
+- F011 FDC;
+- C=64 mode (with "GO64" at BASIC prompt);
+
+===================================================================================================
+References:
+
 Hardware infos can be found at:
 http://www.zimmers.net/cbmpics/cbm/c65/c65manual.txt
 http://www.zimmers.net/cbmpics/cbm/c65/c65faq20.txt
@@ -30,7 +42,7 @@ http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C64DX_aka_C65_System
 
 #define MAIN_CLOCK XTAL(28'375'160)/8
 
-// TODO: move to own file, subclass with f018a, use device_execute_interface
+// TODO: move to own file, subclass with f018a and f018b, use device_execute_interface
 class dmagic_f018_device : public device_t
 {
 public:
@@ -50,7 +62,21 @@ private:
 
 	u32 m_dmalist_address = 0;
 
-	void execute(u32 address);
+	TIMER_CALLBACK_MEMBER(execute_cb);
+	typedef enum {
+		COPY,
+		MIX,
+		SWAP,
+		FILL,
+		IDLE,
+		FETCH_PARAMS
+	} dma_state_t;
+
+	dma_state_t m_state;
+	u32 m_src, m_dst, m_length, m_command, m_modulo;
+	bool m_chained_transfer;
+	emu_timer *m_dma_timer;
+	void check_state(int next_cycles);
 };
 
 DEFINE_DEVICE_TYPE(DMAGIC_F018, dmagic_f018_device, "dmagic_f018", "DMAgic F018 Gate Array")
@@ -64,76 +90,135 @@ dmagic_f018_device::dmagic_f018_device(const machine_config &mconfig, const char
 void dmagic_f018_device::device_start()
 {
 	save_item(NAME(m_dmalist_address));
+	//save_item(NAME(m_state));
+
+	m_dma_timer = timer_alloc(FUNC(dmagic_f018_device::execute_cb), this);
 }
 
 void dmagic_f018_device::device_reset()
-{}
-
-void dmagic_f018_device::execute(u32 address)
 {
-	static const char *const dma_cmd_string[] =
+	m_dma_timer->adjust(attotime::never);
+	m_state = dma_state_t::IDLE;
+	m_chained_transfer = false;
+	m_dmalist_address = 0;
+}
+
+void dmagic_f018_device::check_state(int next_cycles)
+{
+	if (m_length != 0)
+		m_dma_timer->adjust(attotime::from_ticks((next_cycles), clock()));
+	else
 	{
-		"COPY",
-		"MIX",
-		"SWAP",
-		"FILL"
-	};
-	u8 cmd = m_space->read_byte(address++);
-	u16 length = m_space->read_byte(address++);
-	length    |=(m_space->read_byte(address++)<<8);
-
-	u32 src = m_space->read_byte(address++);
-	src    |=(m_space->read_byte(address++)<<8);
-	src    |=(m_space->read_byte(address++)<<16);
-
-	u32 dst = m_space->read_byte(address++);
-	dst    |=(m_space->read_byte(address++)<<8);
-	dst    |=(m_space->read_byte(address++)<<16);
-
-	if(cmd & 0xfc)
-		logerror("%02x\n",cmd & 0xfc);
-	switch(cmd & 3)
-	{
-		// copy
-		// TODO: untested, is it even implemented in F018?
-		case 0:
-		{
-				if(length != 1)
-					logerror("DMAgic %s %02x -> %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src,dst,length,cmd & 4 ? "yes" : "no");
-				uint32_t SourceIndex;
-				uint32_t DestIndex;
-				uint16_t SizeIndex;
-				SourceIndex = src & 0xfffff;
-				DestIndex = dst & 0xfffff;
-				SizeIndex = length;
-				do
-				{
-					m_space->write_byte(DestIndex++,m_space->read_byte(SourceIndex++));
-					SizeIndex--;
-				}while(SizeIndex != 0);
-
-			return;
-		}
-		// fill
-		case 3:
-		{
-				// TODO: upper bits of source
-				logerror("DMAgic %s %02x -> %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src & 0xff,dst,length,cmd & 4 ? "yes" : "no");
-				uint8_t FillValue;
-				uint32_t DestIndex;
-				uint16_t SizeIndex;
-				FillValue = src & 0xff;
-				DestIndex = dst & 0xfffff;
-				SizeIndex = length;
-				do
-				{
-					m_space->write_byte(DestIndex++,FillValue);
-					SizeIndex--;
-				}while(SizeIndex != 0);
-			return;
-		}
+		m_chained_transfer = bool(BIT(m_command, 2));
+		if (m_chained_transfer)
+			popmessage("DMAgic: untested Chain Mode");
+		m_state = m_chained_transfer ? FETCH_PARAMS : IDLE;
+		m_dma_timer->adjust(m_chained_transfer ? attotime::from_ticks(12, clock()) : attotime::never);
 	}
-	logerror("DMAgic %s %08x %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src,dst,length,cmd & 4 ? "yes" : "no");
+}
+
+TIMER_CALLBACK_MEMBER(dmagic_f018_device::execute_cb)
+{
+	switch(m_state)
+	{
+		case dma_state_t::IDLE:
+			return;
+
+		case dma_state_t::FETCH_PARAMS: {
+			static const char *const dma_cmd_string[] =
+			{
+				"COPY",
+				"MIX",
+				"SWAP",
+				"FILL"
+			};
+
+			u32 address = m_dmalist_address;
+			logerror("%05x ", address);
+			m_command = m_space->read_byte(address++);
+
+			m_length = m_space->read_byte(address++);
+			m_length |=(m_space->read_byte(address++)<<8);
+
+			if (m_length == 0)
+				m_length = 0x10000;
+
+			m_src = m_space->read_byte(address++);
+			m_src |=(m_space->read_byte(address++)<<8);
+			m_src |=(m_space->read_byte(address++)<<16);
+
+			m_dst = m_space->read_byte(address++);
+			m_dst |=(m_space->read_byte(address++)<<8);
+			m_dst |=(m_space->read_byte(address++)<<16);
+
+			m_modulo = m_space->read_byte(address++);
+			m_modulo |=(m_space->read_byte(address++)<<8);
+
+			m_dmalist_address = address;
+			m_state = (dma_state_t)(m_command & 3);
+
+			logerror("DMAgic %s %06x -> %06x %04x %02x (CHAIN=%s)\n"
+				, dma_cmd_string[m_command & 3]
+				, m_src
+				, m_dst
+				, m_length
+				, m_modulo
+				, m_command & 4 ? "yes" : "no"
+			);
+
+			if (m_command & 0xf8)
+				popmessage("DMAgic unhandled command %02x", m_command);
+
+			// x--- I/O select
+			// -x-- DIR
+			// --x- MOD
+			// ---x HOLD
+			if ((m_src & 0xf0'0000 || m_dst & 0xf0'0000) && m_length != 1)
+			{
+				popmessage("DMAgic unhandled source %06x dst %06x length %05x", m_src, m_dst, m_length);
+				machine().debug_break();
+			}
+
+			m_dma_timer->adjust(attotime::from_ticks((1), clock()));
+			break;
+		}
+
+		// TODO: very limited use by the BIOS, not extensively tested
+		// generally uses length == 1 (for copying BASIC strings from work RAM)
+		// or length == 50 (for scrolling vertical text, cfr. c64dx)
+		case dma_state_t::COPY: {
+			m_space->write_byte(m_dst & 0xf'ffff, m_space->read_byte(m_src & 0xf'ffff));
+			m_src = ((m_src + 1) & 0xffff) | (m_src & 0xf'0000);
+			m_dst = ((m_dst + 1) & 0xffff) | (m_dst & 0xf'0000);
+			m_length --;
+			check_state(2);
+			break;
+		}
+
+		case dma_state_t::MIX:
+			popmessage("DMAgic: unimplemented MIX");
+			break;
+
+		case dma_state_t::SWAP: {
+			popmessage("DMAgic: untested SWAP");
+			const u8 tmp_src = m_space->read_byte(m_src & 0xf'ffff);
+			const u8 tmp_dst = m_space->read_byte(m_dst & 0xf'ffff);
+			m_space->write_byte(m_src & 0xf'ffff, tmp_dst);
+			m_space->write_byte(m_dst & 0xf'ffff, tmp_src);
+			m_src = ((m_src + 1) & 0xffff) | (m_src & 0xf'0000);
+			m_dst = ((m_dst + 1) & 0xffff) | (m_dst & 0xf'0000);
+			m_length --;
+			check_state(4);
+			break;
+		}
+
+		case dma_state_t::FILL:
+			m_space->write_byte(m_dst & 0xf'ffff, m_src & 0xff);
+			m_dst = ((m_dst + 1) & 0xffff) | (m_dst & 0xf'0000);
+			m_length --;
+			check_state(1);
+			break;
+	}
 }
 
 
@@ -143,7 +228,8 @@ void dmagic_f018_device::map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			m_dmalist_address &= 0xffff00;
 			m_dmalist_address |= data;
-			execute(m_dmalist_address);
+			m_state = FETCH_PARAMS;
+			m_dma_timer->adjust(attotime::from_ticks((12), clock()));
 		})
 	);
 	map(1, 1).lw8(
@@ -158,7 +244,11 @@ void dmagic_f018_device::map(address_map &map)
 			m_dmalist_address |= data << 16;
 		})
 	);
-// 3 read status
+	map(3, 3).lr8(
+		NAME([this] (offs_t offset) {
+			return (m_state != IDLE) << 7 | (m_chained_transfer << 0);
+		})
+	);
 }
 
 namespace {
@@ -172,7 +262,7 @@ public:
 		, m_cia(*this, "cia_%u", 0U)
 		, m_sid(*this, "sid_%u", 0U)
 		, m_dma(*this, "dma")
-		, m_cia_view(*this, "cia_view")
+		, m_cram_view(*this, "cram_view")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_workram(*this, "work_ram")
@@ -189,7 +279,7 @@ public:
 	required_device_array<mos6526_device, 2> m_cia;
 	required_device_array<mos6581_device, 2> m_sid;
 	required_device<dmagic_f018_device> m_dma;
-	memory_view m_cia_view;
+	memory_view m_cram_view;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_workram;
@@ -237,6 +327,7 @@ private:
 	uint8_t m_VIC2_EXTColor = 0U;
 	uint8_t m_VIC2_VS_CB_Base = 0U;
 	uint8_t m_VIC2_BK0_Color = 0U;
+	uint8_t m_sprite_enable = 0U;
 	/* 0x30: banking + PAL + EXT SYNC */
 	uint8_t m_VIC3_ControlA = 0U;
 	/* 0x31: video modes */
@@ -262,9 +353,12 @@ void c65_state::vic4567_map(address_map &map)
 			return (m_screen->vpos() & 0xff);
 		})
 	);
-	map(0x15, 0x15).lr8(
-		NAME([] (offs_t offset) {
-			return 0xff; // silence log for now
+	map(0x15, 0x15).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_sprite_enable;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_sprite_enable = data;
 		})
 	);
 	map(0x18, 0x18).lrw8(
@@ -312,7 +406,7 @@ void c65_state::vic4567_map(address_map &map)
 	/*
 	 * KEY register, handles vic-iii and vic-ii modes via two consecutive writes
 	 * 0xa5 -> 0x96 vic-iii mode
-	 * any other write vic-ii mode
+	 * any other write vic-ii mode (changes base memory map)
 	 */
 //  map(0x2f, 0x2f)
 	map(0x30, 0x30).lrw8(
@@ -323,7 +417,8 @@ void c65_state::vic4567_map(address_map &map)
 			if((data & 0xfe) != 0x64)
 				logerror("CONTROL A %02x\n",data);
 			m_VIC3_ControlA = data;
-			m_cia_view.select(BIT(data, 0));
+			// TODO: all the other bits
+			m_cram_view.select(BIT(data, 0));
 		})
 	);
 	map(0x31, 0x31).lrw8(
@@ -471,8 +566,9 @@ void c65_state::cia0_portb_w(uint8_t data)
 
 void c65_state::c65_map(address_map &map)
 {
-	map(0x00000, 0x07fff).ram().share("work_ram"); // TODO: bank
-	map(0x0c800, 0x0cfff).rom().region("ipl", 0xc800);
+	map(0x00000, 0x07fff).ram().share("work_ram");
+	map(0x08000, 0x0bfff).rom().region("ipl", 0x08000);
+	map(0x0c800, 0x0cfff).rom().region("ipl", 0x0c800);
 	map(0x0d000, 0x0d07f).m(*this, FUNC(c65_state::vic4567_map));
 	// 0x0d080, 0x0d09f FDC
 	// 0x0d0a0, 0x0d0ff Ram Expansion Control (REC)
@@ -480,24 +576,26 @@ void c65_state::c65_map(address_map &map)
 	map(0x0d200, 0x0d2ff).ram().w(FUNC(c65_state::PalGreen_w)).share("greenpal"); // 0x0d200, 0x0d2ff Green Palette
 	map(0x0d300, 0x0d3ff).ram().w(FUNC(c65_state::PalBlue_w)).share("bluepal"); // 0x0d300, 0x0d3ff Blue Palette
 	// 0x0d400, 0x0d4*f Right SID
-	map(0x0d400, 0x0d41f).rw(m_sid[1], FUNC(mos6581_device::read), FUNC(mos6581_device::write));
+	// keyboard hold left shift will read to $d484 (?)
+	map(0x0d400, 0x0d41f).mirror(0x80).rw(m_sid[1], FUNC(mos6581_device::read), FUNC(mos6581_device::write));
 	// 0x0d440, 0x0d4*f Left  SID
-	map(0x0d440, 0x0d45f).rw(m_sid[0], FUNC(mos6581_device::read), FUNC(mos6581_device::write));
+	map(0x0d440, 0x0d45f).mirror(0x80).rw(m_sid[0], FUNC(mos6581_device::read), FUNC(mos6581_device::write));
 	map(0x0d600, 0x0d6ff).rw(FUNC(c65_state::uart_r), FUNC(c65_state::uart_w));
 	// 0x0d700, 0x0d7** DMAgic
 	map(0x0d700, 0x0d703).m(m_dma, FUNC(dmagic_f018_device::map));
 	// 0x0d800, 0x0d8** Color matrix
-	map(0x0d800, 0x0dfff).view(m_cia_view);
+	map(0x0d800, 0x0dfff).view(m_cram_view);
 	// maps lower 1024 bytes regardless of the setting (essentially touches $dc00 as overlay)
-	m_cia_view[0](0x0d800, 0x0dbff).lrw8(
+	m_cram_view[0](0x0d800, 0x0dbff).lrw8(
 		NAME([this] (offs_t offset) { return m_cram[offset]; }),
 		NAME([this] (offs_t offset, u8 data) { m_cram[offset] = data; })
 	);
-	m_cia_view[0](0x0dc00, 0x0dc0f).rw(m_cia[0], FUNC(mos6526_device::read), FUNC(mos6526_device::write));
-	m_cia_view[0](0x0dd00, 0x0dd0f).rw(m_cia[1], FUNC(mos6526_device::read), FUNC(mos6526_device::write));
+
+	m_cram_view[0](0x0dc00, 0x0dc0f).rw(m_cia[0], FUNC(mos6526_device::read), FUNC(mos6526_device::write));
+	m_cram_view[0](0x0dd00, 0x0dd0f).rw(m_cia[1], FUNC(mos6526_device::read), FUNC(mos6526_device::write));
 	// 0x0de00, 0x0de** Ext I/O Select 1
 	// 0x0df00, 0x0df** Ext I/O Select 2 (RAM window?)
-	m_cia_view[1](0x0d800, 0x0dfff).ram().share("cram");
+	m_cram_view[1](0x0d800, 0x0dfff).ram().share("cram");
 	map(0x0e000, 0x0ffff).rom().region("ipl", 0x0e000);
 	map(0x10000, 0x1f7ff).ram();
 	map(0x1f800, 0x1ffff).ram().share("cram");
@@ -621,7 +719,8 @@ void c65_state::machine_start()
 
 void c65_state::machine_reset()
 {
-	m_cia_view.select(0);
+	m_VIC3_ControlA = 0;
+	m_cram_view.select(0);
 }
 
 
@@ -660,8 +759,6 @@ void c65_state::IRQCheck(uint8_t irq_cause)
 INTERRUPT_GEN_MEMBER(c65_state::vic3_vblank_irq)
 {
 	IRQCheck(1);
-	//if(m_VIC2_IRQMask & 1)
-	//  m_maincpu->set_input_line(M4510_IRQ_LINE,HOLD_LINE);
 }
 
 void c65_state::cia0_irq(int state)
@@ -687,7 +784,9 @@ void c65_state::c65(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &c65_state::c65_map);
 	m_maincpu->set_vblank_int("screen", FUNC(c65_state::vic3_vblank_irq));
 
-	DMAGIC_F018(config, m_dma, MAIN_CLOCK);
+	// TODO: multiply by x8 because with a more canonical x1 no transfer will complete in time.
+	// is this thing a mixed burst/cycle steal really?
+	DMAGIC_F018(config, m_dma, MAIN_CLOCK * 8);
 	m_dma->set_space(m_maincpu, AS_PROGRAM);
 
 	MOS6526(config, m_cia[0], MAIN_CLOCK);
