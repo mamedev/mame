@@ -199,6 +199,20 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="smartguid4" supported="no">
+		<description>FUN-damentals Series - Smart Guide to 4rd Grade (UK)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-00534"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb_rev" value="REV.A"/>
+			<feature name="u1" value="LeapFrog 2002 32M DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-00534.u1" size="0x400000" crc="0944792f" sha1="f013394ebddb6d89c2feeb3d645c170e2d7be746" />
+			</dataarea>
+		</part>
+	</software>	
 
 	<software name="smartguid5" supported="no">
 		<description>FUN-damentals Series - Smart Guide to 5th Grade (UK)</description>
@@ -1122,6 +1136,30 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="pooh2j" supported="no">
+		<description>Winnie the Pooh 0086a (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog / Sega Toys</publisher>
+		<info name="serial" value="9P4-0086A"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="9p4-0086a.u1" size="0x200000" crc="4aa4df02" sha1="5b66a9e46da71e983b72f3aff049b217b197b37f" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="lantern" supported="no">
+		<description>Goo Chocolate Lantern (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog / Bandai</publisher>
+		<info name="serial" value="9P4-0113A"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="9p4-0113a.u1" size="0x200000" crc="04c4174a" sha1="c9e4a1f22a69f7d60e1d1b11bca8338546e52271" />
+			</dataarea>
+		</part>
+	</software>	
 
 	<software name="kumpoohj" supported="no">
 		<description>Kuma no Pooh-san Hachimitsu no tsubo ga ippai Pooh-san to kazu・katachi (Japan)</description>
