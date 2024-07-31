@@ -2281,7 +2281,8 @@ void pc9801_state::pc9801_common(machine_config &config)
 	FLOPPY_CONNECTOR(config, "upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
 	FLOPPY_CONNECTOR(config, "upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
 
-	SOFTWARE_LIST(config, "disk_list").set_original("pc98");
+	SOFTWARE_LIST(config, "disk_list_orig").set_original("pc98_flop_orig");
+	SOFTWARE_LIST(config, "disk_list").set_original("pc98_flop");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="pc98" description="NEC PC-9801 disk images">
+<softwarelist name="pc98_flop" description="NEC PC-9801 unverified disk images">
 <!--
 
   This software list collects disks from many different sources, including the 13GB pack with ~90 rar files floating around since 2011
@@ -2430,8 +2430,8 @@ TODO:
 		</part>
 	</software>
 
-	<software name="2069ad" supported="yes">
-		<description>2069AD</description>
+	<software name="2069adc" supported="yes">
+		<description>2069AD (cracked)</description>
 		<year>1991</year>
 		<publisher>ホームデータ (Home Data)</publisher>
 		<info name="release" value="19910803" />
@@ -2481,40 +2481,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="31iwayu" supported="yes">
-		<description>31 - Iwayuru Hitotsu no Chou Lovely na Bouken Katsugeki</description>
-		<year>1995</year>
-		<publisher>アルテシア (Altacia)</publisher>
-		<info name="alt_title" value="３１ いわゆるひとつの超らぶりぃな冒険活劇" />
-		<info name="release" value="19950302" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="disk a.fdi" size="1265664" crc="7131e56e" sha1="2070ebdd0acb1a50d77cc73368b448fe05096a3e" offset="0" />
-			</dataarea>
-		</part>
 
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="disk b.fdi" size="1265664" crc="54ed018b" sha1="69aaf92e5545a26fe62e4acd5334249173b0e06b" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="disk c.fdi" size="1265664" crc="2ded1cd4" sha1="f8aae5d47c68248dd3aca381a1306151af6ab3b0" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="disk d.fdi" size="1265664" crc="ce1ec25b" sha1="b0013296d84d6a79b63d532b8a29d859e2c99c54" offset="0" />
-			</dataarea>
-		</part>
-	</software>
 
 	<!-- no sound on VM class (regression?) -->
 	<!-- eventually hangs on gameplay with no drawn text -->
@@ -3463,7 +3430,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="advpowd2pd" cloneof="advpowd2">
+	<software name="advpowd2pd">
 		<description>Advanced Power Dolls 2 - Premium Disk</description>
 		<year>1995</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
@@ -4491,46 +4458,8 @@ TODO:
 		</part>
 	</software>
 
-	<software name="alphdain">
-		<description>Alpha Dain</description>
-		<year>1992</year>
-		<publisher>グレイト (Great)</publisher>
-		<info name="alt_title" value="アルファダイン" />
-		<info name="release" value="19920428" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="adaina.d88" size="1281968" crc="e65dbfc2" sha1="9858a352d4a79587e10aaa5de115af0d2450c466" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="adainb.d88" size="1281968" crc="47fc9b6f" sha1="80a18c24d52dd0903d90f44a08e5d473cd9ccde1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="adainc.d88" size="1281968" crc="2bd8745a" sha1="451ff0b13bec44c12c7c554a5ad242014779cb38" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="adaind.d88" size="1281968" crc="919b9eb2" sha1="435208c97dc29fdbcca383bc0c084394719648d4" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="adaine.d88" size="1281968" crc="1e6555a1" sha1="c5bf545269ad545a2704bb288af2c670f23b4d43" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="alshark">
-		<description>Alshark</description>
+	<software name="alsharkc">
+		<description>Alshark (cracked)</description>
 		<year>1991</year>
 		<publisher>ライトスタッフ (Right Stuff)</publisher>
 		<info name="alt_title" value="アルシャーク" />
@@ -4560,7 +4489,7 @@ TODO:
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="End Disk"/>
+			<feature name="part_id" value="Ending Disk"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="alsk_end.fdi" size="1265664" crc="bcc3b50a" sha1="31b25440e80a49462fcce2a4c8318e4acfd09637" offset="0" />
 			</dataarea>
@@ -4568,9 +4497,9 @@ TODO:
 	</software>
 
 	<!-- boot OK, has disk swap issues (needs to swap multiple times in order to actually make the game to recognize) -->
-	<software name="alvaleak" supported="partial">
+	<software name="alvaleakc" supported="partial">
 		<!-- Origin: Neo Kobe Collection -->
-		<description>Alvaleak Boukenki</description>
+		<description>Alvaleak Boukenki (cracked)</description>
 		<year>1993</year>
 		<publisher>グローディア (Glodia)</publisher>
 		<info name="alt_title" value="アルヴァリーク冒険記" />
@@ -4610,8 +4539,8 @@ TODO:
 	    Runs without sound on a PC-9801-86 sound card, works fine with the PC-9801-26K.
 	    Sound has been confirmed to work on a real PC-9821Nw150 (PC-9801-118 compatible audio), so it's probably an emulation bug.
 	-->
-	<software name="amaranth">
-		<description>Amaranth - Phantasie RPG</description>
+	<software name="amarantho">
+		<description>Amaranth - Phantasie RPG (1990-12-14)</description>
 		<year>1990</year>
 		<publisher>風雅システム (Fuga System)</publisher>
 		<info name="alt_title" value="アマランス" />
@@ -4739,9 +4668,9 @@ TODO:
 		</part>
 	</software>
 
-	<software name="ambition">
+	<software name="ambitionc">
 		<!-- Origin: Neo Kobe Collection -->
-		<description>Ambition</description>
+		<description>Ambition (cracked)</description>
 		<year>1993</year>
 		<publisher>ハッピータイム (Happy Time)</publisher>
 		<info name="alt_title" value="アンビション" />
@@ -4870,48 +4799,6 @@ TODO:
 			<feature name="part_id" value="Data Disk"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="ancient dragon (data disk).hdm" size="1261568" crc="e33307ab" sha1="ff23234bbd6d61bbf2351406f37413ea3d6643e7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!--
-	    The system disk is supposed to come without OS files, and the user is expected to run the setup process (SETUP.EXE) to copy them from
-	    an existing bootable disk. All currently available images of the system disk are modified, so we'll mark it as a bad dump in case a "clean" one appears.
-	-->
-	<software name="angelarm">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Angel Army</description>
-		<year>1994</year>
-		<publisher>フェアリーダスト (Fairy Dust)</publisher>
-		<info name="alt_title" value="エンジェル☆アーミー" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="angel army (system disk).hdm" size="1261568" crc="047eb492" sha1="6915c00585ff77c805af7acc38583ea7d812ab11" offset="0" status="baddump"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Game Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="angel army (game disk).hdm" size="1261568" crc="3e0a06a2" sha1="bb6faf008f74eebc6ebc3bde6e8c8c75b0bae594" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="angel army (data disk 1).hdm" size="1261568" crc="c9588dbe" sha1="aa37d095cf11b6ba16dbd9378e835f6523f99f78" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="angel army (data disk 2).hdm" size="1261568" crc="851e4a56" sha1="faa803c8a5f0382c6ce664355333b18867490260" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 3"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="angel army (data disk 3).hdm" size="1261568" crc="82a0687d" sha1="6b5219dbc95aba9b62b3267dda176a61e185d516" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5064,35 +4951,9 @@ TODO:
 		</part>
 	</software>
 
-	<software name="magcubic">
-		<description>Ankoku Sennen Oukoku - Magical Cubic</description>
-		<year>1993</year>
-		<publisher>ＫＡＴＴＹ (Katty)</publisher>
-		<info name="alt_title" value="暗黒千年王国 マジカルキュービック" />
-		<info name="release" value="19931111" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="disk1.fdi" size="1265664" crc="29b064ae" sha1="b8302ade93968aa939e5ed9efc4ca14849f117e0" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="disk2.fdi" size="1265664" crc="0d4234c1" sha1="cd75c0f0926b42b4f5cdb7b780f206a1dfd15b7a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="disk3.fdi" size="1265664" crc="f191c049" sha1="f057c94dd99d8a36ed6e99989d2d4007308ed235" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- randomly hangs with stuck note -->
-	<software name="annivers" supported="no">
-		<description>Anniversary - Memories of Summer Vacation - Natsuyasumi no Omoide</description>
+	<software name="anniversc" supported="no">
+		<description>Anniversary - Memories of Summer Vacation - Natsuyasumi no Omoide (cracked)</description>
 		<year>1993</year>
 		<publisher>ジャニス (Janis)</publisher>
 		<info name="alt_title" value="アニヴァーサリー ～夏休みの想い出～" />
@@ -5206,8 +5067,8 @@ TODO:
 		</part>
 	</software>
 
-	<software name="apparedn">
-		<description>Appareden - Fukuryuu no Shou</description>
+	<software name="apparednc">
+		<description>Appareden - Fukuryuu no Shou (cracked)</description>
 		<year>1995</year>
 		<publisher>テイジイエル (TGL)</publisher>
 		<info name="alt_title" value="あっぱれ伝＜伏龍の章＞" />
@@ -5389,8 +5250,8 @@ TODO:
 	</software>
 
 	<!-- Incorrect colors -->
-	<software name="apros" supported="partial">
-		<description>Apros - Daichi no Shou - Kaze no Tankyuusha Hen</description>
+	<software name="aprosc" supported="partial">
+		<description>Apros - Daichi no Shou - Kaze no Tankyuusha Hen (cracked)</description>
 		<year>1992</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="アプロス ～大地の章 風の探求者編～" />
@@ -5534,8 +5395,8 @@ TODO:
 
 	<!-- Some graphical glitches in the intro (supposedly text layer not clipping properly) -->
 	<!-- Doesn't like hot swaps (user needs to "empty slot" first when prompted to change disks), btanb -->
-	<software name="arcus2" supported="partial">
-		<description>Arcus II - Silent Symphony</description>
+	<software name="arcus2c" supported="partial">
+		<description>Arcus II - Silent Symphony (cracked)</description>
 		<year>1990</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
 		<info name="alt_title" value="アークス２ Ｓｉｌｅｎｔ Ｓｙｍｐｈｏｎｙ" />
@@ -5560,8 +5421,8 @@ TODO:
 		</part>
 	</software>
 
-	<software name="arcus3">
-		<description>Arcus III</description>
+	<software name="arcus3c">
+		<description>Arcus III (cracked)</description>
 		<year>1991</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="アークス３" />
@@ -5626,8 +5487,8 @@ TODO:
 	</software>
 
 	<!-- Doesn't recognize disk C when booting from floppy. Installing the game to HDD works. -->
-	<software name="area88i" supported="partial">
-		<description>Area 88 - Ikkakujuu no Kiseki</description>
+	<software name="area88ic" supported="partial">
+		<description>Area 88 - Ikkakujuu no Kiseki (cracked)</description>
 		<year>1995</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="alt_title" value="エリア８８ 一角獣の軌跡" />
@@ -5653,8 +5514,8 @@ TODO:
 		</part>
 	</software>
 
-	<software name="area88ia" cloneof="area88i" supported="partial">
-		<description>Area 88 - Ikkakujuu no Kiseki (alt Disk C)</description>
+	<software name="area88ica" cloneof="area88ic" supported="partial">
+		<description>Area 88 - Ikkakujuu no Kiseki (cracked, alt Disk C)</description>
 		<year>1995</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="alt_title" value="エリア８８ 一角獣の軌跡" />
@@ -5680,8 +5541,8 @@ TODO:
 		</part>
 	</software>
 
-	<software name="aress">
-		<description>Aress Ou no Monogatari - The Story of King Aress</description>
+	<software name="aressc">
+		<description>Aress Ou no Monogatari - The Story of King Aress (cracked)</description>
 		<year>1994</year>
 		<publisher>ガスト (Gust)</publisher>
 		<info name="alt_title" value="アレス王の物語" />
@@ -5734,44 +5595,6 @@ TODO:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="659456">
 				<rom name="arkanoid.fdi" size="659456" crc="6ee434e8" sha1="8ce3c8dcb47f026dae0033e0d3314294d6324fe9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="armist">
-		<description>Armist</description>
-		<year>1992</year>
-		<publisher>ベースメント (Basement)</publisher>
-		<info name="alt_title" value="アルミスト" />
-		<info name="release" value="19920703" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="armist-1.fdi" size="1265664" crc="bcba8eac" sha1="a32179c63e5aea90fb4b1d53c49aa805c4262b18" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="armist-2.fdi" size="1265664" crc="f9efff6e" sha1="665ceee561d1989402769452c1ac4b971680ffdf" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="armist-3.fdi" size="1265664" crc="22859f83" sha1="e4421522e8bcc89214e837794b161ad905654aab" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="armist-4.fdi" size="1265664" crc="7329fb57" sha1="2cc77563cfa0155e2f623a02f3404c766a8134e4" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="armist-5.fdi" size="1265664" crc="bf8b3a7b" sha1="32edbb43f68c8c0ff47d57fa4575d345ad006538" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5894,32 +5717,6 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="expansion.d88" size="1281968" crc="87ae2256" sha1="5024ffad03b3f0e48d9e14e95c493f42eb1b48dc" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="artemis">
-		<description>Artemis</description>
-		<year>1991</year>
-		<publisher>バーディーソフト (Birdy Soft)</publisher>
-		<info name="alt_title" value="アルテミス" />
-		<info name="release" value="19910712" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="disk_a.d88" size="1281968" crc="907c163b" sha1="4c31ba8360725b572e1b0ea60aadbe9ae184b4f1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="disk_b.d88" size="1281968" crc="c2f8bd80" sha1="956c4dbfcc0f1f973c265972ef1092ed287e534d" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="disk_c.d88" size="1281968" crc="22ac0277" sha1="c60bb57a36c73d800dc4457e1354ad008593799d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6220,77 +6017,6 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1086448">
 				<rom name="5.d88" size="1086448" crc="c8d6dd3c" sha1="2feeeed82ca66d7c50a49fe2405e907813715c57" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ayumi">
-		<description>Ayumi-chan Monogatari</description>
-		<year>1993</year>
-		<publisher>アリスソフト (AliceSoft)</publisher>
-		<info name="alt_title" value="あゆみちゃん物語" />
-		<info name="release" value="19930915" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="ayu_a.fdi" size="1265664" crc="b1fd0365" sha1="ba709c8b79f432275c78e7f96a843bec35fbd8a1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="ayu_b.fdi" size="1265664" crc="9e8cb212" sha1="fe7b2c47c4b58c5fdf6a397ecf55531d41207a33" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="ayu_c.fdi" size="1265664" crc="5daa0314" sha1="20d371a5274c396987a0925d4bcf8278a2957127" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="ayu_d.fdi" size="1265664" crc="3a72f267" sha1="04aba66ac72fa0921522b583145d24337a439c12" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="ayu_e.fdi" size="1265664" crc="c974476a" sha1="ebafa80b3f7c9f0d7887c8528b48949b6706407f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk F"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="ayu_f.fdi" size="1265664" crc="45cdc8b5" sha1="fff3cb5478a366b0e8be77eb566cc773e3fd2733" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk G"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="ayu_g.fdi" size="1265664" crc="15947df8" sha1="5bd5e037a31f543e1da8420c78e72e469adc2273" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Fails to boot with "Disk I/O Error" on cyan "Please Wait!" screen -->
-	<software name="azusa108" supported="no">
-		<description>Azusa 108 Jimusho</description>
-		<year>1988</year>
-		<publisher>アグミックス (Agumix)</publisher>
-		<info name="alt_title" value="あずさ１０８事務所" />
-		<info name="release" value="198811xx" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="azusaja.fdi" size="1265664" crc="17c18836" sha1="cd10cdd54b225b6df94b66952bfd746b79214c23" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="azusajb.fdi" size="1265664" crc="2499ff96" sha1="7a4b19a398dd76cac802235e273e4d6b531893a1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8514,34 +8240,7 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<software name="brandnew">
-		<!-- Origin: private dump (r09) -->
-		<description>Brandish Renewal</description>
-		<year>1995</year>
-		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<info name="alt_title" value="ブランディッシュ リニューアル" />
-		<info name="release" value="19950310" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="3536856">
-				<rom name="brandish_renewal_disk1.mfm" size="3536856" crc="24056f4f" sha1="6acc923430a1f5165e69a099d25156b533c044a7" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="3594434">
-				<rom name="brandish_renewal_disk2.mfm" size="3594434" crc="411f9f13" sha1="97054b414c002e0b6884746015026e1acb03ddaf" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="3540493">
-				<rom name="brandish_renewal_disk3.mfm" size="3540493" crc="921fcfd9" sha1="f2f0360687115190dcd220b92f3b7232c917c65c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="brandnewc" cloneof="brandnew">
+	<software name="brandnewc">
 		<description>Brandish Renewal (cracked)</description>
 		<year>1995</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -8567,7 +8266,7 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<software name="brandnewca" cloneof="brandnew">
+	<software name="brandnewca">
 		<description>Brandish Renewal (alt, cracked)</description>
 		<year>1995</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -50226,8 +49925,8 @@ Hangs after name entry with illegal opcode 0f 0e at PC=FF2C3
 		</part>
 	</software>
 
-	<software name="arcus">
-		<description>Arcus</description>
+	<software name="arcusc">
+		<description>Arcus (cracked)</description>
 		<year>1988</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
 		<info name="alt_title" value="アークス" />
@@ -56476,102 +56175,6 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<!-- For some reason the installer doesn't display any numbers; it's still possible to install and run the game correctly, though -->
-	<software name="advpowd2">
-		<description>Advanced Power Dolls 2</description>
-		<year>1996</year>
-		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
-		<info name="alt_title" value="アドヴァンスド パワードール２" />
-		<info name="release" value="19960223" />
-		<info name="usage" value="Boot DOS from floppy, insert disk 1 and run INST.EXE" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1092604">
-				<rom name="advanced power dolls 2 (1996)(kogado)(disk 1 of 9)[req install].fdd" size="1092604" crc="ab8d0684" sha1="5cc5a01b3ca4b3d559047f48e5082ad4d995f22e" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="763900">
-				<rom name="advanced power dolls 2 (1996)(kogado)(disk 2 of 9)[req install].fdd" size="763900" crc="f0dc47ad" sha1="26a1e955ab4bbc8a7599f958bd44ec1e9c017e58" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="765948">
-				<rom name="advanced power dolls 2 (1996)(kogado)(disk 3 of 9)[req install].fdd" size="765948" crc="a3ca0977" sha1="db3eb86985ab371baa85a38f0711e3d86d4192d0" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="1311740">
-				<rom name="advanced power dolls 2 (1996)(kogado)(disk 4 of 9)[req install].fdd" size="1311740" crc="695fcb9e" sha1="b86071066c26ac0cde88d1bdbd32bcff8037910e" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5"/>
-			<dataarea name="flop" size="1311740">
-				<rom name="advanced power dolls 2 (1996)(kogado)(disk 5 of 9)[req install].fdd" size="1311740" crc="d95a290f" sha1="c0da2f616a7a84e12ccae92e03fdd27e005d0284" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6"/>
-			<dataarea name="flop" size="1311740">
-				<rom name="advanced power dolls 2 (1996)(kogado)(disk 6 of 9)[req install].fdd" size="1311740" crc="c15a4083" sha1="ee806e7553fd59eb3991887ca5f4145240cf85e4" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 7"/>
-			<dataarea name="flop" size="1311740">
-				<rom name="advanced power dolls 2 (1996)(kogado)(disk 7 of 9)[req install].fdd" size="1311740" crc="032a5ee0" sha1="aadd9829050d00c39879ec5f180dee7e71501aa8" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 8"/>
-			<dataarea name="flop" size="1311740">
-				<rom name="advanced power dolls 2 (1996)(kogado)(disk 8 of 9)[req install].fdd" size="1311740" crc="10ac338b" sha1="020a454c0bc8edb6ba0a44171814177c6238d206" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop9" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 9"/>
-			<dataarea name="flop" size="1038332">
-				<rom name="advanced power dolls 2 (1996)(kogado)(disk 9 of 9)[req install].fdd" size="1038332" crc="44eb30d7" sha1="1199c1ebce8ec6c750de9bc9bc6af07037f27d2a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="aishimai">
-		<description>Ai Shimai - Futari no Kajitsu</description>
-		<year>1994</year>
-		<publisher>シルキーズ (Silky's)</publisher>
-		<info name="alt_title" value="愛姉妹 ～二人の果実～" />
-		<info name="release" value="19940930" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1204220">
-				<rom name="ai shimai - futari no kazitsu (1994)(silky's)(disk 1 of 4)(disk a).fdd" size="1204220" crc="f8c7db65" sha1="adca557b4ecad8136eef70ea2a56f64643bc0f90" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="953340">
-				<rom name="ai shimai - futari no kazitsu (1994)(silky's)(disk 2 of 4)(disk b).fdd" size="953340" crc="7f79a599" sha1="c3df39b8697fd0ece1e2d20c485b563349580da3" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1297404">
-				<rom name="ai shimai - futari no kazitsu (1994)(silky's)(disk 3 of 4)(disk c).fdd" size="1297404" crc="d1607ac4" sha1="ff8269e41d0a5083ba1631205c16d9dc89f7d293" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
-			<dataarea name="flop" size="1055740">
-				<rom name="ai shimai - futari no kazitsu (1994)(silky's)(disk 4 of 4)(disk d).fdd" size="1055740" crc="c10d1006" sha1="2aa8d1831ce9d177bd100776a1af9941efab1356" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="akumu">
 		<description>Akumu - Aoi Kajitsu no Sanka</description>
 		<year>1996</year>
@@ -56745,58 +56348,8 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="ambivalz">
-		<description>AmbivalenZ - Niritsu Haihan</description>
-		<year>1994</year>
-		<publisher>アリスソフト (AliceSoft)</publisher>
-		<info name="alt_title" value="アンビバレンツ ～二律背反～" />
-		<info name="release" value="19940428" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1062908">
-				<rom name="ambivalenz (1994)(alice)(disk 1 of 7)(disk a).fdd" size="1062908" crc="200e992a" sha1="89080ce5c0ce5475d2c1ca4a1c95c173cb59b0f6" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1211388">
-				<rom name="ambivalenz (1994)(alice)(disk 2 of 7)(disk b).fdd" size="1211388" crc="da5539cb" sha1="bd781d938e456257c5daee16e4f3c805dbb8d43f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1223676">
-				<rom name="ambivalenz (1994)(alice)(disk 3 of 7)(disk c).fdd" size="1223676" crc="e3071205" sha1="29f13c2414c5b8b7b9b1aba18eb29d1b2969c033" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
-			<dataarea name="flop" size="932860">
-				<rom name="ambivalenz (1994)(alice)(disk 4 of 7)(disk d).fdd" size="932860" crc="18c69931" sha1="c633f0a0d7ff48cc6995bc35e3b09af25ce283b0" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E"/>
-			<dataarea name="flop" size="1096700">
-				<rom name="ambivalenz (1994)(alice)(disk 5 of 7)(disk e).fdd" size="1096700" crc="c5e48fc0" sha1="4fd1676a61018e71ff85831d5e2150e7e4c3ceef" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk F"/>
-			<dataarea name="flop" size="930812">
-				<rom name="ambivalenz (1994)(alice)(disk 6 of 7)(disk f).fdd" size="930812" crc="56aeadf1" sha1="3964bb8ceb6d474c11f72698522dccd16454bc72" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk G"/>
-			<dataarea name="flop" size="1126396">
-				<rom name="ambivalenz (1994)(alice)(disk 7 of 7)(disk g).fdd" size="1126396" crc="a3209aed" sha1="dc70b3c1a2a8fc8ecfcb4ec9e96051ec6e75d618" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="angel">
-		<description>U-Jin Presents - Angel</description>
+	<software name="angelc">
+		<description>U-Jin Presents - Angel (cracked)</description>
 		<year>1993</year>
 		<publisher>カクテル・ソフト (Cocktail Soft)</publisher>
 		<info name="alt_title" value="遊人 エンジェル" />
