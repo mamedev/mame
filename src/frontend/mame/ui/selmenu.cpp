@@ -1918,7 +1918,11 @@ bool menu_select_launch::handle_keys(u32 flags, int &iptkey)
 
 	if (exclusive_input_pressed(iptkey, IPT_UI_CANCEL, 0))
 	{
-		if (!m_search.empty())
+		if (m_ui_error)
+		{
+			// dismiss error
+		}
+		else if (!m_search.empty())
 		{
 			// escape pressed with non-empty search text clears it
 			m_search.clear();
@@ -1940,7 +1944,12 @@ bool menu_select_launch::handle_keys(u32 flags, int &iptkey)
 	// accept left/right keys as-is with repeat
 	if (exclusive_input_pressed(iptkey, IPT_UI_LEFT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 	{
-		if (m_focus == focused_menu::RIGHTTOP)
+		if (m_ui_error)
+		{
+			// dismiss error
+			return false;
+		}
+		else if (m_focus == focused_menu::RIGHTTOP)
 		{
 			// Swap the right panel and swallow it
 			iptkey = IPT_INVALID;
@@ -1971,7 +1980,12 @@ bool menu_select_launch::handle_keys(u32 flags, int &iptkey)
 	// swallow left/right keys if they are not appropriate
 	if (exclusive_input_pressed(iptkey, IPT_UI_RIGHT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 	{
-		if (m_focus == focused_menu::RIGHTTOP)
+		if (m_ui_error)
+		{
+			// dismiss error
+			return false;
+		}
+		else if (m_focus == focused_menu::RIGHTTOP)
 		{
 			// Swap the right panel and swallow it
 			iptkey = IPT_INVALID;
