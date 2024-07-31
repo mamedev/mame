@@ -1087,7 +1087,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="idainaru" supported="no">
-		<description>Idainaru sakkyokutachi (Japan)</description>
+		<description>Idainaru Sakkyokukatachi (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog / Sega Toys</publisher>
 		<info name="alt_title" value="偉大なる作曲家たち" />
@@ -1137,10 +1137,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pooh2j" supported="no">
-		<description>Winnie the Pooh 0086a (Japan)</description>
+	<software name="poohhach" supported="no">
+		<description>Kuma no Pooh-san: Pooh-san to Hachimitsu (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog / Sega Toys</publisher>
+		<info name="alt_title" value="くまのプーさん プーさんとはちみつ" />
 		<info name="serial" value="9P4-0086A"/>
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x200000">
@@ -1149,10 +1150,11 @@ license:CC0-1.0
 		</part>
 	</software>
 	
-	<software name="lantern" supported="no">
-		<description>Goo Chocolate Lantern (Japan)</description>
+	<software name="goochoco" supported="no">
+		<description>Okaasan to Issho: Goo Choco Lantan: Spoo no Fushigi na Oto no Daibouken! (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog / Bandai</publisher>
+		<info name="alt_title" value="おかあさんといっしょ ぐ〜チョコランタン スプーのふしぎなおとのだいぼうけん!" />
 		<info name="serial" value="9P4-0113A"/>
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x200000">
