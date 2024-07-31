@@ -184,10 +184,8 @@ void midas_state::zoomtable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		m_zoomtable[offset+0x00000] = data & 0xff;
-		m_zoomtable[offset+0x10000] = data & 0xff;
+		m_zoomtable[offset] = data & 0xff;
 	}
-
 }
 /***************************************************************************************
                                        Live Quiz Show
@@ -814,7 +812,7 @@ ROM_START( livequiz )
 	ROM_REGION( 0x200000, "ymz", 0 )
 	ROM_LOAD( "flash.u5", 0x000000, 0x200000, CRC(dc062792) SHA1(ec415c918c47ce9d181f014cde317af5717600e4) )
 
-	ROM_REGION( 0x20000, "spritegen:zoomy", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "spritegen:zoomy", ROMREGION_ERASE00 )
 	/* uploaded */
 ROM_END
 
@@ -912,7 +910,7 @@ ROM_START( hammer )
 	ROM_LOAD( "s0.u25", 0x000000, 0x200000, CRC(c049a3e0) SHA1(0c7016c3128c170a84ad3f92fad1165775210e3d) )
 	ROM_LOAD( "s1.u26", 0x200000, 0x200000, CRC(9cc4b3ec) SHA1(b91a8747074a1032eb7f70a015d394fe8e896d7e) )
 
-	ROM_REGION( 0x20000, "spritegen:zoomy", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "spritegen:zoomy", ROMREGION_ERASE00 )
 	/* uploaded */
 ROM_END
 
