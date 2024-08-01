@@ -424,14 +424,54 @@ void neogeo_cart_slot_device::protection_w(offs_t offset, uint16_t data, uint16_
 //
 // fullset Project Neon r/w port handlers
 //
-int16_t neon_fpga_ver = 0x01;
-int16_t neon_mcu_id = 0x0A;
-int16_t neon_mcu_busy = 0x00;
-int16_t neon_bank = 0;
-int16_t neon_fix_bank = 0;
-int16_t neon_mcu_ram[16];
+typedef enum {
+    NEON_WIFI_DISCONNECTED = 0,
+    NEON_WIFI_CONNECTING = 1,
+    NEON_WIFI_CONNECTED = 2
+} neon_wifi_status_t;
+
+// Command codes:
+#define CART_CMD_SMUL	0x01
+#define CART_CMD_ATAN2	0x02
+
+#define CART_CMD_SAVE	0x03
+#define CART_CMD_LOAD	0x04
+
+#define CART_CMD_SRAND	0x05
+#define CART_CMD_RAND	0x06
+
+#define CART_CMD_WIFI_STATUS	0x20
+#define CART_CMD_WIFI_REFRESH	0x21
+#define CART_CMD_WIFI_GET_NAME	0x22
+#define CART_CMD_WIFI_CONNECT	0x23
+
+#define CART_CMD_TEST	0xAA
+#define CART_CMD_HRESET	0xFF
+
+// Reply codes for CART_CMD_SAVE:
+#define CART_SAVE_OK    0x0000
+#define CART_SAVE_ERR   0x0001
+#define CART_SAVE_NONE  0x0010
+
+// Reply codes for CART_CMD_WIFI_GET_NAME:
+#define CART_WIFI_OK    0x0000
+#define CART_WIFI_INVALID   0x0001
+
+#define NEON_FPGA_RAM_SIZE 40	// In words
+#define NEON_RAM_DATA_MAX (NEON_FPGA_RAM_SIZE - 1)	// First word is always used by echo
+
+#define NEON_MAX_SAVES 10
+
+uint16_t neon_fpga_ver = 0x01;
+uint16_t neon_mcu_id = 0x0A;
+uint16_t neon_mcu_busy = 0x00;
+uint16_t neon_bank = 0;				// 0~F
+uint16_t neon_fix_bank = 0;			// 0~3
+uint16_t neon_game_to_mcu_ram[NEON_FPGA_RAM_SIZE];
+uint16_t neon_mcu_to_game_ram[NEON_FPGA_RAM_SIZE];
 uint32_t neon_sw_rng_next = 1;
-bool neon_debug_enabled = false;
+bool neon_debug_enabled = false;	// MAME-only debug
+neon_wifi_status_t neon_status_wifi = NEON_WIFI_DISCONNECTED;
 
 void neogeo_cart_slot_device::neon_enable_debug_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
 	neon_debug_enabled = data != 0x00;
@@ -442,22 +482,26 @@ void neogeo_cart_slot_device::neon_enable_debug_w(offs_t offset, uint16_t data, 
 }
 
 void neogeo_cart_slot_device::neon_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
-	//no idea what all needs done here - we're just using the primary bank in Project Neon
-	neon_bank = data;
+	// TODO: Implement real P ROM banks - Project Neon uses none
+	neon_bank = data & 0x0f;
 	if (neon_debug_enabled) {
-		printf("neon_bank_w(0x%X)\n", data);
+		if (neon_bank > 7)
+			printf("neon_bank_w(0x%X)\n", data);
+		else
+			printf("neon_bank_w(0x%X) ** not implemented in mame **\n", data);
 	}
 }
 
 uint16_t neogeo_cart_slot_device::neon_mcu_status_r(offs_t offset) {
-	//no idea what all needs done here - we're just using the primary bank in Project Neon
-	u16 result = neon_bank;
+	// TODO: Implement real P ROM banks - Project Neon uses none
+	u16 result;
     
-	if (neon_bank == 0x08) {
-		result = (neon_fpga_ver << 12) + (neon_mcu_id << 8) + (neon_mcu_busy << 7) + (neon_bank << 0); 
+	if (neon_bank > 7) {
+		// FPGA / MCU status
+		result = (neon_fpga_ver << 12) + (neon_mcu_id << 8) + (neon_mcu_busy << 7) + ((neon_bank & 7) << 0); 
 	} else {
-		//need to return proper rom data here, but not sure what to do for that yet
-		result = 0xffff;		
+		//need to return proper rom data from selected bank here, but not sure what to do for that yet
+		result = 0xffff;
 	}
 
 	if (neon_debug_enabled) {
@@ -468,7 +512,7 @@ uint16_t neogeo_cart_slot_device::neon_mcu_status_r(offs_t offset) {
 }
 
 void neogeo_cart_slot_device::neon_fixbank_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
-	//no idea what all needs done here - we're just using the primary bank in Project Neon
+	// TODO: Implement real S ROM banks - Project Neon uses none
 	neon_fix_bank = data;
 	if (neon_debug_enabled) {
 		printf("neon_fixbank_w(0x%X) ** not implemented in mame **\n", data);
@@ -477,106 +521,228 @@ void neogeo_cart_slot_device::neon_fixbank_w(offs_t offset, uint16_t data, uint1
 
 void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
 	uint32_t seed;
-	uint16_t modVal;
-	uint16_t retVal16;
-
-	//trigger MCU irq - here in mame, just set MCU as busy
+	bool valid = true;
+	uint8_t save_number, index;
+	uint16_t result, modulo;
+	char pwd[64 + 1];
+	
 	neon_mcu_busy = 0x01;
 	if (neon_debug_enabled) {
 		printf("neon_irq_w() ** MCU set to BUSY **\n");
 	}
-
-	//do work here
-	switch (neon_mcu_ram[0] >> 8) {
-		case 0x01: //SMUL
-			//need to look at firware to see what this command is
+	
+	uint16_t first_word = neon_game_to_mcu_ram[0];
+	uint8_t count = first_word;
+	uint16_t* data_in = &neon_game_to_mcu_ram[1];
+	uint16_t* data_out = &neon_mcu_to_game_ram[1];
+	
+	// TODO: Simulate execution delays for each command ?
+	switch (first_word >> 8) {
+		case CART_CMD_SMUL: // SMUL(a, b) -- 16x16:32 signed multiply
+			if (count > (NEON_RAM_DATA_MAX / 2)) {
+				printf("mcu SMUL count %d exceeds RAM capacity\n", count);
+				valid = false;
+				break;
+			}
+			
+			for (uint8_t c = 0; c < count; c += 2) {
+				int32_t result = data_in[c] * data_in[c + 1];
+				data_out[c] = result >> 16;
+				data_out[c + 1] = result;
+			}
 
 			if (neon_debug_enabled) {
-				printf("mcu SMUL called\n");
+				printf("mcu SMUL %d operations\n", count);
 			}
 			break;
 
-		case 0x02: //atan2 -- only implementing 1 atan calc (for now?)
-			neon_mcu_ram[1] = fxpt_atan2(neon_mcu_ram[1], neon_mcu_ram[2]);
+		case CART_CMD_ATAN2: // ATAN2(y, x) -- Standard 16bit atan2
+			if (count > (NEON_RAM_DATA_MAX / 2)) {
+				printf("mcu ATAN2 count %d exceeds RAM capacity\n", count);
+				valid = false;
+				break;
+			}
+			
+			for (uint8_t s = 0, d = 0; d < count; s += 2, d++) {
+				data_out[d] = fxpt_atan2(data_in[s], data_in[s + 1]);
+				if (neon_debug_enabled && !d) {
+					// Only print result for first operation
+					printf("mcu ATAN2(%d, %d) = %d\n", data_in[s], data_in[s + 1], data_out[d]);
+				}
+			}
 			
 			if (neon_debug_enabled) {
-				printf("mcu fxp_atan2(%d, %d) = %d\n", neon_mcu_ram[1], neon_mcu_ram[2], neon_mcu_ram[0]);
+				printf("mcu ATAN2 %d operations\n", count);
 			}
 			break;
 
-		case 0x03: //save
-			//do save 
+		case CART_CMD_SAVE: // SAVE(n, data) -- Non-volatile mem save
+			save_number = data_in[0];
+			if (save_number >= NEON_MAX_SAVES) {
+				printf("mcu save number %d invalid\n", save_number);
+				data_out[0] = CART_SAVE_ERR;	// Valid, but return error code
+				break;
+			}
+
+			data_out[0] = CART_SAVE_OK;
+			
+			if (neon_debug_enabled) {
+				printf("mcu SAVE(%d)\n", save_number);
+			}
+			break;
+
+		case CART_CMD_LOAD: // LOAD(n) -- Non-volatile mem load
+			save_number = data_in[0];
+			if (save_number >= NEON_MAX_SAVES) {
+				printf("mcu save number %d invalid\n", save_number);
+				data_out[0] = CART_SAVE_ERR;	// Valid, but return error code
+				break;
+			}
+			
+			data_out[0] = CART_SAVE_OK;
+			// TODO: Load test save data in data_out[1+]
 
 			if (neon_debug_enabled) {
-				printf("mcu SAVE called\n");
+				printf("mcu LOAD(%d)\n", save_number);
 			}
 			break;
 
-		case 0x04: //load
-			//do load
-
-			if (neon_debug_enabled) {
-				printf("mcu LOAD called\n");
-			}
-			break;
-
-		case 0x05: //srand(s) - seed rng
-			seed = (neon_mcu_ram[1] << 16) + neon_mcu_ram[2];
+		case CART_CMD_SRAND: // SRAND(s) -- Seed rng
+			seed = (data_in[0] << 16) + data_in[1];
 			//srand(seed);
 			neon_sw_rng_next = seed;
 
 			if (neon_debug_enabled) {
-				printf("mcu neo_srand(%d)\n", seed);
+				printf("mcu SRAND(%d)\n", seed);
 			}
 			break;
 
-		case 0x06: //rand(m) - generate random number and do mod m on value
-			modVal = neon_mcu_ram[1];
-			//retVal16 = neo_rand() % modVal;
-			//neon_mcu_ram[1] = retVal16;
-
-			//New pseudo rnd generator
-			for (uint8_t pass = 0; pass < 19; pass++) {
-                if (neon_sw_rng_next & 0x80000000UL) {
-                    neon_sw_rng_next <<= 1;
-                    neon_sw_rng_next ^= 0xFFFFFFAFUL;
-                } else {
-                    neon_sw_rng_next <<= 1;
-				}
-            }
-
-			retVal16 = (uint16_t)neon_sw_rng_next % modVal;
-			neon_mcu_ram[1] = retVal16;
+		case CART_CMD_RAND: // RAND(m) -- Generate random numbers mod m
+			if (count > NEON_RAM_DATA_MAX) {
+				printf("mcu RAND count %d exceeds RAM capacity\n", count);
+				valid = false;
+				break;
+			}
+			
+			modulo = data_in[0];
+			
+			for (uint8_t c = 0; c < count; c++) {
+				for (uint8_t pass = 0; pass < 19; pass++) {
+	                if (neon_sw_rng_next & 0x80000000UL) {
+	                    neon_sw_rng_next <<= 1;
+	                    neon_sw_rng_next ^= 0xFFFFFFAFUL;
+	                } else {
+	                    neon_sw_rng_next <<= 1;
+					}
+	            }
+	
+				data_out[c] = (uint16_t)(neon_sw_rng_next % modulo);
+			}
 
 			if (neon_debug_enabled) {
-				printf("mcu neo_rand(%d) = %d\n", modVal, retVal16);
+				printf("mcu %d RAND(%d)'s, last: %d\n", count, modulo, neon_sw_rng_next);
 			}
 			break;
-
-		case 0xAA: //Test
-			// what to do here?
-
+			
+		case CART_CMD_WIFI_STATUS:
+			data_out[0] = neon_status_wifi;
+			
 			if (neon_debug_enabled) {
-				printf("** mcu test **\n");
+				printf("mcu WIFI_STATUS\n");
 			}
 			break;
 
-		case 0xff: //mcu reset
-			if (neon_mcu_ram[0] == 0xff00 && neon_mcu_ram[1] == 0xaa55) {
-				//trigger mcu reset here
+		case CART_CMD_WIFI_REFRESH:		// List WiFi access points
+			data_out[0] = 1;	// Found one access point
+			
+			if (neon_debug_enabled) {
+				printf("mcu WIFI_REFRESH\n");
+			}
+			break;
+		
+		case CART_CMD_WIFI_GET_NAME:	// Get infos about a previously listed WiFi access point
+			index = data_in[0];
+			
+			if (index > 0) {
+				printf("mcu WIFI_GET_NAME index %d out of bounds\n", index);
+				data_out[0] = CART_SAVE_ERR;	// Valid, but return error code
+				break;
+			}
+			
+			data_out[0] = CART_WIFI_OK;
+			data_out[1] = (30 << 8) | 3;	// rssi = 30, authmode = WIFI_AUTH_WPA2_PSK
+			data_out[2] = 11 << 8;			// Channel 11
+			data_out[3] = 0x5465;			// "Test AP"
+			data_out[4] = 0x7374;
+			data_out[5] = 0x2041;
+			data_out[6] = 0x5000;
+			
+			if (neon_debug_enabled) {
+				printf("mcu WIFI_GET_NAME(%d)\n", index);
+			}
+			break;
+			
+		case CART_CMD_WIFI_CONNECT:		// Connected to previously listed WiFi access point
+			index = data_in[0];
+			
+			if (index > 0) {
+				printf("mcu WIFI_CONNECT index %d out of bounds\n", index);
+				data_out[0] = CART_SAVE_ERR;	// Valid, but return error code
+				break;
+			}
+			
+			memcpy(pwd, (uint8_t*)&data_in[1], 64);
+			pwd[64] = 0;
+			
+			neon_status_wifi = NEON_WIFI_CONNECTED;
+			
+			if (neon_debug_enabled) {
+				printf("mcu WIFI_CONNECT(%d) with pwd \"%s\"\n", index, pwd);
+			}
+			break;
+		
+		case CART_CMD_TEST: // MCU test -- Returns 16-bit word sum of data words
+			if (count > NEON_RAM_DATA_MAX) {
+				printf("mcu TEST count %d exceeds RAM capacity\n", count);
+				valid = false;
+				break;
+			}
+			
+			result = 0;
+			for (uint8_t c = 0; c < count; c++) {
+				result += data_in[c];
+			}
+			
+			data_out[0] = result;
+			
+			if (neon_debug_enabled) {
+				printf("** mcu TEST **\n");
+			}
+			break;
+
+		case CART_CMD_HRESET: // HW reset
+			if ((count == 1) && (data_in[0] == 0xaa55)) {
+				// trigger system reset here
 				if (neon_debug_enabled) {
-					printf("** mcu reset **\n");
+					printf("** mcu HRESET **\n");
 				}
 			}
 			break;
 
 		default:
+			valid = false;
+			
 			if (neon_debug_enabled) {
-				printf("** Unhandled MCU command %4X\n", neon_mcu_ram[0]);
+				printf("** Unhandled MCU command %4X\n", first_word);
 			}
 			break;
 	}
 
+	if (!valid)
+		neon_mcu_to_game_ram[0] = 0;
+	else
+		neon_mcu_to_game_ram[0] = first_word;	// Echo means command valid
+		
 	neon_mcu_busy = 0x00;
 	
 	if (neon_debug_enabled) {
@@ -585,19 +751,35 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 }
 
 void neogeo_cart_slot_device::neon_mcu_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
-	neon_mcu_ram[offset & 0x001f] = data;
-	if (neon_debug_enabled) {
-		printf("neon_mcu_ram_w() - writing 0x%X (%d) to offset 0x%X\n", data, data, offset & 0x001f);
+	if (offset < NEON_FPGA_RAM_SIZE) {
+		if (neon_debug_enabled) {
+			printf("neon_mcu_ram_w() - writing 0x%X (%d) to offset 0x%X\n", data, data, offset);
+		}
+		neon_game_to_mcu_ram[offset] = data;
+	} else {
+		if (neon_debug_enabled) {
+			printf("neon_mcu_ram_w() - out of bounds write to offset 0x%X\n", offset);
+		}
 	}
 }
 
 uint16_t neogeo_cart_slot_device::neon_mcu_ram_r(offs_t offset) {
-	if (neon_bank == 0x08) {
-		if (neon_debug_enabled) {
-			printf("neon_mcu_ram_r(%x) = %x (%d)\n", 0x210000 + (offset * 2), neon_mcu_ram[offset], neon_mcu_ram[offset]);
+	// TODO: Implement real P ROM banks - Project Neon uses none
+	
+	if (neon_bank > 7) {
+		if (offset < NEON_FPGA_RAM_SIZE) {
+			if (neon_debug_enabled) {
+				printf("neon_mcu_ram_r(%x) = %x (%d)\n", 0x210000 + (offset * 2), neon_mcu_to_game_ram[offset], neon_mcu_to_game_ram[offset]);
+			}
+			return neon_mcu_to_game_ram[offset];
+		} else {
+			if (neon_debug_enabled) {
+				printf("neon_mcu_ram_r(%x) out of bounds\n", 0x210000 + (offset * 2));
+			}
+			return 0xffff;
 		}
-		return neon_mcu_ram[offset & 0x001f];
 	} else {
+		//need to return proper rom data from selected bank here, but not sure what to do for that yet
 		return 0xffff;
 	}
 }
