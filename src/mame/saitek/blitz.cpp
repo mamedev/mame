@@ -251,7 +251,7 @@ void blitz_state::p6_w(u8 data)
 	m_led_pwm->write_mx(m_inp_mux);
 
 	// P64: 74164(2) CP
-	// P65: 74164(2) DSB, output to LCD commons
+	// P65: 74164(2) DSB, output to LCD common
 	if (~m_port6 & data & 0x10)
 		m_lcd_com = m_lcd_com << 1 | BIT(data, 5);
 
@@ -266,7 +266,7 @@ void blitz_state::p6_w(u8 data)
 *******************************************************************************/
 
 // mode dial, rotary switch with 12 stops (duplicate halves)
-// 1: ready, 2: options, 3: info, 4: game, 5: set up, 6: level
+// ready, options, info, game, set up, level
 static const ioport_value mode_dial[6] = { 5, 1, 2, 4, 6, 3 };
 
 // shuttle dial, free running dial with 6 magnets and 2 reed switches
@@ -274,8 +274,8 @@ static const ioport_value shuttle_dial[4] = { 0, 1, 3, 2 };
 
 static INPUT_PORTS_START( blitz )
 	PORT_START("IN.0")
-	PORT_BIT(0x07, 0x00, IPT_POSITIONAL_V) PORT_POSITIONS(6) PORT_WRAPS PORT_REMAP_TABLE(mode_dial) PORT_SENSITIVITY(5) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Mode Dial")
-	PORT_BIT(0x18, 0x00, IPT_POSITIONAL_H) PORT_POSITIONS(4) PORT_WRAPS PORT_REMAP_TABLE(shuttle_dial) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Shuttle Dial")
+	PORT_BIT(0x07, 0x00, IPT_POSITIONAL_V) PORT_POSITIONS(6) PORT_WRAPS PORT_REMAP_TABLE(mode_dial) PORT_SENSITIVITY(6) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Mode Dial")
+	PORT_BIT(0x18, 0x00, IPT_POSITIONAL_H) PORT_POSITIONS(4) PORT_WRAPS PORT_REMAP_TABLE(shuttle_dial) PORT_SENSITIVITY(12) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Shuttle Dial")
 	PORT_BIT(0x60, IP_ACTIVE_HIGH, IPT_CUSTOM) // freq sel
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 
