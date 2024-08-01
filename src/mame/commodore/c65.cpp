@@ -12,6 +12,8 @@ TODO:
 - Complete interrupts;
 - F011 FDC;
 - C=64 mode (with "GO64" at BASIC prompt);
+- bios 0 detects an expansion RAM without checking REC first and no matter if there's
+  effectively a RAM bank available or not, supposed to bus error or just buggy/hardwired code?
 
 ===================================================================================================
 References:
@@ -75,9 +77,13 @@ private:
 
 	dma_state_t m_state;
 	u32 m_src, m_dst, m_length, m_command, m_modulo;
+	u8 m_src_mode, m_dst_mode;
 	bool m_chained_transfer;
+
 	emu_timer *m_dma_timer;
 	void check_state(int next_cycles);
+	void increment_src();
+	void increment_dst();
 };
 
 DEFINE_DEVICE_TYPE(DMAGIC_F018, dmagic_f018_device, "dmagic_f018", "DMAgic F018 Gate Array")
@@ -117,6 +123,19 @@ void dmagic_f018_device::check_state(int next_cycles)
 		m_dma_timer->adjust(m_chained_transfer ? attotime::from_ticks(12, clock()) : attotime::never);
 	}
 }
+
+void dmagic_f018_device::increment_src()
+{
+	const int src_dir = BIT(m_src_mode, 2) ? -1 : +1;
+	m_src = ((m_src + src_dir) & 0xffff) | (m_src & 0xf'0000);
+}
+
+void dmagic_f018_device::increment_dst()
+{
+	const int dst_dir = BIT(m_dst_mode, 2) ? -1 : +1;
+	m_dst = ((m_dst + dst_dir) & 0xffff) | (m_dst & 0xf'0000);
+}
+
 
 TIMER_CALLBACK_MEMBER(dmagic_f018_device::execute_cb)
 {
@@ -158,7 +177,10 @@ TIMER_CALLBACK_MEMBER(dmagic_f018_device::execute_cb)
 			m_dmalist_address = address;
 			m_state = (dma_state_t)(m_command & 3);
 
-			logerror("DMAgic %s %06x -> %06x %04x %02x (CHAIN=%s)\n"
+			m_src_mode = m_src >> 20;
+			m_dst_mode = m_dst >> 20;
+
+			logerror("DMAgic %s [%06x] -> [%06x] length = %04x modulo = %02x (CHAIN=%s)\n"
 				, dma_cmd_string[m_command & 3]
 				, m_src
 				, m_dst
@@ -172,9 +194,10 @@ TIMER_CALLBACK_MEMBER(dmagic_f018_device::execute_cb)
 
 			// x--- I/O select
 			// -x-- DIR
+			//      \- decrements instead of increment, used by "LIST"
 			// --x- MOD
 			// ---x HOLD
-			if ((m_src & 0xf0'0000 || m_dst & 0xf0'0000) && m_length != 1)
+			if ((m_src_mode & 0xb || m_dst_mode & 0xb) && m_length != 1)
 			{
 				popmessage("DMAgic: unhandled source %06x dst %06x length %05x", m_src, m_dst, m_length);
 			}
@@ -188,8 +211,8 @@ TIMER_CALLBACK_MEMBER(dmagic_f018_device::execute_cb)
 		// or length == 50 (for scrolling vertical text, cfr. c64dx)
 		case dma_state_t::COPY: {
 			m_space->write_byte(m_dst & 0xf'ffff, m_space->read_byte(m_src & 0xf'ffff));
-			m_src = ((m_src + 1) & 0xffff) | (m_src & 0xf'0000);
-			m_dst = ((m_dst + 1) & 0xffff) | (m_dst & 0xf'0000);
+			increment_src();
+			increment_dst();
 			m_length --;
 			check_state(2);
 			break;
@@ -205,8 +228,8 @@ TIMER_CALLBACK_MEMBER(dmagic_f018_device::execute_cb)
 			const u8 tmp_dst = m_space->read_byte(m_dst & 0xf'ffff);
 			m_space->write_byte(m_src & 0xf'ffff, tmp_dst);
 			m_space->write_byte(m_dst & 0xf'ffff, tmp_src);
-			m_src = ((m_src + 1) & 0xffff) | (m_src & 0xf'0000);
-			m_dst = ((m_dst + 1) & 0xffff) | (m_dst & 0xf'0000);
+			increment_src();
+			increment_dst();
 			m_length --;
 			check_state(4);
 			break;
@@ -214,7 +237,7 @@ TIMER_CALLBACK_MEMBER(dmagic_f018_device::execute_cb)
 
 		case dma_state_t::FILL:
 			m_space->write_byte(m_dst & 0xf'ffff, m_src & 0xff);
-			m_dst = ((m_dst + 1) & 0xffff) | (m_dst & 0xf'0000);
+			increment_dst();
 			m_length --;
 			check_state(1);
 			break;
@@ -566,15 +589,17 @@ void c65_state::cia0_portb_w(uint8_t data)
 
 void c65_state::c65_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x00000, 0x07fff).ram().share("work_ram");
 	map(0x08000, 0x0bfff).rom().region("ipl", 0x08000);
 	map(0x0c800, 0x0cfff).rom().region("ipl", 0x0c800);
 	map(0x0d000, 0x0d07f).m(*this, FUNC(c65_state::vic4567_map));
 	// 0x0d080, 0x0d09f FDC
+	map(0x0d080, 0x0d09f).lr8(NAME([] (offs_t offset) { return 0; }));
 	// 0x0d0a0, 0x0d0ff Ram Expansion Control (REC)
-	map(0x0d100, 0x0d1ff).ram().w(FUNC(c65_state::PalRed_w)).share("redpal");// 0x0d100, 0x0d1ff Red Palette
-	map(0x0d200, 0x0d2ff).ram().w(FUNC(c65_state::PalGreen_w)).share("greenpal"); // 0x0d200, 0x0d2ff Green Palette
-	map(0x0d300, 0x0d3ff).ram().w(FUNC(c65_state::PalBlue_w)).share("bluepal"); // 0x0d300, 0x0d3ff Blue Palette
+	map(0x0d100, 0x0d1ff).ram().w(FUNC(c65_state::PalRed_w)).share("redpal");
+	map(0x0d200, 0x0d2ff).ram().w(FUNC(c65_state::PalGreen_w)).share("greenpal");
+	map(0x0d300, 0x0d3ff).ram().w(FUNC(c65_state::PalBlue_w)).share("bluepal");
 	// 0x0d400, 0x0d4*f Right SID
 	// keyboard hold left shift will read to $d484 (?)
 	map(0x0d400, 0x0d41f).mirror(0x80).rw(m_sid[1], FUNC(mos6581_device::read), FUNC(mos6581_device::write));
@@ -602,6 +627,7 @@ void c65_state::c65_map(address_map &map)
 	map(0x20000, 0x3ffff).rom().region("ipl", 0);
 //  0x40000, 0x7ffff cart expansion
 //  0x80000, 0xfffff RAM expansion
+//  map(0x80000, 0xfffff).ram();
 }
 
 
