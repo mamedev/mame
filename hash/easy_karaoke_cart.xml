@@ -199,7 +199,7 @@ license:CC0-1.0
 	What's Going On                             Marvin Gaye
 	-->
 	<software name="karamsc1" supported="no">
-		<description>KaraokeMicro Star Cartouche 1</description>
+		<description>KaraokeMicro Star Cartouche 1 (France)</description>
 		<year>2003</year>
 		<publisher>IVL Technologies / Lexibook</publisher>
 		<part name="cart" interface="easy_karaoke_cart">
@@ -225,7 +225,7 @@ license:CC0-1.0
 	Vacances j'oublie tout                      Elegance
 	-->
 	<software name="karamsc2" supported="no">
-		<description>KaraokeMicro Star Cartouche 2</description>
+		<description>KaraokeMicro Star Cartouche 2 (France)</description>
 		<year>2003</year>
 		<publisher>IVL Technologies / Lexibook</publisher>
 		<part name="cart" interface="easy_karaoke_cart">
@@ -251,12 +251,38 @@ license:CC0-1.0
 	Toutes les femmes de ta vie                 L5
 	-->
 	<software name="karamsc3" supported="no">
-		<description>KaraokeMicro Star Cartouche 3</description>
+		<description>KaraokeMicro Star Cartouche 3 (France)</description>
 		<year>2004</year>
 		<publisher>IVL Technologies / Lexibook</publisher>
 		<part name="cart" interface="easy_karaoke_cart">
 			<dataarea name="rom" size="0x80000">
 				<rom name="27V40.u3" size="0x80000" crc="33047ac7" sha1="bea9197646ba5a9f8c842363149b1b1ec7b9aada" />
+			</dataarea>
+			<dataarea name="mcu" size="0x2000">
+				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	Η ΑΓΑΠΗ ΘΕΛΕΙ ΔΥΟ                           Αλίκη Βουγιουκλάκη, Δημ
+	ΚΑΡΔΙΑ ΜΟΥ ΜΗΝ ΑΝΗΣΥΧΕΙ                     Αντώνης Ρέμος
+	ΜΑΡΤΥΡΙΟ                                    Άννα Βίσση, Γιάννης Πάρ
+	ΠΑΛΙΟΚΑΙΡΟΣ                                 Πασχάλης Τερζής
+	ΣΥΓΧΑΡΗΤΗΡΙΑ                                Άννα Βίσση
+	ΤΡΑΒΑ ΕΜΠΡΟΣ                                Αλίκη Βουγιουκλάκη
+	ΥΠΟΦΕΡΩ                                     Δέσποινα Βανδή
+	ΧΙΛΙΑ ΠΕΡΙΣΤΕΡΙΑ                            Γιώργος Ζαμπέτας
+	ΟΛΑ ΚΑΛΑ                                    Σάκης Ρουβάς
+	ΟΛΑ ΤΑ ΛΕΦΤΑ                                Άννα Βίσση
+	-->
+	<software name="k50gri" supported="no">
+		<description>Karaoke Microphone Pro Cartridge 1 (Greece)</description>
+		<year>2003</year>
+		<publisher>IVL Technologies / Lexibook / Imago</publisher>
+		<part name="cart" interface="easy_karaoke_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="ivl_ics0325-a.u3" size="0x80000" crc="43fb1253" sha1="aaf999003cb9a57ee29db6892ca4f171d17e68e8" />
 			</dataarea>
 			<dataarea name="mcu" size="0x2000">
 				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
