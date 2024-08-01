@@ -42,7 +42,8 @@ http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C64DX_aka_C65_System
 
 #define MAIN_CLOCK XTAL(28'375'160)/8
 
-// TODO: move to own file, subclass with f018a and f018b, use device_execute_interface
+// TODO: move to own file, subclass with f018a and f018b
+// using device_execute_interface will tank performance, avoid it for now.
 class dmagic_f018_device : public device_t
 {
 public:
@@ -167,7 +168,7 @@ TIMER_CALLBACK_MEMBER(dmagic_f018_device::execute_cb)
 			);
 
 			if (m_command & 0xf8)
-				popmessage("DMAgic unhandled command %02x", m_command);
+				popmessage("DMAgic: unhandled command %02x", m_command);
 
 			// x--- I/O select
 			// -x-- DIR
@@ -175,8 +176,7 @@ TIMER_CALLBACK_MEMBER(dmagic_f018_device::execute_cb)
 			// ---x HOLD
 			if ((m_src & 0xf0'0000 || m_dst & 0xf0'0000) && m_length != 1)
 			{
-				popmessage("DMAgic unhandled source %06x dst %06x length %05x", m_src, m_dst, m_length);
-				machine().debug_break();
+				popmessage("DMAgic: unhandled source %06x dst %06x length %05x", m_src, m_dst, m_length);
 			}
 
 			m_dma_timer->adjust(attotime::from_ticks((1), clock()));

@@ -1657,7 +1657,7 @@ stz_ce_aba
 	PC++;
 	TMP = set_h(TMP, read_pc());
 	PC++;
-	write(TMP, A);
+	write(TMP, Z);
 	prefetch();
 
 stz_ce_abx
@@ -1665,7 +1665,7 @@ stz_ce_abx
 	PC++;
 	TMP = set_h(TMP, read_pc());
 	PC++;
-	write(TMP+X, A);
+	write(TMP+X, Z);
 	prefetch();
 
 stz_ce_zpg
