@@ -321,14 +321,15 @@ void altos586_hdc_device::altos586_hdc_io(address_map &map)
 	map(0xfff8, 0xfff9).nopw();
 }
 
-template <uint8_t index> std::error_condition altos586_hdc_device::hdd_load(device_image_interface &image)
+template <uint8_t Index>
+std::error_condition altos586_hdc_device::hdd_load(device_image_interface &image)
 {
-	if (m_hdd[index]->get_info().sectorbytes != 512) {
-		logerror("expected 512 bytes per sector, got %d", m_geom[index]->sectorbytes);
+	if (m_hdd[Index]->get_info().sectorbytes != 512) {
+		logerror("expected 512 bytes per sector, got %d", m_geom[Index]->sectorbytes);
 		return image_error::INVALIDLENGTH;
 	}
 
-	m_geom[index] = &m_hdd[index]->get_info();
+	m_geom[Index] = &m_hdd[Index]->get_info();
 	return std::error_condition();
 }
 
