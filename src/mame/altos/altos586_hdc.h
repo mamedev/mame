@@ -58,8 +58,8 @@ private:
 	void sector_write(uint8_t index);
 
 	// Image mount and unmount.
-	template <uint8_t index> std::error_condition hdd_load(device_image_interface &image);
-	template <uint8_t index> void hdd_unload(device_image_interface &image) { m_geom[index] = nullptr; }
+	template <uint8_t Index> std::error_condition hdd_load(device_image_interface &image);
+	template <uint8_t Index> void hdd_unload(device_image_interface &image) { m_geom[Index] = nullptr; }
 
 	required_address_space m_bus;
 	required_device<i8089_device> m_iop;
@@ -77,8 +77,7 @@ private:
 
 	uint8_t m_drive;
 	uint8_t m_head;
-	const struct hard_disk_file::info* m_geom[2];
-
+	const hard_disk_file::info *m_geom[2];
 };
 
 DECLARE_DEVICE_TYPE(ALTOS586_HDC, altos586_hdc_device)
