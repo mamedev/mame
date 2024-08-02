@@ -24180,6 +24180,42 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 			</dataarea>
 		</part>
 	</software>
+     
+	<software name="winnt40wsd">
+		<description>Windows NT 4.0 Workstation Setup Disks</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<!--- Origin: archive.org --->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="nt1.img" size="1474560" crc="4c586d8b" sha1="c8c5b6263b5e3873471f11ee35a28da9f8e5243a"/>
+			</dataarea>
+			<dataarea name="flop" size="1474560">
+				<rom name="nt2.img" size="1474560" crc="e2198731" sha1="cd9813eed07f376951b706d337574e825b40c5c2"/>
+			</dataarea>
+			<dataarea name="flop" size="1474560">
+				<rom name="nt3.img" size="1474560" crc="350c6b0c" sha1="7438989d0284cdbf093a9abfbf03e40f94995bd3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt40ssd">
+		<description>Windows NT 4.0 Server Setup Disks</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<!--- Origin: archive.org --->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Microsoft Windows NT Server 4.0 Setup Disk 1.IMA" size="1474560" crc="e2a1a411" sha1="1d4729f72f25c1087ffb6edc86b5d2b5ee7bf646"/>
+			</dataarea>
+			<dataarea name="flop" size="1474560">
+				<rom name="Microsoft Windows NT Server 4.0 Setup Disk 2.IMA" size="1474560" crc="2ea2f59c" sha1="3574421f7339e7e83b0a931b29e8ebdae7511634"/>
+			</dataarea>
+			<dataarea name="flop" size="1474560">
+				<rom name="Microsoft Windows NT Server 4.0 Setup Disk 3.IMA" size="1474560" crc="20fcc1c3" sha1="8d2e25e083c82b57b007ae034869b8d11292e690"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="pcga9308">
 		<description>PC Games (coverdisk 1993/08 - August 1993) (Germany)</description>
