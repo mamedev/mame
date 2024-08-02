@@ -1566,15 +1566,15 @@ void neogeo_base_state::set_slot_idx(int slot)
 			space.install_write_handler(0x200000, 0x200001, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_bank_w)));
 			space.install_read_handler(0x200000, 0x200001, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_mcu_status_r)));
 
-			// fix bank select (not implemented)
-			space.install_write_handler(0x200002, 0x200003, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_fixbank_w)));
+			// fix and adpcm banks select (not implemented)
+			space.install_write_handler(0x200002, 0x200003, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_auxbank_w)));
 
 			// mcu irq trigger
 			space.install_write_handler(0x200004, 0x200005, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_irq_w)));
 		
 			// game to mcu / mcu to game ram
-			space.install_write_handler(0x210000, 0x21007f, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_mcu_ram_w)));
-			space.install_read_handler(0x210000, 0x21007f, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_mcu_ram_r)));
+			space.install_write_handler(0x210000, 0x21004f, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_mcu_ram_w)));
+			space.install_read_handler(0x210000, 0x21004f, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_mcu_ram_r)));
 			
 			printf("\n\n*** Fullset Cart Handlers Installed ***\n\n");
 			

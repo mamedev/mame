@@ -235,7 +235,7 @@ public:
 
 	void neon_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t neon_mcu_status_r(offs_t offset);
-	void neon_fixbank_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void neon_auxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void neon_irq_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void neon_mcu_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t neon_mcu_ram_r(offs_t offset);

@@ -467,6 +467,7 @@ uint16_t neon_mcu_id = 0x0A;
 uint16_t neon_mcu_busy = 0x00;
 uint16_t neon_bank = 0;				// 0~F
 uint16_t neon_fix_bank = 0;			// 0~3
+uint16_t neon_adpcm_bank = 0;		// 0~7
 uint16_t neon_game_to_mcu_ram[NEON_FPGA_RAM_SIZE];
 uint16_t neon_mcu_to_game_ram[NEON_FPGA_RAM_SIZE];
 uint32_t neon_sw_rng_next = 1;
@@ -486,9 +487,11 @@ void neogeo_cart_slot_device::neon_bank_w(offs_t offset, uint16_t data, uint16_t
 	neon_bank = data & 0x0f;
 	if (neon_debug_enabled) {
 		if (neon_bank > 7)
-			printf("neon_bank_w(0x%X)\n", data);
+			printf("neon_bank_w: FPGA RAM\n");
+		else if (!neon_bank)
+			printf("neon_bank_w: ROM\n");
 		else
-			printf("neon_bank_w(0x%X) ** not implemented in mame **\n", data);
+			printf("neon_bank_w(%d) ** not implemented in mame **\n", data);
 	}
 }
 
@@ -499,23 +502,29 @@ uint16_t neogeo_cart_slot_device::neon_mcu_status_r(offs_t offset) {
 	if (neon_bank > 7) {
 		// FPGA / MCU status
 		result = (neon_fpga_ver << 12) + (neon_mcu_id << 8) + (neon_mcu_busy << 7) + ((neon_bank & 7) << 0); 
+		if (neon_debug_enabled) {
+			printf("neon_mcu_status_r: 0x%X\n", result);
+		}
 	} else {
 		//need to return proper rom data from selected bank here, but not sure what to do for that yet
 		result = 0xffff;
 	}
 
-	if (neon_debug_enabled) {
-		printf("neon_bank_r() = 0x%X\n", result);
-	}
-
 	return result;
 }
 
-void neogeo_cart_slot_device::neon_fixbank_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
-	// TODO: Implement real S ROM banks - Project Neon uses none
-	neon_fix_bank = data;
-	if (neon_debug_enabled) {
-		printf("neon_fixbank_w(0x%X) ** not implemented in mame **\n", data);
+void neogeo_cart_slot_device::neon_auxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
+	// TODO: Implement real S and V ROM banks - Project Neon uses none
+	if (data & 0x8000) {
+		neon_adpcm_bank = data & 7;
+		if (neon_debug_enabled) {
+			printf("neon_auxbank_w: ADCPM bank %u ** not implemented in mame **\n", neon_adpcm_bank);
+		}
+	} else {
+		neon_fix_bank = data & 3;
+		if (neon_debug_enabled) {
+			printf("neon_fixbank_w: Fix bank %u ** not implemented in mame **\n", neon_fix_bank);
+		}
 	}
 }
 
@@ -625,6 +634,7 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 			}
 			
 			modulo = data_in[0];
+			if (!modulo) modulo = 1;	// Guard against divide by zero
 			
 			for (uint8_t c = 0; c < count; c++) {
 				for (uint8_t pass = 0; pass < 19; pass++) {
@@ -733,7 +743,7 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 			valid = false;
 			
 			if (neon_debug_enabled) {
-				printf("** Unhandled MCU command %4X\n", first_word);
+				printf("** Unhandled MCU command 0x%04X\n", first_word);
 			}
 			break;
 	}
@@ -753,12 +763,12 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 void neogeo_cart_slot_device::neon_mcu_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
 	if (offset < NEON_FPGA_RAM_SIZE) {
 		if (neon_debug_enabled) {
-			printf("neon_mcu_ram_w() - writing 0x%X (%d) to offset 0x%X\n", data, data, offset);
+			printf("neon_mcu_ram_w(%x) = %04x (%d)\n", 0x210000 + (offset * 2), data, data);
 		}
 		neon_game_to_mcu_ram[offset] = data;
 	} else {
 		if (neon_debug_enabled) {
-			printf("neon_mcu_ram_w() - out of bounds write to offset 0x%X\n", offset);
+			printf("neon_mcu_ram_w() - out of bounds write to %X\n", offset);
 		}
 	}
 }
@@ -769,7 +779,7 @@ uint16_t neogeo_cart_slot_device::neon_mcu_ram_r(offs_t offset) {
 	if (neon_bank > 7) {
 		if (offset < NEON_FPGA_RAM_SIZE) {
 			if (neon_debug_enabled) {
-				printf("neon_mcu_ram_r(%x) = %x (%d)\n", 0x210000 + (offset * 2), neon_mcu_to_game_ram[offset], neon_mcu_to_game_ram[offset]);
+				printf("neon_mcu_ram_r(%x) = %04x (%d)\n", 0x210000 + (offset * 2), neon_mcu_to_game_ram[offset], neon_mcu_to_game_ram[offset]);
 			}
 			return neon_mcu_to_game_ram[offset];
 		} else {
