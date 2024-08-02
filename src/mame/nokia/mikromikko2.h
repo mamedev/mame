@@ -85,6 +85,7 @@ private:
 	void mm2_io_map(address_map &map);
 	void vpac_mem(address_map &map);
 
+	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static void floppy_formats(format_registration &fr);

@@ -289,6 +289,13 @@ static GFXDECODE_START( gfx_mm2 )
 	GFXDECODE_ENTRY( "chargen", 0, gfxlayout, 0, 1 )
 GFXDECODE_END
 
+void mm2_state::palette(palette_device &palette) const
+{
+	palette.set_pen_color(0, rgb_t(0xff, 0xff, 0xff)); // white
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // black (normal color)
+	palette.set_pen_color(2, rgb_t(0x7f, 0x7f, 0x7f)); // grey ("highlight" mode color)
+}
+
 uint32_t mm2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!m_blc)
@@ -312,7 +319,7 @@ uint32_t mm2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 				for (int bit = 0; bit < 8; bit++)
 				{
-					bool pixel = BIT(char_data, 0) ^ !m_cpl;
+					bool pixel = BIT(char_data, 0) ^ m_cpl;
 					char_data >>= 1;
 
 					bitmap.pix((sy * 12) + y, (sx * 8) + bit) = pixel;
@@ -400,7 +407,7 @@ void mm2_state::mm2(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mm2);
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	PALETTE(config, m_palette, FUNC(mm2_state::palette), 3);
 
 	CRT9007(config, m_vpac, 35.4525_MHz_XTAL/8);
 	m_vpac->set_addrmap(0, &mm2_state::vpac_mem);
