@@ -42138,6 +42138,9 @@ junior80                        //
 @source:skeleton/kkcount.cpp
 kkcount
 
+@source:skeleton/koto_zevio.cpp
+dbzonep                         //
+
 @source:skeleton/kron.cpp
 kron180                         // 1995 Kron Ltd, Ukraine
 
