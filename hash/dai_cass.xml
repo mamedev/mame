@@ -6,9 +6,10 @@ license:CC0-1.0
 
 <softwarelist name="dai_cass" description="DAI Personal Computer cassettes">
 	<software name="biorythm">
-		<description>Calcul du Biorythme (FR)</description>
+		<description>Calcul du Biorythme</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="French" />
 		<info name="usage" value="Press enter, then LOAD then RUN" />
 		<part name="cass1" interface="dai_cass">
 			<dataarea name="cass" size="3417434">
@@ -18,9 +19,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="dgraph">
-		<description>Demonstration Graphique Dai (FR)</description>
+		<description>Demonstration Graphique DAI</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="French" />
 		<info name="usage" value="Press enter, then LOAD then RUN" />
 		<part name="cass1" interface="dai_cass">
 			<dataarea name="cass" size="9209948">
@@ -30,9 +32,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="dessin">
-		<description>Programme de Dessin (FR)</description>
+		<description>Programme de Dessin</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="French" />
 		<info name="usage" value="Press enter, then LOAD then RUN" />
 		<part name="cass1" interface="dai_cass">
 			<dataarea name="cass" size="4020808">
@@ -42,9 +45,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="lewiscar">
-		<description>Lewis Carroll (FR)</description>
+		<description>Lewis Carroll</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="French" />
 		<info name="usage" value="Press enter, then LOAD then RUN" />
 		<part name="cass1" interface="dai_cass">
 			<dataarea name="cass" size="5123796">
@@ -54,9 +58,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="morpion">
-		<description>Jeu de Morpion (FR)</description>
+		<description>Jeu de Morpion</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="French" />
 		<info name="usage" value="Press enter, then LOAD then RUN" />
 		<part name="cass1" interface="dai_cass">
 			<dataarea name="cass" size="4866728">
@@ -66,9 +71,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="nautilus">
-		<description>Chasse Sous-marine (FR)</description>
+		<description>Chasse Sous-marine</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="French" />
 		<info name="usage" value="Press enter, then LOAD then RUN" />
 		<part name="cass1" interface="dai_cass">
 			<dataarea name="cass" size="9359566">
@@ -102,9 +108,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="acrobat" supported="no"><!-- Runs, but needs joystick support -->
-		<description>De Acrobaten (NL)</description>
+		<description>De Acrobaten</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="Dutch" />
 		<info name="usage" value="Press enter, then UT then Z3 then R then G400" />
 		<part name="cass1" interface="dai_cass">
 			<dataarea name="cass" size="8474728">
