@@ -6,12 +6,10 @@ C=65 / C=64DX (c) 1991 Commodore
 
 TODO:
 - Fails interpreting BASIC commands
-\- DMA tries this COPY in ROM space $20200 but should really be in work RAM $206;
-\- PC=f27c stz $03d5 have Z=0 but transfers a 0x02?
 - Complete memory model;
 - Complete interrupts;
 - F011 FDC;
-- C=64 mode (with "GO64" at BASIC prompt);
+- C=64 mode (with "GO64" at BASIC prompt, or holding C= key during boot);
 - bios 0 detects an expansion RAM without checking REC first and no matter if there's
   effectively a RAM bank available or not, supposed to bus error or just buggy/hardwired code?
 
@@ -34,6 +32,7 @@ http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C64DX_aka_C65_System
 
 #include "emu.h"
 #include "cpu/m6502/m4510.h"
+#include "machine/input_merger.h"
 #include "machine/mos6526.h"
 #include "sound/mos6581.h"
 
@@ -42,7 +41,8 @@ http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C64DX_aka_C65_System
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL(28'375'160)/8
+#define MAIN_C65_CLOCK XTAL(28'375'160) / 8
+#define MAIN_C64_CLOCK XTAL(14'318'181) / 14 // TODO: unconfirmed
 
 // TODO: move to own file, subclass with f018a and f018b
 // using device_execute_interface will tank performance, avoid it for now.
@@ -284,6 +284,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_cia(*this, "cia_%u", 0U)
 		, m_sid(*this, "sid_%u", 0U)
+		, m_irqs(*this, "irqs")
 		, m_dma(*this, "dma")
 		, m_cram_view(*this, "cram_view")
 		, m_screen(*this, "screen")
@@ -301,6 +302,7 @@ public:
 	required_device<m4510_device> m_maincpu;
 	required_device_array<mos6526_device, 2> m_cia;
 	required_device_array<mos6581_device, 2> m_sid;
+	required_device<input_merger_device> m_irqs;
 	required_device<dmagic_f018_device> m_dma;
 	memory_view m_cram_view;
 	required_device<screen_device> m_screen;
@@ -327,7 +329,6 @@ public:
 	void cia0_porta_w(uint8_t data);
 	uint8_t cia0_portb_r();
 	void cia0_portb_w(uint8_t data);
-	void cia0_irq(int state);
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -442,6 +443,10 @@ void c65_state::vic4567_map(address_map &map)
 			m_VIC3_ControlA = data;
 			// TODO: all the other bits
 			m_cram_view.select(BIT(data, 0));
+			logerror("\tROM @ 8000 %d\n", BIT(data, 3));
+			logerror("\tROM @ a000 %d\n", BIT(data, 4));
+			logerror("\tROM @ c000 %d\n", BIT(data, 5));
+			logerror("\tROM @ e000 %d\n", BIT(data, 7));
 		})
 	);
 	map(0x31, 0x31).lrw8(
@@ -451,6 +456,11 @@ void c65_state::vic4567_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			logerror("CONTROL B %02x\n", data);
 			m_VIC3_ControlB = data;
+			// FAST mode
+			const XTAL clock = BIT(data, 6) ? MAIN_C65_CLOCK : MAIN_C64_CLOCK;
+			m_maincpu->set_unscaled_clock(clock);
+			m_cia[0]->set_unscaled_clock(clock);
+			m_cia[1]->set_unscaled_clock(clock);
 		})
 	);
 }
@@ -462,6 +472,8 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 
 	uint8_t *cptr = &m_ipl_rom->base()[((m_VIC3_ControlA & 0x40) ? 0x9000: 0xd000) + ((m_VIC2_VS_CB_Base & 0x2) << 10)];
 
+	const u32 base_offs = (m_VIC2_VS_CB_Base & 0xf0) << 6;
+
 	// TODO: border area
 	for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
@@ -471,7 +483,7 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 			int yi = (y >> 3);
 			int xm = 7 - ((x / pixel_width) & 7);
 			int ym = (y & 7);
-			uint8_t tile = m_workram[xi + yi * columns + 0x800];
+			uint8_t tile = m_workram[xi + yi * columns + base_offs];
 			uint8_t attr = m_cram[xi + yi * columns];
 			int foreground_color = attr & 0xf;
 			int background_color = m_VIC2_BK0_Color & 0xf;
@@ -592,7 +604,7 @@ void c65_state::c65_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000, 0x07fff).ram().share("work_ram");
 	map(0x08000, 0x0bfff).rom().region("ipl", 0x08000);
-	map(0x0c800, 0x0cfff).rom().region("ipl", 0x0c800);
+	map(0x0c000, 0x0cfff).rom().region("ipl", 0x0c000);
 	map(0x0d000, 0x0d07f).m(*this, FUNC(c65_state::vic4567_map));
 	// 0x0d080, 0x0d09f FDC
 	map(0x0d080, 0x0d09f).lr8(NAME([] (offs_t offset) { return 0; }));
@@ -779,7 +791,7 @@ void c65_state::IRQCheck(uint8_t irq_cause)
 	m_VIC2_IRQPend |= (irq_cause != 0) ? 0x80 : 0x00;
 	m_VIC2_IRQPend |= irq_cause;
 
-	m_maincpu->set_input_line(M4510_IRQ_LINE, m_VIC2_IRQMask & m_VIC2_IRQPend ? ASSERT_LINE : CLEAR_LINE);
+	m_irqs->in_w<1>(m_VIC2_IRQMask & m_VIC2_IRQPend);
 }
 
 INTERRUPT_GEN_MEMBER(c65_state::vic3_vblank_irq)
@@ -787,45 +799,32 @@ INTERRUPT_GEN_MEMBER(c65_state::vic3_vblank_irq)
 	IRQCheck(1);
 }
 
-void c65_state::cia0_irq(int state)
-{
-	logerror("%d IRQ\n",state);
-
-#if 0
-	if(state)
-	{
-		static const char *const c64ports[] = { "C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7" };
-		for(int i=0;i<8;i++)
-			m_keyb_input[i] = ioport(c64ports[i])->read();
-	}
-#endif
-//  m_cia[0]_irq = state;
-//  c65_irq(state || m_vicirq);
-}
-
 void c65_state::c65(machine_config &config)
 {
 	/* basic machine hardware */
-	M4510(config, m_maincpu, MAIN_CLOCK);
+	M4510(config, m_maincpu, MAIN_C65_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c65_state::c65_map);
 	m_maincpu->set_vblank_int("screen", FUNC(c65_state::vic3_vblank_irq));
 
 	// TODO: multiply by x8 because with a more canonical x1 no transfer will complete in time.
 	// is this thing a mixed burst/cycle steal really?
-	DMAGIC_F018(config, m_dma, MAIN_CLOCK * 8);
+	DMAGIC_F018(config, m_dma, MAIN_C65_CLOCK * 8);
 	m_dma->set_space(m_maincpu, AS_PROGRAM);
 
-	MOS6526(config, m_cia[0], MAIN_CLOCK);
+	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irqs"));
+	irq.output_handler().set_inputline(m_maincpu, M4510_IRQ_LINE);
+
+	MOS6526(config, m_cia[0], MAIN_C65_CLOCK);
 	m_cia[0]->set_tod_clock(60);
-	m_cia[0]->irq_wr_callback().set(FUNC(c65_state::cia0_irq));
+	m_cia[0]->irq_wr_callback().set("irqs", FUNC(input_merger_device::in_w<0>));
 	m_cia[0]->pa_rd_callback().set(FUNC(c65_state::cia0_porta_r));
 	m_cia[0]->pa_wr_callback().set(FUNC(c65_state::cia0_porta_w));
 	m_cia[0]->pb_rd_callback().set(FUNC(c65_state::cia0_portb_r));
 	m_cia[0]->pb_wr_callback().set(FUNC(c65_state::cia0_portb_w));
 
-	MOS6526(config, m_cia[1], MAIN_CLOCK);
+	MOS6526(config, m_cia[1], MAIN_C65_CLOCK);
 	m_cia[1]->set_tod_clock(60);
-//  m_cia[1]->irq_wr_callback().set(FUNC(c65_state::c65_cia1_interrupt));
+//  m_cia[1]->irq_wr_callback().set(FUNC(c65_state::cia1_irq)); // NMI
 //  m_cia[1]->pa_rd_callback().set(FUNC(c65_state::c65_cia1_port_a_r));
 //  m_cia[1]->pa_wr_callback().set(FUNC(c65_state::c65_cia1_port_a_w));
 
@@ -837,7 +836,7 @@ void c65_state::c65(machine_config &config)
 	m_screen->set_screen_update(FUNC(c65_state::screen_update));
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
-	m_screen->set_raw(MAIN_CLOCK*4, 910, 0, 640, 262, 0, 200); // mods needed
+	m_screen->set_raw(MAIN_C65_CLOCK*4, 910, 0, 640, 262, 0, 200); // mods needed
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_c65);
@@ -848,13 +847,12 @@ void c65_state::c65(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	// 8580 SID
-	constexpr XTAL sidxtal(XTAL(14'318'181) / 14); // TODO: check exact frequency
-	MOS6581(config, m_sid[0], sidxtal);
+	MOS6581(config, m_sid[0], MAIN_C64_CLOCK);
 	//m_sid->potx().set(FUNC(c64_state::sid_potx_r));
 	//m_sid->poty().set(FUNC(c64_state::sid_poty_r));
 	m_sid[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 
-	MOS6581(config, m_sid[1], sidxtal);
+	MOS6581(config, m_sid[1], MAIN_C64_CLOCK);
 	//m_sid->potx().set(FUNC(c64_state::sid_potx_r));
 	//m_sid->poty().set(FUNC(c64_state::sid_poty_r));
 	m_sid[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
