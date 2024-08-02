@@ -1970,7 +1970,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="bibissc" cloneof="bibi">
-		<description>Bi! Bi! (2600 Screen Search Console)</description>
+		<description>Bi! Bi! (2600 Screen Search console)</description>
 		<year>199?</year>
 		<publisher>Jone Yuan Telephonic Enterprise CO</publisher>
 		<info name="alt_title" value="Skindiver" />
@@ -2150,7 +2150,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="berzerke2" cloneof="berzerk">
-		<description>Berzerk (PAL) (anknown, alt)</description>
+		<description>Berzerk (PAL) (unknown, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2408,7 +2408,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="bobhomessc" cloneof="bobhome">
-		<description>Bobby Is Going Home (2600 Screen Search Console)</description>
+		<description>Bobby Is Going Home (2600 Screen Search console)</description>
 		<year>19??</year>
 		<publisher>Jone Yuan Telephonic Enterprise Co</publisher>
 		<sharedfeat name="compatibility" value="NTSC" />
@@ -2790,7 +2790,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="bridgef" cloneof="bridge">
-		<description>Bridge (Fixed?)</description>
+		<description>Bridge (fixed?)</description>
 		<year>1980</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3245,7 +3245,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="ctimessc" cloneof="plaqueat">
-		<description>Catch Time (2600 Screen Search Console)</description>
+		<description>Catch Time (2600 Screen Search console)</description>
 		<year>19??</year>
 		<publisher>Jone Yuan Telephonic Enterprise Co</publisher>
 		<info name="alt_title" value="Plaque Attack" />
@@ -3386,7 +3386,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 
 	<software name="nexarssc" cloneof="nexar">
 	<!-- Hack? -->
-		<description>The Challenge of.... Nexar (2600 Screen Search Console)</description>
+		<description>The Challenge of.... Nexar (2600 Screen Search console)</description>
 		<year>19??</year>
 		<publisher>Jone Yuan Telephonic Enterprise CO</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
@@ -3445,7 +3445,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="checkersssc" cloneof="checkers" supported="no">
-		<description>Checkers (2600 Screen Search Console)</description>
+		<description>Checkers (2600 Screen Search console)</description>
 		<year>19??</year>
 		<publisher>Jone Yuan Telephonic Enterprise CO</publisher>
 		<sharedfeat name="compatibility" value="NTSC" />
@@ -3572,7 +3572,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="chopcommssc" cloneof="chopcomm">
-		<description>Chopper Command (2600 Screen Search Console)</description>
+		<description>Chopper Command (2600 Screen Search console)</description>
 		<year>19??</year>
 		<publisher>Jone Yuan Telephonic Enterprise CO</publisher>
 		<info name="serial" value="771/333" />
@@ -4306,7 +4306,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="crackpotsssc" cloneof="crackpot">
-		<description>Crackpots (2600 Screen Search Console)</description>
+		<description>Crackpots (2600 Screen Search console)</description>
 		<year>19??</year>
 		<publisher>Jone Yuan Telephonic Enterprise Co</publisher>
 		<sharedfeat name="compatibility" value="NTSC" />
@@ -4824,7 +4824,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="demonatkf" cloneof="demonatk">
-		<description>Demon Attack (Fixed?)</description>
+		<description>Demon Attack (fixed?)</description>
 		<year>1982</year>
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5178,7 +5178,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="dodgeemf" cloneof="dodgeem">
-		<description>Dodge 'Em - Dodger Cars (Fixed?)</description>
+		<description>Dodge 'Em - Dodger Cars (fixed?)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -6920,7 +6920,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="gashogf" cloneof="gashog">
-		<description>Gas Hog (Fixed?)</description>
+		<description>Gas Hog (fixed?)</description>
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7664,7 +7664,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="homerun4k" cloneof="homerun">
-		<description>Home Run (4k)</description>
+		<description>Home Run (4K)</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2623" />
@@ -10562,7 +10562,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="mygolff" cloneof="mygolf">
-		<description>My Golf (PAL) (Fixed?)</description>
+		<description>My Golf (PAL) (fixed?)</description>
 		<year>1990</year>
 		<publisher>HES</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
@@ -14833,7 +14833,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="spaceinvf" cloneof="spaceinv">
-		<description>Space Invaders (Fixed?)</description>
+		<description>Space Invaders (fixed?)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -15023,9 +15023,10 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="spacetun1" cloneof="spacetun">
-		<description>Space Tunnel - Le Tunnel de L'Estace (Puzzy)</description>
+		<description>Space Tunnel - Le Tunnel de l'Espace (Puzzy)</description>
 		<year>1982</year>
 		<publisher>Puzzy</publisher>
+		<info name="alt_title" value="Space Tunnel - Le Tunnel de l'Estace" /> <!-- cartridge title -->
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="space tunnel - le tunnel de l'estace (1982) (puzzy - bit corporation) (pg202).bin" size="4096" crc="1b62e1b8" sha1="a49bf74e006867b4bdd6c0e1a7af76cdad8b76ee"/>
@@ -15993,7 +15994,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="starmastef" cloneof="starmast">
-		<description>StarMaster - Kommando Galaxis (PAL) (Fixed?)</description>
+		<description>StarMaster - Kommando Galaxis (PAL) (fixed?)</description>
 		<year>1982</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16618,7 +16619,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="supermanf" cloneof="superman">
-		<description>Superman (Fixed?)</description>
+		<description>Superman (fixed?)</description>
 		<year>1979</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -18718,7 +18719,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 
 <!-- Since the released cart is undumped, let us include at least these demos to test 3E bankswitch code -->
 	<software name="bdash">
-		<description>Boulder Dash (Demo v2)</description>
+		<description>Boulder Dash (demo v2)</description>
 		<year>2014</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -18732,7 +18733,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="bdash1" cloneof="bdash">
-		<description>Boulder Dash (Demo v1)</description>
+		<description>Boulder Dash (demo v1)</description>
 		<year>2011</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
