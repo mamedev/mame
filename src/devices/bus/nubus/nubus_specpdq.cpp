@@ -23,7 +23,6 @@
 
   TODO:
   * Having no alternate oscillator installed is not emulated.
-  * Work out how active line length is configured.
   * Alternate oscillator calibration is currently failing.  Fixing this
     probably requires a complete cycle-accurate Mac II.
 
@@ -326,22 +325,13 @@ void nubus_specpdq_device::update_crtc()
 	// for some reason you temporarily get invalid screen parameters - ignore them
 	if (m_crtc.valid(*this))
 	{
-		rectangle active(
-				m_crtc.h_start(16) + (m_hdelay * 4),
-				m_crtc.h_end(16) - 1,
-				m_crtc.v_start(),
-				m_crtc.v_end() - 1);
+		int h_start_adj = (m_crtc.h_start(1) + 3) * 16;
 
-		// FIXME: work out how it actually configures the RAMDAC end-of-line
-		// this is a horrible hack
-		if (active.width() < 832)
-			active.set_width(640);
-		else if (active.width() < 1024)
-			active.set_width(832);
-		else if (active.width() < 1152)
-			active.set_width(1024);
-		else
-			active.set_width(1152);
+		rectangle active(
+			h_start_adj,
+			m_crtc.h_end(16) - 1,
+			m_crtc.v_start(),
+			m_crtc.v_end() - 1);
 
 		screen().configure(
 				m_crtc.h_total(16),
