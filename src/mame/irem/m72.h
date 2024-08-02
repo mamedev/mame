@@ -96,7 +96,6 @@ public:
 	void nspiritj(machine_config &config);
 
 	void init_dkgenm72();
-	void init_gallop();
 	void init_m72_8751();
 	void init_dbreedm72();
 	void init_nspirit();

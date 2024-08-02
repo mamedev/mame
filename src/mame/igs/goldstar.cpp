@@ -14546,12 +14546,11 @@ ROM_START( hamhouse9 ) // basically same PCB as above but this has standard PROM
 	ROM_LOAD( "m27256.u43",    0x10000, 0x08000, CRC(a5105928) SHA1(ea3a4fb7a0ca3e14da001beb5aca03bfbd43410d) )
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
-	 // TODO: u24 and u10 are identical, this can't be right. Marking both as bad for now, even though one is good
-	ROM_LOAD( "intel27128.u24", 0x00000, 0x02000, BAD_DUMP CRC(69ce2859) SHA1(68cb0c81a471d09f173d8534d94877f3f5c276f4) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "intel27128.u24", 0x00000, 0x02000, CRC(36486029) SHA1(8b0b7e7ad0252a049c0d3d66f102198a31151991) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_IGNORE( 0x2000 )
 	ROM_LOAD( "hn4827128g.u26", 0x02000, 0x02000, CRC(6ba11862) SHA1(ce34727190689df8d591147dc342fe7bf230ce26) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_IGNORE( 0x2000 )
-	ROM_LOAD( "am27c128.u10",   0x04000, 0x02000, BAD_DUMP CRC(69ce2859) SHA1(68cb0c81a471d09f173d8534d94877f3f5c276f4) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "am27c128.u10",   0x04000, 0x02000, CRC(69ce2859) SHA1(68cb0c81a471d09f173d8534d94877f3f5c276f4) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_IGNORE( 0x2000 )
 	ROM_LOAD( "tms27c128.u11",  0x06000, 0x02000, CRC(61a17c65) SHA1(b1212c45c9c98aba50aeed6a38e17960f868ccd3) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_IGNORE( 0x2000 )
@@ -22115,7 +22114,7 @@ GAMEL( 1991, srmagic,    cmv4,     cm,       cmv4,     cmaster_state,  empty_ini
 GAMEL( 1991, cmv4zg,     cmv4,     cmv4zg,   cmv4,     cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 1)",  MACHINE_NOT_WORKING, layout_cmv4 ) // needs correct I/O, maybe slightly protected
 GAMEL( 1991, cmv4zga,    cmv4,     cmv4zg,   cmv4,     cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 2)",  MACHINE_NOT_WORKING, layout_cmv4 ) // needs correct I/O, maybe slightly protected
 GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse,  ROT0, "bootleg",           "Hamburger House",                             MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
-GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING, layout_cmaster ) // bad reel colors, needs correct I/O
+GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           MACHINE_NOT_WORKING, layout_cmaster ) //needs correct I/O
 
 GAMEL( 1991, tonypok,    0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
 GAME(  1998, jkrmast,    0,        jkrmast,  jkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V515)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // needs correct FG colors and controls

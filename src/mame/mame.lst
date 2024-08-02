@@ -28661,6 +28661,7 @@ amhbattl
 docchift
 mmhammer
 shpchamp
+wwdash
 zenponta
 
 @source:misc/anes.cpp
@@ -30680,7 +30681,17 @@ jubileep                        //
 
 @source:misc/jungleyo.cpp
 frtgenie
+frtgeniea
+frtgenieb
+frtgeniec
+frtgenied
 jungleyo
+magjack
+magjacka
+magjackb
+magjackc
+magjackp
+magjackpa
 
 @source:misc/kas89.cpp
 kas89                           // 1989, SFC S.R.L.

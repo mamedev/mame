@@ -300,10 +300,20 @@ ROM_START( zenponta ) // HA9020-0
 	ROM_LOAD( "29lv160.u3", 0x200000, 0x200000, CRC(76ed6b4a) SHA1(5b3523353771d91c0382b8c2440cae795a8207ed) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
 ROM_END
 
+ROM_START( wwdash )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "s29al004d70tfi01.u1", 0x000000, 0x080000, CRC(b8984518) SHA1(23f8f2988a44bf0f0a14c39363f97f8e1b12cf62) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x400000, "gfx", 0)
+	ROM_LOAD( "s29al016d70tfi01.u2", 0x000000, 0x200000, CRC(c02c4fed) SHA1(e3fd56621fc7ca4558f3044a1b13b6b58dd4c368) )
+	ROM_LOAD( "s29al016d70tfi01.u3", 0x200000, 0x200000, CRC(cd66dc10) SHA1(76051b248882f7b5c0adfd0ae62283a16d440523) )
+ROM_END
+
 }   // anonymous namespace
 
 GAME( 2005, zenponta,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Zenigata Ponta",  MACHINE_NOT_WORKING )
 GAME( 2006, amhbattl,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Acchi Muite Hoi Battle",  MACHINE_NOT_WORKING )
 GAME( 2007, docchift,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Docchi Fighter",  MACHINE_NOT_WORKING )
+GAME( 2007, wwdash,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wan Wan Dash",  MACHINE_NOT_WORKING )
 GAME( 2008, mmhammer,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Mogu Mogu Hammer",  MACHINE_NOT_WORKING )
 GAME( 2008, shpchamp,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Shippe Champion",  MACHINE_NOT_WORKING )
