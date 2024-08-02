@@ -38,7 +38,8 @@
 
 #include <algorithm>
 
-//#define VERBOSE 1
+#define VERBOSE 1
+#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 
@@ -347,7 +348,7 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 {
 	auto const screenbase = util::big_endian_cast<uint8_t const>(&m_vram[0]) + 0x9000;
 
-	int const hstart = m_crtc.h_start(16);
+	int const hstart = (m_crtc.h_start(1) + 3) << 4;
 	int const width = m_crtc.h_active(16);
 	int const vstart = m_crtc.v_start();
 	int const vend = m_crtc.v_end();
