@@ -458,15 +458,10 @@ u16 metro_state::balcube_dsw_r(offs_t offset)
 	u16 const in2 = m_io_in[2]->read();
 
 	u16 result = 0xffff;
-	for (unsigned b = 0; 8 > b; ++b)
+	for (unsigned b = 0; 16 > b; ++b)
 	{
 		if (!BIT(offset, b))
 			result &= (BIT(dsw0, b) << 6) | (BIT(in2, b) << 7);
-	}
-	for (unsigned b = 8; 16 > b; ++b)
-	{
-		if (!BIT(offset, b))
-			result &= BIT(dsw0, b) << 6;
 	}
 	return result;
 }
@@ -706,7 +701,7 @@ void gakusai_state::oki_bank_lo_w(u8 data)
 
 u16 gakusai_state::input_r()
 {
-	u16 const input_sel = *m_input_sel);
+	u16 const input_sel = *m_input_sel;
 	u16 result = 0xffff;
 	// Bit 0 ??
 	if (!BIT(input_sel, 1)) result &= m_io_key[0]->read();
@@ -1225,7 +1220,7 @@ static INPUT_PORTS_START( balcube )
 	JOY_LSB(1, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)
 	JOY_MSB(2, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)
 
-	PORT_START("DSW0")  // Strangely mapped in the 0x400000-0x41ffff range
+	PORT_START("DSW0")  // Switch matrix in the 0x400000-0x41ffff range
 	COINAGE_SERVICE_LOC(SW1)
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy )    )
@@ -1247,7 +1242,7 @@ static INPUT_PORTS_START( balcube )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
-	PORT_START("IN2")   // Strangely mapped in the 0x400000-0x41ffff range
+	PORT_START("IN2")   // Switch matrix in the 0x400000-0x41ffff range
 	PORT_BIT(  0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused
 INPUT_PORTS_END
 
@@ -1264,7 +1259,7 @@ static INPUT_PORTS_START( bangball )
 	JOY_LSB(1, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)
 	JOY_MSB(2, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)
 
-	PORT_START("DSW0")  // Strangely mapped in the 0xc00000-0xc1ffff range
+	PORT_START("DSW0")  // Switch matrix in the 0xc00000-0xc1ffff range
 	COINAGE_SERVICE_LOC(SW1)
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy )    )
@@ -1289,7 +1284,7 @@ static INPUT_PORTS_START( bangball )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Japanese ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
 
-	PORT_START("IN2")   // Strangely mapped in the 0xc00000-0xc1ffff range
+	PORT_START("IN2")   // Switch matrix in the 0xc00000-0xc1ffff range
 	PORT_BIT(  0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // used for debug
 INPUT_PORTS_END
 
@@ -1302,7 +1297,7 @@ static INPUT_PORTS_START( batlbubl )
 	JOY_LSB(1, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)
 	JOY_MSB(2, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)
 
-	PORT_START("DSW0")  // Strangely mapped in the 0x300000-0x31ffff range
+	PORT_START("DSW0")  // Switch matrix in the 0x300000-0x31ffff range
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy )    )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal )  )
@@ -1351,7 +1346,7 @@ static INPUT_PORTS_START( batlbubl )
 	PORT_START("IN0")   // $200004
 	COINS
 
-	PORT_START("IN2")   // Strangely mapped in the 0x300000-0x31ffff range
+	PORT_START("IN2")   // Switch matrix in the 0x300000-0x31ffff range
 	// DSW3 is used for debug (it's not soldered on the PCB)
 	PORT_DIPNAME( 0x0001, 0x0001, "0" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -1392,7 +1387,7 @@ static INPUT_PORTS_START( msgogo )
 	JOY_LSB(1, BUTTON1, BUTTON2, UNKNOWN, UNKNOWN)
 	JOY_MSB(2, BUTTON1, BUTTON2, UNKNOWN, UNKNOWN)
 
-	PORT_START("DSW0")  // Strangely mapped in the 0x300000-0x31ffff range
+	PORT_START("DSW0")  // Switch matrix in the 0x300000-0x31ffff range
 	COINAGE_SERVICE_LOC(SW1)
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy )    )  // 0
@@ -1418,7 +1413,7 @@ static INPUT_PORTS_START( msgogo )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Japanese ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
 
-	PORT_START("IN2")   // Strangely mapped in the 0x300000-0x31ffff range
+	PORT_START("IN2")   // Switch matrix in the 0x300000-0x31ffff range
 	// DSW3 is used for debug (it's not soldered on the PCB)
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )

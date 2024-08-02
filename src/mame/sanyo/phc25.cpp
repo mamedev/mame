@@ -38,13 +38,15 @@ RUN
 *****************************************************************************/
 
 #include "emu.h"
+
+#include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
 #include "sound/ay8910.h"
 #include "video/mc6847.h"
 
-#include "bus/centronics/ctronics.h"
 #include "formats/phc25_cas.h"
-#include "imagedev/cassette.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
 
