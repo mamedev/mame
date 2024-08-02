@@ -450,12 +450,6 @@ void m72_state::nspirit_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-void m72_state::loht_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	static const int a[7] = { 0x0000, 0x0020, 0, 0x2c40, 0x4320, 0x7120, 0xb200 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m_audio->set_sample_start(a[data & 0xff]);
-}
-
 void m72_state::dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	static const int a[9] = { 0x00000, 0x00020, 0x02c40, 0x08160, 0x0c8c0, 0x0ffe0, 0x13000, 0x15820, 0x15f40 };

@@ -43,13 +43,11 @@
     - interestingly not only the program ROMs, but the GFX ROMs differ for the
       various sets. Only the Oki ROM is always identical
     - it hits the layer_enable_w popmessage
-    - dip settings are good for frtgenie, need to be checked for the other clones
     - title screen uses 4th 'reel'. Not implemented yet.
 
    Magical Jack (Plus)
     - with a clean NVRAM MAME needs to be soft reset after init or the game
         will trip a '1111 exception';
-    - dip settings TBD.
 
 ===============================================================================
 
@@ -477,12 +475,11 @@ static INPUT_PORTS_START( frtgenie )
 	PORT_DIPSETTING(      0x0010, "40" )
 	PORT_DIPSETTING(      0x0000, "80" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "DSW1:6" ) // no effect in system settings
-	PORT_DIPNAME( 0x0040, 0x0040, "Min. Play" ) PORT_DIPLOCATION("DSW1:7")
-	PORT_DIPSETTING(      0x0000, "1" )
-	PORT_DIPSETTING(      0x0040, "10" )
-	PORT_DIPNAME( 0x0080, 0x0080, "Play Score" ) PORT_DIPLOCATION("DSW1:8")
-	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x00c0, 0x00c0, "10 Times Feature" ) PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(      0x0000, "No (Win Points to Points)" )
+	PORT_DIPSETTING(      0x0080, "No (Win Points to Score)" )
+	PORT_DIPSETTING(      0x0040, "Yes (Free Spin Deducts Credits)" )
+	PORT_DIPSETTING(      0x00c0, "Yes (Normal)" )
 	PORT_DIPNAME( 0x0700, 0x0700, "Coin In" ) PORT_DIPLOCATION("DSW2:1,2,3")
 	PORT_DIPSETTING(      0x0700, "1" )
 	PORT_DIPSETTING(      0x0300, "4" )
@@ -555,6 +552,297 @@ static INPUT_PORTS_START( frtgenie )
 	PORT_DIPSETTING(      0x4000, "75" )
 	PORT_DIPSETTING(      0x8000, "100" )
 	PORT_DIPSETTING(      0x0000, "500" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( frtgeniea )
+	PORT_INCLUDE( frtgenie )
+
+	PORT_MODIFY("DSW12")
+	PORT_DIPNAME( 0x0010, 0x0010, "Max. Play" ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(      0x0010, "120" )
+	PORT_DIPSETTING(      0x0000, "240" )
+
+	PORT_MODIFY("DSW34")
+	PORT_DIPNAME( 0x0003, 0x0003, "Game Limit" ) PORT_DIPLOCATION("DSW3:1,2")
+	PORT_DIPSETTING(      0x0003, "50000" )
+	PORT_DIPSETTING(      0x0001, "100000" )
+	PORT_DIPSETTING(      0x0002, "200000" )
+	PORT_DIPSETTING(      0x0000, "500000" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( frtgenieb )
+	PORT_INCLUDE( frtgenie )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 )
+
+	PORT_MODIFY("DSW34")
+	PORT_DIPNAME( 0x0100, 0x0100, "Must Off" ) PORT_DIPLOCATION("DSW4:1") // sic
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( frtgeniec )
+	PORT_INCLUDE( frtgenieb )
+
+	PORT_MODIFY("DSW12")
+	PORT_DIPNAME( 0x0007, 0x0007, "Main Game Rate" ) PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPSETTING(      0x0007, "90%" )
+	PORT_DIPSETTING(      0x0003, "83%" )
+	PORT_DIPSETTING(      0x0005, "76%" )
+	PORT_DIPSETTING(      0x0001, "69%" )
+	PORT_DIPSETTING(      0x0006, "62%" )
+	PORT_DIPSETTING(      0x0002, "55%" )
+	PORT_DIPSETTING(      0x0004, "48%" )
+	PORT_DIPSETTING(      0x0000, "41%" )
+
+	PORT_MODIFY("DSW34")
+	PORT_DIPNAME( 0x0003, 0x0003, "Game Limit" ) PORT_DIPLOCATION("DSW3:1,2")
+	PORT_DIPSETTING(      0x0003, "10000" )
+	PORT_DIPSETTING(      0x0001, "50000" )
+	PORT_DIPSETTING(      0x0002, "100000" )
+	PORT_DIPSETTING(      0x0000, "200000" )
+	PORT_DIPNAME( 0x0008, 0x0008, "One Start One Ticket" ) PORT_DIPLOCATION("DSW3:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Take Score Speed" ) PORT_DIPLOCATION("DSW3:7") // actually spelt 'Rell Speed'
+	PORT_DIPSETTING(      0x0040, "Normal" )
+	PORT_DIPSETTING(      0x0000, "Fast" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( frtgenied )
+	PORT_INCLUDE( frtgenie )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / All Stop")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Take / Hold / Stop1")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Big / Stop 2")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Small / Stop3")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Sw")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+
+	PORT_MODIFY("DSW12")
+	PORT_DIPNAME( 0x0038, 0x0038, "Min. Bet" ) PORT_DIPLOCATION("DSW1:4,5,6")
+	PORT_DIPSETTING(      0x0038, "1" )
+	PORT_DIPSETTING(      0x0018, "8" )
+	PORT_DIPSETTING(      0x0028, "16" )
+	PORT_DIPSETTING(      0x0008, "24" )
+	PORT_DIPSETTING(      0x0030, "32" )
+	PORT_DIPSETTING(      0x0010, "48" )
+	PORT_DIPSETTING(      0x0020, "64" )
+	PORT_DIPSETTING(      0x0000, "80" )
+	PORT_DIPNAME( 0x00c0, 0x00c0, "Max. Bet" ) PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(      0x00c0, "32" )
+	PORT_DIPSETTING(      0x0040, "64" )
+	PORT_DIPSETTING(      0x0080, "80" )
+	PORT_DIPSETTING(      0x0000, "120" )
+	PORT_DIPNAME( 0x0700, 0x0700, "Coin In" ) PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPSETTING(      0x0700, "1" )
+	PORT_DIPSETTING(      0x0300, "2" )
+	PORT_DIPSETTING(      0x0500, "5" )
+	PORT_DIPSETTING(      0x0100, "10" )
+	PORT_DIPSETTING(      0x0600, "20" )
+	PORT_DIPSETTING(      0x0200, "25" )
+	PORT_DIPSETTING(      0x0400, "50" )
+	PORT_DIPSETTING(      0x0000, "100" )
+	PORT_DIPNAME( 0x3800, 0x3800, "Key In" ) PORT_DIPLOCATION("DSW2:4,5,6")
+	PORT_DIPSETTING(      0x3800, "1" )
+	PORT_DIPSETTING(      0x1800, "5" )
+	PORT_DIPSETTING(      0x2800, "10" )
+	PORT_DIPSETTING(      0x0800, "30" )
+	PORT_DIPSETTING(      0x3000, "50" )
+	PORT_DIPSETTING(      0x1000, "100" )
+	PORT_DIPSETTING(      0x2000, "200" )
+	PORT_DIPSETTING(      0x0000, "500" )
+	PORT_DIPNAME( 0xc000, 0xc000, "Pay Out" ) PORT_DIPLOCATION("DSW2:7,8")
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0xc000, "10" )
+	PORT_DIPSETTING(      0x4000, "50" )
+	PORT_DIPSETTING(      0x8000, "100" )
+
+	PORT_MODIFY("DSW34")
+	PORT_DIPNAME( 0x0007, 0x0007, "Game Limit" ) PORT_DIPLOCATION("DSW3:1,2,3")
+	PORT_DIPSETTING(      0x0007, "5000" )
+	PORT_DIPSETTING(      0x0003, "10000" )
+	PORT_DIPSETTING(      0x0005, "20000" )
+	PORT_DIPSETTING(      0x0001, "30000" )
+	PORT_DIPSETTING(      0x0006, "50000" )
+	PORT_DIPSETTING(      0x0002, "80000" )
+	PORT_DIPSETTING(      0x0004, "100000" )
+	PORT_DIPSETTING(      0x0000, "200000" )
+	PORT_DIPNAME( 0x0018, 0x0018, "Credit Limit" ) PORT_DIPLOCATION("DSW3:4,5")
+	PORT_DIPSETTING(      0x0018, "5000" )
+	PORT_DIPSETTING(      0x0008, "10000" )
+	PORT_DIPSETTING(      0x0010, "50000" )
+	PORT_DIPSETTING(      0x0000, "100000" )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW3:6")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Strip Girl Available" ) PORT_DIPLOCATION("DSW3:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Min. Bet For Bonus" ) PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPSETTING(      0x0080, "8" )
+	PORT_DIPSETTING(      0x0000, "16" )
+	PORT_DIPNAME( 0x0300, 0x0300, "Double Up Rate" ) PORT_DIPLOCATION("DSW4:1,2")
+	PORT_DIPSETTING(      0x0000, "70%" )
+	PORT_DIPSETTING(      0x0200, "75%" )
+	PORT_DIPSETTING(      0x0100, "80%" )
+	PORT_DIPSETTING(      0x0300, "85%" )
+	PORT_DIPNAME( 0x3000, 0x3000, "Pay Out Limit" ) PORT_DIPLOCATION("DSW4:5,6")
+	PORT_DIPSETTING(      0x1000, "300" )
+	PORT_DIPSETTING(      0x2000, "400" )
+	PORT_DIPSETTING(      0x0000, "500" )
+	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0xc000, 0xc000, "Key Out" ) PORT_DIPLOCATION("DSW4:7,8")
+	PORT_DIPSETTING(      0xc000, "10" )
+	PORT_DIPSETTING(      0x4000, "50" )
+	PORT_DIPSETTING(      0x8000, "100" )
+	PORT_DIPSETTING(      0x0000, "500" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( magjack )
+	PORT_INCLUDE( frtgenie )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Take / Stop3")
+
+	PORT_MODIFY("DSW12")
+	PORT_DIPNAME( 0x0018, 0x0018, "Min. Bet" ) PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPSETTING(      0x0018, "1" )
+	PORT_DIPSETTING(      0x0008, "8" )
+	PORT_DIPSETTING(      0x0010, "16" )
+	PORT_DIPSETTING(      0x0000, "32" )
+	PORT_DIPNAME( 0x0060, 0x0060, "Max. Bet" ) PORT_DIPLOCATION("DSW1:6,7")
+	PORT_DIPSETTING(      0x0060, "16" )
+	PORT_DIPSETTING(      0x0020, "32" )
+	PORT_DIPSETTING(      0x0040, "64" )
+	PORT_DIPSETTING(      0x0000, "96" )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8") // no effect in test mode
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0700, 0x0700, "Coin In" ) PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPSETTING(      0x0700, "1" )
+	PORT_DIPSETTING(      0x0300, "2" )
+	PORT_DIPSETTING(      0x0500, "5" )
+	PORT_DIPSETTING(      0x0100, "10" )
+	PORT_DIPSETTING(      0x0600, "20" )
+	PORT_DIPSETTING(      0x0200, "25" )
+	PORT_DIPSETTING(      0x0400, "50" )
+	PORT_DIPSETTING(      0x0000, "100" )
+	PORT_DIPNAME( 0x3800, 0x3800, "Key In" ) PORT_DIPLOCATION("DSW2:4,5,6")
+	PORT_DIPSETTING(      0x3800, "1" )
+	PORT_DIPSETTING(      0x1800, "5" )
+	PORT_DIPSETTING(      0x2800, "10" )
+	PORT_DIPSETTING(      0x0800, "30" )
+	PORT_DIPSETTING(      0x3000, "50" )
+	PORT_DIPSETTING(      0x1000, "100" )
+	PORT_DIPSETTING(      0x2000, "200" )
+	PORT_DIPSETTING(      0x0000, "500" )
+
+	PORT_MODIFY("DSW34")
+	PORT_DIPNAME( 0x0008, 0x0008, "Display Rate Table" ) PORT_DIPLOCATION("DSW3:4")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0300, 0x0300, "Double Up Rate" ) PORT_DIPLOCATION("DSW4:1,2")
+	PORT_DIPSETTING(      0x0300, "98%" )
+	PORT_DIPSETTING(      0x0100, "96%" )
+	PORT_DIPSETTING(      0x0200, "94%" )
+	PORT_DIPSETTING(      0x0000, "92%" )
+	PORT_DIPNAME( 0x1000, 0x1000, "Strip Girl Available" ) PORT_DIPLOCATION("DSW4:5")
+	PORT_DIPSETTING(      0x1000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0xe000, 0xe000, "Key Out" ) PORT_DIPLOCATION("DSW4:6,7,8")
+	PORT_DIPSETTING(      0xe000, "1" )
+	PORT_DIPSETTING(      0x6000, "2" )
+	PORT_DIPSETTING(      0xa000, "5" )
+	PORT_DIPSETTING(      0x2000, "10" )
+	PORT_DIPSETTING(      0xc000, "20" )
+	PORT_DIPSETTING(      0x4000, "40" )
+	PORT_DIPSETTING(      0x8000, "100" )
+	PORT_DIPSETTING(      0x0000, "500" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( magjacka )
+	PORT_INCLUDE( magjack )
+
+	PORT_MODIFY("DSW34")
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW3:6")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( magjackb )
+	PORT_INCLUDE( magjacka )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in input test
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Sw")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( magjackc )
+	PORT_INCLUDE( magjackb )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / All Stop")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+
+	PORT_MODIFY("DSW12")
+	PORT_DIPNAME( 0x0080, 0x0080, "Hold Function" ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW34")
+	PORT_DIPNAME( 0x0080, 0x0080, "Fever Min. Bet" ) PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPSETTING(      0x0080, "8" )
+	PORT_DIPSETTING(      0x0000, "16" )
+	PORT_DIPNAME( 0x1000, 0x1000, "Take Score Speed" ) PORT_DIPLOCATION("DSW4:5")
+	PORT_DIPSETTING(      0x1000, "Slow" )
+	PORT_DIPSETTING(      0x0000, "Fast" )
+	PORT_DIPNAME( 0x2000, 0x2000, "Strip Girl Available" ) PORT_DIPLOCATION("DSW4:6")
+	PORT_DIPSETTING(      0x2000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0xc000, 0xc000, "Key Out" ) PORT_DIPLOCATION("DSW4:7,8")
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0xc000, "10" )
+	PORT_DIPSETTING(      0x4000, "20" )
+	PORT_DIPSETTING(      0x8000, "50" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( magjackp )
+	PORT_INCLUDE( magjack )
+
+	PORT_MODIFY("DSW12")
+	PORT_DIPNAME( 0x0080, 0x0080, "Win Points to Score" ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
+	PORT_DIPNAME( 0x3800, 0x3800, "Key In" ) PORT_DIPLOCATION("DSW2:4,5,6")
+	PORT_DIPSETTING(      0x3800, "1" )
+	PORT_DIPSETTING(      0x1800, "4" )
+	PORT_DIPSETTING(      0x2800, "5" )
+	PORT_DIPSETTING(      0x0800, "15" )
+	PORT_DIPSETTING(      0x3000, "25" )
+	PORT_DIPSETTING(      0x1000, "75" )
+	PORT_DIPSETTING(      0x2000, "100" )
+	PORT_DIPSETTING(      0x0000, "500" )
+
+	PORT_MODIFY("DSW34")
+	PORT_DIPNAME( 0x0080, 0x0080, "Fever Min. Bet" ) PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPSETTING(      0x0080, "8" )
+	PORT_DIPSETTING(      0x0000, "16" )
 INPUT_PORTS_END
 
 
@@ -939,18 +1227,18 @@ void jungleyo_state::init_magjack()
 } // anonymous namespace
 
 
-GAME( 2001, jungleyo,  0,        jungleyo, jungleyo, jungleyo_state, init_jungleyo,       ROT0, "Yonshi",       "Jungle (Italy VI3.02)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, jungleyo,  0,        jungleyo, jungleyo,  jungleyo_state, init_jungleyo,       ROT0, "Yonshi",       "Jungle (Italy VI3.02)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2003, frtgenie,  0,        jungleyo, frtgenie, jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 1)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, frtgeniea, frtgenie, jungleyo, frtgenie, jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, frtgenieb, frtgenie, jungleyo, frtgenie, jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 3)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, frtgeniec, frtgenie, jungleyo, frtgenie, jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 4)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, frtgenied, frtgenie, jungleyo, frtgenie, jungleyo_state, init_jungleyo,       ROT0, "Winnin World", "Fruit Genie (VT 2.11)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, frtgenie,  0,        jungleyo, frtgenie,  jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 1)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, frtgeniea, frtgenie, jungleyo, frtgeniea, jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, frtgenieb, frtgenie, jungleyo, frtgenieb, jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 3)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, frtgeniec, frtgenie, jungleyo, frtgeniec, jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 4)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, frtgenied, frtgenie, jungleyo, frtgenied, jungleyo_state, init_jungleyo,       ROT0, "Winnin World", "Fruit Genie (VT 2.11)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, magjack,   0,        jungleyo, frtgenie, jungleyo_state, init_magjack<0x260>, ROT0, "Global",       "Magical Jack (VA 4.00)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2000/09/28
-GAME( 2000, magjacka,  magjack,  jungleyo, frtgenie, jungleyo_state, init_magjack<0x268>, ROT0, "Global",       "Magical Jack (VA 3.30)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2000/08/04
-GAME( 2000, magjackb,  magjack,  jungleyo, frtgenie, jungleyo_state, init_magjack<0x268>, ROT0, "Global",       "Magical Jack (VA 3.11)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2000/06/29
-GAME( 1999, magjackc,  magjack,  jungleyo, frtgenie, jungleyo_state, init_magjack<0x268>, ROT0, "Global",       "Magical Jack (VA 2.0)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 1999/10/28
+GAME( 2000, magjack,   0,        jungleyo, magjack,   jungleyo_state, init_magjack<0x260>, ROT0, "Global",       "Magical Jack (VA 4.00)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2000/09/28
+GAME( 2000, magjacka,  magjack,  jungleyo, magjacka,  jungleyo_state, init_magjack<0x268>, ROT0, "Global",       "Magical Jack (VA 3.30)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2000/08/04
+GAME( 2000, magjackb,  magjack,  jungleyo, magjackb,  jungleyo_state, init_magjack<0x268>, ROT0, "Global",       "Magical Jack (VA 3.11)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2000/06/29
+GAME( 1999, magjackc,  magjack,  jungleyo, magjackc,  jungleyo_state, init_magjack<0x268>, ROT0, "Global",       "Magical Jack (VA 2.0)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 1999/10/28
 
-GAME( 2001, magjackp,  0,        jungleyo, frtgenie, jungleyo_state, init_magjack<0x1fe>, ROT0, "Global",       "Magical Jack Plus (VA 6.03)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001/07/23
-GAME( 2000, magjackpa, magjackp, jungleyo, frtgenie, jungleyo_state, init_magjack<0x1fe>, ROT0, "Global",       "Magical Jack Plus (VA 6.01)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001/02/14
+GAME( 2001, magjackp,  0,        jungleyo, magjackp,  jungleyo_state, init_magjack<0x1fe>, ROT0, "Global",       "Magical Jack Plus (VA 6.03)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001/07/23
+GAME( 2000, magjackpa, magjackp, jungleyo, magjackp,  jungleyo_state, init_magjack<0x1fe>, ROT0, "Global",       "Magical Jack Plus (VA 6.01)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001/02/14
