@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:Olivier Galibert, AJR
 /*********************************************************************
 
     formats/msx_dsk.cpp
@@ -9,6 +9,10 @@
 *********************************************************************/
 
 #include "msx_dsk.h"
+
+#include "ioprocs.h"
+#include <cstring>
+
 
 //msx_format::msx_format() : wd177x_format(formats)
 msx_format::msx_format() : upd765_format(formats)
@@ -65,5 +69,32 @@ const msx_format::format msx_format::formats[] = {
 	},
 	{}
 };
+
+int msx_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
+{
+	int result = upd765_format::identify(io, form_factor, variants);
+
+	// Attempt to confirm some typical elements of MSX-DOS boot sectors
+	if(result & FIFID_SIZE) {
+		std::uint8_t sector0[0x100];
+		auto const [err, actual] = read_at(io, 0, sector0, 0x100);
+		// First byte of any bootable disk must be either EB or E9
+		if(!err && actual == 0x100 && (sector0[0] & 0xfd) == 0xe9) {
+			// Z80 boot code is entered at offset 1E
+			if(sector0[0x1e] == 0xc9) {
+				// No actual boot code, so check for magic OEM name instead
+				if(!std::memcmp(&sector0[3], u8"-NO$MSX-", 8))
+					result |= FIFID_SIGN;
+			} else if(sector0[0x1e] == 0xd0 || (sector0[0x1e] == 0x18 && sector0[0x1f] == 0x10)) {
+				int i = sector0[0x1e] == 0x18 ? 0x41 : 0x2f;
+				int j = sector0[i] + 1;
+				if(j <= 0x100 - (8+3) && !std::memcmp(&sector0[j], u8"MSXDOS  SYS", 8+3))
+					result |= FIFID_SIGN;
+			}
+		}
+	}
+
+	return result;
+}
 
 const msx_format FLOPPY_MSX_FORMAT;

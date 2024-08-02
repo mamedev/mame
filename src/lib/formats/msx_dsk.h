@@ -23,6 +23,8 @@ public:
 	virtual const char *description() const noexcept override;
 	virtual const char *extensions() const noexcept override;
 
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+
 private:
 	static const format formats[];
 };
