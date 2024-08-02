@@ -60,7 +60,7 @@
 class altos586_mmu_device : public device_t, public device_memory_interface
 {
 public:
-	typedef device_delegate<void ()> violation_delegate;
+	using violation_delegate = device_delegate<void ()>;
 
 	altos586_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -100,10 +100,10 @@ public:
 	void cpu_if_w(int state);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -269,7 +269,7 @@ void altos586_mmu_device::device_start()
 	m_board->space(AS_PROGRAM).specific(m_mem);
 	m_board->space(AS_IO).specific(m_io);
 
-	m_violation_callback.resolve();
+	m_violation_callback.resolve_safe();
 
 	save_item(NAME(m_user));
 	save_item(NAME(m_cpu_if));
@@ -283,9 +283,8 @@ void altos586_mmu_device::device_start()
 device_memory_interface::space_config_vector altos586_mmu_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO, &m_io_config),
-	};
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_IO, &m_io_config) };
 }
 
 offs_t altos586_mmu_device::phys_mem_addr(offs_t offset)
@@ -301,8 +300,7 @@ void altos586_mmu_device::signal_violation(u16 violation_bits)
 		// TODO: Is this (user mode request) bit actually cleared on real hw?
 		// Is this the right place to do that?
 		m_control &= ~1;
-		if (!m_violation_callback.isnull())
-			m_violation_callback();
+		m_violation_callback();
 	}
 }
 
@@ -396,10 +394,10 @@ public:
 	void altos586(machine_config &config);
 
 protected:
-	// machine-level overrides
+	// driver_device implementation
 	virtual void machine_start() override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -462,11 +460,11 @@ void altos586_state::io_map(address_map &map)
 
 	// These are wired funnily
 	map(0x0080, 0x00ff).lrw16(
-		NAME([this](offs_t offset) { return m_pic->read(~offset & 1); }),
-		NAME([this](offs_t offset, u16 data) { m_pic->write(~offset & 1, data); }));
+			NAME([this] (offs_t offset) { return m_pic->read(~offset & 1); }),
+			NAME([this] (offs_t offset, u16 data) { m_pic->write(~offset & 1, data); }));
 	map(0x0100, 0x01ff).lrw16(
-		NAME([this](offs_t offset) { return m_pit->read(~offset) << 8; }),
-		NAME([this](offs_t offset, u16 data) { m_pit->write(~offset, data >> 8); }));
+			NAME([this] (offs_t offset) { return m_pit->read(~offset) << 8; }),
+			NAME([this] (offs_t offset, u16 data) { m_pit->write(~offset, data >> 8); }));
 
 	map(0x0200, 0x03ff).rw(m_mmu, FUNC(altos586_mmu_device::map_ram_r), FUNC(altos586_mmu_device::map_ram_w));
 
@@ -602,9 +600,8 @@ device_memory_interface::space_config_vector altos586_state::memory_space_config
 {
 	// Spaces we provide the MMU
 	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO, &m_io_config),
-	};
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_IO, &m_io_config) };
 }
 
 static void altos586_floppies(device_slot_interface &device)
@@ -633,7 +630,7 @@ void altos586_state::altos586(machine_config &config)
 	m_mmu->set_violation_callback(FUNC(altos586_state::mmu_violation));
 	m_mmu->syscall_handler().set(m_pic, FUNC(pic8259_device::ir0_w));
 
-	I8086(config, m_cpu, 30_MHz_XTAL/3);
+	I8086(config, m_cpu, 30_MHz_XTAL / 3);
 	m_cpu->set_addrmap(AS_PROGRAM, &altos586_state::cpu_mem);
 	m_cpu->set_addrmap(AS_IO, &altos586_state::cpu_io);
 	m_cpu->set_irq_acknowledge_callback(FUNC(altos586_state::inta_cb));
@@ -652,7 +649,7 @@ void altos586_state::altos586(machine_config &config)
 	m_pit->set_clk<2>(62'500);
 	m_pit->out_handler<2>().set(m_pic, FUNC(pic8259_device::ir1_w));
 
-	Z80(config, m_iop, 8_MHz_XTAL/2);
+	Z80(config, m_iop, 8_MHz_XTAL / 2);
 	m_iop->set_addrmap(AS_PROGRAM, &altos586_state::iop_mem);
 	m_iop->set_addrmap(AS_IO, &altos586_state::iop_io);
 
@@ -675,7 +672,7 @@ void altos586_state::altos586(machine_config &config)
 	pit1.out_handler<1>().set("iop_sio2", FUNC(z80sio_device::rxca_w));
 	pit1.out_handler<1>().append("iop_sio2", FUNC(z80sio_device::txca_w));
 
-	z80sio_device &sio0(Z80SIO(config, "iop_sio0", 8_MHz_XTAL/2));
+	z80sio_device &sio0(Z80SIO(config, "iop_sio0", 8_MHz_XTAL / 2));
 	sio0.out_txda_callback().set("rs232_port3", FUNC(rs232_port_device::write_txd));
 	sio0.out_dtra_callback().set("rs232_port3", FUNC(rs232_port_device::write_dtr));
 	sio0.out_rtsa_callback().set("rs232_port3", FUNC(rs232_port_device::write_rts));
@@ -695,7 +692,7 @@ void altos586_state::altos586(machine_config &config)
 	rs232_port4.dcd_handler().set("iop_sio0", FUNC(z80sio_device::dcdb_w));
 	rs232_port4.cts_handler().set("iop_sio0", FUNC(z80sio_device::ctsb_w));
 
-	z80sio_device &sio1(Z80SIO(config, "iop_sio1", 8_MHz_XTAL/2));
+	z80sio_device &sio1(Z80SIO(config, "iop_sio1", 8_MHz_XTAL / 2));
 	sio1.out_txda_callback().set("rs232_port1", FUNC(rs232_port_device::write_txd));
 	sio1.out_dtra_callback().set("rs232_port1", FUNC(rs232_port_device::write_dtr));
 	sio1.out_rtsa_callback().set("rs232_port1", FUNC(rs232_port_device::write_rts));
@@ -735,7 +732,7 @@ void altos586_state::altos586(machine_config &config)
 	rs232_port6.dcd_handler().set("iop_sio2", FUNC(z80sio_device::dcdb_w));
 	rs232_port6.cts_handler().set("iop_sio2", FUNC(z80sio_device::ctsb_w));
 
-	z80pio_device &pio(Z80PIO(config, "iop_pio", 8_MHz_XTAL/2));
+	z80pio_device &pio(Z80PIO(config, "iop_pio", 8_MHz_XTAL / 2));
 	pio.in_pa_callback().set(FUNC(altos586_state::pio_pa_r));
 	pio.out_pa_callback().set(FUNC(altos586_state::pio_pa_w));
 	pio.out_pb_callback().set(FUNC(altos586_state::pio_pb_w));
@@ -745,11 +742,11 @@ void altos586_state::altos586(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy[0], altos586_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats); // TODO: Sound?
 	FLOPPY_CONNECTOR(config, m_floppy[1], altos586_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
 
-	z80dma_device &dma(Z80DMA(config, "iop_dma", 8_MHz_XTAL/2));
-	dma.in_mreq_callback().set([this](offs_t offset) { return m_iop->space(AS_PROGRAM).read_byte(offset); });
-	dma.out_mreq_callback().set([this](offs_t offset, u8 data) { m_iop->space(AS_PROGRAM).write_byte(offset, data); });
-	dma.in_iorq_callback().set([this](offs_t offset) { return m_iop->space(AS_IO).read_byte(offset); });
-	dma.out_iorq_callback().set([this](offs_t offset, u8 data) { m_iop->space(AS_IO).write_byte(offset, data); });
+	z80dma_device &dma(Z80DMA(config, "iop_dma", 8_MHz_XTAL / 2));
+	dma.in_mreq_callback().set([this] (offs_t offset) { return m_iop->space(AS_PROGRAM).read_byte(offset); });
+	dma.out_mreq_callback().set([this] (offs_t offset, u8 data) { m_iop->space(AS_PROGRAM).write_byte(offset, data); });
+	dma.in_iorq_callback().set([this] (offs_t offset) { return m_iop->space(AS_IO).read_byte(offset); });
+	dma.out_iorq_callback().set([this] (offs_t offset, u8 data) { m_iop->space(AS_IO).write_byte(offset, data); });
 
 	// TODO: The RTC seems to run approx. 2 times slower. Why?
 	MM58167(config, "iop_rtc", 32.768_kHz_XTAL);
@@ -757,7 +754,7 @@ void altos586_state::altos586(machine_config &config)
 	// TODO: Could a multibus-like bus interface be implemented?
 	// This sits on a such bus, but the "backplane" are two 50-pin
 	// ribbon cables w/o a fixed number of slots.
-	ALTOS586_HDC(config, "hdc", 30_MHz_XTAL/3, m_mmu);
+	ALTOS586_HDC(config, "hdc", 30_MHz_XTAL / 3, m_mmu);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("altos586");
 }
