@@ -452,51 +452,38 @@ void metro_state::ymf278_map(address_map &map)
                                     Bal Cube
 ***************************************************************************/
 
-// Really weird way of mapping 3 DSWs
 u16 metro_state::balcube_dsw_r(offs_t offset)
 {
-	u16 const dsw1 = m_io_dsw[0]->read() >> 0;
-	u16 const dsw2 = m_io_dsw[0]->read() >> 8;
-	u16 const dsw3 = m_io_in[2]->read();
+	u16 const dsw0 = m_io_dsw[0]->read();
+	u16 const in2 = m_io_in[2]->read();
 
-	switch (offset * 2)
+	u16 result = 0xffff;
+	for (unsigned b = 0; 8 > b; ++b)
 	{
-		case 0x1FFFC:   return (BIT(dsw1, 0) ? 0x40 : 0) | (BIT(dsw3, 0) ? 0x80 : 0);
-		case 0x1FFFA:   return (BIT(dsw1, 1) ? 0x40 : 0) | (BIT(dsw3, 1) ? 0x80 : 0);
-		case 0x1FFF6:   return (BIT(dsw1, 2) ? 0x40 : 0) | (BIT(dsw3, 2) ? 0x80 : 0);
-		case 0x1FFEE:   return (BIT(dsw1, 3) ? 0x40 : 0) | (BIT(dsw3, 3) ? 0x80 : 0);
-		case 0x1FFDE:   return (BIT(dsw1, 4) ? 0x40 : 0) | (BIT(dsw3, 4) ? 0x80 : 0);
-		case 0x1FFBE:   return (BIT(dsw1, 5) ? 0x40 : 0) | (BIT(dsw3, 5) ? 0x80 : 0);
-		case 0x1FF7E:   return (BIT(dsw1, 6) ? 0x40 : 0) | (BIT(dsw3, 6) ? 0x80 : 0);
-		case 0x1FEFE:   return (BIT(dsw1, 7) ? 0x40 : 0) | (BIT(dsw3, 7) ? 0x80 : 0);
-
-		case 0x1FDFE:   return BIT(dsw2, 0) ? 0x40 : 0;
-		case 0x1FBFE:   return BIT(dsw2, 1) ? 0x40 : 0;
-		case 0x1F7FE:   return BIT(dsw2, 2) ? 0x40 : 0;
-		case 0x1EFFE:   return BIT(dsw2, 3) ? 0x40 : 0;
-		case 0x1DFFE:   return BIT(dsw2, 4) ? 0x40 : 0;
-		case 0x1BFFE:   return BIT(dsw2, 5) ? 0x40 : 0;
-		case 0x17FFE:   return BIT(dsw2, 6) ? 0x40 : 0;
-		case 0x0FFFE:   return BIT(dsw2, 7) ? 0x40 : 0;
+		if (!BIT(offset, b))
+			result &= (BIT(dsw0, b) << 6) | (BIT(in2, b) << 7);
 	}
-	if (!machine().side_effects_disabled())
-		logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n", m_maincpu->pc(), offset);
-	return 0xffff;
+	for (unsigned b = 8; 16 > b; ++b)
+	{
+		if (!BIT(offset, b))
+			result &= BIT(dsw0, b) << 6;
+	}
+	return result;
 }
 
 
 void metro_state::balcube_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                             // ROM
-	map(0x300001, 0x300001).r("ymf", FUNC(ymf278b_device::read));   // Sound
+	map(0x000000, 0x07ffff).rom();                                                 // ROM
+	map(0x300001, 0x300001).r("ymf", FUNC(ymf278b_device::read));                  // Sound
 	map(0x300000, 0x30000b).w("ymf", FUNC(ymf278b_device::write)).umask16(0x00ff); // Sound
-	map(0x400000, 0x41ffff).r(FUNC(metro_state::balcube_dsw_r));                             // DSW x 3
-	map(0x500000, 0x500001).portr("IN0");                                // Inputs
-	map(0x500002, 0x500003).portr("IN1");                                //
-	map(0x500006, 0x500007).nopr();                                         //
-	map(0x500002, 0x500009).w(FUNC(metro_state::coin_lockout_4words_w));              // Coin Lockout
+	map(0x400000, 0x41ffff).r(FUNC(metro_state::balcube_dsw_r));                   // DSW x 3
+	map(0x500000, 0x500001).portr("IN0");                                          // Inputs
+	map(0x500002, 0x500003).portr("IN1");                                          //
+	map(0x500006, 0x500007).nopr();                                                //
+	map(0x500002, 0x500009).w(FUNC(metro_state::coin_lockout_4words_w));           // Coin Lockout
 	map(0x600000, 0x67ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
+	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                                // RAM (mirrored)
 }
 
 
@@ -507,16 +494,16 @@ void metro_state::balcube_map(address_map &map)
 
 void metro_state::daitoa_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                             // ROM
+	map(0x000000, 0x07ffff).rom();                                                 // ROM
 	map(0x100000, 0x17ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x200000, 0x200001).portr("IN0");                                // Inputs
-	map(0x200002, 0x200003).portr("IN1");                                //
-	map(0x200006, 0x200007).nopr();                                         //
-	map(0x200002, 0x200009).w(FUNC(metro_state::coin_lockout_4words_w));              // Coin Lockout
-	map(0x300000, 0x31ffff).r(FUNC(metro_state::balcube_dsw_r));                             // DSW x 3
-	map(0x400001, 0x400001).r("ymf", FUNC(ymf278b_device::read));   // Sound
+	map(0x200000, 0x200001).portr("IN0");                                          // Inputs
+	map(0x200002, 0x200003).portr("IN1");                                          //
+	map(0x200006, 0x200007).nopr();                                                //
+	map(0x200002, 0x200009).w(FUNC(metro_state::coin_lockout_4words_w));           // Coin Lockout
+	map(0x300000, 0x31ffff).r(FUNC(metro_state::balcube_dsw_r));                   // DSW x 3
+	map(0x400001, 0x400001).r("ymf", FUNC(ymf278b_device::read));                  // Sound
 	map(0x400000, 0x40000b).w("ymf", FUNC(ymf278b_device::write)).umask16(0x00ff); // Sound
-	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
+	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                                // RAM (mirrored)
 }
 
 
@@ -526,16 +513,16 @@ void metro_state::daitoa_map(address_map &map)
 
 void metro_state::bangball_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                             // ROM
-	map(0xb00001, 0xb00001).r("ymf", FUNC(ymf278b_device::read));   // Sound
+	map(0x000000, 0x07ffff).rom();                                                 // ROM
+	map(0xb00001, 0xb00001).r("ymf", FUNC(ymf278b_device::read));                  // Sound
 	map(0xb00000, 0xb0000b).w("ymf", FUNC(ymf278b_device::write)).umask16(0x00ff); // Sound
-	map(0xc00000, 0xc1ffff).r(FUNC(metro_state::balcube_dsw_r));                             // DSW x 3
-	map(0xd00000, 0xd00001).portr("IN0");                                // Inputs
-	map(0xd00002, 0xd00003).portr("IN1");                                //
-	map(0xd00006, 0xd00007).nopr();                                         //
-	map(0xd00002, 0xd00009).w(FUNC(metro_state::coin_lockout_4words_w));              // Coin Lockout
+	map(0xc00000, 0xc1ffff).r(FUNC(metro_state::balcube_dsw_r));                   // DSW x 3
+	map(0xd00000, 0xd00001).portr("IN0");                                          // Inputs
+	map(0xd00002, 0xd00003).portr("IN1");                                          //
+	map(0xd00006, 0xd00007).nopr();                                                //
+	map(0xd00002, 0xd00009).w(FUNC(metro_state::coin_lockout_4words_w));           // Coin Lockout
 	map(0xe00000, 0xe7ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
+	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                                // RAM (mirrored)
 }
 
 
@@ -545,17 +532,17 @@ void metro_state::bangball_map(address_map &map)
 
 void metro_state::batlbubl_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                             // ROM
+	map(0x000000, 0x0fffff).rom();                                                 // ROM
 	map(0x100000, 0x17ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x200000, 0x200001).portr("IN1");                                // Inputs
-	map(0x200002, 0x200003).portr("DSW0");                               //
-	map(0x200004, 0x200005).portr("IN0");                                //
-	map(0x200006, 0x200007).portr("IN2");                                //
-	map(0x200002, 0x200009).w(FUNC(metro_state::coin_lockout_4words_w));              // Coin Lockout
-	map(0x300000, 0x31ffff).r(FUNC(metro_state::balcube_dsw_r));                             // read but ignored?
-	map(0x400001, 0x400001).r("ymf", FUNC(ymf278b_device::read));   // Sound
+	map(0x200000, 0x200001).portr("IN1");                                          // Inputs
+	map(0x200002, 0x200003).portr("DSW0");                                         //
+	map(0x200004, 0x200005).portr("IN0");                                          //
+	map(0x200006, 0x200007).portr("IN2");                                          //
+	map(0x200002, 0x200009).w(FUNC(metro_state::coin_lockout_4words_w));           // Coin Lockout
+	map(0x300000, 0x31ffff).r(FUNC(metro_state::balcube_dsw_r));                   // read but ignored?
+	map(0x400001, 0x400001).r("ymf", FUNC(ymf278b_device::read));                  // Sound
 	map(0x400000, 0x40000b).w("ymf", FUNC(ymf278b_device::write)).umask16(0x00ff); //
-	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
+	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                                // RAM (mirrored)
 }
 
 
@@ -719,14 +706,15 @@ void gakusai_state::oki_bank_lo_w(u8 data)
 
 u16 gakusai_state::input_r()
 {
-	u16 const input_sel = (*m_input_sel) ^ 0x3e;
+	u16 const input_sel = *m_input_sel);
+	u16 result = 0xffff;
 	// Bit 0 ??
-	if (BIT(input_sel, 1)) return m_io_key[0]->read();
-	if (BIT(input_sel, 2)) return m_io_key[1]->read();
-	if (BIT(input_sel, 3)) return m_io_key[2]->read();
-	if (BIT(input_sel, 4)) return m_io_key[3]->read();
-	if (BIT(input_sel, 5)) return m_io_key[4]->read();
-	return 0xffff;
+	if (!BIT(input_sel, 1)) result &= m_io_key[0]->read();
+	if (!BIT(input_sel, 2)) result &= m_io_key[1]->read();
+	if (!BIT(input_sel, 3)) result &= m_io_key[2]->read();
+	if (!BIT(input_sel, 4)) result &= m_io_key[3]->read();
+	if (!BIT(input_sel, 5)) result &= m_io_key[4]->read();
+	return result;
 }
 
 u8 gakusai_state::gakusai_eeprom_r()
