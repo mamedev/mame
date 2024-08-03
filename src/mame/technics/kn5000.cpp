@@ -100,6 +100,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
+		, m_maincpu_latch(*this, "maincpu_latch")
+		, m_subcpu_latch(*this, "subcpu_latch")
 		, m_fdc(*this, "fdc")
 		, m_checking_device_led_cn11(*this, "checking_device_led_cn11")
 		, m_extension(*this, "extension")
@@ -116,6 +118,8 @@ public:
 private:
 	required_device<tmp94c241_device> m_maincpu;
 	required_device<tmp94c241_device> m_subcpu;
+	required_device<generic_latch_8_device> m_maincpu_latch;
+	required_device<generic_latch_8_device> m_subcpu_latch;
 	required_device<upd72067_device> m_fdc;
 	required_device<beep_device> m_checking_device_led_cn11;
 	required_device<kn5000_extension_device> m_extension;
@@ -167,8 +171,8 @@ void kn5000_state::maincpu_mem(address_map &map)
 
 	//FIXME: map(0x110000, 0x11ffff).m(m_fdc, FUNC(upd765a_device::map)); // Floppy Controller @ IC208
 	//FIXME: map(0x120000, 0x12ffff).w(m_fdc, FUNC(upd765a_device::dack_w)); // Floppy DMA Acknowledge
-	map(0x140000, 0x14ffff).r("to_maincpu_latch", FUNC(generic_latch_8_device::read)); // @ IC23
-	map(0x140000, 0x14ffff).w("to_subcpu_latch", FUNC(generic_latch_8_device::write)); // @ IC22
+	map(0x140000, 0x14ffff).r(m_maincpu_latch, FUNC(generic_latch_8_device::read)); // @ IC23
+	map(0x140000, 0x14ffff).w(m_subcpu_latch, FUNC(generic_latch_8_device::write)); // @ IC22
 	map(0x1703b0, 0x1703df).m("vga", FUNC(mn89304_vga_device::io_map)); // LCD controller @ IC206
 	map(0x1a0000, 0x1bffff).rw("vga", FUNC(mn89304_vga_device::mem_linear_r), FUNC(mn89304_vga_device::mem_linear_w));
 	map(0x1e0000, 0x1fffff).ram(); // 1Mbit SRAM @ IC21 (CS0)  Note: I think this is the message "ERROR in back-up SRAM"
@@ -193,8 +197,8 @@ void kn5000_state::subcpu_mem(address_map &map)
 	// There seems to also be devices at 110000, 130000 and 1e0000
 
 	map(0x000000, 0x0fffff).ram(); // 1Mbyte = 2 * 4Mbit DRAMs @ IC28, IC29
-	map(0x120000, 0x12ffff).r("to_subcpu_latch", FUNC(generic_latch_8_device::read)); // @ IC22
-	map(0x120000, 0x12ffff).w("to_maincpu_latch", FUNC(generic_latch_8_device::write)); // @ IC23
+	map(0x120000, 0x12ffff).r(m_subcpu_latch, FUNC(generic_latch_8_device::read)); // @ IC22
+	map(0x120000, 0x12ffff).w(m_maincpu_latch, FUNC(generic_latch_8_device::write)); // @ IC23
 	//map(0x??????, 0x??????).rw(FUNC(kn5000_state::tone_generator_r), FUNC(kn5000_state::tone_generator_w)); // @ IC303
 	//map(0x??????, 0x??????).rw(FUNC(kn5000_state::dsp1_r), FUNC(kn5000_state::dsp1_w)); // @ IC311
 
@@ -707,7 +711,6 @@ void kn5000_state::kn5000(machine_config &config)
 	TMP94C241(config, m_maincpu, 2 * 8_MHz_XTAL); // TMP94C241F @ IC5
 	// Address bus is set to 32 bits by the pins AM1=+5v and AM0=GND
 	m_maincpu->set_addrmap(AS_PROGRAM, &kn5000_state::maincpu_mem);
-	// Interrupt 0: CLK on "to_maincpu_latch"
 	// Interrupt 4: FDCINT
 	// Interrupt 5: FDCIRQ
 	// Interrupt 6: FDC.H/D
@@ -716,9 +719,6 @@ void kn5000_state::kn5000(machine_config &config)
 	// Interrupt A <edge>: ~CPSCK "Control Panel Serial Clock"
 	// ~NMI: SNS
 	// TC0: FDCTC
-	//
-	// m_maincpu->port?_write().set(FUNC(kn5000_state::maincpu_port?_w));
-	//
 
 
 	// MAINCPU PORT 7:
@@ -806,7 +806,6 @@ void kn5000_state::kn5000(machine_config &config)
 	TMP94C241(config, m_subcpu, 2*10_MHz_XTAL); // TMP94C241F @ IC27
 	// Address bus is set to 8 bits by the pins AM1=GND and AM0=GND
 	m_subcpu->set_addrmap(AS_PROGRAM, &kn5000_state::subcpu_mem);
-	// Interrupt 0: CLK on "to_subcpu_latch"
 
 
 	// SUBCPU PORT D:
@@ -823,8 +822,11 @@ void kn5000_state::kn5000(machine_config &config)
 	});
 
 
-	GENERIC_LATCH_8(config, "to_maincpu_latch"); // @ IC23
-	GENERIC_LATCH_8(config, "to_subcpu_latch"); //  @ IC22
+	GENERIC_LATCH_8(config, m_maincpu_latch); // @ IC23
+	m_maincpu_latch->data_pending_callback().set_inputline(m_maincpu, TLCS900_INT0);
+
+	GENERIC_LATCH_8(config, m_subcpu_latch); //  @ IC22
+	m_subcpu_latch->data_pending_callback().set_inputline(m_subcpu, TLCS900_INT0);
 
 	UPD72067(config, m_fdc, 32'000'000); // actual controller is UPD72068GF-3B9 at IC208
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, TLCS900_INT4);
