@@ -140,6 +140,17 @@ static INPUT_PORTS_START( epo_bowl )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( duelmast )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( epo_sdb )
 	PORT_INCLUDE(xavix)
 
@@ -276,7 +287,6 @@ ROM_END
 
 ROM_START( duelmast )
 	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
-	// dump appears to be good, but game doesn't boot, uses opcodes added in the '2000' type CPU, can be pushed to giving a 'card scanner' error
 	ROM_LOAD("duelmasters.u4", 0x000000, 0x200000, CRC(2f11fcd7) SHA1(d8849c74833e77b8b309e845523f2cdc7ac68054) )
 ROM_END
 
@@ -286,7 +296,8 @@ CONS( 2002, epo_ebox, 0, 0, xavix2000_nv,        epo_ebox,    xavix_state,      
  // die not confirmed, but uses extra opcodes.  (hangs on title screen due to combination of freq_timer_done nested interrupts tripping, and waiting on bits in input ports to change
 CONS( 2002, epo_bowl, 0, 0, xavix2000_i2c_24c04, epo_bowl,    xavix_i2c_state,         init_xavix, "Epoch / SSD Company LTD",       "Excite Bowling (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2003, duelmast, 0, 0, xavix2000_nv,        xavix,       xavix_state,             init_xavix, "Takara / SSD Company LTD",      "Duel Masters (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// takes a long time to boot to a card scanner error
+CONS( 2003, duelmast, 0, 0, xavix2000_i2c_24c04, duelmast,    xavix_duelmast_state,    init_xavix, "Takara / SSD Company LTD",      "Duel Masters (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2004, epo_sdb,  0, 0, xavix2000_nv_sdb,    epo_sdb,     xavix_2000_nv_sdb_state, init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)",  MACHINE_IMPERFECT_SOUND )
 

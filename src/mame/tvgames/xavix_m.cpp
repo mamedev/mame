@@ -453,6 +453,35 @@ uint8_t xavix_state::read_io1(uint8_t direction)
 	return m_in1->read();
 }
 
+uint8_t xavix_duelmast_state::read_io1(uint8_t direction)
+{
+	int pc = m_maincpu->pc();
+
+	// hacks to get it to boot.  It will still spin for a long time on a black
+	// screen before giving a card scanner error, you can bypass that with button 1
+	// but the game isn't playable
+
+	if (pc == 0x3c01)
+		return 0x00;
+
+	if (pc == 0x3c06)
+		return 0x02;
+
+	if (pc == 0x3c14)
+		return 0x04;
+
+	if (pc == 0x3c19)
+		return 0x00;
+
+	if (pc == 0x3c25)
+		return 0x04;
+
+	if (pc == 0x3c2a)
+		return 0x00;
+
+	return m_in1->read();
+}
+
 void xavix_state::write_io0(uint8_t data, uint8_t direction)
 {
 	// no special handling
