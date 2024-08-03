@@ -107,6 +107,8 @@ public:
 		, m_CPL_LED(*this, "CPL_%u", 0U)
 		, m_CPR_LED(*this, "CPR_%u", 0U)
 		, m_led_row(0)
+		, m_mstat(0)
+		, m_sstat(0)
 	{ }
 
 	void kn5000(machine_config &config);
@@ -122,6 +124,8 @@ private:
 	output_finder<50> m_CPL_LED;
 	output_finder<69> m_CPR_LED;
 	uint8_t m_led_row;
+	uint8_t m_mstat;
+	uint8_t m_sstat;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -219,11 +223,11 @@ static INPUT_PORTS_START(kn5000)
 	PORT_DIPSETTING(   0x01, DEF_STR(Off))
 
 	PORT_START("COM_SELECT")
-	PORT_DIPNAME(0x0f, 0x0e, "Computer Interface Selection")
-	PORT_DIPSETTING(   0x0e, "MIDI")
-	PORT_DIPSETTING(   0x0d, "PC1")
-	PORT_DIPSETTING(   0x0b, "PC2")
-	PORT_DIPSETTING(   0x07, "Mac")
+	PORT_DIPNAME(0xf0, 0xe0, "Computer Interface Selection")
+	PORT_DIPSETTING(   0xe0, "MIDI")
+	PORT_DIPSETTING(   0xd0, "PC1")
+	PORT_DIPSETTING(   0xb0, "PC2")
+	PORT_DIPSETTING(   0x70, "Mac")
 
 	PORT_START("CPR_SEG0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -672,6 +676,9 @@ void kn5000_state::cpanel_leds_w(offs_t offset, uint8_t data)
 
 void kn5000_state::machine_start()
 {
+	save_item(NAME(m_mstat));
+	save_item(NAME(m_sstat));
+
 #ifdef EXTENSION_VIEW
 	if(m_extension)
 	{
@@ -713,41 +720,49 @@ void kn5000_state::kn5000(machine_config &config)
 	// m_maincpu->port?_write().set(FUNC(kn5000_state::maincpu_port?_w));
 	//
 
-	// PORT 7:
+
+	// MAINCPU PORT 7:
 	//   bit 5 (~BUSRQ pin): RY/~BY pin of maincpu ROMs
 	m_maincpu->port7_read().set([] { return (1 << 5); }); // checked at EF3735 (v10 ROM)
 
-	// PORT 8:
+
+	// MAINCPU PORT 8:
 	//   bit 6 (~WAIT pin) (input): Something involving VGA.RDY, FDC.DMAACK
 	//                              and shift-register @ IC18
 
-	// PORT A:
+
+	// MAINCPU PORT A:
 	//   bit 0: sub_cpu ~RESET / SRST
 
-	// PORT C:
+
+	// MAINCPU PORT C:
 	//   bit 0 (input) = "check terminal" switch
 	//   bit 1 (output) = "check terminal" LED
 	m_maincpu->portc_read().set([this] { return ioport("CN11")->read(); });
 	m_maincpu->portc_write().set([this] (u8 data) { m_checking_device_led_cn11->set_state(BIT(data, 1) == 0); });
 
-	// PORT D:
+
+	// MAINCPU PORT D:
 	//   bit 0 (output) = FDCRST
 	//   bit 6 (input) = FD.I/O
 	m_maincpu->portd_write().set([this] (u8 data) { m_fdc->reset_w(BIT(data, 0)); });
 	// TODO: bit 6!
 
 
-	// PORT E:
+	// MAINCPU PORT E:
 	//   bit 0 (input) = +5v
 	//   bit 2 (input) = HDDRDY
 	//   bit 4 (?) = MICSNS
 	m_maincpu->porte_read().set([] { return 1; }); //checked at EF05A6 (v10 ROM)
-	                                                   // FIXME: Bit 0 should only be 1 if the optional hard-drive extension board is disabled
+	// FIXME: Bit 0 should only be 1 if the
+	// optional hard-drive extension board is disabled;
 
-	// PORT F:
+
+	// MAINCPU PORT F:
 	//   bit 2 (OUTPUT) = Something related to "RESET CONTROL" circuits?
 
-	// PORT G:
+
+	// MAINCPU PORT G:
 	//   bit 2 (input) = FS1  (Foot Switches and Foot Controler ?)
 	//   bit 3 (input) = FS2
 	//   bit 4 (input) = FC1
@@ -755,22 +770,29 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 6 (input) = FC3
 	//   bit 7 (input) = FC4
 
-	// PORT H:
+
+	// MAINCPU PORT H:
 	//   bit 1 = TC1 Terminal count - microDMA
 	m_maincpu->porth_read().set([] { return 2; }); // area/region detection: checked at EF083E (v10 ROM)
-	                                                   // FIXME: These are resistors on the pcb,
-	                                                   //        but could be declared in the driver as a 2 bit DIP-Switch for area/region selection.
+	// FIXME: These are resistors on the pcb, but could be declared
+	// in the driver as a 2 bit DIP-Switch for area/region selection.
 
-	// PORT Z:
-	//   bit 0 = MSTAT0   SUBCPU: PORT D2
-	//   bit 1 = MSTAT1   SUBCPU: PORT D4
-	//   bit 2 = SSTAT0   SUBCPU: PORT D0
-	//   bit 3 = SSTAT1   SUBCPU: PORT D1
+
+	// MAINCPU PORT Z:
+	//   bit 0 = (output) MSTAT0
+	//   bit 1 = (output) MSTAT1
+	//   bit 2 = (input) SSTAT0
+	//   bit 3 = (input) SSTAT1
 	//   bit 4 = COM.PC2
 	//   bit 5 = COM.PC1
 	//   bit 6 = COM.MAC
 	//   bit 7 = COM.MIDI
-	m_maincpu->portz_read().set_ioport("COM_SELECT");
+	m_maincpu->portz_read().set([this] {
+		return ioport("COM_SELECT")->read() | (m_sstat << 2);
+	});
+	m_maincpu->portz_write().set([this] (u8 data) {
+		m_mstat = data & 3;
+	});
 
 
 	// RX0/TX0 = MRXD/MTXD
@@ -785,6 +807,21 @@ void kn5000_state::kn5000(machine_config &config)
 	// Address bus is set to 8 bits by the pins AM1=GND and AM0=GND
 	m_subcpu->set_addrmap(AS_PROGRAM, &kn5000_state::subcpu_mem);
 	// Interrupt 0: CLK on "to_subcpu_latch"
+
+
+	// SUBCPU PORT D:
+	//   bit 0 = (output) SSTAT0
+	//   bit 1 = (output) SSTAT1
+	//   bit 2 = (input) MSTAT0
+	//   bit 3 (not used)
+	//   bit 4 = (input) MSTAT1
+	m_subcpu->portd_read().set([this] {
+		return (BIT(m_mstat, 0) << 2) | (BIT(m_mstat, 1) << 4);
+	});
+	m_subcpu->portd_write().set([this] (u8 data) {
+		m_sstat = data & 3;
+	});
+
 
 	GENERIC_LATCH_8(config, "to_maincpu_latch"); // @ IC23
 	GENERIC_LATCH_8(config, "to_subcpu_latch"); //  @ IC22
