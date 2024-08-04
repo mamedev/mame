@@ -785,10 +785,10 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 1 = (output) MSTAT1
 	//   bit 2 = (input) SSTAT0
 	//   bit 3 = (input) SSTAT1
-	//   bit 4 = COM.PC2
-	//   bit 5 = COM.PC1
-	//   bit 6 = COM.MAC
-	//   bit 7 = COM.MIDI
+	//   bit 4 = (input) COM.PC2
+	//   bit 5 = (input) COM.PC1
+	//   bit 6 = (input) COM.MAC
+	//   bit 7 = (input) COM.MIDI
 	m_maincpu->portz_read().set([this] {
 		return ioport("COM_SELECT")->read() | (m_sstat << 2);
 	});
@@ -910,10 +910,7 @@ ROM_START(kn5000)
 	ROM_SYSTEM_BIOS(7, "v3", "Version 3") // I have a v3 board but haven't dumped it yet
 	ROMX_LOAD("kn5000_v3_program.rom", 0x00000, 0x200000, NO_DUMP, ROM_BIOS(7))
 
-	ROM_SYSTEM_BIOS(8, "v2", "Version 2") // I've seen one v2 main board for sale on ebay (and it seems to have a different pcb layout & chip references)
-	ROMX_LOAD("kn5000_v2_program.rom", 0x00000, 0x200000, NO_DUMP, ROM_BIOS(8))
-
-	// Note: I've never seen a version 1 main board.
+	// Note: I've never seen boards with versions 1 or 2.
 
 	// Note: Even though this "subprogram" address range contain executable code for the subcpu, it is actually loaded by the maincpu
 	//       from a flash rom and then transfered to the subcpu RAM via the inter-cpu communications latches at some point during boot.
