@@ -19,6 +19,7 @@
 #include "client_ws.hpp"
 
 #include <queue>
+#include <mutex>
 
 namespace bus::ti99::peb {
 
@@ -57,8 +58,7 @@ private:
 
 	void send(const char* message);
 	void send(u8* message, int len);
-	void process_message();
-	void set_td(u8 data);
+	u8 get_rd();
 	void set_tc(u8 data);
 
 	required_device<tipi_attached_device> m_rpi;
@@ -82,9 +82,12 @@ private:
 	int m_attempts;
 	bool m_connected;
 	bool m_rpiconn;
+	int m_pausetime;
 
 	// Incoming queue
 	std::queue<u8> m_indqueue;
+	std::mutex m_mutex;
+	bool m_pending_read;
 
 	// Computer interface
 	u8 m_tc;
