@@ -5,10 +5,11 @@
 C=65 / C=64DX (c) 1991 Commodore
 
 TODO:
-- Fails interpreting BASIC commands
+- Fails interpreting BASIC commands, CPU core bug?
+- DDR/port support from M4510;
 - Complete memory model;
 - Complete interrupts;
-- F011 FDC;
+- F011 FDC (1581 equivalent, does it implies IEC?);
 - C=64 mode (with "GO64" at BASIC prompt, or holding C= key during boot);
 - bios 0 detects an expansion RAM without checking REC first and no matter if there's
   effectively a RAM bank available or not, supposed to bus error or just buggy/hardwired code?
@@ -86,6 +87,7 @@ private:
 	void increment_dst();
 };
 
+// CSG 390957-01
 DEFINE_DEVICE_TYPE(DMAGIC_F018, dmagic_f018_device, "dmagic_f018", "DMAgic F018 Gate Array")
 
 dmagic_f018_device::dmagic_f018_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -336,7 +338,6 @@ public:
 	void init_c65();
 	void init_c65pal();
 
-	INTERRUPT_GEN_MEMBER(vic3_vblank_irq);
 	void c65(machine_config &config);
 	void c65_map(address_map &map);
 protected:
@@ -345,33 +346,61 @@ protected:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
+	virtual void video_reset() override;
 private:
+	// TODO: move to own device
 	uint8_t m_VIC2_IRQPend = 0U, m_VIC2_IRQMask = 0U;
-	/* 0x20: border color (TODO: different thread?) */
 	uint8_t m_VIC2_EXTColor = 0U;
 	uint8_t m_VIC2_VS_CB_Base = 0U;
 	uint8_t m_VIC2_BK0_Color = 0U;
 	uint8_t m_sprite_enable = 0U;
-	/* 0x30: banking + PAL + EXT SYNC */
 	uint8_t m_VIC3_ControlA = 0U;
-	/* 0x31: video modes */
 	uint8_t m_VIC3_ControlB = 0U;
+	bool m_video_enable = false;
+
+	bool m_blink_enable = false;
+	bitmap_ind16 m_bitmap;
+	emu_timer *m_scanline_timer;
+	TIMER_CALLBACK_MEMBER(scanline_cb);
+	std::tuple<u8, bool> get_tile_pixel(int y, int x);
 	void PalEntryFlush(uint8_t offset);
 	void IRQCheck(uint8_t irq_cause);
 };
 
-// TODO: move to own device
 void c65_state::video_start()
 {
+	m_screen->register_screen_bitmap(m_bitmap);
+	m_scanline_timer = timer_alloc(FUNC(c65_state::scanline_cb), this);
+}
+
+void c65_state::video_reset()
+{
+	m_scanline_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 1, 0), m_screen->vpos() + 1);
+	m_video_enable = false;
 }
 
 void c65_state::vic4567_map(address_map &map)
 {
-	map(0x11, 0x11).lr8(
+//  map(0x00, 0x0f) Sprite X/Y
+//  map(0x10, 0x10) bit 8 for Sprites X pos
+	/*
+	 * x--- ---- bit 8 of beam V
+	 * -x-- ---- Extended Color Mode
+	 * --x- ---- Bitmap Mode
+	 * ---x ---- Enable video output
+	 * ---- x--- 25/24 visible rows
+	 * ---- -xxx Screen Soft V Scroll
+	 */
+	map(0x11, 0x11).lrw8(
 		NAME([this] (offs_t offset) {
 			return (m_screen->vpos() & 0x100) >> 1;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_video_enable = bool(BIT(data, 4));
+			logerror("VIC2 $11 mode %02x\n", data);
 		})
 	);
+	// TODO: writes for rasterline irq trigger
 	map(0x12, 0x12).lr8(
 		NAME([this] (offs_t offset) {
 			return (m_screen->vpos() & 0xff);
@@ -385,6 +414,17 @@ void c65_state::vic4567_map(address_map &map)
 			m_sprite_enable = data;
 		})
 	);
+	/*
+	 * ---x ---- Multicolor Mode
+	 * ---- x--- 40/38 visible columns
+	 * ---- -xxx Screen Soft Scroll H
+	 */
+//  map(0x16, 0x16)
+//  map(0x17, 0x17) Sprite magnify V
+	/*
+	 * xxxx ---- Screen RAM base (note bit 4 ignored in C=65 width 80)
+	 * ---- xxx- Character Set base
+	 */
 	map(0x18, 0x18).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_VIC2_VS_CB_Base;
@@ -393,6 +433,13 @@ void c65_state::vic4567_map(address_map &map)
 			m_VIC2_VS_CB_Base = data;
 		})
 	);
+	/*
+	 * x--- ---- Latches high if any IRQ taken below (valid for pending reg only)
+	 * ---- x--- Lightpen input IRQ
+	 * ---- -x-- Sprite-Sprite collision IRQ
+	 * ---- --x- Sprite-Background collision IRQ
+	 * ---- ---x rasterline IRQ
+	 */
 	map(0x19, 0x19).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_VIC2_IRQPend;
@@ -411,12 +458,19 @@ void c65_state::vic4567_map(address_map &map)
 			IRQCheck(0);
 		})
 	);
+//  map(0x1b, 0x1b) Sprite-Background priority
+//  map(0x1c, 0x1c) Sprite multicolor enable
+//  map(0x1d, 0x1d) Sprite magnify X
+//  map(0x1e, 0x1e) Sprite-Sprite collision
+//  map(0x1f, 0x1f) Spirte-background collision
 	map(0x20, 0x20).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_VIC2_EXTColor;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
+			// TODO: all 8-bits in C=65 mode
 			m_VIC2_EXTColor = data & 0xf;
+			//m_screen->update_partial(m_screen->vpos());
 		})
 	);
 	map(0x21, 0x21).lrw8(
@@ -427,12 +481,26 @@ void c65_state::vic4567_map(address_map &map)
 			m_VIC2_BK0_Color = data & 0xf;
 		})
 	);
+//  map(0x21, 0x24) background clut
+//  map(0x25, 0x26) sprite multicolor clut
+//  map(0x27, 0x2e) sprite color clut
 	/*
 	 * KEY register, handles vic-iii and vic-ii modes via two consecutive writes
 	 * 0xa5 -> 0x96 vic-iii mode
 	 * any other write vic-ii mode (changes base memory map)
+	 * vic-iv (MEGA65/C65GS) also has another KEY init sequence
 	 */
 //  map(0x2f, 0x2f)
+	/*
+	 * x--- ---- overlay ROM at $e000
+	 * -x-- ---- Move CROM at @9000
+	 * --x- ---- overlay ROM at $c000
+	 * ---x ---- overlay ROM at $a000
+	 * ---- x--- overlay ROM at $8000
+	 * ---- -x-- read PALette from [P]ROM
+	 * ---- --x- EXT SYNC
+	 * ---- ---x overlay CRAM at $dc00
+	 */
 	map(0x30, 0x30).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_VIC3_ControlA;
@@ -449,6 +517,16 @@ void c65_state::vic4567_map(address_map &map)
 			logerror("\tROM @ e000 %d\n", BIT(data, 7));
 		})
 	);
+	/*
+	 * x--- ---- H640
+	 * -x-- ---- FAST
+	 * --x- ---- ATTR
+	 * ---x ---- BPM Bitplane Mode
+	 * ---- x--- V400
+	 * ---- -x-- H1280
+	 * ---- --x- MONO
+	 * ---- ---x INT
+	 */
 	map(0x31, 0x31).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_VIC3_ControlB;
@@ -463,51 +541,107 @@ void c65_state::vic4567_map(address_map &map)
 			m_cia[1]->set_unscaled_clock(clock);
 		})
 	);
+//  map(0x32, 0x32) Bitplane enable
+//  map(0x33, 0x3a) Bitplane addresses
+//  map(0x3b, 0x3b) BP COMP
+//  map(0x3c, 0x3c) Bitplane X
+//  map(0x3d, 0x3d) Bitplane Y
+//  map(0x3e, 0x3e) Horizontal [screen?] position
+//  map(0x3f, 0x3f) Vertical [screen?] position
+//  map(0x40, 0x47) DAT Bitplane ports
+}
+
+std::tuple<u8, bool> c65_state::get_tile_pixel(int y, int x)
+{
+    // TODO: move width as a screen setup
+	int pixel_width = (m_VIC3_ControlB & 0x80) ? 1 : 2;
+	int columns = 80 / pixel_width;
+
+    // TODO: Move init of these two in handlers
+	uint8_t *cptr = &m_ipl_rom->base()[((m_VIC3_ControlA & 0x40) ? 0x9000: 0xd000) + ((m_VIC2_VS_CB_Base & 0x2) << 10)];
+	const u32 base_offs = (m_VIC2_VS_CB_Base & 0xf0) << 6;
+
+	int xi = (x >> 3) / pixel_width;
+	int yi = (y >> 3);
+	int xm = 7 - ((x / pixel_width) & 7);
+	int ym = (y & 7);
+	uint8_t tile = m_workram[xi + yi * columns + base_offs];
+	uint8_t attr = m_cram[xi + yi * columns];
+	int foreground_color = attr & 0xf;
+	int background_color = m_VIC2_BK0_Color & 0xf;
+	int highlight_color = 0;
+
+	int enable_dot = ((cptr[(tile << 3) + ym] >> xm) & 1);
+
+	if ((attr & 0x80) && ym == 7) enable_dot = 1;
+	if (attr & 0x40) highlight_color = 16;
+	if (attr & 0x20) enable_dot = !enable_dot;
+	if (attr & 0x10 && !m_blink_enable) enable_dot = 0;
+
+	return std::make_tuple(highlight_color + ((enable_dot) ? foreground_color : background_color), enable_dot != 0);
+}
+
+TIMER_CALLBACK_MEMBER(c65_state::scanline_cb)
+{
+	int y = param;
+	uint16_t *p = &m_bitmap.pix(y);
+
+	const int border_left = 0;
+	const int active_left = 32;
+	const int active_right = 640 + active_left;
+	const int border_right = active_right + active_left;
+	const int active_top = 17;
+	const int active_bottom = 200 + active_top;
+
+	int x = border_left;
+
+	if (!m_video_enable)
+	{
+		// TODO: blank color
+		for (x = border_left; x < border_right; x++)
+			p[x] = 0;
+	}
+	else
+	{
+		if (y < active_top || y >= active_bottom)
+		{
+			for (x = border_left; x < border_right; x++)
+				p[x] = m_VIC2_EXTColor;
+		}
+		else
+		{
+			for (x = border_left; x < active_left; x++)
+				p[x] = m_VIC2_EXTColor;
+			for (;x < active_right; x++)
+			{
+				u8 tile_dot;
+				bool is_foreground;
+				// TODO: functional depending on mode
+				// NOTE: VIC-II and VIC-III can switch mid-frame, but latches occur in 8 scanline steps
+                // at least from/to a base C=64 tilemap mode.
+				std::tie(tile_dot, is_foreground) = get_tile_pixel(y - active_top, x - active_left);
+				// TODO: sprites fetch here
+				p[x] = m_palette->pen(tile_dot);
+			}
+			for (;x < border_right; x++)
+				p[x] = m_VIC2_EXTColor;
+		}
+	}
+
+	// TODO: raster irq position
+	if (y == 0xff)
+		IRQCheck(1);
+
+	y += 1;
+	y %= 262;
+	if (y == 0)
+		m_blink_enable = bool((m_screen->frame_number() & 4) == 4);
+	m_scanline_timer->adjust(m_screen->time_until_pos(y, 0), y);
 }
 
 uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int pixel_width = (m_VIC3_ControlB & 0x80) ? 1 : 2;
-	int columns = 80 / pixel_width;
-
-	uint8_t *cptr = &m_ipl_rom->base()[((m_VIC3_ControlA & 0x40) ? 0x9000: 0xd000) + ((m_VIC2_VS_CB_Base & 0x2) << 10)];
-
-	const u32 base_offs = (m_VIC2_VS_CB_Base & 0xf0) << 6;
-
-	// TODO: border area
-	for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
-	{
-		for(int x = cliprect.left(); x <= cliprect.right(); x++)
-		{
-			int xi = (x >> 3) / pixel_width;
-			int yi = (y >> 3);
-			int xm = 7 - ((x / pixel_width) & 7);
-			int ym = (y & 7);
-			uint8_t tile = m_workram[xi + yi * columns + base_offs];
-			uint8_t attr = m_cram[xi + yi * columns];
-			int foreground_color = attr & 0xf;
-			int background_color = m_VIC2_BK0_Color & 0xf;
-			int highlight_color = 0;
-
-			int enable_dot = ((cptr[(tile << 3) + ym] >> xm) & 1);
-
-			if (attr & 0x10)
-			{
-				if ((machine().time().attoseconds() / (ATTOSECONDS_PER_SECOND / 2)) & 1)
-					attr &= 0x0f;
-				else if ((attr & 0xf0) != 0x10)
-					attr &= ~0x10;
-			}
-
-			if ((attr & 0x80) && ym == 7) enable_dot = 1;
-			if (attr & 0x40) highlight_color = 16;
-			if (attr & 0x20) enable_dot = !enable_dot;
-			if (attr & 0x10) enable_dot = 0;
-
-			bitmap.pix(y, x) = m_palette->pen(highlight_color + ((enable_dot) ? foreground_color : background_color));
-		}
-	}
-
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -518,6 +652,7 @@ void c65_state::PalEntryFlush(uint8_t offset)
 
 void c65_state::PalRed_w(offs_t offset, uint8_t data)
 {
+	// TODO: bit 4 for FG/BG, superimposing?
 	m_palred[offset] = data;
 	PalEntryFlush(offset);
 }
@@ -794,17 +929,11 @@ void c65_state::IRQCheck(uint8_t irq_cause)
 	m_irqs->in_w<1>(m_VIC2_IRQMask & m_VIC2_IRQPend);
 }
 
-INTERRUPT_GEN_MEMBER(c65_state::vic3_vblank_irq)
-{
-	IRQCheck(1);
-}
-
 void c65_state::c65(machine_config &config)
 {
 	/* basic machine hardware */
 	M4510(config, m_maincpu, MAIN_C65_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c65_state::c65_map);
-	m_maincpu->set_vblank_int("screen", FUNC(c65_state::vic3_vblank_irq));
 
 	// TODO: multiply by x8 because with a more canonical x1 no transfer will complete in time.
 	// is this thing a mixed burst/cycle steal really?
@@ -831,12 +960,10 @@ void c65_state::c65(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(60);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(c65_state::screen_update));
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
-	m_screen->set_raw(MAIN_C65_CLOCK*4, 910, 0, 640, 262, 0, 200); // mods needed
+	// TODO: stub parameters
+	// C=64 / width 40 modes should actually be running in 320x200
+	m_screen->set_raw(MAIN_C65_CLOCK*4, 910, 0, 640+32 * 2, 262, 0, 200+17*2);
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_c65);
