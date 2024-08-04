@@ -526,7 +526,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="1581demo">
+	<software name="1581demo" supported="no">
 		<description>Commodore 1581 3.5" Disk Drive Demo/Utilities</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
@@ -710,7 +710,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cpm1581">
+	<software name="cpm1581" supported="no">
 		<description>CP/M Version 3.0 (1581)</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
