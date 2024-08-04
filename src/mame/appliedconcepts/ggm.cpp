@@ -9,7 +9,8 @@ After a legal dispute with Chafitz, all rights went to Applied Concepts.
 
 Hardware notes:
 - 6502A 2MHz, SYP6522 VIA
-- 2KB battery-backed RAM(4*HM472114AP-2 or 1*M58725P), no ROM on main PCB
+- 2KB RAM (1*M58725P battery-backed, or 4*2114 / 2*2114 + 2*2114L of which
+  only the first 1KB is battery-backed), no ROM on main PCB
 - 2*74164 shift register, 3*6118P VFD driver
 - 8-digit 14seg VFD panel (same one as in Speak & Spell)
 - 5*4 keypad(unlabeled by default), 1-bit sound
