@@ -732,8 +732,10 @@ void kn5000_state::kn5000(machine_config &config)
 
 
 	// MAINCPU PORT A:
-	//   bit 0: sub_cpu ~RESET / SRST
-
+	//   bit 0 (output) = sub_cpu ~RESET / SRST
+	m_maincpu->porta_write().set([this] (u8 data) {
+		m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+	});
 
 	// MAINCPU PORT C:
 	//   bit 0 (input) = "check terminal" switch
