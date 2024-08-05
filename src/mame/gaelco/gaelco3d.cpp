@@ -1012,7 +1012,7 @@ Gaelco was notorious for using the same ROM labels even when ROM data changed. T
 */
 
 /*
-Speed Up use a small external PCB with a PIC for credit distribution:
+Speed Up uses a small external PCB with a PIC for credit distribution:
   ________________________
  |         ____  ____    |
  |         ····  ····    |
