@@ -1374,6 +1374,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/micropolis_hd.h,FORMATS["MICROPOLIS_HD"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "MICROPOLIS_HD") then
+	files {
+		MAME_DIR.. "src/lib/formats/micropolis_hd.cpp",
+		MAME_DIR.. "src/lib/formats/micropolis_hd.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/mm_dsk.h,FORMATS["MM_DSK"] = true
 --------------------------------------------------
 
