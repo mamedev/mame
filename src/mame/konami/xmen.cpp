@@ -20,7 +20,7 @@ The board only has one of each gfx chip, the only additional chip not found
 on the 2/4p board is 053253. This chip is also on Run n Gun which is
 likewise a 2 screen game.
 
-Reference schematics: https://github.com/jotego/jtbin/blob/master/sch/xmen.pdf
+Reverse-engineered schematics: https://github.com/jotego/jtbin/blob/master/sch/xmen.pdf
 
 ***************************************************************************/
 
