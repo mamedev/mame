@@ -4,7 +4,7 @@
 /*
   Skeleton driver for Alcatel Web Touch One.
   More information and technical manuals: https://www.minitel-alcatel.fr/gamme_webphone.html
-  The phone asks for an adminstrative password for performing a factory reset.
+  The phone asks for an administrative password for performing a factory reset.
 
   Hardware info for model 2840:
    -CPU: Motorola PowerPC 823
