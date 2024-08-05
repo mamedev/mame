@@ -605,7 +605,7 @@ static INPUT_PORTS_START( frtgeniec )
 	PORT_DIPNAME( 0x0008, 0x0008, "One Start One Ticket" ) PORT_DIPLOCATION("DSW3:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Take Score Speed" ) PORT_DIPLOCATION("DSW3:7") // actually spelt 'Rell Speed'
+	PORT_DIPNAME( 0x0040, 0x0040, "Take Score Speed" ) PORT_DIPLOCATION("DSW3:7")
 	PORT_DIPSETTING(      0x0040, "Normal" )
 	PORT_DIPSETTING(      0x0000, "Fast" )
 INPUT_PORTS_END
