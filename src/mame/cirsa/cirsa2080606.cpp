@@ -6,7 +6,7 @@
     Skeleton driver for Unidesa/Cirsa "2080606" slot machines hardware.
 
     The "2080606" PCB (same as "615182080606") is used at least on the following games:
-     - Bing 7 Deluxe
+     - Bingo 7 Deluxe
      - Cat 'n' Mouse
      - Cleopatra
      - El Tesoro de Java
