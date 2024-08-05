@@ -157,6 +157,7 @@
 
 #include "emu.h"
 #include "segaipt.h"
+#include "m50dass.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
@@ -209,6 +210,7 @@ public:
 
 	void tfrceacjpb(machine_config &config);
 	void ribbit(machine_config &config);
+	void c2m50dass(machine_config &config);
 
 	void init_noprot();
 	void init_columns();
@@ -1937,6 +1939,14 @@ void segac2_state::ribbit(machine_config& config)
 	m_upd7759->set_start_delay(250);
 }
 
+// Games supporting Megalo 50 moving seats (DASS)
+void segac2_state::c2m50dass(machine_config& config)
+{
+	segac2(config);
+
+	MEGALO50_DASS(config, "m50dass");
+}
+
 void pclub_state::pclub(machine_config& config)
 {
 	segac2(config);
@@ -3021,7 +3031,7 @@ GAME( 1990, column2j,   columns2, segac,      columns2, segac2_state,    init_co
 /* System C-2 Games */
 GAME( 1990, tfrceac,    0,        segac2,     tfrceac,  segac2_state,    init_tfrceac,  ROT0,   "Technosoft / Sega", "Thunder Force AC", 0 )
 GAME( 1990, tfrceacj,   tfrceac,  segac2,     tfrceac,  segac2_state,    init_tfrceac,  ROT0,   "Technosoft / Sega", "Thunder Force AC (Japan)", 0 )
-GAME( 1990, tfrceacb,   tfrceac,  segac2,     tfrceac,  segac2_state,    init_tfrceacb, ROT0,   "bootleg", "Thunder Force AC (bootleg)", 0 )
+GAME( 1990, tfrceacb,   tfrceac,  segac2,     tfrceac,  segac2_state,    init_tfrceacb, ROT0,   "bootleg",           "Thunder Force AC (bootleg)", 0 )
 GAME( 1990, tfrceacjpb, tfrceac,  tfrceacjpb, tfrceac,  segac2_state,    init_tfrceac,  ROT0,   "Technosoft / Sega", "Thunder Force AC (Japan, prototype, bootleg)", 0 )
 
 GAME( 1990, borench,    0,        segac2,     borench,  segac2_state,    init_borench,  ROT0,   "Sega", "Borench (set 1)", 0 )
@@ -3031,7 +3041,7 @@ GAME( 1990, borenchj,   borench,  segac2,     borench,  segac2_state,    init_bo
 GAME( 1991, ribbit,     0,        ribbit,     ribbit,   segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit!", 0 )
 GAME( 1991, ribbitj,    ribbit,   ribbit,     ribbitj,  segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit! (Japan)", 0 )
 
-GAME( 1991, twinsqua,   0,        segac2,     twinsqua, segac2_state,    init_twinsqua, ROT0,   "Sega", "Twin Squash", 0 )
+GAME( 1991, twinsqua,   0,        c2m50dass,  twinsqua, segac2_state,    init_twinsqua, ROT0,   "Sega", "Twin Squash", 0 )
 
 GAME( 1991, soniccar,   0,        segac2,     soniccar, segac2_state,    init_noprot,   ROT0,   "Sega", "Waku Waku Sonic Patrol Car", 0 )
 
@@ -3039,13 +3049,13 @@ GAME( 1992, ssonicbr,   0,        segac2,     ssonicbr, segac2_state,    init_no
 
 GAME( 1992, ooparts,    0,        segac2,     ooparts,  segac2_state,    init_noprot,   ROT270, "hack", "OOPArts (prototype, joystick hack)", 0 )
 
-GAME( 1992, puyo,       0,        segac2,     puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (World)", 0 )
-GAME( 1992, puyobl,     puyo,     segac2,     puyo,     segac2_state,    init_puyo,     ROT0,   "bootleg", "Puyo Puyo (World, bootleg)", 0 )
-GAME( 1992, puyoj,      puyo,     segac2,     puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (Japan, Rev B)", 0 )
-GAME( 1992, puyoja,     puyo,     segac2,     puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (Japan, Rev A)", 0 )
+GAME( 1992, puyo,       0,        c2m50dass,  puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (World)", 0 )
+GAME( 1992, puyobl,     puyo,     c2m50dass,  puyo,     segac2_state,    init_puyo,     ROT0,   "bootleg",        "Puyo Puyo (World, bootleg)", 0 )
+GAME( 1992, puyoj,      puyo,     c2m50dass,  puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (Japan, Rev B)", 0 )
+GAME( 1992, puyoja,     puyo,     c2m50dass,  puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (Japan, Rev A)", 0 )
 
-GAME( 1992, tantr,      0,        segac2,     ichir,    segac2_state,    init_tantr,    ROT0,   "Sega", "Puzzle & Action: Tant-R (Japan)", 0 )
-GAME( 1993, tantrkor,   tantr,    segac2,     ichir,    segac2_state,    init_tantrkor, ROT0,   "Sega", "Puzzle & Action: Tant-R (Korea)", 0 )
+GAME( 1992, tantr,      0,        segac2,     ichir,    segac2_state,    init_tantr,    ROT0,   "Sega",    "Puzzle & Action: Tant-R (Japan)", 0 )
+GAME( 1993, tantrkor,   tantr,    segac2,     ichir,    segac2_state,    init_tantrkor, ROT0,   "Sega",    "Puzzle & Action: Tant-R (Korea)", 0 )
 GAME( 1992, tantrbl,    tantr,    segac2,     ichir,    segac2_state,    init_noprot,   ROT0,   "bootleg", "Puzzle & Action: Tant-R (Japan) (bootleg set 1)", 0 )
 GAME( 1992, tantrbl4,   tantr,    segac2,     ichir,    segac2_state,    init_noprot,   ROT0,   "bootleg", "Puzzle & Action: Tant-R (Japan) (bootleg set 4)", 0 )
 GAME( 1994, tantrbl2,   tantr,    segac,      ichir,    segac2_state,    init_tantr,    ROT0,   "bootleg", "Puzzle & Action: Tant-R (Japan) (bootleg set 2)", 0 ) // Common bootleg in Europe, C board, no samples
@@ -3062,15 +3072,15 @@ GAME( 1993, sonicpop,   0,        segac2,     sonicpop, segac2_state,    init_no
 GAME( 1993, sonicfgt,   0,        segac2,     sonicfgt, segac2_state,    init_noprot,   ROT0,   "Sega", "SegaSonic Cosmo Fighter (World)", 0 )
 GAME( 1993, sonicfgtj,  sonicfgt, segac2,     sonicfgt, segac2_state,    init_noprot,   ROT0,   "Sega", "SegaSonic Cosmo Fighter (Japan)", 0 )
 
-GAME( 1994, potopoto,   0,        segac2,     potopoto, segac2_state,    init_potopoto, ROT0,   "Sega", "Poto Poto (Japan, Rev A)", 0 )
+GAME( 1994, potopoto,   0,        c2m50dass,  potopoto, segac2_state,    init_potopoto, ROT0,   "Sega", "Poto Poto (Japan, Rev A)", 0 )
 
 GAME( 1994, stkclmns,   0,        segac2,     stkclmns, segac2_state,    init_stkclmns, ROT0,   "Sega", "Stack Columns (World)", 0 )
 GAME( 1994, stkclmnsj,  stkclmns, segac2,     stkclmns, segac2_state,    init_stkclmnj, ROT0,   "Sega", "Stack Columns (Japan)", 0 )
 
-GAME( 1994, ichir,      0,        segac2,     ichir,    segac2_state,    init_ichir,    ROT0,   "Sega", "Puzzle & Action: Ichidant-R (World)", 0 )
+GAME( 1994, ichir,      0,        segac2,     ichir,    segac2_state,    init_ichir,    ROT0,   "Sega",    "Puzzle & Action: Ichidant-R (World)", 0 )
 GAME( 1994, ichirbl,    ichir,    segac2,     ichir,    segac2_state,    init_noprot,   ROT0,   "bootleg", "Puzzle & Action: Ichidant-R (World) (bootleg)", 0 )
-GAME( 1994, ichirk,     ichir,    segac2,     ichir,    segac2_state,    init_ichirk,   ROT0,   "Sega", "Puzzle & Action: Ichidant-R (Korea)", 0 )
-GAME( 1994, ichirj,     ichir,    segac2,     ichir,    segac2_state,    init_ichirj,   ROT0,   "Sega", "Puzzle & Action: Ichidant-R (Japan)", 0 )
+GAME( 1994, ichirk,     ichir,    segac2,     ichir,    segac2_state,    init_ichirk,   ROT0,   "Sega",    "Puzzle & Action: Ichidant-R (Korea)", 0 )
+GAME( 1994, ichirj,     ichir,    segac2,     ichir,    segac2_state,    init_ichirj,   ROT0,   "Sega",    "Puzzle & Action: Ichidant-R (Japan)", 0 )
 GAME( 1994, ichirjbl,   ichir,    segac,      ichir,    segac2_state,    init_ichirjbl, ROT0,   "bootleg", "Puzzle & Action: Ichidant-R (Japan) (bootleg)", 0 ) // C board, no samples
 
 GAME( 1994, puyopuy2,   0,        segac2,     puyopuy2, segac2_state,    init_puyopuy2, ROT0,   "Compile (Sega license)", "Puyo Puyo 2 (Japan)", 0 )
