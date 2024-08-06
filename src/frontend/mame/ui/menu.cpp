@@ -978,7 +978,7 @@ void menu::recompute_metrics(uint32_t width, uint32_t height, float aspect)
 
 }
 
-void menu::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
+void menu::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 }
 
