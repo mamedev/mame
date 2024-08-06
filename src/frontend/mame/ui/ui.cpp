@@ -455,7 +455,7 @@ void mame_ui_manager::config_load_pointers(
 			{
 				auto const timeout(targetnode->get_attribute_float("activity_timeout", -1.0F));
 				auto const ms(std::lround(timeout * 1000.0F));
-				if ((100 <= ms) && (10'000 >= ms))
+				if ((0 <= ms) && (10'000 >= ms))
 				{
 					m_pointer_options[index].timeout = std::chrono::milliseconds(ms);
 					if (config_type::SYSTEM == cfg_type)

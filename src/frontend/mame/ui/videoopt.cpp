@@ -205,17 +205,20 @@ void menu_video_options::populate()
 		bool const hide = ui().hide_inactive_pointers(m_target.index());
 		if (hide)
 		{
-			int const precision = (timeout.count() % 10) ? 3 : (timeout.count() % 100) ? 2 : 1;
-			item_append(
-					_("Hide Inactive Pointers After Delay"),
-					util::string_format(_("%1$.*2$f s"), timeout.count() * 1e-3, precision),
-					((timeout > std::chrono::milliseconds(100)) ? FLAG_LEFT_ARROW : 0) | FLAG_RIGHT_ARROW,
-					reinterpret_cast<void *>(ITEM_POINTERTIMEOUT));
+			if (timeout.count())
+			{
+				int const precision = (timeout.count() % 10) ? 3 : (timeout.count() % 100) ? 2 : 1;
+				item_append(
+						_("Hide Inactive Pointers After Delay"),
+						util::string_format(_("%1$.*2$f s"), timeout.count() * 1e-3, precision),
+						((timeout >= std::chrono::milliseconds(100)) ? FLAG_LEFT_ARROW : 0) | FLAG_RIGHT_ARROW,
+						reinterpret_cast<void *>(ITEM_POINTERTIMEOUT));
+			}
+			else
+				item_append(_("Hide Inactive Pointers After Delay"), _("Always"), FLAG_RIGHT_ARROW, reinterpret_cast<void *>(ITEM_POINTERTIMEOUT));
 		}
 		else
-		{
 			item_append(_("Hide Inactive Pointers After Delay"), _("Never"), FLAG_LEFT_ARROW, reinterpret_cast<void *>(ITEM_POINTERTIMEOUT));
-		}
 	}
 
 	item_append(menu_item_type::SEPARATOR);
@@ -358,13 +361,13 @@ bool menu_video_options::handle(event const *ev)
 				}
 				else
 				{
-					bool const shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
-					std::chrono::milliseconds const increment(shift_pressed ? 100 : 1'000);
 					auto timeout = ui().pointer_activity_timeout(m_target.index());
-					auto const remainder = timeout % increment;
-					timeout -= remainder.count() ? remainder : increment;
-					if (std::chrono::milliseconds(100) <= timeout)
+					if (timeout >= std::chrono::milliseconds(100))
 					{
+						bool const shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
+						std::chrono::milliseconds const increment(shift_pressed ? 100 : 1'000);
+						auto const remainder = timeout % increment;
+						timeout -= remainder.count() ? remainder : increment;
 						ui().set_pointer_activity_timeout(m_target.index(), timeout);
 						changed = true;
 					}
