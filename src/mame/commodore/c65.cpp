@@ -357,12 +357,23 @@ private:
 	uint8_t m_VIC3_ControlA = 0U;
 	uint8_t m_VIC3_ControlB = 0U;
 	bool m_video_enable = false;
+	struct {
+		u16 x;
+		u8 y;
+		u8 clut;
+	}m_sprite[16];
+	u8 m_sprite_hi_xoffs;
+	u8 m_sprite_exp_x, m_sprite_exp_y;
+	u8 m_sprite_multicolor_enable;
+	u8 m_sprite_multicolor_clut[2];
 
 	bool m_blink_enable = false;
 	bitmap_ind16 m_bitmap;
 	emu_timer *m_scanline_timer;
 	TIMER_CALLBACK_MEMBER(scanline_cb);
 	std::tuple<u8, bool> get_tile_pixel(int y, int x);
+	std::tuple<u8, u8, bool> get_sprite_pixel(int y, int x);
+
 	void PalEntryFlush(uint8_t offset);
 	void IRQCheck(uint8_t irq_cause);
 };
@@ -381,16 +392,47 @@ void c65_state::video_reset()
 
 void c65_state::vic4567_map(address_map &map)
 {
-//  map(0x00, 0x0f) Sprite X/Y
-//  map(0x10, 0x10) bit 8 for Sprites X pos
-	/*
-	 * x--- ---- bit 8 of beam V
-	 * -x-- ---- Extended Color Mode
-	 * --x- ---- Bitmap Mode
-	 * ---x ---- Enable video output
-	 * ---- x--- 25/24 visible rows
-	 * ---- -xxx Screen Soft V Scroll
-	 */
+//  53248/$d000 - 53263/$d00f Sprite X/Y
+	map(0x00, 0x00).select(0xe).lrw8(
+		NAME([this] (offs_t offset){
+			return m_sprite[offset >> 1].x & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_sprite[offset >> 1].x &= 0x100;
+			m_sprite[offset >> 1].x |= data;
+		})
+	);
+	map(0x01, 0x01).select(0xe).lrw8(
+		NAME([this] (offs_t offset){
+			return m_sprite[offset >> 1].y;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_sprite[offset >> 1].y = data;
+		})
+	);
+//  53264/$d010 bit 8 for Sprites X pos
+	map(0x10, 0x10).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_sprite_hi_xoffs;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_sprite_hi_xoffs = data;
+			for (int i = 0; i < 8; i++)
+			{
+				m_sprite[i].x &= 0xff;
+				m_sprite[i].x |= BIT(data, i) << 8;
+			}
+		})
+	);
+/*
+ * 53265/$d011
+ * x--- ---- bit 8 of beam V
+ * -x-- ---- Extended Color Mode
+ * --x- ---- Bitmap Mode
+ * ---x ---- Enable video output
+ * ---- x--- 25/24 visible rows
+ * ---- -xxx Screen Soft V Scroll
+ */
 	map(0x11, 0x11).lrw8(
 		NAME([this] (offs_t offset) {
 			return (m_screen->vpos() & 0x100) >> 1;
@@ -414,17 +456,25 @@ void c65_state::vic4567_map(address_map &map)
 			m_sprite_enable = data;
 		})
 	);
-	/*
-	 * ---x ---- Multicolor Mode
-	 * ---- x--- 40/38 visible columns
-	 * ---- -xxx Screen Soft Scroll H
-	 */
+/*
+ * ---x ---- Multicolor Mode
+ * ---- x--- 40/38 visible columns
+ * ---- -xxx Screen Soft Scroll H
+ */
 //  map(0x16, 0x16)
-//  map(0x17, 0x17) Sprite magnify V
-	/*
-	 * xxxx ---- Screen RAM base (note bit 4 ignored in C=65 width 80)
-	 * ---- xxx- Character Set base
-	 */
+//  53271/$d017 Sprite magnify V
+	map(0x17, 0x17).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_sprite_exp_y;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_sprite_exp_y = data;
+		})
+	);
+/*
+ * xxxx ---- Screen RAM base (note bit 4 ignored in C=65 width 80)
+ * ---- xxx- Character Set base
+ */
 	map(0x18, 0x18).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_VIC2_VS_CB_Base;
@@ -433,13 +483,13 @@ void c65_state::vic4567_map(address_map &map)
 			m_VIC2_VS_CB_Base = data;
 		})
 	);
-	/*
-	 * x--- ---- Latches high if any IRQ taken below (valid for pending reg only)
-	 * ---- x--- Lightpen input IRQ
-	 * ---- -x-- Sprite-Sprite collision IRQ
-	 * ---- --x- Sprite-Background collision IRQ
-	 * ---- ---x rasterline IRQ
-	 */
+/*
+ * x--- ---- Latches high if any IRQ taken below (valid for pending reg only)
+ * ---- x--- Lightpen input IRQ
+ * ---- -x-- Sprite-Sprite collision IRQ
+ * ---- --x- Sprite-Background collision IRQ
+ * ---- ---x rasterline IRQ
+ */
 	map(0x19, 0x19).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_VIC2_IRQPend;
@@ -459,10 +509,28 @@ void c65_state::vic4567_map(address_map &map)
 		})
 	);
 //  map(0x1b, 0x1b) Sprite-Background priority
-//  map(0x1c, 0x1c) Sprite multicolor enable
-//  map(0x1d, 0x1d) Sprite magnify X
+//  53276/$d01c Sprite multicolor enable
+	map(0x1c, 0x1c).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_sprite_multicolor_enable;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_sprite_multicolor_enable = data;
+		})
+	);
+//  53277/$d01d Sprite magnify X
+	map(0x1d, 0x1d).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_sprite_exp_x;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_sprite_exp_x = data;
+		})
+	);
+
 //  map(0x1e, 0x1e) Sprite-Sprite collision
 //  map(0x1f, 0x1f) Spirte-background collision
+// 53280,$d020 border color
 	map(0x20, 0x20).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_VIC2_EXTColor;
@@ -482,25 +550,41 @@ void c65_state::vic4567_map(address_map &map)
 		})
 	);
 //  map(0x21, 0x24) background clut
-//  map(0x25, 0x26) sprite multicolor clut
-//  map(0x27, 0x2e) sprite color clut
-	/*
-	 * KEY register, handles vic-iii and vic-ii modes via two consecutive writes
-	 * 0xa5 -> 0x96 vic-iii mode
-	 * any other write vic-ii mode (changes base memory map)
-	 * vic-iv (MEGA65/C65GS) also has another KEY init sequence
-	 */
+//  53285/$d025 - 53286/$d026 sprite multicolor clut
+	map(0x25, 0x26).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_sprite_multicolor_clut[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_sprite_multicolor_clut[offset] = data & 0xf;
+		})
+	);
+//  53287/$d027 - 53294/$d02e sprite color clut
+	map(0x27, 0x2e).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_sprite[offset].clut;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_sprite[offset].clut = data & 0xf;
+		})
+	);
+/*
+ * KEY register, handles vic-iii and vic-ii modes via two consecutive writes
+ * 0xa5 -> 0x96 vic-iii mode
+ * any other write vic-ii mode (changes base memory map)
+ * vic-iv (MEGA65/C65GS) also has another KEY init sequence
+ */
 //  map(0x2f, 0x2f)
-	/*
-	 * x--- ---- overlay ROM at $e000
-	 * -x-- ---- Move CROM at @9000
-	 * --x- ---- overlay ROM at $c000
-	 * ---x ---- overlay ROM at $a000
-	 * ---- x--- overlay ROM at $8000
-	 * ---- -x-- read PALette from [P]ROM
-	 * ---- --x- EXT SYNC
-	 * ---- ---x overlay CRAM at $dc00
-	 */
+/*
+ * x--- ---- overlay ROM at $e000
+ * -x-- ---- Move CROM at @9000
+ * --x- ---- overlay ROM at $c000
+ * ---x ---- overlay ROM at $a000
+ * ---- x--- overlay ROM at $8000
+ * ---- -x-- read PALette from [P]ROM
+ * ---- --x- EXT SYNC
+ * ---- ---x overlay CRAM at $dc00
+ */
 	map(0x30, 0x30).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_VIC3_ControlA;
@@ -517,16 +601,16 @@ void c65_state::vic4567_map(address_map &map)
 			logerror("\tROM @ e000 %d\n", BIT(data, 7));
 		})
 	);
-	/*
-	 * x--- ---- H640
-	 * -x-- ---- FAST
-	 * --x- ---- ATTR
-	 * ---x ---- BPM Bitplane Mode
-	 * ---- x--- V400
-	 * ---- -x-- H1280
-	 * ---- --x- MONO
-	 * ---- ---x INT
-	 */
+/*
+ * x--- ---- H640
+ * -x-- ---- FAST
+ * --x- ---- ATTR
+ * ---x ---- BPM Bitplane Mode
+ * ---- x--- V400
+ * ---- -x-- H1280
+ * ---- --x- MONO
+ * ---- ---x INT
+ */
 	map(0x31, 0x31).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_VIC3_ControlB;
@@ -553,11 +637,11 @@ void c65_state::vic4567_map(address_map &map)
 
 std::tuple<u8, bool> c65_state::get_tile_pixel(int y, int x)
 {
-    // TODO: move width as a screen setup
+	// TODO: move width as a screen setup
 	int pixel_width = (m_VIC3_ControlB & 0x80) ? 1 : 2;
 	int columns = 80 / pixel_width;
 
-    // TODO: Move init of these two in handlers
+	// TODO: Move init of these two in handlers
 	uint8_t *cptr = &m_ipl_rom->base()[((m_VIC3_ControlA & 0x40) ? 0x9000: 0xd000) + ((m_VIC2_VS_CB_Base & 0x2) << 10)];
 	const u32 base_offs = (m_VIC2_VS_CB_Base & 0xf0) << 6;
 
@@ -581,16 +665,71 @@ std::tuple<u8, bool> c65_state::get_tile_pixel(int y, int x)
 	return std::make_tuple(highlight_color + ((enable_dot) ? foreground_color : background_color), enable_dot != 0);
 }
 
+std::tuple<u8, u8, bool> c65_state::get_sprite_pixel(int y, int x)
+{
+	if (!m_sprite_enable)
+		return std::make_tuple(0, 0, false);
+
+	u8 enable_dot = 0;
+	u8 sprite_mask = 0;
+	const u32 base_offs = ((m_VIC2_VS_CB_Base & 0xf0) << 6) + 0x3f8;
+
+	// sprite #7 < #6 < ... < #0
+	for (int i = 7; i >= 0; i--)
+	{
+		if (!BIT(m_sprite_enable, i))
+			continue;
+
+		const int y_width = 0 + BIT(m_sprite_exp_y, i);
+		const int ysize = 21 << y_width;
+		const u16 yi = m_sprite[i].y;
+
+		if (!(y >= yi && y < yi + ysize))
+			continue;
+
+		const int x_width = 1 + BIT(m_sprite_exp_x, i);
+		const int xsize = 24 << x_width;
+		const u16 xi = m_sprite[i].x << 1;
+
+		if (!(x >= xi && x < xi + xsize))
+			continue;
+
+		u32 sprite_offset = m_workram[base_offs + i] << 6;
+		const int xm = (x - xi) >> x_width;
+		const int ym = (y - yi) >> y_width;
+
+		//if (i == 0) {
+		//printf("%d %08x %d %d|%d %d|%d %d\n", i, sprite_offset, xm, ym, xi, yi, x, y);
+		////machine().debug_break();
+		//}
+
+		u8 sprite_data = m_workram[(ym * 3) + (xm >> 3) + sprite_offset];
+		const bool is_multicolor = bool(BIT(m_sprite_multicolor_enable, i));
+		const u8 dot_mask = is_multicolor << 1 | 1;
+		const u8 shift_mask = 7 - is_multicolor;
+		const u8 color_shift = !is_multicolor;
+		u8 sprite_dot = (sprite_data >> (shift_mask - (xm & shift_mask))) & dot_mask;
+		if (sprite_dot)
+		{
+			const std::array<u8, 4> color_map = { 0, m_sprite_multicolor_clut[0], m_sprite[i].clut, m_sprite_multicolor_clut[1] };
+			sprite_mask |= 1 << i;
+			enable_dot = color_map[sprite_dot << color_shift];
+		}
+	}
+	return std::make_tuple(enable_dot, sprite_mask, enable_dot != 0);
+}
+
 TIMER_CALLBACK_MEMBER(c65_state::scanline_cb)
 {
 	int y = param;
 	uint16_t *p = &m_bitmap.pix(y);
+	//popmessage("%02x %02x %02x", m_sprite_enable, m_sprite[0].x, m_sprite[0].y);
 
 	const int border_left = 0;
-	const int active_left = 32;
+	const int active_left = 24;
 	const int active_right = 640 + active_left;
 	const int border_right = active_right + active_left;
-	const int active_top = 17;
+	const int active_top = 30;
 	const int active_bottom = 200 + active_top;
 
 	int x = border_left;
@@ -614,14 +753,19 @@ TIMER_CALLBACK_MEMBER(c65_state::scanline_cb)
 				p[x] = m_VIC2_EXTColor;
 			for (;x < active_right; x++)
 			{
-				u8 tile_dot;
-				bool is_foreground;
+				u8 tile_dot, sprite_dot, sprite_mask;
+				bool is_foreground, is_sprite;
 				// TODO: functional depending on mode
 				// NOTE: VIC-II and VIC-III can switch mid-frame, but latches occur in 8 scanline steps
-                // at least from/to a base C=64 tilemap mode.
+				// at least from/to a base C=64 tilemap mode.
 				std::tie(tile_dot, is_foreground) = get_tile_pixel(y - active_top, x - active_left);
-				// TODO: sprites fetch here
-				p[x] = m_palette->pen(tile_dot);
+				// HACK: are sprite positions in native coordinates from the border?
+				std::tie(sprite_dot, sprite_mask, is_sprite) = get_sprite_pixel(y + 20, x + active_left);
+
+				if (is_sprite)
+					p[x] = m_palette->pen(sprite_dot);
+				else
+					p[x] = m_palette->pen(tile_dot);
 			}
 			for (;x < border_right; x++)
 				p[x] = m_VIC2_EXTColor;
@@ -963,7 +1107,7 @@ void c65_state::c65(machine_config &config)
 	m_screen->set_screen_update(FUNC(c65_state::screen_update));
 	// TODO: stub parameters
 	// C=64 / width 40 modes should actually be running in 320x200
-	m_screen->set_raw(MAIN_C65_CLOCK*4, 910, 0, 640+32 * 2, 262, 0, 200+17*2);
+	m_screen->set_raw(MAIN_C65_CLOCK*4, 910, 0, 640+24 * 2, 262, 0, 200+30*2);
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_c65);
