@@ -44,6 +44,9 @@ public:
 	auto nomreq_cb() { return m_nomreq_cb.bind(); }
 	auto halt_cb() { return m_halt_cb.bind(); }
 	auto busack_cb() { return m_busack_cb.bind(); }
+	auto branch_cb() { return m_branch_cb.bind(); }
+	auto irqfetch_cb() { return m_irqfetch_cb.bind(); }
+	auto reti_cb() { return m_reti_cb.bind(); }
 
 protected:
 	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -118,6 +121,8 @@ protected:
 
 	virtual u8 data_read(u16 addr);
 	virtual void data_write(u16 addr, u8 value);
+	virtual u8 stack_read(u16 addr) { return data_read(addr); }
+	virtual void stack_write(u16 addr, u8 value) { return data_write(addr, value); }
 	virtual u8 opcode_read();
 	virtual u8 arg_read();
 
@@ -135,6 +140,12 @@ protected:
 	devcb_write8 m_nomreq_cb;
 	devcb_write_line m_halt_cb;
 	devcb_write_line m_busack_cb;
+
+	// Extra callbacks that do not map to any documented signals.
+	// Used by derived classes to customise instruction behaviour.
+	devcb_write_line m_branch_cb;
+	devcb_write_line m_irqfetch_cb;
+	devcb_write_line m_reti_cb;
 
 	PAIR         m_prvpc;
 	PAIR         m_pc;
