@@ -175,10 +175,8 @@ void marywu_state::program_map(address_map &map)
 void marywu_state::io_map(address_map &map)
 {
 	map(0x8000, 0x87ff).mirror(0x0800).ram(); /* HM6116: 2kbytes of Static RAM */
-	map(0x9000, 0x9000).mirror(0x0ffc).w("ay1", FUNC(ay8910_device::data_address_w));
-	map(0x9001, 0x9001).mirror(0x0ffc).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0x9002, 0x9002).mirror(0x0ffc).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0x9003, 0x9003).mirror(0x0ffc).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x9000, 0x9001).mirror(0x0ffc).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x9002, 0x9003).mirror(0x0ffc).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xb000, 0xb001).mirror(0x0ffe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0xf000, 0xf000).noprw(); /* TODO: Investigate this. There's something going on at this address range. */
 }
@@ -208,12 +206,12 @@ void marywu_state::marywu(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635))); /* should it be perhaps a fraction of the XTAL clock ? */
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6)); /* should it be perhaps a fraction of the XTAL clock ? */
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 	ay1.port_a_write_callback().set(FUNC(marywu_state::ay1_port_a_w));
 	ay1.port_b_write_callback().set(FUNC(marywu_state::ay1_port_b_w));
-
-	ay8910_device &ay2(AY8910(config, "ay2", XTAL(10'738'635))); /* should it be perhaps a fraction of the XTAL clock ? */
+   
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(10'738'635) / 6)); /* should it be perhaps a fraction of the XTAL clock ? */
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
 	ay2.port_a_write_callback().set(FUNC(marywu_state::ay2_port_a_w));
 	ay2.port_b_write_callback().set(FUNC(marywu_state::ay2_port_b_w));
