@@ -5764,6 +5764,28 @@ ROM_START( tarzana )
 	ROM_LOAD( "tarzan_string.key", 0x00, 0xec, CRC(595fe40c) SHA1(0b46983400d237d8bde97a72eaa99b718a03387e) )
 ROM_END
 
+// IGS PCB NO-0248-1
+ROM_START( tarzanb ) // V110 TARZAN C
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "v110.u19", 0x00000, 0x40000, CRC(16026d12) SHA1(df08641b4bc1437648f0a8cd5f7a8a4786c07041) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a2103_cg_v100f.u15", 0x00000, 0x400000, BAD_DUMP CRC(dcbff16f) SHA1(2bf77ef4448c26124c8d8d18bb7ffe4105cfa940) ) // using tarzanc's one for now, but versions differ
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "text.u5", 0x00000, 0x80000, CRC(1724e039) SHA1(d628499b61f98f7c9034d70b82ee25e002190ece) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102_sp_v102.u14", 0x00000, 0x80000, BAD_DUMP CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) ) // not dumped for this set, using tarzanc's one for now
+
+	ROM_REGION( 0x2dd * 2, "plds", ROMREGION_ERASE )
+	ROM_LOAD( "eg.u20", 0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "eg.u21", 0x2dd, 0x2dd, NO_DUMP )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "tarzanb_string.key", 0x00, 0xec, CRC(595fe40c) SHA1(0b46983400d237d8bde97a72eaa99b718a03387e) )
+ROM_END
+
 /***************************************************************************
 
 Super Tarzan (Italy, V100I)
@@ -5950,6 +5972,7 @@ GAME ( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, init_slqz2, 
 GAME ( 1999,  tarzanc,  0,        tarzan,   tarzan,   igs017_state, init_tarzanc,  ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",                     0 ) // 泰山闯天关
 GAME ( 1999,  tarzan,   tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzan,   ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",                     MACHINE_NOT_WORKING ) // missing sprites and sound rom, imperfect tiles decryption
 GAME ( 1999,  tarzana,  tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzana,  ROT0, "IGS", "Tarzan (V107)",                                                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom
+GAME ( 1999,  tarzanb,  tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzanc,  ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V110)",                             0 )
 GAME ( 2000,  sdmg2p,   0,        sdmg2p,   sdmg2p,   igs017_state, init_sdmg2p,   ROT0, "IGS", "Maque Wangchao / Chaoji Damanguan 2 - Jiaqiang Ban (China, V100C)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 麻雀王朝 / 超級大滿貫 2 -加強版 protection kicks in after starting game, hopper isn't hooked up correctly
 GAMEL( 2000?, starzan,  0,        starzan,  starzan,  igs017_state, init_starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                  0, layout_igsslot  )
 GAMEL( 2000?, happyskl, 0,        happyskl, happyskl, igs017_state, init_happyskl, ROT0, "IGS", "Happy Skill (Italy, V611IT)",                                       0, layout_igspoker )

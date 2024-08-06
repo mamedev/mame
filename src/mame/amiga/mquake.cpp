@@ -397,7 +397,7 @@ U09 MC68705P5S - Label detached / fell off
 
 ROMs had handwritten labels and are TMS 27C512:
 
-U08 / QROM3  MQ_ROM3  0  5-28-87
+U08 / QROM3  MQ-ROM3  0  5-28-87
 U07 / QROM2  MQ-ROM2  0  5-28-87
 U06 / QROM1  MQ-ROM1  0  5-28
 U05 / QROM0  MQ-ROM0  0  5-28

@@ -1090,8 +1090,8 @@ ROM_START( crzybugs ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-204us.u23", 0x000000, 0x80000, CRC(d1232462) SHA1(685a292f39bf57a80d6ef31289cf9f673ba06dd4) ) // MX27C4096
 
-	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU) marked J9, probably same as haunthig, but not dumped for this set
-	ROM_LOAD( "j9.u27", 0x00000, 0x10000, BAD_DUMP CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
+	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU) marked J9
+	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )  // not dumped for this set
 	ROM_LOAD( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, BAD_DUMP CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) )
@@ -1113,8 +1113,8 @@ ROM_START( crzybugsa )
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-202us.u23", 0x000000, 0x80000, CRC(210da1e6) SHA1(c726497bebd25d6a9053e331b4c26acc7e2db0b2) ) // MX27C4096
 
-	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU) probably same as haunthig, but not dumped for this set
-	ROM_LOAD( "j9.u27", 0x00000, 0x10000, BAD_DUMP CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
+	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU)
+	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) ) // M27C4002
@@ -1136,8 +1136,8 @@ ROM_START( crzybugsb )
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-202us.u23", 0x000000, 0x80000, CRC(129e36e9) SHA1(53f20bc3792249de8ef276f84283baa9abd30acd) ) // MX27C4096
 
-	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU) probably same as haunthig, but not dumped for this set
-	ROM_LOAD( "j9.u27", 0x00000, 0x10000, BAD_DUMP CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
+	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU)
+	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, BAD_DUMP CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) ) // not dumped for this set
@@ -1309,7 +1309,7 @@ ROM_START( wldfruit ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_LOAD( "wild_fruit_v-208us.u23", 0x000000, 0x80000, CRC(d43398f1) SHA1(ecc4bd5cb6da16b35c63b843cf7beec1ab84ed9d) ) // M27C4002
 
 	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU) marked J9
-	ROM_LOAD( "j9.u27", 0x00000, 0x10000, NO_DUMP )
+	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "wild_fruit_text.u10", 0x000000, 0x80000, CRC(d6f0fd58) SHA1(5ddae5d4df53504dbb2e0fe9f7caea961c961ef8) ) // 27C4096

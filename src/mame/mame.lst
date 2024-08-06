@@ -20200,6 +20200,7 @@ spkrform                        // (c) 2000?
 starzan                         // (c) 2000?
 tarzan                          // (c) 1999
 tarzana                         // (c) 1999
+tarzanb                         // (c) 1999
 tarzanc                         // (c) 1999
 tjsb                            // (c) 1997
 
@@ -41842,6 +41843,10 @@ bolsaint                        // (c) 2000 Sleic/Petaco
 
 @source:skeleton/boo.cpp
 boo1000
+
+@source:skeleton/boramz80.cpp
+pkboram
+tpkboram
 
 @source:skeleton/bpmmicro.cpp
 bp1200                          // (c) 1991 BP Microsystems

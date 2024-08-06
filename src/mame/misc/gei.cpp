@@ -1311,7 +1311,7 @@ ROM_START( gtsers7a ) // Series 7 (Complete - question ROMs dated 7/9)
 	ROM_LOAD( "general_v",   0x14000, 0x4000, CRC(81bf07c7) SHA1(a53f050b4ef8ffc0499b50224d4bbed4af0ca09c) )
 	ROM_LOAD( "kids_korner", 0x18000, 0x4000, CRC(66631b79) SHA1(ec534941add7113c9bb96d00f2e09834275e314b) )
 	ROM_LOAD( "good_guys",   0x1c000, 0x4000, CRC(4d638326) SHA1(2d6d00ae7f02d1607f37eb1cefae31c42797b2cf) )
-	ROM_LOAD( "sex_triv.",   0x20000, 0x4000, CRC(cd0ce4e2) SHA1(2046ee3da94f00bf4a8b3fc62b1190d58e83cc89) ) // Listed as an alternate question set
+	ROM_LOAD( "sex_triv",    0x20000, 0x4000, CRC(cd0ce4e2) SHA1(2046ee3da94f00bf4a8b3fc62b1190d58e83cc89) ) // Listed as an alternate question set
 ROM_END
 
 ROM_START( gtsersa ) // alt or older version questions
