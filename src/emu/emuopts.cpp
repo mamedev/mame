@@ -212,6 +212,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_UI_MOUSE,                                   "1",         core_options::option_type::BOOLEAN,    "display UI mouse cursor" },
 	{ OPTION_LANGUAGE ";lang",                           "",          core_options::option_type::STRING,     "set UI display language" },
 	{ OPTION_NVRAM_SAVE ";nvwrite",                      "1",         core_options::option_type::BOOLEAN,    "save NVRAM data on exit" },
+	{ OPTION_PAUSE_GAME_ON_MENU,                         "0",         core_options::option_type::BOOLEAN,    "pause the game on internal menu popup" },
 
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "SCRIPTING OPTIONS" },
 	{ OPTION_AUTOBOOT_COMMAND ";ab",                     nullptr,     core_options::option_type::STRING,     "command to execute after machine boot" },

@@ -172,6 +172,7 @@
 #define OPTION_UI                   "ui"
 #define OPTION_RAMSIZE              "ramsize"
 #define OPTION_NVRAM_SAVE           "nvram_save"
+#define OPTION_PAUSE_GAME_ON_MENU   "pause_game_on_menu"
 
 // core comm options
 #define OPTION_COMM_LOCAL_HOST      "comm_localhost"
@@ -456,6 +457,7 @@ public:
 	ui_option ui() const { return m_ui; }
 	const char *ram_size() const { return value(OPTION_RAMSIZE); }
 	bool nvram_save() const { return bool_value(OPTION_NVRAM_SAVE); }
+	bool pause_game_on_menu() const { return bool_value(OPTION_PAUSE_GAME_ON_MENU); }
 
 	// core comm options
 	const char *comm_localhost() const { return value(OPTION_COMM_LOCAL_HOST); }
