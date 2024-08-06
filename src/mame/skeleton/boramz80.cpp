@@ -10,7 +10,8 @@ Main components are:
 Z80A CPU (different variants)
 HD46505SP CRT
 I8255 PPI
-2 XTALs with solder blobs on them (value not readable)
+4 MHz XTAL
+13 MHz XTAL
 AY-8910 sound chip
 on 0211 PCB: 2x 8-DIP banks
 on 0300 III PCB: 4x 8-DIP banks
@@ -186,7 +187,7 @@ GFXDECODE_END
 void boramz80_state::pk(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 4'000'000); // clock unknown
+	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &boramz80_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &boramz80_state::io_map);
 	//m_maincpu->set_vblank_int("screen", FUNC(boramz80_state::irq0_line_hold));
@@ -204,7 +205,7 @@ void boramz80_state::pk(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(boramz80_state::screen_update));
 
-	hd6845s_device &crtc(HD6845S(config, "crtc", 1'000'000));  // clock unknown
+	hd6845s_device &crtc(HD6845S(config, "crtc", 13_MHz_XTAL / 16));  // divisor guessed
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
@@ -214,7 +215,7 @@ void boramz80_state::pk(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1'000'000)); // clock unknown
+	ay8910_device &aysnd(AY8910(config, "aysnd", 4_MHz_XTAL / 4)); // not sure, could derive from 13 MHz XTAL
 	aysnd.port_a_read_callback().set_ioport("DSW1"); // TODO: verify once it works
 	aysnd.port_b_read_callback().set_ioport("DSW2"); // TODO: verify once it works
 	aysnd.port_a_write_callback().set([this] (uint8_t data) { logerror("%s: AY port A write %02x\n", machine().describe_context(), data); });
@@ -239,8 +240,6 @@ ROM_START( pkboram )
 	ROM_LOAD( "8.pg6",  0x28000, 0x8000, CRC(191d2ab3) SHA1(ad8bfc3f28ccf503cf388791634f32f745559c3c) )
 	ROM_LOAD( "9.pg7",  0x30000, 0x8000, CRC(fd182a3a) SHA1(0d7e9e905b33fd6925962d6992c595830a35ac26) )
 	ROM_LOAD( "10.pg8", 0x38000, 0x8000, CRC(7c2e9f86) SHA1(b82efdd718fa49cb57330fdcf05df6a9e025a822) )
-
-	// TODO: PROMs?
 ROM_END
 
 ROM_START( tpkboram )
@@ -260,8 +259,6 @@ ROM_START( tpkboram )
 	ROM_LOAD( "8.pg6",  0x28000, 0x8000, CRC(8f2a8c3e) SHA1(5ec031dc1fa21a09c1a4ebc0b6bb5f899038801a) )
 	ROM_LOAD( "9.pg7",  0x30000, 0x8000, CRC(7dbbdeb5) SHA1(4d379b9e0c825174bf151117e3550809948e1763) )
 	ROM_LOAD( "10.pg8", 0x38000, 0x8000, CRC(4a293afa) SHA1(be532e6a476f78638e7f558bf8093e1914bc3688) )
-
-	// TODO: PROMs?
 ROM_END
 
 } // anonymous namespace
