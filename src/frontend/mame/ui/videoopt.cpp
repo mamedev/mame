@@ -346,14 +346,10 @@ bool menu_video_options::handle(event const *ev)
 
 		// pointer inactivity timeout
 		case ITEM_POINTERTIMEOUT:
-			if (ev->iptkey == IPT_UI_SELECT)
+			switch (ev->iptkey)
 			{
-				// toggle hide after delay
-				ui().set_hide_inactive_pointers(m_target.index(), !ui().hide_inactive_pointers(m_target.index()));
-				changed = true;
-			}
-			else if (ev->iptkey == IPT_UI_LEFT)
-			{
+			// decrease value
+			case IPT_UI_LEFT:
 				if (!ui().hide_inactive_pointers(m_target.index()))
 				{
 					ui().set_hide_inactive_pointers(m_target.index(), true);
@@ -362,8 +358,8 @@ bool menu_video_options::handle(event const *ev)
 				}
 				else
 				{
-					bool const ctrl_pressed = machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(KEYCODE_RCONTROL);
-					std::chrono::milliseconds const increment(ctrl_pressed ? 1'000 : 100);
+					bool const shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
+					std::chrono::milliseconds const increment(shift_pressed ? 100 : 1'000);
 					auto timeout = ui().pointer_activity_timeout(m_target.index());
 					auto const remainder = timeout % increment;
 					timeout -= remainder.count() ? remainder : increment;
@@ -373,9 +369,10 @@ bool menu_video_options::handle(event const *ev)
 						changed = true;
 					}
 				}
-			}
-			else if (ev->iptkey == IPT_UI_RIGHT)
-			{
+				break;
+
+			// increase value
+			case IPT_UI_RIGHT:
 				if (ui().hide_inactive_pointers(m_target.index()))
 				{
 					auto const timeout = ui().pointer_activity_timeout(m_target.index());
@@ -385,14 +382,27 @@ bool menu_video_options::handle(event const *ev)
 					}
 					else
 					{
-						bool const ctrl_pressed = machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(KEYCODE_RCONTROL);
-						int const increment(ctrl_pressed ? 1'000 : 100);
+						bool const shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
+						int const increment(shift_pressed ? 100 : 1'000);
 						ui().set_pointer_activity_timeout(
 								m_target.index(),
 								std::chrono::milliseconds((1 + (timeout / std::chrono::milliseconds(increment))) * increment));
 					}
 					changed = true;
 				}
+				break;
+
+			// toggle hide after delay
+			case IPT_UI_SELECT:
+				ui().set_hide_inactive_pointers(m_target.index(), !ui().hide_inactive_pointers(m_target.index()));
+				changed = true;
+				break;
+
+			// restore default
+			case IPT_UI_CLEAR:
+				ui().reset_pointer_options(m_target.index());
+				changed = true;
+				break;
 			}
 			break;
 

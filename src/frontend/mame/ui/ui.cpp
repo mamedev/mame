@@ -191,11 +191,16 @@ struct mame_ui_manager::active_pointer
 struct mame_ui_manager::pointer_options
 {
 	pointer_options()
-		: timeout(std::chrono::seconds(3))
-		, hide_inactive(true)
-		, timeout_set(false)
-		, hide_inactive_set(false)
 	{
+		reset();
+	}
+
+	void reset()
+	{
+		timeout = std::chrono::seconds(3);
+		hide_inactive = true;
+		timeout_set = false;
+		hide_inactive_set = false;
 	}
 
 	bool options_set() const
@@ -1773,7 +1778,6 @@ std::chrono::steady_clock::duration mame_ui_manager::pointer_activity_timeout(in
 }
 
 
-
 //-------------------------------------------------
 //  hide_inactive_pointers - get per-target hide
 //  inactive pointers setting
@@ -1786,6 +1790,19 @@ bool mame_ui_manager::hide_inactive_pointers(int target) const noexcept
 		return m_pointer_options[target].hide_inactive;
 	else
 		return pointer_options().hide_inactive;
+}
+
+
+//-------------------------------------------------
+//  reset_pointer_options - reset per-target
+//  pointer options
+//-------------------------------------------------
+
+void mame_ui_manager::reset_pointer_options(int target) noexcept
+{
+	assert((0 <= target) && (m_pointer_options.size() > target));
+	if ((0 <= target) && (m_pointer_options.size() > target))
+		m_pointer_options[target].reset();
 }
 
 
