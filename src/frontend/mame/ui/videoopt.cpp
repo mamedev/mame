@@ -370,6 +370,9 @@ bool menu_video_options::handle(event const *ev)
 						timeout -= remainder.count() ? remainder : increment;
 						ui().set_pointer_activity_timeout(m_target.index(), timeout);
 						changed = true;
+
+						if (!timeout.count())
+							machine().popmessage(_("Clickable artwork is still active when pointer is hidden."));
 					}
 				}
 				break;
