@@ -400,12 +400,6 @@ bool menu_video_options::handle(event const *ev)
 				ui().set_hide_inactive_pointers(m_target.index(), !ui().hide_inactive_pointers(m_target.index()));
 				changed = true;
 				break;
-
-			// restore default
-			case IPT_UI_CLEAR:
-				ui().reset_pointer_options(m_target.index());
-				changed = true;
-				break;
 			}
 			break;
 

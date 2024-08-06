@@ -211,7 +211,6 @@ public:
 	void set_hide_inactive_pointers(int target, bool hide) noexcept;
 	std::chrono::steady_clock::duration pointer_activity_timeout(int target) const noexcept;
 	bool hide_inactive_pointers(int target) const noexcept;
-	void reset_pointer_options(int target) noexcept;
 
 	// drawing informational overlays
 	void draw_fps_counter(render_container &container);
