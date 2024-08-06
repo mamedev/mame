@@ -280,10 +280,10 @@ void menu_sliders::custom_render(uint32_t flags, void *selectedref, float top, f
 		tempstring.insert(0, " ").insert(0, curslider->description);
 
 		// move us to the bottom of the screen, and expand to full width
+		float y2 = 1.0f - tb_border();
+		float y1 = y2 - bottom;
 		float x1 = lr_border();
 		float x2 = 1.0f - lr_border();
-		float y1 = origy2 - bottom;
-		float y2 = 1.0f - tb_border();
 
 		// draw extra menu area
 		ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
