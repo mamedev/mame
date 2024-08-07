@@ -12,12 +12,12 @@ static u32 partial_carry_sum(u32 add1,u32 add2,u32 carry_mask,int bits)
 	int carry = 0;
 	for (int i = 0; i < bits; i++)
 	{
-		int bit = BIT(add1,i) + BIT(add2,i) + carry;
+		const int bit = BIT(add1, i) + BIT(add2, i) + carry;
 
 		res += (bit & 1) << i;
 
 		// generate carry only if the corresponding bit in carry_mask is 1
-		if (BIT(carry_mask,i))
+		if (BIT(carry_mask, i))
 			carry = bit >> 1;
 		else
 			carry = 0;
@@ -25,24 +25,24 @@ static u32 partial_carry_sum(u32 add1,u32 add2,u32 carry_mask,int bits)
 
 	// wrap around carry from top bit to bit 0
 	if (carry)
-		res ^=1;
+		res ^= 1;
 
 	return res;
 }
 
-u32 partial_carry_sum32(u32 add1,u32 add2,u32 carry_mask)
+u32 partial_carry_sum32(u32 add1, u32 add2, u32 carry_mask)
 {
-	return partial_carry_sum(add1,add2,carry_mask,32);
+	return partial_carry_sum(add1, add2, carry_mask, 32);
 }
 
-u32 partial_carry_sum24(u32 add1,u32 add2,u32 carry_mask)
+u32 partial_carry_sum24(u32 add1, u32 add2, u32 carry_mask)
 {
-	return partial_carry_sum(add1,add2,carry_mask,24);
+	return partial_carry_sum(add1, add2, carry_mask, 24);
 }
 
-static u32 partial_carry_sum16(u32 add1,u32 add2,u32 carry_mask)
+static u32 partial_carry_sum16(u32 add1, u32 add2, u32 carry_mask)
 {
-	return partial_carry_sum(add1,add2,carry_mask,16);
+	return partial_carry_sum(add1, add2, carry_mask, 16);
 }
 
 
@@ -140,10 +140,10 @@ static const u8 spi_bitswap[16][16] =
 };
 
 
-static int key(int table,int addr)
+static int key(int table, int addr)
 {
 	const int xorbit = 8 + ((table & 0xc) >> 2);
-	return BIT(key_table[addr & 0xff] >> 4,table) ^ BIT(addr,xorbit);
+	return BIT(key_table[addr & 0xff] >> 4, table) ^ BIT(addr, xorbit);
 }
 
 
@@ -266,8 +266,8 @@ void seibuspi_sprite_decrypt(u8 *src, int rom_size)
 				   (key( 8,addr) << 30) |
 				   (key( 0,addr) << 31);
 
-		s1 = partial_carry_sum( s1, add1, 0x3a59, 16 ) ^ 0x843a;
-		s2 = partial_carry_sum( s2, add2, 0x28d49cac, 32 ) ^ 0xc8e29f84;
+		s1 = partial_carry_sum(s1, add1, 0x3a59, 16) ^ 0x843a;
+		s2 = partial_carry_sum(s2, add2, 0x28d49cac, 32) ^ 0xc8e29f84;
 
 
 		// reorder the bits in the order MAME expects to decode the graphics
@@ -342,8 +342,8 @@ void seibuspi_rise10_sprite_decrypt(u8 *rom, int size)
 				27,6,15,21,1,28,10,20,
 				7,31,26,0,18,9,19,8);
 
-		plane54   = partial_carry_sum16( plane54, 0xabcb, 0x55aa ) ^ 0x6699;
-		plane3210 = partial_carry_sum32( plane3210, 0x654321d9 ^ 0x42, 0x1d463748 ) ^ 0x0ca352a9;
+		plane54   = partial_carry_sum16(plane54, 0xabcb, 0x55aa) ^ 0x6699;
+		plane3210 = partial_carry_sum32(plane3210, 0x654321d9 ^ 0x42, 0x1d463748) ^ 0x0ca352a9;
 
 		rom[0 * size + 2 * i]     = plane54   >>  8;
 		rom[0 * size + 2 * i + 1] = plane54   >>  0;
@@ -468,10 +468,10 @@ static void seibuspi_rise11_sprite_decrypt(u8 *rom, int size,
 					   (BIT(b1, 5)<<22) |
 					   (BIT(b3,15)<<23);
 
-		plane543 = partial_carry_sum32( plane543, k1, k2 ) ^ k3;
-		plane210 = partial_carry_sum24( plane210,  i, k4 ) ^ k5;
+		plane543 = partial_carry_sum32(plane543, k1, k2) ^ k3;
+		plane210 = partial_carry_sum24(plane210,  i, k4) ^ k5;
 		if (feversoc_kludge)
-			plane210 = partial_carry_sum24( plane210,  1, 0x000001 );
+			plane210 = partial_carry_sum24(plane210,  1, 0x000001);
 
 		rom[0 * size + 2 * i]     = plane543 >> 16;
 		rom[0 * size + 2 * i + 1] = plane543 >>  8;

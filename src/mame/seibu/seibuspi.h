@@ -6,10 +6,14 @@
 
 ******************************************************************************/
 
+#include "sei25x_rise1x_spr.h"
+
 #include "machine/eepromser.h"
 #include "machine/7200fifo.h"
 #include "machine/intelfsh.h"
+
 #include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -27,11 +31,11 @@ public:
 		, m_oki(*this, "oki%u", 1)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_spritegen(*this, "spritegen")
 		, m_key(*this, "KEY.%u", 0)
 		, m_special(*this, "SPECIAL")
 		, m_z80_bank(*this, "z80_bank")
-		, m_soundflash1(*this, "soundflash1")
-		, m_soundflash2(*this, "soundflash2")
+		, m_soundflash(*this, "soundflash%u", 1U)
 		, m_soundflash1_region(*this, "soundflash1")
 	{ }
 
@@ -71,20 +75,21 @@ protected:
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device_array<fifo7200_device, 2> m_soundfifo;
 	optional_device_array<okim6295_device, 2> m_oki;
-	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<sei25x_rise1x_device> m_spritegen;
 
 	optional_ioport_array<5> m_key;
 	optional_ioport m_special;
 
 	optional_memory_bank m_z80_bank;
 
-	optional_device<intel_e28f008sa_device> m_soundflash1, m_soundflash2;
+	optional_device_array<intel_e28f008sa_device, 2> m_soundflash;
 
 	optional_region_ptr<u8> m_soundflash1_region;
 
-	int m_z80_prg_transfer_pos = 0;
-	int m_z80_lastbank = 0;
+	u32 m_z80_prg_transfer_pos = 0;
+	u8 m_z80_lastbank = 0;
 	u8 m_sb_coin_latch = 0;
 	u8 m_ejsakura_input_port = 0;
 	tilemap_t *m_text_layer = nullptr;
@@ -98,22 +103,22 @@ protected:
 	u8 m_rf2_layer_bank = 0;
 	u16 m_scrollram[6]{};
 	bool m_rowscroll_enable = false;
-	int m_midl_layer_offset = 0;
-	int m_fore_layer_offset = 0;
-	int m_text_layer_offset = 0;
-	int m_fore_layer_d13 = 0;
-	int m_back_layer_d14 = 0;
-	int m_midl_layer_d14 = 0;
-	int m_fore_layer_d14 = 0;
+	u32 m_midl_layer_offset = 0;
+	u32 m_fore_layer_offset = 0;
+	u32 m_text_layer_offset = 0;
+	u32 m_fore_layer_d13 = 0;
+	u32 m_back_layer_d14 = 0;
+	u32 m_midl_layer_d14 = 0;
+	u32 m_fore_layer_d14 = 0;
 	std::unique_ptr<u32[]> m_tilemap_ram;
 	std::unique_ptr<u32[]> m_palette_ram;
-	std::unique_ptr<u32[]> m_sprite_ram;
+	std::unique_ptr<u16[]> m_sprite_ram;
 	u32 m_tilemap_ram_size = 0;
 	u32 m_palette_ram_size = 0;
 	u32 m_sprite_ram_size = 0;
 	u32 m_bg_fore_layer_position = 0;
 	u8 m_alpha_table[0x2000]{};
-	int m_sprite_bpp = 0;
+	u8 m_sprite_bpp = 0;
 
 	void tile_decrypt_key_w(u16 data);
 	void spi_layer_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -153,9 +158,9 @@ protected:
 	void ymf_irqhandler(int state);
 
 	void set_layer_offsets();
-	void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, u32 code, u32 color, bool flipx, bool flipy, int sx, int sy, bitmap_ind8 &primap, u8 primask);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap, int priority);
+	void blend_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
 	void combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int sx, int sy, int opaque, s16 *rowscroll);
+	u32 gfxbank_callback(u32 code, u8 ext);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
