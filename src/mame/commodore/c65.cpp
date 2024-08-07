@@ -8,11 +8,19 @@ TODO:
 - Fails interpreting BASIC commands, CPU core bug?
 - DDR/port support from M4510;
 - Complete memory model;
+\- rom8 / roma and rome all causes issues if hooked up (needs the CPU DDR port?)
+\- Work RAM should really use a memory_share_creator, VIC-III can potentially access the full range.
+\- CRAM is really just RAM that bitplane mode can access as-is;
 - Complete interrupts;
 - F011 FDC (1581 equivalent, does it implies IEC?);
-- C=64 mode (with "GO64" at BASIC prompt, or holding C= key during boot);
 - bios 0 detects an expansion RAM without checking REC first and no matter if there's
   effectively a RAM bank available or not, supposed to bus error or just buggy/hardwired code?
+
+Notes:
+- C=64 mode can be entered in two ways: with "GO64" at BASIC prompt, or by holding C= key during
+boot;
+- C=65 mode from C=64 BASIC is possible, as long as you do some pre-setup such as setting KEY in
+VIC-III mode and disable CIA irqs;
 
 ===================================================================================================
 References:
@@ -289,6 +297,10 @@ public:
 		, m_irqs(*this, "irqs")
 		, m_dma(*this, "dma")
 		, m_cram_view(*this, "cram_view")
+		//, m_rom8_view(*this, "rom8_view")
+		//, m_roma_view(*this, "roma_view")
+		, m_romc_view(*this, "romc_view")
+		//, m_rome_view(*this, "rome_view")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_workram(*this, "work_ram")
@@ -307,6 +319,10 @@ public:
 	required_device<input_merger_device> m_irqs;
 	required_device<dmagic_f018_device> m_dma;
 	memory_view m_cram_view;
+	//memory_view m_rom8_view;
+	//memory_view m_roma_view;
+	memory_view m_romc_view;
+	//memory_view m_rome_view;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_workram;
@@ -332,7 +348,6 @@ public:
 	uint8_t cia0_portb_r();
 	void cia0_portb_w(uint8_t data);
 
-	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void palette_init(palette_device &palette);
 	void init_c65();
@@ -595,6 +610,10 @@ void c65_state::vic4567_map(address_map &map)
 			m_VIC3_ControlA = data;
 			// TODO: all the other bits
 			m_cram_view.select(BIT(data, 0));
+			//m_rom8_view.select(BIT(data, 3));
+			//m_roma_view.select(BIT(data, 4));
+			m_romc_view.select(BIT(data, 5));
+			//m_rome_view.select(BIT(data, 7));
 			logerror("\tROM @ 8000 %d\n", BIT(data, 3));
 			logerror("\tROM @ a000 %d\n", BIT(data, 4));
 			logerror("\tROM @ c000 %d\n", BIT(data, 5));
@@ -883,7 +902,9 @@ void c65_state::c65_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000, 0x07fff).ram().share("work_ram");
 	map(0x08000, 0x0bfff).rom().region("ipl", 0x08000);
-	map(0x0c000, 0x0cfff).rom().region("ipl", 0x0c000);
+	map(0x0c000, 0x0cfff).view(m_romc_view);
+	m_romc_view[0](0x0c000, 0x0cfff).ram();
+	m_romc_view[1](0x0c000, 0x0cfff).rom().region("ipl", 0x0c000);
 	map(0x0d000, 0x0d07f).m(*this, FUNC(c65_state::vic4567_map));
 	// 0x0d080, 0x0d09f FDC
 	map(0x0d080, 0x0d09f).lr8(NAME([] (offs_t offset) { return 0; }));
