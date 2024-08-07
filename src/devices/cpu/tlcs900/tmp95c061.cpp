@@ -8,6 +8,7 @@ Toshiba TMP95C061 emulation
 
 #include "emu.h"
 #include "tmp95c061.h"
+#include "dasm900.h"
 
 DEFINE_DEVICE_TYPE(TMP95C061, tmp95c061_device, "tmp95c061", "Toshiba TMP95C061")
 
@@ -190,6 +191,12 @@ void tmp95c061_device::device_start()
 	save_item(NAME(m_mem_start_mask));
 	save_item(NAME(m_dram_refresh));
 	save_item(NAME(m_dram_access));
+
+	m_nmi_state = CLEAR_LINE;
+	for( int i = 0; i < TLCS900_NUM_INPUTS; i++ )
+	{
+		m_level[i] = CLEAR_LINE;
+	}
 }
 
 void tmp95c061_device::device_reset()
@@ -200,7 +207,6 @@ void tmp95c061_device::device_reset()
 	m_to3 = 0;
 
 	m_ad_cycles_left = 0;
-	m_nmi_state = CLEAR_LINE;
 	m_timer_pre = 0;
 	m_timer_change[0] = 0;
 	m_timer_change[1] = 0;
@@ -250,11 +256,6 @@ void tmp95c061_device::device_reset()
 	std::fill_n(&m_mem_start_mask[0], 4, 0xff);
 	m_dram_refresh = 0x00;
 	m_dram_access = 0x80;
-
-	for (int i = 0; i < TLCS900_NUM_INPUTS; i++)
-	{
-		m_level[i] = CLEAR_LINE;
-	}
 }
 
 
@@ -574,11 +575,11 @@ void tmp95c061_device::tlcs900_handle_ad()
 }
 
 
-enum ff_change
+enum flipflop_change
 {
-	FF_CLEAR,
-	FF_SET,
-	FF_INVERT
+	FLIPFLOP_CLEAR,
+	FLIPFLOP_SET,
+	FLIPFLOP_INVERT
 };
 
 
@@ -589,13 +590,13 @@ void tmp95c061_device::tlcs900_change_tff( int which, int change )
 	case 1:
 		switch( change )
 		{
-		case FF_CLEAR:
+		case FLIPFLOP_CLEAR:
 			m_to1 = 0;
 			break;
-		case FF_SET:
+		case FLIPFLOP_SET:
 			m_to1 = 1;
 			break;
-		case FF_INVERT:
+		case FLIPFLOP_INVERT:
 			m_to1 ^= 1;
 			break;
 		}
@@ -604,13 +605,13 @@ void tmp95c061_device::tlcs900_change_tff( int which, int change )
 	case 3:
 		switch( change )
 		{
-		case FF_CLEAR:
+		case FLIPFLOP_CLEAR:
 			m_to3 = 0;
 			break;
-		case FF_SET:
+		case FLIPFLOP_SET:
 			m_to3 = 1;
 			break;
-		case FF_INVERT:
+		case FLIPFLOP_INVERT:
 			m_to3 ^= 1;
 			break;
 		}
@@ -695,7 +696,7 @@ void tmp95c061_device::tlcs900_handle_timers()
 
 				if ( m_t8_invert & 0x02 )
 				{
-					tlcs900_change_tff( 1, FF_INVERT );
+					tlcs900_change_tff( 1, FLIPFLOP_INVERT );
 				}
 
 				/* In 16bit timer mode also reset timer 0 */
@@ -772,7 +773,7 @@ void tmp95c061_device::tlcs900_handle_timers()
 
 				if ( m_t8_invert & 0x20 )
 				{
-					tlcs900_change_tff( 3, FF_INVERT );
+					tlcs900_change_tff( 3, FLIPFLOP_INVERT );
 				}
 
 				/* In 16bit timer mode also reset timer 2 */
@@ -1090,25 +1091,25 @@ void tmp95c061_device::tffcr_w(uint8_t data)
 	switch( data & 0x0c )
 	{
 	case 0x00:
-		tlcs900_change_tff( 1, FF_INVERT );
+		tlcs900_change_tff( 1, FLIPFLOP_INVERT );
 		break;
 	case 0x04:
-		tlcs900_change_tff( 1, FF_SET );
+		tlcs900_change_tff( 1, FLIPFLOP_SET );
 		break;
 	case 0x08:
-		tlcs900_change_tff( 1, FF_CLEAR );
+		tlcs900_change_tff( 1, FLIPFLOP_CLEAR );
 		break;
 	}
 	switch( data & 0xc0 )
 	{
 	case 0x00:
-		tlcs900_change_tff( 3, FF_INVERT );
+		tlcs900_change_tff( 3, FLIPFLOP_INVERT );
 		break;
 	case 0x40:
-		tlcs900_change_tff( 3, FF_SET );
+		tlcs900_change_tff( 3, FLIPFLOP_SET );
 		break;
 	case 0x80:
-		tlcs900_change_tff( 3, FF_CLEAR );
+		tlcs900_change_tff( 3, FLIPFLOP_CLEAR );
 		break;
 	}
 
@@ -1479,4 +1480,9 @@ uint8_t tmp95c061_device::dmemcr_r()
 void tmp95c061_device::dmemcr_w(uint8_t data)
 {
 	m_dram_access = data;
+}
+
+std::unique_ptr<util::disasm_interface> tmp95c061_device::create_disassembler()
+{
+	return std::make_unique<tmp95c061_disassembler>();
 }
