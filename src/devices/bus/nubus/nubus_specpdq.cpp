@@ -466,11 +466,6 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 		COMBINE_DATA(&m_7xxxxx_regs[offset-0xc0000]);
 	}
 
-	if ((offset >= 0xc0000) && (offset < 0xd0000))
-	{
-		printf("Write %02x (%d) to %x\n", ~data & 0xff, ~data & 0xff, offset);
-	}
-
 	if ((offset >= 0xc0000) && (offset <= 0xc002a))
 	{
 		m_crtc.write(*this, offset - 0xc0000, data >> 24);
