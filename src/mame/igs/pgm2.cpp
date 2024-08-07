@@ -1220,6 +1220,9 @@ ROM_START( bubucar )
 
 	ROM_REGION( 0x10000, "sram", 0 )
 	ROM_LOAD( "bubucar_en_sram",                  0x0000000, 0x0010000, NO_DUMP )
+
+	ROM_REGION( 0x603, "cpld", 0 )
+	ROM_LOAD( "xilinx_xc2c32a-vqg44.u14",         0x0000000, 0x0000603, CRC(bf461ea6) SHA1(26c434f189a3730a07cec3ebd9a05d0d0d5e4a55) )
 ROM_END
 
 static void iga_u16_decode(u16 *rom, int len, int ixor)
