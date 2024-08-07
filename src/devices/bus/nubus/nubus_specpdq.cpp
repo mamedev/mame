@@ -38,8 +38,7 @@
 
 #include <algorithm>
 
-#define VERBOSE 1
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define VERBOSE 1
 #include "logmacro.h"
 
 
@@ -108,7 +107,7 @@ private:
 
 	uint16_t m_stride;
 	uint16_t m_vint;
-	uint8_t m_hdelay;
+	uint8_t m_hdelay, m_hadjust;
 	uint8_t m_osc;
 
 	uint16_t m_blit_stride;
@@ -231,6 +230,7 @@ void nubus_specpdq_device::device_start()
 	save_item(NAME(m_stride));
 	save_item(NAME(m_vint));
 	save_item(NAME(m_hdelay));
+	save_item(NAME(m_hadjust));
 	save_item(NAME(m_osc));
 	save_item(NAME(m_blit_stride));
 	save_item(NAME(m_blit_src));
@@ -261,6 +261,7 @@ void nubus_specpdq_device::device_reset()
 	m_stride = 0;
 	m_vint = 0;
 	m_hdelay = 0;
+	m_hadjust = 0;
 	m_osc = 0;
 
 	m_blit_stride = 0;
@@ -326,11 +327,9 @@ void nubus_specpdq_device::update_crtc()
 	// for some reason you temporarily get invalid screen parameters - ignore them
 	if (m_crtc.valid(*this))
 	{
-		int h_start_adj = (m_crtc.h_start(1) + 3) * 16;
-
 		rectangle active(
-			h_start_adj,
-			m_crtc.h_end(16) - 1,
+			m_crtc.h_start(16) + (m_hdelay * 4),
+			m_crtc.h_end(16) - (m_hadjust - (m_hdelay * 4)) - 1,
 			m_crtc.v_start(),
 			m_crtc.v_end() - 1);
 
@@ -348,7 +347,7 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 {
 	auto const screenbase = util::big_endian_cast<uint8_t const>(&m_vram[0]) + 0x9000;
 
-	int const hstart = (m_crtc.h_start(1) + 3) << 4;
+	int const hstart = m_crtc.h_start(16);
 	int const width = m_crtc.h_active(16);
 	int const vstart = m_crtc.v_start();
 	int const vend = m_crtc.v_end();
@@ -467,6 +466,11 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 		COMBINE_DATA(&m_7xxxxx_regs[offset-0xc0000]);
 	}
 
+	if ((offset >= 0xc0000) && (offset < 0xd0000))
+	{
+		printf("Write %02x (%d) to %x\n", ~data & 0xff, ~data & 0xff, offset);
+	}
+
 	if ((offset >= 0xc0000) && (offset <= 0xc002a))
 	{
 		m_crtc.write(*this, offset - 0xc0000, data >> 24);
@@ -507,6 +511,12 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 			break;
 
 		case 0xc005e:   // not sure, interrupt related?
+			break;
+
+		case 0xc0066:
+			LOG("%s: %u to hadjust\n", machine().describe_context(), ~data & 0xff);
+			m_hadjust = ~data & 0xff;
+			update_crtc();
 			break;
 
 		case 0xc006a:
