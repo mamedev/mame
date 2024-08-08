@@ -156,7 +156,7 @@ void qncrash_state::qncrash(machine_config &config)
 
 	// video hardware
 	// TODO: 
-	// - a 96x16 dot matrix display
+	// - a 96x16 dot matrix LED display
 	// - a 5 digit 7 segment display for time
 	// These should be implemented in a layout,
 	// not as video output.
