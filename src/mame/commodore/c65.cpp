@@ -381,13 +381,14 @@ private:
 	u8 m_sprite_exp_x, m_sprite_exp_y;
 	u8 m_sprite_multicolor_enable;
 	u8 m_sprite_multicolor_clut[2];
+	u8 m_sprite_priority;
 
 	bool m_blink_enable = false;
 	bitmap_ind16 m_bitmap;
 	emu_timer *m_scanline_timer;
 	TIMER_CALLBACK_MEMBER(scanline_cb);
 	std::tuple<u8, bool> get_tile_pixel(int y, int x);
-	std::tuple<u8, u8, bool> get_sprite_pixel(int y, int x);
+	std::tuple<u8, u8, u8, bool> get_sprite_pixel(int y, int x);
 
 	void PalEntryFlush(uint8_t offset);
 	void IRQCheck(uint8_t irq_cause);
@@ -523,7 +524,15 @@ void c65_state::vic4567_map(address_map &map)
 			IRQCheck(0);
 		})
 	);
-//  map(0x1b, 0x1b) Sprite-Background priority
+//  53275/$d01b Sprite-Background priority
+	map(0x1b, 0x1b).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_sprite_priority;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_sprite_priority = data;
+		})
+	);
 //  53276/$d01c Sprite multicolor enable
 	map(0x1c, 0x1c).lrw8(
 		NAME([this] (offs_t offset) {
@@ -684,13 +693,14 @@ std::tuple<u8, bool> c65_state::get_tile_pixel(int y, int x)
 	return std::make_tuple(highlight_color + ((enable_dot) ? foreground_color : background_color), enable_dot != 0);
 }
 
-std::tuple<u8, u8, bool> c65_state::get_sprite_pixel(int y, int x)
+std::tuple<u8, u8, u8, bool> c65_state::get_sprite_pixel(int y, int x)
 {
 	if (!m_sprite_enable)
-		return std::make_tuple(0, 0, false);
+		return std::make_tuple(0, 0, 0, false);
 
 	u8 enable_dot = 0;
 	u8 sprite_mask = 0;
+	u8 idx = 0;
 	const u32 base_offs = ((m_VIC2_VS_CB_Base & 0xf0) << 6) + 0x3f8;
 
 	// sprite #7 < #6 < ... < #0
@@ -732,10 +742,11 @@ std::tuple<u8, u8, bool> c65_state::get_sprite_pixel(int y, int x)
 		{
 			const std::array<u8, 4> color_map = { 0, m_sprite_multicolor_clut[0], m_sprite[i].clut, m_sprite_multicolor_clut[1] };
 			sprite_mask |= 1 << i;
+			idx = i;
 			enable_dot = color_map[sprite_dot << color_shift];
 		}
 	}
-	return std::make_tuple(enable_dot, sprite_mask, enable_dot != 0);
+	return std::make_tuple(enable_dot, sprite_mask, idx, enable_dot != 0);
 }
 
 TIMER_CALLBACK_MEMBER(c65_state::scanline_cb)
@@ -772,19 +783,19 @@ TIMER_CALLBACK_MEMBER(c65_state::scanline_cb)
 				p[x] = m_VIC2_EXTColor;
 			for (;x < active_right; x++)
 			{
-				u8 tile_dot, sprite_dot, sprite_mask;
+				u8 tile_dot, sprite_dot, sprite_mask, sprite_active;
 				bool is_foreground, is_sprite;
 				// TODO: functional depending on mode
 				// NOTE: VIC-II and VIC-III can switch mid-frame, but latches occur in 8 scanline steps
 				// at least from/to a base C=64 tilemap mode.
 				std::tie(tile_dot, is_foreground) = get_tile_pixel(y - active_top, x - active_left);
 				// HACK: are sprite positions in native coordinates from the border?
-				std::tie(sprite_dot, sprite_mask, is_sprite) = get_sprite_pixel(y + 20, x + active_left);
+				std::tie(sprite_dot, sprite_mask, sprite_active, is_sprite) = get_sprite_pixel(y + 20, x + active_left);
 
-				if (is_sprite)
-					p[x] = m_palette->pen(sprite_dot);
-				else
+				if (is_foreground && !(BIT(sprite_mask, sprite_active) & (BIT(m_sprite_priority ^ 0xff, sprite_active))))
 					p[x] = m_palette->pen(tile_dot);
+				else
+					p[x] = m_palette->pen(is_sprite ? sprite_dot : tile_dot);
 			}
 			for (;x < border_right; x++)
 				p[x] = m_VIC2_EXTColor;
