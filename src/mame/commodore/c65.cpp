@@ -5,10 +5,9 @@
 C=65 / C=64DX (c) 1991 Commodore
 
 TODO:
-- Fails interpreting BASIC commands, CPU core bug?
 - DDR/port support from M4510;
 - Complete memory model;
-\- rom8 / roma and rome all causes issues if hooked up (needs the CPU DDR port?)
+\- rom8 / roma / rome all causes bootstrap issues if hooked up (needs the CPU DDR port?)
 \- Work RAM should really use a memory_share_creator, VIC-III can potentially access the full range.
 \- CRAM is really just RAM that bitplane mode can access as-is;
 - Complete interrupts;
