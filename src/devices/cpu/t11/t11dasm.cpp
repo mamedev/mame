@@ -19,7 +19,7 @@ const char *const t11_disassembler::regs[8] = { "R0", "R1", "R2", "R3", "R4", "R
 
 u16 t11_disassembler::r16p(offs_t &pc, const data_buffer &opcodes)
 {
-	u16 r = opcodes.r16(pc);
+	u16 r = opcodes.r16(pc & ~1);
 	pc += 2;
 	return r;
 }
