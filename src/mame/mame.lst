@@ -19952,6 +19952,7 @@ dunhuang                        // (c) 1995
 
 @source:igs/funtech.cpp
 fts2in1
+poker21
 
 @source:igs/goldstar.cpp
 3cdpoker                        // hack?
@@ -42514,6 +42515,9 @@ vp415                           // (c) 1983 Philips
 
 @source:skeleton/webtouchone.cpp
 wto2840sp                       //
+
+@source:skeleton/whtm68k.cpp
+unkwht
 
 @source:skeleton/xbase09.cpp
 xbase09                         //

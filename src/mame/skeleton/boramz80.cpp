@@ -196,7 +196,7 @@ void boramz80_state::pk(machine_config &config)
 	ppi.in_pa_callback().set([this] () { logerror("%s: PPI port A read\n", machine().describe_context()); return ioport("IN0")->read(); });
 	ppi.in_pb_callback().set([this] () { logerror("%s: PPI port B read\n", machine().describe_context()); return ioport("IN1")->read(); });
 	ppi.in_pc_callback().set([this] () { logerror("%s: PPI port C read\n", machine().describe_context()); return ioport("IN2")->read(); });
-	ppi.out_pc_callback().set([this] (u8 data) { logerror("%s: PPI port C write %02x\n", machine().describe_context(), data); });
+	ppi.out_pc_callback().set([this] (uint8_t data) { logerror("%s: PPI port C write %02x\n", machine().describe_context(), data); });
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: everything
 	screen.set_refresh_hz(60);
@@ -264,5 +264,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, pkboram,  0, pk, pkboram,  boramz80_state, empty_init, ROT0, "Boram", "PK",       MACHINE_IS_SKELETON ) // PK-BORAM 0211 aug.04.1987. BORAM CORP
-GAME( 1988, tpkboram, 0, pk, tpkboram, boramz80_state, empty_init, ROT0, "Boram", "Turbo PK", MACHINE_IS_SKELETON ) // PK-TURBO jan.29.1988. BORAM CORP.
+GAME( 1987, pkboram,  0, pk, pkboram,  boramz80_state, empty_init, ROT0, "Boram", "PK - New Exciting Poker!", MACHINE_IS_SKELETON ) // PK-BORAM 0211 aug.04.1987. BORAM CORP
+GAME( 1988, tpkboram, 0, pk, tpkboram, boramz80_state, empty_init, ROT0, "Boram", "Turbo PK",                 MACHINE_IS_SKELETON ) // PK-TURBO jan.29.1988. BORAM CORP.

@@ -19,6 +19,8 @@
  a holographic sticker, this appears to be unprotected but has only been
  read for a few sets, it probably either acts as a secondary protection
  device or as a main CPU instructing the ARM.
+ For Crazy Bugs, MCUs with stickers J9 and F9 have been dumped and both
+ contained the same data, despite the different sticker.
 
 */
 
