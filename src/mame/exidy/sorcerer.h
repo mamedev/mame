@@ -148,7 +148,6 @@ private:
 	bool m_halt = 0;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void busreq_w(bool state);
 	u8 memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, u8 data);
 	u8 io_read_byte(offs_t offset);
