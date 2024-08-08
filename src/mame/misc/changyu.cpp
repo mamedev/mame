@@ -156,6 +156,8 @@ void changyu_state::main2_map(address_map &map)
 	main_map(map);
 	map(0x2030, 0x2030).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x2031, 0x2031).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2800, 0x2801).w("ymsnd", FUNC(ym2413_device::write));
+
 	map(0x3000, 0x37ff).unmaprw();
 
 	map(0x6000, 0xffff).rom().region("boot_rom", 0x6000);
@@ -246,6 +248,7 @@ void changyu_state::changyu(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
+	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
