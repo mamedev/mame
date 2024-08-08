@@ -62,24 +62,25 @@ void namcos21_dsp_device::device_reset()
 	m_suspend_timer->adjust(attotime::zero);
 }
 
-
 uint16_t namcos21_dsp_device::winrun_dspcomram_r(offs_t offset)
 {
-	int bank = 1-(m_winrun_dspcomram_control[0x4/2]&1);
-	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
+	unsigned bank = BIT(~m_winrun_dspcomram_control[0x4/2], 0);
+	uint16_t *mem = &m_winrun_dspcomram[0x1000 * bank];
+
 	return mem[offset];
 }
+
 void namcos21_dsp_device::winrun_dspcomram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int bank = 1-(m_winrun_dspcomram_control[0x4/2]&1);
-	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
-	COMBINE_DATA( &mem[offset] );
+	unsigned bank = BIT(~m_winrun_dspcomram_control[0x4/2], 0);
+	uint16_t *mem = &m_winrun_dspcomram[0x1000 * bank];
+
+	COMBINE_DATA(&mem[offset]);
 }
 
 uint16_t namcos21_dsp_device::winrun_cuskey_r()
 {
-	int pc = m_dsp->pc();
-	switch( pc )
+	switch (m_dsp->pc())
 	{
 	case 0x0064: /* winrun91 */
 		return 0xFEBB;
@@ -94,6 +95,7 @@ uint16_t namcos21_dsp_device::winrun_cuskey_r()
 	default:
 		break;
 	}
+
 	return 0;
 }
 
@@ -103,47 +105,47 @@ void namcos21_dsp_device::winrun_cuskey_w(uint16_t data)
 
 void namcos21_dsp_device::winrun_flush_poly()
 {
-	if( m_winrun_poly_index>0 )
-	{
-		const uint16_t *pSource = m_winrun_poly_buf;
-		uint16_t color;
-		int sx[4], sy[4], zcode[4];
-		int j;
-		color = *pSource++;
-		if( color&0x8000 )
-		{ /* direct-draw */
-			for( j=0; j<4; j++ )
-			{
-				sx[j] = m_poly_frame_width/2  + (int16_t)*pSource++;
-				sy[j] = m_poly_frame_height/2 + (int16_t)*pSource++;
-				zcode[j] = *pSource++;
-			}
-			m_renderer->draw_quad(sx, sy, zcode, color&0x7fff);
-		}
-		else
+	if (m_winrun_poly_index == 0)
+		return;
+
+	const uint16_t *pSource = m_winrun_poly_buf;
+	uint16_t color = *pSource++;
+	int sx[4], sy[4], zcode[4];
+
+	if (BIT(color, 15))
+	{ /* direct-draw */
+		for (int j=0; j<4; j++)
 		{
-			int quad_idx = color*6;
-			for(;;)
-			{
-				uint8_t code = m_pointram[quad_idx++];
-				color = m_pointram[quad_idx++];
-				for( j=0; j<4; j++ )
-				{
-					uint8_t vi = m_pointram[quad_idx++];
-					sx[j] = m_poly_frame_width/2  + (int16_t)pSource[vi*3+0];
-					sy[j] = m_poly_frame_height/2 + (int16_t)pSource[vi*3+1];
-					zcode[j] = pSource[vi*3+2];
-				}
-				m_renderer->draw_quad(sx, sy, zcode, color&0x7fff);
-				if( code&0x80 )
-				{ /* end-of-quadlist marker */
-					break;
-				}
-			}
+			sx[j] = m_poly_frame_width/2  + (int16_t)*pSource++;
+			sy[j] = m_poly_frame_height/2 + (int16_t)*pSource++;
+			zcode[j] = *pSource++;
 		}
-		m_winrun_poly_index = 0;
+
+		m_renderer->draw_quad(sx, sy, zcode, color & 0x7fff);
 	}
-} /* winrun_flushpoly */
+	else
+	{
+		uint8_t code;
+		unsigned quad_idx = color*6;
+		do
+		{
+			code = m_pointram[quad_idx++];
+			color = m_pointram[quad_idx++];
+
+			for (int j=0; j<4; j++)
+			{
+				uint8_t vi = m_pointram[quad_idx++];
+				sx[j] = m_poly_frame_width/2  + (int16_t)pSource[vi*3 + 0];
+				sy[j] = m_poly_frame_height/2 + (int16_t)pSource[vi*3 + 1];
+				zcode[j] = pSource[vi*3 + 2];
+			}
+
+			m_renderer->draw_quad(sx, sy, zcode, color & 0x7fff);
+		} while (!BIT(code, 7)); //Reached end-of-quadlist marker?
+	}
+
+	m_winrun_poly_index = 0;
+}
 
 uint16_t namcos21_dsp_device::winrun_poly_reset_r()
 {
@@ -153,19 +155,15 @@ uint16_t namcos21_dsp_device::winrun_poly_reset_r()
 
 void namcos21_dsp_device::winrun_dsp_render_w(uint16_t data)
 {
-	if( m_winrun_poly_index<WINRUN_MAX_POLY_PARAM )
-	{
+	if (m_winrun_poly_index<WINRUN_MAX_POLY_PARAM)
 		m_winrun_poly_buf[m_winrun_poly_index++] = data;
-	}
 	else
-	{
-		logerror( "WINRUN_POLY_OVERFLOW\n" );
-	}
+		logerror("WINRUN_POLY_OVERFLOW\n");
 }
 
 void namcos21_dsp_device::winrun_dsp_pointrom_addr_w(offs_t offset, uint16_t data)
 {
-	if( offset==0 )
+	if (offset==0)
 	{ /* port 8 */
 		m_winrun_pointrom_addr = data;
 	}
@@ -182,7 +180,7 @@ uint16_t namcos21_dsp_device::winrun_dsp_pointrom_data_r()
 
 void namcos21_dsp_device::winrun_dsp_complete_w(uint16_t data)
 {
-	if( data )
+	if (data)
 	{
 		winrun_flush_poly();
 		m_dsp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -197,8 +195,9 @@ uint16_t namcos21_dsp_device::winrun_table_r(offs_t offset)
 
 void namcos21_dsp_device::winrun_dspbios_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA( &m_winrun_dspbios[offset] );
-	if( offset==0xfff ) // is this the real trigger?
+	COMBINE_DATA(&m_winrun_dspbios[offset]);
+
+	if (offset==0xfff) // is this the real trigger?
 	{
 		m_winrun_dsp_alive = 1;
 		m_dsp->resume(SUSPEND_REASON_HALT);
@@ -212,16 +211,18 @@ void namcos21_dsp_device::winrun_dspbios_w(offs_t offset, uint16_t data, uint16_
 
 uint16_t namcos21_dsp_device::winrun_68k_dspcomram_r(offs_t offset)
 {
-	int bank = m_winrun_dspcomram_control[0x4/2]&1;
+	unsigned bank = BIT(m_winrun_dspcomram_control[0x4/2], 0);
 	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
+
 	return mem[offset];
 }
 
 void namcos21_dsp_device::winrun_68k_dspcomram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int bank = m_winrun_dspcomram_control[0x4/2]&1;
+	unsigned bank = BIT(m_winrun_dspcomram_control[0x4/2], 0);
 	uint16_t *mem = &m_winrun_dspcomram[0x1000*bank];
-	COMBINE_DATA( &mem[offset] );
+
+	COMBINE_DATA(&mem[offset]);
 }
 
 uint16_t namcos21_dsp_device::winrun_dspcomram_control_r(offs_t offset)
@@ -231,7 +232,7 @@ uint16_t namcos21_dsp_device::winrun_dspcomram_control_r(offs_t offset)
 
 void namcos21_dsp_device::winrun_dspcomram_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA( &m_winrun_dspcomram_control[offset] );
+	COMBINE_DATA(&m_winrun_dspcomram_control[offset]);
 }
 
 
@@ -271,7 +272,7 @@ void namcos21_dsp_device::device_add_mconfig(machine_config &config)
 
 void namcos21_dsp_device::pointram_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA( &m_pointram_control );
+	COMBINE_DATA(&m_pointram_control);
 	m_pointram_idx = 0; /* HACK */
 }
 
@@ -282,9 +283,9 @@ uint16_t namcos21_dsp_device::pointram_data_r()
 
 void namcos21_dsp_device::pointram_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if( ACCESSING_BITS_0_7 )
+	if (ACCESSING_BITS_0_7)
 	{
 		m_pointram[m_pointram_idx++] = data;
-		m_pointram_idx &= (PTRAM_SIZE-1);
+		m_pointram_idx &= (PTRAM_SIZE - 1);
 	}
 }
