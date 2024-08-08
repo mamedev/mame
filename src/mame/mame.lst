@@ -33372,6 +33372,7 @@ topracern                       // bootleg
 @source:namco/quickncrash.cpp
 qncrash                         // (c) 1999 Namco
 qncrasha                        // (c) 1999 Namco
+qncrashb                        // (c) 1999 Namco
 
 @source:namco/rallyx.cpp
 commsega                        // (c) 1983 Sega
