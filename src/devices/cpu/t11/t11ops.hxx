@@ -352,13 +352,13 @@ void t11_device::halt(uint16_t op)
 void t11_device::illegal(uint16_t op)
 {
 	m_icount -= 48;
-	trap_to(0x08);
+	trap_to(T11_ILLINST);
 }
 
 void t11_device::illegal4(uint16_t op)
 {
 	m_icount -= 48;
-	trap_to(0x04);
+	trap_to(T11_TIMEOUT);
 }
 
 void t11_device::mark(uint16_t op)
@@ -963,13 +963,13 @@ void t11_device::bcs(uint16_t op)           { m_icount -= 12; { BR( GET_C); } }
 void t11_device::emt(uint16_t op)
 {
 	m_icount -= 48;
-	trap_to(0x18);
+	trap_to(T11_EMT);
 }
 
 void t11_device::trap(uint16_t op)
 {
 	m_icount -= 48;
-	trap_to(0x1c);
+	trap_to(T11_TRAP);
 }
 
 void t11_device::clrb_rg(uint16_t op)       { m_icount -= 12; { CLRB_R(RG);  } }

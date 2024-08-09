@@ -98,7 +98,6 @@ void bk_state::bk0010(machine_config &config)
 	m_kbd->keydown_wr_callback().set(
 			[this] (int state)
 			{
-				m_sel1 |= SEL1_UPDATED;
 				if (state)
 					m_sel1 &= ~SEL1_KEYDOWN;
 				else
