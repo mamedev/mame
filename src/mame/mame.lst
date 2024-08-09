@@ -45053,6 +45053,9 @@ emma2                           // 1979 L.J.Technical Systems
 @source:trainer/instruct.cpp
 instruct                        //
 
+@source:trainer/mcg85.cpp
+mcg85                           //
+
 @source:trainer/mk14.cpp
 mk14                            //
 mk14vdu                         //
