@@ -2,9 +2,10 @@
 // copyright-holders:Nicola Salmoria, Lee Taylor
 /***************************************************************************
 
-Universal board numbers (found on the schematics)
+Universal board numbers (found on the schematics / pics)
 
 Cosmic Alien    - 7910
+No Man's Land   - 8003
 Magical Spot    - 8013
 Magical Spot II - 8013
 Devil Zone      - 8022
