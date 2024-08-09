@@ -371,10 +371,6 @@ void rm380z_state_cos40_hrg::machine_reset()
 	memset(m_hrg_scratchpad, 0, sizeof(m_hrg_scratchpad));
 }
 
-void rm480z_state::machine_reset()
-{
-}
-
 void rm380z_state::config_memory_map()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);

@@ -92,12 +92,12 @@ protected:
 	uint8_t m_fbfe = 0;
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<screen_device> m_screen;
-	optional_device<palette_device> m_palette;
-	optional_device<ram_device> m_messram;
-	optional_device<fd1771_device> m_fdc;
-	optional_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<ram_device> m_messram;
+	required_device<fd1771_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 };
 
 // COS 3.4 machine with cassette and VDU-40 display
@@ -198,7 +198,7 @@ protected:
 	uint8_t m_fbfd = 0;
 
 	required_region_ptr<u8> m_chargen;
-	optional_device<speaker_sound_device> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 
 private:
 	void config_videomode();
@@ -262,28 +262,6 @@ private:
 	hrg_display_mode m_hrg_display_mode = hrg_display_mode::none;
 
 	required_ioport m_io_display_type;
-};
-
-// partially implemented non working RM480z
-class rm480z_state : public rm380z_state_cos40
-{
-public:
-	rm480z_state(const machine_config &mconfig, device_type type, const char *tag) :
-		rm380z_state_cos40(mconfig, type, tag)
-	{
-	}
-
-	void rm480z(machine_config &config);
-	void rm480za(machine_config &config) { rm480z(config); }
-
-protected:
-	void machine_reset() override;
-
-	void update_screen(bitmap_ind16 &bitmap) const override;
-
-private:
-	void rm480z_io(address_map &map);
-	void rm480z_mem(address_map &map);
 };
 
 #endif // MAME_RM_RM380Z_H

@@ -428,37 +428,3 @@ void rm380z_state_cos34::update_screen(bitmap_ind16 &bitmap) const
 		}
 	}
 }
-
-// only partially implemented and non working
-void rm480z_state::update_screen(bitmap_ind16 &bitmap) const
-{
-	uint16_t sy = 0, ma = 0;
-
-	for (uint8_t y = 0; y < RM380Z_SCREENROWS; y++)
-	{
-		for (uint8_t ra = 0; ra < 11; ra++)
-		{
-			uint16_t *p = &bitmap.pix(sy++);
-
-			for (uint16_t x = ma; x < ma + 64; x++)
-			{
-				uint8_t gfx = 0;
-				if (ra < 10)
-				{
-					const uint8_t chr = m_vram.get_char(y, x);
-					gfx = m_chargen[(chr << 4) | ra];
-				}
-
-				// Display a scanline of a character
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
-			}
-		}
-	}
-}
