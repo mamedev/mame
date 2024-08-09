@@ -38993,6 +38993,7 @@ mbc200                          //
 phc20                           // Sanyo PHC-20
 
 @source:sanyo/phc25.cpp
+map1010                         // Seiko MAP-1010
 phc25                           // Sanyo PHC-25 (Europe)
 phc25j                          // Sanyo PHC-25 (Japan)
 
