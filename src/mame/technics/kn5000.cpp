@@ -106,6 +106,8 @@ public:
 		, m_checking_device_led_cn11(*this, "checking_device_led_cn11")
 		, m_extension(*this, "extension")
 		, m_extension_view(*this, "extension_view")
+		, m_CPL_SEG(*this, "CPL_SEG%u", 0U)
+		, m_CPR_SEG(*this, "CPR_SEG%u", 0U)
 		, m_CPL_LED(*this, "CPL_%u", 0U)
 		, m_CPR_LED(*this, "CPR_%u", 0U)
 		, m_led_row(0)
@@ -125,6 +127,8 @@ private:
 	required_device<kn5000_extension_device> m_extension;
 	memory_view m_extension_view;
 
+	required_ioport_array<11> m_CPL_SEG; // buttons on "Control Panel Left" PCB
+	required_ioport_array<11> m_CPR_SEG; // buttons on "Control Panel Right" PCB
 	output_finder<50> m_CPL_LED;
 	output_finder<69> m_CPR_LED;
 	uint8_t m_led_row;
@@ -457,44 +461,12 @@ INPUT_PORTS_END
 
 uint8_t kn5000_state::cpanel_left_buttons_r(offs_t offset)
 {
-	switch (offset)
-	{
-		case 0: return ioport("CPL_SEG0")->read(); break;
-		case 1: return ioport("CPL_SEG1")->read(); break;
-		case 2: return ioport("CPL_SEG2")->read(); break;
-		case 3: return ioport("CPL_SEG3")->read(); break;
-		case 4: return ioport("CPL_SEG4")->read(); break;
-		case 5: return ioport("CPL_SEG5")->read(); break;
-		case 6: return ioport("CPL_SEG6")->read(); break;
-		case 7: return ioport("CPL_SEG7")->read(); break;
-		case 8: return ioport("CPL_SEG8")->read(); break;
-		case 9: return ioport("CPL_SEG9")->read(); break;
-		case 10: return ioport("CPL_SEG10")->read(); break;
-		default:
-			return 0x00;
-			break;
-	}
+	return m_CPL_SEG[offset]->read();
 }
 
 uint8_t kn5000_state::cpanel_right_buttons_r(offs_t offset)
 {
-	switch (offset)
-	{
-		case 0: return ioport("CPR_SEG0")->read(); break;
-		case 1: return ioport("CPR_SEG1")->read(); break;
-		case 2: return ioport("CPR_SEG2")->read(); break;
-		case 3: return ioport("CPR_SEG3")->read(); break;
-		case 4: return ioport("CPR_SEG4")->read(); break;
-		case 5: return ioport("CPR_SEG5")->read(); break;
-		case 6: return ioport("CPR_SEG6")->read(); break;
-		case 7: return ioport("CPR_SEG7")->read(); break;
-		case 8: return ioport("CPR_SEG8")->read(); break;
-		case 9: return ioport("CPR_SEG9")->read(); break;
-		case 10: return ioport("CPR_SEG10")->read(); break;
-		default:
-			return 0x00;
-			break;
-	}
+	return m_CPR_SEG[offset]->read();
 }
 
 
