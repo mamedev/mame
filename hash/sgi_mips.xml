@@ -5854,14 +5854,14 @@ license:CC0-1.0
 			<feature name="part_id" value="NetBSD 2.0 CD sgimipscd"/>
 			<!-- Origin: netbsd.org -->
 			<diskarea name="cdrom">
-				<disk name="sgimipscd" sha1="d8960cfffc55d87f8e83074346e0f670b7a7f024" />
+				<disk name="sgimipscd_2_0" sha1="d8960cfffc55d87f8e83074346e0f670b7a7f024" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="NetBSD 2.0 CD sourcecd"/>
 			<!-- Origin: netbsd.org -->
 			<diskarea name="cdrom">
-				<disk name="sourcecd" sha1="073ceaa3db068938e11a4893fcec81ce533e1016" />
+				<disk name="sourcecd_2_0" sha1="073ceaa3db068938e11a4893fcec81ce533e1016" />
 			</diskarea>
 		</part>
 	</software>
@@ -5874,14 +5874,14 @@ license:CC0-1.0
 			<feature name="part_id" value="NetBSD 2.0.2 CD sgimipscd"/>
 			<!-- Origin: netbsd.org -->
 			<diskarea name="cdrom">
-				<disk name="sgimipscd" sha1="45b78a683010aa75476ca987e48fa469b4cfa127" />
+				<disk name="sgimipscd_2_0_2" sha1="45b78a683010aa75476ca987e48fa469b4cfa127" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="NetBSD 2.0.2 CD sourcecd"/>
 			<!-- Origin: netbsd.org -->
 			<diskarea name="cdrom">
-				<disk name="sourcecd" sha1="e74be0fe637d4ddc8e5bbe818d6c3876fce2f6ae" />
+				<disk name="sourcecd_2_0_2" sha1="e74be0fe637d4ddc8e5bbe818d6c3876fce2f6ae" />
 			</diskarea>
 		</part>
 	</software>
