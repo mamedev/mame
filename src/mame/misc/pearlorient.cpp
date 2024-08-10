@@ -1,7 +1,6 @@
 // license:GPL-2.0+
 // copyright-holders:flama12333
 /*************************************************************************
-driverbased of marywu  but reworked to use a 8052c 
 there are second mcu. if is not present will marked error 10.
 
 Notes:
@@ -12,7 +11,6 @@ New feature: buy a 6th ball toup the odds.
 src: for reference https://youtu.be/GszrVAWQ7d0
 
 5 ball Version. Oriental Pearl
-no have these features.
 src for reference: https://youtu.be/XEaOan6NWKQ?t=18
 
 It is possible that the different voices are different versions?
