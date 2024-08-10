@@ -3,17 +3,30 @@
 /*************************************************************************
 there are second mcu. if is not present will marked error 10.
 
-Notes:
+Features Notes:
 src: Chang yu website
-Pearl in the  East 6 ball version
+
+Pearl in the  East 
+
+5 balls per game ... win a bonus if 4 balls flip into the same slot.
+
+When balls flip into certain slots, additional lamps illuminate.
+
+When scoring on all letters of pearl in the east, up to 4 extra lamps randomly illuminate.
+
+Higher bets when scoring on all letters of PEARL IN THE EAST win a higher bonus.
 
 New feature: buy a 6th ball toup the odds.
 
-src: for reference https://youtu.be/GszrVAWQ7d0
+Oriental Pearl - 1997
 
-5 ball Version. Oriental Pearl
-src for reference: https://youtu.be/XEaOan6NWKQ?t=18
+5 balls per game and 2 win modes.
 
+1 higher bets mean more bonus lights and more chances to win.
+
+Big bonus for scoring on all letters of "ORIENTAL PEARL".
+
+Electronic ball-checking device ensures where ball lands.
 */
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
