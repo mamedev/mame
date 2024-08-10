@@ -74,6 +74,8 @@ license:CC0-1.0
 		<rect><color red="0.05" green="0.05" blue="0.05"/></rect>
 	</element>
 
+	<element name="maincpu_text"><text string="MAIN CPU"><color red="0.3" green="0.3" blue="0.3" /></text></element>
+	<element name="subcpu_text"><text string="SUB CPU"><color red="0.3" green="0.3" blue="0.3" /></text></element>
 
 	<element name="msp_title"><text string="MANUAL SEQUENCE PADS"><color red="0.79" green="0.64" blue="0.49" /></text></element>
 	<element name="demo_text"><text string="DEMO"><color red="0.79" green="0.64" blue="0.49" /></text></element>
@@ -640,7 +642,13 @@ license:CC0-1.0
 	<element name="CPR_67" ref="green_led"><!-- START/STOP 3 BEAT --><bounds x="716" y="558" width="5" height="5"/></element>
 	<element name="CPR_68" ref="green_led"><!-- START/STOP 4 BEAT --><bounds x="732" y="558" width="5" height="5"/></element>
 
+	<element name="checking_device_led_cn11" ref="red_led"><!-- MAINCPU CHECK LED --><bounds x="1270" y="10" width="5" height="5"/></element>
+	<element name="checking_device_led_cn12" ref="red_led"><!-- SUBCPU CHECK LED --><bounds x="1270" y="20" width="5" height="5"/></element>
+
 <!-- Labels -->
+
+	<element ref="maincpu_text"><bounds x="1235" y="8" width="30" height="8"/></element>
+	<element ref="subcpu_text"><bounds x="1235" y="18" width="30" height="8"/></element>
 
 	<element ref="demo_text"><bounds x="34" y="228" width="20" height="8"/></element>
 

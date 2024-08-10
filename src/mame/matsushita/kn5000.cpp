@@ -13,8 +13,6 @@
 #include "machine/gen_latch.h"
 #include "machine/upd765.h"
 #include "screen.h"
-#include "sound/beep.h"
-#include "speaker.h"
 #include "video/pc_vga.h"
 #include "kn5000.lh"
 
@@ -103,11 +101,12 @@ public:
 		, m_maincpu_latch(*this, "maincpu_latch")
 		, m_subcpu_latch(*this, "subcpu_latch")
 		, m_fdc(*this, "fdc")
-		, m_checking_device_led_cn11(*this, "checking_device_led_cn11")
 		, m_extension(*this, "extension")
 		, m_extension_view(*this, "extension_view")
 		, m_CPL_SEG(*this, "CPL_SEG%u", 0U)
 		, m_CPR_SEG(*this, "CPR_SEG%u", 0U)
+		, m_checking_device_led_cn11(*this, "checking_device_led_cn11")
+		, m_checking_device_led_cn12(*this, "checking_device_led_cn12")
 		, m_CPL_LED(*this, "CPL_%u", 0U)
 		, m_CPR_LED(*this, "CPR_%u", 0U)
 		, m_led_row(0)
@@ -123,12 +122,13 @@ private:
 	required_device<generic_latch_8_device> m_maincpu_latch;
 	required_device<generic_latch_8_device> m_subcpu_latch;
 	required_device<upd72067_device> m_fdc;
-	required_device<beep_device> m_checking_device_led_cn11;
 	required_device<kn5000_extension_device> m_extension;
 	memory_view m_extension_view;
 
 	required_ioport_array<11> m_CPL_SEG; // buttons on "Control Panel Left" PCB
 	required_ioport_array<11> m_CPR_SEG; // buttons on "Control Panel Right" PCB
+	output_finder<> m_checking_device_led_cn11;
+	output_finder<> m_checking_device_led_cn12;
 	output_finder<50> m_CPL_LED;
 	output_finder<69> m_CPR_LED;
 	uint8_t m_led_row;
@@ -667,14 +667,16 @@ void kn5000_state::machine_start()
 	}
 #endif // EXTENSION_VIEW
 
+	m_checking_device_led_cn11.resolve();
+	m_checking_device_led_cn12.resolve();
 	m_CPL_LED.resolve();
 	m_CPR_LED.resolve();
 }
 
 void kn5000_state::machine_reset()
 {
-	/* Setup beep */
-	m_checking_device_led_cn11->set_state(0);
+	m_checking_device_led_cn11 = 0;
+	m_checking_device_led_cn12 = 0;
 }
 
 void kn5000_state::kn5000(machine_config &config)
@@ -713,7 +715,7 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 0 (input) = "check terminal" switch
 	//   bit 1 (output) = "check terminal" LED
 	m_maincpu->portc_read().set([this] { return ioport("CN11")->read(); });
-	m_maincpu->portc_write().set([this] (u8 data) { m_checking_device_led_cn11->set_state(BIT(data, 1) == 0); });
+	m_maincpu->portc_write().set([this] (u8 data) { m_checking_device_led_cn11 = (BIT(data, 1) == 0); });
 
 
 	// MAINCPU PORT D:
@@ -781,6 +783,11 @@ void kn5000_state::kn5000(machine_config &config)
 	// Address bus is set to 8 bits by the pins AM1=GND and AM0=GND
 	m_subcpu->set_addrmap(AS_PROGRAM, &kn5000_state::subcpu_mem);
 
+	// SUBCPU PORT C:
+	//   bit 0 (input) = "check terminal" switch
+	//   bit 1 (output) = "check terminal" LED
+	m_subcpu->portc_read().set([this] { return ioport("CN12")->read(); });
+	m_subcpu->portc_write().set([this] (u8 data) { m_checking_device_led_cn12 = (BIT(data, 1) == 0); });
 
 	// SUBCPU PORT D:
 	//   bit 0 = (output) SSTAT0
@@ -836,11 +843,6 @@ void kn5000_state::kn5000(machine_config &config)
 	vga.set_vram_size(0x100000);
 
 	config.set_default_layout(layout_kn5000);
-
-	// This is a quick hack to beep whenever the checking device LED is on
-	// (just because I find it more convenient to listen to the beeps while debugging the driver)
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, "checking_device_led_cn11", 12_MHz_XTAL / 3200).add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 ROM_START(kn5000)
