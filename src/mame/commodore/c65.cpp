@@ -302,7 +302,7 @@ public:
 		//, m_rome_view(*this, "rome_view")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_workram(*this, "work_ram")
+		, m_workram(*this, "work_ram", 0x20000, ENDIANNESS_LITTLE)
 		, m_palred(*this, "redpal")
 		, m_palgreen(*this, "greenpal")
 		, m_palblue(*this, "bluepal")
@@ -311,7 +311,19 @@ public:
 		, m_ipl_rom(*this, "ipl")
 	{ }
 
-	// devices
+	void init_c65();
+	void init_c65pal();
+
+	void c65(machine_config &config);
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void video_start() override;
+	virtual void video_reset() override;
+private:
 	required_device<m4510_device> m_maincpu;
 	required_device_array<mos6526_device, 2> m_cia;
 	required_device_array<mos6581_device, 2> m_sid;
@@ -324,7 +336,7 @@ public:
 	//memory_view m_rome_view;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_workram;
+	memory_share_creator<uint8_t> m_workram;
 	required_shared_ptr<uint8_t> m_palred;
 	required_shared_ptr<uint8_t> m_palgreen;
 	required_shared_ptr<uint8_t> m_palblue;
@@ -346,30 +358,53 @@ public:
 	void cia0_porta_w(uint8_t data);
 	uint8_t cia0_portb_r();
 	void cia0_portb_w(uint8_t data);
+	void cia1_porta_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void palette_init(palette_device &palette);
-	void init_c65();
-	void init_c65pal();
 
-	void c65(machine_config &config);
 	void c65_map(address_map &map);
-protected:
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
-	virtual void video_start() override;
-	virtual void video_reset() override;
-private:
+	void IRQCheck(uint8_t irq_cause);
+
+	template <unsigned StartBase> uint8_t ram_r(offs_t offset)
+	{
+		return m_workram[offset + StartBase];
+	}
+
+	template <unsigned StartBase> void ram_w(offs_t offset, uint8_t data)
+	{
+		m_workram[offset + StartBase] = data;
+	}
+
+	u16 m_vic_bank_base = 0U;
+
 	// TODO: move to own device
 	uint8_t m_VIC2_IRQPend = 0U, m_VIC2_IRQMask = 0U;
 	uint8_t m_VIC2_EXTColor = 0U;
-	uint8_t m_VIC2_VS_CB_Base = 0U;
+	uint8_t m_vs_cb_base = 0U;
 	uint8_t m_VIC2_BK0_Color = 0U;
 	uint8_t m_sprite_enable = 0U;
 	uint8_t m_VIC3_ControlA = 0U;
 	uint8_t m_VIC3_ControlB = 0U;
+	// handler helpers
+	u16 m_vs_base_offset = 0U;
+	u16 m_cb_base_offset = 0U;
+	u8* m_video_ptr = nullptr;
+	u8* m_char_ptr = nullptr;
+
+	// TODO: tracer bullet
+	// this pointer fetch should happen as a bridge between VIC device and memory controller.
+	void flush_cb_base()
+	{
+		m_video_ptr = &m_workram[m_vs_base_offset | m_vic_bank_base];
+		if ((m_cb_base_offset & 0x3000) == 0x1000 && !(BIT(m_vic_bank_base, 14)))
+		{
+			m_char_ptr = &m_ipl_rom->base()[((m_VIC3_ControlA & 0x40) ? 0x9000: 0xd000) + (m_cb_base_offset & 0x800)];
+		}
+		else
+			m_char_ptr = &m_workram[m_cb_base_offset | m_vic_bank_base];
+	};
 	bool m_video_enable = false;
 	struct {
 		u16 x;
@@ -390,7 +425,6 @@ private:
 	std::tuple<u8, u8, u8, bool> get_sprite_pixel(int y, int x);
 
 	void PalEntryFlush(uint8_t offset);
-	void IRQCheck(uint8_t irq_cause);
 };
 
 void c65_state::video_start()
@@ -403,6 +437,8 @@ void c65_state::video_reset()
 {
 	m_scanline_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 1, 0), m_screen->vpos() + 1);
 	m_video_enable = false;
+	// vestigial, so to have a pointer in any case
+	flush_cb_base();
 }
 
 void c65_state::vic4567_map(address_map &map)
@@ -492,10 +528,13 @@ void c65_state::vic4567_map(address_map &map)
  */
 	map(0x18, 0x18).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_VIC2_VS_CB_Base;
+			return m_vs_cb_base;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_VIC2_VS_CB_Base = data;
+			m_vs_cb_base = data;
+			m_vs_base_offset = (m_vs_cb_base & 0xf0) << 6;
+			m_cb_base_offset = (m_vs_cb_base & 0x0e) << 10;
+			flush_cb_base();
 		})
 	);
 /*
@@ -595,12 +634,12 @@ void c65_state::vic4567_map(address_map &map)
  * KEY register, handles vic-iii and vic-ii modes via two consecutive writes
  * 0xa5 -> 0x96 vic-iii mode
  * any other write vic-ii mode (changes base memory map)
- * vic-iv (MEGA65/C65GS) also has another KEY init sequence
+ * vic-iv (MEGA65/C65GS) also has another KEY init sequence (0x47 -> 0x53)
  */
 //  map(0x2f, 0x2f)
 /*
  * x--- ---- overlay ROM at $e000
- * -x-- ---- Move CROM at @9000
+ * -x-- ---- Move CROM at $9000 (C=65), $d000 otherwise (C=64)
  * --x- ---- overlay ROM at $c000
  * ---x ---- overlay ROM at $a000
  * ---- x--- overlay ROM at $8000
@@ -621,6 +660,7 @@ void c65_state::vic4567_map(address_map &map)
 			//m_rom8_view.select(BIT(data, 3));
 			//m_roma_view.select(BIT(data, 4));
 			m_romc_view.select(BIT(data, 5));
+			flush_cb_base();
 			//m_rome_view.select(BIT(data, 7));
 			logerror("\tROM @ 8000 %d\n", BIT(data, 3));
 			logerror("\tROM @ a000 %d\n", BIT(data, 4));
@@ -668,21 +708,17 @@ std::tuple<u8, bool> c65_state::get_tile_pixel(int y, int x)
 	int pixel_width = (m_VIC3_ControlB & 0x80) ? 1 : 2;
 	int columns = 80 / pixel_width;
 
-	// TODO: Move init of these two in handlers
-	uint8_t *cptr = &m_ipl_rom->base()[((m_VIC3_ControlA & 0x40) ? 0x9000: 0xd000) + ((m_VIC2_VS_CB_Base & 0x2) << 10)];
-	const u32 base_offs = (m_VIC2_VS_CB_Base & 0xf0) << 6;
-
 	int xi = (x >> 3) / pixel_width;
 	int yi = (y >> 3);
 	int xm = 7 - ((x / pixel_width) & 7);
 	int ym = (y & 7);
-	uint8_t tile = m_workram[xi + yi * columns + base_offs];
+	uint8_t tile = m_video_ptr[(xi + yi * columns) & 0x3fff];
 	uint8_t attr = m_cram[xi + yi * columns];
 	int foreground_color = attr & 0xf;
 	int background_color = m_VIC2_BK0_Color & 0xf;
 	int highlight_color = 0;
 
-	int enable_dot = ((cptr[(tile << 3) + ym] >> xm) & 1);
+	int enable_dot = ((m_char_ptr[((tile << 3) + ym) & 0x3fff] >> xm) & 1);
 
 	if ((attr & 0x80) && ym == 7) enable_dot = 1;
 	if (attr & 0x40) highlight_color = 16;
@@ -700,7 +736,8 @@ std::tuple<u8, u8, u8, bool> c65_state::get_sprite_pixel(int y, int x)
 	u8 enable_dot = 0;
 	u8 sprite_mask = 0;
 	u8 idx = 0;
-	const u32 base_offs = ((m_VIC2_VS_CB_Base & 0xf0) << 6) + 0x3f8;
+	// TODO: move me, bitplane mode should also affect this
+	const u8 *sprite_ptr = &m_video_ptr[BIT(m_VIC3_ControlB, 7) ? 0x7f8 : 0x3f8];
 
 	// sprite #7 < #6 < ... < #0
 	for (int i = 7; i >= 0; i--)
@@ -722,7 +759,7 @@ std::tuple<u8, u8, u8, bool> c65_state::get_sprite_pixel(int y, int x)
 		if (!(x >= xi && x < xi + xsize))
 			continue;
 
-		u32 sprite_offset = m_workram[base_offs + i] << 6;
+		u32 sprite_offset = sprite_ptr[i] << 6;
 		const int xm = (x - xi) >> x_width;
 		const int ym = (y - yi) >> y_width;
 
@@ -906,14 +943,25 @@ void c65_state::cia0_portb_w(uint8_t data)
 {
 }
 
+/*
+ * xx-- ---- serial bus input
+ * --xx x--- serial bus output
+ * ---- -x-- RS-232 TXD output
+ * ---- --xx VIC bank base
+ */
+void c65_state::cia1_porta_w(uint8_t data)
+{
+	m_vic_bank_base = ~(data & 0x3) << 14;
+	flush_cb_base();
+}
 
 void c65_state::c65_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000, 0x07fff).ram().share("work_ram");
+	map(0x00000, 0x07fff).rw(FUNC(c65_state::ram_r<0x00000>), FUNC(c65_state::ram_w<0x00000>));
 	map(0x08000, 0x0bfff).rom().region("ipl", 0x08000);
 	map(0x0c000, 0x0cfff).view(m_romc_view);
-	m_romc_view[0](0x0c000, 0x0cfff).ram();
+	m_romc_view[0](0x0c000, 0x0cfff).rw(FUNC(c65_state::ram_r<0x0c000>), FUNC(c65_state::ram_w<0x0c000>));
 	m_romc_view[1](0x0c000, 0x0cfff).rom().region("ipl", 0x0c000);
 	map(0x0d000, 0x0d07f).m(*this, FUNC(c65_state::vic4567_map));
 	// 0x0d080, 0x0d09f FDC
@@ -944,7 +992,7 @@ void c65_state::c65_map(address_map &map)
 	// 0x0df00, 0x0df** Ext I/O Select 2 (RAM window?)
 	m_cram_view[1](0x0d800, 0x0dfff).ram().share("cram");
 	map(0x0e000, 0x0ffff).rom().region("ipl", 0x0e000);
-	map(0x10000, 0x1f7ff).ram();
+	map(0x10000, 0x1f7ff).rw(FUNC(c65_state::ram_r<0x010000>), FUNC(c65_state::ram_w<0x10000>));
 	map(0x1f800, 0x1ffff).ram().share("cram");
 	map(0x20000, 0x3ffff).rom().region("ipl", 0);
 //  0x40000, 0x7ffff cart expansion
@@ -1130,7 +1178,7 @@ void c65_state::c65(machine_config &config)
 	m_cia[1]->set_tod_clock(60);
 //  m_cia[1]->irq_wr_callback().set(FUNC(c65_state::cia1_irq)); // NMI
 //  m_cia[1]->pa_rd_callback().set(FUNC(c65_state::c65_cia1_port_a_r));
-//  m_cia[1]->pa_wr_callback().set(FUNC(c65_state::c65_cia1_port_a_w));
+	m_cia[1]->pa_wr_callback().set(FUNC(c65_state::cia1_porta_w));
 
 
 	/* video hardware */
