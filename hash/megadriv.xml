@@ -12591,7 +12591,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 	</software>
 
 	<software name="bmaster2p" cloneof="bmaster2">
-		<description>Blaster Master 2 (USA, prototype)</description>
+		<description>Blaster Master 2 (USA, prototype 19930415)</description>
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -12899,6 +12899,17 @@ No [VDP] sprites
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="bram stoker's dracula (usa).bin" size="1048576" crc="077084a6" sha1="4ede0e75054655acab63f2a41b8c57e1cf137e58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breach">
+		<description>Breach (prototype)</description>
+		<year>1992?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="412818">
+				<rom name="Breach fixed rom.bin" size="412818" crc="121ce289" sha1="3eabd16b3a523e276069a107a95e86221b9a534e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13464,7 +13475,7 @@ No [VDP] sprites
 	</software>
 
 	<software name="centurp" cloneof="centur">
-		<description>Centurion - Defender of Rome (Europe, prototype, 19910528)</description>
+		<description>Centurion - Defender of Rome (Europe, prototype 19910528)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -13486,7 +13497,7 @@ No [VDP] sprites
 	</software>
 
 	<software name="champwcsp" cloneof="champwcs">
-		<description>Champions World Class Soccer (prototype)</description>
+		<description>Champions World Class Soccer (prototype 19940318)</description>
 		<year>1994</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14276,7 +14287,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixp" cloneof="comix">
-		<description>Comix Zone (Europe, prototype, 19950628)</description>
+		<description>Comix Zone (Europe, prototype 19950628)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14314,7 +14325,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software-->
 
 	<software name="comixup01" cloneof="comix">
-		<description>Comix Zone (Europe, prototype, 19950712)</description>
+		<description>Comix Zone (Europe, prototype 19950712)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14325,7 +14336,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup08" cloneof="comix">
-		<description>Comix Zone (USA, prototype, 19950601-B)</description>
+		<description>Comix Zone (USA, prototype 19950601-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14336,7 +14347,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup07" cloneof="comix">
-		<description>Comix Zone (USA, prototype, 19950601-C)</description>
+		<description>Comix Zone (USA, prototype 19950601-C)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14347,7 +14358,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup06" cloneof="comix">
-		<description>Comix Zone (USA, prototype, 19950601-D)</description>
+		<description>Comix Zone (USA, prototype 19950601-D)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14358,7 +14369,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup05" cloneof="comix">
-		<description>Comix Zone (USA, prototype, 19950601)</description>
+		<description>Comix Zone (USA, prototype 19950601)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14369,7 +14380,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup04" cloneof="comix">
-		<description>Comix Zone (USA, prototype, 19950602-B)</description>
+		<description>Comix Zone (USA, prototype 19950602-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14381,7 +14392,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup03" cloneof="comix">
-		<description>Comix Zone (USA, prototype, 19950602)</description>
+		<description>Comix Zone (USA, prototype 19950602)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14393,7 +14404,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup02" cloneof="comix">
-		<description>Comix Zone (USA, prototype, 19950603)</description>
+		<description>Comix Zone (USA, prototype 19950603)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14405,7 +14416,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup10" cloneof="comix">
-		<description>Comix Zone (prototype, 19950526)</description>
+		<description>Comix Zone (prototype 19950526)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -14417,7 +14428,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixup09" cloneof="comix">
-		<description>Comix Zone (prototype, 19950530)</description>
+		<description>Comix Zone (prototype 19950530)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -14429,7 +14440,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixkp" cloneof="comix">
-		<description>Comix Zone (Korea, prototype, 19950609)</description>
+		<description>Comix Zone (Korea, prototype 19950609)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
@@ -14441,7 +14452,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="comixsc" cloneof="comix">
-		<description>Comix Zone (Sega Channel, prototype, 19950612)</description>
+		<description>Comix Zone (Sega Channel, prototype 19950612)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14637,7 +14648,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp06" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940701)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940701)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14649,7 +14660,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp05" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940702)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940702)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14661,7 +14672,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp04" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940703)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940703)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14673,7 +14684,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp03" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940712-B)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940712-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14685,7 +14696,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp02" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940712)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940712)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14697,7 +14708,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp01" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940713)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940713)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14709,7 +14720,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp12" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940601)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940601)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -14721,7 +14732,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp11" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940606)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940606)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -14733,7 +14744,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp10" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940610)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940610)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -14745,7 +14756,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp09" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940623)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940623)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14757,7 +14768,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp08" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940628)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940628)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14769,7 +14780,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp07" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940630)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940630)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14781,7 +14792,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp15" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940511)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940511)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -14793,7 +14804,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp14" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940519)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940519)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -14805,7 +14816,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="crystlptp13" cloneof="crystlpt">
-		<description>Crystal's Pony Tale (USA, prototype, 19940526)</description>
+		<description>Crystal's Pony Tale (USA, prototype 19940526)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -15382,7 +15393,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp9" cloneof="desrtdem" supported="no">
-		<description>Desert Demolition (prototype, 19941206)</description>
+		<description>Desert Demolition (prototype 19941206)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15393,7 +15404,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp8" cloneof="desrtdem">
-		<description>Desert Demolition (prototype, 19941208)</description>
+		<description>Desert Demolition (prototype 19941208)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15404,7 +15415,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp7" cloneof="desrtdem">
-		<description>Desert Demolition (prototype, 19941212-B)</description>
+		<description>Desert Demolition (prototype 19941212-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15415,7 +15426,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp6" cloneof="desrtdem" supported="no">
-		<description>Desert Demolition (prototype, 19941212)</description>
+		<description>Desert Demolition (prototype 19941212)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15426,7 +15437,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp5" cloneof="desrtdem">
-		<description>Desert Demolition (prototype, 19941213)</description>
+		<description>Desert Demolition (prototype 19941213)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15437,7 +15448,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp4" cloneof="desrtdem">
-		<description>Desert Demolition (prototype, 19941214)</description>
+		<description>Desert Demolition (prototype 19941214)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15448,7 +15459,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp3" cloneof="desrtdem">
-		<description>Desert Demolition (prototype, 19941215)</description>
+		<description>Desert Demolition (prototype 19941215)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15459,7 +15470,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp2" cloneof="desrtdem">
-		<description>Desert Demolition (prototype, 19941216)</description>
+		<description>Desert Demolition (prototype 19941216)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15470,7 +15481,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="desrtdemp1" cloneof="desrtdem">
-		<description>Desert Demolition (prototype, 19941219)</description>
+		<description>Desert Demolition (prototype 19941219)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15592,7 +15603,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="dinohirep3" cloneof="dinohire">
-		<description>Tom Mason's Dinosaurs for Hire (prototype, 19930426)</description>
+		<description>Tom Mason's Dinosaurs for Hire (prototype 19930426)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15603,7 +15614,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="dinohirep2" cloneof="dinohire">
-		<description>Tom Mason's Dinosaurs for Hire (prototype, 19930427)</description>
+		<description>Tom Mason's Dinosaurs for Hire (prototype 19930427)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15614,7 +15625,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 	</software>
 
 	<software name="dinohirep1" cloneof="dinohire">
-		<description>Tom Mason's Dinosaurs for Hire (prototype, 19930502)</description>
+		<description>Tom Mason's Dinosaurs for Hire (prototype 19930502)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16068,7 +16079,7 @@ Choppy timings during gameplay (btanb?)
 	</software>
 
 	<software name="dheadp3" cloneof="dhead">
-		<description>Dynamite Headdy (prototype, 19940614-CABEZA)</description>
+		<description>Dynamite Headdy (prototype 19940614-CABEZA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16091,7 +16102,7 @@ Choppy timings during gameplay (btanb?)
 	</software-->
 
 	<software name="dheadp2" cloneof="dhead">
-		<description>Dynamite Headdy (prototype, 19940616)</description>
+		<description>Dynamite Headdy (prototype 19940616)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16102,7 +16113,7 @@ Choppy timings during gameplay (btanb?)
 	</software>
 
 	<software name="dheadp1" cloneof="dhead">
-		<description>Dynamite Headdy (prototype, 19940622)</description>
+		<description>Dynamite Headdy (prototype 19940622)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16172,6 +16183,18 @@ Choppy timings during gameplay (btanb?)
 		</part>
 	</software>
 
+	<software name="ejimu_p" cloneof="ejim">
+		<description>Earthworm Jim (USA, prototype 19940728)</description>
+		<year>1994</year>
+		<publisher>Playmates Interactive</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="3145728">
+				<rom name="Earthworm Jim (Jul 28, 1994 prototype).bin" size="3145728" crc="24aa391b" sha1="606d80bbdddae0cb84d0d56e7c06660d004ee417"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ejim2u" cloneof="ejim2">
 		<description>Earthworm Jim 2 (USA)</description>
 		<year>1996</year>
@@ -16180,6 +16203,18 @@ Choppy timings during gameplay (btanb?)
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="earthworm jim 2 (usa).bin" size="3145728" crc="d57f8ba7" sha1="ef7cccfc5eafa32fc6acc71dd9b71693f64eac94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ejim2_p" cloneof="ejim2">
+		<description>Earthworm Jim 2 (Europe, prototype 19950824)</description>
+		<year>1995</year>
+		<publisher>Playmates Interactive</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="3145728">
+				<rom name="EarthwormJim2.5B1A.bin" size="3145728" crc="f92a931d" sha1="f2f1b0c79c972e83b9ec67cbb41007434c02aad9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16459,7 +16494,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp10" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940418)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940418)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16471,7 +16506,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp06" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940602)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940602)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16483,7 +16518,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp05" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940607)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940607)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16495,7 +16530,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp04" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940610)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940610)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16507,7 +16542,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp03" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940614)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940614)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16519,7 +16554,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp02" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940618-A)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940618-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16531,7 +16566,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp01" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940620)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940620)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16543,7 +16578,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp11" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940309)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940309)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -16555,7 +16590,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp09" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940509)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940509)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -16567,7 +16602,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp08" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940518)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940518)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<!-- Compatibility not enforced -->
@@ -16579,7 +16614,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="tazmarsp07" cloneof="tazmars">
-		<description>Escape from Mars Starring Taz (prototype, 19940523)</description>
+		<description>Escape from Mars Starring Taz (prototype 19940523)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -16703,7 +16738,7 @@ https://segaretro.org/Elitserien_96
 	</software>
 
 	<software name="eternalcjp" cloneof="eternalc">
-		<description>Eternal Champions (Japan, prototype, 19931117)</description>
+		<description>Eternal Champions (Japan, prototype 19931117)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23633,8 +23668,19 @@ Black screen at intro
 	</software>
 
 	<software name="vortex">
-		<description>Out of the Vortex (prototype)</description>
-		<year>199?</year>
+		<description>Out of the Vortex (prototype 19950913)</description>
+		<year>1995</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2084116">
+				<rom name="Out of the Vortex (Sep 13, 1995 prototype).bin" size="2084116" crc="03c997df" sha1="b8535312ffb9955bc52e55292967c4abad9e4b75"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vortex_p1" cloneof="vortex">
+		<description>Out of the Vortex (prototype 19950710)</description>
+		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
