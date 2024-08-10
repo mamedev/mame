@@ -34994,7 +34994,9 @@ trocana                         // NTC / NMK
 
 @source:nmk/quizdna.cpp
 gakupara                        // (c) 1991 NMK
+gakupara102                     // (c) 1991 NMK
 gekiretu                        // (c) 1992 Face
+gekiretup                       // (c) 1992 Face
 quizdna                         // (c) 1992 Face
 
 @source:nmk/quizpani.cpp
