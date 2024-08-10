@@ -4,6 +4,7 @@
 there are second mcu. if is not present will marked error 10.
 
 Notes:
+src: Chang yu website
 Pearl in the  East 6 ball version
 
 New feature: buy a 6th ball toup the odds.
@@ -13,7 +14,6 @@ src: for reference https://youtu.be/GszrVAWQ7d0
 5 ball Version. Oriental Pearl
 src for reference: https://youtu.be/XEaOan6NWKQ?t=18
 
-It is possible that the different voices are different versions?
 */
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
@@ -132,4 +132,4 @@ ROM_END
 
 
 //    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                FLAGS
-GAME( 2001?, pearlorient, 0,       pearlorient,   pearlorient, pearlorient_state, empty_init, ROT0, "Chang Yu Electronic?", "Unknown 6 Ball Pinball Gambling", MACHINE_IS_SKELETON_MECHANICAL ) // EAST8  v1.05  string . this was dumped from soccer santiago II 6 ball pinball
+GAME( 199?, pearlorient, 0,       pearlorient,   pearlorient, pearlorient_state, empty_init, ROT0, "Chang Yu Electronic", "Unknown 6 Ball Pinball Gambling", MACHINE_IS_SKELETON_MECHANICAL ) // EAST8  v1.05  string . this was dumped from soccer santiago II 6 ball pinball
