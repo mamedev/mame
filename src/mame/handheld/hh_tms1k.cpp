@@ -148,7 +148,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  *MP3310   TMS1000   1979, Texas Instruments OEM melody chip
- *MP3312   TMS1000   1980, Nathan Mega 10000
+ @MP3312   TMS1000   1980, Nathan Mega 10000
  *MP3318   TMS1000   1979, Texas Instruments OEM melody chip
  @MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
  @MP3321A  TMS1000   1979, Coleco Head to Head: Electronic Hockey
@@ -315,6 +315,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "mathmarv.lh"
 #include "mbdtower.lh"
 #include "mdndclab.lh"
+#include "mega10k.lh"
 #include "merlin.lh"
 #include "mmarvin.lh"
 #include "mmerlin.lh"
@@ -8031,6 +8032,137 @@ ROM_START( liveafb )
 
 	ROM_REGION( 162058, "mask", 0)
 	ROM_LOAD( "liveafb.svg", 0, 162058, CRC(046078d0) SHA1(68a5775f4f9a1258c06b76839e1cfdab69b61920) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Jeux Nathan Mega 10000
+  * PCB label: MADE IN FRANCE, OD 1112A
+  * TMS1000ENLL MP3312 (die label: 1000E, MP3312)
+  * 9-digit 7seg LED display, 1-bit sound
+
+  It's a quiz game/scorekeeper, it needs question books to play. It's a bit
+  cumbersome to play. To start, enter the book code, press R, then enter number
+  of players (0 or 1-4). Press Q and manually input a question number, press N
+  and enter the player number that will answer, press R, followed by the answer.
+
+*******************************************************************************/
+
+class mega10k_state : public hh_tms1k_state
+{
+public:
+	mega10k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void mega10k(machine_config &config);
+
+private:
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void mega10k_state::write_r(u32 data)
+{
+	// R0-R6: digit segments
+	m_display->write_mx(data);
+
+	// R7-R10: input mux
+	m_inp_mux = data >> 7 & 0xf;
+}
+
+void mega10k_state::write_o(u16 data)
+{
+	// O0-O3: digit select
+	m_display->write_my(~data);
+
+	// O5: speaker out
+	m_speaker->level_w(BIT(data, 5));
+
+	// O6: power off on falling edge
+	if (~data & m_o & 0x40)
+		power_off();
+	m_o = data;
+}
+
+u8 mega10k_state::read_k()
+{
+	// K: multiplexed inputs (note: the Vdd row is always on)
+	return m_inputs[4]->read() | read_inputs(4);
+}
+
+// inputs
+
+static INPUT_PORTS_START( mega10k )
+	PORT_START("IN.0") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("S") // score
+
+	PORT_START("IN.1") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("R") // reponse (answer)
+
+	PORT_START("IN.2") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Q") // question
+
+	PORT_START("IN.3") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("N") // nombre (player#)
+
+	PORT_START("IN.4") // Vdd
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+INPUT_PORTS_END
+
+// config
+
+void mega10k_state::mega10k(machine_config &config)
+{
+	// basic machine hardware
+	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=33K, C=100pF
+	m_maincpu->read_k().set(FUNC(mega10k_state::read_k));
+	m_maincpu->write_r().set(FUNC(mega10k_state::write_r));
+	m_maincpu->write_o().set(FUNC(mega10k_state::write_o));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(4, 7);
+	m_display->set_segmask(0xf, 0x7f);
+	config.set_default_layout(layout_mega10k);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( mega10k )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3312", 0x0000, 0x0400, CRC(2949f6a7) SHA1(0ac5560213ed681150b8f198be09a8d4ec3a41c4) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_mega10k_output.pla", 0, 365, CRC(dbacff74) SHA1(30ba16c0ea955f1d1264157a26c3a7cf169a6983) )
 ROM_END
 
 
@@ -17358,6 +17490,8 @@ SYST( 1978, starwlb,    0,         0,      starwlb,   starwlb,   starwlb_state, 
 SYST( 1979, starwbc,    0,         0,      starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars: Electronic Battle Command Game", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, starwbcp,   starwbc,   0,      starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars: Electronic Battle Command Game (patent)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, liveafb,    0,         0,      liveafb,   liveafb,   liveafb_state,   empty_init, "Kenner", "Live Action Football", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1980, mega10k,    0,         0,      mega10k,   mega10k,   mega10k_state,   empty_init, "Jeux Nathan", u8"Mega 10.000: L'Encyclopédie Électronique", MACHINE_SUPPORTS_SAVE ) // ***
 
 SYST( 1979, astro,      0,         0,      astro,     astro,     astro_state,     empty_init, "Kosmos", "Astro", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 

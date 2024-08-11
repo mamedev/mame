@@ -191,7 +191,7 @@ void eldorado_state::eldorado(machine_config &config)
 
 ROM_START( feldo )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD("100-1027a01", 0x0000, 0x0800, CRC(3b93b6d2) SHA1(353a741624b4c7fd74a0cf601e2e52f9914b58b8) )
+	ROM_LOAD("tmp80c49ap6-6744_100-1027a01", 0x0000, 0x0800, CRC(3b93b6d2) SHA1(353a741624b4c7fd74a0cf601e2e52f9914b58b8) )
 ROM_END
 
 } // anonymous namespace
