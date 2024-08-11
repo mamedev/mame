@@ -39,11 +39,6 @@ private:
 	u8 readmem(u16 offset, bool phase);
 	bool Clock(); // called once to toggle external clock twice
 
-	// emulator helper functions
-	void ClearStatistics();
-	void GetStatistics(u32 &uNPitchPeriods, u32 &uNVoiced, u32 &uNControlWords);
-	void SetPrintLevel(u32 uPrintLevel) { m_uPrintLevel = uPrintLevel; }
-
 	enum class states : u8
 	{
 		IDLE = 0,
@@ -112,15 +107,6 @@ private:
 	// input pins
 	bool m_bStart;
 	u8 m_uWord;             // 6 bit word number to be spoken
-
-	// emulator variables
-	// statistics
-	u32 m_uNPitchPeriods;
-	u32 m_uNVoiced;
-	u32 m_uNControlWords;
-
-	// diagnostic output
-	u32 m_uPrintLevel;
 };
 
 DECLARE_DEVICE_TYPE(S14001A, s14001a_device)

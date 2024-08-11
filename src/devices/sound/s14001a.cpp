@@ -105,6 +105,14 @@ and off as it normally does during speech). Once START has gone low-high-low, th
 #include "emu.h"
 #include "s14001a.h"
 
+#define LOG_SPEAK (1 << 1U) // speech start
+#define LOG_PPE   (1 << 2U) // pitch period end
+#define LOG_CTRL  (1 << 3U) // control word
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
 namespace {
 
 u8 Mux8To2(bool bVoicedP2, u8 uPPQtrP2, u8 uDeltaAdrP2, u8 uRomDataP2)
@@ -245,8 +253,6 @@ void s14001a_device::device_start()
 	m_bBusyP1 = false;
 	m_bStart = false;
 	m_uWord = 0;
-
-	ClearStatistics();
 	m_uOutputP1 = m_uOutputP2 = 7;
 
 	// register for savestates
@@ -285,11 +291,6 @@ void s14001a_device::device_start()
 	save_item(NAME(m_bBusyP1));
 	save_item(NAME(m_bStart));
 	save_item(NAME(m_uWord));
-
-	save_item(NAME(m_uNPitchPeriods));
-	save_item(NAME(m_uNVoiced));
-	save_item(NAME(m_uNControlWords));
-	save_item(NAME(m_uPrintLevel));
 }
 
 
@@ -431,8 +432,7 @@ bool s14001a_device::Clock()
 		break;
 
 	case states::CWARMSB:
-		if (m_uPrintLevel >= 1)
-			logerror("\n speaking word %02x",m_uWord);
+		LOGMASKED(LOG_SPEAK, "speaking word %02x\n", m_uWord);
 
 		// use uDAR to load uCWAR 8 msb
 		m_uCWARP1 = readmem(m_uRomAddrP2, m_bPhase1) << 4; // note use of rom address setup in previous state
@@ -459,7 +459,6 @@ bool s14001a_device::Clock()
 		m_uDAR04To00P1 = 0;
 		m_uCWARP1++;
 		m_RomAddrP1 = m_uCWARP1;
-		m_uNControlWords++; // statistics
 
 		m_uOutputP1 = 7;
 		m_uStateP1  = m_bStart ? states::WORDWAIT : states::CTRLBITS;
@@ -481,26 +480,14 @@ bool s14001a_device::Clock()
 		m_uOutputP1 = 7;
 		m_uStateP1  = m_bStart ? states::WORDWAIT : states::PLAY;
 
-		if (m_uPrintLevel >= 2)
-			logerror("\n cw %d %d %d %d %d", m_bStopP1, m_bVoicedP1, m_bSilenceP1, m_uLengthP1 >> 4, m_uXRepeatP1);
-
+		LOGMASKED(LOG_CTRL, "cw %d %d %d %d %d\n", m_bStopP1, m_bVoicedP1, m_bSilenceP1, m_uLengthP1 >> 4, m_uXRepeatP1);
 		break;
 	}
 
 	case states::PLAY:
 	{
-		// statistics
 		if (m_bPPQCarryP2)
-		{
-			// pitch period end
-			if (m_uPrintLevel >= 3)
-				logerror("\n ppe: RomAddr %03x", m_uRomAddrP2);
-
-			m_uNPitchPeriods++;
-			if (m_bVoicedP2)
-				m_uNVoiced++;
-		}
-		// end statistics
+			LOGMASKED(LOG_PPE, "ppe: RomAddr %03x\n", m_uRomAddrP2); // pitch period end
 
 		// modify output
 		u8 uDeltaP2;     // signal line
@@ -587,19 +574,4 @@ bool s14001a_device::Clock()
 	}
 
 	return true;
-}
-
-void s14001a_device::ClearStatistics()
-{
-	m_uNPitchPeriods = 0;
-	m_uNVoiced       = 0;
-	m_uPrintLevel    = 0;
-	m_uNControlWords = 0;
-}
-
-void s14001a_device::GetStatistics(u32 &uNPitchPeriods, u32 &uNVoiced, u32 &uNControlWords)
-{
-	uNPitchPeriods = m_uNPitchPeriods;
-	uNVoiced = m_uNVoiced;
-	uNControlWords = m_uNControlWords;
 }
