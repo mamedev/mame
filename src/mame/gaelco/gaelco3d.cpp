@@ -1323,7 +1323,26 @@ ROM_START( radikalba ) // Version 2.02, Atari license - REF. 980311 ROM board
 //  ROM_LOAD( "rab_27.ic35", 0x0060000, 0x020000, CRC(bbcf6977) SHA1(0282c8ba79c35ed1240711d5812bfb590d151738) ) // labeled RAB 27 in IC35 on the PCB
 ROM_END
 
-
+/*
+Football Power has a small PCB inside the ball controller, very similar to the one found on
+Gaelco Football, with two accelerometers and a PIC.        
+   _________________
+  |      ______    |
+ _|     /     /    |
+ \|    /  <-ADXL250
+  |   /_____/      |
+  |  ____________  |
+  |  \  \    <-ADXL150
+  |   \  \_____\  \|
+  |    \___________\
+  |   Osc          |
+  |  16 MHz        |
+  |  __________    |
+  | |PIC16C710|    |
+  | |_________|    |
+  |                |
+  |________________|
+*/
 ROM_START( footbpow ) // Version 1.2 - REF. 000208 ROM board
 	ROM_REGION( 0x200000, "maincpu", 0 )    // 68020 code
 	ROM_LOAD32_BYTE( "fop_7.ic7",   0x000000, 0x80000, CRC(a2d7ec69) SHA1(27e4f3d27882152244c0f9d5a984e0f1bd7b7d3f) )
@@ -1354,6 +1373,9 @@ ROM_START( footbpow ) // Version 1.2 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_25.ic35", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) ) // labeled FOP 25 in IC35 on the PCB
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
+
+	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF)
+	ROM_LOAD("ball_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
 ROM_END
 
 ROM_START( footbpow11 ) // Version 1.1 - REF. 000208 ROM board
@@ -1386,6 +1408,9 @@ ROM_START( footbpow11 ) // Version 1.1 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_25.ic35", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) ) // labeled FOP 25 in IC35 on the PCB
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
+
+	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF)
+	ROM_LOAD("ball_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
 ROM_END
 
 
