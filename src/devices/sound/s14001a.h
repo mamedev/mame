@@ -10,14 +10,15 @@
 
 #pragma once
 
-class s14001a_device : public device_t, public device_sound_interface
+#include "dirom.h"
+
+class s14001a_device : public device_t, public device_sound_interface, public device_rom_interface<12>
 {
 public:
 	s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
 	auto bsy() { return m_bsy_handler.bind(); }
-	auto ext_read() { return m_ext_read_handler.bind(); }
 
 	int busy_r();              // /BUSY (pin 40)
 	int romen_r();             // ROM /EN (pin 9)
@@ -26,17 +27,17 @@ public:
 
 	void set_clock(u32 clock); // set new CLK frequency
 	void set_clock(const XTAL &xtal) { set_clock(xtal.value()); }
-	void force_update();       // update stream, eg. before external ROM bankswitch
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void rom_bank_pre_change() override { m_stream->update(); }
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	u8 readmem(u16 offset, bool phase);
+	u8 ReadMem(u16 offset, bool phase);
 	bool Clock(); // called once to toggle external clock twice
 
 	enum class states : u8
@@ -51,11 +52,9 @@ private:
 		DELAY
 	};
 
-	required_region_ptr<u8> m_SpeechRom;
 	sound_stream * m_stream;
 
 	devcb_write_line m_bsy_handler;
-	devcb_read8 m_ext_read_handler;
 
 	// internal state
 	bool m_bPhase1;         // 1 bit internal clock

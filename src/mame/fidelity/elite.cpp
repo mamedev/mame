@@ -115,7 +115,6 @@ public:
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_speech(*this, "speech"),
-		m_speech_rom(*this, "speech"),
 		m_language(*this, "language"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -144,7 +143,6 @@ protected:
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
 	required_device<s14001a_device> m_speech;
-	required_region_ptr<u8> m_speech_rom;
 	required_region_ptr<u8> m_language;
 	required_ioport_array<2> m_inputs;
 
@@ -152,7 +150,6 @@ protected:
 	u8 m_led_data = 0;
 	u8 m_7seg_data = 0;
 	u8 m_inp_mux = 0;
-	u8 m_speech_bank = 0;
 
 	// address maps
 	void pc_map(address_map &map);
@@ -162,7 +159,6 @@ protected:
 
 	// I/O handlers
 	void update_display();
-	u8 speech_r(offs_t offset);
 	void segment_w(offs_t offset, u8 data);
 	void led_w(offs_t offset, u8 data);
 	u8 input_r();
@@ -182,7 +178,6 @@ void elite_state::machine_start()
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_7seg_data));
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_speech_bank));
 }
 
 void elite_state::machine_reset()
@@ -213,11 +208,6 @@ void elite_state::update_display()
 	// 4/8 7seg leds+H, 8*8(+1) chessboard leds
 	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
 	m_display->matrix(1 << m_inp_mux, m_led_data << 8 | seg_data);
-}
-
-u8 elite_state::speech_r(offs_t offset)
-{
-	return m_speech_rom[m_speech_bank << 12 | offset];
 }
 
 void elite_state::segment_w(offs_t offset, u8 data)
@@ -265,7 +255,7 @@ void elite_state::ppi_porta_w(u8 data)
 	// d0-d5: TSI C0-C5
 	// d6: TSI START line
 	m_speech->data_w(data & 0x3f);
-	m_speech->start_w(data >> 6 & 1);
+	m_speech->start_w(BIT(data, 6));
 
 	// d7: printer? (black wire to LED pcb)
 }
@@ -281,8 +271,7 @@ void elite_state::ppi_portc_w(u8 data)
 	m_dac->write(BIT(1 << m_inp_mux, 9));
 
 	// d4: speech ROM A12
-	m_speech->force_update(); // update stream to now
-	m_speech_bank = data >> 4 & 1;
+	m_speech->set_rom_bank(BIT(data, 4));
 
 	// d5: lower TSI volume
 	m_speech->set_output_gain(0, (data & 0x20) ? 0.25 : 1.0);
@@ -476,7 +465,6 @@ void elite_state::pc(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
-	m_speech->ext_read().set(FUNC(elite_state::speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);

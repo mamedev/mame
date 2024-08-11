@@ -176,7 +176,6 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_speech(*this, "speech"),
-		m_speech_rom(*this, "speech"),
 		m_language(*this, "language"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -195,7 +194,6 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<s14001a_device> m_speech;
-	required_region_ptr<u8> m_speech_rom;
 	required_region_ptr<u8> m_language;
 	required_ioport_array<2> m_inputs;
 
@@ -204,7 +202,6 @@ private:
 	u8 m_cb_mux = 0;
 	u8 m_kp_mux = 0;
 	bool m_lan_switch = false;
-	u8 m_speech_bank = 0;
 
 	// address maps
 	void main_map(address_map &map);
@@ -214,7 +211,6 @@ private:
 
 	// I/O handlers
 	void update_display();
-	u8 speech_r(offs_t offset);
 	void ppi_porta_w(u8 data);
 	void ppi_portb_w(u8 data);
 	void ppi_portc_w(u8 data);
@@ -231,7 +227,6 @@ void vsc_state::machine_start()
 	save_item(NAME(m_cb_mux));
 	save_item(NAME(m_kp_mux));
 	save_item(NAME(m_lan_switch));
-	save_item(NAME(m_speech_bank));
 }
 
 
@@ -240,21 +235,13 @@ void vsc_state::machine_start()
     I/O
 *******************************************************************************/
 
-// misc handlers
+// I8255 PPI
 
 void vsc_state::update_display()
 {
 	// 4 7seg leds+H, 8*8 chessboard leds
 	m_display->matrix(m_cb_mux, m_led_data << 8 | m_7seg_data);
 }
-
-u8 vsc_state::speech_r(offs_t offset)
-{
-	return m_speech_rom[m_speech_bank << 12 | offset];
-}
-
-
-// I8255 PPI
 
 void vsc_state::ppi_porta_w(u8 data)
 {
@@ -324,11 +311,10 @@ void vsc_state::pio_portb_w(u8 data)
 	m_lan_switch = bool(data & 0x20);
 
 	// d7: TSI ROM A12
-	m_speech->force_update(); // update stream to now
-	m_speech_bank = data >> 7 & 1;
+	m_speech->set_rom_bank(BIT(data, 7));
 
 	// d6: TSI START line
-	m_speech->start_w(data >> 6 & 1);
+	m_speech->start_w(BIT(data, 6));
 
 	// d2: lower TSI volume
 	m_speech->set_output_gain(0, (data & 4) ? 0.25 : 1.0);
@@ -440,7 +426,6 @@ void vsc_state::vsc(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
-	m_speech->ext_read().set(FUNC(vsc_state::speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
 

@@ -162,9 +162,10 @@ public:
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_speech(*this, "speech"),
-		m_speech_rom(*this, "speech"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
+
+	void init_fexcelv();
 
 	// machine configs
 	void fexcel(machine_config &config);
@@ -189,7 +190,6 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
 	optional_device<s14001a_device> m_speech;
-	optional_region_ptr<u8> m_speech_rom;
 	optional_ioport_array<3> m_inputs;
 
 	u8 m_select = 0;
@@ -202,7 +202,7 @@ private:
 	void fexcelb_map(address_map &map);
 
 	// I/O handlers
-	u8 speech_r(offs_t offset);
+	void speech_w(u8 data, u8 mask);
 	void ttl_w(offs_t offset, u8 data);
 	u8 ttl_r(offs_t offset);
 };
@@ -224,18 +224,39 @@ void excel_state::machine_start()
 
 // speech
 
+void excel_state::init_fexcelv()
+{
+	u8 *rom = memregion("speech")->base();
+	const u32 len = memregion("speech")->bytes();
+	assert(len == 0x8000);
+
+	// TSI A11 is A12, program controls A11, user controls A13,A14(language switches)
+	std::vector<u8> buf(len);
+	memcpy(&buf[0], rom, len);
+	for (int i = 0; i < len; i++)
+		rom[i] = buf[((i & 0x67ff) | bitswap<2>(i,11,12) << 11) ^ 0x6000];
+}
+
 INPUT_CHANGED_MEMBER(excel_state::speech_bankswitch)
 {
 	// tied to speech ROM highest bits
-	m_speech->force_update();
-	m_speech_bank = (m_speech_bank & 1) | newval << 1;
+	m_speech_bank = (m_speech_bank & 1) | (newval << 1 & 6);
+	m_speech->set_rom_bank(m_speech_bank);
 }
 
-u8 excel_state::speech_r(offs_t offset)
+void excel_state::speech_w(u8 data, u8 mask)
 {
-	// TSI A11 is A12, program controls A11, user controls A13,A14(language switches)
-	offset = (offset & 0x7ff) | (offset << 1 & 0x1000);
-	return m_speech_rom[offset | (m_speech_bank << 11 & 0x800) | (~m_speech_bank << 12 & 0x6000)];
+	// a0-a2,d2 (from ttl_w): 74259(2) to speech board
+	m_speech_data = (m_speech_data & ~mask) | ((data & 4) ? mask : 0);
+
+	// 74259 Q6: TSI ROM A11
+	m_speech_bank = (m_speech_bank & ~1) | BIT(m_speech_data, 6);
+	m_speech->set_rom_bank(m_speech_bank);
+
+	// Q0-Q5: TSI C0-C5
+	// Q7: TSI START line
+	m_speech->data_w(m_speech_data & 0x3f);
+	m_speech->start_w(BIT(m_speech_data, 7));
 }
 
 
@@ -268,19 +289,7 @@ void excel_state::ttl_w(offs_t offset, u8 data)
 
 	// speech (model 6092)
 	if (m_speech != nullptr)
-	{
-		// a0-a2,d2: 74259(2) to speech board
-		m_speech_data = (m_speech_data & ~mask) | ((data & 4) ? mask : 0);
-
-		// 74259 Q6: TSI ROM A11
-		m_speech->force_update(); // update stream to now
-		m_speech_bank = (m_speech_bank & ~1) | (m_speech_data >> 6 & 1);
-
-		// Q0-Q5: TSI C0-C5
-		// Q7: TSI START line
-		m_speech->data_w(m_speech_data & 0x3f);
-		m_speech->start_w(m_speech_data >> 7 & 1);
-	}
+		speech_w(data, mask);
 }
 
 u8 excel_state::ttl_r(offs_t offset)
@@ -468,7 +477,6 @@ void excel_state::fexcelv(machine_config &config)
 
 	// sound hardware
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
-	m_speech->ext_read().set(FUNC(excel_state::speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
 
@@ -551,16 +559,16 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT    CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, fexcel,    0,       0,      fexcelb,  fexcelb, excel_state, empty_init, "Fidelity International", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE )
-SYST( 1987, fexcelv,   fexcel,  0,      fexcelv,  fexcelv, excel_state, empty_init, "Fidelity International", "Voice Excellence", MACHINE_SUPPORTS_SAVE )
-SYST( 1987, fexceld,   fexcel,  0,      fexceld,  fexcelb, excel_state, empty_init, "Fidelity International", "Excel Display", MACHINE_SUPPORTS_SAVE )
-SYST( 1985, fexcel12,  fexcel,  0,      fexcel,   fexcel,  excel_state, empty_init, "Fidelity International", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE ) // 1st version of The Excellence
-SYST( 1985, fexcel124, fexcel,  0,      fexcel4,  fexcel,  excel_state, empty_init, "Fidelity International", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE )
-SYST( 1985, fexcela,   fexcel,  0,      fexcel,   fexcel,  excel_state, empty_init, "Fidelity International", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT    CLASS        INIT          COMPANY, FULLNAME, FLAGS
+SYST( 1987, fexcel,    0,       0,      fexcelb,  fexcelb, excel_state, empty_init,   "Fidelity International", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, fexcelv,   fexcel,  0,      fexcelv,  fexcelv, excel_state, init_fexcelv, "Fidelity International", "Voice Excellence", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, fexceld,   fexcel,  0,      fexceld,  fexcelb, excel_state, empty_init,   "Fidelity International", "Excel Display", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, fexcel12,  fexcel,  0,      fexcel,   fexcel,  excel_state, empty_init,   "Fidelity International", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE ) // 1st version of The Excellence
+SYST( 1985, fexcel124, fexcel,  0,      fexcel4,  fexcel,  excel_state, empty_init,   "Fidelity International", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, fexcela,   fexcel,  0,      fexcel,   fexcel,  excel_state, empty_init,   "Fidelity International", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1986, fexcelp,   0,       0,      fexcelp,  fexcel,  excel_state, empty_init, "Fidelity International", "The Par Excellence", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, fexcelpb,  fexcelp, 0,      fexcelp,  fexcel,  excel_state, empty_init, "Fidelity International", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, granits,   fexcelp, 0,      granits,  fexcel,  excel_state, empty_init, "hack (Remote Control Systems)", "Granit S", MACHINE_SUPPORTS_SAVE )
-SYST( 1988, fdes2000,  fexcelp, 0,      fdes2000, fdes,    excel_state, empty_init, "Fidelity International", "Designer 2000", MACHINE_SUPPORTS_SAVE )
-SYST( 1988, fdes2100,  fexcelp, 0,      fdes2100, fdes,    excel_state, empty_init, "Fidelity International", "Designer 2100", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, fexcelp,   0,       0,      fexcelp,  fexcel,  excel_state, empty_init,   "Fidelity International", "The Par Excellence", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, fexcelpb,  fexcelp, 0,      fexcelp,  fexcel,  excel_state, empty_init,   "Fidelity International", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, granits,   fexcelp, 0,      granits,  fexcel,  excel_state, empty_init,   "hack (Remote Control Systems)", "Granit S", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, fdes2000,  fexcelp, 0,      fdes2000, fdes,    excel_state, empty_init,   "Fidelity International", "Designer 2000", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, fdes2100,  fexcelp, 0,      fdes2100, fdes,    excel_state, empty_init,   "Fidelity International", "Designer 2100", MACHINE_SUPPORTS_SAVE )

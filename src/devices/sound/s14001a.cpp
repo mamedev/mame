@@ -206,10 +206,9 @@ DEFINE_DEVICE_TYPE(S14001A, s14001a_device, "s14001a", "SSi TSI S14001A")
 s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, S14001A, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
-	m_SpeechRom(*this, DEVICE_SELF),
+	device_rom_interface(mconfig, *this),
 	m_stream(nullptr),
-	m_bsy_handler(*this),
-	m_ext_read_handler(*this, 0)
+	m_bsy_handler(*this)
 {
 }
 
@@ -313,11 +312,6 @@ void s14001a_device::sound_stream_update(sound_stream &stream, std::vector<read_
     External interface
 **************************************************************************/
 
-void s14001a_device::force_update()
-{
-	m_stream->update();
-}
-
 int s14001a_device::romen_r()
 {
 	m_stream->update();
@@ -355,10 +349,10 @@ void s14001a_device::set_clock(u32 clock)
     Device emulation
 **************************************************************************/
 
-u8 s14001a_device::readmem(u16 offset, bool phase)
+u8 s14001a_device::ReadMem(u16 offset, bool phase)
 {
 	offset &= 0xfff; // 11-bit internal
-	return (m_ext_read_handler.isunset()) ? m_SpeechRom[offset & (m_SpeechRom.bytes() - 1)] : m_ext_read_handler(offset);
+	return read_byte(offset);
 }
 
 bool s14001a_device::Clock()
@@ -435,7 +429,7 @@ bool s14001a_device::Clock()
 		LOGMASKED(LOG_SPEAK, "speaking word %02x\n", m_uWord);
 
 		// use uDAR to load uCWAR 8 msb
-		m_uCWARP1 = readmem(m_uRomAddrP2, m_bPhase1) << 4; // note use of rom address setup in previous state
+		m_uCWARP1 = ReadMem(m_uRomAddrP2, m_bPhase1) << 4; // note use of rom address setup in previous state
 		// increment DAR by 4, 2 lsb's count deltas within a byte
 		m_uDAR04To00P1 += 4;
 		if (m_uDAR04To00P1 >= 32)
@@ -447,7 +441,7 @@ bool s14001a_device::Clock()
 		break;
 
 	case states::CWARLSB:
-		m_uCWARP1   = m_uCWARP2 | (readmem(m_uRomAddrP2, m_bPhase1) >> 4); // setup in previous state
+		m_uCWARP1   = m_uCWARP2 | (ReadMem(m_uRomAddrP2, m_bPhase1) >> 4); // setup in previous state
 		m_RomAddrP1 = m_uCWARP1;
 
 		m_uOutputP1 = 7;
@@ -455,7 +449,7 @@ bool s14001a_device::Clock()
 		break;
 
 	case states::DARMSB:
-		m_uDAR13To05P1 = readmem(m_uRomAddrP2, m_bPhase1) << 1; // 9 bit counter, 8 MSBs from ROM, lsb zeroed
+		m_uDAR13To05P1 = ReadMem(m_uRomAddrP2, m_bPhase1) << 1; // 9 bit counter, 8 MSBs from ROM, lsb zeroed
 		m_uDAR04To00P1 = 0;
 		m_uCWARP1++;
 		m_RomAddrP1 = m_uCWARP1;
@@ -466,7 +460,7 @@ bool s14001a_device::Clock()
 
 	case states::CTRLBITS:
 	{
-		u8 data = readmem(m_uRomAddrP2, m_bPhase1);
+		u8 data = ReadMem(m_uRomAddrP2, m_bPhase1);
 
 		m_bStopP1    = bool(data & 0x80);
 		m_bVoicedP1  = bool(data & 0x40);
@@ -496,7 +490,7 @@ bool s14001a_device::Clock()
 		uDeltaP2 = Mux8To2(m_bVoicedP2,
 				m_uLengthP2 & 0x03,     // pitch period quater counter
 				m_uDAR04To00P2 & 0x03,  // two bit delta address within byte
-				readmem(m_uRomAddrP2, m_bPhase1)
+				ReadMem(m_uRomAddrP2, m_bPhase1)
 		);
 		CalculateIncrement(m_bVoicedP2,
 				m_uLengthP2 & 0x03,     // pitch period quater counter

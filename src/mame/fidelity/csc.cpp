@@ -238,7 +238,6 @@ public:
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_speech(*this, "speech"),
-		m_speech_rom(*this, "speech"),
 		m_language(*this, "language"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -263,14 +262,12 @@ protected:
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
 	optional_device<s14001a_device> m_speech;
-	optional_region_ptr<u8> m_speech_rom;
 	optional_region_ptr<u8> m_language;
 	optional_ioport_array<9> m_inputs;
 
 	u8 m_led_data = 0;
 	u8 m_7seg_data = 0;
 	u8 m_inp_mux = 0;
-	u8 m_speech_bank = 0;
 
 	// address maps
 	void csc_map(address_map &map);
@@ -282,7 +279,6 @@ protected:
 	void update_inputs();
 	void update_display();
 	void update_sound();
-	u8 speech_r(offs_t offset);
 
 	u8 pia0_read(offs_t offset);
 	void pia0_write(offs_t offset, u8 data);
@@ -303,7 +299,6 @@ void csc_state::machine_start()
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_7seg_data));
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_speech_bank));
 }
 
 INPUT_CHANGED_MEMBER(csc_state::su9_change_cpu_freq)
@@ -390,11 +385,6 @@ void csc_state::update_sound()
 	m_dac->write(BIT(1 << m_inp_mux, 9));
 }
 
-u8 csc_state::speech_r(offs_t offset)
-{
-	return m_speech_rom[m_speech_bank << 12 | offset];
-}
-
 
 // 6821 PIA 0
 
@@ -463,11 +453,10 @@ void csc_state::pia1_pa_w(u8 data)
 void csc_state::pia1_pb_w(u8 data)
 {
 	// d0: speech ROM A12
-	m_speech->force_update(); // update stream to now
-	m_speech_bank = data & 1;
+	m_speech->set_rom_bank(data & 1);
 
 	// d1: TSI START line
-	m_speech->start_w(data >> 1 & 1);
+	m_speech->start_w(BIT(data, 1));
 
 	// d4: lower TSI volume
 	m_speech->set_output_gain(0, (data & 0x10) ? 0.25 : 1.0);
@@ -641,7 +630,6 @@ void csc_state::csc(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
-	m_speech->ext_read().set(FUNC(csc_state::speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);

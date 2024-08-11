@@ -126,7 +126,6 @@ public:
 		m_ppi8255(*this, "ppi8255"),
 		m_display(*this, "display"),
 		m_speech(*this, "speech"),
-		m_speech_rom(*this, "speech"),
 		m_language(*this, "language"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -146,14 +145,12 @@ private:
 	required_device<i8255_device> m_ppi8255;
 	required_device<pwm_display_device> m_display;
 	required_device<s14001a_device> m_speech;
-	required_region_ptr<u8> m_speech_rom;
 	required_region_ptr<u8> m_language;
 	required_ioport_array<4> m_inputs;
 
 	u8 m_led_select = 0;
 	u8 m_7seg_data = 0;
 	u8 m_inp_mux = 0;
-	u8 m_speech_bank = 0;
 
 	// address maps
 	void main_map(address_map &map);
@@ -161,7 +158,6 @@ private:
 
 	// I/O handlers
 	void update_display();
-	u8 speech_r(offs_t offset);
 	void ppi_porta_w(u8 data);
 	u8 ppi_portb_r();
 	void ppi_portb_w(u8 data);
@@ -175,7 +171,6 @@ void vcc_state::machine_start()
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_7seg_data));
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_speech_bank));
 
 	// game relies on RAM filled with FF at power-on
 	for (int i = 0; i < 0x400; i++)
@@ -188,22 +183,12 @@ void vcc_state::machine_start()
     I/O
 *******************************************************************************/
 
-// misc handlers
-
 void vcc_state::update_display()
 {
 	// 4 7seg leds (note: sel d0 for extra leds)
 	u8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
 	m_display->matrix(m_led_select >> 2 & 0xf, outdata);
 }
-
-u8 vcc_state::speech_r(offs_t offset)
-{
-	return m_speech_rom[m_speech_bank << 12 | offset];
-}
-
-
-// I8255 PPI
 
 void vcc_state::ppi_porta_w(u8 data)
 {
@@ -214,15 +199,12 @@ void vcc_state::ppi_porta_w(u8 data)
 	// d0-d5: TSI C0-C5
 	// d7: TSI START line
 	m_speech->data_w(data & 0x3f);
-	m_speech->start_w(data >> 7 & 1);
+	m_speech->start_w(BIT(data, 7));
 
 	// d6: language latch data
 	// d7: language latch clock (latch on high)
 	if (data & 0x80)
-	{
-		m_speech->force_update(); // update stream to now
-		m_speech_bank = data >> 6 & 1;
-	}
+		m_speech->set_rom_bank(BIT(data, 6));
 }
 
 u8 vcc_state::ppi_portb_r()
@@ -346,7 +328,6 @@ void vcc_state::vcc(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
-	m_speech->ext_read().set(FUNC(vcc_state::speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
 
