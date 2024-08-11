@@ -36,6 +36,7 @@ public:
 	void spg2xx_base(machine_config &config);
 	void spg2xx(machine_config &config);
 	void spg2xx_pal(machine_config &config);
+	void spg28x(machine_config &config);
 
 	void rad_skat(machine_config &config);
 	void rad_skatp(machine_config &config);
