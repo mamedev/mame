@@ -670,9 +670,10 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 				break;
 			}
 
-			printf("Saving MCU RAM number %d\n", save_number);
+			if (neon_debug_enabled) {
+				printf("Saving MCU RAM number %d\n", save_number);
+			}
 
-			//data_out[0] = CART_SAVE_OK;
 			data_out[0] = neon_save_ram(save_number);
 			
 			if (neon_debug_enabled) {
@@ -688,8 +689,10 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 				break;
 			}
 			
-			// TODO: Load test save data in data_out[1+]
-			//data_out[0] = CART_SAVE_OK;
+			if (neon_debug_enabled) {
+				printf("Loading MCU RAM number %d\n", save_number);
+			}
+
 			data_out[0] = neon_load_ram(save_number);
 
 			if (neon_debug_enabled) {
