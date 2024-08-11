@@ -271,6 +271,7 @@ void k052109_device::device_start()
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_charrombank));
 	save_item(NAME(m_charrombank_2));
+	save_item(NAME(m_addrmap));
 	save_item(NAME(m_has_extra_video_ram));
 }
 
@@ -284,7 +285,7 @@ void k052109_device::device_reset()
 	m_irq_enabled = 0;
 	m_romsubbank = 0;
 	m_scrollctrl = 0;
-
+	m_addrmap    = 0;
 	m_has_extra_video_ram = 0;
 
 	for (int i = 0; i < 4; i++)
