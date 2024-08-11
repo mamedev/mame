@@ -459,8 +459,8 @@ typedef enum {
 
 #define NEON_FPGA_RAM_SIZE 40	// In words
 #define NEON_RAM_DATA_MAX (NEON_FPGA_RAM_SIZE - 1)	// First word is always used by echo
-
 #define NEON_MAX_SAVES 10
+#define NEON_SAVE_RAM_SIZE 64 // in bytes
 
 uint16_t neon_fpga_ver = 0x01;
 uint16_t neon_mcu_id = 0x0A;
@@ -473,6 +473,83 @@ uint16_t neon_mcu_to_game_ram[NEON_FPGA_RAM_SIZE];
 uint32_t neon_sw_rng_next = 1;
 bool neon_debug_enabled = false;	// MAME-only debug
 neon_wifi_status_t neon_status_wifi = NEON_WIFI_DISCONNECTED;
+
+uint16_t neon_save_ram(uint16_t save_number) {
+    uint16_t result = CART_SAVE_OK; //CART_SAVE_ERR
+
+    std::string filename = string_format("nvram%sneon_save0%d.bin", PATH_SEPARATOR, save_number);
+    const char* filenamePointer = filename.c_str(); 
+    
+	if (neon_debug_enabled) {
+		printf("Saving ram file :%s\n", filename.c_str());
+	}
+
+    FILE *file_ptr;
+    file_ptr = fopen(filenamePointer, "wb");
+
+	if (file_ptr == NULL) {
+		if (neon_debug_enabled) {
+			printf("Could not open ram file: %s\n", filename.c_str());
+		}
+		return CART_SAVE_ERR;
+	}
+
+    uint16_t saveResult = fwrite(&neon_game_to_mcu_ram[2], NEON_SAVE_RAM_SIZE, 1, file_ptr);
+
+    fclose(file_ptr);
+
+	if (saveResult != 1) {
+		result = CART_SAVE_ERR;
+		if (neon_debug_enabled) {
+			printf("Writing ram file failed with result: %d\n", saveResult);
+		}
+	} else {
+		if (neon_debug_enabled) {
+			printf("Save file completed successfuly\n");
+		}
+	}
+
+    return result;
+}
+
+uint16_t neon_load_ram(uint16_t save_number) {
+    uint16_t result = CART_SAVE_OK; //CART_SAVE_ERR
+
+    std::string filename = string_format("nvram%sneon_save0%d.bin", PATH_SEPARATOR, save_number);
+    const char* filenamePointer = filename.c_str(); 
+    
+	if (neon_debug_enabled) {
+		printf("Loading ram file :%s\n", filename.c_str());
+	}
+
+    FILE *file_ptr;
+    file_ptr = fopen(filenamePointer, "rb");
+
+	if (file_ptr == NULL) {
+		if (neon_debug_enabled) {
+			printf("Could not open ram file :%s\n", filename.c_str());
+		}
+		return CART_SAVE_ERR;
+	}
+
+	size_t loadResult = fread(&neon_mcu_to_game_ram[2], 1, NEON_SAVE_RAM_SIZE, file_ptr);
+
+	result = loadResult == NEON_SAVE_RAM_SIZE ? CART_SAVE_OK : CART_SAVE_ERR;
+
+	fclose(file_ptr);
+
+	if (result == CART_SAVE_ERR) {
+		if (neon_debug_enabled) {
+			printf("Loading ram file failed with result: %lld\n", loadResult);
+		}
+	} else {
+		if (neon_debug_enabled) {
+			printf("Loading ram file completed successfuly\n");
+		}
+	}
+
+    return result;
+}
 
 void neogeo_cart_slot_device::neon_enable_debug_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
 	neon_debug_enabled = data != 0x00;
@@ -593,7 +670,10 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 				break;
 			}
 
-			data_out[0] = CART_SAVE_OK;
+			printf("Saving MCU RAM number %d\n", save_number);
+
+			//data_out[0] = CART_SAVE_OK;
+			data_out[0] = neon_save_ram(save_number);
 			
 			if (neon_debug_enabled) {
 				printf("mcu SAVE(%d)\n", save_number);
@@ -608,8 +688,9 @@ void neogeo_cart_slot_device::neon_irq_w(offs_t offset, uint16_t data, uint16_t 
 				break;
 			}
 			
-			data_out[0] = CART_SAVE_OK;
 			// TODO: Load test save data in data_out[1+]
+			//data_out[0] = CART_SAVE_OK;
+			data_out[0] = neon_load_ram(save_number);
 
 			if (neon_debug_enabled) {
 				printf("mcu LOAD(%d)\n", save_number);
