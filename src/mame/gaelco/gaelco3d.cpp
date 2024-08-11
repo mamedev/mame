@@ -1374,7 +1374,7 @@ ROM_START( footbpow ) // Version 1.2 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
 
-	ROM_REGION( 0x20000, "io", ROMREGION_ERASEFF)
+	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF)
 	ROM_LOAD("ball_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
 ROM_END
 
@@ -1409,7 +1409,7 @@ ROM_START( footbpow11 ) // Version 1.1 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
 
-	ROM_REGION( 0x20000, "io", ROMREGION_ERASEFF)
+	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF)
 	ROM_LOAD("ball_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
 ROM_END
 
