@@ -11,7 +11,8 @@ panel design, the 2nd version has rectangular buttons. See sc6.cpp for the
 2nd version.
 
 Hardware notes:
-- Zilog Z8 MCU(custom label, probably Z8601), 8MHz XTAL
+- Zilog Z8 MCU (probably Z8601, custom label: SR0016 1001011A01 or SR0022
+  1001011B01), 8MHz XTAL
 - buzzer, 18 leds, 8*8 chessboard buttons, module slot
 
 released modules, * denotes not dumped yet:
