@@ -48,6 +48,13 @@ class z80dma_device :   public device_t,
 						public device_z80daisy_interface
 {
 public:
+	enum class dma_mode : u8
+	{
+		ZILOG = 0,
+		UA858D = 1,
+		SPEC_NEXT = 2
+	};
+
 	// construction/destruction
 	z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -60,6 +67,7 @@ public:
 	auto in_iorq_callback() { return m_in_iorq_cb.bind(); }
 	auto out_iorq_callback() { return m_out_iorq_cb.bind(); }
 
+	void set_dma_mode(dma_mode dma_mode) { m_dma_mode = dma_mode; }
 	u8 read();
 	virtual void write(u8 data);
 
@@ -138,6 +146,7 @@ private:
 
 	emu_timer *m_timer;
 
+	dma_mode m_dma_mode;
 	u16  m_regs[(6 << 3) + 1 + 1];
 	u8   m_num_follow;
 	u8   m_cur_follow;
