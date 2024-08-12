@@ -22,6 +22,9 @@ TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
 
+BTANB:
+- it still has the same AT level bug as sapphire (see sapphire.cpp)
+
 *******************************************************************************/
 
 #include "emu.h"

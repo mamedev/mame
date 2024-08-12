@@ -17,6 +17,9 @@ TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
 
+BTANB:
+- see note below about so-called H8 bug
+
 ================================================================================
 
 Saitek GK 2000 family
