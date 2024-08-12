@@ -147,7 +147,6 @@ protected:
 	void port3f_w(u8 data);
 	u8 port3e_r();
 	std::unique_ptr<u8[]> m_vram;
-	void busreq_w(int state);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);

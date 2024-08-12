@@ -259,14 +259,6 @@ void sorcerer_state::port34_w(u8 data)
 }
 
 // ************ DIGITRIO DMA **************
-void sorcerer_state::busreq_w(bool state)
-{
-// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
-	m_dma->bai_w(state); // tell dma that bus has been granted
-}
-
 u8 sorcerer_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
