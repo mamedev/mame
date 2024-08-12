@@ -12,8 +12,8 @@
 #include "imagedev/floppy.h"
 #include "machine/gen_latch.h"
 #include "machine/upd765.h"
-#include "screen.h"
 #include "video/pc_vga.h"
+#include "screen.h"
 #include "kn5000.lh"
 
 // #define EXTENSION_VIEW
@@ -929,4 +929,4 @@ ROM_END
 } // anonymous namespace
 
 //   YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   STATE         INIT        COMPANY      FULLNAME             FLAGS
-CONS(199?, kn5000,    0,       0, kn5000, kn5000, kn5000_state, empty_init, "Technics", "SX-KN5000 Keyboard", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+CONS(199?, kn5000,    0,       0, kn5000, kn5000, kn5000_state, empty_init, "Technics", "SX-KN5000", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

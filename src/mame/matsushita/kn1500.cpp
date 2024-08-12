@@ -279,4 +279,4 @@ ROM_END
 } // anonymous namespace
 
 //   YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   STATE         INIT        COMPANY      FULLNAME                 FLAGS
-CONS(199?, kn1500,    0,       0, kn1500, kn1500, kn1500_state, empty_init, "Technics", "SX-KN1500 PCM Keyboard", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+CONS(199?, kn1500,    0,       0, kn1500, kn1500, kn1500_state, empty_init, "Technics", "SX-KN1500", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
