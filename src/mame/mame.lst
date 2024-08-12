@@ -1406,6 +1406,7 @@ a2600_pop                       // Atari 2600 Point of Purchase Display
 stvboy
 tvboy                           //
 tvboyii                         //
+tvboyn                          //
 
 @source:atari/a7800.cpp
 a7800                           // Atari 7800 NTSC

@@ -245,7 +245,8 @@ public:
 	{ }
 
 	void tvboy(machine_config &config);
-
+	void tvboyn(machine_config &config);
+	
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -693,6 +694,11 @@ void tvboy_state::tvboy(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tvboy_state::tvboy_mem);
 }
 
+void tvboy_state::tvboyn(machine_config &config)
+{
+	a2600_base_ntsc(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tvboy_state::tvboy_mem);
+}
 
 ROM_START(a2600)
 	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
@@ -781,6 +787,13 @@ ROM_START(tvboy)
 	ROM_LOAD("tvboy.bin", 0x00000, 0x80000, CRC(2f3d1d52) SHA1(fb26778434fade4cec28f82c53db4cc2f23b8b2b))
 ROM_END
 
+ROM_START(tvboyn)
+	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x80000, "mainrom", 0)
+	ROM_LOAD("ns-31_n_tv-bot_127g-nics.59874.bin", 0x00000, 0x80000, CRC(96744687) SHA1(47e7a01e635156d2dd6c7e1059653f286370537d))
+ROM_END
+
 ROM_START(tvboyii)
 	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
 
@@ -813,5 +826,6 @@ GAME( 198?, a2600_pop, 0,      a2600_pop, a2600_pop, a2600_pop_state, empty_init
 
 // Clones
 CONS( 199?, tvboy,   0,     0,      tvboy,   tvboy, tvboy_state,  empty_init, "Systema?", "TV Boy (PAL)",       MACHINE_SUPPORTS_SAVE ) // It's unknown what unit this came from. It could be Akor instead?
+CONS( 199?, tvboyn,  tvboy, 0,      tvboyn,  tvboy, tvboy_state,  empty_init, "Nics",     "TV Boy (Nics, NTSC)",MACHINE_SUPPORTS_SAVE )
 CONS( 199?, tvboyii, tvboy, 0,      tvboy,   tvboy, tvboy_state,  empty_init, "Systema",  "TV Boy II (PAL)",    MACHINE_SUPPORTS_SAVE )
 CONS( 1995, stvboy,  0,     0,      tvboy,   tvboy, tvboy_state,  empty_init, "Akor",     "Super TV Boy (PAL)", MACHINE_SUPPORTS_SAVE )
