@@ -217,7 +217,6 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 uint32_t namco_de_pcbstack_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//uint8_t *videoram = m_gpu_videoram.get();
-	const int pivot = 3;
 
 	bitmap.fill(0xff, cliprect );
 	screen.priority().fill(0, cliprect);
@@ -233,6 +232,7 @@ uint32_t namco_de_pcbstack_device::screen_update(screen_device &screen, bitmap_i
 
 	m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7fbf);
 
+	const int pivot = 3;
 	for (int pri = pivot; pri < 8; pri++)
 		m_c355spr->draw(screen, bitmap, cliprect, pri);
 

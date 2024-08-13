@@ -278,11 +278,9 @@ void namcos21_dsp_c67_device::transfer_dsp_data()
 
 			int32_t masterAddr = read_pointrom_data(code);
 			uint16_t const len = m_dspram16[addr++];
-
 			while (true)
 			{
 				int subAddr = read_pointrom_data(masterAddr++);
-
 				if (subAddr == 0xffffff)
 					break;
 
