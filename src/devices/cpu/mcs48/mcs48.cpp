@@ -1207,12 +1207,7 @@ void mcs48_cpu_device::device_reset()
 	update_regptr();
 	m_f1 = false;
 	m_a11 = 0;
-	m_dbbo = 0xff;
-	bus_w(0xff);
-	m_p1 = 0xff;
-	m_p2 = 0xff;
-	port_w(1, m_p1);
-	port_w(2, m_p2);
+
 	m_tirq_enabled = false;
 	m_xirq_enabled = false;
 	m_timecount_enabled = 0;
@@ -1220,14 +1215,25 @@ void mcs48_cpu_device::device_reset()
 	m_sts = 0;
 	m_flags_enabled = false;
 	m_dma_enabled = false;
-	if (!m_t0_clk_func.isnull())
-		m_t0_clk_func(0);
 
 	// confirmed from interrupt logic description
 	m_irq_in_progress = false;
 	m_timer_overflow = false;
 
 	m_irq_polled = false;
+
+	// BUS is set to high-impedance (except when EA=1)
+	m_dbbo = 0xff;
+	m_bus_out_cb(0, 0xff, m_ea ? 0xff : 0); // bus_w
+
+	// port 1 and port 2 are set to input mode
+	m_p1 = 0xff;
+	m_p2 = 0xff;
+	port_w(1, m_p1);
+	port_w(2, m_p2);
+
+	if (!m_t0_clk_func.isnull())
+		m_t0_clk_func(0);
 }
 
 
