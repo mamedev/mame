@@ -22,6 +22,7 @@
 // | Knob                                 | * | * | * | * |
 // | Beeper                               | * | * | * | * |
 // | ID PROM                              | * | * | * | * |
+// | Option ROMs                          | * | * | * | * |
 // | B/W 80x25 text video w/ attributes   | * |   | * |   |
 // | B/W 50x25 text video w/ attributes   |   | * |   |   |
 // | B/W 400x300 graphic video            | * | * |   |   |
@@ -37,7 +38,6 @@
 //
 // What's not in for all the models:
 // - Expansion cards
-// - Option ROMs
 //
 // Main references:
 // - Olivier De Smet's standalone emulator:
