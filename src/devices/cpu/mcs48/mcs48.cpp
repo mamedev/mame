@@ -8,9 +8,6 @@
     Based on the original work Copyright Dan Boris, an 8048 emulator
 
     TODO:
-    - EA pin - defined by architecture, must implement:
-      1 means external access, bypassing internal ROM
-      reimplement as a push, not a pull
     - add CMOS devices, 1 new opcode (01 IDL)
     - add special 8022 opcodes (RAD, SEL AN0, SEL AN1, RETI)
     - according to the user manual, some opcodes(dis/enable timer/interrupt)
@@ -139,6 +136,10 @@
 #define R7              m_regptr[7]
 
 
+/***************************************************************************
+    DEVICE TYPES
+***************************************************************************/
+
 DEFINE_DEVICE_TYPE(I8021,   i8021_device,   "i8021",   "Intel 8021")
 DEFINE_DEVICE_TYPE(I8022,   i8022_device,   "i8022",   "Intel 8022")
 DEFINE_DEVICE_TYPE(I8035,   i8035_device,   "i8035",   "Intel 8035")
@@ -164,53 +165,17 @@ DEFINE_DEVICE_TYPE(M58715,  m58715_device,  "m58715",  "M58715")
 
 
 /***************************************************************************
-    ADDRESS MAPS
+    CONSTRUCTOR
 ***************************************************************************/
-
-// FIXME: the memory maps should probably support rom banking for EA
-void mcs48_cpu_device::program_10bit(address_map &map)
-{
-	map(0x000, 0x3ff).rom();
-}
-
-void mcs48_cpu_device::program_11bit(address_map &map)
-{
-	map(0x000, 0x7ff).rom();
-}
-
-void mcs48_cpu_device::program_12bit(address_map &map)
-{
-	map(0x000, 0xfff).rom();
-}
-
-void mcs48_cpu_device::data_6bit(address_map &map)
-{
-	map(0x00, 0x3f).ram().share("data");
-}
-
-void mcs48_cpu_device::data_7bit(address_map &map)
-{
-	map(0x00, 0x7f).ram().share("data");
-}
-
-void mcs48_cpu_device::data_8bit(address_map &map)
-{
-	map(0x00, 0xff).ram().share("data");
-}
-
 
 mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_cpu_device::mcs48_ophandler *opcode_table)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, (feature_mask & MB_FEATURE) != 0 ? 12 : 11, 0,
-			(rom_size == 1024) ? address_map_constructor(FUNC(mcs48_cpu_device::program_10bit), this) :
-			(rom_size == 2048) ? address_map_constructor(FUNC(mcs48_cpu_device::program_11bit), this) :
-			(rom_size == 4096) ? address_map_constructor(FUNC(mcs48_cpu_device::program_12bit), this) :
-			address_map_constructor())
+			rom_size ? address_map_constructor(FUNC(mcs48_cpu_device::program_map), this) : address_map_constructor())
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, ((ram_size == 64) ? 6 : ((ram_size == 128) ? 7 : 8)), 0,
-			(ram_size == 64) ? address_map_constructor(FUNC(mcs48_cpu_device::data_6bit), this) :
-			(ram_size == 128) ? address_map_constructor(FUNC(mcs48_cpu_device::data_7bit), this) :
-			address_map_constructor(FUNC(mcs48_cpu_device::data_8bit), this))
+			address_map_constructor(FUNC(mcs48_cpu_device::data_map), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
+	, m_rom_view(*this, "rom_view")
 	, m_port_in_cb(*this, 0xff)
 	, m_port_out_cb(*this)
 	, m_bus_in_cb(*this, 0xff)
@@ -221,16 +186,17 @@ mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type ty
 	, m_psw(0)
 	, m_dataptr(*this, "data")
 	, m_feature_mask(feature_mask)
-	, m_int_rom_size(rom_size)
+	, m_rom_size(rom_size)
+	, m_ram_size(ram_size)
 	, m_opcode_table(opcode_table)
 {
 	// Sanity checks
-	if ( ram_size != 64 && ram_size != 128 && ram_size != 256 )
+	if (ram_size != 64 && ram_size != 128 && ram_size != 256)
 	{
 		fatalerror("mcs48: Invalid RAM size\n");
 	}
 
-	if ( rom_size != 0 && rom_size != 1024 && rom_size != 2048 && rom_size != 4096 )
+	if (rom_size != 0 && rom_size != 1024 && rom_size != 2048 && rom_size != 4096)
 	{
 		fatalerror("mcs48: Invalid ROM size\n");
 	}
@@ -373,6 +339,30 @@ std::unique_ptr<util::disasm_interface> mcs48_cpu_device::create_disassembler()
 
 
 /***************************************************************************
+    ADDRESS MAPS
+***************************************************************************/
+
+void mcs48_cpu_device::program_map(address_map &map)
+{
+	const uint16_t mask = m_rom_size - 1;
+
+	// I802X does not have EA pin
+	if (m_feature_mask & I802X_FEATURE)
+		map(0, mask).rom();
+	else
+	{
+		map(0, mask).view(m_rom_view);
+		m_rom_view[0](0, mask).rom();
+	}
+}
+
+void mcs48_cpu_device::data_map(address_map &map)
+{
+	map(0, m_ram_size - 1).ram().share("data");
+}
+
+
+/***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
@@ -409,6 +399,23 @@ uint8_t mcs48_cpu_device::argument_fetch()
 void mcs48_cpu_device::update_regptr()
 {
 	m_regptr = &m_dataptr[(m_psw & B_FLAG) ? 24 : 0];
+}
+
+
+/*-------------------------------------------------
+    update_ea - apply EA pin (External Access input,
+    EA=1: external ROM, EA=0: internal ROM)
+-------------------------------------------------*/
+
+void mcs48_cpu_device::update_ea()
+{
+	if (m_rom_view.exists())
+	{
+		if (m_ea)
+			m_rom_view.disable();
+		else
+			m_rom_view.select(0);
+	}
 }
 
 
@@ -1104,6 +1111,7 @@ void mcs48_cpu_device::device_start()
 	m_a = 0;
 	m_psw = 0;
 	m_f1 = false;
+	m_a11 = 0;
 	m_p1 = 0;
 	m_p2 = 0;
 	m_timer = 0;
@@ -1122,16 +1130,15 @@ void mcs48_cpu_device::device_start()
 	m_timecount_enabled = 0;
 	m_flags_enabled = false;
 	m_dma_enabled = false;
-	m_a11 = 0;
-
-	// External access line, EA=1: read from external rom, EA=0: read from internal rom
-	// FIXME: Current implementation suboptimal
-	m_ea = (m_int_rom_size ? 0 : 1);
 
 	space(AS_PROGRAM).cache(m_program);
 	space(AS_DATA).specific(m_data);
-	if(m_feature_mask & EXT_BUS_FEATURE)
+	if (m_feature_mask & EXT_BUS_FEATURE)
 		space(AS_IO).specific(m_io);
+
+	// default EA pin state
+	m_ea = m_rom_size ? 0 : 1;
+	update_ea();
 
 	// ensure that regptr is valid before get_info gets called
 	update_regptr();
@@ -1151,11 +1158,10 @@ void mcs48_cpu_device::device_start()
 	state_add(MCS48_P1,        "P1",        m_p1);
 	state_add(MCS48_P2,        "P2",        m_p2);
 
-	for (int regnum = 0; regnum < 8; regnum++) {
+	for (int regnum = 0; regnum < 8; regnum++)
 		state_add(MCS48_R0 + regnum, string_format("R%d", regnum).c_str(), m_rtemp).callimport().callexport();
-	}
 
-	if (m_feature_mask & EXT_BUS_FEATURE)
+	if (!(m_feature_mask & I802X_FEATURE))
 		state_add(MCS48_EA,    "EA",        m_ea).mask(0x1);
 
 	if (m_feature_mask & UPI41_FEATURE)
@@ -1172,6 +1178,7 @@ void mcs48_cpu_device::device_start()
 	save_item(NAME(m_a));
 	save_item(NAME(m_psw));
 	save_item(NAME(m_f1));
+	save_item(NAME(m_a11));
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));
 	save_item(NAME(m_ea));
@@ -1192,8 +1199,6 @@ void mcs48_cpu_device::device_start()
 	save_item(NAME(m_timecount_enabled));
 	save_item(NAME(m_flags_enabled));
 	save_item(NAME(m_dma_enabled));
-
-	save_item(NAME(m_a11));
 
 	set_icountptr(m_icount);
 }
@@ -1311,6 +1316,7 @@ void mcs48_cpu_device::burn_cycles(int count)
 
 		// if the counter is enabled, poll the T1 test input once for each cycle
 		else if (m_timecount_enabled & COUNTER_ENABLED)
+		{
 			for ( ; count > 0; count--, m_icount--)
 			{
 				m_t1_history = (m_t1_history << 1) | (test_r(1) & 1);
@@ -1320,6 +1326,7 @@ void mcs48_cpu_device::burn_cycles(int count)
 						timerover = true;
 				}
 			}
+		}
 
 		// if either source caused a timer overflow, set the flags
 		if (timerover)
@@ -1377,7 +1384,7 @@ void mcs48_cpu_device::execute_run()
 uint8_t upi41_cpu_device::upi41_master_r(offs_t offset)
 {
 	// if just reading the status, return it
-	if ((offset & 1) != 0)
+	if (offset & 1)
 		return (m_sts & 0xf3) | (m_f1 ? 8 : 0) | ((m_psw & F_FLAG) ? 4 : 0);
 
 	// if the output buffer was full, it gets cleared now
@@ -1396,7 +1403,7 @@ uint8_t upi41_cpu_device::upi41_master_r(offs_t offset)
     write
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( upi41_cpu_device::master_callback )
+TIMER_CALLBACK_MEMBER(upi41_cpu_device::master_callback)
 {
 	// data always goes to the input buffer
 	m_dbbi = param & 0xff;
@@ -1499,7 +1506,7 @@ void mcs48_cpu_device::state_string_export(const device_state_entry &entry, std:
 
 void mcs48_cpu_device::execute_set_input(int inputnum, int state)
 {
-	switch( inputnum )
+	switch (inputnum)
 	{
 		case MCS48_INPUT_IRQ:
 			m_irq_state = (state != CLEAR_LINE);
@@ -1507,6 +1514,7 @@ void mcs48_cpu_device::execute_set_input(int inputnum, int state)
 
 		case MCS48_INPUT_EA:
 			m_ea = (state != CLEAR_LINE);
+			update_ea();
 			break;
 	}
 }

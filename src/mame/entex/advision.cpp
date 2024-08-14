@@ -30,7 +30,6 @@ different rate, hence MAME configures a larger screen. In fact, the homebrew dem
 Code Red doesn't use the BIOS for it, and runs at 50*40 to save some RAM.
 
 TODO:
-- EA banking is ugly, it can be turd-polished but the real issue is in mcs48
 - display refresh is actually ~14Hz, but doing that will make MAME very sluggish
 
 BTANB:
@@ -71,7 +70,6 @@ public:
 		m_led_update(*this, "led_update"),
 		m_led_off(*this, "led_off"),
 		m_cart(*this, "cartslot"),
-		m_ea_bank(*this, "ea_bank"),
 		m_joy(*this, "JOY"),
 		m_conf(*this, "CONF")
 	{ }
@@ -94,7 +92,6 @@ private:
 	required_device<timer_device> m_led_update;
 	required_device<timer_device> m_led_off;
 	required_device<generic_slot_device> m_cart;
-	required_memory_bank m_ea_bank;
 	required_ioport m_joy;
 	required_ioport m_conf;
 
@@ -288,8 +285,6 @@ void advision_state::bankswitch_w(u8 data)
 
 	// P12: 8048 EA pin
 	m_maincpu->set_input_line(MCS48_INPUT_EA, BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
-	if (m_cart_rom)
-		m_ea_bank->set_entry(BIT(data, 2));
 }
 
 u8 advision_state::ext_ram_r(offs_t offset)
@@ -319,7 +314,6 @@ void advision_state::ext_ram_w(offs_t offset, u8 data)
 void advision_state::program_map(address_map &map)
 {
 	map(0x0000, 0x0fff).r(m_cart, FUNC(generic_slot_device::read_rom));
-	map(0x0000, 0x03ff).bankr("ea_bank");
 }
 
 void advision_state::io_map(address_map &map)
@@ -379,16 +373,6 @@ INPUT_PORTS_END
 
 void advision_state::machine_start()
 {
-	// configure EA banking
-	std::string region_tag;
-	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-
-	m_ea_bank->configure_entry(0, memregion("maincpu")->base());
-	if (m_cart_rom)
-		m_ea_bank->configure_entry(1, m_cart_rom->base());
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x03ff, m_ea_bank);
-	m_ea_bank->set_entry(0);
-
 	// allocate display buffer
 	m_display = std::make_unique<u8 []>(DISPLAY_WIDTH * 40);
 	std::fill_n(m_display.get(), DISPLAY_WIDTH * 40, 0);
