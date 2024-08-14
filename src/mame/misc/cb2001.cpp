@@ -1054,7 +1054,7 @@ void cb2001_state::ndongmul2(machine_config &config)
 }
 
 
-ROM_START( cb2001 ) // DYNA CO1 V1.1I in bookkeeping screen
+ROM_START( cb2001 ) // DYNA D9702 PCB; DYNA CO1 V1.1I in bookkeeping screen
 	ROM_REGION16_LE( 0x040000, "boot_prg", 0 )
 	ROM_LOAD16_WORD( "c01111.11f", 0x020000, 0x20000, CRC(ec6269f1) SHA1(f2428562a10e30192f2c95053f5ce448302e7cf5) )
 
@@ -1066,12 +1066,13 @@ ROM_START( cb2001 ) // DYNA CO1 V1.1I in bookkeeping screen
 	ROM_LOAD( "am27s29.11b", 0x200, 0x200, CRC(e5aa3ec7) SHA1(675711dd6788b3d0c37573b49b6297cbcd8c8209) )
 ROM_END
 
-ROM_START( scherrym ) // DYNA PLUS V1.6 in bookkeeping screen
+ROM_START( scherrym ) // DYNA D9702 PCB; DYNA PLUS V1.6 in bookkeeping screen
 	ROM_REGION16_LE( 0x040000, "boot_prg", 0 )
 	ROM_LOAD16_WORD( "f11.bin", 0x000000, 0x40000, CRC(8967f58d) SHA1(eb01a16b7d108f5fbe5de8f611b4f77869aedbf1) )
 
 	ROM_REGION( 0x080000, "gfx", ROMREGION_ERASEFF )
-	ROM_LOAD( "gfx.12c", 0x000000, 0x80000, NO_DUMP ) // this board uses an unmarked MASK ROM at 12c, 12a is unpopulated.  Size unknown.
+	// this board uses an unmarked MASK ROM at 12c, 12a is unpopulated.  Size unknown. The bootleg PCB uses an mx29f1610ml, so possibly the same or compatible
+	ROM_LOAD( "gfx.12c", 0x000000, 0x80000, NO_DUMP )
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "n82s135-1.bin", 0x000, 0x100, CRC(66ed363f) SHA1(65bd37842c441c2e712844b07c0cfe37ef16d0ef) )
@@ -1090,7 +1091,7 @@ ROM_END
   |                               |          |                                |
   | __       ___________          |__________|         __U22_____  __________ |___
   ||SW7     | DYNA     |                     Xtal     |N82S147AN| |74HC374AN|   __|
-  ||Ununsed | CPU 91A  |                   24.000 MHz  __________               __|
+  ||Unused  | CPU 91A  |                   24.000 MHz  __________               __|
   ||__|     |          |                              |74LS245N_|               __|
   |         |__________|                  ___U8_____   __________               __|
   | ________      _________              |PALCE16V8|  |74LS245N_|               __|
@@ -1114,7 +1115,7 @@ ROM_END
   |_______________________________________________________________________________|
 
 */
-ROM_START( ndongmul2 ) // 뉴 동물동물 2 (DYNA PLUS V1.2N in bookkeeping screen)
+ROM_START( ndongmul2 ) // 뉴 동물동물 2 (bootleg MIA 94V-0 PCB; DYNA PLUS V1.2N in bookkeeping screen)
 	ROM_REGION16_LE( 0x080000, "boot_prg", 0 ) // CPU91A-011-9915JK001
 	ROM_LOAD16_WORD( "am27c020.u10", 0x000000, 0x040000, CRC(550e53e5) SHA1(a90ee66e7ae9b58005b6ed412669d86532c75156) )
 

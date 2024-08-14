@@ -1392,13 +1392,13 @@ ROM_END
 *        Game Drivers         *
 ******************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT      CLASS         INIT        ROT   COMPANY     FULLNAME                                FLAGS                                                LAYOUT
-GAMEL( 1996, sderby,    0,        sderby,   sderby,    sderby_state, empty_init, ROT0, "Playmark", "Super Derby (Playmark, v.07.03)",      0,                                                   layout_sderby   )
-GAMEL( 1996, sderbya,   sderby,   sderbya,  sderbya,   sderby_state, empty_init, ROT0, "Playmark", "Super Derby (Playmark, v.10.04)",      0,                                                   layout_sderby   )
-GAMEL( 1996, spacewin,  0,        spacewin, spacewin,  sderby_state, empty_init, ROT0, "Playmark", "Scacco Matto / Space Win",             0,                                                   layout_spacewin )
-GAME(  1996, shinygld,  0,        shinygld, shinygld,  sderby_state, empty_init, ROT0, "Playmark", "Shiny Golds",                          0                                                                    )
-GAMEL( 1997, croupier,  0,        pmroulet, pmroulet,  sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
-GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet,  sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
-GAMEL( 1997, croupierb, croupier, zw3,      croupierb, zw3_state,    empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.03.09)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS, layout_pmroulet ) // title screen says Croupier 2 but every string in ROM says Croupier.
-GAME(  1996, luckboom,  0,        luckboom, luckboom,  sderby_state, empty_init, ROT0, "Playmark", "Lucky Boom",                           0                                                                    )
-GAME(  1998, magictch,  0,        zw3,      magictch,  zw3_state,    empty_init, ROT0, "Playmark", "Magic Touch",                          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // sprite offsets aren't 100% correct, no PIC16C74 emulation, needs proper layout
+//     YEAR  NAME       PARENT    MACHINE   INPUT      CLASS         INIT        ROT   COMPANY     FULLNAME                                   FLAGS                                                LAYOUT
+GAMEL( 1996, sderby,    0,        sderby,   sderby,    sderby_state, empty_init, ROT0, "Playmark", "Super Derby (Playmark, v.07.03)",         0,                                                   layout_sderby   )
+GAMEL( 1996, sderbya,   sderby,   sderbya,  sderbya,   sderby_state, empty_init, ROT0, "Playmark", "Super Derby (Playmark, v.10.04)",         0,                                                   layout_sderby   )
+GAMEL( 1996, spacewin,  0,        spacewin, spacewin,  sderby_state, empty_init, ROT0, "Playmark", "Scacco Matto / Space Win",                0,                                                   layout_spacewin )
+GAME(  1996, shinygld,  0,        shinygld, shinygld,  sderby_state, empty_init, ROT0, "Playmark", "Shiny Golds",                             0                                                                    )
+GAMEL( 1997, croupier,  0,        pmroulet, pmroulet,  sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
+GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet,  sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
+GAMEL( 1997, croupierb, croupier, zw3,      croupierb, zw3_state,    empty_init, ROT0, "Playmark", "Croupier II (Playmark Roulette v.03.09)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS, layout_pmroulet ) // title screen says Croupier 2 but every string in ROM says Croupier.
+GAME(  1996, luckboom,  0,        luckboom, luckboom,  sderby_state, empty_init, ROT0, "Playmark", "Lucky Boom",                              0                                                                    )
+GAME(  1998, magictch,  0,        zw3,      magictch,  zw3_state,    empty_init, ROT0, "Playmark", "Magic Touch",                             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // sprite offsets aren't 100% correct, no PIC16C74 emulation, needs proper layout
