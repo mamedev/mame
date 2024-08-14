@@ -252,8 +252,8 @@ u8 elite_state::input_r()
 
 void elite_state::ppi_porta_w(u8 data)
 {
-	// d0-d5: TSI C0-C5
-	// d6: TSI START line
+	// d0-d5: S14001A C0-C5
+	// d6: S14001A start pin
 	m_speech->data_w(data & 0x3f);
 	m_speech->start_w(BIT(data, 6));
 
@@ -273,7 +273,7 @@ void elite_state::ppi_portc_w(u8 data)
 	// d4: speech ROM A12
 	m_speech->set_rom_bank(BIT(data, 4));
 
-	// d5: lower TSI volume
+	// d5: lower S14001A volume
 	m_speech->set_output_gain(0, (data & 0x20) ? 0.25 : 1.0);
 
 	// d6,d7: bookrom bankswitch (model EAG)
@@ -286,10 +286,10 @@ u8 elite_state::ppi_portb_r()
 	// d0: printer? white wire from LED pcb
 	u8 data = 1;
 
-	// d1: TSI BUSY line
+	// d1: S14001A busy pin
 	data |= (m_speech->busy_r()) ? 2 : 0;
 
-	// d2,d3: language switches(hardwired)
+	// d2,d3: language jumpers (hardwired)
 	data |= *m_language << 2 & 0x0c;
 
 	// d5: 3 more buttons

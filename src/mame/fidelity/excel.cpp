@@ -24,7 +24,7 @@ CPU: GTE G65SC102P-3, 32 KB PRG ROM: AMI 101-1080A01(IC5), 8192x8 SRAM SRM2264C1
 
 PCB 2: 510.1117A01
 Speech: TSI S14001A, 32 KB ROM: AMI 101-1081A01(IC2)
-Dip Switches set ROM A13 and ROM A14, on the side of the board
+DIP Switches set ROM A13 and ROM A14, on the side of the board
 
 ROM A12 is tied to S14001A's A11 (yuck)
 ROM A11 is however tied to the CPU's XYZ
@@ -126,7 +126,7 @@ basically same as (Par) Excellence hardware, reskinned board
 
 Designer 2100 (model 6103): exactly same, but running at 5MHz
 
-(Designer 1500 is on 80C50 hardware, same ROM as The Gambit, see sc6.cpp)
+(Designer 1500 is on 80C50 hardware, same ROM as The Classic, see sc6.cpp)
 
 *******************************************************************************/
 
@@ -222,7 +222,7 @@ void excel_state::machine_start()
     I/O
 *******************************************************************************/
 
-// speech
+// speech (fexcelv)
 
 void excel_state::init_fexcelv()
 {
@@ -230,7 +230,7 @@ void excel_state::init_fexcelv()
 	const u32 len = memregion("speech")->bytes();
 	assert(len == 0x8000);
 
-	// TSI A11 is A12, program controls A11, user controls A13,A14(language switches)
+	// program controls A11, user controls A13,A14(language switches)
 	std::vector<u8> buf(len);
 	memcpy(&buf[0], rom, len);
 	for (int i = 0; i < len; i++)
@@ -249,12 +249,12 @@ void excel_state::speech_w(u8 data, u8 mask)
 	// a0-a2,d2 (from ttl_w): 74259(2) to speech board
 	m_speech_data = (m_speech_data & ~mask) | ((data & 4) ? mask : 0);
 
-	// 74259 Q6: TSI ROM A11
+	// 74259 Q6: speech ROM A11
 	m_speech_bank = (m_speech_bank & ~1) | BIT(m_speech_data, 6);
 	m_speech->set_rom_bank(m_speech_bank);
 
-	// Q0-Q5: TSI C0-C5
-	// Q7: TSI START line
+	// Q0-Q5: S14001A C0-C5
+	// Q7: S14001A start pin
 	m_speech->data_w(m_speech_data & 0x3f);
 	m_speech->start_w(BIT(m_speech_data, 7));
 }
@@ -302,7 +302,7 @@ u8 excel_state::ttl_r(offs_t offset)
 	if (m_inputs[2] != nullptr && sel == 0 && ~m_select & 0x80)
 		d7 = m_inputs[2]->read() & 0x80;
 
-	// a0-a2,d6: from speech board: language switches and TSI BUSY line, otherwise tied to VCC
+	// a0-a2,d6: from speech board: language switches and S14001A busy pin, otherwise tied to VCC
 	u8 d6 = (m_inputs[1].read_safe(0xff) >> offset & 1) ? 0x40 : 0;
 
 	// a0-a2,d7: multiplexed inputs (active low)

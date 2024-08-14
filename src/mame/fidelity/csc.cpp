@@ -442,7 +442,7 @@ void csc_state::pia0_ca2_w(int state)
 
 void csc_state::pia1_pa_w(u8 data)
 {
-	// d0-d5: TSI C0-C5
+	// d0-d5: S14001A C0-C5
 	m_speech->data_w(data & 0x3f);
 
 	// d0-d7: data for the 4 7seg leds, bits are ABFGHCDE (H is extra led)
@@ -455,10 +455,10 @@ void csc_state::pia1_pb_w(u8 data)
 	// d0: speech ROM A12
 	m_speech->set_rom_bank(data & 1);
 
-	// d1: TSI START line
+	// d1: S14001A start pin
 	m_speech->start_w(BIT(data, 1));
 
-	// d4: lower TSI volume
+	// d4: lower S14001A volume
 	m_speech->set_output_gain(0, (data & 0x10) ? 0.25 : 1.0);
 }
 
@@ -467,14 +467,14 @@ u8 csc_state::pia1_pb_r()
 	// d2: printer?
 	u8 data = 0x04;
 
-	// d3: TSI BUSY line
+	// d3: S14001A busy pin
 	if (m_speech->busy_r())
 		data |= 0x08;
 
 	// d5: button row 8
 	data |= (read_inputs() >> 3 & 0x20);
 
-	// d6,d7: language switches(hardwired with 2 resistors/jumpers)
+	// d6,d7: language jumpers (hardwired)
 	return data | (*m_language << 6 & 0xc0);
 }
 

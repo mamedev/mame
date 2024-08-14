@@ -29,7 +29,7 @@ use this same ROM  (three or four).  The later chess boards use a slightly diffe
 number, but the contents are identical.
 
 Memory map (VCC):
------------
+-----------------
 0000-0FFF: 4K 2332 ROM VCC1 or 101-32013
 1000-1FFF: 4K 2332 ROM VCC2
 2000-2FFF: 4K 2332 ROM VCC3
@@ -37,7 +37,7 @@ Memory map (VCC):
 6000-FFFF: empty
 
 Memory map (UVC):
------------
+-----------------
 0000-1FFF: 8K 2364 ROM 101-64017
 2000-2FFF: 4K 2332 ROM 101-32010 or VCC3
 4000-5FFF: 1K RAM (2114 SRAM x2)
@@ -64,7 +64,7 @@ PB.2 - digit 0, bottom dot (W)
 PB.3 - digit 1, top dot (W)
 PB.4 - digit 2 (W)
 PB.5 - digit 3 (W)
-PB.6 - enable language switches (W, see below)
+PB.6 - enable language jumpers (W, see below)
 PB.7 - TSI BUSY line (R)
 
 (button rows pulled up to 5V through 2.2K resistors)
@@ -77,14 +77,14 @@ PC.5 - button column B (W)
 PC.6 - button column C (W)
 PC.7 - button column D (W)
 
-language switches:
-------------------
-When PB.6 is pulled low, the language switches can be read.  There are four.
+Language jumpers:
+-----------------
+When PB.6 is pulled low, the language jumpers can be read.  There are four.
 They connect to the button rows.  When enabled, the row(s) will read low if
 the jumper is present.  English only VCC's do not have the 367 or any pads stuffed.
 The jumpers are labeled: French, German, Spanish, and special.
 
-language latch:
+Language latch:
 ---------------
 There's an unstuffed 7474 on the board that connects to PA.6 and PA.7.  It allows
 one to latch the state of A12 to the speech ROM.  The English version has the chip
@@ -196,27 +196,27 @@ void vcc_state::ppi_porta_w(u8 data)
 	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
 	update_display();
 
-	// d0-d5: TSI C0-C5
-	// d7: TSI START line
-	m_speech->data_w(data & 0x3f);
-	m_speech->start_w(BIT(data, 7));
-
 	// d6: language latch data
 	// d7: language latch clock (latch on high)
 	if (data & 0x80)
 		m_speech->set_rom_bank(BIT(data, 6));
+
+	// d0-d5: S14001A C0-C5
+	// d7: S14001A start pin
+	m_speech->data_w(data & 0x3f);
+	m_speech->start_w(BIT(data, 7));
 }
 
 u8 vcc_state::ppi_portb_r()
 {
-	// d7: TSI BUSY line
+	// d7: S14001A busy pin
 	return (m_speech->busy_r()) ? 0x80 : 0x00;
 }
 
 void vcc_state::ppi_portb_w(u8 data)
 {
 	// d0,d2-d5: digit/led select
-	// _d6: enable language switches
+	// _d6: enable language jumpers
 	m_led_select = data;
 	update_display();
 }
@@ -230,8 +230,8 @@ u8 vcc_state::ppi_portc_r()
 		if (BIT(m_inp_mux, i))
 			data |= m_inputs[i]->read();
 
-	// also language switches, hardwired with 4 jumpers
-	// 0(none wired): English, 1: German, 2: French, 4: Spanish, 8:Special(unused)
+	// also language jumpers (hardwired)
+	// 0(no jumper): English, 1: German, 2: French, 4: Spanish, 8: Special(unused)
 	if (~m_led_select & 0x40)
 		data |= *m_language;
 

@@ -18108,8 +18108,9 @@ fscc12                          //
 fscc12a                         //
 
 @source:fidelity/sc6.cpp
-fscc6                           //
-gambit
+classic
+fscc6
+gambitv
 miniscc
 
 @source:fidelity/sc8.cpp
