@@ -49,8 +49,10 @@ The same hardware from Unidesa/Cirsa was also used on some games from
   Unidesa/Cirsa/Europea Oklahoma Express
   Unidesa/Cirsa/Europea Ruleta de la Fortuna
 
-The "960606-3" and "960606-5" versions of this hardware were also used in several fruit
-machines released for the UK market by B Gaming Technology Ltd. (a division of Cirsa?).
+This hardware was also used in several fruit machines released for the UK market by B. Gaming Technology Ltd.
+B. Gaming Technology (BGT) was a brand of International Amusement Machine Corporation (IAMC), which was a
+member of the CIRSA Corporation.
+BGT was was formed in 1995 in Cannock, Staffordshire, to develop and supply gaming machines for the UK market.
 
 
  CIRSA / UNIDESA 960606-5 CPU BOARD
@@ -677,9 +679,9 @@ GAME( 1999,  rockroll,   0,         neptunp2_no_video, c960606,  neptunp2_state,
 GAME( 2001?, unk960606,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "unknown 960606-5 based machine (set 1)",            MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
 GAME( 2001?, unk960606b, 0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/Europea", "unknown 960606-5 based machine (set 2)",            MACHINE_IS_SKELETON_MECHANICAL ) // Year taken from sticker on PCB
 
-// B Gaming Technology Ltd. (BGT) fruit machines on Cirsa "960606-5" CPU PCB
-GAME( 1997,  bg_barmy,   0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B Gaming Technology", "Barmy Army",                            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2000,  bg_dbells,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B Gaming Technology", "Dancing Bells",                         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1999,  bg_ddb,     0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B Gaming Technology", "Ding Dong Bells (B Gaming Technology)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2000,  bg_max,     0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B Gaming Technology", "Max A Million (set 1)",                 MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2000,  bg_maxa,    bg_max,    neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B Gaming Technology", "Max A Million (set 2)",                 MACHINE_IS_SKELETON_MECHANICAL )
+// B. Gaming Technology Ltd. (BGT) fruit machines on Cirsa "960606-5" CPU PCB
+GAME( 1997,  bg_barmy,   0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Barmy Army",                            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2000,  bg_dbells,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Dancing Bells",                         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1999,  bg_ddb,     0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Ding Dong Bells (B Gaming Technology)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2000,  bg_max,     0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Max A Million (set 1)",                 MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2000,  bg_maxa,    bg_max,    neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Max A Million (set 2)",                 MACHINE_IS_SKELETON_MECHANICAL )
