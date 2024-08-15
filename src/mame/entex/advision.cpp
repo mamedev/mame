@@ -105,7 +105,6 @@ private:
 	u8 m_led_latch[5] = { };
 	std::unique_ptr<u8[]> m_display;
 
-	memory_region *m_cart_rom = nullptr;
 	std::vector<u8> m_ext_ram;
 	u16 m_rambank = 0;
 	u8 m_sound_cmd = 0;
