@@ -79,6 +79,7 @@ public:
 	void init_olympic5();
 	void init_tripfev();
 	void init_wldfruit();
+	void init_lthy();
 	[[maybe_unused]] void init_no_dec();
 
 protected:
@@ -859,6 +860,60 @@ ROM_START( mgzz ) // IGS PCB 0295-00 (IGS027A, M6295, IGS031, 8255, Battery)
 	ROM_LOAD( "sp.u14", 0x00000, 0x80000, CRC(f037952e) SHA1(0fa83e164937c9e8245861da7fd11f225525918d) )
 ROM_END
 
+/*********************************************************************************
+
+Long Teng Hu Yue, IGS 1999
+
+PCB Layout
+----------
+
+IGS PCB-0227-03
+|-----------------------------------------|
+|                JAMMA                    |
+|1                              M2401.U17 |
+|8      22MHz   27C4096.U9                |
+|W  SW1                                   |
+|A  SW2                                   |
+|Y                              LM2933    |
+|                IGS031         PAL       |
+|       61256                             |
+|                                IGS027A  |
+|     82C55                      (LABEL D6)
+|1              27C4096.U10               |
+|0                       35256            |
+|W                                        |
+|A  7805                                  |
+|Y   TDA1020      T518B         BATTERY   |
+|      VOL     K668    S2402.U14       SW3|
+|-----------------------------------------|
+Notes:
+       K668 - Oki M6295 clone. Clock 1.000MHz [22/22]. Pin 7 HIGH.
+      SW1/2 - 8-Position DIP Switch
+        SW3 - Reset / NVRAM Clear
+      61256 - EliteMT LP61256 32kBx8-bit SRAM (SOJ28)
+      35256 - Sanyo LC35256 32kBx8-bit SRAM (SOP28)
+      T518B - Reset IC
+
+*********************************************************************************/
+
+ROM_START( lthy ) // appears to be a different edition of lhzb3 (GFX and sound ROM match)
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "d6_igs027a", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "27c4096.u10", 0x000000, 0x80000, CRC(bd04f2e9) SHA1(3d5a2101c7214a37f159e0d17f3e66a9b6ab94ff) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "27c4096.u9", 0x000000, 0x80000, CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "m2401.u17", 0x000000, 0x400000, CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "s2402.u14", 0x000000, 0x100000, CRC(56083fe2) SHA1(62afd651809bf5e639bfda6e5579dbf4b903b664) )
+ROM_END
+
 
 /*
 
@@ -1531,6 +1586,13 @@ void igs_m027_state::init_wldfruit()
 	pgm_create_dummy_internal_arm_region();
 }
 
+void igs_m027_state::init_lthy()
+{
+	lthy_decrypt(machine());
+	//qlgs_gfx_decrypt(machine());
+	pgm_create_dummy_internal_arm_region();
+}
+
 } // anonymous namespace
 
 
@@ -1547,6 +1609,7 @@ GAME( 1999, amazonkp,  amazonia, igs_mahjong, amazonia, igs_m027_state, init_ama
 GAME( 1999, fruitpar,  0,        igs_mahjong, sdwx,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_IS_SKELETON )
 GAME( 1999, oceanpar,  0,        igs_mahjong, sdwx,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_IS_SKELETON ) // 1999 copyright in ROM
 GAME( 1999, oceanpara, oceanpar, igs_mahjong, sdwx,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_IS_SKELETON ) // 1999 copyright in ROM
+GAME( 1999, lthy,      0,        igs_mahjong, sdwx,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_IS_SKELETON )
 GAME( 200?, luckycrs,  0,        igs_mahjong, sdwx,     igs_m027_state, init_luckycrs, ROT0, "IGS", "Lucky Cross (V106SA)", MACHINE_IS_SKELETON )
 GAME( 2002, sdwx,      0,        igs_mahjong, sdwx,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME( 200?, jking02,   0,        igs_mahjong, sdwx,     igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_IS_SKELETON )
