@@ -18084,15 +18084,13 @@ fpresbu                         //
 fpresgla                        //
 
 @source:fidelity/excel.cpp
-fdes2000                        //
-fdes2100                        //
 fexcel                          //
 fexcel12                        //
-fexcel124                       //
+fexcel12a                       //
 fexcela                         //
 fexceld                         //
 fexcelp                         //
-fexcelpb                        //
+fexcelpa                        //
 fexcelv                         //
 granits                         // RCS
 

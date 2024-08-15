@@ -12,7 +12,7 @@ Grandmaster and FCC are verified to be the same PCB + ROMs as UVC. So even thoug
 they have a large wooden chessboard attached instead of a small plastic one, from
 MAME's perspective there's nothing to emulate on top of UVC.
 
-********************************************************************************
+================================================================================
 
 RE notes by Kevin Horton
 

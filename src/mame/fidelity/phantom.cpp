@@ -20,7 +20,7 @@ spawn block and place it anywhere on a free spot at the designated box at the
 edge of the chessboard.
 
 Hardware notes:
-- PCB label 510.1128A01
+- PCB label: 510.1128A01
 - R65C02P4, XTAL marked 4.915200
 - 2*32KB ROM 27C256-15, 8KB RAM MS6264L-10
 - LCD driver, display panel for digits

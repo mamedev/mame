@@ -4,7 +4,7 @@
 /*******************************************************************************
 
 Fidelity Chess Challenger 7 (BCC)
-------------------------
+---------------------------------
 It was Fidelity's most sold chess computer. The first version was released in
 1979, and a newer PCB revision was produced in 1980.
 
@@ -31,7 +31,7 @@ Memory map:
 4000-FFFF: Z80 A14/A15 not connected
 
 Port map (Write):
----------
+-----------------
 D0-D3: digit select and keypad mux
 D4: CHECK led
 D5: LOSE led
@@ -41,7 +41,7 @@ NE591 Q0-Q6: digit segments A-G
 NE591 Q7: buzzer
 
 Port map (Read):
----------
+----------------
 D0-D3: keypad row
 
 *******************************************************************************/

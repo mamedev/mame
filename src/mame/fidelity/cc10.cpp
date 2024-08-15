@@ -9,10 +9,10 @@ TODO:
 - What is cc10 8255 PB.7 for? When set, maximum levels is 3, like in CC3. But
   there is no CC3 with 16 buttons, and things get glitchy in this mode.
 
-********************************************************************************
+================================================================================
 
 Fidelity Chess Challenger 10 (CCX)
--------------------
+----------------------------------
 3 versions are known to exist: A,B,C. Strangely, version C(UCC10) has an 8080
 instead of Z80 and no beeper, it's on CC1-based hardware (see cc1.cpp).
 

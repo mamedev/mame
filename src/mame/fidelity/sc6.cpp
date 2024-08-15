@@ -24,7 +24,7 @@ Known MCU ROM serials:
 TODO:
 - is The Classic model CC8 a different ROM? and what about model 6079D?
 
---------------------------------------------------------------------------------
+================================================================================
 
 SC6 hardware notes:
 - PCB label: 510-1045B01
@@ -39,7 +39,7 @@ SC6 released modules, * denotes not dumped yet:
 
 SC6 program is contained in BO6 and CG6.
 
---------------------------------------------------------------------------------
+================================================================================
 
 MSC hardware notes:
 - PCB label: 510-1044B01
@@ -56,7 +56,7 @@ Silver Bullet hardware notes:
 - TMP80C50AP-6-9311 MCU, 4KB internal ROM, 6MHz XTAL
 - buzzer, 16 leds, 8*8 chessboard buttons, module slot (takes MSC modules)
 
---------------------------------------------------------------------------------
+================================================================================
 
 The Classic (model CC8) hardware notes:
 - PCB label: 510-1095A01
@@ -79,7 +79,7 @@ Designer 1500 hardware notes:
 
 Peri Beta has the same PCB/ROM as Designer 1500, only the housing differs.
 
---------------------------------------------------------------------------------
+================================================================================
 
 Gambit Voice hardware notes:
 - TMP80C50AP-6-9337 MCU, 4KB internal ROM, 6MHz XTAL

@@ -26,7 +26,7 @@ actual speed, overclock V10 and V11 to 230%. This can be done by starting MAME
 with the -cheat option and going to the Slider Controls menu, hold Ctrl and press
 Right to overclock maincpu.
 
-********************************************************************************
+================================================================================
 
 Excel 68000 (model 6094) overview:
 - 16KB RAM(2*SRM2264C-10 @ U8/U9), 64KB ROM(2*AT27C256-15DC @ U6/U7)
@@ -47,7 +47,7 @@ display a ROM checksum.
 fex68km4 continuously tests RAM at boot and displays "512", this is normal.
 To start, hold New Game or Clear.
 
-********************************************************************************
+================================================================================
 
 Elite Avant Garde 2265 (EAG, model 6114)
 ----------------------------------------
@@ -110,7 +110,7 @@ Memory map: (of what is known)
 700002-700003 R lo d7: 74251: keypad row 8
 604000-607FFF: 16KB EEPROM
 
-********************************************************************************
+================================================================================
 
 Elite Avant Garde 2325 (EAG, model 6117)
 ----------------------------------------
@@ -181,7 +181,7 @@ V1x Memory map:
 280000-37FFFF: hashtable SRAM
 B0000x-xxxxxx: see V7, -800000
 
-********************************************************************************
+================================================================================
 
 Elite Premiere (model 6131)
 ---------------------------

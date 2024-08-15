@@ -27,7 +27,7 @@ TODO:
 - the VFD scrolls around 30% too slow compared to the real one, probably depends
   on how many T1 clock edges the 8041 can detect (see mcu_t1_r)
 
-********************************************************************************
+================================================================================
 
 Voice Bridge Challenger (Model VBRC, later reissued as Model 7002/BV2)
 and Bridge Challenger 3 (Model 7014)
@@ -120,7 +120,7 @@ P7.1 - goes through inverter, to pads that are not used
 P7.2 - segment C
 P7.3 - segment H
 
-button matrix:
+Button matrix:
 --------------
 the matrix is composed of 8 columns by 4 rows.
 

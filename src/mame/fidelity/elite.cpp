@@ -14,10 +14,10 @@ BTANB:
   To resolve this, hold the Game Control button while booting to clear nvram.
   The ROM dump was verified from 2 chesscomputers.
 
-********************************************************************************
+================================================================================
 
 Elite A/S Challenger (EAS)
----------------------------------
+--------------------------
 This came out in 1983. 2 program updates were released in 1983 and 1984,
 named Budapest and Glasgow, places where Fidelity competed in chess computer
 matches (they won it in 1983). A/S stands for Auto Sensory, it's the 1st
@@ -1039,13 +1039,13 @@ ROM_START( feag ) // model 6081, aka "Mobile Master" - checksum BE41 9B27 E959 4
 	ROMX_LOAD("101-64106.ic16", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
 ROM_END
 
-ROM_START( feag2100 ) // checksum F234 9D4A 2373 B2F1
+ROM_START( feag2100 ) // model 6088 - checksum F361 9D5E 1D31 ADF0
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("el2100_2.ic5", 0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
-	ROM_LOAD("el2100_3.ic4", 0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
+	ROM_LOAD("2100_c_black.ic5",  0xc000, 0x2000, CRC(454eb839) SHA1(83d206464c194b022d43913b5f4092a8201f36b9) )
+	ROM_LOAD("2100_c_green.ic4",  0xe000, 0x2000, CRC(f1f76a63) SHA1(337b4572b743d383c6a12c360875d37682de3647) )
 
 	ROM_REGION( 0x8000, "rombank", 0 )
-	ROM_LOAD("el2100_1.ic9", 0x0000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
+	ROM_LOAD("2100_c_orange.ic9", 0x0000, 0x8000, CRC(feeff71c) SHA1(87614ca850848581d946193efa317181ef9c7a09) )
 
 	// speech ROM
 	ROM_DEFAULT_BIOS("en")
@@ -1068,13 +1068,13 @@ ROM_START( feag2100 ) // checksum F234 9D4A 2373 B2F1
 	ROMX_LOAD("101-64106.ic16", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
 ROM_END
 
-ROM_START( feag2100a ) // model 6088 - checksum F361 9D5E 1D31 ADF0
+ROM_START( feag2100a ) // checksum F234 9D4A 2373 B2F1
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("2100_c_black.ic5",  0xc000, 0x2000, CRC(454eb839) SHA1(83d206464c194b022d43913b5f4092a8201f36b9) )
-	ROM_LOAD("2100_c_green.ic4",  0xe000, 0x2000, CRC(f1f76a63) SHA1(337b4572b743d383c6a12c360875d37682de3647) )
+	ROM_LOAD("el2100_2.ic5", 0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
+	ROM_LOAD("el2100_3.ic4", 0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
 
 	ROM_REGION( 0x8000, "rombank", 0 )
-	ROM_LOAD("2100_c_orange.ic9", 0x0000, 0x8000, CRC(feeff71c) SHA1(87614ca850848581d946193efa317181ef9c7a09) )
+	ROM_LOAD("el2100_1.ic9", 0x0000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
 
 	// speech ROM
 	ROM_DEFAULT_BIOS("en")

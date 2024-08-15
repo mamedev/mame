@@ -15,7 +15,7 @@ TODO:
 - hook up csce I/O properly, it doesn't have PIAs
 - verify super9cc maskrom dump
 
-********************************************************************************
+================================================================================
 
 Champion Sensory Chess Challenger (CSC)
 ---------------------------------------
@@ -158,7 +158,7 @@ The lone LED is connected to digit 1 common
 
 All three of the above are called "segment H".
 
-********************************************************************************
+================================================================================
 
 Elite Champion Challenger (ELITE)
 This is a limited-release chess computer based on the CSC. They removed the PIAs
@@ -172,7 +172,7 @@ The "Fidelity X" that won the 1981 Travemünde contest is also on this hardware,
 a 5MHz CPU and 32KB total ROM size. In the 90s, Wilfried Bucke provided an upgrade
 kit for csce to make it similar to this version, CPU was changed to a R65C02P4.
 
-********************************************************************************
+================================================================================
 
 Super 9 Sensory Chess Challenger (SU9/DS9)
 This is basically the Fidelity Elite A/S program on CSC hardware.
@@ -188,7 +188,7 @@ See CSC description above for more information.
 
 Like with EAS, the new game command for SU9 is: RE -> D6 (or D8) -> CL.
 
-********************************************************************************
+================================================================================
 
 Reversi Sensory Challenger (RSC)
 The 1st version came out in 1980, a program revision was released in 1981.

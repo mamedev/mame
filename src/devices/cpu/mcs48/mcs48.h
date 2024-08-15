@@ -98,7 +98,6 @@ DECLARE_DEVICE_TYPE(N7751,   n7751_device)    // 8048 clone
 DECLARE_DEVICE_TYPE(M58715,  m58715_device)   // 8049 clone
 
 
-
 class mcs48_cpu_device : public cpu_device
 {
 public:
@@ -126,9 +125,6 @@ public:
 
 	uint8_t p1_r() { return m_p1; }
 	uint8_t p2_r() { return m_p2; }
-
-	void data_map(address_map &map);
-	void program_map(address_map &map);
 
 	template <typename... T> void set_t0_clk_cb(T &&... args) { m_t0_clk_func.set(std::forward<T>(args)...); }
 
@@ -167,7 +163,6 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-protected:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
@@ -231,6 +226,9 @@ protected:
 	static const mcs48_ophandler s_i8021_opcodes[256];
 	static const mcs48_ophandler s_i8022_opcodes[256];
 	const mcs48_ophandler *const m_opcode_table;
+
+	void program_map(address_map &map);
+	void data_map(address_map &map);
 
 	// ROM is mapped to AS_PROGRAM
 	uint8_t program_r(offs_t a)         { return m_program.read_byte(a); }

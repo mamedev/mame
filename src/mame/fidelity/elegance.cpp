@@ -6,12 +6,12 @@
 Fidelity Elegance Chess Challenger (AS12/6085)
 
 Hardware notes (AS12):
-- PCB label 510-1084B01
+- PCB label: 510-1084B01
 - R65C02P3 @ 3/3.57MHz (apparently the first few had a 3MHz CPU)
 - 2*8KB ROM + 1*4KB ROM, 2*2KB RAM(HM6116+TMM2016)
 
 Hardware notes (6085):
-- PCB label 510-1084B01
+- PCB label: 510-1084B01
 - R65C02P4 @ 4MHz
 - 3*8KB ROM(TMM2764), 2*2KB RAM(HM6116+TMM2016)
 

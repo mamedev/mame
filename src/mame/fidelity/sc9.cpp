@@ -27,7 +27,7 @@ I/O is via TTL, not further documented here
 The Playmatic S was only released in Germany, it's basically a 'deluxe' version of SC9
 with magnet sensors and came with CB9 and CB16.
 
---------------------------------------------------------------------------------
+================================================================================
 
 Starting with SC9, Fidelity added a cartridge slot to their chess computers, meant for
 extra book opening databases and recorded games.

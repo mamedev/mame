@@ -6,7 +6,7 @@
 Fidelity Eldorado Chess Challenger (model 6119)
 
 Hardware notes:
-- PCB label CXG262-600-001, CXG262-600-101
+- PCB label: CXG262-600-001, CXG262-600-101
 - TMP80C49AP6-6744 MCU, 2KB internal ROM, 6MHz XTAL
 - buzzer, 16 leds, 8*8 chessboard buttons
 
