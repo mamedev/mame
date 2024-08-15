@@ -730,6 +730,9 @@ ROM_START( revlatns )
 
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "nova dp1-3a", 0, BAD_DUMP SHA1(f69c6a3def1e1eec0a58862c487e47d4da12b25e))  //one disc, no correction, old method
+
+	ROM_REGION( 0x2000, "nvram", 0 )
+	ROM_LOAD( "default_nvram", 0x0000, 0x2000, CRC(339f4e00) SHA1(3d5e4be30e3b21d3e34b2fa97d9ef19f597890eb) )
 ROM_END
 
 } // Anonymous namespace
