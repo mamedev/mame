@@ -69,7 +69,6 @@ public:
 		m_mirror_sync(*this, "mirror_sync"),
 		m_led_update(*this, "led_update"),
 		m_led_off(*this, "led_off"),
-		m_cart(*this, "cartslot"),
 		m_joy(*this, "JOY"),
 		m_conf(*this, "CONF")
 	{ }
@@ -91,7 +90,6 @@ private:
 	required_device<timer_device> m_mirror_sync;
 	required_device<timer_device> m_led_update;
 	required_device<timer_device> m_led_off;
-	required_device<generic_slot_device> m_cart;
 	required_ioport m_joy;
 	required_ioport m_conf;
 
@@ -312,7 +310,7 @@ void advision_state::ext_ram_w(offs_t offset, u8 data)
 
 void advision_state::program_map(address_map &map)
 {
-	map(0x0000, 0x0fff).r(m_cart, FUNC(generic_slot_device::read_rom));
+	map(0x0000, 0x0fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 }
 
 void advision_state::io_map(address_map &map)
@@ -443,7 +441,7 @@ void advision_state::advision(machine_config &config)
 	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	// cartridge
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "advision_cart");
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "advision_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("advision");
 }
 
