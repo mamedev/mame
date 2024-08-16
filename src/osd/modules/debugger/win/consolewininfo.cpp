@@ -250,20 +250,11 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 		AppendMenu(settingsmenu, MF_ENABLED, ID_DARK_BACKGROUND, TEXT("Dark Background"));
 		AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)settingsmenu, TEXT("Settings"));
 
-		// get the work bounds
-		RECT work_bounds, bounds;
+		recompute_widths();
+
+		RECT work_bounds;
 		SystemParametersInfo(SPI_GETWORKAREA, 0, &work_bounds, 0);
 
-		// adjust the min/max sizes for the window style
-		bounds.top = bounds.left = 0;
-		bounds.right = bounds.bottom = EDGE_WIDTH + m_views[1]->maxwidth() + (2 * EDGE_WIDTH) + 100 + EDGE_WIDTH;
-		AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
-		set_minwidth(bounds.right - bounds.left);
-
-		bounds.top = bounds.left = 0;
-		bounds.right = bounds.bottom = EDGE_WIDTH + m_views[1]->maxwidth() + (2 * EDGE_WIDTH) + std::max(m_views[0]->maxwidth(), m_views[2]->maxwidth()) + EDGE_WIDTH;
-		AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
-		set_maxwidth(bounds.right - bounds.left);
 
 		// position the window at the bottom-right
 		int const bestwidth = (std::min<uint32_t>)(maxwidth(), work_bounds.right - work_bounds.left);
@@ -353,6 +344,31 @@ void consolewin_info::recompute_children()
 	m_views[1]->set_bounds(regrect);
 	m_views[2]->set_bounds(conrect);
 	set_editwnd_bounds(editrect);
+
+	recompute_widths();
+}
+
+
+//-------------------------------------------------
+//  recompute_widths - Calculate this window's
+//  min and max widths, based on widths
+//  of its children
+//-------------------------------------------------
+
+void consolewin_info::recompute_widths()
+{
+	RECT bounds;
+
+	// adjust the min/max sizes for the window style
+	bounds.top = bounds.left = 0;
+	bounds.right = bounds.bottom = EDGE_WIDTH + m_views[1]->maxwidth() + (2 * EDGE_WIDTH) + 100 + EDGE_WIDTH;
+	AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
+	set_minwidth(bounds.right - bounds.left);
+
+	bounds.top = bounds.left = 0;
+	bounds.right = bounds.bottom = EDGE_WIDTH + m_views[1]->maxwidth() + (2 * EDGE_WIDTH) + std::max(m_views[0]->maxwidth(), m_views[2]->maxwidth()) + EDGE_WIDTH;
+	AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
+	set_maxwidth(bounds.right - bounds.left);
 }
 
 
