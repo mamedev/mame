@@ -301,7 +301,7 @@ void xmen6p_state::screen_vblank(int state)
 		index += m_tilemap_select ? 2 : 0;
 		for (int offset = 0; offset < (0xc000 / 2); offset++)
 		{
-			if (index == 0 || (offset != 0x1c80 && offset != 0x1e80))
+			if (index == 0 || (offset != 0x1c00 && offset != 0x1c80 && offset != 0x1e80))
 				m_k052109->write(offset, m_tilemap[index][offset] & 0x00ff);
 		}
 
