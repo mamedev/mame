@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, XingXing
 
+// default bookkeeping passwords
+// fearless 1234
+// superkds (unknown)
+
 #include "emu.h"
 
 #include "pgmcrypt.h"
@@ -30,6 +34,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_xa(*this, "xa"),
+		m_sram(*this, "sram"),
 		m_ics(*this, "ics"),
 		m_screen(*this, "screen"),
 		m_videoram(*this, "videoram"),
@@ -114,6 +119,7 @@ private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<mx10exa_cpu_device> m_xa;
+	required_shared_ptr<uint32_t> m_sram;
 	required_device<ics2115_device> m_ics;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<u32> m_videoram;
@@ -122,7 +128,7 @@ private:
 
 	required_device<ticket_dispenser_device> m_ticket;
 	required_ioport_array<2> m_io_dsw;
-	required_ioport_array<2> m_io_trackball;
+	optional_ioport_array<2> m_io_trackball;
 };
 
 
@@ -252,32 +258,32 @@ void igs_fear_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( fear )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW1:1")
@@ -298,16 +304,16 @@ static INPUT_PORTS_START( fear )
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW2:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW2:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "SW2:7")
-
-	PORT_START("AN0")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(20)
-
-	PORT_START("AN1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( superkds )
 	PORT_INCLUDE ( fear )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x03, 0x01, "Scene" ) PORT_DIPLOCATION("SW1:1,2")
@@ -376,6 +382,12 @@ INPUT_PORTS_START( superkds )
 	PORT_DIPNAME( 0x80, 0x00, "Language" ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, "Chinese" )
 	PORT_DIPSETTING(    0x00, "English" )
+
+	PORT_START("AN0")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(20)
+
+	PORT_START("AN1")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
 void igs_fear_state::sound_irq(int state)
@@ -516,7 +528,9 @@ u32 igs_fear_state::xa_r(offs_t offset, u32 mem_mask)
 				for (int i = 0; i < 2; i++)
 				{
 					m_trackball_axis_pre[i] = m_trackball_axis[i];
-					m_trackball_axis[i] = m_io_trackball[i]->read();
+					if (m_io_trackball[i])
+						m_trackball_axis[i] = m_io_trackball[i]->read();
+
 					if (m_trackball_axis[i] & 0x80)
 						m_trackball_axis[i] -= 0x100;
 					m_trackball_axis_diff[i] = m_trackball_axis[i] - m_trackball_axis_pre[i];
@@ -710,6 +724,8 @@ void igs_fear_state::igs_fear(machine_config &config)
 	m_xa->port_out_cb<3>().set(FUNC(igs_fear_state::mcu_p3_w));
 
 	config.set_maximum_quantum(attotime::from_hz(600));
+
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
