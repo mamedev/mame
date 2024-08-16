@@ -122,7 +122,6 @@ public:
 	sc6_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_rom(*this, "maincpu"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -147,7 +146,6 @@ protected:
 private:
 	// devices/pointers
 	required_device<mcs48_cpu_device> m_maincpu;
-	required_region_ptr<u8> m_rom;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	optional_device<dac_1bit_device> m_dac;

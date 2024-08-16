@@ -18,7 +18,6 @@
  *
  ****************************************************************/
 
-#define ACTIVELOW_PORT_BIT(P,A,D) ((P & (~(1 << A))) | ((D ^ 1) << A))
 #define ACTIVEHIGH_PORT_BIT(P,A,D) ((P & (~(1 << A))) | (D << A))
 
 #define MCU_T_R(N) ((m_soundlatch2->read() >> (N)) & 1)
@@ -30,7 +29,6 @@
 #define MCU_P2_W(D) do { set_ea(((D) & 0x20) ? 0 : 1); m_soundlatch4->write(D); } while (0)
 
 #define MCU_P1_W_AH(B,D) MCU_P1_W(ACTIVEHIGH_PORT_BIT(MCU_P1_R(),B,(D)))
-#define MCU_P2_W_AH(B,D) MCU_P2_W(ACTIVEHIGH_PORT_BIT(MCU_P2_R(),B,(D)))
 
 
 #if OLD_SOUND
@@ -422,7 +420,6 @@ void mario_state::sound_start()
 
 void mario_state::sound_reset()
 {
-	/* FIXME: convert to latch8 */
 	m_soundlatch->clear_w();
 	if (m_soundlatch2) m_soundlatch2->clear_w();
 	if (m_soundlatch3) m_soundlatch3->clear_w();

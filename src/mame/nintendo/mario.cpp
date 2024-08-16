@@ -2,32 +2,14 @@
 // copyright-holders:Mirko Buffoni
 /***************************************************************************
 
-Done:
-- discrete sound
-- hooked up z80dma
-- combined memory maps
-- statics in mario_state struct
-- fixed save state issues
-- combine sh_* writes into one routine
-- Hooked up flipscreen
-- Changed monitor orientation to ROT0
-- fixed mario0110u1gre
-- rewrote driver, separate MACHINE_DRIVER(mario_audio)
-- palette from schematics
-- video timing from schematics
-- driver configuration switch Nintendo/Std Monitor
-- got rid of COLORTABLE
-- clocks as defines in .h
-- use XTAL_*
+Mario Bros driver by Mirko Buffoni
 
-Mario Bros memory map (preliminary):
 
-driver by Mirko Buffoni
-
+Memory map (preliminary):
 
 0000-5fff ROM
 6000-6fff RAM
-7000-73ff ?
+7000-73ff Sprite RAM
 7400-77ff Video RAM
 f000-ffff ROM
 
@@ -74,17 +56,19 @@ write:
 7d00      vertical scroll (pow)
 7d80      ?
 7e00      sound
-7e80-7e82 ?
-7e83      sprite palette bank select
-7e84      interrupt enable
-7e85      ?
+7e80-7e87 misc. triggers (see mcfg)
 7f00-7f07 sound triggers
-
 
 I/O ports
 
 write:
-00        ?
+00        Z80 DMA
+
+
+The sound MCU can be easily replaced with a ROMless one such as I8039
+(or just force EA high), by doing a 1-byte patch to the external ROM:
+
+offset $01: change $00 to $01 (call $100 -> call $101)
 
 ***************************************************************************/
 
@@ -551,7 +535,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mario,  0,     mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision G)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mario,  0,     mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision G)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mariof, mario, mario, mariof, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1983, marioe, mario, mario, marioe, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1983, marioj, mario, mario, marioj, mario_state, empty_init, ROT0, "Nintendo",            "Mario Bros. (Japan, Revision C)", MACHINE_SUPPORTS_SAVE )
