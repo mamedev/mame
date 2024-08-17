@@ -300,6 +300,9 @@ public:
 		//, m_roma_view(*this, "roma_view")
 		, m_romc_view(*this, "romc_view")
 		//, m_rome_view(*this, "rome_view")
+        //, m_loram_view(*this, "loram_view")
+        //, m_hiram_view(*this, "hiram_view")
+        , m_charen_view(*this, "charen_view")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_workram(*this, "work_ram", 0x20000, ENDIANNESS_LITTLE)
@@ -334,6 +337,10 @@ private:
 	//memory_view m_roma_view;
 	memory_view m_romc_view;
 	//memory_view m_rome_view;
+    //memory_view m_loram_view;
+    //memory_view m_hiram_view;
+    memory_view m_charen_view;
+
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	memory_share_creator<uint8_t> m_workram;
@@ -359,6 +366,8 @@ private:
 	uint8_t cia0_portb_r();
 	void cia0_portb_w(uint8_t data);
 	void cia1_porta_w(uint8_t data);
+	uint8_t cpu_r();
+	void cpu_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void palette_init(palette_device &palette);
@@ -994,23 +1003,25 @@ void c65_state::c65_map(address_map &map)
 	map(0x0c000, 0x0cfff).view(m_romc_view);
 	m_romc_view[0](0x0c000, 0x0cfff).rw(FUNC(c65_state::ram_r<0x0c000>), FUNC(c65_state::ram_w<0x0c000>));
 	m_romc_view[1](0x0c000, 0x0cfff).rom().region("ipl", 0x0c000);
-	map(0x0d000, 0x0d07f).m(*this, FUNC(c65_state::vic4567_map));
+    map(0x0d000, 0x0dfff).view(m_charen_view);
+    m_charen_view[0](0x0d000, 0x0dfff).rom().region("ipl", 0x0d000);
+	m_charen_view[1](0x0d000, 0x0d07f).m(*this, FUNC(c65_state::vic4567_map));
 	// 0x0d080, 0x0d09f FDC
-	map(0x0d080, 0x0d09f).lr8(NAME([] (offs_t offset) { return 0; }));
+	m_charen_view[1](0x0d080, 0x0d09f).lr8(NAME([] (offs_t offset) { return 0; }));
 	// 0x0d0a0, 0x0d0ff Ram Expansion Control (REC)
-	map(0x0d100, 0x0d1ff).ram().w(FUNC(c65_state::palette_red_w)).share("redpal");
-	map(0x0d200, 0x0d2ff).ram().w(FUNC(c65_state::palette_green_w)).share("greenpal");
-	map(0x0d300, 0x0d3ff).ram().w(FUNC(c65_state::palette_blue_w)).share("bluepal");
+	m_charen_view[1](0x0d100, 0x0d1ff).ram().w(FUNC(c65_state::palette_red_w)).share("redpal");
+	m_charen_view[1](0x0d200, 0x0d2ff).ram().w(FUNC(c65_state::palette_green_w)).share("greenpal");
+	m_charen_view[1](0x0d300, 0x0d3ff).ram().w(FUNC(c65_state::palette_blue_w)).share("bluepal");
 	// 0x0d400, 0x0d4*f Right SID
 	// keyboard hold left shift will read to $d484 (?)
-	map(0x0d400, 0x0d41f).mirror(0x80).rw(m_sid[1], FUNC(mos6581_device::read), FUNC(mos6581_device::write));
+	m_charen_view[1](0x0d400, 0x0d41f).mirror(0x80).rw(m_sid[1], FUNC(mos6581_device::read), FUNC(mos6581_device::write));
 	// 0x0d440, 0x0d4*f Left  SID
-	map(0x0d440, 0x0d45f).mirror(0x80).rw(m_sid[0], FUNC(mos6581_device::read), FUNC(mos6581_device::write));
-	map(0x0d600, 0x0d6ff).rw(FUNC(c65_state::uart_r), FUNC(c65_state::uart_w));
+	m_charen_view[1](0x0d440, 0x0d45f).mirror(0x80).rw(m_sid[0], FUNC(mos6581_device::read), FUNC(mos6581_device::write));
+	m_charen_view[1](0x0d600, 0x0d6ff).rw(FUNC(c65_state::uart_r), FUNC(c65_state::uart_w));
 	// 0x0d700, 0x0d7** DMAgic
-	map(0x0d700, 0x0d703).m(m_dma, FUNC(dmagic_f018_device::map));
+	m_charen_view[1](0x0d700, 0x0d703).m(m_dma, FUNC(dmagic_f018_device::map));
 	// 0x0d800, 0x0d8** Color matrix
-	map(0x0d800, 0x0dfff).view(m_cram_view);
+	m_charen_view[1](0x0d800, 0x0dfff).view(m_cram_view);
 	// maps lower 1024 bytes regardless of the setting (essentially touches $dc00 as overlay)
 	m_cram_view[0](0x0d800, 0x0dbff).lrw8(
 		NAME([this] (offs_t offset) { return m_cram[offset]; }),
@@ -1211,11 +1222,27 @@ void c65_state::irq_check(uint8_t irq_cause)
 	m_irqs->in_w<1>(m_irq_mask & m_irq_pending);
 }
 
+uint8_t c65_state::cpu_r()
+{
+	return 0x07;
+}
+
+void c65_state::cpu_w(uint8_t data)
+{
+//	m_loram = BIT(data, 0);
+//	m_hiram = BIT(data, 1);
+    m_charen_view.select(BIT(data, 2));
+}
+
+
 void c65_state::c65(machine_config &config)
 {
 	/* basic machine hardware */
 	M4510(config, m_maincpu, MAIN_C65_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c65_state::c65_map);
+	m_maincpu->read_callback().set(FUNC(c65_state::cpu_r));
+	m_maincpu->write_callback().set(FUNC(c65_state::cpu_w));
+	m_maincpu->set_pulls(0x07, 0xc0);
 
 	// TODO: multiply by x8 because with a more canonical x1 no transfer will complete in time.
 	// is this thing a mixed burst/cycle steal really?
@@ -1266,9 +1293,8 @@ void c65_state::c65(machine_config &config)
 	//m_sid->poty().set(FUNC(c64_state::sid_poty_r));
 	m_sid[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-
-	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("c65_flop");
+//    SOFTWARE_LIST(config, "cart_list").set_compatible("c64_cart");
 }
 
 
