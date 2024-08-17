@@ -222,7 +222,7 @@ static INPUT_PORTS_START( chmate )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, chmate_state, reset_button, 0) PORT_NAME("New Game")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mk2 ) // meaning of black/white reversed
+static INPUT_PORTS_START( mk2a ) // meaning of black/white reversed
 	PORT_INCLUDE( chmate )
 
 	PORT_MODIFY("IN.0")
@@ -233,7 +233,7 @@ static INPUT_PORTS_START( mk2 ) // meaning of black/white reversed
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("H / White")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mk2a )
+static INPUT_PORTS_START( mk2 )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F) PORT_NAME("6 / F / Level")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_E) PORT_NAME("5 / E / Stop Clock / Rook")
@@ -323,5 +323,5 @@ ROM_END
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1978, chmate, 0,      0,      chmate,  chmate, chmate_state, empty_init, "Commodore", "Chessmate", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1979, ccmk2,  chmate, 0,      mk2,     mk2,    chmate_state, empty_init, "Commodore / Novag Industries", "Chess Champion: MK II (set 1)", MACHINE_SUPPORTS_SAVE ) // 1st version (jukebox model), aka version B
-SYST( 1979, ccmk2a, chmate, 0,      mk2a,    mk2a,   chmate_state, empty_init, "Commodore / Novag Industries", "Chess Champion: MK II (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, ccmk2,  chmate, 0,      mk2,     mk2,    chmate_state, empty_init, "Commodore / Novag Industries", "Chess Champion: MK II (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, ccmk2a, chmate, 0,      mk2a,    mk2a,   chmate_state, empty_init, "Commodore / Novag Industries", "Chess Champion: MK II (set 2)", MACHINE_SUPPORTS_SAVE ) // 1st version (jukebox model), aka version B
