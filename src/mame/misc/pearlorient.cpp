@@ -1,8 +1,6 @@
 // license:GPL-2.0+
 // copyright-holders:flama12333
 /*************************************************************************
-there are second mcu. if is not present will marked error 10.
-
 Features Notes:
 src: Chang yu website
 
@@ -27,6 +25,11 @@ Oriental Pearl - 1997
 Big bonus for scoring on all letters of "ORIENTAL PEARL".
 
 Electronic ball-checking device ensures where ball lands.
+// TODO:
+Need hardware info.
+Hook up nvram inputs opll and adpcm.
+pearlorient Has undumped mcu and adpcm rom.
+Add segment display as marywu.cpp
 */
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
@@ -104,7 +107,6 @@ void pearlorient_state::program_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom();
 }
-// todo Where opll and adpcm are mapped?
 void pearlorient_state::io_map(address_map &map)
 {
     map(0xfa00, 0xfa01).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
@@ -134,11 +136,11 @@ void pearlorient_state::pearlorient(machine_config &config)
 
 ROM_START( pearlorient )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "w27c512.bin", 0x00000, 0x10000, CRC(8D3D1E91) SHA1(b80907df0878057a1ded8b56225059e06382b9d6) ) // main program
+	ROM_LOAD( "w27c512.bin", 0x00000, 0x10000, CRC(8D3D1E91) SHA1(b80907df0878057a1ded8b56225059e06382b9d6) ) // Main program
 	ROM_REGION( 0x1000, "mcu", 0 )
-	ROM_LOAD( "at89s51.bin", 0x0000, 0x1000, NO_DUMP ) // mcu. protection
+	ROM_LOAD( "at89s51.bin", 0x0000, 0x1000, NO_DUMP ) // MCU. Protection
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, NO_DUMP ) //  oki rom voice
+	ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, NO_DUMP ) //  Oki rom voice
 ROM_END
 
 } // anonymous namespace
