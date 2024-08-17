@@ -22,10 +22,6 @@ from the jukebox, but both models have the same ROMs.
 Note that like MK I, although it is a Winkler/Auge production, it doesn't involve
 SciSys company. SciSys was founded by Winkler after MK II.
 
-TODO:
-- is there an older version of chmate? chips on pcb photos are dated 1979, but
-  the game is known to be released in 1978
-
 ================================================================================
 
 Hardware notes:
@@ -33,16 +29,17 @@ Hardware notes:
 MOS MPS 6504 2179
 MOS MPS 6530 024 1879
  layout of 6530 dumped with my adapter
- 0x1300-0x133f io
- 0x1380-0x13bf ram
- 0x1400-0x17ff rom
+ 0x1300-0x133f I/O
+ 0x1380-0x13bf RAM
+ 0x1400-0x17ff ROM
 
 2*MPS6111 RAM (256x4)
 MOS MPS 6332 005 2179
-74145 bcd to decimal encoder
+Older version has 2 2KB ROMs (identical ROM contents)
 
-4x 7 segment led display
-4 single leds
+74145 bcd to decimal encoder
+4*7-segment LED display
+4 single LEDs
 19 buttons (11 on brick model)
 
 *******************************************************************************/
