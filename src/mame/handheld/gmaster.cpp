@@ -173,7 +173,7 @@ void gmaster_state::main_map(address_map &map)
 {
 	// 0x0000-0x0fff is internal ROM
 	map(0x4000, 0x47ff).mirror(0x3800).rw(FUNC(gmaster_state::io_r), FUNC(gmaster_state::io_w)).share("ram");
-	map(0x8000, 0xfeff).r("cartslot", FUNC(generic_slot_device::read_rom));
+	map(0x8000, 0xffff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	// 0xff00-0xffff is internal RAM
 }
 
