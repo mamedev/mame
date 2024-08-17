@@ -3027,6 +3027,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/a2videoterm.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2vulcan.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2vulcan.h",
+		MAME_DIR .. "src/devices/bus/a2bus/a2wico_trackball.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/a2wico_trackball.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2zipdrive.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2zipdrive.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ace2x00.cpp",
@@ -3129,10 +3131,14 @@ if (BUSES["A2GAMEIO"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2gameio/joystick.h",
 		MAME_DIR .. "src/devices/bus/a2gameio/joyport.cpp",
 		MAME_DIR .. "src/devices/bus/a2gameio/joyport.h",
+		MAME_DIR .. "src/devices/bus/a2gameio/joyport_paddles.cpp",
+		MAME_DIR .. "src/devices/bus/a2gameio/joyport_paddles.h",
 		MAME_DIR .. "src/devices/bus/a2gameio/paddles.cpp",
 		MAME_DIR .. "src/devices/bus/a2gameio/paddles.h",
 		MAME_DIR .. "src/devices/bus/a2gameio/gizmo.cpp",
 		MAME_DIR .. "src/devices/bus/a2gameio/gizmo.h",
+		MAME_DIR .. "src/devices/bus/a2gameio/wico_joystick.cpp",
+		MAME_DIR .. "src/devices/bus/a2gameio/wico_joystick.h",
 	}
 end
 

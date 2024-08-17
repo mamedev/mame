@@ -52,9 +52,11 @@
 #include "bus/a2gameio/gameio.h"
 #include "bus/a2gameio/joystick.h"
 #include "bus/a2gameio/joyport.h"
+#include "bus/a2gameio/joyport_paddles.h"
 #include "bus/a2gameio/computereyes.h"
 #include "bus/a2gameio/paddles.h"
 #include "bus/a2gameio/gizmo.h"
+#include "bus/a2gameio/wico_joystick.h"
 
 //**************************************************************************
 //  CONNECTOR DEVICE IMPLEMENTATION
@@ -76,8 +78,10 @@ void apple2_gameio_device::iiandplus_options(device_slot_interface &slot)
 	slot.option_add("joy", APPLE2_JOYSTICK);
 	slot.option_add("paddles", APPLE2_PADDLES);
 	slot.option_add("joyport", APPLE2_JOYPORT);
+	slot.option_add("joyport_paddles", APPLE2_JOYPORT_PADDLES);
 	slot.option_add("gizmo", APPLE2_GIZMO);
 	slot.option_add("compeyes", APPLE2_COMPUTEREYES);
+	slot.option_add("wicojoy", APPLE2_WICO_JOYSTICK);
 }
 
 void apple2_gameio_device::default_options(device_slot_interface &slot)
