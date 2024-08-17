@@ -754,7 +754,82 @@ ROM_START( lhzb3 )
 ROM_END
 
 
+/*********************************************************************************
 
+Long Hu Da Man Guan, IGS 1999
+Long Hu Da Man Guan Plus, IGS 1999
+
+Both boards are identical and use the same mask ROMs, only with changed program EPROM.
+
+PCB Layout
+----------
+
+IGS PCB NO-0240-03
+|-----------------------------------------|
+|              SW1  SW2          M2403.U17|
+|1                                        |
+|8  82C55                        M2401.U18|
+|W                                        |
+|A      22MHz                 UPC29L33    |
+|Y                                PAL     |
+|                   IGS031                |
+|                                         |
+|          61256                  IGS027A |
+|                                         |
+|                  27C4096.U9             |
+|                                         |
+|1                     HM62256            |
+|0 T518B                                  |
+|W                                        |
+|A  7805                                  |
+|Y                                     SW3|
+|UPC1242  VOL   K668   S2402.U14   BATTERY|
+|-----------------------------------------|
+Notes:
+       K668 - Oki M6295 clone. Clock 1.000MHz [22/22]
+      SW1/2 - 8-Position DIP Switch
+        SW3 - Reset / NVRAM Clear
+      61256 - EliteMT LP61256 32kBx8-bit SRAM (SOJ28)
+    HM62256 - Hitachi HM62256 32kBx8-bit SRAM (SOP28)
+      T518B - Reset IC
+
+*********************************************************************************/
+
+ROM_START( lhdmg ) // appears to be a different edition of lhzb3 and lthy (GFX and sound ROM match)
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "lhdmg_igs027a", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "lhdmg_prg.u9", 0x000000, 0x80000, CRC(3b3a77ac) SHA1(c1c40e02d04dc701aa65b7e255b9a928cbecdb8d) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "m2403.u17", 0x000000, 0x80000, CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "m2401.u18", 0x000000, 0x400000, CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "s2402.u14", 0x000000, 0x100000, CRC(56083fe2) SHA1(62afd651809bf5e639bfda6e5579dbf4b903b664) )
+ROM_END
+
+ROM_START( lhdmgp ) // appears to be a different edition of lhzb3 and lthy (GFX and sound ROM match)
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "lhdmgp_igs027a", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "lhdmg_plus_prg.u9", 0x000000, 0x80000, CRC(77dd7855) SHA1(f04995ee34ef9245dcf3d66fcf111fa377394f92) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "m2403.u17", 0x000000, 0x80000, CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "m2401.u18", 0x000000, 0x400000, CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "s2402.u14", 0x000000, 0x100000, CRC(56083fe2) SHA1(62afd651809bf5e639bfda6e5579dbf4b903b664) )
+ROM_END
 
 
 /*
@@ -916,7 +991,6 @@ ROM_END
 
 
 /*
-
 
 Gone Fishing II
 IGS PCB-0388-05-FW
@@ -1610,6 +1684,8 @@ GAME( 1999, fruitpar,  0,        igs_mahjong, sdwx,     igs_m027_state, init_fru
 GAME( 1999, oceanpar,  0,        igs_mahjong, sdwx,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_IS_SKELETON ) // 1999 copyright in ROM
 GAME( 1999, oceanpara, oceanpar, igs_mahjong, sdwx,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_IS_SKELETON ) // 1999 copyright in ROM
 GAME( 1999, lthy,      0,        igs_mahjong, sdwx,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_IS_SKELETON )
+GAME( 1999, lhdmg,     0,        igs_mahjong, sdwx,     igs_m027_state, init_no_dec,   ROT0, "IGS", "Long Hu Da Man Guan", MACHINE_IS_SKELETON )
+GAME( 1999, lhdmgp,    lhdmg,    igs_mahjong, sdwx,     igs_m027_state, init_no_dec,   ROT0, "IGS", "Long Hu Da Man Guan Plus", MACHINE_IS_SKELETON )
 GAME( 200?, luckycrs,  0,        igs_mahjong, sdwx,     igs_m027_state, init_luckycrs, ROT0, "IGS", "Lucky Cross (V106SA)", MACHINE_IS_SKELETON )
 GAME( 2002, sdwx,      0,        igs_mahjong, sdwx,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME( 200?, jking02,   0,        igs_mahjong, sdwx,     igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_IS_SKELETON )
