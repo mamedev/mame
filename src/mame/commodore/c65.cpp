@@ -349,9 +349,9 @@ private:
 	uint8_t m_keyb_c8_c9 = 0U;
 
 	void vic4567_map(address_map &map);
-	void PalRed_w(offs_t offset, uint8_t data);
-	void PalGreen_w(offs_t offset, uint8_t data);
-	void PalBlue_w(offs_t offset, uint8_t data);
+	void palette_red_w(offs_t offset, uint8_t data);
+	void palette_green_w(offs_t offset, uint8_t data);
+	void palette_blue_w(offs_t offset, uint8_t data);
 	uint8_t uart_r(offs_t offset);
 	void uart_w(offs_t offset, uint8_t data);
 	uint8_t cia0_porta_r();
@@ -365,7 +365,7 @@ private:
 
 	void c65_map(address_map &map);
 
-	void IRQCheck(uint8_t irq_cause);
+	void irq_check(uint8_t irq_cause);
 
 	template <unsigned StartBase> uint8_t ram_r(offs_t offset)
 	{
@@ -380,13 +380,21 @@ private:
 	u16 m_vic_bank_base = 0U;
 
 	// TODO: move to own device
-	uint8_t m_VIC2_IRQPend = 0U, m_VIC2_IRQMask = 0U;
-	uint8_t m_VIC2_EXTColor = 0U;
+	uint8_t m_irq_pending = 0U, m_irq_mask = 0U;
+	uint8_t m_border_color = 0U;
 	uint8_t m_vs_cb_base = 0U;
-	uint8_t m_VIC2_BK0_Color = 0U;
+	uint8_t m_bk_color_clut[4]{};
 	uint8_t m_sprite_enable = 0U;
-	uint8_t m_VIC3_ControlA = 0U;
-	uint8_t m_VIC3_ControlB = 0U;
+	uint8_t m_control_a = 0U;
+	uint8_t m_control_b = 0U;
+	u16 m_rcr = 0xffU;
+	bool m_ecm = false;
+	bool m_bmm = false;
+	bool m_blnk = false;
+	u8 m_yscl = 0U;
+	u8 m_xscl = 0U;
+	bool m_csel = false;
+	bool m_mcm = false;
 	// handler helpers
 	u16 m_vs_base_offset = 0U;
 	u16 m_cb_base_offset = 0U;
@@ -400,22 +408,21 @@ private:
 		m_video_ptr = &m_workram[m_vs_base_offset | m_vic_bank_base];
 		if ((m_cb_base_offset & 0x3000) == 0x1000 && !(BIT(m_vic_bank_base, 14)))
 		{
-			m_char_ptr = &m_ipl_rom->base()[((m_VIC3_ControlA & 0x40) ? 0x9000: 0xd000) + (m_cb_base_offset & 0x800)];
+			m_char_ptr = &m_ipl_rom->base()[((BIT(m_control_a, 6)) ? 0x9000 : 0xd000) + (m_cb_base_offset & 0x800)];
 		}
 		else
 			m_char_ptr = &m_workram[m_cb_base_offset | m_vic_bank_base];
 	};
-	bool m_video_enable = false;
 	struct {
 		u16 x;
 		u8 y;
 		u8 clut;
 	}m_sprite[16];
 	u8 m_sprite_hi_xoffs;
-	u8 m_sprite_exp_x, m_sprite_exp_y;
-	u8 m_sprite_multicolor_enable;
+	u8 m_sexx, m_sexy;
+	u8 m_scm;
 	u8 m_sprite_multicolor_clut[2];
-	u8 m_sprite_priority;
+	u8 m_bsp;
 
 	bool m_blink_enable = false;
 	bitmap_ind16 m_bitmap;
@@ -424,7 +431,7 @@ private:
 	std::tuple<u8, bool> get_tile_pixel(int y, int x);
 	std::tuple<u8, u8, u8, bool> get_sprite_pixel(int y, int x);
 
-	void PalEntryFlush(uint8_t offset);
+	void palette_entry_flush(uint8_t offset);
 };
 
 void c65_state::video_start()
@@ -436,14 +443,14 @@ void c65_state::video_start()
 void c65_state::video_reset()
 {
 	m_scanline_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 1, 0), m_screen->vpos() + 1);
-	m_video_enable = false;
+	m_blnk = false;
 	// vestigial, so to have a pointer in any case
 	flush_cb_base();
 }
 
 void c65_state::vic4567_map(address_map &map)
 {
-//  53248/$d000 - 53263/$d00f Sprite X/Y
+//  53248/$d000 - 53263/$d00f S#X - S#Y Sprite X/Y
 	map(0x00, 0x00).select(0xe).lrw8(
 		NAME([this] (offs_t offset){
 			return m_sprite[offset >> 1].x & 0xff;
@@ -461,7 +468,7 @@ void c65_state::vic4567_map(address_map &map)
 			m_sprite[offset >> 1].y = data;
 		})
 	);
-//  53264/$d010 bit 8 for Sprites X pos
+//  53264/$d010 S#X8 bit 8 for Sprites X pos
 	map(0x10, 0x10).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_sprite_hi_xoffs;
@@ -477,28 +484,38 @@ void c65_state::vic4567_map(address_map &map)
 	);
 /*
  * 53265/$d011
- * x--- ---- bit 8 of beam V
- * -x-- ---- Extended Color Mode
- * --x- ---- Bitmap Mode
- * ---x ---- Enable video output
- * ---- x--- 25/24 visible rows
- * ---- -xxx Screen Soft V Scroll
+ * x--- ---- RC8 bit 8 of beam V
+ * -x-- ---- ECM Extended Color Mode
+ * --x- ---- BMM Bitmap Mode
+ * ---x ---- BLNK Enable video output
+ * ---- x--- RSEL 25/24 visible rows
+ * ---- -xxx YSCL2-0 Screen Soft V Scroll
  */
 	map(0x11, 0x11).lrw8(
 		NAME([this] (offs_t offset) {
-			return (m_screen->vpos() & 0x100) >> 1;
+			return ((m_screen->vpos() & 0x100) >> 1) | (m_ecm << 6) | (m_bmm << 5) | (m_blnk << 4) | (m_yscl & 7);
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_video_enable = bool(BIT(data, 4));
-			logerror("VIC2 $11 mode %02x\n", data);
+			m_rcr = ((data & 0x80) << 1) | (m_rcr & 0xff);
+			m_ecm = bool(BIT(data, 6));
+			m_bmm = bool(BIT(data, 5));
+			m_blnk = bool(BIT(data, 4));
+			m_yscl = data & 7;
+			logerror("VIC2: 53265 mode %02x\n", data);
 		})
 	);
-	// TODO: writes for rasterline irq trigger
-	map(0x12, 0x12).lr8(
+//  53266/$d012 RC Raster CouNT
+	map(0x12, 0x12).lrw8(
 		NAME([this] (offs_t offset) {
 			return (m_screen->vpos() & 0xff);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_rcr = data | (m_rcr & 0x100);
 		})
 	);
+//  map(0x13, 0x13) 53267/$d013 LPX lightpen X
+//  map(0x14, 0x14) 53268/$d014 LPY lightpen Y
+	// 53269/$d015 SE# Sprite Enable
 	map(0x15, 0x15).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_sprite_enable;
@@ -508,18 +525,29 @@ void c65_state::vic4567_map(address_map &map)
 		})
 	);
 /*
- * ---x ---- Multicolor Mode
- * ---- x--- 40/38 visible columns
- * ---- -xxx Screen Soft Scroll H
+ *  53270/$d016
+ * --x- ---- RST <unknown>, in c65 specs only?
+ * ---x ---- MCM [Background] Multicolor Mode
+ * ---- x--- CSEL 40/38 visible columns
+ * ---- -xxx XSCL2-0 Screen Soft Scroll H
  */
-//  map(0x16, 0x16)
-//  53271/$d017 Sprite magnify V
-	map(0x17, 0x17).lrw8(
+	map(0x16, 0x16).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_sprite_exp_y;
+			return (m_mcm << 4) | (m_csel << 3) | (m_xscl & 7);
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_sprite_exp_y = data;
+			m_mcm = bool(BIT(data, 4));
+			m_csel = bool(BIT(data, 3));
+			m_xscl = data & 7;
+		})
+	);
+//  53271/$d017 SEXY# Sprite magnify V
+	map(0x17, 0x17).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_sexy;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_sexy = data;
 		})
 	);
 /*
@@ -546,72 +574,72 @@ void c65_state::vic4567_map(address_map &map)
  */
 	map(0x19, 0x19).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_VIC2_IRQPend;
+			return m_irq_pending;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_VIC2_IRQPend &= ~data;
-			IRQCheck(0);
+			m_irq_pending &= ~data;
+			irq_check(0);
 		})
 	);
 	map(0x1a, 0x1a).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_VIC2_IRQMask;
+			return m_irq_mask;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_VIC2_IRQMask = data & 0xf;
-			IRQCheck(0);
+			m_irq_mask = data & 0xf;
+			irq_check(0);
 		})
 	);
-//  53275/$d01b Sprite-Background priority
+//  53275/$d01b BSP# Sprite-Background priority
 	map(0x1b, 0x1b).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_sprite_priority;
+			return m_bsp;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_sprite_priority = data;
+			m_bsp = data;
 		})
 	);
-//  53276/$d01c Sprite multicolor enable
+//  53276/$d01c SCM# Sprite multicolor enable
 	map(0x1c, 0x1c).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_sprite_multicolor_enable;
+			return m_scm;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_sprite_multicolor_enable = data;
+			m_scm = data;
 		})
 	);
 //  53277/$d01d Sprite magnify X
 	map(0x1d, 0x1d).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_sprite_exp_x;
+			return m_sexx;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_sprite_exp_x = data;
+			m_sexx = data;
 		})
 	);
 
 //  map(0x1e, 0x1e) Sprite-Sprite collision
 //  map(0x1f, 0x1f) Spirte-background collision
-// 53280,$d020 border color
+// 53280,$d020 BORD border color
 	map(0x20, 0x20).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_VIC2_EXTColor;
+			return m_border_color;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			// TODO: all 8-bits in C=65 mode
-			m_VIC2_EXTColor = data & 0xf;
+			m_border_color = data & 0xf;
 			//m_screen->update_partial(m_screen->vpos());
 		})
 	);
-	map(0x21, 0x21).lrw8(
+//  53281,$d021 BK#C background clut BK0-BK3
+	map(0x21, 0x24).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_VIC2_BK0_Color;
+			return m_bk_color_clut[offset];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_VIC2_BK0_Color = data & 0xf;
+			m_bk_color_clut[offset] = data & 0xf;
 		})
 	);
-//  map(0x21, 0x24) background clut
 //  53285/$d025 - 53286/$d026 sprite multicolor clut
 	map(0x25, 0x26).lrw8(
 		NAME([this] (offs_t offset) {
@@ -649,12 +677,12 @@ void c65_state::vic4567_map(address_map &map)
  */
 	map(0x30, 0x30).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_VIC3_ControlA;
+			return m_control_a;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			if((data & 0xfe) != 0x64)
 				logerror("CONTROL A %02x\n",data);
-			m_VIC3_ControlA = data;
+			m_control_a = data;
 			// TODO: all the other bits
 			m_cram_view.select(BIT(data, 0));
 			//m_rom8_view.select(BIT(data, 3));
@@ -680,11 +708,11 @@ void c65_state::vic4567_map(address_map &map)
  */
 	map(0x31, 0x31).lrw8(
 		NAME([this] (offs_t offset) {
-			return m_VIC3_ControlB;
+			return m_control_b;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			logerror("CONTROL B %02x\n", data);
-			m_VIC3_ControlB = data;
+			m_control_b = data;
 			// FAST mode
 			const XTAL clock = BIT(data, 6) ? MAIN_C65_CLOCK : MAIN_C64_CLOCK;
 			m_maincpu->set_unscaled_clock(clock);
@@ -705,7 +733,7 @@ void c65_state::vic4567_map(address_map &map)
 std::tuple<u8, bool> c65_state::get_tile_pixel(int y, int x)
 {
 	// TODO: move width as a screen setup
-	int pixel_width = (m_VIC3_ControlB & 0x80) ? 1 : 2;
+	int pixel_width = (m_control_b & 0x80) ? 1 : 2;
 	int columns = 80 / pixel_width;
 
 	int xi = (x >> 3) / pixel_width;
@@ -715,7 +743,7 @@ std::tuple<u8, bool> c65_state::get_tile_pixel(int y, int x)
 	uint8_t tile = m_video_ptr[(xi + yi * columns) & 0x3fff];
 	uint8_t attr = m_cram[xi + yi * columns];
 	int foreground_color = attr & 0xf;
-	int background_color = m_VIC2_BK0_Color & 0xf;
+	int background_color = m_bk_color_clut[0] & 0xf;
 	int highlight_color = 0;
 
 	int enable_dot = ((m_char_ptr[((tile << 3) + ym) & 0x3fff] >> xm) & 1);
@@ -736,8 +764,8 @@ std::tuple<u8, u8, u8, bool> c65_state::get_sprite_pixel(int y, int x)
 	u8 enable_dot = 0;
 	u8 sprite_mask = 0;
 	u8 idx = 0;
-	// TODO: move me, bitplane mode should also affect this
-	const u8 *sprite_ptr = &m_video_ptr[BIT(m_VIC3_ControlB, 7) ? 0x7f8 : 0x3f8];
+	// TODO: move masking outside this function, bitplane mode should also affect this
+	const u8 *sprite_ptr = &m_video_ptr[BIT(m_control_b, 7) ? 0x7f8 : 0x3f8];
 
 	// sprite #7 < #6 < ... < #0
 	for (int i = 7; i >= 0; i--)
@@ -745,14 +773,15 @@ std::tuple<u8, u8, u8, bool> c65_state::get_sprite_pixel(int y, int x)
 		if (!BIT(m_sprite_enable, i))
 			continue;
 
-		const int y_width = 0 + BIT(m_sprite_exp_y, i);
+		// NOTE: "0 +" intentional for 400i mode, eventually.
+		const int y_width = 0 + BIT(m_sexy, i);
 		const int ysize = 21 << y_width;
 		const u16 yi = m_sprite[i].y;
 
 		if (!(y >= yi && y < yi + ysize))
 			continue;
 
-		const int x_width = 1 + BIT(m_sprite_exp_x, i);
+		const int x_width = 1 + BIT(m_sexx, i);
 		const int xsize = 24 << x_width;
 		const u16 xi = m_sprite[i].x << 1;
 
@@ -769,7 +798,7 @@ std::tuple<u8, u8, u8, bool> c65_state::get_sprite_pixel(int y, int x)
 		//}
 
 		u8 sprite_data = m_workram[(ym * 3) + (xm >> 3) + sprite_offset];
-		const bool is_multicolor = bool(BIT(m_sprite_multicolor_enable, i));
+		const bool is_multicolor = bool(BIT(m_scm, i));
 		const u8 dot_mask = is_multicolor << 1 | 1;
 		const u8 shift_mask = 7 - is_multicolor;
 		const u8 color_shift = !is_multicolor;
@@ -800,7 +829,7 @@ TIMER_CALLBACK_MEMBER(c65_state::scanline_cb)
 
 	int x = border_left;
 
-	if (!m_video_enable)
+	if (!m_blnk)
 	{
 		// TODO: blank color
 		for (x = border_left; x < border_right; x++)
@@ -810,13 +839,14 @@ TIMER_CALLBACK_MEMBER(c65_state::scanline_cb)
 	{
 		if (y < active_top || y >= active_bottom)
 		{
+			// TODO: $3fff "opening the border" stuff
 			for (x = border_left; x < border_right; x++)
-				p[x] = m_VIC2_EXTColor;
+				p[x] = m_border_color;
 		}
 		else
 		{
 			for (x = border_left; x < active_left; x++)
-				p[x] = m_VIC2_EXTColor;
+				p[x] = m_border_color;
 			for (;x < active_right; x++)
 			{
 				u8 tile_dot, sprite_dot, sprite_mask, sprite_active;
@@ -824,23 +854,23 @@ TIMER_CALLBACK_MEMBER(c65_state::scanline_cb)
 				// TODO: functional depending on mode
 				// NOTE: VIC-II and VIC-III can switch mid-frame, but latches occur in 8 scanline steps
 				// at least from/to a base C=64 tilemap mode.
-				std::tie(tile_dot, is_foreground) = get_tile_pixel(y - active_top, x - active_left);
+				std::tie(tile_dot, is_foreground) = get_tile_pixel(y - active_top, x - active_left - m_xscl);
 				// HACK: are sprite positions in native coordinates from the border?
 				std::tie(sprite_dot, sprite_mask, sprite_active, is_sprite) = get_sprite_pixel(y + 20, x + active_left);
 
-				if (is_foreground && !(BIT(sprite_mask, sprite_active) & (BIT(m_sprite_priority ^ 0xff, sprite_active))))
+				if (is_foreground && !(BIT(sprite_mask, sprite_active) & (BIT(m_bsp ^ 0xff, sprite_active))))
 					p[x] = m_palette->pen(tile_dot);
 				else
 					p[x] = m_palette->pen(is_sprite ? sprite_dot : tile_dot);
 			}
 			for (;x < border_right; x++)
-				p[x] = m_VIC2_EXTColor;
+				p[x] = m_border_color;
 		}
 	}
 
-	// TODO: raster irq position
-	if (y == 0xff)
-		IRQCheck(1);
+	// HACK: need to compensate
+	if (y == m_rcr - 21)
+		irq_check(1);
 
 	y += 1;
 	y %= 262;
@@ -855,28 +885,28 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-void c65_state::PalEntryFlush(uint8_t offset)
+void c65_state::palette_entry_flush(uint8_t offset)
 {
 	m_palette->set_pen_color(offset, pal4bit(m_palred[offset]), pal4bit(m_palgreen[offset]), pal4bit(m_palblue[offset]));
 }
 
-void c65_state::PalRed_w(offs_t offset, uint8_t data)
+void c65_state::palette_red_w(offs_t offset, uint8_t data)
 {
 	// TODO: bit 4 for FG/BG, superimposing?
 	m_palred[offset] = data;
-	PalEntryFlush(offset);
+	palette_entry_flush(offset);
 }
 
-void c65_state::PalGreen_w(offs_t offset, uint8_t data)
+void c65_state::palette_green_w(offs_t offset, uint8_t data)
 {
 	m_palgreen[offset] = data;
-	PalEntryFlush(offset);
+	palette_entry_flush(offset);
 }
 
-void c65_state::PalBlue_w(offs_t offset, uint8_t data)
+void c65_state::palette_blue_w(offs_t offset, uint8_t data)
 {
 	m_palblue[offset] = data;
-	PalEntryFlush(offset);
+	palette_entry_flush(offset);
 }
 
 uint8_t c65_state::uart_r(offs_t offset)
@@ -959,7 +989,8 @@ void c65_state::c65_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x07fff).rw(FUNC(c65_state::ram_r<0x00000>), FUNC(c65_state::ram_w<0x00000>));
-	map(0x08000, 0x0bfff).rom().region("ipl", 0x08000);
+	map(0x08000, 0x09fff).rw(FUNC(c65_state::ram_r<0x08000>), FUNC(c65_state::ram_w<0x08000>));
+	map(0x0a000, 0x0bfff).rom().region("ipl", 0x0a000);
 	map(0x0c000, 0x0cfff).view(m_romc_view);
 	m_romc_view[0](0x0c000, 0x0cfff).rw(FUNC(c65_state::ram_r<0x0c000>), FUNC(c65_state::ram_w<0x0c000>));
 	m_romc_view[1](0x0c000, 0x0cfff).rom().region("ipl", 0x0c000);
@@ -967,9 +998,9 @@ void c65_state::c65_map(address_map &map)
 	// 0x0d080, 0x0d09f FDC
 	map(0x0d080, 0x0d09f).lr8(NAME([] (offs_t offset) { return 0; }));
 	// 0x0d0a0, 0x0d0ff Ram Expansion Control (REC)
-	map(0x0d100, 0x0d1ff).ram().w(FUNC(c65_state::PalRed_w)).share("redpal");
-	map(0x0d200, 0x0d2ff).ram().w(FUNC(c65_state::PalGreen_w)).share("greenpal");
-	map(0x0d300, 0x0d3ff).ram().w(FUNC(c65_state::PalBlue_w)).share("bluepal");
+	map(0x0d100, 0x0d1ff).ram().w(FUNC(c65_state::palette_red_w)).share("redpal");
+	map(0x0d200, 0x0d2ff).ram().w(FUNC(c65_state::palette_green_w)).share("greenpal");
+	map(0x0d300, 0x0d3ff).ram().w(FUNC(c65_state::palette_blue_w)).share("bluepal");
 	// 0x0d400, 0x0d4*f Right SID
 	// keyboard hold left shift will read to $d484 (?)
 	map(0x0d400, 0x0d41f).mirror(0x80).rw(m_sid[1], FUNC(mos6581_device::read), FUNC(mos6581_device::write));
@@ -1115,15 +1146,43 @@ void c65_state::machine_start()
 
 void c65_state::machine_reset()
 {
-	m_VIC3_ControlA = 0;
+	m_control_a = 0;
 	m_cram_view.select(0);
 }
 
 
 void c65_state::palette_init(palette_device &palette)
 {
-	for (int i = 0; i < 0x100; i++)
-		PalEntryFlush(i);
+	// HACK: should read from an (undumped) PROM, and switch when bit 2 of control A is high
+	static const u8 r_default[] = {
+		0x00, 0x0f, 0x0f, 0x00,
+		0x0f, 0x00, 0x00, 0x0f,
+		0x0f, 0x0a, 0x0f, 0x05,
+		0x08, 0x09, 0x09, 0x0b
+	};
+	static const u8 g_default[] = {
+		0x00, 0x0f, 0x00, 0x0f,
+		0x00, 0x0f, 0x00, 0x0f,
+		0x06, 0x04, 0x07, 0x05,
+		0x08, 0x0f, 0x09, 0x0b
+	};
+	static const u8 b_default[] = {
+		0x00, 0x0f, 0x00, 0x0f,
+		0x0f, 0x00, 0x0f, 0x00,
+		0x00, 0x00, 0x07, 0x05,
+		0x08, 0x09, 0x0f, 0x0b
+	};
+	int i;
+
+	for (i = 0; i < 0x10; i++)
+	{
+		m_palred[i] = r_default[i];
+		m_palgreen[i] = g_default[i];
+		m_palblue[i] = b_default[i];
+	}
+
+	for (i = 0; i < 0x100; i++)
+		palette_entry_flush(i);
 }
 
 // debug
@@ -1144,12 +1203,12 @@ static GFXDECODE_START( gfx_c65 )
 	GFXDECODE_ENTRY( "ipl", 0x9000, charlayout,     0, 16 )
 GFXDECODE_END
 
-void c65_state::IRQCheck(uint8_t irq_cause)
+void c65_state::irq_check(uint8_t irq_cause)
 {
-	m_VIC2_IRQPend |= (irq_cause != 0) ? 0x80 : 0x00;
-	m_VIC2_IRQPend |= irq_cause;
+	m_irq_pending |= (irq_cause != 0) ? 0x80 : 0x00;
+	m_irq_pending |= irq_cause;
 
-	m_irqs->in_w<1>(m_VIC2_IRQMask & m_VIC2_IRQPend);
+	m_irqs->in_w<1>(m_irq_mask & m_irq_pending);
 }
 
 void c65_state::c65(machine_config &config)
