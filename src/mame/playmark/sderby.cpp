@@ -17,6 +17,7 @@
   Super Derby (2 sets),                  1996, Playmark.
   Croupier (Playmark Roulette) (2 sets), 1997, Playmark.
   Magic Touch,                           1998, Playmark.
+  Tropical Fruits                        1999, Playmark.
 
 
 ********************************************************************************************
@@ -59,7 +60,7 @@
   - figure out the reads from 0x308002.w and 0x30800e.w (see input_r read handler)
   (by default, demo sounds are OFF, so change this in the "test mode");
   - hook up the MCU for croupier, croupiera (needs PIC16C74 core);
-  - dump and hook up the MCU for croupierb, magictch;
+  - dump and hook up the MCU (PIC16C65) for croupierb, magictch, tropfrt;
 
 *******************************************************************************************/
 
@@ -859,6 +860,29 @@ static INPUT_PORTS_START( magictch )
 	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tropfrt )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / Low")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / High")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / Double Up")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Collect")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Bet")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE(0x1000, IP_ACTIVE_LOW)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // it must be toggled to boot anyway
+	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 /****************************
 *     Graphics Layouts      *
@@ -1037,6 +1061,7 @@ void zw3_state::zw3(machine_config &config)
 	pmroulet(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &zw3_state::zw3_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sderby_state::irq4_line_hold));
 
 	subdevice<okim6295_device>("oki")->set_clock(1_MHz_XTAL); // pin 7 verified
 }
@@ -1332,7 +1357,7 @@ ROM_END
 /*
 ZW3 PCB with 'MAGIC' sticker
 1x MC68000FN12
-1x PIC16C74 (scratched)
+1x PIC16C65 (scratched)
 1x M48Z02-150PC1 ZEROPOWER RAM
 1x 12 MHz XTAL
 1x 14.318180 MHz XTAL
@@ -1346,8 +1371,8 @@ ROM_START( magictch )
 	ROM_LOAD16_BYTE( "22.u43", 0x00000, 0x20000, CRC(47f047b1) SHA1(f47ab9734f6bb1dc50baf159bca144fa79eac1a5) ) // TMS27C010A
 	ROM_LOAD16_BYTE( "23.u42", 0x00001, 0x20000, CRC(f63e31bf) SHA1(e96da519a8d6488d600e031ac48f5ce1a8a376f5) ) // TMS27C010A
 
-	ROM_REGION( 0x4008, "pic16c74", 0 )
-	ROM_LOAD( "pic16c74.u27", 0x0000, 0x4008, NO_DUMP )
+	ROM_REGION( 0x4008, "pic16c65", 0 )
+	ROM_LOAD( "pic16c65.u28", 0x0000, 0x4008, NO_DUMP )
 
 	ROM_REGION( 0x040000, "oki", 0 )
 	ROM_LOAD( "21.u16", 0x00000, 0x40000, CRC(e06a023f) SHA1(b4cd64f6c97e9c3e50a9658e171d748cb9f1c4ef) ) // ST M27C2001, 1xxxxxxxxxxxxxxxxx = 0xFF
@@ -1363,13 +1388,13 @@ ROM_START( magictch )
 	ROM_LOAD( "gal22cv10-15lnc.u40", 0x000, 0x2e5, NO_DUMP ) // soldered
 ROM_END
 
-ROM_START( croupierb ) // identical PCB as magictch, but with 'ROULETTE' sticker and a Dallas DS1220Y instead of the M48Z02
+ROM_START( croupierb ) // identical PCB to magictch, but with 'ROULETTE' sticker and a Dallas DS1220Y instead of the M48Z02
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "12.u43", 0x00000, 0x20000, CRC(fe6c95f6) SHA1(9a90e15753fab2304a05192202456a3ee7adbc38) ) // TMS27C010A
 	ROM_LOAD16_BYTE( "13.u42", 0x00001, 0x20000, CRC(9e76bd67) SHA1(19951f6a1201feecf8caa79bff6b46508db0f999) ) // TMS27C010A
 
-	ROM_REGION( 0x4008, "pic16c74", 0 )
-	ROM_LOAD( "pic16c74.u27", 0x0000, 0x4008, NO_DUMP )
+	ROM_REGION( 0x4008, "pic16c65", 0 )
+	ROM_LOAD( "pic16c65.u28", 0x0000, 0x4008, NO_DUMP )
 
 	ROM_REGION( 0x080000, "oki", 0 )
 	ROM_LOAD( "1.u16", 0x00000, 0x40000, CRC(6673de85) SHA1(df390cd6268efc0e743a9020f19bc0cbeb757cfa) ) // TMS27C020, same as other croupier sets
@@ -1383,6 +1408,31 @@ ROM_START( croupierb ) // identical PCB as magictch, but with 'ROULETTE' sticker
 
 	ROM_REGION( 0x300, "plds", 0)
 	ROM_LOAD( "gal22cv10-15lnc.u40", 0x000, 0x2e5, NO_DUMP ) // soldered
+ROM_END
+
+ROM_START( tropfrt ) // identical PCB to magictch, but with 'TROPICAL' sticker and not scratched PIC16C65
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "9.u43",  0x00000, 0x20000, CRC(25c675c7) SHA1(ba89fec39028d96c88a22bed71c82361d50eef12) ) // M27C1001
+	ROM_LOAD16_BYTE( "10.u42", 0x00001, 0x20000, CRC(cd1a533a) SHA1(c611cc26239309d8ea21724f20ed88e8cf076fc5) ) // M27C1001
+
+	ROM_REGION( 0x4008, "pic16c65", 0 )
+	ROM_LOAD( "pic16c65.u28", 0x0000, 0x4008, NO_DUMP )
+
+	ROM_REGION( 0x040000, "oki", 0 )
+	ROM_LOAD( "16.u16", 0x00000, 0x40000, CRC(85acb618) SHA1(b7f1cb288bf155cebd8aa47286d1147b538b27e6) ) // M27C2001, 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0xa0000, "gfx", 0 )
+	ROM_LOAD( "11.u76", 0x000000, 0x20000, CRC(02b8ab49) SHA1(3f63af482ac582c90ea89e9d5c54ac87ff7c1d76) ) // M27C1001
+	ROM_LOAD( "12.u77", 0x020000, 0x20000, CRC(d7e39de0) SHA1(acb5204d611f8a7305d7261700b04093800a3463) ) // M27C1001
+	ROM_LOAD( "13.u78", 0x040000, 0x20000, CRC(e0b9fbeb) SHA1(8c2cc0f28e6f61eca79aa5957f294219d2d95694) ) // M27C1001
+	ROM_LOAD( "14.u79", 0x060000, 0x20000, CRC(5909db4d) SHA1(5258586bd16e31cc20576a68fd701fbcf7c4a53c) ) // M27C1001
+	ROM_LOAD( "15.u80", 0x080000, 0x20000, CRC(46f09c0e) SHA1(1324ce512a5e617bcd47850f5ffcbd85ff1c3e61) ) // M27C1001
+
+	ROM_REGION( 0x800, "nvram", 0)
+	ROM_LOAD( "nvram", 0x000, 0x800, CRC(8278a06f) SHA1(a1e6905250102d8be4be681123585b8e131a4ffd) ) // pre-initialized (game doesn't accept coins without initializing)
+
+	ROM_REGION( 0x300, "plds", 0)
+	ROM_LOAD( "gal22v10b-25lp.u40", 0x000, 0x2e5, NO_DUMP ) // soldered
 ROM_END
 
 } // anonymous namespace
@@ -1401,4 +1451,5 @@ GAMEL( 1997, croupier,  0,        pmroulet, pmroulet,  sderby_state, empty_init,
 GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet,  sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
 GAMEL( 1997, croupierb, croupier, zw3,      croupierb, zw3_state,    empty_init, ROT0, "Playmark", "Croupier II (Playmark Roulette v.03.09)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS, layout_pmroulet ) // title screen says Croupier 2 but every string in ROM says Croupier.
 GAME(  1996, luckboom,  0,        luckboom, luckboom,  sderby_state, empty_init, ROT0, "Playmark", "Lucky Boom",                              0                                                                    )
-GAME(  1998, magictch,  0,        zw3,      magictch,  zw3_state,    empty_init, ROT0, "Playmark", "Magic Touch",                             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // sprite offsets aren't 100% correct, no PIC16C74 emulation, needs proper layout
+GAME(  1998, magictch,  0,        zw3,      magictch,  zw3_state,    empty_init, ROT0, "Playmark", "Magic Touch",                             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // sprite offsets aren't 100% correct, no PIC16C65 emulation, needs proper layout
+GAME(  1999, tropfrt,   0,        zw3,      tropfrt,   zw3_state,    empty_init, ROT0, "Playmark", "Tropical Fruits (V. 24-06.00 Rev. 4.0)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // sprite offsets aren't 100% correct, no PIC16C74 emulation, needs proper layout
