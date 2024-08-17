@@ -171,8 +171,8 @@ void ncr5385_device::scsi_ctrl_changed()
 
 	if ((ctrl & S_BSY) && !(ctrl & S_SEL))
 	{
-		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x phase %s%s%s\n", ctrl, nscsi_phase[ctrl & S_PHASE_MASK],
-			ctrl & S_REQ ? " REQ" : "", ctrl & S_ACK ? " ACK" : "");
+		LOGMASKED(LOG_STATE, "scsi_ctrl_changed 0x%03x phase %s%s%s pc(%s)\n", ctrl, nscsi_phase[ctrl & S_PHASE_MASK],
+			ctrl & S_REQ ? " REQ" : "", ctrl & S_ACK ? " ACK" : "", machine().describe_context());
 
 		if (m_state != IDLE)
 			m_state_timer->adjust(attotime::zero);
@@ -355,9 +355,6 @@ void ncr5385_device::cmd_w(u8 data)
 	}
 	else
 	{
-		// we assume everything here generates an IRQ?
-		// assert(data & CMD_INT);
-
 		// interrupting commands
 		m_aux_status &= ~AUX_STATUS_DATA_FULL;
 		m_cmd = data;
@@ -587,7 +584,7 @@ int ncr5385_device::state_step()
 		{
 			LOGMASKED(LOG_STATE, "selection: BSY asserted by target\n");
 			m_state = SEL_COMPLETE;
-			delay = SCSI_BUS_SKEW * 2;
+			delay = SCSI_BUS_SKEW;
 		}
 		else
 		{
@@ -693,6 +690,8 @@ int ncr5385_device::state_step()
 			// clear ACK except after last byte of message input phase
 			if (!remaining() && (ctrl & S_PHASE_MASK) == S_PHASE_MSG_IN)
 			{
+				LOGMASKED(LOG_STATE, "xfi_in: INT_FUNC_COMPLETE\n" );
+			
 				m_int_status |= INT_FUNC_COMPLETE;
 				m_state = IDLE;
 
@@ -722,7 +721,7 @@ int ncr5385_device::state_step()
 			}
 			else
 			{
-				LOGMASKED(LOG_STATE, "xfi_out: %s\n", remaining() ? "phase change" : "transfer complete");
+				LOGMASKED(LOG_STATE, "xfi_out: %s pc(%s)\n", remaining() ? "phase change" : "transfer complete", machine().describe_context());
 
 				m_int_status |= INT_BUS_SERVICE;
 				m_state = IDLE;
@@ -786,6 +785,9 @@ int ncr5385_device::state_step()
 			{
 				scsi_bus->data_w(scsi_refid, 0);
 				scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+
+//				m_int_status |= INT_BUS_SERVICE;
+//				update_int();
 			}
 #endif
 
@@ -847,14 +849,16 @@ void ncr5385_device::update_int()
 	bool const int_state = m_int_status & (INT_FUNC_COMPLETE | INT_BUS_SERVICE |
 			INT_DISCONNECTED | INT_SELECTED | INT_RESELECTED | INT_INVALID_CMD);
 
+	LOGMASKED(LOG_COMMAND, "update_int 0x%02x (0x%02x)  pc(%s)\n", m_int_status, m_int_state, machine().describe_context());
 	if (m_int_state != int_state)
 	{
-		LOG("update_int %d\n", int_state);
 
-		m_aux_status &= ~(AUX_STATUS_MSG | AUX_STATUS_CD | AUX_STATUS_IO);
 		if (int_state)
 		{
 			m_cmd = 0;
+
+		// AB should we not clear out existing?
+		m_aux_status &= ~(AUX_STATUS_MSG | AUX_STATUS_CD | AUX_STATUS_IO);
 
 			// latch current phase
 			u32 const ctrl = scsi_bus->ctrl_r();
@@ -865,8 +869,6 @@ void ncr5385_device::update_int()
 			if (ctrl & S_INP)
 				m_aux_status |= AUX_STATUS_IO;
 		}
-
-LOGMASKED(LOG_COMMAND,"update_int %d  pc(%s)\n", int_state, machine().describe_context());
 
 		m_int_state = int_state;
 		m_int(m_int_state);
