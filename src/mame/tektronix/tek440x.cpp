@@ -346,12 +346,13 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 		m_map_control &= ~(1 << MAP_CPU_WR);
 
 		// selftest expects fail if page.pid != map_control.pid
+if (BIT(m_map[offset >> 11], 11, 3))
 		if (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
 		{
 
 			m_map_control |= (1 << MAP_BLOCK_ACCESS);
 
-			LOG("memory_r: bus error: PID(%d) != %d %08x fc(%d) pc(%08x)\n", BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), OFF16_TO_OFF8(offset), m_maincpu->pc());
+			LOG("memory_r: bus error: PID(%d) != %d %08x fc(%d) pc(%08x)\n", BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
@@ -386,7 +387,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		m_map_control |= (1 << MAP_CPU_WR);
 				
 		// matching pid?
-		if (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
+		if ((BIT(m_map[offset >> 11], 11, 3)) && (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7)))
 		{
 			m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
 
