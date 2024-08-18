@@ -39,6 +39,7 @@ public:
 	void igs_mahjong_xa(machine_config &config);
 
 	void init_crzybugs();
+	void init_crzybugsa();
 	void init_crzybugsj();
 	void init_hauntedh();
 	void init_tripfev();
@@ -220,7 +221,7 @@ ROM_END
 ROM_START( crzybugsa )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "m7_igs27a.u37", 0x00000, 0x4000, CRC(1b20532c) SHA1(e08d0110a843915a8ba8627ae6d3947cccc22048) ) // sticker marked 'M7'
+	ROM_LOAD( "unknown_crzybugsa_igs27a.u37", 0x00000, 0x4000, NO_DUMP ) // sticker marked '??'
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-202us.u23", 0x000000, 0x80000, CRC(210da1e6) SHA1(c726497bebd25d6a9053e331b4c26acc7e2db0b2) ) // MX27C4096
@@ -243,7 +244,7 @@ ROM_END
 ROM_START( crzybugsb )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "m7_igs27a.u37", 0x00000, 0x4000, CRC(1b20532c) SHA1(e08d0110a843915a8ba8627ae6d3947cccc22048) ) // sticker marked 'M7'
+	ROM_LOAD( "unknown_crzybugsb_igs27a.u37", 0x00000, 0x4000, NO_DUMP ) // sticker marked '??'
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-202us.u23", 0x000000, 0x80000, CRC(129e36e9) SHA1(53f20bc3792249de8ef276f84283baa9abd30acd) ) // MX27C4096
@@ -374,6 +375,12 @@ void igs_m027xa_state::init_crzybugs()
 	m_igs017_igs031->tarzan_decrypt_sprites(0); // wrong?
 }
 
+void igs_m027xa_state::init_crzybugsa()
+{
+	crzybugs_decrypt(machine());
+	pgm_create_dummy_internal_arm_region();
+}
+
 void igs_m027xa_state::init_crzybugsj()
 {
 	crzybugsj_decrypt(machine());
@@ -402,8 +409,8 @@ void igs_m027xa_state::init_wldfruit()
 GAME( 2008, haunthig,  0,        igs_mahjong_xa, base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", MACHINE_IS_SKELETON ) // IGS FOR V109US 2008 10 14
 GAME( 2006, haunthiga, haunthig, igs_mahjong_xa, base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", MACHINE_IS_SKELETON ) // IGS FOR V101US 2006 08 23
 GAME( 2009, crzybugs,  0,        igs_mahjong_xa, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", MACHINE_IS_SKELETON ) // IGS FOR V204US 2009 5 19
-GAME( 2006, crzybugsa, crzybugs, igs_mahjong_xa, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", MACHINE_IS_SKELETON ) // IGS FOR V100US 2006 3 29 but also V202US string
-GAME( 2005, crzybugsb, crzybugs, igs_mahjong_xa, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", MACHINE_IS_SKELETON ) // FOR V100US 2005 7 20 but also V200US string
+GAME( 2006, crzybugsa, crzybugs, igs_mahjong_xa, base,     igs_m027xa_state, init_crzybugsa, ROT0, "IGS", "Crazy Bugs (V202US)", MACHINE_IS_SKELETON ) // IGS FOR V100US 2006 3 29 but also V202US string
+GAME( 2005, crzybugsb, crzybugs, igs_mahjong_xa, base,     igs_m027xa_state, init_crzybugsa, ROT0, "IGS", "Crazy Bugs (V200US)", MACHINE_IS_SKELETON ) // FOR V100US 2005 7 20 but also V200US string
 GAME( 2007, crzybugsj, crzybugs, igs_mahjong_xa, base,     igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_IS_SKELETON ) // IGS FOR V101JP 2007 06 08
 GAME( 2006, tripfev,   0,        igs_mahjong_xa, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", MACHINE_IS_SKELETON ) // IGS FOR V107US 2006 09 07
 GAME( 200?, wldfruit,  0,        igs_mahjong_xa, base,     igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_IS_SKELETON ) // IGS-----97----V208US
