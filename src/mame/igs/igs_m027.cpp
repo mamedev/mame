@@ -290,7 +290,7 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_visarea(0, 512-1, 0, 240-1);
 	screen.set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
 	screen.set_palette("igs017_igs031:palette");
 	screen.screen_vblank().set(FUNC(igs_m027_state::vblank_irq));

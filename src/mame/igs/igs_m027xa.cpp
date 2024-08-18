@@ -33,7 +33,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_xa(*this, "xa"),
 		m_ppi(*this, "ppi8255"),
-		m_igs017_igs031(*this, "igs017_igs031")
+		m_igs017_igs031(*this, "igs017_igs031"),
+		m_screen(*this, "screen")
 	{ }
 
 	void igs_mahjong_xa(machine_config &config);
@@ -54,6 +55,7 @@ private:
 	required_device<mx10exa_cpu_device> m_xa;
 	required_device<i8255_device> m_ppi;
 	required_device<igs017_igs031_device> m_igs017_igs031;
+	required_device<screen_device> m_screen;
 
 	void vblank_irq(int state);
 
@@ -67,7 +69,6 @@ private:
 	{
 		return machine().rand();
 	}
-	int irq_toggle = 0;
 };
 
 
@@ -124,14 +125,12 @@ void igs_m027xa_state::vblank_irq(int state)
 	if (state)
 	{
 		// hack
-		irq_toggle ^= 1;
-
-		if (igs_70000100 == 0x55)
+		if (igs_70000100 == 0x55) // IRQ can't be enabled during RAM check, this might not be the enable flag though
 		{
-			if (irq_toggle==0)
+			if (m_screen->frame_number() & 1)
 				m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 			else
-				m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
+				m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // probably from the XA?
 		}
 	}
 
@@ -146,14 +145,14 @@ void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 
 	MX10EXA(config, m_xa, 10000000); // MX10EXAQC (Philips 80C51 XA) unknown frequency
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0, 256-1);
-	screen.set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
-	screen.set_palette("igs017_igs031:palette");
-	screen.screen_vblank().set(FUNC(igs_m027xa_state::vblank_irq));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 240-1);
+	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
+	m_screen->set_palette("igs017_igs031:palette");
+	m_screen->screen_vblank().set(FUNC(igs_m027xa_state::vblank_irq));
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pa_callback().set_ioport("TEST0");
