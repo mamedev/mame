@@ -237,16 +237,16 @@ ROM_START( crzybugs ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU) marked J9
 	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
-	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )  // not dumped for this set
-	ROM_LOAD( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, BAD_DUMP CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) )
 
 	// are these PGM-like sprites?
-	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 ) // not dumped for this set
-	ROM_LOAD( "crazy_bugs_cg.u19",  0x000000, 0x200000, BAD_DUMP CRC(9d53ad47) SHA1(46690a37acf8bd88c7fbe973db2faf5ef0cff805) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "crazy_bugs_cg.u19",  0x000000, 0x200000, CRC(9d53ad47) SHA1(46690a37acf8bd88c7fbe973db2faf5ef0cff805) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 	// u18 not populated
 
 	ROM_REGION( 0x200000, "samples", 0 ) // plain Oki M6295 samples
-	ROM_LOAD( "crazy_bugs_sp.u15", 0x000000, 0x200000, CRC(b15974a1) SHA1(82509902bbb33a2120d815e7879b9b8591a29976) ) // M27C160
+	ROM_LOAD( "crazybugs_sp.u15", 0x000000, 0x200000, CRC(591b315b) SHA1(fda1816d83e202170dba4afc6e7898b706a76087) ) // M27C160
 ROM_END
 
 ROM_START( crzybugsa )
