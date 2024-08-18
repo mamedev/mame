@@ -82,14 +82,15 @@ void igs_m027xa_state::igs_mahjong_map(address_map &map)
 	map(0x10000000, 0x100003ff).ram().share("igs_mainram"); // main RAM for ASIC?
 	map(0x18000000, 0x18007fff).ram();
 
-	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)); // guess based on below
+	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
 	map(0x70000200, 0x70000203).ram();     //??????????????
 	map(0x50000000, 0x500003ff).nopw(); // uploads XOR table to external ROM here
 	map(0xf0000000, 0xf000000f).nopw(); // magic registers
 }
 
-static INPUT_PORTS_START( base )	PORT_START("TEST0")
+static INPUT_PORTS_START( base )
+	PORT_START("TEST0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("TEST1")

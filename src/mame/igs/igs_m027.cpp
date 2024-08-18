@@ -107,7 +107,7 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 	map(0x10000000, 0x100003ff).ram().share("igs_mainram"); // main RAM for ASIC?
 	map(0x18000000, 0x18007fff).ram();
 
-	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)); // guess based on below
+	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
 	map(0x38008000, 0x38008003).r(FUNC(igs_m027_state::unk_r));
 
