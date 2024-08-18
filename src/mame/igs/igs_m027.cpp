@@ -33,10 +33,11 @@
 #include "cpu/arm7/arm7core.h"
 #include "cpu/xa/xa.h"
 
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 
+#include "multibyte.h"
 #include "screen.h"
-
 
 namespace {
 
@@ -48,6 +49,7 @@ public:
 		m_igs_mainram(*this, "igs_mainram"),
 		m_maincpu(*this, "maincpu"),
 		m_xa(*this, "xa"),
+		m_ppi(*this, "ppi8255"),
 		m_igs017_igs031(*this, "igs017_igs031")
 	{ }
 
@@ -89,11 +91,16 @@ private:
 	optional_shared_ptr<u32> m_igs_mainram;
 	required_device<cpu_device> m_maincpu;
 	optional_device<mx10exa_cpu_device> m_xa;
+	optional_device<i8255_device> m_ppi;
 	required_device<igs017_igs031_device> m_igs017_igs031;
+
+	u32 unk_r()
+	{
+		return 0xffffffff;
+	}
 
 	void vblank_irq(int state);
 
-	void sdwx_gfx_decrypt();
 	void pgm_create_dummy_internal_arm_region();
 	void igs_mahjong_map(address_map &map);
 };
@@ -171,6 +178,8 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)); // guess based on below
 
+	map(0x38008000, 0x38008003).r(FUNC(igs_m027_state::unk_r));
+
 	map(0x38009000, 0x38009003).ram();     //??????????????  oki 6295
 
 	map(0x70000200, 0x70000203).ram();     //??????????????
@@ -215,23 +224,6 @@ static const u8 sdwx_tab[] =
 
 
 
-void igs_m027_state::sdwx_gfx_decrypt()
-{
-	unsigned rom_size = 0x80000;
-	u8 *src = (u8 *) (memregion("igs017_igs031:tilemaps")->base());
-	std::vector<u8> result_data(rom_size);
-
-	for (int i = 0; i < rom_size; i++)
-		result_data[i] = src[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 8, 7, 6, 10, 9, 5, 4, 3, 2, 1, 0)];
-
-	for (int i = 0; i < rom_size; i += 0x200)
-	{
-		memcpy(src + i + 0x000, &result_data[i + 0x000], 0x80);
-		memcpy(src + i + 0x080, &result_data[i + 0x100], 0x80);
-		memcpy(src + i + 0x100, &result_data[i + 0x080], 0x80);
-		memcpy(src + i + 0x180, &result_data[i + 0x180], 0x80);
-	}
-}
 
 /***************************************************************************
 
@@ -252,9 +244,21 @@ void igs_m027_state::sdwx_gfx_decrypt()
 ***************************************************************************/
 
 static INPUT_PORTS_START( sdwx )
+
+	PORT_START("TEST0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("TEST1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("TEST2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( amazonia )
+	PORT_INCLUDE(sdwx)
+
 	PORT_START("DSW1")
 // Credits proportion
 	PORT_DIPNAME( 0x03, 0x03, "Proporcao Credito" ) PORT_DIPLOCATION("SW1:1,2")
@@ -360,11 +364,15 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 	screen.set_palette("igs017_igs031:palette");
 	screen.screen_vblank().set(FUNC(igs_m027_state::vblank_irq));
 
+	I8255A(config, m_ppi);
+	m_ppi->in_pa_callback().set_ioport("TEST0");
+	m_ppi->in_pb_callback().set_ioport("TEST1");
+	m_ppi->in_pc_callback().set_ioport("TEST2");
+
+
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits();
-	//m_igs017_igs031->set_i8255_tag("ppi8255");
-
-	// 82C55? (accessed through igs017/igs031 area like igs017.cpp?)
+	m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound hardware
 	// OK6295
@@ -633,7 +641,7 @@ ROM_END
 ROM_START( jking02 ) // PCB-0367-05-FG-1
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "jking02_igs027a", 0x00000, 0x4000, NO_DUMP ) // stickered J6
+	ROM_LOAD( "j6_027a.bin", 0x0000, 0x4000, CRC(69e241f0) SHA1(1ae0aabb217c67ee6e7126f3f0f90c8b3e051888) ) // J6 holographic sticker
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "j_k_2002_v-209us.u23", 0x00000, 0x80000, CRC(ef6b652b) SHA1(ee5c2cef2c7cbcd4a70e05c01295e964ca5e45d1) ) // 27C4096
@@ -1486,28 +1494,28 @@ void igs_m027_state::init_no_dec()
 void igs_m027_state::init_sdwx()
 {
 	sdwx_decrypt(machine());
-	sdwx_gfx_decrypt();
+	m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_klxyj()
 {
 	klxyj_decrypt(machine());
-	//sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_chessc2()
 {
 	chessc2_decrypt(machine());
-	//sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_hauntedh()
 {
 	hauntedh_decrypt(machine());
-	//sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
@@ -1516,77 +1524,77 @@ void igs_m027_state::init_hauntedh()
 void igs_m027_state::init_lhzb4()
 {
 	lhzb4_decrypt(machine());
-	//sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_mgfx()
 {
 	mgfx_decrypt(machine());
-	//sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_lhzb3()
 {
 	lhzb3_decrypt(machine());
-	//sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_sddz()
 {
 	sddz_decrypt(machine());
-	//sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_gonefsh2()
 {
 	gonefsh2_decrypt(machine());
-	//sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_zhongguo()
 {
 	zhongguo_decrypt(machine());
-	//sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_slqz3()
 {
 	slqz3_decrypt(machine());
-	//sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_fruitpar()
 {
 	fruitpar_decrypt(machine());
-	//sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_oceanpar()
 {
 	oceanpar_decrypt(machine());
-	//sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_amazonia()
 {
 	amazonia_decrypt(machine());
-	//sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_amazoni2()
 {
 	amazoni2_decrypt(machine());
-	//sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
@@ -1628,8 +1636,8 @@ void igs_m027_state::init_crzybugsj()
 void igs_m027_state::init_jking02()
 {
 	jking02_decrypt(machine());
-	//qlgs_gfx_decrypt(machine());
-	pgm_create_dummy_internal_arm_region();
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0); // not 100% correect?
 }
 
 void igs_m027_state::init_luckycrs()
