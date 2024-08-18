@@ -330,7 +330,7 @@ void igs017_igs031_device::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cl
 	{
 		const int y     =   s[0] + (s[1] << 8);
 		int x           =   s[2] + (s[3] << 8);
-		u32 addr        =   (s[4] >> 6) | (s[5] << 2) | (s[6] << 10) | ((s[7] & 0x07 /* 0x0f? */) << 18);
+		u32 addr        =   (s[4] >> 6) | (s[5] << 2) | (s[6] << 10) | ((s[7] & 0x0f) << 18);
 
 		addr            *=  3;
 
