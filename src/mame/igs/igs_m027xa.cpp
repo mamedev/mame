@@ -59,6 +59,15 @@ private:
 
 	void pgm_create_dummy_internal_arm_region();
 	void igs_mahjong_map(address_map &map);
+
+	void igs_70000100_w(u32 data);
+	u32 igs_70000100;
+
+	u32 rand_r()
+	{
+		return machine().rand();
+	}
+	int irq_toggle = 0;
 };
 
 
@@ -66,6 +75,11 @@ private:
 void igs_m027xa_state::video_start()
 {
 	m_igs017_igs031->video_start();
+}
+
+void igs_m027xa_state::igs_70000100_w(u32 data)
+{
+	igs_70000100 = data;
 }
 
 
@@ -83,6 +97,11 @@ void igs_m027xa_state::igs_mahjong_map(address_map &map)
 	map(0x18000000, 0x18007fff).ram();
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
+	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027xa_state::rand_r));
+
+	map(0x58000000, 0x580000ff).ram(); // XA?
+
+	map(0x70000100, 0x70000103).w(FUNC(igs_m027xa_state::igs_70000100_w));
 
 	map(0x70000200, 0x70000203).ram();     //??????????????
 	map(0x50000000, 0x500003ff).nopw(); // uploads XOR table to external ROM here
@@ -103,7 +122,19 @@ INPUT_PORTS_END
 void igs_m027xa_state::vblank_irq(int state)
 {
 	if (state)
-		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+	{
+		// hack
+		irq_toggle ^= 1;
+
+		if (igs_70000100 == 0x55)
+		{
+			if (irq_toggle==0)
+				m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+			else
+				m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
+		}
+	}
+
 }
 
 void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
@@ -373,7 +404,7 @@ void igs_m027xa_state::init_crzybugs()
 {
 	crzybugs_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
-	m_igs017_igs031->tarzan_decrypt_sprites(0); // wrong?
+	m_igs017_igs031->tarzan_decrypt_sprites(0); // ok?
 }
 
 void igs_m027xa_state::init_crzybugsa()
