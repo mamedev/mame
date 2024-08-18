@@ -64,6 +64,7 @@ private:
 
 void igs_m027xa_state::video_start()
 {
+	m_igs017_igs031->video_start();
 }
 
 
@@ -369,7 +370,7 @@ void igs_m027xa_state::init_hauntedh()
 void igs_m027xa_state::init_crzybugs()
 {
 	crzybugs_decrypt(machine());
-	m_igs017_igs031->sdwx_gfx_decrypt(); // wrong
+	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0); // wrong?
 }
 

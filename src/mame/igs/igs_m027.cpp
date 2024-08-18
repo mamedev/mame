@@ -88,58 +88,6 @@ private:
 	void igs_mahjong_map(address_map &map);
 };
 
-
-
-/***************************************************************************
-
-    Video
-
-    0x38001000, 0x380017ff      CG_CONTROL,8 byte per object, 0x100 in total
-    0x38001800, 0x380019ff      PALETTE RAM,2 byte per color, 0x100 in total
-    0x38004000, 0x38005FFF      TX Video RAM????????1E00??????512x240??????
-    0x38006000, 0x38007FFF      BG Video RAM????????1E00??????512x240??????
-
-***************************************************************************/
-
-
-
-// CGLayer
-#if 0
-void igs_m027_state::igs_cg_videoram_w(offs_t offset, u32_t data, u32_t mem_mask)
-{
-	COMBINE_DATA(&m_igs_cg_videoram[offset]);
-	// if(data != 0)
-	logerror("PC(%08X) CG @%x = %x!\n", m_maincpu->pc(), offset , m_igs_cg_videoram[offset]);
-
-	/*
-	ROM:08020520                 DCW 0x3E                                           ddd1        y
-	ROM:08020522                 DCW 0x29                                           ddd2        x
-	ROM:08020524                 DCD 0x190BB6                                       ddd3        n
-	ROM:08020528                 DCW 0xC                                            ddd4        Y
-	ROM:0802052A                 DCW 0xA6                                           ddd5        X
-
-	(ddd5+?)??10bit
-	ddd2??9bit
-	(ddd4+?)??11bit
-	ddd1??8bit
-	ddd3??10bit
-
-	8060a4a6 2642ed8f
-	A6A46080 8FED4226
-
-	XXXX-XXXX
-	XXxx-xxxx
-	xxxY-YYYY
-	YYYY-YYyy
-
-	yyyy-yynn
-	nnnn-nnnn
-	*/
-}
-#endif
-
-
-
 void igs_m027_state::video_start()
 {
 	m_igs017_igs031->video_start();
