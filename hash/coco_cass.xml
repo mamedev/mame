@@ -8,6 +8,7 @@ license:CC0-1.0
 
         <!-- cassette images (.cas,.wav) downloaded from the Color Computer Archive (colorcomputerarchive.com) -->
 
+        <!-- known issue: ?OM ERROR IN 20 after running BASIC bootloader (workaround: use disk verison) -->
         <software name="grover">
                 <description>Grover's Number Rover</description>
                 <year>1983</year>
