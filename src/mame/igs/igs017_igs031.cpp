@@ -330,7 +330,8 @@ void igs017_igs031_device::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cl
 	{
 		const int y     =   s[0] + (s[1] << 8);
 		int x           =   s[2] + (s[3] << 8);
-		u32 addr        =   (s[4] >> 6) | (s[5] << 2) | (s[6] << 10) | ((s[7] & 0x07) << 18);
+		u32 addr        =   (s[4] >> 6) | (s[5] << 2) | (s[6] << 10) | ((s[7] & 0x07 /* 0x0f? */) << 18);
+
 		addr            *=  3;
 
 		const int flipx =   s[7] & 0x10;
@@ -580,14 +581,14 @@ void igs017_igs031_device::tarzan_decrypt_sprites(size_t max_size)
 	}
 }
 
-void igs017_igs031_device::starzan_decrypt_sprites()
+void igs017_igs031_device::starzan_decrypt_sprites(size_t max_size)
 {
-	tarzan_decrypt_sprites(0x200000);
+	tarzan_decrypt_sprites(max_size);
 
 	// Overlay rom:
 
 	const int rom_size = 0x80000;
-	u8 *rom = memregion("sprites")->base() + 0x200000;
+	u8 *rom = memregion("sprites")->base() + max_size;
 	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
 
 	// address lines swap

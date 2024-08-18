@@ -68,7 +68,7 @@ public:
 	void lhzb2_decrypt_sprites();
 	void tarzan_decrypt_sprites(size_t max_size);
 	void spkrform_decrypt_sprites();
-	void starzan_decrypt_sprites();
+	void starzan_decrypt_sprites(size_t max_size);
 	void tjsb_decrypt_sprites();
 
 
