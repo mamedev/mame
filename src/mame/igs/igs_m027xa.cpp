@@ -66,7 +66,7 @@ private:
 	void igs_70000100_w(u32 data);
 	u32 m_igs_70000100 = 0;
 
-	u32 rand_r()
+	u32 rnd_r()
 	{
 		return machine().rand();
 	}
@@ -104,7 +104,7 @@ void igs_m027xa_state::igs_mahjong_map(address_map &map)
 	map(0x18000000, 0x18007fff).ram();
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
-	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027xa_state::rand_r));
+	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027xa_state::rnd_r));
 
 	map(0x58000000, 0x580000ff).ram(); // XA?
 
