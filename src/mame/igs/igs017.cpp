@@ -22,6 +22,7 @@ Year + Game                                   PCB        CPU    Sound           
 98  Long Hu Zhengba 2 (set 1)                 NO-0206    68000  K668            IGS031 IGS025 IGS022* Battery
 98  Shuang Long Qiang Zhu 2 VS (VS203J)       NO-0207    68000  K668            IGS031 IGS025 IGS022  Battery
 98  Manguan Caishen (V103CS)                  NO-0192-1  68000  K668            IGS017 IGS025 IGS029  Battery
+98  Manguan Caishen (V106CS)                  NO-0208    68000  M6295           IGS031 IGS025 IGS029  Battery
 99  Tarzan (V107)                             NO-0228?   Z180   U6295           IGS031 IGS025 IGS029  Battery
 99  Tarzan (V109C)                            NO-0248-1  Z180   U6295           IGS031 IGS025         Battery
 00  Chaoji Damanguan 2 - Jiaqiang Ban (V100C) NO-0271    68000  K668            IGS031 IGS025         Battery
@@ -644,6 +645,7 @@ public:
 	void lhzb2(machine_config &config);
 	void lhzb2a(machine_config &config);
 	void mgcs(machine_config &config);
+	void mgcsa(machine_config &config);
 	void mgdh(machine_config &config);
 	void mgdha(machine_config &config);
 	void sdmg2(machine_config &config);
@@ -657,6 +659,7 @@ public:
 	void init_lhzb2();
 	void init_lhzb2a();
 	void init_mgcs();
+	void init_mgcsa();
 	void init_mgdh();
 	void init_mgdha();
 	void init_sdmg2();
@@ -832,6 +835,7 @@ private:
 	void decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0);
 
 	void mgcs_decrypt_program_rom();
+	void mgcsa_decrypt_program_rom();
 	void mgcs_igs029_run();
 	void starzan_decrypt_program_rom();
 	void tarzan_decrypt_program_rom();
@@ -866,6 +870,7 @@ private:
 	void lhzb2a_mux_map(address_map &map);
 	void mgcs_map(address_map &map);
 	void mgcs_mux_map(address_map &map);
+	void mgcsa_map(address_map &map);
 	void mgdh_mux_map(address_map &map);
 	void mgdh_map(address_map &map);
 	void mgdha_mux_map(address_map &map);
@@ -1097,6 +1102,50 @@ void igs017_state::mgcs_decrypt_program_rom()
 	}
 }
 
+void igs017_state::mgcsa_decrypt_program_rom()
+{
+	const int rom_size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = rom[i];
+
+		if (i & 0x20 / 2)
+		{
+			if (i & 0x02 / 2)
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if (!(i & 0x4000 / 2))
+		{
+			if (!(i & 0x300 / 2))
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if (!(i & 0x1000 / 2) && !(i & 0x100 / 2))
+		{
+			if (!(i & 0x20 / 2))
+			{
+				x ^= 0x0100;
+			}
+		}
+		else if (i & 0x1000 / 2)
+		{
+			if ((!(i & 0x100 / 2)) || ((i & 0x20 / 2) && (!(i & 0x400 / 2))))
+			{
+				x ^= 0x0100;
+			}
+		}
+
+		rom[i] = x;
+	}
+}
+
 
 #if 0
 void igs017_state::mgcs_patch_rom()
@@ -1121,6 +1170,14 @@ void igs017_state::init_mgcs()
 	m_igs017_igs031->mgcs_flip_sprites();
 
 //  m_igs_string->dump("mgcs_string.key", 0x1424, 0x1338, true);
+}
+
+void igs017_state::init_mgcsa()
+{
+	mgcsa_decrypt_program_rom();
+
+	m_igs017_igs031->mgcs_decrypt_tiles();
+	m_igs017_igs031->mgcs_flip_sprites();
 }
 
 
@@ -2308,6 +2365,20 @@ void igs017_state::mgcs_mux_map(address_map &map)
 	map(0x03, 0x03).w(FUNC(igs017_state::mgcs_igs029_data_w));
 
 	igs_string_mux_map(map); // 0x05 r, 0x20 - 0x27 w, 0x40 r
+}
+
+void igs017_state::mgcsa_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x103fff).ram();
+
+	map(0x49c000, 0x49c001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
+	map(0x49c002, 0x49c003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
+
+	map(0x900000, 0x90ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
+
+	map(0x912001, 0x912001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	// oki banking through protection (code at $1a350)
 }
 
 
@@ -4615,6 +4686,13 @@ void igs017_state::mgcs(machine_config &config)
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::mgcs_palette_bitswap));
 }
 
+void igs017_state::mgcsa(machine_config &config)
+{
+	mgcs(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::mgcsa_map);
+}
+
 
 // lhzb2
 
@@ -5116,6 +5194,61 @@ ROM_START( mgcs )
 
 	ROM_REGION( 0xec, "igs_string", 0 )
 	ROM_LOAD( "mgcs_string.key", 0x00, 0xec, CRC(6cdadd19) SHA1(c2b4ced5d45d0af1ddeeabd0e352fd5383995d32) )
+ROM_END
+
+/*********************************************************************************
+
+Man Guan Cai Shen, IGS 1998
+
+PCB Layout
+----------
+
+IGS PCB NO- 0208
+|-----------------------------------------|
+|          JAMMA              VOL TDA1020 |
+|1   F521(x25)             7805           |
+|8           S1502.U12     M6295          |
+|W             22MHz             M1503.U22|
+|A       LM2933                           |
+|Y                                        |
+|                                         |
+|IGS029                                   |
+|     8MHz        IGS031                  |
+|                                M1501.U21|
+|                                         |
+|                              27C4096.U24|
+|             61256                       |
+|1   IGS025             68000       6264  |
+|0            PAL                         |
+|W            PAL                         |
+|A   SW1      PAL                         |
+|Y   SW2                    SW3     T518B |
+|-----------------------------------------|
+Notes:
+      68000 - Clock 11.000MHz [22/2]
+      M6295 - Clock 1.000MHz [22/22]
+      SW1/2 - 8-Position DIP Switch
+        SW3 - Reset / NVRAM Clear
+       6264 - 8kBx8-bit SRAM
+      61256 - 32kBx8-bit SRAM
+
+*********************************************************************************/
+
+ROM_START( mgcsa )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "27c4096.u24", 0x00000, 0x80000, CRC(c41b7530) SHA1(1f9f821658c50b84b2e8cce97ffea8349fdae54f) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "m1501.u21", 0x000000, 0x400000, CRC(96fce058) SHA1(6b87f47d646bad9b3061bdc8a9af65467fdbbc9f) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "m1503.u22", 0x00000, 0x80000, CRC(a37f9613) SHA1(812f060ca98a34540c48a180c359c3d0f1c0b5bb) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s1502.u12", 0x00000, 0x80000, CRC(a8a6ba58) SHA1(59276a8ab4a31812600816c2a43b74bd71394419) )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "mgcs_string.key", 0x00, 0xec, BAD_DUMP CRC(6cdadd19) SHA1(c2b4ced5d45d0af1ddeeabd0e352fd5383995d32) ) // TODO: seems the same as the parent, but double-check
 ROM_END
 
 /***************************************************************************
@@ -5782,6 +5915,7 @@ GAME ( 1998,  genius6,  0,        genius6,  genius6,  igs017_state, init_iqblock
 GAME ( 1997,  genius6a, genius6,  genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS", "Genius 6 (V133F)",                                                  0 ) // clone because it has older copyright year
 GAME ( 1997,  genius6b, genius6,  genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS", "Genius 6 (V132F)",                                                  0 ) // "
 GAME ( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, init_mgcs,     ROT0, "IGS", "Manguan Caishen (China, V103CS)",                                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
+GAME ( 1998,  mgcsa,    mgcs,     mgcsa,    mgcs,     igs017_state, init_mgcsa,    ROT0, "IGS", "Manguan Caishen (China, V106CS)",                                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
 GAME ( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, init_lhzb2,    ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                  MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
 GAME ( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, init_lhzb2a,   ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                 0 ) // 龙虎争霸2
 GAME ( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, init_slqz2,    ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",                        MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
