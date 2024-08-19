@@ -58,6 +58,7 @@ private:
 	void update_counter();
 	void update_mp3_decode_state();
 
+	uint16_t decrypt_common(uint16_t data, uint16_t key);
 	uint16_t decrypt_default(uint16_t data);
 	uint16_t decrypt_ddrsbm(uint16_t data);
 
