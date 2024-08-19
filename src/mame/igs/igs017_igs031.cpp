@@ -521,9 +521,15 @@ void igs017_igs031_device::sdwx_gfx_decrypt()
 }
 
 
-void igs017_igs031_device::mgcs_flip_sprites()
+void igs017_igs031_device::mgcs_flip_sprites(size_t max_size)
 {
-	const int rom_size = memregion("sprites")->bytes();
+	int rom_size;
+
+	if (max_size == 0)
+		rom_size = memregion("sprites")->bytes();
+	else
+		rom_size = max_size;
+
 	u8 * const rom = memregion("sprites")->base();
 
 	for (int i = 0; i < rom_size; i+=2)
@@ -566,7 +572,7 @@ void igs017_igs031_device::tjsb_decrypt_sprites()
 
 void igs017_igs031_device::tarzan_decrypt_sprites(size_t max_size)
 {
-	mgcs_flip_sprites();
+	mgcs_flip_sprites(max_size);
 
 	const int rom_size = max_size ? max_size : memregion("sprites")->bytes();
 	u8 *rom = memregion("sprites")->base();

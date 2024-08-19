@@ -1118,7 +1118,7 @@ void igs017_state::init_mgcs()
 //  mgcs_patch_rom();
 
 	m_igs017_igs031->mgcs_decrypt_tiles();
-	m_igs017_igs031->mgcs_flip_sprites();
+	m_igs017_igs031->mgcs_flip_sprites(0);
 
 //  m_igs_string->dump("mgcs_string.key", 0x1424, 0x1338, true);
 }
@@ -1445,7 +1445,7 @@ void igs017_state::init_mgdha()
 		rom[i] = x;
 	}
 
-	m_igs017_igs031->mgcs_flip_sprites();
+	m_igs017_igs031->mgcs_flip_sprites(0);
 
 //  m_igs_string->dump("mgdh_string.key", 0x7b214, 0x7b128, true); // mgdh, mgdha (0x7c5ba, ???)
 }

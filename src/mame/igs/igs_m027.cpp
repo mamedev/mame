@@ -1381,7 +1381,7 @@ void igs_m027_state::init_jking02()
 	jking02_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0x400000); // not 100% correect?
-	// the ROM at 0x400000 doesn't decrypt with the above?
+	// the sprite ROM at 0x400000 doesn't require decryption
 
 	m_allow_irq = false;
 }

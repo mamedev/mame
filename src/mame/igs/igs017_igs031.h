@@ -64,7 +64,7 @@ public:
 	void slqz2_decrypt_tiles();
 	void sdwx_gfx_decrypt();
 
-	void mgcs_flip_sprites();
+	void mgcs_flip_sprites(size_t max_size);
 	void lhzb2_decrypt_sprites();
 	void tarzan_decrypt_sprites(size_t max_size);
 	void spkrform_decrypt_sprites();
