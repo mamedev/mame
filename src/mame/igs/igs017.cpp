@@ -831,21 +831,11 @@ private:
 	// Decrypt
 	void decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0);
 
-	void lhzb2_decrypt_sprites();
-	void lhzb2_decrypt_tiles();
 	void mgcs_decrypt_program_rom();
-	void mgcs_decrypt_tiles();
-	void mgcs_flip_sprites();
 	void mgcs_igs029_run();
-	void slqz2_decrypt_tiles();
-	void spkrform_decrypt_sprites();
 	void starzan_decrypt_program_rom();
-	void starzan_decrypt_sprites();
 	void tarzan_decrypt_program_rom();
-	void tarzan_decrypt_sprites(size_t max_size);
-	void tarzan_decrypt_tiles(int address_xor);
 	void tarzana_decrypt_program_rom();
-	void tjsb_decrypt_sprites();
 
 	// ROM Patches
 //  void lhzb2_patch_rom();
@@ -1046,34 +1036,12 @@ void igs017_state::init_iqblocka()
 
 // tjsb
 
-void igs017_state::tjsb_decrypt_sprites()
-{
-	const int rom_size = memregion("igs017_igs031:sprites")->bytes();
-	u8 * const rom = memregion("igs017_igs031:sprites")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	// address lines swap
-	memcpy(tmp.get(), rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr = (i & ~0xff) | bitswap<8>(i,7,6,5,2,1,4,3,0);
-		rom[i] = tmp[addr];
-	}
-
-	// data lines swap
-	for (int i = 0; i < rom_size; i += 2)
-	{
-		u16 data = get_u16le(&rom[i]); // x-22222-11111-00000
-		data = bitswap<16>(data, 15, 14,13,12,11,10, 9,1,7,6,5, 4,3,2,8,0);
-		put_u16le(&rom[i], data);
-	}
-}
 
 void igs017_state::init_tjsb()
 {
 	decrypt_program_rom(0x05, 7, 6, 3, 2, 5, 4, 1, 0);
 
-	tjsb_decrypt_sprites();
+	m_igs017_igs031->tjsb_decrypt_sprites();
 
 //  m_igs_string->dump("tjsb_string.key", 0x1d24a, 0x1db4, false);
 }
@@ -1129,38 +1097,6 @@ void igs017_state::mgcs_decrypt_program_rom()
 	}
 }
 
-void igs017_state::mgcs_decrypt_tiles()
-{
-	const int rom_size = memregion("igs017_igs031:tilemaps")->bytes();
-	u8 * const rom = memregion("igs017_igs031:tilemaps")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	memcpy(&tmp[0], rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,10,6,7,8,9,5,4,3,2,1,0);
-		rom[i^1] = bitswap<8>(tmp[addr],0,1,2,3,4,5,6,7);
-	}
-}
-
-void igs017_state::mgcs_flip_sprites()
-{
-	const int rom_size = memregion("igs017_igs031:sprites")->bytes();
-	u8 * const rom = memregion("igs017_igs031:sprites")->base();
-
-	for (int i = 0; i < rom_size; i+=2)
-	{
-		u16 pixels = get_u16le(&rom[i]);
-
-		// flip bits
-		pixels = bitswap<16>(pixels,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
-
-		// flip pixels
-		pixels = bitswap<16>(pixels,15, 0,1,2,3,4, 5,6,7,8,9, 10,11,12,13,14);
-
-		put_u16le(&rom[i], pixels);
-	}
-}
 
 #if 0
 void igs017_state::mgcs_patch_rom()
@@ -1181,8 +1117,8 @@ void igs017_state::init_mgcs()
 	mgcs_decrypt_program_rom();
 //  mgcs_patch_rom();
 
-	mgcs_decrypt_tiles();
-	mgcs_flip_sprites();
+	m_igs017_igs031->mgcs_decrypt_tiles();
+	m_igs017_igs031->mgcs_flip_sprites();
 
 //  m_igs_string->dump("mgcs_string.key", 0x1424, 0x1338, true);
 }
@@ -1190,19 +1126,6 @@ void igs017_state::init_mgcs()
 
 // tarzan, tarzana
 
-void igs017_state::tarzan_decrypt_tiles(int address_xor)
-{
-	const int rom_size = memregion("igs017_igs031:tilemaps")->bytes();
-	u8 * const rom = memregion("igs017_igs031:tilemaps")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	memcpy(&tmp[0], rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr = (i & ~0xffff) | (bitswap<16>(i,15,14,13,12,11, 7,8,6,10,9, 5,4,3,2,1,0) ^ address_xor);
-		rom[i] = bitswap<8>(tmp[addr],0,1,2,3,4,5,6,7);
-	}
-}
 
 void igs017_state::tarzan_decrypt_program_rom()
 {
@@ -1238,8 +1161,8 @@ void igs017_state::tarzan_decrypt_program_rom()
 void igs017_state::init_tarzanc()
 {
 	tarzan_decrypt_program_rom();
-	tarzan_decrypt_tiles(1);
-	tarzan_decrypt_sprites(0);
+	m_igs017_igs031->tarzan_decrypt_tiles(1);
+	m_igs017_igs031->tarzan_decrypt_sprites(0);
 
 //  m_igs_string->dump("tarzan_string.key", 0xa98a, 0xab01, false); // tarzan / tarzanc (same program rom)
 }
@@ -1283,7 +1206,7 @@ void igs017_state::tarzana_decrypt_program_rom()
 void igs017_state::init_tarzan()
 {
 	tarzan_decrypt_program_rom();
-	tarzan_decrypt_tiles(0);
+	m_igs017_igs031->tarzan_decrypt_tiles(0);
 
 //  m_igs_string->dump("tarzan_string.key", 0xa98a, 0xab01, false); // tarzan / tarzanc (same program rom)
 }
@@ -1291,7 +1214,7 @@ void igs017_state::init_tarzan()
 void igs017_state::init_tarzana()
 {
 	tarzana_decrypt_program_rom();
-	tarzan_decrypt_tiles(0);
+	m_igs017_igs031->tarzan_decrypt_tiles(0);
 
 //  m_igs_string->dump("tarzana_string.key", 0xaa64, 0xabdb, false); // same data as tarzan / tarzanc
 }
@@ -1338,48 +1261,12 @@ void igs017_state::starzan_decrypt_program_rom()
 void igs017_state::init_starzan()
 {
 	starzan_decrypt_program_rom();
-	tarzan_decrypt_tiles(1);
-	starzan_decrypt_sprites();
+	m_igs017_igs031->tarzan_decrypt_tiles(1);
+	m_igs017_igs031->starzan_decrypt_sprites(0x200000);
 
 //  m_igs_string->dump("starzan_string.key", 0xa86f, 0xa966, false);
 }
 
-
-void igs017_state::tarzan_decrypt_sprites(size_t max_size)
-{
-	mgcs_flip_sprites();
-
-	const int rom_size = max_size ? max_size : memregion("igs017_igs031:sprites")->bytes();
-	u8 *rom = memregion("igs017_igs031:sprites")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	// address lines swap
-	memcpy(tmp.get(), rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13, 9,10,11,12, 5,6,7,8, 4,3,2,1,0);
-		rom[i] = tmp[addr];
-	}
-}
-
-void igs017_state::starzan_decrypt_sprites()
-{
-	tarzan_decrypt_sprites(0x200000);
-
-	// Overlay rom:
-
-	const int rom_size = 0x80000;
-	u8 *rom = memregion("igs017_igs031:sprites")->base() + 0x200000;
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	// address lines swap
-	memcpy(tmp.get(), rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,10,9,  6,5, 8,7, 1,2,3,4, 0);
-		rom[i] = tmp[addr];
-	}
-}
 
 void igs017_state::init_happyskl()
 {
@@ -1416,8 +1303,8 @@ void igs017_state::init_happyskl()
 		rom[i] = x;
 	}
 
-	tarzan_decrypt_tiles(1);
-	starzan_decrypt_sprites();
+	m_igs017_igs031->tarzan_decrypt_tiles(1);
+	m_igs017_igs031->starzan_decrypt_sprites(0x200000);
 }
 
 
@@ -1441,8 +1328,8 @@ void igs017_state::init_cpoker2()
 		rom[i] = x;
 	}
 
-	tarzan_decrypt_tiles(1);
-	tarzan_decrypt_sprites(0);
+	m_igs017_igs031->tarzan_decrypt_tiles(1);
+	m_igs017_igs031->tarzan_decrypt_sprites(0);
 }
 
 
@@ -1558,7 +1445,7 @@ void igs017_state::init_mgdha()
 		rom[i] = x;
 	}
 
-	mgcs_flip_sprites();
+	m_igs017_igs031->mgcs_flip_sprites();
 
 //  m_igs_string->dump("mgdh_string.key", 0x7b214, 0x7b128, true); // mgdh, mgdha (0x7c5ba, ???)
 }
@@ -1593,43 +1480,6 @@ void igs017_state::lhzb2_patch_rom()
 	rom[0x0b48a/2] = 0x604e; // 00B48A: 674E    beq $b4da
 }
 #endif
-
-void igs017_state::lhzb2_decrypt_tiles()
-{
-	const int rom_size = memregion("igs017_igs031:tilemaps")->bytes();
-	u8 * const rom = memregion("igs017_igs031:tilemaps")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	memcpy(&tmp[0], rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr = (i & ~0xffffff) | bitswap<24>(i,23,22,21,20,19,18,17,1,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
-		rom[i] = tmp[addr];
-	}
-}
-
-void igs017_state::lhzb2_decrypt_sprites()
-{
-	const int rom_size = memregion("igs017_igs031:sprites")->bytes();
-	u8 * const rom = memregion("igs017_igs031:sprites")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	// address lines swap
-	memcpy(tmp.get(), rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,6,7,10,9,8,11,12,5,4,3,2,1,0);
-		rom[i] = tmp[addr];
-	}
-
-	// data lines swap
-	for (int i = 0; i < rom_size; i+=2)
-	{
-		u16 data = get_u16le(&rom[i]); // x-22222-11111-00000
-		data = bitswap<16>(data, 15, 7,6,5,4,3, 2,1,0,14,13, 12,11,10,9,8);
-		put_u16le(&rom[i], data);
-	}
-}
 
 void igs017_state::init_lhzb2()
 {
@@ -1714,8 +1564,8 @@ void igs017_state::init_lhzb2()
 		rom[i] = x;
 	}
 
-	lhzb2_decrypt_tiles();
-	lhzb2_decrypt_sprites();
+	m_igs017_igs031->lhzb2_decrypt_tiles();
+	m_igs017_igs031->lhzb2_decrypt_sprites();
 
 //  lhzb2_patch_rom();
 
@@ -1780,8 +1630,8 @@ void igs017_state::init_lhzb2a()
 		rom[i] = x;
 	}
 
-	lhzb2_decrypt_tiles();
-	lhzb2_decrypt_sprites();
+	m_igs017_igs031->lhzb2_decrypt_tiles();
+	m_igs017_igs031->lhzb2_decrypt_sprites();
 
 //  m_igs_string->dump("lhzb2a_string.key", 0x6e11c, 0x6e030, true); // same data as lhzb2
 }
@@ -1801,20 +1651,6 @@ void igs017_state::slqz2_patch_rom()
 	rom[0x0b77a/2] = 0x604e; // 00B77A: 674E    beq $b7ca
 }
 #endif
-
-void igs017_state::slqz2_decrypt_tiles()
-{
-	const int rom_size = memregion("igs017_igs031:tilemaps")->bytes();
-	u8 * const rom = memregion("igs017_igs031:tilemaps")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	memcpy(&tmp[0], rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr = (i & ~0xff) | bitswap<8>(i,7,4,5,6,3,2,1,0);
-		rom[i] = tmp[addr];
-	}
-}
 
 void igs017_state::init_slqz2()
 {
@@ -1890,8 +1726,8 @@ void igs017_state::init_slqz2()
 		rom[i] = x;
 	}
 
-	slqz2_decrypt_tiles();
-	lhzb2_decrypt_sprites();
+	m_igs017_igs031->slqz2_decrypt_tiles();
+	m_igs017_igs031->lhzb2_decrypt_sprites();
 
 //  slqz2_patch_rom();
 
@@ -1900,26 +1736,6 @@ void igs017_state::init_slqz2()
 
 
 // spkrform
-
-void igs017_state::spkrform_decrypt_sprites()
-{
-	const int rom_size = memregion("igs017_igs031:sprites")->bytes();
-	u8 * const rom = memregion("igs017_igs031:sprites")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	// address lines swap
-	memcpy(tmp.get(), rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr;
-		if (i & 0x80000)
-			addr = (i & ~0xff) | bitswap<8>(i,7,6,3,4,5,2,1,0);
-		else
-			addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,10, 4, 8,7,6,5, 9,3,2,1,0);
-
-		rom[i] = tmp[addr];
-	}
-}
 
 void igs017_state::spkrform_patch_rom()
 {
@@ -1933,7 +1749,7 @@ void igs017_state::init_spkrform()
 {
 	decrypt_program_rom(0x14, 7, 6, 5, 4, 3, 0, 1, 2);
 
-	spkrform_decrypt_sprites();
+	m_igs017_igs031->spkrform_decrypt_sprites();
 
 	spkrform_patch_rom();
 

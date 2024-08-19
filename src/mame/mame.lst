@@ -20219,15 +20219,9 @@ amazoni2                        // (c) 2002
 amazonia                        // (c) 1999
 amazonkp                        // (c) 1999
 chessc2                         // (c) 200?
-crzybugs                        // (c) 2009
-crzybugsa                       // (c) 2006
-crzybugsb                       // (c) 2005
-crzybugsj                       // (c) 2007
 extradrw                        // (c) 200?
 fruitpar                        // (c) 200?
 gonefsh2                        // (c) 200?
-haunthig                        // (c) 2008
-haunthiga                       // (c) 2006
 jking02                         // (c) 200?
 klxyj                           // (c) 200?
 lhdmg                           // (c) 1999
@@ -20247,9 +20241,17 @@ qlgs                            // (c) 1999
 sddz                            // (c) 200?
 sdwx                            // (c) 2002
 slqz3                           // (c) 1999
+zhongguo                        // (c) 2000
+
+@source:igs/igs_m027xa.cpp
+crzybugs                        // (c) 2009
+crzybugsa                       // (c) 2006
+crzybugsb                       // (c) 2005
+crzybugsj                       // (c) 2007
+haunthig                        // (c) 2008
+haunthiga                       // (c) 2006
 tripfev                         // (c) 2006
 wldfruit                        // (c) 200?
-zhongguo                        // (c) 2000
 
 @source:igs/igs_m036.cpp
 cjddzsp                         // (c) 200?
