@@ -391,7 +391,7 @@ ROM_START( vcca )
 	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
 ROM_END
 
-ROM_START( avvc )
+ROM_START( avcc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-64017", 0x0000, 0x2000, CRC(f1133abf) SHA1(09dd85051c4e7d364d43507c1cfea5c2d08d37f4) ) // MOS // 101-64017 // 3880
 	ROM_LOAD("101-32010", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) ) // NEC P9Z021 // D2332C 228 // 101-32010, == cn19175n_vcc3 on vcc
@@ -429,4 +429,4 @@ ROM_END
 SYST( 1979, vcc,  0,      0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (set 1)", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, vcca, vcc,    0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger (set 2)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, avvc, vcc,    0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, avcc, vcc,    0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger", MACHINE_SUPPORTS_SAVE )
