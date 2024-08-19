@@ -27,6 +27,7 @@
 
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 
 #include "screen.h"
 
@@ -41,8 +42,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppi(*this, "ppi8255"),
 		m_igs017_igs031(*this, "igs017_igs031"),
-		m_screen(*this, "screen"),
-		m_allow_irq(true)
+		m_screen(*this, "screen")
 	{ }
 
 	void igs_mahjong(machine_config &config);
@@ -85,12 +85,10 @@ private:
 		return 0xffffffff;
 	}
 
-	void vblank_irq(int state);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void pgm_create_dummy_internal_arm_region();
 	void igs_mahjong_map(address_map &map);
-
-	bool m_allow_irq;
 };
 
 void igs_m027_state::video_start()
@@ -209,7 +207,7 @@ static INPUT_PORTS_START( jking02 )
 	PORT_DIPNAME( 0x10, 0x00, "Background Type" )
 	PORT_DIPSETTING(    0x10, "Casino Style" )
 	PORT_DIPSETTING(    0x00, "Jungle Style" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) // also Background Type?
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
@@ -315,24 +313,21 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-void igs_m027_state::vblank_irq(int state)
+TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_state::interrupt)
 {
-	// hack for now
-	if (state)
-	{
-		if (m_screen->frame_number() & 1)
-			m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
-		else
-		{
-			if (m_allow_irq)
-				m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // qlgs needs this, but there's no XA on these PCBs, where is it from? causes coin error in jking02 for now
-		}
-	}
+	int scanline = param;
+
+	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // source?
+
+	if (scanline == 0 && m_igs017_igs031->get_nmi_enable())
+		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
 }
+
 
 void igs_m027_state::igs_mahjong(machine_config &config)
 {
-	ARM7(config, m_maincpu, 20000000);
+	ARM7(config, m_maincpu, 22000000/2); // Jungle King 2002 has a 22Mhz Xtal, what about the others?
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_mahjong_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -344,7 +339,8 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
 	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
 	m_screen->set_palette("igs017_igs031:palette");
-	m_screen->screen_vblank().set(FUNC(igs_m027_state::vblank_irq));
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027_state::interrupt), "screen", 0, 1);
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pa_callback().set_ioport("TEST0");
@@ -1382,8 +1378,6 @@ void igs_m027_state::init_jking02()
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0x400000); // not 100% correect?
 	// the sprite ROM at 0x400000 doesn't require decryption
-
-	m_allow_irq = false;
 }
 
 void igs_m027_state::init_lthy()
