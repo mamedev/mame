@@ -554,6 +554,7 @@ void kn5000_state::cpanel_leds_w(offs_t offset, uint8_t data)
 				break;
 
 			case 0xc3:
+				// FIXME: bits 2 and 3 used twice
 				m_CPL_LED[25] = BIT(data, 0); // D125 - VARIATION & MSA 1
 				m_CPL_LED[26] = BIT(data, 1); // D126 - VARIATION & MSA 2
 				m_CPL_LED[27] = BIT(data, 2); // D127 - VARIATION & MSA 3
@@ -759,8 +760,17 @@ void kn5000_state::kn5000(machine_config &config)
 }
 
 ROM_START(kn5000)
-	ROM_REGION16_LE(0x200000, "program" , 0) // main cpu
 	ROM_DEFAULT_BIOS("v10")
+	ROM_SYSTEM_BIOS(0, "v10", "Version 10 - August 2nd, 1999")
+	ROM_SYSTEM_BIOS(1, "v9", "Version 9 - January 26th, 1999")
+	ROM_SYSTEM_BIOS(2, "v8", "Version 8 - November 13th, 1998")
+	ROM_SYSTEM_BIOS(3, "v7", "Version 7 - June 26th, 1998")
+	ROM_SYSTEM_BIOS(4, "v6", "Version 6 - January 16th, 1998") // sometimes refered to as "update6v0"
+	ROM_SYSTEM_BIOS(5, "v5", "Version 5 - November 12th, 1997") // sometimes refered to as "update5v0"
+	ROM_SYSTEM_BIOS(6, "v4", "Version 4") // I have a v4 board but haven't dumped it yet
+	ROM_SYSTEM_BIOS(7, "v3", "Version 3") // I have a v3 board but haven't dumped it yet
+
+	ROM_REGION16_LE(0x200000, "program" , 0) // main cpu
 
 	// FIXME: These are actually stored in a couple flash rom chips IC6 (even) and IC4 (odd)
 	//
@@ -773,29 +783,14 @@ ROM_START(kn5000)
 	//       More info at:
 	//       https://github.com/felipesanches/kn5000_homebrew/blob/main/kn5000_extract.py
 
-	ROM_SYSTEM_BIOS(0, "v10", "Version 10 - August 2nd, 1999")
 	ROMX_LOAD("kn5000_v10_program.rom", 0x00000, 0x200000, CRC(00303406) SHA1(1f2abc5b1b7b9e16fdf796f26d939edaceded354), ROM_BIOS(0))
-
-	ROM_SYSTEM_BIOS(1, "v9", "Version 9 - January 26th, 1999")
-	ROMX_LOAD("kn5000_v9_program.rom", 0x00000, 0x200000, CRC(c791d765) SHA1(d9a3b462b1f9302402e8d37aacd15f069f56abd9), ROM_BIOS(1))
-
-	ROM_SYSTEM_BIOS(2, "v8", "Version 8 - November 13th, 1998")
-	ROMX_LOAD("kn5000_v8_program.rom", 0x00000, 0x200000, CRC(46b4b242) SHA1(a10a6f5a35175b74c3cfb42cef3bdf571c2858bb), ROM_BIOS(2))
-
-	ROM_SYSTEM_BIOS(3, "v7", "Version 7 - June 26th, 1998")
-	ROMX_LOAD("kn5000_v7_program.rom", 0x00000, 0x200000, CRC(a5a25eb0) SHA1(4c682cb248034a2de04c688b0a45654b8726bffb), ROM_BIOS(3))
-
-	ROM_SYSTEM_BIOS(4, "v6", "Version 6 - January 16th, 1998") // sometimes refered to as "update6v0"
-	ROMX_LOAD("kn5000_v6_program.rom", 0x00000, 0x200000, CRC(0205db30) SHA1(51108e2d75b180a034395e90bd40ca2bd2a0adfb), ROM_BIOS(4))
-
-	ROM_SYSTEM_BIOS(5, "v5", "Version 5 - November 12th, 1997") // sometimes refered to as "update5v0"
-	ROMX_LOAD("kn5000_v5_program.rom", 0x00000, 0x200000, CRC(fbd035e3) SHA1(7b69a8aaa84ee3d337acc0c29c34154c5da2df32), ROM_BIOS(5))
-
-	ROM_SYSTEM_BIOS(6, "v4", "Version 4") // I have a v4 board but haven't dumped it yet
-	ROMX_LOAD("kn5000_v4_program.rom", 0x00000, 0x200000, NO_DUMP, ROM_BIOS(6))
-
-	ROM_SYSTEM_BIOS(7, "v3", "Version 3") // I have a v3 board but haven't dumped it yet
-	ROMX_LOAD("kn5000_v3_program.rom", 0x00000, 0x200000, NO_DUMP, ROM_BIOS(7))
+	ROMX_LOAD("kn5000_v9_program.rom",  0x00000, 0x200000, CRC(c791d765) SHA1(d9a3b462b1f9302402e8d37aacd15f069f56abd9), ROM_BIOS(1))
+	ROMX_LOAD("kn5000_v8_program.rom",  0x00000, 0x200000, CRC(46b4b242) SHA1(a10a6f5a35175b74c3cfb42cef3bdf571c2858bb), ROM_BIOS(2))
+	ROMX_LOAD("kn5000_v7_program.rom",  0x00000, 0x200000, CRC(a5a25eb0) SHA1(4c682cb248034a2de04c688b0a45654b8726bffb), ROM_BIOS(3))
+	ROMX_LOAD("kn5000_v6_program.rom",  0x00000, 0x200000, CRC(0205db30) SHA1(51108e2d75b180a034395e90bd40ca2bd2a0adfb), ROM_BIOS(4))
+	ROMX_LOAD("kn5000_v5_program.rom",  0x00000, 0x200000, CRC(fbd035e3) SHA1(7b69a8aaa84ee3d337acc0c29c34154c5da2df32), ROM_BIOS(5))
+	ROMX_LOAD("kn5000_v4_program.rom",  0x00000, 0x200000, NO_DUMP, ROM_BIOS(6))
+	ROMX_LOAD("kn5000_v3_program.rom",  0x00000, 0x200000, NO_DUMP, ROM_BIOS(7))
 
 	// Note: I've never seen boards with versions 1 or 2.
 
@@ -822,7 +817,7 @@ ROM_START(kn5000)
 
 	ROM_REGION16_LE(0x200000, "table_data", 0)
 	ROM_LOAD16_BYTE("kn5000_table_data_rom_even.ic3", 0x000000, 0x100000, NO_DUMP)
-	ROM_LOAD16_BYTE("kn5000_table_data_rom_odd.ic1", 0x000001, 0x100000, CRC(cd907eac) SHA1(bedf09d606d476f3e6d03e590709715304cf7ea5))
+	ROM_LOAD16_BYTE("kn5000_table_data_rom_odd.ic1",  0x000001, 0x100000, CRC(cd907eac) SHA1(bedf09d606d476f3e6d03e590709715304cf7ea5))
 
 	ROM_REGION16_LE(0x100000, "custom_data", 0)
 	ROM_LOAD("kn5000_custom_data_rom.ic19", 0x000000, 0x100000, CRC(5de11a6b) SHA1(4709f815d3d03ce749c51f4af78c62bf4a5e3d94))

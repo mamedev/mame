@@ -1561,7 +1561,7 @@ if (MACHINES["1MB5"]~=null) then
 end
 
 ---------------------------------------------------
---@src/devices/machine/i2cmem.h,MACHINES["I2CHLE"] = true
+--@src/devices/machine/i2chle.h,MACHINES["I2CHLE"] = true
 ---------------------------------------------------
 
 if (MACHINES["I2CHLE"]~=null) then
