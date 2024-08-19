@@ -189,7 +189,7 @@ ROM_START( haunthig )
 	ROM_LOAD( "hauntedhouse.u17", 0x000000, 0x10000, BAD_DUMP CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // not dumped for this set
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "haunted-h_text.u15", 0x000000, 0x80000, CRC(c23f48c8) SHA1(0cb1b6c61611a081ae4a3c0be51812045ff632fe) )
+	ROM_LOAD16_WORD_SWAP( "haunted-h_text.u15", 0x000000, 0x80000, CRC(c23f48c8) SHA1(0cb1b6c61611a081ae4a3c0be51812045ff632fe) )
 
 	// are these PGM-like sprites?
 	ROM_REGION( 0x800000, "igs017_igs031:sprites", 0 )
@@ -216,7 +216,7 @@ ROM_START( haunthiga ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, O
 	ROM_LOAD( "hauntedhouse.u17", 0x000000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // MX10EXAQC (80C51 XA based MCU) marked J9, not read protected?
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "haunted-h_text.u15", 0x000000, 0x80000, CRC(c23f48c8) SHA1(0cb1b6c61611a081ae4a3c0be51812045ff632fe) )
+	ROM_LOAD16_WORD_SWAP( "haunted-h_text.u15", 0x000000, 0x80000, CRC(c23f48c8) SHA1(0cb1b6c61611a081ae4a3c0be51812045ff632fe) )
 
 	// are these PGM-like sprites?
 	ROM_REGION( 0x800000, "igs017_igs031:sprites", 0 )
@@ -243,7 +243,7 @@ ROM_START( crzybugs ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) )
+	ROM_LOAD16_WORD_SWAP( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) )
 
 	// are these PGM-like sprites?
 	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
@@ -266,7 +266,7 @@ ROM_START( crzybugsa )
 	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) ) // M27C4002
+	ROM_LOAD16_WORD_SWAP( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) ) // M27C4002
 
 	// are these PGM-like sprites?
 	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
@@ -289,7 +289,7 @@ ROM_START( crzybugsb )
 	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, BAD_DUMP CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) ) // not dumped for this set
+	ROM_LOAD16_WORD_SWAP( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, BAD_DUMP CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) ) // not dumped for this set
 
 	// are these PGM-like sprites?
 	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
@@ -312,7 +312,7 @@ ROM_START( crzybugsj ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, O
 	ROM_LOAD( "e9.u17", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // MX10EXAQC (80C51 XA based MCU) marked E9, same as haunthig
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "crazy_bugs_text_u15.u15", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) )
+	ROM_LOAD16_WORD_SWAP( "crazy_bugs_text_u15.u15", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) )
 	// u14 not populated
 
 	// are these PGM-like sprites?
@@ -340,7 +340,7 @@ ROM_START( tripfev ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Oki
 	ROM_LOAD( "p7.u27", 0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "triple_fever_u10_text.u10", 0x000000, 0x80000, CRC(522a1030) SHA1(9a7a5ba9b26bceb0d251be6139c10e4655fc19ec) ) // M27C4002
+	ROM_LOAD16_WORD_SWAP( "triple_fever_u10_text.u10", 0x000000, 0x80000, CRC(522a1030) SHA1(9a7a5ba9b26bceb0d251be6139c10e4655fc19ec) ) // M27C4002
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "triple_fever_u19_cg.u19",  0x000000, 0x400000, CRC(cd45bbf2) SHA1(7f1cf270245bbe4604de2cacade279ab13584dbd) ) // M27C322, FIXED BITS (xxxxxxx0xxxxxxxx)
@@ -362,7 +362,7 @@ ROM_START( wldfruit ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "wild_fruit_text.u10", 0x000000, 0x80000, CRC(d6f0fd58) SHA1(5ddae5d4df53504dbb2e0fe9f7caea961c961ef8) ) // 27C4096
+	ROM_LOAD16_WORD_SWAP( "wild_fruit_text.u10", 0x000000, 0x80000, CRC(d6f0fd58) SHA1(5ddae5d4df53504dbb2e0fe9f7caea961c961ef8) ) // 27C4096
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "wild_fruit_cg.u19",  0x000000, 0x400000, CRC(119686a8) SHA1(22583c1a1018cfdd20f0ef696d91fa1f6e01ab00) ) // M27C322, FIXED BITS (xxxxxxx0xxxxxxxx)
