@@ -1854,7 +1854,7 @@ void mgzz_decrypt(running_machine &machine)
 		IGS27_CRYPT3_ALT2
 		IGS27_CRYPT4
 		IGS27_CRYPT5_ALT
-		IGS27_CRYPT6
+		IGS27_CRYPT6_ALT
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
@@ -1944,7 +1944,7 @@ void qlgs_decrypt(running_machine &machine)
 
 		// may need corrected
 		IGS27_CRYPT1_ALT
-		IGS27_CRYPT2_ALT3
+		IGS27_CRYPT2_ALT
 		IGS27_CRYPT3
 		IGS27_CRYPT4
 		IGS27_CRYPT5 // correct
