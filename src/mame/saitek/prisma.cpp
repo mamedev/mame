@@ -31,7 +31,7 @@ TODO:
 
 #include "cpu/h8/h8325.h"
 #include "machine/sensorboard.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
 #include "video/pwm.h"
 #include "video/sed1500.h"
 
@@ -74,7 +74,7 @@ private:
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<sed1502_device> m_lcd;
-	required_device<speaker_sound_device> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<4> m_inputs;
 	output_finder<16, 34> m_out_lcd;
 
@@ -180,7 +180,7 @@ void prisma_state::p1_w(u8 data)
 	update_leds();
 
 	// P14: speaker out
-	m_dac->level_w(BIT(data, 4));
+	m_dac->write(BIT(data, 4));
 
 	// P16: ext power (no need to emulate it)
 }
@@ -350,7 +350,7 @@ void prisma_state::prisma(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 

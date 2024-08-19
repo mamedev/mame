@@ -14,13 +14,15 @@ It was planned to be called "Bobby", pending Bobby Fischer's approval. Although
 the program was stronger than most other chess computers at the time, Fischer
 declined the idea after trying out the prototype.
 
-Commodore also licensed Chessmate to Novag, and they released it as the MK II.
-The hardware is almost identical and the software is the same(identical ROM labels).
-Two designs were made, one jukebox shape, and one brick shape. The one in MAME came
-from the jukebox, but both models have the same ROMs.
+Commodore also licensed the Chessmate program to Novag, and they released it as
+Chess Champion: MK II. The hardware is almost identical and the software is the
+same (identical ROM labels). Two designs were made, one jukebox shape, and one
+brick shape. The one in MAME came from the jukebox, but both have the same ROMs.
 
 Note that like MK I, although it is a Winkler/Auge production, it doesn't involve
 SciSys company. SciSys was founded by Winkler after MK II.
+
+TEC Schachcomputer from 1981 is also assumed to have the same ROMs.
 
 ================================================================================
 
@@ -323,5 +325,5 @@ ROM_END
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1978, chmate, 0,      0,      chmate,  chmate, chmate_state, empty_init, "Commodore", "Chessmate", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1979, ccmk2,  chmate, 0,      mk2,     mk2,    chmate_state, empty_init, "Commodore / Novag Industries", "Chess Champion: MK II (set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1979, ccmk2a, chmate, 0,      mk2a,    mk2a,   chmate_state, empty_init, "Commodore / Novag Industries", "Chess Champion: MK II (set 2)", MACHINE_SUPPORTS_SAVE ) // 1st version (jukebox model), aka version B
+SYST( 1979, ccmk2,  chmate, 0,      mk2,     mk2,    chmate_state, empty_init, "Novag Industries / Commodore", "Chess Champion: MK II (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, ccmk2a, chmate, 0,      mk2a,    mk2a,   chmate_state, empty_init, "Novag Industries / Commodore", "Chess Champion: MK II (set 2)", MACHINE_SUPPORTS_SAVE ) // 1st version (jukebox model), aka version B

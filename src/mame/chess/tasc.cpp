@@ -60,7 +60,7 @@ BTANB:
 #include "machine/ram.h"
 #include "machine/smartboard.h"
 #include "machine/timer.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
 #include "video/t6963c.h"
 
 #include "speaker.h"
@@ -82,7 +82,7 @@ public:
 		m_nvram(*this, "nvram", 0x20000, ENDIANNESS_LITTLE),
 		m_lcd(*this, "lcd"),
 		m_smartboard(*this, "smartboard"),
-		m_speaker(*this, "speaker"),
+		m_dac(*this, "dac"),
 		m_disable_bootrom(*this, "disable_bootrom"),
 		m_inputs(*this, "IN.%u", 0U),
 		m_out_leds(*this, "pled%u", 0U)
@@ -105,7 +105,7 @@ private:
 	memory_share_creator<u8> m_nvram;
 	required_device<lm24014h_device> m_lcd;
 	required_device<tasc_sb30_device> m_smartboard;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<dac_2bit_ones_complement_device> m_dac;
 	required_device<timer_device> m_disable_bootrom;
 	required_ioport_array<4> m_inputs;
 	output_finder<2> m_out_leds;
@@ -212,7 +212,7 @@ void tasc_state::control_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 		m_out_leds[0] = BIT(data, 0);
 		m_out_leds[1] = BIT(data, 1);
-		m_speaker->level_w((data >> 2) & 3);
+		m_dac->write((data >> 2) & 3);
 	}
 
 	COMBINE_DATA(&m_control);
@@ -326,10 +326,8 @@ void tasc_state::tasc(machine_config &config)
 	config.set_default_layout(layout_tascr30);
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-	m_speaker->set_levels(4, speaker_levels);
+	SPEAKER(config, "speaker").front_center();
+	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }
 
 
