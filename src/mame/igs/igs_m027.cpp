@@ -867,7 +867,7 @@ ROM_END
 ROM_START( mgzz ) // IGS PCB 0295-00 (IGS027A, M6295, IGS031, 8255, Battery)
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "mgzz_027a.bin", 0x00000, 0x4000, CRC(4b270edb) SHA1(3b4821f7cb785056809c121e6508348df123bfa1) ) // unknown sticker
+	ROM_LOAD( "f1_027a.bin", 0x00000, 0x4000, CRC(4b270edb) SHA1(3b4821f7cb785056809c121e6508348df123bfa1) )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v-100cn.u10", 0x000000, 0x80000, CRC(278964f7) SHA1(75e48e3124d038f16f93fe3c1f63dd1568f0c018) )
@@ -1164,7 +1164,7 @@ ROM_END
 ROM_START( mgcs3 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "mgcs3_1", 0x00000, 0x4000, CRC(f40b3202) SHA1(6e2ba210afa886be9b43ed7027023d2724aaa538) ) // unknown sticker
+	ROM_LOAD( "m9_027a.bin", 0x00000, 0x4000, CRC(f40b3202) SHA1(6e2ba210afa886be9b43ed7027023d2724aaa538) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "m2401_v101cn.u17", 0x000000, 0x200000, CRC(d0d78fb6) SHA1(10a16f1ce0a89b5281822be26a2cdcc86702b188) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
