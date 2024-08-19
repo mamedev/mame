@@ -46,6 +46,7 @@ public:
 	void init_wldfruit();
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
@@ -62,7 +63,7 @@ private:
 	void igs_mahjong_map(address_map &map);
 
 	void igs_70000100_w(u32 data);
-	u32 igs_70000100;
+	u32 m_igs_70000100 = 0;
 
 	u32 rand_r()
 	{
@@ -72,6 +73,11 @@ private:
 
 
 
+void igs_m027xa_state::machine_start()
+{
+	save_item(NAME(m_igs_70000100));
+}
+
 void igs_m027xa_state::video_start()
 {
 	m_igs017_igs031->video_start();
@@ -79,7 +85,7 @@ void igs_m027xa_state::video_start()
 
 void igs_m027xa_state::igs_70000100_w(u32 data)
 {
-	igs_70000100 = data;
+	m_igs_70000100 = data;
 }
 
 
@@ -124,7 +130,7 @@ void igs_m027xa_state::vblank_irq(int state)
 	if (state)
 	{
 		// hack
-		if (igs_70000100 == 0x55) // IRQ can't be enabled during RAM check, this might not be the enable flag though
+		if (m_igs_70000100 == 0x55) // IRQ can't be enabled during RAM check, this might not be the enable flag though
 		{
 			if (m_screen->frame_number() & 1)
 				m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
