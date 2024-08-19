@@ -140,7 +140,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 
 void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 {
-	ARM7(config, m_maincpu, 20000000);
+	ARM7(config, m_maincpu, 22000000); // Crazy Bugs has a 22Mhz Xtal, what about the others?
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::igs_mahjong_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

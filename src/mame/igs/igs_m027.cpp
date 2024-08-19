@@ -326,7 +326,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_state::interrupt)
 
 void igs_m027_state::igs_mahjong(machine_config &config)
 {
-	ARM7(config, m_maincpu, 22000000/2); // Jungle King 2002 has a 22Mhz Xtal, what about the others?
+	ARM7(config, m_maincpu, 22000000); // Jungle King 2002 has a 22Mhz Xtal, what about the others?
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_mahjong_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
