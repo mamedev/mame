@@ -19,6 +19,7 @@ These games use the IGS027A processor.
 
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 
 #include "screen.h"
 
@@ -57,7 +58,7 @@ private:
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	required_device<screen_device> m_screen;
 
-	void vblank_irq(int state);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void pgm_create_dummy_internal_arm_region();
 	void igs_mahjong_map(address_map &map);
@@ -125,21 +126,17 @@ static INPUT_PORTS_START( base )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-void igs_m027xa_state::vblank_irq(int state)
+TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 {
-	if (state)
-	{
-		// hack
-		if (m_igs_70000100 == 0x55) // IRQ can't be enabled during RAM check, this might not be the enable flag though
-		{
-			if (m_screen->frame_number() & 1)
-				m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
-			else
-				m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // probably from the XA?
-		}
-	}
+	int scanline = param;
 
+	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // source? (can the XA trigger this?)
+
+	if (scanline == 0 && m_igs017_igs031->get_nmi_enable())
+		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
 }
+
 
 void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 {
@@ -157,7 +154,8 @@ void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
 	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
 	m_screen->set_palette("igs017_igs031:palette");
-	m_screen->screen_vblank().set(FUNC(igs_m027xa_state::vblank_irq));
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027xa_state::interrupt), "screen", 0, 1);
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pa_callback().set_ioport("TEST0");
