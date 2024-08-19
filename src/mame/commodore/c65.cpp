@@ -39,6 +39,10 @@ http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C64DX_aka_C65_System
 **************************************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/m6502/m4510.h"
 #include "machine/input_merger.h"
 #include "machine/mos6526.h"
@@ -294,15 +298,17 @@ public:
 		, m_cia(*this, "cia_%u", 0U)
 		, m_sid(*this, "sid_%u", 0U)
 		, m_irqs(*this, "irqs")
+		, m_nmis(*this, "nmis")
 		, m_dma(*this, "dma")
+		, m_joy(*this, "joy%u", 1U)
 		, m_cram_view(*this, "cram_view")
 		//, m_rom8_view(*this, "rom8_view")
 		//, m_roma_view(*this, "roma_view")
 		, m_romc_view(*this, "romc_view")
 		//, m_rome_view(*this, "rome_view")
-        //, m_loram_view(*this, "loram_view")
-        //, m_hiram_view(*this, "hiram_view")
-        , m_charen_view(*this, "charen_view")
+		//, m_loram_view(*this, "loram_view")
+		//, m_hiram_view(*this, "hiram_view")
+		, m_charen_view(*this, "charen_view")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_workram(*this, "work_ram", 0x20000, ENDIANNESS_LITTLE)
@@ -312,6 +318,8 @@ public:
 		, m_cram(*this, "cram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_ipl_rom(*this, "ipl")
+		, m_cart_exp(*this, "cart_exp")
+		, m_exrom_view(*this, "exrom_view")
 	{ }
 
 	void init_c65();
@@ -331,15 +339,18 @@ private:
 	required_device_array<mos6526_device, 2> m_cia;
 	required_device_array<mos6581_device, 2> m_sid;
 	required_device<input_merger_device> m_irqs;
+	required_device<input_merger_device> m_nmis;
 	required_device<dmagic_f018_device> m_dma;
+	required_device_array<vcs_control_port_device, 2> m_joy;
+
 	memory_view m_cram_view;
 	//memory_view m_rom8_view;
 	//memory_view m_roma_view;
 	memory_view m_romc_view;
 	//memory_view m_rome_view;
-    //memory_view m_loram_view;
-    //memory_view m_hiram_view;
-    memory_view m_charen_view;
+	//memory_view m_loram_view;
+	//memory_view m_hiram_view;
+	memory_view m_charen_view;
 
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -350,6 +361,8 @@ private:
 	required_shared_ptr<uint8_t> m_cram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_memory_region m_ipl_rom;
+	required_device<generic_slot_device> m_cart_exp;
+	memory_view m_exrom_view;
 
 	uint8_t m_keyb_input[10]{};
 	uint8_t m_keyb_c0_c7 = 0U;
@@ -404,6 +417,8 @@ private:
 	u8 m_xscl = 0U;
 	bool m_csel = false;
 	bool m_mcm = false;
+	u8 m_ssc = 0U;
+	u8 m_sbc = 0U;
 	// handler helpers
 	u16 m_vs_base_offset = 0U;
 	u16 m_cb_base_offset = 0U;
@@ -626,10 +641,25 @@ void c65_state::vic4567_map(address_map &map)
 			m_sexx = data;
 		})
 	);
-
-//  map(0x1e, 0x1e) Sprite-Sprite collision
-//  map(0x1f, 0x1f) Spirte-background collision
-// 53280,$d020 BORD border color
+//  53278/$d01e Sprite-Sprite collision
+	map(0x1e, 0x1e).lr8(
+		NAME([this] (offs_t offset) {
+			u8 res = m_ssc;
+			if (!machine().side_effects_disabled())
+				m_ssc = 0;
+			return res;
+		})
+	);
+//  53279/$d01f Sprite-background collision
+	map(0x1f, 0x1f).lr8(
+		NAME([this] (offs_t offset) {
+			u8 res = m_sbc;
+			if (!machine().side_effects_disabled())
+				m_sbc = 0;
+			return res;
+		})
+	);
+//  53280/$d020 BORD border color
 	map(0x20, 0x20).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_border_color;
@@ -640,7 +670,7 @@ void c65_state::vic4567_map(address_map &map)
 			//m_screen->update_partial(m_screen->vpos());
 		})
 	);
-//  53281,$d021 BK#C background clut BK0-BK3
+//  53281/$d021 BK#C background clut BK0-BK3
 	map(0x21, 0x24).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_bk_color_clut[offset];
@@ -747,10 +777,11 @@ std::tuple<u8, bool> c65_state::get_tile_pixel(int y, int x)
 
 	int xi = (x >> 3) / pixel_width;
 	int yi = (y >> 3);
-	int xm = 7 - ((x / pixel_width) & 7);
-	int ym = (y & 7);
 	uint8_t tile = m_video_ptr[(xi + yi * columns) & 0x3fff];
 	uint8_t attr = m_cram[xi + yi * columns];
+
+	int xm = 7 - ((x / pixel_width) & 7);
+	int ym = (y & 7);
 	int foreground_color = attr & 0xf;
 	int background_color = m_bk_color_clut[0] & 0xf;
 	int highlight_color = 0;
@@ -854,6 +885,7 @@ TIMER_CALLBACK_MEMBER(c65_state::scanline_cb)
 		}
 		else
 		{
+			const int width80 = BIT(m_control_b, 7) ^ 1;
 			for (x = border_left; x < active_left; x++)
 				p[x] = m_border_color;
 			for (;x < active_right; x++)
@@ -863,10 +895,11 @@ TIMER_CALLBACK_MEMBER(c65_state::scanline_cb)
 				// TODO: functional depending on mode
 				// NOTE: VIC-II and VIC-III can switch mid-frame, but latches occur in 8 scanline steps
 				// at least from/to a base C=64 tilemap mode.
-				std::tie(tile_dot, is_foreground) = get_tile_pixel(y - active_top, x - active_left - m_xscl);
+				std::tie(tile_dot, is_foreground) = get_tile_pixel(y - active_top, x - active_left - (m_xscl << width80));
 				// HACK: are sprite positions in native coordinates from the border?
 				std::tie(sprite_dot, sprite_mask, sprite_active, is_sprite) = get_sprite_pixel(y + 20, x + active_left);
 
+				//m_ssc |= sprite_mask;
 				if (is_foreground && !(BIT(sprite_mask, sprite_active) & (BIT(m_bsp ^ 0xff, sprite_active))))
 					p[x] = m_palette->pen(tile_dot);
 				else
@@ -943,7 +976,16 @@ void c65_state::uart_w(offs_t offset, uint8_t data)
 
 uint8_t c65_state::cia0_porta_r()
 {
-	return 0xff;
+	uint8_t res = 0xff;
+
+	// joystick
+	uint8_t joy_b = m_joy[1]->read_joy();
+
+	res &= (0xf0 | (joy_b & 0x0f));
+	res &= ~(!BIT(joy_b, 5) << 4);
+
+	return res;
+
 }
 
 uint8_t c65_state::cia0_portb_r()
@@ -953,6 +995,11 @@ uint8_t c65_state::cia0_portb_r()
 	uint8_t res;
 
 	res = 0xff;
+	uint8_t joy_a = m_joy[0]->read_joy();
+
+	res &= (0xf0 | (joy_a & 0x0f));
+	res &= ~(!BIT(joy_a, 5) << 4);
+
 	for(int i=0;i<8;i++)
 	{
 		m_keyb_input[i] = ioport(c64ports[i])->read();
@@ -975,11 +1022,14 @@ uint8_t c65_state::cia0_portb_r()
 void c65_state::cia0_porta_w(uint8_t data)
 {
 	m_keyb_c0_c7 = ~data;
+	m_joy[1]->joy_w(data & 0x1f);
 //  logerror("%02x\n",m_keyb_c0_c7);
 }
 
 void c65_state::cia0_portb_w(uint8_t data)
 {
+	m_joy[0]->joy_w(data & 0x1f);
+
 }
 
 /*
@@ -998,13 +1048,18 @@ void c65_state::c65_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x07fff).rw(FUNC(c65_state::ram_r<0x00000>), FUNC(c65_state::ram_w<0x00000>));
-	map(0x08000, 0x09fff).rw(FUNC(c65_state::ram_r<0x08000>), FUNC(c65_state::ram_w<0x08000>));
-	map(0x0a000, 0x0bfff).rom().region("ipl", 0x0a000);
+
+	map(0x08000, 0x0bfff).view(m_exrom_view);
+	m_exrom_view[0](0x08000, 0x0bfff).r(m_cart_exp, FUNC(generic_slot_device::read_rom));
+	m_exrom_view[1](0x08000, 0x09fff).rw(FUNC(c65_state::ram_r<0x08000>), FUNC(c65_state::ram_w<0x08000>));
+	m_exrom_view[1](0x0a000, 0x0bfff).rom().region("ipl", 0x0a000);
+
 	map(0x0c000, 0x0cfff).view(m_romc_view);
 	m_romc_view[0](0x0c000, 0x0cfff).rw(FUNC(c65_state::ram_r<0x0c000>), FUNC(c65_state::ram_w<0x0c000>));
 	m_romc_view[1](0x0c000, 0x0cfff).rom().region("ipl", 0x0c000);
-    map(0x0d000, 0x0dfff).view(m_charen_view);
-    m_charen_view[0](0x0d000, 0x0dfff).rom().region("ipl", 0x0d000);
+
+	map(0x0d000, 0x0dfff).view(m_charen_view);
+	m_charen_view[0](0x0d000, 0x0dfff).rom().region("ipl", 0x0d000);
 	m_charen_view[1](0x0d000, 0x0d07f).m(*this, FUNC(c65_state::vic4567_map));
 	// 0x0d080, 0x0d09f FDC
 	m_charen_view[1](0x0d080, 0x0d09f).lr8(NAME([] (offs_t offset) { return 0; }));
@@ -1027,13 +1082,14 @@ void c65_state::c65_map(address_map &map)
 		NAME([this] (offs_t offset) { return m_cram[offset]; }),
 		NAME([this] (offs_t offset, u8 data) { m_cram[offset] = data; })
 	);
-
 	m_cram_view[0](0x0dc00, 0x0dc0f).rw(m_cia[0], FUNC(mos6526_device::read), FUNC(mos6526_device::write));
 	m_cram_view[0](0x0dd00, 0x0dd0f).rw(m_cia[1], FUNC(mos6526_device::read), FUNC(mos6526_device::write));
-	// 0x0de00, 0x0de** Ext I/O Select 1
-	// 0x0df00, 0x0df** Ext I/O Select 2 (RAM window?)
+	// 0x0de00, 0x0de** Ext I/O Select 1 (IO1)
+	// 0x0df00, 0x0df** Ext I/O Select 2 (IO2)
 	m_cram_view[1](0x0d800, 0x0dfff).ram().share("cram");
+
 	map(0x0e000, 0x0ffff).rom().region("ipl", 0x0e000);
+
 	map(0x10000, 0x1f7ff).rw(FUNC(c65_state::ram_r<0x010000>), FUNC(c65_state::ram_w<0x10000>));
 	map(0x1f800, 0x1ffff).ram().share("cram");
 	map(0x20000, 0x3ffff).rom().region("ipl", 0);
@@ -1158,7 +1214,9 @@ void c65_state::machine_start()
 void c65_state::machine_reset()
 {
 	m_control_a = 0;
+	m_ssc = m_sbc = 0;
 	m_cram_view.select(0);
+	m_exrom_view.select(m_cart_exp->exists() ^ 1);
 }
 
 
@@ -1229,9 +1287,9 @@ uint8_t c65_state::cpu_r()
 
 void c65_state::cpu_w(uint8_t data)
 {
-//	m_loram = BIT(data, 0);
-//	m_hiram = BIT(data, 1);
-    m_charen_view.select(BIT(data, 2));
+//  m_loram = BIT(data, 0);
+//  m_hiram = BIT(data, 1);
+	m_charen_view.select(BIT(data, 2));
 }
 
 
@@ -1252,6 +1310,9 @@ void c65_state::c65(machine_config &config)
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irqs"));
 	irq.output_handler().set_inputline(m_maincpu, M4510_IRQ_LINE);
 
+	INPUT_MERGER_ANY_HIGH(config, m_nmis);
+	m_nmis->output_handler().set_inputline(m_maincpu, M4510_NMI_LINE);
+
 	MOS6526(config, m_cia[0], MAIN_C65_CLOCK);
 	m_cia[0]->set_tod_clock(60);
 	m_cia[0]->irq_wr_callback().set("irqs", FUNC(input_merger_device::in_w<0>));
@@ -1262,7 +1323,7 @@ void c65_state::c65(machine_config &config)
 
 	MOS6526(config, m_cia[1], MAIN_C65_CLOCK);
 	m_cia[1]->set_tod_clock(60);
-//  m_cia[1]->irq_wr_callback().set(FUNC(c65_state::cia1_irq)); // NMI
+	m_cia[1]->irq_wr_callback().set(m_nmis, FUNC(input_merger_device::in_w<0>));
 //  m_cia[1]->pa_rd_callback().set(FUNC(c65_state::c65_cia1_port_a_r));
 	m_cia[1]->pa_wr_callback().set(FUNC(c65_state::cia1_porta_w));
 
@@ -1292,6 +1353,12 @@ void c65_state::c65(machine_config &config)
 	//m_sid->potx().set(FUNC(c64_state::sid_potx_r));
 	//m_sid->poty().set(FUNC(c64_state::sid_poty_r));
 	m_sid[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+
+	VCS_CONTROL_PORT(config, m_joy[0], vcs_control_port_devices, "joy");
+	//m_joy1->trigger_wr_callback().set(MOS6567_TAG, FUNC(mos6567_device::lp_w));
+	VCS_CONTROL_PORT(config, m_joy[1], vcs_control_port_devices, "joy");
+
+	GENERIC_CARTSLOT(config, m_cart_exp, generic_plain_slot, "c64_cart");
 
 	SOFTWARE_LIST(config, "flop_list").set_original("c65_flop");
 //    SOFTWARE_LIST(config, "cart_list").set_compatible("c64_cart");
