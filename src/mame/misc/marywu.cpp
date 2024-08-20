@@ -21,7 +21,7 @@
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
-
+#include "machine/nvram.h"
 #include "marywu.lh"
 
 
@@ -174,7 +174,7 @@ void marywu_state::program_map(address_map &map)
 
 void marywu_state::io_map(address_map &map)
 {
-	map(0x8000, 0x87ff).mirror(0x0800).ram(); /* HM6116: 2kbytes of Static RAM */
+	map(0x8000, 0x87ff).mirror(0x0800).ram().share("nvram"); /* HM6116: 2kbytes of Static RAM */
 	map(0x9000, 0x9001).mirror(0x0ffc).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0x9002, 0x9003).mirror(0x0ffc).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xb000, 0xb001).mirror(0x0ffe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
@@ -194,7 +194,8 @@ void marywu_state::marywu(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::program_map);
 	maincpu.set_addrmap(AS_IO, &marywu_state::io_map);
 	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
-
+	/* nvram */
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	/* Keyboard & display interface */
 	i8279_device &kbdc(I8279(config, "i8279", XTAL(10'738'635)));       // should it be perhaps a fraction of the XTAL clock ?
 	kbdc.out_sl_callback().set(FUNC(marywu_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
