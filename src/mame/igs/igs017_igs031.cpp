@@ -570,9 +570,9 @@ void igs017_igs031_device::tjsb_decrypt_sprites()
 	}
 }
 
-void igs017_igs031_device::tarzan_decrypt_sprites(size_t max_size)
+void igs017_igs031_device::tarzan_decrypt_sprites(size_t max_size, size_t flip_size)
 {
-	mgcs_flip_sprites(max_size);
+	mgcs_flip_sprites(flip_size);
 
 	const int rom_size = max_size ? max_size : memregion("sprites")->bytes();
 	u8 *rom = memregion("sprites")->base();
@@ -587,9 +587,9 @@ void igs017_igs031_device::tarzan_decrypt_sprites(size_t max_size)
 	}
 }
 
-void igs017_igs031_device::starzan_decrypt_sprites(size_t max_size)
+void igs017_igs031_device::starzan_decrypt_sprites(size_t max_size, size_t flip_size)
 {
-	tarzan_decrypt_sprites(max_size);
+	tarzan_decrypt_sprites(max_size, flip_size);
 
 	// Overlay rom:
 

@@ -1329,7 +1329,7 @@ void igs_m027_state::init_fruitpar()
 {
 	fruitpar_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
-	m_igs017_igs031->tarzan_decrypt_sprites(0x400000);
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027_state::init_oceanpar()
@@ -1357,28 +1357,28 @@ void igs_m027_state::init_qlgs()
 {
 	qlgs_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
-	m_igs017_igs031->tarzan_decrypt_sprites(0x400000);
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027_state::init_mgzz()
 {
 	mgzz_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt(); // wrong?
-	m_igs017_igs031->tarzan_decrypt_sprites(0x400000);
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027_state::init_mgcs3()
 {
 	mgcs3_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt(); // wrong?
-	m_igs017_igs031->tarzan_decrypt_sprites(0x400000);
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027_state::init_jking02()
 {
 	jking02_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
-	m_igs017_igs031->tarzan_decrypt_sprites(0x400000); // not 100% correect?
+	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
 	// the sprite ROM at 0x400000 doesn't require decryption
 }
 
