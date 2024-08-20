@@ -42,7 +42,12 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppi(*this, "ppi8255"),
 		m_igs017_igs031(*this, "igs017_igs031"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_portb(*this, "PORTB"),
+		m_portc(*this, "PORTC"),
+		m_dsw1(*this, "DSW1"),
+		m_dsw2(*this, "DSW2"),
+		m_dsw3(*this, "DSW3")
 	{ }
 
 	void igs_mahjong(machine_config &config);
@@ -71,6 +76,7 @@ public:
 	void init_olympic5();
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
@@ -79,16 +85,29 @@ private:
 	optional_device<i8255_device> m_ppi;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	required_device<screen_device> m_screen;
+	required_ioport m_portb;
+	required_ioport m_portc;
+	required_ioport m_dsw1;
+	required_ioport m_dsw2;
+	required_ioport m_dsw3;
 
 	u32 unk_r()
 	{
 		return 0xffffffff;
 	}
 
+	void dsw_io_select_w(u32 data);
+
+	u8 ppi_porta_r();
+	u8 ppi_portb_r();
+	u8 ppi_portc_r();
+
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void pgm_create_dummy_internal_arm_region();
 	void igs_mahjong_map(address_map &map);
+
+	u32 m_dsw_io_select;
 };
 
 void igs_m027_state::video_start()
@@ -96,6 +115,12 @@ void igs_m027_state::video_start()
 	m_igs017_igs031->video_start();
 }
 
+void igs_m027_state::machine_start()
+{
+	m_dsw_io_select = 0;
+
+	save_item(NAME(m_dsw_io_select));
+}
 
 /***************************************************************************
 
@@ -115,6 +140,8 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 	map(0x38008000, 0x38008003).r(FUNC(igs_m027_state::unk_r));
 
 	map(0x38009000, 0x38009003).ram();     //??????????????  oki 6295
+
+	map(0x40000018, 0x4000001b).w(FUNC(igs_m027_state::dsw_io_select_w));
 
 	map(0x70000200, 0x70000203).ram();     //??????????????
 	map(0x50000000, 0x500003ff).nopw(); // uploads XOR table to external ROM here
@@ -156,21 +183,6 @@ static const u8 sdwx_tab[] =
 };
 #endif
 
-
-
-
-/***************************************************************************
-
-    Protection & I/O
-
-***************************************************************************/
-
-
-
-
-
-
-
 /***************************************************************************
 
     Input Ports
@@ -179,22 +191,98 @@ static const u8 sdwx_tab[] =
 
 static INPUT_PORTS_START( base )
 
-	PORT_START("TEST0")
-    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
 
-	PORT_START("TEST1")
-    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
 
-	PORT_START("TEST2")
-    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+
+	PORT_START("PORTB") // buttons?
+	PORT_DIPNAME( 0x01, 0x01, "PORTB")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PORTC") // buttons?
+	PORT_DIPNAME( 0x01, 0x01, "PORTC")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jking02 )
+	PORT_INCLUDE(base)
 
-	PORT_START("TEST0")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) // can cause a coin error, maybe this port is multiplexed with inputs?
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "DSW2" ) // can cause a coin error (sets different inputs?)
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x02, 0x00, "Show Odds" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -209,31 +297,26 @@ static INPUT_PORTS_START( jking02 )
 	PORT_DIPSETTING(    0x10, "Casino Style" )
 	PORT_DIPSETTING(    0x00, "Casino Style (duplicate 1)" )
 	PORT_DIPSETTING(    0x30, "Casino Style (duplicate 2)" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("TEST1")
-    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("TEST2")
-    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("PORTB")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) // shows dipswitches
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) // maybe service coin?
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( qlgs )
 	PORT_INCLUDE(base)
 
-	PORT_MODIFY("TEST0")
-    PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x04, 0x00, "Link Mode" )
+	PORT_DIPSETTING(    0x04, "Linked" )
+	PORT_DIPSETTING(    0x00, "Standalone" )
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( amazonia )
 	PORT_INCLUDE(base)
 
-	PORT_START("DSW1")
+	PORT_MODIFY("DSW1")
 // Credits proportion
 	PORT_DIPNAME( 0x03, 0x03, "Proporcao Credito" ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "1" )
@@ -262,7 +345,7 @@ static INPUT_PORTS_START( amazonia )
 	PORT_DIPSETTING(    0x80, "Auto" )
 
 
-	PORT_START("DSW2")
+	PORT_MODIFY("DSW2")
 // Demo Song
 	PORT_DIPNAME( 0x01, 0x01, "Demonstracao Musica" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
@@ -293,16 +376,6 @@ static INPUT_PORTS_START( amazonia )
 	PORT_DIPNAME( 0x80, 0x80, "Panel Mode" ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, "36+10" )
 	PORT_DIPSETTING(    0x80, "28" )
-
-	PORT_START("DSW3")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
 INPUT_PORTS_END
 
 
@@ -323,6 +396,39 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_state::interrupt)
 		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
 }
 
+u8 igs_m027_state::ppi_porta_r()
+{
+	logerror("%s: ppi_porta_r with m_dsw_io_select as %08x\n", machine().describe_context(), m_dsw_io_select);
+
+	switch (m_dsw_io_select & 0x7) // 0x10 is set in test mode
+	{
+	case 0x03: return m_dsw3->read();
+	case 0x05: return m_dsw2->read();
+	case 0x06: return m_dsw1->read();
+
+	default:
+		logerror("(unhandled)");
+		return 0xff;
+	}
+}
+
+u8 igs_m027_state::ppi_portb_r()
+{
+	logerror("%s: ppi_portb_r\n", machine().describe_context());
+	return m_portb->read();
+}
+
+u8 igs_m027_state::ppi_portc_r()
+{
+	logerror("%s: ppi_portc_r\n", machine().describe_context());
+	return m_portc->read();
+}
+
+
+void igs_m027_state::dsw_io_select_w(u32 data)
+{
+	m_dsw_io_select = data;
+}
 
 void igs_m027_state::igs_mahjong(machine_config &config)
 {
@@ -342,9 +448,9 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027_state::interrupt), "screen", 0, 1);
 
 	I8255A(config, m_ppi);
-	m_ppi->in_pa_callback().set_ioport("TEST0");
-	m_ppi->in_pb_callback().set_ioport("TEST1");
-	m_ppi->in_pc_callback().set_ioport("TEST2");
+	m_ppi->in_pa_callback().set(FUNC(igs_m027_state::ppi_porta_r));
+	m_ppi->in_pb_callback().set(FUNC(igs_m027_state::ppi_portb_r));
+	m_ppi->in_pc_callback().set(FUNC(igs_m027_state::ppi_portc_r));
 
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
