@@ -29,7 +29,10 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 
+#include "sound/okim6295.h"
+
 #include "screen.h"
+#include "speaker.h"
 
 namespace {
 
@@ -43,6 +46,7 @@ public:
 		m_ppi(*this, "ppi8255"),
 		m_igs017_igs031(*this, "igs017_igs031"),
 		m_screen(*this, "screen"),
+		m_oki(*this, "oki"),
 		m_portb(*this, "PORTB"),
 		m_portc(*this, "PORTC"),
 		m_dsw1(*this, "DSW1"),
@@ -85,16 +89,12 @@ private:
 	optional_device<i8255_device> m_ppi;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	required_device<screen_device> m_screen;
+	required_device<okim6295_device> m_oki;
 	required_ioport m_portb;
 	required_ioport m_portc;
 	required_ioport m_dsw1;
 	required_ioport m_dsw2;
 	required_ioport m_dsw3;
-
-	u32 unk_r()
-	{
-		return 0xffffffff;
-	}
 
 	u32 unk2_r();
 	void unk2_w(u32 data);
@@ -143,9 +143,9 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
-	map(0x38008000, 0x38008003).r(FUNC(igs_m027_state::unk_r));
+	map(0x38008000, 0x38008003).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x000000ff);
 
-	map(0x38009000, 0x38009003).ram();     //??????????????  oki 6295
+//	map(0x38009000, 0x38009003).ram();   
 
 	map(0x40000008, 0x4000000b).w(FUNC(igs_m027_state::unk2_w)); 
 	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027_state::unk2_r)); 
@@ -451,7 +451,8 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 	m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound hardware
-	// OK6295
+	SPEAKER(config, "mono").front_center();
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 /***************************************************************************
