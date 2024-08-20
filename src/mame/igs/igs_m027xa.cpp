@@ -19,6 +19,7 @@ These games use the IGS027A processor.
 
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 
 #include "screen.h"
 
@@ -57,7 +58,7 @@ private:
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	required_device<screen_device> m_screen;
 
-	void vblank_irq(int state);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void pgm_create_dummy_internal_arm_region();
 	void igs_mahjong_map(address_map &map);
@@ -65,7 +66,7 @@ private:
 	void igs_70000100_w(u32 data);
 	u32 m_igs_70000100 = 0;
 
-	u32 rand_r()
+	u32 rnd_r()
 	{
 		return machine().rand();
 	}
@@ -103,7 +104,7 @@ void igs_m027xa_state::igs_mahjong_map(address_map &map)
 	map(0x18000000, 0x18007fff).ram();
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
-	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027xa_state::rand_r));
+	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027xa_state::rnd_r));
 
 	map(0x58000000, 0x580000ff).ram(); // XA?
 
@@ -125,25 +126,21 @@ static INPUT_PORTS_START( base )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-void igs_m027xa_state::vblank_irq(int state)
+TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 {
-	if (state)
-	{
-		// hack
-		if (m_igs_70000100 == 0x55) // IRQ can't be enabled during RAM check, this might not be the enable flag though
-		{
-			if (m_screen->frame_number() & 1)
-				m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
-			else
-				m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // probably from the XA?
-		}
-	}
+	int scanline = param;
 
+	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // source? (can the XA trigger this?)
+
+	if (scanline == 0 && m_igs017_igs031->get_nmi_enable())
+		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
 }
+
 
 void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 {
-	ARM7(config, m_maincpu, 20000000);
+	ARM7(config, m_maincpu, 22000000); // Crazy Bugs has a 22Mhz Xtal, what about the others?
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::igs_mahjong_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -157,7 +154,8 @@ void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
 	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
 	m_screen->set_palette("igs017_igs031:palette");
-	m_screen->screen_vblank().set(FUNC(igs_m027xa_state::vblank_irq));
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027xa_state::interrupt), "screen", 0, 1);
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pa_callback().set_ioport("TEST0");
@@ -189,7 +187,7 @@ ROM_START( haunthig )
 	ROM_LOAD( "hauntedhouse.u17", 0x000000, 0x10000, BAD_DUMP CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // not dumped for this set
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "haunted-h_text.u15", 0x000000, 0x80000, CRC(c23f48c8) SHA1(0cb1b6c61611a081ae4a3c0be51812045ff632fe) )
+	ROM_LOAD16_WORD_SWAP( "haunted-h_text.u15", 0x000000, 0x80000, CRC(c23f48c8) SHA1(0cb1b6c61611a081ae4a3c0be51812045ff632fe) )
 
 	// are these PGM-like sprites?
 	ROM_REGION( 0x800000, "igs017_igs031:sprites", 0 )
@@ -216,7 +214,7 @@ ROM_START( haunthiga ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, O
 	ROM_LOAD( "hauntedhouse.u17", 0x000000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // MX10EXAQC (80C51 XA based MCU) marked J9, not read protected?
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "haunted-h_text.u15", 0x000000, 0x80000, CRC(c23f48c8) SHA1(0cb1b6c61611a081ae4a3c0be51812045ff632fe) )
+	ROM_LOAD16_WORD_SWAP( "haunted-h_text.u15", 0x000000, 0x80000, CRC(c23f48c8) SHA1(0cb1b6c61611a081ae4a3c0be51812045ff632fe) )
 
 	// are these PGM-like sprites?
 	ROM_REGION( 0x800000, "igs017_igs031:sprites", 0 )
@@ -243,7 +241,7 @@ ROM_START( crzybugs ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) )
+	ROM_LOAD16_WORD_SWAP( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) )
 
 	// are these PGM-like sprites?
 	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
@@ -266,7 +264,7 @@ ROM_START( crzybugsa )
 	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) ) // M27C4002
+	ROM_LOAD16_WORD_SWAP( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) ) // M27C4002
 
 	// are these PGM-like sprites?
 	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
@@ -289,7 +287,7 @@ ROM_START( crzybugsb )
 	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, BAD_DUMP CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) ) // not dumped for this set
+	ROM_LOAD16_WORD_SWAP( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, BAD_DUMP CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) ) // not dumped for this set
 
 	// are these PGM-like sprites?
 	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
@@ -312,7 +310,7 @@ ROM_START( crzybugsj ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, O
 	ROM_LOAD( "e9.u17", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // MX10EXAQC (80C51 XA based MCU) marked E9, same as haunthig
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "crazy_bugs_text_u15.u15", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) )
+	ROM_LOAD16_WORD_SWAP( "crazy_bugs_text_u15.u15", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) )
 	// u14 not populated
 
 	// are these PGM-like sprites?
@@ -340,7 +338,7 @@ ROM_START( tripfev ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Oki
 	ROM_LOAD( "p7.u27", 0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "triple_fever_u10_text.u10", 0x000000, 0x80000, CRC(522a1030) SHA1(9a7a5ba9b26bceb0d251be6139c10e4655fc19ec) ) // M27C4002
+	ROM_LOAD16_WORD_SWAP( "triple_fever_u10_text.u10", 0x000000, 0x80000, CRC(522a1030) SHA1(9a7a5ba9b26bceb0d251be6139c10e4655fc19ec) ) // M27C4002
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "triple_fever_u19_cg.u19",  0x000000, 0x400000, CRC(cd45bbf2) SHA1(7f1cf270245bbe4604de2cacade279ab13584dbd) ) // M27C322, FIXED BITS (xxxxxxx0xxxxxxxx)
@@ -362,7 +360,7 @@ ROM_START( wldfruit ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "wild_fruit_text.u10", 0x000000, 0x80000, CRC(d6f0fd58) SHA1(5ddae5d4df53504dbb2e0fe9f7caea961c961ef8) ) // 27C4096
+	ROM_LOAD16_WORD_SWAP( "wild_fruit_text.u10", 0x000000, 0x80000, CRC(d6f0fd58) SHA1(5ddae5d4df53504dbb2e0fe9f7caea961c961ef8) ) // 27C4096
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "wild_fruit_cg.u19",  0x000000, 0x400000, CRC(119686a8) SHA1(22583c1a1018cfdd20f0ef696d91fa1f6e01ab00) ) // M27C322, FIXED BITS (xxxxxxx0xxxxxxxx)
