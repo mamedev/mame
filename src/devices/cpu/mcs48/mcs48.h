@@ -94,7 +94,7 @@ DECLARE_DEVICE_TYPE(I8742AH, i8742ah_device)  // 2k internal UV EPROM, 256 bytes
 
 // Clones
 DECLARE_DEVICE_TYPE(MB8884,  mb8884_device)   // 8035 clone
-DECLARE_DEVICE_TYPE(N7751,   n7751_device)    // 8048 clone
+DECLARE_DEVICE_TYPE(UPD7751, upd7751_device)  // 8048 clone
 DECLARE_DEVICE_TYPE(M58715,  m58715_device)   // 8049 clone
 
 
@@ -604,11 +604,11 @@ public:
 	mb8884_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
-class n7751_device : public mcs48_cpu_device
+class upd7751_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	n7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	upd7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class m58715_device : public mcs48_cpu_device

@@ -31,14 +31,14 @@
     8648    64   1k   27  (OTPROM)
     8748    64   1k   27  (EPROM)
     8884    64   1k
-    N7751   64   1k       (8048, speech synthesizer in internal ROM)
+    UPD7751 64   1k       (8048, speech synthesizer in internal ROM)
 
     8039   128    0   27  (external ROM)
     8049   128   2k   27  (ROM)
     8749   128   2k   27  (EPROM)
     M58715 128    0       (external ROM)
 
-    8040   256   4k   27  (external ROM)
+    8040   256    0   27  (external ROM)
     8050   256   4k   27  (ROM)
 
 ****************************************************************************
@@ -151,6 +151,7 @@ DEFINE_DEVICE_TYPE(I8049,   i8049_device,   "i8049",   "Intel 8049")
 DEFINE_DEVICE_TYPE(I8749,   i8749_device,   "i8749",   "Intel 8749")
 DEFINE_DEVICE_TYPE(I8040,   i8040_device,   "i8040",   "Intel 8040")
 DEFINE_DEVICE_TYPE(I8050,   i8050_device,   "i8050",   "Intel 8050")
+
 DEFINE_DEVICE_TYPE(I8041A,  i8041a_device,  "i8041a",  "Intel 8041A")
 DEFINE_DEVICE_TYPE(I8741A,  i8741a_device,  "i8741a",  "Intel 8741A")
 DEFINE_DEVICE_TYPE(I8041AH, i8041ah_device, "i8041ah", "Intel 8041AH")
@@ -159,9 +160,10 @@ DEFINE_DEVICE_TYPE(I8042,   i8042_device,   "i8042",   "Intel 8042")
 DEFINE_DEVICE_TYPE(I8742,   i8742_device,   "i8742",   "Intel 8742")
 DEFINE_DEVICE_TYPE(I8042AH, i8042ah_device, "i8042ah", "Intel 8042AH")
 DEFINE_DEVICE_TYPE(I8742AH, i8742ah_device, "i8742ah", "Intel 8742AH")
-DEFINE_DEVICE_TYPE(MB8884,  mb8884_device,  "mb8884",  "MB8884")
-DEFINE_DEVICE_TYPE(N7751,   n7751_device,   "n7751",   "NEC uPD7751")
-DEFINE_DEVICE_TYPE(M58715,  m58715_device,  "m58715",  "M58715")
+
+DEFINE_DEVICE_TYPE(MB8884,  mb8884_device,  "mb8884",  "Fujitsu MB8884")
+DEFINE_DEVICE_TYPE(UPD7751, upd7751_device, "upd7751", "NEC uPD7751")
+DEFINE_DEVICE_TYPE(M58715,  m58715_device,  "m58715",  "Mitsubishi M58715")
 
 
 /***************************************************************************
@@ -262,8 +264,8 @@ mb8884_device::mb8884_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-n7751_device::n7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mcs48_cpu_device(mconfig, N7751, tag, owner, clock, 1024, 64, I8048_FEATURE, s_mcs48_opcodes)
+upd7751_device::upd7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: mcs48_cpu_device(mconfig, UPD7751, tag, owner, clock, 1024, 64, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 
