@@ -20245,6 +20245,12 @@ sdwx                            // (c) 2002
 slqz3                           // (c) 1999
 zhongguo                        // (c) 2000
 
+@source:igs/igs_m027_link.cpp
+cjslh
+cjsll
+mgcsh
+mgcsl
+
 @source:igs/igs_m027xa.cpp
 crzybugs                        // (c) 2009
 crzybugsa                       // (c) 2006
