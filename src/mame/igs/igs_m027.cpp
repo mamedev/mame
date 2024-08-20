@@ -96,6 +96,7 @@ private:
 	required_ioport m_dsw2;
 	required_ioport m_dsw3;
 
+	u32 unk_r();
 	u32 unk2_r();
 	void unk2_w(u32 data);
 
@@ -145,7 +146,7 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 
 	map(0x38008000, 0x38008003).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x000000ff);
 
-//	map(0x38009000, 0x38009003).ram();   
+	map(0x38009000, 0x38009003).r(FUNC(igs_m027_state::unk_r)); 
 
 	map(0x40000008, 0x4000000b).w(FUNC(igs_m027_state::unk2_w)); 
 	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027_state::unk2_r)); 
@@ -428,6 +429,15 @@ u32 igs_m027_state::unk2_r()
 	else
 		return 0xffffffef;
 }
+
+u32 igs_m027_state::unk_r()
+{
+	// this is accessed as a byte, lower 2 bytes are read?
+	// slqz3 reads test switch in here? writes to the address look like key matrix?
+	logerror("%s: unk_r\n", machine().describe_context());
+	return 0xffffffff;
+}
+
 
 void igs_m027_state::igs_mahjong(machine_config &config)
 {
@@ -1370,63 +1380,64 @@ void igs_m027_state::init_sdwx()
 void igs_m027_state::init_klxyj()
 {
 	klxyj_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_chessc2()
 {
 	chessc2_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_lhzb4()
 {
 	lhzb4_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_mgfx()
 {
 	mgfx_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_lhzb3()
 {
 	lhzb3_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_sddz()
 {
 	sddz_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_gonefsh2()
 {
 	gonefsh2_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_zhongguo()
 {
 	zhongguo_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_slqz3()
 {
 	slqz3_decrypt(machine());
-	// gfx not encrypted?
+	//m_igs017_igs031->slqz3_decrypt_tiles(); // none of the existing functions are correct for this
+	// sprite gfx not encrypted
 }
 
 void igs_m027_state::init_fruitpar()
@@ -1439,21 +1450,21 @@ void igs_m027_state::init_fruitpar()
 void igs_m027_state::init_oceanpar()
 {
 	oceanpar_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_amazonia()
 {
 	amazonia_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_amazoni2()
 {
 	amazoni2_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
