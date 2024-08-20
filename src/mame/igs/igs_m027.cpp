@@ -769,13 +769,16 @@ Notes:
       61256 - EliteMT LP61256 32kBx8-bit SRAM (SOJ28)
     HM62256 - Hitachi HM62256 32kBx8-bit SRAM (SOP28)
       T518B - Reset IC
+    IGS027A - ARM7 CPU with internal ROM. 
+              lhdmg - Sticker: B6
+              lhdmgplus - Sticker: B4
 
 *********************************************************************************/
 
 ROM_START( lhdmg ) // appears to be a different edition of lhzb3 and lthy (GFX and sound ROM match)
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "lhdmg_igs027a", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "b6_igs027a", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "lhdmg_prg.u9", 0x000000, 0x80000, CRC(3b3a77ac) SHA1(c1c40e02d04dc701aa65b7e255b9a928cbecdb8d) )
@@ -793,7 +796,7 @@ ROM_END
 ROM_START( lhdmgp ) // appears to be a different edition of lhzb3 and lthy (GFX and sound ROM match)
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "lhdmgp_igs027a", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "b4_igs027a", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "lhdmg_plus_prg.u9", 0x000000, 0x80000, CRC(77dd7855) SHA1(f04995ee34ef9245dcf3d66fcf111fa377394f92) )
