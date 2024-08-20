@@ -501,7 +501,7 @@ IGS PCB-0239-11-EE
 ROM_START( slqz3 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "slqz3_igs027a", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "slqz3_027a.bin", 0x00000, 0x4000, CRC(abb8ef8b) SHA1(b8912fe38dc2ff3b1a718e9fe3c76eae30aad7dc) ) // unknown sticker
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "u29", 0x000000, 0x200000, CRC(215fed1e) SHA1(c85d8695e0be1044ac206118c3fc0ddc7063aaf6) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
@@ -511,7 +511,6 @@ ROM_START( slqz3 )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "u18", 0x000000, 0x400000, CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
-
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "u26", 0x000000, 0x200000, CRC(84bc2f3e) SHA1(49dcf5eaa39accd5c6bf01782fd4221298cb43ed) ) // 1ST AND 2ND HALF IDENTICAL
@@ -1427,8 +1426,8 @@ void igs_m027_state::init_zhongguo()
 void igs_m027_state::init_slqz3()
 {
 	slqz3_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
-	pgm_create_dummy_internal_arm_region();
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027_state::init_fruitpar()
