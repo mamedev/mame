@@ -874,11 +874,11 @@ void menu_select_launch::custom_render(uint32_t flags, void *selectedref, float 
 		// next line is overall driver status
 		system_flags const &flags(get_system_flags(driver));
 		if (flags.machine_flags() & machine_flags::NOT_WORKING)
-			tempbuf[2] = _("Overall: NOT WORKING");
+			tempbuf[2] = _("Status: NOT WORKING");
 		else if ((flags.unemulated_features() | flags.imperfect_features()) & device_t::feature::PROTECTION)
-			tempbuf[2] = _("Overall: Unemulated Protection");
+			tempbuf[2] = _("Status: Unemulated Protection");
 		else
-			tempbuf[2] = _("Overall: Working");
+			tempbuf[2] = _("Status: Working");
 
 		// next line is graphics, sound status
 		if (flags.unemulated_features() & device_t::feature::GRAPHICS)
