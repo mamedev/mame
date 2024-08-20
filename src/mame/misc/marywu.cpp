@@ -207,12 +207,12 @@ void marywu_state::marywu(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6)); /* should it be perhaps a fraction of the XTAL clock ? */
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6)); /* should it be perhaps a fraction of the XTAL clock ? Also, an ALE pulse is skipped during each external data memory access, which will affect sound generation if the program does this.*/
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 	ay1.port_a_write_callback().set(FUNC(marywu_state::ay1_port_a_w));
 	ay1.port_b_write_callback().set(FUNC(marywu_state::ay1_port_b_w));
    
-	ay8910_device &ay2(AY8910(config, "ay2", XTAL(10'738'635) / 6)); /* should it be perhaps a fraction of the XTAL clock ? */
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(10'738'635) / 6)); /* should it be perhaps a fraction of the XTAL clock ? Also, an ALE pulse is skipped during each external data memory access, which will affect sound generation if the program does this.*/
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
 	ay2.port_a_write_callback().set(FUNC(marywu_state::ay2_port_a_w));
 	ay2.port_b_write_callback().set(FUNC(marywu_state::ay2_port_b_w));
