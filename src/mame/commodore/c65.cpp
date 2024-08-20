@@ -422,6 +422,7 @@ private:
 	// handler helpers
 	u16 m_vs_base_offset = 0U;
 	u16 m_cb_base_offset = 0U;
+	u8 m_gfxmode = 0U;
 	u8* m_video_ptr = nullptr;
 	u8* m_char_ptr = nullptr;
 
@@ -430,12 +431,20 @@ private:
 	void flush_cb_base()
 	{
 		m_video_ptr = &m_workram[m_vs_base_offset | m_vic_bank_base];
-		if ((m_cb_base_offset & 0x3000) == 0x1000 && !(BIT(m_vic_bank_base, 14)))
+		// In bitmap modes only bit 3 has weight for CB base, cfr. isoccer
+		if (m_gfxmode & 2)
 		{
-			m_char_ptr = &m_ipl_rom->base()[((BIT(m_control_a, 6)) ? 0x9000 : 0xd000) + (m_cb_base_offset & 0x800)];
+			m_char_ptr = &m_workram[(m_cb_base_offset & 0x2000) | m_vic_bank_base];
 		}
 		else
-			m_char_ptr = &m_workram[m_cb_base_offset | m_vic_bank_base];
+		{
+			if ((m_cb_base_offset & 0x3000) == 0x1000 && !(BIT(m_vic_bank_base, 14)))
+			{
+				m_char_ptr = &m_ipl_rom->base()[((BIT(m_control_a, 6)) ? 0x9000 : 0xd000) + (m_cb_base_offset & 0x800)];
+			}
+			else
+				m_char_ptr = &m_workram[m_cb_base_offset | m_vic_bank_base];
+		}
 	};
 	struct {
 		u16 x;
@@ -454,9 +463,31 @@ private:
 	TIMER_CALLBACK_MEMBER(scanline_cb);
 	std::tuple<u8, bool> get_tile_pixel(int y, int x);
 	std::tuple<u8, u8, u8, bool> get_sprite_pixel(int y, int x);
+	typedef std::tuple<u8, bool> (c65_state::*draw_tile_func)(u8 tile, u8 attr, int yi, int xi, int pixel_width);
+	static const draw_tile_func draw_tile_table[8];
+	std::tuple<u8, bool> draw_standard_char(u8 tile, u8 attr, int yi, int xi, int pixel_width);
+	std::tuple<u8, bool> draw_multicolor_char(u8 tile, u8 attr, int yi, int xi, int pixel_width);
+	std::tuple<u8, bool> draw_standard_bitmap(u8 tile, u8 attr, int yi, int xi, int pixel_width);
+	std::tuple<u8, bool> draw_multicolor_bitmap(u8 tile, u8 attr, int yi, int xi, int pixel_width);
+	std::tuple<u8, bool> draw_extended_background(u8 tile, u8 attr, int yi, int xi, int pixel_width);
+	std::tuple<u8, bool> draw_invalid(u8 tile, u8 attr, int yi, int xi, int pixel_width);
 
 	void palette_entry_flush(uint8_t offset);
 };
+
+// TODO: c65 bitplane mode
+const c65_state::draw_tile_func c65_state::draw_tile_table[8] =
+{
+	&c65_state::draw_standard_char,
+	&c65_state::draw_multicolor_char,
+	&c65_state::draw_standard_bitmap,
+	&c65_state::draw_multicolor_bitmap,
+	&c65_state::draw_extended_background,
+	&c65_state::draw_invalid,
+	&c65_state::draw_invalid,
+	&c65_state::draw_invalid
+};
+
 
 void c65_state::video_start()
 {
@@ -526,6 +557,8 @@ void c65_state::vic4567_map(address_map &map)
 			m_blnk = bool(BIT(data, 4));
 			m_yscl = data & 7;
 			logerror("VIC2: 53265 mode %02x\n", data);
+			m_gfxmode = (m_ecm << 2) | (m_bmm << 1) | (m_mcm << 0);
+			flush_cb_base();
 		})
 	);
 //  53266/$d012 RC Raster CouNT
@@ -563,6 +596,8 @@ void c65_state::vic4567_map(address_map &map)
 			m_mcm = bool(BIT(data, 4));
 			m_csel = bool(BIT(data, 3));
 			m_xscl = data & 7;
+			m_gfxmode = (m_ecm << 2) | (m_bmm << 1) | (m_mcm << 0);
+			flush_cb_base();
 		})
 	);
 //  53271/$d017 SEXY# Sprite magnify V
@@ -575,6 +610,7 @@ void c65_state::vic4567_map(address_map &map)
 		})
 	);
 /*
+ * 53272/$d018
  * xxxx ---- Screen RAM base (note bit 4 ignored in C=65 width 80)
  * ---- xxx- Character Set base
  */
@@ -769,6 +805,102 @@ void c65_state::vic4567_map(address_map &map)
 //  map(0x40, 0x47) DAT Bitplane ports
 }
 
+std::tuple<u8, bool> c65_state::draw_standard_char(u8 tile, u8 attr, int yi, int xi, int pixel_width)
+{
+	const int xm = 7 - ((xi / pixel_width) & 7);
+	const int ym = (yi & 7);
+	const int foreground_color = attr & 0xf;
+	const int background_color = m_bk_color_clut[0] & 0xf;
+	u8 highlight_color = 0;
+
+	u8 enable_dot = ((m_char_ptr[((tile << 3) + ym) & 0x3fff] >> xm) & 1);
+	if ((attr & 0x80) && ym == 7) enable_dot = 1;
+	if (attr & 0x40) highlight_color = 16;
+	if (attr & 0x20) enable_dot = !enable_dot;
+	if (attr & 0x10 && !m_blink_enable) enable_dot = 0;
+
+	return std::make_tuple(highlight_color + ((enable_dot) ? foreground_color : background_color), enable_dot != 0);
+}
+
+std::tuple<u8, bool> c65_state::draw_multicolor_char(u8 tile, u8 attr, int yi, int xi, int pixel_width)
+{
+	if (!(attr & 8))
+		return draw_standard_char(tile, attr, yi, xi, pixel_width);
+	const int xm = 6 - ((xi / pixel_width) & 6);
+	const int ym = (yi & 7);
+	const u8 color11 = attr & 0xf;
+	const std::array<u8, 4> color_map = { m_bk_color_clut[0], m_bk_color_clut[1], m_bk_color_clut[2], color11 };
+
+	u8 highlight_color = 0;
+
+	u8 enable_dot = ((m_char_ptr[((tile << 3) + ym) & 0x3fff] >> xm) & 3);
+	if ((attr & 0x80) && ym == 7) enable_dot = 1;
+	if (attr & 0x40) highlight_color = 16;
+	if (attr & 0x20) enable_dot = !enable_dot;
+	if (attr & 0x10 && !m_blink_enable) enable_dot = 0;
+
+	return std::make_tuple(highlight_color + color_map[enable_dot], enable_dot & 2);
+}
+
+std::tuple<u8, bool> c65_state::draw_standard_bitmap(u8 tile, u8 attr, int yi, int xi, int pixel_width)
+{
+	const int xm = 7 - ((xi / pixel_width) & 7);
+	const int ym = (yi & 7);
+	const int foreground_color = tile >> 4;
+	const int background_color = tile & 0xf;
+	u8 highlight_color = 0;
+
+	u8 enable_dot = ((m_char_ptr[((xi >> (3 + (pixel_width - 1))) * 8  + (yi >> 3) * 320 + ym) & 0x3fff] >> xm) & 1);
+//  if ((attr & 0x80) && ym == 7) enable_dot = 1;
+//  if (attr & 0x40) highlight_color = 16;
+//  if (attr & 0x20) enable_dot = !enable_dot;
+//  if (attr & 0x10 && !m_blink_enable) enable_dot = 0;
+
+	return std::make_tuple(highlight_color + ((enable_dot) ? foreground_color : background_color), enable_dot != 0);
+}
+
+std::tuple<u8, bool> c65_state::draw_multicolor_bitmap(u8 tile, u8 attr, int yi, int xi, int pixel_width)
+{
+	const int xm = 6 - ((xi / pixel_width) & 6);
+	const int ym = (yi & 7);
+	const u8 color01 = tile >> 4;
+	const u8 color10 = tile & 0xf;
+	const u8 color11 = attr & 0xf;
+	const std::array<u8, 4> color_map = { m_bk_color_clut[0], color01, color10, color11 };
+
+	u8 highlight_color = 0;
+	u8 enable_dot = ((m_char_ptr[((xi >> (3 + (pixel_width - 1))) * 8  + (yi >> 3) * 320 + ym) & 0x3fff] >> xm) & 3);
+//  if ((attr & 0x80) && ym == 7) enable_dot = 1;
+//  if (attr & 0x40) highlight_color = 16;
+//  if (attr & 0x20) enable_dot = !enable_dot;
+//  if (attr & 0x10 && !m_blink_enable) enable_dot = 0;
+
+	return std::make_tuple(highlight_color + color_map[enable_dot], enable_dot & 2);
+}
+
+std::tuple<u8, bool> c65_state::draw_extended_background(u8 tile, u8 attr, int yi, int xi, int pixel_width)
+{
+	const int xm = 7 - ((xi / pixel_width) & 7);
+	const int ym = (yi & 7);
+	const u8 foreground_color = attr & 0xf;
+	const u8 background_color = m_bk_color_clut[tile >> 6] & 0xf;
+
+	u8 highlight_color = 0;
+	u8 enable_dot = ((m_char_ptr[(((tile & 0x3f) << 3) + ym) & 0x3fff] >> xm) & 1);
+	if ((attr & 0x80) && ym == 7) enable_dot = 1;
+	if (attr & 0x40) highlight_color = 16;
+	if (attr & 0x20) enable_dot = !enable_dot;
+	if (attr & 0x10 && !m_blink_enable) enable_dot = 0;
+
+	return std::make_tuple(highlight_color + ((enable_dot) ? foreground_color : background_color), enable_dot != 0);
+}
+
+// TODO: invalid modes essentially draws black but still weights for collision info
+std::tuple<u8, bool> c65_state::draw_invalid(u8 tile, u8 attr, int yi, int xi, int pixel_width)
+{
+	return std::make_tuple(0, false);
+}
+
 std::tuple<u8, bool> c65_state::get_tile_pixel(int y, int x)
 {
 	// TODO: move width as a screen setup
@@ -780,20 +912,7 @@ std::tuple<u8, bool> c65_state::get_tile_pixel(int y, int x)
 	uint8_t tile = m_video_ptr[(xi + yi * columns) & 0x3fff];
 	uint8_t attr = m_cram[xi + yi * columns];
 
-	int xm = 7 - ((x / pixel_width) & 7);
-	int ym = (y & 7);
-	int foreground_color = attr & 0xf;
-	int background_color = m_bk_color_clut[0] & 0xf;
-	int highlight_color = 0;
-
-	int enable_dot = ((m_char_ptr[((tile << 3) + ym) & 0x3fff] >> xm) & 1);
-
-	if ((attr & 0x80) && ym == 7) enable_dot = 1;
-	if (attr & 0x40) highlight_color = 16;
-	if (attr & 0x20) enable_dot = !enable_dot;
-	if (attr & 0x10 && !m_blink_enable) enable_dot = 0;
-
-	return std::make_tuple(highlight_color + ((enable_dot) ? foreground_color : background_color), enable_dot != 0);
+	return (this->*draw_tile_table[m_gfxmode])(tile, attr, y, x, pixel_width);
 }
 
 std::tuple<u8, u8, u8, bool> c65_state::get_sprite_pixel(int y, int x)
@@ -832,12 +951,8 @@ std::tuple<u8, u8, u8, bool> c65_state::get_sprite_pixel(int y, int x)
 		const int xm = (x - xi) >> x_width;
 		const int ym = (y - yi) >> y_width;
 
-		//if (i == 0) {
-		//printf("%d %08x %d %d|%d %d|%d %d\n", i, sprite_offset, xm, ym, xi, yi, x, y);
-		////machine().debug_break();
-		//}
-
-		u8 sprite_data = m_workram[(ym * 3) + (xm >> 3) + sprite_offset];
+		// TODO: not using m_workram here breaks isoccer boot in gfxmode=0, investigate
+		u8 sprite_data = m_video_ptr[(ym * 3) + (xm >> 3) + sprite_offset];
 		const bool is_multicolor = bool(BIT(m_scm, i));
 		const u8 dot_mask = is_multicolor << 1 | 1;
 		const u8 shift_mask = 7 - is_multicolor;
@@ -892,14 +1007,15 @@ TIMER_CALLBACK_MEMBER(c65_state::scanline_cb)
 			{
 				u8 tile_dot, sprite_dot, sprite_mask, sprite_active;
 				bool is_foreground, is_sprite;
-				// TODO: functional depending on mode
 				// NOTE: VIC-II and VIC-III can switch mid-frame, but latches occur in 8 scanline steps
-				// at least from/to a base C=64 tilemap mode.
+				// at least from/to a base C=64 tilemap mode, also cfr. "bad lines".
 				std::tie(tile_dot, is_foreground) = get_tile_pixel(y - active_top, x - active_left - (m_xscl << width80));
 				// HACK: are sprite positions in native coordinates from the border?
 				std::tie(sprite_dot, sprite_mask, sprite_active, is_sprite) = get_sprite_pixel(y + 20, x + active_left);
 
+				// TODO: collisions
 				//m_ssc |= sprite_mask;
+				// TODO: reduce this
 				if (is_foreground && !(BIT(sprite_mask, sprite_active) & (BIT(m_bsp ^ 0xff, sprite_active))))
 					p[x] = m_palette->pen(tile_dot);
 				else
@@ -910,7 +1026,7 @@ TIMER_CALLBACK_MEMBER(c65_state::scanline_cb)
 		}
 	}
 
-	// HACK: need to compensate
+	// HACK: need to compensate, cfr. princess
 	if (y == m_rcr - 21)
 		irq_check(1);
 
