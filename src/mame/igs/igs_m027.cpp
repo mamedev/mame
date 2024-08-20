@@ -378,18 +378,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_state::interrupt)
 
 u8 igs_m027_state::ppi_porta_r()
 {
-	logerror("%s: ppi_porta_r with m_dsw_io_select as %08x\n", machine().describe_context(), m_dsw_io_select);
-
-	switch (m_dsw_io_select & 0x7) // 0x10 is set in test mode
-	{
-	case 0x03: return m_dsw3->read();
-	case 0x05: return m_dsw2->read();
-	case 0x06: return m_dsw1->read();
-
-	default: // slqz3 does't write the io_select, maybe different PCB?
-		logerror("(unhandled)\n");
-		return 0xff;
-	}
+	logerror("%s: ppi_porta_r\n", machine().describe_context());
+	return 0xff;
 }
 
 u8 igs_m027_state::ppi_portb_r()
