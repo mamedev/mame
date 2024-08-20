@@ -272,8 +272,14 @@ static INPUT_PORTS_START( jking02 )
 	PORT_DIPSETTING(    0x30, "Casino Style (duplicate 2)" )
 
 	PORT_MODIFY("PORTB")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) // shows dipswitches
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) // maybe service coin?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) // shows dipswitches
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) // maybe service coin?
+
+	PORT_MODIFY("PORTC")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // maybe bet?
+
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) // maybe start?
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( qlgs )
