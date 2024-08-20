@@ -1177,7 +1177,7 @@ void igs017_state::init_mgcsa()
 	mgcsa_decrypt_program_rom();
 
 	m_igs017_igs031->mgcs_decrypt_tiles();
-	m_igs017_igs031->mgcs_flip_sprites();
+	m_igs017_igs031->mgcs_flip_sprites(0);
 }
 
 
