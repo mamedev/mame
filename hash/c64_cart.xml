@@ -652,7 +652,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 		</part>
 	</software>
 
-    <!-- TODO: verify region of this and one below, KCS manuals are also in German and Italian -->
+	<!-- TODO: verify region of this and one below, KCS manuals are also in German and Italian -->
 	<software name="spdsaver" supported="no">
 		<description>Speedsaver $C000 (Netherlands?)</description>
 		<year>1984</year>
@@ -1716,6 +1716,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 		<year>1983</year>
 		<publisher>Spinnaker Software</publisher>
 		<info name="serial" value="ABZ-C6" />
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -1811,6 +1812,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-001-04" />
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -1862,7 +1864,8 @@ Black screen, self modifies code in the 0x100-0x14f range
 	</software>
 
 	<software name="blueprnt">
-		<description>Blueprint</description> <!-- spelt 'Blueprint' on cart and 'Blueprint', 'Blue-Print' and 'Blue - - Print' on various game screens -->
+		<!-- spelt 'Blueprint' on cart and 'Blueprint', 'Blue-Print' and 'Blue - - Print' on various game screens -->
+		<description>Blueprint</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64612" />
@@ -2108,10 +2111,14 @@ Black screen, self modifies code in the 0x100-0x14f range
 		</part>
 	</software>
 
-	<software name="decathln">
+	<software name="decathln" supported="no">
 		<description>The Activision Decathlon</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Cannot select (s)ingle or (a)ll events, no key press recognized
+]]></notes>
+
 		<info name="serial" value="DC-004-04" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
@@ -3161,6 +3168,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-104-04" />
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3210,10 +3218,13 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 		</part>
 	</software>
 
-	<software name="pitfall2">
+	<software name="pitfall2" supported="no">
 		<description>Pitfall II: The Lost Caverns</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Black screen, drives CPU port out of cart ROM during bootstrap at PC=8017
+]]></notes>
 		<info name="serial" value="DC-007-04" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
@@ -3537,10 +3548,15 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		</part>
 	</software>
 
-	<software name="riveraid">
+	<software name="riveraid" supported="no">
 		<description>River Raid</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Glitchy [VIC] status bar GFXMODE switches on gameplay
+]]></notes>
+		<info name="usage" value="Requires joystick in port 1" />
+
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
