@@ -89,9 +89,7 @@ static INPUT_PORTS_START( toysoldier )
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
-	
-
-INPUT_PORTS_END
+	INPUT_PORTS_END
 
 
 void toysoldier_state::program_map(address_map &map)
