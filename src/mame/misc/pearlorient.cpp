@@ -55,8 +55,6 @@ private:
 	void io_map(address_map &map);
 	void program_map(address_map &map);
 	virtual void machine_start() override;
-
-
 };
 
 static INPUT_PORTS_START( pearlorient )
@@ -99,20 +97,20 @@ static INPUT_PORTS_START( pearlorient )
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
-
 INPUT_PORTS_END
-
 
 void pearlorient_state::program_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom();
 }
+
 void pearlorient_state::io_map(address_map &map)
 {
     map(0xfa00, 0xfa01).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
     map(0xfb02, 0xfb03).w("psg", FUNC(ay8910_device::address_data_w));
 	
 }
+
 void pearlorient_state::machine_start()
 {
 }
@@ -123,8 +121,10 @@ void pearlorient_state::pearlorient(machine_config &config)
 	i8052_device &maincpu(I8052(config, "maincpu", XTAL(10'738'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &pearlorient_state::program_map);
 	maincpu.set_addrmap(AS_IO, &pearlorient_state::io_map);
+	
 	/* Keyboard & display interface */
 	I8279(config, "kdc", XTAL(10'738'000) / 6); 
+	
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &psg(AY8910(config, "psg", XTAL(10'738'000) / 6));  // Divider not verified
@@ -136,11 +136,11 @@ void pearlorient_state::pearlorient(machine_config &config)
 
 ROM_START( pearlorient )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "w27c512.bin", 0x00000, 0x10000, CRC(8D3D1E91) SHA1(b80907df0878057a1ded8b56225059e06382b9d6) ) // Main program
+	ROM_LOAD( "w27c512.bin", 0x00000, 0x10000, CRC(8D3D1E91) SHA1(b80907df0878057a1ded8b56225059e06382b9d6) ) // main program
 	ROM_REGION( 0x1000, "mcu", 0 )
-	ROM_LOAD( "at89s51.bin", 0x0000, 0x1000, NO_DUMP ) // MCU. Protection
+	ROM_LOAD( "at89s51.bin", 0x0000, 0x1000, NO_DUMP ) // mcu. Protection
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, NO_DUMP ) //  Oki rom voice
+	ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, NO_DUMP ) //  oki rom voice
 ROM_END
 
 } // anonymous namespace
