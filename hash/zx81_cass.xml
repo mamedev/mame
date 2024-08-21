@@ -7,7 +7,7 @@ Sinclair ZX81 cassettes
 
 Loading instructions:
 
-At the prompt, press the following sequence to execute the LOAD "" command: J, LShift+P, LShift+P, Enter
+At the prompt, press the following sequence to execute the LOAD "" command: J, Shift+P, Shift+P, Enter
 Enable UI controls (Scroll Lock) and start the tape (F2).
 If the program doesn't start automatically after loading, execute the RUN command by pressing: R, Enter
 
@@ -262,8 +262,8 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		<publisher>Hestacrest</publisher>
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
-			<dataarea name="cass" size="15859">
-				<rom name="accounts.p" size="15859" crc="407879b7" sha1="0b104f0168ed456f21434e7aee820d24b2f748cd"/>
+			<dataarea name="cass" size="16091">
+				<rom name="accounts.tzx" size="16091" crc="2de97707" sha1="1b6b4a8743548be28680bddae616b39155909837"/>
 			</dataarea>
 		</part>
 	</software>
@@ -313,56 +313,13 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 	</software>
 
 	<software name="adventgb">
-		<description>Adventure (Gavin Baker) (TZX tape image)</description>
+		<description>Adventure (Gavin Baker)</description>
 		<year>1984</year>
 		<publisher>Gavin Baker</publisher>
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="48948">
 				<rom name="Adventure(GBarker).tzx" size="48948" crc="61fea9c8" sha1="f09791d6c0d836302ec3d42568e92d9620163bd6"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="adventgb_a" cloneof="adventgb">
-		<description>Adventure (Gavin Baker) (splitted P tape image)</description>
-		<year>1984</year>
-		<publisher>Gavin Baker</publisher>
-		<info name="usage" value="16K" />
-		<part name="cass1" interface="zx81_cass">
-			<feature name="part_id" value="Intro 1"/>
-			<dataarea name="cass" size="2419">
-				<rom name="intro1.p" size="2419" crc="971b6fcd" sha1="7c874c224553f6de610a4288d7d5cc8c75b5ef0d"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="zx81_cass">
-			<feature name="part_id" value="The Challenge"/>
-			<dataarea name="cass" size="14629">
-				<rom name="thechallenge.p" size="14629" crc="589ab55a" sha1="867118c9cdfa711ed8ef0db805e9efc8b544c3a8"/>
-			</dataarea>
-		</part>
-		<part name="cass3" interface="zx81_cass">
-			<feature name="part_id" value="Intro 2"/>
-			<dataarea name="cass" size="2100">
-				<rom name="intro2.p" size="2100" crc="a9cf345e" sha1="3c997702c718f2949bedf3ff81b8348a16691d75"/>
-			</dataarea>
-		</part>
-		<part name="cass4" interface="zx81_cass">
-			<feature name="part_id" value="Haunted House"/>
-			<dataarea name="cass" size="13443">
-				<rom name="hauntedhouse.p" size="13443" crc="a11163d1" sha1="5280c2b3b49c396fe961c0d71e7a4180bf16f4bc"/>
-			</dataarea>
-		</part>
-		<part name="cass5" interface="zx81_cass">
-			<feature name="part_id" value="Intro 3"/>
-			<dataarea name="cass" size="2560">
-				<rom name="intro3.p" size="2560" crc="d5ad980f" sha1="7c4b355d8b7b7e3bf3afc46c417742ee01d80525"/>
-			</dataarea>
-		</part>
-		<part name="cass6" interface="zx81_cass">
-			<feature name="part_id" value="In Search of the Black Staff"/>
-			<dataarea name="cass" size="12942">
-				<rom name="insearchoftheblackstaff.p" size="12942" crc="b47e3aab" sha1="2119f059c68f11790fdf836ad26371b09e7f155b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1002,6 +959,18 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		</part>
 	</software>
 
+	<software name="bridgehed">
+		<description>Bridgehead</description>
+		<year>1984</year>
+		<publisher>Gavin Barker</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="17462">
+				<rom name="Bridgehead.tzx" size="17462" crc="ba08e53a" sha1="dd59f5192f001f3c48fe64b79a1b71900d18ffd6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bubblbug">
 		<description>Bubble Bugs</description>
 		<year>1983</year>
@@ -1290,7 +1259,7 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 	</software>
 
 	<software name="centipedeg" cloneof="centipede">
-		<description>Centipede (dK'tronics - green cover)</description>
+		<description>Centipede (dK'tronics, green cover)</description>
 		<year>198?</year>
 		<publisher>dK'tronics</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -1334,10 +1303,9 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 	</software>
 
 	<software name="chateauh">
-		<description>Le Chateau Hante</description>
+		<description>Le Chateau Hanté</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
-		<info name="alt_title" value="Le Chateau Hanté" /> <!-- in game title -->
 		<info name="language" value="French" />
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
@@ -1817,19 +1785,6 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="16379">
 				<rom name="Dallas(French).tzx" size="16379" crc="4a65562e" sha1="499bee247f3bdc37eca67e95eee1624de11ec5d6"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dallasf_a" cloneof="dallasf">
-		<description>Dallas (French) (P tape image)</description>
-		<year>1983</year>
-		<publisher>Cases Computer Simulations</publisher>
-		<info name="language" value="French" />
-		<info name="usage" value="16K" />
-		<part name="cass1" interface="zx81_cass">
-			<dataarea name="cass" size="16151">
-				<rom name="Dallas(French).p" size="16151" crc="6fc5f7ec" sha1="1d1cd2f2ce3cdfc7a8c18e8bdd1cd0cdc8f2797e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5063,7 +5018,7 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 	</software>
 
 	<software name="nowotnik">
-		<description>The Nowotnik Puzzle &amp; Other Diversions (TZX tape image)</description>
+		<description>The Nowotnik Puzzle &amp; Other Diversions</description>
 		<year>1982</year>
 		<publisher>Phipps Associates</publisher>
 		<info name="usage" value="16K" />
@@ -5071,31 +5026,6 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 			<feature name="part_id" value="1.Puzzle 2.Demolition 3.Tenpin"/>
 			<dataarea name="cass" size="20711">
 				<rom name="NowotnikPuzzle.tzx" size="20711" crc="fd11e293" sha1="bafa4197d4ba285fd31f9147ccd47eed9cfc514a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nowotnik_a" cloneof="nowotnik">
-		<description>The Nowotnik Puzzle &amp; Other Diversions (splitted P tape image)</description>
-		<year>1982</year>
-		<publisher>Phipps Associates</publisher>
-		<info name="usage" value="16K" />
-		<part name="cass1" interface="zx81_cass">
-			<feature name="part_id" value="Puzzle"/>
-			<dataarea name="cass" size="7385">
-				<rom name="puzzle.p" size="7385" crc="0fcd568c" sha1="c397878e951cfebeb5cd55a7bd0a9c1cf011960a"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="zx81_cass">
-			<feature name="part_id" value="Demolition"/>
-			<dataarea name="cass" size="3565">
-				<rom name="demolition.p" size="3565" crc="9c5bc7d3" sha1="0097c3d7b20c0163b315bcef68dabb2e1e190e92"/>
-			</dataarea>
-		</part>
-		<part name="cass3" interface="zx81_cass">
-			<feature name="part_id" value="Tenpin"/>
-			<dataarea name="cass" size="9283">
-				<rom name="tenpin.p" size="9283" crc="a14ba685" sha1="84459743b188ec326890c759589aee37392bcfe8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5674,8 +5604,8 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		<publisher>Hestacrest</publisher>
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
-			<dataarea name="cass" size="16040">
-				<rom name="purchases.p" size="16040" crc="ae9bbabb" sha1="a770455bf0b3a7f37f474a576079f27e040fbf0c"/>
+			<dataarea name="cass" size="16274">
+				<rom name="purchases.tzx" size="16274" crc="0c373fb0" sha1="9f5fa0daffc6e84b17e1d23793a16206bacc88cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5857,33 +5787,13 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 	</software>
 
 	<software name="racehors">
-		<description>Racehorse Trainer (TZX tape image)</description>
+		<description>Racehorse Trainer</description>
 		<year>1984</year>
 		<publisher>Gavin Barker</publisher>
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
-			<feature name="part_id" value="1.Puzzle 2.Demolition 3.Tenpin"/>
 			<dataarea name="cass" size="17083">
 				<rom name="RacehorseTrainer.tzx" size="17083" crc="c25b4909" sha1="7b970f528e90da9faf7093204bf9bf940124c7d0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="racehors_a" cloneof="racehors">
-		<description>Racehorse Trainer (splitted P tape image)</description>
-		<year>1984</year>
-		<publisher>Gavin Barker</publisher>
-		<info name="usage" value="16K" />
-		<part name="cass1" interface="zx81_cass">
-			<feature name="part_id" value="Intro"/>
-			<dataarea name="cass" size="1890">
-				<rom name="intro.p" size="1890" crc="625aecb0" sha1="953b929a7fbacf683f46395cd694804e404853e4"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="zx81_cass">
-			<feature name="part_id" value="Racehorse Trainer"/>
-			<dataarea name="cass" size="14824">
-				<rom name="racehorsetrainer.p" size="14824" crc="af74bd7e" sha1="e37f584b4658a631ba24d269071361897f366e1e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6087,9 +5997,24 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		<description>Sabotage</description>
 		<year>1982</year>
 		<publisher>Sinclair Research</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="9070">
 				<rom name="Sabotage.tzx" size="9070" crc="0120fe03" sha1="4d123b512a757fe2e0bfd7ddee111322d8238d9f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sabotage_a" cloneof="sabotage">
+		<description>Sabotagem (Timex Portugal)</description>
+		<year>1983</year>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="8322">
+				<rom name="Sabotagem.p" size="8322" crc="e14edcf0" sha1="d2a69107daeb9583f096daf4745da0c95df1c517"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6625,14 +6550,14 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Side A"/>
-			<dataarea name="cass" size="14364">
-				<rom name="startrek.p" size="14364" crc="51de17f2" sha1="47073653c29ca5d662303aed29236773222fa694"/>
+			<dataarea name="cass" size="14586">
+				<rom name="StarTrekAnd3DOsAndXs.A.tzx" size="14586" crc="b9a844e7" sha1="7094c5142b1cea501d8c2c1ba556436c9794e2d3"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="zx81_cass">
 			<feature name="part_id" value="Side B"/>
-			<dataarea name="cass" size="8413">
-				<rom name="3dosandxs.p" size="8413" crc="19bdb3f6" sha1="3fb773dff835963fa1cd106dd74d1a365d421958"/>
+			<dataarea name="cass" size="8633">
+				<rom name="StarTrekAnd3DOsAndXs.B.tzx" size="8633" crc="4152bf8c" sha1="57585dcd38584c66ca2c6bc6bac13c08deca894b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7665,8 +7590,8 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		<publisher>Artic</publisher>
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
-			<dataarea name="cass" size="14757">
-				<rom name="tutorfrench.p" size="14757" crc="3b164378" sha1="44904124c5bfc17072bde73718877de8d0d15e7d"/>
+			<dataarea name="cass" size="14983">
+				<rom name="TutorFrench.tzx" size="14983" crc="14382005" sha1="1c68b4a7ba9a1f822f8283b5d9210e9659251e51"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7926,25 +7851,13 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 	</software>
 
 	<software name="warlord">
-		<description>Warlord (TZX tape image)</description>
+		<description>Warlord</description>
 		<year>1983</year>
 		<publisher>M.C. Lothlorien</publisher>
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="15879">
 				<rom name="Warlord.tzx" size="15879" crc="9bff8537" sha1="dee7757fc095d4de68efcd4147777e0cbbad8424"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="warlord_a" cloneof="warlord">
-		<description>Warlord (P tape image)</description>
-		<year>1983</year>
-		<publisher>M.C. Lothlorien</publisher>
-		<info name="usage" value="16K" />
-		<part name="cass1" interface="zx81_cass">
-			<dataarea name="cass" size="15659">
-				<rom name="warlord.p" size="15659" crc="5b5b6fbb" sha1="e8fe374088097adb86b658e54a4bc05208627ae5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8212,32 +8125,13 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 	</software>
 
 	<software name="zor">
-		<description>Zor (TZX tape image)</description>
+		<description>Zor</description>
 		<year>1982</year>
 		<publisher>International Publishing &amp; Software</publisher>
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="17561">
 				<rom name="Zor.tzx" size="17561" crc="981a342e" sha1="9ca9f0ea3ff878174bbdbeec1864759e2f142a6a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zor_a" cloneof="zor">
-		<description>Zor (splitted P tape image)</description>
-		<year>1982</year>
-		<publisher>International Publishing &amp; Software</publisher>
-		<info name="usage" value="16K" />
-		<part name="cass1" interface="zx81_cass">
-			<feature name="part_id" value="Zor Load Test"/>
-			<dataarea name="cass" size="1537">
-				<rom name="zorloadtest.p" size="1537" crc="1b9fb7ed" sha1="9623ed45b2cc234a200c990af18cec6e0ddc5425"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="zx81_cass">
-			<feature name="part_id" value="Zor"/>
-			<dataarea name="cass" size="15687">
-				<rom name="zor.p" size="15687" crc="2b8b7c95" sha1="b28400845d8f4632c48aff690448e4dc6ad624ad"/>
 			</dataarea>
 		</part>
 	</software>
