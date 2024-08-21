@@ -2,19 +2,27 @@
 // copyright-holders:flama12333
 /*************************************************************************
 known undumped games
+
 W&P CATCHER - lucky dog 
 https://youtu.be/e1Gp7Cr6KIQ
+
 Fantasy World - Diferent version
 https://youtu.be/I7l6sOW40gE
-there are 4 langauge Not configurable.
+
+There are 4 langauge Not configurable.
+
 chinese:
 https://youtu.be/RNM4aPQNWhg
+
 spanish:
 https://youtu.be/na70qV8awqE
+
 english female:
 https://youtu.be/wHEyHoKZkJk
+
 english male:
 https://youtu.be/aArV8y5TuzM?t=13
+
 amusements 
 https://youtu.be/qUiQgHpiAyI
 */
@@ -43,8 +51,6 @@ private:
 	void program_map(address_map &map);
 
 	virtual void machine_start() override;
-
-
 };
 
 static INPUT_PORTS_START( toysoldier )
@@ -131,7 +137,6 @@ void toysoldier_state::toysoldier(machine_config &config)
 	ay.port_b_read_callback().set_ioport("DSW2");
 	ym2413_device &opll(YM2413(config, "opll", 3.579545_MHz_XTAL));
 	opll.add_route(ALL_OUTPUTS, "mono", 1.0);
-	
 }
 
 ROM_START( toysoldier )
