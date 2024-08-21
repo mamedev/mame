@@ -502,7 +502,7 @@ IGS PCB-0239-11-EE
 ROM_START( slqz3 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "slqz3_027a.bin", 0x00000, 0x4000, CRC(abb8ef8b) SHA1(b8912fe38dc2ff3b1a718e9fe3c76eae30aad7dc) ) // unknown sticker
+	ROM_LOAD( "s11_027a.bin", 0x00000, 0x4000, CRC(abb8ef8b) SHA1(b8912fe38dc2ff3b1a718e9fe3c76eae30aad7dc) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "u29", 0x000000, 0x200000, CRC(215fed1e) SHA1(c85d8695e0be1044ac206118c3fc0ddc7063aaf6) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
