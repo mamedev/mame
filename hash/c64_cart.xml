@@ -3218,14 +3218,12 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 		</part>
 	</software>
 
-	<software name="pitfall2" supported="no">
+	<software name="pitfall2" supported="yes">
 		<description>Pitfall II: The Lost Caverns</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
-		<notes><![CDATA[
-Black screen, drives CPU port out of cart ROM during bootstrap at PC=8017
-]]></notes>
 		<info name="serial" value="DC-007-04" />
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />

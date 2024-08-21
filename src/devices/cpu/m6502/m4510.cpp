@@ -73,9 +73,9 @@ void m4510_device::device_reset()
 	nomap = true;
 
 	m65ce02_device::device_reset();
-	dir = 0x00;
-	port = 0x00;
-	drive = 0x00;
+	dir = 0xff;
+	port = 0xff;
+	drive = 0xff;
 	update_port();
 }
 
