@@ -48,7 +48,7 @@ private:
 };
 
 static INPUT_PORTS_START( toysoldier )
-    PORT_START("IN1") //  Gantry. 
+    PORT_START("IN1") //  Claw input 
     PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)
@@ -136,14 +136,14 @@ void toysoldier_state::toysoldier(machine_config &config)
 ROM_START( toysoldier )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "toysoldier.bin", 0x00000, 0x10000, CRC(BD52C1AE) SHA1(a76c10f93f9087bc2d01bfe866c0e66a006b4ddd) )
-	ROM_REGION( 0x200, "eeprom", 0 ) // According to diagram
+	ROM_REGION( 0x200, "eeprom", 0 ) // according to diagram
 	ROM_LOAD( "93c66.bin", 0x000, 0x200, NO_DUMP )
-	ROM_REGION( 0x40000, "voices", 0 )
-    ROM_LOAD( "api8108a.bin", 0x00000, 0x40000, NO_DUMP ) // API8108A VOICE ROM
+	ROM_REGION( 0x40000, "voice", 0 )
+    ROM_LOAD( "api8108a.bin", 0x00000, 0x40000, NO_DUMP ) // api8108A voice rom
 ROM_END
 
 } // anonymous namespace
 
 
 //    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                FLAGS
-GAME( 2003, toysoldier, 0,       toysoldier,   toysoldier, toysoldier_state, empty_init, ROT0, "Paokai / Coastal Amusements Inc", "Toy Soldier", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // This was dumped from a Coastal branded Toy Soldier from around 2003.
+GAME( 2003, toysoldier, 0,       toysoldier,   toysoldier, toysoldier_state, empty_init, ROT0, "Paokai / Coastal Amusements Inc", "Toy Soldier", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // This was dumped from an Coastal branded Toy Soldier from around 2003.
