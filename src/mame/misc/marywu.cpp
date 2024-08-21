@@ -22,6 +22,7 @@
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
+
 #include "marywu.lh"
 
 
@@ -194,8 +195,10 @@ void marywu_state::marywu(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::program_map);
 	maincpu.set_addrmap(AS_IO, &marywu_state::io_map);
 	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
+
 	/* nvram */
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	
 	/* Keyboard & display interface */
 	i8279_device &kbdc(I8279(config, "i8279", XTAL(10'738'635)));       // should it be perhaps a fraction of the XTAL clock ?
 	kbdc.out_sl_callback().set(FUNC(marywu_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
@@ -207,12 +210,12 @@ void marywu_state::marywu(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6)); /*  an ALE pulse is skipped during each external data memory access, which will affect sound generation if the program does this.*/
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6)); /* an ALE pulse is skipped during each external data memory access, which will affect sound generation if the program does this.*/
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 	ay1.port_a_write_callback().set(FUNC(marywu_state::ay1_port_a_w));
 	ay1.port_b_write_callback().set(FUNC(marywu_state::ay1_port_b_w));
    
-	ay8910_device &ay2(AY8910(config, "ay2", XTAL(10'738'635) / 6)); /*  an ALE pulse is skipped during each external data memory access, which will affect sound generation if the program does this.*/
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(10'738'635) / 6)); /* an ALE pulse is skipped during each external data memory access, which will affect sound generation if the program does this.*/
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
 	ay2.port_a_write_callback().set(FUNC(marywu_state::ay2_port_a_w));
 	ay2.port_b_write_callback().set(FUNC(marywu_state::ay2_port_b_w));
