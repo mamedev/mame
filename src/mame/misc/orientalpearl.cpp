@@ -56,7 +56,10 @@ public:
 private:
 	void io_map(address_map &map);
 	void program_map(address_map &map);
+
+protected:
 	virtual void machine_start() override;
+
 };
 
 static INPUT_PORTS_START( orientalpearl )
