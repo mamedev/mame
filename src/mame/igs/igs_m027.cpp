@@ -29,7 +29,10 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 
+#include "sound/okim6295.h"
+
 #include "screen.h"
+#include "speaker.h"
 
 namespace {
 
@@ -42,7 +45,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppi(*this, "ppi8255"),
 		m_igs017_igs031(*this, "igs017_igs031"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_oki(*this, "oki"),
+		m_portb(*this, "PORTB"),
+		m_portc(*this, "PORTC"),
+		m_dsw1(*this, "DSW1"),
+		m_dsw2(*this, "DSW2"),
+		m_dsw3(*this, "DSW3")
 	{ }
 
 	void igs_mahjong(machine_config &config);
@@ -71,6 +80,7 @@ public:
 	void init_olympic5();
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
@@ -79,16 +89,30 @@ private:
 	optional_device<i8255_device> m_ppi;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	required_device<screen_device> m_screen;
+	required_device<okim6295_device> m_oki;
+	required_ioport m_portb;
+	required_ioport m_portc;
+	required_ioport m_dsw1;
+	required_ioport m_dsw2;
+	required_ioport m_dsw3;
 
-	u32 unk_r()
-	{
-		return 0xffffffff;
-	}
+	u32 unk_r();
+	u32 unk2_r();
+	void unk2_w(u32 data);
+
+	void dsw_io_select_w(u32 data);
+
+	u8 ppi_porta_r();
+	u8 ppi_portb_r();
+	u8 ppi_portc_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void pgm_create_dummy_internal_arm_region();
 	void igs_mahjong_map(address_map &map);
+
+	u32 m_dsw_io_select;
+	u32 m_unk2_write_count;
 };
 
 void igs_m027_state::video_start()
@@ -96,6 +120,14 @@ void igs_m027_state::video_start()
 	m_igs017_igs031->video_start();
 }
 
+void igs_m027_state::machine_start()
+{
+	m_dsw_io_select = 0;
+	m_unk2_write_count = 0;
+
+	save_item(NAME(m_dsw_io_select));
+	save_item(NAME(m_unk2_write_count));
+}
 
 /***************************************************************************
 
@@ -112,64 +144,18 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
-	map(0x38008000, 0x38008003).r(FUNC(igs_m027_state::unk_r));
+	map(0x38008000, 0x38008003).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x000000ff);
 
-	map(0x38009000, 0x38009003).ram();     //??????????????  oki 6295
+	map(0x38009000, 0x38009003).r(FUNC(igs_m027_state::unk_r));
+
+	map(0x40000008, 0x4000000b).w(FUNC(igs_m027_state::unk2_w));
+	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027_state::unk2_r));
+	map(0x40000018, 0x4000001b).w(FUNC(igs_m027_state::dsw_io_select_w));
 
 	map(0x70000200, 0x70000203).ram();     //??????????????
 	map(0x50000000, 0x500003ff).nopw(); // uploads XOR table to external ROM here
 	map(0xf0000000, 0xf000000f).nopw(); // magic registers
 }
-
-
-
-/***************************************************************************
-
-    Common functions
-
-***************************************************************************/
-
-/***************************************************************************
-
-    Code Decryption
-
-***************************************************************************/
-#if 0
-static const u8 sdwx_tab[] =
-{
-	0x49, 0x47, 0x53, 0x30, 0x30, 0x35, 0x35, 0x52, 0x44, 0x34, 0x30, 0x32, 0x30, 0x36, 0x32, 0x31,
-	0x8a, 0xbb, 0x20, 0x67, 0x97, 0xa5, 0x20, 0x45, 0x6b, 0xc0, 0xe8, 0x0c, 0x80, 0xfb, 0x49, 0xaa,
-	0x1e, 0xac, 0x29, 0xf2, 0xb9, 0x9f, 0x01, 0x4a, 0x8d, 0x5f, 0x95, 0x96, 0x78, 0xc3, 0xf6, 0x65,
-	0x17, 0xbd, 0xb6, 0x5b, 0x25, 0x5f, 0x6b, 0xde, 0x10, 0x2e, 0x67, 0x05, 0xdc, 0xac, 0xb6, 0xbd,
-	0x3d, 0x20, 0x58, 0x3d, 0xf0, 0xa8, 0xc0, 0xad, 0x5b, 0x82, 0x8d, 0x12, 0x65, 0x97, 0x87, 0x7d,
-	0x97, 0x49, 0xdd, 0x74, 0x74, 0x7e, 0x9d, 0xa1, 0x15, 0xed, 0x75, 0xb9, 0x09, 0xa8, 0xa8, 0xb0,
-	0x6b, 0xea, 0x54, 0x1b, 0x45, 0x23, 0xe2, 0xe5, 0x25, 0x42, 0xce, 0x36, 0xfe, 0x42, 0x99, 0xa0,
-	0x41, 0xf8, 0x0b, 0x8c, 0x3c, 0x1b, 0xae, 0xe4, 0xb2, 0x94, 0x87, 0x02, 0xbc, 0x08, 0x17, 0xd9,
-	0xe0, 0xa4, 0x93, 0x63, 0x6f, 0x28, 0x5f, 0x4a, 0x24, 0x36, 0xd1, 0xda, 0xfa, 0xdd, 0x23, 0x26,
-	0x4e, 0x61, 0xb9, 0x7a, 0x36, 0x4d, 0x95, 0x01, 0x20, 0xbc, 0x18, 0xb7, 0xaf, 0xe4, 0xfb, 0x92,
-	0xd2, 0xe3, 0x8e, 0xec, 0x26, 0xce, 0x2f, 0x34, 0x8f, 0xf7, 0x0d, 0xd6, 0x11, 0x7f, 0x1f, 0x68,
-	0xf4, 0x1d, 0x5f, 0x16, 0x19, 0x2d, 0x4c, 0x4f, 0x96, 0xfc, 0x9f, 0xb0, 0x99, 0x53, 0x4c, 0x32,
-	0x7b, 0x41, 0xbc, 0x90, 0x23, 0x2e, 0x4a, 0xfc, 0x9e, 0x1d, 0xfc, 0x02, 0xfc, 0x41, 0x83, 0xbc,
-	0x6d, 0xc4, 0x75, 0x37, 0x9d, 0xd3, 0xc9, 0x26, 0x4d, 0xed, 0x93, 0xc6, 0x32, 0x6d, 0x02, 0x11,
-	0x12, 0x56, 0x97, 0x26, 0x1d, 0x5f, 0xa7, 0xf8, 0x89, 0x3f, 0x14, 0x36, 0x72, 0x3b, 0x48, 0x7b,
-	0xf1, 0xed, 0x72, 0xb7, 0x7a, 0x56, 0x05, 0xde, 0x7b, 0x27, 0x6d, 0xcf, 0x33, 0x4c, 0x14, 0x86,
-};
-#endif
-
-
-
-
-/***************************************************************************
-
-    Protection & I/O
-
-***************************************************************************/
-
-
-
-
-
-
 
 /***************************************************************************
 
@@ -179,22 +165,98 @@ static const u8 sdwx_tab[] =
 
 static INPUT_PORTS_START( base )
 
-	PORT_START("TEST0")
-    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
 
-	PORT_START("TEST1")
-    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
 
-	PORT_START("TEST2")
-    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+
+	PORT_START("PORTB") // buttons?
+	PORT_DIPNAME( 0x01, 0x01, "PORTB")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PORTC") // buttons?
+	PORT_DIPNAME( 0x01, 0x01, "PORTC")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jking02 )
+	PORT_INCLUDE(base)
 
-	PORT_START("TEST0")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) // can cause a coin error, maybe this port is multiplexed with inputs?
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "DSW2" ) // can cause a coin error (sets different inputs?)
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x02, 0x00, "Show Odds" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -209,31 +271,32 @@ static INPUT_PORTS_START( jking02 )
 	PORT_DIPSETTING(    0x10, "Casino Style" )
 	PORT_DIPSETTING(    0x00, "Casino Style (duplicate 1)" )
 	PORT_DIPSETTING(    0x30, "Casino Style (duplicate 2)" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("TEST1")
-    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("PORTB")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) // shows dipswitches
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) // maybe service coin?
 
-	PORT_START("TEST2")
-    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("PORTC")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // maybe bet?
+
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) // maybe start?
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( qlgs )
 	PORT_INCLUDE(base)
 
-	PORT_MODIFY("TEST0")
-    PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x04, 0x00, "Link Mode" )
+	PORT_DIPSETTING(    0x04, "Linked" )
+	PORT_DIPSETTING(    0x00, "Standalone" )
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( amazonia )
 	PORT_INCLUDE(base)
 
-	PORT_START("DSW1")
+	PORT_MODIFY("DSW1")
 // Credits proportion
 	PORT_DIPNAME( 0x03, 0x03, "Proporcao Credito" ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "1" )
@@ -262,7 +325,7 @@ static INPUT_PORTS_START( amazonia )
 	PORT_DIPSETTING(    0x80, "Auto" )
 
 
-	PORT_START("DSW2")
+	PORT_MODIFY("DSW2")
 // Demo Song
 	PORT_DIPNAME( 0x01, 0x01, "Demonstracao Musica" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
@@ -293,16 +356,6 @@ static INPUT_PORTS_START( amazonia )
 	PORT_DIPNAME( 0x80, 0x80, "Panel Mode" ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, "36+10" )
 	PORT_DIPSETTING(    0x80, "28" )
-
-	PORT_START("DSW3")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
 INPUT_PORTS_END
 
 
@@ -321,6 +374,58 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_state::interrupt)
 
 	if (scanline == 0 && m_igs017_igs031->get_nmi_enable())
 		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
+}
+
+u8 igs_m027_state::ppi_porta_r()
+{
+	logerror("%s: ppi_porta_r\n", machine().describe_context());
+	return 0xff;
+}
+
+u8 igs_m027_state::ppi_portb_r()
+{
+	logerror("%s: ppi_portb_r\n", machine().describe_context());
+	return m_portb->read();
+}
+
+u8 igs_m027_state::ppi_portc_r()
+{
+	logerror("%s: ppi_portc_r\n", machine().describe_context());
+	return m_portc->read();
+}
+
+
+void igs_m027_state::dsw_io_select_w(u32 data)
+{
+	m_dsw_io_select = data;
+}
+
+
+// IO? maybe serial?
+
+void igs_m027_state::unk2_w(u32 data)
+{
+	logerror("%s: unk2_w %08x\n", machine().describe_context(), data);
+	m_unk2_write_count++;
+}
+
+u32 igs_m027_state::unk2_r()
+{
+	logerror("%s: unk2_r\n", machine().describe_context());
+
+	// slqz3 boot check
+	if (m_unk2_write_count & 1)
+		return 0xffffffff;
+	else
+		return 0xffffffef;
+}
+
+u32 igs_m027_state::unk_r()
+{
+	// this is accessed as a byte, lower 2 bytes are read?
+	// slqz3 reads test switch in here? writes to the address look like key matrix?
+	logerror("%s: unk_r\n", machine().describe_context());
+	return 0xffffffff;
 }
 
 
@@ -342,9 +447,9 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027_state::interrupt), "screen", 0, 1);
 
 	I8255A(config, m_ppi);
-	m_ppi->in_pa_callback().set_ioport("TEST0");
-	m_ppi->in_pb_callback().set_ioport("TEST1");
-	m_ppi->in_pc_callback().set_ioport("TEST2");
+	m_ppi->in_pa_callback().set(FUNC(igs_m027_state::ppi_porta_r));
+	m_ppi->in_pb_callback().set(FUNC(igs_m027_state::ppi_portb_r));
+	m_ppi->in_pc_callback().set(FUNC(igs_m027_state::ppi_portc_r));
 
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
@@ -352,7 +457,8 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 	m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound hardware
-	// OK6295
+	SPEAKER(config, "mono").front_center();
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 /***************************************************************************
@@ -395,7 +501,7 @@ IGS PCB-0239-11-EE
 ROM_START( slqz3 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "slqz3_igs027a", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "slqz3_027a.bin", 0x00000, 0x4000, CRC(abb8ef8b) SHA1(b8912fe38dc2ff3b1a718e9fe3c76eae30aad7dc) ) // unknown sticker
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "u29", 0x000000, 0x200000, CRC(215fed1e) SHA1(c85d8695e0be1044ac206118c3fc0ddc7063aaf6) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
@@ -405,7 +511,6 @@ ROM_START( slqz3 )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "u18", 0x000000, 0x400000, CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
-
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "u26", 0x000000, 0x200000, CRC(84bc2f3e) SHA1(49dcf5eaa39accd5c6bf01782fd4221298cb43ed) ) // 1ST AND 2ND HALF IDENTICAL
@@ -769,7 +874,7 @@ Notes:
       61256 - EliteMT LP61256 32kBx8-bit SRAM (SOJ28)
     HM62256 - Hitachi HM62256 32kBx8-bit SRAM (SOP28)
       T518B - Reset IC
-    IGS027A - ARM7 CPU with internal ROM. 
+    IGS027A - ARM7 CPU with internal ROM.
               lhdmg - Sticker: B6
               lhdmgplus - Sticker: B4
 
@@ -1265,91 +1370,91 @@ void igs_m027_state::init_sdwx()
 void igs_m027_state::init_klxyj()
 {
 	klxyj_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_chessc2()
 {
 	chessc2_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_lhzb4()
 {
 	lhzb4_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_mgfx()
 {
 	mgfx_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_lhzb3()
 {
 	lhzb3_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_sddz()
 {
 	sddz_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_gonefsh2()
 {
 	gonefsh2_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_zhongguo()
 {
 	zhongguo_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_slqz3()
 {
 	slqz3_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
-	pgm_create_dummy_internal_arm_region();
+	//m_igs017_igs031->slqz3_decrypt_tiles(); // none of the existing functions are correct for this
+	// sprite gfx not encrypted
 }
 
 void igs_m027_state::init_fruitpar()
 {
 	fruitpar_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
-	m_igs017_igs031->tarzan_decrypt_sprites(0x400000);
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027_state::init_oceanpar()
 {
 	oceanpar_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_amazonia()
 {
 	amazonia_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_amazoni2()
 {
 	amazoni2_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
@@ -1357,28 +1462,28 @@ void igs_m027_state::init_qlgs()
 {
 	qlgs_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
-	m_igs017_igs031->tarzan_decrypt_sprites(0x400000);
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027_state::init_mgzz()
 {
 	mgzz_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt(); // wrong?
-	m_igs017_igs031->tarzan_decrypt_sprites(0x400000);
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027_state::init_mgcs3()
 {
 	mgcs3_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt(); // wrong?
-	m_igs017_igs031->tarzan_decrypt_sprites(0x400000);
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027_state::init_jking02()
 {
 	jking02_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
-	m_igs017_igs031->tarzan_decrypt_sprites(0x400000); // not 100% correect?
+	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
 	// the sprite ROM at 0x400000 doesn't require decryption
 }
 

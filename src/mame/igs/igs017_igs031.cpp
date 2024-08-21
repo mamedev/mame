@@ -524,6 +524,8 @@ void igs017_igs031_device::sdwx_gfx_decrypt()
 void igs017_igs031_device::mgcs_flip_sprites(size_t max_size)
 {
 	int rom_size;
+	if (max_size > memregion("sprites")->bytes())
+		fatalerror("mgcs_flip_sprites: max_size is greater than the size of the ROM region\n");
 
 	if (max_size == 0)
 		rom_size = memregion("sprites")->bytes();
@@ -570,9 +572,12 @@ void igs017_igs031_device::tjsb_decrypt_sprites()
 	}
 }
 
-void igs017_igs031_device::tarzan_decrypt_sprites(size_t max_size)
+void igs017_igs031_device::tarzan_decrypt_sprites(size_t max_size, size_t flip_size)
 {
-	mgcs_flip_sprites(max_size);
+	mgcs_flip_sprites(flip_size);
+
+	if (max_size > memregion("sprites")->bytes())
+		fatalerror("tarzan_decrypt_sprites: max_size is greater than the size of the ROM region\n");
 
 	const int rom_size = max_size ? max_size : memregion("sprites")->bytes();
 	u8 *rom = memregion("sprites")->base();
@@ -587,9 +592,9 @@ void igs017_igs031_device::tarzan_decrypt_sprites(size_t max_size)
 	}
 }
 
-void igs017_igs031_device::starzan_decrypt_sprites(size_t max_size)
+void igs017_igs031_device::starzan_decrypt_sprites(size_t max_size, size_t flip_size)
 {
-	tarzan_decrypt_sprites(max_size);
+	tarzan_decrypt_sprites(max_size, flip_size);
 
 	// Overlay rom:
 

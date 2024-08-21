@@ -1219,7 +1219,7 @@ void igs017_state::init_tarzanc()
 {
 	tarzan_decrypt_program_rom();
 	m_igs017_igs031->tarzan_decrypt_tiles(1);
-	m_igs017_igs031->tarzan_decrypt_sprites(0);
+	m_igs017_igs031->tarzan_decrypt_sprites(0x800000, 0);
 
 //  m_igs_string->dump("tarzan_string.key", 0xa98a, 0xab01, false); // tarzan / tarzanc (same program rom)
 }
@@ -1319,7 +1319,7 @@ void igs017_state::init_starzan()
 {
 	starzan_decrypt_program_rom();
 	m_igs017_igs031->tarzan_decrypt_tiles(1);
-	m_igs017_igs031->starzan_decrypt_sprites(0x200000);
+	m_igs017_igs031->starzan_decrypt_sprites(0x200000, 0x400000);
 
 //  m_igs_string->dump("starzan_string.key", 0xa86f, 0xa966, false);
 }
@@ -1361,7 +1361,7 @@ void igs017_state::init_happyskl()
 	}
 
 	m_igs017_igs031->tarzan_decrypt_tiles(1);
-	m_igs017_igs031->starzan_decrypt_sprites(0x200000);
+	m_igs017_igs031->starzan_decrypt_sprites(0x200000, 0);
 }
 
 
@@ -1386,7 +1386,7 @@ void igs017_state::init_cpoker2()
 	}
 
 	m_igs017_igs031->tarzan_decrypt_tiles(1);
-	m_igs017_igs031->tarzan_decrypt_sprites(0);
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 

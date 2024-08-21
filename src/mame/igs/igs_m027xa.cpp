@@ -406,7 +406,7 @@ void igs_m027xa_state::init_crzybugs()
 {
 	crzybugs_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
-	m_igs017_igs031->tarzan_decrypt_sprites(0); // ok?
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027xa_state::init_crzybugsj()
