@@ -1,6 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:flama12333
 /*************************************************************************
+Probably created by Chang yu Electronic as they used the same music format like changyu2 and gluck2
+
 Features Notes:
 src: Chang yu website
 
@@ -28,7 +30,7 @@ Electronic ball-checking device ensures where ball lands.
 // TODO:
 Need hardware info.
 Hook up nvram inputs opll and adpcm.
-pearlorient Has undumped mcu and adpcm rom.
+orientalpearl Has undumped mcu and adpcm rom.
 Add segment display as marywu.cpp
 */
 #include "emu.h"
@@ -42,14 +44,14 @@ Add segment display as marywu.cpp
 
 namespace {
 
-class pearlorient_state : public driver_device
+class orientalpearl_state : public driver_device
 {
 public:
-	pearlorient_state(const machine_config &mconfig, device_type type, const char *tag)
+	orientalpearl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	void pearlorient(machine_config &config);
+	void orientalpearl(machine_config &config);
 
 private:
 	void io_map(address_map &map);
@@ -57,7 +59,7 @@ private:
 	virtual void machine_start() override;
 };
 
-static INPUT_PORTS_START( pearlorient )
+static INPUT_PORTS_START( orientalpearl )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -99,28 +101,28 @@ static INPUT_PORTS_START( pearlorient )
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
 INPUT_PORTS_END
 
-void pearlorient_state::program_map(address_map &map)
+void orientalpearl_state::program_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom();
 }
 
-void pearlorient_state::io_map(address_map &map)
+void orientalpearl_state::io_map(address_map &map)
 {
     map(0xfa00, 0xfa01).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
     map(0xfb02, 0xfb03).w("psg", FUNC(ay8910_device::address_data_w));
 	
 }
 
-void pearlorient_state::machine_start()
+void orientalpearl_state::machine_start()
 {
 }
 
-void pearlorient_state::pearlorient(machine_config &config)
+void orientalpearl_state::orientalpearl(machine_config &config)
 {
 	/* basic machine hardware */
 	i8052_device &maincpu(I8052(config, "maincpu", XTAL(10'738'000)));
-	maincpu.set_addrmap(AS_PROGRAM, &pearlorient_state::program_map);
-	maincpu.set_addrmap(AS_IO, &pearlorient_state::io_map);
+	maincpu.set_addrmap(AS_PROGRAM, &orientalpearl_state::program_map);
+	maincpu.set_addrmap(AS_IO, &orientalpearl_state::io_map);
 	
 	/* Keyboard & display interface */
 	I8279(config, "kdc", XTAL(10'738'000) / 6); 
@@ -134,7 +136,7 @@ void pearlorient_state::pearlorient(machine_config &config)
 	OKIM6295(config, "oki", XTAL(10'738'000) / 6, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // Clock frequency & pin 7 not verified
 }
 
-ROM_START( pearlorient )
+ROM_START( orientalpearl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "w27c512.bin", 0x00000, 0x10000, CRC(8D3D1E91) SHA1(b80907df0878057a1ded8b56225059e06382b9d6) ) // main program
 	ROM_REGION( 0x1000, "mcu", 0 )
@@ -147,4 +149,4 @@ ROM_END
 
 
 //    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                FLAGS
-GAME( 199?, pearlorient, 0,       pearlorient,   pearlorient, pearlorient_state, empty_init, ROT0, "Chang Yu Electronic", "Unknown 6 Ball Pinball Gambling", MACHINE_IS_SKELETON_MECHANICAL ) // EAST8  v1.05  string . this was dumped from soccer santiago II 6 ball pinball
+GAME( 200?, orientalpearl, 0,       orientalpearl,   orientalpearl, orientalpearl_state, empty_init, ROT0, "<unknown>", "Unknown 6 Ball Pinball Gambling", MACHINE_IS_SKELETON_MECHANICAL ) // EAST8  v1.05  string . this was dumped from soccer santiago II 6 ball pinball
