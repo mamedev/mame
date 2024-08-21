@@ -94,11 +94,11 @@ static INPUT_PORTS_START( toysoldier )
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
 INPUT_PORTS_END
 
-
 void toysoldier_state::program_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom();
 }
+
 void toysoldier_state::io_map(address_map &map)
 {
 	map(0x8000, 0x8001).w("opll", FUNC(ym2413_device::write));
@@ -112,6 +112,7 @@ void toysoldier_state::io_map(address_map &map)
 //  map(0xd000, 0xd000).unmapw(); // 7 segment display  control
     map(0xe000, 0xe000).nopw(); // Super Card
 }
+
 void toysoldier_state::machine_start()
 {
 }
