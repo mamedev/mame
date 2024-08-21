@@ -1219,7 +1219,7 @@ void igs017_state::init_tarzanc()
 {
 	tarzan_decrypt_program_rom();
 	m_igs017_igs031->tarzan_decrypt_tiles(1);
-	m_igs017_igs031->tarzan_decrypt_sprites(0x800000, 0);
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 
 //  m_igs_string->dump("tarzan_string.key", 0xa98a, 0xab01, false); // tarzan / tarzanc (same program rom)
 }
@@ -5519,6 +5519,67 @@ ROM_START( slqz2 )
 	ROM_LOAD( "slqz2_string.key", 0x00, 0xec, CRC(5ca22f9d) SHA1(a795415016fdcb6329623786dc992ac7b0877ddf) )
 ROM_END
 
+/*********************************************************************************
+
+An older version of Shuang Long Qiang Zhu 2 VS
+
+PCB Layout
+----------
+
+IGS PCB NO-0182-1
+|-----------------------------------------|
+|              6264                    SW3|
+|1             6264   27C4096.U25         |
+|8    IGS025                              |
+|W   (LABEL N2)                      6264 |
+|A                                        |
+|Y                                   6264 |
+|                                         |
+|                              68000      |
+|  IGS022    26C512.U12                   |
+|    32.768kHz                            |
+|            M1101.U13                PAL |
+|   8MHz                              PAL |
+|1                                    PAL |
+|0         27C4096.U15                PAL |
+|W                        IGS017          |
+|A  VOL          22MHz              61256 |
+|Y     7805                               |
+|UPC1242   K668  S1102.U22     SW1  SW2   |
+|-----------------------------------------|
+Notes:
+      68000 - Clock 11.000MHz [22/2]
+       K668 - Oki M6295 clone. Clock 1.000MHz [22/22]
+      SW1/2 - 8-Position DIP Switch
+        SW3 - Reset / NVRAM Clear
+      61256 - 32kBx8-bit SRAM
+       6264 - 8kBx8-bit SRAM
+     IGS022 - IGS custom. 32.768kHz crystal is tied to this IC so it has a real time clock integrated into it.
+
+*********************************************************************************/
+
+
+ROM_START( slqz2a )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "27c4096.u25", 0x00000, 0x80000, NO_DUMP )// dead ROM
+
+	ROM_REGION( 0x10000, "igs022", 0 )
+	ROM_LOAD( "26c512.u12",0x0000, 0x10000, CRC(794d0276) SHA1(ac903d2faa3fb315438dc8da22c5337611a8790d) ) // INTERNATIONAL GAMES SYSTEM CO.,LTD
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1101.u13", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) ) // FIXED BITS (0xxxxxxxxxxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "27c4096.u15", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s1102.u20", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "slqz2a_string.key", 0x00, 0xec, BAD_DUMP CRC(5ca22f9d) SHA1(a795415016fdcb6329623786dc992ac7b0877ddf) ) // TODO, if / when program ROM is dumped
+ROM_END
+
+
 /***************************************************************************
 
 Manguan Daheng (V123T1)
@@ -5919,6 +5980,7 @@ GAME ( 1998,  mgcsa,    mgcs,     mgcsa,    mgcs,     igs017_state, init_mgcsa, 
 GAME ( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, init_lhzb2,    ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                  MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
 GAME ( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, init_lhzb2a,   ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                 0 ) // 龙虎争霸2
 GAME ( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, init_slqz2,    ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",                        MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
+GAME ( 1998,  slqz2a,   slqz2,    slqz2,    slqz2,    igs017_state, init_slqz2,    ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, set 2)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
 GAME ( 1999,  tarzanc,  0,        tarzan,   tarzan,   igs017_state, init_tarzanc,  ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",                     0 ) // 泰山闯天关
 GAME ( 1999,  tarzan,   tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzan,   ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",                     MACHINE_NOT_WORKING ) // missing sprites and sound rom, imperfect tiles decryption
 GAME ( 1999,  tarzana,  tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzana,  ROT0, "IGS", "Tarzan (V107)",                                                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom
