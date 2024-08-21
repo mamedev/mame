@@ -138,7 +138,7 @@ void orientalpearl_state::orientalpearl(machine_config &config)
 
 ROM_START( orientalpearl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "w27c512.bin", 0x00000, 0x10000, CRC(8D3D1E91) SHA1(b80907df0878057a1ded8b56225059e06382b9d6) ) // main program
+	ROM_LOAD( "w27c512.bin", 0x00000, 0x10000, CRC(8d3d1e91) SHA1(b80907df0878057a1ded8b56225059e06382b9d6) ) // main program
 	ROM_REGION( 0x1000, "mcu", 0 )
 	ROM_LOAD( "at89s51.bin", 0x0000, 0x1000, NO_DUMP ) // mcu. Protection
 	ROM_REGION( 0x40000, "oki", 0 )
