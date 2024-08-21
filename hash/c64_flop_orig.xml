@@ -69,7 +69,7 @@ Fails loading
 		<description>Boulder Dash</description>
 		<year>1984</year>
 		<publisher>First Star</publisher>
-        <info name="usage" value="Requires joystick in port 1" />
+		<info name="usage" value="Requires joystick in port 1" />
 		<info name="video" value="PAL" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -103,7 +103,7 @@ Eventually goes "CHECKSUM ERROR! LOAD ABORTED!" on bootstrap
 		<description>Commando</description>
 		<year>1985</year>
 		<publisher>Elite</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 LOAD "COMMANDO",8,1
 ]]></notes>
 		<info name="video" value="PAL" />
@@ -118,7 +118,7 @@ LOAD "COMMANDO",8,1
 		<description>Defender of the Crown</description>
 		<year>1987</year>
 		<publisher>Cinemaware</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 LOAD "*",8,1
 Gets stuck at a "V-MAX!" screen
 ]]></notes>
@@ -158,7 +158,7 @@ Gets stuck at a "V-MAX!" screen
 		<description>Green Beret</description>
 		<year>1986</year>
 		<publisher>Ocean</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 LOAD "0:*",8,1
 Never leaves BASIC
 ]]></notes>
@@ -186,7 +186,7 @@ Never leaves BASIC
 		<description>Jack the Nipper</description>
 		<year>1986</year>
 		<publisher>Gremlin Graphics</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 LOAD "*",8,1
 Punts to BASIC
 ]]></notes>
@@ -203,7 +203,7 @@ Punts to BASIC
 		<description>Miami Vice</description>
 		<year>1986</year>
 		<publisher>Ocean</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 LOAD "*",8,1
 Punts to BASIC
 ]]></notes>
@@ -232,7 +232,7 @@ Punts to BASIC
 		<description>Rambo: First Blood Part II</description>
 		<year>1985</year>
 		<publisher>Ocean</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 LOAD "0:*",8,1
 Locks up during boot
 ]]></notes>
@@ -249,7 +249,7 @@ Locks up during boot
 		<description>Rambo: First Blood Part II (NTSC)</description>
 		<year>1985</year>
 		<publisher>Thunder Mountain</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 LOAD "0:*",8,1
 Hangs on loading transition between trademarks and title
 ]]></notes>
@@ -266,7 +266,7 @@ Hangs on loading transition between trademarks and title
 		<description>Rambo III (PAL)</description>
 		<year>1988</year>
 		<publisher>Ocean</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 LOAD "0:*",8,1
 Punts to BASIC
 ]]></notes>
@@ -303,7 +303,7 @@ Punts to BASIC
 		<description>Street Hassle</description>
 		<year>1987</year>
 		<publisher>Melbourne House</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 LOAD "*",8,1
 Part of player sprite draws transparent (collisions still works)
 ]]></notes>
@@ -319,7 +319,7 @@ Part of player sprite draws transparent (collisions still works)
 		<description>Strip Poker</description>
 		<year>1984</year>
 		<publisher>Artworx</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 None of the files on disk leaves BASIC
 ]]></notes>
 		<info name="video" value="PAL" />
@@ -334,7 +334,7 @@ None of the files on disk leaves BASIC
 		<description>Terramex</description>
 		<year>1988</year>
 		<publisher>Grand Slam</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 LOAD "*",8,1
 Crashes at the end of loading sequence
 ]]></notes>
@@ -358,7 +358,7 @@ Crashes at the end of loading sequence
 		<description>Turbo Out Run</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 LOAD "*",8,1
 Punts to BASIC
 ]]></notes>
@@ -384,7 +384,7 @@ Punts to BASIC
 		<description>Game Set and Match</description>
 		<year>1987</year>
 		<publisher>Ocean</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 LOAD "0:*",8,1
 Fails loading at least first two games
 Not extensively tested
@@ -453,7 +453,7 @@ Not extensively tested
 		</part>
 	</software>
 
-    <!-- diskmags -->
+	<!-- diskmags -->
 
 	<software name="input64_22">
 		<description>INPUT 64 10/86</description>
