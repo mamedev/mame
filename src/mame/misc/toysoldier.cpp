@@ -152,4 +152,4 @@ ROM_END
 
 
 //    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                FLAGS
-GAME( 2003, toysoldier, 0,       toysoldier,   toysoldier, toysoldier_state, empty_init, ROT0, "Paokai / Coastal Amusements Inc", "Toy Soldier", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // This was dumped from an Coastal branded Toy Soldier from around 2003.
+GAME( 2003, toysoldier, 0,       toysoldier,   toysoldier, toysoldier_state, empty_init, ROT0, "Toy Soldier (Coastal Amusements)", "Toy Soldier", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // This was dumped from an Coastal branded Toy Soldier from around 2003.
