@@ -133,13 +133,13 @@ void marywu_state::multiplex_7seg_w(uint8_t data)
 
 uint8_t marywu_state::keyboard_r()
 {
-	switch (m_selected_7seg_module >> 3)
+	switch (m_selected_7seg_module & 0x07)
 	{
 	case 0:
 	case 1:
 	case 2:
 	case 3:
-		return m_inputs[m_selected_7seg_module >> 3]->read();
+		return m_inputs[m_selected_7seg_module & 0x07]->read();
 	default:
 		return 0x00;
 	}
