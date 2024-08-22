@@ -28,6 +28,7 @@
   - Verify LEDs and coin counters (should be ok)
   - 3super8 randomly crashes
   - 3super8 doesn't have the 8x32 tilemap, change the video emulation accordingly
+  - jinhulu2 needs decryption work + IGS-003C emulation.
 
 ***************************************************************************/
 
@@ -130,6 +131,8 @@ public:
 	using spoker_state::spoker_state;
 
 	void spokeru(machine_config &config);
+
+	void init_jinhulu2();
 	void init_spokeru();
 
 protected:
@@ -503,7 +506,7 @@ void jb_state::portmap(address_map &map)
 	map(0x6800, 0x69ff).ram().w(FUNC(jb_state::reel_ram_w<0>)).share(m_reel_ram[0]);
 	map(0x6a00, 0x6bff).ram().w(FUNC(jb_state::reel_ram_w<1>)).share(m_reel_ram[1]);
 	map(0x6c00, 0x6dff).ram().w(FUNC(jb_state::reel_ram_w<2>)).share(m_reel_ram[2]);
-	map(0x6e00, 0x6fff).nopw(); // hardware seems to support a 4th reel, unused by the dump game (only writes 0xff)
+	map(0x6e00, 0x6fff).nopw(); // hardware seems to support a 4th reel, unused by the dumped game (only writes 0xff)
 	map(0x8000, 0xffff).rom().region("maincpu", 0x10000);
 }
 
@@ -1388,6 +1391,64 @@ ROM_START( 3super8 )
 	ROM_LOAD( "sound.bin", 0x00000, 0x40000, BAD_DUMP CRC(230b31c3) SHA1(38c107325d3a4e9781912078b1317dc9ba3e1ced) )
 ROM_END
 
+/*********************************************************************************
+
+Jin Hu Lu 2, IGS (year unknown, board dead/rotten, battery leaked EXTENSIVELY and killed it)
+This is a Poker game.
+Board is a mix of through-hole and surface mounted parts (lots of logic is SMD).
+Some chips have year 1999 so this is 1999 or later.
+
+PCB Layout
+----------
+
+IGS PCB No- 0202 - :
+|--------------------------------------------|
+|SW4    BATTERY  12MHz                 Z180  |
+|                                            |
+|1                                           |
+|8       T518B                        PRG.U40|
+|W                              PAL          |
+|A                              PAL     6264 |
+|Y          2149C               PAL          |
+|                               PAL     SKT  |
+|           IGS-003C                         |
+|                                            |
+|1                                           |
+|0                                   IGS002  |
+|W                                           |
+|A                      IGS001A              |
+|Y VOL     6264                        6264  |
+|  UPC1242        M6295           27C4002.U39|
+|7805    SP_U12.U12        SW1  SW2  SW3     |
+|--------------------------------------------|
+Notes:
+      2149C - Might be an 8255 PPI. Definitely not a YM2149 ;-)
+       Z180 - Zilog Z8018008PSC Z180 MPU. Chip rated at 8MHz so clock input likely to be 6MHz [12/2]
+    IGS003C - In a socket but marked on PCB as 'ASIC3' (which is unusual) so could be a custom chip and not a ROM?
+   IGS001/2 - Custom IGS Chip (QFP80)
+       6264 - 8kBx8-bit SRAM
+        SKT - Empty socket, missing PAL maybe?
+      M6295 - Oki Sound Chip. Clock input possibly 1.000MHz [12/12]
+      T518B - Reset Chip
+    SW1/2/3 - 8-Position DIP Switch
+ SP_U12.U12 - OKI Samples. Board printed '27C020' but actual chip is Intel FLASH P28F001
+
+*********************************************************************************/
+
+// TODO: this may actually fit in another driver or need a new one (has IGS-003C, seems different GFX hw). Codebase has some similarities to the Super Poker sets.
+ROM_START( jinhulu2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "prg.u40", 0x00000, 0x10000, CRC(e7974ae0) SHA1(1240fabeb79bb820ba371b378ad51660170c6cd0) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "27c4002.u39", 0x00000, 0x80000, CRC(b933ec01) SHA1(72b541579551114f7c8649c2e9a839ef4128fc14) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_FILL( 0x0000, 0x30000, 0xff )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "sp_u12.u12", 0x00000, 0x20000, CRC(1aeb078c) SHA1(9b8a256f51e66733c4ec30b451ca0711ed02318e) )
+ROM_END
 
 /***************************************************************************
                               Driver Init
@@ -1403,6 +1464,22 @@ void spokeru_state::init_spokeru()
 	{
 		int b = ((a & 0x0fff) | 0xf000);
 		rom[a] = rom[a] ^ rom[b];
+	}
+}
+
+void spokeru_state::init_jinhulu2()
+{
+// 0xf000 - 0xffff seem to be the decrypted version of 0x0000-0x0fff
+
+	// TODO: applying the above, doesn't seem to give 100% correct results. Adjust this.
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int a = 0; a < 0xf000; a++)
+	{
+		rom[a] ^= 0x01;
+		if ((a & 0x0282) == 0x0282) rom[a] ^= 0x01;
+		if ((a & 0x0940) == 0x0940) rom[a] ^= 0x02;
+		if ((a & 0x3220) == 0x0200) rom[a] ^= 0x40;
 	}
 }
 
@@ -1502,3 +1579,4 @@ GAME( 1996,  spk102ua,   spk306us, spokeru,  spoker,   spokeru_state, init_spoke
 GAME( 1996,  spk100,     spk306us, spoker,   spk114it, spoker_state,  init_spk100,   ROT0,  "IGS",       "Super Poker (v100)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1993?, 3super8,    0,        _3super8, 3super8,  spoker_state,  init_3super8,  ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
 GAME( 1997,  jbell,      0,        jb,       jb,       jb_state,      init_spokeru,  ROT0,  "IGS",       "Jingle Bell (v200US)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  jinhulu2,   0,        spokeru,  spoker,   spokeru_state, init_jinhulu2, ROT0,  "IGS",       "Jin Hu Lu 2",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption
