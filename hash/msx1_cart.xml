@@ -17804,7 +17804,7 @@ legacy FM implementations cannot find it.
 		<publisher>Al Alamiah</publisher>
 		<info name="alt_title" value="س و ص"/>
 		<info name="serial" value="M022"/>
-		<info name="usage" value="Does not work on all MSX models. Systems known to work: ax170, hx10, phc23, "/>
+		<info name="usage" value="Does not work on all MSX models. Systems known to work include: ax170, hx10, phc23."/>
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="0x10000">
 				<rom name="x y - al alamiah.rom" size="0x8000" crc="a2541660" sha1="4666e2fe5d8ed47c990a39cc345c744202228924"/>
