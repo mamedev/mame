@@ -478,7 +478,7 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 				case 0x00: data = m_maker_id; break;
 				case 0x02: data = m_device_id; break;
 				case 0x04: logerror("Block Protection Status not implemented.\n"); break;
-				case 0x06: logerror("Extende Memory Block Verify Code not implemented.\n"); break;
+				case 0x06: logerror("Extended Memory Block Verify Code not implemented.\n"); break;
 				case 0x1c: data = m_device_id2; break;
 				case 0x1e: data = m_device_id3; break;
 			}
@@ -947,6 +947,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			m_data[address] = data;
 			break;
 		case 16:  // 16bit mode not tested
+			logerror("16-bit mode word programming not tested.\n");
 			m_data[address*2] = data >> 8;
 			m_data[address*2+1] = data;
 			break;
@@ -963,7 +964,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			m_data[address] = data;
 			break;
 		case 16:
-			logerror("16bit mode programming not teste.d\n");
+			logerror("16-bit mode word programming not tested.\n");
 			m_data[address*2] = data >> 8;
 			m_data[address*2+1] = data;
 			break;
