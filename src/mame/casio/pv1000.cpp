@@ -279,7 +279,7 @@ void pv1000_state::io_w(offs_t offset, uint8_t data)
 			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 		break;
-//  case 0x06 VRAM + PCG location, always fixed at 0xb8xx
+	//case 0x06 VRAM + PCG location, always fixed at 0xb8xx
 	case 0x07:
 		/* ---- -xxx unknown, border color? */
 		m_pcg_bank = (data & 0xe0) >> 5;
@@ -313,28 +313,31 @@ uint8_t pv1000_state::io_r(offs_t offset)
 	{
 		case 4: // port $FC returns player 2 joystick and interrupt status
 			return 0x80
-				| m_joysticks[3]->read()
-				| m_joysticks[2]->read()
-				| (m_irq_active & 3);
-			/* Bit 1 = Matrix IRQ asserted    *
-			 * Bit 0 = Prerender IRQ asserted */
+					| m_joysticks[3]->read()
+					| m_joysticks[2]->read()
+					| (m_irq_active & 3); // Bit 1 = Matrix IRQ, Bit 0 = Prerender IRQ
 
 		case 5: // port $FD returns both joysticks and acknowledges matrix scan IRQ
-			m_irq_active &= ~2;
-			if (m_irq_active == 0)
-				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+			if (!machine().side_effects_disabled())
+			{
+				if (m_irq_active & 2)
+				{
+					m_irq_active &= ~2;
+					if (m_irq_active == 0)
+						m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+				}
+			}
 			return 0x80
-				| m_joysticks[3]->read()
-				| m_joysticks[2]->read()
-				| m_joysticks[1]->read()
-				| m_joysticks[0]->read();
+					| m_joysticks[3]->read()
+					| m_joysticks[2]->read()
+					| m_joysticks[1]->read()
+					| m_joysticks[0]->read();
 
 		default:
-			/* Ports 0xF8-0xFB, 0xFE, and 0xFF are undriven, and pulled high by the
+			/* Ports $F8-$FB, $FE, and $FF are undriven, and pulled high by the
 			   resistors next to the Z80 */
 			return 0xff;
 	}
-
 }
 
 

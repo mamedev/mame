@@ -293,10 +293,10 @@ void deco_ld_state::main_map(address_map &map)
 	map(0x1006, 0x1006).r(FUNC(deco_ld_state::acia_status_hack_r));
 	map(0x1007, 0x1007).rw(m_laserdisc, FUNC(sony_ldp1000_device::status_r), FUNC(sony_ldp1000_device::command_w));
 	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x2000, 0x23ff).mirror(0x800).ram().w(FUNC(deco_ld_state::vram_w<0>)).share("vram0");
-	map(0x2400, 0x27ff).mirror(0x800).ram().w(FUNC(deco_ld_state::attr_w<0>)).share("attr0");
-	map(0x3000, 0x33ff).mirror(0x800).ram().w(FUNC(deco_ld_state::vram_w<1>)).share("vram1");
-	map(0x3400, 0x37ff).mirror(0x800).ram().w(FUNC(deco_ld_state::attr_w<1>)).share("attr1");
+	map(0x2000, 0x23ff).mirror(0x800).ram().w(FUNC(deco_ld_state::vram_w<0>)).share(m_vram[0]);
+	map(0x2400, 0x27ff).mirror(0x800).ram().w(FUNC(deco_ld_state::attr_w<0>)).share(m_attr[0]);
+	map(0x3000, 0x33ff).mirror(0x800).ram().w(FUNC(deco_ld_state::vram_w<1>)).share(m_vram[1]);
+	map(0x3400, 0x37ff).mirror(0x800).ram().w(FUNC(deco_ld_state::attr_w<1>)).share(m_attr[1]);
 	map(0x4000, 0xffff).rom();
 }
 
