@@ -44,7 +44,8 @@ uint16_t bk_state::sel1_r()
 {
 	double level = m_cassette->input();
 	uint16_t data = 0100000 | m_sel1 | ((level < 0) ? 0 : SEL1_RX_CAS);
-	m_sel1 &= ~SEL1_UPDATED;
+	if (!machine().side_effects_disabled())
+		m_sel1 &= ~SEL1_UPDATED;
 
 	return data;
 }
