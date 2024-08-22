@@ -89,7 +89,7 @@ private:
 	void register_for_save_states();
 	void data_write(int data);
 	void update_fifo_status_and_ints();
-	int extract_bits(int count);
+	int read_bits(int count);
 	uint8_t status_read(bool clear_int);
 	bool ready_read();
 	bool int_read();
