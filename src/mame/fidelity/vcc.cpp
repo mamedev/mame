@@ -25,8 +25,8 @@ The Z80's interrupt inputs are all pulled to VCC, so no interrupts are used.
 Reset is connected to a power-on reset circuit and a button on the keypad (marked RE).
 
 The TSI chip connects to a 4K ROM.  All of the 'Voiced' Chess Challengers
-use this same ROM  (three or four).  The later chess boards use a slightly different part
-number, but the contents are identical.
+use this same ROM  (three or four).  The later chess boards use a slightly different
+part number, but the contents are identical.
 
 Memory map (VCC):
 -----------------

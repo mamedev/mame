@@ -132,7 +132,6 @@ public:
 	{ }
 
 	// machine configs
-	template <typename T> void cpu_config(T &maincpu);
 	void shared(machine_config &config);
 	void sc6(machine_config &config);
 	void msc(machine_config &config);
@@ -319,20 +318,16 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-template <typename T>
-void sc6_state::cpu_config(T &maincpu)
-{
-	maincpu.p1_in_cb().set(FUNC(sc6_state::input_r)).mask(0x3f);
-	maincpu.p1_in_cb().append_constant(0xc0).mask(0xc0);
-	maincpu.p1_out_cb().set(FUNC(sc6_state::select_w));
-	maincpu.p2_out_cb().set(FUNC(sc6_state::mux_w));
-	maincpu.t0_in_cb().set(FUNC(sc6_state::input_r)).bit(6);
-	maincpu.t1_in_cb().set(FUNC(sc6_state::input_r)).bit(7);
-}
-
 void sc6_state::shared(machine_config &config)
 {
 	// basic machine hardware
+	m_maincpu->p1_in_cb().set(FUNC(sc6_state::input_r)).mask(0x3f);
+	m_maincpu->p1_in_cb().append_constant(0xc0).mask(0xc0);
+	m_maincpu->p1_out_cb().set(FUNC(sc6_state::select_w));
+	m_maincpu->p2_out_cb().set(FUNC(sc6_state::mux_w));
+	m_maincpu->t0_in_cb().set(FUNC(sc6_state::input_r)).bit(6);
+	m_maincpu->t1_in_cb().set(FUNC(sc6_state::input_r)).bit(7);
+
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
@@ -349,8 +344,6 @@ void sc6_state::sc6(machine_config &config)
 {
 	I8040(config, m_maincpu, 11_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc6_state::sc6_map);
-	cpu_config<i8040_device>(downcast<i8040_device &>(*m_maincpu));
-
 	shared(config);
 
 	// video hardware
@@ -366,8 +359,6 @@ void sc6_state::msc(machine_config &config)
 {
 	I8049(config, m_maincpu, 11_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc6_state::msc_map);
-	cpu_config<i8049_device>(downcast<i8049_device &>(*m_maincpu));
-
 	shared(config);
 
 	config.set_default_layout(layout_fidel_msc_v2);
@@ -380,8 +371,6 @@ void sc6_state::msc(machine_config &config)
 void sc6_state::classic(machine_config &config)
 {
 	I8050(config, m_maincpu, 6_MHz_XTAL);
-	cpu_config<i8050_device>(downcast<i8050_device &>(*m_maincpu));
-
 	shared(config);
 
 	config.set_default_layout(layout_fidel_classic);
