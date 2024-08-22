@@ -3148,6 +3148,19 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		</part>
 	</software>
 
+	<software name="grandprx">
+		<description>Grand Prix</description>
+		<year>198?</year>
+		<publisher>Indescomp</publisher>
+		<info name="developer" value="Jeff Minter" />
+		<info name="language" value="Spanish" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="2780">
+				<rom name="Grand Prix.p" size="2780" crc="2f6120e1" sha1="c45163e37d61d5cb321d710d53322bc80ba8a645"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="graphkit">
 		<description>Graphics Kit</description>
 		<year>1981</year>
