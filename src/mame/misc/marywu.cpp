@@ -17,6 +17,7 @@
 **************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs51/mcs51.h"
 #include "machine/nvram.h"
 #include "machine/i8279.h"
@@ -116,31 +117,29 @@ INPUT_PORTS_END
 
 void marywu_state::ay1_port_a_w(uint8_t data)
 {
-	for (uint8_t i=0; i<8; i++){
+	for (uint8_t i = 0; i < 8; i++)
 		m_leds[i] = BIT(data, i);
-	}
 }
 
 void marywu_state::ay1_port_b_w(uint8_t data)
 {
-	for (uint8_t i=0; i<8; i++){
-		m_leds[i+8] = BIT(data, i);
+	for (uint8_t i = 0; i < 8; i++){
+		m_leds[i + 8] = BIT(data, i);
 	}
 }
 
 void marywu_state::ay2_port_a_w(uint8_t data)
 {
-	for (uint8_t i=0; i<8; i++){
-		m_leds[i+16] = BIT(data, i);
+	for (uint8_t i = 0; i < 8; i++)
+		m_leds[i + 16] = BIT(data, i);
 	}
 }
 
 void marywu_state::ay2_port_b_w(uint8_t data)
 {
-	for (uint8_t i=0; i<6; i++){
-		/* we only have 30 LEDs. The last 2 bits in this port are unused.  */
-		m_leds[i+24] = BIT(data, i);
-	}
+	// we only have 30 LEDs. The last 2 bits in this port are unused.
+	for (uint8_t i = 0; i < 6; i++)
+		m_leds[i + 24] = BIT(data, i);
 }
 
 void marywu_state::multiplex_7seg_w(uint8_t data)
@@ -150,11 +149,12 @@ void marywu_state::multiplex_7seg_w(uint8_t data)
 
 uint8_t marywu_state::keyboard_r()
 {
-	switch(m_selected_7seg_module % 8){
+	switch (m_selected_7seg_module % 8)
+	{
 	case 0: return ioport("KEYS1")->read();
-		case 1: return ioport("KEYS2")->read();
-		case 2: return ioport("DSW")->read();
-		case 3: return ioport("PUSHBUTTONS")->read();
+	case 1: return ioport("KEYS2")->read();
+	case 2: return ioport("DSW")->read();
+	case 3: return ioport("PUSHBUTTONS")->read();
 	default:
 			return 0x00;
 	}
@@ -164,7 +164,7 @@ void marywu_state::display_7seg_data_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // HEF4511BP (7 seg display driver)
 
-	m_digits[2 * m_selected_7seg_module + 0] = patterns[data & 0x0F];
+	m_digits[2 * m_selected_7seg_module + 0] = patterns[data & 0x0f];
 	m_digits[2 * m_selected_7seg_module + 1] = patterns[data >> 4];
 }
 
@@ -190,17 +190,20 @@ void marywu_state::machine_start()
 
 void marywu_state::marywu(machine_config &config)
 {
+	// The 8279 (U23) and PSGs (U16 and U14) are clocked using the ALE output from the 8031.
+	// This is normally 1/6th of the input clock frequency, but a pulse is skipped during external data memory accesses.
+	// If the program accesses external data memory, sound generation and keyboard scanning will be affected.
+
 	/* basic machine hardware */
 	i80c31_device &maincpu(I80C31(config, "maincpu", XTAL(10'738'635))); //actual CPU is a Winbond w78c31b-24
 	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::program_map);
 	maincpu.set_addrmap(AS_IO, &marywu_state::io_map);
 	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
 
-	/* nvram */
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	
+
 	/* Keyboard & display interface */
-	i8279_device &kbdc(I8279(config, "i8279", XTAL(10'738'635)));       // should it be perhaps a fraction of the XTAL clock ?
+	i8279_device &kbdc(I8279(config, "i8279", XTAL(10'738'635) / 6));
 	kbdc.out_sl_callback().set(FUNC(marywu_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
 	kbdc.in_rl_callback().set(FUNC(marywu_state::keyboard_r));          // keyboard Return Lines
 	kbdc.out_disp_callback().set(FUNC(marywu_state::display_7seg_data_w));
@@ -210,12 +213,13 @@ void marywu_state::marywu(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6)); /* an ALE pulse is skipped during each external data memory access, which will affect sound generation if the program does this.*/
+
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 	ay1.port_a_write_callback().set(FUNC(marywu_state::ay1_port_a_w));
 	ay1.port_b_write_callback().set(FUNC(marywu_state::ay1_port_b_w));
    
-	ay8910_device &ay2(AY8910(config, "ay2", XTAL(10'738'635) / 6)); /* an ALE pulse is skipped during each external data memory access, which will affect sound generation if the program does this.*/
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(10'738'635) / 6));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
 	ay2.port_a_write_callback().set(FUNC(marywu_state::ay2_port_a_w));
 	ay2.port_b_write_callback().set(FUNC(marywu_state::ay2_port_b_w));
