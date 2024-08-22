@@ -556,12 +556,12 @@ LRESULT debugwin_info::window_proc(UINT message, WPARAM wparam, LPARAM lparam)
 	// get min/max info: set the minimum window size
 	case WM_GETMINMAXINFO:
 		{
-			recompute_children();
 			auto *minmax = (MINMAXINFO *)lparam;
 			minmax->ptMinTrackSize.x = m_minwidth;
 			minmax->ptMinTrackSize.y = m_minheight;
-			minmax->ptMaxSize.x = minmax->ptMaxTrackSize.x = m_maxwidth;
-			minmax->ptMaxSize.y = minmax->ptMaxTrackSize.y = m_maxheight;
+			// Leave ptMaxSize, ptMaxTrackSize at their
+			// default so the user can expand as much
+			// as they wish
 			break;
 		}
 

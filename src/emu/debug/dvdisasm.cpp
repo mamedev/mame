@@ -352,25 +352,8 @@ void debug_view_disasm::generate_dasm(debug_disasm_buffer &buffer, offs_t pc)
 	generate_from_address(buffer, pc);
 }
 
-//-------------------------------------------------
-//  complete_information - helper used by
-//  view_update() to populate m_dasm just before
-//  calling redraw().  This includes three
-//  chunks of text: address, op codes + params,
-// 	and user-selected option (raw op codes /
-//  encrypted op codes / comments).
-//
-//  Returns the maximum number of characters
-//  needed for that third chunk: maximum comment
-//  length, but always at least 50 to accomodate
-//  other otions
-//-------------------------------------------------
-
-u32 debug_view_disasm::complete_information(const debug_view_disasm_source &source, debug_disasm_buffer &buffer, offs_t pc)
+void debug_view_disasm::complete_information(const debug_view_disasm_source &source, debug_disasm_buffer &buffer, offs_t pc)
 {
-	// Always allow at least 50 characters for third chunk of text on each line
-	u32 max_comment_length = 50;
-
 	for(auto &dasm : m_dasm) {
 		offs_t adr = dasm.m_address;
 
@@ -384,13 +367,9 @@ u32 debug_view_disasm::complete_information(const debug_view_disasm_source &sour
 		dasm.m_is_visited = source.device()->debug()->track_pc_visited(adr);
 
 		const char *comment = source.device()->debug()->comment_text(adr);
-		if(comment) {
+		if(comment)
 			dasm.m_comment = comment;
-			if (dasm.m_comment.size() > max_comment_length)
-				max_comment_length = dasm.m_comment.size();
-		}
 	}
-	return max_comment_length;
 }
 
 //-------------------------------------------------
@@ -406,8 +385,8 @@ void debug_view_disasm::view_update()
 
 	generate_dasm(buffer, pc);
 
-	u32 max_comment_length = complete_information(source, buffer, pc);
-	redraw(max_comment_length);
+	complete_information(source, buffer, pc);
+	redraw();
 }
 
 
@@ -445,7 +424,7 @@ void debug_view_disasm::print(u32 row, std::string text, s32 start, s32 end, u8 
 //  redraw - update the view from the data
 //-------------------------------------------------
 
-void debug_view_disasm::redraw(u32 max_comment_length)
+void debug_view_disasm::redraw()
 {
 	// determine how many characters we need for an address and set the divider
 	s32 divider1 = 1 + m_dasm[0].m_tadr.size() + 1;
@@ -454,7 +433,7 @@ void debug_view_disasm::redraw(u32 max_comment_length)
 	s32 divider2 = divider1 + 1 + m_dasm_width + 1;
 
 	// set the width of the third column to max comment length
-	m_total.x = divider2 + 4 + max_comment_length;
+	m_total.x = divider2 + 1 + 50;        // DEBUG_COMMENT_MAX_LINE_LENGTH
 
 	const s32 max_visible_col = m_topleft.x + m_visible.x;
 
