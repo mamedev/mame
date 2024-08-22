@@ -17802,9 +17802,9 @@ legacy FM implementations cannot find it.
 		<description>X &amp; Y (Arab)</description>
 		<year>1987</year>
 		<publisher>Al Alamiah</publisher>
-		<notes>Does not work on all MSX models. For instance, several Philips MSX2 machines, Sakhr AX-150 and possibly more.</notes>
 		<info name="alt_title" value="س و ص"/>
 		<info name="serial" value="M022"/>
+		<info name="usage" value="Does not work on all MSX models. For instance, several Philips MSX2 machines, Sakhr AX-150 and possibly more."/>
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="0x10000">
 				<rom name="x y - al alamiah.rom" size="0x8000" crc="a2541660" sha1="4666e2fe5d8ed47c990a39cc345c744202228924"/>
