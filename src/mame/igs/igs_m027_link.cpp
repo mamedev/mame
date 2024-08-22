@@ -180,7 +180,7 @@ void extension_state::video_start()
 void host_state::host_map(address_map &map)
 {
 	map(0x00000000, 0x00003fff).rom(); // Internal ROM
-	map(0x08000000, 0x0800ffff).rom().region("user1", 0); // Game ROM
+	map(0x08000000, 0x0800ffff).rom().region("user1", 0); // Game ROM (does it really map here? it appears to be connected indirectly via the 025)
 }
 
 void extension_state::extension_map(address_map &map)
@@ -304,7 +304,7 @@ void extension_state::extension(machine_config &config)
 ROM_START( mgcsh )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "y7_027a.bin", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "y7_027a.bin", 0x00000, 0x4000, CRC(3e726eeb) SHA1(41b4e5f8a9d35b82b1a62029b34c1e19e188a3bc) )	
 
 	ROM_REGION32_LE( 0x10000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v206cmmbox.u13", 0x00000, 0x10000, CRC(2bfdeeeb) SHA1(c92f8994f75e0eefb4dbf25daa0d62ad72a7ddfa) )
@@ -313,7 +313,7 @@ ROM_END
 ROM_START( cjslh )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "s2_027a.bin", 0x00000, 0x4000,  NO_DUMP )
+	ROM_LOAD( "s2_027a.bin", 0x00000, 0x4000, CRC(6be397fd) SHA1(ccd2469995a0b90800e891c39f4b3eaa033783ec) )	
 
 	ROM_REGION32_LE( 0x10000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v-106csm.u13", 0x00000, 0x10000, CRC(5b3f3446) SHA1(1d5b9523ac7f221eb7cc2e5db90cc859c640cc18) )
