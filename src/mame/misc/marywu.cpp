@@ -36,9 +36,13 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "led%u", 0U)
+		, m_inputs(*this, { "KEYS1", "KEYS2", "DSW", "PUSHBUTTONS" })
 	{ }
 
 	void marywu(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	void display_7seg_data_w(uint8_t data);
@@ -52,9 +56,10 @@ private:
 	void program_map(address_map &map);
 
 	uint8_t m_selected_7seg_module = 0;
-	virtual void machine_start() override;
+
 	output_finder<32> m_digits;
 	output_finder<30> m_leds;
+	required_ioport_array<4> m_inputs;
 };
 
 static INPUT_PORTS_START( marywu )
@@ -104,16 +109,14 @@ void marywu_state::ay1_port_a_w(uint8_t data)
 
 void marywu_state::ay1_port_b_w(uint8_t data)
 {
-	for (uint8_t i = 0; i < 8; i++){
+	for (uint8_t i = 0; i < 8; i++)
 		m_leds[i + 8] = BIT(data, i);
-	}
 }
 
 void marywu_state::ay2_port_a_w(uint8_t data)
 {
 	for (uint8_t i = 0; i < 8; i++)
 		m_leds[i + 16] = BIT(data, i);
-	}
 }
 
 void marywu_state::ay2_port_b_w(uint8_t data)
@@ -130,14 +133,15 @@ void marywu_state::multiplex_7seg_w(uint8_t data)
 
 uint8_t marywu_state::keyboard_r()
 {
-	switch (m_selected_7seg_module % 8)
+	switch (m_selected_7seg_module >> 3)
 	{
-	case 0: return ioport("KEYS1")->read();
-	case 1: return ioport("KEYS2")->read();
-	case 2: return ioport("DSW")->read();
-	case 3: return ioport("PUSHBUTTONS")->read();
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+		return m_inputs[m_selected_7seg_module >> 3]->read();
 	default:
-			return 0x00;
+		return 0x00;
 	}
 }
 

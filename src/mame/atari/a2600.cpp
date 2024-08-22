@@ -672,7 +672,6 @@ void a2600_state::a2600(machine_config &config)
 	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
 }
 
-
 void a2600p_state::a2600p(machine_config &config)
 {
 	a2600_base_pal(config);
@@ -699,6 +698,7 @@ void tvboy_state::tvboyn(machine_config &config)
 	a2600_base_ntsc(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tvboy_state::tvboy_mem);
 }
+
 
 ROM_START(a2600)
 	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
