@@ -1345,7 +1345,7 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		</part>
 	</software>
 
-	<software name="chess_mg" cloneof="chess">
+	<software name="chessmg" cloneof="chess">
 		<description>Chess (Mikro-Gen)</description>
 		<year>1982</year>
 		<publisher>Mikro-Gen</publisher>
@@ -1364,7 +1364,7 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		</part>
 	</software>
 
-	<software name="chess_mgo" cloneof="chess">
+	<software name="chessmgo" cloneof="chess">
 		<description>Chess (Mikro-Gen, orange cover)</description>
 		<year>1981</year>
 		<publisher>Mikro-Gen</publisher>
@@ -1383,7 +1383,7 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		</part>
 	</software>
 
-	<software name="chess_tx" cloneof="chess">
+	<software name="chesstx" cloneof="chess">
 		<description>Chess (Timex)</description>
 		<year>1982</year>
 		<publisher>Timex</publisher>
@@ -1394,7 +1394,7 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		</part>
 	</software>
 
-	<software name="chess_txp" cloneof="chess">
+	<software name="xadrez" cloneof="chess">
 		<description>Xadrez (Timex Portugal)</description>
 		<year>1983</year>
 		<publisher>Timex Portugal</publisher>
@@ -1414,7 +1414,7 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		</part>
 	</software>
 
-	<software name="chess_typ" cloneof="chess">
+	<software name="chesstyp" cloneof="chess">
 		<description>Chess (typed)</description>
 		<year>1981</year>
 		<publisher>Mikro-Gen</publisher>
@@ -2314,7 +2314,7 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		</part>
 	</software>
 
-	<software name="flsimul_tx" cloneof="flsimul">
+	<software name="flsimultx" cloneof="flsimul">
 		<description>The Flight Simulator (Timex)</description>
 		<year>1982</year>
 		<publisher>Timex</publisher>
@@ -2338,7 +2338,7 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		</part>
 	</software>
 
-	<software name="flsimul_txp" cloneof="flsimul">
+	<software name="simulvoo" cloneof="flsimul">
 		<description>Simulador de Voo (Timex Portugal)</description>
 		<year>1982</year>
 		<publisher>Timex Portugal</publisher>
@@ -6019,7 +6019,7 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		</part>
 	</software>
 
-	<software name="sabotage_txp" cloneof="sabotage">
+	<software name="sabotagm" cloneof="sabotage">
 		<description>Sabotagem (Timex Portugal)</description>
 		<year>1983</year>
 		<publisher>Timex Portugal</publisher>
@@ -6562,13 +6562,13 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		<publisher>Macronics</publisher>
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
-			<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A - Star Trek"/>
 			<dataarea name="cass" size="14586">
 				<rom name="StarTrekAnd3DOsAndXs.A.tzx" size="14586" crc="b9a844e7" sha1="7094c5142b1cea501d8c2c1ba556436c9794e2d3"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="zx81_cass">
-			<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B - 3D O's and X's"/>
 			<dataarea name="cass" size="8633">
 				<rom name="StarTrekAnd3DOsAndXs.B.tzx" size="8633" crc="4152bf8c" sha1="57585dcd38584c66ca2c6bc6bac13c08deca894b"/>
 			</dataarea>
