@@ -10,7 +10,11 @@ u6 w27c512-457 also to stored music and plays. without it will sound random note
 U9 hm6116l-70
 u10 3567 HX881 - ym2413 clone
 u11 api8208 - voice rom
+
+Direct Recording for reference https://youtu.be/uFzPDBtm-U0
+
 No progress until the internal rom is dumped.
+
 */
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
