@@ -559,9 +559,7 @@ LRESULT debugwin_info::window_proc(UINT message, WPARAM wparam, LPARAM lparam)
 			auto *minmax = (MINMAXINFO *)lparam;
 			minmax->ptMinTrackSize.x = m_minwidth;
 			minmax->ptMinTrackSize.y = m_minheight;
-			// Leave ptMaxSize, ptMaxTrackSize at their
-			// default so the user can expand as much
-			// as they wish
+			// Leave default ptMaxSize and ptMaxTrackSize so maximum size is not restricted
 			break;
 		}
 
