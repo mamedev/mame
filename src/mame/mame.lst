@@ -16337,10 +16337,11 @@ multy                           // (c) 1987  Deta
 trebol                          // (c) 1985  Regama
 
 @source:cirsa/neptunp2.cpp
-bg_barmy                        //
-bg_ddb                          //
-bg_max                          //
-bg_maxa                         //
+bg_barmy                        // (c) 1997 Cirsa / Unidesa / B Gaming Technology
+bg_dbells                       // (c) 2000 Cirsa / Unidesa / B Gaming Technology
+bg_ddb                          // (c) 1999 Cirsa / Unidesa / B Gaming Technology
+bg_max                          // (c) 2000 Cirsa / Unidesa / B Gaming Technology
+bg_maxa                         // (c) 2000 Cirsa / Unidesa / B Gaming Technology
 ccorsario                       // (c) 2002 Cirsa / Unidesa
 ccorsarioa                      // (c) 2002 Cirsa / Unidesa
 charles                         // (c) 2002? Cirsa / Unidesa / Europea
