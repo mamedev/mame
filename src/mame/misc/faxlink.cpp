@@ -94,7 +94,7 @@ void faxlink_state::machine_start()
 void faxlink_state::skilltester(machine_config &config)
 {
 	/* basic machine hardware */
-	i8052_device &maincpu(I8052(config, "maincpu", XTAL(12'000'000)));
+	i8052_device &maincpu(I8052(config, "maincpu", XTAL(11'059'200)));
 	maincpu.set_addrmap(AS_PROGRAM, &faxlink_state::program_map);
 	maincpu.set_addrmap(AS_IO, &faxlink_state::io_map);
 
