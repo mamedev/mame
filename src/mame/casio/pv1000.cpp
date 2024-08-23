@@ -317,8 +317,10 @@ uint8_t pv1000_state::io_r(offs_t offset)
 	{
 		case 4: // port $FC returns player 2 joystick and interrupt status
 			return 0x80
-					| (BIT(m_io_regs[5], 3) ? m_joysticks[3]->read() : 0)
-					| (BIT(m_io_regs[5], 2) ? m_joysticks[2]->read() : 0)
+					| (((BIT(m_io_regs[5], 3) ? m_joysticks[3]->read() : 0)
+						| (BIT(m_io_regs[5], 2) ? m_joysticks[2]->read() : 0)
+						| (BIT(m_io_regs[5], 1) ? m_joysticks[1]->read() : 0)
+						| (BIT(m_io_regs[5], 0) ? m_joysticks[0]->read() : 0)) & 0x0c)
 					| (m_irq_active & 3); // Bit 1 = Matrix IRQ, Bit 0 = Prerender IRQ
 
 		case 5: // port $FD returns both joysticks and acknowledges matrix scan IRQ
