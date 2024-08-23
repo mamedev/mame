@@ -276,9 +276,6 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 				int res_x = ((x * 8) + xi);
 				int res_y = y + yi;
 
-				if(!m_screen->visible_area().contains(res_x, res_y))
-					continue;
-
 				uint8_t pen;
 				if(yi >= 16)
 					pen = 0;
