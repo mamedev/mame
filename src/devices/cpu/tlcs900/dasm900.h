@@ -13,8 +13,15 @@ Toshiba TLCS-900/H disassembly
 
 class tlcs900_disassembler : public util::disasm_interface
 {
+protected:
+	virtual void decode_control_register_8(std::ostream &stream, uint8_t imm);
+	virtual void decode_control_register_16(std::ostream &stream, uint8_t imm);
+	virtual void decode_control_register_32(std::ostream &stream, uint8_t imm);
+
 public:
-	tlcs900_disassembler() = default;
+	tlcs900_disassembler(std::pair<u16, char const *> const symbols[], std::size_t symbol_count);
+	tlcs900_disassembler() : tlcs900_disassembler(nullptr, 0) {}
+
 	virtual ~tlcs900_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override;
@@ -106,6 +113,62 @@ private:
 	static const char *const s_allreg32[256];
 	static const char *const s_cond[16];
 
+	std::pair<u16, char const *> const *m_symbols;
+	std::size_t m_symbol_count;
+
+	template <typename T> std::string address(T offset, int size) const;
+};
+
+
+class tmp94c241_disassembler : public tlcs900_disassembler
+{
+public:
+	tmp94c241_disassembler() : tlcs900_disassembler() {};
+	tmp94c241_disassembler(std::pair<u16, char const *> const symbols[], std::size_t symbol_count);
+	template<size_t N> tmp94c241_disassembler(std::pair<u16, char const *> const (&symbols)[N]) : tlcs900_disassembler(symbols, N) {}
+	
+	void decode_control_register_8(std::ostream &stream, uint8_t imm) override;
+	void decode_control_register_16(std::ostream &stream, uint8_t imm) override;
+	void decode_control_register_32(std::ostream &stream, uint8_t imm) override;
+
+private:
+	static const char *const s_sfr_names[];
+};
+
+
+class tmp95c061_disassembler : public tlcs900_disassembler
+{
+public:
+	tmp95c061_disassembler() : tlcs900_disassembler() {};
+	tmp95c061_disassembler(std::pair<u16, char const *> const symbols[], std::size_t symbol_count);
+	template<size_t N> tmp95c061_disassembler(std::pair<u16, char const *> const (&symbols)[N]) : tlcs900_disassembler(symbols, N) {}
+
+private:
+	static const char *const s_sfr_names[];
+};
+
+
+class tmp95c063_disassembler : public tlcs900_disassembler
+{
+public:
+	tmp95c063_disassembler() : tlcs900_disassembler() {};
+	tmp95c063_disassembler(std::pair<u16, char const *> const symbols[], std::size_t symbol_count);
+	template<size_t N> tmp95c063_disassembler(std::pair<u16, char const *> const (&symbols)[N]) : tlcs900_disassembler(symbols, N) {}
+
+private:
+	static const char *const s_sfr_names[];
+};
+
+
+class tmp96c141_disassembler : public tlcs900_disassembler
+{
+public:
+	tmp96c141_disassembler() : tlcs900_disassembler() {};
+	tmp96c141_disassembler(std::pair<u16, char const *> const symbols[], std::size_t symbol_count);
+	template<size_t N> tmp96c141_disassembler(std::pair<u16, char const *> const (&symbols)[N]) : tlcs900_disassembler(symbols, N) {}
+
+private:
+	static const char *const s_sfr_names[];
 };
 
 #endif

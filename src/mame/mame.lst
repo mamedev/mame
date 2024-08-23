@@ -25212,7 +25212,7 @@ jr200                           //
 jr200u                          //
 
 @source:matsushita/kn5000.cpp
-kn5000                          // (c) 199? Technics SX-KN5000 PCM Keyboard
+kn5000                          // (c) 1997 Technics SX KN-5000 PCM Keyboard
 
 @source:matsushita/myb3k.cpp
 myb3k                           //
