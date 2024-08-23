@@ -415,4 +415,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 199?, mwarr, 0, mwarr, mwarr, mwarr_state, empty_init, ROT0,  "Elettronica Video-Games S.R.L.", "Mighty Warriors (24/1)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, mwarr, 0, mwarr, mwarr, mwarr_state, empty_init, ROT0,  "Elettronica Video-Games", "Mighty Warriors (24/1)", MACHINE_SUPPORTS_SAVE )
