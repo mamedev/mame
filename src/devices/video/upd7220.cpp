@@ -45,16 +45,19 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-// todo typedef
+// TODO: typedef
 enum
 {
 	COMMAND_INVALID = -1,
 	COMMAND_RESET,
+	COMMAND_RESET2,
+	COMMAND_RESET3,
 	COMMAND_SYNC,
 	COMMAND_VSYNC,
 	COMMAND_CCHAR,
 	COMMAND_START,
-	COMMAND_BCTRL,
+	COMMAND_BLANK,
+	COMMAND_BLANK2,
 	COMMAND_ZOOM,
 	COMMAND_CURS,
 	COMMAND_PRAM,
@@ -69,8 +72,7 @@ enum
 	COMMAND_LPRD,
 	COMMAND_DMAR,
 	COMMAND_DMAW,
-	COMMAND_5A,
-	COMMAND_05
+	COMMAND_5A
 };
 
 enum
@@ -87,12 +89,14 @@ enum
 };
 
 #define UPD7220_COMMAND_RESET           0x00
+#define UPD7220_COMMAND_RESET2          0x01
+#define UPD7220_COMMAND_RESET3          0x09
 #define UPD7220_COMMAND_SYNC            0x0e // & 0xfe
 #define UPD7220_COMMAND_VSYNC           0x6e // & 0xfe
 #define UPD7220_COMMAND_CCHAR           0x4b
 #define UPD7220_COMMAND_START           0x6b
-#define UPD7220_COMMAND_BCTRL           0x0c // & 0xfe
-#define UPD7220_COMMAND_05              0x05
+#define UPD7220_COMMAND_BLANK           0x0c // & 0xfe
+#define UPD7220_COMMAND_BLANK2          0x05
 #define UPD7220_COMMAND_ZOOM            0x46
 #define UPD7220_COMMAND_CURS            0x49
 #define UPD7220_COMMAND_PRAM            0x70 // & 0xf0
@@ -142,6 +146,7 @@ static constexpr int y_dir[8] = { 1, 1, 0,-1,-1,-1, 0, 1};
 
 // devices
 DEFINE_DEVICE_TYPE(UPD7220, upd7220_device, "upd7220", "NEC uPD7220")
+DEFINE_DEVICE_TYPE(UPD7220A, upd7220a_device, "upd7220a", "NEC uPD7220A")
 
 
 // default address map
@@ -157,6 +162,11 @@ void upd7220_device::upd7220_vram(address_map &map)
 ROM_START( upd7220 )
 	ROM_REGION( 0x100, "upd7220", 0 )
 	ROM_LOAD( "upd7220.bin", 0x000, 0x100, CRC(3c92b218) SHA1(e154b3106a80c9c98d9f2ee18efcd7f4b4aa7d49) )
+ROM_END
+
+ROM_START( upd7220a )
+	ROM_REGION( 0x100, "upd7220", 0 )
+	ROM_LOAD( "upd7220a.bin", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -182,6 +192,10 @@ const tiny_rom_entry *upd7220_device::device_rom_region() const
 	return ROM_NAME( upd7220 );
 }
 
+const tiny_rom_entry *upd7220a_device::device_rom_region() const
+{
+	return ROM_NAME( upd7220a );
+}
 
 
 //**************************************************************************
@@ -371,7 +385,7 @@ inline void upd7220_device::recompute_parameters()
 	else if((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON)
 	{
 		// in interlaced mode every line contains both fields
-		horiz_mult = 8; // TODO this breaks compis uhrg video, characters are 16 pixels wide in interlaced mode too
+		horiz_mult = 8; // TODO this breaks microbx2, compis uhrg video, characters are 16 pixels wide in interlaced mode too
 		vert_mult = 2;
 	}
 
@@ -459,16 +473,16 @@ inline void upd7220_device::rdat(uint8_t type, uint8_t mod)
 		uint16_t const data = read_vram();
 		switch(type)
 		{
-			case 0:
-				queue(data & 0xff, 0);
-				queue((data >> 8) & 0xff, 0);
-				break;
-			case 2:
-				queue(data & 0xff, 0);
-				break;
-			case 3:
-				queue((data >> 8) & 0xff, 0);
-				break;
+		case 0:
+			queue(data & 0xff, 0);
+			queue((data >> 8) & 0xff, 0);
+			break;
+		case 2:
+			queue(data & 0xff, 0);
+			break;
+		case 3:
+			queue((data >> 8) & 0xff, 0);
+			break;
 		}
 
 		m_figs.m_dc--;
@@ -487,38 +501,38 @@ inline void upd7220_device::write_vram(uint8_t type, uint8_t mod, uint16_t data,
 
 	switch(mod & 3)
 	{
-		case 0x00: //replace
-			if(type == 0)
-				current = (current & (~mask)) | (data & mask);
-			if(type == 2)
-				current = (current & ~(mask & 0xff)) | (data & (mask & 0xff));
-			if(type == 3)
-				current = (current & ~(mask & 0xff00)) | (data & (mask & 0xff00));
-			break;
-		case 0x01: //complement
-			if(type == 0)
-				current = current ^ (data & mask);
-			if(type == 2)
-				current = current ^ (data & (mask & 0xff));
-			if(type == 3)
-				current = current ^ (data & (mask & 0xff00));
-			break;
-		case 0x02: //reset to zero
-			if(type == 0)
-				current = current & ~(data & mask);
-			if(type == 2)
-				current = current & ~(data & (mask & 0xff));
-			if(type == 3)
-				current = current & ~(data & (mask & 0xff00));
-			break;
-		case 0x03: //set to one
-			if(type == 0)
-				current = current | (data & mask);
-			if(type == 2)
-				current = current | (data & (mask & 0xff));
-			if(type == 3)
-				current = current | (data & (mask & 0xff00));
-			break;
+	case 0x00: //replace
+		switch (type)
+		{
+		case 0: current = (current & (~mask)) | (data & mask); break;
+		case 2: current = (current & ~(mask & 0xff)) | (data & (mask & 0xff)); break;
+		case 3: current = (current & ~(mask & 0xff00)) | (data & (mask & 0xff00)); break;
+		}
+		break;
+	case 0x01: //complement
+		switch (type)
+		{
+		case 0: current = current ^ (data & mask); break;
+		case 2: current = current ^ (data & (mask & 0xff)); break;
+		case 3: current = current ^ (data & (mask & 0xff00)); break;
+		}
+		break;
+	case 0x02: //reset to zero
+		switch (type)
+		{
+		case 0: current = current & ~(data & mask); break;
+		case 2: current = current & ~(data & (mask & 0xff)); break;
+		case 3: current = current & ~(data & (mask & 0xff00)); break;
+		}
+		break;
+	case 0x03: //set to one
+		switch (type)
+		{
+		case 0: current = current | (data & mask); break;
+		case 2: current = current | (data & (mask & 0xff)); break;
+		case 3: current = current | (data & (mask & 0xff00)); break;
+		}
+		break;
 	}
 	writeword(m_ead, current);
 }
@@ -535,16 +549,16 @@ inline void upd7220_device::wdat(uint8_t type, uint8_t mod)
 
 	switch(type)
 	{
-		case 0:
-			result &= m_mask;
-			break;
-		case 2:
-			result &= (m_mask & 0xff);
-			break;
-		case 3:
-			result <<= 8;
-			result &= (m_mask & 0xff00);
-			break;
+	case 0:
+		result &= m_mask;
+		break;
+	case 2:
+		result &= (m_mask & 0xff);
+		break;
+	case 3:
+		result <<= 8;
+		result &= (m_mask & 0xff00);
+		break;
 	}
 
 	//if(result)
@@ -598,8 +612,8 @@ inline void upd7220_device::get_graphics_partition(int index, uint32_t *sad, uin
 //  upd7220_device - constructor
 //-------------------------------------------------
 
-upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, UPD7220, tag, owner, clock),
+upd7220_device::upd7220_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_display_cb(*this),
@@ -655,6 +669,16 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	}
 
 	memset(&m_figs, 0x00, sizeof(m_figs));
+}
+
+upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upd7220_device(mconfig, UPD7220, tag, owner, clock)
+{
+}
+
+upd7220a_device::upd7220a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upd7220_device(mconfig, UPD7220A, tag, owner, clock)
+{
 }
 
 
@@ -825,7 +849,7 @@ void upd7220_device::draw_line()
 		{
 			m_figs.m_dir = (d < 0) ? octant : (octant + 1) & 7;
 		}
-		d += ((d < 0 ) ? d1 : d2);
+		d += ((d < 0) ? d1 : d2);
 		next_pixel(m_figs.m_dir);
 	}
 }
@@ -901,7 +925,6 @@ void upd7220_device::draw_char()
 		{1, 3, -3, -1}
 	};
 	const uint8_t type = (m_figs.m_figure_type & 0x10) >> 4;
-
 
 	LOG("uPD7220 char check: %08x %04x %02x %02x %d %d %02x\n",m_ead,m_mask,m_bitmap_mod,m_figs.m_dir,m_figs.m_d,m_figs.m_dc,m_figs.m_figure_type);
 
@@ -984,58 +1007,58 @@ void upd7220_device::next_pixel(int direction)
 {
 	switch(direction & 7)
 	{
-		case 0:
-			m_ead += get_pitch();
-			break;
-		case 1:
-			m_ead += get_pitch();
-			if (m_mask & 0x8000)
-			{
-				m_ead += 1;
-			}
-			m_mask = rotate_left(m_mask);
-			break;
-		case 2:
-			if (m_mask & 0x8000)
-			{
-				m_ead += 1;
-			}
-			m_mask = rotate_left(m_mask);
-			break;
-		case 3:
-			m_ead -= get_pitch();
-			if (m_mask & 0x8000)
-			{
-				m_ead += 1;
-			}
-			m_mask = rotate_left(m_mask);
-			break;
-		case 4:
-			m_ead -= get_pitch();
-			break;
-		case 5:
-			m_ead -= get_pitch();
-			if (m_mask & 0x1)
-			{
-				m_ead -= 1;
-			}
-			m_mask = rotate_right(m_mask);
-			break;
-		case 6:
-			if (m_mask & 0x1)
-			{
-				m_ead -= 1;
-			}
-			m_mask = rotate_right(m_mask);
-			break;
-		case 7:
-			m_ead += get_pitch();
-			if (m_mask & 0x1)
-			{
-				m_ead -= 1;
-			}
-			m_mask = rotate_right(m_mask);
-			break;
+	case 0:
+		m_ead += get_pitch();
+		break;
+	case 1:
+		m_ead += get_pitch();
+		if (m_mask & 0x8000)
+		{
+			m_ead += 1;
+		}
+		m_mask = rotate_left(m_mask);
+		break;
+	case 2:
+		if (m_mask & 0x8000)
+		{
+			m_ead += 1;
+		}
+		m_mask = rotate_left(m_mask);
+		break;
+	case 3:
+		m_ead -= get_pitch();
+		if (m_mask & 0x8000)
+		{
+			m_ead += 1;
+		}
+		m_mask = rotate_left(m_mask);
+		break;
+	case 4:
+		m_ead -= get_pitch();
+		break;
+	case 5:
+		m_ead -= get_pitch();
+		if (m_mask & 0x1)
+		{
+			m_ead -= 1;
+		}
+		m_mask = rotate_right(m_mask);
+		break;
+	case 6:
+		if (m_mask & 0x1)
+		{
+			m_ead -= 1;
+		}
+		m_mask = rotate_right(m_mask);
+		break;
+	case 7:
+		m_ead += get_pitch();
+		if (m_mask & 0x1)
+		{
+			m_ead -= 1;
+		}
+		m_mask = rotate_right(m_mask);
+		break;
 	}
 	m_ead &= 0x3ffff;
 }
@@ -1064,13 +1087,12 @@ int upd7220_device::translate_command(uint8_t data)
 	case UPD7220_COMMAND_CURD:  command = COMMAND_CURD;  break;
 	case UPD7220_COMMAND_LPRD:  command = COMMAND_LPRD;  break;
 	case UPD7220_COMMAND_5A:    command = COMMAND_5A;    break;
-	case UPD7220_COMMAND_05:    command = COMMAND_05;    break;
 	default:
 		switch (data & 0xfe)
 		{
 		case UPD7220_COMMAND_SYNC:  command = COMMAND_SYNC;  break;
 		case UPD7220_COMMAND_VSYNC: command = COMMAND_VSYNC; break;
-		case UPD7220_COMMAND_BCTRL: command = COMMAND_BCTRL; break;
+		case UPD7220_COMMAND_BLANK: command = COMMAND_BLANK; break;
 		default:
 			switch (data & 0xf0)
 			{
@@ -1085,6 +1107,20 @@ int upd7220_device::translate_command(uint8_t data)
 				}
 			}
 		}
+	}
+
+	return command;
+}
+
+int upd7220a_device::translate_command(uint8_t data)
+{
+	int command = upd7220_device::translate_command(data);
+
+	switch (data)
+	{
+	case UPD7220_COMMAND_RESET2: command = COMMAND_RESET2; break;
+	case UPD7220_COMMAND_RESET3: command = COMMAND_RESET3; break;
+	case UPD7220_COMMAND_BLANK2: command = COMMAND_BLANK2; break;
 	}
 
 	return command;
@@ -1106,7 +1142,7 @@ void upd7220_device::process_fifo()
 	if (flag == FIFO_COMMAND)
 	{
 		cr = translate_command(data);
-		if (cr != COMMAND_BCTRL) // workaround for Rainbow 100 Windows 1.03, needs verification
+		if (cr != COMMAND_BLANK) // workaround for Rainbow 100 Windows 1.03, needs verification
 		{
 			m_cr = data;
 			m_param_ptr = 1;
@@ -1131,12 +1167,15 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_RESET: /* reset */
+	case COMMAND_RESET2:
+	case COMMAND_RESET3:
 		switch (m_param_ptr)
 		{
-		case 0:
+		case 1:
 			LOG("uPD7220 RESET\n");
 
-			m_de = 0;
+			if (cr != COMMAND_RESET3)
+				m_de = 0;
 			m_ra[0] = m_ra[1] = m_ra[2] = 0;
 			m_ra[3] = 0x19;
 			m_ead = 0;
@@ -1155,6 +1194,12 @@ void upd7220_device::process_fifo()
 			m_vbp = m_pr[8] >> 2;
 
 			m_pitch = m_aw;
+
+			if (type() == UPD7220A)
+			{
+				m_pitch = ((m_pr[5] & 0x40) << 2) | (m_pitch & 0xff);
+				m_al += (m_pr[6] >> 6) & 1;
+			}
 
 			LOG("uPD7220 Mode: %02x\n", m_mode);
 			LOG("uPD7220 AW: %u\n", m_aw);
@@ -1192,6 +1237,12 @@ void upd7220_device::process_fifo()
 
 			m_pitch = m_aw;
 
+			if (type() == UPD7220A)
+			{
+				m_pitch = ((m_pr[5] & 0x40) << 2) | (m_pitch & 0xff);
+				m_al += (m_pr[6] >> 6) & 1;
+			}
+
 			LOG("uPD7220 Mode: %02x\n", m_mode);
 			LOG("uPD7220 AW: %u\n", m_aw);
 			LOG("uPD7220 HS: %u\n", m_hs);
@@ -1216,32 +1267,32 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_CCHAR: /* cursor & character characteristics */
-		if(m_param_ptr == 2)
+		switch (m_param_ptr)
 		{
+		case 2:
 			m_lr = (m_pr[1] & 0x1f) + 1;
 			m_dc = BIT(m_pr[1], 7);
 
 			LOG("uPD7220 LR: %u\n", m_lr);
 			LOG("uPD7220 DC: %u\n", m_dc);
-		}
+			break;
 
-		if(m_param_ptr == 3)
-		{
+		case 3:
 			m_ctop = m_pr[2] & 0x1f;
 			m_sc = BIT(m_pr[2], 5);
 			m_br = (m_pr[2] >> 6); /* guess, assume that blink rate clears upper bits (if any) */
 
 			LOG("uPD7220 CTOP: %u\n", m_ctop);
 			LOG("uPD7220 SC: %u\n", m_sc);
-		}
+			break;
 
-		if(m_param_ptr == 4)
-		{
+		case 4:
 			m_br = ((m_pr[3] & 0x07) << 2) | (m_pr[2] >> 6);
 			m_cbot = m_pr[3] >> 3;
 
 			LOG("uPD7220 BR: %u\n", m_br);
 			LOG("uPD7220 CBOT: %u\n", m_cbot);
+			break;
 		}
 		break;
 
@@ -1251,11 +1302,11 @@ void upd7220_device::process_fifo()
 		//LOG("uPD7220 '%s' DE: 1\n");
 		break;
 
-	case COMMAND_05:
+	case COMMAND_BLANK2:
 		m_de = 0;
 		break;
 
-	case COMMAND_BCTRL: /* display blanking control */
+	case COMMAND_BLANK: /* display blanking control */
 		m_de = data & 0x01;
 
 		//LOG("uPD7220 DE: %u\n", m_de);
@@ -1300,10 +1351,11 @@ void upd7220_device::process_fifo()
 			{
 				LOG("uPD7220 RA%u: %02x\n", m_ra_addr, data);
 
-				if (m_ra_addr == 8)
-					m_pattern = (m_pattern & 0xff00) | data;
-				else if (m_ra_addr == 9)
-					m_pattern = (m_pattern & 0xff) | (data << 8);
+				switch (m_ra_addr)
+				{
+				case 8: m_pattern = (m_pattern & 0xff00) | data; break;
+				case 9: m_pattern = (m_pattern & 0x00ff) | (data << 8); break;
+				}
 				m_ra[m_ra_addr] = data;
 				m_ra_addr++;
 			}
@@ -1315,7 +1367,7 @@ void upd7220_device::process_fifo()
 	case COMMAND_PITCH: /* pitch specification */
 		if (flag == FIFO_PARAMETER)
 		{
-			m_pitch = data;
+			m_pitch = (m_pitch & 0x100) | data;
 
 			LOG("uPD7220 PITCH: %u\n", m_pitch);
 		}
@@ -1351,8 +1403,9 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_FIGS: /* figure drawing parameters specify */
-		if (m_param_ptr == 2)
+		switch (m_param_ptr)
 		{
+		case 2:
 			m_figs.m_dir = m_pr[1] & 0x7;
 			m_figs.m_figure_type = (m_pr[1] & 0xf8) >> 3;
 
@@ -1360,62 +1413,53 @@ void upd7220_device::process_fifo()
 			LOG("uPD7220 FIG: %02x\n", m_figs.m_figure_type);
 			//if(m_figs.m_dir != 2)
 			//  printf("DIR %02x\n",m_pr[1]);
-		}
+			break;
 
-		// the Decision Mate V during start-up test upload only 2 params before execute the
-		// RDAT command, so I assume this is the expected behaviour, but this needs to be verified.
-		if (m_param_ptr == 3)
-		{
+			// the Decision Mate V during start-up test upload only 2 params before execute the
+			// RDAT command, so I assume this is the expected behaviour, but this needs to be verified.
+		case 3:
 			m_figs.m_dc = (m_pr[2]) | (m_figs.m_dc & 0x3f00);
 			LOG("uPD7220 DC: %04x\n", m_figs.m_dc);
-		}
+			break;
 
-		if (m_param_ptr == 4)
-		{
+		case 4:
 			m_figs.m_dc = (m_pr[2]) | ((m_pr[3] & 0x3f) << 8);
 			m_figs.m_gd = (m_pr[3] & 0x40) && ((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_MIXED);
 			LOG("uPD7220 DC: %04x\n", m_figs.m_dc);
 			LOG("uPD7220 GD: %02x\n", m_figs.m_gd);
-		}
+			break;
 
-		if (m_param_ptr == 6)
-		{
+		case 6:
 			m_figs.m_d = (m_pr[4]) | ((m_pr[5] & 0x3f) << 8);
 			LOG("uPD7220 D: %04x\n", m_figs.m_d);
-		}
+			break;
 
-		if (m_param_ptr == 8)
-		{
+		case 8:
 			m_figs.m_d2 = (m_pr[6]) | ((m_pr[7] & 0x3f) << 8);
 			LOG("uPD7220 D2: %04x\n", m_figs.m_d2);
-		}
+			break;
 
-		if (m_param_ptr == 10)
-		{
+		case 10:
 			m_figs.m_d1 = (m_pr[8]) | ((m_pr[9] & 0x3f) << 8);
 			LOG("uPD7220 D1: %04x\n", m_figs.m_d1);
-		}
+			break;
 
-		if (m_param_ptr == 12)
-		{
+		case 12:
 			m_figs.m_dm = (m_pr[10]) | ((m_pr[11] & 0x3f) << 8);
 			LOG("uPD7220 DM: %04x\n", m_figs.m_dm);
+			break;
 		}
-
 		break;
 
 	case COMMAND_FIGD: /* figure draw start */
-		if(m_figs.m_figure_type == 0)
-			draw_pixel();
-		else if(m_figs.m_figure_type == 1)
-			draw_line();
-		else if(m_figs.m_figure_type == 4)
-			draw_arc();
-		else if(m_figs.m_figure_type == 8)
-			draw_rectangle();
-		else
-			logerror("uPD7220 Unimplemented command FIGD %02x\n", m_figs.m_figure_type);
-
+		switch (m_figs.m_figure_type)
+		{
+		case 0: draw_pixel(); break;
+		case 1: draw_line(); break;
+		case 4: draw_arc(); break;
+		case 8: draw_rectangle(); break;
+		default: logerror("uPD7220 Unimplemented command FIGD %02x\n", m_figs.m_figure_type);
+		}
 		reset_figs_param();
 		m_sr |= UPD7220_SR_DRAWING_IN_PROGRESS;
 		break;
@@ -1439,7 +1483,6 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_CURD: /* cursor address read */
-	{
 		fifo_set_direction(FIFO_READ);
 
 		queue(m_ead & 0xff, 0);
@@ -1450,7 +1493,6 @@ void upd7220_device::process_fifo()
 
 		m_sr |= UPD7220_SR_DATA_READY;
 		break;
-	}
 
 	case COMMAND_LPRD: /* light pen address read */
 		fifo_set_direction(FIFO_READ);
@@ -1557,27 +1599,27 @@ uint8_t upd7220_device::dack_r()
 	uint8_t result = 0;
 	switch(m_dma_type)
 	{
-		case 0:
-			if (m_dma_transfer_length % 2 == 0)
-			{
-				m_dma_data = read_vram();
-				result = m_dma_data & 0xff;
-			}
-			else
-			{
-				result = (m_dma_data >> 8) & 0xff;
-			}
-			break;
-		case 2:
+	case 0:
+		if (m_dma_transfer_length % 2 == 0)
+		{
 			m_dma_data = read_vram();
 			result = m_dma_data & 0xff;
-			break;
-		case 3:
-			m_dma_data = read_vram();
+		}
+		else
+		{
 			result = (m_dma_data >> 8) & 0xff;
-			break;
-		default:
-			logerror("uPD7220 Invalid DMA Transfer Type\n");
+		}
+		break;
+	case 2:
+		m_dma_data = read_vram();
+		result = m_dma_data & 0xff;
+		break;
+	case 3:
+		m_dma_data = read_vram();
+		result = (m_dma_data >> 8) & 0xff;
+		break;
+	default:
+		logerror("uPD7220 Invalid DMA Transfer Type\n");
 	}
 	if (--m_dma_transfer_length == 0)
 	{
@@ -1595,33 +1637,33 @@ void upd7220_device::dack_w(uint8_t data)
 {
 	switch(m_dma_type)
 	{
-		case 0:
-			if (m_dma_transfer_length % 2)
-			{
-				m_dma_data = ((m_dma_data & 0xff) | data << 8) & m_mask;
-				write_vram(m_dma_type, m_dma_mod, m_dma_data);
-				m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
-				m_ead &= 0x3ffff;
-			}
-			else
-			{
-				m_dma_data = (m_dma_data & 0xff00) | data;
-			}
-			break;
-		case 2:
-			m_dma_data = data & (m_mask & 0xff);
+	case 0:
+		if (m_dma_transfer_length % 2)
+		{
+			m_dma_data = ((m_dma_data & 0xff) | data << 8) & m_mask;
 			write_vram(m_dma_type, m_dma_mod, m_dma_data);
 			m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
 			m_ead &= 0x3ffff;
-			break;
-		case 3:
-			m_dma_data = (data << 8) & (m_mask & 0xff00);
-			write_vram(m_dma_type, m_dma_mod, m_dma_data);
-			m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
-			m_ead &= 0x3ffff;
-			break;
-		default:
-			logerror("uPD7220 Invalid DMA Transfer Type\n");
+		}
+		else
+		{
+			m_dma_data = (m_dma_data & 0xff00) | data;
+		}
+		break;
+	case 2:
+		m_dma_data = data & (m_mask & 0xff);
+		write_vram(m_dma_type, m_dma_mod, m_dma_data);
+		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
+		m_ead &= 0x3ffff;
+		break;
+	case 3:
+		m_dma_data = (data << 8) & (m_mask & 0xff00);
+		write_vram(m_dma_type, m_dma_mod, m_dma_data);
+		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
+		m_ead &= 0x3ffff;
+		break;
+	default:
+		logerror("uPD7220 Invalid DMA Transfer Type\n");
 	}
 	if (--m_dma_transfer_length == 0)
 	{

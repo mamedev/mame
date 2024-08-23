@@ -28,7 +28,7 @@ sensor board.
 #include "machine/msm5001n.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
@@ -67,7 +67,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device_array<msm5001n_device, 2> m_lcd_clock;
 	required_device<pwm_display_device> m_display;
-	required_device<speaker_sound_device> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<9> m_inputs;
 	output_finder<2, 4> m_lcd_digits;
 	output_finder<2> m_lcd_colon;
@@ -169,7 +169,7 @@ void turbos24k_state::mux_w(u8 data)
 	update_display();
 
 	// d4: speaker out
-	m_dac->level_w(BIT(data, 4));
+	m_dac->write(BIT(data, 4));
 }
 
 void turbos24k_state::leds_w(u8 data)
@@ -326,7 +326,7 @@ void turbos24k_state::turbos24k(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 

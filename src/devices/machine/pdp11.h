@@ -24,10 +24,10 @@ enum : uint16_t
 
 
 #define clear_virq(_callback, _csr, _ie, _intrq) \
-	if ((_csr) & (_ie)) { (_intrq) = CLEAR_LINE; }
+	do { if ((_csr) & (_ie)) { (_intrq) = CLEAR_LINE; } } while (0)
 
 #define raise_virq(_callback, _csr, _ie, _intrq) \
-	if ((_csr) & (_ie)) { (_intrq) = ASSERT_LINE; _callback (ASSERT_LINE); }
+	do { if ((_csr) & (_ie)) { (_intrq) = ASSERT_LINE; _callback (ASSERT_LINE); } } while (0)
 
 
 #define UPDATE_16BIT(_storage, _data, _mask) \

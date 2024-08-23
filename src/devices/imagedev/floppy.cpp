@@ -160,7 +160,6 @@ format_registration::format_registration()
 
 void format_registration::add_fm_containers()
 {
-	add(FLOPPY_HFE_FORMAT);
 	add(FLOPPY_MFM_FORMAT);
 	add(FLOPPY_TD0_FORMAT);
 	add(FLOPPY_IMD_FORMAT);

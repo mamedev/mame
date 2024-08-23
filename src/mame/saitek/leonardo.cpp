@@ -67,7 +67,7 @@ to be upgraded with an EMI PCB (power supply related, meaningless for emulation)
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
@@ -111,7 +111,7 @@ private:
 	required_device<input_merger_device> m_stb;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<speaker_sound_device> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<9> m_inputs;
 
@@ -185,7 +185,7 @@ void leo_state::mux_w(u8 data)
 	update_display();
 
 	// d4: speaker out
-	m_dac->level_w(BIT(data, 4));
+	m_dac->write(BIT(data, 4));
 }
 
 void leo_state::leds_w(u8 data)
@@ -426,7 +426,7 @@ void leo_state::leonardo(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	// expansion module (configure after video)
 	SAITEKOSA_EXPANSION(config, m_expansion, saitekosa_expansion_modules);

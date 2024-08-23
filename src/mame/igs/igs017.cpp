@@ -22,6 +22,7 @@ Year + Game                                   PCB        CPU    Sound           
 98  Long Hu Zhengba 2 (set 1)                 NO-0206    68000  K668            IGS031 IGS025 IGS022* Battery
 98  Shuang Long Qiang Zhu 2 VS (VS203J)       NO-0207    68000  K668            IGS031 IGS025 IGS022  Battery
 98  Manguan Caishen (V103CS)                  NO-0192-1  68000  K668            IGS017 IGS025 IGS029  Battery
+98  Manguan Caishen (V106CS)                  NO-0208    68000  M6295           IGS031 IGS025 IGS029  Battery
 99  Tarzan (V107)                             NO-0228?   Z180   U6295           IGS031 IGS025 IGS029  Battery
 99  Tarzan (V109C)                            NO-0248-1  Z180   U6295           IGS031 IGS025         Battery
 00  Chaoji Damanguan 2 - Jiaqiang Ban (V100C) NO-0271    68000  K668            IGS031 IGS025         Battery
@@ -644,6 +645,7 @@ public:
 	void lhzb2(machine_config &config);
 	void lhzb2a(machine_config &config);
 	void mgcs(machine_config &config);
+	void mgcsa(machine_config &config);
 	void mgdh(machine_config &config);
 	void mgdha(machine_config &config);
 	void sdmg2(machine_config &config);
@@ -657,6 +659,7 @@ public:
 	void init_lhzb2();
 	void init_lhzb2a();
 	void init_mgcs();
+	void init_mgcsa();
 	void init_mgdh();
 	void init_mgdha();
 	void init_sdmg2();
@@ -831,21 +834,12 @@ private:
 	// Decrypt
 	void decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0);
 
-	void lhzb2_decrypt_sprites();
-	void lhzb2_decrypt_tiles();
 	void mgcs_decrypt_program_rom();
-	void mgcs_decrypt_tiles();
-	void mgcs_flip_sprites();
+	void mgcsa_decrypt_program_rom();
 	void mgcs_igs029_run();
-	void slqz2_decrypt_tiles();
-	void spkrform_decrypt_sprites();
 	void starzan_decrypt_program_rom();
-	void starzan_decrypt_sprites();
 	void tarzan_decrypt_program_rom();
-	void tarzan_decrypt_sprites(size_t max_size);
-	void tarzan_decrypt_tiles(int address_xor);
 	void tarzana_decrypt_program_rom();
-	void tjsb_decrypt_sprites();
 
 	// ROM Patches
 //  void lhzb2_patch_rom();
@@ -876,6 +870,7 @@ private:
 	void lhzb2a_mux_map(address_map &map);
 	void mgcs_map(address_map &map);
 	void mgcs_mux_map(address_map &map);
+	void mgcsa_map(address_map &map);
 	void mgdh_mux_map(address_map &map);
 	void mgdh_map(address_map &map);
 	void mgdha_mux_map(address_map &map);
@@ -1046,34 +1041,12 @@ void igs017_state::init_iqblocka()
 
 // tjsb
 
-void igs017_state::tjsb_decrypt_sprites()
-{
-	const int rom_size = memregion("igs017_igs031:sprites")->bytes();
-	u8 * const rom = memregion("igs017_igs031:sprites")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	// address lines swap
-	memcpy(tmp.get(), rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr = (i & ~0xff) | bitswap<8>(i,7,6,5,2,1,4,3,0);
-		rom[i] = tmp[addr];
-	}
-
-	// data lines swap
-	for (int i = 0; i < rom_size; i += 2)
-	{
-		u16 data = get_u16le(&rom[i]); // x-22222-11111-00000
-		data = bitswap<16>(data, 15, 14,13,12,11,10, 9,1,7,6,5, 4,3,2,8,0);
-		put_u16le(&rom[i], data);
-	}
-}
 
 void igs017_state::init_tjsb()
 {
 	decrypt_program_rom(0x05, 7, 6, 3, 2, 5, 4, 1, 0);
 
-	tjsb_decrypt_sprites();
+	m_igs017_igs031->tjsb_decrypt_sprites();
 
 //  m_igs_string->dump("tjsb_string.key", 0x1d24a, 0x1db4, false);
 }
@@ -1129,38 +1102,50 @@ void igs017_state::mgcs_decrypt_program_rom()
 	}
 }
 
-void igs017_state::mgcs_decrypt_tiles()
+void igs017_state::mgcsa_decrypt_program_rom()
 {
-	const int rom_size = memregion("igs017_igs031:tilemaps")->bytes();
-	u8 * const rom = memregion("igs017_igs031:tilemaps")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
+	const int rom_size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
 
-	memcpy(&tmp[0], rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
+	for (int i = 0; i < rom_size / 2; i++)
 	{
-		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,10,6,7,8,9,5,4,3,2,1,0);
-		rom[i^1] = bitswap<8>(tmp[addr],0,1,2,3,4,5,6,7);
+		u16 x = rom[i];
+
+		if (i & 0x20 / 2)
+		{
+			if (i & 0x02 / 2)
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if (!(i & 0x4000 / 2))
+		{
+			if (!(i & 0x300 / 2))
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if (!(i & 0x1000 / 2) && !(i & 0x100 / 2))
+		{
+			if (!(i & 0x20 / 2))
+			{
+				x ^= 0x0100;
+			}
+		}
+		else if (i & 0x1000 / 2)
+		{
+			if ((!(i & 0x100 / 2)) || ((i & 0x20 / 2) && (!(i & 0x400 / 2))))
+			{
+				x ^= 0x0100;
+			}
+		}
+
+		rom[i] = x;
 	}
 }
 
-void igs017_state::mgcs_flip_sprites()
-{
-	const int rom_size = memregion("igs017_igs031:sprites")->bytes();
-	u8 * const rom = memregion("igs017_igs031:sprites")->base();
-
-	for (int i = 0; i < rom_size; i+=2)
-	{
-		u16 pixels = get_u16le(&rom[i]);
-
-		// flip bits
-		pixels = bitswap<16>(pixels,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
-
-		// flip pixels
-		pixels = bitswap<16>(pixels,15, 0,1,2,3,4, 5,6,7,8,9, 10,11,12,13,14);
-
-		put_u16le(&rom[i], pixels);
-	}
-}
 
 #if 0
 void igs017_state::mgcs_patch_rom()
@@ -1181,28 +1166,23 @@ void igs017_state::init_mgcs()
 	mgcs_decrypt_program_rom();
 //  mgcs_patch_rom();
 
-	mgcs_decrypt_tiles();
-	mgcs_flip_sprites();
+	m_igs017_igs031->mgcs_decrypt_tiles();
+	m_igs017_igs031->mgcs_flip_sprites(0);
 
 //  m_igs_string->dump("mgcs_string.key", 0x1424, 0x1338, true);
+}
+
+void igs017_state::init_mgcsa()
+{
+	mgcsa_decrypt_program_rom();
+
+	m_igs017_igs031->mgcs_decrypt_tiles();
+	m_igs017_igs031->mgcs_flip_sprites(0);
 }
 
 
 // tarzan, tarzana
 
-void igs017_state::tarzan_decrypt_tiles(int address_xor)
-{
-	const int rom_size = memregion("igs017_igs031:tilemaps")->bytes();
-	u8 * const rom = memregion("igs017_igs031:tilemaps")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	memcpy(&tmp[0], rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr = (i & ~0xffff) | (bitswap<16>(i,15,14,13,12,11, 7,8,6,10,9, 5,4,3,2,1,0) ^ address_xor);
-		rom[i] = bitswap<8>(tmp[addr],0,1,2,3,4,5,6,7);
-	}
-}
 
 void igs017_state::tarzan_decrypt_program_rom()
 {
@@ -1238,8 +1218,8 @@ void igs017_state::tarzan_decrypt_program_rom()
 void igs017_state::init_tarzanc()
 {
 	tarzan_decrypt_program_rom();
-	tarzan_decrypt_tiles(1);
-	tarzan_decrypt_sprites(0);
+	m_igs017_igs031->tarzan_decrypt_tiles(1);
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 
 //  m_igs_string->dump("tarzan_string.key", 0xa98a, 0xab01, false); // tarzan / tarzanc (same program rom)
 }
@@ -1283,7 +1263,7 @@ void igs017_state::tarzana_decrypt_program_rom()
 void igs017_state::init_tarzan()
 {
 	tarzan_decrypt_program_rom();
-	tarzan_decrypt_tiles(0);
+	m_igs017_igs031->tarzan_decrypt_tiles(0);
 
 //  m_igs_string->dump("tarzan_string.key", 0xa98a, 0xab01, false); // tarzan / tarzanc (same program rom)
 }
@@ -1291,7 +1271,7 @@ void igs017_state::init_tarzan()
 void igs017_state::init_tarzana()
 {
 	tarzana_decrypt_program_rom();
-	tarzan_decrypt_tiles(0);
+	m_igs017_igs031->tarzan_decrypt_tiles(0);
 
 //  m_igs_string->dump("tarzana_string.key", 0xaa64, 0xabdb, false); // same data as tarzan / tarzanc
 }
@@ -1338,48 +1318,12 @@ void igs017_state::starzan_decrypt_program_rom()
 void igs017_state::init_starzan()
 {
 	starzan_decrypt_program_rom();
-	tarzan_decrypt_tiles(1);
-	starzan_decrypt_sprites();
+	m_igs017_igs031->tarzan_decrypt_tiles(1);
+	m_igs017_igs031->starzan_decrypt_sprites(0x200000, 0x400000);
 
 //  m_igs_string->dump("starzan_string.key", 0xa86f, 0xa966, false);
 }
 
-
-void igs017_state::tarzan_decrypt_sprites(size_t max_size)
-{
-	mgcs_flip_sprites();
-
-	const int rom_size = max_size ? max_size : memregion("igs017_igs031:sprites")->bytes();
-	u8 *rom = memregion("igs017_igs031:sprites")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	// address lines swap
-	memcpy(tmp.get(), rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13, 9,10,11,12, 5,6,7,8, 4,3,2,1,0);
-		rom[i] = tmp[addr];
-	}
-}
-
-void igs017_state::starzan_decrypt_sprites()
-{
-	tarzan_decrypt_sprites(0x200000);
-
-	// Overlay rom:
-
-	const int rom_size = 0x80000;
-	u8 *rom = memregion("igs017_igs031:sprites")->base() + 0x200000;
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	// address lines swap
-	memcpy(tmp.get(), rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,10,9,  6,5, 8,7, 1,2,3,4, 0);
-		rom[i] = tmp[addr];
-	}
-}
 
 void igs017_state::init_happyskl()
 {
@@ -1416,8 +1360,8 @@ void igs017_state::init_happyskl()
 		rom[i] = x;
 	}
 
-	tarzan_decrypt_tiles(1);
-	starzan_decrypt_sprites();
+	m_igs017_igs031->tarzan_decrypt_tiles(1);
+	m_igs017_igs031->starzan_decrypt_sprites(0x200000, 0);
 }
 
 
@@ -1441,8 +1385,8 @@ void igs017_state::init_cpoker2()
 		rom[i] = x;
 	}
 
-	tarzan_decrypt_tiles(1);
-	tarzan_decrypt_sprites(0);
+	m_igs017_igs031->tarzan_decrypt_tiles(1);
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 
@@ -1558,7 +1502,7 @@ void igs017_state::init_mgdha()
 		rom[i] = x;
 	}
 
-	mgcs_flip_sprites();
+	m_igs017_igs031->mgcs_flip_sprites(0);
 
 //  m_igs_string->dump("mgdh_string.key", 0x7b214, 0x7b128, true); // mgdh, mgdha (0x7c5ba, ???)
 }
@@ -1593,43 +1537,6 @@ void igs017_state::lhzb2_patch_rom()
 	rom[0x0b48a/2] = 0x604e; // 00B48A: 674E    beq $b4da
 }
 #endif
-
-void igs017_state::lhzb2_decrypt_tiles()
-{
-	const int rom_size = memregion("igs017_igs031:tilemaps")->bytes();
-	u8 * const rom = memregion("igs017_igs031:tilemaps")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	memcpy(&tmp[0], rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr = (i & ~0xffffff) | bitswap<24>(i,23,22,21,20,19,18,17,1,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
-		rom[i] = tmp[addr];
-	}
-}
-
-void igs017_state::lhzb2_decrypt_sprites()
-{
-	const int rom_size = memregion("igs017_igs031:sprites")->bytes();
-	u8 * const rom = memregion("igs017_igs031:sprites")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	// address lines swap
-	memcpy(tmp.get(), rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,6,7,10,9,8,11,12,5,4,3,2,1,0);
-		rom[i] = tmp[addr];
-	}
-
-	// data lines swap
-	for (int i = 0; i < rom_size; i+=2)
-	{
-		u16 data = get_u16le(&rom[i]); // x-22222-11111-00000
-		data = bitswap<16>(data, 15, 7,6,5,4,3, 2,1,0,14,13, 12,11,10,9,8);
-		put_u16le(&rom[i], data);
-	}
-}
 
 void igs017_state::init_lhzb2()
 {
@@ -1714,8 +1621,8 @@ void igs017_state::init_lhzb2()
 		rom[i] = x;
 	}
 
-	lhzb2_decrypt_tiles();
-	lhzb2_decrypt_sprites();
+	m_igs017_igs031->lhzb2_decrypt_tiles();
+	m_igs017_igs031->lhzb2_decrypt_sprites();
 
 //  lhzb2_patch_rom();
 
@@ -1780,8 +1687,8 @@ void igs017_state::init_lhzb2a()
 		rom[i] = x;
 	}
 
-	lhzb2_decrypt_tiles();
-	lhzb2_decrypt_sprites();
+	m_igs017_igs031->lhzb2_decrypt_tiles();
+	m_igs017_igs031->lhzb2_decrypt_sprites();
 
 //  m_igs_string->dump("lhzb2a_string.key", 0x6e11c, 0x6e030, true); // same data as lhzb2
 }
@@ -1801,20 +1708,6 @@ void igs017_state::slqz2_patch_rom()
 	rom[0x0b77a/2] = 0x604e; // 00B77A: 674E    beq $b7ca
 }
 #endif
-
-void igs017_state::slqz2_decrypt_tiles()
-{
-	const int rom_size = memregion("igs017_igs031:tilemaps")->bytes();
-	u8 * const rom = memregion("igs017_igs031:tilemaps")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	memcpy(&tmp[0], rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr = (i & ~0xff) | bitswap<8>(i,7,4,5,6,3,2,1,0);
-		rom[i] = tmp[addr];
-	}
-}
 
 void igs017_state::init_slqz2()
 {
@@ -1890,8 +1783,8 @@ void igs017_state::init_slqz2()
 		rom[i] = x;
 	}
 
-	slqz2_decrypt_tiles();
-	lhzb2_decrypt_sprites();
+	m_igs017_igs031->slqz2_decrypt_tiles();
+	m_igs017_igs031->lhzb2_decrypt_sprites();
 
 //  slqz2_patch_rom();
 
@@ -1900,26 +1793,6 @@ void igs017_state::init_slqz2()
 
 
 // spkrform
-
-void igs017_state::spkrform_decrypt_sprites()
-{
-	const int rom_size = memregion("igs017_igs031:sprites")->bytes();
-	u8 * const rom = memregion("igs017_igs031:sprites")->base();
-	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
-
-	// address lines swap
-	memcpy(tmp.get(), rom, rom_size);
-	for (int i = 0; i < rom_size; i++)
-	{
-		int addr;
-		if (i & 0x80000)
-			addr = (i & ~0xff) | bitswap<8>(i,7,6,3,4,5,2,1,0);
-		else
-			addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,10, 4, 8,7,6,5, 9,3,2,1,0);
-
-		rom[i] = tmp[addr];
-	}
-}
 
 void igs017_state::spkrform_patch_rom()
 {
@@ -1933,7 +1806,7 @@ void igs017_state::init_spkrform()
 {
 	decrypt_program_rom(0x14, 7, 6, 5, 4, 3, 0, 1, 2);
 
-	spkrform_decrypt_sprites();
+	m_igs017_igs031->spkrform_decrypt_sprites();
 
 	spkrform_patch_rom();
 
@@ -2492,6 +2365,20 @@ void igs017_state::mgcs_mux_map(address_map &map)
 	map(0x03, 0x03).w(FUNC(igs017_state::mgcs_igs029_data_w));
 
 	igs_string_mux_map(map); // 0x05 r, 0x20 - 0x27 w, 0x40 r
+}
+
+void igs017_state::mgcsa_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x103fff).ram();
+
+	map(0x49c000, 0x49c001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
+	map(0x49c002, 0x49c003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
+
+	map(0x900000, 0x90ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
+
+	map(0x912001, 0x912001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	// oki banking through protection (code at $1a350)
 }
 
 
@@ -4799,6 +4686,13 @@ void igs017_state::mgcs(machine_config &config)
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::mgcs_palette_bitswap));
 }
 
+void igs017_state::mgcsa(machine_config &config)
+{
+	mgcs(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::mgcsa_map);
+}
+
 
 // lhzb2
 
@@ -5302,6 +5196,61 @@ ROM_START( mgcs )
 	ROM_LOAD( "mgcs_string.key", 0x00, 0xec, CRC(6cdadd19) SHA1(c2b4ced5d45d0af1ddeeabd0e352fd5383995d32) )
 ROM_END
 
+/*********************************************************************************
+
+Man Guan Cai Shen, IGS 1998
+
+PCB Layout
+----------
+
+IGS PCB NO- 0208
+|-----------------------------------------|
+|          JAMMA              VOL TDA1020 |
+|1   F521(x25)             7805           |
+|8           S1502.U12     M6295          |
+|W             22MHz             M1503.U22|
+|A       LM2933                           |
+|Y                                        |
+|                                         |
+|IGS029                                   |
+|     8MHz        IGS031                  |
+|                                M1501.U21|
+|                                         |
+|                              27C4096.U24|
+|             61256                       |
+|1   IGS025             68000       6264  |
+|0            PAL                         |
+|W            PAL                         |
+|A   SW1      PAL                         |
+|Y   SW2                    SW3     T518B |
+|-----------------------------------------|
+Notes:
+      68000 - Clock 11.000MHz [22/2]
+      M6295 - Clock 1.000MHz [22/22]
+      SW1/2 - 8-Position DIP Switch
+        SW3 - Reset / NVRAM Clear
+       6264 - 8kBx8-bit SRAM
+      61256 - 32kBx8-bit SRAM
+
+*********************************************************************************/
+
+ROM_START( mgcsa )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "27c4096.u24", 0x00000, 0x80000, CRC(c41b7530) SHA1(1f9f821658c50b84b2e8cce97ffea8349fdae54f) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "m1501.u21", 0x000000, 0x400000, CRC(96fce058) SHA1(6b87f47d646bad9b3061bdc8a9af65467fdbbc9f) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "m1503.u22", 0x00000, 0x80000, CRC(a37f9613) SHA1(812f060ca98a34540c48a180c359c3d0f1c0b5bb) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s1502.u12", 0x00000, 0x80000, CRC(a8a6ba58) SHA1(59276a8ab4a31812600816c2a43b74bd71394419) )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "mgcs_string.key", 0x00, 0xec, BAD_DUMP CRC(6cdadd19) SHA1(c2b4ced5d45d0af1ddeeabd0e352fd5383995d32) ) // TODO: seems the same as the parent, but double-check
+ROM_END
+
 /***************************************************************************
 
 Chaoji Damanguan II (China, V754C)
@@ -5569,6 +5518,67 @@ ROM_START( slqz2 )
 	ROM_REGION( 0xec, "igs_string", 0 )
 	ROM_LOAD( "slqz2_string.key", 0x00, 0xec, CRC(5ca22f9d) SHA1(a795415016fdcb6329623786dc992ac7b0877ddf) )
 ROM_END
+
+/*********************************************************************************
+
+An older version of Shuang Long Qiang Zhu 2 VS
+
+PCB Layout
+----------
+
+IGS PCB NO-0182-1
+|-----------------------------------------|
+|              6264                    SW3|
+|1             6264   27C4096.U25         |
+|8    IGS025                              |
+|W   (LABEL N2)                      6264 |
+|A                                        |
+|Y                                   6264 |
+|                                         |
+|                              68000      |
+|  IGS022    26C512.U12                   |
+|    32.768kHz                            |
+|            M1101.U13                PAL |
+|   8MHz                              PAL |
+|1                                    PAL |
+|0         27C4096.U15                PAL |
+|W                        IGS017          |
+|A  VOL          22MHz              61256 |
+|Y     7805                               |
+|UPC1242   K668  S1102.U22     SW1  SW2   |
+|-----------------------------------------|
+Notes:
+      68000 - Clock 11.000MHz [22/2]
+       K668 - Oki M6295 clone. Clock 1.000MHz [22/22]
+      SW1/2 - 8-Position DIP Switch
+        SW3 - Reset / NVRAM Clear
+      61256 - 32kBx8-bit SRAM
+       6264 - 8kBx8-bit SRAM
+     IGS022 - IGS custom. 32.768kHz crystal is tied to this IC so it has a real time clock integrated into it.
+
+*********************************************************************************/
+
+
+ROM_START( slqz2a )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "27c4096.u25", 0x00000, 0x80000, NO_DUMP )// dead ROM
+
+	ROM_REGION( 0x10000, "igs022", 0 )
+	ROM_LOAD( "26c512.u12",0x0000, 0x10000, CRC(794d0276) SHA1(ac903d2faa3fb315438dc8da22c5337611a8790d) ) // INTERNATIONAL GAMES SYSTEM CO.,LTD
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1101.u13", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) ) // FIXED BITS (0xxxxxxxxxxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "27c4096.u15", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s1102.u20", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "slqz2a_string.key", 0x00, 0xec, BAD_DUMP CRC(5ca22f9d) SHA1(a795415016fdcb6329623786dc992ac7b0877ddf) ) // TODO, if / when program ROM is dumped
+ROM_END
+
 
 /***************************************************************************
 
@@ -5966,9 +5976,11 @@ GAME ( 1998,  genius6,  0,        genius6,  genius6,  igs017_state, init_iqblock
 GAME ( 1997,  genius6a, genius6,  genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS", "Genius 6 (V133F)",                                                  0 ) // clone because it has older copyright year
 GAME ( 1997,  genius6b, genius6,  genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS", "Genius 6 (V132F)",                                                  0 ) // "
 GAME ( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, init_mgcs,     ROT0, "IGS", "Manguan Caishen (China, V103CS)",                                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
+GAME ( 1998,  mgcsa,    mgcs,     mgcsa,    mgcs,     igs017_state, init_mgcsa,    ROT0, "IGS", "Manguan Caishen (China, V106CS)",                                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
 GAME ( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, init_lhzb2,    ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                  MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
 GAME ( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, init_lhzb2a,   ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                 0 ) // 龙虎争霸2
 GAME ( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, init_slqz2,    ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",                        MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
+GAME ( 1998,  slqz2a,   slqz2,    slqz2,    slqz2,    igs017_state, init_slqz2,    ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, set 2)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
 GAME ( 1999,  tarzanc,  0,        tarzan,   tarzan,   igs017_state, init_tarzanc,  ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",                     0 ) // 泰山闯天关
 GAME ( 1999,  tarzan,   tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzan,   ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",                     MACHINE_NOT_WORKING ) // missing sprites and sound rom, imperfect tiles decryption
 GAME ( 1999,  tarzana,  tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzana,  ROT0, "IGS", "Tarzan (V107)",                                                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom

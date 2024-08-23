@@ -58,6 +58,20 @@ public:
 	void irq_enable_w(u8 data);
 	virtual void video_start();
 
+	void lhzb2_decrypt_tiles();
+	void mgcs_decrypt_tiles();
+	void tarzan_decrypt_tiles(int address_xor);
+	void slqz2_decrypt_tiles();
+	void sdwx_gfx_decrypt();
+
+	void mgcs_flip_sprites(size_t max_size);
+	void lhzb2_decrypt_sprites();
+	void tarzan_decrypt_sprites(size_t max_size, size_t flip_size);
+	void spkrform_decrypt_sprites();
+	void starzan_decrypt_sprites(size_t max_size, size_t flip_size);
+	void tjsb_decrypt_sprites();
+
+
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;

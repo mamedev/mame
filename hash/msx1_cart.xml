@@ -17798,18 +17798,17 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<!-- Software does not start -->
-	<software name="xy" supported="no">
+	<software name="xy">
 		<description>X &amp; Y (Arab)</description>
 		<year>1987</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="alt_title" value="س و ص"/>
-		<info name="serial" value="M022" />
-		<info name="usage" value="Requires an Arabic MSX" />
+		<info name="serial" value="M022"/>
+		<info name="usage" value="Does not work on all MSX models. Systems known to work include: ax170, hx10, phc23."/>
 		<part name="cart" interface="msx_cart">
-			<feature name="start_page" value="2"/>
-			<dataarea name="rom" size="0x8000">
-				<rom name="x y (1987)(al alamiah).rom" size="0x8000" crc="a2541660" sha1="4666e2fe5d8ed47c990a39cc345c744202228924" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="x y - al alamiah.rom" size="0x8000" crc="a2541660" sha1="4666e2fe5d8ed47c990a39cc345c744202228924"/>
+				<rom size="0x8000" offset="0x8000" loadflag="reload"/>
 			</dataarea>
 		</part>
 	</software>

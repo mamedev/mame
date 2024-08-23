@@ -178,7 +178,8 @@ public:
 		m_p_videoram(*this, "videoram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_joysticks(*this, "IN%u", 0)
 	{ }
 
 	void pv1000(machine_config &config);
@@ -192,15 +193,14 @@ private:
 	uint8_t io_r(offs_t offset);
 	void gfxram_w(offs_t offset, uint8_t data);
 	uint8_t m_io_regs[8]{};
-	uint8_t m_fd_data = 0;
 
 	emu_timer *m_irq_on_timer = nullptr;
-	emu_timer *m_irq_off_timer = nullptr;
 	emu_timer *m_busrq_on_timer = nullptr;
 	emu_timer *m_busrq_off_timer = nullptr;
+	uint8_t m_irq_enabled = 0;
+	uint8_t m_irq_active = 0;
 	uint8_t m_pcg_bank = 0;
 	uint8_t m_force_pattern = 0;
-	uint8_t m_fd_buffer_flag = 0;
 	uint8_t m_border_col = 0;
 	uint8_t m_render_disable = 0;
 
@@ -213,13 +213,14 @@ private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	uint32_t screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(d65010_irq_on_cb);
-	TIMER_CALLBACK_MEMBER(d65010_irq_off_cb);
 	TIMER_CALLBACK_MEMBER(d65010_busrq_on_cb);
 	TIMER_CALLBACK_MEMBER(d65010_busrq_off_cb);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_ioport_array<4> m_joysticks;
+
 	void pv1000_mem(address_map &map);
 	void pv1000_io(address_map &map);
 };
@@ -261,10 +262,24 @@ void pv1000_state::io_w(offs_t offset, uint8_t data)
 		m_sound->voice_w(offset, data);
 	break;
 
-	case 0x05:
-		m_fd_data = 0xf;
+	case 0x04:
+		/* Bit 1 = Matrix IRQ enabled    *
+		 * Bit 0 = Prerender IRQ enabled */
+		m_irq_enabled = data & 3;
+		m_irq_active &= m_irq_enabled;
+		if (m_irq_active == 0)
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+
 		break;
-//  case 0x06 VRAM + PCG location, always fixed at 0xb8xx
+
+	case 0x05:
+		/* Acknowledge Prerender IRQ */
+		m_irq_active &= ~1;
+		if (m_irq_active == 0)
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+
+		break;
+	//case 0x06 VRAM + PCG location, always fixed at 0xb8xx
 	case 0x07:
 		/* ---- -xxx unknown, border color? */
 		m_pcg_bank = (data & 0xe0) >> 5;
@@ -291,39 +306,38 @@ void pv1000_state::io_w(offs_t offset, uint8_t data)
 
 uint8_t pv1000_state::io_r(offs_t offset)
 {
-	uint8_t data = m_io_regs[offset];
-
-//  logerror("io_r offset=%02x\n", offset);
-
+	/* Real hardware always reads MSbit set from the two readable registers;
+	   lidnariq suspects D7 is input-only and the 128s bit is high due to the
+	   weak pull-ups on the data bus */
 	switch (offset)
 	{
-	case 0x04:
-		/* Bit 1 = 1 => Data is available in port FD */
-		/* Bit 0 = 1 => Buffer at port FD is empty */
-		data = 0;
-		data = m_fd_buffer_flag & 1;
-		data |= m_fd_data ? 2 : 0;
-		m_fd_buffer_flag &= ~1;
-		break;
-	case 0x05:
-		static const char *const joynames[] = { "IN0", "IN1", "IN2", "IN3" };
+		case 4: // port $FC returns player 2 joystick and interrupt status
+			return 0x80
+					| m_joysticks[3]->read()
+					| m_joysticks[2]->read()
+					| (m_irq_active & 3); // Bit 1 = Matrix IRQ, Bit 0 = Prerender IRQ
 
-		data = 0;
-
-		for (int i = 0; i < 4; i++)
-		{
-			if (m_io_regs[5] & 1 << i)
+		case 5: // port $FD returns both joysticks and acknowledges matrix scan IRQ
+			if (!machine().side_effects_disabled())
 			{
-				data |= ioport(joynames[i])->read();
-				m_fd_data &= ~(1 << i);
+				if (m_irq_active & 2)
+				{
+					m_irq_active &= ~2;
+					if (m_irq_active == 0)
+						m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+				}
 			}
-		}
+			return 0x80
+					| m_joysticks[3]->read()
+					| m_joysticks[2]->read()
+					| m_joysticks[1]->read()
+					| m_joysticks[0]->read();
 
-		//m_fd_data = 0;
-		break;
+		default:
+			/* Ports $F8-$FB, $FE, and $FF are undriven, and pulled high by the
+			   resistors next to the Z80 */
+			return 0xff;
 	}
-
-	return data;
 }
 
 
@@ -407,14 +421,21 @@ TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_on_cb)
 	int vpos = m_screen->vpos();
 	int next_vpos = vpos + 4;
 
-	if(vpos == 20)
-		m_fd_buffer_flag |= 1; /* TODO: exact timing of this */
+	m_irq_active |= 2 & m_irq_enabled;
+	if (vpos == 20)
+	{
+		m_irq_active |= 1 & m_irq_enabled;
+	}
 
-	/* Set IRQ line and schedule release of IRQ line */
-	m_maincpu->set_input_line(0, ASSERT_LINE);
-	m_irq_off_timer->adjust(m_screen->time_until_pos(vpos, 380/2));
+	if (m_irq_active)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	}
 
-	/* Schedule next IRQ trigger */
+	/* Schedule next IRQ trigger
+
+	   These numbers are an artifact of defining Y=0 as the
+	   top scanline of the non-blanking display. */
 	if (vpos >= 258)
 	{
 		next_vpos = 0; // 262=0, 4, 8, 12, 16, 20
@@ -423,17 +444,10 @@ TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_on_cb)
 	{
 		next_vpos = 222; // 226, 230, 234, 238, 242, 246, 250, 254, 258
 	}
-	m_irq_on_timer->adjust(m_screen->time_until_pos(next_vpos, 224));
+	m_irq_on_timer->adjust(m_screen->time_until_pos(next_vpos, 224+32));
 }
 
-
-TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_off_cb)
-{
-	m_maincpu->set_input_line(0, CLEAR_LINE);
-}
-
-/* if 0,0 is the top left corner of non-black pixels,
-   then busreq is asserted at X=288-32 = 256 */
+/* Add BUSACK-triggered scanline renderer */
 TIMER_CALLBACK_MEMBER(pv1000_state::d65010_busrq_on_cb)
 {
 	int vpos = m_screen->vpos();
@@ -468,7 +482,6 @@ void pv1000_state::pv1000_postload()
 void pv1000_state::machine_start()
 {
 	m_irq_on_timer = timer_alloc(FUNC(pv1000_state::d65010_irq_on_cb), this);
-	m_irq_off_timer = timer_alloc(FUNC(pv1000_state::d65010_irq_off_cb), this);
 	m_busrq_on_timer = timer_alloc(FUNC(pv1000_state::d65010_busrq_on_cb), this);
 	m_busrq_off_timer = timer_alloc(FUNC(pv1000_state::d65010_busrq_off_cb), this);
 
@@ -485,10 +498,10 @@ void pv1000_state::machine_start()
 	}
 
 	save_item(NAME(m_io_regs));
-	save_item(NAME(m_fd_data));
+	save_item(NAME(m_irq_enabled));
+	save_item(NAME(m_irq_active));
 	save_item(NAME(m_pcg_bank));
 	save_item(NAME(m_force_pattern));
-	save_item(NAME(m_fd_buffer_flag));
 	save_item(NAME(m_border_col));
 	save_item(NAME(m_render_disable));
 
@@ -499,9 +512,7 @@ void pv1000_state::machine_start()
 void pv1000_state::machine_reset()
 {
 	m_io_regs[5] = 0;
-	m_fd_data = 0;
-	m_irq_on_timer->adjust(m_screen->time_until_pos(195, 0));
-	m_irq_off_timer->adjust(attotime::never);
+	m_irq_on_timer->adjust(m_screen->time_until_pos(222, 256));
 	m_busrq_on_timer->adjust(m_screen->time_until_pos(26, 0));
 	m_busrq_off_timer->adjust(m_screen->time_until_pos(26, 248));
 }

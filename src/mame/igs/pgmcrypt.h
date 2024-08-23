@@ -52,3 +52,4 @@ void olympic5_decrypt(running_machine &machine);
 void icescape_decrypt(running_machine &machine);
 void tripfev_decrypt(running_machine &machine);
 void wldfruit_decrypt(running_machine &machine);
+void lthy_decrypt(running_machine &machine);

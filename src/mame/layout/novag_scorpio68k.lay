@@ -297,7 +297,7 @@ authors:hap
 
 <!-- buttons -->
 
-	<element name="cyan"><rect><color red="0.5" green="0.8" blue="0.8" /></rect></element>
+	<element name="cyan"><rect><color red="0.4" green="0.8" blue="0.8" /></rect></element>
 
 	<element name="but" defstate="0">
 		<rect state="0"><color red="0.155" green="0.15" blue="0.15" /></rect>
@@ -323,13 +323,13 @@ authors:hap
 		</rect>
 	</element>
 
-	<element name="text_l1a"><text string="Print Board"><color red="0.8" green="0.3" blue="0.2" /></text></element>
+	<element name="text_l1a"><text string="Print Board"><color red="0.8" green="0.25" blue="0.2" /></text></element>
 	<element name="text_l1b"><text string="Interface"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_l2a"><text string="Print List"><color red="0.8" green="0.3" blue="0.2" /></text></element>
-	<element name="text_l2b"><text string="Acc. Time"><color red="0.8" green="0.3" blue="0.2" /></text></element>
-	<element name="text_l3a"><text string="Print Moves"><color red="0.8" green="0.3" blue="0.2" /></text></element>
-	<element name="text_l3b"><text string="Print Evaluations"><color red="0.8" green="0.3" blue="0.2" /></text></element>
-	<element name="text_l4a"><text string="Print Book"><color red="0.8" green="0.3" blue="0.2" /></text></element>
+	<element name="text_l2a"><text string="Print List"><color red="0.8" green="0.25" blue="0.2" /></text></element>
+	<element name="text_l2b"><text string="Acc. Time"><color red="0.8" green="0.25" blue="0.2" /></text></element>
+	<element name="text_l3a"><text string="Print Moves"><color red="0.8" green="0.25" blue="0.2" /></text></element>
+	<element name="text_l3b"><text string="Print Evaluations"><color red="0.8" green="0.25" blue="0.2" /></text></element>
+	<element name="text_l4a"><text string="Print Book"><color red="0.8" green="0.25" blue="0.2" /></text></element>
 	<element name="text_l4b"><text string="Store Game"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_l5a"><text string="No/End"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_l5b"><text string="End of Game"><color red="0.81" green="0.8" blue="0.79" /></text></element>
@@ -357,7 +357,7 @@ authors:hap
 	<element name="text_m8a"><text string="Take Back"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_m8b"><text string="Analyze Games"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
-	<element name="text_r1a"><text string="New Game"><color red="0.5" green="0.8" blue="0.8" /></text></element>
+	<element name="text_r1a"><text string="New Game"><color red="0.4" green="0.8" blue="0.8" /></text></element>
 	<element name="text_r1b"><text string=" "></text></element>
 	<element name="text_r2a"><text string="Verify/Setup"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_r2b"><text string=" "></text></element>
@@ -371,7 +371,7 @@ authors:hap
 	<element name="text_r6b"><text string="Next Best"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_r7a"><text string="Set Level"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_r7b"><text string=" "></text></element>
-	<element name="text_r8a"><text string="Go"><color red="0.5" green="0.8" blue="0.8" /></text></element>
+	<element name="text_r8a"><text string="Go"><color red="0.4" green="0.8" blue="0.8" /></text></element>
 	<element name="text_r8b"><text string=" "></text></element>
 
 	<element name="text_n1b"><text string=" " align="1"></text></element>

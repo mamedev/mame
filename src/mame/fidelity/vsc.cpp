@@ -123,10 +123,10 @@ PB.2 - hi/lo TSI speaker volume
 PB.3 - violet wire to printer port?
 PB.4 - white wire to printer port? (and TSI BUSY line)
 PB.5 - selection jumper input (see below)
-PB.6 - TSI start line
+PB.6 - TSI START line
 PB.7 - TSI ROM A12 line
 
-selection jumpers:
+Selection jumpers:
 ------------------
 These act like another row of buttons.  It is composed of two diode locations,
 so there's up to 4 possible configurations.  My board does not have either diode
@@ -138,7 +138,7 @@ Anyways, the two jumpers are connected to button columns A and B and the common
 connects to Z80A PIO PB.5, which basically makes a 10th button row.  I would
 expect that the software reads these once on startup only.
 
-printer:
+Printer:
 --------
 This is the 1st Fidelity chess computer with a printer port. Many later Fidelity chess
 computers also have support for it. Two models were released:
@@ -201,7 +201,6 @@ private:
 	u8 m_7seg_data = 0;
 	u8 m_cb_mux = 0;
 	u8 m_kp_mux = 0;
-	bool m_lan_switch = false;
 
 	// address maps
 	void main_map(address_map &map);
@@ -226,7 +225,6 @@ void vsc_state::machine_start()
 	save_item(NAME(m_7seg_data));
 	save_item(NAME(m_cb_mux));
 	save_item(NAME(m_kp_mux));
-	save_item(NAME(m_lan_switch));
 }
 
 
@@ -245,7 +243,7 @@ void vsc_state::update_display()
 
 void vsc_state::ppi_porta_w(u8 data)
 {
-	// d0-d5: TSI C0-C5
+	// d0-d5: S14001A C0-C5
 	m_speech->data_w(data & 0x3f);
 
 	// d0-d7: data for the 4 7seg leds, bits are HGCBAFED (H is extra led)
@@ -286,8 +284,8 @@ u8 vsc_state::pio_porta_r()
 		if (BIT(m_kp_mux, i))
 			data |= m_inputs[i]->read();
 
-	// also language switches(hardwired with 2 diodes)
-	if (m_lan_switch)
+	// also language jumpers (hardwired with 2 diodes)
+	if (m_kp_mux & 0x20)
 		data |= *m_language;
 
 	return data;
@@ -295,28 +293,23 @@ u8 vsc_state::pio_porta_r()
 
 u8 vsc_state::pio_portb_r()
 {
-	u8 data = 0;
-
-	// d4: TSI BUSY line
-	data |= (m_speech->busy_r()) ? 0 : 0x10;
-
-	return data;
+	// d4: S14001A busy pin
+	return (m_speech->busy_r()) ? 0 : 0x10;
 }
 
 void vsc_state::pio_portb_w(u8 data)
 {
 	// d0,d1: keypad input mux
-	// d5: enable language switch
-	m_kp_mux = data & 3;
-	m_lan_switch = bool(data & 0x20);
+	// d5: enable language jumpers
+	m_kp_mux = data;
 
-	// d7: TSI ROM A12
+	// d7: speech ROM A12
 	m_speech->set_rom_bank(BIT(data, 7));
 
-	// d6: TSI START line
+	// d6: S14001A start pin
 	m_speech->start_w(BIT(data, 6));
 
-	// d2: lower TSI volume
+	// d2: lower S14001A volume
 	m_speech->set_output_gain(0, (data & 4) ? 0.25 : 1.0);
 }
 
@@ -374,8 +367,8 @@ static INPUT_PORTS_START( vsc )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Queen")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("King")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("RE")
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("TM")

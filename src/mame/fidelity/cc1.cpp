@@ -34,7 +34,7 @@ similar to it. Ron C. Nelson must have ported the algorithms to 8080 when he wro
 his Altair 8800 chess program, and this is what made it into CC1.
 
 CC1 hardware overview:
-- PCB label PC-P-86, P179 C-2 7.77
+- PCB label: PC-P-86, P179 C-2 7.77
 - NEC 8080AF @ 2MHz(18MHz XTAL through a 8224)
 - Everything goes via a NEC B8228, its special features are unused.
 - NEC 2316A ROM(2KB), 4*2101AL RAM(0.5KB total)

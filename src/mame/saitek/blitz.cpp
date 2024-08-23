@@ -41,7 +41,7 @@ TODO:
 
 #include "cpu/h8/h8325.h"
 #include "machine/sensorboard.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
 #include "video/pwm.h"
 
 #include "screen.h"
@@ -81,7 +81,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
-	required_device<speaker_sound_device> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport m_inputs;
 	output_finder<4, 22> m_out_lcd;
 
@@ -242,7 +242,7 @@ u8 blitz_state::p6_r()
 void blitz_state::p6_w(u8 data)
 {
 	// P62: speaker out
-	m_dac->level_w(BIT(data, 2));
+	m_dac->write(BIT(data, 2));
 
 	// P60: 74164(1) CP
 	// P61: 74164(1) DSB, outputs to input mux / LED data
@@ -331,7 +331,7 @@ void blitz_state::blitz(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 

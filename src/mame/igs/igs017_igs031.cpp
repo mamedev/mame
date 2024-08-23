@@ -14,6 +14,8 @@ providing the interface to the 8255, or is it coincidence?
 #include "emu.h"
 #include "igs017_igs031.h"
 
+#include "multibyte.h"
+
 void igs017_igs031_device::map(address_map &map)
 {
 	map(0x1000, 0x17ff).ram().share("spriteram");
@@ -328,7 +330,8 @@ void igs017_igs031_device::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cl
 	{
 		const int y     =   s[0] + (s[1] << 8);
 		int x           =   s[2] + (s[3] << 8);
-		u32 addr        =   (s[4] >> 6) | (s[5] << 2) | (s[6] << 10) | ((s[7] & 0x07) << 18);
+		u32 addr        =   (s[4] >> 6) | (s[5] << 2) | (s[6] << 10) | ((s[7] & 0x0f) << 18);
+
 		addr            *=  3;
 
 		const int flipx =   s[7] & 0x10;
@@ -438,4 +441,215 @@ void igs017_igs031_device::irq_enable_w(u8 data)
 	m_irq_enable = data & 1;
 	if (data != 0 && data != 1 && data != 0xff)
 		logerror("%s: irq_enable = %02x\n", machine().describe_context(), data);
+}
+
+
+// Are these decryption a programmable function of the 031?
+
+void igs017_igs031_device::mgcs_decrypt_tiles()
+{
+	const int rom_size = memregion("tilemaps")->bytes();
+	u8 * const rom = memregion("tilemaps")->base();
+	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
+
+	memcpy(&tmp[0], rom, rom_size);
+	for (int i = 0; i < rom_size; i++)
+	{
+		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,10,6,7,8,9,5,4,3,2,1,0);
+		rom[i^1] = bitswap<8>(tmp[addr],0,1,2,3,4,5,6,7);
+	}
+}
+
+void igs017_igs031_device::slqz2_decrypt_tiles()
+{
+	const int rom_size = memregion("tilemaps")->bytes();
+	u8 * const rom = memregion("tilemaps")->base();
+	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
+
+	memcpy(&tmp[0], rom, rom_size);
+	for (int i = 0; i < rom_size; i++)
+	{
+		int addr = (i & ~0xff) | bitswap<8>(i,7,4,5,6,3,2,1,0);
+		rom[i] = tmp[addr];
+	}
+}
+
+void igs017_igs031_device::tarzan_decrypt_tiles(int address_xor)
+{
+	const int rom_size = memregion("tilemaps")->bytes();
+	u8 * const rom = memregion("tilemaps")->base();
+	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
+
+	memcpy(&tmp[0], rom, rom_size);
+	for (int i = 0; i < rom_size; i++)
+	{
+		int addr = (i & ~0xffff) | (bitswap<16>(i,15,14,13,12,11, 7,8,6,10,9, 5,4,3,2,1,0) ^ address_xor);
+		rom[i] = bitswap<8>(tmp[addr],0,1,2,3,4,5,6,7);
+	}
+}
+
+void igs017_igs031_device::lhzb2_decrypt_tiles()
+{
+	const int rom_size = memregion("tilemaps")->bytes();
+	u8 * const rom = memregion("tilemaps")->base();
+	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
+
+	memcpy(&tmp[0], rom, rom_size);
+	for (int i = 0; i < rom_size; i++)
+	{
+		int addr = (i & ~0xffffff) | bitswap<24>(i,23,22,21,20,19,18,17,1,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
+		rom[i] = tmp[addr];
+	}
+}
+
+void igs017_igs031_device::sdwx_gfx_decrypt()
+{
+	unsigned rom_size = 0x80000;
+	u8 *src = (u8 *) (memregion("tilemaps")->base());
+	std::vector<u8> result_data(rom_size);
+
+	for (int i = 0; i < rom_size; i++)
+		result_data[i] = src[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 8, 7, 6, 10, 9, 5, 4, 3, 2, 1, 0)];
+
+	for (int i = 0; i < rom_size; i += 0x200)
+	{
+		memcpy(src + i + 0x000, &result_data[i + 0x000], 0x80);
+		memcpy(src + i + 0x080, &result_data[i + 0x100], 0x80);
+		memcpy(src + i + 0x100, &result_data[i + 0x080], 0x80);
+		memcpy(src + i + 0x180, &result_data[i + 0x180], 0x80);
+	}
+}
+
+
+void igs017_igs031_device::mgcs_flip_sprites(size_t max_size)
+{
+	int rom_size;
+	if (max_size > memregion("sprites")->bytes())
+		fatalerror("mgcs_flip_sprites: max_size is greater than the size of the ROM region\n");
+
+	if (max_size == 0)
+		rom_size = memregion("sprites")->bytes();
+	else
+		rom_size = max_size;
+
+	u8 * const rom = memregion("sprites")->base();
+
+	for (int i = 0; i < rom_size; i+=2)
+	{
+		u16 pixels = get_u16le(&rom[i]);
+
+		// flip bits
+		pixels = bitswap<16>(pixels,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+
+		// flip pixels
+		pixels = bitswap<16>(pixels,15, 0,1,2,3,4, 5,6,7,8,9, 10,11,12,13,14);
+
+		put_u16le(&rom[i], pixels);
+	}
+}
+
+
+void igs017_igs031_device::tjsb_decrypt_sprites()
+{
+	const int rom_size = memregion("sprites")->bytes();
+	u8 * const rom = memregion("sprites")->base();
+	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
+
+	// address lines swap
+	memcpy(tmp.get(), rom, rom_size);
+	for (int i = 0; i < rom_size; i++)
+	{
+		int addr = (i & ~0xff) | bitswap<8>(i,7,6,5,2,1,4,3,0);
+		rom[i] = tmp[addr];
+	}
+
+	// data lines swap
+	for (int i = 0; i < rom_size; i += 2)
+	{
+		u16 data = get_u16le(&rom[i]); // x-22222-11111-00000
+		data = bitswap<16>(data, 15, 14,13,12,11,10, 9,1,7,6,5, 4,3,2,8,0);
+		put_u16le(&rom[i], data);
+	}
+}
+
+void igs017_igs031_device::tarzan_decrypt_sprites(size_t max_size, size_t flip_size)
+{
+	mgcs_flip_sprites(flip_size);
+
+	if (max_size > memregion("sprites")->bytes())
+		fatalerror("tarzan_decrypt_sprites: max_size is greater than the size of the ROM region\n");
+
+	const int rom_size = max_size ? max_size : memregion("sprites")->bytes();
+	u8 *rom = memregion("sprites")->base();
+	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
+
+	// address lines swap
+	memcpy(tmp.get(), rom, rom_size);
+	for (int i = 0; i < rom_size; i++)
+	{
+		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13, 9,10,11,12, 5,6,7,8, 4,3,2,1,0);
+		rom[i] = tmp[addr];
+	}
+}
+
+void igs017_igs031_device::starzan_decrypt_sprites(size_t max_size, size_t flip_size)
+{
+	tarzan_decrypt_sprites(max_size, flip_size);
+
+	// Overlay rom:
+
+	const int rom_size = 0x80000;
+	u8 *rom = memregion("sprites")->base() + max_size;
+	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
+
+	// address lines swap
+	memcpy(tmp.get(), rom, rom_size);
+	for (int i = 0; i < rom_size; i++)
+	{
+		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,10,9,  6,5, 8,7, 1,2,3,4, 0);
+		rom[i] = tmp[addr];
+	}
+}
+
+void igs017_igs031_device::spkrform_decrypt_sprites()
+{
+	const int rom_size = memregion("sprites")->bytes();
+	u8 * const rom = memregion("sprites")->base();
+	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
+
+	// address lines swap
+	memcpy(tmp.get(), rom, rom_size);
+	for (int i = 0; i < rom_size; i++)
+	{
+		int addr;
+		if (i & 0x80000)
+			addr = (i & ~0xff) | bitswap<8>(i,7,6,3,4,5,2,1,0);
+		else
+			addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,10, 4, 8,7,6,5, 9,3,2,1,0);
+
+		rom[i] = tmp[addr];
+	}
+}
+
+void igs017_igs031_device::lhzb2_decrypt_sprites()
+{
+	const int rom_size = memregion("sprites")->bytes();
+	u8 * const rom = memregion("sprites")->base();
+	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
+
+	// address lines swap
+	memcpy(tmp.get(), rom, rom_size);
+	for (int i = 0; i < rom_size; i++)
+	{
+		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,6,7,10,9,8,11,12,5,4,3,2,1,0);
+		rom[i] = tmp[addr];
+	}
+
+	// data lines swap
+	for (int i = 0; i < rom_size; i+=2)
+	{
+		u16 data = get_u16le(&rom[i]); // x-22222-11111-00000
+		data = bitswap<16>(data, 15, 7,6,5,4,3, 2,1,0,14,13, 12,11,10,9,8);
+		put_u16le(&rom[i], data);
+	}
 }

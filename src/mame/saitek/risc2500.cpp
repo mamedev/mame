@@ -48,7 +48,7 @@ TODO:
 #include "machine/ram.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
 #include "video/sed1520.h"
 
 #include "emupal.h"
@@ -72,7 +72,7 @@ public:
 		m_ram(*this, "ram"),
 		m_nvram(*this, "nvram"),
 		m_disable_bootrom(*this, "disable_bootrom"),
-		m_speaker(*this, "speaker"),
+		m_dac(*this, "dac"),
 		m_lcdc(*this, "lcdc"),
 		m_board(*this, "board"),
 		m_inputs(*this, "IN.%u", 0),
@@ -97,7 +97,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
 	required_device<timer_device> m_disable_bootrom;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<dac_2bit_ones_complement_device> m_dac;
 	required_device<sed1520_device> m_lcdc;
 	required_device<sensorboard_device> m_board;
 	required_ioport_array<8> m_inputs;
@@ -307,7 +307,7 @@ void risc2500_state::control_w(u32 data)
 	}
 
 	// speaker
-	m_speaker->level_w(data >> 28 & 3);
+	m_dac->write(data >> 28 & 3);
 
 	// power-off
 	if (BIT(m_control & ~data, 24))
@@ -456,10 +456,8 @@ void risc2500_state::risc2500(machine_config &config)
 	m_lcdc->set_screen_update_cb(FUNC(risc2500_state::screen_update_cb));
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-	m_speaker->set_levels(4, speaker_levels);
+	SPEAKER(config, "speaker").front_center();
+	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }
 
 void risc2500_state::montreux(machine_config &config)

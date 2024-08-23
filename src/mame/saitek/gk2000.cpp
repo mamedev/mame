@@ -17,9 +17,13 @@ TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
 
+BTANB:
+- see note below about so-called H8 bug
+
 ================================================================================
 
 Saitek GK 2000 family
+---------------------
 
 Hardware notes:
 
@@ -44,6 +48,7 @@ Travel Champion 2080 and Tandy Mega 2050X are 14MHz instead of 20MHz.
 ================================================================================
 
 Saitek Centurion family
+-----------------------
 
 This is the program with the infamous H8 bug, not named after the MCU, but after
 the H8 square. The piece on H8 is moved immediately, regardless of playing level,
