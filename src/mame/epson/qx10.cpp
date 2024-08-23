@@ -273,8 +273,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 
 			for (int xi = 0; xi < 8; xi++)
 			{
-				int res_x = ((x * 8) + xi) * (m_zoom + 1);
-				int res_y = y + (yi * (m_zoom + 1));
+				int res_x = ((x * 8) + xi);
+				int res_y = y + yi;
 
 				if(!m_screen->visible_area().contains(res_x, res_y))
 					continue;
@@ -285,8 +285,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 				else
 					pen = ((tile_data >> xi) & 1) ? color : 0;
 
-				if(pen)
-					bitmap.pix(yi, xi) = palette[pen];
+				if (pen)
+					bitmap.pix(res_y, res_x) = palette[pen];
 			}
 		}
 	}
@@ -294,15 +294,15 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 
 uint32_t qx10_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	m_bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_hgdc->screen_update(screen, m_bitmap, cliprect);
-	const u32 pixel_size = 0x10000 >> m_zoom;
-	copyrozbitmap_trans(
+	const u32 pixel_size = 0x10000 / (m_zoom+1);
+	copyrozbitmap(
 		bitmap, cliprect, m_bitmap,
 		0, 0,
 		pixel_size, 0, 0, pixel_size,
-		false, 0
+		false
 	);
 
 	return 0;
