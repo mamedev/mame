@@ -286,7 +286,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 					pen = ((tile_data >> xi) & 1) ? color : 0;
 
 				if(pen)
-					bitmap.pix(res_y+zy, res_x+zx) = palette[pen];
+					bitmap.pix(yi, xi) = palette[pen];
 			}
 		}
 	}
