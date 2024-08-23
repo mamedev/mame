@@ -25,6 +25,7 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 
@@ -83,7 +84,7 @@ void mmahjong_state::machine_start()
 
 
 /*******************************************************************************
-    I/O
+    Video
 *******************************************************************************/
 
 u32 mmahjong_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -91,6 +92,16 @@ u32 mmahjong_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	m_tilemap->draw(screen, bitmap, cliprect);
 	return 0;
 }
+
+static GFXDECODE_START( gfx_mmahjong )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x1, 0, 1 )
+GFXDECODE_END
+
+
+
+/*******************************************************************************
+    I/O
+*******************************************************************************/
 
 void mmahjong_state::vram_w(offs_t offset, u8 data)
 {
@@ -133,7 +144,7 @@ void mmahjong_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x5000, 0x53ff).ram();
-	map(0x6000, 0x63ff).w(FUNC(mmahjong_state::vram_w)).share("vram");
+	map(0x6000, 0x63ff).w(FUNC(mmahjong_state::vram_w)).share(m_vram);
 	map(0x7001, 0x7001).r(FUNC(mmahjong_state::input_r));
 	map(0x7002, 0x7002).w(FUNC(mmahjong_state::input_w));
 	map(0x7004, 0x7004).w(FUNC(mmahjong_state::sound_w));
@@ -180,10 +191,6 @@ INPUT_PORTS_END
 /*******************************************************************************
     Machine Configs
 *******************************************************************************/
-
-static GFXDECODE_START( gfx_mmahjong )
-	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x1, 0, 1 )
-GFXDECODE_END
 
 void mmahjong_state::mmahjong(machine_config &config)
 {

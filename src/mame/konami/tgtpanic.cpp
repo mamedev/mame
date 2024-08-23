@@ -155,7 +155,7 @@ INPUT_PORTS_END
 void tgtpanic_state::tgtpanic(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config,m_maincpu, XTAL(4'000'000));
+	Z80(config,m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tgtpanic_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &tgtpanic_state::io_map);
 
