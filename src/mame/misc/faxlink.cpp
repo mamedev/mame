@@ -98,7 +98,7 @@ void faxlink_state::machine_start()
 void faxlink_state::skilltester(machine_config &config)
 {
 	/* basic machine hardware */
-	i8052_device &maincpu(I8052(config, "maincpu", XTAL(11'059'200)));
+	i8052_device &maincpu(I8052(config, "maincpu", XTAL(11'059'200))); // actual CPU is a Atmel at892c52.
 	maincpu.set_addrmap(AS_PROGRAM, &faxlink_state::program_map);
 	maincpu.set_addrmap(AS_IO, &faxlink_state::io_map);
 
@@ -110,7 +110,7 @@ void faxlink_state::skilltester(machine_config &config)
 
 ROM_START( skilltester )
 	ROM_REGION( 0x02000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "skill_tester_ver_1_3.u3", 0x00000, 0x02000, NO_DUMP ) // actual CPU is a Atmel at892c52. protected. has the internal program code on it.
+	ROM_LOAD( "skill_tester_ver_1_3.u3", 0x00000, 0x02000, NO_DUMP ) // protected. has the internal program code on it. 
  	ROM_REGION( 0x10000, "eeprom", 0 )
      ROM_LOAD( "skilltester_program.u6", 0x00000, 0x10000, BAD_DUMP  CRC(9b9330f3) SHA1(8f6cfdbba462e6c61fa15e1cb129fadbbe27aafa) ) // 1xxxxxxxxxxxxxxx = 0xFF. label broken. left pin error at 7 and 10.
 
