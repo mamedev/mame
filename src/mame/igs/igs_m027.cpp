@@ -99,6 +99,7 @@ private:
 
 	u32 unk_r();
 	u32 unk2_r();
+	u32 lhdmg_unk2_r();
 	void unk2_w(u32 data);
 
 	void dsw_io_select_w(u32 data);
@@ -419,6 +420,16 @@ u32 igs_m027_state::unk2_r()
 		return 0xffffffff;
 	else
 		return 0xffffffef;
+}
+
+u32 igs_m027_state::lhdmg_unk2_r()
+{
+	logerror("%s: lhdmg_unk2_r\n", machine().describe_context());
+
+	if (m_dsw_io_select & 1)
+		return 0xffffffff;
+	else
+		return 0xffffffff ^ 0x400000;
 }
 
 u32 igs_m027_state::unk_r()
@@ -1511,16 +1522,18 @@ void igs_m027_state::init_olympic5()
 
 void igs_m027_state::init_lhdmg()
 {
-	//lhdmg_decrypt(machine());
+	lhdmg_decrypt(machine());
 	//qlgs_gfx_decrypt(machine());
 	//pgm_create_dummy_internal_arm_region();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000000c, 0x4000000f, read32smo_delegate(*this, FUNC(igs_m027_state::lhdmg_unk2_r)));
 }
 
 void igs_m027_state::init_lhdmgp()
 {
-	//lhdmgp_decrypt(machine());
+	lhdmgp_decrypt(machine());
 	//qlgs_gfx_decrypt(machine());
 	//pgm_create_dummy_internal_arm_region();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000000c, 0x4000000f, read32smo_delegate(*this, FUNC(igs_m027_state::lhdmg_unk2_r)));
 }
 
 
