@@ -119,7 +119,7 @@ private:
 	void complete_information(const debug_view_disasm_source &source, debug_disasm_buffer &buffer, offs_t pc);
 
 	void enumerate_sources();
-	void print(int row, std::string text, int start, int end, u8 attrib);
+	void print(u32 row, std::string text, s32 start, s32 end, u8 attrib);
 	void redraw();
 
 	// internal state
