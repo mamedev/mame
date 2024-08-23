@@ -128,26 +128,29 @@ void toysoldier_state::machine_start()
 void toysoldier_state::toysoldier(machine_config &config)
 {
 	/* basic machine hardware */
-	i8052_device &maincpu(I80C32(config, "maincpu", XTAL(12'000'000)));
+	i8052_device &maincpu(I80C32(config, "maincpu", XTAL(12'000'000))); // Actually cpu is a Winbond W78C32c-40
 	maincpu.set_addrmap(AS_PROGRAM, &toysoldier_state::program_map);
 	maincpu.set_addrmap(AS_IO, &toysoldier_state::io_map);
+	
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &ay(AY8910(config, "ay", XTAL(12'000'000) / 6));  // Divider not verified
+	
+    ay8910_device &ay(AY8910(config, "ay", XTAL(12'000'000) / 6));  // It’s clocked by the ALE output of the 8052 – it will be 1/6 of the 8052 clock frequency, with the issue that data external memory accesses cause it to drop pulses.
     ay.add_route(ALL_OUTPUTS, "mono", 1.0);
 	ay.port_a_read_callback().set_ioport("DSW1");
 	ay.port_b_read_callback().set_ioport("DSW2");
+	
 	ym2413_device &opll(YM2413(config, "opll", 3.579545_MHz_XTAL));
 	opll.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 ROM_START( toysoldier )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "toysoldier.bin", 0x00000, 0x10000, CRC(BD52C1AE) SHA1(a76c10f93f9087bc2d01bfe866c0e66a006b4ddd) )
-	ROM_REGION( 0x200, "eeprom", 0 ) // according to diagram
-	ROM_LOAD( "93c66.bin", 0x000, 0x200, NO_DUMP )
+	ROM_LOAD( "27c512.u3", 0x00000, 0x10000, CRC(BD52C1AE) SHA1(a76c10f93f9087bc2d01bfe866c0e66a006b4ddd) )
 	ROM_REGION( 0x40000, "voice", 0 )
-    ROM_LOAD( "api8108a.bin", 0x00000, 0x40000, NO_DUMP ) // api8108A voice rom
+    ROM_LOAD( "api8108a.u8", 0x00000, 0x40000, NO_DUMP ) // api8108A voice rom
+	ROM_REGION( 0x200, "eeprom", 0 ) // according to diagram
+	ROM_LOAD( "93c66.u39", 0x000, 0x200, NO_DUMP ) // probably for storing internal settings.
 ROM_END
 
 } // anonymous namespace
