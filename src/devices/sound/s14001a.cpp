@@ -333,9 +333,9 @@ void s14001a_device::data_w(u8 data)
 void s14001a_device::start_w(int state)
 {
 	m_stream->update();
-	m_bStart = (state != 0);
-	if (m_bStart)
+	if (state && !m_bStart)
 		m_uStateP1 = states::WORDWAIT;
+	m_bStart = (state != 0);
 }
 
 void s14001a_device::set_clock(u32 clock)
