@@ -187,6 +187,7 @@ public:
 	}
 
 	void nws3410(machine_config &config);
+	void nws3710(machine_config &config);
 
 protected:
 	void nws3410_map(address_map &map);
@@ -585,6 +586,22 @@ void nws3410_state::nws3410(machine_config &config)
 	m_serial[0]->set_default_option("terminal"); // No framebuffer emulation yet
 }
 
+void nws3410_state::nws3710(machine_config &config)
+{
+	// TODO: scrub these for 3710
+	R3000A(config, m_cpu, 20_MHz_XTAL, 65536, 65536);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
+	m_cpu->set_addrmap(AS_PROGRAM, &nws3410_state::nws3410_map);
+
+	// 8MB expandable to 32MB (unknown increments)
+	RAM(config, m_ram);
+	m_ram->set_default_size("8M");
+	m_ram->set_extra_options("32MB");
+	common(config);
+
+	m_serial[0]->set_default_option("terminal"); // No framebuffer emulation yet
+}
+
 ROM_START(nws3260)
 	ROM_REGION32_BE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "nws3260", "NWS-3260 v2.0A")
@@ -620,9 +637,19 @@ ROM_START(nws3410)
 	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(661e2516) SHA1(f0dca34174747321dad6f48c466e1c549b797d2e) BAD_DUMP)
 ROM_END
 
+ROM_START(nws3710)
+	ROM_REGION32_BE(0x20000, "eprom", 0)
+	ROM_SYSTEM_BIOS(0, "nws3710", "TODO") // TODO: double check version
+	ROMX_LOAD("sony_nws-3710.bin", 0x00000, 0x10000, CRC(542e21b8) SHA1(631dca1f3446761973073f5c32c1a0aeba538c2c), ROM_BIOS(0))
+
+	ROM_REGION32_BE(0x100, "idrom", 0) // TODO: this is using the 3410 IDROM
+	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(661e2516) SHA1(f0dca34174747321dad6f48c466e1c549b797d2e) BAD_DUMP)
+ROM_END
+
 } // anonymous namespace
 
 
-/*   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT         COMPANY  FULLNAME    FLAGS */
-COMP(1991, nws3260, 0,      0,      nws3260, nws3260, nws3260_state, init_common, "Sony",  "NWS-3260", MACHINE_NO_SOUND)
-COMP(1991, nws3410, 0,      0,      nws3410, nws3410, nws3410_state, init_common, "Sony",  "NWS-3410", MACHINE_NO_SOUND)
+/*   YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT         COMPANY  FULLNAME    FLAGS */
+COMP(1991, nws3260, 0,       0,      nws3260, nws3260, nws3260_state, init_common, "Sony",  "NWS-3260", MACHINE_NO_SOUND)
+COMP(1991, nws3410, 0,       0,      nws3410, nws3410, nws3410_state, init_common, "Sony",  "NWS-3410", MACHINE_NO_SOUND)
+COMP(199?, nws3710, nws3410, 0,      nws3710, nws3410, nws3410_state, init_common, "Sony",  "NWS-3710", MACHINE_NO_SOUND)
