@@ -724,15 +724,38 @@ int ncr5385_device::state_step()
 			{
 				LOGMASKED(LOG_STATE, "xfi_out: %s pc(%s)\n", remaining() ? "phase change" : "transfer complete", machine().describe_context());
 
+#if 0
 				m_int_status |= INT_BUS_SERVICE;
 				m_state = IDLE;
 
 				update_int();
+#else
+				m_state = 667;
+				delay = 5'000;		// AB 5ms delay works, 2ms fails
+#endif
+
 			}
 		}
 		else
 			delay = -1;
 		break;
+
+
+
+
+	// delay
+	case 667:
+				LOGMASKED(LOG_STATE, "xfi_out: 667\n");
+				m_int_status |= INT_BUS_SERVICE;
+				m_state = IDLE;
+
+				update_int();
+		break;
+		
+
+
+
+
 	case XFI_OUT_DRQ:
 		m_state = XFI_OUT_ACK;
 		m_aux_status &= ~AUX_STATUS_DATA_FULL;
@@ -766,7 +789,7 @@ int ncr5385_device::state_step()
 			else
 				m_sbx = false;
 
-#if 0
+#if 1
 			// clear data and ACK
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
@@ -786,9 +809,6 @@ int ncr5385_device::state_step()
 			{
 				scsi_bus->data_w(scsi_refid, 0);
 				scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
-
-//				m_int_status |= INT_BUS_SERVICE;
-//				update_int();
 			}
 #endif
 
