@@ -2,7 +2,7 @@
 // copyright-holders:Felipe Sanches
 /******************************************************************************
 
-	Technics SX-KN5000 music keyboard driver
+    Technics SX-KN5000 music keyboard driver
 
 ******************************************************************************/
 
@@ -18,15 +18,15 @@
 class mn89304_vga_device : public svga_device
 {
 public:
-    // construction/destruction
-    mn89304_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// construction/destruction
+	mn89304_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-    virtual void device_reset() override;
+	virtual void device_reset() override;
 
-    virtual void palette_update() override;
-    virtual void recompute_params() override;
-    virtual uint16_t offset() override;
+	virtual void palette_update() override;
+	virtual void recompute_params() override;
+	virtual uint16_t offset() override;
 };
 
 DEFINE_DEVICE_TYPE(MN89304_VGA, mn89304_vga_device, "mn89304_vga", "MN89304 VGA")
@@ -35,51 +35,51 @@ DEFINE_DEVICE_TYPE(MN89304_VGA, mn89304_vga_device, "mn89304_vga", "MN89304 VGA"
 mn89304_vga_device::mn89304_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, MN89304_VGA, tag, owner, clock)
 {
-    // ...
+	// ...
 }
 
 void mn89304_vga_device::device_reset()
 {
-    svga_device::device_reset();
-    svga.rgb8_en = 1;
+	svga_device::device_reset();
+	svga.rgb8_en = 1;
 }
 
 // sets up mode 0, by default it will throw 155 Hz, assume divided by 3
 void mn89304_vga_device::recompute_params()
 {
-    u8 xtal_select = (vga.miscellaneous_output & 0x0c) >> 2;
-    int xtal;
+	u8 xtal_select = (vga.miscellaneous_output & 0x0c) >> 2;
+	int xtal;
 
-    switch(xtal_select & 3)
-    {
-        case 0: xtal = XTAL(25'174'800).value() / 3; break;
-        case 1: xtal = XTAL(28'636'363).value() / 3; break;
-        case 2:
-        default:
-            throw emu_fatalerror("MN89304: setup ext. clock select");
-    }
+	switch(xtal_select & 3)
+	{
+		case 0: xtal = XTAL(25'174'800).value() / 3; break;
+		case 1: xtal = XTAL(28'636'363).value() / 3; break;
+		case 2:
+		default:
+			throw emu_fatalerror("MN89304: setup ext. clock select");
+	}
 
-    recompute_params_clock(1, xtal);
+	recompute_params_clock(1, xtal);
 }
 
 
 void mn89304_vga_device::palette_update()
 {
-    // 4bpp RAMDAC
-    for (int i = 0; i < 256; i++)
-    {
-        set_pen_color(
-            i,
-            pal4bit(vga.dac.color[3*(i & vga.dac.mask) + 0]),
-            pal4bit(vga.dac.color[3*(i & vga.dac.mask) + 1]),
-            pal4bit(vga.dac.color[3*(i & vga.dac.mask) + 2])
-        );
-    }
+	// 4bpp RAMDAC
+	for (int i = 0; i < 256; i++)
+	{
+		set_pen_color(
+			i,
+			pal4bit(vga.dac.color[3*(i & vga.dac.mask) + 0]),
+			pal4bit(vga.dac.color[3*(i & vga.dac.mask) + 1]),
+			pal4bit(vga.dac.color[3*(i & vga.dac.mask) + 2])
+		);
+	}
 }
 
 uint16_t mn89304_vga_device::offset()
 {
-    return svga_device::offset() << 3;
+	return svga_device::offset() << 3;
 }
 
 
@@ -152,7 +152,7 @@ void kn5000_state::maincpu_mem(address_map &map)
 	map(0x300000, 0x3fffff).rom().region("custom_data", 0); // 8MBit FLASH ROM @ IC19 (CS5)
 	map(0x400000, 0x7fffff).rom().region("rhythm_data", 0); // 32MBit ROM @ IC14 (A22=1 and CS5)
 	map(0x800000, 0x82ffff).rom().region("subprogram", 0); // not sure yet in which chip this is stored, but I suspect it should be IC19
-//	map(0xc00000, 0xdfffff).mirror(0x200000).rom().region("table_data", 0); //2 * 8MBit ROMs @ IC1, IC3 (CS2)
+//  map(0xc00000, 0xdfffff).mirror(0x200000).rom().region("table_data", 0); //2 * 8MBit ROMs @ IC1, IC3 (CS2)
 	map(0xe00000, 0xffffff).mask(0x1fffff).rom().region("program", 0); //2 * 8MBit FLASH ROMs @ IC4, IC6
 }
 
@@ -686,10 +686,10 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 6 = (input) COM.MAC
 	//   bit 7 = (input) COM.MIDI
 	// TODO: m_maincpu->portz_read().set([this] {
-	// TODO: 	return ioport("COM_SELECT")->read() | (m_sstat << 2);
+	// TODO:    return ioport("COM_SELECT")->read() | (m_sstat << 2);
 	// TODO: });
 	// TODO: m_maincpu->portz_write().set([this] (u8 data) {
-	// TODO: 	m_mstat = data & 3;
+	// TODO:    m_mstat = data & 3;
 	// TODO: });
 
 
@@ -718,10 +718,10 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 3 (not used)
 	//   bit 4 = (input) MSTAT1
 	// TODO: m_subcpu->portd_read().set([this] {
-	// TODO: 	return (BIT(m_mstat, 0) << 2) | (BIT(m_mstat, 1) << 4);
+	// TODO:    return (BIT(m_mstat, 0) << 2) | (BIT(m_mstat, 1) << 4);
 	// TODO: });
 	// TODO: m_subcpu->portd_write().set([this] (u8 data) {
-	// TODO: 	m_sstat = data & 3;
+	// TODO:    m_sstat = data & 3;
 	// TODO: });
 
 

@@ -73,16 +73,16 @@ address lines), and then reading it from the 051962.
 180c-1833: A y scroll
 1a00-1bff: A x scroll
 1c00     : Maps the three 8kB RAM chips to memory addresses.
-			------xx select the configuration from this table
-			   RAM0 RAM1 RAM2
-			00 A~B  6~7  8~9  Reset state
-			01 8~9  4~5  6~7
-			10 6~7  2~3  4~5
-			11 4~5  0~1  2~3  TMNT setting
-			---xxx-- affects how RAMs are accessed
-			-x------
-			         0 = replace bits 5:4 of color attribute by bits 1:0
-			         1 = do not alter color attribute (gradius3,xmen)
+            ------xx select the configuration from this table
+               RAM0 RAM1 RAM2
+            00 A~B  6~7  8~9  Reset state
+            01 8~9  4~5  6~7
+            10 6~7  2~3  4~5
+            11 4~5  0~1  2~3  TMNT setting
+            ---xxx-- affects how RAMs are accessed
+            -x------
+                     0 = replace bits 5:4 of color attribute by bits 1:0
+                     1 = do not alter color attribute (gradius3,xmen)
 1c80     : row/column scroll control
            ------xx layer A row scroll
                     00 = disabled

@@ -3,8 +3,8 @@
 /*
      GPL16250* games using SPI Flash + RAM configuration
 
-	 *part number could be different for these, they've only
-	  been seen as globtops
+     *part number could be different for these, they've only
+      been seen as globtops
 */
 
 #include "emu.h"

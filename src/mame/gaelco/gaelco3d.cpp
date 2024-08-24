@@ -1325,7 +1325,7 @@ ROM_END
 
 /*
 Football Power has a small PCB inside the ball controller, very similar to the one found on
-Gaelco Football, with two accelerometers and a PIC.        
+Gaelco Football, with two accelerometers and a PIC.
    _________________
   |      ______    |
  _|     /     /    |

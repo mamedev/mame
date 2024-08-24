@@ -262,7 +262,7 @@ int z80dma_device::z80daisy_irq_ack()
 	else
 	{
 		LOGINT("z80dma_irq_ack: failed to find an interrupt to ack!\n");
-		return 0;	
+		return 0;
 	}
 }
 

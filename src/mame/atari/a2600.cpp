@@ -246,7 +246,7 @@ public:
 
 	void tvboy(machine_config &config);
 	void tvboyn(machine_config &config);
-	
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

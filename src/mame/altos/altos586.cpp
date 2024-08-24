@@ -143,21 +143,21 @@ private:
 	u16 m_err_addr2;
 
 	enum : u16 {
-		INVALID_INSN		= 0x0001,	// Invalid Instruction
-		END_OF_STACK		= 0x0008,	// End of Stack Warning
-		SYS_W_VIOLATION		= 0x0010,	// System write Violation
-		USER_W_VIOLATION	= 0x0080,	// User Mode Write Violation
-		IOP_W_VIOLATION		= 0x0400,	// I/O Processor Write Violation
-		USER_ACC_VIOLATION	= 0x0800,	// User Mode Access Violation
+		INVALID_INSN        = 0x0001,   // Invalid Instruction
+		END_OF_STACK        = 0x0008,   // End of Stack Warning
+		SYS_W_VIOLATION     = 0x0010,   // System write Violation
+		USER_W_VIOLATION    = 0x0080,   // User Mode Write Violation
+		IOP_W_VIOLATION     = 0x0400,   // I/O Processor Write Violation
+		USER_ACC_VIOLATION  = 0x0800,   // User Mode Access Violation
 	};
 	u16 m_violation;
 
 	enum {
-		IOP_W			= 11,		// Allow I/O Processor Write
-		SYS_W			= 12,		// Allow System Write
-		STACK_BOUND		= 13,		// Stack Boundary Page
-		USER_ACC		= 14,		// Allow User Access
-		USER_W			= 15,		// Allow User Write
+		IOP_W           = 11,       // Allow I/O Processor Write
+		SYS_W           = 12,       // Allow System Write
+		STACK_BOUND     = 13,       // Stack Boundary Page
+		USER_ACC        = 14,       // Allow User Access
+		USER_W          = 15,       // Allow User Write
 	};
 	u16 m_map_ram[256];
 };
@@ -499,17 +499,17 @@ void altos586_state::iop_io(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x00, 0x00).w(FUNC(altos586_state::hiaddr_w));						// 0x00 Address Latch
-	map(0x20, 0x23).rw("iop_pit0", FUNC(pit8254_device::read), FUNC(pit8254_device::write));	// 0x20 PIT 0
-	map(0x24, 0x27).rw("iop_pit1", FUNC(pit8254_device::read), FUNC(pit8254_device::write));	// 0x24 PIT 1
-	map(0x28, 0x2b).rw("iop_sio0", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));	// 0x28 SIO 0
-	map(0x2c, 0x2f).rw("iop_sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));	// 0x2C SIO 1
-	map(0x30, 0x33).rw("iop_sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));	// 0x30 SIO 2
-	map(0x34, 0x37).rw("iop_pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));	// 0x34 PIO
-	map(0x38, 0x3b).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));		// 0x38 FDC
-	map(0x3c, 0x3f).rw("iop_dma", FUNC(z80dma_device::read), FUNC(z80dma_device::write));		// 0x3C DMA
-	map(0x40, 0x40).noprw();									// 0x40 DMA - Clear carrier sense and parity error bit
-	map(0x80, 0x9f).rw("iop_rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write));		// 0x80 RTC - Counter - thousandths of seconds
+	map(0x00, 0x00).w(FUNC(altos586_state::hiaddr_w));                      // 0x00 Address Latch
+	map(0x20, 0x23).rw("iop_pit0", FUNC(pit8254_device::read), FUNC(pit8254_device::write));    // 0x20 PIT 0
+	map(0x24, 0x27).rw("iop_pit1", FUNC(pit8254_device::read), FUNC(pit8254_device::write));    // 0x24 PIT 1
+	map(0x28, 0x2b).rw("iop_sio0", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)); // 0x28 SIO 0
+	map(0x2c, 0x2f).rw("iop_sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)); // 0x2C SIO 1
+	map(0x30, 0x33).rw("iop_sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)); // 0x30 SIO 2
+	map(0x34, 0x37).rw("iop_pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));   // 0x34 PIO
+	map(0x38, 0x3b).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));       // 0x38 FDC
+	map(0x3c, 0x3f).rw("iop_dma", FUNC(z80dma_device::read), FUNC(z80dma_device::write));       // 0x3C DMA
+	map(0x40, 0x40).noprw();                                    // 0x40 DMA - Clear carrier sense and parity error bit
+	map(0x80, 0x9f).rw("iop_rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write));     // 0x80 RTC - Counter - thousandths of seconds
 													// 0x60 586T Generate MULTIBUS interrupt
 }
 

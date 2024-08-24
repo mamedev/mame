@@ -277,7 +277,7 @@ void tsconf_state::tsconf_draw_gfx(bitmap_rgb32 &bitmap, const rectangle &clipre
 				rgb_t pen = m_palette->pen_color(pal_offset | (pix >> 4));
 				if (pen != transparent)
 				{
-					*bm = pen;	
+					*bm = pen;
 				}
 				bm++;
 				if (width != 1)

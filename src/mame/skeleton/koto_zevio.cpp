@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-// The Zevio SoC was developed by Koto Laboratory, the same company behind the Wonderswan 
+// The Zevio SoC was developed by Koto Laboratory, the same company behind the Wonderswan
 
 #include "emu.h"
 
@@ -104,7 +104,7 @@ ROM_START( dbzonep )
 	// original dump had the first 0x100 bytes repeated again at the end, why?
 
 	ROM_REGION( 0x800, "eeprom", ROMREGION_ERASEFF )
-	ROM_LOAD( "s24cs16a.u6", 0x000000, 0x800, CRC(a1724ea8) SHA1(93a6f73e30f47b6a0c83f62dfd9d8236473518a8) )	
+	ROM_LOAD( "s24cs16a.u6", 0x000000, 0x800, CRC(a1724ea8) SHA1(93a6f73e30f47b6a0c83f62dfd9d8236473518a8) )
 ROM_END
 
 } // anonymous namespace
