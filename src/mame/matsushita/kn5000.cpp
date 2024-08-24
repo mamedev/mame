@@ -554,13 +554,12 @@ void kn5000_state::cpanel_leds_w(offs_t offset, uint8_t data)
 				break;
 
 			case 0xc3:
-				// FIXME: bits 2 and 3 used twice
 				m_CPL_LED[25] = BIT(data, 0); // D125 - VARIATION & MSA 1
 				m_CPL_LED[26] = BIT(data, 1); // D126 - VARIATION & MSA 2
 				m_CPL_LED[27] = BIT(data, 2); // D127 - VARIATION & MSA 3
 				m_CPL_LED[28] = BIT(data, 3); // D128 - VARIATION & MSA 4
-				m_CPL_LED[29] = BIT(data, 2); // D129 - MUSIC STYLE ARRANGER
-				m_CPL_LED[30] = BIT(data, 3); // D130 - AUTO PLAY CHORD
+				m_CPL_LED[29] = BIT(data, 4); // D129 - MUSIC STYLE ARRANGER
+				m_CPL_LED[30] = BIT(data, 5); // D130 - AUTO PLAY CHORD
 				break;
 
 			case 0xc4:
@@ -575,7 +574,6 @@ void kn5000_state::cpanel_leds_w(offs_t offset, uint8_t data)
 				break;
 
 			case 0xc8:
-				// I'm not sure yet about this one...
 				m_CPL_LED[49] = BIT(data, 0); // D149 - OTHER PARTS/TR
 				break;
 

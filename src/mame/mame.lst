@@ -25083,13 +25083,13 @@ jr100u                          //
 jr200                           //
 jr200u                          //
 
+@source:matsushita/kn5000.cpp
+kn5000                          // (c) 199? Technics SX-KN5000 PCM Keyboard
+
 @source:matsushita/myb3k.cpp
 myb3k                           //
 jb3000                          //
 stepone                         //
-
-@source:matsushita/kn5000.cpp
-kn5000                          // (c) 199? Technics SX-KN5000 PCM Keyboard
 
 @source:mattel/aquarius.cpp
 aquarius                        // 1983 Aquarius (NTSC)
