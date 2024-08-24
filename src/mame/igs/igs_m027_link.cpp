@@ -3,7 +3,10 @@
 
 /*
 IGS ARM7 (IGS027A) based mahjong / gambling platform(s) with link support
-Keeping them separate from igs_m027.cpp for now.
+Keeping them separate from igs_m027.cpp and igs017.cpp for now.
+
+NOTE: linking between mgcsh and mgcsl has been verified on real hw, while linking
+between cjslh and cjsll doesn't work on real hw for some reason.
 
 *********************************************************************************
 
@@ -121,6 +124,7 @@ Notes:
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
@@ -157,7 +161,10 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	void extension(machine_config &config);
+	void cjsll(machine_config &config);
+	void mgcsl(machine_config &config);
+
+	void init_mgcsl();
 
 protected:
 	virtual void video_start() override;
@@ -167,7 +174,10 @@ private:
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	required_device<screen_device> m_screen;
 
-	void extension_map(address_map &map);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
+	void cjsll_map(address_map &map);
+	void mgcsl_map(address_map &map);
 };
 
 
@@ -183,9 +193,44 @@ void host_state::host_map(address_map &map)
 	map(0x08000000, 0x0800ffff).rom().region("user1", 0); // Game ROM (does it really map here? it appears to be connected indirectly via the 025)
 }
 
-void extension_state::extension_map(address_map &map)
+void extension_state::cjsll_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
+	map(0x600000, 0x603fff).ram();
+
+	// TODO: IGS025? Almost same read writes also seem to happen at 0xd40000-0xd40003
+	//map(0x876000, 0x876001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
+	//map(0x876002, 0x876003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
+
+	map(0xa00000, 0xa0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
+
+	//map(0xa12001, 0xa12001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
+
+void extension_state::mgcsl_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x600000, 0x603fff).ram();
+
+	// TODO: IGS025? Almost same read writes also seem to happen at 0x130000-0x130003
+	//map(0x893000, 0x893001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
+	//map(0x893002, 0x893003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
+
+	map(0xa00000, 0xa0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
+
+	//map(0xa12001, 0xa12001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
+
+
+TIMER_DEVICE_CALLBACK_MEMBER(extension_state::interrupt)
+{
+	int scanline = param;
+
+	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
+		m_maincpu->set_input_line(1, HOLD_LINE);
+
+	if (scanline == 0 && m_igs017_igs031->get_nmi_enable())
+		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 
@@ -274,10 +319,12 @@ void host_state::host(machine_config &config)
 	IGS025(config, "igs025", 0);
 }
 
-void extension_state::extension(machine_config &config)
+void extension_state::cjsll(machine_config &config)
 {
 	M68000(config, m_maincpu, 22_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &extension_state::extension_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &extension_state::cjsll_map);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(extension_state::interrupt), "screen", 0, 1);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -291,20 +338,29 @@ void extension_state::extension(machine_config &config)
 
 	IGS025(config, "igs025", 0);
 
+	I8255A(config, "ppi");
+
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits();
-	m_igs017_igs031->set_i8255_tag("ppi8255");
+	m_igs017_igs031->set_i8255_tag("ppi");
 
 	SPEAKER(config, "mono").front_center();
 
 	OKIM6295(config, "oki", 22_MHz_XTAL / 22, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
+void extension_state::mgcsl(machine_config &config)
+{
+	cjsll(config),
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &extension_state::mgcsl_map);
+}
+
 
 ROM_START( mgcsh )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "y7_027a.bin", 0x00000, 0x4000, CRC(3e726eeb) SHA1(41b4e5f8a9d35b82b1a62029b34c1e19e188a3bc) )	
+	ROM_LOAD( "y7_027a.bin", 0x00000, 0x4000, CRC(3e726eeb) SHA1(41b4e5f8a9d35b82b1a62029b34c1e19e188a3bc) )
 
 	ROM_REGION32_LE( 0x10000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v206cmmbox.u13", 0x00000, 0x10000, CRC(2bfdeeeb) SHA1(c92f8994f75e0eefb4dbf25daa0d62ad72a7ddfa) )
@@ -313,7 +369,7 @@ ROM_END
 ROM_START( cjslh )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "s2_027a.bin", 0x00000, 0x4000, CRC(6be397fd) SHA1(ccd2469995a0b90800e891c39f4b3eaa033783ec) )	
+	ROM_LOAD( "s2_027a.bin", 0x00000, 0x4000, CRC(6be397fd) SHA1(ccd2469995a0b90800e891c39f4b3eaa033783ec) )
 
 	ROM_REGION32_LE( 0x10000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v-106csm.u13", 0x00000, 0x10000, CRC(5b3f3446) SHA1(1d5b9523ac7f221eb7cc2e5db90cc859c640cc18) )
@@ -347,6 +403,68 @@ ROM_START( cjsll )
 	ROM_LOAD( "s2002.u22", 0x00000, 0x80000, CRC(9070c8ee) SHA1(43852ae1891b4d6c00a6fbe6a822e49d9e97ee97) )
 ROM_END
 
+
+// TODO: reduce this monstrosity
+void extension_state::init_mgcsl()
+{
+	const int rom_size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = rom[i];
+
+		switch (i & 0x5000 / 2)
+		{
+			case 0x0000 / 2:
+				if (!(i & 0x0300 / 2))
+				{
+					if (!(i & 0x0002 / 2))
+						x ^= 0x0001;
+					else
+						if (!(i & 0x0020 / 2))
+							x ^= 0x0001;
+				}
+				else
+					if ((i & 0x0022 / 2) == (0x0022 / 2))
+						x ^= 0x0001;
+				break;
+			case 0x1000 / 2:
+				if (i & 0x300 / 2)
+				{
+					if ((i & 0x0022 / 2) == (0x0022 / 2))
+						x ^= 0x0001;
+				}
+				else
+				{
+					if ((i & 0x0022 / 2) != (0x0022 / 2))
+						x ^= 0x0001;
+				}
+				break;
+			case 0x4000 / 2:
+			case 0x5000 / 2: if ((i & 0x0022 / 2) == (0x0022 / 2)) x ^= 0x0001; break;
+		}
+
+		switch (i & 0x6000 / 2)
+		{
+			case 0x0000 / 2: if ((i & 0x280 / 2) == (0x280 / 2)) x ^= 0x0800; break;
+			case 0x2000 / 2: if ((!(i & 0x800 / 2)) && ((i & 0x2c0 / 2) == (0x2c0 / 2))) x ^= 0x0800; break;
+			case 0x4000 / 2: x ^= 0x0800; break;
+			case 0x6000 / 2: if ((!(i & 0x800 / 2)) && (i & 0x40 / 2)) x ^= 0x0800; break;
+		}
+
+		if (i & 0x60000 / 2)
+			x ^= 0x0100;
+
+		rom[i] = x;
+	}
+
+	// TODO: tiles don't seem scrambled, sprites to be verified
+
+	// game id check
+	rom[0x3a48e / 2] = 0x4e71;
+}
+
 } // anonymous namespace
 
 
@@ -355,5 +473,5 @@ GAME( 1999, mgcsh, 0, host, host, host_state, empty_init, ROT0, "IGS", "Manguan 
 GAME( 1999, cjslh, 0, host, host, host_state, empty_init, ROT0, "IGS", "Cai Jin Shen Long (link version, host)", MACHINE_IS_SKELETON )
 
 // extensions
-GAME( 1999, mgcsl, 0, extension, extension, extension_state, empty_init, ROT0, "IGS", "Manguan Caishen (link version, extension)",   MACHINE_IS_SKELETON )
-GAME( 1999, cjsll, 0, extension, extension, extension_state, empty_init, ROT0, "IGS", "Cai Jin Shen Long (link version, extension)", MACHINE_IS_SKELETON )
+GAME( 1999, mgcsl, 0, mgcsl, extension, extension_state, init_mgcsl, ROT0, "IGS", "Manguan Caishen (link version, extension, S110CN)",   MACHINE_IS_SKELETON )
+GAME( 1999, cjsll, 0, cjsll, extension, extension_state, init_mgcsl, ROT0, "IGS", "Cai Jin Shen Long (link version, extension, S111CN)", MACHINE_IS_SKELETON )

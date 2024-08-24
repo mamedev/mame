@@ -556,6 +556,7 @@ Notes:
 *     : These ROMs are surface mounted
 61256 : 32k x8 SRAM (x2)
 RISE11: SEIBU custom stamped 'RISE11' (QFP240)
+        A11-A14 are tied to vcc/gnd so the RAM connected to the RISE11 is configured as 2kB.
 PAL1  : PALCE 16V8 stamped 'SPI ROM 10-2'
 PAL2  : PALCE 16V8 stamped 'SPI ROM 10-1'
 

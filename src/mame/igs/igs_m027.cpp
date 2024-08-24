@@ -583,7 +583,7 @@ ROM_END
 ROM_START( oceanpar ) // IGS PCB-0331-02-FG
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "oceanpar_igs027a", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "oceanpar_igs027a", 0x00000, 0x4000, NO_DUMP ) // possibly B1
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "ocean_paradise_v105us.u23", 0x00000, 0x80000, CRC(e6eb66c3) SHA1(f6c1e31ccddc8ebb8218f52b5c0d97f0797b2e84) )
@@ -601,7 +601,7 @@ ROM_END
 ROM_START( oceanpara ) // IGS PCB-0331-01-FG
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "oceanpara_igs027a", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "b1_igs027a", 0x00000, 0x4000, NO_DUMP ) // stickered B1
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "ocean_paradise_v101us.u23", 0x00000, 0x80000, CRC(4f2bf87a) SHA1(559c8728632336ba84f455ac22b6e514967c644b) )
@@ -620,7 +620,7 @@ ROM_END
 ROM_START( luckycrs )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "luckycrs_igs027a", 0x00000, 0x4000, NO_DUMP ) // stickered V21
+	ROM_LOAD( "v21_igs027a", 0x00000, 0x4000, NO_DUMP ) // stickered V21
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "luckycross_v-106sa.u23", 0x00000, 0x80000, CRC(5716de00) SHA1(ff68fa93c6801c78f910452c08c5a9c1a089261d) ) // 27C4002
@@ -709,7 +709,7 @@ Sound Processor ( U6295 )
 ROM_START( amazoni2 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "sdwx_igs027a", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "p9_igs027a", 0x00000, 0x4000, NO_DUMP ) // stamped P9
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "27c4096_akii_b-202br.u23", 0x000000, 0x80000, CRC(7147b43c) SHA1(29a4a20867595650918c4ab892ddb71440bd3f4b) )
@@ -765,7 +765,7 @@ ROM_END
 ROM_START( olympic5a )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "o2_igs027a", 0x00000, 0x4000, NO_DUMP ) // stickered O2
+	ROM_LOAD( "o2_igs027a", 0x00000, 0x4000, NO_DUMP ) // stickered O2?
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "olympic_5_v-107us.u23", 0x00000, 0x80000, CRC(3bcd4dd9) SHA1(08e49d9a5045e52a7eb60113f0c7ed25b30474c2) ) // MX27C4096
@@ -1226,7 +1226,7 @@ V3021 - Micro Electronic Ultra Low Power 1-Bit 32kHz RTC (Real Time Clock)
   SW4 - Toggle switch
  JP11 - 4 Pin header (HD4-156)
 
-IGS 025  - Custom programmed A8B1723(?)
+IGS 025  - Custom programmed A8B1723(?) - stickered S1
 IGS 0027 - Custom programmed ARM9
 
 */
@@ -1234,7 +1234,7 @@ IGS 0027 - Custom programmed ARM9
 ROM_START( chessc2 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "chessc2_igs027a", 0x00000, 0x4000, NO_DUMP ) // unknown sticker
+	ROM_LOAD( "c8_igs027a", 0x00000, 0x4000, NO_DUMP ) // stickered C8
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "ccii_v-707uso.u12", 0x000000, 0x80000, CRC(5937b67b) SHA1(967b3adf6f5bf92d63ec460d595e473898a78372) )
