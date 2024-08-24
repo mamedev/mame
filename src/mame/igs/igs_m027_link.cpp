@@ -164,6 +164,7 @@ public:
 	void cjsll(machine_config &config);
 	void mgcsl(machine_config &config);
 
+	void init_cjsll();
 	void init_mgcsl();
 
 protected:
@@ -178,6 +179,8 @@ private:
 
 	void cjsll_map(address_map &map);
 	void mgcsl_map(address_map &map);
+
+	void decrypt();
 };
 
 
@@ -198,7 +201,7 @@ void extension_state::cjsll_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x600000, 0x603fff).ram();
 
-	// TODO: IGS025? Almost same read writes also seem to happen at 0xd40000-0xd40003
+	// TODO: IGS025?
 	//map(0x876000, 0x876001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
 	//map(0x876002, 0x876003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
 
@@ -212,7 +215,7 @@ void extension_state::mgcsl_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x600000, 0x603fff).ram();
 
-	// TODO: IGS025? Almost same read writes also seem to happen at 0x130000-0x130003
+	// TODO: IGS025?
 	//map(0x893000, 0x893001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
 	//map(0x893002, 0x893003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
 
@@ -224,7 +227,7 @@ void extension_state::mgcsl_map(address_map &map)
 
 TIMER_DEVICE_CALLBACK_MEMBER(extension_state::interrupt)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
 		m_maincpu->set_input_line(1, HOLD_LINE);
@@ -404,8 +407,8 @@ ROM_START( cjsll )
 ROM_END
 
 
-// TODO: reduce this monstrosity
-void extension_state::init_mgcsl()
+// TODO: reduce this monstrosity. Still some imperfections?
+void extension_state::decrypt()
 {
 	const int rom_size = memregion("maincpu")->bytes();
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
@@ -460,6 +463,23 @@ void extension_state::init_mgcsl()
 	}
 
 	// TODO: tiles don't seem scrambled, sprites to be verified
+}
+
+void extension_state::init_cjsll()
+{
+	decrypt();
+
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+
+	// game id check
+	rom[0x3a994 / 2] = 0x4e71;
+}
+
+void extension_state::init_mgcsl()
+{
+	decrypt();
+
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
 
 	// game id check
 	rom[0x3a48e / 2] = 0x4e71;
@@ -474,4 +494,4 @@ GAME( 1999, cjslh, 0, host, host, host_state, empty_init, ROT0, "IGS", "Cai Jin 
 
 // extensions
 GAME( 1999, mgcsl, 0, mgcsl, extension, extension_state, init_mgcsl, ROT0, "IGS", "Manguan Caishen (link version, extension, S110CN)",   MACHINE_IS_SKELETON )
-GAME( 1999, cjsll, 0, cjsll, extension, extension_state, init_mgcsl, ROT0, "IGS", "Cai Jin Shen Long (link version, extension, S111CN)", MACHINE_IS_SKELETON )
+GAME( 1999, cjsll, 0, cjsll, extension, extension_state, init_cjsll, ROT0, "IGS", "Cai Jin Shen Long (link version, extension, S111CN)", MACHINE_IS_SKELETON )
