@@ -485,7 +485,6 @@ JP1234   - Four 2-pin jumpers. JP3 is shorted, the others are not shorted
 
 *********************************************************************************************
 
-
 On "Super Visual Football: European Sega Cup" and "JLEAGUE" :
 
 JLEAGUE was the original code developed and released in early
@@ -692,10 +691,8 @@ void segas32_state::update_irq_state()
 
 void segas32_state::signal_v60_irq(int which)
 {
-	int i;
-
 	/* see if this interrupt input is mapped to any vectors; if so, mark them */
-	for (i = 0; i < 5; i++)
+	for (int i = 0; i < 5; i++)
 		if (m_v60_irq_control[i] == which)
 			m_v60_irq_control[7] |= 1 << i;
 	update_irq_state();
@@ -2232,7 +2229,6 @@ GFXDECODE_END
 
 
 
-
 /*************************************
  *
  *  Machine driver
@@ -2250,7 +2246,7 @@ void segas32_state::device_add_mconfig(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas32_state::system32_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segas32_state::system32_sound_portmap);
 
-	sega_315_5296_device &io_chip(SEGA_315_5296(config, "io_chip", 0)); // unknown clock
+	sega_315_5296_device &io_chip(SEGA_315_5296(config, "io_chip", MASTER_CLOCK/4));
 	io_chip.in_pa_callback().set_ioport("P1_A");
 	io_chip.in_pb_callback().set_ioport("P2_A");
 	io_chip.in_pc_callback().set_ioport("PORTC_A");
@@ -2310,8 +2306,6 @@ segas32_regular_state::segas32_regular_state(const machine_config &mconfig, cons
 
 
 
-
-
 void segas32_state::system32_analog_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -2343,8 +2337,6 @@ segas32_analog_state::segas32_analog_state(const machine_config &mconfig, device
 	: segas32_state(mconfig, type, tag, owner, clock, false)
 {
 }
-
-
 
 
 
@@ -2388,8 +2380,6 @@ segas32_trackball_state::segas32_trackball_state(const machine_config &mconfig, 
 
 
 
-
-
 void segas32_state::system32_4player_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -2423,8 +2413,6 @@ segas32_4player_state::segas32_4player_state(const machine_config &mconfig, devi
 
 
 
-
-
 void segas32_state::ga2_main_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -2454,21 +2442,20 @@ segas32_v25_state::segas32_v25_state(const machine_config &mconfig, const char *
 
 
 
-
-
 void segas32_upd7725_state::device_add_mconfig(machine_config &config)
 {
 	segas32_analog_state::device_add_mconfig(config);
 
-	/* add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the master pcb's ROM board where an fd1149 could go */
-	upd7725_device &dsp(UPD7725(config, "dsp", 8000000)); // TODO: Find real clock speed for the upd7725; this is a canned oscillator on the 837-8341 pcb
+	// add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the master pcb's ROM board where an fd1149 could go
+	upd7725_device &dsp(UPD7725(config, "dsp", 16_MHz_XTAL/2));
 	dsp.set_addrmap(AS_PROGRAM, &segas32_upd7725_state::upd7725_prg_map);
 	dsp.set_addrmap(AS_DATA, &segas32_upd7725_state::upd7725_data_map);
 	dsp.set_disable(); // TODO: disable for now, needs DMA pins and interrupts implemented in upd7725 core
+
 	// TODO: find /INT source for upd7725
 	// TODO: figure out how the p0 and p1 lines from the upd7725 affect the mainboard; do they select one of four (or 8) latches to/from the mainboard?
 	// TODO: trace out the 837-8341 pcb
-	// See HLE of this dsp in /src/mame/machine/segas32.cpp : arescue_dsp_r and arescue_dsp_w
+	// See HLE of this dsp in segas32_m.cpp: arescue_dsp_r and arescue_dsp_w
 }
 
 DEFINE_DEVICE_TYPE(SEGA_S32_UPD7725_DEVICE, segas32_upd7725_state, "segas32_pcb_upd7725", "Sega System 32 uPD7725 PCB")
@@ -2477,7 +2464,6 @@ segas32_upd7725_state::segas32_upd7725_state(const machine_config &mconfig, cons
 	: segas32_analog_state(mconfig, SEGA_S32_UPD7725_DEVICE, tag, owner, clock)
 {
 }
-
 
 
 
@@ -2573,7 +2559,7 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &sega_multi32_state::multi32_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &sega_multi32_state::multi32_sound_portmap);
 
-	sega_315_5296_device &io_chip_0(SEGA_315_5296(config, "io_chip_0", 0)); // unknown clock
+	sega_315_5296_device &io_chip_0(SEGA_315_5296(config, "io_chip_0", MASTER_CLOCK/4));
 	io_chip_0.in_pa_callback().set_ioport("P1_A");
 	io_chip_0.in_pb_callback().set_ioport("P2_A");
 	io_chip_0.in_pc_callback().set_ioport("PORTC_A");
@@ -2585,7 +2571,7 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	io_chip_0.out_cnt1_callback().set(FUNC(segas32_state::display_enable_w<0>));
 	io_chip_0.out_cnt2_callback().set_inputline(m_soundcpu, INPUT_LINE_RESET).invert();
 
-	sega_315_5296_device &io_chip_1(SEGA_315_5296(config, "io_chip_1", 0)); // unknown clock
+	sega_315_5296_device &io_chip_1(SEGA_315_5296(config, "io_chip_1", MASTER_CLOCK/4));
 	io_chip_1.in_pa_callback().set_ioport("P1_B");
 	io_chip_1.in_pb_callback().set_ioport("P2_B");
 	io_chip_1.in_pc_callback().set_ioport("PORTC_B");
@@ -2852,12 +2838,12 @@ void segas32_new_state::sega_multi32_6p(machine_config &config)
 	SEGA_MULTI32_6PLAYER_DEVICE(config, "mainpcb", 0);
 }
 
+
 /*************************************
  *
  *  ROM definition(s)
  *
  *************************************/
-
 
 #define ROM_LOAD_x2(name, base, length, crc) \
 	ROM_LOAD( name, base + 0 * length, length, crc ) \
