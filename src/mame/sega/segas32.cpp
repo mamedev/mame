@@ -61,13 +61,13 @@ PCB Layout
 |         93C46                                                              D42264         |
 |CNB                         SW2                                             D42264         |
 |                            SW1                                             D42264         |
-|       CNA                  DSW1    32MHz  50MHz                            D42264         |
+|       CNA                  DSW1    32.2159MHz  50MHz                       D42264         |
 |-------------------------------------------------------------------------------------------|
 
 Notes:
-      V60 CPU running at 16.00MHz [32/2]
-      Z80 CPU running at 8.000MHz [32/4]
-      YM3438 running at 8.000MHz [32/4]
+      V60 CPU running at 16.108MHz [32.2159/2]
+      Z80 CPU running at 8.054MHz [32.2159/4]
+      YM3438 running at 8.054MHz [32.2159/4]
       CNE/F/I - Multi-pin connectors for connection of ROM Board
       CND     - 4 pin connector for 2nd Speaker for Stereo Output
       CNA     - 30 pin connector for extra controls PCB
@@ -211,7 +211,7 @@ Notes:
       V70 CPU running at 20.00MHz [40/2]
       Z80 CPU running at 8.000MHz [32/4]
       YM3438 running at 8.000MHz [32/4]
-      315-5560 running at 8.000MHz [32/4]
+      315-5560 running at 10.000MHz [40/4]
       CND/E/F/H: Multi-pin connectors for connection of ROM Board
       CNC      : 4 pin connector for 2nd Speaker for Stereo Output
       CNJ      : 32 pin connector (purpose unknown)
@@ -605,13 +605,6 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
  *
  *************************************/
 
-#define MASTER_CLOCK        32.2159_MHz_XTAL
-#define RFC_CLOCK           50_MHz_XTAL
-#define MULTI32_CLOCK       40_MHz_XTAL
-
-#define TIMER_0_CLOCK       ((MASTER_CLOCK/2)/2048) /* confirmed */
-#define TIMER_1_CLOCK       ((RFC_CLOCK/16)/256)    /* confirmed */
-
 #define MAIN_IRQ_VBSTART    0
 #define MAIN_IRQ_VBSTOP     1
 #define MAIN_IRQ_SOUND      2
@@ -725,8 +718,6 @@ uint8_t segas32_state::int_control_r(offs_t offset)
 
 void segas32_state::int_control_w(offs_t offset, uint8_t data)
 {
-	int duration;
-
 //  logerror("%06X:int_control_w(%X) = %02X\n", m_maincpu->pc(), offset, data);
 	switch (offset)
 	{
@@ -754,25 +745,30 @@ void segas32_state::int_control_w(offs_t offset, uint8_t data)
 
 		case 8:
 		case 9:         /* timer 0 count */
+		{
 			m_v60_irq_control[offset] = data;
-			duration = m_v60_irq_control[8] + ((m_v60_irq_control[9] << 8) & 0xf00);
+			uint16_t duration = m_v60_irq_control[8] | ((m_v60_irq_control[9] << 8) & 0xf00);
 			if (duration)
 			{
-				attotime period = attotime::from_hz(TIMER_0_CLOCK) * duration;
+				const XTAL xtal = m_is_multi32 ? 32_MHz_XTAL : 32.2159_MHz_XTAL;
+				attotime period = attotime::from_ticks(0x800 * duration, xtal / 2);
 				m_v60_irq_timer[0]->adjust(period, MAIN_IRQ_TIMER0);
 			}
 			break;
+		}
 
 		case 10:
 		case 11:        /* timer 1 count */
+		{
 			m_v60_irq_control[offset] = data;
-			duration = m_v60_irq_control[10] + ((m_v60_irq_control[11] << 8) & 0xf00);
+			uint16_t duration = m_v60_irq_control[10] | ((m_v60_irq_control[11] << 8) & 0xf00);
 			if (duration)
 			{
-				attotime period = attotime::from_hz(TIMER_1_CLOCK) * duration;
+				attotime period = attotime::from_ticks(0x100 * duration, 50_MHz_XTAL / 16);
 				m_v60_irq_timer[1]->adjust(period, MAIN_IRQ_TIMER1);
 			}
 			break;
+		}
 
 		case 12:
 		case 13:
@@ -2237,6 +2233,8 @@ GFXDECODE_END
 
 void segas32_state::device_add_mconfig(machine_config &config)
 {
+	constexpr XTAL MASTER_CLOCK = 32.2159_MHz_XTAL;
+
 	/* basic machine hardware */
 	V60(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_state::system32_map);
@@ -2289,7 +2287,7 @@ void segas32_state::device_add_mconfig(machine_config &config)
 	ym2.add_route(0, "lspeaker", 0.40);
 	ym2.add_route(1, "rspeaker", 0.40);
 
-	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", RFC_CLOCK/4)); // ASSP (RF)5C105 or Sega 315-5476A
+	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", 50_MHz_XTAL/4)); // ASSP (RF)5C105 or Sega 315-5476A
 	rfsnd.add_route(0, "lspeaker", 0.55);
 	rfsnd.add_route(1, "rspeaker", 0.55);
 	rfsnd.set_addrmap(0, &segas32_state::rf5c68_map);
@@ -2550,6 +2548,9 @@ segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *ta
 
 void sega_multi32_state::device_add_mconfig(machine_config &config)
 {
+	constexpr XTAL MASTER_CLOCK = 32_MHz_XTAL;
+	constexpr XTAL MULTI32_CLOCK = 40_MHz_XTAL;
+
 	/* basic machine hardware */
 	V70(config, m_maincpu, MULTI32_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sega_multi32_state::multi32_map);
@@ -5833,8 +5834,8 @@ void segas32_state::init_jpark()
 
 	segas32_common_init();
 
-	pROM[0xC15A8/2] = 0xCD70;
-	pROM[0xC15AA/2] = 0xD8CD;
+	pROM[0xc15a8/2] = 0xcd70;
+	pROM[0xc15aa/2] = 0xd8cd;
 
 	m_sw1_output = &segas32_state::jpark_sw1_output;
 }
