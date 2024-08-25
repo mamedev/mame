@@ -27,11 +27,12 @@ Oriental Pearl - 1997
 Big bonus for scoring on all letters of "ORIENTAL PEARL".
 
 Electronic ball-checking device ensures where ball lands.
+
 // TODO:
 Need hardware info.
 Hook up nvram inputs opll and adpcm.
-orientalpearl Has undumped mcu and adpcm rom.
-Add segment display as marywu.cpp
+east8 Has undumped mcu and adpcm rom.
+Need Layout as and Add segment display as marywu.cpp
 */
 
 #include "emu.h"
@@ -138,10 +139,11 @@ void orientalpearl_state::orientalpearl(machine_config &config)
 	psg.add_route(ALL_OUTPUTS, "mono", 1.0);
 	ym2413_device &opll(YM2413(config, "opll", 3.579545_MHz_XTAL));
 	opll.add_route(ALL_OUTPUTS, "mono", 1.0);
+
 	OKIM6295(config, "oki", XTAL(10'738'000) / 6, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // Clock frequency & pin 7 not verified
 }
 
-ROM_START( orientalpearl )
+ROM_START( east8 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) //  EAST8  v1.05 string
 	ROM_LOAD( "w27c512.u33", 0x00000, 0x10000, CRC(8d3d1e91) SHA1(b80907df0878057a1ded8b56225059e06382b9d6) ) // main program
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 )
@@ -154,4 +156,4 @@ ROM_END
 
 
 //    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                FLAGS
-GAME( 200?, orientalpearl, 0,       orientalpearl,   orientalpearl, orientalpearl_state, empty_init, ROT0, "<unknown>", "Unknown 6 Ball Pinball Gambling", MACHINE_IS_SKELETON_MECHANICAL ) // EAST8  v1.05  string . this was dumped from soccer santiago II 6 ball pinball
+GAME( 200?, east8,  0,       orientalpearl,   orientalpearl, orientalpearl_state, empty_init, ROT0, "<unknown>", "Unknown 6 Ball Pinball Gambling", MACHINE_IS_SKELETON_MECHANICAL ) // EAST8  v1.05  string . this was dumped from soccer santiago II 6 ball pinball
