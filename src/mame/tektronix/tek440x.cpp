@@ -346,10 +346,8 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 		m_map_control &= ~(1 << MAP_CPU_WR);
 
 		// selftest expects fail if page.pid != map_control.pid
-if (BIT(m_map[offset >> 11], 11, 3))
 		if (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
 		{
-
 			m_map_control |= (1 << MAP_BLOCK_ACCESS);
 
 			LOG("memory_r: bus error: PID(%d) != %d %08x fc(%d) pc(%08x)\n", BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
@@ -359,6 +357,8 @@ if (BIT(m_map[offset >> 11], 11, 3))
 
 			mem_mask = 0;
 		}
+		
+		LOG("memory_r: map %08x => %08x\n",offset, BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11);
 		
 		offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
 	}
@@ -387,8 +387,9 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		m_map_control |= (1 << MAP_CPU_WR);
 				
 		// matching pid?
-		if ((BIT(m_map[offset >> 11], 11, 3)) && (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7)))
+		if ( (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7)))
 		{
+			// this seems back to front, but passes selftest..
 			m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
 
 			LOG("memory_w: bus error: PID(%d) != %d %08x fc(%d)\n", BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
@@ -442,7 +443,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 
 u16 tek440x_state::map_r(offs_t offset)
 {
-	//LOG("map_r 0x%08x => %04x\n",offset>>11, m_map[offset >> 11] );
+	LOG("map_r 0x%08x => %04x\n",offset>>11, m_map[offset >> 11] );
 
 	// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
 	if (!BIT(m_map_control, MAP_SYS_WR_ENABLE))
@@ -459,7 +460,7 @@ u16 tek440x_state::map_r(offs_t offset)
 
 void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	//LOG("map_w 0x%08x <= %04x\n",offset>>11, data);
+	LOG("map_w 0x%08x <= %04x\n",offset>>11, data);
 
 	if (BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
@@ -472,7 +473,7 @@ u8 tek440x_state::mapcntl_r()
 	// page 2.1-54 implies that this can only be read in user mode
 
 
-	//LOG("mapcntl_r(%02x)\n", m_map_control);
+	LOG("mapcntl_r(%02x)\n", m_map_control);
 
 	u8 ans = m_map_control;
 	
@@ -480,7 +481,7 @@ u8 tek440x_state::mapcntl_r()
 	if ((ans & 0xc0) != 0xc0)
 		ans &= ~0x20;
 	else
-		ans |= 0x20;
+		ans |= 0x20;  // (1<<MAP_SYS_WR_ENABLE)
 		
 	return ans;
 }
@@ -489,9 +490,17 @@ void tek440x_state::mapcntl_w(u8 data)
 {
 	if (m_map_control != (data & 0x3f))
 	{
-		LOG("mapcntl_w mmu_enable   %2d\n", BIT(data, MAP_VM_ENABLE));
+		LOG("mapcntl_w mmu_enable   %2d pc(%8x)\n", BIT(data, MAP_VM_ENABLE),  m_maincpu->pc());
 		LOG("mapcntl_w write_enable %2d\n", BIT(data, MAP_SYS_WR_ENABLE));
 		LOG("mapcntl_w pte PID    0x%02x\n", data & 15);
+		
+		if (BIT(data, MAP_VM_ENABLE) && (data & 15))
+		for(uint32_t i=0; i<0x20; i += 8)
+		{
+			LOG("mapcntl_w: %04x %04x %04x %04x %04x %04x %04x %04x \n",
+				m_map[i+0],m_map[i+1],m_map[i+2],m_map[i+3],m_map[i+4],m_map[i+5],m_map[i+6],m_map[i+7]);
+		}
+		
 	}
 
 	// NB bit 6 & 7 is not used
@@ -526,15 +535,18 @@ u8 tek440x_state::videocntl_r()
 
 void tek440x_state::videocntl_w(u8 data)
 {
-	m_videocntl = data;
-#if 0
-	LOG("m_videocntl %02x\n", data);
-	LOG("m_videocntl VBenable   %2d\n", BIT(data, 6));
-	LOG("m_videocntl ScreenOn   %2d\n", BIT(data, 5));
-	LOG("m_videocntl ScreenInv  %2d\n", BIT(data, 4));
-	LOG("m_videocntl ScreenPan  %2d\n", data & 15);
-#endif
+	if (0)
+	if (m_videocntl != data)
+	{
+		LOG("m_videocntl %02x\n", data);
+		LOG("m_videocntl VBenable   %2d\n", BIT(data, 6));
+		LOG("m_videocntl ScreenOn   %2d\n", BIT(data, 5));
+		LOG("m_videocntl ScreenInv  %2d\n", BIT(data, 4));
+		LOG("m_videocntl ScreenPan  %2d\n", data & 15);
+	}
+
 	m_vint->in_w<0>(BIT(data, 6));
+	m_videocntl = data;
 }
 
 
