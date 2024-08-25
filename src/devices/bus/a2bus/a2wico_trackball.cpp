@@ -18,6 +18,8 @@
 #include "emu.h"
 #include "a2wico_trackball.h"
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -36,7 +38,6 @@ public:
 protected:
 	a2bus_wicotrackball_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -44,16 +45,17 @@ protected:
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 
+private:
+	uint8_t read_position(int axis);
+
 	required_ioport m_wicotrackballb;
 	required_ioport_array<2> m_wicotrackballxy;
 
-private:
 	bool m_speed[2];
 	uint8_t m_buttons;
 	bool m_wraparound;
 	uint8_t m_axis[2];
 	uint32_t m_last_pos[2];
-	uint8_t read_position(int axis);
 };
 
 /***************************************************************************
@@ -65,12 +67,6 @@ private:
 #define WICOTRACKBALL_YAXIS_TAG     "a2wicotrackball_y"
 
 #define WICOTRACKBALL_POS_UNINIT    0xffffffff /* default out-of-range position */
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_WICOTRACKBALL, device_a2bus_card_interface, a2bus_wicotrackball_device, "a2wicotrackball", "Apple II Wico Trackball Card")
 
 static INPUT_PORTS_START( wicotrackball )
 	PORT_START(WICOTRACKBALL_BUTTONS_TAG) /* Trackball - buttons */
@@ -96,15 +92,6 @@ INPUT_PORTS_END
 ioport_constructor a2bus_wicotrackball_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(wicotrackball);
-}
-
-/*-------------------------------------------------
-    device_add_mconfig - device-specific
-    machine configurations
--------------------------------------------------*/
-
-void a2bus_wicotrackball_device::device_add_mconfig(machine_config &config)
-{
 }
 
 /***************************************************************************
@@ -149,37 +136,35 @@ void a2bus_wicotrackball_device::device_reset()
 
 uint8_t a2bus_wicotrackball_device::read_position(int axis)
 {
-	int speed_scale = (1 << m_speed[0]) << (m_speed[1] * 2);
-	uint8_t temp_axis = 0;
-	int diff_pos = 0;
-        int cur_pos = m_wicotrackballxy[axis]->read();
+	int const speed_scale = 1 << (m_speed[0] + m_speed[1] * 2);
+        int const cur_pos = m_wicotrackballxy[axis]->read();
 
-	if (m_last_pos[axis] == WICOTRACKBALL_POS_UNINIT) {
-		m_last_pos[axis] = cur_pos;
-	}
-	diff_pos = cur_pos - m_last_pos[axis];
-	// wrap-around the positoin
-	if (diff_pos > 0x7f) {
-		diff_pos -= 0x100;
-	} else if (diff_pos < -0x80) {
-		diff_pos += 0x100;
-	}
+	uint8_t result = 0;
+	if (m_last_pos[axis] != WICOTRACKBALL_POS_UNINIT) {
+		int diff_pos = cur_pos - m_last_pos[axis];
 
-	if (m_wraparound) {
-		temp_axis = m_axis[axis] + diff_pos / speed_scale;;
-	} else {
-		if ((m_axis[axis] + diff_pos / speed_scale) < 0) {
-			temp_axis = 0;
-		} else if ((m_axis[axis] + diff_pos / speed_scale) > 0xff) {
-			temp_axis = 0xff;
+		// wrap-around the positoin
+		if (diff_pos > 0x7f) {
+			diff_pos -= 0x100;
+		} else if (diff_pos < -0x80) {
+			diff_pos += 0x100;
+		}
+
+		int const updated_axis = int(unsigned(m_axis[axis])) + diff_pos / speed_scale;;
+		if (m_wraparound) {
+			result = unsigned(updated_axis);
 		} else {
-			temp_axis = m_axis[axis] + diff_pos / speed_scale;
+			result = unsigned(std::clamp<int>(updated_axis, 0, 0xff));
+		}
+		if (!machine().side_effects_disabled()) {
+			m_axis[axis] = result;
 		}
 	}
-	m_last_pos[axis] = cur_pos;
-	m_axis[axis] = temp_axis;
+	if (!machine().side_effects_disabled()) {
+		m_last_pos[axis] = cur_pos;
+	}
 
-	return m_axis[axis];
+	return result;
 }
 
 /*-------------------------------------------------
@@ -198,15 +183,18 @@ uint8_t a2bus_wicotrackball_device::read_c0nx(uint8_t offset)
 			data = read_position(1);
 			break;
 		case 0x2: /* set Bounded/Wraparound Soft Switch to Bounded */
-			m_wraparound = false;
+			if (!machine().side_effects_disabled()) {
+				m_wraparound = false;
+			}
 			break;
 		case 0x3: /* set Bounded/Wraparound Soft Switch to Wraparound */
-			m_wraparound = true;
+			if (!machine().side_effects_disabled()) {
+				m_wraparound = true;
+			}
 			break;
 		case 0x6: /* read buttons */
 			data = m_buttons = m_wicotrackballb->read();
 			break;
-
         }
 	return data;
 }
@@ -246,3 +234,12 @@ void a2bus_wicotrackball_device::write_c0nx(uint8_t offset, uint8_t data)
 			break;
         }
 }
+
+} // anonymous namespace
+
+
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_WICOTRACKBALL, device_a2bus_card_interface, a2bus_wicotrackball_device, "a2wicotrackball", "Apple II Wico Trackball Card")

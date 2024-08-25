@@ -41,6 +41,7 @@
 #include "a2ultraterm.h"
 #include "a2videoterm.h"
 #include "a2vulcan.h"
+#include "a2wico_trackball.h"
 #include "a2zipdrive.h"
 #include "booti.h"
 #include "byte8251.h"
@@ -73,7 +74,6 @@
 #include "uniprint.h"
 #include "uthernet.h"
 #include "vistaa800.h"
-#include "a2wico_trackball.h"
 
 
 void apple2_slot0_cards(device_slot_interface &device)

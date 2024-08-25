@@ -21,11 +21,11 @@ public:
 	apple2_joyport_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
-	// device_a2gameio_interface overrides
+	// device_a2gameio_interface implementation
 	virtual u8 pdl0_r() override;
 	virtual u8 pdl1_r() override;
 	virtual u8 pdl2_r() override;
