@@ -605,9 +605,9 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
  *
  *************************************/
 
-#define MASTER_CLOCK        32215900
-#define RFC_CLOCK           XTAL(50'000'000)
-#define MULTI32_CLOCK       XTAL(40'000'000)
+#define MASTER_CLOCK        32.2159_MHz_XTAL
+#define RFC_CLOCK           50_MHz_XTAL
+#define MULTI32_CLOCK       40_MHz_XTAL
 
 #define TIMER_0_CLOCK       ((MASTER_CLOCK/2)/2048) /* confirmed */
 #define TIMER_1_CLOCK       ((RFC_CLOCK/16)/256)    /* confirmed */
