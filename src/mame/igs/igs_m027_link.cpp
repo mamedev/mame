@@ -5,12 +5,16 @@
 IGS ARM7 (IGS027A) based mahjong / gambling platform(s) with link support
 Keeping them separate from igs_m027.cpp and igs017.cpp for now.
 
-NOTE: linking between mgcsh and mgcsl has been verified on real hw, while linking
+NOTE: linking between mgcs2h and mgcs2l has been verified on real hw, while linking
 between cjslh and cjsll doesn't work on real hw for some reason.
+
+The two dumped extension games are really similar to mgdh in igs017.cpp code-wise,
+you can get them to the wait link screen just by implementing the mgdh's IGS MUX
+stuff.
 
 *********************************************************************************
 
-Manguan Caishen, HOST PCB (IGS 1999)
+Manguan Caishen 2, HOST PCB (IGS 1999)
 Cai Jin Shen Long, HOST PCB (IGS 1999)
 
 These boards are housed in a metal box.
@@ -30,7 +34,7 @@ The PCB has a 62-way connector on it but it not accessible to the outside of the
 PCB Layout
 ----------
 
-IGS PCB 0219-04 (Manguan Caishen, HOST)
+IGS PCB 0219-04 (Manguan Caishen 2, HOST)
 IGS PCB 0219-1 (Cai Jin Shen Long, HOST)
 |------------------------------------------------------------------|
 |DIN5         DB9                                             DB25 |
@@ -53,7 +57,7 @@ IGS PCB 0219-1 (Cai Jin Shen Long, HOST)
 |---------------------------------------| |-----------------| |----|
 Notes:
         * - On Cai Jin Shen Long, the V3021 and 32.768kHz crystal are replaced with a ST M48T08 NVRAM (the battery is dead and holds no data).
-EPROM.U13 - Manguan Caishen - labelled 'V206CMMBOX'
+EPROM.U13 - Manguan Caishen 2 - labelled 'V206CMMBOX'
           - Cai Jin Shen Long - labelled 'V-106CSM'
     T518B - Reset IC
   JP10/11 - 2 pins (each) that get tied together when the key switches on the side of the metal box are locked
@@ -61,16 +65,16 @@ EPROM.U13 - Manguan Caishen - labelled 'V206CMMBOX'
     62256 - 32kx8-bit SRAM
       SW1 - 8-position DIP Switch
     V3021 - NVRAM Battery Supervisor IC
-   IGS025 - Manguan Caishen - labelled 'S8'
+   IGS025 - Manguan Caishen 2 - labelled 'S8'
           - Cai Jin Shen Long - labelled 'S2'
-  IGS027A - Manguan Caishen - labelled 'Y7'
+  IGS027A - Manguan Caishen 2 - labelled 'Y7'
           - Cai Jin Shen Long - labelled 'S2'
 
 *********************************************************************************
 
 *********************************************************************************
 
-Manguan Caishen (Link Version, Extension), IGS 1999
+Manguan Caishen 2 (Link Version, Extension), IGS 1999
 Cai Jin Shen Long (Link Version, Extension), IGS 1999
 
 These boards connect to the HOST board running the same game.
@@ -162,10 +166,10 @@ public:
 	{ }
 
 	void cjsll(machine_config &config);
-	void mgcsl(machine_config &config);
+	void mgcs2l(machine_config &config);
 
 	void init_cjsll();
-	void init_mgcsl();
+	void init_mgcs2l();
 
 protected:
 	virtual void video_start() override;
@@ -178,7 +182,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void cjsll_map(address_map &map);
-	void mgcsl_map(address_map &map);
+	void mgcs2l_map(address_map &map);
 
 	void decrypt();
 };
@@ -210,7 +214,7 @@ void extension_state::cjsll_map(address_map &map)
 	//map(0xa12001, 0xa12001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
-void extension_state::mgcsl_map(address_map &map)
+void extension_state::mgcs2l_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x600000, 0x603fff).ram();
@@ -352,15 +356,15 @@ void extension_state::cjsll(machine_config &config)
 	OKIM6295(config, "oki", 22_MHz_XTAL / 22, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
-void extension_state::mgcsl(machine_config &config)
+void extension_state::mgcs2l(machine_config &config)
 {
 	cjsll(config),
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &extension_state::mgcsl_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &extension_state::mgcs2l_map);
 }
 
 
-ROM_START( mgcsh )
+ROM_START( mgcs2h )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
 	ROM_LOAD( "y7_027a.bin", 0x00000, 0x4000, CRC(3e726eeb) SHA1(41b4e5f8a9d35b82b1a62029b34c1e19e188a3bc) )
@@ -378,7 +382,7 @@ ROM_START( cjslh )
 	ROM_LOAD( "v-106csm.u13", 0x00000, 0x10000, CRC(5b3f3446) SHA1(1d5b9523ac7f221eb7cc2e5db90cc859c640cc18) )
 ROM_END
 
-ROM_START( mgcsl )
+ROM_START( mgcs2l )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "p2000.u19", 0x00000, 0x80000, CRC(05a065e8) SHA1(5302fcb272c1561380bce57d840ddb5cc45b9497) )
 
@@ -462,7 +466,7 @@ void extension_state::decrypt()
 		rom[i] = x;
 	}
 
-	// TODO: tiles don't seem scrambled, sprites to be verified
+	// TODO: tiles are scrambled in a different way from what's already supported, sprites to be verified
 }
 
 void extension_state::init_cjsll()
@@ -475,7 +479,7 @@ void extension_state::init_cjsll()
 	rom[0x3a994 / 2] = 0x4e71;
 }
 
-void extension_state::init_mgcsl()
+void extension_state::init_mgcs2l()
 {
 	decrypt();
 
@@ -489,9 +493,9 @@ void extension_state::init_mgcsl()
 
 
 // hosts
-GAME( 1999, mgcsh, 0, host, host, host_state, empty_init, ROT0, "IGS", "Manguan Caishen (link version, host)",   MACHINE_IS_SKELETON )
-GAME( 1999, cjslh, 0, host, host, host_state, empty_init, ROT0, "IGS", "Cai Jin Shen Long (link version, host)", MACHINE_IS_SKELETON )
+GAME( 1999, mgcs2h, 0, host, host, host_state, empty_init, ROT0, "IGS", "Manguan Caishen 2 (link version, host)", MACHINE_IS_SKELETON )
+GAME( 1999, cjslh,  0, host, host, host_state, empty_init, ROT0, "IGS", "Cai Jin Shen Long (link version, host)", MACHINE_IS_SKELETON )
 
 // extensions
-GAME( 1999, mgcsl, 0, mgcsl, extension, extension_state, init_mgcsl, ROT0, "IGS", "Manguan Caishen (link version, extension, S110CN)",   MACHINE_IS_SKELETON )
-GAME( 1999, cjsll, 0, cjsll, extension, extension_state, init_cjsll, ROT0, "IGS", "Cai Jin Shen Long (link version, extension, S111CN)", MACHINE_IS_SKELETON )
+GAME( 1999, mgcs2l, 0, mgcs2l, extension, extension_state, init_mgcs2l, ROT0, "IGS", "Manguan Caishen 2 (link version, extension, S110CN)", MACHINE_IS_SKELETON )
+GAME( 1999, cjsll,  0, cjsll,  extension, extension_state, init_cjsll,  ROT0, "IGS", "Cai Jin Shen Long (link version, extension, S111CN)", MACHINE_IS_SKELETON )
