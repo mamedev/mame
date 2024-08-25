@@ -256,7 +256,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 		int tile = m_video_ram[((addr+x)*2) >> 1] & 0xff;
 		int attr = m_video_ram[((addr+x)*2) >> 1] >> 8;
 
-		uint8_t color = (m_color_mode) ? 1 : (attr & 4) ? 2 : 1; /* TODO: color mode */
+		// TODO: color mode support
+		uint8_t color = (m_color_mode) ? 1 : (attr & 4) ? 2 : 1;
 
 		for (int yi = 0; yi < lr; yi++)
 		{
@@ -265,16 +266,21 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 			if(attr & 8)
 				tile_data^=0xff;
 
-			if(cursor_on && cursor_addr == addr+x) //TODO
+			if(cursor_on && cursor_addr == addr+x)
 				tile_data^=0xff;
 
-			if(attr & 0x80 && m_screen->frame_number() & 0x10) //TODO: check for blinking interval
+			 //TODO: check for blinking interval
+			if(attr & 0x80 && m_screen->frame_number() & 0x10)
 				tile_data=0;
 
 			for (int xi = 0; xi < 8; xi++)
 			{
 				int res_x = ((x * 8) + xi);
 				int res_y = y + yi;
+
+				// TODO: cpm22mf:flop2 display random character test will go out of bounds here
+				if(!m_screen->visible_area().contains(res_x, res_y))
+					continue;
 
 				uint8_t pen;
 				if(yi >= 16)
@@ -294,6 +300,7 @@ uint32_t qx10_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap,
 	m_bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_hgdc->screen_update(screen, m_bitmap, cliprect);
+	// cpm22mf:flop2 will test this under Zoom Test
 	const u32 pixel_size = 0x10000 / (m_zoom+1);
 	copyrozbitmap(
 		bitmap, cliprect, m_bitmap,
