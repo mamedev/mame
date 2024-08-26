@@ -51,6 +51,7 @@ Need Layout as and Add segment display as marywu.cpp
 
 #include "emu.h"
 
+
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"
@@ -59,6 +60,9 @@ Need Layout as and Add segment display as marywu.cpp
 #include "sound/okim6295.h"
 #include "speaker.h"
 
+#include "marywu.lh"
+
+
 namespace {
 
 class orientalpearl_state : public driver_device
@@ -66,60 +70,119 @@ class orientalpearl_state : public driver_device
 public:
 	orientalpearl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
+		, m_inputs(*this, { "KEYS1", "KEYS2", "DSW", "PUSHBUTTONS" })
 	{ }
 
 	void orientalpearl(machine_config &config);
-
-private:
-	void io_map(address_map &map);
-	void program_map(address_map &map);
-
 protected:
 	virtual void machine_start() override;
 
+private:
+	void display_7seg_data_w(uint8_t data);
+	void multiplex_7seg_w(uint8_t data);
+	void ay1_port_a_w(uint8_t data);
+	void ay1_port_b_w(uint8_t data);
+	uint8_t keyboard_r();
+	void io_map(address_map &map);
+	void program_map(address_map &map);
+
+	uint8_t m_selected_7seg_module = 0;
+
+	output_finder<32> m_digits;
+	output_finder<30> m_leds;
+	required_ioport_array<4> m_inputs;
 };
 
 static INPUT_PORTS_START( orientalpearl )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("KEYS1")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I)
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
-	PORT_START("DSW0")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW0:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW0:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW0:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW0:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW0:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW0:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW0:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW0:8")
+	PORT_START("KEYS2")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K)
 
 	PORT_START("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW:1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW:2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW:3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW:4")
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW:5")
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW:6")
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW:7")
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW:8")
+	
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW:1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW:2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW:3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW:4")
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW:5")
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW:6")
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW:7")
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW:8")
+	
+	PORT_START("PUSHBUTTONS")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) // K0
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) // K1
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) // K2
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) // K3
+	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+void orientalpearl_state::ay1_port_a_w(uint8_t data)
+{
+	for (uint8_t i = 0; i < 8; i++)
+		m_leds[i] = BIT(data, i);
+}
+
+void orientalpearl_state::ay1_port_b_w(uint8_t data)
+{
+	for (uint8_t i = 0; i < 8; i++)
+		m_leds[i + 8] = BIT(data, i);
+}
+
+void orientalpearl_state::multiplex_7seg_w(uint8_t data)
+{
+	m_selected_7seg_module = data;
+}
+
+
+uint8_t orientalpearl_state::keyboard_r()
+{
+	switch (m_selected_7seg_module & 0x07)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+		return m_inputs[m_selected_7seg_module & 0x07]->read();
+	default:
+		return 0x00;
+	}
+}
+
+void orientalpearl_state::display_7seg_data_w(uint8_t data)
+{
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // HEF4511BP (7 seg display driver)
+
+	m_digits[2 * m_selected_7seg_module + 0] = patterns[data & 0x0f];
+	m_digits[2 * m_selected_7seg_module + 1] = patterns[data >> 4];
+}
 
 void orientalpearl_state::program_map(address_map &map)
 {
@@ -128,33 +191,50 @@ void orientalpearl_state::program_map(address_map &map)
 
 void orientalpearl_state::io_map(address_map &map)
 {
-    map(0xfa00, 0xfa01).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
-    map(0xfb02, 0xfb03).w("psg", FUNC(ay8910_device::address_data_w));
-	
+
+    map(0xfa00, 0xfa01).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+    map(0xfb02, 0xfb03).w("ay1", FUNC(ay8910_device::address_data_w));
 }
 
 void orientalpearl_state::machine_start()
 {
+	m_digits.resolve();
+	m_leds.resolve();
 }
 
 void orientalpearl_state::orientalpearl(machine_config &config)
 {
+
 	/* basic machine hardware */
 	i8052_device &maincpu(I8052(config, "maincpu", XTAL(10'738'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &orientalpearl_state::program_map);
 	maincpu.set_addrmap(AS_IO, &orientalpearl_state::io_map);
-	
+
+	// NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	/* Keyboard & display interface */
-	I8279(config, "kdc", XTAL(10'738'000) / 6); 
-	
+	i8279_device &kbdc(I8279(config, "i8279", XTAL(10'738'635) / 6));
+	kbdc.out_sl_callback().set(FUNC(orientalpearl_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
+	kbdc.in_rl_callback().set(FUNC(orientalpearl_state::keyboard_r));          // keyboard Return Lines
+	kbdc.out_disp_callback().set(FUNC(orientalpearl_state::display_7seg_data_w));
+
+	/* Video */
+	config.set_default_layout(layout_marywu);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &psg(AY8910(config, "psg", XTAL(10'738'000) / 6));  // Divider not verified
-	psg.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
+	ay1.port_a_write_callback().set(FUNC(orientalpearl_state::ay1_port_a_w));
+	ay1.port_b_write_callback().set(FUNC(orientalpearl_state::ay1_port_b_w));
+	
 	ym2413_device &opll(YM2413(config, "opll", 3.579545_MHz_XTAL));
 	opll.add_route(ALL_OUTPUTS, "mono", 1.0);
-
+	
 	OKIM6295(config, "oki", XTAL(10'738'000) / 6, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // Clock frequency & pin 7 not verified
+
+	
 }
 
 ROM_START( east8 )
