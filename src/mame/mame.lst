@@ -42776,7 +42776,7 @@ nws1580                         // Sony NEWS NWS-1580
 @source:sony/news_r3k.cpp
 nws3260                         // Sony NEWS NWS-3260
 nws3410                         // Sony NEWS NWS-3410
-nws3710                         // Sony NEWS NWS-3710
+nws3720                         // Sony NEWS NWS-3720
 
 @source:sony/news_r4k.cpp
 nws5000x                        // Sony NEWS NWS-5000X

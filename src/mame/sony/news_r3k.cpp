@@ -2,12 +2,13 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
- * Sony NEWS R3000 systems.
+ * Sony NEWS R3000 single-processor systems.
  *
  * Sources:
  *   - https://github.com/robohack/ucb-csrg-bsd/blob/master/sys/news3400/
  *   - https://www.mmcc.it/resources/docs/NWS-3410_3460_ServiceManual_MMCC.PDF
  *   - https://www.mmcc.it/resources/docs/Sony_NEWS_NWS-3260_ROM_Monitor_User_Guide_r2.pdf
+ *   - http://bitsavers.org/pdf/sony/news/Sony_NEWS_Technical_Manual_3ed_199103.pdf
  *
  * TODO:
  *   - lcd controller
@@ -187,7 +188,7 @@ public:
 	}
 
 	void nws3410(machine_config &config);
-	void nws3710(machine_config &config);
+	void nws3720(machine_config &config);
 
 protected:
 	void nws3410_map(address_map &map);
@@ -253,6 +254,11 @@ void nws3260_state::nws3260_map(address_map &map)
 void nws3410_state::nws3410_map(address_map &map)
 {
 	cpu_map(map);
+
+	// LCD framebuffer memory regions - without bus errors, the framebuffer probe logic in NEWS-OS will think there is an LCD attached
+	// While this doesn't break anything, it does cause the device to be exposed when it isn't present.
+	map(0x10000000, 0x1021ffff).r(FUNC(nws3410_state::bus_error));
+	map(0x1ff50000, 0x1ff6001b).r(FUNC(nws3410_state::bus_error));
 }
 
 void news_r3k_base_state::cpu_map(address_map &map)
@@ -271,7 +277,7 @@ void news_r3k_base_state::cpu_map(address_map &map)
 	// 1fcc0000 // cstrobe?
 	// 1fcc0002 // sccstatus0?
 	map(0x1fcc0003, 0x1fcc0003).rw(FUNC(news_r3k_base_state::debug_r), FUNC(news_r3k_base_state::debug_w));
-	// 1fcc0007 // sccvect?
+	map(0x1fcc0007, 0x1fcc0007).lr8([this](){ return m_scc->m1_r(); }, "sccvect_r");
 
 	map(0x1fd00000, 0x1fd00007).m(m_hid, FUNC(news_hid_hle_device::map));
 	map(0x1fd40000, 0x1fd40003).noprw(); // FIXME: ignore buzzer for now
@@ -586,17 +592,16 @@ void nws3410_state::nws3410(machine_config &config)
 	m_serial[0]->set_default_option("terminal"); // No framebuffer emulation yet
 }
 
-void nws3410_state::nws3710(machine_config &config)
+void nws3410_state::nws3720(machine_config &config)
 {
-	// TODO: scrub these for 3710
 	R3000A(config, m_cpu, 20_MHz_XTAL, 65536, 65536);
 	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
 	m_cpu->set_addrmap(AS_PROGRAM, &nws3410_state::nws3410_map);
 
-	// 8MB expandable to 32MB (unknown increments)
+	// 16MB expandable to 128MB (unknown increments)
 	RAM(config, m_ram);
-	m_ram->set_default_size("8M");
-	m_ram->set_extra_options("32MB");
+	m_ram->set_default_size("16M");
+	m_ram->set_extra_options("128MB");
 	common(config);
 
 	m_serial[0]->set_default_option("terminal"); // No framebuffer emulation yet
@@ -637,13 +642,13 @@ ROM_START(nws3410)
 	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(661e2516) SHA1(f0dca34174747321dad6f48c466e1c549b797d2e) BAD_DUMP)
 ROM_END
 
-ROM_START(nws3710)
+ROM_START(nws3720)
 	ROM_REGION32_BE(0x20000, "eprom", 0)
-	ROM_SYSTEM_BIOS(0, "nws3710", "TODO") // TODO: double check version
-	ROMX_LOAD("sony_nws-3710.bin", 0x00000, 0x10000, CRC(542e21b8) SHA1(631dca1f3446761973073f5c32c1a0aeba538c2c), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(0, "nws3720", "SONY NET WORK STATION R3000 Monitor Release 2.0A")
+	ROMX_LOAD("sony_nws-3720.bin", 0x00000, 0x20000, CRC(61222991) SHA1(076fab0ad0682cd7dacc7094e42efe8558cbaaa1), ROM_BIOS(0))
 
-	ROM_REGION32_BE(0x100, "idrom", 0) // TODO: this is using the 3410 IDROM
-	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(661e2516) SHA1(f0dca34174747321dad6f48c466e1c549b797d2e) BAD_DUMP)
+	ROM_REGION32_BE(0x100, "idrom", 0)
+	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(6ec5860e) SHA1(612d2c2f149b34551b5fd9392dd6f9b1612417b5) BAD_DUMP)
 ROM_END
 
 } // anonymous namespace
@@ -652,4 +657,4 @@ ROM_END
 /*   YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT         COMPANY  FULLNAME    FLAGS */
 COMP(1991, nws3260, 0,       0,      nws3260, nws3260, nws3260_state, init_common, "Sony",  "NWS-3260", MACHINE_NO_SOUND)
 COMP(1991, nws3410, 0,       0,      nws3410, nws3410, nws3410_state, init_common, "Sony",  "NWS-3410", MACHINE_NO_SOUND)
-COMP(199?, nws3710, nws3410, 0,      nws3710, nws3410, nws3410_state, init_common, "Sony",  "NWS-3710", MACHINE_NO_SOUND)
+COMP(1991, nws3720, nws3410, 0,      nws3720, nws3410, nws3410_state, init_common, "Sony",  "NWS-3720", MACHINE_NO_SOUND)
