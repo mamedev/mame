@@ -24,7 +24,6 @@
 #define LOG_COMMAND  (1U << 5)
 
 //#define VERBOSE (LOG_GENERAL|LOG_REGW|LOG_REGR|LOG_STATE|LOG_DMA|LOG_COMMAND)
-#define VERBOSE -1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NCR5385, ncr5385_device, "ncr5385", "NCR 5385 SCSI Protocol Controller")
@@ -724,37 +723,15 @@ int ncr5385_device::state_step()
 			{
 				LOGMASKED(LOG_STATE, "xfi_out: %s pc(%s)\n", remaining() ? "phase change" : "transfer complete", machine().describe_context());
 
-#if 0
 				m_int_status |= INT_BUS_SERVICE;
 				m_state = IDLE;
 
 				update_int();
-#else
-				m_state = 667;
-				delay = 5'000;		// AB 5ms delay works, 2ms fails
-#endif
-
 			}
 		}
 		else
 			delay = -1;
 		break;
-
-
-
-
-	// delay
-	case 667:
-				LOGMASKED(LOG_STATE, "xfi_out: 667\n");
-				m_int_status |= INT_BUS_SERVICE;
-				m_state = IDLE;
-
-				update_int();
-		break;
-		
-
-
-
 
 	case XFI_OUT_DRQ:
 		m_state = XFI_OUT_ACK;
@@ -789,28 +766,11 @@ int ncr5385_device::state_step()
 			else
 				m_sbx = false;
 
-#if 1
+			delay = 3'500;		// >=3.5ms delay works, < 3.5ms fails
+			
 			// clear data and ACK
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
-#else
-			// clear ACK except after last byte of message output phase
-			if (!remaining() && (ctrl & S_PHASE_MASK) == S_PHASE_MSG_OUT)
-			{
-			
-				LOGMASKED(LOG_STATE, "xfi_out: INT_FUNC_COMPLETE\n" );
-			
-				m_int_status |= INT_FUNC_COMPLETE;
-				m_state = IDLE;
-
-				update_int();
-			}
-			else
-			{
-				scsi_bus->data_w(scsi_refid, 0);
-				scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
-			}
-#endif
 
 		}
 		else
