@@ -28,6 +28,20 @@ Big bonus for scoring on all letters of "ORIENTAL PEARL".
 
 Electronic ball-checking device ensures where ball lands.
 
+Buttons
+K1
+K2
+K3
+K4
+
+ic
+u1 kc8279
+u17 and u21 nec d8255ac-2
+u32 hm6264
+??  winbond w27c020 adpcm rom.
+u33 winbond w27c512 boot rom.
+u39 at89s51 second mcu for protection.
+
 // TODO:
 Need hardware info.
 Hook up nvram inputs opll and adpcm.
