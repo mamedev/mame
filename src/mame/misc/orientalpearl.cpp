@@ -35,7 +35,7 @@ K3
 K4
 
 56 leds
- 5 2x 7 segment display
+ 5 2x 7 segment display, 4x 7 segment big display bonus.
 
 ic
 u1 kc8279
