@@ -181,7 +181,7 @@ uint8_t orientalpearl_state::keyboard_r()
 
 void orientalpearl_state::display_7seg_data_w(uint8_t data)
 {
-	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // HEF4511BP (7 seg display driver)
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // (7 seg display driver) Might be not correct
 
 	m_digits[2 * m_selected_7seg_module + 0] = patterns[data & 0x0f];
 	m_digits[2 * m_selected_7seg_module + 1] = patterns[data >> 4];
