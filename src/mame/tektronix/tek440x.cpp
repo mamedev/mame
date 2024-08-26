@@ -524,12 +524,16 @@ void tek440x_state::videoaddr_w(offs_t offset, u16 data)
 u8 tek440x_state::videocntl_r()
 {
 	int ans = m_videocntl;
-	
+
+	// page 2.1-92
 	if (m_screen->vblank())
-		ans |= 0x10;					// pretty sure this is VBL indicator; selftest looks for turning on and off within 2^15 cycles
+		ans |= 0x20;
 	else
-		ans |= 0x40 + 0x20;		// no idea what these are; selftest looks for turning on and off within 0x200000 cycles
-	
+		ans |= 0x10;
+
+	if (m_screen->hblank())
+		ans |= 0x40;
+		
 	return ans;
 }
 
