@@ -90,7 +90,7 @@ private:
 
 	uint8_t m_selected_7seg_module = 0;
 
-	output_finder<32> m_digits;
+	output_finder<14> m_digits;
 	output_finder<30> m_leds;
 	required_ioport_array<4> m_inputs;
 };
