@@ -530,6 +530,8 @@ void vs_base_state::machine_start()
 
 void vs_uni_state::machine_start()
 {
+	vs_base_state::machine_start();
+
 	// establish chr banks
 	// DRIVER_INIT is called first - means we can handle this different for VRAM games!
 	if (m_gfx1_rom != nullptr)
@@ -559,6 +561,8 @@ void vs_uni_state::machine_start()
 
 void vs_dual_state::machine_start()
 {
+	vs_base_state::machine_start();
+
 	for (int i = 0; i < 2; i++)
 	{
 		const char *region = i ? "gfx2" : "gfx1";
@@ -571,6 +575,8 @@ void vs_dual_state::machine_start()
 
 void vs_smbbl_state::machine_start()
 {
+	vs_base_state::machine_start();
+
 	m_ppu1->set_scanline_callback(*this, FUNC(vs_smbbl_state::smbbl_scanline_cb));
 
 	u8 *base = m_gfx1_rom->base();
