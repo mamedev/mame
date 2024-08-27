@@ -15,11 +15,11 @@ Note: this module only works in trackball mode and not in joystick emulation mod
     CONSTANTS
 ***************************************************************************/
 
-#define TRAKBALL_BUTTON_TAG   "trackball_buttons"
-#define TRAKBALL_XAXIS_TAG    "trackball_x"
-#define TRAKBALL_YAXIS_TAG    "trackball_y"
+#define TRAKBALL_BUTTON_TAG	"trackball_buttons"
+#define TRAKBALL_XAXIS_TAG	"trackball_x"
+#define TRAKBALL_YAXIS_TAG	"trackball_y"
 
-#define TRAKBALL_POS_UNINIT   0xffffffff /* default out-of-range position */
+#define TRAKBALL_POS_UNINIT	0xffffffff /* default out-of-range position */
 
 //**************************************************************************
 //  DEVICE TYPE DEFINITION
@@ -73,17 +73,26 @@ ioport_constructor atari_trakball_device::device_input_ports() const
 }
 
 //-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void atari_trakball_device::device_start()
+{
+}
+
+
+//-------------------------------------------------
 //  vcs_joy_r - read digital inputs
 //-------------------------------------------------
 
 u8 atari_trakball_device::vcs_joy_r()
 {
 	int diff_pos[2] = {0, 0};
-        int cur_pos[2] = {0, 0};
+	int cur_pos[2] = {0, 0};
 	u8 vcs_joy_return = 0;
 
-        for (int axis = 0; axis < 2; axis++) {
-	        cur_pos[axis] = m_trakballxy[axis]->read();
+	for (int axis = 0; axis < 2; axis++) {
+		cur_pos[axis] = m_trakballxy[axis]->read();
 		if (m_last_pos[axis] == TRAKBALL_POS_UNINIT) {
 			if (!machine().side_effects_disabled()) {
 				m_last_pos[axis] = cur_pos[axis];
@@ -98,11 +107,7 @@ u8 atari_trakball_device::vcs_joy_r()
 		}
 		if (!machine().side_effects_disabled()) {
 			m_last_pos[axis] = cur_pos[axis];
-		}
-		if (diff_pos[axis]) {
-			if (!machine().side_effects_disabled()) {
-				m_last_pos_sent[axis] = !m_last_pos_sent[axis];
-			}
+			if (diff_pos[axis]) m_last_pos_sent[axis] = !m_last_pos_sent[axis];
 		}
 	}
 
