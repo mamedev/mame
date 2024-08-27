@@ -40,10 +40,10 @@ protected:
 private:
 	uint8_t m_port_b_data;
 
-	uint8_t port_a_r();
-	uint8_t port_b_r();
-	uint8_t port_c_r();
-	void port_b_w(uint8_t data);
+//	uint8_t port_a_r();
+//	uint8_t port_b_r();
+//	uint8_t port_c_r();
+//	void port_b_w(uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
@@ -129,19 +129,21 @@ void champ2_state::champ2(machine_config &config)
 ROM_START( champ2 )
 	ROM_REGION( 0x2000, "bios", 0 )
 	// borrowed from pc/genpc.cpp
-	ROM_LOAD("pcxt.rom",       0x0000, 0x02000, BAD_DUMP CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f) )
+	ROM_LOAD( "pcxt.rom",       0x0000, 0x02000, BAD_DUMP CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f) )
 
 	ROM_REGION( 0x100000, "game_prg", 0 )
 	ROM_LOAD( "champ2.u2", 0x00000, 0x80000, CRC(058bd1a4) SHA1(e4c0db329cda0cdcab7c7b4d130f1c38fa32385f) )
 	ROM_LOAD( "champ2.u3", 0x80000, 0x80000, CRC(3bb1951f) SHA1(8057327285f57787cc7da678427767ee7f979a64) )
 
 	ROM_REGION( 0x1caf, "pal", 0 )
-	ROM_LOAD("champ2.u7",  0x00000, 0x1caf, BAD_DUMP CRC(bd70e89b) SHA1(3567d22057e366a439ffce2dd35180f5df80d47c) )
+	ROM_LOAD( "champ2.u7",  0x00000, 0x1caf, BAD_DUMP CRC(bd70e89b) SHA1(3567d22057e366a439ffce2dd35180f5df80d47c) )
 ROM_END
 
 
 } // anonymous namespace
 
 
-GAME( 1993, champ2,  0, champ2,  champ2, champ2_state, empty_init, ROT0,  "U.S. Games", "Countertop Champ II (ver 2.11)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// Title assumed by "Champ II" ROM labels
+GAME( 1994, champ2,  0, champ2,  champ2, champ2_state, empty_init, ROT0,  "U.S. Games", "Countertop Champion 2 (ver 2.11)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+//GAME( 1993, champ2,  0, champ2,  champ2, champ2_state, empty_init, ROT0,  "U.S. Games", "Countertop Champion", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
