@@ -1,0 +1,195 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="pencursor">
+		<image state="1">
+			<data><![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1" height="1" viewBox="0 0 1 1">
+					<g fill="none" stroke="#6666ff" stroke-width="0.06" stroke-opacity="1">
+						<circle cx="0.5" cy="0.5" r="0.1" />
+						<circle cx="0.5" cy="0.5" r="0.47" />
+						<line x1="0.03" y1="0.5" x2="0.4" y2="0.5" />
+						<line x1="0.6" y1="0.5" x2="0.97" y2="0.5" />
+						<line x1="0.5" y1="0.03" x2="0.5" y2="0.4" />
+						<line x1="0.5" y1="0.6" x2="0.5" y2="0.97" />
+					</g>
+				</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<element name="panel">
+		<rect>
+			<color red="0.3" green="0.3" blue="0.3" />
+			<bounds x="0" y="0" width="10" height="1.5" />
+		</rect>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Launcher">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="0.5" yc="0.75" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="1.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Address">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="1.5" yc="0.60" width="0.9" height="0.3" />
+		</text>
+		<text string="Book">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="1.5" yc="0.90" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="2.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Date">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="2.5" yc="0.60" width="0.9" height="0.3" />
+		</text>
+		<text string="Book">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="2.5" yc="0.90" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="3.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Note">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="3.5" yc="0.60" width="0.9" height="0.3" />
+		</text>
+		<text string="Book">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="3.5" yc="0.90" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="4.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Pocket">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="4.5" yc="0.60" width="0.9" height="0.3" />
+		</text>
+		<text string="Quicken">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="4.5" yc="0.90" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="5.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="World">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="5.5" yc="0.60" width="0.9" height="0.3" />
+		</text>
+		<text string="Clock">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="5.5" yc="0.90" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="6.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Calculator">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="6.5" yc="0.75" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="7.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Menu">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="7.5" yc="0.75" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="8.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Keyboard">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="8.5" yc="0.75" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="9.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Help">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="9.5" yc="0.75" width="0.9" height="0.3" />
+		</text>
+	</element>
+
+	<view name="Default View">
+		<screen index="0">
+			<bounds x="0" y="0" width="256" height="320" />
+		</screen>
+
+		<element id="panel" ref="panel">
+			<bounds x="0" y="320" width="256" height="38" />
+		</element>
+
+		<element id="cursor" ref="pencursor">
+			<!-- will be positioned by script -->
+			<bounds x="0" y="320" width="20" height="20" />
+			<color alpha="0.7" />
+		</element>
+	</view>
+
+	<script>
+	<![CDATA[
+		file:set_resolve_tags_callback(
+				function ()
+					local view = file.views['Default View']
+					local cursor = view.items['cursor']
+
+					local penx = file.device:ioport('PEN_X')
+					local peny = file.device:ioport('PEN_Y')
+
+					-- recompute target pen cursor size and area when necessary
+					local curxoffs, curyoffs, curxscale, curyscale, curwidth, curheight
+					view:set_recomputed_callback(
+							function ()
+								local bounds = view.items['panel'].bounds
+
+								curwidth = bounds.height * 2 / 3
+								curheight = curwidth
+								curxoffs = bounds.x0 - (curwidth * 0.5)
+								curyoffs = bounds.y0 - (curheight * 0.5)
+								curxscale = bounds.width / penx:field(0x3ff).maxvalue
+								curyscale = bounds.height / (peny:field(0x3ff).maxvalue - 320)
+							end)
+
+					-- animate the position of the pen cursor
+					cursor:set_element_state_callback(
+							function ()
+								if peny:read() >= 320 then return 1 end
+								return 0
+							end)
+					cursor:set_bounds_callback(
+							function ()
+								local x = curxoffs + (penx:read() * curxscale)
+								local y = curyoffs + ((peny:read() - 320) * curyscale)
+								return emu.render_bounds(x, y, x + curwidth, y + curheight)
+							end)
+				end)
+	]]>
+	</script>
+</mamelayout>
