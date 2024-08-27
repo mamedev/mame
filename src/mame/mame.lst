@@ -35943,6 +35943,9 @@ europc                          // 1988 Schneider Euro PC (CGA or Hercules)
 europc2                         // 1989 Schneider Euro PC II
 euroxt                          // Schneider Euro XT
 
+@source:pc/filetto.cpp
+filetto                         // (c) 1990 Novamatic
+
 @source:pc/fruitpc.cpp
 fruitpc                         // ???
 
@@ -36093,10 +36096,6 @@ so30h                           // SOYO 30H motherboard (486)
 so4saw2                         // SOYO SY-4SAW2 motherboard (486)
 zito4dps                        // ZIDA Tomato board 4DPS (486)
 
-@source:pc/pcxt.cpp
-filetto                         // (c) 1990 Novamatic
-tetriskr                        // (c) 1988? bootleg
-
 @source:pc/poisk1.cpp
 poisk1                          //
 
@@ -36139,6 +36138,9 @@ t1000tx                         // 1987 Tandy 1000 TX
 
 @source:pc/teradrive.cpp
 teradrive
+
+@source:pc/tetriskr.cpp
+tetriskr                        // (c) 1988? bootleg
 
 @source:pc/tosh1000.cpp
 tosh1000
