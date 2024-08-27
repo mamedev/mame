@@ -89,12 +89,13 @@ class filetto_state : public driver_device
 {
 public:
 	filetto_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_mb(*this, "mb"),
-		m_bank(*this, "bank"),
-		m_cvsd(*this, "voice"),
-		m_samples(*this, "samples"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_mb(*this, "mb")
+		, m_bank(*this, "bank")
+		, m_cvsd(*this, "voice")
+		, m_samples(*this, "samples")
+	{ }
 
 	void filetto(machine_config &config);
 
@@ -267,7 +268,7 @@ void filetto_state::fdc_dor_w(uint8_t data)
 // TODO: move to a real um5100 device
 void filetto_state::voice_start_w(uint8_t data)
 {
-    // TODO: accurate pitch frequency
+	// TODO: accurate pitch frequency
 	m_sample->adjust(attotime::zero, 0, attotime::from_hz(44150));
 	m_bit = 7;
 	m_vaddr = ((m_voice & 0xf / 5) | (BIT(m_voice, 4) << 2)) * 0x8000;
@@ -411,7 +412,7 @@ ROM_START( filetto )
 	ROM_LOAD( "m2.u3", 0x20000, 0x10000, CRC(abc64869) SHA1(564fc9d90d241a7b7776160b3fd036fb08037355) )
 	ROM_LOAD( "m3.u4", 0x30000, 0x10000, CRC(0c1e8a67) SHA1(f1b9280c65fcfcb5ec481cae48eb6f52d6cdbc9d) )
 
-	ROM_REGION( 0x40000, "samples", 0 ) // UM5100 sample roms?
+	ROM_REGION( 0x40000, "samples", 0 ) // UM5100 sample roms
 	ROM_LOAD("v1.u15",  0x00000, 0x20000, CRC(613ddd07) SHA1(ebda3d559315879819cb7034b5696f8e7861fe42) )
 	ROM_LOAD("v2.u14",  0x20000, 0x20000, CRC(427e012e) SHA1(50514a6307e63078fe7444a96e39d834684db7df) )
 ROM_END

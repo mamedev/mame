@@ -130,7 +130,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_mb(*this, "mb")
-    { }
+	{ }
 
 	void tetriskr(machine_config &config);
 
@@ -156,7 +156,7 @@ private:
 
 uint8_t tetriskr_state::port_a_r()
 {
-    //harmless keyboard error occurs without this
+	//harmless keyboard error occurs without this
 	return 0xaa;
 }
 
