@@ -9,6 +9,55 @@ license:CC0-1.0
 
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
 
+	<!-- e-kara cartridge pins
+	
+	1  GND
+	2  N/C
+	3  jumper to 22
+	4  VCC
+	5  A15
+	6  A14
+	7  A13
+	8  A12
+	9  A11
+	10 A10
+	11 A9
+	12 A8
+	13 A7
+	14 A6
+	15 A5
+	16 A4
+	17 A3
+	18 A2
+	19 A1
+	20 A0
+	21 VCC
+	22 jumper to 3
+	23 /CE
+	24 D7
+	25 D6
+	26 D5
+	27 D4
+	28 D3
+	29 D2
+	30 D1
+	31 D0
+	32 GND
+	33 WE =>SET TO VCC on USER-CARTRIDE!
+	34 /OE
+	35 VCC
+	36 N/C (A23?)
+	37 N/C (A22?)
+	38 N/C (A21?)
+	39 N/C (A20?)
+	40 A19 (N/C on starter cart)
+	41 A18
+	42 A17
+	43 A16
+	44 GND
+	
+	-->
+
 	<!--
 
 	Japanese e-kara carts appear to have a number of different genres split across various
