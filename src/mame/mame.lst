@@ -35676,7 +35676,7 @@ pcd3nsl                         // Siemens-Nixdorf PCD-3Nsl
 pcd3nsx                         // Siemens-Nixdorf PCD-3Nsx
 php3239                         // Philips P3239
 ppm3333p                        // DTK Computer PPM-3333P
-pt319a                          // Pint PT-319A motherboard (386sx)
+pt319a                          // Pine PT-319A motherboard (386sx)
 scamp386sx                      // motherboards using the SCAMPSX chipset (386sx)
 scsxaio                         // Peacock 386sx Ver. 2.0 motherboard SCsxAIO (386sx)
 sh386sx20                       // Shuttle 386SX REV 2.0A motherboard (386sx)
@@ -35916,6 +35916,9 @@ calchase                        // (c) 1999 The Game Room
 eggsplc                         // (c) 2002 The Game Room
 hostinv                         // (c) 1998 The Game Room
 
+@source:pc/champ2.cpp
+champ2                          // (c) 1993 US Games
+
 @source:pc/compc.cpp
 compc10                         // 1984 Commodore PC-10, PC-20 and PC-30
 pc10iii                         // 1987 Commodore PC-10 III
@@ -35942,6 +35945,9 @@ ec1845                          //
 europc                          // 1988 Schneider Euro PC (CGA or Hercules)
 europc2                         // 1989 Schneider Euro PC II
 euroxt                          // Schneider Euro XT
+
+@source:pc/filetto.cpp
+filetto                         // (c) 1990 Novamatic
 
 @source:pc/fruitpc.cpp
 fruitpc                         // ???
@@ -36093,10 +36099,6 @@ so30h                           // SOYO 30H motherboard (486)
 so4saw2                         // SOYO SY-4SAW2 motherboard (486)
 zito4dps                        // ZIDA Tomato board 4DPS (486)
 
-@source:pc/pcxt.cpp
-filetto                         // (c) 1990 Novamatic
-tetriskr                        // (c) 1988? bootleg
-
 @source:pc/poisk1.cpp
 poisk1                          //
 
@@ -36139,6 +36141,9 @@ t1000tx                         // 1987 Tandy 1000 TX
 
 @source:pc/teradrive.cpp
 teradrive
+
+@source:pc/tetriskr.cpp
+tetriskr                        // (c) 1988? bootleg
 
 @source:pc/tosh1000.cpp
 tosh1000
