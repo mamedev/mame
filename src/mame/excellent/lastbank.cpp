@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// copyright-holders: Angelo Salese
+
 /***************************************************************************
 
     Last Bank (c) 1994 Excellent System
@@ -15,24 +16,28 @@
     * Miracle Seven - Heaven's Gate Turbo
     * Ukiyo Box
 
+
+    TODO:
+    fever13: inputs / dips once the GFX ROM is dumped. Dips are helpfully
+             shown at startup
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "sound/es8712.h"
-#include "sound/okim6295.h"
-#include "sound/ymopn.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/tc009xlvc.h"
 #include "machine/timer.h"
+#include "sound/es8712.h"
+#include "sound/okim6295.h"
+#include "sound/ymopn.h"
+
 #include "screen.h"
 #include "speaker.h"
 
 
 namespace {
-
-#define MASTER_CLOCK XTAL(14'318'181)
 
 class lastbank_state : public driver_device
 {
@@ -45,6 +50,7 @@ public:
 	{ }
 
 	void lastbank(machine_config &config);
+	void fever13(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r);
 
@@ -56,10 +62,10 @@ private:
 	required_device<okim6295_device> m_oki;
 	required_device<es8712_device> m_essnd;
 
-	void screen_vblank(int state);
-
 	uint8_t m_mux_data = 0;
 	uint8_t m_sound_flags = 0;
+
+	void screen_vblank(int state);
 
 	void output_w(offs_t offset, uint8_t data);
 
@@ -69,8 +75,9 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline);
 	void lastbank_audio_io(address_map &map);
-	void lastbank_audio_map(address_map &map);
-	void lastbank_map(address_map &map);
+	void fever13_audio_io(address_map &map);
+	void audio_program_map(address_map &map);
+	void main_program_map(address_map &map);
 	void tc0091lvc_map(address_map &map);
 };
 
@@ -156,7 +163,7 @@ void lastbank_state::tc0091lvc_map(address_map &map)
 	map(0xff08, 0xff08).rw(m_maincpu, FUNC(tc0091lvc_device::rom_bank_r), FUNC(tc0091lvc_device::rom_bank_w));
 }
 
-void lastbank_state::lastbank_map(address_map &map)
+void lastbank_state::main_program_map(address_map &map)
 {
 	tc0091lvc_map(map);
 	map(0xa000, 0xa00d).noprw(); // MSM62X42B or equivalent probably read from here
@@ -175,7 +182,7 @@ void lastbank_state::lastbank_map(address_map &map)
 	map(0xa81f, 0xa81f).portr("DSW3");
 }
 
-void lastbank_state::lastbank_audio_map(address_map &map)
+void lastbank_state::audio_program_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram();
@@ -187,9 +194,16 @@ void lastbank_state::lastbank_audio_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x06).rw(m_essnd, FUNC(es8712_device::read), FUNC(es8712_device::write));
 	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x80, 0x80).w(FUNC(lastbank_state::sound_flags_w));
-	map(0x80, 0x80).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0x80, 0x80).r("soundlatch1", FUNC(generic_latch_8_device::read)).w(FUNC(lastbank_state::sound_flags_w));
 	map(0xc0, 0xc0).r("soundlatch2", FUNC(generic_latch_8_device::read));
+}
+
+void lastbank_state::fever13_audio_io(address_map &map)
+{
+	lastbank_audio_io(map);
+
+	map(0x80, 0x80).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0xc0, 0xc0).r("soundlatch1", FUNC(generic_latch_8_device::read)).w(FUNC(lastbank_state::sound_flags_w));
 }
 
 static INPUT_PORTS_START( lastbank )
@@ -391,23 +405,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::irq_scanline)
 
 void lastbank_state::lastbank(machine_config &config)
 {
-	/* basic machine hardware */
-	TC0091LVC(config, m_maincpu, MASTER_CLOCK/4); //!!! TC0091LVC !!!
-	m_maincpu->set_addrmap(AS_PROGRAM, &lastbank_state::lastbank_map);
+	// basic machine hardware
+	TC0091LVC(config, m_maincpu, XTAL(14'318'181) / 4); //!!! TC0091LVC !!!
+	m_maincpu->set_addrmap(AS_PROGRAM, &lastbank_state::main_program_map);
 	m_maincpu->set_tilemap_xoffs(0,192); // TODO: correct?
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(lastbank_state::irq_scanline), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", MASTER_CLOCK/4));
-	audiocpu.set_addrmap(AS_PROGRAM, &lastbank_state::lastbank_audio_map);
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181) / 4));
+	audiocpu.set_addrmap(AS_PROGRAM, &lastbank_state::audio_program_map);
 	audiocpu.set_addrmap(AS_IO, &lastbank_state::lastbank_audio_io);
 	// yes, we have no interrupts
 
 	config.set_perfect_quantum(m_maincpu);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -417,19 +431,19 @@ void lastbank_state::lastbank(machine_config &config)
 	screen.screen_vblank().set(FUNC(lastbank_state::screen_vblank));
 	screen.set_palette("maincpu:palette");
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch1");
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.75);
+	OKIM6295(config, m_oki, 1'000'000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	ES8712(config, m_essnd, 0);
 	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
 	m_essnd->set_msm_tag("msm");
 
-	msm6585_device &msm(MSM6585(config, "msm", 640_kHz_XTAL)); /* Not verified, It's actually MSM6585? */
+	msm6585_device &msm(MSM6585(config, "msm", 640_kHz_XTAL));
 	msm.vck_legacy_callback().set("essnd", FUNC(es8712_device::msm_int));
 	msm.set_prescaler_selector(msm6585_device::S40); /* Not verified */
 	msm.add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -437,6 +451,13 @@ void lastbank_state::lastbank(machine_config &config)
 	// A RTC-62421 is present on the Last Bank PCB. However, the code
 	// that tries to read from it is broken and nonfunctional. The RTC
 	// is also absent from some other games on the same hardware.
+}
+
+void lastbank_state::fever13(machine_config &config)
+{
+	lastbank(config);
+
+	subdevice<z80_device>("audiocpu")->set_addrmap(AS_IO, &lastbank_state::fever13_audio_io);
 }
 
 /***************************************************************************
@@ -459,11 +480,29 @@ ROM_START( lastbank )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "6.u55", 0x00000, 0x40000, CRC(9e78e234) SHA1(031f93e4bc338d0257fa673da7ce656bb1cda5fb) )
 
-	ROM_REGION( 0x80000, "essnd", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "essnd", 0 ) // Samples
 	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
+ROM_END
+
+ROM_START( fever13 ) // ES-9410 PCB (TC0090LVC marked ES9402LA, Z80, ES8712,14'318'181 MHz XTAL, OKI M6295 with 1000J resonator, MSM6585 with 640J resonator)
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "9.u9", 0x00000, 0x40000, CRC(a17a6a9c) SHA1(b2bff250d1ea879bcdd9bea92537975a168babc8) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "4.u48", 0x00000, 0x10000, CRC(33cba6b2) SHA1(cf7d1c7c6215b2f83c9266f92f46d3cfc0242afc) )
+
+	ROM_REGION( 0x120000, "maincpu:gfx", 0 )
+	ROM_LOAD( "u11",   0x000000, 0x100000, BAD_DUMP CRC(2588d82d) SHA1(426f6821862d54123e53410e2776586ddf6b21e7) ) // not dumped yet, using lastbank's for now
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "es-9410.u55", 0x00000, 0x40000, CRC(09b5e4d6) SHA1(cf0235e9cf0577bf932beda7e4fb1b84410a3e0c) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "essnd", 0 ) // Samples
+	ROM_LOAD( "2.u60", 0x00000, 0x80000, CRC(4e0da568) SHA1(6cd4d3facf8f05747d6cff03617bdfc91b5e9d67) )
 ROM_END
 
 } // Anonymous namespace
 
 
 GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fever13,  0, fever13,  lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Fever 13 (v1.3)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing GFX dump
