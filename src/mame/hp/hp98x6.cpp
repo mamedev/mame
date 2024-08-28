@@ -185,7 +185,7 @@ void hp98x6_base_state::machine_start()
 
 	space->install_ram(0x1000000 - m_ram->size(), 0xffffff, m_ram->pointer());
 
-	for (auto& finder : m_rom_drawers) {
+	for (auto &finder : m_rom_drawers) {
 		finder->install_handlers(space);
 	}
 }
@@ -241,7 +241,7 @@ void hp98x6_base_state::hp98x6_base(machine_config &config, unsigned dot_clock, 
 	IEEE488_SLOT(config, "ieee_rem", 0, remote488_devices, nullptr);
 
 	// Optional ROM slots
-	for (auto& finder : m_rom_drawers) {
+	for (auto &finder : m_rom_drawers) {
 		HP98X6_OPTROM(config, finder);
 	}
 
@@ -2069,8 +2069,8 @@ ROM_END
 
 } // anonymous namespace
 
-//   YEAR  NAME     PARENT  COMPAT  MACHINE INPUT   CLASS        INIT        COMPANY            FULLNAME    FLAGS
-COMP(1982, hp9816a, 0,      0,      hp9816, hp9816, hp9816_state,empty_init, "Hewlett-Packard", "HP 9816A", 0)
-COMP(1981, hp9826a, 0,      0,      hp9826, hp9826_36,hp9826_state,empty_init,"Hewlett-Packard","HP 9826A", 0)
-COMP(1981, hp9836a, 0,      0,      hp9836, hp9836, hp9836_state,empty_init, "Hewlett-Packard", "HP 9836A", 0)
-COMP(1983, hp9836c, 0,      0,      hp9836c,hp9836, hp9836c_state,empty_init,"Hewlett-Packard", "HP 9836C", 0)
+//   YEAR  NAME     PARENT  COMPAT  MACHINE INPUT     CLASS        INIT        COMPANY            FULLNAME    FLAGS
+COMP(1982, hp9816a, 0,      0,      hp9816, hp9816,   hp9816_state,empty_init, "Hewlett-Packard", "HP 9816A", 0)
+COMP(1981, hp9826a, 0,      0,      hp9826, hp9826_36,hp9826_state,empty_init, "Hewlett-Packard", "HP 9826A", 0)
+COMP(1981, hp9836a, 0,      0,      hp9836, hp9836,   hp9836_state,empty_init, "Hewlett-Packard", "HP 9836A", 0)
+COMP(1983, hp9836c, 0,      0,      hp9836c,hp9836,   hp9836c_state,empty_init,"Hewlett-Packard", "HP 9836C", 0)

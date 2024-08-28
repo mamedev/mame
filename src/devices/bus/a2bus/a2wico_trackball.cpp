@@ -137,7 +137,7 @@ void a2bus_wicotrackball_device::device_reset()
 uint8_t a2bus_wicotrackball_device::read_position(int axis)
 {
 	int const speed_scale = 1 << (m_speed[0] + m_speed[1] * 2);
-        int const cur_pos = m_wicotrackballxy[axis]->read();
+	int const cur_pos = m_wicotrackballxy[axis]->read();
 
 	uint8_t result = 0;
 	if (m_last_pos[axis] != WICOTRACKBALL_POS_UNINIT) {
@@ -195,7 +195,7 @@ uint8_t a2bus_wicotrackball_device::read_c0nx(uint8_t offset)
 		case 0x6: /* read buttons */
 			data = m_buttons = m_wicotrackballb->read();
 			break;
-        }
+	}
 	return data;
 }
 
@@ -232,7 +232,7 @@ void a2bus_wicotrackball_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 0x7: /* set Speed 3/4 Soft Switch to Speed 4 */
 			m_speed[1] = true;
 			break;
-        }
+	}
 }
 
 } // anonymous namespace
