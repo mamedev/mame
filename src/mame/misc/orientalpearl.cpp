@@ -1,7 +1,35 @@
 // license:GPL-2.0+
 // copyright-holders:flama12333
+
 /*************************************************************************
-Probably created by Chang yu Electronic as they used the same music format like changyu2 and gluck2
+This Driver is for Oriental Pearl hardware and clones.
+
+Probably created by Chang yu Electronic due to same sound system like changyu2 and gluck2.
+
+Buttons
+K1
+K2
+K3
+K4
+
+56 leds
+ 5 2x 7 segment display, 
+ 4x 7 segment big display bonus connected in on the back of pcb.
+
+ic
+u1 kc8279
+u17 and u21 nec d8255ac-2
+u32 hm6264
+??  winbond w27c020 adpcm rom.
+u33 winbond w27c512 boot rom.
+u39 at89s51 second mcu for protection.
+
+// TODO:
+Need Proper hardware info.
+Hook up nvram inputs opll and adpcm.
+east8 Has undumped mcu and adpcm rom.
+Need Layout as and Add segment display as marywu.cpp.
+
 
 Features Notes:
 src: Chang yu website
@@ -28,28 +56,8 @@ Big bonus for scoring on all letters of "ORIENTAL PEARL".
 
 Electronic ball-checking device ensures where ball lands.
 
-Buttons
-K1
-K2
-K3
-K4
-
-56 leds
- 5 2x 7 segment display, 4x 7 segment big display bonus.
-
-ic
-u1 kc8279
-u17 and u21 nec d8255ac-2
-u32 hm6264
-??  winbond w27c020 adpcm rom.
-u33 winbond w27c512 boot rom.
-u39 at89s51 second mcu for protection.
-
-// TODO:
-Need hardware info.
-Hook up nvram inputs opll and adpcm.
-east8 Has undumped mcu and adpcm rom.
-Need Layout as and Add segment display as marywu.cpp
+There are clones that use music adpcm instead of ym2413.
+also diferent adpcm voices.
 */
 
 #include "emu.h"
@@ -61,9 +69,10 @@ Need Layout as and Add segment display as marywu.cpp
 #include "sound/ay8910.h"
 #include "sound/ymopl.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 #include "speaker.h"
 
-#include "marywu.lh"
+#include "orientpearl.lh"
 
 
 namespace {
@@ -76,9 +85,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "led%u", 0U)
 		, m_inputs(*this, { "KEYS1", "KEYS2", "DSW1", "PUSHBUTTONS" })
+		
 	{ }
 
-	void orientalpearl(machine_config &config);
+	void east8(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -181,7 +191,7 @@ uint8_t orientalpearl_state::keyboard_r()
 
 void orientalpearl_state::display_7seg_data_w(uint8_t data)
 {
-	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // (7 seg display driver) Might be not correct
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // Might be not correct
 
 	m_digits[2 * m_selected_7seg_module + 0] = patterns[data & 0x0f];
 	m_digits[2 * m_selected_7seg_module + 1] = patterns[data >> 4];
@@ -194,9 +204,9 @@ void orientalpearl_state::program_map(address_map &map)
 
 void orientalpearl_state::io_map(address_map &map)
 {
-
     map(0xfa00, 0xfa01).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
     map(0xfb02, 0xfb03).w("ay1", FUNC(ay8910_device::address_data_w));
+
 }
 
 void orientalpearl_state::machine_start()
@@ -205,7 +215,7 @@ void orientalpearl_state::machine_start()
 	m_leds.resolve();
 }
 
-void orientalpearl_state::orientalpearl(machine_config &config)
+void orientalpearl_state::east8(machine_config &config)
 {
 
 	/* basic machine hardware */
@@ -213,7 +223,7 @@ void orientalpearl_state::orientalpearl(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &orientalpearl_state::program_map);
 	maincpu.set_addrmap(AS_IO, &orientalpearl_state::io_map);
 
-	// NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Keyboard & display interface */
 	i8279_device &kbdc(I8279(config, "i8279", XTAL(10'738'635) / 6));
@@ -222,7 +232,7 @@ void orientalpearl_state::orientalpearl(machine_config &config)
 	kbdc.out_disp_callback().set(FUNC(orientalpearl_state::display_7seg_data_w));
 
 	/* Video */
-	config.set_default_layout(layout_marywu);
+	config.set_default_layout(layout_orientpearl);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -237,7 +247,6 @@ void orientalpearl_state::orientalpearl(machine_config &config)
 	
 	OKIM6295(config, "oki", XTAL(10'738'000) / 6, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // Clock frequency & pin 7 not verified
 
-	
 }
 
 ROM_START( east8 )
@@ -252,5 +261,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                FLAGS
-GAME( 200?, east8,  0,       orientalpearl,   orientalpearl, orientalpearl_state, empty_init, ROT0, "<unknown>", "Unknown 6 Ball Pinball Gambling", MACHINE_IS_SKELETON_MECHANICAL ) // EAST8  v1.05  string . this was dumped from soccer santiago II 6 ball pinball
+//    YEAR  NAME    PARENT   MACHINE   INPUT         STATE                INIT        ROT    COMPANY      FULLNAME                                                FLAGS
+GAME( 200?, east8,  0,       east8,   orientalpearl, orientalpearl_state, empty_init, ROT0, "<unknown>", "Unknown 6 Ball Pinball Gambling", MACHINE_IS_SKELETON_MECHANICAL ) // EAST8  v1.05  string . this was dumped from soccer santiago II 6 ball pinball.
