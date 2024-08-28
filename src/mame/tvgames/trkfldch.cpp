@@ -1658,7 +1658,7 @@ ROM_START( teleshi )
 ROM_END
 
 /*
-Included with Purple model (for customers with Orange model)
+Included with Purple model
 
     ももたろう (日本昔話)
         Momotarou (Nippon mukashi banashi)
@@ -1706,7 +1706,6 @@ The following were also available (via the Download service?)
         Asonde Manabou (Original)
     あそんでまなぼう2 (オリジナル)
         Asonde Manabou 2 (Original)
-        (for some reason 2 is listed twice on the page)
     おうたであそぼう3 (オリジナル)
         Asonde Manabou 3 (Original)
     おうたであそぼう4 (オリジナル)
