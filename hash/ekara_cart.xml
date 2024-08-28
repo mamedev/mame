@@ -230,7 +230,7 @@ license:CC0-1.0
 	*D-4   DC0004-TPJ  TV Pop Junior Volume 8
 	*D-5   DC0005-TPJ  TV Pop Junior Volume 9
 	*D-6   DC0006-BHT  Best Hit Volume 10
-	 D-7   DC0007-KID  Kids' Song Volume 4 (volumes 1, 2 and 3 are in the main EC series)
+	*D-7   DC0007-KID  Kids' Song Volume 4 (volumes 1, 2 and 3 are in the main EC series)
 	*D-8   DC0008-BAT  Best Artist Volume 7
 	*D-9   DC0009-TPJ  TV Pop Junior (no volume number on cover)
 
@@ -330,7 +330,7 @@ license:CC0-1.0
 	M-14 *MC0014-ATM  Artist Mini Volume 8 (BoA)
 	M-15 *MC0015-TPM  TV Pop Mini Volume 1
 	M-16 *MC0016-ATM  Artist Mini Volume 9  (Yamaguchi Momoe)
-	M-17  MC0017-KSM  Kids' Song Mini Volume 6
+	M-17 *MC0017-KSM  Kids' Song Mini Volume 6
 
 	***********************************************************************************
 
@@ -1833,6 +1833,19 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="dc0007">
+		<description>Dream Cartridge: Kids' Song Volume 4 (Japan) (DC0007-BHT)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="dc0007-kid.u1" size="0x100000" crc="c8908d43" sha1="a42010f805c3839b974fa8a6e2a412d68c903324"/>
+			</dataarea>
+		</part>
+	</software>	
 
 	<software name="dc0008">
 		<description>Dream Cartridge: Best Artist Vol.7 (Japan) (DC0008-BAT)</description>
@@ -2493,7 +2506,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
-
+	<software name="mc0017">
+		<description>Kids' Song Mini Volume 6 (Japan) (MC0017-KSM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソングミニ mini vol.6"/>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0017-ksm.u1" size="0x080000" crc="8ef6e48d" sha1="093f820295c35c08e29efe6f3f5e9f00a3813a27"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<!-- ********************************************************************************************************************************************************************** -->
 
 
@@ -3099,7 +3124,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
-
+	<software name="ekaraweb8">
+		<description>e-kara Web cartridge 8M (used, with 8 songs) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="usercart.u1" size="0x100000" crc="28a5a5c7" sha1="408ef97a8a42e286cb18b9df61ac575a24b1462d"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<!-- ********************************************************************************************************************************************************************** -->
 
 
