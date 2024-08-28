@@ -3186,6 +3186,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- this one has some songs programmed into it:
+		世界に一つだけの花 - SMAP				Sekai ni Hitotsu Dake no Hana - SMAP
+		さくらんぼ - 大塚愛					Sakuranbo - Otsuka Ai
+		あ~よかった - 花*花					Ah Yokatta - Hana*Hana
+		ハッスル - かいけつゾロリ (山寺宏一)			Hustle - Kaiketsu Zorori (Yamadera Koichi)
+		アララの呪文 - ちびまる子ちゃん with 爆チュー問題		Arara no Jumon - Chibi Maruko-chan with Bakuchu Monda
+		ミニハムずの愛の唄 - ミニハムず				Minihams no Ai no Uta - Minihams
+		ミニモニ。ジャンケンぴょん! - ミニモニ。			Mini-Moni. Jankenpyon! - Minimoni.
+		大きな古時計 - 童謠				Ookina Furudokei - Douwa
+	-->	
 	<software name="ekaraweb8">
 		<description>e-kara Web cartridge 8M (used, with 8 songs) (Japan)</description>
 		<year>2003</year>
