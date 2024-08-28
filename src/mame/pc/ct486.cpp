@@ -182,9 +182,6 @@ void ct486_state::ct486(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	// video hardware
-	PALETTE(config, "palette").set_entries(256); // todo: really needed?
-
 	/* software lists */
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
