@@ -506,7 +506,7 @@ void csc_state::csce_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1003).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1800, 0x1803).w(m_pia[0], FUNC(pia6821_device::write)).r(FUNC(csc_state::pia0_read));
+	map(0x1800, 0x1803).rw(FUNC(csc_state::pia0_read), FUNC(csc_state::pia0_write));
 	map(0x2000, 0x3fff).rom();
 	map(0xa000, 0xffff).rom();
 }
@@ -515,7 +515,7 @@ void csc_state::rsc_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
-	map(0x2000, 0x2003).w(m_pia[0], FUNC(pia6821_device::write)).r(FUNC(csc_state::pia0_read));
+	map(0x2000, 0x2003).rw(FUNC(csc_state::pia0_read), FUNC(csc_state::pia0_write));
 	map(0xf000, 0xffff).rom();
 }
 

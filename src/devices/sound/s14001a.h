@@ -25,12 +25,10 @@ public:
 	void start_w(int state);   // START (pin 10)
 	void data_w(u8 data);      // 6-bit word
 
-	void set_clock(u32 clock); // set new CLK frequency
-	void set_clock(const XTAL &xtal) { set_clock(xtal.value()); }
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override { m_stream->update(); m_stream->set_sample_rate(clock()); }
 	virtual void rom_bank_pre_change() override { m_stream->update(); }
 
 	// sound stream update overrides
@@ -96,7 +94,7 @@ private:
 	bool m_bPPQCarryP2;
 	bool m_bRepeatCarryP2;
 	bool m_bLengthCarryP2;
-	u16 m_RomAddrP1;        // rom address
+	u16 m_uRomAddrP1;       // rom address
 
 	// output pins
 	u8 m_uOutputP2;         // output changes on phase2

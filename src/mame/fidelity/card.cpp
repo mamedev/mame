@@ -41,7 +41,7 @@ added.
 RE notes by Kevin Horton
 
 This unit is similar in construction kinda to the chess challengers, however it
-has an 8041 which does ALL of the system I/O.  The Z80 has NO IO AT ALL other than
+has an 8041 which does ALL of the system I/O. The Z80 has NO IO AT ALL other than
 what is performed through the 8041!
 
 The main CPU is a Z80 running at 2.5MHz
@@ -61,10 +61,10 @@ Memory Map:
 8000-DFFF: unused
 E000-FFFF: write to TSI chip
 
-NOTE: when the TSI chip is written to, the CPU IS STOPPED.  The CPU will run again
-when the word is done being spoken.  This is because D0-D5 run to the TSI chip directly.
+NOTE: when the TSI chip is written to, the CPU IS STOPPED. The CPU will run again
+when the word is done being spoken. This is because D0-D5 run to the TSI chip directly.
 
-The TSI chip's ROM is 4K, and is marked 101-32118.  The clock is the same as the Chess
+The TSI chip's ROM is 4K, and is marked 101-32118. The clock is the same as the Chess
 Challengers- 470K/100pf which gives a frequency around 25KHz or so.
 
 Port Map:
@@ -115,7 +115,7 @@ P6.1 - segment B
 P6.2 - segment F
 P6.3 - segment G
 
-P7.0 - LED enable (high = LEDs can be lit.  low = LEDs will not light)
+P7.0 - LED enable (high = LEDs can be lit. low = LEDs will not light)
 P7.1 - goes through inverter, to pads that are not used
 P7.2 - segment C
 P7.3 - segment H
@@ -155,7 +155,7 @@ E*  *  *  *  *C
        D
 
 The digits of the display are numbered left to right, 0 through 7 and are controlled
-by the grids.  hi = grid on, hi = segment on.
+by the grids. hi = grid on, hi = segment on.
 
 A detailed description of the hardware can be found also in the patent 4,373,719.
 
