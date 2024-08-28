@@ -5,8 +5,7 @@
 IGS ARM7 (IGS027A) based mahjong / gambling platform(s) with link support
 Keeping them separate from igs_m027.cpp and igs017.cpp for now.
 
-NOTE: linking between mgcs2h and mgcs2l has been verified on real hw, while linking
-between cjslh and cjsll doesn't work on real hw for some reason.
+Linking has been verified to work fine on real hardware for both games.
 
 The two dumped extension games are really similar to mgdh in igs017.cpp code-wise,
 you can get them to the wait link screen just by implementing the mgdh's IGS MUX

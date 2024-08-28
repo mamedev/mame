@@ -15034,6 +15034,7 @@ jxzh                            // (c) 1996 BMC
 koftball                        // (c) 1995 BMC
 
 @source:bmc/popobear.cpp
+magkengo                        // (c) 2005 Herb Home
 popobear                        // (c) 2000 BMC
 
 @source:bondwell/bw12.cpp
@@ -27422,6 +27423,7 @@ jspecter                        // (c) 1979 Jatre
 jspecter2                       // (c) 1979 Jatre
 laser                           // (c) 1980 Leisure Time Electronics Inc.
 lrescue                         // LR  (c) 1979 Taito
+lrescueabl                      // Artic bootleg
 lrescuem                        // Model Racing bootleg set 1
 lrescuem2                       // Model Racing bootleg set 2
 lupin3                          // LP  (c) 1980 Taito
@@ -30566,6 +30568,7 @@ zoomaniaa
 
 @source:misc/hitpoker.cpp
 hitpoker                        // (c) 1997
+reelmtp                         // (c) 1999
 
 @source:misc/hobbyplay.cpp
 unkhpslt                        //
