@@ -91,33 +91,21 @@ license:CC0-1.0
 	SAI = Saiten Cartridge (supports scoring)
 	TPJ = TV Pop Junior
 
-	Some Japanese carts have a number starting with S  (S-x on case, SCxxxx-xxx part numbers) (see ekara_japan_s.xml)  (for e-kara - custom presentation)
-	                                                M  (M-x on case, MCxxxx-xxx part numbers) (see ekara_japan_m.xml)  (for e-kara - custom presentation)
-	                                                EN (EN-X on case, no part numbers)        (see ekara_japan_en.xml) (for e-kara - custom presentation)
-	                                                BH (BG-XX on case, BH-xxxx on PCB)        (see ekara_japan_bh.xml) (for e-kara - custom presentation)
-	                                                GK (GK-X on case)                         (see ekara_japan_gk.xml) (for e-kara / e-pitch - custom presentation)
-	                                                G  (G-x on case, GCxxxx-xxx part numbers) (see ekara_japan_g.xml)  (for e-kara, Popira / 2)
-	                                                P  (P-x on case, PCxxxx-xxx part numbers) (see ekara_japan_p.xml)  (for e-kara, Popira / 2, DDR Family Mat)
-	                                                D  (D-x on case, DCxxxx-xxx part numbers) (see ekara_japan_d.xml)  (for e-kara, Popira / 2, Taiko de Popira)
-	                                                SP (SP-x on case, no part numbers)        (see ekara_japan_sp.xml) (for e-kara, Popira / 2, Taiko de Popira, Jumping Popira)
-	                                                A  (A-x on case, Pichi Pichi Pitch series)(see ekara_japan_a.xml)  (for e-kara / e-pitch)
-	                                                                        AC (KR-xx on cart, maybe part of A series)
-	                                                JP (JP-x on case)                         (see ekara_japan_jp.xml) (for Jumping Popira Only)
-
-	these exist but haven't got any
-	Some Japanese carts have a number starting with
-	                                                KE (for Kids Lyric book device Only?)
-	                                                KD (for e-kara?)
-	                                                PR (seen a PR-02 AYY) (what is it?)
-
-	(there are others, need to document them)
-
+	Some Japanese carts have a number starting with S  (S-x on case, SCxxxx-xxx part numbers) (for e-kara - custom presentation)
+	                                                M  (M-x on case, MCxxxx-xxx part numbers) (for e-kara - custom presentation)
+	                                                EN (EN-X on case, no part numbers)        (for e-kara - custom presentation)
+	                                                BH (BG-XX on case, BH-xxxx on PCB)        (for e-kara - custom presentation)
+	                                                GK (GK-X on case)                         (for e-kara / e-pitch - custom presentation)
+	                                                G  (G-x on case, GCxxxx-xxx part numbers) (for e-kara, Popira / 2)
+	                                                P  (P-x on case, PCxxxx-xxx part numbers) (for e-kara, Popira / 2, DDR Family Mat)
+	                                                D  (D-x on case, DCxxxx-xxx part numbers) (for e-kara, Popira / 2, Taiko de Popira)
+	                                                SP (SP-x on case, no part numbers)        (for e-kara, Popira / 2, Taiko de Popira, Jumping Popira)
+	                                                A  (A-x on case, Pichi Pichi Pitch series)(for e-kara / e-pitch)
+	                                                JP (JP-x on case)                         (for Jumping Popira Only)
 
 	There are also e-kara Web cartridges that were meant to be programmed using a special unit connected to a PC using the defunct e-kara web service (see ekara_japan_web.xml)
 
 	Genres can cross multiple cart types, eg. TV Pop 1,3,4,5,6 are in the 'G' series, while TV Pop 2 is in the 'P' series, and TV Pop 9 is in the 'D' series (where are 7,8?)
-
-	for non-Japanese carts see ekara_us.xml and ekara_pal.xml, the PAL ones are noteworthy for using a different timing system
 
 	***********************************************************************************
 
@@ -486,6 +474,31 @@ license:CC0-1.0
 	*JP-01  'Jumping Popira' JP-1
 	*JP-02  'Jumping Popira' JP-2
 
+	***********************************************************************************
+	
+	The Korean release of e-kara was called i-singer, and was distributed by Sonokong
+	
+	At least 15 cartridges exist for it
+	
+	It is unknown if the internal ROM is the same as the non-Japanese e-kara units, or if it
+	would have a Korean 'please insert a cartridge' message.  It is also unconfirmed if these
+	cartridges function on non-Korean units.
+
+	Vol.1 HOT/SES
+	Vol.2 Yoo Seung-joon/Park Ji-yoon
+	Vol.3 Compositional Hair/Humming
+	Vol.4 Shin Seung Hoon & Lee Seung Hwan
+	Vol.5 Trot Collection I
+	Vol.6 Omnibus I
+	Vol.7 Omnibus II
+	Vol.8 Omnibus III
+	Vol.9 Omnibus IV
+	Vol.10 Omnibus V
+	Vol.11 Omnibus Primary Song Pack V (same configuration as Cartry included in the general configuration)
+	Vol.12 Omnibus VI 6
+	Vol.13 Trot Collection II
+	Vol.14 ?
+	Vol.15 Park Jinyoung & Cool & J & Baek Jiyoung
 
 	************************************************************************************************************************************************************
 	 Everything below is not standard e-kara / XaviX based hardware, listed for reference

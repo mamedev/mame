@@ -1601,5 +1601,5 @@ CONS( 201?, ppgc200g,   0,         0,  nes_vt_pal_8mb, nes_vt, nes_vt_state, emp
 CONS( 201?, dgun2869,  0,         0,  nes_vt_16mb,     nes_vt, nes_vt_state, empty_init, "dreamGEAR", "My Arcade Retro Micro Controller - 220 Built-In Video Games (DGUN-2869)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 201?, dgun2959,  0,         0,  nes_vt_pal_16mb, nes_vt, nes_vt_state, empty_init, "dreamGEAR", "My Arcade Plug And Play 220 Game Retro Controller (DGUN-2959)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// needs inputs - unit is a Mahjong controller.  This is a hack(?) of a Famicom game (unless it was licensed by the original developer)
+// needs inputs - unit is a Mahjong controller.  This is said to be a hack(?) of a Famicom game (unless it was licensed by the original developer)
 CONS( 200?, tvmjfc,    0,        0,  nes_vt_2mb,    nes_vt, nes_vt_state, empty_init, "bootleg?", "TV Mahjong Game (VTxx hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
