@@ -1628,16 +1628,15 @@ ROM_START( lexitvsprt )
 	ROM_LOAD( "29l3211.u2a", 0x000000, 0x400000, CRC(65e5223c) SHA1(13eae6e34100fb9761335e87a3cf728bb31e860f) )
 ROM_END
 
-ROM_START( konsbp )
-	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "s29gl128n90tfir2.bin", 0x000000, 0x1000000, CRC(28c12a48) SHA1(68557849e2b6f3669de76540de841ca99119ec58) )
-ROM_END
-
-ROM_START( konsbo )
+ROM_START( teleshi )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "s29gl128n90tfir.bin", 0x000000, 0x1000000, CRC(8c032142) SHA1(7dff151ea1abd5911e753f0708b0b4f66599791f) )
 ROM_END
 
+ROM_START( teleship )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "s29gl128n90tfir2.bin", 0x000000, 0x1000000, CRC(28c12a48) SHA1(68557849e2b6f3669de76540de841ca99119ec58) )
+ROM_END
 
 
 } // anonymous namespace
@@ -1650,5 +1649,5 @@ CONS( 200?, shtscore,  0,          0,  trkfldch, shtscore,trkfldch_state,      e
 CONS( 200?, lexitvsprt,0,          0,  trkfldch, lexi,    trkfldch_lexi_state, empty_init,    "Lexibook",                                   "TV Sports Plug & Play 5-in-1 (JG7000)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // additional online content could be downloaded onto these if they were connected to a PC via USB
-CONS( 2008, konsbp,    0,          0,  trkfldch, konsb,   trkfldch_state,      empty_init,    "Konami",                                     "Konami Storybook (purple version) (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 2008, konsbo,    0,          0,  trkfldch, konsb,   trkfldch_state,      empty_init,    "Konami",                                     "Konami Storybook (orange version) (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2008, teleshi,   0,          0,  trkfldch, konsb,   trkfldch_state,      empty_init,    "Konami",                                     "Teleshibai (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // テレしばい - this one is orange  
+CONS( 2008, teleship,  0,          0,  trkfldch, konsb,   trkfldch_state,      empty_init,    "Konami",                                     "Teleshibai - Purple Version (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // テレしばい (パープルバージョン) - this has Purple Version as part of the name  on the box
