@@ -1382,6 +1382,12 @@ ROM_START( gamezn2 )
 	ROM_LOAD16_WORD_SWAP( "gamezone2.bin", 0x00000, 0x400000, CRC(f7b2d609) SHA1(7d2d8f6e822c4e6b97e9accaa524b7910c6b97bf) ) // byteswapped as protection?
 ROM_END
 
+ROM_START( tvmjfc )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "s29al016m90tfir2_tsop48.bin", 0x00000, 0x200000, CRC(28ef6219) SHA1(7ac2592f2a88532f537629660074ebae08efab82) )
+ROM_END
+
+
 
 
 void nes_vt_state::init_protpp()
@@ -1594,3 +1600,6 @@ CONS( 201?, ppgc200g,   0,         0,  nes_vt_pal_8mb, nes_vt, nes_vt_state, emp
 // unknown tech level, it's most likely a vt09 or vt369 but isn't using any of the extended features
 CONS( 201?, dgun2869,  0,         0,  nes_vt_16mb,     nes_vt, nes_vt_state, empty_init, "dreamGEAR", "My Arcade Retro Micro Controller - 220 Built-In Video Games (DGUN-2869)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 201?, dgun2959,  0,         0,  nes_vt_pal_16mb, nes_vt, nes_vt_state, empty_init, "dreamGEAR", "My Arcade Plug And Play 220 Game Retro Controller (DGUN-2959)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// needs inputs - unit is a Mahjong controller.  This is said to be a hack(?) of a Famicom game (unless it was licensed by the original developer)
+CONS( 200?, tvmjfc,    0,        0,  nes_vt_2mb,    nes_vt, nes_vt_state, empty_init, "bootleg?", "TV Mahjong Game (VTxx hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

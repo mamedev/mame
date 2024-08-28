@@ -34565,6 +34565,7 @@ sudopptv
 techni4
 timetp36
 timetp7
+tvmjfc
 vdogdeme
 vdogdemo
 vfootbal
@@ -45625,6 +45626,8 @@ abl4play
 lexitvsprt
 my1stddr                        // (c) 2006 Konami
 shtscore
+teleshi
+teleship
 trkfldch                        // (c) 2007 Konami
 
 @source:tvgames/tvgame.cpp
