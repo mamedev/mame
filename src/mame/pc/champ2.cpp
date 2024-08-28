@@ -9,8 +9,8 @@ Dump contains a MS-DOS 3.3 ROM disk, ebay auction shows a Pine Technology PT-319
 (SARC RC2016A5 chipset) + 2 other populated ISA16 cards out of 6.
 
 TODO:
-- Jumps in unpopulated RAM area as soon as it banks (PC=ca029 -> 0000:36AF), area may be
-multibanked instead;
+- Does extensive checks to COM1, towards what it claims to be `mtv1` (MicroTouch?)
+- ROM disk banking incomplete, meaning of $ca000 writes unknown;
 
 **************************************************************************************************/
 
@@ -36,7 +36,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_mb(*this, "mb")
 		, m_ram(*this, "ram")
-		, m_bank(*this, "bank")
+		, m_bank(*this, "bank%u", 0U)
 	{ }
 
 	void champ2(machine_config &config);
@@ -51,12 +51,10 @@ private:
 	required_device<i386_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
-	required_device<address_map_bank_device> m_bank;
+	required_device_array<address_map_bank_device, 2> m_bank;
 	void bank_map(address_map &map);
 	void main_io(address_map &map);
 	void main_map(address_map &map);
-
-	bool m_unlock_bank = false;
 };
 
 
@@ -64,18 +62,20 @@ void champ2_state::main_map(address_map &map)
 {
 	map(0x000000, 0x09ffff).bankrw("bank10");
 	// Selectable thru jumpers (0xc800, 0xd000, 0xd800, 0xe000)
-	map(0x0c8000, 0x0cffff).m(m_bank, FUNC(address_map_bank_device::amap8));
+	map(0x0c8000, 0x0c9fff).m(m_bank[0], FUNC(address_map_bank_device::amap8));
+	map(0x0ca000, 0x0cbfff).m(m_bank[1], FUNC(address_map_bank_device::amap8));
 	// writes to $+2000 then $+0000, same value (0x03) at POST,
 	// then writes 0 to $+2000 and N to $+0000
 	map(0x0c8000, 0x0c8000).lw8(
 		NAME([this] (offs_t offset, u8 data) {
-			if (m_unlock_bank)
-				m_bank->set_bank(data & 0x1f);
+			logerror("$c8000 bank %02x\n", data);
+			m_bank[1]->set_bank(data & 0x7f);
 		})
 	);
 	map(0x0ca000, 0x0ca000).lw8(
 		NAME([this] (offs_t offset, u8 data) {
-			m_unlock_bank = data == 0;
+			logerror("$ca000 bank %02x\n", data);
+			//m_bank[0]->set_bank(data & 0x7f);
 		})
 	);
 	map(0x0e0000, 0x0fffff).rom().region("bios", 0);
@@ -86,6 +86,7 @@ void champ2_state::main_io(address_map &map)
 {
 	map.global_mask(0x3ff);
 	map(0x0000, 0x00ff).m(m_mb, FUNC(at_mb_device::map));
+	map(0x0200, 0x0201).portr("GAME");
 }
 
 
@@ -95,6 +96,33 @@ void champ2_state::bank_map(address_map &map)
 }
 
 static INPUT_PORTS_START( champ2 )
+	PORT_START("GAME")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0100, 0x0100, "GAME" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	// punts with "terminated - illegal" if any of these two are low
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void champ2_state::machine_start()
@@ -103,8 +131,8 @@ void champ2_state::machine_start()
 
 void champ2_state::machine_reset()
 {
-	m_bank->set_bank(0);
-	m_unlock_bank = false;
+	m_bank[0]->set_bank(0);
+	m_bank[1]->set_bank(0);
 }
 
 
@@ -134,7 +162,8 @@ void champ2_state::champ2(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("15M").set_extra_options("640K,1024K,1664K,2M,4M,8M,15M");
 
-	ADDRESS_MAP_BANK(config, m_bank).set_map(&champ2_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x8000);
+	for (auto bank : m_bank)
+		ADDRESS_MAP_BANK(config, bank).set_map(&champ2_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x2000);
 }
 
 
