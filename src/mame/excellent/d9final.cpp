@@ -6,9 +6,8 @@ Dream 9 Final (c) 1992 Excellent Systems
 
 TODO:
 - What does the ES8712 control? There's definitely no ADPCM chip or sample ROM here;
-- Some inputs not understood;
-- A bunch of missing port outputs (including payout);
-- screen disable? Start-up fading looks horrible;
+- lamps;
+- Start-up fading looks horrible, video timings? btanb?
 - Game looks IGS-esque, is there any correlation?
 
 ============================================================================================
