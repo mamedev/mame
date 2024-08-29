@@ -1334,6 +1334,28 @@ static INPUT_PORTS_START( virtten )
 	PORT_MODIFY("P3")
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( ddr33v )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // quits out of songs
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xffc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+INPUT_PORTS_END
+
+
 void spg2xx_game_state::machine_start()
 {
 	if (m_bank)
@@ -1851,6 +1873,26 @@ void spg2xx_game_lexiart_state::lexiart(machine_config &config)
 }
 
 
+void spg2xx_game_ddr33v_state::init_ddr33v()
+{
+	// what is this checking? timer? battery state? protection? it goes to a blank screen after the boot logo otherwise
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	rom[0x208055] = 0x4440;
+}
+
+void spg2xx_game_ddr33v_state::ddr33v(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_ddr33v_state::mem_map_4m);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_ddr33v_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_ddr33v_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_ddr33v_state::base_portc_r));
+}
+
+
 void spg2xx_game_senwfit_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int bank = 0;
@@ -2293,6 +2335,12 @@ ROM_START( virtten )
 	ROM_LOAD16_WORD_SWAP( "virttennis.bin", 0x000000, 0x400000, CRC(e665bea9) SHA1(8c2c9f879c929e224cd885165ed60aed8baeb19d) )
 ROM_END
 
+ROM_START( ddr33v )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "ddr33v.bin", 0x000000, 0x800000, CRC(56c7015c) SHA1(a1faef2ab6eb191dea1497f8cfd4ccbd8c504e6d) )
+ROM_END
+
+
 void spg2xx_game_state::init_crc()
 {
 	// several games have a byte sum checksum listed at the start of ROM, this little helper function logs what it should match.
@@ -2466,3 +2514,6 @@ CONS( 2005, doyousud,   0,        0, spg2xx,    doyousud,  spg2xx_game_state,   
 
 CONS( 200?, virtbb,     0,        0, spg2xx,    virtbb,    spg2xx_game_state,          empty_init,    "VTG Interactive",                                        "Virtual Baseball (VTG)",                                                MACHINE_NOT_WORKING ) // motion controls not fully understood
 CONS( 200?, virtten,    0,        0, spg2xx,    virtten,   spg2xx_game_state,          empty_init,    "VTG Interactive",                                        "Virtual Tennis (VTG)",                                                  MACHINE_NOT_WORKING ) // motion controls not fully understood
+
+// 2007 ingame, 2008 on box
+CONS( 2008, ddr33v,     0,        0, ddr33v,    ddr33v,    spg2xx_game_ddr33v_state,   init_ddr33v,    "DDRGame",                                               "16-bit TV Dance Pad with 15 songs (DDRGame)",                           MACHINE_IMPERFECT_SOUND )
