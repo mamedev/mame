@@ -2515,5 +2515,5 @@ CONS( 2005, doyousud,   0,        0, spg2xx,    doyousud,  spg2xx_game_state,   
 CONS( 200?, virtbb,     0,        0, spg2xx,    virtbb,    spg2xx_game_state,          empty_init,    "VTG Interactive",                                        "Virtual Baseball (VTG)",                                                MACHINE_NOT_WORKING ) // motion controls not fully understood
 CONS( 200?, virtten,    0,        0, spg2xx,    virtten,   spg2xx_game_state,          empty_init,    "VTG Interactive",                                        "Virtual Tennis (VTG)",                                                  MACHINE_NOT_WORKING ) // motion controls not fully understood
 
-// 2007 ingame, 2008 on box
-CONS( 2008, ddr33v,     0,        0, ddr33v,    ddr33v,    spg2xx_game_ddr33v_state,   init_ddr33v,    "DDRGame",                                               "16-bit TV Dance Pad with 15 songs / Dance Dance Party Mix (DDRGame)",   MACHINE_IMPERFECT_SOUND )
+// 2007 ingame, 2008 on box.  Hyperkin is also mentioned alongside DDRGame on the box.  Songs "composed by Kenneth Baylon"
+CONS( 2008, ddr33v,     0,        0, ddr33v,    ddr33v,    spg2xx_game_ddr33v_state,   init_ddr33v,    "DDRGame / Hyperkin",                                    "16-bit TV Dance Pad with 15 songs / Dance Dance Party Mix (DDRGame)",   MACHINE_IMPERFECT_SOUND )
