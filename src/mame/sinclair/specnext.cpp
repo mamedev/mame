@@ -294,7 +294,7 @@ private:
 	memory_view m_view0, m_view1, m_view2, m_view3, m_view4, m_view5, m_view6, m_view7;
 	required_device<specnext_copper_device> m_copper;
 	required_device<specnext_ctc_device> m_ctc;
-	required_device<z80dma_device> m_dma;
+	required_device<specnext_dma_device> m_dma;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<spi_sdcard_sdhc_device> m_sdcard;
 	required_device_array<ym2149_device, 3> m_ay;
@@ -3454,8 +3454,7 @@ void specnext_state::tbblue(machine_config &config)
 	SPECNEXT_CTC(config, m_ctc, 28_MHz_XTAL / 8);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80DMA(config, m_dma, 28_MHz_XTAL / 8);
-	m_dma->set_dma_mode(z80dma_device::dma_mode::SPEC_NEXT);
+	SPECNEXT_DMA(config, m_dma, 28_MHz_XTAL / 8);
 	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dma->in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });

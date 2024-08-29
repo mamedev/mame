@@ -137,13 +137,14 @@ ALLOW_SAVE_TYPE(z80dma_device::dma_mode);
  * z80dma_device - constructor
  ****************************************************************************/
 z80dma_device::z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: z80dma_device(mconfig, Z80DMA, tag, owner, clock)
+	: z80dma_device(mconfig, Z80DMA, tag, owner, clock, dma_mode::ZILOG)
 {
 }
 
-z80dma_device::z80dma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+z80dma_device::z80dma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, dma_mode dma_mode)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_z80daisy_interface(mconfig, *this)
+	, m_dma_mode(dma_mode)
 	, m_out_busreq_cb(*this)
 	, m_out_int_cb(*this)
 	, m_out_ieo_cb(*this)
@@ -152,7 +153,6 @@ z80dma_device::z80dma_device(const machine_config &mconfig, device_type type, co
 	, m_out_mreq_cb(*this)
 	, m_in_iorq_cb(*this, 0)
 	, m_out_iorq_cb(*this)
-	, m_dma_mode(dma_mode::ZILOG)
 {
 }
 
@@ -429,11 +429,6 @@ void z80dma_device::do_search()
 
 void z80dma_device::do_write()
 {
-	if (m_byte_counter && m_dma_mode == dma_mode::SPEC_NEXT)
-	{
-		m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
-	}
-
 	switch(TRANSFER_MODE)
 	{
 		case TM_TRANSFER:
@@ -456,15 +451,7 @@ void z80dma_device::do_write()
 
 	m_byte_counter++;
 	m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
-	if (m_dma_mode == dma_mode::SPEC_NEXT)
-	{
-		if ((m_byte_counter + 1) == m_count)
-			m_byte_counter++;
-	}
-	else
-	{
-		m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
-	}
+	m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
 }
 
 /****************************************************************************
@@ -778,10 +765,6 @@ void z80dma_device::write(u8 data)
 					break;
 				case COMMAND_ENABLE_DMA:
 					LOG("Z80DMA Enable DMA\n");
-					if (num_follow() == 0 && m_dma_mode == dma_mode::SPEC_NEXT)
-					{
-						m_byte_counter = 0;
-					}
 					enable();
 					break;
 				case COMMAND_READ_MASK_FOLLOWS:
@@ -904,4 +887,68 @@ void z80dma_device::rdy_w(int state)
 void z80dma_device::bai_w(int state)
 {
 	m_busrq_ack = state;
+}
+
+
+DEFINE_DEVICE_TYPE(UA858D, ua858d_device, "ua858d", "UA858D DMA Controller")
+
+ua858d_device::ua858d_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: z80dma_device(mconfig, UA858D, tag, owner, clock, dma_mode::UA858D)
+{
+}
+
+
+DEFINE_DEVICE_TYPE(SPECNEXT_DMA, specnext_dma_device, "specnext_dma", "Spectrum Next DMA")
+
+specnext_dma_device::specnext_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: z80dma_device(mconfig, SPECNEXT_DMA, tag, owner, clock, dma_mode::SPEC_NEXT)
+{
+}
+
+void specnext_dma_device::do_write()
+{
+	if (m_dma_mode != dma_mode::SPEC_NEXT)
+	{
+		z80dma_device::do_write();
+	}
+	else
+	{
+		if (m_byte_counter)
+			m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
+
+		switch (TRANSFER_MODE)
+		{
+		case TM_TRANSFER:
+			do_transfer_write();
+			break;
+
+		case TM_SEARCH:
+			do_search();
+			break;
+
+		case TM_SEARCH_TRANSFER:
+			do_transfer_write();
+			do_search();
+			break;
+
+		default:
+			logerror("z80dma_do_operation: invalid mode %d!\n", TRANSFER_MODE);
+			break;
+		}
+
+		m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
+
+		m_byte_counter++;
+		if ((m_byte_counter + 1) == m_count)
+			m_byte_counter++;
+	}
+}
+
+void specnext_dma_device::write(u8 data)
+{
+	if (m_dma_mode == dma_mode::SPEC_NEXT && data == COMMAND_ENABLE_DMA && num_follow() == 0)
+	{
+		m_byte_counter = 0;
+	}
+	z80dma_device::write(data);
 }
