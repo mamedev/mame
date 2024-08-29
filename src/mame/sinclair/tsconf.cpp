@@ -237,6 +237,12 @@ void tsconf_state::machine_reset()
 	while (m_keyboard->read() != 0) { /* invalidate buffer */ }
 }
 
+void tsconf_state::device_post_load()
+{
+	spectrum_128_state::device_post_load();
+	m_sprites_cache.clear();
+}
+
 INPUT_PORTS_START( tsconf )
 	PORT_INCLUDE( spec_plus )
 
