@@ -17535,6 +17535,7 @@ realbrkk                        // "600" Billiard Academy Real Break 1998 (Korea
 realbrko                        // "600" Billiard Academy Real Break 1998 (Europe)
 
 @source:dynax/royalmah.cpp
+akamj                           // bootleg
 cafebrk                         // "528" Mahjong Cafe Break (C) 1999 Nakanihon / Dynax
 cafedoll                        // "76" (c) 1993 Dynax
 cafedollg                       // "76" (c) 1993 Dynax
@@ -17550,7 +17551,7 @@ janoh                           // (c) 1984 Toaplan
 janoha                          // (c) 1984 Toaplan
 janptr96                        // "503" (c) 1996 Dynax
 janptrsp                        // "511" (c) 1997 Dynax
-janputer                        // (c) 1982 Taito
+janputer                        // bootleg
 jansou                          // (c) 1985 Dyna
 jansoua                         // (c) 1985 Dyna
 janyoup2                        // Falcon bootleg
@@ -19959,6 +19960,8 @@ zoofari                         // (c) 2006 ICE/Play Mechanix
 
 @source:igs/cabaret.cpp
 cabaret                         // (c) 1992 AMT
+double8l                        // (c) 1992 AMT
+kungfua                         // (c) 1992 IGS
 
 @source:igs/dunhuang.cpp
 dunhuang                        // (c) 1995
@@ -20306,7 +20309,6 @@ igs_ncs                         // (c) 198? IGS
 igs_ncs2                        // (c) 2000 IGS
 igstet341                       // (c) 199? IGS
 igstet342                       // (c) 199? IGS
-kungfua                         // (c) 1992 IGS
 number10                        // (c) IGS (Board labeled Playmark Srl)
 numbr10l                        // (c) IGS (Board labeled Playmark Srl)
 pktet346                        // (c) 199? IGS
@@ -29142,7 +29144,8 @@ castrev                         // Revolution
 @source:misc/cb2001.cpp
 cb2001                          // (c) 2001 Dyna Electronics
 ndongmul2                       // (c) 1999 Dyna Electronics
-scherrym                        // (c) 2001? Dyna Electronics
+scherrym                        // (c) 1997 Dyna Electronics
+scherrymp                       // (c) 1997 Dyna Electronics
 
 @source:misc/chameleonrx1.cpp
 chamrx1                         // 2003
@@ -41897,6 +41900,7 @@ boo1000
 @source:skeleton/boramz80.cpp
 pkboram
 tpkboram
+tpkborama
 
 @source:skeleton/bpmmicro.cpp
 bp1200                          // (c) 1991 BP Microsystems

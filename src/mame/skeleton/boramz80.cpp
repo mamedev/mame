@@ -46,6 +46,8 @@ public:
 
 	void pk(machine_config &config) ATTR_COLD;
 
+	void init_tpkborama();
+
 protected:
 	virtual void video_start() override ATTR_COLD;
 
@@ -261,8 +263,50 @@ ROM_START( tpkboram )
 	ROM_LOAD( "10.pg8", 0x38000, 0x8000, CRC(4a293afa) SHA1(be532e6a476f78638e7f558bf8093e1914bc3688) )
 ROM_END
 
+// this runs on a newer ATPK-BORAM 0500 PCB. Given all GFX match tpkboram, it's probably a newer revision.
+// code is encrypted
+ROM_START( tpkborama )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "223.rom", 0x0000, 0x8000, CRC(1d776d37) SHA1(6918cddb0b47d28cf8145823f869dfd2296c0eed) )
+
+	ROM_REGION( 0x4000, "chars", 0 ) // these are same as tpkboram
+	ROM_LOAD( "1.cg1", 0x0000, 0x2000, CRC(69f44d04) SHA1(2f98805e4b70ce3426078f35ff260a3bc97fab86) )
+	ROM_LOAD( "2.cg2", 0x2000, 0x2000, CRC(c1adf009) SHA1(0d5d8b39d40c807b9b5ed7418ba871c4d683286a) )
+
+	ROM_REGION( 0x40000, "tiles", 0 ) // these are all 1st and 2nd half identical, but same as tpkboram if split
+	ROM_LOAD( "3.pg1",  0x00000, 0x8000, CRC(612c5b39) SHA1(9682167b1fbbcd34b71c2628641b646a2993f61b) )
+	ROM_IGNORE(                  0x8000 )
+	ROM_LOAD( "4.pg2",  0x08000, 0x8000, CRC(14ee6437) SHA1(a046b3efb14a400d201f7ce1c3ee0e01badb46a6) )
+	ROM_IGNORE(                  0x8000 )
+	ROM_LOAD( "5.pg3",  0x10000, 0x8000, CRC(ce87f0c5) SHA1(96379856182bb0c81c805906551ec2e4aa2eb1d5) )
+	ROM_IGNORE(                  0x8000 )
+	ROM_LOAD( "6.pg4",  0x18000, 0x8000, CRC(0a8a6106) SHA1(ac88f1ef2eb39cd24a236b2f18e85367c0736ae8) )
+	ROM_IGNORE(                  0x8000 )
+	ROM_LOAD( "7.pg5",  0x20000, 0x8000, CRC(484a0eec) SHA1(6e32da2d4d78fb4c4bae2d2da945a71231051d5f) )
+	ROM_IGNORE(                  0x8000 )
+	ROM_LOAD( "8.pg6",  0x28000, 0x8000, CRC(772d8996) SHA1(bd0412d0656a26a80b0f00ff5d6bcff2c4adb6c7) )
+	ROM_IGNORE(                  0x8000 )
+	ROM_LOAD( "9.pg7",  0x30000, 0x8000, CRC(ff052a99) SHA1(7523ab2eeef1e44107710c8a68897daa7bf2ce12) )
+	ROM_IGNORE(                  0x8000 )
+	ROM_LOAD( "10.pg8", 0x38000, 0x8000, CRC(61a4e0f3) SHA1(8d9f0efd3b691eaf93c933c63ba6aa34ebad71b1) )
+	ROM_IGNORE(                  0x8000 )
+ROM_END
+
+
+void boramz80_state::init_tpkborama()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		// TODO
+		rom[i] = rom[i];
+	}
+}
+
 } // anonymous namespace
 
 
-GAME( 1987, pkboram,  0, pk, pkboram,  boramz80_state, empty_init, ROT0, "Boram", "PK - New Exciting Poker!", MACHINE_IS_SKELETON ) // PK-BORAM 0211 aug.04.1987. BORAM CORP
-GAME( 1988, tpkboram, 0, pk, tpkboram, boramz80_state, empty_init, ROT0, "Boram", "Turbo PK",                 MACHINE_IS_SKELETON ) // PK-TURBO jan.29.1988. BORAM CORP.
+GAME( 1987, pkboram,   0,        pk, pkboram,  boramz80_state, empty_init,     ROT0, "Boram", "PK - New Exciting Poker!",        MACHINE_IS_SKELETON ) // PK-BORAM 0211 aug.04.1987. BORAM CORP
+GAME( 1988, tpkboram,  0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "Turbo PK",                        MACHINE_IS_SKELETON ) // PK-TURBO jan.29.1988. BORAM CORP.
+GAME( 1998, tpkborama, tpkboram, pk, tpkboram, boramz80_state, init_tpkborama, ROT0, "Boram", "Turbo PK (Ver 2.3B2, encrypted)", MACHINE_IS_SKELETON ) // dep inctype-23B1998 0519Ver 2.3B2

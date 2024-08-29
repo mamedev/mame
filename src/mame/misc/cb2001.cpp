@@ -1079,6 +1079,19 @@ ROM_START( scherrym ) // DYNA D9702 PCB; DYNA PLUS V1.6 in bookkeeping screen
 	ROM_LOAD( "n82s135-2.bin", 0x200, 0x100, CRC(a19821db) SHA1(62dda90dd67dfbc0b96f161f1f2b7a46a5805eae) )
 ROM_END
 
+ROM_START( scherrymp ) // DYNA D9702 PCB; DYNA PLUS V1.0U in bookkeeping screen
+	ROM_REGION16_LE( 0x040000, "boot_prg", 0 )
+	ROM_LOAD16_WORD( "m27c2001.bin", 0x000000, 0x40000, CRC(6e797b3f) SHA1(cc333e3dc2d416f1059559ce958bfe25a3869fc8) )
+
+	ROM_REGION( 0x080000, "gfx", ROMREGION_ERASEFF )
+	// this board uses an unmarked MASK ROM at 12c, 12a is unpopulated.  Size unknown. The bootleg PCB uses an mx29f1610ml, so possibly the same or compatible
+	ROM_LOAD( "gfx.12c", 0x000000, 0x80000, NO_DUMP )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "82s147.9b",  0x000, 0x200, CRC(dcf976d2) SHA1(73a08e4587f3516d694a8060b79470cf71df3925) )
+	ROM_LOAD( "82s147.11b", 0x200, 0x200, CRC(a67e7a63) SHA1(b23e0eb9af13e57bbc8602ddc7fb381ba5c8267e) )
+ROM_END
+
 /* New DongmulDongmul 2 (뉴 동물동물 2, New AnimalAnimal 2) runs on slightly different hardware, but with same CPU, custom and I/O.
    Video from the real hardware: https://youtu.be/1K9e_7RzeiM
    _______________________________________________________________________________
@@ -1138,7 +1151,8 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT  MACHINE    INPUT      CLASS         INIT        ROT   COMPANY  FULLNAME                FLAGS
-GAME( 2001, cb2001,    0,      cb2001,    cb2001,    cb2001_state, empty_init, ROT0, "Dyna",  "Cherry Bonus 2001",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, ndongmul2, 0,      ndongmul2, ndongmul2, cb2001_state, empty_init, ROT0, "Dyna",  "New DongmulDongmul 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // goes into the weeds at various point, due to either missing MCU dump or incomplete decryption. Bad reels GFX.
-GAME( 2001, scherrym,  0,      cb2001,    cb2001,    cb2001_state, empty_init, ROT0, "Dyna",  "Super Cherry Master",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
+//    YEAR  NAME       PARENT  MACHINE    INPUT      CLASS         INIT        ROT   COMPANY  FULLNAME                     FLAGS
+GAME( 2001, cb2001,    0,      cb2001,    cb2001,    cb2001_state, empty_init, ROT0, "Dyna",  "Cherry Bonus 2001",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, ndongmul2, 0,      ndongmul2, ndongmul2, cb2001_state, empty_init, ROT0, "Dyna",  "New DongmulDongmul 2",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // goes into the weeds at various point, due to either missing MCU dump or incomplete decryption. Bad reels GFX.
+GAME( 1997, scherrym,  0,      cb2001,    cb2001,    cb2001_state, empty_init, ROT0, "Dyna",  "Super Cherry Master",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
+GAME( 1997, scherrymp, 0,      cb2001,    cb2001,    cb2001_state, empty_init, ROT0, "Dyna",  "Super Cherry Master Plus",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //
