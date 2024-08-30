@@ -56,7 +56,7 @@ public:
 	{ }
 
 
-	void thinkpad8xx(machine_config &config);
+	void thinkpad850(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -66,7 +66,7 @@ private:
 static INPUT_PORTS_START(thinkpad8xx)
 INPUT_PORTS_END
 
-void thinkpad850_state::thinkpad8xx(machine_config &config)
+void thinkpad8xx_state::thinkpad850(machine_config &config)
 {
 	PPC603(config, m_maincpu, 33.333_MHz_XTAL * 3); // IBM PPCI603eFC100BPQ
 
@@ -75,8 +75,7 @@ void thinkpad850_state::thinkpad8xx(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	SOFTWARE_LIST(config, "thinkpad8xx_cd").set_original("thinkpad8xx_cd"); // CD-ROMs
-	SOFTWARE_LIST(config, "thinkpad8xx_flop").set_original("thinkpad8xx_flop"); // Floppies
+	SOFTWARE_LIST(config, "thinkpad8xx_cd").set_original("thinkpad8xx");
 }
 
 
