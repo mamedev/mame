@@ -12,12 +12,13 @@ TODO:
 - DSW3 is read, not sure where it's used
 - Keyboard is mapped through test mode, but some bits are unknown, and hopper
   is not emulated
-- Map Leds and Coin counters
+- Map LEDs and coin counters
 - Remove patches after finding why there are so many pitfalls.  Maybe the
   game expects to read inputs via an external device and expects certain
   timings
 - Trojan out internal ROMs for kungfua and double8l
-- kungfua and double8l have 5 8-DIP banks (sheets available for double8l)
+- kungfua and double8l have 5 banks of 8 DIP switches (sheets available for
+  double8l)
 
 Press F1+F2 during reset to see 'pork*ish' test mode :P
 
@@ -182,8 +183,8 @@ void cabaret_state::nmi_and_coins_w(uint8_t data)
 {
 	if ((m_nmi_enable ^ data) & (~0xdd))
 	{
-		logerror("PC %06X: nmi_and_coins = %02x\n", m_maincpu->pc(), data);
-//      popmessage("%02x",data);
+		logerror("%s: nmi_and_coins = %02x\n", machine().describe_context(), data);
+		//popmessage("%02x", data);
 	}
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);   // coin_a
@@ -191,9 +192,9 @@ void cabaret_state::nmi_and_coins_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(2, data & 0x08);   // key in
 	machine().bookkeeping().coin_counter_w(3, data & 0x10);   // coin m_out mech
 
-	m_led = BIT(data, 6);   // led for coin m_out / hopper active
+	m_led = BIT(data, 6);   // LED for coin m_out / hopper active
 
-	m_nmi_enable = data;    //  data & 0x80     // nmi enable?
+	m_nmi_enable = data;    // data & 0x80     // NMI enable?
 
 	m_out[0] = data;
 	show_out();

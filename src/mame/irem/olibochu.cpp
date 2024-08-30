@@ -3,7 +3,7 @@
 /*******************************************************************************
 
 Oli-Boo-Chu (USA) / Punching Kid (パンチングキッド) (Japan)
-There's also an English flyer for Ali-Boo-Chu
+There's also an English language flyer for Ali-Boo-Chu
 
 driver by Nicola Salmoria
 
@@ -76,12 +76,12 @@ VIDEO M-47B-A:
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
-#include "video/resnet.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+#include "video/resnet.h"
 
 
 namespace {
@@ -359,7 +359,7 @@ void olibochu_state::sound_command_w(offs_t offset, u8 data)
 	}
 
 	// sound_command high bits = soundlatch d0-d3
-	for (c = 0; c < 16 && !BIT(hi, c); c++) { ; }
+	for (c = 0; c < 16 && !BIT(hi, c); c++) { }
 	m_soundlatch[0]->write((16 - c) & 0xf);
 }
 
