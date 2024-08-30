@@ -113,7 +113,7 @@ void igs_m027_state::video_start()
 
 void igs_m027_state::machine_start()
 {
-	m_dsw_io_select = 0;
+	m_dsw_io_select = 7;
 	m_unk2_write_count = 0;
 
 	save_item(NAME(m_dsw_io_select));
