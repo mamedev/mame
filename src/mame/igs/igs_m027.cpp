@@ -47,8 +47,6 @@ public:
 		m_igs017_igs031(*this, "igs017_igs031"),
 		m_screen(*this, "screen"),
 		m_oki(*this, "oki"),
-		m_portb(*this, "PORTB"),
-		m_portc(*this, "PORTC"),
 		m_dsw(*this, "DSW%u", 1U)
 	{ }
 
@@ -88,8 +86,6 @@ private:
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	required_device<screen_device> m_screen;
 	required_device<okim6295_device> m_oki;
-	required_ioport m_portb;
-	required_ioport m_portc;
 	required_ioport_array<3> m_dsw;
 
 	u32 unk_r();
@@ -100,8 +96,6 @@ private:
 	void dsw_io_select_w(u32 data);
 
 	u8 ppi_porta_r();
-	u8 ppi_portb_r();
-	u8 ppi_portc_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
@@ -372,22 +366,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_state::interrupt)
 
 u8 igs_m027_state::ppi_porta_r()
 {
-	logerror("%s: ppi_porta_r\n", machine().describe_context());
-	return 0xff;
-}
+	u8 data = 0xff;
 
-u8 igs_m027_state::ppi_portb_r()
-{
-	logerror("%s: ppi_portb_r\n", machine().describe_context());
-	return m_portb->read();
-}
+	for (int i = 0; i < 3; i++)
+		if (!BIT(m_dsw_io_select, i))
+			data &= m_dsw[i]->read();
 
-u8 igs_m027_state::ppi_portc_r()
-{
-	logerror("%s: ppi_portc_r\n", machine().describe_context());
-	return m_portc->read();
+	return data;
 }
-
 
 void igs_m027_state::dsw_io_select_w(u32 data)
 {
@@ -416,16 +402,6 @@ u32 igs_m027_state::unk2_r()
 
 u32 igs_m027_state::lhdmg_unk2_r()
 {
-#if 0
-	u32 data = 0xffffffff;
-
-	for (int i = 0; i < 3; i++)
-		if (!BIT(m_dsw_io_select, i))
-			data &= m_dsw[i]->read() | 0xffffff00;
-
-	return data;
-#endif
-
 	logerror("%s: lhdmg_unk2_r\n", machine().describe_context());
 
 	if (m_dsw_io_select & 1)
@@ -462,8 +438,8 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(igs_m027_state::ppi_porta_r));
-	m_ppi->in_pb_callback().set(FUNC(igs_m027_state::ppi_portb_r));
-	m_ppi->in_pc_callback().set(FUNC(igs_m027_state::ppi_portc_r));
+	m_ppi->in_pb_callback().set_ioport("PORTB");
+	m_ppi->in_pc_callback().set_ioport("PORTC");
 
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
