@@ -347,10 +347,12 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	{
 		if ((m_maincpu->get_fc() & 4) == 0)			// User mode access updates map_control from write latch
 		{
-				if (m_latched_map_control != m_map_control)
+				// NB need to apply once only as m_map_control gets modified
+				if (m_latched_map_control && m_latched_map_control != m_map_control)
 				{
 					LOG("memory_r: m_map_control updated\n");
 					m_map_control = m_latched_map_control;
+					m_latched_map_control = 0;
 				}
 		}
 		
@@ -384,7 +386,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 				m_map_control |= (1 << MAP_BLOCK_ACCESS);
 			}
 			
-			LOG("memory_r: map %08x => paddr(%08x) pc(%08x)\n",OFF16_TO_OFF8(offset), OFF16_TO_OFF8(BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11), m_maincpu->pc());
+			//LOG("memory_r: map %08x => paddr(%08x) pc(%08x)\n",OFF16_TO_OFF8(offset), OFF16_TO_OFF8(BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11), m_maincpu->pc());
 			
 			offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
 		}
@@ -408,10 +410,11 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if ((m_maincpu->get_fc() & 4) == 0)			// User mode access updates map_control from write latch
 	{
-			if (m_latched_map_control != m_map_control)
+			if (m_latched_map_control && m_latched_map_control != m_map_control)
 			{
 				LOG("memory_w: m_map_control updated\n");
 				m_map_control = m_latched_map_control;
+				m_latched_map_control = 0;
 			}
 	}
 	
