@@ -509,15 +509,9 @@ void igs017_igs031_device::sdwx_gfx_decrypt()
 	std::vector<u8> result_data(rom_size);
 
 	for (int i = 0; i < rom_size; i++)
-		result_data[i] = src[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 8, 7, 6, 10, 9, 5, 4, 3, 2, 1, 0)];
+		result_data[i] = src[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 7, 8, 6, 10, 9, 5, 4, 3, 2, 1, 0)];
 
-	for (int i = 0; i < rom_size; i += 0x200)
-	{
-		memcpy(src + i + 0x000, &result_data[i + 0x000], 0x80);
-		memcpy(src + i + 0x080, &result_data[i + 0x100], 0x80);
-		memcpy(src + i + 0x100, &result_data[i + 0x080], 0x80);
-		memcpy(src + i + 0x180, &result_data[i + 0x180], 0x80);
-	}
+	memcpy(src, result_data.data(), rom_size);
 }
 
 
