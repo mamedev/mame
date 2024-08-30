@@ -116,11 +116,9 @@ uint8_t lastbank_state::key_matrix_r()
 {
 	uint8_t res = 0xff;
 
-	if (BIT(m_key_select, 0)) res &= m_key[Player][0]->read();
-	if (BIT(m_key_select, 1)) res &= m_key[Player][1]->read();
-	if (BIT(m_key_select, 2)) res &= m_key[Player][2]->read();
-	if (BIT(m_key_select, 3)) res &= m_key[Player][3]->read();
-	if (BIT(m_key_select, 4)) res &= m_key[Player][4]->read();
+	for (int i = 0; i < 5; i++)
+		if (BIT(m_key_select, i))
+			res &= m_key[Player][i]->read();
 
 	return res;
 }
