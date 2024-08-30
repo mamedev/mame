@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="thinkpad8xx_cd" description="IBM Thinkpad 800 series software on CD-ROM">
+
+	<!-- Operating systems -->
+
+	<software name="aix_4_1_5">
+		<description>AIX 4.1.5</description>
+		<year>1997</year>
+		<publisher>IBM</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="aix_4.1.5_disc_01" sha1="4c49c8190e33c2c7f13a74d7332d384edd6b3042" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="aix_4.1.5_disc_01" sha1="228afedd90619e89c6b466b4970bda0e5a3e9a13" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="solaris_2_5_1_ppc">
+		<description>Solaris 2.5.1 PowerPC Platform Edition</description>
+		<year>1996</year>
+		<publisher>Sun Microsystem</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="704-5237-06"/>
+			<diskarea name="cdrom">
+				<disk name="solaris_2.5.1_powerpc" sha1="61f003bf259e472673b6f65b18ed9b2629ea396b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="solaris_desktop_ppc_1_1_ppc">
+		<description>Solaris Desktop 1.1 PowerPC Platform Edition</description>
+		<year>1996</year>
+		<publisher>Sun Microsystem</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="704-5507-06"/>
+			<diskarea name="cdrom">
+				<disk name="solaris_desktop_1.1_powerpc" sha1="00502ae94b626f0fc3a080ba1c419397b8aaaae3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="windowsnt_3_5_ppc">
+		<description>Windows NT Workstation 3.5 PowerPC Edition</description>
+		<year>1994</year>
+		<publisher>IBM</publisher>
+		<part name="cdrom" interface="cdrom">
+		<feature name="part_number" value="11H5926"/>
+			<diskarea name="cdrom">
+				<disk name="windows_nt_3.5_workstation_powerpc" sha1="ea1035d1c7f68d8237926125e9a9ccae83fa3f82" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

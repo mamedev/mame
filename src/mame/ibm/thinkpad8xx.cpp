@@ -1,0 +1,92 @@
+// license:BSD-3-Clause
+// copyright-holders:
+/***********************************************************************************************************
+Skeleton driver for IBM Thinkpad Power Series.
+The IBM ThinkPad Power Series (800/820/821/822/823/850/851/860) is a laptop series from the ThinkPad line
+that was manufactured by IBM. It is based on the PowerPC architecture.
+All of the PowerPC ThinkPads could run Windows NT 3.51 and 4.0, AIX 4.1.x, and Solaris Desktop 2.5.1 PowerPC
+Edition. It is also possible to run certain PowerPC versions of Linux on the 800 Series.
+
+Hardware for the 850 model:
+-SCSI hard disk.
+-SCSI CD-ROM drive.
+-Two expansión slots for PCMCIA-like DRAM cards.
+-Video: 
+   -IBM 85G7815 (by Seiko/Epson).
+   -Western Digital WD90C24A SVGA LCD controller.
+   -Two Hitachi HM51S4260 262144 x 16bit DRAM (1MB of video display memory).
+   -10.4" 640×480 or 800×600 screen.
+-Video capture:
+   -Brooktree BT812 NTSC/PAL to RGB/YCrCb Decoder.
+   -Two Hitachi HM530281 high speed 331776 x 8bit Frame buffer DRAM.
+   -ASCII V7310AS (アスキー, Asukii) Video Capture Device.
+-Crystal CS4231 16bit stereo codec for audio.
+-Two DRAM DIMMs slots.
+-Hitachi H8/338 (HD6473388) for main board supervisión.
+-CPU:
+    -IBM PowerPC 603e @ 100MHz (PPCI603eFC100BPQ).
+    -Two 32k x 36bits IBM043614 burst SRAM (256k L2 cache total).
+    -IDT71216 240K (16K x 15bit) cache-tag RAM.
+    -33.333 MHz xtal (tripled for 100MHz system clock).
+
+***********************************************************************************************************/
+
+#include "emu.h"
+#include "cpu/h8/h8325.h"
+#include "cpu/powerpc/ppc.h"
+#include "emupal.h"
+#include "screen.h"
+#include "softlist_dev.h"
+#include "speaker.h"
+
+
+namespace {
+
+class thinkpad8xx_state : public driver_device
+{
+public:
+	thinkpad8xx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
+
+
+	void thinkpad8xx(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
+};
+
+
+static INPUT_PORTS_START(thinkpad8xx)
+INPUT_PORTS_END
+
+void thinkpad8xx_state::thinkpad8xx(machine_config &config)
+{
+	PPC603(config, m_maincpu, 100'000'000); // IBM PPCI603eFC100BPQ
+
+	H8325(config, "mcu", XTAL(10'000'000)); // Actually an H8/338 (HD6473388: 48k-byte ROM; 2k-byte RAM), unknown clock
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	SOFTWARE_LIST(config, "thinkpad8xx_cd").set_original("thinkpad8xx_cd"); // CD-ROMs
+	SOFTWARE_LIST(config, "thinkpad8xx_flop").set_original("thinkpad8xx_flop"); // Floppies
+}
+
+
+ROM_START(thinkpad850)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_SYSTEM_BIOS( 0, "40h5218", "40H5218 (08-12-1996)" )
+	ROMX_LOAD( "40h5218_ibm_mbm29f040a.u21", 0x00000, 0x80000, CRC(2bc2da24) SHA1(adc36bf18176e0fbfb389249da0b60b381cee764), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "91g0610", "91G0610 (07-03-1995)" )
+	ROMX_LOAD( "91g0610_ibm_mbm29f040a.u21", 0x00000, 0x80000, CRC(169a79c4) SHA1(da74a2f346b732add62d08ca5f34f192cae5d033), ROM_BIOS(1) )
+
+	ROM_REGION(0xe000, "mcu", 0)
+	ROM_LOAD("hd6473388.u15", 0x0000, 0xe000, NO_DUMP)
+ROM_END
+
+} // anonymous namespace
+
+//    YEAR, NAME,        PARENT, COMPAT, MACHINE,     INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,       FLAGS
+COMP( 1996, thinkpad850, 0,      0,      thinkpad8xx, thinkpad8xx, thinkpad8xx_state, empty_init, "IBM",   "ThinkPad 850", MACHINE_IS_SKELETON )
