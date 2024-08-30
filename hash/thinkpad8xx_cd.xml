@@ -23,6 +23,26 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Only supported on IBM Power Series 830/850 desktops -->
+	<software name="os2w_ppc">
+		<description>OS/2 Warp PowerPC Edition</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="19H1133"/>
+			<diskarea name="cdrom">
+				<disk name="aix_4.1.5_disc_01" sha1="b646fdb3ab5f982304e7cbaf6bd735e20cc66198" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="19H1134"/>
+			<diskarea name="cdrom">
+				<!-- Applications Sampler December, 1995-->
+				<disk name="aix_4.1.5_disc_01" sha1="e1fd3631c353b2903d35658a59e8a79b6306c1d2" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="sol_2_5_1_ppc">
 		<description>Solaris 2.5.1 PowerPC Platform Edition</description>
 		<year>1996</year>

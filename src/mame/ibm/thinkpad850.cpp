@@ -1,9 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:
 /***********************************************************************************************************
-Skeleton driver for IBM Thinkpad Power Series.
-The IBM ThinkPad Power Series (800/820/821/822/823/850/851/860) is a laptop series from the ThinkPad line
-that was manufactured by IBM. It is based on the PowerPC architecture.
+Skeleton driver for IBM Thinkpad Power Series model 850.
+The IBM ThinkPad 850 is a laptop from the ThinkPad based on the PowerPC architecture.
 All of the PowerPC ThinkPads could run Windows NT 3.51 and 4.0, AIX 4.1.x, and Solaris Desktop 2.5.1 PowerPC
 Edition. It is also possible to run certain PowerPC versions of Linux on the 800 Series.
 
@@ -40,8 +39,6 @@ More info: http://oldcomputer.info/portables/tp850/ibm_ppc_thinkpad_redbook.pdf
 #include "emu.h"
 #include "cpu/h8/h8325.h"
 #include "cpu/powerpc/ppc.h"
-#include "emupal.h"
-#include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -89,7 +86,7 @@ ROM_START(thinkpad850)
 	ROMX_LOAD( "91g0610_ibm_mbm29f040a.u21", 0x00000, 0x80000, CRC(169a79c4) SHA1(da74a2f346b732add62d08ca5f34f192cae5d033), ROM_BIOS(1) )
 
 	ROM_REGION(0xe000, "mcu", 0)
-	ROM_LOAD("hd6473388.u15", 0x0000, 0xe000, NO_DUMP)
+	ROM_LOAD( "hd6473388.u15", 0x0000, 0xe000, NO_DUMP )
 ROM_END
 
 } // anonymous namespace
