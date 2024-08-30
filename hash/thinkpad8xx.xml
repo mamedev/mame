@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="thinkpad8xx_cd" description="IBM Thinkpad 800 series software on CD-ROM">
+<softwarelist name="thinkpad8xx" description="IBM Thinkpad 800 series software">
 
 	<!-- Operating systems -->
 
