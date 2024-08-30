@@ -250,6 +250,7 @@ void tek440x_state::machine_start()
 {
 	save_item(NAME(m_boot));
 	save_item(NAME(m_map_control));
+	save_item(NAME(m_latched_map_control));
 	save_item(NAME(m_kb_rdata));
 	save_item(NAME(m_kb_tdata));
 	save_item(NAME(m_kb_rclamp));
@@ -289,6 +290,7 @@ void tek440x_state::machine_reset()
 	m_u244latch = 0;
 	m_led_disk = 1;
 	m_keyboard->kdo_w(1);
+	m_latched_map_control = 0;
 	mapcntl_w(0);
 	videocntl_w(0);
 }
@@ -333,7 +335,6 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 static int inbuserr = 0;
 
-
 /*************************************
  *
  *  CPU memory handlers
@@ -341,14 +342,18 @@ static int inbuserr = 0;
  *************************************/
 u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 {
-	if (m_boot)
-		return m_prom[offset & 0x3fff];
 
 	if (!machine().side_effects_disabled())
 	{
 		if ((m_maincpu->get_fc() & 4) == 0)			// User mode access updates map_control from write latch
-				m_map_control = m_latched_map_control;
-
+		{
+				if (m_latched_map_control != m_map_control)
+				{
+					LOG("memory_r: m_map_control updated\n");
+					m_map_control = m_latched_map_control;
+				}
+		}
+		
 		const offs_t offset0 = offset;
 		if (!inbuserr)														// not in buserr interrupt
 		if ((m_maincpu->get_fc() & 4) == 0)			// only in User mode
@@ -361,7 +366,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 			// selftest expects fail if page.pid != map_control.pid
 			if (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
 			{
-				m_map_control |= (1 << MAP_BLOCK_ACCESS);
+				m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
 
 				inbuserr = 1;
 
@@ -374,8 +379,12 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 				return 0xffff;
 		
 			}
+			else
+			{
+				m_map_control |= (1 << MAP_BLOCK_ACCESS);
+			}
 			
-			LOG("memory_r: map %08x => paddr(%08x) pc(%08x)\n",OFF16_TO_OFF8(offset), OFF16_TO_OFF8(BIT(offset, 0, 11) | OFF8_TO_OFF16(BIT(m_map[offset >> 11], 0, 11) << 11)), m_maincpu->pc());
+			LOG("memory_r: map %08x => paddr(%08x) pc(%08x)\n",OFF16_TO_OFF8(offset), OFF16_TO_OFF8(BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11), m_maincpu->pc());
 			
 			offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
 		}
@@ -391,14 +400,21 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	}
 	
 	inbuserr = 0;
-	return m_vm->read16(offset, mem_mask);
+
+	return (m_boot) ? m_prom[offset & 0x3fff] : m_vm->read16(offset, mem_mask);
 }
 
 void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if ((m_maincpu->get_fc() & 4) == 0)			// User mode access updates map_control from write latch
-			m_map_control = m_latched_map_control;
-
+	{
+			if (m_latched_map_control != m_map_control)
+			{
+				LOG("memory_w: m_map_control updated\n");
+				m_map_control = m_latched_map_control;
+			}
+	}
+	
 	const offs_t offset0 = offset;
 	if ((m_maincpu->get_fc() & 4) == 0)			// only in User mode
 	if (BIT(m_map_control, MAP_VM_ENABLE))
@@ -422,8 +438,6 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 			m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), 0, m_maincpu->get_fc());
 			
 			mem_mask = 0;	// disable write
-			return;
-
 		}
 		else
 		{
@@ -434,6 +448,8 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		if (BIT(m_map[offset >> 11], 14) == 0)
 		{
 			m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
+
+			inbuserr = 1;
 
 			LOG("memory_w: bus error: READONLY %08x fc(%d) pc(%08x)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc(),  m_maincpu->pc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -491,8 +507,13 @@ u16 tek440x_state::map_r(offs_t offset)
 void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if ((offset>>11) < 0x20)
-		LOG("map_w 0x%08x <= %04x pc(%08x)\n",offset>>11, data, m_maincpu->pc());
-
+	{
+		LOG("map_w: %08x  <= %04x paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
+			offset>>11, data,
+			OFF16_TO_OFF8(BIT(data, 0, 11)<<11),BIT(data, 11, 3), data & 0x8000 ? 1 : 0, data & 0x4000 ? 1 : 0,
+			m_maincpu->pc());
+	}
+	
 	if (BIT(m_map_control, MAP_SYS_WR_ENABLE))
 	{
 		COMBINE_DATA(&m_map[(offset >> 11) & 0x7ff]);
@@ -556,6 +577,9 @@ void tek440x_state::mapcntl_w(u8 data)
 	}
 
 	// NB bit 6 & 7 is not used
+	
+	// disable using latched state for now
+	
 	m_map_control = data & 0x3f;
 	
 }
@@ -918,6 +942,10 @@ void tek440x_state::physical_map(address_map &map)
 
 			// TODO: bit 7 -> SCSI bus reset
 			LOG("scsi bus reset %d\n", BIT(data, 7));
+			if (BIT(data, 7))
+			{
+				//m_scsi->cmd_w(0);
+			}
 			
 		}, "scsi_addr"); // 7bc000-7bdfff: SCSI bus address registers
 	map(0x7be000, 0x7be01f).m(m_scsi, FUNC(ncr5385_device::map)).umask16(0xff00); //.mirror(0x1fe0) .cswidth(16);
