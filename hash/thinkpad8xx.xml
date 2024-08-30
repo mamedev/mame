@@ -11,6 +11,7 @@ license:CC0-1.0
 		<description>AIX 4.1.5</description>
 		<year>1997</year>
 		<publisher>IBM</publisher>
+		<sharedfeat name="compatibility" value="800,820,850" />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="aix_4.1.5_disc_01" sha1="4c49c8190e33c2c7f13a74d7332d384edd6b3042" />
@@ -23,11 +24,12 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Only supported on IBM Power Series 830/850 desktops -->
+	<!-- Only supported on Thinkpad Series 820 and 850 -->
 	<software name="os2w_ppc">
 		<description>OS/2 Warp PowerPC Edition</description>
 		<year>1995</year>
 		<publisher>IBM</publisher>
+		<sharedfeat name="compatibility" value="820,850" />
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="19H1133"/>
 			<diskarea name="cdrom">
@@ -47,6 +49,7 @@ license:CC0-1.0
 		<description>Solaris 2.5.1 PowerPC Platform Edition</description>
 		<year>1996</year>
 		<publisher>Sun Microsystem</publisher>
+		<sharedfeat name="compatibility" value="800,820,850" />
 		<part name="flop" interface="floppy">
 			<feature name="part_number" value="702-4348-06"/>
 			<dataarea name="flop" size="168000">
@@ -73,6 +76,7 @@ license:CC0-1.0
 		<description>Windows NT Workstation 3.5 PowerPC Edition</description>
 		<year>1994</year>
 		<publisher>IBM</publisher>
+		<sharedfeat name="compatibility" value="800,820,850" />
 		<part name="cdrom" interface="cdrom">
 		<feature name="part_number" value="11H5926"/>
 			<diskarea name="cdrom">
