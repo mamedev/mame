@@ -347,7 +347,7 @@ void extension_state::cjsll(machine_config &config)
 	I8255A(config, "ppi");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_text_reverse_bits();
+	m_igs017_igs031->set_text_reverse_bits(true);
 	m_igs017_igs031->set_i8255_tag("ppi");
 
 	SPEAKER(config, "mono").front_center();
