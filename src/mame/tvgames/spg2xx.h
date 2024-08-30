@@ -384,8 +384,6 @@ public:
 		spg2xx_game_state(mconfig, type, tag)
 	{ }
 
-	void ddr33v(machine_config &config);
-
 	void init_ddr33v();
 
 protected:

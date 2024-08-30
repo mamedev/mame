@@ -1872,27 +1872,6 @@ void spg2xx_game_lexiart_state::lexiart(machine_config &config)
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_lexiart_state::base_portc_r));
 }
 
-
-void spg2xx_game_ddr33v_state::init_ddr33v()
-{
-	// what is this checking? timer? battery state? protection? it goes to a blank screen after the boot logo otherwise
-	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
-	rom[0x208055] = 0x4440;
-}
-
-void spg2xx_game_ddr33v_state::ddr33v(machine_config &config)
-{
-	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
-	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_ddr33v_state::mem_map_4m);
-
-	spg2xx_base(config);
-
-	m_maincpu->porta_in().set(FUNC(spg2xx_game_ddr33v_state::base_porta_r));
-	m_maincpu->portb_in().set(FUNC(spg2xx_game_ddr33v_state::base_portb_r));
-	m_maincpu->portc_in().set(FUNC(spg2xx_game_ddr33v_state::base_portc_r));
-}
-
-
 void spg2xx_game_senwfit_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int bank = 0;
@@ -2081,6 +2060,12 @@ void spg2xx_game_doraphone_state::doraphonep(machine_config &config)
 	m_screen->set_refresh_hz(50);
 }
 
+void spg2xx_game_ddr33v_state::init_ddr33v()
+{
+	// what is this checking? timer? battery state? protection? it goes to a blank screen after the boot logo otherwise
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	rom[0x208055] = 0x4440;
+}
 
 ROM_START( rad_skat )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -2515,5 +2500,6 @@ CONS( 2005, doyousud,   0,        0, spg2xx,    doyousud,  spg2xx_game_state,   
 CONS( 200?, virtbb,     0,        0, spg2xx,    virtbb,    spg2xx_game_state,          empty_init,    "VTG Interactive",                                        "Virtual Baseball (VTG)",                                                MACHINE_NOT_WORKING ) // motion controls not fully understood
 CONS( 200?, virtten,    0,        0, spg2xx,    virtten,   spg2xx_game_state,          empty_init,    "VTG Interactive",                                        "Virtual Tennis (VTG)",                                                  MACHINE_NOT_WORKING ) // motion controls not fully understood
 
-// 2007 ingame, 2008 on box.  Hyperkin is also mentioned alongside DDRGame on the box.  Songs "composed by Kenneth Baylon"
-CONS( 2008, ddr33v,     0,        0, ddr33v,    ddr33v,    spg2xx_game_ddr33v_state,   init_ddr33v,    "DDRGame / Hyperkin",                                    "16-bit TV Dance Pad with 15 songs / Dance Dance Party Mix (DDRGame)",   MACHINE_IMPERFECT_SOUND )
+// 2007 ingame, 2008 on box.  Hyperkin is mentioned as being the registered trademark holder alongside DDRGame on the box.
+// Songs "composed by Kenneth Baylon"
+CONS( 2008, ddr33v,     0,        0, spg2xx,    ddr33v,    spg2xx_game_ddr33v_state,   init_ddr33v,   "DDRGame / Hyperkin",                                    "16-bit TV Dance Pad with 15 songs / Dance Dance Party Mix (DDRGame)",   MACHINE_IMPERFECT_SOUND )
