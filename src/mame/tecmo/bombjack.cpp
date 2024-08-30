@@ -1086,5 +1086,5 @@ GAME( 1984, bombjack2,  bombjack, bombjack, bombjack, bombjack_state, empty_init
 GAME( 1984, bombjackt,  bombjack, bombjack, bombjack, bombjack_state, empty_init,    ROT90, "Tehkan (Tecfri license)", "Bomb Jack (Tecfri, Spain)",           MACHINE_SUPPORTS_SAVE ) // official license
 GAME( 1985, bombjackbl, bombjack, bombjack, bombjack, bombjack_state, empty_init,    ROT90, "bootleg",                 "Bomb Jack (bootleg)",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, calorie,    0,        calorie,  calorie,  calorie_state,  empty_init,    ROT0, "Sega",                     "Calorie Kun vs Moguranian",           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, calorieb,   calorie,  calorieb, calorie,  calorie_state,  init_calorieb, ROT0, "bootleg",                  "Calorie Kun vs Moguranian (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, calorie,    0,        calorie,  calorie,  calorie_state,  empty_init,    ROT0,  "Sega",                    "Calorie Kun vs Moguranian",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, calorieb,   calorie,  calorieb, calorie,  calorie_state,  init_calorieb, ROT0,  "bootleg",                 "Calorie Kun vs Moguranian (bootleg)", MACHINE_SUPPORTS_SAVE )
