@@ -13,7 +13,7 @@ license:CC0-1.0
 		<publisher>Sun Microsystem</publisher>
 		<part name="flop" interface="floppy">
 			<feature name="part_number" value="702-4348-06"/>
-			<dataarea name="flop">
+			<dataarea name="flop" size="168000">
 				<rom name="solaris_2_5_1_mdb_boot_ppc_ibm.img" size="168000" crc="b45832e2" sha1="be9e11364816ab5f3362396ed0f457d4a2e61188" />
 			</dataarea>
 		</part>
