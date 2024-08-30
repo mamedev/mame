@@ -1,30 +1,32 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-/***********************************************************************
+/*******************************************************************************
 
-    Oli-Boo-Chu (USA) / Punching Kid (パンチングキッド) (Japan)
-    There's also an English flyer for Ali-Boo-Chu
+Oli-Boo-Chu (USA) / Punching Kid (パンチングキッド) (Japan)
+There's also an English flyer for Ali-Boo-Chu
 
-    driver by Nicola Salmoria, sound work by hap
+driver by Nicola Salmoria
 
-    NOTE:
-    * Irem M47 hardware? (according to PCB, this is all we have)
-    * Doesn't seem related to later Irem designs (M52, etc.)
-    * PCB (Punching Kid): https://youtu.be/ImUpedYnfME
-    * PCB (Oli Boo Chu): https://youtu.be/nPzBmCDtHO0
-    * Punching Kid has a POST with zeroes across the screen, Oli
-      Boo Chu shows nothing. Punching Kid also doesn't play a
-      sound when Boo drops food. The "CHU HAS FOOD" sample isn't
-      played in either version (no write to sound_command...)
+NOTES:
+- Irem M47 hardware? (according to PCB, this is all we have)
+- Doesn't seem related to later Irem designs (M52, etc.)
+- PCB (Punching Kid): https://youtu.be/ImUpedYnfME
+- PCB (Oli Boo Chu): https://youtu.be/nPzBmCDtHO0
+- Punching Kid has a POST with zeroes across the screen, Oli Boo Chu shows nothing.
+  Punching Kid also doesn't play a sound when Boo drops food. The "CHU HAS FOOD"
+  sample isn't played in either version (no write to sound_command...)
 
-    TODO:
-    * accurate video timing, IRQ timing, waitstates
-    * HC55516 should actually be an HC55536, the "OLI IS OUT"
-      sound is also muffled compared to known PCB footage.
-    * verify HC55536 clock, I don't think it's from master XTAL,
-      maybe R/C osc.
-    * Diagnostics outputs? See flip_screen_w for an explanation.
-    * Verify the PROM color resistances, seems to be standard.
+TODO:
+- verify video timing, PCB video reference does imply a 62.5Hz refresh rate
+- accurate IRQ timing
+- does it have Z80 waitstates?
+- HC55516 should actually be an HC55536, the "OLI IS OUT", sound is also muffled
+  compared to known PCB footage.
+- verify HC55536 clock, I don't think it's from master XTAL, maybe R/C osc.
+- Diagnostics outputs? See flip_screen_w for an explanation.
+- Verify the PROM color resistances, seems to be standard.
+
+--------------
 
 Sound M-47C-A:
 
@@ -64,14 +66,13 @@ VIDEO M-47B-A:
                                     2114
                OBC14     OBC13
 
-***********************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
 #include "machine/gen_latch.h"
-#include "machine/output_latch.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
@@ -93,7 +94,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
-		m_timer(*this, "timer"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
@@ -122,7 +122,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
-	required_device<timer_device> m_timer;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u8> m_videoram;
@@ -163,7 +162,6 @@ private:
 	void sound_map(address_map &map);
 };
 
-
 void olibochu_state::machine_start()
 {
 	save_item(NAME(m_sound_command));
@@ -178,21 +176,21 @@ void olibochu_state::machine_reset()
 }
 
 
-/***********************************************************************
+/*******************************************************************************
     Video
-***********************************************************************/
+*******************************************************************************/
 
 void olibochu_state::palette(palette_device &palette) const
 {
 	u8 const *prom = memregion("proms")->base();
-	static int constexpr resistances[3] = { 1000, 470, 220 }; // see TODO
+	static int constexpr resistances[3] = { 1000, 470, 220 };
 
 	// compute the color output resistor weights
 	double rweights[3], gweights[3], bweights[2];
 	compute_resistor_weights(0, 255, -1.0,
-		3, &resistances[0], rweights, 0, 0,
-		3, &resistances[0], gweights, 0, 0,
-		2, &resistances[1], bweights, 0, 0);
+			3, &resistances[0], rweights, 0, 0,
+			3, &resistances[0], gweights, 0, 0,
+			2, &resistances[1], bweights, 0, 0);
 
 	// create a lookup table for the palette
 	for (int i = 0; i < 0x20; i++)
@@ -293,12 +291,10 @@ void olibochu_state::draw_sprites(bitmap_ind16 &bitmap, rectangle const &cliprec
 			if (bank == 1) // fix wrap
 				ypos = ((ypos + 8) & 0xff) - 8;
 
-			int const hpos = bank == 1 ? 240 : 248;
-			int const vpos = bank == 1 ? 240 : 248;
 			if (flip_screen())
 			{
-				xpos = hpos - xpos;
-				ypos = vpos - ypos;
+				xpos = (bank ? 240 : 248) - xpos;
+				ypos = (bank ? 240 : 248) - ypos;
 				flipx = !flipx;
 				flipy = !flipy;
 			}
@@ -314,13 +310,14 @@ u32 olibochu_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(0));
 	draw_sprites(bitmap, cliprect);
+
 	// high priority tiles are used during intermission (after round 2)
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1));
 
 	return 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::scanline) // see TODO
+TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::scanline)
 {
 	int const scanline = param;
 
@@ -338,9 +335,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::scanline) // see TODO
 }
 
 
-/***********************************************************************
+/*******************************************************************************
     Sound
-***********************************************************************/
+*******************************************************************************/
 
 void olibochu_state::sound_command_w(offs_t offset, u8 data)
 {
@@ -398,9 +395,9 @@ void olibochu_state::cvsd_tick(int state)
 }
 
 
-/***********************************************************************
+/*******************************************************************************
     Address Maps
-***********************************************************************/
+*******************************************************************************/
 
 void olibochu_state::main_map(address_map &map)
 {
@@ -432,9 +429,9 @@ void olibochu_state::sound_map(address_map &map)
 }
 
 
-/***********************************************************************
+/*******************************************************************************
     Input Ports
-***********************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( olibochu )
 	PORT_START("IN0")
@@ -530,9 +527,9 @@ static INPUT_PORTS_START( punchkid )
 INPUT_PORTS_END
 
 
-/***********************************************************************
+/*******************************************************************************
     GFX Layouts
-***********************************************************************/
+*******************************************************************************/
 
 static gfx_layout const gfx_8x8 =
 {
@@ -562,41 +559,33 @@ static GFXDECODE_START( gfx_olibochu )
 GFXDECODE_END
 
 
-/***********************************************************************
+/*******************************************************************************
     Machine Configs
-***********************************************************************/
+*******************************************************************************/
 
 void olibochu_state::olibochu(machine_config &config)
 {
+	// basic machine hardware
 	XTAL constexpr MASTER_CLOCK = 18.432_MHz_XTAL;
 
 	Z80(config, m_maincpu, MASTER_CLOCK / 3 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &olibochu_state::main_map);
 
-	// video
+	Z80(config, m_audiocpu, MASTER_CLOCK / 3 / 2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &olibochu_state::sound_map);
+
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// HTOTAL = 384, HBSTART = 256, HBEND = 0;
-	// VTOTAL = 256, VBSTART = 248, VBEND = 8;
-	// VTOTAL of 256? really? has to be somewhere between 256-260
-	// 262 is somewhat slower than either reference available
-	// HTOTAL is certainly correct, but as still needs checking
-	// m_screen->set_raw(MASTER_CLOCK / 3, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	m_screen->set_refresh_hz(62); // estimate, lines up with references
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32 * 8, 32 * 8);
-	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 1 * 8, 31 * 8 - 1);
+	m_screen->set_raw(MASTER_CLOCK / 3, 384, 0, 256, 256, 8, 248);
 	m_screen->set_screen_update(FUNC(olibochu_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	TIMER(config, m_timer).configure_scanline(FUNC(olibochu_state::scanline), m_screen, 0, 1);
+	TIMER(config, "scanline").configure_scanline(FUNC(olibochu_state::scanline), m_screen, 0, 1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_olibochu);
 	PALETTE(config, m_palette, FUNC(olibochu_state::palette), 256 * 2, 32);
 
-	// sound
-	Z80(config, m_audiocpu, MASTER_CLOCK / 3 / 2);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &olibochu_state::sound_map);
-
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
@@ -604,16 +593,16 @@ void olibochu_state::olibochu(machine_config &config)
 
 	AY8910(config, m_ay8910, MASTER_CLOCK / 3 / 2 / 2).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, "mono", 0.5); // see TODO
-	CLOCK(config, m_cvsd_clock, 16000); // see TODO
+	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, "mono", 0.5);
+	CLOCK(config, m_cvsd_clock, 16000);
 	m_cvsd_clock->signal_handler().set(FUNC(olibochu_state::cvsd_tick));
 	m_cvsd_clock->signal_handler().append(m_cvsd, FUNC(hc55516_device::mclock_w));
 }
 
 
-/***********************************************************************
+/*******************************************************************************
     ROM Definitions
-***********************************************************************/
+*******************************************************************************/
 
 ROM_START( olibochu )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -688,5 +677,10 @@ ROM_END
 } // anonymous namespace
 
 
+/*******************************************************************************
+    Drivers
+*******************************************************************************/
+
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT        SCREEN  COMPANY               FULLNAME                FLAGS
 GAME( 1981, olibochu, 0,        olibochu, olibochu, olibochu_state, empty_init, ROT270, "Irem (GDI license)", "Oli-Boo-Chu (USA)",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, punchkid, olibochu, olibochu, punchkid, olibochu_state, empty_init, ROT270, "Irem",               "Punching Kid (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
