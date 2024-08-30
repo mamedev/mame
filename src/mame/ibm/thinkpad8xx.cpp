@@ -1,14 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:
 /***********************************************************************************************************
-Skeleton driver for IBM Thinkpad Power Series model 850.
-The IBM ThinkPad 850 is a laptop from the ThinkPad based on the PowerPC architecture.
+Skeleton driver for IBM Thinkpad Power Series.
+The IBM ThinkPad Power Series (800/820/821/822/823/850/851/860) is a laptop series from the ThinkPad line
+that was manufactured by IBM. It is based on the PowerPC architecture.
 All of the PowerPC ThinkPads could run Windows NT 3.51 and 4.0, AIX 4.1.x, and Solaris Desktop 2.5.1 PowerPC
 Edition. It is also possible to run certain PowerPC versions of Linux on the 800 Series.
+830 and 850 models can also run OS/2 Warp PowerPC Edition.
 
 Hardware for the 850 model:
 -SCSI hard disk and SCSI CD-ROM drive (with a NCR 53C810 PCI-SCSI I/O Processor).
--Two PC Card expansión slots (with a Ricoh RF53C366L PC Card interface controller and a MAX780 Dual-Slot PCMCIA Analog Power Controller).
+-Two PC Card expansion slots (with a Ricoh RF53C366L PC Card interface controller and a MAX780 Dual-Slot PCMCIA Analog Power Controller).
 -Video: 
    -IBM 85G7815 (by Seiko/Epson).
    -Western Digital WD90C24A SVGA LCD controller.
@@ -20,7 +22,7 @@ Hardware for the 850 model:
    -ASCII V7310AS (アスキー, Asukii) Video Capture Device.
 -Crystal CS4231 16bit stereo codec for audio.
 -Two DRAM DIMMs slots.
--Hitachi H8/338 (HD6473388) for main board supervisión.
+-Hitachi H8/338 (HD6473388) for main board supervision.
 -CPU:
     -IBM PowerPC 603e @ 100MHz (PPCI603eFC100BPQ).
     -Two 32k x 36bits IBM043614 burst SRAM (256k L2 cache total).
@@ -64,7 +66,7 @@ private:
 static INPUT_PORTS_START(thinkpad8xx)
 INPUT_PORTS_END
 
-void thinkpad8xx_state::thinkpad8xx(machine_config &config)
+void thinkpad850_state::thinkpad8xx(machine_config &config)
 {
 	PPC603(config, m_maincpu, 33.333_MHz_XTAL * 3); // IBM PPCI603eFC100BPQ
 
@@ -92,4 +94,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR, NAME,        PARENT, COMPAT, MACHINE,     INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,       FLAGS
-COMP( 1996, thinkpad850, 0,      0,      thinkpad8xx, thinkpad8xx, thinkpad8xx_state, empty_init, "IBM",   "ThinkPad 850", MACHINE_IS_SKELETON )
+COMP( 1996, thinkpad850, 0,      0,      thinkpad850, thinkpad8xx, thinkpad8xx_state, empty_init, "IBM",   "ThinkPad 850", MACHINE_IS_SKELETON )
