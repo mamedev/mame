@@ -259,7 +259,7 @@ TILE_GET_INFO_MEMBER(olibochu_state::get_bg_tile_info)
 	bool const bank = BIT(attr, 5);
 	u16 const code  = m_videoram[tile_index] | (bank << 8);
 	u8 const color  = (attr & 0x1f) | 0x20;
-	int const flags = (BIT(attr, 6) ? TILE_FLIPX : 0) | (BIT(attr, 7) ? TILE_FLIPY : 0);
+	int const flags = TILE_FLIPYX(attr >> 6 & 3);
 
 	tileinfo.category = bank;
 	tileinfo.set(0, code, color, flags);
