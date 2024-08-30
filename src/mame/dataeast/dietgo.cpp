@@ -19,6 +19,10 @@ PAL16L8B 7H
 PAL16L8B 6H
 PAL16R6A 11H
 
+European versions were seen with either the MAY-01 and MAY-02,
+or MAY-04 and MAY-05 sprite ROMs. The latter is more common on newer versions,
+these contain data for alternative title screen graphics enabled with a DIP switch.
+
 */
 
 #include "emu.h"
@@ -130,7 +134,7 @@ void dietgo_state::main_map(address_map &map)
 	map(0x280000, 0x2807ff).ram().share(m_spriteram);
 	map(0x300000, 0x300bff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x340000, 0x343fff).rw(FUNC(dietgo_state::ioprot_r), FUNC(dietgo_state::ioprot_w)).share("prot16ram"); // Protection device
-	map(0x380000, 0x38ffff).ram(); // mainram
+	map(0x380000, 0x38ffff).ram();
 }
 
 void dietgo_state::decrypted_opcodes_map(address_map &map)
@@ -228,7 +232,7 @@ static INPUT_PORTS_START( dietgo )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( dietgoe ) // European version with optional alternate graphics
+static INPUT_PORTS_START( dietgoe ) // European version with optional alternative graphics
 	PORT_INCLUDE( dietgo )
 
 	PORT_MODIFY("DSW")
@@ -276,12 +280,12 @@ DECO16IC_BANK_CB_MEMBER(dietgo_state::bank_callback)
 void dietgo_state::dietgo(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(28'000'000) / 2); // DE102 (verified on PCB)
+	M68000(config, m_maincpu, 28_MHz_XTAL / 2); // DE102 (verified on PCB)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dietgo_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &dietgo_state::decrypted_opcodes_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dietgo_state::irq6_line_hold));
 
-	H6280(config, m_audiocpu, XTAL(32'220'000) / 4 / 3);  // Custom chip 45; XIN is 32.220MHZ/4, verified on PCB
+	H6280(config, m_audiocpu, 32.22_MHz_XTAL / 4 / 3); // Custom chip 45; XIN is 32.220MHZ/4, verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dietgo_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
@@ -324,14 +328,14 @@ void dietgo_state::dietgo(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'220'000) / 9)); // verified on PCB
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32.22_MHz_XTAL / 9)); // verified on PCB
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); // IRQ2
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.45);
 
-	OKIM6295(config, "oki", XTAL(32'220'000) / 32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); // verified on PCB
+	OKIM6295(config, "oki", 32.22_MHz_XTAL / 32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); // verified on PCB
 }
 
-ROM_START( dietgo ) // same version 1.1 and same date as dietgoea but newer version in ROM labels
+ROM_START( dietgo ) // same version 1.1 and same date as dietgoe but newer version in ROM labels
 	ROM_REGION( 0x80000, "maincpu", 0 ) // DE102 code (encrypted)
 	ROM_LOAD16_BYTE( "jy_00-3.4h", 0x000001, 0x040000, CRC(a863ad0c) SHA1(61bf2fe5dce92e3995791a7e9ef813d64bcc2b93) )
 	ROM_LOAD16_BYTE( "jy_01-3.5h", 0x000000, 0x040000, CRC(ef243eda) SHA1(b8efbb80c5bf40ef6c26a06fc7232d6e63596cb4) )
@@ -344,7 +348,7 @@ ROM_START( dietgo ) // same version 1.1 and same date as dietgoea but newer vers
 
 	ROM_DEFAULT_BIOS("m04")
 	ROM_SYSTEM_BIOS(0, "m01", "MAY-01/02")
-	ROM_SYSTEM_BIOS(1, "m04", "MAY-04/05") // the one that supports the alternate graphics
+	ROM_SYSTEM_BIOS(1, "m04", "MAY-04/05") // the one that supports the alternative graphics
 
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROMX_LOAD( "may-01.14a",               0x000000, 0x100000, CRC(2da57d04) SHA1(3898e9fef365ecaa4d86aa11756b527a4fffb494), ROM_BIOS(0) )
@@ -374,7 +378,7 @@ ROM_START( dietgoe ) // weird, still version 1.1 and same date
 
 	ROM_DEFAULT_BIOS("m04")
 	ROM_SYSTEM_BIOS(0, "m01", "MAY-01/02")
-	ROM_SYSTEM_BIOS(1, "m04", "MAY-04/05") // the one that supports the alternate graphics
+	ROM_SYSTEM_BIOS(1, "m04", "MAY-04/05") // the one that supports the alternative graphics
 
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROMX_LOAD( "may-01.14a",               0x000000, 0x100000, CRC(2da57d04) SHA1(3898e9fef365ecaa4d86aa11756b527a4fffb494), ROM_BIOS(0) )
@@ -404,7 +408,7 @@ ROM_START( dietgoea ) // weird, still version 1.1 but different (earlier) date
 
 	ROM_DEFAULT_BIOS("m04")
 	ROM_SYSTEM_BIOS(0, "m01", "MAY-01/02")
-	ROM_SYSTEM_BIOS(1, "m04", "MAY-04/05") // the one that supports the alternate graphics
+	ROM_SYSTEM_BIOS(1, "m04", "MAY-04/05") // the one that supports the alternative graphics
 
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROMX_LOAD( "may-01.14a",               0x000000, 0x100000, CRC(2da57d04) SHA1(3898e9fef365ecaa4d86aa11756b527a4fffb494), ROM_BIOS(0) )
