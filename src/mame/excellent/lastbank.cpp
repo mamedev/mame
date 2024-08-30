@@ -46,6 +46,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_oki(*this, "oki")
 		, m_essnd(*this, "essnd")
+		, m_key{ { *this, "P1_KEY%u", 0U }, { *this, "P2_KEY%u", 0U } }
 	{ }
 
 	void lastbank(machine_config &config);
@@ -65,6 +66,8 @@ private:
 	required_device<okim6295_device> m_oki;
 	required_device<es8712_device> m_essnd;
 
+	required_ioport_array<5> m_key[2];
+
 	uint8_t m_key_select = 0;
 	uint8_t m_sound_flags = 0;
 
@@ -72,7 +75,7 @@ private:
 
 	void output_w(offs_t offset, uint8_t data);
 
-	uint8_t key_matrix_r();
+	template <uint8_t Player> uint8_t key_matrix_r();
 	void key_select_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline);
@@ -108,21 +111,16 @@ void lastbank_state::screen_vblank(int state)
 }
 
 
+template <uint8_t Player>
 uint8_t lastbank_state::key_matrix_r()
 {
-	const char *const keynames[2][5] = {
-		{"P1_KEY0", "P1_KEY1", "P1_KEY2", "P1_KEY3", "P1_KEY4"},
-		{"P2_KEY0", "P2_KEY1", "P2_KEY2", "P2_KEY3", "P2_KEY4"} };
-	uint8_t res;
-	int i;
+	uint8_t res = 0xff;
 
-	res = 0xff;
-
-	for(i=0;i<5;i++)
-	{
-		if(m_key_select & 1 << i)
-			res = ioport(keynames[0][i])->read();
-	}
+	if (BIT(m_key_select, 0)) res &= m_key[Player][0]->read();
+	if (BIT(m_key_select, 1)) res &= m_key[Player][1]->read();
+	if (BIT(m_key_select, 2)) res &= m_key[Player][2]->read();
+	if (BIT(m_key_select, 3)) res &= m_key[Player][3]->read();
+	if (BIT(m_key_select, 4)) res &= m_key[Player][4]->read();
 
 	return res;
 }
@@ -186,8 +184,8 @@ void lastbank_state::main_map(address_map &map)
 	map(0xa805, 0xa805).w("soundlatch1", FUNC(generic_latch_8_device::write));
 	map(0xa806, 0xa806).w("soundlatch2", FUNC(generic_latch_8_device::write));
 	map(0xa807, 0xa807).nopw(); // hopper?
-	map(0xa808, 0xa808).r(FUNC(lastbank_state::key_matrix_r));
-	map(0xa80c, 0xa80c).r(FUNC(lastbank_state::key_matrix_r));
+	map(0xa808, 0xa808).r(FUNC(lastbank_state::key_matrix_r<0>));
+	map(0xa80c, 0xa80c).r(FUNC(lastbank_state::key_matrix_r<1>));
 	map(0xa81c, 0xa81c).portr("DSW1");
 	map(0xa81d, 0xa81d).portr("DSW2");
 	map(0xa81e, 0xa81e).portr("DSW3");
@@ -291,6 +289,22 @@ static INPUT_PORTS_START( lastbank )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("2-3") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	// TODO
+	PORT_START("P2_KEY0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2_KEY1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2_KEY2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2_KEY3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2_KEY4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
@@ -555,7 +569,7 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::irq_scanline)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	if (scanline == 240 && (m_maincpu->irq_enable() & 4))
 	{
@@ -571,7 +585,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::irq_scanline)
 void lastbank_state::lastbank(machine_config &config)
 {
 	// basic machine hardware
-	TC0091LVC(config, m_maincpu, XTAL(14'318'181) / 4); //!!! TC0091LVC !!!
+	TC0091LVC(config, m_maincpu, 14.318181_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lastbank_state::main_map);
 	m_maincpu->set_tilemap_xoffs(0,192); // TODO: correct?
 
@@ -579,7 +593,7 @@ void lastbank_state::lastbank(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181) / 4));
+	z80_device &audiocpu(Z80(config, "audiocpu", 14.318181_MHz_XTAL / 4));
 	audiocpu.set_addrmap(AS_PROGRAM, &lastbank_state::audio_map);
 	audiocpu.set_addrmap(AS_IO, &lastbank_state::audio_io);
 	// yes, we have no interrupts
@@ -602,7 +616,7 @@ void lastbank_state::lastbank(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch1");
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	OKIM6295(config, m_oki, 1'000'000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.75);
+	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	ES8712(config, m_essnd, 0);
 	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
@@ -642,7 +656,7 @@ ROM_START( lastbank )
 	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
 ROM_END
 
-ROM_START( fever13 ) // ES-9410 PCB (TC0090LVC marked ES9402LA, Z80, ES8712,14'318'181 MHz XTAL, OKI M6295 with 1000J resonator, MSM6585 with 640J resonator)
+ROM_START( fever13 ) // ES-9410 PCB (TC0090LVC marked ES9402LA, Z80, ES8712, 14'318'181 MHz XTAL, OKI M6295 with 1000J resonator, MSM6585 with 640J resonator)
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "9.u9", 0x00000, 0x40000, CRC(a17a6a9c) SHA1(b2bff250d1ea879bcdd9bea92537975a168babc8) )
 
@@ -662,5 +676,5 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fever13,  0, lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // missing GFX dump
+GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fever13,  0, lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // missing GFX ROM dump

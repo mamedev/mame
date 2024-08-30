@@ -579,5 +579,5 @@ ROM_END
 
 
 GAME( 1992, cabaret,  0,      cabaret, cabaret, cabaret_state, init_cabaret,  ROT0, "AMT Co. Ltd.", "Cabaret Show",                 MACHINE_NOT_WORKING )
-GAME( 1992, double8l, 0,      cabaret, cabaret, cabaret_state, init_double8l, ROT0, "AMT Co. Ltd.", "Double 8 Lines",               MACHINE_NOT_WORKING ) // missing internal ROM dump
+GAME( 1992, double8l, 0,      cabaret, cabaret, cabaret_state, init_double8l, ROT0, "AMT Co. Ltd.", "Double 8 Line",                MACHINE_NOT_WORKING ) // missing internal ROM dump
 GAME( 1992, kungfua,  kungfu, cabaret, cabaret, cabaret_state, init_kungfua,  ROT0, "IGS",          "Kung Fu Fighters (IGS, v100)", MACHINE_NOT_WORKING ) // missing internal ROM dump
