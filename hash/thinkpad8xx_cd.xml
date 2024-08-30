@@ -23,7 +23,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="solaris_2_5_1_ppc">
+	<software name="sol_2_5_1_ppc">
 		<description>Solaris 2.5.1 PowerPC Platform Edition</description>
 		<year>1996</year>
 		<publisher>Sun Microsystem</publisher>
@@ -35,7 +35,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="solaris_desktop_ppc_1_1_ppc">
+	<software name="sol_dskp_1_1_ppc">
 		<description>Solaris Desktop 1.1 PowerPC Platform Edition</description>
 		<year>1996</year>
 		<publisher>Sun Microsystem</publisher>
@@ -47,7 +47,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="windowsnt_3_5_ppc">
+	<software name="win_nt_3_5_ppc">
 		<description>Windows NT Workstation 3.5 PowerPC Edition</description>
 		<year>1994</year>
 		<publisher>IBM</publisher>

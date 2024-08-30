@@ -8,9 +8,8 @@ All of the PowerPC ThinkPads could run Windows NT 3.51 and 4.0, AIX 4.1.x, and S
 Edition. It is also possible to run certain PowerPC versions of Linux on the 800 Series.
 
 Hardware for the 850 model:
--SCSI hard disk.
--SCSI CD-ROM drive.
--Two expansión slots for PCMCIA-like DRAM cards.
+-SCSI hard disk and SCSI CD-ROM drive (with a NCR 53C810 PCI-SCSI I/O Processor).
+-Two PC Card expansión slots (with a Ricoh RF53C366L PC Card interface controller and a MAX780 Dual-Slot PCMCIA Analog Power Controller).
 -Video: 
    -IBM 85G7815 (by Seiko/Epson).
    -Western Digital WD90C24A SVGA LCD controller.
@@ -28,6 +27,11 @@ Hardware for the 850 model:
     -Two 32k x 36bits IBM043614 burst SRAM (256k L2 cache total).
     -IDT71216 240K (16K x 15bit) cache-tag RAM.
     -33.333 MHz xtal (tripled for 100MHz system clock).
+-Dallas DS1585S RTC
+-Intel S82378ZB PCIset
+-Other ICs: Motorola XPC105ARX66CD, National Semiconductor DP87322VF, S-MOS 85G7814, S-MOS 85G2680
+
+More info: http://oldcomputer.info/portables/tp850/ibm_ppc_thinkpad_redbook.pdf
 
 ***********************************************************************************************************/
 
@@ -63,7 +67,7 @@ INPUT_PORTS_END
 
 void thinkpad8xx_state::thinkpad8xx(machine_config &config)
 {
-	PPC603(config, m_maincpu, 100'000'000); // IBM PPCI603eFC100BPQ
+	PPC603(config, m_maincpu, 33.333_MHz_XTAL * 3); // IBM PPCI603eFC100BPQ
 
 	H8325(config, "mcu", XTAL(10'000'000)); // Actually an H8/338 (HD6473388: 48k-byte ROM; 2k-byte RAM), unknown clock
 

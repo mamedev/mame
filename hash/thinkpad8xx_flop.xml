@@ -7,7 +7,7 @@ license:CC0-1.0
 
 	<!-- Operating systems -->
 
-	<software name="solaris_2_5_1_mdb_boot_ibm_ppc">
+	<software name="sol_251_ibm_ppc">
 		<description>Solaris MDB Boot 2.5.1 Release PowerPC Platform Edition (IBM Hardware Platform)</description>
 		<year>1996</year>
 		<publisher>Sun Microsystem</publisher>
