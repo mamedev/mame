@@ -16,7 +16,7 @@ Hardware for the 850 model:
    -Two Hitachi HM51S4260 262144 x 16bit DRAM (1MB of video display memory).
    -10.4" 640×480 or 800×600 screen.
 -Video capture:
-   -Brooktree BT812 NTSC/PAL to RGB/YCrCb Decoder.
+   -Brooktree Bt812 NTSC/PAL to RGB/YCrCb Decoder.
    -Two Hitachi HM530281 high speed 331776 x 8bit Frame buffer DRAM.
    -ASCII V7310AS (アスキー, Asukii) Video Capture Device.
 -Crystal CS4231 16bit stereo codec for audio.
@@ -27,9 +27,11 @@ Hardware for the 850 model:
     -Two 32k x 36bits IBM043614 burst SRAM (256k L2 cache total).
     -IDT71216 240K (16K x 15bit) cache-tag RAM.
     -33.333 MHz xtal (tripled for 100MHz system clock).
--Dallas DS1585S RTC
--Intel S82378ZB PCIset
--Other ICs: Motorola XPC105ARX66CD, National Semiconductor DP87322VF, S-MOS 85G7814, S-MOS 85G2680
+-Dallas DS1585S RTC.
+-Intel S82378ZB PCIset.
+-National Semiconductor DP87322VF (SuperI/O III, Floppy Disk Controller with Dual UARTs, Enhanced Parallel Port, and IDE Interface).
+-Motorola XPC105ARX66CD (PowerPC PCI Bridge/Memory Controller).
+-Other ICs: S-MOS 85G7814, S-MOS 85G2680
 
 More info: http://oldcomputer.info/portables/tp850/ibm_ppc_thinkpad_redbook.pdf
 
