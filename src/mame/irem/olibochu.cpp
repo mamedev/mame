@@ -195,7 +195,7 @@ void olibochu_state::palette(palette_device &palette) const
 	// create a lookup table for the palette
 	for (int i = 0; i < 0x20; i++)
 	{
-		bool bit0, bit1, bit2;
+		int bit0, bit1, bit2;
 
 		// red component
 		bit0 = BIT(prom[i], 0);
@@ -351,14 +351,14 @@ void olibochu_state::sound_command_w(offs_t offset, u8 data)
 	u16 const hi = m_sound_command & 0xffc0;
 	u16 const lo = m_sound_command & 0x003f;
 
-	// sound_command low bits (edge-triggered) = soundlatch d4-d7
+	// sound command low bits (edge-triggered) = soundlatch d4-d7
 	if (lo && lo != prev_lo)
 	{
 		c = count_leading_zeros_32(lo) - 26;
 		m_soundlatch[1]->write(c & 0xf);
 	}
 
-	// sound_command high bits = soundlatch d0-d3
+	// sound command high bits = soundlatch d0-d3
 	for (c = 0; c < 16 && !BIT(hi, c); c++) { }
 	m_soundlatch[0]->write((16 - c) & 0xf);
 }
