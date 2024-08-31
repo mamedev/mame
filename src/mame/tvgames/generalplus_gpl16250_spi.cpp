@@ -140,7 +140,7 @@ ROM_START( prailpls )
 	ROM_LOAD16_WORD_SWAP( "mx25l25635f.u9", 0x0000, 0x2000000, CRC(17faefb0) SHA1(1d31c5aa1a37882f74c08414f69c4285149352b7) )
 ROM_END
 
-ROM_START( anpansp )
+ROM_START( anpanbd )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
 
@@ -201,6 +201,6 @@ void generalplus_gpspispi_game_state::init_spi()
 CONS(2015, prailpls, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Takara Tomy", "Boku wa Plarail Untenshi Shinkansen de Ikou! Plus (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // has built-in screen, but can be connected to a TV
 
 // this is a half-head shaped unit, SHP13017-R1 main PCB  -  アンパンマン レッツゴー!育脳ドライブ きみものれるよ!アンパンマンごう 「それいけ!アンパンマン」 
-CONS(2014, anpansp,  0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "JoyPalette", "Anpanman Let's Go! Brain Drive (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2014, anpanbd,  0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "JoyPalette", "Anpanman Let's Go! Brain Drive (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2015, bkrankp,  0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
