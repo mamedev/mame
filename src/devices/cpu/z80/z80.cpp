@@ -578,10 +578,10 @@ void z80_device::device_start()
 	save_item(NAME(m_bc2.w));
 	save_item(NAME(m_de2.w));
 	save_item(NAME(m_hl2.w));
-	save_item(NAME(m_r));
-	save_item(NAME(m_r2));
-	save_item(NAME(m_q));
-	save_item(NAME(m_qtemp));
+	save_item(NAME(QT));
+	save_item(NAME(Q));
+	save_item(NAME(R));
+	save_item(NAME(R2));
 	save_item(NAME(m_iff1));
 	save_item(NAME(m_iff2));
 	save_item(NAME(m_halt));
@@ -595,11 +595,13 @@ void z80_device::device_start()
 	save_item(NAME(m_busack_state));
 	save_item(NAME(m_after_ei));
 	save_item(NAME(m_after_ldair));
-	save_item(NAME(m_ref));
+	save_item(NAME(m_ea));
 	save_item(NAME(m_tmp_irq_vector));
 	save_item(NAME(m_shared_addr.w));
 	save_item(NAME(m_shared_data.w));
 	save_item(NAME(m_shared_data2.w));
+	save_item(NAME(m_rtemp));
+	save_item(NAME(m_ref));
 
 	// Reset registers to their initial values
 	PRVPC = 0;
@@ -616,8 +618,10 @@ void z80_device::device_start()
 	m_bc2.w = 0;
 	m_de2.w = 0;
 	m_hl2.w = 0;
-	m_r = 0;
-	m_r2 = 0;
+	QT = 0;
+	Q = 0;
+	R = 0;
+	R2 = 0;
 	m_iff1 = 0;
 	m_iff2 = 0;
 	m_halt = 0;
@@ -632,6 +636,7 @@ void z80_device::device_start()
 	m_after_ei = false;
 	m_after_ldair = false;
 	m_ea = 0;
+	m_rtemp = 0;
 
 	space(AS_PROGRAM).cache(m_args);
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_opcodes);
