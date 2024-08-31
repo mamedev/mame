@@ -1,43 +1,37 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese, Roberto Fresca
-/***************************************************************************
+/**************************************************************************************************
 
-    Double Crown (c) 1997 Cadence Technology / Dyna
+Double Crown (c) 1997 Cadence Technology / Dyna
 
-    Driver by Angelo Salese
-    Additional work by Roberto Fresca.
+TODO:
+- Bogus "Hole" in main screen display;
+- Is the background pen really black?
+- Lots of unmapped I/Os (game doesn't make much use of the HW);
+- video / irq timings;
 
-    TODO:
-    - Bogus "Hole" in main screen display;
-    - Is the background pen really black?
-    - Lots of unmapped I/Os (game doesn't make much use of the HW);
-    - video / irq timings;
+Notes:
+- at POST the SW tries to write to the palette RAM in a banking fashion. HW left-over?
+- there are various $0030-$0033 ROM checks across the SW, changing these values to non-zero
+  effectively changes game functionality (cfr. matrix mode at POST), ROM overlay?
 
-    Notes:
-    - at POST the SW tries to write to the palette RAM in a banking fashion.
-      I think it's just an HW left-over.
-    - there are various bogus checks to ROM region throughout the whole SW
-      (0x0030-0x0033? O.o), trying to change the values of these ones changes
-      the functionality of the game, almost like that the DSWs are tied to
-      these ...
+===================================================================================================
 
-============================================================================
+Excellent System
+boardlabel: ES-9411B
 
-    Excellent System
-    boardlabel: ES-9411B
+28.6363 xtal
+ES-9409 QFP is 208 pins.. for graphics only?
+Z0840006PSC Zilog z80, is rated 6.17 MHz
+OKI M82C55A-2
+65764H-5 .. 64kbit ram CMOS
+2 * N341256P-25 - CMOS SRAM 256K-BIT(32KX8)
+4 * dipsw 8pos
+YMZ284-D (ay8910, but without i/o ports)
+MAXIM MAX693ACPE is a "Microprocessor Supervisory Circuit", for watchdog
+and for nvram functions.
 
-    28.6363 xtal
-    ES-9409 QFP is 208 pins.. for graphics only?
-    Z0840006PSC Zilog z80, is rated 6.17 MHz
-    OKI M82C55A-2
-    65764H-5 .. 64kbit ram CMOS
-    2 * N341256P-25 - CMOS SRAM 256K-BIT(32KX8)
-    4 * dipsw 8pos
-    YMZ284-D (ay8910, but without i/o ports)
-    MAXIM MAX693ACPE is a "Microprocessor Supervisory Circuit", for watchdog
-    and for nvram functions.
-
-***************************************************************************/
+**************************************************************************************************/
 
 
 #define MAIN_CLOCK          XTAL(28'636'363)
@@ -60,6 +54,7 @@
 
 namespace {
 
+// TODO: remove me, crashes in screen_update at first RAM-based char drawn ...
 #define DEBUG_VRAM
 
 class dblcrown_state : public driver_device
@@ -96,18 +91,17 @@ private:
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t vram_bank_r(offs_t offset);
 	void vram_bank_w(offs_t offset, uint8_t data);
-	void mux_w(uint8_t data);
-	uint8_t in_mux_r();
-	uint8_t in_mux_type_r();
+	void key_select_w(uint8_t data);
+	uint8_t key_matrix_r();
+	uint8_t key_pending_r();
 	void output_w(uint8_t data);
 	void lamps_w(uint8_t data);
 	void watchdog_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
-	void dblcrown_palette(palette_device &palette) const;
 
-	void dblcrown_io(address_map &map);
-	void dblcrown_map(address_map &map);
+	void main_map(address_map &map);
+	void main_io(address_map &map);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -122,7 +116,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_pal_ram;
 	std::unique_ptr<uint8_t[]> m_vram;
 	uint8_t m_vram_bank[2]{};
-	uint8_t m_mux_data = 0;
+	uint8_t m_key_select = 0;
 };
 
 void dblcrown_state::video_start()
@@ -161,7 +155,7 @@ uint32_t dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	{
 		for (x = 0; x < 64; x++)
 		{
-			uint16_t tile = ((m_vram[count]) | (m_vram[count + 1] << 8)) & 0xfff;
+			uint16_t tile = ((m_vram[count]) | (m_vram[count + 1] << 8)) & 0x7ff;
 			uint8_t col = (m_vram[count + 1] >> 4); // ok?
 
 			gfx->transpen(bitmap, cliprect, tile, col, 0, 0, x * 8, y * 8, 0);
@@ -252,28 +246,28 @@ void dblcrown_state::vram_bank_w(offs_t offset, uint8_t data)
 	m_vram_bank[offset] = data & 0xf;
 
 	if(data & 0xf0)
-		printf("vram bank = %02x\n",data);
+		logerror("Upper vram bank write = %02x\n",data);
 }
 
-void dblcrown_state::mux_w(uint8_t data)
+void dblcrown_state::key_select_w(uint8_t data)
 {
-	m_mux_data = data;
+	m_key_select = data;
 }
 
-uint8_t dblcrown_state::in_mux_r()
+uint8_t dblcrown_state::key_matrix_r()
 {
 	uint8_t res = 0;
 
 	for(int i = 0; i < 4; i++)
 	{
-		if(m_mux_data & 1 << i)
+		if(m_key_select & 1 << i)
 			res |= m_inputs[i]->read();
 	}
 
 	return res;
 }
 
-uint8_t dblcrown_state::in_mux_type_r()
+uint8_t dblcrown_state::key_pending_r()
 {
 	uint8_t res = 0xff;
 
@@ -286,47 +280,42 @@ uint8_t dblcrown_state::in_mux_type_r()
 	return res;
 }
 
+/*  bits
+ * 7654 3210
+ * ---- -x--  unknown (active after deal)
+ * ---- x---  Payout counter pulse
+ * ---x ----  Coin In counter pulse
+ * -x-- ----  unknown (active after deal)
+ * x-x- --xx  unknown
+ */
 void dblcrown_state::output_w(uint8_t data)
 {
-/*  bits
-  7654 3210
-  ---- -x--  unknown (active after deal)
-  ---- x---  Payout counter pulse
-  ---x ----  Coin In counter pulse
-  -x-- ----  unknown (active after deal)
-  x-x- --xx  unknown
-*/
-
-	machine().bookkeeping().coin_counter_w(0, data & 0x10);  /* Coin In counter pulse */
-	machine().bookkeeping().coin_counter_w(1 ,data & 0x08);  /* Payout counter pulse */
-//  popmessage("out: %02x", data);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));  /* Coin In counter pulse */
+	// TODO: should be hopper motor_w
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));  /* Payout counter pulse */
 }
 
-
+/*  bits
+ * 7654 3210
+ * ---- ---x  Deal
+ * ---- --x-  Bet
+ * ---- -x--  Cancel
+ * ---- x---  Hold 5
+ * ---x ----  Hold 4
+ * --x- ----  Hold 3
+ * -x-- ----  Hold 2
+ * x--- ----  Hold 1
+ */
 void dblcrown_state::lamps_w(uint8_t data)
 {
-/*  bits
-  7654 3210
-  ---- ---x  Deal
-  ---- --x-  Bet
-  ---- -x--  Cancel
-  ---- x---  Hold 5
-  ---x ----  Hold 4
-  --x- ----  Hold 3
-  -x-- ----  Hold 2
-  x--- ----  Hold 1
-*/
-
 	for (int n = 0; n < 8; n++)
 		m_lamps[n] = BIT(data, n);
 }
 
 void dblcrown_state::watchdog_w(uint8_t data)
-/*
-  Always 0x01...
-*/
 {
-	if (data & 0x01)      /* check for refresh value (0x01) */
+	// check for refresh value (0x01)
+	if (data & 0x01)
 	{
 		m_watchdog->watchdog_reset();
 	}
@@ -337,7 +326,7 @@ void dblcrown_state::watchdog_w(uint8_t data)
 }
 
 
-void dblcrown_state::dblcrown_map(address_map &map)
+void dblcrown_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
@@ -353,7 +342,7 @@ void dblcrown_state::dblcrown_map(address_map &map)
 
 }
 
-void dblcrown_state::dblcrown_io(address_map &map)
+void dblcrown_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
@@ -361,8 +350,8 @@ void dblcrown_state::dblcrown_io(address_map &map)
 	map(0x01, 0x01).portr("DSWB");
 	map(0x02, 0x02).portr("DSWC");
 	map(0x03, 0x03).portr("DSWD");
-	map(0x04, 0x04).r(FUNC(dblcrown_state::in_mux_r));
-	map(0x05, 0x05).r(FUNC(dblcrown_state::in_mux_type_r));
+	map(0x04, 0x04).r(FUNC(dblcrown_state::key_matrix_r));
+	map(0x05, 0x05).r(FUNC(dblcrown_state::key_pending_r));
 	map(0x10, 0x13).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x20, 0x21).w("ymz", FUNC(ymz284_device::address_data_w));
 	map(0x30, 0x30).w(FUNC(dblcrown_state::watchdog_w));
@@ -539,10 +528,6 @@ void dblcrown_state::machine_reset()
 }
 
 
-void dblcrown_state::dblcrown_palette(palette_device &palette) const
-{
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_state::dblcrown_irq_scanline)
 {
 	int scanline = param;
@@ -590,8 +575,8 @@ void dblcrown_state::dblcrown(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &dblcrown_state::dblcrown_map);
-	m_maincpu->set_addrmap(AS_IO, &dblcrown_state::dblcrown_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dblcrown_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &dblcrown_state::main_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(dblcrown_state::dblcrown_irq_scanline), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000));   /* 1000 ms. (minimal of MAX693A watchdog long timeout period with internal oscillator) */
@@ -607,14 +592,14 @@ void dblcrown_state::dblcrown(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dblcrown);
 
-	PALETTE(config, m_palette, FUNC(dblcrown_state::dblcrown_palette), 0x100);
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(dblcrown_state::lamps_w));
 	ppi.out_pb_callback().set(FUNC(dblcrown_state::bank_w));
-	ppi.out_pc_callback().set(FUNC(dblcrown_state::mux_w));
+	ppi.out_pc_callback().set(FUNC(dblcrown_state::key_select_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -647,5 +632,4 @@ ROM_END
 } // anonymous namespace
 
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT    COMPANY                FULLNAME                FLAGS                    LAYOUT  */
 GAMEL( 1997, dblcrown, 0,      dblcrown, dblcrown, dblcrown_state, empty_init, ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", MACHINE_IMPERFECT_GRAPHICS, layout_dblcrown ) // 1997 DYNA copyright in tile GFX
