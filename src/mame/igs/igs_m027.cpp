@@ -539,7 +539,10 @@ ROM_START( slqz3 )
 	// Internal ROM of IGS027A type G ARM based MCU
 	ROM_LOAD( "s11_027a.bin", 0x00000, 0x4000, CRC(abb8ef8b) SHA1(b8912fe38dc2ff3b1a718e9fe3c76eae30aad7dc) )
 
-	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF )
+	/* decrypted ROM from user1_encrypted is copied here at runtime */
+
+	ROM_REGION32_LE( 0x200000, "user1_encrypted", 0 ) // external ARM data / prg
 	ROM_LOAD( "u29", 0x000000, 0x200000, CRC(215fed1e) SHA1(c85d8695e0be1044ac206118c3fc0ddc7063aaf6) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
@@ -1449,7 +1452,7 @@ void igs_m027_state::init_zhongguo()
 
 void igs_m027_state::init_slqz3()
 {
-	slqz3_decrypt(machine());
+	m_decrypt_function = slqz3_decrypt;
 	m_igs017_igs031->set_text_reverse_bits(false);
 }
 

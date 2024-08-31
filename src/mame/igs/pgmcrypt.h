@@ -35,7 +35,7 @@ void lhzb4_decrypt(running_machine &machine);
 void fearless_decrypt(running_machine &machine);
 void superkds_decrypt(running_machine &machine);
 void pgm_decrypt_pgm3in1(running_machine &machine);
-void slqz3_decrypt(running_machine &machine);
+void slqz3_decrypt(running_machine &machine, u8* table);
 void fruitpar_decrypt(running_machine &machine);
 void oceanpar_decrypt(running_machine &machine);
 void amazonia_decrypt(running_machine &machine);
