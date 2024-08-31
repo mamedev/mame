@@ -90,7 +90,6 @@ void nmk16_state::video_init()
 	m_bgbank = 0;
 	m_mustang_bg_xscroll = 0;
 
-	m_dma_timer = timer_alloc(FUNC(nmk16_state::dma_callback), this);
 	save_pointer(NAME(m_spriteram_old), 0x1000/2);
 	save_pointer(NAME(m_spriteram_old2), 0x1000/2);
 	save_item(NAME(m_bgbank));
