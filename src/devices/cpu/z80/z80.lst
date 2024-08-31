@@ -627,15 +627,15 @@ macro   nsc800_take_interrupt
 	m_iff1 = m_iff2 = 0;
 	// 'interrupt latency' cycles
 	+ 7
-	if (m_nsc800_irq_state[NSC800_RSTA]) {
+	if (m_nsc800_irq_state[0]) {
 		TDAT = PC;
 		call wm16_sp
 		PC = 0x003c;
-	} else if (m_nsc800_irq_state[NSC800_RSTB]) {
+	} else if (m_nsc800_irq_state[1]) {
 		TDAT = PC;
 		call wm16_sp
 		PC = 0x0034;
-	} else if (m_nsc800_irq_state[NSC800_RSTC]) {
+	} else if (m_nsc800_irq_state[2]) {
 		TDAT = PC;
 		call wm16_sp
 		PC = 0x002c;
@@ -652,7 +652,7 @@ macro   nsc800_take_interrupt
 macro   ncs800:check_interrupts
 	if (m_nmi_pending) {
 		call take_nmi
-	} else if ((m_nsc800_irq_state[NSC800_RSTA] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTB] != CLEAR_LINE || m_nsc800_irq_state[NSC800_RSTC] != CLEAR_LINE) && m_iff1 && !m_after_ei) {
+	} else if ((m_nsc800_irq_state[0] != CLEAR_LINE || m_nsc800_irq_state[1] != CLEAR_LINE || m_nsc800_irq_state[2] != CLEAR_LINE) && m_iff1 && !m_after_ei) {
 		call nsc800_take_interrupt
 	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei) {
 		call take_interrupt

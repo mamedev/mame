@@ -680,13 +680,6 @@ void z80_device::device_start()
 	set_icountptr(m_icount);
 }
 
-void nsc800_device::device_start()
-{
-	z80_device::device_start();
-
-	save_item(NAME(m_nsc800_irq_state));
-}
-
 /****************************************************************************
  * Do a reset
  ****************************************************************************/
@@ -707,20 +700,9 @@ void z80_device::device_reset()
 	m_iff2 = 0;
 }
 
-void nsc800_device::device_reset()
-{
-	z80_device::device_reset();
-	memset(m_nsc800_irq_state, 0, sizeof(m_nsc800_irq_state));
-}
-
 void z80_device::do_op()
 {
 	#include "cpu/z80/z80.hxx"
-}
-
-void nsc800_device::do_op()
-{
-	#include "cpu/z80/ncs800.hxx"
 }
 
 /****************************************************************************
@@ -769,28 +751,6 @@ void z80_device::execute_set_input(int inputnum, int state)
 		break;
 
 	default:
-		break;
-	}
-}
-
-void nsc800_device::execute_set_input(int inputnum, int state)
-{
-	switch (inputnum)
-	{
-	case NSC800_RSTA:
-		m_nsc800_irq_state[NSC800_RSTA] = state;
-		break;
-
-	case NSC800_RSTB:
-		m_nsc800_irq_state[NSC800_RSTB] = state;
-		break;
-
-	case NSC800_RSTC:
-		m_nsc800_irq_state[NSC800_RSTC] = state;
-		break;
-
-	default:
-		z80_device::execute_set_input(inputnum, state);
 		break;
 	}
 }
@@ -901,10 +861,3 @@ device_memory_interface::space_config_vector z80_device::memory_space_config() c
 }
 
 DEFINE_DEVICE_TYPE(Z80, z80_device, "z80", "Zilog Z80")
-
-nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: z80_device(mconfig, NSC800, tag, owner, clock)
-{
-}
-
-DEFINE_DEVICE_TYPE(NSC800, nsc800_device, "nsc800", "National Semiconductor NSC800")

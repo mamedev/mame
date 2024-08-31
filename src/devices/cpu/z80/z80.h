@@ -9,12 +9,11 @@
 
 enum
 {
-	NSC800_RSTA = INPUT_LINE_IRQ0 + 1,
-	NSC800_RSTB,
-	NSC800_RSTC,
-	Z80_INPUT_LINE_WAIT,
+	Z80_INPUT_LINE_WAIT = INPUT_LINE_IRQ0 + 1,
 	Z80_INPUT_LINE_BOGUSWAIT, // WAIT pin implementation used to be nonexistent, please remove this when all drivers are updated with Z80_INPUT_LINE_WAIT
-	Z80_INPUT_LINE_BUSRQ
+	Z80_INPUT_LINE_BUSRQ,
+
+	Z80_INPUT_LINE_MAX
 };
 
 enum
@@ -193,26 +192,6 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)
-
-class nsc800_device : public z80_device
-{
-public:
-	nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	// device_t implementation
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
-	// device_execute_interface implementation
-	virtual u32 execute_input_lines() const noexcept override { return 7; }
-	virtual void execute_set_input(int inputnum, int state) override;
-
-	virtual void do_op() override;
-	u8 m_nsc800_irq_state[4]; // state of NSC800 restart interrupts A, B, C
-};
-
-DECLARE_DEVICE_TYPE(NSC800, nsc800_device)
 
 
 #endif // MAME_CPU_Z80_Z80_H
