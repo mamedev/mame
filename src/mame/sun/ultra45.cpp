@@ -49,7 +49,7 @@ ROM_START(ultra45)
 	ROM_LOAD( "chicago_4.25.9_cks_c1bd_s29al032d.u29", 0x000000, 0x400000, CRC(e08f3c4f) SHA1(87bd5c92f59121b5253c0c12d627d18401a01bf7) )
 
 	ROM_REGION(0x400000, "extra1", 0)
-	ROM_LOAD( "chicago_1.80.3_cks_8ee3_s29al032d.u81", 0x000000, 0x400000, BAD_DUMP CRC(0b18627e) SHA1(473fe575e0dad4467bb40cdb76234be354d67ac2) ) // Marked bad because checksum does not match with the one printed on the label
+	ROM_LOAD( "chicago_1.80.3_cks_8ee3_s29al032d.u81", 0x000000, 0x400000, CRC(0b18627e) SHA1(473fe575e0dad4467bb40cdb76234be354d67ac2) ) // checksum does not match with the one printed on the label, probably because a firmware update
 
 	ROM_REGION(0x021000, "extra2", 0)
 	ROM_LOAD( "d887_at45db011b.u77",                   0x000000, 0x021000, CRC(b6363183) SHA1(1769ffa968e0f79bbfa7bc147f8d6c179f5ca44b) )
