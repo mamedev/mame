@@ -45,7 +45,7 @@ void mgcs3_decrypt(running_machine &machine);
 void crzybugs_decrypt(running_machine &machine);
 void crzybugsj_decrypt(running_machine &machine);
 void qlgs_decrypt(running_machine &machine);
-void jking02_decrypt(running_machine &machine);
+void jking02_decrypt(running_machine& machine, u8* table);
 void luckycrs_decrypt(running_machine &machine);
 void olympic5_decrypt(running_machine &machine);
 void icescape_decrypt(running_machine &machine);

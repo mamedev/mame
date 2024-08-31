@@ -78,6 +78,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
+	virtual void device_post_load() override;
+
 private:
 	optional_shared_ptr<u32> m_igs_mainram;
 	required_device<cpu_device> m_maincpu;
@@ -92,6 +94,9 @@ private:
 	u32 lhdmg_unk2_r();
 	void unk2_w(u32 data);
 
+	u8 xor_read(offs_t offset, u8 data);
+	void xor_write(offs_t offset, u8 data);
+
 	void dsw_io_select_w(u32 data);
 
 	u8 ppi_porta_r();
@@ -101,9 +106,33 @@ private:
 	void pgm_create_dummy_internal_arm_region();
 	void igs_mahjong_map(address_map &map);
 
+	void do_decrypt();
+
 	u32 m_dsw_io_select;
 	u32 m_unk2_write_count;
+
+	u8 m_xortable[0x100];
+	int m_runtime_decrypt_done;
+
+	void (*m_decrypt_function)(running_machine &machine, u8* table) = nullptr;
 };
+
+void igs_m027_state::do_decrypt()
+{
+	if (m_decrypt_function)
+	{
+		m_decrypt_function(machine(), m_xortable);
+		m_runtime_decrypt_done = 1;
+	}
+}
+
+void igs_m027_state::device_post_load()
+{
+	// restore decrypted region
+	if (m_runtime_decrypt_done)
+		do_decrypt();
+}
+
 
 void igs_m027_state::video_start()
 {
@@ -114,9 +143,27 @@ void igs_m027_state::machine_start()
 {
 	m_dsw_io_select = 7;
 	m_unk2_write_count = 0;
+	m_runtime_decrypt_done = 0;
 
 	save_item(NAME(m_dsw_io_select));
 	save_item(NAME(m_unk2_write_count));
+	save_item(NAME(m_xortable));
+	save_item(NAME(m_runtime_decrypt_done));
+}
+
+u8 igs_m027_state::xor_read(offs_t offset, u8 data)
+{
+	return m_xortable[offset];
+}
+
+void igs_m027_state::xor_write(offs_t offset, u8 data)
+{
+	m_xortable[offset] = data;
+
+	if (offset == 0xff) // might not be the trigger
+	{
+		do_decrypt();
+	}
 }
 
 /***************************************************************************
@@ -134,7 +181,7 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
-	map(0x38008000, 0x38008003).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x000000ff);
+	map(0x38008000, 0x38008003).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask32(0x000000ff);
 
 	map(0x38009000, 0x38009003).r(FUNC(igs_m027_state::unk_r));
 
@@ -143,7 +190,7 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 	map(0x40000018, 0x4000001b).w(FUNC(igs_m027_state::dsw_io_select_w));
 
 	map(0x70000200, 0x70000203).ram(); // ??????????????
-	map(0x50000000, 0x500003ff).nopw(); // uploads XOR table to external ROM here
+	map(0x50000000, 0x500003ff).rw(FUNC(igs_m027_state::xor_read), FUNC(igs_m027_state::xor_write)).umask32(0x000000ff); // uploads XOR table to external ROM here
 	map(0xf0000000, 0xf000000f).nopw(); // magic registers
 }
 
@@ -706,7 +753,10 @@ ROM_START( jking02 ) // PCB-0367-05-FG-1
 	// Internal ROM of IGS027A type G ARM based MCU
 	ROM_LOAD( "j6_027a.bin", 0x0000, 0x4000, CRC(69e241f0) SHA1(1ae0aabb217c67ee6e7126f3f0f90c8b3e051888) ) // J6 holographic sticker
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF )
+	/* decrypted ROM from user1_encrypted is copied here at runtime */
+
+	ROM_REGION32_LE( 0x80000, "user1_encrypted", 0 ) // external ARM data / prg
 	ROM_LOAD( "j_k_2002_v-209us.u23", 0x00000, 0x80000, CRC(ef6b652b) SHA1(ee5c2cef2c7cbcd4a70e05c01295e964ca5e45d1) ) // 27C4096
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -1453,11 +1503,13 @@ void igs_m027_state::init_mgcs3()
 
 void igs_m027_state::init_jking02()
 {
-	jking02_decrypt(machine());
+	m_decrypt_function = jking02_decrypt;
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
 	// the sprite ROM at 0x400000 doesn't require decryption
 }
+
+
 
 void igs_m027_state::init_lthy()
 {
