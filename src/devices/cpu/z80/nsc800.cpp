@@ -59,7 +59,6 @@ void nsc800_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
-	case INPUT_LINE_IRQ0:
 	case NSC800_RSTA:
 		m_nsc800_irq_state[0] = state;
 		break;
