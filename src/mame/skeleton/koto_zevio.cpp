@@ -97,6 +97,10 @@ void zevio_state::zevio(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 }
 
+ROM_START( dbzscout )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mr27t6402l.ic6", 0x000000, 0x800000, CRC(9cb896d6) SHA1(4185ee4593c2ef3b637f6004d1f80dadd4530902) )
+ROM_END
 
 ROM_START( dbzonep )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
@@ -109,5 +113,5 @@ ROM_END
 
 } // anonymous namespace
 
-// 2007 - Dragon Ball Z: Scouter Battle Taikan Kamehameha: Ora to Omee to Scouter
+CONS( 2007, dbzscout,     0,              0,      zevio, zevio, zevio_state, empty_init, "Bandai / Koto", "Dragon Ball Z: Scouter Battle Taikan Kamehameha: Ora to Omee to Scouter (Japan)", MACHINE_IS_SKELETON )
 CONS( 2008, dbzonep,      0,              0,      zevio, zevio, zevio_state, empty_init, "Bandai / Koto", "Dragon Ball Z x One Piece: Battle Taikan Gum-Gum no Kamehameha: Omee no Koe de Ora o Yobu (Japan)", MACHINE_IS_SKELETON )

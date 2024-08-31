@@ -39301,21 +39301,21 @@ ssf2mdb
 twinktmb
 
 @source:sega/megadriv_rad.cpp
-rad_sf2                         // (c)2004 Radica
-rad_sf2uk                       // (c)2004 Radica
+dgunl3227
+mdtvp1j
+msi_sf2
+ra145
 rad_gen1                        // (c)2004 Radica
 rad_gen2                        // (c)2004 Radica
 rad_md1
 rad_md1uk
 rad_md2uk
-rad_ssoc                        // (c)2004 Radica
+rad_orun
+rad_sf2                         // (c)2004 Radica
+rad_sf2uk                       // (c)2004 Radica
 rad_sonic
 rad_sonicuk
-rad_orun
-mdtvp1j
-msi_sf2
-dgunl3227
-ra145
+rad_ssoc                        // (c)2004 Radica
 
 @source:sega/megadriv_sunmix.cpp
 sbubsm                          // (c) 1996 Sun Mixing
@@ -42208,6 +42208,7 @@ kkcount
 
 @source:skeleton/koto_zevio.cpp
 dbzonep                         //
+dbzscout
 
 @source:skeleton/kron.cpp
 kron180                         // 1995 Kron Ltd, Ukraine
@@ -45341,6 +45342,7 @@ jak_ths
 wrlshunt                        // Wireless: Hunting Video Game System
 
 @source:tvgames/generalplus_gpl16250_spi.cpp
+anpansp
 bkrankp
 prailpls
 

@@ -3,11 +3,11 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="daig" description="Takara Daigander DX cartridges">
+<softwarelist name="takara_daigander_dx_cart" description="Takara Daigander DX cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
 
-	<software name="romr01" supported="no">
-		<description>ROM R-01</description>
+	<software name="r01rom" supported="no">
+		<description>R-01 ROM - Robot Brion</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -17,8 +17,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="romr02" supported="no">
-		<description>ROM R-02</description>
+	<software name="r02rom" supported="no">
+		<description>R-02 ROM - Robot Bornrex</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
