@@ -27,6 +27,15 @@ TODO:
 
 #include "z80.inc"
 
+#define LOG_INT   (1U << 1) // z80.lst
+#define LOG_UNDOC (1U << 2)
+
+#define VERBOSE (LOG_UNDOC)
+#include "logmacro.h"
+
+#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
+#define LOGUNDOC(...) LOGMASKED(LOG_UNDOC, __VA_ARGS__)
+
 bool z80_device::tables_initialised = false;
 u8 z80_device::SZ[] = {};       // zero and sign flags
 u8 z80_device::SZ_BIT[] = {};   // zero, sign and parity/overflow (=zero) flags for BIT opcode
@@ -84,7 +93,7 @@ void z80_device::data_write(u16 addr, u8 value)
  ***************************************************************/
 u8 z80_device::opcode_read()
 {
-	return m_opcodes.read_byte(translate_memory_address(PCD));
+	return m_opcodes.read_byte(translate_memory_address(PC));
 }
 
 /****************************************************************
@@ -96,7 +105,7 @@ u8 z80_device::opcode_read()
  ***************************************************************/
 u8 z80_device::arg_read()
 {
-	return m_args.read_byte(translate_memory_address(PCD));
+	return m_args.read_byte(translate_memory_address(PC));
 }
 
 /***************************************************************
@@ -163,7 +172,7 @@ void z80_device::rra()
  ***************************************************************/
 void z80_device::add_a(u8 value)
 {
-	u32 ah = AFD & 0xff00;
+	u32 ah = AF & 0xff00;
 	u32 res = (u8)((ah >> 8) + value);
 	set_f(SZHVC_add[ah | res]);
 	A = res;
@@ -174,7 +183,7 @@ void z80_device::add_a(u8 value)
  ***************************************************************/
 void z80_device::adc_a(u8 value)
 {
-	u32 ah = AFD & 0xff00, c = AFD & 1;
+	u32 ah = AF & 0xff00, c = AF & 1;
 	u32 res = (u8)((ah >> 8) + value + c);
 	set_f(SZHVC_add[(c << 16) | ah | res]);
 	A = res;
@@ -185,7 +194,7 @@ void z80_device::adc_a(u8 value)
  ***************************************************************/
 void z80_device::sub(u8 value)
 {
-	u32 ah = AFD & 0xff00;
+	u32 ah = AF & 0xff00;
 	u32 res = (u8)((ah >> 8) - value);
 	set_f(SZHVC_sub[ah | res]);
 	A = res;
@@ -196,7 +205,7 @@ void z80_device::sub(u8 value)
  ***************************************************************/
 void z80_device::sbc_a(u8 value)
 {
-	u32 ah = AFD & 0xff00, c = AFD & 1;
+	u32 ah = AF & 0xff00, c = AF & 1;
 	u32 res = (u8)((ah >> 8) - value - c);
 	set_f(SZHVC_sub[(c << 16) | ah | res]);
 	A = res;
@@ -266,7 +275,7 @@ void z80_device::xor_a(u8 value)
 void z80_device::cp(u8 value)
 {
 	unsigned val = value;
-	u32 ah = AFD & 0xff00;
+	u32 ah = AF & 0xff00;
 	u32 res = (u8)((ah >> 8) - val);
 	set_f((SZHVC_sub[ah | res] & ~(YF | XF)) | (val & (YF | XF)));
 }
@@ -460,13 +469,13 @@ void z80_device::set_f(u8 f)
 void z80_device::illegal_1()
 {
 	LOGUNDOC("ill. opcode $%02x $%02x ($%04x)\n",
-			 m_opcodes.read_byte(translate_memory_address((PCD - 1) & 0xffff)), m_opcodes.read_byte(translate_memory_address(PCD)), PCD - 1);
+			 m_opcodes.read_byte(translate_memory_address((PC - 1) & 0xffff)), m_opcodes.read_byte(translate_memory_address(PC)), PC - 1);
 }
 
 void z80_device::illegal_2()
 {
 	LOGUNDOC("ill. opcode $ed $%02x\n",
-			 m_opcodes.read_byte(translate_memory_address((PCD - 1) & 0xffff)));
+			 m_opcodes.read_byte(translate_memory_address((PC - 1) & 0xffff)));
 }
 
 /****************************************************************************
@@ -555,7 +564,7 @@ void z80_device::device_start()
 		tables_initialised = true;
 	}
 
-	save_item(NAME(m_prvpc.w.l));
+	save_item(NAME(PRVPC));
 	save_item(NAME(PC));
 	save_item(NAME(SP));
 	save_item(NAME(AF));
@@ -565,14 +574,14 @@ void z80_device::device_start()
 	save_item(NAME(IX));
 	save_item(NAME(IY));
 	save_item(NAME(WZ));
-	save_item(NAME(m_af2.w.l));
-	save_item(NAME(m_bc2.w.l));
-	save_item(NAME(m_de2.w.l));
-	save_item(NAME(m_hl2.w.l));
-	save_item(NAME(m_r));
-	save_item(NAME(m_r2));
-	save_item(NAME(m_q));
-	save_item(NAME(m_qtemp));
+	save_item(NAME(m_af2.w));
+	save_item(NAME(m_bc2.w));
+	save_item(NAME(m_de2.w));
+	save_item(NAME(m_hl2.w));
+	save_item(NAME(QT));
+	save_item(NAME(Q));
+	save_item(NAME(R));
+	save_item(NAME(R2));
 	save_item(NAME(m_iff1));
 	save_item(NAME(m_iff2));
 	save_item(NAME(m_halt));
@@ -586,29 +595,33 @@ void z80_device::device_start()
 	save_item(NAME(m_busack_state));
 	save_item(NAME(m_after_ei));
 	save_item(NAME(m_after_ldair));
-	save_item(NAME(m_ref));
+	save_item(NAME(m_ea));
 	save_item(NAME(m_tmp_irq_vector));
 	save_item(NAME(m_shared_addr.w));
 	save_item(NAME(m_shared_data.w));
 	save_item(NAME(m_shared_data2.w));
+	save_item(NAME(m_rtemp));
+	save_item(NAME(m_ref));
 
 	// Reset registers to their initial values
 	PRVPC = 0;
-	PCD = 0;
-	SPD = 0;
-	AFD = 0;
-	BCD = 0;
-	DED = 0;
-	HLD = 0;
-	IXD = 0;
-	IYD = 0;
+	PC = 0;
+	SP = 0;
+	AF = 0;
+	BC = 0;
+	DE = 0;
+	HL = 0;
+	IX = 0;
+	IY = 0;
 	WZ = 0;
-	m_af2.d = 0;
-	m_bc2.d = 0;
-	m_de2.d = 0;
-	m_hl2.d = 0;
-	m_r = 0;
-	m_r2 = 0;
+	m_af2.w = 0;
+	m_bc2.w = 0;
+	m_de2.w = 0;
+	m_hl2.w = 0;
+	QT = 0;
+	Q = 0;
+	R = 0;
+	R2 = 0;
 	m_iff1 = 0;
 	m_iff2 = 0;
 	m_halt = 0;
@@ -623,6 +636,7 @@ void z80_device::device_start()
 	m_after_ei = false;
 	m_after_ldair = false;
 	m_ea = 0;
+	m_rtemp = 0;
 
 	space(AS_PROGRAM).cache(m_args);
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_opcodes);
@@ -633,8 +647,8 @@ void z80_device::device_start()
 	set_f(ZF);        // Zero flag is set
 
 	// set up the state table
-	state_add(STATE_GENPC,     "PC",        m_pc.w.l).callimport();
-	state_add(STATE_GENPCBASE, "CURPC",     m_prvpc.w.l).callimport().noshow();
+	state_add(STATE_GENPC,     "PC",        m_pc.w).callimport();
+	state_add(STATE_GENPCBASE, "CURPC",     m_prvpc.w).callimport().noshow();
 	state_add(Z80_SP,          "SP",        SP);
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  F).noshow().formatstr("%8s");
 	state_add(Z80_A,           "A",         A).noshow();
@@ -650,10 +664,10 @@ void z80_device::device_start()
 	state_add(Z80_HL,          "HL",        HL);
 	state_add(Z80_IX,          "IX",        IX);
 	state_add(Z80_IY,          "IY",        IY);
-	state_add(Z80_AF2,         "AF2",       m_af2.w.l);
-	state_add(Z80_BC2,         "BC2",       m_bc2.w.l);
-	state_add(Z80_DE2,         "DE2",       m_de2.w.l);
-	state_add(Z80_HL2,         "HL2",       m_hl2.w.l);
+	state_add(Z80_AF2,         "AF2",       m_af2.w);
+	state_add(Z80_BC2,         "BC2",       m_bc2.w);
+	state_add(Z80_DE2,         "DE2",       m_de2.w);
+	state_add(Z80_HL2,         "HL2",       m_hl2.w);
 	state_add(Z80_WZ,          "WZ",        WZ);
 	state_add(Z80_R,           "R",         m_rtemp).callimport().callexport();
 	state_add(Z80_I,           "I",         m_i);
@@ -666,13 +680,6 @@ void z80_device::device_start()
 	set_icountptr(m_icount);
 }
 
-void nsc800_device::device_start()
-{
-	z80_device::device_start();
-
-	save_item(NAME(m_nsc800_irq_state));
-}
-
 /****************************************************************************
  * Do a reset
  ****************************************************************************/
@@ -682,6 +689,7 @@ void z80_device::device_reset()
 
 	m_ref = 0xffff00;
 	PC = 0x0000;
+	WZ = PC;
 	m_i = 0;
 	m_r = 0;
 	m_r2 = 0;
@@ -690,24 +698,11 @@ void z80_device::device_reset()
 	m_after_ldair = false;
 	m_iff1 = 0;
 	m_iff2 = 0;
-
-	WZ = PCD;
-}
-
-void nsc800_device::device_reset()
-{
-	z80_device::device_reset();
-	memset(m_nsc800_irq_state, 0, sizeof(m_nsc800_irq_state));
 }
 
 void z80_device::do_op()
 {
 	#include "cpu/z80/z80.hxx"
-}
-
-void nsc800_device::do_op()
-{
-	#include "cpu/z80/ncs800.hxx"
 }
 
 /****************************************************************************
@@ -756,28 +751,6 @@ void z80_device::execute_set_input(int inputnum, int state)
 		break;
 
 	default:
-		break;
-	}
-}
-
-void nsc800_device::execute_set_input(int inputnum, int state)
-{
-	switch (inputnum)
-	{
-	case NSC800_RSTA:
-		m_nsc800_irq_state[NSC800_RSTA] = state;
-		break;
-
-	case NSC800_RSTB:
-		m_nsc800_irq_state[NSC800_RSTB] = state;
-		break;
-
-	case NSC800_RSTC:
-		m_nsc800_irq_state[NSC800_RSTC] = state;
-		break;
-
-	default:
-		z80_device::execute_set_input(inputnum, state);
 		break;
 	}
 }
@@ -888,10 +861,3 @@ device_memory_interface::space_config_vector z80_device::memory_space_config() c
 }
 
 DEFINE_DEVICE_TYPE(Z80, z80_device, "z80", "Zilog Z80")
-
-nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: z80_device(mconfig, NSC800, tag, owner, clock)
-{
-}
-
-DEFINE_DEVICE_TYPE(NSC800, nsc800_device, "nsc800", "National Semiconductor NSC800")

@@ -2914,15 +2914,36 @@ TIMER_DEVICE_CALLBACK_MEMBER(adillor_state::trackball_interrupt)
 TIMER_DEVICE_CALLBACK_MEMBER(adillor_state::trackball_update)
 {
 	// arbitrary timer for reading optical trackball
+	u32 const trackval[2] = { m_opt[0]->read(), m_opt[1]->read() };
+	s32 delta[2] = { s32(trackval[0] - m_trackball_count[0]), s32(trackval[1] - m_trackball_count[1]) };
+	m_trackball_count[0] = trackval[0];
+	m_trackball_count[1] = trackval[1];
+	if (delta[0] > 0x8000)
+		delta[0] -= 0x10000;
+	else if (delta[0] < -0x8000)
+		delta[0] += 0x10000;
+	if (delta[1] > 0x8000)
+		delta[1] -= 0x10000;
+	else if (delta[1] < -0x8000)
+		delta[1] += 0x10000;
+	m_trackball_residual[0] += delta[0];
+	m_trackball_residual[1] += delta[1];
+	int const speed[2] = { std::clamp<s32>(m_trackball_residual[0], -0x7f, 0x7f), std::clamp<s32>(m_trackball_residual[1], -0x7f, 0x7f) };
+	m_trackball_residual[0] -= speed[0];
+	m_trackball_residual[1] -= speed[1];
+
 	// -1.0 .. 1.0
-	double x = (double)(int)(m_opt[0]->read() - 0x80) / 127.0;
-	double y = (double)(int)(m_opt[1]->read() - 0x80) / 127.0;
+	double x = speed[0] / 127.0;
+	double y = speed[1] / 127.0;
 
 	// note that it is rotated by 45 degrees, so instead of axes like (+), they are like (x)
-	double ox = x, oy = y;
-	double a = M_PI / 4.0;
-	x = ox*cos(a) - oy*sin(a);
-	y = ox*sin(a) + oy*cos(a);
+	if (BIT(m_config_switches->read(), 1))
+	{
+		double const ox = x, oy = y;
+		double const a = M_PI / 4.0;
+		x = ox*cos(a) - oy*sin(a);
+		y = ox*sin(a) + oy*cos(a);
+	}
 
 	// tied to mcu A2/A3 timer (speed determines frequency)
 	double t[2];
@@ -3443,10 +3464,10 @@ static INPUT_PORTS_START( adillor )
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("OPT.0")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(8) PORT_NAME("Trackball X")
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(0x100) PORT_KEYDELTA(0x10)
 
 	PORT_START("OPT.1")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(8) PORT_NAME("Trackball Y") PORT_REVERSE
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(0x100) PORT_KEYDELTA(0x10) PORT_REVERSE
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x00010000, 0x00010000, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
@@ -3465,6 +3486,9 @@ static INPUT_PORTS_START( adillor )
 	PORT_CONFNAME( 0x01, 0x00, "Enable Dev Inputs" )
 	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_CONFNAME( 0x02, 0x02, "Trackball Orientation" )
+	PORT_CONFSETTING(    0x00, "Direct" )
+	PORT_CONFSETTING(    0x02, "Natural" )
 
 	PORT_START("CUSTOM.0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Enter")
@@ -3737,6 +3761,14 @@ void alpine_state::machine_start()
 	namcos22s_state::machine_start();
 
 	save_item(NAME(m_motor_status));
+}
+
+void adillor_state::machine_start()
+{
+	namcos22s_state::machine_start();
+
+	save_item(NAME(m_trackball_count));
+	save_item(NAME(m_trackball_residual));
 }
 
 // System22

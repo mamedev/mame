@@ -47,11 +47,7 @@ public:
 		m_igs017_igs031(*this, "igs017_igs031"),
 		m_screen(*this, "screen"),
 		m_oki(*this, "oki"),
-		m_portb(*this, "PORTB"),
-		m_portc(*this, "PORTC"),
-		m_dsw1(*this, "DSW1"),
-		m_dsw2(*this, "DSW2"),
-		m_dsw3(*this, "DSW3")
+		m_dsw(*this, "DSW%u", 1U)
 	{ }
 
 	void igs_mahjong(machine_config &config);
@@ -59,7 +55,6 @@ public:
 	void init_sdwx();
 	void init_chessc2();
 	void init_lhzb4();
-	void init_lhzb3();
 	void init_gonefsh2();
 	void init_sddz();
 	void init_zhongguo();
@@ -90,11 +85,7 @@ private:
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	required_device<screen_device> m_screen;
 	required_device<okim6295_device> m_oki;
-	required_ioport m_portb;
-	required_ioport m_portc;
-	required_ioport m_dsw1;
-	required_ioport m_dsw2;
-	required_ioport m_dsw3;
+	required_ioport_array<3> m_dsw;
 
 	u32 unk_r();
 	u32 unk2_r();
@@ -104,8 +95,6 @@ private:
 	void dsw_io_select_w(u32 data);
 
 	u8 ppi_porta_r();
-	u8 ppi_portb_r();
-	u8 ppi_portc_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
@@ -123,7 +112,7 @@ void igs_m027_state::video_start()
 
 void igs_m027_state::machine_start()
 {
-	m_dsw_io_select = 0;
+	m_dsw_io_select = 7;
 	m_unk2_write_count = 0;
 
 	save_item(NAME(m_dsw_io_select));
@@ -153,7 +142,7 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027_state::unk2_r));
 	map(0x40000018, 0x4000001b).w(FUNC(igs_m027_state::dsw_io_select_w));
 
-	map(0x70000200, 0x70000203).ram();     //??????????????
+	map(0x70000200, 0x70000203).ram(); // ??????????????
 	map(0x50000000, 0x500003ff).nopw(); // uploads XOR table to external ROM here
 	map(0xf0000000, 0xf000000f).nopw(); // magic registers
 }
@@ -165,7 +154,6 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 ***************************************************************************/
 
 static INPUT_PORTS_START( base )
-
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
@@ -281,7 +269,6 @@ static INPUT_PORTS_START( jking02 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // maybe bet?
 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) // maybe start?
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( qlgs )
@@ -291,7 +278,6 @@ static INPUT_PORTS_START( qlgs )
 	PORT_DIPNAME( 0x04, 0x00, "Link Mode" )
 	PORT_DIPSETTING(    0x04, "Linked" )
 	PORT_DIPSETTING(    0x00, "Standalone" )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( amazonia )
@@ -379,22 +365,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_state::interrupt)
 
 u8 igs_m027_state::ppi_porta_r()
 {
-	logerror("%s: ppi_porta_r\n", machine().describe_context());
-	return 0xff;
-}
+	u8 data = 0xff;
 
-u8 igs_m027_state::ppi_portb_r()
-{
-	logerror("%s: ppi_portb_r\n", machine().describe_context());
-	return m_portb->read();
-}
+	for (int i = 0; i < 3; i++)
+		if (!BIT(m_dsw_io_select, i))
+			data &= m_dsw[i]->read();
 
-u8 igs_m027_state::ppi_portc_r()
-{
-	logerror("%s: ppi_portc_r\n", machine().describe_context());
-	return m_portc->read();
+	return data;
 }
-
 
 void igs_m027_state::dsw_io_select_w(u32 data)
 {
@@ -459,12 +437,12 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(igs_m027_state::ppi_porta_r));
-	m_ppi->in_pb_callback().set(FUNC(igs_m027_state::ppi_portb_r));
-	m_ppi->in_pc_callback().set(FUNC(igs_m027_state::ppi_portc_r));
+	m_ppi->in_pb_callback().set_ioport("PORTB");
+	m_ppi->in_pc_callback().set_ioport("PORTC");
 
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_text_reverse_bits();
+	m_igs017_igs031->set_text_reverse_bits(true);
 	m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound hardware
@@ -518,7 +496,7 @@ ROM_START( slqz3 )
 	ROM_LOAD( "u29", 0x000000, 0x200000, CRC(215fed1e) SHA1(c85d8695e0be1044ac206118c3fc0ddc7063aaf6) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD16_WORD_SWAP( "u9",  0x000000, 0x080000, CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
+	ROM_LOAD( "u9",  0x000000, 0x080000, CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "u18", 0x000000, 0x400000, CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
@@ -831,13 +809,13 @@ ROM_END
 ROM_START( lhzb3 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "lhzb3_igs027a", 0x00000, 0x4000, NO_DUMP ) // unknown sticker
+	ROM_LOAD( "b6_igs027a", 0x00000, 0x4000, CRC(75645f8c) SHA1(738fba64a906f4f10e78e332ad30b8da9dc86b21) )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "lhzb3_104.u9", 0x000000, 0x80000, CRC(70d61846) SHA1(662b59702ef6f26129de6b16346786df92f99097) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD16_WORD_SWAP( "lhzb3_text.u17", 0x000000, 0x80000,CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
+	ROM_LOAD( "lhzb3_text.u17", 0x000000, 0x80000,CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "m2401.u18", 0x000000, 0x400000,  CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) )
@@ -900,7 +878,7 @@ ROM_START( lhdmg ) // appears to be a different edition of lhzb3 and lthy (GFX a
 	ROM_LOAD( "lhdmg_prg.u9", 0x000000, 0x80000, CRC(3b3a77ac) SHA1(c1c40e02d04dc701aa65b7e255b9a928cbecdb8d) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD16_WORD_SWAP( "m2403.u17", 0x000000, 0x80000, CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
+	ROM_LOAD( "m2403.u17", 0x000000, 0x80000, CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "m2401.u18", 0x000000, 0x400000, CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
@@ -918,7 +896,7 @@ ROM_START( lhdmgp ) // appears to be a different edition of lhzb3 and lthy (GFX 
 	ROM_LOAD( "lhdmg_plus_prg.u9", 0x000000, 0x80000, CRC(77dd7855) SHA1(f04995ee34ef9245dcf3d66fcf111fa377394f92) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD16_WORD_SWAP( "m2403.u17", 0x000000, 0x80000, CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
+	ROM_LOAD( "m2403.u17", 0x000000, 0x80000, CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "m2401.u18", 0x000000, 0x400000, CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
@@ -982,7 +960,7 @@ ROM_START( zhongguo )
 	ROM_LOAD( "p2600.u10", 0x000000, 0x80000, CRC(9ad34135) SHA1(54717753d1296efe49946369fd4a27181f19dbc0) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD16_WORD_SWAP( "t2604.u9", 0x000000, 0x80000, CRC(5401a52d) SHA1(05b47a4b39939c1d5904e3fbd5cc56d6ee9b7953) )
+	ROM_LOAD( "t2604.u9", 0x000000, 0x80000, CRC(5401a52d) SHA1(05b47a4b39939c1d5904e3fbd5cc56d6ee9b7953) )
 
 	ROM_REGION( 0x480000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "m2601.u17", 0x000000, 0x400000, CRC(89736e3f) SHA1(6a22e2eb10d2c740cf21640c43a8caf4c72d3be7) )
@@ -1003,7 +981,7 @@ ROM_START( mgzz )
 	ROM_LOAD( "mgfx_101.u10", 0x000000, 0x80000, CRC(897c88a1) SHA1(0f7a7808b9503ff28ad32c0b8e071cb24cff59b1) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD16_WORD_SWAP( "mgfx_text.u9", 0x000000, 0x80000, CRC(e41e7768) SHA1(3d0add7c75c23533309e799fd8853c815e6f811c) )
+	ROM_LOAD( "mgfx_text.u9", 0x000000, 0x80000, CRC(e41e7768) SHA1(3d0add7c75c23533309e799fd8853c815e6f811c) )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "mgfx_ani.u17", 0x000000, 0x400000, CRC(9fc75f4d) SHA1(acb600739dcf252a5210e28ec96d749573061b27) )
@@ -1022,7 +1000,7 @@ ROM_START( mgzza ) // IGS PCB 0295-00 (IGS027A, M6295, IGS031, 8255, Battery)
 	ROM_LOAD( "v-100cn.u10", 0x000000, 0x80000, CRC(278964f7) SHA1(75e48e3124d038f16f93fe3c1f63dd1568f0c018) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD16_WORD_SWAP( "text.u9", 0x000000, 0x80000, CRC(10792638) SHA1(ae5d93659140252da332a3dd03cb188ddf79ad5a) )
+	ROM_LOAD( "text.u9", 0x000000, 0x80000, CRC(10792638) SHA1(ae5d93659140252da332a3dd03cb188ddf79ad5a) )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "cg.u17", 0x000000, 0x400000, CRC(1643fa78) SHA1(4c08b62d3dd7171a9ad3182634f66befa82cb581) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
@@ -1076,7 +1054,7 @@ ROM_START( lthy ) // appears to be a different edition of lhzb3 (GFX and sound R
 	ROM_LOAD( "27c4096.u10", 0x000000, 0x80000, CRC(bd04f2e9) SHA1(3d5a2101c7214a37f159e0d17f3e66a9b6ab94ff) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD16_WORD_SWAP( "27c4096.u9", 0x000000, 0x80000, CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
+	ROM_LOAD( "27c4096.u9", 0x000000, 0x80000, CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "m2401.u17", 0x000000, 0x400000, CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
@@ -1399,13 +1377,6 @@ void igs_m027_state::init_lhzb4()
 	pgm_create_dummy_internal_arm_region();
 }
 
-void igs_m027_state::init_lhzb3()
-{
-	lhzb3_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt();
-	pgm_create_dummy_internal_arm_region();
-}
-
 void igs_m027_state::init_sddz()
 {
 	sddz_decrypt(machine());
@@ -1423,15 +1394,13 @@ void igs_m027_state::init_gonefsh2()
 void igs_m027_state::init_zhongguo()
 {
 	zhongguo_decrypt(machine());
-	m_igs017_igs031->mgcs_decrypt_tiles(); // close, but wrong, see copyright date
-	// sprites aren't encrypted
+	m_igs017_igs031->set_text_reverse_bits(false);
 }
 
 void igs_m027_state::init_slqz3()
 {
 	slqz3_decrypt(machine());
-	//m_igs017_igs031->slqz3_decrypt_tiles(); // none of the existing functions are correct for this
-	// sprite gfx not encrypted
+	m_igs017_igs031->set_text_reverse_bits(false);
 }
 
 void igs_m027_state::init_fruitpar()
@@ -1472,6 +1441,7 @@ void igs_m027_state::init_qlgs()
 void igs_m027_state::init_mgzz()
 {
 	mgzz_decrypt(machine());
+	m_igs017_igs031->set_text_reverse_bits(false);
 }
 
 void igs_m027_state::init_mgcs3()
@@ -1492,8 +1462,7 @@ void igs_m027_state::init_jking02()
 void igs_m027_state::init_lthy()
 {
 	lthy_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(); // wrong
-	//pgm_create_dummy_internal_arm_region();
+	m_igs017_igs031->set_text_reverse_bits(false);
 }
 
 void igs_m027_state::init_luckycrs()
@@ -1513,16 +1482,14 @@ void igs_m027_state::init_olympic5()
 void igs_m027_state::init_lhdmg()
 {
 	lhdmg_decrypt(machine());
-	//qlgs_gfx_decrypt(machine());
-	//pgm_create_dummy_internal_arm_region();
+	m_igs017_igs031->set_text_reverse_bits(false);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000000c, 0x4000000f, read32smo_delegate(*this, FUNC(igs_m027_state::lhdmg_unk2_r)));
 }
 
 void igs_m027_state::init_lhdmgp()
 {
 	lhdmgp_decrypt(machine());
-	//qlgs_gfx_decrypt(machine());
-	//pgm_create_dummy_internal_arm_region();
+	m_igs017_igs031->set_text_reverse_bits(false);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000000c, 0x4000000f, read32smo_delegate(*this, FUNC(igs_m027_state::lhdmg_unk2_r)));
 }
 
@@ -1542,11 +1509,12 @@ GAME( 1999, qlgs,      0,        igs_mahjong, qlgs,     igs_m027_state, init_qlg
 GAME( 1999, fruitpar,  0,        igs_mahjong, base,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_IS_SKELETON )
 GAME( 1999, lhdmg,     0,        igs_mahjong, base,     igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Man Guan", MACHINE_IS_SKELETON )
 GAME( 1999, lhdmgp,    lhdmg,    igs_mahjong, base,     igs_m027_state, init_lhdmgp,   ROT0, "IGS", "Long Hu Da Man Guan Plus", MACHINE_IS_SKELETON )
+GAME( 1999, lhzb3,     lhdmg,    igs_mahjong, base,     igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III", MACHINE_IS_SKELETON ) // 龙虎争霸Ⅲ
 GAME( 1999, lthy,      0,        igs_mahjong, base,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_IS_SKELETON )
 GAME( 2000, zhongguo,  0,        igs_mahjong, base,     igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhong Guo Chu Da D", MACHINE_IS_SKELETON )
 GAME( 200?, jking02,   0,        igs_mahjong, jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_IS_SKELETON )
 GAME( 2003, mgzz,      0,        igs_mahjong, base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V101CN)", MACHINE_IS_SKELETON )
-GAME( 2000, mgzza,     0,        igs_mahjong, base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_IS_SKELETON )
+GAME( 2000, mgzza,     mgzz,     igs_mahjong, base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_IS_SKELETON )
 GAME( 2007, mgcs3,     0,        igs_mahjong, base,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)", MACHINE_IS_SKELETON )
 
 // Incomplete dumps
@@ -1560,7 +1528,6 @@ GAME( 2003, olympic5a, olympic5, igs_mahjong, base,     igs_m027_state, init_oly
 GAME( 2003, amazoni2,  0,        igs_mahjong, base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_IS_SKELETON )
 GAME( 2002, sdwx,      0,        igs_mahjong, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME( 200?, sddz,      0,        igs_mahjong, base,     igs_m027_state, init_sddz,     ROT0, "IGS", "Super Dou Di Zhu", MACHINE_IS_SKELETON )
-GAME( 200?, lhzb3,     0,        igs_mahjong, base,     igs_m027_state, init_lhzb3,    ROT0, "IGS", "Long Hu Zhengba III", MACHINE_IS_SKELETON ) // 龙虎争霸Ⅲ
 GAME( 2004, lhzb4,     0,        igs_mahjong, base,     igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4", MACHINE_IS_SKELETON ) // 龙虎争霸4
 GAME( 200?, klxyj,     0,        igs_mahjong, base,     igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji", MACHINE_IS_SKELETON )
 GAME( 200?, extradrw,  0,        igs_mahjong, base,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Extra Draw", MACHINE_IS_SKELETON )

@@ -213,7 +213,7 @@ void horizon_state::horizon(machine_config &config)
 
 	// S-100
 	S100_BUS(config, m_s100, XTAL(8'000'000) / 4);
-	m_s100->rdy().set_inputline(m_maincpu, Z80_INPUT_LINE_BOGUSWAIT);
+	//m_s100->rdy().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT);
 	//S100_SLOT(config, S100_TAG":1", horizon_s100_cards, nullptr, nullptr); // CPU
 	S100_SLOT(config, "s100:2", horizon_s100_cards, nullptr); // RAM
 	S100_SLOT(config, "s100:3", horizon_s100_cards, "mdsad"); // MDS

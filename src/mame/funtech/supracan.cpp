@@ -9,6 +9,9 @@
     Preliminary driver by Angelo Salese
     Improvements by Ryan Holtz
 
+References:
+- https://gist.github.com/evadot/66cfdb8891544b41b4c9
+- https://upload.wikimedia.org/wikipedia/commons/0/0b/Super-Acan-Motherboard-01.jpg
 
 *******************************************************************************
 

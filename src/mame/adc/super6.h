@@ -80,6 +80,8 @@ private:
 	required_region_ptr<uint8_t> m_rom;
 	required_ioport m_j7;
 
+	bool m_z80_wait = false;
+
 	// memory state
 	uint8_t m_s100 = 0;
 	uint8_t m_bank0 = 0;

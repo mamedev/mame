@@ -23,7 +23,7 @@ TODO:
 - Audio CD player rewind/fast forward don't work properly
   \- never go past 1 minute mark, underflows;
 - Fader feature is sketchy and unchecked against real HW;
-- Implement proper check condition errors (non-SCSI complaint);
+- Implement proper check condition errors (non-SCSI compliant);
 
 **************************************************************************************************/
 

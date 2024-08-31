@@ -103,7 +103,6 @@ protected:
 	required_ioport_array<8> m_inputs;
 
 	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 	u8 m_lcd_control = 0;
 	u8 m_lcd_data = 0;
 
@@ -111,7 +110,6 @@ protected:
 	void sexpert_map(address_map &map);
 
 	// I/O handlers
-	void update_display();
 	virtual void lcd_control_w(u8 data);
 	virtual void lcd_data_w(u8 data);
 	void leds_w(u8 data);
@@ -127,7 +125,6 @@ void sexpert_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_led_data));
 	save_item(NAME(m_lcd_control));
 	save_item(NAME(m_lcd_data));
 }
@@ -213,13 +210,7 @@ HD44780_PIXEL_UPDATE(sexpert_state::lcd_pixel_update)
 }
 
 
-// TTL/generic
-
-void sexpert_state::update_display()
-{
-	// update leds (lcd is done separately)
-	m_display->matrix(m_inp_mux, m_led_data);
-}
+// common
 
 void sexpert_state::lcd_control_w(u8 data)
 {
@@ -240,8 +231,7 @@ void sexpert_state::lcd_data_w(u8 data)
 void sexpert_state::leds_w(u8 data)
 {
 	// d0-d7: chessboard leds
-	m_led_data = data;
-	update_display();
+	m_display->write_mx(data);
 }
 
 void sexpert_state::mux_w(u8 data)
@@ -250,11 +240,11 @@ void sexpert_state::mux_w(u8 data)
 	m_rombank->set_entry(data & 1);
 
 	// d3: enable beeper
-	m_beeper->set_state(data >> 3 & 1);
+	m_beeper->set_state(BIT(data, 3));
 
 	// d4-d7: 74145 to input mux/led select
 	m_inp_mux = 1 << (data >> 4 & 0xf) & 0xff;
-	update_display();
+	m_display->write_my(m_inp_mux);
 }
 
 u8 sexpert_state::input1_r()
@@ -301,10 +291,10 @@ void sforte_state::lcd_data_w(u8 data)
 	// d0-d2: 74145 to input mux/led select
 	// 74145 D from lcd control d2 (HD44780 E)
 	m_inp_mux = 1 << ((m_lcd_control << 1 & 8) | (data & 7));
+	m_display->write_my(m_inp_mux);
 
 	// d5,d6: led data
-	m_led_data = ~data >> 5 & 3;
-	update_display();
+	m_display->write_mx(~data >> 5 & 3);
 
 	// d7: enable beeper
 	// capacitor for noise filter (sound glitches otherwise)
@@ -341,10 +331,7 @@ void sexpert_state::sexpert_map(address_map &map)
 void sforte_state::sforte_map(address_map &map)
 {
 	sexpert_map(map);
-	map(0x1ff4, 0x1ff4).nopw();
-	map(0x1ff5, 0x1ff5).nopw();
-	map(0x1ff6, 0x1ff6).w(FUNC(sforte_state::lcd_control_w));
-	map(0x1ff7, 0x1ff7).w(FUNC(sforte_state::lcd_data_w));
+	map(0x1ff4, 0x1ff5).nopw();
 }
 
 
@@ -483,6 +470,7 @@ void sforte_state::sforte(machine_config &config)
 
 	m_board->set_type(sensorboard_device::BUTTONS);
 
+	m_display->set_width(2);
 	config.set_default_layout(layout_novag_sforte);
 }
 

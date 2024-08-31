@@ -12,21 +12,35 @@ Grandmaster and FCC are verified to be the same PCB + ROMs as UVC. So even thoug
 they have a large wooden chessboard attached instead of a small plastic one, from
 MAME's perspective there's nothing to emulate on top of UVC.
 
+TODO:
+- add low-pass filters to sound? but when using flt_rc, it does not sound like
+  recordings from a real VCC, maybe use a netlist or is it overkill? (same goes
+  for newer Fidelity chess computers with this speech chip)
+
+BTANB:
+- with the English voice ROM, the letter D is barely distinguishable from E,
+  Fidelity never updated the ROM later, and it sounds fine with other languages
+
 ================================================================================
 
 RE notes by Kevin Horton
 
-The CPU is a Z80 running at 4MHz.  The TSI chip runs at around 25KHz, using a
-470K / 100pf RC network.  This system is very very basic, and is composed of just
+The CPU is a Z80 running at 4MHz. The TSI chip runs at around 25KHz, using a
+470K / 100pf RC network. This system is very very basic, and is composed of just
 the Z80, 4 ROMs, the TSI chip, and an 8255.
 
 The Z80's interrupt inputs are all pulled to VCC, so no interrupts are used.
 
 Reset is connected to a power-on reset circuit and a button on the keypad (marked RE).
 
-The TSI chip connects to a 4K ROM.  All of the 'Voiced' Chess Challengers
-use this same ROM  (three or four).  The later chess boards use a slightly different
+The TSI chip connects to a 4K ROM. All of the 'Voiced' Chess Challengers
+use this same ROM  (three or four). The later chess boards use a slightly different
 part number, but the contents are identical.
+
+The speech chip analog out (pin 11) goes to a PNP transistor, followed by two
+cascaded low-pass filters (18K+5nf and 18K+20nf), an LM386N amplifier, and a
+speaker. Newer Fidelity chess computers with this chip have a similar configuration,
+with an additional volume filter before the LM386N.
 
 Memory map (VCC):
 -----------------
@@ -79,26 +93,26 @@ PC.7 - button column D (W)
 
 Language jumpers:
 -----------------
-When PB.6 is pulled low, the language jumpers can be read.  There are four.
-They connect to the button rows.  When enabled, the row(s) will read low if
-the jumper is present.  English only VCC's do not have the 367 or any pads stuffed.
+When PB.6 is pulled low, the language jumpers can be read. There are four.
+They connect to the button rows. When enabled, the row(s) will read low if
+the jumper is present. English only VCC's do not have the 367 or any pads stuffed.
 The jumpers are labeled: French, German, Spanish, and special.
 
 Language latch:
 ---------------
-There's an unstuffed 7474 on the board that connects to PA.6 and PA.7.  It allows
-one to latch the state of A12 to the speech ROM.  The English version has the chip
-missing, and a jumper pulling "A12" to ground.  This line is really a negative
+There's an unstuffed 7474 on the board that connects to PA.6 and PA.7. It allows
+one to latch the state of A12 to the speech ROM. The English version has the chip
+missing, and a jumper pulling "A12" to ground. This line is really a negative
 enable.
 
 To make the VCC multi-language, one would install the 74367 (note: it must be a 74367
-or possibly a 74LS367.  A 74HC367 would not work since they rely on the input current
+or possibly a 74LS367. A 74HC367 would not work since they rely on the input current
 to keep the inputs pulled up), solder a piggybacked ROM to the existing English
 speech ROM, and finally install a 7474 dual flipflop.
 
-This way, the game can then detect which secondary language is present, and then it can
-automatically select the correct ROM(s).  I have to test whether it will do automatic
-determination and give you a language option on power up or something.
+This way, the game can then detect which secondary language is present, and then
+it can automatically select the correct ROM(s). I have to test whether it will do
+automatic determination and give you a language option on power up or something.
 
 *******************************************************************************/
 

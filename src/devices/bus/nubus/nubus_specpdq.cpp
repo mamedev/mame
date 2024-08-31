@@ -327,11 +327,15 @@ void nubus_specpdq_device::update_crtc()
 	// for some reason you temporarily get invalid screen parameters - ignore them
 	if (m_crtc.valid(*this))
 	{
-		rectangle active(
-			m_crtc.h_start(16) + (m_hdelay * 4),
-			m_crtc.h_end(16) - (m_hadjust - (m_hdelay * 4)) - 1,
-			m_crtc.v_start(),
-			m_crtc.v_end() - 1);
+		// FIXME: there's still something missing in the active width calculation
+		// With the Apple RGB (640*480) monitor selected, the active width is 16 pixels
+		// too wide in black and white mode, and 16 pixels too narrow in greyscale or
+		// colour modes.
+		rectangle const active(
+				m_crtc.h_start(16) + (m_hdelay * 4),
+				m_crtc.h_end(16) + (m_hdelay * 4) - m_hadjust - 1,
+				m_crtc.v_start(),
+				m_crtc.v_end() - 1);
 
 		screen().configure(
 				m_crtc.h_total(16),

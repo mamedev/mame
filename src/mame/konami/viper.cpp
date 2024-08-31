@@ -82,9 +82,9 @@
       ds2430.
     - Voodoo 3 has issues with LOD minimums, cfr. mocapglf where card check don't display a bar
       near the percentage;
-    - convert i2c to be a real i2c-complaint device;
+    - convert i2c to be a real i2c-compliant device;
     - hookup adc0838, reads from i2c;
-    - convert epic to be a device, make it input_merger/irq_callback complaint;
+    - convert epic to be a device, make it input_merger/irq_callback compliant;
     - (more intermediate steps for proper PCI conversions here)
     - jpark3: attract mode demo play acts weird, the dinosaur gets submerged
       and camera doesn't really know what to do, CPU core bug?

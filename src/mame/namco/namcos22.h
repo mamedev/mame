@@ -667,14 +667,22 @@ class adillor_state : public namcos22s_state
 public:
 	adillor_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcos22s_state(mconfig, type, tag),
-		m_trackball_interrupt(*this, "trackball_int%u", 0)
+		m_trackball_interrupt(*this, "trackball_int%u", 0),
+		m_config_switches(*this, "DEV")
 	{ }
 
 	void adillor(machine_config &config);
 	void init_adillor();
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	required_device_array<timer_device, 2> m_trackball_interrupt;
+	required_ioport m_config_switches;
+
+	u32 m_trackball_count[2] = { };
+	s32 m_trackball_residual[2] = { };
 
 	TIMER_DEVICE_CALLBACK_MEMBER(trackball_update);
 	TIMER_DEVICE_CALLBACK_MEMBER(trackball_interrupt);

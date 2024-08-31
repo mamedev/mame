@@ -9,12 +9,10 @@
 
 enum
 {
-	NSC800_RSTA = INPUT_LINE_IRQ0 + 1,
-	NSC800_RSTB,
-	NSC800_RSTC,
-	Z80_INPUT_LINE_WAIT,
-	Z80_INPUT_LINE_BOGUSWAIT, // WAIT pin implementation used to be nonexistent, please remove this when all drivers are updated with Z80_INPUT_LINE_WAIT
-	Z80_INPUT_LINE_BUSRQ
+	Z80_INPUT_LINE_WAIT = INPUT_LINE_IRQ0 + 1,
+	Z80_INPUT_LINE_BUSRQ,
+
+	Z80_INPUT_LINE_MAX
 };
 
 enum
@@ -136,20 +134,20 @@ protected:
 	devcb_write_line m_halt_cb;
 	devcb_write_line m_busack_cb;
 
-	PAIR         m_prvpc;
-	PAIR         m_pc;
-	PAIR         m_sp;
-	PAIR         m_af;
-	PAIR         m_bc;
-	PAIR         m_de;
-	PAIR         m_hl;
-	PAIR         m_ix;
-	PAIR         m_iy;
-	PAIR         m_wz;
-	PAIR         m_af2;
-	PAIR         m_bc2;
-	PAIR         m_de2;
-	PAIR         m_hl2;
+	PAIR16       m_prvpc;
+	PAIR16       m_pc;
+	PAIR16       m_sp;
+	PAIR16       m_af;
+	PAIR16       m_bc;
+	PAIR16       m_de;
+	PAIR16       m_hl;
+	PAIR16       m_ix;
+	PAIR16       m_iy;
+	PAIR16       m_wz;
+	PAIR16       m_af2;
+	PAIR16       m_bc2;
+	PAIR16       m_de2;
+	PAIR16       m_hl2;
 	u8           m_qtemp;
 	u8           m_q;
 	u8           m_r;
@@ -167,7 +165,7 @@ protected:
 	u8           m_busack_state;       // bus acknowledge pin state
 	bool         m_after_ei;           // are we in the EI shadow?
 	bool         m_after_ldair;        // same, but for LD A,I or LD A,R
-	u32          m_ea;
+	u16          m_ea;
 
 	int          m_icount;
 	int          m_tmp_irq_vector;
@@ -193,26 +191,6 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)
-
-class nsc800_device : public z80_device
-{
-public:
-	nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	// device_t implementation
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
-	// device_execute_interface implementation
-	virtual u32 execute_input_lines() const noexcept override { return 7; }
-	virtual void execute_set_input(int inputnum, int state) override;
-
-	virtual void do_op() override;
-	u8 m_nsc800_irq_state[4]; // state of NSC800 restart interrupts A, B, C
-};
-
-DECLARE_DEVICE_TYPE(NSC800, nsc800_device)
 
 
 #endif // MAME_CPU_Z80_Z80_H
