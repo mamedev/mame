@@ -2138,7 +2138,7 @@ void tripfev_decrypt(running_machine &machine)
 		IGS27_CRYPT3
 		IGS27_CRYPT4_ALT // $2fc0
 		IGS27_CRYPT5_ALT // $35da0
-		IGS27_CRYPT6_ALT
+		IGS27_CRYPT6
 		IGS27_CRYPT7_ALT // $2b0
 		IGS27_CRYPT8 // $1100
 
