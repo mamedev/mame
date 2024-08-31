@@ -263,7 +263,7 @@ ROM_START( tpkboram )
 	ROM_LOAD( "10.pg8", 0x38000, 0x8000, CRC(4a293afa) SHA1(be532e6a476f78638e7f558bf8093e1914bc3688) )
 ROM_END
 
-// this runs on a newer ATPK-BORAM 0500 PCB. Given all GFX match tpkboram, it's probably a newer revision.
+// this runs on a newer ATPK-BORAM PK-0500 PCB. Given all GFX match tpkboram, it's probably a newer revision.
 // code is encrypted
 ROM_START( tpkborama )
 	ROM_REGION( 0x8000, "maincpu", 0 )
