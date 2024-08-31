@@ -36461,6 +36461,18 @@ Jumps to invalid address, needs own slot type with mountable carts
 		</part>
 	</software>
 
+	<software name="pvar" supported="no">
+		<description>Pro Version Action Replay (Europe)</description>
+		<year>1992</year>
+		<publisher>Datel</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="131072">
+				<rom name="27c256.low"  size="32768" crc="cca1bd54" sha1="39a934fca8343cf84ecff4f2010cb08e55ad2b06" offset="0x0000" loadflag="load16_byte"/>
+				<rom name="27c256.high" size="32768" crc="41c5499f" sha1="9f39ddfc9299f2d796e0f00472d258a854ce1b18" offset="0x0001" loadflag="load16_byte"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="par2" supported="no">
 		<description>Pro Action Replay 2 (Europe)</description>
 		<year>1994</year>
