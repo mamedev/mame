@@ -1,14 +1,3 @@
-#define LOG_UNDOC (1U << 1)
-#define LOG_INT   (1U << 2)
-#define LOG_TIME  (1U << 3)
-
-#define VERBOSE ( LOG_UNDOC /*| LOG_INT*/ )
-#include "logmacro.h"
-
-#define LOGUNDOC(...) LOGMASKED(LOG_UNDOC, __VA_ARGS__)
-#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
-
-
 /* On an NMOS Z80, if LD A,I or LD A,R is interrupted, P/V flag gets reset,
    even if IFF2 was set before this instruction. This issue was fixed on
    the CMOS Z80, so until knowing (most) Z80 types on hardware, it's disabled */

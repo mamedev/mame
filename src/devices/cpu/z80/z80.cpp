@@ -27,6 +27,15 @@ TODO:
 
 #include "z80.inc"
 
+#define LOG_INT   (1U << 1) // z80.lst
+#define LOG_UNDOC (1U << 2)
+
+#define VERBOSE (LOG_UNDOC)
+#include "logmacro.h"
+
+#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
+#define LOGUNDOC(...) LOGMASKED(LOG_UNDOC, __VA_ARGS__)
+
 bool z80_device::tables_initialised = false;
 u8 z80_device::SZ[] = {};       // zero and sign flags
 u8 z80_device::SZ_BIT[] = {};   // zero, sign and parity/overflow (=zero) flags for BIT opcode
