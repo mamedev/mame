@@ -640,7 +640,7 @@ void xor100_state::xor100(machine_config &config)
 
 	// S-100
 	S100_BUS(config, m_s100, 8_MHz_XTAL / 4);
-	m_s100->rdy().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT);
+	//m_s100->rdy().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT);
 	S100_SLOT(config, S100_TAG ":1", xor100_s100_cards, nullptr);
 	S100_SLOT(config, S100_TAG ":2", xor100_s100_cards, nullptr);
 	S100_SLOT(config, S100_TAG ":3", xor100_s100_cards, nullptr);
