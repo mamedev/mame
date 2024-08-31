@@ -136,20 +136,20 @@ protected:
 	devcb_write_line m_halt_cb;
 	devcb_write_line m_busack_cb;
 
-	PAIR         m_prvpc;
-	PAIR         m_pc;
-	PAIR         m_sp;
-	PAIR         m_af;
-	PAIR         m_bc;
-	PAIR         m_de;
-	PAIR         m_hl;
-	PAIR         m_ix;
-	PAIR         m_iy;
-	PAIR         m_wz;
-	PAIR         m_af2;
-	PAIR         m_bc2;
-	PAIR         m_de2;
-	PAIR         m_hl2;
+	PAIR16       m_prvpc;
+	PAIR16       m_pc;
+	PAIR16       m_sp;
+	PAIR16       m_af;
+	PAIR16       m_bc;
+	PAIR16       m_de;
+	PAIR16       m_hl;
+	PAIR16       m_ix;
+	PAIR16       m_iy;
+	PAIR16       m_wz;
+	PAIR16       m_af2;
+	PAIR16       m_bc2;
+	PAIR16       m_de2;
+	PAIR16       m_hl2;
 	u8           m_qtemp;
 	u8           m_q;
 	u8           m_r;
@@ -167,7 +167,7 @@ protected:
 	u8           m_busack_state;       // bus acknowledge pin state
 	bool         m_after_ei;           // are we in the EI shadow?
 	bool         m_after_ldair;        // same, but for LD A,I or LD A,R
-	u32          m_ea;
+	u16          m_ea;
 
 	int          m_icount;
 	int          m_tmp_irq_vector;
