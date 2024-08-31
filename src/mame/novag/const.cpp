@@ -129,7 +129,6 @@ private:
 
 	bool m_power = false;
 	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 
 	// address maps
 	void const_map(address_map &map);
@@ -137,7 +136,6 @@ private:
 	void sconst_map(address_map &map);
 
 	// I/O handlers
-	void update_display();
 	void mux_w(u8 data);
 	void control_w(u8 data);
 	u8 input1_r();
@@ -149,7 +147,6 @@ void const_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_led_select));
 }
 
 INPUT_CHANGED_MEMBER(const_state::power_off)
@@ -175,28 +172,23 @@ void const_state::init_const()
     I/O
 *******************************************************************************/
 
-void const_state::update_display()
-{
-	m_display->matrix(m_led_select, m_inp_mux);
-}
-
 void const_state::mux_w(u8 data)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = data;
-	update_display();
+	m_display->write_mx(data);
 }
 
 void const_state::control_w(u8 data)
 {
 	// d0-d2: ?
 	// d3: ? (goes high at power-off NMI)
+
 	// d4-d6: select led row
-	m_led_select = data >> 4 & 7;
-	update_display();
+	m_display->write_my(data >> 4 & 7);
 
 	// d7: enable beeper
-	m_beeper->set_state(data >> 7 & 1);
+	m_beeper->set_state(BIT(data, 7));
 }
 
 u8 const_state::input1_r()

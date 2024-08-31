@@ -2972,6 +2972,14 @@ end
 --------------------------------------------------
 -- Zilog Z80
 --@src/devices/cpu/z80/z80.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/tmpz84c011.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/tmpz84c015.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/ez80.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/lz8420m.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/mc8123.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/nsc800.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/r800.h,CPUS["Z80"] = true
+--@src/devices/cpu/z80/z84c015.h,CPUS["Z80"] = true
 --@src/devices/cpu/z80/z80n.h,CPUS["Z80N"] = true
 --@src/devices/cpu/z80/kc82.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/kl5c80a12.h,CPUS["KC80"] = true
@@ -2993,6 +3001,8 @@ if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] then
 		MAME_DIR .. "src/devices/cpu/z80/lz8420m.h",
 		MAME_DIR .. "src/devices/cpu/z80/mc8123.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/mc8123.h",
+		MAME_DIR .. "src/devices/cpu/z80/nsc800.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/nsc800.h",
 		MAME_DIR .. "src/devices/cpu/z80/r800.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/r800.h",
 		MAME_DIR .. "src/devices/cpu/z80/z84c015.cpp",

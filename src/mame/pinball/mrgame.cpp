@@ -728,7 +728,7 @@ void mrgame_state::mrgame(machine_config &config)
 	dacvol.add_route(0, "rdac", -1.0, DAC_INPUT_RANGE_LO);
 
 	tms5220_device &tms(TMS5220(config, "tms", 672000)); // uses a RC combination. 672k copied from jedi.h
-	tms.ready_cb().set_inputline("audiocpu2", Z80_INPUT_LINE_BOGUSWAIT);
+	tms.ready_cb().set_inputline("audiocpu2", Z80_INPUT_LINE_WAIT);
 	tms.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	tms.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 

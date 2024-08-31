@@ -144,7 +144,6 @@ protected:
 	optional_ioport_array<2> m_dsw_io;
 	optional_ioport_array<3> m_in_io;
 
-	emu_timer *m_dma_timer = nullptr;
 	int m_tilerambank = 0;
 	int m_sprdma_base = 0;
 	int mask[4*2]{};
@@ -158,7 +157,7 @@ protected:
 	u8 m_scroll[2][4]{};
 	u16 m_vscroll[4]{};
 	int m_prot_count = 0;
-	u8 m_interrupt_trigger;
+	u8 m_vtiming_val = 0;
 
 	void mainram_strange_w(offs_t offset, u16 data/*, u16 mem_mask = ~0*/);
 	u16 mainram_swapped_r(offs_t offset);
@@ -207,7 +206,7 @@ protected:
 	u32 screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank_powerins_bootleg(int state);
-	TIMER_CALLBACK_MEMBER(dma_callback);
+	void sprite_dma();
 	TIMER_DEVICE_CALLBACK_MEMBER(manybloc_scanline);
 	void video_init();
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *src);
@@ -293,7 +292,6 @@ protected:
 	void mcu_port6_w(u8 data);
 	u8 mcu_port5_r();
 	u8 mcu_port6_r();
-	u8 mcu_port7_r(); // NMK-113 uses this
 
 	u8 m_bus_status;
 };

@@ -309,8 +309,18 @@ ROM_START( wwdash )
 	ROM_LOAD( "s29al016d70tfi01.u3", 0x200000, 0x200000, CRC(cd66dc10) SHA1(76051b248882f7b5c0adfd0ae62283a16d440523) )
 ROM_END
 
+ROM_START( boobood ) // ブーブードンパッチ, HA9019-0
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "29f400.u1", 0x000000, 0x080000, CRC(79411d05) SHA1(31727db741aa14224e60d7baa817081ba272c8cf) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x400000, "gfx", 0)
+	ROM_LOAD( "29f016a.u2", 0x000000, 0x200000, CRC(edf8d7e2) SHA1(aee4d70dfd0fcb0d766365722b8712bb3a63efb4) )
+	ROM_LOAD( "29lv160.u3", 0x200000, 0x200000, CRC(684523f0) SHA1(ca96918abde4ec63f33d82cf30b121f2ac05f68d) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
 }   // anonymous namespace
 
+GAME( 2005, boobood,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Boo Boo Donpatchi",  MACHINE_NOT_WORKING )
 GAME( 2005, zenponta,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Zenigata Ponta",  MACHINE_NOT_WORKING )
 GAME( 2006, amhbattl,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Acchi Muite Hoi Battle",  MACHINE_NOT_WORKING )
 GAME( 2007, docchift,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Docchi Fighter",  MACHINE_NOT_WORKING )

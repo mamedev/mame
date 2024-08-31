@@ -16,18 +16,21 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(HP98X6_OPTROM, hp98x6_optrom_device, "hp98x6_optrom", "HP98x6 optional ROM")
+namespace {
 
 struct optrom_region {
 	offs_t m_start;
 	const char *m_tag;
 };
 
-constexpr std::array<struct optrom_region , 2> region_tab =
-	{{
-	  { 0x100000, "rom100000" },
-	  { 0x80000, "rom80000" }
-	}};
+constexpr std::array<struct optrom_region , 2> region_tab = {{
+	{ 0x100000, "rom100000" },
+	{ 0x080000, "rom80000" }
+}};
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE(HP98X6_OPTROM, hp98x6_optrom_device, "hp98x6_optrom", "HP98x6 optional ROM")
 
 // +--------------------+
 // |hp98x6_optrom_device|
@@ -52,7 +55,7 @@ void hp98x6_optrom_device::install_handlers(address_space *space_r)
 {
 	m_space_r = space_r;
 
-	for (const struct optrom_region& reg : region_tab) {
+	for (const struct optrom_region &reg : region_tab) {
 		uint8_t *ptr = get_software_region(reg.m_tag);
 		if (ptr != nullptr) {
 			auto len = get_software_region_length(reg.m_tag);
@@ -80,7 +83,7 @@ void hp98x6_optrom_device::call_unload()
 {
 	LOG("hp98x6_optrom: call_unload\n");
 	if (m_space_r != nullptr) {
-		for (const struct optrom_region& reg : region_tab) {
+		for (const struct optrom_region &reg : region_tab) {
 			auto len = get_software_region_length(reg.m_tag);
 			if (len != 0) {
 				m_space_r->unmap_read(reg.m_start , reg.m_start + len - 1);

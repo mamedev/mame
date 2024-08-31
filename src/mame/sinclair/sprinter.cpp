@@ -108,9 +108,10 @@ public:
 	INPUT_CHANGED_MEMBER(turbo_changed);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	void map_io(address_map &map);
 	void map_mem(address_map &map);
@@ -1414,6 +1415,12 @@ void sprinter_state::machine_reset()
 	}
 	else
 		update_memory();
+}
+
+void sprinter_state::device_post_load()
+{
+	spectrum_128_state::device_post_load();
+	m_ints.clear();
 }
 
 static const gfx_layout sprinter_charlayout =
