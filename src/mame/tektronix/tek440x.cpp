@@ -386,7 +386,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 				m_map_control |= (1 << MAP_BLOCK_ACCESS);
 			}
 			
-			//LOG("memory_r: map %08x => paddr(%08x) pc(%08x)\n",OFF16_TO_OFF8(offset), OFF16_TO_OFF8(BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11), m_maincpu->pc());
+			LOG("memory_r: map %08x => paddr(%08x) fc(%d) pc(%08x)\n",OFF16_TO_OFF8(offset), OFF16_TO_OFF8(BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11), m_maincpu->get_fc(), m_maincpu->pc());
 			
 			offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
 		}
@@ -491,7 +491,8 @@ u16 tek440x_state::map_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
-		LOG("map_r 0x%08x => %04x\n",offset>>11, m_map[offset >> 11] );
+		if ((offset>>11) < 0x20)
+			LOG("map_r 0x%08x => %04x\n",offset>>11, m_map[offset >> 11] );
 
 		// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
 		if (!BIT(m_map_control, MAP_SYS_WR_ENABLE))
@@ -541,11 +542,10 @@ u8 tek440x_state::mapcntl_r()
 	u8 ans = m_map_control;
 	
 	// mask out 'SysWrEn'
+	// 0xc0 means 'not blocked write' aka successful write
 	if ((ans & 0xc0) != 0xc0)
-		ans &= ~0x20;
-	else
-		ans |= 0x20;  // (1<<MAP_SYS_WR_ENABLE)
-		
+		ans &= ~(1<<MAP_SYS_WR_ENABLE);
+
 	return ans;
 }
 
@@ -561,21 +561,12 @@ void tek440x_state::mapcntl_w(u8 data)
 		LOG("mapcntl_w pte PID      %2d\n", data & 15);
 		
 		if (BIT(data, MAP_VM_ENABLE) && (data & 15))
-#if 0
-		for(uint32_t i=0; i<0x20; i += 8)
-		{
-			LOG("mapcntl_w: %04x %04x %04x %04x %04x %04x %04x %04x \n",
-				m_map[i+0],m_map[i+1],m_map[i+2],m_map[i+3],m_map[i+4],m_map[i+5],m_map[i+6],m_map[i+7]);
-		}
-#else
 		for(uint32_t i=0; i<0x08; i++)
 		{
 			LOG("mapcntl_w: %08x -> paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
 				OFF16_TO_OFF8(i << 11), OFF16_TO_OFF8(BIT(m_map[i], 0, 11)<<11),
 				BIT(m_map[i], 11, 3), m_map[i] & 0x8000 ? 1 : 0, m_map[i] & 0x4000 ? 1 : 0);
 		}
-
-#endif
 
 	}
 
