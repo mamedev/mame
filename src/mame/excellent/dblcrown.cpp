@@ -15,6 +15,9 @@ Notes:
 - there are various $0030-$0033 ROM checks across the SW, changing these values to non-zero
   effectively changes game functionality (cfr. matrix mode at POST), ROM overlay or just
   different ROM versions?
+- Topmost 2 rows are intended to be seen, cfr. analyzer "5 of a kind" and "royal flush" drawn there.
+  Whatever these rows are supposed to indicate in gameplay (scoring cards for a fever bonus?)
+  is untested.
 
 ===================================================================================================
 
@@ -41,22 +44,22 @@ and for nvram functions.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
+#include "machine/bankdev.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "dblcrown.lh"
 
 
 namespace {
-
-// TODO: remove me, crashes in screen_update at first RAM-based char drawn ...
-#define DEBUG_VRAM
 
 class dblcrown_state : public driver_device
 {
@@ -65,6 +68,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_watchdog(*this, "watchdog")
+		, m_vram(*this, "vram")
+		, m_vram_bank(*this, "vram_bank%u", 0U)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_inputs(*this, "IN%u", 0U)
@@ -74,14 +79,19 @@ public:
 	void dblcrown(machine_config &config);
 
 private:
-	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_shared_ptr<u8> m_vram;
+	required_device_array<address_map_bank_device, 2> m_vram_bank;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_ioport_array<4> m_inputs;
+	output_finder<8> m_lamps;
 
 	void bank_w(uint8_t data);
 	uint8_t irq_source_r();
@@ -99,72 +109,65 @@ private:
 	void lamps_w(uint8_t data);
 	void watchdog_w(uint8_t data);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
 	void main_map(address_map &map);
 	void main_io(address_map &map);
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<watchdog_timer_device> m_watchdog;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_ioport_array<4> m_inputs;
-	output_finder<8> m_lamps;
+	void vram_map(address_map &map);
 
 	uint8_t m_bank = 0;
 	uint8_t m_irq_src = 0;
-	std::unique_ptr<uint8_t[]> m_pal_ram;
-	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t m_vram_bank[2]{};
 	uint8_t m_key_select = 0;
+
+	std::unique_ptr<uint8_t[]> m_pal_ram;
+	uint8_t m_vram_bank_entry[2]{};
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
+
+TILE_GET_INFO_MEMBER(dblcrown_state::get_bg_tile_info)
+{
+	const u8 *rambase = (const u8 *)tilemap.user_data();
+	const u16 code = (rambase[tile_index * 2 + 0] | (rambase[tile_index * 2 + 1] << 8)) & 0xfff;
+	const u8 color = (rambase[tile_index * 2 + 1] >> 4);
+
+	tileinfo.set(0, code, color, 0);
+}
+
+TILE_GET_INFO_MEMBER(dblcrown_state::get_fg_tile_info)
+{
+	const u8 *rambase = (const u8 *)tilemap.user_data();
+	const u16 code = (rambase[tile_index * 2 + 0] | (rambase[tile_index * 2 + 1] << 8)) & 0x7ff;
+	const u8 color = (rambase[tile_index * 2 + 1] >> 4);
+
+	tileinfo.set(1, code, color, 0);
+}
 
 void dblcrown_state::video_start()
 {
-	m_pal_ram = std::make_unique<uint8_t[]>(0x200 * 2);
-	m_vram = std::make_unique<uint8_t[]>(0x1000 * 0x10);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dblcrown_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	m_bg_tilemap->set_user_data(&m_vram[0xa000]);
 
-	save_pointer(NAME(m_vram), 0x1000 * 0x10);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dblcrown_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap->set_user_data(&m_vram[0xb000]);
+
+	m_fg_tilemap->set_transparent_pen(0);
+
+	m_pal_ram = std::make_unique<uint8_t[]>(0x200 * 2);
+	// NOTE: set_source alone will crash with 0-length gfxdecoding
+	// need to explicitly use a fn otherwise unused by the rest of
+	// the MAME ecosystem at the time of this writing.
+	m_gfxdecode->gfx(1)->set_source_and_total(m_vram, m_vram.length() / 32);
 }
 
 uint32_t dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-	gfx_element *gfx_2 = m_gfxdecode->gfx(1);
-	int x,y;
-	int count;
-
-	count = 0xa000;
-
-	for (y = 0; y < 16; y++)
-	{
-		for (x = 0; x < 32; x++)
-		{
-			uint16_t tile = ((m_vram[count]) | (m_vram[count+1] << 8)) & 0xfff;
-			uint8_t col = (m_vram[count+1] >> 4);
-
-			gfx_2->opaque(bitmap, cliprect, tile, col, 0, 0, x * 16, y * 16);
-
-			count += 2;
-		}
-	}
-
-	count = 0xb000;
-
-	for (y = 0; y < 32; y++)
-	{
-		for (x = 0; x < 64; x++)
-		{
-			uint16_t tile = ((m_vram[count]) | (m_vram[count + 1] << 8)) & 0x7ff;
-			uint8_t col = (m_vram[count + 1] >> 4); // ok?
-
-			gfx->transpen(bitmap, cliprect, tile, col, 0, 0, x * 8, y * 8, 0);
-
-			count += 2;
-		}
-	}
-
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -211,40 +214,28 @@ void dblcrown_state::palette_w(offs_t offset, uint8_t data)
 	m_palette->set_pen_color(offset, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-
-uint8_t dblcrown_state::vram_r(offs_t offset)
-{
-	uint32_t hi_offs;
-	hi_offs = m_vram_bank[(offset & 0x1000) >> 12] << 12;
-
-	return m_vram[(offset & 0xfff) | hi_offs];
-}
-
 void dblcrown_state::vram_w(offs_t offset, uint8_t data)
 {
-	uint32_t hi_offs;
-	hi_offs = m_vram_bank[(offset & 0x1000) >> 12] << 12;
+	m_vram[offset] = data;
 
-	m_vram[(offset & 0xfff) | hi_offs] = data;
+	if ((offset & 0xf000) == 0xa000)
+		m_bg_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
 
-	#ifdef DEBUG_VRAM
-	{
-		uint8_t *VRAM = memregion("vram")->base();
+	if ((offset & 0xf000) == 0xb000)
+		m_fg_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
 
-		VRAM[(offset & 0xfff) | hi_offs] = data;
-		m_gfxdecode->gfx(0)->mark_dirty(((offset & 0xfff) | hi_offs) / 32);
-	}
-	#endif
+	m_gfxdecode->gfx(1)->mark_dirty(offset / 32);
 }
 
 uint8_t dblcrown_state::vram_bank_r(offs_t offset)
 {
-	return m_vram_bank[offset];
+	return m_vram_bank_entry[offset];
 }
 
 void dblcrown_state::vram_bank_w(offs_t offset, uint8_t data)
 {
-	m_vram_bank[offset] = data & 0xf;
+	m_vram_bank_entry[offset] = data & 0xf;
+	m_vram_bank[offset]->set_bank(m_vram_bank_entry[offset]);
 
 	if(data & 0xf0)
 		logerror("Upper vram bank write = %02x\n",data);
@@ -313,6 +304,7 @@ void dblcrown_state::lamps_w(uint8_t data)
 		m_lamps[n] = BIT(data, n);
 }
 
+// MAX693A
 void dblcrown_state::watchdog_w(uint8_t data)
 {
 	// check for refresh value (0x01)
@@ -334,13 +326,13 @@ void dblcrown_state::main_map(address_map &map)
 	map(0x8000, 0x9fff).bankr("rom_bank");
 	map(0xa000, 0xb7ff).ram(); // work ram
 	map(0xb800, 0xbfff).ram().share("nvram");
-	map(0xc000, 0xdfff).rw(FUNC(dblcrown_state::vram_r), FUNC(dblcrown_state::vram_w));
+	map(0xc000, 0xcfff).m(m_vram_bank[0], FUNC(address_map_bank_device::amap8));
+	map(0xd000, 0xdfff).m(m_vram_bank[1], FUNC(address_map_bank_device::amap8));
 	map(0xf000, 0xf1ff).rw(FUNC(dblcrown_state::palette_r), FUNC(dblcrown_state::palette_w));
 	map(0xfe00, 0xfeff).ram(); // ???
 	map(0xff00, 0xffff).ram(); // ???, intentional fall-through
 	map(0xff00, 0xff01).rw(FUNC(dblcrown_state::vram_bank_r), FUNC(dblcrown_state::vram_bank_w));
 	map(0xff04, 0xff04).rw(FUNC(dblcrown_state::irq_source_r), FUNC(dblcrown_state::irq_source_w));
-
 }
 
 void dblcrown_state::main_io(address_map &map)
@@ -357,6 +349,11 @@ void dblcrown_state::main_io(address_map &map)
 	map(0x20, 0x21).w("ymz", FUNC(ymz284_device::address_data_w));
 	map(0x30, 0x30).w(FUNC(dblcrown_state::watchdog_w));
 	map(0x40, 0x40).w(FUNC(dblcrown_state::output_w));
+}
+
+void dblcrown_state::vram_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram().w(FUNC(dblcrown_state::vram_w)).share("vram");
 }
 
 static INPUT_PORTS_START( dblcrown )
@@ -513,10 +510,8 @@ static const gfx_layout char_16x16_layout =
 
 
 static GFXDECODE_START( gfx_dblcrown )
-#ifdef DEBUG_VRAM
-	GFXDECODE_ENTRY( "vram", 0, gfx_8x8x4_packed_lsb, 0, 0x10 )
-#endif
 	GFXDECODE_ENTRY( "gfx1", 0, char_16x16_layout, 0, 0x10 )
+	GFXDECODE_ENTRY( nullptr, 0, gfx_8x8x4_packed_lsb, 0, 0x10 )
 GFXDECODE_END
 
 
@@ -531,10 +526,12 @@ void dblcrown_state::machine_start()
 
 void dblcrown_state::machine_reset()
 {
+	m_vram_bank[0]->set_bank(0);
+	m_vram_bank[1]->set_bank(0);
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_state::dblcrown_irq_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_state::scanline_cb)
 {
 	int scanline = param;
 
@@ -579,26 +576,13 @@ It needs at least 64 instances because 0xa05b will be eventually nuked by the vb
 
 void dblcrown_state::dblcrown(machine_config &config)
 {
-	/* basic machine hardware */
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dblcrown_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &dblcrown_state::main_io);
-	TIMER(config, "scantimer").configure_scanline(FUNC(dblcrown_state::dblcrown_irq_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(dblcrown_state::scanline_cb), "screen", 0, 1);
 
-	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000));   /* 1000 ms. (minimal of MAX693A watchdog long timeout period with internal oscillator) */
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_screen_update(FUNC(dblcrown_state::screen_update));
-	screen.set_size(64*8, 64*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	screen.set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dblcrown);
-
-	PALETTE(config, m_palette).set_entries(0x100);
+	// 1000 ms. (minimal of MAX693A watchdog long timeout period with internal oscillator)
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -607,7 +591,21 @@ void dblcrown_state::dblcrown(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(dblcrown_state::bank_w));
 	ppi.out_pc_callback().set(FUNC(dblcrown_state::key_select_w));
 
-	/* sound hardware */
+	for (auto bank : m_vram_bank)
+		ADDRESS_MAP_BANK(config, bank).set_map(&dblcrown_state::vram_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x1000);
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(dblcrown_state::screen_update));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	screen.set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dblcrown);
+
+	PALETTE(config, m_palette).set_entries(0x100);
+
 	SPEAKER(config, "mono").front_center();
 	YMZ284(config, "ymz", SND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
@@ -626,10 +624,6 @@ ROM_START( dblcrown )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD("2.u43", 0x00000, 0x80000, CRC(58200bd4) SHA1(2795cfc41056111f66bfb82916343d1c733baa83) )
-
-#ifdef DEBUG_VRAM
-	ROM_REGION( 0x1000*0x10, "vram", ROMREGION_ERASE00 )
-#endif
 
 	ROM_REGION( 0x0bf1, "plds", 0 )
 	ROM_LOAD("palce16v8h.u39", 0x0000, 0x0117, CRC(c74231ee) SHA1(f1b9e98f1fde53eee64d5da38fb8a6c22b6333e2) )
