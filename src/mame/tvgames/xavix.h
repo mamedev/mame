@@ -717,6 +717,7 @@ public:
 	void xavix_cart_popira(machine_config &config);
 	void xavix_cart_ddrfammt(machine_config &config);
 	void xavix_cart_evio(machine_config &config);
+	void xavix_cart_daig(machine_config &config);
 
 protected:
 
@@ -948,6 +949,16 @@ public:
 
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
+};
+
+class xavix_daig_cart_state : public xavix_cart_state
+{
+public:
+	xavix_daig_cart_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_cart_state(mconfig,type,tag)
+	{ }
+
+protected:
 };
 
 class xavix_ekara_state : public xavix_cart_state
