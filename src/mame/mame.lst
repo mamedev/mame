@@ -32452,6 +32452,9 @@ mekd4                           // 1980 Motorola Evaluation Kit
 @source:motorola/mekd5.cpp
 mekd5                           // 1980 Motorola Evaluation Kit
 
+@source:motorola/mex68kecb.cpp
+mex68kecb                       // (c) 1981 Motorola
+
 @source:motorola/mvme162.cpp
 mvme162                         // (c) 1993 Motorola
 
