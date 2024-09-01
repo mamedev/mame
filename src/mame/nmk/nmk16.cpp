@@ -4098,7 +4098,7 @@ void nmk16_state::machine_reset()
 
 
   For V-timing PROM, it's tipically a 82S135 (256x8bit) (first 117 entries are not used). Some games (such as Comad
-  ones) use a 82S147 (512x8bit) with A5 tied to GND, using only half of the total space. TODO: currently unsupported
+  ones) use a 82S147 (512x8bit) with A5 tied to GND, using only half of the total space.
   The format is:
 
     Offset  Bits         Description
@@ -4227,7 +4227,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 	// every PROM entry is addressed each 2 scanlines, so only even lines are actually addressing it:
 	if ((scanline & 0x1) == 0x0)
 	{
-		int address = (((scanline / 2) + PROM_FRAME_OFFSET) % (len - PROM_START_OFFSET)) + PROM_START_OFFSET;
+		u8 address = ((((scanline / 2) + PROM_FRAME_OFFSET) % (0x100 - PROM_START_OFFSET)) + PROM_START_OFFSET) % len;
 
 		LOG("nmk16_scanline: Scanline: %03d - Current PROM entry: %03d\n", scanline, address);
 
@@ -4887,7 +4887,7 @@ void nmk16_state::ssmissin(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, 8000000); // 8 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::ssmissin_map);
-	set_hacky_interrupt_timing(config);
+	set_interrupt_timing(config);
 
 	Z80(config, m_audiocpu, 8000000/2); // 4 Mhz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::ssmissin_sound_map);
@@ -5891,6 +5891,18 @@ void nmk16_state::decode_ssmissin()
 	for (int A = 0; A < len; A++)
 	{
 		rom[A] = decode_byte(rom[A], decode_data_ssmissingfx[0]);
+	}
+
+	// Vertical timing ROM is half empty
+	rom = memregion("vtiming")->base();
+	len = memregion("vtiming")->bytes();
+	assert(len == 0x200);
+	for (int A = 0; A < len; A++)
+	{
+		if (A < 0x100)
+			rom[A] = rom[(A & 0x1f) | (A << 1 & 0x1c0)];
+		else
+			rom[A] = 0;
 	}
 }
 
@@ -7191,7 +7203,7 @@ ROM_START( tdragon1 )
 	ROM_LOAD16_BYTE( "thund.8",  0x00000, 0x20000, CRC(edd02831) SHA1(d6bc8d2c37707768a8bf666090f33eea12dda336) )
 	ROM_LOAD16_BYTE( "thund.7",  0x00001, 0x20000, CRC(52192fe5) SHA1(9afef197410e7feb71dc48003e181fbbaf5c99b2) )
 
-	ROM_REGION( 0x04000, "protcpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x04000, "protcpu", 0 )
 	ROM_LOAD( "nmk-110-tdragon.bin", 0x00000, 0x4000, CRC(cf66a660) SHA1(a1d3346f7688e9bf5513194a2890a9a6aaf28742) ) // 910527 and "SLASH META" for game name string (Slash Metal was an earlier name for the game, tiles still exist in ROM)
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -9667,7 +9679,7 @@ ROM_START( redfoxwp2a )
 	ROM_LOAD( "afega_af1-b2.uc8", 0x000000, 0x200000, CRC(d68588c2) SHA1(c5f397d74a6ecfd2e375082f82e37c5a330fba62) )
 	ROM_LOAD( "afega_af1-b1.uc3", 0x200000, 0x200000, CRC(f8b200a8) SHA1(a6c43dd57b752d87138d7125b47dc0df83df8987) )
 
-	ROM_REGION( 0x10000, "fgtile", ROMREGION_ERASEFF )    // Layer 1, 8x8x4
+	ROM_REGION( 0x10000, "fgtile", 0 )    // Layer 1, 8x8x4
 	ROM_LOAD( "afega_3.u4", 0x000000, 0x10000, CRC(64608687) SHA1(c13e55429171653437c8e8c7c8e9c6c5ffa2d2dc) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )    // Samples
@@ -10211,7 +10223,7 @@ ROM_START( spec2kh )
 	ROM_LOAD( "u153.bin", 0x000000, 0x200000, CRC(a00bbf8f) SHA1(622f52ef50d52cdd5e6b250d68439caae5c13404) ) // UC2 MX29F1610ML Flash ROM
 	ROM_LOAD( "u152.bin", 0x200000, 0x200000, CRC(f6423fab) SHA1(253e0791eb58efa1df42e9c74d397e6e65c8c252) ) // UC3 MX29F1610ML Flash ROM
 
-	ROM_REGION( 0x20000, "fgtile", ROMREGION_ERASEFF )    // Layer 1, 8x8x4
+	ROM_REGION( 0x20000, "fgtile", 0 )    // Layer 1, 8x8x4
 	ROM_LOAD( "yonatech4.u3", 0x00000, 0x20000, CRC(5626b08e) SHA1(63207ed6b4fc8684690bf3fe1991a4f3babd73e8) )
 
 	ROM_REGION( 0x40000, "oki1", 0 ) // Samples
@@ -10236,7 +10248,7 @@ ROM_START( spec2k )
 	ROM_LOAD( "uc3", 0x000000, 0x200000, CRC(1d087122) SHA1(9e82c5f26c1387c6006cbd9248b333921388146c) )
 	ROM_LOAD( "uc2", 0x200000, 0x200000, CRC(998dc05c) SHA1(cadf8bb0b8944372fbce9934b93684749ebc3ba0) )
 
-	ROM_REGION( 0x20000, "fgtile", ROMREGION_ERASEFF )    // Layer 1, 8x8x4
+	ROM_REGION( 0x20000, "fgtile", 0 )    // Layer 1, 8x8x4
 	ROM_LOAD( "u3", 0x00000, 0x20000, CRC(921503b8) SHA1(dea6e9d47c9db83e79907bc0609a64176aff26bc) )
 
 	ROM_REGION( 0x40000, "oki1", 0 ) // Samples
