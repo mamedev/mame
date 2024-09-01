@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="takara_daigander_dx_cart" description="Takara Daigander DX cartridges">
+<softwarelist name="takara_daigunder_dx_cart" description="Takara Daigunder DX cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
 
 	<!-- Cartridge Pinout (same as evio)
@@ -64,23 +64,25 @@ license:CC0-1.0
 	-->
 
 	<software name="r01rom" supported="no">
-		<description>R-01 ROM - Robot Brion</description>
+		<description>R-01 ROM Robo Bulion</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="R-01 ROMロボ 「蒼き稲妻」ブライオン" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="bluerobot.bin" size="0x100000" crc="1e1d1b6f" sha1="5165a27aa556cff5e1379521e0ad84964a1472f3"/>
+				<rom name="bulion.bin" size="0x100000" crc="1e1d1b6f" sha1="5165a27aa556cff5e1379521e0ad84964a1472f3" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="r02rom" supported="no">
-		<description>R-02 ROM - Robot Bornrex</description>
+		<description>R-02 ROM Robo Jurassic Soldier Bonerex</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="R-02 ROMロボ 「ジュラシックソルジャー」ボーンレックス" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="redrobot.bin" size="0x100000" crc="40b65182" sha1="0399e5f5f1fd8438f4334e388de4bce547d79d73"/>
+				<rom name="bonerex.bin" size="0x100000" crc="40b65182" sha1="0399e5f5f1fd8438f4334e388de4bce547d79d73" />
 			</dataarea>
 		</part>
 	</software>
