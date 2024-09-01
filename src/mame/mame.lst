@@ -29146,11 +29146,11 @@ castfpt                         // Fortune Pot
 castrev                         // Revolution
 
 @source:misc/cb2001.cpp
-cb2001                          // (c) 2001 Dyna Electronics
+cb2001                          // (c) 2000 Dyna Electronics
 cb5                             // (c) 1997 Dyna Electronics
 ndongmul2                       // (c) 1999 Dyna Electronics
-scherrym                        // (c) 1997 Dyna Electronics
 scherrymp                       // (c) 1997 Dyna Electronics
+scherrymp10u                    // (c) 1997 Dyna Electronics
 
 @source:misc/chameleonrx1.cpp
 chamrx1                         // 2003

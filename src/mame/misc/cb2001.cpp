@@ -86,6 +86,8 @@ public:
 	void cb5(machine_config &config);
 	void ndongmul2(machine_config &config);
 
+	void init_smaller_proms();
+
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -451,7 +453,7 @@ void cb2001_state::vidctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (ACCESSING_BITS_8_15) // video control?
 	{
 		LOGVIDEOREGS("vidctrl_w %04x %04x\n", data, mem_mask);
-		m_videobank = (data & 0x0c00) >> 10;
+		m_videobank = (data & 0x1c00) >> 10;
 	}
 	else // something else
 		m_other1 = data & 0x00ff;
@@ -497,7 +499,7 @@ TILE_GET_INFO_MEMBER(cb2001_state::get_reel_tile_info)
 
 	code &= 0xff;
 
-	int const reel_bank = (m_other2 & 0x0c) << 8;
+	int const reel_bank = (m_other2 & 0x1c) << 8;
 
 	int const colour = 0; //= (out_c & 0x7) + 8;
 
@@ -1180,7 +1182,6 @@ GFXDECODE_END
 void cb2001_state::palette_init(palette_device &palette) const
 {
 	uint8_t const *const proms = memregion("proms")->base();
-	int const length = memregion("proms")->bytes();
 
 	for (int i = 0; i < 0x200; i++)
 	{
@@ -1190,14 +1191,7 @@ void cb2001_state::palette_init(palette_device &palette) const
 		int const r = ((dat >> 6) & 0x1f) << 3;
 		int const g = ((dat >> 11) & 0x1f) << 3;
 
-		if (length == 0x400) // are the cb2001 PROMs dumped incorrectly?
-		{
-			if (!(i & 0x20)) palette.set_pen_color((i & 0x1f) | ((i & ~0x3f) >> 1), rgb_t(r, g, b));
-		}
-		else
-		{
-			palette.set_pen_color(i, rgb_t(r, g, b));
-		}
+		if (!(i & 0x20)) palette.set_pen_color((i & 0x1f) | ((i & ~0x3f) >> 1), rgb_t(r, g, b));
 	}
 }
 
@@ -1275,26 +1269,25 @@ ROM_START( cb2001 ) // DYNA D9702 PCB; DYNA CO1 V1.1I in bookkeeping screen
 	ROM_LOAD( "am27s29.11b", 0x200, 0x200, CRC(e5aa3ec7) SHA1(675711dd6788b3d0c37573b49b6297cbcd8c8209) )
 ROM_END
 
-ROM_START( scherrym ) // DYNA D9702 PCB; DYNA PLUS V1.6 in bookkeeping screen
+ROM_START( scherrymp ) // DYNA D9702 PCB; DYNA PLUS V1.6 in bookkeeping screen
 	ROM_REGION16_LE( 0x040000, "boot_prg", 0 )
 	ROM_LOAD16_WORD( "f11.bin", 0x000000, 0x40000, CRC(8967f58d) SHA1(eb01a16b7d108f5fbe5de8f611b4f77869aedbf1) )
 
-	ROM_REGION( 0x080000, "gfx", ROMREGION_ERASEFF )
-	// this board uses an unmarked MASK ROM at 12c, 12a is unpopulated.  Size unknown. The bootleg PCB uses an mx29f1610ml, so possibly the same or compatible
-	ROM_LOAD( "gfx.12c", 0x000000, 0x80000, NO_DUMP )
+	ROM_REGION( 0x100000, "gfx", 0 )
+	ROM_LOAD( "d9701.12c", 0x000000, 0x100000, CRC(07d711a6) SHA1(6b5a4017eb1d31dc184831f85d786331f4a8e01f) )
 
+	// these are confirmed correct, though it's the only set using the smaller PROMs.
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "n82s135-1.bin", 0x000, 0x100, CRC(66ed363f) SHA1(65bd37842c441c2e712844b07c0cfe37ef16d0ef) )
-	ROM_LOAD( "n82s135-2.bin", 0x200, 0x100, CRC(a19821db) SHA1(62dda90dd67dfbc0b96f161f1f2b7a46a5805eae) )
+	ROM_LOAD( "n82s135-2.bin", 0x100, 0x100, CRC(a19821db) SHA1(62dda90dd67dfbc0b96f161f1f2b7a46a5805eae) )
 ROM_END
 
-ROM_START( scherrymp ) // DYNA D9702 PCB; DYNA PLUS V1.0U in bookkeeping screen
+ROM_START( scherrymp10u ) // DYNA D9702 PCB; DYNA PLUS V1.0U in bookkeeping screen
 	ROM_REGION16_LE( 0x040000, "boot_prg", 0 )
 	ROM_LOAD16_WORD( "m27c2001.bin", 0x000000, 0x40000, CRC(6e797b3f) SHA1(cc333e3dc2d416f1059559ce958bfe25a3869fc8) )
 
-	ROM_REGION( 0x080000, "gfx", ROMREGION_ERASEFF )
-	// this board uses an unmarked MASK ROM at 12c, 12a is unpopulated.  Size unknown. The bootleg PCB uses an mx29f1610ml, so possibly the same or compatible
-	ROM_LOAD( "gfx.12c", 0x000000, 0x80000, NO_DUMP )
+	ROM_REGION( 0x100000, "gfx", 0 )
+	ROM_LOAD( "d9701.12c", 0x000000, 0x100000, CRC(07d711a6) SHA1(6b5a4017eb1d31dc184831f85d786331f4a8e01f) )
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "82s147.9b",  0x000, 0x200, CRC(dcf976d2) SHA1(73a08e4587f3516d694a8060b79470cf71df3925) )
@@ -1305,12 +1298,12 @@ ROM_START( cb5 ) // Wing W4 board + DYNA D9701 subboard; DYNA CB5 V1.3 in bookke
 	ROM_REGION16_LE( 0x040000, "boot_prg", 0 )
 	ROM_LOAD16_WORD( "cb5-131.1g", 0x020000, 0x20000, CRC(7d47192c) SHA1(bc65f0b3223789fbcd78a7f3ba4f1c0e2a1ee4da) )
 
-	ROM_REGION( 0x080000, "gfx", 0 ) // not dumped yet, using cb2001's for now
-	ROM_LOAD( "hn27c4096.u24", 0x000000, 0x80000, NO_DUMP )
+	ROM_REGION( 0x100000, "gfx", 0 ) // not dumped for this set, but seems to work fine. Marked as bad dump as precaution
+	ROM_LOAD( "flash", 0x000000, 0x100000, BAD_DUMP CRC(07d711a6) SHA1(6b5a4017eb1d31dc184831f85d786331f4a8e01f) )
 
-	ROM_REGION( 0x400, "proms", 0 ) // not dumped for this set
-	ROM_LOAD( "n82s147an.u22", 0x000, 0x200, NO_DUMP )
-	ROM_LOAD( "n82s147an.u23", 0x200, 0x200, NO_DUMP  )
+	ROM_REGION( 0x400, "proms", 0 ) // not dumped for this set, but seem to work fine. Marked as bad dump as precaution
+	ROM_LOAD( "82s147.9b",  0x000, 0x200, BAD_DUMP CRC(dcf976d2) SHA1(73a08e4587f3516d694a8060b79470cf71df3925) )
+	ROM_LOAD( "82s147.11b", 0x200, 0x200, BAD_DUMP CRC(a67e7a63) SHA1(b23e0eb9af13e57bbc8602ddc7fb381ba5c8267e) )
 ROM_END
 
 /* New DongmulDongmul 2 (뉴 동물동물 2, New AnimalAnimal 2) runs on slightly different hardware, but with same CPU, custom and I/O.
@@ -1369,12 +1362,30 @@ ROM_START( ndongmul2 ) // 뉴 동물동물 2 (bootleg MIA 94V-0 PCB; DYNA PLUS V
 	ROM_LOAD( "gal16v8d.u7",         0x000000, 0x000117, CRC(55e39258) SHA1(4546fdbd343290c2a7953b4cd0f8db5aab2fad18) )
 ROM_END
 
+
+void cb2001_state::init_smaller_proms()
+{
+	uint8_t *proms = memregion("proms")->base();
+	std::vector<uint8_t> buffer(0x400);
+	memcpy(&buffer[0], proms, 0x400);
+
+	for (int i = 0; i < 0x400; i++)
+	{
+		if (!(i & 0x20))
+			proms[i] = buffer[(i & 0x1f) | ((i & 0x3c0) >> 1)];
+		else
+			proms[i] = 0x00;
+	}
+
+	m_palette->update();
+}
+
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT  MACHINE    INPUT      CLASS         INIT        ROT   COMPANY  FULLNAME                     FLAGS
-GAME( 2001, cb2001,    0,      cb2001,    cb2001,    cb2001_state, empty_init, ROT0, "Dyna",  "Cherry Bonus 2001",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, ndongmul2, 0,      ndongmul2, ndongmul2, cb2001_state, empty_init, ROT0, "Dyna",  "New DongmulDongmul 2",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // goes into the weeds at various point, due to either missing MCU dump or incomplete decryption. Bad reels GFX.
-GAME( 1997, scherrym,  0,      cb2001,    cb2001,    cb2001_state, empty_init, ROT0, "Dyna",  "Super Cherry Master",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
-GAME( 1997, scherrymp, 0,      cb2001,    cb2001,    cb2001_state, empty_init, ROT0, "Dyna",  "Super Cherry Master Plus",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //
-GAME( 1997, cb5,       0,      cb5,       cb5,       cb2001_state, empty_init, ROT0, "Dyna",  "Cherry Bonus V Five",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME          PARENT     MACHINE    INPUT      CLASS         INIT                ROT   COMPANY  FULLNAME                            FLAGS
+GAME( 2000, cb2001,       0,         cb2001,    cb2001,    cb2001_state, empty_init,         ROT0, "Dyna",  "Cherry Bonus 2001 (V1.1I)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, ndongmul2,    0,         ndongmul2, ndongmul2, cb2001_state, empty_init,         ROT0, "Dyna",  "New DongmulDongmul 2 (V1.2N)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // goes into the weeds at various point, due to either missing MCU dump or incomplete decryption. Bad reels GFX.
+GAME( 1997, scherrymp,    0,         cb2001,    cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Super Cherry Master Plus (V1.6)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
+GAME( 1997, scherrymp10u, scherrymp, cb2001,    cb2001,    cb2001_state, empty_init,         ROT0, "Dyna",  "Super Cherry Master Plus (V1.0U)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //
+GAME( 1997, cb5,          0,         cb5,       cb5,       cb2001_state, empty_init, ROT0, "Dyna",  "Cherry Bonus V Five (V1.3)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
