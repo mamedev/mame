@@ -1618,7 +1618,7 @@ void xavix_cart_state::xavix_cart_daig(machine_config &config)
 	xavix_cart(config);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	SOFTWARE_LIST(config, "cart_list_daig").set_original("takara_daigander_dx_cart");
+	SOFTWARE_LIST(config, "cart_list_daig").set_original("takara_daigunder_dx_cart");
 }
 
 void xavix_cart_gcslottv_state::xavix_cart_gcslottv(machine_config &config)
@@ -2126,6 +2126,7 @@ ROM_START( evio )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
+// 爆闘宣言ダイガンダー
 ROM_START( tak_daig )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "robottransformer_unit.bin", 0x600000, 0x200000, CRC(02deddaa) SHA1(7d7b54684f8b0b92daf02738560779c7df627b91) )
@@ -2297,9 +2298,9 @@ CONS( 2004, jpopira,  0,           0,  xavix_i2c_jpopira,jpopira,  xavix_i2c_car
 
 CONS( 2003, evio,     0,           0,  xavix_cart_evio,  evio,     xavix_evio_cart_state,init_xavix,    "Tomy / SSD Company LTD",                       "Evio (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? it's a violin controller
 
-// 2 ROM expansion cartridges were available for this, in the form of other robots (the heads acts as cartridges) see takara_daigander_dx_cart.xml
+// 2 ROM expansion cartridges were available for this, in the form of other robots (the heads acts as cartridges) see takara_daigunder_dx_cart.xml
 // a number of other robots were also available, but those act as controllers and don't plug into the ROM slot (presumably the signal sent is used to determine the character)
-CONS( 2002, tak_daig, 0,           0,  xavix_cart_daig,  daig,     xavix_daig_cart_state,init_xavix,    "Takara / SSD Company LTD",                     "Bakutou Sengen Daigander DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? maybe IO interrupt?
+CONS( 2002, tak_daig, 0,           0,  xavix_cart_daig,  daig,     xavix_daig_cart_state,init_xavix,    "Takara / SSD Company LTD",                     "Bakutou Sengen Daigunder DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? maybe IO interrupt?
 
 CONS( 2002, gcslottv, 0,           0,  xavix_cart_gcslottv,  gcslottv,     xavix_cart_gcslottv_state,     init_xavix,    "Takara / Sammy / DCT / SSD Company LTD",       "Gachinko Shoubu! PachisloTV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
 
