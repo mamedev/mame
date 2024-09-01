@@ -539,6 +539,11 @@ ROM_START( rad_md1uk )
 	ROM_LOAD16_WORD_SWAP( "radicauk.u2", 0x000000, 0x400000, CRC(03a6734b) SHA1(255048d46b593bc975b3a6c44e8b8e35917511c7) )
 ROM_END
 
+ROM_START( mdtvp1j )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "l08y6_i_32m.u2", 0x000000, 0x400000, CRC(740a8859) SHA1(cf1212ef28e75e2cea752cf10a06ea715a30ae07) ) // 04-07-23 date sticker (23 July 2004)
+ROM_END
+
 ROM_START( rad_gen2 )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "radica_genesis_vol2_red_usa.bin", 0x000000, 0x400000, CRC(7c1a0f0e) SHA1(a6441f75a4cd48f1563aeafdfbdde00202d4067c) )
@@ -709,6 +714,7 @@ void megadriv_ra145_state::init_ra145()
 CONS( 2004, rad_gen1,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
 CONS( 2004, rad_md1,   rad_gen1, 0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Mega Drive Collection Volume 1 (Radica, Arcade Legends) (Europe)", 0)
 CONS( 2004, rad_md1uk, rad_gen1, 0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Mega Drive Collection Volume 1 (Radica, Arcade Legends) (UK)", 0)
+CONS( 2004, mdtvp1j,   rad_gen1, 0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Sega Toys",                         "Mega Drive Play TV 1 (Japan)", 0) // expects US region despite being a Japanese unit (Bean Machine is region locked)
 
 CONS( 2004, rad_gen2,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Genesis Collection Volume 2 (Radica, Arcade Legends) (USA)", 0)
 CONS( 2004, rad_md2uk, rad_gen2, 0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Mega Drive Collection Volume 2 (Radica, Arcade Legends) (UK)", 0)

@@ -3011,7 +3011,7 @@ if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] then
 
 	dependency {
 		{ MAME_DIR .. "src/devices/cpu/z80/z80.cpp", GEN_DIR .. "emu/cpu/z80/z80.hxx" },
-		{ MAME_DIR .. "src/devices/cpu/z80/z80.cpp", GEN_DIR .. "emu/cpu/z80/ncs800.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/z80/nsc800.cpp", GEN_DIR .. "emu/cpu/z80/ncs800.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/z80/r800.cpp", GEN_DIR .. "emu/cpu/z80/r800.hxx" },
 	}
 
