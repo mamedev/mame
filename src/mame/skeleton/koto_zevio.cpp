@@ -97,6 +97,8 @@ void zevio_state::zevio(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 }
 
+
+// ドラゴンボールＺ スカウターバトル体感かめはめ波 おらとおめえとスカウター
 ROM_START( dbzscout )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "mr27t6402l.ic6", 0x000000, 0x800000, CRC(9cb896d6) SHA1(4185ee4593c2ef3b637f6004d1f80dadd4530902) )
