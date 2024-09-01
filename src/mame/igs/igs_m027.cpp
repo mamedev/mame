@@ -51,6 +51,7 @@ public:
 	{ }
 
 	void igs_mahjong(machine_config &config);
+	void extradraw(machine_config &config);
 
 	void init_sdwx();
 	void init_chessc2();
@@ -73,6 +74,7 @@ public:
 	void init_lthy();
 	void init_luckycrs();
 	void init_olympic5();
+	void init_extradrw();
 
 protected:
 	virtual void machine_start() override;
@@ -105,6 +107,7 @@ private:
 
 	void pgm_create_dummy_internal_arm_region();
 	void igs_mahjong_map(address_map &map);
+	void extradraw_map(address_map &map);
 
 	void do_decrypt();
 
@@ -192,6 +195,12 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 	map(0x70000200, 0x70000203).ram(); // ??????????????
 	map(0x50000000, 0x500003ff).rw(FUNC(igs_m027_state::xor_read), FUNC(igs_m027_state::xor_write)).umask32(0x000000ff); // uploads XOR table to external ROM here
 	map(0xf0000000, 0xf000000f).nopw(); // magic registers
+}
+
+void igs_m027_state::extradraw_map(address_map &map)
+{
+	igs_mahjong_map(map);
+	map(0x18088000, 0x1808ffff).ram(); // Extra Draw needs RAM here, maybe just a mirror, maybe due to PCB difference
 }
 
 /***************************************************************************
@@ -495,6 +504,12 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
+void igs_m027_state::extradraw(machine_config &config)
+{
+	igs_mahjong(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::extradraw_map);
 }
 
 /***************************************************************************
@@ -1362,10 +1377,10 @@ ROM_END
 ROM_START( extradrw ) // IGS PCB 0326-05-DV-1
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal rom of IGS027A ARM based MCU
-	ROM_LOAD( "e1_igs027a", 0x00000, 0x4000, NO_DUMP ) // has a 'E1' sticker
+	ROM_LOAD( "e1_027a.bin", 0x00000, 0x4000, CRC(ebbf4922) SHA1(d2d196756317523db650bfe9e4bf2aa243e87a00) ) // has a 'E1' sticker
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg?
-	ROM_LOAD( "u21", 0x00000, 0x80000, BAD_DUMP CRC(c1641b14) SHA1(bd2525a5b38d4d8a39e99e43ef62e1d2fd3c044d) ) // 1ST AND 2ND HALF IDENTICAL, label not readable, suspected bad dump (doesn't decrypt with usual methods)
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "u21", 0x00000, 0x80000, CRC(c1641b14) SHA1(bd2525a5b38d4d8a39e99e43ef62e1d2fd3c044d) ) // 1ST AND 2ND HALF IDENTICAL, but correct, game only uses 1st half, label not readable
 
 	ROM_REGION( 0x280000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD16_WORD_SWAP( "u12",           0x000000, 0x200000, CRC(642247fb) SHA1(69c01c3551551120a3786522b28a80621a0d5082) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF, label not readable
@@ -1491,6 +1506,14 @@ void igs_m027_state::init_qlgs()
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
+
+void igs_m027_state::init_extradrw()
+{
+	extradrw_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+}
+
+
 void igs_m027_state::init_mgzz()
 {
 	mgzz_decrypt(machine());
@@ -1574,6 +1597,7 @@ GAME( 2000, mgzza,     mgzz,     igs_mahjong, base,     igs_m027_state, init_mgz
 GAME( 2007, mgcs3,     0,        igs_mahjong, base,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)", MACHINE_NOT_WORKING )
 GAME( 1999, oceanpar,  0,        igs_mahjong, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
 GAME( 1999, oceanpara, oceanpar, igs_mahjong, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
+GAME( 200?, extradrw,  0,        extradraw,   base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
 
 // Incomplete dumps
 GAME( 1999, amazonia,  0,        igs_mahjong, amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_NOT_WORKING )
@@ -1585,7 +1609,6 @@ GAME( 2003, amazoni2,  0,        igs_mahjong, base,     igs_m027_state, init_ama
 GAME( 2002, sdwx,      0,        igs_mahjong, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME( 200?, sddz,      0,        igs_mahjong, base,     igs_m027_state, init_sddz,     ROT0, "IGS", "Super Dou Di Zhu", MACHINE_NOT_WORKING )
 GAME( 200?, klxyj,     0,        igs_mahjong, base,     igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji", MACHINE_NOT_WORKING )
-GAME( 200?, extradrw,  0,        igs_mahjong, base,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME( 200?, gonefsh2,  0,        igs_mahjong, base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )
 GAME( 2002, chessc2,   0,        igs_mahjong, base,     igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING )

@@ -54,3 +54,4 @@ void wldfruit_decrypt(running_machine &machine);
 void lthy_decrypt(running_machine &machine);
 void lhdmg_decrypt(running_machine &machine);
 void lhdmgp_decrypt(running_machine &machine);
+void extradrw_decrypt(running_machine &machine);
