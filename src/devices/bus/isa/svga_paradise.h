@@ -89,6 +89,9 @@ public:
 	// construction/destruction
 	isa16_wd90c00_jk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// resets itself at card POST for accessing $c6xxx area, plays with input sense later
+	static constexpr feature_type unemulated_features() { return feature::PROTECTION; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
