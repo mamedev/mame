@@ -28943,6 +28943,7 @@ blackbdb                        //
 dslayrr                         //
 dslayrra                        //
 hawaii                          //
+hwparty                         //
 oligam                          //
 rasce                           //
 
@@ -42046,6 +42047,11 @@ dsb46                           //
 @source:skeleton/dual68.cpp
 dual68                          //
 
+@source:skeleton/dyna_d0404.cpp
+cm2005
+cm2005a
+cm2005b
+
 @source:skeleton/e100.cpp
 e100                            //
 
@@ -42494,6 +42500,9 @@ systec                          //
 
 @source:skeleton/systel1.cpp
 systel100                       //
+
+@source:skeleton/syvg.cpp
+luckyvl
 
 @source:skeleton/tavernie.cpp
 cpu09                           //
