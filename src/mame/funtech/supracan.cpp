@@ -66,7 +66,7 @@ STATUS:
 
 DEBUG TRICKS:
 
-    baseball game debug trick:
+    staiwbbl:
     wpset e90020,1f,w
     do pc=5ac40
     ...
@@ -1015,6 +1015,8 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		m_sprite_final_bitmap.fill(0x00, cliprect);
 		m_sprite_mask_bitmap.fill(0x00, cliprect);
 		m_prio_bitmap.fill(0xff, cliprect);
+		// TODO: pinpoint back layer color
+		// A'Can logo wants 0x30, boomzoo (title) and sangofgt (1st fighter stage) wants 0x00
 		bitmap.fill(0x80, cliprect);
 
 		draw_sprites(m_sprite_final_bitmap, m_sprite_mask_bitmap, m_prio_bitmap, cliprect);
@@ -1489,6 +1491,8 @@ void supracan_state::_6502_soundmem_w(offs_t offset, uint8_t data)
 	}
 	case 0x410:
 		m_soundcpu_irq_enable = data;
+		// gamblord (at least) checks for pending irqs
+		m_soundcpu->set_input_line(0, (m_soundcpu_irq_enable & m_soundcpu_irq_source) ? ASSERT_LINE : CLEAR_LINE);
 		LOGMASKED(LOG_SOUND | LOG_IRQS, "%s: 6502_soundmem_w: IRQ enable: %02x\n", machine().describe_context(), data);
 		break;
 	case 0x420:
@@ -1617,7 +1621,7 @@ uint16_t supracan_state::sound_r(offs_t offset, uint16_t mem_mask)
 	case 0x0c/2:
 		data = m_soundram[0x40a];
 		LOGMASKED(LOG_SOUND, "%s: sound_r: DMA Request flag from 6502, %08x: %04x & %04x\n", machine().describe_context(), 0xe90000 + (offset << 1), data, mem_mask);
-		machine().debug_break();
+		//machine().debug_break();
 		break;
 
 	default:
