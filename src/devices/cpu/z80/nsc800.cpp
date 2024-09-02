@@ -16,8 +16,6 @@
 //#define VERBOSE (LOG_INT)
 #include "logmacro.h"
 
-#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
-
 
 // device type definition
 DEFINE_DEVICE_TYPE(NSC800, nsc800_device, "nsc800", "National Semiconductor NSC800")
