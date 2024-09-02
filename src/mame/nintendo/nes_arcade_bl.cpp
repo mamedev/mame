@@ -328,6 +328,9 @@ ROM_START( smb3bl )
 	ROM_LOAD( "mario_3-6.bin", 0x10000, 0x10000, CRC(a88664e0) SHA1(327d246f198713f20adc7764ee539d18eb0b82ad) ) // hvc-um-0 chr [2/2]      IDENTICAL
 
 	ROM_REGION( 0x8000, "timercpu", 0 )
+	/* 2KiB content repeated 8 times to fill the upper half of the ROM (lower half is empty).
+	   Also seen using a 27C128 (16K*8) with the 2KiB content repeated 8 times to fill the entire ROM, with CRC(986fb6b3) and
+	   SHA1(fa205601adf15947bb073afd5fbd57cd971bff7d) */
 	ROM_LOAD( "nes_jamma_base.bin", 0x0000, 0x4000, CRC(ea276bdd) SHA1(1cd5916e9a6ea9e40526a4fe55b846ca1818fd5f) ) // BADADDR x-xxxxxxxxxxxxx
 	ROM_CONTINUE(                   0x0000, 0x4000 )
 ROM_END
