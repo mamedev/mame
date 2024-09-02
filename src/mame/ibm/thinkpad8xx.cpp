@@ -70,6 +70,8 @@ void thinkpad8xx_state::thinkpad850(machine_config &config)
 {
 	PPC603(config, m_maincpu, 33.333_MHz_XTAL * 3); // IBM PPCI603eFC100BPQ
 
+	// All BIOS ROM chip lines are routed through the S-MOS 85G7814
+
 	H8325(config, "mcu", XTAL(10'000'000)); // Actually an H8/338 (HD6473388: 48k-byte ROM; 2k-byte RAM), unknown clock
 
 	SPEAKER(config, "lspeaker").front_left();
