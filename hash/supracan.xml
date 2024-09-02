@@ -4,13 +4,15 @@
 license:CC0-1.0
 -->
 <softwarelist name="supracan" description="Funtech Super A'Can cartridges">
-
-
-	<!-- appears to work, but gameplay logic is broken, attack pieces don't drop down, game can get stuck, can sometimes rotate pieces through other pieces too! -->
 	<software name="formduel" supported="no"> <!-- F001 - 福爾摩沙大對決 (Formosa Da Dui Jue) - aka Formosa Duel -->
 		<description>Formosa Duel</description>
 		<year>1995</year>
 		<publisher>AV Artisan Corp.</publisher>
+		<notes><![CDATA[
+Unresponsive [joy] start button
+]]></notes>
+		<!-- Old note: appears to work, but gameplay logic is broken, attack pieces don't drop down, game can get stuck, can sometimes rotate pieces through other pieces too! -->
+
 		<info name="serial" value="F001" />
 		<part name="cart" interface="supracan_cart">
 			<dataarea name="rom" width="16" endianness="big" size="0x100000">
@@ -19,7 +21,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sangofgt">
+	<software name="sangofgt" supported="partial">
 		<description>Sango Fighter ~ Wu Jiang Zheng Ba - San Guo Zhi</description>
 		<year>1995</year>
 		<publisher>Panda Entertainment Technology</publisher>
@@ -35,6 +37,9 @@ license:CC0-1.0
 		<description>The Son of Evil ~ Xie E Zhi Zi</description>
 		<year>1995</year>
 		<publisher>Funtech</publisher>
+		<notes><![CDATA[
+Black screen while BGM playing in background
+]]></notes>
 		<info name="serial" value="F003" />
 		<info name="alt_title" value="邪惡之子" />
 		<part name="cart" interface="supracan_cart">
@@ -48,6 +53,11 @@ license:CC0-1.0
 		<description>Speedy Dragon ~ Yin Su Fei Long</description>
 		<year>1995</year>
 		<publisher>AV Artisan Corp.</publisher>
+		<notes><![CDATA[
+Unresponsive [joy] start button
+Wrong [video] layer priorities in gameplay
+[video] text layer has wrong colors in gameplay
+]]></notes>
 		<info name="serial" value="F004" />
 		<info name="alt_title" value="音速飛龍" />
 		<part name="cart" interface="supracan_cart">
@@ -61,6 +71,9 @@ license:CC0-1.0
 		<description>Super Taiwanese Baseball League ~ Chao Ji Zhong Hua Zhi Bang Lian Meng</description>
 		<year>1995</year>
 		<publisher>C&amp;E Soft</publisher>
+		<notes><![CDATA[
+Black screen, executes an unsupported [DMA] type, expects a vector in RAM at PC=0269e4
+]]></notes>
 		<info name="serial" value="F005" />
 		<info name="alt_title" value="超級中華職棒聯盟" />
 		<part name="cart" interface="supracan_cart">
@@ -74,6 +87,9 @@ license:CC0-1.0
 		<description>Journey to the Laugh ~ Xi You Ji</description>
 		<year>1995</year>
 		<publisher>Funtech</publisher>
+		<notes><![CDATA[
+Unresponsive [joy] start button
+]]></notes>
 		<info name="serial" value="F006" />
 		<info name="alt_title" value="嘻遊記" />
 		<part name="cart" interface="supracan_cart">
@@ -87,6 +103,9 @@ license:CC0-1.0
 		<description>Super Light Saga - Dragon Force ~ Chao Ji Guang Ming Zhan Shi</description>
 		<year>1996</year>
 		<publisher>Kingformation</publisher>
+		<notes><![CDATA[
+Black screen at security BIOS time, cfr. PC=f8061a
+]]></notes>
 		<info name="serial" value="F007" />
 		<info name="alt_title" value="超級光明戰史" />
 		<part name="cart" interface="supracan_cart">
@@ -97,7 +116,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="monopoly">
+	<software name="monopoly" supported="partial">
 		<description>Monopoly: Adventure in Africa ~ Fei Zhou Tan Xian Da Fu Weng</description>
 		<year>1995</year>
 		<publisher>Panda Entertainment Technology</publisher>
@@ -110,10 +129,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gamblord">
+	<software name="gamblord" supported="no">
 		<description>Gambling Lord</description>
 		<year>1996</year>
 		<publisher>Funtech</publisher>
+		<notes><![CDATA[
+Too fast in gameplay
+]]></notes>
 		<info name="serial" value="F009" />
 		<info name="alt_title" value="賭霸 (Du Ba)" />
 		<part name="cart" interface="supracan_cart">
@@ -123,10 +145,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="magipool">
+	<software name="magipool" supported="no">
 		<description>Magical Pool</description>
 		<year>199?</year>
 		<publisher>Funtech</publisher>
+		<notes><![CDATA[
+Crashes after few seconds in attract
+]]></notes>
 		<info name="serial" value="F010" />
 		<info name="alt_title" value="魔棒撞球 (Mo Bang Zhuang Qiu)" />
 		<part name="cart" interface="supracan_cart">
@@ -136,7 +161,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="boomzoo">
+	<software name="boomzoo" supported="partial">
 		<description>Boom Zoo ~ Bao Bao Dong Wu Yuan</description>
 		<year>1996</year>
 		<publisher>Funtech</publisher>
