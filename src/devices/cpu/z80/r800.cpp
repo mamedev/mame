@@ -26,7 +26,6 @@ TODO:
 //#define VERBOSE (LOG_INT)
 #include "logmacro.h"
 
-#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
 
 //**************************************************************************
 //  GLOBAL VARIABLES

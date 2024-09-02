@@ -102,6 +102,7 @@ const double XTAL::known_xtals[] = {
 	  3'579'000, // 3.579_MHz_XTAL         BeebOPL
 	  3'579'545, // 3.579545_MHz_XTAL      NTSC color subcarrier, extremely common, used on 100's of PCBs (Keytronic custom part #48-300-010 is equivalent)
 	  3'579'575, // 3.579575_MHz_XTAL      Atari 2600 NTSC
+	  3'580'000, // 3.58_MHz_XTAL          Resonator - Ritam Monty
 	  3'680'000, // 3.68_MHz_XTAL          Resonator - Baud rate clock for the 6551 in the MTU-130
 	  3'686'400, // 3.6864_MHz_XTAL        Baud rate clock for MC68681 and similar UARTs
 	  3'840'000, // 3.84_MHz_XTAL          Fairlight CMI Alphanumeric Keyboard
