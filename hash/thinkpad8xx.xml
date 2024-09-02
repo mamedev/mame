@@ -24,7 +24,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Only supported on Thinkpad Series 820 and 850 -->
+	<!-- Only supported on ThinkPad Series models 820 and 850 -->
 	<software name="os2w_ppc" supported="no">
 		<description>OS/2 Warp PowerPC Edition</description>
 		<year>1995</year>
@@ -80,7 +80,7 @@ license:CC0-1.0
 		<part name="flop" interface="floppy">
 			<feature name="part_id" value="Windows NT ARC Boot Firmware v1.51"/>
 			<dataarea name="flop" size="168000">
-				<rom name="winnt_arc151.img" size="168000" crc="98db8c77" sha1="56be119ce7a0020bf4caabd099d2eae8e249305c" />
+				<rom name="winnt_arc_151.img" size="168000" crc="98db8c77" sha1="56be119ce7a0020bf4caabd099d2eae8e249305c" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
