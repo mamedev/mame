@@ -3,11 +3,11 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="thinkpad8xx" description="IBM Thinkpad 800 series software">
+<softwarelist name="thinkpad8xx" description="IBM ThinkPad Power Series software">
 
 	<!-- Operating systems -->
 
-	<software name="aix_4_1_5">
+	<software name="aix_4_1_5" supported="no">
 		<description>AIX 4.1.5</description>
 		<year>1997</year>
 		<publisher>IBM</publisher>
@@ -25,7 +25,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Only supported on Thinkpad Series 820 and 850 -->
-	<software name="os2w_ppc">
+	<software name="os2w_ppc" supported="no">
 		<description>OS/2 Warp PowerPC Edition</description>
 		<year>1995</year>
 		<publisher>IBM</publisher>
@@ -33,27 +33,27 @@ license:CC0-1.0
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_number" value="19H1133"/>
 			<diskarea name="cdrom">
-				<disk name="aix_4.1.5_disc_01" sha1="b646fdb3ab5f982304e7cbaf6bd735e20cc66198" />
+				<disk name="os2-ppc-cd1-os" sha1="b646fdb3ab5f982304e7cbaf6bd735e20cc66198" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Applications Sampler December, 1995"/>
 			<feature name="part_number" value="19H1134"/>
 			<diskarea name="cdrom">
-				<!-- Applications Sampler December, 1995-->
-				<disk name="aix_4.1.5_disc_01" sha1="e1fd3631c353b2903d35658a59e8a79b6306c1d2" />
+				<disk name="os2-ppc-cd2-sampler" sha1="e1fd3631c353b2903d35658a59e8a79b6306c1d2" />
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="sol_2_5_1_ppc">
+	<software name="sol_2_5_1_ppc" supported="no">
 		<description>Solaris 2.5.1 PowerPC Platform Edition</description>
 		<year>1996</year>
 		<publisher>Sun Microsystem</publisher>
 		<sharedfeat name="compatibility" value="800,820,850" />
 		<part name="flop" interface="floppy">
+			<feature name="part_id" value="Solaris MDB Boot 2.5.1 Release PowerPC Platform Edition (IBM Hardware Platform)"/>
 			<feature name="part_number" value="702-4348-06"/>
 			<dataarea name="flop" size="168000">
-				<!-- Solaris MDB Boot 2.5.1 Release PowerPC Platform Edition (IBM Hardware Platform) -->
 				<rom name="solaris_2_5_1_mdb_boot_ppc_ibm.img" size="168000" crc="b45832e2" sha1="be9e11364816ab5f3362396ed0f457d4a2e61188" />
 			</dataarea>
 		</part>
@@ -64,15 +64,15 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Solaris Desktop 1.1 PowerPC Platform Edition"/>
 			<feature name="part_number" value="704-5507-06"/>
 			<diskarea name="cdrom">
-				<!-- Solaris Desktop 1.1 PowerPC Platform Edition -->
 				<disk name="solaris_desktop_1.1_powerpc" sha1="00502ae94b626f0fc3a080ba1c419397b8aaaae3" />
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="win_nt_3_5_ppc">
+	<software name="win_nt_3_5_ppc" supported="no">
 		<description>Windows NT Workstation 3.5 PowerPC Edition</description>
 		<year>1994</year>
 		<publisher>IBM</publisher>

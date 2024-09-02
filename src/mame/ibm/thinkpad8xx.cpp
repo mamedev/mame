@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:
 /***********************************************************************************************************
-Skeleton driver for IBM Thinkpad Power Series.
+Skeleton driver for IBM ThinkPad Power Series.
 The IBM ThinkPad Power Series (800/820/821/822/823/850/851/860) is a laptop series from the ThinkPad line
 that was manufactured by IBM. It is based on the PowerPC architecture.
 All of the PowerPC ThinkPads could run Windows NT 3.51 and 4.0, AIX 4.1.x, and Solaris Desktop 2.5.1 PowerPC
@@ -77,7 +77,7 @@ void thinkpad8xx_state::thinkpad850(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	SOFTWARE_LIST(config, "thinkpad8xx_cd").set_original("thinkpad8xx");
+	SOFTWARE_LIST(config, "thinkpad8xx").set_original("thinkpad8xx");
 }
 
 
