@@ -13,8 +13,8 @@ Undumped games on similar hardware (ES-9402 or ES-9410):
 * Miracle Seven - Heaven's Gate Turbo
 * Ukiyo Box
 
-
 TODO:
+- lastbank: sprites should be clip masked during gameplay (verify);
 - fever13: GFX ROM dump;
 - fever13: OKI sound volume overdrives a lot;
 - hookup hopper device;
@@ -78,7 +78,7 @@ private:
 	template <uint8_t Player> uint8_t key_matrix_r();
 	void key_select_w(uint8_t data);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 	void audio_map(address_map &map);
 	void tc0091lvc_map(address_map &map);
 };
@@ -562,10 +562,9 @@ static INPUT_PORTS_START( fever13 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::irq_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::scanline_cb)
 {
 	int const scanline = param;
 
@@ -582,19 +581,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::irq_scanline)
 
 void lastbank_state::lastbank(machine_config &config)
 {
-	// basic machine hardware
-	TC0091LVC(config, m_maincpu, 14.318181_MHz_XTAL / 4);
+	constexpr XTAL MASTER_CLOCK = 14.318181_MHz_XTAL;
+
+	// NOTE: too slow with /4, cfr. animation of official ringing the bell during gameplay
+	TC0091LVC(config, m_maincpu, MASTER_CLOCK / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lastbank_state::main_map);
 	m_maincpu->set_tilemap_xoffs(0,192); // TODO: correct?
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(lastbank_state::irq_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(lastbank_state::scanline_cb), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 14.318181_MHz_XTAL / 4));
+	z80_device &audiocpu(Z80(config, "audiocpu", MASTER_CLOCK / 4));
 	audiocpu.set_addrmap(AS_PROGRAM, &lastbank_state::audio_map);
 	audiocpu.set_addrmap(AS_IO, &lastbank_state::audio_io);
-	// yes, we have no interrupts
 
 	config.set_perfect_quantum(m_maincpu);
 

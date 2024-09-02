@@ -285,7 +285,7 @@ uint8_t dblcrown_state::key_pending_r()
  */
 void dblcrown_state::output_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));  /* Coin In counter pulse */
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 	m_hopper->motor_w(BIT(data, 3));
 	machine().bookkeeping().coin_lockout_global_w(!BIT(data, 2));
 }
@@ -495,7 +495,7 @@ static INPUT_PORTS_START( dblcrown )
 	PORT_DIPSETTING(    0x20, "1 Coin/50 Credits" )
 	PORT_DIPSETTING(    0x10, "1 Coin/100 Credits" )
 	PORT_DIPSETTING(    0x00, "1 Coin/500 Credits" )
-    // TODO: game will error blink if On at payout time
+	// TODO: game will error blink if On at payout time
 	PORT_DIPNAME( 0x80, 0x80, "Hopper Status?" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
