@@ -46,7 +46,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sol_2_5_1_ppc" supported="no">
-		<description>Solaris 2.5.1 PowerPC Platform Edition</description>
+		<description>Solaris 2.5.1 Limited Availability PowerPC Platform Edition</description>
 		<year>1996</year>
 		<publisher>Sun Microsystem</publisher>
 		<sharedfeat name="compatibility" value="800,820,850" />
@@ -77,6 +77,12 @@ license:CC0-1.0
 		<year>1994</year>
 		<publisher>IBM</publisher>
 		<sharedfeat name="compatibility" value="800,820,850" />
+		<part name="flop" interface="floppy">
+			<feature name="part_id" value="Windows NT ARC Boot Firmware v1.51"/>
+			<dataarea name="flop" size="168000">
+				<rom name="winnt_arc151.img" size="168000" crc="98db8c77" sha1="56be119ce7a0020bf4caabd099d2eae8e249305c" />
+			</dataarea>
+		</part>
 		<part name="cdrom" interface="cdrom">
 		<feature name="part_number" value="11H5926"/>
 			<diskarea name="cdrom">
