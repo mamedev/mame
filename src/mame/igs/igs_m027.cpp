@@ -1279,7 +1279,7 @@ IGS 0027 - Custom programmed ARM9
 ROM_START( chessc2 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "c8_igs027a", 0x00000, 0x4000, NO_DUMP ) // stickered C8
+	ROM_LOAD( "c8_027a.bin", 0x00000, 0x4000, CRC(0ef83d8b) SHA1(31ee4bf95561cdccf4262463545839bcde9ce087) ) // stickered C8
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "ccii_v-707uso.u12", 0x000000, 0x80000, CRC(5937b67b) SHA1(967b3adf6f5bf92d63ec460d595e473898a78372) )
@@ -1377,17 +1377,17 @@ ROM_END
 ROM_START( extradrw ) // IGS PCB 0326-05-DV-1
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal rom of IGS027A ARM based MCU
-	ROM_LOAD( "e1_027a.bin", 0x00000, 0x4000, CRC(ebbf4922) SHA1(d2d196756317523db650bfe9e4bf2aa243e87a00) ) // has a 'E1' sticker
+	ROM_LOAD( "e1_igs027a", 0x00000, 0x4000, CRC(ebbf4922) SHA1(d2d196756317523db650bfe9e4bf2aa243e87a00) ) // has a 'E1' sticker
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
-	ROM_LOAD( "u21", 0x00000, 0x80000, CRC(c1641b14) SHA1(bd2525a5b38d4d8a39e99e43ef62e1d2fd3c044d) ) // 1ST AND 2ND HALF IDENTICAL, but correct, game only uses 1st half, label not readable
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg?
+	ROM_LOAD( "u21", 0x00000, 0x80000, CRC(c1641b14) SHA1(bd2525a5b38d4d8a39e99e43ef62e1d2fd3c044d) ) // 1ST AND 2ND HALF IDENTICAL, label not readable
 
-	ROM_REGION( 0x280000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD16_WORD_SWAP( "u12",           0x000000, 0x200000, CRC(642247fb) SHA1(69c01c3551551120a3786522b28a80621a0d5082) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF, label not readable
-	ROM_LOAD16_WORD_SWAP( "igs m3001.u4",  0x000000, 0x080000, CRC(d161f8f7) SHA1(4b495197895fd805979c5d5c5a4b7f07a68f4171) ) // label barely readable
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs m3001.u4",  0x000000, 0x080000, CRC(d161f8f7) SHA1(4b495197895fd805979c5d5c5a4b7f07a68f4171) ) // label barely readable
 
-	ROM_REGION( 0x100000, "igs017_igs031:sprites", 0 )
-	ROM_LOAD( "u3", 0x000000, 0x80000, CRC(97227767) SHA1(c6a1916c0df1aceafbd488ecace5794390058c49) ) // FIXED BITS (xxxxxxx0xxxxxxxx), label not readable
+	ROM_REGION( 0x280000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "u12",0x000000, 0x200000, CRC(642247fb) SHA1(69c01c3551551120a3786522b28a80621a0d5082) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF, label not readable
+	ROM_LOAD( "u3", 0x200000, 0x080000, CRC(97227767) SHA1(c6a1916c0df1aceafbd488ecace5794390058c49) ) // FIXED BITS (xxxxxxx0xxxxxxxx), label not readable
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "igs s3002.u18", 0x00000, 0x200000, CRC(48601c32) SHA1(8ef3bad80931f4b1badf0598463e15508602f104) ) // BADADDR   --xxxxxxxxxxxxxxxxxxx
@@ -1434,8 +1434,8 @@ void igs_m027_state::init_klxyj()
 void igs_m027_state::init_chessc2()
 {
 	chessc2_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt();
-	pgm_create_dummy_internal_arm_region();
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	//pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_lhzb4()
@@ -1598,6 +1598,9 @@ GAME( 2007, mgcs3,     0,        igs_mahjong, base,     igs_m027_state, init_mgc
 GAME( 1999, oceanpar,  0,        igs_mahjong, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
 GAME( 1999, oceanpara, oceanpar, igs_mahjong, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
 GAME( 200?, extradrw,  0,        extradraw,   base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
+// these have an IGS025 protection device instead of the 8255
+GAME( 2002, chessc2,   0,        igs_mahjong, base,     igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING )
+
 
 // Incomplete dumps
 GAME( 1999, amazonia,  0,        igs_mahjong, amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_NOT_WORKING )
@@ -1611,4 +1614,3 @@ GAME( 200?, sddz,      0,        igs_mahjong, base,     igs_m027_state, init_sdd
 GAME( 200?, klxyj,     0,        igs_mahjong, base,     igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME( 200?, gonefsh2,  0,        igs_mahjong, base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )
-GAME( 2002, chessc2,   0,        igs_mahjong, base,     igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING )

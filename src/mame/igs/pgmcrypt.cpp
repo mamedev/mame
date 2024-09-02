@@ -2328,8 +2328,6 @@ void lhdmgp_decrypt(running_machine &machine)
 	}
 }
 
-
-
 void extradrw_decrypt(running_machine &machine)
 {
 	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(machine.root_device().memregion("user1")->base()));
@@ -2338,9 +2336,19 @@ void extradrw_decrypt(running_machine &machine)
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
-		// this doesn't seem like a standard IGS encryption, and the internal ROM never fully uploads a XOR table either
-		src[i] = x ^ 0x6969;
+		uint16_t x = 0;
+
+		IGS27_CRYPT1
+		IGS27_CRYPT2_ALT
+		IGS27_CRYPT3_ALT2
+		IGS27_CRYPT4
+		IGS27_CRYPT5
+		IGS27_CRYPT6
+		IGS27_CRYPT7
+		IGS27_CRYPT8_ALT
+
+		x |= (x << 8);
+		src[i] ^= x;
 	}
 }
 
