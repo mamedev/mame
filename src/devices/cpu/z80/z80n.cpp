@@ -15,7 +15,6 @@
 //#define VERBOSE (LOG_INT)
 #include "logmacro.h"
 
-#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(Z80N, z80n_device, "z80n", "Z80N")
 

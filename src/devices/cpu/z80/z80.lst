@@ -148,7 +148,7 @@ macro   ret_cond
 
 macro   retn
 	call pop
-	PC = TDAT; LOGINT("RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
+	PC = TDAT; LOGMASKED(LOG_INT, "RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
 
 macro   z80n:retn
 	m_out_retn_seen_cb(0);
@@ -159,7 +159,7 @@ macro   z80n:retn
 	} else {
 		PC = TDAT;
 	}
-	LOGINT("RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
+	LOGMASKED(LOG_INT, "RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
 
 macro   reti
 	call pop
@@ -536,7 +536,7 @@ macro   take_interrupt
 		// fetch the IRQ vector
 		device_z80daisy_interface *intf = daisy_get_irq_device();
 		m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
-		LOGINT("single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
+		LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
 	}
 	// 'interrupt latency' cycles
 	+ 2
@@ -553,10 +553,10 @@ macro   take_interrupt
 		TADR = m_tmp_irq_vector;
 		call rm16
 		PC = TDAT;
-		LOGINT("IM2 [$%04x] = $%04x\n", m_tmp_irq_vector, PC);
+		LOGMASKED(LOG_INT, "IM2 [$%04x] = $%04x\n", m_tmp_irq_vector, PC);
 	} else if (m_im == 1) {
 		// Interrupt mode 1. RST 38h
-		LOGINT("'%s' IM1 $0038\n", tag());
+		LOGMASKED(LOG_INT, "'%s' IM1 $0038\n", tag());
 		// RST $38
 		+ 5
 		TDAT = PC;
@@ -566,7 +566,7 @@ macro   take_interrupt
 		/* Interrupt mode 0. We check for CALL and JP instructions,
 		   if neither of these were found we assume a 1 byte opcode
 		   was placed on the databus */
-		LOGINT("IM0 $%04x\n", m_tmp_irq_vector);
+		LOGMASKED(LOG_INT, "IM0 $%04x\n", m_tmp_irq_vector);
 
 		// check for nop
 		if (m_tmp_irq_vector != 0x00) {
@@ -580,16 +580,16 @@ macro   take_interrupt
 				// JP $xxxx cycles
 				+ 10
 				PC = m_tmp_irq_vector & 0xffff;
-			} else if (m_tmp_irq_vector == 0xfb) {
-				// rst (or other opcodes?)
-				+ 4
-				ei();
 			} else if ((m_tmp_irq_vector & 0xc7) == 0xc7) {
 				// RST $xx cycles
 				+ 5
 				TDAT = PC;
 				call wm16_sp
 				PC = m_tmp_irq_vector & 0x0038;
+			} else if (m_tmp_irq_vector == 0xfb) {
+				// EI cycles
+				+ 4
+				ei();
 			} else {
 				logerror("take_interrupt: unexpected opcode in im0 mode: 0x%02x\n", m_tmp_irq_vector);
 			}

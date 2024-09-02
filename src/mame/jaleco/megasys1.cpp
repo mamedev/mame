@@ -4055,7 +4055,7 @@ ROM_START( p47a )
 	ROM_LOAD( "jaleco_p-47_12.rom6", 0x040000, 0x020000, CRC(5268395f) SHA1(de0cba1e7a7d4acc27467d1b553e8f39bea7282e) )
 
 	ROM_REGION( 0x020000, "scroll2", 0 ) /* Scroll 2 */
-	ROM_LOAD( "jaleco_p-47_16.rom12", 0x000000, 0x010000, CRC(30e44375) SHA1(62a4bb217b6aad5fd4760a0f4999cb63559549a5) ) // "phantom" instead of "freedom" in the logo
+	ROM_LOAD( "jaleco_p-47_16.rom12", 0x000000, 0x010000, CRC(30e44375) SHA1(62a4bb217b6aad5fd4760a0f4999cb63559549a5) ) // "freedom" instead of "phantom" in the logo
 
 	ROM_REGION( 0x080000, "sprites", 0 ) /* Sprites */
 	ROM_LOAD( "hn62312ap_c45.rom11",  0x000000, 0x040000, CRC(a239baf4) SHA1(127e9ae02a87b3074300ebda68f00ed1a6e51dfb) )
