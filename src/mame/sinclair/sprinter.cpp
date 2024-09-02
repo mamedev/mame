@@ -122,6 +122,7 @@ protected:
 
 	void update_memory();
 	void update_cpu();
+	void update_video(bool is312);
 
 	virtual TIMER_CALLBACK_MEMBER(irq_on) override;
 	virtual TIMER_CALLBACK_MEMBER(irq_off) override;
@@ -357,6 +358,13 @@ void sprinter_state::update_cpu()
 	m_maincpu->set_clock_scale((m_turbo && m_turbo_hard) ? 6 : 1); // 1 - 21MHz, 0 - 3.5MHz
 }
 
+void sprinter_state::update_video(bool is312)
+{
+	const u16 vtotal = SPRINT_HEIGHT - (8 * is312);
+	m_screen->configure(SPRINT_WIDTH, vtotal, m_screen->visible_area(), HZ_TO_ATTOSECONDS(X_SP / 3) * SPRINT_WIDTH * vtotal);
+	update_int(true);
+}
+
 u32 sprinter_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_conf)
@@ -372,7 +380,8 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 	const bool flash = BIT(screen.frame_number(), 4);
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom();)
 	{
-		const u16 b8 = (SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - m_hold.second) % SPRINT_HEIGHT;
+		const u16 scr_height = screen.height();
+		const u16 b8 = (scr_height + vpos - SPRINT_BORDER_TOP - m_hold.second) % scr_height;
 		for (u16 hpos = cliprect.left(); hpos <= cliprect.right();)
 		{
 			const u16 a16 = (SPRINT_WIDTH + hpos - SPRINT_BORDER_LEFT - m_hold.first) % SPRINT_WIDTH;
@@ -405,8 +414,8 @@ void sprinter_state::draw_tile(u8* mode, bitmap_ind16 &bitmap, const rectangle &
 	{
 		for (auto dx = cliprect.left(); dx <= cliprect.right(); dx++)
 		{
-			const u8 color = m_vram[(y + ((dy & 7) >> lowres)) * 1024 + x + ((dx & 15) >> (1 + lowres))];
-			*pix++ = pal + (BIT(mode[0], 5) ? color : ((dx & 1) ? (color & 0x0f) : (color >> 4)));
+			const u8 color = m_vram[(y + (((dy - m_hold.second) & 7) >> lowres)) * 1024 + x + (((dx - m_hold.first) & 15) >> (1 + lowres))];
+			*pix++ = pal + (BIT(mode[0], 5) ? color : (((dx - m_hold.first) & 1) ? (color & 0x0f) : (color >> 4)));
 		}
 		pix += SPRINT_WIDTH - cliprect.width();
 	}
@@ -463,7 +472,8 @@ void sprinter_state::screen_update_game(screen_device &screen, bitmap_ind16 &bit
 {
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
-		const u8 b = ((SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - m_hold.second) % SPRINT_HEIGHT) >> 3;
+		const u16 scr_height = screen.height();
+		const u8 b = ((scr_height + vpos - SPRINT_BORDER_TOP - m_hold.second) % scr_height) >> 3;
 		const u8 a = ((SPRINT_WIDTH + cliprect.left() - SPRINT_BORDER_LEFT - m_hold.first) % SPRINT_WIDTH) >> 4;
 		std::pair<u8, u8> scroll = lookback_scroll(a, b);
 
@@ -480,7 +490,7 @@ void sprinter_state::screen_update_game(screen_device &screen, bitmap_ind16 &bit
 				scroll = {mode[3] & 0x0f, mode[3] >> 4};
 				a16 = (SPRINT_WIDTH + hpos + (scroll.first << 1) - SPRINT_BORDER_LEFT - m_hold.first) % SPRINT_WIDTH;
 			}
-			const u16 b8 = (SPRINT_HEIGHT + vpos + scroll.second - SPRINT_BORDER_TOP - m_hold.second) % SPRINT_HEIGHT;
+			const u16 b8 = (scr_height + vpos + scroll.second - SPRINT_BORDER_TOP - m_hold.second) % scr_height;
 
 			if (mode == nullptr)
 			{
@@ -729,6 +739,10 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		break;
 	case 0x2b: // HDD2 - primary
 		m_ata_selected = 0;
+		break;
+	case 0x2c: // 320
+	case 0x2d: // 312
+		update_video(dcpp & 1);
 		break;
 	case 0x2e:
 		if (m_conf)
@@ -1164,12 +1178,13 @@ void sprinter_state::update_int(bool recalculate)
 	if (recalculate)
 		m_ints.clear();
 
+	const u8 height = m_screen->height() / 8;
 	if (m_ints.empty())
 	{
-		for (auto scr_b = 0; scr_b <= 39; scr_b++)
+		for (auto scr_b = 0; scr_b < height; scr_b++)
 		{
 			bool pre_int = false;
-			const u8 b = (scr_b + 40 - 2) % 40; // 2-top border
+			const u8 b = (scr_b + height - 2) % height; // 2-top border
 			for (auto scr_a = 0; scr_a <= 55; scr_a++)
 			{
 				const u8 a = (scr_a + 56 - 6) % 56; // 3-left border, 3-teared blank?
@@ -1414,7 +1429,10 @@ void sprinter_state::machine_reset()
 		m_bank_view3.disable();
 	}
 	else
+	{
 		update_memory();
+		update_video(0);
+	}
 }
 
 void sprinter_state::device_post_load()
@@ -1547,7 +1565,7 @@ TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_off)
 {
-	m_irq_off_timer->adjust(attotime::never); // in case it's called from INT Ack, not by timer itself
+	m_irq_off_timer->reset(); // in case it's called from INT Ack, not by timer itself
 	m_hold_irq = 0;
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
@@ -1568,7 +1586,7 @@ TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
 	{
 		m_hold_irq = 1;
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		m_irq_off_timer->adjust(attotime::never);
+		m_irq_off_timer->reset();
 	}
 }
 

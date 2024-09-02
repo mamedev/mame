@@ -33,8 +33,6 @@ TODO:
 #define VERBOSE (LOG_UNDOC)
 #include "logmacro.h"
 
-#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
-#define LOGUNDOC(...) LOGMASKED(LOG_UNDOC, __VA_ARGS__)
 
 bool z80_device::tables_initialised = false;
 u8 z80_device::SZ[] = {};       // zero and sign flags
@@ -468,14 +466,15 @@ void z80_device::set_f(u8 f)
 
 void z80_device::illegal_1()
 {
-	LOGUNDOC("ill. opcode $%02x $%02x ($%04x)\n",
-			 m_opcodes.read_byte(translate_memory_address((PC - 1) & 0xffff)), m_opcodes.read_byte(translate_memory_address(PC)), PC - 1);
+	LOGMASKED(LOG_UNDOC, "ill. opcode $%02x $%02x ($%04x)\n",
+			m_opcodes.read_byte(translate_memory_address((PC - 1) & 0xffff)),
+			m_opcodes.read_byte(translate_memory_address(PC)), PC - 1);
 }
 
 void z80_device::illegal_2()
 {
-	LOGUNDOC("ill. opcode $ed $%02x\n",
-			 m_opcodes.read_byte(translate_memory_address((PC - 1) & 0xffff)));
+	LOGMASKED(LOG_UNDOC, "ill. opcode $ed $%02x\n",
+			m_opcodes.read_byte(translate_memory_address((PC - 1) & 0xffff)));
 }
 
 /****************************************************************************
