@@ -3523,7 +3523,11 @@ ROM_START( le2j )
 	ROM_LOAD( "le2j.nv", 0x0000, 0x080, CRC(f6790425) SHA1(f233f3c09c4cdbd1c6e5204fc6554a4826b44c59) )
 ROM_END
 
-/* Racin' Force */
+/* Racin' Force.
+   For reference, there is a common "year hack" version with:
+    -250eac02.34n CRC(292330d9) SHA1(14f119332fe9bd96171f970642e187fedd24d97d) SUM(c279)
+    -250eac03.31n CRC(2607386c) SHA1(8b0e87d3293547f5b23223c30dc3b6a03c616106) SUM(3d70)
+*/
 ROM_START( racinfrc )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
