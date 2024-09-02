@@ -80,8 +80,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	virtual void device_post_load() override;
-
 private:
 	optional_shared_ptr<u32> m_igs_mainram;
 	required_device<cpu_device> m_maincpu;
@@ -96,9 +94,6 @@ private:
 	u32 lhdmg_unk2_r();
 	void unk2_w(u32 data);
 
-	u8 xor_read(offs_t offset, u8 data);
-	void xor_write(offs_t offset, u8 data);
-
 	void dsw_io_select_w(u32 data);
 
 	u8 ppi_porta_r();
@@ -109,33 +104,9 @@ private:
 	void igs_mahjong_map(address_map &map);
 	void extradraw_map(address_map &map);
 
-	void do_decrypt();
-
 	u32 m_dsw_io_select;
 	u32 m_unk2_write_count;
-
-	u8 m_xortable[0x100];
-	int m_runtime_decrypt_done;
-
-	void (*m_decrypt_function)(running_machine &machine, u8* table) = nullptr;
 };
-
-void igs_m027_state::do_decrypt()
-{
-	if (m_decrypt_function)
-	{
-		m_decrypt_function(machine(), m_xortable);
-		m_runtime_decrypt_done = 1;
-	}
-}
-
-void igs_m027_state::device_post_load()
-{
-	// restore decrypted region
-	if (m_runtime_decrypt_done)
-		do_decrypt();
-}
-
 
 void igs_m027_state::video_start()
 {
@@ -146,27 +117,9 @@ void igs_m027_state::machine_start()
 {
 	m_dsw_io_select = 7;
 	m_unk2_write_count = 0;
-	m_runtime_decrypt_done = 0;
 
 	save_item(NAME(m_dsw_io_select));
 	save_item(NAME(m_unk2_write_count));
-	save_item(NAME(m_xortable));
-	save_item(NAME(m_runtime_decrypt_done));
-}
-
-u8 igs_m027_state::xor_read(offs_t offset, u8 data)
-{
-	return m_xortable[offset];
-}
-
-void igs_m027_state::xor_write(offs_t offset, u8 data)
-{
-	m_xortable[offset] = data;
-
-	if (offset == 0xff) // might not be the trigger
-	{
-		do_decrypt();
-	}
 }
 
 /***************************************************************************
@@ -184,7 +137,7 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
-	map(0x38008000, 0x38008003).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask32(0x000000ff);
+	map(0x38008000, 0x38008003).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x000000ff);
 
 	map(0x38009000, 0x38009003).r(FUNC(igs_m027_state::unk_r));
 
@@ -193,7 +146,7 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 	map(0x40000018, 0x4000001b).w(FUNC(igs_m027_state::dsw_io_select_w));
 
 	map(0x70000200, 0x70000203).ram(); // ??????????????
-	map(0x50000000, 0x500003ff).rw(FUNC(igs_m027_state::xor_read), FUNC(igs_m027_state::xor_write)).umask32(0x000000ff); // uploads XOR table to external ROM here
+	map(0x50000000, 0x500003ff).nopw(); // uploads XOR table to external ROM here
 	map(0xf0000000, 0xf000000f).nopw(); // magic registers
 }
 
@@ -554,10 +507,7 @@ ROM_START( slqz3 )
 	// Internal ROM of IGS027A type G ARM based MCU
 	ROM_LOAD( "s11_027a.bin", 0x00000, 0x4000, CRC(abb8ef8b) SHA1(b8912fe38dc2ff3b1a718e9fe3c76eae30aad7dc) )
 
-	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x200000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "u29", 0x000000, 0x200000, CRC(215fed1e) SHA1(c85d8695e0be1044ac206118c3fc0ddc7063aaf6) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
@@ -609,10 +559,7 @@ ROM_START( fruitpar )
 	// Internal ROM of IGS027A type G ARM based MCU
 	ROM_LOAD( "q5_027a.bin", 0x00000, 0x4000, CRC(df756ac3) SHA1(5b5d2a7f6363260166e3411d1571056cc30a5e56) )
 
-	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x80000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "fruit_paradise_v214.u23", 0x00000, 0x80000, CRC(e37bc4e0) SHA1(f5580e6007dc60f32efd3b3e7e64c5ee446ede8a) )
 
 	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
@@ -631,9 +578,6 @@ ROM_START( fruitpara )
 	ROM_LOAD( "q5_027a.bin", 0x00000, 0x4000, CRC(df756ac3) SHA1(5b5d2a7f6363260166e3411d1571056cc30a5e56) )
 
 	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x80000, "user1_encrypted", 0 ) // external ARM data / prg
 	ROM_LOAD( "f paradise v-206us.u23", 0x00000, 0x80000, CRC(ee2fa627) SHA1(6e964213e17d7db021ec63c7a1af08f863483369) )
 
 	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
@@ -651,10 +595,7 @@ ROM_START( oceanpar ) // IGS PCB-0331-02-FG
 	// Internal ROM of IGS027A type G ARM based MCU
 	ROM_LOAD( "b1_027a.bin", 0x00000, 0x4000, CRC(e64a01a0) SHA1(22f2afbe1fc66c3c9e6d5d87c98b0974615b8a20) )
 
-	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x80000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "ocean_paradise_v105us.u23", 0x00000, 0x80000, CRC(e6eb66c3) SHA1(f6c1e31ccddc8ebb8218f52b5c0d97f0797b2e84) )
 
 	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
@@ -672,10 +613,7 @@ ROM_START( oceanpara ) // IGS PCB-0331-01-FG
 	// Internal ROM of IGS027A type G ARM based MCU
 	ROM_LOAD( "b1_027a.bin", 0x00000, 0x4000, CRC(e64a01a0) SHA1(22f2afbe1fc66c3c9e6d5d87c98b0974615b8a20) )
 
-	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x80000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "ocean_paradise_v101us.u23", 0x00000, 0x80000, CRC(4f2bf87a) SHA1(559c8728632336ba84f455ac22b6e514967c644b) )
 
 	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
@@ -801,10 +739,7 @@ ROM_START( jking02 ) // PCB-0367-05-FG-1
 	// Internal ROM of IGS027A type G ARM based MCU
 	ROM_LOAD( "j6_027a.bin", 0x0000, 0x4000, CRC(69e241f0) SHA1(1ae0aabb217c67ee6e7126f3f0f90c8b3e051888) ) // J6 holographic sticker
 
-	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x80000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "j_k_2002_v-209us.u23", 0x00000, 0x80000, CRC(ef6b652b) SHA1(ee5c2cef2c7cbcd4a70e05c01295e964ca5e45d1) ) // 27C4096
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -909,10 +844,7 @@ ROM_START( lhzb3 )
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "b6_igs027a", 0x00000, 0x4000, CRC(75645f8c) SHA1(738fba64a906f4f10e78e332ad30b8da9dc86b21) )
 
-	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x80000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "lhzb3_104.u9", 0x000000, 0x80000, CRC(70d61846) SHA1(662b59702ef6f26129de6b16346786df92f99097) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -975,10 +907,7 @@ ROM_START( lhdmg ) // appears to be a different edition of lhzb3 and lthy (GFX a
 	// Internal ROM of IGS027A type G ARM based MCU
 	ROM_LOAD( "b6_igs027a", 0x00000, 0x4000, CRC(75645f8c) SHA1(738fba64a906f4f10e78e332ad30b8da9dc86b21) )
 
-	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x80000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "lhdmg_prg.u9", 0x000000, 0x80000, CRC(3b3a77ac) SHA1(c1c40e02d04dc701aa65b7e255b9a928cbecdb8d) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -996,10 +925,7 @@ ROM_START( lhdmgp ) // appears to be a different edition of lhzb3 and lthy (GFX 
 	// Internal ROM of IGS027A type G ARM based MCU
 	ROM_LOAD( "b4_igs027a", 0x00000, 0x4000, CRC(6fd48959) SHA1(75cb6fc6ea3c36805d1a61536e2f2476942c0c49) )
 
-	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x80000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "lhdmg_plus_prg.u9", 0x000000, 0x80000, CRC(77dd7855) SHA1(f04995ee34ef9245dcf3d66fcf111fa377394f92) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -1063,10 +989,7 @@ ROM_START( zhongguo )
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "j8_igs027a", 0x00000, 0x4000, CRC(95c51462) SHA1(818aad8ac25355950ba00438d0eecf58f0a17d8a) )
 
-	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x80000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "p2600.u10", 0x000000, 0x80000, CRC(9ad34135) SHA1(54717753d1296efe49946369fd4a27181f19dbc0) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -1087,10 +1010,7 @@ ROM_START( mgzz )
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "f1_027a.bin", 0x00000, 0x4000, CRC(4b270edb) SHA1(3b4821f7cb785056809c121e6508348df123bfa1) )
 
-	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x80000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "mgfx_101.u10", 0x000000, 0x80000, CRC(897c88a1) SHA1(0f7a7808b9503ff28ad32c0b8e071cb24cff59b1) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -1109,10 +1029,7 @@ ROM_START( mgzza ) // IGS PCB 0295-00 (IGS027A, M6295, IGS031, 8255, Battery)
 	// Internal ROM of IGS027A type G ARM based MCU
 	ROM_LOAD( "f1_027a.bin", 0x00000, 0x4000, CRC(4b270edb) SHA1(3b4821f7cb785056809c121e6508348df123bfa1) )
 
-	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x80000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v-100cn.u10", 0x000000, 0x80000, CRC(278964f7) SHA1(75e48e3124d038f16f93fe3c1f63dd1568f0c018) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -1166,10 +1083,7 @@ ROM_START( lthy ) // appears to be a different edition of lhzb3 (GFX and sound R
 	// Internal ROM of IGS027A type G ARM based MCU
 	ROM_LOAD( "d6_igs027a", 0x00000, 0x4000, CRC(b29ee32b) SHA1(aa5f1f8ed8d61dd328c4c28a7bba700935526d26) )
 
-	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x80000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "27c4096.u10", 0x000000, 0x80000, CRC(bd04f2e9) SHA1(3d5a2101c7214a37f159e0d17f3e66a9b6ab94ff) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -1332,10 +1246,7 @@ ROM_START( chessc2 )
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "c8_027a.bin", 0x00000, 0x4000, CRC(0ef83d8b) SHA1(31ee4bf95561cdccf4262463545839bcde9ce087) ) // stickered C8
 
-	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x80000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "ccii_v-707uso.u12", 0x000000, 0x80000, CRC(5937b67b) SHA1(967b3adf6f5bf92d63ec460d595e473898a78372) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -1377,10 +1288,7 @@ ROM_START( lhzb4 )
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "lhzb4_igs027a", 0x00000, 0x4000, CRC(de12c918) SHA1(87c1cf92a95565d78c6fe7629c19729f5fb5c2a5) ) // unknown sticker
 
-	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x80000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "lhzb4_104.u17", 0x000000, 0x80000, CRC(6f349bbb) SHA1(54cf895889ef0f208637ba732ede696ca3603ee0) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -1399,10 +1307,7 @@ ROM_START( qlgs )
 	// Internal ROM of IGS027A type G ARM based MCU
 	ROM_LOAD( "c3_igs027a.bin", 0x00000, 0x4000, CRC(7b107594) SHA1(274d9927b396b610f99f4a3c760f9f4d9c21d29c) ) // has a 'DJ-2 U17' and a 'C3' sticker
 
-	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x200000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "s-501cn.u17", 0x000000, 0x200000, CRC(c80b61c0) SHA1(4e9920beb85fd559620f3136ea52ab6532657b1f) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x200000, "igs017_igs031:tilemaps", 0 )
@@ -1421,10 +1326,7 @@ ROM_START( mgcs3 )
 	// Internal ROM of IGS027A type G ARM based MCU
 	ROM_LOAD( "m9_027a.bin", 0x00000, 0x4000, CRC(f40b3202) SHA1(6e2ba210afa886be9b43ed7027023d2724aaa538) )
 
-	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF )
-	/* decrypted ROM from user1_encrypted is copied here at runtime */
-
-	ROM_REGION32_LE( 0x200000, "user1_encrypted", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "m2401_v101cn.u17", 0x000000, 0x200000, CRC(d0d78fb6) SHA1(10a16f1ce0a89b5281822be26a2cdcc86702b188) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x200000, "igs017_igs031:tilemaps", 0 )
@@ -1440,17 +1342,17 @@ ROM_END
 ROM_START( extradrw ) // IGS PCB 0326-05-DV-1
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal rom of IGS027A ARM based MCU
-	ROM_LOAD( "e1_igs027a", 0x00000, 0x4000, CRC(ebbf4922) SHA1(d2d196756317523db650bfe9e4bf2aa243e87a00) ) // has a 'E1' sticker
+	ROM_LOAD( "e1_027a.bin", 0x00000, 0x4000, CRC(ebbf4922) SHA1(d2d196756317523db650bfe9e4bf2aa243e87a00) ) // has a 'E1' sticker
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg?
-	ROM_LOAD( "u21", 0x00000, 0x80000, CRC(c1641b14) SHA1(bd2525a5b38d4d8a39e99e43ef62e1d2fd3c044d) ) // 1ST AND 2ND HALF IDENTICAL, label not readable
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "u21", 0x00000, 0x80000, CRC(c1641b14) SHA1(bd2525a5b38d4d8a39e99e43ef62e1d2fd3c044d) ) // 1ST AND 2ND HALF IDENTICAL, but correct, label not readable
 
-	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "igs m3001.u4",  0x000000, 0x080000, CRC(d161f8f7) SHA1(4b495197895fd805979c5d5c5a4b7f07a68f4171) ) // label barely readable
 
 	ROM_REGION( 0x280000, "igs017_igs031:sprites", 0 )
-	ROM_LOAD( "u12",0x000000, 0x200000, CRC(642247fb) SHA1(69c01c3551551120a3786522b28a80621a0d5082) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF, label not readable
-	ROM_LOAD( "u3", 0x200000, 0x080000, CRC(97227767) SHA1(c6a1916c0df1aceafbd488ecace5794390058c49) ) // FIXED BITS (xxxxxxx0xxxxxxxx), label not readable
+	ROM_LOAD( "u12",  0x000000, 0x200000, CRC(642247fb) SHA1(69c01c3551551120a3786522b28a80621a0d5082) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF, label not readable
+	ROM_LOAD( "u3",   0x200000, 0x080000, CRC(97227767) SHA1(c6a1916c0df1aceafbd488ecace5794390058c49) ) // FIXED BITS (xxxxxxx0xxxxxxxx), label not readable
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "igs s3002.u18", 0x00000, 0x200000, CRC(48601c32) SHA1(8ef3bad80931f4b1badf0598463e15508602f104) ) // BADADDR   --xxxxxxxxxxxxxxxxxxx
@@ -1496,13 +1398,13 @@ void igs_m027_state::init_klxyj()
 
 void igs_m027_state::init_chessc2()
 {
-	m_decrypt_function = chessc2_decrypt;
+	chessc2_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
 }
 
 void igs_m027_state::init_lhzb4()
 {
-	m_decrypt_function = lhzb4_decrypt;
+	lhzb4_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
@@ -1523,26 +1425,26 @@ void igs_m027_state::init_gonefsh2()
 
 void igs_m027_state::init_zhongguo()
 {
-	m_decrypt_function = zhongguo_decrypt;
+	zhongguo_decrypt(machine());
 	m_igs017_igs031->set_text_reverse_bits(false);
 }
 
 void igs_m027_state::init_slqz3()
 {
-	m_decrypt_function = slqz3_decrypt;
+	slqz3_decrypt(machine());
 	m_igs017_igs031->set_text_reverse_bits(false);
 }
 
 void igs_m027_state::init_fruitpar()
 {
-	m_decrypt_function = fruitpar_decrypt;
+	fruitpar_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027_state::init_oceanpar()
 {
-	m_decrypt_function = oceanpar_decrypt;
+	oceanpar_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
@@ -1563,7 +1465,7 @@ void igs_m027_state::init_amazoni2()
 
 void igs_m027_state::init_qlgs()
 {
-	m_decrypt_function = qlgs_decrypt;
+	qlgs_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
@@ -1578,30 +1480,28 @@ void igs_m027_state::init_extradrw()
 
 void igs_m027_state::init_mgzz()
 {
-	m_decrypt_function = mgzz_decrypt;
+	mgzz_decrypt(machine());
 	m_igs017_igs031->set_text_reverse_bits(false);
 }
 
 void igs_m027_state::init_mgcs3()
 {
-	m_decrypt_function = mgcs3_decrypt;
+	mgcs3_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027_state::init_jking02()
 {
-	m_decrypt_function = jking02_decrypt;
+	jking02_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
 	// the sprite ROM at 0x400000 doesn't require decryption
 }
 
-
-
 void igs_m027_state::init_lthy()
 {
-	m_decrypt_function = lthy_decrypt;
+	lthy_decrypt(machine());
 	m_igs017_igs031->set_text_reverse_bits(false);
 }
 
@@ -1621,14 +1521,14 @@ void igs_m027_state::init_olympic5()
 
 void igs_m027_state::init_lhdmg()
 {
-	m_decrypt_function = lhdmg_decrypt;
+	lhdmg_decrypt(machine());
 	m_igs017_igs031->set_text_reverse_bits(false);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000000c, 0x4000000f, read32smo_delegate(*this, FUNC(igs_m027_state::lhdmg_unk2_r)));
 }
 
 void igs_m027_state::init_lhdmgp()
 {
-	m_decrypt_function = lhdmgp_decrypt;
+	lhdmgp_decrypt(machine());
 	m_igs017_igs031->set_text_reverse_bits(false);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000000c, 0x4000000f, read32smo_delegate(*this, FUNC(igs_m027_state::lhdmg_unk2_r)));
 }
@@ -1664,13 +1564,12 @@ GAME( 200?, extradrw,  0,        extradraw,   base,     igs_m027_state, init_ext
 // these have an IGS025 protection device instead of the 8255
 GAME( 2002, chessc2,   0,        igs_mahjong, base,     igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING )
 
-
 // Incomplete dumps
 GAME( 1999, amazonia,  0,        igs_mahjong, amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_NOT_WORKING )
 GAME( 1999, amazonkp,  amazonia, igs_mahjong, amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King Plus (V204BR)", MACHINE_NOT_WORKING )
-GAME( 200?, luckycrs,  0,        igs_mahjong, base,     igs_m027_state, init_luckycrs, ROT0, "IGS", "Lucky Cross (V106SA)", MACHINE_NOT_WORKING )
 GAME( 2005, olympic5,  0,        igs_mahjong, base,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V112US)", MACHINE_NOT_WORKING ) // IGS FOR V112US 2005 02 14
 GAME( 2003, olympic5a, olympic5, igs_mahjong, base,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V107US)", MACHINE_NOT_WORKING ) // IGS FOR V107US 2003 10 2
+GAME( 200?, luckycrs,  0,        igs_mahjong, base,     igs_m027_state, init_luckycrs, ROT0, "IGS", "Lucky Cross (V106SA)", MACHINE_NOT_WORKING )
 GAME( 2003, amazoni2,  0,        igs_mahjong, base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_NOT_WORKING )
 GAME( 2002, sdwx,      0,        igs_mahjong, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME( 200?, sddz,      0,        igs_mahjong, base,     igs_m027_state, init_sddz,     ROT0, "IGS", "Super Dou Di Zhu", MACHINE_NOT_WORKING )
