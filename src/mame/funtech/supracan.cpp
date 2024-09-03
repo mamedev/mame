@@ -127,8 +127,8 @@ public:
 		, m_cart(*this, "cartslot")
 		, m_lockout(*this, "lockout")
 		, m_internal68(*this, "internal68")
-		, m_internal68_view(*this, "internal68")
-		, m_internal68_view_hi(*this, "internal68_hi")
+		, m_main_loview(*this, "main_loview")
+		, m_main_hiview(*this, "main_hiview")
 		, m_vram(*this, "vram")
 		, m_soundram(*this, "soundram")
 		, m_sound(*this, "acansnd")
@@ -189,8 +189,8 @@ private:
 	required_device<generic_slot_device> m_cart;
 	required_device<umc6650_device> m_lockout;
 	required_region_ptr<uint16_t> m_internal68;
-	memory_view m_internal68_view;
-	memory_view m_internal68_view_hi;
+	memory_view m_main_loview;
+	memory_view m_main_hiview;
 
 	required_shared_ptr<uint16_t> m_vram;
 	required_shared_ptr<uint8_t> m_soundram;
@@ -1329,7 +1329,10 @@ void supracan_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void supracan_state::supracan_mem(address_map &map)
 {
-	// 0x000000..0x3fffff is mapped by the cartslot
+	map(0x000000, 0x3fffff).view(m_main_loview);
+	m_main_loview[0](0x000000, 0x3fffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
+	m_main_loview[0](0x000000, 0x000fff).rom().region(m_internal68, 0);
+	m_main_loview[1](0x000000, 0x3fffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
 	map(0xe80000, 0xe8ffff).rw(FUNC(supracan_state::_68k_soundram_r), FUNC(supracan_state::_68k_soundram_w));
 	map(0xe90000, 0xe9001f).rw(FUNC(supracan_state::sound_r), FUNC(supracan_state::sound_w));
 	map(0xe90020, 0xe9002f).w(FUNC(supracan_state::dma_channel0_w));
@@ -1342,6 +1345,10 @@ void supracan_state::supracan_mem(address_map &map)
 	map(0xf00000, 0xf001ff).rw(FUNC(supracan_state::video_r), FUNC(supracan_state::video_w));
 	map(0xf00200, 0xf003ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xf40000, 0xf5ffff).ram().w(FUNC(supracan_state::vram_w)).share("vram");
+	map(0xf80000, 0xfbffff).view(m_main_hiview);
+	m_main_hiview[0](0xf80000, 0xfbffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
+	m_main_hiview[0](0xf80000, 0xf80fff).rom().region(m_internal68, 0);
+	m_main_hiview[1](0xf80000, 0xfbffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
 	map(0xfc0000, 0xfcffff).mirror(0x30000).ram(); /* System work ram */
 }
 
@@ -1624,12 +1631,12 @@ void supracan_state::sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		const uint16_t changed = old ^ m_sound_cpu_ctrl;
 		if (BIT(changed, 3) && BIT(data, 3))
 		{
-			m_internal68_view_hi.select(1);
+			m_main_hiview.select(1);
 		}
 
 		if (BIT(changed, 1) && BIT(data, 1))
 		{
-			m_internal68_view.select(1);
+			m_main_loview.select(1);
 		}
 
 		if (BIT(changed, 0))
@@ -2019,26 +2026,13 @@ void supracan_state::machine_start()
 	m_hbl_timer = timer_alloc(FUNC(supracan_state::hbl_callback), this);
 	m_line_on_timer = timer_alloc(FUNC(supracan_state::line_on_callback), this);
 	m_line_off_timer = timer_alloc(FUNC(supracan_state::line_off_callback), this);
-
-	m_maincpu->space(AS_PROGRAM).install_view(0x000000, 0x3fffff, m_internal68_view);
-	m_maincpu->space(AS_PROGRAM).install_view(0xf80000, 0xfbffff, m_internal68_view_hi);
-	if (m_cart->exists())
-	{
-		//m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x3fffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
-		m_internal68_view[0].install_read_handler(0x000000, 0x3fffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
-		m_internal68_view[1].install_read_handler(0x000000, 0x3fffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
-		m_internal68_view_hi[0].install_read_handler(0xf80000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
-		m_internal68_view_hi[1].install_read_handler(0xf80000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
-	}
-	m_internal68_view[0].install_rom(0x0000, 0x0fff, m_internal68);
-	m_internal68_view_hi[0].install_rom(0xf80000, 0xf80fff, m_internal68);
 }
 
 
 void supracan_state::machine_reset()
 {
-	m_internal68_view.select(0);
-	m_internal68_view_hi.select(0);
+	m_main_loview.select(0);
+	m_main_hiview.select(0);
 
 	m_sprite_count = 0;
 	m_sprite_base_addr = 0;
@@ -2182,6 +2176,7 @@ void supracan_state::supracan(machine_config &config)
 	m_sound->add_route(1, "rspeaker", 1.0);
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "supracan_cart"));
+	cartslot.set_must_be_loaded(true);
 	cartslot.set_width(GENERIC_ROM16_WIDTH);
 	cartslot.set_endian(ENDIANNESS_BIG);
 	cartslot.set_device_load(FUNC(supracan_state::cart_load));

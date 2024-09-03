@@ -23,7 +23,7 @@ umc6650_device::umc6650_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, UMC6650, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_romkey(*this, "romkey")
-	, m_space_io_config("io", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(FUNC(umc6650_device::internal_map), this))
+	, m_space_io_config("io", ENDIANNESS_BIG, 8, 7, 0, address_map_constructor(FUNC(umc6650_device::internal_map), this))
 {
 }
 
