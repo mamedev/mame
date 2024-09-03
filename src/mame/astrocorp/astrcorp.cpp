@@ -3,6 +3,7 @@
 /*************************************************************************************************************
 
                                             -= Astro Corp. CGA Hardware =-
+                                                 (known as "Permus")
 
                                        driver by   Luca Elia (l.elia@tin.it)
                                    decryption by   Olivier Galibert
@@ -71,7 +72,8 @@ TODO:
 - speedmst,a,b: need RE of the CPU code, correct EEPROM. Won't boot right now.
 - cptshark: needs verifying of inputs and layout
 - wwitch: needs correct GFX ROMs loading / decode, RE of the CPU code, inputs, outputs. Currently starts but then freezes.
-- hapfarm: doesn't work, possibly wrong interrupts. Code base differs significantly, needs studying.
+- hapfarm: doesn't work, possibly wrong interrupts. Code base differs significantly, needs studying. Probably the link between
+  this generation of hardware and the one in astrocorp/hummer.cpp.
 
 *************************************************************************************************************/
 

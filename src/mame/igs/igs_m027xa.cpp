@@ -329,7 +329,7 @@ ROM_END
 ROM_START( tripfev ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Oki M6295, 3x 8-DIP banks
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "m1_igs027a.u37", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) ) // sticker marked 'W1'
+	ROM_LOAD( "m1_igs027a.u37", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) ) // sticker marked 'M1'
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "triple_fever_u23_v107_us.u23", 0x000000, 0x80000, CRC(aa56d888) SHA1(0b8b2765079259b76ea803289841d867c33c8cb2) ) // 27C4096
