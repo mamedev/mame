@@ -137,7 +137,7 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
-	map(0x38008000, 0x38008003).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x000000ff);
+	map(0x38008000, 0x38008003).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask32(0x000000ff);
 
 	map(0x38009000, 0x38009003).r(FUNC(igs_m027_state::unk_r));
 
