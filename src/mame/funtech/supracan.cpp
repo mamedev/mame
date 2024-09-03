@@ -2,12 +2,7 @@
 // copyright-holders:Angelo Salese,Ryan Holtz
 /***************************************************************************
 
-
-    Funtech Super A'Can
-    -------------------
-
-    Preliminary driver by Angelo Salese
-    Improvements by Ryan Holtz
+Super A'Can (c) 1995 Funtech
 
 References:
 - https://gist.github.com/evadot/66cfdb8891544b41b4c9
@@ -89,6 +84,7 @@ DEBUG TRICKS:
 #include "softlist_dev.h"
 #include "speaker.h"
 #include "tilemap.h"
+#include "umc6650.h"
 
 #define LOG_UNKNOWNS    (1U << 1)
 #define LOG_DMA         (1U << 2)
@@ -108,7 +104,7 @@ DEBUG TRICKS:
 #define LOG_ALL         (LOG_UNKNOWNS | LOG_HFUNKNOWNS | LOG_DMA | LOG_VIDEO | LOG_HFVIDEO | LOG_IRQS | LOG_SOUND | LOG_68K_SOUND | LOG_CONTROLS)
 #define LOG_DEFAULT     (LOG_ALL & ~(LOG_HFVIDEO | LOG_HFUNKNOWNS))
 
-#define VERBOSE         (LOG_UNKNOWNS | LOG_SOUND | LOG_DMA)
+#define VERBOSE         (LOG_UNKNOWNS | LOG_DMA)
 #include "logmacro.h"
 
 
@@ -129,10 +125,10 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_soundcpu(*this, "soundcpu")
 		, m_cart(*this, "cartslot")
+		, m_lockout(*this, "lockout")
 		, m_internal68(*this, "internal68")
 		, m_internal68_view(*this, "internal68")
 		, m_internal68_view_hi(*this, "internal68_hi")
-		, m_umc6650key(*this, "umc6650key")
 		, m_vram(*this, "vram")
 		, m_soundram(*this, "soundram")
 		, m_sound(*this, "acansnd")
@@ -168,10 +164,6 @@ private:
 	void video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void umc6650_addr_w(uint8_t data);
-	uint8_t umc6650_data_r();
-	void umc6650_data_w(uint8_t data);
-
 	uint8_t sound_ram_read(offs_t offset);
 
 	struct dma_regs_t
@@ -195,10 +187,10 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<generic_slot_device> m_cart;
+	required_device<umc6650_device> m_lockout;
 	required_region_ptr<uint16_t> m_internal68;
 	memory_view m_internal68_view;
 	memory_view m_internal68_view_hi;
-	required_region_ptr<uint8_t> m_umc6650key;
 
 	required_shared_ptr<uint16_t> m_vram;
 	required_shared_ptr<uint8_t> m_soundram;
@@ -1335,23 +1327,6 @@ void supracan_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_gfxdecode->gfx(4)->mark_dirty((offset * 2) / 8);
 }
 
-void supracan_state::umc6650_addr_w(uint8_t data)
-{
-	m_umc6650_addr = data & 0x7f;
-}
-
-uint8_t supracan_state::umc6650_data_r()
-{
-	if (m_umc6650_addr >= 0x20 && m_umc6650_addr < 0x2f)
-		return m_umc6650key[m_umc6650_addr & 0xf];
-	return m_umc6650_data[m_umc6650_addr];
-}
-
-void supracan_state::umc6650_data_w(uint8_t data)
-{
-	m_umc6650_data[m_umc6650_addr] = data;
-}
-
 void supracan_state::supracan_mem(address_map &map)
 {
 	// 0x000000..0x3fffff is mapped by the cartslot
@@ -1360,8 +1335,9 @@ void supracan_state::supracan_mem(address_map &map)
 	map(0xe90020, 0xe9002f).w(FUNC(supracan_state::dma_channel0_w));
 	map(0xe90030, 0xe9003f).w(FUNC(supracan_state::dma_channel1_w));
 
-	map(0xeb0d00, 0xeb0d01).rw(FUNC(supracan_state::umc6650_data_r), FUNC(supracan_state::umc6650_data_w)).umask16(0x00ff);
-	map(0xeb0d02, 0xeb0d03).w(FUNC(supracan_state::umc6650_addr_w)).umask16(0x00ff);
+	map(0xe90b3c, 0xe90b3d).noprw(); // noisy during lockout checks
+
+	map(0xeb0d00, 0xeb0d03).rw(m_lockout, FUNC(umc6650_device::read), FUNC(umc6650_device::write)).umask16(0x00ff);
 
 	map(0xf00000, 0xf001ff).rw(FUNC(supracan_state::video_r), FUNC(supracan_state::video_w));
 	map(0xf00200, 0xf003ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
@@ -2177,10 +2153,13 @@ void supracan_state::supracan(machine_config &config)
 	M68000(config, m_maincpu, XTAL(10'738'635));        /* Correct frequency unknown */
 	m_maincpu->set_addrmap(AS_PROGRAM, &supracan_state::supracan_mem);
 
-	M6502(config, m_soundcpu, XTAL(3'579'545));     /* TODO: Verify actual clock */
+	// TODO: Verify actual clock
+	M6502(config, m_soundcpu, XTAL(3'579'545));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &supracan_state::supracan_sound_mem);
 
 	config.set_perfect_quantum(m_soundcpu);
+
+	UMC6650(config, m_lockout, 0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(10'738'635)/2, 348, 0, 256, 256, 0, 240);  /* No idea if this is correct */
@@ -2214,10 +2193,6 @@ ROM_START( supracan )
 	ROM_REGION16_BE(0x1000, "internal68", ROMREGION_ERASEFF)
 	// 68k internal ROM (security related)
 	ROM_LOAD16_WORD_SWAP( "internal_68k.bin", 0x0000,  0x1000, CRC(8d575662) SHA1(a8e75633662978d0a885f16a4ed0f898f278a10a) )
-
-	ROM_REGION(0x10, "umc6650key", ROMREGION_ERASEFF)
-	// 68k internal ROM (security related)
-	ROM_LOAD( "umc6650.bin", 0x00,  0x10, CRC(0ba78597) SHA1(f94805457976d60b91e8df18f9f49cccec77be78) )
 
 	ROM_REGION(0x2000, "internal6502", ROMREGION_ERASEFF)
 	// 2 additional blocks of ROM(?) can be seen next to the 68k ROM on a die shot from Furrtek

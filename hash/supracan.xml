@@ -134,7 +134,7 @@ Black screen at security BIOS time, cfr. PC=f8061a
 		<year>1996</year>
 		<publisher>Funtech</publisher>
 		<notes><![CDATA[
-Too fast in gameplay
+Too fast in gameplay, [irq 3] related
 ]]></notes>
 		<info name="serial" value="F009" />
 		<info name="alt_title" value="賭霸 (Du Ba)" />
