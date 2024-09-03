@@ -4,7 +4,7 @@
 /*
 Dyna D0404 PCB
 
-This PCB is newer hardware than the one is misc/dyna_d0404.cpp, possibly the next one.
+This PCB is newer hardware than the one is misc/cb2001.cpp, possibly the next one.
 It seems Dyna got rid of some legacy features like physical DIPs, color PROMs and AY sound.
 While the CPU is sanded off, ROM seems to contain valid ARM code.
 Currently unknown what produces the sound.
