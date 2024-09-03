@@ -1602,7 +1602,7 @@ void oceanpar_decrypt(running_machine &machine)
 		IGS27_CRYPT5_ALT
 		IGS27_CRYPT6
 		IGS27_CRYPT7_ALT
-		IGS27_CRYPT8_ALT
+		IGS27_CRYPT8
 
 		x ^= oceanpar_tab[(i>> 1) & 0xff] << 8;
 
@@ -2172,7 +2172,7 @@ void tripfev_decrypt(running_machine &machine)
 		IGS27_CRYPT3
 		IGS27_CRYPT4_ALT // $2fc0
 		IGS27_CRYPT5_ALT // $35da0
-		IGS27_CRYPT6_ALT
+		IGS27_CRYPT6
 		IGS27_CRYPT7_ALT // $2b0
 		IGS27_CRYPT8 // $1100
 
@@ -2361,3 +2361,30 @@ void lhdmgp_decrypt(running_machine &machine)
 		src[i] = x;
 	}
 }
+
+
+
+void extradrw_decrypt(running_machine &machine)
+{
+	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(machine.root_device().memregion("user1")->base()));
+
+	int const rom_size = 0x80000;
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		uint16_t x = 0;
+
+		IGS27_CRYPT1
+		IGS27_CRYPT2_ALT
+		IGS27_CRYPT3_ALT2
+		IGS27_CRYPT4
+		IGS27_CRYPT5
+		IGS27_CRYPT6
+		IGS27_CRYPT7
+		IGS27_CRYPT8_ALT
+
+		x |= (x << 8);
+		src[i] ^= x;
+	}
+}
+
