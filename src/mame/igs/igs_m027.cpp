@@ -34,6 +34,11 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
+#include <algorithm>
+
+
 namespace {
 
 class igs_m027_state : public driver_device
@@ -41,6 +46,7 @@ class igs_m027_state : public driver_device
 public:
 	igs_m027_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_external_rom(*this, "user1"),
 		m_igs_mainram(*this, "igs_mainram"),
 		m_maincpu(*this, "maincpu"),
 		m_ppi(*this, "ppi8255"),
@@ -50,77 +56,89 @@ public:
 		m_dsw(*this, "DSW%u", 1U)
 	{ }
 
-	void igs_mahjong(machine_config &config);
-	void extradraw(machine_config &config);
+	void igs_mahjong(machine_config &config) ATTR_COLD;
+	void igs_mahjong_xor(machine_config &config) ATTR_COLD;
+	void extradraw(machine_config &config) ATTR_COLD;
 
-	void init_sdwx();
-	void init_chessc2();
-	void init_lhzb4();
-	void init_gonefsh2();
-	void init_sddz();
-	void init_zhongguo();
-	void init_klxyj();
-	void init_slqz3();
-	void init_fruitpar();
-	void init_oceanpar();
-	void init_amazonia();
-	void init_amazoni2();
-	void init_qlgs();
-	void init_mgzz();
-	void init_mgcs3();
-	void init_jking02();
-	void init_lhdmg();
-	void init_lhdmgp();
-	void init_lthy();
-	void init_luckycrs();
-	void init_olympic5();
-	void init_extradrw();
+	void init_sdwx() ATTR_COLD;
+	void init_chessc2() ATTR_COLD;
+	void init_lhzb4() ATTR_COLD;
+	void init_gonefsh2() ATTR_COLD;
+	void init_sddz() ATTR_COLD;
+	void init_zhongguo() ATTR_COLD;
+	void init_klxyj() ATTR_COLD;
+	void init_slqz3() ATTR_COLD;
+	void init_fruitpar() ATTR_COLD;
+	void init_oceanpar() ATTR_COLD;
+	void init_amazonia() ATTR_COLD;
+	void init_amazoni2() ATTR_COLD;
+	void init_qlgs() ATTR_COLD;
+	void init_mgzz() ATTR_COLD;
+	void init_mgcs3() ATTR_COLD;
+	void init_jking02() ATTR_COLD;
+	void init_lhdmg() ATTR_COLD;
+	void init_lhdmgp() ATTR_COLD;
+	void init_lthy() ATTR_COLD;
+	void init_luckycrs() ATTR_COLD;
+	void init_olympic5() ATTR_COLD;
+	void init_extradrw() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
+	required_region_ptr<u32> m_external_rom;
 	optional_shared_ptr<u32> m_igs_mainram;
 	required_device<cpu_device> m_maincpu;
-	optional_device<i8255_device> m_ppi;
+	required_device<i8255_device> m_ppi;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	required_device<screen_device> m_screen;
 	required_device<okim6295_device> m_oki;
 	required_ioport_array<3> m_dsw;
+
+	u32 m_xor_table[0x100];
+	u32 m_dsw_io_select;
+	u32 m_unk2_write_count;
+
+	u8 ppi_porta_r();
+
+	void dsw_io_select_w(u32 data);
+
+	u32 external_rom_r(offs_t offset);
+
+	void xor_table_w(offs_t offset, u8 data);
 
 	u32 unk_r();
 	u32 unk2_r();
 	u32 lhdmg_unk2_r();
 	void unk2_w(u32 data);
 
-	void dsw_io_select_w(u32 data);
-
-	u8 ppi_porta_r();
-
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void pgm_create_dummy_internal_arm_region();
-	void igs_mahjong_map(address_map &map);
-	void extradraw_map(address_map &map);
+	void pgm_create_dummy_internal_arm_region() ATTR_COLD;
 
-	u32 m_dsw_io_select;
-	u32 m_unk2_write_count;
+	void igs_mahjong_map(address_map &map) ATTR_COLD;
+	void igs_mahjong_xor_map(address_map &map) ATTR_COLD;
+	void extradraw_map(address_map &map) ATTR_COLD;
 };
+
+void igs_m027_state::machine_start()
+{
+	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
+	m_dsw_io_select = 7;
+	m_unk2_write_count = 0;
+
+	save_item(NAME(m_xor_table));
+	save_item(NAME(m_dsw_io_select));
+	save_item(NAME(m_unk2_write_count));
+}
 
 void igs_m027_state::video_start()
 {
 	m_igs017_igs031->video_start();
 }
 
-void igs_m027_state::machine_start()
-{
-	m_dsw_io_select = 7;
-	m_unk2_write_count = 0;
-
-	save_item(NAME(m_dsw_io_select));
-	save_item(NAME(m_unk2_write_count));
-}
 
 /***************************************************************************
 
@@ -137,7 +155,7 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
-	map(0x38008000, 0x38008003).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask32(0x000000ff);
+	map(0x38008000, 0x38008003).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
 	map(0x38009000, 0x38009003).r(FUNC(igs_m027_state::unk_r));
 
@@ -146,13 +164,22 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 	map(0x40000018, 0x4000001b).w(FUNC(igs_m027_state::dsw_io_select_w));
 
 	map(0x70000200, 0x70000203).ram(); // ??????????????
-	map(0x50000000, 0x500003ff).nopw(); // uploads XOR table to external ROM here
 	map(0xf0000000, 0xf000000f).nopw(); // magic registers
+}
+
+void igs_m027_state::igs_mahjong_xor_map(address_map &map)
+{
+	igs_mahjong_map(map);
+
+	map(0x08000000, 0x0807ffff).r(FUNC(igs_m027_state::external_rom_r)); // Game ROM
+
+	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027_state::xor_table_w)); // uploads XOR table to external ROM here
 }
 
 void igs_m027_state::extradraw_map(address_map &map)
 {
 	igs_mahjong_map(map);
+
 	map(0x18088000, 0x1808ffff).ram(); // Extra Draw needs RAM here, maybe just a mirror, maybe due to PCB difference
 }
 
@@ -383,18 +410,33 @@ u8 igs_m027_state::ppi_porta_r()
 	return data;
 }
 
+
 void igs_m027_state::dsw_io_select_w(u32 data)
 {
 	m_dsw_io_select = data;
 }
 
 
+u32 igs_m027_state::external_rom_r(offs_t offset)
+{
+	return m_external_rom[offset] ^ m_xor_table[offset & 0x00ff];
+}
+
+
+void igs_m027_state::xor_table_w(offs_t offset, u8 data)
+{
+	m_xor_table[offset] = (u32(data) << 24) | (u32(data) << 8);
+}
+
+
 // IO? maybe serial?
 
-void igs_m027_state::unk2_w(u32 data)
+u32 igs_m027_state::unk_r()
 {
-	logerror("%s: unk2_w %08x\n", machine().describe_context(), data);
-	m_unk2_write_count++;
+	// this is accessed as a byte, lower 2 bytes are read?
+	// slqz3 reads test switch in here? writes to the address look like key matrix?
+	logerror("%s: unk_r\n", machine().describe_context());
+	return 0xffffffff;
 }
 
 u32 igs_m027_state::unk2_r()
@@ -418,12 +460,10 @@ u32 igs_m027_state::lhdmg_unk2_r()
 		return 0xffffffff ^ 0x400000;
 }
 
-u32 igs_m027_state::unk_r()
+void igs_m027_state::unk2_w(u32 data)
 {
-	// this is accessed as a byte, lower 2 bytes are read?
-	// slqz3 reads test switch in here? writes to the address look like key matrix?
-	logerror("%s: unk_r\n", machine().describe_context());
-	return 0xffffffff;
+	logerror("%s: unk2_w %08x\n", machine().describe_context(), data);
+	m_unk2_write_count++;
 }
 
 
@@ -449,7 +489,6 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 	m_ppi->in_pb_callback().set_ioport("PORTB");
 	m_ppi->in_pc_callback().set_ioport("PORTC");
 
-
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits(true);
 	m_igs017_igs031->set_i8255_tag("ppi8255");
@@ -459,9 +498,17 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
+void igs_m027_state::igs_mahjong_xor(machine_config &config)
+{
+	igs_mahjong(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_mahjong_xor_map);
+}
+
 void igs_m027_state::extradraw(machine_config &config)
 {
 	igs_mahjong(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::extradraw_map);
 }
 
@@ -1361,13 +1408,13 @@ ROM_END
 
 void igs_m027_state::pgm_create_dummy_internal_arm_region()
 {
-	u16 *temp16 = (u16 *)memregion("maincpu")->base();
+	auto const temp16 = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(memregion("maincpu")->base()));
 
 	// fill with RX 14
 	for (int i = 0; i < 0x4000 / 2; i += 2)
 	{
 		temp16[i] = 0xff1e;
-		temp16[ i +1] = 0xe12f;
+		temp16[i + 1] = 0xe12f;
 
 	}
 
@@ -1544,35 +1591,35 @@ void igs_m027_state::init_lhdmgp()
 ***************************************************************************/
 
 // Complete dumps
-GAME( 1999, slqz3,     0,        igs_mahjong, base,     igs_m027_state, init_slqz3,    ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_NOT_WORKING )
-GAME( 1999, qlgs,      0,        igs_mahjong, qlgs,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Que Long Gao Shou", MACHINE_NOT_WORKING )
-GAME( 1999, fruitpar,  0,        igs_mahjong, base,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_NOT_WORKING )
-GAME( 1999, fruitpara, fruitpar, igs_mahjong, base,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", MACHINE_NOT_WORKING )
-GAME( 1999, lhdmg,     0,        igs_mahjong, base,     igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Man Guan", MACHINE_NOT_WORKING )
-GAME( 1999, lhdmgp,    lhdmg,    igs_mahjong, base,     igs_m027_state, init_lhdmgp,   ROT0, "IGS", "Long Hu Da Man Guan Plus", MACHINE_NOT_WORKING )
-GAME( 1999, lhzb3,     0,        igs_mahjong, base,     igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III", MACHINE_NOT_WORKING ) // 龙虎争霸Ⅲ
-GAME( 2004, lhzb4,     0,        igs_mahjong, base,     igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4", MACHINE_NOT_WORKING ) // 龙虎争霸4
-GAME( 1999, lthy,      0,        igs_mahjong, base,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_NOT_WORKING )
-GAME( 2000, zhongguo,  0,        igs_mahjong, base,     igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhong Guo Chu Da D", MACHINE_NOT_WORKING )
-GAME( 200?, jking02,   0,        igs_mahjong, jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NOT_WORKING )
-GAME( 2003, mgzz,      0,        igs_mahjong, base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V101CN)", MACHINE_NOT_WORKING )
-GAME( 2000, mgzza,     mgzz,     igs_mahjong, base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_NOT_WORKING )
-GAME( 2007, mgcs3,     0,        igs_mahjong, base,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)", MACHINE_NOT_WORKING )
-GAME( 1999, oceanpar,  0,        igs_mahjong, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
-GAME( 1999, oceanpara, oceanpar, igs_mahjong, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
-GAME( 200?, extradrw,  0,        extradraw,   base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
+GAME( 1999, slqz3,     0,        igs_mahjong_xor, base,     igs_m027_state, init_slqz3,    ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_NOT_WORKING )
+GAME( 1999, qlgs,      0,        igs_mahjong_xor, qlgs,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Que Long Gao Shou", MACHINE_NOT_WORKING )
+GAME( 1999, fruitpar,  0,        igs_mahjong_xor, base,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_NOT_WORKING )
+GAME( 1999, fruitpara, fruitpar, igs_mahjong_xor, base,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", MACHINE_NOT_WORKING )
+GAME( 1999, lhdmg,     0,        igs_mahjong_xor, base,     igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Man Guan", MACHINE_NOT_WORKING )
+GAME( 1999, lhdmgp,    lhdmg,    igs_mahjong_xor, base,     igs_m027_state, init_lhdmgp,   ROT0, "IGS", "Long Hu Da Man Guan Plus", MACHINE_NOT_WORKING )
+GAME( 1999, lhzb3,     0,        igs_mahjong_xor, base,     igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III", MACHINE_NOT_WORKING ) // 龙虎争霸Ⅲ
+GAME( 2004, lhzb4,     0,        igs_mahjong_xor, base,     igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4", MACHINE_NOT_WORKING ) // 龙虎争霸4
+GAME( 1999, lthy,      0,        igs_mahjong_xor, base,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_NOT_WORKING )
+GAME( 2000, zhongguo,  0,        igs_mahjong_xor, base,     igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhong Guo Chu Da D", MACHINE_NOT_WORKING )
+GAME( 200?, jking02,   0,        igs_mahjong_xor, jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NOT_WORKING )
+GAME( 2003, mgzz,      0,        igs_mahjong_xor, base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V101CN)", MACHINE_NOT_WORKING )
+GAME( 2000, mgzza,     mgzz,     igs_mahjong_xor, base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_NOT_WORKING )
+GAME( 2007, mgcs3,     0,        igs_mahjong_xor, base,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)", MACHINE_NOT_WORKING )
+GAME( 1999, oceanpar,  0,        igs_mahjong_xor, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
+GAME( 1999, oceanpara, oceanpar, igs_mahjong_xor, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
+GAME( 200?, extradrw,  0,        extradraw,       base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
-GAME( 2002, chessc2,   0,        igs_mahjong, base,     igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING )
+GAME( 2002, chessc2,   0,        igs_mahjong_xor, base,     igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING )
 
 // Incomplete dumps
-GAME( 1999, amazonia,  0,        igs_mahjong, amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_NOT_WORKING )
-GAME( 1999, amazonkp,  amazonia, igs_mahjong, amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King Plus (V204BR)", MACHINE_NOT_WORKING )
-GAME( 2005, olympic5,  0,        igs_mahjong, base,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V112US)", MACHINE_NOT_WORKING ) // IGS FOR V112US 2005 02 14
-GAME( 2003, olympic5a, olympic5, igs_mahjong, base,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V107US)", MACHINE_NOT_WORKING ) // IGS FOR V107US 2003 10 2
-GAME( 200?, luckycrs,  0,        igs_mahjong, base,     igs_m027_state, init_luckycrs, ROT0, "IGS", "Lucky Cross (V106SA)", MACHINE_NOT_WORKING )
-GAME( 2003, amazoni2,  0,        igs_mahjong, base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_NOT_WORKING )
-GAME( 2002, sdwx,      0,        igs_mahjong, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
-GAME( 200?, sddz,      0,        igs_mahjong, base,     igs_m027_state, init_sddz,     ROT0, "IGS", "Super Dou Di Zhu", MACHINE_NOT_WORKING )
-GAME( 200?, klxyj,     0,        igs_mahjong, base,     igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji", MACHINE_NOT_WORKING )
+GAME( 1999, amazonia,  0,        igs_mahjong,     amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_NOT_WORKING )
+GAME( 1999, amazonkp,  amazonia, igs_mahjong,     amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King Plus (V204BR)", MACHINE_NOT_WORKING )
+GAME( 2005, olympic5,  0,        igs_mahjong,     base,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V112US)", MACHINE_NOT_WORKING ) // IGS FOR V112US 2005 02 14
+GAME( 2003, olympic5a, olympic5, igs_mahjong,     base,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V107US)", MACHINE_NOT_WORKING ) // IGS FOR V107US 2003 10 2
+GAME( 200?, luckycrs,  0,        igs_mahjong,     base,     igs_m027_state, init_luckycrs, ROT0, "IGS", "Lucky Cross (V106SA)", MACHINE_NOT_WORKING )
+GAME( 2003, amazoni2,  0,        igs_mahjong,     base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_NOT_WORKING )
+GAME( 2002, sdwx,      0,        igs_mahjong,     base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
+GAME( 200?, sddz,      0,        igs_mahjong,     base,     igs_m027_state, init_sddz,     ROT0, "IGS", "Super Dou Di Zhu", MACHINE_NOT_WORKING )
+GAME( 200?, klxyj,     0,        igs_mahjong,     base,     igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
-GAME( 200?, gonefsh2,  0,        igs_mahjong, base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )
+GAME( 200?, gonefsh2,  0,        igs_mahjong,     base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )
