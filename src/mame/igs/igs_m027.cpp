@@ -1446,6 +1446,17 @@ void igs_m027_state::init_chessc2()
 {
 	chessc2_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+
+	// bypass IGS025 'version' check
+	u16* ROM = (u16*)memregion("user1")->base();
+	ROM[0x207d8/2] ^= 0x0100;
+	// bypass external ROM checksum
+	u16* ROM2 = (u16*)memregion("maincpu")->base();
+	ROM2[(0x16a/2)] ^= 0x1000;
+
+	// what lives here? coin error otherwise
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000000c, 0x4000000f, read32smo_delegate(*this, FUNC(igs_m027_state::lhdmg_unk2_r)));
 }
 
 void igs_m027_state::init_lhzb4()
@@ -1594,7 +1605,7 @@ GAME( 1999, lthy,      0,        igs_mahjong_xor, base,     igs_m027_state, init
 GAME( 2000, zhongguo,  0,        igs_mahjong_xor, base,     igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhong Guo Chu Da D", MACHINE_NOT_WORKING )
 GAME( 200?, jking02,   0,        igs_mahjong_xor, jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NOT_WORKING )
 GAME( 2003, mgzz,      0,        igs_mahjong_xor, base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V101CN)", MACHINE_NOT_WORKING )
-GAME( 2000, mgzza,     mgzz,     igs_mahjong_xor, base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_NOT_WORKING )
+GAME( 2003, mgzza,     mgzz,     igs_mahjong_xor, base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_NOT_WORKING )
 GAME( 2007, mgcs3,     0,        igs_mahjong_xor, base,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)", MACHINE_NOT_WORKING )
 GAME( 1999, oceanpar,  0,        igs_mahjong_xor, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
 GAME( 1999, oceanpara, oceanpar, igs_mahjong_xor, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
