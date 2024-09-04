@@ -45947,6 +45947,9 @@ orionzms                        //
 @source:ussr/partner.cpp
 partner                         //
 
+@source:ussr/pk32.cpp
+pk32                            // (c) 1991 Elektronika, USSR
+
 @source:ussr/pk8000.cpp
 hobby                           //
 pk8002                          //
