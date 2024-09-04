@@ -608,7 +608,7 @@ void ep64_state::ep64(machine_config &config)
 	m_exp->set_io_space(m_dave, AS_IO);
 	m_exp->irq_wr().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_wr().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_exp->wait_wr().set_inputline(m_maincpu, Z80_INPUT_LINE_BOGUSWAIT);
+	m_exp->wait_wr().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(ep64_state::write_centronics_busy));

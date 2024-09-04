@@ -1556,7 +1556,7 @@ void fruitpar_decrypt(running_machine &machine)
 		IGS27_CRYPT4_ALT
 		IGS27_CRYPT5
 		IGS27_CRYPT6
-		IGS27_CRYPT7
+		IGS27_CRYPT7_ALT
 		IGS27_CRYPT8
 
 		x ^= fruitpar_tab[(i>> 1) & 0xff] << 8;

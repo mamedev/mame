@@ -89,6 +89,8 @@ private:
 
 	void main_map(address_map &map);
 	void main2_map(address_map &map);
+    void prog2_map(address_map &map);
+    void ext2_map(address_map &map);
 
 	virtual void machine_start() override;
 
@@ -161,6 +163,18 @@ void changyu_state::main2_map(address_map &map)
 	map(0x3000, 0x37ff).unmaprw();
 
 	map(0x6000, 0xffff).rom().region("boot_rom", 0x6000);
+}
+
+void changyu_state::prog2_map(address_map &map)
+{
+
+	map(0x0000, 0xfff).rom().region("mcu", 0);
+}
+
+
+void changyu_state::ext2_map(address_map &map)
+{
+    map(0x0502, 0x0503).w("ay", FUNC(ay8910_device::data_address_w));
 }
 
 static INPUT_PORTS_START( changyu )
@@ -265,7 +279,8 @@ void changyu_state::changyu2(machine_config &config)
 
 	I87C51(config.replace(), m_mcu, XTAL(8'000'000));
 //  m_mcu->set_disable();
-
+	m_mcu->set_addrmap(AS_PROGRAM, &changyu_state::prog2_map);
+ 	m_mcu->set_addrmap(AS_IO, &changyu_state::ext2_map);
 	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

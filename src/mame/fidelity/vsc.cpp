@@ -7,7 +7,7 @@ Fidelity Voice Sensory Chess Challenger (VSC)
 RE notes by Kevin Horton
 
 The display/button/LED/speech technology is identical to Fidelity CSC.
-Only the CPU board was changed.  As such, it works the same but is interfaced
+Only the CPU board was changed. As such, it works the same but is interfaced
 to different port chips this time.
 
 Hardware:
@@ -19,11 +19,11 @@ I/O is composed of an 8255 triple port adaptor, and a Z80A PIO parallel I/O
 interface.
 
 There's the usual TSI S14001A speech synth with its requisite 4K ROM which is the
-same as on the other talking chess boards.  The TSI chip is running at 26.37KHz.
+same as on the other talking chess boards. The TSI chip is running at 26.37KHz.
 It uses a 470K resistor and a 100pf capacitor.
 
 The "perfect" clock would be 1/RC most likely (actually this will be skewed a tad by
-duty cycle of the oscillator) which with those parts values gives 21.27KHz.  The
+duty cycle of the oscillator) which with those parts values gives 21.27KHz. The
 formula is probably more likely to be 1/1.2RC or so.
 
 Rounding out the hardware are three driver chips for the LEDs, a 7404 inverter to
@@ -59,13 +59,13 @@ So to enable only the 8255, you'd write/read to 08-0Bh for example
 To enable only the PIO, you'd write/read to 04-07h for example.
 
 writing to 00-03h will enable and write to BOTH chips, and reading 00-03h
-will return data from BOTH chips (and cause a bus conflict).  The code probably
+will return data from BOTH chips (and cause a bus conflict). The code probably
 never does either of these things.
 
 Likewise, writing/reading to 0Ch-0Fh will result in open bus, because neither chip's
 enable line will be low.
 
-This sequence repeats every 16 addresses.  So to recap:
+This sequence repeats every 16 addresses. So to recap:
 
 00-03: both chips enabled (probably not used)
 04-07: PIO enabled
@@ -75,7 +75,7 @@ This sequence repeats every 16 addresses.  So to recap:
 10-FF: mirrors of 00-0F.
 
 Refer to the Sensory Champ. Chess Chall. for explanations of the below
-I/O names and labels.  It's the same.
+I/O names and labels. It's the same.
 
 8255:
 -----
@@ -128,20 +128,20 @@ PB.7 - TSI ROM A12 line
 
 Selection jumpers:
 ------------------
-These act like another row of buttons.  It is composed of two diode locations,
-so there's up to 4 possible configurations.  My board does not have either diode
-stuffed, so this most likely is "English".  I suspect it selects which language to use
-for the speech synth.  Of course you need the other speech ROMs for this to function
-properly.
+These act like another row of buttons. It is composed of two diode locations,
+so there's up to 4 possible configurations. My board does not have either diode
+stuffed, so this most likely is "English". I suspect it selects which language
+to use for the speech synth. Of course you need the other speech ROMs for this
+to function properly.
 
 Anyways, the two jumpers are connected to button columns A and B and the common
-connects to Z80A PIO PB.5, which basically makes a 10th button row.  I would
+connects to Z80A PIO PB.5, which basically makes a 10th button row. I would
 expect that the software reads these once on startup only.
 
 Printer:
 --------
-This is the 1st Fidelity chess computer with a printer port. Many later Fidelity chess
-computers also have support for it. Two models were released:
+This is the 1st Fidelity chess computer with a printer port. Many later Fidelity
+chess computers also have support for it. Two models were released:
 FP: Challenger Printer - thermal printer, MCU=D8048C243
 IFP: Impact Printer - also compatible with C64 apparently.
 

@@ -32,7 +32,7 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/z80/z80.h"
+#include "cpu/z80/nsc800.h"
 #include "machine/mm58274c.h"
 #include "machine/nsc810.h"
 #include "machine/ram.h"

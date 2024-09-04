@@ -15,7 +15,7 @@ Hardware notes:
 #include "emu.h"
 #include "chess.h"
 
-#include "cpu/z80/z80.h"
+#include "cpu/z80/nsc800.h"
 #include "machine/gen_latch.h"
 
 namespace {

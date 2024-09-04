@@ -163,7 +163,7 @@ void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 	m_ppi->in_pc_callback().set_ioport("TEST2");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_text_reverse_bits();
+	m_igs017_igs031->set_text_reverse_bits(true);
 	m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound hardware

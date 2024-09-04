@@ -155,7 +155,7 @@ class megasys1_typea_state : public megasys1_state
 public:
 	megasys1_typea_state(const machine_config &mconfig, device_type type, const char *tag) :
 		megasys1_state(mconfig, type, tag),
-		m_p47b_adpcm(*this, "msm%u", 1U),
+		m_p47bl_adpcm(*this, "msm%u", 1U),
 		m_gatearray(*this, "gatearray")
 	{ }
 
@@ -164,7 +164,7 @@ public:
 	void system_A_gs88000_soldam(machine_config &config);
 	void system_A_iganinju(machine_config &config);
 	void system_A_kickoffb(machine_config &config);
-	void system_A_p47b(machine_config &config);
+	void system_A_p47bl(machine_config &config);
 	void system_A_d65006(machine_config &config);
 	void system_A_d65006_iganinju(machine_config &config);
 	void system_A_gs88000(machine_config &config);
@@ -180,17 +180,17 @@ protected:
 	virtual void machine_reset() override;
 
 	void kickoffb_sound_map(address_map &map);
-	void p47b_sound_map(address_map &map);
-	void p47b_extracpu_prg_map(address_map &map);
-	void p47b_extracpu_io_map(address_map &map);
+	void p47bl_sound_map(address_map &map);
+	void p47bl_extracpu_prg_map(address_map &map);
+	void p47bl_extracpu_io_map(address_map &map);
 	void megasys1A_map(address_map &map);
 	void megasys1A_sound_map(address_map &map);
 
-	void p47b_adpcm_w(offs_t offset, u8 data);
+	void p47bl_adpcm_w(offs_t offset, u8 data);
 
 
 private:
-	optional_device_array<msm5205_device, 2> m_p47b_adpcm;
+	optional_device_array<msm5205_device, 2> m_p47bl_adpcm;
 	optional_device<megasys1_gatearray_device> m_gatearray;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);

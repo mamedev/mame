@@ -10,8 +10,8 @@ TODO (main):
 \- fan monitor, cfr. I/O $294 reads in shutms11 BIOS fan tests;
 \- FDC doesn't work, moans on first boot;
 - '900 Ethernet PXE (missing ROM dump);
-- USB controllers (OpenHCI complaint);
-- ACPI is not fully lpc-acpi complaint;
+- USB controllers (OpenHCI compliant);
+- ACPI is not fully lpc-acpi compliant;
 - EISA slots;
 - SMBus;
 - PS/2 mouse is unstable, worked around by disabling and using a serial mouse instead.
@@ -316,7 +316,7 @@ void sis630_state::sis630(machine_config &config)
 	serport1.ri_handler().set("superio:it8705f", FUNC(it8705f_device::nri2_w));
 	serport1.cts_handler().set("superio:it8705f", FUNC(it8705f_device::ncts2_w));
 
-	// TODO: AMR (Audio/modem riser) + UPT (Panel Link-TV out), assume [E]ISA complaint, needs specific slot options
+	// TODO: AMR (Audio/modem riser) + UPT (Panel Link-TV out), assume [E]ISA compliant, needs specific slot options
 //  ISA16_SLOT(config, "isa1", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 //  ISA16_SLOT(config, "isa2", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 }

@@ -54,6 +54,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	virtual TIMER_CALLBACK_MEMBER(irq_off) override;
 	TIMER_CALLBACK_MEMBER(irq_frame);

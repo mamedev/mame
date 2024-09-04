@@ -4469,6 +4469,19 @@ ROM_START( ippatsu )
 	ROM_LOAD( "82s123an", 0x00, 0x20, CRC(3bde1bbd) SHA1(729498483943f960e38c4ada992b099b698b497a) )
 ROM_END
 
+// has NEW DOUBLE BET MOJHONG (sic) in ROM but title screen shows 赤麻雀 (Red Mahjong)
+ROM_START( akamj )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "b3.bin",  0x00000, 0x8000, CRC(fb2e5a3e) SHA1(6a06b36dd3baa4c0aba339aaf2e00d82d08cbb22) )
+	ROM_LOAD( "bc2.bin", 0x08000, 0x8000, CRC(38d2aa91) SHA1(b0469803265c6359dc5680e669324a41b84548d7) )
+	ROM_LOAD( "bc1.bin", 0x10000, 0x8000, CRC(38d2aa91) SHA1(b0469803265c6359dc5680e669324a41b84548d7) ) // yes, same ROM 2 times
+
+	ROM_REGION( 0x20, "proms", 0 )
+	// taken from Royal Mahjong, might or might not be the same.
+	ROM_LOAD( "82s123.prm", 0x00, 0x20, BAD_DUMP CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
+ROM_END
+
+
 ROM_START( suzume )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "p1.bin",     0x00000, 0x1000, CRC(e9706967) SHA1(2e3d78178623de6552c9036da90e02f240d94055) )
@@ -6182,6 +6195,7 @@ GAME( 1983,  seljan,   0,        seljan,   seljan,   royalmah_state,         emp
 GAME( 1983,  janyoup2, royalmj,  janyoup2, janyoup2, royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1985,  tahjong,  royalmj,  tahjong,  tahjong,  royalmah_prgbank_state, init_tahjong,  ROT0,   "Bally Pond / Nasco",         "Tahjong Yakitori (ver. 2-1)",           0 ) // 1985 Jun. 17
 GAME( 1981,  janputer, 0,        royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong)", 0 ) // MT #05392
+GAME( 1981,  akamj,    0,        ippatsu,  ippatsu,  royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd.)", "Aka Mahjong (Double Bet)",          0 )
 GAME( 1984,  rkjanoh2, 0,        rkjanoh2, royalmah, royalmah_prgbank_state, init_chalgirl, ROT0,   "SNK / Dyna Corp",            "Royal King Jang Oh 2 (v4.00 1984 Jun 10th)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // never seems to set the palette bank?
 GAME( 1984,  janoh,    0,        janoh,    royalmah, royalmah_state,         empty_init,    ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        MACHINE_NOT_WORKING )
 GAME( 1984,  janoha,   janoh,    janoha,   royalmah, royalmah_state,         empty_init,    ROT0,   "Toaplan",                    "Jan Oh (set 2)",                        MACHINE_NOT_WORKING ) // this one is complete?

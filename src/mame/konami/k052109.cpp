@@ -516,11 +516,11 @@ void k052109_device::tilemap_update( )
 
 #if 0
 	popmessage("%x %x %x %x",
-		m_charrombank[0],
-		m_charrombank[1],
-		m_charrombank[2],
-		m_charrombank[3]);
-	// popmessage("%x",m_addrmap);
+			m_charrombank[0],
+			m_charrombank[1],
+			m_charrombank[2],
+			m_charrombank[3]);
+	//popmessage("%x",m_addrmap);
 #endif
 
 	// note: this chip can do both per-column and per-row scroll in the same time, currently not emulated.

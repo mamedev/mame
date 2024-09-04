@@ -45,7 +45,7 @@
 #include "emu.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-#include "cpu/z80/z80.h" //CPU was actually a NSC800 (Z80 compatible)
+#include "cpu/z80/nsc800.h"
 #include "machine/i8279.h"
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
