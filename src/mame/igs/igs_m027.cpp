@@ -64,7 +64,7 @@ public:
 	void init_chessc2() ATTR_COLD;
 	void init_lhzb4() ATTR_COLD;
 	void init_gonefsh2() ATTR_COLD;
-	void init_sddz() ATTR_COLD;
+	void init_cjddz() ATTR_COLD;
 	void init_zhongguo() ATTR_COLD;
 	void init_klxyj() ATTR_COLD;
 	void init_slqz3() ATTR_COLD;
@@ -1311,10 +1311,10 @@ ROM_END
 // cg at u28
 // samples at u4 (or u5?)
 
-ROM_START( sddz )
+ROM_START( cjddz )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "sddz_igs027a", 0x00000, 0x4000, NO_DUMP ) // unknown sticker
+	ROM_LOAD( "cjddz_igs027a", 0x00000, 0x4000, CRC(124f4bee) SHA1(bf9785516ef36290c2a7bac307bb2d849f2045ae) ) // unknown sticker
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "ddz_218cn.u17", 0x000000, 0x80000, CRC(3cfe38d5) SHA1(9c7f82ecffbc22879583519d5f753bb35e973ee3) )
@@ -1455,11 +1455,11 @@ void igs_m027_state::init_lhzb4()
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
-void igs_m027_state::init_sddz()
+void igs_m027_state::init_cjddz()
 {
-	sddz_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt();
-	pgm_create_dummy_internal_arm_region();
+	cjddz_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027_state::init_gonefsh2()
@@ -1598,6 +1598,7 @@ GAME( 2000, mgzza,     mgzz,     igs_mahjong_xor, base,     igs_m027_state, init
 GAME( 2007, mgcs3,     0,        igs_mahjong_xor, base,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)", MACHINE_NOT_WORKING )
 GAME( 1999, oceanpar,  0,        igs_mahjong_xor, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
 GAME( 1999, oceanpara, oceanpar, igs_mahjong_xor, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
+GAME( 200?, cjddz,     0,        igs_mahjong_xor, base,     igs_m027_state, init_cjddz,    ROT0, "IGS", "Chao Ji Dou Di Zhu", MACHINE_NOT_WORKING )
 GAME( 200?, extradrw,  0,        extradraw,       base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME( 2002, chessc2,   0,        igs_mahjong_xor, base,     igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING )
@@ -1610,7 +1611,6 @@ GAME( 2003, olympic5a, olympic5, igs_mahjong,     base,     igs_m027_state, init
 GAME( 200?, luckycrs,  0,        igs_mahjong,     base,     igs_m027_state, init_luckycrs, ROT0, "IGS", "Lucky Cross (V106SA)", MACHINE_NOT_WORKING )
 GAME( 2003, amazoni2,  0,        igs_mahjong,     base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_NOT_WORKING )
 GAME( 2002, sdwx,      0,        igs_mahjong,     base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
-GAME( 200?, sddz,      0,        igs_mahjong,     base,     igs_m027_state, init_sddz,     ROT0, "IGS", "Super Dou Di Zhu", MACHINE_NOT_WORKING )
 GAME( 200?, klxyj,     0,        igs_mahjong,     base,     igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME( 200?, gonefsh2,  0,        igs_mahjong,     base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )
