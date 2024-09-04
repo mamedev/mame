@@ -12,7 +12,6 @@
 
 #include "ctrl.h"
 
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -25,6 +24,7 @@ class atari_trakball_device : public device_t,
 public:
 	// construction/destruction
 	atari_trakball_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	DECLARE_INPUT_CHANGED_MEMBER( trakball_moved );
 
 protected:
 	// device_t implementation
@@ -40,8 +40,10 @@ private:
 	required_ioport m_trakballb;
 	required_ioport_array<2> m_trakballxy;
 
+	void trakball_pos_and_dir_upd(int axis);
+
 	uint32_t m_last_pos[2];
-	uint8_t m_last_pos_sent[2];
+	uint8_t m_last_direction[2];
 };
 
 

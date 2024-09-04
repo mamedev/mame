@@ -5,11 +5,12 @@
 
 Note: this module only works in trackball mode and not in joystick emulation mode
 
+Reference: Atari, CX22 Trakball Field Service Manual, Rev. 01 (FD100660), November 1983
+
 **********************************************************************/
 
 #include "emu.h"
 #include "trakball.h"
-
 
 /***************************************************************************
     CONSTANTS
@@ -34,14 +35,15 @@ DEFINE_DEVICE_TYPE(ATARI_TRAKBALL, atari_trakball_device, "atari_trakball", "Ata
 
 static INPUT_PORTS_START(atari_trakball)
 	PORT_START(TRAKBALL_BUTTON_TAG) /* Trak-ball - button */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_WRITE_LINE_MEMBER(atari_trakball_device, trigger_w)
-	PORT_BIT( 0xdf, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_WRITE_LINE_MEMBER(atari_trakball_device, trigger_w)
+	PORT_BIT( 0xd0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START(TRAKBALL_XAXIS_TAG) /* Trak-ball - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(80) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(80) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, atari_trakball_device, trakball_moved, 0)
 
 	PORT_START(TRAKBALL_YAXIS_TAG) /* Trak-ball - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(80) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(80) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, atari_trakball_device, trakball_moved, 1)
 INPUT_PORTS_END
 
 
@@ -59,7 +61,7 @@ atari_trakball_device::atari_trakball_device(const machine_config &mconfig, cons
 	, m_trakballb(*this, TRAKBALL_BUTTON_TAG)
 	, m_trakballxy(*this, { TRAKBALL_XAXIS_TAG, TRAKBALL_YAXIS_TAG })
 	, m_last_pos{ TRAKBALL_POS_UNINIT, TRAKBALL_POS_UNINIT }
-	, m_last_pos_sent{ 0, 0 }
+	, m_last_direction{ 0, 0 }
 {
 }
 
@@ -80,6 +82,48 @@ void atari_trakball_device::device_start()
 {
 }
 
+#define QUADRATURE_ANGLE_RESOLUTION 0x02
+
+//-----------------------------------------------------------------
+//  trakbal_pos_and_dir_upd - update tracked position and direction
+//-----------------------------------------------------------------
+
+void atari_trakball_device::trakball_pos_and_dir_upd(int axis)
+{
+	int diff_pos = 0;
+	int cur_pos = 0;
+
+	cur_pos = m_trakballxy[axis]->read();
+	if (m_last_pos[axis] == TRAKBALL_POS_UNINIT) {
+		if (!machine().side_effects_disabled()) {
+			m_last_pos[axis] = cur_pos;
+		}
+	}
+	diff_pos = cur_pos - m_last_pos[axis];
+	// wrap-around the position
+	if (diff_pos > 0x7f) {
+		diff_pos -= 0x100;
+	} else if (diff_pos < -0x80) {
+		diff_pos += 0x100;
+	}
+	if (!machine().side_effects_disabled()) {
+		m_last_pos[axis] = cur_pos;
+		if (diff_pos) {
+			m_last_direction[axis] = diff_pos > 0;
+		}
+	}
+}
+
+//---------------------------------------------------------
+//  trakball_moved - called when moved outside of polling
+//---------------------------------------------------------
+
+INPUT_CHANGED_MEMBER( atari_trakball_device::trakball_moved )
+{
+	const int axis(param);
+
+	trakball_pos_and_dir_upd(axis);
+}
 
 //-------------------------------------------------
 //  vcs_joy_r - read digital inputs
@@ -87,36 +131,18 @@ void atari_trakball_device::device_start()
 
 u8 atari_trakball_device::vcs_joy_r()
 {
-	int diff_pos[2] = {0, 0};
-	int cur_pos[2] = {0, 0};
 	u8 vcs_joy_return = 0;
 
 	for (int axis = 0; axis < 2; axis++) {
-		cur_pos[axis] = m_trakballxy[axis]->read();
-		if (m_last_pos[axis] == TRAKBALL_POS_UNINIT) {
-			if (!machine().side_effects_disabled()) {
-				m_last_pos[axis] = cur_pos[axis];
-			}
-		}
-		diff_pos[axis] = cur_pos[axis] - m_last_pos[axis];
-		// wrap-around the position
-		if (diff_pos[axis] > 0x7f) {
-			diff_pos[axis] -= 0x100;
-		} else if (diff_pos[axis] < -0x80) {
-			diff_pos[axis] += 0x100;
-		}
-		if (!machine().side_effects_disabled()) {
-			m_last_pos[axis] = cur_pos[axis];
-			if (diff_pos[axis]) m_last_pos_sent[axis] = !m_last_pos_sent[axis];
-		}
+		trakball_pos_and_dir_upd(axis);
 	}
 
 	vcs_joy_return =
 		m_trakballb->read() |
-		((diff_pos[0] > 0) ? 0x01 : 0x00) |
-		((m_last_pos_sent[0] > 0) ? 0x02 : 0x00) |
-		((diff_pos[1] > 0) ? 0x04 : 0x00) |
-		((m_last_pos_sent[1] > 0) ? 0x08 : 0x00);
+		(m_last_direction[0] ? 0x01 : 0x00) |
+		((m_last_pos[0] & QUADRATURE_ANGLE_RESOLUTION) ? 0x02 : 0x00) |
+		(m_last_direction[1] ? 0x04 : 0x00) |
+		((m_last_pos[1] & QUADRATURE_ANGLE_RESOLUTION) ? 0x08 : 0x00);
 
 	return vcs_joy_return;
 }
