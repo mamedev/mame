@@ -21,9 +21,12 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 #define LOG_DEBUG       (1U << 1)
 #define VERBOSE         (0)
 #include "logmacro.h"
+
 
 namespace {
 
@@ -32,33 +35,35 @@ class igs_fear_state : public driver_device
 public:
 	igs_fear_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_external_rom(*this, "user1"),
+		m_gfxrom(*this, "gfx1"),
+		m_sram(*this, "sram"),
+		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_xa(*this, "xa"),
-		m_sram(*this, "sram"),
 		m_ics(*this, "ics"),
 		m_screen(*this, "screen"),
-		m_videoram(*this, "videoram"),
 		m_palette(*this, "palette"),
-		m_gfxrom(*this, "gfx1"),
 		m_ticket(*this, "ticket"),
 		m_io_dsw(*this, "DSW%u", 1U),
 		m_io_trackball(*this, "AN%u", 0)
 	{ }
 
-	void igs_fear(machine_config &config);
+	void igs_fear(machine_config &config) ATTR_COLD;
+	void igs_fear_xor(machine_config &config) ATTR_COLD;
 
-	void init_igs_fear();
-	void init_igs_icescape();
-	void init_igs_superkds();
+	void init_igs_fear() ATTR_COLD;
+	void init_igs_icescape() ATTR_COLD;
+	void init_igs_superkds() ATTR_COLD;
 
 protected:
-	virtual void video_start() override;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_xor_map(address_map &map) ATTR_COLD;
 
 	void sound_irq(int state);
 	void vblank_irq(int state);
@@ -66,6 +71,10 @@ private:
 	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int height, int width, int palette, int flipx, int romoffset);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	u32 external_rom_r(offs_t offset);
+
+	void xor_table_w(offs_t offset, u8 data);
 
 	u32 igs027_gpio_r(offs_t offset, u32 mem_mask);
 	void igs027_gpio_w(offs_t offset, u32 data, u32 mem_mask);
@@ -93,6 +102,27 @@ private:
 
 	u16 xa_wait_r(offs_t offset);
 
+	required_region_ptr<u32> m_external_rom;
+	required_region_ptr<u8> m_gfxrom;
+	required_shared_ptr<uint32_t> m_sram;
+	required_shared_ptr<u32> m_videoram;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<mx10exa_cpu_device> m_xa;
+	required_device<ics2115_device> m_ics;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	required_device<ticket_dispenser_device> m_ticket;
+
+	required_ioport_array<2> m_io_dsw;
+	optional_ioport_array<2> m_io_trackball;
+
+	emu_timer *m_timer0;
+	emu_timer *m_timer1;
+
+	u32 m_xor_table[0x100];
+
 	u8 m_port2_latch;
 	u8 m_port0_latch;
 
@@ -112,23 +142,6 @@ private:
 
 	int m_trackball_cnt;
 	int m_trackball_axis[2], m_trackball_axis_pre[2], m_trackball_axis_diff[2];
-
-	emu_timer *m_timer0;
-	emu_timer *m_timer1;
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<mx10exa_cpu_device> m_xa;
-	required_shared_ptr<uint32_t> m_sram;
-	required_device<ics2115_device> m_ics;
-	required_device<screen_device> m_screen;
-	required_shared_ptr<u32> m_videoram;
-	required_device<palette_device> m_palette;
-	required_region_ptr<u8> m_gfxrom;
-
-	required_device<ticket_dispenser_device> m_ticket;
-	required_ioport_array<2> m_io_dsw;
-	optional_ioport_array<2> m_io_trackball;
 };
 
 
@@ -139,6 +152,10 @@ void igs_fear_state::video_start()
 
 void igs_fear_state::machine_start()
 {
+	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
+
+	save_item(NAME(m_xor_table));
+
 	save_item(NAME(m_port2_latch));
 	save_item(NAME(m_port0_latch));
 
@@ -238,23 +255,35 @@ u32 igs_fear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void igs_fear_state::main_map(address_map &map)
 {
-	map(0x00000000, 0x00003fff).rom(); /* Internal ROM */
-	map(0x08000000, 0x0807ffff).rom().region("user1", 0);/* Game ROM */
+	map(0x00000000, 0x00003fff).rom(); // Internal ROM
+	map(0x08000000, 0x0807ffff).rom().region("user1", 0); // Game ROM
 	map(0x10000000, 0x100003ff).ram().share("iram");
-	map(0x18000000, 0x1800ffff).ram().share("sram");
-	map(0x40000000, 0x400003ff).rw(FUNC(igs_fear_state::igs027_gpio_r), FUNC(igs_fear_state::igs027_gpio_w));
-	map(0x50000000, 0x500003ff).ram().share("xortab");
-	map(0x70000000, 0x700003ff).rw(FUNC(igs_fear_state::igs027_periph_r), FUNC(igs_fear_state::igs027_periph_w));
-
+	map(0x18000000, 0x1800ffff).ram().share(m_sram);
 	map(0x28000000, 0x28000003).rw("rtc", FUNC(v3021_device::read), FUNC(v3021_device::write));
-	map(0x38000000, 0x38001fff).ram().share("videoram");
+
+	map(0x38000000, 0x38001fff).ram().share(m_videoram);
 	map(0x38004000, 0x38007fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x38008500, 0x380085ff).rw(FUNC(igs_fear_state::xa_r), FUNC(igs_fear_state::xa_w));
+
+	map(0x40000000, 0x400003ff).rw(FUNC(igs_fear_state::igs027_gpio_r), FUNC(igs_fear_state::igs027_gpio_w));
+
+	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_fear_state::xor_table_w));
+
 	map(0x58000000, 0x58000003).portr("IN0");
 	map(0x58100000, 0x58100003).portr("IN1");
+
 	map(0x68000000, 0x6800000f).w(FUNC(igs_fear_state::cpld_w));
 
+	map(0x70000000, 0x700003ff).rw(FUNC(igs_fear_state::igs027_periph_r), FUNC(igs_fear_state::igs027_periph_w));
 }
+
+void igs_fear_state::main_xor_map(address_map &map)
+{
+	main_map(map);
+
+	map(0x08000000, 0x0807ffff).r(FUNC(igs_fear_state::external_rom_r)); // Game ROM
+}
+
 
 static INPUT_PORTS_START( fear )
 	PORT_START("IN0")
@@ -403,6 +432,19 @@ void igs_fear_state::vblank_irq(int state)
 		if (m_screen->frame_number() & 1)
 			m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 }
+
+
+u32 igs_fear_state::external_rom_r(offs_t offset)
+{
+	return m_external_rom[offset] ^ m_xor_table[offset & 0x00ff];
+}
+
+
+void igs_fear_state::xor_table_w(offs_t offset, u8 data)
+{
+	m_xor_table[offset] = (u32(data) << 24) | (u32(data) << 8);
+}
+
 
 u32 igs_fear_state::igs027_gpio_r(offs_t offset, u32 mem_mask)
 {
@@ -708,6 +750,7 @@ void igs_fear_state::mcu_p3_w(uint8_t data)
 	}
 }
 
+
 void igs_fear_state::igs_fear(machine_config &config)
 {
 	ARM7(config, m_maincpu, 50000000/2);
@@ -748,6 +791,13 @@ void igs_fear_state::igs_fear(machine_config &config)
 	ICS2115(config, m_ics, 33.8688_MHz_XTAL); // TODO : Correct?
 	m_ics->irq().set(FUNC(igs_fear_state::sound_irq));
 	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
+}
+
+void igs_fear_state::igs_fear_xor(machine_config &config)
+{
+	igs_fear(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::main_xor_map);
 }
 
 
@@ -835,6 +885,6 @@ void igs_fear_state::init_igs_icescape()
 
 } // anonymous namespace
 
-GAME( 2005, superkds, 0, igs_fear, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS (Golden Dragon Amusement license)", "Super Kids / Jiu Nan Xiao Yingxiong (S019CN)", 0 )
-GAME( 2006, fearless, 0, igs_fear, fear,     igs_fear_state, init_igs_fear,     ROT0, "IGS (American Alpha license)",          "Fearless Pinocchio (V101US)",                  0 )
-GAME( 2006, icescape, 0, igs_fear, fear,     igs_fear_state, init_igs_icescape, ROT0, "IGS",                                   "Icescape (V104FA)",                            MACHINE_IS_SKELETON ) // IGS FOR V104FA 2006-11-02
+GAME( 2005, superkds, 0, igs_fear_xor, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS (Golden Dragon Amusement license)", "Super Kids / Jiu Nan Xiao Yingxiong (S019CN)", 0 )
+GAME( 2006, fearless, 0, igs_fear_xor, fear,     igs_fear_state, init_igs_fear,     ROT0, "IGS (American Alpha license)",          "Fearless Pinocchio (V101US)",                  0 )
+GAME( 2006, icescape, 0, igs_fear,     fear,     igs_fear_state, init_igs_icescape, ROT0, "IGS",                                   "Icescape (V104FA)",                            MACHINE_IS_SKELETON ) // IGS FOR V104FA 2006-11-02
