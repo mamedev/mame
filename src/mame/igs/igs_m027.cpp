@@ -15,6 +15,11 @@
  To emulate these games the Internal ROM will need dumping
  There are at least 20 other games on this and similar platforms.
 
+ TODO:
+ * Inputs and DIP switches for most games
+ * Hopper for payout
+ * Joystick controls for zhongguo
+ * Coin lockout (zhongguo displays a coin error on unexpected coins)
 */
 
 #include "emu.h"
@@ -60,7 +65,8 @@ public:
 
 	void m027(machine_config &config) ATTR_COLD;
 	void m027_xor(machine_config &config) ATTR_COLD;
-	void mahjong_xor(machine_config &config) ATTR_COLD;
+	void lhdmg_xor(machine_config &config) ATTR_COLD;
+	void zhongguo_xor(machine_config &config) ATTR_COLD;
 	void extradraw(machine_config &config) ATTR_COLD;
 
 	void init_sdwx() ATTR_COLD;
@@ -102,15 +108,13 @@ private:
 	required_ioport m_io_test;
 
 	u32 m_xor_table[0x100];
-	u8 m_kbd_io_select;
-	u8 m_dsw_io_select;
+	u8 m_io_select[2];
 	u32 m_unk2_write_count;
 
 	u8 ppi_porta_r();
-	u8 ppi_portc_mahjong_r();
+	template <unsigned N, unsigned S, unsigned R> u8 kbd_r();
 
-	void kbd_io_select_w(u8 data);
-	void dsw_io_select_w(u8 data);
+	template <unsigned N> void io_select_w(u8 data);
 
 	u32 external_rom_r(offs_t offset);
 
@@ -127,17 +131,18 @@ private:
 
 	void igs_mahjong_map(address_map &map) ATTR_COLD;
 	void igs_mahjong_xor_map(address_map &map) ATTR_COLD;
+	void zhongguo_xor_map(address_map &map) ATTR_COLD;
 	void extradraw_map(address_map &map) ATTR_COLD;
 };
 
 void igs_m027_state::machine_start()
 {
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
-	m_dsw_io_select = 7;
+	m_io_select[0] = m_io_select[1] = 0xff;
 	m_unk2_write_count = 0;
 
 	save_item(NAME(m_xor_table));
-	save_item(NAME(m_dsw_io_select));
+	save_item(NAME(m_io_select));
 	save_item(NAME(m_unk2_write_count));
 }
 
@@ -165,11 +170,11 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 	map(0x38008000, 0x38008003).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
 	map(0x38009000, 0x38009003).umask32(0x000000ff).r(FUNC(igs_m027_state::test_r));
-	map(0x38009000, 0x38009003).umask32(0x0000ff00).w(FUNC(igs_m027_state::kbd_io_select_w));
+	map(0x38009000, 0x38009003).umask32(0x0000ff00).w(FUNC(igs_m027_state::io_select_w<0>));
 
 	map(0x40000008, 0x4000000b).w(FUNC(igs_m027_state::unk2_w));
 	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027_state::unk2_r));
-	map(0x40000018, 0x4000001b).umask32(0x000000ff).w(FUNC(igs_m027_state::dsw_io_select_w));
+	map(0x40000018, 0x4000001b).umask32(0x000000ff).w(FUNC(igs_m027_state::io_select_w<1>));
 
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027_state::xor_table_w)); // uploads XOR table to external ROM here
 	map(0x70000200, 0x70000203).ram(); // ??????????????
@@ -181,6 +186,13 @@ void igs_m027_state::igs_mahjong_xor_map(address_map &map)
 	igs_mahjong_map(map);
 
 	map(0x08000000, 0x0807ffff).r(FUNC(igs_m027_state::external_rom_r)); // Game ROM
+}
+
+void igs_m027_state::zhongguo_xor_map(address_map &map)
+{
+	igs_mahjong_xor_map(map);
+
+	map(0x38009000, 0x38009003).umask32(0x0000ff00).r(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
 }
 
 void igs_m027_state::extradraw_map(address_map &map)
@@ -355,7 +367,14 @@ static INPUT_PORTS_START( mahjong )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
 
 	PORT_START("TEST")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT ) // 哈巴
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_NAME("Clear") // 清除
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) // 查帐
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // TODO: default assignment clashes with mahjong I, using it hangs waiting for hopper to respond
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jking02 )
@@ -447,16 +466,65 @@ static INPUT_PORTS_START( lhdmg )
 	PORT_DIPSETTING(    0x00, "Continue Play" )                                         // 续玩
 	PORT_DIPNAME( 0x40, 0x40, "Number Type" )              PORT_DIPLOCATION("SW2:7")    // 数字型态   (affects credit and bet display)
 	PORT_DIPSETTING(    0x40, "Numbers" )                                               // 数字       (text and digits)
-	PORT_DIPSETTING(    0x00, "Blocks" )                                                // 方块       (pig for credit, apples for bet, mahjong plates suit for numbers)
+	PORT_DIPSETTING(    0x00, "Blocks" )                                                // 方块       (pigs for credit, apples for bet, mahjong tong tiles for numbers)
 	PORT_DIPNAME( 0x80, 0x80, "Hidden Function" )          PORT_DIPLOCATION("SW2:8")    // 隐分功能   (hides credits and bets, game plays normally)
 	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                            // 无
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                             // 有
+INPUT_PORTS_END
 
-	PORT_MODIFY("TEST")
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) // 查帐
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // TODO: default assignment clashes with mahjong I, using it hangs waiting for hopper to respond
+static INPUT_PORTS_START( zhongguo )
+	PORT_INCLUDE(mahjong)
+
+	// missing joystick mode controls
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coin_A) )            PORT_DIPLOCATION("SW1:1,2")  // 投币比率
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_3C) )
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_5C) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Key-In Rate" )              PORT_DIPLOCATION("SW1:3,4")  // 开分比率
+	PORT_DIPSETTING(    0x0c, "10" )
+	PORT_DIPSETTING(    0x08, "20" )
+	PORT_DIPSETTING(    0x04, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x10, 0x10, "Credit Limit" )             PORT_DIPLOCATION("SW1:5")    // 进分上限
+	PORT_DIPSETTING(    0x10, "1000" )
+	PORT_DIPSETTING(    0x00, "2000" )
+	PORT_DIPNAME( 0x20, 0x20, "Credit Mode" )              PORT_DIPLOCATION("SW1:6")    // 进分上方式 (sets coin input function)
+	PORT_DIPSETTING(    0x20, "Coin Acceptor" )                                         // 投币       (uses coin A rate)
+	PORT_DIPSETTING(    0x00, "Key-In" )                                                // 开分       (uses key-in rate)
+	PORT_DIPNAME( 0x40, 0x40, "Payout Mode" )              PORT_DIPLOCATION("SW1:7")    // 退分上方式
+	PORT_DIPSETTING(    0x40, "Return Coins" )                                          // 退币       (uses hopper to pay out credits)
+	PORT_DIPSETTING(    0x00, "Key-Out" )                                               // 洗分       (just clears credits)
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:8")    // 示范音乐
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                            // 无
+	PORT_DIPSETTING(    0x80, DEF_STR(On) )                                             // 有
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Control Mode" )             PORT_DIPLOCATION("SW2:1")    // 操作模式
+	PORT_DIPSETTING(    0x01, "Buttons" )                                               // 按键
+	PORT_DIPSETTING(    0x00, "Joystick" )                                              // 搖杆
+	PORT_DIPNAME( 0x06, 0x06, "Card Display" )             PORT_DIPLOCATION("SW2:2,3")  // 扑克画面
+	PORT_DIPSETTING(    0x06, "Small Cards" )                                           // 小扑克
+	PORT_DIPSETTING(    0x04, "Cards" )                                                 // 扑克
+	PORT_DIPSETTING(    0x02, "Alternate" )                                             // 変异       (numbers with coloured dot patterns for suits)
+	PORT_DIPSETTING(    0x00, "Small Cards" )                                           // 小扑克
+	PORT_DIPNAME( 0x08, 0x08, "Double Up Jackpot" )        PORT_DIPLOCATION("SW2:4")    // 比倍爆机
+	PORT_DIPSETTING(    0x08, "1000" )
+	PORT_DIPSETTING(    0x00, "2000" )
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Function" )       PORT_DIPLOCATION("SW2:5")    // 比倍功能
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                            // 无
+	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                             // 有
+	PORT_DIPNAME( 0x20, 0x20, "Double Up/Continue Play" )  PORT_DIPLOCATION("SW2:6")    // 比倍续玩
+	PORT_DIPSETTING(    0x20, "Double Up" )                                             // 比倍
+	PORT_DIPSETTING(    0x00, "Continue Play" )                                         // 续玩
+	PORT_DIPNAME( 0x40, 0x40, "Credit Display" )           PORT_DIPLOCATION("SW2:7")    // 萤屏计分
+	PORT_DIPSETTING(    0x40, "Numbers" )                                               // 数字       (text and digits)
+	PORT_DIPSETTING(    0x00, "Circle Tiles" )                                          // 筒子       (pigs for credits, apples for bet, mahjong tong tiles for numbers)
+	PORT_DIPNAME( 0x80, 0x80, "Hidden Function" )          PORT_DIPLOCATION("SW2:8")    // 隐分功能   (hides credits and bets, game plays normally)
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                            // 无
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                             // 有
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( amazonia )
@@ -548,33 +616,29 @@ u8 igs_m027_state::ppi_porta_r()
 	u8 data = 0xff;
 
 	for (int i = 0; i < 3; i++)
-		if (!BIT(m_dsw_io_select, i))
+		if (!BIT(m_io_select[1], i))
 			data &= m_io_dsw[i].read_safe(0xff);
 
 	return data;
 }
 
-u8 igs_m027_state::ppi_portc_mahjong_r()
+template <unsigned N, unsigned S, unsigned R>
+u8 igs_m027_state::kbd_r()
 {
 	u8 data = 0xff;
 
 	for (int i = 0; i < 5; i++)
-		if (!BIT(m_kbd_io_select, i + 3))
+		if (!BIT(m_io_select[N], i + S))
 			data &= m_io_kbd[i].read_safe(0xff);
 
-	return data;
+	return (data << R) | (data >> (8 - R));
 }
 
 
-void igs_m027_state::kbd_io_select_w(u8 data)
+template <unsigned N>
+void igs_m027_state::io_select_w(u8 data)
 {
-	m_kbd_io_select = data;
-}
-
-
-void igs_m027_state::dsw_io_select_w(u8 data)
-{
-	m_dsw_io_select = data;
+	m_io_select[N] = data;
 }
 
 
@@ -612,7 +676,7 @@ u32 igs_m027_state::lhdmg_unk2_r()
 {
 	logerror("%s: lhdmg_unk2_r\n", machine().describe_context());
 
-	if (m_dsw_io_select & 1)
+	if (m_io_select[1] & 1)
 		return 0xffffffff;
 	else
 		return 0xffffffff ^ 0x400000;
@@ -663,13 +727,22 @@ void igs_m027_state::m027_xor(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_mahjong_xor_map);
 }
 
-void igs_m027_state::mahjong_xor(machine_config &config)
+void igs_m027_state::lhdmg_xor(machine_config &config)
 {
 	m027_xor(config);
 
 	m_ppi->in_pa_callback().set_ioport("DSW1");
 	m_ppi->in_pb_callback().set_ioport("DSW2");
-	m_ppi->in_pc_callback().set(FUNC(igs_m027_state::ppi_portc_mahjong_r));
+	m_ppi->in_pc_callback().set(NAME((&igs_m027_state::kbd_r<0, 3, 0>)));
+}
+
+void igs_m027_state::zhongguo_xor(machine_config &config)
+{
+	lhdmg_xor(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::zhongguo_xor_map);
+
+	m_ppi->in_pc_callback().set_constant(0xff);
 }
 
 void igs_m027_state::extradraw(machine_config &config)
@@ -1760,35 +1833,35 @@ void igs_m027_state::init_lhdmg()
 ***************************************************************************/
 
 // Complete dumps
-GAME( 1999, slqz3,     0,        m027_xor,    base,     igs_m027_state, init_slqz3,    ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_NOT_WORKING )
-GAME( 1999, qlgs,      0,        m027_xor,    qlgs,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Que Long Gao Shou", MACHINE_NOT_WORKING )
-GAME( 1999, fruitpar,  0,        m027_xor,    base,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_NOT_WORKING )
-GAME( 1999, fruitpara, fruitpar, m027_xor,    base,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", MACHINE_NOT_WORKING )
-GAME( 1999, lhdmg,     0,        mahjong_xor, lhdmg,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan", MACHINE_NOT_WORKING ) // 龙虎大满贯
-GAME( 1999, lhdmgp,    lhdmg,    m027_xor,    base,     igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan Plus", MACHINE_NOT_WORKING ) // 龙虎大满贯
-GAME( 1999, lhzb3,     0,        m027_xor,    base,     igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III", MACHINE_NOT_WORKING ) // 龙虎争霸Ⅲ
-GAME( 2004, lhzb4,     0,        m027_xor,    base,     igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4", MACHINE_NOT_WORKING ) // 龙虎争霸4
-GAME( 1999, lthy,      0,        m027_xor,    base,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_NOT_WORKING )
-GAME( 2000, zhongguo,  0,        m027_xor,    base,     igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhongguo Chu Da D", MACHINE_NOT_WORKING ) // 中国锄大D
-GAME( 200?, jking02,   0,        m027_xor,    jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NOT_WORKING )
-GAME( 2003, mgzz,      0,        m027_xor,    base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V101CN)", MACHINE_NOT_WORKING )
-GAME( 2000, mgzza,     mgzz,     m027_xor,    base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_NOT_WORKING )
-GAME( 2007, mgcs3,     0,        m027_xor,    base,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)", MACHINE_NOT_WORKING )
-GAME( 1999, oceanpar,  0,        m027_xor,    base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
-GAME( 1999, oceanpara, oceanpar, m027_xor,    base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
-GAME( 200?, cjddz,     0,        m027_xor,    base,     igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", MACHINE_NOT_WORKING ) // 超级斗地主
-GAME( 200?, extradrw,  0,        extradraw,   base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
+GAME( 1999, slqz3,     0,        m027_xor,     base,     igs_m027_state, init_slqz3,    ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_NOT_WORKING )
+GAME( 1999, qlgs,      0,        m027_xor,     qlgs,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Que Long Gao Shou", MACHINE_NOT_WORKING )
+GAME( 1999, fruitpar,  0,        m027_xor,     base,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_NOT_WORKING )
+GAME( 1999, fruitpara, fruitpar, m027_xor,     base,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", MACHINE_NOT_WORKING )
+GAME( 1999, lhdmg,     0,        lhdmg_xor,    lhdmg,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan", MACHINE_NOT_WORKING ) // 龙虎大满贯
+GAME( 1999, lhdmgp,    lhdmg,    lhdmg_xor,    lhdmg,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan Plus", MACHINE_NOT_WORKING ) // 龙虎大满贯
+GAME( 1999, lhzb3,     0,        m027_xor,     base,     igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III", MACHINE_NOT_WORKING ) // 龙虎争霸Ⅲ
+GAME( 2004, lhzb4,     0,        m027_xor,     base,     igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4", MACHINE_NOT_WORKING ) // 龙虎争霸4
+GAME( 1999, lthy,      0,        m027_xor,     base,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_NOT_WORKING )
+GAME( 2000, zhongguo,  0,        zhongguo_xor, zhongguo, igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhongguo Chu Da D", MACHINE_NOT_WORKING ) // 中国锄大D
+GAME( 200?, jking02,   0,        m027_xor,     jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NOT_WORKING )
+GAME( 2003, mgzz,      0,        m027_xor,     base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V101CN)", MACHINE_NOT_WORKING )
+GAME( 2000, mgzza,     mgzz,     m027_xor,     base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_NOT_WORKING )
+GAME( 2007, mgcs3,     0,        m027_xor,     base,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)", MACHINE_NOT_WORKING )
+GAME( 1999, oceanpar,  0,        m027_xor,     base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
+GAME( 1999, oceanpara, oceanpar, m027_xor,     base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
+GAME( 200?, cjddz,     0,        m027_xor,     base,     igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", MACHINE_NOT_WORKING ) // 超级斗地主
+GAME( 200?, extradrw,  0,        extradraw,    base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
-GAME( 2002, chessc2,   0,        m027_xor,    base,     igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING )
+GAME( 2002, chessc2,   0,        m027_xor,     base,     igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING )
 
 // Incomplete dumps
-GAME( 1999, amazonia,  0,        m027,        amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_NOT_WORKING )
-GAME( 1999, amazonkp,  amazonia, m027,        amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King Plus (V204BR)", MACHINE_NOT_WORKING )
-GAME( 2005, olympic5,  0,        m027,        base,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V112US)", MACHINE_NOT_WORKING ) // IGS FOR V112US 2005 02 14
-GAME( 2003, olympic5a, olympic5, m027,        base,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V107US)", MACHINE_NOT_WORKING ) // IGS FOR V107US 2003 10 2
-GAME( 200?, luckycrs,  0,        m027,        base,     igs_m027_state, init_luckycrs, ROT0, "IGS", "Lucky Cross (V106SA)", MACHINE_NOT_WORKING )
-GAME( 2003, amazoni2,  0,        m027,        base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_NOT_WORKING )
-GAME( 2002, sdwx,      0,        m027,        base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
-GAME( 200?, klxyj,     0,        m027,        base,     igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji", MACHINE_NOT_WORKING )
+GAME( 1999, amazonia,  0,        m027,         amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_NOT_WORKING )
+GAME( 1999, amazonkp,  amazonia, m027,         amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King Plus (V204BR)", MACHINE_NOT_WORKING )
+GAME( 2005, olympic5,  0,        m027,         base,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V112US)", MACHINE_NOT_WORKING ) // IGS FOR V112US 2005 02 14
+GAME( 2003, olympic5a, olympic5, m027,         base,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V107US)", MACHINE_NOT_WORKING ) // IGS FOR V107US 2003 10 2
+GAME( 200?, luckycrs,  0,        m027,         base,     igs_m027_state, init_luckycrs, ROT0, "IGS", "Lucky Cross (V106SA)", MACHINE_NOT_WORKING )
+GAME( 2003, amazoni2,  0,        m027,         base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_NOT_WORKING )
+GAME( 2002, sdwx,      0,        m027,         base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
+GAME( 200?, klxyj,     0,        m027,         base,     igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
-GAME( 200?, gonefsh2,  0,        m027,        base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )
+GAME( 200?, gonefsh2,  0,        m027,         base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )
