@@ -1607,6 +1607,10 @@ uint16_t supracan_state::sound_r(offs_t offset, uint16_t mem_mask)
 		//machine().debug_break();
 		break;
 
+	case 0x10/2:
+		data = m_irq_mask;
+		break;
+
 	default:
 		LOGMASKED(LOG_SOUND | LOG_UNKNOWNS, "%s: sound_r: Unknown register: %08x & %04x\n", machine().describe_context(), 0xe90000 + (offset << 1), mem_mask);
 		break;
@@ -1624,6 +1628,12 @@ void supracan_state::sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		set_sound_irq(5, 1);
 		//m_soundcpu->set_input_line(0, ASSERT_LINE);
 		break;
+	case 0x10/2:
+		// bit 7: enabled by slghtsag after BIOS (would otherwise address error)
+		// other bits tbd (bit 3 doesn't seem irq 3 enable as per speedyd not enabling it)
+		COMBINE_DATA(&m_irq_mask);
+		break;
+
 	case 0x001c/2:  /* Sound cpu control. Bit 0 tied to sound cpu RESET line, Bit 2 internal ROM lockout? */
 	{
 		const uint16_t old = m_sound_cpu_ctrl;
@@ -1711,6 +1721,9 @@ uint16_t supracan_state::video_r(offs_t offset, uint16_t mem_mask)
 	return data;
 }
 
+// TODO: FRC, not hblank
+// controlled by $e90014-16, cfr. magipool and gamblord
+// former assumed to run at < 1 irq per frame ...
 TIMER_CALLBACK_MEMBER(supracan_state::hbl_callback)
 {
 	m_maincpu->set_input_line(3, HOLD_LINE);
@@ -1755,7 +1768,7 @@ TIMER_CALLBACK_MEMBER(supracan_state::video_callback)
 		break;
 
 	case 240:
-		if (m_irq_mask & 1)
+		if (BIT(m_irq_mask, 7))
 		{
 			LOGMASKED(LOG_IRQS, "Triggering VBL IRQ\n\n");
 			m_maincpu->set_input_line(7, HOLD_LINE);
@@ -1932,15 +1945,17 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	case 0x1d0/2: m_unk_1d0 = data; LOGMASKED(LOG_UNKNOWNS, "unk_1d0 = %04x\n", data); break;
 
-	case 0x1f0/2: // FIXME: this register is mostly not understood
-		m_irq_mask = data;//(data & 8) ? 0 : 1;
+	case 0x1f0/2:
+		// FIXME: this register is not understood
+		// can't be irq mask, more likely outbound pins (to cart & UM6619) or color control
+		//m_irq_mask = data;//(data & 8) ? 0 : 1;
 #if 0
 		if (!m_irq_mask && !m_hbl_mask)
 		{
 			m_maincpu->set_input_line(7, CLEAR_LINE);
 		}
 #endif
-		LOGMASKED(LOG_IRQS, "irq_mask = %04x\n", data);
+		//LOGMASKED(LOG_IRQS, "irq_mask = %04x\n", data);
 		break;
 	default:
 		LOGMASKED(LOG_UNKNOWNS, "video_w: Unknown register: %08x = %04x & %04x\n", 0xf00000 + (offset << 1), data, mem_mask);
