@@ -77,7 +77,6 @@ public:
 	void init_mgcs3() ATTR_COLD;
 	void init_jking02() ATTR_COLD;
 	void init_lhdmg() ATTR_COLD;
-	void init_lhdmgp() ATTR_COLD;
 	void init_lthy() ATTR_COLD;
 	void init_luckycrs() ATTR_COLD;
 	void init_olympic5() ATTR_COLD;
@@ -163,6 +162,7 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027_state::unk2_r));
 	map(0x40000018, 0x4000001b).w(FUNC(igs_m027_state::dsw_io_select_w));
 
+	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027_state::xor_table_w)); // uploads XOR table to external ROM here
 	map(0x70000200, 0x70000203).ram(); // ??????????????
 	map(0xf0000000, 0xf000000f).nopw(); // magic registers
 }
@@ -173,7 +173,6 @@ void igs_m027_state::igs_mahjong_xor_map(address_map &map)
 
 	map(0x08000000, 0x0807ffff).r(FUNC(igs_m027_state::external_rom_r)); // Game ROM
 
-	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027_state::xor_table_w)); // uploads XOR table to external ROM here
 }
 
 void igs_m027_state::extradraw_map(address_map &map)
@@ -1573,14 +1572,6 @@ void igs_m027_state::init_lhdmg()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000000c, 0x4000000f, read32smo_delegate(*this, FUNC(igs_m027_state::lhdmg_unk2_r)));
 }
 
-void igs_m027_state::init_lhdmgp()
-{
-	lhdmgp_decrypt(machine());
-	m_igs017_igs031->set_text_reverse_bits(false);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000000c, 0x4000000f, read32smo_delegate(*this, FUNC(igs_m027_state::lhdmg_unk2_r)));
-}
-
-
 } // anonymous namespace
 
 
@@ -1596,7 +1587,7 @@ GAME( 1999, qlgs,      0,        igs_mahjong_xor, qlgs,     igs_m027_state, init
 GAME( 1999, fruitpar,  0,        igs_mahjong_xor, base,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_NOT_WORKING )
 GAME( 1999, fruitpara, fruitpar, igs_mahjong_xor, base,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", MACHINE_NOT_WORKING )
 GAME( 1999, lhdmg,     0,        igs_mahjong_xor, base,     igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Man Guan", MACHINE_NOT_WORKING )
-GAME( 1999, lhdmgp,    lhdmg,    igs_mahjong_xor, base,     igs_m027_state, init_lhdmgp,   ROT0, "IGS", "Long Hu Da Man Guan Plus", MACHINE_NOT_WORKING )
+GAME( 1999, lhdmgp,    lhdmg,    igs_mahjong_xor, base,     igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Man Guan Plus", MACHINE_NOT_WORKING )
 GAME( 1999, lhzb3,     0,        igs_mahjong_xor, base,     igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III", MACHINE_NOT_WORKING ) // 龙虎争霸Ⅲ
 GAME( 2004, lhzb4,     0,        igs_mahjong_xor, base,     igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4", MACHINE_NOT_WORKING ) // 龙虎争霸4
 GAME( 1999, lthy,      0,        igs_mahjong_xor, base,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_NOT_WORKING )

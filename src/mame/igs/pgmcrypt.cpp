@@ -1042,7 +1042,7 @@ void chessc2_decrypt(running_machine &machine)
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		uint16_t x = 0;
 
 		IGS27_CRYPT1
 		IGS27_CRYPT2_ALT
@@ -1053,7 +1053,7 @@ void chessc2_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
@@ -1112,7 +1112,7 @@ void zhongguo_decrypt(running_machine &machine)
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		uint16_t x = 0;
 
 		IGS27_CRYPT1
 		IGS27_CRYPT2_ALT
@@ -1123,7 +1123,7 @@ void zhongguo_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
@@ -1219,50 +1219,6 @@ void sddz_decrypt(running_machine &machine)
 	}
 }
 
-static const uint8_t lhzb3_tab[0x100] = {
-	0x13, 0x45, 0x21, 0xa1, 0x69, 0x9a, 0x05, 0xda, 0x7d, 0x10, 0xda, 0x7f, 0x34, 0x9f, 0xf3, 0x64,
-	0x35, 0xf9, 0x16, 0x1c, 0xd4, 0x60, 0x02, 0xf3, 0x42, 0xc7, 0x42, 0x29, 0xf3, 0x2c, 0x31, 0x71,
-	0x50, 0x35, 0x4e, 0xaa, 0x9f, 0x09, 0xc3, 0xdd, 0x2f, 0x72, 0x30, 0x77, 0xc7, 0x30, 0xbc, 0xc8,
-	0x51, 0xa0, 0x5e, 0xbb, 0xc3, 0x8e, 0x69, 0xd7, 0x4f, 0x57, 0x56, 0x77, 0xcb, 0x43, 0xd6, 0x46,
-	0x62, 0x21, 0x18, 0xfd, 0x7d, 0x24, 0x58, 0x61, 0xec, 0xfe, 0xa9, 0x77, 0x59, 0x3b, 0x03, 0x0a,
-	0xef, 0xdf, 0x90, 0x60, 0x46, 0x43, 0x33, 0x38, 0x92, 0x2d, 0x5a, 0x08, 0x0d, 0x2f, 0x05, 0x75,
-	0x3e, 0x60, 0x87, 0x22, 0xb7, 0xbf, 0xd6, 0xf9, 0x17, 0x86, 0xea, 0x02, 0xbe, 0x23, 0xba, 0xd3,
-	0xdd, 0x0d, 0x3e, 0x8c, 0x65, 0xa0, 0xf8, 0xd8, 0x2f, 0x35, 0xc6, 0x26, 0x6c, 0x81, 0xe6, 0x29,
-	0x50, 0x30, 0x4a, 0x8e, 0xfa, 0xc2, 0x1e, 0xfd, 0xa7, 0xa5, 0x98, 0x53, 0x18, 0x94, 0xff, 0x1d,
-	0x41, 0x2f, 0xff, 0x58, 0x33, 0xdc, 0x2b, 0x67, 0x4b, 0xdd, 0xd3, 0x56, 0x9c, 0xb2, 0x09, 0x4e,
-	0x9b, 0xb1, 0xee, 0x58, 0x0a, 0xe4, 0x42, 0x56, 0x26, 0x23, 0x2c, 0x3f, 0x14, 0x73, 0x46, 0x9a,
-	0xa1, 0x42, 0x17, 0x12, 0xdb, 0xa2, 0xdd, 0x5d, 0x0c, 0xec, 0xdc, 0xf7, 0xc1, 0x76, 0xe0, 0x24,
-	0x65, 0xef, 0x41, 0x83, 0x35, 0x38, 0x78, 0x0e, 0x65, 0x82, 0xe3, 0x55, 0x90, 0xa8, 0xd5, 0xf7,
-	0x66, 0xcf, 0xe2, 0x61, 0x91, 0x3c, 0x69, 0xcb, 0xe7, 0x75, 0x62, 0x6f, 0xd7, 0x9b, 0x69, 0x0c,
-	0x0d, 0x07, 0x0c, 0x9c, 0x68, 0x24, 0x51, 0x51, 0x1f, 0x8d, 0x8b, 0xd6, 0x2e, 0x67, 0x5f, 0xc3,
-	0x07, 0x00, 0x12, 0x61, 0x77, 0xa8, 0x15, 0xa1, 0xd6, 0xd0, 0xd3, 0x57, 0x73, 0x62, 0xb9, 0xbb
-};
-
-void lhzb3_decrypt(running_machine &machine)
-{
-	auto const src = reinterpret_cast<u16 *>(machine.root_device().memregion("user1")->base());
-
-	int const rom_size = 0x80000;
-
-	for (int i = 0; i < rom_size / 2; i++)
-	{
-		uint16_t x = src[i];
-
-		IGS27_CRYPT1
-		IGS27_CRYPT2_ALT
-	//  IGS27_CRYPT3
-		IGS27_CRYPT4
-		IGS27_CRYPT5
-		IGS27_CRYPT6_ALT
-		IGS27_CRYPT7
-		IGS27_CRYPT8
-
-		x ^= lhzb3_tab[(i>> 1) & 0xff] << 8;
-
-		src[i] = x;
-	}
-}
-
 
 // IGS FOR V000CN 2004 12 01
 void lhzb4_decrypt(running_machine &machine)
@@ -1273,7 +1229,7 @@ void lhzb4_decrypt(running_machine &machine)
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		uint16_t x = 0;
 
 		IGS27_CRYPT1
 	//  IGS27_CRYPT2
@@ -1284,7 +1240,7 @@ void lhzb4_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8_ALT
 
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
@@ -1313,13 +1269,13 @@ static const uint8_t superkds_tab[256] = {
 
 void superkds_decrypt(running_machine &machine)
 {
-	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(machine.root_device().memregion("user1")->base()));
-
-	int const rom_size = 0x80000;
+	memory_region *const region = machine.root_device().memregion("user1");
+	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
+	auto const rom_size = region->bytes();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		uint16_t x = 0;
 
 		IGS27_CRYPT1
 		IGS27_CRYPT2_ALT
@@ -1332,15 +1288,15 @@ void superkds_decrypt(running_machine &machine)
 
 		x ^= superkds_tab[(i >> 1) & 0xff] << 8;
 
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
 void fearless_decrypt(running_machine &machine)
 {
-	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(machine.root_device().memregion("user1")->base()));
-
-	int const rom_size = 0x80000;
+	memory_region *const region = machine.root_device().memregion("user1");
+	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
+	auto const rom_size = region->bytes();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -1417,7 +1373,7 @@ void slqz3_decrypt(running_machine &machine)
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		uint16_t x = 0;
 
 		// not 100% verified
 		IGS27_CRYPT1
@@ -1429,7 +1385,7 @@ void slqz3_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
@@ -1444,7 +1400,7 @@ void fruitpar_decrypt(running_machine &machine)
 	// not 100% verified
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		uint16_t x = 0;
 
 		IGS27_CRYPT1
 		IGS27_CRYPT2
@@ -1455,7 +1411,7 @@ void fruitpar_decrypt(running_machine &machine)
 		IGS27_CRYPT7_ALT
 		IGS27_CRYPT8
 
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
@@ -1468,7 +1424,7 @@ void oceanpar_decrypt(running_machine &machine)
 	// not 100% verified
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		uint16_t x = 0;
 
 		IGS27_CRYPT1_ALT
 		IGS27_CRYPT2_ALT
@@ -1479,7 +1435,7 @@ void oceanpar_decrypt(running_machine &machine)
 		IGS27_CRYPT7_ALT
 		IGS27_CRYPT8
 
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
@@ -1609,7 +1565,7 @@ void mgcs3_decrypt(running_machine &machine)
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		uint16_t x = 0;
 
 		IGS27_CRYPT1
 		IGS27_CRYPT2
@@ -1620,7 +1576,7 @@ void mgcs3_decrypt(running_machine &machine)
 		IGS27_CRYPT7_ALT
 		IGS27_CRYPT8
 
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
@@ -1633,7 +1589,7 @@ void mgzz_decrypt(running_machine &machine)
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		int x = src[i];
+		int x = 0;
 
 		IGS27_CRYPT1_ALT
 		IGS27_CRYPT2
@@ -1644,7 +1600,7 @@ void mgzz_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
@@ -1704,7 +1660,7 @@ void qlgs_decrypt(running_machine &machine)
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		uint16_t x = 0;
 
 		// may need corrected
 		IGS27_CRYPT1_ALT
@@ -1716,7 +1672,7 @@ void qlgs_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
@@ -1729,7 +1685,7 @@ void jking02_decrypt(running_machine &machine)
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		uint16_t x = 0;
 
 		// probably needs work...
 		IGS27_CRYPT1
@@ -1741,7 +1697,7 @@ void jking02_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
@@ -1903,13 +1859,13 @@ static const uint8_t icescape_tab[0x100] = {
 
 void icescape_decrypt(running_machine &machine)
 {
-	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(machine.root_device().memregion("user1")->base()));
-
-	int const rom_size = 0x80000;
+	memory_region *const region = machine.root_device().memregion("user1");
+	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
+	auto const rom_size = region->bytes();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		uint16_t x = 0;
 
 		IGS27_CRYPT1
 		IGS27_CRYPT2_ALT // $18ed0
@@ -1922,7 +1878,7 @@ void icescape_decrypt(running_machine &machine)
 
 		x ^= icescape_tab[(i>> 1) & 0xff] << 8;
 
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
@@ -2026,7 +1982,7 @@ void lthy_decrypt(running_machine &machine)
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		uint16_t x = 0;
 
 		IGS27_CRYPT1
 		IGS27_CRYPT2_ALT    // correct-85a8
@@ -2037,7 +1993,7 @@ void lthy_decrypt(running_machine &machine)
 		IGS27_CRYPT7        // ?
 		IGS27_CRYPT8        // correct 12c0
 
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
@@ -2050,7 +2006,7 @@ void lhdmg_decrypt(running_machine &machine)
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		uint16_t x = 0;
 
 		IGS27_CRYPT1
 		IGS27_CRYPT2_ALT
@@ -2061,31 +2017,7 @@ void lhdmg_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
-		src[i] = x;
-	}
-}
-
-
-void lhdmgp_decrypt(running_machine &machine)
-{
-	memory_region *const region = machine.root_device().memregion("user1");
-	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
-	auto const rom_size = region->bytes();
-
-	for (int i = 0; i < rom_size / 2; i++)
-	{
-		uint16_t x = src[i];
-
-		IGS27_CRYPT1
-		IGS27_CRYPT2_ALT
-		IGS27_CRYPT3
-		IGS27_CRYPT4
-		IGS27_CRYPT5
-		IGS27_CRYPT6_ALT
-		IGS27_CRYPT7
-		IGS27_CRYPT8
-
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
@@ -2114,4 +2046,3 @@ void extradrw_decrypt(running_machine &machine)
 		src[i] ^= x;
 	}
 }
-
