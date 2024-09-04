@@ -983,33 +983,18 @@ void supracan_state::draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &clipr
 
 uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// treat the sprites as frame-buffered and only update the buffer when drawing scanline 0 - this might not be true!
+	m_sprite_final_bitmap.fill(0x00, cliprect);
+	m_sprite_mask_bitmap.fill(0x00, cliprect);
+	m_prio_bitmap.fill(0xff, cliprect);
+	// TODO: pinpoint back layer color
+	// - A'Can logo wants 0x30
+	// - boomzoo (title) wants 0x00
+	// - sangofgt (1st fighter stage) wants 0x00
+	// - sonevil (intro) wants 0x00
+	//bitmap.fill(0x80, cliprect);
+	bitmap.fill(0x00, cliprect);
 
-	if (0)
-	{
-		if (cliprect.min_y == 0x00)
-		{
-			const rectangle &visarea = screen.visible_area();
-
-			m_sprite_final_bitmap.fill(0x00, visarea);
-			m_sprite_mask_bitmap.fill(0x00, cliprect);
-			m_prio_bitmap.fill(0xff, cliprect);
-			bitmap.fill(0x80, visarea);
-
-			draw_sprites(m_sprite_final_bitmap, m_sprite_mask_bitmap, m_prio_bitmap, visarea);
-		}
-	}
-	else
-	{
-		m_sprite_final_bitmap.fill(0x00, cliprect);
-		m_sprite_mask_bitmap.fill(0x00, cliprect);
-		m_prio_bitmap.fill(0xff, cliprect);
-		// TODO: pinpoint back layer color
-		// A'Can logo wants 0x30, boomzoo (title) and sangofgt (1st fighter stage) wants 0x00
-		bitmap.fill(0x80, cliprect);
-
-		draw_sprites(m_sprite_final_bitmap, m_sprite_mask_bitmap, m_prio_bitmap, cliprect);
-	}
+	draw_sprites(m_sprite_final_bitmap, m_sprite_mask_bitmap, m_prio_bitmap, cliprect);
 
 	// mix screen
 	int xsize = 0, ysize = 0;
@@ -1246,8 +1231,6 @@ void supracan_state::dma_w(int offset, uint16_t data, uint16_t mem_mask, int ch)
 		LOGMASKED(LOG_DMA, "dma_w: control %d: %04x\n", ch, data);
 		if (data & 0x8800)
 		{
-//            if (data & 0x2000)
-//            m_dma_regs.source-=2;
 			LOGMASKED(LOG_DMA, "dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", m_dma_regs.source[ch], m_dma_regs.dest[ch], m_dma_regs.count[ch] + 1, data);
 
 			for (int i = 0; i <= m_dma_regs.count[ch]; i++)
@@ -1619,7 +1602,7 @@ void supracan_state::host_um6619_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			// bit 7: enabled by slghtsag after BIOS (would otherwise address error)
 			// other bits tbd (bit 3 doesn't seem irq 3 enable as per speedyd not enabling it)
-			logerror("irq mask %02x\n", data);
+			logerror("irq mask %02x @ VPOS %d\n", data, m_screen->vpos());
 			m_irq_mask = data;
 		})
 	);
@@ -1648,7 +1631,11 @@ void supracan_state::host_um6619_map(address_map &map)
 	 * ---x sound reset
 	 */
 	// TODO: likely 8-bit
-	map(0x1c, 0x1d).lw16(
+	map(0x1c, 0x1d).lrw16(
+		NAME([this] (offs_t offset) {
+			// BIOS rmw the result, at least in speedyd
+			return m_sound_cpu_ctrl;
+		}),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			const uint16_t old = m_sound_cpu_ctrl;
 			COMBINE_DATA(&m_sound_cpu_ctrl);
@@ -1689,15 +1676,23 @@ uint16_t supracan_state::video_r(offs_t offset, uint16_t mem_mask)
 	switch (offset)
 	{
 	case 0x00/2: // Video IRQ flags
+		data = m_screen->vpos() >= 240 ? 0x8000 : 0;
+		// checked by sonevil in vblank routine, assume ODD flag
+		if (m_screen->frame_number() & 1)
+			data |= 2;
 		if (!machine().side_effects_disabled())
 		{
 			LOGMASKED(LOG_HFVIDEO, "read video IRQ flags (%04x)\n", data);
+			// TODO: should likely ack from the UM6619 bit 7 == 0 not here
+			// sonevil will flip vblank mask a lot,
+			// which may explain why it checks the current scanline inside irq service.
 			m_maincpu->set_input_line(7, CLEAR_LINE);
 		}
-		break;
+		return data;
 	case 0x02/2: // Current scanline
-		LOGMASKED(LOG_VIDEO, "read current scanline (%04x)\n", data);
-		break;
+		data = m_screen->vpos();
+		LOGMASKED(LOG_VIDEO, "read current scanline (%04x / %d)\n", data, data);
+		return data;
 	case 0x08/2: // Unknown (not video flags!) - gambling lord disagrees, it MUST read back what it wrote because it reads it before turning on/off layers and writes it back
 		LOGMASKED(LOG_VIDEO, "read unkown 0x08 (%04x)\n", data);
 		break;
@@ -1758,22 +1753,14 @@ TIMER_CALLBACK_MEMBER(supracan_state::video_callback)
 {
 	int vpos = m_screen->vpos();
 
-	m_video_regs[0] &= ~0x0002;
-
 	switch (vpos)
 	{
 	case 0:
-		m_video_regs[0] &= 0x7fff;
-
 		// we really need better management of this
 		mark_active_tilemap_all_dirty(0);
 		mark_active_tilemap_all_dirty(1);
 		mark_active_tilemap_all_dirty(2);
 		mark_active_tilemap_all_dirty(3);
-		break;
-
-	case 224: // FIXME: Son of Evil is pretty picky about this one, a timing of 240 makes it crash
-		m_video_regs[0] |= 0x8000;
 		break;
 
 	case 240:
@@ -1785,8 +1772,6 @@ TIMER_CALLBACK_MEMBER(supracan_state::video_callback)
 		break;
 	}
 
-	m_video_regs[1] = m_screen->vpos() - 16; // for son of evil, wants vblank active around 224 instead...
-
 	m_hbl_timer->adjust(m_screen->time_until_pos(vpos, 320));
 	m_video_timer->adjust(m_screen->time_until_pos((vpos + 1) % 256, 0));
 }
@@ -1795,7 +1780,7 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
-	// if any of this changes we need a partial update (see sango fighters intro)
+	// if any of this changes we need a partial update (see sangofgt intro)
 	m_screen->update_partial(m_screen->vpos());
 
 	COMBINE_DATA(&m_video_regs[offset]);
