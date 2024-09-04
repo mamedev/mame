@@ -1553,6 +1553,13 @@ uint16_t supracan_state::_68k_soundram_r(offs_t offset, uint16_t mem_mask)
 	uint16_t data = m_soundram[offset * 2] << 8;
 	data |= m_soundram[offset * 2 + 1];
 
+	// formduel, jttlaugh & speedyd all wants polling in "direct mode" from 68k
+	if ((offset * 2) == 0x200)
+		return m_pads[0]->read() ^ 0xffff;
+
+	if ((offset * 2) == 0x202)
+		return m_pads[1]->read() ^ 0xffff;
+
 	if (offset * 2 >= 0x400 && offset * 2 < 0x500)
 	{
 		data = 0;
