@@ -55,6 +55,8 @@ public:
 
 	void mex68kecb(machine_config &config) ATTR_COLD;
 
+	DECLARE_INPUT_CHANGED_MEMBER(abort_button);
+
 protected:
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -81,6 +83,7 @@ private:
 	required_device<rs232_port_device> m_host;
 };
 
+
 /* Input ports */
 static INPUT_PORTS_START( mex68kecb )
 	PORT_START("ACIA1_BAUD")
@@ -104,6 +107,9 @@ static INPUT_PORTS_START( mex68kecb )
 	PORT_DIPSETTING(0x04,  "300")
 	PORT_DIPSETTING(0x02,  "150")
 	PORT_DIPSETTING(0x01,  "110")
+
+	PORT_START("ABORT")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Abort button") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mex68kecb_state, abort_button, 0)
 INPUT_PORTS_END
 
 
@@ -138,7 +144,7 @@ void mex68kecb_state::mex68kecb(machine_config &config)
 	// Optional 6800 peripherals at IRQ4
 	m_acia1->irq_handler().set_inputline(m_maincpu, M68K_IRQ_5);
 	m_acia2->irq_handler().set_inputline(m_maincpu, M68K_IRQ_6);
-	// ABORT Button at IRQ7
+	// Abort button at IRQ7, see abort_button()
 
 	// Set up terminal RS-232.
 
@@ -198,7 +204,13 @@ void mex68kecb_state::write_acia_clock(int state)
 	}
 }
 
-// Boot vector handler, the PCB hardwires the first 16 bytes from 0xfc0000 to 0x0 at reset.
+// Abort button handler
+INPUT_CHANGED_MEMBER(mex68kecb_state::abort_button)
+{
+	m_maincpu->set_input_line(M68K_IRQ_7, newval ? CLEAR_LINE : ASSERT_LINE); // active low
+}
+
+// Boot vector handler, the PCB hardwires the first 8 bytes from 0x008000 to 0x0 at reset.
 void mex68kecb_state::bootvect_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sysram[offset]);
