@@ -1449,11 +1449,10 @@ void igs_m027_state::init_chessc2()
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 
 	// bypass IGS025 'version' check
-	u16* ROM = (u16*)memregion("user1")->base();
-	ROM[0x207d8/2] ^= 0x0100;
+	m_external_rom[0x207d8/4] ^= 0x00000100;
 	// bypass external ROM checksum
-	u16* ROM2 = (u16*)memregion("maincpu")->base();
-	ROM2[(0x16a/2)] ^= 0x1000;
+	u32 *ROM2 = &memregion("maincpu")->as_u32();
+	ROM2[(0x168/4)] ^= 0x10000000;
 
 	// what lives here? coin error otherwise
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000000c, 0x4000000f, read32smo_delegate(*this, FUNC(igs_m027_state::lhdmg_unk2_r)));
