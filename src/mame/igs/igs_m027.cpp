@@ -1605,7 +1605,7 @@ GAME( 1999, lthy,      0,        igs_mahjong_xor, base,     igs_m027_state, init
 GAME( 2000, zhongguo,  0,        igs_mahjong_xor, base,     igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhong Guo Chu Da D", MACHINE_NOT_WORKING )
 GAME( 200?, jking02,   0,        igs_mahjong_xor, jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NOT_WORKING )
 GAME( 2003, mgzz,      0,        igs_mahjong_xor, base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V101CN)", MACHINE_NOT_WORKING )
-GAME( 2003, mgzza,     mgzz,     igs_mahjong_xor, base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_NOT_WORKING )
+GAME( 2000, mgzza,     mgzz,     igs_mahjong_xor, base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_NOT_WORKING )
 GAME( 2007, mgcs3,     0,        igs_mahjong_xor, base,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)", MACHINE_NOT_WORKING )
 GAME( 1999, oceanpar,  0,        igs_mahjong_xor, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
 GAME( 1999, oceanpara, oceanpar, igs_mahjong_xor, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
