@@ -327,32 +327,32 @@ void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int
 	count += base;
 
 	uint16_t tile_bank = 0;
-	uint16_t palette_bank = 0;
+	uint16_t palette_shift = 0;
 	switch (gfx_mode)
 	{
 	case 7:
 		tile_bank = 0x1c00;
-		palette_bank = 0x00;
 		break;
 
 	case 6: // gambling lord
 		tile_bank = 0x0c00;
-		palette_bank = 0x00;
 		break;
 
 	case 4:
 		tile_bank = 0x800;
-		palette_bank = 0x00;
 		break;
 
 	case 2:
 		tile_bank = 0x400;
-		palette_bank = 0x00;
+		break;
+
+	case 1:
+		// formduel gameplay (for layer 2 -> 0x1400)
+		tile_bank = 0x200;
 		break;
 
 	case 0:
 		tile_bank = 0;
-		palette_bank = 0x00;
 		break;
 
 	default:
@@ -363,12 +363,16 @@ void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int
 
 	if (layer == 2)
 	{
-		tile_bank = 0x1000;
+		tile_bank = (0x1000 | (tile_bank << 1)) & 0x1c00;
+		// speedyd hints that text layer color offsets are in steps of 4
+		// TODO: is this actually selectable with mode bit 14 in this context?
+		// Notice that GFX2 will mask with 0x1fff, making that effectively unused for this calculation.
+		palette_shift = 2;
 	}
 
 	int tile = (supracan_vram[count] & 0x03ff) + tile_bank;
 	int flipxy = (supracan_vram[count] & 0x0c00) >> 10;
-	int palette = ((supracan_vram[count] & 0xf000) >> 12) + palette_bank;
+	int palette = ((supracan_vram[count] & 0xf000) >> 12) << palette_shift;
 
 	tileinfo.set(region, tile, palette, TILE_FLIPXY(flipxy));
 }
