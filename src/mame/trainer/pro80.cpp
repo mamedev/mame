@@ -179,7 +179,7 @@ void pro80_state::machine_start()
 {
 	save_item(NAME(m_digit_sel));
 	save_item(NAME(m_cass_in));
-	save_pointer(NAME(m_cass_data) ,4);
+	save_item(NAME(m_cass_data));
 }
 
 void pro80_state::pro80(machine_config &config)
