@@ -83,7 +83,7 @@ void kisssite_state::machine_reset()
 void kisssite_state::mem(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).ram();
-	map(0x1c000000, 0x1c03ffff).mirror(0x00fc0000).rom();
+	map(0x1c000000, 0x1c03ffff).mirror(0x00fc0000).rom().region("maincpu", 0);
 	// registers at 0x20000000-0x2000ffff, ES6008 datasheet could be helpful
 }
 
