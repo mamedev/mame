@@ -10,11 +10,10 @@
 
     TODO:
     - Understand better the video emulation and convert it to tilemaps;
-    - Check audio IRQ frequency (controls music tempo, if too high 2 Player mode becomes slow)
 
 ==========================================================================================================
 
-    pcb marked  GD91071
+    pcb marked GD91071
 
     68000P10
     YM2203C
@@ -30,12 +29,13 @@
 
 *********************************************************************************************************/
 
-
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/tlcs90/tlcs90.h"
 #include "machine/timer.h"
 #include "sound/ymopn.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -67,6 +67,11 @@ public:
 
 	void ddealer(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	void flipscreen_w(u16 data);
 	void back_vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -89,12 +94,7 @@ private:
 	void ddealer_map(address_map &map);
 	void prot_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	TIMER_DEVICE_CALLBACK_MEMBER(ddealer_scanline);
-	void set_interrupt_timing(machine_config &config);
 
 	// memory pointers
 	required_shared_ptr<u16> m_vregs;
@@ -119,8 +119,8 @@ private:
 	tilemap_t  *m_fg_tilemap_left;
 	tilemap_t  *m_fg_tilemap_right;
 
-	u8 m_bus_status;
-	u8 m_interrupt_trigger;
+	u8 m_bus_status = 0;
+	u8 m_interrupt_trigger = 0;
 };
 
 void ddealer_state::machine_start()
@@ -175,8 +175,7 @@ void ddealer_state::mcu_side_shared_w(offs_t offset, u8 data)
 
 u8 ddealer_state::mcu_side_shared_r(offs_t offset)
 {
-	u8 retval = m_maincpu->space(AS_PROGRAM).read_byte((offset));
-	return retval;
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
 void ddealer_state::prot_map(address_map &map)
@@ -201,20 +200,14 @@ TILE_GET_INFO_MEMBER(ddealer_state::get_back_tile_info)
 {
 	u32 code, color;
 	get_tile_info(m_back_vram[tile_index], code, color);
-	tileinfo.set(0,
-			code,
-			color,
-			0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(ddealer_state::get_fg_tile_info)
 {
 	u32 code, color;
 	get_tile_info(m_fg_vram[tile_index], code, color);
-	tileinfo.set(1,
-			code,
-			color,
-			0);
+	tileinfo.set(1, code, color, 0);
 }
 
 template<unsigned Offset>
@@ -222,10 +215,7 @@ TILE_GET_INFO_MEMBER(ddealer_state::get_fg_splitted_tile_info)
 {
 	u32 code, color;
 	get_tile_info(m_fg_vram[Offset + (tile_index & 0x17ff)], code, color);
-	tileinfo.set(1,
-			code,
-			color,
-			0);
+	tileinfo.set(1, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(ddealer_state::scan_fg)
@@ -237,17 +227,17 @@ void ddealer_state::video_start()
 {
 	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ddealer_state::get_back_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode,
-					tilemap_get_info_delegate(*this, FUNC(ddealer_state::get_fg_tile_info)),
-					tilemap_mapper_delegate(*this, FUNC(ddealer_state::scan_fg)),
-					16, 16, 256, 32);
+			tilemap_get_info_delegate(*this, FUNC(ddealer_state::get_fg_tile_info)),
+			tilemap_mapper_delegate(*this, FUNC(ddealer_state::scan_fg)),
+			16, 16, 256, 32);
 	m_fg_tilemap_left = &machine().tilemap().create(*m_gfxdecode,
-					tilemap_get_info_delegate(*this, FUNC(ddealer_state::get_fg_splitted_tile_info<0>)),
-					tilemap_mapper_delegate(*this, FUNC(ddealer_state::scan_fg)),
-					16, 16, 128, 32);
+			tilemap_get_info_delegate(*this, FUNC(ddealer_state::get_fg_splitted_tile_info<0>)),
+			tilemap_mapper_delegate(*this, FUNC(ddealer_state::scan_fg)),
+			16, 16, 128, 32);
 	m_fg_tilemap_right = &machine().tilemap().create(*m_gfxdecode,
-					tilemap_get_info_delegate(*this, FUNC(ddealer_state::get_fg_splitted_tile_info<0x800>)),
-					tilemap_mapper_delegate(*this, FUNC(ddealer_state::scan_fg)),
-					16, 16, 128, 32);
+			tilemap_get_info_delegate(*this, FUNC(ddealer_state::get_fg_splitted_tile_info<0x800>)),
+			tilemap_mapper_delegate(*this, FUNC(ddealer_state::scan_fg)),
+			16, 16, 128, 32);
 
 	m_fg_tilemap->set_transparent_pen(15);
 	m_fg_tilemap_left->set_transparent_pen(15);
@@ -431,11 +421,6 @@ static GFXDECODE_START( gfx_ddealer )
 	GFXDECODE_ENTRY( "fgrom", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 )
 GFXDECODE_END
 
-/***************************************************************************
-
-                             Interrupt Handlers
-
-***************************************************************************/
 /*
   Summary of triggered IRQs:
 
@@ -444,6 +429,8 @@ GFXDECODE_END
 
   - IRQ4: (VBOUT)
     - At 240 scanline (VBOUT = start of VBLANK = end of active video)
+
+  Refer to nmk16.cpp for a more thorough description.
 */
 TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::ddealer_scanline)
 {
@@ -467,7 +454,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::ddealer_scanline)
 	// every PROM entry is addressed each 2 scanlines, so only even lines are actually addressing it:
 	if ((scanline & 0x1) == 0x0)
 	{
-
 		int promAddress = (((scanline / 2) + PROM_FRAME_OFFSET) % (len - PROM_START_OFFSET)) + PROM_START_OFFSET;
 
 		LOG("ddealer_scanline: Scanline: %03d - Current PROM entry: %03d\n", scanline, promAddress);
@@ -478,7 +464,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::ddealer_scanline)
 		u8 trigger = BIT(val, TRIGG_INDEX);
 		if (m_interrupt_trigger == 0 && trigger == 1)
 		{
-
 			u8 int_level = bitswap<3>(val, IPL2_INDEX, IPL1_INDEX, IPL0_INDEX);
 			if (int_level > 0)
 			{
@@ -491,18 +476,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::ddealer_scanline)
 	}
 }
 
-void ddealer_state::set_interrupt_timing(machine_config &config)
-{
-	TIMER(config, "scantimer").configure_scanline(FUNC(ddealer_state::ddealer_scanline), "screen", 0, 1);
-}
-
 void ddealer_state::ddealer(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* 8MHz */
+	M68000(config, m_maincpu, 16_MHz_XTAL/2); // 8MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddealer_state::ddealer_map);
-	set_interrupt_timing(config);
+	TIMER(config, "scantimer").configure_scanline(FUNC(ddealer_state::ddealer_scanline), "screen", 0, 1);
 
-	TMP91640(config, m_protcpu, XTAL(16'000'000)/4); // Toshiba TMP91640 marked as NMK-110, with 16Kbyte internal ROM, 512bytes internal RAM
+	TMP91640(config, m_protcpu, 16_MHz_XTAL/4); // Toshiba TMP91640 marked as NMK-110, with 16Kbyte internal ROM, 512bytes internal RAM
 	m_protcpu->set_addrmap(AS_PROGRAM, &ddealer_state::prot_map);
 	m_protcpu->port_write<6>().set(FUNC(ddealer_state::mcu_port6_w));
 	m_protcpu->port_read<5>().set(FUNC(ddealer_state::mcu_port5_r));
@@ -513,35 +493,35 @@ void ddealer_state::ddealer(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddealer);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(16'000'000)/2, 512, 28, 412, 278, 16, 240); // confirmed
+	screen.set_raw(16_MHz_XTAL/2, 512, 28, 412, 278, 16, 240); // confirmed
 	screen.set_screen_update(FUNC(ddealer_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x200);
 
 	SPEAKER(config, "mono").front_center();
-	YM2203(config, "ymsnd", XTAL(6'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.40); /* 7.5KHz */
+	YM2203(config, "ymsnd", 6_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.40); // 7.5kHz
 }
 
 ROM_START( ddealer )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "1.ic6",  0x00001, 0x20000, CRC(ce0dff50) SHA1(2d7a03f6b9609aea7511a4dc49560a901b0b9f19) )
 	ROM_LOAD16_BYTE( "2.ic28", 0x00000, 0x20000, CRC(f00c346f) SHA1(bd73efb19d5f9efc88210d92a82a3f4595b41097) )
 
 	ROM_REGION( 0x04000, "protcpu", 0 )
 	ROM_LOAD( "nmk-110_ddealer.bin", 0x0000, 0x4000, CRC(088db9b4) SHA1(71946399e37ffa9293eceac637b76c9169ac16e6) ) // chip markings are identical to nmk-110 on thunder dragon, code is confirmed to be different
 
-	ROM_REGION( 0x20000, "bgrom", 0 ) /* BG */
+	ROM_REGION( 0x20000, "bgrom", 0 ) // BG
 	ROM_LOAD( "4.ic65", 0x00000, 0x20000, CRC(4939ff1b) SHA1(af2f2feeef5520d775731a58cbfc8fcc913b7348) )
 
-	ROM_REGION( 0x80000, "fgrom", 0 ) /* FG */
+	ROM_REGION( 0x80000, "fgrom", 0 ) // FG
 	ROM_LOAD( "3.ic64", 0x00000, 0x80000, CRC(660e367c) SHA1(54827a8998c58c578c594126d5efc18a92363eaa))
 
 	ROM_REGION( 0x0100, "htiming", 0 )
-	ROM_LOAD( "6.ic86", 0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
+	ROM_LOAD( "6.ic86", 0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
 
 	ROM_REGION( 0x0100, "vtiming", 0 )
-	ROM_LOAD( "5.ic67", 0x0000, 0x0100, CRC(1d3d7e17) SHA1(b5aa0d024f0c0b5f72a2d0a23d1576775a7b3826) )  // 82S135
+	ROM_LOAD( "5.ic67", 0x0000, 0x0100, CRC(1d3d7e17) SHA1(b5aa0d024f0c0b5f72a2d0a23d1576775a7b3826) ) // 82S135
 ROM_END
 
 } // anonymous namespace
