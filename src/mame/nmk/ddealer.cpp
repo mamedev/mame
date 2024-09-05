@@ -57,6 +57,7 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_mcu_shared_ram(*this, "mcu_shared_ram"),
 		m_in0_io(*this, "IN0"),
+		m_vtiming_prom(*this, "vtiming"),
 		m_maincpu(*this, "maincpu"),
 		m_protcpu(*this, "protcpu"),
 		m_screen(*this, "screen"),
@@ -92,6 +93,9 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	TIMER_DEVICE_CALLBACK_MEMBER(ddealer_scanline);
+	void set_interrupt_timing(machine_config &config);
+
 	// memory pointers
 	required_shared_ptr<u16> m_vregs;
 	required_shared_ptr<u16> m_back_vram;
@@ -99,6 +103,7 @@ private:
 	required_shared_ptr<u16> m_work_ram;
 	required_shared_ptr<u16> m_mcu_shared_ram;
 	required_ioport m_in0_io;
+	required_memory_region m_vtiming_prom;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -115,16 +120,19 @@ private:
 	tilemap_t  *m_fg_tilemap_right;
 
 	u8 m_bus_status;
+	u8 m_interrupt_trigger;
 };
 
 void ddealer_state::machine_start()
 {
 	save_item(NAME(m_bus_status));
+	save_item(NAME(m_interrupt_trigger));
 }
 
 void ddealer_state::machine_reset()
 {
 	m_bus_status = 0x04;
+	m_interrupt_trigger = 0x01;
 }
 
 void ddealer_state::mcu_port6_w(u8 data)
@@ -245,10 +253,10 @@ void ddealer_state::video_start()
 	m_fg_tilemap_left->set_transparent_pen(15);
 	m_fg_tilemap_right->set_transparent_pen(15);
 
-	m_back_tilemap->set_scrolldx(64,64);
-	m_fg_tilemap->set_scrolldx(64,64);
-	m_fg_tilemap_left->set_scrolldx(64,64);
-	m_fg_tilemap_right->set_scrolldx(64,64);
+	m_back_tilemap->set_scrolldx(28+64,28+64);
+	m_fg_tilemap->set_scrolldx(28+64,28+64);
+	m_fg_tilemap_left->set_scrolldx(28+64,28+64);
+	m_fg_tilemap_right->set_scrolldx(28+64,28+64);
 }
 
 void ddealer_state::draw_video_layer(u16* vreg_base, tilemap_t *tmap, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -423,12 +431,76 @@ static GFXDECODE_START( gfx_ddealer )
 	GFXDECODE_ENTRY( "fgrom", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 )
 GFXDECODE_END
 
+/***************************************************************************
+
+                             Interrupt Handlers
+
+***************************************************************************/
+/*
+  Summary of triggered IRQs:
+
+  - IRQ1:
+    - At 102 scanline
+
+  - IRQ4: (VBOUT)
+    - At 240 scanline (VBOUT = start of VBLANK = end of active video)
+*/
+TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::ddealer_scanline)
+{
+//	constexpr int SPRDMA_INDEX = 0;  // not used in emulation
+//	constexpr int VSYNC_INDEX  = 1;  // not used in emulation
+//	constexpr int VBLANK_INDEX = 2;  // not used in emulation
+//	constexpr int NOT_USED     = 3;  // not used in emulation
+	constexpr int IPL0_INDEX   = 4;
+	constexpr int IPL1_INDEX   = 5;
+	constexpr int IPL2_INDEX   = 6;
+	constexpr int TRIGG_INDEX  = 7;
+
+	constexpr int PROM_START_OFFSET = 0x75;  // previous entries are never addressed
+	constexpr int PROM_FRAME_OFFSET = 0x0b;  // first 11 "used" entries (from 0x75 to 0x7f: 0xb entries) are prior to start of frame, which occurs on 0x80 address (128 entry)
+
+	u8 *prom = m_vtiming_prom->base();
+	int len = m_vtiming_prom->bytes();
+
+	int scanline = param;
+
+	// every PROM entry is addressed each 2 scanlines, so only even lines are actually addressing it:
+	if ((scanline & 0x1) == 0x0)
+	{
+
+		int promAddress = (((scanline / 2) + PROM_FRAME_OFFSET) % (len - PROM_START_OFFSET)) + PROM_START_OFFSET;
+
+		LOG("ddealer_scanline: Scanline: %03d - Current PROM entry: %03d\n", scanline, promAddress);
+
+		u8 val = prom[promAddress];
+
+		// Interrupt requests are triggered at raising edge of bit 7:
+		u8 trigger = BIT(val, TRIGG_INDEX);
+		if (m_interrupt_trigger == 0 && trigger == 1)
+		{
+
+			u8 int_level = bitswap<3>(val, IPL2_INDEX, IPL1_INDEX, IPL0_INDEX);
+			if (int_level > 0)
+			{
+				LOG("ddealer_scanline: Triggered interrupt: IRQ%d at scanline: %03d\n", int_level, scanline);
+				m_maincpu->set_input_line(int_level, HOLD_LINE);
+			}
+		}
+
+		m_interrupt_trigger = trigger;
+	}
+}
+
+void ddealer_state::set_interrupt_timing(machine_config &config)
+{
+	TIMER(config, "scantimer").configure_scanline(FUNC(ddealer_state::ddealer_scanline), "screen", 0, 1);
+}
+
 void ddealer_state::ddealer(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* 8MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddealer_state::ddealer_map);
-	m_maincpu->set_vblank_int("screen", FUNC(ddealer_state::irq4_line_hold));
-	m_maincpu->set_periodic_int(FUNC(ddealer_state::irq1_line_hold), attotime::from_hz(60)); //guess, controls music tempo, 112 is way too fast, 90 causes 2 player mode to be too slow
+	set_interrupt_timing(config);
 
 	TMP91640(config, m_protcpu, XTAL(16'000'000)/4); // Toshiba TMP91640 marked as NMK-110, with 16Kbyte internal ROM, 512bytes internal RAM
 	m_protcpu->set_addrmap(AS_PROGRAM, &ddealer_state::prot_map);
@@ -441,10 +513,7 @@ void ddealer_state::ddealer(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddealer);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_raw(XTAL(16'000'000)/2, 512, 28, 412, 278, 16, 240); // confirmed
 	screen.set_screen_update(FUNC(ddealer_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -468,9 +537,11 @@ ROM_START( ddealer )
 	ROM_REGION( 0x80000, "fgrom", 0 ) /* FG */
 	ROM_LOAD( "3.ic64", 0x00000, 0x80000, CRC(660e367c) SHA1(54827a8998c58c578c594126d5efc18a92363eaa))
 
-	ROM_REGION( 0x200, "user1", 0 ) /* Proms */
-	ROM_LOAD( "5.ic67", 0x000, 0x100, CRC(1d3d7e17) SHA1(b5aa0d024f0c0b5f72a2d0a23d1576775a7b3826) ) // 82S135
-	ROM_LOAD( "6.ic86", 0x100, 0x100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
+	ROM_REGION( 0x0100, "htiming", 0 )
+	ROM_LOAD( "6.ic86", 0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
+
+	ROM_REGION( 0x0100, "vtiming", 0 )
+	ROM_LOAD( "5.ic67", 0x0000, 0x0100, CRC(1d3d7e17) SHA1(b5aa0d024f0c0b5f72a2d0a23d1576775a7b3826) )  // 82S135
 ROM_END
 
 } // anonymous namespace
