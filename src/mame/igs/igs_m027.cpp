@@ -15,16 +15,19 @@
  To emulate these games the Internal ROM will need dumping
  There are at least 20 other games on this and similar platforms.
 
+ Hold service on boot to access input test.
+
  TODO:
  * Inputs and DIP switches for most games
  * Hopper for payout
- * Joystick controls for zhongguo
+ * Joystick controls for zhongguo and mgzz
  * Coin lockout (zhongguo displays a coin error on unexpected coins)
 */
 
 #include "emu.h"
 
 #include "igs017_igs031.h"
+#include "mahjong.h"
 #include "pgmcrypt.h"
 
 #include "cpu/arm7/arm7.h"
@@ -58,7 +61,7 @@ public:
 		m_igs017_igs031(*this, "igs017_igs031"),
 		m_screen(*this, "screen"),
 		m_oki(*this, "oki"),
-		m_io_kbd(*this, "KBD%u", 1U),
+		m_io_kbd(*this, "KEY%u", 0U),
 		m_io_dsw(*this, "DSW%u", 1U),
 		m_io_test(*this, "TEST")
 	{ }
@@ -67,6 +70,7 @@ public:
 	void m027_xor(machine_config &config) ATTR_COLD;
 	void lhdmg_xor(machine_config &config) ATTR_COLD;
 	void zhongguo_xor(machine_config &config) ATTR_COLD;
+	void mgzz_xor(machine_config &config) ATTR_COLD;
 	void extradraw(machine_config &config) ATTR_COLD;
 
 	void init_sdwx() ATTR_COLD;
@@ -105,16 +109,16 @@ private:
 	required_device<okim6295_device> m_oki;
 	optional_ioport_array<5> m_io_kbd;
 	optional_ioport_array<3> m_io_dsw;
-	required_ioport m_io_test;
+	optional_ioport m_io_test;
 
 	u32 m_xor_table[0x100];
 	u8 m_io_select[2];
 	u32 m_unk2_write_count;
 
-	u8 ppi_porta_r();
-	template <unsigned N, unsigned S, unsigned R> u8 kbd_r();
+	template <unsigned Select, unsigned First> u8 dsw_r();
+	template <unsigned Select, unsigned S, unsigned R> u8 kbd_r();
 
-	template <unsigned N> void io_select_w(u8 data);
+	template <unsigned Select> void io_select_w(u8 data);
 
 	u32 external_rom_r(offs_t offset);
 
@@ -131,14 +135,16 @@ private:
 
 	void igs_mahjong_map(address_map &map) ATTR_COLD;
 	void igs_mahjong_xor_map(address_map &map) ATTR_COLD;
+	void lhdmg_xor_map(address_map &map) ATTR_COLD;
 	void zhongguo_xor_map(address_map &map) ATTR_COLD;
+	void mgzz_xor_map(address_map &map) ATTR_COLD;
 	void extradraw_map(address_map &map) ATTR_COLD;
 };
 
 void igs_m027_state::machine_start()
 {
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
-	m_io_select[0] = m_io_select[1] = 0xff;
+	std::fill(std::begin(m_io_select), std::end(m_io_select), 0xff);
 	m_unk2_write_count = 0;
 
 	save_item(NAME(m_xor_table));
@@ -169,7 +175,6 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 
 	map(0x38008000, 0x38008003).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0x38009000, 0x38009003).umask32(0x000000ff).r(FUNC(igs_m027_state::test_r));
 	map(0x38009000, 0x38009003).umask32(0x0000ff00).w(FUNC(igs_m027_state::io_select_w<0>));
 
 	map(0x40000008, 0x4000000b).w(FUNC(igs_m027_state::unk2_w));
@@ -188,11 +193,27 @@ void igs_m027_state::igs_mahjong_xor_map(address_map &map)
 	map(0x08000000, 0x0807ffff).r(FUNC(igs_m027_state::external_rom_r)); // Game ROM
 }
 
+void igs_m027_state::lhdmg_xor_map(address_map &map)
+{
+	igs_mahjong_xor_map(map);
+
+	map(0x38009000, 0x38009003).umask32(0x000000ff).r(FUNC(igs_m027_state::test_r));
+}
+
 void igs_m027_state::zhongguo_xor_map(address_map &map)
 {
 	igs_mahjong_xor_map(map);
 
+	map(0x38009000, 0x38009003).umask32(0x000000ff).r(FUNC(igs_m027_state::test_r));
 	map(0x38009000, 0x38009003).umask32(0x0000ff00).r(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
+}
+
+void igs_m027_state::mgzz_xor_map(address_map &map)
+{
+	igs_mahjong_xor_map(map);
+
+	map(0x38009000, 0x38009003).umask32(0x0000ff00).r(FUNC(igs_m027_state::test_r));
+	map(0x38009000, 0x38009003).umask32(0x00ff0000).r(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
 }
 
 void igs_m027_state::extradraw_map(address_map &map)
@@ -208,7 +229,7 @@ void igs_m027_state::extradraw_map(address_map &map)
 
 ***************************************************************************/
 
-static INPUT_PORTS_START( base )
+INPUT_PORTS_START( base )
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
@@ -290,81 +311,10 @@ static INPUT_PORTS_START( base )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("TEST")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mahjong )
-	PORT_START("KBD1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KBD2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KBD3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KBD4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KBD5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
-
-	PORT_START("DSW2")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+INPUT_PORTS_START( mahjong )
+	PORT_INCLUDE(igs_mahjong_matrix)
 
 	PORT_START("TEST")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT ) // 哈巴
@@ -377,7 +327,7 @@ static INPUT_PORTS_START( mahjong )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( jking02 )
+INPUT_PORTS_START( jking02 )
 	PORT_INCLUDE(base)
 
 	PORT_MODIFY("DSW2")
@@ -411,7 +361,7 @@ static INPUT_PORTS_START( jking02 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) // maybe start?
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( qlgs )
+INPUT_PORTS_START( qlgs )
 	PORT_INCLUDE(base)
 
 	PORT_MODIFY("DSW2")
@@ -420,10 +370,10 @@ static INPUT_PORTS_START( qlgs )
 	PORT_DIPSETTING(    0x00, "Standalone" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( lhdmg )
+INPUT_PORTS_START( lhdmg )
 	PORT_INCLUDE(mahjong)
 
-	PORT_MODIFY("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coin_A) )            PORT_DIPLOCATION("SW1:1,2")  // 投币比率
 	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )
 	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )
@@ -447,13 +397,13 @@ static INPUT_PORTS_START( lhdmg )
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                            // 无
 	PORT_DIPSETTING(    0x80, DEF_STR(On) )                                             // 有
 
-	PORT_MODIFY("DSW2")
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Double Up Jackpot" )        PORT_DIPLOCATION("SW2:1,2")  // 比倍爆机
 	PORT_DIPSETTING(    0x03, "500" )
 	PORT_DIPSETTING(    0x02, "1000" )
 	PORT_DIPSETTING(    0x01, "1500" )
 	PORT_DIPSETTING(    0x00, "2000" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )              PORT_DIPLOCATION("SW2:3,4")  // 最小押注   (all settings show 1 in service mode)
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )              PORT_DIPLOCATION("SW2:3,4")  // 最小押注   (all settings show 1 in service mode and function identically)
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x04, "1" )
@@ -472,12 +422,12 @@ static INPUT_PORTS_START( lhdmg )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                             // 有
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( zhongguo )
+INPUT_PORTS_START( zhongguo )
 	PORT_INCLUDE(mahjong)
 
-	// missing joystick mode controls
+	// TODO: missing joystick mode controls
 
-	PORT_MODIFY("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coin_A) )            PORT_DIPLOCATION("SW1:1,2")  // 投币比率
 	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )
 	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )
@@ -501,7 +451,7 @@ static INPUT_PORTS_START( zhongguo )
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                            // 无
 	PORT_DIPSETTING(    0x80, DEF_STR(On) )                                             // 有
 
-	PORT_MODIFY("DSW2")
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Control Mode" )             PORT_DIPLOCATION("SW2:1")    // 操作模式
 	PORT_DIPSETTING(    0x01, "Buttons" )                                               // 按键
 	PORT_DIPSETTING(    0x00, "Joystick" )                                              // 搖杆
@@ -527,7 +477,63 @@ static INPUT_PORTS_START( zhongguo )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                             // 有
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( amazonia )
+INPUT_PORTS_START( mgzz )
+	PORT_INCLUDE(mahjong)
+
+	// TODO: missing KEYIN and PAYOUT shown in input test
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Allow_Continue) )    PORT_DIPLOCATION("SW1:1")    // 續玩遊戲
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                            // 無
+	PORT_DIPSETTING(    0x01, DEF_STR(On) )                                             // 有
+	PORT_DIPNAME( 0x02, 0x02, "Control Mode" )             PORT_DIPLOCATION("SW1:2")    // 操作方式
+	PORT_DIPSETTING(    0x02, "Buttons" )                                               // 按鍵
+	PORT_DIPSETTING(    0x00, "Joystick" )                                              // 搖桿
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:3")    // 示範音樂
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                            // 無
+	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                             // 有
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR(Coin_A) )            PORT_DIPLOCATION("SW1:4,5")  // 投币比率
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x08, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x10, DEF_STR(1C_5C) )
+	PORT_DIPSETTING(    0x18, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x60, 0x60, "Key-In Rate" )              PORT_DIPLOCATION("SW1:6,7")  // 开分比率
+	PORT_DIPSETTING(    0x60, "50" )
+	PORT_DIPSETTING(    0x40, "100" )
+	PORT_DIPSETTING(    0x20, "200" )
+	PORT_DIPSETTING(    0x00, "500" )
+	PORT_DIPNAME( 0x80, 0x80, "Credit Limit" )             PORT_DIPLOCATION("SW1:8")    // 进分上限
+	PORT_DIPSETTING(    0x80, "5000" )
+	PORT_DIPSETTING(    0x00, "10000" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Minimum Bet" )              PORT_DIPLOCATION("SW2:1,2")  // 最小押注
+	PORT_DIPSETTING(    0x03, "10" )
+	PORT_DIPSETTING(    0x02, "20" )
+	PORT_DIPSETTING(    0x01, "30" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPNAME( 0x04, 0x04, "Continue Immediately" )     PORT_DIPLOCATION("SW2:3")    // 直接續玩
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                            // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                             // 有
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )                                       // remaining DIP switches not shown in test mode
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_MODIFY("TEST")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( mgzza )
+	PORT_INCLUDE( mgzz )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )                                       // not shown in test mode
+INPUT_PORTS_END
+
+INPUT_PORTS_START( amazonia )
 	PORT_INCLUDE(base)
 
 	PORT_MODIFY("DSW1")
@@ -611,34 +617,35 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_state::interrupt)
 }
 
 
-u8 igs_m027_state::ppi_porta_r()
+template <unsigned Select, unsigned First>
+u8 igs_m027_state::dsw_r()
 {
 	u8 data = 0xff;
 
-	for (int i = 0; i < 3; i++)
-		if (!BIT(m_io_select[1], i))
+	for (int i = First; i < m_io_dsw.size(); i++)
+		if (!BIT(m_io_select[Select], i - First))
 			data &= m_io_dsw[i].read_safe(0xff);
 
 	return data;
 }
 
-template <unsigned N, unsigned S, unsigned R>
+template <unsigned Select, unsigned S, unsigned R>
 u8 igs_m027_state::kbd_r()
 {
 	u8 data = 0xff;
 
 	for (int i = 0; i < 5; i++)
-		if (!BIT(m_io_select[N], i + S))
+		if (!BIT(m_io_select[Select], i + S))
 			data &= m_io_kbd[i].read_safe(0xff);
 
 	return (data << R) | (data >> (8 - R));
 }
 
 
-template <unsigned N>
+template <unsigned Select>
 void igs_m027_state::io_select_w(u8 data)
 {
-	m_io_select[N] = data;
+	m_io_select[Select] = data;
 }
 
 
@@ -707,7 +714,7 @@ void igs_m027_state::m027(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027_state::interrupt), "screen", 0, 1);
 
 	I8255A(config, m_ppi);
-	m_ppi->in_pa_callback().set(FUNC(igs_m027_state::ppi_porta_r));
+	m_ppi->in_pa_callback().set(NAME((&igs_m027_state::dsw_r<1, 0>)));
 	m_ppi->in_pb_callback().set_ioport("PORTB");
 	m_ppi->in_pc_callback().set_ioport("PORTC");
 
@@ -731,6 +738,8 @@ void igs_m027_state::lhdmg_xor(machine_config &config)
 {
 	m027_xor(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::lhdmg_xor_map);
+
 	m_ppi->in_pa_callback().set_ioport("DSW1");
 	m_ppi->in_pb_callback().set_ioport("DSW2");
 	m_ppi->in_pc_callback().set(NAME((&igs_m027_state::kbd_r<0, 3, 0>)));
@@ -743,6 +752,13 @@ void igs_m027_state::zhongguo_xor(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::zhongguo_xor_map);
 
 	m_ppi->in_pc_callback().set_constant(0xff);
+}
+
+void igs_m027_state::mgzz_xor(machine_config &config)
+{
+	lhdmg_xor(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::mgzz_xor_map);
 }
 
 void igs_m027_state::extradraw(machine_config &config)
@@ -1844,8 +1860,8 @@ GAME( 2004, lhzb4,     0,        m027_xor,     base,     igs_m027_state, init_lh
 GAME( 1999, lthy,      0,        m027_xor,     base,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_NOT_WORKING )
 GAME( 2000, zhongguo,  0,        zhongguo_xor, zhongguo, igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhongguo Chu Da D", MACHINE_NOT_WORKING ) // 中国锄大D
 GAME( 200?, jking02,   0,        m027_xor,     jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NOT_WORKING )
-GAME( 2003, mgzz,      0,        m027_xor,     base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V101CN)", MACHINE_NOT_WORKING )
-GAME( 2000, mgzza,     mgzz,     m027_xor,     base,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_NOT_WORKING )
+GAME( 2003, mgzz,      0,        mgzz_xor,     mgzz,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V101CN)", MACHINE_NOT_WORKING )
+GAME( 2000, mgzza,     mgzz,     mgzz_xor,     mgzza,    igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_NOT_WORKING )
 GAME( 2007, mgcs3,     0,        m027_xor,     base,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)", MACHINE_NOT_WORKING )
 GAME( 1999, oceanpar,  0,        m027_xor,     base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
 GAME( 1999, oceanpara, oceanpar, m027_xor,     base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
