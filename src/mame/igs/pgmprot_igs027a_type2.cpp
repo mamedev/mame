@@ -113,16 +113,25 @@ void pgm_arm_type2_state::kov2_mem(address_map &map)
 	map(0xd10000, 0xd10001).rw(FUNC(pgm_arm_type2_state::arm7_latch_68k_r), FUNC(pgm_arm_type2_state::arm7_latch_68k_w)); /* ARM7 Latch */
 }
 
+u32 pgm_arm_type2_state::external_rom_r(offs_t offset)
+{
+	return m_external_rom[offset] ^ m_xor_table[offset & 0x00ff];
+}
+
+void pgm_arm_type2_state::xor_table_w(offs_t offset, u8 data)
+{
+	m_xor_table[offset] = (u32(data) << 24) | (u32(data) << 8);
+}
 
 void pgm_arm_type2_state::_55857F_arm7_map(address_map &map)
 {
 	map(0x00000000, 0x00003fff).rom();
-	map(0x08000000, 0x083fffff).rom().region("user1", 0);
+	map(0x08000000, 0x083fffff).rom().r(FUNC(pgm_arm_type2_state::external_rom_r));
 	map(0x10000000, 0x100003ff).ram();
 	map(0x18000000, 0x1800ffff).ram().share("arm_ram");
 	map(0x38000000, 0x38000003).rw(FUNC(pgm_arm_type2_state::arm7_latch_arm_r), FUNC(pgm_arm_type2_state::arm7_latch_arm_w)); /* 68k Latch */
 	map(0x48000000, 0x4800ffff).rw(FUNC(pgm_arm_type2_state::arm7_shareram_r), FUNC(pgm_arm_type2_state::arm7_shareram_w)).share("arm7_shareram");
-	map(0x50000000, 0x500003ff).ram();
+	map(0x50000000, 0x500003ff).ram().umask32(0x000000ff).w(FUNC(pgm_arm_type2_state::xor_table_w)); 
 }
 
 /******* ARM 55857F *******/
@@ -150,9 +159,11 @@ void pgm_arm_type2_state::kov2_latch_init()
 {
 	m_kov2_latchdata_68k_w = 0;
 	m_kov2_latchdata_arm_w = 0;
+	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 
 	save_item(NAME(m_kov2_latchdata_68k_w));
 	save_item(NAME(m_kov2_latchdata_arm_w));
+	save_item(NAME(m_xor_table));
 }
 
 void pgm_arm_type2_state::kov2_arm_region_w(offs_t offset, u32 data, u32 mem_mask)

@@ -4,12 +4,15 @@
 class pgm_arm_type2_state : public pgm_state
 {
 public:
-	pgm_arm_type2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pgm_state(mconfig, type, tag),
-			m_arm_ram(*this, "arm_ram"),
-			m_arm7_shareram(*this, "arm7_shareram"),
-			m_prot(*this, "prot") {
+	pgm_arm_type2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pgm_state(mconfig, type, tag),
+		m_arm_ram(*this, "arm_ram"),
+		m_arm7_shareram(*this, "arm7_shareram"),
+		m_prot(*this, "prot"),
+		m_external_rom(*this, "user1")
+	{
 	}
+
 	void init_kov2();
 	void init_kov2p();
 	void init_martmast();
@@ -30,7 +33,12 @@ private:
 	required_shared_ptr<u32> m_arm7_shareram;
 
 	optional_device<cpu_device> m_prot;
+	required_region_ptr<u32> m_external_rom;
 
+	u32 m_xor_table[0x100];
+
+	u32 external_rom_r(offs_t offset);
+	void xor_table_w(offs_t offset, u8 data);
 	u32 arm7_latch_arm_r(offs_t offset, u32 mem_mask = ~0);
 	void arm7_latch_arm_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 arm7_shareram_r(offs_t offset, u32 mem_mask = ~0);
