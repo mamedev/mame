@@ -226,7 +226,7 @@ private:
 	uint16_t *m_pram = nullptr;
 #endif
 
-	uint16_t m_sprite_count = 0;
+	u32 m_sprite_count = 0;
 	uint32_t m_sprite_base_addr = 0;
 	uint8_t m_sprite_flags = 0;
 
@@ -303,12 +303,14 @@ int supracan_state::get_tilemap_region(int layer)
 
 	if (layer == 3)
 	{
+		// TODO: sonevil wants region 0/8bpp during intro
 		// roz layer
 		static const int s_roz_mode_lut[4] = { 4, 2, 1, 0 };
 		return s_roz_mode_lut[m_roz_mode & 3];
 	}
 	else
 	{
+		// TODO: slghtsag wants region 0/8bpp at character select
 		// normal layers
 		if ((m_tilemap_mode[layer] & 0x7000) == 0x7000)
 		{
@@ -1248,8 +1250,11 @@ void supracan_state::dma_w(int offset, uint16_t data, uint16_t mem_mask, int ch)
 					m_dma_regs.dest[ch] += 2;
 					m_dma_regs.source[ch] += 2;
 					if (data & 0x0100)
+					{
+						// staiwbbl, indirect transfers towards port $f00010-$1f
 						if ((m_dma_regs.dest[ch] & 0xf) == 0)
 							m_dma_regs.dest[ch] -= 0x10;
+					}
 				}
 				else
 				{
@@ -1836,6 +1841,17 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		break;
 	case 0x1e/2:
 		LOGMASKED(LOG_SPRDMA, "video_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", m_sprdma_regs.src, m_sprdma_regs.dst, m_sprdma_regs.count, data);
+
+		// HACK: staiwbbl trashes memory at boot
+		// - it will indirect transfer from DMA #1, from $ff637c with count 0x24f (max sprite size?)
+		// - it writes 0xffff to count port, possibly locking the port?
+		// - these are extremely illegal transfers, possibly ignored by the HW for multiple reasons.
+		// if (m_sprite_count == 0x10000)
+		if (m_sprdma_regs.dst & 0xff00'0000 || m_sprdma_regs.src & 0xff00'0000)
+		{
+			logerror("Attempt to transfer from src %08x to dst %08x size %04x (ignored)\n", m_sprdma_regs.src,m_sprdma_regs.dst, m_sprdma_regs.count);
+			return;
+		}
 
 		/* TODO: what's 0x2000 and 0x4000 for? */
 		if (data & 0x8000)
