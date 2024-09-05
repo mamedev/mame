@@ -192,6 +192,7 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 #include "machine/ncr5380.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
@@ -333,6 +334,7 @@ static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("tape", NSCSI_TAPE);
 	device.set_option_machine_config("cdrom", sun_cdrom);
 }
 
@@ -1061,7 +1063,7 @@ void sun3_state::sun3(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, "tape");
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsibus:7").option_set("sbc", NCR5380).machine_config([this] (device_t *device) { ncr5380(device); });
@@ -1167,7 +1169,7 @@ void sun3_state::sun3_50(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, "tape");
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsibus:7").option_set("sbc", NCR5380).machine_config([this] (device_t *device) { ncr5380(device); });
