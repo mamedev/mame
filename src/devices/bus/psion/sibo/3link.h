@@ -27,8 +27,6 @@ public:
 	// construction/destruction
 	psion_3link_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static constexpr feature_type imperfect_features() { return feature::COMMS; }
-
 protected:
 	// device_t overrides
 	virtual void device_start() override;
