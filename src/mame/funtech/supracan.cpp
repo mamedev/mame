@@ -60,18 +60,6 @@ STATUS:
 
     - All: are ALL the layers ROZ capable??
 
-DEBUG TRICKS:
-
-    staiwbbl:
-    wpset e90020,1f,w
-    do pc=5ac40
-    ...
-    do pc=5acd4
-    wpclear
-    bp 0269E4
-    [ff7be4] <- 0x269ec
-    bpclear
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -226,7 +214,7 @@ private:
 	uint16_t *m_pram = nullptr;
 #endif
 
-	u32 m_sprite_count = 0;
+	uint16_t m_sprite_count = 0;
 	uint32_t m_sprite_base_addr = 0;
 	uint8_t m_sprite_flags = 0;
 
@@ -1846,8 +1834,9 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		// - it will indirect transfer from DMA #1, from $ff637c with count 0x24f (max sprite size?)
 		// - it writes 0xffff to count port, possibly locking the port?
 		// - these are extremely illegal transfers, possibly ignored by the HW for multiple reasons.
+		// - src == 0xffff'xxxx is actually used by sonevil, breaking title screen if ignored here.
 		// if (m_sprite_count == 0x10000)
-		if (m_sprdma_regs.dst & 0xff00'0000 || m_sprdma_regs.src & 0xff00'0000)
+		if (m_sprdma_regs.dst & 0xff00'0000)
 		{
 			logerror("Attempt to transfer from src %08x to dst %08x size %04x (ignored)\n", m_sprdma_regs.src,m_sprdma_regs.dst, m_sprdma_regs.count);
 			return;
