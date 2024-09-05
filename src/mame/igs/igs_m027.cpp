@@ -20,7 +20,6 @@
  TODO:
  * Inputs and DIP switches for most games
  * Hopper for payout
- * Joystick controls for zhongguo and mgzz
  * Coin lockout (zhongguo displays a coin error on unexpected coins)
 */
 
@@ -69,6 +68,7 @@ public:
 	void m027(machine_config &config) ATTR_COLD;
 	void m027_xor(machine_config &config) ATTR_COLD;
 	void lhdmg_xor(machine_config &config) ATTR_COLD;
+	void lhzb4_xor(machine_config &config) ATTR_COLD;
 	void zhongguo_xor(machine_config &config) ATTR_COLD;
 	void mgzz_xor(machine_config &config) ATTR_COLD;
 	void extradraw(machine_config &config) ATTR_COLD;
@@ -136,6 +136,7 @@ private:
 	void igs_mahjong_map(address_map &map) ATTR_COLD;
 	void igs_mahjong_xor_map(address_map &map) ATTR_COLD;
 	void lhdmg_xor_map(address_map &map) ATTR_COLD;
+	void lhzb4_xor_map(address_map &map) ATTR_COLD;
 	void zhongguo_xor_map(address_map &map) ATTR_COLD;
 	void mgzz_xor_map(address_map &map) ATTR_COLD;
 	void extradraw_map(address_map &map) ATTR_COLD;
@@ -175,8 +176,6 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 
 	map(0x38008000, 0x38008003).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0x38009000, 0x38009003).umask32(0x0000ff00).w(FUNC(igs_m027_state::io_select_w<0>));
-
 	map(0x40000008, 0x4000000b).w(FUNC(igs_m027_state::unk2_w));
 	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027_state::unk2_r));
 	map(0x40000018, 0x4000001b).umask32(0x000000ff).w(FUNC(igs_m027_state::io_select_w<1>));
@@ -198,13 +197,21 @@ void igs_m027_state::lhdmg_xor_map(address_map &map)
 	igs_mahjong_xor_map(map);
 
 	map(0x38009000, 0x38009003).umask32(0x000000ff).r(FUNC(igs_m027_state::test_r));
+	map(0x38009000, 0x38009003).umask32(0x0000ff00).w(FUNC(igs_m027_state::io_select_w<0>));
+}
+
+void igs_m027_state::lhzb4_xor_map(address_map &map)
+{
+	igs_mahjong_xor_map(map);
+
+	map(0x38009000, 0x38009003).umask32(0x000000ff).r(FUNC(igs_m027_state::test_r));
+	map(0x38009000, 0x38009003).umask32(0x00ff0000).w(FUNC(igs_m027_state::io_select_w<0>));
 }
 
 void igs_m027_state::zhongguo_xor_map(address_map &map)
 {
 	igs_mahjong_xor_map(map);
 
-	map(0x38009000, 0x38009003).umask32(0x000000ff).r(FUNC(igs_m027_state::test_r));
 	map(0x38009000, 0x38009003).umask32(0x0000ff00).r(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
 }
 
@@ -327,6 +334,24 @@ INPUT_PORTS_START( mahjong )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( mahjong_joy )
+	PORT_INCLUDE(mahjong)
+
+	PORT_MODIFY("TEST")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) // also functions as BET
+
+	PORT_START("JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( jking02 )
 	PORT_INCLUDE(base)
 
@@ -352,7 +377,7 @@ INPUT_PORTS_START( jking02 )
 	PORT_DIPSETTING(    0x30, "Casino Style (duplicate 2)" )
 
 	PORT_MODIFY("PORTB")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) // shows dipswitches
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) // shows DIP switches
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) // maybe service coin?
 
 	PORT_MODIFY("PORTC")
@@ -422,10 +447,71 @@ INPUT_PORTS_START( lhdmg )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                             // 有
 INPUT_PORTS_END
 
-INPUT_PORTS_START( zhongguo )
+INPUT_PORTS_START( lhzb3 )
+	PORT_INCLUDE(lhdmg)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x04, 0x04, "Show Title" )               PORT_DIPLOCATION("SW2:3")    // 机种名称
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                            // 无         (game title not shown)
+	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                             // 有
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )                                       // not shown in test mode
+INPUT_PORTS_END
+
+INPUT_PORTS_START( lhzb4 )
+	// TODO: this is very preliminary, mahjong inputs aren't hooked up
+
 	PORT_INCLUDE(mahjong)
 
-	// TODO: missing joystick mode controls
+	PORT_MODIFY("TEST")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+
+	PORT_START("JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("HP") // TODO: what is this?
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Control Panel" )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "JAMMA" )
+	PORT_DIPSETTING(    0x01, "Keyboard" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" ) // remaining DIP switches not shown in test mode
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( zhongguo )
+	PORT_INCLUDE(mahjong_joy)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coin_A) )            PORT_DIPLOCATION("SW1:1,2")  // 投币比率
@@ -478,17 +564,24 @@ INPUT_PORTS_START( zhongguo )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( mgzz )
-	PORT_INCLUDE(mahjong)
+	PORT_INCLUDE(mahjong_joy)
 
-	// TODO: missing KEYIN and PAYOUT shown in input test
+	// TODO: missing HP input shown in test mode for joystick mode
+
+	PORT_MODIFY("KEY4")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // TODO: default assignment clashes with mahjong I, using it hangs waiting for hopper to respond
+
+	PORT_MODIFY("TEST")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Allow_Continue) )    PORT_DIPLOCATION("SW1:1")    // 續玩遊戲
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                            // 無
 	PORT_DIPSETTING(    0x01, DEF_STR(On) )                                             // 有
 	PORT_DIPNAME( 0x02, 0x02, "Control Mode" )             PORT_DIPLOCATION("SW1:2")    // 操作方式
-	PORT_DIPSETTING(    0x02, "Buttons" )                                               // 按鍵
-	PORT_DIPSETTING(    0x00, "Joystick" )                                              // 搖桿
+	PORT_DIPSETTING(    0x02, "Buttons" )                                               // 按鍵       (called "MAHJONG" in input test)
+	PORT_DIPSETTING(    0x00, "Joystick" )                                              // 搖桿       (called "JAMMA" in input test)
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:3")    // 示範音樂
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                            // 無
 	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                             // 有
@@ -520,10 +613,6 @@ INPUT_PORTS_START( mgzz )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
-
-	PORT_MODIFY("TEST")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( mgzza )
@@ -745,20 +834,37 @@ void igs_m027_state::lhdmg_xor(machine_config &config)
 	m_ppi->in_pc_callback().set(NAME((&igs_m027_state::kbd_r<0, 3, 0>)));
 }
 
+void igs_m027_state::lhzb4_xor(machine_config &config)
+{
+	m027_xor(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::lhzb4_xor_map);
+
+	m_ppi->in_pa_callback().set(NAME((&igs_m027_state::dsw_r<1, 0>)));
+	m_ppi->in_pb_callback().set_ioport("TEST");
+	m_ppi->in_pc_callback().set_ioport("JOY");
+}
+
 void igs_m027_state::zhongguo_xor(machine_config &config)
 {
-	lhdmg_xor(config);
+	m027_xor(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::zhongguo_xor_map);
 
-	m_ppi->in_pc_callback().set_constant(0xff);
+	m_ppi->in_pa_callback().set_ioport("DSW1");
+	m_ppi->in_pb_callback().set_ioport("DSW2");
+	m_ppi->in_pc_callback().set_ioport("JOY");
 }
 
 void igs_m027_state::mgzz_xor(machine_config &config)
 {
-	lhdmg_xor(config);
+	m027_xor(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::mgzz_xor_map);
+
+	m_ppi->in_pa_callback().set_ioport("DSW1");
+	m_ppi->in_pb_callback().set_ioport("DSW2");
+	m_ppi->in_pc_callback().set_ioport("JOY");
 }
 
 void igs_m027_state::extradraw(machine_config &config)
@@ -1855,8 +1961,8 @@ GAME( 1999, fruitpar,  0,        m027_xor,     base,     igs_m027_state, init_fr
 GAME( 1999, fruitpara, fruitpar, m027_xor,     base,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", MACHINE_NOT_WORKING )
 GAME( 1999, lhdmg,     0,        lhdmg_xor,    lhdmg,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan", MACHINE_NOT_WORKING ) // 龙虎大满贯
 GAME( 1999, lhdmgp,    lhdmg,    lhdmg_xor,    lhdmg,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan Plus", MACHINE_NOT_WORKING ) // 龙虎大满贯
-GAME( 1999, lhzb3,     0,        m027_xor,     base,     igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III", MACHINE_NOT_WORKING ) // 龙虎争霸Ⅲ
-GAME( 2004, lhzb4,     0,        m027_xor,     base,     igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4", MACHINE_NOT_WORKING ) // 龙虎争霸4
+GAME( 1999, lhzb3,     0,        lhdmg_xor,    lhzb3,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III", MACHINE_NOT_WORKING ) // 龙虎争霸Ⅲ
+GAME( 2004, lhzb4,     0,        lhzb4_xor,    lhzb4,    igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4", MACHINE_NOT_WORKING ) // 龙虎争霸4
 GAME( 1999, lthy,      0,        m027_xor,     base,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_NOT_WORKING )
 GAME( 2000, zhongguo,  0,        zhongguo_xor, zhongguo, igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhongguo Chu Da D", MACHINE_NOT_WORKING ) // 中国锄大D
 GAME( 200?, jking02,   0,        m027_xor,     jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NOT_WORKING )
