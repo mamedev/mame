@@ -45,7 +45,6 @@
 
 namespace {
 
-
 class ms68k_state : public driver_device
 {
 public:
@@ -70,7 +69,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
@@ -98,8 +97,8 @@ private:
 	void duart_w(offs_t offset, uint8_t data);
 
 	// Floppy
-	static void floppy_types(device_slot_interface &device);
-	static void floppy_formats(format_registration &fr);
+	static void floppy_types(device_slot_interface &device) ATTR_COLD;
+	static void floppy_formats(format_registration &fr) ATTR_COLD;
 	void floppy_side_w(int state);
 	void floppy_drive0_w(int state);
 	void floppy_drive1_w(int state);
