@@ -4,6 +4,8 @@
 
 [Super A'Can] UMC 6650 lockout chip
 
+Located in every A'Can cartridge
+
 TODO:
 - signal to cart B26 & B27 (from register $09?).
 - Does the effective lockout resolution input merges with $1c signal from UMC6619 host space?
@@ -17,7 +19,7 @@ TODO:
 #define VERBOSE     (1)
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(UMC6650, umc6650_device, "umc6650", "UMC 6650 lockout chip")
+DEFINE_DEVICE_TYPE(UMC6650, umc6650_device, "umc6650", "UMC UM6650 lockout chip")
 
 umc6650_device::umc6650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, UMC6650, tag, owner, clock)

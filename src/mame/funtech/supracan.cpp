@@ -6,7 +6,7 @@ Super A'Can (c) 1995 Funtech
 
 References:
 - https://gist.github.com/evadot/66cfdb8891544b41b4c9
-- https://upload.wikimedia.org/wikipedia/commons/0/0b/Super-Acan-Motherboard-01.jpg
+- https://upload.wikimedia.org/wikipedia/commons/a/a6/Super-ACan-motherboard-flat.jpg
 - https://github.com/angelosa/hw_docs/blob/main/funtech_superacan/pergame.md
 
 *******************************************************************************
@@ -76,7 +76,7 @@ DEBUG TRICKS:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65c02.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "acan.h"
@@ -110,6 +110,9 @@ DEBUG TRICKS:
 
 
 namespace {
+
+// NOTE: same as sega/segac2.cpp XL2
+static constexpr XTAL U13_CLOCK = XTAL(53'693'175);
 
 #define DRAW_DEBUG_ROZ          (0)
 
@@ -1705,8 +1708,8 @@ uint16_t supracan_state::video_r(offs_t offset, uint16_t mem_mask)
 		LOGMASKED(LOG_VIDEO, "read current scanline (%04x / %d)\n", data, data);
 		return data;
 	case 0x08/2: // Unknown (not video flags!) - gambling lord disagrees, it MUST read back what it wrote because it reads it before turning on/off layers and writes it back
-		LOGMASKED(LOG_VIDEO, "read unkown 0x08 (%04x)\n", data);
-		break;
+		LOGMASKED(LOG_VIDEO, "read video flags [0x08] %04x & %04x\n", m_video_flags, mem_mask);
+		return m_video_flags;
 	case 0x100/2:
 		if (!machine().side_effects_disabled())
 		{
@@ -1873,12 +1876,20 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		{
 			LOGMASKED(LOG_VIDEO, "video_flags = %04x\n", data);
 
+			const int h320_mode = BIT(data, 8);
+
+			// TODO: verify if this support midframe switching
+			if (h320_mode != BIT(m_video_flags, 8))
+			{
+				rectangle visarea = m_screen->visible_area();
+				const int htotal = h320_mode ? 455 : 342;
+				const int divider = h320_mode ? 8 : 10;
+
+				visarea.set(0, (h320_mode ? 320 : 256) - 1, 8, 232 - 1);
+				m_screen->configure(htotal, 262, visarea, attotime::from_ticks(htotal * 262, U13_CLOCK / divider).as_attoseconds());
+			}
+
 			m_video_flags = data;
-
-			rectangle visarea = m_screen->visible_area();
-
-			visarea.set(0, ((m_video_flags & 0x100) ? 320 : 256) - 1, 8, 232 - 1);
-			m_screen->configure(348, 256, visarea, m_screen->frame_period().attoseconds());
 		}
 		break;
 	case 0x0a/2:
@@ -2149,11 +2160,13 @@ GFXDECODE_END
 
 void supracan_state::supracan(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(10'738'635));        /* Correct frequency unknown */
+	// M68000P10
+	M68000(config, m_maincpu, U13_CLOCK / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &supracan_state::supracan_mem);
 
-	// TODO: Verify actual clock
-	M6502(config, m_soundcpu, XTAL(3'579'545));
+	// TODO: Verify type and actual clock
+	// /4 makes speedyd to fail booting
+	M65C02(config, m_soundcpu, U13_CLOCK / 6 / 2);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &supracan_state::supracan_sound_mem);
 
 	config.set_perfect_quantum(m_soundcpu);
@@ -2161,7 +2174,7 @@ void supracan_state::supracan(machine_config &config)
 	UMC6650(config, m_lockout, 0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(10'738'635)/2, 348, 0, 256, 256, 0, 240);  /* No idea if this is correct */
+	m_screen->set_raw(U13_CLOCK / 10, 342, 0, 256, 262, 8, 232);
 	m_screen->set_screen_update(FUNC(supracan_state::screen_update));
 	m_screen->set_palette("palette");
 	//m_screen->screen_vblank().set(FUNC(supracan_state::screen_vblank));
@@ -2173,6 +2186,7 @@ void supracan_state::supracan(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
+	// TODO: derive and verify from U13_CLOCK
 	ACANSND(config, m_sound, XTAL(3'579'545));
 	m_sound->ram_read().set(FUNC(supracan_state::sound_ram_read));
 	m_sound->timer_irq_handler().set(FUNC(supracan_state::sound_timer_irq));
