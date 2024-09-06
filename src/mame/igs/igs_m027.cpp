@@ -18,6 +18,7 @@
  Hold service on boot to access input test.
 
  TODO:
+ * NVRAM
  * Inputs and DIP switches for most games
  * Hopper for payout
  * Coin lockout (zhongguo displays a coin error on unexpected coins)
@@ -365,35 +366,100 @@ INPUT_PORTS_END
 INPUT_PORTS_START( jking02 )
 	PORT_INCLUDE(base)
 
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x1f, 0x1f, "ID Number")                 PORT_DIPLOCATION("SW1:1,2,3,4,5")
+	PORT_DIPSETTING(    0x1f, "1" )
+	PORT_DIPSETTING(    0x1e, "2" )
+	PORT_DIPSETTING(    0x1d, "3" )
+	PORT_DIPSETTING(    0x1c, "4" )
+	PORT_DIPSETTING(    0x1b, "5" )
+	PORT_DIPSETTING(    0x1a, "6" )
+	PORT_DIPSETTING(    0x19, "7" )
+	PORT_DIPSETTING(    0x18, "8" )
+	PORT_DIPSETTING(    0x17, "9" )
+	PORT_DIPSETTING(    0x16, "10" )
+	PORT_DIPSETTING(    0x15, "11" )
+	PORT_DIPSETTING(    0x14, "12" )
+	PORT_DIPSETTING(    0x13, "13" )
+	PORT_DIPSETTING(    0x12, "14" )
+	PORT_DIPSETTING(    0x11, "15" )
+	PORT_DIPSETTING(    0x10, "16" )
+	PORT_DIPSETTING(    0x0f, "17" )
+	PORT_DIPSETTING(    0x0e, "18" )
+	PORT_DIPSETTING(    0x0d, "19" )
+	PORT_DIPSETTING(    0x0c, "20" )
+	PORT_DIPSETTING(    0x0b, "20" ) // 20 is maximum no. - all other settings are the same
+	PORT_DIPSETTING(    0x0a, "20" )
+	PORT_DIPSETTING(    0x09, "20" )
+	PORT_DIPSETTING(    0x08, "20" )
+	PORT_DIPSETTING(    0x07, "20" )
+	PORT_DIPSETTING(    0x06, "20" )
+	PORT_DIPSETTING(    0x05, "20" )
+	PORT_DIPSETTING(    0x04, "20" )
+	PORT_DIPSETTING(    0x03, "20" )
+	PORT_DIPSETTING(    0x02, "20" )
+	PORT_DIPSETTING(    0x01, "20" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x80, 0x80, "PC Board Mode" )            PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, "Single" )
+	PORT_DIPSETTING(    0x00, "Linking" )
+
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "DSW2" ) // can cause a coin error (sets different inputs?)
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "Wiring Diagram" )           PORT_DIPLOCATION("SW2:1")  // only 28-pin is supported for now
+	PORT_DIPSETTING(    0x01, "36+10" )
+	PORT_DIPSETTING(    0x00, "28-pin" )
+	PORT_DIPNAME( 0x02, 0x02, "Odds Table" )               PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x08, 0x00, "Back Color" )               PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, "Black" )
+	PORT_DIPSETTING(    0x00, "Color" )
+	PORT_DIPNAME( 0x10, 0x10, "Password" )                 PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x20, 0x20, "Double-Up Game" )           PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x40, 0x40, "Auto Stop" )                PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x80, 0x80, "Payout Mode" )              PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(Normal) )
+	PORT_DIPSETTING(    0x00, "Auto" )
 
 	PORT_MODIFY("DSW3")
-	PORT_DIPNAME( 0x02, 0x00, "Show Odds" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x03, 0x03, "Score Box" )                PORT_DIPLOCATION("SW3:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, "10 Times" )
+	PORT_DIPSETTING(    0x00, "10 Times" )
+	PORT_DIPNAME( 0x04, 0x04, "Play Score" )               PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Show Title" )
+	PORT_DIPNAME( 0x08, 0x00, "Show Title" )               PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x20, "Background Type" )
-	PORT_DIPSETTING(    0x20, "Jungle Style" )
-	PORT_DIPSETTING(    0x10, "Casino Style" )
-	PORT_DIPSETTING(    0x00, "Casino Style (duplicate 1)" )
-	PORT_DIPSETTING(    0x30, "Casino Style (duplicate 2)" )
+	PORT_DIPNAME( 0x30, 0x20, "Symbols" )                  PORT_DIPLOCATION("SW3:5,6")
+	PORT_DIPSETTING(    0x30, "Fruit" )                // slot machine symbols
+	PORT_DIPSETTING(    0x20, "Legend" )               // characters from Journey to the West
+	PORT_DIPSETTING(    0x10, "Both" )                 // seems to do the same thing as "Fruit"
+	PORT_DIPSETTING(    0x00, "Both" )                 // seems to do the same thing as "Fruit"
 
 	PORT_MODIFY("PORTB")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) // shows DIP switches
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) // maybe service coin?
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )    PORT_NAME("Stop Reel 4 / Double Up")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   // also provides access to game setup (coinage, etc.)
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )      // shows DIP switch settings
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )    PORT_NAME("Stop Reel 3 / Small")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )    PORT_NAME("Stop Reel 2 / Big")
 
 	PORT_MODIFY("PORTC")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // maybe bet?
-
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) // maybe start?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )    PORT_NAME("Stop Reel 1 / Take Score")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( qlgs )
