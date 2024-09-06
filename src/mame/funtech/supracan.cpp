@@ -998,33 +998,29 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	for (int pri = 7; pri >= 0; pri--)
 	{
-		for (int layer = 3; layer >=0; layer--)
+		// Wanted like this by speedyd, formduel and magipool at very least
+		for (int layer = 0; layer < 4; layer ++)
 		{
-		//  popmessage("%04x\n",m_video_flags);
 			int enabled = 0;
 
-			if (m_video_flags & 0x04)
-				if (layer==3) enabled = 1;
-
-			if (m_video_flags & 0x80)
-				if (layer==0) enabled = 1;
-
-			if (m_video_flags & 0x40)
-				if (layer==1) enabled = 1;
-
-			if (m_video_flags & 0x20)
-				if (layer==2) enabled = 1;
-
-
-			if (layer==3)
-				priority = ((m_roz_mode >> 13) & 7); // roz case
+			// ROZ
+			if (layer == 3)
+			{
+				enabled = BIT(m_video_flags, 2);
+				if (!enabled)
+					continue;
+				priority = ((m_roz_mode >> 13) & 7);
+			}
 			else
-				priority = ((m_tilemap_flags[layer] >> 13) & 7); // normal cases
-
+			{
+				enabled = BIT(m_video_flags, 7 - layer);
+				if (!enabled)
+					continue;
+				priority = ((m_tilemap_flags[layer] >> 13) & 7);
+			}
 
 			if (priority == pri)
 			{
-//            tilemap_num = layer;
 				int which_tilemap_size = get_tilemap_dimensions(xsize, ysize, layer);
 				bitmap_ind16 &src_bitmap = m_tilemap_sizes[layer][which_tilemap_size]->pixmap();
 				int gfx_region = get_tilemap_region(layer);
@@ -1039,126 +1035,124 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					case 4: transmask = 0x01; break;
 				}
 
-				if (enabled)
+				if (layer != 3) // standard layers, NOT roz
 				{
-					if (layer != 3) // standard layers, NOT roz
+					int wrap = (m_tilemap_flags[layer] & 0x20);
+
+					int scrollx = m_tilemap_scrollx[layer];
+					int scrolly = m_tilemap_scrolly[layer];
+
+					if (scrollx & 0x8000) scrollx -= 0x10000;
+					if (scrolly & 0x8000) scrolly -= 0x10000;
+
+					int mosaic_count = (m_tilemap_flags[layer] & 0x001c) >> 2;
+					int mosaic_mask = 0xffffffff << mosaic_count;
+
+					// yes, it will draw a single line if you specify a cliprect as such (partial updates...)
+
+					for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 					{
-						int wrap = (m_tilemap_flags[layer] & 0x20);
+						// these will have to change to uint32_t* etc. once alpha blending is supported
+						uint16_t *screen = &bitmap.pix(y);
 
-						int scrollx = m_tilemap_scrollx[layer];
-						int scrolly = m_tilemap_scrolly[layer];
+						int actualy = y & mosaic_mask;
+						int realy = actualy + scrolly;
 
-						if (scrollx & 0x8000) scrollx -= 0x10000;
-						if (scrolly & 0x8000) scrolly -= 0x10000;
+						if (!wrap)
+							if (scrolly + y < 0 || scrolly + y > ((ysize * 8) - 1))
+								continue;
 
-						int mosaic_count = (m_tilemap_flags[layer] & 0x001c) >> 2;
-						int mosaic_mask = 0xffffffff << mosaic_count;
+						uint16_t *src = &src_bitmap.pix(realy & ((ysize * 8) - 1));
+						uint8_t *priop = &m_prio_bitmap.pix(y);
 
-						// yes, it will draw a single line if you specify a cliprect as such (partial updates...)
-
-						for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+						for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 						{
-							// these will have to change to uint32_t* etc. once alpha blending is supported
-							uint16_t *screen = &bitmap.pix(y);
-
-							int actualy = y & mosaic_mask;
-							int realy = actualy + scrolly;
+							int actualx = x & mosaic_mask;
+							int realx = actualx + scrollx;
 
 							if (!wrap)
-								if (scrolly + y < 0 || scrolly + y > ((ysize * 8) - 1))
+								if (scrollx + x < 0 || scrollx + x > ((xsize * 8) - 1))
 									continue;
 
-							uint16_t *src = &src_bitmap.pix(realy & ((ysize * 8) - 1));
-							uint8_t *priop = &m_prio_bitmap.pix(y);
+							uint16_t srcpix = src[realx & ((xsize * 8) - 1)];
 
-							for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+							if ((srcpix & transmask) != 0 && priority < (priop[x] >> 4))
 							{
-								int actualx = x & mosaic_mask;
-								int realx = actualx + scrollx;
-
-								if (!wrap)
-									if (scrollx + x < 0 || scrollx + x > ((xsize * 8) - 1))
-										continue;
-
-								uint16_t srcpix = src[realx & ((xsize * 8) - 1)];
-
-								if ((srcpix & transmask) != 0 && priority < (priop[x] >> 4))
-								{
-									screen[x] = srcpix;
-									priop[x] = (priop[x] & 0x0f) | (priority << 4);
-								}
+								screen[x] = srcpix;
+								priop[x] = (priop[x] & 0x0f) | (priority << 4);
 							}
+						}
+					}
+				}
+				else
+				{
+					int wrap = m_roz_mode & 0x20;
+
+					int incxx = m_roz_coeffa;
+					int incyy = m_roz_coeffd;
+
+					int incxy = m_roz_coeffc;
+					int incyx = m_roz_coeffb;
+
+					int scrollx = m_roz_scrollx;
+					int scrolly = m_roz_scrolly;
+
+					if (incyx & 0x8000) incyx -= 0x10000;
+					if (incxy & 0x8000) incxy -= 0x10000;
+
+					if (incyy & 0x8000) incyy -= 0x10000;
+					if (incxx & 0x8000) incxx -= 0x10000;
+
+					//popmessage("%04x %04x\n",m_video_flags, m_roz_mode);
+
+					// roz mode..
+					//4020 = enabled speedyd
+					//6c22 = enabled speedyd
+					//2c22 = enabled speedyd
+					//4622 = disabled jttlaugh
+					//2602 = disabled monopoly
+					//0402 = disabled (sango title)
+					// or is it always enabled, and only corrupt because we don't clear ram properly?
+					// (probably not this register?)
+
+					if (!(m_roz_mode & 0x0200) && (m_roz_mode & 0xf000)) // HACK - Not trusted: Acan Logo, Speedy Dragon Intro, Speed Dragon Bonus stage need it.  Monopoly and JTT *don't* causes graphical issues
+					{
+						// NOT accurate, causes issues when the attract mode loops and the logo is shown the 2nd time in some games - investigate
+						for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+						{
+							rectangle clip(cliprect.min_x, cliprect.max_x, y, y);
+
+							scrollx = (m_roz_scrollx);
+							scrolly = (m_roz_scrolly);
+							incxx = (m_roz_coeffa);
+
+							incxx += m_vram[m_roz_unk_base0/2 + y];
+
+							scrollx += m_vram[m_roz_unk_base1/2 + y * 2] << 16;
+							scrollx += m_vram[m_roz_unk_base1/2 + y * 2 + 1];
+
+							scrolly += m_vram[m_roz_unk_base2/2 + y * 2] << 16;
+							scrolly += m_vram[m_roz_unk_base2/2 + y * 2 + 1];
+
+							if (incxx & 0x8000) incxx -= 0x10000;
+
+							if (m_vram[m_roz_unk_base0/2 + y]) // incxx = 0, no draw?
+								draw_roz_layer(bitmap, clip, m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
 						}
 					}
 					else
 					{
-						int wrap = m_roz_mode & 0x20;
-
-						int incxx = m_roz_coeffa;
-						int incyy = m_roz_coeffd;
-
-						int incxy = m_roz_coeffc;
-						int incyx = m_roz_coeffb;
-
-						int scrollx = m_roz_scrollx;
-						int scrolly = m_roz_scrolly;
-
-						if (incyx & 0x8000) incyx -= 0x10000;
-						if (incxy & 0x8000) incxy -= 0x10000;
-
-						if (incyy & 0x8000) incyy -= 0x10000;
-						if (incxx & 0x8000) incxx -= 0x10000;
-
-						//popmessage("%04x %04x\n",m_video_flags, m_roz_mode);
-
-						// roz mode..
-						//4020 = enabled speedyd
-						//6c22 = enabled speedyd
-						//2c22 = enabled speedyd
-						//4622 = disabled jttlaugh
-						//2602 = disabled monopoly
-						//0402 = disabled (sango title)
-						// or is it always enabled, and only corrupt because we don't clear ram properly?
-						// (probably not this register?)
-
-						if (!(m_roz_mode & 0x0200) && (m_roz_mode & 0xf000)) // HACK - Not trusted: Acan Logo, Speedy Dragon Intro, Speed Dragon Bonus stage need it.  Monopoly and JTT *don't* causes graphical issues
-						{
-							// NOT accurate, causes issues when the attract mode loops and the logo is shown the 2nd time in some games - investigate
-							for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-							{
-								rectangle clip(cliprect.min_x, cliprect.max_x, y, y);
-
-								scrollx = (m_roz_scrollx);
-								scrolly = (m_roz_scrolly);
-								incxx = (m_roz_coeffa);
-
-								incxx += m_vram[m_roz_unk_base0/2 + y];
-
-								scrollx += m_vram[m_roz_unk_base1/2 + y * 2] << 16;
-								scrollx += m_vram[m_roz_unk_base1/2 + y * 2 + 1];
-
-								scrolly += m_vram[m_roz_unk_base2/2 + y * 2] << 16;
-								scrolly += m_vram[m_roz_unk_base2/2 + y * 2 + 1];
-
-								if (incxx & 0x8000) incxx -= 0x10000;
-
-								if (m_vram[m_roz_unk_base0/2 + y]) // incxx = 0, no draw?
-									draw_roz_layer(bitmap, clip, m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
-							}
-						}
-						else
-						{
-							draw_roz_layer(bitmap, cliprect, m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
-						}
+						draw_roz_layer(bitmap, cliprect, m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
 					}
 				}
+
 			}
 		}
 	}
 
 
 	// combine sprites
-	if (m_video_flags & 0x08)
+	if (BIT(m_video_flags, 3))
 	{
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
