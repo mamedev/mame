@@ -1,5 +1,5 @@
 // license: BSD-3-Clause
-// copyright-holders: Angelo Salese,Ryan Holtz
+// copyright-holders: Angelo Salese, Ryan Holtz
 /***************************************************************************
 
 Super A'Can (c) 1995 Funtech
@@ -48,7 +48,7 @@ STATUS:
     - All: Priorities are largely unknown.
     - C.U.G.: Gameplay backgrounds are broken.
     - Sango Fighter: Possible missing masking on the upper edges of the screen during gameplay.
-    - Sango Fighter: Raster effects off by 1 line
+    - Sango Fighter: Raster effects off by 1 line (btanb)
     - Sango Fighter: Specifies tiles out of range of video ram??
     - Speedy Dragon: Backgrounds are broken (wrong tile bank/region).
     - Super Taiwanese Baseball League: Does not boot, uses an unemulated DMA type
@@ -126,7 +126,7 @@ public:
 		, m_sound(*this, "acansnd")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
-		, m_pads(*this, "P%u", 1U)
+		, m_pad(*this, "P%u", 1U)
 	{
 	}
 
@@ -138,17 +138,15 @@ protected:
 	virtual void video_start() override;
 
 private:
-	void supracan_mem(address_map &map);
-	void supracan_sound_mem(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 
 	uint16_t _68k_soundram_r(offs_t offset, uint16_t mem_mask = ~0);
 	void _68k_soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t _6502_soundmem_r(offs_t offset);
 	void _6502_soundmem_w(offs_t offset, uint8_t data);
 
-	void dma_w(int offset, uint16_t data, uint16_t mem_mask, int ch);
-	void dma_channel0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dma_channel1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <unsigned ch> void dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint16_t video_r(offs_t offset, uint16_t mem_mask = 0);
 	void video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -189,7 +187,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 
-	required_ioport_array<2> m_pads;
+	required_ioport_array<2> m_pad;
 
 	dma_regs_t m_dma_regs;
 	sprdma_regs_t m_sprdma_regs;
@@ -252,7 +250,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
 	TILE_GET_INFO_MEMBER(get_roz_tile_info);
-	void palette_init(palette_device &palette) const;
 	void sound_timer_irq(int state);
 	void sound_dma_irq(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -270,7 +267,7 @@ private:
 	void draw_sprite_tile_masked(bitmap_ind16 &dst, bitmap_ind8 &mask, bitmap_ind8 &priomap, const rectangle &cliprect, gfx_element *gfx, int tile, int palette, bool xflip, bool yflip, int dstx, int dsty, int prio);
 	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bitmap_ind8 &priomap, const rectangle &cliprect);
 	void mark_active_tilemap_all_dirty(int layer);
-	void draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask);
+	void draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t *scrollram*/, int transmask);
 
 	void set_sound_irq(uint8_t bit, uint8_t state);
 
@@ -311,7 +308,7 @@ int supracan_state::get_tilemap_region(int layer)
 
 void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int count)
 {
-	uint16_t* supracan_vram = m_vram;
+	uint16_t *vram = m_vram;
 
 	uint32_t base = m_tilemap_base_addr[layer];
 	int gfx_mode = (m_tilemap_mode[layer] & 0x7000) >> 12;
@@ -363,9 +360,9 @@ void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int
 		palette_shift = 2;
 	}
 
-	int tile = (supracan_vram[count] & 0x03ff) + tile_bank;
-	int flipxy = (supracan_vram[count] & 0x0c00) >> 10;
-	int palette = ((supracan_vram[count] & 0xf000) >> 12) << palette_shift;
+	int tile = (vram[count] & 0x03ff) + tile_bank;
+	int flipxy = (vram[count] & 0x0c00) >> 10;
+	int palette = ((vram[count] & 0xf000) >> 12) << palette_shift;
 
 	tileinfo.set(region, tile, palette, TILE_FLIPXY(flipxy));
 }
@@ -373,7 +370,7 @@ void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int
 // I wonder how different this really is.. my guess, not at all.
 void supracan_state::get_roz_tilemap_info(int layer, tile_data &tileinfo, int count)
 {
-	uint16_t* supracan_vram = m_vram;
+	uint16_t *vram = m_vram;
 
 	uint32_t base = m_roz_base_addr;
 
@@ -414,9 +411,9 @@ void supracan_state::get_roz_tilemap_info(int layer, tile_data &tileinfo, int co
 
 	count += base;
 
-	int tile = (supracan_vram[count] & 0x03ff) + tile_bank;
-	int flipxy = (supracan_vram[count] & 0x0c00) >> 10;
-	int palette = ((supracan_vram[count] & 0xf000) >> 12) + palette_bank;
+	int tile = (vram[count] & 0x03ff) + tile_bank;
+	int flipxy = (vram[count] & 0x0c00) >> 10;
+	int palette = ((vram[count] & 0xf000) >> 12) + palette_bank;
 
 	tileinfo.set(region, tile, palette, TILE_FLIPXY(flipxy));
 }
@@ -733,7 +730,7 @@ void supracan_state::draw_sprite_tile_masked(bitmap_ind16 &dst, bitmap_ind8 &mas
 
 void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bitmap_ind8 &priomap, const rectangle &cliprect)
 {
-	uint16_t *supracan_vram = m_vram;
+	uint16_t *vram = m_vram;
 
 //      [0]
 //      -e-- ---- ---- ---- sprite enable?
@@ -763,50 +760,50 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 
 	for (int i = start_word; i < end_word; i += 4)
 	{
-		int x = supracan_vram[i + 2] & 0x01ff;
-		int y = supracan_vram[i + 0] & 0x01ff;
+		int x = vram[i + 2] & 0x01ff;
+		int y = vram[i + 0] & 0x01ff;
 
-		int sprite_offset = (supracan_vram[i + 3])<< 1;
+		int sprite_offset = (vram[i + 3])<< 1;
 
-		int bank = (supracan_vram[i + 1] & 0xf000) >> 12;
-		int mask = (supracan_vram[i + 1] & 0x0300) >> 8;
-		int sprite_xflip = (supracan_vram[i + 1] & 0x0800) >> 11;
-		int sprite_yflip = (supracan_vram[i + 1] & 0x0400) >> 10;
-		int prio = (supracan_vram[i + 2] >> 9) & 3;
-		//int xscale = supracan_vram[i + 2] >> 13;
+		int bank = (vram[i + 1] & 0xf000) >> 12;
+		int mask = (vram[i + 1] & 0x0300) >> 8;
+		int sprite_xflip = (vram[i + 1] & 0x0800) >> 11;
+		int sprite_yflip = (vram[i + 1] & 0x0400) >> 10;
+		int prio = (vram[i + 2] >> 9) & 3;
+		//int xscale = vram[i + 2] >> 13;
 		gfx_element *gfx = m_gfxdecode->gfx(region);
 
 		// wraparound
 		if (y >= 0x180) y -= 0x200;
 		if (x >= 0x180) x -= 0x200;
 
-		if ((supracan_vram[i + 0] & 0x4000))
+		if ((vram[i + 0] & 0x4000))
 		{
 		#if 0
 			printf("%d (unk %02x) (enable %02x) (unk Y2 %02x, %02x) (y pos %02x) (bank %01x) (flip %01x) (unknown %02x) (x size %02x) (xscale %01x) (unk %01x) (xpos %02x) (code %04x)\n", i,
-				(supracan_vram[i + 0] & 0x8000) >> 15,
-				(supracan_vram[i + 0] & 0x4000) >> 14,
-				(supracan_vram[i + 0] & 0x2000) >> 13,
-				(supracan_vram[i + 0] & 0x1e00) >> 8,
-				(supracan_vram[i + 0] & 0x01ff),
-				(supracan_vram[i + 1] & 0xf000) >> 12,
-				(supracan_vram[i + 1] & 0x0c00) >> 10,
-				(supracan_vram[i + 1] & 0x03f0) >> 4,
-				(supracan_vram[i + 1] & 0x000f),
-				(supracan_vram[i + 2] & 0xf000) >> 12,
-				(supracan_vram[i + 2] & 0x0e00) >> 8,
-				(supracan_vram[i + 2] & 0x01ff) >> 0,
-				(supracan_vram[i + 3] & 0xffff));
+				(vram[i + 0] & 0x8000) >> 15,
+				(vram[i + 0] & 0x4000) >> 14,
+				(vram[i + 0] & 0x2000) >> 13,
+				(vram[i + 0] & 0x1e00) >> 8,
+				(vram[i + 0] & 0x01ff),
+				(vram[i + 1] & 0xf000) >> 12,
+				(vram[i + 1] & 0x0c00) >> 10,
+				(vram[i + 1] & 0x03f0) >> 4,
+				(vram[i + 1] & 0x000f),
+				(vram[i + 2] & 0xf000) >> 12,
+				(vram[i + 2] & 0x0e00) >> 8,
+				(vram[i + 2] & 0x01ff) >> 0,
+				(vram[i + 3] & 0xffff));
 		#endif
 
-			if (supracan_vram[i + 3] & 0x8000)
+			if (vram[i + 3] & 0x8000)
 			{
-				uint16_t data = supracan_vram[i + 3];
+				uint16_t data = vram[i + 3];
 				int tile = (bank * 0x200) + (data & 0x03ff);
 
 				int palette = (data & 0xf000) >> 12; // this might not be correct, due to the & 0x8000 condition above this would force all single tile sprites to be using palette >= 0x8 only
 
-				// printf("sprite data %04x %04x %04x %04x\n", supracan_vram[i+0] , supracan_vram[i+1] , supracan_vram[i+2] ,supracan_vram[i+3]  );
+				// printf("sprite data %04x %04x %04x %04x\n", vram[i+0] , vram[i+1] , vram[i+2] ,vram[i+3]  );
 
 				if (mask > 1)
 					draw_sprite_tile_mask(maskmap, cliprect, gfx, tile, sprite_xflip, sprite_yflip, x, y);
@@ -817,8 +814,8 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 			}
 			else
 			{
-				int xsize = 1 << (supracan_vram[i + 1] & 7);
-				int ysize = ((supracan_vram[i + 0] & 0x1e00) >> 9) + 1;
+				int xsize = 1 << (vram[i + 1] & 7);
+				int ysize = ((vram[i + 0] & 0x1e00) >> 9) + 1;
 
 				// I think the xsize must influence the ysize somehow, there are too many conflicting cases otherwise
 				// there don't appear to be any special markers in the actual looked up tile data to indicate skip / end of list
@@ -827,7 +824,7 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 				{
 					for (int xtile = 0; xtile < xsize; xtile++)
 					{
-						uint16_t data = supracan_vram[(sprite_offset + ytile * xsize + xtile) & VRAM_MASK];
+						uint16_t data = vram[(sprite_offset + ytile * xsize + xtile) & VRAM_MASK];
 						int tile = (bank * 0x200) + (data & 0x03ff);
 						int palette = (data & 0xf000) >> 12;
 
@@ -883,7 +880,7 @@ void supracan_state::mark_active_tilemap_all_dirty(int layer)
 
 
 /* draws tilemap with linescroll OR columnscroll to 16-bit indexed bitmap */
-void supracan_state::draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask)
+void supracan_state::draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t *scrollram*/, int transmask)
 {
 	bitmap_ind16 &srcbitmap = tmap->pixmap();
 	const int xmask = srcbitmap.width() - 1;
@@ -1061,7 +1058,7 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 						for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 						{
 							// these will have to change to uint32_t* etc. once alpha blending is supported
-							uint16_t* screen = &bitmap.pix(y);
+							uint16_t *screen = &bitmap.pix(y);
 
 							int actualy = y & mosaic_mask;
 							int realy = actualy + scrolly;
@@ -1070,8 +1067,8 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 								if (scrolly + y < 0 || scrolly + y > ((ysize * 8) - 1))
 									continue;
 
-							uint16_t* src = &src_bitmap.pix(realy & ((ysize * 8) - 1));
-							uint8_t* priop = &m_prio_bitmap.pix(y);
+							uint16_t *src = &src_bitmap.pix(realy & ((ysize * 8) - 1));
+							uint8_t *priop = &m_prio_bitmap.pix(y);
 
 							for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 							{
@@ -1164,9 +1161,9 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			uint16_t* dstp = &bitmap.pix(y);
-			uint8_t* priop = &m_prio_bitmap.pix(y);
-			uint16_t* spritep = &m_sprite_final_bitmap.pix(y);
+			uint16_t *dstp = &bitmap.pix(y);
+			uint8_t *priop = &m_prio_bitmap.pix(y);
+			uint16_t *spritep = &m_sprite_final_bitmap.pix(y);
 
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
@@ -1194,7 +1191,7 @@ void supracan_state::sound_dma_irq(int state)
 	set_sound_irq(6, state);
 }
 
-void supracan_state::dma_w(int offset, uint16_t data, uint16_t mem_mask, int ch)
+template <unsigned ch> void supracan_state::dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
@@ -1264,17 +1261,6 @@ void supracan_state::dma_w(int offset, uint16_t data, uint16_t mem_mask, int ch)
 	}
 }
 
-void supracan_state::dma_channel0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	dma_w(offset, data, mem_mask, 0);
-}
-
-void supracan_state::dma_channel1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	dma_w(offset, data, mem_mask, 1);
-}
-
-
 #if 0
 void supracan_state::supracan_pram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -1307,7 +1293,7 @@ void supracan_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_gfxdecode->gfx(4)->mark_dirty((offset * 2) / 8);
 }
 
-void supracan_state::supracan_mem(address_map &map)
+void supracan_state::main_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).view(m_main_loview);
 	m_main_loview[0](0x000000, 0x3fffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
@@ -1315,8 +1301,8 @@ void supracan_state::supracan_mem(address_map &map)
 	m_main_loview[1](0x000000, 0x3fffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
 	map(0xe80000, 0xe8ffff).rw(FUNC(supracan_state::_68k_soundram_r), FUNC(supracan_state::_68k_soundram_w));
 	map(0xe90000, 0xe9001f).m(*this, FUNC(supracan_state::host_um6619_map));
-	map(0xe90020, 0xe9002f).w(FUNC(supracan_state::dma_channel0_w));
-	map(0xe90030, 0xe9003f).w(FUNC(supracan_state::dma_channel1_w));
+	map(0xe90020, 0xe9002f).w(FUNC(supracan_state::dma_w<0>));
+	map(0xe90030, 0xe9003f).w(FUNC(supracan_state::dma_w<1>));
 
 	map(0xe90b3c, 0xe90b3d).noprw(); // noisy during lockout checks
 
@@ -1437,7 +1423,7 @@ void supracan_state::_6502_soundmem_w(offs_t offset, uint8_t data)
 		{
 			if (BIT(lowered, pad + 0))
 			{
-				m_latched_controls[pad] = m_pads[pad]->read();
+				m_latched_controls[pad] = m_pad[pad]->read();
 			}
 			if (BIT(lowered, pad + 2))
 			{
@@ -1480,53 +1466,9 @@ void supracan_state::_6502_soundmem_w(offs_t offset, uint8_t data)
 	}
 }
 
-void supracan_state::supracan_sound_mem(address_map &map)
+void supracan_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(supracan_state::_6502_soundmem_r), FUNC(supracan_state::_6502_soundmem_w)).share("soundram");
-}
-
-static INPUT_PORTS_START( supracan )
-	PORT_START("P1")
-	PORT_BIT(0x000f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_PLAYER(1) PORT_NAME("P1 Button R")
-	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_PLAYER(1) PORT_NAME("P1 Button L")
-	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(1) PORT_NAME("P1 Button Y")
-	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1) PORT_NAME("P1 Button X")
-	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_NAME("P1 Joypad Right")
-	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1) PORT_NAME("P1 Joypad Left")
-	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1) PORT_NAME("P1 Joypad Down")
-	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1) PORT_NAME("P1 Joypad Up")
-	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_START1)
-	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1) PORT_NAME("P1 Button B")
-	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Button A")
-
-	PORT_START("P2")
-	PORT_BIT(0x000f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_PLAYER(2) PORT_NAME("P2 Button R")
-	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_PLAYER(2) PORT_NAME("P2 Button L")
-	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(2) PORT_NAME("P2 Button Y")
-	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Button X")
-	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_NAME("P2 Joypad Right")
-	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2) PORT_NAME("P2 Joypad Left")
-	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2) PORT_NAME("P2 Joypad Down")
-	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2) PORT_NAME("P2 Joypad Up")
-	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_START2)
-	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2) PORT_NAME("P2 Button B")
-	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Button A")
-INPUT_PORTS_END
-
-void supracan_state::palette_init(palette_device &palette) const
-{
-	// Used for debugging purposes for now
-	for (int i = 0; i < 32768; i++)
-	{
-		int const r = (i & 0x1f) << 3;
-		int const g = ((i >> 5) & 0x1f) << 3;
-		int const b = ((i >> 10) & 0x1f) << 3;
-		palette.set_pen_color(i, r, g, b);
-	}
 }
 
 void supracan_state::_68k_soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -1555,10 +1497,10 @@ uint16_t supracan_state::_68k_soundram_r(offs_t offset, uint16_t mem_mask)
 
 	// formduel, jttlaugh & speedyd all wants polling in "direct mode" from 68k
 	if ((offset * 2) == 0x200)
-		return m_pads[0]->read() ^ 0xffff;
+		return m_pad[0]->read() ^ 0xffff;
 
 	if ((offset * 2) == 0x202)
-		return m_pads[1]->read() ^ 0xffff;
+		return m_pad[1]->read() ^ 0xffff;
 
 	if (offset * 2 >= 0x400 && offset * 2 < 0x500)
 	{
@@ -1582,14 +1524,14 @@ void supracan_state::host_um6619_map(address_map &map)
 	map(0x04, 0x05).lr8(
 		NAME([this] (offs_t offset) {
 			const u8 res = m_soundram[0x40c + offset];
-			LOGMASKED(LOG_SOUND, "%s [host_um6619_map] DMA Request address from 6502 [%04x] %02x\n", machine().describe_context(), offset + 0x404, res);
+			LOGMASKED(LOG_SOUND, "%s DMA Request address from 6502 [%04x] %02x\n", machine().describe_context(), offset + 0x404, res);
 			return res;
 		})
 	);
 	// TODO: verify $b access
 	map(0x0a, 0x0b).lw8(
 		NAME([this] (offs_t offset, u8 data) {
-			LOGMASKED(LOG_SOUND, "%s [host_um6619_map] Sound CPU IRQ request [%02x]: %02x\n", machine().describe_context(), offset + 0x40a, data);
+			LOGMASKED(LOG_SOUND, "%s Sound CPU IRQ request [%02x]: %02x\n", machine().describe_context(), offset + 0x40a, data);
 			set_sound_irq(5, 1);
 		})
 	);
@@ -1597,7 +1539,7 @@ void supracan_state::host_um6619_map(address_map &map)
 	map(0x0c, 0x0d).lr8(
 		NAME([this] (offs_t offset) {
 			const u8 res = m_soundram[0x40a];
-			LOGMASKED(LOG_SOUND, "%s: [host_um6619_map] DMA Request flag from 6502, [%02x]: %02x\n", machine().describe_context(), offset + 0x40c, res);
+			LOGMASKED(LOG_SOUND, "%s: DMA Request flag from 6502, [%02x]: %02x\n", machine().describe_context(), offset + 0x40c, res);
 			return res;
 		})
 	);
@@ -1609,7 +1551,7 @@ void supracan_state::host_um6619_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			// bit 7: enabled by slghtsag after BIOS (would otherwise address error)
 			// other bits tbd (bit 3 doesn't seem irq 3 enable as per speedyd not enabling it)
-			logerror("irq mask %02x @ VPOS %d\n", data, m_screen->vpos());
+			//logerror("irq mask %02x @ VPOS %d\n", data, m_screen->vpos());
 			m_irq_mask = data;
 		})
 	);
@@ -1671,7 +1613,7 @@ void supracan_state::host_um6619_map(address_map &map)
 					m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 				}
 			}
-			LOGMASKED(LOG_SOUND, "%s: [host_um6619_map] Sound CPU ctrl write: %04x\n", machine().describe_context(), data);
+			LOGMASKED(LOG_SOUND, "%s: Sound CPU ctrl write: %04x\n", machine().describe_context(), data);
 		})
 	);
 }
@@ -1780,7 +1722,7 @@ TIMER_CALLBACK_MEMBER(supracan_state::video_callback)
 	}
 
 	m_hbl_timer->adjust(m_screen->time_until_pos(vpos, 320));
-	m_video_timer->adjust(m_screen->time_until_pos((vpos + 1) % 256, 0));
+	m_video_timer->adjust(m_screen->time_until_pos((vpos + 1) % 262, 0));
 }
 
 void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -1861,7 +1803,7 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				{
 					mem.write_word(m_sprdma_regs.dst, 0);
 					m_sprdma_regs.dst += 2 * m_sprdma_regs.dst_inc;
-					//memset(supracan_vram, 0x00, 0x020000);
+					//memset(vram, 0x00, 0x020000);
 				}
 				else
 				{
@@ -1902,6 +1844,7 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		LOGMASKED(LOG_IRQS, "Raster 'line on' IRQ Trigger write? = %04x\n", data);
 		if (data & 0x8000)
 		{
+			// NOTE: sangofgt draws a garbage line strip at target line, but this happens on real HW as well
 			m_line_on_timer->adjust(m_screen->time_until_pos((data & 0x00ff), 0));
 		}
 		else
@@ -1993,6 +1936,38 @@ DEVICE_IMAGE_LOAD_MEMBER(supracan_state::cart_load)
 	return std::make_pair(std::error_condition(), std::string());
 }
 
+static INPUT_PORTS_START( supracan )
+	PORT_START("P1")
+	PORT_BIT(0x000f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_PLAYER(1) PORT_NAME("P1 Button R")
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_PLAYER(1) PORT_NAME("P1 Button L")
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(1) PORT_NAME("P1 Button Y")
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1) PORT_NAME("P1 Button X")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_NAME("P1 Joypad Right")
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1) PORT_NAME("P1 Joypad Left")
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1) PORT_NAME("P1 Joypad Down")
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1) PORT_NAME("P1 Joypad Up")
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1) PORT_NAME("P1 Button B")
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Button A")
+
+	PORT_START("P2")
+	PORT_BIT(0x000f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_PLAYER(2) PORT_NAME("P2 Button R")
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_PLAYER(2) PORT_NAME("P2 Button L")
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(2) PORT_NAME("P2 Button Y")
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Button X")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_NAME("P2 Joypad Right")
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2) PORT_NAME("P2 Joypad Left")
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2) PORT_NAME("P2 Joypad Down")
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2) PORT_NAME("P2 Joypad Up")
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2) PORT_NAME("P2 Button B")
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Button A")
+INPUT_PORTS_END
+
 
 void supracan_state::machine_start()
 {
@@ -2081,7 +2056,6 @@ void supracan_state::machine_reset()
 	std::fill(std::begin(m_tilemap_base_addr), std::end(m_tilemap_base_addr), 0);
 }
 
-/* gfxdecode is retained for reference purposes but not otherwise used by the driver */
 static const gfx_layout supracan_gfx8bpp =
 {
 	8, 8,
@@ -2117,7 +2091,6 @@ static const gfx_layout supracan_gfx2bpp =
 	8*16
 };
 
-
 static const uint32_t xtexlayout_xoffset[64] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,
 												24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,
 												45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63 };
@@ -2130,6 +2103,7 @@ static const uint32_t xtexlayout_yoffset[64] = {  0*64,1*64,2*64,3*64,4*64,5*64,
 												40*64,41*64,42*64,43*64,44*64,45*64,46*64,47*64,
 												48*64,49*64,50*64,51*64,52*64,53*64,54*64,55*64,
 												56*64,57*64,58*64,59*64,60*64,61*64,62*64,63*64 };
+
 static const gfx_layout supracan_gfx1bpp =
 {
 	64, 64,
@@ -2167,12 +2141,12 @@ void supracan_state::supracan(machine_config &config)
 {
 	// M68000P10
 	M68000(config, m_maincpu, U13_CLOCK / 6);
-	m_maincpu->set_addrmap(AS_PROGRAM, &supracan_state::supracan_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &supracan_state::main_map);
 
 	// TODO: Verify type and actual clock
 	// /4 makes speedyd to fail booting
 	M65C02(config, m_soundcpu, U13_CLOCK / 6 / 2);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &supracan_state::supracan_sound_mem);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &supracan_state::sound_map);
 
 	config.set_perfect_quantum(m_soundcpu);
 
@@ -2184,7 +2158,7 @@ void supracan_state::supracan(machine_config &config)
 	m_screen->set_palette("palette");
 	//m_screen->screen_vblank().set(FUNC(supracan_state::screen_vblank));
 
-	PALETTE(config, "palette", FUNC(supracan_state::palette_init)).set_format(palette_device::xBGR_555, 32768);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 256);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_supracan);
 

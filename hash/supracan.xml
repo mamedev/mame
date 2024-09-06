@@ -28,7 +28,7 @@ Gameplay logic falls apart once either side attacks (side becomes unresponsive, 
 		<publisher>Panda Entertainment Technology</publisher>
 		<notes><![CDATA[
 [video] sprites may need buffering (noticeable on gameplay jumps)
-[video] intro raster effect is slightly off
+[video] intro raster effect is slightly off (btanb)
 ]]></notes>
 		<info name="serial" value="F002" />
 		<part name="cart" interface="supracan_cart">
