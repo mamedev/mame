@@ -351,14 +351,12 @@ void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int
 	if (region == 0)
 		tile_bank >>= 1;
 
-	if (layer == 2)
-	{
-		tile_bank = (0x1000 | (tile_bank << 1)) & 0x1c00;
-		// speedyd hints that text layer color offsets are in steps of 4
-		// TODO: is this actually selectable with mode bit 14 in this context?
-		// Notice that GFX2 will mask with 0x1fff, making that effectively unused for this calculation.
+    // speedyd and slghtsag hints that text layer color offsets are in steps of 4
+	if (region == 2)
 		palette_shift = 2;
-	}
+
+	if (layer == 2)
+		tile_bank = (0x1000 | (tile_bank << 1)) & 0x1c00;
 
 	int tile = (vram[count] & 0x03ff) + tile_bank;
 	int flipxy = (vram[count] & 0x0c00) >> 10;
@@ -1039,11 +1037,12 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				{
 					int wrap = (m_tilemap_flags[layer] & 0x20);
 
-					int scrollx = m_tilemap_scrollx[layer];
-					int scrolly = m_tilemap_scrolly[layer];
+					// slghtsag wants a resolution of 12-bits for text and title
+					int scrollx = m_tilemap_scrollx[layer] & 0xfff;
+					int scrolly = m_tilemap_scrolly[layer] & 0xfff;
 
-					if (scrollx & 0x8000) scrollx -= 0x10000;
-					if (scrolly & 0x8000) scrolly -= 0x10000;
+					if (scrollx & 0x800) scrollx -= 0x1000;
+					if (scrolly & 0x800) scrolly -= 0x1000;
 
 					int mosaic_count = (m_tilemap_flags[layer] & 0x001c) >> 2;
 					int mosaic_mask = 0xffffffff << mosaic_count;
