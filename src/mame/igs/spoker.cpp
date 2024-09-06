@@ -28,7 +28,7 @@
   - Verify LEDs and coin counters (should be ok)
   - 3super8 randomly crashes
   - 3super8 doesn't have the 8x32 tilemap, change the video emulation accordingly
-  - jinhulu2 needs decryption work + IGS-003C emulation.
+  - jinhulu2 stops at "system is connecting". Some type of link feature?
 
 ***************************************************************************/
 
@@ -132,7 +132,6 @@ public:
 
 	void spokeru(machine_config &config);
 
-	void init_jinhulu2();
 	void init_spokeru();
 
 protected:
@@ -140,11 +139,28 @@ protected:
 
 	void portmap(address_map &map);
 
-private:
 	void coins_w(uint8_t data);
 	void nmi_video_leds_w(uint8_t data);
 
+private:
 	void program_map(address_map &map);
+};
+
+class jinhulu2_state : public spokeru_state
+{
+public:
+	jinhulu2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spokeru_state(mconfig, type, tag)
+	{ }
+
+	void jinhulu2(machine_config &config);
+
+	void init_jinhulu2();
+
+private:
+	void nmi_w(uint8_t data);
+
+	void portmap(address_map &map);
 };
 
 class jb_state : public spokeru_state
@@ -173,6 +189,7 @@ private:
 
 	void portmap(address_map &map);
 };
+
 
 /***************************************************************************
                                 Video Hardware
@@ -389,6 +406,19 @@ void spokeru_state::nmi_video_leds_w(uint8_t data)
 	show_out(machine(), m_out);
 }
 
+void jinhulu2_state::nmi_w(uint8_t data)
+{
+	if (data & 0xef)
+		logerror("nmi_w: %02x\n", data & 0xef);
+
+	if (((m_nmi_ack & 0x10) == 0) && data & 0x10)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+
+	m_nmi_ack = data & 0x10;     // NMI acknowledge, 0 -> 1
+
+	// TODO: bit 5 is set often
+}
+
 void spoker_state::leds_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 0);  // stop_1
@@ -495,6 +525,24 @@ void spokeru_state::portmap(address_map &map)
 	map(0x50c0, 0x50c0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x7000, 0x77ff).ram().w(FUNC(spokeru_state::fg_tile_w)).share(m_fg_tile_ram);
 	map(0x7800, 0x7fff).ram().w(FUNC(spokeru_state::fg_color_w)).share(m_fg_color_ram);
+}
+
+void jinhulu2_state::portmap(address_map &map)
+{
+	map(0x0000, 0x003f).ram(); // Z180 internal regs
+	map(0x2000, 0x20ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x3000, 0x30ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	// TODO: the following reads may be hooked to the wrong inputs
+	map(0x4000, 0x4000).portr("DSW1");
+	map(0x4001, 0x4001).portr("DSW2");
+	map(0x4002, 0x4002).portr("DSW3");
+	map(0x5001, 0x5001).portr("SERVICE");
+	//map(0x5030, 0x5030).w(FUNC()); // TODO: almost surely same protections as seen in igspoker.cpp and igs011.cpp. Probably the IGS003
+	//map(0x5031, 0x5031).r(FUNC()); // TODO: "
+	map(0x5031, 0x5031).w(FUNC(jinhulu2_state::nmi_w));
+	//map(0x????, 0x????).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x7000, 0x77ff).ram().w(FUNC(jinhulu2_state::fg_tile_w)).share(m_fg_tile_ram);
+	map(0x7800, 0x7fff).ram().w(FUNC(jinhulu2_state::fg_color_w)).share(m_fg_color_ram);
 }
 
 void jb_state::portmap(address_map &map)
@@ -989,11 +1037,26 @@ static GFXDECODE_START( gfx_3super8 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, layout_8x32x6,   0, 16 )
 GFXDECODE_END
 
+// TODO: probably correct but to be verified once it passes the connection check
+static const gfx_layout layout_8x8x4 =
+{
+	8, 8,
+	RGN_FRAC(1, 1),
+	4,
+	{ STEP4(24, -8) },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8*4) },
+	8*8*4
+};
+
+static GFXDECODE_START( gfx_jinhulu2 )
+	GFXDECODE_ENTRY( "tiles", 0, layout_8x8x4, 0, 16 )
+GFXDECODE_END
+
 static GFXDECODE_START( gfx_jb )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, layout_8x8x6,    0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, layout_8x32x6,   0, 16 )
 GFXDECODE_END
-
 
 /***************************************************************************
                            Machine Start & Reset
@@ -1072,6 +1135,16 @@ void spokeru_state::spokeru(machine_config &config)
 
 	config.device_remove("ppi8255_0");
 	config.device_remove("ppi8255_1");
+}
+
+
+void jinhulu2_state::jinhulu2(machine_config &config)
+{
+	spokeru(config);
+
+	m_maincpu->set_addrmap(AS_IO, &jinhulu2_state::portmap);
+
+	m_gfxdecode->set_info(gfx_jinhulu2);
 }
 
 
@@ -1435,16 +1508,13 @@ Notes:
 
 *********************************************************************************/
 
-// TODO: this may actually fit in another driver or need a new one (has IGS-003C, seems different GFX hw). Codebase has some similarities to the Super Poker sets.
 ROM_START( jinhulu2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "prg.u40", 0x00000, 0x10000, CRC(e7974ae0) SHA1(1240fabeb79bb820ba371b378ad51660170c6cd0) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "27c4002.u39", 0x00000, 0x80000, CRC(b933ec01) SHA1(72b541579551114f7c8649c2e9a839ef4128fc14) ) // 1ST AND 2ND HALF IDENTICAL
-
-	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_FILL( 0x0000, 0x30000, 0xff )
+	ROM_REGION( 0x40000, "tiles", 0 )
+	ROM_LOAD( "27c4002.u39", 0x00000, 0x40000, CRC(b933ec01) SHA1(72b541579551114f7c8649c2e9a839ef4128fc14) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                       0x40000 )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "sp_u12.u12", 0x00000, 0x20000, CRC(1aeb078c) SHA1(9b8a256f51e66733c4ec30b451ca0711ed02318e) )
@@ -1467,11 +1537,8 @@ void spokeru_state::init_spokeru()
 	}
 }
 
-void spokeru_state::init_jinhulu2()
+void jinhulu2_state::init_jinhulu2()
 {
-// 0xf000 - 0xffff seem to be the decrypted version of 0x0000-0x0fff
-
-	// TODO: applying the above, doesn't seem to give 100% correct results. Adjust this.
 	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int a = 0; a < 0xf000; a++)
@@ -1479,8 +1546,21 @@ void spokeru_state::init_jinhulu2()
 		rom[a] ^= 0x01;
 		if ((a & 0x0282) == 0x0282) rom[a] ^= 0x01;
 		if ((a & 0x0940) == 0x0940) rom[a] ^= 0x02;
-		if ((a & 0x3220) == 0x0200) rom[a] ^= 0x40;
 	}
+
+	const int rom_size = memregion("tiles")->bytes();
+	u8 * const gfxrom = memregion("tiles")->base();
+	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
+
+	// address lines swap
+	memcpy(tmp.get(), gfxrom, rom_size);
+	for (int i = 0; i < rom_size; i++)
+	{
+		// TODO: may need some higher bits swapped, too. To be verified once it passes the connection check
+		int addr = bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 6, 11, 8, 9, 10, 7, 12, 5, 4, 3, 2, 1, 0);
+		gfxrom[i] = tmp[addr];
+	}
+
 }
 
 void spoker_state::init_spk116it()
@@ -1565,18 +1645,18 @@ void spoker_state::init_3super8()
                               Game Drivers
 ***************************************************************************/
 
-//    YEAR   NAME        PARENT    MACHINE   INPUT     STATE          INIT           ROT    COMPANY      FULLNAME                    FLAGS
-GAME( 1996,  spk306us,   0,        spokeru,  spoker,   spokeru_state, init_spokeru,  ROT0,  "IGS",       "Super Poker (v306US)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk205us,   spk306us, spokeru,  spoker,   spokeru_state, init_spokeru,  ROT0,  "IGS",       "Super Poker (v205US)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk203us,   spk306us, spokeru,  spoker,   spokeru_state, init_spokeru,  ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_SUPPORTS_SAVE ) // LS1. 8 203US in test mode
-GAME( 1996,  spk201ua,   spk306us, spokeru,  spoker,   spokeru_state, init_spokeru,  ROT0,  "IGS",       "Super Poker (v201UA)",     MACHINE_SUPPORTS_SAVE ) // still shows 200UA in test mode
-GAME( 1996,  spk200ua,   spk306us, spokeru,  spoker,   spokeru_state, init_spokeru,  ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk116it,   spk306us, spoker,   spoker,   spoker_state,  init_spk116it, ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk116itmx, spk306us, spoker,   spoker,   spoker_state,  init_spk114it, ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk115it,   spk306us, spoker,   spoker,   spoker_state,  init_spk116it, ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk114it,   spk306us, spoker,   spk114it, spoker_state,  init_spk114it, ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk102ua,   spk306us, spokeru,  spoker,   spokeru_state, init_spokeru,  ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk100,     spk306us, spoker,   spk114it, spoker_state,  init_spk100,   ROT0,  "IGS",       "Super Poker (v100)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, 3super8,    0,        _3super8, 3super8,  spoker_state,  init_3super8,  ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
-GAME( 1997,  jbell,      0,        jb,       jb,       jb_state,      init_spokeru,  ROT0,  "IGS",       "Jingle Bell (v200US)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  jinhulu2,   0,        spokeru,  spoker,   spokeru_state, init_jinhulu2, ROT0,  "IGS",       "Jin Hu Lu 2",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption
+//    YEAR   NAME        PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY      FULLNAME                    FLAGS
+GAME( 1996,  spk306us,   0,        spokeru,  spoker,   spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v306US)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk205us,   spk306us, spokeru,  spoker,   spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v205US)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk203us,   spk306us, spokeru,  spoker,   spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_SUPPORTS_SAVE ) // LS1. 8 203US in test mode
+GAME( 1996,  spk201ua,   spk306us, spokeru,  spoker,   spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v201UA)",     MACHINE_SUPPORTS_SAVE ) // still shows 200UA in test mode
+GAME( 1996,  spk200ua,   spk306us, spokeru,  spoker,   spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk116it,   spk306us, spoker,   spoker,   spoker_state,   init_spk116it, ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk116itmx, spk306us, spoker,   spoker,   spoker_state,   init_spk114it, ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk115it,   spk306us, spoker,   spoker,   spoker_state,   init_spk116it, ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk114it,   spk306us, spoker,   spk114it, spoker_state,   init_spk114it, ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk102ua,   spk306us, spokeru,  spoker,   spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk100,     spk306us, spoker,   spk114it, spoker_state,   init_spk100,   ROT0,  "IGS",       "Super Poker (v100)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, 3super8,    0,        _3super8, 3super8,  spoker_state,   init_3super8,  ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
+GAME( 1997,  jbell,      0,        jb,       jb,       jb_state,       init_spokeru,  ROT0,  "IGS",       "Jingle Bell (v200US)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  jinhulu2,   0,        jinhulu2, spoker,   jinhulu2_state, init_jinhulu2, ROT0,  "IGS",       "Jin Hu Lu 2 (v412GS)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption
