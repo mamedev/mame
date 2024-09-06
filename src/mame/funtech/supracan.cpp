@@ -202,7 +202,6 @@ private:
 	uint8_t m_sound_reg_addr = 0;
 
 	emu_timer *m_video_timer = nullptr;
-	emu_timer *m_hbl_timer = nullptr;
 	emu_timer *m_line_on_timer = nullptr;
 	emu_timer *m_line_off_timer = nullptr;
 
@@ -253,10 +252,10 @@ private:
 	void sound_timer_irq(int state);
 	void sound_dma_irq(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(hbl_callback);
-	TIMER_CALLBACK_MEMBER(line_on_callback);
-	TIMER_CALLBACK_MEMBER(line_off_callback);
-	TIMER_CALLBACK_MEMBER(video_callback);
+	TIMER_CALLBACK_MEMBER(frc_timer_cb);
+	TIMER_CALLBACK_MEMBER(line_on_cb);
+	TIMER_CALLBACK_MEMBER(line_off_cb);
+	TIMER_CALLBACK_MEMBER(scanline_cb);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	int get_tilemap_region(int layer);
 	void get_tilemap_info_common(int layer, tile_data &tileinfo, int count);
@@ -275,6 +274,8 @@ private:
 	u8 m_irq_mask = 0;
 	u16 m_frc_control = 0;
 	u16 m_frc_frequency = 0;
+	emu_timer *m_frc_timer = nullptr;
+	void update_frc_state();
 };
 
 
@@ -1519,6 +1520,51 @@ uint16_t supracan_state::_68k_soundram_r(offs_t offset, uint16_t mem_mask)
 	return data;
 }
 
+TIMER_CALLBACK_MEMBER(supracan_state::frc_timer_cb)
+{
+	m_maincpu->set_input_line(3, HOLD_LINE);
+
+	update_frc_state();
+}
+
+void supracan_state::update_frc_state()
+{
+	if ((m_frc_control & 0xff00) == 0xa200)
+	{
+		// HACK: handle case by case until we resolve the equation
+		// (particularly with variable frequencies)
+		switch(m_frc_control & 0xf)
+		{
+			// speedyd: sets this up to 0xa0d6 / 0x0000 at boot, then goes 0xa200 0x013a
+			// - dictates a very slow timer (pinpoint for what);
+			// - would give massive slowdowns during gameplay if too many fires;
+			case 0:
+				m_frc_timer->adjust(attotime::from_hz(1));
+				break;
+
+			// magipool: sets 0xa201 / 0x0104 at startup, sometimes flips frequency to 0x0046
+			// - causes a crash at boot if too fast;
+			// - takes roughly 6 seconds for a title screen kanji to move right-to-left;
+			case 1:
+				m_frc_timer->adjust(attotime::from_hz(30));
+				break;
+
+			// gamblord: sets 0xa20f normally, plays with frequency register a lot.
+			// - takes ~13 seconds for title screen to complete animation;
+			// - takes ~1 second for character screen to switch;
+			// - during gameplay sometimes switches to 0xa200 / 0xffff;
+			case 0xf:
+				m_frc_timer->adjust(attotime::from_hz(120));
+				break;
+			default:
+				popmessage("Attempt to fire up FRC with %04x %04x", m_frc_control, m_frc_frequency);
+				break;
+		}
+	}
+	else
+		m_frc_timer->adjust(attotime::never);
+}
+
 void supracan_state::host_um6619_map(address_map &map)
 {
 	map(0x04, 0x05).lr8(
@@ -1562,6 +1608,7 @@ void supracan_state::host_um6619_map(address_map &map)
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			COMBINE_DATA(&m_frc_control);
 			logerror("FRC control %04x & %04x\n", data, mem_mask);
+			update_frc_state();
 		})
 	);
 	map(0x16, 0x17).lrw16(
@@ -1571,6 +1618,7 @@ void supracan_state::host_um6619_map(address_map &map)
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			COMBINE_DATA(&m_frc_frequency);
 			logerror("FRC frequency %04x & %04x\n", data, mem_mask);
+			update_frc_state();
 		})
 	);
 	/**
@@ -1674,31 +1722,23 @@ uint16_t supracan_state::video_r(offs_t offset, uint16_t mem_mask)
 	return data;
 }
 
-// TODO: shared with FRC
-// controlled by $e90014-16, cfr. magipool and gamblord
-// former assumed to run at < 1 irq per frame ...
-TIMER_CALLBACK_MEMBER(supracan_state::hbl_callback)
-{
-	m_maincpu->set_input_line(3, HOLD_LINE);
 
-	m_hbl_timer->adjust(attotime::never);
-}
-
-TIMER_CALLBACK_MEMBER(supracan_state::line_on_callback)
+TIMER_CALLBACK_MEMBER(supracan_state::line_on_cb)
 {
 	m_maincpu->set_input_line(5, HOLD_LINE);
 
 	m_line_on_timer->adjust(attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(supracan_state::line_off_callback)
+TIMER_CALLBACK_MEMBER(supracan_state::line_off_cb)
 {
 	m_maincpu->set_input_line(5, CLEAR_LINE);
 
 	m_line_on_timer->adjust(attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(supracan_state::video_callback)
+// TODO: derive from param, merge with line_on/_off stuff
+TIMER_CALLBACK_MEMBER(supracan_state::scanline_cb)
 {
 	int vpos = m_screen->vpos();
 
@@ -1721,7 +1761,6 @@ TIMER_CALLBACK_MEMBER(supracan_state::video_callback)
 		break;
 	}
 
-	m_hbl_timer->adjust(m_screen->time_until_pos(vpos, 320));
 	m_video_timer->adjust(m_screen->time_until_pos((vpos + 1) % 262, 0));
 }
 
@@ -2021,10 +2060,10 @@ void supracan_state::machine_start()
 
 	save_item(NAME(m_video_regs));
 
-	m_video_timer = timer_alloc(FUNC(supracan_state::video_callback), this);
-	m_hbl_timer = timer_alloc(FUNC(supracan_state::hbl_callback), this);
-	m_line_on_timer = timer_alloc(FUNC(supracan_state::line_on_callback), this);
-	m_line_off_timer = timer_alloc(FUNC(supracan_state::line_off_callback), this);
+	m_video_timer = timer_alloc(FUNC(supracan_state::scanline_cb), this);
+	m_frc_timer = timer_alloc(FUNC(supracan_state::frc_timer_cb), this);
+	m_line_on_timer = timer_alloc(FUNC(supracan_state::line_on_cb), this);
+	m_line_off_timer = timer_alloc(FUNC(supracan_state::line_off_cb), this);
 }
 
 
