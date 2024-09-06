@@ -9,6 +9,7 @@ References:
 - https://upload.wikimedia.org/wikipedia/commons/a/a6/Super-ACan-motherboard-flat.jpg
 - https://github.com/angelosa/hw_docs/blob/main/funtech_superacan/pergame.md
 
+
 *******************************************************************************
 
 INFO:
@@ -1366,9 +1367,10 @@ uint8_t supracan_state::_6502_soundmem_r(offs_t offset)
 		break;
 	case 0x411:
 		data = m_soundcpu_irq_source;
-		m_soundcpu_irq_source = 0;
+		// TODO: should really check for further pending irqs before acking
 		if (!machine().side_effects_disabled())
 		{
+			m_soundcpu_irq_source = 0;
 			LOGMASKED(LOG_SOUND, "%s: %s: 6502_soundmem_r: Sound IRQ source read + clear: %02x\n", machine().describe_context(), machine().time().to_string(), data);
 			m_soundcpu->set_input_line(0, CLEAR_LINE);
 		}
@@ -1757,6 +1759,9 @@ TIMER_CALLBACK_MEMBER(supracan_state::scanline_cb)
 		{
 			LOGMASKED(LOG_IRQS, "Triggering VBL IRQ\n\n");
 			m_maincpu->set_input_line(7, HOLD_LINE);
+			// TODO: ack, from $412?
+			// staiwbbl requires this for inputs to work
+			m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 		break;
 	}

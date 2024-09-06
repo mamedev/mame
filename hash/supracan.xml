@@ -188,7 +188,8 @@ Crashes after few seconds in attract, controls [irq 3] as FRC
 		</part>
 	</software>
 
-	<!-- F012 - Rebel Star -->
+	<!-- F012 - Rebel Star / 叛星 -->
+	<!-- presumably uses blending during gameplay -->
 
 	<!-- Unreleased Super A'can carts -->
 	<!-- Dinosaur Wars -->
