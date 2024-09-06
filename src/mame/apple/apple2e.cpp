@@ -1037,6 +1037,13 @@ void apple2e_state::machine_start()
 	m_joystick_x1_time = m_joystick_x2_time = m_joystick_y1_time = m_joystick_y2_time = 0;
 	m_reset_latch = false;
 
+	last_mx = 0;
+	last_my = 0;
+	count_x = 0;
+	count_y = 0;
+	m_x0 = false;
+	m_y0 = false;
+
 	// setup save states
 	save_item(NAME(m_speaker_state));
 	save_item(NAME(m_cassette_state));
@@ -1165,12 +1172,6 @@ void apple2e_state::machine_reset()
 	m_xy = false;
 	m_x0edge = false;
 	m_y0edge = false;
-	last_mx = 0;
-	last_my = 0;
-	count_x = 0;
-	count_y = 0;
-	m_x0 = false;
-	m_y0 = false;
 	m_x1 = false;
 	m_y1 = false;
 	m_xirq = false;
@@ -2793,9 +2794,9 @@ void apple2e_state::update_iic_mouse()
 		m_y0 = !m_y0;
 	}
 
-	if (raise_mousexy_irq) {
+	if (raise_mousexy_irq)
+	{
 		raise_irq(IRQ_MOUSEXY);
-		raise_mousexy_irq = false;
 	}
 }
 
