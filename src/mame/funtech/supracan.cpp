@@ -237,6 +237,8 @@ private:
 	uint16_t m_roz_coeffd = 0;
 	int32_t m_roz_changed = 0;
 	uint16_t m_unk_1d0 = 0;
+	u8 m_pixel_mode = 0;
+	u8 m_gfx_mode = 0;
 
 	uint16_t m_video_regs[256]{};
 
@@ -282,30 +284,24 @@ private:
 
 int supracan_state::get_tilemap_region(int layer)
 {
-	// HACK!!!
-	if (layer == 2)
+	switch(layer)
 	{
-		return 2;
-	}
-
-	if (layer == 3)
-	{
-		// TODO: sonevil wants region 0/8bpp during intro
-		// roz layer
-		static const int s_roz_mode_lut[4] = { 4, 2, 1, 0 };
-		return s_roz_mode_lut[m_roz_mode & 3];
-	}
-	else
-	{
-		// TODO: slghtsag wants region 0/8bpp at character select
-		// normal layers
-		if ((m_tilemap_mode[layer] & 0x7000) == 0x7000)
-		{
+		case 0:
+			static const int layer0_mode[8] = { 2, 1, 0, 1, 0, 0, 0, 0 };
+			return layer0_mode[m_gfx_mode & 7];
+		case 1:
+			static const int layer1_mode[8] = { 2, 1, 1, 1, 2, 2, 2, 2 };
+			return layer1_mode[m_gfx_mode & 7];
+		// HACK: can be 2bpp or 1bpp
+		case 2:
 			return 2;
-		}
-		return 1;
+		case 3:
+			static const int s_roz_mode_lut[4] = { 4, 2, 1, 0 };
+			return s_roz_mode_lut[m_roz_mode & 3];
 	}
 
+	// TODO: 4th layer at $f00160 (gfx mode 0 only, ignored for everything else)
+	throw new emu_fatalerror("Error: layer = %d not defined", layer);
 }
 
 void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int count)
@@ -352,6 +348,8 @@ void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int
 		break;
 	}
 
+	if (region == 0)
+		tile_bank >>= 1;
 
 	if (layer == 2)
 	{
@@ -365,6 +363,7 @@ void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int
 	int tile = (vram[count] & 0x03ff) + tile_bank;
 	int flipxy = (vram[count] & 0x0c00) >> 10;
 	int palette = ((vram[count] & 0xf000) >> 12) << palette_shift;
+
 
 	tileinfo.set(region, tile, palette, TILE_FLIPXY(flipxy));
 }
@@ -1713,6 +1712,8 @@ uint16_t supracan_state::video_r(offs_t offset, uint16_t mem_mask)
 			LOGMASKED(LOG_TILEMAP1, "read tilemap_flags[1] (%04x)\n", data);
 		}
 		break;
+	case 0x1f0/2:
+		return m_pixel_mode | m_gfx_mode;
 	default:
 		if (!machine().side_effects_disabled())
 		{
@@ -1951,12 +1952,16 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x19a/2: m_roz_unk_base1 = data << 2; LOGMASKED(LOG_ROZ, "roz_unk_base1 = %05x\n", data << 2); break;
 	case 0x19e/2: m_roz_unk_base2 = data << 2; LOGMASKED(LOG_ROZ, "roz_unk_base2 = %05x\n", data << 2); break;
 
+	// color mixing stuff goes here
 	case 0x1d0/2: m_unk_1d0 = data; LOGMASKED(LOG_UNKNOWNS, "unk_1d0 = %04x\n", data); break;
 
 	case 0x1f0/2:
-		// FIXME: this register is not understood
-		// can't be irq mask, more likely outbound pins (to cart & UM6619) or color control
-		//m_irq_mask = data;//(data & 8) ? 0 : 1;
+		m_pixel_mode = data & 0x18;
+		m_gfx_mode = data & 0x7;
+		if (m_pixel_mode & 0x10)
+			popmessage("Special pixel mode enabled!");
+		if (m_gfx_mode >= 5)
+			popmessage("Reserved GFX mode set %02x", data);
 		//LOGMASKED(LOG_IRQS, "irq_mask = %04x\n", data);
 		break;
 	default:
