@@ -192,7 +192,7 @@ void zoomer_state::maincpu_io_map(address_map &map)
 	map(0x0072, 0x0072).portr("PORT72");
 	map(0x0073, 0x0073).lr8(NAME([] { return 0x06; })); // PCMCIA slot voltage?
 	map(0x0075, 0x0076).noprw(); // unknown, pen related
-	map(0x0077, 0x0077).w(NAME(zoomer_state::apo_w));
+	map(0x0077, 0x0077).w(FUNC(zoomer_state::apo_w));
 	map(0x0090, 0x00af).rw(FUNC(zoomer_state::ems_a000_bank_r), FUNC(zoomer_state::ems_a000_bank_w));
 	map(0x00c0, 0x00c7).rw(FUNC(zoomer_state::ems_2000_bank_r), FUNC(zoomer_state::ems_2000_bank_w));
 	map(0x00d0, 0x00d1).noprw(); // unknown, input related
