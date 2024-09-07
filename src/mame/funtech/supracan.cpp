@@ -1251,7 +1251,24 @@ template <unsigned ch> void supracan_state::dma_w(offs_t offset, uint16_t data, 
 
 			for (int i = 0; i <= m_dma_regs.count[ch]; i++)
 			{
-				if (data & 0x1000)
+				// staiwbbl wants to fill both VRAM and work RAM at startup,
+				// and expects to transfer word for VRAM, byte for work RAM.
+				// Not providing this will cause all kinds of video and logic glitches.
+				// TODO: pinpoint DMA modes here (at least upper bits 14-13 should do)
+				if (data == 0xa800)
+				{
+					if ((m_dma_regs.dest[ch] & 0xfe0000) == 0xf40000)
+					{
+						mem.write_word(m_dma_regs.dest[ch], 0);
+						m_dma_regs.dest[ch]   += dest_dec ? -2 : 2;
+					}
+					else
+					{
+						mem.write_byte(m_dma_regs.dest[ch], mem.read_byte(m_dma_regs.source[ch]));
+						m_dma_regs.dest[ch]   += dest_dec ? -1 : 1;
+					}
+				}
+				else if (data & 0x1000)
 				{
 					mem.write_word(m_dma_regs.dest[ch], mem.read_word(m_dma_regs.source[ch]));
 					m_dma_regs.dest[ch]   += dest_dec ? -2 : 2;
@@ -1270,6 +1287,9 @@ template <unsigned ch> void supracan_state::dma_w(offs_t offset, uint16_t data, 
 					m_dma_regs.source[ch] += src_dec  ? -1 : 1;
 				}
 			}
+			// TODO: are these DMA cycle steal?
+			// There's no indication of a DMA status read so far that would indicate burst.
+			//m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(m_dma_regs.count[ch] * 2));
 		}
 		else if (data != 0x0000) // fake DMA, used by C.U.G.
 		{
@@ -1568,7 +1588,7 @@ void supracan_state::update_frc_state()
 
 			// magipool: sets 0xa201 / 0x0104 at startup, sometimes flips frequency to 0x0046
 			// - causes a crash at boot if too fast;
-			// - takes roughly 6 seconds for a title screen kanji to move right-to-left;
+			// - takes roughly 6 seconds for a title screen individual kanji to move right-to-left;
 			case 1:
 				m_frc_timer->adjust(attotime::from_hz(30));
 				break;

@@ -9,9 +9,8 @@ license:CC0-1.0
 		<year>1995</year>
 		<publisher>AV Artisan Corp.</publisher>
 		<notes><![CDATA[
-Gameplay logic falls apart once either side attacks (side becomes unresponsive, pieces stop moving, collision won't work etc.)
-[video] priority issue on versus presentation screen
-[video] layer 0 won't show left side character, scrollx = 0x0080
+[video] layer 0 won't show left side character, scrollx = 0x0080 + global flip x
+[video] wrong tilemap paging for layer 1 on game over
 ]]></notes>
 		<info name="serial" value="F001" />
 		<info name="alt_title" value="福爾摩沙大對決" />
@@ -29,8 +28,11 @@ Gameplay logic falls apart once either side attacks (side becomes unresponsive, 
 		<notes><![CDATA[
 [video] sprites may need buffering (noticeable on gameplay jumps)
 [video] intro raster effect is slightly off (btanb)
+[irq 5] 2nd fighter stage used with global flip y + mosaic (lake effect)
+[video] enables window effect during ending and credits
 ]]></notes>
 		<info name="serial" value="F002" />
+		<info name="alt_title" value="三國志 武將爭霸" />
 		<part name="cart" interface="supracan_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom loadflag="load16_word_swap" name="sangofgt.bin" size="3145728" crc="a4de6dde" sha1="f4bed63775130a75eb9c50b32e0cf50d1a7b8f50" offset="0" />
@@ -44,12 +46,15 @@ Gameplay logic falls apart once either side attacks (side becomes unresponsive, 
 		<publisher>Funtech</publisher>
 		<notes><![CDATA[
 Uses [video] blending during attract and title screen
-Broken [video] ROZ during intro
+Wrong [video] ROZ paging for title screen
+Broken [video] during intro, uses bitmap mode
 Broken [video] sprites during gameplay
+[video] uses per-tile priority during gameplay
 ]]></notes>
 		<info name="serial" value="F003" />
 		<info name="alt_title" value="邪惡之子" />
 		<part name="cart" interface="supracan_cart">
+			<!-- TODO: sram -->
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom loadflag="load16_word_swap" name="16005.cu5" size="2097152" crc="9f6119a7" sha1="67ae9e7f99e1c3054ea54d53dbbba7792ef45134" offset="0" />
 			</dataarea>
@@ -63,7 +68,7 @@ Broken [video] sprites during gameplay
 		<notes><![CDATA[
 [video] intro should sprite clip against active display area.
 [video] title animation blanks some sprites.
-[video] concealed layer 0 priority during gameplay, and several tiles have wrong colors.
+[video] uses per-tile priority during gameplay
 ]]></notes>
 		<info name="serial" value="F004" />
 		<info name="alt_title" value="音速飛龍" />
@@ -79,13 +84,12 @@ Broken [video] sprites during gameplay
 		<year>1995</year>
 		<publisher>C&amp;E Soft</publisher>
 		<notes><![CDATA[
-Unresponsive [joy] inputs
-[video] garbage tiles during attract demo (cleares some after upper 1st inning)
-[video] ROZ is misaligned
+[video] ROZ is misaligned during intro
 ]]></notes>
 		<info name="serial" value="F005" />
 		<info name="alt_title" value="超級中華職棒聯盟" />
 		<part name="cart" interface="supracan_cart">
+			<!-- TODO: sram -->
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom loadflag="load16_word_swap" name="16005.0" size="2097152" crc="ccf6829b" sha1="17a413803d8749fbe9643ca56d703afd64569b9f" offset="0" />
 			</dataarea>
@@ -96,6 +100,9 @@ Unresponsive [joy] inputs
 		<description>Journey to the Laugh ~ Xi You Ji</description>
 		<year>1995</year>
 		<publisher>Funtech</publisher>
+		<notes><![CDATA[
+Can potentially hang, [maincpu] tight loops for $e80300 bit 7 high
+]]></notes>
 		<info name="serial" value="F006" />
 		<info name="alt_title" value="嘻遊記" />
 		<part name="cart" interface="supracan_cart">
@@ -110,13 +117,13 @@ Unresponsive [joy] inputs
 		<year>1996</year>
 		<publisher>Kingformation</publisher>
 		<notes><![CDATA[
-Wrong [video] layer 1 priority and colors during intro
-[video] text layer is concealed and sprites are cutoff at character select
-[video] layer 0 draws garbage, should use 8bpp region
+[video] sprites are cutoff at character select
+[video] wrong position for text markers in load game screens
 ]]></notes>
 		<info name="serial" value="F007" />
 		<info name="alt_title" value="超級光明戰史" />
 		<part name="cart" interface="supracan_cart">
+			<!-- TODO: sram -->
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom loadflag="load16_word_swap" name="16007.0" size="2097152" crc="56c1c3fb" sha1="249e2ad6d8d40ecd31eda5a1bd5e5d0f47174a27" offset="000000" />
 				<rom loadflag="load16_word_swap" name="08007.1" size="1048576" crc="fc79f05f" sha1="7ce2e23ea3fd25764935708be4d47bf1a9843938" offset="0x200000" />
@@ -131,6 +138,7 @@ Wrong [video] layer 1 priority and colors during intro
 		<info name="serial" value="F008" />
 		<info name="alt_title" value="非洲探險" />
 		<part name="cart" interface="supracan_cart">
+			<!-- TODO: sram -->
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom loadflag="load16_word_swap" name="08003.bin" size="1048576" crc="dc3b7b84" sha1="6dcbd7923203da7892915595d65ee668afbf0339" offset="0" />
 			</dataarea>
@@ -142,8 +150,9 @@ Wrong [video] layer 1 priority and colors during intro
 		<year>1996</year>
 		<publisher>Funtech</publisher>
 		<notes><![CDATA[
-Missing [video] a sprites row cloud strip during intro
-Too fast in gameplay, controls [irq 3] as FRC
+[video] intro has a glitchy cloud row strip
+[video] intro shows some vertical strips of garbage when title screen dragon appears
+Erratic gameplay speed, controls [irq 3] as FRC, can potentially hang
 ]]></notes>
 		<info name="serial" value="F009" />
 		<info name="alt_title" value="賭霸" />
@@ -156,15 +165,14 @@ Too fast in gameplay, controls [irq 3] as FRC
 
 	<software name="magipool" supported="no">
 		<description>Magical Pool ~ Mo Bang Zhuang Qiu</description>
-		<year>199?</year>
+		<year>1996</year>
 		<publisher>Funtech</publisher>
 		<notes><![CDATA[
-Crashes after few seconds in attract, controls [irq 3] as FRC
+Erratic gameplay speed, controls [irq 3] as FRC
 [video] should blend white, and use layer 1 as masking effect (sprites goes under it)
-[video] game select has missing table layer
 [video] character select has misaligned sprites
 [video] gameplay has corrupted sprite markers
-[video] gameplay has wrong priority for layer 1
+[video] billiard cue sprite cut off left side (should wraparound)
 ]]></notes>
 		<info name="serial" value="F010" />
 		<info name="alt_title" value="魔棒撞球" />
