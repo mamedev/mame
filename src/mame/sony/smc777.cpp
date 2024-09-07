@@ -22,6 +22,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/timer.h"
@@ -37,8 +38,6 @@
 
 
 namespace {
-
-#define MASTER_CLOCK 4.028_MHz_XTAL
 
 #define mc6845_h_char_total     (m_crtc_vreg[0]+1)
 #define mc6845_h_display        (m_crtc_vreg[1])
@@ -1104,10 +1103,14 @@ static void smc777_floppies(device_slot_interface &device)
 
 void smc777_state::smc777(machine_config &config)
 {
+    constexpr XTAL MASTER_CLOCK = 32.2238_MHz_XTAL;
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK);
+	Z80(config, m_maincpu, MASTER_CLOCK / 8); // nominally 4.028 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &smc777_state::smc777_mem);
 	m_maincpu->set_addrmap(AS_IO, &smc777_state::smc777_io);
+
+    I8041A(config, "mcu", 6_MHz_XTAL).set_disable();
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1122,14 +1125,14 @@ void smc777_state::smc777(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	HD6845S(config, m_crtc, MASTER_CLOCK/2);    /* HD68A45SP; unknown clock, hand tuned to get ~60 fps */
+	HD6845S(config, m_crtc, MASTER_CLOCK / 16); // HD68A45SP; unknown clock, hand tuned to get ~60 fps
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
 	m_crtc->out_vsync_callback().set(FUNC(smc777_state::vsync_w));
 
 	// floppy controller
-	MB8876(config, m_fdc, 1_MHz_XTAL);
+	MB8876(config, m_fdc, MASTER_CLOCK / 32); // divider not confirmed
 	m_fdc->intrq_wr_callback().set(FUNC(smc777_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(smc777_state::fdc_drq_w));
 
@@ -1143,7 +1146,7 @@ void smc777_state::smc777(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, "sn1", MASTER_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider
+	SN76489A(config, "sn1", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider
 
 	BEEP(config, m_beeper, 300); // TODO: correct frequency
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
