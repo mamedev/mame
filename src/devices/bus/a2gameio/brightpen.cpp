@@ -23,14 +23,14 @@ class apple2_brightpen_device : public device_t, public device_a2gameio_interfac
 {
 public:
 	// construction/destruction
-        apple2_brightpen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	        : device_t(mconfig, APPLE2_BRIGHTPEN, tag, owner, clock)
-	        , device_a2gameio_interface(mconfig, *this)
-	        , m_brightpen_point(*this, BRIGHTPEN_POINT)
-	        , m_brightpen_x(*this, BRIGHTPEN_X)
-	        , m_brightpen_y(*this, BRIGHTPEN_Y)
-        {
-        }
+	apple2_brightpen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, APPLE2_BRIGHTPEN, tag, owner, clock)
+		, device_a2gameio_interface(mconfig, *this)
+		, m_brightpen_point(*this, BRIGHTPEN_POINT)
+		, m_brightpen_x(*this, BRIGHTPEN_X)
+		, m_brightpen_y(*this, BRIGHTPEN_Y)
+	{
+	}
 
 protected:
 	// device_t implementation
@@ -69,9 +69,10 @@ static INPUT_PORTS_START( apple2_brightpen )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-ioport_constructor apple2_brightpen_device::device_input_ports() const {
+ioport_constructor apple2_brightpen_device::device_input_ports() const
+{
 	return INPUT_PORTS_NAME(apple2_brightpen);
-};
+}
 
 void apple2_brightpen_device::device_start()
 {
@@ -79,9 +80,10 @@ void apple2_brightpen_device::device_start()
 
 // light detection logic based on zapper_sensor.cpp nes_zapper_sensor_device::detect_light
 
-int apple2_brightpen_device::sw0_r() {
-        int x = m_brightpen_x->read();
-        int y = m_brightpen_y->read();
+int apple2_brightpen_device::sw0_r()
+{
+	int x = m_brightpen_x->read();
+	int y = m_brightpen_y->read();
 	int vpos = m_screen->vpos();
 	int hpos = m_screen->hpos();
 
