@@ -30,7 +30,7 @@ Arabian Night        NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=31
 Black Beard         YES  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=32
 Dragon Slayer       YES  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=33
 Flying Age           NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=34
-Halloween Party      NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=35
+Halloween Party     YES  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=35
 Olympian Games      YES  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=36
 The Circus           NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=37
 Treasure Hunting     NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=38
@@ -286,6 +286,22 @@ ROM_START( rasce )
 	ROM_LOAD( "rs.06.03r", 0x0000, 0x7a80000, CRC(66132c3d) SHA1(4a73bab9518548950e11aebc6edf67f64d0d7798) )
 ROM_END
 
+ // Pallas GX1 REV:B - AMD Geode CS5530A-UCE, SMC FDC37C932APM. Sub board with ROMs, ASTRO M and ASTRO V102PX-003 customs
+ROM_START( hwparty )
+	// GAME NAME    : HALLOWEEN PARTY
+	// GAME TYPE    : MULTI-LINER
+	// DEVELOPER    : ASTRO CORP
+	ROM_REGION32_LE(0x40000, "pci:12.0", 0) /* motherboard bios */
+	ROM_LOAD( "phoenixbios_e586 bios.u16", 0x0000, 0x040000, CRC(885e3cde) SHA1(ff90cda4383a119c7f54545c11fa432505e66c1b) )
+
+	ROM_REGION(0x20000, "rom", 0) // on subboard
+	ROM_LOAD16_BYTE( "1_hwus-112.u22", 0x00000, 0x010000, CRC(5cbe992c) SHA1(e785e5863ccc52d4ca5485569244d89e226398a0) )
+	ROM_LOAD16_BYTE( "2_hwus-112.u11", 0x00001, 0x010000, CRC(7b0187ed) SHA1(7d0791990aec06d929bcb40a6d9888b3bb350071) )
+
+	ROM_REGION(0x8000000, "drive", 0)
+	ROM_LOAD( "halloween_us.23.a.img", 0x0000, 0x7a80000, CRC(65d3877f) SHA1(076035bd55189a186368ae42463ab7471be1583c) )
+ROM_END
+
 
 void astropc_state::init_astropc()
 {
@@ -300,6 +316,8 @@ GAME( 2005,  blackbdb, blackbd, astropc, astropc, astropc_state, init_astropc, R
 
 GAME( 2005,  dslayrr,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Dragon Slayer (Russia, v15.B, 2005/08/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2006,  dslayrra, dslayrr, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Dragon Slayer (Russia, v16.B, 2005/11/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+GAME( 2005,  hwparty,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Halloween Party (US.23.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 GAME( 2004,  hawaii,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Hawaii (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 

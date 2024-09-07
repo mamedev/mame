@@ -4,14 +4,17 @@
 license:CC0-1.0
 -->
 <softwarelist name="supracan" description="Funtech Super A'Can cartridges">
-
-
-	<!-- appears to work, but gameplay logic is broken, attack pieces don't drop down, game can get stuck, can sometimes rotate pieces through other pieces too! -->
-	<software name="formduel" supported="no"> <!-- F001 - 福爾摩沙大對決 (Formosa Da Dui Jue) - aka Formosa Duel -->
-		<description>Formosa Duel</description>
+	<software name="formduel" supported="no">
+		<description>Formosa Duel ~ Formosa Da Dui Jue</description>
 		<year>1995</year>
 		<publisher>AV Artisan Corp.</publisher>
+		<notes><![CDATA[
+Gameplay logic falls apart once either side attacks (side becomes unresponsive, pieces stop moving, collision won't work etc.)
+[video] priority issue on versus presentation screen
+[video] layer 0 won't show left side character, scrollx = 0x0080
+]]></notes>
 		<info name="serial" value="F001" />
+		<info name="alt_title" value="福爾摩沙大對決" />
 		<part name="cart" interface="supracan_cart">
 			<dataarea name="rom" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="Formosa Duel (Taiwan).bin" size="0x100000" crc="b2bf31dc" sha1="8d0680e1322af21b20d5cee2c100b05cf4217815" offset="0" />
@@ -19,10 +22,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sangofgt">
+	<software name="sangofgt" supported="partial">
 		<description>Sango Fighter ~ Wu Jiang Zheng Ba - San Guo Zhi</description>
 		<year>1995</year>
 		<publisher>Panda Entertainment Technology</publisher>
+		<notes><![CDATA[
+[video] sprites may need buffering (noticeable on gameplay jumps)
+[video] intro raster effect is slightly off (btanb)
+]]></notes>
 		<info name="serial" value="F002" />
 		<part name="cart" interface="supracan_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -35,6 +42,11 @@ license:CC0-1.0
 		<description>The Son of Evil ~ Xie E Zhi Zi</description>
 		<year>1995</year>
 		<publisher>Funtech</publisher>
+		<notes><![CDATA[
+Uses [video] blending during attract and title screen
+Broken [video] ROZ during intro
+Broken [video] sprites during gameplay
+]]></notes>
 		<info name="serial" value="F003" />
 		<info name="alt_title" value="邪惡之子" />
 		<part name="cart" interface="supracan_cart">
@@ -48,6 +60,11 @@ license:CC0-1.0
 		<description>Speedy Dragon ~ Yin Su Fei Long</description>
 		<year>1995</year>
 		<publisher>AV Artisan Corp.</publisher>
+		<notes><![CDATA[
+[video] intro should sprite clip against active display area.
+[video] title animation blanks some sprites.
+[video] concealed layer 0 priority during gameplay, and several tiles have wrong colors.
+]]></notes>
 		<info name="serial" value="F004" />
 		<info name="alt_title" value="音速飛龍" />
 		<part name="cart" interface="supracan_cart">
@@ -61,6 +78,11 @@ license:CC0-1.0
 		<description>Super Taiwanese Baseball League ~ Chao Ji Zhong Hua Zhi Bang Lian Meng</description>
 		<year>1995</year>
 		<publisher>C&amp;E Soft</publisher>
+		<notes><![CDATA[
+Unresponsive [joy] inputs
+[video] garbage tiles during attract demo (cleares some after upper 1st inning)
+[video] ROZ is misaligned
+]]></notes>
 		<info name="serial" value="F005" />
 		<info name="alt_title" value="超級中華職棒聯盟" />
 		<part name="cart" interface="supracan_cart">
@@ -87,6 +109,11 @@ license:CC0-1.0
 		<description>Super Light Saga - Dragon Force ~ Chao Ji Guang Ming Zhan Shi</description>
 		<year>1996</year>
 		<publisher>Kingformation</publisher>
+		<notes><![CDATA[
+Wrong [video] layer 1 priority and colors during intro
+[video] text layer is concealed and sprites are cutoff at character select
+[video] layer 0 draws garbage, should use 8bpp region
+]]></notes>
 		<info name="serial" value="F007" />
 		<info name="alt_title" value="超級光明戰史" />
 		<part name="cart" interface="supracan_cart">
@@ -97,7 +124,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="monopoly">
+	<software name="monopoly" supported="partial">
 		<description>Monopoly: Adventure in Africa ~ Fei Zhou Tan Xian Da Fu Weng</description>
 		<year>1995</year>
 		<publisher>Panda Entertainment Technology</publisher>
@@ -110,12 +137,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gamblord">
-		<description>Gambling Lord</description>
+	<software name="gamblord" supported="no">
+		<description>Gambling Lord ~ Du Ba</description>
 		<year>1996</year>
 		<publisher>Funtech</publisher>
+		<notes><![CDATA[
+Missing [video] a sprites row cloud strip during intro
+Too fast in gameplay, controls [irq 3] as FRC
+]]></notes>
 		<info name="serial" value="F009" />
-		<info name="alt_title" value="賭霸 (Du Ba)" />
+		<info name="alt_title" value="賭霸" />
 		<part name="cart" interface="supracan_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom loadflag="load16_word_swap" name="16006.bin" size="2097152" crc="ac4fa721" sha1="0fda223817f0b50f0ce9687076d29df3d1b86960" offset="0" />
@@ -123,12 +154,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="magipool">
-		<description>Magical Pool</description>
+	<software name="magipool" supported="no">
+		<description>Magical Pool ~ Mo Bang Zhuang Qiu</description>
 		<year>199?</year>
 		<publisher>Funtech</publisher>
+		<notes><![CDATA[
+Crashes after few seconds in attract, controls [irq 3] as FRC
+[video] should blend white, and use layer 1 as masking effect (sprites goes under it)
+[video] game select has missing table layer
+[video] character select has misaligned sprites
+[video] gameplay has corrupted sprite markers
+[video] gameplay has wrong priority for layer 1
+]]></notes>
 		<info name="serial" value="F010" />
-		<info name="alt_title" value="魔棒撞球 (Mo Bang Zhuang Qiu)" />
+		<info name="alt_title" value="魔棒撞球" />
 		<part name="cart" interface="supracan_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom loadflag="load16_word_swap" name="08004.bin" size="2097152" crc="aed4e4f8" sha1="6be79db9006c46ea21f5dbe1add755ce2e413796" offset="0" />
@@ -136,7 +175,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="boomzoo">
+	<software name="boomzoo" supported="partial">
 		<description>Boom Zoo ~ Bao Bao Dong Wu Yuan</description>
 		<year>1996</year>
 		<publisher>Funtech</publisher>
@@ -149,7 +188,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- F012 - Rebel Star -->
+	<!-- F012 - Rebel Star / 叛星 -->
+	<!-- presumably uses blending during gameplay -->
 
 	<!-- Unreleased Super A'can carts -->
 	<!-- Dinosaur Wars -->

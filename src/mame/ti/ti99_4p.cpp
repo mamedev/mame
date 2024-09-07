@@ -970,7 +970,7 @@ void ti99_4p_state::driver_start()
 	save_item(NAME(m_rom6_active));
 	save_item(NAME(m_rom6_upper));
 	save_item(NAME(m_dbin));
-	save_pointer(NAME(m_mapper),16);
+	save_item(NAME(m_mapper));
 }
 
 /*

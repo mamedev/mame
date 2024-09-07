@@ -38,9 +38,9 @@ void k001006_device::device_start()
 
 	preprocess_texture_data(m_texrom.get(), m_gfxrom, 0x800000);
 
-	save_pointer(NAME(m_pal_ram), 0x800*sizeof(uint16_t));
-	save_pointer(NAME(m_unknown_ram), 0x1000*sizeof(uint16_t));
-	save_pointer(NAME(m_palette), 0x800*sizeof(uint32_t));
+	save_pointer(NAME(m_pal_ram), 0x800);
+	save_pointer(NAME(m_unknown_ram), 0x1000);
+	save_pointer(NAME(m_palette), 0x800);
 	save_item(NAME(m_device_sel));
 	save_item(NAME(m_addr));
 }

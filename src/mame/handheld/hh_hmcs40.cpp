@@ -82,6 +82,7 @@ known chips:
   C89     HD44801  1985, CXG Portachess (1985 version) -> cxg/computachess.cpp
 
  *A86     HD44820  1983, Chess King Pocket Micro / Mighty Midget
+ *B46     HD44820  1984, Chess King Pocket Micro Deluxe
  *B63     HD44820  1985, CXG Pocket Chess (12 buttons)
 
  *A13     HD44840  1982, CXG Computachess II

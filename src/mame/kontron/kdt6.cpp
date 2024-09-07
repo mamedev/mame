@@ -589,7 +589,7 @@ void kdt6_state::machine_start()
 	save_item(NAME(m_status0));
 	save_item(NAME(m_status1));
 	save_item(NAME(m_status2));
-	save_pointer(NAME(m_mapper), 16);
+	save_item(NAME(m_mapper));
 	save_item(NAME(m_video_address));
 }
 

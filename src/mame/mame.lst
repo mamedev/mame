@@ -1399,6 +1399,56 @@ rcasino1                        // (c) 1984 Dyna Electronics (D-2608208A1-1, Lar
 rcasinoo                        // (c) 1984 Dyna Electronics (D-2608208A1-1, Smaller Board)
 rcasino2                        // (c) 1984 Dyna Electronics
 
+@source:astrocorp/astrcorp.cpp
+astoneag                        // (c) 2005  Astro Corp.
+cptshark                        // (c) 2006  Astro Corp.
+dinodino                        // (c) 2005  Astro Corp.
+gostopac                        // (c) 2004  Astro Corp.
+hacher                          // (c) 2005  bootleg (Gametron)
+hapfarm                         // (c) 2008  Astro Corp.
+luckycoin                       // (c) 2002  Astro Corp.
+magibomb                        // (c) 2001? Astro Corp.
+magibomba                       // (c) 2002  Astro Corp.
+magibombb                       // (c) 2002  Astro Corp.
+magibombc                       // (c) 2001  Astro Corp.
+magibombd                       // (c) 2005  Astro Corp.
+magibombe                       // (c) 2001? Astro Corp.
+magibombf                       // (c) 2002  Astro Corp.
+magibombg                       // (c) 2004  Astro Corp.
+magibombh                       // (c) 2001? Astro Corp.
+magibombi                       // (c) 2001? Astro Corp.
+magibombj                       // (c) 2005  Astro Corp.
+monkeyl                         // (c) 2005  Astro Corp.
+monkeyla                        // (c) 2004  Astro Corp.
+showhanc                        // (c) 2000  Astro Corp.
+showhand                        // (c) 2000  Astro Corp.
+skilldrp                        // (c) 2002  Astro Corp.
+skilldrpa                       // (c) 2002  Astro Corp.
+speeddrp                        // (c) 2003  Astro Corp.
+speedmst                        // (c) 2004  D2 Enterprises
+speedmsta                       // (c) 2003  D2 Enterprises
+speedmstb                       // (c) 2004  D2 Enterprises
+westvent                        // (c) 2007? Astro Corp.
+winbingo                        // (c) 2006  Astro Corp.
+winbingoa                       // (c) 2006  Astro Corp.
+wwitch                          // (c) 2005  Astro Corp.
+zoo                             // (c) 2004  Astro Corp.
+
+@source:astrocorp/astropc.cpp
+blackbd                         //
+blackbda                        //
+blackbdb                        //
+dslayrr                         //
+dslayrra                        //
+hawaii                          //
+hwparty                         //
+oligam                          //
+rasce                           //
+
+@source:astrocorp/hummer.cpp
+jackvent
+pengprty
+
 @source:atari/a2600.cpp
 a2600                           // Atari 2600
 a2600p                          // Atari 2600 PAL
@@ -20236,8 +20286,10 @@ amazoni2                        // (c) 2002
 amazonia                        // (c) 1999
 amazonkp                        // (c) 1999
 chessc2                         // (c) 200?
+cjddz                           // (c) 200?
 extradrw                        // (c) 200?
-fruitpar                        // (c) 200?
+fruitpar                        // (c) 1999
+fruitpara                       // (c) 1999
 gonefsh2                        // (c) 200?
 jking02                         // (c) 200?
 klxyj                           // (c) 200?
@@ -20255,7 +20307,6 @@ oceanpara                       //
 olympic5                        // (c) 2005
 olympic5a                       // (c) 2003
 qlgs                            // (c) 1999
-sddz                            // (c) 200?
 sdwx                            // (c) 2002
 slqz3                           // (c) 1999
 zhongguo                        // (c) 2000
@@ -28900,51 +28951,6 @@ as_wwb                          //
 as_wwc                          //
 as_wwd                          //
 as_wwe                          //
-
-@source:misc/astrcorp.cpp
-astoneag                        // (c) 2005  Astro Corp.
-cptshark                        // (c) 2006  Astro Corp.
-dinodino                        // (c) 2005  Astro Corp.
-gostopac                        // (c) 2004  Astro Corp.
-hacher                          // (c) 2005  bootleg (Gametron)
-hapfarm                         // (c) 2008  Astro Corp.
-luckycoin                       // (c) 2002  Astro Corp.
-magibomb                        // (c) 2001? Astro Corp.
-magibomba                       // (c) 2002  Astro Corp.
-magibombb                       // (c) 2002  Astro Corp.
-magibombc                       // (c) 2001  Astro Corp.
-magibombd                       // (c) 2005  Astro Corp.
-magibombe                       // (c) 2001? Astro Corp.
-magibombf                       // (c) 2002  Astro Corp.
-magibombg                       // (c) 2004  Astro Corp.
-magibombh                       // (c) 2001? Astro Corp.
-magibombi                       // (c) 2001? Astro Corp.
-magibombj                       // (c) 2005  Astro Corp.
-monkeyl                         // (c) 2005  Astro Corp.
-monkeyla                        // (c) 2004  Astro Corp.
-showhanc                        // (c) 2000  Astro Corp.
-showhand                        // (c) 2000  Astro Corp.
-skilldrp                        // (c) 2002  Astro Corp.
-skilldrpa                       // (c) 2002  Astro Corp.
-speeddrp                        // (c) 2003  Astro Corp.
-speedmst                        // (c) 2004  D2 Enterprises
-speedmsta                       // (c) 2003  D2 Enterprises
-speedmstb                       // (c) 2004  D2 Enterprises
-westvent                        // (c) 2007? Astro Corp.
-winbingo                        // (c) 2006  Astro Corp.
-winbingoa                       // (c) 2006  Astro Corp.
-wwitch                          // (c) 2005  Astro Corp.
-zoo                             // (c) 2004  Astro Corp.
-
-@source:misc/astropc.cpp
-blackbd                         //
-blackbda                        //
-blackbdb                        //
-dslayrr                         //
-dslayrra                        //
-hawaii                          //
-oligam                          //
-rasce                           //
 
 @source:misc/atronic.cpp
 3wishrd                         // Three Wishes Red
@@ -42046,6 +42052,11 @@ dsb46                           //
 @source:skeleton/dual68.cpp
 dual68                          //
 
+@source:skeleton/dyna_d0404.cpp
+cm2005
+cm2005a
+cm2005b
+
 @source:skeleton/e100.cpp
 e100                            //
 
@@ -42494,6 +42505,9 @@ systec                          //
 
 @source:skeleton/systel1.cpp
 systel100                       //
+
+@source:skeleton/syvg.cpp
+luckyvl
 
 @source:skeleton/tavernie.cpp
 cpu09                           //
@@ -45133,6 +45147,9 @@ mcg85                           //
 @source:trainer/mk14.cpp
 mk14                            //
 mk14vdu                         //
+
+@source:trainer/ms68k.cpp
+ms68k                           // Marion Systems MS68K
 
 @source:trainer/thaler.cpp
 ct65                            // 1982 Thaler CT-65

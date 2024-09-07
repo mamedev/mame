@@ -47,7 +47,6 @@ TODO:
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/sed1520.h"
 
@@ -68,10 +67,10 @@ public:
 	risc2500_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_boot_view(*this, "boot_view"),
 		m_rom(*this, "maincpu"),
 		m_ram(*this, "ram"),
 		m_nvram(*this, "nvram"),
-		m_disable_bootrom(*this, "disable_bootrom"),
 		m_dac(*this, "dac"),
 		m_lcdc(*this, "lcdc"),
 		m_board(*this, "board"),
@@ -89,14 +88,13 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_post_load() override { install_bootrom(m_bootrom_enabled); }
 
 private:
 	required_device<arm_cpu_device> m_maincpu;
+	memory_view m_boot_view;
 	required_region_ptr<u32> m_rom;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
-	required_device<timer_device> m_disable_bootrom;
 	required_device<dac_2bit_ones_complement_device> m_dac;
 	required_device<sed1520_device> m_lcdc;
 	required_device<sensorboard_device> m_board;
@@ -105,12 +103,12 @@ private:
 	output_finder<14> m_syms;
 	output_finder<16> m_leds;
 
+	emu_timer *m_boot_timer;
+
 	bool m_power = false;
 	u32 m_control = 0;
 	u32 m_prev_pc = 0;
 	u64 m_prev_cycle = 0;
-
-	bool m_bootrom_enabled = false;
 
 	void risc2500_mem(address_map &map);
 
@@ -121,10 +119,15 @@ private:
 	u32 rom_r(offs_t offset);
 	void power_off();
 
-	u32 disable_boot_rom_r();
-	void install_bootrom(bool enable);
-	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
+	u32 disable_bootrom_r();
+	TIMER_CALLBACK_MEMBER(disable_bootrom) { m_boot_view.select(1); }
 };
+
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
 
 void risc2500_state::machine_start()
 {
@@ -132,11 +135,12 @@ void risc2500_state::machine_start()
 	m_syms.resolve();
 	m_leds.resolve();
 
+	m_boot_timer = timer_alloc(FUNC(risc2500_state::disable_bootrom), this);
+	m_boot_view[1].install_ram(0, m_ram->size() - 1, m_ram->pointer());
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 
 	// register for savestates
 	save_item(NAME(m_power));
-	save_item(NAME(m_bootrom_enabled));
 	save_item(NAME(m_control));
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_prev_cycle));
@@ -144,7 +148,8 @@ void risc2500_state::machine_start()
 
 void risc2500_state::machine_reset()
 {
-	install_bootrom(true);
+	m_boot_view.select(0);
+	m_boot_timer->adjust(attotime::never);
 
 	m_power = true;
 	m_control = 0;
@@ -210,31 +215,6 @@ SED1520_UPDATE_CB(risc2500_state::screen_update_cb)
 /*******************************************************************************
     I/O
 *******************************************************************************/
-
-// bootrom bankswitch
-
-void risc2500_state::install_bootrom(bool enable)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	program.unmap_readwrite(0, std::max(m_rom.bytes(), size_t(m_ram->size())) - 1);
-
-	if (enable)
-		program.install_read_handler(0, m_rom.bytes() - 1, read32sm_delegate(*this, FUNC(risc2500_state::rom_r)));
-	else
-		program.install_ram(0, m_ram->size() - 1, m_ram->pointer());
-
-	m_bootrom_enabled = enable;
-}
-
-u32 risc2500_state::disable_boot_rom_r()
-{
-	// disconnect bootrom from the bus after next opcode
-	if (m_bootrom_enabled && !m_disable_bootrom->enabled() && !machine().side_effects_disabled())
-		m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(10));
-
-	return 0;
-}
-
 
 // soft power on/off
 
@@ -316,6 +296,15 @@ void risc2500_state::control_w(u32 data)
 	m_control = data;
 }
 
+u32 risc2500_state::disable_bootrom_r()
+{
+	// disconnect bootrom from the bus after next opcode
+	if (!machine().side_effects_disabled() && m_boot_timer->remaining().is_never())
+		m_boot_timer->adjust(m_maincpu->cycles_to_attotime(10));
+
+	return 0;
+}
+
 u32 risc2500_state::rom_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
@@ -352,7 +341,10 @@ u32 risc2500_state::rom_r(offs_t offset)
 
 void risc2500_state::risc2500_mem(address_map &map)
 {
-	map(0x01800000, 0x01800003).r(FUNC(risc2500_state::disable_boot_rom_r));
+	map(0x00000000, 0x001fffff).view(m_boot_view);
+	m_boot_view[0](0x00000000, 0x0003ffff).r(FUNC(risc2500_state::rom_r));
+
+	map(0x01800000, 0x01800003).r(FUNC(risc2500_state::disable_bootrom_r));
 	map(0x01000000, 0x01000003).rw(FUNC(risc2500_state::input_r), FUNC(risc2500_state::control_w));
 	map(0x02000000, 0x0203ffff).r(FUNC(risc2500_state::rom_r));
 }
@@ -425,8 +417,6 @@ void risc2500_state::risc2500(machine_config &config)
 
 	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL / 128); // 256Hz
 	m_maincpu->set_periodic_int(FUNC(risc2500_state::irq1_line_assert), irq_period);
-
-	TIMER(config, "disable_bootrom").configure_generic(FUNC(risc2500_state::disable_bootrom));
 
 	RAM(config, m_ram).set_extra_options("128K, 256K, 512K, 1M, 2M");
 	m_ram->set_default_size("128K");
