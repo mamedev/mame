@@ -82,7 +82,7 @@ known chips:
   C89     HD44801  1985, CXG Portachess (1985 version) -> cxg/computachess.cpp
 
  *A86     HD44820  1983, Chess King Pocket Micro / Mighty Midget
- *B46     HD44820  1984, Chess King Pocket Micro Deluxe
+ *B46     HD44820  1984, Chess King Pocket Micro / Mighty Midget
  *B63     HD44820  1985, CXG Pocket Chess (12 buttons)
 
  *A13     HD44840  1982, CXG Computachess II
@@ -91,7 +91,7 @@ known chips:
  *B55     HD44860  1987, Saitek Pro Bridge 100
 
  *A04     HD44868  1984, SciSys Rapier
- *A07     HD44868  1984, Chess King Pocket Micro Deluxe
+ *A07     HD44868  1984, Chess King Pocket Micro Deluxe / Mephisto Teufelchen
  *A12     HD44868  1985, SciSys MK 10 / Pocket Chess / Electronic Trio
  *A14     HD44868  1985, SciSys Kasparov Plus
  *A16     HD44868  1988, Saitek Pocket Checkers

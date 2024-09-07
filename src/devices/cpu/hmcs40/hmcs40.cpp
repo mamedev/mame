@@ -572,7 +572,7 @@ void hmcs40_cpu_device::execute_run()
 		// handle opcode
 		switch (m_op)
 		{
-			/* 0x000 */
+			// 0x000
 
 			case 0x000: case 0x001: case 0x002: case 0x003:
 				op_xsp(); break;
@@ -647,7 +647,7 @@ void hmcs40_cpu_device::execute_run()
 				op_xamr(); break;
 
 
-			/* 0x100 */
+			// 0x100
 
 			case 0x110: case 0x111:
 				op_lmaiy(); break;
@@ -695,7 +695,7 @@ void hmcs40_cpu_device::execute_run()
 				op_br(); break;
 
 
-			/* 0x200 */
+			// 0x200
 
 			case 0x200: case 0x201: case 0x202: case 0x203:
 				op_tm(); break;
@@ -763,7 +763,8 @@ void hmcs40_cpu_device::execute_run()
 				op_lrb(); break;
 
 
-			/* 0x300 */
+			// 0x300
+
 			case 0x320:
 				op_comb(); break;
 			case 0x324:
@@ -797,6 +798,6 @@ void hmcs40_cpu_device::execute_run()
 
 			default:
 				op_illegal(); break;
-		} /* big switch */
+		} // big switch
 	}
 }

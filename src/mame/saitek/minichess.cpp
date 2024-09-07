@@ -210,7 +210,7 @@ void mini_state::smchess(machine_config &config)
 
 ROM_START( smchess )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD("44801a34_proj_t", 0x0000, 0x2000, CRC(be71f1c0) SHA1(6b4d5c8f8491c82bdec1938bd83c14e826ff3e30) )
+	ROM_LOAD("44801a34_scisys-w_ltd_proj_t", 0x0000, 0x2000, CRC(be71f1c0) SHA1(6b4d5c8f8491c82bdec1938bd83c14e826ff3e30) )
 
 	ROM_REGION( 48645, "screen", 0 )
 	ROM_LOAD("smchess.svg", 0, 48645, CRC(19beaa99) SHA1(2d738bd6953dfd7a2c8c37814badd0aac2960c8c) )
