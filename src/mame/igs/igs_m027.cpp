@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders: Xing Xing, David Haywood
+// copyright-holders: XingXing, David Haywood
 
 /* IGS ARM7 (IGS027A) based Mahjong / Gambling platform(s)
- Driver by Xing Xing
+ Driver by XingXing
 
  These games use the IGS027A processor.
 
@@ -19,8 +19,7 @@
 
  TODO:
  * NVRAM
- * Inputs and DIP switches for most games
- * Hopper for payout
+ * Inputs, DIP switches, coin counters and payout systems for most games
  * Coin lockout (zhongguo displays a coin error on unexpected coins)
 */
 
@@ -35,6 +34,7 @@
 
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
 
 #include "sound/okim6295.h"
@@ -61,13 +61,16 @@ public:
 		m_igs017_igs031(*this, "igs017_igs031"),
 		m_screen(*this, "screen"),
 		m_oki(*this, "oki"),
+		m_hopper(*this, "hopper"),
 		m_io_kbd(*this, "KEY%u", 0U),
 		m_io_dsw(*this, "DSW%u", 1U),
-		m_io_test(*this, "TEST")
+		m_io_test(*this, "TEST"),
+		m_out_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	void m027(machine_config &config) ATTR_COLD;
 	void m027_xor(machine_config &config) ATTR_COLD;
+	void jking02_xor(machine_config &config) ATTR_COLD;
 	void lhdmg_xor(machine_config &config) ATTR_COLD;
 	void lhzb4_xor(machine_config &config) ATTR_COLD;
 	void lthy_xor(machine_config &config) ATTR_COLD;
@@ -104,14 +107,19 @@ protected:
 private:
 	required_region_ptr<u32> m_external_rom;
 	optional_shared_ptr<u32> m_igs_mainram;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	required_device<screen_device> m_screen;
 	required_device<okim6295_device> m_oki;
+	optional_device<hopper_device> m_hopper;
+
 	optional_ioport_array<5> m_io_kbd;
 	optional_ioport_array<3> m_io_dsw;
 	optional_ioport m_io_test;
+
+	output_finder<8> m_out_lamps;
 
 	u32 m_xor_table[0x100];
 	u8 m_io_select[2];
@@ -127,6 +135,10 @@ private:
 	void xor_table_w(offs_t offset, u8 data);
 
 	u8 test_r();
+	void lamps_w(u8 data);
+	void mahjong_output_w(u8 data);
+	void jking02_output_w(u8 data);
+
 	u32 unk2_r();
 	u32 lhdmg_unk2_r();
 	void unk2_w(u32 data);
@@ -137,16 +149,18 @@ private:
 
 	void igs_mahjong_map(address_map &map) ATTR_COLD;
 	void igs_mahjong_xor_map(address_map &map) ATTR_COLD;
+	void jking02_xor_map(address_map &map) ATTR_COLD;
 	void lhdmg_xor_map(address_map &map) ATTR_COLD;
 	void lhzb4_xor_map(address_map &map) ATTR_COLD;
 	void lthy_xor_map(address_map &map) ATTR_COLD;
-	void zhongguo_xor_map(address_map &map) ATTR_COLD;
 	void mgzz_xor_map(address_map &map) ATTR_COLD;
 	void extradraw_map(address_map &map) ATTR_COLD;
 };
 
 void igs_m027_state::machine_start()
 {
+	m_out_lamps.resolve();
+
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 	std::fill(std::begin(m_io_select), std::end(m_io_select), 0xff);
 	m_unk2_write_count = 0;
@@ -195,12 +209,23 @@ void igs_m027_state::igs_mahjong_xor_map(address_map &map)
 	map(0x08000000, 0x0807ffff).r(FUNC(igs_m027_state::external_rom_r)); // Game ROM
 }
 
+void igs_m027_state::jking02_xor_map(address_map &map)
+{
+	igs_mahjong_xor_map(map);
+
+	map(0x38009000, 0x38009003).umask32(0x000000ff).w(FUNC(igs_m027_state::lamps_w));
+	map(0x38009000, 0x38009003).umask32(0x0000ff00).w(FUNC(igs_m027_state::jking02_output_w));
+}
+
 void igs_m027_state::lhdmg_xor_map(address_map &map)
 {
 	igs_mahjong_xor_map(map);
 
 	map(0x38009000, 0x38009003).umask32(0x000000ff).r(FUNC(igs_m027_state::test_r));
 	map(0x38009000, 0x38009003).umask32(0x0000ff00).w(FUNC(igs_m027_state::io_select_w<0>));
+	map(0x38009000, 0x38009003).umask32(0x00ff0000).w(FUNC(igs_m027_state::mahjong_output_w));
+
+	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027_state::lhdmg_unk2_r));
 }
 
 void igs_m027_state::lhzb4_xor_map(address_map &map)
@@ -217,19 +242,14 @@ void igs_m027_state::lthy_xor_map(address_map &map)
 
 	map(0x38009000, 0x38009003).umask32(0x000000ff).r(FUNC(igs_m027_state::test_r));
 	map(0x38009000, 0x38009003).umask32(0x0000ff00).r(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
-}
-
-void igs_m027_state::zhongguo_xor_map(address_map &map)
-{
-	igs_mahjong_xor_map(map);
-
-	map(0x38009000, 0x38009003).umask32(0x0000ff00).r(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
+	map(0x38009000, 0x38009003).umask32(0x00ff0000).w(FUNC(igs_m027_state::mahjong_output_w));
 }
 
 void igs_m027_state::mgzz_xor_map(address_map &map)
 {
 	igs_mahjong_xor_map(map);
 
+	map(0x38009000, 0x38009003).umask32(0x000000ff).w(FUNC(igs_m027_state::mahjong_output_w));
 	map(0x38009000, 0x38009003).umask32(0x0000ff00).r(FUNC(igs_m027_state::test_r));
 	map(0x38009000, 0x38009003).umask32(0x00ff0000).r(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
 }
@@ -340,7 +360,7 @@ INPUT_PORTS_START( mahjong )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) // 查帐
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // TODO: default assignment clashes with mahjong I, using it hangs waiting for hopper to respond
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // TODO: default assignment clashes with mahjong I
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -474,6 +494,9 @@ INPUT_PORTS_END
 INPUT_PORTS_START( lhdmg )
 	PORT_INCLUDE(mahjong)
 
+	PORT_MODIFY("TEST")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
+
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coin_A) )            PORT_DIPLOCATION("SW1:1,2")        // 投币比率
 	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )
@@ -589,6 +612,9 @@ INPUT_PORTS_END
 INPUT_PORTS_START( lthy )
 	PORT_INCLUDE(mahjong_joy)
 
+	PORT_MODIFY("TEST")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x1f, 0x1f, "Satellite Machine No." )    PORT_DIPLOCATION("SW1:1,2,3,4,5")  // 副机编号
 	PORT_DIPSETTING(    0x1f, "1" )
@@ -648,6 +674,9 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( zhongguo )
 	PORT_INCLUDE(mahjong_joy)
+
+	PORT_MODIFY("TEST")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coin_A) )            PORT_DIPLOCATION("SW1:1,2")  // 投币比率
@@ -709,6 +738,7 @@ INPUT_PORTS_START( mgzz )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // TODO: default assignment clashes with mahjong I, using it hangs waiting for hopper to respond
 
 	PORT_MODIFY("TEST")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("DSW1")
@@ -893,6 +923,38 @@ u8 igs_m027_state::test_r()
 	return m_io_test->read();
 }
 
+void igs_m027_state::lamps_w(u8 data)
+{
+	// active high outputs
+	// +------+---------------+
+	// | lamp | jking02       |
+	// +------+---------------+
+	// | 0    | bet           |
+	// | 1    | start         |
+	// | 2    |               |
+	// | 3    | stop 1/take   |
+	// | 4    | stop 2/big    |
+	// | 5    | stop 4/double |
+	// | 6    | stop 3/small  |
+	// | 7    |               |
+	// +------+---------------+
+	for (unsigned i = 0; 8 > i; ++i)
+		m_out_lamps[i] = BIT(data, i);
+}
+
+void igs_m027_state::mahjong_output_w(u8 data)
+{
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // one pulse per coin accepted or key-in
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // one pulse per coin paid out by key-out
+	if (m_hopper)
+		m_hopper->motor_w(BIT(data, 2));
+}
+
+void igs_m027_state::jking02_output_w(u8 data)
+{
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5)); // one pulse per coin accepted
+}
+
 u32 igs_m027_state::unk2_r()
 {
 	logerror("%s: unk2_r\n", machine().describe_context());
@@ -959,6 +1021,13 @@ void igs_m027_state::m027_xor(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_mahjong_xor_map);
 }
 
+void igs_m027_state::jking02_xor(machine_config &config)
+{
+	m027_xor(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::jking02_xor_map);
+}
+
 void igs_m027_state::lhdmg_xor(machine_config &config)
 {
 	m027_xor(config);
@@ -968,6 +1037,8 @@ void igs_m027_state::lhdmg_xor(machine_config &config)
 	m_ppi->in_pa_callback().set_ioport("DSW1");
 	m_ppi->in_pb_callback().set_ioport("DSW2");
 	m_ppi->in_pc_callback().set(NAME((&igs_m027_state::kbd_r<0, 3, 0>)));
+
+	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 }
 
 void igs_m027_state::lhzb4_xor(machine_config &config)
@@ -994,13 +1065,9 @@ void igs_m027_state::lthy_xor(machine_config &config)
 
 void igs_m027_state::zhongguo_xor(machine_config &config)
 {
-	m027_xor(config);
+	lthy_xor(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::zhongguo_xor_map);
-
-	m_ppi->in_pa_callback().set_ioport("DSW1");
-	m_ppi->in_pb_callback().set_ioport("DSW2");
-	m_ppi->in_pc_callback().set_ioport("JOY");
+	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 }
 
 void igs_m027_state::mgzz_xor(machine_config &config)
@@ -1012,6 +1079,8 @@ void igs_m027_state::mgzz_xor(machine_config &config)
 	m_ppi->in_pa_callback().set_ioport("DSW1");
 	m_ppi->in_pb_callback().set_ioport("DSW2");
 	m_ppi->in_pc_callback().set_ioport("JOY");
+
+	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 }
 
 void igs_m027_state::extradraw(machine_config &config)
@@ -2089,7 +2158,6 @@ void igs_m027_state::init_lhdmg()
 {
 	lhdmg_decrypt(machine());
 	m_igs017_igs031->set_text_reverse_bits(false);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000000c, 0x4000000f, read32smo_delegate(*this, FUNC(igs_m027_state::lhdmg_unk2_r)));
 }
 
 } // anonymous namespace
@@ -2112,7 +2180,7 @@ GAME( 1999, lhzb3,     0,        lhdmg_xor,    lhzb3,    igs_m027_state, init_lh
 GAME( 2004, lhzb4,     0,        lhzb4_xor,    lhzb4,    igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4", MACHINE_NOT_WORKING ) // 龙虎争霸4
 GAME( 1999, lthy,      0,        lthy_xor,     lthy,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_NOT_WORKING ) // 龙腾虎跃
 GAME( 2000, zhongguo,  0,        zhongguo_xor, zhongguo, igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhongguo Chu Da D", MACHINE_NOT_WORKING ) // 中国锄大D
-GAME( 200?, jking02,   0,        m027_xor,     jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NOT_WORKING )
+GAME( 200?, jking02,   0,        jking02_xor,  jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NOT_WORKING )
 GAME( 2003, mgzz,      0,        mgzz_xor,     mgzz,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V101CN)", MACHINE_NOT_WORKING )
 GAME( 2000, mgzza,     mgzz,     mgzz_xor,     mgzza,    igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_NOT_WORKING )
 GAME( 2007, mgcs3,     0,        m027_xor,     base,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)", MACHINE_NOT_WORKING )
