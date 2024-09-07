@@ -31,8 +31,6 @@ public:
 
 	psion_asic5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	static constexpr feature_type imperfect_features() { return feature::COMMS; }
-
 	void set_mode(pc6_state mode) { m_mode = mode; }
 
 	auto readpa_handler() { return m_in_a_handler.bind(); }

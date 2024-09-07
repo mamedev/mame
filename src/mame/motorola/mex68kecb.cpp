@@ -3,9 +3,6 @@
 /*
  * mex68kecb.cpp - Motorola MEX68KECB
  *
- * Created on: August 31, 2024
- *     Author: Chris Hanson
- *
  * Documentation:
  *   http://www.bitsavers.org/components/motorola/68000/MEX68KECB/MEX68KECB_D2_EduCompBd_Jul82.pdf
  *
@@ -20,9 +17,8 @@
  * - MC6850 ACIA x 2
  * - MC68230 PIT
  *
- * To Do:
+ * TODO:
  * - Cassette I/O
- * - Save/Restore
  *
  */
 
@@ -35,11 +31,17 @@
 #include "machine/mc14411.h"
 
 
+namespace {
+
 class mex68kecb_state : public driver_device
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::TAPE; }
+
 	mex68kecb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_bootvect(*this, "bootvect")
+		, m_sysram(*this, "ram")
 		, m_maincpu(*this, "maincpu")
 		, m_pit(*this, "pit")
 		, m_brg(*this, "brg")
@@ -51,9 +53,24 @@ public:
 		, m_host(*this, "host")
 	{ }
 
-	void mex68kecb(machine_config &config);
+	void mex68kecb(machine_config &config) ATTR_COLD;
+
+	DECLARE_INPUT_CHANGED_MEMBER(abort_button);
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	void mem_map(address_map &map) ATTR_COLD;
+
+	// Clocks from Baud Rate Generator
+	template <uint8_t Bit> void write_acia_clock(int state);
+
+	void bootvect_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	memory_view m_bootvect;
+	required_shared_ptr<uint16_t> m_sysram; // Pointer to System RAM needed by bootvect_w and masking RAM buffer for post reset accesses
+
 	required_device<cpu_device> m_maincpu;
 	required_device<pit68230_device> m_pit;
 	required_device<mc14411_device> m_brg;
@@ -64,44 +81,35 @@ private:
 
 	required_device<rs232_port_device> m_terminal;
 	required_device<rs232_port_device> m_host;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void mem_map(address_map &map);
-
-	// Clocks from Baud Rate Generator
-	template <u8 bit> void write_acia_clock(int state);
-
-	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
-	uint16_t *m_sysrom = nullptr;
-	uint16_t m_sysram[8]{};
-	uint16_t bootvect_r(offs_t offset);
-	void bootvect_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
+
 
 /* Input ports */
 static INPUT_PORTS_START( mex68kecb )
 	PORT_START("ACIA1_BAUD")
-	PORT_DIPNAME(0xff, 0x80, "Terminal Baud Rate")
-	PORT_DIPSETTING(0x80, "9600") PORT_DIPLOCATION("J10:8,7,6,5,4,3,2,1")
-	PORT_DIPSETTING(0x40, "4800") PORT_DIPLOCATION("J10:8,7,6,5,4,3,2,1")
-	PORT_DIPSETTING(0x20, "2400") PORT_DIPLOCATION("J10:8,7,6,5,4,3,2,1")
-	PORT_DIPSETTING(0x10, "1200") PORT_DIPLOCATION("J10:8,7,6,5,4,3,2,1")
-	PORT_DIPSETTING(0x08,  "600") PORT_DIPLOCATION("J10:8,7,6,5,4,3,2,1")
-	PORT_DIPSETTING(0x04,  "300") PORT_DIPLOCATION("J10:8,7,6,5,4,3,2,1")
-	PORT_DIPSETTING(0x02,  "150") PORT_DIPLOCATION("J10:8,7,6,5,4,3,2,1")
-	PORT_DIPSETTING(0x01,  "110") PORT_DIPLOCATION("J10:8,7,6,5,4,3,2,1")
+	PORT_DIPNAME(0xff, 0x80, "Terminal Baud Rate") PORT_DIPLOCATION("J10:8,7,6,5,4,3,2,1")
+	PORT_DIPSETTING(0x80, "9600")
+	PORT_DIPSETTING(0x40, "4800")
+	PORT_DIPSETTING(0x20, "2400")
+	PORT_DIPSETTING(0x10, "1200")
+	PORT_DIPSETTING(0x08,  "600")
+	PORT_DIPSETTING(0x04,  "300")
+	PORT_DIPSETTING(0x02,  "150")
+	PORT_DIPSETTING(0x01,  "110")
 
 	PORT_START("ACIA2_BAUD")
-	PORT_DIPNAME(0xff, 0x80, "Host Baud Rate")
-	PORT_DIPSETTING(0x80, "9600") PORT_DIPLOCATION("J9:8,7,6,5,4,3,2,1")
-	PORT_DIPSETTING(0x40, "4800") PORT_DIPLOCATION("J9:8,7,6,5,4,3,2,1")
-	PORT_DIPSETTING(0x20, "2400") PORT_DIPLOCATION("J9:8,7,6,5,4,3,2,1")
-	PORT_DIPSETTING(0x10, "1200") PORT_DIPLOCATION("J9:8,7,6,5,4,3,2,1")
-	PORT_DIPSETTING(0x08,  "600") PORT_DIPLOCATION("J9:8,7,6,5,4,3,2,1")
-	PORT_DIPSETTING(0x04,  "300") PORT_DIPLOCATION("J9:8,7,6,5,4,3,2,1")
-	PORT_DIPSETTING(0x02,  "150") PORT_DIPLOCATION("J9:8,7,6,5,4,3,2,1")
-	PORT_DIPSETTING(0x01,  "110") PORT_DIPLOCATION("J9:8,7,6,5,4,3,2,1")
+	PORT_DIPNAME(0xff, 0x80, "Host Baud Rate") PORT_DIPLOCATION("J9:8,7,6,5,4,3,2,1")
+	PORT_DIPSETTING(0x80, "9600")
+	PORT_DIPSETTING(0x40, "4800")
+	PORT_DIPSETTING(0x20, "2400")
+	PORT_DIPSETTING(0x10, "1200")
+	PORT_DIPSETTING(0x08,  "600")
+	PORT_DIPSETTING(0x04,  "300")
+	PORT_DIPSETTING(0x02,  "150")
+	PORT_DIPSETTING(0x01,  "110")
+
+	PORT_START("ABORT")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Abort button") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mex68kecb_state, abort_button, 0)
 INPUT_PORTS_END
 
 
@@ -131,12 +139,12 @@ void mex68kecb_state::mex68kecb(machine_config &config)
 	// Set up interrupts.
 
 	// Nothing at IRQ1
-	m_pit->timer_irq_callback().set_inputline("maincpu", M68K_IRQ_2);
-	m_pit->port_irq_callback().set_inputline("maincpu", M68K_IRQ_3);
+	m_pit->timer_irq_callback().set_inputline(m_maincpu, M68K_IRQ_2);
+	m_pit->port_irq_callback().set_inputline(m_maincpu, M68K_IRQ_3);
 	// Optional 6800 peripherals at IRQ4
-	m_acia1->irq_handler().set_inputline("maincpu", M68K_IRQ_5);
-	m_acia2->irq_handler().set_inputline("maincpu", M68K_IRQ_6);
-	// ABORT Button at IRQ7
+	m_acia1->irq_handler().set_inputline(m_maincpu, M68K_IRQ_5);
+	m_acia2->irq_handler().set_inputline(m_maincpu, M68K_IRQ_6);
+	// Abort button at IRQ7, see abort_button()
 
 	// Set up terminal RS-232.
 
@@ -160,19 +168,16 @@ void mex68kecb_state::mex68kecb(machine_config &config)
 void mex68kecb_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x000007).ram().w(FUNC(mex68kecb_state::bootvect_w));       /* After first write we act as RAM */
-	map(0x000000, 0x000007).rom().r(FUNC(mex68kecb_state::bootvect_r));       /* ROM mirror just during reset */
-	map(0x000008, 0x007fff).ram(); /* 32KB RAM */
-	map(0x008000, 0x00bfff).rom().region("roms", 0); /* 16KB ROM */
-	map(0x010000, 0x01003f).rw("pit", FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
-	map(0x010040, 0x010043).rw("acia1", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
-	map(0x010040, 0x010043).rw("acia2", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
-}
 
-void mex68kecb_state::machine_start()
-{
-	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
-	m_sysrom = (uint16_t *)(memregion("roms")->base());
+	map(0x000000, 0x007fff).ram().share("ram"); // 32KB RAM
+	map(0x008000, 0x00bfff).rom().region("roms", 0); // 16KB ROM
+	map(0x010000, 0x01003f).rw(m_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
+	map(0x010040, 0x010043).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
+	map(0x010040, 0x010043).rw(m_acia2, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+
+	map(0x000000, 0x000007).view(m_bootvect);
+	m_bootvect[0](0x000000, 0x000007).rom().region("roms", 0);              // After first write we act as RAM
+	m_bootvect[0](0x000000, 0x000007).w(FUNC(mex68kecb_state::bootvect_w)); // ROM mirror just during reset
 }
 
 void mex68kecb_state::machine_reset()
@@ -181,34 +186,35 @@ void mex68kecb_state::machine_reset()
 	m_brg->rsa_w(CLEAR_LINE);
 	m_brg->rsb_w(ASSERT_LINE);
 
-	/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
-	if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
-		m_sysrom = (uint16_t*)(memregion("roms")->base());
+	// Reset pointer to bootvector in ROM for bootvector view
+	m_bootvect.select(0);
 }
 
-template <u8 bit>
+template <uint8_t Bit>
 void mex68kecb_state::write_acia_clock(int state)
 {
-	if (BIT(m_acia1_baud->read(), bit)) {
+	if (BIT(m_acia1_baud->read(), Bit)) {
 		m_acia1->write_txc(state);
 		m_acia1->write_rxc(state);
 	}
 
-	if (BIT(m_acia2_baud->read(), bit)) {
+	if (BIT(m_acia2_baud->read(), Bit)) {
 		m_acia2->write_txc(state);
 		m_acia2->write_rxc(state);
 	}
 }
 
-/* Boot vector handler, the PCB hardwires the first 16 bytes from 0xfc0000 to 0x0 at reset. */
-uint16_t mex68kecb_state::bootvect_r(offs_t offset) {
-	return m_sysrom[offset];
+// Abort button handler
+INPUT_CHANGED_MEMBER(mex68kecb_state::abort_button)
+{
+	m_maincpu->set_input_line(M68K_IRQ_7, newval ? CLEAR_LINE : ASSERT_LINE); // active low
 }
 
-void mex68kecb_state::bootvect_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
-	m_sysram[offset % std::size(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % std::size(m_sysram)] |= (data & mem_mask);
-	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
+// Boot vector handler, the PCB hardwires the first 8 bytes from 0x008000 to 0x0 at reset.
+void mex68kecb_state::bootvect_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_sysram[offset]);
+	m_bootvect.disable(); // redirect all upcoming accesses to masking RAM until reset.
 }
 
 
@@ -222,7 +228,9 @@ ROM_START( mex68kecb )
 	ROMX_LOAD("tutor13l.bin", 0x000001, 0x002000, CRC(2bb3a4e2) SHA1(3dac64ec5af4f46a367959ec80677103e3822f20), ROM_SKIP(1) | ROM_BIOS(0) )
 ROM_END
 
+} // anonymous namespace
 
-/* Driver */
-/*    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY     FULLNAME            FLAGS */
-COMP( 1981, mex68kecb, 0,      0,      mex68kecb, mex68kecb, mex68kecb_state, empty_init, "Motorola", "Motorola 68K ECB", MACHINE_NO_SOUND_HW )
+
+// Driver
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY     FULLNAME            FLAGS
+COMP( 1981, mex68kecb, 0,      0,      mex68kecb, mex68kecb, mex68kecb_state, empty_init, "Motorola", "Motorola 68K ECB", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

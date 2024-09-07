@@ -239,7 +239,7 @@ VIDEO_START_MEMBER(redalert_state,demoneye)
 {
 	VIDEO_START_CALL_MEMBER( redalert );
 
-	save_pointer(NAME(m_demoneye_bitmap_reg), 4);
+	save_item(NAME(m_demoneye_bitmap_reg));
 	save_item(NAME(m_demoneye_bitmap_yoffs));
 }
 

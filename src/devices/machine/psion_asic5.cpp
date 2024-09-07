@@ -133,6 +133,8 @@ void psion_asic5_device::rcv_callback()
 
 void psion_asic5_device::rcv_complete()
 {
+	receive_register_extract();
+
 	if (is_receive_framing_error() || is_receive_parity_error())
 		m_int_status |= 0x04;
 
@@ -389,7 +391,6 @@ uint8_t psion_asic5_device::data_r()
 			break;
 
 		case 0x09: // UART Receive register
-			receive_register_extract();
 			data = get_received_char();
 			LOG("%s data_r: UART Receive register %02x\n", machine().describe_context(), data);
 			m_int_status &= ~0x01;

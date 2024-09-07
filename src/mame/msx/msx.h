@@ -351,6 +351,7 @@ protected:
 	void set_cold_boot_flags(u8 cold_boot_flags) { m_cold_boot_flags = cold_boot_flags; }
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void msx2plus_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
 	void msx2plus_pal_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);

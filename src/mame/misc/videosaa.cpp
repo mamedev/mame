@@ -386,7 +386,7 @@ void videosaa_state::machine_start()
 	save_pointer(NAME(m_vram0), 0x800);
 	save_pointer(NAME(m_vram1), 0x800);
 	save_item(NAME(m_chip_latch));
-	save_pointer(NAME(m_video_latch), 4);
+	save_item(NAME(m_video_latch));
 }
 
 void videosaa_state::machine_reset()

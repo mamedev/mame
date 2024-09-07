@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "acan.h"
 
-#define VERBOSE     (1)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 // device type definition

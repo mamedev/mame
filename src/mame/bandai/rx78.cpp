@@ -459,7 +459,7 @@ void rx78_state::machine_start()
 	save_pointer(NAME(m_vram), 0xc000);
 	save_item(NAME(m_vram_read_bank));
 	save_item(NAME(m_vram_write_bank));
-	save_pointer(NAME(m_pal_reg), 7);
+	save_item(NAME(m_pal_reg));
 	save_item(NAME(m_pri_mask));
 	save_item(NAME(m_key_mux));
 	save_item(NAME(m_background));
