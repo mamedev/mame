@@ -102,6 +102,8 @@ namespace {
 
 // NOTE: same as sega/segac2.cpp XL2
 static constexpr XTAL U13_CLOCK = XTAL(53'693'175);
+// TODO: bump to 4 after conversion of video_r/_w to um6618_map
+static constexpr int ROZ_LAYER_NUMBER = 3;
 
 #define DRAW_DEBUG_ROZ          (0)
 
@@ -222,9 +224,11 @@ private:
 	uint16_t m_video_flags = 0;
 	uint16_t m_tilemap_flags[3]{};
 	uint16_t m_tilemap_mode[3]{};
+	uint16_t m_tilemap_tile_mode[3]{};
 
 	uint32_t m_roz_base_addr = 0;
 	uint16_t m_roz_mode = 0;
+	uint16_t m_roz_tile_mode = 0;
 	uint32_t m_roz_scrollx = 0;
 	uint32_t m_roz_scrolly = 0;
 	uint16_t m_roz_tile_bank = 0;
@@ -351,17 +355,25 @@ void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int
 	if (region == 0)
 		tile_bank >>= 1;
 
-    // speedyd and slghtsag hints that text layer color offsets are in steps of 4
+	// speedyd and slghtsag hints that text layer color offsets in steps of 4
 	if (region == 2)
 		palette_shift = 2;
 
 	if (layer == 2)
 		tile_bank = (0x1000 | (tile_bank << 1)) & 0x1c00;
 
-	int tile = (vram[count] & 0x03ff) + tile_bank;
-	int flipxy = (vram[count] & 0x0c00) >> 10;
-	int palette = ((vram[count] & 0xf000) >> 12) << palette_shift;
+	u8 palette_base = ((vram[count] & 0xf000) >> 12);
 
+	// speedyd gameplay
+	if (BIT(m_tilemap_tile_mode[layer], 9))
+	{
+		tileinfo.category = !BIT(palette_base, 3);
+		palette_base |= 8;
+	}
+
+	u16 tile = (vram[count] & 0x03ff) + tile_bank;
+	u8 flipxy = (vram[count] & 0x0c00) >> 10;
+	u8 palette = palette_base << palette_shift;
 
 	tileinfo.set(region, tile, palette, TILE_FLIPXY(flipxy));
 }
@@ -375,7 +387,6 @@ void supracan_state::get_roz_tilemap_info(int layer, tile_data &tileinfo, int co
 
 	int region = 1;
 	uint16_t tile_bank = 0;
-	uint16_t palette_bank = 0;
 
 	region = get_tilemap_region(layer);
 
@@ -410,9 +421,18 @@ void supracan_state::get_roz_tilemap_info(int layer, tile_data &tileinfo, int co
 
 	count += base;
 
-	int tile = (vram[count] & 0x03ff) + tile_bank;
-	int flipxy = (vram[count] & 0x0c00) >> 10;
-	int palette = ((vram[count] & 0xf000) >> 12) + palette_bank;
+	u8 palette_base = ((vram[count] & 0xf000) >> 12);
+
+	// sonevil gameplay
+	if (BIT(m_roz_tile_mode, 9))
+	{
+		tileinfo.category = !BIT(palette_base, 3);
+		palette_base |= 8;
+	}
+
+	u16 tile = (vram[count] & 0x03ff) + tile_bank;
+	u8 flipxy = (vram[count] & 0x0c00) >> 10;
+	u8 palette = palette_base;
 
 	tileinfo.set(region, tile, palette, TILE_FLIPXY(flipxy));
 }
@@ -477,7 +497,7 @@ int supracan_state::get_tilemap_dimensions(int &xsize, int &ysize, int layer)
 	ysize = 32;
 
 	int select;
-	if (layer == 3)
+	if (layer == ROZ_LAYER_NUMBER)
 		select = m_roz_mode & 0x0f00;
 	else
 		select = m_tilemap_flags[layer] & 0x0f00;
@@ -997,12 +1017,12 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	for (int pri = 7; pri >= 0; pri--)
 	{
 		// Wanted like this by speedyd, formduel and magipool at very least
-		for (int layer = 0; layer < 4; layer ++)
+		for (int layer = 0; layer < ROZ_LAYER_NUMBER + 1; layer ++)
 		{
 			int enabled = 0;
 
 			// ROZ
-			if (layer == 3)
+			if (layer == ROZ_LAYER_NUMBER)
 			{
 				enabled = BIT(m_video_flags, 2);
 				if (!enabled)
@@ -1033,7 +1053,7 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					case 4: transmask = 0x01; break;
 				}
 
-				if (layer != 3) // standard layers, NOT roz
+				if (layer != ROZ_LAYER_NUMBER)
 				{
 					int wrap = (m_tilemap_flags[layer] & 0x20);
 
@@ -1910,6 +1930,7 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	/* Tilemap 0 */
 	case 0x100/2: m_tilemap_flags[0] = data; LOGMASKED(LOG_TILEMAP0, "tilemap_flags[0] = %04x\n", data); break;
+	case 0x102/2: m_tilemap_tile_mode[0] = data; break;
 	case 0x104/2: m_tilemap_scrollx[0] = data; LOGMASKED(LOG_TILEMAP0, "tilemap_scrollx[0] = %04x\n", data); break;
 	case 0x106/2: m_tilemap_scrolly[0] = data; LOGMASKED(LOG_TILEMAP0, "tilemap_scrolly[0] = %04x\n", data); break;
 	case 0x108/2: m_tilemap_base_addr[0] = data << 1; LOGMASKED(LOG_TILEMAP0, "tilemap_base_addr[0] = %05x\n", data << 2); break;
@@ -1917,6 +1938,7 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	/* Tilemap 1 */
 	case 0x120/2: m_tilemap_flags[1] = data; LOGMASKED(LOG_TILEMAP1, "tilemap_flags[1] = %04x\n", data); break;
+	case 0x122/2: m_tilemap_tile_mode[1] = data; break;
 	case 0x124/2: m_tilemap_scrollx[1] = data; LOGMASKED(LOG_TILEMAP1, "tilemap_scrollx[1] = %04x\n", data); break;
 	case 0x126/2: m_tilemap_scrolly[1] = data; LOGMASKED(LOG_TILEMAP1, "tilemap_scrolly[1] = %04x\n", data); break;
 	case 0x128/2: m_tilemap_base_addr[1] = data << 1; LOGMASKED(LOG_TILEMAP1, "tilemap_base_addr[1] = %05x\n", data << 2); break;
@@ -1924,6 +1946,7 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	/* Tilemap 2? */
 	case 0x140/2: m_tilemap_flags[2] = data; LOGMASKED(LOG_TILEMAP2, "tilemap_flags[2] = %04x\n", data); break;
+	case 0x142/2: m_tilemap_tile_mode[2] = data; break;
 	case 0x144/2: m_tilemap_scrollx[2] = data; LOGMASKED(LOG_TILEMAP2, "tilemap_scrollx[2] = %04x\n", data); break;
 	case 0x146/2: m_tilemap_scrolly[2] = data; LOGMASKED(LOG_TILEMAP2, "tilemap_scrolly[2] = %04x\n", data); break;
 	case 0x148/2: m_tilemap_base_addr[2] = data << 1; LOGMASKED(LOG_TILEMAP2, "tilemap_base_addr[2] = %05x\n", data << 2); break;
@@ -1931,6 +1954,7 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	/* ROZ */
 	case 0x180/2: m_roz_mode = data; LOGMASKED(LOG_ROZ, "roz_mode = %04x\n", data); break;
+	case 0x182/2: m_roz_tile_mode = data; break;
 	case 0x184/2: m_roz_scrollx = (data << 16) | (m_roz_scrollx & 0xffff); m_roz_changed |= 1; LOGMASKED(LOG_ROZ, "roz_scrollx = %08x\n", m_roz_scrollx); break;
 	case 0x186/2: m_roz_scrollx = (data) | (m_roz_scrollx & 0xffff0000); m_roz_changed |= 1; LOGMASKED(LOG_ROZ, "roz_scrollx = %08x\n", m_roz_scrollx); break;
 	case 0x188/2: m_roz_scrolly = (data << 16) | (m_roz_scrolly & 0xffff); m_roz_changed |= 2; LOGMASKED(LOG_ROZ, "roz_scrolly = %08x\n", m_roz_scrolly); break;
