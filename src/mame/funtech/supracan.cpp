@@ -1241,13 +1241,21 @@ template <unsigned ch> void supracan_state::dma_w(offs_t offset, uint16_t data, 
 		{
 			LOGMASKED(LOG_DMA, "dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", m_dma_regs.source[ch], m_dma_regs.dest[ch], m_dma_regs.count[ch] + 1, data);
 
+			// formduel sets both for gameplay to work
+			// TODO: verify which one is source and which destination
+			const bool dest_dec = BIT(data, 10);
+			const bool src_dec  = BIT(data, 9);
+
+			if (dest_dec ^ src_dec)
+				popmessage("DMA trigger %04x with one increment bit set %04x", data, data & 0x0600);
+
 			for (int i = 0; i <= m_dma_regs.count[ch]; i++)
 			{
 				if (data & 0x1000)
 				{
 					mem.write_word(m_dma_regs.dest[ch], mem.read_word(m_dma_regs.source[ch]));
-					m_dma_regs.dest[ch] += 2;
-					m_dma_regs.source[ch] += 2;
+					m_dma_regs.dest[ch]   += dest_dec ? -2 : 2;
+					m_dma_regs.source[ch] += src_dec  ? -2 : 2;
 					if (data & 0x0100)
 					{
 						// staiwbbl, indirect transfers towards port $f00010-$1f
@@ -1258,8 +1266,8 @@ template <unsigned ch> void supracan_state::dma_w(offs_t offset, uint16_t data, 
 				else
 				{
 					mem.write_byte(m_dma_regs.dest[ch], mem.read_byte(m_dma_regs.source[ch]));
-					m_dma_regs.dest[ch]++;
-					m_dma_regs.source[ch]++;
+					m_dma_regs.dest[ch]   += dest_dec ? -1 : 1;
+					m_dma_regs.source[ch] += src_dec  ? -1 : 1;
 				}
 			}
 		}
@@ -1321,6 +1329,8 @@ void supracan_state::main_map(address_map &map)
 	map(0xe90b3c, 0xe90b3d).noprw(); // noisy during lockout checks
 
 	map(0xeb0d00, 0xeb0d03).rw(m_lockout, FUNC(umc6650_device::read), FUNC(umc6650_device::write)).umask16(0x00ff);
+
+//  map(0xec0000, 0xec*fff) Cart NVRAM, 8-bit interface
 
 	map(0xf00000, 0xf001ff).rw(FUNC(supracan_state::video_r), FUNC(supracan_state::video_w));
 	map(0xf00200, 0xf003ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
