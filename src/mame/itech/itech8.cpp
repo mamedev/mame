@@ -1721,7 +1721,7 @@ void itech8_state::itech8_core_devices(machine_config &config)
 {
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_RANDOM);
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_LOW);
 
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 

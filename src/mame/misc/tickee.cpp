@@ -806,8 +806,8 @@ void tickee_gun_state::tickee(machine_config &config)
 	set_beamadd(50, 0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	TICKET_DISPENSER(config, m_ticket[0], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_ticket[1], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket[0], attotime::from_msec(100), ticket_dispenser_device::MOTOR_ACTIVE_LOW, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket[1], attotime::from_msec(100), ticket_dispenser_device::MOTOR_ACTIVE_LOW, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
 
 	// video hardware
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
@@ -850,8 +850,8 @@ void tickee_state::mouseatk(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	TICKET_DISPENSER(config, m_ticket[0], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_ticket[1], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket[0], attotime::from_msec(100), ticket_dispenser_device::MOTOR_ACTIVE_LOW, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket[1], attotime::from_msec(100), ticket_dispenser_device::MOTOR_ACTIVE_LOW, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
 
 	// video hardware
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
@@ -908,7 +908,7 @@ void tickee_gun_state::maletmad(machine_config &config)
 {
 	rapidfir(config);
 
-	TICKET_DISPENSER(config, m_ticket[0], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket[0], attotime::from_msec(100), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
 }
 
 

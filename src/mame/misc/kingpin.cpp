@@ -240,7 +240,7 @@ void kingpin_state::kingpin(machine_config &config)
 
 	AY8912(config, "aysnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, "hopper", attotime::from_msec(100), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 
 	config.set_default_layout(layout_kingpin);
 }

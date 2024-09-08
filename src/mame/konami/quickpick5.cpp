@@ -22,16 +22,18 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/eepromser.h"
-#include "sound/k051649.h"
-#include "sound/okim6295.h"
 #include "k053244_k053245.h"
 #include "konami_helper.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
 #include "machine/k053252.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
+#include "sound/k051649.h"
+#include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -587,7 +589,7 @@ void quickpick5_state::quickpick5(machine_config &config)
 	Z80(config, m_maincpu, XTAL(32'000'000)/4); // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &quickpick5_state::quickpick5_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(quickpick5_state::scanline), "screen", 0, 1);
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, "hopper", attotime::from_msec(100), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 
 	K053252(config, m_k053252, XTAL(32'000'000)/4); /* K053252, xtal verified, divider not verified */
 	m_k053252->int1_ack().set(FUNC(quickpick5_state::vbl_ack_w));

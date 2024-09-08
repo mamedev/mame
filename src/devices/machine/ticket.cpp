@@ -43,8 +43,8 @@ DEFINE_DEVICE_TYPE(HOPPER, hopper_device, "coin_hopper", "Coin Hopper")
 
 ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_motor_sense(TICKET_MOTOR_ACTIVE_LOW)
-	, m_status_sense(TICKET_STATUS_ACTIVE_LOW)
+	, m_motor_sense(MOTOR_ACTIVE_LOW)
+	, m_status_sense(STATUS_ACTIVE_LOW)
 	, m_period(attotime::from_msec(100))
 	, m_hopper_type(false)
 	, m_motoron(0)
@@ -134,8 +134,8 @@ void ticket_dispenser_device::motor_w(int state)
 
 void ticket_dispenser_device::device_start()
 {
-	m_motoron = (m_motor_sense == TICKET_MOTOR_ACTIVE_HIGH);
-	m_ticketdispensed = (m_status_sense == TICKET_STATUS_ACTIVE_HIGH);
+	m_motoron = (m_motor_sense == MOTOR_ACTIVE_HIGH);
+	m_ticketdispensed = (m_status_sense == STATUS_ACTIVE_HIGH);
 	m_ticketnotdispensed = !m_ticketdispensed;
 
 	m_timer = timer_alloc(FUNC(ticket_dispenser_device::update_output_state), this);

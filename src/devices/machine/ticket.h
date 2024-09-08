@@ -17,20 +17,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-// device type definition
 DECLARE_DEVICE_TYPE(TICKET_DISPENSER, ticket_dispenser_device)
 DECLARE_DEVICE_TYPE(HOPPER, hopper_device)
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-const uint8_t TICKET_MOTOR_ACTIVE_LOW = 0;    /* Ticket motor is triggered by D7=0 */
-const uint8_t TICKET_MOTOR_ACTIVE_HIGH = 1;    /* Ticket motor is triggered by D7=1 */
-
-const uint8_t TICKET_STATUS_ACTIVE_LOW = 0;    /* Ticket is done dispensing when D7=0 */
-const uint8_t TICKET_STATUS_ACTIVE_HIGH = 1;    /* Ticket is done dispensing when D7=1 */
-
 
 
 //**************************************************************************
@@ -42,6 +30,12 @@ const uint8_t TICKET_STATUS_ACTIVE_HIGH = 1;    /* Ticket is done dispensing whe
 class ticket_dispenser_device : public device_t
 {
 public:
+	static inline constexpr uint8_t MOTOR_ACTIVE_LOW = 0;    // activated by state = 0
+	static inline constexpr uint8_t MOTOR_ACTIVE_HIGH = 1;   // activated by state = 1
+
+	static inline constexpr uint8_t STATUS_ACTIVE_LOW = 0;   // output 0 when dispensing is done
+	static inline constexpr uint8_t STATUS_ACTIVE_HIGH = 1;  // output 1 when dispensing is done
+
 	// construction/destruction
 	ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, const attotime &period, uint8_t motor_sense, uint8_t status_sense)
 		: ticket_dispenser_device(mconfig, tag, owner)

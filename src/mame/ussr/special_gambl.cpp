@@ -274,7 +274,7 @@ void dinaris_state::dice(machine_config &config)
 	m_ppi2->out_pc_callback().set(FUNC(dinaris_state::ppi2c_w));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(100), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 }
 
 ROM_START(dindice)

@@ -337,7 +337,7 @@ void wackygtr_state::wackygtr(machine_config &config)
 	m_pit8253[1]->set_clk<2>(XTAL(3'579'545)/16);  // this is a guess
 	m_pit8253[1]->out_handler<2>().set(FUNC(wackygtr_state::alligator_ck<4>));
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
 }
 
 

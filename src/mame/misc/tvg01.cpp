@@ -308,7 +308,7 @@ void tvg01_state::theboat(machine_config &config)
 	vdp.set_vram_size(VDP_MEM);  // 4x MB81464-15
 	vdp.int_cb().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
-	TICKET_DISPENSER(config, "hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "hopper", attotime::from_msec(HOPPER_PULSE), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
 
 	SPEAKER(config, "mono").front_center();
 

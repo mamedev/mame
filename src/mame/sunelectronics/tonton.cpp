@@ -226,7 +226,7 @@ void tonton_state::tonton(machine_config &config)
 	m_v9938->int_cb().set_inputline(m_maincpu, 0);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW );
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_LOW);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

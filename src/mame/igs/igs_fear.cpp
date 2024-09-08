@@ -783,7 +783,7 @@ void igs_fear_state::igs_fear(machine_config &config)
 
 	V3021(config, "rtc");
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

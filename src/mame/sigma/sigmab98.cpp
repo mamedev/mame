@@ -1444,7 +1444,7 @@ void sigmab98_state::sigmab98(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_LOW, ticket_dispenser_device::STATUS_ACTIVE_LOW );
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1516,7 +1516,7 @@ void lufykzku_state::lufykzku(machine_config &config)
 	// No EEPROM
 
 	MB3773(config, m_watchdog, 0);
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_LOW, ticket_dispenser_device::STATUS_ACTIVE_LOW );
 
 	// 2 x 8-bit parallel/serial converters
 	TTL165(config, m_dsw_shifter[0]);
@@ -1593,7 +1593,7 @@ void sammymdl_state::sammymdl(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // battery backed RAM
 	EEPROM_93C46_8BIT(config, "eeprom");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_LOW, ticket_dispenser_device::STATUS_ACTIVE_LOW );
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -1640,8 +1640,8 @@ void sammymdl_state::gocowboy(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(sammymdl_state::gocowboy_int), "screen", 0, 1);
 
 	config.device_remove("hopper");
-	TICKET_DISPENSER(config, m_hopper_small, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
-	TICKET_DISPENSER(config, m_hopper_large, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
+	TICKET_DISPENSER(config, m_hopper_small, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_LOW, ticket_dispenser_device::STATUS_ACTIVE_LOW );
+	TICKET_DISPENSER(config, m_hopper_large, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_LOW, ticket_dispenser_device::STATUS_ACTIVE_LOW );
 
 	m_screen->screen_vblank().set_nop();
 }

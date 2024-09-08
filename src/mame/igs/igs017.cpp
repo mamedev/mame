@@ -4436,7 +4436,7 @@ void igs017_state::tarzan(machine_config &config)
 	m_igs017_igs031->in_pa_callback().set_ioport("COINS");
 	m_igs017_igs031->in_pb_callback().set(FUNC(igs017_state::tarzan_keys_joy_r));
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4470,7 +4470,7 @@ void igs017_state::starzan(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("PLAYER1");
 	m_igs017_igs031->in_pc_callback().set(FUNC(igs017_state::dsw_r));
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4504,7 +4504,7 @@ void igs017_state::happyskl(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("PLAYER1");
 	m_igs017_igs031->in_pc_callback().set(FUNC(igs017_state::dsw_r));
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tarzan_palette_bitswap));
@@ -4529,7 +4529,7 @@ void igs017_state::cpoker2(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("PLAYER1");
 	m_igs017_igs031->in_pc_callback().set(FUNC(igs017_state::dsw_r));
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 
 	// protection
 	IGS_INCDEC(config, m_igs_incdec, 0);
@@ -4559,7 +4559,7 @@ void igs017_state::tjsb(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
 	m_igs017_igs031->in_pc_callback().set_ioport("DSW3");
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4590,7 +4590,7 @@ void igs017_state::spkrform(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
 	m_igs017_igs031->in_pc_callback().set_ioport("DSW3");
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4630,7 +4630,7 @@ void igs017_state::mgcs(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set(FUNC(igs017_state::mgcs_keys_joy_r));
 	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4664,7 +4664,7 @@ void igs017_state::lhzb2(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW1");
 	m_igs017_igs031->in_pc_callback().set_ioport("DSW2");
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4699,7 +4699,7 @@ void igs017_state::lhzb2a(machine_config &config)
 
 	// ppi8255 not used for i/o (just video enable)?
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4736,7 +4736,7 @@ void igs017_state::slqz2(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW1");
 	m_igs017_igs031->in_pc_callback().set_ioport("DSW2");
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4765,7 +4765,7 @@ void igs017_state::sdmg2(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
 	// DSW3 is read but unused (it's not populated on the PCB)
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 
 	// protection
 	IGS_INCDEC(config, m_igs_incdec, 0);
@@ -4798,7 +4798,7 @@ void igs017_state::mgdha(machine_config &config)
 
 	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 }
 
 void igs017_state::mgdh(machine_config &config)
@@ -4826,7 +4826,7 @@ void igs017_state::sdmg2p(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
 	m_igs017_igs031->in_pc_callback().set_ioport("DSW3"); // there are 3 DIP banks on PCB but only two are shown in test mode
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 
 	IGS_STRING(config, m_igs_string, 0);
 }

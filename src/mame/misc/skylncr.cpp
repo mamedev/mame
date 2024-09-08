@@ -1689,7 +1689,7 @@ void skylncr_state::skylncr(machine_config &config)
 	ppi1.in_pb_callback().set_ioport("IN3");
 	ppi1.in_pc_callback().set_ioport("IN4");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

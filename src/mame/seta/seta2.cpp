@@ -2371,7 +2371,7 @@ void seta2_state::reelquak(machine_config &config)
 	downcast<tmp68301_device &>(*m_maincpu).parallel_w_cb().set(FUNC(seta2_state::reelquak_leds_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	TICKET_DISPENSER(config, m_dispenser, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_dispenser, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_LOW);
 
 	m_screen->set_visarea(0x00, 0x140-1, 0x000, 0x0f0-1);
 }
@@ -2417,7 +2417,7 @@ void seta2_state::telpacfl(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom"); // not hooked up, seems unused
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	HOPPER(config, m_dispenser, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_dispenser, attotime::from_msec(200), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
 
 	// video hardware
 	m_screen->set_visarea(0x0, 0x180-1, 0x00, 0xf0-1); // still off by 1 because of different CRTC regs?

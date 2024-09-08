@@ -1081,7 +1081,7 @@ void gsan_state::gs_medal(machine_config &config)
 
 	m_screen->set_raw(XTAL(36'000'000) / 5, 457, 0, 320, 262, 0, 240);
 
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, "hopper", attotime::from_msec(100), hopper_device::MOTOR_ACTIVE_LOW, hopper_device::STATUS_ACTIVE_HIGH);
 }
 
 void gsan_state::init_gsan()
