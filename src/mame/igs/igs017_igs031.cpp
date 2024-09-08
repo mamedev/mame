@@ -22,7 +22,7 @@ void igs017_igs031_device::map(address_map &map)
 	map(0x1800, 0x1bff).ram().w(FUNC(igs017_igs031_device::palram_w)).share("palram");
 	map(0x1c00, 0x1fff).ram();
 
-	map(0x2010, 0x2013).r(FUNC(igs017_igs031_device::i8255_r));
+	map(0x2010, 0x2012).r(FUNC(igs017_igs031_device::input_port_r));
 	map(0x2012, 0x2012).w(FUNC(igs017_igs031_device::video_disable_w));
 
 	map(0x2014, 0x2014).w(FUNC(igs017_igs031_device::nmi_enable_w));
@@ -32,13 +32,9 @@ void igs017_igs031_device::map(address_map &map)
 	map(0x6000, 0x7fff).ram().w(FUNC(igs017_igs031_device::bg_w)).share("bg_videoram");
 }
 
-u8 igs017_igs031_device::i8255_r(offs_t offset)
+u8 igs017_igs031_device::input_port_r(offs_t offset)
 {
-	if (m_i8255)
-		return m_i8255->read(offset);
-
-	logerror("igs017_igs031_device::i8255_r(%02x) with no 8255 device\n", offset);
-	return 0;
+	return m_input_port_cb[offset]();
 }
 
 
@@ -68,11 +64,11 @@ igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const 
 	, device_memory_interface(mconfig, *this)
 	, m_palette_scramble_cb(*this, FUNC(igs017_igs031_device::palette_callback_straight))
 	, m_space_config("igs017_igs031", ENDIANNESS_BIG, 8,15, 0, address_map_constructor(FUNC(igs017_igs031_device::map), this))
+	, m_input_port_cb(*this, 0xff)
 	, m_spriteram(*this, "spriteram")
 	, m_fg_videoram(*this, "fg_videoram")
 	, m_bg_videoram(*this, "bg_videoram")
 	, m_palram(*this, "palram")
-	, m_i8255(*this, finder_base::DUMMY_TAG)
 	, m_palette(*this, "palette")
 	, m_revbits(false)
 {

@@ -3192,7 +3192,7 @@ static INPUT_PORTS_START( mgcs )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 
-	// Joystick mode: the top 2 bits of COINS (i8255 port A) and JOY (i8255 port B) are read and combined with the bottom 4 bits read from port C (see code at $1c83a)
+	// Joystick mode: the top 2 bits of COINS (port A) and JOY (port B) are read and combined with the bottom 4 bits read from port C (see code at $1c83a)
 
 	PORT_START("JOY")
 	// Joystick mode:
@@ -3200,7 +3200,7 @@ static INPUT_PORTS_START( mgcs )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1        ) // take tile or throw (as N in mahjong keyboard)
-	// i8255 port C input is 4 bits
+	// Port C input is 4 bits
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1         )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
 
@@ -4344,7 +4344,6 @@ void igs017_state::base_machine_oki(machine_config &config, const XTAL &xtal_oki
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -4377,9 +4376,9 @@ void igs017_state::iqblocka(machine_config &config)
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::iqblocka_mux_map);
 
-	m_ppi->in_pa_callback().set_ioport("DSW1");
-	m_ppi->in_pb_callback().set_ioport("DSW2");
-	m_ppi->in_pc_callback().set_ioport("DSW3");
+	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
+	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
+	m_igs017_igs031->in_pc_callback().set_ioport("DSW3");
 
 	// protection
 	IGS_BITSWAP(config, m_igs_bitswap, 0);
@@ -4434,8 +4433,8 @@ void igs017_state::tarzan(machine_config &config)
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::tarzan_mux_map);
 
-	m_ppi->in_pa_callback().set_ioport("COINS");
-	m_ppi->in_pb_callback().set(FUNC(igs017_state::tarzan_keys_joy_r));
+	m_igs017_igs031->in_pa_callback().set_ioport("COINS");
+	m_igs017_igs031->in_pb_callback().set(FUNC(igs017_state::tarzan_keys_joy_r));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
@@ -4467,9 +4466,9 @@ void igs017_state::starzan(machine_config &config)
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::starzan_mux_map);
 
-	m_ppi->in_pa_callback().set_ioport("COINS");
-	m_ppi->in_pb_callback().set_ioport("PLAYER1");
-	m_ppi->in_pc_callback().set(FUNC(igs017_state::dsw_r));
+	m_igs017_igs031->in_pa_callback().set_ioport("COINS");
+	m_igs017_igs031->in_pb_callback().set_ioport("PLAYER1");
+	m_igs017_igs031->in_pc_callback().set(FUNC(igs017_state::dsw_r));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
@@ -4501,9 +4500,9 @@ void igs017_state::happyskl(machine_config &config)
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::happyskl_mux_map);
 
-	m_ppi->in_pa_callback().set_ioport("COINS");
-	m_ppi->in_pb_callback().set_ioport("PLAYER1");
-	m_ppi->in_pc_callback().set(FUNC(igs017_state::dsw_r));
+	m_igs017_igs031->in_pa_callback().set_ioport("COINS");
+	m_igs017_igs031->in_pb_callback().set_ioport("PLAYER1");
+	m_igs017_igs031->in_pc_callback().set(FUNC(igs017_state::dsw_r));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
@@ -4526,9 +4525,9 @@ void igs017_state::cpoker2(machine_config &config)
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::cpoker2_mux_map);
 
-	m_ppi->in_pa_callback().set_ioport("COINS");
-	m_ppi->in_pb_callback().set_ioport("PLAYER1");
-	m_ppi->in_pc_callback().set(FUNC(igs017_state::dsw_r));
+	m_igs017_igs031->in_pa_callback().set_ioport("COINS");
+	m_igs017_igs031->in_pb_callback().set_ioport("PLAYER1");
+	m_igs017_igs031->in_pc_callback().set(FUNC(igs017_state::dsw_r));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
@@ -4556,9 +4555,9 @@ void igs017_state::tjsb(machine_config &config)
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::tjsb_mux_map);
 
-	m_ppi->in_pa_callback().set_ioport("DSW1");
-	m_ppi->in_pb_callback().set_ioport("DSW2");
-	m_ppi->in_pc_callback().set_ioport("DSW3");
+	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
+	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
+	m_igs017_igs031->in_pc_callback().set_ioport("DSW3");
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
@@ -4587,9 +4586,9 @@ void igs017_state::spkrform(machine_config &config)
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::spkrform_mux_map);
 
-	m_ppi->in_pa_callback().set_ioport("DSW1");
-	m_ppi->in_pb_callback().set_ioport("DSW2");
-	m_ppi->in_pc_callback().set_ioport("DSW3");
+	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
+	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
+	m_igs017_igs031->in_pc_callback().set_ioport("DSW3");
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
@@ -4627,9 +4626,9 @@ void igs017_state::mgcs(machine_config &config)
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::mgcs_mux_map);
 
-	m_ppi->in_pa_callback().set_ioport("COINS");
-	m_ppi->in_pb_callback().set(FUNC(igs017_state::mgcs_keys_joy_r));
-	m_ppi->in_pc_callback().set_ioport("JOY");
+	m_igs017_igs031->in_pa_callback().set_ioport("COINS");
+	m_igs017_igs031->in_pb_callback().set(FUNC(igs017_state::mgcs_keys_joy_r));
+	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
@@ -4661,9 +4660,9 @@ void igs017_state::lhzb2(machine_config &config)
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::lhzb2_mux_map);
 
-	m_ppi->in_pa_callback().set_ioport("COINS");
-	m_ppi->in_pb_callback().set_ioport("DSW1");
-	m_ppi->in_pc_callback().set_ioport("DSW2");
+	m_igs017_igs031->in_pa_callback().set_ioport("COINS");
+	m_igs017_igs031->in_pb_callback().set_ioport("DSW1");
+	m_igs017_igs031->in_pc_callback().set_ioport("DSW2");
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
@@ -4733,9 +4732,9 @@ void igs017_state::slqz2(machine_config &config)
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::slqz2_mux_map);
 
-	m_ppi->in_pa_callback().set_ioport("COINS");
-	m_ppi->in_pb_callback().set_ioport("DSW1");
-	m_ppi->in_pc_callback().set_ioport("DSW2");
+	m_igs017_igs031->in_pa_callback().set_ioport("COINS");
+	m_igs017_igs031->in_pb_callback().set_ioport("DSW1");
+	m_igs017_igs031->in_pc_callback().set_ioport("DSW2");
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
@@ -4762,8 +4761,8 @@ void igs017_state::sdmg2(machine_config &config)
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::sdmg2_mux_map);
 
-	m_ppi->in_pa_callback().set_ioport("DSW1");
-	m_ppi->in_pb_callback().set_ioport("DSW2");
+	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
+	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
 	// DSW3 is read but unused (it's not populated on the PCB)
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
@@ -4797,7 +4796,7 @@ void igs017_state::mgdha(machine_config &config)
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::mgdha_mux_map);
 
-	m_ppi->in_pa_callback().set_ioport("DSW1");
+	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 }
@@ -4823,9 +4822,9 @@ void igs017_state::sdmg2p(machine_config &config)
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::sdmg2p_mux_map);
 
-	m_ppi->in_pa_callback().set_ioport("DSW1");
-	m_ppi->in_pb_callback().set_ioport("DSW2");
-	m_ppi->in_pc_callback().set_ioport("DSW3"); // there are 3 DIP banks on PCB but only two are shown in test mode
+	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
+	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
+	m_igs017_igs031->in_pc_callback().set_ioport("DSW3"); // there are 3 DIP banks on PCB but only two are shown in test mode
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 

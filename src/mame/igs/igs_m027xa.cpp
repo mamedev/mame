@@ -104,6 +104,7 @@ void igs_m027xa_state::igs_mahjong_map(address_map &map)
 	map(0x18000000, 0x18007fff).ram();
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
+	map(0x38009000, 0x38009003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027xa_state::rnd_r));
 
 	map(0x58000000, 0x580000ff).ram(); // XA?
@@ -158,13 +159,13 @@ void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027xa_state::interrupt), "screen", 0, 1);
 
 	I8255A(config, m_ppi);
-	m_ppi->in_pa_callback().set_ioport("TEST0");
-	m_ppi->in_pb_callback().set_ioport("TEST1");
-	m_ppi->in_pc_callback().set_ioport("TEST2");
+	// crzybugs: PPI port A = input, port B = output, port C = output
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits(true);
-	m_igs017_igs031->set_i8255_tag("ppi8255");
+	m_igs017_igs031->in_pa_callback().set_ioport("TEST0");
+	m_igs017_igs031->in_pb_callback().set_ioport("TEST1");
+	m_igs017_igs031->in_pc_callback().set_ioport("TEST2");
 
 	// sound hardware
 	// OK6295

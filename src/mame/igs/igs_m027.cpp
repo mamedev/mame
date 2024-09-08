@@ -70,6 +70,7 @@ public:
 
 	void m027(machine_config &config) ATTR_COLD;
 	void m027_xor(machine_config &config) ATTR_COLD;
+	void slqz3_xor(machine_config &config) ATTR_COLD;
 	void jking02_xor(machine_config &config) ATTR_COLD;
 	void lhdmg_xor(machine_config &config) ATTR_COLD;
 	void lhzb4_xor(machine_config &config) ATTR_COLD;
@@ -149,11 +150,7 @@ private:
 
 	void igs_mahjong_map(address_map &map) ATTR_COLD;
 	void igs_mahjong_xor_map(address_map &map) ATTR_COLD;
-	void jking02_xor_map(address_map &map) ATTR_COLD;
 	void lhdmg_xor_map(address_map &map) ATTR_COLD;
-	void lhzb4_xor_map(address_map &map) ATTR_COLD;
-	void lthy_xor_map(address_map &map) ATTR_COLD;
-	void mgzz_xor_map(address_map &map) ATTR_COLD;
 	void extradraw_map(address_map &map) ATTR_COLD;
 };
 
@@ -192,6 +189,7 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
 	map(0x38008000, 0x38008003).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x38009000, 0x38009003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 
 	map(0x40000008, 0x4000000b).w(FUNC(igs_m027_state::unk2_w));
 	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027_state::unk2_r));
@@ -209,49 +207,11 @@ void igs_m027_state::igs_mahjong_xor_map(address_map &map)
 	map(0x08000000, 0x0807ffff).r(FUNC(igs_m027_state::external_rom_r)); // Game ROM
 }
 
-void igs_m027_state::jking02_xor_map(address_map &map)
-{
-	igs_mahjong_xor_map(map);
-
-	map(0x38009000, 0x38009003).umask32(0x000000ff).w(FUNC(igs_m027_state::lamps_w));
-	map(0x38009000, 0x38009003).umask32(0x0000ff00).w(FUNC(igs_m027_state::jking02_output_w));
-}
-
 void igs_m027_state::lhdmg_xor_map(address_map &map)
 {
 	igs_mahjong_xor_map(map);
 
-	map(0x38009000, 0x38009003).umask32(0x000000ff).r(FUNC(igs_m027_state::test_r));
-	map(0x38009000, 0x38009003).umask32(0x0000ff00).w(FUNC(igs_m027_state::io_select_w<0>));
-	map(0x38009000, 0x38009003).umask32(0x00ff0000).w(FUNC(igs_m027_state::mahjong_output_w));
-
 	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027_state::lhdmg_unk2_r));
-}
-
-void igs_m027_state::lhzb4_xor_map(address_map &map)
-{
-	igs_mahjong_xor_map(map);
-
-	map(0x38009000, 0x38009003).umask32(0x000000ff).r(FUNC(igs_m027_state::test_r));
-	map(0x38009000, 0x38009003).umask32(0x00ff0000).w(FUNC(igs_m027_state::io_select_w<0>));
-}
-
-void igs_m027_state::lthy_xor_map(address_map &map)
-{
-	igs_mahjong_xor_map(map);
-
-	map(0x38009000, 0x38009003).umask32(0x000000ff).r(FUNC(igs_m027_state::test_r));
-	map(0x38009000, 0x38009003).umask32(0x0000ff00).r(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
-	map(0x38009000, 0x38009003).umask32(0x00ff0000).w(FUNC(igs_m027_state::mahjong_output_w));
-}
-
-void igs_m027_state::mgzz_xor_map(address_map &map)
-{
-	igs_mahjong_xor_map(map);
-
-	map(0x38009000, 0x38009003).umask32(0x000000ff).w(FUNC(igs_m027_state::mahjong_output_w));
-	map(0x38009000, 0x38009003).umask32(0x0000ff00).r(FUNC(igs_m027_state::test_r));
-	map(0x38009000, 0x38009003).umask32(0x00ff0000).r(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
 }
 
 void igs_m027_state::extradraw_map(address_map &map)
@@ -1001,13 +961,12 @@ void igs_m027_state::m027(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027_state::interrupt), "screen", 0, 1);
 
 	I8255A(config, m_ppi);
-	m_ppi->in_pa_callback().set(NAME((&igs_m027_state::dsw_r<1, 0>)));
-	m_ppi->in_pb_callback().set_ioport("PORTB");
-	m_ppi->in_pc_callback().set_ioport("PORTC");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits(true);
-	m_igs017_igs031->set_i8255_tag("ppi8255");
+	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027_state::dsw_r<1, 0>)));
+	m_igs017_igs031->in_pb_callback().set_ioport("PORTB");
+	m_igs017_igs031->in_pc_callback().set_ioport("PORTC");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1021,11 +980,20 @@ void igs_m027_state::m027_xor(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_mahjong_xor_map);
 }
 
+void igs_m027_state::slqz3_xor(machine_config &config)
+{
+	m027_xor(config);
+
+	// TODO: PPI port A = input, port B = input, port C = output
+}
+
 void igs_m027_state::jking02_xor(machine_config &config)
 {
 	m027_xor(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::jking02_xor_map);
+	m_ppi->out_pa_callback().set(FUNC(igs_m027_state::lamps_w));
+	m_ppi->out_pb_callback().set(FUNC(igs_m027_state::jking02_output_w));
+	//m_ppi->out_pc_callback().set(...);
 }
 
 void igs_m027_state::lhdmg_xor(machine_config &config)
@@ -1034,9 +1002,13 @@ void igs_m027_state::lhdmg_xor(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::lhdmg_xor_map);
 
-	m_ppi->in_pa_callback().set_ioport("DSW1");
-	m_ppi->in_pb_callback().set_ioport("DSW2");
-	m_ppi->in_pc_callback().set(NAME((&igs_m027_state::kbd_r<0, 3, 0>)));
+	m_ppi->in_pa_callback().set(FUNC(igs_m027_state::test_r));
+	m_ppi->out_pb_callback().set(FUNC(igs_m027_state::io_select_w<0>));
+	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::mahjong_output_w));
+
+	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
+	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
+	m_igs017_igs031->in_pc_callback().set(NAME((&igs_m027_state::kbd_r<0, 3, 0>)));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 }
@@ -1045,22 +1017,26 @@ void igs_m027_state::lhzb4_xor(machine_config &config)
 {
 	m027_xor(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::lhzb4_xor_map);
+	//m_ppi->out_pa_callback().set(...);
+	//m_ppi->out_pb_callback().set(...);
+	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::io_select_w<0>));
 
-	m_ppi->in_pa_callback().set(NAME((&igs_m027_state::dsw_r<1, 0>)));
-	m_ppi->in_pb_callback().set_ioport("TEST");
-	m_ppi->in_pc_callback().set_ioport("JOY");
+	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027_state::dsw_r<1, 0>)));
+	m_igs017_igs031->in_pb_callback().set_ioport("TEST");
+	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
 }
 
 void igs_m027_state::lthy_xor(machine_config &config)
 {
 	m027_xor(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::lthy_xor_map);
+	m_ppi->in_pa_callback().set(FUNC(igs_m027_state::test_r));
+	m_ppi->in_pb_callback().set(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
+	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::mahjong_output_w));
 
-	m_ppi->in_pa_callback().set_ioport("DSW1");
-	m_ppi->in_pb_callback().set_ioport("DSW2");
-	m_ppi->in_pc_callback().set_ioport("JOY");
+	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
+	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
+	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
 }
 
 void igs_m027_state::zhongguo_xor(machine_config &config)
@@ -1074,11 +1050,13 @@ void igs_m027_state::mgzz_xor(machine_config &config)
 {
 	m027_xor(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::mgzz_xor_map);
+	m_ppi->out_pa_callback().set(FUNC(igs_m027_state::mahjong_output_w));
+	m_ppi->in_pb_callback().set(FUNC(igs_m027_state::test_r));
+	m_ppi->in_pc_callback().set(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
 
-	m_ppi->in_pa_callback().set_ioport("DSW1");
-	m_ppi->in_pb_callback().set_ioport("DSW2");
-	m_ppi->in_pc_callback().set_ioport("JOY");
+	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
+	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
+	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 }
@@ -2170,7 +2148,7 @@ void igs_m027_state::init_lhdmg()
 ***************************************************************************/
 
 // Complete dumps
-GAME( 1999, slqz3,     0,        m027_xor,     base,     igs_m027_state, init_slqz3,    ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_NOT_WORKING )
+GAME( 1999, slqz3,     0,        slqz3_xor,    base,     igs_m027_state, init_slqz3,    ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_NOT_WORKING )
 GAME( 1999, qlgs,      0,        m027_xor,     qlgs,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Que Long Gao Shou", MACHINE_NOT_WORKING )
 GAME( 1999, fruitpar,  0,        m027_xor,     base,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_NOT_WORKING )
 GAME( 1999, fruitpara, fruitpar, m027_xor,     base,     igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", MACHINE_NOT_WORKING )
@@ -2184,8 +2162,8 @@ GAME( 200?, jking02,   0,        jking02_xor,  jking02,  igs_m027_state, init_jk
 GAME( 2003, mgzz,      0,        mgzz_xor,     mgzz,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V101CN)", MACHINE_NOT_WORKING )
 GAME( 2000, mgzza,     mgzz,     mgzz_xor,     mgzza,    igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_NOT_WORKING )
 GAME( 2007, mgcs3,     0,        m027_xor,     base,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)", MACHINE_NOT_WORKING )
-GAME( 1999, oceanpar,  0,        m027_xor,     base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
-GAME( 1999, oceanpara, oceanpar, m027_xor,     base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
+GAME( 1999, oceanpar,  0,        jking02_xor,  jking02,  igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
+GAME( 1999, oceanpara, oceanpar, jking02_xor,  jking02,  igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
 GAME( 200?, cjddz,     0,        m027_xor,     base,     igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", MACHINE_NOT_WORKING ) // 超级斗地主
 GAME( 200?, extradrw,  0,        extradraw,    base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
