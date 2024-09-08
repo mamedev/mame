@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 
-#ifndef MAME_MACHINE_ZOOMER_RTC_H
-#define MAME_MACHINE_ZOOMER_RTC_H
+#ifndef MAME_CASIO_ZOOMER_RTC_H
+#define MAME_CASIO_ZOOMER_RTC_H
 
 #pragma once
 
@@ -69,4 +69,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ZOOMER_RTC, zoomer_rtc_device)
 
-#endif // MAME_MACHINE_ZOOMER_RTC_H
+#endif // MAME_CASIO_ZOOMER_RTC_H

@@ -5361,14 +5361,3 @@ if (MACHINES["SCI4"]~=null) then
 		MAME_DIR .. "src/devices/machine/sci4.h",
 	}
 end
-
----------------------------------------------------
---
---@src/devices/machine/zoomer_rtc.h,MACHINES["ZOOMER_RTC"] = true
----------------------------------------------------
-if (MACHINES["ZOOMER_RTC"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/zoomer_rtc.cpp",
-		MAME_DIR .. "src/devices/machine/zoomer_rtc.h",
-	}
-end

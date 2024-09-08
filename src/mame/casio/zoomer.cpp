@@ -31,10 +31,10 @@
 
 #include "emu.h"
 
+#include "zoomer_rtc.h"
 #include "cpu/nec/nec.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
-#include "machine/zoomer_rtc.h"
 #include "sound/upd65043gfu01.h"
 
 #include "crsshair.h"
