@@ -25,6 +25,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
+#include "machine/74259.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "softlist_dev.h"
@@ -66,6 +67,7 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:%u", 0U)
+		, m_ioctrl(*this, "ioctrl")
 		, m_beeper(*this, "beeper")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
@@ -94,6 +96,14 @@ private:
 	uint8_t io_status_1c_r();
 	uint8_t io_status_1d_r();
 	void io_control_w(uint8_t data);
+	void raminh_w(int state);
+	void vsup_w(int state);
+	void screen_lines_w(int state);
+	void rgb_select_w(int state);
+	void mt_on_w(int state);
+	void sound_out_w(int state);
+	void printer_strb_w(int state);
+	void cas_out_w(int state);
 	void color_mode_w(uint8_t data);
 	void ramdac_w(offs_t offset, uint8_t data);
 	uint8_t gcw_r();
@@ -124,6 +134,7 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<mb8876_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
+	required_device<ls259_device> m_ioctrl;
 	required_device<beep_device> m_beeper;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -142,7 +153,6 @@ private:
 	uint8_t m_display_reg = 0;
 	uint8_t m_fdc_irq_flag = 0;
 	uint8_t m_fdc_drq_flag = 0;
-	uint8_t m_system_data = 0;
 	struct { uint8_t r = 0, g = 0, b = 0; } m_pal;
 	uint8_t m_raminh = 0, m_raminh_pending_change = 0; //bankswitch
 	uint8_t m_raminh_prefetch = 0;
@@ -574,29 +584,50 @@ uint8_t smc777_state::io_status_1d_r()
 
 void smc777_state::io_control_w(uint8_t data)
 {
-	/*
-	 * flip-flop based
-	 * ---x -111 cassette write
-	 * ---x -110 printer strobe
-	 * ---x -101 beeper
-	 * ---x -100 cassette start (MONITOR_ON_OFF)
-	 * ---x -011 0=RGB 1=Component
-	 * ---x -010 0=525 lines 1=625 lines (NTSC/PAL switch?)
-	 * ---x -001 1=display disable
-	 * ---x -000 ram inibit signal
-	 */
-	m_system_data = data;
-	switch(m_system_data & 0x07)
-	{
-		case 0x00:
-			// "ROM / RAM register change is done at the beginning of the next M1 cycle"
-			m_raminh_pending_change = ((data & 0x10) >> 4) ^ 1;
-			m_raminh_prefetch = (uint8_t)(m_maincpu->state_int(Z80_R)) & 0x7f;
-			break;
-		case 0x02: printf("Screen line number %d\n",data & 0x10 ? 625 : 525); break;
-		case 0x05: m_beeper->set_state(data & 0x10); break;
-		default: printf("System FF W %02x\n",data); break;
-	}
+	m_ioctrl->write_bit(data & 0x07, BIT(data, 4));
+}
+
+void smc777_state::raminh_w(int state)
+{
+	// "ROM / RAM register change is done at the beginning of the next M1 cycle"
+	m_raminh_pending_change = state ^ 1;
+	m_raminh_prefetch = (uint8_t)(m_maincpu->state_int(Z80_R)) & 0x7f;
+}
+
+void smc777_state::vsup_w(int state)
+{
+	logerror("%s: Display %sabled\n", machine().describe_context(), state ? "dis" : "en");
+}
+
+void smc777_state::screen_lines_w(int state)
+{
+	logerror("%s: Screen line number %d\n", machine().describe_context(), state ? 625 : 525);
+}
+
+void smc777_state::rgb_select_w(int state)
+{
+	// 0=RGB 1=Component
+	logerror("%s: %s video selected\n", machine().describe_context(), state ? "Component" : "RGB");
+}
+
+void smc777_state::mt_on_w(int state)
+{
+	logerror("%s: Cassette monitor %s\n", machine().describe_context(), state ? "on" : "off");
+}
+
+void smc777_state::sound_out_w(int state)
+{
+	m_beeper->set_state(state);
+}
+
+void smc777_state::printer_strb_w(int state)
+{
+	logerror("%s: Printer strobe %d\n", machine().describe_context(), !state);
+}
+
+void smc777_state::cas_out_w(int state)
+{
+	logerror("%s: Cassette write %d\n", machine().describe_context(), state);
 }
 
 void smc777_state::color_mode_w(uint8_t data)
@@ -664,11 +695,11 @@ uint8_t smc777_state::smc777_mem_r(offs_t offset)
 	uint8_t z80_r;
 
 	// TODO: do the bankswitch AFTER that the prefetch instruction is executed (hackish implementation)
-	if(m_raminh_prefetch != 0xff)
+	if(m_raminh_prefetch != 0xff && !machine().side_effects_disabled())
 	{
 		z80_r = (uint8_t)m_maincpu->state_int(Z80_R);
 
-		if(z80_r == ((m_raminh_prefetch+2) & 0x7f))
+		if(z80_r == ((m_raminh_prefetch+1) & 0x7f))
 		{
 			m_raminh = m_raminh_pending_change;
 			m_raminh_prefetch = 0xff;
@@ -1111,6 +1142,16 @@ void smc777_state::smc777(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &smc777_state::smc777_io);
 
     I8041A(config, "mcu", 6_MHz_XTAL).set_disable();
+
+	LS259(config, m_ioctrl);
+	m_ioctrl->q_out_cb<0>().set(FUNC(smc777_state::raminh_w));
+	m_ioctrl->q_out_cb<1>().set(FUNC(smc777_state::vsup_w));
+	m_ioctrl->q_out_cb<2>().set(FUNC(smc777_state::screen_lines_w));
+	m_ioctrl->q_out_cb<3>().set(FUNC(smc777_state::rgb_select_w));
+	m_ioctrl->q_out_cb<4>().set(FUNC(smc777_state::mt_on_w));
+	m_ioctrl->q_out_cb<5>().set(FUNC(smc777_state::sound_out_w));
+	m_ioctrl->q_out_cb<6>().set(FUNC(smc777_state::printer_strb_w));
+	m_ioctrl->q_out_cb<7>().set(FUNC(smc777_state::cas_out_w));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
