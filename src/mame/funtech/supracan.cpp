@@ -270,6 +270,7 @@ private:
 	void get_tilemap_info_common(int layer, tile_data &tileinfo, int count);
 	void get_roz_tilemap_info(int layer, tile_data &tileinfo, int count);
 	int get_tilemap_dimensions(int &xsize, int &ysize, int layer);
+	void update_tilemap_flags(int layer);
 	void draw_sprite_tile(bitmap_ind16 &dst, bitmap_ind8 &priomap, const rectangle &cliprect, gfx_element *gfx, int tile, int palette, bool xflip, bool yflip, int dstx, int dsty, int prio);
 	void draw_sprite_tile_mask(bitmap_ind8 &dst, const rectangle &cliprect, gfx_element *gfx, int tile, bool xflip, bool yflip, int dstx, int dsty);
 	void draw_sprite_tile_masked(bitmap_ind16 &dst, bitmap_ind8 &mask, bitmap_ind8 &priomap, const rectangle &cliprect, gfx_element *gfx, int tile, int palette, bool xflip, bool yflip, int dstx, int dsty, int prio);
@@ -524,6 +525,21 @@ int supracan_state::get_tilemap_dimensions(int &xsize, int &ysize, int layer)
 	default:
 		LOGMASKED(LOG_HFUNKNOWNS, "Unsupported tilemap size for layer %d: %04x\n", layer, select);
 		return 0;
+	}
+}
+
+void supracan_state::update_tilemap_flags(int layer)
+{
+	const u32 attr = layer == ROZ_LAYER_NUMBER ? m_roz_mode : m_tilemap_flags[layer];
+	const u32 flip_x = BIT(attr, 1) ? TILEMAP_FLIPX : 0;
+	const u32 flip_y = BIT(attr, 0) ? TILEMAP_FLIPY : 0;
+
+	// TODO: we should really track what's the current tilemap paging and update only that
+	// Obviously we should also NOT mark all dirty, but just subscribe to what's the effective bank.
+	// is a dynamic mapper even possible with tilemap.h?
+	for (int i = 0; i < 4; i++)
+	{
+		m_tilemap_sizes[layer][i]->set_flip(flip_x | flip_y);
 	}
 }
 
@@ -1050,6 +1066,14 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 					if (scrollx & 0x800) scrollx -= 0x1000;
 					if (scrolly & 0x800) scrolly -= 0x1000;
+
+					// global flips also inverts scroll meanings
+					// cfr. formduel left character and sangofgt 2nd fighter stage.
+					if (BIT(m_tilemap_flags[layer], 1))
+						scrollx ^= ((xsize * 8) - 1);
+
+					if (BIT(m_tilemap_flags[layer], 0))
+						scrolly ^= ((ysize * 8) - 1);
 
 					int mosaic_count = (m_tilemap_flags[layer] & 0x001c) >> 2;
 					int mosaic_mask = 0xffffffff << mosaic_count;
@@ -1957,7 +1981,12 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x26/2: m_sprite_flags = data; LOGMASKED(LOG_SPRITES, "sprite_flags = %04x\n", data); break;
 
 	/* Tilemap 0 */
-	case 0x100/2: m_tilemap_flags[0] = data; LOGMASKED(LOG_TILEMAP0, "tilemap_flags[0] = %04x\n", data); break;
+	case 0x100/2: {
+		m_tilemap_flags[0] = data;
+		LOGMASKED(LOG_TILEMAP0, "tilemap_flags[0] = %04x\n", data);
+		update_tilemap_flags(0);
+		break;
+	}
 	case 0x102/2: m_tilemap_tile_mode[0] = data; break;
 	case 0x104/2: m_tilemap_scrollx[0] = data; LOGMASKED(LOG_TILEMAP0, "tilemap_scrollx[0] = %04x\n", data); break;
 	case 0x106/2: m_tilemap_scrolly[0] = data; LOGMASKED(LOG_TILEMAP0, "tilemap_scrolly[0] = %04x\n", data); break;
@@ -1965,15 +1994,25 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x10a/2: m_tilemap_mode[0] = data; LOGMASKED(LOG_TILEMAP0, "tilemap_mode[0] = %04x\n", data); break;
 
 	/* Tilemap 1 */
-	case 0x120/2: m_tilemap_flags[1] = data; LOGMASKED(LOG_TILEMAP1, "tilemap_flags[1] = %04x\n", data); break;
+	case 0x120/2: {
+		m_tilemap_flags[1] = data;
+		LOGMASKED(LOG_TILEMAP1, "tilemap_flags[1] = %04x\n", data);
+		update_tilemap_flags(1);
+		break;
+	}
 	case 0x122/2: m_tilemap_tile_mode[1] = data; break;
 	case 0x124/2: m_tilemap_scrollx[1] = data; LOGMASKED(LOG_TILEMAP1, "tilemap_scrollx[1] = %04x\n", data); break;
 	case 0x126/2: m_tilemap_scrolly[1] = data; LOGMASKED(LOG_TILEMAP1, "tilemap_scrolly[1] = %04x\n", data); break;
 	case 0x128/2: m_tilemap_base_addr[1] = data << 1; LOGMASKED(LOG_TILEMAP1, "tilemap_base_addr[1] = %05x\n", data << 2); break;
 	case 0x12a/2: m_tilemap_mode[1] = data; LOGMASKED(LOG_TILEMAP1, "tilemap_mode[1] = %04x\n", data); break;
 
-	/* Tilemap 2? */
-	case 0x140/2: m_tilemap_flags[2] = data; LOGMASKED(LOG_TILEMAP2, "tilemap_flags[2] = %04x\n", data); break;
+	/* Tilemap 2 */
+	case 0x140/2: {
+		m_tilemap_flags[2] = data;
+		LOGMASKED(LOG_TILEMAP2, "tilemap_flags[2] = %04x\n", data);
+		update_tilemap_flags(2);
+		break;
+	}
 	case 0x142/2: m_tilemap_tile_mode[2] = data; break;
 	case 0x144/2: m_tilemap_scrollx[2] = data; LOGMASKED(LOG_TILEMAP2, "tilemap_scrollx[2] = %04x\n", data); break;
 	case 0x146/2: m_tilemap_scrolly[2] = data; LOGMASKED(LOG_TILEMAP2, "tilemap_scrolly[2] = %04x\n", data); break;
@@ -1981,7 +2020,12 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x14a/2: m_tilemap_mode[2] = data; LOGMASKED(LOG_TILEMAP2, "tilemap_mode[2] = %04x\n", data); break;
 
 	/* ROZ */
-	case 0x180/2: m_roz_mode = data; LOGMASKED(LOG_ROZ, "roz_mode = %04x\n", data); break;
+	case 0x180/2: {
+		m_roz_mode = data;
+		LOGMASKED(LOG_ROZ, "roz_mode = %04x\n", data);
+		//update_tilemap_flags(ROZ_LAYER_NUMBER);
+		break;
+	}
 	case 0x182/2: m_roz_tile_mode = data; break;
 	case 0x184/2: m_roz_scrollx = (data << 16) | (m_roz_scrollx & 0xffff); m_roz_changed |= 1; LOGMASKED(LOG_ROZ, "roz_scrollx = %08x\n", m_roz_scrollx); break;
 	case 0x186/2: m_roz_scrollx = (data) | (m_roz_scrollx & 0xffff0000); m_roz_changed |= 1; LOGMASKED(LOG_ROZ, "roz_scrollx = %08x\n", m_roz_scrollx); break;
