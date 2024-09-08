@@ -64,16 +64,18 @@ STATUS:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/m6502/m65c02.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "acan.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/m6502/m65c02.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 #include "tilemap.h"
+#include "umc6619_sound.h"
 #include "umc6650.h"
 
 #define LOG_UNKNOWNS    (1U << 1)
@@ -185,7 +187,7 @@ private:
 
 	required_shared_ptr<uint16_t> m_vram;
 	required_shared_ptr<uint8_t> m_soundram;
-	required_device<acan_sound_device> m_sound;
+	required_device<umc6619_sound_device> m_sound;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -2255,7 +2257,7 @@ void supracan_state::supracan(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	// TODO: derive and verify from U13_CLOCK
-	ACANSND(config, m_sound, XTAL(3'579'545));
+	UMC6619_SOUND(config, m_sound, XTAL(3'579'545));
 	m_sound->ram_read().set(FUNC(supracan_state::sound_ram_read));
 	m_sound->timer_irq_handler().set(FUNC(supracan_state::sound_timer_irq));
 	m_sound->dma_irq_handler().set(FUNC(supracan_state::sound_dma_irq));
