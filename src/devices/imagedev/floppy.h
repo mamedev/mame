@@ -289,6 +289,8 @@ protected:
 	}; \
 	DECLARE_DEVICE_TYPE(Type, Name)
 
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_SSSD,       floppy_3_sssd,       "floppy_3")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_DSSD,       floppy_3_dssd,       "floppy_3")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_SSDD,       floppy_3_ssdd,       "floppy_3")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_DSDD,       floppy_3_dsdd,       "floppy_3")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_SSDD,      floppy_35_ssdd,      "floppy_3_5")

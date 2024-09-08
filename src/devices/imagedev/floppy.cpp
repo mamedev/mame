@@ -51,8 +51,10 @@
 DEFINE_DEVICE_TYPE(FLOPPY_CONNECTOR, floppy_connector, "floppy_connector", "Floppy drive connector abstraction")
 
 // generic 3" drives
-DEFINE_DEVICE_TYPE(FLOPPY_3_SSDD, floppy_3_ssdd, "floppy_3_ssdd", "3\" single-sided floppy drive")
-DEFINE_DEVICE_TYPE(FLOPPY_3_DSDD, floppy_3_dsdd, "floppy_3_dsdd", "3\" double-sided floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_3_SSSD, floppy_3_sssd, "floppy_3_sssd", "3\" single-sided single density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_3_DSSD, floppy_3_dssd, "floppy_3_dssd", "3\" double-sided single density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_3_SSDD, floppy_3_ssdd, "floppy_3_ssdd", "3\" single-sided double density floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_3_DSDD, floppy_3_dsdd, "floppy_3_dsdd", "3\" double-sided double density floppy drive")
 
 // generic 3.5" drives
 DEFINE_DEVICE_TYPE(FLOPPY_35_SSDD, floppy_35_ssdd, "floppy_35_ssdd", "3.5\" single-sided double density floppy drive")
@@ -1713,6 +1715,53 @@ DEFINE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device, "flopsnd", "Floppy sound")
 //**************************************************************************
 
 //-------------------------------------------------
+//  3" single-sided single density
+//-------------------------------------------------
+
+floppy_3_sssd::floppy_3_sssd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_3_SSSD, tag, owner, clock)
+{
+}
+
+floppy_3_sssd::~floppy_3_sssd()
+{
+}
+
+void floppy_3_sssd::setup_characteristics()
+{
+	m_form_factor = floppy_image::FF_3;
+	m_tracks = 42;
+	m_sides = 1;
+	set_rpm(300);
+
+	add_variant(floppy_image::SSSD);
+}
+
+//-------------------------------------------------
+//  3" double-sided single density
+//-------------------------------------------------
+
+floppy_3_dssd::floppy_3_dssd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_3_DSSD, tag, owner, clock)
+{
+}
+
+floppy_3_dssd::~floppy_3_dssd()
+{
+}
+
+void floppy_3_dssd::setup_characteristics()
+{
+	m_form_factor = floppy_image::FF_3;
+	m_tracks = 42;
+	m_sides = 2;
+	set_rpm(300);
+
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::DSSD);
+}
+
+//-------------------------------------------------
 //  3" single-sided double density
 //-------------------------------------------------
 
@@ -1732,6 +1781,7 @@ void floppy_3_ssdd::setup_characteristics()
 	m_sides = 1;
 	set_rpm(300);
 
+	add_variant(floppy_image::SSSD);
 	add_variant(floppy_image::SSDD);
 }
 
@@ -1755,6 +1805,8 @@ void floppy_3_dsdd::setup_characteristics()
 	m_sides = 2;
 	set_rpm(300);
 
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::DSSD);
 	add_variant(floppy_image::SSDD);
 	add_variant(floppy_image::DSDD);
 }

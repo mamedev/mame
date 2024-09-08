@@ -5,8 +5,7 @@
     bml3mp1805.c
 
     Hitachi MP-1805 floppy disk controller card for the MB-6890
-    Floppy drive is attached
-    TODO: make sure disk can be read
+    Floppy drive is attached (single-sided, single density)
 
 *********************************************************************/
 
@@ -32,11 +31,9 @@ ROM_START( mp1805 )
 	ROM_LOAD( "mp1805.rom", 0x000, 0x800, BAD_DUMP CRC(b532d8d9) SHA1(6f1160356d5bf64b5926b1fdb60db414edf65f22))
 ROM_END
 
-// Although the drive is single-sided, D88 images are double-sided,
-//  so we need to allocate enough space or MAME will crash.
 void bml3bus_mp1805_device::floppy_drives(device_slot_interface &device)
 {
-	device.option_add("mb_6890", FLOPPY_3_DSDD);
+	device.option_add("mb_6890", FLOPPY_3_SSSD);
 }
 
 
