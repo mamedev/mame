@@ -1,6 +1,6 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese, Ryan Holtz
-/***************************************************************************
+/**************************************************************************************************
 
 Super A'Can (c) 1995 Funtech
 
@@ -10,7 +10,7 @@ References:
 - https://github.com/angelosa/hw_docs/blob/main/funtech_superacan/pergame.md
 
 
-*******************************************************************************
+===================================================================================================
 
 INFO:
 
@@ -61,7 +61,7 @@ STATUS:
 
     - All: are ALL the layers ROZ capable??
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -378,7 +378,7 @@ void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int
 	tileinfo.set(region, tile, palette, TILE_FLIPXY(flipxy));
 }
 
-// I wonder how different this really is.. my guess, not at all.
+// TODO: merge with normal layers.
 void supracan_state::get_roz_tilemap_info(int layer, tile_data &tileinfo, int count)
 {
 	uint16_t *vram = m_vram;
@@ -747,28 +747,27 @@ void supracan_state::draw_sprite_tile_masked(bitmap_ind16 &dst, bitmap_ind8 &mas
 	}
 }
 
+// [0]
+// -e-- ---- ---- ---- sprite enable?
+// ---h hhh- ---- ---- Y size (not always right)
+// ---- ---y yyyy yyyy Y position
+// [1]
+// bbbb ---- ---- ---- Tile bank
+// ---- h--- ---- ---- Horizontal flip
+// ---- -v-- ---- ---- Vertical flip
+// ---- --mm ---- ---- Masking mode
+// ---- ---- ---- -www X size
+// [2]
+// zzz- ---- ---- ---- X scale
+// ---- ???- ---- ---- Unknown, but often written.
+//                     Values include 111 and 110 for the Super A'Can logo, 110 in the Sango Fighter intro, and 101/100 in the Boom Zoo intro.
+// ---- ---x xxxx xxxx X position
+// [3]
+// d--- ---- ---- ---- Direct Sprite (use details from here, not looked up in vram)
+// -ooo oooo oooo oooo Sprite address
 void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bitmap_ind8 &priomap, const rectangle &cliprect)
 {
 	uint16_t *vram = m_vram;
-
-//      [0]
-//      -e-- ---- ---- ---- sprite enable?
-//      ---h hhh- ---- ---- Y size (not always right)
-//      ---- ---y yyyy yyyy Y position
-//      [1]
-//      bbbb ---- ---- ---- Tile bank
-//      ---- h--- ---- ---- Horizontal flip
-//      ---- -v-- ---- ---- Vertical flip
-//      ---- --mm ---- ---- Masking mode
-//      ---- ---- ---- -www X size
-//      [2]
-//      zzz- ---- ---- ---- X scale
-//      ---- ???- ---- ---- Unknown, but often written.
-//                          Values include 111 and 110 for the Super A'Can logo, 110 in the Sango Fighter intro, and 101/100 in the Boom Zoo intro.
-//      ---- ---x xxxx xxxx X position
-//      [3]
-//      d--- ---- ---- ---- Direct Sprite (use details from here, not looked up in vram)
-//      -ooo oooo oooo oooo Sprite address
 
 	uint32_t skip_count = 0;
 	uint32_t start_word = (m_sprite_base_addr >> 1) + skip_count * 4;
@@ -782,13 +781,12 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 		int x = vram[i + 2] & 0x01ff;
 		int y = vram[i + 0] & 0x01ff;
 
-		int sprite_offset = (vram[i + 3])<< 1;
-
 		int bank = (vram[i + 1] & 0xf000) >> 12;
 		int mask = (vram[i + 1] & 0x0300) >> 8;
 		int sprite_xflip = (vram[i + 1] & 0x0800) >> 11;
 		int sprite_yflip = (vram[i + 1] & 0x0400) >> 10;
 		int prio = (vram[i + 2] >> 9) & 3;
+		const u16 sprite_ptr = vram[i + 3];
 		//int xscale = vram[i + 2] >> 13;
 		gfx_element *gfx = m_gfxdecode->gfx(region);
 
@@ -798,44 +796,31 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 
 		if ((vram[i + 0] & 0x4000))
 		{
-		#if 0
-			printf("%d (unk %02x) (enable %02x) (unk Y2 %02x, %02x) (y pos %02x) (bank %01x) (flip %01x) (unknown %02x) (x size %02x) (xscale %01x) (unk %01x) (xpos %02x) (code %04x)\n", i,
-				(vram[i + 0] & 0x8000) >> 15,
-				(vram[i + 0] & 0x4000) >> 14,
-				(vram[i + 0] & 0x2000) >> 13,
-				(vram[i + 0] & 0x1e00) >> 8,
-				(vram[i + 0] & 0x01ff),
-				(vram[i + 1] & 0xf000) >> 12,
-				(vram[i + 1] & 0x0c00) >> 10,
-				(vram[i + 1] & 0x03f0) >> 4,
-				(vram[i + 1] & 0x000f),
-				(vram[i + 2] & 0xf000) >> 12,
-				(vram[i + 2] & 0x0e00) >> 8,
-				(vram[i + 2] & 0x01ff) >> 0,
-				(vram[i + 3] & 0xffff));
-		#endif
+			int xsize = 1 << (vram[i + 1] & 7);
+			int ysize = ((vram[i + 0] & 0x1e00) >> 9) + 1;
 
-			if (vram[i + 3] & 0x8000)
+			// HACK: sonevil sets 1x1 tiles, and expecting to take this path.
+			// Most likely former condition is wrong, and it just "direct sprite" when latter occurs.
+			// magipool also wants latter, for the shot markers to work.
+			if (sprite_ptr & 0x8000 || (xsize == 1 && ysize == 1))
 			{
-				uint16_t data = vram[i + 3];
-				int tile = (bank * 0x200) + (data & 0x03ff);
+				int tile = (bank * 0x200) + (sprite_ptr & 0x03ff);
 
-				int palette = (data & 0xf000) >> 12; // this might not be correct, due to the & 0x8000 condition above this would force all single tile sprites to be using palette >= 0x8 only
+				int palette = (sprite_ptr & 0xf000) >> 12; // this might not be correct, due to the & 0x8000 condition above this would force all single tile sprites to be using palette >= 0x8 only
 
-				// printf("sprite data %04x %04x %04x %04x\n", vram[i+0] , vram[i+1] , vram[i+2] ,vram[i+3]  );
+				// sonevil expect to flip X/Y thru the sprite pointer
+				int tile_xflip = sprite_xflip ^ ((sprite_ptr & 0x0800) >> 11);
+				int tile_yflip = sprite_yflip ^ ((sprite_ptr & 0x0400) >> 10);
 
 				if (mask > 1)
-					draw_sprite_tile_mask(maskmap, cliprect, gfx, tile, sprite_xflip, sprite_yflip, x, y);
+					draw_sprite_tile_mask(maskmap, cliprect, gfx, tile, tile_xflip, tile_yflip, x, y);
 				else if (mask == 1)
-					draw_sprite_tile_masked(bitmap, maskmap, priomap, cliprect, gfx, tile, palette, sprite_xflip, sprite_yflip, x, y, prio);
+					draw_sprite_tile_masked(bitmap, maskmap, priomap, cliprect, gfx, tile, palette, tile_xflip, tile_yflip, x, y, prio);
 				else
-					draw_sprite_tile(bitmap, priomap, cliprect, gfx, tile, palette, sprite_xflip, sprite_yflip, x, y, prio);
+					draw_sprite_tile(bitmap, priomap, cliprect, gfx, tile, palette, tile_xflip, tile_yflip, x, y, prio);
 			}
 			else
 			{
-				int xsize = 1 << (vram[i + 1] & 7);
-				int ysize = ((vram[i + 0] & 0x1e00) >> 9) + 1;
-
 				// I think the xsize must influence the ysize somehow, there are too many conflicting cases otherwise
 				// there don't appear to be any special markers in the actual looked up tile data to indicate skip / end of list
 
@@ -843,7 +828,7 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 				{
 					for (int xtile = 0; xtile < xsize; xtile++)
 					{
-						uint16_t data = vram[(sprite_offset + ytile * xsize + xtile) & VRAM_MASK];
+						uint16_t data = vram[((sprite_ptr << 1) + ytile * xsize + xtile) & VRAM_MASK];
 						int tile = (bank * 0x200) + (data & 0x03ff);
 						int palette = (data & 0xf000) >> 12;
 
@@ -863,6 +848,7 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 				}
 			}
 
+			// TODO: scaling
 #if 0
 			if (xscale == 0) continue;
 			uint32_t delta = (1 << 17) / xscale;
@@ -999,12 +985,11 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_sprite_final_bitmap.fill(0x00, cliprect);
 	m_sprite_mask_bitmap.fill(0x00, cliprect);
 	m_prio_bitmap.fill(0xff, cliprect);
-	// TODO: pinpoint back layer color
-	// - A'Can logo wants 0x30
+	// Back layer normally fills with 0x00
 	// - boomzoo (title) wants 0x00
 	// - sangofgt (1st fighter stage) wants 0x00
 	// - sonevil (intro) wants 0x00
-	//bitmap.fill(0x80, cliprect);
+	// TODO: layer overlay happens from mixing registers (A'Can BIOS sets 0x02 there)
 	bitmap.fill(0x00, cliprect);
 
 	draw_sprites(m_sprite_final_bitmap, m_sprite_mask_bitmap, m_prio_bitmap, cliprect);
