@@ -197,11 +197,12 @@ void sc6_state::mux_w(u8 data)
 	// P24-P27: 7442 A-D (or 74145)
 	// 7442 0-8: input mux, led data
 	m_inp_mux = data >> 4 & 0xf;
-	m_display->write_mx(1 << m_inp_mux);
+	u16 sel = 1 << m_inp_mux;
+	m_display->write_mx(sel);
 
 	// 7442 9: speaker out
 	if (m_dac != nullptr)
-		m_dac->write(BIT(1 << m_inp_mux, 9));
+		m_dac->write(BIT(sel, 9));
 }
 
 void sc6_state::select_w(u8 data)

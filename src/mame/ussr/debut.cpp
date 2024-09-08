@@ -13,7 +13,7 @@ TODO:
 - where does the interrupt come from?
 - Debut-M is an updated version? Or is it the same program as Debut with a redesigned case?
 
-********************************************************************************
+================================================================================
 
 Hardware notes:
 - КР1810ВМ86 (i8086 clone), 16200K XTAL
