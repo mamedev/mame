@@ -1468,6 +1468,14 @@ void supracan_state::_6502_soundmem_w(offs_t offset, uint8_t data)
 		}
 		break;
 	}
+	case 0x40a:
+		// speedyd/magipool uses this to request main to kickoff a sound DMA.
+		// gamblord/formduel just sets this just to poll a sound command
+		// all sets up 0x40c/0x40d as a buffer, and 0x40a to check if the irq is valid
+		// (does reading from 68k side acknowledges?)
+		m_maincpu->set_input_line(6, HOLD_LINE);
+		m_soundram[0x40a] = data;
+		break;
 	case 0x410:
 		m_soundcpu_irq_enable = data;
 		// gamblord (at least) checks for pending irqs
