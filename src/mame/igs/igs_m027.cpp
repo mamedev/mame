@@ -77,6 +77,7 @@ public:
 	void lthy_xor(machine_config &config) ATTR_COLD;
 	void zhongguo_xor(machine_config &config) ATTR_COLD;
 	void mgzz_xor(machine_config &config) ATTR_COLD;
+	void oceanpar_xor(machine_config &config) ATTR_COLD;
 	void extradraw(machine_config &config) ATTR_COLD;
 
 	void init_sdwx() ATTR_COLD;
@@ -1059,6 +1060,13 @@ void igs_m027_state::mgzz_xor(machine_config &config)
 	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
 
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+}
+
+void igs_m027_state::oceanpar_xor(machine_config &config)
+{
+	m027_xor(config);
+
+	// TODO: PPI port A = output, port B = output, port C = output
 }
 
 void igs_m027_state::extradraw(machine_config &config)
@@ -2162,8 +2170,8 @@ GAME( 200?, jking02,   0,        jking02_xor,  jking02,  igs_m027_state, init_jk
 GAME( 2003, mgzz,      0,        mgzz_xor,     mgzz,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V101CN)", MACHINE_NOT_WORKING )
 GAME( 2000, mgzza,     mgzz,     mgzz_xor,     mgzza,    igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_NOT_WORKING )
 GAME( 2007, mgcs3,     0,        m027_xor,     base,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)", MACHINE_NOT_WORKING )
-GAME( 1999, oceanpar,  0,        jking02_xor,  jking02,  igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
-GAME( 1999, oceanpara, oceanpar, jking02_xor,  jking02,  igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
+GAME( 1999, oceanpar,  0,        oceanpar_xor, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
+GAME( 1999, oceanpara, oceanpar, oceanpar_xor, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
 GAME( 200?, cjddz,     0,        m027_xor,     base,     igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", MACHINE_NOT_WORKING ) // 超级斗地主
 GAME( 200?, extradrw,  0,        extradraw,    base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
