@@ -65,7 +65,6 @@ public:
 		m_ticket(*this, "ticket"),
 		m_io_kbd(*this, "KEY%u", 0U),
 		m_io_dsw(*this, "DSW%u", 1U),
-		m_io_test(*this, "TEST"),
 		m_out_lamps(*this, "lamp%u", 1U)
 	{ }
 
@@ -121,7 +120,6 @@ private:
 
 	optional_ioport_array<5> m_io_kbd;
 	optional_ioport_array<3> m_io_dsw;
-	optional_ioport m_io_test;
 
 	output_finder<8> m_out_lamps;
 
@@ -138,7 +136,6 @@ private:
 
 	void xor_table_w(offs_t offset, u8 data);
 
-	u8 test_r();
 	void lamps_w(u8 data);
 	void mahjong_output_w(u8 data);
 	void jking02_output_w(u8 data);
@@ -964,11 +961,6 @@ void igs_m027_state::xor_table_w(offs_t offset, u8 data)
 
 // I/O? maybe serial?
 
-u8 igs_m027_state::test_r()
-{
-	return m_io_test->read();
-}
-
 void igs_m027_state::lamps_w(u8 data)
 {
 	// active high outputs
@@ -1100,7 +1092,7 @@ void igs_m027_state::lhdmg_xor(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::lhdmg_xor_map);
 
-	m_ppi->in_pa_callback().set(FUNC(igs_m027_state::test_r));
+	m_ppi->in_pa_callback().set_ioport("TEST");
 	m_ppi->out_pb_callback().set(FUNC(igs_m027_state::io_select_w<0>));
 	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::mahjong_output_w));
 
@@ -1128,7 +1120,7 @@ void igs_m027_state::lthy_xor(machine_config &config)
 {
 	m027_xor(config);
 
-	m_ppi->in_pa_callback().set(FUNC(igs_m027_state::test_r));
+	m_ppi->in_pa_callback().set_ioport("TEST");
 	m_ppi->in_pb_callback().set(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
 	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::mahjong_output_w));
 
@@ -1149,7 +1141,7 @@ void igs_m027_state::mgzz_xor(machine_config &config)
 	m027_xor(config);
 
 	m_ppi->out_pa_callback().set(FUNC(igs_m027_state::mahjong_output_w));
-	m_ppi->in_pb_callback().set(FUNC(igs_m027_state::test_r));
+	m_ppi->in_pb_callback().set_ioport("TEST");
 	m_ppi->in_pc_callback().set(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
 
 	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
