@@ -90,6 +90,8 @@ public:
 	const floppy_image_format_t *get_load_format() const;
 	std::pair<std::error_condition, const floppy_image_format_t *> identify(std::string_view filename);
 	void set_rpm(float rpm);
+	void set_sectoring_type(uint32_t sectoring_type);
+	uint32_t get_sectoring_type();
 
 	void init_fs(const fs_info *fs, const fs::meta_data &meta);
 
@@ -194,6 +196,7 @@ protected:
 	int m_tracks; /* addressable tracks */
 	int m_sides;  /* number of heads */
 	uint32_t m_form_factor; /* 3"5, 5"25, etc */
+	uint32_t m_sectoring_type; /* SOFT, Hard 10/16/32 */
 	bool m_motor_always_on;
 	bool m_dskchg_writable;
 	bool m_has_trk00_sensor;
@@ -255,6 +258,8 @@ protected:
 
 	void register_formats();
 
+	void add_variant(uint32_t variant);
+
 	void check_led();
 	uint32_t find_position(attotime &base, const attotime &when);
 	attotime position_to_time(const attotime &base, int position) const;
@@ -299,7 +304,6 @@ DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSDD,     floppy_525_ssdd,     "floppy_5_
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_DD,       floppy_525_dd,       "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSQD,     floppy_525_ssqd,     "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_QD,       floppy_525_qd,       "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_QD16,     floppy_525_qd16,     "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_HD,       floppy_525_hd,       "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_8_SSSD,       floppy_8_sssd,       "floppy_8")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_8_DSSD,       floppy_8_dssd,       "floppy_8")
@@ -460,6 +464,7 @@ public:
 
 	template <typename T> void set_formats(T &&_formats) { formats = std::forward<T>(_formats); }
 	void enable_sound(bool doit) { m_enable_sound = doit; }
+	void set_sectoring_type(uint32_t sectoring_type) { m_sectoring_type = sectoring_type; }
 
 	floppy_image_device *get_device();
 
@@ -470,6 +475,7 @@ protected:
 private:
 	std::function<void (format_registration &fr)> formats;
 	bool m_enable_sound;
+	uint32_t m_sectoring_type;
 };
 
 

@@ -138,13 +138,26 @@ const char *floppy_image::get_variant_name(uint32_t form_factor, uint32_t varian
 {
 	switch(variant) {
 	case SSSD:   return "Single side, single density";
+	case SSSD10: return "Single side, single density, 10-sector";
+	case SSSD16: return "Single side, single density, 16-sector";
+	case SSSD32: return "Single side, single density, 32-sector";
 	case SSDD:   return "Single side, double density";
+	case SSDD10: return "Single side, double density, 10-sector";
 	case SSDD16: return "Single side, double density, 16 hard sector";
+	case SSDD32: return "Single side, double density, 32-sector";
 	case SSQD:   return "Single side, quad density";
+	case SSQD10: return "Single side, quad density, 10-sector";
 	case SSQD16: return "Single side, quad density, 16 hard sector";
+	case DSSD:   return "Double side, single density";
+	case DSSD10: return "Double side, single density, 10-sector";
+	case DSSD16: return "Double side, single density, 16-sector";
+	case DSSD32: return "Double side, single density, 32-sector";
 	case DSDD:   return "Double side, double density";
+	case DSDD10: return "Double side, double density, 10-sector";
 	case DSDD16: return "Double side, double density, 16 hard sector";
+	case DSDD32: return "Double side, double density, 32-sector";
 	case DSQD:   return "Double side, quad density";
+	case DSQD10: return "Double side, quad density, 10-sector";
 	case DSQD16: return "Double side, quad density, 16 hard sector";
 	case DSHD:   return "Double side, high density";
 	case DSED:   return "Double side, extended density";
