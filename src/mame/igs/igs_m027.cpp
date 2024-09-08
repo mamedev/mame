@@ -62,6 +62,7 @@ public:
 		m_screen(*this, "screen"),
 		m_oki(*this, "oki"),
 		m_hopper(*this, "hopper"),
+		m_ticket(*this, "ticket"),
 		m_io_kbd(*this, "KEY%u", 0U),
 		m_io_dsw(*this, "DSW%u", 1U),
 		m_io_test(*this, "TEST"),
@@ -116,6 +117,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<okim6295_device> m_oki;
 	optional_device<hopper_device> m_hopper;
+	optional_device<ticket_dispenser_device> m_ticket;
 
 	optional_ioport_array<5> m_io_kbd;
 	optional_ioport_array<3> m_io_dsw;
@@ -140,6 +142,7 @@ private:
 	void lamps_w(u8 data);
 	void mahjong_output_w(u8 data);
 	void jking02_output_w(u8 data);
+	void oceanpar_output_w(u8 data);
 
 	u32 unk2_r();
 	u32 lhdmg_unk2_r();
@@ -152,6 +155,7 @@ private:
 	void igs_mahjong_map(address_map &map) ATTR_COLD;
 	void igs_mahjong_xor_map(address_map &map) ATTR_COLD;
 	void lhdmg_xor_map(address_map &map) ATTR_COLD;
+	void oceanpar_xor_map(address_map &map) ATTR_COLD;
 	void extradraw_map(address_map &map) ATTR_COLD;
 };
 
@@ -193,7 +197,6 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 	map(0x38009000, 0x38009003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 
 	map(0x40000008, 0x4000000b).w(FUNC(igs_m027_state::unk2_w));
-	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027_state::unk2_r));
 	map(0x40000018, 0x4000001b).umask32(0x000000ff).w(FUNC(igs_m027_state::io_select_w<1>));
 
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027_state::xor_table_w)); // uploads XOR table to external ROM here
@@ -213,6 +216,13 @@ void igs_m027_state::lhdmg_xor_map(address_map &map)
 	igs_mahjong_xor_map(map);
 
 	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027_state::lhdmg_unk2_r));
+}
+
+void igs_m027_state::oceanpar_xor_map(address_map &map)
+{
+	igs_mahjong_xor_map(map);
+
+	map(0x4000000c, 0x4000000f).portr("PLAYER");
 }
 
 void igs_m027_state::extradraw_map(address_map &map)
@@ -749,6 +759,81 @@ INPUT_PORTS_START( mgzza )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )                                       // not shown in test mode
 INPUT_PORTS_END
 
+INPUT_PORTS_START( oceanpara )
+	PORT_INCLUDE( base )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x01, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x02, "Non-Stop" )                 PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x04, 0x04, "Record Password" )          PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x04, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x08, 0x08, "Odds Table" )               PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x08, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x10, 0x10, "Auto Take" )                PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x20, 0x20, "Double-Up Game" )           PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x20, DEF_STR(On) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Double-Up Game Type" )      PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0xc0, "Poker 1" )
+	PORT_DIPSETTING(    0x80, "Poker 2" )
+	PORT_DIPSETTING(    0x40, "Symbol" )
+	PORT_DIPSETTING(    0x00, "Symbol" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Chance Level" )             PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Low) )
+	PORT_DIPSETTING(    0x00, DEF_STR(High) )
+
+	PORT_MODIFY("PORTB")
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )               PORT_NAME("Call Attendant")
+
+	PORT_MODIFY("PORTC")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // HPSW
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
+	PORT_START("PLAYER")
+	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN1 )          // COINA
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL )  PORT_NAME("Stop All Reels / Big")
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )     PORT_NAME("Stop Reel 1 / Double Up")
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )     PORT_NAME("Stop Reel 2 / Small")
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )     PORT_NAME("Stop Reel 3 / Take Score")
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x00003800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_NAME("Ticket") // TICKET
+	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r) // TKSW
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN2 )          // COINC
+	PORT_BIT( 0xfffe0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( oceanpar )
+	PORT_INCLUDE( oceanpara )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x06, 0x06, "Score Box" )                PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, "10 Times" )
+	PORT_DIPSETTING(    0x00, "10 Times" )
+	PORT_DIPNAME( 0x08, 0x08, "Play Score" )               PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( amazonia )
 	PORT_INCLUDE(base)
 
@@ -887,18 +972,18 @@ u8 igs_m027_state::test_r()
 void igs_m027_state::lamps_w(u8 data)
 {
 	// active high outputs
-	// +------+---------------+
-	// | lamp | jking02       |
-	// +------+---------------+
-	// | 0    | bet           |
-	// | 1    | start         |
-	// | 2    |               |
-	// | 3    | stop 1/take   |
-	// | 4    | stop 2/big    |
-	// | 5    | stop 4/double |
-	// | 6    | stop 3/small  |
-	// | 7    |               |
-	// +------+---------------+
+	// +------+---------------+---------------+
+	// | lamp | jking02       | oceanpar      |
+	// +------+---------------+---------------+
+	// | 0    | bet           | start         |
+	// | 1    | start         | stop 2/small  |
+	// | 2    |               | bet           |
+	// | 3    | stop 1/take   | stop 3/take   |
+	// | 4    | stop 2/big    | stop 1/double |
+	// | 5    | stop 4/double | stop all/big  |
+	// | 6    | stop 3/small  |               |
+	// | 7    |               |               |
+	// +------+---------------+---------------+
 	for (unsigned i = 0; 8 > i; ++i)
 		m_out_lamps[i] = BIT(data, i);
 }
@@ -914,6 +999,15 @@ void igs_m027_state::mahjong_output_w(u8 data)
 void igs_m027_state::jking02_output_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 5)); // one pulse per coin accepted
+}
+
+void igs_m027_state::oceanpar_output_w(u8 data)
+{
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // one pulse per COINA accepted
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 1)); // one pulse per KEYIN accepted
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 2)); // one pulse per COINC accepted
+	machine().bookkeeping().coin_counter_w(3, BIT(data, 6)); // one pulse per KEYOUT
+	m_hopper->motor_w(BIT(data, 7));
 }
 
 u32 igs_m027_state::unk2_r()
@@ -962,6 +1056,9 @@ void igs_m027_state::m027(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027_state::interrupt), "screen", 0, 1);
 
 	I8255A(config, m_ppi);
+	m_ppi->tri_pa_callback().set_constant(0x00);
+	m_ppi->tri_pb_callback().set_constant(0x00);
+	m_ppi->tri_pc_callback().set_constant(0x00);
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits(true);
@@ -1066,7 +1163,14 @@ void igs_m027_state::oceanpar_xor(machine_config &config)
 {
 	m027_xor(config);
 
-	// TODO: PPI port A = output, port B = output, port C = output
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::oceanpar_xor_map);
+
+	m_ppi->out_pa_callback().set(m_ticket, FUNC(ticket_dispenser_device::motor_w)).bit(7);
+	m_ppi->out_pb_callback().set(FUNC(igs_m027_state::oceanpar_output_w));
+	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::lamps_w));
+
+	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW );
 }
 
 void igs_m027_state::extradraw(machine_config &config)
@@ -2054,6 +2158,9 @@ void igs_m027_state::init_slqz3()
 {
 	slqz3_decrypt(machine());
 	m_igs017_igs031->set_text_reverse_bits(false);
+
+	// what lives here?
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000000c, 0x4000000f, read32smo_delegate(*this, FUNC(igs_m027_state::unk2_r)));
 }
 
 void igs_m027_state::init_fruitpar()
@@ -2170,8 +2277,8 @@ GAME( 200?, jking02,   0,        jking02_xor,  jking02,  igs_m027_state, init_jk
 GAME( 2003, mgzz,      0,        mgzz_xor,     mgzz,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V101CN)", MACHINE_NOT_WORKING )
 GAME( 2000, mgzza,     mgzz,     mgzz_xor,     mgzza,    igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_NOT_WORKING )
 GAME( 2007, mgcs3,     0,        m027_xor,     base,     igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)", MACHINE_NOT_WORKING )
-GAME( 1999, oceanpar,  0,        oceanpar_xor, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
-GAME( 1999, oceanpara, oceanpar, oceanpar_xor, base,     igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
+GAME( 1999, oceanpar,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
+GAME( 1999, oceanpara, oceanpar, oceanpar_xor, oceanpar, igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING ) // 1999 copyright in ROM
 GAME( 200?, cjddz,     0,        m027_xor,     base,     igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", MACHINE_NOT_WORKING ) // 超级斗地主
 GAME( 200?, extradrw,  0,        extradraw,    base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
