@@ -1570,6 +1570,8 @@ void supracan_state::update_frc_state()
 {
 	if ((m_frc_control & 0xff00) == 0xa200)
 	{
+		const u32 period = ((m_frc_control & 0xff << 16) | (m_frc_frequency));
+
 		// HACK: handle case by case until we resolve the equation
 		// (particularly with variable frequencies)
 		switch(m_frc_control & 0xf)
@@ -1585,7 +1587,7 @@ void supracan_state::update_frc_state()
 			// - causes a crash at boot if too fast;
 			// - takes roughly 6 seconds for a title screen individual kanji to move right-to-left;
 			case 1:
-				m_frc_timer->adjust(attotime::from_hz(30));
+				m_frc_timer->adjust(m_maincpu->cycles_to_attotime(1024 * period), 0);
 				break;
 
 			// gamblord: sets 0xa20f normally, plays with frequency register a lot.
@@ -1593,8 +1595,9 @@ void supracan_state::update_frc_state()
 			// - takes ~1 second for character screen to switch;
 			// - during gameplay sometimes switches to 0xa200 / 0xffff;
 			case 0xf:
-				m_frc_timer->adjust(attotime::from_hz(120));
+				m_frc_timer->adjust(m_maincpu->cycles_to_attotime(8192 * period), 0);
 				break;
+
 			default:
 				popmessage("Attempt to fire up FRC with %04x %04x", m_frc_control, m_frc_frequency);
 				break;
