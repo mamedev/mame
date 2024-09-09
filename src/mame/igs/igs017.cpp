@@ -3118,7 +3118,7 @@ static INPUT_PORTS_START( lhzb2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
 	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW   ) // test mode (keep pressed during boot too)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK ) // press with the above for sound test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1       ) PORT_IMPULSE(5) // coin error otherwise
@@ -3133,7 +3133,7 @@ static INPUT_PORTS_START( lhzb2a )
 
 	PORT_MODIFY("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN     )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
 	PORT_SERVICE_NO_TOGGLE( 0x04,   IP_ACTIVE_LOW   ) // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK ) // press with the above for sound test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1       ) PORT_IMPULSE(5)
@@ -3205,7 +3205,7 @@ static INPUT_PORTS_START( mgcs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
 	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW   ) // test mode (keep pressed during boot too)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK ) // press with the above for sound test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1       ) PORT_IMPULSE(5)
@@ -3319,7 +3319,7 @@ static INPUT_PORTS_START( sdmg2 )
 	PORT_DIPSETTING(    0x00, "Tile" )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1    ) PORT_NAME("Hide Gambling") // shown in test mode as "clear" (清除), does not work in game?
 	PORT_SERVICE_NO_TOGGLE( 0x04,   IP_ACTIVE_LOW   ) // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK )
@@ -3536,7 +3536,7 @@ static INPUT_PORTS_START( sdmg2p )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch, TODO: verify
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch, TODO: verify
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mgdh )
@@ -3590,7 +3590,7 @@ static INPUT_PORTS_START( mgdh )
 	PORT_DIPSETTING(    0x00, "10" )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
 	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW   ) // test mode (keep pressed during boot too)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK ) // press with the above for sound test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1       ) PORT_IMPULSE(5) // coin error otherwise
@@ -3720,7 +3720,7 @@ static INPUT_PORTS_START( slqz2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
 	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW   ) // test mode (keep pressed during boot too)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK ) // press with the above for sound test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1       ) PORT_IMPULSE(5) // coin error otherwise
@@ -3840,7 +3840,7 @@ static INPUT_PORTS_START( tjsb )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM   ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_CUSTOM   ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 INPUT_PORTS_END
@@ -3934,7 +3934,7 @@ static INPUT_PORTS_START( spkrform )
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1          ) PORT_IMPULSE(5) // coin 1 (impulse prevents coin error in gambling mode)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2          ) PORT_IMPULSE(5) // coin 2 ""
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM         ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT  ) // payout
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE3       ) PORT_NAME("Return To Gambling (From Formosa). Then Bet, Hold 1..5") // To switch back to poker from Formosa, start the sequence pressing this key (memory $f4a3 holds the sequence number)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK    ) // book
@@ -4014,7 +4014,7 @@ static INPUT_PORTS_START( tarzan )
 	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "SW3:8")
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM         ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW       ) // Service
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   ) // Book
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1         ) PORT_IMPULSE(5) // Coin/Key in (coin error in coin mode)
@@ -4139,7 +4139,7 @@ static INPUT_PORTS_START( starzan )
 	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "SW3:8")
 
 	PORT_START("PLAYER1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
@@ -4237,7 +4237,7 @@ static INPUT_PORTS_START( happyskl )
 	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "SW3:8")
 
 	PORT_START("PLAYER1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
@@ -4436,7 +4436,7 @@ void igs017_state::tarzan(machine_config &config)
 	m_igs017_igs031->in_pa_callback().set_ioport("COINS");
 	m_igs017_igs031->in_pb_callback().set(FUNC(igs017_state::tarzan_keys_joy_r));
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4470,7 +4470,7 @@ void igs017_state::starzan(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("PLAYER1");
 	m_igs017_igs031->in_pc_callback().set(FUNC(igs017_state::dsw_r));
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4504,7 +4504,7 @@ void igs017_state::happyskl(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("PLAYER1");
 	m_igs017_igs031->in_pc_callback().set(FUNC(igs017_state::dsw_r));
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tarzan_palette_bitswap));
@@ -4529,7 +4529,7 @@ void igs017_state::cpoker2(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("PLAYER1");
 	m_igs017_igs031->in_pc_callback().set(FUNC(igs017_state::dsw_r));
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 
 	// protection
 	IGS_INCDEC(config, m_igs_incdec, 0);
@@ -4559,7 +4559,7 @@ void igs017_state::tjsb(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
 	m_igs017_igs031->in_pc_callback().set_ioport("DSW3");
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4590,7 +4590,7 @@ void igs017_state::spkrform(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
 	m_igs017_igs031->in_pc_callback().set_ioport("DSW3");
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4630,7 +4630,7 @@ void igs017_state::mgcs(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set(FUNC(igs017_state::mgcs_keys_joy_r));
 	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4664,7 +4664,7 @@ void igs017_state::lhzb2(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW1");
 	m_igs017_igs031->in_pc_callback().set_ioport("DSW2");
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4699,7 +4699,7 @@ void igs017_state::lhzb2a(machine_config &config)
 
 	// ppi8255 not used for i/o (just video enable)?
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4736,7 +4736,7 @@ void igs017_state::slqz2(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW1");
 	m_igs017_igs031->in_pc_callback().set_ioport("DSW2");
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 
 	// protection
 	IGS_STRING(config, m_igs_string, 0);
@@ -4765,7 +4765,7 @@ void igs017_state::sdmg2(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
 	// DSW3 is read but unused (it's not populated on the PCB)
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 
 	// protection
 	IGS_INCDEC(config, m_igs_incdec, 0);
@@ -4798,7 +4798,7 @@ void igs017_state::mgdha(machine_config &config)
 
 	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 }
 
 void igs017_state::mgdh(machine_config &config)
@@ -4826,7 +4826,7 @@ void igs017_state::sdmg2p(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
 	m_igs017_igs031->in_pc_callback().set_ioport("DSW3"); // there are 3 DIP banks on PCB but only two are shown in test mode
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 
 	IGS_STRING(config, m_igs_string, 0);
 }

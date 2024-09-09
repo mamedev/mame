@@ -463,7 +463,7 @@ INPUT_PORTS_START( lhdmg )
 	PORT_INCLUDE(mahjong)
 
 	PORT_MODIFY("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coin_A) )            PORT_DIPLOCATION("SW1:1,2")        // 投币比率
@@ -644,7 +644,7 @@ INPUT_PORTS_START( zhongguo )
 	PORT_INCLUDE(mahjong_joy)
 
 	PORT_MODIFY("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coin_A) )            PORT_DIPLOCATION("SW1:1,2")  // 投币比率
@@ -706,7 +706,7 @@ INPUT_PORTS_START( mgzz )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // TODO: default assignment clashes with mahjong I, using it hangs waiting for hopper to respond
 
 	PORT_MODIFY("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // 哈巴
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("DSW1")
@@ -797,7 +797,7 @@ INPUT_PORTS_START( oceanpara )
 
 	PORT_MODIFY("PORTC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // HPSW
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // HPSW
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("PLAYER")
@@ -812,7 +812,7 @@ INPUT_PORTS_START( oceanpara )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x00003800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_NAME("Ticket") // TICKET
-	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r) // TKSW
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r) // TKSW
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN2 )          // COINC
 	PORT_BIT( 0xfffe0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -1100,7 +1100,7 @@ void igs_m027_state::lhdmg_xor(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
 	m_igs017_igs031->in_pc_callback().set(NAME((&igs_m027_state::kbd_r<0, 3, 0>)));
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 }
 
 void igs_m027_state::lhzb4_xor(machine_config &config)
@@ -1133,7 +1133,7 @@ void igs_m027_state::zhongguo_xor(machine_config &config)
 {
 	lthy_xor(config);
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 }
 
 void igs_m027_state::mgzz_xor(machine_config &config)
@@ -1148,7 +1148,7 @@ void igs_m027_state::mgzz_xor(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
 	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
 }
 
 void igs_m027_state::oceanpar_xor(machine_config &config)
@@ -1161,8 +1161,8 @@ void igs_m027_state::oceanpar_xor(machine_config &config)
 	m_ppi->out_pb_callback().set(FUNC(igs_m027_state::oceanpar_output_w));
 	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::lamps_w));
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_LOW);
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
 }
 
 void igs_m027_state::extradraw(machine_config &config)
