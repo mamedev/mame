@@ -73,6 +73,8 @@ public:
 
 	void changyu(machine_config &config);
 	void changyu2(machine_config &config);
+	DECLARE_VIDEO_START(changyu2);
+
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -132,9 +134,14 @@ void changyu_state::videoram_w(offs_t offset, u8 data)
 
 void changyu_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(changyu_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(changyu_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 72, 32);
 
 //  m_bg_tilemap->set_transparent_pen(0);
+}
+
+VIDEO_START_MEMBER(changyu_state, changyu2)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(changyu_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 uint32_t changyu_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -145,8 +152,10 @@ uint32_t changyu_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 void changyu_state::main_map(address_map &map)
-{
-	map(0x0000, 0x0fff).ram();
+{   
+	map(0x0000, 0x07ff).ram();
+	map(0x0838, 0x0838).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x0839, 0x0839).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x1000, 0x1fff).ram().w(FUNC(changyu_state::videoram_w)).share("videoram");
 	map(0x3000, 0x37ff).ram();
 	map(0x8000, 0xffff).rom().region("boot_rom", 0x8000);
@@ -283,6 +292,8 @@ void changyu_state::changyu2(machine_config &config)
 	m_mcu->set_addrmap(AS_IO, &changyu_state::ext2_map);
 
 	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
+	
+	MCFG_VIDEO_START_OVERRIDE(changyu_state, changyu2)
 }
 
 ROM_START( changyu )
