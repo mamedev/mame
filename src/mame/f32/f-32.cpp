@@ -470,7 +470,7 @@ void royalpk2_state::royalpk2(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
-	HOPPER(config, m_hopper, attotime::from_msec(100), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

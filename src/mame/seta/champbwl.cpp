@@ -601,7 +601,7 @@ void doraemon_state::doraemon(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0x00, 0x01);
 	m_spritegen->set_fg_yoffsets(0x00, 0x10);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(2000), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(2000));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

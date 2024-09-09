@@ -1263,8 +1263,8 @@ void astrocorp_state::showhand(machine_config &config)
 	NVRAM(config, "nvram");
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	HOPPER(config, m_ticket, attotime::from_msec(200), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
-	HOPPER(config, m_hopper, attotime::from_msec(200), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_ticket, attotime::from_msec(200));
+	HOPPER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1308,8 +1308,8 @@ void astrocorp_state::skilldrp(machine_config &config)
 	NVRAM(config, "nvram");
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	HOPPER(config, m_ticket, attotime::from_msec(200), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
-	HOPPER(config, m_hopper, attotime::from_msec(200), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_ticket, attotime::from_msec(200));
+	HOPPER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

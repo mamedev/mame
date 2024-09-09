@@ -1165,9 +1165,7 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TICKET_DISPENSER(config, m_hopper, 0);
-	m_hopper->set_period(attotime::from_msec(10));
-	m_hopper->set_senses(ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH, false); // hopper stuck low if too slow
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(10)); // hopper stuck low if too slow
 
 	SPEAKER(config, "mono").front_center();
 

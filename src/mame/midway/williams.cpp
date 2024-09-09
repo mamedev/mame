@@ -1780,7 +1780,7 @@ void williams_state::lottofun(machine_config &config)
 	m_pia[0]->writepb_handler().set("ticket", FUNC(ticket_dispenser_device::motor_w)).bit(7).invert();
 	m_pia[0]->ca2_handler().set([this](int state) { machine().bookkeeping().coin_lockout_global_w(state); });
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(70), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(70));
 }
 
 

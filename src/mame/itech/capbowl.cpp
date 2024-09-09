@@ -584,7 +584,7 @@ void capbowl_base_state::base(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

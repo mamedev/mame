@@ -1100,7 +1100,7 @@ void igs_m027_state::lhdmg_xor(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
 	m_igs017_igs031->in_pc_callback().set(NAME((&igs_m027_state::kbd_r<0, 3, 0>)));
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 void igs_m027_state::lhzb4_xor(machine_config &config)
@@ -1133,7 +1133,7 @@ void igs_m027_state::zhongguo_xor(machine_config &config)
 {
 	lthy_xor(config);
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 void igs_m027_state::mgzz_xor(machine_config &config)
@@ -1148,7 +1148,7 @@ void igs_m027_state::mgzz_xor(machine_config &config)
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
 	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 void igs_m027_state::oceanpar_xor(machine_config &config)
@@ -1161,8 +1161,8 @@ void igs_m027_state::oceanpar_xor(machine_config &config)
 	m_ppi->out_pb_callback().set(FUNC(igs_m027_state::oceanpar_output_w));
 	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::lamps_w));
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(50));
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
 }
 
 void igs_m027_state::extradraw(machine_config &config)

@@ -1059,7 +1059,7 @@ void gei_state::getrivia(machine_config &config)
 	m_ppi[1]->out_pb_callback().set(FUNC(gei_state::lamps_w));
 	m_ppi[1]->out_pc_callback().set(FUNC(gei_state::lamps2_w));
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100));
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();

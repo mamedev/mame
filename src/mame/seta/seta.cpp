@@ -7799,7 +7799,7 @@ void setaroul_state::setaroul(machine_config &config)
 	// devices
 	UPD4992(config, m_rtc, 32'768); // ! Actually D4911C !
 	ACIA6850(config, "acia0", 0);
-	TICKET_DISPENSER(config, "hopper", attotime::from_msec(150), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "hopper", attotime::from_msec(150));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9091,8 +9091,8 @@ void jockeyc_state::jockeyc(machine_config &config)
 	// devices
 	UPD4992(config, m_rtc, 32'768); // ! Actually D4911C !
 	ACIA6850(config, "acia0", 0);
-	TICKET_DISPENSER(config, "hopper1", attotime::from_msec(150), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, "hopper2", attotime::from_msec(150), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "hopper1", attotime::from_msec(150));
+	TICKET_DISPENSER(config, "hopper2", attotime::from_msec(150));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

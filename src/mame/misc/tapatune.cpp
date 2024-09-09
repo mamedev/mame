@@ -539,7 +539,7 @@ void tapatune_state::tapatune_base(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -183,9 +183,9 @@ void bsuprem_state::bsuprem(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	HOPPER(config, m_hopper_5, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
-	HOPPER(config, m_hopper_25, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
-	HOPPER(config, m_hopper_100, attotime::from_msec(50), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper_5, attotime::from_msec(50));
+	HOPPER(config, m_hopper_25, attotime::from_msec(50));
+	HOPPER(config, m_hopper_100, attotime::from_msec(50));
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -671,17 +671,9 @@ void midas_state::hammer(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	TICKET_DISPENSER(config, m_prize[0], 0);
-	m_prize[0]->set_period(attotime::from_msec(1000*5));
-	m_prize[0]->set_senses(ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH, false);
-
-	TICKET_DISPENSER(config, m_prize[1], 0);
-	m_prize[1]->set_period(attotime::from_msec(1000*5));
-	m_prize[1]->set_senses(ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH, false);
-
-	TICKET_DISPENSER(config, m_ticket, 0);
-	m_ticket->set_period(attotime::from_msec(200));
-	m_ticket->set_senses(ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH, false);
+	TICKET_DISPENSER(config, m_prize[0], attotime::from_msec(1000*5));
+	TICKET_DISPENSER(config, m_prize[1], attotime::from_msec(1000*5));
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

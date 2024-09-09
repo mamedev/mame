@@ -320,7 +320,7 @@ void xtheball_state::xtheball(machine_config &config)
 	latch3.q_out_cb<3>().set(FUNC(xtheball_state::foreground_mode_w));
 	// Q3 = video foreground control?
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 

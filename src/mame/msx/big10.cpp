@@ -235,7 +235,7 @@ void big10_state::big10(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(40), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(40));
 
 	// video hardware
 	v9938_device &v9938(V9938(config, "v9938", MASTER_CLOCK));

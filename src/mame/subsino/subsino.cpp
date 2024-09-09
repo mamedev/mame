@@ -2808,7 +2808,7 @@ void subsino_state::victor21(machine_config &config)
 	ppi.tri_pb_callback().set_constant(0);
 	ppi.in_pc_callback().set_ioport("INC");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -2850,7 +2850,7 @@ void subsino_state::crsbingo(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::crsbingo_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -2891,7 +2891,7 @@ void subsino_state::srider(machine_config &config)
 	ppi2.in_pb_callback().set_ioport("INA");
 	ppi2.in_pc_callback().set_ioport("INB");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -2954,7 +2954,7 @@ void subsino_state::tisub(machine_config &config)
 	ppi2.in_pb_callback().set_ioport("INA");
 	ppi2.in_pc_callback().set_ioport("INB");
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -3009,7 +3009,7 @@ void subsino_state::stbsub(machine_config &config)
 	ppi2.in_pc_callback().set_ioport("INA");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

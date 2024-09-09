@@ -235,7 +235,7 @@ void piggypas_state::piggypas(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(piggypas_state::ctrl_w));
 	ppi.in_pc_callback().set_ioport("IN0");
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100));
 }
 
 void piggypas_state::fidlstix(machine_config &config)

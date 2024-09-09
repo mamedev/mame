@@ -388,7 +388,7 @@ void dcheese_state::dcheese(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(200), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(200));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

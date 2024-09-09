@@ -642,7 +642,7 @@ void konmedal68k_state::kzaurus(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::kzaurus_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal68k_state::scanline), "screen", 0, 1);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	HOPPER(config, "hopper", attotime::from_msec(100), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
+	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

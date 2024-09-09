@@ -2422,7 +2422,7 @@ void aristmk5_state::aristmk5(machine_config &config)
 
 	DS1302(config, m_rtc, 32.768_kHz_XTAL);
 
-	HOPPER(config, m_hopper, attotime::from_msec(100), hopper_device::MOTOR_ACTIVE_HIGH, hopper_device::STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	// some games (jungjuic, penpir2) use the IOC KART interface for debug
 	rs232_port_device &rs232(RS232_PORT(config, "kart", default_rs232_devices, nullptr));

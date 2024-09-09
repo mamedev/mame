@@ -475,7 +475,7 @@ void mjsenpu_state::mjsenpu(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// more likely coins out?
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50), ticket_dispenser_device::MOTOR_ACTIVE_HIGH, ticket_dispenser_device::STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
