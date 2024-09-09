@@ -33,6 +33,7 @@
 
 #include "zoomer_rtc.h"
 #include "cpu/nec/nec.h"
+#include "machine/bankdev.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "sound/upd65043gfu01.h"
@@ -52,9 +53,16 @@ public:
 	zoomer_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_bank_2000(*this, "bank_2000_%u", 0),
+		m_bank_a000(*this, "bank_a000_%u", 0),
+		m_wp_view{
+			{*this, "wp_view0"}, {*this, "wp_view1"}, {*this, "wp_view2"}, {*this, "wp_view3"},
+			{*this, "wp_view4"}, {*this, "wp_view5"}, {*this, "wp_view6"}, {*this, "wp_view7"},
+			{*this, "wp_view8"}, {*this, "wp_view9"}, {*this, "wp_view10"}, {*this, "wp_view11"},
+			{*this, "wp_view12"}, {*this, "wp_view13"}, {*this, "wp_view14"}, {*this, "wp_view15"},
+		},
 		m_rtc(*this, "rtc"),
 		m_psg(*this, "psg"),
-		m_rom(*this, "maincpu"),
 		m_nvram(*this, "nvram", 0x100000, endianness_t::little),
 		m_pen(*this, "PEN"),
 		m_pen_x(*this, "PEN_X"),
@@ -76,27 +84,17 @@ private:
 	static constexpr unsigned TIMER_RATE = (32768 / 8);
 
 	void maincpu_map(address_map &map);
+	void maincpu_ems_map(address_map &map);
 	void maincpu_io_map(address_map &map);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void apo_w(u8 data);
 
-	u32 bank_base_2000(unsigned bank) const;
-	u32 bank_base_a000(unsigned bank) const;
-
 	u8 ems_2000_bank_r(offs_t offset);
 	void ems_2000_bank_w(offs_t offset, u8 data);
 	u8 ems_a000_bank_r(offs_t offset);
 	void ems_a000_bank_w(offs_t offset, u8 data);
-
-	u8 ems_2000_r(offs_t offset);
-	void ems_2000_w(offs_t offset, u8 data);
-	u8 ems_a000_r(offs_t offset);
-	void ems_a000_w(offs_t offset, u8 data);
-
-	u8 ems_mem_r(offs_t offset);
-	void ems_mem_w(offs_t offset, u8 data);
 
 	template<int Num>
 	TIMER_CALLBACK_MEMBER(timer_irq) { irq_set<Num>(1); }
@@ -122,9 +120,11 @@ private:
 	void lcdram_w(offs_t offset, u8 data);
 
 	required_device<v20_device> m_maincpu;
+	required_device_array<address_map_bank_device, 4> m_bank_2000;  // 128kb windows (banked w/ 64kb granularity) at 20000-9ffff
+	required_device_array<address_map_bank_device, 16> m_bank_a000; // 16kb windows at a0000-dffff
+	memory_view m_wp_view[16]; // view used for enabling write-protect trap in a0000-dffff area
 	required_device<zoomer_rtc_device> m_rtc;
 	required_device<upd65043gfu01_device> m_psg;
-	required_memory_region m_rom;
 
 	memory_share_creator<u8> m_nvram;
 
@@ -138,8 +138,8 @@ private:
 	u16 m_irq_status;
 	u16 m_pending_irq;
 
-	u16 m_bank_2000[4];
-	u16 m_bank_a000[16];
+	u16 m_bank_2000_num[4];
+	u16 m_bank_a000_num[16];
 
 	u8 m_pen_select;
 
@@ -172,11 +172,28 @@ enum
 
 void zoomer_state::maincpu_map(address_map &map)
 {
-	map(0x20000, 0x9ffff).rw(FUNC(zoomer_state::ems_2000_r), FUNC(zoomer_state::ems_2000_w));
-	map(0xa0000, 0xdffff).r(FUNC(zoomer_state::ems_a000_r));
-	map(0xa0000, 0xd7fff).w(FUNC(zoomer_state::ems_a000_w));
+	for (int i = 0; i < 4; i++)
+	{
+		const offs_t start = 0x20000 + (i << 17);
+		map(start, start | 0x1ffff).rw(m_bank_2000[i], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	}
+	for (int i = 0; i < 16; i++)
+	{
+		const offs_t start = 0xa0000 + (i << 14);
+		map(start, start | 0x3fff).rw(m_bank_a000[i], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+		map(start, start | 0x3fff).view(m_wp_view[i]);
+		m_wp_view[i][0](start, start | 0x3fff).lw8(NAME([this](u8 data) { irq_set<IRQ_EMS>(1); }));
+	}
+
 	map(0xd8000, 0xdffff).w(FUNC(zoomer_state::lcdram_w));
 	map(0xe0000, 0xfffff).rom().region("maincpu", 0);
+}
+
+void zoomer_state::maincpu_ems_map(address_map &map)
+{
+	map(0x0000000, 0x00fffff).ram().share("nvram");
+	map(0x0400000, 0x07fffff).rom().region("maincpu", 0);
+//	map(0x1000000, 0x1ffffff) - TODO: PCMCIA
 }
 
 void zoomer_state::maincpu_io_map(address_map &map)
@@ -275,8 +292,8 @@ void zoomer_state::machine_start()
 	m_pending_irq = 0;
 
 	std::fill(std::begin(m_timer_rate), std::end(m_timer_rate), 0);
-	std::fill(std::begin(m_bank_2000), std::end(m_bank_2000), 0);
-	std::fill(std::begin(m_bank_a000), std::end(m_bank_a000), 0);
+	std::fill(std::begin(m_bank_2000_num), std::end(m_bank_2000_num), 0);
+	std::fill(std::begin(m_bank_a000_num), std::end(m_bank_a000_num), 0);
 
 	m_pen_select = 0;
 
@@ -293,8 +310,8 @@ void zoomer_state::machine_start()
 	save_item(NAME(m_irq_status));
 	save_item(NAME(m_pending_irq));
 	save_item(NAME(m_timer_rate));
-	save_item(NAME(m_bank_2000));
-	save_item(NAME(m_bank_a000));
+	save_item(NAME(m_bank_2000_num));
+	save_item(NAME(m_bank_a000_num));
 	save_item(NAME(m_pen_select));
 	save_item(NAME(m_lcdram_latch));
 	save_item(NAME(m_lcd_ctrl));
@@ -356,108 +373,58 @@ void zoomer_state::apo_w(u8 data)
 }
 
 //**************************************************************************
-u32 zoomer_state::bank_base_2000(unsigned bank) const
-{
-	return (m_bank_2000[bank] & 0x1ff) << 16;
-}
-
-//**************************************************************************
-u32 zoomer_state::bank_base_a000(unsigned bank) const
-{
-	return (m_bank_a000[bank] & 0x7ff) << 14;
-}
-
-//**************************************************************************
 u8 zoomer_state::ems_2000_bank_r(offs_t offset)
 {
-	return m_bank_2000[offset >> 1] >> (BIT(offset, 0) * 8);;
+	return m_bank_2000_num[offset >> 1] >> (BIT(offset, 0) * 8);
 }
 
 //**************************************************************************
 void zoomer_state::ems_2000_bank_w(offs_t offset, u8 data)
 {
+	const offs_t bank = offset >> 1;
+
 	if (BIT(offset, 0))
 	{
-		m_bank_2000[offset >> 1] &= 0x00ff;
-		m_bank_2000[offset >> 1] |= (data << 8);
+		m_bank_2000_num[bank] &= 0x00ff;
+		m_bank_2000_num[bank] |= (data << 8);
 	}
 	else
 	{
-		m_bank_2000[offset >> 1] &= 0xff00;
-		m_bank_2000[offset >> 1] |= data;
+		m_bank_2000_num[bank] &= 0xff00;
+		m_bank_2000_num[bank] |= data;
 	}
+
+	m_bank_2000[bank]->set_bank(m_bank_2000_num[bank]);
 }
 
 //**************************************************************************
 u8 zoomer_state::ems_a000_bank_r(offs_t offset)
 {
-	return m_bank_a000[offset >> 1] >> (BIT(offset, 0) * 8);
+	return m_bank_a000_num[offset >> 1] >> (BIT(offset, 0) * 8);
 }
 
 //**************************************************************************
 void zoomer_state::ems_a000_bank_w(offs_t offset, u8 data)
 {
+	const offs_t bank = offset >> 1;
+
 	if (BIT(offset, 0))
 	{
-		m_bank_a000[offset >> 1] &= 0x00ff;
-		m_bank_a000[offset >> 1] |= (data << 8);
+		m_bank_a000_num[offset >> 1] &= 0x00ff;
+		m_bank_a000_num[offset >> 1] |= (data << 8);
+
+		if (BIT(data, 7))
+			m_wp_view[bank].select(0);
+		else
+			m_wp_view[bank].disable();
 	}
 	else
 	{
-		m_bank_a000[offset >> 1] &= 0xff00;
-		m_bank_a000[offset >> 1] |= data;
+		m_bank_a000_num[offset >> 1] &= 0xff00;
+		m_bank_a000_num[offset >> 1] |= data;
 	}
-}
 
-//**************************************************************************
-u8 zoomer_state::ems_2000_r(offs_t offset)
-{
-	return ems_mem_r((offset & 0x1ffff) | bank_base_2000(offset >> 17));
-}
-
-//**************************************************************************
-void zoomer_state::ems_2000_w(offs_t offset, u8 data)
-{
-	ems_mem_w((offset & 0x1ffff) | bank_base_2000(offset >> 17), data);
-}
-
-//**************************************************************************
-u8 zoomer_state::ems_a000_r(offs_t offset)
-{
-	return ems_mem_r((offset & 0x3fff) | bank_base_a000(offset >> 14));
-}
-
-//**************************************************************************
-void zoomer_state::ems_a000_w(offs_t offset, u8 data)
-{
-	if (BIT(m_bank_a000[offset >> 14], 15))
-		irq_set<IRQ_EMS>(1); // write protect
-	else
-		ems_mem_w((offset & 0x3fff) | bank_base_a000(offset >> 14), data);
-}
-
-//**************************************************************************
-u8 zoomer_state::ems_mem_r(offs_t offset)
-{
-	if (offset < 0x0100000)
-		return m_nvram[offset];
-	else if (offset >= 0x0400000 && offset < 0x0800000)
-		return m_rom->base()[offset &= 0x3fffff];
-	// TODO: PCMCIA at 0x1000000
-	else if (!machine().side_effects_disabled())
-		logerror("%s: unmapped read from EMS @ %08x\n", machine().describe_context(), offset);
-
-	return 0;
-}
-
-//**************************************************************************
-void zoomer_state::ems_mem_w(offs_t offset, u8 data)
-{
-	if (offset < 0xf8000)
-		m_nvram[offset] = data;
-	// TODO: PCMCIA at 0x1000000
-	else
-		logerror("%s: unmapped write to EMS @ %08x\n", machine().describe_context(), offset);
+	m_bank_a000[bank]->set_bank(m_bank_a000_num[bank]);
 }
 
 //**************************************************************************
@@ -678,6 +645,11 @@ void zoomer_state::zoomer(machine_config &config)
 	V20(config, m_maincpu, 7.3728_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zoomer_state::maincpu_map);
 	m_maincpu->set_addrmap(AS_IO, &zoomer_state::maincpu_io_map);
+
+	for (int i = 0; i < 4; i++)
+		ADDRESS_MAP_BANK(config, m_bank_2000[i]).set_map(&zoomer_state::maincpu_ems_map).set_options(ENDIANNESS_LITTLE, 8, 25, 0x10000);
+	for (int i = 0; i < 16; i++)
+		ADDRESS_MAP_BANK(config, m_bank_a000[i]).set_map(&zoomer_state::maincpu_ems_map).set_options(ENDIANNESS_LITTLE, 8, 25, 0x4000);
 
 	ZOOMER_RTC(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->alarm_cb().set(FUNC(zoomer_state::irq_set<IRQ_RTC_ALARM>));
