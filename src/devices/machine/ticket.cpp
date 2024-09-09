@@ -54,7 +54,7 @@ ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, 
 	, m_power(0)
 	, m_timer(nullptr)
 	, m_output(*this, tag) // TODO: change to "tag:status"
-	, m_dispense_handler(*this) // TODO: can we use m_output for this?
+	, m_dispense_handler(*this)
 {
 }
 
