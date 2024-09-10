@@ -24,7 +24,7 @@ These games use the IGS027A processor.
 #include "screen.h"
 
 #define LOG_DEBUG       (1U << 1)
-#define VERBOSE         (0)
+#define VERBOSE         (LOG_DEBUG)
 #include "logmacro.h"
 
 namespace {
@@ -84,6 +84,12 @@ private:
 	void mcu_p2_w(uint8_t data);
 	void mcu_p3_w(uint8_t data);
 
+	u32 igs027_periph_r(offs_t offset, u32 mem_mask);
+	void igs027_periph_w(offs_t offset, u32 data, u32 mem_mask);
+
+	TIMER_CALLBACK_MEMBER(igs027_timer0);
+	TIMER_CALLBACK_MEMBER(igs027_timer1);
+
 	u32 rnd_r()	{ return machine().rand(); }
 
 	u8 m_port2_latch;
@@ -98,6 +104,10 @@ private:
 	u8 m_port1_dat;
 	u8 m_port2_dat;
 	u8 m_port3_dat;
+
+	emu_timer *m_timer0;
+	emu_timer *m_timer1;
+
 };
 
 
@@ -105,8 +115,8 @@ void igs_m027xa_state::machine_reset()
 {
 	m_port2_latch = 0;
 	m_port0_latch = 0;
-	m_irq_enable = -1;
-	m_irq_pending = -1;
+	m_irq_enable = 0xff;
+	m_irq_pending = 0xff;
 	m_xa_cmd = 0;
 	m_xa_ret0 = 0;
 	m_xa_ret1 = 0;
@@ -133,6 +143,10 @@ void igs_m027xa_state::machine_start()
 	save_item(NAME(m_port1_dat));
 	save_item(NAME(m_port2_dat));
 	save_item(NAME(m_port3_dat));
+
+	m_timer0 = timer_alloc(FUNC(igs_m027xa_state::igs027_timer0), this);
+	m_timer1 = timer_alloc(FUNC(igs_m027xa_state::igs027_timer1), this);
+
 }
 
 void igs_m027xa_state::video_start()
@@ -142,9 +156,62 @@ void igs_m027xa_state::video_start()
 
 void igs_m027xa_state::igs_70000100_w(u32 data)
 {
+	logerror("%s: igs_70000100_w %04x\n", machine().describe_context(), data);
 	m_igs_70000100 = data;
 }
 
+
+
+TIMER_CALLBACK_MEMBER(igs_m027xa_state::igs027_timer0)
+{
+	igs027_trigger_irq(0);
+}
+
+TIMER_CALLBACK_MEMBER(igs_m027xa_state::igs027_timer1)
+{
+	igs027_trigger_irq(1);
+}
+
+void igs_m027xa_state::igs027_periph_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	switch (offset * 4)
+	{
+	case 0x100:
+		// TODO: verify the timer interval
+		m_timer0->adjust(attotime::from_hz(data / 2), 0, attotime::from_hz(data / 2));
+		break;
+
+	case 0x104:
+		m_timer1->adjust(attotime::from_hz(data / 2), 0, attotime::from_hz(data / 2));
+		break;
+
+	case 0x200:
+		m_irq_enable = data;
+		break;
+
+	default:
+		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_periph_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+		break;
+	}
+}
+
+u32 igs_m027xa_state::igs027_periph_r(offs_t offset, u32 mem_mask)
+{
+	u32 data = ~u32(0);
+	switch (offset * 4)
+	{
+	case 0x200:
+		data = m_irq_pending;
+		m_irq_pending = 0xff;
+		break;
+
+	default:
+		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_periph_r %04x (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
+		break;
+
+	}
+	return data;
+}
 
 /***************************************************************************
 
@@ -167,7 +234,8 @@ void igs_m027xa_state::igs_mahjong_map(address_map &map)
 
 	map(0x70000100, 0x70000103).w(FUNC(igs_m027xa_state::igs_70000100_w));
 
-	map(0x70000200, 0x70000203).ram();     //??????????????
+	map(0x70000000, 0x700003ff).rw(FUNC(igs_m027xa_state::igs027_periph_r), FUNC(igs_m027xa_state::igs027_periph_w));
+
 	map(0x50000000, 0x500003ff).nopw(); // uploads XOR table to external ROM here
 	map(0xf0000000, 0xf000000f).nopw(); // magic registers
 }
@@ -342,8 +410,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 
 	// should be using igs027_trigger_irq with more compelx interrupt logic?
 
-	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
-		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // source? (can the XA trigger this?)
+	//if (scanline == 240 && m_igs017_igs031->get_irq_enable())
+	//	m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // source? (can the XA trigger this?)
 
 	if (scanline == 0 && m_igs017_igs031->get_nmi_enable())
 		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
