@@ -228,21 +228,6 @@ static const struct {
 	{ INTE56,   0x08, 0x40 },     // INT5
 								  // 0x3c - reserved
 	{ INTE34,   0x80, 0x38 },     // INT4
-	{ INTE34,   0x80, 0x38 },     // INT4
-	{ INTE34,   0x80, 0x38 },     // INT4
-	{ INTE34,   0x80, 0x38 },     // INT4
-	{ INTE34,   0x80, 0x38 },     // INT4
-	{ INTE34,   0x80, 0x38 },     // INT4
-	{ INTE34,   0x80, 0x38 },     // INT4
-	{ INTE34,   0x80, 0x38 },     // INT4
-	{ INTE34,   0x80, 0x38 },     // INT4
-	{ INTE34,   0x80, 0x38 },     // INT4
-	{ INTE34,   0x80, 0x38 },     // INT4
-	{ INTE34,   0x80, 0x38 },     // INT4
-	{ INTE34,   0x80, 0x38 },     // INT4
-	{ INTE34,   0x80, 0x38 },     // INT4
-	{ INTE34,   0x80, 0x38 },     // INT4
-	{ INTE34,   0x80, 0x38 },     // INT4
 	{ INTE34,   0x08, 0x34 },     // INT3
 	{ INTE12,   0x80, 0x30 },     // INT2
 	{ INTE12,   0x08, 0x2c },     // INT1
