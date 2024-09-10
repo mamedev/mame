@@ -257,7 +257,8 @@ void tmp95c061_device::device_reset()
 	}
 }
 
-enum {
+enum
+{
 	INTE0AD,
 	INTE45,
 	INTE67,
@@ -277,29 +278,29 @@ static const struct {
 	uint8_t vector;
 } tmp95c061_irq_vector_map[] =
 {
-	{ INTETC32, 0x80, 0x80 },   /* INTTC3 */
-	{ INTETC32, 0x08, 0x7c },   /* INTTC2 */
-	{ INTETC10, 0x80, 0x78 },   /* INTTC1 */
-	{ INTETC10, 0x08, 0x74 },   /* INTTC0 */
-	{ INTE0AD, 0x80, 0x70 },    /* INTAD */
-	{ INTES1, 0x80, 0x6c },     /* INTTX1 */
-	{ INTES1, 0x08, 0x68 },     /* INTRX1 */
-	{ INTES0, 0x80, 0x64 },     /* INTTX0 */
-	{ INTES0, 0x08, 0x60 },     /* INTRX0 */
-	{ INTET76, 0x80, 0x5c },    /* INTTR7 */
-	{ INTET76, 0x08, 0x58 },    /* INTTR6 */
-	{ INTET54, 0x80, 0x54 },    /* INTTR5 */
-	{ INTET54, 0x08, 0x50 },    /* INTTR4 */
-	{ INTET32, 0x80, 0x4c },    /* INTT3 */
-	{ INTET32, 0x08, 0x48 },    /* INTT2 */
-	{ INTET10, 0x80, 0x44 },    /* INTT1 */
-	{ INTET10, 0x08, 0x40 },    /* INTT0 */
-								/* 0x3c - reserved */
-	{ INTE67, 0x80, 0x38 },     /* INT7 */
-	{ INTE67, 0x08, 0x34 },     /* INT6 */
-	{ INTE45, 0x80, 0x30 },     /* INT5 */
-	{ INTE45, 0x08, 0x2c },     /* INT4 */
-	{ INTE0AD, 0x08, 0x28 }     /* INT0 */
+	{ INTETC32, 0x80, 0x80 },   // INTTC3
+	{ INTETC32, 0x08, 0x7c },   // INTTC2
+	{ INTETC10, 0x80, 0x78 },   // INTTC1
+	{ INTETC10, 0x08, 0x74 },   // INTTC0
+	{ INTE0AD,  0x80, 0x70 },   // INTAD
+	{ INTES1,   0x80, 0x6c },   // INTTX1
+	{ INTES1,   0x08, 0x68 },   // INTRX1
+	{ INTES0,   0x80, 0x64 },   // INTTX0
+	{ INTES0,   0x08, 0x60 },   // INTRX0
+	{ INTET76,  0x80, 0x5c },   // INTTR7
+	{ INTET76,  0x08, 0x58 },   // INTTR6
+	{ INTET54,  0x80, 0x54 },   // INTTR5
+	{ INTET54,  0x08, 0x50 },   // INTTR4
+	{ INTET32,  0x80, 0x4c },   // INTT3
+	{ INTET32,  0x08, 0x48 },   // INTT2
+	{ INTET10,  0x80, 0x44 },   // INTT1
+	{ INTET10,  0x08, 0x40 },   // INTT0
+								// 0x3c - reserved
+	{ INTE67,   0x80, 0x38 },   // INT7
+	{ INTE67,   0x08, 0x34 },   // INT6
+	{ INTE45,   0x80, 0x30 },   // INT5
+	{ INTE45,   0x08, 0x2c },   // INT4
+	{ INTE0AD,  0x08, 0x28 }    // INT0
 };
 static constexpr u8 NUM_MASKABLE_IRQS = sizeof(tmp95c061_irq_vector_map) / 3;
 
