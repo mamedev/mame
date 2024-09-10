@@ -73,6 +73,8 @@ private:
 	u32 xa_r(offs_t offset, u32 mem_mask);
 	void xa_w(offs_t offset, u32 data, u32 mem_mask);
 
+	void igs_40000014_w(offs_t offset, u32 data, u32 mem_mask);
+
 	u8 mcu_p0_r();
 	u8 mcu_p1_r();
 	u8 mcu_p2_r();
@@ -97,11 +99,13 @@ private:
 	u32 m_xa_cmd;
 	u32 m_xa_ret0;
 	u32 m_xa_ret1;
-	u8 m_num_params;
 	u8 m_port0_dat;
+	s8 m_num_params;
 	u8 m_port1_dat;
 	u8 m_port2_dat;
 	u8 m_port3_dat;
+
+	u32 m_igs_40000014;
 
 	emu_timer *m_timer0;
 	emu_timer *m_timer1;
@@ -123,6 +127,8 @@ void igs_m027xa_state::machine_reset()
 	m_port1_dat = 0;
 	m_port2_dat = 0;
 	m_port3_dat = 0;
+
+	m_igs_40000014 = 0;
 }
 
 void igs_m027xa_state::machine_start()
@@ -139,6 +145,8 @@ void igs_m027xa_state::machine_start()
 	save_item(NAME(m_port1_dat));
 	save_item(NAME(m_port2_dat));
 	save_item(NAME(m_port3_dat));
+
+	save_item(NAME(m_igs_40000014));
 
 	m_timer0 = timer_alloc(FUNC(igs_m027xa_state::igs027_timer0), this);
 	m_timer1 = timer_alloc(FUNC(igs_m027xa_state::igs027_timer1), this);
@@ -217,7 +225,7 @@ void igs_m027xa_state::igs_mahjong_map(address_map &map)
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 	map(0x38009000, 0x38009003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027xa_state::rnd_r));
-
+	map(0x40000014, 0x40000017).w(FUNC(igs_m027xa_state::igs_40000014_w));
 	map(0x58000000, 0x580000ff).rw(FUNC(igs_m027xa_state::xa_r), FUNC(igs_m027xa_state::xa_w));
 
 	map(0x70000000, 0x700003ff).rw(FUNC(igs_m027xa_state::igs027_periph_r), FUNC(igs_m027xa_state::igs027_periph_w));
@@ -263,6 +271,12 @@ u32 igs_m027xa_state::xa_r(offs_t offset, u32 mem_mask)
 		break;
 	}
 	return data;
+}
+
+void igs_m027xa_state::igs_40000014_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// sets bit 1 before waiting on FIRQ, maybe it's an enable here?
+	m_igs_40000014 = data;
 }
 
 void igs_m027xa_state::xa_w(offs_t offset, u32 data, u32 mem_mask)
@@ -399,7 +413,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 	//if (scanline == 240 && m_igs017_igs031->get_irq_enable())
 	//	m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // source? (can the XA trigger this?)
 
-	if (scanline == 0 && m_igs017_igs031->get_nmi_enable())
+	if (scanline == 0 && (m_igs_40000014 & 1))
 		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
 }
 
