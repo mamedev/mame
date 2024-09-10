@@ -79584,6 +79584,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="xmas23" supported="no">
+		<description>8-bit Xmas 2023</description>
+		<year>2023</year>
+		<publisher>retroUSB</publisher>
+		<info name="serial" value="RET-Y3-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="xmas23demo.prg" size="0x20000" crc="7c30674c" sha1="b1aa0d0ab8dab24f7dda27036d8dd12f1d6b7bea" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge? -->
+			<dataarea name="vram" size="0x8000" />
+		</part>
+	</software>
+
 	<software name="musicpow">
 		<description>8Bit Music Power</description>
 		<year>2016</year>
