@@ -1,20 +1,139 @@
 // license:BSD-3-Clause
 // copyright-holders:K.Wilkins
-/*****************************************************************************
- *
- * Asteroids Analog Sound system interface
- *
- *****************************************************************************/
+/***********************************************************************
 
+    Lunar Lander / Asteroids audio hardware
+
+    TODO:
+        * Netlist implementations.
+
+***********************************************************************/
 #include "emu.h"
-#include "asteroid.h"
-#include "machine/74259.h"
-#include "speaker.h"
+#include "asteroid_a.h"
 
-/************************************************************************/
-/* Asteroids Sound System Analog emulation by K.Wilkins Nov 2000        */
-/* Questions/Suggestions to mame@esplexo.co.uk                          */
-/************************************************************************/
+
+/*************************************
+ *
+ *  Audio hardware
+ *  (Lunar Lander)
+ *
+ *************************************/
+DEFINE_DEVICE_TYPE(LLANDER_AUDIO, llander_audio_device, "llander_audio", "Lunar Lander Audio")
+
+llander_audio_device::llander_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, LLANDER_AUDIO, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_discrete(*this, "discrete")
+{ }
+
+#define LLANDER_TONE3K_EN   NODE_01
+#define LLANDER_TONE6K_EN   NODE_02
+#define LLANDER_THRUST_DATA NODE_03
+#define LLANDER_EXPLOD_EN   NODE_04
+#define LLANDER_NOISE_RESET NODE_05
+
+#define LLANDER_NOISE               NODE_10
+#define LLANDER_TONE_3K_SND         NODE_11
+#define LLANDER_TONE_6K_SND         NODE_12
+#define LLANDER_THRUST_EXPLOD_SND   NODE_13
+
+static const discrete_lfsr_desc llander_lfsr =
+{
+	DISC_CLK_IS_FREQ,
+	16,         /* Bit Length */
+	0,          /* Reset Value */
+	6,          /* Use Bit 6 as XOR input 0 */
+	14,         /* Use Bit 14 as XOR input 1 */
+	DISC_LFSR_XNOR,     /* Feedback stage1 is inverted XOR */
+	DISC_LFSR_IN0,      /* Feedback stage2 is just stage 1 output external feed not used */
+	DISC_LFSR_REPLACE,  /* Feedback stage3 replaces the shifted register contents */
+	0x000001,       /* Everything is shifted into the first bit only */
+	0,          /* Output not inverted */
+	14          /* Output bit */
+};
+
+static DISCRETE_SOUND_START(llander_discrete)
+	/************************************************/
+	/* llander Effects Relataive Gain Table         */
+	/*                                              */
+	/* Effect       V-ampIn   Gain ratio  Relative  */
+	/* Tone3k        4        10/390          9.2   */
+	/* Tone6k        4        10/390          9.2   */
+	/* Explode       3.8      10/6.8*2     1000.0   */
+	/* Thrust        3.8      10/6.8*2      600.0   */
+	/*  NOTE: Thrust gain has to be tweaked, due to */
+	/*        the filter stage.                     */
+	/************************************************/
+
+	/*                        NODE             GAIN      OFFSET  INIT */
+	DISCRETE_INPUTX_DATA(LLANDER_THRUST_DATA,  600.0/7*7.6,   0,      0)
+	DISCRETE_INPUT_LOGIC(LLANDER_TONE3K_EN)
+	DISCRETE_INPUT_LOGIC(LLANDER_TONE6K_EN)
+	DISCRETE_INPUT_LOGIC(LLANDER_EXPLOD_EN)
+	DISCRETE_INPUT_PULSE(LLANDER_NOISE_RESET, 1)
+
+	DISCRETE_LFSR_NOISE(NODE_20, 1, LLANDER_NOISE_RESET, 12000, 1, 0, 0, &llander_lfsr) // 12KHz Noise source for thrust
+	DISCRETE_RCFILTER(LLANDER_NOISE, NODE_20, 2247, 1e-6)
+
+	DISCRETE_SQUAREWFIX(LLANDER_TONE_3K_SND, LLANDER_TONE3K_EN, 3000, 9.2, 50, 0, 0)    // 3KHz
+
+	DISCRETE_SQUAREWFIX(LLANDER_TONE_6K_SND, LLANDER_TONE6K_EN, 6000, 9.2, 50, 0, 0)    // 6KHz
+
+	DISCRETE_MULTIPLY(NODE_30, LLANDER_NOISE, LLANDER_THRUST_DATA)  // Mix in 12KHz Noise source for thrust
+	/* TBD - replace this line with a Sallen-Key Bandpass macro */
+	DISCRETE_FILTER2(NODE_31, 1, NODE_30, 89.5, (1.0 / 7.6), DISC_FILTER_BANDPASS)
+	DISCRETE_MULTIPLY(NODE_32, NODE_30, 1000.0/600.0)   // Explode adds original noise source onto filtered source
+	DISCRETE_ONOFF(NODE_33, LLANDER_EXPLOD_EN, NODE_32)
+	DISCRETE_ADDER2(NODE_34, 1, NODE_31, NODE_33)
+	/* TBD - replace this line with a Active Lowpass macro */
+	DISCRETE_FILTER1(LLANDER_THRUST_EXPLOD_SND, 1, NODE_34, 560, DISC_FILTER_LOWPASS)
+
+	DISCRETE_ADDER3(NODE_90, 1, LLANDER_TONE_3K_SND, LLANDER_TONE_6K_SND, LLANDER_THRUST_EXPLOD_SND)    // Mix all four sound sources
+	DISCRETE_GAIN(NODE_91, NODE_90, 65534.0/(9.2+9.2+600+1000))
+
+	DISCRETE_OUTPUT(NODE_90, 65534.0/(9.2+9.2+600+1000))        // Take the output from the mixer
+DISCRETE_SOUND_END
+
+void llander_audio_device::noise_reset_w(u8 data)
+{
+	// Resets the LFSR that is used for the white noise generator
+	m_discrete->write(LLANDER_NOISE_RESET, 0); // Reset
+}
+
+void llander_audio_device::sound_w(u8 data)
+{
+	// TODO: the latch is an LS174
+	m_discrete->write(LLANDER_THRUST_DATA, data & 0x07); // Thrust volume
+	m_discrete->write(LLANDER_TONE3K_EN, data & 0x10);   // Tone 3KHz enable
+	m_discrete->write(LLANDER_TONE6K_EN, data & 0x20);   // Tone 6KHz enable
+	m_discrete->write(LLANDER_EXPLOD_EN, data & 0x08);   // Explosion
+}
+
+void llander_audio_device::device_add_mconfig(machine_config &config)
+{
+	DISCRETE(config, m_discrete, llander_discrete)
+		.add_route(ALL_OUTPUTS, *this, 1.4);
+}
+
+
+/*************************************
+ *
+ *  Audio hardware
+ *  (Asteroids)
+ *
+ *************************************/
+DEFINE_DEVICE_TYPE(ASTEROID_AUDIO, asteroid_audio_device, "asteroid_audio", "Asteroids Audio")
+
+asteroid_audio_device::asteroid_audio_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_discrete(*this, "discrete")
+	, m_latch(*this, "latch")
+{ }
+
+asteroid_audio_device::asteroid_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: asteroid_audio_device(mconfig, ASTEROID_AUDIO, tag, owner, clock)
+{ }
 
 static const discrete_lfsr_desc asteroid_lfsr =
 {
@@ -216,6 +335,73 @@ static DISCRETE_SOUND_START(asteroid_discrete)
 	DISCRETE_OUTPUT(NODE_91, 65534.0 / (131.6+76.1+49.5+53.0+1000.0+600.0))     // Take the output from the mixer
 DISCRETE_SOUND_END
 
+void asteroid_audio_device::sound_w(offs_t offset, u8 data)
+{
+	m_latch->write_d7(offset, data);
+}
+
+void asteroid_audio_device::explode_w(u8 data)
+{
+	m_discrete->write(ASTEROID_EXPLODE_DATA, (data & 0x3c) >> 2); // Volume
+
+	// We will modify the pitch data to send the divider value.
+	switch (data & 0xc0)
+	{
+		case 0x00:
+			data = 12;
+			break;
+		case 0x40:
+			data = 6;
+			break;
+		case 0x80:
+			data = 3;
+			break;
+		case 0xc0:
+			data = 5;
+			break;
+	}
+	m_discrete->write(ASTEROID_EXPLODE_PITCH, data);
+}
+
+void asteroid_audio_device::thump_w(u8 data)
+{
+	m_discrete->write(ASTEROID_THUMP_EN, data & 0x10);
+	m_discrete->write(ASTEROID_THUMP_DATA, data & 0x0f);
+}
+
+void asteroid_audio_device::noise_reset_w(u8 data)
+{
+	m_discrete->write(ASTEROID_NOISE_RESET, 0);
+}
+
+void asteroid_audio_device::device_add_mconfig(machine_config &config)
+{
+	DISCRETE(config, m_discrete, asteroid_discrete)
+		.add_route(ALL_OUTPUTS, *this, 1.4);
+
+	LS259(config, m_latch); // M10
+	m_latch->q_out_cb<0>().set(m_discrete, FUNC(discrete_device::write_line<ASTEROID_SAUCER_SND_EN>));
+	m_latch->q_out_cb<1>().set(m_discrete, FUNC(discrete_device::write_line<ASTEROID_SAUCER_FIRE_EN>));
+	m_latch->q_out_cb<2>().set(m_discrete, FUNC(discrete_device::write_line<ASTEROID_SAUCER_SEL>));
+	m_latch->q_out_cb<3>().set(m_discrete, FUNC(discrete_device::write_line<ASTEROID_THRUST_EN>));
+	m_latch->q_out_cb<4>().set(m_discrete, FUNC(discrete_device::write_line<ASTEROID_SHIP_FIRE_EN>));
+	m_latch->q_out_cb<5>().set(m_discrete, FUNC(discrete_device::write_line<ASTEROID_LIFE_EN>));
+}
+
+
+/*************************************
+ *
+ *  Audio hardware
+ *  (Asteroids Deluxe)
+ *
+ *************************************/
+DEFINE_DEVICE_TYPE(ASTDELUX_AUDIO, astdelux_audio_device, "astdelux_audio", "Asteroids Deluxe Audio")
+
+astdelux_audio_device::astdelux_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: asteroid_audio_device(mconfig, ASTDELUX_AUDIO, tag, owner, clock)
+	, m_pokey(*this, "pokey")
+	, m_dswcb(*this, 0x00)
+{ }
 
 static DISCRETE_SOUND_START(astdelux_discrete)
 	/************************************************/
@@ -280,63 +466,18 @@ static DISCRETE_SOUND_START(astdelux_discrete)
 	DISCRETE_OUTPUT(NODE_90, 65534.0/(1000+600))    // Take the output from the mixer
 DISCRETE_SOUND_END
 
-
-void asteroid_state::asteroid_explode_w(uint8_t data)
+void astdelux_audio_device::thrust_w(int state)
 {
-	m_discrete->write(ASTEROID_EXPLODE_DATA,(data&0x3c)>>2);                // Volume
-	/* We will modify the pitch data to send the divider value. */
-	switch ((data&0xc0))
-	{
-		case 0x00:
-			data = 12;
-			break;
-		case 0x40:
-			data = 6;
-			break;
-		case 0x80:
-			data = 3;
-			break;
-		case 0xc0:
-			data = 5;
-			break;
-	}
-	m_discrete->write(ASTEROID_EXPLODE_PITCH, data);
+	m_discrete->write(ASTEROID_THRUST_EN, state);
 }
 
-void asteroid_state::asteroid_thump_w(uint8_t data)
+void astdelux_audio_device::device_add_mconfig(machine_config &config)
 {
-	m_discrete->write(ASTEROID_THUMP_EN,   data & 0x10);
-	m_discrete->write(ASTEROID_THUMP_DATA, data & 0x0f);
-}
+	DISCRETE(config, m_discrete, astdelux_discrete)
+		.add_route(ALL_OUTPUTS, *this, 1.0);
 
-void asteroid_state::asteroid_noise_reset_w(uint8_t data)
-{
-	m_discrete->write(ASTEROID_NOISE_RESET, 0);
-}
-
-
-void asteroid_state::asteroid_sound(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	DISCRETE(config, m_discrete, asteroid_discrete).add_route(ALL_OUTPUTS, "mono", 1.4);
-
-	ls259_device &audiolatch(LS259(config, "audiolatch")); // M10
-	audiolatch.q_out_cb<0>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_SAUCER_SND_EN>));
-	audiolatch.q_out_cb<1>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_SAUCER_FIRE_EN>));
-	audiolatch.q_out_cb<2>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_SAUCER_SEL>));
-	audiolatch.q_out_cb<3>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_THRUST_EN>));
-	audiolatch.q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_SHIP_FIRE_EN>));
-	audiolatch.q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_LIFE_EN>));
-}
-
-
-void asteroid_state::astdelux_sound(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	DISCRETE(config, m_discrete, astdelux_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	ls259_device &audiolatch(LS259(config, "audiolatch")); // M10
-	audiolatch.q_out_cb<3>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_THRUST_EN>));
+	POKEY(config, m_pokey, DERIVED_CLOCK(1, 8));
+	m_pokey->allpot_r().set([this] { return m_dswcb(); });
+	m_pokey->set_output_rc(RES_K(10), CAP_U(0.015), 5.0);
+	m_pokey->add_route(ALL_OUTPUTS, *this, 1.0);
 }
