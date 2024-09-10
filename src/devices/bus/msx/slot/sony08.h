@@ -36,7 +36,7 @@ private:
 	memory_bank_array_creator<6> m_rombank;
 	memory_view m_view[2];
 	u32 m_region_offset;
-	std::vector<u8> m_sram;
+	std::unique_ptr<u8[]> m_sram;
 };
 
 

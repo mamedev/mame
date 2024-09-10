@@ -52,6 +52,7 @@ void msx_slot_panasonic08r_device::device_start()
 	save_item(NAME(m_selected_bank));
 	save_item(NAME(m_control));
 	save_item(NAME(m_bank9));
+	save_pointer(NAME(m_sram), m_sram_size);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -65,13 +66,13 @@ void msx_slot_panasonic08r_device::device_start()
 		}
 
 		// Assuming smaller internal RAM is mirrored.
-		int internal_ram_banks = m_mm->get_ram().size() / 0x2000;
+		int internal_ram_banks = m_mm->get_ram_size() / 0x2000;
 		int start_bank = 0x180;
 		do {
 			int nr_banks = internal_ram_banks;
 			if (start_bank + nr_banks > 0x200)
 				nr_banks = 0x200 - start_bank;
-			m_bank[i]->configure_entries(start_bank, nr_banks, m_mm->get_ram().data(), 0x2000);
+			m_bank[i]->configure_entries(start_bank, nr_banks, m_mm->get_ram_base(), 0x2000);
 			start_bank += internal_ram_banks;
 		}
 		while (start_bank < 0x200);
