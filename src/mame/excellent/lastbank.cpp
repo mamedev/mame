@@ -662,7 +662,8 @@ ROM_START( fever13 ) // ES-9410 PCB (TC0090LVC marked ES9402LA, Z80, ES8712, 14'
 	ROM_LOAD( "4.u48", 0x00000, 0x10000, CRC(33cba6b2) SHA1(cf7d1c7c6215b2f83c9266f92f46d3cfc0242afc) )
 
 	ROM_REGION( 0x120000, "maincpu:gfx", 0 )
-	ROM_LOAD( "u11",   0x000000, 0x100000, BAD_DUMP CRC(2588d82d) SHA1(426f6821862d54123e53410e2776586ddf6b21e7) ) // not dumped yet, using lastbank's for now
+	// unlabeled mask ROM, socket marked as 23C8000 CG ROM
+	ROM_LOAD( "u11", 0x000000, 0x100000, CRC(da59b0d8) SHA1(86fd3cd77aae22e103d11e697b8b4f70ae8b8197) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "es-9410.u55", 0x00000, 0x40000, CRC(09b5e4d6) SHA1(cf0235e9cf0577bf932beda7e4fb1b84410a3e0c) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
@@ -675,4 +676,4 @@ ROM_END
 
 
 GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fever13,  0, lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // missing GFX ROM dump
+GAME( 1995, fever13,  0, lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
