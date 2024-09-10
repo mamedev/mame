@@ -187,7 +187,7 @@ Erratic gameplay speed, controls [irq 3] as FRC, show [video] missing/glitched t
 		<year>1996</year>
 		<publisher>Funtech</publisher>
 		<notes><![CDATA[
-Erratic gameplay speed, controls [irq 3] as FRC
+Erratic gameplay speed, controls [irq 3] as FRC, [sound] BGM plays random tune on title
 [video] use layer 1 as clipping effect (sprites goes under it)
 [video] character select has misaligned sprites
 [video] billiard cue sprite cut off left side (should wraparound)
