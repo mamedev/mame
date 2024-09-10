@@ -68,8 +68,6 @@ private:
 	void pgm_create_dummy_internal_arm_region();
 	void igs_mahjong_map(address_map &map);
 
-	void igs_70000100_w(u32 data);
-	u32 m_igs_70000100 = 0;
 	void igs027_trigger_irq(int num);
 
 	u32 xa_r(offs_t offset, u32 mem_mask);
@@ -129,8 +127,6 @@ void igs_m027xa_state::machine_reset()
 
 void igs_m027xa_state::machine_start()
 {
-	save_item(NAME(m_igs_70000100));
-
 	save_item(NAME(m_port2_latch));
 	save_item(NAME(m_port0_latch));
 	save_item(NAME(m_irq_enable));
@@ -153,14 +149,6 @@ void igs_m027xa_state::video_start()
 {
 	m_igs017_igs031->video_start();
 }
-
-void igs_m027xa_state::igs_70000100_w(u32 data)
-{
-	logerror("%s: igs_70000100_w %04x\n", machine().describe_context(), data);
-	m_igs_70000100 = data;
-}
-
-
 
 TIMER_CALLBACK_MEMBER(igs_m027xa_state::igs027_timer0)
 {
@@ -231,8 +219,6 @@ void igs_m027xa_state::igs_mahjong_map(address_map &map)
 	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027xa_state::rnd_r));
 
 	map(0x58000000, 0x580000ff).rw(FUNC(igs_m027xa_state::xa_r), FUNC(igs_m027xa_state::xa_w));
-
-	map(0x70000100, 0x70000103).w(FUNC(igs_m027xa_state::igs_70000100_w));
 
 	map(0x70000000, 0x700003ff).rw(FUNC(igs_m027xa_state::igs027_periph_r), FUNC(igs_m027xa_state::igs027_periph_w));
 
