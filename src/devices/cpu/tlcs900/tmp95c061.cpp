@@ -257,50 +257,52 @@ void tmp95c061_device::device_reset()
 	}
 }
 
+enum
+{
+	INTE0AD,
+	INTE45,
+	INTE67,
+	INTET10,
+	INTET32,
+	INTET54,
+	INTET76,
+	INTES0,
+	INTES1,
+	INTETC10,
+	INTETC32
+};
 
-#define TMP95C061_INTE0AD     0x0
-#define TMP95C061_INTE45      0x1
-#define TMP95C061_INTE67      0x2
-#define TMP95C061_INTET10     0x3
-#define TMP95C061_INTET32     0x4
-#define TMP95C061_INTET54     0x5
-#define TMP95C061_INTET76     0x6
-#define TMP95C061_INTES0      0x7
-#define TMP95C061_INTES1      0x8
-#define TMP95C061_INTETC10    0x9
-#define TMP95C061_INTETC32    0xa
-
-#define TMP95C061_NUM_MASKABLE_IRQS   22
 static const struct {
 	uint8_t reg;
 	uint8_t iff;
 	uint8_t vector;
-} tmp95c061_irq_vector_map[TMP95C061_NUM_MASKABLE_IRQS] =
+} tmp95c061_irq_vector_map[] =
 {
-	{ TMP95C061_INTETC32, 0x80, 0x80 },   /* INTTC3 */
-	{ TMP95C061_INTETC32, 0x08, 0x7c },   /* INTTC2 */
-	{ TMP95C061_INTETC10, 0x80, 0x78 },   /* INTTC1 */
-	{ TMP95C061_INTETC10, 0x08, 0x74 },   /* INTTC0 */
-	{ TMP95C061_INTE0AD, 0x80, 0x70 },    /* INTAD */
-	{ TMP95C061_INTES1, 0x80, 0x6c },     /* INTTX1 */
-	{ TMP95C061_INTES1, 0x08, 0x68 },     /* INTRX1 */
-	{ TMP95C061_INTES0, 0x80, 0x64 },     /* INTTX0 */
-	{ TMP95C061_INTES0, 0x08, 0x60 },     /* INTRX0 */
-	{ TMP95C061_INTET76, 0x80, 0x5c },    /* INTTR7 */
-	{ TMP95C061_INTET76, 0x08, 0x58 },    /* INTTR6 */
-	{ TMP95C061_INTET54, 0x80, 0x54 },    /* INTTR5 */
-	{ TMP95C061_INTET54, 0x08, 0x50 },    /* INTTR4 */
-	{ TMP95C061_INTET32, 0x80, 0x4c },    /* INTT3 */
-	{ TMP95C061_INTET32, 0x08, 0x48 },    /* INTT2 */
-	{ TMP95C061_INTET10, 0x80, 0x44 },    /* INTT1 */
-	{ TMP95C061_INTET10, 0x08, 0x40 },    /* INTT0 */
-								/* 0x3c - reserved */
-	{ TMP95C061_INTE67, 0x80, 0x38 },     /* INT7 */
-	{ TMP95C061_INTE67, 0x08, 0x34 },     /* INT6 */
-	{ TMP95C061_INTE45, 0x80, 0x30 },     /* INT5 */
-	{ TMP95C061_INTE45, 0x08, 0x2c },     /* INT4 */
-	{ TMP95C061_INTE0AD, 0x08, 0x28 }     /* INT0 */
+	{ INTETC32, 0x80, 0x80 },   // INTTC3
+	{ INTETC32, 0x08, 0x7c },   // INTTC2
+	{ INTETC10, 0x80, 0x78 },   // INTTC1
+	{ INTETC10, 0x08, 0x74 },   // INTTC0
+	{ INTE0AD,  0x80, 0x70 },   // INTAD
+	{ INTES1,   0x80, 0x6c },   // INTTX1
+	{ INTES1,   0x08, 0x68 },   // INTRX1
+	{ INTES0,   0x80, 0x64 },   // INTTX0
+	{ INTES0,   0x08, 0x60 },   // INTRX0
+	{ INTET76,  0x80, 0x5c },   // INTTR7
+	{ INTET76,  0x08, 0x58 },   // INTTR6
+	{ INTET54,  0x80, 0x54 },   // INTTR5
+	{ INTET54,  0x08, 0x50 },   // INTTR4
+	{ INTET32,  0x80, 0x4c },   // INTT3
+	{ INTET32,  0x08, 0x48 },   // INTT2
+	{ INTET10,  0x80, 0x44 },   // INTT1
+	{ INTET10,  0x08, 0x40 },   // INTT0
+								// 0x3c - reserved
+	{ INTE67,   0x80, 0x38 },   // INT7
+	{ INTE67,   0x08, 0x34 },   // INT6
+	{ INTE45,   0x80, 0x30 },   // INT5
+	{ INTE45,   0x08, 0x2c },   // INT4
+	{ INTE0AD,  0x08, 0x28 }    // INT0
 };
+static constexpr u8 NUM_MASKABLE_IRQS = sizeof(tmp95c061_irq_vector_map) / 3;
 
 
 int tmp95c061_device::tlcs900_process_hdma( int channel )
@@ -312,11 +314,11 @@ int tmp95c061_device::tlcs900_process_hdma( int channel )
 	{
 		int irq = 0;
 
-		while( irq < TMP95C061_NUM_MASKABLE_IRQS && tmp95c061_irq_vector_map[irq].vector != vector )
+		while( irq < NUM_MASKABLE_IRQS && tmp95c061_irq_vector_map[irq].vector != vector )
 			irq++;
 
 		/* Check if our interrupt flip-flop is set */
-		if ( irq < TMP95C061_NUM_MASKABLE_IRQS && m_int_reg[tmp95c061_irq_vector_map[irq].reg] & tmp95c061_irq_vector_map[irq].iff )
+		if ( irq < NUM_MASKABLE_IRQS && m_int_reg[tmp95c061_irq_vector_map[irq].reg] & tmp95c061_irq_vector_map[irq].iff )
 		{
 			switch( m_dmam[channel].b.l & 0x1f )
 			{
@@ -406,16 +408,16 @@ int tmp95c061_device::tlcs900_process_hdma( int channel )
 				switch( channel )
 				{
 				case 0:
-					m_int_reg[TMP95C061_INTETC10] |= 0x08;
+					m_int_reg[INTETC10] |= 0x08;
 					break;
 				case 1:
-					m_int_reg[TMP95C061_INTETC10] |= 0x80;
+					m_int_reg[INTETC10] |= 0x80;
 					break;
 				case 2:
-					m_int_reg[TMP95C061_INTETC32] |= 0x08;
+					m_int_reg[INTETC32] |= 0x08;
 					break;
 				case 3:
-					m_int_reg[TMP95C061_INTETC32] |= 0x80;
+					m_int_reg[INTETC32] |= 0x80;
 					break;
 				}
 			}
@@ -475,7 +477,7 @@ void tmp95c061_device::tlcs900_check_irqs()
 	}
 
 	/* Check regular irqs */
-	for( i = 0; i < TMP95C061_NUM_MASKABLE_IRQS; i++ )
+	for( i = 0; i < NUM_MASKABLE_IRQS; i++ )
 	{
 		if ( m_int_reg[tmp95c061_irq_vector_map[i].reg] & tmp95c061_irq_vector_map[i].iff )
 		{
@@ -563,7 +565,7 @@ void tmp95c061_device::tlcs900_handle_ad()
 			m_ad_mode &= ~ 0x40;
 			m_ad_mode |= 0x80;
 
-			m_int_reg[TMP95C061_INTE0AD] |= 0x80;
+			m_int_reg[INTE0AD] |= 0x80;
 			m_check_irqs = 1;
 
 			/* AD repeat mode */
@@ -661,7 +663,7 @@ void tmp95c061_device::tlcs900_handle_timers()
 				if ( ( m_t8_mode[0] & 0xc0 ) != 0x40 )
 				{
 					m_timer[0] = 0;
-					m_int_reg[TMP95C061_INTET10] |= 0x08;
+					m_int_reg[INTET10] |= 0x08;
 				}
 			}
 		}
@@ -691,7 +693,7 @@ void tmp95c061_device::tlcs900_handle_timers()
 			if ( m_timer[1] == m_t8_reg[1] )
 			{
 				m_timer[1] = 0;
-				m_int_reg[TMP95C061_INTET10] |= 0x80;
+				m_int_reg[INTET10] |= 0x80;
 
 				if ( m_t8_invert & 0x02 )
 				{
@@ -738,7 +740,7 @@ void tmp95c061_device::tlcs900_handle_timers()
 				if ( ( m_t8_mode[1] & 0xc0 ) != 0x40 )
 				{
 					m_timer[2] = 0;
-					m_int_reg[TMP95C061_INTET32] |= 0x08;
+					m_int_reg[INTET32] |= 0x08;
 				}
 			}
 		}
@@ -768,7 +770,7 @@ void tmp95c061_device::tlcs900_handle_timers()
 			if ( m_timer[3] == m_t8_reg[3] )
 			{
 				m_timer[3] = 0;
-				m_int_reg[TMP95C061_INTET32] |= 0x80;
+				m_int_reg[INTET32] |= 0x80;
 
 				if ( m_t8_invert & 0x20 )
 				{
@@ -815,16 +817,16 @@ void tmp95c061_device::execute_set_input(int input, int level)
 				{
 					/* Leave HALT state */
 					m_halted = 0;
-					m_int_reg[TMP95C061_INTE0AD] |= 0x08;
+					m_int_reg[INTE0AD] |= 0x08;
 				}
 			}
 			else
 			{
 				/* Level detect */
 				if ( level == ASSERT_LINE )
-					m_int_reg[TMP95C061_INTE0AD] |= 0x08;
+					m_int_reg[INTE0AD] |= 0x08;
 				else
-					m_int_reg[TMP95C061_INTE0AD] &= ~ 0x08;
+					m_int_reg[INTE0AD] &= ~ 0x08;
 			}
 		}
 		m_level[TLCS900_INT0] = level;
@@ -835,7 +837,7 @@ void tmp95c061_device::execute_set_input(int input, int level)
 		{
 			if ( m_level[TLCS900_INT4] == CLEAR_LINE && level == ASSERT_LINE )
 			{
-				m_int_reg[TMP95C061_INTE45] |= 0x08;
+				m_int_reg[INTE45] |= 0x08;
 			}
 		}
 		m_level[TLCS900_INT4] = level;
@@ -846,7 +848,7 @@ void tmp95c061_device::execute_set_input(int input, int level)
 		{
 			if ( m_level[TLCS900_INT5] == CLEAR_LINE && level == ASSERT_LINE )
 			{
-				m_int_reg[TMP95C061_INTE45] |= 0x80;
+				m_int_reg[INTE45] |= 0x80;
 			}
 		}
 		m_level[TLCS900_INT5] = level;
@@ -1262,7 +1264,7 @@ uint8_t tmp95c061_device::sc0buf_r()
 void tmp95c061_device::sc0buf_w(uint8_t data)
 {
 	// Fake finish sending data
-	m_int_reg[TMP95C061_INTES0] |= 0x80;
+	m_int_reg[INTES0] |= 0x80;
 	m_check_irqs = 1;
 }
 
@@ -1307,7 +1309,7 @@ uint8_t tmp95c061_device::sc1buf_r()
 void tmp95c061_device::sc1buf_w(uint8_t data)
 {
 	// Fake finish sending data
-	m_int_reg[TMP95C061_INTES1] |= 0x80;
+	m_int_reg[INTES1] |= 0x80;
 	m_check_irqs = 1;
 }
 
@@ -1364,7 +1366,7 @@ uint8_t tmp95c061_device::adreg_r(offs_t offset)
 		return m_ad_result[offset >> 1] >> 2;
 
 	// Reading data from the upper 8 bits clears INTE0AD IADC
-	m_int_reg[TMP95C061_INTE0AD] &= ~0x80;
+	m_int_reg[INTE0AD] &= ~0x80;
 	return m_ad_result[offset >> 1] << 6 | 0x3f;
 }
 
