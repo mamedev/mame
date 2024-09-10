@@ -108,6 +108,9 @@
 #include "nec.h"
 #include "necdasm.h"
 
+#include "logmacro.h"
+#define LOG_BUSLOCK (1<<1)
+
 typedef uint8_t BOOLEAN;
 typedef uint8_t BYTE;
 typedef uint16_t WORD;

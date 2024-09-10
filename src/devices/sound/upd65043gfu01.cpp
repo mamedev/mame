@@ -146,7 +146,7 @@ void upd65043gfu01_device::write(offs_t offset, u8 data)
 		break;
 
 	case 0xb:
-		m_pcm_buffer[m_pcm_buffer_write & 0x1ff] = (s8)(data - 0x80);
+		m_pcm_buffer[m_pcm_buffer_write & 0x1ff] = s8(u8(data - 0x80));
 		m_pcm_buffer_write++;
 		break;
 
@@ -161,8 +161,7 @@ void upd65043gfu01_device::write(offs_t offset, u8 data)
 		break;
 
 	default:
-		if (!machine().side_effects_disabled())
-			logerror("%s: unknown register write %x = %02x\n", machine().describe_context(), offset, data);
+		logerror("%s: unknown register write %x = %02x\n", machine().describe_context(), offset, data);
 		break;
 	}
 }
@@ -185,7 +184,7 @@ void upd65043gfu01_device::update_irq()
 	else
 	{
 		// recalculate timer so the IRQ fires when there are 128 samples or fewer in the buffer
-		// (GEOS will push up to 128 more samples at this point);
+		// (GEOS will push up to 128 more samples at this point)
 		const u16 samples_left = std::min(128, (m_pcm_buffer_write - m_pcm_buffer_read) & 0x1ff);
 		const u16 ticks_left = (samples_left * m_pcm_period) - m_pcm_count;
 		m_irq_timer->adjust(m_stream->sample_period() * ticks_left);
