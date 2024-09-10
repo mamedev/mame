@@ -39,10 +39,13 @@ public:
 		m_xa(*this, "xa"),
 		m_ppi(*this, "ppi8255"),
 		m_igs017_igs031(*this, "igs017_igs031"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_external_rom(*this, "user1")
 	{ }
 
 	void igs_mahjong_xa(machine_config &config);
+	void igs_mahjong_xa_xor(machine_config &config);
+	void igs_mahjong_xa_xor_disable(machine_config &config);
 
 	void init_crzybugs();
 	void init_crzybugsj();
@@ -62,13 +65,19 @@ private:
 	required_device<i8255_device> m_ppi;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	required_device<screen_device> m_screen;
+	required_region_ptr<u32> m_external_rom;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void pgm_create_dummy_internal_arm_region();
-	void igs_mahjong_map(address_map &map);
+	void main_map(address_map &map);
+	void main_xor_map(address_map &map);
 
 	void igs027_trigger_irq(int num);
+
+	u32 external_rom_r(offs_t offset);
+
+	void xor_table_w(offs_t offset, u8 data);
 
 	u32 xa_r(offs_t offset, u32 mem_mask);
 	void xa_w(offs_t offset, u32 data, u32 mem_mask);
@@ -107,6 +116,8 @@ private:
 
 	u32 m_igs_40000014;
 
+	u32 m_xor_table[0x100];
+
 	emu_timer *m_timer0;
 	emu_timer *m_timer1;
 
@@ -133,6 +144,10 @@ void igs_m027xa_state::machine_reset()
 
 void igs_m027xa_state::machine_start()
 {
+	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
+
+	save_item(NAME(m_xor_table));
+
 	save_item(NAME(m_port2_latch));
 	save_item(NAME(m_port0_latch));
 	save_item(NAME(m_irq_enable));
@@ -215,7 +230,7 @@ u32 igs_m027xa_state::igs027_periph_r(offs_t offset, u32 mem_mask)
 
 ***************************************************************************/
 
-void igs_m027xa_state::igs_mahjong_map(address_map &map)
+void igs_m027xa_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x00003fff).rom(); // Internal ROM
 	map(0x08000000, 0x0807ffff).rom().region("user1", 0); // Game ROM
@@ -230,8 +245,16 @@ void igs_m027xa_state::igs_mahjong_map(address_map &map)
 
 	map(0x70000000, 0x700003ff).rw(FUNC(igs_m027xa_state::igs027_periph_r), FUNC(igs_m027xa_state::igs027_periph_w));
 
-	map(0x50000000, 0x500003ff).nopw(); // uploads XOR table to external ROM here
+	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027xa_state::xor_table_w));
+
 	map(0xf0000000, 0xf000000f).nopw(); // magic registers
+}
+
+void igs_m027xa_state::main_xor_map(address_map &map)
+{
+	main_map(map);
+
+	map(0x08000000, 0x0807ffff).r(FUNC(igs_m027xa_state::external_rom_r)); // Game ROM
 }
 
 static INPUT_PORTS_START( base )
@@ -401,6 +424,16 @@ void igs_m027xa_state::mcu_p3_w(uint8_t data)
 	}
 }
 
+u32 igs_m027xa_state::external_rom_r(offs_t offset)
+{
+	return m_external_rom[offset] ^ m_xor_table[offset & 0x00ff];
+}
+
+
+void igs_m027xa_state::xor_table_w(offs_t offset, u8 data)
+{
+	m_xor_table[offset] = (u32(data) << 24) | (u32(data) << 8);
+}
 
 
 
@@ -421,7 +454,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 {
 	ARM7(config, m_maincpu, 22000000); // Crazy Bugs has a 22Mhz Xtal, what about the others?
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::igs_mahjong_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::main_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -457,6 +490,22 @@ void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 	// sound hardware
 	// OK6295
 }
+
+void igs_m027xa_state::igs_mahjong_xa_xor(machine_config &config)
+{
+	igs_mahjong_xa(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::main_xor_map);
+}
+
+void igs_m027xa_state::igs_mahjong_xa_xor_disable(machine_config &config)
+{
+	igs_mahjong_xa_xor(config);
+
+	m_xa->set_disable();
+}
+
+
 
 // prg at u34
 // text at u15
@@ -720,13 +769,18 @@ void igs_m027xa_state::init_wldfruit()
 
 } // anonymous namespace
 
-// These use the MX10EXAQC (80c51XA from Philips) and maybe don't belong in here
+// These use the MX10EXAQC (80c51XA from Philips)
 // the PCBs are closer to igs_fear.cpp in terms of layout
-GAME( 2008, haunthig,  0,        igs_mahjong_xa, base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", MACHINE_IS_SKELETON ) // IGS FOR V109US 2008 10 14
-GAME( 2006, haunthiga, haunthig, igs_mahjong_xa, base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", MACHINE_IS_SKELETON ) // IGS FOR V101US 2006 08 23
-GAME( 2009, crzybugs,  0,        igs_mahjong_xa, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", MACHINE_IS_SKELETON ) // IGS FOR V204US 2009 5 19
-GAME( 2006, crzybugsa, crzybugs, igs_mahjong_xa, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", MACHINE_IS_SKELETON ) // IGS FOR V100US 2006 3 29 but also V202US string
-GAME( 2005, crzybugsb, crzybugs, igs_mahjong_xa, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", MACHINE_IS_SKELETON ) // FOR V100US 2005 7 20 but also V200US string
-GAME( 2007, crzybugsj, crzybugs, igs_mahjong_xa, base,     igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_IS_SKELETON ) // IGS FOR V101JP 2007 06 08
-GAME( 2006, tripfev,   0,        igs_mahjong_xa, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", MACHINE_IS_SKELETON ) // IGS FOR V107US 2006 09 07
+GAME( 2008, haunthig,  0,        igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", MACHINE_IS_SKELETON ) // IGS FOR V109US 2008 10 14
+GAME( 2006, haunthiga, haunthig, igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", MACHINE_IS_SKELETON ) // IGS FOR V101US 2006 08 23
+
+GAME( 2009, crzybugs,  0,        igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", MACHINE_IS_SKELETON ) // IGS FOR V204US 2009 5 19
+GAME( 2006, crzybugsa, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", MACHINE_IS_SKELETON ) // IGS FOR V100US 2006 3 29 but also V202US string
+GAME( 2005, crzybugsb, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", MACHINE_IS_SKELETON ) // FOR V100US 2005 7 20 but also V200US string
+
+GAME( 2007, crzybugsj, crzybugs, igs_mahjong_xa,     base,     igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_IS_SKELETON ) // IGS FOR V101JP 2007 06 08
+
+// XA dump is missing, so XA CPU will crash, disable for now
+GAME( 2006, tripfev,   0,        igs_mahjong_xa_xor_disable, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", MACHINE_IS_SKELETON ) // IGS FOR V107US 2006 09 07
+
 GAME( 200?, wldfruit,  0,        igs_mahjong_xa, base,     igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_IS_SKELETON ) // IGS-----97----V208US
