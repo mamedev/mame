@@ -15,7 +15,6 @@ Undumped games on similar hardware (ES-9402 or ES-9410):
 
 TODO:
 - lastbank: sprites should be clip masked during gameplay (verify);
-- fever13: GFX ROM dump;
 - fever13: OKI sound volume overdrives a lot;
 - hookup hopper device;
 
@@ -27,6 +26,7 @@ TODO:
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/tc009xlvc.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
 #include "sound/es8712.h"
 #include "sound/okim6295.h"
@@ -44,6 +44,7 @@ public:
 	lastbank_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_hopper(*this, "hopper")
 		, m_oki(*this, "oki")
 		, m_essnd(*this, "essnd")
 		, m_key{ { *this, "P1_KEY%u", 0U }, { *this, "P2_KEY%u", 0U } }
@@ -63,6 +64,7 @@ protected:
 
 private:
 	required_device<tc0091lvc_device> m_maincpu;
+	required_device<hopper_device> m_hopper;
 	required_device<okim6295_device> m_oki;
 	required_device<es8712_device> m_essnd;
 
@@ -128,8 +130,12 @@ void lastbank_state::output_w(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0:
+			// lamps?
+			break;
+
 		case 1:
-			//logerror("%s: Writing %02x to A80%x\n", machine().describe_context(), data, offset);
+			// xxxx ---- probably individual lockouts
+			m_hopper->motor_w(BIT(data, 2));
 			break;
 
 		case 2:
@@ -181,7 +187,7 @@ void lastbank_state::main_map(address_map &map)
 	map(0xa804, 0xa804).portr("SPECIAL");
 	map(0xa805, 0xa805).w("soundlatch1", FUNC(generic_latch_8_device::write));
 	map(0xa806, 0xa806).w("soundlatch2", FUNC(generic_latch_8_device::write));
-	map(0xa807, 0xa807).nopw(); // hopper?
+	map(0xa807, 0xa807).nopw();
 	map(0xa808, 0xa808).r(FUNC(lastbank_state::key_matrix_r<0>));
 	map(0xa80c, 0xa80c).r(FUNC(lastbank_state::key_matrix_r<1>));
 	map(0xa81c, 0xa81c).portr("DSW1");
@@ -235,9 +241,7 @@ static INPUT_PORTS_START( lastbank )
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )
-	PORT_DIPNAME( 0x04, 0x04, "Hopper Count" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
 	PORT_DIPNAME( 0x08, 0x08, "Hopper Empty" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -592,6 +596,8 @@ void lastbank_state::lastbank(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
+	HOPPER(config, m_hopper, attotime::from_msec(50));
+
 	z80_device &audiocpu(Z80(config, "audiocpu", MASTER_CLOCK / 4));
 	audiocpu.set_addrmap(AS_PROGRAM, &lastbank_state::audio_map);
 	audiocpu.set_addrmap(AS_IO, &lastbank_state::audio_io);
@@ -654,7 +660,9 @@ ROM_START( lastbank )
 	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
 ROM_END
 
-ROM_START( fever13 ) // ES-9410 PCB (TC0090LVC marked ES9402LA, Z80, ES8712, 14'318'181 MHz XTAL, OKI M6295 with 1000J resonator, MSM6585 with 640J resonator)
+ // ES-9410 PCB (TC0090LVC marked ES9402LA, Z80, ES8712, 14'318'181 MHz XTAL,
+ // OKI M6295 with 1000J resonator, MSM6585 with 640J resonator)
+ROM_START( fever13 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "9.u9", 0x00000, 0x40000, CRC(a17a6a9c) SHA1(b2bff250d1ea879bcdd9bea92537975a168babc8) )
 
