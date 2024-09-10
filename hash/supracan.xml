@@ -10,8 +10,8 @@ license:CC0-1.0
 		<publisher>AV Artisan Corp.</publisher>
 		<notes><![CDATA[
 [video] intro uses circular clipping effect
-[video] layer 0 won't show left side character, scrollx = 0x0080 + global flip x
 [video] wrong tilemap paging for layer 1 on game over
+[sound] noisy channels 13-15 starting from character screen, supposed to release after a while (12 00 0f 79)
 ]]></notes>
 		<info name="serial" value="F001" />
 		<info name="alt_title" value="福爾摩沙大對決" />
@@ -27,9 +27,8 @@ license:CC0-1.0
 		<year>1995</year>
 		<publisher>Panda Entertainment Technology</publisher>
 		<notes><![CDATA[
-[video] sprites may need buffering (noticeable on gameplay jumps)
+[video] sprites may need buffering (noticeable on gameplay jumps, verify)
 [video] intro raster effect is slightly off (btanb)
-[irq 5] 2nd fighter stage used with global flip y + mosaic (lake effect)
 [video] enables clipping effect during ending and credits
 ]]></notes>
 		<info name="serial" value="F002" />
@@ -50,6 +49,7 @@ Uses [video] blending during attract and title screen
 Wrong [video] ROZ paging for title screen
 Broken [video] during intro, uses bitmap mode
 [video] uses per-tile priority during gameplay
+[sound] BGM during intro releases few keys too early (TODO: pinpoint which)
 ]]></notes>
 		<info name="serial" value="F003" />
 		<info name="alt_title" value="邪惡之子" />
@@ -68,7 +68,9 @@ Broken [video] during intro, uses bitmap mode
 		<notes><![CDATA[
 [video] intro should sprite clip against active display area.
 [video] title animation blanks some sprites.
-[video] uses per-tile priority during gameplay
+[video] uses per-tile priority during gameplay.
+[sound] noisy channels 13-15 when jump occurs (12 00 0f 79)
+[sound] jump (1f 0f 0e a9) and attack (1f 00 0f 69) channels 11-12 keeps repeating
 ]]></notes>
 		<info name="serial" value="F004" />
 		<info name="alt_title" value="音速飛龍" />
@@ -84,7 +86,9 @@ Broken [video] during intro, uses bitmap mode
 		<year>1995</year>
 		<publisher>C&amp;E Soft</publisher>
 		<notes><![CDATA[
-[video] ROZ is misaligned during intro, and initially concealed
+[video] ROZ is misaligned during intro, and initially concealed (blending?).
+[sound] missing crowd noise during gameplay, tries to play an empty buffer in the $2xxx range.
+[sound] DMA driven samples cuts off too early.
 ]]></notes>
 		<info name="serial" value="F005" />
 		<info name="alt_title" value="超級中華職棒聯盟" />
@@ -101,7 +105,7 @@ Broken [video] during intro, uses bitmap mode
 		<year>1995</year>
 		<publisher>Funtech</publisher>
 		<notes><![CDATA[
-Can potentially hang, [maincpu] tight loops for $e80300 bit 7 high
+Can potentially hang, [maincpu] tight loops for $e80300 bit 7 high (verify)
 ]]></notes>
 		<info name="serial" value="F006" />
 		<info name="alt_title" value="嘻遊記" />
@@ -150,9 +154,9 @@ Can potentially hang, [maincpu] tight loops for $e80300 bit 7 high
 		<year>1996</year>
 		<publisher>Funtech</publisher>
 		<notes><![CDATA[
-[video] intro has a glitchy cloud row strip
-[video] intro shows some vertical strips of garbage when title screen dragon appears
-Erratic gameplay speed, controls [irq 3] as FRC, can potentially hang
+[video] intro has a glitchy cloud row strip.
+[video] intro shows some vertical strips of garbage when title screen dragon appears.
+Erratic gameplay speed, controls [irq 3] as FRC, show [video] missing/glitched tiles in gameplay.
 ]]></notes>
 		<info name="serial" value="F009" />
 		<info name="alt_title" value="賭霸" />
