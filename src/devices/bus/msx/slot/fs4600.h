@@ -41,7 +41,7 @@ private:
 	memory_view m_view[3];
 	u32 m_region_offset;
 	u32 m_sram_address;
-	std::vector<u8> m_sram;
+	std::unique_ptr<u8[]> m_sram;
 };
 
 

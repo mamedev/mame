@@ -20,7 +20,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	std::vector<u8> m_ram;
+	std::unique_ptr<u8[]> m_ram;
 };
 
 

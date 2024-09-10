@@ -16,7 +16,8 @@ public:
 	msx_slot_ram_mm_device &set_unused_bits(u8 unused_bits) { m_unused_bits = unused_bits; return *this; }
 
 	// Backdoor for the Turbo-R firmware/internal mapper to access internal RAM.
-	std::vector<u8> &get_ram() { return m_ram; }
+	u32 get_ram_size() { return m_total_size; }
+	u8 *get_ram_base() { return &m_ram[0]; }
 
 protected:
 	virtual void device_start() override;
@@ -25,7 +26,7 @@ private:
 	u8 read_mapper_bank(offs_t offset);
 	void write_mapper_bank(offs_t offset, u8 data);
 
-	std::vector<u8> m_ram;
+	std::unique_ptr<u8[]> m_ram;
 	u32 m_total_size;
 	u8 m_bank_mask;
 	u8 m_unused_bits;

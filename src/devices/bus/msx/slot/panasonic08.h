@@ -41,7 +41,7 @@ private:
 	u32 m_region_offset;
 	u8 m_selected_bank[6];
 	u8 m_control;
-	std::vector<uint8_t> m_sram;
+	std::unique_ptr<u8[]> m_sram;
 };
 
 
