@@ -1144,8 +1144,7 @@ void igs_m027_state::jking02_misc_w(u8 data)
 {
 	// jking02 uses bits 0x18 and has 4 banks, fruitpar/oceanpar use bits 0x08 and only have 2 banks
 	m_oki->set_rom_bank((data & 0x18) >> 3);
-
-	// lower bits are used for something too?
+	m_io_select[1] = data & 0x07;
 }
 
 u32 igs_m027_state::unk2_r()
