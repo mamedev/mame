@@ -65,8 +65,8 @@ STATUS:
 
 #include "emu.h"
 
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "bus/supracan/rom.h"
+#include "bus/supracan/slot.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m65c02.h"
 
@@ -179,7 +179,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<generic_slot_device> m_cart;
+	required_device<superacan_cart_slot_device> m_cart;
 	required_device<umc6650_device> m_lockout;
 	required_region_ptr<uint16_t> m_internal68;
 	memory_view m_main_loview;
@@ -265,7 +265,6 @@ private:
 	TIMER_CALLBACK_MEMBER(line_on_cb);
 	TIMER_CALLBACK_MEMBER(line_off_cb);
 	TIMER_CALLBACK_MEMBER(scanline_cb);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	int get_tilemap_region(int layer);
 	void get_tilemap_info_common(int layer, tile_data &tileinfo, int count);
 	void get_roz_tilemap_info(int layer, tile_data &tileinfo, int count);
@@ -308,7 +307,7 @@ int supracan_state::get_tilemap_region(int layer)
 	}
 
 	// TODO: 4th layer at $f00160 (gfx mode 0 only, ignored for everything else)
-	throw new emu_fatalerror("Error: layer = %d not defined", layer);
+	throw emu_fatalerror("Error: layer = %d not defined", layer);
 }
 
 void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int count)
@@ -1349,9 +1348,9 @@ void supracan_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void supracan_state::main_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).view(m_main_loview);
-	m_main_loview[0](0x000000, 0x3fffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
+	m_main_loview[0](0x000000, 0x3fffff).r(m_cart, FUNC(superacan_cart_slot_device::rom_r)),
 	m_main_loview[0](0x000000, 0x000fff).rom().region(m_internal68, 0);
-	m_main_loview[1](0x000000, 0x3fffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
+	m_main_loview[1](0x000000, 0x3fffff).r(m_cart, FUNC(superacan_cart_slot_device::rom_r));
 	map(0xe80000, 0xe8ffff).rw(FUNC(supracan_state::_68k_soundram_r), FUNC(supracan_state::_68k_soundram_w));
 	map(0xe90000, 0xe9001f).m(*this, FUNC(supracan_state::host_um6619_map));
 	map(0xe90020, 0xe9002f).w(FUNC(supracan_state::dma_w<0>));
@@ -1361,15 +1360,15 @@ void supracan_state::main_map(address_map &map)
 
 	map(0xeb0d00, 0xeb0d03).rw(m_lockout, FUNC(umc6650_device::read), FUNC(umc6650_device::write)).umask16(0x00ff);
 
-//  map(0xec0000, 0xec*fff) Cart NVRAM, 8-bit interface
+	map(0xec0000, 0xecffff).rw(m_cart, FUNC(superacan_cart_slot_device::nvram_r), FUNC(superacan_cart_slot_device::nvram_w)).umask16(0x00ff);
 
 	map(0xf00000, 0xf001ff).rw(FUNC(supracan_state::video_r), FUNC(supracan_state::video_w));
 	map(0xf00200, 0xf003ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xf40000, 0xf5ffff).ram().w(FUNC(supracan_state::vram_w)).share("vram");
 	map(0xf80000, 0xfbffff).view(m_main_hiview);
-	m_main_hiview[0](0xf80000, 0xfbffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
+	m_main_hiview[0](0xf80000, 0xfbffff).r(m_cart, FUNC(superacan_cart_slot_device::rom_r));
 	m_main_hiview[0](0xf80000, 0xf80fff).rom().region(m_internal68, 0);
-	m_main_hiview[1](0xf80000, 0xfbffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
+	m_main_hiview[1](0xf80000, 0xfbffff).r(m_cart, FUNC(superacan_cart_slot_device::rom_r));
 	map(0xfc0000, 0xfcffff).mirror(0x30000).ram(); /* System work ram */
 }
 
@@ -2060,20 +2059,6 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 //  m_video_regs[offset] = data;
 }
 
-
-DEVICE_IMAGE_LOAD_MEMBER(supracan_state::cart_load)
-{
-	uint32_t size = m_cart->common_get_size("rom");
-
-	if (size > 0x40'0000)
-		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be no larger than 4M)");
-
-	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return std::make_pair(std::error_condition(), std::string());
-}
-
 static INPUT_PORTS_START( supracan )
 	PORT_START("P1")
 	PORT_BIT(0x000f, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -2275,6 +2260,12 @@ static GFXDECODE_START( gfx_supracan )
 	GFXDECODE_RAM( "vram", 0, supracan_gfx1bpp_alt, 0, 0x80 )
 GFXDECODE_END
 
+static void superacan_cart_types(device_slot_interface &device)
+{
+	device.option_add_internal("std",      SUPERACAN_ROM_STD);
+}
+
+
 void supracan_state::supracan(machine_config &config)
 {
 	// M68000P10
@@ -2311,11 +2302,8 @@ void supracan_state::supracan(machine_config &config)
 	m_sound->add_route(0, "lspeaker", 1.0);
 	m_sound->add_route(1, "rspeaker", 1.0);
 
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "supracan_cart"));
-	cartslot.set_must_be_loaded(true);
-	cartslot.set_width(GENERIC_ROM16_WIDTH);
-	cartslot.set_endian(ENDIANNESS_BIG);
-	cartslot.set_device_load(FUNC(supracan_state::cart_load));
+	// TODO: clock for cart is (again) unconfirmed
+	SUPERACAN_CART_SLOT(config, m_cart, U13_CLOCK / 6, superacan_cart_types, nullptr).set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("supracan");
 }

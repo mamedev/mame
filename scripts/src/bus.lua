@@ -2576,6 +2576,20 @@ if (BUSES["SS50"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/supracan/slot.h,BUSES["SUPRACAN"] = true
+---------------------------------------------------
+
+if (BUSES["SUPRACAN"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/supracan/slot.cpp",
+		MAME_DIR .. "src/devices/bus/supracan/slot.h",
+		MAME_DIR .. "src/devices/bus/supracan/rom.cpp",
+		MAME_DIR .. "src/devices/bus/supracan/rom.h",
+	}
+end
+
 
 ---------------------------------------------------
 --
