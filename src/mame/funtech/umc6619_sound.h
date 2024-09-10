@@ -49,6 +49,7 @@ private:
 		uint8_t  volume_l;
 		uint8_t  volume_r;
 		bool     one_shot;
+		uint8_t  unk_upper_05;
 	};
 
 	void keyon_voice(uint8_t voice);
@@ -63,6 +64,8 @@ private:
 	acan_channel m_channels[16];
 	uint8_t m_regs[256];
 	std::unique_ptr<int32_t[]> m_mix;
+
+	std::string print_audio_state();
 };
 
 DECLARE_DEVICE_TYPE(UMC6619_SOUND, umc6619_sound_device)
