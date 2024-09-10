@@ -45,7 +45,7 @@ private:
 	u16 m_selected_bank[8];
 	u8 m_control;
 	u8 m_bank9;
-	std::vector<u8> m_sram;
+	std::unique_ptr<u8[]> m_sram;
 };
 
 

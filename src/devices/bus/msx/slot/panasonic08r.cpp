@@ -46,8 +46,7 @@ void msx_slot_panasonic08r_device::device_start()
 	if (m_sram_size != 0x4000 && m_sram_size != 0x8000)
 		fatalerror("Invalid SRAM size for the panasonic08r firmware\n");
 
-	m_sram.resize(m_sram_size);
-
+	m_sram = std::make_unique<u8[]>(m_sram_size);
 	m_nvram->set_base(&m_sram[0], m_sram_size);
 
 	save_item(NAME(m_selected_bank));
@@ -57,12 +56,12 @@ void msx_slot_panasonic08r_device::device_start()
 	for (int i = 0; i < 8; i++)
 	{
 		m_bank[i]->configure_entries(0, 0x200, m_rom_region->base() + m_region_offset, 0x2000);
-		m_bank[i]->configure_entry(0x80, m_sram.data());
-		m_bank[i]->configure_entry(0x81, m_sram.data() + 0x2000);
+		m_bank[i]->configure_entry(0x80, &m_sram[0]);
+		m_bank[i]->configure_entry(0x81, &m_sram[0x2000]);
 		if (m_sram_size >= 0x8000)
 		{
-			m_bank[i]->configure_entry(0x82, m_sram.data() + 0x4000);
-			m_bank[i]->configure_entry(0x83, m_sram.data() + 0x6000);
+			m_bank[i]->configure_entry(0x82, &m_sram[0x4000]);
+			m_bank[i]->configure_entry(0x83, &m_sram[0x6000]);
 		}
 
 		// Assuming smaller internal RAM is mirrored.
