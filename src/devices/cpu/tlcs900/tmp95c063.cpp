@@ -176,7 +176,8 @@ void tmp95c063_device::device_config_complete()
 	}
 }
 
-enum {
+enum
+{
 	INTE0AD,
 	INTE12,
 	INTE34,
@@ -200,37 +201,52 @@ static const struct {
 	uint8_t vector;
 } tmp95c063_irq_vector_map[] =
 {
-	{ INTETC23, 0x80, 0xa0 },     /* INTTC3 */
-	{ INTETC23, 0x08, 0x9c },     /* INTTC2 */
-	{ INTETC01, 0x80, 0x98 },     /* INTTC1 */
-	{ INTETC01, 0x08, 0x94 },     /* INTTC0 */
-	{ INTE0AD, 0x80, 0x90 },      /* INTAD */
-	{ INTES1, 0x80, 0x8c },       /* INTTX1 */
-	{ INTES1, 0x08, 0x88 },       /* INTRX1 */
-	{ INTES0, 0x80, 0x84 },       /* INTTX0 */
-	{ INTES0, 0x08, 0x80 },       /* INTRX0 */
-	{ INTETAB, 0x80, 0x7c },      /* INTTRB */
-	{ INTETAB, 0x08, 0x78 },      /* INTTRA */
-	{ INTET89, 0x80, 0x74 },      /* INTTR9 */
-	{ INTET89, 0x80, 0x70 },      /* INTTR8 */
-	{ INTET67, 0x80, 0x6c },      /* INTT7 */
-	{ INTET67, 0x08, 0x68 },      /* INTT6 */
-	{ INTET45, 0x80, 0x64 },      /* INTT5 */
-	{ INTET45, 0x08, 0x60 },      /* INTT4 */
-	{ INTET23, 0x80, 0x5c },      /* INTT3 */
-	{ INTET23, 0x08, 0x58 },      /* INTT2 */
-	{ INTET01, 0x80, 0x54 },      /* INTT1 */
-	{ INTET01, 0x08, 0x50 },      /* INTT0 */
-	{ INTE78, 0x80, 0x4c },       /* int8_t */
-	{ INTE78, 0x08, 0x48 },       /* INT7 */
-	{ INTE56, 0x80, 0x44 },       /* INT6 */
-	{ INTE56, 0x08, 0x40 },       /* INT5 */
-								/* 0x3c - reserved */
-	{ INTE34, 0x80, 0x38 },       /* INT4 */
-	{ INTE34, 0x08, 0x34 },       /* INT3 */
-	{ INTE12, 0x80, 0x30 },       /* INT2 */
-	{ INTE12, 0x08, 0x2c },       /* INT1 */
-	{ INTE0AD, 0x08, 0x28 }       /* INT0 */
+	{ INTETC23, 0x80, 0xa0 },     // INTTC3
+	{ INTETC23, 0x08, 0x9c },     // INTTC2
+	{ INTETC01, 0x80, 0x98 },     // INTTC1
+	{ INTETC01, 0x08, 0x94 },     // INTTC0
+	{ INTE0AD,  0x80, 0x90 },     // INTAD
+	{ INTES1,   0x80, 0x8c },     // INTTX1
+	{ INTES1,   0x08, 0x88 },     // INTRX1
+	{ INTES0,   0x80, 0x84 },     // INTTX0
+	{ INTES0,   0x08, 0x80 },     // INTRX0
+	{ INTETAB,  0x80, 0x7c },     // INTTRB
+	{ INTETAB,  0x08, 0x78 },     // INTTRA
+	{ INTET89,  0x80, 0x74 },     // INTTR9
+	{ INTET89,  0x80, 0x70 },     // INTTR8
+	{ INTET67,  0x80, 0x6c },     // INTT7
+	{ INTET67,  0x08, 0x68 },     // INTT6
+	{ INTET45,  0x80, 0x64 },     // INTT5
+	{ INTET45,  0x08, 0x60 },     // INTT4
+	{ INTET23,  0x80, 0x5c },     // INTT3
+	{ INTET23,  0x08, 0x58 },     // INTT2
+	{ INTET01,  0x80, 0x54 },     // INTT1
+	{ INTET01,  0x08, 0x50 },     // INTT0
+	{ INTE78,   0x80, 0x4c },     // INT8
+	{ INTE78,   0x08, 0x48 },     // INT7
+	{ INTE56,   0x80, 0x44 },     // INT6
+	{ INTE56,   0x08, 0x40 },     // INT5
+								  // 0x3c - reserved
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x08, 0x34 },     // INT3
+	{ INTE12,   0x80, 0x30 },     // INT2
+	{ INTE12,   0x08, 0x2c },     // INT1
+	{ INTE0AD,  0x08, 0x28 }      // INT0
 };
 static constexpr u8 NUM_MASKABLE_IRQS = sizeof(tmp95c063_irq_vector_map) / 3;
 
