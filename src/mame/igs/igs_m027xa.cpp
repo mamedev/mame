@@ -23,6 +23,10 @@ These games use the IGS027A processor.
 
 #include "screen.h"
 
+#define LOG_DEBUG       (1U << 1)
+#define VERBOSE         (0)
+#include "logmacro.h"
+
 namespace {
 
 class igs_m027xa_state : public driver_device
@@ -48,6 +52,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 private:
@@ -65,18 +70,69 @@ private:
 
 	void igs_70000100_w(u32 data);
 	u32 m_igs_70000100 = 0;
+	void igs027_trigger_irq(int num);
 
-	u32 rnd_r()
-	{
-		return machine().rand();
-	}
+	u32 xa_r(offs_t offset, u32 mem_mask);
+	void xa_w(offs_t offset, u32 data, u32 mem_mask);
+
+	u8 mcu_p0_r();
+	u8 mcu_p1_r();
+	u8 mcu_p2_r();
+	u8 mcu_p3_r();
+	void mcu_p0_w(uint8_t data);
+	void mcu_p1_w(uint8_t data);
+	void mcu_p2_w(uint8_t data);
+	void mcu_p3_w(uint8_t data);
+
+	u32 rnd_r()	{ return machine().rand(); }
+
+	u8 m_port2_latch;
+	u8 m_port0_latch;
+	u32 m_irq_enable;  // m_irq_enable and m_irq_pending are not currently hooked up
+	u32 m_irq_pending; // it appears they will be needed to differentiate between IRQs from the XA and elsewhere though
+	u32 m_xa_cmd;
+	u32 m_xa_ret0;
+	u32 m_xa_ret1;
+	u8 m_num_params;
+	u8 m_port0_dat;
+	u8 m_port1_dat;
+	u8 m_port2_dat;
+	u8 m_port3_dat;
 };
 
 
+void igs_m027xa_state::machine_reset()
+{
+	m_port2_latch = 0;
+	m_port0_latch = 0;
+	m_irq_enable = -1;
+	m_irq_pending = -1;
+	m_xa_cmd = 0;
+	m_xa_ret0 = 0;
+	m_xa_ret1 = 0;
+	m_num_params = 0;
+	m_port0_dat = 0;
+	m_port1_dat = 0;
+	m_port2_dat = 0;
+	m_port3_dat = 0;
+}
 
 void igs_m027xa_state::machine_start()
 {
 	save_item(NAME(m_igs_70000100));
+
+	save_item(NAME(m_port2_latch));
+	save_item(NAME(m_port0_latch));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_pending));
+	save_item(NAME(m_xa_cmd));
+	save_item(NAME(m_xa_ret0));
+	save_item(NAME(m_xa_ret1));
+	save_item(NAME(m_num_params));
+	save_item(NAME(m_port0_dat));
+	save_item(NAME(m_port1_dat));
+	save_item(NAME(m_port2_dat));
+	save_item(NAME(m_port3_dat));
 }
 
 void igs_m027xa_state::video_start()
@@ -107,7 +163,7 @@ void igs_m027xa_state::igs_mahjong_map(address_map &map)
 	map(0x38009000, 0x38009003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027xa_state::rnd_r));
 
-	map(0x58000000, 0x580000ff).ram(); // XA?
+	map(0x58000000, 0x580000ff).rw(FUNC(igs_m027xa_state::xa_r), FUNC(igs_m027xa_state::xa_w));
 
 	map(0x70000100, 0x70000103).w(FUNC(igs_m027xa_state::igs_70000100_w));
 
@@ -127,9 +183,164 @@ static INPUT_PORTS_START( base )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+void igs_m027xa_state::igs027_trigger_irq(int num)
+{
+	if (!BIT(m_irq_enable, num))
+	{
+		m_irq_pending &= ~(u32(1) << num);
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
+	}
+}
+
+u32 igs_m027xa_state::xa_r(offs_t offset, u32 mem_mask)
+{
+	u32 data = ~u32(0);
+
+	switch (offset * 4)
+	{
+	case 0:
+	{
+		data = m_xa_ret0;
+		break;
+	}
+	case 0x80:
+		data = m_xa_ret1 << 16;
+		break;
+	}
+	return data;
+}
+
+void igs_m027xa_state::xa_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	m_xa_cmd = data;
+
+	if (offset == 0)
+	{
+		m_num_params--;
+
+		if (m_num_params <= 0)
+		{
+			LOGMASKED(LOG_DEBUG, "---------------m_xa_cmd is %02x size %02x\n", (data & 0xff00)>>8, data & 0xff);
+			m_num_params = data & 0xff;
+		}
+		else
+		{
+			LOGMASKED(LOG_DEBUG, "-------------------------- param %04x\n", data & 0xffff);
+		}
+		m_xa->set_input_line(XA_EXT_IRQ0, ASSERT_LINE);
+	}
+	else
+	{
+		LOGMASKED(LOG_DEBUG, "%s: unhandled xa_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+	}
+}
+
+
+u8 igs_m027xa_state::mcu_p0_r()
+{
+	u8 ret = m_port0_latch;
+	LOGMASKED(LOG_DEBUG, "%s: COMMAND READ LOWER mcu_p0_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
+	return ret;
+}
+
+u8 igs_m027xa_state::mcu_p1_r()
+{
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p1_r()\n", machine().describe_context());
+	return m_port1_dat;
+}
+
+u8 igs_m027xa_state::mcu_p2_r()
+{
+	u8 ret = m_port2_latch;
+	LOGMASKED(LOG_DEBUG, "%s: COMMAND READ mcu_p2_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
+	return m_port2_latch;
+}
+
+u8 igs_m027xa_state::mcu_p3_r()
+{
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p3_r()\n", machine().describe_context());
+	return m_port3_dat;
+}
+
+static int posedge(uint32_t oldval, uint32_t val, int bit)
+{
+	return (!BIT(oldval, bit)) && (BIT(val, bit));
+}
+
+static int negedge(uint32_t oldval, uint32_t val, int bit)
+{
+	return (BIT(oldval, bit)) && (!BIT(val, bit));
+}
+
+void igs_m027xa_state::mcu_p0_w(uint8_t data)
+{
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p0_w() %02x with port 3 as %02x and port 1 as %02x\n", machine().describe_context(), data, m_port3_dat, m_port1_dat);
+	m_port0_dat = data;
+}
+
+void igs_m027xa_state::mcu_p1_w(uint8_t data)
+{
+	u8 olddata = m_port1_dat;
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p1_w() %02x\n", machine().describe_context(), data);
+	m_port1_dat = data;
+
+	if (posedge(olddata, m_port1_dat, 3))
+	{
+		igs027_trigger_irq(3); // wrong here?
+	}
+}
+
+void igs_m027xa_state::mcu_p2_w(uint8_t data)
+{
+	m_port2_dat = data;
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p2_w() %02x with port 3 as %02x\n", machine().describe_context(), data, m_port3_dat);
+}
+
+void igs_m027xa_state::mcu_p3_w(uint8_t data)
+{
+	u8 oldport3 = m_port3_dat;
+	m_port3_dat = data;
+	LOGMASKED(LOG_DEBUG, "%s: mcu_p3_w() %02x - do latches oldport3 %02x newport3 %02x\n", machine().describe_context(), data, oldport3, m_port3_dat);
+
+	// high->low transition on bit 0x80 must read into latches!
+	if (negedge(oldport3, m_port3_dat, 7))
+	{
+		if (!BIT(m_port3_dat, 5))
+		{
+			LOGMASKED(LOG_DEBUG, "read command [%d] = [%04x]\n", m_port1_dat & 7, m_xa_cmd);
+			m_port2_latch = (m_xa_cmd & 0xff00) >> 8;
+			m_port0_latch = m_xa_cmd & 0x00ff;
+		}
+	}
+
+	if (negedge(oldport3, m_port3_dat, 6))
+	{
+		if (!BIT(m_port3_dat, 5))
+		{
+			uint32_t dat = (m_port2_dat << 8) | m_port0_dat;
+			LOGMASKED(LOG_DEBUG, "write command [%d] = [%04x]\n", m_port1_dat & 7, dat);
+			switch (m_port1_dat & 7)
+			{
+			case 1:
+				m_xa_ret1 = dat;
+				break;
+			case 2:
+				m_xa_ret0 = dat;
+				break;
+			}
+		}
+	}
+}
+
+
+
+
 TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 {
 	int scanline = param;
+
+	// should be using igs027_trigger_irq with more compelx interrupt logic?
 
 	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
 		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // source? (can the XA trigger this?)
@@ -147,6 +358,14 @@ void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MX10EXA(config, m_xa, 10000000); // MX10EXAQC (Philips 80C51 XA) unknown frequency
+	m_xa->port_in_cb<0>().set(FUNC(igs_m027xa_state::mcu_p0_r));
+	m_xa->port_in_cb<1>().set(FUNC(igs_m027xa_state::mcu_p1_r));
+	m_xa->port_in_cb<2>().set(FUNC(igs_m027xa_state::mcu_p2_r));
+	m_xa->port_in_cb<3>().set(FUNC(igs_m027xa_state::mcu_p3_r));
+	m_xa->port_out_cb<0>().set(FUNC(igs_m027xa_state::mcu_p0_w));
+	m_xa->port_out_cb<1>().set(FUNC(igs_m027xa_state::mcu_p1_w));
+	m_xa->port_out_cb<2>().set(FUNC(igs_m027xa_state::mcu_p2_w));
+	m_xa->port_out_cb<3>().set(FUNC(igs_m027xa_state::mcu_p3_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
