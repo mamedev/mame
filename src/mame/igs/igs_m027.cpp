@@ -639,7 +639,7 @@ INPUT_PORTS_START( lhzb4 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )                 PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01 )                              // S2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )                 PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01 )                              // S1
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )                  PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01 )                              // 开始
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )                    PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01 )  PORT_NAME("Hopper Switch")  // HP
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )                  PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01 )  PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // HP
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )                 PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )          PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01 )                              // 右
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )                 PORT_CONDITION("DSW1", 0x01, EQUALS, 0x00 )
@@ -647,7 +647,7 @@ INPUT_PORTS_START( lhzb4 )
 	PORT_START("PLAYER")
 	PORT_BIT( 0x000001ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )           PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01 )
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_TILT )              PORT_CONDITION("DSW1", 0x01, EQUALS, 0x00 )  PORT_NAME("Hopper Switch")  // HP
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_CUSTOM )            PORT_CONDITION("DSW1", 0x01, EQUALS, 0x00 )  PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // HP
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )                                                                               // 开分
 	PORT_BIT( 0x0007f000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1247,10 +1247,13 @@ void igs_m027_state::lhzb4_xor(machine_config &config)
 	//m_ppi->out_pa_callback().set(...);
 	m_ppi->out_pb_callback().set(FUNC(igs_m027_state::lhzb4_output_w));
 	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::io_select_w<0>));
+	m_ppi->out_pc_callback().append(m_hopper, FUNC(hopper_device::motor_w)).bit(7);
 
 	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027_state::dsw_r<1, 0>)));
 	m_igs017_igs031->in_pb_callback().set_ioport("TEST");
 	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 void igs_m027_state::lthy_xor(machine_config &config)
