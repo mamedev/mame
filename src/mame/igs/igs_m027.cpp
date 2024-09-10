@@ -144,6 +144,7 @@ private:
 	void lhzb4_output_w(u8 data);
 	void jking02_output_w(u8 data);
 	void oceanpar_output_w(u8 data);
+	void jking02_misc_w(u8 data);
 
 	u32 unk2_r();
 	u32 lhdmg_unk2_r();
@@ -224,6 +225,7 @@ void igs_m027_state::jking02_xor_map(address_map &map)
 	igs_mahjong_xor_map(map);
 
 	map(0x4000000c, 0x4000000f).portr("PLAYER");
+	map(0x40000018, 0x4000001b).umask32(0x000000ff).w(FUNC(igs_m027_state::jking02_misc_w));
 }
 
 void igs_m027_state::extradraw_map(address_map &map)
@@ -1136,6 +1138,14 @@ void igs_m027_state::oceanpar_output_w(u8 data)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 2)); // one pulse per COINC accepted
 	machine().bookkeeping().coin_counter_w(3, BIT(data, 6)); // one pulse per KEYOUT
 	m_hopper->motor_w(BIT(data, 7));
+}
+
+void igs_m027_state::jking02_misc_w(u8 data)
+{
+	// jking02 uses bits 0x18 and has 4 banks, fruitpar/oceanpar use bits 0x08 and only have 2 banks
+	m_oki->set_rom_bank((data & 0x18) >> 3);
+
+	// lower bits are used for something too?
 }
 
 u32 igs_m027_state::unk2_r()
