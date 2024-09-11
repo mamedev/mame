@@ -32,6 +32,7 @@
 #include "emu.h"
 
 #include "zoomer_rtc.h"
+
 #include "cpu/nec/nec.h"
 #include "machine/bankdev.h"
 #include "machine/clock.h"
@@ -56,11 +57,10 @@ public:
 		m_bank_2000(*this, "bank_2000_%u", 0),
 		m_bank_a000(*this, "bank_a000_%u", 0),
 		m_wp_view{
-			{*this, "wp_view0"}, {*this, "wp_view1"}, {*this, "wp_view2"}, {*this, "wp_view3"},
-			{*this, "wp_view4"}, {*this, "wp_view5"}, {*this, "wp_view6"}, {*this, "wp_view7"},
-			{*this, "wp_view8"}, {*this, "wp_view9"}, {*this, "wp_view10"}, {*this, "wp_view11"},
-			{*this, "wp_view12"}, {*this, "wp_view13"}, {*this, "wp_view14"}, {*this, "wp_view15"},
-		},
+				{ *this, "wp_view0" }, { *this, "wp_view1" }, { *this, "wp_view2" }, { *this, "wp_view3" },
+				{ *this, "wp_view4" }, { *this, "wp_view5" }, { *this, "wp_view6" }, { *this, "wp_view7" },
+				{ *this, "wp_view8" }, { *this, "wp_view9" }, { *this, "wp_view10" }, { *this, "wp_view11" },
+				{ *this, "wp_view12" }, { *this, "wp_view13" }, { *this, "wp_view14" }, {*this, "wp_view15" } },
 		m_rtc(*this, "rtc"),
 		m_psg(*this, "psg"),
 		m_nvram(*this, "nvram", 0x100000, endianness_t::little),
@@ -69,23 +69,23 @@ public:
 		m_pen_y(*this, "PEN_Y")
 	{ }
 
-	void zoomer(machine_config &config);
+	void zoomer(machine_config &config) ATTR_COLD;
 
-	template<int Num>
+	template <int Num>
 	void irq_set(int state);
 
 	void power_w(int state);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	static constexpr unsigned TIMER_RATE = (32768 / 8);
+	static inline constexpr unsigned TIMER_RATE = (32768 / 8);
 
-	void maincpu_map(address_map &map);
-	void maincpu_ems_map(address_map &map);
-	void maincpu_io_map(address_map &map);
+	void maincpu_map(address_map &map) ATTR_COLD;
+	void maincpu_ems_map(address_map &map) ATTR_COLD;
+	void maincpu_io_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -96,7 +96,7 @@ private:
 	u8 ems_a000_bank_r(offs_t offset);
 	void ems_a000_bank_w(offs_t offset, u8 data);
 
-	template<int Num>
+	template <int Num>
 	TIMER_CALLBACK_MEMBER(timer_irq) { irq_set<Num>(1); }
 
 	u16 timer_count(u8 timer) const;
@@ -255,7 +255,7 @@ static INPUT_PORTS_START( zoomer )
 	PORT_CONFSETTING(0x04, "Low")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN) // needs to be high to boot
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER  ) // TODO: PCMCIA lock switch (generates IRQ_PCMCIA_LOCK and IRQ_PCMCIA_UNLOCK)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER)          PORT_NAME("PCMCIA Lock Switch") // TODO: PCMCIA lock switch (generates IRQ_PCMCIA_LOCK and IRQ_PCMCIA_UNLOCK)
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 
 	PORT_START("KEYPAD")
@@ -542,7 +542,7 @@ void zoomer_state::update_irq()
 }
 
 //**************************************************************************
-template<int Num>
+template <int Num>
 void zoomer_state::irq_set(int state)
 {
 	if (state)
