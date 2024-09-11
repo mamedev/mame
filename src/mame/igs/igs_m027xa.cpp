@@ -21,7 +21,10 @@ These games use the IGS027A processor.
 #include "machine/nvram.h"
 #include "machine/timer.h"
 
+#include "sound/okim6295.h"
+
 #include "screen.h"
+#include "speaker.h"
 
 #define LOG_DEBUG       (1U << 1)
 #define VERBOSE         (LOG_DEBUG)
@@ -39,8 +42,11 @@ public:
 		m_xa(*this, "xa"),
 		m_ppi(*this, "ppi8255"),
 		m_igs017_igs031(*this, "igs017_igs031"),
+		m_oki(*this, "oki"),
 		m_screen(*this, "screen"),
-		m_external_rom(*this, "user1")
+		m_external_rom(*this, "user1"),
+		m_io_test(*this, "TEST%u", 0U),
+		m_io_dsw(*this, "DSW%u", 1U)
 	{ }
 
 	void igs_mahjong_xa(machine_config &config);
@@ -64,13 +70,18 @@ private:
 	required_device<mx10exa_cpu_device> m_xa;
 	required_device<i8255_device> m_ppi;
 	required_device<igs017_igs031_device> m_igs017_igs031;
+	required_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_region_ptr<u32> m_external_rom;
+
+	optional_ioport_array<3> m_io_test;
+	optional_ioport_array<3> m_io_dsw;
 
 	emu_timer *m_timer0;
 	emu_timer *m_timer1;
 
 	u32 m_xor_table[0x100];
+	u8 m_io_select[2];
 
 	u8 m_port2_latch;
 	u8 m_port0_latch;
@@ -78,7 +89,8 @@ private:
 	u32 m_irq_pending; // it appears they will be needed to differentiate between IRQs from the XA and elsewhere though
 	u32 m_xa_cmd;
 	u32 m_xa_ret0;
-	u32 m_xa_ret1;
+	bool irq_from_igs031;
+	bool irq_from_xa;
 	u8 m_port0_dat;
 	s8 m_num_params;
 	u8 m_port1_dat;
@@ -99,8 +111,8 @@ private:
 
 	void xor_table_w(offs_t offset, u8 data);
 
-	u32 xa_r(offs_t offset, u32 mem_mask);
-	void xa_w(offs_t offset, u32 data, u32 mem_mask);
+	u16 xa_r(offs_t offset, u16 mem_mask);
+	void xa_w(offs_t offset, u16 data, u16 mem_mask);
 
 	void igs_40000014_w(offs_t offset, u32 data, u32 mem_mask);
 
@@ -119,7 +131,10 @@ private:
 	template <unsigned N>
 	TIMER_CALLBACK_MEMBER(igs027_timer_irq);
 
-	u32 rnd_r()	{ return machine().rand(); }
+	u32 gpio_r();
+	void oki_bank_w(offs_t offset, u8 data);
+	template <unsigned Select, unsigned First> u8 dsw_r();
+	template <unsigned Select> void io_select_w(u8 data);
 };
 
 
@@ -131,7 +146,8 @@ void igs_m027xa_state::machine_reset()
 	m_irq_pending = 0xff;
 	m_xa_cmd = 0;
 	m_xa_ret0 = 0;
-	m_xa_ret1 = 0;
+	irq_from_igs031 = false;
+	irq_from_xa = false;
 	m_num_params = 0;
 	m_port0_dat = 0;
 	m_port1_dat = 0;
@@ -146,6 +162,7 @@ void igs_m027xa_state::machine_start()
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 
 	save_item(NAME(m_xor_table));
+	save_item(NAME(m_io_select));
 
 	save_item(NAME(m_port2_latch));
 	save_item(NAME(m_port0_latch));
@@ -153,7 +170,8 @@ void igs_m027xa_state::machine_start()
 	save_item(NAME(m_irq_pending));
 	save_item(NAME(m_xa_cmd));
 	save_item(NAME(m_xa_ret0));
-	save_item(NAME(m_xa_ret1));
+	save_item(NAME(irq_from_igs031));
+	save_item(NAME(irq_from_xa));
 	save_item(NAME(m_num_params));
 	save_item(NAME(m_port0_dat));
 	save_item(NAME(m_port1_dat));
@@ -229,9 +247,13 @@ void igs_m027xa_state::main_map(address_map &map)
 	map(0x18000000, 0x18007fff).ram();
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
+	map(0x38008000, 0x38008003).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x38009000, 0x38009003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027xa_state::rnd_r));
+	map(0x3800c000, 0x3800c003).w(FUNC(igs_m027xa_state::oki_bank_w));
+	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027xa_state::gpio_r));
 	map(0x40000014, 0x40000017).w(FUNC(igs_m027xa_state::igs_40000014_w));
+	map(0x40000018, 0x4000001b).umask32(0x000000ff).w(FUNC(igs_m027xa_state::io_select_w<1>));
+
 	map(0x58000000, 0x580000ff).rw(FUNC(igs_m027xa_state::xa_r), FUNC(igs_m027xa_state::xa_w));
 
 	map(0x70000000, 0x700003ff).rw(FUNC(igs_m027xa_state::igs027_periph_r), FUNC(igs_m027xa_state::igs027_periph_w));
@@ -250,13 +272,86 @@ void igs_m027xa_state::main_xor_map(address_map &map)
 
 static INPUT_PORTS_START( base )
 	PORT_START("TEST0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Play")
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_NAME("Big")
 
 	PORT_START("TEST1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL )  PORT_NAME("Stop All Reels / Start")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_NAME("Ticket")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ticket sw
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ??
 
 	PORT_START("TEST2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0000003f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop Reel 2 / Small")
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop Reel 3 / Take Score")
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop Reel 1 / Double Up")
+	PORT_BIT( 0xfffffe00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x02, 0x02, "Non Stop" )       PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x02, DEF_STR(No) )
+	PORT_DIPNAME( 0x04, 0x04, "Password" )       PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x04, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x08, 0x08, "Odds Table" )       PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x08, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )       PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x10, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x60, 0x60, "Symbol" )       PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x00, "Both" )
+	PORT_DIPSETTING(    0x20, "Both (duplicate)" )
+	PORT_DIPSETTING(    0x40, "Fruit" )
+	PORT_DIPSETTING(    0x60, "Bug" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Score Box" )       PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, "10X" )
+	PORT_DIPSETTING(    0x01, "10X (duplicate)" )
+	PORT_DIPSETTING(    0x02, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x03, DEF_STR(No) )
+	PORT_DIPNAME( 0x04, 0x04, "Play Score" )       PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x04, DEF_STR(No) )
+	PORT_DIPNAME( 0x08, 0x08, "Hand Count" )       PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x08, DEF_STR(No) )
+	PORT_DIPNAME( 0x30, 0x30, "Hold Pair" )       PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x00, "Georgia" )
+	PORT_DIPSETTING(    0x10, "Georgia (duplicate)" )
+	PORT_DIPSETTING(    0x20, "Regular" )
+	PORT_DIPSETTING(    0x30, DEF_STR(Off) )
+	PORT_DIPNAME( 0x40, 0x40, "Auto Hold" )       PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x40, DEF_STR(No) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
 INPUT_PORTS_END
 
 
@@ -269,18 +364,14 @@ void igs_m027xa_state::igs027_trigger_irq(int num)
 	}
 }
 
-u32 igs_m027xa_state::xa_r(offs_t offset, u32 mem_mask)
+u16 igs_m027xa_state::xa_r(offs_t offset, u16 mem_mask)
 {
 	u32 data = ~u32(0);
 
-	switch (offset * 4)
+	switch (offset * 2)
 	{
 	case 0:
 		data = m_xa_ret0;
-		break;
-
-	case 0x80:
-		data = m_xa_ret1 << 16;
 		break;
 	}
 	return data;
@@ -292,7 +383,40 @@ void igs_m027xa_state::igs_40000014_w(offs_t offset, u32 data, u32 mem_mask)
 	m_igs_40000014 = data;
 }
 
-void igs_m027xa_state::xa_w(offs_t offset, u32 data, u32 mem_mask)
+u32 igs_m027xa_state::gpio_r()
+{
+	u32 ret = m_io_test[2].read_safe(0xffffffff);
+	if (irq_from_igs031)
+		ret ^= 1 << 11;
+	if (irq_from_xa)
+		ret ^= 1 << 12;
+	return ret;
+}
+
+void igs_m027xa_state::oki_bank_w(offs_t offset, u8 data)
+{
+	if (offset == 0)
+		m_oki->set_rom_bank(data & 3);
+}
+
+template <unsigned Select, unsigned First>
+u8 igs_m027xa_state::dsw_r()
+{
+	u8 data = 0xff;
+
+	for (int i = First; i < m_io_dsw.size(); i++)
+		if (!BIT(m_io_select[Select], i - First))
+			data &= m_io_dsw[i].read_safe(0xff);
+	return data;
+}
+
+template <unsigned Select>
+void igs_m027xa_state::io_select_w(u8 data)
+{
+	m_io_select[Select] = data;
+}
+
+void igs_m027xa_state::xa_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_xa_cmd = data;
 
@@ -313,7 +437,8 @@ void igs_m027xa_state::xa_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 	else
 	{
-		LOGMASKED(LOG_DEBUG, "%s: unhandled xa_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+		irq_from_xa = false;
+		LOGMASKED(LOG_DEBUG, "%s: unhandled xa_w %04x %08x (%08x)\n", machine().describe_context(), offset * 2, data, mem_mask);
 	}
 }
 
@@ -364,14 +489,8 @@ void igs_m027xa_state::mcu_p0_w(uint8_t data)
 
 void igs_m027xa_state::mcu_p1_w(uint8_t data)
 {
-	u8 olddata = m_port1_dat;
 	LOGMASKED(LOG_DEBUG, "%s: mcu_p1_w() %02x\n", machine().describe_context(), data);
 	m_port1_dat = data;
-
-	if (posedge(olddata, m_port1_dat, 3))
-	{
-		igs027_trigger_irq(3); // wrong here?
-	}
 }
 
 void igs_m027xa_state::mcu_p2_w(uint8_t data)
@@ -386,33 +505,24 @@ void igs_m027xa_state::mcu_p3_w(uint8_t data)
 	m_port3_dat = data;
 	LOGMASKED(LOG_DEBUG, "%s: mcu_p3_w() %02x - do latches oldport3 %02x newport3 %02x\n", machine().describe_context(), data, oldport3, m_port3_dat);
 
+	if (posedge(oldport3, m_port3_dat, 5))
+	{
+		irq_from_xa = true;
+		igs027_trigger_irq(3);
+	}
 	// high->low transition on bit 0x80 must read into latches!
 	if (negedge(oldport3, m_port3_dat, 7))
 	{
-		if (!BIT(m_port3_dat, 5))
-		{
-			LOGMASKED(LOG_DEBUG, "read command [%d] = [%04x]\n", m_port1_dat & 7, m_xa_cmd);
-			m_port2_latch = (m_xa_cmd & 0xff00) >> 8;
-			m_port0_latch = m_xa_cmd & 0x00ff;
-		}
+		LOGMASKED(LOG_DEBUG, "read command [%d] = [%04x]\n", m_port1_dat & 7, m_xa_cmd);
+		m_port2_latch = (m_xa_cmd & 0xff00) >> 8;
+		m_port0_latch = m_xa_cmd & 0x00ff;
 	}
 
 	if (negedge(oldport3, m_port3_dat, 6))
 	{
-		if (!BIT(m_port3_dat, 5))
-		{
-			uint32_t dat = (m_port2_dat << 8) | m_port0_dat;
-			LOGMASKED(LOG_DEBUG, "write command [%d] = [%04x]\n", m_port1_dat & 7, dat);
-			switch (m_port1_dat & 7)
-			{
-			case 1:
-				m_xa_ret1 = dat;
-				break;
-			case 2:
-				m_xa_ret0 = dat;
-				break;
-			}
-		}
+		uint32_t dat = (m_port2_dat << 8) | m_port0_dat;
+		LOGMASKED(LOG_DEBUG, "write command [%d] = [%04x]\n", m_port1_dat & 7, dat);
+		m_xa_ret0 = dat;
 	}
 }
 
@@ -435,9 +545,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 
 	// should be using igs027_trigger_irq with more compelx interrupt logic?
 
-	//if (scanline == 240 && m_igs017_igs031->get_irq_enable())
-	//	m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // source? (can the XA trigger this?)
-
+	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
+	{
+		irq_from_igs031 = true;
+		igs027_trigger_irq(3);
+	}
 	if (scanline == 0 && (m_igs_40000014 & 1))
 		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
 }
@@ -475,12 +587,13 @@ void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits(true);
-	m_igs017_igs031->in_pa_callback().set_ioport("TEST0");
-	m_igs017_igs031->in_pb_callback().set_ioport("TEST1");
-	m_igs017_igs031->in_pc_callback().set_ioport("TEST2");
+	m_igs017_igs031->in_pa_callback().set(FUNC((igs_m027xa_state::dsw_r<1, 0>)));
+	m_igs017_igs031->in_pb_callback().set_ioport("TEST0");
+	m_igs017_igs031->in_pc_callback().set_ioport("TEST1");
 
 	// sound hardware
-	// OK6295
+	SPEAKER(config, "mono").front_center();
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void igs_m027xa_state::igs_mahjong_xa_xor(machine_config &config)
@@ -523,7 +636,7 @@ ROM_START( haunthig )
 	ROM_LOAD( "haunted-h_cg.u32",  0x000000, 0x400000, BAD_DUMP CRC(e0ea10e6) SHA1(e81be78fea93e72d4b1f4c0b58560bda46cf7948) ) // not dumped for this set, FIXED BITS (xxxxxxx0xxxxxxxx)
 	ROM_LOAD( "haunted-h_ext.u12", 0x400000, 0x400000, BAD_DUMP CRC(662eb883) SHA1(831ebe29e1e7a8b2c2fff7fbc608975771c3486c) ) // not dumped for this set, FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x200000, "samples", 0 ) // Oki M6295 samples, missing sample table, bad?
+	ROM_REGION( 0x200000, "oki", 0 ) // Oki M6295 samples, missing sample table, bad?
 	ROM_LOAD( "haunted-h_sp.u3", 0x00000, 0x200000,  BAD_DUMP CRC(fe3fcddf) SHA1(ac57ab6d4e4883747c093bd19d0025cf6588cb2c) ) // not dumped for this set
 
 	ROM_REGION( 0x500, "plds", ROMREGION_ERASE00 )
@@ -550,7 +663,7 @@ ROM_START( haunthiga ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, O
 	ROM_LOAD( "haunted-h_cg.u32",  0x000000, 0x400000, CRC(e0ea10e6) SHA1(e81be78fea93e72d4b1f4c0b58560bda46cf7948) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 	ROM_LOAD( "haunted-h_ext.u12", 0x400000, 0x400000, CRC(662eb883) SHA1(831ebe29e1e7a8b2c2fff7fbc608975771c3486c) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x200000, "samples", 0 ) // Oki M6295 samples, missing sample table, bad?
+	ROM_REGION( 0x200000, "oki", 0 ) // Oki M6295 samples, missing sample table, bad?
 	ROM_LOAD( "haunted-h_sp.u3", 0x00000, 0x200000, BAD_DUMP CRC(fe3fcddf) SHA1(ac57ab6d4e4883747c093bd19d0025cf6588cb2c) )
 
 	ROM_REGION( 0x500, "plds", ROMREGION_ERASE00 )
@@ -577,7 +690,7 @@ ROM_START( crzybugs ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_LOAD( "crazy_bugs_cg.u19",  0x000000, 0x200000, CRC(9d53ad47) SHA1(46690a37acf8bd88c7fbe973db2faf5ef0cff805) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 	// u18 not populated
 
-	ROM_REGION( 0x200000, "samples", 0 ) // plain Oki M6295 samples
+	ROM_REGION( 0x200000, "oki", 0 ) // plain Oki M6295 samples
 	ROM_LOAD( "crazybugs_sp.u15", 0x000000, 0x200000, CRC(591b315b) SHA1(fda1816d83e202170dba4afc6e7898b706a76087) ) // M27C160
 ROM_END
 
@@ -600,7 +713,7 @@ ROM_START( crzybugsa )
 	ROM_LOAD( "crazy_bugs_cg.u19",  0x000000, 0x200000, CRC(9d53ad47) SHA1(46690a37acf8bd88c7fbe973db2faf5ef0cff805) ) // M27C160, FIXED BITS (xxxxxxx0xxxxxxxx)
 	// u18 not populated
 
-	ROM_REGION( 0x200000, "samples", 0 ) // plain Oki M6295 samples
+	ROM_REGION( 0x200000, "oki", 0 ) // plain Oki M6295 samples
 	ROM_LOAD( "crazy_bugs_sp.u15", 0x000000, 0x200000, CRC(591b315b) SHA1(fda1816d83e202170dba4afc6e7898b706a76087) ) // M27C160
 ROM_END
 
@@ -623,7 +736,7 @@ ROM_START( crzybugsb )
 	ROM_LOAD( "crazy_bugs_cg.u19",  0x000000, 0x200000, BAD_DUMP CRC(9d53ad47) SHA1(46690a37acf8bd88c7fbe973db2faf5ef0cff805) ) // not dumped for this set, FIXED BITS (xxxxxxx0xxxxxxxx)
 	// u18 not populated
 
-	ROM_REGION( 0x200000, "samples", 0 ) // plain Oki M6295 samples
+	ROM_REGION( 0x200000, "oki", 0 ) // plain Oki M6295 samples
 	ROM_LOAD( "crazy_bugs_sp.u15", 0x000000, 0x200000, BAD_DUMP CRC(591b315b) SHA1(fda1816d83e202170dba4afc6e7898b706a76087) ) // not dumped for this set
 ROM_END
 
@@ -647,7 +760,7 @@ ROM_START( crzybugsj ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, O
 	ROM_LOAD( "crazy_bugs_ani-cg-u32.u32",  0x000000, 0x200000, CRC(9d53ad47) SHA1(46690a37acf8bd88c7fbe973db2faf5ef0cff805) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 	// u12 not populated
 
-	ROM_REGION( 0x200000, "samples", 0 ) // plain Oki M6295 samples
+	ROM_REGION( 0x200000, "oki", 0 ) // plain Oki M6295 samples
 	ROM_LOAD( "crazy_bugs_sp_u3.u3", 0x000000, 0x200000,  CRC(b15974a1) SHA1(82509902bbb33a2120d815e7879b9b8591a29976) )
 
 	ROM_REGION( 0x500, "plds", ROMREGION_ERASE00 )
@@ -673,7 +786,7 @@ ROM_START( tripfev ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Oki
 	ROM_LOAD( "triple_fever_u19_cg.u19",  0x000000, 0x400000, CRC(cd45bbf2) SHA1(7f1cf270245bbe4604de2cacade279ab13584dbd) ) // M27C322, FIXED BITS (xxxxxxx0xxxxxxxx)
 	// u18 not populated
 
-	ROM_REGION( 0x200000, "samples", 0 ) // plain Oki M6295 samples
+	ROM_REGION( 0x200000, "oki", 0 ) // plain Oki M6295 samples
 	ROM_LOAD( "triplef_sp_u15.u15", 0x000000, 0x200000, CRC(98b9cafd) SHA1(3bf3971f0d9520c98fc6b1c2e77ab9c178d21c62) ) // M27C160
 ROM_END
 
@@ -695,7 +808,7 @@ ROM_START( wldfruit ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_LOAD( "wild_fruit_cg.u19",  0x000000, 0x400000, CRC(119686a8) SHA1(22583c1a1018cfdd20f0ef696d91fa1f6e01ab00) ) // M27C322, FIXED BITS (xxxxxxx0xxxxxxxx)
 	// u18 not populated
 
-	ROM_REGION( 0x200000, "samples", 0 ) // plain Oki M6295 samples
+	ROM_REGION( 0x200000, "oki", 0 ) // plain Oki M6295 samples
 	ROM_LOAD( "wild_fruit_sp.u15", 0x000000, 0x200000, CRC(9da3e9dd) SHA1(7e447492713549e6be362d4aca6d223dad20771a) ) // M27C160
 ROM_END
 
