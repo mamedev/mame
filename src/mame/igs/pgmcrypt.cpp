@@ -1662,15 +1662,16 @@ void olympic5_decrypt(running_machine &machine)
 	}
 }
 
+
 void crzybugs_decrypt(running_machine &machine)
 {
-	auto const src = reinterpret_cast<u16 *>(machine.root_device().memregion("user1")->base());
-
-	int const rom_size = 0x80000;
+	memory_region *const region = machine.root_device().memregion("user1");
+	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
+	auto const rom_size = region->bytes();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		uint16_t x = 0;
 
 		IGS27_CRYPT1
 		IGS27_CRYPT2_ALT
@@ -1681,7 +1682,7 @@ void crzybugs_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
@@ -1733,13 +1734,13 @@ void icescape_decrypt(running_machine &machine)
 
 void tripfev_decrypt(running_machine &machine)
 {
-	auto const src = reinterpret_cast<u16 *>(machine.root_device().memregion("user1")->base());
-
-	int const rom_size = 0x80000;
+	memory_region *const region = machine.root_device().memregion("user1");
+	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
+	auto const rom_size = region->bytes();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		uint16_t x = 0;
 
 		IGS27_CRYPT1
 		IGS27_CRYPT2 //
@@ -1750,7 +1751,7 @@ void tripfev_decrypt(running_machine &machine)
 		IGS27_CRYPT7_ALT // $2b0
 		IGS27_CRYPT8 // $1100
 
-		src[i] = x;
+		src[i] ^= x;
 	}
 }
 
