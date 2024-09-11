@@ -49,6 +49,9 @@
 #include "jking02.lh"
 #include "oceanpar.lh"
 
+#define LOG_DEBUG       (1U << 1)
+#define VERBOSE         (LOG_DEBUG)
+#include "logmacro.h"
 
 namespace {
 
@@ -107,6 +110,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -129,11 +133,18 @@ private:
 	u32 m_xor_table[0x100];
 	u8 m_io_select[2];
 	u32 m_unk2_write_count;
+	u32 m_irq_enable;
+	u32 m_irq_pending;
+
+	emu_timer *m_timer0;
+	emu_timer *m_timer1;
 
 	template <unsigned Select, unsigned First> u8 dsw_r();
 	template <unsigned Select, unsigned S, unsigned R> u8 kbd_r();
 
 	template <unsigned Select> void io_select_w(u8 data);
+
+	void igs027_trigger_irq(int num);
 
 	u32 external_rom_r(offs_t offset);
 
@@ -150,7 +161,13 @@ private:
 	u32 lhdmg_unk2_r();
 	void unk2_w(u32 data);
 
+	u32 igs027_periph_r(offs_t offset, u32 mem_mask);
+	void igs027_periph_w(offs_t offset, u32 data, u32 mem_mask);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
+	template <unsigned N>
+	TIMER_CALLBACK_MEMBER(igs027_timer_irq);
 
 	void pgm_create_dummy_internal_arm_region() ATTR_COLD;
 
@@ -172,13 +189,84 @@ void igs_m027_state::machine_start()
 	save_item(NAME(m_xor_table));
 	save_item(NAME(m_io_select));
 	save_item(NAME(m_unk2_write_count));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_pending));
+
+	m_timer0 = timer_alloc(FUNC(igs_m027_state::igs027_timer_irq<0>), this);
+	m_timer1 = timer_alloc(FUNC(igs_m027_state::igs027_timer_irq<1>), this);
 }
+
+void igs_m027_state::machine_reset()
+{
+	m_irq_enable = 0xff;
+	m_irq_pending = 0xff;
+}
+
 
 void igs_m027_state::video_start()
 {
 	m_igs017_igs031->video_start();
 }
 
+/***************************************************************************
+
+    Peripherals (Timers)
+
+***************************************************************************/
+
+template <unsigned N>
+TIMER_CALLBACK_MEMBER(igs_m027_state::igs027_timer_irq)
+{
+	igs027_trigger_irq(N);
+}
+
+void igs_m027_state::igs027_trigger_irq(int num)
+{
+	if (!BIT(m_irq_enable, num))
+	{
+		m_irq_pending &= ~(u32(1) << num);
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
+	}
+}
+
+
+u32 igs_m027_state::igs027_periph_r(offs_t offset, u32 mem_mask)
+{
+	u32 data = ~u32(0);
+	switch (offset * 4)
+	{
+	case 0x200:
+		data = m_irq_pending;
+		m_irq_pending = 0xff;
+		break;
+
+	default:
+		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_periph_r %04x (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
+	}
+	return data;
+}
+
+void igs_m027_state::igs027_periph_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	switch (offset * 4)
+	{
+	case 0x100:
+		// TODO: verify the timer interval
+		m_timer0->adjust(attotime::from_hz(data / 2), 0, attotime::from_hz(data / 2));
+		break;
+
+	case 0x104:
+		m_timer1->adjust(attotime::from_hz(data / 2), 0, attotime::from_hz(data / 2));
+		break;
+
+	case 0x200:
+		m_irq_enable = data;
+		break;
+
+	default:
+		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_periph_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+	}
+}
 
 /***************************************************************************
 
@@ -202,7 +290,7 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 	map(0x40000018, 0x4000001b).umask32(0x000000ff).w(FUNC(igs_m027_state::io_select_w<1>));
 
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027_state::xor_table_w)); // uploads XOR table to external ROM here
-	map(0x70000200, 0x70000203).ram(); // ??????????????
+	map(0x70000000, 0x700003ff).rw(FUNC(igs_m027_state::igs027_periph_r), FUNC(igs_m027_state::igs027_periph_w));
 	map(0xf0000000, 0xf000000f).nopw(); // magic registers
 }
 
@@ -218,6 +306,7 @@ void igs_m027_state::lhdmg_xor_map(address_map &map)
 	igs_mahjong_xor_map(map);
 
 	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027_state::lhdmg_unk2_r));
+	map(0x40000018, 0x4000001b).umask32(0x000000ff).w(FUNC(igs_m027_state::jking02_misc_w));
 }
 
 void igs_m027_state::jking02_xor_map(address_map &map)
@@ -232,7 +321,7 @@ void igs_m027_state::extradraw_map(address_map &map)
 {
 	igs_mahjong_map(map);
 
-	map(0x18088000, 0x1808ffff).ram(); // Extra Draw needs RAM here, maybe just a mirror, maybe due to PCB difference
+	map(0x18080000, 0x1808ffff).ram(); // Extra Draw needs RAM here, maybe just a mirror, maybe due to PCB difference
 }
 
 /***************************************************************************
@@ -1023,7 +1112,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_state::interrupt)
 	int scanline = param;
 
 	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
-		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // source?
+		igs027_trigger_irq(3);
 
 	if (scanline == 0 && m_igs017_igs031->get_nmi_enable())
 		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
@@ -2220,9 +2309,10 @@ ROM_START( extradrw ) // IGS PCB 0326-05-DV-1
 	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "igs m3001.u4",  0x000000, 0x080000, CRC(d161f8f7) SHA1(4b495197895fd805979c5d5c5a4b7f07a68f4171) ) // label barely readable
 
-	ROM_REGION( 0x280000, "igs017_igs031:sprites", 0 )
-	ROM_LOAD( "u12",  0x000000, 0x200000, CRC(642247fb) SHA1(69c01c3551551120a3786522b28a80621a0d5082) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF, label not readable
-	ROM_LOAD( "u3",   0x200000, 0x080000, CRC(97227767) SHA1(c6a1916c0df1aceafbd488ecace5794390058c49) ) // FIXED BITS (xxxxxxx0xxxxxxxx), label not readable
+	ROM_REGION( 0x180000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "u12",  0x000000, 0x100000, CRC(642247fb) SHA1(69c01c3551551120a3786522b28a80621a0d5082) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF, label not readable
+	ROM_IGNORE(0x100000)
+	ROM_LOAD( "u3",   0x100000, 0x080000, CRC(97227767) SHA1(c6a1916c0df1aceafbd488ecace5794390058c49) ) // FIXED BITS (xxxxxxx0xxxxxxxx), label not readable
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "igs s3002.u18", 0x00000, 0x200000, CRC(48601c32) SHA1(8ef3bad80931f4b1badf0598463e15508602f104) ) // BADADDR   --xxxxxxxxxxxxxxxxxxx
@@ -2357,7 +2447,7 @@ void igs_m027_state::init_qlgs()
 void igs_m027_state::init_extradrw()
 {
 	extradrw_decrypt(machine());
-	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->set_text_reverse_bits(false);
 }
 
 
