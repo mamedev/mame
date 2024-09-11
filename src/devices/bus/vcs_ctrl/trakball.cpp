@@ -16,11 +16,11 @@ Reference: Atari, CX22 Trakball Field Service Manual, Rev. 01 (FD100660), Novemb
     CONSTANTS
 ***************************************************************************/
 
-#define TRAKBALL_BUTTON_TAG	"trackball_buttons"
-#define TRAKBALL_XAXIS_TAG	"trackball_x"
-#define TRAKBALL_YAXIS_TAG	"trackball_y"
+#define TRAKBALL_BUTTON_TAG "trackball_buttons"
+#define TRAKBALL_XAXIS_TAG  "trackball_x"
+#define TRAKBALL_YAXIS_TAG  "trackball_y"
 
-#define TRAKBALL_POS_UNINIT	0xffffffff /* default out-of-range position */
+#define TRAKBALL_POS_UNINIT 0xffffffff /* default out-of-range position */
 
 //**************************************************************************
 //  DEVICE TYPE DEFINITION
