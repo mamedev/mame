@@ -20,12 +20,18 @@
 
 #include <algorithm>
 
-DEFINE_DEVICE_TYPE(UPD65043GFU01, upd65043gfu01_device, "upd65043gfu01", "NEC uPD65043GF-U01")
 
-const s8 upd65043gfu01_device::output_level[16] =
+namespace {
+
+constexpr s8 OUTPUT_LEVEL[16] =
 {
 	0, 5, 6, 8, 10, 12, 15, 20, 25, 31, 40, 50, 63, 80, 100, 127
 };
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE(UPD65043GFU01, upd65043gfu01_device, "upd65043gfu01", "NEC uPD65043GF-U01")
 
 //**************************************************************************
 upd65043gfu01_device::upd65043gfu01_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -185,7 +191,7 @@ void upd65043gfu01_device::update_irq()
 	{
 		// recalculate timer so the IRQ fires when there are 128 samples or fewer in the buffer
 		// (GEOS will push up to 128 more samples at this point)
-		const u16 samples_left = std::min(128, (m_pcm_buffer_write - m_pcm_buffer_read) & 0x1ff);
+		const u16 samples_left = std::min<u16>(128, (m_pcm_buffer_write - m_pcm_buffer_read) & 0x1ff);
 		const u16 ticks_left = (samples_left * m_pcm_period) - m_pcm_count;
 		m_irq_timer->adjust(m_stream->sample_period() * ticks_left);
 	}
@@ -221,9 +227,9 @@ void upd65043gfu01_device::sound_stream_update(sound_stream &stream, std::vector
 			if (!BIT(m_control, 3))
 			{
 				if (BIT(m_output[i], 0))
-					sample += output_level[m_volume[i] & 0xf];
+					sample += OUTPUT_LEVEL[m_volume[i] & 0xf];
 				else
-					sample -= output_level[m_volume[i] & 0xf];
+					sample -= OUTPUT_LEVEL[m_volume[i] & 0xf];
 			}
 		}
 
