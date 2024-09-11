@@ -31,8 +31,6 @@ private:
 
 	void update_noise();
 
-	static const s8 output_level[16];
-
 	sound_stream *m_stream;
 	emu_timer *m_irq_timer;
 
