@@ -67,6 +67,26 @@ private:
 	required_device<screen_device> m_screen;
 	required_region_ptr<u32> m_external_rom;
 
+	emu_timer *m_timer0;
+	emu_timer *m_timer1;
+
+	u32 m_xor_table[0x100];
+
+	u8 m_port2_latch;
+	u8 m_port0_latch;
+	u32 m_irq_enable;  // m_irq_enable and m_irq_pending are not currently hooked up
+	u32 m_irq_pending; // it appears they will be needed to differentiate between IRQs from the XA and elsewhere though
+	u32 m_xa_cmd;
+	u32 m_xa_ret0;
+	u32 m_xa_ret1;
+	u8 m_port0_dat;
+	s8 m_num_params;
+	u8 m_port1_dat;
+	u8 m_port2_dat;
+	u8 m_port3_dat;
+
+	u32 m_igs_40000014;
+
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void pgm_create_dummy_internal_arm_region();
@@ -96,31 +116,10 @@ private:
 	u32 igs027_periph_r(offs_t offset, u32 mem_mask);
 	void igs027_periph_w(offs_t offset, u32 data, u32 mem_mask);
 
-	TIMER_CALLBACK_MEMBER(igs027_timer0);
-	TIMER_CALLBACK_MEMBER(igs027_timer1);
+	template <unsigned N>
+	TIMER_CALLBACK_MEMBER(igs027_timer_irq);
 
 	u32 rnd_r()	{ return machine().rand(); }
-
-	u8 m_port2_latch;
-	u8 m_port0_latch;
-	u32 m_irq_enable;  // m_irq_enable and m_irq_pending are not currently hooked up
-	u32 m_irq_pending; // it appears they will be needed to differentiate between IRQs from the XA and elsewhere though
-	u32 m_xa_cmd;
-	u32 m_xa_ret0;
-	u32 m_xa_ret1;
-	u8 m_port0_dat;
-	s8 m_num_params;
-	u8 m_port1_dat;
-	u8 m_port2_dat;
-	u8 m_port3_dat;
-
-	u32 m_igs_40000014;
-
-	u32 m_xor_table[0x100];
-
-	emu_timer *m_timer0;
-	emu_timer *m_timer1;
-
 };
 
 
@@ -163,9 +162,8 @@ void igs_m027xa_state::machine_start()
 
 	save_item(NAME(m_igs_40000014));
 
-	m_timer0 = timer_alloc(FUNC(igs_m027xa_state::igs027_timer0), this);
-	m_timer1 = timer_alloc(FUNC(igs_m027xa_state::igs027_timer1), this);
-
+	m_timer0 = timer_alloc(FUNC(igs_m027xa_state::igs027_timer_irq<0>), this);
+	m_timer1 = timer_alloc(FUNC(igs_m027xa_state::igs027_timer_irq<1>), this);
 }
 
 void igs_m027xa_state::video_start()
@@ -173,14 +171,10 @@ void igs_m027xa_state::video_start()
 	m_igs017_igs031->video_start();
 }
 
-TIMER_CALLBACK_MEMBER(igs_m027xa_state::igs027_timer0)
+template <unsigned N>
+TIMER_CALLBACK_MEMBER(igs_m027xa_state::igs027_timer_irq)
 {
-	igs027_trigger_irq(0);
-}
-
-TIMER_CALLBACK_MEMBER(igs_m027xa_state::igs027_timer1)
-{
-	igs027_trigger_irq(1);
+	igs027_trigger_irq(N);
 }
 
 void igs_m027xa_state::igs027_periph_w(offs_t offset, u32 data, u32 mem_mask)
@@ -202,7 +196,6 @@ void igs_m027xa_state::igs027_periph_w(offs_t offset, u32 data, u32 mem_mask)
 
 	default:
 		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_periph_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
-		break;
 	}
 }
 
@@ -218,8 +211,6 @@ u32 igs_m027xa_state::igs027_periph_r(offs_t offset, u32 mem_mask)
 
 	default:
 		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_periph_r %04x (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
-		break;
-
 	}
 	return data;
 }
@@ -285,10 +276,9 @@ u32 igs_m027xa_state::xa_r(offs_t offset, u32 mem_mask)
 	switch (offset * 4)
 	{
 	case 0:
-	{
 		data = m_xa_ret0;
 		break;
-	}
+
 	case 0x80:
 		data = m_xa_ret1 << 16;
 		break;
@@ -354,14 +344,16 @@ u8 igs_m027xa_state::mcu_p3_r()
 	return m_port3_dat;
 }
 
-static int posedge(uint32_t oldval, uint32_t val, int bit)
+template <typename T>
+constexpr bool posedge(T oldval, T val, unsigned bit)
 {
-	return (!BIT(oldval, bit)) && (BIT(val, bit));
+	return BIT(~oldval & val, bit);
 }
 
-static int negedge(uint32_t oldval, uint32_t val, int bit)
+template <typename T>
+constexpr bool negedge(T oldval, T val, unsigned bit)
 {
-	return (BIT(oldval, bit)) && (!BIT(val, bit));
+	return BIT(oldval & ~val, bit);
 }
 
 void igs_m027xa_state::mcu_p0_w(uint8_t data)
@@ -453,12 +445,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 
 void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 {
-	ARM7(config, m_maincpu, 22000000); // Crazy Bugs has a 22Mhz Xtal, what about the others?
+	ARM7(config, m_maincpu, 22'000'000); // Crazy Bugs has a 22MHz crystal, what about the others?
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::main_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MX10EXA(config, m_xa, 10000000); // MX10EXAQC (Philips 80C51 XA) unknown frequency
+	MX10EXA(config, m_xa, 10'000'000); // MX10EXAQC (Philips 80C51 XA) unknown frequency
 	m_xa->port_in_cb<0>().set(FUNC(igs_m027xa_state::mcu_p0_r));
 	m_xa->port_in_cb<1>().set(FUNC(igs_m027xa_state::mcu_p1_r));
 	m_xa->port_in_cb<2>().set(FUNC(igs_m027xa_state::mcu_p2_r));
