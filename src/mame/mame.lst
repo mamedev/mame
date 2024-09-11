@@ -16129,6 +16129,9 @@ sk10                            //
 @source:casio/sx1000.cpp
 sx1010                          // Casio SX1010
 
+@source:casio/zoomer.cpp
+zoomer                          // 1993 Casio/Tandy
+
 @source:cave/cavepc.cpp
 deathsm2                        //
 
