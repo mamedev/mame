@@ -587,7 +587,7 @@ void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits(true);
-	m_igs017_igs031->in_pa_callback().set(FUNC((igs_m027xa_state::dsw_r<1, 0>)));
+	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027xa_state::dsw_r<1, 0>)));
 	m_igs017_igs031->in_pb_callback().set_ioport("TEST0");
 	m_igs017_igs031->in_pc_callback().set_ioport("TEST1");
 
