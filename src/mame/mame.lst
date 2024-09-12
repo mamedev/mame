@@ -43140,6 +43140,9 @@ sun4_60                         //
 sun4_65                         //
 sun4_75                         //
 
+@source:sun/ultra45.cpp
+ultra45                         //
+
 @source:suna/go2000.cpp
 go2000                          // (c) 2000 SA
 
