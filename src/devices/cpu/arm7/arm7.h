@@ -52,6 +52,7 @@ class arm7_cpu_device : public cpu_device, public arm7_disassembler::config
 public:
 	// construction/destruction
 	arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~arm7_cpu_device();
 
 	void set_high_vectors() { m_vectorbase = 0xffff0000; }
 
@@ -113,7 +114,16 @@ protected:
 		ARM9_COPRO_ID_MFR_INTEL = 0x69 << 24
 	};
 
-	arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness);
+	arm7_cpu_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			uint8_t archRev,
+			uint32_t archFlags,
+			endianness_t endianness,
+			address_map_constructor internal_map = address_map_constructor());
 
 	void postload();
 

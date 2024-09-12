@@ -131,7 +131,7 @@ void pgm_arm_type2_state::_55857F_arm7_map(address_map &map)
 	map(0x18000000, 0x1800ffff).ram().share("arm_ram");
 	map(0x38000000, 0x38000003).rw(FUNC(pgm_arm_type2_state::arm7_latch_arm_r), FUNC(pgm_arm_type2_state::arm7_latch_arm_w)); /* 68k Latch */
 	map(0x48000000, 0x4800ffff).rw(FUNC(pgm_arm_type2_state::arm7_shareram_r), FUNC(pgm_arm_type2_state::arm7_shareram_w)).share("arm7_shareram");
-	map(0x50000000, 0x500003ff).ram().umask32(0x000000ff).w(FUNC(pgm_arm_type2_state::xor_table_w)); 
+	map(0x50000000, 0x500003ff).ram().umask32(0x000000ff).w(FUNC(pgm_arm_type2_state::xor_table_w));
 }
 
 /******* ARM 55857F *******/

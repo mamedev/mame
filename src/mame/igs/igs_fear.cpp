@@ -7,9 +7,9 @@
 
 #include "emu.h"
 
+#include "igs027a.h"
 #include "pgmcrypt.h"
 
-#include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "cpu/xa/xa.h"
 #include "machine/nvram.h"
@@ -79,14 +79,6 @@ private:
 	u32 igs027_gpio_r(offs_t offset, u32 mem_mask);
 	void igs027_gpio_w(offs_t offset, u32 data, u32 mem_mask);
 
-	TIMER_CALLBACK_MEMBER(igs027_timer0);
-	TIMER_CALLBACK_MEMBER(igs027_timer1);
-
-	void igs027_periph_init(void);
-	void igs027_trigger_irq(int num);
-	u32 igs027_periph_r(offs_t offset, u32 mem_mask);
-	void igs027_periph_w(offs_t offset, u32 data, u32 mem_mask);
-
 	u32 xa_r(offs_t offset, u32 mem_mask);
 	void xa_w(offs_t offset, u32 data, u32 mem_mask);
 	void cpld_w(offs_t offset, u32 data, u32 mem_mask);
@@ -107,7 +99,7 @@ private:
 	required_shared_ptr<uint32_t> m_sram;
 	required_shared_ptr<u32> m_videoram;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<igs027a_cpu_device> m_maincpu;
 	required_device<mx10exa_cpu_device> m_xa;
 	required_device<ics2115_device> m_ics;
 	required_device<screen_device> m_screen;
@@ -118,17 +110,12 @@ private:
 	required_ioport_array<2> m_io_dsw;
 	optional_ioport_array<2> m_io_trackball;
 
-	emu_timer *m_timer0;
-	emu_timer *m_timer1;
-
 	u32 m_xor_table[0x100];
 
 	u8 m_port2_latch;
 	u8 m_port0_latch;
 
 	u32 m_gpio_o;
-	u32 m_irq_enable;
-	u32 m_irq_pending;
 
 	u32 m_xa_cmd;
 	u32 m_xa_ret0;
@@ -147,7 +134,6 @@ private:
 
 void igs_fear_state::video_start()
 {
-	igs027_periph_init();
 }
 
 void igs_fear_state::machine_start()
@@ -160,8 +146,6 @@ void igs_fear_state::machine_start()
 	save_item(NAME(m_port0_latch));
 
 	save_item(NAME(m_gpio_o));
-	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_irq_pending));
 
 	save_item(NAME(m_xa_cmd));
 	save_item(NAME(m_xa_ret0));
@@ -180,8 +164,6 @@ void igs_fear_state::machine_reset()
 	m_port0_latch = 0;
 
 	m_gpio_o = 0;
-	m_irq_enable = 0;
-	m_irq_pending = 0;
 
 	m_xa_cmd = 0;
 	m_xa_ret0 = 0;
@@ -255,7 +237,6 @@ u32 igs_fear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void igs_fear_state::main_map(address_map &map)
 {
-	map(0x00000000, 0x00003fff).rom(); // Internal ROM
 	map(0x08000000, 0x0807ffff).rom().region("user1", 0); // Game ROM
 	map(0x10000000, 0x100003ff).ram().share("iram");
 	map(0x18000000, 0x1800ffff).ram().share(m_sram);
@@ -273,8 +254,6 @@ void igs_fear_state::main_map(address_map &map)
 	map(0x58100000, 0x58100003).portr("IN1");
 
 	map(0x68000000, 0x6800000f).w(FUNC(igs_fear_state::cpld_w));
-
-	map(0x70000000, 0x700003ff).rw(FUNC(igs_fear_state::igs027_periph_r), FUNC(igs_fear_state::igs027_periph_w));
 }
 
 void igs_fear_state::main_xor_map(address_map &map)
@@ -482,74 +461,6 @@ void igs_fear_state::igs027_gpio_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 }
 
-void igs_fear_state::igs027_periph_init()
-{
-	m_irq_enable = 0xff;
-	m_irq_pending = 0xff;
-	m_timer0 = timer_alloc(FUNC(igs_fear_state::igs027_timer0), this);
-	m_timer1 = timer_alloc(FUNC(igs_fear_state::igs027_timer1), this);
-}
-
-void igs_fear_state::igs027_trigger_irq(int num)
-{
-	if (!BIT(m_irq_enable, num))
-	{
-		m_irq_pending &= ~(u32(1) << num);
-		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
-	}
-}
-
-TIMER_CALLBACK_MEMBER(igs_fear_state::igs027_timer0)
-{
-	igs027_trigger_irq(0);
-}
-
-TIMER_CALLBACK_MEMBER(igs_fear_state::igs027_timer1)
-{
-	igs027_trigger_irq(1);
-}
-
-void igs_fear_state::igs027_periph_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	switch (offset * 4)
-	{
-	case 0x100:
-		// TODO: verify the timer interval
-		m_timer0->adjust(attotime::from_hz(data / 2), 0, attotime::from_hz(data / 2));
-		break;
-
-	case 0x104:
-		m_timer1->adjust(attotime::from_hz(data / 2), 0, attotime::from_hz(data / 2));
-		break;
-
-	case 0x200:
-		m_irq_enable = data;
-		break;
-
-	default:
-		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_periph_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
-		break;
-	}
-}
-
-u32 igs_fear_state::igs027_periph_r(offs_t offset, u32 mem_mask)
-{
-	u32 data = ~u32(0);
-	switch (offset * 4)
-	{
-	case 0x200:
-		data = m_irq_pending;
-		m_irq_pending = 0xff;
-		break;
-
-	default:
-		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_periph_r %04x (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
-		break;
-
-	}
-	return data;
-}
-
 // TODO: trackball support in XA
 u32 igs_fear_state::xa_r(offs_t offset, u32 mem_mask)
 {
@@ -694,7 +605,7 @@ void igs_fear_state::mcu_p1_w(uint8_t data)
 
 	if (posedge(olddata, m_port1_dat, 3))
 	{
-		igs027_trigger_irq(3);
+		m_maincpu->trigger_irq(3);
 	}
 }
 
@@ -753,10 +664,10 @@ void igs_fear_state::mcu_p3_w(uint8_t data)
 
 void igs_fear_state::igs_fear(machine_config &config)
 {
-	ARM7(config, m_maincpu, 50000000/2);
+	IGS027A(config, m_maincpu, 50'000'000/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::main_map);
 
-	MX10EXA(config, m_xa, 50000000/3); // MX10EXAQC (Philips 80C51 XA)
+	MX10EXA(config, m_xa, 50'000'000/3); // MX10EXAQC (Philips 80C51 XA)
 	m_xa->port_in_cb<0>().set(FUNC(igs_fear_state::mcu_p0_r));
 	m_xa->port_in_cb<1>().set(FUNC(igs_fear_state::mcu_p1_r));
 	m_xa->port_in_cb<2>().set(FUNC(igs_fear_state::mcu_p2_r));

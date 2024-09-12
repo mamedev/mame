@@ -11,9 +11,9 @@ These games use the IGS027A processor.
 #include "emu.h"
 
 #include "igs017_igs031.h"
+#include "igs027a.h"
 #include "pgmcrypt.h"
 
-#include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "cpu/xa/xa.h"
 
@@ -66,7 +66,7 @@ protected:
 
 private:
 	optional_shared_ptr<u32> m_igs_mainram;
-	required_device<cpu_device> m_maincpu;
+	required_device<igs027a_cpu_device> m_maincpu;
 	required_device<mx10exa_cpu_device> m_xa;
 	required_device<i8255_device> m_ppi;
 	required_device<igs017_igs031_device> m_igs017_igs031;
@@ -77,16 +77,11 @@ private:
 	optional_ioport_array<3> m_io_test;
 	optional_ioport_array<3> m_io_dsw;
 
-	emu_timer *m_timer0;
-	emu_timer *m_timer1;
-
 	u32 m_xor_table[0x100];
 	u8 m_io_select[2];
 
 	u8 m_port2_latch;
 	u8 m_port0_latch;
-	u32 m_irq_enable;  // m_irq_enable and m_irq_pending are not currently hooked up
-	u32 m_irq_pending; // it appears they will be needed to differentiate between IRQs from the XA and elsewhere though
 	u32 m_xa_cmd;
 	u32 m_xa_ret0;
 	bool m_irq_from_igs031;
@@ -104,8 +99,6 @@ private:
 	void pgm_create_dummy_internal_arm_region();
 	void main_map(address_map &map);
 	void main_xor_map(address_map &map);
-
-	void igs027_trigger_irq(int num);
 
 	u32 external_rom_r(offs_t offset);
 
@@ -125,12 +118,6 @@ private:
 	void mcu_p2_w(uint8_t data);
 	void mcu_p3_w(uint8_t data);
 
-	u32 igs027_periph_r(offs_t offset, u32 mem_mask);
-	void igs027_periph_w(offs_t offset, u32 data, u32 mem_mask);
-
-	template <unsigned N>
-	TIMER_CALLBACK_MEMBER(igs027_timer_irq);
-
 	u32 gpio_r();
 	void oki_bank_w(offs_t offset, u8 data);
 	template <unsigned Select, unsigned First> u8 dsw_r();
@@ -142,8 +129,6 @@ void igs_m027xa_state::machine_reset()
 {
 	m_port2_latch = 0;
 	m_port0_latch = 0;
-	m_irq_enable = 0xff;
-	m_irq_pending = 0xff;
 	m_xa_cmd = 0;
 	m_xa_ret0 = 0;
 	m_irq_from_igs031 = false;
@@ -166,8 +151,6 @@ void igs_m027xa_state::machine_start()
 
 	save_item(NAME(m_port2_latch));
 	save_item(NAME(m_port0_latch));
-	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_irq_pending));
 	save_item(NAME(m_xa_cmd));
 	save_item(NAME(m_xa_ret0));
 	save_item(NAME(m_irq_from_igs031));
@@ -179,58 +162,11 @@ void igs_m027xa_state::machine_start()
 	save_item(NAME(m_port3_dat));
 
 	save_item(NAME(m_igs_40000014));
-
-	m_timer0 = timer_alloc(FUNC(igs_m027xa_state::igs027_timer_irq<0>), this);
-	m_timer1 = timer_alloc(FUNC(igs_m027xa_state::igs027_timer_irq<1>), this);
 }
 
 void igs_m027xa_state::video_start()
 {
 	m_igs017_igs031->video_start();
-}
-
-template <unsigned N>
-TIMER_CALLBACK_MEMBER(igs_m027xa_state::igs027_timer_irq)
-{
-	igs027_trigger_irq(N);
-}
-
-void igs_m027xa_state::igs027_periph_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	switch (offset * 4)
-	{
-	case 0x100:
-		// TODO: verify the timer interval
-		m_timer0->adjust(attotime::from_hz(data / 2), 0, attotime::from_hz(data / 2));
-		break;
-
-	case 0x104:
-		m_timer1->adjust(attotime::from_hz(data / 2), 0, attotime::from_hz(data / 2));
-		break;
-
-	case 0x200:
-		m_irq_enable = data;
-		break;
-
-	default:
-		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_periph_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
-	}
-}
-
-u32 igs_m027xa_state::igs027_periph_r(offs_t offset, u32 mem_mask)
-{
-	u32 data = ~u32(0);
-	switch (offset * 4)
-	{
-	case 0x200:
-		data = m_irq_pending;
-		m_irq_pending = 0xff;
-		break;
-
-	default:
-		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_periph_r %04x (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
-	}
-	return data;
 }
 
 /***************************************************************************
@@ -241,7 +177,6 @@ u32 igs_m027xa_state::igs027_periph_r(offs_t offset, u32 mem_mask)
 
 void igs_m027xa_state::main_map(address_map &map)
 {
-	map(0x00000000, 0x00003fff).rom(); // Internal ROM
 	map(0x08000000, 0x0807ffff).rom().region("user1", 0); // Game ROM
 	map(0x10000000, 0x100003ff).ram().share("igs_mainram"); // main RAM for ASIC?
 	map(0x18000000, 0x18007fff).ram();
@@ -254,13 +189,9 @@ void igs_m027xa_state::main_map(address_map &map)
 	map(0x40000014, 0x40000017).w(FUNC(igs_m027xa_state::igs_40000014_w));
 	map(0x40000018, 0x4000001b).umask32(0x000000ff).w(FUNC(igs_m027xa_state::io_select_w<1>));
 
-	map(0x58000000, 0x580000ff).rw(FUNC(igs_m027xa_state::xa_r), FUNC(igs_m027xa_state::xa_w));
-
-	map(0x70000000, 0x700003ff).rw(FUNC(igs_m027xa_state::igs027_periph_r), FUNC(igs_m027xa_state::igs027_periph_w));
-
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027xa_state::xor_table_w));
 
-	map(0xf0000000, 0xf000000f).nopw(); // magic registers
+	map(0x58000000, 0x580000ff).rw(FUNC(igs_m027xa_state::xa_r), FUNC(igs_m027xa_state::xa_w));
 }
 
 void igs_m027xa_state::main_xor_map(address_map &map)
@@ -354,15 +285,6 @@ static INPUT_PORTS_START( base )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
 INPUT_PORTS_END
 
-
-void igs_m027xa_state::igs027_trigger_irq(int num)
-{
-	if (!BIT(m_irq_enable, num))
-	{
-		m_irq_pending &= ~(u32(1) << num);
-		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
-	}
-}
 
 u16 igs_m027xa_state::xa_r(offs_t offset, u16 mem_mask)
 {
@@ -508,7 +430,7 @@ void igs_m027xa_state::mcu_p3_w(uint8_t data)
 	if (posedge(oldport3, m_port3_dat, 5))
 	{
 		m_irq_from_xa = true;
-		igs027_trigger_irq(3);
+		m_maincpu->trigger_irq(3);
 	}
 	// high->low transition on bit 0x80 must read into latches!
 	if (negedge(oldport3, m_port3_dat, 7))
@@ -543,12 +465,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 {
 	int scanline = param;
 
-	// should be using igs027_trigger_irq with more compelx interrupt logic?
+	// should be using m_maincpu->trigger_irq with more compelx interrupt logic?
 
 	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
 	{
 		m_irq_from_igs031 = true;
-		igs027_trigger_irq(3);
+		m_maincpu->trigger_irq(3);
 	}
 	if (scanline == 0 && (m_igs_40000014 & 1))
 		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
@@ -557,7 +479,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 
 void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 {
-	ARM7(config, m_maincpu, 22'000'000); // Crazy Bugs has a 22MHz crystal, what about the others?
+	IGS027A(config, m_maincpu, 22'000'000); // Crazy Bugs has a 22MHz crystal, what about the others?
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::main_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

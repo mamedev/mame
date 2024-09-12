@@ -83,9 +83,17 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness)
+arm7_cpu_device::arm7_cpu_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag, device_t *owner,
+		uint32_t clock,
+		uint8_t archRev,
+		uint32_t archFlags,
+		endianness_t endianness,
+		address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", endianness, 32, 32, 0)
+	, m_program_config("program", endianness, 32, 32, 0, internal_map)
 	, m_prefetch_word0_shift(endianness == ENDIANNESS_LITTLE ? 0 : 16)
 	, m_prefetch_word1_shift(endianness == ENDIANNESS_LITTLE ? 16 : 0)
 	, m_endian(endianness)
@@ -111,6 +119,10 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type
 	m_insn_prefetch_index = 0;
 	m_tlb_log = 0;
 	m_actual_log = 0;
+}
+
+arm7_cpu_device::~arm7_cpu_device()
+{
 }
 
 
