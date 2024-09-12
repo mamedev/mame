@@ -10,8 +10,8 @@ license:CC0-1.0
 		<publisher>AV Artisan Corp.</publisher>
 		<notes><![CDATA[
 [video] intro uses circular clipping effect
-[video] wrong tilemap paging for layer 1 on game over
 [sound] noisy channels 13-15 starting from character screen, supposed to release after a while (12 00 0f 79)
+game over screen uses a RNG register for rain scroll (verify)
 ]]></notes>
 		<info name="serial" value="F001" />
 		<info name="alt_title" value="福爾摩沙大對決" />
@@ -29,7 +29,9 @@ license:CC0-1.0
 		<notes><![CDATA[
 [video] sprites may need buffering (noticeable on gameplay jumps, verify)
 [video] intro raster effect is slightly off (btanb)
-[video] enables clipping effect during ending and credits
+[video] rain stage should overlay clip effect over sprites (TODO: fill which character)
+[video] 3rd from right stage floor glitches with scroll, [irq 5] related
+[video] 9th character ball special attack cuts off 1 tile, [4]12P (numpad notation)
 ]]></notes>
 		<info name="serial" value="F002" />
 		<info name="alt_title" value="三國志 武將爭霸" />
@@ -47,7 +49,7 @@ license:CC0-1.0
 		<notes><![CDATA[
 Uses [video] blending during attract and title screen
 Wrong [video] ROZ paging for title screen
-Broken [video] during intro, uses bitmap mode
+Broken [video] during intro, uses bitmap mode with ROZ layer
 [video] uses per-tile priority during gameplay
 [sound] BGM during intro releases few keys too early (TODO: pinpoint which)
 ]]></notes>

@@ -96,7 +96,7 @@ STATUS:
 #define LOG_ALL         (LOG_UNKNOWNS | LOG_HFUNKNOWNS | LOG_DMA | LOG_VIDEO | LOG_HFVIDEO | LOG_IRQS | LOG_SOUND | LOG_68K_SOUND | LOG_CONTROLS)
 #define LOG_DEFAULT     (LOG_ALL & ~(LOG_HFVIDEO | LOG_HFUNKNOWNS))
 
-#define VERBOSE         (LOG_UNKNOWNS | LOG_DMA)
+#define VERBOSE         (LOG_GENERAL | LOG_UNKNOWNS | LOG_DMA | LOG_HFUNKNOWNS)
 #include "logmacro.h"
 
 
@@ -194,9 +194,6 @@ private:
 
 	required_ioport_array<2> m_pad;
 
-	dma_regs_t m_dma_regs;
-	sprdma_regs_t m_sprdma_regs;
-
 	uint16_t m_sound_cpu_ctrl = 0;
 	uint8_t m_soundcpu_irq_enable = 0;
 	uint8_t m_soundcpu_irq_source = 0;
@@ -212,18 +209,18 @@ private:
 
 	std::vector<uint8_t> m_vram_addr_swapped{};
 
-#if 0
-	uint16_t *m_pram = nullptr;
-#endif
-
 	uint16_t m_sprite_count = 0;
 	uint32_t m_sprite_base_addr = 0;
+	uint8_t m_sprite_mono_color = 0;
 	uint8_t m_sprite_flags = 0;
 
+	dma_regs_t m_dma_regs;
+	sprdma_regs_t m_sprdma_regs;
+
+	uint16_t m_video_flags = 0;
 	uint32_t m_tilemap_base_addr[3]{};
 	int m_tilemap_scrollx[3]{};
 	int m_tilemap_scrolly[3]{};
-	uint16_t m_video_flags = 0;
 	uint16_t m_tilemap_flags[3]{};
 	uint16_t m_tilemap_mode[3]{};
 	uint16_t m_tilemap_tile_mode[3]{};
@@ -253,7 +250,7 @@ private:
 
 	uint16_t m_video_regs[256]{};
 
-	tilemap_t *m_tilemap_sizes[4][4]{};
+	tilemap_t *m_tilemap_sizes[4][5]{};
 	bitmap_ind16 m_sprite_final_bitmap;
 	bitmap_ind8 m_sprite_mask_bitmap;
 	bitmap_ind8 m_prio_bitmap;
@@ -481,21 +478,25 @@ void supracan_state::video_start()
 	m_tilemap_sizes[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_tilemap0_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap_sizes[0][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_tilemap0_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 	m_tilemap_sizes[0][3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_tilemap0_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap_sizes[0][4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_tilemap0_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 16, 16);
 
 	m_tilemap_sizes[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_tilemap1_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap_sizes[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_tilemap1_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap_sizes[1][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_tilemap1_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 	m_tilemap_sizes[1][3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_tilemap1_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap_sizes[1][4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_tilemap1_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 16, 16);
 
 	m_tilemap_sizes[2][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_tilemap2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap_sizes[2][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_tilemap2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap_sizes[2][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_tilemap2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 	m_tilemap_sizes[2][3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_tilemap2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap_sizes[2][4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_tilemap2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 16, 16);
 
 	m_tilemap_sizes[3][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_roz_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap_sizes[3][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_roz_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap_sizes[3][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_roz_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 	m_tilemap_sizes[3][3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_roz_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap_sizes[3][4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supracan_state::get_roz_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 16, 16);
 }
 
 int supracan_state::get_tilemap_dimensions(int &xsize, int &ysize, int layer)
@@ -511,6 +512,18 @@ int supracan_state::get_tilemap_dimensions(int &xsize, int &ysize, int layer)
 
 	switch (select)
 	{
+	// formduel rain layer on game over
+	// sonevil title screen
+	case 0x200:
+		xsize = 16;
+		ysize = 16;
+		return 4;
+
+	case 0x400:
+		xsize = 32;
+		ysize = 32;
+		return 0;
+
 	case 0x600:
 		xsize = 64;
 		ysize = 32;
@@ -527,6 +540,8 @@ int supracan_state::get_tilemap_dimensions(int &xsize, int &ysize, int layer)
 		return 3;
 
 	default:
+		// TODO: setting 0 is already tested by A'Can logo (in bitmap mode)
+		// select & 0x100 is 16x16 tiles
 		LOGMASKED(LOG_HFUNKNOWNS, "Unsupported tilemap size for layer %d: %04x\n", layer, select);
 		return 0;
 	}
@@ -936,6 +951,7 @@ void supracan_state::draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &clipr
 
 			/* get dest and priority pointers */
 			uint16_t *dest = &bitmap.pix(sy, sx);
+			// TODO: somebody ate the priority pointer here ...
 
 			/* loop over columns */
 			while (x <= ex)
@@ -1342,6 +1358,9 @@ template <unsigned ch> void supracan_state::dma_w(offs_t offset, uint16_t data, 
 					if (data & 0x0100)
 					{
 						// staiwbbl, indirect transfers towards port $f00010-$1f
+						// TODO: also used by sangofgt
+						// will glitch on some super moves because it tries to transfer
+						// multiple times to the VRAM port (normally size is set to 8x2 bytes)
 						if ((m_dma_regs.dest[ch] & 0xf) == 0)
 							m_dma_regs.dest[ch] -= 0x10;
 					}
@@ -1368,14 +1387,6 @@ template <unsigned ch> void supracan_state::dma_w(offs_t offset, uint16_t data, 
 		break;
 	}
 }
-
-#if 0
-void supracan_state::supracan_pram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	m_pram[offset] &= ~mem_mask;
-	m_pram[offset] |= data & mem_mask;
-}
-#endif
 
 // swap address around so that 64x64 tile can be decoded as 8x8 tiles..
 void supracan_state::write_swapped_byte(int offset, uint8_t byte)
@@ -1466,6 +1477,10 @@ uint8_t supracan_state::_6502_soundmem_r(offs_t offset)
 		}
 		break;
 	}
+	case 0x406:
+		// staiwbbl: pad +5V presence?
+		// Will flip and pass bits 1-0 to 0x407 writes
+		return 0x00;
 	case 0x410:
 		data = m_soundcpu_irq_enable;
 		if (!machine().side_effects_disabled())
@@ -1482,6 +1497,9 @@ uint8_t supracan_state::_6502_soundmem_r(offs_t offset)
 			LOGMASKED(LOG_SOUND, "%s: %s: 6502_soundmem_r: Sound IRQ source read + clear: %02x\n", machine().describe_context(), machine().time().to_string(), data);
 			m_soundcpu->set_input_line(0, CLEAR_LINE);
 		}
+		break;
+	case 0x412:
+		// NMI acknowledge
 		break;
 	case 0x420:
 		if (!machine().side_effects_disabled())
@@ -1549,6 +1567,10 @@ void supracan_state::_6502_soundmem_w(offs_t offset, uint8_t data)
 		}
 		break;
 	}
+	// written with 0x06 at game startups, prior to enabling sound irqs
+	// (NMI + master irq enable?)
+	//case 0x409:
+	//break;
 	case 0x40a:
 		// speedyd/magipool uses this to request main to kickoff a sound DMA.
 		// gamblord/formduel just sets this just to poll a sound command
@@ -1740,6 +1762,14 @@ void supracan_state::host_um6619_map(address_map &map)
 			COMBINE_DATA(&m_frc_frequency);
 			logerror("FRC frequency %04x & %04x\n", data, mem_mask);
 			update_frc_state();
+		})
+	);
+	map(0x18, 0x19).lr16(
+		NAME([this] (offs_t offset) {
+			// formduel uses this to scroll the game over rain layer, in both X & Y directions.
+			// TODO: details, obviously.
+			logerror("$e90018: RNG read?\n");
+			return m_soundcpu->total_cycles() % (0xffff);
 		})
 	);
 	/**
