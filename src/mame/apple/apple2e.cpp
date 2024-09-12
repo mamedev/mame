@@ -28,6 +28,12 @@
          if double-lo-res works or not.  We emulate the much more common Rev B or later
          board.
 
+         Has a keyboard switch on models with localized keyboard to toggle between the
+         US QWERTY and local keyboards.  US models do not have a physical keyboard switch,
+         however Rev B motherboards have the DVORAK in ROM that is inaccessible to the user
+         without a hardware modification  (see: Apple IIe Hardware: Dvorak
+         Keyboard Layout (May 25, 1989) from the Apple Tech Info Library)
+
     IIe enhanced: 65C02 CPU with more instructions, MouseText in the character generator.
 
     IIe platinum: Like enhanced but with added numeric keypad and extended 80-column card
@@ -50,7 +56,10 @@
      - Apple II Mouse card (firmware entry points are compatible,
        but the hardware implementation omits the 68705 and is quite different!)
 
-     Has a 40/80 column switch and a QWERTY/DVORAK switch.
+     Has a 40/80 column switch and a keyboard switch.  The keyboard switches
+     between QWERTY and DVORAK layouts on models without localized keyboards.
+     On models with localized keyboards, it switches between US QWERTY
+     and the local keyboard layout and character set.
 
     IIc (UniDisk 3.5): IIc with ROM doubled to 32K and the ROMSWITCH register
          added to page between the original 16K ROM and the new added 16K.  The
@@ -87,6 +96,8 @@
         3.5" drive.
 
         External drive port allows IIgs-style daisy-chaining.
+
+        40/80 column switch removed.
 
 ----------------------------------
 
@@ -213,6 +224,7 @@ public:
 		m_mousey(*this, MOUSE_YAXIS_TAG),
 		m_kbdrom(*this, "keyboard"),
 		m_kbspecial(*this, "keyb_special"),
+		m_kbd_lang_sel(*this, "kbd_lang_select"),
 		m_sysconfig(*this, "a2_config"),
 		m_franklin_fkeys(*this, "franklin_fkeys"),
 		m_speaker(*this, A2_SPEAKER_TAG),
@@ -269,6 +281,7 @@ public:
 	optional_ioport m_mouseb, m_mousex, m_mousey;
 	optional_memory_region m_kbdrom;
 	required_ioport m_kbspecial;
+	optional_ioport m_kbd_lang_sel; // high-order nibble: keyboard selection offset - low-order nibble: character ROM area selection offset (including lo-res patterns)
 	optional_ioport m_sysconfig;
 	optional_ioport m_franklin_fkeys;
 	required_device<speaker_sound_device> m_speaker;
@@ -384,13 +397,17 @@ public:
 	void ace500(machine_config &config);
 	void ace2200(machine_config &config);
 	void apple2c_iwm(machine_config &config);
+	void apple2c_iwm_pal(machine_config &config);
 	void apple2c_mem(machine_config &config);
+	void apple2c_mem_pal(machine_config &config);
 	void cec(machine_config &config);
 	void mprof3(machine_config &config);
 	void apple2e(machine_config &config);
 	void apple2epal(machine_config &config);
 	void apple2ep(machine_config &config);
+	void apple2eppal(machine_config &config);
 	void apple2c(machine_config &config);
+	void apple2cpal(machine_config &config);
 	void tk3000(machine_config &config);
 	void apple2ee(machine_config &config);
 	void apple2eepal(machine_config &config);
@@ -1044,6 +1061,10 @@ void apple2e_state::machine_start()
 	m_x0 = false;
 	m_y0 = false;
 
+	m_35sel = false;
+	m_hdsel = false;
+	m_intdrive = false;
+
 	// setup save states
 	save_item(NAME(m_speaker_state));
 	save_item(NAME(m_cassette_state));
@@ -1322,6 +1343,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 	if ((m_isiic) || (m_has_laser_mouse) || (m_isace500))
 	{
 		update_iic_mouse();
+	}
+
+	// update character selection
+	if (m_kbd_lang_sel)
+	{
+		u8 charset_id = m_kbd_lang_sel->read() & 0x0f;
+		if (m_video->get_iie_langsw() != charset_id)
+		{
+			m_video->set_iie_langsw(charset_id);
+		}
 	}
 
 	if (scanline == 192)
@@ -2103,6 +2134,9 @@ u8 apple2e_state::c000_laser_r(offs_t offset)
 
 	switch (offset)
 	{
+		case 0x60: // 40/80 column switch
+			return ((m_sysconfig.read_safe(0) & 0x40) ? 0x80 : 0) | uFloatingBus7;
+
 		case 0x63:  // read mouse button
 			return (m_mouseb->read() ? 0 : 0x80) | uFloatingBus7;
 
@@ -2468,8 +2502,8 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 		case 0x43:  // read Y0Edge (IIc only)
 			return m_y0edge ? 0x80 : 0x00;
 
-		case 0x60: // 40/80 column switch (IIc only)
-			return ((m_sysconfig->read() & 0x40) ? 0x80 : 0) | uFloatingBus7;
+		case 0x60: // 40/80 column switch (IIc and Franklin ACE 500 only)
+			return ((m_sysconfig.read_safe(0) & 0x40) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x61:  // button 0 or Open Apple or mouse button 1
 		case 0x69:
@@ -3783,12 +3817,10 @@ void apple2e_state::ay3600_data_ready_w(int state)
 		}
 		trans |= (m_kbspecial->read() & 0x01) ? 0x0000 : 0x0200;    // caps lock is bit 9 (active low)
 
-		if (m_isiic)
+		if (m_kbd_lang_sel)
 		{
-			if (m_sysconfig->read() & 0x80)
-			{
-				trans += 0x400; // go to DVORAK half of the ROM
-			}
+			u8 kbd_layout_id = (m_kbd_lang_sel->read() & 0xf0) >> 4;
+			trans += kbd_layout_id * 0x400; // go to second half of the ROM (DVORAK on US IIc/IIe models) or beyond
 		}
 
 		m_transchar = decode[trans];
@@ -3837,6 +3869,7 @@ static INPUT_PORTS_START( apple2_sysconfig_accel )
 	PORT_CONFNAME(0x20, 0x00, "Bootup speed")
 	PORT_CONFSETTING(0x00, "Standard")
 	PORT_CONFSETTING(0x20, "4 MHz")
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( laser128_sysconfig )
@@ -3844,33 +3877,27 @@ static INPUT_PORTS_START( laser128_sysconfig )
 	PORT_CONFNAME(0x08, 0x00, "Printer type")
 	PORT_CONFSETTING(0x00, "Serial")
 	PORT_CONFSETTING(0x08, "Parallel")
+	PORT_CONFNAME(0x40, 0x40, "40/80 Columns")
+	PORT_CONFSETTING(0x00, "80 columns")
+	PORT_CONFSETTING(0x40, "40 columns")
+
+	PORT_START("kbd_lang_select")
+	PORT_CONFNAME(0x11, 0x00, "Keyboard")
+	PORT_CONFSETTING(0x00, "QWERTY")
+	PORT_CONFSETTING(0x10, "DVORAK") // Only switch keyboard offset - second half of character ROM "laser 128 video rom vt27-0706-0.bin" has French characters
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( apple2c_sysconfig )
+static INPUT_PORTS_START( apple2c_common_config )
 	PORT_START("a2_config")
 	PORT_CONFNAME(0x40, 0x40, "40/80 Columns")
 	PORT_CONFSETTING(0x00, "80 columns")
 	PORT_CONFSETTING(0x40, "40 columns")
-	PORT_CONFNAME(0x80, 0x00, "QWERTY/DVORAK")
-	PORT_CONFSETTING(0x00, "QWERTY")
-	PORT_CONFSETTING(0x80, "DVORAK")
-
 	PORT_CONFNAME(0x10, 0x00, "CPU type")
 	PORT_CONFSETTING(0x00, "Standard")
 	PORT_CONFSETTING(0x10, "4 MHz Zip Chip")
 	PORT_CONFNAME(0x20, 0x00, "Bootup speed")
 	PORT_CONFSETTING(0x00, "Standard")
 	PORT_CONFSETTING(0x20, "4 MHz")
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( apple2cp_sysconfig )
-	PORT_START("a2_config")
-	PORT_CONFNAME(0x04, 0x04, "40/80 Columns")
-	PORT_CONFSETTING(0x00, "80 columns")
-	PORT_CONFSETTING(0x04, "40 columns")
-	PORT_CONFNAME(0x08, 0x00, "QWERTY/DVORAK")
-	PORT_CONFSETTING(0x00, "QWERTY")
-	PORT_CONFSETTING(0x08, "DVORAK")
 INPUT_PORTS_END
 
 	/*
@@ -4384,7 +4411,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( apple2c )
 	PORT_INCLUDE( apple2e_common )
 	PORT_INCLUDE( apple2e_special )
-	PORT_INCLUDE( apple2c_sysconfig )
+	PORT_INCLUDE( apple2c_common_config )
 
 	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
@@ -4394,6 +4421,30 @@ static INPUT_PORTS_START( apple2c )
 
 	PORT_START(MOUSE_YAXIS_TAG) /* Mouse - Y AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2cus_sysconfig )
+	PORT_START("kbd_lang_select")
+	PORT_CONFNAME(0x12, 0x00, "Keyboard")
+	PORT_CONFSETTING(0x00, "QWERTY")
+	PORT_CONFSETTING(0x12, "DVORAK")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2cus )
+	PORT_INCLUDE( apple2c )
+	PORT_INCLUDE( apple2cus_sysconfig )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2euk_sysconfig )
+	PORT_START("kbd_lang_select")
+	PORT_CONFNAME(0x12, 0x00, "Keyboard")
+	PORT_CONFSETTING(0x00, "UK English")
+	PORT_CONFSETTING(0x12, "US English")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2cuk )
+	PORT_INCLUDE( apple2c )
+	PORT_INCLUDE( apple2euk_sysconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( laser128 )
@@ -4419,13 +4470,13 @@ static INPUT_PORTS_START( laser128 )
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( ace500 )
+static INPUT_PORTS_START( ace_common )
 	PORT_INCLUDE( apple2e_common )
 
-	PORT_START("a2_config")
-	PORT_CONFNAME(0x80, 0x00, "Auto Line Feed for printer")
-	PORT_CONFSETTING(0x80, DEF_STR(On))
-	PORT_CONFSETTING(0x00, DEF_STR(Off))
+	PORT_START("kbd_lang_select")
+	PORT_CONFNAME(0x02, 0x00, "Character Set") // Franklin ACE's switch changes video ROM character output without affecting the keyboard
+	PORT_CONFSETTING(0x00, "Mouse")
+	PORT_CONFSETTING(0x02, "Std")
 
 	PORT_START("keyb_special")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
@@ -4460,10 +4511,31 @@ static INPUT_PORTS_START( ace500 )
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ace2200 )
+	PORT_START("a2_config")
+	PORT_CONFNAME(0x80, 0x00, "Auto Line Feed for printer")
+	PORT_CONFSETTING(0x80, DEF_STR(On))
+	PORT_CONFSETTING(0x00, DEF_STR(Off))
+
+	PORT_INCLUDE( ace_common )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ace500 )
+	PORT_START("a2_config")
+	PORT_CONFNAME(0x40, 0x40, "40/80 Columns")
+	PORT_CONFSETTING(0x00, "80 columns")
+	PORT_CONFSETTING(0x40, "40 columns")
+	PORT_CONFNAME(0x80, 0x00, "Auto Line Feed for printer")
+	PORT_CONFSETTING(0x80, DEF_STR(On))
+	PORT_CONFSETTING(0x00, DEF_STR(Off))
+
+	PORT_INCLUDE( ace_common )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( apple2cp )
 	PORT_INCLUDE( apple2e_common )
 	PORT_INCLUDE( apple2e_special )
-	PORT_INCLUDE( apple2cp_sysconfig )
+	PORT_INCLUDE( apple2cus_sysconfig )
 
 	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
@@ -4475,7 +4547,48 @@ static INPUT_PORTS_START( apple2cp )
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( apple2eus_sysconfig )
+	PORT_START("kbd_lang_select")
+	PORT_CONFNAME(0x12, 0x00, "Dvorak keyboard layout mod")
+	PORT_CONFSETTING(0x00, "Not installed")
+	PORT_CONFSETTING(0x12, "Installed")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2eus )
+	PORT_INCLUDE( apple2e )
+	PORT_INCLUDE( apple2eus_sysconfig )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tk3000 )
+	PORT_INCLUDE( apple2e )
+
+	PORT_START("kbd_lang_select")
+	PORT_CONFNAME(0x01, 0x00, "Character Set")
+	PORT_CONFSETTING(0x00, "Portuguese")
+	PORT_CONFSETTING(0x01, "US English")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spectred )
+	PORT_INCLUDE( apple2e )
+
+	PORT_START("kbd_lang_select")
+	PORT_CONFNAME(0x01, 0x00, "Character Set")
+	PORT_CONFSETTING(0x00, "Portuguese without MouseText")
+	PORT_CONFSETTING(0x01, "US English with MouseText")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( prav8c )
+	PORT_INCLUDE( apple2e )
+
+	PORT_START("kbd_lang_select")
+	PORT_CONFNAME(0x02, 0x00, "Character Set")
+	PORT_CONFSETTING(0x00, "Cyrilic")
+	PORT_CONFSETTING(0x02, "US English")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( apple2euk )
+	PORT_INCLUDE( apple2euk_sysconfig )
+
 	PORT_START("X0")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)  PORT_CHAR('1') PORT_CHAR('!')
@@ -4597,6 +4710,11 @@ static INPUT_PORTS_START( apple2euk )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2ees )
+	PORT_START("kbd_lang_select")
+	PORT_CONFNAME(0x12, 0x00, "Keyboard")
+	PORT_CONFSETTING(0x00, "Spanish")
+	PORT_CONFSETTING(0x12, "US English")
+
 	PORT_START("X0")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)  PORT_CHAR('1') PORT_CHAR('!')
@@ -4718,6 +4836,11 @@ static INPUT_PORTS_START( apple2ees )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2efr )   // French AZERTY keyboard (Apple uses the Belgian AZERTY layout in France also)
+	PORT_START("kbd_lang_select")
+	PORT_CONFNAME(0x12, 0x00, "Keyboard")
+	PORT_CONFSETTING(0x00, "French")
+	PORT_CONFSETTING(0x12, "US English")
+
 	PORT_START("X0")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)  PORT_CHAR('1') PORT_CHAR('&')
@@ -4959,6 +5082,16 @@ INPUT_PORTS_START( apple2ep )
 	PORT_INCLUDE(apple2_sysconfig_accel)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( apple2epus )
+	PORT_INCLUDE( apple2ep )
+	PORT_INCLUDE( apple2eus_sysconfig )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2epuk )
+	PORT_INCLUDE( apple2ep )
+	PORT_INCLUDE( apple2euk_sysconfig )
+INPUT_PORTS_END
+
 static void apple2eaux_cards(device_slot_interface &device)
 {
 	device.option_add("std80", A2EAUX_STD80COL); // Apple IIe Standard 80 Column Card
@@ -5124,10 +5257,17 @@ void apple2e_state::tk3000(machine_config &config)
 
 void apple2e_state::apple2ep(machine_config &config)
 {
-	apple2e(config);
-	M65C02(config.replace(), m_maincpu, 1021800);
+	apple2ee(config);
+}
+
+void apple2e_state::apple2eppal(machine_config &config)
+{
+	apple2ee(config);
+	M65C02(config.replace(), m_maincpu, 1016966);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+
+	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
 void apple2e_state::apple2c(machine_config &config)
@@ -5182,6 +5322,16 @@ void apple2e_state::apple2c(machine_config &config)
 	m_ram->set_default_size("128K").set_extra_options("128K");
 }
 
+void apple2e_state::apple2cpal(machine_config &config)
+{
+	apple2c(config);
+	M65C02(config.replace(), m_maincpu, 1016966);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+
+	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
+}
+
 void apple2e_state::apple2cp(machine_config &config)
 {
 	apple2c(config);
@@ -5213,6 +5363,16 @@ void apple2e_state::apple2c_iwm(machine_config &config)
 	A2BUS_IWM(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 }
 
+void apple2e_state::apple2c_iwm_pal(machine_config &config)
+{
+	apple2c_iwm(config);
+	M65C02(config.replace(), m_maincpu, 1016966);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+
+	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
+}
+
 void apple2e_state::apple2c_mem(machine_config &config)
 {
 	apple2c(config);
@@ -5224,6 +5384,16 @@ void apple2e_state::apple2c_mem(machine_config &config)
 	A2BUS_IWM(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
+}
+
+void apple2e_state::apple2c_mem_pal(machine_config &config)
+{
+	apple2c_mem(config);
+	M65C02(config.replace(), m_maincpu, 1016966);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_memexp_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+
+	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
 void apple2e_state::laser128(machine_config &config)
@@ -5533,6 +5703,17 @@ ROM_START(apple2ep)
 	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
+ROM_START(apple2epuk)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("342-0273-a.chr", 0x0000, 0x2000, CRC(9157085a) SHA1(85479a509d6c8176949a5b20720567b7022aa631))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("32-0349-b.128", 0x0000, 0x4000, CRC(1d70b193) SHA1(b8ea90abe135a0031065e01697c4a3a20d51198b)) /* should rom name be 342-0349-b? */
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0150-a.e12", 0x000, 0x800, CRC(66ffacd7) SHA1(47bb9608be38ff75429a989b930a93b47099648e))
+ROM_END
+
 ROM_START(apple2c)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
@@ -5543,6 +5724,17 @@ ROM_START(apple2c)
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
 	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
+ROM_END
+
+ROM_START(apple2cuk)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("342-0273-a.chr", 0x0000, 0x2000, CRC(9157085a) SHA1(85479a509d6c8176949a5b20720567b7022aa631))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("a2c.128", 0x0000, 0x4000, CRC(f0edaa1b) SHA1(1a9b8aca5e32bb702ddb7791daddd60a89655729)) /* should be 342-0272-A? */
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0150-a.e12", 0x000, 0x800, CRC(66ffacd7) SHA1(47bb9608be38ff75429a989b930a93b47099648e))
 ROM_END
 
 ROM_START(spectred)
@@ -5610,6 +5802,17 @@ ROM_START(apple2c0)
 	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
 ROM_END
 
+ROM_START(apple2c0uk)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("342-0273-a.chr", 0x0000, 0x2000, CRC(9157085a) SHA1(85479a509d6c8176949a5b20720567b7022aa631))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("3420033a.256", 0x0000, 0x8000, CRC(c8b979b3) SHA1(10767e96cc17bad0970afda3a4146564e6272ba1))
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0150-a.e12", 0x000, 0x800, CRC(66ffacd7) SHA1(47bb9608be38ff75429a989b930a93b47099648e))
+ROM_END
+
 ROM_START(apple2c3)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
@@ -5622,6 +5825,17 @@ ROM_START(apple2c3)
 	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
 ROM_END
 
+ROM_START(apple2c3uk)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("342-0273-a.chr", 0x0000, 0x2000, CRC(9157085a) SHA1(85479a509d6c8176949a5b20720567b7022aa631))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("342-0445-a.256", 0x0000, 0x8000, CRC(bc5a79ff) SHA1(5338d9baa7ae202457b6500fde5883dbdc86e5d3))
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0150-a.e12", 0x000, 0x800, CRC(66ffacd7) SHA1(47bb9608be38ff75429a989b930a93b47099648e))
+ROM_END
+
 ROM_START(apple2c4)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
@@ -5632,6 +5846,17 @@ ROM_START(apple2c4)
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
 	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
+ROM_END
+
+ROM_START(apple2c4uk)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("342-0273-a.chr", 0x0000, 0x2000, CRC(9157085a) SHA1(85479a509d6c8176949a5b20720567b7022aa631))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("3410445b.256", 0x0000, 0x8000, CRC(06f53328) SHA1(015061597c4cda7755aeb88b735994ffd2f235ca))
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0150-a.e12", 0x000, 0x800, CRC(66ffacd7) SHA1(47bb9608be38ff75429a989b930a93b47099648e))
 ROM_END
 
 ROM_START(laser128)
@@ -5891,32 +6116,37 @@ ROM_END
 } // anonymous namespace
 
 
-/*    YEAR  NAME        PARENT   COMPAT  MACHINE      INPUT      CLASS          INIT        COMPANY             FULLNAME */
-COMP( 1983, apple2e,    0,       apple2, apple2e,     apple2e,   apple2e_state, empty_init, "Apple Computer",   "Apple //e", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, apple2euk,  apple2e, 0,      apple2epal,  apple2euk, apple2e_state, init_pal,   "Apple Computer",   "Apple //e (UK)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, apple2ees,  apple2e, 0,      apple2epal,  apple2ees, apple2e_state, init_pal,   "Apple Computer",   "Apple //e (Spain)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, mprof3,     apple2e, 0,      mprof3,      apple2e,   apple2e_state, empty_init, "Multitech",        "Microprofessor III", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, apple2ee,   apple2e, 0,      apple2ee,    apple2e,   apple2e_state, empty_init, "Apple Computer",   "Apple //e (enhanced)", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, apple2eeuk, apple2e, 0,      apple2eepal, apple2euk, apple2e_state, init_pal,   "Apple Computer",   "Apple //e (enhanced, UK)", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, apple2eefr, apple2e, 0,      apple2eepal, apple2efr, apple2e_state, init_pal,   "Apple Computer",   "Apple //e (enhanced, France)", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, apple2ep,   apple2e, 0,      apple2ep,    apple2ep,  apple2e_state, empty_init, "Apple Computer",   "Apple //e (Platinum)", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, apple2c,    0,       apple2, apple2c,     apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c" , MACHINE_SUPPORTS_SAVE )
-COMP( 1985?,spectred,   apple2e, 0,      spectred,    apple2e,   apple2e_state, empty_init, "Scopus/Spectrum",  "Spectrum ED" , MACHINE_SUPPORTS_SAVE )
-COMP( 1986, tk3000,     apple2c, 0,      tk3000,      apple2e,   apple2e_state, empty_init, "Microdigital",     "TK3000//e" , MACHINE_SUPPORTS_SAVE )
-COMP( 1989, prav8c,     apple2e, 0,      apple2e,     apple2e,   apple2e_state, empty_init, "Pravetz",          "Pravetz 8C", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, laser128,   apple2c, 0,      laser128,    laser128,  apple2e_state, init_laser128, "Video Technology", "Laser 128", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, laser128o,  apple2c, 0,      laser128o,   laser128,  apple2e_state, init_laser128, "Video Technology", "Laser 128 (original hardware)", MACHINE_SUPPORTS_SAVE )
-COMP( 1988, las128ex,   apple2c, 0,      laser128,    laser128,  apple2e_state, init_128ex, "Video Technology", "Laser 128ex (version 4.5)", MACHINE_SUPPORTS_SAVE )
-COMP( 1988, las128e2,   apple2c, 0,      laser128ex2, laser128,  apple2e_state, init_128ex, "Video Technology", "Laser 128ex2 (version 6.1)", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, apple2c0,   apple2c, 0,      apple2c_iwm, apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c (UniDisk 3.5)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2c3,   apple2c, 0,      apple2c_mem, apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c (Original Memory Expansion)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2c4,   apple2c, 0,      apple2c_mem, apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c (rev 4)", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, ceci,       0,       apple2, cec,         ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer I", MACHINE_SUPPORTS_SAVE )
-COMP( 1989, cece,       0,       apple2, cec,         ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer E", MACHINE_SUPPORTS_SAVE )
-COMP( 1989, cecg,       0,       apple2, cec,         ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer G", MACHINE_SUPPORTS_SAVE )
-COMP( 1989, cecm,       0,       apple2, cec,         cecm,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer M", MACHINE_SUPPORTS_SAVE )
-COMP( 1991, cec2000,    0,       apple2, cec,         ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer 2000", MACHINE_SUPPORTS_SAVE )
-COMP( 1989, zijini,     0,       apple2, cec,         zijini,    apple2e_state, empty_init, "Nanjing Computer Factory", "Zi Jin I", MACHINE_SUPPORTS_SAVE )
-COMP( 1988, apple2cp,   apple2c, 0,      apple2cp,    apple2cp,  apple2e_state, empty_init, "Apple Computer",   "Apple //c Plus", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ace2200,    apple2e, 0,      ace2200,     ace500,    apple2e_state, init_ace2200,"Franklin Computer", "Franklin ACE 2200", MACHINE_SUPPORTS_SAVE)
-COMP( 1986, ace500,     apple2c, 0,      ace500,      ace500,    apple2e_state, init_ace500,"Franklin Computer", "Franklin ACE 500", MACHINE_SUPPORTS_SAVE)
+/*    YEAR  NAME        PARENT   COMPAT  MACHINE          INPUT       CLASS          INIT           COMPANY                              FULLNAME */
+COMP( 1983, apple2e,    0,       apple2, apple2e,         apple2eus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, apple2euk,  apple2e, 0,      apple2epal,      apple2euk,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, apple2ees,  apple2e, 0,      apple2epal,      apple2ees,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (Spain)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, mprof3,     apple2e, 0,      mprof3,          apple2e,    apple2e_state, empty_init,    "Multitech",                         "Microprofessor III", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, apple2ee,   apple2e, 0,      apple2ee,        apple2eus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (enhanced)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, apple2eeuk, apple2e, 0,      apple2eepal,     apple2euk,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (enhanced, UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, apple2eefr, apple2e, 0,      apple2eepal,     apple2efr,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (enhanced, France)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, apple2ep,   apple2e, 0,      apple2ep,        apple2epus, apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (Platinum)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, apple2epuk, apple2e, 0,      apple2eppal,     apple2epuk, apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (Platinum, UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, apple2c,    0,       apple2, apple2c,         apple2cus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //c" , MACHINE_SUPPORTS_SAVE )
+COMP( 1984, apple2cuk,  apple2c, 0,      apple2cpal,      apple2cuk,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (UK)" , MACHINE_SUPPORTS_SAVE )
+COMP( 1985?,spectred,   apple2e, 0,      spectred,        spectred,   apple2e_state, empty_init,    "Scopus/Spectrum",                   "Spectrum ED" , MACHINE_SUPPORTS_SAVE )
+COMP( 1986, tk3000,     apple2c, 0,      tk3000,          tk3000,     apple2e_state, empty_init,    "Microdigital",                      "TK3000//e" , MACHINE_SUPPORTS_SAVE )
+COMP( 1989, prav8c,     apple2e, 0,      apple2e,         prav8c,     apple2e_state, empty_init,    "Pravetz",                           "Pravetz 8C", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, laser128,   apple2c, 0,      laser128,        laser128,   apple2e_state, init_laser128, "Video Technology",                  "Laser 128", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, laser128o,  apple2c, 0,      laser128o,       laser128,   apple2e_state, init_laser128, "Video Technology",                  "Laser 128 (original hardware)", MACHINE_SUPPORTS_SAVE )
+COMP( 1988, las128ex,   apple2c, 0,      laser128,        laser128,   apple2e_state, init_128ex,    "Video Technology",                  "Laser 128ex (version 4.5)", MACHINE_SUPPORTS_SAVE )
+COMP( 1988, las128e2,   apple2c, 0,      laser128ex2,     laser128,   apple2e_state, init_128ex,    "Video Technology",                  "Laser 128ex2 (version 6.1)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, apple2c0,   apple2c, 0,      apple2c_iwm,     apple2cus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //c (UniDisk 3.5)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, apple2c0uk, apple2c, 0,      apple2c_iwm_pal, apple2cuk,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (UniDisk 3.5, UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2c3,   apple2c, 0,      apple2c_mem,     apple2cus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //c (Original Memory Expansion)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2c3uk, apple2c, 0,      apple2c_mem_pal, apple2cuk,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (Original Memory Expansion, UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2c4,   apple2c, 0,      apple2c_mem,     apple2cus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //c (rev 4)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2c4uk, apple2c, 0,      apple2c_mem_pal, apple2cuk,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (rev 4, UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, ceci,       0,       apple2, cec,             ceci,       apple2e_state, empty_init,    "Shaanxi Province Computer Factory", "China Education Computer I", MACHINE_SUPPORTS_SAVE )
+COMP( 1989, cece,       0,       apple2, cec,             ceci,       apple2e_state, empty_init,    "Shaanxi Province Computer Factory", "China Education Computer E", MACHINE_SUPPORTS_SAVE )
+COMP( 1989, cecg,       0,       apple2, cec,             ceci,       apple2e_state, empty_init,    "Shaanxi Province Computer Factory", "China Education Computer G", MACHINE_SUPPORTS_SAVE )
+COMP( 1989, cecm,       0,       apple2, cec,             cecm,       apple2e_state, empty_init,    "Shaanxi Province Computer Factory", "China Education Computer M", MACHINE_SUPPORTS_SAVE )
+COMP( 1991, cec2000,    0,       apple2, cec,             ceci,       apple2e_state, empty_init,    "Shaanxi Province Computer Factory", "China Education Computer 2000", MACHINE_SUPPORTS_SAVE )
+COMP( 1989, zijini,     0,       apple2, cec,             zijini,     apple2e_state, empty_init,    "Nanjing Computer Factory",          "Zi Jin I", MACHINE_SUPPORTS_SAVE )
+COMP( 1988, apple2cp,   apple2c, 0,      apple2cp,        apple2cp,   apple2e_state, empty_init,    "Apple Computer",                    "Apple //c Plus", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ace2200,    apple2e, 0,      ace2200,         ace2200,    apple2e_state, init_ace2200,  "Franklin Computer",                 "Franklin ACE 2200", MACHINE_SUPPORTS_SAVE)
+COMP( 1986, ace500,     apple2c, 0,      ace500,          ace500,     apple2e_state, init_ace500,   "Franklin Computer",                 "Franklin ACE 500", MACHINE_SUPPORTS_SAVE)
