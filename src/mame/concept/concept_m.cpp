@@ -40,6 +40,17 @@ enum
 
 void concept_state::machine_start()
 {
+	// OS will not boot if TDRE is clear on ACIA 0; this fixes that
+	m_acia0->write_cts(0);
+	m_acia0->write_dcd(0);
+	m_acia0->write_dsr(0);
+	m_acia1->write_cts(0);
+	m_acia1->write_dcd(0);
+	m_acia1->write_dsr(0);
+	m_kbdacia->write_cts(0);
+	m_kbdacia->write_dcd(0);
+	m_kbdacia->write_dsr(0);
+
 	/* initialize clock interface */
 	m_clock_enable = false /*true*/;
 
@@ -50,13 +61,6 @@ void concept_state::machine_start()
 
 void concept_state::machine_reset()
 {
-	// OS will not boot if TDRE is clear on ACIA 0; this fixes that
-	m_acia0->write_cts(0);
-	m_acia0->write_dcd(0);
-	m_acia1->write_cts(0);
-	m_acia1->write_dcd(0);
-	m_kbdacia->write_cts(0);
-	m_kbdacia->write_dcd(0);
 }
 
 void concept_state::video_start()
