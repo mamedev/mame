@@ -73,6 +73,8 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(kbd_ioport_r);
 
+	template <unsigned N> void counter_w(int state);
+
 	void m027(machine_config &config) ATTR_COLD;
 	void m027_xor(machine_config &config) ATTR_COLD;
 	void slqz3_xor(machine_config &config) ATTR_COLD;
@@ -83,7 +85,6 @@ public:
 	void lthy_xor(machine_config &config) ATTR_COLD;
 	void zhongguo_xor(machine_config &config) ATTR_COLD;
 	void mgzz_xor(machine_config &config) ATTR_COLD;
-	void mgcs3_xor(machine_config &config) ATTR_COLD;
 	void oceanpar_xor(machine_config &config) ATTR_COLD;
 	void extradraw(machine_config &config) ATTR_COLD;
 
@@ -145,11 +146,8 @@ private:
 
 	template <unsigned Start> void lamps_w(u8 data);
 	void mahjong_output_w(u8 data);
-	void lhzb4_output_w(u8 data);
 	void jking02_output_w(u8 data);
 	void oceanpar_output_w(u8 data);
-
-	void mgcs3_ppi_pc_w(u8 data);
 
 	u32 unk2_r();
 	u32 lhdmg_unk2_r();
@@ -744,6 +742,17 @@ INPUT_PORTS_START( lhzb4 )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                                                                              // 洗分
 	PORT_BIT( 0xffe00000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("PPIB")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<2>) // hopper
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<1>) // key-out
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) // key-in
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+
+	PORT_START("PPIC")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) // coin or key-in
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<1>) // hopper or key-out
+
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "Control Panel" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR(Joystick) ) // called JAMMA
@@ -994,6 +1003,17 @@ INPUT_PORTS_START( mgcs3 )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                                                                           // 洗分
 	PORT_BIT( 0xffe00000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("PPIB")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<1>) // key-out
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<2>) // hopper
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) // key-in
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+
+	PORT_START("PPIC")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) // coin or key-in
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<1>) // hopper or key-out
+
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:1")          // 示范音乐
 	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                  // 无
@@ -1010,6 +1030,97 @@ INPUT_PORTS_START( mgcs3 )
 	PORT_DIPNAME( 0x01, 0x01, "Control Panel" )            PORT_DIPLOCATION("SW2:1")          // 配线方式
 	PORT_DIPSETTING(    0x01, DEF_STR(Joystick) )                                             // 娱乐
 	PORT_DIPSETTING(    0x00, "Mahjong" )                                                     // 麻将
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( cjddz )
+	PORT_INCLUDE(igs_mahjong_matrix)
+
+	PORT_START("TEST")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )                                                                                 // 下
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                                                      // 测试
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                                                   // 査帐
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )                 PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)                              // 投币
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )               PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )                                                                                   // 上
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )                                                                                 // 左
+
+	PORT_START("JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )                                                                                       // S3
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )                                                                                       // S2
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )                                                                                       // S1
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )                                                                                        // 开始
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )                PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)  PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // HPSW.
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )               PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )               PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )                 PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)                              // 投币
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )                                                                                // 右
+
+	PORT_START("PLAYER")
+	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x000001f8, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(igs_m027_state, kbd_ioport_r)
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )         PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_CUSTOM )          PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r) // HPSW.
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )                                                                            // 开分
+	PORT_BIT( 0x0007f000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                                                                           // 退币
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                                                                           // 洗分
+	PORT_BIT( 0xffe00000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("PPIB")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<1>) // key-out
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<2>) // hopper
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) // key-in
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+
+	PORT_START("PPIC")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) // coin or key-in
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<1>) // hopper or key-out
+
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:1")          // 示范音乐
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无
+	PORT_DIPSETTING(    0x01, DEF_STR(On) )                                                   // 有
+	PORT_DIPNAME( 0x02, 0x02, "Control Panel" )            PORT_DIPLOCATION("SW1:2")          // 配线方式
+	PORT_DIPSETTING(    0x02, DEF_STR(Joystick) )                                             // 娱乐
+	PORT_DIPSETTING(    0x00, "Mahjong" )                                                     // 麻将
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Allow_Continue) )    PORT_DIPLOCATION("SW1:3")          // 续玩游戏
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无
+	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                                   // 有
+	PORT_DIPNAME( 0x08, 0x08, "Alarm Sound" )              PORT_DIPLOCATION("SW1:4")          // 报警音效
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无
+	PORT_DIPSETTING(    0x08, DEF_STR(On) )                                                   // 有
+	PORT_DIPNAME( 0x10, 0x10, "Auto Pass" )                PORT_DIPLOCATION("SW1:5")          // 自动PASS
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无
+	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                                   // 有
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
@@ -1274,12 +1385,6 @@ void igs_m027_state::mahjong_output_w(u8 data)
 		m_hopper->motor_w(BIT(data, 2));
 }
 
-void igs_m027_state::lhzb4_output_w(u8 data)
-{
-	machine().bookkeeping().coin_counter_w(1, BIT(data, 6)); // one pulse per key-out
-	machine().bookkeeping().coin_counter_w(0, BIT(data, 7)); // one pulse per key-in accepted
-}
-
 void igs_m027_state::jking02_output_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // one pulse per coin 1 accepted (36+10)
@@ -1298,13 +1403,6 @@ void igs_m027_state::oceanpar_output_w(u8 data)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 2)); // one pulse per COINC accepted
 	machine().bookkeeping().coin_counter_w(3, BIT(data, 6)); // one pulse per KEYOUT
 	m_hopper->motor_w(BIT(data, 7));
-}
-
-void igs_m027_state::mgcs3_ppi_pc_w(u8 data)
-{
-	io_select_w<0>(data & 0x1f);
-	machine().bookkeeping().coin_counter_w(0, BIT(data, 5)); // one pulse per coin or key-in accepted
-	machine().bookkeeping().coin_counter_w(1, BIT(data, 6)); // one pulse per key-out
 }
 
 u32 igs_m027_state::unk2_r()
@@ -1338,6 +1436,12 @@ void igs_m027_state::unk2_w(u32 data)
 CUSTOM_INPUT_MEMBER(igs_m027_state::kbd_ioport_r)
 {
 	return kbd_r<0, 0, 0>();
+}
+
+template <unsigned N>
+void igs_m027_state::counter_w(int state)
+{
+	machine().bookkeeping().coin_counter_w(N, state);
 }
 
 
@@ -1432,11 +1536,10 @@ void igs_m027_state::lhzb4_xor(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::jking02_xor_map);
 
 	//m_ppi->out_pa_callback().set(...);
-	m_ppi->out_pb_callback().set(FUNC(igs_m027_state::lhzb4_output_w));
-	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::io_select_w<0>));
-	m_ppi->out_pc_callback().append(m_hopper, FUNC(hopper_device::motor_w)).bit(7);
+	m_ppi->out_pb_callback().set_ioport("PPIB");
+	m_ppi->out_pc_callback().set_ioport("PPIC");
+	m_ppi->out_pc_callback().append(FUNC(igs_m027_state::io_select_w<0>)).mask(0x1f);
 
-	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027_state::dsw_r<1, 0>)));
 	m_igs017_igs031->in_pb_callback().set_ioport("TEST");
 	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
 
@@ -1484,21 +1587,6 @@ void igs_m027_state::mgzz_xor(machine_config &config)
 
 	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
-	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
-
-	HOPPER(config, m_hopper, attotime::from_msec(50));
-}
-
-void igs_m027_state::mgcs3_xor(machine_config &config)
-{
-	m027_xor(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::jking02_xor_map);
-
-	m_ppi->out_pb_callback().set(m_hopper, FUNC(hopper_device::motor_w)).bit(4);
-	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::mgcs3_ppi_pc_w));
-
-	m_igs017_igs031->in_pb_callback().set_ioport("TEST");
 	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
@@ -2617,14 +2705,14 @@ GAME(  2004, lhzb4,     0,        lhzb4_xor,    lhzb4,    igs_m027_state, init_l
 GAME(  1999, lthy,      0,        lthy_xor,     lthy,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_NOT_WORKING ) // 龙腾虎跃
 GAME(  2000, zhongguo,  0,        zhongguo_xor, zhongguo, igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhongguo Chu Da D", MACHINE_NOT_WORKING ) // 中国锄大D
 GAMEL( 200?, jking02,   0,        jking02_xor,  jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NOT_WORKING, layout_jking02 )
-GAME(  2003, mgzz,      0,        mgzz_xor,     mgzz,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V101CN)", MACHINE_NOT_WORKING )
-GAME(  2000, mgzza,     mgzz,     mgzz_xor,     mgzza,    igs_m027_state, init_mgzz,     ROT0, "IGS", "Man Guan Zhi Zun (V100CN)", MACHINE_NOT_WORKING )
-GAME(  2007, mgcs3,     0,        mgcs3_xor,    mgcs3,    igs_m027_state, init_mgcs3,    ROT0, "IGS", "Man Guan Caishen 3 (V101CN)", MACHINE_NOT_WORKING )
+GAME(  2003, mgzz,      0,        mgzz_xor,     mgzz,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V101CN)", MACHINE_NOT_WORKING ) // 满贯至尊
+GAME(  2000, mgzza,     mgzz,     mgzz_xor,     mgzza,    igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V100CN)", MACHINE_NOT_WORKING ) // 满贯至尊
+GAME(  2007, mgcs3,     0,        lhzb4_xor,    mgcs3,    igs_m027_state, init_mgcs3,    ROT0, "IGS", "Manguan Caishen 3 (V101CN)", MACHINE_NOT_WORKING ) // 满贯财神3
 GAMEL( 1999, oceanpar,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING, layout_oceanpar ) // 1999 copyright in ROM
 GAMEL( 1999, oceanpara, oceanpar, oceanpar_xor, oceanpara,igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING, layout_oceanpar ) // 1999 copyright in ROM
 GAMEL( 1999, fruitpar,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)",   MACHINE_NOT_WORKING, layout_oceanpar )
 GAMEL( 1999, fruitpara, fruitpar, oceanpar_xor, fruitpara,igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", MACHINE_NOT_WORKING, layout_oceanpar )
-GAME(  200?, cjddz,     0,        m027_xor,     base,     igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", MACHINE_NOT_WORKING ) // 超级斗地主
+GAME(  200?, cjddz,     0,        lhzb4_xor,    cjddz,    igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", MACHINE_NOT_WORKING ) // 超级斗地主
 GAME(  200?, extradrw,  0,        extradraw,    base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME(  2002, chessc2,   0,        m027_xor,     base,     igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING )
