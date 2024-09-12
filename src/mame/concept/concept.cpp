@@ -172,7 +172,7 @@ void concept_state::corvus_concept(machine_config &config)
 	A2BUS_SLOT(config, "sl3", m_a2bus, concept_a2_cards, nullptr);
 	A2BUS_SLOT(config, "sl4", m_a2bus, concept_a2_cards, "fdc01");
 
-	INPUT_MERGER_ANY_HIGH(config, "iocint").output_handler().set_inputline(m_maincpu, M68K_IRQ_3);
+	INPUT_MERGER_ANY_HIGH(config, "iocint").output_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 
 	/* 2x RS232 ports */
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
