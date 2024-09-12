@@ -57,14 +57,6 @@ hopper_device::hopper_device(const machine_config &mconfig, const char *tag, dev
 	m_hopper_type = true;
 }
 
-//-------------------------------------------------
-//  ~ticket_dispenser_device - destructor
-//-------------------------------------------------
-
-ticket_dispenser_device::~ticket_dispenser_device()
-{
-}
-
 
 //**************************************************************************
 //  READ/WRITE HANDLERS
@@ -86,7 +78,7 @@ int ticket_dispenser_device::line_r()
 
 void ticket_dispenser_device::motor_w(int state)
 {
-	// On an activate signal, start dispensing!
+	// On rising edge, start dispensing!
 	if (state)
 	{
 		if (!m_power)

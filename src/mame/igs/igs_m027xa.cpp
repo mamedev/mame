@@ -89,10 +89,10 @@ private:
 	u32 m_irq_pending; // it appears they will be needed to differentiate between IRQs from the XA and elsewhere though
 	u32 m_xa_cmd;
 	u32 m_xa_ret0;
-	bool irq_from_igs031;
-	bool irq_from_xa;
-	u8 m_port0_dat;
+	bool m_irq_from_igs031;
+	bool m_irq_from_xa;
 	s8 m_num_params;
+	u8 m_port0_dat;
 	u8 m_port1_dat;
 	u8 m_port2_dat;
 	u8 m_port3_dat;
@@ -146,8 +146,8 @@ void igs_m027xa_state::machine_reset()
 	m_irq_pending = 0xff;
 	m_xa_cmd = 0;
 	m_xa_ret0 = 0;
-	irq_from_igs031 = false;
-	irq_from_xa = false;
+	m_irq_from_igs031 = false;
+	m_irq_from_xa = false;
 	m_num_params = 0;
 	m_port0_dat = 0;
 	m_port1_dat = 0;
@@ -170,8 +170,8 @@ void igs_m027xa_state::machine_start()
 	save_item(NAME(m_irq_pending));
 	save_item(NAME(m_xa_cmd));
 	save_item(NAME(m_xa_ret0));
-	save_item(NAME(irq_from_igs031));
-	save_item(NAME(irq_from_xa));
+	save_item(NAME(m_irq_from_igs031));
+	save_item(NAME(m_irq_from_xa));
 	save_item(NAME(m_num_params));
 	save_item(NAME(m_port0_dat));
 	save_item(NAME(m_port1_dat));
@@ -386,9 +386,9 @@ void igs_m027xa_state::igs_40000014_w(offs_t offset, u32 data, u32 mem_mask)
 u32 igs_m027xa_state::gpio_r()
 {
 	u32 ret = m_io_test[2].read_safe(0xffffffff);
-	if (irq_from_igs031)
+	if (m_irq_from_igs031)
 		ret ^= 1 << 11;
-	if (irq_from_xa)
+	if (m_irq_from_xa)
 		ret ^= 1 << 12;
 	return ret;
 }
@@ -437,7 +437,7 @@ void igs_m027xa_state::xa_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 	else
 	{
-		irq_from_xa = false;
+		m_irq_from_xa = false;
 		LOGMASKED(LOG_DEBUG, "%s: unhandled xa_w %04x %08x (%08x)\n", machine().describe_context(), offset * 2, data, mem_mask);
 	}
 }
@@ -507,7 +507,7 @@ void igs_m027xa_state::mcu_p3_w(uint8_t data)
 
 	if (posedge(oldport3, m_port3_dat, 5))
 	{
-		irq_from_xa = true;
+		m_irq_from_xa = true;
 		igs027_trigger_irq(3);
 	}
 	// high->low transition on bit 0x80 must read into latches!
@@ -547,7 +547,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 
 	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
 	{
-		irq_from_igs031 = true;
+		m_irq_from_igs031 = true;
 		igs027_trigger_irq(3);
 	}
 	if (scanline == 0 && (m_igs_40000014 & 1))

@@ -37,7 +37,6 @@ public:
 		set_period(period);
 	}
 	ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual ~ticket_dispenser_device();
 
 	// inline configuration helpers
 	void set_period(const attotime &period) { m_period = period; }

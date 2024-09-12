@@ -151,7 +151,7 @@ void concept_state::corvus_concept(machine_config &config)
 	MOS6551(config, m_acia1, 16.364_MHz_XTAL / 16);
 	m_acia1->set_xtal(16.364_MHz_XTAL / 9);
 	m_acia1->txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
-	m_acia0->irq_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+	m_acia1->irq_handler().set_inputline(m_maincpu, M68K_IRQ_2);
 
 	MOS6551(config, m_kbdacia, 16.364_MHz_XTAL / 16);
 	m_kbdacia->set_xtal(16.364_MHz_XTAL / 9);
