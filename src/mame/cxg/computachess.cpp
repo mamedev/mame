@@ -130,7 +130,7 @@ void computachess_state::mux_w(u8 data)
 void computachess_state::control_w(u16 data)
 {
 	// D0: speaker out
-	m_dac->write(data & 1);
+	m_dac->write(~data & 1);
 
 	// D2,D3: led select
 	m_display->write_my(~data >> 2 & 3);
@@ -208,6 +208,8 @@ void computachess_state::scptchess(machine_config &config)
 void computachess_state::scptchessa(machine_config &config)
 {
 	scptchess(config);
+
+	m_maincpu->write_d().set(FUNC(computachess_state::control_w)).exor(1);
 	config.set_default_layout(layout_cxg_scptchessa);
 }
 

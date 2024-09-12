@@ -5,7 +5,7 @@
 
 SciSys Travel Sensor Chess (aka Travel Sensor)
 
-The chess engine was written by Mark Taylor, employee at Intelligent Software
+The chess engine was written by Mark Taylor, employee of Intelligent Software
 (formerly known as Philidor Software). The I/O is very similar to CXG Sensor
 Computachess (see cxg/computachess.cpp).
 
@@ -100,7 +100,7 @@ void tschess_state::control_w(u16 data)
 	m_display->write_my(~data >> 1 & 7);
 
 	// D4: speaker out
-	m_dac->write(data >> 4 & 1);
+	m_dac->write(BIT(data, 4));
 }
 
 u16 tschess_state::input_r()
