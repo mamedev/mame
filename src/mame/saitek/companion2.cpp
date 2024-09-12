@@ -16,7 +16,7 @@ TODO:
 
 ================================================================================
 
-Hardware notes:
+SciSys Chess Companion II family hardware notes:
 
 Chess Companion II:
 - PCB label: YO1B-01 REV.B

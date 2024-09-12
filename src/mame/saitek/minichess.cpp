@@ -9,7 +9,7 @@ It's the first chess program on HMCS40. The engine was written by Mark Taylor
 with assistance from David Levy.
 
 Hardware notes:
-- Hitachi 44801A34 MCU @ ~400kHz
+- Hitachi 44801A34 MCU @ ~500kHz
 - 4-digit LCD screen
 
 Excluding resellers with same title, this MCU was used in:
@@ -182,7 +182,7 @@ INPUT_PORTS_END
 void mini_state::smchess(machine_config &config)
 {
 	// basic machine hardware
-	HD44801(config, m_maincpu, 400'000);
+	HD44801(config, m_maincpu, 500'000); // approximation, R=62K
 	m_maincpu->write_r<2>().set(FUNC(mini_state::seg_w<0>));
 	m_maincpu->write_r<3>().set(FUNC(mini_state::seg_w<1>));
 	m_maincpu->write_d().set(FUNC(mini_state::mux_w));
@@ -225,4 +225,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, smchess, 0,      0,      smchess, smchess, mini_state, empty_init, "SciSys", "Mini Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+SYST( 1981, smchess, 0,      0,      smchess, smchess, mini_state, empty_init, "SciSys / Philidor Software", "Mini Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
