@@ -836,6 +836,8 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 		if ((vram[i + 0] & 0x4000))
 		{
 			int xsize = 1 << (vram[i + 1] & 7);
+			// TODO: this looks non-linear, particularly at bit 3 ON settings
+			// cfr. A'Can logo, speedyd intro, slghtsag character select
 			int ysize = ((vram[i + 0] & 0x1e00) >> 9) + 1;
 
 			// HACK: sonevil sets 1x1 tiles in game, and expecting to take this path.
