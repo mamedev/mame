@@ -225,6 +225,7 @@ private:
 	uint16_t m_tilemap_mode[3]{};
 	uint16_t m_tilemap_tile_mode[3]{};
 	uint16_t m_tilemap_linescrollx_addr[3]{};
+	uint16_t m_tilemap_lineselect_addr[3]{};
 
 	uint16_t m_window_control[2]{};
 	uint16_t m_window_start_addr[2]{};
@@ -1119,6 +1120,13 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 							if (scrolly + y < 0 || scrolly + y > ((ysize * 8) - 1))
 								continue;
 
+						// slghtsag enables lineselect on load game
+						if (BIT(m_tilemap_tile_mode[layer], 11))
+						{
+							int16_t lineselect = (int16_t)m_vram[((m_tilemap_lineselect_addr[layer] << 1) + y ) & 0xffff];
+							realy = (lineselect + scrolly) & ((ysize * 8) - 1);
+						}
+
 						uint16_t *src = &src_bitmap.pix(realy & ((ysize * 8) - 1));
 						uint8_t *priop = &m_prio_bitmap.pix(y);
 						int line_scroll_x = scrollx;
@@ -1129,6 +1137,7 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 							int16_t linescrollx = (int16_t)m_vram[((m_tilemap_linescrollx_addr[layer] << 1) + y) & 0xffff];
 							line_scroll_x += linescrollx;
 						}
+
 
 						for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 						{
@@ -2085,6 +2094,7 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x108/2: m_tilemap_base_addr[0] = data << 1; LOGMASKED(LOG_TILEMAP0, "tilemap_base_addr[0] = %05x\n", data << 2); break;
 	case 0x10a/2: m_tilemap_mode[0] = data; LOGMASKED(LOG_TILEMAP0, "tilemap_mode[0] = %04x\n", data); break;
 	case 0x10c/2: m_tilemap_linescrollx_addr[0] = data; break;
+	case 0x10e/2: m_tilemap_lineselect_addr[0] = data; break;
 
 	/* Tilemap 1 */
 	case 0x120/2: {
@@ -2099,6 +2109,7 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x128/2: m_tilemap_base_addr[1] = data << 1; LOGMASKED(LOG_TILEMAP1, "tilemap_base_addr[1] = %05x\n", data << 2); break;
 	case 0x12a/2: m_tilemap_mode[1] = data; LOGMASKED(LOG_TILEMAP1, "tilemap_mode[1] = %04x\n", data); break;
 	case 0x12c/2: m_tilemap_linescrollx_addr[1] = data; break;
+	case 0x12e/2: m_tilemap_lineselect_addr[1] = data; break;
 
 	/* Tilemap 2 */
 	case 0x140/2: {
@@ -2113,6 +2124,7 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x148/2: m_tilemap_base_addr[2] = data << 1; LOGMASKED(LOG_TILEMAP2, "tilemap_base_addr[2] = %05x\n", data << 2); break;
 	case 0x14a/2: m_tilemap_mode[2] = data; LOGMASKED(LOG_TILEMAP2, "tilemap_mode[2] = %04x\n", data); break;
 	case 0x14c/2: m_tilemap_linescrollx_addr[2] = data; break;
+	case 0x14e/2: m_tilemap_lineselect_addr[2] = data; break;
 
 	/* ROZ */
 	case 0x180/2: {
