@@ -1575,7 +1575,8 @@ void supracan_state::_6502_soundmem_w(offs_t offset, uint8_t data)
 		// speedyd/magipool uses this to request main to kickoff a sound DMA.
 		// gamblord/formduel just sets this just to poll a sound command
 		// all sets up 0x40c/0x40d as a buffer, and 0x40a to check if the irq is valid
-		// (does reading from 68k side acknowledges?)
+		// TODO: staiwbbl writes here from 68k side
+		// which raises a nopped irq service for now, may just acknowledge instead
 		m_maincpu->set_input_line(6, HOLD_LINE);
 		m_soundram[0x40a] = data;
 		break;
@@ -1724,7 +1725,9 @@ void supracan_state::host_um6619_map(address_map &map)
 			set_sound_irq(5, 1);
 		})
 	);
-	// TODO: verify $d access
+	// TODO: verify $d access reads
+	// noisy in staiwbbl, expects an 0xff value just after clearing $e8040a
+	// Playing with it makes BGM and samples to be initialized properly in gameplay.
 	map(0x0c, 0x0d).lr8(
 		NAME([this] (offs_t offset) {
 			const u8 res = m_soundram[0x40a];
@@ -1768,7 +1771,8 @@ void supracan_state::host_um6619_map(address_map &map)
 		NAME([this] (offs_t offset) {
 			// formduel uses this to scroll the game over rain layer, in both X & Y directions.
 			// TODO: details, obviously.
-			logerror("$e90018: RNG read?\n");
+			if (!machine().side_effects_disabled())
+				logerror("$e90018: RNG read?\n");
 			return m_soundcpu->total_cycles() % (0xffff);
 		})
 	);
@@ -1973,18 +1977,6 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x1e/2:
 		LOGMASKED(LOG_SPRDMA, "video_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", m_sprdma_regs.src, m_sprdma_regs.dst, m_sprdma_regs.count, data);
 
-		// HACK: staiwbbl trashes memory at boot
-		// - it will indirect transfer from DMA #1, from $ff637c with count 0x24f (max sprite size?)
-		// - it writes 0xffff to count port, possibly locking the port?
-		// - these are extremely illegal transfers, possibly ignored by the HW for multiple reasons.
-		// - src == 0xffff'xxxx is actually used by sonevil, breaking title screen if ignored here.
-		// if (m_sprite_count == 0x10000)
-		if (m_sprdma_regs.dst & 0xff00'0000)
-		{
-			logerror("Attempt to transfer from src %08x to dst %08x size %04x (ignored)\n", m_sprdma_regs.src,m_sprdma_regs.dst, m_sprdma_regs.count);
-			return;
-		}
-
 		/* TODO: what's 0x2000 and 0x4000 for? */
 		if (data & 0x8000)
 		{
@@ -2070,7 +2062,7 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	/* Sprites */
 	case 0x20/2: m_sprite_base_addr = data << 2; LOGMASKED(LOG_SPRITES, "sprite_base_addr = %04x\n", data); break;
 	case 0x22/2: m_sprite_count = data + 1; LOGMASKED(LOG_SPRITES, "sprite_count = %d\n", data + 1); break;
-    case 0x24/2: m_sprite_mono_color = data & 0xff; break;
+	case 0x24/2: m_sprite_mono_color = data & 0xff; break;
 	case 0x26/2: m_sprite_flags = data; LOGMASKED(LOG_SPRITES, "sprite_flags = %04x\n", data); break;
 
 	/* Tilemap 0 */
