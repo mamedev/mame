@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(HOPPER, hopper_device, "coin_hopper", "Coin Hopper")
 //**************************************************************************
 
 //-------------------------------------------------
-//  ticket_dispenser_device - constructor
+//  constructor
 //-------------------------------------------------
 
 ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -56,6 +56,16 @@ hopper_device::hopper_device(const machine_config &mconfig, const char *tag, dev
 {
 	m_hopper_type = true;
 }
+
+
+//-------------------------------------------------
+//  destructor
+//-------------------------------------------------
+
+ticket_dispenser_device::~ticket_dispenser_device()
+{
+}
+
 
 
 //**************************************************************************

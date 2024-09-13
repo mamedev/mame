@@ -9,7 +9,7 @@ It's the first chess program on HMCS40. The engine was written by Mark Taylor
 with assistance from David Levy.
 
 Hardware notes:
-- Hitachi 44801A34 MCU @ ~500kHz
+- Hitachi 44801A34 MCU @ ~400kHz
 - 4-digit LCD screen
 
 Excluding resellers with same title, this MCU was used in:
@@ -18,6 +18,10 @@ Excluding resellers with same title, this MCU was used in:
 - SciSys Graduate Chess
 - SciSys Chess Partner 3000
 - SciSys Chess Partner 4000
+
+MCU clock is via a resistor, this less accurate than with an XTAL, so the speed
+may vary. Graduate Chess appears to have a 62K resistor between the OSC pins,
+which would make it around 500kHz?
 
 On CP3000/4000 they added a level slider. This will oscillate the level switch
 input pin, so the highest level setting is the same as level 2 on Mini Chess.
@@ -182,7 +186,7 @@ INPUT_PORTS_END
 void mini_state::smchess(machine_config &config)
 {
 	// basic machine hardware
-	HD44801(config, m_maincpu, 500'000); // approximation, R=62K
+	HD44801(config, m_maincpu, 400'000); // approximation
 	m_maincpu->write_r<2>().set(FUNC(mini_state::seg_w<0>));
 	m_maincpu->write_r<3>().set(FUNC(mini_state::seg_w<1>));
 	m_maincpu->write_d().set(FUNC(mini_state::mux_w));
