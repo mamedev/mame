@@ -14,6 +14,8 @@ public:
 	igs027a_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 	virtual ~igs027a_cpu_device();
 
+	auto out_port() { return m_out_port_cb.bind(); }
+
 	void trigger_irq(unsigned num);
 
 protected:
@@ -23,6 +25,7 @@ protected:
 private:
 	void onboard_peripherals(address_map &map) ATTR_COLD;
 
+	void out_port_w(u8 data);
 	template <unsigned N> void timer_rate_w(u8 data);
 	u8 irq_pending_r();
 	void irq_enable_w(u8 data);
@@ -30,6 +33,8 @@ private:
 	void bus_sizing_w(u8 data);
 
 	template <unsigned N> TIMER_CALLBACK_MEMBER(timer_irq);
+
+	devcb_write8 m_out_port_cb;
 
 	emu_timer *m_irq_timers[2];
 

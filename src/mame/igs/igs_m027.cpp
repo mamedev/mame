@@ -201,7 +201,6 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 	map(0x38009000, 0x38009003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 
 	map(0x40000008, 0x4000000b).w(FUNC(igs_m027_state::unk2_w));
-	map(0x40000018, 0x4000001b).umask32(0x000000ff).w(FUNC(igs_m027_state::io_select_w<1>));
 
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027_state::xor_table_w)); // uploads XOR table to external ROM here
 }
@@ -1449,6 +1448,7 @@ void igs_m027_state::m027(machine_config &config)
 {
 	IGS027A(config, m_maincpu, 22'000'000); // Jungle King 2002 has a 22Mhz Xtal, what about the others?
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_mahjong_map);
+	m_maincpu->out_port().set(FUNC(igs_m027_state::io_select_w<1>));
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1505,6 +1505,7 @@ void igs_m027_state::qlgs_xor(machine_config &config)
 	m027_xor(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::jking02_xor_map);
+	m_maincpu->out_port().append(m_oki, FUNC(okim6295_device::set_rom_bank)).rshift(3);
 
 	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::io_select_w<0>));
 
@@ -1521,6 +1522,7 @@ void igs_m027_state::lhdmg_xor(machine_config &config)
 	m_ppi->in_pa_callback().set_ioport("TEST");
 	m_ppi->out_pb_callback().set(FUNC(igs_m027_state::io_select_w<0>));
 	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::mahjong_output_w));
+	m_ppi->out_pc_callback().append(m_oki, FUNC(okim6295_device::set_rom_bank)).bit(7); // FIXME: not right - issues with gameplay sound, especially on last chance screen
 
 	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
@@ -1597,6 +1599,7 @@ void igs_m027_state::oceanpar_xor(machine_config &config)
 	m027_xor(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::jking02_xor_map);
+	m_maincpu->out_port().append(m_oki, FUNC(okim6295_device::set_rom_bank)).rshift(3);
 
 	m_ppi->out_pa_callback().set(m_ticket, FUNC(ticket_dispenser_device::motor_w)).bit(7);
 	m_ppi->out_pb_callback().set(FUNC(igs_m027_state::oceanpar_output_w));
@@ -2001,7 +2004,7 @@ ROM_START( lhzb3 )
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "m2401.u18", 0x000000, 0x400000,  CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) )
 
-	ROM_REGION( 0x200000, "unknown", 0 )
+	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "s2402.u14", 0x00000, 0x100000, CRC(56083fe2) SHA1(62afd651809bf5e639bfda6e5579dbf4b903b664) )
 ROM_END
 

@@ -187,7 +187,6 @@ void igs_m027xa_state::main_map(address_map &map)
 	map(0x3800c000, 0x3800c003).w(FUNC(igs_m027xa_state::oki_bank_w));
 	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027xa_state::gpio_r));
 	map(0x40000014, 0x40000017).w(FUNC(igs_m027xa_state::igs_40000014_w));
-	map(0x40000018, 0x4000001b).umask32(0x000000ff).w(FUNC(igs_m027xa_state::io_select_w<1>));
 
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027xa_state::xor_table_w));
 
@@ -481,6 +480,7 @@ void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 {
 	IGS027A(config, m_maincpu, 22'000'000); // Crazy Bugs has a 22MHz crystal, what about the others?
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::main_map);
+	m_maincpu->out_port().set(FUNC(igs_m027xa_state::io_select_w<1>));
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

@@ -21,6 +21,7 @@ igs027a_cpu_device::igs027a_cpu_device(machine_config const &mconfig, char const
 			ARCHFLAG_T,
 			ENDIANNESS_LITTLE,
 			address_map_constructor(FUNC(igs027a_cpu_device::onboard_peripherals), this)),
+	m_out_port_cb(*this),
 	m_irq_timers{ nullptr, nullptr },
 	m_irq_enable(0xff),
 	m_irq_pending(0xff)
@@ -66,6 +67,8 @@ void igs027a_cpu_device::onboard_peripherals(address_map &map)
 {
 	map(0x0000'0000, 0x0000'3fff).rom().region(DEVICE_SELF, 0);
 
+	map(0x4000'0018, 0x4000'001b).umask32(0x0000'00ff).w(FUNC(igs027a_cpu_device::out_port_w));
+
 	map(0x7000'0100, 0x7000'0103).umask32(0x0000'00ff).w(FUNC(igs027a_cpu_device::timer_rate_w<0>));
 	map(0x7000'0104, 0x7000'0107).umask32(0x0000'00ff).w(FUNC(igs027a_cpu_device::timer_rate_w<1>));
 	map(0x7000'0200, 0x7000'0203).umask32(0x0000'00ff).rw(FUNC(igs027a_cpu_device::irq_pending_r), FUNC(igs027a_cpu_device::irq_enable_w));
@@ -73,6 +76,12 @@ void igs027a_cpu_device::onboard_peripherals(address_map &map)
 	map(0xf000'0008, 0xf000'000b).umask32(0x0000'00ff).w(FUNC(igs027a_cpu_device::bus_sizing_w));
 }
 
+
+void igs027a_cpu_device::out_port_w(u8 data)
+{
+	// 5-bit output port
+	m_out_port_cb(0, data & 0x1f, 0x1f);
+}
 
 template <unsigned N>
 void igs027a_cpu_device::timer_rate_w(u8 data)
