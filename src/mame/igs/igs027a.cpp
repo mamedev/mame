@@ -87,7 +87,16 @@ template <unsigned N>
 void igs027a_cpu_device::timer_rate_w(u8 data)
 {
 	// TODO: determine how timer intervals are derived from clocks
-	m_irq_timers[N]->adjust(attotime::from_hz(data / 2), 0, attotime::from_hz(data / 2));
+	if (data)
+	{
+		constexpr u32 TIMER_DIVISOR = 4263;
+		auto period = attotime::from_hz(clock() / TIMER_DIVISOR / (data + 1));
+		m_irq_timers[N]->adjust(period, 0, period);
+	}
+	else
+	{
+		m_irq_timers[N]->adjust(attotime::never, 0, attotime::never);
+	}
 }
 
 u8 igs027a_cpu_device::irq_pending_r()
