@@ -1244,7 +1244,7 @@ license:CC0-1.0
 	<!-- This was found in multiple carts with Coleco-style shell, both from USA, Euro and Canada -->
 	<software name="pitstop">
 		<!-- Pitstop (1983)(Epyx)[a].bin -->
-		<description>Pitstop (Euro, USA, Canada)</description>
+		<description>Pitstop (Europe, USA, Canada)</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
 		<info name="serial" value="600" />
@@ -2344,7 +2344,7 @@ license:CC0-1.0
 	<software name="victory">
 		<!-- Victory (1983)(Coleco).bin -->
 		<!-- 0x5000-0x5fff : Filled with 0xff -->
-		<description>Victory (Euro)</description>
+		<description>Victory (Europe)</description>
 		<year>1983</year>
 		<publisher>CBS</publisher>
 		<info name="developer" value="Exidy" />
@@ -2567,7 +2567,7 @@ license:CC0-1.0
 <!-- The dump with title "Super Action Soccer" is likely hacked -->
 	<software name="safootb">
 		<!-- Super Action Football (1984)(Coleco)[a].bin -->
-		<description>Super Action Football (Euro)</description>
+		<description>Super Action Football (Europe)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="serial" value="2422" />
