@@ -171,7 +171,6 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121(*this, "k007121_%u", 1U),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 	{ }
@@ -198,7 +197,6 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<k007121_device, 2> m_k007121;
 	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
@@ -220,8 +218,6 @@ private:
 	void sound_map(address_map &map);
 };
 
-
-// video
 
 /***************************************************************************
 **
@@ -289,7 +285,7 @@ TILE_GET_INFO_MEMBER(contra_state::get_tile_info)
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	tileinfo.set(Which,
+	tileinfo.set(0,
 			m_vram[Which][tile_index] + bank * 256,
 			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
@@ -326,9 +322,9 @@ TILE_GET_INFO_MEMBER(contra_state::get_tx_tile_info)
 
 void contra_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(contra_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(contra_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(contra_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(contra_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_k007121[1], tilemap_get_info_delegate(*this, FUNC(contra_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[2] = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(contra_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_clip[1] = m_screen->visible_area();
 	m_clip[1].min_x += 40;
@@ -400,7 +396,7 @@ void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 {
 	int base_color = (m_k007121[Which]->ctrlram_r(6) & 0x30) * 2;
 
-	m_k007121[Which]->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(Which), *m_palette, m_buffered_spriteram[Which]->buffer(), base_color, 40, 0, priority_bitmap, (uint32_t)-1);
+	m_k007121[Which]->sprites_draw(bitmap, cliprect, m_buffered_spriteram[Which]->buffer(), base_color, 40, 0, priority_bitmap, (uint32_t)-1);
 }
 
 uint32_t contra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -430,8 +426,6 @@ uint32_t contra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 INTERRUPT_GEN_MEMBER(contra_state::interrupt)
 {
@@ -576,8 +570,11 @@ static INPUT_PORTS_START( gryzor )
 INPUT_PORTS_END
 
 
-static GFXDECODE_START( gfx_contra )
+static GFXDECODE_START( gfx_contra_1 )
 	GFXDECODE_ENTRY( "k007121_1", 0, gfx_8x8x4_packed_msb,       0, 8*16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_contra_2 )
 	GFXDECODE_ENTRY( "k007121_2", 0, gfx_8x8x4_packed_msb, 8*16*16, 8*16 )
 GFXDECODE_END
 
@@ -620,17 +617,13 @@ void contra_state::contra(machine_config &config)
 	m_screen->set_screen_update(FUNC(contra_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_contra);
-
 	PALETTE(config, m_palette, FUNC(contra_state::palette));
 	m_palette->set_format(palette_device::xBGR_555, 2 * 8 * 16 * 16);
 	m_palette->set_indirect_entries(128);
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
-	K007121(config, m_k007121[0], 0);
-	m_k007121[0]->set_palette_tag(m_palette);
-	K007121(config, m_k007121[1], 0);
-	m_k007121[1]->set_palette_tag(m_palette);
+	K007121(config, m_k007121[0], 0, m_palette, gfx_contra_1);
+	K007121(config, m_k007121[1], 0, m_palette, gfx_contra_2);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();

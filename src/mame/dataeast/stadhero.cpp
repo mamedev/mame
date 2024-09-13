@@ -160,8 +160,6 @@ private:
 };
 
 
-// video
-
 /******************************************************************************/
 
 uint32_t stadhero_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -172,7 +170,7 @@ uint32_t stadhero_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_pf1_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	m_tilegen->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(2), m_spriteram, 0x800 / 2);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, 0x800 / 2);
 	m_pf1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -207,8 +205,6 @@ void stadhero_state::video_start()
 }
 
 /******************************************************************************/
-
-// machine
 
 /******************************************************************************/
 
@@ -360,6 +356,9 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( gfx_stadhero )
 	GFXDECODE_ENTRY( "chars",   0, charlayout,     0, 16 ) // 8x8
 	GFXDECODE_ENTRY( "tiles",   0, tile_3bpp,    512, 16 ) // 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_stadhero_spr )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 256, 16 ) // 16x16
 GFXDECODE_END
 
@@ -391,7 +390,7 @@ void stadhero_state::stadhero(machine_config &config)
 	m_tilegen->set_gfx_region_wide(1, 1, 2);
 	m_tilegen->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_MXC06(config, m_spritegen, 0);
+	DECO_MXC06(config, m_spritegen, 0, "palette", gfx_stadhero_spr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

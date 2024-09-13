@@ -131,7 +131,7 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
-	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq) { update_cpu_freq(newval); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 	// machine configs
 	void cmpchess(machine_config &config);
@@ -166,7 +166,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(blink) { m_blink = !m_blink; update_display(); }
 	void update_display();
 	void update_reset(ioport_value state);
-	void update_cpu_freq(ioport_value state);
 
 	// I/O handlers
 	void input_w(u8 data);
@@ -197,9 +196,6 @@ void cmpchess_state::machine_start()
 
 void cmpchess_state::machine_reset()
 {
-	if (ioport("FAKE") != nullptr)
-		update_cpu_freq(ioport("FAKE")->read());
-
 	update_reset(ioport("RESET")->read());
 }
 
@@ -213,10 +209,10 @@ void cmpchess_state::update_reset(ioport_value state)
 		m_display->clear();
 }
 
-void cmpchess_state::update_cpu_freq(ioport_value state)
+INPUT_CHANGED_MEMBER(cmpchess_state::change_cpu_freq)
 {
 	// 2 MK I versions, 2nd one was a lot faster
-	const u32 freq = state ? 3'500'000 : 2'250'000;
+	const u32 freq = (newval & 1) ? 3'500'000 : 2'250'000;
 	m_maincpu->set_unscaled_clock(freq);
 	subdevice<f3853_device>("smi")->set_unscaled_clock(freq);
 }
@@ -368,7 +364,7 @@ static INPUT_PORTS_START( mk1 )
 	PORT_MODIFY("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, cmpchess_state, reset_switch, 0) PORT_NAME("L.S. Switch")
 
-	PORT_START("FAKE")
+	PORT_START("CPU")
 	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, cmpchess_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "2.25MHz (Spassky packaging)" )
 	PORT_CONFSETTING(    0x01, "3.5MHz (Karpov packaging)" )
@@ -506,9 +502,9 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1977, cmpchess,  0,        0,      cmpchess,  cmpchess, cmpchess_state, empty_init, "DataCash Systems / Staid", "CompuChess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka CompuChess I
-SYST( 1978, cmpchess2, 0,        0,      cmpchess2, cmpchess, cmpchess_state, empty_init, "DataCash Systems / Staid", "CompuChess: The Second Edition", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1977, cmpchess,  0,        0,      cmpchess,  cmpchess, cmpchess_state, empty_init, "DataCash Systems / Staid", "CompuChess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE ) // aka CompuChess I
+SYST( 1978, cmpchess2, 0,        0,      cmpchess2, cmpchess, cmpchess_state, empty_init, "DataCash Systems / Staid", "CompuChess: The Second Edition", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
 
-SYST( 1978, ccmk1,     cmpchess, 0,      mk1,       mk1,      cmpchess_state, empty_init, "bootleg (Novag)", "Chess Champion: MK I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1978, ccmk1,     cmpchess, 0,      mk1,       mk1,      cmpchess_state, empty_init, "bootleg (Novag Industries)", "Chess Champion: MK I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
 
-SYST( 1979, cncchess,  0,        0,      cncchess,  cncchess, cmpchess_state, empty_init, "Conic", "Computer Chess (Conic, model 7011)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, cncchess,  0,        0,      cncchess,  cncchess, cmpchess_state, empty_init, "Conic", "Computer Chess (Conic, model 7011)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

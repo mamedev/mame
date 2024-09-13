@@ -8,7 +8,7 @@ Driver by Angelo Salese
 LaserDisc and artwork hookup by Ryan Holtz
 
 TODO:
-- Unemulated Sony LDP-1450 player, and Pioneer LD-V4200 is HLE; needs a dump of the BIOSes and
+- Sony LDP-1450 player (not hooked up) and Pioneer LD-V4200 are HLE; needs a dump of the BIOSes and
   proper hook-up.
 
 ==================================================================================================
@@ -352,12 +352,12 @@ ROM_START( timetrv2 )
 	ROM_LOAD( "epr-72491.u9",   0xc0000, 0x40000, CRC(c7998e2f) SHA1(26060653b2368f52c304e6433b4f447f99a36839) )
 
 	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "timetrv", 0, SHA1(8abb5e6aa58ab49477ef89f507264d35454f99d3) BAD_DUMP )
+	DISK_IMAGE_READONLY( "timetrv2", 0, SHA1(0bb0c34df0aae2b5e019c6dc2fc071e23c82ba75) )
 ROM_END
 
 } // anonymous namespace
 
 
 
-GAMEL( 1991, timetrv,  0,       timetrv,  timetrv, timetrv_state, empty_init, ORIENTATION_FLIP_Y, "Virtual Image Productions (Sega license)", "Time Traveler (set 1)", MACHINE_SUPPORTS_SAVE, layout_timetrv )
-GAMEL( 1991, timetrv2, timetrv, timetrv,  timetrv, timetrv_state, empty_init, ORIENTATION_FLIP_Y, "Virtual Image Productions (Sega license)", "Time Traveler (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING, layout_timetrv ) // Different frame indices; Europe?
+GAMEL( 1991, timetrv,  0,       timetrv,  timetrv, timetrv_state, empty_init, ORIENTATION_FLIP_Y, "Virtual Image Productions (Sega license)", "Time Traveler", MACHINE_SUPPORTS_SAVE, layout_timetrv )
+GAMEL( 1991, timetrv2, timetrv, timetrv,  timetrv, timetrv_state, empty_init, ORIENTATION_FLIP_Y, "Virtual Image Productions (Sega license)", "Time Traveler (Japan)", MACHINE_SUPPORTS_SAVE, layout_timetrv )

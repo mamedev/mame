@@ -43,7 +43,6 @@
         * Determine correct video timing
         * Unknown sound writes (volume and body sonic control?)
         * Better document mecha drive CPU
-        * Use TMS32020(currently unemulated) device instead of TMS32025
 
 ****************************************************************************/
 
@@ -955,7 +954,7 @@ void mlanding_state::mlanding(machine_config &config)
 	m_mechacpu->set_addrmap(AS_PROGRAM, &mlanding_state::mecha_map_prog);
 	m_mechacpu->set_vblank_int("screen", FUNC(mlanding_state::irq0_line_hold));
 
-	tms32025_device& dsp(TMS32025(config, m_dsp, 16_MHz_XTAL)); // TMS32020GBL
+	auto &dsp(TMS32020(config, m_dsp, 16_MHz_XTAL)); // TMS32020GBL
 	dsp.set_addrmap(AS_PROGRAM, &mlanding_state::dsp_map_prog);
 	dsp.set_addrmap(AS_DATA, &mlanding_state::dsp_map_data);
 	dsp.hold_in_cb().set(FUNC(mlanding_state::dsp_hold_signal_r));
@@ -965,8 +964,8 @@ void mlanding_state::mlanding(machine_config &config)
 	m_ctc->zc_callback<0>().set(FUNC(mlanding_state::z80ctc_to0));
 
 	pc060ha_device& ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -1076,5 +1075,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, mlanding,  0,        mlanding, mlanding,  mlanding_state, empty_init, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE ) // Japanese or German selectable via dip-switch. Copyright changes accordingly.
-GAME( 1987, mlandingj, mlanding, mlanding, mlandingj, mlanding_state, empty_init, ROT0, "Taito Corporation",         "Midnight Landing (Japan)",   MACHINE_SUPPORTS_SAVE ) // Japanese or English selectable via dip-switch. Copyright changes accordingly.
+GAME( 1987, mlanding,  0,        mlanding, mlanding,  mlanding_state, empty_init, ROT0, "Taito America Corporation", "Midnight Landing (Germany)",      MACHINE_SUPPORTS_SAVE ) // Japanese or German selectable via dip-switch. Copyright changes accordingly.
+GAME( 1987, mlandingj, mlanding, mlanding, mlandingj, mlanding_state, empty_init, ROT0, "Taito Corporation",         "Midnight Landing (Japan, rev 3)", MACHINE_SUPPORTS_SAVE ) // Japanese or English selectable via dip-switch. Copyright changes accordingly.

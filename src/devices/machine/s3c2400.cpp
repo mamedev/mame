@@ -9,7 +9,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "machine/s3c2400.h"
+#include "s3c2400.h"
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"

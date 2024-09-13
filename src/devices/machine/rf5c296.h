@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "pccard.h"
+#include "bus/pccard/pccard.h"
 
 
 class rf5c296_device : public device_t

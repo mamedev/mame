@@ -21,6 +21,8 @@ public:
 	// construction/destruction
 	isa16_pvga1a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -87,6 +89,9 @@ public:
 	// construction/destruction
 	isa16_wd90c00_jk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// resets itself at card POST for accessing $c6xxx area, plays with input sense later
+	static constexpr feature_type unemulated_features() { return feature::PROTECTION; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -152,6 +157,8 @@ class isa16_wd90c31_lr_device :
 public:
 	// construction/destruction
 	isa16_wd90c31_lr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 protected:
 	// device-level overrides

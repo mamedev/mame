@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "cpu/z80/z80.h"
+#include "cpu/z80/nsc800.h"
 #include "sound/beep.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"

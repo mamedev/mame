@@ -450,12 +450,6 @@ void m72_state::nspirit_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-void m72_state::loht_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	static const int a[7] = { 0x0000, 0x0020, 0, 0x2c40, 0x4320, 0x7120, 0xb200 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m_audio->set_sample_start(a[data & 0xff]);
-}
-
 void m72_state::dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	static const int a[9] = { 0x00000, 0x00020, 0x02c40, 0x08160, 0x0c8c0, 0x0ffe0, 0x13000, 0x15820, 0x15f40 };
@@ -471,17 +465,6 @@ void m72_state::dkgenm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 		0x153c0, 0x197e0, 0x1af40, 0x1c080 };
 
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 28) m_audio->set_sample_start(a[data & 0xff]);
-}
-
-void m72_state::gallop_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	static const int a[31] = {
-		0x00000, 0x00020, 0x00040, 0x01360, 0x02580, 0x04f20, 0x06240, 0x076e0,
-		0x08660, 0x092a0, 0x09ba0, 0x0a560, 0x0cee0, 0x0de20, 0x0e620, 0x0f1c0,
-		0x10200, 0x10220, 0x10240, 0x11380, 0x12760, 0x12780, 0x127a0, 0x13c40,
-		0x140a0, 0x16760, 0x17e40, 0x18ee0, 0x19f60, 0x1bbc0, 0x1cee0 };
-
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 31) m_audio->set_sample_start(a[data & 0xff]);
 }
 
 
@@ -613,11 +596,6 @@ void m72_state::init_dkgenm72()
 {
 	install_protection_handler(dkgenm72_code,dkgenm72_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::dkgenm72_sample_trigger_w)));
-}
-
-void m72_state::init_gallop()
-{
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::gallop_sample_trigger_w)));
 }
 
 
@@ -1879,7 +1857,6 @@ void m72_state::m72_dbreed(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,dbreedm72)
 }
-
 
 
 
@@ -3663,7 +3640,7 @@ ROM_START( gallopm72 )
 	ROM_RELOAD(                       0xc0000, 0x20000 )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "cc_c-pr-.ic1", 0x0000, 0x1000, NO_DUMP ) // read protected (only used for sample triggering, not supplying code / warning screens)
+	ROM_LOAD( "cc_c-pr-.ic1", 0x0000, 0x1000, CRC(ac4421b1) SHA1(4614acbc4efb26b27f3871b4d22879d74df5e2e0) ) // i8751 MCU labeled  CC C-PR-
 
 	ROM_REGION( 0x080000, "sprites", 0 )  // sprites - same data as the cosmccop/gallop sets
 	ROM_LOAD( "cc_c-00.ic53", 0x00000, 0x20000, CRC(9d99deaa) SHA1(acf16bea0f482306107d2a305c568406b6c21e9a) )   // == cc-b-n0.ic31
@@ -3724,7 +3701,7 @@ ROM_START( xmultipl )
 	ROM_LOAD( "t51.31.ic13", 0xe0000, 0x20000, CRC(229bf7b1) SHA1(ae42c7efbb6278dd3fa56842361138391f2d49ca) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 ) // mask ROMs
-	ROM_LOAD( "t53.a0,ic50", 0x00000, 0x20000, CRC(1a082494) SHA1(63a3a84a262833d2cafab41e35df8f10a5e317b1) )  // tiles #1
+	ROM_LOAD( "t53.a0.ic50", 0x00000, 0x20000, CRC(1a082494) SHA1(63a3a84a262833d2cafab41e35df8f10a5e317b1) )  // tiles #1
 	ROM_LOAD( "t54.a1.ic49", 0x20000, 0x20000, CRC(076c16c5) SHA1(4be858806b916953d59aceee550e721eaf3996a6) )
 	ROM_LOAD( "t55.a2.ic51", 0x40000, 0x20000, CRC(25d877a5) SHA1(48c948bf714c432f534c098123c8f50d5561756f) )
 	ROM_LOAD( "t56.a3.ic52", 0x60000, 0x20000, CRC(5b1213f5) SHA1(87782aa0bd04d4378c4ba78b63028ae2709da2f1) )
@@ -4418,7 +4395,7 @@ ROM_START( cosmccop )
 	ROM_LOAD( "cc_d-g30-.ic64", 0x60000, 0x20000, CRC(f64a3166) SHA1(1661db2a37c76e6b4552e48c04966dbbccab8926) )   // == cc-b-a3.ic23 + cc-b-b3.ic24
 
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
-	ROM_LOAD( "cc_d-vo-.ic14", 0x00000, 0x20000, CRC(6247bade) SHA1(4bc9f86acd09908c74b1ab0e7817c4ff1cad6f0b) )   // == cc-c-v0.ic44
+	ROM_LOAD( "cc_d-v0-.ic14", 0x00000, 0x20000, CRC(6247bade) SHA1(4bc9f86acd09908c74b1ab0e7817c4ff1cad6f0b) )   // == cc-c-v0.ic44
 
 	ROM_REGION( 0x0200, "proms", 0 ) // located on M84-B-B top board
 	ROM_LOAD( "ken_b-4n-.ic23", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10N
@@ -4455,7 +4432,7 @@ ROM_START( gallop )
 	ROM_LOAD( "cc_d-g30-.ic64", 0x60000, 0x20000, CRC(f64a3166) SHA1(1661db2a37c76e6b4552e48c04966dbbccab8926) )   // == cc-b-a3.ic23 + cc-b-b3.ic24
 
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
-	ROM_LOAD( "cc_d-vo-.ic14", 0x00000, 0x20000, CRC(6247bade) SHA1(4bc9f86acd09908c74b1ab0e7817c4ff1cad6f0b) )   // == cc-c-v0.ic44
+	ROM_LOAD( "cc_d-v0-.ic14", 0x00000, 0x20000, CRC(6247bade) SHA1(4bc9f86acd09908c74b1ab0e7817c4ff1cad6f0b) )   // == cc-c-v0.ic44
 
 	ROM_REGION( 0x0200, "proms", 0 ) // located on M84-B-B top board
 	ROM_LOAD( "ken_b-4n-.ic23", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10N
@@ -4724,7 +4701,7 @@ GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl, xmultipl,     m72_state, init_m
 GAME( 1989, dbreedm72,   dbreed,   m72_dbreedw,  dbreed,       m72_state, init_dbreedm72,  ROT0,   "Irem", "Dragon Breed (World, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
 GAME( 1989, dbreedjm72,  dbreed,   m72_dbreed,   dbreed,       m72_state, init_m72_8751,   ROT0,   "Irem", "Dragon Breed (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, gallopm72,   cosmccop, m72,          gallop,       m72_state, init_gallop,     ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
+GAME( 1991, gallopm72,   cosmccop, m72_airduel,  gallop,       m72_state, init_m72_8751,   ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, airduelm72,  airduel,  m72_airduel,  airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (World, M72 hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, airdueljm72, airduel,  m72_airduel,  airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (Japan, M72 hardware)", MACHINE_SUPPORTS_SAVE )

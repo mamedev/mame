@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -15,36 +16,14 @@ license:CC0-1.0
 	<element name="red"><rect><color red="0.9" green="0.2" blue="0.2" /></rect></element>
 	<element name="orange"><rect><color red="0.9" green="0.6" blue="0.17" /></rect></element>
 
-	<element name="text_stage">
-		<rect><color red="0.9" green="0.2" blue="0.2" /></rect>
-		<text string="STAGE" align="1"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_time">
-		<rect><color red="0.9" green="0.2" blue="0.2" /></rect>
-		<text string="TIME"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_hits">
-		<rect><color red="0.9" green="0.6" blue="0.17" /></rect>
-		<text string="HITS"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_high">
-		<rect><color red="0.9" green="0.9" blue="0.15" /></rect>
-		<text string="HIGH SCORE"><color red="0.8" green="0.5" blue="0.12" /></text>
-	</element>
-	<element name="text_1ph">
-		<text string="1 PLAYER"><color red="0.9" green="0.9" blue="0.15" /></text>
-	</element>
-	<element name="text_2ph">
-		<text string="2 PLAYERS"><color red="0.9" green="0.9" blue="0.15" /></text>
-	</element>
-	<element name="text_start1">
-		<rect><color red="0.9" green="0.9" blue="0.92" /></rect>
-		<text string="EASY" align="2"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_start2">
-		<rect><color red="0.9" green="0.9" blue="0.92" /></rect>
-		<text string="HARD" align="2"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
+	<element name="text_stage"><text string="STAGE" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_time"><text string="TIME"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_hits"><text string="HITS"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_high"><text string="HIGH SCORE"><color red="0.8" green="0.5" blue="0.12" /></text></element>
+	<element name="text_1ph"><text string="1 PLAYER"><color red="0.9" green="0.9" blue="0.15" /></text></element>
+	<element name="text_2ph"><text string="2 PLAYERS"><color red="0.9" green="0.9" blue="0.15" /></text></element>
+	<element name="text_start1"><text string="EASY" align="2"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_start2"><text string="HARD" align="2"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 
 	<element name="yellowe">
 		<disk>

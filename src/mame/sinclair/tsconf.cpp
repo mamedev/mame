@@ -229,11 +229,18 @@ void tsconf_state::machine_reset()
 	m_zctl_di = 0xff;
 	m_ay_selected = 0;
 
+	m_sprites_cache.clear();
 	tsconf_update_bank0();
 	tsconf_update_video_mode();
 
 	m_keyboard->write(0xff);
 	while (m_keyboard->read() != 0) { /* invalidate buffer */ }
+}
+
+void tsconf_state::device_post_load()
+{
+	spectrum_128_state::device_post_load();
+	m_sprites_cache.clear();
 }
 
 INPUT_PORTS_START( tsconf )
@@ -313,6 +320,9 @@ void tsconf_state::tsconf(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(tsconf_state::tsconf_palette), 256);
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(0), 448, 320, with_vblank(0), 320);
+	m_screen->set_screen_update(FUNC(tsconf_state::screen_update));
+	m_screen->set_no_palette();
+
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tsconf);
 	RAM(config, m_cram).set_default_size("512").set_default_value(0);
 	RAM(config, m_sfile).set_default_size("512").set_default_value(0); // 85*6

@@ -7,15 +7,8 @@
 
 #include "m68kcommon.h"
 
-// SoftFloat 2 lacks an include guard
-#ifndef softfloat2_h
-#define softfloat2_h 1
-#include "softfloat/milieu.h"
-#include "softfloat/softfloat.h"
-#endif
-
-extern flag floatx80_is_nan(floatx80 a);
-
+#include "softfloat3/source/include/softfloat.h"
+#include "softfloat3/bochs_ext/softfloat3_ext.h"
 
 /* MMU constants */
 constexpr int MMU_ATC_ENTRIES = (22);    // 68851 has 64, 030 has 22
@@ -152,7 +145,7 @@ protected:
 	u32 m_cacr;         /* Cache Control Register (m68020, unemulated) */
 	u32 m_caar;         /* Cache Address Register (m68020, unemulated) */
 	u32 m_ir;           /* Instruction Register */
-	floatx80 m_fpr[8];     /* FPU Data Register (m68030/040) */
+	extFloat80_t m_fpr[8]; /* FPU Data Register (m68030/040) */
 	u32 m_fpiar;        /* FPU Instruction Address Register (m68040) */
 	u32 m_fpsr;         /* FPU Status Register (m68040) */
 	u32 m_fpcr;         /* FPU Control Register (m68040) */
@@ -329,48 +322,45 @@ protected:
 #include "m68kops.h"
 #include "m68kmmu.h"
 
-	static double fx80_to_double(floatx80 fx)
+	static double fx80_to_double(extFloat80_t fx)
 	{
-		u64 d;
-		double *foo;
-
-		foo = (double *)&d;
-
-		d = floatx80_to_float64(fx);
+		const float64_t d = extF80_to_f64(fx);
+		const double *foo = (double *)&d;
 
 		return *foo;
 	}
 
-	static floatx80 double_to_fx80(double in)
+	static extFloat80_t double_to_fx80(double in)
 	{
-		u64 *d;
+		float64_t *d = (float64_t *)&in;
 
-		d = (u64 *)&in;
-
-		return float64_to_floatx80(*d);
+		return f64_to_extF80(*d);
 	}
 
 	// defined in m68kfpu.cpp
 	static const u32 pkmask2[18];
 	static const u32 pkmask3[18];
-	inline floatx80 load_extended_float80(u32 ea);
-	inline void store_extended_float80(u32 ea, floatx80 fpr);
-	inline floatx80 load_pack_float80(u32 ea);
-	inline void store_pack_float80(u32 ea, int k, floatx80 fpr);
-	inline void SET_CONDITION_CODES(floatx80 reg);
-	inline int TEST_CONDITION(int condition);
+	inline extFloat80_t load_extended_float80(u32 ea);
+	inline void store_extended_float80(u32 ea, extFloat80_t fpr);
+	inline extFloat80_t load_pack_float80(u32 ea);
+	inline void store_pack_float80(u32 ea, int k, extFloat80_t fpr);
+	void set_condition_codes(extFloat80_t reg);
+	int test_condition(int condition);
+	void clear_exception_flags();
+	void sync_exception_flags(extFloat80_t op1, extFloat80_t op2, u32 enables);
+	s32 convert_to_int(extFloat80_t source, s32 lowerLimit, s32 upperLimit);
 	u8 READ_EA_8(int ea);
 	u16 READ_EA_16(int ea);
 	u32 READ_EA_32(int ea);
 	u64 READ_EA_64(int ea);
-	floatx80 READ_EA_FPE(int mode, int reg, uint32 di_mode_ea);
-	floatx80 READ_EA_PACK(int ea);
+	extFloat80_t READ_EA_FPE(int mode, int reg, uint32_t di_mode_ea);
+	extFloat80_t READ_EA_PACK(int ea);
 	void WRITE_EA_8(int ea, u8 data);
 	void WRITE_EA_16(int ea, u16 data);
 	void WRITE_EA_32(int ea, u32 data);
 	void WRITE_EA_64(int ea, u64 data);
-	void WRITE_EA_FPE(int mode, int reg, floatx80 fpr, uint32 di_mode_ea);
-	void WRITE_EA_PACK(int ea, int k, floatx80 fpr);
+	void WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, uint32_t di_mode_ea);
+	void WRITE_EA_PACK(int ea, int k, extFloat80_t fpr);
 	void fpgen_rm_reg(u16 w2);
 	void fmove_reg_mem(u16 w2);
 	void fmove_fpcr(u16 w2);

@@ -76,8 +76,8 @@ public:
 	auto    int_cb() { return m_interrupt.bind(); }
 
 protected:
-	void device_start() override;
-	void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 private:
 	devcb_write_line           m_interrupt;

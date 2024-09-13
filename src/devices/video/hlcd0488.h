@@ -59,13 +59,13 @@ protected:
 
 private:
 	// pin state
-	int m_latch_pulse = 0;
-	int m_latch_pulse_prev = 0;
-	int m_data_clk = 0;
-	int m_data_clk_prev = 0;
-	u8 m_data = 0;
+	u8 m_latch_pulse;
+	u8 m_latch_pulse_prev;
+	u8 m_data_clk;
+	u8 m_data_clk_prev;
+	u8 m_data;
 
-	u8 m_count = 0;
+	u8 m_count;
 	u8 m_latch[8];
 	u8 m_hold[8];
 

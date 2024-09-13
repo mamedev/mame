@@ -43,6 +43,7 @@
 #define OSDCOMMAND_LIST_NETWORK_ADAPTERS "listnetwork"
 
 #define OSDOPTION_DEBUGGER              "debugger"
+#define OSDOPTION_DEBUGGER_HOST         "debugger_host"
 #define OSDOPTION_DEBUGGER_PORT         "debugger_port"
 #define OSDOPTION_DEBUGGER_FONT         "debugger_font"
 #define OSDOPTION_DEBUGGER_FONT_SIZE    "debugger_font_size"
@@ -119,6 +120,7 @@ public:
 
 	// debugging options
 	const char *debugger() const { return value(OSDOPTION_DEBUGGER); }
+	const char *debugger_host() const { return value(OSDOPTION_DEBUGGER_HOST); }
 	int debugger_port() const { return int_value(OSDOPTION_DEBUGGER_PORT); }
 	const char *debugger_font() const { return value(OSDOPTION_DEBUGGER_FONT); }
 	float debugger_font_size() const { return float_value(OSDOPTION_DEBUGGER_FONT_SIZE); }
@@ -238,7 +240,8 @@ public:
 	virtual osd_font::ptr font_alloc() override;
 	virtual bool get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &result) override;
 
-	virtual std::unique_ptr<osd_midi_device> create_midi_device() override;
+	virtual std::unique_ptr<osd::midi_input_port> create_midi_input(std::string_view name) override;
+	virtual std::unique_ptr<osd::midi_output_port> create_midi_output(std::string_view name) override;
 
 	// FIXME: everything below seems to be osd specific and not part of
 	//        this INTERFACE but part of the osd IMPLEMENTATION
@@ -275,9 +278,6 @@ public:
 
 protected:
 	virtual bool input_init();
-
-	virtual void build_slider_list() { }
-	virtual void update_slider_list() { }
 
 	void poll_input_modules(bool relative_reset);
 

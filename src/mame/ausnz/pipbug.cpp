@@ -118,7 +118,7 @@ int pipbug_state::serial_r()
 
 void pipbug_state::machine_start()
 {
-	save_pointer(NAME(m_cass_data), 4);
+	save_item(NAME(m_cass_data));
 	save_item(NAME(m_cassold));
 	save_item(NAME(m_cassinbit));
 }

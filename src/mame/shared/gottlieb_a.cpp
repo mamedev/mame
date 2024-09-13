@@ -67,7 +67,7 @@ gottlieb_sound_p2_device::gottlieb_sound_p2_device(const machine_config &mconfig
 //  write - handle an external command write
 //-------------------------------------------------
 
-void gottlieb_sound_p2_device::write_sync(int param)
+void gottlieb_sound_p2_device::write_sync(s32 param)
 {
 	// write the command data to bits 0-3 (also bit 6 used in system1 pinballs)
 	u8 pb0_3 = ~param & 0x4f; // U7
@@ -176,7 +176,7 @@ gottlieb_sound_p3_device::gottlieb_sound_p3_device(const machine_config &mconfig
 //  write - handle an external command write
 //-------------------------------------------------
 
-void gottlieb_sound_p3_device::write_sync(int param)
+void gottlieb_sound_p3_device::write_sync(s32 param)
 {
 	// low 4 bits NORed together, triggers IRQ on falling edge
 	bool irqclock = (~param & 0xf) == 0;
@@ -286,7 +286,7 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig
 //  write - handle an external command write
 //-------------------------------------------------
 
-void gottlieb_sound_r1_device::write_sync(int param)
+void gottlieb_sound_r1_device::write_sync(s32 param)
 {
 	// write the command data to the low 6 bits, the low 4 bits are also NANDed together and go to PA7
 	u8 pa0_5 = ~param & 0x3f;
@@ -742,7 +742,7 @@ gottlieb_sound_p4_device::gottlieb_sound_p4_device(const machine_config &mconfig
 //  write - handle an external command write
 //-------------------------------------------------
 
-void gottlieb_sound_p4_device::write_sync(int param)
+void gottlieb_sound_p4_device::write_sync(s32 param)
 {
 	// when data is not 0xff, the transparent latch at A3 allows it to pass through unmolested
 	if (param != 0xff)

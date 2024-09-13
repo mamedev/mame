@@ -8,8 +8,8 @@
 
 // todo, move these back, currently the sprite code needs some of the values tho
 #define NEOGEO_HTOTAL                           (0x180)
-#define NEOGEO_HBEND                            (0x01e) /* this should really be 29.5 */
-#define NEOGEO_HBSTART                          (0x15e) /* this should really be 349.5 */
+#define NEOGEO_HBEND                            (0x01c) // verified from https://wiki.neogeodev.org/index.php?title=Display_timing
+#define NEOGEO_HBSTART                          (0x15c)
 #define NEOGEO_VTOTAL                           (0x108)
 #define NEOGEO_VBEND                            (0x010)
 #define NEOGEO_VBSTART                          (0x0f0)

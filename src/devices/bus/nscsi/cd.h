@@ -43,8 +43,10 @@ protected:
 	virtual uint8_t scsi_get_data(int id, int pos) override;
 	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
 
-	void return_no_cd();
+	virtual void return_no_cd();
 	static int to_msf(int frame);
+
+	bool m_removal_prevented;
 
 private:
 	static constexpr uint32_t bytes_per_sector = 2048;
@@ -133,6 +135,7 @@ protected:
 	virtual void scsi_command() override;
 	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
 	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
+	virtual void return_no_cd() override;
 
 private:
 	bool m_stopped;

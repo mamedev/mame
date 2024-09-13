@@ -2,15 +2,15 @@
 // copyright-holders:Angelo Salese
 /************************************************************************************************
 
-    Sharp X1Twin = Sharp X1 + NEC PC Engine All-in-One
+Sharp X1Twin = Sharp X1 + NEC PC Engine All-in-One
 
-    Both systems don't interact at all, according to info on the net they just share the
-    same "house". It doesn't even do super-imposing, not even with the in-built X1 feature apparently
+Both systems don't interact at all, according to info on the net they just share the
+same "house". It doesn't even do super-imposing, not even with the in-built X1 feature apparently
 
-    TODO:
-    - Find 100% trusted info about it.
-    - inherit pce_state into x1twin_state
-    - Needs video mods
+TODO:
+- Find 100% trusted info about it.
+- Work out this to really be a middleground for both pce_state & x1twin_state
+- Needs video mods
 
 ************************************************************************************************/
 
@@ -35,8 +35,8 @@ namespace {
 class x1twin_state : public x1_state
 {
 public:
-	x1twin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: x1_state(mconfig, type, tag)
+	x1twin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		x1_state(mconfig, type, tag)
 	{ }
 
 	void x1twin(machine_config &config);
@@ -66,7 +66,7 @@ uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &
 void x1twin_state::x1_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(FUNC(x1twin_state::x1_mem_r), FUNC(x1twin_state::x1_mem_w));
+	map(0x0000, 0xffff).rw(FUNC(x1twin_state::mem_r), FUNC(x1twin_state::mem_w));
 }
 
 void x1twin_state::x1_io(address_map &map)
@@ -444,8 +444,6 @@ void x1twin_state::x1twin(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(x1_state::x1_portb_w));
 	ppi.out_pc_callback().set(FUNC(x1_state::x1_portc_w));
 
-	MCFG_MACHINE_RESET_OVERRIDE(x1twin_state,x1)
-
 	#if 0
 	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, pce_mem);
@@ -483,8 +481,6 @@ void x1twin_state::x1twin(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x1);
 
 	MB8877(config, m_fdc, MAIN_CLOCK / 16);
-	// TODO: guesswork, try to implicitly start the motor
-	m_fdc->hld_wr_callback().set(FUNC(x1_state::hdl_w));
 
 	FLOPPY_CONNECTOR(config, "fdc:0", x1_floppies, "dd", x1_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", x1_floppies, "dd", x1_state::floppy_formats);
@@ -507,10 +503,8 @@ void x1twin_state::x1twin(machine_config &config)
 	ay8910_device &ay(AY8910(config, "ay", MAIN_CLOCK/8));
 	ay.port_a_read_callback().set_ioport("P1");
 	ay.port_b_read_callback().set_ioport("P2");
-	ay.add_route(0, "x1_l", 0.25);
-	ay.add_route(0, "x1_r", 0.25);
-	ay.add_route(1, "x1_l", 0.5);
-	ay.add_route(2, "x1_r", 0.5);
+	ay.add_route(ALL_OUTPUTS, "x1_l", 0.25);
+	ay.add_route(ALL_OUTPUTS, "x1_r", 0.25);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(x1_cassette_formats);
@@ -520,8 +514,8 @@ void x1twin_state::x1twin(machine_config &config)
 
 	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");
 
-	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1twin_state::x1_keyboard_callback), attotime::from_hz(250));
-	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1twin_state::x1_cmt_wind_timer), attotime::from_hz(16));
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1twin_state::sub_keyboard_cb), attotime::from_hz(250));
+	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1twin_state::cmt_seek_cb), attotime::from_hz(16));
 }
 
 ROM_START( x1twin )

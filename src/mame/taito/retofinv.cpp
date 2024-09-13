@@ -221,8 +221,6 @@ private:
 };
 
 
-// video
-
 void retofinv_state::palette(palette_device &palette) const
 {
 	uint8_t const *const palette_prom = memregion("palette")->base();
@@ -459,8 +457,6 @@ uint32_t retofinv_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void retofinv_state::machine_start()
 {

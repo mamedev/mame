@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "hpc3.h"
 
+#include <algorithm>
+
 #define LOG_UNKNOWN     (1U << 1)
 #define LOG_PBUS_DMA    (1U << 2)
 #define LOG_SCSI        (1U << 3)
@@ -155,7 +157,7 @@ void hpc3_device::device_reset()
 {
 	m_cpu_aux_ctrl = 0;
 
-	memset(m_scsi_dma, 0, sizeof(scsi_dma_t) * 2);
+	std::fill(std::begin(m_scsi_dma), std::end(m_scsi_dma), scsi_dma_t());
 
 	for (uint32_t i = 0; i < 8; i++)
 	{
@@ -1071,7 +1073,7 @@ void hpc3_device::eeprom_w(uint32_t data)
 	m_eeprom_clk_cb(BIT(data, 2));
 }
 
-void hpc3_device::enet_transmit(int param)
+void hpc3_device::enet_transmit(int32_t param)
 {
 	// save the first transmit buffer descriptor pointer
 	// TODO: not sure how cpfbdp and ppfbdp work, perhaps round-robin?

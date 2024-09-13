@@ -14,16 +14,21 @@ typedef device_delegate<uint16_t (uint16_t col, bool extcol)> decospr_col_cb_del
 #define DECOSPR_COLOUR_CB_MEMBER(_name)     uint16_t _name(uint16_t col, bool extcol)
 
 
-class decospr_device : public device_t, public device_video_interface
+class decospr_device : public device_t, public device_video_interface, public device_gfx_interface
 {
 public:
 	decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T> decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: decospr_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
 
 	// configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
-	void set_gfx_region(int gfxregion) { m_gfxregion = gfxregion; }
 	template <typename... T> void set_pri_callback(T &&... args) { m_pri_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_col_callback(T &&... args) { m_col_cb.set(std::forward<T>(args)...); }
+	void set_alt_format(bool alt) { m_alt_format = alt; }
 	void set_is_bootleg(bool is_bootleg) { m_is_bootleg = is_bootleg; }
 	void set_bootleg_type(int bootleg_type) { m_bootleg_type = bootleg_type; }
 	void set_flipallx(int flipallx) { m_flipallx = flipallx; }
@@ -36,7 +41,6 @@ public:
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords);
-	void set_alt_format(bool alt) { m_alt_format = alt; }
 	void set_pix_mix_mask(uint16_t mask) { m_pixmask = mask; }
 	void set_pix_raw_shift(uint16_t shift) { m_raw_shift = shift; }
 	void set_flip_screen(bool flip) { m_flip_screen = flip; }
@@ -50,14 +54,13 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	uint8_t m_gfxregion;
 	decospr_pri_cb_delegate m_pri_cb;
 	decospr_col_cb_delegate m_col_cb;
 	bitmap_ind16 m_sprite_bitmap;// optional sprite bitmap (should be INDEXED16)
-	bool m_alt_format = false;
-	uint16_t m_pixmask = 0;
-	uint16_t m_raw_shift = 0;
-	bool m_flip_screen = false;
+	bool m_alt_format;
+	uint16_t m_pixmask;
+	uint16_t m_raw_shift;
+	bool m_flip_screen;
 
 	// used by various bootleg / clone chips.
 	bool m_is_bootleg; // used by various bootlegs (disables masking of sprite tile number when multi-sprite is used)
@@ -69,7 +72,6 @@ protected:
 private:
 	template<class BitmapClass>
 	void draw_sprites_common(BitmapClass &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords);
-	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 DECLARE_DEVICE_TYPE(DECO_SPRITE, decospr_device)

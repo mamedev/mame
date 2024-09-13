@@ -14,16 +14,17 @@
 
 #include "ui/menu.h"
 
+#include "notifier.h"
+
+#include <string>
+#include <vector>
+
 
 namespace ui {
 
 class menu_file_manager : public menu
 {
 public:
-	std::string current_directory;
-	std::string current_file;
-	device_image_interface *selected_device;
-
 	static void force_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings);
 
 	menu_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings);
@@ -31,15 +32,17 @@ public:
 
 protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
 
 private:
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
-	void fill_image_line(device_image_interface *img, std::string &instance, std::string &filename);
+	void fill_image_line(device_image_interface &img, std::string &instance, std::string &filename);
 
 	std::string const m_warnings;
+	std::vector<util::notifier_subscription> m_notifiers;
+	device_image_interface *m_selected_device;
 };
 
 } // namespace ui

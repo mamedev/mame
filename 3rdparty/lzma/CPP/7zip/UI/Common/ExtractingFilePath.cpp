@@ -124,7 +124,7 @@ static const char * const g_ReservedNames[] =
 
 static bool IsSupportedName(const UString &name)
 {
-  for (unsigned i = 0; i < ARRAY_SIZE(g_ReservedNames); i++)
+  for (unsigned i = 0; i < Z7_ARRAY_SIZE(g_ReservedNames); i++)
   {
     const char *reservedName = g_ReservedNames[i];
     unsigned len = MyStringLen(reservedName);

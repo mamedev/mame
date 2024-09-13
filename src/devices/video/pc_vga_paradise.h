@@ -54,6 +54,18 @@ class wd90c00_vga_device : public pvga1a_vga_device
 public:
 	wd90c00_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// TODO: backport to original PVGA1A
+	// claims these as CNF(7)-CNF(4), which implies input sense read from GC register instead.
+	auto read_cnf15_callback() { return m_cnf15_read_cb.bind(); }
+	auto read_cnf14_callback() { return m_cnf14_read_cb.bind(); }
+	auto read_cnf13_callback() { return m_cnf13_read_cb.bind(); }
+	auto read_cnf12_callback() { return m_cnf12_read_cb.bind(); }
+
+	// NOTE: these are internal shadows, for the input sense.
+	CUSTOM_INPUT_MEMBER(egasw4_r);
+	CUSTOM_INPUT_MEMBER(egasw3_r);
+	CUSTOM_INPUT_MEMBER(egasw2_r);
+	CUSTOM_INPUT_MEMBER(egasw1_r);
 protected:
 	wd90c00_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -64,8 +76,12 @@ protected:
 
 	virtual bool get_interlace_mode() override { return m_interlace_mode; }
 
-	memory_view m_ext_crtc_view;
+	virtual ioport_constructor device_input_ports() const override;
+
 private:
+	virtual u8 crtc_data_r(offs_t offset) override;
+	virtual void crtc_data_w(offs_t offset, u8 data) override;
+
 	u8 ext_crtc_status_r(offs_t offset);
 	void ext_crtc_unlock_w(offs_t offset, u8 data);
 	u8 egasw_r(offs_t offset);
@@ -75,13 +91,19 @@ private:
 	u8 misc_control_1_r(offs_t offset);
 	void misc_control_1_w(offs_t offset, u8 data);
 
+	bool m_ext_crtc_read_unlock = false;
 	bool m_ext_crtc_write_unlock = false;
 	u8 m_pr10_scratch = 0;
-	u8 m_egasw = 0;
+	u8 m_pr11 = 0;
 	u8 m_interlace_start = 0;
 	u8 m_interlace_end = 0;
 	bool m_interlace_mode = 0;
 	u8 m_pr15 = 0;
+
+	devcb_read_line m_cnf15_read_cb;
+	devcb_read_line m_cnf14_read_cb;
+	devcb_read_line m_cnf13_read_cb;
+	devcb_read_line m_cnf12_read_cb;
 };
 
 class wd90c11a_vga_device : public wd90c00_vga_device

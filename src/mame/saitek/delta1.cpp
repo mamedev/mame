@@ -31,6 +31,7 @@ In the Delta-1 ROM is even some fragmented code remaining of the message:
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "machine/timer.h"
@@ -106,8 +107,6 @@ void delta1_state::machine_start()
 /*******************************************************************************
     I/O
 *******************************************************************************/
-
-// 3850 ports
 
 void delta1_state::update_display()
 {
@@ -253,4 +252,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, ccdelta1, 0,      0,      delta1,  delta1, delta1_state, empty_init, "SciSys / Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, ccdelta1, 0,      0,      delta1,  delta1, delta1_state, empty_init, "SciSys / Novag Industries", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

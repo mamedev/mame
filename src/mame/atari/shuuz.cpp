@@ -83,8 +83,6 @@ private:
 };
 
 
-// video
-
 /*************************************
  *
  *  Tilemap callbacks
@@ -165,6 +163,7 @@ uint32_t shuuz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			uint16_t const *const mo = &mobitmap.pix(y);
 			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
+			{
 				if (mo[x] != 0xffff)
 				{
 					/* verified from the GALs on the real PCB; equations follow
@@ -181,24 +180,28 @@ uint32_t shuuz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 					 *         +PFS7*(LBD7&LBD6)*!M3*!O13
 					 *
 					 */
-					int const o13 = ((pf[x] & 0xf0) == 0xf0);
 
-					// compute the MO/PF signal
-					int mopf = 0;
-					if ((!(pf[x] & 0x80) && ((mo[x] & 0xc0) != 0xc0) && ((mo[x] & 0x0e) != 0x00) && !o13) ||
-						((pf[x] & 0x80) && ((mo[x] & 0xc0) == 0xc0) && ((mo[x] & 0x0e) != 0x00) && !o13))
-						mopf = 1;
+					// This is based on observations, and not verified against schematics and GAL equations.
+					// TODO:
+					// * Locate schematics for (or trace out) video mixing section.
+					// * Obtain equations for video mixing GALs.
+					bool const o13 = (pf[x] & 0xf0) == 0xf0;
+					bool const mopf = ((pf[x] & 0x80) ? ((mo[x] & 0xc0) == 0xc0) : ((mo[x] & 0xc0) != 0xc0)) && !o13;
 
-					// if MO/PF is 1, we draw the MO
+					// if MO/PF is asserted, we draw the MO
 					if (mopf)
-						pf[x] = mo[x];
+					{
+						if (mo[x] & 0x0e)       // solid colors
+							pf[x] = mo[x];
+						else if (mo[x] & 0x01)  // shadows
+							pf[x] |= 0x200;
+					}
 				}
+			}
 		}
 	return 0;
 }
 
-
-// machine
 
 void shuuz_state::machine_start()
 {

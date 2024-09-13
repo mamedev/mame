@@ -5,15 +5,18 @@
 
 #pragma once
 
+#include "machine/8042kbdc.h"
 #include "machine/am9517a.h"
+#include "machine/mc146818.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/mc146818.h"
-#include "machine/8042kbdc.h"
+
 
 class pcat_base_state : public driver_device
 {
 public:
+	// cfr. https://github.com/mamedev/mame/issues/391
+	[[deprecated("Leaky abstraction of a southbridge, to be replaced with actual chipset emulation.")]]
 	pcat_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),

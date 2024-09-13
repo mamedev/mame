@@ -68,10 +68,6 @@ public:
 
 	virtual mac_options &options() override { return m_options; }
 
-protected:
-	virtual void build_slider_list() override;
-	virtual void update_slider_list() override;
-
 private:
 	virtual void osd_exit() override;
 

@@ -54,8 +54,6 @@ private:
 
 
 
-// video
-
 void albazc_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom(memregion("proms")->base());
@@ -229,7 +227,7 @@ void albazc_state::hanaroku(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

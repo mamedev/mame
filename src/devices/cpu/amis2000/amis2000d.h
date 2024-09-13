@@ -17,20 +17,11 @@ public:
 	amis2000_disassembler() = default;
 	virtual ~amis2000_disassembler() = default;
 
-	virtual u32 opcode_alignment() const override;
+	virtual u32 opcode_alignment() const override { return 1; }
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	enum e_mnemonics
-	{
-		mLAB = 0, mLAE, mLAI, mLBE, mLBEP, mLBF, mLBZ, mXAB, mXABU, mXAE,
-		mLAM, mXC, mXCI, mXCD, mSTM, mRSM,
-		mADD, mADCS, mADIS, mAND, mXOR, mCMA, mSTC, mRSC, mSF1, mRF1, mSF2, mRF2,
-		mSAM, mSZM, mSBE, mSZC, mSOS, mSZK, mSZI, mTF1, mTF2,
-		mPP, mJMP, mJMS, mRT, mRTS, mNOP, mHALT,
-		mINP, mOUT, mDISB, mDISN, mMVS, mPSH, mPSL, mEUR
-	};
-
+	enum e_mnemonics : unsigned;
 	static const char *const s_mnemonics[];
 	static const s8 s_bits[];
 	static const u32 s_flags[];

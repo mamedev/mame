@@ -275,6 +275,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
 #include "machine/pci-smbus.h"
@@ -283,8 +284,8 @@ Notes:
 #include "machine/i82371eb_ide.h"
 #include "machine/i82371eb_acpi.h"
 #include "machine/i82371eb_usb.h"
-#include "video/virge_pci.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/pci/virge_pci.h"
 //#include "bus/rs232/hlemouse.h"
 //#include "bus/rs232/null_modem.h"
 //#include "bus/rs232/rs232.h"
@@ -378,6 +379,8 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 	m_maincpu->smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
 
+	P87C552(config, "iocpu", 16'000'000).set_disable();
+
 	PCI_ROOT(config, "pci", 0);
 	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
 	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
@@ -419,7 +422,7 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 #endif
 	// "pci:0d.0" J4D2
 	// "pci:0e.0" J4D1
-	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
+	PCI_SLOT(config, "pci:1", pci_cards, 14, 0, 1, 2, 3, "virge");
 }
 
 // Graphite runs on incompatible HW, consider splitting if things starts to get hairy ...

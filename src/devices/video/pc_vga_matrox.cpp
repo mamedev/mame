@@ -6,7 +6,7 @@
 
 #define DEBUG_VRAM_VIEWER 0
 
-DEFINE_DEVICE_TYPE(MATROX_VGA,  matrox_vga_device,  "matrox_vga",  "Matrox MGA2064W VGA")
+DEFINE_DEVICE_TYPE(MATROX_VGA,  matrox_vga_device,  "matrox_vga",  "Matrox MGA2064W VGA i/f")
 
 matrox_vga_device::matrox_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, MATROX_VGA, tag, owner, clock)
@@ -42,6 +42,9 @@ void matrox_vga_device::device_start()
 	save_item(NAME(m_msc));
 	save_item(NAME(m_truecolor_ctrl));
 	save_item(NAME(m_multiplex_ctrl));
+
+	save_item(NAME(m_pll_par));
+	save_pointer(NAME(m_pll_data), 12);
 }
 
 void matrox_vga_device::device_reset()
@@ -360,6 +363,68 @@ void matrox_vga_device::cursor_data_w(offs_t offset, u8 data)
 	}
 }
 
+// map(0x2d, 0x2d) PPD pixel clock PLL
+// map(0x2e, 0x2e) MPD memory clock PLL
+// map(0x2f, 0x2f) LPD loop clock PLL
+u8 matrox_vga_device::pll_data_r(offs_t offset)
+{
+	assert(offset < 3);
+	const std::string source_pll[] = { "Pixel", "MCLK", "Loop" };
+	const std::string value_pll[] = { "N-value", "M-value", "P-value", "Status" };
+
+	const u8 par = (m_pll_par >> (offset * 2)) & 3;
+
+	logerror("PLL %s %s R\n", source_pll[offset], value_pll[par]);
+	u8 res = m_pll_data[(offset << 2) | par];
+	// each of these registers wants specific signatures, beos 4 cares
+	switch(par)
+	{
+		case 0: res |= 0xc0; break;
+		case 1: res &= 0x3f; break;
+		case 2:
+			switch(offset)
+			{
+				case 0:
+					res |= 0x30;
+					// TODO: why beos 4 also expects bit 6 to be on specifically for Pixel clock?
+					// TVP documentation claims to be PCLKEN
+					res |= 0x40;
+					break;
+				case 1:
+					res &= 0x83;
+					res |= 0x30;
+					break;
+				case 2:
+					res &= 0x8b;
+					res |= 0x70;
+					break;
+			}
+
+			break;
+		case 3:
+			// HACK: always lock for now
+			res = 0x40;
+			break;
+	}
+
+	return res;
+}
+
+void matrox_vga_device::pll_data_w(offs_t offset, u8 data)
+{
+	assert(offset < 3);
+	const std::string source_pll[] = { "Pixel", "MCLK", "Loop" };
+	const std::string value_pll[] = { "N-value", "M-value", "P-value", "<Status?>" };
+
+	const u8 par = (m_pll_par >> (offset * 2)) & 3;
+
+	logerror("PLL %s %s %02x W\n", source_pll[offset], value_pll[par], data);
+	// status is read-only
+	if (par == 3)
+		return;
+	m_pll_data[(offset << 2) | par] = data;
+}
+
 void matrox_vga_device::ramdac_indexed_map(address_map &map)
 {
 	// silicon revision
@@ -397,9 +462,19 @@ void matrox_vga_device::ramdac_indexed_map(address_map &map)
 	);
 //  map(0x2a, 0x2a) IOC GPIO control (bits 4-0, 1 = data bit as output, 0 = data bit as input)
 //  map(0x2b, 0x2b) GPIO data (bits 4-0)
-//  map(0x2d, 0x2d) pixel clock PLL
-//  map(0x2e, 0x2e) memory clock PLL
-//  map(0x2f, 0x2f) loop clock PLL
+	// PLL Address Register
+	// bits 5-4 Loop clock PLL, 3-2 MCLK PLL, 1-0 Pixel clock PLL
+	map(0x2c, 0x2c).lrw8(
+		NAME([this] (offs_t offset) {
+			logerror("$2c PLL PAR R\n");
+			return m_pll_par;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			logerror("$2c PLL PAR W %02x\n", data);
+			m_pll_par = data;
+		})
+	);
+	map(0x2d, 0x2f).rw(FUNC(matrox_vga_device::pll_data_r), FUNC(matrox_vga_device::pll_data_w));
 //  map(0x30, 0x31) color key overlay
 //  map(0x32, 0x37) color key r/g/b
 //  map(0x38, 0x38) CKC color key control
@@ -598,13 +673,15 @@ uint16_t matrox_vga_device::offset()
 	return svga_device::offset();
 }
 
-uint32_t matrox_vga_device::start_addr()
+uint32_t matrox_vga_device::latch_start_addr()
 {
-	// TODO: fails VBEtest scrolling tests
-//  if (m_mgamode)
-//      return (vga.crtc.start_addr << 4);
+	// TODO: fails SDD scrolling tests
+	// Looks like it can latch per byte in SVGA modes, which contradicts what's in pc_vga
+	// drawing functions.
+	//if (m_mgamode)
+	//  return (vga.crtc.start_addr << 4);
 
-	return svga_device::start_addr();
+	return vga.crtc.start_addr_latch;
 }
 
 u16 matrox_vga_device::line_compare_mask()
@@ -656,10 +733,10 @@ uint32_t matrox_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &b
 	const int m_test_y = cliprect.max_y;
 
 	if(machine().input().code_pressed(JOYCODE_X_RIGHT_SWITCH))
-		m_test_x += 1 << (machine().input().code_pressed(JOYCODE_BUTTON2) ? 4 : 0);;
+		m_test_x += 1 << (machine().input().code_pressed(JOYCODE_BUTTON2) ? 4 : 0);
 
 	if(machine().input().code_pressed(JOYCODE_X_LEFT_SWITCH))
-		m_test_x -= 1 << (machine().input().code_pressed(JOYCODE_BUTTON2) ? 4 : 0);;
+		m_test_x -= 1 << (machine().input().code_pressed(JOYCODE_BUTTON2) ? 4 : 0);
 
 	//if(machine().input().code_pressed(JOYCODE_Y_DOWN_SWITCH))
 	//  m_test_y++;

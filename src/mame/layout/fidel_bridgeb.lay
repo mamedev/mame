@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -8,45 +9,45 @@ license:CC0-1.0
 
 	<element name="beige"><rect><color red="0.8" green="0.75" blue="0.6" /></rect></element>
 
-	<element name="text_b11"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="RE"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b11"><text string="RE"><color red="0.5" green="0.2" blue="0.1" /></text></element>
 	<element name="text_b12"><rect><color alpha="0" /></rect></element>
-	<element name="text_b13"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="CL"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b14"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="EN"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b13"><text string="CL"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b14"><text string="EN"><color red="0.5" green="0.2" blue="0.1" /></text></element>
 	<element name="text_b15"><rect><color alpha="0" /></rect></element>
-	<element name="text_b16"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="J"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b17"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="Q"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b18"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="K"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b19"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="A"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b16"><text string="J"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b17"><text string="Q"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b18"><text string="K"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b19"><text string="A"><color red="0.5" green="0.2" blue="0.1" /></text></element>
 
-	<element name="text_b21"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="BR"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b22"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="PR"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b23"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="DB"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b24"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="HD"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b21"><text string="BR"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b22"><text string="PR"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b23"><text string="DB"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b24"><text string="HD"><color red="0.5" green="0.2" blue="0.1" /></text></element>
 	<element name="text_b25"><rect><color alpha="0" /></rect></element>
-	<element name="text_b26"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="7"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b27"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="8"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b28"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="9"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b29"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="10"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b26"><text string="7"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b27"><text string="8"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b28"><text string="9"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b29"><text string="10"><color red="0.5" green="0.2" blue="0.1" /></text></element>
 
-	<element name="text_b31"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="DL"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b32"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="CV"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b33"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="VL"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b34"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="IN"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b31"><text string="DL"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b32"><text string="CV"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b33"><text string="VL"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b34"><text string="IN"><color red="0.5" green="0.2" blue="0.1" /></text></element>
 	<element name="text_b35"><rect><color alpha="0" /></rect></element>
-	<element name="text_b36"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="3"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b37"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="4"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b38"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="5"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b39"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="6"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b36"><text string="3"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b37"><text string="4"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b38"><text string="5"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b39"><text string="6"><color red="0.5" green="0.2" blue="0.1" /></text></element>
 
-	<element name="text_b41"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="&#x2663;"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b42"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="&#x2666;"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b43"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="&#x2665;"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b44"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="&#x2660;"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b41"><text string="&#x2663;"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b42"><text string="&#x2666;"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b43"><text string="&#x2665;"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b44"><text string="&#x2660;"><color red="0.5" green="0.2" blue="0.1" /></text></element>
 	<element name="text_b45"><rect><color alpha="0" /></rect></element>
-	<element name="text_b46"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="NT"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b47"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="P"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b48"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="1"><color red="0.5" green="0.2" blue="0.1" /></text></element>
-	<element name="text_b49"><rect><color red="0.8" green="0.75" blue="0.6" /></rect><text string="2"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b46"><text string="NT"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b47"><text string="P"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b48"><text string="1"><color red="0.5" green="0.2" blue="0.1" /></text></element>
+	<element name="text_b49"><text string="2"><color red="0.5" green="0.2" blue="0.1" /></text></element>
 
 	<element name="triangle">
 		<image><data><![CDATA[

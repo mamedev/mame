@@ -126,25 +126,25 @@ license:CC0-1.0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<element name="lamp0" ref="hold1">
+		<element name="lamp0" ref="hold1" inputtag="IN0" inputmask="0x02">
 			<bounds x="0" y="3.13" width="0.55" height="0.24" />
 		</element>
-		<element name="lamp1" ref="hold2">
+		<element name="lamp1" ref="hold2" inputtag="IN1" inputmask="0x01">
 			<bounds x="0.65" y="3.13" width="0.55" height="0.24" />
 		</element>
-		<element name="lamp2" ref="hold3">
+		<element name="lamp2" ref="hold3" inputtag="IN1" inputmask="0x02">
 			<bounds x="1.3" y="3.13" width="0.55" height="0.24" />
 		</element>
-		<element name="lamp3" ref="hold4">
+		<element name="lamp3" ref="hold4" inputtag="IN0" inputmask="0x80">
 			<bounds x="1.95" y="3.13" width="0.55" height="0.24" />
 		</element>
-		<element name="lamp4" ref="hold5">
+		<element name="lamp4" ref="hold5" inputtag="IN0" inputmask="0x10">
 			<bounds x="2.6" y="3.13" width="0.55" height="0.24" />
 		</element>
-		<element name="lamp5" ref="cancel">
+		<element name="lamp5" ref="cancel" inputtag="IN0" inputmask="0x04">
 			<bounds x="3.45" y="3.02" width="0.55" height="0.24" />
 		</element>
-		<element name="lamp6" ref="deal">
+		<element name="lamp6" ref="deal" inputtag="IN0" inputmask="0x08">
 			<bounds x="3.45" y="3.28" width="0.55" height="0.24" />
 		</element>
 	</view>

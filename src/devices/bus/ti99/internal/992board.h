@@ -174,10 +174,8 @@ public:
 	virtual void write(offs_t offset, uint8_t data) { }
 };
 
-class ti992_expport_device : public device_t, public device_slot_interface
+class ti992_expport_device : public device_t, public device_single_card_slot_interface<ti992_expport_attached_device>
 {
-	friend class expport_attached_device;
-
 public:
 	template <typename U>
 	ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)

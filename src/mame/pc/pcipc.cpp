@@ -20,6 +20,7 @@
 #include "emu.h"
 
 #include "bus/isa/isa_cards.h"
+#include "bus/pci/pci_slot.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/rs232.h"
@@ -38,10 +39,12 @@
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
 #include "machine/w83977tf.h"
-#include "video/clgd546x_laguna.h"
-#include "video/mga2064w.h"
-#include "video/riva128.h"
-#include "video/virge_pci.h"
+
+#include "softlist_dev.h"
+
+// enable ISA verbose messaging at I/O $80
+// NOTE: xubuntu 6.10 will ping the port a lot once it gets to GNOME.
+#define VERBOSE_ISA_DEBUG 0
 
 namespace {
 
@@ -58,12 +61,15 @@ public:
 	static const boot_state_info boot_state_infos_award[];
 
 	void pcipc(machine_config &config);
+	void pcipcs7(machine_config &config);
 	void pcipctx(machine_config &config);
 	void pcinv3(machine_config &config);
-	void pcimga(machine_config &config);
 	void pciagp(machine_config &config);
 
 	pcipc_state(const machine_config &mconfig, device_type type, const char *tag);
+
+protected:
+	void x86_softlists(machine_config &config);
 
 private:
 	void pcipc_map(address_map &map);
@@ -456,6 +462,7 @@ const pcipc_state::boot_state_info pcipc_state::boot_state_infos_award[] = {
 
 void pcipc_state::boot_state_phoenix_w(uint8_t data)
 {
+#if VERBOSE_ISA_DEBUG
 	const char *desc = "";
 	for(int i=0; boot_state_infos_phoenix[i].message; i++)
 		if(boot_state_infos_phoenix[i].val == data) {
@@ -463,11 +470,12 @@ void pcipc_state::boot_state_phoenix_w(uint8_t data)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-
+#endif
 }
 
 void pcipc_state::boot_state_phoenix_ver40_rev6_w(uint8_t data)
 {
+#if VERBOSE_ISA_DEBUG
 	const char *desc = "";
 	for(int i=0; boot_state_infos_phoenix_ver40_rev6[i].message; i++)
 		if(boot_state_infos_phoenix_ver40_rev6[i].val == data) {
@@ -475,12 +483,13 @@ void pcipc_state::boot_state_phoenix_ver40_rev6_w(uint8_t data)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-//  printf("[%02X]",data);
+#endif
 }
 
 
 void pcipc_state::boot_state_award_w(uint8_t data)
 {
+#if VERBOSE_ISA_DEBUG
 	const char *desc = "";
 	for(int i=0; boot_state_infos_award[i].message; i++)
 		if(boot_state_infos_award[i].val == data) {
@@ -488,7 +497,7 @@ void pcipc_state::boot_state_award_w(uint8_t data)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-
+#endif
 }
 
 static void isa_internal_devices(device_slot_interface &device)
@@ -552,6 +561,16 @@ void pcipc_state::pcipc_map_io(address_map &map)
 	map.unmap_value_high();
 }
 
+void pcipc_state::x86_softlists(machine_config &config)
+{
+	/* software lists */
+	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
+	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
+	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
+}
+
 void pcipc_state::pcipc(machine_config &config)
 {
 	pentium_device &maincpu(PENTIUM(config, "maincpu", 90000000));
@@ -570,8 +589,11 @@ void pcipc_state::pcipc(machine_config &config)
 	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", 0, "maincpu"));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
-//  MGA2064W(config, "pci:12.0", 0);
-	VIRGE_PCI(config, "pci:12.0", 0);   // use VIRGEDX_PCI for its VESA 2.0 BIOS
+
+	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr);
+	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "virge");
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
@@ -580,7 +602,7 @@ void pcipc_state::pcipc(machine_config &config)
 	ISA16_SLOT(config, "isa4", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa5", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
 	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));
 	serport0.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd1_w));
 	serport0.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr1_w));
@@ -593,6 +615,20 @@ void pcipc_state::pcipc(machine_config &config)
 	serport1.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr2_w));
 	serport1.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri2_w));
 	serport1.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts2_w));
+
+	//  SW1000XG(config, "pci:11.0");
+
+	x86_softlists(config);
+}
+
+void pcipc_state::pcipcs7(machine_config &config)
+{
+	pcipc_state::pcipc(config);
+	pentium_mmx_device &maincpu(PENTIUM_MMX(config.replace(), "maincpu", 266'000'000)); // socket 7 CPU
+	maincpu.set_addrmap(AS_PROGRAM, &pcipc_state::pcipc_map);
+	maincpu.set_addrmap(AS_IO, &pcipc_state::pcipc_map_io);
+	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	maincpu.smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
 }
 
 void pcipc_state::pcipctx(machine_config &config)
@@ -606,25 +642,18 @@ void pcipc_state::pcipctx(machine_config &config)
 	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, "maincpu"));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
 //  IDE_PCI(config, "pci:07.1", 0, 0x80867010, 0x03, 0x00000000);
-	// TODO: eventually change this to something else
-	MGA2064W(config, "pci:12.0", 0);
-}
 
-void pcipc_state::pcinv3(machine_config &config)
-{
-	pcipc_state::pcipc(config);
-	RIVA128(config.replace(), "pci:12.0", 0);
-}
+	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr);
+	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "mga2064w");
 
-void pcipc_state::pcimga(machine_config &config)
-{
-	pcipc_state::pcipc(config);
-	MGA2064W(config.replace(), "pci:12.0", 0);
+	x86_softlists(config);
 }
 
 void pcipc_state::pciagp(machine_config &config)
 {
-	// TODO: starts at 233'000'000
+	// TODO: starts at 233'000'000, consider adding FSB & AGP clocks here
 	pentium2_device &maincpu(PENTIUM2(config, "maincpu", 90'000'000));
 	maincpu.set_addrmap(AS_PROGRAM, &pcipc_state::pcipc_map);
 	maincpu.set_addrmap(AS_IO, &pcipc_state::pcipc_map_io);
@@ -633,8 +662,7 @@ void pcipc_state::pciagp(machine_config &config)
 
 	PCI_ROOT(config, "pci", 0);
 	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
-	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
-	//I82443BX_AGP   (config, "pci:01.0:00.0");
+	I82443BX_BRIDGE(config, "pci:01.0", 0 );
 
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu"));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
@@ -655,7 +683,7 @@ void pcipc_state::pciagp(machine_config &config)
 	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 #if 0
-	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
 	serport0.rxd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::rxd1_w));
 	serport0.dcd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndcd1_w));
 	serport0.dsr_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndsr1_w));
@@ -670,8 +698,15 @@ void pcipc_state::pciagp(machine_config &config)
 	serport1.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts2_w));
 #endif
 
-	// TODO: temp link, to be moved to quakeat.cpp
-	CIRRUS_GD5465_LAGUNA3D(config, "pci:01.0:00.0", 0);
+	// FIXME: int mapping is unchecked for all slots
+	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "riva128");
+
+	PCI_SLOT(config, "pci:1", pci_cards, 15, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr);
+	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, nullptr);
+
+	x86_softlists(config);
 }
 
 ROM_START(pcipc)
@@ -682,6 +717,7 @@ ROM_START(pcipc)
 	ROMX_LOAD("m55-04s.rom", 0x20000, 0x20000, CRC(34a7422e) SHA1(68753fe373c97844beff83ea75c634c77cfedb8f), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "crisis", "Version 07/01/98, for flash recovery")
 	ROMX_LOAD("crisis.rom", 0x00000, 0x40000, CRC(38a1458a) SHA1(8881ac336392cca79a772b4168f63efc31f953dd), ROM_BIOS(2) )
+	// FIXME: this is incompatible, it's a Gigabyte GA-586HX with W83877F Super I/O
 	ROM_SYSTEM_BIOS(3, "5hx29", "5hx29")
 	ROMX_LOAD("5hx29.bin",   0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68), ROM_BIOS(3) )
 //  ROM_REGION(0x8000,"ibm_vga", 0)
@@ -697,24 +733,14 @@ ROM_START(pcipctx)
 	ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )
 ROM_END
 
-ROM_START(pcinv3)
-	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
-	ROM_SYSTEM_BIOS(0, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
-	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116b2b0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(0))
-ROM_END
-
-ROM_START(pcimga)
-	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
-	ROM_SYSTEM_BIOS(0, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
-	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116b2b0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(0))
-ROM_END
-
 ROM_START(pciagp)
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
 	// a.k.a. the BIOS present in savquest.cpp
 	ROM_SYSTEM_BIOS(0, "dfi_p2xbl", "Octek Rhino BX-ATX")
 	ROMX_LOAD( "p2xbl_award_451pg.bin", 0x00000, 0x040000, CRC(37d0030e) SHA1(c6773d0e02325116f95c497b9953f59a9ac81317), ROM_BIOS(0) )
 ROM_END
+
+#define rom_pcipcs7    rom_pcipc
 
 static INPUT_PORTS_START(pcipc)
 INPUT_PORTS_END
@@ -723,7 +749,6 @@ INPUT_PORTS_END
 
 
 COMP(1998, pcipc,    0,     0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND )
-COMP(1998, pcinv3,   pcipc, 0, pcinv3,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX with nVidia Riva 128)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Windows 98 doesn't recognize video card, may need AGP BIOS instead
-COMP(1998, pcimga,   pcipc, 0, pcimga,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX with Matrox Millennium)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // cfr. MGA2064W emulation
+COMP(1998, pcipcs7,  pcipc, 0, pcipcs7, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX, Socket 7 CPU)", MACHINE_NO_SOUND ) // alternative of above, for running already installed OSes at their nominal speed + fiddling with MMX
 COMP(1998, pcipctx,  0,     0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // unemulated super I/O
-COMP(1999, pciagp,   0,     0, pciagp,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI/AGP PC (440BX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // errors out with ISA state 0x05 (keyboard), does stuff if bypassed but eventually PnP breaks OS booting
+COMP(1999, pciagp,   0,     0, pciagp,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI/AGP PC (440BX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // errors out with ISA state $05 (keyboard, blame 8042kbdc.cpp) bp e140c,1,{eax&=~1;g}) does stuff if bypassed but eventually PnP breaks OS booting

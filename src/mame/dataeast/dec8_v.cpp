@@ -226,7 +226,7 @@ uint32_t oscar_state::screen_update_cobracom(screen_device &screen, bitmap_ind16
 
 	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 1);
 	m_tilegen[1]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 2);
-	m_spritegen_mxc->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x800/2);
+	m_spritegen_mxc->draw_sprites(screen, bitmap, cliprect, m_buffered_spriteram16.get(), 0x800/2);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -261,7 +261,7 @@ VIDEO_START_MEMBER(oscar_state,cobracom)
 uint32_t lastmisn_state::screen_update_ghostb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0);
-	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x400);
+	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_buffered_spriteram16.get(), 0x400);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -307,7 +307,7 @@ uint32_t oscar_state::screen_update_oscar(screen_device &screen, bitmap_ind16 &b
 	m_fix_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_LAYER1, 0);
-	m_spritegen_mxc->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x800/2);
+	m_spritegen_mxc->draw_sprites(screen, bitmap, cliprect, m_buffered_spriteram16.get(), 0x800/2);
 	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_LAYER0, 0);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -345,7 +345,7 @@ uint32_t lastmisn_state::screen_update_lastmisn(screen_device &screen, bitmap_in
 	m_bg_tilemap->set_scrolly(0, ((m_scroll[2] << 8)+ m_scroll[3]));
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x400);
+	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_buffered_spriteram16.get(), 0x400);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -358,7 +358,7 @@ uint32_t lastmisn_state::screen_update_shackled(screen_device &screen, bitmap_in
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
-	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x400);
+	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_buffered_spriteram16.get(), 0x400);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -381,7 +381,7 @@ TILE_GET_INFO_MEMBER(lastmisn_state::get_lastmisn_tile_info)
 	else
 		tileinfo.category = 0;
 
-	tileinfo.set(2,
+	tileinfo.set(1,
 			tile & 0xfff,
 			color,
 			0);
@@ -492,7 +492,7 @@ uint32_t gondo_state::screen_update_gondo(screen_device &screen, bitmap_ind16 &b
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 1);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 2);
-	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x400);
+	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_buffered_spriteram16.get(), 0x400);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -503,7 +503,7 @@ uint32_t lastmisn_state::screen_update_garyoret(screen_device &screen, bitmap_in
 	m_bg_tilemap->set_scrolly(0, ((m_scroll[2] << 8) + m_scroll[3]));
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x400);
+	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_buffered_spriteram16.get(), 0x400);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -532,7 +532,7 @@ TILE_GET_INFO_MEMBER(lastmisn_state::get_gondo_tile_info)
 	else
 		tileinfo.category = 0;
 
-	tileinfo.set(2,
+	tileinfo.set(1,
 			tile&0xfff,
 			color,
 			0);

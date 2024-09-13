@@ -187,13 +187,13 @@ bool generic_spi_flash_device::nvram_read(util::read_stream &file)
 		return false;
 	}
 
-	size_t actual;
-	return !file.read(m_spiptr, m_length, actual) && actual == m_length;
+	auto const [err, actual] = util::read(file, m_spiptr, m_length);
+	return !err && (actual == m_length);
 }
 
 bool generic_spi_flash_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_spiptr, m_length, actual) && actual == m_length;
+	auto const [err, actual] = util::write(file, m_spiptr, m_length);
+	return !err;
 }
 

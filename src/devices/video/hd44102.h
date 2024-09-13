@@ -31,7 +31,7 @@ public:
 	void write(offs_t offset, u8 data);
 
 	const u8 *render();
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect); // optional
 
 protected:
 	// device-level overrides

@@ -1159,15 +1159,17 @@ static const gfx_layout tilelayout =
 	16*16*4
 };
 
-static GFXDECODE_START( gfx_legionna ) // Background and Midground has shared ROM
+static GFXDECODE_START( gfx_legionna_spr )
 	GFXDECODE_ENTRY( "sprite", 0, tilelayout, 64*16, 64 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_legionna ) // Background and Midground has shared ROM
 	GFXDECODE_ENTRY( "char",   0, charlayout, 48*16, 16 )
 	GFXDECODE_ENTRY( "back",   0, tilelayout,     0, 32 )
 	GFXDECODE_ENTRY( "fore",   0, tilelayout, 32*16, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_heatbrl ) // Midground has independent ROM
-	GFXDECODE_ENTRY( "sprite", 0, tilelayout, 64*16, 64 )
 	GFXDECODE_ENTRY( "char",   0, charlayout, 48*16, 16 )
 	GFXDECODE_ENTRY( "back",   0, tilelayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "fore",   0, tilelayout, 32*16, 16 )
@@ -1208,6 +1210,9 @@ void legionna_state::legionna(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_legionna);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
+
+	SEI0211(config, m_spritegen, XTAL(12'000'000), m_palette, gfx_legionna_spr);
+	m_spritegen->set_pri_callback(FUNC(legionna_state::pri_cb));
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,legionna)
 
@@ -1261,6 +1266,9 @@ void legionna_state::heatbrl(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_heatbrl);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
+
+	SEI0211(config, m_spritegen, XTAL(12'000'000), m_palette, gfx_legionna_spr);
+	m_spritegen->set_pri_callback(FUNC(legionna_state::pri_cb));
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,heatbrl)
 
@@ -1318,6 +1326,10 @@ void legionna_state::godzilla(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_legionna);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
+	SEI0211(config, m_spritegen, XTAL(14'318'181), m_palette, gfx_legionna_spr);
+	m_spritegen->set_pri_callback(FUNC(legionna_state::pri_cb));
+	m_spritegen->set_gfxbank_callback(FUNC(legionna_state::godzilla_tile_cb));
+
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,godzilla)
 
 	/* sound hardware */
@@ -1372,6 +1384,10 @@ void legionna_state::denjinmk(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_heatbrl);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
+	SEI0211(config, m_spritegen, XTAL(14'318'181), m_palette, gfx_legionna_spr);
+	m_spritegen->set_pri_callback(FUNC(legionna_state::pri_cb));
+	m_spritegen->set_gfxbank_callback(FUNC(legionna_state::godzilla_tile_cb));
+
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,denjinmk)
 
 	/* sound hardware */
@@ -1425,6 +1441,10 @@ void legionna_state::grainbow(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_legionna);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
+
+	SEI0211(config, m_spritegen, XTAL(14'318'181), m_palette, gfx_legionna_spr);
+	m_spritegen->set_pri_callback(FUNC(legionna_state::grainbow_pri_cb));
+	m_spritegen->set_offset(16, 16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,grainbow)
 
@@ -1483,6 +1503,9 @@ void legionna_state::cupsoc(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_legionna);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
+
+	SEI0211(config, m_spritegen, XTAL(14'318'181), m_palette, gfx_legionna_spr);
+	m_spritegen->set_pri_callback(FUNC(legionna_state::pri_cb));
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,cupsoc)
 

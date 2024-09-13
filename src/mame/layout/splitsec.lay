@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -26,8 +27,7 @@ license:CC0-1.0
 			<bounds left="0" right="18" top="0" bottom="28" />
 		</element>
 
-	<!-- maze of lamps -->
-
+		<!-- maze of lamps -->
 		<element name="0.0" ref="lamp_rect"><bounds x="2" y="1" width="4" height="1" /></element>
 		<element name="0.2" ref="lamp_rect"><bounds x="7" y="1" width="4" height="1" /></element>
 		<element name="0.4" ref="lamp_rect"><bounds x="12" y="1" width="4" height="1" /></element>

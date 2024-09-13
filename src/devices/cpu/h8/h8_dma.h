@@ -133,7 +133,6 @@ protected:
 
 
 
-
 class h8gen_dma_channel_device : public device_t {
 public:
 	enum {

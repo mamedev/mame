@@ -602,7 +602,7 @@ static INPUT_PORTS_START( pc200 ) // TODO: PPC512/PPC640 DSW differ, see readme 
 	PORT_DIPNAME( 0x07, 0x07, "Name/Language")
 	PORT_DIPSETTING(    0x00, "English/less checks" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Italian ) ) //prego attendere
-	PORT_DIPSETTING(    0x02, "V.g. v\xC3\xA4nta" )
+	PORT_DIPSETTING(    0x02, u8"V.g. vänta" )
 	PORT_DIPSETTING(    0x03, "Vent et cjeblik" ) // seldom c
 	PORT_DIPSETTING(    0x04, DEF_STR( Spanish ) ) //Por favor
 	PORT_DIPSETTING(    0x05, DEF_STR( French ) ) //patientez

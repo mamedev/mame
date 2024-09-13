@@ -112,6 +112,33 @@ u32 tsconf_state::get_vpage_offset()
 	return PAGE4K(m_regs[V_PAGE] & ((VM == VM_16C) ? 0xf8 : 0xf0));
 }
 
+u32 tsconf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	rectangle scr = get_screen_area();
+	rectangle vis = screen.visible_area();
+	if (vis != scr)
+	{
+		rectangle bsides[4] = {
+			rectangle(vis.left(),      vis.right(),    vis.top(),        scr.top() - 1),
+			rectangle(vis.left(),      scr.left() - 1, scr.top(),        scr.bottom()),
+			rectangle(scr.right() + 1, vis.right(),    scr.top(),        scr.bottom()),
+			rectangle(vis.left(),      vis.right(),    scr.bottom() + 1, vis.bottom())
+		};
+		for (auto i = 0; i < 4; i++)
+		{
+			rectangle border = bsides[i] & cliprect;
+			if (!border.empty())
+				bitmap.fill(m_palette->pen_color(get_border_color()), border);
+		}
+	}
+
+	scr &= cliprect;
+	if (!scr.empty())
+		tsconf_update_screen(screen, bitmap, scr);
+
+	return 0;
+}
+
 /*
 Layered as:
  + Border - already updated with screen_update_spectrum()
@@ -122,44 +149,54 @@ Layered as:
  + Tiles 1
  + Sprites 2
 */
-void tsconf_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tsconf_state::tsconf_update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (!BIT(m_regs[V_CONFIG], 5))
 	{
 		if (VM == VM_ZX)
-			tsconf_UpdateZxScreenBitmap(screen, bitmap, cliprect);
+		{
+			tsconf_draw_zx(screen, bitmap, cliprect);
+		}
 		else if (VM == VM_TXT)
-			tsconf_UpdateTxtBitmap(bitmap, cliprect);
+		{
+			tsconf_draw_txt(bitmap, cliprect);
+		}
 		else
-			tsconf_UpdateGfxBitmap(bitmap, cliprect);
+		{
+			bitmap.fill(m_palette->pen_color(get_border_color()), cliprect);
+			tsconf_draw_gfx(bitmap, cliprect);
+		}
 	}
 	else
 	{
-		bitmap.fill(get_border_color(), cliprect);
+		bitmap.fill(m_palette->pen_color(get_border_color()), cliprect);
 	}
 
 	if (!BIT(m_regs[V_CONFIG], 4))
 	{
 		screen.priority().fill(0, cliprect);
 		if (BIT(m_regs[TS_CONFIG], 5))
-			m_ts_tilemap[TM_TILES0]->draw(screen, bitmap, cliprect,
-										  BIT(m_regs[TS_CONFIG], 2) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 1);
+		{
+			m_ts_tilemap[TM_TILES0]->draw(
+					screen, bitmap, cliprect,
+					BIT(m_regs[TS_CONFIG], 2) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 1, 0);
+		}
 
 		if (BIT(m_regs[TS_CONFIG], 6))
-			m_ts_tilemap[TM_TILES1]->draw(screen, bitmap, cliprect,
-										  BIT(m_regs[TS_CONFIG], 3) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 2);
+		{
+			m_ts_tilemap[TM_TILES1]->draw(
+					screen, bitmap, cliprect,
+					BIT(m_regs[TS_CONFIG], 3) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 2, 0);
+		}
 
 		if (BIT(m_regs[TS_CONFIG], 7))
 		{
-			// draw_sprites(screen, bitmap, cliprect);
-			//  Avoid frequent expensive updates for now. Currently once per frame
-			if (cliprect.bottom() == get_screen_area().bottom() && cliprect.right() == get_screen_area().right())
-				draw_sprites(screen, bitmap, get_screen_area());
+			draw_sprites(screen, bitmap, get_screen_area());
 		}
 	}
 }
 
-void tsconf_state::tsconf_UpdateZxScreenBitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tsconf_state::tsconf_draw_zx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	u8 pal_offset = m_regs[PAL_SEL] << 4;
 	u8 *screen_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]);
@@ -172,7 +209,7 @@ void tsconf_state::tsconf_UpdateZxScreenBitmap(screen_device &screen, bitmap_ind
 		u16 y = vpos - get_screen_area().top();
 		u8 *scr = &screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | (x >> 3)];
 		u8 *attr = &attrs_location[((y & 0xf8) << 2) | (x >> 3)];
-		u16 *pix = &(bitmap.pix(vpos, hpos));
+		u32 *pix = &(bitmap.pix(vpos, hpos));
 		while (hpos <= cliprect.right())
 		{
 			u16 ink = pal_offset | ((*attr >> 3) & 0x08) | (*attr & 0x07);
@@ -180,14 +217,14 @@ void tsconf_state::tsconf_UpdateZxScreenBitmap(screen_device &screen, bitmap_ind
 			u8 pix8 = (invert_attrs && (*attr & 0x80)) ? ~*scr : *scr;
 
 			for (u8 b = 0x80 >> (x & 0x07); b != 0 && hpos <= cliprect.right(); b >>= 1, x++, hpos++)
-				*pix++ = (pix8 & b) ? ink : pap;
+				*pix++ = m_palette->pen_color((pix8 & b) ? ink : pap);
 			scr++;
 			attr++;
 		}
 	}
 }
 
-void tsconf_state::tsconf_UpdateTxtBitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tsconf_state::tsconf_draw_txt(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	u8 *font_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE] ^ 0x01);
 	u8 pal_offset = m_regs[PAL_SEL] << 4;
@@ -200,34 +237,35 @@ void tsconf_state::tsconf_UpdateTxtBitmap(bitmap_ind16 &bitmap, const rectangle 
 
 		// TODO? u16 x_offset = OFFS_512(G_X_OFFS_L);
 		u8 *text_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + (y_offset / 8 * 256 + x / 8);
-		u16 *pix = &(bitmap.pix(vpos, hpos));
+		u32 *pix = &(bitmap.pix(vpos, hpos));
 		while (hpos <= cliprect.right())
 		{
 			u8 font_color = *(text_location + 128) & 0x0f;
 			u8 bg_color = (*(text_location + 128) & 0xf0) >> 4;
 			u8 char_x = *(font_location + (*text_location * 8) + (y_offset % 8));
 			for (u8 b = 0x80 >> (x & 0x07); b != 0 && hpos <= cliprect.right(); b >>= 1, x++, hpos++)
-				*pix++ = pal_offset | ((char_x & b) ? font_color : bg_color);
+				*pix++ = m_palette->pen_color(pal_offset | ((char_x & b) ? font_color : bg_color));
 			text_location++;
 		}
 	}
 }
 
-void tsconf_state::tsconf_UpdateGfxBitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tsconf_state::tsconf_draw_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	u8 pal_offset = m_regs[PAL_SEL] << 4;
+	const rgb_t transparent = m_palette->pen_color(0);
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
 		u16 y_offset = (OFFS_512(G_Y_OFFS_L) + m_gfx_y_frame_offset + vpos) & 0x1ff;
 		u16 x_offset = (OFFS_512(G_X_OFFS_L) + (cliprect.left() - get_screen_area().left())) & 0x1ff;
 		u8 *video_location = m_ram->pointer() + get_vpage_offset() + ((y_offset * 512 + x_offset) >> (2 - VM));
-		u16 *bm = &(bitmap.pix(vpos, cliprect.left()));
+		u32 *bm = &(bitmap.pix(vpos, cliprect.left()));
 		s16 width = cliprect.width();
 		if (VM == VM_16C)
 		{
 			if (x_offset & 1)
 			{
-				*bm++ = pal_offset | (*video_location++ & 0x0f);
+				*bm++ = m_palette->pen_color(pal_offset | (*video_location++ & 0x0f));
 				x_offset++;
 				width--;
 			}
@@ -236,9 +274,21 @@ void tsconf_state::tsconf_UpdateGfxBitmap(bitmap_ind16 &bitmap, const rectangle 
 				if (x_offset == 512)
 					video_location -= 256;
 				u8 pix = *video_location++;
-				*bm++ = pal_offset | (pix >> 4);
+				rgb_t pen = m_palette->pen_color(pal_offset | (pix >> 4));
+				if (pen != transparent)
+				{
+					*bm = pen;
+				}
+				bm++;
 				if (width != 1)
-					*bm++ = pal_offset | (pix & 0x0f);
+				{
+					pen = m_palette->pen_color(pal_offset | (pix & 0x0f));
+					if (pen != transparent)
+					{
+						*bm = pen;
+					}
+					bm++;
+				}
 			}
 		}
 		else // VM_256C
@@ -247,7 +297,12 @@ void tsconf_state::tsconf_UpdateGfxBitmap(bitmap_ind16 &bitmap, const rectangle 
 			{
 				if (x_offset == 512)
 					video_location -= 512;
-				*bm++ = *video_location++;
+				rgb_t pen = m_palette->pen_color(*video_location++);
+				if (pen != transparent)
+				{
+					*bm = pen;
+				}
+				bm++;
 			}
 		}
 	}
@@ -262,62 +317,71 @@ SFILE   Reg.16  7       6       5       4       3       2       1       0
 4       R2L     TNUM[7:0]
 5       R2H     SPAL[7:4]                       TNUM[11:8]
 */
-void tsconf_state::draw_sprites(screen_device &screen_d, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tsconf_state::draw_sprites(screen_device &screen_d, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	rectangle screen = get_screen_area();
-
-	u8 layer = 0;
-	u8 *sinfo = m_sfile->pointer() + 1;
-	u8 sid = 1;
-	// Higher Sprite draws on top. Prepare to iterate backwards.
-	for (; sid < 85 && layer < 3; sid++)
+	if (m_sprites_cache.empty())
 	{
-		if (BIT(*sinfo, 6))
-			layer++;
-		sinfo += 6;
-	}
-	sinfo -= 1;
-
-	for (; sid; sid--)
-	{
-		s16 y = *sinfo++;
-		y |= BIT(*sinfo, 0) << 8;
-		y += screen.top() - (y >= screen.height() ? 512 : 0);
-		u8 height8 = BIT(*sinfo, 1, 3);
-		layer -= BIT(*sinfo, 6);
-		if (!BIT(*sinfo, 5))
+		const rectangle screen = get_screen_area();
+		u8 layer = 0;
+		u8 *sinfo = m_sfile->pointer();
+		for (u8 sid = 0; sid < 85 && layer < 3; sid++)
 		{
-			// sprite disabled -> move to previous
-			sinfo -= 7;
-		}
-		else
-		{
-			bool flipy = BIT(*sinfo++, 7);
-			s16 x = *sinfo++;
-			x |= BIT(*sinfo, 0) << 8;
-			x += screen.left() - (x >= screen.width() ? 512 : 0);
-			u8 width8 = BIT(*sinfo, 1, 3);
-			bool flipx = BIT(*sinfo++, 7);
-			u16 code = *sinfo++;
-			code |= BIT(*sinfo, 0, 4) << 8;
-			u8 pal = BIT(*sinfo, 4, 4);
-			sinfo -= 11;
-
-			u32 pmask = layer ? (layer == 1 ? GFX_PMASK_2 : 0) : (GFX_PMASK_1 | GFX_PMASK_2);
-
-			u8 tile_row = code / 64 + flipy * height8;
-			for (auto iy = y; iy <= y + height8 * 8; iy = iy + 8)
+			s16 y = *sinfo++;
+			y |= BIT(*sinfo, 0) << 8;
+			y += screen.top() - (y >= screen.height() ? 512 : 0);
+			const u8 height8 = BIT(*sinfo, 1, 3);
+			const bool leap_next = BIT(*sinfo, 6);
+			if (!BIT(*sinfo, 5))
 			{
-				u8 tile_col = (code % 64) + flipx * width8;
-				for (auto ix = x; ix <= x + width8 * 8; ix = ix + 8)
-				{
-					m_gfxdecode->gfx(TM_SPRITES)->prio_transpen(bitmap, cliprect, tmp_tile_oversized_to_code((tile_row % 64) * 64 + (tile_col % 64)), pal, flipx, flipy, ix, iy, screen_d.priority(), pmask, 0);
-					tile_col += flipx ? -1 : 1;
-				}
-				tile_row += flipy ? -1 : 1;
+				// sprite disabled -> move to next
+				sinfo += 5;
 			}
+			else
+			{
+				const bool flipy = BIT(*sinfo++, 7);
+				s16 x = *sinfo++;
+				x |= BIT(*sinfo, 0) << 8;
+				x += screen.left() - (x >= screen.width() ? 512 : 0);
+				const u8 width8 = BIT(*sinfo, 1, 3);
+				const bool flipx = BIT(*sinfo++, 7);
+				u16 code = *sinfo++;
+				code |= BIT(*sinfo, 0, 4) << 8;
+				const u8 pal = BIT(*sinfo++, 4, 4);
+
+				u8 tile_row = code / 64 + flipy * height8;
+				const u32 pmask = (~1) << layer;
+				for (auto iy = y; iy <= y + height8 * 8; iy = iy + 8)
+				{
+					u8 tile_col = (code % 64) + flipx * width8;
+					for (auto ix = x; ix <= x + width8 * 8; ix = ix + 8)
+					{
+						sprite_data spr = {};
+						spr.code = (tile_row % 64) * 64 + (tile_col % 64);
+						spr.color = pal;
+						spr.flipx = flipx;
+						spr.flipy = flipy;
+						spr.destx = ix;
+						spr.desty = iy;
+						spr.pmask = pmask;
+
+						m_sprites_cache.push_back(spr);
+						tile_col += flipx ? -1 : 1;
+					}
+					tile_row += flipy ? -1 : 1;
+				}
+			}
+			layer += leap_next;
 		}
 	}
+
+	// Higher Sprite draws on top. Iterate backwards.
+	for (auto spr = m_sprites_cache.rbegin(); spr != m_sprites_cache.rend(); ++spr)
+	{
+		m_gfxdecode->gfx(TM_SPRITES)->prio_transpen(bitmap, cliprect,
+			tmp_tile_oversized_to_code(spr->code), spr->color, spr->flipx, spr->flipy, spr->destx, spr->desty,
+			screen_d.priority(), spr->pmask, 0);
+	}
+
 }
 
 void tsconf_state::ram_bank_write(u8 bank, offs_t offset, u8 data)
@@ -332,7 +396,10 @@ void tsconf_state::ram_bank_write(u8 bank, offs_t offset, u8 data)
 			if (addr_w < 512)
 				cram_write(addr_w, data);
 			else if (addr_w < 1024)
+			{
+				m_sprites_cache.clear();
 				m_sfile->write(addr_w - 512, data);
+			}
 			else
 				tsconf_port_xxaf_w((addr_w - 1024) << 8, data);
 		}
@@ -353,10 +420,16 @@ void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 	else
 	{
 		if (ram_addr >= PAGE4K(m_regs[T0_G_PAGE] & 0xf8) && ram_addr < PAGE4K((m_regs[T0_G_PAGE] & 0xf8) + 8))
+		{
 			m_gfxdecode->gfx(TM_TILES0)->mark_all_dirty();
+			m_ts_tilemap[TM_TILES0]->mark_all_dirty();
+		}
 
 		if (ram_addr >= PAGE4K(m_regs[T1_G_PAGE] & 0xf8) && ram_addr < PAGE4K((m_regs[T1_G_PAGE] & 0xf8) + 8))
+		{
 			m_gfxdecode->gfx(TM_TILES1)->mark_all_dirty();
+			m_ts_tilemap[TM_TILES1]->mark_all_dirty();
+		}
 	}
 
 	if (ram_addr >= get_vpage_offset() && ram_addr < get_vpage_offset() + PAGE4K((VM == VM_16C) ? 8 : 16))
@@ -395,25 +468,27 @@ void tsconf_state::cram_write(u16 offset, u8 data)
 	u8 pen = dest >> 1;
 	rgb_t rgb = from_pwm((m_cram->read(dest | 1) << 8 | m_cram->read(dest & 0x1fe)));
 	m_palette->set_pen_color(pen, rgb);
-};
+}
 
 void tsconf_state::cram_write16(offs_t offset, u16 data)
 {
 	cram_write(offset & 0x1fe, data >> 8);
 	cram_write(offset | 1, data & 0xff);
-};
+}
 
 void tsconf_state::sfile_write16(offs_t offset, u16 data)
 {
+	m_sprites_cache.clear();
+
 	u16 dest = offset & 0x1fe;
 	m_sfile->write(dest, data >> 8);
 	m_sfile->write(dest | 1, data & 0xff);
-};
+}
 
 u8 tsconf_state::tsconf_port_xx1f_r(offs_t offset) {
 	return m_beta->started() && m_beta->is_active()
-		? m_beta->status_r()
-		: 0x00; // TODO kempston read
+			? m_beta->status_r()
+			: 0x00; // TODO kempston read
 }
 
 void tsconf_state::tsconf_port_7ffd_w(u8 data)
@@ -637,8 +712,8 @@ u8 tsconf_state::tsconf_port_f7_r(offs_t offset)
 {
 	// BFF7
 	return  (m_port_f7_ext == PS2KEYBOARDS_LOG && m_glukrs->address_r() == 0xf0)
-		? m_keyboard->read()
-		: m_glukrs->data_r();
+			? m_keyboard->read()
+			: m_glukrs->data_r();
 }
 
 void tsconf_state::tsconf_port_f7_w(offs_t offset, u8 data)
@@ -849,16 +924,18 @@ TIMER_CALLBACK_MEMBER(tsconf_state::irq_scanline)
 		case G_Y_OFFS_L:
 		case G_Y_OFFS_H:
 			m_gfx_y_frame_offset = screen_vpos < get_screen_area().top()
-				? -get_screen_area().top()
-				: -screen_vpos;
+					? -get_screen_area().top()
+					: -screen_vpos;
 			break;
 
 		case T0_G_PAGE:
 			m_gfxdecode->gfx(TM_TILES0)->set_source(m_ram->pointer() + PAGE4K(val & 0xf8));
+			m_ts_tilemap[TM_TILES0]->mark_all_dirty();
 			break;
 
 		case T1_G_PAGE:
 			m_gfxdecode->gfx(TM_TILES1)->set_source(m_ram->pointer() + PAGE4K(val & 0xf8));
+			m_ts_tilemap[TM_TILES1]->mark_all_dirty();
 			break;
 
 		case T0_X_OFFSET_L:

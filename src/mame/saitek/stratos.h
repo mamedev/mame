@@ -17,10 +17,10 @@
 #include <algorithm>
 
 
-class saitek_stratos_state : public driver_device
+class stratos_base_state : public driver_device
 {
 public:
-	saitek_stratos_state(const machine_config &mconfig, device_type type, const char *tag) :
+	stratos_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),
@@ -28,7 +28,7 @@ public:
 		m_out_lcd(*this, "lcd%u.%u.%u", 0U, 0U, 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
 protected:
@@ -52,7 +52,6 @@ protected:
 	void clear_lcd() { std::fill(std::begin(m_lcd_data), std::end(m_lcd_data), 0); }
 	void update_lcd();
 	void power_off();
-	void set_cpu_freq();
 	void lcd_data_w(u8 data);
 };
 

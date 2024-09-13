@@ -18,6 +18,8 @@
 
 #include "../../Common/FileStreams.h"
 #include "../../Common/LimitedStreams.h"
+#include "../../Common/MultiOutStream.h"
+#include "../../Common/StreamUtils.h"
 
 #include "../../Compress/CopyCoder.h"
 
@@ -71,203 +73,44 @@ HRESULT CUpdateErrorInfo::SetFromError_DWORD(const char *message, const FString 
 
 using namespace NUpdateArchive;
 
-class COutMultiVolStream:
-  public IOutStream,
-  public CMyUnknownImp
+struct CMultiOutStream_Rec
 {
-  unsigned _streamIndex; // required stream
-  UInt64 _offsetPos; // offset from start of _streamIndex index
-  UInt64 _absPos;
-  UInt64 _length;
-
-  struct CAltStreamInfo
-  {
-    COutFileStream *StreamSpec;
-    CMyComPtr<IOutStream> Stream;
-    FString Name;
-    UInt64 Pos;
-    UInt64 RealSize;
-  };
-  CObjectVector<CAltStreamInfo> Streams;
-public:
-  // CMyComPtr<IArchiveUpdateCallback2> VolumeCallback;
-  CRecordVector<UInt64> Sizes;
-  FString Prefix;
-  CTempFiles *TempFiles;
-
-  void Init()
-  {
-    _streamIndex = 0;
-    _offsetPos = 0;
-    _absPos = 0;
-    _length = 0;
-  }
-
-  bool SetMTime(const CFiTime *mTime);
-  HRESULT Close();
-
-  UInt64 GetSize() const { return _length; }
-
-  MY_UNKNOWN_IMP1(IOutStream)
-
-  STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
-  STDMETHOD(Seek)(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition);
-  STDMETHOD(SetSize)(UInt64 newSize);
+  CMultiOutStream *Spec;
+  CMyComPtr<IOutStream> Ref;
 };
 
-// static NSynchronization::CCriticalSection g_TempPathsCS;
-
-HRESULT COutMultiVolStream::Close()
+struct CMultiOutStream_Bunch
 {
-  HRESULT res = S_OK;
-  FOR_VECTOR (i, Streams)
+  CObjectVector<CMultiOutStream_Rec> Items;
+  
+  HRESULT Destruct()
   {
-    COutFileStream *s = Streams[i].StreamSpec;
-    if (s)
+    HRESULT hres = S_OK;
+    FOR_VECTOR (i, Items)
     {
-      HRESULT res2 = s->Close();
-      if (res2 != S_OK)
-        res = res2;
-    }
-  }
-  return res;
-}
-
-bool COutMultiVolStream::SetMTime(const CFiTime *mTime)
-{
-  bool res = true;
-  FOR_VECTOR (i, Streams)
-  {
-    COutFileStream *s = Streams[i].StreamSpec;
-    if (s)
-      if (!s->SetMTime(mTime))
-        res = false;
-  }
-  return res;
-}
-
-STDMETHODIMP COutMultiVolStream::Write(const void *data, UInt32 size, UInt32 *processedSize)
-{
-  if (processedSize)
-    *processedSize = 0;
-  while (size > 0)
-  {
-    if (_streamIndex >= Streams.Size())
-    {
-      CAltStreamInfo altStream;
-
-      FString name;
-      name.Add_UInt32(_streamIndex + 1);
-      while (name.Len() < 3)
-        name.InsertAtFront(FTEXT('0'));
-      name.Insert(0, Prefix);
-      altStream.StreamSpec = new COutFileStream;
-      altStream.Stream = altStream.StreamSpec;
-      if (!altStream.StreamSpec->Create(name, false))
-        return GetLastError_noZero_HRESULT();
+      CMultiOutStream_Rec &rec = Items[i];
+      if (rec.Ref)
       {
-        // NSynchronization::CCriticalSectionLock lock(g_TempPathsCS);
-        TempFiles->Paths.Add(name);
+        const HRESULT hres2 = rec.Spec->Destruct();
+        if (hres == S_OK)
+          hres = hres2;
       }
-
-      altStream.Pos = 0;
-      altStream.RealSize = 0;
-      altStream.Name = name;
-      Streams.Add(altStream);
-      continue;
     }
-    CAltStreamInfo &altStream = Streams[_streamIndex];
-
-    unsigned index = _streamIndex;
-    if (index >= Sizes.Size())
-      index = Sizes.Size() - 1;
-    UInt64 volSize = Sizes[index];
-
-    if (_offsetPos >= volSize)
-    {
-      _offsetPos -= volSize;
-      _streamIndex++;
-      continue;
-    }
-    if (_offsetPos != altStream.Pos)
-    {
-      // CMyComPtr<IOutStream> outStream;
-      // RINOK(altStream.Stream.QueryInterface(IID_IOutStream, &outStream));
-      RINOK(altStream.Stream->Seek((Int64)_offsetPos, STREAM_SEEK_SET, NULL));
-      altStream.Pos = _offsetPos;
-    }
-
-    UInt32 curSize = (UInt32)MyMin((UInt64)size, volSize - altStream.Pos);
-    UInt32 realProcessed;
-    RINOK(altStream.Stream->Write(data, curSize, &realProcessed));
-    data = (const void *)((const Byte *)data + realProcessed);
-    size -= realProcessed;
-    altStream.Pos += realProcessed;
-    _offsetPos += realProcessed;
-    _absPos += realProcessed;
-    if (_absPos > _length)
-      _length = _absPos;
-    if (_offsetPos > altStream.RealSize)
-      altStream.RealSize = _offsetPos;
-    if (processedSize)
-      *processedSize += realProcessed;
-    if (altStream.Pos == volSize)
-    {
-      _streamIndex++;
-      _offsetPos = 0;
-    }
-    if (realProcessed == 0 && curSize != 0)
-      return E_FAIL;
-    break;
+    Items.Clear();
+    return hres;
   }
-  return S_OK;
-}
 
-STDMETHODIMP COutMultiVolStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition)
-{
-  if (seekOrigin >= 3)
-    return STG_E_INVALIDFUNCTION;
-  switch (seekOrigin)
+  void DisableDeletion()
   {
-    case STREAM_SEEK_SET: _absPos = (UInt64)offset; break;
-    case STREAM_SEEK_CUR: _absPos = (UInt64)((Int64)_absPos + offset); break;
-    case STREAM_SEEK_END: _absPos = (UInt64)((Int64)_length + offset); break;
+    FOR_VECTOR (i, Items)
+    {
+      CMultiOutStream_Rec &rec = Items[i];
+      if (rec.Ref)
+        rec.Spec->NeedDelete = false;
+    }
   }
-  _offsetPos = _absPos;
-  if (newPosition)
-    *newPosition = _absPos;
-  _streamIndex = 0;
-  return S_OK;
-}
+};
 
-STDMETHODIMP COutMultiVolStream::SetSize(UInt64 newSize)
-{
-  unsigned i = 0;
-  while (i < Streams.Size())
-  {
-    CAltStreamInfo &altStream = Streams[i++];
-    if ((UInt64)newSize < altStream.RealSize)
-    {
-      RINOK(altStream.Stream->SetSize(newSize));
-      altStream.RealSize = newSize;
-      break;
-    }
-    newSize -= altStream.RealSize;
-  }
-  while (i < Streams.Size())
-  {
-    {
-      CAltStreamInfo &altStream = Streams.Back();
-      altStream.Stream.Release();
-      DeleteFileAlways(altStream.Name);
-    }
-    Streams.DeleteBack();
-  }
-  _offsetPos = _absPos;
-  _streamIndex = 0;
-  _length = newSize;
-  return S_OK;
-}
 
 void CArchivePath::ParseFromPath(const UString &path, EArcNameMode mode)
 {
@@ -305,7 +148,7 @@ UString CArchivePath::GetFinalPath() const
   UString path = GetPathWithoutExt();
   if (!BaseExtension.IsEmpty())
   {
-    path += '.';
+    path.Add_Dot();
     path += BaseExtension;
   }
   return path;
@@ -317,7 +160,7 @@ UString CArchivePath::GetFinalVolPath() const
   // if BaseExtension is empty, we must ignore VolExtension also.
   if (!BaseExtension.IsEmpty())
   {
-    path += '.';
+    path.Add_Dot();
     path += VolExtension;
   }
   return path;
@@ -329,7 +172,7 @@ FString CArchivePath::GetTempPath() const
   path += us2fs(Name);
   if (!BaseExtension.IsEmpty())
   {
-    path += '.';
+    path.Add_Dot();
     path += us2fs(BaseExtension);
   }
   path += ".tmp";
@@ -403,7 +246,7 @@ bool CUpdateOptions::SetArcPath(const CCodecs *codecs, const UString &arcPath)
 }
 
 
-struct CUpdateProduceCallbackImp: public IUpdateProduceCallback
+struct CUpdateProduceCallbackImp Z7_final: public IUpdateProduceCallback
 {
   const CObjectVector<CArcItem> *_arcItems;
   CDirItemsStat *_stat;
@@ -417,7 +260,7 @@ struct CUpdateProduceCallbackImp: public IUpdateProduceCallback
     _stat(stat),
     _callback(callback) {}
   
-  virtual HRESULT ShowDeleteFile(unsigned arcIndex);
+  virtual HRESULT ShowDeleteFile(unsigned arcIndex) Z7_override;
 };
 
 
@@ -499,6 +342,8 @@ bool CRenamePair::GetNewPath(bool isFolder, const UString &src, UString &dest) c
 int FindAltStreamColon_in_Path(const wchar_t *path);
 #endif
 
+
+
 static HRESULT Compress(
     const CUpdateOptions &options,
     bool isUpdatingItself,
@@ -511,6 +356,7 @@ static HRESULT Compress(
     const CDirItems &dirItems,
     const CDirItem *parentDirItem,
     CTempFiles &tempFiles,
+    CMultiOutStream_Bunch &multiStreams,
     CUpdateErrorInfo &errorInfo,
     IUpdateCallbackUI *callback,
     CFinishArchiveStat &st)
@@ -530,15 +376,15 @@ static HRESULT Compress(
   }
   else
   {
-    RINOK(codecs->CreateOutArchive((unsigned)formatIndex, outArchive));
+    RINOK(codecs->CreateOutArchive((unsigned)formatIndex, outArchive))
 
-    #ifdef EXTERNAL_CODECS
+    #ifdef Z7_EXTERNAL_CODECS
     {
       CMyComPtr<ISetCompressCodecsInfo> setCompressCodecsInfo;
       outArchive.QueryInterface(IID_ISetCompressCodecsInfo, (void **)&setCompressCodecsInfo);
       if (setCompressCodecsInfo)
       {
-        RINOK(setCompressCodecsInfo->SetCompressCodecsInfo(codecs));
+        RINOK(setCompressCodecsInfo->SetCompressCodecsInfo(codecs))
       }
     }
     #endif
@@ -548,7 +394,7 @@ static HRESULT Compress(
     throw kUpdateIsNotSupoorted;
 
   // we need to set properties to get fileTimeType.
-  RINOK(SetProperties(outArchive, options.MethodMode.Properties));
+  RINOK(SetProperties(outArchive, options.MethodMode.Properties))
 
   NFileTimeType::EEnum fileTimeType;
   {
@@ -580,7 +426,7 @@ static HRESULT Compress(
     */
 
     UInt32 value;
-    RINOK(outArchive->GetFileTimeType(&value));
+    RINOK(outArchive->GetFileTimeType(&value))
 
     // we support any future fileType here.
     fileTimeType = (NFileTimeType::EEnum)value;
@@ -676,7 +522,7 @@ static HRESULT Compress(
       if (needRename)
       {
         up2.NewProps = true;
-        RINOK(arc->IsItem_Anti(i, up2.IsAnti));
+        RINOK(arc->IsItem_Anti(i, up2.IsAnti))
         up2.NewNameIndex = (int)newNames.Add(dest);
       }
       updatePairs2.Add(up2);
@@ -768,7 +614,7 @@ static HRESULT Compress(
         }
       }
     }
-    RINOK(callback->SetNumItems(stat2));
+    RINOK(callback->SetNumItems(stat2))
   }
   
   CArchiveUpdateCallback *updateCallbackSpec = new CArchiveUpdateCallback;
@@ -828,7 +674,7 @@ static HRESULT Compress(
 
   COutFileStream *outStreamSpec = NULL;
   CStdOutFileStream *stdOutFileStreamSpec = NULL;
-  COutMultiVolStream *volStreamSpec = NULL;
+  CMultiOutStream *volStreamSpec = NULL;
 
   if (options.VolumesSizes.Size() == 0)
   {
@@ -881,14 +727,17 @@ static HRESULT Compress(
     if (arc && arc->GetGlobalOffset() > 0)
       return E_NOTIMPL;
       
-    volStreamSpec = new COutMultiVolStream;
+    volStreamSpec = new CMultiOutStream();
     outSeekStream = volStreamSpec;
     outStream = outSeekStream;
-    volStreamSpec->Sizes = options.VolumesSizes;
     volStreamSpec->Prefix = us2fs(archivePath.GetFinalVolPath());
-    volStreamSpec->Prefix += '.';
-    volStreamSpec->TempFiles = &tempFiles;
-    volStreamSpec->Init();
+    volStreamSpec->Prefix.Add_Dot();
+    volStreamSpec->Init(options.VolumesSizes);
+    {
+      CMultiOutStream_Rec &rec = multiStreams.Items.AddNew();
+      rec.Spec = volStreamSpec;
+      rec.Ref = rec.Spec;
+    }
 
     /*
     updateCallbackSpec->VolumesSizes = volumesSizes;
@@ -913,22 +762,22 @@ static HRESULT Compress(
     {
       outStreamSpec2 = new COutFileStream;
       sfxOutStream = outStreamSpec2;
-      FString realPath = us2fs(archivePath.GetFinalPath());
+      const FString realPath = us2fs(archivePath.GetFinalPath());
       if (!outStreamSpec2->Create(realPath, false))
         return errorInfo.SetFromLastError("cannot open file", realPath);
     }
 
     {
       UInt64 sfxSize;
-      RINOK(sfxStreamSpec->GetSize(&sfxSize));
-      RINOK(callback->WriteSfx(fs2us(options.SfxModule), sfxSize));
+      RINOK(sfxStreamSpec->GetSize(&sfxSize))
+      RINOK(callback->WriteSfx(fs2us(options.SfxModule), sfxSize))
     }
 
-    RINOK(NCompress::CopyStream(sfxStream, sfxOutStream, NULL));
+    RINOK(NCompress::CopyStream(sfxStream, sfxOutStream, NULL))
     
     if (outStreamSpec2)
     {
-      RINOK(outStreamSpec2->Close());
+      RINOK(outStreamSpec2->Close())
     }
   }
 
@@ -939,8 +788,8 @@ static HRESULT Compress(
   else
   {
     // Int64 globalOffset = arc->GetGlobalOffset();
-    RINOK(arc->InStream->Seek(0, STREAM_SEEK_SET, NULL));
-    RINOK(NCompress::CopyStream_ExactSize(arc->InStream, outStream, arc->ArcStreamOffset, NULL));
+    RINOK(InStream_SeekToBegin(arc->InStream))
+    RINOK(NCompress::CopyStream_ExactSize(arc->InStream, outStream, arc->ArcStreamOffset, NULL))
     if (options.StdOutMode)
       tailStream = outStream;
     else
@@ -953,10 +802,57 @@ static HRESULT Compress(
     }
   }
 
+  CFiTime ft;
+  FiTime_Clear(ft);
+  bool ft_Defined = false;
+  {
+    FOR_VECTOR (i, updatePairs2)
+    {
+      const CUpdatePair2 &pair2 = updatePairs2[i];
+      CFiTime ft2;
+      FiTime_Clear(ft2);
+      bool ft2_Defined = false;
+      /* we use full precision of dirItem, if dirItem is defined
+         and (dirItem will be used or dirItem is sameTime in dir and arc */
+      if (pair2.DirIndex >= 0 &&
+          (pair2.NewProps || pair2.IsSameTime))
+      {
+        ft2 = dirItems.Items[(unsigned)pair2.DirIndex].MTime;
+        ft2_Defined = true;
+      }
+      else if (pair2.UseArcProps && pair2.ArcIndex >= 0)
+      {
+        const CArcItem &arcItem = arcItems[(unsigned)pair2.ArcIndex];
+        if (arcItem.MTime.Def)
+        {
+          arcItem.MTime.Write_To_FiTime(ft2);
+          ft2_Defined = true;
+        }
+      }
+      if (ft2_Defined)
+      {
+        if (!ft_Defined || Compare_FiTime(&ft, &ft2) < 0)
+        {
+          ft = ft2;
+          ft_Defined = true;
+        }
+      }
+    }
+    /*
+    if (fileTimeType != NFileTimeType::kNotDefined)
+    FiTime_Normalize_With_Prec(ft, fileTimeType);
+    */
+  }
+
+  if (volStreamSpec && options.SetArcMTime && ft_Defined)
+  {
+    volStreamSpec->MTime = ft;
+    volStreamSpec->MTime_Defined = true;
+  }
 
   HRESULT result = outArchive->UpdateItems(tailStream, updatePairs2.Size(), updateCallback);
   // callback->Finalize();
-  RINOK(result);
+  RINOK(result)
 
   if (!updateCallbackSpec->AreAllFilesClosed())
   {
@@ -967,10 +863,6 @@ static HRESULT Compress(
 
   if (options.SetArcMTime)
   {
-    CFiTime ft;
-    FiTime_Clear(ft);
-    bool isDefined = false;
-
     // bool needNormalizeAfterStream;
     // needParse;
     /*
@@ -990,40 +882,9 @@ static HRESULT Compress(
         // CArcTime at = StreamCallback_ArcMTime;
         // updateCallbackSpec->StreamCallback_ArcMTime.Write_To_FiTime(ft);
         // we must normalize with precision from archive;
-        ft = updateCallbackSpec->LatestMTime;
-        isDefined = true;
-      }
-
-      FOR_VECTOR (i, updatePairs2)
-      {
-        const CUpdatePair2 &pair2 = updatePairs2[i];
-        CFiTime ft2;
-        bool ft2_Defined = false;
-        /* we use full precision of dirItem, if dirItem is defined
-           and (dirItem will be used or dirItem is sameTime in dir and arc */
-        if (pair2.DirIndex >= 0 &&
-            (pair2.NewProps || pair2.IsSameTime))
-        {
-          ft2 = dirItems.Items[(unsigned)pair2.DirIndex].MTime;
-          ft2_Defined = true;
-        }
-        else if (pair2.UseArcProps && pair2.ArcIndex >= 0)
-        {
-          const CArcItem &arcItem = arcItems[(unsigned)pair2.ArcIndex];
-          if (arcItem.MTime.Def)
-          {
-            arcItem.MTime.Write_To_FiTime(ft2);
-            ft2_Defined = true;
-          }
-        }
-        if (ft2_Defined)
-        {
-          if (Compare_FiTime(&ft, &ft2) < 0)
-          {
-            ft = ft2;
-            isDefined = true;
-          }
-        }
+        if (!ft_Defined || Compare_FiTime(&ft, &updateCallbackSpec->LatestMTime) < 0)
+          ft = updateCallbackSpec->LatestMTime;
+        ft_Defined = true;
       }
       /*
       if (fileTimeType != NFileTimeType::kNotDefined)
@@ -1031,12 +892,14 @@ static HRESULT Compress(
       */
     }
     // if (ft.dwLowDateTime != 0 || ft.dwHighDateTime != 0)
-    if (isDefined)
+    if (ft_Defined)
     {
+      // we ignore set time errors here.
+      // note that user could move some finished volumes to another folder.
       if (outStreamSpec)
         outStreamSpec->SetMTime(&ft);
       else if (volStreamSpec)
-        volStreamSpec->SetMTime(&ft);
+        volStreamSpec->SetMTime_Final(ft);
     }
   }
 
@@ -1056,7 +919,10 @@ static HRESULT Compress(
   if (outStreamSpec)
     result = outStreamSpec->Close();
   else if (volStreamSpec)
-    result = volStreamSpec->Close();
+  {
+    result = volStreamSpec->FinalFlush_and_CloseFiles(st.NumVolumes);
+    st.IsMultiVolMode = true;
+  }
 
   RINOK(result)
   
@@ -1121,7 +987,7 @@ static HRESULT EnumerateInArchiveItems(
   arcItems.Clear();
   UInt32 numItems;
   IInArchive *archive = arc.Archive;
-  RINOK(archive->GetNumberOfItems(&numItems));
+  RINOK(archive->GetNumberOfItems(&numItems))
   arcItems.ClearAndReserve(numItems);
 
   CReadArcItem item;
@@ -1132,7 +998,7 @@ static HRESULT EnumerateInArchiveItems(
   {
     CArcItem ai;
 
-    RINOK(arc.GetItem(i, item));
+    RINOK(arc.GetItem(i, item))
     ai.Name = item.Path;
     ai.IsDir = item.IsDir;
     ai.IsAltStream =
@@ -1152,8 +1018,8 @@ static HRESULT EnumerateInArchiveItems(
       ai.Censored = Censor_CheckPath(censor, item);
 
     // ai.MTime will be set to archive MTime, if not present in archive item
-    RINOK(arc.GetItem_MTime(i, ai.MTime));
-    RINOK(arc.GetItem_Size(i, ai.Size, ai.Size_Defined));
+    RINOK(arc.GetItem_MTime(i, ai.MTime))
+    RINOK(arc.GetItem_Size(i, ai.Size, ai.Size_Defined))
 
     ai.IndexInServer = i;
     arcItems.AddInReserved(ai);
@@ -1163,9 +1029,72 @@ static HRESULT EnumerateInArchiveItems(
 
 #if defined(_WIN32) && !defined(UNDER_CE)
 
+#if defined(__MINGW32__) || defined(__MINGW64__)
+#include <mapi.h>
+#else
 #include <MAPI.h>
-
 #endif
+
+extern "C" {
+
+#ifdef MAPI_FORCE_UNICODE
+
+#define Z7_WIN_LPMAPISENDMAILW  LPMAPISENDMAILW
+#define Z7_WIN_MapiFileDescW    MapiFileDescW
+#define Z7_WIN_MapiMessageW     MapiMessageW
+#define Z7_WIN_MapiRecipDescW   MapiRecipDescW
+
+#else
+
+typedef struct
+{
+    ULONG ulReserved;
+    ULONG ulRecipClass;
+    PWSTR lpszName;
+    PWSTR lpszAddress;
+    ULONG ulEIDSize;
+    PVOID lpEntryID;
+} Z7_WIN_MapiRecipDescW, *Z7_WIN_lpMapiRecipDescW;
+
+typedef struct
+{
+    ULONG ulReserved;
+    ULONG flFlags;
+    ULONG nPosition;
+    PWSTR lpszPathName;
+    PWSTR lpszFileName;
+    PVOID lpFileType;
+} Z7_WIN_MapiFileDescW, *Z7_WIN_lpMapiFileDescW;
+
+typedef struct
+{
+  ULONG ulReserved;
+  PWSTR lpszSubject;
+  PWSTR lpszNoteText;
+  PWSTR lpszMessageType;
+  PWSTR lpszDateReceived;
+  PWSTR lpszConversationID;
+  FLAGS flFlags;
+  Z7_WIN_lpMapiRecipDescW lpOriginator;
+  ULONG nRecipCount;
+  Z7_WIN_lpMapiRecipDescW lpRecips;
+  ULONG nFileCount;
+  Z7_WIN_lpMapiFileDescW lpFiles;
+} Z7_WIN_MapiMessageW, *Z7_WIN_lpMapiMessageW;
+
+typedef ULONG (FAR PASCAL Z7_WIN_MAPISENDMAILW)(
+  LHANDLE lhSession,
+  ULONG_PTR ulUIParam,
+  Z7_WIN_lpMapiMessageW lpMessage,
+  FLAGS flFlags,
+  ULONG ulReserved
+);
+typedef Z7_WIN_MAPISENDMAILW FAR *Z7_WIN_LPMAPISENDMAILW;
+
+#endif // MAPI_FORCE_UNICODE
+}
+#endif // _WIN32
+
 
 HRESULT UpdateArchive(
     CCodecs *codecs,
@@ -1253,8 +1182,7 @@ HRESULT UpdateArchive(
   if (!options.VolumesSizes.IsEmpty())
   {
     arcPath = options.ArchivePath.GetFinalVolPath();
-    arcPath += '.';
-    arcPath += "001";
+    arcPath += ".001";
   }
 
   if (cmdArcPath2.IsEmpty())
@@ -1268,7 +1196,7 @@ HRESULT UpdateArchive(
     if (!fi.Find_FollowLink(us2fs(arcPath)))
     {
       if (renameMode)
-        throw "can't find archive";;
+        throw "can't find archive";
       if (options.MethodMode.Type.FormatIndex < 0)
       {
         if (!options.SetArcPath(codecs, cmdArcPath2))
@@ -1319,7 +1247,7 @@ HRESULT UpdateArchive(
 
       CIntVector excl;
       COpenOptions op;
-      #ifndef _SFX
+      #ifndef Z7_SFX
       op.props = &options.MethodMode.Properties;
       #endif
       op.codecs = codecs;
@@ -1329,7 +1257,7 @@ HRESULT UpdateArchive(
       op.stream = NULL;
       op.filePath = arcPath;
 
-      RINOK(callback->StartOpenArchive(arcPath));
+      RINOK(callback->StartOpenArchive(arcPath))
 
       HRESULT result = arcLink.Open_Strict(op, openCallback);
 
@@ -1341,8 +1269,8 @@ HRESULT UpdateArchive(
       if (result == S_FALSE)
         return E_FAIL;
       */
-      RINOK(res2);
-      RINOK(result);
+      RINOK(res2)
+      RINOK(result)
 
       if (arcLink.VolumePaths.Size() > 1)
       {
@@ -1422,7 +1350,7 @@ HRESULT UpdateArchive(
 
     if (needScanning)
     {
-      RINOK(callback->StartScanning());
+      RINOK(callback->StartScanning())
 
       dirItems.SymLinks = options.SymLinks.Val;
 
@@ -1452,7 +1380,7 @@ HRESULT UpdateArchive(
         return res;
       }
       
-      RINOK(callback->FinishScanning(dirItems.Stat));
+      RINOK(callback->FinishScanning(dirItems.Stat))
 
       // 22.00: we don't need parent folder, if absolute path mode
       if (options.PathMode != NWildcard::k_AbsPath)
@@ -1460,7 +1388,7 @@ HRESULT UpdateArchive(
       {
         NFind::CFileInfo fi;
         FString prefix = us2fs(censor.Pairs[0].Prefix);
-        prefix += '.';
+        prefix.Add_Dot();
         // UString prefix = censor.Pairs[0].Prefix;
         /*
         if (prefix.Back() == WCHAR_PATH_SEPARATOR)
@@ -1576,7 +1504,7 @@ HRESULT UpdateArchive(
   {
     RINOK(EnumerateInArchiveItems(
       // options.StoreAltStreams,
-      censor, arcLink.Arcs.Back(), arcItems));
+      censor, arcLink.Arcs.Back(), arcItems))
   }
 
   /*
@@ -1595,8 +1523,10 @@ HRESULT UpdateArchive(
       processedItems[i] = 0;
   }
 
+  CMultiOutStream_Bunch multiStreams;
+
   /*
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
   if (arcLink.PasswordWasAsked)
   {
     // We set password, if open have requested password
@@ -1640,17 +1570,21 @@ HRESULT UpdateArchive(
         parentDirItem_Ptr,
 
         tempFiles,
-        errorInfo, callback, st));
+        multiStreams,
+        errorInfo, callback, st))
 
-    RINOK(callback->FinishArchive(st));
+    RINOK(callback->FinishArchive(st))
   }
 
 
   if (thereIsInArchive)
   {
-    RINOK(arcLink.Close());
+    RINOK(arcLink.Close())
     arcLink.Release();
   }
+
+  multiStreams.DisableDeletion();
+  RINOK(multiStreams.Destruct())
 
   tempFiles.Paths.Clear();
   if (createTempFile)
@@ -1702,6 +1636,19 @@ HRESULT UpdateArchive(
       return errorInfo.Get_HRESULT_Error();
     }
 
+    FStringVector fullPaths;
+    unsigned i;
+    
+    for (i = 0; i < options.Commands.Size(); i++)
+    {
+      CArchivePath &ap = options.Commands[i].ArchivePath;
+      const FString finalPath = us2fs(ap.GetFinalPath());
+      FString arcPath2;
+      if (!MyGetFullPathName(finalPath, arcPath2))
+        return errorInfo.SetFromLastError("GetFullPathName error", finalPath);
+      fullPaths.Add(arcPath2);
+    }
+
     /*
     LPMAPISENDDOCUMENTS fnSend = (LPMAPISENDDOCUMENTS)mapiLib.GetProc("MAPISendDocuments");
     if (fnSend == 0)
@@ -1710,25 +1657,70 @@ HRESULT UpdateArchive(
       return errorInfo.Get_HRESULT_Error();
     }
     */
+    const
+    Z7_WIN_LPMAPISENDMAILW sendMailW = Z7_GET_PROC_ADDRESS(
+    Z7_WIN_LPMAPISENDMAILW, mapiLib.Get_HMODULE(),
+            "MAPISendMailW");
+   if (sendMailW)
+   {
+
+    CCurrentDirRestorer curDirRestorer;
+
+    UStringVector paths;
+    UStringVector names;
     
-    LPMAPISENDMAIL sendMail = (LPMAPISENDMAIL)(void *)mapiLib.GetProc("MAPISendMail");
-    if (sendMail == 0)
+    for (i = 0; i < fullPaths.Size(); i++)
     {
-      errorInfo.SetFromLastError("7-Zip cannot find MAPISendMail function");
-      return errorInfo.Get_HRESULT_Error();;
+      const UString arcPath2 = fs2us(fullPaths[i]);
+      const UString fileName = ExtractFileNameFromPath(arcPath2);
+      paths.Add(arcPath2);
+      names.Add(fileName);
+      // Warning!!! MAPISendDocuments function changes Current directory
+      // fnSend(0, ";", (LPSTR)(LPCSTR)path, (LPSTR)(LPCSTR)name, 0);
     }
 
-    FStringVector fullPaths;
-    unsigned i;
+    CRecordVector<Z7_WIN_MapiFileDescW> files;
+    files.ClearAndSetSize(paths.Size());
     
-    for (i = 0; i < options.Commands.Size(); i++)
+    for (i = 0; i < paths.Size(); i++)
     {
-      CArchivePath &ap = options.Commands[i].ArchivePath;
-      FString finalPath = us2fs(ap.GetFinalPath());
-      FString arcPath2;
-      if (!MyGetFullPathName(finalPath, arcPath2))
-        return errorInfo.SetFromLastError("GetFullPathName error", finalPath);
-      fullPaths.Add(arcPath2);
+      Z7_WIN_MapiFileDescW &f = files[i];
+      memset(&f, 0, sizeof(f));
+      f.nPosition = 0xFFFFFFFF;
+      f.lpszPathName = paths[i].Ptr_non_const();
+      f.lpszFileName = names[i].Ptr_non_const();
+    }
+
+    {
+      Z7_WIN_MapiMessageW m;
+      memset(&m, 0, sizeof(m));
+      m.nFileCount = files.Size();
+      m.lpFiles = &files.Front();
+      
+      const UString addr (options.EMailAddress);
+      Z7_WIN_MapiRecipDescW rec;
+      if (!addr.IsEmpty())
+      {
+        memset(&rec, 0, sizeof(rec));
+        rec.ulRecipClass = MAPI_TO;
+        rec.lpszAddress = addr.Ptr_non_const();
+        m.nRecipCount = 1;
+        m.lpRecips = &rec;
+      }
+      
+      sendMailW((LHANDLE)0, 0, &m, MAPI_DIALOG, 0);
+    }
+   }
+   else
+   {
+    const
+    LPMAPISENDMAIL sendMail = Z7_GET_PROC_ADDRESS(
+    LPMAPISENDMAIL, mapiLib.Get_HMODULE(),
+     "MAPISendMail");
+    if (!sendMail)
+    {
+      errorInfo.SetFromLastError("7-Zip cannot find MAPISendMail function");
+      return errorInfo.Get_HRESULT_Error();
     }
 
     CCurrentDirRestorer curDirRestorer;
@@ -1779,6 +1771,7 @@ HRESULT UpdateArchive(
       
       sendMail((LHANDLE)0, 0, &m, MAPI_DIALOG, 0);
     }
+   }
   }
   
   #endif
@@ -1827,7 +1820,7 @@ HRESULT UpdateArchive(
                 && Compare_FiTime(&fileInfo.MTime, &dirItem.MTime) == 0
                 && Compare_FiTime(&fileInfo.CTime, &dirItem.CTime) == 0)
             {
-              RINOK(callback->DeletingAfterArchiving(phyPath, false));
+              RINOK(callback->DeletingAfterArchiving(phyPath, false))
               DeleteFileAlways(phyPath);
             }
           }
@@ -1852,12 +1845,12 @@ HRESULT UpdateArchive(
       const FString phyPath = dirItems.GetPhyPath(pairs[i].Index);
       if (NFind::DoesDirExist(phyPath))
       {
-        RINOK(callback->DeletingAfterArchiving(phyPath, true));
+        RINOK(callback->DeletingAfterArchiving(phyPath, true))
         RemoveDir(phyPath);
       }
     }
 
-    RINOK(callback->FinishDeletingAfterArchiving());
+    RINOK(callback->FinishDeletingAfterArchiving())
   }
 
   return S_OK;

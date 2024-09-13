@@ -17,12 +17,17 @@ public:
 	pwm_display_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration helpers
-	pwm_display_device &set_size(u8 numrows, u8 rowbits) { m_height = numrows; m_width = rowbits; return *this; } // max 64 * 64
-	pwm_display_device &set_refresh(attotime duration) { m_framerate_set = duration; return *this; } // time between each outputs refresh
-	pwm_display_device &set_interpolation(double factor) { m_interpolation = factor; return *this; } // frame interpolation (0.0 - 1.0)
+	pwm_display_device &set_size(u8 height, u8 width) { m_height = height; m_width = width; return *this; } // max 64 * 64
+	pwm_display_device &set_height(u8 height) { m_height = height; return *this; }
+	pwm_display_device &set_width(u8 width) { m_width = width; return *this; }
+
 	pwm_display_device &set_segmask(u64 digits, u64 mask); // mask for multi-state outputs, eg. 7seg led
 	pwm_display_device &reset_segmask() { std::fill(std::begin(m_segmask), std::end(m_segmask), 0); return *this; }
-	pwm_display_device &set_bri_levels(double l0, double l1 = 1.0, double l2 = 1.0, double l3 = 1.0); // brightness threshold per level (0.0 - 1.0)
+
+	pwm_display_device &set_refresh(attotime duration) { m_framerate_set = duration; return *this; } // time between each outputs refresh (default 60hz)
+	pwm_display_device &set_interpolation(double factor) { m_interpolation = factor; return *this; } // frame interpolation (0.0 - 1.0, default 0.5)
+
+	pwm_display_device &set_bri_levels(double l0, double l1 = 1.0, double l2 = 1.0, double l3 = 1.0); // brightness threshold per level (0.0 - 1.0, default 0.01)
 	pwm_display_device &set_bri_minimum(u8 i) { m_level_min = i; return *this; } // minimum level index for element to be considered "on"
 	pwm_display_device &set_bri_maximum(double b) { m_level_max = b; return *this; } // maximum brightness level, 0.0 for auto
 
@@ -45,6 +50,9 @@ public:
 	void write_mx(u64 x) { matrix(m_rowsel, x); }
 	u64 read_my() { return m_rowsel; }
 	u64 read_mx() { return m_rowdata_last; }
+
+	u8 height() { return m_height; }
+	u8 width() { return m_width; }
 
 	// directly handle individual element (does not affect m_rowsel), y = row num, x = row bit
 	int read_element(u8 y, u8 x) { return BIT(m_rowdata[y], x); }

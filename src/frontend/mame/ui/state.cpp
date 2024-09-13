@@ -13,6 +13,7 @@
 
 #include "emuopts.h"
 #include "inputdev.h"
+#include "uiinput.h"
 
 #include "path.h"
 
@@ -376,10 +377,11 @@ void menu_load_save_state_base::slot_selected(std::string &&name)
 //  handle_keys - override key handling
 //-------------------------------------------------
 
-void menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
+bool menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
 {
 	if (m_confirm_delete)
 	{
+		bool updated(false);
 		if (exclusive_input_pressed(iptkey, IPT_UI_SELECT, 0))
 		{
 			// try to remove the file
@@ -415,17 +417,36 @@ void menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
 			m_confirm_prompt.clear();
 			m_confirm_delete = nullptr;
 			m_keys_released = false;
+			updated = true;
 		}
 		iptkey = IPT_INVALID;
+		return updated;
 	}
 	else if (INPUT_CODE_INVALID != m_slot_selected)
 	{
 		iptkey = IPT_INVALID;
+		return false;
 	}
 	else
 	{
-		menu::handle_keys(flags, iptkey);
+		return autopause_menu<>::handle_keys(flags, iptkey);
 	}
+}
+
+
+//-------------------------------------------------
+//  custom_pointer_updated - override pointer
+//  handling
+//-------------------------------------------------
+
+std::tuple<int, bool, bool> menu_load_save_state_base::custom_pointer_updated(bool changed, ui_event const &uievt)
+{
+	// suppress clicks on the menu while the delete prompt is visible
+	if (m_confirm_delete && uievt.pointer_buttons)
+		return std::make_tuple(IPT_INVALID, true, false);
+	else
+		return autopause_menu<>::custom_pointer_updated(changed, uievt);
+
 }
 
 
@@ -446,7 +467,7 @@ void menu_load_save_state_base::recompute_metrics(uint32_t width, uint32_t heigh
 //  custom_render - perform our special rendering
 //-------------------------------------------------
 
-void menu_load_save_state_base::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_load_save_state_base::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	std::string_view text[2];
 	unsigned count(0U);

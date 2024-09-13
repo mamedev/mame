@@ -76,6 +76,7 @@ void pc8801_exp_device::device_start()
 
 
 // slot devices
+#include "gsx8800.h"
 #include "pcg8100.h"
 #include "pc8801_23.h"
 #include "jmbx1.h"
@@ -89,4 +90,5 @@ void pc8801_exp_devices(device_slot_interface &device)
 
 	device.option_add("jmbx1", JMBX1);
 	device.option_add("hmb20", HMB20);
+	device.option_add("gsx8800", GSX8800);
 }

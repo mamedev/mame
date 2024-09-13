@@ -238,7 +238,7 @@ void roland_s10_state::s10(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(roland_s10_state::palette_init), 2);
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(roland_s10_state::lcd_pixel_update));
 	m_lcdc->set_busy_factor(0.005f);

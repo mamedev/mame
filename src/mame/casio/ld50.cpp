@@ -277,7 +277,7 @@ void ld50_state::ld50(machine_config &config)
 	m_maincpu->port_out_cb<3>().set(FUNC(ld50_state::port3_w));
 
 	// LCD
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(ld50_state::lcd_update));
 

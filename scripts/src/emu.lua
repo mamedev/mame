@@ -9,6 +9,8 @@
 --
 ---------------------------------------------------------------------------
 
+if _OPTIONS["with-emulator"] then
+
 project ("emu")
 uuid ("e6fa15e4-a354-4526-acef-13c8e80fcacf")
 kind (LIBTYPE)
@@ -308,6 +310,7 @@ custombuildtask {
 	layoutbuildtask("emu/layout", "triphsxs"),
 	layoutbuildtask("emu/layout", "quadhsxs"),
 }
+end
 
 project ("precompile")
 uuid ("a6fb15d4-b123-4445-acef-13c8e80fcacf")

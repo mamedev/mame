@@ -51,12 +51,14 @@ private:
 		u8 control;
 		u16 map;
 		u16 tc;
+		bool req;
 	};
 
 	u8 timer_r(offs_t offset);
 	void timer_w(offs_t offset, u8 data);
 	u16 get_timer_count() const;
 	TIMER_CALLBACK_MEMBER(timer1_callback);
+	TIMER_CALLBACK_MEMBER(dma_timer_callback);
 	u8 dma_channel_r(offs_t offset);
 	void dma_channel_w(offs_t offset, u8 data);
 	u8 scc_control_r();
@@ -89,7 +91,7 @@ private:
 	devcb_write_line::array<2> m_gpout_callback;
 
 	// internal state
-	emu_timer *m_timer1;
+	emu_timer *m_timer1, *m_dma_timer;
 	attotime m_timer_last_expired;
 	u16 m_ram_address;
 	u8 m_status_reg;

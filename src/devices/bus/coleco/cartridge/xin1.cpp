@@ -59,8 +59,10 @@ void colecovision_xin1_cartridge_device::device_reset()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t colecovision_xin1_cartridge_device::bd_r(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000)
+uint8_t colecovision_xin1_cartridge_device::read(offs_t offset, int _8000, int _a000, int _c000, int _e000)
 {
+	uint8_t data = 0xff;
+
 	if (!_8000 || !_a000 || !_c000 || !_e000)
 	{
 		data = m_rom[m_current_offset + offset];

@@ -2,13 +2,10 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    mcs48dsm.c
-
     Simple MCS-48/UPI-41 disassembler.
     Written by Aaron Giles
 
 ***************************************************************************/
-
 
 #ifndef MAME_CPU_MCS48_MCS48DASM_H
 #define MAME_CPU_MCS48_MCS48DASM_H

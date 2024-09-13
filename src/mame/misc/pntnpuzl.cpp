@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* paint & puzzle */
-/* video is standard VGA */
 /*
-OK, here's a somewhat complete rundown of the PCB.
+paint & puzzle
+
+video is standard VGA
 
 Main PCB
 Reb B
@@ -138,6 +138,7 @@ CN1 standard DB15 VGA connector (15KHz)
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs96/i8x9x.h"
 #include "machine/6522via.h"
@@ -145,6 +146,11 @@ CN1 standard DB15 VGA connector (15KHz)
 #include "video/pc_vga_trident.h"
 
 #include "screen.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
+
+#include "pntnpuzl.lh"
 
 
 namespace {
@@ -158,6 +164,8 @@ public:
 		, m_svga(*this, "svga")
 		, m_via(*this, "via")
 		, m_screen(*this, "screen")
+		, m_in0(*this, "IN0")
+		, m_touch(*this, { "TOUCHX", "TOUCHY" })
 	{ }
 
 	void pntnpuzl(machine_config &config);
@@ -171,14 +179,14 @@ private:
 	required_device<tvga9000_device> m_svga;
 	required_device<via6522_device> m_via;
 	required_device<screen_device> m_screen;
+	required_ioport m_in0;
+	required_ioport_array<2> m_touch;
 
 	uint16_t m_pntpzl_200000 = 0;
 	uint16_t m_serial = 0;
 	uint16_t m_serial_out = 0;
 	uint16_t m_read_count = 0;
 	int m_touchscr[5]{};
-
-
 
 	void pntnpuzl_200000_w(uint16_t data);
 	void pntnpuzl_280018_w(uint16_t data);
@@ -217,7 +225,7 @@ write                                     read
 
 void pntnpuzl_state::pntnpuzl_200000_w(uint16_t data)
 {
-// logerror("200000: %04x\n",data);
+	LOG("200000: %04x\n", data);
 	// bit 12: set to 1 when going to serial output to 280018
 	if ((m_pntpzl_200000 & 0x1000) && !(data & 0x1000))
 	{
@@ -231,7 +239,7 @@ void pntnpuzl_state::pntnpuzl_200000_w(uint16_t data)
 
 void pntnpuzl_state::pntnpuzl_280018_w(uint16_t data)
 {
-// logerror("%04x: 280018: %04x\n",m_maincpu->pc(),data);
+	LOG("%04x: 280018: %04x\n", m_maincpu->pc(), data);
 	m_serial >>= 1;
 	if (data & 0x2000)
 		m_serial |= 0x400;
@@ -241,56 +249,67 @@ void pntnpuzl_state::pntnpuzl_280018_w(uint16_t data)
 
 uint16_t pntnpuzl_state::pntnpuzl_280014_r()
 {
-	static const int startup[3] = { 0x80, 0x0c, 0x00 };
+	constexpr int startup[3] = { 0x80, 0x0c, 0x00 };
 	int res;
 
 	(void)m_via->read(0x14/2);
 
-	if (m_serial_out == 0x11)
+	if (!machine().side_effects_disabled())
 	{
-		if (ioport("IN0")->read() & 0x10)
+		if (m_serial_out == 0x11)
 		{
-			m_touchscr[0] = 0x1b;
-			m_touchscr[2] = bitswap<8>(ioport("TOUCHX")->read(),0,1,2,3,4,5,6,7);
-			m_touchscr[4] = bitswap<8>(ioport("TOUCHY")->read(),0,1,2,3,4,5,6,7);
+			if (m_in0->read() & 0x10)
+			{
+				m_touchscr[0] = 0x1b;
+				m_touchscr[2] = bitswap<8>(m_touch[0]->read(), 0, 1, 2, 3, 4, 5, 6, 7);
+				m_touchscr[4] = bitswap<8>(m_touch[1]->read(), 0, 1, 2, 3, 4, 5, 6, 7);
+			}
+			else
+			{
+				m_touchscr[0] = 0;
+			}
+
+			if (m_read_count >= 10)
+				m_read_count = 0;
+			res = m_touchscr[m_read_count / 2];
+			m_read_count++;
 		}
 		else
-			m_touchscr[0] = 0;
-
-		if (m_read_count >= 10) m_read_count = 0;
-		res = m_touchscr[m_read_count/2];
-		m_read_count++;
+		{
+			if (m_read_count >= 6)
+				m_read_count = 0;
+			res = startup[m_read_count / 2];
+			m_read_count++;
+		}
+		logerror("read 280014: %02x\n",res);
 	}
 	else
 	{
-		if (m_read_count >= 6) m_read_count = 0;
-		res = startup[m_read_count/2];
-		m_read_count++;
+		res = (m_serial_out == 0x11) ? m_touchscr[m_read_count / 2] : startup[m_read_count / 2];
 	}
-	logerror("read 280014: %02x\n",res);
 	return res << 8;
 }
 
 uint16_t pntnpuzl_state::pntnpuzl_28001a_r()
 {
-	return 0x0c00 | (m_via->read(0x1a/2) << 8);
+	return 0x0c00 | (m_via->read(0x1a / 2) << 8);
 }
 
 uint16_t pntnpuzl_state::irq1_ack_r()
 {
-//  m_maincpu->set_input_line(1, CLEAR_LINE);
+	//if (!machine().side_effects_disabled()) m_maincpu->set_input_line(1, CLEAR_LINE);
 	return 0;
 }
 
 uint16_t pntnpuzl_state::irq2_ack_r()
 {
-//  m_maincpu->set_input_line(2, CLEAR_LINE);
+	//if (!machine().side_effects_disabled()) m_maincpu->set_input_line(2, CLEAR_LINE);
 	return 0;
 }
 
 uint16_t pntnpuzl_state::irq4_ack_r()
 {
-//  m_maincpu->set_input_line(4, CLEAR_LINE);
+	//if (!machine().side_effects_disabled()) m_maincpu->set_input_line(4, CLEAR_LINE);
 	return 0;
 }
 
@@ -324,13 +343,13 @@ void pntnpuzl_state::mcu_map(address_map &map)
 
 INPUT_CHANGED_MEMBER(pntnpuzl_state::coin_inserted)
 {
-	/* TODO: change this! */
-	if(newval)
-		m_maincpu->pulse_input_line((uint8_t)param, m_maincpu->minimum_quantum_time());
+	// TODO: change this!
+	if (newval)
+		m_maincpu->pulse_input_line(uint8_t(param), m_maincpu->minimum_quantum_time());
 }
 
 static INPUT_PORTS_START( pntnpuzl )
-	PORT_START("IN0")   /* fake inputs */
+	PORT_START("IN0")   // fake inputs
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, pntnpuzl_state,coin_inserted, 1) PORT_IMPULSE(1)
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_HIGH )PORT_CHANGED_MEMBER(DEVICE_SELF, pntnpuzl_state,coin_inserted, 2) PORT_IMPULSE(1)
@@ -427,4 +446,4 @@ void pntnpuzl_state::init_pip()
 } // anonymous namespace
 
 
-GAME( 1993, pntnpuzl, 0, pntnpuzl, pntnpuzl, pntnpuzl_state, init_pip, ROT90, "Century Vending", "Paint 'N Puzzle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAMEL( 1993, pntnpuzl, 0, pntnpuzl, pntnpuzl, pntnpuzl_state, init_pip, ROT90, "Century Vending", "Paint 'N Puzzle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING, layout_pntnpuzl )

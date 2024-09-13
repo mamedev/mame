@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<!-- also known to exist
+ドラえもんエキサイトピンポン (Doraemon Excite Ping-Pong)
+-->
+
+<softwarelist name="super_tv_pc_cart" description="Epoch Super TV-PC cartridges">
+
+	<!-- these appear to require the system BIOS as they access above the 4MB mark for audio during the boot screen -->
+	<software name="hamtaro" supported="no">
+		<description>Tottoko Hamtaro Ham Ham Ongaku Paradaichu!</description>
+		<year>2004</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="とっとこハム太郎 ハムハムおんがくぱらだいちゅ！" />
+		<part name="cart" interface="super_tv_pc_cart">
+			<dataarea name="prg" size="0x400000">
+				<rom name="c-01.u1" size="0x400000" crc="0accbdcc" sha1="24fd19a87256a3335b5d1e32f11c9171f7359f32" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doraecol" supported="no">
+		<description>Doraemon Chō Nōryoku Game Collection</description>
+		<year>2004</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="ドラえもん 超能力ゲームコレクション" />
+		<part name="cart" interface="super_tv_pc_cart">
+			<dataarea name="prg" size="0x400000">
+				<rom name="c-02.u1" size="0x400000" crc="99fb0088" sha1="b46400c850b08abd5c8ee649f483e0694b3eb059" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dblmouse" supported="no">
+		<description>Double Mouse Party</description>
+		<year>2004</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="ダブルマウスパーティー" />
+		<part name="cart" interface="super_tv_pc_cart">
+			<dataarea name="prg" size="0x200000">
+				<rom name="c-03.u1" size="0x200000" crc="94634a7b" sha1="d69ec0a8c6061e749206927ee68dbcf852fcc03e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conan" supported="no">
+		<description>Detective Conan: Suiri Adventure</description>
+		<year>2005</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="名探偵コナン 推理アドベンチャー" />
+		<part name="cart" interface="super_tv_pc_cart">
+			<dataarea name="prg" size="0x400000">
+				<rom name="c-04.u1" size="0x400000" crc="89b6ef86" sha1="1af69047508fce08fa949a7d821255e306a329a3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eccjr" supported="no">
+		<description>ECC Junior: Ason de Eigo dekichatta!</description>
+		<year>2005</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="ECCジュニア あそんでえいごできちゃった!" />
+		<part name="cart" interface="super_tv_pc_cart">
+			<dataarea name="prg" size="0x400000">
+				<rom name="c-05.u1" size="0x400000" crc="91848208" sha1="098db879c5b77b7af031baf95a2accff13b2b215" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- C-06 -->
+
+	<software name="link" supported="no">
+		<description>Pet Keitai Link</description>
+		<year>2006</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="ペットケータイ Link" />
+		<part name="cart" interface="super_tv_pc_cart">
+			<dataarea name="prg" size="0x400000">
+				<rom name="c-07.u1" size="0x400000" crc="8aeea23c" sha1="e89921fe7714c60dcd60cc29382268350ac6f3f5" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 /*
- * Sandbox for SiS based x86 PCs, targeting the new PCI model
+ * Sandbox for SiS based 496/497 x86 PCs, targeting the new PCI model
  *
  * Notes:
  * - sis85c471 doesn't belong here, it's a full on ISA PC/AT
@@ -16,10 +16,18 @@
 
 #include "emu.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/pci/pci_slot.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/sis85c496.h"
+#include "machine/w83787f.h"
 #include "video/voodoo_pci.h"
+
 
 class sis496_state : public driver_device
 {
@@ -33,12 +41,15 @@ public:
 
 protected:
 	required_device<i486dx4_device> m_maincpu;
+
 private:
 	void main_io(address_map &map);
 	void main_map(address_map &map);
+
+	static void winbond_superio_config(device_t *device);
 };
 
-#define PCI_ID_VIDEO    "pci:08.0"
+#define PCI_ID_VIDEO    "pci:09.0"
 
 class sis496_voodoo1_state : public sis496_state
 {
@@ -46,7 +57,7 @@ public:
 	sis496_voodoo1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sis496_state(mconfig, type, tag)
 		, m_voodoo(*this, PCI_ID_VIDEO)
-		, m_screen(*this, "screen")
+		, m_screen(*this, "voodoo_screen")
 	{ }
 
 	void sis496_voodoo1(machine_config &config);
@@ -66,9 +77,41 @@ void sis496_state::main_io(address_map &map)
 	map.unmap_value_high();
 }
 
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+}
+
+static void isa_internal_devices(device_slot_interface &device)
+{
+	device.option_add("w83787f", W83787F);
+}
+
+void sis496_state::winbond_superio_config(device_t *device)
+{
+	w83787f_device &fdc = *downcast<w83787f_device *>(device);
+//  fdc.set_sysopt_pin(1);
+//  fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+//  fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pci:05.0", FUNC(sis85c496_host_device::pc_irq1_w));
+	fdc.irq8().set(":pci:05.0", FUNC(sis85c496_host_device::pc_irq8n_w));
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+}
+
 void sis496_state::sis496(machine_config &config)
 {
-	// Basic machine hardware
 	I486DX4(config, m_maincpu, 75000000); // I486DX4, 75 or 100 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &sis496_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &sis496_state::main_io);
@@ -77,9 +120,26 @@ void sis496_state::sis496(machine_config &config)
 	PCI_ROOT(config, "pci", 0);
 	SIS85C496_HOST(config, "pci:05.0", 0, "maincpu", 32*1024*1024);
 
-	ISA16_SLOT(config, "isa1", 0, "pci:05.0:isabus",  pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "board4", 0, "pci:05.0:isabus", isa_internal_devices, "w83787f", true).set_option_machine_config("w83787f", winbond_superio_config);
+	ISA16_SLOT(config, "isa1", 0, "pci:05.0:isabus",  pc_isa16_cards, "wd90c31_lr", false);
 	ISA16_SLOT(config, "isa2", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
+
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
+	serport0.rxd_handler().set("board4:w83787f", FUNC(w83787f_device::rxd1_w));
+	serport0.dcd_handler().set("board4:w83787f", FUNC(w83787f_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:w83787f", FUNC(w83787f_device::ndsr1_w));
+	serport0.ri_handler().set("board4:w83787f", FUNC(w83787f_device::nri1_w));
+	serport0.cts_handler().set("board4:w83787f", FUNC(w83787f_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board4:w83787f", FUNC(w83787f_device::rxd2_w));
+	serport1.dcd_handler().set("board4:w83787f", FUNC(w83787f_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:w83787f", FUNC(w83787f_device::ndsr2_w));
+	serport1.ri_handler().set("board4:w83787f", FUNC(w83787f_device::nri2_w));
+	serport1.cts_handler().set("board4:w83787f", FUNC(w83787f_device::ncts2_w));
+
+	// TODO: 9-10-11-12 for PCI_SLOT (according to BIOS)
 }
 
 void sis496_voodoo1_state::sis496_voodoo1(machine_config &config)
@@ -89,28 +149,41 @@ void sis496_voodoo1_state::sis496_voodoo1(machine_config &config)
 	VOODOO_1_PCI(config, m_voodoo, 0, m_maincpu, m_screen);
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 0);
+	// TODO: games are very annoyed with Direct3D 5 init/teardown fns around this.
 	m_voodoo->set_status_cycles(1000);
 
+	// TODO: wrong, needs VGA passthru
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// Screeen size and timing is re-calculated later in voodoo card
 	m_screen->set_refresh_hz(57);
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
 	m_screen->set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_1_pci_device::screen_update));
+
+	PCI_SLOT(config, "pci:1", pci_cards, 10, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards, 11, 1, 2, 3, 0, nullptr);
 }
 
 // generic placeholder for unknown BIOS types
 // Funworld BIOS is temporary until we rewrite funworld/photoply.cpp
 ROM_START( sis85c496 )
 	ROM_REGION32_LE(0x20000, "pci:05.0", 0)
-	ROM_SYSTEM_BIOS(0, "funworld", "Award 486e BIOS with W83787")
+	ROM_SYSTEM_BIOS(0, "funworld", "Award 486e BIOS with W83787 (photoply)")
 	// Photoplay BIOS
+	// Lucky Star LS-486EF REV:B
 	ROMX_LOAD("funworld_award_486e_w83787.bin", 0x000000, 0x20000, BAD_DUMP CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68), ROM_BIOS(0) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS, AT29C010A
+
+	// MegaTouch XL BIOSes
+	// 09/11/96-SiS-496-SMC665-2A4IBU41C-00
+	ROM_SYSTEM_BIOS(1, "merit", "Award 486e BIOS Telco (mtouchxl)")
+	ROMX_LOAD( "094572516 bios - 486.bin", 0x000000, 0x020000, CRC(1c0b3ba0) SHA1(ff86dd6e476405e716ac7a4de4a216d2d2b49f15), ROM_BIOS(1) )
+	// AMI BIOS, Jetway branded MB?
+	// 40-040B-001276-00101111-040493-OP495SLC-0
+	//ROMX_LOAD("prom.mb", 0x10000, 0x10000, BAD_DUMP CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) )
 
 	// Chipset: SiS 85C496/85C497 - CPU: Socket 3 - RAM: 2xSIMM72, Cache - Keyboard-BIOS: JETkey V5.0
 	// ISA16: 3, PCI: 3 - BIOS: SST29EE010 (128k) AMI 486DX ISA BIOS AA2558003 - screen remains blank
-	ROM_SYSTEM_BIOS(1, "4sim002", "AMI ISA BIOS (unknown)")
-	ROMX_LOAD( "4sim002.bin", 0x00000, 0x20000, BAD_DUMP CRC(ea898f85) SHA1(7236cd2fc985985f21979e4808cb708be8d0445f), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "4sim002", "AMI ISA unknown BIOS")
+	ROMX_LOAD( "4sim002.bin", 0x00000, 0x20000, BAD_DUMP CRC(ea898f85) SHA1(7236cd2fc985985f21979e4808cb708be8d0445f), ROM_BIOS(2) )
 ROM_END
 
 // A-Trend ATC-1425A - Chipset: SiS 85C496, 85C497 - RAM: 4xSIMM72, Cache: 4x32pin + TAG - ISA16: 4, PCI: 3

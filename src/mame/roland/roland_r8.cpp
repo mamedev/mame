@@ -79,7 +79,7 @@ R8 mkII doesn't seem to store the tone list in the program ROM.
 #include "bus/generic/slot.h"
 #include "cpu/upd78k/upd78k2.h"
 #include "machine/nvram.h"
-#include "sound/rolandpcm.h"
+#include "sound/roland_lp.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"

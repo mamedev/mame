@@ -80,7 +80,6 @@ private:
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
-	void busreq_w(int state);
 	void tc_w(int state);
 	void rt1715_floppy_enable(uint8_t data);
 	uint8_t k7658_led1_r();
@@ -401,13 +400,6 @@ void rt1715_state::io_write_byte(offs_t offset, uint8_t data)
 	prog_space.write_byte(offset, data);
 }
 
-void rt1715_state::busreq_w(int state)
-{
-	// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
-	m_dma->bai_w(state); // tell dma that bus has been granted
-}
-
 /***************************************************************************
     VIDEO EMULATION
 ***************************************************************************/
@@ -423,15 +415,18 @@ void rt1715_state::crtc_drq_w(int state)
 
 I8275_DRAW_CHARACTER_MEMBER(rt1715_state::crtc_display_pixels)
 {
+	using namespace i8275_attributes;
+
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	u8 gfx = (lten) ? 0xff : 0;
+	u8 gfx = BIT(attrcode, LTEN) ? 0xff : 0;
 
-	if (!vsp)
-		gfx = m_p_chargen[((gpa & 1) << 11) | (linecount << 7) | charcode];
+	if (!BIT(attrcode, VSP))
+		gfx = m_p_chargen[(BIT(attrcode, GPA0) ? 0x800 : 0) | (linecount << 7) | charcode];
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		gfx ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for (u8 i=0; i<8; i++)
 		bitmap.pix(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }
@@ -793,6 +788,7 @@ void rt1715_state::rt1715w(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &rt1715_state::rt1715w_mem);
 	m_maincpu->set_addrmap(AS_IO, &rt1715_state::rt1715w_io);
 	m_maincpu->set_daisy_config(rt1715w_daisy_chain);
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	MCFG_MACHINE_START_OVERRIDE(rt1715_state, rt1715w)
 	MCFG_MACHINE_RESET_OVERRIDE(rt1715_state, rt1715w)
@@ -809,7 +805,7 @@ void rt1715_state::rt1715w(machine_config &config)
 	FLOPPY_CONNECTOR(config, "i8272:1", rt1715w_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 
 	Z80DMA(config, m_dma, 15.9744_MHz_XTAL / 4);
-	m_dma->out_busreq_callback().set(FUNC(rt1715_state::busreq_w));
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->out_int_callback().set(FUNC(rt1715_state::tc_w));
 	m_dma->in_mreq_callback().set(FUNC(rt1715_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(rt1715_state::memory_write_byte));

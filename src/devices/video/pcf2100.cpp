@@ -15,7 +15,7 @@ Actual segment output frequency is divided by number of LCD commons.
 */
 
 #include "emu.h"
-#include "video/pcf2100.h"
+#include "pcf2100.h"
 
 
 DEFINE_DEVICE_TYPE(PCF2100, pcf2100_device, "pcf2100", "Philips PCF2100 LCD Driver")

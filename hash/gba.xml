@@ -4982,7 +4982,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cvaniahdj" cloneof="cvaniahd">
+	<software name="cvaniahdj" cloneof="cvaniahd" supported="no">
 		<description>Castlevania - Byakuya no Concerto (Japan)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
@@ -5010,10 +5010,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cvaniahd">
+	<software name="cvaniahd" supported="no">
 		<description>Castlevania - Harmony of Dissonance (Europe)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Hangs during cutscene after beating Maxim for best ending path (i.e. before real Dracula fight)
+]]></notes>
 		<info name="serial" value="AGB-ACHP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E06-10" />
@@ -5029,7 +5032,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cvaniahdu" cloneof="cvaniahd">
+	<software name="cvaniahdu" cloneof="cvaniahd" supported="no">
 		<description>Castlevania - Harmony of Dissonance (USA)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
@@ -14154,6 +14157,7 @@ license:CC0-1.0
 		<description>Gunstar Future Heroes (Europe)</description>
 		<year>2005</year>
 		<publisher>Sega</publisher>
+		<!-- TODO: verify if it still hangs around endgame -->
 		<info name="serial" value="AGB-BHGP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
@@ -14944,7 +14948,7 @@ license:CC0-1.0
 		<description>Heidi (Europe)</description>
 		<year>2005</year>
 		<publisher>East Entertainment Media</publisher>
-		<info name="alt_title" value="Heidi - The Game (Euro Box), Heidi - Das Spiel zum Film (Ger Box)" />
+		<info name="alt_title" value="Heidi - The Game (Europe Box), Heidi - Das Spiel zum Film (Germany Box)" />
 		<info name="serial" value="AGB-BHJP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
@@ -21921,7 +21925,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mconanam">
-		<description>Meitantei Conan - Akatsuki no Monument (Japan)</description>
+		<description>Detective Conan: Akatsuki no Monument (Japan)</description>
 		<year>2005</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="AGB-BQAJ-JPN"/>
@@ -21936,7 +21940,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mconannt">
-		<description>Meitantei Conan - Nerawareta Tantei (Japan)</description>
+		<description>Detective Conan: Nerawareta Tantei (Japan)</description>
 		<year>2003</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="AGB-AC4J-JPN"/>
@@ -37024,7 +37028,7 @@ license:CC0-1.0
 		<description>Ultimate Muscle - The Kinnikuman Legacy - The Path of the Superhero (USA, prototype, 20030429)</description>
 		<year>2003</year>
 		<publisher>Bandai</publisher>
-			<part name="cart" interface="gba_cart">
+		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="ultimate muscle - the kinnikuman legacy - the path of the superhero (usa, prototype).bin" size="16777216" crc="65e2295b" sha1="314fe99854c8c3ab8786b633f4a20afba835d696"/>

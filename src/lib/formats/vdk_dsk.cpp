@@ -36,9 +36,10 @@ const char *vdk_format::extensions() const noexcept
 
 int vdk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	size_t actual;
 	uint8_t id[2];
-	io.read_at(0, id, 2, actual);
+	auto const [err, actual] = read_at(io, 0, id, 2);
+	if (err || (2 != actual))
+		return 0;
 
 	if (id[0] == 'd' && id[1] == 'k')
 		return FIFID_SIGN;
@@ -48,12 +49,11 @@ int vdk_format::identify(util::random_read &io, uint32_t form_factor, const std:
 
 bool vdk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
-	size_t actual;
 	if (io.seek(0, SEEK_SET))
 		return false;
 
 	uint8_t header[0x100];
-	io.read(header, 0x100, actual);
+	read(io, header, 0x100); // FIXME: check for errors and premature EOF
 
 	int const header_size = header[3] * 0x100 + header[2];
 	int const track_count = header[8];
@@ -81,7 +81,7 @@ bool vdk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sectors[i].bad_crc = false;
 				sectors[i].data = &sector_data[sector_offset];
 
-				io.read(sectors[i].data, SECTOR_SIZE, actual);
+				read(io, sectors[i].data, SECTOR_SIZE); // FIXME: check for errors and premature EOF
 
 				sector_offset += SECTOR_SIZE;
 			}
@@ -95,7 +95,6 @@ bool vdk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 bool vdk_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
-	size_t actual;
 	if (io.seek(0, SEEK_SET))
 		return false;
 
@@ -118,7 +117,7 @@ bool vdk_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	header[10] = 0;
 	header[11] = 0;
 
-	io.write(header, sizeof(header), actual);
+	write(io, header, sizeof(header)); // FIXME: check for errors
 
 	// write disk data
 	for (int track = 0; track < track_count; track++)
@@ -129,7 +128,7 @@ bool vdk_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			auto sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 
 			for (int i = 0; i < SECTOR_COUNT; i++)
-				io.write(sectors[FIRST_SECTOR_ID + i].data(), SECTOR_SIZE, actual);
+				write(io, sectors[FIRST_SECTOR_ID + i].data(), SECTOR_SIZE); // FIXME: check for errors
 		}
 	}
 

@@ -96,8 +96,6 @@ private:
 };
 
 
-// video
-
 
 /*************************************
  *
@@ -189,8 +187,6 @@ uint32_t offtwall_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 
 /*************************************

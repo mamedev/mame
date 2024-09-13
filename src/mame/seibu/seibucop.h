@@ -110,29 +110,13 @@ public:
 
 
 	struct colinfo {
-		colinfo()
-		{
-			pos[0] = pos[1] = pos[2] = 0;
-			dx[0] = dx[1] = dx[2] = 0;
-			size[0] = size[1] = size[2] = 0;
-			allow_swap = false;
-			flags_swap = 0;
-			spradr = 0;
-			min[0] = min[1] = min[2] = 0;
-			max[0] = max[1] = max[2] = 0;
-
-		}
-
-
-		int16_t pos[3];
-		int8_t dx[3];
-		uint8_t size[3];
-		bool allow_swap;
-		uint16_t flags_swap;
-		uint32_t spradr;
-		int16_t min[3], max[3];
-
-
+		int16_t pos[3] = { 0, 0, 0 };
+		int8_t dx[3] = { 0, 0, 0 };
+		uint8_t size[3] = { 0, 0, 0 };
+		bool allow_swap = false;
+		uint16_t flags_swap = 0;
+		uint32_t spradr = 0;
+		int16_t min[3] = { 0, 0, 0 }, max[3] = { 0, 0, 0 };
 	};
 
 	colinfo cop_collision_info[2];

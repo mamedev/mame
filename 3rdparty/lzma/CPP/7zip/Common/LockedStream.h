@@ -1,6 +1,6 @@
 // LockedStream.h
 
-#ifndef __LOCKED_STREAM_H
-#define __LOCKED_STREAM_H
+#ifndef ZIP7_INC_LOCKED_STREAM_H
+#define ZIP7_INC_LOCKED_STREAM_H
 
 #endif

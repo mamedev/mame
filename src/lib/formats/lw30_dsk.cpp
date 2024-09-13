@@ -9,6 +9,7 @@
 #include "lw30_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include <array>
 #include <cassert>
@@ -137,9 +138,11 @@ static constexpr int raw_track_size = 2/*0xaa*/ + 48/*0xaa*/ + SECTORS_PER_TRACK
 int lw30_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size = 0;
-	io.length(size);
+	if(io.length(size))
+		return 0;
+
 	if(size == TRACKS_PER_DISK * SECTORS_PER_TRACK * SECTOR_SIZE)
-		return 50; // identified by size
+		return FIFID_SIZE; // identified by size
 
 	return 0;
 }
@@ -149,9 +152,8 @@ bool lw30_format::load(util::random_read &io, uint32_t form_factor, const std::v
 	uint8_t trackdata[SECTORS_PER_TRACK * SECTOR_SIZE], rawdata[CELLS_PER_REV / 8];
 	memset(rawdata, 0xaa, sizeof(rawdata));
 	for(int track = 0; track < TRACKS_PER_DISK; track++) {
-		size_t actual{};
-		io.read_at(track * SECTORS_PER_TRACK * SECTOR_SIZE, trackdata, SECTORS_PER_TRACK * SECTOR_SIZE, actual);
-		if(actual != SECTORS_PER_TRACK * SECTOR_SIZE)
+		auto const [err, actual] = read_at(io, track * SECTORS_PER_TRACK * SECTOR_SIZE, trackdata, SECTORS_PER_TRACK * SECTOR_SIZE);
+		if(err || (actual != SECTORS_PER_TRACK * SECTOR_SIZE))
 			return false;
 		size_t i = 0;
 		for(int x = 0; x < 2 + 48; x++)
@@ -162,10 +164,10 @@ bool lw30_format::load(util::random_read &io, uint32_t form_factor, const std::v
 			// according to check_track_and_sector
 			for(const auto& d : sector_prefix) // 8 bytes
 				rawdata[i++] = d;
-			rawdata[i++] = sync_table[track] & 0xff;
-			rawdata[i++] = sync_table[track] >> 8;
-			rawdata[i++] = sync_table[sector] & 0xff;
-			rawdata[i++] = sync_table[sector] >> 8;
+			put_u16le(&rawdata[i], sync_table[track]);
+			i += 2;
+			put_u16le(&rawdata[i], sync_table[sector]);
+			i += 2;
 			rawdata[i++] = 0xdd;
 			for(const auto& d : sector_header) // 16 bytes
 				rawdata[i++] = d;

@@ -1144,11 +1144,19 @@ void i386_device::i386_repeat(int invert_flag)
 		m_segment_prefix=1;
 		break;
 		case 0x66:
-		m_operand_size ^= 1;
-		m_xmm_operand_size ^= 1;
+		if(!m_operand_prefix)
+		{
+			m_operand_size ^= 1;
+			m_xmm_operand_size ^= 1;
+			m_operand_prefix = 1;
+		}
 		break;
 		case 0x67:
-		m_address_size ^= 1;
+		if(!m_address_prefix)
+		{
+			m_address_size ^= 1;
+			m_address_prefix = 1;
+		}
 		break;
 		default:
 		prefix_flag=0;
@@ -1270,7 +1278,7 @@ void i386_device::i386_repeat(int invert_flag)
 			count = --REG32(ECX);
 		else
 			count = --REG16(CX);
-		if (m_cycles <= 0)
+		if (count && (m_cycles <= 0))
 			goto outofcycles;
 	}
 	while( count && (!flag || (invert_flag ? !*flag : *flag)) );
@@ -2485,13 +2493,13 @@ void i386_device::i386_clts()              // Opcode 0x0f 0x06
 	// Privileged instruction, CPL must be zero.  Can be used in real or v86 mode.
 	if(PROTECTED_MODE && m_CPL != 0)
 		FAULT(FAULT_GP,0)
-	m_cr[0] &= ~0x08;   /* clear TS bit */
+	m_cr[0] &= ~CR0_TS;   /* clear TS bit */
 	CYCLES(CYCLES_CLTS);
 }
 
 void i386_device::i386_wait()              // Opcode 0x9B
 {
-	if ((m_cr[0] & 0xa) == 0xa)
+	if ((m_cr[0] & (CR0_TS | CR0_MP)) == (CR0_TS | CR0_MP))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;

@@ -50,7 +50,7 @@
         * G-80 2716 EPROM board
         * Video I board
         * Monster Bash Background Board
-        * Monster Bash Sound Board (N7751+DAC, TMS3617, discrete)
+        * Monster Bash Sound Board (D7751+DAC, TMS3617, discrete)
 
     It appears that later on in the evolution of the hardware, Sega
     produced a 2-board version of the hardware which put all the CPU,
@@ -58,7 +58,7 @@
 
     Monster Bash (2 board):
         * G-80 consolidated boardset (315-5006 encrypted Z80)
-        * Monster Bash Sound Board (N7751+DAC, TMS3617, discrete)
+        * Monster Bash Sound Board (D7751+DAC, TMS3617, discrete)
 
     Pig Newton:
         * G-80 consolidated boardset (315-0062 security)
@@ -909,8 +909,8 @@ void segag80r_state::monsterb(machine_config &config)
 	i8255_device &ppi(I8255A(config, "ppi8255"));
 	ppi.out_pa_callback().set(m_soundbrd, FUNC(monsterb_sound_device::sound_a_w));
 	ppi.out_pb_callback().set(m_soundbrd, FUNC(monsterb_sound_device::sound_b_w));
-	ppi.in_pc_callback().set(m_soundbrd, FUNC(monsterb_sound_device::n7751_status_r));
-	ppi.out_pc_callback().set(m_soundbrd, FUNC(monsterb_sound_device::n7751_command_w));
+	ppi.in_pc_callback().set(m_soundbrd, FUNC(monsterb_sound_device::upd7751_status_r));
+	ppi.out_pc_callback().set(m_soundbrd, FUNC(monsterb_sound_device::upd7751_command_w));
 
 	/* background board changes */
 	m_gfxdecode->set_info(gfx_monsterb);
@@ -1369,7 +1369,7 @@ ROM_START( monsterb )
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "1518a.bg-u22",   0x0000, 0x2000, CRC(2d5932fe) SHA1(a9ca239a062e047b307cf3d0740cb6492a55abb4) )
 
-	ROM_REGION( 0x2000, "soundbrd:n7751", 0 )
+	ROM_REGION( 0x2000, "soundbrd:upd7751", 0 )
 	ROM_LOAD( "1543snd.bin",    0x0000, 0x1000, CRC(b525ce8f) SHA1(61e541061a0a579101e52ffa2431540010b9df3e) ) /* U19 */
 	ROM_LOAD( "1544snd.bin",    0x1000, 0x1000, CRC(56c79fb0) SHA1(26de83efcc97318220603f83acf4387f6d70d806) ) /* U23 */
 
@@ -1412,7 +1412,7 @@ ROM_START( monsterb2 )
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "epr-1554.58",  0x0000, 0x2000, CRC(a87937d0) SHA1(cfc2fca52bd74beb2f20ece07e9dd3e3f1038f7c) )
 
-	ROM_REGION( 0x2000, "soundbrd:n7751", 0 )
+	ROM_REGION( 0x2000, "soundbrd:upd7751", 0 )
 	ROM_LOAD( "epr-1543.19",  0x0000, 0x1000, CRC(b525ce8f) SHA1(61e541061a0a579101e52ffa2431540010b9df3e) )
 	ROM_LOAD( "epr-1544.23",  0x1000, 0x1000, CRC(56c79fb0) SHA1(26de83efcc97318220603f83acf4387f6d70d806) )
 
@@ -1516,14 +1516,14 @@ ROM_START( sindbadm )
 	ROM_LOAD( "epr-5400.4a", 0x0000, 0x2000, CRC(5114f18e) SHA1(343f96c728f96df5d50a9888fc87488d9440d7f4) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "epr-5428.9m", 0x0000, 0x2000, CRC(f6044a1e) SHA1(19622aa0991553604236a1ff64a3e5dd1d881ed8) )
-	ROM_LOAD( "epr-5429.9p", 0x2000, 0x2000, CRC(b23eca10) SHA1(e00ab3b50b52e16d7281ece42d73603fb188c9b3) )
+	ROM_LOAD( "epr-5428.9m", 0x0000, 0x2000, CRC(f6044a1e) SHA1(19622aa0991553604236a1ff64a3e5dd1d881ed8) ) // also found labeled as EPR-5500
+	ROM_LOAD( "epr-5429.9p", 0x2000, 0x2000, CRC(b23eca10) SHA1(e00ab3b50b52e16d7281ece42d73603fb188c9b3) ) // also found labeled as EPR-5499
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "epr-5424.9e", 0x0000, 0x2000, CRC(4bfc2e95) SHA1(7d513df944d5768b14983f44a1e3c76930a55e9a) )
-	ROM_LOAD( "epr-5425.9h", 0x2000, 0x2000, CRC(b654841a) SHA1(9b224fbe5f4c7bbb486a3d15550cc10e4f317631) )
-	ROM_LOAD( "epr-5426.9j", 0x4000, 0x2000, CRC(9de0da28) SHA1(79e01005861e2426a8112544b1bc6d1c6a9ce936) )
-	ROM_LOAD( "epr-5427.9l", 0x6000, 0x2000, CRC(a94f4d41) SHA1(fe4f412ea3680c0e5a6242827eab9e82a841d7c7) )
+	ROM_LOAD( "epr-5424.9e", 0x0000, 0x2000, CRC(4bfc2e95) SHA1(7d513df944d5768b14983f44a1e3c76930a55e9a) ) // also found labeled as EPR-5495
+	ROM_LOAD( "epr-5425.9h", 0x2000, 0x2000, CRC(b654841a) SHA1(9b224fbe5f4c7bbb486a3d15550cc10e4f317631) ) // also found labeled as EPR-5496
+	ROM_LOAD( "epr-5426.9j", 0x4000, 0x2000, CRC(9de0da28) SHA1(79e01005861e2426a8112544b1bc6d1c6a9ce936) ) // also found labeled as EPR-5497
+	ROM_LOAD( "epr-5427.9l", 0x6000, 0x2000, CRC(a94f4d41) SHA1(fe4f412ea3680c0e5a6242827eab9e82a841d7c7) ) // also found labeled as EPR-5498
 ROM_END
 
 
@@ -1760,7 +1760,6 @@ GAME( 1981, astrob2b,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob
 GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 1)", MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
 GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (German)", 0 )
 GAME( 1981, 005,       0,        sega005,  005,      segag80r_state, init_005,      ROT270, "Sega", "005", MACHINE_IMPERFECT_SOUND )
-
 
 /* basic G-80 system with individual background boards */
 GAME( 1981, spaceod,   0,        spaceod,  spaceod,  segag80r_state, init_spaceod,  ROT270, "Sega", "Space Odyssey (version 2)", MACHINE_IMPERFECT_SOUND )

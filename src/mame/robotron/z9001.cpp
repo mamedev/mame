@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic , Robbbert
+// copyright-holders:Miodrag Milanovic, Robbbert
 /*************************************************************************************
 
 Robotron Z9001 (KC85/1)

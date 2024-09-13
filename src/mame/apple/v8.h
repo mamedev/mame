@@ -11,12 +11,11 @@
 #include "machine/swim2.h"
 #include "sound/asc.h"
 #include "emupal.h"
-#include "speaker.h"
 #include "screen.h"
 
 // ======================> v8_device
 
-class v8_device :  public device_t
+class v8_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
@@ -52,6 +51,8 @@ protected:
 
 	u8 m_pseudovia_regs[256];
 	u32 *m_ram_ptr;
+	u32 m_ram_size;
+	bool m_overlay;
 
 	v8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -61,9 +62,13 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
 	virtual u8 pseudovia_r(offs_t offset);
 
 	void asc_irq(int state);
+
+	virtual void ram_size(u8 config);
 
 private:
 	devcb_write_line write_pb4, write_pb5, write_cb2, write_hdsel, write_hmmu_enable;
@@ -73,17 +78,15 @@ private:
 	required_device<via6522_device> m_via1;
 	required_region_ptr<u32> m_rom;
 
+	sound_stream *m_stream;
 	emu_timer *m_6015_timer;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
 	u8 m_pseudovia_ier, m_pseudovia_ifr;
 	u8 m_pal_address, m_pal_idx, m_pal_control, m_pal_colkey;
-	bool m_overlay;
-	u32 m_ram_size;
 
 	bool m_baseIs4M;
 
 	u32 rom_switch_r(offs_t offset);
-	void ram_size(u8 config);
 
 	void pseudovia_w(offs_t offset, u8 data);
 	void pseudovia_recalc_irqs();
@@ -140,30 +143,52 @@ public:
 	required_device_array<floppy_connector, 2> m_floppy;
 
 protected:
+	spice_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
+
+	void phases_w(u8 phases);
+	void devsel_w(u8 devsel);
 
 private:
 	floppy_image_device *m_cur_floppy = nullptr;
 	int m_hdsel;
 
-	u8 via_in_a() override;
+	virtual u8 via_in_a() override;
 	virtual void via_out_a(u8 data) override;
-	u8 pseudovia_r(offs_t offset) override;
+	virtual u8 pseudovia_r(offs_t offset) override;
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	void phases_w(u8 phases);
-	void devsel_w(u8 devsel);
 	u16 swim_r(offs_t offset, u16 mem_mask);
 	void swim_w(offs_t offset, u16 data, u16 mem_mask);
 
 	void bright_contrast_w(offs_t offset, u8 data);
 };
 
+// ======================> tinkerbell_device
+
+class tinkerbell_device : public spice_device
+{
+public:
+	tinkerbell_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual void ram_size(u8 config) override;
+
+private:
+	virtual u8 via_in_a() override;
+	virtual u8 pseudovia_r(offs_t offset) override;
+	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(V8, v8_device)
 DECLARE_DEVICE_TYPE(EAGLE, eagle_device)
 DECLARE_DEVICE_TYPE(SPICE, spice_device)
+DECLARE_DEVICE_TYPE(TINKERBELL, tinkerbell_device)
 
 #endif // MAME_APPLE_V8_H

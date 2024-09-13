@@ -1,0 +1,356 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="hikara" description="Takara Tomy Hi-kara cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
+
+	***********************************************************************************
+
+	cartridge pinout
+
+	01 | NC                         27 | GND
+	02 | connects to 13             28 | NC
+	03 | A15                        29 | NC
+	04 | A14                        30 | NC
+	05 | A13                        31 | NC
+	06 | A12                        32 | VCC
+	07 | A11                        33 | D07
+	08 | A10                        34 | D06
+	09 | A09                        35 | D05
+	10 | A08                        36 | D04
+	11 | A07                        37 | D03
+	12 | A06                        38 | D02
+	13 | connects to 02             39 | D01
+	14 | CE                         40 | D00
+	15 | A05                        41 | GND
+	16 | A04                        42 | WE
+	17 | A03                        43 | OE
+	18 | A02                        44 | VCC
+	19 | A01                        45 | NC
+	20 | A00                        46 | A22
+	21 | VCC                        47 | A21
+	22 | NC                         48 | A20
+	23 | NC                         49 | A19
+	24 | NC                         50 | A18
+	25 | NC                         51 | A17
+	26 | GND                        52 | A16
+
+	-->
+
+	<!-- User cartridges are advertised as 'prepaid' and come in 5,10, or 20 song capacity for the user to download songs to.
+	     The service is no longer available.
+	-->
+
+	<!--
+	        * = dumped
+
+	        * Best Hit Collection Volume 1: J-Pop 1         BH0801001   Light Blue
+	        * Best Hit Collection Volume 2: J-Pop 2         BH0801002   Bright Pink
+	        * Best Hit Collection Volume 3: J-Pop 3         BH0801003   Grey
+	        * Best Hit Collection Volume 4: Anime Song 1    BH0802001   Deep Pink
+	        * Best Hit Collection Volume 5: Anime Song 2    BH0802002   Yellow
+	        * Best Hit Collection Volume 6: Kid's Songs 1   BH0803001   Green
+	        * Best Hit Collection Volume 7 (no subtitle)    BH0904001   Blue
+	        * Best Hit Collection Volume 8 (no subtitle)    BH0904002   Orange
+
+	        * Pocket Monsters Special                       -none-      Yellow
+	        * Ciao Special                                  CC0907001   Translucent Pink - came with the 2009/06 issue of the Ciao (ちゃお) manga
+
+	        4 User Cartridge (5 Capacity)                   n/a         Translucent Grey/White
+	        2 User Cartridge (10 Capacity)                  n/a         Translucent Pink
+	        2 User Cartridge (20 Capacity)                  n/a         Translucent Blue
+	-->
+
+	<!-- this one has some songs programmed into it:
+	    キューティーハニー              倖田來未                    Cutie Honey                     Kōda Kumi
+	    KissHug                         aiko                        KissHug                         aiko
+	    さくらんぼ                      大塚愛                      Sakuranbo                       Ōtsuka Ai
+	    Dream Fighter                   Perfume                     Dream Fighter                   Perfume
+	    ポリリズム                      Perfume                     Polyrhythm                      Perfume -->
+	<software name="user5" supported="no">
+		<description>Hi-kara 5-song capacity user cartridge (used, with 5 songs) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="A29L800ATV.u1" size="0x100000" crc="679f92e9" sha1="9af880f7f09c0e616d0f0b3cd499ab42de3ab210"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	    崖の上のポニョ                  藤岡藤巻と大橋のぞみ        Gake no Ue no Ponyo             Fujioka Fujimaki & Ōhashi Nozomi
+	    タンタンターン！                MilkyWay                    Tan Tan Tān!                    MilkyWay
+	    ハートのエースが出てこない      キャンディーズ              Heart no Ace ga Detekonai       Candies
+	    プリキュア5、スマイル go go!    工藤真由                    PreCure 5, Smile Go Go!         Kudō Mari -->
+	<software name="user5a" cloneof="user5" supported="no">
+		<description>Hi-kara 5-song capacity user cartridge (used, with 4 songs, set 1) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="usercart_4songs.bin" size="0x100000" crc="e0c3d088" sha1="d2063a65e0e9526ac0f9907fcf82d1f55bd488ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	    崖の上のポニョ                  藤岡藤巻と大橋のぞみ            Gake no Ue no Ponyo             Fujioka Fujimaki & Ōhashi Nozomi
+	    キセキ                          GReeeeN                         Kiseki                          GReeeeN
+	    タッチ                          岩崎良美                        TOUCH                           Iwasaki Yoshimi
+	    キューティーハニー              倖田來未                        Cutie Honey                     Kōda Kumi -->
+	<software name="user5b" cloneof="user5" supported="no">
+		<description>Hi-kara 5-song capacity user cartridge (used, with 4 songs, set 2) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="usercart_5_2.u1" size="0x100000" crc="800aaba1" sha1="bc1bf147ae83d9c601a053d856a6d7f9d7402ff0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	    刹那                            GReeeeN                         Setsuna                         GReeeeN
+	    ヤッターマンの歌                ET-KING                         Yatterman no Uta                ET-KING -->
+	<software name="user5c" cloneof="user5" supported="no">
+		<description>Hi-kara 5-song capacity user cartridge (used, with 2 songs) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="usercart_5_1.u1" size="0x100000" crc="a2761c33" sha1="957b95983037bedb42759502e0111fd9008cb26f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	    雫                              スキマスイッチ                  Shizuku                         Sukima Switch
+	    鐘を鳴らして                    BONNIE PINK                     Kane o Narashite                BONNIE PINK
+	    ホウキ雲                        RYTHEM                          Houkigumo                       RYTHEM
+	    さくらびと                      SunSet Swish                    Sakurabito                      SunSet Swish
+	    again                           YUI                             again                           YUI
+	    カルマ                          BUMP OF CHICKEN                 Karma                           BUMP OF CHICKEN
+	    創聖のアクエリオン              AKINO                           Genesis of AQUARION             AKINO
+	    レイン                          シド                            Rain                            SID
+	    きっと伝えて                    松たか子                        Kitto Tsutaete                  Matsu Takako
+	    メリッサ                        ポルノグラフィティ              Melissa                         Porno Graffitti -->
+	<software name="user10" supported="no">
+		<description>Hi-kara 10-song capacity user cartridge (used, with 10 songs, set 1) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="cartdump_pink.u1" size="0x200000" crc="235c1c52" sha1="8ce599227e2824d7ca98e3d0f9bb163c09d8fa58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	    陽は、また昇る                  アラジン                        Hi wa, Mata Noboru              Aladdin
+	    ポリリズム                      Perfume                         Polyrhythm                      Perfume
+	    世界がひとつになるまで          Ya-Ya-yah                       Sekai ga Hitotsu ni Naromade    Ya-Ya-yah
+	    亜麻色の髪の乙女                島谷ひとみ                      Amairo no Kami no Otome         Shimatani Hitomi
+	    サボテンの花                    チューリップ                    Saboten no Hana                 TULIP
+	    涙そうそう                      川りみ                          Nada Sōsō                       Natsukawa Rimi
+	    侍戦隊シンケンジャー            サイキックラバー(Project.R)     Samurai Sentai Shinkenger       PSYCHIC LOVER (Project.R)
+	    Journey through the Decade      Gackt                           Journey through the Decade      Gackt
+	    PEACH                           大塚愛                          PEACH                           Ōtsuka Ai -->
+	<software name="user10a" cloneof="user10" supported="no">
+		<description>Hi-kara 10-song capacity user cartridge (used, with 10 songs, set 2) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="usercart_10.u1" size="0x200000" crc="51e64d8e" sha1="90e5592446101807f47772b0868ce3de5d78b9f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	    一番綺麗な私を                  中島美嘉                        Ichiban Kireina Watashi o       Nakajima Mika
+	    わかれうた                      中島みゆき                      Wakareuta                       Nakajima Miyuki
+	    地上の星                        中島みゆき                      Chijō no Hoshi                  Nakajima Miyuki
+	    ロビンソン                      スピッツ                        Robinson                        Spitz
+	    蕾                              コブクロ                        Tsubomi                         KOBUKURO
+	    粉雪                            レミオロメン                    Konayuki                        Remioromen
+	    木枯しに抱かれて                小泉今日子                      Kogarashi ni Dakarete           Koizumi Kyōko
+	    あなたに会えてよかった          小泉今日子                      Anata ni Aeteyokatta            Koizumi Kyōko
+	    能動的三分間                    東京事変                        Nōdōteki Sanpunkan              Tōkyō Jihen
+	    ワンルーム・ディスコ            Perfume                         One Room Disco                  Perfume
+	    VOICE                           Perfume                         VOICE                           Perfume
+	    時をかける少女                  原田知世                        Toki o Kakeru Shōjo             Harada Tomiyo
+	    アポロ                          ポルノグラフィティ              Apollo                          Porno Graffitti
+	    冬がはじまるよ                  槇原敬之                        Fuyu ga Hajimaru yo             Makihara Noriyuki
+	    遠く遠く                        槇原敬之                        Tōku Tōku                       Makihara Noriyuki
+	    もう一度キスしたかった          B'z                             Mō Ichidō Kiss Shitakatta       B'z
+	    LOVE PHANTOM                    B'z                             LOVE PHANTOM                    B'z
+	    天体観測                        BUMP OF CHICKEN                 Tentai Kansoku                  BUMP OF CHICKEN
+	    情熱の薔薇                      THE BLUE HEARTS                 Jōnetsu no Bara                 THE BLUE HEARTS
+	    ありがとう                      いきものがかり                  Arigatō                         Ikimonogakari -->
+	<software name="user20" supported="no">
+		<description>Hi-kara 20-song capacity user cartridge (used, with 20 songs, set 1) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="cartdump_blue.u1" size="0x200000" crc="4912b515" sha1="0b004821b07b82eb05c3ce7b0c89e55b35dff20b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	    もうすぐクリスマス                      里田まい with 合田兄妹          Mōsugu Christmas                            Satoda Mai with Gōda Kyōdai
+	    ブルーバード                            いきねのがかり                  Blue Bird                                   Ikimonogakari
+	    さくらんぼ                              大塚愛                          Sakuranbo                                   Ōtsuka Ai
+	    千の風になって                          秋川雅史                        Sen no Kaze ni Natte                        Akikawa Masafumi
+	    想い出がいっぱい                        H2O                             Amaide ga Ippai                             H2O
+	    残酷な天使のテーゼ                      高橋洋子                        Sankoku na Tenshi no Thesis                 Takahashi Yōko
+	    青春おでん                              twe'lv                          Seishun Oden                                twe'lv
+	    テルーの唄                              手嶌葵                          Therru no Uta                               Teshima Aoi
+	    ゲゲゲの鬼太郎                          泉谷しげる                      Gegege no Kitarō                            Izumiya Shigeru
+	    気まぐれロマンティック                  いきねのがかり                  Kimagure Romantic                           Ikimonogakari
+	    世界に一つだけの花                      SMAP                            Sekai ni Hitotsu Dake no Hana               SMAP
+	    地上の星                                中島みゆき                      Chijō no Hoshi                              Nakajima Miyuki
+	    碧いうさぎ                              酒井法子                        Aoi Usagi                                   Sakai Noriko
+	    未来へ                                  Kiroro                          Mirai e                                     Kiroro
+	    弱虫サンタ                              羞恥心                          Yowamushi Santa                             Shūchishin
+	    泣かないで                              羞恥心                          Nakanaide                                   Shūchishin
+	    羞恥心                                  羞恥心                          Shūchishin                                  Shūchishin
+	    炎神戦隊ゴーオンジャー                  高橋秀幸(Project.R)             ENGINE SENTAI GO-ONGER                      Takahashi Hideyuki
+	    いつも何度でも                          木村弓                          Itsumo Nandodemo                            Kimura Yumi
+	    ニホンノミカタ-ネバダカラキマシタ-      矢島美容室                      Nihon no Mikata -Nevada kara Kimashita-     Yajima Biyōshitsu -->
+	<software name="user20a" cloneof="user20" supported="no">
+		<description>Hi-kara 20-song capacity user cartridge (used, with 20 songs, set 2) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="usercart_20.u1" size="0x200000" crc="e047d928" sha1="a75ca2035d74bf4292562576872389e012ceb1ad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh1jpop1" supported="no">
+		<description>Best Hit Collection Volume 1: J-Pop 1 (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.1 J-POP①"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0801001.u1" size="0x200000" crc="298dff43" sha1="c644a00154d129808261688482943b93440c33dc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh2jpop2" supported="no">
+		<description>Best Hit Collection Volume 2: J-Pop 2 (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.2 J-POP②"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0801002.u1" size="0x200000" crc="ef4c68f3" sha1="ea9d62d6ba98f3c067f39b6d2e9d8b03d441b315"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh3jpop3" supported="no">
+		<description>Best Hit Collection Volume 3: J-Pop 3 (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.3 J-POP③"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0801003.u1" size="0x200000" crc="66fbff9d" sha1="02cc6f288a56ec4d598b6d51d920985caa8a7458"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh4anim1" supported="no">
+		<description>Best Hit Collection Volume 4: Anime Song 1</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.4 アニメソング①"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0802001.u1" size="0x200000" crc="1294fbcc" sha1="aa68b6aeb497837f8fed595a3537f49a2a17dd11"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh5anim2" supported="no">
+		<description>Best Hit Collection Volume 5: Anime Song 2</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.5 アニメソング②"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0802002.u1" size="0x200000" crc="d367d127" sha1="9bbe04ca274caf9b70f542e317ea71028a4886ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh6kids1" supported="no">
+		<description>Best Hit Collection Volume 6: Kids' Song 1</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.6 キッズソング①"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0803001.u1" size="0x200000" crc="2921a2ba" sha1="0708d985784669c4289636a87876163285f8cb97"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh7" supported="no">
+		<description>Best Hit Collection Volume 7</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.7"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0904001.u1" size="0x200000" crc="20d58743" sha1="25e348663d2d41bb96267c4430d2eb858bbb79c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bh8" supported="no">
+		<description>Best Hit Collection Volume 8</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.8"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0904002.u1" size="0x200000" crc="fd24eefa" sha1="015ce9845dd2fb36a04e2c1cdb50d2fc9d4e14c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokemon" supported="no">
+		<description>Utatte Asonde! Best Hit Pokémon</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="うたってあそんで！ベストヒットポケモン"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="r-08b0541.u1" size="0x200000" crc="8b6a6d4b" sha1="5f264bff2deedbd61d844c4f8ba4421ac598636c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ciao" supported="no">
+		<description>Ciao Best Hit Cartridge</description>
+		<year>2009</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ちゃお ベストヒットカートリッジ"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="cc0907001.u1" size="0x200000" crc="45f6b2a3" sha1="b3b1b3f269b128a2b09aa932f77d53da53f6130f"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

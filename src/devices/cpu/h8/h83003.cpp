@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(H83003, h83003_device, "h83003", "Hitachi H8/3003")
 
-h83003_device::h83003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83003_device::h83003_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8h_device(mconfig, H83003, tag, owner, clock, address_map_constructor(FUNC(h83003_device::map), this)),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
@@ -30,9 +30,9 @@ h83003_device::h83003_device(const machine_config &mconfig, const char *tag, dev
 	m_timer16_3(*this, "timer16:3"),
 	m_timer16_4(*this, "timer16:4"),
 	m_watchdog(*this, "watchdog"),
-	m_tend_cb(*this)
+	m_tend_cb(*this),
+	m_syscr(0)
 {
-	m_syscr = 0;
 }
 
 void h83003_device::map(address_map &map)
@@ -132,21 +132,21 @@ void h83003_device::map(address_map &map)
 	map(base | 0xffbb, base | 0xffbb).rw(m_sci[1], FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
 	map(base | 0xffbc, base | 0xffbc).rw(m_sci[1], FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
 	map(base | 0xffbd, base | 0xffbd).r(m_sci[1], FUNC(h8_sci_device::rdr_r));
-	map(base | 0xffc5, base | 0xffc5).w(m_port4, FUNC(h8_port_device::ddr_w));
+	map(base | 0xffc5, base | 0xffc5).rw(m_port4, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 	map(base | 0xffc7, base | 0xffc7).rw(m_port4, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(base | 0xffc8, base | 0xffc8).w(m_port5, FUNC(h8_port_device::ddr_w));
-	map(base | 0xffc9, base | 0xffc9).w(m_port6, FUNC(h8_port_device::ddr_w));
+	map(base | 0xffc8, base | 0xffc8).rw(m_port5, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(base | 0xffc9, base | 0xffc9).rw(m_port6, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 	map(base | 0xffca, base | 0xffca).rw(m_port5, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(base | 0xffcb, base | 0xffcb).rw(m_port6, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(base | 0xffcd, base | 0xffcd).w(m_port8, FUNC(h8_port_device::ddr_w));
+	map(base | 0xffcd, base | 0xffcd).rw(m_port8, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 	map(base | 0xffce, base | 0xffce).r(m_port7, FUNC(h8_port_device::port_r));
 	map(base | 0xffcf, base | 0xffcf).rw(m_port8, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(base | 0xffd0, base | 0xffd0).w(m_port9, FUNC(h8_port_device::ddr_w));
-	map(base | 0xffd1, base | 0xffd1).w(m_porta, FUNC(h8_port_device::ddr_w));
+	map(base | 0xffd0, base | 0xffd0).rw(m_port9, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(base | 0xffd1, base | 0xffd1).rw(m_porta, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 	map(base | 0xffd2, base | 0xffd2).rw(m_port9, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(base | 0xffd3, base | 0xffd3).rw(m_porta, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(base | 0xffd4, base | 0xffd4).w(m_portb, FUNC(h8_port_device::ddr_w));
-	map(base | 0xffd5, base | 0xffd5).w(m_portc, FUNC(h8_port_device::ddr_w));
+	map(base | 0xffd4, base | 0xffd4).rw(m_portb, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
+	map(base | 0xffd5, base | 0xffd5).rw(m_portc, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 	map(base | 0xffd6, base | 0xffd6).rw(m_portb, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(base | 0xffd7, base | 0xffd7).rw(m_portc, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(base | 0xffda, base | 0xffda).rw(m_port4, FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
@@ -243,9 +243,9 @@ void h83003_device::interrupt_taken()
 	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
-void h83003_device::internal_update(uint64_t current_time)
+void h83003_device::internal_update(u64 current_time)
 {
-	uint64_t event_time = 0;
+	u64 event_time = 0;
 
 	add_event(event_time, m_adc->internal_update(current_time));
 	add_event(event_time, m_sci[0]->internal_update(current_time));
@@ -260,37 +260,54 @@ void h83003_device::internal_update(uint64_t current_time)
 	recompute_bcount(event_time);
 }
 
+void h83003_device::notify_standby(int state)
+{
+	m_adc->notify_standby(state);
+	m_sci[0]->notify_standby(state);
+	m_sci[1]->notify_standby(state);
+	m_timer16_0->notify_standby(state);
+	m_timer16_1->notify_standby(state);
+	m_timer16_2->notify_standby(state);
+	m_timer16_3->notify_standby(state);
+	m_timer16_4->notify_standby(state);
+	m_watchdog->notify_standby(state);
+}
+
 void h83003_device::device_start()
 {
 	h8h_device::device_start();
 	m_dma_device = m_dma;
+
+	save_item(NAME(m_syscr));
+	save_item(NAME(m_rtmcsr));
 }
 
 void h83003_device::device_reset()
 {
 	h8h_device::device_reset();
 	m_syscr = 0x09;
+	m_rtmcsr = 0x00;
 }
 
-uint8_t h83003_device::syscr_r()
+u8 h83003_device::syscr_r()
 {
 	return m_syscr;
 }
 
-void h83003_device::syscr_w(uint8_t data)
+void h83003_device::syscr_w(u8 data)
 {
 	m_syscr = data;
 	update_irq_filter();
 	logerror("syscr = %02x\n", data);
 }
 
-uint8_t h83003_device::rtmcsr_r()
+u8 h83003_device::rtmcsr_r()
 {
 	// set bit 7 -- Compare Match Flag (CMF): This status flag indicates that the RTCNT and RTCOR values have matched.
 	return m_rtmcsr | 0x80;
 }
 
-void h83003_device::rtmcsr_w(uint8_t data)
+void h83003_device::rtmcsr_w(u8 data)
 {
 	m_rtmcsr = data;
 	logerror("rtmcsr = %02x\n", data);

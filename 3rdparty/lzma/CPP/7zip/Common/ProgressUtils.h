@@ -1,35 +1,33 @@
 // ProgressUtils.h
 
-#ifndef __PROGRESS_UTILS_H
-#define __PROGRESS_UTILS_H
+#ifndef ZIP7_INC_PROGRESS_UTILS_H
+#define ZIP7_INC_PROGRESS_UTILS_H
 
 #include "../../Common/MyCom.h"
 
 #include "../ICoder.h"
 #include "../IProgress.h"
 
-class CLocalProgress:
-  public ICompressProgressInfo,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_COM_1(
+  CLocalProgress
+  , ICompressProgressInfo
+)
+public:
+  bool SendRatio;
+  bool SendProgress;
+private:
+  bool _inSizeIsMain;
   CMyComPtr<IProgress> _progress;
   CMyComPtr<ICompressProgressInfo> _ratioProgress;
-  bool _inSizeIsMain;
 public:
   UInt64 ProgressOffset;
   UInt64 InSize;
   UInt64 OutSize;
-  bool SendRatio;
-  bool SendProgress;
 
   CLocalProgress();
 
   void Init(IProgress *progress, bool inSizeIsMain);
   HRESULT SetCur();
-
-  MY_UNKNOWN_IMP1(ICompressProgressInfo)
-
-  STDMETHOD(SetRatioInfo)(const UInt64 *inSize, const UInt64 *outSize);
 };
 
 #endif

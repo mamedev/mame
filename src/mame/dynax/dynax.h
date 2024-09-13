@@ -12,12 +12,12 @@
 
 #include "dynax_blitter_rev2.h"
 
+#include "machine/74259.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/rstbuf.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
-#include "machine/74259.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -43,7 +43,9 @@ public:
 	void majrjhdx(machine_config &config);
 	void tenkai(machine_config &config);
 	void ougonhai(machine_config &config);
+	void ougonhaib1(machine_config &config);
 	void mjreach(machine_config &config);
+	void mjreachp2(machine_config &config);
 	void mjdialq2(machine_config &config);
 	void sprtmtch(machine_config &config);
 
@@ -162,6 +164,7 @@ private:
 	void tenkai_p8_w(uint8_t data);
 	uint8_t tenkai_p8_r();
 	void ougonhai_p7_w(uint8_t data);
+	void mjreachp2_p8_w(uint8_t data);
 	void tenkai_6c_w(int state);
 	void tenkai_70_w(int state);
 	void tenkai_blit_romregion_w(uint8_t data);
@@ -209,8 +212,13 @@ private:
 	void tenkai_map(address_map &map) ATTR_COLD;
 	void tenkai_banked_map(address_map &map) ATTR_COLD;
 
+	void ougonhai_map(address_map &map) ATTR_COLD;
+	void ougonhai_banked_map(address_map &map) ATTR_COLD;
+
 	void gekisha_map(address_map &map) ATTR_COLD;
 	void gekisha_banked_map(address_map &map) ATTR_COLD;
+
+	void mjreachp2_map(address_map &map) ATTR_COLD;
 
 	// misc
 	int m_rombank = 0;

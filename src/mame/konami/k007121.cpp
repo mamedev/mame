@@ -125,8 +125,8 @@ DEFINE_DEVICE_TYPE(K007121, k007121_device, "k007121", "K007121 Sprite/Tilemap C
 
 k007121_device::k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K007121, tag, owner, clock)
-	, m_flipscreen(0)
-	, m_palette(*this, finder_base::DUMMY_TAG)
+	, device_gfx_interface(mconfig, *this)
+	, m_flipscreen(false)
 {
 }
 
@@ -146,7 +146,7 @@ void k007121_device::device_start()
 
 void k007121_device::device_reset()
 {
-	m_flipscreen = 0;
+	m_flipscreen = false;
 
 	for (int i = 0; i < 8; i++)
 		m_ctrlram[i] = 0;
@@ -177,7 +177,7 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 			machine().tilemap().mark_all_dirty();
 		break;
 	case 7:
-		m_flipscreen = data & 0x08;
+		m_flipscreen = BIT(data, 3);
 		break;
 	}
 
@@ -208,7 +208,7 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
  *
  */
 
-void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, device_palette_interface &palette,
+void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect,
 		const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask, bool is_flakatck )
 {
 	// TODO: sprite limit is supposed to be per-line! (check MT #00185)
@@ -252,7 +252,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		if (is_flakatck)
 			transparent_mask = 1 << 0;
 		else
-			transparent_mask = palette.transpen_mask(*gfx, color, 0);
+			transparent_mask = palette().transpen_mask(*gfx(0), color, 0);
 
 		number += bank_base;
 
@@ -292,7 +292,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 
 				if (pri_mask != (uint32_t)-1)
 				{
-					gfx->prio_transmask(bitmap,cliprect,
+					gfx(0)->prio_transmask(bitmap,cliprect,
 							number + x_offset[ex] + y_offset[ey],
 							color,
 							flipx,flipy,
@@ -302,7 +302,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 				}
 				else
 				{
-					gfx->transmask(bitmap,cliprect,
+					gfx(0)->transmask(bitmap,cliprect,
 							number + x_offset[ex] + y_offset[ey],
 							color,
 							flipx,flipy,

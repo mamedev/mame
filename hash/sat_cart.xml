@@ -11,7 +11,7 @@ Kof95 and Ultraman require additional ROM cartridges to work!
 
 	<!-- The header would indicate this is the same for both regions -->
 	<software name="kof95" supported="no">
-		<description>The King of Fighters '95 (Euro, Jpn) (Support Cartridge)</description>
+		<description>The King of Fighters '95 (Europe, Japan) (support cartridge)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="T-3101G" />
@@ -28,7 +28,7 @@ Kof95 and Ultraman require additional ROM cartridges to work!
 	</software>
 
 	<software name="ultraman" supported="no">
-		<description>Ultraman (Jpn) (Support Cartridge)</description>
+		<description>Ultraman (Japan) (support cartridge)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="sat_cart">

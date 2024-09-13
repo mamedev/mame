@@ -267,6 +267,19 @@ ROM_START(bbnny_lu)
 	ROM_RELOAD(0x50000, 0x10000)
 ROM_END
 
+ROM_START(bbnny_lg)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("bugs_bunny_u26_lg-2_nova_apparate.bin", 0x0000, 0x8000, CRC(0ba81bae) SHA1(ce56eadf26ee74a3a7b185893dceb09dc4929fa8))
+	ROM_LOAD("bugs_bunny_u27_lg-2_nova_apparate.bin", 0x8000, 0x8000, CRC(33344679) SHA1(c504c8a85820b3ca8923513bbba5e058138be4a1))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("bugs_u4.l2", 0x00000, 0x10000, CRC(04bc9aa5) SHA1(c3da2dc3e26b88a0ebc6f87e61fc71bec45330c3))
+	ROM_RELOAD(0x10000, 0x10000)
+	ROM_LOAD("bugs_u19.l1", 0x20000, 0x10000, CRC(a2084702) SHA1(ffd749387e7b52bad1e98c6a8939fb87bc67524c))
+	ROM_RELOAD(0x30000, 0x10000)
+	ROM_LOAD("bugs_u20.l1", 0x40000, 0x10000, CRC(5df734ef) SHA1(c8d153444dd6171c3ebddc8100ab06fde3373cc6))
+	ROM_RELOAD(0x50000, 0x10000)
+ROM_END
+
 /*--------------------
 / Diner 8/90 (#571)
 /--------------------*/
@@ -313,6 +326,19 @@ ROM_START(diner_f2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("dinr_u26.l2", 0x4000, 0x4000, CRC(8b6aa22e) SHA1(6b802a85fc2babf5a183fb434df11597363c1c9d))
 	ROM_LOAD("dinr_u27.lf2", 0x8000, 0x8000, CRC(343af291) SHA1(ecf30dd828537cd68dc6c9f97256a38c820b9afc))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dinr_u4.l1", 0x00000, 0x10000, CRC(3bd28368) SHA1(41eec2f5f863039deaabfae8aece4b1cf15e4b78))
+	ROM_RELOAD(0x10000, 0x10000)
+	ROM_LOAD("dinr_u19.l1", 0x20000, 0x10000, CRC(278b9a30) SHA1(41e59adb8b6c08caee46c3dd73256480b4041619))
+	ROM_RELOAD(0x30000, 0x10000)
+	ROM_LOAD("dinr_u20.l1", 0x40000, 0x10000, CRC(511fb260) SHA1(e6e25b464c5c38f3c0492436f1e8aa2be33dd278))
+	ROM_RELOAD(0x50000, 0x10000)
+ROM_END
+
+ROM_START(diner_g2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("dinr_u26.l2", 0x4000, 0x4000, CRC(8b6aa22e) SHA1(6b802a85fc2babf5a183fb434df11597363c1c9d))
+	ROM_LOAD("diner_nova_apparate_u27_rev2.bin", 0x8000, 0x8000, CRC(74be688e) SHA1(053d32a7db72a310521781db94d6090ef8553c89))
 	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("dinr_u4.l1", 0x00000, 0x10000, CRC(3bd28368) SHA1(41eec2f5f863039deaabfae8aece4b1cf15e4b78))
 	ROM_RELOAD(0x10000, 0x10000)
@@ -655,6 +681,19 @@ ROM_START(rollr_d2) // American Drops 2 - sample/prototype with 8 drop targets
 	ROM_RELOAD(0x50000, 0x10000)
 ROM_END
 
+ROM_START(rollr_l1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("rolr_u26.l1", 0x4000, 0x4000, CRC(8808dc0c) SHA1(19239e0884859e17e4c6f4de4d1e06f9e9913777))
+	ROM_LOAD("rolr_u27.l1", 0x8000, 0x8000, CRC(7e816a7b) SHA1(546dd3b12f2152148749de501b2540f4a2506c32))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("rolr_u4.l3", 0x00000, 0x10000, CRC(d366c705) SHA1(76018305b5040b2e5d8c45cc81a18f13e1a8f8da))
+	ROM_RELOAD(0x10000, 0x10000)
+	ROM_LOAD("rolr_u19.l3", 0x20000, 0x10000, CRC(45a89e55) SHA1(3aff897514d242c83a8e7575d430d594a873736e))
+	ROM_RELOAD(0x30000, 0x10000)
+	ROM_LOAD("rolr_u20.l3", 0x40000, 0x10000, CRC(77f89aff) SHA1(dcd9fe233f33ef8f97cdeaaa365532e485a28944))
+	ROM_RELOAD(0x50000, 0x10000)
+ROM_END
+
 /*---------------------------------
 / The Bally Game Show 4/90 (#2003)
 /---------------------------------*/
@@ -736,10 +775,12 @@ ROM_END
 
 GAME(1990,  bbnny_l2,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Bugs Bunny Birthday Ball (L-2)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  bbnny_lu,   bbnny_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Bugs Bunny Birthday Ball (LU-2) European",     MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  bbnny_lg,   bbnny_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Bugs Bunny Birthday Ball (LG-2) German",       MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  diner_l4,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LA-4)",                                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  diner_l3,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LA-3)",                                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  diner_l2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LU-2) Europe",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  diner_f2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LF-2) French",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  diner_g2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LG-2) German",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  diner_l1,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (LU-1) Europe",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  diner_p0,   diner_l4,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Diner (PA-0 prototype)",                       MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  dd_l2,      0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Dr. Dude (LA-2)",                              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
@@ -755,7 +796,7 @@ GAME(1990,  radcl_g1,   radcl_l1,   s11c,   s11c, s11c_state, init_s11c,  ROT0, 
 GAME(1990,  radcl_p3,   radcl_l1,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "Radical! (P-3)",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  rvrbt_l3,   0,          s11c,   s11c, s11c_state, init_s11c7, ROT0,   "Williams",             "Riverboat Gambler (L-3)",                      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  rvrbt_p7,   rvrbt_l3,   s11c,   s11c, s11c_state, init_s11c7, ROT0,   "Williams",             "Riverboat Gambler (PA-7)",                     MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  rollr_l2,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (L-2)",                            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  rollr_l2,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LA-2)",                           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1991,  rollr_ex,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (EXPERIMENTAL)",                   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1991,  rollr_e1,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (PU-1)",                           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1991,  rollr_p2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (PA-2 / PA-1 Sound)",              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
@@ -764,6 +805,7 @@ GAME(1990,  rollr_g3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0, 
 GAME(1991,  rollr_f2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LF-2) French",                    MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  rollr_f3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LF-3) French",                    MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  rollr_d2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (AD-2) Prototype",                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  rollr_l1,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Williams",             "Rollergames (LA-1)",                           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  gs_lu4,     0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LU-4) Europe",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  gs_lu3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LU-3) Europe",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  gs_la3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LA-3)",                   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

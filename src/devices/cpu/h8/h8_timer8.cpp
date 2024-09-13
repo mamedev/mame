@@ -1,5 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+/***************************************************************************
+
+    h8_timer8.cpp
+
+    H8 8 bits timer
+
+    TODO:
+    - IRQs are level triggered? eg. when an interrupt enable flag gets set
+      while an overflow or compare match flag is 1, will it trigger an IRQ?
+      Or if it's edge triggered, will it trigger an IRQ on rising edge of
+      (irq_enable & flag)?
+    - When writing 0 to the status register(s), the overflow/compare match
+      flags will only be cleared after a read access was done while they
+      were set? It's how the databook explains it, similar to HD6301.
+
+***************************************************************************/
+
 #include "emu.h"
 #include "h8_timer8.h"
 
@@ -12,12 +29,12 @@ static constexpr int V = 1;
 DEFINE_DEVICE_TYPE(H8_TIMER8_CHANNEL,  h8_timer8_channel_device,  "h8_timer8_channel",  "H8 8-bit timer channel")
 DEFINE_DEVICE_TYPE(H8H_TIMER8_CHANNEL, h8h_timer8_channel_device, "h8h_timer8_channel", "H8H 8-bit timer channel")
 
-h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_timer8_channel_device(mconfig, H8_TIMER8_CHANNEL, tag, owner, clock)
 {
 }
 
-h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_intc(*this, finder_base::DUMMY_TAG),
@@ -30,12 +47,12 @@ h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig
 	m_has_ice = false;
 }
 
-uint8_t h8_timer8_channel_device::tcr_r()
+u8 h8_timer8_channel_device::tcr_r()
 {
 	return m_tcr;
 }
 
-void h8_timer8_channel_device::tcr_w(uint8_t data)
+void h8_timer8_channel_device::tcr_w(u8 data)
 {
 	update_counter();
 	m_tcr = data;
@@ -64,7 +81,7 @@ void h8_timer8_channel_device::update_tcr()
 	case 1: case 2: case 3:
 		m_clock_type = DIV;
 		m_clock_divider = m_div_tab[((m_tcr & TCR_CKS)-1)*2 + m_extra_clock_bit];
-		if(V>=1) util::stream_format(message, "clock %dHz", m_cpu->clock()/m_clock_divider);
+		if(V>=1) util::stream_format(message, "clock %dHz", m_cpu->system_clock()/m_clock_divider);
 		break;
 
 	case 4:
@@ -114,24 +131,26 @@ void h8_timer8_channel_device::update_tcr()
 		break;
 	}
 
-	if(V>=1) util::stream_format(message, ", irq=%c%c%c\n",
-						m_tcr & TCR_CMIEB ? 'b' : '-',
-						m_tcr & TCR_CMIEA ? 'a' : '-',
-						m_tcr & TCR_OVIE  ? 'o' : '-');
+	if(V>=1) {
+		util::stream_format(message, ", irq=%c%c%c\n",
+				m_tcr & TCR_CMIEB ? 'b' : '-',
+				m_tcr & TCR_CMIEA ? 'a' : '-',
+				m_tcr & TCR_OVIE  ? 'o' : '-');
 
-	logerror(std::move(message).str());
+		logerror(std::move(message).str());
+	}
 }
 
-uint8_t h8_timer8_channel_device::tcsr_r()
+u8 h8_timer8_channel_device::tcsr_r()
 {
 	return m_tcsr;
 }
 
-void h8_timer8_channel_device::tcsr_w(uint8_t data)
+void h8_timer8_channel_device::tcsr_w(u8 data)
 {
 	update_counter();
 
-	uint8_t mask = m_has_adte || m_has_ice ? 0x1f : 0x0f;
+	u8 mask = m_has_adte || m_has_ice ? 0x1f : 0x0f;
 	m_tcsr = (m_tcsr & ~mask) | (data & mask);
 	m_tcsr &= data | 0x1f;
 
@@ -140,12 +159,12 @@ void h8_timer8_channel_device::tcsr_w(uint8_t data)
 	recalc_event();
 }
 
-uint8_t h8_timer8_channel_device::tcor_r(offs_t offset)
+u8 h8_timer8_channel_device::tcor_r(offs_t offset)
 {
 	return m_tcor[offset];
 }
 
-void h8_timer8_channel_device::tcor_w(offs_t offset, uint8_t data)
+void h8_timer8_channel_device::tcor_w(offs_t offset, u8 data)
 {
 	update_counter();
 	m_tcor[offset] = data;
@@ -153,14 +172,16 @@ void h8_timer8_channel_device::tcor_w(offs_t offset, uint8_t data)
 	recalc_event();
 }
 
-uint8_t h8_timer8_channel_device::tcnt_r()
+u8 h8_timer8_channel_device::tcnt_r()
 {
-	update_counter();
-	recalc_event();
+	if(!machine().side_effects_disabled()) {
+		update_counter();
+		recalc_event();
+	}
 	return m_tcnt;
 }
 
-void h8_timer8_channel_device::tcnt_w(uint8_t data)
+void h8_timer8_channel_device::tcnt_w(u8 data)
 {
 	update_counter();
 	m_tcnt = data;
@@ -170,6 +191,17 @@ void h8_timer8_channel_device::tcnt_w(uint8_t data)
 
 void h8_timer8_channel_device::device_start()
 {
+	save_item(NAME(m_tcor));
+	save_item(NAME(m_tcr));
+	save_item(NAME(m_tcsr));
+	save_item(NAME(m_tcnt));
+	save_item(NAME(m_extra_clock_bit));
+	save_item(NAME(m_clock_type));
+	save_item(NAME(m_clock_divider));
+	save_item(NAME(m_clear_type));
+	save_item(NAME(m_counter_cycle));
+	save_item(NAME(m_last_clock_update));
+	save_item(NAME(m_event_time));
 }
 
 void h8_timer8_channel_device::device_reset()
@@ -188,34 +220,54 @@ void h8_timer8_channel_device::device_reset()
 	m_extra_clock_bit = false;
 }
 
-uint64_t h8_timer8_channel_device::internal_update(uint64_t current_time)
+u64 h8_timer8_channel_device::internal_update(u64 current_time)
 {
-	if(m_event_time && current_time >= m_event_time) {
-		update_counter(current_time);
-		recalc_event(current_time);
+	while(m_event_time && current_time >= m_event_time) {
+		update_counter(m_event_time);
+		recalc_event(m_event_time);
 	}
 
 	return m_event_time;
 }
 
-void h8_timer8_channel_device::update_counter(uint64_t cur_time)
+void h8_timer8_channel_device::notify_standby(int state)
 {
-	if(m_clock_type != DIV)
+	if(!state && m_event_time) {
+		u64 delta = m_cpu->total_cycles() - m_cpu->standby_time();
+		m_event_time += delta;
+		m_last_clock_update += delta;
+	}
+}
+
+void h8_timer8_channel_device::update_counter(u64 cur_time, u64 delta)
+{
+	if(m_clock_type == DIV) {
+		if(!cur_time)
+			cur_time = m_cpu->total_cycles();
+
+		u64 base_time = (m_last_clock_update + m_clock_divider/2) / m_clock_divider;
+		m_last_clock_update = cur_time;
+		u64 new_time = (cur_time + m_clock_divider/2) / m_clock_divider;
+		delta = new_time - base_time;
+	}
+
+	if(!delta)
 		return;
 
-	if(!cur_time)
-		cur_time = m_cpu->total_cycles();
+	u8 prev = m_tcnt;
+	u64 tt = m_tcnt + delta;
 
-	uint64_t base_time = (m_last_clock_update + m_clock_divider/2) / m_clock_divider;
-	uint64_t new_time = (cur_time + m_clock_divider/2) / m_clock_divider;
+	if(prev >= m_counter_cycle) {
+		if(tt >= 0x100)
+			m_tcnt = (tt - 0x100) % m_counter_cycle;
+		else
+			m_tcnt = tt;
+	} else
+		m_tcnt = tt % m_counter_cycle;
 
-	int tt = m_tcnt + new_time - base_time;
-	m_tcnt = tt % m_counter_cycle;
-
-	if(tt == m_tcor[0] || m_tcnt == m_tcor[0]) {
+	if(u8 cmp = m_tcor[0] + 1; m_tcnt == cmp || (tt == cmp && tt == m_counter_cycle)) {
 		if(m_chained_timer)
 			m_chained_timer->chained_timer_tcora();
-
 		if(!(m_tcsr & TCSR_CMFA)) {
 			m_tcsr |= TCSR_CMFA;
 			if(m_tcr & TCR_CMIEA)
@@ -223,13 +275,15 @@ void h8_timer8_channel_device::update_counter(uint64_t cur_time)
 		}
 	}
 
-	if(!(m_tcsr & TCSR_CMFB) && (tt == m_tcor[1] || m_tcnt == m_tcor[1])) {
-		m_tcsr |= TCSR_CMFB;
-		if(m_tcr & TCR_CMIEB)
-			m_intc->internal_interrupt(m_irq_cb);
+	if(u8 cmp = m_tcor[1] + 1; m_tcnt == cmp || (tt == cmp && tt == m_counter_cycle)) {
+		if(!(m_tcsr & TCSR_CMFB)) {
+			m_tcsr |= TCSR_CMFB;
+			if(m_tcr & TCR_CMIEB)
+				m_intc->internal_interrupt(m_irq_cb);
+		}
 	}
 
-	if(tt >= 0x100) {
+	if(tt >= 0x100 && (m_counter_cycle == 0x100 || prev >= m_counter_cycle)) {
 		if(m_chained_timer)
 			m_chained_timer->chained_timer_overflow();
 		if(!(m_tcsr & TCSR_OVF)) {
@@ -238,13 +292,12 @@ void h8_timer8_channel_device::update_counter(uint64_t cur_time)
 				m_intc->internal_interrupt(m_irq_v);
 		}
 	}
-	m_last_clock_update = cur_time;
 }
 
-void h8_timer8_channel_device::recalc_event(uint64_t cur_time)
+void h8_timer8_channel_device::recalc_event(u64 cur_time)
 {
 	bool update_cpu = cur_time == 0;
-	uint64_t old_event_time = m_event_time;
+	u64 old_event_time = m_event_time;
 
 	if(m_clock_type != DIV) {
 		m_event_time = 0;
@@ -256,33 +309,32 @@ void h8_timer8_channel_device::recalc_event(uint64_t cur_time)
 	if(!cur_time)
 		cur_time = m_cpu->total_cycles();
 
-	uint32_t event_delay = 0xffffffff;
+	u32 event_delay = 0xffffffff;
 	if(m_clear_type == CLEAR_A || m_clear_type == CLEAR_B)
-		m_counter_cycle = m_tcor[m_clear_type - CLEAR_A];
-	else {
+		m_counter_cycle = m_tcor[m_clear_type - CLEAR_A] + 1;
+	else
 		m_counter_cycle = 0x100;
-		event_delay = m_counter_cycle - m_tcnt;
-		if(!event_delay)
-			event_delay = m_counter_cycle;
-	}
+	if(m_counter_cycle == 0x100 || m_tcnt >= m_counter_cycle)
+		event_delay = 0x100 - m_tcnt;
 
-	for(auto &elem : m_tcor) {
-		uint32_t new_delay = 0xffffffff;
-		if(elem > m_tcnt) {
-			if(m_tcnt >= m_counter_cycle || elem <= m_counter_cycle)
-				new_delay = elem - m_tcnt;
-		} else if(elem <= m_counter_cycle) {
+	for(auto &tcor : m_tcor) {
+		u32 new_delay = 0xffffffff;
+		u8 cmp = tcor + 1;
+		if(cmp > m_tcnt) {
+			if(m_tcnt >= m_counter_cycle || cmp <= m_counter_cycle)
+				new_delay = cmp - m_tcnt;
+		} else if(cmp <= m_counter_cycle) {
 			if(m_tcnt < m_counter_cycle)
-				new_delay = (m_counter_cycle - m_tcnt) + elem;
+				new_delay = (m_counter_cycle - m_tcnt) + cmp;
 			else
-				new_delay = (0x100 - m_tcnt) + elem;
+				new_delay = (0x100 - m_tcnt) + cmp;
 		}
 		if(event_delay > new_delay)
 			event_delay = new_delay;
 	}
 
 	if(event_delay != 0xffffffff)
-		m_event_time = ((((cur_time + m_clock_divider) / m_clock_divider) + event_delay - 1) * m_clock_divider) + m_clock_divider/2;
+		m_event_time = ((((cur_time + m_clock_divider/2) / m_clock_divider) + event_delay - 1) * m_clock_divider) + m_clock_divider/2;
 	else
 		m_event_time = 0;
 
@@ -293,48 +345,16 @@ void h8_timer8_channel_device::recalc_event(uint64_t cur_time)
 void h8_timer8_channel_device::chained_timer_overflow()
 {
 	if(m_clock_type == CHAIN_OVERFLOW)
-		timer_tick();
+		update_counter(0, 1);
 }
 
 void h8_timer8_channel_device::chained_timer_tcora()
 {
 	if(m_clock_type == CHAIN_A)
-		timer_tick();
+		update_counter(0, 1);
 }
 
-void h8_timer8_channel_device::timer_tick()
-{
-	m_tcnt++;
-
-	if(m_tcnt == m_tcor[0]) {
-		if(m_chained_timer)
-			m_chained_timer->chained_timer_tcora();
-
-		if(!(m_tcsr & TCSR_CMFA)) {
-			m_tcsr |= TCSR_CMFA;
-			if(m_tcr & TCR_CMIEA)
-				m_intc->internal_interrupt(m_irq_ca);
-		}
-	}
-
-	if(!(m_tcsr & TCSR_CMFB) && m_tcnt == m_tcor[1]) {
-		m_tcsr |= TCSR_CMFB;
-		if(m_tcr & TCR_CMIEB)
-			m_intc->internal_interrupt(m_irq_cb);
-	}
-
-	if(m_tcnt == 0x00) {
-		if(m_chained_timer)
-			m_chained_timer->chained_timer_overflow();
-		if(!(m_tcsr & TCSR_OVF)) {
-			m_tcsr |= TCSR_OVF;
-			if(m_tcr & TCR_OVIE)
-				m_intc->internal_interrupt(m_irq_v);
-		}
-	}
-}
-
-h8h_timer8_channel_device::h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8h_timer8_channel_device::h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_timer8_channel_device(mconfig, H8H_TIMER8_CHANNEL, tag, owner, clock)
 {
 	// The extra clock bit is not used for h8h+

@@ -219,12 +219,14 @@
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/h8/h83002.h"
 //#include "cpu/h8/h83006.h"
 #include "sound/ymz280b.h"
 #include "machine/i2cmem.h"
 #include "machine/msm6242.h"
 #include "video/ramdac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -249,9 +251,6 @@ public:
 		, m_gfxdecode(*this, "gfxdecode%u", 0U)
 		, m_palette(*this, "palette%u", 0U)
 	{ }
-
-	void init_colorama();
-	void init_cmrltv75();
 
 	void coinmvga(machine_config &config);
 
@@ -938,19 +937,6 @@ ROM_START( cmkenospa )
 	ROM_LOAD( "rwc497ym.sp4",   0x300000, 0x100000, CRC(b5729ae7) SHA1(0e63fbb81ff5f2fef3c653f769db8073dff1214b) )
 ROM_END
 
-
-/*************************
-*      Driver Init       *
-*************************/
-
-void coinmvga_state::init_colorama()
-{
-}
-
-void coinmvga_state::init_cmrltv75()
-{
-}
-
 } // anonymous namespace
 
 
@@ -958,11 +944,11 @@ void coinmvga_state::init_cmrltv75()
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY                    FULLNAME                                       FLAGS
-GAME( 2000, colorama,  0,        coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521, English)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, coloramas, colorama, coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521 V13, Spanish)",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, wof_v16,   0,        coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Wheel of Fortune (P517 V16, English)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, wof_v11,   wof_v16,  coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Wheel of Fortune (P517 V11, English)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, coinmvga_state, init_cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette P497 V75 (Y2K, Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, coinmvga_state, empty_init,    ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, coinmvga_state, empty_init,    ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        ROT    COMPANY                    FULLNAME                                       FLAGS
+GAME( 2000, colorama,  0,        coinmvga, coinmvga, coinmvga_state, empty_init, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521, English)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, coloramas, colorama, coinmvga, coinmvga, coinmvga_state, empty_init, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521 V13, Spanish)",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, wof_v16,   0,        coinmvga, coinmvga, coinmvga_state, empty_init, ROT0,  "Coinmaster-Gaming, Ltd.", "Wheel of Fortune (P517 V16, English)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, wof_v11,   wof_v16,  coinmvga, coinmvga, coinmvga_state, empty_init, ROT0,  "Coinmaster-Gaming, Ltd.", "Wheel of Fortune (P517 V11, English)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, coinmvga_state, empty_init, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette P497 V75 (Y2K, Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, coinmvga_state, empty_init, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, coinmvga_state, empty_init, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

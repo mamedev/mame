@@ -1,12 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
-/* Belatra Russian Fruit Machines (Video?) */
+// copyright-holders: David Haywood
+
+// Belatra Russian Fruit Machines (Video?)
 
 /*
 
-These appear to run on Acorn Archimedes-compatible hardware, similar to ertictac.c.
-That would make the SoC an ARM7500 or similar.
+SoC is suspected to be an ARM7500 or similar.
 
+TODO:
+- just a skeleton and everything is complete guesswork.
 */
 
 /*
@@ -36,14 +38,19 @@ Merry Joiner
 Piggy Bank
 The Scrooge
 Spirit of Prairies
-Viking?s Fun Mill
+Viking's Fun Mill
 
 */
 
 
 #include "emu.h"
+
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "machine/acorn_vidc.h"
+#include "machine/arm_iomd.h"
+
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -54,20 +61,31 @@ class belatra_state : public driver_device
 public:
 	belatra_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_vidc(*this, "vidc"),
+		m_iomd(*this, "iomd")
 	{ }
 
 	void belatra(machine_config &config);
-	void belatra_map(address_map &map);
-protected:
 
-	// devices
+private:
 	required_device<cpu_device> m_maincpu;
+	required_device<arm_vidc20_device> m_vidc;
+	required_device<arm7500fe_iomd_device> m_iomd;
+
+	void program_map(address_map &map);
 };
 
-void belatra_state::belatra_map(address_map &map)
+void belatra_state::program_map(address_map &map)
 {
-	map(0x00000000, 0x003fffff).rom();
+	map(0x00000000, 0x001fffff).rom().region("maincpu", 0x000000); // TODO: implement this as proper flash ROM device
+	map(0x00800000, 0x009fffff).rom().region("maincpu", 0x200000); // "
+	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map)); // TODO: writes to some unimplemented registers
+	//map(0x03340000, 0x03340003).r;
+	//map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
+	//map(0x08000000, 0x0800000f).r;
+	map(0x10000000, 0x13ffffff).ram();
+	map(0x14000000, 0x17ffffff).ram();
 }
 
 static INPUT_PORTS_START( belatra )
@@ -75,12 +93,33 @@ INPUT_PORTS_END
 
 void belatra_state::belatra(machine_config &config)
 {
-	ARM7(config, m_maincpu, 54000000); // guess...
-	m_maincpu->set_addrmap(AS_PROGRAM, &belatra_state::belatra_map);
+	ARM7500(config, m_maincpu, 54'000'000); // CPU type and clock guessed
+	m_maincpu->set_addrmap(AS_PROGRAM, &belatra_state::program_map);
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+
+	ARM_VIDC20(config, m_vidc, 24'000'000); // chip type and clock guessed
+	m_vidc->set_screen("screen");
+	m_vidc->vblank().set(m_iomd, FUNC(arm_iomd_device::vblank_irq));
+	m_vidc->sound_drq().set(m_iomd, FUNC(arm_iomd_device::sound_drq));
+
+	ARM7500FE_IOMD(config, m_iomd, 54'000'000); // CPU type and clock guessed
+	m_iomd->set_host_cpu_tag(m_maincpu);
+	m_iomd->set_vidc_tag(m_vidc);
+	m_iomd->iocr_read_od<0>().set([this] () { logerror("%s: IOCR read OD 0\n", machine().describe_context()); return 0; });
+	m_iomd->iocr_read_od<1>().set([this] () { logerror("%s: IOCR read OD 1\n", machine().describe_context()); return 0; });
+	m_iomd->iocr_read_id().set([this] () { logerror("%s: IOCR read ID\n", machine().describe_context()); return 0; });
+	m_iomd->iocr_write_od<0>().set([this] (int state) { logerror("%s: IOCR write OD 0 %d\n", machine().describe_context(), state); });
+	m_iomd->iocr_write_od<1>().set([this] (int state) { logerror("%s: IOCR write OD 1 %d\n", machine().describe_context(), state); });
+	m_iomd->iocr_write_id().set([this] (int state) { logerror("%s: IOCR write ID %d\n", machine().describe_context(), state); });
+	m_iomd->iolines_read().set([this] () { logerror("%s: IO lines read\n", machine().describe_context()); return uint8_t(0); });
+	m_iomd->iolines_write().set([this] (uint8_t data) { logerror("%s: IO lines write %02x\n", machine().describe_context(), data); });
+
+	// AT90S2313(config, "mcu", xxxx); // TODO: AVR 8-bit core, only the fairyl2 set has a dump
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	/* unknown sound */
+	// unknown sound
 }
 
 
@@ -94,6 +133,7 @@ ROM_START( fairyl2 )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "zfl2-1belatra.bin", 0x000000, 0x200000, CRC(cb0f3eba) SHA1(a7776810cfe037c25c196bbe900e5e17a2005d2d) )
 	ROM_LOAD( "zfl2-2belatra.bin", 0x200000, 0x200000, CRC(755fad4b) SHA1(12243fdf95fcdd9012d1bbde6a18abb00918f560) )
+
 	ROM_REGION( 0x400000, "others", ROMREGION_ERASEFF )
 	ROM_LOAD( "at90s2313_fl2.bin", 0x0000, 0x000800, CRC(38e2d37e) SHA1(78178cb3ea219a71d1f15ffde722f9c03ad64dda) )
 ROM_END
@@ -131,12 +171,12 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2004, fairyl2,   0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra","Fairy Land 2 (set 1)",   MACHINE_IS_SKELETON )
-GAME( 2004, fairyl2a,  fairyl2, belatra, belatra, belatra_state, empty_init, ROT0, "Belatra","Fairy Land 2 (set 2)",   MACHINE_IS_SKELETON )
-GAME( 2004, fairyl2b,  fairyl2, belatra, belatra, belatra_state, empty_init, ROT0, "Belatra","Fairy Land 2 (set 3)",   MACHINE_IS_SKELETON )
-GAME( 2004, fairyl2bl, fairyl2, belatra, belatra, belatra_state, empty_init, ROT0, "Belatra","Fairy Land 2 (bootleg)", MACHINE_IS_SKELETON )
+GAME( 2004, fairyl2,   0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Fairy Land 2 (set 1)",   MACHINE_IS_SKELETON )
+GAME( 2004, fairyl2a,  fairyl2, belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Fairy Land 2 (set 2)",   MACHINE_IS_SKELETON )
+GAME( 2004, fairyl2b,  fairyl2, belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Fairy Land 2 (set 3)",   MACHINE_IS_SKELETON )
+GAME( 2004, fairyl2bl, fairyl2, belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Fairy Land 2 (bootleg)", MACHINE_IS_SKELETON )
 
-GAME( 2004, ldrink,    0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra","Lucky Drink (set 1)",    MACHINE_IS_SKELETON )
-GAME( 2004, ldrinka,   ldrink,  belatra, belatra, belatra_state, empty_init, ROT0, "Belatra","Lucky Drink (set 2)",    MACHINE_IS_SKELETON )
+GAME( 2004, ldrink,    0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Lucky Drink (set 1)",    MACHINE_IS_SKELETON )
+GAME( 2004, ldrinka,   ldrink,  belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Lucky Drink (set 2)",    MACHINE_IS_SKELETON )
 
-GAME( 2004, merryjn,   0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra","Merry Joiner",           MACHINE_IS_SKELETON )
+GAME( 2004, merryjn,   0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Merry Joiner",           MACHINE_IS_SKELETON )

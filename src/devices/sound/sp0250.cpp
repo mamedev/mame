@@ -109,11 +109,6 @@ void sp0250_device::device_reset()
 	load_values();
 }
 
-TIMER_CALLBACK_MEMBER(sp0250_device::delayed_stream_update)
-{
-	m_stream->update();
-}
-
 static uint16_t sp0250_ga(uint8_t v)
 {
 	return (v & 0x1f) << (v>>5);

@@ -61,8 +61,16 @@ SDL Keyboard Mapping
     Keymap file name.  Default is ``keymap.dat``.
 
 
-SDL Joystick Mapping
---------------------
+SDL Input Options
+-----------------
+
+.. _mame-scommandline-enabletouch:
+
+**-enable_touch**
+
+    Enable support for touch input.  If this option is switched off, mouse input
+    simulated from touch devices will be used instead.  Default is OFF
+    (**-noenable_touch**)
 
 .. _mame-scommandline-sixaxis:
 
@@ -71,6 +79,23 @@ SDL Joystick Mapping
     Use special handling for PlayStation 3 SixAxis controllers.  May cause
     undesirable behaviour with other controllers.  Only affects the ``sdljoy``
     joystick provider.  Default is OFF (**-nosixaxis**)
+
+.. _mame-scommandline-duallightgun:
+
+**-[no]dual_lightgun** / **-[no]dual**
+
+    Controls whether or not MAME attempts to track two lightguns that appear as
+    a single mouse.  This option requires the :ref:`lightgun option
+    <mame-commandline-nolightgun>` to be on and the :ref:`lightgunprovider
+    option <mame-commandline-lightgunprovider>` to be set to *sdl*.
+
+    This option supports dual lightgun setups that work by setting the mouse
+    pointer location at the moment a lightgun trigger is activated.  The primary
+    and secondary triggers on the first lightgun correspond to the first and
+    second mouse buttons, and the primary and secondary triggers on the second
+    lightgun correspond to the third and fourth mouse buttons.
+
+    The default is OFF (**-nodual_lightgun**).
 
 
 SDL Lightgun Mapping

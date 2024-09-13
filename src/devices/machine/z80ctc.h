@@ -100,6 +100,8 @@ public:
 	u16 get_channel_constant(int ch) const { return m_channel[ch]->m_tconst; }
 
 protected:
+	z80ctc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -110,20 +112,18 @@ protected:
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;
 
-private:
 	// internal helpers
+	u8 channel_int_state(int ch) const noexcept { return m_channel[ch]->m_int_state; }
 	void interrupt_check();
 
 	z80ctc_channel_device &channel_config(int ch) { return *m_channel[ch].lookup(); }
 
 	// internal state
-	devcb_write_line   m_intr_cb;              // interrupt callback
-	devcb_write_line::array<4> m_zc_cb;             // zero crossing/timer output callbacks
+	required_device_array<z80ctc_channel_device, 4> m_channel;  // subdevice for each channel
+	devcb_write_line                                m_intr_cb;  // interrupt callback
+	devcb_write_line::array<4>                      m_zc_cb;    // zero crossing/timer output callbacks
 
-	u8                 m_vector;               // interrupt vector
-
-	// subdevice for each channel
-	required_device_array<z80ctc_channel_device, 4> m_channel;
+	u8                                              m_vector;   // interrupt vector
 };
 
 

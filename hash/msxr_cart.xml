@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="msxr_cart" description="MSX Turbo-R cartridges">
+
+	<software name="losaben" supported="no">
+		<description>Losaben Akel (demo)</description>
+		<year>201?</year>
+		<publisher>ASM</publisher>
+		<notes>MSX Turbo-R is not supported. Requires V9990.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x40000">
+				<rom name="losaben akel (demo) - asm.rom" size="0x40000" crc="b26bcc6c" sha1="4fc580ae6d8011ab215d5302f3ec5dec4dbd71b9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxview" supported="no">
+		<description>MSX View (Japan, v1.21)</description>
+		<year>1992</year>
+		<publisher>ASCII</publisher>
+		<notes>MSX Turbo-R is not supported.</notes>
+		<info name="barcode" value="4988606209170"/>
+		<info name="usage" value="Requires at least 512KB Memory Mapper RAM."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="halnote"/>
+			<dataarea name="rom" size="0x100000">
+				<!-- underdump? -->
+				<rom name="lh532a39.ic1" size="0x30000" crc="97a7fccb" sha1="8c0887035b8235d16592ad270381c3a3e21f6e97" status="baddump"/>
+			</dataarea>
+			<!-- size not verified -->
+			<dataarea name="sram" size="0x4000"/>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Execution Disk - 実行用ディスク"/>
+			<dataarea name="flop" size="737280">
+				<rom name="msx view - ascii (execution disk, v1.21).dsk" size="737280" crc="a8e5a3bb" sha1="3371058cda220e1ba77abfb6e269865b28f4abe5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Storage Disk - 保存用ディスク"/>
+			<dataarea name="flop" size="737280">
+				<rom name="msx view - ascii (storage disk, v1.21).dsk" size="737280" crc="c7768a7a" sha1="705c83bb99a65305b295cb6b2f9c9e98b8b3965d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="OverVIEW Disk"/>
+			<dataarea name="flop" size="737280">
+				<rom name="msx view - ascii (overview disk, v1.21).dsk" size="737280" crc="d319bdae" sha1="f685a4019736bd37335e8124b0e60e785238d073"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxview100" cloneof="msxview" supported="no">
+		<description>MSX View (Japan, v1.00)</description>
+		<year>1990</year>
+		<publisher>ASCII</publisher>
+		<notes>MSX Turbo-R is not supported.</notes>
+		<info name="barcode" value="4988606206322"/>
+		<info name="usage" value="Requires at least 512KB Memory Mapper RAM."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="halnote"/>
+			<dataarea name="rom" size="0x100000">
+				<!-- underdump? -->
+				<rom name="lh532a39.ic1" size="0x30000" crc="97a7fccb" sha1="8c0887035b8235d16592ad270381c3a3e21f6e97" status="baddump"/>
+			</dataarea>
+			<!-- size not verified -->
+			<dataarea name="sram" size="0x4000"/>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Execution Disk - 実行用ディスク"/>
+			<dataarea name="flop" size="737280">
+				<rom name="msx view - ascii (execution disk, v1.00).dsk" size="737280" crc="f86cc18e" sha1="510a164e1b8823808952437045516bf1968c524f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Storage Disk - 保存用ディスク"/>
+			<dataarea name="flop" size="737280">
+				<rom name="msx view - ascii (storage disk, v1.00).dsk" size="737280" crc="d631eacb" sha1="17af744441a9c0f367cf263bc3bc1678e58bd051"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="OverVIEW Disk"/>
+			<dataarea name="flop" size="737280">
+				<rom name="msx view - ascii (overview disk, v1.00).dsk" size="737280" crc="99efa8de" sha1="b9c867275b06ae84a9245e0b0e72c0eaeef03657"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoneterd" supported="no">
+		<description>Zone Terra (demo)</description>
+		<year>1994</year>
+		<publisher>Quadrivium</publisher>
+		<notes>MSX Turbo-R is not supported. During gameplay, the status bar at the top of the screen is cut off.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="zone terra (demo) - quadrivium.rom" size="0x100000" crc="a3ee75a8" sha1="554ab47e0cf4c2946b86c6256b5c9a6f5ec37f33"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -28,6 +28,7 @@ DEFINE_DEVICE_TYPE(SAMSUNG_K9F1G08U0B,  samsung_k9f1g08u0b_device,  "samsung_k9f
 DEFINE_DEVICE_TYPE(SAMSUNG_K9F1G08U0M,  samsung_k9f1g08u0m_device,  "samsung_k9f1g08u0m",  "Samsung K9F1G08U0M")
 DEFINE_DEVICE_TYPE(SAMSUNG_K9LAG08U0M,  samsung_k9lag08u0m_device,  "samsung_k9lag08u0m",  "Samsung K9LAG08U0M")
 DEFINE_DEVICE_TYPE(SAMSUNG_K9F2G08U0M,  samsung_k9f2g08u0m_device,  "samsung_k9f2g08u0m",  "Samsung K9F2G08U0M")
+DEFINE_DEVICE_TYPE(TOSHIBA_TC58256AFT,  toshiba_tc58256aft_device,  "toshiba_tc58256aft",  "Toshiba TC58256AFT")
 
 nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nand_device(mconfig, NAND, tag, owner, clock)
@@ -182,6 +183,21 @@ samsung_k9f2g08u0m_device::samsung_k9f2g08u0m_device(const machine_config &mconf
 	m_sequential_row_read = 0;
 }
 
+toshiba_tc58256aft_device::toshiba_tc58256aft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, TOSHIBA_TC58256AFT, tag, owner, clock)
+{
+	m_id_len = 2;
+	m_id[0] = 0x98;
+	m_id[1] = 0x75;
+	m_page_data_size = 512;
+	m_page_total_size = 512 + 16;
+	m_log2_pages_per_block = compute_log2(32);
+	m_num_pages = 32 * 2048;
+	m_col_address_cycles = 1;
+	m_row_address_cycles = 2;
+	m_sequential_row_read = 0;
+}
+
 void nand_device::device_start()
 {
 	m_data_uid_ptr = nullptr; // smartmed cruft
@@ -231,16 +247,16 @@ void nand_device::nvram_default()
 
 bool nand_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	uint32_t size = m_page_total_size * m_num_pages;
-	return !file.read(&m_feeprom_data[0], size, actual) && actual == size;
+	uint32_t const size = m_page_total_size * m_num_pages;
+	auto const [err, actual] = read(file, &m_feeprom_data[0], size);
+	return !err && (actual == size);
 }
 
 bool nand_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	uint32_t size = m_page_total_size * m_num_pages;
-	return !file.write(&m_feeprom_data[0], size, actual) && actual == size;
+	uint32_t const size = m_page_total_size * m_num_pages;
+	auto const [err, actual] = write(file, &m_feeprom_data[0], size);
+	return !err;
 }
 
 int nand_device::is_present()

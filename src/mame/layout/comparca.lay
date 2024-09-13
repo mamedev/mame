@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -8,27 +9,12 @@ license:CC0-1.0
 
 	<element name="white"><rect><color red="0.8" green="0.8" blue="0.81" /></rect></element>
 
-	<element name="text_repeat">
-		<rect><color red="0.8" green="0.8" blue="0.81" /></rect>
-		<text string="REPEAT-2"><color red="0.6" green="0.6" blue="0.6" /></text>
-	</element>
-	<element name="text_space">
-		<rect><color red="0.8" green="0.8" blue="0.81" /></rect>
-		<text string="SPACE-2"><color red="0.6" green="0.6" blue="0.6" /></text>
-	</element>
+	<element name="text_repeat"><text string="REPEAT-2"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_space"><text string="SPACE-2"><color red="0.6" green="0.6" blue="0.6" /></text></element>
 
-	<element name="text_start">
-		<rect><color red="0.8" green="0.8" blue="0.81" /></rect>
-		<text string="START"><color red="0.6" green="0.6" blue="0.6" /></text>
-	</element>
-	<element name="text_select">
-		<rect><color red="0.8" green="0.8" blue="0.81" /></rect>
-		<text string="SELECT"><color red="0.6" green="0.6" blue="0.6" /></text>
-	</element>
-	<element name="text_play">
-		<rect><color red="0.8" green="0.8" blue="0.81" /></rect>
-		<text string="PLAY-2/HIT-7"><color red="0.6" green="0.6" blue="0.6" /></text>
-	</element>
+	<element name="text_start"><text string="START"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_select"><text string="SELECT"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_play"><text string="PLAY-2/HIT-7"><color red="0.6" green="0.6" blue="0.6" /></text></element>
 
 	<element name="buto" defstate="0">
 		<rect>

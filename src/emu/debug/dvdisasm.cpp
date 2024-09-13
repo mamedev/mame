@@ -394,25 +394,25 @@ void debug_view_disasm::view_update()
 //  print - print a string in the disassembly view
 //-------------------------------------------------
 
-void debug_view_disasm::print(int row, std::string text, int start, int end, u8 attrib)
+void debug_view_disasm::print(u32 row, std::string text, s32 start, s32 end, u8 attrib)
 {
-	int view_end = end - m_topleft.x;
+	s32 view_end = end - m_topleft.x;
 	if(view_end < 0)
 		return;
 
-	int string_0 = start - m_topleft.x;
+	s32 string_0 = start - m_topleft.x;
 	if(string_0 >= m_visible.x)
 		return;
 
-	int view_start = string_0 > 0 ? string_0 : 0;
+	s32 view_start = string_0 > 0 ? string_0 : 0;
 	debug_view_char *dest = &m_viewdata[row * m_visible.x + view_start];
 
 	if(view_end >= m_visible.x)
 		view_end = m_visible.x;
 
-	for(int pos = view_start; pos < view_end; pos++) {
-		int spos = pos - string_0;
-		if(spos >= int(text.size()))
+	for(s32 pos = view_start; pos < view_end; pos++) {
+		s32 spos = pos - string_0;
+		if(spos >= s32(text.size()))
 			*dest++ = { ' ', attrib };
 		else
 			*dest++ = { u8(text[spos]), attrib };
@@ -427,13 +427,15 @@ void debug_view_disasm::print(int row, std::string text, int start, int end, u8 
 void debug_view_disasm::redraw()
 {
 	// determine how many characters we need for an address and set the divider
-	int m_divider1 = 1 + m_dasm[0].m_tadr.size() + 1;
+	s32 divider1 = 1 + m_dasm[0].m_tadr.size() + 1;
 
 	// assume a fixed number of characters for the disassembly
-	int m_divider2 = m_divider1 + 1 + m_dasm_width + 1;
+	s32 divider2 = divider1 + 1 + m_dasm_width + 1;
 
 	// set the width of the third column to max comment length
-	m_total.x = m_divider2 + 1 + 50;        // DEBUG_COMMENT_MAX_LINE_LENGTH
+	m_total.x = divider2 + 1 + 50;        // DEBUG_COMMENT_MAX_LINE_LENGTH
+
+	const s32 max_visible_col = m_topleft.x + m_visible.x;
 
 	// loop over visible rows
 	for(u32 row = 0; row < m_visible.y; row++)
@@ -460,22 +462,22 @@ void debug_view_disasm::redraw()
 			if(m_dasm[effrow].m_is_visited)
 				attrib |= DCA_VISITED;
 
-			print(row, ' ' + m_dasm[effrow].m_tadr, 0, m_divider1, attrib | DCA_ANCILLARY);
-			print(row, ' ' + m_dasm[effrow].m_dasm, m_divider1, m_divider2, attrib);
+			print(row, ' ' + m_dasm[effrow].m_tadr, 0, divider1, attrib | DCA_ANCILLARY);
+			print(row, ' ' + m_dasm[effrow].m_dasm, divider1, divider2, attrib);
 
 			if(m_right_column == DASM_RIGHTCOL_RAW || m_right_column == DASM_RIGHTCOL_ENCRYPTED) {
 				std::string text = ' ' +(m_right_column == DASM_RIGHTCOL_RAW ? m_dasm[effrow].m_topcodes : m_dasm[effrow].m_tparams);
-				print(row, text, m_divider2, m_visible.x, attrib | DCA_ANCILLARY);
-				if(int(text.size()) > m_visible.x - m_divider2) {
-					int base = m_total.x - 3;
-					if(base < m_divider2)
-						base = m_divider2;
-					print(row, "...", base, m_visible.x, attrib | DCA_ANCILLARY);
+				print(row, text, divider2, max_visible_col, attrib | DCA_ANCILLARY);
+				if(s32(text.size()) > max_visible_col - divider2) {
+					s32 base = max_visible_col - 3;
+					if(base < divider2)
+						base = divider2;
+					print(row, "...", base, max_visible_col, attrib | DCA_ANCILLARY);
 				}
 			} else if(!m_dasm[effrow].m_comment.empty())
-				print(row, " // " + m_dasm[effrow].m_comment, m_divider2, m_visible.x, attrib | DCA_COMMENT | DCA_ANCILLARY);
+				print(row, " // " + m_dasm[effrow].m_comment, divider2, max_visible_col, attrib | DCA_COMMENT | DCA_ANCILLARY);
 			else
-				print(row, "", m_divider2, m_visible.x, attrib | DCA_COMMENT | DCA_ANCILLARY);
+				print(row, "", divider2, max_visible_col, attrib | DCA_COMMENT | DCA_ANCILLARY);
 		}
 	}
 }

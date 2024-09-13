@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "exp.h"
 
+#include <tuple>
+
 
 
 //**************************************************************************
@@ -85,26 +87,39 @@ void cbm2_expansion_slot_device::device_start()
 
 std::pair<std::error_condition, std::string> cbm2_expansion_slot_device::call_load()
 {
+	std::error_condition err;
+
 	if (m_card)
 	{
 		if (!loaded_through_softlist())
 		{
+			util::core_file &file = image_core_file();
 			size_t const size = length();
 
 			if (is_filetype("20"))
 			{
-				m_card->m_bank1 = std::make_unique<uint8_t[]>(size);
-				fread(m_card->m_bank1, size);
+				size_t actual;
+				std::tie(err, m_card->m_bank1, actual) = util::read(file, size);
+				if (!err && (actual != size))
+					err = std::errc::io_error;
 			}
 			else if (is_filetype("40"))
 			{
-				m_card->m_bank2 = std::make_unique<uint8_t[]>(size);
-				fread(m_card->m_bank2, size);
+				size_t actual;
+				std::tie(err, m_card->m_bank2, actual) = util::read(file, size);
+				if (!err && (actual != size))
+					err = std::errc::io_error;
 			}
 			else if (is_filetype("60"))
 			{
-				m_card->m_bank3 = std::make_unique<uint8_t[]>(size);
-				fread(m_card->m_bank3, size);
+				size_t actual;
+				std::tie(err, m_card->m_bank3, actual) = util::read(file, size);
+				if (!err && (actual != size))
+					err = std::errc::io_error;
+			}
+			else
+			{
+				err = image_error::INVALIDIMAGE;
 			}
 		}
 		else
@@ -115,7 +130,7 @@ std::pair<std::error_condition, std::string> cbm2_expansion_slot_device::call_lo
 		}
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return std::make_pair(err, std::string());
 }
 
 

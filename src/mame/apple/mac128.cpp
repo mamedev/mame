@@ -143,9 +143,9 @@ public:
 		m_adbmodem(*this, "adbmodem"),
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
-		m_scsibus(*this, "scsibus"),
+		m_scsibus(*this, "scsi"),
 		m_scsihelp(*this, "scsihelp"),
-		m_ncr5380(*this, "scsibus:7:ncr5380"),
+		m_ncr5380(*this, "scsi:7:ncr5380"),
 		m_iwm(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
 		m_mackbd(*this, "kbd"),
@@ -1083,6 +1083,7 @@ void mac128_state::mac512ke(machine_config &config)
 	M68000(config, m_maincpu, C7M);        /* 7.8336 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::mac512ke_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
+	m_maincpu->set_tas_write_callback(NAME([] (offs_t offset, uint8_t data) { })); // TAS read-modify-write cycles are not supported on pre-SE Macs
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
@@ -1178,19 +1179,19 @@ void mac128_state::macplus(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	NSCSI_BUS(config, m_scsibus);
-	NSCSI_CONNECTOR(config, "scsibus:0", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:1", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
 			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
 			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
 		});
-	NSCSI_CONNECTOR(config, "scsibus:4", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:5", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:6", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380", NCR5380).machine_config([this](device_t *device) {
+	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR5380).machine_config([this](device_t *device) {
 		ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
 		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
 		adapter.drq_handler().set(*this, FUNC(mac128_state::scsi_drq_w));
@@ -1212,7 +1213,9 @@ static void mac_sepds_cards(device_slot_interface &device)
 void mac128_state::macse(machine_config &config)
 {
 	macplus(config);
+	M68000(config.replace(), m_maincpu, C7M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::macse_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	config.device_remove("kbd");
 	config.device_remove("pds");
@@ -1232,7 +1235,7 @@ void mac128_state::macse(machine_config &config)
 	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	m_scsihelp->timeout_error_callback().set(FUNC(mac128_state::scsi_berr_w));
 
-	subdevice<nscsi_connector>("scsibus:7")->set_option_machine_config("ncr5380", [this](device_t *device) {
+	subdevice<nscsi_connector>("scsi:7")->set_option_machine_config("ncr5380", [this](device_t *device) {
 		ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
 		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
 		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
@@ -1281,10 +1284,10 @@ void mac128_state::macclasc(machine_config &config)
 {
 	macsefd(config);
 
-	config.device_remove("pds");
-	config.device_remove("sepds");
+//  config.device_remove("pds");
+//  config.device_remove("sepds");
 
-	NSCSI_CONNECTOR(config.replace(), "scsibus:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device) {
+	NSCSI_CONNECTOR(config.replace(), "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device) {
 		ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
 		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
 		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));

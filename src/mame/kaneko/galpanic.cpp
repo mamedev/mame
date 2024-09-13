@@ -89,7 +89,6 @@ public:
 	galpanic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_pandora(*this, "pandora")
@@ -107,7 +106,6 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<kaneko_pandora_device> m_pandora;
@@ -134,8 +132,6 @@ private:
 	void galpanica_map(address_map &map);
 };
 
-
-// video
 
 void galpanic_state::video_start()
 {
@@ -187,8 +183,6 @@ uint32_t galpanic_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void galpanic_state::machine_start()
 {
@@ -326,7 +320,7 @@ static INPUT_PORTS_START( galpanica )
 INPUT_PORTS_END
 
 
-static GFXDECODE_START( gfx_galpanic )
+static GFXDECODE_START( gfx_galpanic_spr )
 	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_row_2x2_group_packed_msb, 256, 16 )
 GFXDECODE_END
 
@@ -350,13 +344,11 @@ void galpanic_state::galpanic(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(galpanic_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galpanic);
 	// fg palette RAM, bit 0 seems to be a transparency flag for the front bitmap
 	PALETTE(config, m_palette, FUNC(galpanic_state::palette)).set_format(palette_device::GRBx_555, 1024 + 32768);
 
-	KANEKO_PANDORA(config, m_pandora, 0);
+	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_galpanic_spr);
 	m_pandora->set_offsets(0, -16);
-	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -69,6 +69,8 @@ private:
 
 	void crc_update(int bit);
 	void crc_clear();
+
+	void update_dat1byte();
 };
 
 DECLARE_DEVICE_TYPE(SWIM2, swim2_device)

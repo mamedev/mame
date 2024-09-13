@@ -1,16 +1,17 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
-	<!-- define elements -->
+<!-- define elements -->
 
 	<element name="digit" defstate="0">
 		<led14seg><color red="0.2" green="1.0" blue="0.85" /></led14seg>
 	</element>
 
-	<!-- add our own for DP(display point) and the custom AP(apostrophe) segments -->
+<!-- add our own for DP(display point) and the custom AP(apostrophe) segments -->
 
 	<element name="seg_disk" defstate="0">
 		<disk state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></disk>
@@ -22,13 +23,12 @@ license:CC0-1.0
 	</element>
 
 
-	<!-- build screen -->
+<!-- build screen -->
 
 	<view name="Internal Layout">
 		<bounds left="0" right="88.5" top="0" bottom="15" />
 
 		<!-- 8 digits -->
-
 		<repeat count="8">
 			<param name="i" start="0" increment="1" />
 			<param name="digit_x" start="0" increment="11" />

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -20,38 +21,14 @@ license:CC0-1.0
 		<rect state="1"><color red="1" green="1" blue="1" /></rect>
 	</element>
 
-	<element name="text_b2">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="XMV"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b3">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="FP"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b4">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="EP"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b5">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="PLY"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b6">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="RST"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b11">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="WSD"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b16">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="BSD"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_b21">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="CE"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
+	<element name="text_b2"><text string="XMV"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b3"><text string="FP"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b4"><text string="EP"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b5"><text string="PLY"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b6"><text string="RST"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b11"><text string="WSD"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b16"><text string="BSD"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b21"><text string="CE"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 
 	<element name="text_b7a"><text string="A"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b7b"><text string="WK"><color red="0.7" green="0.7" blue="0.7" /></text></element>
@@ -105,9 +82,9 @@ license:CC0-1.0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="9" right="35.5" top="1.5" bottom="37.25" />
+		<bounds left="9" right="35.5" top="2.75" bottom="36.75" />
 
-		<group ref="display"><bounds x="10" y="4.5" width="24.5" height="2.75" /></group>
+		<group ref="display"><bounds x="10" y="5" width="24.5" height="2.75" /></group>
 
 		<element ref="white"><bounds x="10" y="10" width="4.5" height="4.5" /></element> <!-- ON switch is here -->
 		<element ref="white"><bounds x="15" y="10" width="4.5" height="4.5" /></element>

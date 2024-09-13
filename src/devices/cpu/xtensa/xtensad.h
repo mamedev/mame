@@ -6,6 +6,7 @@
 
 #pragma once
 
+
 class xtensa_disassembler : public util::disasm_interface
 {
 public:
@@ -16,12 +17,6 @@ protected:
 	// disassembler overrides
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
-
-private:
-	// formatting helpers
-	static void format_imm(std::ostream &stream, u32 imm);
-
-	static std::string special_reg(u8 n, bool wsr);
 };
 
 #endif // MAME_CPU_XTENSA_XTENSAD_H

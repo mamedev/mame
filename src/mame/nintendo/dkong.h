@@ -313,7 +313,6 @@ private:
 	void s2650_interrupt(int state);
 	void vblank_irq(int state);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
-	void busreq_w(int state);
 
 	void braze_decrypt_rom(uint8_t *dest);
 	void dk_braze_decrypt();

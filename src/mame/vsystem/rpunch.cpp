@@ -128,9 +128,6 @@
 
 namespace {
 
-#define MASTER_CLOCK        XTAL(16'000'000)
-#define VIDEO_CLOCK         XTAL(13'333'000)
-
 
 class rpunch_state : public driver_device
 {
@@ -317,7 +314,7 @@ void rpunch_state::videoreg_w(offs_t offset, u16 data, u16 mem_mask)
 
 	if (m_videoflags != oldword)
 	{
-		/* invalidate tilemaps */
+		// invalidate tilemaps
 		if ((oldword ^ m_videoflags) & 0x0410)
 			m_background[0]->mark_all_dirty();
 		if ((oldword ^ m_videoflags) & 0x0820)
@@ -360,7 +357,7 @@ void rpunch_state::gga_data_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
-		/* only register we know about.... */
+		// only register we know about....
 		case 0x0b:
 			m_crtc_timer->adjust(m_screen->time_until_vblank_start(), (data == 0xc0) ? 2 : 1);
 			break;
@@ -395,14 +392,14 @@ void rpunch_state::sprite_ctrl_w(offs_t offset, u8 data)
 
 void rpunch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* draw the sprites */
+	// draw the sprites
 	int offs = m_sprite_num;
 	while (offs > 0)
 	{
 		offs--;
 		const u32 ram = offs << 2;
 		u32 pri = 0; // above everything except direct mapped bitmap
-		/* this seems like the most plausible explanation */
+		// this seems like the most plausible explanation
 		if (offs < m_sprite_pri)
 			pri |= GFX_PMASK_2; // behind foreground
 
@@ -478,11 +475,11 @@ void rpunch_state::machine_start()
 {
 	m_videoflags = 0;
 
-	/* allocate tilemaps for the backgrounds */
+	// allocate tilemaps for the backgrounds
 	m_background[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rpunch_state::get_bg0_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 64);
 	m_background[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rpunch_state::get_bg1_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 64);
 
-	/* configure the tilemaps */
+	// configure the tilemaps
 	m_background[1]->set_transparent_pen(15);
 
 	m_pixmap = std::make_unique<bitmap_ind16>(512, 256);
@@ -490,7 +487,7 @@ void rpunch_state::machine_start()
 	const rectangle pixmap_rect(0,511,0,255);
 	m_pixmap->fill(0xf, pixmap_rect);
 
-	/* reset the timer */
+	// reset the timer
 	m_crtc_timer = timer_alloc(FUNC(rpunch_state::crtc_interrupt_gen), this);
 
 	save_item(NAME(m_upd_rom_bank));
@@ -551,8 +548,8 @@ void rpunch_state::svolley_map(address_map &map)
 {
 	map.global_mask(0xfffff);
 	map(0x000000, 0x03ffff).rom();
-	map(0x060000, 0x060fff).ram().share("spriteram");
-	map(0x080000, 0x083fff).ram().w(FUNC(rpunch_state::videoram_w)).share("videoram");
+	map(0x060000, 0x060fff).ram().share(m_spriteram);
+	map(0x080000, 0x083fff).ram().w(FUNC(rpunch_state::videoram_w)).share(m_videoram);
 	map(0x0a0000, 0x0a07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0c0000, 0x0c0007).w(FUNC(rpunch_state::scrollreg_w));
 	map(0x0c0009, 0x0c0009).select(0x20).w(FUNC(rpunch_state::gga_w));
@@ -616,7 +613,7 @@ void rpunch_state::svolleybl_sound_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( rpunch )
-	PORT_START("P1")    /* c0018 lower 8 bits */
+	PORT_START("P1")    // c0018 lower 8 bits
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -626,7 +623,7 @@ static INPUT_PORTS_START( rpunch )
 	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(rpunch_state, hi_bits_r)
 
-	PORT_START("P2")    /* c001a lower 8 bits */
+	PORT_START("P2")    // c001a lower 8 bits
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -636,17 +633,17 @@ static INPUT_PORTS_START( rpunch )
 	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(rpunch_state, hi_bits_r)
 
-	PORT_START("SERVICE")   /* c0018/c001a upper 8 bits */
+	PORT_START("SERVICE")   // c0018/c001a upper 8 bits
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) /* Hold F2 at bootup */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )  /* Freeze game */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) // Hold F2 at bootup
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )  // Freeze game
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("DSW")   /* c001c DIP switches */
+	PORT_START("DSW")   // c001c DIP switches
 	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:1,2,3,4")
 	PORT_DIPSETTING(      0x000d, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( 2C_1C ) )
@@ -755,18 +752,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout bglayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP4(3*4,-4), STEP4(7*4,-4) },
-	{ STEP8(0,8*4) },
-	8*8*4
-};
-
-
 static const gfx_layout splayout =
 {
 	16,32,
@@ -780,9 +765,9 @@ static const gfx_layout splayout =
 
 
 static GFXDECODE_START( gfx_rpunch )
-	GFXDECODE_ENTRY( "gfx1",    0, bglayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx2",    0, bglayout, 256, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, splayout,   0, 64 )
+	GFXDECODE_ENTRY( "tiles1",  0, gfx_8x8x4_packed_lsb,   0, 16 )
+	GFXDECODE_ENTRY( "tiles2",  0, gfx_8x8x4_packed_lsb, 256, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, splayout,               0, 64 )
 GFXDECODE_END
 
 
@@ -809,8 +794,8 @@ static const gfx_layout bootleg_sprite_layout =
 };
 
 static GFXDECODE_START( gfx_svolleybl )
-	GFXDECODE_ENTRY( "gfx1",    0, bootleg_tile_layout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx2",    0, bootleg_tile_layout, 256, 16 )
+	GFXDECODE_ENTRY( "tiles1",  0, bootleg_tile_layout,   0, 16 )
+	GFXDECODE_ENTRY( "tiles2",  0, bootleg_tile_layout, 256, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, bootleg_sprite_layout, 0, 64 )
 GFXDECODE_END
 
@@ -821,9 +806,12 @@ GFXDECODE_END
  *
  *************************************/
 
+static constexpr XTAL MASTER_CLOCK = XTAL(16'000'000);
+static constexpr XTAL VIDEO_CLOCK = XTAL(13'333'000);
+
 void rpunch_state::rpunch(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rpunch_state::rpunch_map);
 
@@ -835,7 +823,7 @@ void rpunch_state::rpunch(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
-	/* video hardware */
+	// video hardware
 	set_sprite_palette(0x300);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -851,7 +839,7 @@ void rpunch_state::rpunch(machine_config &config)
 	VSYSTEM_GGA(config, m_gga, VIDEO_CLOCK/2); // verified from rpunch schematics
 	m_gga->write_cb().set(FUNC(rpunch_state::gga_data_w));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", MASTER_CLOCK/4));
@@ -879,7 +867,7 @@ void svolley_state::svolley(machine_config &config)
 // FIXME: copy/paste of above for now, bootleg hardware, things need verifying
 void rpunch_state::svolleybl(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rpunch_state::svolleybl_main_map);
 
@@ -889,7 +877,7 @@ void rpunch_state::svolleybl(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	/* video hardware */
+	// video hardware
 	set_sprite_palette(0x080);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -905,7 +893,7 @@ void rpunch_state::svolleybl(machine_config &config)
 	VSYSTEM_GGA(config, m_gga, VIDEO_CLOCK/2);
 	m_gga->write_cb().set(FUNC(rpunch_state::gga_data_w));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", MASTER_CLOCK/4));
@@ -933,16 +921,16 @@ ROM_START( rpunch )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "rpunch.92", 0x00000, 0x10000, CRC(5e1870e3) SHA1(0ab33f39144ed72d805341d869f61764610d3df6) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "rl_c13.bin", 0x00000, 0x40000, CRC(7c8403b0) SHA1(2fb92860a41f3331076c73b2b010e175cb4929ca) )
-	ROM_LOAD16_WORD_SWAP( "rl_c10.bin", 0x40000, 0x08000, CRC(312eb260) SHA1(31faa90fde54fbc6c110bee7b4690a30beaec469) )
-	ROM_LOAD16_WORD_SWAP( "rl_c12.bin", 0x48000, 0x08000, CRC(bea85219) SHA1(4036bdad921dd3555a2dc6bb12e9ffa615de70ca) )
-	ROM_FILL(                           0x50000, 0x10000, 0xff )
+	ROM_REGION( 0x80000, "tiles1", ROMREGION_ERASEFF )
+	ROM_LOAD( "rl_c13.bin", 0x00000, 0x40000, CRC(7c8403b0) SHA1(2fb92860a41f3331076c73b2b010e175cb4929ca) )
+	ROM_LOAD( "rl_c10.bin", 0x40000, 0x08000, CRC(312eb260) SHA1(31faa90fde54fbc6c110bee7b4690a30beaec469) )
+	ROM_LOAD( "rl_c12.bin", 0x48000, 0x08000, CRC(bea85219) SHA1(4036bdad921dd3555a2dc6bb12e9ffa615de70ca) )
+	ROM_FILL(               0x50000, 0x10000, 0xff )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "rl_a10.bin", 0x00000, 0x40000, CRC(c2a77619) SHA1(9b1e85fb18833c3b96a6c58b8714984f60a90afc) )
-	ROM_LOAD16_WORD_SWAP( "rl_a13.bin", 0x40000, 0x08000, CRC(a39c2c16) SHA1(d8d55eb58d3fc79f982f535ec85f69593fe9d883) )
-	ROM_LOAD16_WORD_SWAP( "rpunch.54",  0x48000, 0x08000, CRC(e2969747) SHA1(8da996fc2e2e3d281f293d0ccaf35ebdb9379d48) )
+	ROM_REGION( 0x80000, "tiles2", ROMREGION_ERASEFF )
+	ROM_LOAD( "rl_a10.bin", 0x00000, 0x40000, CRC(c2a77619) SHA1(9b1e85fb18833c3b96a6c58b8714984f60a90afc) )
+	ROM_LOAD( "rl_a13.bin", 0x40000, 0x08000, CRC(a39c2c16) SHA1(d8d55eb58d3fc79f982f535ec85f69593fe9d883) )
+	ROM_LOAD( "rpunch.54",  0x48000, 0x08000, CRC(e2969747) SHA1(8da996fc2e2e3d281f293d0ccaf35ebdb9379d48) )
 
 	ROM_REGION( 0x80000, "sprites", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "rl_4g.bin", 0x00000, 0x20000, CRC(c5cb4b7a) SHA1(2b6be85800ab62b000a0b01cff8af689b25c4c65) )
@@ -967,16 +955,16 @@ ROM_START( rabiolep )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "rl_f20.bin", 0x00000, 0x10000, CRC(a6f50351) SHA1(3152d4ed100b0dfaf0da4ee79cd9e0f1692335e0) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "rl_c13.bin", 0x00000, 0x40000, CRC(7c8403b0) SHA1(2fb92860a41f3331076c73b2b010e175cb4929ca) )
-	ROM_LOAD16_WORD_SWAP( "rl_c10.bin", 0x40000, 0x08000, CRC(312eb260) SHA1(31faa90fde54fbc6c110bee7b4690a30beaec469) )
-	ROM_LOAD16_WORD_SWAP( "rl_c12.bin", 0x48000, 0x08000, CRC(bea85219) SHA1(4036bdad921dd3555a2dc6bb12e9ffa615de70ca) )
-	ROM_FILL(                           0x50000, 0x10000, 0xff )
+	ROM_REGION( 0x80000, "tiles1", ROMREGION_ERASEFF )
+	ROM_LOAD( "rl_c13.bin", 0x00000, 0x40000, CRC(7c8403b0) SHA1(2fb92860a41f3331076c73b2b010e175cb4929ca) )
+	ROM_LOAD( "rl_c10.bin", 0x40000, 0x08000, CRC(312eb260) SHA1(31faa90fde54fbc6c110bee7b4690a30beaec469) )
+	ROM_LOAD( "rl_c12.bin", 0x48000, 0x08000, CRC(bea85219) SHA1(4036bdad921dd3555a2dc6bb12e9ffa615de70ca) )
+	ROM_FILL(               0x50000, 0x10000, 0xff )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "rl_a10.bin", 0x00000, 0x40000, CRC(c2a77619) SHA1(9b1e85fb18833c3b96a6c58b8714984f60a90afc) )
-	ROM_LOAD16_WORD_SWAP( "rl_a13.bin", 0x40000, 0x08000, CRC(a39c2c16) SHA1(d8d55eb58d3fc79f982f535ec85f69593fe9d883) )
-	ROM_LOAD16_WORD_SWAP( "rl_a12.bin", 0x48000, 0x08000, CRC(970b0e32) SHA1(a1d4025ee4470a41aa047c6f06ca7aa98a1f7ffd) )
+	ROM_REGION( 0x80000, "tiles2", ROMREGION_ERASEFF )
+	ROM_LOAD( "rl_a10.bin", 0x00000, 0x40000, CRC(c2a77619) SHA1(9b1e85fb18833c3b96a6c58b8714984f60a90afc) )
+	ROM_LOAD( "rl_a13.bin", 0x40000, 0x08000, CRC(a39c2c16) SHA1(d8d55eb58d3fc79f982f535ec85f69593fe9d883) )
+	ROM_LOAD( "rl_a12.bin", 0x48000, 0x08000, CRC(970b0e32) SHA1(a1d4025ee4470a41aa047c6f06ca7aa98a1f7ffd) )
 
 	ROM_REGION( 0x80000, "sprites", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "rl_4g.bin", 0x00000, 0x20000, CRC(c5cb4b7a) SHA1(2b6be85800ab62b000a0b01cff8af689b25c4c65) )
@@ -1001,19 +989,19 @@ ROM_START( svolley )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sps_17.bin", 0x00000, 0x10000, CRC(48b89688) SHA1(1f39d979a852f5237a7d95231e86a28cdc1f4d65) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "sps_02.bin", 0x00000, 0x10000, CRC(1a0abe75) SHA1(49251c5e377f9317471f7df26ac2c6b8cfa51007) )
-	ROM_LOAD16_WORD_SWAP( "sps_03.bin", 0x10000, 0x10000, CRC(36279075) SHA1(6c4cf3fab9eb764cb8bc10ab4f8aa54d0afb65d9) )
-	ROM_LOAD16_WORD_SWAP( "sps_04.bin", 0x20000, 0x10000, CRC(7cede7d9) SHA1(9c7e3a9b7dd8d390b327d52ced35b03b8c1fd5ee) )
-	ROM_LOAD16_WORD_SWAP( "sps_01.bin", 0x30000, 0x08000, CRC(6425e6d7) SHA1(b6c81155c22072d1de88ca23d58bd9621139dc6c) )
-	ROM_LOAD16_WORD_SWAP( "sps_10.bin", 0x40000, 0x08000, CRC(a12b1589) SHA1(ecaa941f29c028ca94fcd1d86edfd69884e61d2c) )
+	ROM_REGION( 0x80000, "tiles1", ROMREGION_ERASEFF )
+	ROM_LOAD( "sps_02.bin", 0x00000, 0x10000, CRC(1a0abe75) SHA1(49251c5e377f9317471f7df26ac2c6b8cfa51007) )
+	ROM_LOAD( "sps_03.bin", 0x10000, 0x10000, CRC(36279075) SHA1(6c4cf3fab9eb764cb8bc10ab4f8aa54d0afb65d9) )
+	ROM_LOAD( "sps_04.bin", 0x20000, 0x10000, CRC(7cede7d9) SHA1(9c7e3a9b7dd8d390b327d52ced35b03b8c1fd5ee) )
+	ROM_LOAD( "sps_01.bin", 0x30000, 0x08000, CRC(6425e6d7) SHA1(b6c81155c22072d1de88ca23d58bd9621139dc6c) )
+	ROM_LOAD( "sps_10.bin", 0x40000, 0x08000, CRC(a12b1589) SHA1(ecaa941f29c028ca94fcd1d86edfd69884e61d2c) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "sps_05.bin", 0x00000, 0x10000, CRC(b0671d12) SHA1(defc71b6d7c31c74a58789a1620a506f36b85837) )
-	ROM_LOAD16_WORD_SWAP( "sps_06.bin", 0x10000, 0x10000, CRC(c231957e) SHA1(b56afd41969bd865ad3ca16fb51e39030aeb1943) )
-	ROM_LOAD16_WORD_SWAP( "sps_07.bin", 0x20000, 0x10000, CRC(904b7709) SHA1(9b66a565cd599928b666baad9f97c50f35ffcc37) )
-	ROM_LOAD16_WORD_SWAP( "sps_08.bin", 0x30000, 0x10000, CRC(5430ffac) SHA1(163311d96f2f7e1ecb0901d0be73ac357b01bf6a) )
-	ROM_LOAD16_WORD_SWAP( "sps_09.bin", 0x40000, 0x10000, CRC(414a6278) SHA1(baa9dc9ab0dd3c5f27c128de23053edcddf45ad0) )
+	ROM_REGION( 0x80000, "tiles2", ROMREGION_ERASEFF )
+	ROM_LOAD( "sps_05.bin", 0x00000, 0x10000, CRC(b0671d12) SHA1(defc71b6d7c31c74a58789a1620a506f36b85837) )
+	ROM_LOAD( "sps_06.bin", 0x10000, 0x10000, CRC(c231957e) SHA1(b56afd41969bd865ad3ca16fb51e39030aeb1943) )
+	ROM_LOAD( "sps_07.bin", 0x20000, 0x10000, CRC(904b7709) SHA1(9b66a565cd599928b666baad9f97c50f35ffcc37) )
+	ROM_LOAD( "sps_08.bin", 0x30000, 0x10000, CRC(5430ffac) SHA1(163311d96f2f7e1ecb0901d0be73ac357b01bf6a) )
+	ROM_LOAD( "sps_09.bin", 0x40000, 0x10000, CRC(414a6278) SHA1(baa9dc9ab0dd3c5f27c128de23053edcddf45ad0) )
 
 	ROM_REGION( 0x80000, "sprites", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "sps_20.bin", 0x00000, 0x10000, CRC(c9e7206d) SHA1(af5b2f49387a3b46c6693f4782aa0e587f17ab25) )
@@ -1040,20 +1028,20 @@ ROM_START( svolleyk )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sps_17.bin", 0x00000, 0x10000, CRC(48b89688) SHA1(1f39d979a852f5237a7d95231e86a28cdc1f4d65) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "sps_02.bin", 0x00000, 0x10000, CRC(1a0abe75) SHA1(49251c5e377f9317471f7df26ac2c6b8cfa51007) )
-	ROM_LOAD16_WORD_SWAP( "sps_03.bin", 0x10000, 0x10000, CRC(36279075) SHA1(6c4cf3fab9eb764cb8bc10ab4f8aa54d0afb65d9) )
-	ROM_LOAD16_WORD_SWAP( "sps_04.bin", 0x20000, 0x10000, CRC(7cede7d9) SHA1(9c7e3a9b7dd8d390b327d52ced35b03b8c1fd5ee) )
-	ROM_LOAD16_WORD_SWAP( "sps_01.bin", 0x30000, 0x08000, CRC(6425e6d7) SHA1(b6c81155c22072d1de88ca23d58bd9621139dc6c) )
-	ROM_LOAD16_WORD_SWAP( "sps_10.bin", 0x40000, 0x08000, CRC(a12b1589) SHA1(ecaa941f29c028ca94fcd1d86edfd69884e61d2c) )
+	ROM_REGION( 0x80000, "tiles1", ROMREGION_ERASEFF )
+	ROM_LOAD( "sps_02.bin", 0x00000, 0x10000, CRC(1a0abe75) SHA1(49251c5e377f9317471f7df26ac2c6b8cfa51007) )
+	ROM_LOAD( "sps_03.bin", 0x10000, 0x10000, CRC(36279075) SHA1(6c4cf3fab9eb764cb8bc10ab4f8aa54d0afb65d9) )
+	ROM_LOAD( "sps_04.bin", 0x20000, 0x10000, CRC(7cede7d9) SHA1(9c7e3a9b7dd8d390b327d52ced35b03b8c1fd5ee) )
+	ROM_LOAD( "sps_01.bin", 0x30000, 0x08000, CRC(6425e6d7) SHA1(b6c81155c22072d1de88ca23d58bd9621139dc6c) )
+	ROM_LOAD( "sps_10.bin", 0x40000, 0x08000, CRC(a12b1589) SHA1(ecaa941f29c028ca94fcd1d86edfd69884e61d2c) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "sps_05.bin", 0x00000, 0x10000, CRC(b0671d12) SHA1(defc71b6d7c31c74a58789a1620a506f36b85837) )
-	ROM_LOAD16_WORD_SWAP( "sps_06.bin", 0x10000, 0x10000, CRC(c231957e) SHA1(b56afd41969bd865ad3ca16fb51e39030aeb1943) )
-	ROM_LOAD16_WORD_SWAP( "sps_07.bin", 0x20000, 0x10000, CRC(904b7709) SHA1(9b66a565cd599928b666baad9f97c50f35ffcc37) )
-	ROM_LOAD16_WORD_SWAP( "sps_08.bin", 0x30000, 0x10000, CRC(5430ffac) SHA1(163311d96f2f7e1ecb0901d0be73ac357b01bf6a) )
-	ROM_LOAD16_WORD_SWAP( "sps_09.bin", 0x40000, 0x10000, CRC(414a6278) SHA1(baa9dc9ab0dd3c5f27c128de23053edcddf45ad0) )
-	ROM_LOAD16_WORD_SWAP( "a09.bin",    0x50000, 0x08000, CRC(dd92dfe1) SHA1(08c956e11d567a215ec3cdaf6ef75fa9a886513a) ) // contains Korea, GB and Spain flags
+	ROM_REGION( 0x80000, "tiles2", ROMREGION_ERASEFF )
+	ROM_LOAD( "sps_05.bin", 0x00000, 0x10000, CRC(b0671d12) SHA1(defc71b6d7c31c74a58789a1620a506f36b85837) )
+	ROM_LOAD( "sps_06.bin", 0x10000, 0x10000, CRC(c231957e) SHA1(b56afd41969bd865ad3ca16fb51e39030aeb1943) )
+	ROM_LOAD( "sps_07.bin", 0x20000, 0x10000, CRC(904b7709) SHA1(9b66a565cd599928b666baad9f97c50f35ffcc37) )
+	ROM_LOAD( "sps_08.bin", 0x30000, 0x10000, CRC(5430ffac) SHA1(163311d96f2f7e1ecb0901d0be73ac357b01bf6a) )
+	ROM_LOAD( "sps_09.bin", 0x40000, 0x10000, CRC(414a6278) SHA1(baa9dc9ab0dd3c5f27c128de23053edcddf45ad0) )
+	ROM_LOAD( "a09.bin",    0x50000, 0x08000, CRC(dd92dfe1) SHA1(08c956e11d567a215ec3cdaf6ef75fa9a886513a) ) // contains Korea, GB and Spain flags
 
 	ROM_REGION( 0x80000, "sprites", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "sps_20.bin", 0x00000, 0x10000, CRC(c9e7206d) SHA1(af5b2f49387a3b46c6693f4782aa0e587f17ab25) )
@@ -1080,20 +1068,20 @@ ROM_START( svolleyu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sps_17.bin", 0x00000, 0x10000, CRC(48b89688) SHA1(1f39d979a852f5237a7d95231e86a28cdc1f4d65) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "sps_02.bin", 0x00000, 0x10000, CRC(1a0abe75) SHA1(49251c5e377f9317471f7df26ac2c6b8cfa51007) )
-	ROM_LOAD16_WORD_SWAP( "sps_03.bin", 0x10000, 0x10000, CRC(36279075) SHA1(6c4cf3fab9eb764cb8bc10ab4f8aa54d0afb65d9) )
-	ROM_LOAD16_WORD_SWAP( "sps_04.bin", 0x20000, 0x10000, CRC(7cede7d9) SHA1(9c7e3a9b7dd8d390b327d52ced35b03b8c1fd5ee) )
-	ROM_LOAD16_WORD_SWAP( "sps_01.bin", 0x30000, 0x08000, CRC(6425e6d7) SHA1(b6c81155c22072d1de88ca23d58bd9621139dc6c) )
-	ROM_LOAD16_WORD_SWAP( "sps_10.bin", 0x40000, 0x08000, CRC(a12b1589) SHA1(ecaa941f29c028ca94fcd1d86edfd69884e61d2c) )
+	ROM_REGION( 0x80000, "tiles1", ROMREGION_ERASEFF )
+	ROM_LOAD( "sps_02.bin", 0x00000, 0x10000, CRC(1a0abe75) SHA1(49251c5e377f9317471f7df26ac2c6b8cfa51007) )
+	ROM_LOAD( "sps_03.bin", 0x10000, 0x10000, CRC(36279075) SHA1(6c4cf3fab9eb764cb8bc10ab4f8aa54d0afb65d9) )
+	ROM_LOAD( "sps_04.bin", 0x20000, 0x10000, CRC(7cede7d9) SHA1(9c7e3a9b7dd8d390b327d52ced35b03b8c1fd5ee) )
+	ROM_LOAD( "sps_01.bin", 0x30000, 0x08000, CRC(6425e6d7) SHA1(b6c81155c22072d1de88ca23d58bd9621139dc6c) )
+	ROM_LOAD( "sps_10.bin", 0x40000, 0x08000, CRC(a12b1589) SHA1(ecaa941f29c028ca94fcd1d86edfd69884e61d2c) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "sps_05.bin", 0x00000, 0x10000, CRC(b0671d12) SHA1(defc71b6d7c31c74a58789a1620a506f36b85837) )
-	ROM_LOAD16_WORD_SWAP( "sps_06.bin", 0x10000, 0x10000, CRC(c231957e) SHA1(b56afd41969bd865ad3ca16fb51e39030aeb1943) )
-	ROM_LOAD16_WORD_SWAP( "sps_07.bin", 0x20000, 0x10000, CRC(904b7709) SHA1(9b66a565cd599928b666baad9f97c50f35ffcc37) )
-	ROM_LOAD16_WORD_SWAP( "sps_08.bin", 0x30000, 0x10000, CRC(5430ffac) SHA1(163311d96f2f7e1ecb0901d0be73ac357b01bf6a) )
-	ROM_LOAD16_WORD_SWAP( "sps_09.bin", 0x40000, 0x10000, CRC(414a6278) SHA1(baa9dc9ab0dd3c5f27c128de23053edcddf45ad0) )
-//  ROM_LOAD16_WORD_SWAP( "a09.bin",    0x50000, 0x08000, CRC(dd92dfe1) SHA1(08c956e11d567a215ec3cdaf6ef75fa9a886513a) ) // not on this set?
+	ROM_REGION( 0x80000, "tiles2", ROMREGION_ERASEFF )
+	ROM_LOAD( "sps_05.bin", 0x00000, 0x10000, CRC(b0671d12) SHA1(defc71b6d7c31c74a58789a1620a506f36b85837) )
+	ROM_LOAD( "sps_06.bin", 0x10000, 0x10000, CRC(c231957e) SHA1(b56afd41969bd865ad3ca16fb51e39030aeb1943) )
+	ROM_LOAD( "sps_07.bin", 0x20000, 0x10000, CRC(904b7709) SHA1(9b66a565cd599928b666baad9f97c50f35ffcc37) )
+	ROM_LOAD( "sps_08.bin", 0x30000, 0x10000, CRC(5430ffac) SHA1(163311d96f2f7e1ecb0901d0be73ac357b01bf6a) )
+	ROM_LOAD( "sps_09.bin", 0x40000, 0x10000, CRC(414a6278) SHA1(baa9dc9ab0dd3c5f27c128de23053edcddf45ad0) )
+//  ROM_LOAD( "a09.bin",    0x50000, 0x08000, CRC(dd92dfe1) SHA1(08c956e11d567a215ec3cdaf6ef75fa9a886513a) ) // not on this set?
 
 	ROM_REGION( 0x80000, "sprites", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "sps_20.bin", 0x00000, 0x10000, CRC(c9e7206d) SHA1(af5b2f49387a3b46c6693f4782aa0e587f17ab25) )
@@ -1122,13 +1110,13 @@ ROM_START( svolleyua )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // same
 	ROM_LOAD( "1.ic112", 0x00000, 0x10000, CRC(48b89688) SHA1(1f39d979a852f5237a7d95231e86a28cdc1f4d65) ) // 27512
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASEFF ) // same but split differently
-	ROM_LOAD16_WORD(      "lh532099.ic46", 0x00000, 0x40000, CRC(9428cc36) SHA1(d915dc6ee16cca695fd8b2ff3049a9cc7f601e34) ) // 2m MASK ROM, 27C020 compatible
-	ROM_LOAD16_WORD_SWAP( "7.ic35",        0x40000, 0x10000, CRC(83b20b91) SHA1(043cb6035d762fca3955221edee284fbcf0f8d1e) ) // 27512, double sized but second half 0x00 filled
+	ROM_REGION( 0x80000, "tiles1", ROMREGION_ERASEFF ) // same but split differently
+	ROM_LOAD16_WORD_SWAP( "lh532099.ic46", 0x00000, 0x40000, CRC(9428cc36) SHA1(d915dc6ee16cca695fd8b2ff3049a9cc7f601e34) ) // 2m MASK ROM, 27C020 compatible
+	ROM_LOAD16_WORD(      "7.ic35",        0x40000, 0x10000, CRC(83b20b91) SHA1(043cb6035d762fca3955221edee284fbcf0f8d1e) ) // 27512, double sized but second half 0x00 filled
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF ) // same but split differently
-	ROM_LOAD16_WORD(      "lh53200a.ic47", 0x00000, 0x40000, CRC(75930468) SHA1(be5889b969ede70a8e39932e91fd6bd24b9f9df2) ) // 2m MASK ROM, 27C020 compatible
-	ROM_LOAD16_WORD_SWAP( "10.ic36",       0x40000, 0x10000, CRC(414a6278) SHA1(baa9dc9ab0dd3c5f27c128de23053edcddf45ad0) ) // 27512
+	ROM_REGION( 0x80000, "tiles2", ROMREGION_ERASEFF ) // same but split differently
+	ROM_LOAD16_WORD_SWAP( "lh53200a.ic47", 0x00000, 0x40000, CRC(75930468) SHA1(be5889b969ede70a8e39932e91fd6bd24b9f9df2) ) // 2m MASK ROM, 27C020 compatible
+	ROM_LOAD16_WORD(      "10.ic36",       0x40000, 0x10000, CRC(414a6278) SHA1(baa9dc9ab0dd3c5f27c128de23053edcddf45ad0) ) // 27512
 
 	ROM_REGION( 0x80000, "sprites", ROMREGION_ERASEFF ) // same but split differently
 	ROM_LOAD16_WORD( "lh5320h7.ic51", 0x00000, 0x40000, CRC(152ff5b6) SHA1(8574f59757d198b197284efabb2befe3a7e41d45) ) // 2m MASK ROM, 27C020 compatible
@@ -1143,19 +1131,19 @@ ROM_END
 
 
 ROM_START( svolleybl )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "4-prg.bin", 0x00001, 0x10000, CRC(eefaa208) SHA1(2a0417e170de3212f45be64719bb1eb0c6d33c59) )
 	ROM_LOAD16_BYTE( "6-prg.bin", 0x00000, 0x10000, CRC(da7d2e81) SHA1(ca78a661876ddbcb0e7599edcc819558afb76930) )
 	ROM_LOAD16_BYTE( "5-prg.bin", 0x20000, 0x08000, CRC(e7630122) SHA1(d200afe5134030be615f112af0ab54ac3b349eca) ) // these 2 match program ROMs from svolley
 	ROM_LOAD16_BYTE( "3-prg.bin", 0x20001, 0x08000, CRC(b6b24910) SHA1(2e4cf80a8eb1fcd9448405ff881bb99ae4ce8909) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_REGION( 0x080000, "tiles1", 0 )
 	ROM_LOAD32_BYTE( "7.bin",        0x000000, 0x010000, CRC(9596a4c0) SHA1(1f233bb2fa662fb8cd9c0db478e392ca26d9484b) )
 	ROM_LOAD32_BYTE( "10.bin",       0x000001, 0x010000, CRC(a05249e6) SHA1(8671e0c980ba87ea14895176fb5c8a48bb4c932e) )
 	ROM_LOAD32_BYTE( "13.bin",       0x000002, 0x010000, CRC(429159f3) SHA1(4395413c4ab4a1fd322a1af6f2b93bb62b044223) )
 	ROM_LOAD32_BYTE( "16.bin",       0x000003, 0x010000, CRC(f5436c8d) SHA1(d29508cc5ee43d7b072112c6d95c36ee0328e5fb) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_REGION( 0x080000, "tiles2", 0 )
 	ROM_LOAD32_BYTE( "8.bin",        0x000000, 0x010000, CRC(451ebd75) SHA1(67d5a9fadf3c8a39d59e7b21cb8633dd19886f76) )
 	ROM_LOAD32_BYTE( "11.bin",       0x000001, 0x010000, CRC(0983987a) SHA1(c334276774ffdee0023ea6287e98e0e6e372fb80) )
 	ROM_LOAD32_BYTE( "14.bin",       0x000002, 0x010000, CRC(4babf749) SHA1(1d5055e825b9efc17a200f4e04e6fa326397f7cc) )
@@ -1171,7 +1159,7 @@ ROM_START( svolleybl )
 	ROM_LOAD32_BYTE( "21.bin",       0x000002, 0x010000, CRC(51cbe0d6) SHA1(d60b2a297d7e994c60db28e8ba60b0664e01f61d) )
 	ROM_LOAD32_BYTE( "22.bin",       0x000003, 0x010000, CRC(c289bfc0) SHA1(4a8929c5f304a1d203cad04c72fc6e96764dc858) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 Sound CPU */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 Sound CPU
 	ROM_LOAD( "2-snd.bin", 0x00000, 0x10000, CRC(e3065b1d) SHA1(c4a3a95ba7f43cdf1b0c574f41de06d007ad2bd8) ) // matches 1.ic140 from spikes91
 	ROM_LOAD( "1-snd.bin", 0x10000, 0x08000, CRC(009d7157) SHA1(2cdda7094c7476289d75a78ee25b34fa3b3225c0) ) // matches 2.ic141 from spikes91, when halved
 ROM_END

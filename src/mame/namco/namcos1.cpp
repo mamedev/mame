@@ -353,7 +353,7 @@ void namcos1_state::audiocpu_irq_ack_w(u8 data)
 
 void namcos1_state::mcu_irq_ack_w(u8 data)
 {
-	m_mcu->set_input_line(HD6301_IRQ_LINE, CLEAR_LINE);
+	m_mcu->set_input_line(HD6301_IRQ1_LINE, CLEAR_LINE);
 }
 
 

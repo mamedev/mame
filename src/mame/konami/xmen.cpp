@@ -20,6 +20,8 @@ The board only has one of each gfx chip, the only additional chip not found
 on the 2/4p board is 053253. This chip is also on Run n Gun which is
 likewise a 2 screen game.
 
+Reverse-engineered schematics: https://github.com/jotego/jtbin/blob/master/sch/xmen.pdf
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -161,8 +163,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Callbacks for the K052109
@@ -301,7 +301,7 @@ void xmen6p_state::screen_vblank(int state)
 		index += m_tilemap_select ? 2 : 0;
 		for (int offset = 0; offset < (0xc000 / 2); offset++)
 		{
-			if (index == 0 || (offset != 0x1c80 && offset != 0x1e80))
+			if (index == 0 || (offset != 0x1c00 && offset != 0x1c80 && offset != 0x1e80))
 				m_k052109->write(offset, m_tilemap[index][offset] & 0x00ff);
 		}
 
@@ -337,8 +337,6 @@ void xmen6p_state::screen_vblank(int state)
 	}
 }
 
-
-// machine
 
 /***************************************************************************
 
@@ -512,7 +510,11 @@ static INPUT_PORTS_START( xmen )
 	KONAMI16_MSB_UDLR(4, IPT_BUTTON3, IPT_COIN4 )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE4 )
+	PORT_BIT( 0x0030, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )

@@ -36,6 +36,7 @@ public:
 	void spg2xx_base(machine_config &config);
 	void spg2xx(machine_config &config);
 	void spg2xx_pal(machine_config &config);
+	void spg28x(machine_config &config);
 
 	void rad_skat(machine_config &config);
 	void rad_skatp(machine_config &config);
@@ -296,6 +297,24 @@ private:
 
 	void mem_map_wfcentro(address_map& map);
 };
+
+
+class spg2xx_game_lexiart_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_lexiart_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void lexiart(machine_config &config);
+
+protected:
+
+private:
+
+	void mem_map_lexiart(address_map& map);
+};
+
 
 class spg2xx_game_ordentv_state : public spg2xx_game_state
 {

@@ -21,6 +21,7 @@
 #include "fileio.h"
 
 #include <cinttypes>
+#include <string_view>
 
 
 namespace osd {
@@ -253,9 +254,9 @@ static const gdb_register_map gdb_register_map_m68020pmmu =
 		{ "A4", "a4", false, TYPE_INT },
 		{ "A5", "a5", false, TYPE_INT },
 		{ "A6", "fp", true,  TYPE_INT },
-		{ "A7", "sp", true,  TYPE_INT },
+		{ "SP", "sp", true,  TYPE_INT },
 		{ "SR", "ps", false, TYPE_INT }, // NOTE GDB named it ps, but it's actually sr
-		{ "PC", "pc", true,  TYPE_CODE_POINTER },
+		{ "CURPC","pc", true,  TYPE_CODE_POINTER },
 	}
 };
 
@@ -280,9 +281,9 @@ static const gdb_register_map gdb_register_map_m68000 =
 		{ "A4", "a4", false, TYPE_INT },
 		{ "A5", "a5", false, TYPE_INT },
 		{ "A6", "fp", true,  TYPE_INT },
-		{ "A7", "sp", true,  TYPE_INT },
+		{ "SP", "sp", true,  TYPE_INT },
 		{ "SR", "ps", false, TYPE_INT }, // NOTE GDB named it ps, but it's actually sr
-		{ "PC", "pc", true,  TYPE_CODE_POINTER },
+		{ "CURPC","pc", true,  TYPE_CODE_POINTER },
 		//NOTE m68-elf-gdb complains about fpcontrol register not present but 68000 doesn't have floating point so...
 	}
 };
@@ -477,9 +478,15 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 	{ "m68020pmmu", gdb_register_map_m68020pmmu },
 	{ "m68000",     gdb_register_map_m68000 },
 	{ "z80",        gdb_register_map_z80 },
+	{ "z80n",       gdb_register_map_z80 },
 	{ "z84c015",    gdb_register_map_z80 },
 	{ "m6502",      gdb_register_map_m6502 },
+	{ "m6507",      gdb_register_map_m6502 },
+	{ "m6510",      gdb_register_map_m6502 },
+	{ "m65c02",     gdb_register_map_m6502 },
+	{ "m65ce02",    gdb_register_map_m6502 },
 	{ "rp2a03",     gdb_register_map_m6502 },
+	{ "w65c02s",    gdb_register_map_m6502 },
 	{ "m6809",      gdb_register_map_m6809 },
 	{ "score7",     gdb_register_map_score7 },
 	{ "nios2",      gdb_register_map_nios2 },
@@ -489,8 +496,8 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 class debug_gdbstub : public osd_module, public debug_module
 {
 public:
-	debug_gdbstub()
-	: osd_module(OSD_DEBUG_PROVIDER, "gdbstub"), debug_module(),
+	debug_gdbstub() :
+		osd_module(OSD_DEBUG_PROVIDER, "gdbstub"), debug_module(),
 		m_readbuf_state(PACKET_START),
 		m_machine(nullptr),
 		m_maincpu(nullptr),
@@ -499,6 +506,7 @@ public:
 		m_address_space(nullptr),
 		m_debugger_cpu(nullptr),
 		m_debugger_console(nullptr),
+		m_debugger_host(),
 		m_debugger_port(0),
 		m_socket(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE),
 		m_is_be(false),
@@ -582,7 +590,7 @@ public:
 
 	int readchar();
 
-	void send_reply(const char *str);
+	void send_reply(std::string_view str);
 	void send_stop_packet();
 
 private:
@@ -593,6 +601,7 @@ private:
 	address_space *m_address_space;
 	debugger_cpu *m_debugger_cpu;
 	debugger_console *m_debugger_console;
+	std::string m_debugger_host;
 	int m_debugger_port;
 	emu_file m_socket;
 	bool m_is_be;
@@ -635,6 +644,7 @@ private:
 //-------------------------------------------------------------------------
 int debug_gdbstub::init(osd_interface &osd, const osd_options &options)
 {
+	m_debugger_host = options.debugger_host();
 	m_debugger_port = options.debugger_port();
 	return 0;
 }
@@ -671,11 +681,11 @@ int debug_gdbstub::readchar()
 }
 
 //-------------------------------------------------------------------------
-static std::string escape_packet(const std::string src)
+static std::string escape_packet(std::string_view src)
 {
 	std::string result;
 	result.reserve(src.length());
-	for ( char ch: src )
+	for ( char ch : src )
 	{
 		if ( ch == '#' || ch == '$' || ch == '}' )
 		{
@@ -696,10 +706,10 @@ void debug_gdbstub::generate_target_xml()
 	target_xml += "<?xml version=\"1.0\"?>\n";
 	target_xml += "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">\n";
 	target_xml += "<target version=\"1.0\">\n";
-	target_xml += string_format("<architecture>%s</architecture>\n", m_gdb_arch.c_str());
-	target_xml += string_format("  <feature name=\"%s\">\n", m_gdb_feature.c_str());
+	target_xml += string_format("<architecture>%s</architecture>\n", m_gdb_arch);
+	target_xml += string_format("  <feature name=\"%s\">\n", m_gdb_feature);
 	for ( const auto &reg: m_gdb_registers )
-		target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\"/>\n", reg.gdb_name.c_str(), reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type]);
+		target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\"/>\n", reg.gdb_name, reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type]);
 	target_xml += "  </feature>\n";
 	target_xml += "</target>\n";
 	m_target_xml = escape_packet(target_xml);
@@ -782,11 +792,11 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 			osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name);
 #endif
 
-		std::string socket_name = string_format("socket.localhost:%d", m_debugger_port);
+		std::string socket_name = string_format("socket.%s:%d", m_debugger_host, m_debugger_port);
 		std::error_condition const filerr = m_socket.open(socket_name);
 		if ( filerr )
-			fatalerror("gdbstub: failed to start listening on port %d\n", m_debugger_port);
-		osd_printf_info("gdbstub: listening on port %d\n", m_debugger_port);
+			fatalerror("gdbstub: failed to start listening on address %s port %d\n", m_debugger_host, m_debugger_port);
+		osd_printf_info("gdbstub: listening on address %s port %d\n", m_debugger_host, m_debugger_port);
 
 		m_initialized = true;
 	}
@@ -832,26 +842,24 @@ void debug_gdbstub::debugger_update()
 //-------------------------------------------------------------------------
 void debug_gdbstub::send_nack()
 {
-	m_socket.puts("-");
+	m_socket.write("-", 1);
 }
 
 //-------------------------------------------------------------------------
 void debug_gdbstub::send_ack()
 {
-	m_socket.puts("+");
+	m_socket.write("+", 1);
 }
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::send_reply(const char *str)
+void debug_gdbstub::send_reply(std::string_view str)
 {
-	size_t length = strlen(str);
-
 	uint8_t checksum = 0;
-	for ( size_t i = 0; i < length; i++ )
-		checksum += str[i];
+	for ( char ch : str )
+		checksum += ch;
 
 	std::string reply = string_format("$%s#%02x", str, checksum);
-	m_socket.puts(reply);
+	m_socket.write(reply.c_str(), reply.length());
 }
 
 
@@ -909,7 +917,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_g(const char *buf)
 	std::string reply;
 	for ( const auto &reg: m_gdb_registers )
 		reply += get_register_string(reg.gdb_regnum);
-	send_reply(reply.c_str());
+	send_reply(reply);
 	return REPLY_NONE;
 }
 
@@ -978,7 +986,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_m(const char *buf)
 		uint8_t value = tspace->read_byte(offset + i);
 		reply += string_format("%02x", value);
 	}
-	send_reply(reply.c_str());
+	send_reply(reply);
 
 	return REPLY_NONE;
 }
@@ -1034,7 +1042,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_p(const char *buf)
 	if ( sscanf(buf, "%x", &gdb_regnum) != 1 || gdb_regnum >= m_gdb_registers.size() )
 		return REPLY_ENN;
 	std::string reply = get_register_string(gdb_regnum);
-	send_reply(reply.c_str());
+	send_reply(reply);
 	return REPLY_NONE;
 }
 
@@ -1101,7 +1109,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 				reply += string_format("%02x", *line++);
 			reply += "0A";
 		}
-		send_reply(reply.c_str());
+		send_reply(reply);
 		return REPLY_NONE;
 	}
 
@@ -1118,7 +1126,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 	{
 		std::string reply = string_format("PacketSize=%x", MAX_PACKET_SIZE);
 		reply += ";qXfer:features:read+";
-		send_reply(reply.c_str());
+		send_reply(reply);
 		return REPLY_NONE;
 	}
 	else if ( name == "Xfer" )
@@ -1139,7 +1147,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 				else
 					reply += 'l';
 				reply += m_target_xml.substr(offset, length);
-				send_reply(reply.c_str());
+				send_reply(reply);
 				m_target_xml_sent = true;
 				return REPLY_NONE;
 			}
@@ -1326,7 +1334,7 @@ void debug_gdbstub::send_stop_packet()
 	if ( m_target_xml_sent )
 		for ( const auto &gdb_regnum: m_stop_reply_registers )
 			reply += string_format("%02x:%s;", gdb_regnum, get_register_string(gdb_regnum));
-	send_reply(reply.c_str());
+	send_reply(reply);
 }
 
 //-------------------------------------------------------------------------

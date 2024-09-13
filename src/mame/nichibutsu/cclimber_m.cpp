@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "cclimber.h"
 
-/* set to 1 to fix protection check after bonus round (see notes in pacman.c driver) */
+// set to 1 to fix protection check after bonus round (see notes in pacman.c driver)
 #define CANNONB_HACK    0
 
 void cclimber_state::cclimber_decode(const uint8_t convtable[8][16])
@@ -15,14 +15,14 @@ void cclimber_state::cclimber_decode(const uint8_t convtable[8][16])
 		int i,j;
 		uint8_t src = rom[A];
 
-		/* pick the translation table from bit 0 of the address */
-		/* and from bits 1 7 of the source data */
+		// pick the translation table from bit 0 of the address
+		// and from bits 1 7 of the source data
 		i = (A & 1) | (src & 0x02) | ((src & 0x80) >> 5);
 
-		/* pick the offset in the table from bits 0 2 4 6 of the source data */
+		// pick the offset in the table from bits 0 2 4 6 of the source data
 		j = (src & 0x01) | ((src & 0x04) >> 1) | ((src & 0x10) >> 2) | ((src & 0x40) >> 3);
 
-		/* decode the opcodes */
+		// decode the opcodes
 		m_decrypted_opcodes[A] = (src & 0xaa) | convtable[i][j];
 	}
 }
@@ -31,7 +31,7 @@ void cclimber_state::init_cclimber()
 {
 	static const uint8_t convtable[8][16] =
 	{
-		/* 0xff marks spots which are unused and therefore unknown */
+		// 0xff marks spots which are unused and therefore unknown
 		{ 0x44,0x14,0x54,0x10,0x11,0x41,0x05,0x50,0x51,0x00,0x40,0x55,0x45,0x04,0x01,0x15 },
 		{ 0x44,0x10,0x15,0x55,0x00,0x41,0x40,0x51,0x14,0x45,0x11,0x50,0x01,0x54,0x04,0x05 },
 		{ 0x45,0x10,0x11,0x44,0x05,0x50,0x51,0x04,0x41,0x14,0x15,0x40,0x01,0x54,0x55,0x00 },
@@ -66,7 +66,7 @@ void cclimber_state::init_ckongb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (int A = 0x0000; A < 0x6000; A++) /* all the program ROMs are encrypted */
+	for (int A = 0x0000; A < 0x6000; A++) // all the program ROMs are encrypted
 	{
 		rom[A] = rom[A] ^ 0xf0;
 	}
@@ -88,7 +88,7 @@ void cclimber_state::init_cannonb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (int A = 0x0000; A < 0x1000; A++) /* only first ROM is encrypted */
+	for (int A = 0x0000; A < 0x1000; A++) // only first ROM is encrypted
 	{
 		uint8_t src;
 		int i;

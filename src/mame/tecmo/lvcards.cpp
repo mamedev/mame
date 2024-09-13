@@ -160,8 +160,6 @@ private:
 };
 
 
-// video
-
 void lvcards_state::palette(palette_device &palette) const //Ever so slightly different, but different enough.
 {
 	const uint8_t *color_prom = memregion("proms")->base();
@@ -231,8 +229,6 @@ uint32_t lvcards_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void lvpoker_state::machine_start()
 {
@@ -840,5 +836,5 @@ void lvcards_state::init_lvcardsa()
 
 GAME( 1985, lvcards,  0,       lvcards,  lvcards,  lvcards_state, empty_init,    ROT0, "Tehkan", "Lovely Cards",             MACHINE_SUPPORTS_SAVE )
 GAME( 1985, lvcardsa, lvcards, lvcardsa, lvcards,  lvcards_state, init_lvcardsa, ROT0, "Tehkan", "Lovely Cards (encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvpoker_state, empty_init,    ROT0, "Tehkan", "Lovely Poker [BET]",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvpoker_state, empty_init,    ROT0, "Tehkan", "Lovely Poker",             MACHINE_SUPPORTS_SAVE )
 GAME( 1985, ponttehk, 0,       ponttehk, ponttehk, lvpoker_state, empty_init,    ROT0, "Tehkan", "Pontoon (Tehkan)",         MACHINE_SUPPORTS_SAVE )

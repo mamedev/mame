@@ -80,7 +80,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_text_info);
 	TILEMAP_MAPPER_MEMBER(back_scan);
 	TILE_GET_INFO_MEMBER(get_back_info);
-	void palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void expand_bg() ATTR_COLD;
@@ -88,9 +88,7 @@ private:
 };
 
 
-// video
-
-void compgolf_state::palette(palette_device &palette) const
+void compgolf_state::palette_init(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
 
@@ -205,8 +203,6 @@ uint32_t compgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *
@@ -427,9 +423,8 @@ void compgolf_state::compgolf(machine_config &config)
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	PALETTE(config, m_palette, FUNC(compgolf_state::palette), 0x100);
+	PALETTE(config, m_palette, FUNC(compgolf_state::palette_init), 0x100);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_compgolf);
-
 
 	SPEAKER(config, "mono").front_center();
 
@@ -532,5 +527,5 @@ void compgolf_state::init_compgolf()
  *
  *************************************/
 
-GAME( 1986, compgolf,  0,        compgolf, compgolf, compgolf_state, init_compgolf, ROT0, "Data East", "Competition Golf Final Round (revision 3)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1985, compgolfo, compgolf, compgolf, compgolf, compgolf_state, init_compgolf, ROT0, "Data East", "Competition Golf Final Round (Japan, old version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, compgolf,  0,        compgolf, compgolf, compgolf_state, init_compgolf, ROT0, "Data East Corporation", "Competition Golf Final Round (World?, revision 3)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1985, compgolfo, compgolf, compgolf, compgolf, compgolf_state, init_compgolf, ROT0, "Data East Corporation", "Competition Golf Final Round (Japan, old version)", MACHINE_SUPPORTS_SAVE )

@@ -15,8 +15,8 @@ class tc0140syt_device : public device_t
 public:
 	tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <typename T> void set_master_tag(T &&tag) { m_mastercpu.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_slave_tag(T &&tag) { m_slavecpu.set_tag(std::forward<T>(tag)); }
+	auto nmi_callback() { return m_nmi_cb.bind(); }
+	auto reset_callback() { return m_reset_cb.bind(); }
 
 	// MASTER (4-bit bus) control functions
 	void master_port_w(u8 data);
@@ -45,8 +45,8 @@ private:
 	u8     m_status;        /* Status data */
 	u8     m_nmi_enabled;   /* 1 if slave cpu has nmi's enabled */
 
-	required_device<cpu_device> m_mastercpu;     /* this is the maincpu */
-	required_device<cpu_device> m_slavecpu;      /* this is the audiocpu */
+	devcb_write_line m_nmi_cb;
+	devcb_write_line m_reset_cb;
 };
 
 // ======================> pc060ha_device

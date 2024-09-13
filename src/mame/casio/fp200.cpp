@@ -1,27 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+// thanks-to: Takeda Toshiya
+/**************************************************************************************************
 
-    FP-200 (c) 1982 Casio
+FP-200 (c) 1982 Casio
 
-    preliminary driver by Angelo Salese
+TODO:
+- cassette i/f, glued together by discrete;
+- serial i/f;
+- FDC (requires test program that Service manual mentions);
+- ROM/RAM slot interface;
+- mini plotter printer (FP-1011PL)
+- graphic printer (FP-1012PR)
 
-    TODO:
-    - What's the LCDC type? Custom?
-    - Unless I've missed something in the schems, this one shouldn't have any
-      sound capability.
-    - backup RAM.
-    - Rewrite video emulation from scratch.
+Notes:
+- on start-up there's a "memory illegal" warning. Issue a "RESET" command to initialize it.
 
-    Notes:
-    - on start-up there's a "memory illegal" warning. Enter "RESET" command
-      to initialize it (thanks to Takeda Toshiya for pointing this out).
-
-***************************************************************************/
-
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/nvram.h"
+#include "machine/rp5c01.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -37,6 +37,11 @@ public:
 	fp200_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rtc(*this, "rtc")
+		, m_nvram(*this, "nvram")
+		, m_ioview(*this, "ioview")
+		, m_key(*this, "KEY%X", 0U)
+		, m_gfxrom(*this, "chargen")
 	{ }
 
 	void fp200(machine_config &config);
@@ -46,38 +51,37 @@ public:
 private:
 	// devices
 	required_device<i8085a_cpu_device> m_maincpu;
-	uint8_t m_io_type = 0;
-	uint8_t *m_chargen = nullptr;
-	uint8_t m_keyb_mux = 0;
+	required_device<rp5c01_device> m_rtc;
+	required_device<nvram_device> m_nvram;
+	memory_view m_ioview;
+	required_ioport_array<16> m_key;
+	required_memory_region m_gfxrom;
 
-	struct{
-		uint8_t x = 0;
-		uint8_t y = 0;
-		uint8_t status = 0;
-		std::unique_ptr<uint8_t[]> vram;
-		std::unique_ptr<uint8_t[]> attr;
-	}m_lcd;
-	uint8_t read_lcd_attr(uint16_t X, uint16_t Y);
-	uint8_t read_lcd_vram(uint16_t X, uint16_t Y);
-	void write_lcd_attr(uint16_t X, uint16_t Y,uint8_t data);
-	void write_lcd_vram(uint16_t X, uint16_t Y,uint8_t data);
+	//uint8_t *m_chargen = nullptr;
+	uint8_t m_keyb_matrix = 0;
 
-	// screen updates
+	std::unique_ptr<uint8_t[]> m_lcd_vram[2];
+	u16 m_lcd_yoffset[2]{};
+	u16 m_lcd_address = 0;
+	u8 m_lcd_status = 0;
+	bool m_lcd_text_mode = false;
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint8_t fp200_io_r(offs_t offset);
-	void fp200_io_w(offs_t offset, uint8_t data);
-	uint8_t fp200_lcd_r(offs_t offset);
-	void fp200_lcd_w(offs_t offset, uint8_t data);
-	uint8_t fp200_keyb_r(offs_t offset);
-	void fp200_keyb_w(offs_t offset, uint8_t data);
+	template <unsigned N> u8 lcd_data_r(offs_t offset);
+	template <unsigned N> void lcd_data_w(offs_t offset, u8 data);
+
+	void lcd_map(address_map &map);
+
+	uint8_t keyb_r(offs_t offset);
+	void keyb_w(offs_t offset, uint8_t data);
 
 	void sod_w(int state);
 	int sid_r();
 
-	void fp200_palette(palette_device &palette) const;
-	void fp200_io(address_map &map);
-	void fp200_map(address_map &map);
+	void palette_init(palette_device &palette) const;
+	void main_io(address_map &map);
+	void main_map(address_map &map);
 
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -88,352 +92,166 @@ private:
 
 void fp200_state::video_start()
 {
-	m_lcd.vram = make_unique_clear<uint8_t[]>(20*64);
-	m_lcd.attr = make_unique_clear<uint8_t[]>(20*64);
+	m_lcd_vram[0] = make_unique_clear<uint8_t[]>(0x400);
+	m_lcd_vram[1] = make_unique_clear<uint8_t[]>(0x400);
+
+	save_pointer(NAME(m_lcd_vram[0]), 0x400);
+	save_pointer(NAME(m_lcd_vram[1]), 0x400);
 }
 
-/* TODO: Very preliminary, I actually believe that the LCDC writes in a blitter fashion ... */
 uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint16_t l_offs, r_offs;
-
-	bitmap.fill(0, cliprect);
-
-	l_offs = 0;
-	r_offs = 0;
-	for(int y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
+	for(int y = cliprect.min_x; y <= cliprect.max_y; y ++)
 	{
-		for(int x=0;x<80;x++)
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x ++)
 		{
-			if(m_lcd.attr[x/8+y*20] == 0x50)
-			{
-				l_offs = (y & ~7);
-				break;
-			}
-		}
-	}
+			const u8 which = x < 80;
+			const u8 x_tile = x >> 3;
+			const u8 y_tile = y >> 3;
+			const u16 base_addr = ((x_tile % 10 + y_tile * 0x80) + m_lcd_yoffset[which]) & 0x3ff;
+			const u8 xi = x & 7;
+			const u8 yi = y & 7;
 
-	for(int y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
-	{
-		for(int x=80;x<160;x++)
-		{
-			if(m_lcd.attr[x/8+y*20] == 0x50)
-			{
-				r_offs = (y & ~7);
-				break;
-			}
-		}
-	}
-
-	for(int y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
-	{
-		for(int x=0;x<80;x++)
-		{
-			uint16_t yoffs;
-
-			yoffs = y + l_offs;
-
-			if(yoffs >= 64)
-				yoffs -= 64;
-
-			if(m_lcd.attr[x/8+yoffs*20] == 0x60 || m_lcd.attr[x/8+yoffs*20] == 0x50)
-			{
-				uint8_t const vram = m_lcd.vram[x/8+yoffs*20];
-				uint8_t const pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(yoffs & 7))) & 1;
-				bitmap.pix(y,x) = pix;
-			}
-			/*
-			else if(m_lcd.attr[x/8+yoffs*20] == 0x40)
-			{
-			    uint8_t const vram = m_lcd.vram[x/8+yoffs*20];
-			    uint8_t const pix = (vram) >> (7-(yoffs & 7)) & 1;
-			    bitmap.pix(y,x) = pix;
-			}*/
-		}
-	}
-
-	for(int y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
-	{
-		for(int x=80;x<160;x++)
-		{
-			uint16_t yoffs;
-
-			yoffs = y + r_offs;
-
-			if(yoffs >= 64)
-				yoffs -= 64;
-
-			if(m_lcd.attr[x/8+yoffs*20] == 0x60 || m_lcd.attr[x/8+yoffs*20] == 0x50)
-			{
-				uint8_t const vram = m_lcd.vram[x/8+yoffs*20];
-				uint8_t const pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(yoffs & 7))) & 1;
-				bitmap.pix(y,x) = pix;
-			}
-			/*else if(m_lcd.attr[x/8+yoffs*20] == 0x40)
-			{
-			    uint8_t const vram = m_lcd.vram[x/8+yoffs*20];
-			    uint8_t const pix = (vram) >> (7-(yoffs & 7)) & 1;
-			    bitmap.pix(y,x) = pix;
-			}*/
+			const u8 vram = m_lcd_vram[which][(base_addr + yi * 0x10) & 0x3ff];
+			uint8_t const pix = BIT(vram, xi);
+			bitmap.pix(y, x) = pix;
 		}
 	}
 
 	return 0;
 }
 
-
-/*
-[1] DDDD DDDD vram data/attr (left half)
-[2] DDDD DDDD vram data/attr (right half)
-[8] SSSS --YY Status code (1=vram type/0xb=attr type) / upper part of Y address
-[9] YYYY XXXX lower part of Y address / X address
-*/
-uint8_t fp200_state::read_lcd_attr(uint16_t X, uint16_t Y)
+template <unsigned N> u8 fp200_state::lcd_data_r(offs_t offset)
 {
-	uint16_t base_offs;
-	uint8_t res = 0;
-
-	for(int yi=0;yi<8;yi++)
-	{
-		base_offs = X+(Y+yi)*20;
-
-		if(base_offs >= 20*64)
-			return 0xff;
-
-		res = m_lcd.attr[base_offs];
-	}
-
-	return res;
+	return m_lcd_vram[N][m_lcd_address & 0x3ff];
 }
 
-uint8_t fp200_state::read_lcd_vram(uint16_t X, uint16_t Y)
+template <unsigned N> void fp200_state::lcd_data_w(offs_t offset, u8 data)
 {
-	uint16_t base_offs;
-	uint8_t res = 0;
-
-	for(int yi=0;yi<8;yi++)
+	switch (m_lcd_status)
 	{
-		base_offs = X+(Y+yi)*20;
+		// select mode
+		case 0xb:
+			if (BIT(data, 6))
+			{
+				if (BIT(data, 4))
+					m_lcd_yoffset[N] = m_lcd_address;
+				else
+					m_lcd_text_mode = bool(BIT(data, 5));
+			}
 
-		if(base_offs >= 20*64)
-			return 0xff;
+			if (data & 0x8f)
+				logerror("Warning: LCD write with unknown mode %02x\n", data);
 
-		res = m_lcd.vram[base_offs];
-	}
-
-	return res;
-}
-
-uint8_t fp200_state::fp200_lcd_r(offs_t offset)
-{
-	uint8_t res;
-
-	res = 0;
-
-	switch(offset)
-	{
-		case 1:
-			//printf("%d %d -> (L) %02x\n",m_lcd.x,m_lcd.y,m_lcd.status);
-			if(m_lcd.status == 0xb)
-				res = read_lcd_attr(m_lcd.x,m_lcd.y);
-			else if(m_lcd.status == 1)
-				res = read_lcd_vram(m_lcd.x,m_lcd.y);
 			break;
-		case 2:
-			//printf("%d %d -> (R) %02x\n",m_lcd.x,m_lcd.y,m_lcd.status);
-			if(m_lcd.status == 0xb)
-				res = read_lcd_attr(m_lcd.x + 10,m_lcd.y);
-			else if(m_lcd.status == 1)
-				res = read_lcd_vram(m_lcd.x + 10,m_lcd.y);
+
+		// data write
+		case 0x1:
+			if (m_lcd_text_mode)
+			{
+				// The handling doesn't make a whole lot of sense for being practically usable ...
+				const u8 tile_address = bitswap<8>(data, 3, 2, 1, 0, 7, 6, 5, 4);
+				for (int yi = 0; yi < 8; yi ++)
+				{
+					u8 tile = 0;
+					for (int xi = 0; xi < 8; xi ++)
+						tile |= BIT(m_gfxrom->base()[tile_address * 8 + xi], 7 - yi) << xi;
+					m_lcd_vram[N][(m_lcd_address + 0x10 * yi) & 0x3ff] = tile;
+				}
+			}
+			else
+				m_lcd_vram[N][m_lcd_address & 0x3ff] = data;
+
 			break;
-		case 8:
-			res =  (m_lcd.status & 0xf) << 4;
-			res |= (m_lcd.y & 0x30) >> 4;
-			break;
-		case 9:
-			res =  (m_lcd.y & 0xf) << 4;
-			res |= (m_lcd.x & 0xf);
+		default:
+			logerror("Warning: LCD write with unknown status type %02x\n", m_lcd_status);
 			break;
 	}
-
-
-	return res;
-}
-
-void fp200_state::write_lcd_attr(uint16_t X, uint16_t Y,uint8_t data)
-{
-	uint16_t base_offs;
-
-	for(int yi=0;yi<8;yi++)
-	{
-		base_offs = X+(Y+yi)*20;
-
-		if(base_offs >= 20*64)
-			return;
-
-		//if(data != 0x60)
-		//  printf("%d %d %02x\n",X,Y,data);
-
-		m_lcd.attr[base_offs] = data;
-	}
-}
-
-void fp200_state::write_lcd_vram(uint16_t X, uint16_t Y,uint8_t data)
-{
-	uint16_t base_offs;
-
-	for(int yi=0;yi<8;yi++)
-	{
-		base_offs = X+(Y+yi)*20;
-
-		if(base_offs >= 20*64)
-			return;
-
-		m_lcd.vram[base_offs] = data;
-	}
-}
-
-void fp200_state::fp200_lcd_w(offs_t offset, uint8_t data)
-{
-	switch(offset)
-	{
-		case 1:
-			//printf("%d %d -> %02x (%c) (L %02x)\n",m_lcd.x,m_lcd.y,data,data,m_lcd.status);
-			if(m_lcd.status == 0xb)
-				write_lcd_attr(m_lcd.x,m_lcd.y,data);
-			else if(m_lcd.status == 1)
-				write_lcd_vram(m_lcd.x,m_lcd.y,data);
-			break;
-		case 2:
-			//printf("%d %d -> %02x (%c) (R %02x)\n",m_lcd.x + 10,m_lcd.y,data,data,m_lcd.status);
-			if(m_lcd.status == 0xb)
-				write_lcd_attr(m_lcd.x + 10,m_lcd.y,data);
-			else if(m_lcd.status == 1)
-				write_lcd_vram(m_lcd.x + 10,m_lcd.y,data);
-			break;
-		case 8:
-			m_lcd.status = (data & 0xf0) >> 4;
-			if(m_lcd.status == 0x0b)
-				m_lcd.y = (m_lcd.y & 0xf) | ((data & 3) << 4);
-			break;
-		case 9:
-			m_lcd.y = (m_lcd.y & 0x30) | ((data & 0xf0) >> 4);
-			m_lcd.x = data & 0xf;
-			break;
-	}
-}
-
-uint8_t fp200_state::fp200_keyb_r(offs_t offset)
-{
-	const char *const keynames[16] = { "KEY0", "KEY1", "KEY2", "KEY3",
-										"KEY4", "KEY5", "KEY6", "KEY7",
-										"KEY8", "KEY9", "UNUSED", "UNUSED",
-										"UNUSED", "UNUSED", "UNUSED", "UNUSED"};
-	uint8_t res;
-
-	if(offset == 0)
-		res = ioport(keynames[m_keyb_mux])->read();
-	else
-	{
-		printf("Unknown keyboard offset read access %02x\n",offset + 0x20);
-		res = 0;
-	}
-
-	return res;
-}
-
-void fp200_state::fp200_keyb_w(offs_t offset, uint8_t data)
-{
-	if(offset == 1)
-		m_keyb_mux = data & 0xf;
-	else if(offset == 0)
-	{
-		// ... ?
-	}
-	else
-		printf("Unknown keyboard offset write access %02x %02x\n",offset + 0x20,data);
 }
 
 /*
-Annoyingly the i/o map uses the SOD to access different devices, so we need trampolines.
-SOD = 0
-0x10 - 0x1f Timer control (RPC05 RTC)
-0x20 - 0x2f AUTO-POWER OFF
-0x40 - 0x4f FDC Device ID Code (5 for "FP-1021FD")
-0x80 - 0xff FDD (unknown type)
-SOD = 1
-0x00 - 0x0f LCD control.
-0x10 - 0x1f I/O control
-0x20 - 0x2f Keyboard
-0x40 - 0x4f MT.RS-232C control
-0x80 - 0x8f Printer (Centronics)
-*/
-uint8_t fp200_state::fp200_io_r(offs_t offset)
+ * video section is 2x MSM6216-01GS-1K + 1x MSM6215-01GS-K glued together by the gate array
+ *
+ * [1] DDDD DDDD vram data/mode select (right half)
+ * [2] DDDD DDDD vram data/mode select (left half)
+ * [8] SSSS ---- Status code (1=vram type/0xb=attr type)
+ *     ---- --YY upper part of Y address
+ * [9] YYYY XXXX lower part of Y address / X address
+ */
+void fp200_state::lcd_map(address_map &map)
 {
-	uint8_t res;
+	map(0x1, 0x1).rw(FUNC(fp200_state::lcd_data_r<1>), FUNC(fp200_state::lcd_data_w<1>));
+	map(0x2, 0x2).rw(FUNC(fp200_state::lcd_data_r<0>), FUNC(fp200_state::lcd_data_w<0>));
+	map(0x8, 0x8).lrw8(
+		NAME([this] (offs_t offset) {
+			u8 res =  (m_lcd_status & 0xf) << 4 | (m_lcd_address & 0x300) >> 4;
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_lcd_status = (data & 0xf0) >> 4;
+			if (m_lcd_status == 0xb)
+			{
+				m_lcd_address &= 0xff;
+				m_lcd_address |= (data & 0x3) << 8;
+			}
+		})
+	);
+	map(0x9, 0x9).lrw8(
+		NAME([this] (offs_t offset) {
+			u8 res =  m_lcd_address & 0xff;
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_lcd_address &= 0x300;
+			m_lcd_address |= data;
+		})
+	);
+}
 
-	if(m_io_type == 0)
-	{
-		res = 0;
-		logerror("Unemulated I/O read %02x (%02x)\n",offset,m_io_type);
-	}
-	else
-	{
-		switch(offset & 0xf0)
-		{
-			//case 0x00: return;
-			case 0x00: res = fp200_lcd_r(offset & 0xf); break;
-			case 0x20: res = fp200_keyb_r(offset & 0xf); break;
-			default: res = 0; logerror("Unemulated I/O read %02x (%02x)\n",offset,m_io_type); break;
-		}
-	}
-
+uint8_t fp200_state::keyb_r(offs_t offset)
+{
+	const uint8_t res = m_key[m_keyb_matrix & 0xf]->read();
 	return res;
 }
 
-void fp200_state::fp200_io_w(offs_t offset, uint8_t data)
+void fp200_state::keyb_w(offs_t offset, uint8_t data)
 {
-	if(m_io_type == 0)
-	{
-		switch(offset & 0xf0)
-		{
-			default:logerror("Unemulated I/O write %02x (%02x) <- %02x\n",offset,m_io_type,data); break;
-		}
-	}
-	else
-	{
-		switch(offset & 0xf0)
-		{
-			case 0x00: fp200_lcd_w(offset & 0xf,data); break;
-			case 0x20: fp200_keyb_w(offset & 0xf,data); break;
-			default:logerror("Unemulated I/O write %02x (%02x) <- %02x\n",offset,m_io_type,data); break;
-		}
-	}
+	m_keyb_matrix = data & 0xf;
 }
 
-void fp200_state::fp200_map(address_map &map)
+void fp200_state::main_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).ram();
-//  0xa000, 0xffff exp RAM
+	map(0x0000, 0x7fff).rom(); // basic & cetl
+	// TODO: 1 waitstate penalty for accessing any RAM
+	map(0x8000, 0x9fff).ram().share("nvram"); // internal RAM
+//  0xa000, 0xffff exp RAM (FP-201RAM)
 	map(0xa000, 0xbfff).ram();
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xffff).ram();
+	map(0xe000, 0xffff).ram(); // or exp ROM (FP-206ROM)
 }
 
-void fp200_state::fp200_io(address_map &map)
+void fp200_state::main_io(address_map &map)
 {
-	map(0x00, 0xff).rw(FUNC(fp200_state::fp200_io_r), FUNC(fp200_state::fp200_io_w));
+	map(0x00, 0xff).view(m_ioview);
+	m_ioview[0](0x10, 0x1f).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
+//  m_ioview[0](0x20, 0x2f) AUTO-POWER OFF
+//  m_ioview[0](0x40, 0x4f) FDC Device ID Code (5 for "FP-1021FD")
+//  m_ioview[0](0x80, 0xff) FDD (unknown type)
+	m_ioview[1](0x00, 0x0f).m(*this, FUNC(fp200_state::lcd_map));
+//  m_ioview[1](0x10, 0x10) I/O control (w/o), D1 selects CMT or RS-232C
+//  m_ioview[1](0x11, 0x11) I/O control (w/o), uPD65010G gate array control
+	// TODO: writes are undocumented, just before reads PC=35C (strobe for update?)
+	m_ioview[1](0x20, 0x20).r(FUNC(fp200_state::keyb_r)).nopw();
+	m_ioview[1](0x21, 0x21).w(FUNC(fp200_state::keyb_w));
+//  m_ioview[1](0x40, 0x4f) CMT & RS-232C control
+//  m_ioview[1](0x80, 0x8f) [Centronics] printer
 }
 
 INPUT_CHANGED_MEMBER(fp200_state::keyb_irq)
 {
-	/* a keyboard stroke causes a rst7.5 */
 	m_maincpu->set_input_line(I8085_RST75_LINE, (newval) ? ASSERT_LINE : CLEAR_LINE);
-
 }
 
-/* TODO: remote SW? */
 static INPUT_PORTS_START( fp200 )
 	PORT_START("KEY0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -523,9 +341,28 @@ static INPUT_PORTS_START( fp200 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, fp200_state,keyb_irq, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, fp200_state,keyb_irq, 0)
 
+	PORT_START("KEYA")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("KEYB")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("KEYC")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("KEYD")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("KEYE")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("KEYF")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_START("KEYMOD")
 	PORT_BIT( 0x01f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x020, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CETL") PORT_TOGGLE
+	// positional switch on keyboard
+	PORT_BIT( 0x020, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Basic / CETL Mode") PORT_TOGGLE
 	PORT_BIT( 0x040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT( 0x080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BREAK")
 	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GRAPH")
@@ -541,8 +378,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,1),
 	1,
 	{ RGN_FRAC(0,1) },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ STEP8(0, 8) },
+	{ STEP8(0, 1) },
 	8*8
 };
 
@@ -553,13 +390,6 @@ GFXDECODE_END
 
 void fp200_state::machine_start()
 {
-	uint8_t *raw_gfx = memregion("raw_gfx")->base();
-	m_chargen = memregion("chargen")->base();
-
-	for(int i=0;i<0x800;i++)
-	{
-		m_chargen[i] = raw_gfx[bitswap<16>(i,15,14,13,12,11,6,5,4,3,10,9,8,7,2,1,0)];
-	}
 }
 
 void fp200_state::machine_reset()
@@ -567,7 +397,7 @@ void fp200_state::machine_reset()
 }
 
 
-void fp200_state::fp200_palette(palette_device &palette) const
+void fp200_state::palette_init(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xa0, 0xa8, 0xa0);
 	palette.set_pen_color(1, 0x30, 0x38, 0x10);
@@ -575,24 +405,25 @@ void fp200_state::fp200_palette(palette_device &palette) const
 
 void fp200_state::sod_w(int state)
 {
-	m_io_type = state;
+	m_ioview.select(state);
 }
 
 int fp200_state::sid_r()
 {
-	return (ioport("KEYMOD")->read() >> m_keyb_mux) & 1;
+	return (ioport("KEYMOD")->read() >> m_keyb_matrix) & 1;
 }
 
 void fp200_state::fp200(machine_config &config)
 {
-	/* basic machine hardware */
 	I8085A(config, m_maincpu, MAIN_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fp200_state::fp200_map);
-	m_maincpu->set_addrmap(AS_IO, &fp200_state::fp200_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fp200_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &fp200_state::main_io);
 	m_maincpu->in_sid_func().set(FUNC(fp200_state::sid_r));
 	m_maincpu->out_sod_func().set(FUNC(fp200_state::sod_w));
 
-	/* video hardware */
+	RP5C01(config, "rtc", XTAL(32'768));
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -603,10 +434,9 @@ void fp200_state::fp200(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_fp200);
 
-	PALETTE(config, "palette", FUNC(fp200_state::fp200_palette), 2);
+	PALETTE(config, "palette", FUNC(fp200_state::palette_init), 2);
 
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
+	// No sound HW
 }
 
 
@@ -620,10 +450,8 @@ ROM_START( fp200 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "fp200rom.bin", 0x0000, 0x8000, CRC(dba6e41b) SHA1(c694fa19172eb56585a9503997655bcf9d369c34) )
 
-	ROM_REGION( 0x800, "raw_gfx", ROMREGION_ERASE00 )
-	ROM_LOAD( "chr.bin", 0x0000, 0x800, CRC(2e6501a5) SHA1(6186e25feabe6db851ee7d61dad11e182a6d3a4a) )
-
 	ROM_REGION( 0x800, "chargen", ROMREGION_ERASE00 )
+	ROM_LOAD( "chr.bin", 0x0000, 0x800, CRC(2e6501a5) SHA1(6186e25feabe6db851ee7d61dad11e182a6d3a4a) )
 ROM_END
 
 } // anonymous namespace

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -99,10 +100,7 @@ license:CC0-1.0
 		<disk><color red="0.75" green="0.75" blue="0.75" /></disk>
 	</element>
 
-	<element name="text_gps">
-		<rect><color red="0.85" green="0.6" blue="0.1" /></rect>
-		<text string="GAME  PLAYERS  SPEED"><color red="0.8" green="0.2" blue="0.1" /></text>
-	</element>
+	<element name="text_gps"><text string="GAME  PLAYERS  SPEED"><color red="0.8" green="0.2" blue="0.1" /></text></element>
 
 
 <!-- build screen -->
@@ -136,7 +134,7 @@ license:CC0-1.0
 		<element ref="nothing" inputtag="IN.5" inputmask="0x07" inputraw="yes"><bounds xc="100" yc="97" width="3.5" height="3.5" /></element>
 		<element ref="nothing" inputtag="IN.6" inputmask="0x06" inputraw="yes"><bounds xc="106.5" yc="97" width="3.5" height="3.5" /></element>
 
-		<element ref="nothing" inputtag="IN.3" inputmask="0x00" inputraw="yes"><bounds xc="100" y="85" width="25" height="18" /></element>
+		<element ref="nothing" clickthrough="no"><bounds xc="100" y="85" width="25" height="18" /></element>
 
 		<element ref="redd"><bounds xc="100" yc="100" width="20" height="20" /></element>
 		<element ref="text_set" blend="multiply"><bounds xc="100" yc="106" width="20" height="5" /></element>

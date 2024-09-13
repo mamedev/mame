@@ -610,8 +610,8 @@ void piratesh_state::piratesh(machine_config &config)
 	K053252(config, m_k053252, XTAL(32'000'000)/4);
 	m_k053252->set_offsets(40, 16); // TODO
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	HOPPER(config, "hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(200));
+	HOPPER(config, "hopper", attotime::from_msec(200));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

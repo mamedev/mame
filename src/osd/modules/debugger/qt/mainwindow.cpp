@@ -463,8 +463,9 @@ void MainWindow::debugActClose()
 
 void MainWindow::debuggerExit()
 {
+	// this isn't called from a Qt event loop, so close() will leak the window object
 	m_exiting = true;
-	close();
+	delete this;
 }
 
 

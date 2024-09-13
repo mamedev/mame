@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 
-Pretty much all info taken from http://www.sharpmz.org/index.html
+Pretty much all info taken from https://original.sharpmz.org/
 
 Currently, this list lists all dumps known and found. A lot of these are simple
 homemade hacks, mods and bad dumps which should probably be weeded out from the originals.
@@ -15,6 +15,22 @@ Editor-Assembler 5Z-011C
 Symbolic Debugger 1Z-018D
 Symbolic Debugger 5Z-011D
 Easidata (English Version)
+-->
+
+<!--
+    Loading instructions for games that require BASIC:
+    1) Start the system with the BASIC Interpreter tape
+    2) Type L or LOAD then press CR (Return/Enter by default)
+    3) Play tape until BASIC is loaded
+    4) Change to the game's tape
+    5) Type LOAD then press enter
+    6) Play tape until the game is loaded
+    7) Type RUN
+
+    Loading instructions for games that don't require BASIC:
+    1) Start the system with the desire game's tape
+    2) Type L or LOAD then press CR (Return/Enter by default)
+    3) Play tape until the game is loaded
 -->
 
 <softwarelist name="mz700_cass" description="Sharp MZ-700 cassettes">
@@ -50,9 +66,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-<!-- This is a straight recording of the tape. It might be preferrable to convert to some cooked format. Is MZF considered adequate for preservation? -->
 	<software name="1z013bswe" cloneof="1z013b">
-		<description>BASIC Interpreter 1Z-013B V1.0A (Swe)</description>
+		<description>BASIC Interpreter 1Z-013B V1.0A (Sweden)</description>
 		<year>1983</year>
 		<publisher>Sharp Corporation</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -62,9 +77,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-<!-- This is a straight recording of the tape. It might be preferrable to convert to some cooked format. Is MZF considered adequate for preservation? -->
 	<software name="10gamesa" cloneof="10games">
-		<description>10 Games for MZ-700 (Alt)</description>
+		<description>10 Games for MZ-700 (alt)</description>
 		<year>1983?</year>
 		<publisher>Sharp Corporation</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -93,10 +107,9 @@ Easidata (English Version)
 		</part>
 	</software>
 
-<!-- This is a straight recording of the tape. The tape seems to have been destroyed by time and as such a possible bad dump. It might be preferrable to convert to some cooked format. Is MZF considered adequate for preservation?
-     Side A of the dumped tape had been taped over, hence the nodump. -->
+<!-- Side A of the dumped tape had been taped over, hence the nodump. -->
 	<software name="1z013b_a" cloneof="1z013b">
-		<description>BASIC Interpreter 1Z-013B V1.0A / Applications V1.0A (Alt)</description>
+		<description>BASIC Interpreter 1Z-013B V1.0A / Applications V1.0A (alt)</description>
 		<year>1983</year>
 		<publisher>Sharp Corporation</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -150,7 +163,7 @@ Easidata (English Version)
 
 <!-- Modified version of 1z013b. -->
 	<software name="kbasic5" cloneof="1z013b">
-		<description>Interpreteur K-BASIC 5 (Fra)</description>
+		<description>Interpreteur K-BASIC 5 (France)</description>
 		<year>1984</year>
 		<publisher>Bernard Kokanosky</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -173,7 +186,7 @@ Easidata (English Version)
 
 <!-- This is apparently a mashup of several BASIC variants and hacks. -->
 	<software name="tbasic" cloneof="1z013b">
-		<description>T-BASIC+BM+PK(+) (Ned)</description>
+		<description>T-BASIC+BM+PK(+) (Netherlands)</description>
 		<year>19??</year>
 		<publisher>MZ-GG</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -190,8 +203,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="pcgbasic">
-		<description>PCG BASIC Interpreter (Ger)</description>
+	<software name="pcgbasic" supported="partial">
+		<description>PCG BASIC Interpreter (Germany)</description>
 		<year>19??</year>
 		<publisher>Ursoft</publisher>
 		<info name="usage" value="PCG-700 supported"/>
@@ -204,7 +217,7 @@ Easidata (English Version)
 
 <!-- Modified version of 1z013b. -->
 	<software name="cent2" cloneof="1z013b">
-		<description>BASIC-Interpreter for Parallel Printer (Ger)</description>
+		<description>BASIC-Interpreter for Parallel Printer (Germany)</description>
 		<year>1983</year>
 		<publisher>Multisoft</publisher>
 		<info name="usage" value="Load documentation from BASIC"/>
@@ -224,7 +237,7 @@ Easidata (English Version)
 
 <!-- This is just the documentation for the program. The actual program is on disk while the docs are on tape. -->
 	<software name="cent2dsk">
-		<description>Centronics Interface Utility (Ger)</description>
+		<description>Centronics Interface Utility (Germany)</description>
 		<year>1984</year>
 		<publisher>Multisoft</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -248,7 +261,7 @@ Easidata (English Version)
 
 <!-- Modified version of sbasicc. -->
 	<software name="sbasiccdutch1" cloneof="sbasicc">
-		<description>S-BASIC Compiler (Ned)</description>
+		<description>S-BASIC Compiler (Netherlands)</description>
 		<year>1987</year>
 		<publisher>Marius H. Velimaat</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -260,7 +273,7 @@ Easidata (English Version)
 
 <!-- Modified version of sbasicc. -->
 	<software name="sbasiccdutch2" cloneof="sbasicc">
-		<description>S-BASIC Compiler (Ned, Printer Version)</description>
+		<description>S-BASIC Compiler (Netherlands, printer version)</description>
 		<year>1987</year>
 		<publisher>Marius H. Velimaat</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -283,7 +296,7 @@ Easidata (English Version)
 
 <!-- Modified version of xbc. -->
 	<software name="xbcmod" cloneof="xbc">
-		<description>XBC F V1.02 (Modified)</description>
+		<description>XBC F V1.02 (modified)</description>
 		<year>1988</year>
 		<publisher>MiKrSoft</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -317,7 +330,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="basicod2">
-		<description>S-BASIC/Vertaler BASICODE-2 (Ned)</description>
+		<description>S-BASIC/Vertaler BASICODE-2 (Netherlands)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -425,7 +438,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="knightsfmod" cloneof="knightsf">
-		<description>Knight's MZ-700 Forth (Modified)</description>
+		<description>Knight's MZ-700 Forth (modified)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -436,7 +449,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="logov30">
-		<description>Bienvenue sous LOGO V3.0 (Fra)</description>
+		<description>Bienvenue sous LOGO V3.0 (France)</description>
 		<year>1987?</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -448,7 +461,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="z80dis">
-		<description>Z80 Disassembleur V1.1 (Fra)</description>
+		<description>Z80 Disassembleur V1.1 (France)</description>
 		<year>1989</year>
 		<publisher>Jean François Campan</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -459,7 +472,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="urasz80">
-		<description>URAS-Z80 V1.1 (Ger)</description>
+		<description>URAS-Z80 V1.1 (Germany)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -481,7 +494,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="specdbug">
-		<description>Spectrum Debugger V1.1R (Cz)</description>
+		<description>Spectrum Debugger V1.1R (Czechoslovakia)</description>
 		<year>1991</year>
 		<publisher>Proton Software</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -553,7 +566,7 @@ Easidata (English Version)
 
 <!-- Broken? -->
 	<software name="monitor2">
-		<description>Monitor (Machine code)</description>
+		<description>Monitor (machine code)</description>
 		<year>1984</year>
 		<publisher>R. Scharnagl?</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -575,7 +588,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="zen">
+	<software name="zen" supported="no">
 		<description>Zen</description>
 		<year>1983</year>
 		<publisher>Multisoft</publisher>
@@ -587,7 +600,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="3dgraph">
-		<description>3-D Graphikpaket (Ger)</description>
+		<description>3-D Graphikpaket (Germany)</description>
 		<year>19??</year>
 		<publisher>BBG Software</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -599,7 +612,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="plot">
-		<description>MZ700 Plot (Ger)</description>
+		<description>MZ700 Plot (Germany)</description>
 		<year>1985</year>
 		<publisher>RK-Datentechnik</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -610,8 +623,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="pcgaid">
-		<description>PCGAID-700 V1.0 (Jpn)</description>
+	<software name="pcgaid" supported="no">
+		<description>PCGAID-700 V1.0 (Japan)</description>
 		<year>19??</year>
 		<publisher>HAL Laboratory</publisher>
 		<info name="usage" value="PCG-700 required"/>
@@ -622,8 +635,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="pcgaide" cloneof="pcgaid">
-		<description>PCGAID-700 V1.0 (Euro)</description>
+	<software name="pcgaide" cloneof="pcgaid" supported="no">
+		<description>PCGAID-700 V1.0 (Europe)</description>
 		<year>19??</year>
 		<publisher>HAL Laboratory</publisher>
 		<info name="usage" value="PCG-700 required"/>
@@ -635,7 +648,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="copy">
-		<description>Multicopy-BV (Ger)</description>
+		<description>Multicopy-BV (Germany)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -646,7 +659,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="cmaster">
-		<description>C-Master (Ger)</description>
+		<description>C-Master (Germany)</description>
 		<year>19??</year>
 		<publisher>Ursoft</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -657,7 +670,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="dbp701">
-		<description>DBP701+ Datenbanksystem (Ger)</description>
+		<description>DBP701+ Datenbanksystem (Germany)</description>
 		<year>1982</year>
 		<publisher>Kersten &amp; Partner</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -668,7 +681,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="spadata">
-		<description>SPA Data (Ger)</description>
+		<description>SPA Data (Germany)</description>
 		<year>1983</year>
 		<publisher>Solo Software</publisher>
 		<info name="serial" value="MZ-7B55"/>
@@ -694,7 +707,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="easidata">
-		<description>Easidata V1.3 (Ger)</description>
+		<description>Easidata V1.3 (Germany)</description>
 		<year>1983</year>
 		<publisher>Solo Software</publisher>
 		<info name="serial" value="MZ-7B53"/>
@@ -706,7 +719,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="dateiuni">
-		<description>Datei Universal (Ger)</description>
+		<description>Datei Universal (Germany)</description>
 		<year>19??</year>
 		<publisher>BBG Software</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -739,7 +752,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="moleatck">
+	<software name="moleatck" supported="no">
 		<description>Mole Attack</description>
 		<year>1982</year>
 		<publisher>HAL Laboratory</publisher>
@@ -752,8 +765,8 @@ Easidata (English Version)
 	</software>
 
 <!-- Has boot modes for several siffernt MZ models including 80K, 1200, 700 etc. -->
-	<software name="tomahawk">
-		<description>Tomahawk (Ger)</description>
+	<software name="tomahawk" supported="partial">
+		<description>Tomahawk (Germany)</description>
 		<year>19??</year>
 		<publisher>Hiroshi Masuko</publisher>
 		<info name="usage" value="PCG-700 optional"/>
@@ -764,8 +777,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="lissajou">
-		<description>Lissajou-Figur (Ger)</description>
+	<software name="lissajou" supported="no">
+		<description>Lissajou-Figur (Germany)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load from PCG-BASIC"/>
@@ -777,8 +790,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="sinberg">
-		<description>Sin-Berg (Ger)</description>
+	<software name="sinberg" supported="no">
+		<description>Sin-Berg (Germany)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load from PCG-BASIC"/>
@@ -792,7 +805,7 @@ Easidata (English Version)
 
 <!-- Modified version of apollowp. -->
 	<software name="apollowp28" cloneof="apollowp">
-		<description>Apollo Word Processor V2.8 (Ned)</description>
+		<description>Apollo Word Processor V2.8 (Netherlands)</description>
 		<year>1985</year>
 		<publisher>MZ-GG</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -814,7 +827,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="raumuhle">
-		<description>Raummühle (Ger)</description>
+		<description>Raummühle (Germany)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -872,7 +885,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="aliens">
-		<description>Aliens (Ned)</description>
+		<description>Aliens (Netherlands)</description>
 		<year>19??</year>
 		<publisher>G.J. Krijnen</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -883,8 +896,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="antares">
-		<description>Antares (Ger)</description>
+	<software name="antares" supported="no">
+		<description>Antares (Germany)</description>
 		<year>1986</year>
 		<publisher>BBG Software</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -894,8 +907,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="amity">
-		<description>Amityville (Fra)</description>
+	<software name="amity" supported="no">
+		<description>Amityville (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -919,8 +932,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="nombres">
-		<description>Apprentissage des Nombres (Fra)</description>
+	<software name="nombres" supported="no">
+		<description>Apprentissage des Nombres (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -992,7 +1005,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="bio700">
-		<description>Biorhythmus (Ger)</description>
+		<description>Biorhythmus (Germany)</description>
 		<year>1983</year>
 		<publisher>Ursoft</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1037,8 +1050,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="bouldash">
-		<description>Boulder Dash (Fra)</description>
+	<software name="bouldash" supported="no">
+		<description>Boulder Dash (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1050,7 +1063,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="breuken1">
-		<description>Breuken 1 (Ned)</description>
+		<description>Breuken 1 (Netherlands)</description>
 		<year>1984?</year>
 		<publisher>Roger Deneweth?</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1062,7 +1075,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="calendri">
-		<description>Calendrier (Fra)</description>
+		<description>Calendrier (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1084,8 +1097,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="catacomb">
-		<description>Catacombes (Fra)</description>
+	<software name="catacomb" supported="no">
+		<description>Catacombes (France)</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1097,7 +1110,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="cataplus">
-		<description>Catacombes+ (Fra)</description>
+		<description>Catacombes+ (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -1140,7 +1153,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="codeword">
-		<description>Codewoord (Ned)</description>
+		<description>Codewoord (Netherlands)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1151,7 +1164,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="complain">
+	<software name="complain" supported="no">
 		<description>Commando Plain</description>
 		<year>1982</year>
 		<publisher>Solo Software</publisher>
@@ -1164,7 +1177,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="competit">
-		<description>Competitie (Ned)</description>
+		<description>Competitie (Netherlands)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1188,8 +1201,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="comptek">
-		<description>Computertekenen (Ned)</description>
+	<software name="comptek" supported="no">
+		<description>Computertekenen (Netherlands)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1263,8 +1276,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="demasaso">
-		<description>Demasaso (Fra)</description>
+	<software name="demasaso" supported="no">
+		<description>Demasaso (France)</description>
 		<year>1985</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1275,8 +1288,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="descente">
-		<description>Descente aux Enfers (Fra)</description>
+	<software name="descente" supported="no">
+		<description>Descente aux Enfers (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1287,8 +1300,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="destruct">
-		<description>Destructeurs (Fra)</description>
+	<software name="destruct" supported="no">
+		<description>Destructeurs (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -1385,7 +1398,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="flugsim">
-		<description>Flugsimulator (Ger)</description>
+		<description>Flugsimulator (Germany)</description>
 		<year>1984</year>
 		<publisher>HOBRA Soft</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -1425,7 +1438,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="geboorte">
-		<description>Geboortedatum (Ned)</description>
+		<description>Geboortedatum (Netherlands)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1448,8 +1461,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="globule">
-		<description>Globule (Fra)</description>
+	<software name="globule" supported="no">
+		<description>Globule (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1495,8 +1508,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="guerre">
-		<description>Guerre Spatiale (Fra)</description>
+	<software name="guerre" supported="no">
+		<description>Guerre Spatiale (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1530,8 +1543,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="impomiss">
-		<description>Impossible Mission (Fra)</description>
+	<software name="impomiss" supported="no">
+		<description>Impossible Mission (France)</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1542,8 +1555,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="isola">
-		<description>Isola (Fra)</description>
+	<software name="isola" supported="no">
+		<description>Isola (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1554,8 +1567,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="jeuxint">
-		<description>Jeux Intergalactiques (Fra)</description>
+	<software name="jeuxint" supported="no">
+		<description>Jeux Intergalactiques (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1566,8 +1579,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="jumprun">
-		<description>Jumping-Runner (Fra)</description>
+	<software name="jumprun" supported="no">
+		<description>Jumping-Runner (France)</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1579,7 +1592,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="kamertje">
-		<description>Kamertje Verhuren (Ned)</description>
+		<description>Kamertje Verhuren (Netherlands)</description>
 		<year>1987</year>
 		<publisher>NOS</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1591,7 +1604,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="kasboek">
-		<description>Kasboek (Ned)</description>
+		<description>Kasboek (Netherlands)</description>
 		<year>1984</year>
 		<publisher>NOS</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1616,7 +1629,7 @@ Easidata (English Version)
 	</software>
 
 <!-- What is Part 2 and what does it do? -->
-	<software name="ksmines">
+	<software name="ksmines" supported="no">
 		<description>King Solomon's Mines</description>
 		<year>19??</year>
 		<publisher>Solo Software</publisher>
@@ -1699,7 +1712,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="diaboliq">
+	<software name="diaboliq" supported="no">
 		<description>Le Cadre Diabolique</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -1769,8 +1782,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="manza">
-		<description>Manza (Fra)</description>
+	<software name="manza" supported="no">
+		<description>Manza (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1792,8 +1805,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="matpendu">
-		<description>Matpendu (Fra)</description>
+	<software name="matpendu" supported="no">
+		<description>Matpendu (France)</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1817,7 +1830,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="messing">
-		<description>Messing (Ned)</description>
+		<description>Messing (Netherlands)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1828,7 +1841,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="missiona">
+	<software name="missiona" supported="no">
 		<description>Mission A</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -1840,8 +1853,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="misalpha">
-		<description>Mission Alpha (Fra)</description>
+	<software name="misalpha" supported="no">
+		<description>Mission Alpha (France)</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1852,8 +1865,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="misdelta">
-		<description>Mission Delta (Fra)</description>
+	<software name="misdelta" supported="no">
+		<description>Mission Delta (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1864,8 +1877,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="morpion">
-		<description>Morpion (Fra)</description>
+	<software name="morpion" supported="no">
+		<description>Morpion (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1876,8 +1889,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="morpius">
-		<description>Morpius (Fra)</description>
+	<software name="morpius" supported="no">
+		<description>Morpius (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -1943,7 +1956,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="klavier">
-		<description>MZ-700 Klavier (Ger)</description>
+		<description>MZ-700 Klavier (Germany)</description>
 		<year>19??</year>
 		<publisher>MZ-Verlag</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -2005,7 +2018,7 @@ Easidata (English Version)
 
 <!-- This was originally found with an .mzt extension, but does not seem to actually be an MZT file -->
 	<software name="nighparkb" cloneof="nighpark">
-		<description>Nightmare Park (Bad Dump?)</description>
+		<description>Nightmare Park (bad dump?)</description>
 		<year>1982</year>
 		<publisher>Solo Software</publisher>
 		<info name="serial" value="MZ-7G060"/>
@@ -2030,8 +2043,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="octopuss">
-		<description>Octopussy (Fra)</description>
+	<software name="octopuss" supported="no">
+		<description>Octopussy (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -2043,7 +2056,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="macpacg" cloneof="macpac">
-		<description>Mac Pac (Ger)</description>
+		<description>Mac Pac (Germany)</description>
 		<year>1983</year>
 		<publisher>DEVIL-Soft</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -2053,8 +2066,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="panique">
-		<description>Panique (Fra)</description>
+	<software name="panique" supported="no">
+		<description>Panique (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -2089,8 +2102,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="pendu">
-		<description>Le Pendu (Fra)</description>
+	<software name="pendu" supported="no">
+		<description>Le Pendu (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -2126,8 +2139,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="puiss4">
-		<description>Puissance 4 (Fra)</description>
+	<software name="puiss4" supported="no">
+		<description>Puissance 4 (France)</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -2138,8 +2151,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="puzzle">
-		<description>Puzzle (Fra)</description>
+	<software name="puzzle" supported="no">
+		<description>Puzzle (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -2161,8 +2174,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="rebond">
-		<description>Rebond (Fra)</description>
+	<software name="rebond" supported="no">
+		<description>Rebond (France)</description>
 		<year>1987</year>
 		<publisher>Jean François Campan</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -2196,8 +2209,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="rr1906">
-		<description>Rolls-Royce 1906 Silverghost (Ger?)</description>
+	<software name="rr1906" supported="no">
+		<description>Rolls-Royce 1906 Silverghost (Germany?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -2220,8 +2233,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="schac700">
-		<description>Schach 700 (Ger)</description>
+	<software name="schac700" supported="no">
+		<description>Schach 700 (Germany)</description>
 		<year>1984</year>
 		<publisher>Hobra Soft</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -2253,8 +2266,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="soudard">
-		<description>Soudard (Fra)</description>
+	<software name="soudard" supported="no">
+		<description>Soudard (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -2265,7 +2278,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="spacific">
+	<software name="spacific" supported="no">
 		<description>South Pacific</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -2320,7 +2333,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="squash">
-		<description>Squash (Ger)</description>
+		<description>Squash (Germany)</description>
 		<year>19??</year>
 		<publisher>BBG Software</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -2330,7 +2343,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="starfght">
+	<software name="starfght" supported="no">
 		<description>Star Fighter</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
@@ -2355,7 +2368,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="spoker">
+	<software name="spoker" supported="no">
 		<description>Strip Poker</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
@@ -2402,7 +2415,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="supinvdr">
+	<software name="supinvdr" supported="no">
 		<description>Superior Space Invader</description>
 		<year>1983</year>
 		<publisher>P. Dormand</publisher>
@@ -2414,7 +2427,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="superspy">
-		<description>Super Spy (Ned)</description>
+		<description>Super Spy (Netherlands)</description>
 		<year>19??</year>
 		<publisher>Erik van Hattum</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -2425,7 +2438,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="suprtypn">
-		<description>Lichtkrantspel (Ned)</description>
+		<description>Lichtkrantspel (Netherlands)</description>
 		<year>19??</year>
 		<publisher>Henk Barten</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -2435,8 +2448,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="suprvrac">
-		<description>Super Vrac (Fra)</description>
+	<software name="suprvrac" supported="no">
+		<description>Super Vrac (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -2447,8 +2460,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="sysxpert">
-		<description>Systeme Expert (Fra)</description>
+	<software name="sysxpert" supported="no">
+		<description>Systeme Expert (France)</description>
 		<year>1989</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -2461,7 +2474,7 @@ Easidata (English Version)
 
 <!-- Possibly a Quickdisk image -->
 	<software name="telefon">
-		<description>Telefontarieven (Ned)</description>
+		<description>Telefontarieven (Netherlands)</description>
 		<year>1987?</year>
 		<publisher>NOS</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -2510,7 +2523,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="typen">
-		<description>Typevaardigheid (Ned)</description>
+		<description>Typevaardigheid (Netherlands)</description>
 		<year>19??</year>
 		<publisher>Henk Barten</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -2520,8 +2533,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="urania2">
-		<description>Urania II (Fra)</description>
+	<software name="urania2" supported="no">
+		<description>Urania II (France)</description>
 		<year>1984</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -2545,8 +2558,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="vol676">
-		<description>Vol 676 (Fra)</description>
+	<software name="vol676" supported="no">
+		<description>Vol 676 (France)</description>
 		<year>1986</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -2558,7 +2571,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="vragend">
-		<description>Vragend Maken (Ned)</description>
+		<description>Vragend Maken (Netherlands)</description>
 		<year>1984?</year>
 		<publisher>NOS</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -2583,7 +2596,7 @@ Easidata (English Version)
 	</software>
 
 	<software name="wndrhous">
-		<description>Wonder House (Jpn)</description>
+		<description>Wonder House (Japan)</description>
 		<year>1983</year>
 		<publisher>Task Forts Kochi</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -2622,8 +2635,8 @@ Easidata (English Version)
 		</part>
 	</software>
 
-	<software name="yams">
-		<description>Y.A.M.S. (Fra)</description>
+	<software name="yams" supported="no">
+		<description>Y.A.M.S. (France)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
 		<info name="usage" value="Load from BASIC"/>
@@ -2727,7 +2740,7 @@ Easidata (English Version)
 <!-- WARNING! The following ones should be in disk formats, but they seem to be only available as tapes (MZF is a tape format!) -->
 <!-- we include these here as placeholders until proper dumps are found -->
 
-<!-- Pretty much all info taken from http://www.sharpmz.org/index.html
+<!--
 
 Undumped:
 Centronics Interface Utility Disk Version
@@ -2763,7 +2776,7 @@ DATABASE FILER (SOLO SOFTWARE)
 	</software>
 
 	<software name="kp80c354">
-		<description>K&amp;P 80-column Disk Basic V3.54 (Ger)</description>
+		<description>K&amp;P 80-column Disk Basic V3.54 (Germany)</description>
 		<year>19??</year>
 		<publisher>Kersten &amp; Partner</publisher>
 		<info name="usage" value="K&amp;P 80-column card supported"/>
@@ -2775,7 +2788,7 @@ DATABASE FILER (SOLO SOFTWARE)
 	</software>
 
 	<software name="kp80c355">
-		<description>K&amp;P 80-column Disk Basic V3.55 (Ger)</description>
+		<description>K&amp;P 80-column Disk Basic V3.55 (Germany)</description>
 		<year>19??</year>
 		<publisher>Kersten &amp; Partner</publisher>
 		<info name="usage" value="K&amp;P 80-column card supported"/>
@@ -2801,7 +2814,7 @@ DATABASE FILER (SOLO SOFTWARE)
 <!-- we include these here as placeholders until proper dumps are found -->
 
 <!--
-These are Quick Disks. Pretty much all info taken from http://www.sharpmz.org/index.html
+These are Quick Disks.
 
 Undumped:
 BASIC 5Z-008 V1.0B

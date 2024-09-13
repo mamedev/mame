@@ -92,6 +92,7 @@ private:
 	void adpcm_vol_w(uint8_t data);
 	void adpcm_int(int state);
 
+	uint32_t pri_cb(uint8_t pri);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(gemini_get_bg_tile_info);

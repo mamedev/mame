@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol
 /**********************************************************************
 
-   MSX Digital Joystick emulation
+    MSX Digital Joystick emulation
 
 **********************************************************************/
 

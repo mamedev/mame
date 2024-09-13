@@ -57,7 +57,7 @@ sensor state instead.
 */
 
 #include "emu.h"
-#include "machine/sensorboard.h"
+#include "sensorboard.h"
 
 
 DEFINE_DEVICE_TYPE(SENSORBOARD, sensorboard_device, "sensorboard", "Sensorboard")
@@ -78,6 +78,7 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 	m_inp_conf(*this, "CONF"),
 	m_clear_cb(*this),
 	m_init_cb(*this),
+	m_remove_cb(*this, 0),
 	m_sensor_cb(*this, 0),
 	m_spawn_cb(*this, 0),
 	m_output_cb(*this)
@@ -153,7 +154,7 @@ void sensorboard_device::device_start()
 	save_item(NAME(m_sensordelay));
 }
 
-void sensorboard_device::preset_chess(int state)
+void sensorboard_device::preset_chess(u8 data)
 {
 	// set chessboard start position
 
@@ -213,15 +214,15 @@ void sensorboard_device::nvram_default()
 
 bool sensorboard_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_curstate, sizeof(m_curstate), actual) && actual == sizeof(m_curstate);
+	auto const [err, actual] = read(file, m_curstate, sizeof(m_curstate));
+	return !err && (sizeof(m_curstate) == actual);
 }
 
 bool sensorboard_device::nvram_write(util::write_stream &file)
 {
 	// save last board position
-	size_t actual;
-	return !file.write(m_curstate, sizeof(m_curstate), actual) && actual == sizeof(m_curstate);
+	auto const [err, actual] = write(file, m_curstate, sizeof(m_curstate));
+	return !err;
 }
 
 bool sensorboard_device::nvram_can_write() const
@@ -477,13 +478,15 @@ INPUT_CHANGED_MEMBER(sensorboard_device::sensor)
 		m_sensortimer->adjust(m_sensordelay);
 	}
 
+	bool drop = m_hand != 0;
+
 	// optional custom handling:
 	// return d0 = block drop piece
 	// return d1 = block pick up piece
 	u8 custom = m_sensor_cb(pos);
 
 	// drop piece
-	if (m_hand != 0)
+	if (drop)
 	{
 		if (~custom & 1)
 			drop_piece(x, y);
@@ -519,7 +522,12 @@ INPUT_CHANGED_MEMBER(sensorboard_device::ui_hand)
 		return;
 
 	cancel_sensor();
-	remove_hand();
+
+	// optional custom handling:
+	// return d0: block remove hand
+	if (~m_remove_cb() & 1)
+		remove_hand();
+
 	refresh();
 }
 
@@ -598,17 +606,18 @@ INPUT_CHANGED_MEMBER(sensorboard_device::ui_init)
 	if (!newval)
 		return;
 
-	u8 init = (u8)param;
+	u8 init = param ? 1 : 0;
 	cancel_sensor();
 	cancel_hand();
 
-	m_clear_cb(init ? 0 : 1);
+	u8 rotate = m_inp_ui->read() & 2;
+	m_clear_cb((init ^ 1) | rotate);
 
 	if (init)
-		m_init_cb(1);
+		m_init_cb(init | rotate);
 
 	// rotate pieces
-	if (m_inp_ui->read() & 2)
+	if (rotate)
 	{
 		u8 tempstate[0x100];
 		for (int y = 0; y < m_height; y++)
@@ -645,6 +654,7 @@ static INPUT_PORTS_START( sensorboard )
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<16 | 1<<9, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x09) PORT_NAME("Sensor J1")
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<16 | 1<<10, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x0a) PORT_NAME("Sensor K1")
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<16 | 1<<11, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x0b) PORT_NAME("Sensor L1")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<16 | 1<<12, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x0c) PORT_NAME("Sensor M1")
 
 	PORT_START("RANK.2")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<17 | 1<<0, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x10) PORT_NAME("Sensor A2")
@@ -659,6 +669,7 @@ static INPUT_PORTS_START( sensorboard )
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<17 | 1<<9, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x19) PORT_NAME("Sensor J2")
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<17 | 1<<10, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x1a) PORT_NAME("Sensor K2")
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<17 | 1<<11, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x1b) PORT_NAME("Sensor L2")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<17 | 1<<12, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x1c) PORT_NAME("Sensor M2")
 
 	PORT_START("RANK.3")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<18 | 1<<0, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x20) PORT_NAME("Sensor A3")
@@ -673,6 +684,7 @@ static INPUT_PORTS_START( sensorboard )
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<18 | 1<<9, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x29) PORT_NAME("Sensor J3")
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<18 | 1<<10, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x2a) PORT_NAME("Sensor K3")
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<18 | 1<<11, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x2b) PORT_NAME("Sensor L3")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<18 | 1<<12, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x2c) PORT_NAME("Sensor M3")
 
 	PORT_START("RANK.4")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<19 | 1<<0, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x30) PORT_NAME("Sensor A4")
@@ -687,6 +699,7 @@ static INPUT_PORTS_START( sensorboard )
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<19 | 1<<9, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x39) PORT_NAME("Sensor J4")
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<19 | 1<<10, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x3a) PORT_NAME("Sensor K4")
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<19 | 1<<11, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x3b) PORT_NAME("Sensor L4")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<19 | 1<<12, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x3c) PORT_NAME("Sensor M4")
 
 	PORT_START("RANK.5")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<20 | 1<<0, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x40) PORT_NAME("Sensor A5")
@@ -701,6 +714,7 @@ static INPUT_PORTS_START( sensorboard )
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<20 | 1<<9, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x49) PORT_NAME("Sensor J5")
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<20 | 1<<10, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x4a) PORT_NAME("Sensor K5")
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<20 | 1<<11, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x4b) PORT_NAME("Sensor L5")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<20 | 1<<12, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x4c) PORT_NAME("Sensor M5")
 
 	PORT_START("RANK.6")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<21 | 1<<0, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x50) PORT_NAME("Sensor A6")
@@ -715,6 +729,7 @@ static INPUT_PORTS_START( sensorboard )
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<21 | 1<<9, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x59) PORT_NAME("Sensor J6")
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<21 | 1<<10, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x5a) PORT_NAME("Sensor K6")
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<21 | 1<<11, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x5b) PORT_NAME("Sensor L6")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<21 | 1<<12, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x5c) PORT_NAME("Sensor M6")
 
 	PORT_START("RANK.7")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<22 | 1<<0, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x60) PORT_NAME("Sensor A7")
@@ -729,6 +744,7 @@ static INPUT_PORTS_START( sensorboard )
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<22 | 1<<9, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x69) PORT_NAME("Sensor J7")
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<22 | 1<<10, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x6a) PORT_NAME("Sensor K7")
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<22 | 1<<11, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x6b) PORT_NAME("Sensor L7")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<22 | 1<<12, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x6c) PORT_NAME("Sensor M7")
 
 	PORT_START("RANK.8")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<23 | 1<<0, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x70) PORT_NAME("Sensor A8")
@@ -743,6 +759,7 @@ static INPUT_PORTS_START( sensorboard )
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<23 | 1<<9, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x79) PORT_NAME("Sensor J8")
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<23 | 1<<10, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x7a) PORT_NAME("Sensor K8")
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<23 | 1<<11, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x7b) PORT_NAME("Sensor L8")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<23 | 1<<12, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x7c) PORT_NAME("Sensor M8")
 
 	PORT_START("RANK.9")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<24 | 1<<0, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x80) PORT_NAME("Sensor A9")
@@ -757,6 +774,7 @@ static INPUT_PORTS_START( sensorboard )
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<24 | 1<<9, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x89) PORT_NAME("Sensor J9")
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<24 | 1<<10, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x8a) PORT_NAME("Sensor K9")
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<24 | 1<<11, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x8b) PORT_NAME("Sensor L9")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<24 | 1<<12, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x8c) PORT_NAME("Sensor M9")
 
 	PORT_START("RANK.10")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<25 | 1<<0, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x90) PORT_NAME("Sensor A10")
@@ -771,6 +789,7 @@ static INPUT_PORTS_START( sensorboard )
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<25 | 1<<9, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x99) PORT_NAME("Sensor J10")
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<25 | 1<<10, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x9a) PORT_NAME("Sensor K10")
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<25 | 1<<11, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x9b) PORT_NAME("Sensor L10")
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<25 | 1<<12, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x9c) PORT_NAME("Sensor M10")
 
 	PORT_START("SPAWN")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("SS_CHECK", 1<<0, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_spawn, 1) PORT_NAME("Spawn Piece 1")

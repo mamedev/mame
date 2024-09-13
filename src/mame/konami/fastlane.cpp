@@ -42,7 +42,6 @@ public:
 		m_prgbank(*this, "prgbank"),
 		m_k007232(*this, "k007232_%u", 1U),
 		m_k007121(*this, "k007121"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 	{ }
@@ -69,7 +68,6 @@ private:
 	// devices
 	required_device_array<k007232_device, 2> m_k007232;
 	required_device<k007121_device> m_k007121;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
@@ -86,8 +84,6 @@ private:
 	void prg_map(address_map &map);
 };
 
-
-// video
 
 void fastlane_state::palette(palette_device &palette) const
 {
@@ -146,8 +142,8 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info)
 
 void fastlane_state::video_start()
 {
-	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer[0] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer[1] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_layer[0]->set_scroll_rows(32);
 
@@ -194,13 +190,11 @@ uint32_t fastlane_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_layer[0]->set_scrolly(0, m_k007121->ctrlram_r(2));
 
 	m_layer[0]->draw(screen, bitmap, finalclip0, 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), *m_palette, m_spriteram, 0, 40, 0, screen.priority(), (uint32_t)- 1);
+	m_k007121->sprites_draw(bitmap, cliprect, m_spriteram, 0, 40, 0, screen.priority(), (uint32_t)- 1);
 	m_layer[1]->draw(screen, bitmap, finalclip1, 0, 0);
 	return 0;
 }
 
-
-// machine
 
 TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::scanline)
 {
@@ -332,19 +326,8 @@ static INPUT_PORTS_START( fastlane )
 	KONAMI8_B12_UNK(2)
 INPUT_PORTS_END
 
-static const gfx_layout gfxlayout =
-{
-	8,8,
-	0x80000/32,
-	4,
-	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static GFXDECODE_START( gfx_fastlane )
-	GFXDECODE_ENTRY( "gfx", 0, gfxlayout, 0, 64*16 )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x4_packed_msb, 0, 64*16 )
 GFXDECODE_END
 
 /***************************************************************************
@@ -385,11 +368,9 @@ void fastlane_state::fastlane(machine_config &config)
 	m_screen->set_screen_update(FUNC(fastlane_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fastlane);
 	PALETTE(config, m_palette, FUNC(fastlane_state::palette)).set_format(palette_device::xBGR_555, 1024*16, 0x400);
 
-	K007121(config, m_k007121, 0);
-	m_k007121->set_palette_tag(m_palette);
+	K007121(config, m_k007121, 0, m_palette, gfx_fastlane);
 
 	K051733(config, "k051733", 0);
 
@@ -420,7 +401,7 @@ ROM_START( fastlane )
 	ROM_LOAD( "752_e01.10h", 0x08000, 0x10000, CRC(ff4d6029) SHA1(b5c5d8654ce728300d268628bd3dd878570ba7b8) )  // banked ROM
 
 	ROM_REGION( 0x80000, "gfx", 0 )
-	ROM_LOAD( "752e04.2i",   0x00000, 0x80000, CRC(a126e82d) SHA1(6663230c2c36dec563969bccad8c62e3d454d240) )  // tiles + sprites
+	ROM_LOAD16_WORD_SWAP( "752e04.2i",   0x00000, 0x80000, CRC(a126e82d) SHA1(6663230c2c36dec563969bccad8c62e3d454d240) )  // tiles + sprites
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "752e03.6h",   0x0000, 0x0100, CRC(44300aeb) SHA1(580c6e88cbb3b6d8156ea0b9103834f199ec2747) )

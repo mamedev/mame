@@ -12,6 +12,8 @@
 
   Based on the WStech documentation by Judge and Dox.
 
+  These systems were developed by Koto Laboratory
+
   Usage:
     Keep START button pressed during startup (or reset) to enter the internal
     configuration menu.
@@ -63,8 +65,11 @@ public:
 	{ }
 
 	void wswan(machine_config &config);
+	void pockchv2(machine_config &config);
 
 protected:
+	void wswan_base(machine_config &config);
+
 	// Interrupt flags
 	static constexpr u8 WSWAN_IFLAG_STX    = 0x01;
 	static constexpr u8 WSWAN_IFLAG_KEY    = 0x02;
@@ -258,7 +263,7 @@ static void wswan_cart(device_slot_interface &device)
 }
 
 
-void wswan_state::wswan(machine_config &config)
+void wswan_state::wswan_base(machine_config &config)
 {
 	// Basic machine hardware
 	V30MZ(config, m_maincpu, X1 / 4);
@@ -298,13 +303,26 @@ void wswan_state::wswan(machine_config &config)
 	// cartridge
 	WS_CART_SLOT(config, m_cart, X1 / 32, wswan_cart, nullptr);
 
+
+}
+
+void wswan_state::wswan(machine_config &config)
+{
+	wswan_base(config);
+
 	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("wswan");
 	SOFTWARE_LIST(config, "wsc_list").set_compatible("wscolor");
-
-	SOFTWARE_LIST(config, "pc2_list").set_compatible("pockchalv2");
 }
 
+// while the pc2 software is compatible with a Wonderswan, the physical cartridges are not
+void wswan_state::pockchv2(machine_config &config)
+{
+	wswan_base(config);
+
+	// software lists
+	SOFTWARE_LIST(config, "pc2_list").set_original("pockchalv2");
+}
 
 void wscolor_state::wscolor(machine_config &config)
 {
@@ -982,11 +1000,24 @@ ROM_START(wscolor)
 	ROM_LOAD("internal_eeprom.wsc", 0x000, 0x800, BAD_DUMP CRC(ca11afc9) SHA1(0951845f01f83bee497268a63b5fb7baccfeff7c))
 ROM_END
 
+// this currently uses the wswan internal ROMs, the real ones should be different
+ROM_START(pockchv2)
+	ROM_REGION(0x1000, "maincpu", 0)
+	ROM_LOAD("boot.rom", 0x0000, 0x1000, BAD_DUMP CRC(7f35f890) SHA1(4015bcacea76bb0b5bbdb13c5358f7e1abb986a1))
+
+	ROM_REGION(0x80, "nvram", 0)
+	// Need a dump from an original new unit
+	// Empty file containing just the name 'WONDERSAN'
+	ROM_LOAD("internal_eeprom.ws", 0x00, 0x80, BAD_DUMP CRC(b1dff316) SHA1(7b76c3d59c9add9501f95e8bfc34427773fcbd28))
+ROM_END
+
 // SwanCrystal has the name 'SWANCRYSTAL' (from Youtube videos)
 
 } // anonymous namespace
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT        COMPANY   FULLNAME
-CONS( 1999, wswan,   0,      0,      wswan,   wswan, wswan_state,   empty_init, "Bandai", "WonderSwan",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, wscolor_state, empty_init, "Bandai", "WonderSwan Color", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS          INIT        COMPANY   FULLNAME
+CONS( 1999, wswan,    0,      0,      wswan,    wswan, wswan_state,   empty_init, "Bandai", "WonderSwan",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 2000, wscolor,  wswan,  0,      wscolor,  wswan, wscolor_state, empty_init, "Bandai", "WonderSwan Color", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+CONS( 2002, pockchv2, wswan,  0,      pockchv2, wswan, wswan_state,   empty_init, "Benesse Corporation", "Pocket Challenge V2",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

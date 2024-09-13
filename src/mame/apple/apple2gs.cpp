@@ -839,11 +839,11 @@ void apple2gs_state::machine_reset()
 	m_ramrd = false;
 	m_ramwrt = false;
 	m_ioudis = true;
-	m_video->set_newvideo(0x01);      // verified on ROM03 hardware
+	m_video->set_newvideo(0x01); // verified on ROM03 hardware
 	m_clock_frame = 0;
 	m_slot_irq = false;
 	m_clkdata = 0;
-	m_clock_control =0;
+	m_clock_control = 0;
 
 	m_shadow = 0x00;
 	m_speed = 0x80;
@@ -1047,7 +1047,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 
 	if (scanline == (192+BORDER_TOP))
 	{
-		m_macadb->adb_vblank();
 		m_vbl = true;
 
 		// VBL interrupt
@@ -1215,20 +1214,20 @@ void apple2gs_state::lc_update(int offset, bool writing)
 {
 	bool old_lcram = m_lcram;
 
-	//any even access disables pre-write and writing
+	// any even access disables pre-write and writing
 	if ((offset & 1) == 0)
 	{
 		m_lcprewrite = false;
 		m_lcwriteenable = false;
 	}
 
-	//any write disables pre-write
-	//has no effect on write-enable if writing was enabled already
+	// any write disables pre-write
+	// has no effect on write-enable if writing was enabled already
 	if (writing == true)
 	{
 		m_lcprewrite = false;
 	}
-	//first odd read enables pre-write, second one enables writing
+	// first odd read enables pre-write, second one enables writing
 	else if ((offset & 1) == 1)
 	{
 		if (m_lcprewrite == false)
@@ -1316,7 +1315,7 @@ void apple2gs_state::do_io(int offset)
 		case 0x20:
 			break;
 
-		case 0x28:  //  ROMSWITCH - not used by the IIgs firmware or SSW, but does exist at least on ROM 0/1 (need to test on ROM 3 hw)
+		case 0x28:  // ROMSWITCH - not used by the IIgs firmware or SSW, but does exist at least on ROM 0/1 (need to test on ROM 3 hw)
 			if (!m_is_rom3)
 			{
 				m_romswitch = !m_romswitch;
@@ -1681,18 +1680,18 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return read_floatingbus();
 
 		case 0x60: // button 3 on IIgs
-			return m_gameio->sw3_r() | uFloatingBus7;
+			return (m_gameio->sw3_r() ? 0x80 : 0x00) | uFloatingBus7;
 
 		case 0x61: // button 0 or Open Apple
 			// HACK/TODO: the 65816 loses a race to the microcontroller on reset
 			if (m_adb_reset_freeze > 0) m_adb_reset_freeze--;
-			return m_gameio->sw0_r() | uFloatingBus7 | ((m_adb_p3_last & 0x20) ? 0x80 : 0);
+			return ((m_gameio->sw0_r() || (m_adb_p3_last & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x62: // button 1 or Option
-			return m_gameio->sw1_r() | uFloatingBus7 | ((m_adb_p3_last & 0x10) ? 0x80 : 0);
+			return ((m_gameio->sw1_r() || (m_adb_p3_last & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x63: // button 2 or SHIFT key
-			return m_gameio->sw2_r() | uFloatingBus7;
+			return (m_gameio->sw2_r() ? 0x80 : 0x00) | uFloatingBus7;
 
 		case 0x64:  // joy 1 X axis
 			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
@@ -2227,7 +2226,7 @@ u8 apple2gs_state::c080_r(offs_t offset)
 
 		slow_cycle();
 
-		offset &= 0x7F;
+		offset &= 0x7f;
 		slot = offset / 0x10;
 
 		if (slot == 0)
@@ -2282,7 +2281,7 @@ void apple2gs_state::c080_w(offs_t offset, u8 data)
 
 	slow_cycle();
 
-	offset &= 0x7F;
+	offset &= 0x7f;
 	slot = offset / 0x10;
 
 	if (slot == 0)
@@ -3178,8 +3177,8 @@ void apple2gs_state::apple2gs_map(address_map &map)
 
 	map(0x000400, 0x0007ff).view(m_b0_0400bank);
 	m_b0_0400bank[0](0x0400, 0x07ff).rw(FUNC(apple2gs_state::b0ram0400_r), FUNC(apple2gs_state::b0ram0400_w)); // wr 0 rd 0
-	m_b0_0400bank[1](0x0400, 0x07ff).rw(FUNC(apple2gs_state::b1ram0400_r), FUNC(apple2gs_state::b0ram0400_w));  // wr 0 rd 1
-	m_b0_0400bank[2](0x0400, 0x07ff).rw(FUNC(apple2gs_state::b0ram0400_r), FUNC(apple2gs_state::b1ram0400_w));  // wr 1 rd 0
+	m_b0_0400bank[1](0x0400, 0x07ff).rw(FUNC(apple2gs_state::b1ram0400_r), FUNC(apple2gs_state::b0ram0400_w)); // wr 0 rd 1
+	m_b0_0400bank[2](0x0400, 0x07ff).rw(FUNC(apple2gs_state::b0ram0400_r), FUNC(apple2gs_state::b1ram0400_w)); // wr 1 rd 0
 	m_b0_0400bank[3](0x0400, 0x07ff).rw(FUNC(apple2gs_state::b1ram0400_r), FUNC(apple2gs_state::b1ram0400_w)); // wr 1 rd 1
 
 	map(0x000800, 0x001fff).view(m_b0_0800bank);
@@ -3794,7 +3793,6 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_adbmicro->write_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_out));
 
 	MACADB(config, m_macadb, A2GS_MASTER_CLOCK/8);
-	m_macadb->set_mcu_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(apple2gs_state::set_adb_line));
 
 	RTC3430042(config, m_rtc, XTAL(32'768));
@@ -4027,11 +4025,11 @@ ROM_END
 } // Anonymous namespace
 
 
-/*    YEAR  NAME            PARENT    COMPAT    MACHINE     INPUT     CLASS        INIT  COMPANY           FULLNAME */
+/*    YEAR  NAME          PARENT    COMPAT  MACHINE     INPUT         CLASS           INIT       COMPANY           FULLNAME */
 COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gsrom3, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
 COMP( 198?, apple2gsr3p,  apple2gs, 0,      apple2gs,   apple2gsrom3, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
-COMP( 1987, apple2gsr1,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM01)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM00)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0p,  apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0p2, apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM00 prototype 3/10/1986)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, apple2gsr1,   apple2gs, 0,      apple2gsr1, apple2gs,     apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM01)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0,   apple2gs, 0,      apple2gsr1, apple2gs,     apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM00)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0p,  apple2gs, 0,      apple2gsr1, apple2gs,     apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0p2, apple2gs, 0,      apple2gsr1, apple2gs,     apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM00 prototype 3/10/1986)", MACHINE_SUPPORTS_SAVE )
 COMP( 1991, apple2gsmt,   apple2gs, 0,      apple2gsmt, apple2gsrom3, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (1991 Mark Twain prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -86,137 +87,41 @@ license:CC0-1.0
 		<text string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
 
-	<element name="cba">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="A" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb2">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="2" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb3">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="3" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb4">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="4" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb5">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="5" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb6">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="6" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb7">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="7" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb8">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="8" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb9">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="9" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb0">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="10" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cbj">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="J" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cbq">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="Q" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cbk">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="K" align="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
+	<element name="cba"><text string="A" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="cb2"><text string="2" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="cb3"><text string="3" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="cb4"><text string="4" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="cb5"><text string="5" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="cb6"><text string="6" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="cb7"><text string="7" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="cb8"><text string="8" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="cb9"><text string="9" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="cb0"><text string="10" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="cbj"><text string="J" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="cbq"><text string="Q" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="cbk"><text string="K" align="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 
-	<element name="cra">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="A" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr2">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="2" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr3">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="3" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr4">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="4" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr5">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="5" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr6">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="6" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr7">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="7" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr8">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="8" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr9">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="9" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr0">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="10" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="crj">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="J" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="crq">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="Q" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="crk">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="K" align="1"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
+	<element name="cra"><text string="A" align="1"><color red="0.8" green="0.1" blue="0.1" /></text></element>
+	<element name="cr2"><text string="2" align="1"><color red="0.8" green="0.1" blue="0.1" /></text></element>
+	<element name="cr3"><text string="3" align="1"><color red="0.8" green="0.1" blue="0.1" /></text></element>
+	<element name="cr4"><text string="4" align="1"><color red="0.8" green="0.1" blue="0.1" /></text></element>
+	<element name="cr5"><text string="5" align="1"><color red="0.8" green="0.1" blue="0.1" /></text></element>
+	<element name="cr6"><text string="6" align="1"><color red="0.8" green="0.1" blue="0.1" /></text></element>
+	<element name="cr7"><text string="7" align="1"><color red="0.8" green="0.1" blue="0.1" /></text></element>
+	<element name="cr8"><text string="8" align="1"><color red="0.8" green="0.1" blue="0.1" /></text></element>
+	<element name="cr9"><text string="9" align="1"><color red="0.8" green="0.1" blue="0.1" /></text></element>
+	<element name="cr0"><text string="10" align="1"><color red="0.8" green="0.1" blue="0.1" /></text></element>
+	<element name="crj"><text string="J" align="1"><color red="0.8" green="0.1" blue="0.1" /></text></element>
+	<element name="crq"><text string="Q" align="1"><color red="0.8" green="0.1" blue="0.1" /></text></element>
+	<element name="crk"><text string="K" align="1"><color red="0.8" green="0.1" blue="0.1" /></text></element>
 
-	<element name="csh">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text align="2" string="&#x2665;"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="csd">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text align="2" string="&#x2666;"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="csc">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text align="2" string="&#x2663;"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="css">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text align="2" string="&#x2660;"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
+	<element name="csh"><text align="2" string="&#x2665;"><color red="0.8" green="0.1" blue="0.1" /></text></element>
+	<element name="csd"><text align="2" string="&#x2666;"><color red="0.8" green="0.1" blue="0.1" /></text></element>
+	<element name="csc"><text align="2" string="&#x2663;"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="css"><text align="2" string="&#x2660;"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 
-	<element name="cbjk">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="&#x263a;"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="crjk">
-		<rect><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text string="&#x263a;"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
+	<element name="cbjk"><text string="&#x263a;"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="crjk"><text string="&#x263a;"><color red="0.8" green="0.1" blue="0.1" /></text></element>
 
 
 <!-- build screen -->

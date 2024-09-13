@@ -10,24 +10,21 @@
 
 #include "screen.h"
 
-
-class s3_vga_device : public svga_device
+class s3vision864_vga_device : public svga_device
 {
 public:
 	// construction/destruction
-	s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s3vision864_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb) override;
-
 	ibm8514a_device* get_8514() { return m_8514; }
 
 protected:
-	s3_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	s3vision864_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -36,6 +33,7 @@ protected:
 
 	virtual void crtc_map(address_map &map) override;
 	virtual void sequencer_map(address_map &map) override;
+	virtual uint32_t latch_start_addr() override;
 
 	virtual u16 line_compare_mask() override;
 
@@ -90,12 +88,47 @@ protected:
 	virtual uint16_t offset() override;
 
 	virtual void s3_define_video_mode(void);
+	virtual bool get_interlace_mode() override { return BIT(s3.cr42, 5); }
 
 private:
 	ibm8514a_device* m_8514;
+	void refresh_pitch_offset();
+};
+
+class s3vision964_vga_device : public s3vision864_vga_device
+{
+public:
+	s3vision964_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	s3vision964_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	virtual void device_start() override;
+};
+
+class s3vision968_vga_device : public s3vision964_vga_device
+{
+public:
+	s3vision968_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	s3vision968_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	virtual void device_start() override;
+};
+
+class s3trio64_vga_device : public s3vision968_vga_device
+{
+public:
+	s3trio64_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	s3trio64_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	virtual void device_start() override;
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(S3_VGA, s3_vga_device)
+DECLARE_DEVICE_TYPE(S3_VISION864_VGA, s3vision864_vga_device)
+DECLARE_DEVICE_TYPE(S3_VISION964_VGA, s3vision964_vga_device)
+DECLARE_DEVICE_TYPE(S3_VISION968_VGA, s3vision968_vga_device)
+DECLARE_DEVICE_TYPE(S3_TRIO64_VGA, s3trio64_vga_device)
 
 #endif // MAME_VIDEO_PC_VGA_S3_H

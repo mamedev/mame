@@ -61,7 +61,7 @@ Super Constellation also has a power-off NMI, but it doesn't do anything other
 than writing 0x08 to control_w.
 
 TODO:
-- if/when MAME supports an exit callback, hook up power-off NMI to that
+- if/when MAME supports an exit callback, hook up power-off switch to that
 - is Dynamic S a program update of ssensor4 or identical?
 
 *******************************************************************************/
@@ -129,7 +129,6 @@ private:
 
 	bool m_power = false;
 	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 
 	// address maps
 	void const_map(address_map &map);
@@ -137,19 +136,23 @@ private:
 	void sconst_map(address_map &map);
 
 	// I/O handlers
-	void update_display();
 	void mux_w(u8 data);
 	void control_w(u8 data);
 	u8 input1_r();
 	u8 input2_r();
 };
 
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
 void const_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_led_select));
 }
 
 INPUT_CHANGED_MEMBER(const_state::power_off)
@@ -175,28 +178,23 @@ void const_state::init_const()
     I/O
 *******************************************************************************/
 
-void const_state::update_display()
-{
-	m_display->matrix(m_led_select, m_inp_mux);
-}
-
 void const_state::mux_w(u8 data)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = data;
-	update_display();
+	m_display->write_mx(data);
 }
 
 void const_state::control_w(u8 data)
 {
 	// d0-d2: ?
 	// d3: ? (goes high at power-off NMI)
+
 	// d4-d6: select led row
-	m_led_select = data >> 4 & 7;
-	update_display();
+	m_display->write_my(data >> 4 & 7);
 
 	// d7: enable beeper
-	m_beeper->set_state(data >> 7 & 1);
+	m_beeper->set_state(BIT(data, 7));
 }
 
 u8 const_state::input1_r()
@@ -513,11 +511,11 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, ssensor4, 0,       0,      ssensor4,  ssensor4, const_state, empty_init, "Novag", "Super Sensor IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, ssensor4, 0,       0,      ssensor4,  ssensor4, const_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Super Sensor IV", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1983, const,    0,       0,      nconst,    nconst,   const_state, init_const, "Novag", "Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1984, const36,  const,   0,      nconst36,  nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, const36a, const,   0,      nconst36a, nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, constq,   const,   0,      nconstq,   nconstq,  const_state, init_const, "Novag", "Constellation Quattro", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, const,    0,       0,      nconst,    nconst,   const_state, init_const, "Novag Industries / Intelligent Heuristic Programming", "Constellation", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, const36,  const,   0,      nconst36,  nconst,   const_state, init_const, "Novag Industries / Intelligent Heuristic Programming", "Constellation 3.6MHz (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, const36a, const,   0,      nconst36a, nconst,   const_state, init_const, "Novag Industries / Intelligent Heuristic Programming", "Constellation 3.6MHz (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, constq,   const,   0,      nconstq,   nconstq,  const_state, init_const, "Novag Industries / Intelligent Heuristic Programming", "Constellation Quattro", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1984, supercon, 0,       0,      sconst,    sconst,   const_state, empty_init, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, supercon, 0,       0,      sconst,    sconst,   const_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Super Constellation", MACHINE_SUPPORTS_SAVE )

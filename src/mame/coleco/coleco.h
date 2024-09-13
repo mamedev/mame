@@ -44,6 +44,8 @@ public:
 	virtual void machine_reset() override;
 
 	uint8_t cart_r(offs_t offset);
+	void cart_w(offs_t offset, uint8_t data);
+
 	uint8_t paddle_1_r();
 	uint8_t paddle_2_r();
 	void paddle_off_w(uint8_t data);

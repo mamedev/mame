@@ -344,8 +344,8 @@ void tickee_state::tickee_control_w(offs_t offset, uint8_t data)
 			break;
 
 		case 3:
-			m_ticket[0]->motor_w(BIT(data, 3));
-			m_ticket[1]->motor_w(BIT(data, 2));
+			m_ticket[0]->motor_w(BIT(~data, 3));
+			m_ticket[1]->motor_w(BIT(~data, 2));
 			break;
 
 		default:
@@ -806,8 +806,8 @@ void tickee_gun_state::tickee(machine_config &config)
 	set_beamadd(50, 0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	TICKET_DISPENSER(config, m_ticket[0], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_ticket[1], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket[0], attotime::from_msec(100));
+	TICKET_DISPENSER(config, m_ticket[1], attotime::from_msec(100));
 
 	// video hardware
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
@@ -850,8 +850,8 @@ void tickee_state::mouseatk(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	TICKET_DISPENSER(config, m_ticket[0], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_ticket[1], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket[0], attotime::from_msec(100));
+	TICKET_DISPENSER(config, m_ticket[1], attotime::from_msec(100));
 
 	// video hardware
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
@@ -908,7 +908,7 @@ void tickee_gun_state::maletmad(machine_config &config)
 {
 	rapidfir(config);
 
-	TICKET_DISPENSER(config, m_ticket[0], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket[0], attotime::from_msec(100));
 }
 
 
@@ -1204,13 +1204,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, tickee,    0,        tickee,   tickee,   tickee_gun_state, empty_init, ROT0, "Raster Elite",                  "Tickee Tickats",              MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Ghost Hunter",                MACHINE_SUPPORTS_SAVE )
-GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, tickee_gun_state, empty_init, ROT0, "Island Design",                 "Tut's Tomb",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, tickee,    0,        tickee,   tickee,   tickee_gun_state, empty_init, ROT0, "Raster Elite",                  "Tickee Tickats",               MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Ghost Hunter",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, tickee_gun_state, empty_init, ROT0, "Island Design",                 "Tut's Tomb",                   MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, tickee_state,     empty_init, ROT0, "ICE",                           "Mouse Attack",                MACHINE_SUPPORTS_SAVE )
+GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, tickee_state,     empty_init, ROT0, "ICE",                           "Mouse Attack",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire v1.1 (Build 239)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire v1.1 (Build 238)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire v1.0 (Build 236)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, maletmad,  0,        maletmad, maletmad, tickee_gun_state, empty_init, ROT0, "Hanaho Games (Capcom license)", "Mallet Madness v2.1",         MACHINE_SUPPORTS_SAVE )
+GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire (v1.1, Build 239)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire (v1.1, Build 238)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",                  "Rapid Fire (v1.0, Build 236)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, maletmad,  0,        maletmad, maletmad, tickee_gun_state, empty_init, ROT0, "Hanaho Games (Capcom license)", "Mallet Madness (v2.1)",        MACHINE_SUPPORTS_SAVE )

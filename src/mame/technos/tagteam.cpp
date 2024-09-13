@@ -102,8 +102,6 @@ private:
 };
 
 
-// video
-
 // TODO: fix or confirm resnet implementation
 // schematics say emitter circuit with 47 ohm pullup and 470 ohm pulldown but this results in a bad palette
 static const res_net_info tagteam_net_info =
@@ -276,8 +274,6 @@ uint32_t tagteam_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void tagteam_state::machine_start()
 {

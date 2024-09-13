@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -35,21 +36,15 @@ license:CC0-1.0
 	<element name="nothing" defstate="0"><rect><color alpha="0" /></rect></element>
 
 	<element name="switch1" defstate="0">
-		<rect><color red="0.6" green="0.35" blue="0.1" /></rect>
 		<text state="0x00" string="PRO1" align="1"><color red="0.82" green="0.82" blue="0.82" /></text>
 		<text state="0x01" string="PRO2" align="1"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="switch2" defstate="0">
-		<rect><color red="0.6" green="0.35" blue="0.1" /></rect>
 		<text state="0x01" string="1PLAYER" align="2"><color red="0.82" green="0.82" blue="0.82" /></text>
 		<text state="0x00" string="2PLAYER" align="2"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 
-	<element name="text_score1">
-		<text string="SCORE"><color red="0.82" green="0.82" blue="0.82" /></text>
-	</element>
-	<element name="text_score2">
-		<rect><color red="0.6" green="0.35" blue="0.1" /></rect>
+	<element name="text_score">
 		<text string="SCORE"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 
@@ -246,18 +241,18 @@ license:CC0-1.0
 		<element ref="black"><bounds x="265" yc="150" width="8" height="22" /></element>
 		<element name="5.3" ref="led"><bounds x="266.25" yc="150" width="5.5" height="5.5" /></element> <!-- 11 -->
 
-		<element ref="text_score1"><bounds xc="150" y="24" width="50" height="9" /></element>
+		<element ref="text_score"><bounds xc="150" y="24" width="50" height="9" /></element>
 		<group ref="digits"><bounds xc="150" y="33" width="45" height="43" /></group>
 
 		<!-- other buttons -->
-		<element ref="nothing" inputtag="IN.3" inputmask="0x00" inputraw="yes"><bounds xc="150" y="232.5" width="230" height="4.5" /></element>
+		<element ref="nothing" clickthrough="no"><bounds xc="150" y="232.5" width="230" height="4.5" /></element>
 		<element ref="switch1" inputtag="IN.3" inputmask="0x02" inputraw="yes"><bounds xc="111" y="232.5" width="30" height="4.5" /></element>
 		<element ref="switch2" inputtag="IN.3" inputmask="0x01" inputraw="yes"><bounds xc="193" y="232.5" width="30" height="4.5" /></element>
 
 		<element ref="black2d" inputtag="IN.3" inputmask="0x02" inputraw="yes"><bounds xc="100" y="226" width="6" height="6" /></element>
 		<element ref="black2d" inputtag="IN.3" inputmask="0x01" inputraw="yes"><bounds xc="200" y="226" width="6" height="6" /></element>
 
-		<element ref="text_score2"><bounds xc="150" y="232.5" width="30" height="4.5" /></element>
+		<element ref="text_score"><bounds xc="150" y="232.5" width="30" height="4.5" /></element>
 		<element ref="buts" inputtag="IN.2" inputmask="0x01"><bounds xc="150" y="226" width="6" height="6" /></element>
 	</group>
 

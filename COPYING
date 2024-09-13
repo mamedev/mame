@@ -11,7 +11,7 @@ distributions.
 
 
 MAME
-Copyright (c) 1997-2023 MAMEdev and contributors
+Copyright (c) 1997-2024 MAMEdev and contributors
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License version 2, as provided
@@ -56,7 +56,7 @@ Other Information
 
 
 Asio C++ Library
-Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 
 Permission is hereby granted, free of charge, to any person or
 organization obtaining a copy of the software and accompanying
@@ -89,10 +89,14 @@ Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 The Regents of
 the University of California
 
 FLAC - Free Lossless Audio Codec
-Copyright (c) 2001,2002,2003,2004,2005,2006,2007 Josh Coalson 
+Copyright (C) 2000-2009  Josh Coalson
+Copyright (C) 2011-2023  Xiph.Org Foundation
 
 The msinttypes r29 
 Copyright (c) 2006-2013 Alexander Chemeris 
+
+Zstandard software
+Copyright (c) Meta Platforms, Inc. and affiliates.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -197,7 +201,7 @@ tap-windows.h
 Copyright (C) 2002-2014 OpenVPN Technologies, Inc.
 
 utf8proc
-Copyright (c) 2014-2015 Steven G. Johnson, Jiahao Chen, Tony Kelman,
+Copyright (c) 2014-2021 Steven G. Johnson, Jiahao Chen, Tony Kelman,
 Jonas Fonseca, and other contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a
@@ -252,7 +256,7 @@ Copyright (c) 2006 and later Cockos Incorporated
 Copyright (c) 1999 D. J. Bernstein
 
 zlib data compression library
-Copyright (C) 1995-2022 Jean-loup Gailly and Mark Adler
+Copyright (C) 1995-2023 Jean-loup Gailly and Mark Adler
 
 This software is provided 'as-is', without any express or implied
 warranty.  In no event will the authors be held liable for any damages

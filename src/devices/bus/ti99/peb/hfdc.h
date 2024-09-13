@@ -44,8 +44,6 @@ public:
 	virtual void cruwrite(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_config_complete() override;
-
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -101,10 +99,10 @@ private:
 	required_device<mm58274c_device> m_clock;
 
 	// Link to the attached floppy drives
-	floppy_image_device*    m_floppy_unit[4];
+	required_device_array<floppy_connector, 4> m_floppy;
 
 	// Link to the attached hard disks
-	mfm_harddisk_device*    m_harddisk_unit[3];
+	required_device_array<mfm_harddisk_connector, 3> m_harddisk;
 
 	// Currently selected floppy drive
 	floppy_image_device*    m_current_floppy;

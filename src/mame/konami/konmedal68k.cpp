@@ -21,16 +21,18 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "k054156_k054157_k056832.h"
+#include "k055555.h"
+#include "konami_helper.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "sound/ymz280b.h"
-#include "k054156_k054157_k056832.h"
-#include "k055555.h"
-#include "konami_helper.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -640,7 +642,7 @@ void konmedal68k_state::kzaurus(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::kzaurus_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal68k_state::scanline), "screen", 0, 1);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

@@ -80,7 +80,7 @@ void nmk004_device::nmk004_sound_mem_map(address_map &map)
 
 ROM_START( nmk004 )
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "nmk004.bin", 0x00000, 0x02000, CRC(83b6f611) SHA1(bb7ddc00affe8a066002ecd6858dbd2854af8940) )
+	ROM_LOAD( "nmk004.bin", 0x00000, 0x02000, CRC(8ae61a09) SHA1(f55f9e6bb55bfa56f9f797518dca032aaa3f6a32) )
 ROM_END
 
 

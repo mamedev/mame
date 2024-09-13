@@ -113,27 +113,27 @@ enum
 
 struct n64_tile_t
 {
-	int32_t format; // Image data format: RGBA, YUV, CI, IA, I
-	int32_t size; // Size of texel element: 4b, 8b, 16b, 32b
-	int32_t line; // Size of tile line in bytes
-	int32_t tmem; // Starting tmem address for this tile in bytes
-	int32_t palette; // Palette number for 4b CI texels
-	int32_t ct, mt, cs, ms; // Clamp / mirror enable bits for S / T direction
-	int32_t mask_t, shift_t, mask_s, shift_s; // Mask values / LOD shifts
-	int32_t lshift_s, rshift_s, lshift_t, rshift_t;
-	int32_t wrapped_mask_s, wrapped_mask_t;
-	bool clamp_s, clamp_t;
-	rgbaint_t mm, invmm;
-	rgbaint_t wrapped_mask;
-	rgbaint_t mask;
-	rgbaint_t invmask;
-	rgbaint_t lshift;
-	rgbaint_t rshift;
-	rgbaint_t sth;
-	rgbaint_t stl;
-	rgbaint_t clamp_st;
-	uint16_t sl, tl, sh, th;      // 10.2 fixed-point, starting and ending texel row / column
-	int32_t num;
+	int32_t format = 0; // Image data format: RGBA, YUV, CI, IA, I
+	int32_t size = 0; // Size of texel element: 4b, 8b, 16b, 32b
+	int32_t line = 0; // Size of tile line in bytes
+	int32_t tmem = 0; // Starting tmem address for this tile in bytes
+	int32_t palette = 0; // Palette number for 4b CI texels
+	int32_t ct = 0, mt = 0, cs = 0, ms = 0; // Clamp / mirror enable bits for S / T direction
+	int32_t mask_t = 0, shift_t = 0, mask_s = 0, shift_s = 0; // Mask values / LOD shifts
+	int32_t lshift_s = 0, rshift_s = 0, lshift_t = 0, rshift_t = 0;
+	int32_t wrapped_mask_s = 0, wrapped_mask_t = 0;
+	bool clamp_s = false, clamp_t = false;
+	rgbaint_t mm = { 0, 0, 0, 0 }, invmm = { 0, 0, 0, 0 };
+	rgbaint_t wrapped_mask = { 0, 0, 0, 0 };
+	rgbaint_t mask = { 0, 0, 0, 0 };
+	rgbaint_t invmask = { 0, 0, 0, 0 };
+	rgbaint_t lshift = { 0, 0, 0, 0 };
+	rgbaint_t rshift = { 0, 0, 0, 0 };
+	rgbaint_t sth = { 0, 0, 0, 0 };
+	rgbaint_t stl = { 0, 0, 0, 0 };
+	rgbaint_t clamp_st = { 0, 0, 0, 0 };
+	uint16_t sl = 0, tl = 0, sh = 0, th = 0;      // 10.2 fixed-point, starting and ending texel row / column
+	int32_t num = 0;
 };
 
 struct span_base_t
@@ -255,10 +255,10 @@ struct rdp_poly_state
 	other_modes_t       m_other_modes;          /* miscellaneous rasterizer bits (2) */
 	span_base_t         m_span_base;            /* span initial values for triangle rasterization */
 	rectangle_t         m_scissor;              /* screen-space scissor bounds */
-	uint32_t              m_fill_color;           /* poly fill color */
+	uint32_t            m_fill_color;           /* poly fill color */
 	n64_tile_t          m_tiles[8];             /* texture tile state */
-	uint8_t               m_tmem[0x1000];         /* texture cache */
-	int32_t               tilenum;                /* texture tile index */
+	uint8_t             m_tmem[0x1000];         /* texture cache */
+	int32_t             tilenum;                /* texture tile index */
 	bool                flip;                   /* left-major / right-major flip */
 	bool                rect;                   /* primitive is rectangle (vs. triangle) */
 };
@@ -268,8 +268,8 @@ struct rdp_poly_state
 // This is enormous and horrible
 struct rdp_span_aux
 {
-	uint32_t              m_unscissored_rx;
-	uint16_t              m_cvg[RDP_CVG_SPAN_MAX];
+	uint32_t            m_unscissored_rx;
+	uint16_t            m_cvg[RDP_CVG_SPAN_MAX];
 	color_t             m_memory_color;
 	color_t             m_pixel_color;
 	color_t             m_inv_pixel_color;

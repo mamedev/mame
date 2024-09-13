@@ -157,7 +157,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define REG_BPLCON2     (0x104/2)   /* W    D    Bit plane control reg. (priority control) */
 #define REG_BPLCON3     (0x106/2)   /* W    D    Bit plane control reg (enhanced features) */
 #define REG_BPL1MOD     (0x108/2)   /* W  A      Bit plane modulo (odd planes) */
-#define REG_BPL2MOD     (0x10A/2)   /* W  A      Bit Plane modulo (even planes) */
+#define REG_BPL2MOD     (0x10A/2)   /* W  A      Bit plane modulo (even planes) */
 #define REG_BPLCON4     (0x10C/2)   /* W    D    Bit plane control reg. (display masks) */
 #define REG_BPL1DAT     (0x110/2)   /* W    D    Bit plane 1 data (parallel-to-serial convert) */
 #define REG_BPL2DAT     (0x112/2)   /* W    D    Bit plane 2 data (parallel-to-serial convert) */
@@ -434,13 +434,12 @@ public:
 	DECLARE_VIDEO_START( amiga_aga );
 	void amiga_palette(palette_device &palette) const;
 
-	uint32_t screen_update_amiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_screenmode();
 
 	TIMER_CALLBACK_MEMBER( scanline_callback );
-	TIMER_CALLBACK_MEMBER (amiga_irq_proc );
-	TIMER_CALLBACK_MEMBER( amiga_blitter_proc );
+	TIMER_CALLBACK_MEMBER( irq_process_callback );
+	TIMER_CALLBACK_MEMBER( blitter_process_callback );
 	void update_irqs();
 
 	template <int P> DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
@@ -622,6 +621,7 @@ protected:
 
 	// TODO: move to Agnus/Alice
 	u16 vposr_r();
+	u16 vhposr_r();
 	void vposw_w(u16 data);
 	void bplcon0_w(u16 data);
 	void aga_bplcon0_w(u16 data);
@@ -709,6 +709,7 @@ private:
 
 	bool m_previous_lof;
 	bitmap_rgb32 m_flickerfixer;
+	bitmap_rgb32 m_scanline_bitmap;
 
 	uint16_t m_rx_shift;
 	uint16_t m_tx_shift;

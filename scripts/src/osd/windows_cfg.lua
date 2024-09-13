@@ -3,15 +3,11 @@
 
 defines {
 	"OSD_WINDOWS",
+	"UNICODE",
+	"_UNICODE",
 	"WIN32_LEAN_AND_MEAN",
 	"NOMINMAX",
 }
-
-configuration { "mingw* or vs*" }
-	defines {
-		"UNICODE",
-		"_UNICODE"
-	}
 
 configuration { "vs*" }
 	flags {
@@ -33,7 +29,7 @@ if _OPTIONS["MODERN_WIN_API"]=="1" then
 	}
 else
 	defines {
-		"_WIN32_WINNT=0x0600",
+		"_WIN32_WINNT=0x0602",
 		"NTDDI_VERSION=0x06000000",
 	}
 end

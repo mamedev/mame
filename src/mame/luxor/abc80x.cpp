@@ -283,7 +283,7 @@ void abc800c_state::abc800c_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
-	palette.set_pen_color(2, rgb_t::green());
+	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // green
 	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0x00)); // yellow
 	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0xff)); // blue
 	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0xff)); // magenta
@@ -1127,7 +1127,7 @@ void abc806_state::abc806_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
-	palette.set_pen_color(2, rgb_t::green());
+	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // green
 	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0x00)); // yellow
 	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0xff)); // blue
 	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0xff)); // magenta
@@ -2019,6 +2019,12 @@ QUICKLOAD_LOAD_MEMBER(abc800_state::quickload_cb)
 	return std::make_pair(std::error_condition(), std::string());
 }
 
+static void printer_devices(device_slot_interface &device)
+{
+	device.option_add("printer", SERIAL_PRINTER);
+	device.option_add("teletex800", TELETEX_800);
+}
+
 
 
 //**************************************************************************
@@ -2071,7 +2077,7 @@ void abc800_state::common(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, TIMER_CASSETTE_TAG).configure_periodic(FUNC(abc800_state::cassette_input_tick), attotime::from_hz(44100));
 
-	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, printer_devices, nullptr));
 	rs232a.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
 	rs232a.dcd_handler().set(m_dart, FUNC(z80dart_device::dcda_w));
 	rs232a.cts_handler().set(m_dart, FUNC(z80dart_device::ctsa_w));

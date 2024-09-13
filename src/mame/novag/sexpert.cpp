@@ -10,7 +10,7 @@ Hardware notes (Super Expert)
 - 8KB RAM battery-backed, 3*32KB ROM
 - HD44780A00 LCD controller (16x1)
 - beeper(32KHz/32), IRQ(32KHz/128) via MC14060
-- optional R65C51P2 ACIA @ 1.8432MHz, for IBM PC interface (only works in version C)
+- optional R65C51P2 ACIA @ 1.8432MHz, for Super System (only works in version C)
 - printer port, magnetic sensors, 8*8 chessboard leds
 
 I/O via TTL, hardware design was very awkward.
@@ -84,7 +84,7 @@ public:
 
 	void init_sexpert();
 
-	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq) { sexpert_set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
@@ -103,17 +103,13 @@ protected:
 	required_ioport_array<8> m_inputs;
 
 	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 	u8 m_lcd_control = 0;
 	u8 m_lcd_data = 0;
-
-	void sexpert_set_cpu_freq();
 
 	// address maps
 	void sexpert_map(address_map &map);
 
 	// I/O handlers
-	void update_display();
 	virtual void lcd_control_w(u8 data);
 	virtual void lcd_data_w(u8 data);
 	void leds_w(u8 data);
@@ -129,20 +125,18 @@ void sexpert_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_led_data));
 	save_item(NAME(m_lcd_control));
 	save_item(NAME(m_lcd_data));
 }
 
-void sexpert_state::sexpert_set_cpu_freq()
+INPUT_CHANGED_MEMBER(sexpert_state::change_cpu_freq)
 {
 	// machines were released with either 5MHz or 6MHz CPU
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (12_MHz_XTAL/2) : (10_MHz_XTAL/2));
+	m_maincpu->set_unscaled_clock((newval & 1) ? (12_MHz_XTAL/2) : (10_MHz_XTAL/2));
 }
 
 void sexpert_state::machine_reset()
 {
-	sexpert_set_cpu_freq();
 	m_rombank->set_entry(0);
 }
 
@@ -150,6 +144,7 @@ void sexpert_state::init_sexpert()
 {
 	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
 }
+
 
 // Super Forte
 
@@ -215,13 +210,7 @@ HD44780_PIXEL_UPDATE(sexpert_state::lcd_pixel_update)
 }
 
 
-// TTL/generic
-
-void sexpert_state::update_display()
-{
-	// update leds (lcd is done separately)
-	m_display->matrix(m_inp_mux, m_led_data);
-}
+// common
 
 void sexpert_state::lcd_control_w(u8 data)
 {
@@ -242,8 +231,7 @@ void sexpert_state::lcd_data_w(u8 data)
 void sexpert_state::leds_w(u8 data)
 {
 	// d0-d7: chessboard leds
-	m_led_data = data;
-	update_display();
+	m_display->write_mx(data);
 }
 
 void sexpert_state::mux_w(u8 data)
@@ -252,11 +240,11 @@ void sexpert_state::mux_w(u8 data)
 	m_rombank->set_entry(data & 1);
 
 	// d3: enable beeper
-	m_beeper->set_state(data >> 3 & 1);
+	m_beeper->set_state(BIT(data, 3));
 
 	// d4-d7: 74145 to input mux/led select
 	m_inp_mux = 1 << (data >> 4 & 0xf) & 0xff;
-	update_display();
+	m_display->write_my(m_inp_mux);
 }
 
 u8 sexpert_state::input1_r()
@@ -303,16 +291,15 @@ void sforte_state::lcd_data_w(u8 data)
 	// d0-d2: 74145 to input mux/led select
 	// 74145 D from lcd control d2 (HD44780 E)
 	m_inp_mux = 1 << ((m_lcd_control << 1 & 8) | (data & 7));
+	m_display->write_my(m_inp_mux);
 
 	// d5,d6: led data
-	m_led_data = ~data >> 5 & 3;
-	update_display();
+	m_display->write_mx(~data >> 5 & 3);
 
 	// d7: enable beeper
 	// capacitor for noise filter (sound glitches otherwise)
-	u8 param = data >> 7 & 1;
-	if (param != m_beeptimer->param())
-		m_beeptimer->adjust(attotime::from_msec(1), param);
+	if (m_beeptimer->param() != BIT(data, 7))
+		m_beeptimer->adjust(attotime::from_msec(1), BIT(data, 7));
 
 	// LCD pins: same as sexpert
 	sexpert_state::lcd_data_w(data);
@@ -344,10 +331,7 @@ void sexpert_state::sexpert_map(address_map &map)
 void sforte_state::sforte_map(address_map &map)
 {
 	sexpert_map(map);
-	map(0x1ff4, 0x1ff4).nopw();
-	map(0x1ff5, 0x1ff5).nopw();
-	map(0x1ff6, 0x1ff6).w(FUNC(sforte_state::lcd_control_w));
-	map(0x1ff7, 0x1ff7).w(FUNC(sforte_state::lcd_data_w));
+	map(0x1ff4, 0x1ff5).nopw();
 }
 
 
@@ -397,8 +381,8 @@ static INPUT_PORTS_START( sexpert )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Player/Player / Gambit Book / King")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Print Board / Interface")
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sexpert_state, sexpert_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sexpert_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "5MHz" )
 	PORT_CONFSETTING(    0x01, "6MHz" )
 INPUT_PORTS_END
@@ -406,8 +390,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sexpertb )
 	PORT_INCLUDE( sexpert )
 
-	PORT_MODIFY("FAKE") // default CPU for B/C is W65C802P-6 @ 6MHz
-	PORT_CONFNAME( 0x01, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sexpert_state, sexpert_cpu_freq, 0) // factory set
+	PORT_MODIFY("CPU") // default CPU for B/C is W65C802P-6 @ 6MHz
+	PORT_CONFNAME( 0x01, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sexpert_state, change_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "5MHz" )
 	PORT_CONFSETTING(    0x01, "6MHz" )
 INPUT_PORTS_END
@@ -486,6 +470,7 @@ void sforte_state::sforte(machine_config &config)
 
 	m_board->set_type(sensorboard_device::BUTTONS);
 
+	m_display->set_width(2);
 	config.set_default_layout(layout_novag_sforte);
 }
 
@@ -602,17 +587,17 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS          INIT          COMPANY, FULLNAME, FLAGS
-SYST( 1988, sexperta,  0,        0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 886
-SYST( 1987, sexperta1, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 878
-SYST( 1987, sexperta2, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag", "Super Expert (version A, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 878
-SYST( 1988, sexpertb,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 887
-SYST( 1990, sexpertc,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 902
-SYST( 1990, sexpertc1, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v3.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 902
-SYST( 1990, sexpertc2, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 902
+SYST( 1988, sexperta,  0,        0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version A, set 1)", MACHINE_SUPPORTS_SAVE ) // 886
+SYST( 1987, sexperta1, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version A, set 2)", MACHINE_SUPPORTS_SAVE ) // 878
+SYST( 1987, sexperta2, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version A, set 3)", MACHINE_SUPPORTS_SAVE ) // 878
+SYST( 1988, sexpertb,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE ) // 887
+SYST( 1990, sexpertc,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version C, v3.6)", MACHINE_SUPPORTS_SAVE ) // 902
+SYST( 1990, sexpertc1, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version C, v3.0)", MACHINE_SUPPORTS_SAVE ) // 902
+SYST( 1990, sexpertc2, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version C, v1.2)", MACHINE_SUPPORTS_SAVE ) // 902
 
-SYST( 1987, sfortea,   0,        0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1987, sfortea1,  sfortea,  0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1987, sfortea2,  sfortea,  0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, sforteb,   sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, sfortec,   sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag", "Super Forte (version C, v3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, sfortec1,  sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag", "Super Forte (version C, v1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, sfortea,   0,        0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, sfortea1,  sfortea,  0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, sfortea2,  sfortea,  0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version A, set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, sforteb,   sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, sfortec,   sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version C, v3.6)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, sfortec1,  sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version C, v1.2)", MACHINE_SUPPORTS_SAVE )

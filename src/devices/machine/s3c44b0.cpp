@@ -9,7 +9,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "machine/s3c44b0.h"
+#include "s3c44b0.h"
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
@@ -1106,9 +1106,8 @@ void s3c44b0_device::pwm_start(int timer)
 		break;
 		default :
 		{
-			cnt = cmp = auto_reload = 0;
+			fatalerror("Invalid timer index %d!", timer);
 		}
-		break;
 	}
 //  hz = freq / (cnt - cmp + 1);
 	if (cnt < 2)

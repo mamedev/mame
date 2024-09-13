@@ -104,8 +104,6 @@ public:
 	// construction/destruction
 	virtual ~device_a1bus_card_interface();
 
-	device_a1bus_card_interface *next() const { return m_next; }
-
 	// inline configuration
 	void set_a1bus(a1bus_device *a1bus, const char *slottag) { m_a1bus = a1bus; m_a1bus_slottag = slottag; }
 	template <typename T> void set_onboard(T &&a1bus) { m_a1bus_finder.set_tag(std::forward<T>(a1bus)); m_a1bus_slottag = device().tag(); }
@@ -128,7 +126,6 @@ private:
 	optional_device<a1bus_device> m_a1bus_finder;
 	a1bus_device *m_a1bus;
 	const char *m_a1bus_slottag;
-	device_a1bus_card_interface *m_next;
 };
 
 #endif  // MAME_BUS_A1BUS_A1BUS_H

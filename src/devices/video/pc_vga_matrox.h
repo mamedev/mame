@@ -43,7 +43,7 @@ protected:
 	virtual void device_reset() override;
 
 	virtual uint16_t offset() override;
-	virtual uint32_t start_addr() override;
+	virtual uint32_t latch_start_addr() override;
 	virtual void recompute_params() override;
 	virtual void palette_update() override;
 
@@ -103,6 +103,13 @@ private:
 	u8 m_truecolor_ctrl = 0;
 
 	u8 m_msc = 0;
+
+	// PLL
+	u8 pll_data_r(offs_t offset);
+	void pll_data_w(offs_t offset, u8 data);
+
+	u8 m_pll_par = 0;
+	u8 m_pll_data[12]{};
 };
 
 DECLARE_DEVICE_TYPE(MATROX_VGA, matrox_vga_device)

@@ -155,8 +155,6 @@ private:
 };
 
 
-// video
-
 // pastelg specific methods
 
 uint16_t pastelg_state::blitter_src_addr_r()
@@ -440,8 +438,6 @@ uint32_t pastelg_common_state::screen_update(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-
-// machine
 
 void threeds_state::machine_start()
 {
@@ -948,7 +944,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, pastelg,  0,       pastelg, pastelg, pastelg_state, empty_init, ROT0, "Nichibutsu",         "Pastel Gal (Japan 851224)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pastelg,  0,       pastelg, pastelg, pastelg_state, empty_init, ROT0, "Nichibutsu",         "Pastel Gal (Japan 851224)",                       MACHINE_SUPPORTS_SAVE ) // パステルギャル
 GAME( 1985, threeds,  0,       threeds, threeds, threeds_state, empty_init, ROT0, "Nichibutsu",         "Three Ds - Three Dealers Casino House (set 1)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1985, threedsa, threeds, threeds, threeds, threeds_state, empty_init, ROT0, "Nichibutsu",         "Three Ds - Three Dealers Casino House (set 2)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1985, galds,    threeds, threeds, galds,   threeds_state, empty_init, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", MACHINE_SUPPORTS_SAVE )

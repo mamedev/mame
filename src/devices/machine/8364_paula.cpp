@@ -207,8 +207,9 @@ TIMER_CALLBACK_MEMBER( paula_8364_device::signal_irq )
 void paula_8364_device::dma_reload(audio_channel *chan, bool startup)
 {
 	chan->curlocation = chan->loc;
-	// TODO: how to treat length == 0?
-	chan->curlength = chan->len;
+	// TODO: Unconfirmed, assume max size if length is 0.
+	// cfr. wrestlmn and videokid, where they pratically never get even close to buffer exhaustion.
+	chan->curlength = chan->len == 0 ? 0x10000 : chan->len;
 	// TODO: on startup=false irq should be delayed two cycles
 	if (startup)
 		chan->irq_timer->adjust(attotime::from_hz(15750), chan->index); // clock() / 227

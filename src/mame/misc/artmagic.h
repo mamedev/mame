@@ -87,6 +87,7 @@ private:
 	void shtstar_guncpu_map(address_map &map);
 	void shtstar_map(address_map &map);
 	void shtstar_subcpu_map(address_map &map);
+	void shtstar_subcpu_vector_map(address_map &map);
 	void stonebal_map(address_map &map);
 	void stonebal_tms_map(address_map &map);
 	void tms_map(address_map &map);

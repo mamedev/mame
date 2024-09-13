@@ -159,9 +159,9 @@ void spectrum_opus_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_opus_device::romcs()
+bool spectrum_opus_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 void spectrum_opus_device::post_opcode_fetch(offs_t offset)

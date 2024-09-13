@@ -117,28 +117,28 @@ private:
 
 	struct live_info {
 		attotime tm;
-		int state, next_state;
-		int sync;
-		int byte;
-		int ds;
-		int oe;
-		int soe;
-		int accl;
-		uint8_t accl_yb;
+		int state = 0, next_state = 0;
+		int sync = 0;
+		int byte = 0;
+		int ds = 0;
+		int oe = 0;
+		int soe = 0;
+		int accl = 0;
+		uint8_t accl_yb = 0;
 
 		attotime edge;
-		uint16_t shift_reg;
-		int cycle_counter;
-		int cell_counter;
-		int bit_counter;
-		int zero_counter;
-		int cycles_until_random_flux;
+		uint16_t shift_reg = 0;
+		int cycle_counter = 0;
+		int cell_counter = 0;
+		int bit_counter = 0;
+		int zero_counter = 0;
+		int cycles_until_random_flux = 0;
 
-		uint8_t yb;
-		uint8_t shift_reg_write;
+		uint8_t yb = 0;
+		uint8_t shift_reg_write = 0;
 		attotime write_start_time;
 		attotime write_buffer[32];
-		int write_position;
+		int write_position = 0;
 	};
 
 	devcb_write_line m_write_atn;

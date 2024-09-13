@@ -40,6 +40,8 @@
 #include "emu.h"
 #include "asc.h"
 
+#include "multibyte.h"
+
 // device type definition
 DEFINE_DEVICE_TYPE(ASC, asc_device, "asc", "ASC")
 
@@ -408,33 +410,17 @@ uint8_t asc_device::read(offs_t offset)
 	// WT inc/phase registers - rebuild from "live" copies"
 	if ((offset >= 0x810) && (offset <= 0x82f))
 	{
-		m_regs[0x11] = m_phase[0]>>16;
-		m_regs[0x12] = m_phase[0]>>8;
-		m_regs[0x13] = m_phase[0];
-		m_regs[0x15] = m_incr[0]>>16;
-		m_regs[0x16] = m_incr[0]>>8;
-		m_regs[0x17] = m_incr[0];
+		put_u24be(&m_regs[0x11], m_phase[0]);
+		put_u24be(&m_regs[0x15], m_incr[0]);
 
-		m_regs[0x19] = m_phase[1]>>16;
-		m_regs[0x1a] = m_phase[1]>>8;
-		m_regs[0x1b] = m_phase[1];
-		m_regs[0x1d] = m_incr[1]>>16;
-		m_regs[0x1e] = m_incr[1]>>8;
-		m_regs[0x1f] = m_incr[1];
+		put_u24be(&m_regs[0x19], m_phase[1]);
+		put_u24be(&m_regs[0x1d], m_incr[1]);
 
-		m_regs[0x21] = m_phase[2]>>16;
-		m_regs[0x22] = m_phase[2]>>8;
-		m_regs[0x23] = m_phase[2];
-		m_regs[0x25] = m_incr[2]>>16;
-		m_regs[0x26] = m_incr[2]>>8;
-		m_regs[0x27] = m_incr[2];
+		put_u24be(&m_regs[0x21], m_phase[2]);
+		put_u24be(&m_regs[0x25], m_incr[2]);
 
-		m_regs[0x29] = m_phase[3]>>16;
-		m_regs[0x2a] = m_phase[3]>>8;
-		m_regs[0x2b] = m_phase[3];
-		m_regs[0x2d] = m_incr[3]>>16;
-		m_regs[0x2e] = m_incr[3]>>8;
-		m_regs[0x2f] = m_incr[3];
+		put_u24be(&m_regs[0x29], m_phase[3]);
+		put_u24be(&m_regs[0x2d], m_incr[3]);
 	}
 
 	if (offset >= 0x1000)

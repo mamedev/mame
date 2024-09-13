@@ -2645,13 +2645,13 @@ public:
 
 	void select(int entry);
 	void disable();
+	bool exists() const { return m_config != nullptr; }
 
 	std::optional<int> entry() const { return m_cur_id == -1 ? std::optional<int>() : m_cur_slot; }
 
 	const std::string &name() const { return m_name; }
 
 private:
-
 	device_t &                                      m_device;
 	std::string                                     m_name;
 	std::map<int, int>                              m_entry_mapping;
@@ -2671,6 +2671,7 @@ private:
 	void make_subdispatch(std::string context);
 	int id_to_slot(int id) const;
 	void register_state();
+	void refresh_id();
 };
 
 

@@ -547,8 +547,8 @@ license:CC0-1.0
 	  Jantei: Battle Cos-Player (Japan) [T-34601G]                                          | (jantbcp)
 	  Japan Super Bass Classic '96 (Japan) [T-18707G]                                       | (jsbc96)
 	  Jikkyou Oshaberi Parodius: Forever with Me (Japan) [T-9513G]                          | (jikkparo)
-	  Jikkyou Powerful Pro Yakyuu '95 Kaimakuban (Japan) [T-9502G]                          | (powyak95)
-	  Jikkyou Powerful Pro Yakyuu S (Japan) [T-9523G]                                       | (powyaks)
+	  Jikkyou Pawafuru Puro Yakyū '95 Kaimaku-ban (Japan) [T-9502G]                         | (powyak95)
+	  Jikkyou Pawafuru Puro Yakyū S (Japan) [T-9523G]                                       | (powyaks)
 	  Jikuu Tantei DD: Dracula Detective: Maboroshi no Lorelei (Japan) [T-2103G]            | (jikudrac)
 	  Jinzou Ningen Hakaider: Last Judgement (Japan) [GS-9088]                              | (lastjudg)
 	  Jissen Mahjong (Japan) [T-15002G]                                                     | (jissenmj)
@@ -2594,6 +2594,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<description>Alien Trilogy (Japan)</description>
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
+		<info name="language" value="Japanese" />
 		<info name="serial" value="T-8113G"/>
 		<info name="release" value="19960830"/>
 		<info name="alt_title" value="エイリアントリロジー"/>
@@ -3464,6 +3465,27 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
+	<software name="delisoba" supported="yes">
+		<!-- Dates refers to build date, actual release unknown -->
+		<description>Delisoba Deluxe (Japan)</description>
+		<year>1997?</year>
+		<publisher>TBS</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Delisoba_Deluxe
+]]></notes>
+		<!-- From back cover (does it even have an actual spine?) -->
+		<info name="serial" value="610-6803"/>
+		<info name="release" value="19971028"/>
+		<info name="alt_title" value="デリソバ デラックス"/>
+		<info name="developer" value="Sega, Cave"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="delisoba deluxe (japan)" sha1="6b75366d5f5694d07603e3334ab603c78b077c8d" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Identifying Dennou Senki Virtual-On (Japan)... -->
 	<software name="vonj" cloneof="von" supported="no">
 		<description>Dennou Senki Virtual-On (Japan)</description>
@@ -3523,7 +3545,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="detana twinbee yahho  deluxe pack (japan) (3m)" sha1="eba96093ca1030f0d6cafb34c64567ec91851684" />
+				<disk name="detana twinbee yahho deluxe pack (japan) (3m)" sha1="eba96093ca1030f0d6cafb34c64567ec91851684" />
 			</diskarea>
 		</part>
 	</software>
@@ -9654,6 +9676,7 @@ Sega logo animation draws offset [VDP2]
 		<description>Alien Trilogy (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
+		<info name="language" value="Japanese" />
 		<info name="serial" value="T-8113G"/>
 		<info name="release" value="19960830"/>
 		<info name="alt_title" value="エイリアントリロジー"/>
@@ -14925,6 +14948,7 @@ Sega logo animation draws offset [VDP2]
 		<description>Alien Trilogy (Japan, alt 2)</description>
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
+		<info name="language" value="Japanese" />
 		<info name="serial" value="T-8113G"/>
 		<info name="release" value="19960830"/>
 		<info name="alt_title" value="エイリアントリロジー"/>
@@ -16450,7 +16474,7 @@ Sega logo animation draws offset [VDP2]
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="detana twinbee yahho  deluxe pack (t-9505g)" sha1="29b400fe6415db5dcba45b4c420fff24197f3284" />
+				<disk name="detana twinbee yahho deluxe pack (t-9505g)" sha1="29b400fe6415db5dcba45b4c420fff24197f3284" />
 			</diskarea>
 		</part>
 	</software>
@@ -18380,12 +18404,13 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Jikkyou Pawerful Puroyakyu '95 (J) (T-9502G)... -->
 	<software name="powyak95" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu '95 - Kaimaku-ban (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū '95 Kaimaku-ban (Japan)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9502G (VS001-J1)"/>
 		<info name="release" value="19950728"/>
 		<info name="alt_title" value="実況パワフルプロ野球'95 開幕版"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu '95 Kaimaku-ban"/> <!-- often used unofficially -->
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -18626,12 +18651,12 @@ Sega logo animation draws offset [VDP2]
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="koden koureijjyutsu  hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 1 (t-14324g)" sha1="4a7920d95cab3ea9234c0a54f364020ba328f980" />
+				<disk name="koden koureijjyutsu hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 1 (t-14324g)" sha1="4a7920d95cab3ea9234c0a54f364020ba328f980" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="koden koureijjyutsu  hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 2 (t-14324g)" sha1="48cb3c216397b3444f479980f7fab0b49283afa9" />
+				<disk name="koden koureijjyutsu hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 2 (t-14324g)" sha1="48cb3c216397b3444f479980f7fab0b49283afa9" />
 			</diskarea>
 		</part>
 	</software>
@@ -27090,12 +27115,13 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Jikkyou Powerful Pro Yakyuu S T-9523G... -->
 	<software name="powyaks" supported="no">
-		<description>Jikkyou Powerful Pro Yakyuu S (Japan)</description>
+		<description>Jikkyou Pawafuru Puro Yakyū S (Japan)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9523G (VS050-J1)"/>
 		<info name="release" value="19971204"/>
 		<info name="alt_title" value="実況パワフルプロ野球S"/>
+		<info name="alt_title" value="Jikkyou Powerful Pro Yakyuu S"/> <!-- often used unofficially -->
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -30175,6 +30201,7 @@ Sega logo animation draws offset [VDP2]
 		<description>Alien Trilogy (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="language" value="English/French/Italian/Spanish" />
 		<info name="serial" value="T-8113H-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
@@ -30189,6 +30216,7 @@ Sega logo animation draws offset [VDP2]
 		<description>Alien Trilogy (Germany)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="language" value="German" />
 		<info name="serial" value="T-8113H-18"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="sat_cdrom">
@@ -34263,7 +34291,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying CRIMEWAVE_demo... -->
 	<software name="crimewavd" cloneof="crimewav" supported="no">
-		<description>CrimeWave Playable Demonstration Disk (Europe)</description>
+		<description>CrimeWave Playable Demonstration Disk - Not For Resale (Europe)</description>
 		<year>1997</year>
 		<publisher>Eidos</publisher>
 		<info name="serial" value="610-6455"/>
@@ -34693,6 +34721,7 @@ Sega logo animation draws offset [VDP2]
 		<description>Alien Trilogy (USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="language" value="Japanese" />
 		<info name="serial" value="T-8113H"/>
 		<info name="release" value="199607xx"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -37185,7 +37214,7 @@ Sega logo animation draws offset [VDP2]
 	</software>
 
 	<!-- Identifying dw-sat-0856-Rayman-usa... -->
-	<software name="raymanu" supported="no">
+	<software name="raymanu" cloneof="rayman" supported="no">
 		<description>Rayman (USA)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
@@ -39076,7 +39105,7 @@ Sega logo animation draws offset [VDP2]
 	<!-- input / output cue/bin verified identical as of CHDMAN change made around 28th Dec 2015, except for
 	   the 'ISRC 904002100272' metadata line after 'TRACK 24 AUDIO' being ommitted from the cuesheet, we don't
 	   store that information -->
-	<software name="raymanp" supported="no"> <!-- the header lists 19950424, but elsewhere there are date stamps of 19950720 -->
+	<software name="raymanp" cloneof="rayman" supported="no"> <!-- the header lists 19950424, but elsewhere there are date stamps of 19950720 -->
 		<description>Rayman (prototype 19950720)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>

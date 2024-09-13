@@ -513,15 +513,6 @@ void lua_engine::initialize_input(sol::table &emu)
 
 	auto uiinput_type = sol().registry().new_usertype<ui_input_manager>("uiinput", sol::no_constructor);
 	uiinput_type.set_function("reset", &ui_input_manager::reset);
-	uiinput_type.set_function(
-		"find_mouse",
-		[] (ui_input_manager &ui)
-		{
-			int32_t x, y;
-			bool button;
-			render_target *rt = ui.find_mouse(&x, &y, &button);
-			return std::make_tuple(x, y, button, rt);
-		});
 	uiinput_type.set_function("pressed", &ui_input_manager::pressed);
 	uiinput_type.set_function("pressed_repeat", &ui_input_manager::pressed_repeat);
 	uiinput_type["presses_enabled"] = sol::property(&ui_input_manager::presses_enabled, &ui_input_manager::set_presses_enabled);

@@ -1,7 +1,7 @@
 // Common/NewHandler.h
 
-#ifndef __COMMON_NEW_HANDLER_H
-#define __COMMON_NEW_HANDLER_H
+#ifndef ZIP7_INC_COMMON_NEW_HANDLER_H
+#define ZIP7_INC_COMMON_NEW_HANDLER_H
 
 /*
 NewHandler.h and NewHandler.cpp allows to solve problem with compilers that
@@ -9,6 +9,16 @@ don't throw exception in operator new().
 
 This file must be included before any code that uses operators new() or delete()
 and you must compile and link "NewHandler.cpp", if you use some old MSVC compiler.
+
+DOCs:
+  Since ISO C++98, operator new throws std::bad_alloc when memory allocation fails.
+  MSVC 6.0 returned a null pointer on an allocation failure.
+  Beginning in VS2002, operator new conforms to the standard and throws on failure.
+
+  By default, the compiler also generates defensive null checks to prevent
+  these older-style allocators from causing an immediate crash on failure.
+  The /Zc:throwingNew option tells the compiler to leave out these null checks,
+  on the assumption that all linked memory allocators conform to the standard.
 
 The operator new() in some MSVC versions doesn't throw exception std::bad_alloc.
 MSVC 6.0 (_MSC_VER == 1200) doesn't throw exception.
@@ -36,13 +46,13 @@ void my_delete(void *p) throw();
 #endif
 
 
-#if defined(_MSC_VER) && (_MSC_VER < 1900)
+#if defined(_MSC_VER) && (_MSC_VER < 1600)
   // If you want to use default operator new(), you can disable the following line
-  #define _7ZIP_REDEFINE_OPERATOR_NEW
+  #define Z7_REDEFINE_OPERATOR_NEW
 #endif
 
 
-#ifdef _7ZIP_REDEFINE_OPERATOR_NEW
+#ifdef Z7_REDEFINE_OPERATOR_NEW
 
 // std::bad_alloc can require additional DLL dependency.
 // So we don't define CNewException as std::bad_alloc here.

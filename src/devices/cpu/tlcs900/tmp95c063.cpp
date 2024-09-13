@@ -176,64 +176,64 @@ void tmp95c063_device::device_config_complete()
 	}
 }
 
+enum
+{
+	INTE0AD,
+	INTE12,
+	INTE34,
+	INTE56,
+	INTE78,
+	INTET01,
+	INTET23,
+	INTET45,
+	INTET67,
+	INTET89,
+	INTETAB,
+	INTES0,
+	INTES1,
+	INTETC01,
+	INTETC23
+};
 
-
-#define TMP95C063_INTE0AD   0x0
-#define TMP95C063_INTE12    0x1
-#define TMP95C063_INTE34    0x2
-#define TMP95C063_INTE56    0x3
-#define TMP95C063_INTE78    0x4
-#define TMP95C063_INTET01   0x5
-#define TMP95C063_INTET23   0x6
-#define TMP95C063_INTET45   0x7
-#define TMP95C063_INTET67   0x8
-#define TMP95C063_INTET89   0x9
-#define TMP95C063_INTETAB   0xa
-#define TMP95C063_INTES0    0xb
-#define TMP95C063_INTES1    0xc
-#define TMP95C063_INTETC01  0xd
-#define TMP95C063_INTETC23  0xe
-
-
-#define TMP95C063_NUM_MASKABLE_IRQS 30
 static const struct {
 	uint8_t reg;
 	uint8_t iff;
 	uint8_t vector;
-} tmp95c063_irq_vector_map[TMP95C063_NUM_MASKABLE_IRQS] =
+} tmp95c063_irq_vector_map[] =
 {
-	{ TMP95C063_INTETC23, 0x80, 0xa0 },     /* INTTC3 */
-	{ TMP95C063_INTETC23, 0x08, 0x9c },     /* INTTC2 */
-	{ TMP95C063_INTETC01, 0x80, 0x98 },     /* INTTC1 */
-	{ TMP95C063_INTETC01, 0x08, 0x94 },     /* INTTC0 */
-	{ TMP95C063_INTE0AD, 0x80, 0x90 },      /* INTAD */
-	{ TMP95C063_INTES1, 0x80, 0x8c },       /* INTTX1 */
-	{ TMP95C063_INTES1, 0x08, 0x88 },       /* INTRX1 */
-	{ TMP95C063_INTES0, 0x80, 0x84 },       /* INTTX0 */
-	{ TMP95C063_INTES0, 0x08, 0x80 },       /* INTRX0 */
-	{ TMP95C063_INTETAB, 0x80, 0x7c },      /* INTTRB */
-	{ TMP95C063_INTETAB, 0x08, 0x78 },      /* INTTRA */
-	{ TMP95C063_INTET89, 0x80, 0x74 },      /* INTTR9 */
-	{ TMP95C063_INTET89, 0x80, 0x70 },      /* INTTR8 */
-	{ TMP95C063_INTET67, 0x80, 0x6c },      /* INTT7 */
-	{ TMP95C063_INTET67, 0x08, 0x68 },      /* INTT6 */
-	{ TMP95C063_INTET45, 0x80, 0x64 },      /* INTT5 */
-	{ TMP95C063_INTET45, 0x08, 0x60 },      /* INTT4 */
-	{ TMP95C063_INTET23, 0x80, 0x5c },      /* INTT3 */
-	{ TMP95C063_INTET23, 0x08, 0x58 },      /* INTT2 */
-	{ TMP95C063_INTET01, 0x80, 0x54 },      /* INTT1 */
-	{ TMP95C063_INTET01, 0x08, 0x50 },      /* INTT0 */
-	{ TMP95C063_INTE78, 0x80, 0x4c },       /* int8_t */
-	{ TMP95C063_INTE78, 0x08, 0x48 },       /* INT7 */
-	{ TMP95C063_INTE56, 0x80, 0x44 },       /* INT6 */
-	{ TMP95C063_INTE56, 0x08, 0x40 },       /* INT5 */
-								/* 0x3c - reserved */
-	{ TMP95C063_INTE34, 0x80, 0x38 },       /* INT4 */
-	{ TMP95C063_INTE34, 0x08, 0x34 },       /* INT3 */
-	{ TMP95C063_INTE12, 0x80, 0x30 },       /* INT2 */
-	{ TMP95C063_INTE12, 0x08, 0x2c },       /* INT1 */
-	{ TMP95C063_INTE0AD, 0x08, 0x28 }       /* INT0 */
+	{ INTETC23, 0x80, 0xa0 },     // INTTC3
+	{ INTETC23, 0x08, 0x9c },     // INTTC2
+	{ INTETC01, 0x80, 0x98 },     // INTTC1
+	{ INTETC01, 0x08, 0x94 },     // INTTC0
+	{ INTE0AD,  0x80, 0x90 },     // INTAD
+	{ INTES1,   0x80, 0x8c },     // INTTX1
+	{ INTES1,   0x08, 0x88 },     // INTRX1
+	{ INTES0,   0x80, 0x84 },     // INTTX0
+	{ INTES0,   0x08, 0x80 },     // INTRX0
+	{ INTETAB,  0x80, 0x7c },     // INTTRB
+	{ INTETAB,  0x08, 0x78 },     // INTTRA
+	{ INTET89,  0x80, 0x74 },     // INTTR9
+	{ INTET89,  0x80, 0x70 },     // INTTR8
+	{ INTET67,  0x80, 0x6c },     // INTT7
+	{ INTET67,  0x08, 0x68 },     // INTT6
+	{ INTET45,  0x80, 0x64 },     // INTT5
+	{ INTET45,  0x08, 0x60 },     // INTT4
+	{ INTET23,  0x80, 0x5c },     // INTT3
+	{ INTET23,  0x08, 0x58 },     // INTT2
+	{ INTET01,  0x80, 0x54 },     // INTT1
+	{ INTET01,  0x08, 0x50 },     // INTT0
+	{ INTE78,   0x80, 0x4c },     // INT8
+	{ INTE78,   0x08, 0x48 },     // INT7
+	{ INTE56,   0x80, 0x44 },     // INT6
+	{ INTE56,   0x08, 0x40 },     // INT5
+								  // 0x3c - reserved
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x08, 0x34 },     // INT3
+	{ INTE12,   0x80, 0x30 },     // INT2
+	{ INTE12,   0x08, 0x2c },     // INT1
+	{ INTE0AD,  0x08, 0x28 }      // INT0
 };
+static constexpr u8 NUM_MASKABLE_IRQS = sizeof(tmp95c063_irq_vector_map) / 3;
 
 void tmp95c063_device::tlcs900_handle_timers()
 {
@@ -277,7 +277,7 @@ void tmp95c063_device::tlcs900_handle_timers()
 				if ( ( m_t8_mode[0] & 0xc0 ) != 0x40 )
 				{
 					m_timer[0] = 0;
-					m_int_reg[TMP95C063_INTET01] |= 0x08;
+					m_int_reg[INTET01] |= 0x08;
 				}
 			}
 		}
@@ -307,7 +307,7 @@ void tmp95c063_device::tlcs900_handle_timers()
 			if ( m_timer[1] == m_t8_reg[1] )
 			{
 				m_timer[1] = 0;
-				m_int_reg[TMP95C063_INTET01] |= 0x80;
+				m_int_reg[INTET01] |= 0x80;
 
 				if ( m_t8_invert[0] & 0x02 )
 				{
@@ -354,7 +354,7 @@ void tmp95c063_device::tlcs900_handle_timers()
 				if ( ( m_t8_mode[1] & 0xc0 ) != 0x40 )
 				{
 					m_timer[2] = 0;
-					m_int_reg[TMP95C063_INTET23] |= 0x08;
+					m_int_reg[INTET23] |= 0x08;
 				}
 			}
 		}
@@ -384,7 +384,7 @@ void tmp95c063_device::tlcs900_handle_timers()
 			if ( m_timer[3] == m_t8_reg[3] )
 			{
 				m_timer[3] = 0;
-				m_int_reg[TMP95C063_INTET23] |= 0x80;
+				m_int_reg[INTET23] |= 0x80;
 
 				if ( m_t8_invert[1] & 0x20 )
 				{
@@ -434,7 +434,7 @@ void tmp95c063_device::tlcs900_check_irqs()
 	}
 
 	/* Check regular irqs */
-	for( i = 0; i < TMP95C063_NUM_MASKABLE_IRQS; i++ )
+	for( i = 0; i < NUM_MASKABLE_IRQS; i++ )
 	{
 		if ( m_int_reg[tmp95c063_irq_vector_map[i].reg] & tmp95c063_irq_vector_map[i].iff )
 		{
@@ -544,7 +544,7 @@ void tmp95c063_device::tlcs900_handle_ad()
 			m_ad_mode1 &= ~ 0x40;
 			m_ad_mode1 |= 0x80;
 
-			m_int_reg[TMP95C063_INTE0AD] |= 0x80;
+			m_int_reg[INTE0AD] |= 0x80;
 			m_check_irqs = 1;
 		}
 	}
@@ -1225,7 +1225,7 @@ uint8_t tmp95c063_device::sc0buf_r()
 void tmp95c063_device::sc0buf_w(uint8_t data)
 {
 	// Fake finish sending data
-	m_int_reg[TMP95C063_INTES0] |= 0x80;
+	m_int_reg[INTES0] |= 0x80;
 	m_check_irqs = 1;
 }
 
@@ -1270,7 +1270,7 @@ uint8_t tmp95c063_device::sc1buf_r()
 void tmp95c063_device::sc1buf_w(uint8_t data)
 {
 	// Fake finish sending data
-	m_int_reg[TMP95C063_INTES1] |= 0x80;
+	m_int_reg[INTES1] |= 0x80;
 	m_check_irqs = 1;
 }
 
@@ -1503,16 +1503,16 @@ void tmp95c063_device::execute_set_input(int input, int level)
 				{
 					/* Leave HALT state */
 					m_halted = 0;
-					m_int_reg[TMP95C063_INTE0AD] |= 0x08;
+					m_int_reg[INTE0AD] |= 0x08;
 				}
 			}
 			else
 			{
 				/* Level detect */
 				if (level == ASSERT_LINE)
-					m_int_reg[TMP95C063_INTE0AD] |= 0x08;
+					m_int_reg[INTE0AD] |= 0x08;
 				else
-					m_int_reg[TMP95C063_INTE0AD] &= ~ 0x08;
+					m_int_reg[INTE0AD] &= ~ 0x08;
 			}
 		}
 		m_level[TLCS900_INT0] = level;
@@ -1521,11 +1521,11 @@ void tmp95c063_device::execute_set_input(int input, int level)
 	case TLCS900_INT1:
 		if (m_level[TLCS900_INT1] == CLEAR_LINE && level == ASSERT_LINE)
 		{
-			m_int_reg[TMP95C063_INTE12] |= 0x08;
+			m_int_reg[INTE12] |= 0x08;
 		}
 		else if (m_level[TLCS900_INT1] == ASSERT_LINE && level == CLEAR_LINE)
 		{
-			m_int_reg[TMP95C063_INTE12] &= ~0x08;
+			m_int_reg[INTE12] &= ~0x08;
 		}
 		m_level[TLCS900_INT1] = level;
 		break;
@@ -1533,11 +1533,11 @@ void tmp95c063_device::execute_set_input(int input, int level)
 	case TLCS900_INT2:
 		if (m_level[TLCS900_INT2] == CLEAR_LINE && level == ASSERT_LINE)
 		{
-			m_int_reg[TMP95C063_INTE12] |= 0x80;
+			m_int_reg[INTE12] |= 0x80;
 		}
 		else if (m_level[TLCS900_INT2] == ASSERT_LINE && level == CLEAR_LINE)
 		{
-			m_int_reg[TMP95C063_INTE12] &= ~0x80;
+			m_int_reg[INTE12] &= ~0x80;
 		}
 		m_level[TLCS900_INT2] = level;
 		break;
@@ -1545,11 +1545,11 @@ void tmp95c063_device::execute_set_input(int input, int level)
 	case TLCS900_INT3:
 		if (m_level[TLCS900_INT3] == CLEAR_LINE && level == ASSERT_LINE)
 		{
-			m_int_reg[TMP95C063_INTE34] |= 0x08;
+			m_int_reg[INTE34] |= 0x08;
 		}
 		else if (m_level[TLCS900_INT3] == ASSERT_LINE && level == CLEAR_LINE)
 		{
-			m_int_reg[TMP95C063_INTE34] &= ~0x08;
+			m_int_reg[INTE34] &= ~0x08;
 		}
 		m_level[TLCS900_INT3] = level;
 		break;
@@ -1559,7 +1559,7 @@ void tmp95c063_device::execute_set_input(int input, int level)
 		{
 			if ( m_level[TLCS900_INT4] == CLEAR_LINE && level == ASSERT_LINE )
 			{
-				m_int_reg[TMP95C063_INTE34] |= 0x80;
+				m_int_reg[INTE34] |= 0x80;
 			}
 		}
 		m_level[TLCS900_INT4] = level;
@@ -1570,7 +1570,7 @@ void tmp95c063_device::execute_set_input(int input, int level)
 		{
 			if ( m_level[TLCS900_INT5] == CLEAR_LINE && level == ASSERT_LINE )
 			{
-				m_int_reg[TMP95C063_INTE56] |= 0x08;
+				m_int_reg[INTE56] |= 0x08;
 			}
 		}
 		m_level[TLCS900_INT5] = level;
@@ -1579,11 +1579,11 @@ void tmp95c063_device::execute_set_input(int input, int level)
 	case TLCS900_INT6:
 		if (m_level[TLCS900_INT6] == CLEAR_LINE && level == ASSERT_LINE)
 		{
-			m_int_reg[TMP95C063_INTE56] |= 0x80;
+			m_int_reg[INTE56] |= 0x80;
 		}
 		else if (m_level[TLCS900_INT6] == ASSERT_LINE && level == CLEAR_LINE)
 		{
-			m_int_reg[TMP95C063_INTE56] &= ~0x80;
+			m_int_reg[INTE56] &= ~0x80;
 		}
 		m_level[TLCS900_INT6] = level;
 		break;

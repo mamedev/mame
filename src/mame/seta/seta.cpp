@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-/***************************************************************************
+/*******************************************************************************
 
                             -= Seta Hardware =-
 
@@ -77,7 +77,7 @@ P0-122A  (SZR-001)      95 Zombie Raid                          American Sammy
 (7) Bad tilemaps colors in demo mode are real game bug. Fade-in and fade-out "bad" colors are also right.
     Bad sprites priorities are real game bugs. The bad-looking colors in Jurane stage are right.
 
-****************************************************************************
+*******************************************************************************
 
 Notes:
 - jjsquawk is modified from jjsquawko so nuts don't fall from the trees shaken by white animal.
@@ -124,7 +124,7 @@ TODO:
   stage 2: when BOX-MEN gets angry
 - games using 6bpp gfx switch tilemaps color mode. Only blandia uses both, while the other ones use only mode 1, thus mode 0 is untested for them
 
-****************************************************************************
+*******************************************************************************
 
 Note:   if MAME_DEBUG is defined, pressing Z with:
 
@@ -251,12 +251,9 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
                         7654 3210       High Bit Of X For Columns f-8
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                Dragon Unit
-                     [Prototype of "Castle Of Dragon"]
+Dragon Unit [Prototype of "Castle Of Dragon"]
 
 PCB:    P0-053-1
 CPU:    68000-8
@@ -265,11 +262,9 @@ OSC:    16.0000MHz
 
 Chips:  X1-001A, X1-002A, X1-004, X1-006, X1-007, X1-010, X1-011, X1-012
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                    Wit's
+Wit's
 
 (c)1989 Athena (distributed by Visco)
 P0-055B (board is made by Seta)
@@ -296,11 +291,9 @@ Custom chips:   X1-001A     X1-002A
                 X1-007
                 X1-010
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                            Thunder & Lightning
+Thunder & Lightning
 
 Location      Device      File ID      Checksum
 -----------------------------------------------
@@ -323,11 +316,9 @@ Custom: X1-001A     X1-002A
         X1-007
         X1-010
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                Athena no Hatena?
+Athena no Hatena?
 
 CPU  : 68000-16
 Sound: X1-010
@@ -346,11 +337,7 @@ Chips:  X1-001A X1-002A
         X1-007
         X1-010
 
-***************************************************************************/
-
-/***************************************************************************
-
-                                Blandia
+*******************************************************************************
 
 Blandia by Allumer
 
@@ -358,11 +345,9 @@ This set is coming from an original Blandia PCB ref : P0-078A
 
 As usually, it use a lot of customs allumer chips !
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                Blandia (prototype)
+Blandia (prototype)
 
 PCB:    P0-072-2
 CPU:    68000-16
@@ -375,11 +360,9 @@ Chips:  X1-001A     X1-002A
         X1-010
         X1-011 x2   X1-012 x2
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                    Block Carnival / Thunder & Lightning 2
+Block Carnival / Thunder & Lightning 2
 
 P0-068B, M6100723A
 
@@ -406,11 +389,9 @@ Custom chips:   X1-001A X1-002A
 Other:
 Lithium battery x1
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                            Daioh
+Daioh
 
 DAIOH
 Allumer 1993, Sammy license
@@ -429,11 +410,9 @@ FG-001-007
 
                             X1-007  X1-004
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                Eight Forces
+Eight Forces
 
 P0-079A (Same board as ZingZingZip)
 
@@ -468,11 +447,9 @@ Custom:     X1-001A X1-002A
             X1-010
             X1-011 (x2)     X1-012 (x2)
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                Extreme Downhill
+Extreme Downhill
 
 (c)1995 Sammy
 DH-01
@@ -505,11 +482,9 @@ Custom chips:   X1-001A     X1-002A
                 X1-010
                 X1-011 (x2) X1-012 (x2)
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                    GundHara
+GundHara
 
 (C) 1995 Banpresto
 Seta/Allumer Hardware
@@ -546,9 +521,7 @@ BPGH-011.U67    TC538000
 BPGH-012.U68    TC5316200
 BPGH-013.U70    TC538000
 
-***************************************************************************/
-
-/***************************************************************************
+*******************************************************************************
 
 Zombie Raid
 Sammy, 1996
@@ -585,11 +558,9 @@ Notes:
 *     = These ROMs located on a small daughterboard. Main PCB locations used as filename extension.
 CONN1 = 8 pin header for gun connection
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                J.J. Squawkers
+J.J. Squawkers
 
 68HC000N -16N
 
@@ -604,11 +575,10 @@ X1-004
 
 NEC 71054C  ----???
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
+Kamen Rider
 
-                                Kamen Rider
 Kamen Riderclub Battleracer
 Banpresto, 1993
 Hardware info by Guru
@@ -636,11 +606,9 @@ ROMs  :
         FJ001006.22     16M Mask    gfx
         FJ001005.21     16M Mask    gfx
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                Krazy Bowl
+Krazy Bowl
 
 PCB:    SKB-001
         P0-114A
@@ -662,11 +630,9 @@ FV 001 006
 X1-010           X1-006
                  X1-007      X1-004
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                    Mad Shark
+Mad Shark
 
 Allumer, 1993
 This game is a vertical shoot'em-up and runs on fairly standard Allumer hardware.
@@ -697,11 +663,9 @@ P0-102A
 Notes:
       *: 4 jumper pads for region selection (hardwired)
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                               Magical Speed
+Magical Speed
 
 (c)1994 Allumer
 
@@ -752,11 +716,9 @@ PAL   :FU-011 @ U50
        FU-014 @ u53
        FU-015 @ U54
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                            Mobile Suit Gundam
+Mobile Suit Gundam
 
 Banpresto 1993
 P0-081A
@@ -779,11 +741,9 @@ FA-001-004    X1-011  X1-012  5160
   X1-010
                     X1-007   X1-004     X1-005
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                            Oishii Puzzle Ha Irimasenka
+Oishii Puzzle Ha Irimasenka
 
 PCB  : P0-097A
 CPU  : 68000
@@ -798,11 +758,9 @@ Custom chips:   X1-001A X1-002A
                 X1-010
                 X1-011 (x2) X1-012 (x2)
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                            Triple Fun
+Triple Fun
 
 Triple Fun
 ??, 19??
@@ -826,11 +784,9 @@ ROMs  :
 02.bin + 03.bin    OKI Samples
 06.bin to 11.bin   GFX
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                Quiz Kokology
+Quiz Kokology
 
 (c)1992 Tecmo
 
@@ -846,11 +802,9 @@ Custom chips:   X1-001A X1-002A
                 X1-010
                 X1-011  X1-012
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                Quiz Koko-logy 2
+Quiz Koko-logy 2
 
 (c)1992 Tecmo
 
@@ -874,11 +828,9 @@ Custom chips:   X1-001A     X1-002A
                 X1-010
                 X1-011      X1-012
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                Rezon (Japan)
+Rezon (Japan)
 
 PCB     : P0-063A
 CPU     : TOSHIBA TMP68HC000N-16
@@ -890,11 +842,9 @@ Other   : Allumer
             X1-007
             X1-011 x 2      X1-012 x 2
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                            SD Gundam Neo Battling
+SD Gundam Neo Battling
 
 Banpresto, 1992
 This game runs on Seta/Allumer hardware
@@ -931,11 +881,9 @@ Notes:
       VSync: 58Hz
       HSync: 15.22kHz
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                            Sokonuke Taisen Game (Japan)
+Sokonuke Taisen Game (Japan)
 
 (c)1995 Sammy
 
@@ -943,11 +891,9 @@ CPU:    68HC000
 Sound:  All PCM ?
 OSC:    16MHz
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                Strike Gunner
+Strike Gunner
 
 (c)1991 Athena (distributed by Tecmo)
 
@@ -963,11 +909,9 @@ Custom chips:   X1-001A X1-002A
                 X1-010
                 X1-011  X1-012
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                Ultraman Club
+Ultraman Club
 
 Banpresto, 1992
 Board looks similar to Castle of Dragon PCB.
@@ -1001,9 +945,7 @@ BP-U-002.U2       4M mask (40 pin, 512k x 8), read as MX27C4100        /
 
 BP-U-003.U13      8M mask (32 pin, 1M x 8),   read as MX27C8000           Sound
 
-***************************************************************************/
-
-/***************************************************************************
+*******************************************************************************
 
 Ultra Toukon Densetsu
 Banpresto, 1993
@@ -1049,12 +991,10 @@ Notes:
 1.048.576 93uta07.68
 1.048.576 93uta08.69
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                               War of Aero
-                            Project M E I O U
+War of Aero
+Project M E I O U
 
 93111A  YANG CHENG
 
@@ -1071,11 +1011,9 @@ Other : Allumer
             C324C
             D71054C
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                                Zing Zing Zip
+Zing Zing Zip
 
 P0-079A
 
@@ -1097,7 +1035,7 @@ X1-010                           5168-10       68000-16
 
                              X1-007    X1-004
 
-***************************************************************************
+*******************************************************************************
 
 Pairs Love
 Allumer, 199x
@@ -1134,7 +1072,7 @@ Notes:
       68000 clock: 8.000MHz
       VSync: 60Hz
 
-***************************************************************************
+*******************************************************************************
 
 Rezon (Taito License)
 Allumer / Taito, 1992
@@ -1208,9 +1146,7 @@ Notes:
 
             US001009.U70     4M MaskROM (DIP32)   PCM Samples
 
-***************************************************************************/
-
-/***************************************************************************
+*******************************************************************************
 
 Crazy Fight
 Subsino 1996
@@ -1266,11 +1202,9 @@ Notes:
       HSync        - 15.1433kHz
       VSync        - 59.1851Hz
 
-***************************************************************************/
+*******************************************************************************
 
-/***************************************************************************
-
-                               International Toote
+International Toote
 
 Main PCB (P0-058C):
 
@@ -1297,7 +1231,7 @@ Horse Race I/O Expansion (PCB-HRE-000):
 Note: on screen copyright is (c)1998 Coinmaster.
       The I/O board has      (c)1993 Coinmaster.
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -1439,7 +1373,6 @@ protected:
 	void seta_vregs_w(u8 data);
 	u16 seta_dsw_r(offs_t offset);
 
-	u16 zingzipbl_unknown_r();
 	void blockcar_interrupt_w(u8 data);
 	u16 extdwnhl_watchdog_r();
 	void utoukond_sound_control_w(u8 data);
@@ -2497,41 +2430,36 @@ void zombraid_state::zombraid_x1_map(address_map &map)
 	map(0x80000, 0xfffff).bankr("x1_bank");
 }
 
-u16 seta_state::zingzipbl_unknown_r()
-{
-	return 0x0000;
-}
-
 void seta_state::zingzipbl_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                             // ROM (up to 2MB)
-	map(0x200000, 0x20ffff).ram().share("workram");       // RAM (pointer for zombraid crosshair hack)
-//  map(0x400000, 0x400001).port_r("P1");                 // P1
-//  map(0x400002, 0x400003).port_r("P2");                 // P2
-	map(0x400002, 0x400003).r(FUNC(seta_state::zingzipbl_unknown_r));       // P2
-//  map(0x400004, 0x400005).port_r("COINS");              // Coins
-	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
-	map(0x500003, 0x500003).w(FUNC(seta_state::seta_vregs_w));              // Video Registers
-	map(0x500004, 0x500005).nopw();
-	//map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));              // DSW
-	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
-	map(0x800000, 0x803fff).ram().w(m_layers[0], FUNC(x1_012_device::vram_w)).share("layer1"); // VRAM 0&1
-	map(0x880000, 0x883fff).ram().w(m_layers[1], FUNC(x1_012_device::vram_w)).share("layer2"); // VRAM 2&3
-	map(0x900000, 0x900005).rw(m_layers[0], FUNC(x1_012_device::vctrl_r), FUNC(x1_012_device::vctrl_w));     // VRAM 0&1 Ctrl
+	map(0x000000, 0x07ffff).rom(); // ok
+	map(0x200000, 0x20ffff).ram(); // ok
+	// TODO: coins (possibly 0x400000). For now only free-play 'works'.
+	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_lockout_w)); // ok
+	map(0x500003, 0x500003).w(FUNC(seta_state::seta_vregs_w)); // maybe?
+	map(0x700400, 0x700fff).ram().share("paletteram1"); // ok
+	map(0x800000, 0x803fff).ram().w(m_layers[0], FUNC(x1_012_device::vram_w)).share("layer1"); // ok
+	map(0x880000, 0x883fff).ram().w(m_layers[1], FUNC(x1_012_device::vram_w)).share("layer2"); // ok
+	map(0x902001, 0x902001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // should be ok, but bad ROM
+	// the following appear to be video registers, but laid out differently than in the original. Trampoline galore for now. TODO: verify
+	map(0x902004, 0x902005).lw16(NAME([this] (offs_t offset, uint16_t data, uint16_t mem_mask) { m_layers[1]->vctrl_w(1, data, mem_mask); }));
+	map(0x902006, 0x902007).lw16(NAME([this] (offs_t offset, uint16_t data, uint16_t mem_mask) { m_layers[1]->vctrl_w(0, data, mem_mask); }));
+	map(0x902008, 0x902009).lw16(NAME([this] (offs_t offset, uint16_t data, uint16_t mem_mask) { m_layers[0]->vctrl_w(1, data, mem_mask); }));
+	map(0x90200a, 0x90200b).lw16(NAME([this] (offs_t offset, uint16_t data, uint16_t mem_mask) { m_layers[0]->vctrl_w(0, data, mem_mask); }));
+	map(0x900004, 0x900005).lw16(NAME([this] (offs_t offset, uint16_t data, uint16_t mem_mask) { m_layers[0]->vctrl_w(2, data, mem_mask); }));
+	map(0x980004, 0x980005).lw16(NAME([this] (offs_t offset, uint16_t data, uint16_t mem_mask) { m_layers[1]->vctrl_w(2, data, mem_mask); }));
+	map(0x902010, 0x902013).r(FUNC(seta_state::seta_dsw_r)); // ok
+	map(0x902014, 0x902015).portr("P1"); // ok
+	map(0x902016, 0x902017).portr("P2"); // ok
 
-	//map(0x902006, 0x902007).w // writes 0 here on start up
-	map(0x902010, 0x902013).r(FUNC(seta_state::zingzipbl_unknown_r));
-
-	map(0x980000, 0x980005).rw(m_layers[1], FUNC(x1_012_device::vctrl_r), FUNC(x1_012_device::vctrl_w));     // VRAM 2&3 Ctrl
+	// TODO: sprites also seem to have different registers, need correct implementation
 	map(0xa00000, 0xa005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16));     // Sprites Y
 	map(0xa00600, 0xa00607).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r16), FUNC(x1_001_device::spritectrl_w16));
 	map(0xa00608, 0xa00fff).ram(); // zeroed on start up
-	map(0xa00600, 0xa00607).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r16), FUNC(x1_001_device::spritectrl_w16));
-	map(0xa80000, 0xa80001).ram();                             // ? 0x4000
 	map(0xb00000, 0xb03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xc00000, 0xc000ff).ram(); // zeroed on startup
-	map(0xe00000, 0xe00001).nopw();                        // ? VBlank IRQ Ack
-	map(0xf00000, 0xf00001).nopw();                        // ? Sound  IRQ Ack
+
+	map(0xc00000, 0xc000ff).ram(); // zeroed on startup, doesn't seem to be used later
+	map(0xe00000, 0xe00001).w(m_watchdog, FUNC(watchdog_timer_device::reset16_w));
 }
 
 void seta_state::jjsquawb_map(address_map &map)
@@ -4649,7 +4577,7 @@ static INPUT_PORTS_START( setaroul )
 	PORT_SERVICE( 0x08, 0x08 )                          PORT_DIPLOCATION("SW2:1") // service mode
 
 	PORT_START("COIN") // d40009.b
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // medal (causes hopper over run / empty if the dsw is on)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // medal (causes hopper over run / empty if the dsw is on)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset")         // rst     (button SW5? Press twice quickly to enter the keyboard test)
 	PORT_DIPNAME( 0x04, 0x04, "Credit Meter" )    PORT_DIPLOCATION("SW6:1")  // crt.mtr (switch SW6? Shows stats screen. With added menus, if their dsw is on)
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
@@ -6960,7 +6888,7 @@ static INPUT_PORTS_START( jockeyc )
 	PORT_START("COIN") // 200002.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) // Coin Drop - 1P
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) // Hopper Overflow - 1P
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper1", ticket_dispenser_device, line_r) // Hopper Coin Out - 1P
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper1", ticket_dispenser_device, line_r) // Hopper Coin Out - 1P
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER   ) // Attendant Pay - 1P
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin B - 1P")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin A - 1P")
@@ -6968,7 +6896,7 @@ static INPUT_PORTS_START( jockeyc )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) // Coin Sense 1 - 1P
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM ) // Coin Drop - 2P
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // Sel Sense (single hopper mode) / Hopper Overflow - 2P (double hopper mode)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper2", ticket_dispenser_device, line_r) // Hopper Coin Out - 2P (double hopper mode)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper2", ticket_dispenser_device, line_r) // Hopper Coin Out - 2P (double hopper mode)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER   ) // Attendant Pay - 2P
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Coin B - 2P")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Coin A - 2P")
@@ -7871,7 +7799,7 @@ void setaroul_state::setaroul(machine_config &config)
 	// devices
 	UPD4992(config, m_rtc, 32'768); // ! Actually D4911C !
 	ACIA6850(config, "acia0", 0);
-	TICKET_DISPENSER(config, "hopper", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, "hopper", attotime::from_msec(150));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8897,21 +8825,18 @@ void seta_state::utoukond(machine_config &config)
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 	m_soundlatch->set_separate_acknowledge(true);
 
 	X1_010(config, m_x1snd, 16000000);
-	m_x1snd->add_route(0, "lspeaker", 1.0);
-	m_x1snd->add_route(1, "rspeaker", 1.0);
+	m_x1snd->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ym3438_device &ymsnd(YM3438(config, "ymsnd", 16000000/4)); // 4 MHz
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", 16000000/2)); // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-	ymsnd.add_route(0, "lspeaker", 0.30);
-	ymsnd.add_route(1, "rspeaker", 0.30);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
 
@@ -9016,11 +8941,12 @@ void seta_state::zingzipbl(machine_config &config)
 	m_spritegen->set_info(gfx_zingzipbl_sprites);
 	m_layers[0]->set_info(gfx_zingzipbl_layer1);
 	m_layers[1]->set_info(gfx_zingzipbl_layer2);
+	// TODO: layers x and y offsets' adjustments
 
 	M68000(config.replace(), m_maincpu, 16000000);   // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::zingzipbl_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
-	subdevice<screen_device>("screen")->screen_vblank().set_nop();
+
+	subdevice<screen_device>("screen")->screen_vblank().set_inputline(m_maincpu, 6, HOLD_LINE); // TODO: there's probably more than this
 
 	config.device_remove("x1snd");
 
@@ -9165,8 +9091,8 @@ void jockeyc_state::jockeyc(machine_config &config)
 	// devices
 	UPD4992(config, m_rtc, 32'768); // ! Actually D4911C !
 	ACIA6850(config, "acia0", 0);
-	TICKET_DISPENSER(config, "hopper1", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
-	TICKET_DISPENSER(config, "hopper2", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, "hopper1", attotime::from_msec(150));
+	TICKET_DISPENSER(config, "hopper2", attotime::from_msec(150));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9734,8 +9660,8 @@ ROM_START( zingzipbl )
 	ROM_COPY( "gfxtemp", 0x080000, 0x000000, 0x80000 )
 	ROM_COPY( "gfxtemp", 0x180000, 0x080000, 0x80000 )
 
-	ROM_REGION( 0x100000, "oki", 0 )    // OKI Samples - Not Seta
-	ROM_LOAD( "8",  0x000000, 0x40000, CRC(7927a200) SHA1(fd6163d2867959ec14b418d6207ae024afd3b654) )
+	ROM_REGION( 0x40000, "oki", 0 )    // OKI Samples - Not Seta
+	ROM_LOAD( "8", 0x00000, 0x40000, BAD_DUMP CRC(7927a200) SHA1(fd6163d2867959ec14b418d6207ae024afd3b654) ) // BADADDR      xxxxxxxxxxxxxxx-xx
 ROM_END
 
 ROM_START( atehate )
@@ -11309,8 +11235,8 @@ void jockeyc_state::init_inttoote()
 
 ***************************************************************************/
 
-GAME( 1989?, setaroul,  0,        setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "Visco",                     "The Roulette (Visco)", MACHINE_CLICKABLE_ARTWORK )
-GAME( 1989?, setaroula, setaroul, setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "hack (CODERE)",             "Super Ruleta 36 (Spanish hack of The Roulette)", MACHINE_CLICKABLE_ARTWORK )
+GAME( 1989?, setaroul,  0,        setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "Visco",                     "The Roulette (Visco)", 0 )
+GAME( 1989?, setaroula, setaroul, setaroul,  setaroul,  setaroul_state, empty_init,    ROT270, "hack (CODERE)",             "Super Ruleta 36 (Spanish hack of The Roulette)", 0 )
 
 GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_init,     ROT0,   "Athena / Seta",             "Dragon Unit / Castle of Dragon", 0 ) // Country/License: DSW
 
@@ -11324,17 +11250,17 @@ GAME( 1990, thunderlbl2,thunderl,thunderlbl,thunderl,  thunderl_state, empty_ini
 GAME( 1994, wiggie,    0,        wiggie,    thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Wiggie Waggie", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1994, superbar,  wiggie,   superbar,  thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Super Bar", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 
-GAME( 1990, jockeyc,   0,        jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "Seta (Visco license)",      "Jockey Club (v1.18)", MACHINE_CLICKABLE_ARTWORK )
-GAME( 1993, inttoote2, jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "bootleg (Coinmaster)",      "International Toote II (v1.24, P387.V01)", MACHINE_CLICKABLE_ARTWORK )
-GAME( 1998, inttoote,  jockeyc,  inttoote,  inttoote,  jockeyc_state,  init_inttoote,  ROT0,   "bootleg (Coinmaster)",      "International Toote (Germany, P523.V01)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_CLICKABLE_ARTWORK )
-GAME( 1990, gderby,    jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "hack (CODERE)",             "Gran Derby (Spanish hack of Jockey Club)", MACHINE_CLICKABLE_ARTWORK )
+GAME( 1990, jockeyc,   0,        jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "Seta (Visco license)",      "Jockey Club (v1.18)", 0 )
+GAME( 1993, inttoote2, jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "bootleg (Coinmaster)",      "International Toote II (v1.24, P387.V01)", 0 )
+GAME( 1998, inttoote,  jockeyc,  inttoote,  inttoote,  jockeyc_state,  init_inttoote,  ROT0,   "bootleg (Coinmaster)",      "International Toote (Germany, P523.V01)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1990, gderby,    jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "hack (CODERE)",             "Gran Derby (Spanish hack of Jockey Club)", 0 )
 
 GAME( 1992, rezon,     0,        rezon,     rezon,     seta_state,     empty_init,     ROT0,   "Allumer",                   "Rezon", 0 ) // License: Jumper
 GAME( 1991, rezono,    rezon,    rezon,     rezon,     seta_state,     empty_init,     ROT0,   "Allumer",                   "Rezon (earlier)", 0 ) // ""
 
 GAME( 1991, stg,       0,        stg,       stg,       seta_state,     empty_init,     ROT270, "Athena / Tecmo",            "Strike Gunner S.T.G", 0 )
 
-GAME( 1991, pairlove,  0,        pairlove,  pairlove,  pairlove_state, empty_init,     ROT270, "Athena",                    "Pairs Love", 0 )
+GAME( 1991, pairlove,  0,        pairlove,  pairlove,  pairlove_state, empty_init,     ROT270, "Athena / Nihon System",     "Pairs Love", 0 ) // Non-explicit Nihon System credit on title screen thru logo
 
 GAME( 1992, blandia,   0,        blandia,   blandia,   seta_state,     init_bankx1,    ROT0,   "Allumer",                   "Blandia", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, blandiap,  blandia,  blandiap,  blandia,   seta_state,     init_bankx1,    ROT0,   "Allumer",                   "Blandia (prototype)", MACHINE_IMPERFECT_GRAPHICS )
@@ -11344,12 +11270,12 @@ GAME( 1992, blockcarb, blockcar, blockcarb, blockcar,  seta_state,     empty_ini
 
 GAME( 1992, qzkklogy,  0,        qzkklogy,  qzkklogy,  seta_state,     empty_init,     ROT0,   "Tecmo",                     "Quiz Kokology", 0 )
 
-GAME( 1992, neobattl,  0,        umanclub,  neobattl,  seta_state,     empty_init,     ROT270, "Banpresto / Sotsu Agency. Sunrise", "SD Gundam Neo Battling (Japan)", 0 )
+GAME( 1992, neobattl,  0,        umanclub,  neobattl,  seta_state,     empty_init,     ROT270, "Banpresto",                 "SD Gundam Neo Battling (Japan)", 0 )
 
-GAME( 1992, umanclub,  0,        umanclub,  umanclub,  seta_state,     empty_init,     ROT0,   "Banpresto / Tsuburaya Productions", "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
+GAME( 1992, umanclub,  0,        umanclub,  umanclub,  seta_state,     empty_init,     ROT0,   "Banpresto",                 "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
 
 GAME( 1992, zingzip,   0,        zingzip,   zingzip,   seta_state,     empty_init,     ROT270, "Allumer / Tecmo",           "Zing Zing Zip (World) / Zhen Zhen Ji Pao (China?)", 0 ) // This set has Chinese Characters in Title screen, it distributed for Chinese market/or Title: DSW?
-GAME( 1992, zingzipbl, zingzip,  zingzipbl, zingzip,   seta_state,     empty_init,     ROT270, "bootleg",                   "Zing Zing Zip (bootleg)", MACHINE_NOT_WORKING )
+GAME( 1992, zingzipbl, zingzip,  zingzipbl, zingzip,   seta_state,     empty_init,     ROT270, "bootleg",                   "Zing Zing Zip (bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // different video registers, bad Oki ROM dump
 
 GAME( 1993, atehate,   0,        atehate,   atehate,   seta_state,     empty_init,     ROT0,   "Athena",                    "Athena no Hatena?", 0 )
 
@@ -11366,7 +11292,7 @@ GAME( 1999, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_ini
 GAME( 1999, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg (Daigom Games)",    "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race / Kamen Rider Club Battle Racer", 0 )
+GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto",                 "Masked Riders Club Battle Race / Kamen Rider Club Battle Racer", 0 )
 
 GAME( 1993, madshark,  0,        madshark,  madshark,  seta_state,     empty_init,     ROT270, "Allumer",                   "Mad Shark", 0 )
 GAME( 1993, madsharkbl,madshark, madsharkbl,madshark,  seta_state,     init_madsharkbl,ROT270, "bootleg",                   "Mad Shark (bootleg)", MACHINE_IMPERFECT_SOUND ) // no BGM. Wrong Oki banking?
@@ -11382,7 +11308,7 @@ GAME( 1993, triplfunk, oisipuzl, triplfun,  oisipuzl,  seta_state,     empty_ini
 
 GAME( 1993, qzkklgy2,  0,        qzkklgy2,  qzkklgy2,  seta_state,     empty_init,     ROT0,   "Tecmo",                     "Quiz Kokology 2", 0 )
 
-GAME( 1993, utoukond,  0,        utoukond,  utoukond,  seta_state,     empty_init,     ROT0,   "Banpresto / Tsuburaya Productions", "Ultra Toukon Densetsu (Japan)", 0 )
+GAME( 1993, utoukond,  0,        utoukond,  utoukond,  seta_state,     empty_init,     ROT0,   "Banpresto",                 "Ultra Toukon Densetsu (Japan)", 0 )
 
 GAME( 1993, wrofaero,  0,        wrofaero,  wrofaero,  seta_state,     empty_init,     ROT270, "Yang Cheng",                "War of Aero - Project MEIOU", 0 )
 
@@ -11406,6 +11332,6 @@ GAME( 1995, sokonuke,  0,        extdwnhl,  sokonuke,  seta_state,     empty_ini
 
 GAME( 1995, zombraid,  0,        zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
 GAME( 1995, zombraidp, zombraid, zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
-GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
+GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "Sammy Industries",          "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
 
 GAME( 1996, crazyfgt,  0,        crazyfgt,  crazyfgt,  crazyfgt_state, empty_init,     ROT0,   "Subsino",                   "Crazy Fight", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

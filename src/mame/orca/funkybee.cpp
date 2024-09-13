@@ -146,8 +146,6 @@ private:
 };
 
 
-// video
-
 void funkybee_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
@@ -289,8 +287,6 @@ uint32_t funkybee_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// machine
-
 uint8_t funkybee_state::input_port_0_r()
 {
 	if (!machine().side_effects_disabled())
@@ -388,6 +384,8 @@ static INPUT_PORTS_START( funkybeeb )
 	PORT_DIPSETTING(    0x00, "4" )
 INPUT_PORTS_END
 
+// NOTE: available manual claims Lives 3-6 as per skylancre set, without an explicit mention to Esco Trading.
+// Is current skylancr set an earlier/location test rev? Also cfr. arguably worse enemy colors right off the bat.
 static INPUT_PORTS_START( skylancr )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -425,7 +423,7 @@ static INPUT_PORTS_START( skylancr )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:4,3") // Also affects bonus life
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:4,3") // Also affects bonus life
 	PORT_DIPSETTING(    0x30, "1" )             // Bonus life at 20000 and 50000
 	PORT_DIPSETTING(    0x20, "2" )             // Bonus life at 20000 and 50000
 	PORT_DIPSETTING(    0x10, "3" )             // Bonus life at 40000 and 70000

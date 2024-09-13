@@ -10,7 +10,9 @@
 
 #include "emu.h"
 #include "midiin.h"
+
 #include "osdepend.h"
+
 
 /***************************************************************************
     IMPLEMENTATION
@@ -183,11 +185,9 @@ std::pair<std::error_condition, std::string> midiin_device::call_load()
 	}
 	else
 	{
-		m_midi = machine().osd().create_midi_device();
-
-		if (!m_midi->open_input(filename()))
+		m_midi = machine().osd().create_midi_input(filename());
+		if (!m_midi)
 		{
-			m_midi.reset();
 			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		}
 
@@ -202,11 +202,7 @@ std::pair<std::error_condition, std::string> midiin_device::call_load()
 
 void midiin_device::call_unload()
 {
-	if (m_midi)
-	{
-		m_midi->close();
-	}
-	else
+	if (!m_midi)
 	{
 		// send "all notes off" CC if unloading a MIDI file
 		for (u8 channel = 0; channel < 0x10; channel++)
@@ -346,8 +342,8 @@ u8 midiin_device::midi_parser::byte()
 	check_bounds(1);
 
 	u8 result = 0;
-	std::size_t actual = 0;
-	if (m_stream.read_at(m_offset, &result, 1, actual) || actual != 1)
+	auto const [err, actual] = read_at(m_stream, m_offset, &result, 1);
+	if (err || actual != 1)
 		throw error("Error reading data");
 	m_offset++;
 	return result;
@@ -363,8 +359,8 @@ u16 midiin_device::midi_parser::word_be()
 	check_bounds(2);
 
 	u16 result = 0;
-	std::size_t actual = 0;
-	if (m_stream.read_at(m_offset, &result, 2, actual) || actual != 2)
+	auto const [err, actual] = read_at(m_stream, m_offset, &result, 2);
+	if (err || actual != 2)
 		throw error("Error reading data");
 	m_offset += 2;
 	return big_endianize_int16(result);
@@ -380,8 +376,8 @@ u32 midiin_device::midi_parser::triple_be()
 	check_bounds(3);
 
 	u32 result = 0;
-	std::size_t actual = 0;
-	if (m_stream.read_at(m_offset, &result, 3, actual) || actual != 3)
+	auto const [err, actual] = read_at(m_stream, m_offset, &result, 3);
+	if (err || actual != 3)
 		throw error("Error reading data");
 	m_offset += 3;
 	return big_endianize_int32(result) >> 8;
@@ -397,8 +393,8 @@ u32 midiin_device::midi_parser::dword_be()
 	check_bounds(4);
 
 	u32 result = 0;
-	std::size_t actual = 0;
-	if (m_stream.read_at(m_offset, &result, 4, actual) || actual != 4)
+	auto const [err, actual] = read_at(m_stream, m_offset, &result, 4);
+	if (err || actual != 4)
 		throw error("Error reading data");
 	m_offset += 4;
 	return big_endianize_int32(result);
@@ -414,8 +410,8 @@ u32 midiin_device::midi_parser::dword_le()
 	check_bounds(4);
 
 	u32 result = 0;
-	std::size_t actual = 0;
-	if (m_stream.read_at(m_offset, &result, 4, actual) || actual != 4)
+	auto const [err, actual] = read_at(m_stream, m_offset, &result, 4);
+	if (err || actual != 4)
 		throw error("Error reading data");
 	m_offset += 4;
 	return little_endianize_int32(result);

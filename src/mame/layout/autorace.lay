@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -14,7 +15,6 @@ license:CC0-1.0
 	</element>
 
 	<element name="gear" defstate="3">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
 		<text state="3" string="GEAR:1"><color red="0.6" green="0.6" blue="0.6" /></text>
 		<text state="1" string="GEAR:2"><color red="0.6" green="0.6" blue="0.6" /></text>
 		<text state="0" string="GEAR:3"><color red="0.6" green="0.6" blue="0.6" /></text>
@@ -55,13 +55,13 @@ license:CC0-1.0
 
 <!-- build screen -->
 
-	<view name="Internal Layout">
+	<view name="Internal Layout" showpointers="no">
 		<bounds left="16" right="24" top="5.8" bottom="34.5" />
 
 		<!-- bezel -->
 		<element ref="lane"><bounds x="18.69" y="9.7" width="2.62" height="24" /></element>
 
-		<element ref="white" inputtag="IN.0" inputmask="0x00" inputraw="yes"><bounds x="16" y="9.7" width="8" height="0.8" /></element>
+		<element ref="white" clickthrough="no"><bounds x="16" y="9.7" width="8" height="0.8" /></element>
 		<collection name="Gear Position">
 			<element ref="gear" inputtag="IN.0" inputmask="0x0c" inputraw="yes"><bounds x="16" y="9.7" width="8" height="0.8" /></element>
 		</collection>

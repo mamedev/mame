@@ -23,20 +23,21 @@ public:
 	static constexpr unsigned ROAD_FOREGROUND    = 1;
 
 
-
 	struct road_info
 	{
-		u8           index;                          /* index of this structure */
-		u8           type;                           /* type of road system (see segaic16.h for details) */
-		u8           control;                        /* control register value */
-		u16          colorbase1;                     /* color base for road ROM data */
-		u16          colorbase2;                     /* color base for road background data */
-		u16          colorbase3;                     /* color base for sky data */
-		s32          xoffs;                          /* X scroll offset */
-		void         (*draw)(struct road_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-		u16 *        roadram;                        /* pointer to roadram pointer */
-		std::unique_ptr<u16[]> buffer;               /* buffered roadram pointer */
-		std::unique_ptr<u8[]>  gfx;                  /* expanded road graphics */
+		using draw_func = void (*)(struct road_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+
+		u8                      index = 0;          // index of this structure
+		u8                      type = 0;           // type of road system (see segaic16.h for details)
+		u8                      control = 0;        // control register value
+		u16                     colorbase1 = 0;     // color base for road ROM data
+		u16                     colorbase2 = 0;     // color base for road background data
+		u16                     colorbase3 = 0;     // color base for sky data
+		s32                     xoffs = 0;          // X scroll offset
+		draw_func               draw = nullptr;
+		u16 *                   roadram = nullptr;  // pointer to roadram pointer
+		std::unique_ptr<u16[]>  buffer;             // buffered roadram pointer
+		std::unique_ptr<u8[]>   gfx;                // expanded road graphics
 	};
 
 

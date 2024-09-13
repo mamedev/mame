@@ -15,7 +15,7 @@ Other:  BMC B816140 (CPLD)
 
 TODO:
  * Hopper hookup doesn't work properly.  MAME counts far more "tickets
-   dispensed" than the number of coins/tickets the games are suppoed to
+   dispensed" than the number of coins/tickets the games are supposed to
    pay out.
 
 ***************************************************************************/
@@ -50,6 +50,7 @@ public:
 		m_pixram(*this, "pixram"),
 		m_priority(*this, "priority"),
 		m_layerctrl(*this, "layerctrl"),
+		m_backpen(*this, "backpen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_dsw(*this, "DSW%u", 1U),
@@ -78,6 +79,7 @@ private:
 	required_shared_ptr<uint16_t> m_pixram;
 	required_shared_ptr<uint16_t> m_priority;
 	required_shared_ptr<uint16_t> m_layerctrl;
+	required_shared_ptr<uint16_t> m_backpen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -283,7 +285,7 @@ uint32_t bmcpokr_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	}
 #endif
 
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(*m_backpen, cliprect);
 
 	if (layers_ctrl & 2)    draw_layer(screen, bitmap, cliprect, 2);
 /*
@@ -380,7 +382,7 @@ int bmcpokr_state::hopper_r()
 {
 	// motor off should clear the sense bit (I guess ticket.cpp should actually do this).
 	// Otherwise a hopper bit stuck low will prevent several keys from being registered.
-	return (m_mux & 0x01) ? m_hopper->line_r() : 1;
+	return (m_mux & 0x01) ? (m_hopper->line_r() ^ 1) : 1;
 }
 
 void bmcpokr_state::irq_enable_w(offs_t offset, uint8_t data, uint8_t mem_mask)
@@ -424,7 +426,7 @@ void bmcpokr_state::bmcpokr_mem(address_map &map)
 	map(0x340009, 0x340009).w(FUNC(bmcpokr_state::irq_enable_w));
 	map(0x34000e, 0x34000f).ram().share(m_priority);    // 34000f.b, w (priority?)
 	map(0x340017, 0x340017).w(FUNC(bmcpokr_state::pixpal_w));
-	map(0x340018, 0x340019).ram(); // 340019.b, w
+	map(0x340018, 0x340019).ram().share(m_backpen); // 340019.b, w
 	map(0x34001a, 0x34001b).r(FUNC(bmcpokr_state::unk_r)).nopw();
 	map(0x34001c, 0x34001d).ram(); // 34001d.b, w(0)
 
@@ -508,7 +510,7 @@ void bmcpokr_state::mjmaglmp_map(address_map &map)
 	map(0x3ca009, 0x3ca009).w(FUNC(bmcpokr_state::irq_enable_w));
 	map(0x3ca00e, 0x3ca00f).ram().share(m_priority);    // 3ca00f.b, w (priority?)
 	map(0x3ca017, 0x3ca017).w(FUNC(bmcpokr_state::pixpal_w));
-	map(0x3ca018, 0x3ca019).ram(); // 3ca019.b, w
+	map(0x3ca018, 0x3ca019).ram().share(m_backpen); // 3ca019.b, w
 	map(0x3ca01a, 0x3ca01b).r(FUNC(bmcpokr_state::unk_r)).nopw();
 	map(0x3ca01c, 0x3ca01d).ram(); // 3ca01d.b, w(0)
 }
@@ -540,7 +542,7 @@ void bmcpokr_state::shendeng_map(address_map &map)
 	map(0x370009, 0x370009).w(FUNC(bmcpokr_state::irq_enable_w));
 	map(0x37000e, 0x37000f).ram().share(m_priority);    // 37000f.b, w (priority?)
 	map(0x370017, 0x370017).w(FUNC(bmcpokr_state::pixpal_w));
-	map(0x370018, 0x370019).ram(); // 370019.b, w
+	map(0x370018, 0x370019).ram().share(m_backpen); // 370019.b, w
 	map(0x37001a, 0x37001b).r(FUNC(bmcpokr_state::unk_r)).nopw();
 	map(0x37001c, 0x37001d).ram(); // 3ca01d.b, w(0)
 	map(0x380001, 0x380001).w("ramdac", FUNC(ramdac_device::index_w));
@@ -947,7 +949,7 @@ static INPUT_PORTS_START( fengyunh )
 	PORT_DIPSETTING(    0x18, "200 / 10" )
 	PORT_DIPSETTING(    0x08, "300 / 15" )
 	PORT_DIPSETTING(    0x00, "500 / 25" )
-	PORT_DIPNAME( 0x60, 0x60, "Credits Per Key-Out" )       PORT_DIPLOCATION("DIP2:6,7")   // 洗分洗分
+	PORT_DIPNAME( 0x60, 0x60, "Credits Per Key-Out" )       PORT_DIPLOCATION("DIP2:6,7")   // 洗分單位
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x20, "20" )
 	PORT_DIPSETTING(    0x60, "30" )
@@ -1147,7 +1149,7 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 	TIMER(config, "scantimer", 0).configure_scanline(FUNC(bmcpokr_state::interrupt), "screen", 0, 1);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh(HZ_TO_ATTOSECONDS(58.935));    // HSync - 15.440kHz, VSync - 58.935Hz
+	screen.set_refresh(HZ_TO_ATTOSECONDS(58.935)); // HSync - 15.440kHz, VSync - 58.935Hz
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_screen_update(FUNC(bmcpokr_state::screen_update));
 	screen.set_size(64*8, 32*8);
@@ -1163,15 +1165,13 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TICKET_DISPENSER(config, m_hopper, 0);
-	m_hopper->set_period(attotime::from_msec(10));
-	m_hopper->set_senses(TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW, false);    // hopper stuck low if too slow
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(10)); // hopper stuck low if too slow
 
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ymsnd", XTAL(42'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 1.00);    // UM3567 @3.50MHz (42/12)
+	YM2413(config, "ymsnd", XTAL(42'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 1.00); // UM3567 @3.50MHz (42/12)
 
-	OKIM6295(config, "oki", XTAL(42'000'000) / 40, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00);   // M6295 @1.05MHz (42/40)
+	OKIM6295(config, "oki", XTAL(42'000'000) / 40, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); // M6295 @1.05MHz (42/40)
 }
 
 void bmcpokr_state::fengyunh(machine_config &config)

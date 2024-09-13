@@ -255,21 +255,21 @@ void msx_slot_rs232_sony_device::device_start()
 {
 	msx_slot_rs232_base_device::device_start();
 
-	m_ram.resize(RAM_SIZE);
-	save_item(NAME(m_ram));
+	m_ram = std::make_unique<u8[]>(RAM_SIZE);
+	save_pointer(NAME(m_ram), RAM_SIZE);
 
 	// TODO unmap rom from page 0
-	page(0)->install_ram(0x2000, 0x27ff, m_ram.data());
+	page(0)->install_ram(0x2000, 0x27ff, &m_ram[0]);
 	page(1)->install_rom(0x4000, 0x5fff, m_rom_region->base() + m_region_offset);
-	page(1)->install_ram(0x6000, 0x67ff, m_ram.data());
-	page(2)->install_ram(0xa000, 0xa7ff, m_ram.data());
+	page(1)->install_ram(0x6000, 0x67ff, &m_ram[0]);
+	page(2)->install_ram(0xa000, 0xa7ff, &m_ram[0]);
 	page(2)->install_read_handler(0xbff8, 0xbff9, emu::rw_delegate(*m_i8251, FUNC(i8251_device::read)));
 	page(2)->install_write_handler(0xbff8, 0xbff9, emu::rw_delegate(*m_i8251, FUNC(i8251_device::write)));
 	page(2)->install_read_handler(0xbffa, 0xbffa, emu::rw_delegate(*this, FUNC(msx_slot_rs232_sony_device::status_r)));
 	page(2)->install_write_handler(0xbffa, 0xbffa, emu::rw_delegate(*this, FUNC(msx_slot_rs232_sony_device::irq_mask_w)));
 	page(2)->install_read_handler(0xbffc, 0xbfff, emu::rw_delegate(*m_i8253, FUNC(pit8253_device::read)));
 	page(2)->install_write_handler(0xbffc, 0xbfff, emu::rw_delegate(*m_i8253, FUNC(pit8253_device::write)));
-	page(3)->install_ram(0xe000, 0xe7ff, m_ram.data());
+	page(3)->install_ram(0xe000, 0xe7ff, &m_ram[0]);
 }
 
 u8 msx_slot_rs232_sony_device::status_r(offs_t offset)
@@ -454,10 +454,11 @@ void msx_slot_rs232_toshiba_hx3x_device::device_start()
 	io_space().install_readwrite_handler(0x82, 0x82, emu::rw_delegate(*this, FUNC(msx_slot_rs232_toshiba_hx3x_device::status_r)), emu::rw_delegate(*this, FUNC(msx_slot_rs232_toshiba_hx3x_device::irq_mask_w)));
 	io_space().install_readwrite_handler(0x84, 0x87, emu::rw_delegate(*m_i8253, FUNC(pit8253_device::read)), emu::rw_delegate(*m_i8253, FUNC(pit8253_device::write)));
 
-	m_sram.resize(SRAM_SIZE);
-	m_nvram->set_base(m_sram.data(), SRAM_SIZE);
+	m_sram = std::make_unique<u8[]>(SRAM_SIZE);
+	m_nvram->set_base(&m_sram[0], SRAM_SIZE);
 
 	save_item(NAME(m_bank_reg));
+	save_pointer(NAME(m_sram), SRAM_SIZE);
 
 	m_rombank->configure_entries(0, 4, m_rom_region->base() + m_region_offset + 0x4000, 0x4000);
 
@@ -465,7 +466,7 @@ void msx_slot_rs232_toshiba_hx3x_device::device_start()
 	page(1)->install_read_handler(0x7fff, 0x7fff, emu::rw_delegate(*this, FUNC(msx_slot_rs232_toshiba_hx3x_device::bank_r)));
 	page(2)->install_view(0x8000, 0xbfff, m_view);
 	m_view[0].install_read_bank(0x8000, 0xbfff, m_rombank);
-	m_view[1].install_ram(0x8000, 0x87ff, 0x3800, m_sram.data());
+	m_view[1].install_ram(0x8000, 0x87ff, 0x3800, &m_sram[0]);
 }
 
 void msx_slot_rs232_toshiba_hx3x_device::device_reset()

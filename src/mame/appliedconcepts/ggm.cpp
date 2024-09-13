@@ -3,12 +3,14 @@
 // thanks-to:bataais, Berger
 /*******************************************************************************
 
-Applied Concepts Great Game Machine (GGM), electronic board game computer.
-2nd source distribution: Modular Game System (MGS), by Chafitz.
+Applied Concepts Great Game Machine (GGM), electronic board game computer,
+in cooperation with Chafitz, who marketed it as Modular Game System (MGS).
+After a legal dispute with Chafitz, all rights went to Applied Concepts.
 
 Hardware notes:
 - 6502A 2MHz, SYP6522 VIA
-- 2KB battery-backed RAM(4*HM472114AP-2 or 1*M58725P), no ROM on main PCB
+- 2KB RAM (1*M58725P battery-backed, or 4*2114 / 2*2114 + 2*2114L of which
+  only the first 1KB is battery-backed), no ROM on main PCB
 - 2*74164 shift register, 3*6118P VFD driver
 - 8-digit 14seg VFD panel (same one as in Speak & Spell)
 - 5*4 keypad(unlabeled by default), 1-bit sound
@@ -463,7 +465,7 @@ static INPUT_PORTS_START( overlay_lasvegas )
 
 	PORT_MODIFY("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_L) PORT_NAME("Split")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_U) PORT_NAME("Shuffle Point")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_P) PORT_NAME("Shuffle Point")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_A) PORT_NAME("Audio")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_T) PORT_NAME("Total")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
@@ -485,7 +487,7 @@ static INPUT_PORTS_START( overlay_odin )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_U) PORT_NAME("Audio")
 
 	PORT_MODIFY("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_Y) PORT_NAME("Play / -")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_P) PORT_NAME("Play / -")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_W) PORT_NAME("B/W")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_K) PORT_NAME("Rank")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_T) PORT_NAME("Time")
@@ -616,4 +618,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, ggm,  0,      0,      ggm,     ggm,   ggm_state, empty_init, "Applied Concepts", "Great Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, ggm,  0,      0,      ggm,     ggm,   ggm_state, empty_init, "Applied Concepts / Chafitz", "Great Game Machine", MACHINE_SUPPORTS_SAVE )

@@ -899,7 +899,7 @@ void flash_state::speaker_update()
 		m_speaker_volume = 50.0;
 
 	// it takes a bit before it actually starts fading
-	m_volume->flt_volume_set_volume(std::min(m_speaker_volume, 1.0));
+	m_volume->set_gain(std::min(m_speaker_volume, 1.0));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(flash_state::speaker_decay_sim)
@@ -1024,31 +1024,21 @@ public:
 
 	void matchme(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(speed_switch) { set_clock(); }
-
-protected:
-	virtual void machine_reset() override;
+	DECLARE_INPUT_CHANGED_MEMBER(speed_switch);
 
 private:
-	void set_clock();
 	void write_b(u8 data);
 	void write_c(u8 data);
 	u8 read_c();
 };
 
-void matchme_state::machine_reset()
-{
-	hh_pic16_state::machine_reset();
-	set_clock();
-}
-
 // handlers
 
-void matchme_state::set_clock()
+INPUT_CHANGED_MEMBER(matchme_state::speed_switch)
 {
 	// MCU clock is ~1.2MHz by default (R=18K, C=15pF), high speed setting adds a
 	// 10pF cap to speed it up by about 7.5%.
-	m_maincpu->set_unscaled_clock((m_inputs[4]->read() & 1) ? 1300000 : 1200000);
+	m_maincpu->set_unscaled_clock((newval & 1) ? 1300000 : 1200000);
 }
 
 void matchme_state::write_b(u8 data)
@@ -1111,7 +1101,7 @@ static INPUT_PORTS_START( matchme )
 	PORT_CONFSETTING(    0x08, "Amateur" ) // AM
 	PORT_CONFSETTING(    0x00, "Professional" ) // PRO
 
-	PORT_START("IN.4") // another fake
+	PORT_START("CPU") // another fake
 	PORT_CONFNAME( 0x01, 0x00, "Speed" ) PORT_CHANGED_MEMBER(DEVICE_SELF, matchme_state, speed_switch, 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( Low ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( High ) )
@@ -1128,7 +1118,7 @@ INPUT_PORTS_END
 void matchme_state::matchme(machine_config &config)
 {
 	// basic machine hardware
-	PIC1655(config, m_maincpu, 1200000); // see set_clock
+	PIC1655(config, m_maincpu, 1200000); // see speed_switch
 	m_maincpu->read_a().set_ioport("IN.3");
 	m_maincpu->write_b().set(FUNC(matchme_state::write_b));
 	m_maincpu->read_c().set(FUNC(matchme_state::read_c));
@@ -1342,7 +1332,7 @@ void leboom_state::speaker_update()
 	if (~m_c & 0x80)
 		m_speaker_volume = 1.0;
 
-	m_volume->flt_volume_set_volume(m_speaker_volume);
+	m_volume->set_gain(m_speaker_volume);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(leboom_state::speaker_decay_sim)
@@ -2203,22 +2193,22 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, touchme,   0,       0,      touchme,   touchme,   touchme_state,   empty_init, "Atari", "Touch Me (handheld, Rev. 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, touchme,   0,       0,      touchme,   touchme,   touchme_state,   empty_init, "Atari", "Touch Me (handheld, rev. 2)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1979, pabball,   0,       0,      pabball,   pabball,   pabball_state,   empty_init, "Calfax / Caprice Electronics", "Pro-Action Electronic-Computerized Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 SYST( 1981, sfxphasor, 0,       0,      sfxphasor, sfxphasor, sfxphasor_state, empty_init, "Electroplay", "Sound FX Phasor", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-SYST( 1980, melodym,   0,       0,      melodym,   melodym,   melodym_state,   empty_init, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, melodym,   0,       0,      melodym,   melodym,   melodym_state,   empty_init, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1979, maniac,    0,       0,      maniac,    maniac,    maniac_state,    empty_init, "Ideal Toy Corporation", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1980, flash,     0,       0,      flash,     flash,     flash_state,     empty_init, "Ideal Toy Corporation", "Flash (Ideal)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, maniac,    0,       0,      maniac,    maniac,    maniac_state,    empty_init, "Ideal Toy Corporation", "Maniac", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, flash,     0,       0,      flash,     flash,     flash_state,     empty_init, "Ideal Toy Corporation", "Flash (Ideal)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, matchme,   0,       0,      matchme,   matchme,   matchme_state,   empty_init, "Kingsford", "Match Me", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, matchme,   0,       0,      matchme,   matchme,   matchme_state,   empty_init, "Kingsford", "Match Me", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1979, drdunk,    0,       0,      drdunk,    drdunk,    drdunk_state,    empty_init, "Kmart Corporation", "Dr. Dunk", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, leboom,    0,       0,      leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, leboom,    0,       0,      leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1979, rockpin,   0,       0,      rockpin,   rockpin,   rockpin_state,   empty_init, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, hccbaskb,  0,       0,      hccbaskb,  hccbaskb,  hccbaskb_state,  empty_init, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )

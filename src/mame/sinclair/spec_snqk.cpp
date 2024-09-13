@@ -160,8 +160,8 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 	}
 	else if (image.is_filetype("sem"))
 	{
-		if (snapshot_data[0] != 0x05 && snapshot_data[1] != 'S' && \
-			snapshot_data[2] != 'P' && snapshot_data[3] != 'E' && \
+		if (snapshot_data[0] != 0x05 && snapshot_data[1] != 'S' &&
+			snapshot_data[2] != 'P' && snapshot_data[3] != 'E' &&
 			snapshot_data[4] != 'C' && snapshot_data[5] != '1')
 		{
 			if (snapshot_size != SEM_SIZE)
@@ -192,7 +192,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 	}
 	else if (image.is_filetype("snx"))
 	{
-		if (snapshot_data[0] != 'X' && snapshot_data[1] != 'S' && \
+		if (snapshot_data[0] != 'X' && snapshot_data[1] != 'S' &&
 			snapshot_data[2] != 'N' && snapshot_data[3] != 'A')
 			return std::make_pair(image_error::INVALIDIMAGE, "Invalid .SNX file header");
 
@@ -1072,7 +1072,7 @@ void spectrum_state::setup_plusd(uint8_t *snapdata, uint32_t snapsize)
 						m_port_7ffd_data += i;
 						update_paging();
 						break;
-			};
+			}
 			logerror("Loading bank %d from offset:%05X\n", i, PLUSD128_HDR + i*SPECTRUM_BANK);
 			for (j = 0; j < SPECTRUM_BANK; j++)
 				space.write_byte(j + addr, snapdata[j + PLUSD128_HDR + i*SPECTRUM_BANK]);
@@ -2010,7 +2010,7 @@ void spectrum_state::setup_frz(uint8_t *snapdata, uint32_t snapsize)
 					m_port_7ffd_data += banks[i];
 					update_paging();
 					break;
-		};
+		}
 		logerror("Loading bank %d from offset:%05X\n", banks[i], FRZ_HDR + i*SPECTRUM_BANK);
 		for (j = 0; j < SPECTRUM_BANK; j++)
 			space.write_byte(j + addr, snapdata[j + FRZ_HDR + i*SPECTRUM_BANK]);

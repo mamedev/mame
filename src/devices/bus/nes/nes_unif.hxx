@@ -12,6 +12,7 @@
 ****************************************************************************************/
 
 #include "corestr.h"
+#include "multibyte.h"
 
 /* Set to generate prg & chr files when the cart is loaded */
 #define SPLIT_PRG   0
@@ -220,7 +221,7 @@ void nes_cart_slot_device::call_load_unif()
 
 	fseek(4, SEEK_SET);
 	fread(&buffer, 4);
-	unif_ver = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+	unif_ver = get_u32le(buffer);
 	logerror("Loaded game in UNIF format, version %d\n", unif_ver);
 
 	do
@@ -241,7 +242,7 @@ void nes_cart_slot_device::call_load_unif()
 				mapr_chunk_found = true;
 				logerror("[MAPR] chunk found: ");
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 
 				if (chunk_length <= 0x20)
 					fread(&unif_mapr, chunk_length);
@@ -255,7 +256,7 @@ void nes_cart_slot_device::call_load_unif()
 			{
 				logerror("Skip this chunk. We need a [MAPR] chunk before anything else.\n");
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 
 				read_length += (chunk_length + 8);
 			}
@@ -269,7 +270,7 @@ void nes_cart_slot_device::call_load_unif()
 				/* TO DO: it would be nice to check if more than one MAPR chunk is present */
 				logerror("[MAPR] chunk found (in the 2nd run). Already loaded.\n");
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 
 				read_length += (chunk_length + 8);
 			}
@@ -277,7 +278,7 @@ void nes_cart_slot_device::call_load_unif()
 			{
 				logerror("[READ] chunk found. No support yet.\n");
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 
 				read_length += (chunk_length + 8);
 			}
@@ -285,7 +286,7 @@ void nes_cart_slot_device::call_load_unif()
 			{
 				logerror("[NAME] chunk found. No support yet.\n");
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 
 				read_length += (chunk_length + 8);
 			}
@@ -293,7 +294,7 @@ void nes_cart_slot_device::call_load_unif()
 			{
 				logerror("[WRTR] chunk found. No support yet.\n");
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 
 				read_length += (chunk_length + 8);
 			}
@@ -301,7 +302,7 @@ void nes_cart_slot_device::call_load_unif()
 			{
 				logerror("[TVCI] chunk found.\n");
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 
 				fread(&temp_byte, 1);
 				logerror("Television Standard : %s\n", (temp_byte == 0) ? "NTSC" : (temp_byte == 1) ? "PAL" : "Does not matter");
@@ -312,7 +313,7 @@ void nes_cart_slot_device::call_load_unif()
 			{
 				logerror("[TVSC] chunk found. No support yet.\n");
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 
 				read_length += (chunk_length + 8);
 			}
@@ -320,7 +321,7 @@ void nes_cart_slot_device::call_load_unif()
 			{
 				logerror("[DINF] chunk found. No support yet.\n");
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 
 				read_length += (chunk_length + 8);
 			}
@@ -328,7 +329,7 @@ void nes_cart_slot_device::call_load_unif()
 			{
 				logerror("[CTRL] chunk found. No support yet.\n");
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 
 				read_length += (chunk_length + 8);
 			}
@@ -336,7 +337,7 @@ void nes_cart_slot_device::call_load_unif()
 			{
 				logerror("[BATR] chunk found. No support yet.\n");
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 
 				read_length += (chunk_length + 8);
 			}
@@ -344,7 +345,7 @@ void nes_cart_slot_device::call_load_unif()
 			{
 				logerror("[VROR] chunk found. No support yet.\n");
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 
 				read_length += (chunk_length + 8);
 			}
@@ -352,7 +353,7 @@ void nes_cart_slot_device::call_load_unif()
 			{
 				logerror("[MIRR] chunk found.\n");
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 
 				fread(&mirror, 1);
 
@@ -362,7 +363,7 @@ void nes_cart_slot_device::call_load_unif()
 			{
 				logerror("[PCK%c] chunk found. No support yet.\n", magic2[3]);
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 
 				read_length += (chunk_length + 8);
 			}
@@ -370,7 +371,7 @@ void nes_cart_slot_device::call_load_unif()
 			{
 				logerror("[CCK%c] chunk found. No support yet.\n", magic2[3]);
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 
 				read_length += (chunk_length + 8);
 			}
@@ -378,7 +379,7 @@ void nes_cart_slot_device::call_load_unif()
 			{
 				logerror("[PRG%c] chunk found. ", magic2[3]);
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 				prg_size += chunk_length;
 
 				if (chunk_length / 0x4000)
@@ -399,7 +400,7 @@ void nes_cart_slot_device::call_load_unif()
 			{
 				logerror("[CHR%c] chunk found. ", magic2[3]);
 				fread(&buffer, 4);
-				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+				chunk_length = get_u32le(buffer);
 				vrom_size += chunk_length;
 
 				logerror("It consists of %d 8K-blocks.\n", chunk_length / 0x2000);
@@ -562,7 +563,7 @@ const char * nes_cart_slot_device::get_default_card_unif(const uint8_t *ROM, uin
 	{
 		if ((ROM[read_length + 0] == 'M') && (ROM[read_length + 1] == 'A') && (ROM[read_length + 2] == 'P') && (ROM[read_length + 3] == 'R'))
 		{
-			chunk_length = ROM[read_length + 4] | (ROM[read_length + 5] << 8) | (ROM[read_length + 6] << 16) | (ROM[read_length + 7] << 24);
+			chunk_length = get_u32le(&ROM[read_length + 4]);
 
 			if (chunk_length <= 0x20)
 				memcpy(unif_mapr, ROM + read_length + 8, chunk_length);
@@ -571,7 +572,7 @@ const char * nes_cart_slot_device::get_default_card_unif(const uint8_t *ROM, uin
 		}
 		else
 		{
-			chunk_length = ROM[read_length + 4] | (ROM[read_length + 5] << 8) | (ROM[read_length + 6] << 16) | (ROM[read_length + 7] << 24);
+			chunk_length = get_u32le(&ROM[read_length + 4]);
 			read_length += (chunk_length + 8);
 		}
 	} while (len > read_length);

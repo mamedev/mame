@@ -111,8 +111,6 @@ private:
 };
 
 
-// video
-
 void mugsmash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// Each Sprite takes 16 bytes, 5 used?
@@ -230,8 +228,6 @@ uint32_t mugsmash_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void mugsmash_state::reg2_w(offs_t offset, uint16_t data)
 {

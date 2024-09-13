@@ -312,7 +312,6 @@ INPUT_PORTS_END
 
 void pencil2_state::machine_start()
 {
-
 	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_centronics_ack));
 	save_item(NAME(m_cass_state));

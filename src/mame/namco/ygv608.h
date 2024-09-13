@@ -130,7 +130,7 @@ private:
 	void register_state_save();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_layer_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *source_tilemap);
-	void ygv608_draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect, int n);
+	void draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect, int n);
 
 	uint8_t m_namcond1_gfxbank;
 

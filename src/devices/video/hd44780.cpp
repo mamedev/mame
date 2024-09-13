@@ -119,7 +119,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/hd44780.h"
+#include "hd44780.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -188,7 +188,7 @@ ROM_START( ks0066 )
 	//ROM_SYSTEM_BIOS(?, "f59", "F59")
 
 	ROM_REGION( 0x1000, "cgrom", 0 )
-	ROMX_LOAD( "ks0066_f00.bin",    0x0000, 0x1000,  BAD_DUMP CRC(e459877c) SHA1(65cf075a988cdcbb316b9afdd0529b374a1a65ec), ROM_BIOS(0)) // from page 61 of the KS0066 non-U datasheet
+	ROMX_LOAD( "ks0066_f00.bin",    0x0000, 0x1000,  CRC(e459877c) SHA1(65cf075a988cdcbb316b9afdd0529b374a1a65ec), ROM_BIOS(0)) // from page 61 of the KS0066 non-U datasheet, validated on a psr540
 	ROMX_LOAD( "ks0066_f05.bin",    0x0000, 0x1000,  BAD_DUMP CRC(af9e7bd6) SHA1(0196e871584ee5d370856e7307c0f9d1466e3e51), ROM_BIOS(1)) // from page 51 of the KS0066 datasheet
 ROM_END
 
@@ -486,24 +486,23 @@ const u8 *hd44780_device::render()
 			{
 				uint16_t char_pos = line * 0x40 + ((pos + m_disp_shift) % line_size);
 
-				int char_base;
+				const u8 *src;
 				if (m_ddram[char_pos] < 0x10)
 				{
 					// draw CGRAM characters
 					if (m_char_size == 8)
-						char_base = (m_ddram[char_pos] & 0x07) * 8;
+						src = m_cgram + (m_ddram[char_pos] & 0x07) * 8;
 					else
-						char_base = ((m_ddram[char_pos] >> 1) & 0x03) * 16;
+						src = m_cgram + ((m_ddram[char_pos] >> 1) & 0x03) * 16;
 				}
 				else
 				{
 					// draw CGROM characters
-					char_base = m_ddram[char_pos] * 0x10;
+					src = m_cgrom + m_ddram[char_pos] * 0x10;
 				}
 
-				const u8 *charset = (m_ddram[char_pos] < 0x10) ? m_cgram : m_cgrom;
 				u8 *dest = m_render_buf + 16 * (line * line_size + pos);
-				memcpy (dest, charset + char_base, m_char_size);
+				memcpy (dest, src, m_char_size);
 
 				if (char_pos == m_ac)
 				{
@@ -753,7 +752,7 @@ u8 hd44780_device::control_read()
 
 void hd44780_device::data_write(u8 data)
 {
-	if (m_busy_flag)
+	if (false && m_busy_flag)
 	{
 		logerror("HD44780: Ignoring data write %02x due of busy flag\n", data);
 		return;

@@ -71,7 +71,7 @@ private:
 
 	struct SPRITE
 	{
-		const SPRITE_HELPER *data;
+		const SPRITE_HELPER *data = nullptr;
 		int mask = 0;
 		int state = 0;
 		int delay = 0;

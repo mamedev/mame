@@ -30,7 +30,7 @@ license:CC0-1.0
 -->
 
 	<software name="vcd">
-		<description>Video CD Card (Euro, v1.105)</description>
+		<description>Video CD Card (Europe, v1.105)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-80310" />
@@ -48,7 +48,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="hivcd2d">
-		<description>Hitachi Video CD Card (Jpn, Two Dots, v1.011)</description>
+		<description>Hitachi Video CD Card (Japan, two white dots, v1.011)</description>
 		<year>1995</year>
 		<publisher>Hitachi</publisher>
 		<part name="cart" interface="sat_vcd_cart">
@@ -65,7 +65,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="hivcd1d" cloneof="hivcd2d">
-		<description>Hitachi Video CD Card (Jpn, One Dot, v1.009)</description>
+		<description>Hitachi Video CD Card (Japan, one white dot, v1.009)</description>
 		<year>1995</year>
 		<publisher>Hitachi</publisher>
 		<part name="cart" interface="sat_vcd_cart">
@@ -81,7 +81,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ssmovie">
-		<description>SegaSaturn Movie Card (Jpn, v1.102)</description>
+		<description>SegaSaturn Movie Card (Japan, v1.102)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="HSS-0119" />
@@ -98,7 +98,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jvcvc20">
-		<description>JVC Video CD / Photo CD Decoder (Jpn, v3.000)</description>
+		<description>JVC Video CD / Photo CD Decoder (Japan, v3.000)</description>
 		<year>1996?</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="RG-VC20" />
@@ -116,7 +116,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jvcvc2">
-		<description>Victor Twin Operator Video CD &amp; Photo CD (Jpn, v2.001)</description>
+		<description>Victor Twin Operator Video CD &amp; Photo CD (Japan, v2.001)</description>
 		<year>1995</year>
 		<publisher>Victor</publisher>
 		<info name="serial" value="RG-VC2" />
@@ -133,7 +133,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jvcvc2a" cloneof="jvcvc2">
-		<description>Victor Twin Operator Video CD &amp; Photo CD (Jpn, v2.000)</description>
+		<description>Victor Twin Operator Video CD &amp; Photo CD (Japan, v2.000)</description>
 		<year>1995</year>
 		<publisher>Victor</publisher>
 		<info name="serial" value="RG-VC2" />
@@ -150,7 +150,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jvcvc1">
-		<description>Victor Video CD Decoder (Jpn, v1.003)</description>
+		<description>Victor Video CD Decoder (Japan, v1.003)</description>
 		<year>1995</year>
 		<publisher>Victor</publisher>
 		<info name="serial" value="RG-VC1" />

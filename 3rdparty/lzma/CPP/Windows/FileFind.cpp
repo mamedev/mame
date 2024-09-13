@@ -39,10 +39,10 @@ typedef struct
   WCHAR cStreamName[MAX_PATH + 36];
 } MY_WIN32_FIND_STREAM_DATA, *MY_PWIN32_FIND_STREAM_DATA;
 
-typedef HANDLE (WINAPI *FindFirstStreamW_Ptr)(LPCWSTR fileName, MY_STREAM_INFO_LEVELS infoLevel,
+typedef HANDLE (WINAPI *Func_FindFirstStreamW)(LPCWSTR fileName, MY_STREAM_INFO_LEVELS infoLevel,
     LPVOID findStreamData, DWORD flags);
 
-typedef BOOL (APIENTRY *FindNextStreamW_Ptr)(HANDLE findStream, LPVOID findStreamData);
+typedef BOOL (APIENTRY *Func_FindNextStreamW)(HANDLE findStream, LPVOID findStreamData);
 
 EXTERN_C_END
 
@@ -54,7 +54,7 @@ namespace NFile {
 
 
 #ifdef _WIN32
-#ifdef SUPPORT_DEVICE_FILE
+#ifdef Z7_DEVICE_FILE
 namespace NSystem
 {
 bool MyGetDiskFreeSpace(CFSTR rootPath, UInt64 &clusterSize, UInt64 &totalSize, UInt64 &freeSize);
@@ -128,7 +128,7 @@ bool CFileInfo::IsDots() const throw()
 
 static void Convert_WIN32_FIND_DATA_to_FileInfo(const WIN32_FIND_DATAW &fd, CFileInfo &fi)
 {
-  WIN_FD_TO_MY_FI(fi, fd);
+  WIN_FD_TO_MY_FI(fi, fd)
   fi.Name = us2fs(fd.cFileName);
   #if defined(_WIN32) && !defined(UNDER_CE)
   // fi.ShortName = us2fs(fd.cAlternateFileName);
@@ -138,7 +138,7 @@ static void Convert_WIN32_FIND_DATA_to_FileInfo(const WIN32_FIND_DATAW &fd, CFil
 #ifndef _UNICODE
 static void Convert_WIN32_FIND_DATA_to_FileInfo(const WIN32_FIND_DATA &fd, CFileInfo &fi)
 {
-  WIN_FD_TO_MY_FI(fi, fd);
+  WIN_FD_TO_MY_FI(fi, fd)
   fi.Name = fas2fs(fd.cFileName);
   #if defined(_WIN32) && !defined(UNDER_CE)
   // fi.ShortName = fas2fs(fd.cAlternateFileName);
@@ -211,7 +211,7 @@ bool CFindFile::FindFirst(CFSTR path, CFileInfo &fi)
 
     IF_USE_MAIN_PATH
       _handle = ::FindFirstFileW(fs2us(path), &fd);
-    #ifdef WIN_LONG_PATH
+    #ifdef Z7_LONG_PATH
     if (_handle == INVALID_HANDLE_VALUE && USE_SUPER_PATH)
     {
       UString superPath;
@@ -252,23 +252,27 @@ bool CFindFile::FindNext(CFileInfo &fi)
 ////////////////////////////////
 // AltStreams
 
-static FindFirstStreamW_Ptr g_FindFirstStreamW;
-static FindNextStreamW_Ptr g_FindNextStreamW;
+static Func_FindFirstStreamW g_FindFirstStreamW;
+static Func_FindNextStreamW g_FindNextStreamW;
 
 static struct CFindStreamLoader
 {
   CFindStreamLoader()
   {
-    HMODULE hm = ::GetModuleHandleA("kernel32.dll");
-    g_FindFirstStreamW = (FindFirstStreamW_Ptr)(void *)::GetProcAddress(hm, "FindFirstStreamW");
-    g_FindNextStreamW = (FindNextStreamW_Ptr)(void *)::GetProcAddress(hm, "FindNextStreamW");
+    const HMODULE hm = ::GetModuleHandleA("kernel32.dll");
+       g_FindFirstStreamW = Z7_GET_PROC_ADDRESS(
+    Func_FindFirstStreamW, hm,
+        "FindFirstStreamW");
+       g_FindNextStreamW = Z7_GET_PROC_ADDRESS(
+    Func_FindNextStreamW, hm,
+        "FindNextStreamW");
   }
 } g_FindStreamLoader;
 
 bool CStreamInfo::IsMainStream() const throw()
 {
   return StringsAreEqualNoCase_Ascii(Name, "::$DATA");
-};
+}
 
 UString CStreamInfo::GetReducedName() const
 {
@@ -331,7 +335,7 @@ bool CFindStream::FindFirst(CFSTR path, CStreamInfo &si)
       if (::GetLastError() == ERROR_HANDLE_EOF)
         return false;
       // long name can be tricky for path like ".\dirName".
-      #ifdef WIN_LONG_PATH
+      #ifdef Z7_LONG_PATH
       if (USE_SUPER_PATH)
       {
         UString superPath;
@@ -414,7 +418,7 @@ DWORD GetFileAttrib(CFSTR path)
       if (dw != INVALID_FILE_ATTRIBUTES)
         return dw;
     }
-    #ifdef WIN_LONG_PATH
+    #ifdef Z7_LONG_PATH
     if (USE_SUPER_PATH)
     {
       UString superPath;
@@ -451,7 +455,7 @@ also we support paths that are not supported by FindFirstFile:
 
 bool CFileInfo::Find(CFSTR path, bool followLink)
 {
-  #ifdef SUPPORT_DEVICE_FILE
+  #ifdef Z7_DEVICE_FILE
   
   if (IS_PATH_SEPAR(path[0]) &&
       IS_PATH_SEPAR(path[1]) &&
@@ -847,7 +851,7 @@ HANDLE CFindChangeNotification::FindFirst(CFSTR path, bool watchSubtree, DWORD n
   {
     IF_USE_MAIN_PATH
     _handle = ::FindFirstChangeNotificationW(fs2us(path), BoolToBOOL(watchSubtree), notifyFilter);
-    #ifdef WIN_LONG_PATH
+    #ifdef Z7_LONG_PATH
     if (!IsHandleAllocated())
     {
       UString superPath;

@@ -182,8 +182,8 @@ void fb01_state::fb01(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(fb01_state::fb01_palette), 2);
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 250'000)); // TODO: clock not measured, datasheet typical clock used
-	hd44780.set_lcd_size(2, 8);   // 2x8 displayed as 1x16
+	hd44780_device &hd44780(HD44780(config, "hd44780", 270'000)); // TODO: clock not measured, datasheet typical clock used
+	hd44780.set_lcd_size(2, 8); // 2x8 displayed as 1x16
 	hd44780.set_pixel_update_cb(FUNC(fb01_state::fb01_pixel_update));
 
 	I8251(config, m_upd71051, XTAL(4'000'000));

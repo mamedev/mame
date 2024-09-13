@@ -215,10 +215,13 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( gfx_madmotor )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 ) /* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 512, 16 ) /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 768, 16 ) /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 256, 16 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "char",    0, charlayout,   0, 16 ) /* Characters 8x8 */
+	GFXDECODE_ENTRY( "tiles1",  0, tilelayout, 512, 16 ) /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "tiles2",  0, tilelayout, 768, 16 ) /* Tiles 16x16 */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_madmotor_spr )
+	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 256, 16 ) /* Sprites 16x16 */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -233,7 +236,7 @@ uint32_t madmotor_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	m_tilegen[2]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0);
 	m_tilegen[1]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 0);
-	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(3), m_spriteram, 0x800/2);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, 0x800/2);
 	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 0);
 	return 0;
 }
@@ -276,7 +279,7 @@ void madmotor_state::madmotor(machine_config &config)
 	m_tilegen[2]->set_gfx_region_wide(0, 2, 1);
 	m_tilegen[2]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_MXC06(config, m_spritegen, 0);
+	DECO_MXC06(config, m_spritegen, 0, "palette", gfx_madmotor_spr);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -308,21 +311,21 @@ ROM_START( madmotor )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "14.l7",    0x00000, 0x10000, CRC(1c28a7e5) SHA1(ed30d0a5a8a079677bd34b6d98ab1b15b934b30f) )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_REGION( 0x020000, "char", 0 )
 	ROM_LOAD16_BYTE( "04.a9",     0x000000, 0x10000, CRC(833ca3ab) SHA1(7a3e7ebecc1596d2e487595369ad9ba54ced5bfb) )    /* chars */
 	ROM_LOAD16_BYTE( "05.a11",    0x000001, 0x10000, CRC(a691fbfe) SHA1(c726a4c15d599feb6883d9b643453e7028fa16d6) )
 
-	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_REGION( 0x040000, "tiles1", 0 )
 	ROM_LOAD16_BYTE( "10.a19",    0x000000, 0x20000, CRC(9dbf482b) SHA1(086e9170d577e502604c180f174fbce53a1e20e5) )    /* tiles */
 	ROM_LOAD16_BYTE( "11.a21",    0x000001, 0x20000, CRC(593c48a9) SHA1(1158888f6b836253b8ae9db9b8e352f289b2e815) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 )
+	ROM_REGION( 0x080000, "tiles2", 0 )
 	ROM_LOAD16_BYTE( "06.a13",    0x000000, 0x20000, CRC(448850e5) SHA1(6a44a42738cf6a55b4bec807e0a3939a42b36793) )    /* tiles */
 	ROM_LOAD16_BYTE( "07.a14",    0x040000, 0x20000, CRC(ede4d141) SHA1(7b847372bac043aa397aa5c274f90b9193de9176) )
 	ROM_LOAD16_BYTE( "08.a16",    0x000001, 0x20000, CRC(c380e5e5) SHA1(ec87a94e7948b84c96b1577f5a8caebc56e38a94) )
 	ROM_LOAD16_BYTE( "09.a18",    0x040001, 0x20000, CRC(1ee3326a) SHA1(bd03e5c4a2e7689260e6cc67288e71ef13f05a4b) )
 
-	ROM_REGION( 0x100000, "gfx4", 0 )
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "15.h11",    0x000000, 0x20000, CRC(90ae9f74) SHA1(806f96fd08fca1beeeaefe3c0fac1991410aa9c4) )    /* sprites */
 	ROM_LOAD16_BYTE( "16.h13",    0x040000, 0x20000, CRC(e96ac815) SHA1(a2b22a29ad0a4f144bb09299c454dc7a842a5318) )
 	ROM_LOAD16_BYTE( "17.h14",    0x000001, 0x20000, CRC(abad9a1b) SHA1(3cec6b4ef925205efe4a8fb28e08eb58e3ba4019) )

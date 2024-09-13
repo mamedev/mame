@@ -33,7 +33,7 @@ V(Verkauf?) home version:
 - 8*8 LEDs, magnets chessboard
 
 T(Turnier) tournament version: (differences)
-- XC68030RC50B, CPU frequency tuned for tournament (see set_cpu_freq)
+- XC68030RC50B, CPU frequency tuned for tournament (see change_cpu_freq)
 - 3 more 2MB DRAM rows
 
 After boot, it copies ROM to RAM, probably to circumvent waitstates on slow ROM.
@@ -47,7 +47,6 @@ After boot, it copies ROM to RAM, probably to circumvent waitstates on slow ROM.
 
 #include "cpu/m68000/m68030.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 
 // internal artwork
 #include "mephisto_modular_tm.lh"
@@ -61,34 +60,27 @@ public:
 	mmtm_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_rom(*this, "maincpu"),
-		m_mainram(*this, "mainram"),
-		m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG),
-		m_disable_bootrom(*this, "disable_bootrom"),
-		m_fake(*this, "FAKE")
+		m_boot_view(*this, "boot_view"),
+		m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG)
 	{ }
 
 	// machine configs
 	void mmtm_v(machine_config &config);
 	void mmtm_t(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_post_load() override { install_bootrom(m_bootrom_enabled); }
 
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_region_ptr<u32> m_rom;
-	required_shared_ptr<u32> m_mainram;
+	memory_view m_boot_view;
 	memory_share_creator<u8> m_nvram;
-	required_device<timer_device> m_disable_bootrom;
-	optional_ioport m_fake;
 
-	bool m_bootrom_enabled = false;
+	emu_timer *m_boot_timer;
 
 	// address maps
 	void mmtm_2m_map(address_map &map);
@@ -97,51 +89,37 @@ private:
 	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
 	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
 
-	void install_bootrom(bool enable);
-	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
-
-	void set_cpu_freq();
+	TIMER_CALLBACK_MEMBER(disable_bootrom) { m_boot_view.select(1); }
 };
+
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
 
 void mmtm_state::machine_start()
 {
-	save_item(NAME(m_bootrom_enabled));
+	m_boot_timer = timer_alloc(FUNC(mmtm_state::disable_bootrom), this);
 }
 
 void mmtm_state::machine_reset()
 {
-	set_cpu_freq();
-
 	// disable bootrom after reset
-	install_bootrom(true);
-	m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(50));
+	m_boot_view.select(0);
+	m_boot_timer->adjust(m_maincpu->cycles_to_attotime(50));
 }
 
-void mmtm_state::install_bootrom(bool enable)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	program.unmap_readwrite(0, std::max(m_rom.bytes(), m_mainram.bytes()) - 1);
-
-	if (enable)
-		program.install_rom(0, m_rom.bytes() - 1, m_rom);
-	else
-		program.install_ram(0, m_mainram.bytes() - 1, m_mainram);
-
-	m_bootrom_enabled = enable;
-}
-
-void mmtm_state::set_cpu_freq()
+INPUT_CHANGED_MEMBER(mmtm_state::change_cpu_freq)
 {
 	// "Mephisto X" were usually overclocked at tournaments
 	// rare versions sold to fans seen overclocked at 60MHz or 66MHz
 	// default frequency of TM version is 50MHz (also matches beeper pitch with V version)
-	ioport_value val = m_fake.read_safe(0);
-
-	static const XTAL xtal[] = { 36_MHz_XTAL, 50_MHz_XTAL, 60_MHz_XTAL, 66_MHz_XTAL };
-	m_maincpu->set_unscaled_clock(xtal[val]);
+	static const XTAL xtal[3] = { 50_MHz_XTAL, 60_MHz_XTAL, 66_MHz_XTAL };
+	m_maincpu->set_unscaled_clock(xtal[newval % 3]);
 
 	// lcd busy flag timing problem when overclocked
-	subdevice<hd44780_device>("display:hd44780")->set_clock_scale((val > 1) ? 1.32 : 1.0);
+	subdevice<hd44780_device>("display:hd44780")->set_clock_scale((newval == 0) ? 1.0 : 1.32);
 }
 
 
@@ -152,7 +130,10 @@ void mmtm_state::set_cpu_freq()
 
 void mmtm_state::mmtm_2m_map(address_map &map)
 {
-	map(0x00000000, 0x0003ffff).ram().share("mainram");
+	map(0x00000000, 0x0003ffff).view(m_boot_view);
+	m_boot_view[0](0x00000000, 0x0003ffff).rom().region("maincpu", 0);
+	m_boot_view[1](0x00000000, 0x0003ffff).ram();
+
 	map(0x80000000, 0x801fffff).ram();
 	map(0xf0000000, 0xf003ffff).rom().region("maincpu", 0);
 	map(0xfc000000, 0xfc001fff).rw(FUNC(mmtm_state::nvram_r), FUNC(mmtm_state::nvram_w)).umask32(0xffffffff);
@@ -169,9 +150,7 @@ void mmtm_state::mmtm_2m_map(address_map &map)
 void mmtm_state::mmtm_8m_map(address_map &map)
 {
 	mmtm_2m_map(map);
-	map(0x80200000, 0x803fffff).ram();
-	map(0x80400000, 0x805fffff).ram();
-	map(0x80600000, 0x807fffff).ram();
+	map(0x80000000, 0x807fffff).ram();
 }
 
 
@@ -182,26 +161,26 @@ void mmtm_state::mmtm_8m_map(address_map &map)
 
 static INPUT_PORTS_START( mmtm_v )
 	PORT_START("KEY1")
-	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("LEFT")   PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("LEFT")   PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CODE(KEYCODE_7_PAD)
 
 	PORT_START("KEY2")
-	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("RIGHT")  PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("UP")     PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("RIGHT")  PORT_CODE(KEYCODE_RIGHT) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("UP")     PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_8_PAD)
 
 	PORT_START("KEY3")
-	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("DOWN")   PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("DOWN")   PORT_CODE(KEYCODE_DOWN) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_9_PAD)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mmtm_t )
 	PORT_INCLUDE( mmtm_v )
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mmtm_state, cpu_freq, 0)
-	PORT_CONFSETTING(    0x01, "50MHz" )
-	PORT_CONFSETTING(    0x02, "60MHz" )
-	PORT_CONFSETTING(    0x03, "66MHz" )
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mmtm_state, change_cpu_freq, 0)
+	PORT_CONFSETTING(    0x00, "50MHz" )
+	PORT_CONFSETTING(    0x01, "60MHz" )
+	PORT_CONFSETTING(    0x02, "66MHz" )
 INPUT_PORTS_END
 
 
@@ -218,8 +197,6 @@ void mmtm_state::mmtm_v(machine_config &config)
 
 	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 0x8000); // through 4060, 375Hz
 	m_maincpu->set_periodic_int(FUNC(mmtm_state::irq3_line_hold), irq_period);
-
-	TIMER(config, "disable_bootrom").configure_generic(FUNC(mmtm_state::disable_bootrom));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -294,14 +271,14 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT   CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, port32t,   port32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, port32t,   port32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 68030", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1990, lyon32t,   lyon32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, lyon32t8,  lyon32, 0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Lyon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, lyon32t,   lyon32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 68030", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, lyon32t8,  lyon32, 0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Lyon", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1991, van32t,    van32,  0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1991, van32t8,   van32,  0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Vancouver", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1991, berl32t8p, van32,  0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Berlin (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, van32t,    van32,  0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 68030", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, van32t8,   van32,  0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Vancouver", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, berl32t8p, van32,  0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Berlin (prototype)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1996, lond32t,   lond32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Saitek", "Mephisto London 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // after Saitek took over H+G
-SYST( 1996, lond32t8,  lond32, 0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Saitek", "Mephisto TM London", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
+SYST( 1996, lond32t,   lond32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Saitek", "Mephisto London 68030", MACHINE_SUPPORTS_SAVE ) // after Saitek took over H+G
+SYST( 1996, lond32t8,  lond32, 0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Saitek", "Mephisto TM London", MACHINE_SUPPORTS_SAVE ) // "

@@ -46,6 +46,8 @@ protected:
 	virtual bool nvram_write(util::write_stream &file) override;
 	virtual bool nvram_can_write() const override;
 
+	void reset_in(int state) override;
+
 private:
 	required_device<ram_device> m_ram;
 	required_device<ram_device> m_dsrram;
@@ -65,6 +67,8 @@ private:
 	bool    m_phoenix_split;
 	bool    m_hideswitch;
 	bool    m_rambo_supported;
+
+	bool    m_reset_in;
 
 	// Do not save if nothing was modified.
 	bool    m_modified;

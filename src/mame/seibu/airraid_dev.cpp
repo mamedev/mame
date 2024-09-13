@@ -11,21 +11,21 @@
 
 DEFINE_DEVICE_TYPE(AIRRAID_VIDEO, airraid_video_device, "airraid_vid", "Seibu Air Raid Video")
 
-airraid_video_device::airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AIRRAID_VIDEO, tag, owner, clock),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "^palette"),
-		m_screen(*this, "screen"),
-		m_tx_clut(*this, "tx_clut"),
-		m_fg_clut(*this, "fg_clut"),
-		m_bg_clut(*this, "bg_clut"),
-		m_spr_clut(*this, "spr_clut"),
-		m_fgmap(*this, "fg_map"),
-		m_bgmap(*this, "bg_map"),
-		m_sprite_ram(*this, "^sprite_ram"),
-		m_txram(*this,"^txram"),
-		m_vregs(*this,"^vregs"),
-		m_hw(0x09)
+airraid_video_device::airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, AIRRAID_VIDEO, tag, owner, clock),
+	m_gfxdecode(*this, "gfxdecode"),
+	m_palette(*this, "^palette"),
+	m_screen(*this, "screen"),
+	m_tx_clut(*this, "tx_clut"),
+	m_fg_clut(*this, "fg_clut"),
+	m_bg_clut(*this, "bg_clut"),
+	m_spr_clut(*this, "spr_clut"),
+	m_fgmap(*this, "fg_map"),
+	m_bgmap(*this, "bg_map"),
+	m_sprite_ram(*this, "^sprite_ram"),
+	m_txram(*this,"^txram"),
+	m_vregs(*this,"^vregs"),
+	m_hw(0x09)
 {
 }
 

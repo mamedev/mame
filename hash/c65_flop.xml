@@ -2,10 +2,13 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
+
+TODO:
+- support for TOSEC images (loose files, requires floptool .d81 support)
 -->
 <softwarelist name="c65_flop" description="Commodore 65 diskettes">
 
-	<software name="demo">
+	<software name="demo" supported="no">
 		<description>C65 Demo</description>
 		<year>2002</year>
 		<publisher>K2</publisher>

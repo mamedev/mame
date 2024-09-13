@@ -123,8 +123,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -333,8 +331,6 @@ uint32_t magmax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 void magmax_state::cpu_irq_ack_w(uint16_t data)
 {

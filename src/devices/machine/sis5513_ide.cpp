@@ -144,6 +144,7 @@ void sis5513_ide_device::device_reset()
 	pci_device::device_reset();
 
 	command = 0x0000;
+	command_mask = 5;
 	status = 0x0000;
 	pclass = 0x01018a;
 	m_ide_ctrl0 = 0;

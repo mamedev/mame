@@ -5,7 +5,7 @@
 // TODO: Emulate pin-compatible Crystal Semiconductor CS4231 and its extra Mode 2 features
 
 #include "emu.h"
-#include "sound/ad1848.h"
+#include "ad1848.h"
 
 #include "speaker.h"
 

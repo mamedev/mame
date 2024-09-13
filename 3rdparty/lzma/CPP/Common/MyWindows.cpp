@@ -78,7 +78,7 @@ BSTR SysAllocStringLen(const OLECHAR *s, UINT len)
 BSTR SysAllocString(const OLECHAR *s)
 {
   if (!s)
-    return 0;
+    return NULL;
   const OLECHAR *s2 = s;
   while (*s2 != 0)
     s2++;
@@ -181,7 +181,7 @@ BOOL WINAPI FileTimeToLocalFileTime(const FILETIME *fileTime, FILETIME *localFil
 {
   UInt64 v = GET_TIME_64(fileTime);
   v = (UInt64)((Int64)v - (Int64)TIME_GetBias() * TICKS_PER_SEC);
-  SET_FILETIME(localFileTime, v);
+  SET_FILETIME(localFileTime, v)
   return TRUE;
 }
 
@@ -189,7 +189,7 @@ BOOL WINAPI LocalFileTimeToFileTime(const FILETIME *localFileTime, FILETIME *fil
 {
   UInt64 v = GET_TIME_64(localFileTime);
   v = (UInt64)((Int64)v + (Int64)TIME_GetBias() * TICKS_PER_SEC);
-  SET_FILETIME(fileTime, v);
+  SET_FILETIME(fileTime, v)
   return TRUE;
 }
 
@@ -203,7 +203,7 @@ VOID WINAPI GetSystemTimeAsFileTime(FILETIME *ft)
     t = tv.tv_sec * (UInt64)TICKS_PER_SEC + TICKS_1601_TO_1970;
     t += tv.tv_usec * 10;
   }
-  SET_FILETIME(ft, t);
+  SET_FILETIME(ft, t)
 }
 */
 

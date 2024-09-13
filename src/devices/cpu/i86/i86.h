@@ -139,6 +139,7 @@ protected:
 	virtual uint8_t read_port_byte(uint16_t port);
 	virtual uint16_t read_port_word(uint16_t port);
 	virtual void write_port_byte(uint16_t port, uint8_t data);
+	virtual void write_port_byte_al(uint16_t port);
 	virtual void write_port_word(uint16_t port, uint16_t data);
 
 	// Executing instructions

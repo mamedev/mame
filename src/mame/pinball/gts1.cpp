@@ -801,8 +801,8 @@ void gts1_state::p2(machine_config &config)
 
 #define GTS1_BIOS \
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF ) \
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345) ) \
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e) )
+	ROM_LOAD("a1752cf.u5", 0x0000, 0x0800, CRC(614a3bd9) SHA1(febca18fb6f96037ca82e515dd161dfcb0e4c776) ) \
+	ROM_LOAD("a1753ce.u4", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e) )
 
 
 ROM_START( gts1 )
@@ -990,9 +990,7 @@ ROM_START(sinbad)
 ROM_END
 
 ROM_START(sinbadn)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("412no1.cpu", 0x0000, 0x0400, CRC(f5373f5f) SHA1(027840501416ff01b2adf07188c7d667adf3ad5f))

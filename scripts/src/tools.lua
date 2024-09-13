@@ -31,6 +31,7 @@ links {
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("zstd"),
 	ext_lib("utf8proc"),
 }
 
@@ -72,6 +73,7 @@ links {
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("zstd"),
 	ext_lib("flac"),
 	ext_lib("utf8proc"),
 }
@@ -160,6 +162,7 @@ links {
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("zstd"),
 	ext_lib("flac"),
 	ext_lib("utf8proc"),
 }
@@ -205,6 +208,7 @@ links {
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("zstd"),
 	ext_lib("flac"),
 	ext_lib("utf8proc"),
 }
@@ -251,6 +255,7 @@ links {
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("zstd"),
 	ext_lib("flac"),
 	ext_lib("utf8proc"),
 }
@@ -377,6 +382,7 @@ links {
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("zstd"),
 	ext_lib("flac"),
 	ext_lib("utf8proc"),
 }
@@ -463,7 +469,7 @@ includedirs {
 }
 
 defines {
-  "NL_DISABLE_DYNAMIC_LOAD=1",
+	"NL_DISABLE_DYNAMIC_LOAD=1",
 }
 
 files {
@@ -554,6 +560,7 @@ links {
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("zstd"),
 	ext_lib("flac"),
 	ext_lib("utf8proc"),
 }
@@ -598,6 +605,7 @@ links {
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("zstd"),
 	ext_lib("flac"),
 	ext_lib("utf8proc"),
 }
@@ -645,6 +653,7 @@ links {
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("zstd"),
 	ext_lib("flac"),
 	ext_lib("utf8proc"),
 }
@@ -738,7 +747,7 @@ if _OPTIONS["targetos"] == "macosx" then
 		}
 
 		dependency {
-			{ "aueffectutil",  MAME_DIR .. "src/tools/aueffectutil-Info.plist", true  },
+			{ "aueffectutil", MAME_DIR .. "src/tools/aueffectutil-Info.plist", true },
 		}
 
 		links {

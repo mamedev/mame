@@ -17,7 +17,7 @@
 
 using namespace NWindows;
 
-#ifdef LANG
+#ifdef Z7_LANG
 static const UInt32 kLangIDs[] =
 {
   IDT_OVERWRITE_HEADER,
@@ -48,7 +48,7 @@ void COverwriteDialog::ReduceString(UString &s)
   }
 }
 
-void COverwriteDialog::SetFileInfoControl(int textID, int iconID,
+void COverwriteDialog::SetFileInfoControl(unsigned textID, unsigned iconID,
     const NOverwriteDialog::CFileInfo &fileInfo)
 {
   UString sizeString;
@@ -96,9 +96,9 @@ void COverwriteDialog::SetFileInfoControl(int textID, int iconID,
 
 bool COverwriteDialog::OnInit()
 {
-  #ifdef LANG
+  #ifdef Z7_LANG
   LangSetWindowText(*this, IDD_OVERWRITE);
-  LangSetDlgItems(*this, kLangIDs, ARRAY_SIZE(kLangIDs));
+  LangSetDlgItems(*this, kLangIDs, Z7_ARRAY_SIZE(kLangIDs));
   #endif
   SetFileInfoControl(IDT_OVERWRITE_OLD_FILE_SIZE_TIME, IDI_OVERWRITE_OLD_FILE, OldFileInfo);
   SetFileInfoControl(IDT_OVERWRITE_NEW_FILE_SIZE_TIME, IDI_OVERWRITE_NEW_FILE, NewFileInfo);
@@ -122,7 +122,7 @@ bool COverwriteDialog::OnInit()
   return CModalDialog::OnInit();
 }
 
-bool COverwriteDialog::OnButtonClicked(int buttonID, HWND buttonHWND)
+bool COverwriteDialog::OnButtonClicked(unsigned buttonID, HWND buttonHWND)
 {
   switch (buttonID)
   {
@@ -131,7 +131,7 @@ bool COverwriteDialog::OnButtonClicked(int buttonID, HWND buttonHWND)
     case IDB_YES_TO_ALL:
     case IDB_NO_TO_ALL:
     case IDB_AUTO_RENAME:
-      End(buttonID);
+      End((INT_PTR)buttonID);
       return true;
   }
   return CModalDialog::OnButtonClicked(buttonID, buttonHWND);

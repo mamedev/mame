@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
-// copyright-holders:Pierpaolo Prazzoli
+// copyright-holders: Pierpaolo Prazzoli
+
 /*
 
  Enerdyne Technologies Inc. (El Cajon, CA 92020) hardware
 
  CPU: Z80
  Sound: AY-3-8912 (x3)
- Other: Dallas DS1220Y NVRAM, N8T245N (x2), PAL16L8A-2CN (x2,protected)
+ Other: Dallas DS1220Y NVRAM, N8T245N (x2), PAL16L8A-2CN (x2, protected)
 
  XTAL = 12 MHz
 
@@ -27,10 +28,12 @@ Notes:
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -44,81 +47,84 @@ class ettrivia_state : public driver_device
 public:
 	ettrivia_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_fg_videoram(*this, "fg_videoram")
-		, m_bg_videoram(*this, "bg_videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_ay(*this, "ay%u", 1)
+		, m_fg_videoram(*this, "fg_videoram")
+		, m_bg_videoram(*this, "bg_videoram")
+		, m_questions_bank(*this, "questions_bank")
+		, m_coin(*this, "COIN")
 	{
 	}
 
 	void ettrivia(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
-	int m_palreg = 0;
-	int m_gfx_bank = 0;
-	int m_question_bank = 0;
-	int m_b000_val = 0;
-	int m_b000_ret = 0;
-	int m_b800_prev = 0;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device_array<ay8912_device, 3> m_ay;
+
 	required_shared_ptr<uint8_t> m_fg_videoram;
 	required_shared_ptr<uint8_t> m_bg_videoram;
+	required_memory_bank m_questions_bank;
+
+	required_ioport m_coin;
+
+	uint8_t m_palreg = 0;
+	uint8_t m_gfx_bank = 0;
+	uint8_t m_b000_val = 0;
+	uint8_t m_b000_ret = 0;
+	uint8_t m_b800_prev = 0;
+
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
-	void ettrivia_fg_w(offs_t offset, uint8_t data);
-	void ettrivia_bg_w(offs_t offset, uint8_t data);
-	void ettrivia_control_w(uint8_t data);
-	uint8_t ettrivia_question_r(offs_t offset);
+
+	void fg_w(offs_t offset, uint8_t data);
+	void bg_w(offs_t offset, uint8_t data);
+	void control_w(uint8_t data);
+	uint8_t question_r(offs_t offset);
 	void b000_w(uint8_t data);
 	uint8_t b000_r();
 	void b800_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
-	void ettrivia_palette(palette_device &palette) const;
-	uint32_t screen_update_ettrivia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ettrivia_interrupt);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(interrupt);
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, uint8_t *vidram, int gfx_code);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device_array<ay8912_device, 3> m_ay;
-	void cpu_map(address_map &map);
+	void program_map(address_map &map);
 	void io_map(address_map &map);
 };
 
 
-void ettrivia_state::ettrivia_fg_w(offs_t offset, uint8_t data)
+void ettrivia_state::fg_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-void ettrivia_state::ettrivia_bg_w(offs_t offset, uint8_t data)
+void ettrivia_state::bg_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-void ettrivia_state::ettrivia_control_w(uint8_t data)
+void ettrivia_state::control_w(uint8_t data)
 {
 	machine().tilemap().mark_all_dirty();
 
 	m_palreg  = (data >> 1) & 3;
 	m_gfx_bank = (data >> 2) & 1;
 
-	m_question_bank = (data >> 3) & 3;
+	m_questions_bank->set_entry((data >> 3) & 3);
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 
 	flip_screen_set(data & 1);
-}
-
-uint8_t ettrivia_state::ettrivia_question_r(offs_t offset)
-{
-	uint8_t *QUESTIONS = memregion("user1")->base();
-	return QUESTIONS[offset + 0x10000 * m_question_bank];
 }
 
 void ettrivia_state::b000_w(uint8_t data)
@@ -128,7 +134,7 @@ void ettrivia_state::b000_w(uint8_t data)
 
 uint8_t ettrivia_state::b000_r()
 {
-	if(m_b800_prev)
+	if (m_b800_prev)
 		return m_b000_ret;
 	else
 		return m_b000_val;
@@ -136,17 +142,17 @@ uint8_t ettrivia_state::b000_r()
 
 void ettrivia_state::b800_w(uint8_t data)
 {
-	switch(data)
+	switch (data)
 	{
-		/* special case to return the value written to 0xb000 */
-		/* does it reset the chips too ? */
+		/* special case to return the value written to 0xb000
+		   does it reset the chips too ? */
 		case 0: break;
 		case 0xc4: m_b000_ret = m_ay[0]->data_r();    break;
 		case 0x94: m_b000_ret = m_ay[1]->data_r();    break;
 		case 0x86: m_b000_ret = m_ay[2]->data_r();    break;
 
 		case 0x80:
-			switch(m_b800_prev)
+			switch (m_b800_prev)
 			{
 				case 0xe0: m_ay[0]->address_w(m_b000_val);    break;
 				case 0x98: m_ay[1]->address_w(m_b000_val);    break;
@@ -163,22 +169,33 @@ void ettrivia_state::b800_w(uint8_t data)
 	m_b800_prev = data;
 }
 
-void ettrivia_state::cpu_map(address_map &map)
+void ettrivia_state::machine_start()
+{
+	m_questions_bank->configure_entries(0, 4, memregion("questions")->base(), 0x10000);
+
+	save_item(NAME(m_palreg));
+	save_item(NAME(m_gfx_bank));
+	save_item(NAME(m_b000_val));
+	save_item(NAME(m_b000_ret));
+	save_item(NAME(m_b800_prev));
+}
+
+void ettrivia_state::program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x9000, 0x9000).w(FUNC(ettrivia_state::ettrivia_control_w));
+	map(0x9000, 0x9000).w(FUNC(ettrivia_state::control_w));
 	map(0x9800, 0x9800).nopw();
 	map(0xa000, 0xa000).nopw();
 	map(0xb000, 0xb000).r(FUNC(ettrivia_state::b000_r)).w(FUNC(ettrivia_state::b000_w));
 	map(0xb800, 0xb800).w(FUNC(ettrivia_state::b800_w));
-	map(0xc000, 0xc7ff).ram().w(FUNC(ettrivia_state::ettrivia_fg_w)).share("fg_videoram");
-	map(0xe000, 0xe7ff).ram().w(FUNC(ettrivia_state::ettrivia_bg_w)).share("bg_videoram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(ettrivia_state::fg_w)).share(m_fg_videoram);
+	map(0xe000, 0xe7ff).ram().w(FUNC(ettrivia_state::bg_w)).share(m_bg_videoram);
 }
 
 void ettrivia_state::io_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(ettrivia_state::ettrivia_question_r));
+	map(0x0000, 0xffff).bankr(m_questions_bank);
 }
 
 static INPUT_PORTS_START( ettrivia )
@@ -212,24 +229,24 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	2,
 	{ RGN_FRAC(1,2), RGN_FRAC(0,2) },
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(7,-1) },
+	{ STEP8(0,8) },
 	8*8
 };
 
 static GFXDECODE_START( gfx_ettrivia )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 32*4, 32 )
+	GFXDECODE_ENTRY( "bgchars", 0, charlayout,    0, 32 )
+	GFXDECODE_ENTRY( "fgchars", 0, charlayout, 32*4, 32 )
 GFXDECODE_END
 
 void ettrivia_state::get_tile_info(tile_data &tileinfo, int tile_index, uint8_t *vidram, int gfx_code)
 {
 	int code = vidram[tile_index];
-	int color = (code >> 5) + 8 * m_palreg;
+	int const color = (code >> 5) + 8 * m_palreg;
 
 	code += m_gfx_bank * 0x100;
 
-	tileinfo.set(gfx_code,code,color,0);
+	tileinfo.set(gfx_code, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_bg)
@@ -242,7 +259,7 @@ TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_fg)
 	get_tile_info(tileinfo, tile_index, m_fg_videoram, 1);
 }
 
-void ettrivia_state::ettrivia_palette(palette_device &palette) const
+void ettrivia_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
 	static constexpr int resistances[2] = { 270, 130 };
@@ -260,41 +277,41 @@ void ettrivia_state::ettrivia_palette(palette_device &palette) const
 
 		// red component
 		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i+0x100], 0);
+		bit1 = BIT(color_prom[i + 0x100], 0);
 		int const r = combine_weights(weights, bit0, bit1);
 
 		// green component
 		bit0 = BIT(color_prom[i], 2);
-		bit1 = BIT(color_prom[i+0x100], 2);
+		bit1 = BIT(color_prom[i + 0x100], 2);
 		int const g = combine_weights(weights, bit0, bit1);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 1);
-		bit1 = BIT(color_prom[i+0x100], 1);
+		bit1 = BIT(color_prom[i + 0x100], 1);
 		int const b = combine_weights(weights, bit0, bit1);
 
-		palette.set_pen_color(bitswap<8>(i,5,7,6,2,1,0,4,3), rgb_t(r, g, b));
+		palette.set_pen_color(bitswap<8>(i, 5, 7, 6, 2, 1, 0, 4, 3), rgb_t(r, g, b));
 	}
 }
 
 void ettrivia_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ettrivia_state::get_tile_info_bg)), TILEMAP_SCAN_ROWS, 8,8,64,32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ettrivia_state::get_tile_info_fg)), TILEMAP_SCAN_ROWS, 8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ettrivia_state::get_tile_info_bg)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ettrivia_state::get_tile_info_fg)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-uint32_t ettrivia_state::screen_update_ettrivia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ettrivia_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(ettrivia_state::ettrivia_interrupt)
+INTERRUPT_GEN_MEMBER(ettrivia_state::interrupt)
 {
-	if( ioport("COIN")->read() & 0x01 )
+	if (m_coin->read() & 0x01)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		device.execute().set_input_line(0, HOLD_LINE);
@@ -302,26 +319,26 @@ INTERRUPT_GEN_MEMBER(ettrivia_state::ettrivia_interrupt)
 
 void ettrivia_state::ettrivia(machine_config &config)
 {
-	Z80(config, m_maincpu, 12000000/4-48000); //should be ok, it gives the 300 interrupts expected
-	m_maincpu->set_addrmap(AS_PROGRAM, &ettrivia_state::cpu_map);
+	Z80(config, m_maincpu, 12'000'000 / 4 - 48'000); //should be ok, it gives the 300 interrupts expected
+	m_maincpu->set_addrmap(AS_PROGRAM, &ettrivia_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &ettrivia_state::io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(ettrivia_state::ettrivia_interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(ettrivia_state::interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
-	screen.set_screen_update(FUNC(ettrivia_state::screen_update_ettrivia));
+	screen.set_screen_update(FUNC(ettrivia_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_ettrivia);
-	PALETTE(config, "palette", FUNC(ettrivia_state::ettrivia_palette), 256);
+	PALETTE(config, "palette", FUNC(ettrivia_state::palette), 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	AY8912(config, m_ay[0], 1500000).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -339,19 +356,19 @@ ROM_START( promutrv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u16.u16",      0x0000, 0x8000, CRC(e37d48be) SHA1(1d700cff0c28e50fa2851e0c46de21aa47a23416) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "bgchars", 0 )
 	ROM_LOAD( "mt44ic.44",    0x0000, 0x1000, CRC(8d543ea4) SHA1(86ab848a45851540d5d3315e15b92f7b2ac0b77c) )
 	ROM_LOAD( "mt46ic.46",    0x1000, 0x1000, CRC(6d6e1f68) SHA1(e8196ecd915a2528122407d31a7078f177be0beb) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "fgchars", 0 )
 	ROM_LOAD( "mt48ic.48",    0x0000, 0x1000, CRC(f2efe300) SHA1(419e889b2f4d038ae64e3ccf4e2498add80b4c9f) )
 	ROM_LOAD( "mt50ic.50",    0x1000, 0x1000, CRC(ee89d24e) SHA1(e3536df549278040255657201433ab23e0386533) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "ic64.prm",     0x0000, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) /* palette low bits */
-	ROM_LOAD( "ic63.prm",     0x0100, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) /* palette high bits */
+	ROM_LOAD( "ic64.prm",     0x0000, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) // palette low bits
+	ROM_LOAD( "ic63.prm",     0x0100, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) // palette high bits
 
-	ROM_REGION( 0x40000, "user1", 0 ) /* Question roms */
+	ROM_REGION( 0x40000, "questions", 0 )
 	ROM_LOAD( "movie-tv.lo0", 0x00000, 0x8000, CRC(dbf03e62) SHA1(0210442ff80cce8fe39ba5e373bca0f47bb389c4) )
 	ROM_LOAD( "movie-tv.hi0", 0x08000, 0x8000, CRC(77f09aab) SHA1(007ae0ec1f37b575412fa71c92d1891a62069089) )
 	ROM_LOAD( "scifi.lo1",    0x10000, 0x8000, CRC(b5595f81) SHA1(5e7fa334f6541860a5c04e5f345673ea12efafb4) )
@@ -366,19 +383,19 @@ ROM_START( promutrva )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u16.u16",      0x0000, 0x8000, CRC(e37d48be) SHA1(1d700cff0c28e50fa2851e0c46de21aa47a23416) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "bgchars", 0 )
 	ROM_LOAD( "mt44ic.44",    0x0000, 0x1000, CRC(8d543ea4) SHA1(86ab848a45851540d5d3315e15b92f7b2ac0b77c) )
 	ROM_LOAD( "mt46ic.46",    0x1000, 0x1000, CRC(6d6e1f68) SHA1(e8196ecd915a2528122407d31a7078f177be0beb) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "fgchars", 0 )
 	ROM_LOAD( "mt48ic.48",    0x0000, 0x1000, CRC(f2efe300) SHA1(419e889b2f4d038ae64e3ccf4e2498add80b4c9f) )
 	ROM_LOAD( "mt50ic.50",    0x1000, 0x1000, CRC(ee89d24e) SHA1(e3536df549278040255657201433ab23e0386533) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "ic64.prm",     0x0000, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) /* palette low bits */
-	ROM_LOAD( "ic63.prm",     0x0100, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) /* palette high bits */
+	ROM_LOAD( "ic64.prm",     0x0000, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) // palette low bits
+	ROM_LOAD( "ic63.prm",     0x0100, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) // palette high bits
 
-	ROM_REGION( 0x40000, "user1", 0 ) /* Question roms */
+	ROM_REGION( 0x40000, "questions", 0 )
 	ROM_LOAD( "movie-tv.lo0", 0x00000, 0x8000, CRC(dbf03e62) SHA1(0210442ff80cce8fe39ba5e373bca0f47bb389c4) )
 	ROM_LOAD( "movie-tv.hi0", 0x08000, 0x8000, CRC(77f09aab) SHA1(007ae0ec1f37b575412fa71c92d1891a62069089) )
 	ROM_LOAD( "rock-pop.lo1", 0x10000, 0x8000, CRC(4252bc23) SHA1(d6c5b3c5f227b043f298cea585bcb934538b8880) )
@@ -393,19 +410,19 @@ ROM_START( promutrvb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u16.u16",      0x0000, 0x8000, CRC(e37d48be) SHA1(1d700cff0c28e50fa2851e0c46de21aa47a23416) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "bgchars", 0 )
 	ROM_LOAD( "mt44.ic44",    0x0000, 0x1000, CRC(8d543ea4) SHA1(86ab848a45851540d5d3315e15b92f7b2ac0b77c) )
 	ROM_LOAD( "mt46.ic46",    0x1000, 0x1000, CRC(6d6e1f68) SHA1(e8196ecd915a2528122407d31a7078f177be0beb) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "fgchars", 0 )
 	ROM_LOAD( "mt48.ic48",    0x0000, 0x1000, CRC(f2efe300) SHA1(419e889b2f4d038ae64e3ccf4e2498add80b4c9f) )
 	ROM_LOAD( "mt50.ic50",    0x1000, 0x1000, CRC(ee89d24e) SHA1(e3536df549278040255657201433ab23e0386533) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "dm74s287n.ic64",     0x0000, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) /* palette low bits */
-	ROM_LOAD( "dm74s287n.ic63",     0x0100, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) /* palette high bits */
+	ROM_LOAD( "dm74s287n.ic64",     0x0000, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) // palette low bits
+	ROM_LOAD( "dm74s287n.ic63",     0x0100, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) // palette high bits
 
-	ROM_REGION( 0x40000, "user1", 0 ) /* Question roms */
+	ROM_REGION( 0x40000, "questions", 0 )
 	ROM_LOAD( "movie-tv.lo0.u8", 0x00000, 0x8000, CRC(dbf03e62) SHA1(0210442ff80cce8fe39ba5e373bca0f47bb389c4) )
 	ROM_LOAD( "movie-tv.hi0.u7", 0x08000, 0x8000, CRC(77f09aab) SHA1(007ae0ec1f37b575412fa71c92d1891a62069089) )
 	ROM_LOAD( "rock-pop.lo1.u6", 0x10000, 0x8000, CRC(4252bc23) SHA1(d6c5b3c5f227b043f298cea585bcb934538b8880) )
@@ -424,19 +441,19 @@ ROM_START( promutrvc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u16.u16",      0x0000, 0x8000, CRC(e37d48be) SHA1(1d700cff0c28e50fa2851e0c46de21aa47a23416) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "bgchars", 0 )
 	ROM_LOAD( "mt44.ic44",    0x0000, 0x1000, CRC(8d543ea4) SHA1(86ab848a45851540d5d3315e15b92f7b2ac0b77c) )
 	ROM_LOAD( "mt46.ic46",    0x1000, 0x1000, CRC(6d6e1f68) SHA1(e8196ecd915a2528122407d31a7078f177be0beb) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "fgchars", 0 )
 	ROM_LOAD( "mt48.ic48",    0x0000, 0x1000, CRC(f2efe300) SHA1(419e889b2f4d038ae64e3ccf4e2498add80b4c9f) )
 	ROM_LOAD( "mt50.ic50",    0x1000, 0x1000, CRC(ee89d24e) SHA1(e3536df549278040255657201433ab23e0386533) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "dm74s287n.ic64",     0x0000, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) /* palette low bits */
-	ROM_LOAD( "dm74s287n.ic63",     0x0100, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) /* palette high bits */
+	ROM_LOAD( "dm74s287n.ic64",     0x0000, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) // palette low bits
+	ROM_LOAD( "dm74s287n.ic63",     0x0100, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) // palette high bits
 
-	ROM_REGION( 0x40000, "user1", 0 ) /* Question roms */
+	ROM_REGION( 0x40000, "questions", 0 )
 	ROM_LOAD( "sports.lo0.u8",   0x00000, 0x8000, CRC(bb28fa92) SHA1(a3c4c67be0e31793d68b0b048f3a73e9ce1d5859) )
 	ROM_LOAD( "sports2.hi0.u7",  0x08000, 0x8000, CRC(4d0107d7) SHA1(4cbef1bc5faaca52ce6bb490560f213d60a96191) )
 	ROM_LOAD( "expert.lo1.u6",   0x10000, 0x8000, CRC(19153d1a) SHA1(a2f2bbabbd1c68aae58ff29a43cb02b0e8867f5a) )
@@ -455,19 +472,19 @@ ROM_START( strvmstr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "stm16.u16",    0x0000, 0x8000, CRC(ae734db9) SHA1(1bacdfdebaa1f250bfbd49053c3910f1396afe11) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "bgchars", 0 )
 	ROM_LOAD( "stm44.rom",    0x0000, 0x1000, CRC(e69da710) SHA1(218a9d7600d67858d1f21282a0cebec0ae93e0ff) )
 	ROM_LOAD( "stm46.rom",    0x1000, 0x1000, CRC(d927a1f1) SHA1(63a49a61107deaf7a9f28b9653c310c5331f5143) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "fgchars", 0 )
 	ROM_LOAD( "stm48.rom",    0x0000, 0x1000, CRC(51719714) SHA1(fdecbd22ea65eec7b4b5138f89ddc5876b05def6) )
 	ROM_LOAD( "stm50.rom",    0x1000, 0x1000, CRC(cfc1a1d1) SHA1(9ef38f12360dd946651e67770742ca72fa6846f1) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "stm64.prm",    0x0000, 0x0100, BAD_DUMP CRC(69ebc0b8) SHA1(de2b936e3246e3bfc7e2ff9546c1854ec3504cc2) ) /* palette low bits */
-	ROM_LOAD( "stm63.prm",    0x0100, 0x0100, BAD_DUMP CRC(305271cf) SHA1(6fd5fe085d79ca7aa57010cffbdb2a85b9c24701) ) /* palette high bits */
+	ROM_LOAD( "stm64.prm",    0x0000, 0x0100, BAD_DUMP CRC(69ebc0b8) SHA1(de2b936e3246e3bfc7e2ff9546c1854ec3504cc2) ) // palette low bits
+	ROM_LOAD( "stm63.prm",    0x0100, 0x0100, BAD_DUMP CRC(305271cf) SHA1(6fd5fe085d79ca7aa57010cffbdb2a85b9c24701) ) // palette high bits
 
-	ROM_REGION( 0x40000, "user1", 0 ) /* Question roms */
+	ROM_REGION( 0x40000, "questions", 0 )
 	ROM_LOAD( "sex2.lo0",     0x00000, 0x8000, CRC(9c68b277) SHA1(34bc9d7b973fe482abd5e34a058b72eb5ec8db64) )
 	ROM_LOAD( "sports.hi0",   0x08000, 0x8000, CRC(3678fb79) SHA1(4e40cc20707195c0e88e595f752a2982b531b57e) )
 	ROM_LOAD( "movies.lo1",   0x10000, 0x8000, CRC(16cba1b7) SHA1(8aa3eff72d1ec8dac906f2e803a88578a9fe763c) )
@@ -481,8 +498,8 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, promutrv,  0,        ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 1)", 0 )
-GAME( 1985, promutrva, promutrv, ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", 0 )
-GAME( 1985, promutrvb, promutrv, ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 3)", 0 )
-GAME( 1985, promutrvc, promutrv, ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 4)", 0 )
-GAME( 1986, strvmstr,  0,        ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Super Trivia Master",                       MACHINE_WRONG_COLORS )
+GAME( 1985, promutrv,  0,        ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, promutrva, promutrv, ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, promutrvb, promutrv, ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, promutrvc, promutrv, ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, strvmstr,  0,        ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Super Trivia Master",                       MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

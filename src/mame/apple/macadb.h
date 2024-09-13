@@ -17,25 +17,18 @@ class macadb_device :  public device_t
 {
 public:
 	// construction/destruction
-	macadb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	macadb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void set_mcu_mode(bool bMCUMode) { m_bIsMCUMode = bMCUMode; }
-
-	auto via_clock_callback() { return write_via_clock.bind(); }
-	auto via_data_callback() { return write_via_data.bind(); }
 	auto adb_data_callback() { return write_adb_data.bind(); }
 	auto adb_irq_callback() { return write_adb_irq.bind(); }
 
 	required_ioport m_mouse0, m_mouse1, m_mouse2;
 	required_ioport_array<8> m_keys;
-	devcb_write_line write_via_clock, write_via_data, write_adb_data, write_adb_irq;
+	devcb_write_line write_adb_data, write_adb_irq;
 
-	void adb_data_w(int state);
 	void adb_linechange_w(int state);
 
-	void adb_vblank();
-	void mac_adb_newaction(int state);
-	int32_t get_adb_state(void) { return m_adb_state; }
+	void adb_vblank() {}
 
 protected:
 	// device-level overrides
@@ -44,46 +37,42 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	bool m_bIsMCUMode;
-
-	uint64_t m_last_adb_time;
-
-	emu_timer *m_adb_timer;
+	u64 m_last_adb_time;
+	emu_timer *m_timer;
 
 	/* keyboard matrix to detect transition */
 	u16 m_key_matrix[9];
 
 	// ADB HLE state
-	int32_t m_adb_state, m_adb_waiting_cmd, m_adb_datasize;
-	int32_t m_adb_command, m_adb_send, m_adb_timer_ticks, m_adb_extclock, m_adb_direction;
-	int32_t m_adb_listenreg, m_adb_listenaddr, m_adb_last_talk, m_adb_srq_switch;
-	int32_t m_adb_stream_ptr;
-	int32_t m_adb_linestate;
-	u8 m_adb_buffer[257], m_last_kbd[2], m_last_mouse[2], m_keyboard_handler, m_mouse_handler;
-	bool  m_adb_srqflag;
-	int m_adb_linein;
+	bool m_waiting_cmd;
+	s32 m_datasize;
+	s32 m_command, m_direction;
+	u8 m_listenreg, m_listenaddr;
+	s32 m_srq_switch, m_stream_ptr, m_linestate;
+	u8 m_buffer[16], m_last_kbd[2], m_last_mouse[2];
+	u8 m_keyboard_handler, m_mouse_handler;
+	bool m_srqflag;
+	s32 m_linein;
 
-	#define kADBKeyBufSize 32
-	uint8_t m_adb_keybuf[kADBKeyBufSize];
-	uint8_t m_adb_keybuf_start;
-	uint8_t m_adb_keybuf_end;
+	static constexpr int kADBKeyBufSize = 32;
+	u8 m_keybuf[kADBKeyBufSize];
+	u8 m_keybuf_start;
+	u8 m_keybuf_end;
 
 	// ADB mouse state
-	int m_adb_mouseaddr;
-	int m_adb_lastmousex, m_adb_lastmousey, m_adb_lastbutton, m_adb_mouse_initialized;
+	u8 m_mouseaddr;
+	s32 m_lastmousex, m_lastmousey, m_lastbutton;
 
 	// ADB keyboard state
-	int m_adb_keybaddr;
-	int m_adb_keybinitialized, m_adb_currentkeys[2], m_adb_modifiers;
+	u8 m_keybaddr;
+	s32 m_currentkeys[2], m_modifiers;
 
-	int adb_pollkbd(int update);
-	int adb_pollmouse();
-	void adb_accummouse( uint8_t *MouseX, uint8_t *MouseY );
+	bool adb_pollkbd(int update);
+	bool adb_pollmouse();
+	void adb_accummouse(u8 *MouseX, u8 *MouseY );
 	void adb_talk();
 
-	inline void set_adb_line(int linestate) { write_adb_data(linestate); }
-
-	TIMER_CALLBACK_MEMBER(mac_adb_tick);
+	TIMER_CALLBACK_MEMBER(timer_tick);
 };
 
 // device type definition

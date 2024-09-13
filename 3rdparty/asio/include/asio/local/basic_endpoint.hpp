@@ -2,7 +2,7 @@
 // local/basic_endpoint.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Derived from a public domain implementation written by Daniel Casimiro.
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -60,7 +60,7 @@ public:
 #endif
 
   /// Default constructor.
-  basic_endpoint() ASIO_NOEXCEPT
+  basic_endpoint() noexcept
   {
   }
 
@@ -90,13 +90,11 @@ public:
   {
   }
 
-#if defined(ASIO_HAS_MOVE)
   /// Move constructor.
   basic_endpoint(basic_endpoint&& other)
     : impl_(other.impl_)
   {
   }
-#endif // defined(ASIO_HAS_MOVE)
 
   /// Assign from another endpoint.
   basic_endpoint& operator=(const basic_endpoint& other)
@@ -105,14 +103,12 @@ public:
     return *this;
   }
 
-#if defined(ASIO_HAS_MOVE)
   /// Move-assign from another endpoint.
   basic_endpoint& operator=(basic_endpoint&& other)
   {
     impl_ = other.impl_;
     return *this;
   }
-#endif // defined(ASIO_HAS_MOVE)
 
   /// The protocol associated with the endpoint.
   protocol_type protocol() const

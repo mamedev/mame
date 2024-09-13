@@ -109,7 +109,8 @@ static void dumpSizeOf(void) noexcept {
     DUMP_TYPE(BaseBuilder);
     DUMP_TYPE(BaseNode);
     DUMP_TYPE(InstNode);
-    DUMP_TYPE(InstExNode);
+    DUMP_TYPE(InstNodeWithOperands<InstNode::kBaseOpCapacity>);
+    DUMP_TYPE(InstNodeWithOperands<InstNode::kFullOpCapacity>);
     DUMP_TYPE(AlignNode);
     DUMP_TYPE(LabelNode);
     DUMP_TYPE(EmbedDataNode);

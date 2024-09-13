@@ -178,8 +178,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
     Uses Data East custom chip 55 for backgrounds, with a special 8bpp mode
@@ -248,8 +246,6 @@ uint32_t sshangha_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-
-// machine
 
 /******************************************************************************/
 
@@ -511,7 +507,13 @@ static const gfx_layout tilelayout =
 static GFXDECODE_START( gfx_sshangha )
 	GFXDECODE_ENTRY( "tiles",    0, charlayout,  0x000, 64 ) // 8x8
 	GFXDECODE_ENTRY( "tiles",    0, tilelayout,  0x000, 64 ) // 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_sshangha_spr1 )
 	GFXDECODE_ENTRY( "sprites1", 0, tilelayout,  0x000, 64 ) // 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_sshangha_spr2 )
 	GFXDECODE_ENTRY( "sprites2", 0, tilelayout,  0x000, 64 ) // 16x16
 GFXDECODE_END
 
@@ -567,13 +569,8 @@ void sshangha_state::sshangha(machine_config &config)
 	m_tilegen->set_pf12_16x16_bank(1);
 	m_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_gfx_region(2);
-	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
-
-	DECO_SPRITE(config, m_sprgen[1], 0);
-	m_sprgen[1]->set_gfx_region(3);
-	m_sprgen[1]->set_gfxdecode_tag("gfxdecode");
+	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_sshangha_spr1);
+	DECO_SPRITE(config, m_sprgen[1], 0, m_palette, gfx_sshangha_spr2);
 
 	DECO146PROT(config, m_deco146, 0);
 	m_deco146->port_a_cb().set_ioport(m_inputs);

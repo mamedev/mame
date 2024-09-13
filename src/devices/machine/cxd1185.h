@@ -111,13 +111,21 @@ private:
 	}
 	m_state;
 
+	enum dma_direction : u8
+	{
+		DMA_NONE,
+		DMA_IN,
+		DMA_OUT
+	};
+
 	// internal state
 	bool m_irq_asserted;
 	bool m_drq_asserted;
-	util::fifo <u8, 16> m_fifo;
+	util::fifo<u8, 16> m_fifo;
 	bool m_pio_data_mode;
 	bool m_pio_ctrl_mode;
 	u32 m_scsi_ctrl_state;
+	dma_direction m_last_dma_direction;
 
 	enum status_mask : u8
 	{

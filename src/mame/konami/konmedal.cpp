@@ -832,7 +832,7 @@ void konmedal_state::tsukande(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
 	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
@@ -875,7 +875,7 @@ void konmedal_state::ddboy(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
 	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
@@ -1019,7 +1019,7 @@ void konmedal_state::shuriboy(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 	m_nvram->set_custom_handler(FUNC(konmedal_state::shuriboy_nvram_init));
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // everything not verified, just a placeholder

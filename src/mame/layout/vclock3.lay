@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -26,7 +27,7 @@ license:CC0-1.0
 
 <!-- build screen -->
 
-	<view name="Internal Layout">
+	<view name="Internal Layout" showpointers="no">
 		<bounds left="-3.5" right="56" top="-3" bottom="18" />
 
 		<element name="digit0" ref="digit"><bounds x="0" y="0" width="10" height="15" /></element>
@@ -40,7 +41,7 @@ license:CC0-1.0
 		<element name="0.8" ref="led"><bounds x="-2" y="0" width="1.5" height="1.5" /></element>
 		<element ref="text_pm"><bounds x="-4" y="2" width="5.5" height="1.5" /></element>
 
-		<element ref="nothing" inputtag="IN.6" inputmask="0x00" inputraw="yes"><bounds x="-2" y="9" width="1.5" height="1.5" /></element> <!-- block clickable input -->
+		<element ref="nothing" clickthrough="no"><bounds x="-2" y="9" width="1.5" height="1.5" /></element> <!-- block clickable input -->
 		<element ref="led" inputtag="IN.6" inputmask="0x02"><bounds x="-2" y="9" width="1.5" height="1.5" /></element>
 		<element ref="text_b1"><bounds x="-3" y="11" width="7.5" height="1.5" /></element>
 		<element ref="text_b2"><bounds x="-3" y="12.5" width="7.5" height="1.5" /></element>

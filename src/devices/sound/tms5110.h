@@ -74,7 +74,7 @@ private:
 	void new_int_write_addr(uint8_t addr);
 	uint8_t new_int_read();
 	void register_for_save_states();
-	int extract_bits(int count);
+	int read_bits(int count);
 	void perform_dummy_read();
 	int32_t lattice_filter();
 	void process(int16_t *buffer, unsigned int size);

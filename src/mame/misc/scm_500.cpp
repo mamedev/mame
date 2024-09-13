@@ -84,15 +84,15 @@ Std-chan is most current program.
 
 ROM_START( scm_500 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS( 0, "usa_442",   "USA 4.42" ) \
+	ROM_SYSTEM_BIOS( 0, "usa_442",   "USA 4.42" )
 	ROM_LOAD_BIOS( 0, "stndxgr_442", 0x00000, 0x10000, CRC(7e641cfa) SHA1(5c9ed9551f3c0496bc6c810375595e821a2eb75d)  ) // USA 04.42 (for 500 and 500E)
-	ROM_SYSTEM_BIOS( 1, "usa_431",   "USA 4.31" ) \
+	ROM_SYSTEM_BIOS( 1, "usa_431",   "USA 4.31" )
 	ROM_LOAD_BIOS( 1, "stndxgr_431", 0x00000, 0x10000, CRC(66a179d7) SHA1(3cdb06917616b57e3e3947007f6e2d923fb592a2)  ) // USA 04.31
-	ROM_SYSTEM_BIOS( 2, "usa_427",   "USA 4.27" ) \
+	ROM_SYSTEM_BIOS( 2, "usa_427",   "USA 4.27" )
 	ROM_LOAD_BIOS( 2, "stndxgr_427", 0x00000, 0x10000, CRC(908cda2f) SHA1(2a32922305b8201c25310679d5dd02f0951a4985)  ) // USA 04.27
-	ROM_SYSTEM_BIOS( 3, "usa_426",   "USA 4.26" ) \
+	ROM_SYSTEM_BIOS( 3, "usa_426",   "USA 4.26" )
 	ROM_LOAD_BIOS( 3, "stndxgr_426", 0x00000, 0x10000, CRC(fa459c77) SHA1(cafbde4256cf69ae422a700adfadeeaec4af53d3)  ) // USA 04.36
-	ROM_SYSTEM_BIOS( 4, "usa_307",   "USA 3.07" ) \
+	ROM_SYSTEM_BIOS( 4, "usa_307",   "USA 3.07" )
 	ROM_LOAD_BIOS( 4, "stndxgr_307", 0x00000, 0x10000, CRC(4d0d91c6) SHA1(85ff5d43ec331bcd4cde6aaf82f6143acc7e020c)  ) // USA 03.07 (could be 500E specific)
 ROM_END
 

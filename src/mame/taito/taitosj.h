@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 
-
 #include "machine/input_merger.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -16,8 +15,8 @@
 class taitosj_state : public driver_device
 {
 public:
-	taitosj_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	taitosj_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram_%u", 1U),
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),

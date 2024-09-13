@@ -65,6 +65,7 @@ public:
 	void init_kov3_101();
 	void init_kov3_100();
 	void init_kof98umh();
+	void init_bubucar();
 
 	void pgm2_ramrom(machine_config &config);
 	void pgm2_lores(machine_config &config);

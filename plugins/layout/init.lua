@@ -19,6 +19,12 @@ function layout.startplugin()
 		local env = {
 			machine = manager.machine,
 			emu = {
+				device_enumerator = emu.device_enumerator,
+				palette_enumerator = emu.palette_enumerator,
+				screen_enumerator = emu.screen_enumerator,
+				cassette_enumerator = emu.cassette_enumerator,
+				image_enumerator = emu.image_enumerator,
+				slot_enumerator = emu.slot_enumerator,
 				attotime = emu.attotime,
 				render_bounds = emu.render_bounds,
 				render_color = emu.render_color,
@@ -35,6 +41,7 @@ function layout.startplugin()
 				print_info = emu.print_info,
 				print_debug = emu.print_debug },
 			file = file,
+			math = math,
 			print = print,
 			pairs = pairs,
 			ipairs = ipairs,
@@ -44,7 +51,7 @@ function layout.startplugin()
 			table = table }
 		local script, err = load(script, script, "t", env)
 		if not script then
-			emu.print_verbose("error loading layout script " .. err)
+			emu.print_warning("error loading layout script " .. err)
 			return
 		end
 		local hooks = script()

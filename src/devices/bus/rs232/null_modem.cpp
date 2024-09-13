@@ -37,10 +37,10 @@ static INPUT_PORTS_START(null_modem)
 
 	PORT_START("FLOW_CONTROL")
 	PORT_CONFNAME(0x07, 0x00, "Flow Control")
-	PORT_CONFSETTING(0x00, "Off")
-	PORT_CONFSETTING(0x01, "RTS")
-	PORT_CONFSETTING(0x02, "DTR")
-	PORT_CONFSETTING(0x04, "XON/XOFF")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x01, "RTS")
+	PORT_CONFSETTING(   0x02, "DTR")
+	PORT_CONFSETTING(   0x04, "XON/XOFF")
 INPUT_PORTS_END
 
 ioport_constructor null_modem_device::device_input_ports() const
@@ -149,4 +149,4 @@ void null_modem_device::rcv_complete()
 	}
 }
 
-DEFINE_DEVICE_TYPE(NULL_MODEM, null_modem_device, "null_modem", "RS232 Null Modem")
+DEFINE_DEVICE_TYPE(NULL_MODEM, null_modem_device, "null_modem", "RS-232 Null Modem")

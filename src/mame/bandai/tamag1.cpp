@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:digshadow, segher
+// thanks-to:digshadow, Segher
 /*******************************************************************************
 
 Bandai Tamagotchi generation 1 hardware
@@ -10,6 +10,10 @@ Hardware notes:
 - Seiko Epson E0C6S46 MCU under epoxy
 - 32*16 LCD screen + 8 custom segments
 - 1-bit sound
+
+TODO:
+- change to SVG screen
+- add the Mothra version that was recently dumped (has a E0C6S48)
 
 *******************************************************************************/
 
@@ -64,8 +68,7 @@ void tamag1_state::machine_start()
 
 E0C6S46_PIXEL_UPDATE(tamag1_state::pixel_update)
 {
-	// 16 COM(common) pins, 40 SEG(segment) pins from MCU,
-	// 32x16 LCD screen:
+	// 16 COM(common) pins, 40 SEG(segment) pins from MCU, 32x16 LCD screen:
 	static const int seg2x[0x28] =
 	{
 		0, 1, 2, 3, 4, 5, 6, 7,
@@ -102,11 +105,8 @@ void tamag1_state::tama_palette(palette_device &palette) const
 
 INPUT_CHANGED_MEMBER(tamag1_state::input_changed)
 {
-	// inputs are hooked up backwards here, because MCU input
-	// ports are all tied to its interrupt controller
-	int line = param;
-	int state = newval ? ASSERT_LINE : CLEAR_LINE;
-	m_maincpu->set_input_line(line, state);
+	// inputs are hooked up backwards here, because MCU input ports are all tied to its interrupt controller
+	m_maincpu->set_input_line(param, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( tama )
@@ -169,5 +169,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY,  FULLNAME,           FLAGS
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY   FULLNAME            FLAGS
 SYST( 1997, tama, 0,      0,      tama,    tama,  tamag1_state, empty_init, "Bandai", "Tamagotchi (USA)", MACHINE_SUPPORTS_SAVE )

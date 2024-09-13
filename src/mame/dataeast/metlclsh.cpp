@@ -124,8 +124,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
                               -= Metal Clash =-
@@ -367,8 +365,6 @@ uint32_t metlclsh_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /***************************************************************************
 
@@ -746,4 +742,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, metlclsh, 0, metlclsh, metlclsh, metlclsh_state, empty_init, ROT0, "Data East", "Metal Clash (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, metlclsh, 0, metlclsh, metlclsh, metlclsh_state, empty_init, ROT0, "Data East Corporation", "Metal Clash (Japan)", MACHINE_SUPPORTS_SAVE )

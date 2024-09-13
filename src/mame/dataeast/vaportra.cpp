@@ -95,8 +95,6 @@ private:
 };
 
 
-// video
-
 /****************************************************************************
 
     2 Data East 55 chips for playfields (same as Dark Seal, etc)
@@ -187,13 +185,11 @@ uint32_t vaportra_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 	}
 
-	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(4), m_spriteram->buffer(), 0x800 / 2);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram->buffer(), 0x800 / 2);
 	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-
-// machine
 
 /******************************************************************************/
 
@@ -350,11 +346,14 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( gfx_vaportra )
-	GFXDECODE_ENTRY( "tiles1",  0x000000, charlayout,    0x000, 0x500 )    // Characters 8x8
-	GFXDECODE_ENTRY( "tiles1",  0x000000, tilelayout,    0x000, 0x500 )    // Tiles 16x16
-	GFXDECODE_ENTRY( "tiles2",  0x000000, charlayout,    0x000, 0x500 )    // Characters 8x8
-	GFXDECODE_ENTRY( "tiles2",  0x000000, tilelayout,    0x000, 0x500 )    // Tiles 16x16 // ok
-	GFXDECODE_ENTRY( "sprites", 0x000000, tilelayout,    0x100, 16 )       // 16x16
+	GFXDECODE_ENTRY( "tiles1",  0, charlayout, 0x000, 0x500 )    // Characters 8x8
+	GFXDECODE_ENTRY( "tiles1",  0, tilelayout, 0x000, 0x500 )    // Tiles 16x16
+	GFXDECODE_ENTRY( "tiles2",  0, charlayout, 0x000, 0x500 )    // Characters 8x8
+	GFXDECODE_ENTRY( "tiles2",  0, tilelayout, 0x000, 0x500 )    // Tiles 16x16 // ok
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_vaportra_spr )
+	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 16 )       // 16x16
 GFXDECODE_END
 
 /******************************************************************************/
@@ -427,7 +426,7 @@ void vaportra_state::vaportra(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(3);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_MXC06(config, m_spritegen, 0);
+	DECO_MXC06(config, m_spritegen, 0, m_palette, gfx_vaportra_spr);
 	m_spritegen->set_colpri_callback(FUNC(vaportra_state::colpri_cb));
 
 	// sound hardware

@@ -506,7 +506,7 @@ Protection file start
 
 #define MCU_READ(_ioport_, _bit_, _offset_, _retval_) \
 	if((0xffff - port[_ioport_]->read()) & _bit_) \
-		{ m_sharedram[_offset_] = _retval_; } \
+		{ m_sharedram[_offset_] = _retval_; }
 
 
 /* RAM-based protection handlings (input) */
@@ -1173,7 +1173,7 @@ void urashima_state::urashima(machine_config &config)
 // we actually compile it using EASy68k tool
 #define LOAD_FAKE_MCU_ROM \
 	ROM_REGION16_BE( 0x10000, "jmcu_rom", 0 ) \
-	ROM_LOAD16_WORD( "mcu.bin", 0, 0x10000, BAD_DUMP CRC(35425d2f) SHA1(9a9914d4e50a665d4eb0efb80552f357fc719e7e)) \
+	ROM_LOAD16_WORD( "mcu.bin", 0, 0x10000, BAD_DUMP CRC(35425d2f) SHA1(9a9914d4e50a665d4eb0efb80552f357fc719e7e))
 
 
 /*
@@ -1522,7 +1522,7 @@ uint16_t jalmah_state::urashima_mcu_r()
 #define MCU_JMP(_workram_,_data_) \
 	m_sharedram[_workram_]   = 0x4ef9; \
 	m_sharedram[_workram_+1] = 0x0010; \
-	m_sharedram[_workram_+2] = _data_; \
+	m_sharedram[_workram_+2] = _data_;
 
 
 /*

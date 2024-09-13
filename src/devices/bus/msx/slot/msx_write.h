@@ -31,8 +31,7 @@ private:
 	required_memory_region m_rom_region;
 	required_ioport m_switch_port;
 	memory_bank_array_creator<2> m_rombank;
-	memory_view m_view1;
-	memory_view m_view2;
+	memory_view m_view[2];
 	u32 m_region_offset;
 	bool m_enabled;
 };

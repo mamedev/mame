@@ -81,8 +81,6 @@ private:
 };
 
 
-// video
-
 void higemaru_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
@@ -168,10 +166,10 @@ void higemaru_state::c800_w(uint8_t data)
 
 TILE_GET_INFO_MEMBER(higemaru_state::get_bg_tile_info)
 {
-	int const code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x80) << 1);
-	int const color = m_colorram[tile_index] & 0x1f;
+	int const attr = m_colorram[tile_index];
+	int const code = m_videoram[tile_index] | ((attr & 0x80) << 1);
 
-	tileinfo.set(0, code, color, 0);
+	tileinfo.set(0, code, attr & 0x1f, TILE_FLIPYX((attr & 0x60) >> 5));
 }
 
 void higemaru_state::video_start()
@@ -219,8 +217,6 @@ uint32_t higemaru_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 TIMER_DEVICE_CALLBACK_MEMBER(higemaru_state::scanline)
 {

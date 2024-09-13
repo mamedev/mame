@@ -13,15 +13,17 @@
 */
 
 #include "emu.h"
-#include "machine/adc0808.h"
-#include "decocrpt.h"
 #include "deco156_m.h"
+#include "deco16ic.h"
+#include "decocrpt.h"
+#include "decospr.h"
+
+#include "cpu/arm/arm.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
-#include "cpu/arm/arm.h"
-#include "deco16ic.h"
-#include "decospr.h"
+
 #include "emupal.h"
 #include "layout/generic.h"
 #include "screen.h"
@@ -35,6 +37,8 @@ class backfire_state : public driver_device
 public:
 	backfire_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_spriteram(*this, "spriteram%u", 1U, 0x1000U, ENDIANNESS_LITTLE),
+		m_pf_rowscroll(*this, "pf%u_rowscroll", 1U, 0x800U, ENDIANNESS_LITTLE),
 		m_mainram(*this, "mainram"),
 		m_left_priority(*this, "left_priority"),
 		m_right_priority(*this, "right_priority"),
@@ -59,8 +63,6 @@ private:
 	uint32_t backfire_speedup_r();
 	void eeprom_w(uint8_t data);
 	uint32_t pot_select_r(offs_t offset);
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vbl_interrupt(int state);
@@ -72,8 +74,8 @@ private:
 	void backfire_map(address_map &map);
 
 	/* memory pointers */
-	std::unique_ptr<uint16_t[]>  m_spriteram[2];
-	std::unique_ptr<uint16_t[]>  m_pf_rowscroll[4];
+	memory_share_array_creator<uint16_t, 2> m_spriteram;
+	memory_share_array_creator<uint16_t, 4> m_pf_rowscroll;
 	required_shared_ptr<uint32_t> m_mainram;
 	required_shared_ptr<uint32_t> m_left_priority;
 	required_shared_ptr<uint32_t> m_right_priority;
@@ -92,38 +94,16 @@ private:
 
 //uint32_t *backfire_180010, *backfire_188010;
 
-/* I'm using the functions in deco16ic.c ... same chips, why duplicate code? */
-void backfire_state::video_start()
-{
-	m_spriteram[0] = std::make_unique<uint16_t[]>(0x2000/4);
-	m_spriteram[1] = std::make_unique<uint16_t[]>(0x2000/4);
-
-	/* and register the allocated ram so that save states still work */
-	m_pf_rowscroll[0] = std::make_unique<uint16_t[]>(0x1000/4);
-	m_pf_rowscroll[1] = std::make_unique<uint16_t[]>(0x1000/4);
-	m_pf_rowscroll[2] = std::make_unique<uint16_t[]>(0x1000/4);
-	m_pf_rowscroll[3] = std::make_unique<uint16_t[]>(0x1000/4);
-
-	save_pointer(NAME(m_spriteram[0]), 0x2000/4);
-	save_pointer(NAME(m_spriteram[1]), 0x2000/4);
-
-	save_pointer(NAME(m_pf_rowscroll[0]), 0x1000/4);
-	save_pointer(NAME(m_pf_rowscroll[1]), 0x1000/4);
-	save_pointer(NAME(m_pf_rowscroll[2]), 0x1000/4);
-	save_pointer(NAME(m_pf_rowscroll[3]), 0x1000/4);
-}
-
-
 
 uint32_t backfire_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// sprites are flipped relative to tilemaps
 	m_sprgen[0]->set_flip_screen(true);
 
-	/* screen 1 uses pf1 as the forground and pf3 as the background */
+	/* screen 1 uses pf1 as the foreground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
-	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
+	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
+	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2], m_pf_rowscroll[3]);
 
 	screen.priority().fill(0);
 	bitmap.fill(0x100, cliprect);
@@ -132,13 +112,13 @@ uint32_t backfire_state::screen_update_left(screen_device &screen, bitmap_ind16 
 	{
 		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 1);
 		m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
-		m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram[0].get(), 0x2000/4);
+		m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram[0], 0x2000/4);
 	}
 	else if (m_left_priority[0] == 2)
 	{
 		m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
 		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
-		m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram[0].get(), 0x2000/4);
+		m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram[0], 0x2000/4);
 	}
 	else
 		popmessage( "unknown left priority %08x", m_left_priority[0]);
@@ -151,10 +131,10 @@ uint32_t backfire_state::screen_update_right(screen_device &screen, bitmap_ind16
 	// sprites are flipped relative to tilemaps
 	m_sprgen[1]->set_flip_screen(true);
 
-	/* screen 1 uses pf1 as the forground and pf3 as the background */
+	/* screen 1 uses pf1 as the foreground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
-	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
+	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
+	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2], m_pf_rowscroll[3]);
 
 	screen.priority().fill(0);
 	bitmap.fill(0x500, cliprect);
@@ -163,13 +143,13 @@ uint32_t backfire_state::screen_update_right(screen_device &screen, bitmap_ind16
 	{
 		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
 		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_sprgen[1]->draw_sprites(bitmap, cliprect, m_spriteram[1].get(), 0x2000/4);
+		m_sprgen[1]->draw_sprites(bitmap, cliprect, m_spriteram[1], 0x2000/4);
 	}
 	else if (m_right_priority[0] == 2)
 	{
 		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
 		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
-		m_sprgen[1]->draw_sprites(bitmap, cliprect, m_spriteram[1].get(), 0x2000/4);
+		m_sprgen[1]->draw_sprites(bitmap, cliprect, m_spriteram[1], 0x2000/4);
 	}
 	else
 		popmessage( "unknown right priority %08x", m_right_priority[0]);
@@ -230,7 +210,7 @@ void backfire_state::backfire_map(address_map &map)
 	map(0x150000, 0x150fff).rw(FUNC(backfire_state::pf_rowscroll_r<2>), FUNC(backfire_state::pf_rowscroll_w<2>));
 	map(0x154000, 0x154fff).rw(FUNC(backfire_state::pf_rowscroll_r<3>), FUNC(backfire_state::pf_rowscroll_w<3>));
 	map(0x160000, 0x161fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
-	map(0x170000, 0x177fff).ram().share("mainram");// main ram
+	map(0x170000, 0x177fff).ram().share(m_mainram);// main ram
 	map(0x180010, 0x180013).nopw(); // always 180010 ?
 	map(0x184000, 0x185fff).rw(FUNC(backfire_state::spriteram_r<0>), FUNC(backfire_state::spriteram_w<0>));
 	map(0x188010, 0x188013).nopw(); // always 188010 ?
@@ -238,11 +218,11 @@ void backfire_state::backfire_map(address_map &map)
 	map(0x190000, 0x190003).portr("IN0");
 	map(0x194000, 0x194003).portr("IN1");
 	map(0x1a4000, 0x1a4000).w(FUNC(backfire_state::eeprom_w));
-	map(0x1a8000, 0x1a8003).ram().share("left_priority");
-	map(0x1ac000, 0x1ac003).ram().share("right_priority");
+	map(0x1a8000, 0x1a8003).ram().share(m_left_priority);
+	map(0x1ac000, 0x1ac003).ram().share(m_right_priority);
 	map(0x1b0000, 0x1b0003).w(FUNC(backfire_state::irq_ack_w));
 	map(0x1c0000, 0x1c0007).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x000000ff);
-	map(0x1e4000, 0x1e4000).r("adc", FUNC(adc0808_device::data_r));
+	map(0x1e4000, 0x1e4000).r(m_adc, FUNC(adc0808_device::data_r));
 	map(0x1e8000, 0x1e8007).r(FUNC(backfire_state::pot_select_r));
 }
 
@@ -318,12 +298,18 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( gfx_backfire )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 128 )   /* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,     0, 128 )   /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0, 128 )   /* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0, 128 )   /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x200,  32 )   /* Sprites 16x16 (screen 1) */
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 0x600,  32 )   /* Sprites 16x16 (screen 2) */
+	GFXDECODE_ENTRY( "tiles1", 0, charlayout,     0, 128 )   /* Characters 8x8 */
+	GFXDECODE_ENTRY( "tiles1", 0, tilelayout,     0, 128 )   /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "tiles2", 0, charlayout,     0, 128 )   /* Characters 8x8 */
+	GFXDECODE_ENTRY( "tiles2", 0, tilelayout,     0, 128 )   /* Tiles 16x16 */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_backfire_spr1 )
+	GFXDECODE_ENTRY( "sprites1", 0, tilelayout, 0x200,  32 )   /* Sprites 16x16 (screen 1) */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_backfire_spr2 )
+	GFXDECODE_ENTRY( "sprites2", 0, tilelayout, 0x600,  32 )   /* Sprites 16x16 (screen 2) */
 GFXDECODE_END
 
 
@@ -341,7 +327,7 @@ void backfire_state::irq_ack_w(uint32_t data)
 
 DECO16IC_BANK_CB_MEMBER(backfire_state::bank_callback)
 {
-	//  osd_printf_debug("bank callback %04x\n",bank); // bit 1 gets set too?
+	//  logerror("bank callback %04x\n",bank); // bit 1 gets set too?
 	bank = bank >> 4;
 	bank = (bank & 1) | ((bank & 4) >> 1) | ((bank & 2) << 1);
 
@@ -358,10 +344,6 @@ DECOSPR_PRIORITY_CB_MEMBER(backfire_state::pri_callback)
 		case 0xc000: return 0xf0; // car wheels in race?
 	}
 	return 0;
-}
-
-void backfire_state::machine_start()
-{
 }
 
 void backfire_state::backfire(machine_config &config)
@@ -427,17 +409,13 @@ void backfire_state::backfire(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(3);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
+	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_backfire_spr1);
 	m_sprgen[0]->set_screen(m_lscreen);
-	m_sprgen[0]->set_gfx_region(4);
 	m_sprgen[0]->set_pri_callback(FUNC(backfire_state::pri_callback));
-	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen[1], 0);
+	DECO_SPRITE(config, m_sprgen[1], 0, m_palette, gfx_backfire_spr2);
 	m_sprgen[1]->set_screen("rscreen");
-	m_sprgen[1]->set_gfx_region(5);
 	m_sprgen[1]->set_pri_callback(FUNC(backfire_state::pri_callback));
-	m_sprgen[1]->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -508,7 +486,7 @@ ROM_START( backfire )
 	ROM_LOAD32_WORD( "ra00-0.2j",    0x000002, 0x080000, CRC(790da069) SHA1(84fd90fb1833b97459cb337fdb92f7b6e93b5936) )
 	ROM_LOAD32_WORD( "ra01-0.3j",    0x000000, 0x080000, CRC(447cb57b) SHA1(1d503b9cf1cadd3fdd7c9d6d59d4c40a59fa25ab))
 
-	ROM_REGION( 0x400000, "gfx1", 0 ) /* Tiles 1 */
+	ROM_REGION( 0x400000, "tiles1", 0 ) /* Tiles 1 */
 	ROM_LOAD( "mbz-00.9a",    0x000000, 0x080000, CRC(1098d504) SHA1(1fecd26b92faffce0b59a8a9646bfd457c17c87c) )
 	ROM_CONTINUE( 0x200000, 0x080000)
 	ROM_CONTINUE( 0x100000, 0x080000)
@@ -518,14 +496,14 @@ ROM_START( backfire )
 	ROM_CONTINUE( 0x180000, 0x080000)
 	ROM_CONTINUE( 0x380000, 0x080000)
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) /* Tiles 2 */
+	ROM_REGION( 0x100000, "tiles2", 0 ) /* Tiles 2 */
 	ROM_LOAD( "mbz-02.12a",    0x000000, 0x100000, CRC(2bd2b0a1) SHA1(8fcb37728f3248ad55e48f2d398b014b36c9ec05) )
 
-	ROM_REGION( 0x400000, "gfx3", 0 ) /* Sprites 1 */
+	ROM_REGION( 0x400000, "sprites1", 0 ) /* Sprites 1 */
 	ROM_LOAD( "mbz-03.15a",    0x000000, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
 	ROM_LOAD( "mbz-04.16a",    0x200000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
 
-	ROM_REGION( 0x400000, "gfx4", 0 ) /* Sprites 2 */
+	ROM_REGION( 0x400000, "sprites2", 0 ) /* Sprites 2 */
 	ROM_LOAD( "mbz-03.18a",    0x000000, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
 	ROM_LOAD( "mbz-04.19a",    0x200000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
 
@@ -545,7 +523,7 @@ ROM_START( backfirea )
 	ROM_LOAD32_WORD( "rb-00h.h2",    0x000002, 0x080000, CRC(60973046) SHA1(e70d9be9cb172920da2a2ac9d317768b1438c59d) )
 	ROM_LOAD32_WORD( "rb-01l.h3",    0x000000, 0x080000, CRC(27472f60) SHA1(d73b1e68dc51e28b1148db39ce22bd2e93f6fd0a) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 ) /* Tiles 1 */
+	ROM_REGION( 0x400000, "tiles1", 0 ) /* Tiles 1 */
 	ROM_LOAD( "mbz-00.9a",    0x000000, 0x080000, CRC(1098d504) SHA1(1fecd26b92faffce0b59a8a9646bfd457c17c87c) )
 	ROM_CONTINUE( 0x200000, 0x080000)
 	ROM_CONTINUE( 0x100000, 0x080000)
@@ -555,14 +533,14 @@ ROM_START( backfirea )
 	ROM_CONTINUE( 0x180000, 0x080000)
 	ROM_CONTINUE( 0x380000, 0x080000)
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) /* Tiles 2 */
+	ROM_REGION( 0x100000, "tiles2", 0 ) /* Tiles 2 */
 	ROM_LOAD( "mbz-02.12a",    0x000000, 0x100000, CRC(2bd2b0a1) SHA1(8fcb37728f3248ad55e48f2d398b014b36c9ec05) )
 
-	ROM_REGION( 0x400000, "gfx3", 0 ) /* Sprites 1 */
+	ROM_REGION( 0x400000, "sprites1", 0 ) /* Sprites 1 */
 	ROM_LOAD( "mbz-03.15a",    0x000000, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
 	ROM_LOAD( "mbz-04.16a",    0x200000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
 
-	ROM_REGION( 0x400000, "gfx4", 0 ) /* Sprites 2 */
+	ROM_REGION( 0x400000, "sprites2", 0 ) /* Sprites 2 */
 	ROM_LOAD( "mbz-03.18a",    0x000000, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
 	ROM_LOAD( "mbz-04.19a",    0x200000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
 
@@ -597,10 +575,14 @@ void backfire_state::descramble_sound()
 
 uint32_t backfire_state::backfire_speedup_r()
 {
-	//osd_printf_debug( "%08x\n",m_maincpu->pc());
 
-	if (m_maincpu->pc() == 0xce44) m_maincpu->spin_until_time(attotime::from_usec(400)); // backfire
-	if (m_maincpu->pc() == 0xcee4) m_maincpu->spin_until_time(attotime::from_usec(400)); // backfirea
+	if (!machine().side_effects_disabled())
+	{
+		//logerror( "%08x\n",m_maincpu->pc());
+
+		if (m_maincpu->pc() == 0xce44) m_maincpu->spin_until_time(attotime::from_usec(400)); // backfire
+		if (m_maincpu->pc() == 0xcee4) m_maincpu->spin_until_time(attotime::from_usec(400)); // backfirea
+	}
 
 	return m_mainram[0x18/4];
 }
@@ -608,8 +590,8 @@ uint32_t backfire_state::backfire_speedup_r()
 
 void backfire_state::init_backfire()
 {
-	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
-	deco56_decrypt_gfx(machine(), "gfx2"); /* 141 */
+	deco56_decrypt_gfx(machine(), "tiles1"); /* 141 */
+	deco56_decrypt_gfx(machine(), "tiles2"); /* 141 */
 	deco156_decrypt(machine());
 	m_maincpu->set_clock_scale(4.0f); /* core timings aren't accurate */
 	descramble_sound();

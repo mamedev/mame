@@ -1,7 +1,7 @@
 // CWrappers.h
 
-#ifndef __C_WRAPPERS_H
-#define __C_WRAPPERS_H
+#ifndef ZIP7_INC_C_WRAPPERS_H
+#define ZIP7_INC_C_WRAPPERS_H
 
 #include "../ICoder.h"
 #include "../../Common/MyCom.h"
@@ -63,7 +63,7 @@ struct CByteInBufWrap
   bool Extra;
   HRESULT Res;
   
-  CByteInBufWrap();
+  CByteInBufWrap() throw();
   ~CByteInBufWrap() { Free(); }
   void Free() throw();
   bool Alloc(UInt32 size) throw();

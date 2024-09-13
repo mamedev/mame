@@ -34,7 +34,7 @@ similar to it. Ron C. Nelson must have ported the algorithms to 8080 when he wro
 his Altair 8800 chess program, and this is what made it into CC1.
 
 CC1 hardware overview:
-- PCB label PC-P-86, P179 C-2 7.77
+- PCB label: PC-P-86, P179 C-2 7.77
 - NEC 8080AF @ 2MHz(18MHz XTAL through a 8224)
 - Everything goes via a NEC B8228, its special features are unused.
 - NEC 2316A ROM(2KB), 4*2101AL RAM(0.5KB total)
@@ -62,7 +62,6 @@ with CCX and CC7.
 
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
-#include "machine/timer.h"
 #include "video/pwm.h"
 
 // internal artwork
@@ -81,7 +80,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppi8255(*this, "ppi8255"),
 		m_display(*this, "display"),
-		m_delay(*this, "delay"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -101,9 +99,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
 	required_device<pwm_display_device> m_display;
-	optional_device<timer_device> m_delay;
 	required_ioport_array<2> m_inputs;
 
+	attotime m_555_delay;
 	u8 m_led_select = 0;
 	u8 m_7seg_data = 0;
 
@@ -122,6 +120,7 @@ private:
 void cc1_state::machine_start()
 {
 	// register for savestates
+	save_item(NAME(m_555_delay));
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_7seg_data));
 }
@@ -151,7 +150,7 @@ u8 cc1_state::ppi_porta_r()
 	data |= ~m_inputs[1]->read() << 5 & 0xe0;
 
 	// d4: 555 Q
-	return data | ((m_delay->enabled()) ? 0x10 : 0);
+	return data | ((m_555_delay > machine().time()) ? 0x10 : 0);
 }
 
 void cc1_state::ppi_portb_w(u8 data)
@@ -164,8 +163,8 @@ void cc1_state::ppi_portb_w(u8 data)
 void cc1_state::ppi_portc_w(u8 data)
 {
 	// d6: trigger monostable 555 (R=15K, C=1uF)
-	if (~data & m_led_select & 0x40 && !m_delay->enabled())
-		m_delay->adjust(attotime::from_msec(17));
+	if (~data & m_led_select & 0x40 && m_555_delay < machine().time())
+		m_555_delay = machine().time() + attotime::from_msec(17);
 
 	// d0-d3: digit select
 	// d4: check led, d5: lose led
@@ -244,7 +243,7 @@ static INPUT_PORTS_START( cc10c )
 	PORT_INCLUDE( cc3 )
 
 	PORT_MODIFY("IN.1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM / PB") PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM / PB") PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_P)
 INPUT_PORTS_END
 
 
@@ -266,8 +265,6 @@ void cc1_state::cc1(machine_config &config)
 	m_ppi8255->tri_pb_callback().set_constant(0);
 	m_ppi8255->out_pc_callback().set(FUNC(cc1_state::ppi_portc_w));
 	m_ppi8255->tri_pc_callback().set_constant(0);
-
-	TIMER(config, "delay").configure_generic(nullptr);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 7);
@@ -322,6 +319,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1977, cc1,   0,      0,      cc1,     cc1,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-SYST( 1977, cc3,   0,      0,      cc3,     cc3,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (upgraded version, 3 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 3
-SYST( 1979, cc10c, 0,      0,      cc10c,   cc10c, cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (model UCC10, 10 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 10 C
+SYST( 1977, cc1,   0,      0,      cc1,     cc1,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, cc3,   0,      0,      cc3,     cc3,   cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (upgraded version, 3 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 3
+SYST( 1979, cc10c, 0,      0,      cc10c,   cc10c, cc1_state, empty_init, "Fidelity Electronics", "Chess Challenger (model UCC10, 10 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // aka Chess Challenger 10 C

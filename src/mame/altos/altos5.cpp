@@ -224,9 +224,7 @@ void altos5_state::io_write_byte(offs_t offset, uint8_t data)
 
 void altos5_state::busreq_w(int state)
 {
-// since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
-	m_dma->bai_w(state); // tell dma that bus has been granted
 	setup_banks(state); // adjust banking for dma or cpu
 }
 
@@ -387,6 +385,7 @@ void altos5_state::altos5(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &altos5_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &altos5_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain_intf);
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	/* devices */
 	Z80DMA(config, m_dma, 8_MHz_XTAL / 2);

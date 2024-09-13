@@ -16,13 +16,14 @@ driver by Yochizo and Takahiro Nogi
 
 Supported games :
 ==================
- Super Real Mahjong Part1     (C) 1987 Seta
- Super Real Mahjong Part2     (C) 1987 Seta
- Super Real Mahjong Part3     (C) 1988 Seta
- Mahjong Yuugi (set 1)        (C) 1990 Visco
- Mahjong Yuugi (set 2)        (C) 1990 Visco
- Mahjong Pon Chin Kan (set 1) (C) 1991 Visco
- Mahjong Pon Chin Kan (set 2) (C) 1991 Visco
+ Super Real Mahjong Part1     (C) 1987 Seta    P0-023
+ Super Real Mahjong Part2     (C) 1987 Seta    P0-023
+ Super Real Mahjong Part3     (C) 1988 Seta    P0-037A
+ Real Mahjong Gold Yumehai    (C) 1988 Seta    P0-064A
+ Mahjong Yuugi (set 1)        (C) 1990 Visco   P0-049A
+ Mahjong Yuugi (set 2)        (C) 1990 Visco   P0-049A
+ Mahjong Pon Chin Kan (set 1) (C) 1991 Visco   P0-049A
+ Mahjong Pon Chin Kan (set 2) (C) 1991 Visco   P0-049A
 
 
 System specs :
@@ -58,16 +59,165 @@ Note:
 
 ****************************************************************************/
 
-
 #include "emu.h"
-#include "srmp2.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "sound/msm5205.h"
+#include "video/x1_001.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+namespace {
+
+class srmp2_state : public driver_device
+{
+public:
+	srmp2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_spritegen(*this, "spritegen"),
+		m_msm(*this, "msm"),
+		m_adpcm_rom(*this, "adpcm"),
+		m_mainbank(*this, "mainbank"),
+		m_keys(*this, "KEY%u", 0U),
+		m_service(*this, "SERVICE")
+	{ }
+
+	void mjyuugi(machine_config &config);
+	void srmp2(machine_config &config);
+	void rmgoldyh(machine_config &config);
+	void srmp3(machine_config &config);
+
+private:
+	struct iox_t
+	{
+		int reset = 0, ff_event,ff_1 = 0, protcheck[4]{}, protlatch[4]{};
+		uint8_t data = 0;
+		uint8_t mux = 0;
+		uint8_t ff = 0;
+	};
+
+	required_device<cpu_device> m_maincpu;
+	required_device<x1_001_device> m_spritegen;
+	required_device<msm5205_device> m_msm;
+	required_region_ptr<uint8_t> m_adpcm_rom;
+	optional_memory_bank m_mainbank;
+	required_ioport_array<8> m_keys;
+	required_ioport m_service;
+
+	uint8_t m_color_bank = 0;
+	uint8_t m_gfx_bank = 0;
+	uint8_t m_adpcm_bank = 0;
+	int16_t m_adpcm_data = 0;
+	uint32_t m_adpcm_sptr = 0;
+	uint32_t m_adpcm_eptr = 0;
+	iox_t m_iox;
+
+	// common
+	uint8_t vox_status_r();
+	uint8_t iox_mux_r();
+	uint8_t iox_status_r();
+	void iox_command_w(uint8_t data);
+	void iox_data_w(uint8_t data);
+	void adpcm_int(int state);
+
+	// mjuugi
+	void mjyuugi_flags_w(uint16_t data);
+	void mjyuugi_adpcm_bank_w(uint16_t data);
+	uint8_t mjyuugi_irq2_ack_r(address_space &space);
+	uint8_t mjyuugi_irq4_ack_r(address_space &space);
+
+	// rmgoldyh
+	void rmgoldyh_rombank_w(uint8_t data);
+
+	// srmp2
+	void srmp2_irq2_ack_w(uint8_t data);
+	void srmp2_irq4_ack_w(uint8_t data);
+	void srmp2_flags_w(uint16_t data);
+	void adpcm_code_w(uint8_t data);
+
+	// srmp3
+	void srmp3_rombank_w(uint8_t data);
+	void srmp3_flags_w(uint8_t data);
+	void srmp3_irq_ack_w(uint8_t data);
+
+	virtual void machine_start() override;
+	DECLARE_MACHINE_START(srmp2);
+	void srmp2_palette(palette_device &palette) const;
+	DECLARE_MACHINE_START(srmp3);
+	void srmp3_palette(palette_device &palette) const;
+	DECLARE_MACHINE_START(rmgoldyh);
+	DECLARE_MACHINE_START(mjyuugi);
+
+	uint32_t screen_update_srmp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_srmp3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	X1_001_SPRITE_GFXBANK_CB_MEMBER(srmp3_gfxbank_callback);
+
+	uint8_t iox_key_matrix_calc(uint8_t p_side);
+
+	void mjyuugi_map(address_map &map);
+	void rmgoldyh_io_map(address_map &map);
+	void rmgoldyh_map(address_map &map);
+	void srmp2_map(address_map &map);
+	void srmp3_io_map(address_map &map);
+	void srmp3_map(address_map &map);
+};
+
+
+/***************************************************************************
+
+  Video hardware
+
+***************************************************************************/
+
+void srmp2_state::srmp2_palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int const col = (color_prom[i] << 8) + color_prom[i + palette.entries()];
+		palette.set_pen_color(i ^ 0x0f, pal5bit(col >> 10), pal5bit(col >> 5), pal5bit(col >> 0));
+	}
+}
+
+
+void srmp2_state::srmp3_palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int const col = (color_prom[i] << 8) + color_prom[i + palette.entries()];
+		palette.set_pen_color(i,pal5bit(col >> 10), pal5bit(col >> 5), pal5bit(col >> 0));
+	}
+}
+
+X1_001_SPRITE_GFXBANK_CB_MEMBER(srmp2_state::srmp3_gfxbank_callback)
+{
+	return (code & 0x3fff) + ((code & 0x2000) ? (m_gfx_bank<<13) : 0);
+}
+
+
+uint32_t srmp2_state::screen_update_srmp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0x1ff, cliprect);
+
+	m_spritegen->set_colorbase(m_color_bank<<5);
+
+	m_spritegen->draw_sprites(screen,bitmap,cliprect,0x1000);
+	return 0;
+}
+
+uint32_t srmp2_state::screen_update_srmp3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0x1f0, cliprect);
+
+	m_spritegen->draw_sprites(screen,bitmap,cliprect,0x1000);
+	return 0;
+}
 
 
 /***************************************************************************
@@ -1342,7 +1492,7 @@ ROM_START( srmp1 )
 	ROM_LOAD( "ub2.13", 0x400, 0x200, CRC(7e7d25f7) SHA1(e5bf5071567f95c3bb70347f0b86a9703f9f2e6c) )
 ROM_END
 
-ROM_START( srmp2 )
+ROM_START( srmp2 ) // PCB: P0-023
 	ROM_REGION( 0x040000, "maincpu", 0 )                    /* 68000 Code */
 	ROM_LOAD16_BYTE( "uco-2.17", 0x000000, 0x020000, CRC(0d6c131f) SHA1(be85f2578b0ae2a072565605b7dbeb970e5e3851) )
 	ROM_LOAD16_BYTE( "uco-3.18", 0x000001, 0x020000, CRC(e9fdf5f8) SHA1(aa1f8cc3f1d0ed942403c0473605775bc1537cbf) )
@@ -1371,7 +1521,7 @@ ROM_START( srmp2 )
 	ROM_LOAD( "uc-2o.13", 0x000400, 0x000400, CRC(50a33b96) SHA1(cfb6d3cb6b73d1bf484014fb340c28bc1774137d) )
 ROM_END
 
-ROM_START( srmp3 )
+ROM_START( srmp3 ) // PCB: P0-037A
 	ROM_REGION( 0x020000, "maincpu", 0 )                    /* Z80 Code */
 	ROM_LOAD( "za0-10.bin", 0x000000, 0x020000, CRC(939d126f) SHA1(7a5c7f7fbee8de11a08194d3c8f10a20f8dc2f0a) )
 
@@ -1481,7 +1631,7 @@ ROM_START( rmgoldyh )
 	ROM_LOAD( "zf0-13.u59", 0x000200, 0x000200, CRC(4ea3d2fe) SHA1(c7d18b9c1331e08faadf33e52033c658bf2b16fc) )
 ROM_END
 
-ROM_START( mjyuugi )
+ROM_START( mjyuugi ) // PCB: P0-049A
 	ROM_REGION( 0x080000, "maincpu", 0 )                    /* 68000 Code */
 	ROM_LOAD16_BYTE( "um001.001", 0x000000, 0x020000, CRC(28d5340f) SHA1(683d89987b8b794695fdb6104d8e6ff5204afafb) )
 	ROM_LOAD16_BYTE( "um001.003", 0x000001, 0x020000, CRC(275197de) SHA1(2f8efa112f23f172eaef9bb732b2a253307dd896) )
@@ -1509,7 +1659,7 @@ ROM_START( mjyuugi )
 	ROM_LOAD( "maj-001.02", 0x080000, 0x080000, CRC(eb28e641) SHA1(67e1d89c9b40e4a83a3783d4343d7a8121668091) )
 ROM_END
 
-ROM_START( mjyuugia )
+ROM_START( mjyuugia ) // PCB: P0-049A
 	ROM_REGION( 0x080000, "maincpu", 0 )                    /* 68000 Code */
 	ROM_LOAD16_BYTE( "um_001.001", 0x000000, 0x020000, CRC(76dc0594) SHA1(4bd81616769cdc59eaf6f7921e404e166500f67f) )
 	ROM_LOAD16_BYTE( "um001.003",  0x000001, 0x020000, CRC(275197de) SHA1(2f8efa112f23f172eaef9bb732b2a253307dd896) )
@@ -1537,7 +1687,7 @@ ROM_START( mjyuugia )
 	ROM_LOAD( "maj-001.02", 0x080000, 0x080000, CRC(eb28e641) SHA1(67e1d89c9b40e4a83a3783d4343d7a8121668091) )
 ROM_END
 
-ROM_START( ponchin )
+ROM_START( ponchin ) // PCB: P0-049A
 	ROM_REGION( 0x080000, "maincpu", 0 )                    /* 68000 Code */
 	ROM_LOAD16_BYTE( "um2_1_1.u22", 0x000000, 0x020000, CRC(cf88efbb) SHA1(7bd2304d365524fc5bcf3fb30752f5efec73a9f5) )
 	ROM_LOAD16_BYTE( "um2_1_3.u42", 0x000001, 0x020000, CRC(e053458f) SHA1(db4a34589a08d0252d700144a6260a0f6c4e8e30) )
@@ -1562,7 +1712,7 @@ ROM_START( ponchin )
 	ROM_LOAD( "um2_1_10.u63", 0x080000, 0x080000, CRC(53e643e9) SHA1(3b221217e8f846ae96a9a47149037cea19d97549) )
 ROM_END
 
-ROM_START( ponchina )
+ROM_START( ponchina ) // PCB: P0-049A
 	ROM_REGION( 0x080000, "maincpu", 0 )                    /* 68000 Code */
 	ROM_LOAD16_BYTE( "u22.bin",     0x000000, 0x020000, CRC(9181de20) SHA1(03fdb289d862ff2d87249d35991bd60784e172d9) )
 	ROM_LOAD16_BYTE( "um2_1_3.u42", 0x000001, 0x020000, CRC(e053458f) SHA1(db4a34589a08d0252d700144a6260a0f6c4e8e30) )
@@ -1586,12 +1736,13 @@ ROM_START( ponchina )
 	ROM_LOAD( "um2_1_10.u63", 0x080000, 0x080000, CRC(53e643e9) SHA1(3b221217e8f846ae96a9a47149037cea19d97549) )
 ROM_END
 
+} // anonymous namespace
 
 
 GAME( 1987, srmp1,     0,        srmp2,    srmp2,    srmp2_state, empty_init, ROT0, "Seta",                "Super Real Mahjong Part 1 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, srmp2,     0,        srmp2,    srmp2,    srmp2_state, empty_init, ROT0, "Seta",                "Super Real Mahjong Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, srmp3,     0,        srmp3,    srmp3,    srmp2_state, empty_init, ROT0, "Seta",                "Super Real Mahjong Part 3 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, srmp2_state, empty_init, ROT0, "Seta (Alba license)", "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, srmp2_state, empty_init, ROT0, "Seta (Alba license)", "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  srmp2_state, empty_init, ROT0, "Visco",               "Mahjong Yuugi (Japan set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  srmp2_state, empty_init, ROT0, "Visco",               "Mahjong Yuugi (Japan set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  srmp2_state, empty_init, ROT0, "Visco",               "Mahjong Pon Chin Kan (Japan set 1)", MACHINE_SUPPORTS_SAVE )

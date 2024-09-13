@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -81,30 +82,12 @@ license:CC0-1.0
 	<element name="text_c6"><text string="Computing"><color red="0.6" green="0.6" blue="0.63" /></text></element>
 	<element name="text_c7"><text string="Trace Mode"><color red="0.6" green="0.6" blue="0.63" /></text></element>
 
-	<element name="text_b11">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="New Game"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b12">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Classic Game"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b13">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Solve Mate"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b14">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Clear Board"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b15">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Change Color"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b16">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Set Up"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_b11"><text string="New Game"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b12"><text string="Classic Game"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b13"><text string="Solve Mate"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b14"><text string="Clear Board"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b15"><text string="Change Color"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b16"><text string="Set Up"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 
 	<element name="text_b21a"><image file="chess/bp.svg"/></element>
 	<element name="text_b22a"><image file="chess/br.svg"/></element>
@@ -112,93 +95,30 @@ license:CC0-1.0
 	<element name="text_b24a"><image file="chess/bb.svg"/></element>
 	<element name="text_b25a"><image file="chess/bq.svg"/></element>
 
-	<element name="text_b21">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Set Level"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b22">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Set Rate"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b23">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Sound on/off"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b24">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Best Move"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b25">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Mate Alert"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b26">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Promote"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_b21"><text string="Set Level"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b22"><text string="Set Rate"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b23"><text string="Sound on/off"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b24"><text string="Best Move"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b25"><text string="Mate Alert"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b26"><text string="Promote"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 
-	<element name="text_b31">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Print Moves"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b32">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Print List"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b33">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Print Board"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b34">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Form Size"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b35">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Auto Play"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b36">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Hint"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_b31"><text string="Print Moves"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b32"><text string="Print List"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b33"><text string="Print Board"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b34"><text string="Form Size"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b35"><text string="Auto Play"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b36"><text string="Hint"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 
-	<element name="text_b41">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Trace Back"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b42">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Trace Forward"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b43">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Review"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b44">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Show Moves"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b45">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Return"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_b46">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="Go"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_b41"><text string="Trace Back"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b42"><text string="Trace Forward"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b43"><text string="Review"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b44"><text string="Show Moves"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b45"><text string="Return"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b46"><text string="Go"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 
-	<element name="text_b1x">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="SET UP"><color red="0.85" green="0.35" blue="0.05" /></text>
-	</element>
-	<element name="text_b3x">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="PRINTER"><color red="0.85" green="0.35" blue="0.05" /></text>
-	</element>
-	<element name="text_b4x">
-		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>
-		<text string="MEMORY"><color red="0.85" green="0.35" blue="0.05" /></text>
-	</element>
+	<element name="text_b1x"><text string="SET UP"><color red="0.85" green="0.35" blue="0.05" /></text></element>
+	<element name="text_b3x"><text string="PRINTER"><color red="0.85" green="0.35" blue="0.05" /></text></element>
+	<element name="text_b4x"><text string="MEMORY"><color red="0.85" green="0.35" blue="0.05" /></text></element>
 
 
 <!-- groups -->
@@ -235,7 +155,7 @@ license:CC0-1.0
 		</repeat>
 
 		<!-- backlight -->
-		<element ref="nothing" blend="add" inputtag="LIGHT" inputmask="0x00" inputraw="yes"><bounds x="0" y="0" width="101" height="114" /></element>
+		<element ref="nothing" blend="add" clickthrough="no"><bounds x="0" y="0" width="101" height="114" /></element>
 		<element ref="cb_light" blend="multiply" inputtag="LIGHT" inputmask="0x01" inputraw="yes"><bounds x="0" y="0" width="101" height="114" /></element>
 
 		<!-- mask edges -->

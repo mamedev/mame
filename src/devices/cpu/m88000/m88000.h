@@ -20,8 +20,8 @@ public:
 	// construction/destruction
 	mc88100_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	template <typename T> void set_cmmu_d(T &&tag) { m_cmmu_d.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_cmmu_i(T &&tag) { m_cmmu_i.set_tag(std::forward<T>(tag)); }
+	void set_cmmu_code(std::function<mc88200_device &(u32 const address)> f) { m_cmmu_code = f; }
+	void set_cmmu_data(std::function<mc88200_device &(u32 const address)> f) { m_cmmu_data = f; }
 
 protected:
 	// device_t implementation
@@ -64,11 +64,11 @@ private:
 	// address spaces
 	address_space_config m_code_config;
 	address_space_config m_data_config;
-	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_inst_space;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_code_space;
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_data_space;
 
-	optional_device<mc88200_device> m_cmmu_d;
-	optional_device<mc88200_device> m_cmmu_i;
+	std::function<mc88200_device &(u32 const address)> m_cmmu_code;
+	std::function<mc88200_device &(u32 const address)> m_cmmu_data;
 
 	// register storage
 	u32 m_xip; // execute instruction pointer

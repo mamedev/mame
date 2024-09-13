@@ -49,7 +49,7 @@ void victory_state::video_start()
 	m_scrollx = m_scrolly = 0;
 	m_video_control = 0;
 
-	memset(&m_micro, 0, sizeof(m_micro));
+	m_micro = micro_t();
 	m_micro.timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 
 	for (int i = 0; i < 128; i++)

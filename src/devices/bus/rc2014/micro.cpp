@@ -8,13 +8,15 @@
 
 #include "emu.h"
 #include "micro.h"
+
 #include "modules.h"
 
+#include "bus/ata/ataintf.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
-#include "bus/ata/ataintf.h"
-#include "bus/rs232/rs232.h"
+
 
 namespace {
 
@@ -30,13 +32,16 @@ public:
 	rc2014_micro(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 private:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_resolve_objects() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	virtual void card_int_w(int state) override { m_maincpu->set_input_line(INPUT_LINE_IRQ0, state); }
+	virtual void card_rx_w(int state) override  { m_acia->write_rxd(state); }
 
 	void clk_w(int state) { m_bus->clk_w(state); }
 	void tx_w(int state) { m_bus->tx_w(state); }
@@ -96,10 +101,6 @@ void rc2014_micro::device_resolve_objects()
 	// Setup CPU
 	m_bus->assign_installer(AS_PROGRAM, &m_maincpu->space(AS_PROGRAM));
 	m_bus->assign_installer(AS_IO, &m_maincpu->space(AS_IO));
-	m_bus->int_callback().append_inputline(m_maincpu, INPUT_LINE_IRQ0);
-
-	// Setup ACIA
-	m_bus->rx_callback().append(m_acia, FUNC(acia6850_device::write_rxd));
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -178,7 +179,7 @@ public:
 	rc2014_mini_cpm(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override { update_banks(); }
@@ -291,7 +292,9 @@ const tiny_rom_entry *rc2014_mini_cpm::device_rom_region() const
 	return ROM_NAME( rc2014_mini_cpm );
 }
 
-}
+} // anonymous namespace
+
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************

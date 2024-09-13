@@ -142,7 +142,7 @@ void alphajuno_state::ajuno1(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(alphajuno_state::palette_init), 2);
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(alphajuno_state::lcd_pixel_update));
 	m_lcdc->set_busy_factor(0.005f);
@@ -181,7 +181,7 @@ void alphajuno_state::mks50(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(alphajuno_state::palette_init), 2);
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(alphajuno_state::lcd_pixel_update));
 	m_lcdc->set_busy_factor(0.05f);

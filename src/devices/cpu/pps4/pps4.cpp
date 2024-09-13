@@ -252,7 +252,7 @@ void pps4_device::iADC()
  */
 void pps4_device::iADSK()
 {
-	m_A = m_A + M() + m_C;   // This fixes the diagnostic test button, same as pinmame. It means ADSK and ADCSK are the same.
+	m_A = m_A + M();
 	//m_A += M();
 	m_C = (m_A > 15) ? 1 : 0;
 	m_Skip = m_C;
@@ -978,7 +978,7 @@ void pps4_device::iT()
  * @brief pps4_device::iTM Transfer and mark indirect
  * HEX   BINARY    CYCLES  MNEMONIC
  * ----------------------------------
- * 0xc0+ 11xx xxxx      2   TM x
+ * 0xd0+ 11x1 xxxx      2   TM x
  *       yyyy yyyy  from page 3
  *
  * Symbolic equation

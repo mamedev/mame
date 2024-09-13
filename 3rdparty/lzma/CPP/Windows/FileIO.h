@@ -1,23 +1,23 @@
 // Windows/FileIO.h
 
-#ifndef __WINDOWS_FILE_IO_H
-#define __WINDOWS_FILE_IO_H
+#ifndef ZIP7_INC_WINDOWS_FILE_IO_H
+#define ZIP7_INC_WINDOWS_FILE_IO_H
 
 #include "../Common/MyWindows.h"
 
-#define _my_IO_REPARSE_TAG_MOUNT_POINT  (0xA0000003L)
-#define _my_IO_REPARSE_TAG_SYMLINK      (0xA000000CL)
-#define _my_IO_REPARSE_TAG_LX_SYMLINK   (0xA000001DL)
+#define Z7_WIN_IO_REPARSE_TAG_MOUNT_POINT  (0xA0000003L)
+#define Z7_WIN_IO_REPARSE_TAG_SYMLINK      (0xA000000CL)
+#define Z7_WIN_IO_REPARSE_TAG_LX_SYMLINK   (0xA000001DL)
 
-#define _my_SYMLINK_FLAG_RELATIVE 1
+#define Z7_WIN_SYMLINK_FLAG_RELATIVE 1
 
 // what the meaning of that FLAG or field (2)?
-#define _my_LX_SYMLINK_FLAG 2
+#define Z7_WIN_LX_SYMLINK_FLAG 2
 
 #ifdef _WIN32
 
 #if defined(_WIN32) && !defined(UNDER_CE)
-#include <WinIoCtl.h>
+#include <winioctl.h>
 #endif
 
 #else
@@ -76,11 +76,11 @@ struct CReparseAttr
   // returns (false) and (ErrorCode = ERROR_REPARSE_TAG_INVALID), if unknown tag
   bool Parse(const Byte *p, size_t size);
 
-  bool IsMountPoint()  const { return Tag == _my_IO_REPARSE_TAG_MOUNT_POINT; } // it's Junction
-  bool IsSymLink_Win() const { return Tag == _my_IO_REPARSE_TAG_SYMLINK; }
-  bool IsSymLink_WSL() const { return Tag == _my_IO_REPARSE_TAG_LX_SYMLINK; }
+  bool IsMountPoint()  const { return Tag == Z7_WIN_IO_REPARSE_TAG_MOUNT_POINT; } // it's Junction
+  bool IsSymLink_Win() const { return Tag == Z7_WIN_IO_REPARSE_TAG_SYMLINK; }
+  bool IsSymLink_WSL() const { return Tag == Z7_WIN_IO_REPARSE_TAG_LX_SYMLINK; }
 
-  bool IsRelative_Win() const { return Flags == _my_SYMLINK_FLAG_RELATIVE; }
+  bool IsRelative_Win() const { return Flags == Z7_WIN_SYMLINK_FLAG_RELATIVE; }
 
   bool IsRelative_WSL() const
   {
@@ -141,16 +141,18 @@ public:
 
 public:
   bool PreserveATime;
-  #ifdef SUPPORT_DEVICE_FILE
+  #ifdef Z7_DEVICE_FILE
   bool IsDeviceFile;
   bool SizeDefined;
   UInt64 Size; // it can be larger than real available size
   #endif
 
-  CFileBase(): _handle(INVALID_HANDLE_VALUE), PreserveATime(false) {};
+  CFileBase(): _handle(INVALID_HANDLE_VALUE), PreserveATime(false) {}
   ~CFileBase() { Close(); }
 
   HANDLE GetHandle() const { return _handle; }
+
+  // void Detach() { _handle = INVALID_HANDLE_VALUE; }
 
   bool Close() throw();
 
@@ -193,7 +195,7 @@ struct my_DISK_GEOMETRY_EX
 
 class CInFile: public CFileBase
 {
-  #ifdef SUPPORT_DEVICE_FILE
+  #ifdef Z7_DEVICE_FILE
 
   #ifndef UNDER_CE
   
@@ -229,6 +231,14 @@ public:
         FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
         OPEN_EXISTING,
         FILE_FLAG_BACKUP_SEMANTICS);
+    // we must use (FILE_FLAG_BACKUP_SEMANTICS) to open handle of directory.
+  }
+
+  bool Open_for_FileRenameInformation(CFSTR fileName)
+  {
+    return Create(fileName, DELETE | SYNCHRONIZE | GENERIC_READ,
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL);
     // we must use (FILE_FLAG_BACKUP_SEMANTICS) to open handle of directory.
   }
 
@@ -295,12 +305,13 @@ protected:
   UInt64 Size; // it can be larger than real available size
   */
 
-  bool OpenBinary(const char *name, int flags);
+  bool OpenBinary(const char *name, int flags, mode_t mode = 0666);
 public:
   bool PreserveATime;
 
-  CFileBase(): _handle(-1), PreserveATime(false) {};
+  CFileBase(): _handle(-1), PreserveATime(false) {}
   ~CFileBase() { Close(); }
+  // void Detach() { _handle = -1; }
   bool Close();
   bool GetLength(UInt64 &length) const;
   off_t seek(off_t distanceToMove, int moveMethod) const;
@@ -330,7 +341,6 @@ class COutFile: public CFileBase
   bool CTime_defined;
   bool ATime_defined;
   bool MTime_defined;
-
   CFiTime CTime;
   CFiTime ATime;
   CFiTime MTime;
@@ -338,10 +348,13 @@ class COutFile: public CFileBase
   AString Path;
   ssize_t write_part(const void *data, size_t size) throw();
 public:
+  mode_t mode_for_Create;
+
   COutFile():
       CTime_defined(false),
       ATime_defined(false),
-      MTime_defined(false)
+      MTime_defined(false),
+      mode_for_Create(0666)
       {}
 
   bool Close();

@@ -129,8 +129,6 @@ private:
 };
 
 
-// video
-
 /***************************************************************************
 
   Gaelco Type 1 Video Hardware Rev B
@@ -334,8 +332,6 @@ uint32_t thoop2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 void thoop2_state::machine_start()
 {

@@ -18,8 +18,6 @@
 #include "tilemap.h"
 
 
-
-
 class segas32_state : public device_t
 {
 public:

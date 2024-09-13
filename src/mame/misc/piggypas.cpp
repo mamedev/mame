@@ -220,7 +220,7 @@ void piggypas_state::piggypas(machine_config &config)
 	PALETTE(config, "palette").set_entries(2);
 	config.set_default_layout(layout_piggypas);
 
-	HD44780(config, m_hd44780, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_hd44780, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_hd44780->set_lcd_size(1, 16);
 	m_hd44780->set_pixel_update_cb(FUNC(piggypas_state::piggypas_pixel_update));
 
@@ -235,7 +235,7 @@ void piggypas_state::piggypas(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(piggypas_state::ctrl_w));
 	ppi.in_pc_callback().set_ioport("IN0");
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100));
 }
 
 void piggypas_state::fidlstix(machine_config &config)

@@ -165,12 +165,11 @@ void simpl156_state::eeprom_w(u32 data)
 
 u32 simpl156_state::spriteram_r(offs_t offset)
 {
-	return m_spriteram[offset] ^ 0xffff0000;
+	return m_spriteram[offset] | 0xffff0000;
 }
 
 void simpl156_state::spriteram_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
 	COMBINE_DATA(&m_spriteram[offset]);
@@ -179,12 +178,11 @@ void simpl156_state::spriteram_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 simpl156_state::mainram_r(offs_t offset)
 {
-	return m_mainram[offset] ^ 0xffff0000;
+	return m_mainram[offset] | 0xffff0000;
 }
 
 void simpl156_state::mainram_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
 	COMBINE_DATA(&m_mainram[offset]);
@@ -193,13 +191,12 @@ void simpl156_state::mainram_w(offs_t offset, u32 data, u32 mem_mask)
 template<unsigned Layer>
 u32 simpl156_state::rowscroll_r(offs_t offset)
 {
-	return m_rowscroll[Layer][offset] ^ 0xffff0000;
+	return m_rowscroll[Layer][offset] | 0xffff0000;
 }
 
 template<unsigned Layer>
 void simpl156_state::rowscroll_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
 	COMBINE_DATA(&m_rowscroll[Layer][offset]);
@@ -212,14 +209,14 @@ void simpl156_state::base_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x07ffff).rom(); // rom (32-bit)
 	map(0x200000, 0x200003).portr("IN0");
-	map(0x201000, 0x201fff).ram().share("systemram").mirror(0x002000); // work ram (32-bit)
+	map(0x201000, 0x201fff).ram().share(m_systemram).mirror(0x002000); // work ram (32-bit)
 }
 
 /* Joe and Mac Returns */
 void simpl156_state::joemacr_map(address_map &map)
 {
 	base_map(map);
-	map(0x100000, 0x107fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)).share("mainram"); // main ram
+	map(0x100000, 0x107fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)); // main ram
 	map(0x110000, 0x111fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
 	map(0x120000, 0x120fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x130000, 0x130003).portr("IN1").w(FUNC(simpl156_state::eeprom_w));
@@ -240,7 +237,7 @@ void simpl156_state::chainrec_map(address_map &map)
 {
 	base_map(map);
 	map(0x3c0000, 0x3c0000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x400000, 0x407fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)).share("mainram"); // main ram?
+	map(0x400000, 0x407fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)); // main ram?
 	map(0x410000, 0x411fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
 	map(0x420000, 0x420fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x430000, 0x430003).portr("IN1").w(FUNC(simpl156_state::eeprom_w));
@@ -260,7 +257,7 @@ void simpl156_state::magdrop_map(address_map &map)
 {
 	base_map(map);
 	map(0x340000, 0x340000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x380000, 0x387fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)).share("mainram"); // main ram?
+	map(0x380000, 0x387fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)); // main ram?
 	map(0x390000, 0x391fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
 	map(0x3a0000, 0x3a0fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x3b0000, 0x3b0003).portr("IN1").w(FUNC(simpl156_state::eeprom_w));
@@ -280,7 +277,7 @@ void simpl156_state::magdropp_map(address_map &map)
 {
 	base_map(map);
 	map(0x4c0000, 0x4c0000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x680000, 0x687fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)).share("mainram"); // main ram?
+	map(0x680000, 0x687fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)); // main ram?
 	map(0x690000, 0x691fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
 	map(0x6a0000, 0x6a0fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x6b0000, 0x6b0003).portr("IN1").w(FUNC(simpl156_state::eeprom_w));
@@ -301,7 +298,7 @@ void simpl156_state::mitchell156_map(address_map &map)
 	base_map(map);
 	map(0x100000, 0x100000).rw("okisfx", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).rw(m_okimusic, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x180000, 0x187fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)).share("mainram"); // main ram
+	map(0x180000, 0x187fff).rw(FUNC(simpl156_state::mainram_r), FUNC(simpl156_state::mainram_w)); // main ram
 	map(0x190000, 0x191fff).rw(FUNC(simpl156_state::spriteram_r), FUNC(simpl156_state::spriteram_w));
 	map(0x1a0000, 0x1a0fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x1b0000, 0x1b0003).portr("IN1").w(FUNC(simpl156_state::eeprom_w));
@@ -338,9 +335,12 @@ static const gfx_layout tile_16x16_layout =
 };
 
 static GFXDECODE_START( gfx_simpl156 )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,       0, 32 )    /* Tiles (8x8) */
-	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,     0, 32 )    /* Tiles (16x16) */
-	GFXDECODE_ENTRY( "gfx2", 0, tile_16x16_layout, 0x200, 32 )    /* Sprites (16x16) */
+	GFXDECODE_ENTRY( "tiles", 0, tile_8x8_layout,       0, 32 )    /* Tiles (8x8) */
+	GFXDECODE_ENTRY( "tiles", 0, tile_16x16_layout,     0, 32 )    /* Tiles (16x16) */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_simpl156_spr )
+	GFXDECODE_ENTRY( "sprites", 0, tile_16x16_layout, 0x200, 32 )    /* Sprites (16x16) */
 GFXDECODE_END
 
 void simpl156_state::vblank_interrupt(int state)
@@ -387,7 +387,7 @@ void simpl156_state::chainrec(machine_config &config)
 	screen.screen_vblank().set(FUNC(simpl156_state::vblank_interrupt));
 
 	PALETTE(config, m_palette);
-	m_palette->set_format(palette_device::xBGR_555, 4096);
+	m_palette->set_format(palette_device::xBGR_555, 4096/4);
 	m_palette->set_membits(16);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_simpl156);
@@ -405,21 +405,16 @@ void simpl156_state::chainrec(machine_config &config)
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
+	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_simpl156_spr);
 	m_sprgen->set_pri_callback(FUNC(simpl156_state::pri_callback));
-	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	okim6295_device &okisfx(OKIM6295(config, "okisfx", 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH)); // divider not verified
-	okisfx.add_route(ALL_OUTPUTS, "lspeaker", 0.6);
-	okisfx.add_route(ALL_OUTPUTS, "rspeaker", 0.6);
+	okisfx.add_route(ALL_OUTPUTS, "mono", 0.6);
 
 	OKIM6295(config, m_okimusic, 28_MHz_XTAL / 14, okim6295_device::PIN7_HIGH); // divider not verified
-	m_okimusic->add_route(ALL_OUTPUTS, "lspeaker", 0.2);
-	m_okimusic->add_route(ALL_OUTPUTS, "rspeaker", 0.2);
+	m_okimusic->add_route(ALL_OUTPUTS, "mono", 0.2);
 }
 
 void simpl156_state::magdrop(machine_config &config)
@@ -493,15 +488,15 @@ ROM_START( joemacr )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "05.u29",    0x000000, 0x080000,  CRC(74e9a158) SHA1(eee447303ac0884e152b89f59a9694afade87336) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "01.u8l",    0x000000, 0x080000,  CRC(4da4a2c1) SHA1(1ed4bd4337d8b185b56e326e662a8715e4d09e17) )
 	ROM_LOAD( "02.u8h",    0x080000, 0x080000,  CRC(642c08db) SHA1(9a541fd56ae34c24f803e08869702be6fafd81d1) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD( "mbn01",    0x080000, 0x080000, CRC(a3a37353) SHA1(c4509c8268afb647c20e71b42ae8ebd2bdf075e6) ) /* 03.u11 */
 	ROM_LOAD( "mbn02",    0x000000, 0x080000, CRC(aa2230c5) SHA1(43b7ac5c69cde1840a5255a8897e1c5d5f89fd7b) ) /* 04.u12 */
 
-	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mbn04",    0x00000, 0x40000,  CRC(dcbd4771) SHA1(2a1ab6b0fc372333c7eb17aab077fe1ca5ba1dea) ) /* 07.u46 */
 
 	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
@@ -530,14 +525,14 @@ ROM_START( joemacra )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "mw00",    0x000000, 0x080000,  CRC(e1b78f40) SHA1(e611c317ada5a049a5e05d69c051e22a43fa2845) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) // rebuilt with roms from other set
+	ROM_REGION( 0x100000, "tiles", 0 ) // rebuilt with roms from other set
 	ROM_LOAD( "mbn00",    0x000000, 0x100000, CRC(11b2dac7) SHA1(71a50f606caddeb0ef266e2d3df9e429a4873f21) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD( "mbn01",    0x080000, 0x080000, CRC(a3a37353) SHA1(c4509c8268afb647c20e71b42ae8ebd2bdf075e6) )
 	ROM_LOAD( "mbn02",    0x000000, 0x080000, CRC(aa2230c5) SHA1(43b7ac5c69cde1840a5255a8897e1c5d5f89fd7b) )
 
-	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mbn04",    0x00000, 0x40000,  CRC(dcbd4771) SHA1(2a1ab6b0fc372333c7eb17aab077fe1ca5ba1dea) )
 
 	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
@@ -548,14 +543,14 @@ ROM_START( joemacrj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "my00-.e1",    0x000000, 0x080000,  CRC(2c184981) SHA1(976fbb554de96aa6405f6f64cd75b633439fe583) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) // rebuilt with roms from other set
+	ROM_REGION( 0x100000, "tiles", 0 ) // rebuilt with roms from other set
 	ROM_LOAD( "mbn00",    0x000000, 0x100000, CRC(11b2dac7) SHA1(71a50f606caddeb0ef266e2d3df9e429a4873f21) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD( "mbn01",    0x080000, 0x080000, CRC(a3a37353) SHA1(c4509c8268afb647c20e71b42ae8ebd2bdf075e6) )
 	ROM_LOAD( "mbn02",    0x000000, 0x080000, CRC(aa2230c5) SHA1(43b7ac5c69cde1840a5255a8897e1c5d5f89fd7b) )
 
-	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mbn04",    0x00000, 0x40000,  CRC(dcbd4771) SHA1(2a1ab6b0fc372333c7eb17aab077fe1ca5ba1dea) )
 
 	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
@@ -595,16 +590,16 @@ ROM_START( chainrec )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "e1",    0x000000, 0x080000, CRC(8a8340ef) SHA1(4aaee56127b73453b862ff2a33dc241eeabf5658) ) /* No DECO ID number on label */
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "mcc-00",    0x000000, 0x100000, CRC(646b03ec) SHA1(9a2fc11b1575032b5a784d88c3a90913068d1e69) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "u3",    0x000000, 0x080000, CRC(92659721) SHA1(b446ce98ec9c2c16375ef00639cfb463b365b8f7) ) /* No DECO ID numbers on labels */
 	ROM_LOAD16_BYTE( "u4",    0x000001, 0x080000, CRC(e304eb32) SHA1(61a647ec89695a6b25ff924bdc6d29cbd7aca82b) )
 	ROM_LOAD16_BYTE( "u5",    0x100000, 0x080000, CRC(1b6f01ea) SHA1(753fc670707432e317d035b09b0bad0762fea731) )
 	ROM_LOAD16_BYTE( "u6",    0x100001, 0x080000, CRC(531a56f2) SHA1(89602bb873a3b110bffc216f921ba228e53380f9) )
 
-	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mcc-04",    0x00000, 0x40000,  CRC(86ee6ade) SHA1(56ad3f432c7f430f19fcba7c89940c63da165906) )
 
 	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
@@ -642,14 +637,14 @@ ROM_START( magdrop )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "re00-2.e1",    0x000000, 0x080000,  CRC(7138f10f) SHA1(ca93c3c2dc9a7dd6901c8429a6bf6883076a9b8f) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "mcc-00",    0x000000, 0x100000, CRC(646b03ec) SHA1(9a2fc11b1575032b5a784d88c3a90913068d1e69) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "mcc-01.a13",    0x100000, 0x100000, CRC(13d88745) SHA1(0ce4ec1481f31be860ee80322de6e32f9a566229) )
 	ROM_LOAD( "mcc-02.a14",    0x000000, 0x100000, CRC(d0f97126) SHA1(3848a6f00d0e57aaf383298c4d111eb63a88b073) )
 
-	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mcc-04",    0x00000, 0x40000,  CRC(86ee6ade) SHA1(56ad3f432c7f430f19fcba7c89940c63da165906) )
 
 	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
@@ -663,14 +658,14 @@ ROM_START( magdropp )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "rz00-1.e1",    0x000000, 0x080000,  CRC(28caf639) SHA1(a17e792c82e65009e21680094acf093c0c4f1021) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "tiles", 0 )
 	ROM_LOAD( "mcc-00",    0x000000, 0x100000, CRC(646b03ec) SHA1(9a2fc11b1575032b5a784d88c3a90913068d1e69) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "mcc-01.a13",    0x100000, 0x100000, CRC(13d88745) SHA1(0ce4ec1481f31be860ee80322de6e32f9a566229) )
 	ROM_LOAD( "mcc-02.a14",    0x000000, 0x100000, CRC(d0f97126) SHA1(3848a6f00d0e57aaf383298c4d111eb63a88b073) )
 
-	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mcc-04",    0x00000, 0x40000,  CRC(86ee6ade) SHA1(56ad3f432c7f430f19fcba7c89940c63da165906) )
 
 	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
@@ -726,17 +721,17 @@ ROM_START( charlien )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "nd00-1.1e",    0x000000, 0x080000,  CRC(f18f4b23) SHA1(cb0c159b4dde3a3c5f295f270485996811e5e4d2) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD( "mbr-00.9a",    0x000000, 0x080000, CRC(ecf2c7f0) SHA1(3c735a4eef2bc49f16ac9365a5689101f43c13e9) )
 	ROM_CONTINUE( 0x100000, 0x080000)
 	ROM_CONTINUE( 0x080000, 0x080000)
 	ROM_CONTINUE( 0x180000, 0x080000)
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "mbr-01.14a",    0x100000, 0x100000, CRC(46c90215) SHA1(152acdeea34ec1db3f761066a0c1ff6e43e47f9d) )
 	ROM_LOAD( "mbr-03.14h",    0x000000, 0x100000, CRC(c448a68a) SHA1(4b607dfee269abdfeb710b74b73ef87dc2b30e8c) )
 
-	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "nd01-0.13h",    0x00000, 0x40000,  CRC(635a100a) SHA1(f6ec70890892e7557097ccd519de37247bb8c98d) )
 
 	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
@@ -807,19 +802,19 @@ ROM_START( prtytime )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "pz_00-0.1e",    0x000000, 0x080000, CRC(ec715c87) SHA1(c9f28399d59b37977f31a5c67cb97af6c58947ae) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD( "mcb-00.9a",    0x000000, 0x080000, CRC(c48a4f2b) SHA1(2dee5f8507b2a7e6f7e44b14f9abca36d0ebf78b) )
 	ROM_CONTINUE( 0x100000, 0x080000)
 	ROM_CONTINUE( 0x080000, 0x080000)
 	ROM_CONTINUE( 0x180000, 0x080000)
 
-	ROM_REGION( 0x800000, "gfx2", 0 )
+	ROM_REGION( 0x800000, "sprites", 0 )
 	ROM_LOAD( "mcb-01.13a",    0x600000, 0x200000, CRC(06f40a57) SHA1(896f1d373e911dcff7223bf21756ad35b28b4c5d) )
 	ROM_LOAD( "mcb-02.14a",    0x400000, 0x200000, CRC(423cfb38) SHA1(b8c772a8ab471c365a11a88c85e1c8c7d2ad6e80) )
 	ROM_LOAD( "mcb-03.14d",    0x200000, 0x200000, CRC(0aef73af) SHA1(76cf13f53da5202da80820f98660edee1eef7f1a) )
 	ROM_LOAD( "mcb-05.14h",    0x000000, 0x200000, CRC(81540cfb) SHA1(6f7bc62c3c4d4a29eb1e0cfb261ace461bbca57c) )
 
-	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "pz_01-0.13h",    0x00000, 0x40000,  CRC(8925bce2) SHA1(0ff2d5db7a24a2af30bd753eba274572c32cc2e7) )
 
 	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
@@ -833,19 +828,19 @@ ROM_START( gangonta )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "rd_00-0.1e",    0x000000, 0x080000, CRC(f80f43bb) SHA1(f9d26829eb90d41a6c410d4d673fe9595f814868) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD( "mcb-00.9a",    0x000000, 0x080000, CRC(c48a4f2b) SHA1(2dee5f8507b2a7e6f7e44b14f9abca36d0ebf78b) )
 	ROM_CONTINUE( 0x100000, 0x080000)
 	ROM_CONTINUE( 0x080000, 0x080000)
 	ROM_CONTINUE( 0x180000, 0x080000)
 
-	ROM_REGION( 0x800000, "gfx2", 0 )
+	ROM_REGION( 0x800000, "sprites", 0 )
 	ROM_LOAD( "mcb-01.13a",    0x600000, 0x200000, CRC(06f40a57) SHA1(896f1d373e911dcff7223bf21756ad35b28b4c5d) )
 	ROM_LOAD( "mcb-02.14a",    0x400000, 0x200000, CRC(423cfb38) SHA1(b8c772a8ab471c365a11a88c85e1c8c7d2ad6e80) )
 	ROM_LOAD( "mcb-03.14d",    0x200000, 0x200000, CRC(0aef73af) SHA1(76cf13f53da5202da80820f98660edee1eef7f1a) )
 	ROM_LOAD( "mcb-05.14h",    0x000000, 0x200000, CRC(81540cfb) SHA1(6f7bc62c3c4d4a29eb1e0cfb261ace461bbca57c) )
 
-	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "rd_01-0.13h",    0x00000, 0x40000,  CRC(70fd18c6) SHA1(368cd8e10c5f5a13eb3813974a7e6b46a4fa6b6c) )
 
 	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
@@ -898,19 +893,19 @@ ROM_START( osman )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "sa00-0.1e",    0x000000, 0x080000, CRC(ec6b3257) SHA1(10a42a680ce122ab030eaa2ccd99d302cb77854e) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD( "mcf-00.9a",    0x000000, 0x080000, CRC(247712dc) SHA1(bcb765afd7e756b68131c97c30d210de115d6b50) )
 	ROM_CONTINUE( 0x100000, 0x080000)
 	ROM_CONTINUE( 0x080000, 0x080000)
 	ROM_CONTINUE( 0x180000, 0x080000)
 
-	ROM_REGION( 0x800000, "gfx2", 0 )
+	ROM_REGION( 0x800000, "sprites", 0 )
 	ROM_LOAD( "mcf-01.13a",    0x600000, 0x200000, CRC(83881e25) SHA1(ae82cf0f704e6efea94c6c1d276d4e3e5b3ebe43) )
 	ROM_LOAD( "mcf-02.14a",    0x400000, 0x200000, CRC(21251b33) SHA1(d252fe5c6eef8cbc9327e4176b4868b1cb17a738) )
 	ROM_LOAD( "mcf-03.14d",    0x200000, 0x200000, CRC(faf1d51d) SHA1(675dbbfe15b8010d54b2b3af26d42cdd753c2ce2) )
 	ROM_LOAD( "mcf-04.14h",    0x000000, 0x200000, CRC(4fa55577) SHA1(e229ba9cce46b92ce255aa33b974e19b214c4017) )
 
-	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "sa01-0.13h",    0x00000, 0x40000,  CRC(cea8368e) SHA1(1fcc641381fdc29bd50d3a4b23e67647f79e505a))
 
 	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
@@ -926,19 +921,19 @@ ROM_START( candance )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "sa00-0.1e",    0x000000, 0x080000, CRC(ec6b3257) SHA1(10a42a680ce122ab030eaa2ccd99d302cb77854e) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD( "mcf-00.9a",    0x000000, 0x080000, CRC(247712dc) SHA1(bcb765afd7e756b68131c97c30d210de115d6b50) )
 	ROM_CONTINUE( 0x100000, 0x080000)
 	ROM_CONTINUE( 0x080000, 0x080000)
 	ROM_CONTINUE( 0x180000, 0x080000)
 
-	ROM_REGION( 0x800000, "gfx2", 0 )
+	ROM_REGION( 0x800000, "sprites", 0 )
 	ROM_LOAD( "mcf-01.13a",    0x600000, 0x200000, CRC(83881e25) SHA1(ae82cf0f704e6efea94c6c1d276d4e3e5b3ebe43) )
 	ROM_LOAD( "mcf-02.14a",    0x400000, 0x200000, CRC(21251b33) SHA1(d252fe5c6eef8cbc9327e4176b4868b1cb17a738) )
 	ROM_LOAD( "mcf-03.14d",    0x200000, 0x200000, CRC(faf1d51d) SHA1(675dbbfe15b8010d54b2b3af26d42cdd753c2ce2) )
 	ROM_LOAD( "mcf-04.14h",    0x000000, 0x200000, CRC(4fa55577) SHA1(e229ba9cce46b92ce255aa33b974e19b214c4017) )
 
-	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
+	ROM_REGION( 0x40000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "sa01-0.13h",    0x00000, 0x40000,  CRC(cea8368e) SHA1(1fcc641381fdc29bd50d3a4b23e67647f79e505a))
 
 	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
@@ -1030,15 +1025,18 @@ void simpl156_state::init_simpl156()
 
 	memcpy(rom, &buf1[0], length);
 
-	deco56_decrypt_gfx(machine(), "gfx1");
+	deco56_decrypt_gfx(machine(), "tiles");
 	deco156_decrypt(machine());
 }
 
 /* Everything seems more stable if we run the CPU speed x4 and use Idle skips.. maybe it has an internal multiplier? */
 u32 simpl156_state::joemacr_speedup_r()
 {
-	if (m_maincpu->pc() == 0x284)
-		m_maincpu->spin_until_time(attotime::from_usec(400));
+	if (!machine().side_effects_disabled())
+	{
+		if (m_maincpu->pc() == 0x284)
+			m_maincpu->spin_until_time(attotime::from_usec(400));
+	}
 	return m_systemram[0x18/4];
 }
 
@@ -1051,8 +1049,11 @@ void simpl156_state::init_joemacr()
 
 u32 simpl156_state::chainrec_speedup_r()
 {
-	if (m_maincpu->pc() == 0x2d4)
-		m_maincpu->spin_until_time(attotime::from_usec(400));
+	if (!machine().side_effects_disabled())
+	{
+		if (m_maincpu->pc() == 0x2d4)
+			m_maincpu->spin_until_time(attotime::from_usec(400));
+	}
 	return m_systemram[0x18/4];
 }
 
@@ -1064,8 +1065,11 @@ void simpl156_state::init_chainrec()
 
 u32 simpl156_state::prtytime_speedup_r()
 {
-	if (m_maincpu->pc() == 0x4f0)
-		m_maincpu->spin_until_time(attotime::from_usec(400));
+	if (!machine().side_effects_disabled())
+	{
+		if (m_maincpu->pc() == 0x4f0)
+			m_maincpu->spin_until_time(attotime::from_usec(400));
+	}
 	return m_systemram[0xae0/4];
 }
 
@@ -1078,8 +1082,11 @@ void simpl156_state::init_prtytime()
 
 u32 simpl156_state::charlien_speedup_r()
 {
-	if (m_maincpu->pc() == 0xc8c8)
-		m_maincpu->spin_until_time(attotime::from_usec(400));
+	if (!machine().side_effects_disabled())
+	{
+		if (m_maincpu->pc() == 0xc8c8)
+			m_maincpu->spin_until_time(attotime::from_usec(400));
+	}
 	return m_systemram[0x10/4];
 }
 
@@ -1091,8 +1098,11 @@ void simpl156_state::init_charlien()
 
 u32 simpl156_state::osman_speedup_r()
 {
-	if (m_maincpu->pc() == 0x5974)
-		m_maincpu->spin_until_time(attotime::from_usec(400));
+	if (!machine().side_effects_disabled())
+	{
+		if (m_maincpu->pc() == 0x5974)
+			m_maincpu->spin_until_time(attotime::from_usec(400));
+	}
 	return m_systemram[0x10/4];
 }
 

@@ -2321,7 +2321,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 	BACTA_DATALOGGER(config, m_dataport, 0);
 	m_dataport->rxd_handler().set(FUNC(mpu4_state::dataport_rxd));
 
-	HOPPER(config, m_hopper1, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper1, attotime::from_msec(100));
 
 
 	SPEAKER(config, "mono").front_center();

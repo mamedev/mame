@@ -167,8 +167,6 @@ private:
 };
 
 
-// video
-
 /****************************************************************************
 
 The Video system used in Space Tactics is unusual.
@@ -567,8 +565,6 @@ uint32_t stactics_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

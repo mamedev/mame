@@ -1,7 +1,7 @@
 // XzDecoder.h
 
-#ifndef __XZ_DECODER_H
-#define __XZ_DECODER_H
+#ifndef ZIP7_INC_XZ_DECODER_H
+#define ZIP7_INC_XZ_DECODER_H
 
 #include "../../../C/Xz.h"
 
@@ -46,45 +46,38 @@ struct CDecoder
 };
 
 
-class CComDecoder:
+class CComDecoder Z7_final:
   public ICompressCoder,
   public ICompressSetFinishMode,
   public ICompressGetInStreamProcessedSize,
-
-  #ifndef _7ZIP_ST
+ #ifndef Z7_ST
   public ICompressSetCoderMt,
   public ICompressSetMemLimit,
-  #endif
-
+ #endif
   public CMyUnknownImp,
   public CDecoder
 {
+  Z7_COM_QI_BEGIN2(ICompressCoder)
+  Z7_COM_QI_ENTRY(ICompressSetFinishMode)
+  Z7_COM_QI_ENTRY(ICompressGetInStreamProcessedSize)
+ #ifndef Z7_ST
+  Z7_COM_QI_ENTRY(ICompressSetCoderMt)
+  Z7_COM_QI_ENTRY(ICompressSetMemLimit)
+ #endif
+  Z7_COM_QI_END
+  Z7_COM_ADDREF_RELEASE
+
+  Z7_IFACE_COM7_IMP(ICompressCoder)
+  Z7_IFACE_COM7_IMP(ICompressSetFinishMode)
+  Z7_IFACE_COM7_IMP(ICompressGetInStreamProcessedSize)
+ #ifndef Z7_ST
+  Z7_IFACE_COM7_IMP(ICompressSetCoderMt)
+  Z7_IFACE_COM7_IMP(ICompressSetMemLimit)
+ #endif
+
   bool _finishStream;
 
 public:
-  MY_QUERYINTERFACE_BEGIN2(ICompressCoder)
-
-  MY_QUERYINTERFACE_ENTRY(ICompressSetFinishMode)
-  MY_QUERYINTERFACE_ENTRY(ICompressGetInStreamProcessedSize)
-
-  #ifndef _7ZIP_ST
-  MY_QUERYINTERFACE_ENTRY(ICompressSetCoderMt)
-  MY_QUERYINTERFACE_ENTRY(ICompressSetMemLimit)
-  #endif
-  
-  MY_QUERYINTERFACE_END
-  MY_ADDREF_RELEASE
-
-  STDMETHOD(Code)(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-      const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress);
-  STDMETHOD(SetFinishMode)(UInt32 finishMode);
-  STDMETHOD(GetInStreamProcessedSize)(UInt64 *value);
-
-  #ifndef _7ZIP_ST
-  STDMETHOD(SetNumberOfThreads)(UInt32 numThreads);
-  STDMETHOD(SetMemLimit)(UInt64 memUsage);
-  #endif
-
   CComDecoder(): _finishStream(false) {}
 };
 

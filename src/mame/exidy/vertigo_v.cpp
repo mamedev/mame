@@ -163,27 +163,27 @@ void vertigo_state::vertigo_vproc_reset()
 	/* Decode microcode */
 	for (int i = 0; i < MC_LENGTH; i++)
 	{
-		m_mc[i].x = (mcode[i] >> 44) & 0x3f;
-		m_mc[i].a = (mcode[i] >> 40) & 0xf;
-		m_mc[i].b = (mcode[i] >> 36) & 0xf;
-		m_mc[i].inst = (mcode[i] >> 27) & 077;
-		m_mc[i].dest = (mcode[i] >> 33) & 07;
-		m_mc[i].cn = (mcode[i] >> 26) & 0x1;
-		m_mc[i].mreq = (mcode[i] >> 25) & 0x1;
-		m_mc[i].rwrite = (mcode[i] >> 23) & 0x1;
-		m_mc[i].rsel = m_mc[i].rwrite & ((mcode[i] >> 24) & 0x1);
-		m_mc[i].of =  (mcode[i] >> 20) & 0x7;
-		m_mc[i].iif = (mcode[i] >> 18) & 0x3;
-		m_mc[i].oa = (mcode[i] >> 16) & 0x3;
-		m_mc[i].jpos = (mcode[i] >> 14) & 0x1;
-		m_mc[i].jmp = (mcode[i] >> 12) & 0x3;
-		m_mc[i].jcon = (mcode[i] >> 9) & 0x7;
-		m_mc[i].ma = mcode[i] & 0x1ff;
+		m_mc[i].x       = BIT(mcode[i], 44, 6);
+		m_mc[i].a       = BIT(mcode[i], 40, 4);
+		m_mc[i].b       = BIT(mcode[i], 36, 4);
+		m_mc[i].inst    = BIT(mcode[i], 27, 6);
+		m_mc[i].dest    = BIT(mcode[i], 33, 3);
+		m_mc[i].cn      = BIT(mcode[i], 26, 1);
+		m_mc[i].mreq    = BIT(mcode[i], 25, 1);
+		m_mc[i].rwrite  = BIT(mcode[i], 23, 1);
+		m_mc[i].rsel    = BIT(mcode[i], 24, 1) & m_mc[i].rwrite;
+		m_mc[i].of      = BIT(mcode[i], 20, 3);
+		m_mc[i].iif     = BIT(mcode[i], 18, 2);
+		m_mc[i].oa      = BIT(mcode[i], 16, 2);
+		m_mc[i].jpos    = BIT(mcode[i], 14, 1);
+		m_mc[i].jmp     = BIT(mcode[i], 12, 2);
+		m_mc[i].jcon    = BIT(mcode[i],  9, 3);
+		m_mc[i].ma      = BIT(mcode[i],  0, 9);
 	}
 
-	memset(&m_vs, 0, sizeof(m_vs));
-	memset(&m_bsp, 0, sizeof(m_bsp));
-	memset(&m_vgen, 0, sizeof(m_vgen));
+	m_vs = vproc();
+	m_bsp = am2901();
+	m_vgen = vector_generator();
 }
 
 

@@ -38,11 +38,10 @@ public:
 	// bool dvena_r();
 
 protected:
-	void device_start() override;
-	void device_reset() override;
-	void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
@@ -105,7 +104,7 @@ private:
 	uint8_t*  m_dsrrom;
 
 	// Link to the attached floppy drives
-	floppy_image_device*    m_floppy[3];
+	required_device_array<floppy_connector, 3> m_floppy;
 
 	// Currently selected floppy drive
 	int  m_sel_floppy;

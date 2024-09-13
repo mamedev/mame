@@ -92,7 +92,6 @@ private:
 	TILE_GET_INFO_MEMBER(mariobl_char_tile_info);
 	TILE_GET_INFO_MEMBER(dkong3abl_char_tile_info);
 
-	void flip_screen_w(int state);
 	void scroll_ram_w(offs_t offset, uint8_t data);
 	void color_bank_1_w(int state);
 	void color_bank_2_w(int state);
@@ -557,11 +556,6 @@ uint32_t ambush_state::screen_update_bootleg(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-void ambush_state::flip_screen_w(int state)
-{
-	flip_screen_set(state);
-}
-
 void ambush_state::scroll_ram_w(offs_t offset, uint8_t data)
 {
 	m_scroll_ram[offset] = data;
@@ -764,7 +758,7 @@ void ambush_state::ambush(machine_config &config)
 
 	// addressable latches at 8B and 8C
 	LS259(config, m_outlatch[0]);
-	m_outlatch[0]->q_out_cb<4>().set(FUNC(ambush_state::flip_screen_w));
+	m_outlatch[0]->q_out_cb<4>().set(FUNC(ambush_state::flip_screen_set));
 	m_outlatch[0]->q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
 	m_outlatch[0]->q_out_cb<7>().set(FUNC(ambush_state::coin_counter_1_w));
 

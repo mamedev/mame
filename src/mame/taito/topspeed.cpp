@@ -274,8 +274,6 @@ private:
 };
 
 
-// video
-
 /****************************************************************************
 
                                      NOTES
@@ -555,8 +553,6 @@ u32 topspeed_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 
-// machine
-
 /**********************************************************
                        CPU CONTROL
 **********************************************************/
@@ -719,7 +715,7 @@ void topspeed_state::volume_w(offs_t offset, u8 data)
 		case 0x600: filter = m_filter1r;    break; // YM-2151 R
 	}
 
-	filter->flt_volume_set_volume(data / 255.0f);
+	filter->set_gain(data / 255.0f);
 }
 
 void topspeed_state::z80ctc_to0(int state)
@@ -908,8 +904,11 @@ static const gfx_layout tile16x8_layout =
 
 static GFXDECODE_START( gfx_topspeed )
 	GFXDECODE_ENTRY( "sprites", 0x0, tile16x8_layout,      0, 256 ) // Sprite parts
-	GFXDECODE_ENTRY( "pc080sn", 0x0, gfx_8x8x4_packed_msb, 0, 512 ) // Playfield
 	// Road Lines gfxdecodable ?
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_topspeed_tmap )
+	GFXDECODE_ENTRY( "pc080sn", 0x0, gfx_8x8x4_packed_msb, 0, 512 ) // Playfield
 GFXDECODE_END
 
 
@@ -963,19 +962,15 @@ void topspeed_state::topspeed(machine_config &config)
 	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'000'000) / 4));
 	ctc.zc_callback<0>().set(FUNC(topspeed_state::z80ctc_to0));
 
-	PC080SN(config, m_pc080sn[0], 0);
-	m_pc080sn[0]->set_gfx_region(1);
+	PC080SN(config, m_pc080sn[0], 0, "palette", gfx_topspeed_tmap);
 	m_pc080sn[0]->set_offsets(0, 8);
-	m_pc080sn[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	PC080SN(config, m_pc080sn[1], 0);
-	m_pc080sn[1]->set_gfx_region(1);
+	PC080SN(config, m_pc080sn[1], 0, "palette", gfx_topspeed_tmap);
 	m_pc080sn[1]->set_offsets(0, 8);
-	m_pc080sn[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 
 	TC0040IOC(config, m_tc0040ioc, 0);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
@@ -1170,6 +1165,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAMEL( 1987, topspeed,  0,        topspeed, topspeed, topspeed_state, empty_init, ROT0, "Taito Corporation Japan",                     "Top Speed (World)",     MACHINE_SUPPORTS_SAVE, layout_topspeed )
-GAMEL( 1987, topspeedu, topspeed, topspeed, fullthrl, topspeed_state, empty_init, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)",        MACHINE_SUPPORTS_SAVE, layout_topspeed )
-GAMEL( 1987, fullthrl,  topspeed, topspeed, fullthrl, topspeed_state, empty_init, ROT0, "Taito Corporation",                           "Full Throttle (Japan)", MACHINE_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, topspeed,  0,        topspeed, topspeed, topspeed_state, empty_init, ROT0, "Taito Corporation Japan",                     "Top Speed (World, rev 1)", MACHINE_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, topspeedu, topspeed, topspeed, fullthrl, topspeed_state, empty_init, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)",           MACHINE_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, fullthrl,  topspeed, topspeed, fullthrl, topspeed_state, empty_init, ROT0, "Taito Corporation",                           "Full Throttle (Japan)",    MACHINE_SUPPORTS_SAVE, layout_topspeed )

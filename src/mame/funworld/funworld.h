@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca, Peter Ferrie
+// copyright-holders:Roberto Fresca, Grull Osgo, Peter Ferrie
 #ifndef MAME_FUNWORLD_FUNWORLD_H
 #define MAME_FUNWORLD_FUNWORLD_H
 
@@ -188,8 +188,12 @@ public:
 
 	void intrgmes(machine_config &config);
 
+	void init_novop_a();
+	void init_novop_b();
+	void init_intgms();
+
 protected:
-	virtual void driver_start() override;
+
 	virtual void machine_reset() override;
 
 private:

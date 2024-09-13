@@ -37,6 +37,9 @@ public:
 	void int2_w(int state) { external_int(2, state); }
 	void int3_w(int state) { external_int(3, state); }
 
+	// This a hack, only use if there are sync problems with another cpu
+	void dma_sync_req(int which) { drq_callback(which); }
+
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
@@ -75,7 +78,7 @@ protected:
 	virtual uint8_t read_port_byte(uint16_t port) override;
 	virtual uint16_t read_port_word(uint16_t port) override;
 	virtual void write_port_byte(uint16_t port, uint8_t data) override;
-	void write_port_byte_al(uint16_t port);
+	virtual void write_port_byte_al(uint16_t port) override;
 	virtual void write_port_word(uint16_t port, uint16_t data) override;
 	virtual uint8_t read_byte(uint32_t addr) override;
 	virtual uint16_t read_word(uint32_t addr) override;

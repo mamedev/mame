@@ -40,8 +40,8 @@ Test Paste:
 #include "cpu/m6809/m6809.h"
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
-#include "speaker.h"
 #include "video/pwm.h"
+#include "speaker.h"
 
 #include "mkit09.lh"
 

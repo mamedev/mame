@@ -36,6 +36,9 @@ PERFORMANCE_TEST_EXES = \
 	tests/performance/server.exe
 
 UNIT_TEST_EXES = \
+	tests/unit/any_completion_executor.exe \
+	tests/unit/any_completion_handler.exe \
+	tests/unit/any_io_executor.exe \
 	tests/unit/associated_allocator.exe \
 	tests/unit/associated_executor.exe \
 	tests/unit/async_result.exe \
@@ -72,27 +75,13 @@ UNIT_TEST_EXES = \
 	tests/unit/execution/any_executor.exe \
 	tests/unit/execution/blocking.exe \
 	tests/unit/execution/blocking_adaptation.exe \
-	tests/unit/execution/bulk_execute.exe \
-	tests/unit/execution/bulk_guarantee.exe \
-	tests/unit/execution/connect.exe \
 	tests/unit/execution/context_as.exe \
-	tests/unit/execution/execute.exe \
 	tests/unit/execution/executor.exe \
 	tests/unit/execution/invocable_archetype.exe \
 	tests/unit/execution/mapping.exe \
-	tests/unit/execution/operation_state.exe \
 	tests/unit/execution/outstanding_work.exe \
 	tests/unit/execution/prefer_only.exe \
-	tests/unit/execution/receiver.exe \
 	tests/unit/execution/relationship.exe \
-	tests/unit/execution/schedule.exe \
-	tests/unit/execution/scheduler.exe \
-	tests/unit/execution/sender.exe \
-	tests/unit/execution/set_done.exe \
-	tests/unit/execution/set_error.exe \
-	tests/unit/execution/set_value.exe \
-	tests/unit/execution/start.exe \
-	tests/unit/execution/submit.exe \
 	tests/unit/executor.exe \
 	tests/unit/executor_work_guard.exe \
 	tests/unit/generic/basic_endpoint.exe \
@@ -173,66 +162,67 @@ UNIT_TEST_EXES = \
 	tests/unit/write.exe \
 	tests/unit/write_at.exe
 
-CPP03_EXAMPLE_EXES = \
-	examples/cpp03/allocation/server.exe \
-	examples/cpp03/buffers/reference_counted.exe \
-	examples/cpp03/chat/chat_client.exe \
-	examples/cpp03/chat/chat_server.exe \
-	examples/cpp03/echo/async_tcp_echo_server.exe \
-	examples/cpp03/echo/async_udp_echo_server.exe \
-	examples/cpp03/echo/blocking_tcp_echo_client.exe \
-	examples/cpp03/echo/blocking_tcp_echo_server.exe \
-	examples/cpp03/echo/blocking_udp_echo_client.exe \
-	examples/cpp03/echo/blocking_udp_echo_server.exe \
-	examples/cpp03/http/client/async_client.exe \
-	examples/cpp03/http/client/sync_client.exe \
-	examples/cpp03/http/server/http_server.exe \
-	examples/cpp03/http/server2/http_server.exe \
-	examples/cpp03/http/server3/http_server.exe \
-	examples/cpp03/http/server4/http_server.exe \
-	examples/cpp03/icmp/ping.exe \
-	examples/cpp03/invocation/prioritised_handlers.exe \
-	examples/cpp03/iostreams/daytime_client.exe \
-	examples/cpp03/iostreams/daytime_server.exe \
-	examples/cpp03/iostreams/http_client.exe \
-	examples/cpp03/multicast/receiver.exe \
-	examples/cpp03/multicast/sender.exe \
-	examples/cpp03/nonblocking/third_party_lib.exe \
-	examples/cpp03/porthopper/client.exe \
-	examples/cpp03/porthopper/server.exe \
-	examples/cpp03/services/daytime_client.exe \
-	examples/cpp03/socks4/sync_client.exe \
-	examples/cpp03/timeouts/async_tcp_client.exe \
-	examples/cpp03/timeouts/blocking_tcp_client.exe \
-	examples/cpp03/timeouts/blocking_token_tcp_client.exe \
-	examples/cpp03/timeouts/blocking_udp_client.exe \
-	examples/cpp03/timeouts/server.exe \
-	examples/cpp03/timers/time_t_timer.exe \
-	examples/cpp03/tutorial/timer1/timer.exe \
-	examples/cpp03/tutorial/timer2/timer.exe \
-	examples/cpp03/tutorial/timer3/timer.exe \
-	examples/cpp03/tutorial/timer4/timer.exe \
-	examples/cpp03/tutorial/timer5/timer.exe \
-	examples/cpp03/tutorial/daytime1/client.exe \
-	examples/cpp03/tutorial/daytime2/server.exe \
-	examples/cpp03/tutorial/daytime3/server.exe \
-	examples/cpp03/tutorial/daytime4/client.exe \
-	examples/cpp03/tutorial/daytime5/server.exe \
-	examples/cpp03/tutorial/daytime6/server.exe \
-	examples/cpp03/tutorial/daytime7/server.exe \
-	examples/cpp03/windows/transmit_file.exe
+CPP11_EXAMPLE_EXES = \
+	examples/cpp11/allocation/server.exe \
+	examples/cpp11/buffers/reference_counted.exe \
+	examples/cpp11/chat/chat_client.exe \
+	examples/cpp11/chat/chat_server.exe \
+	examples/cpp11/echo/async_tcp_echo_server.exe \
+	examples/cpp11/echo/async_udp_echo_server.exe \
+	examples/cpp11/echo/blocking_tcp_echo_client.exe \
+	examples/cpp11/echo/blocking_tcp_echo_server.exe \
+	examples/cpp11/echo/blocking_udp_echo_client.exe \
+	examples/cpp11/echo/blocking_udp_echo_server.exe \
+	examples/cpp11/http/client/async_client.exe \
+	examples/cpp11/http/client/sync_client.exe \
+	examples/cpp11/http/server/http_server.exe \
+	examples/cpp11/http/server2/http_server.exe \
+	examples/cpp11/http/server3/http_server.exe \
+	examples/cpp11/http/server4/http_server.exe \
+	examples/cpp11/icmp/ping.exe \
+	examples/cpp11/invocation/prioritised_handlers.exe \
+	examples/cpp11/iostreams/daytime_client.exe \
+	examples/cpp11/iostreams/daytime_server.exe \
+	examples/cpp11/iostreams/http_client.exe \
+	examples/cpp11/multicast/receiver.exe \
+	examples/cpp11/multicast/sender.exe \
+	examples/cpp11/nonblocking/third_party_lib.exe \
+	examples/cpp11/porthopper/client.exe \
+	examples/cpp11/porthopper/server.exe \
+	examples/cpp11/services/daytime_client.exe \
+	examples/cpp11/socks4/sync_client.exe \
+	examples/cpp11/timeouts/async_tcp_client.exe \
+	examples/cpp11/timeouts/blocking_tcp_client.exe \
+	examples/cpp11/timeouts/blocking_token_tcp_client.exe \
+	examples/cpp11/timeouts/blocking_udp_client.exe \
+	examples/cpp11/timeouts/server.exe \
+	examples/cpp11/timers/time_t_timer.exe \
+	examples/cpp11/tutorial/timer1/timer.exe \
+	examples/cpp11/tutorial/timer2/timer.exe \
+	examples/cpp11/tutorial/timer3/timer.exe \
+	examples/cpp11/tutorial/timer4/timer.exe \
+	examples/cpp11/tutorial/timer5/timer.exe \
+	examples/cpp11/tutorial/daytime1/client.exe \
+	examples/cpp11/tutorial/daytime2/server.exe \
+	examples/cpp11/tutorial/daytime3/server.exe \
+	examples/cpp11/tutorial/daytime4/client.exe \
+	examples/cpp11/tutorial/daytime5/server.exe \
+	examples/cpp11/tutorial/daytime6/server.exe \
+	examples/cpp11/tutorial/daytime7/server.exe \
+	examples/cpp11/windows/transmit_file.exe
 
 ifdef STANDALONE
 all: \
 	$(SEPARATE_COMPILATION_LIB) \
+	$(EXAMPLE_EXES) \
 	$(UNIT_TEST_EXES)
 else
 all: \
 	$(SEPARATE_COMPILATION_LIB) \
 	$(PERFORMANCE_TEST_EXES) \
-	$(UNIT_TEST_EXES) \
 	$(EXAMPLE_EXES) \
-	$(OTHER_EXAMPLE_EXES)
+	$(OTHER_EXAMPLE_EXES) \
+	$(UNIT_TEST_EXES)
 endif
 
 ifdef SEPARATE_COMPILATION
@@ -260,41 +250,41 @@ $(UNIT_TEST_EXES): %.exe: %.o
 $(PERFORMANCE_TEST_EXES) $(EXAMPLE_EXES): %.exe: %.o
 	g++ -o$@ $(LDFLAGS) $< $(LIBS)
 
-examples/cpp03/http/server/http_server.exe: \
-		examples/cpp03/http/server/connection.o \
-		examples/cpp03/http/server/connection_manager.o \
-		examples/cpp03/http/server/main.o \
-		examples/cpp03/http/server/mime_types.o \
-		examples/cpp03/http/server/reply.o \
-		examples/cpp03/http/server/request_handler.o \
-		examples/cpp03/http/server/request_parser.o \
-		examples/cpp03/http/server/server.o
+examples/cpp11/http/server/http_server.exe: \
+		examples/cpp11/http/server/connection.o \
+		examples/cpp11/http/server/connection_manager.o \
+		examples/cpp11/http/server/main.o \
+		examples/cpp11/http/server/mime_types.o \
+		examples/cpp11/http/server/reply.o \
+		examples/cpp11/http/server/request_handler.o \
+		examples/cpp11/http/server/request_parser.o \
+		examples/cpp11/http/server/server.o
 	g++ -o$@ $(LDFLAGS) $^ $(LIBS)
 
-examples/cpp03/http/server2/http_server.exe: \
-		examples/cpp03/http/server2/connection.o \
-		examples/cpp03/http/server2/io_context_pool.o \
-		examples/cpp03/http/server2/main.o \
-		examples/cpp03/http/server2/mime_types.o \
-		examples/cpp03/http/server2/reply.o \
-		examples/cpp03/http/server2/request_handler.o \
-		examples/cpp03/http/server2/request_parser.o \
-		examples/cpp03/http/server2/server.o
+examples/cpp11/http/server2/http_server.exe: \
+		examples/cpp11/http/server2/connection.o \
+		examples/cpp11/http/server2/io_context_pool.o \
+		examples/cpp11/http/server2/main.o \
+		examples/cpp11/http/server2/mime_types.o \
+		examples/cpp11/http/server2/reply.o \
+		examples/cpp11/http/server2/request_handler.o \
+		examples/cpp11/http/server2/request_parser.o \
+		examples/cpp11/http/server2/server.o
 	g++ -o$@ $(LDFLAGS) $^ $(LIBS)
 
-examples/cpp03/http/server3/http_server.exe: \
-		examples/cpp03/http/server3/connection.o \
-		examples/cpp03/http/server3/main.o \
-		examples/cpp03/http/server3/mime_types.o \
-		examples/cpp03/http/server3/reply.o \
-		examples/cpp03/http/server3/request_handler.o \
-		examples/cpp03/http/server3/request_parser.o \
-		examples/cpp03/http/server3/server.o
+examples/cpp11/http/server3/http_server.exe: \
+		examples/cpp11/http/server3/connection.o \
+		examples/cpp11/http/server3/main.o \
+		examples/cpp11/http/server3/mime_types.o \
+		examples/cpp11/http/server3/reply.o \
+		examples/cpp11/http/server3/request_handler.o \
+		examples/cpp11/http/server3/request_parser.o \
+		examples/cpp11/http/server3/server.o
 	g++ -o$@ $(LDFLAGS) $^ $(LIBS)
 
-examples/cpp03/services/daytime_client.exe: \
-		examples/cpp03/services/daytime_client.o \
-		examples/cpp03/services/logger_service.o
+examples/cpp11/services/daytime_client.exe: \
+		examples/cpp11/services/daytime_client.o \
+		examples/cpp11/services/logger_service.o
 	g++ -o$@ $(LDFLAGS) $^ $(LIBS)
 
 .cpp.o:

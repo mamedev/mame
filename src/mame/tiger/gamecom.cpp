@@ -230,7 +230,7 @@ static INPUT_PORTS_START( gamecom )
 	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_OTHER)
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_OTHER)
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_OTHER)
-	INPUT_PORTS_END
+INPUT_PORTS_END
 
 void gamecom_state::gamecom_palette(palette_device &palette) const
 {
@@ -299,4 +299,4 @@ ROM_START( gamecom )
 ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY  FULLNAME    FLAGS
-CONS( 1997, gamecom, 0,      0,      gamecom, gamecom, gamecom_state, init_gamecom, "Tiger", "Game.com", MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK)
+CONS( 1997, gamecom, 0,      0,      gamecom, gamecom, gamecom_state, init_gamecom, "Tiger", "Game.com", MACHINE_IMPERFECT_SOUND )

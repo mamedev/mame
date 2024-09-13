@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "sound/okiadpcm.h"
+#include "sound/imaadpcm.h"
 #include "cpu/unsp/unsp.h"
 
 class spg2xx_audio_device : public device_t, public device_sound_interface
@@ -112,6 +112,13 @@ protected:
 	uint32_t get_wave_addr(const offs_t channel) const { return ((uint32_t)get_wave_addr_high(channel) << 16) | m_audio_regs[(channel << 4) | AUDIO_WAVE_ADDR]; }
 	uint32_t get_loop_addr(const offs_t channel) const { return ((uint32_t)get_loop_addr_high(channel) << 16) | m_audio_regs[(channel << 4) | AUDIO_LOOP_ADDR]; }
 	uint32_t get_envelope_addr(const offs_t channel) const { return ((uint32_t)get_envelope_addr_high(channel) << 16) | m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_ADDR]; }
+	void inc_wave_addr(const offs_t channel) { set_wave_addr(channel, get_wave_addr(channel) + 1); }
+	void set_wave_addr(const offs_t channel, uint32_t addr)
+	{
+		m_audio_regs[(channel << 4) | AUDIO_MODE] &= ~AUDIO_WADDR_HIGH_MASK;
+		m_audio_regs[(channel << 4) | AUDIO_MODE] |= (addr >> 16) & AUDIO_WADDR_HIGH_MASK;
+		m_audio_regs[(channel << 4) | AUDIO_WAVE_ADDR] = addr & 0xffff;
+	}
 
 	enum // at audio write offset 0x000 in spg2xx
 	{
@@ -338,6 +345,7 @@ protected:
 
 	uint16_t read_space(offs_t offset);
 
+	void start_channel(const uint32_t channel);
 	void stop_channel(const uint32_t channel);
 	bool advance_channel(const uint32_t channel);
 	bool fetch_sample(const uint32_t channel);
@@ -353,7 +361,6 @@ protected:
 	uint16_t m_audio_ctrl_regs[0x400];
 	uint8_t m_sample_shift[16];
 	uint32_t m_sample_count[16];
-	uint32_t m_sample_addr[16];
 	double m_channel_rate[16];
 	double m_channel_rate_accum[16];
 	uint32_t m_rampdown_frame[16];
@@ -366,7 +373,7 @@ protected:
 	emu_timer *m_channel_irq[16];
 
 	sound_stream *m_stream;
-	oki_adpcm_state m_adpcm[16];
+	ima_adpcm_state m_adpcm[16];
 	adpcm36_state m_adpcm36_state[16];
 
 	static const uint32_t s_rampdown_frame_counts[8];

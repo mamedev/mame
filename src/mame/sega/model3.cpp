@@ -20,6 +20,7 @@
     basssdx/getbass/getbassdx - I/O board error (?)
 
   * scud/scuddx/scudau - works
+  * scuddxo - lots of GFX problems, hangs after a few seconds in test mode and in game.
   * scudplus/scudplusa - works
     lostwsga - works
     vs215 - works
@@ -2161,10 +2162,10 @@ ROM_START( scud )  /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 834-13
 	ROM_LOAD16_WORD_SWAP( "mpr-19670.22", 0x000000, 0x400000, CRC(bd31cc06) SHA1(d1c85d0cf79b92de5bcbe20dfb8b626ad72de019) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19671.24", 0x400000, 0x400000, CRC(8e8526ab) SHA1(3d2cbb09bd185660feea4dd80bee5af2e2a19aa6) )
 
-	ROM_REGION( 0x20000, "mpegcpu", 0 ) /* Z80 code */
+	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0 ) /* Z80 code */
 	ROM_LOAD( "epr-19612.2", 0x000000,  0x20000,  CRC(13978fd4) SHA1(bb597914a34308376239afab6e04fc231e39e379) )
 
-	ROM_REGION( 0x800000, "mpeg", 0 )   /* DSB samples */
+	ROM_REGION( 0x800000, "dsbz80:mpeg", 0 )   /* DSB samples */
 	ROM_LOAD( "mpr-19603.57",  0x000000, 0x200000, CRC(b1b1765f) SHA1(cdcb4d6e6507322f84ac5153b386c3eb5d031e22) )
 	ROM_LOAD( "mpr-19604.58",  0x200000, 0x200000, CRC(6ac85b49) SHA1(3e74ae6e9ac7b208e2cd5ebdf80bb3cee19d436d) )
 	ROM_LOAD( "mpr-19605.59",  0x400000, 0x200000, CRC(bec891eb) SHA1(357849d2842ac77f9945eb4a0ca89253e474f617) )
@@ -2230,10 +2231,79 @@ ROM_START( scuddx )  /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 1293
 	ROM_LOAD16_WORD_SWAP( "mpr-19601.22", 0x000000, 0x400000, CRC(ba350fcc) SHA1(b85a9d45e06e048c3e777cbb190d20b5ef72d1b3) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19602.24", 0x400000, 0x400000, CRC(a92231c1) SHA1(9ecf97dce0a2184dc31906c6090c27494188384c) )
 
-	ROM_REGION( 0x20000, "mpegcpu", 0 ) /* Z80 code */
+	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0 ) /* Z80 code */
 	ROM_LOAD( "epr-19612.2", 0x000000,  0x20000,  CRC(13978fd4) SHA1(bb597914a34308376239afab6e04fc231e39e379) )
 
-	ROM_REGION( 0x800000, "mpeg", 0 )   /* DSB samples */
+	ROM_REGION( 0x800000, "dsbz80:mpeg", 0 )   /* DSB samples */
+	ROM_LOAD( "mpr-19603.57",  0x000000, 0x200000, CRC(b1b1765f) SHA1(cdcb4d6e6507322f84ac5153b386c3eb5d031e22) )
+	ROM_LOAD( "mpr-19604.58",  0x200000, 0x200000, CRC(6ac85b49) SHA1(3e74ae6e9ac7b208e2cd5ebdf80bb3cee19d436d) )
+	ROM_LOAD( "mpr-19605.59",  0x400000, 0x200000, CRC(bec891eb) SHA1(357849d2842ac77f9945eb4a0ca89253e474f617) )
+	ROM_LOAD( "mpr-19606.60",  0x600000, 0x200000, CRC(adad46b2) SHA1(360b23870f1d15ab527fae1bb731da6e7a8b19c1) )
+
+	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
+	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
+ROM_END
+
+ROM_START( scuddxo )  /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 833-12938, Digital Audio board ID# 837-12941 */
+	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
+	// CROM
+	ROM_LOAD64_WORD_SWAP( "epr-19610.17",  0x0600006,  0x80000,  CRC(3632870a) SHA1(321e260cad93632e9a177ec0597d841abb16b698) ) // Single DX cabinet only
+	ROM_LOAD64_WORD_SWAP( "epr-19609.18",  0x0600004,  0x80000,  CRC(75d2675c) SHA1(fde6935deaef889bfd8a7225490ee7fd66ece7f7) ) // Game Assignments supports:
+	ROM_LOAD64_WORD_SWAP( "epr-19608.19",  0x0600002,  0x80000,  CRC(56b46d26) SHA1(1b1a0bc862763e7a6c40d5c6213f9681607e14ef) ) //   Regions: Japan, USA, Export
+	ROM_LOAD64_WORD_SWAP( "epr-19607.20",  0x0600000,  0x80000,  CRC(365ce059) SHA1(8e6c21744fa42a3ee941fc4744ab9465d70f6972) )
+
+	// CROM0
+	ROM_LOAD64_WORD_SWAP( "mpr-19592.1",  0x0800006,  0x400000, CRC(d9003b6f) SHA1(c8242645619b1a02c29ca3f941461f163c9bf38f) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19591.2",  0x0800004,  0x400000, CRC(48e1aaff) SHA1(c90cc70f049f6bd41cc28b02af29bcea4a6a0c31) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19590.3",  0x0800002,  0x400000, CRC(a5cd4718) SHA1(15478ddf519655038762959cd9ecd306c945b626) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19589.4",  0x0800000,  0x400000, CRC(5482238f) SHA1(32480284d35b66035ef878761d0b4b8d63eec468) )
+
+	// mirror CROM0 to CROM
+	ROM_COPY("user1", 0x800000, 0x000000, 0x600000)
+
+	// CROM1
+	ROM_LOAD64_WORD_SWAP( "mpr-19596.5",  0x1800006,  0x400000, CRC(5672e3f4) SHA1(1caf5fb2879657868d02da86de8ae2f15139572b) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19595.6",  0x1800004,  0x400000, CRC(d06fd9d6) SHA1(4be22886ee4bdeee001d5914735171f10fc1fc8e) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19594.7",  0x1800002,  0x400000, CRC(654c26b0) SHA1(de5aaa12b121878dd6fd9dfa79f9b996d1c53295) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19593.8",  0x1800000,  0x400000, CRC(21e48ff8) SHA1(d45b9a20485e671e4403881b4bafefd6a5ccabbd) )
+
+	// CROM2
+	ROM_LOAD64_WORD_SWAP( "mpr-19600.9",  0x2800006,  0x400000, CRC(a25da127) SHA1(e5f598747df05212223a4fe87f5b6e60f4e0c9ab) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19599.10", 0x2800004,  0x400000, CRC(65c1d33c) SHA1(a9c605393203b98f355a7bed4cbd435e38070816) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19598.11", 0x2800002,  0x400000, CRC(a081592e) SHA1(c97596185fe383dce941b87c47251a80cc6cec3e) )
+	ROM_LOAD64_WORD_SWAP( "mpr-19597.12", 0x2800000,  0x400000, CRC(4d0ffe60) SHA1(7db2ca50499f3e9f9d423e83b68b12ff8ec8f9c7) )
+
+	ROM_REGION( 0x1000000, "user3", 0 )  /* Video ROMs Part 1 */
+	ROM_LOAD_VROM( "mpr-19574.26", 0x0000002,  0x200000, CRC(9be8f314) SHA1(7fd3006bbcebcbff17c5c33c581cd3d66c804074) )
+	ROM_LOAD_VROM( "mpr-19573.27", 0x0000000,  0x200000, CRC(57b61d65) SHA1(add743a5c9b61912028ffd8b4f03ec88ba0d63f4) )
+	ROM_LOAD_VROM( "mpr-19576.28", 0x0000006,  0x200000, CRC(85f9b587) SHA1(0f954a82c3cac0c5127ed3578c3f0dd9de1e51fd) )
+	ROM_LOAD_VROM( "mpr-19575.29", 0x0000004,  0x200000, CRC(dab11c34) SHA1(457e19f938fbae414efae186838c94d8e20bbe4a) )
+	ROM_LOAD_VROM( "mpr-19578.30", 0x000000a,  0x200000, CRC(ae882c42) SHA1(4443b56731e67ea9ce3dbb23e20a0f784073404e) )
+	ROM_LOAD_VROM( "mpr-19577.31", 0x0000008,  0x200000, CRC(36a1fe5d) SHA1(d8e501b6cd5efc18c407b62e8074726a7ca63b22) )
+	ROM_LOAD_VROM( "mpr-19580.32", 0x000000e,  0x200000, CRC(62503cee) SHA1(f2f1084d35225f27680b9883671f35b3141d574c) )
+	ROM_LOAD_VROM( "mpr-19579.33", 0x000000c,  0x200000, CRC(af9698d0) SHA1(f342a386c876ab41999465c5071687a03ace08b9) )
+
+	ROM_REGION( 0x1000000, "user4", 0 )  /* Video ROMs Part 2 */
+	ROM_LOAD_VROM( "mpr-19582.34", 0x0000002,  0x200000, CRC(c8b9cf1a) SHA1(df0f58710c58778cbc54eee6457ae61f83779fc8) )
+	ROM_LOAD_VROM( "mpr-19581.35", 0x0000000,  0x200000, CRC(8863c2d7) SHA1(7f9fe110cf2570ebefbee216b9d26a75c303faa8) )
+	ROM_LOAD_VROM( "mpr-19584.36", 0x0000006,  0x200000, CRC(256b056c) SHA1(2395c7fbf359af9a4bc1ecbc377f3bcc04317c7f) )
+	ROM_LOAD_VROM( "mpr-19583.37", 0x0000004,  0x200000, CRC(c22cb5aa) SHA1(67d9f2d75d4cc0e0dba6b2061c22fcc2f33239e3) )
+	ROM_LOAD_VROM( "mpr-19586.38", 0x000000a,  0x200000, CRC(ac37163e) SHA1(a35147011f612363754ffe43dca4c2fa2e27056e) )
+	ROM_LOAD_VROM( "mpr-19585.39", 0x0000008,  0x200000, CRC(e2598012) SHA1(5f4124b5134553513262c8401052899551179cb1) )
+	ROM_LOAD_VROM( "mpr-19588.40", 0x000000e,  0x200000, CRC(42e20ae9) SHA1(3a9b464b74627e0f6501cff6da50d0503ef54864) )
+	ROM_LOAD_VROM( "mpr-19587.41", 0x000000c,  0x200000, CRC(c288c910) SHA1(730874b7f8162583ba6400a0ee26a84d407e327d) )
+
+	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "epr-19611.21", 0x000000, 0x040000, CRC(8888bf36) SHA1(33dfed490fb0f244e076e3854aba7a6473f56844) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_LOAD16_WORD_SWAP( "mpr-19601.22", 0x000000, 0x400000, CRC(ba350fcc) SHA1(b85a9d45e06e048c3e777cbb190d20b5ef72d1b3) )
+	ROM_LOAD16_WORD_SWAP( "mpr-19602.24", 0x400000, 0x400000, CRC(a92231c1) SHA1(9ecf97dce0a2184dc31906c6090c27494188384c) )
+
+	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0 ) /* Z80 code */
+	ROM_LOAD( "epr-19612.2", 0x000000,  0x20000,  CRC(13978fd4) SHA1(bb597914a34308376239afab6e04fc231e39e379) )
+
+	ROM_REGION( 0x800000, "dsbz80:mpeg", 0 )   /* DSB samples */
 	ROM_LOAD( "mpr-19603.57",  0x000000, 0x200000, CRC(b1b1765f) SHA1(cdcb4d6e6507322f84ac5153b386c3eb5d031e22) )
 	ROM_LOAD( "mpr-19604.58",  0x200000, 0x200000, CRC(6ac85b49) SHA1(3e74ae6e9ac7b208e2cd5ebdf80bb3cee19d436d) )
 	ROM_LOAD( "mpr-19605.59",  0x400000, 0x200000, CRC(bec891eb) SHA1(357849d2842ac77f9945eb4a0ca89253e474f617) )
@@ -2301,10 +2371,10 @@ ROM_START( scudau )   /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 834
 	ROM_LOAD16_WORD_SWAP( "mpr-19670.22", 0x000000, 0x400000, CRC(bd31cc06) SHA1(d1c85d0cf79b92de5bcbe20dfb8b626ad72de019) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19671.24", 0x400000, 0x400000, CRC(8e8526ab) SHA1(3d2cbb09bd185660feea4dd80bee5af2e2a19aa6) )
 
-	ROM_REGION( 0x20000, "mpegcpu", 0 ) /* Z80 code */
+	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0 ) /* Z80 code */
 	ROM_LOAD( "epr-19612.2", 0x000000,  0x20000,  CRC(13978fd4) SHA1(bb597914a34308376239afab6e04fc231e39e379) )
 
-	ROM_REGION( 0x800000, "mpeg", 0 )   /* DSB samples */
+	ROM_REGION( 0x800000, "dsbz80:mpeg", 0 )   /* DSB samples */
 	ROM_LOAD( "mpr-19603.57",  0x000000, 0x200000, CRC(b1b1765f) SHA1(cdcb4d6e6507322f84ac5153b386c3eb5d031e22) )
 	ROM_LOAD( "mpr-19604.58",  0x200000, 0x200000, CRC(6ac85b49) SHA1(3e74ae6e9ac7b208e2cd5ebdf80bb3cee19d436d) )
 	ROM_LOAD( "mpr-19605.59",  0x400000, 0x200000, CRC(bec891eb) SHA1(357849d2842ac77f9945eb4a0ca89253e474f617) )
@@ -2376,10 +2446,10 @@ ROM_START( scudplus )   /* step 1.5, Sega game ID# is 833-13260 SCUD PLUS, ROM b
 	ROM_LOAD16_WORD_SWAP( "mpr-19670.22", 0x000000, 0x400000, CRC(bd31cc06) SHA1(d1c85d0cf79b92de5bcbe20dfb8b626ad72de019) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20101.24", 0x400000, 0x400000, CRC(66d1e31f) SHA1(cbc06e9aebcdf82f14bef1c35cbb3203530ef6ae) )
 
-	ROM_REGION( 0x20000, "mpegcpu", 0 ) /* Z80 code */
+	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0 ) /* Z80 code */
 	ROM_LOAD( "epr-19612.2", 0x000000,  0x20000,  CRC(13978fd4) SHA1(bb597914a34308376239afab6e04fc231e39e379) )
 
-	ROM_REGION( 0x800000, "mpeg", 0 )   /* DSB samples */
+	ROM_REGION( 0x800000, "dsbz80:mpeg", 0 )   /* DSB samples */
 	ROM_LOAD( "mpr-19603.57",  0x000000, 0x200000, CRC(b1b1765f) SHA1(cdcb4d6e6507322f84ac5153b386c3eb5d031e22) )
 	ROM_LOAD( "mpr-19604.58",  0x200000, 0x200000, CRC(6ac85b49) SHA1(3e74ae6e9ac7b208e2cd5ebdf80bb3cee19d436d) )
 	ROM_LOAD( "mpr-19605.59",  0x400000, 0x200000, CRC(bec891eb) SHA1(357849d2842ac77f9945eb4a0ca89253e474f617) )
@@ -2451,10 +2521,10 @@ ROM_START( scudplusa )  /* step 1.5, Sega game ID# is 833-13260 SCUD PLUS, ROM b
 	ROM_LOAD16_WORD_SWAP( "mpr-19670.22", 0x000000, 0x400000, CRC(bd31cc06) SHA1(d1c85d0cf79b92de5bcbe20dfb8b626ad72de019) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20101.24", 0x400000, 0x400000, CRC(66d1e31f) SHA1(cbc06e9aebcdf82f14bef1c35cbb3203530ef6ae) )
 
-	ROM_REGION( 0x20000, "mpegcpu", 0 ) /* Z80 code */
+	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0 ) /* Z80 code */
 	ROM_LOAD( "epr-19612.2", 0x000000,  0x20000,  CRC(13978fd4) SHA1(bb597914a34308376239afab6e04fc231e39e379) )
 
-	ROM_REGION( 0x800000, "mpeg", 0 )   /* DSB samples */
+	ROM_REGION( 0x800000, "dsbz80:mpeg", 0 )   /* DSB samples */
 	ROM_LOAD( "mpr-19603.57",  0x000000, 0x200000, CRC(b1b1765f) SHA1(cdcb4d6e6507322f84ac5153b386c3eb5d031e22) )
 	ROM_LOAD( "mpr-19604.58",  0x200000, 0x200000, CRC(6ac85b49) SHA1(3e74ae6e9ac7b208e2cd5ebdf80bb3cee19d436d) )
 	ROM_LOAD( "mpr-19605.59",  0x400000, 0x200000, CRC(bec891eb) SHA1(357849d2842ac77f9945eb4a0ca89253e474f617) )
@@ -6867,6 +6937,7 @@ GAME( 1997, getbass,      bassdx,   getbass,      bass,     model3_state,     in
 /* Model 3 Step 1.5 */
 GAME( 1996, scud,              0,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race / Sega Super GT - Twin/DX (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
 GAME( 1996, scuddx,         scud,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race / Sega Super GT - Deluxe (Export, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
+GAME( 1996, scuddxo,        scud,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race / Sega Super GT - Deluxe (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
 GAME( 1996, scudau,         scud,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race - Twin/DX (Australia)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, scudplus,       scud,      scud,      scud,     model3_state, init_scudplus, ROT0, "Sega", "Scud Race Plus / Sega Super GT Plus - Twin/DX (Export, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
 GAME( 1997, scudplusa,      scud,      scud,      scud,     model3_state,init_scudplusa, ROT0, "Sega", "Scud Race Plus / Sega Super GT Plus - Twin/DX (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
@@ -6905,8 +6976,8 @@ GAME( 1998, vs299,       vs2v991, model3_20_5881, model3,   model3_state,    ini
 GAME( 1998, vs299j,      vs2v991, model3_20_5881, model3,   model3_state,    init_vs299, ROT0, "Sega", "Virtua Striker 2 '99.1 (Japan, Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows Virtua Striker 2 Version '99.1 icon during demo
 
 /* Model 3 Step 2.1 */
-GAME( 1998, daytona2,          0, model3_21_5881, daytona2, model3_state, init_daytona2, ROT0, "Sega", "Daytona USA 2 (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, dayto2pe,          0, model3_21_5881, daytona2, model3_state, init_dayto2pe, ROT0, "Sega", "Daytona USA 2 Power Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, daytona2,          0, model3_21_5881, daytona2, model3_state, init_daytona2, ROT0, "Sega", "Daytona USA 2: Battle on the Edge (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, dayto2pe,          0, model3_21_5881, daytona2, model3_state, init_dayto2pe, ROT0, "Sega", "Daytona USA 2: Power Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, dirtdvls,          0, model3_21_5881, scud,     model3_state, init_dirtdvls, ROT0, "Sega", "Dirt Devils (Export, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, dirtdvlsu,  dirtdvls, model3_21_5881, scud,     model3_state, init_dirtdvls, ROT0, "Sega", "Dirt Devils (USA, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, dirtdvlsau, dirtdvls, model3_21_5881, scud,     model3_state, init_dirtdvls, ROT0, "Sega", "Dirt Devils (Australia, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

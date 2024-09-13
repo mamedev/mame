@@ -19,6 +19,10 @@ Excluding resellers with same title, this MCU was used in:
 - SciSys Chess Partner 3000
 - SciSys Chess Partner 4000
 
+MCU clock is via a resistor, this less accurate than with an XTAL, so the speed
+may vary. Graduate Chess appears to have a 62K resistor between the OSC pins,
+which would make it around 500kHz?
+
 On CP3000/4000 they added a level slider. This will oscillate the level switch
 input pin, so the highest level setting is the same as level 2 on Mini Chess.
 It works on the old A34 MCU because the game keeps reading D0 while computing.
@@ -26,10 +30,13 @@ It works on the old A34 MCU because the game keeps reading D0 while computing.
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/hmcs40/hmcs40.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
+
+#include "screen.h"
 #include "speaker.h"
 
 // internal artwork
@@ -158,7 +165,7 @@ static INPUT_PORTS_START( smchess )
 	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("G 7 / White")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H 8 / Black")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("FP") // find position
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("FP") // find position
 
 	PORT_START("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
@@ -179,7 +186,7 @@ INPUT_PORTS_END
 void mini_state::smchess(machine_config &config)
 {
 	// basic machine hardware
-	HD44801(config, m_maincpu, 400'000);
+	HD44801(config, m_maincpu, 400'000); // approximation
 	m_maincpu->write_r<2>().set(FUNC(mini_state::seg_w<0>));
 	m_maincpu->write_r<3>().set(FUNC(mini_state::seg_w<1>));
 	m_maincpu->write_d().set(FUNC(mini_state::mux_w));
@@ -189,10 +196,14 @@ void mini_state::smchess(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
 	m_display->set_refresh(attotime::from_hz(30));
+	config.set_default_layout(layout_saitek_minichess);
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920/2.5, 567/2.5);
+	screen.set_visarea_full();
 
 	TIMER(config, m_comp_timer).configure_generic(FUNC(mini_state::computing));
-
-	config.set_default_layout(layout_saitek_minichess);
 }
 
 
@@ -203,7 +214,10 @@ void mini_state::smchess(machine_config &config)
 
 ROM_START( smchess )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD("44801a34_proj_t", 0x0000, 0x2000, CRC(be71f1c0) SHA1(6b4d5c8f8491c82bdec1938bd83c14e826ff3e30) )
+	ROM_LOAD("44801a34_scisys-w_ltd_proj_t", 0x0000, 0x2000, CRC(be71f1c0) SHA1(6b4d5c8f8491c82bdec1938bd83c14e826ff3e30) )
+
+	ROM_REGION( 48645, "screen", 0 )
+	ROM_LOAD("smchess.svg", 0, 48645, CRC(19beaa99) SHA1(2d738bd6953dfd7a2c8c37814badd0aac2960c8c) )
 ROM_END
 
 } // anonymous namespace
@@ -215,4 +229,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, smchess, 0,      0,      smchess, smchess, mini_state, empty_init, "SciSys", "Mini Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, smchess, 0,      0,      smchess, smchess, mini_state, empty_init, "SciSys / Philidor Software", "Mini Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

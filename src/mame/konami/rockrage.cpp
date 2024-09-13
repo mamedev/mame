@@ -80,7 +80,6 @@ public:
 		m_k007342(*this, "k007342"),
 		m_k007420(*this, "k007420"),
 		m_vlm(*this, "vlm"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_rombank(*this, "rombank")
 	{ }
@@ -98,7 +97,6 @@ private:
 	required_device<k007342_device> m_k007342;
 	required_device<k007420_device> m_k007420;
 	required_device<vlm5030_device> m_vlm;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	// memory pointers
@@ -114,16 +112,14 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
-	K007342_CALLBACK_MEMBER(tile_callback);
-	K007420_CALLBACK_MEMBER(sprite_callback);
+	void tile_callback(int layer, uint32_t bank, uint32_t &code, uint32_t &color, uint8_t &flags);
+	void sprite_callback(uint32_t &code, uint32_t &color);
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void vlm_map(address_map &map);
 };
 
-
-// video
 
 void rockrage_state::palette(palette_device &palette) const
 {
@@ -146,13 +142,13 @@ void rockrage_state::palette(palette_device &palette) const
 
 ***************************************************************************/
 
-K007342_CALLBACK_MEMBER(rockrage_state::tile_callback)
+void rockrage_state::tile_callback(int layer, uint32_t bank, uint32_t &code, uint32_t &color, uint8_t &flags)
 {
 	if (layer == 1)
-		*code |= ((*color & 0x40) << 2) | ((m_vreg & 0x04) << 7); // doesn't use bank here (Tutankhamen eyes blinking)
+		code |= ((color & 0x40) << 2) | ((m_vreg & 0x04) << 7); // doesn't use bank here (Tutankhamen eyes blinking)
 	else
-		*code |= ((*color & 0x40) << 2) | ((bank & 0x03) << 10) | ((m_vreg & 0x04) << 7) | ((m_vreg & 0x08) << 9);
-	*color = layer * 16 + (*color & 0x0f);
+		code |= ((color & 0x40) << 2) | ((bank & 0x03) << 10) | ((m_vreg & 0x04) << 7) | ((m_vreg & 0x08) << 9);
+	color = layer * 16 + (color & 0x0f);
 }
 
 /***************************************************************************
@@ -161,11 +157,11 @@ K007342_CALLBACK_MEMBER(rockrage_state::tile_callback)
 
 ***************************************************************************/
 
-K007420_CALLBACK_MEMBER(rockrage_state::sprite_callback)
+void rockrage_state::sprite_callback(uint32_t &code, uint32_t &color)
 {
-	*code |= ((*color & 0x40) << 2) | ((*color & 0x80) << 1) * ((m_vreg & 0x03) << 1);
-	*code = (*code << 2) | ((*color & 0x30) >> 4);
-	*color = 0 + (*color & 0x0f);
+	code |= ((color & 0x40) << 2) | ((color & 0x80) << 1) * ((m_vreg & 0x03) << 1);
+	code = (code << 2) | ((color & 0x30) >> 4);
+	color = 0 + (color & 0x0f);
 }
 
 
@@ -196,14 +192,12 @@ uint32_t rockrage_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	// Tutankhamen eyes go below sprites
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
-	m_k007420->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(1));
+	m_k007420->sprites_draw(bitmap, cliprect);
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, 1, 0);
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 1, 1, 0);
 	return 0;
 }
 
-
-// machine
 
 void rockrage_state::vblank_irq(int state)
 {
@@ -343,19 +337,11 @@ static INPUT_PORTS_START( rockrage )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,            // 8 x 8 characters
-	0x40000/32,     // 8192 characters
-	4,              // 4bpp
-	{ 0, 1, 2, 3 }, // the four bitplanes are packed in one nibble
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8            // every character takes 32 consecutive bytes
-};
+static GFXDECODE_START( gfx_rockrage_tiles )
+	GFXDECODE_ENTRY( "tiles",   0, gfx_8x8x4_packed_msb,   0, 32 )  // colors 00..31, using 2 lookup tables
+GFXDECODE_END
 
-static GFXDECODE_START( gfx_rockrage )
-	GFXDECODE_ENTRY( "tiles",   0, charlayout,             0, 32 )  // colors 00..31, using 2 lookup tables
+static GFXDECODE_START( gfx_rockrage_spr )
 	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb, 512, 16 )  // colors 32..47, using lookup table
 GFXDECODE_END
 
@@ -400,17 +386,13 @@ void rockrage_state::rockrage(machine_config &config)
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(rockrage_state::vblank_irq));
 
-	K007342(config, m_k007342, 0);
-	m_k007342->set_gfxnum(0);
+	K007342(config, m_k007342, 0, m_palette, gfx_rockrage_tiles);
 	m_k007342->set_tile_callback(FUNC(rockrage_state::tile_callback));
-	m_k007342->set_gfxdecode_tag(m_gfxdecode);
 
-	K007420(config, m_k007420, 0);
+	K007420(config, m_k007420, 0, m_palette, gfx_rockrage_spr);
 	m_k007420->set_bank_limit(0x3ff);
 	m_k007420->set_sprite_callback(FUNC(rockrage_state::sprite_callback));
-	m_k007420->set_palette_tag(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rockrage);
 	PALETTE(config, m_palette, FUNC(rockrage_state::palette));
 	m_palette->set_format(palette_device::xBGR_555, 16*16*3, 64);
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
@@ -445,8 +427,8 @@ ROM_START( rockrage )
 	ROM_LOAD( "620k03.11c", 0x08000, 0x08000, CRC(9fbefe82) SHA1(ab42b7e519a0dd08f2249dad0819edea0976f39a) )
 
 	ROM_REGION( 0x040000, "tiles", 0 )
-	ROM_LOAD16_BYTE( "620k05.rom", 0x00000, 0x20000, CRC(145d387c) SHA1(4fb0c54f9a218d512d8aec09ef995494a06912d6)  )
-	ROM_LOAD16_BYTE( "620k06.rom", 0x00001, 0x20000, CRC(7fa2c57c) SHA1(8c5d85c31dc26cb59a012ebb1ea195c3db80cda8)  ) // Both World & Japan use the same "K" code for these???
+	ROM_LOAD16_BYTE( "620k05.rom", 0x00001, 0x20000, CRC(145d387c) SHA1(4fb0c54f9a218d512d8aec09ef995494a06912d6)  )
+	ROM_LOAD16_BYTE( "620k06.rom", 0x00000, 0x20000, CRC(7fa2c57c) SHA1(8c5d85c31dc26cb59a012ebb1ea195c3db80cda8)  ) // Both World & Japan use the same "K" code for these???
 
 	ROM_REGION( 0x040000, "sprites", 0 )
 	ROM_LOAD( "620k11.rom", 0x000000, 0x20000, CRC(70449239) SHA1(07653ea3bfe0063c9d2b2102ac52a1b50fc2971e) )
@@ -470,10 +452,10 @@ ROM_START( rockragea )
 	ROM_LOAD( "620k03.11c", 0x08000, 0x08000, CRC(9fbefe82) SHA1(ab42b7e519a0dd08f2249dad0819edea0976f39a) ) // Same ROM but labeled as ver "G"
 
 	ROM_REGION( 0x040000, "tiles", 0 )
-	ROM_LOAD16_BYTE( "620d05a.16g", 0x00000, 0x10000, CRC(4d53fde9) SHA1(941fb6c94922727516945330b4b738aa052f7734) )
-	ROM_LOAD16_BYTE( "620d06a.15g", 0x00001, 0x10000, CRC(8cc05d4b) SHA1(0d6fef98bdc4d299229de4e0044241aedee83b85) )
-	ROM_LOAD16_BYTE( "620d05b.16f", 0x20000, 0x10000, CRC(69f4599f) SHA1(664581874d74ed7bf59bde6730799e15f4e0144d) )
-	ROM_LOAD16_BYTE( "620d06b.15f", 0x20001, 0x10000, CRC(3892d41d) SHA1(c49f2e61f24a59be4e59e2f3c60e731b8a05ddd3) )
+	ROM_LOAD16_BYTE( "620d05a.16g", 0x00001, 0x10000, CRC(4d53fde9) SHA1(941fb6c94922727516945330b4b738aa052f7734) )
+	ROM_LOAD16_BYTE( "620d06a.15g", 0x00000, 0x10000, CRC(8cc05d4b) SHA1(0d6fef98bdc4d299229de4e0044241aedee83b85) )
+	ROM_LOAD16_BYTE( "620d05b.16f", 0x20001, 0x10000, CRC(69f4599f) SHA1(664581874d74ed7bf59bde6730799e15f4e0144d) )
+	ROM_LOAD16_BYTE( "620d06b.15f", 0x20000, 0x10000, CRC(3892d41d) SHA1(c49f2e61f24a59be4e59e2f3c60e731b8a05ddd3) )
 
 	ROM_REGION( 0x040000, "sprites", 0 )
 	ROM_LOAD( "620g11a.7g", 0x000000, 0x10000, CRC(0ef40c2c) SHA1(2c0b7e611333a072ebcef60c1985211d5936bf66) )
@@ -499,8 +481,8 @@ ROM_START( rockragej )
 	ROM_LOAD( "620k03.11c", 0x08000, 0x08000, CRC(9fbefe82) SHA1(ab42b7e519a0dd08f2249dad0819edea0976f39a) )
 
 	ROM_REGION( 0x040000, "tiles", 0 )
-	ROM_LOAD16_BYTE( "620k05.16g", 0x00000, 0x20000, CRC(ca9d9346) SHA1(fee8d98def802f312c6cd0ec751c67aa18acfacd) )
-	ROM_LOAD16_BYTE( "620k06.15g", 0x00001, 0x20000, CRC(c0e2b35c) SHA1(fb37a151188f27f883fed5fdfb0094c3efa9470d) ) // Both World & Japan use the same "K" code for these???
+	ROM_LOAD16_BYTE( "620k05.16g", 0x00001, 0x20000, CRC(ca9d9346) SHA1(fee8d98def802f312c6cd0ec751c67aa18acfacd) )
+	ROM_LOAD16_BYTE( "620k06.15g", 0x00000, 0x20000, CRC(c0e2b35c) SHA1(fb37a151188f27f883fed5fdfb0094c3efa9470d) ) // Both World & Japan use the same "K" code for these???
 
 	ROM_REGION( 0x040000, "sprites", 0 )
 	ROM_LOAD( "620k11.7g",  0x000000, 0x20000, CRC(7430f6e9) SHA1(5d488c7b7b0eb4e502b3e566ac102cd3267e8568) )

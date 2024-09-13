@@ -8,7 +8,7 @@
 #include "../../Common/ComTry.h"
 #include "../../Common/MyBuffer2.h"
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
 #include "../../Windows/Synchronization.h"
 #endif
 
@@ -17,7 +17,7 @@
 #include "7zAes.h"
 #include "MyAes.h"
 
-#ifndef EXTRACT_ONLY
+#ifndef Z7_EXTRACT_ONLY
 #include "RandGen.h"
 #endif
 
@@ -86,8 +86,8 @@ void CKeyInfo::CalcKey()
         r += numUnroll;
         do
         {
-          SetUi32(dest, i); i++; dest += bufSize;
-          // SetUi32(dest, i); i++; dest += bufSize;
+          SetUi32(dest, i)  i++; dest += bufSize;
+          // SetUi32(dest, i)  i++; dest += bufSize;
         }
         while (i < r);
         Sha256_Update((CSha256 *)(void *)(Byte *)sha, buf, unrollSize);
@@ -153,7 +153,7 @@ void CKeyInfoCache::Add(const CKeyInfo &key)
 
 static CKeyInfoCache g_GlobalKeyCache(32);
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
   static NWindows::NSynchronization::CCriticalSection g_GlobalKeyCacheCriticalSection;
   #define MT_LOCK NWindows::NSynchronization::CCriticalSectionLock lock(g_GlobalKeyCacheCriticalSection);
 #else
@@ -185,10 +185,10 @@ void CBase::PrepareKey()
     g_GlobalKeyCache.FindAndAdd(_key);
 }
 
-#ifndef EXTRACT_ONLY
+#ifndef Z7_EXTRACT_ONLY
 
 /*
-STDMETHODIMP CEncoder::ResetSalt()
+Z7_COM7F_IMF(CEncoder::ResetSalt())
 {
   _key.SaltSize = 4;
   g_RandomGenerator.Generate(_key.Salt, _key.SaltSize);
@@ -196,7 +196,7 @@ STDMETHODIMP CEncoder::ResetSalt()
 }
 */
 
-STDMETHODIMP CEncoder::ResetInitVector()
+Z7_COM7F_IMF(CEncoder::ResetInitVector())
 {
   for (unsigned i = 0; i < sizeof(_iv); i++)
     _iv[i] = 0;
@@ -205,7 +205,7 @@ STDMETHODIMP CEncoder::ResetInitVector()
   return S_OK;
 }
 
-STDMETHODIMP CEncoder::WriteCoderProperties(ISequentialOutStream *outStream)
+Z7_COM7F_IMF(CEncoder::WriteCoderProperties(ISequentialOutStream *outStream))
 {
   Byte props[2 + sizeof(_key.Salt) + sizeof(_iv)];
   unsigned propsSize = 1;
@@ -243,7 +243,7 @@ CDecoder::CDecoder()
   _aesFilter = new CAesCbcDecoder(kKeySize);
 }
 
-STDMETHODIMP CDecoder::SetDecoderProperties2(const Byte *data, UInt32 size)
+Z7_COM7F_IMF(CDecoder::SetDecoderProperties2(const Byte *data, UInt32 size))
 {
   _key.ClearProps();
  
@@ -282,7 +282,7 @@ STDMETHODIMP CDecoder::SetDecoderProperties2(const Byte *data, UInt32 size)
 }
 
 
-STDMETHODIMP CBaseCoder::CryptoSetPassword(const Byte *data, UInt32 size)
+Z7_COM7F_IMF(CBaseCoder::CryptoSetPassword(const Byte *data, UInt32 size))
 {
   COM_TRY_BEGIN
   
@@ -293,23 +293,23 @@ STDMETHODIMP CBaseCoder::CryptoSetPassword(const Byte *data, UInt32 size)
   COM_TRY_END
 }
 
-STDMETHODIMP CBaseCoder::Init()
+Z7_COM7F_IMF(CBaseCoder::Init())
 {
   COM_TRY_BEGIN
   
   PrepareKey();
   CMyComPtr<ICryptoProperties> cp;
-  RINOK(_aesFilter.QueryInterface(IID_ICryptoProperties, &cp));
+  RINOK(_aesFilter.QueryInterface(IID_ICryptoProperties, &cp))
   if (!cp)
     return E_FAIL;
-  RINOK(cp->SetKey(_key.Key, kKeySize));
-  RINOK(cp->SetInitVector(_iv, sizeof(_iv)));
+  RINOK(cp->SetKey(_key.Key, kKeySize))
+  RINOK(cp->SetInitVector(_iv, sizeof(_iv)))
   return _aesFilter->Init();
   
   COM_TRY_END
 }
 
-STDMETHODIMP_(UInt32) CBaseCoder::Filter(Byte *data, UInt32 size)
+Z7_COM7F_IMF2(UInt32, CBaseCoder::Filter(Byte *data, UInt32 size))
 {
   return _aesFilter->Filter(data, size);
 }

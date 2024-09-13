@@ -63,7 +63,6 @@ public:
 		m_k007420(*this, "k007420"),
 		m_upd7759(*this, "upd"),
 		m_filter(*this, "filter%u", 1U),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch"),
 		m_trackball(*this, "TRACKBALL.%u", 0),
 		m_lamps(*this, "lamp%u", 0U),
@@ -84,7 +83,6 @@ private:
 	required_device<k007420_device> m_k007420;
 	required_device<upd7759_device> m_upd7759;
 	required_device_array<filter_rc_device, 3> m_filter;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	// I/O
@@ -108,15 +106,13 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	K007342_CALLBACK_MEMBER(tile_callback);
-	K007420_CALLBACK_MEMBER(sprite_callback);
+	void tile_callback(int layer, uint32_t bank, uint32_t &code, uint32_t &color, uint8_t &flags);
+	void sprite_callback(uint32_t &code, uint32_t &color);
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
 
-
-// video
 
 void bladestl_state::palette(palette_device &palette) const
 {
@@ -142,10 +138,10 @@ void bladestl_state::palette(palette_device &palette) const
 
 ***************************************************************************/
 
-K007342_CALLBACK_MEMBER(bladestl_state::tile_callback)
+void bladestl_state::tile_callback(int layer, uint32_t bank, uint32_t &code, uint32_t &color, uint8_t &flags)
 {
-	*code |= ((*color & 0x0f) << 8) | ((*color & 0x40) << 6);
-	*color = layer;
+	code |= ((color & 0x0f) << 8) | ((color & 0x40) << 6);
+	color = layer;
 }
 
 /***************************************************************************
@@ -154,11 +150,11 @@ K007342_CALLBACK_MEMBER(bladestl_state::tile_callback)
 
 ***************************************************************************/
 
-K007420_CALLBACK_MEMBER(bladestl_state::sprite_callback)
+void bladestl_state::sprite_callback(uint32_t &code, uint32_t &color)
 {
-	*code |= ((*color & 0xc0) << 2) + m_spritebank;
-	*code = (*code << 2) | ((*color & 0x30) >> 4);
-	*color = 0 + (*color & 0x0f);
+	code |= ((color & 0xc0) << 2) + m_spritebank;
+	code = (code << 2) | ((color & 0x30) >> 4);
+	color = 0 + (color & 0x0f);
 }
 
 
@@ -173,15 +169,13 @@ uint32_t bladestl_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_k007342->tilemap_update();
 
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
-	m_k007420->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(1));
+	m_k007420->sprites_draw(bitmap, cliprect);
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 1, 1 | TILEMAP_DRAW_OPAQUE, 0);
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, 0 ,0);
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, 1 ,0);
 	return 0;
 }
 
-
-// machine
 
 TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::scanline)
 {
@@ -391,19 +385,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,            // 8 x 8 characters
-	0x40000/32,     // 8192 characters
-	4,              // 4bpp
-	{ 0, 1, 2, 3 }, // the four bitplanes are packed in one nibble
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8            // every character takes 32 consecutive bytes
-};
+static GFXDECODE_START( gfx_bladestl_tiles )
+	GFXDECODE_ENTRY( "tiles",   0, gfx_8x8x4_packed_msb,  0,  2 ) // colors 00..31
+GFXDECODE_END
 
-static GFXDECODE_START( gfx_bladestl )
-	GFXDECODE_ENTRY( "tiles",   0, charlayout,            0,  2 ) // colors 00..31
+static GFXDECODE_START( gfx_bladestl_spr )
 	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb, 32, 16 ) // colors 32..47 but using lookup table
 GFXDECODE_END
 
@@ -456,18 +442,14 @@ void bladestl_state::bladestl(machine_config &config)
 	screen.set_screen_update(FUNC(bladestl_state::screen_update));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_bladestl);
 	PALETTE(config, "palette", FUNC(bladestl_state::palette)).set_format(palette_device::xBGR_555, 32 + 16*16, 32+16);
 
-	K007342(config, m_k007342, 0);
-	m_k007342->set_gfxnum(0);
+	K007342(config, m_k007342, 0, "palette", gfx_bladestl_tiles);
 	m_k007342->set_tile_callback(FUNC(bladestl_state::tile_callback));
-	m_k007342->set_gfxdecode_tag(m_gfxdecode);
 
-	K007420(config, m_k007420, 0);
+	K007420(config, m_k007420, 0, "palette", gfx_bladestl_spr);
 	m_k007420->set_bank_limit(0x3ff);
 	m_k007420->set_sprite_callback(FUNC(bladestl_state::sprite_callback));
-	m_k007420->set_palette_tag("palette");
 
 	K051733(config, "k051733", 0);
 
@@ -510,7 +492,7 @@ ROM_START( bladestl )
 	ROM_LOAD( "797-c02.12d", 0x08000, 0x08000, CRC(65a331ea) SHA1(f206f6c5f0474542a5b7686b2f4d2cc7077dd5b9) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
-	ROM_LOAD( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )
+	ROM_LOAD16_WORD_SWAP( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )
 
 	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD( "797a06.13h", 0x00000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )
@@ -531,7 +513,7 @@ ROM_START( bladestll )
 	ROM_LOAD( "797-c02.12d", 0x08000, 0x08000, CRC(65a331ea) SHA1(f206f6c5f0474542a5b7686b2f4d2cc7077dd5b9) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
-	ROM_LOAD( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )
+	ROM_LOAD16_WORD_SWAP( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )
 
 	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD( "797a06.13h", 0x00000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )
@@ -552,7 +534,7 @@ ROM_START( bladestle )
 	ROM_LOAD( "797-c02.12d", 0x08000, 0x08000, CRC(65a331ea) SHA1(f206f6c5f0474542a5b7686b2f4d2cc7077dd5b9) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
-	ROM_LOAD( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )
+	ROM_LOAD16_WORD_SWAP( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )
 
 	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD( "797a06.13h", 0x00000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )
