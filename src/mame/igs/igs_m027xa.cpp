@@ -19,12 +19,15 @@ These games use the IGS027A processor.
 
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
 
 #include "sound/okim6295.h"
 
 #include "screen.h"
 #include "speaker.h"
+
+#include "crzybugs.lh"
 
 #define LOG_DEBUG       (1U << 1)
 //#define VERBOSE         (LOG_DEBUG)
@@ -44,9 +47,11 @@ public:
 		m_igs017_igs031(*this, "igs017_igs031"),
 		m_oki(*this, "oki"),
 		m_screen(*this, "screen"),
+		m_ticket(*this, "ticket"),
 		m_external_rom(*this, "user1"),
 		m_io_test(*this, "TEST%u", 0U),
-		m_io_dsw(*this, "DSW%u", 1U)
+		m_io_dsw(*this, "DSW%u", 1U),
+		m_out_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	void igs_mahjong_xa(machine_config &config);
@@ -72,10 +77,13 @@ private:
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	required_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
+	optional_device<ticket_dispenser_device> m_ticket;
 	required_region_ptr<u32> m_external_rom;
 
 	optional_ioport_array<3> m_io_test;
 	optional_ioport_array<3> m_io_dsw;
+
+	output_finder<8> m_out_lamps;
 
 	u32 m_xor_table[0x100];
 	u8 m_io_select[2];
@@ -106,6 +114,9 @@ private:
 
 	u16 xa_r(offs_t offset, u16 mem_mask);
 	void xa_w(offs_t offset, u16 data, u16 mem_mask);
+
+	void output_w(u8 data);
+	void lamps_w(u8 data);
 
 	void igs_40000014_w(offs_t offset, u32 data, u32 mem_mask);
 
@@ -144,6 +155,8 @@ void igs_m027xa_state::machine_reset()
 
 void igs_m027xa_state::machine_start()
 {
+	m_out_lamps.resolve();
+
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 
 	save_item(NAME(m_xor_table));
@@ -185,7 +198,6 @@ void igs_m027xa_state::main_map(address_map &map)
 	map(0x38008000, 0x38008003).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x38009000, 0x38009003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x3800c000, 0x3800c003).w(FUNC(igs_m027xa_state::oki_bank_w));
-	map(0x4000000c, 0x4000000f).r(FUNC(igs_m027xa_state::gpio_r));
 	map(0x40000014, 0x40000017).w(FUNC(igs_m027xa_state::igs_40000014_w));
 
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027xa_state::xor_table_w));
@@ -206,7 +218,7 @@ static INPUT_PORTS_START( base )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Play")
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )          // COINA
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME("Big")
@@ -214,19 +226,19 @@ static INPUT_PORTS_START( base )
 	PORT_START("TEST1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL )  PORT_NAME("Stop All Reels / Start")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Stop All Reels")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_NAME("Ticket")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ticket sw
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ??
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )          // COINC
 
 	PORT_START("TEST2")
-	PORT_BIT( 0x0000003f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop Reel 2 / Small")
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop Reel 3 / Take Score")
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop Reel 1 / Double Up")
-	PORT_BIT( 0xfffffe00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00007, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00008, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop Reel 2 / Small")
+	PORT_BIT( 0x00010, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop Reel 3 / Take Score")
+	PORT_BIT( 0x00020, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop Reel 1 / Double Up")
+	PORT_BIT( 0xfffc0, IP_ACTIVE_LOW, IPT_UNUSED ) // peripheral interrupts in bits 8 and 9 - see gpio_r
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:1")
@@ -298,6 +310,37 @@ u16 igs_m027xa_state::xa_r(offs_t offset, u16 mem_mask)
 	return data;
 }
 
+
+void igs_m027xa_state::output_w(u8 data)
+{
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // one pulse per COINA accepted
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 1)); // one pulse per key-in accepted
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 2)); // one pulse per COINC accepted
+	// bits 3 and 4 have something to do with counting credits paid out by ticket and key-out
+	if (m_ticket)
+		m_ticket->motor_w(BIT(data, 6));
+}
+
+void igs_m027xa_state::lamps_w(u8 data)
+{
+	// active high outputs
+	// +------+----------------+
+	// | lamp | crzybugs       |
+	// +------+----------------+
+	// |  1   | stop all/start |
+	// |  2   | stop 2/small   |
+	// |  3   | bet            |
+	// |  4   | stop 3/take    |
+	// |  5   | stop 1/double  |
+	// |  6   | big            |
+	// |  7   |                |
+	// |  8   |                |
+	// +------+----------------+
+	for (unsigned i = 0; 8 > i; ++i)
+		m_out_lamps[i] = BIT(data, i);
+}
+
+
 void igs_m027xa_state::igs_40000014_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// sets bit 1 before waiting on FIRQ, maybe it's an enable here?
@@ -306,11 +349,11 @@ void igs_m027xa_state::igs_40000014_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 igs_m027xa_state::gpio_r()
 {
-	u32 ret = m_io_test[2].read_safe(0xffffffff);
+	u32 ret = m_io_test[2].read_safe(0xfffff);
 	if (m_irq_from_igs031)
-		ret ^= 1 << 11;
+		ret &= ~(u32(1) << 8);
 	if (m_irq_from_xa)
-		ret ^= 1 << 12;
+		ret &= ~(u32(1) << 9);
 	return ret;
 }
 
@@ -480,6 +523,7 @@ void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 {
 	IGS027A(config, m_maincpu, 22'000'000); // Crazy Bugs has a 22MHz crystal, what about the others?
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::main_map);
+	m_maincpu->in_port().set(FUNC(igs_m027xa_state::gpio_r));
 	m_maincpu->out_port().set(FUNC(igs_m027xa_state::io_select_w<1>));
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -504,14 +548,21 @@ void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027xa_state::interrupt), "screen", 0, 1);
 
-	I8255A(config, m_ppi);
 	// crzybugs: PPI port A = input, port B = output, port C = output
+	I8255A(config, m_ppi);
+	m_ppi->tri_pa_callback().set_constant(0x00);
+	m_ppi->tri_pb_callback().set_constant(0x00);
+	m_ppi->tri_pc_callback().set_constant(0x00);
+	m_ppi->out_pb_callback().set(FUNC(igs_m027xa_state::output_w));
+	m_ppi->out_pc_callback().set(FUNC(igs_m027xa_state::lamps_w));
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits(true);
 	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027xa_state::dsw_r<1, 0>)));
 	m_igs017_igs031->in_pb_callback().set_ioport("TEST0");
 	m_igs017_igs031->in_pc_callback().set_ioport("TEST1");
+
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -798,16 +849,16 @@ void igs_m027xa_state::init_wldfruit()
 
 // These use the MX10EXAQC (80c51XA from Philips)
 // the PCBs are closer to igs_fear.cpp in terms of layout
-GAME( 2008, haunthig,  0,        igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", MACHINE_IS_SKELETON ) // IGS FOR V109US 2008 10 14
-GAME( 2006, haunthiga, haunthig, igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", MACHINE_IS_SKELETON ) // IGS FOR V101US 2006 08 23
+GAME(  2008, haunthig,  0,        igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", MACHINE_IS_SKELETON ) // IGS FOR V109US 2008 10 14
+GAME(  2006, haunthiga, haunthig, igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", MACHINE_IS_SKELETON ) // IGS FOR V101US 2006 08 23
 
-GAME( 2009, crzybugs,  0,        igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", MACHINE_IS_SKELETON ) // IGS FOR V204US 2009 5 19
-GAME( 2006, crzybugsa, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", MACHINE_IS_SKELETON ) // IGS FOR V100US 2006 3 29 but also V202US string
-GAME( 2005, crzybugsb, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", MACHINE_IS_SKELETON ) // FOR V100US 2005 7 20 but also V200US string
+GAMEL( 2009, crzybugs,  0,        igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", MACHINE_IS_SKELETON, layout_crzybugs ) // IGS FOR V204US 2009 5 19
+GAMEL( 2006, crzybugsa, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", MACHINE_IS_SKELETON, layout_crzybugs ) // IGS FOR V100US 2006 3 29 but also V202US string
+GAMEL( 2005, crzybugsb, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", MACHINE_IS_SKELETON, layout_crzybugs ) // FOR V100US 2005 7 20 but also V200US string
 
-GAME( 2007, crzybugsj, crzybugs, igs_mahjong_xa,     base,     igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_IS_SKELETON ) // IGS FOR V101JP 2007 06 08
+GAME(  2007, crzybugsj, crzybugs, igs_mahjong_xa,     base,     igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_IS_SKELETON ) // IGS FOR V101JP 2007 06 08
 
 // XA dump is missing, so XA CPU will crash, disable for now
-GAME( 2006, tripfev,   0,        igs_mahjong_xa_xor_disable, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", MACHINE_IS_SKELETON ) // IGS FOR V107US 2006 09 07
+GAME(  2006, tripfev,   0,        igs_mahjong_xa_xor_disable, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", MACHINE_IS_SKELETON ) // IGS FOR V107US 2006 09 07
 
-GAME( 200?, wldfruit,  0,        igs_mahjong_xa, base,     igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_IS_SKELETON ) // IGS-----97----V208US
+GAME(  200?, wldfruit,  0,        igs_mahjong_xa, base,     igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_IS_SKELETON ) // IGS-----97----V208US

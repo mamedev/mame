@@ -14,6 +14,9 @@ public:
 	igs027a_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 	virtual ~igs027a_cpu_device();
 
+	static constexpr feature_type imperfect_features() { return feature::TIMING; }
+
+	auto in_port() { return m_in_port_cb.bind(); }
 	auto out_port() { return m_out_port_cb.bind(); }
 
 	void trigger_irq(unsigned num);
@@ -25,6 +28,7 @@ protected:
 private:
 	void onboard_peripherals(address_map &map) ATTR_COLD;
 
+	u32 in_port_r();
 	void out_port_w(u8 data);
 	template <unsigned N> void timer_rate_w(u8 data);
 	u8 irq_pending_r();
@@ -34,6 +38,7 @@ private:
 
 	template <unsigned N> TIMER_CALLBACK_MEMBER(timer_irq);
 
+	devcb_read32 m_in_port_cb;
 	devcb_write8 m_out_port_cb;
 
 	emu_timer *m_irq_timers[2];
