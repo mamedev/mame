@@ -542,7 +542,8 @@ int supracan_state::get_tilemap_dimensions(int &xsize, int &ysize, int layer)
 	default:
 		// TODO: setting 0 is already tested by A'Can logo (in bitmap mode)
 		// select & 0x100 is 16x16 tiles
-		LOGMASKED(LOG_HFUNKNOWNS, "Unsupported tilemap size for layer %d: %04x\n", layer, select);
+		if (select != 0)
+			LOGMASKED(LOG_HFUNKNOWNS, "Unsupported tilemap size for layer %d: %04x\n", layer, select);
 		return 0;
 	}
 }
@@ -836,7 +837,7 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 			int xsize = 1 << (vram[i + 1] & 7);
 			int ysize = ((vram[i + 0] & 0x1e00) >> 9) + 1;
 
-			// HACK: sonevil sets 1x1 tiles, and expecting to take this path.
+			// HACK: sonevil sets 1x1 tiles in game, and expecting to take this path.
 			// Most likely former condition is wrong, and it just "direct sprite" when latter occurs.
 			// magipool also wants latter, for the shot markers to work.
 			if (sprite_ptr & 0x8000 || (xsize == 1 && ysize == 1))
@@ -871,6 +872,12 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 
 						int xpos = sprite_xflip ? (x - (xtile + 1) * 8 + xsize * 8) : (x + xtile * 8);
 						int ypos = sprite_yflip ? (y - (ytile + 1) * 8 + ysize * 8) : (y + ytile * 8);
+
+						// magipool rolls back at 512 edge for the shot power menu
+						// TODO: should also control clip inside the functions
+						// (which should be merged as well)
+						// TODO: verify ypos, likely same.
+						xpos &= 0x1ff;
 
 						int tile_xflip = sprite_xflip ^ ((data & 0x0800) >> 11);
 						int tile_yflip = sprite_yflip ^ ((data & 0x0400) >> 10);
