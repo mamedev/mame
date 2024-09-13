@@ -421,9 +421,9 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, nvip,   0,      0,      vip,     vip,   vip_state, empty_init, "Novag Industries", "VIP (Novag)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, nvip,   0,      0,      vip,     vip,   vip_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "VIP (Novag)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1989, nsvip,  0,      0,      svip,    svip,  vip_state, empty_init, "Novag Industries", "Super VIP (v3.7)", MACHINE_SUPPORTS_SAVE )
-SYST( 1989, nsvipa, nsvip,  0,      svip,    svip,  vip_state, empty_init, "Novag Industries", "Super VIP (v3.6)", MACHINE_SUPPORTS_SAVE )
-SYST( 1989, nsvipb, nsvip,  0,      svip,    svip,  vip_state, empty_init, "Novag Industries", "Super VIP (v1.03)", MACHINE_SUPPORTS_SAVE )
-SYST( 1989, nsvipc, nsvip,  0,      svip,    svip,  vip_state, empty_init, "Novag Industries", "Super VIP (v1.01)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, nsvip,  0,      0,      svip,    svip,  vip_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Super VIP (v3.7)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, nsvipa, nsvip,  0,      svip,    svip,  vip_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Super VIP (v3.6)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, nsvipb, nsvip,  0,      svip,    svip,  vip_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Super VIP (v1.03)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, nsvipc, nsvip,  0,      svip,    svip,  vip_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Super VIP (v1.01)", MACHINE_SUPPORTS_SAVE )

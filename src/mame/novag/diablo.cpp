@@ -376,8 +376,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1991, diablo68,  0,        0,      diablo68,  diablo68,  diablo_state, empty_init, "Novag Industries", "Diablo 68000 (set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1991, diablo68a, diablo68, 0,      diablo68,  diablo68,  diablo_state, empty_init, "Novag Industries", "Diablo 68000 (set 2)", MACHINE_SUPPORTS_SAVE )
-SYST( 1991, diablo68b, diablo68, 0,      diablo68,  diablo68,  diablo_state, empty_init, "Novag Industries", "Diablo 68000 (set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, diablo68,  0,        0,      diablo68,  diablo68,  diablo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Diablo 68000 (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, diablo68a, diablo68, 0,      diablo68,  diablo68,  diablo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Diablo 68000 (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, diablo68b, diablo68, 0,      diablo68,  diablo68,  diablo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Diablo 68000 (set 3)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1991, scorpio68, 0,        0,      scorpio68, diablo68,  diablo_state, empty_init, "Novag Industries", "Scorpio 68000", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, scorpio68, 0,        0,      scorpio68, diablo68,  diablo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Scorpio 68000", MACHINE_SUPPORTS_SAVE )

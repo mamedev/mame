@@ -6,7 +6,8 @@
 Novag Micro Chess
 
 It's a portable chesscomputer with sensory board. The MCU says "(C) CAL R & O3",
-though the program is supposedly by David Kittinger?
+though the program is supposedly by David Kittinger? Unlikely, since his first
+work with Novag was Super Sensor IV, a couple of months newer than Micro Chess.
 
 Hardware notes:
 - Mostek 3875/42 (4KB ROM, 64 bytes extra RAM)

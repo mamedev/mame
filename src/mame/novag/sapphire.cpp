@@ -457,6 +457,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1994, sapphire,  0,      0,      sapphire,  sapphire, sapphire_state, empty_init, "Novag Industries", "Sapphire", MACHINE_SUPPORTS_SAVE )
+SYST( 1994, sapphire,  0,      0,      sapphire,  sapphire, sapphire_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Sapphire", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1997, sapphire2, 0,      0,      sapphire2, sapphire, sapphire_state, empty_init, "Novag Industries", "Sapphire II", MACHINE_SUPPORTS_SAVE )
+SYST( 1997, sapphire2, 0,      0,      sapphire2, sapphire, sapphire_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Sapphire II", MACHINE_SUPPORTS_SAVE )

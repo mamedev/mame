@@ -312,4 +312,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, mentor16, 0,      0,      mentor16, mentor16, mentor16_state, empty_init, "Novag Industries", "Mentor 16", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, mentor16, 0,      0,      mentor16, mentor16, mentor16_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Mentor 16", MACHINE_SUPPORTS_SAVE )

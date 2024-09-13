@@ -511,11 +511,11 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, ssensor4, 0,       0,      ssensor4,  ssensor4, const_state, empty_init, "Novag Industries", "Super Sensor IV", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, ssensor4, 0,       0,      ssensor4,  ssensor4, const_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Super Sensor IV", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1983, const,    0,       0,      nconst,    nconst,   const_state, init_const, "Novag Industries", "Constellation", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, const36,  const,   0,      nconst36,  nconst,   const_state, init_const, "Novag Industries", "Constellation 3.6MHz (set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, const36a, const,   0,      nconst36a, nconst,   const_state, init_const, "Novag Industries", "Constellation 3.6MHz (set 2)", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, constq,   const,   0,      nconstq,   nconstq,  const_state, init_const, "Novag Industries", "Constellation Quattro", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, const,    0,       0,      nconst,    nconst,   const_state, init_const, "Novag Industries / Intelligent Heuristic Programming", "Constellation", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, const36,  const,   0,      nconst36,  nconst,   const_state, init_const, "Novag Industries / Intelligent Heuristic Programming", "Constellation 3.6MHz (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, const36a, const,   0,      nconst36a, nconst,   const_state, init_const, "Novag Industries / Intelligent Heuristic Programming", "Constellation 3.6MHz (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, constq,   const,   0,      nconstq,   nconstq,  const_state, init_const, "Novag Industries / Intelligent Heuristic Programming", "Constellation Quattro", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1984, supercon, 0,       0,      sconst,    sconst,   const_state, empty_init, "Novag Industries", "Super Constellation", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, supercon, 0,       0,      sconst,    sconst,   const_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Super Constellation", MACHINE_SUPPORTS_SAVE )
