@@ -13,12 +13,6 @@
 namespace {
 
 template <typename T>
-constexpr bool posedge(T old, T val, unsigned bit)
-{
-	return bool(BIT(~old & val, bit));
-}
-
-template <typename T>
 constexpr bool negedge(T old, T val, unsigned bit)
 {
 	return bool(BIT(old & ~val, bit));
