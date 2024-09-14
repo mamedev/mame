@@ -46,6 +46,19 @@ private:
 	attotime m_reset_time;
 };
 
+// ======================> wy85_keyboard_device
+
+class wy85_keyboard_device : public wyse_gate_array_keyboard_device
+{
+public:
+	// device type constructor
+	wy85_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0U);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+	virtual u8 wysekbd_get_id() override;
+};
+
 // ======================> wy60_ascii_keyboard_device
 
 class wy60_ascii_keyboard_device : public wyse_gate_array_keyboard_device
@@ -126,6 +139,7 @@ protected:
 };
 
 // device type declarations
+DECLARE_DEVICE_TYPE(WY85_KEYBOARD, wy85_keyboard_device)
 DECLARE_DEVICE_TYPE(WY60_ASCII_KEYBOARD, wy60_ascii_keyboard_device)
 DECLARE_DEVICE_TYPE(WYSE_AT_KEYBOARD, wyse_at_keyboard_device)
 DECLARE_DEVICE_TYPE(WYSE_316X_KEYBOARD, wyse_316x_keyboard_device)

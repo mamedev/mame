@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /*******************************************************************************
 
-    Skeleton driver for Wyse WY-85 VT220-compatible terminal.
+    Preliminary driver for Wyse WY-85 VT220-compatible terminal.
 
     Unlike most later Wyse terminals, the WY-85 lacks a video gate array. It
     also has non-embedded hidden attributes, though they are buffered with the
@@ -29,7 +29,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_earom(*this, "earom")
-		, m_keyboard(*this, "keyboard")
+		, m_kybd(*this, "kybd")
 		, m_pvtc(*this, "pvtc")
 		, m_duart(*this, "duart")
 		, m_comm(*this, "comm")
@@ -79,7 +79,7 @@ private:
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<er1400_device> m_earom;
-	required_device<wyse_keyboard_port_device> m_keyboard;
+	required_device<wyse_keyboard_port_device> m_kybd;
 	required_device<scn2672_device> m_pvtc;
 	required_device<scn2681_device> m_duart;
 	required_device<rs232_port_device> m_comm;
@@ -191,7 +191,7 @@ u8 wy85_state::utility_r()
 	// D1 = not connected?
 	// D2 = NVD OUT
 	// D3 = KEY DATA
-	return (m_earom->data_r() << 2) | (!m_keyboard->data_r() << 3);
+	return (m_earom->data_r() << 2) | (!m_kybd->data_r() << 3);
 }
 
 void wy85_state::duart_op_w(u8 data)
@@ -242,7 +242,7 @@ void wy85_state::p3_w(u8 data)
 	// P3.5 (T1) = KEY OUT
 
 	m_pr->write_txd(BIT(data, 1));
-	m_keyboard->cmd_w(!BIT(data, 5));
+	m_kybd->cmd_w(!BIT(data, 5));
 }
 
 void wy85_state::prg_map(address_map &map)
@@ -317,7 +317,7 @@ void wy85_state::wy85(machine_config &config)
 
 	ER1400(config, m_earom); // M5G1400
 
-	WYSE_KEYBOARD(config, m_keyboard, 0);
+	WYSE_KEYBOARD(config, m_kybd, wy85_keyboards, "wy85");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());
@@ -342,16 +342,16 @@ void wy85_state::wy85(machine_config &config)
 	m_duart->outport_cb().set(FUNC(wy85_state::duart_op_w));
 	m_duart->irq_cb().set_inputline(m_maincpu, MCS51_INT1_LINE);
 
-	RS232_PORT(config, m_comm, default_rs232_devices, "loopback"); // RS423 port, also RS232 compatible
+	RS232_PORT(config, m_comm, default_rs232_devices, nullptr); // RS423 port, also RS232 compatible
 	m_comm->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
 	m_comm->cts_handler().set(m_duart, FUNC(scn2681_device::ip0_w));
 	m_comm->dsr_handler().set(m_duart, FUNC(scn2681_device::ip1_w));
 	m_comm->dcd_handler().set(m_duart, FUNC(scn2681_device::ip2_w));
 	m_comm->si_handler().set(m_duart, FUNC(scn2681_device::ip4_w));
 
-	RS232_PORT(config, m_pr, default_rs232_devices, "loopback"); // RS423 port, also RS232 compatible
+	RS232_PORT(config, m_pr, default_rs232_devices, nullptr); // RS423 port, also RS232 compatible
 
-	RS232_PORT(config, "20ma", default_rs232_devices, "loopback") // 20mA current loop, not actually RS232 compatible
+	RS232_PORT(config, "20ma", default_rs232_devices, nullptr) // 20mA current loop, not actually RS232 compatible
 				.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
 }
 
@@ -369,4 +369,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1985, wy85, 0, 0, wy85, wy85, wy85_state, empty_init, "Wyse Technology", "WY-85", MACHINE_IS_SKELETON)
+COMP(1985, wy85, 0, 0, wy85, wy85, wy85_state, empty_init, "Wyse Technology", "WY-85", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

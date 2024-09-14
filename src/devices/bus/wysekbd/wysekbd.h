@@ -69,6 +69,7 @@ protected:
 DECLARE_DEVICE_TYPE(WYSE_KEYBOARD, wyse_keyboard_port_device)
 
 // standard options
+extern void wy85_keyboards(device_slot_interface &slot);
 extern void wy60_keyboards(device_slot_interface &slot);
 
 //**************************************************************************

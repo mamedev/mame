@@ -69,6 +69,11 @@ wyse_keyboard_interface::~wyse_keyboard_interface()
 //  KEYBOARD OPTIONS
 //**************************************************************************
 
+void wy85_keyboards(device_slot_interface &slot)
+{
+	slot.option_add("wy85", WY85_KEYBOARD);
+}
+
 void wy60_keyboards(device_slot_interface &slot)
 {
 	slot.option_add("ascii", WY60_ASCII_KEYBOARD);
