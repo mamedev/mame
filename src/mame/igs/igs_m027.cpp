@@ -1444,6 +1444,7 @@ void igs_m027_state::mahjong_output_w(u8 data)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // one pulse per coin paid out by key-out
 	if (m_hopper)
 		m_hopper->motor_w(BIT(data, 2));
+	m_oki->set_rom_bank(data >> 6);
 }
 
 void igs_m027_state::jking02_output_w(u8 data)
@@ -1595,7 +1596,6 @@ void igs_m027_state::lhdmg_xor(machine_config &config)
 	m_ppi->in_pa_callback().set_ioport("TEST");
 	m_ppi->out_pb_callback().set(FUNC(igs_m027_state::io_select_w<0>));
 	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::mahjong_output_w));
-	m_ppi->out_pc_callback().append(m_oki, FUNC(okim6295_device::set_rom_bank)).bit(7); // FIXME: not right - issues with gameplay sound, especially on last chance screen
 
 	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
