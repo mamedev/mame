@@ -15,11 +15,10 @@
  To emulate these games the Internal ROM will need dumping
  There are at least 20 other games on this and similar platforms.
 
- Hold service on boot to access input test.
+ Hold service on boot to access input test and sond test when implemented.
 
  TODO:
- * NVRAM
- * Inputs, DIP switches, coin counters and payout systems for most games
+ * I/O for remaining games
  * Coin lockout (zhongguo displays a coin error on unexpected coins)
 */
 
@@ -64,6 +63,7 @@ public:
 		m_igs017_igs031(*this, "igs017_igs031"),
 		m_screen(*this, "screen"),
 		m_oki(*this, "oki"),
+		m_okibank(*this, "okibank%u", 0U),
 		m_hopper(*this, "hopper"),
 		m_ticket(*this, "ticket"),
 		m_io_kbd(*this, "KEY%u", 0U),
@@ -81,12 +81,12 @@ public:
 	void jking02_xor(machine_config &config) ATTR_COLD;
 	void qlgs_xor(machine_config &config) ATTR_COLD;
 	void lhdmg_xor(machine_config &config) ATTR_COLD;
+	void cjddz_xor(machine_config &config) ATTR_COLD;
 	void lhzb4_xor(machine_config &config) ATTR_COLD;
 	void lthy_xor(machine_config &config) ATTR_COLD;
 	void zhongguo_xor(machine_config &config) ATTR_COLD;
 	void mgzz_xor(machine_config &config) ATTR_COLD;
 	void oceanpar_xor(machine_config &config) ATTR_COLD;
-	void extradraw(machine_config &config) ATTR_COLD;
 	void chessc2_xor(machine_config &config) ATTR_COLD;
 
 	void init_sdwx() ATTR_COLD;
@@ -124,6 +124,7 @@ private:
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	required_device<screen_device> m_screen;
 	required_device<okim6295_device> m_oki;
+	optional_memory_bank_array<2> m_okibank;
 	optional_device<hopper_device> m_hopper;
 	optional_device<ticket_dispenser_device> m_ticket;
 
@@ -134,7 +135,6 @@ private:
 
 	u32 m_xor_table[0x100];
 	u8 m_io_select[2];
-	u32 m_unk2_write_count;
 
 	template <unsigned Select, unsigned First> u8 dsw_r();
 	template <unsigned Select, unsigned S, unsigned R> u8 kbd_r();
@@ -149,6 +149,7 @@ private:
 	void mahjong_output_w(u8 data);
 	void jking02_output_w(u8 data);
 	void oceanpar_output_w(u8 data);
+	void oki_128k_bank_w(u8 data);
 
 	u32 slqz3_gpio_r();
 	u32 lhdmg_gpio_r();
@@ -160,7 +161,9 @@ private:
 
 	void igs_mahjong_map(address_map &map) ATTR_COLD;
 	void igs_mahjong_xor_map(address_map &map) ATTR_COLD;
-	void extradraw_map(address_map &map) ATTR_COLD;
+	void cjddz_xor_map(address_map &map) ATTR_COLD;
+
+	void oki_128k_map(address_map &map) ATTR_COLD;
 };
 
 void igs_m027_state::machine_start()
@@ -169,11 +172,16 @@ void igs_m027_state::machine_start()
 
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 	std::fill(std::begin(m_io_select), std::end(m_io_select), 0xff);
-	m_unk2_write_count = 0;
+
+	auto const *region = memregion("oki");
+	for (auto &bank : m_okibank)
+	{
+		if (region && bank)
+			bank->configure_entries(0, region->bytes() / 0x20000, region->base(), 0x20000);
+	}
 
 	save_item(NAME(m_xor_table));
 	save_item(NAME(m_io_select));
-	save_item(NAME(m_unk2_write_count));
 }
 
 void igs_m027_state::video_start()
@@ -190,33 +198,38 @@ void igs_m027_state::video_start()
 
 void igs_m027_state::igs_mahjong_map(address_map &map)
 {
-	map(0x08000000, 0x0807ffff).rom().region("user1", 0); // Game ROM
-	map(0x10000000, 0x100003ff).ram().share("igs_mainram"); // main RAM for ASIC?
-	map(0x18000000, 0x18007fff).ram();
+	map(0x0800'0000, 0x0807'ffff).rom().region("user1", 0); // Game ROM
+	map(0x1000'0000, 0x1000'03ff).ram().share("igs_mainram"); // main RAM for ASIC?
+	map(0x1800'0000, 0x1800'7fff).ram().mirror(0x0000f'8000).share("nvram");
 
-	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
+	map(0x3800'0000, 0x3800'7fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
-	map(0x38008000, 0x38008003).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x38009000, 0x38009003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x3800'8000, 0x3800'8003).umask32(0x0000'00ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x3800'9000, 0x3800'9003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-	map(0x40000008, 0x4000000b).w(FUNC(igs_m027_state::unk2_w));
-
-	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027_state::xor_table_w)); // uploads XOR table to external ROM here
+	map(0x5000'0000, 0x5000'03ff).umask32(0x0000'00ff).w(FUNC(igs_m027_state::xor_table_w)); // uploads XOR table to external ROM here
 }
 
 void igs_m027_state::igs_mahjong_xor_map(address_map &map)
 {
 	igs_mahjong_map(map);
 
-	map(0x08000000, 0x0807ffff).r(FUNC(igs_m027_state::external_rom_r)); // Game ROM
+	map(0x0800'0000, 0x0807'ffff).r(FUNC(igs_m027_state::external_rom_r)); // Game ROM
 }
 
-void igs_m027_state::extradraw_map(address_map &map)
+void igs_m027_state::cjddz_xor_map(address_map &map)
 {
-	igs_mahjong_map(map);
+	igs_mahjong_xor_map(map);
 
-	map(0x18080000, 0x1808ffff).ram(); // Extra Draw needs RAM here, maybe just a mirror, maybe due to PCB difference
+	map(0x3800'b000, 0x3800'b003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::oki_128k_bank_w));
 }
+
+void igs_m027_state::oki_128k_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).bankr(m_okibank[0]);
+	map(0x20000, 0x3ffff).bankr(m_okibank[1]);
+}
+
 
 /***************************************************************************
 
@@ -1417,6 +1430,7 @@ void igs_m027_state::mahjong_output_w(u8 data)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // one pulse per coin paid out by key-out
 	if (m_hopper)
 		m_hopper->motor_w(BIT(data, 2));
+	m_oki->set_rom_bank(data >> 6);
 }
 
 void igs_m027_state::jking02_output_w(u8 data)
@@ -1439,12 +1453,21 @@ void igs_m027_state::oceanpar_output_w(u8 data)
 	m_hopper->motor_w(BIT(data, 7));
 }
 
+void igs_m027_state::oki_128k_bank_w(u8 data)
+{
+	for (int i = 0; i < m_okibank.size(); i++)
+	{
+		if (m_okibank[i])
+			m_okibank[i]->set_entry(BIT(data, i * 4, 4));
+	}
+}
+
 u32 igs_m027_state::slqz3_gpio_r()
 {
 	logerror("%s: slqz3_gpio_r\n", machine().describe_context());
 
 	// slqz3 boot check
-	if (m_unk2_write_count & 1)
+	if (m_io_select[1] & 1)
 		return 0xfffff;
 	else
 		return 0xffffd;
@@ -1458,12 +1481,6 @@ u32 igs_m027_state::lhdmg_gpio_r()
 		return 0xfffff;
 	else
 		return 0xfffff ^ 0x80000;
-}
-
-void igs_m027_state::unk2_w(u32 data)
-{
-	logerror("%s: unk2_w %08x\n", machine().describe_context(), data);
-	m_unk2_write_count++;
 }
 
 
@@ -1485,7 +1502,7 @@ void igs_m027_state::m027(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_mahjong_map);
 	m_maincpu->out_port().set(FUNC(igs_m027_state::io_select_w<1>));
 
-//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -1559,7 +1576,6 @@ void igs_m027_state::lhdmg_xor(machine_config &config)
 	m_ppi->in_pa_callback().set_ioport("TEST");
 	m_ppi->out_pb_callback().set(FUNC(igs_m027_state::io_select_w<0>));
 	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::mahjong_output_w));
-	m_ppi->out_pc_callback().append(m_oki, FUNC(okim6295_device::set_rom_bank)).bit(7); // FIXME: not right - issues with gameplay sound, especially on last chance screen
 
 	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
@@ -1568,11 +1584,14 @@ void igs_m027_state::lhdmg_xor(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
-void igs_m027_state::lhzb4_xor(machine_config &config)
+void igs_m027_state::cjddz_xor(machine_config &config)
 {
 	m027_xor(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::cjddz_xor_map);
 	m_maincpu->in_port().set_ioport("PLAYER");
+
+	m_oki->set_addrmap(0, &igs_m027_state::oki_128k_map);
 
 	//m_ppi->out_pa_callback().set(...);
 	m_ppi->out_pb_callback().set_ioport("PPIB");
@@ -1583,6 +1602,13 @@ void igs_m027_state::lhzb4_xor(machine_config &config)
 	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
+}
+
+void igs_m027_state::lhzb4_xor(machine_config &config)
+{
+	cjddz_xor(config);
+
+	m_oki->set_clock(2'000'000);
 }
 
 void igs_m027_state::lthy_xor(machine_config &config)
@@ -1644,13 +1670,6 @@ void igs_m027_state::oceanpar_xor(machine_config &config)
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
-}
-
-void igs_m027_state::extradraw(machine_config &config)
-{
-	m027(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::extradraw_map);
 }
 
 void igs_m027_state::chessc2_xor(machine_config &config)
@@ -2758,8 +2777,8 @@ GAMEL( 1999, oceanpar,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_o
 GAMEL( 1999, oceanpara, oceanpar, oceanpar_xor, oceanpara,igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING, layout_oceanpar ) // 1999 copyright in ROM
 GAMEL( 1999, fruitpar,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)",   MACHINE_NOT_WORKING, layout_oceanpar )
 GAMEL( 1999, fruitpara, fruitpar, oceanpar_xor, fruitpara,igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", MACHINE_NOT_WORKING, layout_oceanpar )
-GAME(  200?, cjddz,     0,        lhzb4_xor,    cjddz,    igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", MACHINE_NOT_WORKING ) // 超级斗地主
-GAME(  2001, extradrw,  0,        extradraw,    base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
+GAME(  200?, cjddz,     0,        cjddz_xor,    cjddz,    igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", MACHINE_NOT_WORKING ) // 超级斗地主
+GAME(  2001, extradrw,  0,        m027,         base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME(  2002, chessc2,   0,        chessc2_xor,  chessc2,  igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING )
 
