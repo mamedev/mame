@@ -360,7 +360,7 @@ u32 igs_m027xa_state::gpio_r()
 void igs_m027xa_state::oki_bank_w(offs_t offset, u8 data)
 {
 	if (offset == 0)
-		m_oki->set_rom_bank(data & 3);
+		m_oki->set_rom_bank(data & 7);
 }
 
 template <unsigned Select, unsigned First>
