@@ -550,8 +550,9 @@ RAND USR 16530
 
 	<software name="aeri">
 		<description>AERI - Análise de Estruturas Recticuladas Isostácticas</description>
-		<year>198?</year>
+		<year>1982</year>
 		<publisher>Landry</publisher>
+		<info name="language" value="Portuguese" />
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Catálogo"/>
 			<dataarea name="cass" size="1446">
@@ -1956,6 +1957,7 @@ RAND USR 16530
 		<description>Colunas - Dimensionamento de Colunas Montantes de Edifícios</description>
 		<year>1982</year>
 		<publisher>Landry</publisher>
+		<info name="language" value="Portuguese" />
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Catálogo"/>
 			<dataarea name="cass" size="1436">
