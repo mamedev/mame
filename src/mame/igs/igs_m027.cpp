@@ -139,7 +139,6 @@ private:
 
 	u32 m_xor_table[0x100];
 	u8 m_io_select[2];
-	u32 m_unk2_write_count;
 
 	template <unsigned Select, unsigned First> u8 dsw_r();
 	template <unsigned Select, unsigned S, unsigned R> u8 kbd_r();
@@ -176,7 +175,6 @@ void igs_m027_state::machine_start()
 
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 	std::fill(std::begin(m_io_select), std::end(m_io_select), 0xff);
-	m_unk2_write_count = 0;
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -187,7 +185,6 @@ void igs_m027_state::machine_start()
 
 	save_item(NAME(m_xor_table));
 	save_item(NAME(m_io_select));
-	save_item(NAME(m_unk2_write_count));
 }
 
 void igs_m027_state::video_start()
@@ -212,8 +209,6 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 
 	map(0x38008000, 0x38008003).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x38009000, 0x38009003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-
-	map(0x40000008, 0x4000000b).w(FUNC(igs_m027_state::unk2_w));
 
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027_state::xor_table_w)); // uploads XOR table to external ROM here
 }
@@ -1479,7 +1474,7 @@ u32 igs_m027_state::slqz3_gpio_r()
 	logerror("%s: slqz3_gpio_r\n", machine().describe_context());
 
 	// slqz3 boot check
-	if (m_unk2_write_count & 1)
+	if (m_io_select[1] & 1)
 		return 0xfffff;
 	else
 		return 0xffffd;
@@ -1495,11 +1490,6 @@ u32 igs_m027_state::lhdmg_gpio_r()
 		return 0xfffff ^ 0x80000;
 }
 
-void igs_m027_state::unk2_w(u32 data)
-{
-	logerror("%s: unk2_w %08x\n", machine().describe_context(), data);
-	m_unk2_write_count++;
-}
 
 
 CUSTOM_INPUT_MEMBER(igs_m027_state::kbd_ioport_r)
