@@ -9,13 +9,12 @@
 
 #include "igs027a.h"
 #include "pgmcrypt.h"
+#include "xamcu.h"
 
 #include "cpu/arm7/arm7core.h"
-#include "cpu/xa/xa.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/v3021.h"
-#include "sound/ics2115.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -24,7 +23,7 @@
 #include <algorithm>
 
 #define LOG_DEBUG       (1U << 1)
-#define VERBOSE         (0)
+//#define VERBOSE         (LOG_DEBUG)
 #include "logmacro.h"
 
 
@@ -41,7 +40,6 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_xa(*this, "xa"),
-		m_ics(*this, "ics"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_ticket(*this, "ticket"),
@@ -80,19 +78,7 @@ private:
 	void igs027_gpio_w(u8 data);
 
 	u32 xa_r(offs_t offset, u32 mem_mask);
-	void xa_w(offs_t offset, u32 data, u32 mem_mask);
 	void cpld_w(offs_t offset, u32 data, u32 mem_mask);
-
-	u8 mcu_p0_r();
-	u8 mcu_p1_r();
-	u8 mcu_p2_r();
-	u8 mcu_p3_r();
-	void mcu_p0_w(uint8_t data);
-	void mcu_p1_w(uint8_t data);
-	void mcu_p2_w(uint8_t data);
-	void mcu_p3_w(uint8_t data);
-
-	u16 xa_wait_r(offs_t offset);
 
 	required_region_ptr<u32> m_external_rom;
 	required_region_ptr<u8> m_gfxrom;
@@ -100,8 +86,7 @@ private:
 	required_shared_ptr<u32> m_videoram;
 
 	required_device<igs027a_cpu_device> m_maincpu;
-	required_device<mx10exa_cpu_device> m_xa;
-	required_device<ics2115_device> m_ics;
+	required_device<igs_xa_mcu_ics_sound_device> m_xa;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
@@ -112,20 +97,7 @@ private:
 
 	u32 m_xor_table[0x100];
 
-	u8 m_port2_latch;
-	u8 m_port0_latch;
-
 	u8 m_gpio_o;
-
-	u32 m_xa_cmd;
-	u32 m_xa_ret0;
-	u32 m_xa_ret1;
-	u8 m_num_params;
-
-	u8 m_port0_dat;
-	u8 m_port1_dat;
-	u8 m_port2_dat;
-	u8 m_port3_dat;
 
 	int m_trackball_cnt;
 	int m_trackball_axis[2], m_trackball_axis_pre[2], m_trackball_axis_diff[2];
@@ -142,39 +114,11 @@ void igs_fear_state::machine_start()
 
 	save_item(NAME(m_xor_table));
 
-	save_item(NAME(m_port2_latch));
-	save_item(NAME(m_port0_latch));
-
 	save_item(NAME(m_gpio_o));
-
-	save_item(NAME(m_xa_cmd));
-	save_item(NAME(m_xa_ret0));
-	save_item(NAME(m_xa_ret1));
-	save_item(NAME(m_num_params));
-
-	save_item(NAME(m_port0_dat));
-	save_item(NAME(m_port1_dat));
-	save_item(NAME(m_port2_dat));
-	save_item(NAME(m_port3_dat));
 }
 
 void igs_fear_state::machine_reset()
 {
-	m_port2_latch = 0;
-	m_port0_latch = 0;
-
-	m_gpio_o = 0;
-
-	m_xa_cmd = 0;
-	m_xa_ret0 = 0;
-	m_xa_ret1 = 0;
-	m_num_params = 0;
-
-	m_port0_dat = 0;
-	m_port1_dat = 0;
-	m_port2_dat = 0;
-	m_port3_dat = 0;
-
 }
 
 void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int height, int width, int palette, int flipx, int romoffset)
@@ -244,7 +188,8 @@ void igs_fear_state::main_map(address_map &map)
 
 	map(0x38000000, 0x38001fff).ram().share(m_videoram);
 	map(0x38004000, 0x38007fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x38008500, 0x380085ff).rw(FUNC(igs_fear_state::xa_r), FUNC(igs_fear_state::xa_w));
+	map(0x38008500, 0x38008503).umask32(0x0000ffff).w(m_xa, FUNC(igs_xa_mcu_ics_sound_device::cmd_w));
+	map(0x38008500, 0x380085ff).r(FUNC(igs_fear_state::xa_r));
 
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_fear_state::xor_table_w));
 
@@ -327,9 +272,9 @@ INPUT_PORTS_START( superkds )
 	PORT_DIPSETTING(    0x02, "Jungle" )
 	PORT_DIPSETTING(    0x01, "Ice Field" )
 	PORT_DIPSETTING(    0x00, "Ice Field (duplicate)" )
-	PORT_DIPNAME( 0x04, 0x00, "Ticket" )                  PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Ticket Dispenser" )        PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0xf8, 0x00, "Ticket Payout Table" )     PORT_DIPLOCATION("SW1:4,5,6,7,8")
 	PORT_DIPSETTING(    0xf8, "3 2 2 1 1 0 0 0" )
 	PORT_DIPSETTING(    0xf0, "3 2 2 2 1 1 1 1" )
@@ -369,13 +314,13 @@ INPUT_PORTS_START( superkds )
 	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR(Coin_A) )           PORT_DIPLOCATION("SW2:2,3")
-	PORT_DIPSETTING(    0x06, DEF_STR(1C_1C) )
-	PORT_DIPSETTING(    0x04, DEF_STR(2C_1C) )
-	PORT_DIPSETTING(    0x02, DEF_STR(3C_1C) )
 	PORT_DIPSETTING(    0x00, DEF_STR(4C_1C) )
+	PORT_DIPSETTING(    0x02, DEF_STR(3C_1C) )
+	PORT_DIPSETTING(    0x04, DEF_STR(2C_1C) )
+	PORT_DIPSETTING(    0x06, DEF_STR(1C_1C) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR(Demo_Sounds) )      PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x70, 0x00, "Slave ID" )                PORT_DIPLOCATION("SW2:5,6,7")
 	PORT_DIPSETTING(    0x70, "0" )
 	PORT_DIPSETTING(    0x60, "1" )
@@ -398,9 +343,9 @@ INPUT_PORTS_END
 
 void igs_fear_state::sound_irq(int state)
 {
-	LOGMASKED(LOG_DEBUG, "sound irq\n");
+	LOGMASKED(LOG_DEBUG, "sound irq = %d\n", state);
 	if (state)
-		m_xa->set_input_line(XA_EXT_IRQ2, ASSERT_LINE);
+		m_maincpu->trigger_irq(3);
 }
 
 void igs_fear_state::vblank_irq(int state)
@@ -445,9 +390,9 @@ u32 igs_fear_state::xa_r(offs_t offset, u32 mem_mask)
 	{
 	case 0:
 	{
-		data = m_xa_ret0;
+		data = m_xa->response_low_r();
 		// TODO: This should be remove when we implement serial trackball support in XA
-		if (m_xa_cmd == 0xa301)
+		if (m_xa->cmd_r() == 0xa301)
 		{
 			switch (m_trackball_cnt++)
 			{
@@ -485,35 +430,10 @@ u32 igs_fear_state::xa_r(offs_t offset, u32 mem_mask)
 		break;
 	}
 	case 0x80:
-		data = m_xa_ret1 << 16;
+		data = u32(m_xa->response_high_r()) << 16;
 		break;
 	}
 	return data;
-}
-
-void igs_fear_state::xa_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	m_xa_cmd = data;
-
-	if (offset == 0)
-	{
-		m_num_params--;
-
-		if (m_num_params <= 0)
-		{
-			LOGMASKED(LOG_DEBUG, "---------------m_xa_cmd is %02x size %02x\n", (data & 0xff00)>>8, data & 0xff);
-			m_num_params = data & 0xff;
-		}
-		else
-		{
-			LOGMASKED(LOG_DEBUG, "-------------------------- param %04x\n", data & 0xffff);
-		}
-		m_xa->set_input_line(XA_EXT_IRQ0, ASSERT_LINE);
-	}
-	else
-	{
-		LOGMASKED(LOG_DEBUG, "%s: unhandled xa_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
-	}
 }
 
 void igs_fear_state::cpld_w(offs_t offset, u32 data, u32 mem_mask)
@@ -530,112 +450,6 @@ void igs_fear_state::cpld_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 }
 
-u8 igs_fear_state::mcu_p0_r()
-{
-	u8 ret = m_port0_latch;
-	LOGMASKED(LOG_DEBUG, "%s: COMMAND READ LOWER mcu_p0_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
-	return ret;
-}
-
-u8 igs_fear_state::mcu_p1_r()
-{
-	LOGMASKED(LOG_DEBUG, "%s: mcu_p1_r()\n", machine().describe_context());
-	return m_port1_dat; // superkds XA will end up failing returning port1 dat for now, but not attempt to play any sounds otherwise?
-}
-
-u8 igs_fear_state::mcu_p2_r()
-{
-	u8 ret = m_port2_latch;
-	LOGMASKED(LOG_DEBUG, "%s: COMMAND READ mcu_p2_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
-	return m_port2_latch;
-}
-
-u8 igs_fear_state::mcu_p3_r()
-{
-	LOGMASKED(LOG_DEBUG, "%s: mcu_p3_r()\n", machine().describe_context());
-	return m_port3_dat;
-}
-
-static int posedge(uint32_t oldval, uint32_t val, int bit)
-{
-	return (!BIT(oldval, bit)) && (BIT(val, bit));
-}
-
-static int negedge(uint32_t oldval, uint32_t val, int bit)
-{
-	return (BIT(oldval, bit)) && (!BIT(val, bit));
-}
-
-void igs_fear_state::mcu_p0_w(uint8_t data)
-{
-	LOGMASKED(LOG_DEBUG, "%s: mcu_p0_w() %02x with port 3 as %02x and port 1 as %02x\n", machine().describe_context(), data, m_port3_dat, m_port1_dat);
-	m_port0_dat = data;
-}
-
-void igs_fear_state::mcu_p1_w(uint8_t data)
-{
-	u8 olddata = m_port1_dat;
-	LOGMASKED(LOG_DEBUG, "%s: mcu_p1_w() %02x\n", machine().describe_context(), data);
-	m_port1_dat = data;
-
-	if (posedge(olddata, m_port1_dat, 3))
-	{
-		m_maincpu->trigger_irq(3);
-	}
-}
-
-void igs_fear_state::mcu_p2_w(uint8_t data)
-{
-	m_port2_dat = data;
-	LOGMASKED(LOG_DEBUG, "%s: mcu_p2_w() %02x with port 3 as %02x\n", machine().describe_context(), data, m_port3_dat);
-}
-
-void igs_fear_state::mcu_p3_w(uint8_t data)
-{
-	u8 oldport3 = m_port3_dat;
-	m_port3_dat = data;
-	LOGMASKED(LOG_DEBUG, "%s: mcu_p3_w() %02x - do latches oldport3 %02x newport3 %02x\n", machine().describe_context(), data, oldport3, m_port3_dat);
-
-	// high->low transition on bit 0x80 must read into latches!
-	if (negedge(oldport3, m_port3_dat, 7))
-	{
-		if (!BIT(m_port3_dat, 4))
-		{
-			m_port0_latch = m_ics->read(m_port1_dat & 7);
-			LOGMASKED(LOG_DEBUG, "read from ics [%d] = [%02x]\n", m_port1_dat & 7, m_port0_latch);
-		}
-		else if (!BIT(m_port3_dat, 5))
-		{
-			LOGMASKED(LOG_DEBUG, "read command [%d] = [%04x]\n", m_port1_dat & 7, m_xa_cmd);
-			m_port2_latch = (m_xa_cmd & 0xff00) >> 8;
-			m_port0_latch = m_xa_cmd & 0x00ff;
-		}
-	}
-
-	if (negedge(oldport3, m_port3_dat, 6))
-	{
-		if (!BIT(m_port3_dat, 4))
-		{
-			LOGMASKED(LOG_DEBUG, "write to ics [%d] = [%02x]\n", m_port1_dat & 7, m_port0_dat);
-			m_ics->write(m_port1_dat & 7, m_port0_dat);
-		}
-		else if (!BIT(m_port3_dat, 5))
-		{
-			uint32_t dat = (m_port2_dat << 8) | m_port0_dat;
-			LOGMASKED(LOG_DEBUG, "write command [%d] = [%04x]\n", m_port1_dat & 7, dat);
-			switch (m_port1_dat & 7)
-			{
-			case 1:
-				m_xa_ret1 = dat;
-				break;
-			case 2:
-				m_xa_ret0 = dat;
-				break;
-			}
-		}
-	}
-}
-
 
 void igs_fear_state::igs_fear(machine_config &config)
 {
@@ -643,16 +457,6 @@ void igs_fear_state::igs_fear(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::main_map);
 	m_maincpu->in_port().set(FUNC(igs_fear_state::igs027_gpio_r));
 	m_maincpu->out_port().set(FUNC(igs_fear_state::igs027_gpio_w));
-
-	MX10EXA(config, m_xa, 50'000'000/3); // MX10EXAQC (Philips 80C51 XA)
-	m_xa->port_in_cb<0>().set(FUNC(igs_fear_state::mcu_p0_r));
-	m_xa->port_in_cb<1>().set(FUNC(igs_fear_state::mcu_p1_r));
-	m_xa->port_in_cb<2>().set(FUNC(igs_fear_state::mcu_p2_r));
-	m_xa->port_in_cb<3>().set(FUNC(igs_fear_state::mcu_p3_r));
-	m_xa->port_out_cb<0>().set(FUNC(igs_fear_state::mcu_p0_w));
-	m_xa->port_out_cb<1>().set(FUNC(igs_fear_state::mcu_p1_w));
-	m_xa->port_out_cb<2>().set(FUNC(igs_fear_state::mcu_p2_w));
-	m_xa->port_out_cb<3>().set(FUNC(igs_fear_state::mcu_p3_w));
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -674,11 +478,8 @@ void igs_fear_state::igs_fear(machine_config &config)
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	ICS2115(config, m_ics, 33.8688_MHz_XTAL); // TODO : Correct?
-	m_ics->irq().set(FUNC(igs_fear_state::sound_irq));
-	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
+	IGS_XA_ICS_SOUND(config, m_xa, 50'000'000/3);
+	m_xa->irq().set(FUNC(igs_fear_state::sound_irq));
 }
 
 void igs_fear_state::igs_fear_xor(machine_config &config)
@@ -696,7 +497,7 @@ ROM_START( fearless )
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "fearlessp_v-101us.u37", 0x000000, 0x80000, CRC(2522873c) SHA1(8db709877311b6d2796353fc9a44a820937e35c2) )
 
-	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU) marked 07, not read protected
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked 07, not read protected
 	ROM_LOAD( "fearlessp_07.u33", 0x000000, 0x10000, CRC(7dae4900) SHA1(bbf7ba7c9e95ff2ffeb1dc0fc7ccedd4da274d01) )
 
 	ROM_REGION( 0x3000000, "gfx1", 0 ) // FIXED BITS (0xxxxxxx) (graphics are 7bpp)
@@ -707,7 +508,7 @@ ROM_START( fearless )
 	ROM_LOAD32_WORD( "fearlessp_u18_cg-2l.u18", 0x2000000, 0x800000, CRC(07623d66) SHA1(041d5e44917bc16caa720ea98bdc0a4f5fb4b8e0) )
 	ROM_LOAD32_WORD( "fearlessp_u17_cg-2h.u17", 0x2000002, 0x800000, CRC(756fe1f2) SHA1(48ee81c5fa4808406b57b2521b836db3ff5a7fa9) )
 
-	ROM_REGION( 0x800000, "ics", 0 )
+	ROM_REGION( 0x800000, "xa:ics", 0 )
 	ROM_LOAD( "fearlessp_u25_music0.u25", 0x000000, 0x400000, CRC(a015b9b1) SHA1(7b129c59acd523dec82e58a75d873bbc5341fb28) )
 	ROM_LOAD( "fearlessp_u26_music1.u26", 0x400000, 0x400000, CRC(9d5f18da) SHA1(42e5224c1af0898cc2e02b2e051ea8b629d5fb6d) )
 ROM_END
@@ -719,7 +520,7 @@ ROM_START( superkds )
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "superkids_s019cn.u37", 0x000000, 0x80000, CRC(1a7f17dd) SHA1(ba20c0f521bff2f5ae2103ea49bd413b0e6459ba) )
 
-	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU) marked 07, not read protected
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked 07, not read protected
 	ROM_LOAD( "superkids_mx10exa.u33", 0x000000, 0x10000, CRC(8baf5ba2) SHA1(2f8c2c48e756264e593bce7c09260e50d5cac827) ) // sticker marked G6
 
 	ROM_REGION( 0x2000000, "gfx1", 0 ) // FIXED BITS (0xxxxxxx) (graphics are 7bpp)
@@ -728,7 +529,7 @@ ROM_START( superkds )
 	ROM_LOAD32_WORD( "superkids_cg-1l.u14", 0x1000000, 0x800000, CRC(57081c96) SHA1(886ac14ad1c9ce8c7a67bbfc6c00e7c75be634dc) )
 	ROM_LOAD32_WORD( "superkids_cg-1h.u13", 0x1000002, 0x800000, CRC(cd1e41ef) SHA1(a40bcbd97fa3e742e8f9c7b7c7d8879175bf10ee) )
 
-	ROM_REGION( 0x800000, "ics", 0 )
+	ROM_REGION( 0x800000, "xa:ics", 0 )
 	ROM_LOAD( "superkids_music0.u25", 0x000000, 0x400000, CRC(d7c37216) SHA1(ffcf7f1bf3093eb34ad0ae2cc89062de45b9d420) )
 	ROM_LOAD( "superkids_music1.u26", 0x400000, 0x400000, CRC(5f080dbf) SHA1(f02330db3336f6606aae9f5a9eca819701caa3bf) )
 ROM_END
@@ -741,7 +542,7 @@ ROM_START( icescape ) // IGS PCB-0433-16-GK (same PCB as Fearless Pinocchio) - H
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "icescape_v-104fa.u37", 0x000000, 0x80000, CRC(e3552726) SHA1(bac34ac4fce1519c1bc8020064090e77b5c2a629) ) // TMS27C240
 
-	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU) marked O7
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked O7
 	ROM_LOAD( "o7.u33", 0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x2000000, "gfx1", 0 ) // FIXED BITS (0xxxxxxx) (graphics are 7bpp)
@@ -751,7 +552,7 @@ ROM_START( icescape ) // IGS PCB-0433-16-GK (same PCB as Fearless Pinocchio) - H
 	ROM_LOAD32_WORD( "icescape_fa_cg_u13.u13", 0x1000002, 0x800000, NO_DUMP )
 	// u17 and u18 not populated
 
-	ROM_REGION( 0x400000, "ics", 0 )
+	ROM_REGION( 0x400000, "xa:ics", 0 )
 	ROM_LOAD( "icescape_fa_sp_u25.u25", 0x000000, 0x200000, CRC(a01febd6) SHA1(6abe8b700c5725909939421e2493940421fc823f) ) // M27C160
 	ROM_LOAD( "icescape_fa_sp_u26.u26", 0x200000, 0x200000, CRC(35085613) SHA1(bdc6ecf5ee6fd095a56e33e8ce893fe05bcb426c) ) // M27C160
 ROM_END
@@ -773,6 +574,6 @@ void igs_fear_state::init_igs_icescape()
 
 } // anonymous namespace
 
-GAME( 2005, superkds, 0, igs_fear_xor, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS (Golden Dragon Amusement license)", "Super Kids / Jiu Nan Xiao Yingxiong (S019CN)", 0 )
+GAME( 2005, superkds, 0, igs_fear_xor, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS (Golden Dragon Amusement license)", "Super Kids / Jiu Nan Xiao Yingxiong (S019CN)", MACHINE_NODEVICE_LAN )
 GAME( 2006, fearless, 0, igs_fear_xor, fear,     igs_fear_state, init_igs_fear,     ROT0, "IGS (American Alpha license)",          "Fearless Pinocchio (V101US)",                  0 )
 GAME( 2006, icescape, 0, igs_fear,     fear,     igs_fear_state, init_igs_icescape, ROT0, "IGS",                                   "Icescape (V104FA)",                            MACHINE_IS_SKELETON ) // IGS FOR V104FA 2006-11-02

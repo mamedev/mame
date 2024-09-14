@@ -2629,7 +2629,8 @@ void xa_cpu::check_interrupts()
 void xa_cpu::execute_set_input(int inputnum, int state)
 {
 	// This is not accurate, just test code for fearless/superkds
-	m_irq_pending |= 1 << inputnum;
+	if (state)
+		m_irq_pending |= 1 << inputnum;
 	check_interrupts();
 }
 

@@ -13,9 +13,9 @@ These games use the IGS027A processor.
 #include "igs017_igs031.h"
 #include "igs027a.h"
 #include "pgmcrypt.h"
+#include "xamcu.h"
 
 #include "cpu/arm7/arm7core.h"
-#include "cpu/xa/xa.h"
 
 #include "machine/i8255.h"
 #include "machine/nvram.h"
@@ -72,7 +72,7 @@ protected:
 private:
 	optional_shared_ptr<u32> m_igs_mainram;
 	required_device<igs027a_cpu_device> m_maincpu;
-	required_device<mx10exa_cpu_device> m_xa;
+	required_device<igs_xa_mcu_subcpu_device> m_xa;
 	required_device<i8255_device> m_ppi;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	required_device<okim6295_device> m_oki;
@@ -88,17 +88,7 @@ private:
 	u32 m_xor_table[0x100];
 	u8 m_io_select[2];
 
-	u8 m_port2_latch;
-	u8 m_port0_latch;
-	u32 m_xa_cmd;
-	u32 m_xa_ret0;
 	bool m_irq_from_igs031;
-	bool m_irq_from_xa;
-	s8 m_num_params;
-	u8 m_port0_dat;
-	u8 m_port1_dat;
-	u8 m_port2_dat;
-	u8 m_port3_dat;
 
 	u32 m_igs_40000014;
 
@@ -120,14 +110,7 @@ private:
 
 	void igs_40000014_w(offs_t offset, u32 data, u32 mem_mask);
 
-	u8 mcu_p0_r();
-	u8 mcu_p1_r();
-	u8 mcu_p2_r();
-	u8 mcu_p3_r();
-	void mcu_p0_w(uint8_t data);
-	void mcu_p1_w(uint8_t data);
-	void mcu_p2_w(uint8_t data);
-	void mcu_p3_w(uint8_t data);
+	void xa_irq(int state);
 
 	u32 gpio_r();
 	void oki_bank_w(offs_t offset, u8 data);
@@ -138,17 +121,7 @@ private:
 
 void igs_m027xa_state::machine_reset()
 {
-	m_port2_latch = 0;
-	m_port0_latch = 0;
-	m_xa_cmd = 0;
-	m_xa_ret0 = 0;
 	m_irq_from_igs031 = false;
-	m_irq_from_xa = false;
-	m_num_params = 0;
-	m_port0_dat = 0;
-	m_port1_dat = 0;
-	m_port2_dat = 0;
-	m_port3_dat = 0;
 
 	m_igs_40000014 = 0;
 }
@@ -162,17 +135,7 @@ void igs_m027xa_state::machine_start()
 	save_item(NAME(m_xor_table));
 	save_item(NAME(m_io_select));
 
-	save_item(NAME(m_port2_latch));
-	save_item(NAME(m_port0_latch));
-	save_item(NAME(m_xa_cmd));
-	save_item(NAME(m_xa_ret0));
 	save_item(NAME(m_irq_from_igs031));
-	save_item(NAME(m_irq_from_xa));
-	save_item(NAME(m_num_params));
-	save_item(NAME(m_port0_dat));
-	save_item(NAME(m_port1_dat));
-	save_item(NAME(m_port2_dat));
-	save_item(NAME(m_port3_dat));
 
 	save_item(NAME(m_igs_40000014));
 }
@@ -202,7 +165,8 @@ void igs_m027xa_state::main_map(address_map &map)
 
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027xa_state::xor_table_w));
 
-	map(0x58000000, 0x580000ff).rw(FUNC(igs_m027xa_state::xa_r), FUNC(igs_m027xa_state::xa_w));
+	map(0x58000000, 0x58000003).umask32(0x0000ffff).rw(m_xa, FUNC(igs_xa_mcu_subcpu_device::response_r), FUNC(igs_xa_mcu_subcpu_device::cmd_w));
+	map(0x58000000, 0x58000003).umask32(0xffff0000).w(m_xa, FUNC(igs_xa_mcu_subcpu_device::irqack_w));
 }
 
 void igs_m027xa_state::main_xor_map(address_map &map)
@@ -235,18 +199,20 @@ static INPUT_PORTS_START( base )
 
 	PORT_START("TEST2")
 	PORT_BIT( 0x00007, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00008, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop Reel 2 / Small")
-	PORT_BIT( 0x00010, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop Reel 3 / Take Score")
-	PORT_BIT( 0x00020, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop Reel 1 / Double Up")
-	PORT_BIT( 0xfffc0, IP_ACTIVE_LOW, IPT_UNUSED ) // peripheral interrupts in bits 8 and 9 - see gpio_r
+	PORT_BIT( 0x00008, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )  PORT_NAME("Stop Reel 2 / Small")
+	PORT_BIT( 0x00010, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )  PORT_NAME("Stop Reel 3 / Take Score")
+	PORT_BIT( 0x00020, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )  PORT_NAME("Stop Reel 1 / Double Up")
+	PORT_BIT( 0x001c0, IP_ACTIVE_LOW, IPT_UNUSED )      // IGS031 interrupt in bit 8 - see gpio_r
+	PORT_BIT( 0x00200, IP_ACTIVE_LOW, IPT_CUSTOM )      PORT_READ_LINE_DEVICE_MEMBER("xa", igs_xa_mcu_subcpu_device, irq_r)
+	PORT_BIT( 0xffc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x01, DEF_STR(On) )
 	PORT_DIPNAME( 0x02, 0x02, "Non Stop" )                 PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 	PORT_DIPSETTING(    0x02, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 	PORT_DIPNAME( 0x04, 0x04, "Password" )                 PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR(No) )
 	PORT_DIPSETTING(    0x04, DEF_STR(Yes) )
@@ -270,19 +236,19 @@ static INPUT_PORTS_START( base )
 	PORT_DIPSETTING(    0x02, DEF_STR(Yes) )
 	PORT_DIPSETTING(    0x03, DEF_STR(No) )
 	PORT_DIPNAME( 0x04, 0x04, "Play Score" )               PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 	PORT_DIPSETTING(    0x04, DEF_STR(No) )
-	PORT_DIPNAME( 0x08, 0x08, "Hand Count" )               PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x08, 0x08, "Hand Count" )               PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 	PORT_DIPNAME( 0x30, 0x30, "Hold Pair" )                PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x30, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x20, "Regular" )
 	PORT_DIPSETTING(    0x00, "Georgia" )
 	PORT_DIPSETTING(    0x10, "Georgia (duplicate)" )
-	PORT_DIPSETTING(    0x20, "Regular" )
-	PORT_DIPSETTING(    0x30, DEF_STR(Off) )
 	PORT_DIPNAME( 0x40, 0x40, "Auto Hold" )                PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 	PORT_DIPSETTING(    0x40, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
 
 	PORT_START("DSW3")
@@ -295,20 +261,6 @@ static INPUT_PORTS_START( base )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
 INPUT_PORTS_END
-
-
-u16 igs_m027xa_state::xa_r(offs_t offset, u16 mem_mask)
-{
-	u32 data = ~u32(0);
-
-	switch (offset * 2)
-	{
-	case 0:
-		data = m_xa_ret0;
-		break;
-	}
-	return data;
-}
 
 
 void igs_m027xa_state::output_w(u8 data)
@@ -352,8 +304,6 @@ u32 igs_m027xa_state::gpio_r()
 	u32 ret = m_io_test[2].read_safe(0xfffff);
 	if (m_irq_from_igs031)
 		ret &= ~(u32(1) << 8);
-	if (m_irq_from_xa)
-		ret &= ~(u32(1) << 9);
 	return ret;
 }
 
@@ -380,114 +330,11 @@ void igs_m027xa_state::io_select_w(u8 data)
 	m_io_select[Select] = data;
 }
 
-void igs_m027xa_state::xa_w(offs_t offset, u16 data, u16 mem_mask)
+
+void igs_m027xa_state::xa_irq(int state)
 {
-	m_xa_cmd = data;
-
-	if (offset == 0)
-	{
-		m_num_params--;
-
-		if (m_num_params <= 0)
-		{
-			LOGMASKED(LOG_DEBUG, "---------------m_xa_cmd is %02x size %02x\n", (data & 0xff00)>>8, data & 0xff);
-			m_num_params = data & 0xff;
-		}
-		else
-		{
-			LOGMASKED(LOG_DEBUG, "-------------------------- param %04x\n", data & 0xffff);
-		}
-		m_xa->set_input_line(XA_EXT_IRQ0, ASSERT_LINE);
-	}
-	else
-	{
-		m_irq_from_xa = false;
-		LOGMASKED(LOG_DEBUG, "%s: unhandled xa_w %04x %08x (%08x)\n", machine().describe_context(), offset * 2, data, mem_mask);
-	}
-}
-
-
-u8 igs_m027xa_state::mcu_p0_r()
-{
-	u8 ret = m_port0_latch;
-	LOGMASKED(LOG_DEBUG, "%s: COMMAND READ LOWER mcu_p0_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
-	return ret;
-}
-
-u8 igs_m027xa_state::mcu_p1_r()
-{
-	LOGMASKED(LOG_DEBUG, "%s: mcu_p1_r()\n", machine().describe_context());
-	return m_port1_dat;
-}
-
-u8 igs_m027xa_state::mcu_p2_r()
-{
-	u8 ret = m_port2_latch;
-	LOGMASKED(LOG_DEBUG, "%s: COMMAND READ mcu_p2_r() returning %02x with port3 as %02x\n", machine().describe_context(), ret, m_port3_dat);
-	return m_port2_latch;
-}
-
-u8 igs_m027xa_state::mcu_p3_r()
-{
-	LOGMASKED(LOG_DEBUG, "%s: mcu_p3_r()\n", machine().describe_context());
-	return m_port3_dat;
-}
-
-template <typename T>
-constexpr bool posedge(T oldval, T val, unsigned bit)
-{
-	return BIT(~oldval & val, bit);
-}
-
-template <typename T>
-constexpr bool negedge(T oldval, T val, unsigned bit)
-{
-	return BIT(oldval & ~val, bit);
-}
-
-void igs_m027xa_state::mcu_p0_w(uint8_t data)
-{
-	LOGMASKED(LOG_DEBUG, "%s: mcu_p0_w() %02x with port 3 as %02x and port 1 as %02x\n", machine().describe_context(), data, m_port3_dat, m_port1_dat);
-	m_port0_dat = data;
-}
-
-void igs_m027xa_state::mcu_p1_w(uint8_t data)
-{
-	LOGMASKED(LOG_DEBUG, "%s: mcu_p1_w() %02x\n", machine().describe_context(), data);
-	m_port1_dat = data;
-}
-
-void igs_m027xa_state::mcu_p2_w(uint8_t data)
-{
-	m_port2_dat = data;
-	LOGMASKED(LOG_DEBUG, "%s: mcu_p2_w() %02x with port 3 as %02x\n", machine().describe_context(), data, m_port3_dat);
-}
-
-void igs_m027xa_state::mcu_p3_w(uint8_t data)
-{
-	u8 oldport3 = m_port3_dat;
-	m_port3_dat = data;
-	LOGMASKED(LOG_DEBUG, "%s: mcu_p3_w() %02x - do latches oldport3 %02x newport3 %02x\n", machine().describe_context(), data, oldport3, m_port3_dat);
-
-	if (posedge(oldport3, m_port3_dat, 5))
-	{
-		m_irq_from_xa = true;
+	if (state)
 		m_maincpu->trigger_irq(3);
-	}
-	// high->low transition on bit 0x80 must read into latches!
-	if (negedge(oldport3, m_port3_dat, 7))
-	{
-		LOGMASKED(LOG_DEBUG, "read command [%d] = [%04x]\n", m_port1_dat & 7, m_xa_cmd);
-		m_port2_latch = (m_xa_cmd & 0xff00) >> 8;
-		m_port0_latch = m_xa_cmd & 0x00ff;
-	}
-
-	if (negedge(oldport3, m_port3_dat, 6))
-	{
-		uint32_t dat = (m_port2_dat << 8) | m_port0_dat;
-		LOGMASKED(LOG_DEBUG, "write command [%d] = [%04x]\n", m_port1_dat & 7, dat);
-		m_xa_ret0 = dat;
-	}
 }
 
 u32 igs_m027xa_state::external_rom_r(offs_t offset)
@@ -511,7 +358,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 
 	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
 	{
-		m_irq_from_igs031 = true;
+		m_irq_from_igs031 = true; // FIXME: this should be cleared at some point
 		m_maincpu->trigger_irq(3);
 	}
 	if (scanline == 0 && (m_igs_40000014 & 1))
@@ -528,15 +375,8 @@ void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MX10EXA(config, m_xa, 10'000'000); // MX10EXAQC (Philips 80C51 XA) unknown frequency
-	m_xa->port_in_cb<0>().set(FUNC(igs_m027xa_state::mcu_p0_r));
-	m_xa->port_in_cb<1>().set(FUNC(igs_m027xa_state::mcu_p1_r));
-	m_xa->port_in_cb<2>().set(FUNC(igs_m027xa_state::mcu_p2_r));
-	m_xa->port_in_cb<3>().set(FUNC(igs_m027xa_state::mcu_p3_r));
-	m_xa->port_out_cb<0>().set(FUNC(igs_m027xa_state::mcu_p0_w));
-	m_xa->port_out_cb<1>().set(FUNC(igs_m027xa_state::mcu_p1_w));
-	m_xa->port_out_cb<2>().set(FUNC(igs_m027xa_state::mcu_p2_w));
-	m_xa->port_out_cb<3>().set(FUNC(igs_m027xa_state::mcu_p3_w));
+	IGS_XA_SUBCPU(config, m_xa, 10'000'000); // MX10EXAQC (Philips 80C51 XA) unknown frequency
+	m_xa->irq().set(FUNC(igs_m027xa_state::xa_irq));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -598,7 +438,7 @@ ROM_START( haunthig )
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "hauntedhouse_ver-109us.u34", 0x000000, 0x80000, CRC(300fed78) SHA1(afa4c8855cd780c57d4f92ea6131ed4e77063268) )
 
-	ROM_REGION( 0x10000, "xa", 0 )
+	ROM_REGION( 0x10000, "xa:mcu", 0 )
 	ROM_LOAD( "hauntedhouse.u17", 0x000000, 0x10000, BAD_DUMP CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // not dumped for this set
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -625,7 +465,7 @@ ROM_START( haunthiga ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, O
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "hauntedhouse_ver-101us.u34", 0x000000, 0x80000, CRC(4bf045d4) SHA1(78c848fd69961df8d9b75f92ad57c3534fbf08db) )
 
-	ROM_REGION( 0x10000, "xa", 0 )
+	ROM_REGION( 0x10000, "xa:mcu", 0 )
 	ROM_LOAD( "hauntedhouse.u17", 0x000000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // MX10EXAQC (80C51 XA based MCU) marked J9, not read protected?
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -652,7 +492,7 @@ ROM_START( crzybugs ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-204us.u23", 0x000000, 0x80000, CRC(d1232462) SHA1(685a292f39bf57a80d6ef31289cf9f673ba06dd4) ) // MX27C4096
 
-	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU) marked J9
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked J9
 	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -675,7 +515,7 @@ ROM_START( crzybugsa )
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-202us.u23", 0x000000, 0x80000, CRC(210da1e6) SHA1(c726497bebd25d6a9053e331b4c26acc7e2db0b2) ) // MX27C4096
 
-	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU)
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
 	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -698,7 +538,7 @@ ROM_START( crzybugsb )
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-202us.u23", 0x000000, 0x80000, CRC(129e36e9) SHA1(53f20bc3792249de8ef276f84283baa9abd30acd) ) // MX27C4096
 
-	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU)
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
 	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -721,7 +561,7 @@ ROM_START( crzybugsj ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, O
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-103jp.u34", 0x000000, 0x200000, CRC(1e35ed79) SHA1(0e4f8b706cdfcaf2aacdc40eec422df9d865b311) )
 
-	ROM_REGION( 0x10000, "xa", 0 )
+	ROM_REGION( 0x10000, "xa:mcu", 0 )
 	ROM_LOAD( "e9.u17", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // MX10EXAQC (80C51 XA based MCU) marked E9, same as haunthig
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -749,7 +589,7 @@ ROM_START( tripfev ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Oki
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "triple_fever_u23_v107_us.u23", 0x000000, 0x80000, CRC(aa56d888) SHA1(0b8b2765079259b76ea803289841d867c33c8cb2) ) // 27C4096
 
-	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU) marked P7
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked P7
 	ROM_LOAD( "p7.u27", 0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -771,7 +611,7 @@ ROM_START( wldfruit ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "wild_fruit_v-208us.u23", 0x000000, 0x80000, CRC(d43398f1) SHA1(ecc4bd5cb6da16b35c63b843cf7beec1ab84ed9d) ) // M27C4002
 
-	ROM_REGION( 0x10000, "xa", 0 ) // MX10EXAQC (80C51 XA based MCU) marked J9
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked J9
 	ROM_LOAD( "j9.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -852,9 +692,9 @@ void igs_m027xa_state::init_wldfruit()
 GAME(  2008, haunthig,  0,        igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", MACHINE_IS_SKELETON ) // IGS FOR V109US 2008 10 14
 GAME(  2006, haunthiga, haunthig, igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", MACHINE_IS_SKELETON ) // IGS FOR V101US 2006 08 23
 
-GAMEL( 2009, crzybugs,  0,        igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", MACHINE_IS_SKELETON, layout_crzybugs ) // IGS FOR V204US 2009 5 19
-GAMEL( 2006, crzybugsa, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", MACHINE_IS_SKELETON, layout_crzybugs ) // IGS FOR V100US 2006 3 29 but also V202US string
-GAMEL( 2005, crzybugsb, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", MACHINE_IS_SKELETON, layout_crzybugs ) // FOR V100US 2005 7 20 but also V200US string
+GAMEL( 2009, crzybugs,  0,        igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", MACHINE_NOT_WORKING, layout_crzybugs ) // IGS FOR V204US 2009 5 19
+GAMEL( 2006, crzybugsa, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", MACHINE_NOT_WORKING, layout_crzybugs ) // IGS FOR V100US 2006 3 29 but also V202US string
+GAMEL( 2005, crzybugsb, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", MACHINE_NOT_WORKING, layout_crzybugs ) // FOR V100US 2005 7 20 but also V200US string
 
 GAME(  2007, crzybugsj, crzybugs, igs_mahjong_xa,     base,     igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_IS_SKELETON ) // IGS FOR V101JP 2007 06 08
 
