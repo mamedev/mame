@@ -10,22 +10,20 @@
 
 DECLARE_DEVICE_TYPE(TMP95C061, tmp95c061_device)
 
-enum Port
-{
-	PORT_1, // 8 bit I/O. Shared with D8-D15
-	PORT_2, // 8 bit output only. Shared with A16-A23
-	PORT_5, // 4 bit I/O. Shared with HWR, BUSRQ, BUSAK, RW
-	PORT_6, // 6 bit I/O. Shared with CS0, CS1, CS3/LCAS, RAS, REFOUT
-	PORT_7, // 8 bit I/O. Shared with PG0-OUT, PG1-OUT
-	PORT_8, // 6 bit I/O. Shared with TXD0, TXD1, RXD0, RXD1, CTS0, SCLK0, SCLK1
-	PORT_9, // 4 bit input only. Shared with AN0-AN3
-	PORT_A, // 4 bit I/O. Shared with WAIT, TI0, TO1, TO2
-	PORT_B, // 8 bit I/O. Shared with TI4/INT4, TI5/INT5, TI6/INT6, TI7/INT7, TO4, TO5, TO6
-	NUM_PORTS
-};
 
 class tmp95c061_device : public tlcs900h_device
 {
+	static constexpr uint8_t PORT_1 = 0; // 8 bit I/O. Shared with D8-D15
+	static constexpr uint8_t PORT_2 = 1; // 8 bit output only. Shared with A16-A23
+	static constexpr uint8_t PORT_5 = 2; // 4 bit I/O. Shared with HWR, BUSRQ, BUSAK, RW
+	static constexpr uint8_t PORT_6 = 3; // 6 bit I/O. Shared with CS0, CS1, CS3/LCAS, RAS, REFOUT
+	static constexpr uint8_t PORT_7 = 4; // 8 bit I/O. Shared with PG0-OUT, PG1-OUT
+	static constexpr uint8_t PORT_8 = 5; // 6 bit I/O. Shared with TXD0, TXD1, RXD0, RXD1, CTS0, SCLK0, SCLK1
+	static constexpr uint8_t PORT_9 = 6; // 4 bit input only. Shared with AN0-AN3
+	static constexpr uint8_t PORT_A = 7; // 4 bit I/O. Shared with WAIT, TI0, TO1, TO2
+	static constexpr uint8_t PORT_B = 8; // 8 bit I/O. Shared with TI4/INT4, TI5/INT5, TI6/INT6, TI7/INT7, TO4, TO5, TO6
+	static constexpr uint8_t NUM_PORTS = 9;
+
 public:
 	// construction/destruction
 	tmp95c061_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -64,10 +62,10 @@ protected:
 	void update_porta();
 
 private:
-	template <Port> uint8_t port_r();
-	template <Port> void port_w(uint8_t data);
-	template <Port> void port_cr_w(uint8_t data);
-	template <Port> void port_fc_w(uint8_t data);
+	template <uint8_t> uint8_t port_r();
+	template <uint8_t> void port_w(uint8_t data);
+	template <uint8_t> void port_cr_w(uint8_t data);
+	template <uint8_t> void port_fc_w(uint8_t data);
 	uint8_t trun_r();
 	void trun_w(uint8_t data);
 	void treg01_w(offs_t offset, uint8_t data);

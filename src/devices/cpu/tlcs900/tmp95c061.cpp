@@ -53,47 +53,47 @@ tmp95c061_device::tmp95c061_device(const machine_config &mconfig, const char *ta
 {
 }
 
-template <Port P>
+template <uint8_t P>
 void tmp95c061_device::port_w(uint8_t data)
 {
 	m_port_latch[P] = data;
 	m_port_write[P](0, data, 0xff);
 }
 
-template <Port P>
+template <uint8_t P>
 uint8_t tmp95c061_device::port_r()
 {
 	return m_port_read[P](0);
 }
 
-template <Port P>
+template <uint8_t P>
 void tmp95c061_device::port_cr_w(uint8_t data)
 {
 	m_port_control[P] = data;
 }
 
-template <Port P>
+template <uint8_t P>
 void tmp95c061_device::port_fc_w(uint8_t data)
 {
 	m_port_function[P] = data;
 }
 
 template<>
-void tmp95c061_device::port_w <PORT_A> (uint8_t data)
+void tmp95c061_device::port_w <tmp95c061_device::PORT_A> (uint8_t data)
 {
 	m_port_latch[PORT_A] = data;
 	update_porta();
 }
 
 template<>
-void tmp95c061_device::port_cr_w <PORT_A> (uint8_t data)
+void tmp95c061_device::port_cr_w <tmp95c061_device::PORT_A> (uint8_t data)
 {
 	m_port_control[PORT_A] = data;
 	update_porta();
 }
 
 template<>
-void tmp95c061_device::port_fc_w <PORT_A> (uint8_t data)
+void tmp95c061_device::port_fc_w <tmp95c061_device::PORT_A> (uint8_t data)
 {
 	m_port_function[PORT_A] = data;
 	update_porta();
