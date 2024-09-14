@@ -173,7 +173,7 @@ void igs_m027_state::machine_start()
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 	std::fill(std::begin(m_io_select), std::end(m_io_select), 0xff);
 
-	auto const *region = memregion("oki");
+	auto *const region = memregion("oki");
 	for (auto &bank : m_okibank)
 	{
 		if (region && bank)

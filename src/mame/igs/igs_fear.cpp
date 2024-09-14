@@ -76,8 +76,8 @@ private:
 
 	void xor_table_w(offs_t offset, u8 data);
 
-	u32 igs027_gpio_r(offs_t offset, u32 mem_mask);
-	void igs027_gpio_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 igs027_gpio_r();
+	void igs027_gpio_w(u8 data);
 
 	u32 xa_r(offs_t offset, u32 mem_mask);
 	void xa_w(offs_t offset, u32 data, u32 mem_mask);
@@ -115,7 +115,7 @@ private:
 	u8 m_port2_latch;
 	u8 m_port0_latch;
 
-	u32 m_gpio_o;
+	u8 m_gpio_o;
 
 	u32 m_xa_cmd;
 	u32 m_xa_ret0;
@@ -246,8 +246,6 @@ void igs_fear_state::main_map(address_map &map)
 	map(0x38004000, 0x38007fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x38008500, 0x380085ff).rw(FUNC(igs_fear_state::xa_r), FUNC(igs_fear_state::xa_w));
 
-	map(0x40000000, 0x400003ff).rw(FUNC(igs_fear_state::igs027_gpio_r), FUNC(igs_fear_state::igs027_gpio_w));
-
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_fear_state::xor_table_w));
 
 	map(0x58000000, 0x58000003).portr("IN0");
@@ -324,61 +322,61 @@ INPUT_PORTS_START( superkds )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x01, "Scene" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x01, "Scene" )                   PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "Volcano" )
 	PORT_DIPSETTING(    0x02, "Jungle" )
 	PORT_DIPSETTING(    0x01, "Ice Field" )
 	PORT_DIPSETTING(    0x00, "Ice Field (duplicate)" )
-	PORT_DIPNAME( 0x04, 0x00, "Ticket" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, "Ticket" )                  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0xf8, 0x00, "Ticket Table" ) PORT_DIPLOCATION("SW1:4,5,6,7,8")
-	PORT_DIPSETTING(    0xf8, "Table1" )
-	PORT_DIPSETTING(    0xf0, "Table2" )
-	PORT_DIPSETTING(    0xe8, "Table3" )
-	PORT_DIPSETTING(    0xe0, "Table4" )
-	PORT_DIPSETTING(    0xd8, "Table5" )
-	PORT_DIPSETTING(    0xd0, "Table6" )
-	PORT_DIPSETTING(    0xc8, "Table7" )
-	PORT_DIPSETTING(    0xc0, "Table8" )
-	PORT_DIPSETTING(    0xb8, "Table9" )
-	PORT_DIPSETTING(    0xb0, "Table10" )
-	PORT_DIPSETTING(    0xa8, "Table11" )
-	PORT_DIPSETTING(    0xa0, "Table12" )
-	PORT_DIPSETTING(    0x98, "Table13" )
-	PORT_DIPSETTING(    0x90, "Table14" )
-	PORT_DIPSETTING(    0x88, "Table15" )
-	PORT_DIPSETTING(    0x80, "Table16" )
-	PORT_DIPSETTING(    0x78, "Table17" )
-	PORT_DIPSETTING(    0x70, "Table18" )
-	PORT_DIPSETTING(    0x68, "Table19" )
-	PORT_DIPSETTING(    0x60, "Table20" )
-	PORT_DIPSETTING(    0x58, "Table21" )
-	PORT_DIPSETTING(    0x50, "Table22" )
-	PORT_DIPSETTING(    0x48, "Table23" )
-	PORT_DIPSETTING(    0x40, "Table24" )
-	PORT_DIPSETTING(    0x38, "Table25" )
-	PORT_DIPSETTING(    0x30, "Table26" )
-	PORT_DIPSETTING(    0x28, "Table27" )
-	PORT_DIPSETTING(    0x20, "Table28" )
-	PORT_DIPSETTING(    0x18, "Table29" )
-	PORT_DIPSETTING(    0x10, "Table30" )
-	PORT_DIPSETTING(    0x08, "Table31" )
-	PORT_DIPSETTING(    0x00, "Table32" )
+	PORT_DIPNAME( 0xf8, 0x00, "Ticket Payout Table" )     PORT_DIPLOCATION("SW1:4,5,6,7,8")
+	PORT_DIPSETTING(    0xf8, "3 2 2 1 1 0 0 0" )
+	PORT_DIPSETTING(    0xf0, "3 2 2 2 1 1 1 1" )
+	PORT_DIPSETTING(    0xe8, "3 2 2 2 2 2 2 2" )
+	PORT_DIPSETTING(    0xe0, "3 3 3 3 3 3 3 3" )
+	PORT_DIPSETTING(    0xd8, "6 5 4 3 2 1 0 0" )
+	PORT_DIPSETTING(    0xd0, "6 5 4 3 3 2 1 1" )
+	PORT_DIPSETTING(    0xc8, "6 5 4 4 3 3 2 2" )
+	PORT_DIPSETTING(    0xc0, "6 5 5 4 4 3 3 3" )
+	PORT_DIPSETTING(    0xb8, "9 7 6 5 3 2 1 0" )
+	PORT_DIPSETTING(    0xb0, "9 7 6 5 4 3 2 1" )
+	PORT_DIPSETTING(    0xa8, "9 8 7 6 5 4 3 2" )
+	PORT_DIPSETTING(    0xa0, "9 8 7 6 5 4 3 3" )
+	PORT_DIPSETTING(    0x98, "12 10 8 6 5 3 1 0" )
+	PORT_DIPSETTING(    0x90, "12 10 8 7 5 4 2 1" )
+	PORT_DIPSETTING(    0x88, "12 10 9 7 6 4 3 2" )
+	PORT_DIPSETTING(    0x80, "12 10 9 8 6 5 4 3" )
+	PORT_DIPSETTING(    0x78, "20 17 14 11 8 5 2 0" )
+	PORT_DIPSETTING(    0x70, "20 17 14 11 9 6 3 1" )
+	PORT_DIPSETTING(    0x68, "20 17 14 12 9 7 4 2" )
+	PORT_DIPSETTING(    0x60, "20 17 15 12 10 7 5 3" )
+	PORT_DIPSETTING(    0x58, "30 25 21 17 12 8 4 0" )
+	PORT_DIPSETTING(    0x50, "30 25 21 17 13 9 5 1" )
+	PORT_DIPSETTING(    0x48, "30 26 22 18 14 10 6 2" )
+	PORT_DIPSETTING(    0x40, "30 26 22 18 14 10 6 3" )
+	PORT_DIPSETTING(    0x38, "40 34 28 22 17 11 5 0" )
+	PORT_DIPSETTING(    0x30, "40 34 28 23 17 12 6 1" )
+	PORT_DIPSETTING(    0x28, "40 34 29 23 18 12 7 2" )
+	PORT_DIPSETTING(    0x20, "40 34 29 24 18 13 8 3" )
+	PORT_DIPSETTING(    0x18, "50 42 35 28 21 14 7 0" )
+	PORT_DIPSETTING(    0x10, "50 43 36 29 22 15 8 1" )
+	PORT_DIPSETTING(    0x08, "50 43 36 29 22 15 8 2" )
+	PORT_DIPSETTING(    0x00, "50 43 36 29 23 16 9 3" )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Free Play" ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin/Credit" ) PORT_DIPLOCATION("SW2:2,3")
-	PORT_DIPSETTING(    0x06, "1" )
-	PORT_DIPSETTING(    0x04, "2" )
-	PORT_DIPSETTING(    0x02, "3" )
-	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x08, 0x08, "Demo BGM" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Free_Play) )        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR(Coin_A) )           PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x04, DEF_STR(2C_1C) )
+	PORT_DIPSETTING(    0x02, DEF_STR(3C_1C) )
+	PORT_DIPSETTING(    0x00, DEF_STR(4C_1C) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR(Demo_Sounds) )      PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x70, 0x00, "Slave" ) PORT_DIPLOCATION("SW2:5,6,7")
+	PORT_DIPNAME( 0x70, 0x00, "Slave ID" )                PORT_DIPLOCATION("SW2:5,6,7")
 	PORT_DIPSETTING(    0x70, "0" )
 	PORT_DIPSETTING(    0x60, "1" )
 	PORT_DIPSETTING(    0x50, "2" )
@@ -387,9 +385,9 @@ INPUT_PORTS_START( superkds )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x10, "6" )
 	PORT_DIPSETTING(    0x00, "Single" )
-	PORT_DIPNAME( 0x80, 0x00, "Language" ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, "Chinese" )
-	PORT_DIPSETTING(    0x00, "English" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR(Language) )         PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(Chinese) )
+	PORT_DIPSETTING(    0x00, DEF_STR(English) )
 
 	PORT_START("AN0")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(20)
@@ -425,40 +423,17 @@ void igs_fear_state::xor_table_w(offs_t offset, u8 data)
 }
 
 
-u32 igs_fear_state::igs027_gpio_r(offs_t offset, u32 mem_mask)
+u32 igs_fear_state::igs027_gpio_r()
 {
-	u32 data = ~u32(0);
-	switch (offset * 4)
-	{
-	case 0xc:
-		{
-			u8 ret = 0xff;
-			if (!BIT(m_gpio_o, 0)) ret &= m_io_dsw[0]->read();
-			if (!BIT(m_gpio_o, 1)) ret &= m_io_dsw[1]->read();
-			data = 0x2000 | (u32(ret) << 3);
-		}
-		break;
-
-	default:
-		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_gpio_r %04x (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
-		break;
-	}
-
-	return data;
+	u8 dsw = 0xff;
+	if (!BIT(m_gpio_o, 0)) dsw &= m_io_dsw[0]->read();
+	if (!BIT(m_gpio_o, 1)) dsw &= m_io_dsw[1]->read();
+	return 0x00400 | dsw;
 }
 
-void igs_fear_state::igs027_gpio_w(offs_t offset, u32 data, u32 mem_mask)
+void igs_fear_state::igs027_gpio_w(u8 data)
 {
-	switch (offset * 4)
-	{
-	case 0x18:
-		m_gpio_o = data;
-		break;
-
-	default:
-		LOGMASKED(LOG_DEBUG, "%s: unhandled igs027_gpio_w %04x %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
-		break;
-	}
+	m_gpio_o = data;
 }
 
 // TODO: trackball support in XA
@@ -666,6 +641,8 @@ void igs_fear_state::igs_fear(machine_config &config)
 {
 	IGS027A(config, m_maincpu, 50'000'000/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::main_map);
+	m_maincpu->in_port().set(FUNC(igs_fear_state::igs027_gpio_r));
+	m_maincpu->out_port().set(FUNC(igs_fear_state::igs027_gpio_w));
 
 	MX10EXA(config, m_xa, 50'000'000/3); // MX10EXAQC (Philips 80C51 XA)
 	m_xa->port_in_cb<0>().set(FUNC(igs_fear_state::mcu_p0_r));
