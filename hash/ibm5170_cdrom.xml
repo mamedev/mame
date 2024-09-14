@@ -6972,6 +6972,68 @@ Incredibly slow in tearing down even on pcipcs7 (bypass with fast forward)
 		</part>
 	</software>
 
+	<software name="freedos13rc5">
+		<description>FreeDOS 1.3 Release Candidate 5</description>
+		<year>2021</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC5" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="LiveCD" />
+			<diskarea name="cdrom">
+				<disk name="fd13live" sha1="628ff96887541f357d458138f99efffe1a73e219" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Legacy CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13lgcy" sha1="9b5e8143d9a32da94fbf06dfe406e3cd4aa41999" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Bonus CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13bns" sha1="46e472fce064db14c94d52c969f0610e1ae11922" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot Floppy" />
+			<dataarea name="flop" size="1474560">
+				<rom name="FD13BOOT.img" size="1474560" crc="d36ffc0c" sha1="0fcc214d055ef6216204a8697ca0b8e41ff3f4da" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos13">
+		<description>FreeDOS 1.3</description>
+		<year>2022</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="LiveCD" />
+			<diskarea name="cdrom">
+				<disk name="fd13live" sha1="ada640e575887a8088cb159067d2c746a9c8968a" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Legacy CD" />
+			<diskarea name="cdrom">
+				<disk name="fd13lgcy" sha1="4d9faeb8bbc76b0bffb8e834ec156345e069c861" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Bonus CD" />
+			<diskarea name="cdrom">
+				<disk name="fd13bns" sha1="46d858e5f98ea166d8137fbd86b9939d7b7250cd" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot Floppy" />
+			<dataarea name="flop" size="1474560">
+				<rom name="FD13BOOT.img" size="1474560" crc="5c647576" sha1="ec08f57f36b0bbc4d2b7613dc0857f0b43fd08e5" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nasfdu12">
 		<description>NASLite NAS Server Operating System (v1.x)</description>
 		<year>2004</year>

@@ -809,6 +809,190 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="freedos13rc5_120" cloneof="freedos13rc5_144">
+		<description>FreeDOS 1.3 Release Candidate 5 (Floppy-Only Edition, 5.25" 1.2MB)</description>
+		<year>2021</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC5" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Installer" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86BOOT.img" size="1228800" crc="25cf9bef" sha1="0c0dd504bdc30df3dda8583c4938e859421617f2" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK01.img" size="1228800" crc="f99281c8" sha1="8288bcca2bbdb631ef6cdd22b3d0fc4e3d42d217" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK02.img" size="1228800" crc="4742a3ba" sha1="08bb8dbf9080b6720a58b30ff63b3a3759c267fc" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK03.img" size="1228800" crc="463829eb" sha1="a80aa9cc94b7c71e1bffbc2d85c8285cd9dbbb7e" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK04.img" size="1228800" crc="097a6c7c" sha1="a8af7e9755710d132875238a036c5e50aa0152b6" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK05.img" size="1228800" crc="4be05057" sha1="0c63cafe348d5ea417f5303228de6b13a0bc909c" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK06.img" size="1228800" crc="691fff4d" sha1="4b9fcbe2b78b7b54e960fc9b9802f52af6d79b0b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos13rc5_144">
+		<description>FreeDOS 1.3 Release Candidate 5 (Floppy-Only Edition, 3.5" 1.44MB)</description>
+		<year>2021</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC5" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installer" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86BOOT.img" size="1474560" crc="57091652" sha1="43601d2b5f9c374490178290cb6618411b052991" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK01.img" size="1474560" crc="4926b4cf" sha1="f307505a0dd4031c1234918b189f7d89fb358811" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK02.img" size="1474560" crc="4a61e43f" sha1="be3a9bddba789d7a8cff4a4e4dd7c4e7b151b973" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK03.img" size="1474560" crc="7a6dec58" sha1="67c99ea40fb7103cb88b9236f1faa8367567e519" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK04.img" size="1474560" crc="dba0f18a" sha1="8f52c14fee0ab08b96eb25a8f862c5fd134399ff" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK05.img" size="1474560" crc="4f39fb4e" sha1="79c335d3e3b84aae62734381ed47ea33c643cc9b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos13_120" cloneof="freedos13_144">
+		<description>FreeDOS 1.3 (Floppy-Only Edition, 5.25" 1.2MB)</description>
+		<year>2022</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Installer" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86BOOT.img" size="1228800" crc="a819423e" sha1="5aec2c84293a3939eacbe67c70f6e27a6f27ca3d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK01.img" size="1228800" crc="171a38a0" sha1="aaf2c753fc306ade3973dc63b39253d6e4729f06" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK02.img" size="1228800" crc="db021279" sha1="58ce155e371ae1c181a800e8f02adc055e5b9c9f" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK03.img" size="1228800" crc="96243ef3" sha1="f3ebec3d47fe866685eae0c9908d91cbb367d32a" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK04.img" size="1228800" crc="13654150" sha1="1ef596bf5cc9a1b898f24be01160dc3064a43ef6" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK05.img" size="1228800" crc="94347568" sha1="267e49e30303d597046c0d4387b8d8dba7df53e0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK06.img" size="1228800" crc="998bc8e4" sha1="8ed59283ca57fba3d5b7d1be1b8d4fbeffcb30c6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos13_144">
+		<description>FreeDOS 1.3 (Floppy-Only Edition, 3.5" 1.44MB)</description>
+		<year>2022</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installer" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86BOOT.img" size="1474560" crc="136d3418" sha1="7f687f2d0b89ab2e4992b4800c89b8fb2c251a6a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK01.img" size="1474560" crc="f91d97d6" sha1="8a4fe73720371d7d1771134ca0558ca40f5559ba" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK02.img" size="1474560" crc="0be95607" sha1="b1a3df3f294c026a4557c909295186e05ebf9189" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK03.img" size="1474560" crc="c959f717" sha1="a5d22214218ac549d58673bddc9e5213b4f9f611" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK04.img" size="1474560" crc="da8b62b9" sha1="6530926b2af5f18df8d293e2727ea0faf5325473" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK05.img" size="1474560" crc="73ffe00e" sha1="291a97e3d4423f2551bdb35bba9ce45296e1cc15" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gem11">
 		<description>GEM Desktop 1.1</description>
 		<year>1985</year>
