@@ -15,11 +15,10 @@
  To emulate these games the Internal ROM will need dumping
  There are at least 20 other games on this and similar platforms.
 
- Hold service on boot to access input test.
+ Hold service on boot to access input test and sond test when implemented.
 
  TODO:
- * NVRAM
- * Inputs, DIP switches, coin counters and payout systems for most games
+ * I/O for remaining games
  * Coin lockout (zhongguo displays a coin error on unexpected coins)
 */
 
@@ -90,8 +89,6 @@ public:
 	void oceanpar_xor(machine_config &config) ATTR_COLD;
 	void extradraw(machine_config &config) ATTR_COLD;
 	void chessc2_xor(machine_config &config) ATTR_COLD;
-
-	void oki_128k_map(address_map &map);
 
 	void init_sdwx() ATTR_COLD;
 	void init_chessc2() ATTR_COLD;
@@ -165,8 +162,9 @@ private:
 
 	void igs_mahjong_map(address_map &map) ATTR_COLD;
 	void igs_mahjong_xor_map(address_map &map) ATTR_COLD;
-	void cjddz_map(address_map &map) ATTR_COLD;
-	void extradraw_map(address_map &map) ATTR_COLD;
+	void cjddz_xor_map(address_map &map) ATTR_COLD;
+
+	void oki_128k_map(address_map &map) ATTR_COLD;
 };
 
 void igs_m027_state::machine_start()
@@ -176,11 +174,11 @@ void igs_m027_state::machine_start()
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 	std::fill(std::begin(m_io_select), std::end(m_io_select), 0xff);
 
-	for (int i = 0; i < 2; i++)
+	auto const *region = memregion("oki");
+	for (auto &bank : m_okibank)
 	{
-		auto region = memregion("oki");
-		if (region && m_okibank[i].found())
-			m_okibank[i]->configure_entries(0, region->bytes() / 0x20000, region->base(), 0x20000);
+		if (region && bank)
+			bank->configure_entries(0, region->bytes() / 0x20000, region->base(), 0x20000);
 	}
 
 	save_item(NAME(m_xor_table));
@@ -201,42 +199,38 @@ void igs_m027_state::video_start()
 
 void igs_m027_state::igs_mahjong_map(address_map &map)
 {
-	map(0x08000000, 0x0807ffff).rom().region("user1", 0); // Game ROM
-	map(0x10000000, 0x100003ff).ram().share("igs_mainram"); // main RAM for ASIC?
-	map(0x18000000, 0x18007fff).ram().mirror(0xf8000).share("nvram");
+	map(0x0800'0000, 0x0807'ffff).rom().region("user1", 0); // Game ROM
+	map(0x1000'0000, 0x1000'03ff).ram().share("igs_mainram"); // main RAM for ASIC?
+	map(0x1800'0000, 0x1800'7fff).ram().mirror(0x0000f'8000).share("nvram");
 
-	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
+	map(0x3800'0000, 0x3800'7fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
-	map(0x38008000, 0x38008003).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x38009000, 0x38009003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x3800'8000, 0x3800'8003).umask32(0x0000'00ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x3800'9000, 0x3800'9003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027_state::xor_table_w)); // uploads XOR table to external ROM here
+	map(0x5000'0000, 0x5000'03ff).umask32(0x0000'00ff).w(FUNC(igs_m027_state::xor_table_w)); // uploads XOR table to external ROM here
 }
 
 void igs_m027_state::igs_mahjong_xor_map(address_map &map)
 {
 	igs_mahjong_map(map);
 
-	map(0x08000000, 0x0807ffff).r(FUNC(igs_m027_state::external_rom_r)); // Game ROM
+	map(0x0800'0000, 0x0807'ffff).r(FUNC(igs_m027_state::external_rom_r)); // Game ROM
 }
 
-void igs_m027_state::cjddz_map(address_map &map)
+void igs_m027_state::cjddz_xor_map(address_map &map)
 {
 	igs_mahjong_xor_map(map);
 
-	map(0x3800b000, 0x3800b003).w(FUNC(igs_m027_state::oki_128k_bank_w));
-}
-
-void igs_m027_state::extradraw_map(address_map &map)
-{
-	igs_mahjong_map(map);
+	map(0x3800'b000, 0x3800'b003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::oki_128k_bank_w));
 }
 
 void igs_m027_state::oki_128k_map(address_map &map)
 {
-	map(0x00000, 0x1ffff).bankr("okibank0");
-	map(0x20000, 0x3ffff).bankr("okibank1");
+	map(0x00000, 0x1ffff).bankr(m_okibank[0]);
+	map(0x20000, 0x3ffff).bankr(m_okibank[1]);
 }
+
 
 /***************************************************************************
 
@@ -1462,10 +1456,10 @@ void igs_m027_state::oceanpar_output_w(u8 data)
 
 void igs_m027_state::oki_128k_bank_w(u8 data)
 {
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < m_okibank.size(); i++)
 	{
-		if (m_okibank[i].found())
-			m_okibank[i]->set_entry((data >> (i * 4)) & 0xf);
+		if (m_okibank[i])
+			m_okibank[i]->set_entry(BIT(data, i * 4, 4));
 	}
 }
 
@@ -1489,7 +1483,6 @@ u32 igs_m027_state::lhdmg_gpio_r()
 	else
 		return 0xfffff ^ 0x80000;
 }
-
 
 
 CUSTOM_INPUT_MEMBER(igs_m027_state::kbd_ioport_r)
@@ -1596,7 +1589,7 @@ void igs_m027_state::cjddz_xor(machine_config &config)
 {
 	m027_xor(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::cjddz_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::cjddz_xor_map);
 	m_maincpu->in_port().set_ioport("PLAYER");
 
 	m_oki->set_addrmap(0, &igs_m027_state::oki_128k_map);
