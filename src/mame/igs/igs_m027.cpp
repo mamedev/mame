@@ -206,7 +206,7 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 {
 	map(0x08000000, 0x0807ffff).rom().region("user1", 0); // Game ROM
 	map(0x10000000, 0x100003ff).ram().share("igs_mainram"); // main RAM for ASIC?
-	map(0x18000000, 0x18007fff).ram();
+	map(0x18000000, 0x18007fff).ram().mirror(0xf8000).share("nvram");
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
@@ -235,8 +235,6 @@ void igs_m027_state::cjddz_map(address_map &map)
 void igs_m027_state::extradraw_map(address_map &map)
 {
 	igs_mahjong_map(map);
-
-	map(0x18080000, 0x1808ffff).ram(); // Extra Draw needs RAM here, maybe just a mirror, maybe due to PCB difference
 }
 
 void igs_m027_state::oki_128k_map(address_map &map)
@@ -1522,7 +1520,7 @@ void igs_m027_state::m027(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_mahjong_map);
 	m_maincpu->out_port().set(FUNC(igs_m027_state::io_select_w<1>));
 
-//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

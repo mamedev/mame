@@ -192,7 +192,7 @@ void igs_m027xa_state::main_map(address_map &map)
 {
 	map(0x08000000, 0x0807ffff).rom().region("user1", 0); // Game ROM
 	map(0x10000000, 0x100003ff).ram().share("igs_mainram"); // main RAM for ASIC?
-	map(0x18000000, 0x18007fff).ram();
+	map(0x18000000, 0x18007fff).ram().mirror(0xf8000).share("nvram");
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 	map(0x38008000, 0x38008003).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -526,7 +526,7 @@ void igs_m027xa_state::igs_mahjong_xa(machine_config &config)
 	m_maincpu->in_port().set(FUNC(igs_m027xa_state::gpio_r));
 	m_maincpu->out_port().set(FUNC(igs_m027xa_state::io_select_w<1>));
 
-//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MX10EXA(config, m_xa, 10'000'000); // MX10EXAQC (Philips 80C51 XA) unknown frequency
 	m_xa->port_in_cb<0>().set(FUNC(igs_m027xa_state::mcu_p0_r));
