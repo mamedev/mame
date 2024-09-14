@@ -46647,6 +46647,7 @@ mu80                            // 1994 MU-80
 
 @source:yamaha/ymmu90.cpp
 mu90                            // 1996 MU-90
+mu90b                           // 2005 MU-90B
 
 @source:yamaha/ymmu100.cpp
 mu100                           // 1997 MU-100
