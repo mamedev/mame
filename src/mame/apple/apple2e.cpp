@@ -5628,6 +5628,18 @@ ROM_START(apple2euk)
 	ROM_LOAD( "341-0150-a.e12", 0x000, 0x800, CRC(66ffacd7) SHA1(47bb9608be38ff75429a989b930a93b47099648e) )
 ROM_END
 
+ROM_START(apple2efr)
+	ROM_REGION(0x2000, "gfx1", 0)
+	ROM_LOAD("341-0163-a.e9", 0x0000, 0x2000, BAD_DUMP CRC(1824d614) SHA1(a513bec3e44b8e823465720f3db6ee3f7781c1cd)) // created from "342-0274-a.e9"
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("342-0135-b.64", 0x0000, 0x2000, CRC(e248835e) SHA1(523838c19c79f481fa02df56856da1ec3816d16e))
+	ROM_LOAD("342-0134-a.64", 0x2000, 0x2000, CRC(fc3d59d8) SHA1(8895a4b703f2184b673078f411f4089889b61c54))
+
+	ROM_REGION(0x800, "keyboard", ROMREGION_ERASE00)
+	ROM_LOAD("342-0153-a.f12", 0x000, 0x800, CRC(cbf1bbe7) SHA1(d1628c911ec4a0ff583f7346d3c38dc82023263e))
+ROM_END
+
 ROM_START(apple2ees)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "341-0212-a.e9", 0x000000, 0x002000, CRC(bc5575ef) SHA1(aa20c257255ef552295d32a3f56ccbb52b8716c3) )
@@ -6119,6 +6131,7 @@ ROM_END
 /*    YEAR  NAME        PARENT   COMPAT  MACHINE          INPUT       CLASS          INIT           COMPANY                              FULLNAME */
 COMP( 1983, apple2e,    0,       apple2, apple2e,         apple2eus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, apple2euk,  apple2e, 0,      apple2epal,      apple2euk,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, apple2efr,  apple2e, 0,      apple2epal,      apple2efr,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (France)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, apple2ees,  apple2e, 0,      apple2epal,      apple2ees,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (Spain)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, mprof3,     apple2e, 0,      mprof3,          apple2e,    apple2e_state, empty_init,    "Multitech",                         "Microprofessor III", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2ee,   apple2e, 0,      apple2ee,        apple2eus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (enhanced)", MACHINE_SUPPORTS_SAVE )
