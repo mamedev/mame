@@ -32760,8 +32760,6 @@ expert3t                        //
 expertac                        //
 expertdx                        //
 fsa1fx                          // 1988 MSX2+ Japan
-fsa1gt                          //
-fsa1st                          //
 fsa1wsx                         // 1989 MSX2+ Japan
 fsa1wx                          // 1988 MSX2+ Japan
 fsa1wxa                         // 1988 MSX2+ Japan
@@ -32770,6 +32768,10 @@ hbf1xv                          // 1989 MSX2+ Japan
 phc35j                          // 1989 MSX2+ Japan
 phc70fd                         // 1988 MSX2+ Japan
 phc70fd2                        // 1988 MSX2+ Japan
+
+@source:msx/msxtr.cpp
+fsa1gt                          //
+fsa1st                          //
 
 @source:msx/pengadvb.cpp
 pengadvb                        // (c) 1988 Screen
