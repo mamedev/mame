@@ -10,17 +10,6 @@
 #include "logmacro.h"
 
 
-namespace {
-
-template <typename T>
-constexpr bool negedge(T old, T val, unsigned bit)
-{
-	return bool(BIT(old & ~val, bit));
-}
-
-} // anonymous namespace
-
-
 DEFINE_DEVICE_TYPE(IGS_XA_ICS_SOUND, igs_xa_mcu_ics_sound_device, "igs_xa_ics_sound", "IGS MX10EXAQC-based ICS2115 sound system")
 DEFINE_DEVICE_TYPE(IGS_XA_SUBCPU,    igs_xa_mcu_subcpu_device,    "igs_xa_subcpu",    "IGS MX10EXAQC sub-CPU")
 
@@ -50,19 +39,7 @@ igs_xa_mcu_device_base::~igs_xa_mcu_device_base()
 
 void igs_xa_mcu_device_base::cmd_w(u16 data)
 {
-	m_command = data;
-
-	m_num_params--;
-	if (m_num_params <= 0)
-	{
-		LOG("command is %02x size %02x\n", data >> 8, data & 0x00ff);
-		m_num_params = data & 0x00ff;
-	}
-	else
-	{
-		LOG("param %04x\n", data);
-	}
-	m_mcu->pulse_input_line(XA_EXT_IRQ0, m_mcu->minimum_quantum_time());
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(igs_xa_mcu_device_base::do_cmd_w), this), s32(u32(data)));
 }
 
 
@@ -156,6 +133,24 @@ void igs_xa_mcu_device_base::mcu_p3_w(u8 data)
 }
 
 
+TIMER_CALLBACK_MEMBER(igs_xa_mcu_device_base::do_cmd_w)
+{
+	m_command = u16(u32(param));
+
+	m_num_params--;
+	if (m_num_params <= 0)
+	{
+		LOG("command is %02x size %02x\n", m_command >> 8, m_command & 0x00ff);
+		m_num_params = m_command & 0x00ff;
+	}
+	else
+	{
+		LOG("param %04x\n", m_command);
+	}
+	m_mcu->pulse_input_line(XA_EXT_IRQ0, m_mcu->minimum_quantum_time());
+}
+
+
 
 igs_xa_mcu_ics_sound_device::igs_xa_mcu_ics_sound_device(
 		machine_config const &mconfig,
@@ -204,11 +199,11 @@ void igs_xa_mcu_ics_sound_device::mcu_p1_w(u8 data)
 
 void igs_xa_mcu_ics_sound_device::mcu_p3_w(u8 data)
 {
-	u8 const oldport3 = m_port_dat[3];
+	u8 const falling = m_port_dat[3] & ~data;
 	igs_xa_mcu_device_base::mcu_p3_w(data);
 
 	// high->low transition on bit 0x80 must read into latches!
-	if (negedge(oldport3, data, 7))
+	if (BIT(falling, 7))
 	{
 		if (!BIT(data, 4))
 		{
@@ -223,7 +218,7 @@ void igs_xa_mcu_ics_sound_device::mcu_p3_w(u8 data)
 		}
 	}
 
-	if (negedge(oldport3, data, 6))
+	if (BIT(falling, 6))
 	{
 		if (!BIT(data, 4))
 		{
@@ -267,7 +262,6 @@ igs_xa_mcu_subcpu_device::~igs_xa_mcu_subcpu_device()
 void igs_xa_mcu_subcpu_device::irqack_w(u16 data)
 {
 	LOG("%s: lower IRQ %08x\n", machine().describe_context(), data);
-	m_command = data;
 	set_irq(0);
 }
 
@@ -289,20 +283,22 @@ void igs_xa_mcu_subcpu_device::device_start()
 
 void igs_xa_mcu_subcpu_device::mcu_p3_w(u8 data)
 {
-	u8 const oldport3 = m_port_dat[3];
+	u8 const rising = ~m_port_dat[3] & data;
+	u8 const falling = m_port_dat[3] & ~data;
 	igs_xa_mcu_device_base::mcu_p3_w(data);
 
-	set_irq(BIT(data, 5));
+	if (BIT(rising, 5))
+		set_irq(1);
 
 	// high->low transition on bit 0x80 must read into latches!
-	if (negedge(oldport3, data, 7))
+	if (BIT(falling, 7))
 	{
 		LOG("read command [%d] = [%04x]\n", m_port_dat[1] & 7, m_command);
 		m_port2_latch = m_command >> 8;
 		m_port0_latch = m_command & 0x00ff;
 	}
 
-	if (negedge(oldport3, data, 6))
+	if (BIT(falling, 6))
 	{
 		u16 const dat = (u16(m_port_dat[2]) << 8) | m_port_dat[0];
 		LOG("write response [%d] = [%04x]\n", m_port_dat[1] & 7, dat);

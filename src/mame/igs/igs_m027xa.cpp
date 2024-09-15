@@ -302,7 +302,7 @@ void igs_m027xa_state::igs_40000014_w(offs_t offset, u32 data, u32 mem_mask)
 u32 igs_m027xa_state::gpio_r()
 {
 	u32 ret = m_io_test[2].read_safe(0xfffff);
-	if (m_irq_from_igs031)
+	if (m_irq_from_igs031 && m_igs017_igs031->get_irq_enable())
 		ret &= ~(u32(1) << 8);
 	return ret;
 }
@@ -356,13 +356,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 
 	// should be using m_maincpu->trigger_irq with more compelx interrupt logic?
 
-	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
+	switch (scanline)
 	{
-		m_irq_from_igs031 = true; // FIXME: this should be cleared at some point
-		m_maincpu->trigger_irq(3);
+	case 0:
+		if (m_igs_40000014 & 1)
+			m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
+		m_irq_from_igs031 = false;
+		break;
+	case 240:
+		if (m_igs017_igs031->get_irq_enable())
+		{
+			m_irq_from_igs031 = true;
+			m_maincpu->trigger_irq(3);
+		}
+		break;
 	}
-	if (scanline == 0 && (m_igs_40000014 & 1))
-		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
 }
 
 
@@ -692,9 +700,9 @@ void igs_m027xa_state::init_wldfruit()
 GAME(  2008, haunthig,  0,        igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", MACHINE_IS_SKELETON ) // IGS FOR V109US 2008 10 14
 GAME(  2006, haunthiga, haunthig, igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", MACHINE_IS_SKELETON ) // IGS FOR V101US 2006 08 23
 
-GAMEL( 2009, crzybugs,  0,        igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", MACHINE_NOT_WORKING, layout_crzybugs ) // IGS FOR V204US 2009 5 19
-GAMEL( 2006, crzybugsa, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", MACHINE_NOT_WORKING, layout_crzybugs ) // IGS FOR V100US 2006 3 29 but also V202US string
-GAMEL( 2005, crzybugsb, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", MACHINE_NOT_WORKING, layout_crzybugs ) // FOR V100US 2005 7 20 but also V200US string
+GAMEL( 2009, crzybugs,  0,        igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", 0, layout_crzybugs ) // IGS FOR V204US 2009 5 19
+GAMEL( 2006, crzybugsa, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", 0, layout_crzybugs ) // IGS FOR V100US 2006 3 29 but also V202US string
+GAMEL( 2005, crzybugsb, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", 0, layout_crzybugs ) // FOR V100US 2005 7 20 but also V200US string
 
 GAME(  2007, crzybugsj, crzybugs, igs_mahjong_xa,     base,     igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_IS_SKELETON ) // IGS FOR V101JP 2007 06 08
 

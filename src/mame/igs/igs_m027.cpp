@@ -1687,7 +1687,7 @@ void igs_m027_state::chessc2_xor(machine_config &config)
 
 /***************************************************************************
 
-Mahjong Shuang Long Qiang Zhu 3
+双龙抢珠Ⅲ (Shuāng Lóng Qiǎng Zhū III)
 IGS, 1999
 
 PCB Layout
@@ -2053,6 +2053,7 @@ ROM_END
 // samples at u14
 
 
+// 龙虎争霸Ⅲ (Lóng Hǔ Zhēngbà III)
 ROM_START( lhzb3 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
@@ -2074,8 +2075,8 @@ ROM_END
 
 /*********************************************************************************
 
-Long Hu Da Man Guan, IGS 1999
-Long Hu Da Man Guan Plus, IGS 1999
+龙虎大满贯 (Lóng Hǔ Dà Mǎnguàn), IGS 1999
+龙虎大满贯 (Lóng Hǔ Dà Mǎnguàn Plus), IGS 1999
 
 Both boards are identical and use the same mask ROMs, only with changed program EPROM.
 
@@ -2155,7 +2156,7 @@ ROM_END
 
 /*
 
-Zhong Guo Chu Da D
+中国锄大D (Zhōngguó chú dà D)
 IGS, 2000
 
 PCB Layout
@@ -2219,6 +2220,7 @@ ROM_END
 
 
 
+// 满贯至尊 (Mǎnguàn Zhìzūn)
 ROM_START( mgzz )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
@@ -2238,6 +2240,7 @@ ROM_START( mgzz )
 ROM_END
 
 
+// 满贯至尊 (Mǎnguàn Zhìzūn)
 ROM_START( mgzza ) // IGS PCB 0295-00 (IGS027A, M6295, IGS031, 8255, Battery)
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
@@ -2256,9 +2259,10 @@ ROM_START( mgzza ) // IGS PCB 0295-00 (IGS027A, M6295, IGS031, 8255, Battery)
 	ROM_LOAD( "sp.u14", 0x00000, 0x80000, CRC(f037952e) SHA1(0fa83e164937c9e8245861da7fd11f225525918d) )
 ROM_END
 
+
 /*********************************************************************************
 
-Long Teng Hu Yue, IGS 1999
+龙腾虎跃 (Lóng Téng Hǔ Yuè), IGS 1999
 
 PCB Layout
 ----------
@@ -2479,6 +2483,7 @@ ROM_END
 // cg at u28
 // samples at u4 (or u5?)
 
+// 超级斗地主 (Chāojí Dòu Dìzhǔ)
 ROM_START( cjddz )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
@@ -2499,6 +2504,7 @@ ROM_START( cjddz )
 	ROM_LOAD( "ddz_sp.u4", 0x00000, 0x200000, CRC(7ef65d95) SHA1(345c587cd449d6d06908e9687480be76b2cb2d28) )
 ROM_END
 
+// 龙虎争霸4 (Lóng Hǔ Zhēngbà 4)
 ROM_START( lhzb4 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
@@ -2518,7 +2524,8 @@ ROM_START( lhzb4 )
 	ROM_LOAD( "w05502.u5", 0x00000, 0x200000, CRC(467f677e) SHA1(63927c0d606176c0e22db89ea3a9777ed702abbd) )
 ROM_END
 
-// Que Long Gao Shou (Master on Mahjong Dragon) (IGS, 1999) - PCB-0489-17-FM-1 (IGS027A, M6295, IGS031, 8255, Battery)
+// 雀龙高手 (Què Lóng Gāoshǒu) (IGS, 1999)
+// PCB-0489-17-FM-1 (IGS027A, M6295, IGS031, 8255, Battery)
 ROM_START( qlgs )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
@@ -2537,6 +2544,8 @@ ROM_START( qlgs )
 	ROM_LOAD( "sp_u5.u5", 0x00000, 0x200000, CRC(6049b892) SHA1(f87285a288bd3fd169080045f70ff15181661582) ) // 11xxxxxxxxxxxxxxxxxxx = 0x00
 ROM_END
 
+
+// 满贯财神3 (Mǎnguàn Cáishén 3)
 // PCB-0489-15-FM-1 (IGS027A, M6295, IGS031, 8255, Battery) - same PCB as qlgs
 ROM_START( mgcs3 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
@@ -2760,23 +2769,23 @@ void igs_m027_state::init_lhdmg()
 ***************************************************************************/
 
 // Complete dumps
-GAME(  1999, slqz3,     0,        slqz3_xor,    slqz3,    igs_m027_state, init_slqz3,    ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_NOT_WORKING ) // 双龙抢珠Ⅲ
-GAME(  1999, qlgs,      0,        qlgs_xor,     qlgs,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Que Long Gaoshou", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN ) // 雀龙高手
-GAME(  1999, lhdmg,     0,        lhdmg_xor,    lhdmg,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan", MACHINE_NOT_WORKING ) // 龙虎大满贯
-GAME(  1999, lhdmgp,    lhdmg,    lhdmg_xor,    lhdmg,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan Plus", MACHINE_NOT_WORKING ) // 龙虎大满贯
-GAME(  1999, lhzb3,     0,        lhdmg_xor,    lhzb3,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III", MACHINE_NOT_WORKING ) // 龙虎争霸Ⅲ
-GAME(  2004, lhzb4,     0,        lhzb4_xor,    lhzb4,    igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4", MACHINE_NOT_WORKING ) // 龙虎争霸4
-GAME(  1999, lthy,      0,        lthy_xor,     lthy,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN ) // 龙腾虎跃
-GAME(  2000, zhongguo,  0,        zhongguo_xor, zhongguo, igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhongguo Chu Da D", MACHINE_NOT_WORKING ) // 中国锄大D
-GAMEL( 200?, jking02,   0,        jking02_xor,  jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN, layout_jking02 )
-GAME(  2003, mgzz,      0,        mgzz_xor,     mgzz,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V101CN)", MACHINE_NOT_WORKING ) // 满贯至尊
-GAME(  2003, mgzza,     mgzz,     mgzz_xor,     mgzza,    igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V100CN)", MACHINE_NOT_WORKING ) // 满贯至尊
-GAME(  2007, mgcs3,     0,        lhzb4_xor,    mgcs3,    igs_m027_state, init_mgcs3,    ROT0, "IGS", "Manguan Caishen 3 (V101CN)", MACHINE_NOT_WORKING ) // 满贯财神3
-GAMEL( 1999, oceanpar,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", MACHINE_NOT_WORKING, layout_oceanpar ) // 1999 copyright in ROM
-GAMEL( 1999, oceanpara, oceanpar, oceanpar_xor, oceanpara,igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", MACHINE_NOT_WORKING, layout_oceanpar ) // 1999 copyright in ROM
-GAMEL( 1999, fruitpar,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)",   MACHINE_NOT_WORKING, layout_oceanpar )
-GAMEL( 1999, fruitpara, fruitpar, oceanpar_xor, fruitpara,igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", MACHINE_NOT_WORKING, layout_oceanpar )
-GAME(  200?, cjddz,     0,        cjddz_xor,    cjddz,    igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", MACHINE_NOT_WORKING ) // 超级斗地主
+GAME(  1999, slqz3,     0,        slqz3_xor,    slqz3,    igs_m027_state, init_slqz3,    ROT0, "IGS", "Shuang Long Qiang Zhu 3 (China, VS107C)", 0 )
+GAME(  1999, qlgs,      0,        qlgs_xor,     qlgs,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Que Long Gaoshou", MACHINE_NODEVICE_LAN )
+GAME(  1999, lhdmg,     0,        lhdmg_xor,    lhdmg,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan", 0 )
+GAME(  1999, lhdmgp,    lhdmg,    lhdmg_xor,    lhdmg,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan Plus", 0 )
+GAME(  1999, lhzb3,     0,        lhdmg_xor,    lhzb3,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III", 0 )
+GAME(  2004, lhzb4,     0,        lhzb4_xor,    lhzb4,    igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4", 0 )
+GAME(  1999, lthy,      0,        lthy_xor,     lthy,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_NODEVICE_LAN )
+GAME(  2000, zhongguo,  0,        zhongguo_xor, zhongguo, igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhongguo Chu Da D", 0 )
+GAMEL( 200?, jking02,   0,        jking02_xor,  jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NODEVICE_LAN, layout_jking02 )
+GAME(  2003, mgzz,      0,        mgzz_xor,     mgzz,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V101CN)", 0 )
+GAME(  2003, mgzza,     mgzz,     mgzz_xor,     mgzza,    igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V100CN)", 0 )
+GAME(  2007, mgcs3,     0,        lhzb4_xor,    mgcs3,    igs_m027_state, init_mgcs3,    ROT0, "IGS", "Manguan Caishen 3 (V101CN)", 0 )
+GAMEL( 1999, oceanpar,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", 0, layout_oceanpar ) // 1999 copyright in ROM
+GAMEL( 1999, oceanpara, oceanpar, oceanpar_xor, oceanpara,igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", 0, layout_oceanpar ) // 1999 copyright in ROM
+GAMEL( 1999, fruitpar,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)",   0, layout_oceanpar )
+GAMEL( 1999, fruitpara, fruitpar, oceanpar_xor, fruitpara,igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", 0, layout_oceanpar )
+GAME(  200?, cjddz,     0,        cjddz_xor,    cjddz,    igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", 0 )
 GAME(  2001, extradrw,  0,        m027,         base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME(  2002, chessc2,   0,        chessc2_xor,  chessc2,  igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

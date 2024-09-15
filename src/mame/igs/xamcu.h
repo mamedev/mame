@@ -38,6 +38,8 @@ protected:
 	void mcu_p2_w(u8 data);
 	void mcu_p3_w(u8 data);
 
+	TIMER_CALLBACK_MEMBER(do_cmd_w);
+
 	required_device<mx10exa_cpu_device> m_mcu;
 
 	devcb_write_line m_irq_cb;
