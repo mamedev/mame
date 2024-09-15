@@ -272,7 +272,7 @@ public:
 		m_pos(*this, "mpos%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(arm_sensors_r);
+	ioport_value arm_sensors_r();
 	void dnbanban(machine_config &config) ATTR_COLD;
 
 protected:
@@ -372,7 +372,7 @@ void katosmedz80_state::io_map(address_map &map)
 
 */
 
-CUSTOM_INPUT_MEMBER(katosmedz80_state::arm_sensors_r)
+ioport_value katosmedz80_state::arm_sensors_r()
 {
 	return m_sensors;
 }

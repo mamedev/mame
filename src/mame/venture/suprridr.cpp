@@ -116,7 +116,7 @@ public:
 
 	void suprridr(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(control_r);
+	ioport_value control_r();
 
 protected:
 	virtual void machine_start() override;
@@ -478,7 +478,7 @@ void suprridr_state::sound_portmap(address_map &map)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(suprridr_state::control_r)
+ioport_value suprridr_state::control_r()
 {
 	// screen flip multiplexes controls
 

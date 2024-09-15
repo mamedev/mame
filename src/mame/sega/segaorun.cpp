@@ -912,7 +912,7 @@ void segaorun_state::sound_portmap(address_map &map)
 //  GENERIC PORT DEFINITIONS
 //**************************************************************************
 
-CUSTOM_INPUT_MEMBER(segaorun_state::bankmotor_pos_r)
+ioport_value segaorun_state::bankmotor_pos_r()
 {
 	return m_bankmotor_pos >> 8 & 0xff;
 }

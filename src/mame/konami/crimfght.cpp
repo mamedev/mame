@@ -47,7 +47,7 @@ public:
 		m_rombank(*this, "rombank")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
+	ioport_value system_r();
 	void crimfght(machine_config &config);
 
 private:
@@ -414,7 +414,7 @@ void crimfght_state::banking_callback(uint8_t data)
 	m_init = BIT(data, 7);
 }
 
-CUSTOM_INPUT_MEMBER( crimfght_state::system_r )
+ioport_value crimfght_state::system_r()
 {
 	uint8_t data = 0;
 

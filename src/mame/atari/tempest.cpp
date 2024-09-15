@@ -322,8 +322,8 @@ public:
 
 	void tempest(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
+	ioport_value tempest_knob_r();
+	ioport_value tempest_buttons_r();
 	int clock_r();
 
 protected:
@@ -385,12 +385,12 @@ void tempest_state::wdclr_w(uint8_t data)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(tempest_state::tempest_knob_r)
+ioport_value tempest_state::tempest_knob_r()
 {
 	return (m_player_select == 0) ? m_knob_p1->read() : m_knob_p2->read();
 }
 
-CUSTOM_INPUT_MEMBER(tempest_state::tempest_buttons_r)
+ioport_value tempest_state::tempest_buttons_r()
 {
 	return (m_player_select == 0) ? m_buttons_p1->read() : m_buttons_p2->read();
 }

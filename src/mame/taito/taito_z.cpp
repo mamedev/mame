@@ -1359,20 +1359,20 @@ void spacegun_state::spacegun_eeprom_w(u8 data)
                        GAME INPUTS
 **********************************************************/
 
-CUSTOM_INPUT_MEMBER(taitoz_state::gas_pedal_r)
+ioport_value taitoz_state::gas_pedal_r()
 {
 	static const u8 retval[8] = { 0,1,3,2,6,7,5,4 };
 	return retval[m_gas.read_safe(0) & 7];
 }
 
-CUSTOM_INPUT_MEMBER(taitoz_state::brake_pedal_r)
+ioport_value taitoz_state::brake_pedal_r()
 {
 	static const u8 retval[8] = { 0,1,3,2,6,7,5,4 };
 	return retval[m_brake.read_safe(0) & 7];
 }
 
 // enforceja only, 3 bits applied on both pots
-template <int axis> CUSTOM_INPUT_MEMBER(taitoz_state::adstick_r)
+template <int axis> ioport_value taitoz_state::adstick_r()
 {
 	static const u8 retval[8] = { 0,1,3,2,6,7,5,4 };
 	u8 raw_value = ((axis == 0 ? m_stickx : m_sticky).read_safe(0) >> 5) & 7;

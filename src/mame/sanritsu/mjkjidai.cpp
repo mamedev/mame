@@ -67,7 +67,7 @@ public:
 
 	void mjkjidai(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(keyboard_r);
+	ioport_value keyboard_r();
 
 protected:
 	virtual void machine_start() override;
@@ -254,7 +254,7 @@ void mjkjidai_state::adpcm_int(int state)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(mjkjidai_state::keyboard_r)
+ioport_value mjkjidai_state::keyboard_r()
 {
 	int res = 0x3f;
 

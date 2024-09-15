@@ -70,7 +70,7 @@ public:
 		, m_triggers(*this, "TRIGGERS")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_pos_r);
+	ioport_value lightgun_pos_r();
 	int lightgun_trigger_r();
 	int lightgun_holster_r();
 
@@ -167,7 +167,7 @@ void alg_state::potgo_w(uint16_t data)
 }
 
 
-CUSTOM_INPUT_MEMBER(alg_state::lightgun_pos_r)
+ioport_value alg_state::lightgun_pos_r()
 {
 	int x = 0, y = 0;
 

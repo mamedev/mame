@@ -1553,8 +1553,8 @@ public:
 	void setaroul(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
+	ioport_value coin_sensors_r();
+	ioport_value hopper_sensors_r();
 
 	void screen_vblank(int state);
 
@@ -2807,7 +2807,7 @@ INPUT_CHANGED_MEMBER( setaroul_state::coin_drop_start )
 		m_coin_start_cycles = m_maincpu->total_cycles();
 }
 
-CUSTOM_INPUT_MEMBER( setaroul_state::coin_sensors_r )
+ioport_value setaroul_state::coin_sensors_r()
 {
 	u8 data = 0x03;
 

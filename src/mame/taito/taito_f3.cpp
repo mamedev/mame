@@ -36,14 +36,14 @@
 /******************************************************************************/
 
 template <int Num>
-CUSTOM_INPUT_MEMBER(taito_f3_state::f3_analog_r)
+ioport_value taito_f3_state::f3_analog_r()
 {
 	const int data = m_dial[Num]->read();
 	return ((data & 0xf) << 12) | ((data & 0xff0) >> 4);
 }
 
 template <int Num>
-CUSTOM_INPUT_MEMBER(taito_f3_state::f3_coin_r)
+ioport_value taito_f3_state::f3_coin_r()
 {
 	return m_coin_word[Num];
 }
@@ -229,7 +229,7 @@ void taito_f3_state::bubsympb_oki_map(address_map &map)
 
 /******************************************************************************/
 
-CUSTOM_INPUT_MEMBER( taito_f3_state::eeprom_read )
+ioport_value taito_f3_state::eeprom_read()
 {
 	return m_eepromin->read();
 }

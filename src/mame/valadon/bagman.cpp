@@ -447,7 +447,7 @@ GFXDECODE_END
 
 /* squaitsa doesn't map the dial directly, instead it polls the results of the dial through an external circuitry.
    I don't know if the following is correct, there can possibly be multiple solutions for the same problem. */
-template <unsigned N> CUSTOM_INPUT_MEMBER(squaitsa_state::dial_input_r)
+template <unsigned N> ioport_value squaitsa_state::dial_input_r()
 {
 	uint8_t const dial_val = m_dial[N]->read();
 

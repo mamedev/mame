@@ -63,7 +63,7 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 		{ }
 
-	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
+	template <int Mask> ioport_value wolfman_replay_hs_r();
 	void init_0() { m_game = 0; }
 	void init_1() { m_game = 1; }
 	void init_2() { m_game = 2; }
@@ -213,7 +213,7 @@ void peyper_state::sol_w(u8 data)
 
 
 template <int Mask>
-CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
+ioport_value peyper_state::wolfman_replay_hs_r()
 {
 	switch (Mask)
 	{

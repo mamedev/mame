@@ -89,7 +89,7 @@ public:
 	int shot_standby_r();
 	int not_shot_arrive_r();
 	int motor_not_ready_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(get_rng);
+	ioport_value get_rng();
 
 protected:
 	virtual void machine_start() override;
@@ -645,7 +645,7 @@ void stactics_state::move_motor()
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_rng)
+ioport_value stactics_state::get_rng()
 {
 	// this is a 555 timer, but cannot read one of the resistor values
 	return machine().rand() & 0x07;

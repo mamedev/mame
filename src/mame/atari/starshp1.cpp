@@ -71,8 +71,8 @@ public:
 
 	void starshp1(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(analog_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(collision_latch_r);
+	ioport_value analog_r();
+	ioport_value collision_latch_r();
 
 protected:
 	virtual void machine_start() override;
@@ -562,7 +562,7 @@ void starshp1_state::collision_reset_w(uint8_t data)
 }
 
 
-CUSTOM_INPUT_MEMBER(starshp1_state::analog_r)
+ioport_value starshp1_state::analog_r()
 {
 	int val = 0;
 
@@ -586,7 +586,7 @@ CUSTOM_INPUT_MEMBER(starshp1_state::analog_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(starshp1_state::collision_latch_r)
+ioport_value starshp1_state::collision_latch_r()
 {
 	return m_collision_latch & 0x0f;
 }

@@ -36,7 +36,7 @@ public:
 	void satansat(machine_config &config);
 	void sasuke(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sasuke_count_r);
+	ioport_value sasuke_count_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 	DECLARE_VIDEO_START(pballoon);

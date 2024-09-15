@@ -62,10 +62,10 @@ public:
 	auto read_cnf12_callback() { return m_cnf12_read_cb.bind(); }
 
 	// NOTE: these are internal shadows, for the input sense.
-	CUSTOM_INPUT_MEMBER(egasw4_r);
-	CUSTOM_INPUT_MEMBER(egasw3_r);
-	CUSTOM_INPUT_MEMBER(egasw2_r);
-	CUSTOM_INPUT_MEMBER(egasw1_r);
+	ioport_value egasw4_r();
+	ioport_value egasw3_r();
+	ioport_value egasw2_r();
+	ioport_value egasw1_r();
 protected:
 	wd90c00_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

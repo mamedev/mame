@@ -209,7 +209,7 @@ public:
 	void mtrap(machine_config &config);
 	void pepper2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(intsource_coins_r);
+	ioport_value intsource_coins_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_count_w);
 
 protected:
@@ -289,8 +289,8 @@ public:
 	void rallys(machine_config &config);
 	void phantoma(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(spectar_coins_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(rallys_coin1_r);
+	ioport_value spectar_coins_r();
+	ioport_value rallys_coin1_r();
 
 	void init_sidetrac();
 	void init_spectar();
@@ -364,7 +364,7 @@ public:
 
 	void teetert(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(teetert_input_r);
+	ioport_value teetert_input_r();
 
 protected:
 	virtual void machine_start() override;
@@ -404,26 +404,26 @@ private:
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(exidy_state::intsource_coins_r)
+ioport_value exidy_state::intsource_coins_r()
 {
 	uint8_t const dsw = m_dsw->read();
 	uint8_t const in0 = m_in0->read();
 	return (BIT(~in0, 7) << 1) | BIT(dsw, 0);
 }
 
-CUSTOM_INPUT_MEMBER(spectar_state::spectar_coins_r)
+ioport_value spectar_state::spectar_coins_r()
 {
 	uint8_t const dsw = m_dsw->read();
 	uint8_t const in0 = m_in0->read();
 	return (BIT(~in0, 7) << 1) | BIT(~dsw, 0);
 }
 
-CUSTOM_INPUT_MEMBER(spectar_state::rallys_coin1_r)
+ioport_value spectar_state::rallys_coin1_r()
 {
 	return BIT(m_in0->read(), 7);
 }
 
-CUSTOM_INPUT_MEMBER(teetert_state::teetert_input_r)
+ioport_value teetert_state::teetert_input_r()
 {
 	uint8_t const dial = m_dial->read();
 

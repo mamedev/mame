@@ -61,7 +61,7 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(coins_in);
+	ioport_value coins_in();
 
 	DECLARE_INPUT_CHANGED_MEMBER(test_changed);
 
@@ -379,7 +379,7 @@ void flicker_state::cm_ram2_w(int state)
 }
 
 
-CUSTOM_INPUT_MEMBER(flicker_state::coins_in)
+ioport_value flicker_state::coins_in()
 {
 	u8 const coins(m_coinport->read());
 	return BIT(coins, 7) ? (coins & 0x3f) : 0;

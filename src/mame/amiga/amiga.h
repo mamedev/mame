@@ -442,8 +442,8 @@ public:
 	TIMER_CALLBACK_MEMBER( blitter_process_callback );
 	void update_irqs();
 
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
-	DECLARE_CUSTOM_INPUT_MEMBER( floppy_drive_status );
+	template <int P> ioport_value amiga_joystick_convert();
+	ioport_value floppy_drive_status();
 
 	void m68k_reset(int state);
 	void kbreset_w(int state);

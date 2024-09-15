@@ -47,7 +47,7 @@ public:
 	void spg110_base(machine_config &config);
 	void spg110_spdmo(machine_config& config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(plunger_r);
+	ioport_value plunger_r();
 
 protected:
 	required_device<spg110_device> m_maincpu;
@@ -247,7 +247,7 @@ static INPUT_PORTS_START( jak_capb )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER(spg110_game_state::plunger_r)
+ioport_value spg110_game_state::plunger_r()
 {
 	// this is only needed because our PORT_CENTERDELTA doesn't work if set > 255 (and is limited in the menu to that) such a value that doesn't center quickly enough for the plunger to be effective
 	return ioport("JOYY_REAL")->read()<<2;

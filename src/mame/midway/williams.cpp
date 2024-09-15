@@ -1385,7 +1385,7 @@ INPUT_PORTS_END
 
 
 template <int P>
-CUSTOM_INPUT_MEMBER(tshoot_state::gun_r)
+ioport_value tshoot_state::gun_r()
 {
 	int data = m_gun[P]->read();
 	return (data & 0x3f) ^ ((data & 0x3f) >> 1);

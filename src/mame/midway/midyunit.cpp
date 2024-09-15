@@ -162,7 +162,7 @@ int midzunit_state::narc_talkback_strobe_r()
 }
 
 
-CUSTOM_INPUT_MEMBER(midzunit_state::narc_talkback_data_r)
+ioport_value midzunit_state::narc_talkback_data_r()
 {
 	return m_narc_sound->read() & 0xff;
 }

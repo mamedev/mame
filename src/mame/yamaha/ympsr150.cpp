@@ -100,12 +100,12 @@ public:
 	template <unsigned StartBit, unsigned Count>
 	void keys_w(int state);
 	template <unsigned StartBit>
-	DECLARE_CUSTOM_INPUT_MEMBER(keys_r);
+	ioport_value keys_r();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
+	ioport_value dial_r();
 
 	DECLARE_INPUT_CHANGED_MEMBER(switch_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(switch_r) { return m_switch; }
+	ioport_value switch_r() { return m_switch; }
 
 	void apo_w(int state) { if (state) m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); }
 	DECLARE_INPUT_CHANGED_MEMBER(power_w) { if (!newval) m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE); }
@@ -120,7 +120,7 @@ public:
 	template <unsigned Num>
 	void digit_w(u8 state) { m_digit[Num] = state ^ 0xff; }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(lcd_r) { return m_lcdc->db_r() >> 4; }
+	ioport_value lcd_r() { return m_lcdc->db_r() >> 4; }
 	void lcd_w(int state) { m_lcdc->db_w(state << 4); }
 
 private:
@@ -162,7 +162,7 @@ void psr150_state::keys_w(int state)
 }
 
 template <unsigned StartBit>
-CUSTOM_INPUT_MEMBER(psr150_state::keys_r)
+ioport_value psr150_state::keys_r()
 {
 	ioport_value result = 0;
 	for (unsigned i = 0U; i < m_keys.size(); i++)
@@ -172,7 +172,7 @@ CUSTOM_INPUT_MEMBER(psr150_state::keys_r)
 	return result >> StartBit;
 }
 
-CUSTOM_INPUT_MEMBER(psr150_state::dial_r)
+ioport_value psr150_state::dial_r()
 {
 	// return the dial position as a 2-bit gray code
 	const u8 val = m_dial->read();

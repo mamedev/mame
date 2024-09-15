@@ -8651,7 +8651,7 @@ void pacman_state::init_pengomc1()
 		romdata[i] = buf[i^0xff];
 }
 
-CUSTOM_INPUT_MEMBER(clubpacm_state::clubpacm_input_r)
+ioport_value clubpacm_state::clubpacm_input_r()
 {
 	ioport_value data = 0x0f;
 

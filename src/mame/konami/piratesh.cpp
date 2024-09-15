@@ -70,8 +70,8 @@ public:
 
 	void piratesh(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(helm_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(battery_r);
+	ioport_value helm_r();
+	ioport_value battery_r();
 
 protected:
 	virtual void machine_start() override;
@@ -443,7 +443,7 @@ void piratesh_state::k054539_nmi_gen(int state)
 	m_sound_intck = state;
 }
 
-CUSTOM_INPUT_MEMBER(piratesh_state::helm_r)
+ioport_value piratesh_state::helm_r()
 {
 	// Appears to be a quadrature encoder
 	uint8_t xa, xb;
@@ -455,7 +455,7 @@ CUSTOM_INPUT_MEMBER(piratesh_state::helm_r)
 	return (xb << 1) | xa;
 }
 
-CUSTOM_INPUT_MEMBER(piratesh_state::battery_r)
+ioport_value piratesh_state::battery_r()
 {
 	// .x MB3790 /ALARM1
 	// x. MB3790 /ALARM2

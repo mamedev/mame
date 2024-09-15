@@ -58,7 +58,7 @@ public:
 	void tinvader(machine_config &config);
 	void dodgem(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(bg_collision_r) { return m_collision_background; }
+	ioport_value bg_collision_r() { return m_collision_background; }
 
 protected:
 	virtual void video_start() override;

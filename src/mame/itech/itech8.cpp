@@ -1166,7 +1166,7 @@ INPUT_PORTS_END
 
 
 
-CUSTOM_INPUT_MEMBER(itech8_state::gtg_mux)
+ioport_value itech8_state::gtg_mux()
 {
 	return m_p1->read() & m_p2->read();
 }

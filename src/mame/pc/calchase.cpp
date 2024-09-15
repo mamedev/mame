@@ -146,7 +146,7 @@ public:
 	isa16_calchase_jamma_if(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_CUSTOM_INPUT_MEMBER( heartbeat_r );
+	ioport_value heartbeat_r();
 
 protected:
 	virtual void device_start() override;
@@ -247,7 +247,7 @@ TIMER_CALLBACK_MEMBER(isa16_calchase_jamma_if::heartbeat_cb)
 	m_hb_state ^= 1;
 }
 
-CUSTOM_INPUT_MEMBER(isa16_calchase_jamma_if::heartbeat_r)
+ioport_value isa16_calchase_jamma_if::heartbeat_r()
 {
 	return m_hb_state;
 }

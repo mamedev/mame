@@ -124,7 +124,7 @@ public:
 
 	void tristar8000(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_r) { return m_coin_latch; }
+	ioport_value coin_r() { return m_coin_latch; }
 	DECLARE_INPUT_CHANGED_MEMBER(coin_switch) { if (newval) m_coin_latch |= param; }
 
 protected:

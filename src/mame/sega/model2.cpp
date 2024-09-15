@@ -1623,7 +1623,7 @@ u8 model2_state::in0_r()
 */
 
 // Used by Sega Rally and Daytona USA, others might be different
-CUSTOM_INPUT_MEMBER(model2_state::daytona_gearbox_r)
+ioport_value model2_state::daytona_gearbox_r()
 {
 	u8 res = m_gears.read_safe(0);
 	int i;

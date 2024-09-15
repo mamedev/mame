@@ -71,7 +71,7 @@ public:
 		m_out_lamps(*this, "lamp%u", 1U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(kbd_ioport_r);
+	ioport_value kbd_ioport_r();
 
 	template <unsigned N> void counter_w(int state);
 
@@ -1483,7 +1483,7 @@ u32 igs_m027_state::lhdmg_gpio_r()
 }
 
 
-CUSTOM_INPUT_MEMBER(igs_m027_state::kbd_ioport_r)
+ioport_value igs_m027_state::kbd_ioport_r()
 {
 	return kbd_r<0, 0, 0>();
 }

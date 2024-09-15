@@ -885,7 +885,7 @@ u8 hotsmash_state::hotsmash_z80_mcu_r()
 	return m_from_mcu;
 }
 
-CUSTOM_INPUT_MEMBER(hotsmash_state::pbillian_semaphore_input_r)
+ioport_value hotsmash_state::pbillian_semaphore_input_r()
 {
 	ioport_value res = 0;
 	// bit 0x40 is PROBABLY latch 1 on 74ls74.7c, is high if m_z80_has_written is clear

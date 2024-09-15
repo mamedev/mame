@@ -138,7 +138,7 @@ public:
 	void init_mrkicker();
 	void init_solitaire();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(boonggab_photo_sensors_r);
+	ioport_value boonggab_photo_sensors_r();
 
 	u16 eeprom_r(offs_t offset);
 	u32 eeprom32_r();
@@ -918,7 +918,7 @@ u32 vamphalf_state::screen_update_aoh(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(vamphalf_state::boonggab_photo_sensors_r)
+ioport_value vamphalf_state::boonggab_photo_sensors_r()
 {
 	static const u16 photo_sensors_table[8] = { 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 };
 	u8 res = m_photosensors->read();

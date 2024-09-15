@@ -146,7 +146,7 @@ public:
 //  void ym_irq(int state);
 
 	void update_dial(int P);
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
+	template <int P> ioport_value dial_r();
 
 	void init_skydest();
 	void init_cyclemb();
@@ -765,7 +765,7 @@ void cyclemb_state::update_dial(int P)
 }
 
 template <int P>
-CUSTOM_INPUT_MEMBER(cyclemb_state::dial_r)
+ioport_value cyclemb_state::dial_r()
 {
 	return m_dial_status[P].current_value | (m_dial_status[P].reverse ? 0x80 : 0x00);
 }

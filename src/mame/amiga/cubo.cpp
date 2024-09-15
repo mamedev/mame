@@ -343,7 +343,7 @@ public:
 	void handle_joystick_cia(uint8_t pra, uint8_t dra);
 	uint16_t handle_joystick_potgor(uint16_t potgor);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
+	ioport_value cubo_input();
 	template <int P> int cd32_sel_mirror_input();
 
 	void akiko_int_w(int state);
@@ -537,7 +537,7 @@ uint16_t cubo_state::handle_joystick_potgor(uint16_t potgor)
 	return potgor;
 }
 
-CUSTOM_INPUT_MEMBER( cubo_state::cubo_input )
+ioport_value cubo_state::cubo_input()
 {
 	return handle_joystick_potgor(m_potgo_value) >> 8;
 }
