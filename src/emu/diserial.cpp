@@ -192,7 +192,8 @@ void device_serial_interface::set_data_frame(int start_bit_count, int data_bit_c
 	m_df_parity = parity;
 	m_df_start_bit_count = start_bit_count;
 
-	m_rcv_bit_count = m_df_word_length + m_df_stop_bit_count;
+	/* Don't require any stop bits when receiving */
+	m_rcv_bit_count = m_df_word_length;
 
 	if (m_df_parity != PARITY_NONE)
 	{
@@ -274,6 +275,10 @@ void device_serial_interface::receive_register_update_bit(int bit)
 				m_rcv_framing_error = false;
 				m_rcv_parity_error = false;
 			}
+			else
+			{
+				LOGMASKED(LOG_RX, "Receiver saw stop bit (%s)\n", device().machine().time().to_string());
+			}
 		}
 	}
 	else if (m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
@@ -281,7 +286,7 @@ void device_serial_interface::receive_register_update_bit(int bit)
 		LOGMASKED(LOG_RX, "Received bit %d as %d (%s)\n", m_rcv_bit_count_received, bit, device().machine().time().to_string());
 		m_rcv_bit_count_received++;
 
-		if (!bit && (m_rcv_bit_count_received > (m_rcv_bit_count - m_df_stop_bit_count)))
+		if (!bit && (m_rcv_bit_count_received > m_rcv_bit_count))
 		{
 			LOGMASKED(LOG_RX, "Framing error\n");
 			m_rcv_framing_error = true;
