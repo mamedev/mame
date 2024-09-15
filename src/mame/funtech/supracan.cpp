@@ -2060,16 +2060,24 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		{
 			LOGMASKED(LOG_VIDEO, "video_flags = %04x\n", data);
 
-			const int h320_mode = BIT(data, 8);
+			if (data & 0xc00)
+				popmessage("Interlace enable %04x", data & 0xc00);
 
 			// TODO: verify if this support midframe switching
-			if (h320_mode != BIT(m_video_flags, 8))
+			if ((data & 0x300) != (m_video_flags & 0x300))
 			{
 				rectangle visarea = m_screen->visible_area();
+				const int h320_mode = BIT(data, 8);
+				// enabled by sangofgt (224 + 16 borders), magipool wants (240)
+				const int overscan_mode = BIT(data, 9);
+
 				const int htotal = h320_mode ? 455 : 342;
 				const int divider = h320_mode ? 8 : 10;
 
-				visarea.set(0, (h320_mode ? 320 : 256) - 1, 8, 232 - 1);
+				const int vdisplay_start = overscan_mode ? 8 : 0;
+				const int vdisplay_end = overscan_mode ? 232 : 240;
+
+				visarea.set(0, (h320_mode ? 320 : 256) - 1, vdisplay_start, vdisplay_end - 1);
 				m_screen->configure(htotal, 262, visarea, attotime::from_ticks(htotal * 262, U13_CLOCK / divider).as_attoseconds());
 				//m_screen->reset_origin(0, 0);
 			}

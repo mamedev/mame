@@ -83,7 +83,7 @@ Broken [video] during intro, uses bitmap mode with ROZ layer
 		</part>
 	</software>
 
-    <!-- NOTE: supported=no for broken sound -->
+	<!-- NOTE: supported=no for broken sound -->
 	<software name="staiwbbl" supported="no">
 		<description>Super Taiwanese Baseball League ~ Chao Ji Zhong Hua Zhi Bang Lian Meng</description>
 		<year>1995</year>
@@ -192,9 +192,9 @@ few [video] missing/glitched tiles in gameplay, likely related to above.
 		<notes><![CDATA[
 Erratic gameplay speed, controls [irq 3] as FRC
 [sound] BGM plays random tune on title (verify, two video refs plays different BGMs there wtf?)
-[video] use layer 1 as clipping effect (sprites goes under it)
-[video] character select has misaligned sprites
-[video] billiard cue sprite cut off left side (should wraparound)
+[video] title screen doesn't cliprect properly against white
+[video] title screen has priority issues with overlapping overlays (layer 1 + ROZ)
+[video] garbage sprites in 1p vs. com gameplay, [DMA]s with invalid dest pointers.
 [sound] main menu selection channel 14 keeps repeating (1f 15 0b dd)
 ]]></notes>
 		<info name="serial" value="F010" />
