@@ -238,5 +238,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT     COMPAT  MACHINE     INPUT       CLASS               INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, scptchess,  0,         0,      scptchess,  scptchess,  computachess_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Sensor Computachess (1985 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, scptchess,  0,         0,      scptchess,  scptchess,  computachess_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Chess Software", "Sensor Computachess (1985 version)", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, scptchessa, scptchess, 0,      scptchessa, scptchessa, computachess_state, empty_init, "CXG Systems / White and Allcock / Intelligent Software", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE )

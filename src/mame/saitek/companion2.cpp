@@ -6,7 +6,8 @@
 SciSys Chess Companion II family
 CXG Enterprise "S" family
 
-The chess engine is LogiChess (ported from Z80 to 6801), by Kaare Danielsen.
+The chess engine is LogiChess (ported from Z80 to 6801), by Kaare Danielsen,
+after founding the company LogiSoft ApS.
 
 NOTE: It triggers an NMI when the power switch is changed from ON to MEMORY.
 If this is not done, NVRAM won't save properly.
@@ -413,7 +414,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1983, compan2,  0,       0,      compan2,  compan2,  compan2_state, empty_init, "SciSys", "Chess Companion II", MACHINE_SUPPORTS_SAVE )
-SYST( 1983, expchess, compan2, 0,      expchess, expchess, compan2_state, empty_init, "SciSys", "Explorer Chess", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, compan2,  0,       0,      compan2,  compan2,  compan2_state, empty_init, "SciSys / LogiSoft", "Chess Companion II", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, expchess, compan2, 0,      expchess, expchess, compan2_state, empty_init, "SciSys / LogiSoft", "Explorer Chess", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1984, enterp,   0,       0,      enterp,   enterp,   compan2_state, empty_init, "CXG Systems / Newcrest Technology", "Enterprise \"S\"", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, enterp,   0,       0,      enterp,   enterp,   compan2_state, empty_init, "CXG Systems / Newcrest Technology / LogiSoft", "Enterprise \"S\"", MACHINE_SUPPORTS_SAVE )
