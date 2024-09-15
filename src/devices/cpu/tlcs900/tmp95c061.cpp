@@ -78,22 +78,22 @@ void tmp95c061_device::port_fc_w(uint8_t data)
 	m_port_function[P] = data;
 }
 
-template<>
-void tmp95c061_device::port_w <tmp95c061_device::PORT_A> (uint8_t data)
+template <>
+void tmp95c061_device::port_w<tmp95c061_device::PORT_A>(uint8_t data)
 {
 	m_port_latch[PORT_A] = data;
 	update_porta();
 }
 
-template<>
-void tmp95c061_device::port_cr_w <tmp95c061_device::PORT_A> (uint8_t data)
+template <>
+void tmp95c061_device::port_cr_w<tmp95c061_device::PORT_A>(uint8_t data)
 {
 	m_port_control[PORT_A] = data;
 	update_porta();
 }
 
-template<>
-void tmp95c061_device::port_fc_w <tmp95c061_device::PORT_A> (uint8_t data)
+template <>
+void tmp95c061_device::port_fc_w<tmp95c061_device::PORT_A>(uint8_t data)
 {
 	m_port_function[PORT_A] = data;
 	update_porta();
