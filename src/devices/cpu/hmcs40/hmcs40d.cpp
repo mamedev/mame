@@ -35,6 +35,10 @@ hmcs40_disassembler::hmcs40_disassembler()
 	}
 }
 
+hmcs40_disassembler::~hmcs40_disassembler()
+{
+}
+
 
 // common lookup tables
 

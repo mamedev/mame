@@ -25,74 +25,47 @@ TODO:
 #define IS_CMOS ~0
 
 
-// MCU types
+//-------------------------------------------------
+//  device types
+//-------------------------------------------------
 
-// HMCS42/C/CL
-//DEFINE_DEVICE_TYPE(HD38702, hd38702_device, "hd38702", "Hitachi HD38702") // PMOS, 28 pins, 22 I/O lines, (512+32)x10 ROM, 32x4 RAM, no B or SPY register
-//DEFINE_DEVICE_TYPE(HD44700, hd44700_device, "hd44700", "Hitachi HD44700") // CMOS version
-//DEFINE_DEVICE_TYPE(HD44708, hd44708_device, "hd44708", "Hitachi HD44708") // CMOS version, low-power
+// HMCS42/C/CL, 28 pins, 22 I/O lines, (512+32)x10 ROM, 32x4 RAM, no B or SPY register
+//DEFINE_DEVICE_TYPE(HD38702, hd38702_device, "hd38702", "Hitachi HD38702") // PMOS
+//DEFINE_DEVICE_TYPE(HD44700, hd44700_device, "hd44700", "Hitachi HD44700") // CMOS
+//DEFINE_DEVICE_TYPE(HD44708, hd44708_device, "hd44708", "Hitachi HD44708") // CMOS, low-power
 
-// HMCS43/C/CL
-DEFINE_DEVICE_TYPE(HD38750, hd38750_device, "hd38750", "Hitachi HD38750") // PMOS, 42 pins, 32 I/O lines, (1024+64)x10 ROM, 80x4 RAM
+// HMCS43/C/CL, 42 pins, 32 I/O lines, (1024+64)x10 ROM, 80x4 RAM
+DEFINE_DEVICE_TYPE(HD38750, hd38750_device, "hd38750", "Hitachi HD38750") // PMOS
 DEFINE_DEVICE_TYPE(HD38755, hd38755_device, "hd38755", "Hitachi HD38755") // ceramic filter oscillator type
-DEFINE_DEVICE_TYPE(HD44750, hd44750_device, "hd44750", "Hitachi HD44750") // CMOS version
-DEFINE_DEVICE_TYPE(HD44758, hd44758_device, "hd44758", "Hitachi HD44758") // CMOS version, low-power
+DEFINE_DEVICE_TYPE(HD44750, hd44750_device, "hd44750", "Hitachi HD44750") // CMOS
+DEFINE_DEVICE_TYPE(HD44758, hd44758_device, "hd44758", "Hitachi HD44758") // CMOS, low-power
 
-// HMCS44A/C/CL
-DEFINE_DEVICE_TYPE(HD38800, hd38800_device, "hd38800", "Hitachi HD38800") // PMOS, 42 pins, 32 I/O lines, (2048+128)x10 ROM, 160x4 RAM
+// HMCS44A/C/CL, 42 pins, 32 I/O lines, (2048+128)x10 ROM, 160x4 RAM
+DEFINE_DEVICE_TYPE(HD38800, hd38800_device, "hd38800", "Hitachi HD38800") // PMOS
 DEFINE_DEVICE_TYPE(HD38805, hd38805_device, "hd38805", "Hitachi HD38805") // ceramic filter oscillator type
-DEFINE_DEVICE_TYPE(HD44801, hd44801_device, "hd44801", "Hitachi HD44801") // CMOS version
-DEFINE_DEVICE_TYPE(HD44808, hd44808_device, "hd44808", "Hitachi HD44808") // CMOS version, low-power
+DEFINE_DEVICE_TYPE(HD44801, hd44801_device, "hd44801", "Hitachi HD44801") // CMOS
+DEFINE_DEVICE_TYPE(HD44808, hd44808_device, "hd44808", "Hitachi HD44808") // CMOS, low-power
 
-// HMCS45A/C/CL
-DEFINE_DEVICE_TYPE(HD38820, hd38820_device, "hd38820", "Hitachi HD38820") // PMOS, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, (2048+128)x10 ROM, 160x4 RAM
+// HMCS45A/C/CL, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, (2048+128)x10 ROM, 160x4 RAM
+DEFINE_DEVICE_TYPE(HD38820, hd38820_device, "hd38820", "Hitachi HD38820") // PMOS
 DEFINE_DEVICE_TYPE(HD38825, hd38825_device, "hd38825", "Hitachi HD38825") // ceramic filter oscillator type
-DEFINE_DEVICE_TYPE(HD44820, hd44820_device, "hd44820", "Hitachi HD44820") // CMOS version
-DEFINE_DEVICE_TYPE(HD44828, hd44828_device, "hd44828", "Hitachi HD44828") // CMOS version, low-power
+DEFINE_DEVICE_TYPE(HD44820, hd44820_device, "hd44820", "Hitachi HD44820") // CMOS
+DEFINE_DEVICE_TYPE(HD44828, hd44828_device, "hd44828", "Hitachi HD44828") // CMOS, low-power
 
-// HMCS46C/CL (no PMOS version exists)
-//DEFINE_DEVICE_TYPE(HD44840, hd44840_device, "hd44840", "Hitachi HD44840") // CMOS, 42 pins, 32 I/O lines, 4096x10 ROM, 256x4 RAM
+// HMCS46C/CL, 42 pins, 32 I/O lines, 4096x10 ROM, 256x4 RAM (no PMOS version exists)
+//DEFINE_DEVICE_TYPE(HD44840, hd44840_device, "hd44840", "Hitachi HD44840") // CMOS
 //DEFINE_DEVICE_TYPE(HD44848, hd44848_device, "hd44848", "Hitachi HD44848") // CMOS, low-power
 
-// HMCS47A/C/CL
-//DEFINE_DEVICE_TYPE(HD38870, hd38870_device, "hd38870", "Hitachi HD38870") // PMOS, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, 4096x10 ROM, 256x4 RAM
-//DEFINE_DEVICE_TYPE(HD44860, hd44860_device, "hd44860", "Hitachi HD44860") // CMOS version
-//DEFINE_DEVICE_TYPE(HD44868, hd44868_device, "hd44868", "Hitachi HD44868") // CMOS version, low-power
+// HMCS47A/C/CL, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, 4096x10 ROM, 256x4 RAM
+//DEFINE_DEVICE_TYPE(HD38870, hd38870_device, "hd38870", "Hitachi HD38870") // PMOS
+//DEFINE_DEVICE_TYPE(HD44860, hd44860_device, "hd44860", "Hitachi HD44860") // CMOS
+//DEFINE_DEVICE_TYPE(HD44868, hd44868_device, "hd44868", "Hitachi HD44868") // CMOS, low-power
 
 
-// internal memory maps
+//-------------------------------------------------
+//  constructor
+//-------------------------------------------------
 
-// On HMCS42/3/4/5, only half of the ROM address range contains user-executable code,
-// there is up to 128 bytes of pattern data in the 2nd half. The 2nd half also includes
-// a couple of pages with factory test code by Hitachi, only executable when MCU test
-// mode is enabled externally. This data can still be accessed with the P opcode.
-
-void hmcs40_cpu_device::program_1k(address_map &map)
-{
-	map(0x0000, 0x07ff).rom();
-}
-
-void hmcs40_cpu_device::program_2k(address_map &map)
-{
-	map(0x0000, 0x0fff).rom();
-}
-
-
-void hmcs40_cpu_device::data_80x4(address_map &map)
-{
-	map(0x00, 0x3f).ram();
-	map(0x40, 0x4f).ram().mirror(0x30);
-}
-
-void hmcs40_cpu_device::data_160x4(address_map &map)
-{
-	map(0x00, 0x7f).ram();
-	map(0x80, 0x8f).ram().mirror(0x30);
-	map(0xc0, 0xcf).ram().mirror(0x30);
-}
-
-
-// device definitions
 hmcs40_cpu_device::hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, u16 polarity, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program),
@@ -109,8 +82,11 @@ hmcs40_cpu_device::hmcs40_cpu_device(const machine_config &mconfig, device_type 
 	m_write_d(*this)
 { }
 
+hmcs40_cpu_device::~hmcs40_cpu_device() { }
+
+
 hmcs43_cpu_device::hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity) :
-	hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS43, polarity, 3 /* stack levels */, 10 /* pc width */, 11 /* prg width */, address_map_constructor(FUNC(hmcs43_cpu_device::program_1k), this), 7 /* data width */, address_map_constructor(FUNC(hmcs43_cpu_device::data_80x4), this))
+	hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS43_FAMILY, polarity, 3 /* stack levels */, 10 /* pc width */, 11 /* prg width */, address_map_constructor(FUNC(hmcs43_cpu_device::program_1k), this), 7 /* data width */, address_map_constructor(FUNC(hmcs43_cpu_device::data_80x4), this))
 { }
 
 hd38750_device::hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -128,7 +104,7 @@ hd44758_device::hd44758_device(const machine_config &mconfig, const char *tag, d
 
 
 hmcs44_cpu_device::hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity) :
-	hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS44, polarity, 4, 11, 12, address_map_constructor(FUNC(hmcs44_cpu_device::program_2k), this), 8, address_map_constructor(FUNC(hmcs44_cpu_device::data_160x4), this))
+	hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS44_FAMILY, polarity, 4, 11, 12, address_map_constructor(FUNC(hmcs44_cpu_device::program_2k), this), 8, address_map_constructor(FUNC(hmcs44_cpu_device::data_160x4), this))
 { }
 
 hd38800_device::hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -146,7 +122,7 @@ hd44808_device::hd44808_device(const machine_config &mconfig, const char *tag, d
 
 
 hmcs45_cpu_device::hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity) :
-	hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS45, polarity, 4, 11, 12, address_map_constructor(FUNC(hmcs45_cpu_device::program_2k), this), 8, address_map_constructor(FUNC(hmcs45_cpu_device::data_160x4), this))
+	hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS45_FAMILY, polarity, 4, 11, 12, address_map_constructor(FUNC(hmcs45_cpu_device::program_2k), this), 8, address_map_constructor(FUNC(hmcs45_cpu_device::data_160x4), this))
 { }
 
 hd38820_device::hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -162,38 +138,9 @@ hd44828_device::hd44828_device(const machine_config &mconfig, const char *tag, d
 	hmcs45_cpu_device(mconfig, HD44828, tag, owner, clock, IS_CMOS)
 { }
 
-device_memory_interface::space_config_vector hmcs40_cpu_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA,    &m_data_config)
-	};
-}
-
-// disasm
-void hmcs40_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
-{
-	switch (entry.index())
-	{
-		case STATE_GENFLAGS:
-			str = string_format("%c%c",
-				m_c ? 'C':'c',
-				m_s ? 'S':'s'
-			);
-			break;
-
-		default: break;
-	}
-}
-
-std::unique_ptr<util::disasm_interface> hmcs40_cpu_device::create_disassembler()
-{
-	return std::make_unique<hmcs40_disassembler>();
-}
-
 
 //-------------------------------------------------
-//  device_start - device-specific startup
+//  initialization
 //-------------------------------------------------
 
 void hmcs40_cpu_device::device_start()
@@ -282,12 +229,6 @@ void hmcs40_cpu_device::device_start()
 	set_icountptr(m_icount);
 }
 
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
 void hmcs40_cpu_device::device_reset()
 {
 	m_pc = m_pcmask;
@@ -308,6 +249,72 @@ void hmcs40_cpu_device::device_reset()
 		hmcs40_cpu_device::write_r(i, m_polarity & 0xf);
 }
 
+
+//-------------------------------------------------
+//  disasm
+//-------------------------------------------------
+
+void hmcs40_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			str = string_format("%c%c",
+				m_c ? 'C':'c',
+				m_s ? 'S':'s'
+			);
+			break;
+
+		default: break;
+	}
+}
+
+std::unique_ptr<util::disasm_interface> hmcs40_cpu_device::create_disassembler()
+{
+	return std::make_unique<hmcs40_disassembler>();
+}
+
+
+//-------------------------------------------------
+//  internal memory maps
+//-------------------------------------------------
+
+// On HMCS42/3/4/5, only half of the ROM address range contains user-executable code,
+// there is up to 128 bytes of pattern data in the 2nd half. The 2nd half also includes
+// a couple of pages with factory test code by Hitachi, only executable when MCU test
+// mode is enabled externally. This data can still be accessed with the P opcode.
+
+void hmcs40_cpu_device::program_1k(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
+
+void hmcs40_cpu_device::program_2k(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
+
+
+void hmcs40_cpu_device::data_80x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+	map(0x40, 0x4f).ram().mirror(0x30);
+}
+
+void hmcs40_cpu_device::data_160x4(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+	map(0x80, 0x8f).ram().mirror(0x30);
+	map(0xc0, 0xcf).ram().mirror(0x30);
+}
+
+device_memory_interface::space_config_vector hmcs40_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
 
 
 //-------------------------------------------------
@@ -435,7 +442,6 @@ void hmcs45_cpu_device::write_r(int index, u8 data)
 }
 
 
-
 //-------------------------------------------------
 //  interrupt/timer handling
 //-------------------------------------------------
@@ -516,7 +522,6 @@ void hmcs40_cpu_device::increment_tc()
 		m_tf = 1;
 	}
 }
-
 
 
 //-------------------------------------------------

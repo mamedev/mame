@@ -15,7 +15,7 @@ class hmcs40_disassembler : public util::disasm_interface
 {
 public:
 	hmcs40_disassembler();
-	virtual ~hmcs40_disassembler() = default;
+	virtual ~hmcs40_disassembler();
 
 	virtual u32 opcode_alignment() const override { return 1; }
 	virtual u32 interface_flags() const override { return NONLINEAR_PC | PAGED; }

@@ -81,6 +81,8 @@ enum
 class hmcs40_cpu_device : public cpu_device
 {
 public:
+	virtual ~hmcs40_cpu_device();
+
 	// max 8 4-bit R ports
 	template <std::size_t N> auto read_r() { return m_read_r[N].bind(); }
 	template <std::size_t N> auto write_r() { return m_write_r[N].bind(); }
@@ -92,38 +94,38 @@ public:
 protected:
 	enum
 	{
-		HMCS40_FAMILY_HMCS42 = 0,
-		HMCS40_FAMILY_HMCS43,
-		HMCS40_FAMILY_HMCS44,
-		HMCS40_FAMILY_HMCS45,
-		HMCS40_FAMILY_HMCS46,
-		HMCS40_FAMILY_HMCS47
+		HMCS42_FAMILY = 0,
+		HMCS43_FAMILY,
+		HMCS44_FAMILY,
+		HMCS45_FAMILY,
+		HMCS46_FAMILY,
+		HMCS47_FAMILY
 	};
 
-	// construction/destruction
+	// construction
 	hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, u16 polarity, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); } // "
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 2+1; } // max 2 + interrupt
-	virtual u32 execute_input_lines() const noexcept override { return 2+1; } // 3rd one is internal
+	virtual u32 execute_input_lines() const noexcept override { return 3; }
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// memorymaps
+	// memory maps
 	void program_1k(address_map &map);
 	void program_2k(address_map &map);
 	void data_160x4(address_map &map);
@@ -137,12 +139,12 @@ protected:
 	int m_icount;
 	int m_state_count;
 
-	int const m_pcwidth;        // Program Counter bit-width
-	int const m_prgwidth;
-	int const m_datawidth;
-	int const m_family;         // MCU family (42-47)
-	u16 const m_polarity;       // i/o polarity (pmos vs cmos)
-	int const m_stack_levels;   // number of callstack levels
+	const int m_pcwidth;        // Program Counter bit-width
+	const int m_prgwidth;
+	const int m_datawidth;
+	const int m_family;         // MCU family (42-47)
+	const u16 m_polarity;       // i/o polarity (pmos vs cmos)
+	const int m_stack_levels;   // number of callstack levels
 	int m_pcmask;
 	int m_prgmask;
 	int m_datamask;
