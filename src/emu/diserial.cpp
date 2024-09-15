@@ -25,6 +25,7 @@ device_serial_interface::device_serial_interface(const machine_config &mconfig, 
 	m_df_word_length(0),
 	m_df_parity(PARITY_NONE),
 	m_df_stop_bit_count(STOP_BITS_0),
+	m_df_min_rx_stop_bit_count(0),
 	m_rcv_register_data(0x8000),
 	m_rcv_flags(0),
 	m_rcv_bit_count_received(0),
@@ -81,6 +82,7 @@ void device_serial_interface::interface_post_start()
 	device().save_item(NAME(m_df_word_length));
 	device().save_item(NAME(m_df_parity));
 	device().save_item(NAME(m_df_stop_bit_count));
+	device().save_item(NAME(m_df_min_rx_stop_bit_count));
 	device().save_item(NAME(m_rcv_register_data));
 	device().save_item(NAME(m_rcv_flags));
 	device().save_item(NAME(m_rcv_bit_count_received));
@@ -174,26 +176,30 @@ void device_serial_interface::set_data_frame(int start_bit_count, int data_bit_c
 	case STOP_BITS_0:
 	default:
 		m_df_stop_bit_count = 0;
+		m_df_min_rx_stop_bit_count = 0;
 		break;
 
 	case STOP_BITS_1:
 		m_df_stop_bit_count = 1;
+		m_df_min_rx_stop_bit_count = 1;
 		break;
 
 	case STOP_BITS_1_5:
 		m_df_stop_bit_count = 2; // TODO: support 1.5 stop bits
+		m_df_min_rx_stop_bit_count = 1;
 		break;
 
 	case STOP_BITS_2:
 		m_df_stop_bit_count = 2;
+		m_df_min_rx_stop_bit_count = 1;
 		break;
 	}
 
 	m_df_parity = parity;
 	m_df_start_bit_count = start_bit_count;
 
-	/* Don't require any stop bits when receiving */
-	m_rcv_bit_count = m_df_word_length;
+	/* Require at least one stop bit in async RX mode, none in sync RX mode. */
+	m_rcv_bit_count = m_df_word_length + m_df_min_rx_stop_bit_count;
 
 	if (m_df_parity != PARITY_NONE)
 	{
@@ -286,7 +292,7 @@ void device_serial_interface::receive_register_update_bit(int bit)
 		LOGMASKED(LOG_RX, "Received bit %d as %d (%s)\n", m_rcv_bit_count_received, bit, device().machine().time().to_string());
 		m_rcv_bit_count_received++;
 
-		if (!bit && (m_rcv_bit_count_received > m_rcv_bit_count))
+		if (!bit && (m_rcv_bit_count_received > (m_rcv_bit_count - m_df_min_rx_stop_bit_count)))
 		{
 			LOGMASKED(LOG_RX, "Framing error\n");
 			m_rcv_framing_error = true;
@@ -429,7 +435,7 @@ void device_serial_interface::transmit_register_setup(u8 data_byte)
 		transmit_register_add_bit(parity);
 	}
 
-	/* stop bit(s) */
+	/* TX stop bit(s) */
 	for (i=0; i<m_df_stop_bit_count; i++)
 		transmit_register_add_bit(1);
 }
