@@ -14,32 +14,12 @@ DEFINE_DEVICE_TYPE(TMP95C063, tmp95c063_device, "tmp95c063", "Toshiba TMP95C063"
 
 tmp95c063_device::tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	tlcs900h_device(mconfig, TMP95C063, tag, owner, clock),
-	m_port1_read(*this, 0),
-	m_port1_write(*this),
-	m_port2_write(*this),
-	m_port5_read(*this, 0),
-	m_port5_write(*this),
-	m_port6_read(*this, 0),
-	m_port6_write(*this),
-	m_port7_read(*this, 0),
-	m_port7_write(*this),
-	m_port8_read(*this, 0),
-	m_port8_write(*this),
-	m_port9_read(*this, 0),
-	m_port9_write(*this),
-	m_porta_read(*this, 0),
-	m_porta_write(*this),
-	m_portb_read(*this, 0),
-	m_portb_write(*this),
-	m_portc_read(*this, 0),
-	m_portd_read(*this, 0),
-	m_portd_write(*this),
-	m_porte_read(*this, 0),
-	m_porte_write(*this),
 	m_an_read(*this, 0),
-	m_port_latch{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	m_port_control{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	m_port_function{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	m_port_read(*this, 0),
+	m_port_write(*this),
+	m_port_latch{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	m_port_control{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	m_port_function{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	m_t8run(0),
 	m_t8_reg{ 0, 0, 0, 0, 0, 0, 0, 0 },
 	m_t8_mode{ 0, 0, 0, 0 },
@@ -74,28 +54,54 @@ tmp95c063_device::tmp95c063_device(const machine_config &mconfig, const char *ta
 {
 }
 
+template <uint8_t P>
+void tmp95c063_device::port_w(uint8_t data)
+{
+	m_port_latch[P] = data;
+	m_port_write[P](0, data, 0xff);
+}
+
+template <uint8_t P>
+uint8_t tmp95c063_device::port_r()
+{
+	return m_port_read[P](0);
+}
+
+template <uint8_t P>
+void tmp95c063_device::port_cr_w(uint8_t data)
+{
+	m_port_control[P] = data;
+}
+
+template <uint8_t P>
+void tmp95c063_device::port_fc_w(uint8_t data)
+{
+	m_port_function[P] = data;
+}
+
+
 void tmp95c063_device::internal_mem(address_map &map)
 {
-	map(0x000001, 0x000001).rw(FUNC(tmp95c063_device::p1_r), FUNC(tmp95c063_device::p1_w));
-	map(0x000004, 0x000004).w(FUNC(tmp95c063_device::p1cr_w));
-	map(0x000006, 0x000006).rw(FUNC(tmp95c063_device::p2_r), FUNC(tmp95c063_device::p2_w));
-	map(0x000009, 0x000009).w(FUNC(tmp95c063_device::p2fc_w));
-	map(0x00000d, 0x00000d).rw(FUNC(tmp95c063_device::p5_r), FUNC(tmp95c063_device::p5_w));
-	map(0x000010, 0x000010).w(FUNC(tmp95c063_device::p5cr_w));
-	map(0x000011, 0x000011).w(FUNC(tmp95c063_device::p5fc_w));
-	map(0x000012, 0x000012).rw(FUNC(tmp95c063_device::p6_r), FUNC(tmp95c063_device::p6_w));
-	map(0x000013, 0x000013).rw(FUNC(tmp95c063_device::p7_r), FUNC(tmp95c063_device::p7_w));
-	map(0x000015, 0x000015).w(FUNC(tmp95c063_device::p6fc_w));
-	map(0x000016, 0x000016).w(FUNC(tmp95c063_device::p7cr_w));
-	map(0x000017, 0x000017).w(FUNC(tmp95c063_device::p7fc_w));
-	map(0x000018, 0x000018).rw(FUNC(tmp95c063_device::p8_r), FUNC(tmp95c063_device::p8_w));
-	map(0x000019, 0x000019).rw(FUNC(tmp95c063_device::p9_r), FUNC(tmp95c063_device::p9_w));
-	map(0x00001a, 0x00001a).w(FUNC(tmp95c063_device::p8cr_w));
-	map(0x00001b, 0x00001b).w(FUNC(tmp95c063_device::p8fc_w));
-	map(0x00001c, 0x00001c).w(FUNC(tmp95c063_device::p9cr_w));
-	map(0x00001d, 0x00001d).w(FUNC(tmp95c063_device::p9fc_w));
-	map(0x00001e, 0x00001e).rw(FUNC(tmp95c063_device::pa_r), FUNC(tmp95c063_device::pa_w));
-	map(0x00001f, 0x00001f).rw(FUNC(tmp95c063_device::pb_r), FUNC(tmp95c063_device::pb_w));
+	map(0x000001, 0x000001).rw(FUNC(tmp95c063_device::port_r<PORT_1>), FUNC(tmp95c063_device::port_w<PORT_1>));
+	map(0x000004, 0x000004).w(FUNC(tmp95c063_device::port_cr_w<PORT_1>));
+	map(0x000006, 0x000006).rw(FUNC(tmp95c063_device::port_r<PORT_2>), FUNC(tmp95c063_device::port_w<PORT_2>));
+	map(0x000009, 0x000009).w(FUNC(tmp95c063_device::port_fc_w<PORT_2>));
+	map(0x00000d, 0x00000d).rw(FUNC(tmp95c063_device::port_r<PORT_5>), FUNC(tmp95c063_device::port_w<PORT_5>));
+	map(0x000010, 0x000010).w(FUNC(tmp95c063_device::port_cr_w<PORT_5>));
+	map(0x000011, 0x000011).w(FUNC(tmp95c063_device::port_fc_w<PORT_5>));
+	map(0x000012, 0x000012).rw(FUNC(tmp95c063_device::port_r<PORT_6>), FUNC(tmp95c063_device::port_w<PORT_6>));
+	map(0x000013, 0x000013).rw(FUNC(tmp95c063_device::port_r<PORT_7>), FUNC(tmp95c063_device::port_w<PORT_7>));
+	map(0x000015, 0x000015).w(FUNC(tmp95c063_device::port_fc_w<PORT_6>));
+	map(0x000016, 0x000016).w(FUNC(tmp95c063_device::port_cr_w<PORT_7>));
+	map(0x000017, 0x000017).w(FUNC(tmp95c063_device::port_fc_w<PORT_7>));
+	map(0x000018, 0x000018).rw(FUNC(tmp95c063_device::port_r<PORT_8>), FUNC(tmp95c063_device::port_w<PORT_8>));
+	map(0x000019, 0x000019).rw(FUNC(tmp95c063_device::port_r<PORT_9>), FUNC(tmp95c063_device::port_w<PORT_9>));
+	map(0x00001a, 0x00001a).w(FUNC(tmp95c063_device::port_cr_w<PORT_8>));
+	map(0x00001b, 0x00001b).w(FUNC(tmp95c063_device::port_fc_w<PORT_8>));
+	map(0x00001c, 0x00001c).w(FUNC(tmp95c063_device::port_cr_w<PORT_9>));
+	map(0x00001d, 0x00001d).w(FUNC(tmp95c063_device::port_fc_w<PORT_9>));
+	map(0x00001e, 0x00001e).rw(FUNC(tmp95c063_device::port_r<PORT_A>), FUNC(tmp95c063_device::port_w<PORT_A>));
+	map(0x00001f, 0x00001f).rw(FUNC(tmp95c063_device::port_r<PORT_A>), FUNC(tmp95c063_device::port_w<PORT_B>));
 	map(0x000020, 0x000020).rw(FUNC(tmp95c063_device::t8run_r), FUNC(tmp95c063_device::t8run_w));
 	map(0x000021, 0x000021).rw(FUNC(tmp95c063_device::trdc_r), FUNC(tmp95c063_device::trdc_w));
 	map(0x000022, 0x000023).w(FUNC(tmp95c063_device::treg01_w));
@@ -140,15 +146,15 @@ void tmp95c063_device::internal_mem(address_map &map)
 	map(0x00006f, 0x00006f).w(FUNC(tmp95c063_device::wdcr_w));
 	map(0x000070, 0x00007e).rw(FUNC(tmp95c063_device::inte_r), FUNC(tmp95c063_device::inte_w));
 	map(0x00007f, 0x00007f).w(FUNC(tmp95c063_device::iimc_w));
-	map(0x000080, 0x000080).w(FUNC(tmp95c063_device::pacr_w));
-	map(0x000081, 0x000081).w(FUNC(tmp95c063_device::pafc_w));
-	map(0x000082, 0x000082).w(FUNC(tmp95c063_device::pbcr_w));
-	map(0x000083, 0x000083).w(FUNC(tmp95c063_device::pbfc_w));
-	map(0x000084, 0x000084).r(FUNC(tmp95c063_device::pc_r));
-	map(0x000085, 0x000085).rw(FUNC(tmp95c063_device::pd_r), FUNC(tmp95c063_device::pd_w));
-	map(0x000088, 0x000088).w(FUNC(tmp95c063_device::pdcr_w));
-	map(0x00008a, 0x00008a).rw(FUNC(tmp95c063_device::pe_r), FUNC(tmp95c063_device::pe_w));
-	map(0x00008c, 0x00008c).w(FUNC(tmp95c063_device::pecr_w));
+	map(0x000080, 0x000080).w(FUNC(tmp95c063_device::port_cr_w<PORT_A>));
+	map(0x000081, 0x000081).w(FUNC(tmp95c063_device::port_fc_w<PORT_A>));
+	map(0x000082, 0x000082).w(FUNC(tmp95c063_device::port_cr_w<PORT_B>));
+	map(0x000083, 0x000083).w(FUNC(tmp95c063_device::port_fc_w<PORT_B>));
+	map(0x000084, 0x000084).r(FUNC(tmp95c063_device::port_r<PORT_C>));
+	map(0x000085, 0x000085).rw(FUNC(tmp95c063_device::port_r<PORT_D>), FUNC(tmp95c063_device::port_w<PORT_D>));
+	map(0x000088, 0x000088).w(FUNC(tmp95c063_device::port_cr_w<PORT_D>));
+	map(0x00008a, 0x00008a).rw(FUNC(tmp95c063_device::port_r<PORT_E>), FUNC(tmp95c063_device::port_w<PORT_E>));
+	map(0x00008c, 0x00008c).w(FUNC(tmp95c063_device::port_cr_w<PORT_E>));
 	map(0x00008f, 0x00008f).w(FUNC(tmp95c063_device::bexcs_w));
 	map(0x000090, 0x000093).w(FUNC(tmp95c063_device::bcs_w));
 	map(0x000094, 0x00009b).rw(FUNC(tmp95c063_device::msar_r), FUNC(tmp95c063_device::msar_w));
@@ -603,16 +609,18 @@ void tmp95c063_device::device_reset()
 	m_timer_change[2] = 0;
 	m_timer_change[3] = 0;
 
-	m_port_latch[1] = 0x00;
-	m_port_latch[2] = 0xff;
-	m_port_latch[5] = 0x3d;
-	m_port_latch[6] = 0x3b;
-	m_port_latch[7] = 0xff;
-	m_port_latch[8] = 0x3f;
-	m_port_latch[0xa] = 0x0f;
-	m_port_latch[0xb] = 0xff;
-	std::fill_n(&m_port_control[0], 0xc, 0x00);
-	std::fill_n(&m_port_function[0], 0xc, 0x00);
+	m_port_latch[PORT_1] = 0x00;
+	m_port_latch[PORT_2] = 0xff;
+	m_port_latch[PORT_5] = 0x3d;
+	m_port_latch[PORT_6] = 0x3b;
+	m_port_latch[PORT_7] = 0xff;
+	m_port_latch[PORT_8] = 0x3f;
+	m_port_latch[PORT_A] = 0x0f;
+	m_port_latch[PORT_B] = 0xff;
+	// FIXME: init ports 9, C, D & E
+	std::fill_n(&m_port_control[0], NUM_PORTS, 0x00);
+	std::fill_n(&m_port_function[0], NUM_PORTS, 0x00);
+
 	m_t8run = 0x00;
 	std::fill_n(&m_t8_mode[0], 4, 0x00);
 	std::fill_n(&m_t8_invert[0], 2, 0xcc);
@@ -651,217 +659,6 @@ void tmp95c063_device::device_reset()
 	for (int i = 0; i < TLCS900_NUM_INPUTS; i++)
 		m_level[i] = CLEAR_LINE;
 }
-
-
-uint8_t tmp95c063_device::p1_r()
-{
-	return m_port1_read(0);
-}
-
-void tmp95c063_device::p1_w(uint8_t data)
-{
-	m_port_latch[1] = data;
-	m_port1_write(0, data, 0xff);
-}
-
-void tmp95c063_device::p1cr_w(uint8_t data)
-{
-	m_port_control[1] = data;
-}
-
-uint8_t tmp95c063_device::p2_r()
-{
-	return m_port_latch[2];
-}
-
-void tmp95c063_device::p2_w(uint8_t data)
-{
-	m_port_latch[2] = data;
-	m_port2_write(0, data, 0xff);
-}
-
-void tmp95c063_device::p2fc_w(uint8_t data)
-{
-	m_port_control[2] = data;
-}
-
-uint8_t tmp95c063_device::p5_r()
-{
-	return m_port5_read(0);
-}
-
-void tmp95c063_device::p5_w(uint8_t data)
-{
-	m_port_latch[5] = data;
-	m_port5_write(0, data, 0xff);
-}
-
-void tmp95c063_device::p5cr_w(uint8_t data)
-{
-	m_port_control[5] = data;
-}
-
-void tmp95c063_device::p5fc_w(uint8_t data)
-{
-	m_port_function[5] = data;
-}
-
-uint8_t tmp95c063_device::p6_r()
-{
-	return m_port6_read(0);
-}
-
-void tmp95c063_device::p6_w(uint8_t data)
-{
-	m_port_latch[6] = data;
-	m_port6_write(0, data, 0xff);
-}
-
-void tmp95c063_device::p6fc_w(uint8_t data)
-{
-	m_port_function[6] = data;
-}
-
-uint8_t tmp95c063_device::p7_r()
-{
-	return m_port7_read(0);
-}
-
-void tmp95c063_device::p7_w(uint8_t data)
-{
-	m_port_latch[7] = data;
-	m_port7_write(0, data, 0xff);
-}
-
-void tmp95c063_device::p7cr_w(uint8_t data)
-{
-	m_port_control[7] = data;
-}
-
-void tmp95c063_device::p7fc_w(uint8_t data)
-{
-	m_port_function[7] = data;
-}
-
-uint8_t tmp95c063_device::p8_r()
-{
-	return m_port8_read(0);
-}
-
-void tmp95c063_device::p8_w(uint8_t data)
-{
-	m_port_latch[8] = data;
-	m_port8_write(0, data, 0xff);
-}
-
-void tmp95c063_device::p8cr_w(uint8_t data)
-{
-	m_port_control[8] = data;
-}
-
-void tmp95c063_device::p8fc_w(uint8_t data)
-{
-	m_port_function[8] = data;
-}
-
-uint8_t tmp95c063_device::p9_r()
-{
-	return m_port9_read(0);
-}
-
-void tmp95c063_device::p9_w(uint8_t data)
-{
-	m_port_latch[0x9] = data;
-}
-
-void tmp95c063_device::p9cr_w(uint8_t data)
-{
-	m_port_control[0x9] = data;
-}
-
-void tmp95c063_device::p9fc_w(uint8_t data)
-{
-	m_port_function[0x9] = data;
-}
-
-uint8_t tmp95c063_device::pa_r()
-{
-	return m_porta_read(0);
-}
-
-void tmp95c063_device::pa_w(uint8_t data)
-{
-	m_port_latch[0xa] = data;
-}
-
-void tmp95c063_device::pacr_w(uint8_t data)
-{
-	m_port_control[0xa] = data;
-}
-
-void tmp95c063_device::pafc_w(uint8_t data)
-{
-	m_port_function[0xa] = data;
-}
-
-uint8_t tmp95c063_device::pb_r()
-{
-	return m_portb_read(0);
-}
-
-void tmp95c063_device::pb_w(uint8_t data)
-{
-	m_port_latch[0xb] = data;
-	m_portb_write(0, data, 0xff);
-}
-
-void tmp95c063_device::pbcr_w(uint8_t data)
-{
-	m_port_control[0xb] = data;
-}
-
-void tmp95c063_device::pbfc_w(uint8_t data)
-{
-	m_port_function[0xb] = data;
-}
-
-uint8_t tmp95c063_device::pc_r()
-{
-	return m_portc_read(0);
-}
-
-uint8_t tmp95c063_device::pd_r()
-{
-	return m_portd_read(0);
-}
-
-void tmp95c063_device::pd_w(uint8_t data)
-{
-	m_port_latch[0xd] = data;
-	m_portd_write(0, data, 0xff);
-}
-
-void tmp95c063_device::pdcr_w(uint8_t data)
-{
-	m_port_control[0xd] = data;
-}
-
-uint8_t tmp95c063_device::pe_r()
-{
-	return m_porte_read(0);
-}
-
-void tmp95c063_device::pe_w(uint8_t data)
-{
-	m_port_latch[0xe] = data;
-	m_porte_write(0, data, 0xff);
-}
-
-void tmp95c063_device::pecr_w(uint8_t data)
-{
-	m_port_control[0xe] = data;
-}
-
 
 uint8_t tmp95c063_device::t8run_r()
 {
