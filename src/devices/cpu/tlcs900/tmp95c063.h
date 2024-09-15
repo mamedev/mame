@@ -10,6 +10,7 @@
 
 DECLARE_DEVICE_TYPE(TMP95C063, tmp95c063_device)
 
+
 class tmp95c063_device : public tlcs900h_device
 {
 	static constexpr uint8_t PORT_1 = 0; // 8 bit I/O. Shared with d8-d15
