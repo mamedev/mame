@@ -35,7 +35,7 @@ protected:
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + m_divider - 1) / m_divider; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * m_divider); }
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
-	virtual u32 execute_max_cycles() const noexcept override { return 2+2; } // max 2 + interrupt
+	virtual u32 execute_max_cycles() const noexcept override { return 3+2; } // max 3 + interrupt
 	virtual u32 execute_input_lines() const noexcept override { return 2; }
 	//virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
@@ -58,14 +58,16 @@ protected:
 	const u32 m_rom_size; // ROM size in 16-bit words
 	const u32 m_ram_size; // RAM size minus the 64-byte stack
 	bool m_has_div;       // MCU supports divider mask option
-	bool m_has_law;       // MCU supports LAW/LWA opcodes
 	u8 m_divider;         // system clock divider
 
 	u16 m_pc;
 	u16 m_prev_pc;
 	u16 m_op;
+	u16 m_param;
 
 	int m_icount;
+
+	u16 fetch();
 
 	// opcode handlers
 	void op_illegal();
@@ -84,16 +86,34 @@ public:
 	hd614022_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
+class hd614023_device : public hmcs402_cpu_device
+{
+public:
+	hd614023_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
 class hd614025_device : public hmcs402_cpu_device
 {
 public:
 	hd614025_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
+class hd614026_device : public hmcs402_cpu_device
+{
+public:
+	hd614026_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
 class hd614028_device : public hmcs402_cpu_device
 {
 public:
 	hd614028_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd614029_device : public hmcs402_cpu_device
+{
+public:
+	hd614029_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
@@ -109,16 +129,34 @@ public:
 	hd614042_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
+class hd614043_device : public hmcs404_cpu_device
+{
+public:
+	hd614043_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
 class hd614045_device : public hmcs404_cpu_device
 {
 public:
 	hd614045_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
+class hd614046_device : public hmcs404_cpu_device
+{
+public:
+	hd614046_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
 class hd614048_device : public hmcs404_cpu_device
 {
 public:
 	hd614048_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd614049_device : public hmcs404_cpu_device
+{
+public:
+	hd614049_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
@@ -134,10 +172,22 @@ public:
 	hd614080_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
+class hd614081_device : public hmcs408_cpu_device
+{
+public:
+	hd614081_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
 class hd614085_device : public hmcs408_cpu_device
 {
 public:
 	hd614085_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd614086_device : public hmcs408_cpu_device
+{
+public:
+	hd614086_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class hd614088_device : public hmcs408_cpu_device
@@ -146,17 +196,32 @@ public:
 	hd614088_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
+class hd614089_device : public hmcs408_cpu_device
+{
+public:
+	hd614089_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
 
 DECLARE_DEVICE_TYPE(HD614022, hd614022_device)
+DECLARE_DEVICE_TYPE(HD614023, hd614023_device)
 DECLARE_DEVICE_TYPE(HD614025, hd614025_device)
+DECLARE_DEVICE_TYPE(HD614026, hd614026_device)
 DECLARE_DEVICE_TYPE(HD614028, hd614028_device)
+DECLARE_DEVICE_TYPE(HD614029, hd614029_device)
 
 DECLARE_DEVICE_TYPE(HD614042, hd614042_device)
+DECLARE_DEVICE_TYPE(HD614043, hd614043_device)
 DECLARE_DEVICE_TYPE(HD614045, hd614045_device)
+DECLARE_DEVICE_TYPE(HD614046, hd614046_device)
 DECLARE_DEVICE_TYPE(HD614048, hd614048_device)
+DECLARE_DEVICE_TYPE(HD614049, hd614049_device)
 
 DECLARE_DEVICE_TYPE(HD614080, hd614080_device)
+DECLARE_DEVICE_TYPE(HD614081, hd614081_device)
 DECLARE_DEVICE_TYPE(HD614085, hd614085_device)
+DECLARE_DEVICE_TYPE(HD614086, hd614086_device)
 DECLARE_DEVICE_TYPE(HD614088, hd614088_device)
+DECLARE_DEVICE_TYPE(HD614089, hd614089_device)
 
 #endif // MAME_CPU_HMCS400_HMCS400_H
