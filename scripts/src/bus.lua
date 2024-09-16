@@ -2865,6 +2865,8 @@ if (BUSES["VME"]~=null) then
 		MAME_DIR .. "src/devices/bus/vme/mvme187.h",
 		MAME_DIR .. "src/devices/bus/vme/mvme327a.cpp",
 		MAME_DIR .. "src/devices/bus/vme/mvme327a.h",
+		MAME_DIR .. "src/devices/bus/vme/mvme328.cpp",
+		MAME_DIR .. "src/devices/bus/vme/mvme328.h",
 		MAME_DIR .. "src/devices/bus/vme/mvme350.cpp",
 		MAME_DIR .. "src/devices/bus/vme/mvme350.h",
 		MAME_DIR .. "src/devices/bus/vme/mzr8105.cpp",
