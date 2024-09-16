@@ -36,7 +36,6 @@ void hmcs40_cpu_device::push_stack()
 }
 
 
-
 // instruction set
 
 void hmcs40_cpu_device::op_illegal()
@@ -144,7 +143,7 @@ void hmcs40_cpu_device::op_ayy()
 {
 	// AYY: Add A to Y
 	m_y += m_a;
-	m_s = m_y >> 4 & 1;
+	m_s = BIT(m_y, 4);
 	m_y &= 0xf;
 }
 
@@ -152,7 +151,7 @@ void hmcs40_cpu_device::op_syy()
 {
 	// SYY: Subtract A from Y
 	m_y -= m_a;
-	m_s = ~m_y >> 4 & 1;
+	m_s = BIT(~m_y, 4);
 	m_y &= 0xf;
 }
 
@@ -253,7 +252,7 @@ void hmcs40_cpu_device::op_ai()
 {
 	// AI i: Add Immediate to A
 	m_a += m_i;
-	m_s = m_a >> 4 & 1;
+	m_s = BIT(m_a, 4);
 	m_a &= 0xf;
 }
 
@@ -275,7 +274,7 @@ void hmcs40_cpu_device::op_amc()
 {
 	// AMC: Add A to Memory with Carry
 	m_a += ram_r() + m_c;
-	m_c = m_a >> 4 & 1;
+	m_c = BIT(m_a, 4);
 	m_s = m_c;
 	m_a &= 0xf;
 }
@@ -284,7 +283,7 @@ void hmcs40_cpu_device::op_smc()
 {
 	// SMC: Subtract A from Memory with Carry
 	m_a = ram_r() - m_a - (m_c ^ 1);
-	m_c = ~m_a >> 4 & 1;
+	m_c = BIT(~m_a, 4);
 	m_s = m_c;
 	m_a &= 0xf;
 }
@@ -293,7 +292,7 @@ void hmcs40_cpu_device::op_am()
 {
 	// AM: Add A to Memory
 	m_a += ram_r();
-	m_s = m_a >> 4 & 1;
+	m_s = BIT(m_a, 4);
 	m_a &= 0xf;
 }
 
@@ -351,7 +350,7 @@ void hmcs40_cpu_device::op_rotl()
 {
 	// ROTL: Rotate Left A with Carry
 	m_a = m_a << 1 | m_c;
-	m_c = m_a >> 4 & 1;
+	m_c = BIT(m_a, 4);
 	m_a &= 0xf;
 }
 
@@ -375,7 +374,7 @@ void hmcs40_cpu_device::op_or()
 void hmcs40_cpu_device::op_mnei()
 {
 	// MNEI i: Memory Not Equal to Immediate
-	m_s = (ram_r() != m_i);
+	m_s = (m_i != ram_r());
 }
 
 void hmcs40_cpu_device::op_ynei()
@@ -432,7 +431,7 @@ void hmcs40_cpu_device::op_rem()
 void hmcs40_cpu_device::op_tm()
 {
 	// TM n: Test Memory Bit
-	m_s = ram_r() >> (m_op & 3) & 1;
+	m_s = BIT(ram_r(), m_op & 3);
 }
 
 

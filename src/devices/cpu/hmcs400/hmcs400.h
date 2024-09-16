@@ -45,6 +45,7 @@ protected:
 
 	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// memory maps
 	void program_map(address_map &map);
@@ -55,26 +56,47 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 
+	int m_icount;
+	int m_state_count;
+
 	const u32 m_rom_size; // ROM size in 16-bit words
 	const u32 m_ram_size; // RAM size minus the 64-byte stack
 	bool m_has_div;       // MCU supports divider mask option
 	u8 m_divider;         // system clock divider
 
-	u16 m_pc;
+	u16 m_pc;             // program counter
 	u16 m_prev_pc;
-	u16 m_op;
-	u16 m_param;
+	u16 m_sp;             // stack pointer
+	u16 m_op;             // current opcode
+	u16 m_param;          // 2-byte opcode param or RAM address
+	u8 m_i;               // 4-bit immediate opcode param
 
-	int m_icount;
+	u8 m_a;               // 4-bit accumulator
+	u8 m_b;               // 4-bit B register
+	u8 m_w;               // 2-bit W register
+	u8 m_x;               // 4-bit X register
+	u8 m_spx;             // 4-bit SPX register
+	u8 m_y;               // 4-bit Y register
+	u8 m_spy;             // 4-bit SPY register
+	u8 m_st;              // status flag
+	u8 m_ca;              // carry flag
 
 	u16 fetch();
+
+	// misc internal helpers
+	u8 ram_r(u8 mem_mask = 0xf);
+	void ram_w(u8 data, u8 mem_mask = 0xf);
+	void pop_stack();
+	void push_stack();
+
+	void cycle();
 
 	// opcode handlers
 	void op_illegal();
 
 	void op_lai();
 	void op_lbi();
-	void op_lmid();
+	void op_lmi();
 	void op_lmiiy();
 
 	void op_lab();

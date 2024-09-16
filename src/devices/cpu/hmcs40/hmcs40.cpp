@@ -159,6 +159,8 @@ void hmcs40_cpu_device::device_start()
 	m_eint_line = 0;
 	m_halt = 0;
 	m_prescaler = 0;
+	m_block_int = false;
+
 	m_pc = 0;
 	m_prev_pc = 0;
 	m_page = 0;
@@ -170,6 +172,7 @@ void hmcs40_cpu_device::device_start()
 	m_spy = 0;
 	m_s = 1;
 	m_c = 0;
+
 	m_tc = 0;
 	m_cf = 0;
 	m_ie = 0;
@@ -177,7 +180,6 @@ void hmcs40_cpu_device::device_start()
 	memset(m_if, 0, sizeof(m_if));
 	m_tf = 0;
 	memset(m_int, 0, sizeof(m_int));
-	m_block_int = false;
 	memset(m_r, 0, sizeof(m_r));
 	m_d = 0;
 
@@ -188,6 +190,9 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_i));
 	save_item(NAME(m_eint_line));
 	save_item(NAME(m_halt));
+	save_item(NAME(m_prescaler));
+	save_item(NAME(m_block_int));
+
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_page));
@@ -199,8 +204,8 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_spy));
 	save_item(NAME(m_s));
 	save_item(NAME(m_c));
+
 	save_item(NAME(m_tc));
-	save_item(NAME(m_prescaler));
 	save_item(NAME(m_cf));
 	save_item(NAME(m_ie));
 	save_item(NAME(m_iri));
@@ -208,7 +213,6 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_if));
 	save_item(NAME(m_tf));
 	save_item(NAME(m_int));
-	save_item(NAME(m_block_int));
 	save_item(NAME(m_r));
 	save_item(NAME(m_d));
 
@@ -225,6 +229,9 @@ void hmcs40_cpu_device::device_start()
 	state_add(++m_state_count, "SPX", m_spx).formatstr("%01X"); // 5
 	state_add(++m_state_count, "Y", m_y).formatstr("%01X"); // 6
 	state_add(++m_state_count, "SPY", m_spy).formatstr("%01X"); // 7
+
+	state_add(++m_state_count, "S", m_s).formatstr("%01X").noshow(); // 8
+	state_add(++m_state_count, "C", m_c).formatstr("%01X").noshow(); // 9
 
 	set_icountptr(m_icount);
 }

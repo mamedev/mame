@@ -139,45 +139,47 @@ protected:
 	int m_icount;
 	int m_state_count;
 
-	const int m_pcwidth;        // Program Counter bit-width
+	const int m_pcwidth;      // program counter bit-width
 	const int m_prgwidth;
 	const int m_datawidth;
-	const int m_family;         // MCU family (42-47)
-	const u16 m_polarity;       // i/o polarity (pmos vs cmos)
-	const int m_stack_levels;   // number of callstack levels
+	const int m_family;       // MCU family (42-47)
+	const u16 m_polarity;     // i/o polarity (pmos vs cmos)
+	const int m_stack_levels; // number of callstack levels
 	int m_pcmask;
 	int m_prgmask;
 	int m_datamask;
-	u16 m_stack[4];     // max 4
-	u16 m_op;           // current opcode
-	u16 m_prev_op;
-	u8 m_i;             // 4-bit immediate opcode param
-	int m_eint_line;    // which input_line caused an interrupt
-	int m_halt;         // internal HLT state
-	u8 m_prescaler;     // internal timer prescaler
-	bool m_block_int;   // block interrupt on next cycle
 
-	u16 m_pc;           // Program Counter
+	u16 m_stack[4];           // max 4
+	u16 m_op;                 // current opcode
+	u16 m_prev_op;
+	u8 m_i;                   // 4-bit immediate opcode param
+	int m_eint_line;          // which input_line caused an interrupt
+	int m_halt;               // internal HLT state
+	u8 m_prescaler;           // internal timer prescaler
+	bool m_block_int;         // block interrupt on next cycle
+
+	u16 m_pc;                 // program counter
 	u16 m_prev_pc;
-	u8 m_page;          // LPU prepared page
-	u8 m_a;             // 4-bit Accumulator
-	u8 m_b;             // 4-bit B register
-	u8 m_x;             // 1/3/4-bit X register
-	u8 m_spx;           // 1/3/4-bit SPX register
-	u8 m_y;             // 4-bit Y register
-	u8 m_spy;           // 4-bit SPY register
-	u8 m_s;             // Status F/F (F/F = flip-flop)
-	u8 m_c;             // Carry F/F
-	u8 m_tc;            // Timer/Counter
-	u8 m_cf;            // CF F/F (timer mode or counter mode)
-	u8 m_ie;            // I/E(Interrupt Enable) F/F
-	u8 m_iri;           // external interrupt pending I/RI F/F
-	u8 m_irt;           // timer interrupt pending I/RT F/F
-	u8 m_if[2];         // external interrupt mask IF0,1 F/F
-	u8 m_tf;            // timer interrupt mask TF F/F
-	u8 m_int[2];        // INT0/1 pins state
-	u8 m_r[8];          // R outputs state
-	u16 m_d;            // D pins state
+	u8 m_page;                // LPU prepared page
+	u8 m_a;                   // 4-bit accumulator
+	u8 m_b;                   // 4-bit B register
+	u8 m_x;                   // 1/3/4-bit X register
+	u8 m_spx;                 // 1/3/4-bit SPX register
+	u8 m_y;                   // 4-bit Y register
+	u8 m_spy;                 // 4-bit SPY register
+	u8 m_s;                   // status F/F (F/F = flip-flop)
+	u8 m_c;                   // carry F/F
+
+	u8 m_tc;                  // timer/counter
+	u8 m_cf;                  // CF F/F (timer mode or counter mode)
+	u8 m_ie;                  // I/E (interrupt enable) F/F
+	u8 m_iri;                 // external interrupt pending I/RI F/F
+	u8 m_irt;                 // timer interrupt pending I/RT F/F
+	u8 m_if[2];               // external interrupt mask IF0,1 F/F
+	u8 m_tf;                  // timer interrupt mask TF F/F
+	u8 m_int[2];              // INT0/1 pins state
+	u8 m_r[8];                // R outputs state
+	u16 m_d;                  // D pins state
 
 	// I/O handlers
 	devcb_read8::array<8> m_read_r;

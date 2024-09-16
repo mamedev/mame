@@ -4,8 +4,13 @@
 
 Hitachi HMCS400 MCU family cores
 
-It's the successor to HMCS40, around 5 times faster, and more versatile peripherals,
-like a serial interface. It was mainly used in consumer electronics, not much in games.
+It's the successor to HMCS40, it was mainly used in consumer electronics, not
+much in games.
+
+Compared to HMCS40, it accepts a higher clock speed, and it has more versatile
+peripherals, like a serial interface. The opcodes were mostly kept the same.
+They added an extra RAM addressing mode, and interrupt-related opcodes were
+removed (interrupt flags are via memory-mapped I/O).
 
 TODO:
 - do the LAW/LWA opcodes not work on early revisions of HMCS400? the 1988 user
@@ -160,21 +165,57 @@ void hmcs400_cpu_device::device_start()
 	// zerofill
 	m_pc = 0;
 	m_prev_pc = 0;
+	m_sp = 0;
 	m_op = 0;
 	m_param = 0;
+	m_i = 0;
+
+	m_a = 0;
+	m_b = 0;
+	m_w = 0;
+	m_x = 0;
+	m_spx = 0;
+	m_y = 0;
+	m_spy = 0;
+	m_st = 0;
+	m_ca = 0;
 
 	// register for savestates
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prev_pc));
+	save_item(NAME(m_sp));
 	save_item(NAME(m_op));
 	save_item(NAME(m_param));
+	save_item(NAME(m_i));
+
+	save_item(NAME(m_a));
+	save_item(NAME(m_b));
+	save_item(NAME(m_w));
+	save_item(NAME(m_x));
+	save_item(NAME(m_spx));
+	save_item(NAME(m_y));
+	save_item(NAME(m_spy));
+	save_item(NAME(m_st));
+	save_item(NAME(m_ca));
 
 	// register state for debugger
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_st).formatstr("%2s").noshow();
 
-	int state_count = 0;
-	state_add(++state_count, "PC", m_pc).formatstr("%04X"); // 1
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%04X"); // 1
+	state_add(++m_state_count, "SP", m_sp).formatstr("%03X"); // 2
+	state_add(++m_state_count, "A", m_a).formatstr("%01X"); // 3
+	state_add(++m_state_count, "B", m_b).formatstr("%01X"); // 4
+	state_add(++m_state_count, "W", m_w).formatstr("%01X"); // 5
+	state_add(++m_state_count, "X", m_x).formatstr("%01X"); // 6
+	state_add(++m_state_count, "SPX", m_spx).formatstr("%01X"); // 7
+	state_add(++m_state_count, "Y", m_y).formatstr("%01X"); // 8
+	state_add(++m_state_count, "SPY", m_spy).formatstr("%01X"); // 9
+
+	state_add(++m_state_count, "ST", m_st).formatstr("%01X").noshow(); // 10
+	state_add(++m_state_count, "CA", m_ca).formatstr("%01X").noshow(); // 11
 
 	set_icountptr(m_icount);
 }
@@ -182,6 +223,28 @@ void hmcs400_cpu_device::device_start()
 void hmcs400_cpu_device::device_reset()
 {
 	m_pc = 0;
+	m_sp = 0x3ff;
+	m_st = 1;
+}
+
+
+//-------------------------------------------------
+//  disasm
+//-------------------------------------------------
+
+void hmcs400_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			str = string_format("%c%c",
+				m_ca ? 'C':'c',
+				m_st ? 'S':'s'
+			);
+			break;
+
+		default: break;
+	}
 }
 
 std::unique_ptr<util::disasm_interface> hmcs400_cpu_device::create_disassembler()
@@ -219,11 +282,16 @@ device_memory_interface::space_config_vector hmcs400_cpu_device::memory_space_co
 //  execute
 //-------------------------------------------------
 
+void hmcs400_cpu_device::cycle()
+{
+	m_icount--;
+}
+
 u16 hmcs400_cpu_device::fetch()
 {
 	u16 data = m_program->read_word(m_pc);
 	m_pc = (m_pc + 1) & 0x3fff;
-	m_icount--;
+	cycle();
 
 	return data & 0x3ff;
 }
@@ -236,12 +304,13 @@ void hmcs400_cpu_device::execute_run()
 		m_prev_pc = m_pc;
 		debugger_instruction_hook(m_pc);
 		m_op = fetch();
+		m_i = m_op & 0xf;
 
 		// 2-byte opcodes / RAM address
 		if ((m_op >= 0x100 && m_op < 0x140) || (m_op >= 0x150 && m_op < 0x1b0))
 			m_param = fetch();
 		else
-			m_param = 0;
+			m_param = (m_w << 8 | m_x << 4 | m_y) & 0x3ff;
 
 		// handle opcode
 		switch (m_op & 0x3f0)
@@ -255,7 +324,7 @@ void hmcs400_cpu_device::execute_run()
 			case 0x150: op_jmpl(); break;
 			case 0x160: op_call(); break;
 			case 0x170: op_brl(); break;
-			case 0x1a0: op_lmid(); break;
+			case 0x1a0: op_lmi(); break;
 			case 0x1b0: op_p(); break;
 
 			case 0x200: op_lbi(); break;
