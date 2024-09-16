@@ -2156,7 +2156,7 @@ ROM_END
 
 /*
 
-中国锄大D (Zhōngguó chú dà D)
+中国锄大D (Zhōngguó Chú Dà D)
 IGS, 2000
 
 PCB Layout

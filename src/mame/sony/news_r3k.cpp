@@ -21,34 +21,25 @@
 
 #include "emu.h"
 
-#include "cpu/mips/mips1.h"
-
-// memory
-#include "machine/ram.h"
-
-// various hardware
-#include "machine/timekpr.h"
-#include "machine/z80scc.h"
-#include "machine/am79c90.h"
-#include "machine/upd765.h"
 #include "dmac_0448.h"
 #include "news_hid.h"
-#include "machine/cxd1185.h"
 
-// video
-#include "screen.h"
-
-// audio
-#include "sound/spkrdev.h"
-#include "speaker.h"
-
-// busses and connectors
-#include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
-
+#include "cpu/mips/mips1.h"
 #include "imagedev/floppy.h"
+#include "machine/am79c90.h"
+#include "machine/cxd1185.h"
+#include "machine/nscsi_bus.h"
+#include "machine/ram.h"
+#include "machine/timekpr.h"
+#include "machine/upd765.h"
+#include "machine/z80scc.h"
+#include "sound/spkrdev.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -277,7 +268,7 @@ void news_r3k_base_state::cpu_map(address_map &map)
 	// 1fcc0000 // cstrobe?
 	// 1fcc0002 // sccstatus0?
 	map(0x1fcc0003, 0x1fcc0003).rw(FUNC(news_r3k_base_state::debug_r), FUNC(news_r3k_base_state::debug_w));
-	map(0x1fcc0007, 0x1fcc0007).lr8([this](){ return m_scc->m1_r(); }, "sccvect_r");
+	map(0x1fcc0007, 0x1fcc0007).lr8([this] () { return m_scc->m1_r(); }, "sccvect_r");
 
 	map(0x1fd00000, 0x1fd00007).m(m_hid, FUNC(news_hid_hle_device::map));
 	map(0x1fd40000, 0x1fd40003).noprw(); // FIXME: ignore buzzer for now

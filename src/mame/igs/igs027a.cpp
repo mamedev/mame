@@ -79,8 +79,7 @@ void igs027a_cpu_device::onboard_peripherals(address_map &map)
 	map(0x4000'000c, 0x4000'000f).r(FUNC(igs027a_cpu_device::in_port_r));
 	map(0x4000'0018, 0x4000'001b).umask32(0x0000'00ff).w(FUNC(igs027a_cpu_device::out_port_w));
 
-	map(0x7000'0100, 0x7000'0103).umask32(0x0000'00ff).w(FUNC(igs027a_cpu_device::timer_rate_w<0>));
-	map(0x7000'0104, 0x7000'0107).umask32(0x0000'00ff).w(FUNC(igs027a_cpu_device::timer_rate_w<1>));
+	map(0x7000'0100, 0x7000'0107).umask32(0x0000'00ff).w(FUNC(igs027a_cpu_device::timer_rate_w));
 	map(0x7000'0200, 0x7000'0203).umask32(0x0000'00ff).rw(FUNC(igs027a_cpu_device::irq_pending_r), FUNC(igs027a_cpu_device::irq_enable_w));
 
 	map(0xf000'0008, 0xf000'000b).umask32(0x0000'00ff).w(FUNC(igs027a_cpu_device::bus_sizing_w));
@@ -101,19 +100,18 @@ void igs027a_cpu_device::out_port_w(u8 data)
 	m_out_port_cb(0, data & OUT_PORT_MASK, OUT_PORT_MASK);
 }
 
-template <unsigned N>
-void igs027a_cpu_device::timer_rate_w(u8 data)
+void igs027a_cpu_device::timer_rate_w(offs_t offset, u8 data)
 {
 	// TODO: determine how timer intervals are derived from clocks
 	if (data)
 	{
 		constexpr u32 TIMER_DIVISOR = 4263;
 		auto const period = attotime::from_ticks(TIMER_DIVISOR * (data + 1), clock());
-		m_irq_timers[N]->adjust(period, 0, period);
+		m_irq_timers[offset]->adjust(period, 0, period);
 	}
 	else
 	{
-		m_irq_timers[N]->adjust(attotime::never, 0, attotime::never);
+		m_irq_timers[offset]->adjust(attotime::never, 0, attotime::never);
 	}
 }
 

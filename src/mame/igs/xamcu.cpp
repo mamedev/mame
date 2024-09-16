@@ -37,12 +37,6 @@ igs_xa_mcu_device_base::~igs_xa_mcu_device_base()
 }
 
 
-void igs_xa_mcu_device_base::cmd_w(u16 data)
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(igs_xa_mcu_device_base::do_cmd_w), this), s32(u32(data)));
-}
-
-
 void igs_xa_mcu_device_base::device_add_mconfig(machine_config &config)
 {
 	MX10EXA(config, m_mcu, DERIVED_CLOCK(1, 1)); // MX10EXAQC (Philips 80C51XA)
@@ -168,6 +162,12 @@ igs_xa_mcu_ics_sound_device::~igs_xa_mcu_ics_sound_device()
 }
 
 
+void igs_xa_mcu_ics_sound_device::cmd_w(u16 data)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(igs_xa_mcu_ics_sound_device::do_cmd_w), this), s32(u32(data)));
+}
+
+
 void igs_xa_mcu_ics_sound_device::device_add_mconfig(machine_config &config)
 {
 	igs_xa_mcu_device_base::device_add_mconfig(config);
@@ -259,10 +259,17 @@ igs_xa_mcu_subcpu_device::~igs_xa_mcu_subcpu_device()
 }
 
 
-void igs_xa_mcu_subcpu_device::irqack_w(u16 data)
+void igs_xa_mcu_subcpu_device::cmd_w(offs_t offset, u16 data)
 {
-	LOG("%s: lower IRQ %08x\n", machine().describe_context(), data);
-	set_irq(0);
+	if (!BIT(offset, 0))
+	{
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(igs_xa_mcu_subcpu_device::do_cmd_w), this), s32(u32(data)));
+	}
+	else
+	{
+		LOG("%s: lower IRQ %08x\n", machine().describe_context(), data);
+		set_irq(0);
+	}
 }
 
 

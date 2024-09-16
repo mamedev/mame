@@ -30,7 +30,7 @@ private:
 
 	u32 in_port_r();
 	void out_port_w(u8 data);
-	template <unsigned N> void timer_rate_w(u8 data);
+	void timer_rate_w(offs_t offset, u8 data);
 	u8 irq_pending_r();
 	void irq_enable_w(u8 data);
 

@@ -16,7 +16,6 @@ public:
 
 	auto irq() { return m_irq_cb.bind(); }
 
-	void cmd_w(u16 data);
 	int irq_r() const { return m_irq; }
 
 protected:
@@ -61,6 +60,7 @@ public:
 	igs_xa_mcu_ics_sound_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 	virtual ~igs_xa_mcu_ics_sound_device();
 
+	void cmd_w(u16 data);
 	u16 response_low_r() { return m_response[0]; }
 	u16 response_high_r() { return m_response[1]; }
 
@@ -85,9 +85,9 @@ public:
 	igs_xa_mcu_subcpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 	virtual ~igs_xa_mcu_subcpu_device();
 
-	void set_disable() { m_mcu.lookup()->set_disable(); }
+	void set_disable() { m_mcu.lookup()->set_disable(); } // for systems where the microcontroller has not been dumped
 
-	void irqack_w(u16 data);
+	void cmd_w(offs_t offset, u16 data);
 	u16 response_r() { return m_response; }
 
 protected:

@@ -165,8 +165,8 @@ void igs_m027xa_state::main_map(address_map &map)
 
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027xa_state::xor_table_w));
 
-	map(0x58000000, 0x58000003).umask32(0x0000ffff).rw(m_xa, FUNC(igs_xa_mcu_subcpu_device::response_r), FUNC(igs_xa_mcu_subcpu_device::cmd_w));
-	map(0x58000000, 0x58000003).umask32(0xffff0000).w(m_xa, FUNC(igs_xa_mcu_subcpu_device::irqack_w));
+	map(0x58000000, 0x58000003).umask32(0x0000ffff).r(m_xa, FUNC(igs_xa_mcu_subcpu_device::response_r));
+	map(0x58000000, 0x58000003).w(m_xa, FUNC(igs_xa_mcu_subcpu_device::cmd_w));
 }
 
 void igs_m027xa_state::main_xor_map(address_map &map)
