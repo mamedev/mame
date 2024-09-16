@@ -3925,6 +3925,41 @@ INPUT_PORTS_END
 	*/
 
 	/*
+	  Original Apple IIe keypad matrix (341-0132-B - 1982)
+
+	      | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  |
+	      |     |     |     |     |     |     |
+	  ----+-----+-----+-----+-----+-----+-----+
+	  X4  | KP/ |KPLFT| KP0 | KP1 | KP2 | KP3 |
+	  ----+-----+-----+-----+-----+-----+-----+
+	  X5  | KP) |KPEsc| KP4 | KP5 | KP6 | KP7 |
+	  ----+-----+-----+-----+-----+-----+-----+
+	  X6  | KP* |KPRGT| KP8 | KP9 | KP. | KP+ |
+	  ----+-----+-----+-----+-----+-----+-----+
+	  X7  | KP? |KPSPC| KP( | KP- |KPENT| KP, |
+	  ----+-----+-----+-----+-----+-----+-----+
+
+	      Note: KP ? is labeled as Print on the physical keypad, where ? is a shortcut for PRINT in Applesoft Basic
+
+	*/
+
+	/*
+	  Revised Apple IIe keypad matrix (341-0132-C - 1983)
+
+	      | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  |
+	      |     |     |     |     |     |     |
+	  ----+-----+-----+-----+-----+-----+-----+
+	  X4  | KP/ |KPDWN| KP0 | KP1 | KP2 | KP3 |
+	  ----+-----+-----+-----+-----+-----+-----+
+	  X5  | KP) |KPUP | KP4 | KP5 | KP6 | KP7 |
+	  ----+-----+-----+-----+-----+-----+-----+
+	  X6  | KP* |KPLFT| KP8 | KP9 | KP. | KP+ |
+	  ----+-----+-----+-----+-----+-----+-----+
+	  X7  |KPEsc|KPRGT| KP( | KP- |KPENT| KP, |
+	  ----+-----+-----+-----+-----+-----+-----+
+	*/
+
+	/*
 	  Apple IIe platinum key matrix
 
 	      | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  | Y6  | Y7  | Y8  | Y9  |
@@ -4549,9 +4584,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2eus_sysconfig )
 	PORT_START("kbd_lang_select")
-	PORT_CONFNAME(0x12, 0x00, "Dvorak keyboard layout mod")
+	PORT_CONFNAME(0x10, 0x00, "Dvorak keyboard layout mod")
 	PORT_CONFSETTING(0x00, "Not installed")
-	PORT_CONFSETTING(0x12, "Installed")
+	PORT_CONFSETTING(0x10, "Installed")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2eus )
@@ -5603,6 +5638,7 @@ void apple2e_state::cec(machine_config &config)
 
 ***************************************************************************/
 
+
 ROM_START(apple2e)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD ( "342-0133-a.chr", 0x0000, 0x1000,CRC(b081df66) SHA1(7060de104046736529c1e8a687a0dd7b84f8c51b))
@@ -5699,7 +5735,7 @@ ROM_START(apple2eefr)
 	ROM_LOAD( "342-0303-a.e5", 0x2000, 0x2000, CRC(95e10034) SHA1(afb09bb96038232dc757d40c0605623cae38088e) )
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0326-a.f12", 0x0000, 0x0800, BAD_DUMP CRC(05e9e8df) SHA1(0b6de5e3301fe87623da01a74f32a86b282f9b72) ) // merged French half of 341-0326-a.f12 with QWERTY 342-0132-c.e12
+	ROM_LOAD( "342-0326-a.f12", 0x0000, 0x0800, BAD_DUMP CRC(f04970a9) SHA1(806a602195c18ffec637c03b6bb3405188b0dc1e) ) // merged French half of 341-0326-a.f12 with QWERTY 341-0150-a.e12
 ROM_END
 
 ROM_START(apple2ep)
