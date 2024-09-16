@@ -2,14 +2,15 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-Basic Master Jr (MB-6885) (c) 1982? Hitachi
+Basic Master Jr. (MB-6885) (c) 1982? Hitachi
 
 TODO:
 - Memory view control at $efd0;
-- Color adapter;
+- Color adapter (Jr specific);
 - Sound DAC;
 - Keyboard eats inputs if typed relatively fast (verify, particularly with emu.keypost);
 - Break key is unemulated (tied with the NMI);
+- Downgrade for earlier variants (needs dump first);
 
 **************************************************************************************************/
 
@@ -361,7 +362,7 @@ void bmjr_state::machine_reset()
 void bmjr_state::bmjr(machine_config &config)
 {
 	// 750khz gets the cassette sound close to a normal kansas city 300 baud
-	M6800(config, m_maincpu, 754'560); // TODO: derive from actual clock / divider
+	M6800(config, m_maincpu, 754'560); // TODO: HD46800, derive from actual clock / divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmjr_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bmjr_state::irq0_line_hold));
 
@@ -405,4 +406,7 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1982, bmjr, 0,      0,      bmjr,    bmjr,  bmjr_state, empty_init, "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+// 1979 Basic Master MB-6880 (retroactively Level 1)
+// 1979 Basic Master Level 2 MB-6880L2
+// 1980 Basic Master Level 2 II MB-6881
+COMP( 1981, bmjr, 0,      0,      bmjr,    bmjr,  bmjr_state, empty_init, "Hitachi", "Basic Master Jr. (MB-6885)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
