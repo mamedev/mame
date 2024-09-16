@@ -45,7 +45,7 @@ void hmcs40_cpu_device::op_illegal()
 }
 
 
-// Register-to-Register Instruction
+// register-to-register instructions
 
 void hmcs40_cpu_device::op_lab()
 {
@@ -100,7 +100,7 @@ void hmcs40_cpu_device::op_xamr()
 }
 
 
-// RAM Address Instruction
+// RAM address instructions
 
 void hmcs40_cpu_device::op_lxa()
 {
@@ -158,7 +158,7 @@ void hmcs40_cpu_device::op_syy()
 
 void hmcs40_cpu_device::op_xsp()
 {
-	// XSP (XY): Exchange X and SPX, Y and SPY, or NOP if 0
+	// XSP(XY): Exchange X and SPX, Y and SPY, or NOP if 0
 	if (m_op & 1)
 	{
 		u8 old_x = m_x;
@@ -174,25 +174,25 @@ void hmcs40_cpu_device::op_xsp()
 }
 
 
-// RAM Register Instruction
+// RAM register instructions
 
 void hmcs40_cpu_device::op_lam()
 {
-	// LAM (XY): Load A from Memory
+	// LAM(XY): Load A from Memory
 	m_a = ram_r();
 	op_xsp();
 }
 
 void hmcs40_cpu_device::op_lbm()
 {
-	// LBM (XY): Load B from Memory
+	// LBM(XY): Load B from Memory
 	m_b = ram_r();
 	op_xsp();
 }
 
 void hmcs40_cpu_device::op_xma()
 {
-	// XMA (XY): Exchange Memory and A
+	// XMA(XY): Exchange Memory and A
 	u8 old_a = m_a;
 	m_a = ram_r();
 	ram_w(old_a);
@@ -201,7 +201,7 @@ void hmcs40_cpu_device::op_xma()
 
 void hmcs40_cpu_device::op_xmb()
 {
-	// XMB (XY): Exchange Memory and B
+	// XMB(XY): Exchange Memory and B
 	u8 old_b = m_b;
 	m_b = ram_r();
 	ram_w(old_b);
@@ -210,7 +210,7 @@ void hmcs40_cpu_device::op_xmb()
 
 void hmcs40_cpu_device::op_lmaiy()
 {
-	// LMAIY (X): Load Memory from A, Increment Y
+	// LMAIY(X): Load Memory from A, Increment Y
 	ram_w(m_a);
 	op_iy();
 	op_xsp();
@@ -218,14 +218,14 @@ void hmcs40_cpu_device::op_lmaiy()
 
 void hmcs40_cpu_device::op_lmady()
 {
-	// LMADY (X): Load Memory from A, Decrement Y
+	// LMADY(X): Load Memory from A, Decrement Y
 	ram_w(m_a);
 	op_dy();
 	op_xsp();
 }
 
 
-// Immediate Instruction
+// immediate instructions
 
 void hmcs40_cpu_device::op_lmiiy()
 {
@@ -247,7 +247,7 @@ void hmcs40_cpu_device::op_lbi()
 }
 
 
-// Arithmetic Instruction
+// arithmetic instructions
 
 void hmcs40_cpu_device::op_ai()
 {
@@ -365,12 +365,12 @@ void hmcs40_cpu_device::op_rotr()
 
 void hmcs40_cpu_device::op_or()
 {
-	// OR: OR A with B
+	// OR: Or A with B
 	m_a |= m_b;
 }
 
 
-// Compare Instruction
+// compare instructions
 
 void hmcs40_cpu_device::op_mnei()
 {
@@ -415,7 +415,7 @@ void hmcs40_cpu_device::op_blem()
 }
 
 
-// RAM Bit Manipulation Instruction
+// RAM bit manipulation instructions
 
 void hmcs40_cpu_device::op_sem()
 {
@@ -436,7 +436,7 @@ void hmcs40_cpu_device::op_tm()
 }
 
 
-// ROM Address Instruction
+// ROM address instructions
 
 void hmcs40_cpu_device::op_br()
 {
@@ -486,7 +486,7 @@ void hmcs40_cpu_device::op_rtn()
 }
 
 
-// Interrupt Instruction
+// interrupt instructions
 
 void hmcs40_cpu_device::op_seie()
 {
@@ -606,7 +606,7 @@ void hmcs40_cpu_device::op_rtni()
 }
 
 
-// Input/Output Instruction
+// input/output instructions
 
 void hmcs40_cpu_device::op_sed()
 {

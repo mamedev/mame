@@ -71,6 +71,98 @@ protected:
 
 	// opcode handlers
 	void op_illegal();
+
+	void op_lai();
+	void op_lbi();
+	void op_lmid();
+	void op_lmiiy();
+
+	void op_lab();
+	void op_lba();
+	void op_law();
+	void op_lay();
+	void op_laspx();
+	void op_laspy();
+	void op_lamr();
+	void op_xmra();
+
+	void op_lwi();
+	void op_lxi();
+	void op_lyi();
+	void op_lwa();
+	void op_lxa();
+	void op_lya();
+	void op_iy();
+	void op_dy();
+	void op_ayy();
+	void op_syy();
+	void op_xsp();
+
+	void op_lam();
+	void op_lbm();
+	void op_lma();
+	void op_lmaiy();
+	void op_lmady();
+	void op_xma();
+	void op_xmb();
+
+	void op_ai();
+	void op_ib();
+	void op_db();
+	void op_daa();
+	void op_das();
+	void op_nega();
+	void op_comb();
+	void op_rotr();
+	void op_rotl();
+	void op_sec();
+	void op_rec();
+	void op_tc();
+	void op_am();
+	void op_amc();
+	void op_smc();
+	void op_or();
+	void op_anm();
+	void op_orm();
+	void op_eorm();
+
+	void op_inem();
+	void op_anem();
+	void op_bnem();
+	void op_ynei();
+	void op_ilem();
+	void op_alem();
+	void op_blem();
+	void op_alei();
+
+	void op_sem();
+	void op_rem();
+	void op_tm();
+
+	void op_br();
+	void op_brl();
+	void op_jmpl();
+	void op_cal();
+	void op_call();
+	void op_tbr();
+	void op_rtn();
+	void op_rtni();
+
+	void op_sed();
+	void op_sedd();
+	void op_red();
+	void op_redd();
+	void op_td();
+	void op_tdd();
+	void op_lar();
+	void op_lbr();
+	void op_lra();
+	void op_lrb();
+	void op_p();
+
+	void op_sts();
+	void op_sby();
+	void op_stop();
 };
 
 

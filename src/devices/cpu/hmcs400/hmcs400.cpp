@@ -4,6 +4,9 @@
 
 Hitachi HMCS400 MCU family cores
 
+It's the successor to HMCS40, around 5 times faster, and more versatile peripherals,
+like a serial interface. It was mainly used in consumer electronics, not much in games.
+
 TODO:
 - do the LAW/LWA opcodes not work on early revisions of HMCS400? the 1988 user
   manual warns that the W register is write-only, and that there is no efficient
@@ -218,11 +221,11 @@ device_memory_interface::space_config_vector hmcs400_cpu_device::memory_space_co
 
 u16 hmcs400_cpu_device::fetch()
 {
-	u16 data = m_program->read_word(m_pc) & 0x3ff;
+	u16 data = m_program->read_word(m_pc);
 	m_pc = (m_pc + 1) & 0x3fff;
 	m_icount--;
 
-	return data;
+	return data & 0x3ff;
 }
 
 void hmcs400_cpu_device::execute_run()
@@ -234,10 +237,126 @@ void hmcs400_cpu_device::execute_run()
 		debugger_instruction_hook(m_pc);
 		m_op = fetch();
 
-		// 2-byte opcodes
+		// 2-byte opcodes / RAM address
 		if ((m_op >= 0x100 && m_op < 0x140) || (m_op >= 0x150 && m_op < 0x1b0))
 			m_param = fetch();
+		else
+			m_param = 0;
 
-		op_illegal();
+		// handle opcode
+		switch (m_op & 0x3f0)
+		{
+			case 0x1c0: case 0x1d0: case 0x1e0: case 0x1f0: op_cal(); break;
+
+			case 0x020: case 0x120: op_inem(); break;
+			case 0x030: case 0x130: op_ilem(); break;
+			case 0x070: op_ynei(); break;
+			case 0x0b0: op_tbr(); break;
+			case 0x150: op_jmpl(); break;
+			case 0x160: op_call(); break;
+			case 0x170: op_brl(); break;
+			case 0x1a0: op_lmid(); break;
+			case 0x1b0: op_p(); break;
+
+			case 0x200: op_lbi(); break;
+			case 0x210: op_lyi(); break;
+			case 0x220: op_lxi(); break;
+			case 0x230: op_lai(); break;
+			case 0x240: op_lbr(); break;
+			case 0x250: op_lar(); break;
+			case 0x260: op_redd(); break;
+			case 0x270: op_lamr(); break;
+			case 0x280: op_ai(); break;
+			case 0x290: op_lmiiy(); break;
+			case 0x2a0: op_tdd(); break;
+			case 0x2b0: op_alei(); break;
+			case 0x2c0: op_lrb(); break;
+			case 0x2d0: op_lra(); break;
+			case 0x2e0: op_sedd(); break;
+			case 0x2f0: op_xmra(); break;
+
+			default:
+				if ((m_op & 0x300) == 0x300)
+				{
+					op_br(); break;
+				}
+
+				switch (m_op & 0x3fc)
+				{
+			case 0x084: case 0x184: op_sem(); break;
+			case 0x088: case 0x188: op_rem(); break;
+			case 0x08c: case 0x18c: op_tm(); break;
+
+			case 0x000: op_xsp(); break;
+			case 0x040: op_lbm(); break;
+			case 0x080: op_xma(); break;
+			case 0x090: op_lam(); break;
+			case 0x094: op_lma(); break;
+			case 0x0c0: op_xmb(); break;
+			case 0x0f0: op_lwi(); break;
+
+			default:
+				switch (m_op)
+				{
+			case 0x004: case 0x104: op_anem(); break;
+			case 0x008: case 0x108: op_am(); break;
+			case 0x00c: case 0x10c: op_orm(); break;
+			case 0x014: case 0x114: op_alem(); break;
+			case 0x018: case 0x118: op_amc(); break;
+			case 0x01c: case 0x11c: op_eorm(); break;
+			case 0x098: case 0x198: op_smc(); break;
+			case 0x09c: case 0x19c: op_anm(); break;
+
+			case 0x010: op_rtn(); break;
+			case 0x011: op_rtni(); break;
+			case 0x044: op_bnem(); break;
+			case 0x048: op_lab(); break;
+			case 0x04c: op_ib(); break;
+			case 0x050: case 0x051: op_lmaiy(); break;
+			case 0x054: op_ayy(); break;
+			case 0x058: op_laspy(); break;
+			case 0x05c: op_iy(); break;
+			case 0x060: op_nega(); break;
+			case 0x064: op_red(); break;
+			case 0x068: op_laspx(); break;
+			case 0x06f: op_tc(); break;
+
+			case 0x0a0: op_rotr(); break;
+			case 0x0a1: op_rotl(); break;
+			case 0x0a6: op_daa(); break;
+			case 0x0aa: op_das(); break;
+			case 0x0af: op_lay(); break;
+			case 0x0c4: op_blem(); break;
+			case 0x0c8: op_lba(); break;
+			case 0x0cf: op_db(); break;
+			case 0x0d0: case 0x0d1: op_lmady(); break;
+			case 0x0d4: op_syy(); break;
+			case 0x0d8: op_lya(); break;
+			case 0x0df: op_dy(); break;
+			case 0x0e0: op_td(); break;
+			case 0x0e4: op_sed(); break;
+			case 0x0e8: op_lxa(); break;
+			case 0x0ec: op_rec(); break;
+			case 0x0ef: op_sec(); break;
+
+			case 0x100: op_law(); break;
+			case 0x110: op_lwa(); break;
+			case 0x140: op_comb(); break;
+			case 0x144: op_or(); break;
+			case 0x148: op_sts(); break;
+			case 0x14c: op_sby(); break;
+			case 0x14d: op_stop(); break;
+			case 0x180: op_xma(); break;
+			case 0x190: op_lam(); break;
+			case 0x194: op_lma(); break;
+
+			default: op_illegal(); break;
+				}
+				break; // 0x3ff
+
+				}
+				break; // 0x3fc
+
+		} // 0x3f0
 	}
 }
