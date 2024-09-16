@@ -1,18 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
-    Basic Master Jr (MB-6885) (c) 1982? Hitachi
+Basic Master Jr (MB-6885) (c) 1982? Hitachi
 
-    preliminary driver by Angelo Salese
+TODO:
+- Memory view control at $efd0;
+- Color adapter;
+- Sound DAC;
+- Keyboard eats inputs if typed relatively fast (verify, particularly with emu.keypost);
+- Break key is unemulated (tied with the NMI);
 
-    To enter the monitor: MON
-    To quit: E
-
-    TODO:
-    - Break key is unemulated (tied with the NMI)
-
-****************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -34,7 +33,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
 		, m_beep(*this, "beeper")
-		, m_p_wram(*this, "wram")
+		, m_workram(*this, "work_ram")
 		, m_p_chargen(*this, "chargen")
 		, m_io_keyboard(*this, "KEY%d", 0U)
 	{ }
@@ -52,10 +51,10 @@ private:
 	u8 tape_start_r();
 	void xor_display_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mem_map(address_map &map);
+	void main_map(address_map &map);
 	bool m_tape_switch = 0;
 	u8 m_xor_display = 0U;
-	u8 m_key_mux = 0U;
+	u8 m_key_select = 0U;
 	u16 m_casscnt = 0U;
 	bool m_cassold = 0, m_cassbit = 0;
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
@@ -64,7 +63,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
-	required_shared_ptr<u8> m_p_wram;
+	required_shared_ptr<u8> m_workram;
 	required_region_ptr<u8> m_p_chargen;
 	required_ioport_array<16> m_io_keyboard;
 };
@@ -85,7 +84,7 @@ u32 bmjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const
 
 			for (u16 x = ma; x < ma + 32; x++)
 			{
-				u8 const chr = m_p_wram[x];
+				u8 const chr = m_workram[x];
 				u8 const gfx = m_p_chargen[(chr<<3) | ra] ^ inv;
 
 				/* Display a scanline of a character */
@@ -107,15 +106,14 @@ u32 bmjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const
 
 u8 bmjr_state::key_r()
 {
-	return m_io_keyboard[m_key_mux]->read() | ioport("KEYMOD")->read();
+	return (m_io_keyboard[m_key_select]->read() & 0xf) | ioport("KEYMOD")->read();
 }
 
 void bmjr_state::key_w(u8 data)
 {
-	m_key_mux = data & 0xf;
+	m_key_select = data & 0xf;
 
-//  if(data & 0xf0)
-//      printf("%02x",data & 0xf0);
+	// TODO: bit 7: NMI enable
 }
 
 
@@ -160,6 +158,7 @@ void bmjr_state::tape_w(u8 data)
 {
 	if(!m_tape_switch)
 	{
+		// TODO: to five bit DAC, --xx xxx-
 		m_beep->set_state(!BIT(data, 7));
 	}
 	else
@@ -189,31 +188,36 @@ void bmjr_state::xor_display_w(u8 data)
 	m_xor_display = data;
 }
 
-void bmjr_state::mem_map(address_map &map)
+void bmjr_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	//0x0100, 0x03ff basic vram
 	//0x0900, 0x20ff vram, modes 0x40 / 0xc0
 	//0x2100, 0x38ff vram, modes 0x44 / 0xcc
-	map(0x0000, 0xafff).ram().share("wram");
-	map(0xb000, 0xdfff).rom();
-	map(0xe000, 0xe7ff).rom();
+	map(0x0000, 0xafff).ram().share("work_ram");
+	map(0xb000, 0xdfff).rom().region("basic", 0);
+	map(0xe000, 0xe7ff).rom().region("printer", 0);
+	// 0xe800-0xedff expansion I/O
+	// TODO: view selectable thru $efd0
+//  map(0xe800, 0xe803) 6820 or 6821 PIA
 //  map(0xe890, 0xe890) W MP-1710 tile color
 //  map(0xe891, 0xe891) W MP-1710 background color
 //  map(0xe892, 0xe892) W MP-1710 monochrome / color setting
+	// 0xee00-0xefff system I/O
 	map(0xee00, 0xee00).r(FUNC(bmjr_state::tape_stop_r)); //R stop tape
 	map(0xee20, 0xee20).r(FUNC(bmjr_state::tape_start_r)); //R start tape
 	map(0xee40, 0xee40).w(FUNC(bmjr_state::xor_display_w)); //W Picture reverse
 	map(0xee80, 0xee80).rw(FUNC(bmjr_state::tape_r), FUNC(bmjr_state::tape_w));//RW tape input / output
 	map(0xeec0, 0xeec0).rw(FUNC(bmjr_state::key_r), FUNC(bmjr_state::key_w));//RW keyboard
-	map(0xef00, 0xef00).r(FUNC(bmjr_state::ff_r)); //R timer
-	map(0xef40, 0xef40).r(FUNC(bmjr_state::ff_r)); //R unknown
-	map(0xef80, 0xef80).r(FUNC(bmjr_state::unk_r)); //R unknown
+	map(0xef00, 0xef00).r(FUNC(bmjr_state::ff_r)); // R timer
+	map(0xef40, 0xef40).r(FUNC(bmjr_state::ff_r)); // R unknown
+	map(0xef80, 0xef80).r(FUNC(bmjr_state::unk_r)); // TODO: to break key
+//  map(0xefd0, 0xefd0) memory bank + timer control
 //  map(0xefe0, 0xefe0) W screen mode
-	map(0xf000, 0xffff).rom();
+	map(0xf000, 0xffff).rom().region("monitor", 0);
 }
 
-/* Input ports */
+
 static INPUT_PORTS_START( bmjr )
 	PORT_START("KEY0")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
@@ -326,8 +330,8 @@ static const gfx_layout bmjr_charlayout =
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
 	8*8
 };
 
@@ -339,7 +343,7 @@ void bmjr_state::machine_start()
 {
 	save_item(NAME(m_tape_switch));
 	save_item(NAME(m_xor_display));
-	save_item(NAME(m_key_mux));
+	save_item(NAME(m_key_select));
 	save_item(NAME(m_casscnt));
 	save_item(NAME(m_cassold));
 	save_item(NAME(m_cassbit));
@@ -350,24 +354,23 @@ void bmjr_state::machine_reset()
 	m_beep->set_state(0);
 	m_tape_switch = 0;
 	m_xor_display = 0;
-	m_key_mux = 0;
+	m_key_select = 0;
 	m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
 void bmjr_state::bmjr(machine_config &config)
 {
-	/* basic machine hardware */
 	// 750khz gets the cassette sound close to a normal kansas city 300 baud
-	M6800(config, m_maincpu, 750'000); //XTAL(4'000'000)/4); //unknown clock / divider
-	m_maincpu->set_addrmap(AS_PROGRAM, &bmjr_state::mem_map);
+	M6800(config, m_maincpu, 754'560); // TODO: derive from actual clock / divider
+	m_maincpu->set_addrmap(AS_PROGRAM, &bmjr_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bmjr_state::irq0_line_hold));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(256, 192);
-	screen.set_visarea_full();
+	screen.set_size(320, 262);
+	screen.set_visarea(0, 256 - 1, 0, 192 - 1);
 	screen.set_screen_update(FUNC(bmjr_state::screen_update));
 	screen.set_palette("palette");
 
@@ -386,20 +389,20 @@ void bmjr_state::bmjr(machine_config &config)
 
 /* ROM definition */
 ROM_START( bmjr )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "bas.rom", 0xb000, 0x3000, BAD_DUMP CRC(2318e04e) SHA1(cdb3535663090f5bcaba20b1dbf1f34724ef6a5f)) //12k ROMs doesn't exist ...
-	ROM_LOAD( "mon.rom", 0xf000, 0x1000, CRC(776cfa3a) SHA1(be747bc40fdca66b040e0f792b05fcd43a1565ce))
-	ROM_LOAD( "prt.rom", 0xe000, 0x0800, CRC(b9aea867) SHA1(b8dd5348790d76961b6bdef41cfea371fdbcd93d))
+	ROM_REGION( 0x3000, "basic", ROMREGION_ERASEFF )
+	ROM_LOAD( "bas.rom", 0x0000, 0x3000, BAD_DUMP CRC(2318e04e) SHA1(cdb3535663090f5bcaba20b1dbf1f34724ef6a5f)) // needs splitting in three halves
+
+	ROM_REGION( 0x1000, "monitor", ROMREGION_ERASEFF )
+	ROM_LOAD( "mon.rom", 0x0000, 0x1000, CRC(776cfa3a) SHA1(be747bc40fdca66b040e0f792b05fcd43a1565ce))
+
+	ROM_REGION( 0x800, "printer", ROMREGION_ERASEFF )
+	ROM_LOAD( "prt.rom", 0x000, 0x800, CRC(b9aea867) SHA1(b8dd5348790d76961b6bdef41cfea371fdbcd93d))
 
 	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(258c6fd7) SHA1(d7c7dd57d6fc3b3d44f14c32182717a48e24587f)) //taken from a JP emulator
+	ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(258c6fd7) SHA1(d7c7dd57d6fc3b3d44f14c32182717a48e24587f)) // taken from a JP emulator
 ROM_END
 
 } // anonymous namespace
 
 
-/* Driver */
-
-
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY    FULLNAME           FLAGS */
 COMP( 1982, bmjr, 0,      0,      bmjr,    bmjr,  bmjr_state, empty_init, "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
