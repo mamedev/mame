@@ -18,6 +18,8 @@ TODO:
   way to save this register when using interrupts
 - what happens when accessing ROM/RAM out of address range? Hitachi documentation
   says 'unused', but maybe it's mirrored?
+- current I/O ports are hardcoded for HMS402/4/8, which will need to be changed
+  when other MCU types are added
 
 */
 
@@ -73,7 +75,11 @@ hmcs400_cpu_device::hmcs400_cpu_device(const machine_config &mconfig, device_typ
 	m_rom_size(rom_size),
 	m_ram_size(ram_size),
 	m_has_div(false),
-	m_divider(8)
+	m_divider(8),
+	m_read_r(*this, 0),
+	m_write_r(*this),
+	m_read_d(*this, 0),
+	m_write_d(*this)
 { }
 
 hmcs400_cpu_device::~hmcs400_cpu_device() { }
@@ -185,8 +191,6 @@ void hmcs400_cpu_device::device_start()
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_sp));
 	save_item(NAME(m_op));
-	save_item(NAME(m_param));
-	save_item(NAME(m_i));
 
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
@@ -197,6 +201,9 @@ void hmcs400_cpu_device::device_start()
 	save_item(NAME(m_spy));
 	save_item(NAME(m_st));
 	save_item(NAME(m_ca));
+
+	save_item(NAME(m_r));
+	save_item(NAME(m_d));
 
 	// register state for debugger
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
@@ -225,6 +232,9 @@ void hmcs400_cpu_device::device_reset()
 	m_pc = 0;
 	m_sp = 0x3ff;
 	m_st = 1;
+
+	// all I/O ports set to input
+	reset_io();
 }
 
 
@@ -275,6 +285,78 @@ device_memory_interface::space_config_vector hmcs400_cpu_device::memory_space_co
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_data_config)
 	};
+}
+
+
+//-------------------------------------------------
+//  i/o ports
+//-------------------------------------------------
+
+void hmcs400_cpu_device::reset_io()
+{
+	// D4-D15 are high-voltage
+	m_d_mask = m_d = 0x000f;
+	m_write_d(m_d_mask);
+
+	for (int i = 0; i < 10; i++)
+	{
+		// R0-R2 and RA are high-voltage
+		u8 mask = (i >= 3 && i <= 9) ? 0xf : 0;
+
+		m_r_mask[i] = m_r[i] = mask;
+		m_write_r[i](i, mask);
+	}
+}
+
+u8 hmcs400_cpu_device::read_r(u8 index)
+{
+	// reads from write-only or non-existent ports are invalid
+	bool write_only = index == 0 || (index >= 6 && index <= 8);
+	if (write_only || index > 10)
+	{
+		logerror("read from %s port R%X at $%04X\n", write_only ? "output" : "unknown", index, m_prev_pc);
+		return 0xf;
+	}
+
+	u8 inp = m_read_r[index].isunset() ? m_r_mask[index] : m_read_r[index](index);
+	u8 mask = (index == 10) ? 3 : 0xf; // port A is 2-bit
+
+	if (m_r_mask[index])
+		return (inp & m_r[index]) & mask;
+	else
+		return (inp | m_r[index]) & mask;
+}
+
+void hmcs400_cpu_device::write_r(u8 index, u8 data)
+{
+	// ignore writes to read-only or non-existent ports
+	if (index > 8)
+		return;
+
+	data &= 0xf;
+	m_r[index] = data;
+	m_write_r[index](index, data);
+}
+
+int hmcs400_cpu_device::read_d(u8 index)
+{
+	index &= 0xf;
+	u16 mask = 1 << index;
+	u16 inp = m_read_d.isunset() ? m_d_mask : m_read_d(0, mask);
+
+	if (m_d_mask & mask)
+		return BIT(inp & m_d, index);
+	else
+		return BIT(inp | m_d, index);
+}
+
+void hmcs400_cpu_device::write_d(u8 index, int state)
+{
+	index &= 0xf;
+	u16 mask = 1 << index;
+
+	m_d = (m_d & ~mask) | (state ? mask : 0);
+	m_write_d(0, m_d, mask);
 }
 
 

@@ -534,9 +534,9 @@ void hmcs400_cpu_device::op_cal()
 	// CAL a: Subroutine Jump on Status 1
 	if (m_st)
 	{
+		cycle();
 		push_stack();
 		m_pc = m_op & 0x3f;
-		cycle();
 	}
 	else
 		m_st = 1;
@@ -563,9 +563,9 @@ void hmcs400_cpu_device::op_tbr()
 void hmcs400_cpu_device::op_rtn()
 {
 	// RTN: Return from Subroutine
+	cycle();
+	cycle();
 	pop_stack();
-	cycle();
-	cycle();
 }
 
 void hmcs400_cpu_device::op_rtni()
@@ -580,56 +580,82 @@ void hmcs400_cpu_device::op_rtni()
 void hmcs400_cpu_device::op_sed()
 {
 	// SED: Set Discrete I/O Latch
+	write_d(m_y, 1);
 }
 
 void hmcs400_cpu_device::op_sedd()
 {
 	// SEDD m: Set Discrete I/O Latch Direct
+	write_d(m_i, 1);
 }
 
 void hmcs400_cpu_device::op_red()
 {
 	// RED: Reset Discrete I/O Latch
+	write_d(m_y, 0);
 }
 
 void hmcs400_cpu_device::op_redd()
 {
 	// REDD m: Reset Discrete I/O Latch Direct
+	write_d(m_i, 0);
 }
 
 void hmcs400_cpu_device::op_td()
 {
 	// TD: Test Discrete I/O Latch
+	m_st = read_d(m_y);
 }
 
 void hmcs400_cpu_device::op_tdd()
 {
 	// TDD m: Test Discrete I/O Latch Direct
+	m_st = read_d(m_i);
 }
 
 void hmcs400_cpu_device::op_lar()
 {
 	// LAR m: Load A from R Port Register
+	m_a = read_r(m_i);
 }
 
 void hmcs400_cpu_device::op_lbr()
 {
 	// LBR m: Load B from R Port Register
+	m_b = read_r(m_i);
 }
 
 void hmcs400_cpu_device::op_lra()
 {
 	// LRA m: Load R Port Register from A
+	write_r(m_i, m_a);
 }
 
 void hmcs400_cpu_device::op_lrb()
 {
 	// LRB m: Load R Port Register from B
+	write_r(m_i, m_b);
 }
 
 void hmcs400_cpu_device::op_p()
 {
 	// P p: Pattern Generation
+	cycle();
+	u16 data = m_program->read_word(m_i << 8 | m_b << 4 | m_a);
+
+	// destination is determined by the 2 highest bits
+	if (data & 0x100)
+	{
+		// to A/B registers
+		m_a = data & 0xf;
+		m_b = data >> 4 & 0xf;
+	}
+	if (data & 0x200)
+	{
+		// to R1/R2 ports
+		write_r(1, data & 0xf);
+		write_r(2, data >> 4 & 0xf);
+	}
 }
 
 

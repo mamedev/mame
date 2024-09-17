@@ -247,13 +247,8 @@ void hmcs40_cpu_device::device_reset()
 	m_iri = m_irt = 0;
 	m_if[0] = m_if[1] = m_tf = 1;
 
-	// clear i/o
-	m_d = m_polarity;
-	for (int i = 0; i < 16; i++)
-		hmcs40_cpu_device::write_d(i, m_polarity);
-
-	for (int i = 0; i < 8; i++)
-		hmcs40_cpu_device::write_r(i, m_polarity & 0xf);
+	// all I/O ports set to input
+	reset_io();
 }
 
 
@@ -325,13 +320,22 @@ device_memory_interface::space_config_vector hmcs40_cpu_device::memory_space_con
 
 
 //-------------------------------------------------
-//  i/o handling
+//  i/o ports
 //-------------------------------------------------
 
-u8 hmcs40_cpu_device::read_r(int index)
+void hmcs40_cpu_device::reset_io()
+{
+	m_d = m_polarity;
+	m_write_d(m_polarity);
+
+	for (int i = 0; i < 8; i++)
+		hmcs40_cpu_device::write_r(i, m_polarity);
+}
+
+u8 hmcs40_cpu_device::read_r(u8 index)
 {
 	index &= 7;
-	u8 inp = m_read_r[index](index, 0xff);
+	u8 inp = m_read_r[index](index);
 
 	if (m_polarity)
 		return (inp & m_r[index]) & 0xf;
@@ -339,38 +343,39 @@ u8 hmcs40_cpu_device::read_r(int index)
 		return (inp | m_r[index]) & 0xf;
 }
 
-void hmcs40_cpu_device::write_r(int index, u8 data)
+void hmcs40_cpu_device::write_r(u8 index, u8 data)
 {
 	index &= 7;
 	data &= 0xf;
 	m_r[index] = data;
-	m_write_r[index](index, data, 0xff);
+	m_write_r[index](index, data);
 }
 
-int hmcs40_cpu_device::read_d(int index)
+int hmcs40_cpu_device::read_d(u8 index)
 {
-	index &= 15;
+	index &= 0xf;
+	u16 inp = m_read_d(0, 1 << index);
 
 	if (m_polarity)
-		return (m_read_d(index, 0xffff) & m_d) >> index & 1;
+		return BIT(inp & m_d, index);
 	else
-		return (m_read_d(index, 0xffff) | m_d) >> index & 1;
+		return BIT(inp | m_d, index);
 }
 
-void hmcs40_cpu_device::write_d(int index, int state)
+void hmcs40_cpu_device::write_d(u8 index, int state)
 {
-	index &= 15;
-	state = (state) ? 1 : 0;
+	index &= 0xf;
+	u16 mask = 1 << index;
 
-	m_d = (m_d & ~(1 << index)) | state << index;
-	m_write_d(index, m_d, 0xffff);
+	m_d = (m_d & ~mask) | (state ? mask : 0);
+	m_write_d(0, m_d, mask);
 }
 
 // HMCS43:
 // R0 is input-only, R1 is i/o, R2,R3 are output-only, no R4-R7
 // D0-D3 are i/o, D4-D15 are output-only
 
-u8 hmcs43_cpu_device::read_r(int index)
+u8 hmcs43_cpu_device::read_r(u8 index)
 {
 	index &= 7;
 
@@ -380,7 +385,7 @@ u8 hmcs43_cpu_device::read_r(int index)
 	return hmcs40_cpu_device::read_r(index);
 }
 
-void hmcs43_cpu_device::write_r(int index, u8 data)
+void hmcs43_cpu_device::write_r(u8 index, u8 data)
 {
 	index &= 7;
 
@@ -390,7 +395,7 @@ void hmcs43_cpu_device::write_r(int index, u8 data)
 		logerror("ineffective write to port R%d = $%X at $%04X\n", index, data & 0xf, m_prev_pc);
 }
 
-int hmcs43_cpu_device::read_d(int index)
+int hmcs43_cpu_device::read_d(u8 index)
 {
 	index &= 15;
 
@@ -404,7 +409,7 @@ int hmcs43_cpu_device::read_d(int index)
 // R0-R3 are i/o, R4,R5 are extra registers, no R6,R7
 // D0-D15 are i/o
 
-u8 hmcs44_cpu_device::read_r(int index)
+u8 hmcs44_cpu_device::read_r(u8 index)
 {
 	index &= 7;
 
@@ -414,7 +419,7 @@ u8 hmcs44_cpu_device::read_r(int index)
 	return hmcs40_cpu_device::read_r(index);
 }
 
-void hmcs44_cpu_device::write_r(int index, u8 data)
+void hmcs44_cpu_device::write_r(u8 index, u8 data)
 {
 	index &= 7;
 
@@ -428,7 +433,7 @@ void hmcs44_cpu_device::write_r(int index, u8 data)
 // R0-R5 are i/o, R6 is output-only, no R7
 // D0-D15 are i/o
 
-u8 hmcs45_cpu_device::read_r(int index)
+u8 hmcs45_cpu_device::read_r(u8 index)
 {
 	index &= 7;
 
@@ -438,7 +443,7 @@ u8 hmcs45_cpu_device::read_r(int index)
 	return hmcs40_cpu_device::read_r(index);
 }
 
-void hmcs45_cpu_device::write_r(int index, u8 data)
+void hmcs45_cpu_device::write_r(u8 index, u8 data)
 {
 	index &= 7;
 
@@ -450,7 +455,7 @@ void hmcs45_cpu_device::write_r(int index, u8 data)
 
 
 //-------------------------------------------------
-//  interrupt/timer handling
+//  interrupt/timer
 //-------------------------------------------------
 
 void hmcs40_cpu_device::do_interrupt()

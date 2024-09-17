@@ -663,24 +663,24 @@ void hmcs40_cpu_device::op_lrb()
 
 void hmcs40_cpu_device::op_p()
 {
+	// P p: Pattern Generation
 	cycle();
 
-	// P p: Pattern Generation
 	u16 address = m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9 | (m_pc & ~0x3f);
-	u16 o = m_program->read_word(address & m_prgmask);
+	u16 data = m_program->read_word(address & m_prgmask);
 
 	// destination is determined by the 2 highest bits
-	if (o & 0x100)
+	if (data & 0x100)
 	{
 		// B3 B2 B1 B0 A0 A1 A2 A3
-		m_a = bitswap<4>(o,0,1,2,3);
-		m_b = o >> 4 & 0xf;
+		m_a = bitswap<4>(data,0,1,2,3);
+		m_b = data >> 4 & 0xf;
 	}
-	if (o & 0x200)
+	if (data & 0x200)
 	{
 		// R20 R21 R22 R23 R30 R31 R32 R33
-		o = bitswap<8>(o,0,1,2,3,4,5,6,7);
-		write_r(2, o & 0xf);
-		write_r(3, o >> 4 & 0xf);
+		data = bitswap<8>(data,0,1,2,3,4,5,6,7);
+		write_r(2, data & 0xf);
+		write_r(3, data >> 4 & 0xf);
 	}
 }

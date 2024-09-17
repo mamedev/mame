@@ -19,6 +19,14 @@ public:
 
 	// configuration helpers
 
+	// 10 4-bit R ports (port A is 2-bit)
+	template <std::size_t N> auto read_r() { return m_read_r[N].bind(); }
+	template <std::size_t N> auto write_r() { return m_write_r[N].bind(); }
+
+	// 16-bit discrete
+	auto read_d() { return m_read_d.bind(); }
+	auto write_d() { return m_write_d.bind(); }
+
 	// system clock divider mask option (only for HMCS408, HMCS414, HMCS424)
 	// valid options: 4, 8, 16, default to 8
 	auto &set_divider(u8 div) { assert(m_has_div); m_divider = div; return *this; }
@@ -81,7 +89,16 @@ protected:
 	u8 m_st;              // status flag
 	u8 m_ca;              // carry flag
 
-	u16 fetch();
+	u8 m_r[10];           // R outputs state
+	u8 m_r_mask[10];
+	u16 m_d;              // D pins state
+	u16 m_d_mask;
+
+	// I/O handlers
+	devcb_read8::array<8> m_read_r;
+	devcb_write8::array<8> m_write_r;
+	devcb_read16 m_read_d;
+	devcb_write16 m_write_d;
 
 	// misc internal helpers
 	u8 ram_r(u8 mem_mask = 0xf);
@@ -89,7 +106,14 @@ protected:
 	void pop_stack();
 	void push_stack();
 
+	void reset_io();
+	u8 read_r(u8 index);
+	void write_r(u8 index, u8 data);
+	int read_d(u8 index);
+	void write_d(u8 index, int state);
+
 	void cycle();
+	u16 fetch();
 
 	// opcode handlers
 	void op_illegal();

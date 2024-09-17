@@ -12,7 +12,7 @@
 #pragma once
 
 
-// I/O ports setup
+// input lines
 
 enum
 {
@@ -195,10 +195,11 @@ protected:
 	void pop_stack();
 	void push_stack();
 
-	virtual u8 read_r(int index);
-	virtual void write_r(int index, u8 data);
-	virtual int read_d(int index);
-	virtual void write_d(int index, int state);
+	virtual void reset_io();
+	virtual u8 read_r(u8 index);
+	virtual void write_r(u8 index, u8 data);
+	virtual int read_d(u8 index);
+	virtual void write_d(u8 index, int state);
 
 	void cycle();
 	void increment_tc();
@@ -309,9 +310,9 @@ protected:
 	hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity);
 
 	// overrides
-	virtual u8 read_r(int index) override;
-	virtual void write_r(int index, u8 data) override;
-	virtual int read_d(int index) override;
+	virtual u8 read_r(u8 index) override;
+	virtual void write_r(u8 index, u8 data) override;
+	virtual int read_d(u8 index) override;
 };
 
 class hd38750_device : public hmcs43_cpu_device
@@ -345,8 +346,8 @@ protected:
 	hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity);
 
 	// overrides
-	virtual u8 read_r(int index) override;
-	virtual void write_r(int index, u8 data) override;
+	virtual u8 read_r(u8 index) override;
+	virtual void write_r(u8 index, u8 data) override;
 };
 
 class hd38800_device : public hmcs44_cpu_device
@@ -380,8 +381,8 @@ protected:
 	hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity);
 
 	// overrides
-	virtual u8 read_r(int index) override;
-	virtual void write_r(int index, u8 data) override;
+	virtual u8 read_r(u8 index) override;
+	virtual void write_r(u8 index, u8 data) override;
 };
 
 class hd38820_device : public hmcs45_cpu_device
