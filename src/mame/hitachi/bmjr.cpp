@@ -34,6 +34,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
 		, m_work_ram(*this, "work_ram")
+		, m_basic_view(*this, "basic_view")
+		, m_printer_view(*this, "printer_view")
+		, m_monitor_view(*this, "monitor_view")
 		, m_p_chargen(*this, "chargen")
 		, m_io_keyboard(*this, "KEY%d", 0U)
 	{ }
@@ -66,13 +69,20 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<u8> m_work_ram;
+	memory_view m_basic_view;
+	memory_view m_printer_view;
+	memory_view m_monitor_view;
 	required_region_ptr<u8> m_p_chargen;
 	required_ioport_array<16> m_io_keyboard;
 
+	u8 m_bank_mode = 0U;
+	u8 bank_mode_r();
+	void bank_mode_w(u8 data);
+
 	std::unique_ptr<u8[]> m_color_ram;
-	u8 m_color_mode = 0;
-	u8 m_tile_latch = 0;
-	u8 m_screen_mode = 0;
+	u8 m_color_mode = 0U;
+	u8 m_tile_latch = 0U;
+	u8 m_screen_mode = 0U;
 	void mp1710_map(address_map &map);
 	void screen_mode_w(u8 data);
 };
@@ -200,11 +210,46 @@ u8 bmjr_state::tape_start_r()
 	return 0x01;
 }
 
+u8 bmjr_state::bank_mode_r()
+{
+	return m_bank_mode;
+}
+
+/*
+ * ---x ---- timer enable?
+ * ---- -x-- maps $f000-$ffff to work RAM
+ * ---- --x- maps $e000-$edff to work RAM
+ * ---- ---x maps $b000-$dfff to work RAM
+ */
+void bmjr_state::bank_mode_w(u8 data)
+{
+	m_bank_mode = data;
+	if (BIT(data, 0))
+		m_basic_view.disable();
+	else
+		m_basic_view.select(0);
+
+	if (BIT(data, 1))
+		m_printer_view.disable();
+	else
+		m_printer_view.select(0);
+
+	if (BIT(data, 2))
+		m_monitor_view.disable();
+	else
+		m_monitor_view.select(0);
+}
+
 void bmjr_state::screen_reverse_w(u8 data)
 {
 	m_screen_reverse = data;
 }
 
+/*
+ * x--- ---- enable bitmap mode
+ * -?-- ---- <unknown, set by osotos>
+ * ---- xxxx bank base for bitmap mode
+ */
 void bmjr_state::screen_mode_w(u8 data)
 {
 	m_screen_mode = data;
@@ -226,10 +271,7 @@ void bmjr_state::mp1710_map(address_map &map)
 void bmjr_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
-	//0x0100, 0x03ff basic vram
-	//0x0900, 0x20ff vram, modes 0x40 / 0xc0
-	//0x2100, 0x38ff vram, modes 0x44 / 0xcc
-	map(0x0000, 0xafff).ram().share("work_ram");
+	map(0x0000, 0xffff).ram().share("work_ram");
 	// overlay for MP-1710 tile latches
 	map(0x0100, 0x03ff).lrw8(
 		NAME([this] (offs_t offset) { return m_work_ram[offset + 0x100]; }),
@@ -238,16 +280,14 @@ void bmjr_state::main_map(address_map &map)
 			m_color_ram[offset] = m_tile_latch;
 		})
 	);
-	map(0xb000, 0xdfff).rom().region("basic", 0);
-	map(0xe000, 0xe7ff).rom().region("printer", 0);
+	map(0xb000, 0xdfff).view(m_basic_view);
+	m_basic_view[0](0xb000, 0xdfff).rom().region("basic", 0);
+	map(0xe000, 0xefff).view(m_printer_view);
+	m_printer_view[0](0xe000, 0xe7ff).rom().region("printer", 0);
 	// 0xe800-0xedff expansion I/O
-	// TODO: view selectable thru $efd0
 //  map(0xe800, 0xe803) 6820 or 6821 PIA
-//  map(0xe890, 0xe890) W MP-1710 tile color
-//  map(0xe891, 0xe891) W MP-1710 background color
-//  map(0xe892, 0xe892) W MP-1710 monochrome / color setting
-	map(0xe890, 0xe89f).m(*this, FUNC(bmjr_state::mp1710_map));
-	// 0xee00-0xefff system I/O
+	m_printer_view[0](0xe890, 0xe89f).m(*this, FUNC(bmjr_state::mp1710_map));
+	// 0xee00-0xefff system I/O (ignored by printer view enabled)
 	map(0xee00, 0xee00).r(FUNC(bmjr_state::tape_stop_r)); //R stop tape
 	map(0xee20, 0xee20).r(FUNC(bmjr_state::tape_start_r)); //R start tape
 	map(0xee40, 0xee40).w(FUNC(bmjr_state::screen_reverse_w)); //W Picture reverse
@@ -256,9 +296,10 @@ void bmjr_state::main_map(address_map &map)
 	map(0xef00, 0xef00).r(FUNC(bmjr_state::ff_r)); // R timer
 	map(0xef40, 0xef40).r(FUNC(bmjr_state::ff_r)); // R unknown
 	map(0xef80, 0xef80).r(FUNC(bmjr_state::unk_r)); // TODO: to break key
-//  map(0xefd0, 0xefd0) memory bank + timer control
+	map(0xefd0, 0xefd0).rw(FUNC(bmjr_state::bank_mode_r), FUNC(bmjr_state::bank_mode_w));
 	map(0xefe0, 0xefe0).w(FUNC(bmjr_state::screen_mode_w));
-	map(0xf000, 0xffff).rom().region("monitor", 0);
+	map(0xf000, 0xffff).view(m_monitor_view);
+	m_monitor_view[0](0xf000, 0xffff).rom().region("monitor", 0);
 }
 
 
@@ -398,6 +439,11 @@ void bmjr_state::machine_reset()
 	m_tape_switch = 0;
 	m_key_select = 0;
 	m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+	m_bank_mode = 0;
+	m_basic_view.select(0);
+	m_printer_view.select(0);
+	m_monitor_view.select(0);
+	m_maincpu->reset();
 }
 
 void bmjr_state::bmjr(machine_config &config)
