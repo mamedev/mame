@@ -1880,9 +1880,6 @@ ROM_START( luckycrs )
 	ROM_LOAD( "igs_w4102_u37.u37", 0x000000, 0x200000, CRC(114b44ee) SHA1(728ffee34c64edcfef3a46e8be97db60da8a90dc) ) // 27C160, 11xxxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
-
-
-
 /***************************************************************************
 
 Amazonia King
