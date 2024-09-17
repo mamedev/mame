@@ -138,7 +138,7 @@ void x68k_state::spritereg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_video.bg_hstart = (data - 4) * 8 + 1;
 		break;
 	case 0x407:  // BG V-DISP (like CRTC reg 6)
-		m_video.bg_vstart = data - 1;
+		m_video.bg_vstart = data;
 		break;
 	case 0x408:  // BG H/V-Res
 		m_video.bg_hvres = data & 0x1f;
@@ -443,7 +443,7 @@ template <bool Blend> rgb_t x68k_state::get_gfx_pixel(int scanline, int pixel, b
 		if(colour || (m_video.gfx_pri == 2))
 		{
 			if(blend)
-				return ((blendpix >> 1) & 0xff7f7f7f) + ((pal555(colour, 6, 11, 1) >> 1) & 0x7f7f7f);
+				return ((blendpix >> 1) & 0xff7f7f7f) + ((pal555(colour, 6, 11, 1) >> 2) & 0x3f3f3f);
 			else
 				return pal555(colour, 6, 11, 1);
 		}
@@ -461,7 +461,7 @@ template <bool Blend> rgb_t x68k_state::get_gfx_pixel(int scanline, int pixel, b
 		if((m_gfxpalette->pen(colour) & 0xffffff) || (m_video.gfx_pri == 2))
 		{
 			if(blend)
-				return ((blendpix >> 1) & 0xff7f7f7f) + ((m_gfxpalette->pen(colour) >> 1) & 0x7f7f7f);
+				return ((blendpix >> 1) & 0xff7f7f7f) + ((m_gfxpalette->pen(colour) >> 2) & 0x3f3f3f);
 			else
 				return m_gfxpalette->pen(colour);
 		}
