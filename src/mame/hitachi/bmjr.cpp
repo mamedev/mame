@@ -5,12 +5,11 @@
 Basic Master Jr. (MB-6885) (c) 1982? Hitachi
 
 TODO:
-- Memory view control at $efd0;
-- Convert MP-1710 color adapter to device (bmjr specific);
-- Sound DAC;
+- Identify and improve Sound DAC details;
 - Keyboard eats inputs if typed relatively fast (verify, particularly with emu.keypost);
 - Break key is unemulated (tied with the NMI);
-- Downgrade for earlier variants (needs dump first);
+- Downgrade for earlier variants (needs dump first), convert MP-1710 color adapter to device
+  (bmjr specific);
 
 **************************************************************************************************/
 
@@ -18,6 +17,7 @@ TODO:
 #include "cpu/m6800/m6800.h"
 #include "imagedev/cassette.h"
 #include "machine/timer.h"
+#include "sound/dac.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -33,6 +33,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
+        , m_dac(*this, "dac")
 		, m_work_ram(*this, "work_ram")
 		, m_basic_view(*this, "basic_view")
 		, m_printer_view(*this, "printer_view")
@@ -68,6 +69,7 @@ private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
+    required_device<dac_5bit_binary_weighted_device> m_dac;
 	required_shared_ptr<u8> m_work_ram;
 	memory_view m_basic_view;
 	memory_view m_printer_view;
@@ -185,8 +187,7 @@ void bmjr_state::tape_w(u8 data)
 {
 	if(!m_tape_switch)
 	{
-		// TODO: to five bit DAC, --xx xxx-
-		//m_beep->set_state(!BIT(data, 7));
+        m_dac->write((data >> 1) & 0x1f);
 	}
 	else
 	{
@@ -469,7 +470,8 @@ void bmjr_state::bmjr(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_bmjr);
 
 	SPEAKER(config, "mono").front_center();
-	// TODO: DAC_5BIT_?
+    // TODO: unknown DAC type, likely connected to discrete circuitry.
+	DAC_5BIT_BINARY_WEIGHTED(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 /* ROM definition */
@@ -493,4 +495,4 @@ ROM_END
 // 1979 Basic Master MB-6880 (retroactively Level 1)
 // 1979 Basic Master Level 2 MB-6880L2
 // 1980 Basic Master Level 2 II MB-6881
-COMP( 1981, bmjr, 0,      0,      bmjr,    bmjr,  bmjr_state, empty_init, "Hitachi", "Basic Master Jr. (MB-6885)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, bmjr, 0,      0,      bmjr,    bmjr,  bmjr_state, empty_init, "Hitachi", "Basic Master Jr. (MB-6885)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
