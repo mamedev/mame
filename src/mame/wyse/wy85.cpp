@@ -16,8 +16,10 @@
 #include "cpu/mcs51/mcs51.h"
 #include "machine/er1400.h"
 #include "machine/mc68681.h"
+#include "sound/beep.h"
 #include "video/scn2674.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 namespace {
@@ -32,6 +34,7 @@ public:
 		, m_kybd(*this, "kybd")
 		, m_pvtc(*this, "pvtc")
 		, m_duart(*this, "duart")
+		, m_beeper(*this, "beeper")
 		, m_comm(*this, "comm")
 		, m_pr(*this, "pr")
 		, m_chargen(*this, "chargen")
@@ -82,6 +85,7 @@ private:
 	required_device<wyse_keyboard_port_device> m_kybd;
 	required_device<scn2672_device> m_pvtc;
 	required_device<scn2681_device> m_duart;
+	required_device<beep_device> m_beeper;
 	required_device<rs232_port_device> m_comm;
 	required_device<rs232_port_device> m_pr;
 
@@ -229,6 +233,8 @@ void wy85_state::p1_w(u8 data)
 	m_pr->write_rts(BIT(data, 3));
 
 	m_clr_rb = !BIT(data, 1);
+
+	m_beeper->set_state(BIT(data, 5));
 }
 
 u8 wy85_state::p3_r()
@@ -342,6 +348,9 @@ void wy85_state::wy85(machine_config &config)
 	m_duart->outport_cb().set(FUNC(wy85_state::duart_op_w));
 	m_duart->irq_cb().set_inputline(m_maincpu, MCS51_INT1_LINE);
 
+	SPEAKER(config, "speaker").front_center();
+	BEEP(config, m_beeper, 1000).add_route(ALL_OUTPUTS, "speaker", 0.10); // FIXME: not accurate; actually uses same circuit as WY-50 with 74LS14 Schmitt triggers and discrete components
+
 	RS232_PORT(config, m_comm, default_rs232_devices, nullptr); // RS423 port, also RS232 compatible
 	m_comm->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
 	m_comm->cts_handler().set(m_duart, FUNC(scn2681_device::ip0_w));
@@ -369,4 +378,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1985, wy85, 0, 0, wy85, wy85, wy85_state, empty_init, "Wyse Technology", "WY-85", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+COMP(1985, wy85, 0, 0, wy85, wy85, wy85_state, empty_init, "Wyse Technology", "WY-85", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

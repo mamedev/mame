@@ -243,8 +243,8 @@ ioport_constructor wy85_keyboard_device::device_input_ports() const
 
 u8 wy85_keyboard_device::wysekbd_get_id()
 {
-	// Apparently doesn't have an ID
-	return 0xff;
+	// Original LSTTL version definitely lacks an ID; gate array version has this ID according to https://geekhack.org/index.php?topic=51079.0
+	return 0x60 ^ 0xff;
 }
 
 
