@@ -587,6 +587,7 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(bml3_state::nmi_button)
 {
+	// TODO: isn't this supposed to actually raise an NMI, just like earlier Basic Master LV1/2?
 	m_nmi = newval ? 0x80 : 0;
 }
 
