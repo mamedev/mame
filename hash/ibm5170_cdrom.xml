@@ -6968,14 +6968,221 @@ Incredibly slow in tearing down even on pcipcs7 (bypass with fast forward)
 		</part>
 	</software>
 
-	<software name="winnt31w">
-		<description>Windows NT 3.1 Workstation (3.10.511.1)</description>
+	<software name="winnt31">
+		<description>Windows NT 3.1 (3.10.528.1, MSDN, en-US)</description> <!-- This SKU became "Workstation" in 3.5, 3.51, and 4.0 -->
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		This floppy image is actually connected to the 1993 release, but it works.
+		None of the files changed on the CD are part of the floppy disk.
+		]]></notes>
+		<info name="language" value="English"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 3.10.528.1 1994" sha1="2076b06f7a975903265a1498b69e7fe4932d196e"/>
+			</diskarea>
+		</part>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt 3.10.528.1 3.5.img" size="1474560" crc="1e2c946b" sha1="7928d1cd298b32e724fc33731184b2a7dbd55b7e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt31o1" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.528.1, en-US)</description>
 		<year>1993</year>
 		<publisher>Microsoft</publisher>
+		<info name="language" value="English"/>
 		<part name="cdrom" interface="cdrom">
-			<!-- Origin: WinWorld -->
 			<diskarea name="cdrom">
-				<disk name="en_winnt_3_1_wks" sha1="0a542add03b6c9ab130421d24f94731c4992e0a7"/>
+				<disk name="en-us windows nt 3.10.528.1" sha1="1601864708df96e3f4ff57329bc6e384cd000494"/>
+			</diskarea>
+		</part>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt 3.10.528.1 3.5.img" size="1474560" crc="1e2c946b" sha1="7928d1cd298b32e724fc33731184b2a7dbd55b7e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt31o2" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.511.1, en-US)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 3.10.511.1" sha1="ce0cd139bf0b022e9d46d530b11cf0a7b32fa22b"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt 3.10.511.1 3.5.img" size="1474560" crc="6501bf63" sha1="386d83a2e9fd758272cbbd0beb4148f9e238626e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt 3.10.511.1 5.25.img" size="1228800" crc="e1c5ab56" sha1="da770baa202d5ef0dc1800bb73bc836c1f0d6730"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt31as" cloneof="winnt31">
+		<description>Windows NT Advanced Server 3.1 (3.10.528.1, en-US)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		While the standard (“Workstation”) edition was included in the MSDN 1994 set,
+		Advanced Server was not.  An updated Advanced Server build may not exist.
+		]]></notes>
+		<info name="language" value="English"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt advanced server 3.10.528.1" sha1="ccdc9056a1343198d95d6513e90f6037f73c7507"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31aso" cloneof="winnt31">
+		<description>Windows NT Advanced Server 3.1 (3.10.511.1, en-US)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt advanced server 3.10.511.1" sha1="afe907bfd1593a4d86a189ea1dd168cc803b0385"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt advanced server 3.10.511.1 3.5.img" size="1474560" crc="986a1b8e" sha1="7a9a549e25a504957523575970c3e01529647d7a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt advanced server 3.10.511.1 5.25.img" size="1228800" crc="5e0a8239" sha1="989a4721e4f57c75131b4c3c746f8e86e73863ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Language variants of the client version -->
+	<software name="winnt31_dadk" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.528.1, MSDN, da-DK)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Danish"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="da-dk windows nt 3.10.528.1" sha1="ae88ac0bbea68565189b6fdafe86f8e66ff9e9b4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_dede" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.511.1, MSDN, de-DE)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="German"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="de-de windows nt 3.10.511.1" sha1="5ea4098f8b0bf00bdb00af9d56a0ee2df01fdb13"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_eses" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.511.1, MSDN, es-ES)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Spanish"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="es-es windows nt 3.10.511.1" sha1="ff032060d15982d3724ea17b683faab8c4c07e27"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_fifi" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.528.1, MSDN, fi-fi)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Finnish"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fi-fi windows nt 3.10.528.1" sha1="9249745d9f6ed9bfd0a10e31e53b886adf6c4991"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_frfr" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.511.1, MSDN, fr-FR)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="French"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fr-fr windows nt 3.10.511.1" sha1="9a6a6ade986a9ebaf2d84d0b47cb904496656e38"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_itit" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.511.1, MSDN, it-IT)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Italian"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="it-it windows nt 3.10.511.1" sha1="4756551eddc21f000194a63e7659078e945367d7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_nlnl" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.511.1, MSDN, nl-NL)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Dutch"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="nl-nl windows nt 3.10.511.1" sha1="572eb82f0c2c964798857b117f96438630ddb99c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_nono" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.528.1, MSDN, no-NO)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Norwegian"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="no-no windows nt 3.10.528.1" sha1="fd3c6c2156510b5128da4aba2aa6bad7821bdf30"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_ptbr" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.528.1, MSDN, pt-BR)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Portuguese (Brazil)"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pt-br windows nt 3.10.528.1" sha1="20d3cb0168629c019c33a493b1cc8c976c79523f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31_svse" cloneof="winnt31">
+		<description>Windows NT 3.1 (3.10.511.1, MSDN, sv-SE)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Swedish"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sv-se windows nt 3.10.511.1" sha1="1b184f2c14e14a43161201af8a5054fcda886c38"/>
 			</diskarea>
 		</part>
 	</software>
