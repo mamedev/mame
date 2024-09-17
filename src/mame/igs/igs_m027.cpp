@@ -2817,7 +2817,7 @@ GAMEL( 1999, oceanpara, oceanpar, oceanpar_xor, oceanpara,igs_m027_state, init_o
 GAMEL( 1999, fruitpar,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)",   0, layout_oceanpar )
 GAMEL( 1999, fruitpara, fruitpar, oceanpar_xor, fruitpara,igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", 0, layout_oceanpar )
 GAME(  200?, cjddz,     0,        cjddz_xor,    cjddz,    igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", 0 )
-GAME(  2007, tripslot,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_tripshot, ROT0, "IGS", "Triple Slot (V200VE)", MACHINE_NOT_WORKING ) // 2007 date in internal ROM at least, could be later
+GAME(  2007, tripslot,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_tripshot, ROT0, "IGS", "Triple Slot (V200VE)", MACHINE_NOT_WORKING ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
 // this has a 2nd 8255
 GAME(  2001, extradrw,  0,        m027,         base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
