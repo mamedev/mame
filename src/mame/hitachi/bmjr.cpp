@@ -6,7 +6,7 @@ Basic Master Jr. (MB-6885) (c) 1982? Hitachi
 
 TODO:
 - Memory view control at $efd0;
-- Color adapter (Jr specific);
+- Convert MP-1710 color adapter to device (bmjr specific);
 - Sound DAC;
 - Keyboard eats inputs if typed relatively fast (verify, particularly with emu.keypost);
 - Break key is unemulated (tied with the NMI);
@@ -18,7 +18,7 @@ TODO:
 #include "cpu/m6800/m6800.h"
 #include "imagedev/cassette.h"
 #include "machine/timer.h"
-#include "sound/beep.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -33,14 +33,16 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
-		, m_beep(*this, "beeper")
-		, m_workram(*this, "work_ram")
+		, m_work_ram(*this, "work_ram")
 		, m_p_chargen(*this, "chargen")
 		, m_io_keyboard(*this, "KEY%d", 0U)
 	{ }
 
 	void bmjr(machine_config &config);
 
+protected:
+	virtual void video_start() override;
+	virtual void video_reset() override;
 private:
 	u8 key_r();
 	void key_w(u8 data);
@@ -50,11 +52,11 @@ private:
 	void tape_w(u8 data);
 	u8 tape_stop_r();
 	u8 tape_start_r();
-	void xor_display_w(u8 data);
+	void screen_reverse_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
 	bool m_tape_switch = 0;
-	u8 m_xor_display = 0U;
+	u8 m_screen_reverse = 0U;
 	u8 m_key_select = 0U;
 	u16 m_casscnt = 0U;
 	bool m_cassold = 0, m_cassbit = 0;
@@ -63,43 +65,58 @@ private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
-	required_device<beep_device> m_beep;
-	required_shared_ptr<u8> m_workram;
+	required_shared_ptr<u8> m_work_ram;
 	required_region_ptr<u8> m_p_chargen;
 	required_ioport_array<16> m_io_keyboard;
+
+	std::unique_ptr<u8[]> m_color_ram;
+	u8 m_color_mode = 0;
+	u8 m_tile_latch = 0;
+	u8 m_screen_mode = 0;
+	void mp1710_map(address_map &map);
+	void screen_mode_w(u8 data);
 };
 
+void bmjr_state::video_start()
+{
+	m_color_ram = std::make_unique<u8[]>(0x300);
+	save_item(NAME(m_screen_mode));
+	save_item(NAME(m_screen_reverse));
+	save_item(NAME(m_color_mode));
+	save_pointer(NAME(m_color_ram), 0x300);
+}
 
+void bmjr_state::video_reset()
+{
+	m_tile_latch = 0x07;
+	m_screen_reverse = 0;
+	m_screen_mode = 0;
+}
 
 u32 bmjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 fg=4;
-	u16 sy=0,ma=0x100;
-	u8 const inv = (m_xor_display) ? 0xff : 0;
+	const u8 fg_shift = m_screen_reverse ? 4 : 0;
+	const u8 bg_shift = m_screen_reverse ? 0 : 4;
+	const u16 screen_bank_offset = 0x900 + ((m_screen_mode & 0xf) << 9);
 
-	for(u8 y = 0; y < 24; y++ )
+	// TODO: convert to scanline based renderer
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++ )
 	{
-		for (u8 ra = 0; ra < 8; ra++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x+= 8)
 		{
-			u16 *p = &bitmap.pix(sy++);
+			const u16 tile_offset = (x >> 3) + ((y >> 3) * 32);
+			const u16 tile = m_work_ram[0x100 + tile_offset] << 3;
+			const u8 gfx_data = BIT(m_screen_mode, 7) ? m_work_ram[screen_bank_offset + (x >> 3) + (y * 32)] : m_p_chargen[tile | (y & 7)];
+			const u8 attr = BIT(m_color_mode, 0) ? m_color_ram[tile_offset] : 0x07;
+			const u8 fg_color = (attr >> fg_shift) & 7;
+			const u8 bg_color = (attr >> bg_shift) & 7;
 
-			for (u16 x = ma; x < ma + 32; x++)
+			for (int xi = 0; xi < 8; xi++)
 			{
-				u8 const chr = m_workram[x];
-				u8 const gfx = m_p_chargen[(chr<<3) | ra] ^ inv;
-
-				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7) ? fg : 0;
-				*p++ = BIT(gfx, 6) ? fg : 0;
-				*p++ = BIT(gfx, 5) ? fg : 0;
-				*p++ = BIT(gfx, 4) ? fg : 0;
-				*p++ = BIT(gfx, 3) ? fg : 0;
-				*p++ = BIT(gfx, 2) ? fg : 0;
-				*p++ = BIT(gfx, 1) ? fg : 0;
-				*p++ = BIT(gfx, 0) ? fg : 0;
+				const u8 pen = BIT(gfx_data, 7 - xi) ? fg_color : bg_color;
+				bitmap.pix(y, x + xi) = pen;
 			}
 		}
-		ma+=32;
 	}
 
 	return 0;
@@ -140,8 +157,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( bmjr_state::kansas_r )
 		m_cassbit = (m_casscnt < 12) ? 1 : 0;
 		m_casscnt = 0;
 	}
-	else
-	if (m_casscnt > 32)
+	else if (m_casscnt > 32)
 	{
 		m_casscnt = 32;
 		m_cassbit = 0;
@@ -160,7 +176,7 @@ void bmjr_state::tape_w(u8 data)
 	if(!m_tape_switch)
 	{
 		// TODO: to five bit DAC, --xx xxx-
-		m_beep->set_state(!BIT(data, 7));
+		//m_beep->set_state(!BIT(data, 7));
 	}
 	else
 	{
@@ -184,9 +200,27 @@ u8 bmjr_state::tape_start_r()
 	return 0x01;
 }
 
-void bmjr_state::xor_display_w(u8 data)
+void bmjr_state::screen_reverse_w(u8 data)
 {
-	m_xor_display = data;
+	m_screen_reverse = data;
+}
+
+void bmjr_state::screen_mode_w(u8 data)
+{
+	m_screen_mode = data;
+}
+
+void bmjr_state::mp1710_map(address_map &map)
+{
+	map(0x00, 0x00).lrw8(
+		NAME([this] (offs_t offset) { return m_tile_latch; }),
+		NAME([this] (offs_t offset, u8 data) { m_tile_latch = data; })
+	);
+	//map(0x01, 0x01) border color?
+	map(0x02, 0x02).lrw8(
+		NAME([this] (offs_t offset) { return m_color_mode; }),
+		NAME([this] (offs_t offset, u8 data) { m_color_mode = data; })
+	);
 }
 
 void bmjr_state::main_map(address_map &map)
@@ -196,6 +230,14 @@ void bmjr_state::main_map(address_map &map)
 	//0x0900, 0x20ff vram, modes 0x40 / 0xc0
 	//0x2100, 0x38ff vram, modes 0x44 / 0xcc
 	map(0x0000, 0xafff).ram().share("work_ram");
+	// overlay for MP-1710 tile latches
+	map(0x0100, 0x03ff).lrw8(
+		NAME([this] (offs_t offset) { return m_work_ram[offset + 0x100]; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_work_ram[offset + 0x100] = data;
+			m_color_ram[offset] = m_tile_latch;
+		})
+	);
 	map(0xb000, 0xdfff).rom().region("basic", 0);
 	map(0xe000, 0xe7ff).rom().region("printer", 0);
 	// 0xe800-0xedff expansion I/O
@@ -204,17 +246,18 @@ void bmjr_state::main_map(address_map &map)
 //  map(0xe890, 0xe890) W MP-1710 tile color
 //  map(0xe891, 0xe891) W MP-1710 background color
 //  map(0xe892, 0xe892) W MP-1710 monochrome / color setting
+	map(0xe890, 0xe89f).m(*this, FUNC(bmjr_state::mp1710_map));
 	// 0xee00-0xefff system I/O
 	map(0xee00, 0xee00).r(FUNC(bmjr_state::tape_stop_r)); //R stop tape
 	map(0xee20, 0xee20).r(FUNC(bmjr_state::tape_start_r)); //R start tape
-	map(0xee40, 0xee40).w(FUNC(bmjr_state::xor_display_w)); //W Picture reverse
+	map(0xee40, 0xee40).w(FUNC(bmjr_state::screen_reverse_w)); //W Picture reverse
 	map(0xee80, 0xee80).rw(FUNC(bmjr_state::tape_r), FUNC(bmjr_state::tape_w));//RW tape input / output
 	map(0xeec0, 0xeec0).rw(FUNC(bmjr_state::key_r), FUNC(bmjr_state::key_w));//RW keyboard
 	map(0xef00, 0xef00).r(FUNC(bmjr_state::ff_r)); // R timer
 	map(0xef40, 0xef40).r(FUNC(bmjr_state::ff_r)); // R unknown
 	map(0xef80, 0xef80).r(FUNC(bmjr_state::unk_r)); // TODO: to break key
 //  map(0xefd0, 0xefd0) memory bank + timer control
-//  map(0xefe0, 0xefe0) W screen mode
+	map(0xefe0, 0xefe0).w(FUNC(bmjr_state::screen_mode_w));
 	map(0xf000, 0xffff).rom().region("monitor", 0);
 }
 
@@ -343,7 +386,6 @@ GFXDECODE_END
 void bmjr_state::machine_start()
 {
 	save_item(NAME(m_tape_switch));
-	save_item(NAME(m_xor_display));
 	save_item(NAME(m_key_select));
 	save_item(NAME(m_casscnt));
 	save_item(NAME(m_cassold));
@@ -352,9 +394,8 @@ void bmjr_state::machine_start()
 
 void bmjr_state::machine_reset()
 {
-	m_beep->set_state(0);
+	//m_beep->set_state(0);
 	m_tape_switch = 0;
-	m_xor_display = 0;
 	m_key_select = 0;
 	m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
@@ -366,7 +407,10 @@ void bmjr_state::bmjr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmjr_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bmjr_state::irq0_line_hold));
 
-	/* video hardware */
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_r").configure_periodic(FUNC(bmjr_state::kansas_r), attotime::from_hz(40000));
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
@@ -378,14 +422,8 @@ void bmjr_state::bmjr(machine_config &config)
 	PALETTE(config, "palette", palette_device::BRG_3BIT);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_bmjr);
 
-	/* Audio */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50); // guesswork
-
-	/* Devices */
-	CASSETTE(config, m_cass);
-	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
-	TIMER(config, "kansas_r").configure_periodic(FUNC(bmjr_state::kansas_r), attotime::from_hz(40000));
+	// TODO: DAC_5BIT_?
 }
 
 /* ROM definition */
@@ -409,4 +447,4 @@ ROM_END
 // 1979 Basic Master MB-6880 (retroactively Level 1)
 // 1979 Basic Master Level 2 MB-6880L2
 // 1980 Basic Master Level 2 II MB-6881
-COMP( 1981, bmjr, 0,      0,      bmjr,    bmjr,  bmjr_state, empty_init, "Hitachi", "Basic Master Jr. (MB-6885)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, bmjr, 0,      0,      bmjr,    bmjr,  bmjr_state, empty_init, "Hitachi", "Basic Master Jr. (MB-6885)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
