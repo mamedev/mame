@@ -305,18 +305,6 @@ bool device_execute_interface::execute_input_edge_triggered(int linenum) const n
 
 
 //-------------------------------------------------
-//  execute_burn - called after we consume a bunch
-//  of cycles for artifical reasons (such as
-//  spinning devices for performance optimization)
-//-------------------------------------------------
-
-void device_execute_interface::execute_burn(s32 cycles)
-{
-	// by default, do nothing
-}
-
-
-//-------------------------------------------------
 //  execute_set_input - called when a synchronized
 //  input is changed
 //-------------------------------------------------

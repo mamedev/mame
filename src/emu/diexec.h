@@ -205,7 +205,6 @@ protected:
 
 	// optional operation overrides
 	virtual void execute_run() = 0;
-	virtual void execute_burn(s32 cycles);
 	virtual void execute_set_input(int linenum, int state);
 
 	// interface-level overrides

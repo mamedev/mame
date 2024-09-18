@@ -147,7 +147,7 @@ protected:
 	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
-	virtual void execute_burn(int32_t cycles) override;
+	[[maybe_unused]] void execute_burn(int32_t cycles);
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface implementation
