@@ -1849,6 +1849,7 @@ void lhdmg_decrypt(running_machine &machine)
 	}
 }
 
+
 void tripshot_decrypt(running_machine &machine)
 {
 	memory_region *const region = machine.root_device().memregion("user1");
@@ -1871,7 +1872,6 @@ void tripshot_decrypt(running_machine &machine)
 		src[i] ^= x;
 	}
 }
-
 
 
 void extradrw_decrypt(running_machine &machine)
