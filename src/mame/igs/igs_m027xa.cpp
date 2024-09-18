@@ -734,8 +734,8 @@ GAMEL( 2005, crzybugsb, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state
 
 GAME(  2007, crzybugsj, crzybugs, igs_mahjong_xa,     base,     igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_NOT_WORKING ) // IGS FOR V101JP 2007 06 08
 
-GAME(  2006, tripfev,   0,        igs_mahjong_xa_xor, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V108US)", MACHINE_NOT_WORKING ) // IGS FOR V107US 2006 09 07
-GAME(  2006, tripfeva,  tripfev,  igs_mahjong_xa_xor, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", MACHINE_NOT_WORKING )
+GAME(  2006, tripfev,   0,        igs_mahjong_xa_xor, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V108US)", MACHINE_NOT_WORKING )
+GAME(  2006, tripfeva,  tripfev,  igs_mahjong_xa_xor, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", MACHINE_NOT_WORKING ) // IGS FOR V107US 2006 09 07
 GAME(  2006, tripfevb,  tripfev,  igs_mahjong_xa_xor, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V105US)", MACHINE_NOT_WORKING )
 
 GAME(  200?, wldfruit,  0,        igs_mahjong_xa, base,     igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_NOT_WORKING ) // IGS-----97----V208US
