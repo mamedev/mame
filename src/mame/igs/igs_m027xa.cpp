@@ -446,7 +446,7 @@ ROM_START( haunthig )
 	ROM_LOAD( "haunted-h_cg.u32",  0x000000, 0x400000, BAD_DUMP CRC(e0ea10e6) SHA1(e81be78fea93e72d4b1f4c0b58560bda46cf7948) ) // not dumped for this set, FIXED BITS (xxxxxxx0xxxxxxxx)
 	ROM_LOAD( "haunted-h_ext.u12", 0x400000, 0x400000, BAD_DUMP CRC(662eb883) SHA1(831ebe29e1e7a8b2c2fff7fbc608975771c3486c) ) // not dumped for this set, FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x200000, "oki", 0 ) // Oki M6295 samples, missing sample table, bad?
+	ROM_REGION( 0x200000, "oki", 0 ) // Oki M6295 samples
 	ROM_LOAD( "haunted-h_sp.u3", 0x00000, 0x200000,  BAD_DUMP CRC(fe3fcddf) SHA1(ac57ab6d4e4883747c093bd19d0025cf6588cb2c) ) // not dumped for this set
 
 	ROM_REGION( 0x500, "plds", ROMREGION_ERASE00 )
@@ -472,8 +472,8 @@ ROM_START( haunthiga ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, O
 	ROM_LOAD( "haunted-h_cg.u32",  0x000000, 0x400000, CRC(e0ea10e6) SHA1(e81be78fea93e72d4b1f4c0b58560bda46cf7948) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 	ROM_LOAD( "haunted-h_ext.u12", 0x400000, 0x400000, CRC(662eb883) SHA1(831ebe29e1e7a8b2c2fff7fbc608975771c3486c) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x200000, "oki", 0 ) // Oki M6295 samples, missing sample table, bad?
-	ROM_LOAD( "haunted-h_sp.u3", 0x00000, 0x200000, BAD_DUMP CRC(fe3fcddf) SHA1(ac57ab6d4e4883747c093bd19d0025cf6588cb2c) )
+	ROM_REGION( 0x200000, "oki", 0 ) // Oki M6295 samples
+	ROM_LOAD( "haunted-h_sp.u3", 0x00000, 0x200000, CRC(fe3fcddf) SHA1(ac57ab6d4e4883747c093bd19d0025cf6588cb2c) )
 
 	ROM_REGION( 0x500, "plds", ROMREGION_ERASE00 )
 	ROM_LOAD( "hu_u38a.u38", 0x000, 0x117, NO_DUMP ) // ATF16V8B, protected
