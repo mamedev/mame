@@ -40,6 +40,7 @@ public:
 		, m_chargen(*this, "chargen")
 		, m_mainram(*this, "mainram")
 		, m_clr_rb(false)
+		, m_tru_inv(false)
 		, m_lc(0)
 	{
 	}
@@ -96,6 +97,7 @@ private:
 	std::unique_ptr<u8[]> m_fontram;
 
 	bool m_clr_rb;
+	bool m_tru_inv;
 	u8 m_lc;
 };
 
@@ -108,6 +110,8 @@ void wy85_state::machine_start()
 	save_pointer(NAME(m_fontram), 0x800);
 
 	save_item(NAME(m_clr_rb));
+	save_item(NAME(m_tru_inv));
+	save_item(NAME(m_lc));
 }
 
 void wy85_state::machine_reset()
@@ -117,13 +121,28 @@ void wy85_state::machine_reset()
 
 SCN2672_DRAW_CHARACTER_MEMBER(wy85_state::draw_character)
 {
-	u16 a = bitswap<2>(attrcode, 5, 6) << 11 | ((charcode & 0x7f) << 4) | ((m_lc + (m_clr_rb ? 0 : linecount)) & 0xf);
-	u8 c = a >= 0x1800 ? m_fontram[a - 0x1800] : m_chargen[a];
+	if (BIT(attrcode, 0, 2) == 0)
+	{
+		std::fill_n(&bitmap.pix(y, x), 10, rgb_t::black());
+		return;
+	}
 
-	// TODO: attributes
+	u8 lc = m_lc + (m_clr_rb ? 0 : linecount);
+	u16 a = bitswap<2>(attrcode, 5, 6) << 11 | ((charcode & 0x7f) << 4) | (lc & 0xf);
+	u16 c = BIT(attrcode, 3) && (lc & 9) == 9 ? 0x3ff : a >= 0x1800 ? m_fontram[a - 0x1800] << 2 : m_chargen[a] << 2;
+
+	rgb_t fg = !BIT(attrcode, 1) || (BIT(attrcode, 4) && blink) ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
+	bool inv = (BIT(attrcode, 2) != cursor) == m_tru_inv;
+	if (inv && BIT(c, 2))
+		c |= 3;
+	if (BIT(attrcode, 0, 2) == 3)
+		c |= c >> 1;
+	if (inv)
+		c ^= 0x3ff;
+
 	for (int i = 0; i < 10; i++)
 	{
-		bitmap.pix(y, x++) = BIT(c, 7) ? rgb_t::white() : rgb_t::black();
+		bitmap.pix(y, x++) = BIT(c, 9) ? fg : rgb_t::black();
 		c <<= 1;
 	}
 }
@@ -233,6 +252,7 @@ void wy85_state::p1_w(u8 data)
 	m_pr->write_rts(BIT(data, 3));
 
 	m_clr_rb = !BIT(data, 1);
+	m_tru_inv = BIT(data, 6);
 
 	m_beeper->set_state(BIT(data, 5));
 }
