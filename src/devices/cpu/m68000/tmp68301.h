@@ -35,7 +35,6 @@ protected:
 
 	void device_start() override;
 	void device_reset() override;
-	u32 execute_input_lines() const noexcept override;
 	void execute_set_input(int inputnum, int state) override;
 
 	void internal_update(uint64_t current_time = 0) override;

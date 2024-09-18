@@ -26,7 +26,6 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface implementation
-	virtual u32 execute_input_lines() const noexcept override { return 7; }
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	virtual void do_op() override;

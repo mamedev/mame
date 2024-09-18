@@ -109,7 +109,6 @@ public:
 	u32 max_cycles() const { return execute_max_cycles(); }
 	attotime cycles_to_attotime(u64 cycles) const { return device().clocks_to_attotime(cycles_to_clocks(cycles)); }
 	u64 attotime_to_cycles(const attotime &duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
-	u32 input_lines() const { return execute_input_lines(); }
 	u32 default_irq_vector(int linenum) const { return execute_default_irq_vector(linenum); }
 	bool input_edge_triggered(int linenum) const { return execute_input_edge_triggered(linenum); }
 
@@ -201,7 +200,6 @@ protected:
 	virtual u32 execute_max_cycles() const noexcept;
 
 	// input line information getters
-	virtual u32 execute_input_lines() const noexcept;
 	virtual u32 execute_default_irq_vector(int linenum) const noexcept;
 	virtual bool execute_input_edge_triggered(int linenum) const noexcept;
 

@@ -37,7 +37,7 @@ TODO:
 // AC = high-speed
 
 // HMCS408, HMCS414, HMCS424 have a mask option for the system clock divider
-// rev 2 apparently added LAW/LWA opcodes
+// rev 2 apparently added LAW/LWA opcodes?
 
 // HMCS402C/CL/AC, 64 pins DP-64S or FP-64, 2Kx10 ROM, 160x4 RAM
 DEFINE_DEVICE_TYPE(HD614022, hd614022_device, "hd614022", "Hitachi HD614022") // C, rev 2

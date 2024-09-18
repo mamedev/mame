@@ -83,7 +83,6 @@ protected:
 	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
-	virtual u32 execute_input_lines() const noexcept override { return 6; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return m6800_cpu_device::execute_input_edge_triggered(inputnum) || inputnum == M6801_STBY_LINE; }
 	virtual void execute_set_input(int inputnum, int state) override;
 

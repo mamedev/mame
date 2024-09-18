@@ -86,7 +86,6 @@ protected:
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * m_divider); }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 5; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 49; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int extline, int state) override;
 

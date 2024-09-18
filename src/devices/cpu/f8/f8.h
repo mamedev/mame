@@ -39,7 +39,6 @@ protected:
 	// device_execute_interface implementation
 	virtual u32 execute_min_cycles() const noexcept override { return 4; }
 	virtual u32 execute_max_cycles() const noexcept override { return 26; }
-	virtual u32 execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

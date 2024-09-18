@@ -54,7 +54,6 @@ public:
 	void set_interrupt_mixer(bool enable) { m_interrupt_mixer = enable; }
 	auto reset_cb() { return m_reset_cb.bind(); }
 
-	virtual u32 execute_input_lines() const noexcept override { return m_interrupt_mixer ? 8 : 3; } // number of input lines
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return m_interrupt_mixer ? inputnum == M68K_IRQ_7 : false; }
 
 	virtual bool supervisor_mode() const noexcept = 0;

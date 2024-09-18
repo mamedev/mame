@@ -83,9 +83,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_execute_interface overrides
-	virtual u32 execute_input_lines() const noexcept override { return 6; }
-
 	virtual void cpu_execute(u32 const op) override;
 	virtual bool cpu_translate(u64 &address, int intention) override;
 
