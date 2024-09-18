@@ -110,6 +110,7 @@ public:
 	void init_luckycrs() ATTR_COLD;
 	void init_olympic5() ATTR_COLD;
 	void init_extradrw() ATTR_COLD;
+	void init_tripshot() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -1840,10 +1841,29 @@ ROM_START( fruitpara )
 	ROM_LOAD( "igs_w4102.u28", 0x00000, 0x80000, CRC(558cab25) SHA1(0280b37a14589329f0385c048e5742b9e89bd587) )
 ROM_END
 
+ROM_START( tripslot )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "v21_027a.bin", 0x00000, 0x4000, CRC(debf0400) SHA1(b359f7d0549005682780d70060a8fc9a4b4b777e) ) // V21 sticker
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "tripleslot_v-200ve.u23", 0x000000, 0x80000, CRC(c1a1ff26) SHA1(866b5cb04069d8dfedda06f7e2fd21b9a03d4b5a) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "tripleslot_text.u12", 0x000000, 0x80000, CRC(c2537d18) SHA1(172cccfb69b814c670f3c1673ccece6eab866fe1) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "tripleslot_ani_cg.u13", 0x000000, 0x400000, CRC(83fc100e) SHA1(8a03e2cb9876a0f61364ad9214ac2a74ceaf7f5e) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "tripleslot_sp.u37", 0x00000, 0x200000, CRC(98b9cafd) SHA1(3bf3971f0d9520c98fc6b1c2e77ab9c178d21c62) )
+ROM_END
+
 // supposedly a reskin of fruitpar / oceanpar, runs on a slightly different PCB (type not readable, seems same as amazonkp)
 ROM_START( luckycrs )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
+	// note, despite the sticker still being V21 this is NOT the same as tripslot, XOR table needs to be different at least
 	ROM_LOAD( "v21_igs027a", 0x00000, 0x4000, NO_DUMP ) // stickered V21
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
@@ -2570,16 +2590,18 @@ ROM_START( extradrw ) // IGS PCB 0326-05-DV-1
 	// Internal rom of IGS027A ARM based MCU
 	ROM_LOAD( "e1_027a.bin", 0x00000, 0x4000, CRC(ebbf4922) SHA1(d2d196756317523db650bfe9e4bf2aa243e87a00) ) // has a 'E1' sticker
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
-	ROM_LOAD( "u21", 0x00000, 0x80000, CRC(c1641b14) SHA1(bd2525a5b38d4d8a39e99e43ef62e1d2fd3c044d) ) // 1ST AND 2ND HALF IDENTICAL, but correct, label not readable
+	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
+	// has been seen on boards with an unlabeled chip that is double the size, with data doubled up (CRC(c1641b14) SHA1(bd2525a5b38d4d8a39e99e43ef62e1d2fd3c044d))
+	ROM_LOAD( "extradraw_v100ve.u21", 0x00000, 0x40000, CRC(d83c1975) SHA1(c38bc41e5b5560dc02421fe1770359d9259b5e93) )
+	ROM_RELOAD(                       0x40000, 0x40000 )
 
 	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "igs m3001.u4",  0x000000, 0x080000, CRC(d161f8f7) SHA1(4b495197895fd805979c5d5c5a4b7f07a68f4171) ) // label barely readable
+	ROM_LOAD( "igs_m3004.u4",  0x000000, 0x080000, CRC(d161f8f7) SHA1(4b495197895fd805979c5d5c5a4b7f07a68f4171) )
 
 	ROM_REGION( 0x180000, "igs017_igs031:sprites", 0 )
-	ROM_LOAD( "u12",  0x000000, 0x100000, CRC(642247fb) SHA1(69c01c3551551120a3786522b28a80621a0d5082) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF, label not readable
+	ROM_LOAD( "igs_m3001.u12",  0x000000, 0x100000, CRC(642247fb) SHA1(69c01c3551551120a3786522b28a80621a0d5082) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_IGNORE(0x100000)
-	ROM_LOAD( "u3",   0x100000, 0x080000, CRC(97227767) SHA1(c6a1916c0df1aceafbd488ecace5794390058c49) ) // FIXED BITS (xxxxxxx0xxxxxxxx), label not readable
+	ROM_LOAD( "h2_and_cg.u3",   0x100000, 0x080000, CRC(97227767) SHA1(c6a1916c0df1aceafbd488ecace5794390058c49) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "igs s3002.u18", 0x00000, 0x200000, CRC(48601c32) SHA1(8ef3bad80931f4b1badf0598463e15508602f104) ) // BADADDR   --xxxxxxxxxxxxxxxxxxx
@@ -2746,6 +2768,13 @@ void igs_m027_state::init_luckycrs()
 	pgm_create_dummy_internal_arm_region();
 }
 
+void igs_m027_state::init_tripshot()
+{
+	tripshot_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
 void igs_m027_state::init_olympic5()
 {
 	olympic5_decrypt(machine());
@@ -2786,7 +2815,9 @@ GAMEL( 1999, oceanpara, oceanpar, oceanpar_xor, oceanpara,igs_m027_state, init_o
 GAMEL( 1999, fruitpar,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)",   0, layout_oceanpar )
 GAMEL( 1999, fruitpara, fruitpar, oceanpar_xor, fruitpara,igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", 0, layout_oceanpar )
 GAME(  200?, cjddz,     0,        cjddz_xor,    cjddz,    igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", 0 )
-GAME(  2001, extradrw,  0,        m027,         base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw", MACHINE_NOT_WORKING )
+GAME(  2007, tripslot,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_tripshot, ROT0, "IGS", "Triple Slot (V200VE)", MACHINE_NOT_WORKING ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
+// this has a 2nd 8255
+GAME(  2001, extradrw,  0,        m027,         base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME(  2002, chessc2,   0,        chessc2_xor,  chessc2,  igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 

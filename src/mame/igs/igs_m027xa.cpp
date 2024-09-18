@@ -56,7 +56,6 @@ public:
 
 	void igs_mahjong_xa(machine_config &config);
 	void igs_mahjong_xa_xor(machine_config &config);
-	void igs_mahjong_xa_xor_disable(machine_config &config);
 
 	void init_crzybugs();
 	void init_crzybugsj();
@@ -424,15 +423,6 @@ void igs_m027xa_state::igs_mahjong_xa_xor(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::main_xor_map);
 }
 
-void igs_m027xa_state::igs_mahjong_xa_xor_disable(machine_config &config)
-{
-	igs_mahjong_xa_xor(config);
-
-	m_xa->set_disable();
-}
-
-
-
 // prg at u34
 // text at u15
 // cg at u32 / u12
@@ -452,12 +442,11 @@ ROM_START( haunthig )
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD16_WORD_SWAP( "haunted-h_text.u15", 0x000000, 0x80000, CRC(c23f48c8) SHA1(0cb1b6c61611a081ae4a3c0be51812045ff632fe) )
 
-	// are these PGM-like sprites?
 	ROM_REGION( 0x800000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "haunted-h_cg.u32",  0x000000, 0x400000, BAD_DUMP CRC(e0ea10e6) SHA1(e81be78fea93e72d4b1f4c0b58560bda46cf7948) ) // not dumped for this set, FIXED BITS (xxxxxxx0xxxxxxxx)
 	ROM_LOAD( "haunted-h_ext.u12", 0x400000, 0x400000, BAD_DUMP CRC(662eb883) SHA1(831ebe29e1e7a8b2c2fff7fbc608975771c3486c) ) // not dumped for this set, FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x200000, "oki", 0 ) // Oki M6295 samples, missing sample table, bad?
+	ROM_REGION( 0x200000, "oki", 0 ) // Oki M6295 samples
 	ROM_LOAD( "haunted-h_sp.u3", 0x00000, 0x200000,  BAD_DUMP CRC(fe3fcddf) SHA1(ac57ab6d4e4883747c093bd19d0025cf6588cb2c) ) // not dumped for this set
 
 	ROM_REGION( 0x500, "plds", ROMREGION_ERASE00 )
@@ -479,13 +468,12 @@ ROM_START( haunthiga ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, O
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD16_WORD_SWAP( "haunted-h_text.u15", 0x000000, 0x80000, CRC(c23f48c8) SHA1(0cb1b6c61611a081ae4a3c0be51812045ff632fe) )
 
-	// are these PGM-like sprites?
 	ROM_REGION( 0x800000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "haunted-h_cg.u32",  0x000000, 0x400000, CRC(e0ea10e6) SHA1(e81be78fea93e72d4b1f4c0b58560bda46cf7948) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 	ROM_LOAD( "haunted-h_ext.u12", 0x400000, 0x400000, CRC(662eb883) SHA1(831ebe29e1e7a8b2c2fff7fbc608975771c3486c) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x200000, "oki", 0 ) // Oki M6295 samples, missing sample table, bad?
-	ROM_LOAD( "haunted-h_sp.u3", 0x00000, 0x200000, BAD_DUMP CRC(fe3fcddf) SHA1(ac57ab6d4e4883747c093bd19d0025cf6588cb2c) )
+	ROM_REGION( 0x200000, "oki", 0 ) // Oki M6295 samples
+	ROM_LOAD( "haunted-h_sp.u3", 0x00000, 0x200000, CRC(fe3fcddf) SHA1(ac57ab6d4e4883747c093bd19d0025cf6588cb2c) )
 
 	ROM_REGION( 0x500, "plds", ROMREGION_ERASE00 )
 	ROM_LOAD( "hu_u38a.u38", 0x000, 0x117, NO_DUMP ) // ATF16V8B, protected
@@ -506,7 +494,6 @@ ROM_START( crzybugs ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD16_WORD_SWAP( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) )
 
-	// are these PGM-like sprites?
 	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "crazy_bugs_cg.u19",  0x000000, 0x200000, CRC(9d53ad47) SHA1(46690a37acf8bd88c7fbe973db2faf5ef0cff805) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 	// u18 not populated
@@ -529,7 +516,6 @@ ROM_START( crzybugsa )
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD16_WORD_SWAP( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) ) // M27C4002
 
-	// are these PGM-like sprites?
 	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "crazy_bugs_cg.u19",  0x000000, 0x200000, CRC(9d53ad47) SHA1(46690a37acf8bd88c7fbe973db2faf5ef0cff805) ) // M27C160, FIXED BITS (xxxxxxx0xxxxxxxx)
 	// u18 not populated
@@ -552,7 +538,6 @@ ROM_START( crzybugsb )
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD16_WORD_SWAP( "crazy_bugs_text_u10.u10", 0x000000, 0x80000, BAD_DUMP CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) ) // not dumped for this set
 
-	// are these PGM-like sprites?
 	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "crazy_bugs_cg.u19",  0x000000, 0x200000, BAD_DUMP CRC(9d53ad47) SHA1(46690a37acf8bd88c7fbe973db2faf5ef0cff805) ) // not dumped for this set, FIXED BITS (xxxxxxx0xxxxxxxx)
 	// u18 not populated
@@ -576,7 +561,6 @@ ROM_START( crzybugsj ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, O
 	ROM_LOAD16_WORD_SWAP( "crazy_bugs_text_u15.u15", 0x000000, 0x80000, CRC(db0d679a) SHA1(c5d039aa4fa2218b6f574ccb5b6da983b8d4067d) )
 	// u14 not populated
 
-	// are these PGM-like sprites?
 	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "crazy_bugs_ani-cg-u32.u32",  0x000000, 0x200000, CRC(9d53ad47) SHA1(46690a37acf8bd88c7fbe973db2faf5ef0cff805) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 	// u12 not populated
@@ -589,16 +573,60 @@ ROM_START( crzybugsj ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, O
 	ROM_LOAD( "hu_u39.u39", 0x200, 0x2dd, CRC(75f58b46) SHA1(7cb136a41899ddd50c95a67ca6353ce5d8d92149) ) // AT22V10
 ROM_END
 
-ROM_START( tripfev ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Oki M6295, 3x 8-DIP banks
+ROM_START( tripfev ) // IGS PCB-0575-02-HU PCB
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "m1_igs027a.u37", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) ) // sticker marked 'M1'
+	ROM_LOAD( "w1_igs027a.u42", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) ) // sticker marked 'W1'
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v108.u34", 0x000000, 0x80000, CRC(f0ad18ed) SHA1(95239e7b9925f12008051140afb74d47a5da4a3a) ) // 27C4096
+
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked P7
+	ROM_LOAD( "p7.u17", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // MX10EXAQC (80C51 XA based MCU) marked P7, but same as haunthig, crzybugsj
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "triple_fever_text.u15", 0x000000, 0x80000, CRC(522a1030) SHA1(9a7a5ba9b26bceb0d251be6139c10e4655fc19ec) ) // M27C4002
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "triple_fever_cg.u32",  0x000000, 0x400000, CRC(cd45bbf2) SHA1(7f1cf270245bbe4604de2cacade279ab13584dbd) ) // M27C322, FIXED BITS (xxxxxxx0xxxxxxxx)
+	// u18 not populated
+
+	ROM_REGION( 0x200000, "oki", 0 ) // plain Oki M6295 samples
+	ROM_LOAD( "triplef_sp.u3", 0x000000, 0x200000, CRC(98b9cafd) SHA1(3bf3971f0d9520c98fc6b1c2e77ab9c178d21c62) ) // M27C160
+ROM_END
+
+ROM_START( tripfeva ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Oki M6295, 3x 8-DIP banks
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "w1_igs027a.u37", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) ) // sticker marked 'W1'
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "triple_fever_u23_v107_us.u23", 0x000000, 0x80000, CRC(aa56d888) SHA1(0b8b2765079259b76ea803289841d867c33c8cb2) ) // 27C4096
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked P7
-	ROM_LOAD( "p7.u27", 0x00000, 0x10000, NO_DUMP )
+	ROM_LOAD( "p7.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // MX10EXAQC (80C51 XA based MCU) marked P7, but same as haunthig, crzybugsj
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "triple_fever_u10_text.u10", 0x000000, 0x80000, CRC(522a1030) SHA1(9a7a5ba9b26bceb0d251be6139c10e4655fc19ec) ) // M27C4002
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "triple_fever_u19_cg.u19",  0x000000, 0x400000, CRC(cd45bbf2) SHA1(7f1cf270245bbe4604de2cacade279ab13584dbd) ) // M27C322, FIXED BITS (xxxxxxx0xxxxxxxx)
+	// u18 not populated
+
+	ROM_REGION( 0x200000, "oki", 0 ) // plain Oki M6295 samples
+	ROM_LOAD( "triplef_sp_u15.u15", 0x000000, 0x200000, CRC(98b9cafd) SHA1(3bf3971f0d9520c98fc6b1c2e77ab9c178d21c62) ) // M27C160
+ROM_END
+
+ROM_START( tripfevb ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Oki M6295, 3x 8-DIP banks
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "w1_igs027a.u37", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) ) // sticker marked 'W1'
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "u23 27c4096.bin", 0x000000, 0x80000, CRC(f870edda) SHA1(30d1c2d4c575749adbbf28b64eca1f35bcf7dfca) ) // 27C4096, unreadable label
+
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked P7
+	ROM_LOAD( "p7.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // MX10EXAQC (80C51 XA based MCU) marked P7, but same as haunthig, crzybugsj
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD16_WORD_SWAP( "triple_fever_u10_text.u10", 0x000000, 0x80000, CRC(522a1030) SHA1(9a7a5ba9b26bceb0d251be6139c10e4655fc19ec) ) // M27C4002
@@ -614,7 +642,7 @@ ROM_END
 ROM_START( wldfruit ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Oki M6295, 3x 8-DIP banks
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "w1.u37", 0x00000, 0x4000, NO_DUMP ) // sticker marked 'W1'
+	ROM_LOAD( "w1.u37", 0x00000, 0x4000, NO_DUMP ) // sticker marked 'W1?' (same label, but not the same as tripfev? or an error)
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "wild_fruit_v-208us.u23", 0x000000, 0x80000, CRC(d43398f1) SHA1(ecc4bd5cb6da16b35c63b843cf7beec1ab84ed9d) ) // M27C4002
@@ -642,7 +670,7 @@ void igs_m027xa_state::pgm_create_dummy_internal_arm_region()
 	for (int i = 0; i < 0x4000 / 2; i += 2)
 	{
 		temp16[i] = 0xff1e;
-		temp16[ i +1] = 0xe12f;
+		temp16[i +1] = 0xe12f;
 
 	}
 
@@ -697,16 +725,17 @@ void igs_m027xa_state::init_wldfruit()
 
 // These use the MX10EXAQC (80c51XA from Philips)
 // the PCBs are closer to igs_fear.cpp in terms of layout
-GAME(  2008, haunthig,  0,        igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", MACHINE_IS_SKELETON ) // IGS FOR V109US 2008 10 14
-GAME(  2006, haunthiga, haunthig, igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", MACHINE_IS_SKELETON ) // IGS FOR V101US 2006 08 23
+GAME(  2008, haunthig,  0,        igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", MACHINE_NOT_WORKING ) // IGS FOR V109US 2008 10 14
+GAME(  2006, haunthiga, haunthig, igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", MACHINE_NOT_WORKING ) // IGS FOR V101US 2006 08 23
 
 GAMEL( 2009, crzybugs,  0,        igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", 0, layout_crzybugs ) // IGS FOR V204US 2009 5 19
 GAMEL( 2006, crzybugsa, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", 0, layout_crzybugs ) // IGS FOR V100US 2006 3 29 but also V202US string
 GAMEL( 2005, crzybugsb, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", 0, layout_crzybugs ) // FOR V100US 2005 7 20 but also V200US string
 
-GAME(  2007, crzybugsj, crzybugs, igs_mahjong_xa,     base,     igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_IS_SKELETON ) // IGS FOR V101JP 2007 06 08
+GAME(  2007, crzybugsj, crzybugs, igs_mahjong_xa,     base,     igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_NOT_WORKING ) // IGS FOR V101JP 2007 06 08
 
-// XA dump is missing, so XA CPU will crash, disable for now
-GAME(  2006, tripfev,   0,        igs_mahjong_xa_xor_disable, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", MACHINE_IS_SKELETON ) // IGS FOR V107US 2006 09 07
+GAME(  2006, tripfev,   0,        igs_mahjong_xa_xor, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V108US)", MACHINE_NOT_WORKING )
+GAME(  2006, tripfeva,  tripfev,  igs_mahjong_xa_xor, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", MACHINE_NOT_WORKING ) // IGS FOR V107US 2006 09 07
+GAME(  2006, tripfevb,  tripfev,  igs_mahjong_xa_xor, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V105US)", MACHINE_NOT_WORKING )
 
-GAME(  200?, wldfruit,  0,        igs_mahjong_xa, base,     igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_IS_SKELETON ) // IGS-----97----V208US
+GAME(  200?, wldfruit,  0,        igs_mahjong_xa, base,     igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_NOT_WORKING ) // IGS-----97----V208US

@@ -1850,6 +1850,29 @@ void lhdmg_decrypt(running_machine &machine)
 }
 
 
+void tripshot_decrypt(running_machine &machine)
+{
+	memory_region *const region = machine.root_device().memregion("user1");
+	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
+	auto const rom_size = region->bytes();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		uint16_t x = 0;
+
+		IGS27_CRYPT1
+		IGS27_CRYPT2
+		IGS27_CRYPT3
+		IGS27_CRYPT4_ALT
+		IGS27_CRYPT5
+		IGS27_CRYPT6
+		IGS27_CRYPT7
+		IGS27_CRYPT8
+
+		src[i] ^= x;
+	}
+}
+
 
 void extradrw_decrypt(running_machine &machine)
 {
