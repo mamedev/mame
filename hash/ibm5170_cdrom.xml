@@ -7350,6 +7350,179 @@ Incredibly slow in tearing down even on pcipcs7 (bypass with fast forward)
 		</part>
 	</software>
 
+	<software name="winnt40">
+		<description>Windows NT Workstation 4.0 with Service Pack 1 (4.0.1381.2)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		This release gets frequently mis-identified online as RTM, but it is actually Service Pack 1.
+		]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt workstation 4.0.1381.2" sha1="fe7fa62edebcf2484b5ed0da4ea258498f6f36e0"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt workstation 4.0.1381.2 3.5-1.img" size="1474560" crc="e20df9ac" sha1="42ab0a34ca8ce959481e17b5c3ce8d547c8983c4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt workstation 4.0.1381.2 3.5-2.img" size="1474560" crc="a0700c68" sha1="fac8607b5f616ca2a8428d772de95f7ffd079c63"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt workstation 4.0.1381.2 3.5-3.img" size="1474560" crc="fb4b6ae7" sha1="b1f0aef09c2355602bc04c81dbaac90ef3c7dba8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt40o" cloneof="winnt40">
+		<description>Windows NT Workstation 4.0 (4.0.1381.1)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt workstation 4.0.1381.1" sha1="250083b2b150b6930bc544f5b1dc135a6387f669"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt workstation 4.0.1381.1 3.5-1.img" size="1474560" crc="3ba4b1a5" sha1="01807d518f1873e126fc3c7ac71e80886059a242"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt workstation 4.0.1381.1 3.5-2.img" size="1474560" crc="da4a4f16" sha1="a404f347dec15f99f602d973198311da10207e05"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt workstation 4.0.1381.1 3.5-3.img" size="1474560" crc="fb4b6ae7" sha1="b1f0aef09c2355602bc04c81dbaac90ef3c7dba8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt40s" cloneof="winnt40">
+		<description>Windows NT Server 4.0 with Service Pack 1 (4.0.1381.2)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		This release gets frequently mis-identified online as RTM, but it is actually Service Pack 1.
+		]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt server 4.0.1381.2" sha1="88d1b561763834b822fbcd28c3d3b32ad28b24c5"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 4.0.1381.2 3.5-1.img" size="1474560" crc="d03beabe" sha1="cf8dc3ae32989a10001bd68717265cb57aec8162"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 4.0.1381.2 3.5-2.img" size="1474560" crc="7fe218e5" sha1="5285e45771616eeb9267f666c0f15eaf94f5c4d4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 4.0.1381.2 3.5-3.img" size="1474560" crc="877dd676" sha1="3716aca680ab79d340d49291ecda05dc5387b19c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt40so" cloneof="winnt40">
+		<description>Windows NT Server 4.0 (4.0.1381.1)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt server 4.0.1381.1" sha1="c9d25d4abcb72653929624545c24f3ce7e09b63e"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 4.0.1381.1 3.5-1.img" size="1474560" crc="e2a1a411" sha1="1d4729f72f25c1087ffb6edc86b5d2b5ee7bf646"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 4.0.1381.1 3.5-2.img" size="1474560" crc="2ea2f59c" sha1="3574421f7339e7e83b0a931b29e8ebdae7511634"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 4.0.1381.1 3.5-3.img" size="1474560" crc="20fcc1c3" sha1="8d2e25e083c82b57b007ae034869b8d11292e690"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt40ts" cloneof="winnt40">
+		<description>Windows NT Server, Terminal Server Edition 4.0 (4.0.419.1)</description>
+		<year>1998</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt terminal server 4.0.419.1" sha1="31b87bdf7ad173ba1643c2b11acb08a45fa17ae1"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt terminal server 4.0.419.1 3.5-1.img" size="1474560" crc="d49a1246" sha1="b23acea288d91b0ef4b40ed0f68a336561de2ad1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt terminal server 4.0.419.1 3.5-2.img" size="1474560" crc="61b8e332" sha1="bfe47d04d39bba2ae53afab83d6a939be624ed40"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt terminal server 4.0.419.1 3.5-3.img" size="1474560" crc="89fd5fb4" sha1="1bd3648bbe1c081d2694b1450fed5dbd8e056d02"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt40e" cloneof="winnt40">
+		<description>Windows NT Server, Enterpise Edition 4.0 (4.0.1381.4)</description>
+		<year>1997</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		This installs as 4.0.1381.2 (SP1), but immediately prompts to install
+		Service Pack 3 to bring it to 4.0.1381.4. Let's go with that number.
+		]]></notes>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Operating System"/>
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt enterprise server 4.0.1381.4 disc 1" sha1="35f1693e9f40dee0d9019a0db3dbaa01812d596d"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Components"/>
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt enterprise server 4.0.1381.4 disc 2" sha1="80e4aebb1808a1c3ea43b2f401874612d0ff0394"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="win2kps4">
 		<description>Windows 2000 Professional (with Service Pack 4) (en 5.00.2195.6717)</description>
 		<year>1999</year>
