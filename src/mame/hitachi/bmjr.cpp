@@ -6,9 +6,15 @@ Basic Master Jr. (MB-6885) (c) 1982? Hitachi
 
 TODO:
 - Identify and improve Sound DAC details;
-- Keyboard eats inputs if typed relatively fast (verify, particularly with emu.keypost);
-- Downgrade for earlier variants (needs dump first), convert MP-1710 color adapter to device
-  (bmjr specific);
+- Keyboard eats inputs if typed relatively fast (verify);
+- Add kana mappings to keyboard;
+- Timer control (needs SW that bothers with it);
+- Downgrade for earlier variants (needs dump first), convert MP-1710 color adapter to expansion
+  bus device (bmjr specific);
+- Floppy adapter MP-1803, thru expansion bus;
+- Border color for MP-1710;
+- Printer, MP-1041/MP-1045;
+- Hookup SW list;
 
 **************************************************************************************************/
 
@@ -43,29 +49,17 @@ public:
 
 	void bmjr(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(break_key_pressed);
+	static constexpr feature_type unemulated_features() { return feature::PRINTER; }
 
 protected:
 	virtual void video_start() override;
 	virtual void video_reset() override;
-private:
-	u8 key_r();
-	void key_w(u8 data);
-	u8 ff_r();
-	u8 tape_r();
-	void tape_w(u8 data);
-	u8 tape_stop_r();
-	u8 tape_start_r();
-	void screen_reverse_w(u8 data);
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
-	bool m_tape_switch = 0;
-	u8 m_screen_reverse = 0U;
-	u8 m_key_select = 0U;
-	u16 m_casscnt = 0U;
-	bool m_cassold = 0, m_cassbit = 0;
-	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+private:
+	void main_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<dac_5bit_binary_weighted_device> m_dac;
@@ -76,9 +70,24 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 	required_ioport_array<16> m_io_keyboard;
 
+	bool m_tape_switch = 0;
+	u8 m_screen_reverse = 0U;
+	u8 m_key_select = 0U;
+	u8 m_nmi_enable = 0U;
+	u16 m_casscnt = 0U;
+	bool m_cassold = 0, m_cassbit = 0;
 	u8 m_bank_mode = 0U;
+
 	u8 bank_mode_r();
 	void bank_mode_w(u8 data);
+	u8 key_r();
+	void key_w(u8 data);
+	u8 timer_r();
+	u8 tape_r();
+	void tape_w(u8 data);
+	u8 tape_stop_r();
+	u8 tape_start_r();
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
 	std::unique_ptr<u8[]> m_color_ram;
 	u8 m_color_mode = 0U;
@@ -86,6 +95,8 @@ private:
 	u8 m_screen_mode = 0U;
 	void mp1710_map(address_map &map);
 	void screen_mode_w(u8 data);
+	void screen_reverse_w(u8 data);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void bmjr_state::video_start()
@@ -94,6 +105,7 @@ void bmjr_state::video_start()
 	save_item(NAME(m_screen_mode));
 	save_item(NAME(m_screen_reverse));
 	save_item(NAME(m_color_mode));
+	save_item(NAME(m_tile_latch));
 	save_pointer(NAME(m_color_ram), 0x300);
 }
 
@@ -142,11 +154,17 @@ void bmjr_state::key_w(u8 data)
 {
 	m_key_select = data & 0xf;
 
-	// TODO: bit 7: NMI enable
+	m_nmi_enable = BIT(data, 7);
+	if (!m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-
-u8 bmjr_state::ff_r()
+/*
+ * x--- ---- checked in irq routine
+ * 1--- ---- routes to 1 second timer at $000c (TIME 3)
+ * 0--- ---- routes to $000a-$000b (TIME 1/TIME 2), likely enabled thru $efd0 bit 4 high
+ */
+u8 bmjr_state::timer_r()
 {
 	return 0xff;
 }
@@ -218,6 +236,7 @@ u8 bmjr_state::bank_mode_r()
  */
 void bmjr_state::bank_mode_w(u8 data)
 {
+	logerror("bank_mode_w %02x\n", data);
 	m_bank_mode = data;
 	if (BIT(data, 0))
 		m_basic_view.disable();
@@ -237,12 +256,12 @@ void bmjr_state::bank_mode_w(u8 data)
 
 void bmjr_state::screen_reverse_w(u8 data)
 {
-	m_screen_reverse = data;
+	m_screen_reverse = BIT(data, 7);
 }
 
 /*
  * x--- ---- enable bitmap mode
- * -?-- ---- <unknown, set by osotos>
+ * -?-- ---- <unknown, looks set in tandem with bit 7>
  * ---- xxxx bank base for bitmap mode
  */
 void bmjr_state::screen_mode_w(u8 data)
@@ -288,8 +307,7 @@ void bmjr_state::main_map(address_map &map)
 	map(0xee40, 0xee40).w(FUNC(bmjr_state::screen_reverse_w)); //W Picture reverse
 	map(0xee80, 0xee80).rw(FUNC(bmjr_state::tape_r), FUNC(bmjr_state::tape_w));//RW tape input / output
 	map(0xeec0, 0xeec0).rw(FUNC(bmjr_state::key_r), FUNC(bmjr_state::key_w));//RW keyboard
-	map(0xef00, 0xef00).r(FUNC(bmjr_state::ff_r)); // R timer
-	map(0xef40, 0xef40).r(FUNC(bmjr_state::ff_r)); // R unknown
+	map(0xef00, 0xef00).r(FUNC(bmjr_state::timer_r));
 	map(0xef80, 0xef80).portr("BREAK");
 	map(0xefd0, 0xefd0).rw(FUNC(bmjr_state::bank_mode_r), FUNC(bmjr_state::bank_mode_w));
 	map(0xefe0, 0xefe0).w(FUNC(bmjr_state::screen_mode_w));
@@ -299,7 +317,8 @@ void bmjr_state::main_map(address_map &map)
 
 INPUT_CHANGED_MEMBER(bmjr_state::break_key_pressed)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	if (newval && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( bmjr )
@@ -364,36 +383,26 @@ static INPUT_PORTS_START( bmjr )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 
 	PORT_START("KEY10")
-	PORT_BIT(0x01,IP_ACTIVE_LOW, IPT_UNUSED )
+	// NOTE: works on kana / shift only
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("_") PORT_CHAR('_')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(": *") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("@ Up") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('@')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"@ \u2191") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('@')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("- =") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
 
 	PORT_START("KEY11")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("]") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("[ Down") PORT_CODE(KEYCODE_OPENBRACE) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('[')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("^ Right") PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('^')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"[ \u2193") PORT_CODE(KEYCODE_OPENBRACE) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('[')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"^ \u2192") PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('^')
 
 	PORT_START("KEY12")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"¥ / Left") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"¥ \u2190") PORT_CODE(KEYCODE_4_PAD)
 
 	PORT_START("KEY13")
-	PORT_DIPNAME( 0x01, 0x01, "D" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEY14")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -408,7 +417,7 @@ static INPUT_PORTS_START( bmjr )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Kana") PORT_CODE(KEYCODE_RCONTROL)
 
 	PORT_START("BREAK")
-	PORT_BIT(0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // TODO: read by timer irq service
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CHANGED_MEMBER(DEVICE_SELF, bmjr_state, break_key_pressed, 0)
 INPUT_PORTS_END
 
@@ -434,6 +443,8 @@ void bmjr_state::machine_start()
 	save_item(NAME(m_casscnt));
 	save_item(NAME(m_cassold));
 	save_item(NAME(m_cassbit));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_bank_mode));
 }
 
 void bmjr_state::machine_reset()
@@ -454,8 +465,10 @@ void bmjr_state::bmjr(machine_config &config)
 	// 750khz gets the cassette sound close to a normal kansas city 300 baud
 	M6800(config, m_maincpu, 754'560); // TODO: HD46800, derive from actual clock / divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmjr_state::main_map);
+	// NOTE: checked by using TIME commands, which implies a separate thread than the actual timer control
 	m_maincpu->set_vblank_int("screen", FUNC(bmjr_state::irq0_line_hold));
 
+	// TRQ237/TRQ359
 	CASSETTE(config, m_cass);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_r").configure_periodic(FUNC(bmjr_state::kansas_r), attotime::from_hz(40000));
@@ -497,4 +510,4 @@ ROM_END
 // 1979 Basic Master MB-6880 (retroactively Level 1)
 // 1979 Basic Master Level 2 MB-6880L2
 // 1980 Basic Master Level 2 II MB-6881
-COMP( 1981, bmjr, 0,      0,      bmjr,    bmjr,  bmjr_state, empty_init, "Hitachi", "Basic Master Jr. (MB-6885)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, bmjr, 0,      0,      bmjr,    bmjr,  bmjr_state, empty_init, "Hitachi", "Basic Master Jr. (MB-6885)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
