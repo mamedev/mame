@@ -416,7 +416,7 @@ QUICKLOAD_LOAD_MEMBER(dmv_state::quickload_cb)
 	{
 		uint8_t data;
 		if (image.fread(&data, 1) != 1)
-			return std::make_pair(image_error::BADSOFTWARE, "Problem reading the image at offset " + std::to_string(i));
+			return std::make_pair(image_error::UNSPECIFIED, "Problem reading the image at offset " + std::to_string(i));
 		m_ram->base()[i + 0x100] = data;
 	}
 

@@ -39,7 +39,7 @@ class HandlerBase(object):
             505: 'HTTP Version Not Supported' }
 
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(HandlerBase, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.app = app
         self.js_escape = app.js_escape
         self.application_uri = application_uri
@@ -52,7 +52,7 @@ class HandlerBase(object):
 
 class ErrorPageHandler(HandlerBase):
     def __init__(self, code, app, application_uri, environ, start_response, **kwargs):
-        super(ErrorPageHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
         self.code = code
         self.start_response('%d %s' % (self.code, self.STATUS_MESSAGE[code]), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
 
@@ -64,7 +64,7 @@ class AssetHandler(HandlerBase):
     EXTENSIONMAP = { '.js': 'application/javascript', '.svg': 'image/svg+xml' }
 
     def __init__(self, directory, app, application_uri, environ, start_response, **kwargs):
-        super(AssetHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
         self.directory = directory
         self.asset = shiftpath(environ)
 
@@ -99,7 +99,7 @@ class AssetHandler(HandlerBase):
 
 class QueryPageHandler(HandlerBase):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(QueryPageHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
         self.dbcurs = app.dbconn.cursor()
 
     def machine_href(self, shortname):
@@ -191,7 +191,7 @@ class QueryPageHandler(HandlerBase):
 
 class MachineRpcHandlerBase(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(MachineRpcHandlerBase, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
         self.shortname = shiftpath(environ)
 
     def __iter__(self):
@@ -216,7 +216,7 @@ class MachineRpcHandlerBase(QueryPageHandler):
 
 class MachineHandler(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(MachineHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
         self.shortname = shiftpath(environ)
 
     def __iter__(self):
@@ -464,7 +464,7 @@ class MachineHandler(QueryPageHandler):
 
 class SourceFileHandler(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(SourceFileHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
 
     def __iter__(self):
         self.filename = self.environ['PATH_INFO']
@@ -577,7 +577,7 @@ class SourceFileHandler(QueryPageHandler):
 
 class SoftwareListHandler(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(SoftwareListHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
         self.shortname = shiftpath(environ)
         self.software = shiftpath(environ)
 
@@ -788,7 +788,7 @@ class SoftwareListHandler(QueryPageHandler):
 
 class RomIdentHandler(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(QueryPageHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
         self.dbcurs = app.dbconn.cursor()
 
     def __iter__(self):
@@ -833,7 +833,7 @@ class SoftwareListsRpcHandler(MachineRpcHandlerBase):
 
 class RomDumpsRpcHandler(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(RomDumpsRpcHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
 
     def __iter__(self):
         if self.environ['PATH_INFO']:
@@ -890,7 +890,7 @@ class RomDumpsRpcHandler(QueryPageHandler):
 
 class DiskDumpsRpcHandler(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(DiskDumpsRpcHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
 
     def __iter__(self):
         if self.environ['PATH_INFO']:
@@ -954,7 +954,7 @@ class MiniMawsApp(object):
             'diskdumps':        DiskDumpsRpcHandler }
 
     def __init__(self, dbfile, **kwargs):
-        super(MiniMawsApp, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.dbconn = dbaccess.QueryConnection(dbfile)
         self.assetsdir = os.path.join(os.path.dirname(inspect.getfile(self.__class__)), 'assets')
         if not mimetypes.inited:

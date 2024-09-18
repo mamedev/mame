@@ -315,7 +315,7 @@ QUICKLOAD_LOAD_MEMBER(kaypro_state::quickload_cb)
 	{
 		u8 data;
 		if (image.fread(&data, 1) != 1)
-			return std::make_pair(image_error::BADSOFTWARE, "Problem reading the image at offset " + std::to_string(i));
+			return std::make_pair(image_error::UNSPECIFIED, "Problem reading the image at offset " + std::to_string(i));
 		prog_space.write_byte(i + 0x100, data);
 	}
 

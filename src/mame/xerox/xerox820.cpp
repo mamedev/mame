@@ -401,11 +401,11 @@ QUICKLOAD_LOAD_MEMBER(xerox820_state::quickload_cb)
 	{
 		uint8_t data;
 		if (image.fread(&data, 1) != 1)
-			return std::make_pair(image_error::BADSOFTWARE, "Problem reading the image at offset " + std::to_string(i));
+			return std::make_pair(image_error::UNSPECIFIED, "Problem reading the image at offset " + std::to_string(i));
 		prog_space.write_byte(i + 0x100, data);
 	}
 
-	// clear out command tail */
+	// clear out command tail
 	prog_space.write_byte(0x80, 0);
 	prog_space.write_byte(0x81, 0);
 
