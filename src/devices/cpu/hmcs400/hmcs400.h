@@ -117,6 +117,7 @@ protected:
 
 	// opcode handlers
 	void op_illegal();
+	void op_todo();
 
 	void op_lai();
 	void op_lbi();

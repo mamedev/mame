@@ -318,8 +318,14 @@ u8 hmcs400_cpu_device::read_r(u8 index)
 		return 0xf;
 	}
 
-	u8 inp = m_read_r[index].isunset() ? m_r_mask[index] : m_read_r[index](index);
 	u8 mask = (index == 10) ? 3 : 0xf; // port A is 2-bit
+	u8 inp = m_read_r[index](index);
+
+	if (m_read_r[index].isunset())
+	{
+		inp = m_r_mask[index];
+		logerror("read from unmapped port R%X at $%04X\n", index, m_prev_pc);
+	}
 
 	if (m_r_mask[index])
 		return (inp & m_r[index]) & mask;
@@ -329,11 +335,15 @@ u8 hmcs400_cpu_device::read_r(u8 index)
 
 void hmcs400_cpu_device::write_r(u8 index, u8 data)
 {
+	data &= 0xf;
+
 	// ignore writes to read-only or non-existent ports
 	if (index > 8)
 		return;
 
-	data &= 0xf;
+	if (m_write_r[index].isunset())
+		logerror("write $%X to unmapped port R%d at $%04X\n", data, index, m_prev_pc);
+
 	m_r[index] = data;
 	m_write_r[index](index, data);
 }
@@ -342,7 +352,13 @@ int hmcs400_cpu_device::read_d(u8 index)
 {
 	index &= 0xf;
 	u16 mask = 1 << index;
-	u16 inp = m_read_d.isunset() ? m_d_mask : m_read_d(0, mask);
+	u16 inp = m_read_d(0, mask);
+
+	if (m_read_d.isunset())
+	{
+		inp = m_d_mask;
+		logerror("read from unmapped port D%d at $%04X\n", index, m_prev_pc);
+	}
 
 	if (m_d_mask & mask)
 		return BIT(inp & m_d, index);
@@ -354,6 +370,9 @@ void hmcs400_cpu_device::write_d(u8 index, int state)
 {
 	index &= 0xf;
 	u16 mask = 1 << index;
+
+	if (m_write_d.isunset())
+		logerror("write %d to unmapped port D%d at $%04X\n", state, index, m_prev_pc);
 
 	m_d = (m_d & ~mask) | (state ? mask : 0);
 	m_write_d(0, m_d, mask);

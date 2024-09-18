@@ -58,6 +58,11 @@ void hmcs400_cpu_device::op_illegal()
 	logerror("unknown opcode $%03X at $%04X\n", m_op, m_prev_pc);
 }
 
+void hmcs400_cpu_device::op_todo()
+{
+	logerror("unimplemented opcode $%03X at $%04X\n", m_op, m_prev_pc);
+}
+
 
 // immediate instructions
 
@@ -572,6 +577,7 @@ void hmcs400_cpu_device::op_rtni()
 {
 	// RTNI: Return from Interrupt
 	op_rtn();
+	op_todo();
 }
 
 
@@ -664,14 +670,17 @@ void hmcs400_cpu_device::op_p()
 void hmcs400_cpu_device::op_sts()
 {
 	// STS: Start Serial
+	op_todo();
 }
 
 void hmcs400_cpu_device::op_sby()
 {
 	// SBY: Standby Mode
+	op_todo();
 }
 
 void hmcs400_cpu_device::op_stop()
 {
 	// STOP: Stop Mode
+	op_todo();
 }
