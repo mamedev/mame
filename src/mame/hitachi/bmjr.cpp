@@ -26,6 +26,7 @@ TODO:
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -37,7 +38,7 @@ public:
 	bmjr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_cass(*this, "cassette")
+		, m_cassette(*this, "cassette")
 		, m_dac(*this, "dac")
 		, m_work_ram(*this, "work_ram")
 		, m_basic_view(*this, "basic_view")
@@ -61,7 +62,7 @@ private:
 	void main_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cass;
+	required_device<cassette_image_device> m_cassette;
 	required_device<dac_5bit_binary_weighted_device> m_dac;
 	required_shared_ptr<u8> m_work_ram;
 	memory_view m_basic_view;
@@ -172,7 +173,7 @@ u8 bmjr_state::timer_r()
 TIMER_DEVICE_CALLBACK_MEMBER( bmjr_state::kansas_r )
 {
 	/* cassette - turn pulses into a bit */
-	bool cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+	bool cass_ws = (m_cassette->input() > +0.04) ? 1 : 0;
 	m_casscnt++;
 
 	if (cass_ws != m_cassold)
@@ -190,7 +191,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( bmjr_state::kansas_r )
 
 u8 bmjr_state::tape_r()
 {
-	//m_cass->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+	//m_cassette->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 
 	return m_cassbit ? 0xff : 0x00;
 }
@@ -203,23 +204,23 @@ void bmjr_state::tape_w(u8 data)
 	}
 	else
 	{
-		//m_cass->change_state(CASSETTE_RECORD,CASSETTE_MASK_UISTATE);
-		m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
+		//m_cassette->change_state(CASSETTE_RECORD,CASSETTE_MASK_UISTATE);
+		m_cassette->output(BIT(data, 0) ? -1.0 : +1.0);
 	}
 }
 
 u8 bmjr_state::tape_stop_r()
 {
 	m_tape_switch = 0;
-	//m_cass->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
-	m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+	//m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+	m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 	return 0x01;
 }
 
 u8 bmjr_state::tape_start_r()
 {
 	m_tape_switch = 1;
-	m_cass->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+	m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 	return 0x01;
 }
 
@@ -452,7 +453,7 @@ void bmjr_state::machine_reset()
 	//m_beep->set_state(0);
 	m_tape_switch = 0;
 	m_key_select = 0;
-	m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+	m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 	m_bank_mode = 0;
 	m_basic_view.select(0);
 	m_printer_view.select(0);
@@ -469,8 +470,10 @@ void bmjr_state::bmjr(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(bmjr_state::irq0_line_hold));
 
 	// TRQ237/TRQ359
-	CASSETTE(config, m_cass);
-	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	CASSETTE(config, m_cassette);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("bmjr_cass");
+
 	TIMER(config, "kansas_r").configure_periodic(FUNC(bmjr_state::kansas_r), attotime::from_hz(40000));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -487,6 +490,8 @@ void bmjr_state::bmjr(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	// TODO: unknown DAC type, likely connected to discrete circuitry.
 	DAC_5BIT_BINARY_WEIGHTED(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	SOFTWARE_LIST(config, "cass_list").set_original("bmjr_cass");
 }
 
 /* ROM definition */
