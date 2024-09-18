@@ -2595,12 +2595,12 @@ ROM_START( extradrw ) // IGS PCB 0326-05-DV-1
 	ROM_LOAD( "extradraw_v100ve.u21", 0x00000, 0x40000, CRC(d83c1975) SHA1(c38bc41e5b5560dc02421fe1770359d9259b5e93) )
 
 	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "igs_m3004.u4",  0x000000, 0x080000, CRC(d161f8f7) SHA1(4b495197895fd805979c5d5c5a4b7f07a68f4171) ) // label barely readable
+	ROM_LOAD( "igs_m3004.u4",  0x000000, 0x080000, CRC(d161f8f7) SHA1(4b495197895fd805979c5d5c5a4b7f07a68f4171) )
 
 	ROM_REGION( 0x180000, "igs017_igs031:sprites", 0 )
-	ROM_LOAD( "igs_m3001.u12",  0x000000, 0x100000, CRC(642247fb) SHA1(69c01c3551551120a3786522b28a80621a0d5082) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF, label not readable
+	ROM_LOAD( "igs_m3001.u12",  0x000000, 0x100000, CRC(642247fb) SHA1(69c01c3551551120a3786522b28a80621a0d5082) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_IGNORE(0x100000)
-	ROM_LOAD( "h2_and_cg.u3",   0x100000, 0x080000, CRC(97227767) SHA1(c6a1916c0df1aceafbd488ecace5794390058c49) ) // FIXED BITS (xxxxxxx0xxxxxxxx), label not readable
+	ROM_LOAD( "h2_and_cg.u3",   0x100000, 0x080000, CRC(97227767) SHA1(c6a1916c0df1aceafbd488ecace5794390058c49) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "igs s3002.u18", 0x00000, 0x200000, CRC(48601c32) SHA1(8ef3bad80931f4b1badf0598463e15508602f104) ) // BADADDR   --xxxxxxxxxxxxxxxxxxx
