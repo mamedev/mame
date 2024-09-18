@@ -4804,32 +4804,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="winnt35w">
-		<description>Windows NT 3.5 Workstation (3.50.807)</description>
-		<year>1994</year>
-		<publisher>Microsoft</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Setup Boot Disk"/>
-			<dataarea name="flop" size="1474560">
-				<rom name="Windows NT 3.5 Workstation Setup Boot Disk.img" size="1474560" crc="19c6db54" sha1="76135bc803549758de607ad1ef7b15eb48050f53" status="baddump"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Setup Disk 2"/>
-			<dataarea name="flop" size="1474560">
-				<rom name="Windows NT 3.5 Workstation Setup Disk 2.img" size="1474560" crc="957a6b0f" sha1="e2a9899c92606276206fdc9121b711e9bce33f82" status="baddump"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Setup Disk 3"/>
-			<dataarea name="flop" size="1474560">
-				<rom name="Windows NT 3.5 Workstation Setup Disk 3.img" size="1474560" crc="e9e002ca" sha1="7d323569c1301ce60efda367d8feb6daa04dfbd4" status="baddump"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="winnt35w_35">
-		<description>Windows NT 3.5 Workstation (3.50.807) [3.5" floppies]</description>
+	<software name="winnt35_35">
+		<description>Windows NT Workstation 3.5 (3.50.807.1) [3.5" floppies]</description>
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">

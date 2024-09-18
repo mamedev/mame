@@ -7187,6 +7187,111 @@ Incredibly slow in tearing down even on pcipcs7 (bypass with fast forward)
 		</part>
 	</software>
 
+	<software name="winnt35">
+		<description>Windows NT Workstation 3.5 (3.50.807.1)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		This version often gets mislabeled as 3.50.800.1 even though no such build exists.
+		]]></notes>
+		<info name="language" value="English"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt workstation 3.50.807.1" sha1="aa5bb83088f0bc7638bceba6aafb2da37c3bfc84"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<!-- Created via "winnt /ox" and sanitized timestamps. Needs to be resourced from original media. -->
+				<rom name="en-us windows nt workstation 3.50.807.1 3.5-1.img" size="1474560" crc="0c986718" sha1="c24cb01bfc8fe427c395e40d44b2a1f6e7c8cdb0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<!-- Created via "winnt /ox" and sanitized timestamps. Needs to be resourced from original media. -->
+				<rom name="en-us windows nt workstation 3.50.807.1 3.5-2.img" size="1474560" crc="ebbcbf4f" sha1="431a3ce499505434565c317638f00805ac1f64ff" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<!-- Created via "winnt /ox" and sanitized timestamps. Needs to be resourced from original media. -->
+				<rom name="en-us windows nt workstation 3.50.807.1 3.5-3.img" size="1474560" crc="7ad56677" sha1="cb7b2f996014db65f60f6f0e9495b95c037bbef4" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt workstation 3.50.807.1 5.25-1.img" size="1228800" crc="d3c8c12b" sha1="5fe2ab57474ed0edda9d16185446787f2891f721"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt workstation 3.50.807.1 5.25-2.img" size="1228800" crc="604f9763" sha1="02380c23156dc73962f2afcd8a5ff02405f55df1"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt workstation 3.50.807.1 5.25-3.img" size="1228800" crc="32dc2810" sha1="fa08ad00538a58f69eb52bdf162d8a0f526fb076"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winnt35s" cloneof="winnt35">
+		<description>Windows NT Server 3.5 (3.50.807.1)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		This version often gets mislabeled as 3.50.800.1 even though no such build exists.
+		]]></notes>
+		<info name="language" value="English"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt server 3.50.807.1" sha1="36f00cb5b6fbca8c78fd1a1f8af0f74fb885523a"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 3.50.807.1 3.5-1.img" size="1474560" crc="c0e12038" sha1="fc8c954bce54dfffb6d4307a6b324eae7dcf025b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 3.50.807.1 3.5-2.img" size="1474560" crc="cc364c47" sha1="ab153db91fe2e3ced86da095efd60d4002a2bf4b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="en-us windows nt server 3.50.807.1 3.5-3.img" size="1474560" crc="2680e894" sha1="dc4803a6d929d828b878a3116341e2fb999b9dc6"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt server 3.50.807.1 5.25-1.img" size="1228800" crc="0f6a9a7f" sha1="9a2d1ac530de4769569443cf0d950820788cbdfd"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt server 3.50.807.1 5.25-2.img" size="1228800" crc="ed51e1e0" sha1="19b2b75673af0315634d52987ae6cacf4ce86f0c"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="en-us windows nt server 3.50.807.1 5.25-3.img" size="1228800" crc="cc4c2dde" sha1="0db508bf14dcdfda09a6d13a8ff85953999fdcd2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="winnt351w">
 		<description>Windows NT 3.51 Workstation (3.51.1057.1)</description>
 		<year>1995</year>
