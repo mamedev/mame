@@ -163,7 +163,6 @@ void tsconf_state::tsconf_update_screen(screen_device &screen, bitmap_rgb32 &bit
 		}
 		else
 		{
-			bitmap.fill(m_palette->pen_color(get_border_color()), cliprect);
 			tsconf_draw_gfx(bitmap, cliprect);
 		}
 	}
@@ -253,7 +252,6 @@ void tsconf_state::tsconf_draw_txt(bitmap_rgb32 &bitmap, const rectangle &clipre
 void tsconf_state::tsconf_draw_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	u8 pal_offset = m_regs[PAL_SEL] << 4;
-	const rgb_t transparent = m_palette->pen_color(0);
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
 		u16 y_offset = (OFFS_512(G_Y_OFFS_L) + m_gfx_y_frame_offset + vpos) & 0x1ff;
@@ -275,19 +273,11 @@ void tsconf_state::tsconf_draw_gfx(bitmap_rgb32 &bitmap, const rectangle &clipre
 					video_location -= 256;
 				u8 pix = *video_location++;
 				rgb_t pen = m_palette->pen_color(pal_offset | (pix >> 4));
-				if (pen != transparent)
-				{
-					*bm = pen;
-				}
-				bm++;
+				*bm++ = pen;
 				if (width != 1)
 				{
 					pen = m_palette->pen_color(pal_offset | (pix & 0x0f));
-					if (pen != transparent)
-					{
-						*bm = pen;
-					}
-					bm++;
+					*bm++ = pen;
 				}
 			}
 		}
@@ -298,11 +288,7 @@ void tsconf_state::tsconf_draw_gfx(bitmap_rgb32 &bitmap, const rectangle &clipre
 				if (x_offset == 512)
 					video_location -= 512;
 				rgb_t pen = m_palette->pen_color(*video_location++);
-				if (pen != transparent)
-				{
-					*bm = pen;
-				}
-				bm++;
+				*bm++ = pen;
 			}
 		}
 	}
@@ -441,18 +427,18 @@ void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 	if (ram_addr >= PAGE4K(m_regs[SG_PAGE] & 0xf8) && ram_addr < PAGE4K((m_regs[SG_PAGE] & 0xf8) + 8))
 		m_gfxdecode->gfx(TM_SPRITES)->mark_all_dirty();
 
-	m_ram->write(ram_addr, data);
+	m_ram->pointer()[ram_addr] = data;
 }
 
 u16 tsconf_state::ram_read16(offs_t offset)
 {
-	return (m_ram->read(offset & ~offs_t(1)) << 8) | m_ram->read(offset | 1);
+	return (m_ram->pointer()[offset & ~offs_t(1)] << 8) | m_ram->pointer()[offset | 1];
 }
 
 void tsconf_state::ram_write16(offs_t offset, u16 data)
 {
 	ram_page_write(0, offset & ~offs_t(1), data >> 8);
-	ram_page_write(0, offset | 1, data & 0xff);
+	m_ram->pointer()[offset | 1] = data & 0xff;
 }
 
 u16 tsconf_state::spi_read16()
@@ -514,7 +500,7 @@ void tsconf_state::tsconf_port_7ffd_w(u8 data)
 void tsconf_state::tsconf_ula_w(offs_t offset, u8 data)
 {
 	spectrum_ula_w(offset, data);
-	tsconf_port_xxaf_w(BORDER << 8, (data & 0x07) | (m_regs[PAL_SEL] << 4));
+	tsconf_port_xxaf_w(BORDER << 8, 0xf0 | (data & 0x07));
 }
 
 u8 tsconf_state::tsconf_port_xxaf_r(offs_t port)
