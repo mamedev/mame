@@ -901,10 +901,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::kansas_w )
 
 static void bml3_cards(device_slot_interface &device)
 {
-	device.option_add("bml3mp1802", BML3BUS_MP1802); // MP-1802 Floppy Controller Card
-	device.option_add("bml3mp1805", BML3BUS_MP1805); // MP-1805 Floppy Controller Card
-	device.option_add("bml3kanji",  BML3BUS_KANJI);
-	device.option_add("bml3rtc",    BML3BUS_RTC);
+	device.option_add("mp1802", BML3BUS_MP1802);
+	device.option_add("mp1805", BML3BUS_MP1805);
+	device.option_add("kanji",  BML3BUS_KANJI);
+	device.option_add("rtc",    BML3BUS_RTC);
 }
 
 
@@ -969,11 +969,11 @@ void bml3_state::bml3_common(machine_config &config)
 	   Note it isn't feasible to use both, as they each place boot ROM at F800.
 	 */
 	BML3BUS_SLOT(config, "sl1", m_bml3bus, bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl2", m_bml3bus, bml3_cards, "bml3rtc");
+	BML3BUS_SLOT(config, "sl2", m_bml3bus, bml3_cards, "rtc");
 	BML3BUS_SLOT(config, "sl3", m_bml3bus, bml3_cards, nullptr);
 	BML3BUS_SLOT(config, "sl4", m_bml3bus, bml3_cards, nullptr);
 	BML3BUS_SLOT(config, "sl5", m_bml3bus, bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl6", m_bml3bus, bml3_cards, "bml3kanji");
+	BML3BUS_SLOT(config, "sl6", m_bml3bus, bml3_cards, "kanji");
 }
 
 void bml3_state::bml3(machine_config &config)
