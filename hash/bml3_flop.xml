@@ -17,7 +17,7 @@ Compatibility flags:
 		<sharedfeat name="compatibility" value="5" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="346800">
-				<rom name="hiwriter.d88" size="346800" crc="637f3b94" sha1="0bf7fdb528e03aa2409f386e63e257f5aa013c8f" />
+				<rom name="hiwriter.d88" size="346800" crc="53015bf2" sha1="73cbde8f921203335c1afa68ce4accb5d0be4ce5" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -35,7 +35,7 @@ Compatibility flags:
 		<sharedfeat name="compatibility" value="5" />
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="346800">
-				<rom name="tetris.d88" size="346800" crc="f19034fc" sha1="de8385deac89f149837d76d920113c9010182def" />
+				<rom name="tetris.d88" size="346800" crc="c1ee549a" sha1="1715049196046ae98a0c666a6e4ee60ee0c7e2be" />
 			</dataarea>
 		</part>
 	</software>
@@ -59,19 +59,23 @@ Compatibility flags:
 		<sharedfeat name="compatibility" value="5" />
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="0x54ab0">
-				<rom name="dbu.d88" size="0x54ab0" crc="9af7d68f" sha1="adea7e9b6ada493a9b7a378a43762b0183dacf05" />
+				<rom name="dbu.d88" size="0x54ab0" crc="aa89b6e9" sha1="7ccbdcacc066a3f9199d397db724e181ee68c970" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="fcg6890">
-		<description>FCG6890</description><!-- some kind of graphics package -->
+	<software name="fcg6890" supported="partial">
+        <!-- some kind of graphics package -->
+		<description>FCG6890</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+        <notes><![CDATA[
+Assume optional light pen or mouse support
+]]></notes>
 		<sharedfeat name="compatibility" value="5" />
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="0x54ab0">
-				<rom name="fcg6890.d88" size="0x54ab0" crc="47e5a35c" sha1="de3da9839de2d5bd760cf5c3120896f34ca020ef" />
+				<rom name="fcg6890.d88" size="0x54ab0" crc="779bc33a" sha1="10796b1760d3169a88a39acec29ce8b7856caa4b" />
 			</dataarea>
 		</part>
 	</software>
@@ -83,7 +87,7 @@ Compatibility flags:
 		<sharedfeat name="compatibility" value="5" />
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="0x54ab0">
-				<rom name="insecth.d88" size="0x54ab0" crc="cd06a634" sha1="c4a35d229db9f1f09e083c71bd65f41d846db064" />
+				<rom name="insecth.d88" size="0x54ab0" crc="fd78c652" sha1="47e94241c5fcb4ea03854b1c2f8efc74be86bb23" />
 			</dataarea>
 		</part>
 	</software>
@@ -95,7 +99,7 @@ Compatibility flags:
 		<sharedfeat name="compatibility" value="5" />
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="0x54ab0">
-				<rom name="jwp.d88" size="0x54ab0" crc="26139d53" sha1="561a15859d6da9cb3448277b494c2589c40644fd" />
+				<rom name="jwp.d88" size="0x54ab0" crc="166dfd35" sha1="817dd857d8c980c9707642241407c055a3c45b24" />
 			</dataarea>
 		</part>
 	</software>
@@ -107,7 +111,7 @@ Compatibility flags:
 		<sharedfeat name="compatibility" value="5" />
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="0x54ab0">
-				<rom name="tetris.d88" size="0x54ab0" crc="484cf520" sha1="adb4d687e8ace9e35b7bc9f9a20a9cc5c5cf6ae7" />
+				<rom name="subtreas.d88" size="0x54ab0" crc="78329546" sha1="9d3c16b4515408cee2e4a8ae711c14ffe49a2b83" />
 			</dataarea>
 		</part>
 	</software>
