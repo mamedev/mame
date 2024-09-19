@@ -21,6 +21,48 @@ enum
 };
 
 
+// pinout reference
+
+/*
+                _________________
+        D11  1 |*                | 64 D10
+        D12  2 |                 | 63 D9
+        D13  3 |                 | 62 D8
+        D14  4 |                 | 61 D7
+        D15  5 |                 | 60 D6
+        R00  6 |                 | 59 D5
+        R01  7 |                 | 58 D4
+        R02  8 |                 | 57 D3
+        R03  9 |                 | 56 D2
+        R10 10 |                 | 55 D1
+        R11 11 |                 | 54 D0
+        R12 12 |                 | 53 GND
+        R13 13 |                 | 52 OSC2
+        R20 14 |    HD61402x     | 51 OSC1
+        R21 15 |    HD61404x     | 50 _TEST
+        R22 16 |    HD61408x     | 49 RESET
+        R23 17 |                 | 48 R93
+        RA0 18 |     DP-64S      | 47 R92
+  RA1/Vdisp 19 |     DC-64S      | 46 R91
+        R30 20 |                 | 45 R90
+        R31 21 |                 | 44 R83
+  R32/_INT0 22 |                 | 43 R82
+  R33/_INT1 23 |                 | 42 R81
+        R50 24 |                 | 41 R80
+        R51 25 |                 | 40 R73
+        R52 26 |                 | 39 R72
+        R53 27 |                 | 38 R71
+        R60 28 |                 | 37 R70
+        R61 29 |                 | 36 R43
+        R62 30 |                 | 35 R42/SO
+        R63 31 |                 | 34 R41/SI
+        Vcc 32 |_________________| 33 R40/_SCK
+
+        (see datasheets for FP-64 pinouts)
+
+*/
+
+
 class hmcs400_cpu_device : public cpu_device
 {
 public:
@@ -102,9 +144,9 @@ protected:
 	u16 m_d;              // D pins state
 	u16 m_d_mask;
 
-	u8 m_int_line[2];
-	u16 m_irq_flags;
-	u8 m_pmr;
+	u8 m_int_line[2];     // INT0/INT1 pin state
+	u16 m_irq_flags;      // interrupt control bits
+	u8 m_pmr;             // port mode register
 
 	// I/O handlers
 	devcb_read8::array<8> m_read_r;
