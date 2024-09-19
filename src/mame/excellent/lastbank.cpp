@@ -52,7 +52,7 @@ public:
 
 	void lastbank(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r);
+	ioport_value sound_status_r();
 
 protected:
 	virtual void machine_start() override;
@@ -161,7 +161,7 @@ void lastbank_state::sound_flags_w(uint8_t data)
 		m_oki->reset();
 }
 
-CUSTOM_INPUT_MEMBER(lastbank_state::sound_status_r)
+ioport_value lastbank_state::sound_status_r()
 {
 	return BIT(m_sound_flags, 0) << 1 | BIT(m_sound_flags, 1);
 }

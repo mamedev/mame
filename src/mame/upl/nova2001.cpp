@@ -139,7 +139,7 @@ e000 - e7ff        R/W      Work RAM
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(nova2001_state::ninjakun_io_A002_ctrl_r)
+ioport_value nova2001_state::ninjakun_io_A002_ctrl_r()
 {
 	return m_ninjakun_io_a002_ctrl;
 }

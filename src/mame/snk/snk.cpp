@@ -1110,7 +1110,7 @@ hand, always returning 0xf inbetween valid values confuses the game.
 *****************************************************************************/
 
 template <int Which>
-CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
+ioport_value snk_state::gwar_rotary()
 {
 	int value = m_rot_io[Which]->read();
 
@@ -1126,7 +1126,7 @@ CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
 }
 
 template <int Which>
-CUSTOM_INPUT_MEMBER(snk_state::gwarb_rotary)
+ioport_value snk_state::gwarb_rotary()
 {
 	if (m_joymode_io->read() == 1)
 	{
@@ -1173,12 +1173,12 @@ void snk_state::countryc_trackball_w(uint8_t data)
 	m_countryc_trackball = data & 1;
 }
 
-CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_x)
+ioport_value snk_state::countryc_trackball_x()
 {
 	return m_trackball_x_io[m_countryc_trackball]->read();
 }
 
-CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_y)
+ioport_value snk_state::countryc_trackball_y()
 {
 	return m_trackball_y_io[m_countryc_trackball]->read();
 }
@@ -1187,7 +1187,7 @@ CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_y)
 /************************************************************************/
 
 template <int Mask>
-CUSTOM_INPUT_MEMBER(snk_state::snk_bonus_r)
+ioport_value snk_state::snk_bonus_r()
 {
 	switch (Mask)
 	{

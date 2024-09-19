@@ -124,13 +124,13 @@ INPUT_CHANGED_MEMBER(astrof_state::service_coin_inserted)
 }
 
 
-CUSTOM_INPUT_MEMBER(astrof_state::astrof_p1_controls_r)
+ioport_value astrof_state::astrof_p1_controls_r()
 {
 	return ioport("P1")->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(astrof_state::astrof_p2_controls_r)
+ioport_value astrof_state::astrof_p2_controls_r()
 {
 	uint32_t ret;
 
@@ -146,7 +146,7 @@ CUSTOM_INPUT_MEMBER(astrof_state::astrof_p2_controls_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(astrof_state::tomahawk_controls_r)
+ioport_value astrof_state::tomahawk_controls_r()
 {
 	uint32_t ret;
 

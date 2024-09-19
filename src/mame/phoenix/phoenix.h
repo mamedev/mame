@@ -23,7 +23,7 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
+	ioport_value player_input_r();
 	int pleiads_protection_r();
 
 	void condor(machine_config &config);

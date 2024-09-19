@@ -324,7 +324,7 @@ public:
 	void bigkonggx(machine_config &config);
 	void scrammr(machine_config &config);
 
-	template <int Mask> CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
+	template <int Mask> ioport_value ckongg_coinage_r();
 	template <int Mask> int ckongs_coinage_r();
 
 protected:
@@ -494,7 +494,7 @@ public:
 	void gmgalax(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(game_changed);
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(port_r);
+	template <int N> ioport_value port_r();
 
 	void init_gmgalax();
 
@@ -862,7 +862,7 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
+	ioport_value dial_r();
 
 	void moonwar(machine_config &config);
 

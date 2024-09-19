@@ -165,16 +165,12 @@ void skykid_state::palette(palette_device &palette) const
 // convert from 32x32 to 36x28
 TILEMAP_MAPPER_MEMBER(skykid_state::tx_tilemap_scan)
 {
-	int offs;
-
 	row += 2;
 	col -= 2;
 	if (col & 0x20)
-		offs = row + ((col & 0x1f) << 5);
+		return row + ((col & 0x1f) << 5);
 	else
-		offs = col + (row << 5);
-
-	return offs;
+		return col + (row << 5);
 }
 
 TILE_GET_INFO_MEMBER(skykid_state::tx_get_tile_info)

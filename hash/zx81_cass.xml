@@ -33,7 +33,7 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 	</software>
 
 	<software name="1kgames">
-		<description>1K Games Pack</description>
+		<description>1K Games Pack (Artic)</description>
 		<year>198?</year>
 		<publisher>Artic</publisher>
 		<info name="author" value="Adam Waring" />
@@ -51,6 +51,32 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="8576">
 				<rom name="1KGames.tzx" size="8576" crc="2648f563" sha1="11562494bb40cef9bcea606b1bd2ad375f47ef75"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1kgmpack" supported="no">
+		<description>1K Games Pack (Crystal)</description>
+		<year>1982</year>
+		<publisher>Crystal Computing</publisher>
+		<notes><![CDATA[
+ASTRAVOID		LOAD "A"
+BOMBER			LOAD "B"
+SUPER SLALOM	LOAD "SS"
+DUNGEON QUEST	LOAD "DQ"
+SPACE INVADERS	LOAD "SI"
+
+When the program has loaded in enter one of the following corresponding to the game you have chosen:
+RAND USR A
+RAND USR B
+RAND USR SS
+RAND USR DQ
+RAND USR 16530
+]]></notes>
+		<info name="usage" value="1K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="4073">
+				<rom name="1K Games Pack (Crystal).tzx" size="4073" crc="f3022143" sha1="e56cf8be5c3265786a366de9821abb0e0445ef6f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -124,6 +150,27 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="12095">
 				<rom name="3DDefender(NGS).tzx" size="12095" crc="0df02e27" sha1="6aa9a12e6256bc2657326361c636571faf2cfb83"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dform1">
+		<description>3D Formule 1</description>
+		<year>1984</year>
+		<publisher>ERE Informatique</publisher>
+		<info name="developer" value="Marc Lachevrie" />
+		<info name="language" value="French" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="A - 3D Formule 1"/>
+			<dataarea name="cass" size="7686">
+				<rom name="3D Formule 1 - Side 1.tzx" size="7686" crc="225298aa" sha1="fba16cb4e6290f9c48237514cc25cf67eefae711"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="B - Construisez votre route"/>
+			<dataarea name="cass" size="10009">
+				<rom name="3D Formule 1 - Side 2.tzx" size="10009" crc="e512fee0" sha1="c7dcf1371e88b5eaebd289caf27167fb8ae49b80"/>
 			</dataarea>
 		</part>
 	</software>
@@ -368,6 +415,19 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		</part>
 	</software>
 
+	<software name="airtraff">
+		<description>Air Traffic Control</description>
+		<year>1984</year>
+		<publisher>Hama Systems</publisher>
+		<info name="alt_title" value="A.T.C. - Air Traffic Controller" /> <!-- in game title -->
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="12057">
+				<rom name="Air Traffic Control (Hama Systems).tzx" size="12057" crc="1f64205e" sha1="84fd42c3d18b13265abcaa7430de5dd2ae640294"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="airline">
 		<description>Airline</description>
 		<year>1982</year>
@@ -408,6 +468,23 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="6429">
 				<rom name="AlienAttack.tzx" size="6429" crc="e6ce2fa6" sha1="f52df2571903d9aae931b359eabb67e2bbd6fc41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alieninv">
+		<description>Alien Invaders</description>
+		<year>1983</year>
+		<publisher>Real Time Software</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15383">
+				<rom name="Alien Invaders - Side 1.tzx" size="15383" crc="4a3ae570" sha1="b8b5b2529051284900fbd52ffd88aed921112a99"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<dataarea name="cass" size="15383">
+				<rom name="Alien Invaders - Side 2.tzx" size="15383" crc="2cd6b41e" sha1="33fb3083bd96941f8705209098a4698ee316cf7a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -467,6 +544,31 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 			<feature name="part_id" value="B"/>
 			<dataarea name="cass" size="13817">
 				<rom name="ams81b.p" size="13817" crc="c87bbd26" sha1="dc7db398a10655df89897b9d4f5801764cb9008d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aeri">
+		<description>AERI - Análise de Estruturas Recticuladas Isostácticas</description>
+		<year>1982</year>
+		<publisher>Landry</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Catálogo"/>
+			<dataarea name="cass" size="1446">
+				<rom name="Cat.p" size="1446" crc="1ca9842f" sha1="0c39806d7f2ec5560c3c8cb529bd42a075d2b193" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="AERI (sem impressão)"/>
+			<dataarea name="cass" size="13552">
+				<rom name="Aeri.p" size="13552" crc="aef0320a" sha1="fac683452bfbec910e8b445d42c7e3860e4c2b2c" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="AERI.I (com impressão)"/>
+			<dataarea name="cass" size="13968">
+				<rom name="Aeri.I (com impressao).p" size="13968" crc="0d049b02" sha1="e2e37a760b26b246af8ce5a4fd2b8001f643e362" />
 			</dataarea>
 		</part>
 	</software>
@@ -818,7 +920,7 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 	</software>
 
 	<software name="blkcrystls" cloneof="blkcrystl">
-		<description>Black Crystal (Single Sided)</description>
+		<description>Black Crystal (single sided)</description>
 		<year>1982</year>
 		<publisher>Carnell</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -865,7 +967,7 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 	</software>
 
 	<software name="bomberm" cloneof="bomber">
-		<description>Bomber (MikroGen)</description>
+		<description>Bomber (Mikro-Gen)</description>
 		<year>198?</year>
 		<publisher>Mikro-Gen</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -1851,6 +1953,42 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		</part>
 	</software>
 
+	<software name="colunas">
+		<description>Colunas - Dimensionamento de Colunas Montantes de Edifícios</description>
+		<year>1982</year>
+		<publisher>Landry</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Catálogo"/>
+			<dataarea name="cass" size="1436">
+				<rom name="Cat.p" size="1436" crc="0e6995c9" sha1="ca0971e18e3d2a28df561fb805c764c46208c781"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Colunas (sem impressão)"/>
+			<dataarea name="cass" size="15922">
+				<rom name="Colunas (sem impressao).p" size="15922" crc="ccebc148" sha1="5443a70eeb17d19a73edf18bfbcd905466ce44ac"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Colunas (com impressão)"/>
+			<dataarea name="cass" size="16335">
+				<rom name="Colunas.I (com impressao).p" size="16335" crc="a789c970" sha1="92ede76b9441ce1dd2f89399db05ef48e8a7c615"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disacsem">
+		<description>Dis-ACSem</description>
+		<year>1981</year>
+		<publisher>ACS Software</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7207">
+				<rom name="DIS-ACSem.p" size="7207" crc="7ee68cb6" sha1="9f429fc51d814e262f23ecb4f7e67cc31a4a5060"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dodgcon4">
 		<description>Dodgems and Connect 4</description>
 		<year>198?</year>
@@ -1975,6 +2113,20 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="16121">
 				<rom name="Electronics.tzx" size="16121" crc="e777753a" sha1="d3a41d3aa66db93144eef927a1c37fc8bb9fab90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buscates">
+		<description>Em Busca dos Tesouros</description>
+		<year>1986</year>
+		<publisher>Micro Sistemas</publisher>
+		<info name="developer" value="Tadeu Curinga da Silva" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15818">
+				<rom name="ebdt.p" size="15818" crc="e38b5ac7" sha1="79ba7b0a21839100ec7597eae945ae0870f6479a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3081,9 +3233,30 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		<description>Geometry 1</description>
 		<year>1982</year>
 		<publisher>Timex</publisher>
+		<info name="language" value="English" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="5483">
 				<rom name="Geometry1.tzx" size="5483" crc="80dad6c4" sha1="be9373f6519a369e7d2dba40a14319f4751b1b78"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geomtria" cloneof="geometr1">
+		<description>Geometria I</description>
+		<year>1982</year>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Face A - Load &quot;Area&quot; ou Load &quot;Triangulo&quot; ou Load &quot;Vector&quot; ou Load &quot;Graus&quot;"/>
+			<dataarea name="cass" size="8566">
+				<rom name="Geometria I_A.tzx" size="8566" crc="5144043f" sha1="e9fcd585bf5d301e1ee4b08a7e4b18c29cb1ec97"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Face B - Load &quot;Area&quot; ou Load &quot;Triangulo&quot; ou Load &quot;Vector&quot; ou Load &quot;Graus&quot;"/>
+			<dataarea name="cass" size="8566">
+				<rom name="Geometria I_B.tzx" size="8566" crc="46cf2ea8" sha1="d4f24c319550b26aa14389c38a232dac54b2446f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4339,6 +4512,18 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="14657">
 				<rom name="Lemonade.tzx" size="14657" crc="1e38efc7" sha1="6d42e26c5d3f5865a110265c0499d8f0197f2c2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="letterht">
+		<description>Letter Hunt</description>
+		<year>198?</year>
+		<publisher>EdZX Educational Software</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="4053">
+				<rom name="Letter Hunt.p" size="4053" crc="e2223d5f" sha1="f93bac5abc2de384c1b5eae4edd920f4c09d310b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8689,6 +8874,22 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		<part name="cass2" interface="zx81_cass">
 			<dataarea name="cass" size="8141">
 				<rom name="ZXTri.B.tzx" size="8141" crc="646bf81d" sha1="12fbf74c7cf04fe63c868ac34b3504ea2444a4d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Homebrews -->
+
+	<software name="tuttut">
+		<description>Tut-Tut</description>
+		<year>2019</year>
+		<publisher>ZX81 Keyboard Adventure</publisher>
+		<info name="developer" value="David A. Stephenson" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15746">
+				<rom name="tut-tut.p" size="15746" crc="3af8b76f" sha1="228b11560f2937d7dfed0edc4b120fada36335f8"/>
 			</dataarea>
 		</part>
 	</software>

@@ -311,7 +311,7 @@ void coco3_state::coco3(machine_config &config)
 
 	// monitor
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(28.636363_MHz_XTAL/2, 912, 0, 640-1, 262, 1, 241-1);
+	m_screen->set_raw(28.636363_MHz_XTAL/2, 912, 0, 640, 262, 1, 240);
 	m_screen->set_screen_update(FUNC(coco3_state::screen_update));
 
 	// internal ram

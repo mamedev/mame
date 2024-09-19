@@ -184,8 +184,8 @@ public:
 
 	void init_enigma2();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(p1_controls_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(p2_controls_r);
+	ioport_value p1_controls_r();
+	ioport_value p2_controls_r();
 
 protected:
 	virtual void machine_start() override;
@@ -535,13 +535,13 @@ void enigma2_state::enigma2_flip_screen_w(uint8_t data)
 }
 
 
-CUSTOM_INPUT_MEMBER(enigma2_state::p1_controls_r)
+ioport_value enigma2_state::p1_controls_r()
 {
 	return ioport("P1CONTROLS")->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(enigma2_state::p2_controls_r)
+ioport_value enigma2_state::p2_controls_r()
 {
 	if (m_flip_screen)
 		return ioport("P2CONTROLS")->read();

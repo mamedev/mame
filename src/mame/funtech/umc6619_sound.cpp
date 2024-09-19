@@ -198,7 +198,7 @@ uint8_t umc6619_sound_device::read(offs_t offset)
 		// acknowledge DMA IRQ?
 		m_dma_irq_handler(0);
 	}
-	// TODO: offset 0x15 (read by streaming DMAs)
+	// TODO: offset 0x15 (read by streaming DMAs, cfr. staiwbbl)
 	return m_regs[offset];
 }
 

@@ -49,9 +49,9 @@ public:
 		m_cpua_out(*this, "genout%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(gas_pedal_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(brake_pedal_r);
-	template <int axis> DECLARE_CUSTOM_INPUT_MEMBER(adstick_r);
+	ioport_value gas_pedal_r();
+	ioport_value brake_pedal_r();
+	template <int axis> ioport_value adstick_r();
 
 	void bshark_base(machine_config &config);
 	void bshark(machine_config &config);

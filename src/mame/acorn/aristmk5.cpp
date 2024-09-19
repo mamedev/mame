@@ -782,8 +782,8 @@ public:
 	void init_aristmk5();
 
 	INPUT_CHANGED_MEMBER(coin_start);
-	CUSTOM_INPUT_MEMBER(coin_r);
-	CUSTOM_INPUT_MEMBER(coin_usa_r);
+	ioport_value coin_r();
+	ioport_value coin_usa_r();
 	int hopper_r();
 
 private:
@@ -1283,7 +1283,7 @@ int aristmk5_state::hopper_r()
 	return (m_hopper_test && !m_hopper->line_r()) ? 0 : 1;
 }
 
-CUSTOM_INPUT_MEMBER(aristmk5_state::coin_usa_r)
+ioport_value aristmk5_state::coin_usa_r()
 {
 	//  ---x  Coin Acceptor
 	//  --x-  Credit Sense
@@ -1313,7 +1313,7 @@ CUSTOM_INPUT_MEMBER(aristmk5_state::coin_usa_r)
 	return data;
 }
 
-CUSTOM_INPUT_MEMBER(aristmk5_state::coin_r)
+ioport_value aristmk5_state::coin_r()
 {
 	uint8_t data = 0x01;
 

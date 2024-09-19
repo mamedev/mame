@@ -1097,10 +1097,6 @@ private:
 
 #define UCHAR_MAMEKEY(code) (UCHAR_MAMEKEY_BEGIN + ITEM_ID_##code)
 
-// macro for a read callback function (PORT_CUSTOM)
-#define CUSTOM_INPUT_MEMBER(name)   ioport_value name()
-#define DECLARE_CUSTOM_INPUT_MEMBER(name)   ioport_value name()
-
 // macro for port write callback functions (PORT_CHANGED)
 #define INPUT_CHANGED_MEMBER(name)  void name(ioport_field &field, u32 param, ioport_value oldval, ioport_value newval)
 #define DECLARE_INPUT_CHANGED_MEMBER(name)  void name(ioport_field &field, u32 param, ioport_value oldval, ioport_value newval)

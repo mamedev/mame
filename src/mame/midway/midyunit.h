@@ -132,7 +132,7 @@ public:
 	void init_narc();
 
 	int narc_talkback_strobe_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_data_r);
+	ioport_value narc_talkback_data_r();
 
 protected:
 	virtual void machine_reset() override;

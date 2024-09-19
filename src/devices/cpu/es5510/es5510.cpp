@@ -670,10 +670,6 @@ uint32_t es5510_device::execute_max_cycles() const noexcept {
 	return 1;
 }
 
-uint32_t es5510_device::execute_input_lines() const noexcept {
-	return 1;
-}
-
 void es5510_device::execute_set_input(int linenum, int state) {
 	if (linenum == ES5510_HALT) {
 		halt_asserted = (state == ASSERT_LINE);

@@ -1206,7 +1206,7 @@ void seibuspi_state::ymf_irqhandler(int state)
 }
 
 template <int N>
-CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
+ioport_value seibuspi_state::ejanhs_encode()
 {
 	/* E-Jan Highschool has a keyboard with the following keys
 	The keys are encoded with 3 bits for each input port

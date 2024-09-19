@@ -59,7 +59,7 @@ public:
 
 	void dice(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(boot_r) { return m_cold_boot; }
+	ioport_value boot_r() { return m_cold_boot; }
 	DECLARE_INPUT_CHANGED_MEMBER(ram_test) { m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE); }
 
 protected:

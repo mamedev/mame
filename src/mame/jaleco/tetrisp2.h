@@ -162,7 +162,7 @@ public:
 
 	void rocknms(machine_config &config);
 	void init_rocknms();
-	DECLARE_CUSTOM_INPUT_MEMBER(rocknms_main2sub_status_r);
+	ioport_value rocknms_main2sub_status_r();
 
 private:
 	required_device<cpu_device> m_subcpu;

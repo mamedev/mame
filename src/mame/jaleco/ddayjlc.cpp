@@ -90,7 +90,7 @@ public:
 	void ddayjlc(machine_config &config);
 
 	void init_ddayjlc();
-	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
+	ioport_value prot_r();
 
 protected:
 	virtual void machine_start() override;
@@ -282,7 +282,7 @@ static const uint8_t prot_data[0x10] =
 	0x03, 0x01, 0x00, 0x03
 };
 
-CUSTOM_INPUT_MEMBER(ddayjlc_state::prot_r)
+ioport_value ddayjlc_state::prot_r()
 {
 	return prot_data[m_prot_addr];
 }

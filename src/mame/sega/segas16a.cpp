@@ -1187,7 +1187,7 @@ static INPUT_PORTS_START( afighter )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER(afighter_16a_analog_state::afighter_accel_r)
+ioport_value afighter_16a_analog_state::afighter_accel_r()
 {
 	int accel = m_accel->read();
 
@@ -1202,7 +1202,7 @@ CUSTOM_INPUT_MEMBER(afighter_16a_analog_state::afighter_accel_r)
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(afighter_16a_analog_state::afighter_handl_left_r)
+ioport_value afighter_16a_analog_state::afighter_handl_left_r()
 {
 	int steer = m_steer->read();
 
@@ -1220,7 +1220,7 @@ CUSTOM_INPUT_MEMBER(afighter_16a_analog_state::afighter_handl_left_r)
 	return 0x00;
 }
 
-CUSTOM_INPUT_MEMBER(afighter_16a_analog_state::afighter_handl_right_r)
+ioport_value afighter_16a_analog_state::afighter_handl_right_r()
 {
 	int steer = m_steer->read();
 

@@ -228,7 +228,6 @@ protected:
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return cycles; }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 8; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 4; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == DSP56156_IRQ_RESET; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;

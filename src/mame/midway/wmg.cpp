@@ -97,7 +97,7 @@ public:
 
 	void wmg(machine_config &config);
 
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
+	template <int N> ioport_value wmg_mux_r();
 
 protected:
 	virtual void machine_start() override;
@@ -442,7 +442,7 @@ void wmg_state::wmg_port_select_w(int state)
 }
 
 template <int N>
-CUSTOM_INPUT_MEMBER(wmg_state::wmg_mux_r)
+ioport_value wmg_state::wmg_mux_r()
 {
 	if (N == 0)
 	{

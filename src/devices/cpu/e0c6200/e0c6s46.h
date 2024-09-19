@@ -73,7 +73,6 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual u32 execute_input_lines() const noexcept override { return 8; }
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_one() override;
 	virtual bool check_interrupt() override;

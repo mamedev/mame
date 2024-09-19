@@ -213,9 +213,9 @@ public:
 	void init_rongrong();
 
 	int blitter_irq_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovj_blitter_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(nettoqc_special_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(mjflove_blitter_r);
+	ioport_value ddenlovj_blitter_r();
+	ioport_value nettoqc_special_r();
+	ioport_value mjflove_blitter_r();
 
 protected:
 	auto blitter_irq() { return m_blitter_irq_handler.bind(); }
@@ -2094,7 +2094,7 @@ void ddenlovr_state::ddenlovj_coincounter_w(uint8_t data)
 	//                data & 0x80 ?
 }
 
-CUSTOM_INPUT_MEMBER(ddenlovr_state::ddenlovj_blitter_r)
+ioport_value ddenlovr_state::ddenlovj_blitter_r()
 {
 	return m_ddenlovr_blitter_irq_flag ? 0x03 : 0x00;       // bit 4 = 1 -> blitter busy
 }
@@ -2226,7 +2226,7 @@ void ddenlovr_state::ddenlovr_map(address_map &map)
 }
 
 
-CUSTOM_INPUT_MEMBER(ddenlovr_state::nettoqc_special_r)
+ioport_value ddenlovr_state::nettoqc_special_r()
 {
 	return m_ddenlovr_blitter_irq_flag ? 0x03 : 0x00;
 }
@@ -3921,7 +3921,7 @@ uint8_t ddenlovr_state::mjflove_keyb_r(offs_t offset)
 	return val;
 }
 
-CUSTOM_INPUT_MEMBER(ddenlovr_state::mjflove_blitter_r)
+ioport_value ddenlovr_state::mjflove_blitter_r()
 {
 	// bit 7 = 1 -> blitter busy
 	// bit 6 = 0 -> VBLANK?

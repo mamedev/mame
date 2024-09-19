@@ -56,7 +56,6 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override { }
 
-	virtual u32 execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_set_input(int line, int state) override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

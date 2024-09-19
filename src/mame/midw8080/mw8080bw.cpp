@@ -414,7 +414,7 @@ void seawolf_state::periscope_lamp_w(u8 data)
 }
 
 
-CUSTOM_INPUT_MEMBER(seawolf_state::erase_input_r)
+ioport_value seawolf_state::erase_input_r()
 {
 	return m_erase_sw->read() & m_erase_dip->read();
 }
@@ -654,13 +654,13 @@ uint8_t mw8080bw_state::tornbase_get_cabinet_type()
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_hit_left_input_r)
+ioport_value mw8080bw_state::tornbase_hit_left_input_r()
 {
 	return ioport(TORNBASE_L_HIT_PORT_TAG)->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_hit_right_input_r)
+ioport_value mw8080bw_state::tornbase_hit_right_input_r()
 {
 	uint32_t ret;
 
@@ -681,7 +681,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_hit_right_input_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_pitch_left_input_r)
+ioport_value mw8080bw_state::tornbase_pitch_left_input_r()
 {
 	uint32_t ret;
 
@@ -702,13 +702,13 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_pitch_left_input_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_pitch_right_input_r)
+ioport_value mw8080bw_state::tornbase_pitch_right_input_r()
 {
 	return ioport(TORNBASE_L_PITCH_PORT_TAG)->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_score_input_r)
+ioport_value mw8080bw_state::tornbase_score_input_r()
 {
 	return ioport(TORNBASE_SCORE_SW_PORT_TAG)->read() &
 			ioport(TORNBASE_SCORE_DIP_PORT_TAG)->read();
@@ -1303,13 +1303,13 @@ void desertgu_state::machine_start()
 }
 
 
-CUSTOM_INPUT_MEMBER(desertgu_state::gun_input_r)
+ioport_value desertgu_state::gun_input_r()
 {
 	return m_gun_port[m_controller_select]->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(desertgu_state::dip_sw_0_1_r)
+ioport_value desertgu_state::dip_sw_0_1_r()
 {
 	return m_dip_sw_0_1[m_controller_select]->read();
 }
@@ -1413,7 +1413,7 @@ void desertgu_state::desertgu(machine_config &config)
 #define DPLAY_CAB_TYPE_COCKTAIL     (1)
 
 
-CUSTOM_INPUT_MEMBER(dplay_state::dplay_pitch_left_input_r)
+ioport_value dplay_state::dplay_pitch_left_input_r()
 {
 	uint32_t ret;
 
@@ -1426,7 +1426,7 @@ CUSTOM_INPUT_MEMBER(dplay_state::dplay_pitch_left_input_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(dplay_state::dplay_pitch_right_input_r)
+ioport_value dplay_state::dplay_pitch_right_input_r()
 {
 	return m_l_pitch->read();
 }
@@ -1779,7 +1779,7 @@ void clowns_state::machine_start()
 }
 
 
-CUSTOM_INPUT_MEMBER(clowns_state::controller_r)
+ioport_value clowns_state::controller_r()
 {
 	return m_controllers[m_controller_select]->read();
 }
@@ -2572,7 +2572,7 @@ void invaders_state::machine_start()
 
 
 
-CUSTOM_INPUT_MEMBER(invaders_state::invaders_sw6_sw7_r)
+ioport_value invaders_state::invaders_sw6_sw7_r()
 {
 	// upright PCB : switches visible
 	// cocktail PCB: HI
@@ -2584,7 +2584,7 @@ CUSTOM_INPUT_MEMBER(invaders_state::invaders_sw6_sw7_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(invaders_state::invaders_sw5_r)
+ioport_value invaders_state::invaders_sw5_r()
 {
 	// upright PCB : switch visible
 	// cocktail PCB: HI
@@ -2596,7 +2596,7 @@ CUSTOM_INPUT_MEMBER(invaders_state::invaders_sw5_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(invaders_state::invaders_in0_control_r)
+ioport_value invaders_state::invaders_in0_control_r()
 {
 	// upright PCB : P1 controls
 	// cocktail PCB: HI
@@ -2608,13 +2608,13 @@ CUSTOM_INPUT_MEMBER(invaders_state::invaders_in0_control_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(invaders_state::invaders_in1_control_r)
+ioport_value invaders_state::invaders_in1_control_r()
 {
 	return m_player_controls[0]->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(invaders_state::invaders_in2_control_r)
+ioport_value invaders_state::invaders_in2_control_r()
 {
 	// upright PCB : P1 controls
 	// cocktail PCB: P2 controls
@@ -2739,7 +2739,7 @@ void invaders_state::invaders(machine_config &config)
 #define BLUESHRK_COIN_INPUT_PORT_TAG    ("COIN")
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::blueshrk_coin_input_r)
+ioport_value mw8080bw_state::blueshrk_coin_input_r()
 {
 	uint32_t ret = ioport(BLUESHRK_COIN_INPUT_PORT_TAG)->read();
 

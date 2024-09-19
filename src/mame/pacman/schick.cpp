@@ -164,16 +164,12 @@ void schick_state::machine_start()
 
 TILEMAP_MAPPER_MEMBER(schick_state::schick_scan_rows)
 {
-	int offs;
-
 	row += 2;
 	col -= 2;
 	if (col & 0x20)
-		offs = row + ((col & 0x1f) << 5);
+		return row + ((col & 0x1f) << 5);
 	else
-		offs = col + (row << 5);
-
-	return offs;
+		return col + (row << 5);
 }
 
 TILE_GET_INFO_MEMBER(schick_state::schick_get_tile_info)

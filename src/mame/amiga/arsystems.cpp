@@ -90,7 +90,7 @@ public:
 	void init_dlta();
 	void init_argh();
 
-	template <int Coin> DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
+	template <int Coin> ioport_value coin_counter_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
 
 protected:
@@ -167,7 +167,7 @@ void arcadia_amiga_state::arcadia_cia_0_portb_w(uint8_t data)
  *************************************/
 
 template <int Coin>
-CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
+ioport_value arcadia_amiga_state::coin_counter_r()
 {
 	/* return coin counter values */
 	return m_coin_counter[Coin] & 3;

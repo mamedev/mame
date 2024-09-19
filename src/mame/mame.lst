@@ -20316,6 +20316,7 @@ oceanpar                        //
 oceanpara                       //
 olympic5                        // (c) 2005
 olympic5a                       // (c) 2003
+tripslot                        // (c) 2007
 qlgs                            // (c) 1999
 sdwx                            // (c) 2002
 slqz3                           // (c) 1999
@@ -20335,6 +20336,8 @@ crzybugsj                       // (c) 2007
 haunthig                        // (c) 2008
 haunthiga                       // (c) 2006
 tripfev                         // (c) 2006
+tripfeva                        // (c) 2006
+tripfevb                        // (c) 2006
 wldfruit                        // (c) 200?
 
 @source:igs/igs_m036.cpp
@@ -32766,8 +32769,6 @@ expert3t                        //
 expertac                        //
 expertdx                        //
 fsa1fx                          // 1988 MSX2+ Japan
-fsa1gt                          //
-fsa1st                          //
 fsa1wsx                         // 1989 MSX2+ Japan
 fsa1wx                          // 1988 MSX2+ Japan
 fsa1wxa                         // 1988 MSX2+ Japan
@@ -32776,6 +32777,10 @@ hbf1xv                          // 1989 MSX2+ Japan
 phc35j                          // 1989 MSX2+ Japan
 phc70fd                         // 1988 MSX2+ Japan
 phc70fd2                        // 1988 MSX2+ Japan
+
+@source:msx/msxtr.cpp
+fsa1gt                          //
+fsa1st                          //
 
 @source:msx/pengadvb.cpp
 pengadvb                        // (c) 1988 Screen
@@ -42372,6 +42377,9 @@ p8000_16                        //
 @source:skeleton/palestra.cpp
 palestra
 
+@source:skeleton/pap2.cpp
+pap2
+
 @source:skeleton/pcksurfer.cpp
 pcksurfer                       // (c) 2006 Datawind
 
@@ -42831,6 +42839,7 @@ nws1580                         // Sony NEWS NWS-1580
 @source:sony/news_r3k.cpp
 nws3260                         // Sony NEWS NWS-3260
 nws3410                         // Sony NEWS NWS-3410
+nws3720                         // Sony NEWS NWS-3720
 
 @source:sony/news_r4k.cpp
 nws5000x                        // Sony NEWS NWS-5000X
@@ -46653,6 +46662,7 @@ mu80                            // 1994 MU-80
 
 @source:yamaha/ymmu90.cpp
 mu90                            // 1996 MU-90
+mu90b                           // 2005 MU-90B
 
 @source:yamaha/ymmu100.cpp
 mu100                           // 1997 MU-100

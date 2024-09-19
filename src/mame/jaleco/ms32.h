@@ -93,7 +93,7 @@ public:
 	void init_bnstars();
 	void init_ss92046_01();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+	ioport_value mahjong_ctrl_r();
 
 protected:
 	required_device<jaleco_ms32_sysctrl_device> m_sysctrl;

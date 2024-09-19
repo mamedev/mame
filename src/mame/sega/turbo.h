@@ -44,7 +44,7 @@ public:
 		, m_lamp(*this, "lamp")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(pedal_r);
+	ioport_value pedal_r();
 
 protected:
 	virtual void machine_start() override;

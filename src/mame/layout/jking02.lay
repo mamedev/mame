@@ -227,45 +227,45 @@ May or may not match arrangement/colour of real control panel
 	<view name="36+10">
 		<group ref="cpanel" />
 
-		<element ref="bet_b" name="lamp3" inputtag="PLAYER" inputmask="0x00000400">
+		<element ref="bet_b" name="lamp3" inputtag="PLAYER" inputmask="0x00080">
 			<bounds x="0.10" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="bet" name="lamp3" inputtag="PLAYER" inputmask="0x00000400">
+		<element ref="bet" name="lamp3" inputtag="PLAYER" inputmask="0x00080">
 			<bounds x="0.12" y="3.10" width="0.46" height="0.20" />
 		</element>
 
-		<element ref="stop_b" name="lamp6" inputtag="PLAYER" inputmask="0x00000040">
+		<element ref="stop_b" name="lamp6" inputtag="PLAYER" inputmask="0x00008">
 			<bounds x="1.00" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="stop" name="lamp6" inputtag="PLAYER" inputmask="0x00000040">
+		<element ref="stop" name="lamp6" inputtag="PLAYER" inputmask="0x00008">
 			<bounds x="1.02" y="3.10" width="0.46" height="0.20" />
 		</element>
 
-		<element ref="stop_b" name="lamp4" inputtag="PLAYER" inputmask="0x00000200">
+		<element ref="stop_b" name="lamp4" inputtag="PLAYER" inputmask="0x00040">
 			<bounds x="1.60" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="stop1" name="lamp4" inputtag="PLAYER" inputmask="0x00000200">
+		<element ref="stop1" name="lamp4" inputtag="PLAYER" inputmask="0x00040">
 			<bounds x="1.62" y="3.10" width="0.46" height="0.20" />
 		</element>
 
-		<element ref="stop_b" name="lamp5" inputtag="PLAYER" inputmask="0x00000080">
+		<element ref="stop_b" name="lamp5" inputtag="PLAYER" inputmask="0x00010">
 			<bounds x="2.20" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="stop2a" name="lamp5" inputtag="PLAYER" inputmask="0x00000080">
+		<element ref="stop2a" name="lamp5" inputtag="PLAYER" inputmask="0x00010">
 			<bounds x="2.22" y="3.10" width="0.46" height="0.20" />
 		</element>
 
-		<element ref="stop_b" name="lamp2" inputtag="PLAYER" inputmask="0x00000100">
+		<element ref="stop_b" name="lamp2" inputtag="PLAYER" inputmask="0x00020">
 			<bounds x="2.80" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="stop3" name="lamp2" inputtag="PLAYER" inputmask="0x00000100">
+		<element ref="stop3" name="lamp2" inputtag="PLAYER" inputmask="0x00020">
 			<bounds x="2.82" y="3.10" width="0.46" height="0.20" />
 		</element>
 
-		<element ref="stop_b" name="lamp1" inputtag="PLAYER" inputmask="0x00000020">
+		<element ref="stop_b" name="lamp1" inputtag="PLAYER" inputmask="0x00004">
 			<bounds x="3.40" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="stop4a" name="lamp1" inputtag="PLAYER" inputmask="0x00000020">
+		<element ref="stop4a" name="lamp1" inputtag="PLAYER" inputmask="0x00004">
 			<bounds x="3.42" y="3.10" width="0.46" height="0.20" />
 		</element>
 

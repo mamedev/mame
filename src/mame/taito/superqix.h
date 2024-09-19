@@ -160,7 +160,7 @@ public:
 	void pbillian(machine_config &config);
 	void pbillianb(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(pbillian_semaphore_input_r);
+	ioport_value pbillian_semaphore_input_r();
 
 protected:
 	virtual void machine_start() override;

@@ -576,7 +576,7 @@ public:
 	void handle_joystick_cia(u8 pra, u8 dra);
 	u16 handle_joystick_potgor(u16 potgor);
 
-	DECLARE_CUSTOM_INPUT_MEMBER( cd32_input );
+	ioport_value cd32_input();
 	template <int P> int cd32_sel_mirror_input();
 
 	void init_pal();
@@ -1165,7 +1165,7 @@ u16 cd32_state::handle_joystick_potgor(u16 potgor)
 	return potgor;
 }
 
-CUSTOM_INPUT_MEMBER( cd32_state::cd32_input )
+ioport_value cd32_state::cd32_input()
 {
 	return handle_joystick_potgor(m_potgo_value) >> 8;
 }
@@ -1495,7 +1495,7 @@ void a4000_state::a4000t_mem(address_map &map)
 //**************************************************************************
 
 template <int P>
-CUSTOM_INPUT_MEMBER( amiga_state::amiga_joystick_convert )
+ioport_value amiga_state::amiga_joystick_convert()
 {
 	uint8_t bits = m_joy_ports[P].read_safe(0xff);
 

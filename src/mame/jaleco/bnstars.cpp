@@ -128,7 +128,7 @@ public:
 
 	void init_bnstars();
 
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+	template <int P> ioport_value mahjong_ctrl_r();
 
 private:
 
@@ -436,7 +436,7 @@ template <int chip> void ms32_bnstars_state::palette_ram_w(offs_t offset, u16 da
 }
 
 template <int P>
-CUSTOM_INPUT_MEMBER(ms32_bnstars_state::mahjong_ctrl_r)
+ioport_value ms32_bnstars_state::mahjong_ctrl_r()
 {
 	required_ioport_array<4> &keys = (P == 0) ? m_p1_keys : m_p2_keys;
 	// different routing than other ms32.cpp mahjong games, using 0x2080 as mask

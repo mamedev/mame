@@ -466,8 +466,8 @@ public:
 
 	void usclssic(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(trackball_x_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(trackball_y_r);
+	ioport_value trackball_x_r();
+	ioport_value trackball_y_r();
 
 protected:
 	virtual void machine_start() override;
@@ -858,12 +858,12 @@ u16 usclssic_state::dsw_r(offs_t offset)
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(usclssic_state::trackball_x_r)
+ioport_value usclssic_state::trackball_x_r()
 {
 	return m_track_x[m_port_select ? 1 : 0]->read();
 }
 
-CUSTOM_INPUT_MEMBER(usclssic_state::trackball_y_r)
+ioport_value usclssic_state::trackball_y_r()
 {
 	return m_track_y[m_port_select ? 1 : 0]->read();
 }

@@ -319,4 +319,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT     CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1997, emerclp, 0,      0,      emerclp,  emerclp, emerclp_state, empty_init, "Novag Industries", "Emerald Classic Plus", MACHINE_SUPPORTS_SAVE )
+SYST( 1997, emerclp, 0,      0,      emerclp,  emerclp, emerclp_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Emerald Classic Plus", MACHINE_SUPPORTS_SAVE )

@@ -47,8 +47,8 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(alligators_rear_sensors_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(alligators_front_sensors_r);
+	ioport_value alligators_rear_sensors_r();
+	ioport_value alligators_front_sensors_r();
 
 	void wackygtr(machine_config &config);
 
@@ -162,7 +162,7 @@ void wackygtr_state::pmm8713_ck(int i, int state)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(wackygtr_state::alligators_rear_sensors_r)
+ioport_value wackygtr_state::alligators_rear_sensors_r()
 {
 	return  ((m_motors_pos[0] < 10) ? 0x01 : 0) |
 			((m_motors_pos[1] < 10) ? 0x02 : 0) |
@@ -172,7 +172,7 @@ CUSTOM_INPUT_MEMBER(wackygtr_state::alligators_rear_sensors_r)
 			(m_alligators_ctrl ^ 0x1f);
 }
 
-CUSTOM_INPUT_MEMBER(wackygtr_state::alligators_front_sensors_r)
+ioport_value wackygtr_state::alligators_front_sensors_r()
 {
 	return  ((m_motors_pos[0] < 5 || m_motors_pos[0] > 55) ? 0x01 : 0) |
 			((m_motors_pos[1] < 5 || m_motors_pos[1] > 55) ? 0x02 : 0) |

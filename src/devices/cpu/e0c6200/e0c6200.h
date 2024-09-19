@@ -24,7 +24,6 @@ protected:
 	// device_execute_interface overrides
 	virtual u32 execute_min_cycles() const noexcept override { return 5; }
 	virtual u32 execute_max_cycles() const noexcept override { return 14; } // longest opcode is 12 cycles, but interrupt service takes up to 14
-	virtual u32 execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_one();
 	virtual bool check_interrupt() { return false; } // nothing to do by default
