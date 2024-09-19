@@ -587,17 +587,17 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS          INIT          COMPANY, FULLNAME, FLAGS
-SYST( 1988, sexperta,  0,        0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag Industries", "Super Expert (version A, set 1)", MACHINE_SUPPORTS_SAVE ) // 886
-SYST( 1987, sexperta1, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag Industries", "Super Expert (version A, set 2)", MACHINE_SUPPORTS_SAVE ) // 878
-SYST( 1987, sexperta2, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag Industries", "Super Expert (version A, set 3)", MACHINE_SUPPORTS_SAVE ) // 878
-SYST( 1988, sexpertb,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE ) // 887
-SYST( 1990, sexpertc,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries", "Super Expert (version C, v3.6)", MACHINE_SUPPORTS_SAVE ) // 902
-SYST( 1990, sexpertc1, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries", "Super Expert (version C, v3.0)", MACHINE_SUPPORTS_SAVE ) // 902
-SYST( 1990, sexpertc2, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries", "Super Expert (version C, v1.2)", MACHINE_SUPPORTS_SAVE ) // 902
+SYST( 1988, sexperta,  0,        0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version A, set 1)", MACHINE_SUPPORTS_SAVE ) // 886
+SYST( 1987, sexperta1, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version A, set 2)", MACHINE_SUPPORTS_SAVE ) // 878
+SYST( 1987, sexperta2, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version A, set 3)", MACHINE_SUPPORTS_SAVE ) // 878
+SYST( 1988, sexpertb,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE ) // 887
+SYST( 1990, sexpertc,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version C, v3.6)", MACHINE_SUPPORTS_SAVE ) // 902
+SYST( 1990, sexpertc1, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version C, v3.0)", MACHINE_SUPPORTS_SAVE ) // 902
+SYST( 1990, sexpertc2, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version C, v1.2)", MACHINE_SUPPORTS_SAVE ) // 902
 
-SYST( 1987, sfortea,   0,        0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag Industries", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1987, sfortea1,  sfortea,  0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag Industries", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE )
-SYST( 1987, sfortea2,  sfortea,  0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag Industries", "Super Forte (version A, set 3)", MACHINE_SUPPORTS_SAVE )
-SYST( 1988, sforteb,   sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag Industries", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE )
-SYST( 1990, sfortec,   sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag Industries", "Super Forte (version C, v3.6)", MACHINE_SUPPORTS_SAVE )
-SYST( 1990, sfortec1,  sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag Industries", "Super Forte (version C, v1.2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, sfortea,   0,        0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, sfortea1,  sfortea,  0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, sfortea2,  sfortea,  0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version A, set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, sforteb,   sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, sfortec,   sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version C, v3.6)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, sfortec1,  sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version C, v1.2)", MACHINE_SUPPORTS_SAVE )

@@ -1080,7 +1080,7 @@ void igrosoft_gamble_state::igrosoft_gamble(machine_config &config)
 	AY8910(config, "aysnd", 6000000/4).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	M48T35(config, m_m48t35, 0);
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 }
 
 void igrosoft_gamble_state::rollfr(machine_config &config)

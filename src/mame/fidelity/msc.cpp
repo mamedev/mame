@@ -27,12 +27,12 @@ and one for MCS48. A12 is forced high or low to select the bank.
 
 #include "emu.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/z8/z8.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -55,7 +55,6 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	// machine configs
 	void msc(machine_config &config);
 
 protected:
@@ -72,18 +71,13 @@ private:
 	u8 m_led_select = 0;
 	u16 m_inp_mux = 0;
 
-	// address maps
 	void main_map(address_map &map);
 
 	// I/O handlers
 	void update_display();
 	void mux_w(u8 data);
 	void control_w(u8 data);
-	u8 rom_r(offs_t offset);
-
-	u8 read_inputs();
-	u8 input_hi_r();
-	u8 input_lo_r();
+	u8 input_r();
 };
 
 void msc_state::machine_start()
@@ -113,18 +107,20 @@ void msc_state::mux_w(u8 data)
 
 void msc_state::control_w(u8 data)
 {
-	// P37: input mux highest bit
-	// P35,P36: led select
-	m_inp_mux = (m_inp_mux & 0xff) | (data << 1 & 0x100);
-	m_led_select = ~data >> 5 & 3;
-	update_display();
-
 	// P34: speaker out
 	m_dac->write(BIT(~data, 4));
+
+	// P35,P36: led select
+	m_led_select = ~data >> 5 & 3;
+
+	// P37: input mux highest bit, led data
+	m_inp_mux = (m_inp_mux & 0xff) | (data << 1 & 0x100);
+	update_display();
 }
 
-u8 msc_state::read_inputs()
+u8 msc_state::input_r()
 {
+	// P30-P33,P04-P07: multiplexed inputs
 	u8 data = 0;
 
 	// read chessboard sensors
@@ -137,18 +133,6 @@ u8 msc_state::read_inputs()
 		data |= m_inputs->read();
 
 	return bitswap<8>(~data,0,1,2,3,4,5,6,7);
-}
-
-u8 msc_state::input_hi_r()
-{
-	// P04-P07: multiplexed inputs high
-	return read_inputs() | 0x0f;
-}
-
-u8 msc_state::input_lo_r()
-{
-	// P30-P33: multiplexed inputs low
-	return read_inputs() | 0xf0;
 }
 
 
@@ -191,9 +175,11 @@ void msc_state::msc(machine_config &config)
 	// basic machine hardware
 	Z8601(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &msc_state::main_map);
-	m_maincpu->p0_in_cb().set(FUNC(msc_state::input_hi_r));
+	m_maincpu->p0_in_cb().set(FUNC(msc_state::input_r)).mask(0xf0);
+	m_maincpu->p0_in_cb().append_constant(0x0f).mask(0x0f);
 	m_maincpu->p2_out_cb().set(FUNC(msc_state::mux_w));
-	m_maincpu->p3_in_cb().set(FUNC(msc_state::input_lo_r));
+	m_maincpu->p3_in_cb().set(FUNC(msc_state::input_r)).mask(0x0f);
+	m_maincpu->p3_in_cb().append_constant(0xf0).mask(0xf0);
 	m_maincpu->p3_out_cb().set(FUNC(msc_state::control_w));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);

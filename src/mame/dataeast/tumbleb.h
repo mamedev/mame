@@ -70,7 +70,7 @@ public:
 	void init_magipur();
 	void init_carket();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(suprtrio_prot_latch_r);
+	ioport_value suprtrio_prot_latch_r();
 
 protected:
 	/* memory pointers */

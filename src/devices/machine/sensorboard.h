@@ -76,10 +76,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ui_init);
 	DECLARE_INPUT_CHANGED_MEMBER(ui_refresh) { refresh(); }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(check_sensor_busy) { return (m_sensorpos == -1) ? 0 : 1; }
-	DECLARE_CUSTOM_INPUT_MEMBER(check_bs_mask) { return m_bs_mask; }
-	DECLARE_CUSTOM_INPUT_MEMBER(check_ss_mask) { return m_ss_mask; }
-	DECLARE_CUSTOM_INPUT_MEMBER(check_ui_enabled) { return m_ui_enabled; }
+	ioport_value check_sensor_busy() { return (m_sensorpos == -1) ? 0 : 1; }
+	ioport_value check_bs_mask() { return m_bs_mask; }
+	ioport_value check_ss_mask() { return m_ss_mask; }
+	ioport_value check_ui_enabled() { return m_ui_enabled; }
 
 protected:
 	// device-level overrides

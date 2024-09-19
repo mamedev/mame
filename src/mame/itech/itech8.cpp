@@ -1166,7 +1166,7 @@ INPUT_PORTS_END
 
 
 
-CUSTOM_INPUT_MEMBER(itech8_state::gtg_mux)
+ioport_value itech8_state::gtg_mux()
 {
 	return m_p1->read() & m_p2->read();
 }
@@ -1721,7 +1721,7 @@ void itech8_state::itech8_core_devices(machine_config &config)
 {
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_RANDOM);
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
 
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
@@ -1795,7 +1795,7 @@ void itech8_state::itech8_sound_ym3812(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech8_state::sound3812_map);
 
 	pia6821_device &pia(PIA6821(config, "pia"));
-	pia.readpb_handler().set("ticket", FUNC(ticket_dispenser_device::line_r));
+	pia.readpb_handler().set("ticket", FUNC(ticket_dispenser_device::line_r)).invert();
 	pia.writepa_handler().set(FUNC(itech8_state::pia_porta_out));
 	pia.writepb_handler().set(FUNC(itech8_state::pia_portb_out));
 

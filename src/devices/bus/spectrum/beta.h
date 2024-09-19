@@ -144,7 +144,7 @@ public:
 	spectrum_gamma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	spectrum_gamma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(busy_r) { return !m_centronics_busy; }
+	ioport_value busy_r() { return !m_centronics_busy; }
 protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;

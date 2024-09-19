@@ -9,10 +9,9 @@
     Still to do:
         * fix protection
         * fix jpark correctly
-        * priorities in multi32 appear wrong - stadium cross map screen
-                                           and title fight ingame backgrounds
         * should f1lap be set up as a twin cabinet / direct link or can it
           be operated as a single screen, unlike f1en/air rescue
+        * also see segas32_v.cpp for gfx issues
 
 ****************************************************************************
 

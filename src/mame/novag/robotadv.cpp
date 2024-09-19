@@ -573,4 +573,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, robotadv, 0,      0,      robotadv, robotadv, robotadv_state, empty_init, "Novag Industries", "Chess Robot Adversary", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1982, robotadv, 0,      0,      robotadv, robotadv, robotadv_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Chess Robot Adversary", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )

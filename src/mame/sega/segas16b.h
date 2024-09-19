@@ -324,9 +324,9 @@ public:
 		, m_steer(*this, "STEER")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(afighter_accel_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_left_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_right_r);
+	ioport_value afighter_accel_r();
+	ioport_value afighter_handl_left_r();
+	ioport_value afighter_handl_right_r();
 
 private:
 	required_ioport     m_accel;

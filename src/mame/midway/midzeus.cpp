@@ -140,7 +140,7 @@ public:
 
 	void crusnexo(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
+	ioport_value keypad_r();
 
 protected:
 	virtual void machine_start() override
@@ -186,7 +186,7 @@ public:
 
 	void thegrid(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(custom_49way_r);
+	ioport_value custom_49way_r();
 
 private:
 	uint32_t trackball_r(offs_t offset);
@@ -668,7 +668,7 @@ void midzeus_state::tms32032_control_w(offs_t offset, uint32_t data, uint32_t me
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(thegrid_state::custom_49way_r)
+ioport_value thegrid_state::custom_49way_r()
 {
 	static const uint8_t translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
 	return (translate49[m_io_49way_y->read() >> 4] << 4) | translate49[m_io_49way_x->read() >> 4];
@@ -682,7 +682,7 @@ void crusnexo_state::keypad_select_w(offs_t offset, uint32_t data)
 }
 
 
-CUSTOM_INPUT_MEMBER(crusnexo_state::keypad_r)
+ioport_value crusnexo_state::keypad_r()
 {
 	uint32_t bits = m_io_keypad->read();
 	uint8_t select = m_keypad_select;

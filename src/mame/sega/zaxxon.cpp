@@ -351,7 +351,7 @@ uint8_t zaxxon_state::razmataz_counter_r()
 
 
 template <int Num>
-CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
+ioport_value zaxxon_state::razmataz_dial_r()
 {
 	int res;
 

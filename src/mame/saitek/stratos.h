@@ -17,10 +17,10 @@
 #include <algorithm>
 
 
-class saitek_stratos_state : public driver_device
+class stratos_base_state : public driver_device
 {
 public:
-	saitek_stratos_state(const machine_config &mconfig, device_type type, const char *tag) :
+	stratos_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),

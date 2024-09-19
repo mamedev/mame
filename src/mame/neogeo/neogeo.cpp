@@ -915,7 +915,7 @@ uint16_t ngarcade_base_state::in1_edge_joy_r()
 	return ((m_edge->in1_r() & m_ctrl2->read_ctrl()) << 8) | 0xff;
 }
 
-CUSTOM_INPUT_MEMBER(ngarcade_base_state::startsel_edge_joy_r)
+ioport_value ngarcade_base_state::startsel_edge_joy_r()
 {
 	uint32_t ret = m_edge->read_start_sel() | ~0x05;
 	if (m_ctrl1)
@@ -1059,7 +1059,7 @@ void ngarcade_base_state::save_ram_w(offs_t offset, uint16_t data, uint16_t mem_
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(neogeo_base_state::get_memcard_status)
+ioport_value neogeo_base_state::get_memcard_status()
 {
 	// D0 and D1 are memcard 1 and 2 presence indicators, D2 indicates memcard
 	// write protect status (we are always write enabled)
@@ -1095,7 +1095,7 @@ void neogeo_base_state::memcard_w(offs_t offset, uint16_t data, uint16_t mem_mas
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(neogeo_base_state::get_audio_result)
+ioport_value neogeo_base_state::get_audio_result()
 {
 	uint8_t ret = m_soundlatch2->read();
 

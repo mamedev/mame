@@ -58,7 +58,7 @@ public:
 	void segajw(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
+	ioport_value coin_sensors_r();
 	int hopper_sensors_r();
 
 protected:
@@ -153,7 +153,7 @@ int segajw_state::hopper_sensors_r()
 	return data;
 }
 
-CUSTOM_INPUT_MEMBER( segajw_state::coin_sensors_r )
+ioport_value segajw_state::coin_sensors_r()
 {
 	uint8_t data = 0;
 

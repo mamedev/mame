@@ -1237,7 +1237,7 @@ void interflip8035_state::interflip(machine_config &config)
 	add_em_reels(config, 20, attotime::from_double(2));
 
 	// hopper device
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	// sound stuff
 	SPEAKER(config, "mono").front_center();

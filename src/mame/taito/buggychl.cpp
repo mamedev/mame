@@ -147,7 +147,7 @@ public:
 
 	void buggychl(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(pedal_in_r);
+	ioport_value pedal_in_r();
 
 protected:
 	virtual void machine_start() override;
@@ -651,7 +651,7 @@ Sound Master CPU (SMCPU)
 /******************************************************************************/
 
 // accelerator is 4-bit, we need to convert it here so that it doesn't clash with other inputs in IN1 (known i/o framework fault)
-CUSTOM_INPUT_MEMBER( buggychl_state::pedal_in_r )
+ioport_value buggychl_state::pedal_in_r()
 {
 	return m_pedal_input->read() >> 4;
 }

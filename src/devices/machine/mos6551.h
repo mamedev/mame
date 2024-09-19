@@ -17,7 +17,7 @@
                   _CTS   9 |             | 20  DB2
                    TxD  10 |             | 19  DB1
                   _DTR  11 |             | 18  DB0
-                   RxD  12 |             | 17  _DBR
+                   RxD  12 |             | 17  _DSR
                    RS0  13 |             | 16  _DCD
                    RS1  14 |_____________| 15  Vcc
 
@@ -40,6 +40,8 @@ public:
 	auto rxc_handler() { return m_rxc_handler.bind(); }
 	auto rts_handler() { return m_rts_handler.bind(); }
 	auto dtr_handler() { return m_dtr_handler.bind(); }
+
+	void map(address_map &map);
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);

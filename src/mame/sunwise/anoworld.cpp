@@ -1,6 +1,6 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese, AJR
-/***************************************************************************************************
+/**************************************************************************************************
 
 Another World (c) 1989 Sunwise
 
@@ -8,13 +8,14 @@ TODO:
 - Identify irq sources ($24 timer, $26 VBLANK?, $20 or $22 quadrature encoder);
 - Z80DMA never sends a ready signal, workaround by forcing is_ready fn to 1;
 - Verify data ROM bank;
+- Complete inputs: cabinet shows 3 buttons and a trackball;
 - Sound i/f not fully understood:
   \- no irq from CTC, hooking up YM irq in daisy chain will fail device validation;
   \- sound ROMs mainly decodes as regular 8-bit DAC, mono, 8000 Hz.
   \- Denote they ends abruptly towards the end (bad ROMs?).
   \- is output connected to CTC ZC0 / ZC1 as DAC1BIT?
 
-====================================================================================================
+===================================================================================================
 
 TOP BOARD (S-8808A)
 =========
@@ -44,7 +45,7 @@ video output
 5x 5816 RAM
 18 MHz osc
 
-***************************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 

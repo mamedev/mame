@@ -31,7 +31,7 @@ public:
 	void init_raiders5();
 	void init_pkunwar();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ninjakun_io_A002_ctrl_r);
+	ioport_value ninjakun_io_A002_ctrl_r();
 
 private:
 	required_device<z80_device> m_maincpu;

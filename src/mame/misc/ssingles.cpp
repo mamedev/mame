@@ -187,7 +187,7 @@ public:
 	void ssingles(machine_config &config);
 	void atamanot(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
+	ioport_value controls_r();
 
 protected:
 	virtual void video_start() override;
@@ -329,7 +329,7 @@ void ssingles_state::c001_w(uint8_t data)
 	m_prot_data ^= data ^ 0x11;
 }
 
-CUSTOM_INPUT_MEMBER(ssingles_state::controls_r)
+ioport_value ssingles_state::controls_r()
 {
 	int data = 7;
 	switch (m_extra->read())     //multiplexed

@@ -36,8 +36,8 @@ public:
 	void ps4big(machine_config &config);
 	void ps4small(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+	ioport_value system_r();
+	template <int P> ioport_value mahjong_ctrl_r();
 
 private:
 	/* memory pointers */

@@ -18,7 +18,7 @@
 DEFINE_DEVICE_TYPE(COLECO_HAND_CONTROLLER, coleco_hand_controller_device, "coleco_hand", "ColecoVision Hand Controller")
 
 
-CUSTOM_INPUT_MEMBER( coleco_hand_controller_device::keypad_r )
+ioport_value coleco_hand_controller_device::keypad_r()
 {
 	uint8_t data = 0xf;
 	uint16_t keypad = m_io_keypad->read();

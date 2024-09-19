@@ -32,9 +32,9 @@
 class invaders_clone_state : public invaders_state
 {
 public:
-	DECLARE_CUSTOM_INPUT_MEMBER(sicv_in2_control_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invadpt2_in1_control_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invadpt2_in2_control_r);
+	ioport_value sicv_in2_control_r();
+	ioport_value invadpt2_in1_control_r();
+	ioport_value invadpt2_in2_control_r();
 
 protected:
 	invaders_clone_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -404,7 +404,7 @@ public:
 
 	void rollingc(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(game_select_r);
+	ioport_value game_select_r();
 
 protected:
 	virtual void machine_start() override;

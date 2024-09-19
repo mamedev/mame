@@ -130,7 +130,7 @@ public:
 
 	void imolagp(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
+	ioport_value imolagp_steerlatch_r();
 
 protected:
 	virtual void machine_start() override;
@@ -416,7 +416,7 @@ void imolagp_state::imolagp_slave_io(address_map &map)
 
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(imolagp_state::imolagp_steerlatch_r)
+ioport_value imolagp_state::imolagp_steerlatch_r()
 {
 	return m_steerlatch & 0xf;
 }

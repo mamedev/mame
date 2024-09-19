@@ -2010,6 +2010,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/slot/music.h",
 		MAME_DIR .. "src/devices/bus/msx/slot/panasonic08.cpp",
 		MAME_DIR .. "src/devices/bus/msx/slot/panasonic08.h",
+		MAME_DIR .. "src/devices/bus/msx/slot/panasonic08r.cpp",
+		MAME_DIR .. "src/devices/bus/msx/slot/panasonic08r.h",
 		MAME_DIR .. "src/devices/bus/msx/slot/rom.cpp",
 		MAME_DIR .. "src/devices/bus/msx/slot/rom.h",
 		MAME_DIR .. "src/devices/bus/msx/slot/ram.cpp",
@@ -2576,6 +2578,20 @@ if (BUSES["SS50"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/supracan/slot.h,BUSES["SUPRACAN"] = true
+---------------------------------------------------
+
+if (BUSES["SUPRACAN"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/supracan/slot.cpp",
+		MAME_DIR .. "src/devices/bus/supracan/slot.h",
+		MAME_DIR .. "src/devices/bus/supracan/rom.cpp",
+		MAME_DIR .. "src/devices/bus/supracan/rom.h",
+	}
+end
+
 
 ---------------------------------------------------
 --
@@ -2851,6 +2867,8 @@ if (BUSES["VME"]~=null) then
 		MAME_DIR .. "src/devices/bus/vme/mvme187.h",
 		MAME_DIR .. "src/devices/bus/vme/mvme327a.cpp",
 		MAME_DIR .. "src/devices/bus/vme/mvme327a.h",
+		MAME_DIR .. "src/devices/bus/vme/mvme328.cpp",
+		MAME_DIR .. "src/devices/bus/vme/mvme328.h",
 		MAME_DIR .. "src/devices/bus/vme/mvme350.cpp",
 		MAME_DIR .. "src/devices/bus/vme/mvme350.h",
 		MAME_DIR .. "src/devices/bus/vme/mzr8105.cpp",
@@ -5627,6 +5645,8 @@ if (BUSES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/bus/pci/mga2064w.h",
 		MAME_DIR .. "src/devices/bus/pci/ncr53c825.cpp",
 		MAME_DIR .. "src/devices/bus/pci/ncr53c825.h",
+		MAME_DIR .. "src/devices/bus/pci/neon250.cpp",
+		MAME_DIR .. "src/devices/bus/pci/neon250.h",
 		MAME_DIR .. "src/devices/bus/pci/oti_spitfire.cpp",
 		MAME_DIR .. "src/devices/bus/pci/oti_spitfire.h",
 		MAME_DIR .. "src/devices/bus/pci/opti82c861.cpp",

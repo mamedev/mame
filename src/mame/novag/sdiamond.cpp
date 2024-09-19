@@ -373,4 +373,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 2003, sdiamond, 0,      0,      sdiamond, sdiamond, sdiamond_state, empty_init, "Perfect Technology", "Star Diamond", MACHINE_SUPPORTS_SAVE )
+SYST( 2003, sdiamond, 0,      0,      sdiamond, sdiamond, sdiamond_state, empty_init, "Perfect Technology / Intelligent Heuristic Programming", "Star Diamond", MACHINE_SUPPORTS_SAVE )

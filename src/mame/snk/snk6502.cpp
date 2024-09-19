@@ -322,7 +322,7 @@ void snk6502_state::sasuke_start_counter()
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(snk6502_state::sasuke_count_r)
+ioport_value snk6502_state::sasuke_count_r()
 {
 	return (m_sasuke_counter >> 4);
 }

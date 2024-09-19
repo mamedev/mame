@@ -90,9 +90,9 @@ public:
 	void init_scfinals();
 	void init_pbobbl2x();
 
-	template <int Num> DECLARE_CUSTOM_INPUT_MEMBER(f3_analog_r);
-	template <int Num> DECLARE_CUSTOM_INPUT_MEMBER(f3_coin_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(eeprom_read);
+	template <int Num> ioport_value f3_analog_r();
+	template <int Num> ioport_value f3_coin_r();
+	ioport_value eeprom_read();
 
 protected:
 	using fixed8 = s32;

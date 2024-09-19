@@ -1383,9 +1383,9 @@ void namcos10_state::namcos10_mgexio(machine_config &config)
 
 	namcos10_mgexio_device &mgexio(NAMCOS10_MGEXIO(config, m_exio, 0));
 
-	HOPPER(config, m_mgexio_hopper[0], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	HOPPER(config, m_mgexio_hopper[1], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	HOPPER(config, m_mgexio_hopper[2], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_mgexio_hopper[0], attotime::from_msec(100));
+	HOPPER(config, m_mgexio_hopper[1], attotime::from_msec(100));
+	HOPPER(config, m_mgexio_hopper[2], attotime::from_msec(100));
 
 	mgexio.port4_read_callback().set([this] (offs_t offset) {
 		uint8_t r = 0;

@@ -203,7 +203,7 @@ public:
 	void init_crusnu21();
 	void init_crusnusa();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(motion_r);
+	ioport_value motion_r();
 
 protected:
 	void init_crusnusa_common(offs_t speedup);

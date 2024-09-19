@@ -67,12 +67,12 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(direct_coin_count);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_hit_left_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_hit_right_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_pitch_left_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_pitch_right_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_score_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(blueshrk_coin_input_r);
+	ioport_value tornbase_hit_left_input_r();
+	ioport_value tornbase_hit_right_input_r();
+	ioport_value tornbase_pitch_left_input_r();
+	ioport_value tornbase_pitch_right_input_r();
+	ioport_value tornbase_score_input_r();
+	ioport_value blueshrk_coin_input_r();
 
 	IRQ_CALLBACK_MEMBER(interrupt_vector);
 
@@ -165,7 +165,7 @@ public:
 
 	void seawolf(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(erase_input_r);
+	ioport_value erase_input_r();
 
 protected:
 	virtual void machine_start() override;
@@ -250,8 +250,8 @@ public:
 
 	void desertgu(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(gun_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(dip_sw_0_1_r);
+	ioport_value gun_input_r();
+	ioport_value dip_sw_0_1_r();
 
 protected:
 	virtual void machine_start() override;
@@ -282,8 +282,8 @@ public:
 
 	void dplay(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_left_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_right_input_r);
+	ioport_value dplay_pitch_left_input_r();
+	ioport_value dplay_pitch_right_input_r();
 
 private:
 	void io_map(address_map &map);
@@ -306,7 +306,7 @@ public:
 	void clowns(machine_config &config);
 	void spacwalk(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(controller_r);
+	ioport_value controller_r();
 
 protected:
 	virtual void machine_start() override;
@@ -388,11 +388,11 @@ public:
 
 	void invaders(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw6_sw7_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw5_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in0_control_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in1_control_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in2_control_r);
+	ioport_value invaders_sw6_sw7_r();
+	ioport_value invaders_sw5_r();
+	ioport_value invaders_in0_control_r();
+	ioport_value invaders_in1_control_r();
+	ioport_value invaders_in2_control_r();
 
 protected:
 	void machine_start() override;

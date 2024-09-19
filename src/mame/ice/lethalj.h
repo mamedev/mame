@@ -40,7 +40,7 @@ public:
 	void init_ripribit();
 	void init_cclownz();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(cclownz_paddle);
+	ioport_value cclownz_paddle();
 
 private:
 	void ripribit_control_w(uint16_t data);

@@ -6,15 +6,15 @@
 
 **********************************************************************/
 
-#ifndef MAME_FUNTECH_ACAN_H
-#define MAME_FUNTECH_ACAN_H
+#ifndef MAME_FUNTECH_UM6619_SOUND_H
+#define MAME_FUNTECH_UM6619_SOUND_H
 
 #pragma once
 
-class acan_sound_device : public device_t, public device_sound_interface
+class umc6619_sound_device : public device_t, public device_sound_interface
 {
 public:
-	acan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	umc6619_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto ram_read() { return m_ram_read.bind(); }
 	auto timer_irq_handler() { return m_timer_irq_handler.bind(); }
@@ -49,6 +49,7 @@ private:
 		uint8_t  volume_l;
 		uint8_t  volume_r;
 		bool     one_shot;
+		uint8_t  unk_upper_05;
 	};
 
 	void keyon_voice(uint8_t voice);
@@ -63,8 +64,10 @@ private:
 	acan_channel m_channels[16];
 	uint8_t m_regs[256];
 	std::unique_ptr<int32_t[]> m_mix;
+
+	std::string print_audio_state();
 };
 
-DECLARE_DEVICE_TYPE(ACANSND, acan_sound_device)
+DECLARE_DEVICE_TYPE(UMC6619_SOUND, umc6619_sound_device)
 
-#endif // MAME_FUNTECH_ACAN_H
+#endif // MAME_FUNTECH_UM6619_SOUND_H

@@ -335,7 +335,7 @@ void d9final_state::d9final(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // Sharp LH5116D-10 + battery
 
-	HOPPER(config, m_hopper, attotime::from_msec(20), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
+	HOPPER(config, m_hopper, attotime::from_msec(20));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

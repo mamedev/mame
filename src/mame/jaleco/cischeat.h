@@ -183,9 +183,9 @@ public:
 	void armchmp2(machine_config &config);
 	void armchmp2_map(address_map &map);
 	TIMER_DEVICE_CALLBACK_MEMBER(armchamp2_scanline);
-	DECLARE_CUSTOM_INPUT_MEMBER(left_sensor_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(right_sensor_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(center_sensor_r);
+	ioport_value left_sensor_r();
+	ioport_value right_sensor_r();
+	ioport_value center_sensor_r();
 
 private:
 	u16 m_arm_motor_command;
@@ -232,7 +232,7 @@ public:
 
 	void captflag(machine_config &config);
 	template <int N> int motor_busy_r();
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(motor_pos_r);
+	template <int N> ioport_value motor_pos_r();
 	void init_captflag();
 	void init_vscaptfl();
 

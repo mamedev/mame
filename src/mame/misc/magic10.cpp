@@ -984,8 +984,8 @@ void magic10_state::magic10(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &magic10_state::magic10_map);
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(6), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
-	HOPPER(config, m_hopper, attotime::from_msec(20), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(6));
+	HOPPER(config, m_hopper, attotime::from_msec(20));
 }
 
 
@@ -1044,7 +1044,7 @@ void spetrix_state::spetrix(machine_config &config)
 {
 	base(config);
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(6), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(6));
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &spetrix_state::spetrix_map);
 	m_maincpu->set_vblank_int("screen", FUNC(spetrix_state::irq2_line_hold));    // L1 interrupts

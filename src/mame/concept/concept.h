@@ -54,7 +54,6 @@ private:
 	required_device<a2bus_device> m_a2bus;
 	required_shared_ptr<uint16_t> m_videoram;
 
-	uint8_t m_pending_interrupts = 0U;
 	bool m_clock_enable = false;
 	uint8_t m_clock_address = 0U;
 	uint8_t io_r(offs_t offset);
@@ -69,9 +68,6 @@ private:
 	uint8_t via_in_b();
 	void via_out_b(uint8_t data);
 	void via_out_cb2(int state);
-	void via_irq_func(int state);
-	void ioc_interrupt(int state);
-	void concept_set_interrupt(int level, int state);
 
 	void concept_memmap(address_map &map);
 };

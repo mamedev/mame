@@ -113,8 +113,8 @@ public:
 	void init_bootsys2();
 	void init_bootsys2d();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_data_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_status_r);
+	ioport_value dakkochn_mux_data_r();
+	ioport_value dakkochn_mux_status_r();
 
 protected:
 	virtual void machine_start() override;

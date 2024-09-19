@@ -19,6 +19,7 @@ class qsound_device : public device_t, public device_sound_interface, public dev
 public:
 	// default 60MHz clock (divided by 2 for DSP core clock, and then by 1248 for sample rate)
 	qsound_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 60'000'000);
+	virtual ~qsound_device();
 
 	void qsound_w(offs_t offset, u8 data);
 	u8 qsound_r();

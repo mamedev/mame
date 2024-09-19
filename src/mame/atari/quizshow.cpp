@@ -58,7 +58,7 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(tape_headpos_r);
+	ioport_value tape_headpos_r();
 	DECLARE_INPUT_CHANGED_MEMBER(category_select);
 	void init_quizshow();
 	void quizshow(machine_config &config);
@@ -271,7 +271,7 @@ void quizshow_state::mem_map(address_map &map)
 
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(quizshow_state::tape_headpos_r)
+ioport_value quizshow_state::tape_headpos_r()
 {
 	return 1 << m_tape_head_pos;
 }

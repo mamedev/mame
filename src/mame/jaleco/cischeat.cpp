@@ -835,7 +835,7 @@ void captflag_state::motor_move(int side, uint16_t data)
 }
 
 template <int N>
-CUSTOM_INPUT_MEMBER(captflag_state::motor_pos_r)
+ioport_value captflag_state::motor_pos_r()
 {
 	const uint8_t pos[4] = {1,0,2,3}; // -> 2,3,1,0 offsets -> 0123
 	return ~pos[m_motor_pos[N]];
@@ -1668,19 +1668,19 @@ INPUT_PORTS_END
                             Arm Champs II
 **************************************************************************/
 
-CUSTOM_INPUT_MEMBER(armchamp2_state::left_sensor_r)
+ioport_value armchamp2_state::left_sensor_r()
 {
 	int arm_x = ioport("ARM")->read();
 	return (arm_x < 0x40);
 }
 
-CUSTOM_INPUT_MEMBER(armchamp2_state::right_sensor_r)
+ioport_value armchamp2_state::right_sensor_r()
 {
 	int arm_x = ioport("ARM")->read();
 	return (arm_x > 0xc0);
 }
 
-CUSTOM_INPUT_MEMBER(armchamp2_state::center_sensor_r)
+ioport_value armchamp2_state::center_sensor_r()
 {
 	int arm_x = ioport("ARM")->read();
 	return ((arm_x > 0x60) && (arm_x < 0xa0));
@@ -2369,7 +2369,7 @@ void captflag_state::captflag(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &captflag_state::captflag_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(captflag_state::captflag_scanline), "screen", 0, 1);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(2000));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

@@ -285,7 +285,7 @@ void cchance_state::cchance(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(cchance_state::scanline_cb), "screen", 0, 1);
 
 	TAITOIO_OPTO(config, "opto", 0);
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	X1_001(config, m_spritegen, 12_MHz_XTAL, m_palette, gfx_cchance);
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);

@@ -66,8 +66,8 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(col_bg_r) { return m_collision_bg_car; }
-	DECLARE_CUSTOM_INPUT_MEMBER(col_fg_r) { return m_collision_fg_car; }
+	ioport_value col_bg_r() { return m_collision_bg_car; }
+	ioport_value col_fg_r() { return m_collision_fg_car; }
 
 	void lbeach(machine_config &config);
 

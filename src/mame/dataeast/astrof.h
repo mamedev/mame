@@ -40,9 +40,9 @@ public:
 	void spfghmk2_audio(machine_config &config);
 	void tomahawk_audio(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(astrof_p1_controls_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(astrof_p2_controls_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tomahawk_controls_r);
+	ioport_value astrof_p1_controls_r();
+	ioport_value astrof_p2_controls_r();
+	ioport_value tomahawk_controls_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(service_coin_inserted);
 

@@ -450,9 +450,6 @@ private:
 #define YM2149_CLOCK    MAIN_CLOCK/6/2  // '/SEL' pin tied to GND, so internal divisor x2 is active
 #define M5205_CLOCK     XTAL(384'000)
 
-#define HOPPER_PULSE    50          // time between hopper pulses in milliseconds
-#define VDP_MEM         0x30000
-
 
 /*************************************************
 *                  Interrupts                    *
@@ -861,11 +858,11 @@ void kurukuru_state::kurukuru(machine_config &config)
 	// video hardware
 	v9938_device &v9938(V9938(config, "v9938", MAIN_CLOCK));
 	v9938.set_screen_ntsc("screen");
-	v9938.set_vram_size(VDP_MEM);
+	v9938.set_vram_size(0x30000);
 	v9938.int_cb().set_inputline("maincpu", 0);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	TICKET_DISPENSER(config, "hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "hopper", attotime::from_msec(50));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

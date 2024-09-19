@@ -35,6 +35,10 @@ hmcs40_disassembler::hmcs40_disassembler()
 	}
 }
 
+hmcs40_disassembler::~hmcs40_disassembler()
+{
+}
+
 
 // common lookup tables
 
@@ -231,11 +235,7 @@ offs_t hmcs40_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			}
 
 			param &= ((1 << bits) - 1);
-
-			if (bits > 5)
-				util::stream_format(stream, "$%02X", param);
-			else
-				util::stream_format(stream, "%d", param);
+			util::stream_format(stream, (bits > 4) ? "$%02X" : (param < 10) ? "%d" : "$%X", param);
 		}
 	}
 

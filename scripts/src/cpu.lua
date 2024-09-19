@@ -856,6 +856,24 @@ if opt_tool(CPUS, "HMCS40") then
 end
 
 --------------------------------------------------
+-- Hitachi HMCS400 series
+--@src/devices/cpu/hmcs400/hmcs400.h,CPUS["HMCS400"] = true
+--------------------------------------------------
+
+if CPUS["HMCS400"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400.cpp",
+		MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400.h",
+		MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400op.cpp",
+	}
+end
+
+if opt_tool(CPUS, "HMCS400") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400d.h")
+end
+
+--------------------------------------------------
 -- Hitachi SuperH series (SH1/SH2/SH3/SH4)
 --@src/devices/cpu/sh/sh2.h,CPUS["SH"] = true
 --@src/devices/cpu/sh/sh4.h,CPUS["SH"] = true

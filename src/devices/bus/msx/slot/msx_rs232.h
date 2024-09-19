@@ -95,7 +95,7 @@ protected:
 	static constexpr size_t RAM_SIZE = 0x800;
 
 	required_ioport m_switch_port;
-	std::vector<u8> m_ram;
+	std::unique_ptr<u8[]> m_ram;
 };
 
 
@@ -152,7 +152,7 @@ protected:
 	required_device<nvram_device> m_nvram;
 	memory_bank_creator m_rombank;
 	memory_view m_view;
-	std::vector<u8> m_sram;
+	std::unique_ptr<u8[]> m_sram;
 	u8 m_bank_reg;
 };
 

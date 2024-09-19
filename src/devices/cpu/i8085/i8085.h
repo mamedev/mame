@@ -72,7 +72,6 @@ protected:
 	// device_execute_interface overrides
 	virtual u32 execute_min_cycles() const noexcept override { return 4; }
 	virtual u32 execute_max_cycles() const noexcept override { return 16; }
-	virtual u32 execute_input_lines() const noexcept override { return 4; }
 	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == I8085_RST75_LINE; }
 	virtual void execute_run() override;
@@ -177,7 +176,6 @@ public:
 protected:
 	i8080_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual u32 execute_input_lines() const noexcept override { return 1; }
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return clocks; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return cycles; }
 

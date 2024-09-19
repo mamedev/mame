@@ -147,7 +147,7 @@ public:
 
 	int sprite0_r();
 	int homerun_d7756_busy_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_hopper_status_r);
+	ioport_value ganjaja_hopper_status_r();
 
 protected:
 	virtual void machine_start() override;
@@ -409,7 +409,7 @@ int homerun_state::homerun_d7756_busy_r()
 	return m_samples->playing(0) ? 0 : 1;
 }
 
-CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_hopper_status_r)
+ioport_value homerun_state::ganjaja_hopper_status_r()
 {
 	// gives hopper error if not 0
 	return 0;

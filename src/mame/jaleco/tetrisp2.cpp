@@ -230,7 +230,7 @@ void rocknms_state::rocknms_main2sub_w(offs_t offset, u16 data, u16 mem_mask)
 		m_rocknms_main2sub = (data ^ 0xffff);
 }
 
-CUSTOM_INPUT_MEMBER(rocknms_state::rocknms_main2sub_status_r)
+ioport_value rocknms_state::rocknms_main2sub_status_r()
 {
 	return m_rocknms_sub2main & 0x0003;
 }

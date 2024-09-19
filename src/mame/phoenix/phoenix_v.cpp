@@ -294,7 +294,7 @@ void phoenix_state::phoenix_scroll_w(uint8_t data)
 }
 
 
-CUSTOM_INPUT_MEMBER(phoenix_state::player_input_r)
+ioport_value phoenix_state::player_input_r()
 {
 	if (m_cocktail_mode)
 		return (ioport("CTRL")->read() & 0xf0) >> 4;

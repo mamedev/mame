@@ -1475,7 +1475,7 @@ Unoffical software releases for the Coleco Colecovision
 	</software>
 
 	<software name="spacesha" cloneof="spacesh">
-		<description>Space Shuttle: A Journey Into Space (64k)</description>
+		<description>Space Shuttle: A Journey Into Space (64K)</description>
 		<year>2022</year>
 		<publisher>Team Pixelboy</publisher>
 		<info name="usage" value="req. Super Game Module" />
