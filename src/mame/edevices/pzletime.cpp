@@ -298,7 +298,7 @@ void pzletime_state::pzletime(machine_config &config)
 	PALETTE(config, m_palette[1], palette_device::RGB_555);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(2000));
 
 	SPEAKER(config, "mono").front_center();
 	OKIM6295(config, m_oki, 937500, okim6295_device::PIN7_HIGH); //freq & pin7 taken from stlforce

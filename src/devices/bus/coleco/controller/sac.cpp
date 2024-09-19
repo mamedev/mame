@@ -18,7 +18,7 @@
 DEFINE_DEVICE_TYPE(COLECO_SUPER_ACTION_CONTROLLER, coleco_super_action_controller_device, "coleco_sac", "ColecoVision Super Action Controller")
 
 
-CUSTOM_INPUT_MEMBER( coleco_super_action_controller_device::keypad_r )
+ioport_value coleco_super_action_controller_device::keypad_r()
 {
 	uint8_t data = 0xf;
 	uint16_t keypad = m_io_keypad->read();

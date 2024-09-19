@@ -55,7 +55,6 @@ protected:
 	virtual bool cpu_is_interruptible() const override { return true; }
 	virtual u32 execute_min_cycles() const noexcept override { return 2; }
 	virtual u32 execute_max_cycles() const noexcept override { return 16; }
-	virtual u32 execute_input_lines() const noexcept override { return 4; }
 	virtual u32 execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;

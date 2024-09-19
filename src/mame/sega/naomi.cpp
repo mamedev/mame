@@ -1977,7 +1977,7 @@ INPUT_CHANGED_MEMBER(naomi_state::naomi_mp_w)
 	m_mp_mux = newval;
 }
 
-CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
+ioport_value naomi_state::naomi_mp_r()
 {
 	uint8_t retval = 0;
 
@@ -2047,7 +2047,7 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_MAHJONG_D )
 INPUT_PORTS_END
 
-CUSTOM_INPUT_MEMBER(naomi_state::suchie3_mp_r)
+ioport_value naomi_state::suchie3_mp_r()
 {
 	uint8_t retval = 0;
 
@@ -2075,7 +2075,7 @@ static INPUT_PORTS_START( suchie3 )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(naomi_state, suchie3_mp_r)
 INPUT_PORTS_END
 
-template <int P> CUSTOM_INPUT_MEMBER(naomi_state::naomi_kb_r)
+template <int P> ioport_value naomi_state::naomi_kb_r()
 {
 	for (int i = 0; i < 5; i++)
 	{

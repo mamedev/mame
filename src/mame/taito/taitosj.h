@@ -54,8 +54,8 @@ public:
 	void init_junglhbr();
 	void init_spacecr();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(input_port_4_f0_r);
-	template <int Player> DECLARE_CUSTOM_INPUT_MEMBER(kikstart_gear_r);
+	ioport_value input_port_4_f0_r();
+	template <int Player> ioport_value kikstart_gear_r();
 
 protected:
 	virtual void machine_start() override;

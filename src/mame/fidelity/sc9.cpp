@@ -102,7 +102,6 @@ protected:
 	void sc9d_map(address_map &map);
 
 	// I/O handlers
-	void update_display();
 	void control_w(u8 data);
 	void led_w(offs_t offset, u8 data);
 	u8 input_r();
@@ -129,21 +128,16 @@ INPUT_CHANGED_MEMBER(sc9_state::sc9c_change_cpu_freq)
     I/O
 *******************************************************************************/
 
-void sc9_state::update_display()
-{
-	// 8*8 chessboard leds + 1 corner led
-	m_display->matrix(1 << m_inp_mux, m_led_data);
-}
-
 void sc9_state::control_w(u8 data)
 {
 	// d0-d3: 74245 P0-P3
 	// 74245 Q0-Q8: input mux, led select
 	m_inp_mux = data & 0xf;
-	update_display();
+	u16 sel = 1 << m_inp_mux;
+	m_display->write_my(sel);
 
 	// 74245 Q9: speaker out
-	m_dac->write(BIT(1 << m_inp_mux, 9));
+	m_dac->write(BIT(sel, 9));
 
 	// d4,d5: ?
 	// d6,d7: N/C
@@ -153,14 +147,14 @@ void sc9_state::led_w(offs_t offset, u8 data)
 {
 	// a0-a2,d0: led data via NE591N
 	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
-	update_display();
+	m_display->write_mx(m_led_data);
 }
 
 u8 sc9_state::input_r()
 {
+	// d0-d7: multiplexed inputs (active low)
 	u8 data = 0;
 
-	// d0-d7: multiplexed inputs (active low)
 	// read chessboard sensors
 	if (m_inp_mux < 8)
 		data = m_board->read_file(m_inp_mux);

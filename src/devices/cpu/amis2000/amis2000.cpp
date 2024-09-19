@@ -337,6 +337,6 @@ void amis2000_base_device::execute_run()
 				}
 				break; // 0xff
 
-		} // big switch
+		} // 0xf0
 	}
 }

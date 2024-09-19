@@ -1553,8 +1553,8 @@ public:
 	void setaroul(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
+	ioport_value coin_sensors_r();
+	ioport_value hopper_sensors_r();
 
 	void screen_vblank(int state);
 
@@ -2807,7 +2807,7 @@ INPUT_CHANGED_MEMBER( setaroul_state::coin_drop_start )
 		m_coin_start_cycles = m_maincpu->total_cycles();
 }
 
-CUSTOM_INPUT_MEMBER( setaroul_state::coin_sensors_r )
+ioport_value setaroul_state::coin_sensors_r()
 {
 	u8 data = 0x03;
 
@@ -4577,7 +4577,7 @@ static INPUT_PORTS_START( setaroul )
 	PORT_SERVICE( 0x08, 0x08 )                          PORT_DIPLOCATION("SW2:1") // service mode
 
 	PORT_START("COIN") // d40009.b
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // medal (causes hopper over run / empty if the dsw is on)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // medal (causes hopper over run / empty if the dsw is on)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset")         // rst     (button SW5? Press twice quickly to enter the keyboard test)
 	PORT_DIPNAME( 0x04, 0x04, "Credit Meter" )    PORT_DIPLOCATION("SW6:1")  // crt.mtr (switch SW6? Shows stats screen. With added menus, if their dsw is on)
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
@@ -6888,7 +6888,7 @@ static INPUT_PORTS_START( jockeyc )
 	PORT_START("COIN") // 200002.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) // Coin Drop - 1P
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) // Hopper Overflow - 1P
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper1", ticket_dispenser_device, line_r) // Hopper Coin Out - 1P
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper1", ticket_dispenser_device, line_r) // Hopper Coin Out - 1P
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER   ) // Attendant Pay - 1P
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin B - 1P")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin A - 1P")
@@ -6896,7 +6896,7 @@ static INPUT_PORTS_START( jockeyc )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) // Coin Sense 1 - 1P
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM ) // Coin Drop - 2P
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // Sel Sense (single hopper mode) / Hopper Overflow - 2P (double hopper mode)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper2", ticket_dispenser_device, line_r) // Hopper Coin Out - 2P (double hopper mode)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper2", ticket_dispenser_device, line_r) // Hopper Coin Out - 2P (double hopper mode)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER   ) // Attendant Pay - 2P
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Coin B - 2P")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Coin A - 2P")
@@ -7799,7 +7799,7 @@ void setaroul_state::setaroul(machine_config &config)
 	// devices
 	UPD4992(config, m_rtc, 32'768); // ! Actually D4911C !
 	ACIA6850(config, "acia0", 0);
-	TICKET_DISPENSER(config, "hopper", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, "hopper", attotime::from_msec(150));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9091,8 +9091,8 @@ void jockeyc_state::jockeyc(machine_config &config)
 	// devices
 	UPD4992(config, m_rtc, 32'768); // ! Actually D4911C !
 	ACIA6850(config, "acia0", 0);
-	TICKET_DISPENSER(config, "hopper1", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
-	TICKET_DISPENSER(config, "hopper2", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, "hopper1", attotime::from_msec(150));
+	TICKET_DISPENSER(config, "hopper2", attotime::from_msec(150));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

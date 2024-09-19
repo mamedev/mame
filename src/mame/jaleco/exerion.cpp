@@ -168,7 +168,7 @@ public:
 	void init_exerionb();
 	void init_irion();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
+	ioport_value controls_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
@@ -628,7 +628,7 @@ uint32_t exerion_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
  *************************************/
 
 // Players inputs are muxed at 0xa000
-CUSTOM_INPUT_MEMBER(exerion_state::controls_r)
+ioport_value exerion_state::controls_r()
 {
 	return m_inputs[m_cocktail_flip]->read() & 0x3f;
 }

@@ -206,8 +206,8 @@ public:
 
 	void topspeed(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(gas_pedal_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(brake_pedal_r);
+	ioport_value gas_pedal_r();
+	ioport_value brake_pedal_r();
 
 protected:
 	virtual void machine_start() override;
@@ -587,13 +587,13 @@ u8 topspeed_state::input_bypass_r()
 	}
 }
 
-CUSTOM_INPUT_MEMBER(topspeed_state::gas_pedal_r)
+ioport_value topspeed_state::gas_pedal_r()
 {
 	static constexpr u8 retval[8] = { 0, 1, 3, 2, 6, 7, 5, 4 };
 	return retval[m_gas->read() & 7];
 }
 
-CUSTOM_INPUT_MEMBER(topspeed_state::brake_pedal_r)
+ioport_value topspeed_state::brake_pedal_r()
 {
 	static constexpr u8 retval[8] = { 0, 1, 3, 2, 6, 7, 5, 4 };
 	return retval[m_brake->read() & 7];

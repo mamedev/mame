@@ -150,7 +150,7 @@ public:
 	void rpunch(machine_config &config);
 	void svolleybl(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hi_bits_r) { return m_hi_bits->read(); }
+	ioport_value hi_bits_r() { return m_hi_bits->read(); }
 
 protected:
 	required_device<cpu_device> m_maincpu;

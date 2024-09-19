@@ -215,7 +215,7 @@ public:
 	{ }
 
 	void ebases(machine_config &config);
-	DECLARE_CUSTOM_INPUT_MEMBER(trackball_r);
+	ioport_value trackball_r();
 
 protected:
 	virtual void machine_start() override;
@@ -240,7 +240,7 @@ public:
 	{ }
 
 	void demndrgn(machine_config &config);
-	DECLARE_CUSTOM_INPUT_MEMBER(trackball_r);
+	ioport_value trackball_r();
 
 protected:
 	virtual void machine_start() override;

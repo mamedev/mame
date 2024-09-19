@@ -588,7 +588,7 @@ void dblcrown_state::dblcrown(machine_config &config)
 	// 1000 ms. (minimal of MAX693A watchdog long timeout period with internal oscillator)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000));
 
-	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

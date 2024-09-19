@@ -57,7 +57,7 @@ public:
 	void init_hstennis();
 
 	int special_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
+	ioport_value gtg_mux();
 
 protected:
 	static constexpr u32 VRAM_SIZE = 0x40000;

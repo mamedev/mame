@@ -188,7 +188,7 @@ private:
 
 	void duart_irq_callback(int state);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(port_mod_r);
+	ioport_value port_mod_r();
 	uint16_t port_ctrl_r(offs_t offset);
 	void port_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t m_port_data = 0;

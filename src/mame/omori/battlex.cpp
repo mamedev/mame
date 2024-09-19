@@ -111,7 +111,7 @@ public:
 
 	void battlex(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(in0_b4_r);
+	ioport_value in0_b4_r();
 
 protected:
 	virtual void machine_start() override;
@@ -287,7 +287,7 @@ INTERRUPT_GEN_MEMBER(battlex_state::interrupt)
 	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(battlex_state::in0_b4_r)
+ioport_value battlex_state::in0_b4_r()
 {
 	uint32_t ret = m_in0_b4;
 	if (m_in0_b4)

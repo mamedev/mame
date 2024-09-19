@@ -31,7 +31,7 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_CUSTOM_INPUT_MEMBER( keypad_r );
+	ioport_value keypad_r();
 
 protected:
 	// device-level overrides

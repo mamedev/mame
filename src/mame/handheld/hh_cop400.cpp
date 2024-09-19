@@ -1115,7 +1115,7 @@ public:
 	void mbaskb2(machine_config &config);
 	void msoccer2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(switch_r);
+	ioport_value switch_r();
 
 protected:
 	virtual void machine_start() override;
@@ -1188,7 +1188,7 @@ u8 mbaskb2_state::sub_read_in()
 
 // inputs
 
-CUSTOM_INPUT_MEMBER(mbaskb2_state::switch_r)
+ioport_value mbaskb2_state::switch_r()
 {
 	// The power switch is off-1-2, and the game relies on power-on starting at 1,
 	// otherwise msoccer2 boots up to what looks like a factory test mode.

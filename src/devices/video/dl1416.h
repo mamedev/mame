@@ -33,6 +33,8 @@ DECLARE_DEVICE_TYPE(DL1416T, dl1416_device)
 class dl1414_device : public device_t
 {
 public:
+	virtual ~dl1414_device();
+
 	auto update() { return m_update_cb.bind(); }
 
 	// signal-level interface
@@ -51,7 +53,7 @@ protected:
 			device_t *owner,
 			u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -76,6 +78,8 @@ private:
 class dl1416_device : public dl1414_device
 {
 public:
+	virtual ~dl1416_device();
+
 	virtual void wr_w(int state) override;
 	void ce_w(int state); // chip enable (active low)
 	void cu_w(int state); // cursor enable (active low)

@@ -962,7 +962,7 @@ void mpu12wbk_state::mpu12wbk(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0);
 
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

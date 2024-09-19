@@ -30,7 +30,7 @@ public:
 	void wheelrun(machine_config &config);
 	void galaxygn(machine_config &config);
 
-	template <int Player> DECLARE_CUSTOM_INPUT_MEMBER(wheelrun_wheel_r);
+	template <int Player> ioport_value wheelrun_wheel_r();
 
 protected:
 	/* misc */

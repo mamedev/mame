@@ -790,12 +790,12 @@ static INPUT_PORTS_START( doyousud )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel_r)
+ioport_value spg2xx_game_fordrace_state::wheel_r()
 {
 	return ioport("WHEEL_REAL")->read() >> 1;
 }
 
-CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel2_r)
+ioport_value spg2xx_game_fordrace_state::wheel2_r()
 {
 //  return 0x0800;
 	uint16_t dat = ioport("WHEEL_REAL")->read();

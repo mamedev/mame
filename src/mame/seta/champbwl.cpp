@@ -323,7 +323,7 @@ void doraemon_state::outputs_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // gift out counter
 
 	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 3)); // coin lockout
-	m_hopper->motor_w(BIT(~data, 2)); // gift out motor
+	m_hopper->motor_w(BIT(data, 2)); // gift out motor
 
 	m_mainbank->set_entry((data & 0x30) >> 4);
 
@@ -481,7 +481,7 @@ static INPUT_PORTS_START( doraemon )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3  )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)   // sensor
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // sensor
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
@@ -601,7 +601,7 @@ void doraemon_state::doraemon(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0x00, 0x01);
 	m_spritegen->set_fg_yoffsets(0x00, 0x10);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(2000));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

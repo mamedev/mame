@@ -817,11 +817,6 @@ i4004_cpu_device::i4004_cpu_device(machine_config const &mconfig, char const *ta
     device_execute_interface implementation
 ***********************************************************************/
 
-u32 i4004_cpu_device::execute_input_lines() const noexcept
-{
-	return 1U;
-}
-
 void i4004_cpu_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
@@ -1126,11 +1121,6 @@ i4040_cpu_device::i4040_cpu_device(machine_config const &mconfig, char const *ta
 /***********************************************************************
     device_execute_interface implementation
 ***********************************************************************/
-
-u32 i4040_cpu_device::execute_input_lines() const noexcept
-{
-	return 3U;
-}
 
 void i4040_cpu_device::execute_set_input(int inputnum, int state)
 {

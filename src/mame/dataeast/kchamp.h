@@ -88,8 +88,7 @@ private:
 	uint32_t screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(sound_int);
-	void kchamp_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void kchampvs_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int dx, int dy);
 	void decrypt_code();
 	void msmint(int state);
 	void decrypted_opcodes_map(address_map &map);

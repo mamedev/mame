@@ -20,6 +20,8 @@
 class at_kbc_device_base : public device_t
 {
 public:
+	virtual ~at_kbc_device_base();
+
 	// outputs to host
 	auto hot_res() { return m_hot_res_cb.bind(); }
 	auto gate_a20() { return m_gate_a20_cb.bind(); }
@@ -83,6 +85,7 @@ class at_keyboard_controller_device : public at_kbc_device_base
 public:
 	// standard constructor
 	at_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	virtual ~at_keyboard_controller_device();
 
 protected:
 	// device_t implementation
@@ -120,6 +123,7 @@ public:
 
 	// standard constructor
 	ps2_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	virtual ~ps2_keyboard_controller_device();
 
 protected:
 	// device_t implementation

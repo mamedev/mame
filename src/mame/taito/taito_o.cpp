@@ -455,7 +455,7 @@ void taitoo_state::taitoo(machine_config &config)
 	m_tc0080vco->set_bgflip_yoffs(-2);
 	m_tc0080vco->set_palette(m_palette);
 
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 	m_hopper->dispense_handler().set(FUNC(taitoo_state::hopper_int_cb));
 
 	SPEAKER(config, "mono").front_center();

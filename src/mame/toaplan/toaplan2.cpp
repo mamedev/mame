@@ -404,8 +404,6 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 #include "speaker.h"
 
 
-#define PWRKICK_HOPPER_PULSE    50          // time between hopper pulses in milliseconds (probably wrong)
-
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
 
 constexpr unsigned toaplan2_state::T2PALETTE_LENGTH;
@@ -4188,7 +4186,7 @@ void pwrkick_state::pwrkick(machine_config &config) // Sunwise SW931201-1 PCB (2
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(PWRKICK_HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50)); // duration is probably wrong
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

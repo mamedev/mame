@@ -280,7 +280,7 @@ void amusco_state::output_b_w(uint8_t data)
 	m_lamps[6] = BIT(data, 2); // Lamp 6 (Start/Draw)
 	m_lamps[7] = BIT(data, 1); // Lamp 7 (Unknown)
 
-	m_pit->write_gate0(!BIT(data, 4));
+	m_pit->write_gate0(BIT(~data, 4));
 
 //  logerror("Writing %02Xh to PPI output B\n", data);
 }
@@ -300,8 +300,8 @@ void amusco_state::output_c_w(uint8_t data)
 	if (!data)
 		return;
 
-	machine().bookkeeping().coin_counter_w(0, !BIT(data, 1));
-	m_hopper->motor_w(BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(0, BIT(~data, 1));
+	m_hopper->motor_w(BIT(~data, 4));
 
 //  logerror("Writing %02Xh to PPI output C\n", data);
 }
@@ -574,7 +574,7 @@ void amusco_state::amusco(machine_config &config)
 	i8155b.in_pc_callback().set(m_rtc, FUNC(msm5832_device::data_r));
 	i8155b.out_pc_callback().set(m_rtc, FUNC(msm5832_device::data_w));
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(30));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

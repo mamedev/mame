@@ -73,7 +73,7 @@ known chips:
   A34     HD44801  1981, SciSys Mini Chess -> saitek/minichess.cpp
   A50     HD44801  1981, CXG Sensor Computachess -> cxg/computachess.cpp
   A75     HD44801  1982, Alpha 8201 protection MCU -> alpha/alpha8201.*
- *A85     HD44801  1982, SciSys Travel Sensor / Travel Mate / Chesspartner 5000/6000
+  A85     HD44801  1982, SciSys Travel Sensor Chess -> saitek/tschess.cpp
  *A92     HD44801  1982, SciSys Play Bridge Computer
   B35     HD44801  1983, Alpha 8302 protection MCU (see 8201)
   B42     HD44801  1983, Alpha 8303 protection MCU (see 8201)
@@ -82,7 +82,7 @@ known chips:
   C89     HD44801  1985, CXG Portachess (1985 version) -> cxg/computachess.cpp
 
  *A86     HD44820  1983, Chess King Pocket Micro / Mighty Midget
- *B46     HD44820  1984, Chess King Pocket Micro Deluxe
+ *B46     HD44820  1984, Chess King Pocket Micro / Mighty Midget
  *B63     HD44820  1985, CXG Pocket Chess (12 buttons)
 
  *A13     HD44840  1982, CXG Computachess II
@@ -91,8 +91,8 @@ known chips:
  *B55     HD44860  1987, Saitek Pro Bridge 100
 
  *A04     HD44868  1984, SciSys Rapier
- *A07     HD44868  1984, Chess King Pocket Micro Deluxe
- *A12     HD44868  1985, SciSys MK 10 / Pocket Chess / Electronic Trio
+ *A07     HD44868  1984, Chess King Pocket Micro Deluxe / Mephisto Teufelchen
+ *A12     HD44868  1985, SciSys Travel Mate II / Pocket Chess / MK 10 / Electronic Trio
  *A14     HD44868  1985, SciSys Kasparov Plus
  *A16     HD44868  1988, Saitek Pocket Checkers
 

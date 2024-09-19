@@ -6,7 +6,8 @@
 Novag Micro Chess
 
 It's a portable chesscomputer with sensory board. The MCU says "(C) CAL R & O3",
-though the program is supposedly by David Kittinger?
+though the program is supposedly by David Kittinger? Unlikely, since his first
+work with Novag was Super Sensor IV, a couple of months newer than Micro Chess.
 
 Hardware notes:
 - Mostek 3875/42 (4KB ROM, 64 bytes extra RAM)
@@ -105,9 +106,9 @@ void micro_state::input_w(u8 data)
 
 u8 micro_state::input_r()
 {
+	// P10-P17: multiplexed inputs
 	u8 data = 0;
 
-	// P10-P17: multiplexed inputs
 	// read chessboard
 	u8 cb_mux = (m_inp_mux << 2) | (m_control >> 5 & 3);
 	cb_mux = bitswap<8>(cb_mux,4,5,6,7,1,0,3,2);

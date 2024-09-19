@@ -270,8 +270,8 @@ public:
 
 	void fordrace(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(wheel_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(wheel2_r);
+	ioport_value wheel_r();
+	ioport_value wheel2_r();
 
 private:
 };

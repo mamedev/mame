@@ -394,7 +394,7 @@ INPUT_CHANGED_MEMBER( sg1000_state::trigger_nmi )
 }
 
 /*-------------------------------------------------
-    CUSTOM_INPUT_MEMBER( ctrl2_r )
+    ioport_value ctrl2_r()
 -------------------------------------------------*/
 
 template <unsigned Shift>

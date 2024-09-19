@@ -127,7 +127,6 @@ Notes:
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
@@ -197,6 +196,10 @@ void host_state::host_map(address_map &map)
 {
 	map(0x00000000, 0x00003fff).rom(); // Internal ROM
 	map(0x08000000, 0x0800ffff).rom().region("user1", 0); // Game ROM (does it really map here? it appears to be connected indirectly via the 025)
+
+	// TODO: IGS025?
+	//map(0x28007000, 0x28007000).w(m_igs_mux, FUNC(igs_mux_device::address_w));
+	//map(0x28007001, 0x28007001).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w));
 }
 
 void extension_state::cjsll_map(address_map &map)
@@ -344,11 +347,8 @@ void extension_state::cjsll(machine_config &config)
 
 	IGS025(config, "igs025", 0);
 
-	I8255A(config, "ppi");
-
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits(true);
-	m_igs017_igs031->set_i8255_tag("ppi");
 
 	SPEAKER(config, "mono").front_center();
 

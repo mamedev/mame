@@ -275,7 +275,7 @@ int xain_state::vblank_r()
 
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(xain_state::mcu_status_r)
+ioport_value xain_state::mcu_status_r()
 {
 	// bit 0 is host MCU flag, bit 1 is host semaphore flag (both active low)
 	return

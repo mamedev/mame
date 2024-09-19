@@ -707,7 +707,7 @@ void jackhouse_state::jackhouse(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jackhouse);
 	config.set_default_layout(layout_jackhouse);
 
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	SPEAKER(config, "speaker").front_center();
 

@@ -1414,12 +1414,11 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 	}
 
 	// then verify the number of bits in the mask matches
-	ioport_value temp;
-	int bits;
-	for (bits = 0, temp = m_mask; temp != 0 && bits < 32; bits++)
-		temp &= temp - 1;
-	if (bits != entries)
+	int const bits = population_count_32(m_mask);
+	if (bits > entries)
 		errorbuf.append(string_format("Switch location '%s' does not describe enough bits for mask %X\n", location, m_mask));
+	else if (bits < entries)
+		errorbuf.append(string_format("Switch location '%s' describes too many bits for mask %X\n", location, m_mask));
 }
 
 

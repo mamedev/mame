@@ -728,7 +728,7 @@ void rfslotsmcs48_state::rf_3115_base(machine_config &config)
 	NVRAM(config, "data_ram", nvram_device::DEFAULT_ALL_0);
 
 	// Hopper device
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	SPEAKER(config, "mono").front_center();
 }

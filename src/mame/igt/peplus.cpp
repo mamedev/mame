@@ -266,7 +266,7 @@ public:
 	void init_pepluss64();
 	void init_peplussbw();
 
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(input_r);
+	template <int N> ioport_value input_r();
 
 protected:
 	virtual void machine_start() override;
@@ -1085,7 +1085,7 @@ void peplus_state::main_iomap(address_map &map)
 *************************/
 
 template <int N>
-CUSTOM_INPUT_MEMBER(peplus_state::input_r)
+ioport_value peplus_state::input_r()
 {
 	uint8_t inp_ret = 0x00;
 	uint8_t inp_read = m_inp_bank[N]->read();

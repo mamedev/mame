@@ -58,9 +58,9 @@ public:
 	void init_naomigd();
 	void init_naomigd_mp();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(naomi_mp_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(suchie3_mp_r);
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(naomi_kb_r);
+	ioport_value naomi_mp_r();
+	ioport_value suchie3_mp_r();
+	template <int P> ioport_value naomi_kb_r();
 	DECLARE_INPUT_CHANGED_MEMBER(naomi_mp_w);
 
 	uint64_t naomi2_biose_idle_skip_r();

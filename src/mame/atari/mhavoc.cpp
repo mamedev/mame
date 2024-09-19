@@ -277,7 +277,7 @@ public:
 
 	void mhavoc(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_service_r);
+	ioport_value coin_service_r();
 	int gamma_rcvd_r();
 	int gamma_xmtd_r();
 	int alpha_rcvd_r();
@@ -557,7 +557,7 @@ void alphaone_state::rom_banksel_w(uint8_t data)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::coin_service_r)
+ioport_value mhavoc_state::coin_service_r()
 {
 	return (m_player_1 ? m_service : m_coin)->read() & 0x03;
 }

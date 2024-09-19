@@ -809,7 +809,7 @@ void cgang_state::cgang(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog); // HA1835P
 	m_watchdog->set_time(attotime::from_msec(100)); // approximation
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(3000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(3000));
 
 	// video hardware
 	PWM_DISPLAY(config, m_digits).set_size(10, 7);

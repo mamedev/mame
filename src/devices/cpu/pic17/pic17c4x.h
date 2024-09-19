@@ -82,7 +82,6 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface implementation
-	virtual u32 execute_input_lines() const noexcept override { return 6; } // for now
 	virtual bool execute_input_edge_triggered(int linenum) const noexcept override { return linenum == INT_LINE || linenum == T0CKI_LINE; }
 	virtual void execute_set_input(int linenum, int state) override;
 

@@ -70,13 +70,12 @@ std::unique_ptr<util::disasm_interface> tlcs900_device::create_disassembler()
 }
 
 
-/* Flag defines */
-#define FLAG_CF     0x01
-#define FLAG_NF     0x02
-#define FLAG_VF     0x04
-#define FLAG_HF     0x10
-#define FLAG_ZF     0x40
-#define FLAG_SF     0x80
+static constexpr u8 FLAG_CF = 0x01;
+static constexpr u8 FLAG_NF = 0x02;
+static constexpr u8 FLAG_VF = 0x04;
+static constexpr u8 FLAG_HF = 0x10;
+static constexpr u8 FLAG_ZF = 0x40;
+static constexpr u8 FLAG_SF = 0x80;
 
 
 inline uint8_t tlcs900_device::RDOP()

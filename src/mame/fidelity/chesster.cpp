@@ -62,7 +62,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override { m_dac->write(0x80); }
 
 private:
 	// devices/pointers
@@ -93,11 +93,6 @@ void chesster_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_speech_bank));
 	save_item(NAME(m_select));
-}
-
-void chesster_state::machine_reset()
-{
-	m_dac->write(0x80);
 }
 
 

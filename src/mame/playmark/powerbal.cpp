@@ -699,8 +699,8 @@ void magicstk_state::magicstk(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerbal);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_token,  attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(350));
+	TICKET_DISPENSER(config, m_token,  attotime::from_msec(350));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

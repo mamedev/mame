@@ -103,9 +103,6 @@ private:
 #define CPU_CLOCK       MAIN_CLOCK / 6
 #define PSG_CLOCK       MAIN_CLOCK / 12
 
-#define VDP_MEM         0x20000     // 4x MB81464-15
-#define HOPPER_PULSE    50          // time between hopper pulses in milliseconds
-
 
 void tvg01_state::machine_start()
 {
@@ -305,10 +302,10 @@ void tvg01_state::theboat(machine_config &config)
 
 	v9938_device &vdp(V9938(config, "vdp", VDP_CLOCK));  // unknown type (surface-scratched 64-pin SDIP)
 	vdp.set_screen_ntsc("screen");
-	vdp.set_vram_size(VDP_MEM);  // 4x MB81464-15
+	vdp.set_vram_size(0x20000);  // 4x MB81464-15
 	vdp.int_cb().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
-	TICKET_DISPENSER(config, "hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "hopper", attotime::from_msec(50));
 
 	SPEAKER(config, "mono").front_center();
 

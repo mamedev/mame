@@ -43,7 +43,7 @@ public:
 
 	memory_bank_creator m_cavelon_bank_object;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_dial_r);
+	ioport_value darkplnt_dial_r();
 	uint8_t hncholms_prot_r();
 	uint8_t scramble_soundram_r(offs_t offset);
 	uint8_t mars_ppi8255_0_r(offs_t offset);

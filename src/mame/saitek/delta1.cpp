@@ -31,6 +31,7 @@ In the Delta-1 ROM is even some fragmented code remaining of the message:
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "machine/timer.h"
@@ -106,8 +107,6 @@ void delta1_state::machine_start()
 /*******************************************************************************
     I/O
 *******************************************************************************/
-
-// 3850 ports
 
 void delta1_state::update_display()
 {

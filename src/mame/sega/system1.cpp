@@ -433,14 +433,14 @@ void system1_state::videomode_w(u8 data)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(system1_state::dakkochn_mux_data_r)
+ioport_value system1_state::dakkochn_mux_data_r()
 {
 	static const char *const ports[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6" };
 	return ioport(ports[m_dakkochn_mux_data])->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(system1_state::dakkochn_mux_status_r)
+ioport_value system1_state::dakkochn_mux_status_r()
 {
 	/* reads from here indicate which mux port is selected */
 	return 1 << (m_dakkochn_mux_data);

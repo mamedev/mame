@@ -1043,7 +1043,7 @@ static INPUT_PORTS_START( showhand )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_POKER_HOLD3   ) PORT_NAME("Look / Small") // HOLD5 in full test mode
 	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW     ) // settings
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("ticket", hopper_device, line_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("ticket", hopper_device, line_r)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_POKER_HOLD2   ) PORT_NAME("Yes / Big") // HOLD4 in full test mode
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT ) // HOLD1 in full test mode
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_POKER_HOLD1   ) PORT_NAME("Select") // HOLD2 in full test mode
@@ -1051,7 +1051,7 @@ static INPUT_PORTS_START( showhand )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_MEMORY_RESET  ) // press with keyout if eeprom error (green screen) or to reset settings
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
 
 	PORT_START( "EEPROM_IN" )
 	PORT_BIT( 0xfff7, IP_ACTIVE_LOW,  IPT_UNUSED )
@@ -1081,7 +1081,7 @@ static INPUT_PORTS_START( showhanc )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_POKER_HOLD2   ) PORT_NAME("Yes / Big") // HOLD4 in full test mode
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_MEMORY_RESET  ) // press with keyout if eeprom error (green screen) or to reset settings. "DOOR OPEN" error in-game.
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN       ) // must be 0 for payout/lamps to work, might be a hopper empty sense?
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 INPUT_PORTS_END
 
@@ -1103,9 +1103,9 @@ static INPUT_PORTS_START( skilldrp )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_GAMBLE_BET    ) PORT_NAME("Play")
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("ticket", hopper_device, line_r)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("ticket", hopper_device, line_r)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 INPUT_PORTS_END
 
@@ -1169,9 +1169,9 @@ static INPUT_PORTS_START( dinodino )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_SLOT_STOP_ALL ) PORT_NAME("Auto")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SLOT_STOP2    ) PORT_NAME("Odds")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_GAMBLE_BET    ) PORT_NAME("Play")
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("ticket", hopper_device, line_r)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("ticket", hopper_device, line_r)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 
 	PORT_START( "CPUCODE_IN" )
@@ -1212,7 +1212,7 @@ static INPUT_PORTS_START( astoneag )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_GAMBLE_BET    )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_OTHER         ) PORT_NAME("Reserve Switch") // shown in test mode
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 INPUT_PORTS_END
 
@@ -1263,8 +1263,8 @@ void astrocorp_state::showhand(machine_config &config)
 	NVRAM(config, "nvram");
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	HOPPER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW );
-	HOPPER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW );
+	HOPPER(config, m_ticket, attotime::from_msec(200));
+	HOPPER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1308,8 +1308,8 @@ void astrocorp_state::skilldrp(machine_config &config)
 	NVRAM(config, "nvram");
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	HOPPER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW );
-	HOPPER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW );
+	HOPPER(config, m_ticket, attotime::from_msec(200));
+	HOPPER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

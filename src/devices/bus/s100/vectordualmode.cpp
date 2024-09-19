@@ -334,7 +334,7 @@ void s100_vector_dualmode_device::device_reset()
 
 static void vector4_floppies(device_slot_interface &device)
 {
-	device.option_add("525", FLOPPY_525_QD16);
+	device.option_add("525", FLOPPY_525_QD);
 }
 
 static void vector4_formats(format_registration &fr)
@@ -346,9 +346,13 @@ static void vector4_formats(format_registration &fr)
 void s100_vector_dualmode_device::device_add_mconfig(machine_config &config)
 {
 	FLOPPY_CONNECTOR(config, m_floppy[0], vector4_floppies, "525", vector4_formats).enable_sound(true);
+	m_floppy[0]->set_sectoring_type(floppy_image::H16);
 	FLOPPY_CONNECTOR(config, m_floppy[1], vector4_floppies, "525", vector4_formats).enable_sound(true);
+	m_floppy[1]->set_sectoring_type(floppy_image::H16);
 	FLOPPY_CONNECTOR(config, m_floppy[2], vector4_floppies, "525", vector4_formats).enable_sound(true);
+	m_floppy[2]->set_sectoring_type(floppy_image::H16);
 	FLOPPY_CONNECTOR(config, m_floppy[3], vector4_floppies, "525", vector4_formats).enable_sound(true);
+	m_floppy[3]->set_sectoring_type(floppy_image::H16);
 }
 
 DEFINE_DEVICE_TYPE(S100_VECTOR_DUALMODE, s100_vector_dualmode_device, "vectordualmode", "Vector Dual-Mode Disk Controller")

@@ -767,7 +767,7 @@ public:
 	void dsem(machine_config &config);
 	void dsem2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER( gn845pwbb_read );
+	ioport_value gn845pwbb_read();
 
 	void init_ddr();
 
@@ -1425,7 +1425,7 @@ void ddr_state::gn845pwbb_clk_w( int offset, int data )
 		m_stage_state[ offset ].state, m_stage_state[ offset ].DO, m_stage_state[ offset ].shift, m_stage_state[ offset ].bit, m_stage_mask );
 }
 
-CUSTOM_INPUT_MEMBER( ddr_state::gn845pwbb_read )
+ioport_value ddr_state::gn845pwbb_read()
 {
 	return m_stage->read() & m_stage_mask;
 }

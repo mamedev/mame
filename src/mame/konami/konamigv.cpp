@@ -342,7 +342,7 @@ public:
 	uint16_t tokimeki_serial_r();
 	void tokimeki_serial_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(tokimeki_device_check_r);
+	ioport_value tokimeki_device_check_r();
 	void tokimeki_device_check_w(int state);
 
 private:
@@ -1122,7 +1122,7 @@ void tokimeki_state::tmoshsp_init()
 	m_printer_is_manual_layout = true;
 }
 
-CUSTOM_INPUT_MEMBER(tokimeki_state::tokimeki_device_check_r)
+ioport_value tokimeki_state::tokimeki_device_check_r()
 {
 	return BIT(m_device_val, 15);
 }

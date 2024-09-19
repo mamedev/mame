@@ -36,6 +36,7 @@ snapshot_image_device::snapshot_image_device(const machine_config &mconfig, devi
 	, m_timer(nullptr)
 {
 }
+
 //-------------------------------------------------
 //  snapshot_image_device - destructor
 //-------------------------------------------------
@@ -67,7 +68,7 @@ TIMER_CALLBACK_MEMBER(snapshot_image_device::process_snapshot_or_quickload)
 				err.value(),
 				err.message());
 		popmessage(
-				!message.empty() ? "Error loading '%1$s': %3$s" : "Error loading '%1$s': %4$s",
+				!message.empty() ? "Error loading '%1$s': %2$s" : "Error loading '%1$s': %3$s",
 				basename(),
 				message,
 				err.message());

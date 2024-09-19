@@ -33,6 +33,7 @@ class fifo2812_device : public device_t
 public:
 	// standard constructor
 	fifo2812_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	virtual ~fifo2812_device();
 
 	// callbacks
 	auto q_cb() { return m_q_cb.bind(); }

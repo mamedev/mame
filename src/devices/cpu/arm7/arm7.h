@@ -52,6 +52,7 @@ class arm7_cpu_device : public cpu_device, public arm7_disassembler::config
 public:
 	// construction/destruction
 	arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~arm7_cpu_device();
 
 	void set_high_vectors() { m_vectorbase = 0xffff0000; }
 
@@ -113,7 +114,16 @@ protected:
 		ARM9_COPRO_ID_MFR_INTEL = 0x69 << 24
 	};
 
-	arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness);
+	arm7_cpu_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			uint8_t archRev,
+			uint32_t archFlags,
+			endianness_t endianness,
+			address_map_constructor internal_map = address_map_constructor());
 
 	void postload();
 
@@ -124,7 +134,6 @@ protected:
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 3; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 4; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 4; } /* There are actually only 2 input lines: we use 3 variants of the ABORT line while there is only 1 real one */
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

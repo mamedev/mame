@@ -166,7 +166,7 @@ INTERRUPT_GEN_MEMBER(psikyo4_state::interrupt)
 }
 
 template <int P>
-CUSTOM_INPUT_MEMBER(psikyo4_state::mahjong_ctrl_r)/* used by hotgmck/hgkairak */
+ioport_value psikyo4_state::mahjong_ctrl_r()/* used by hotgmck/hgkairak */
 {
 	int ret = 0xff;
 
@@ -297,7 +297,7 @@ void psikyo4_state::ps4_ymf_map(address_map &map)
 }
 
 
-CUSTOM_INPUT_MEMBER(psikyo4_state::system_r)
+ioport_value psikyo4_state::system_r()
 {
 	return m_system->read();
 }

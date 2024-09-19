@@ -167,6 +167,12 @@ protected:
 	void ppi_portc_w(u8 data);
 };
 
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
 void elite_state::machine_start()
 {
 	fidel_clockdiv_state::machine_start();

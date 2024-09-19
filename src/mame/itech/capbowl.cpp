@@ -584,7 +584,7 @@ void capbowl_base_state::base(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -604,7 +604,7 @@ void capbowl_base_state::base(machine_config &config)
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(8'000'000) / 2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
-	ymsnd.port_a_read_callback().set("ticket", FUNC(ticket_dispenser_device::line_r)).lshift(7);
+	ymsnd.port_a_read_callback().set("ticket", FUNC(ticket_dispenser_device::line_r)).invert().lshift(7);
 	ymsnd.port_b_write_callback().set("ticket", FUNC(ticket_dispenser_device::motor_w)).bit(7); // Also a status LED. See memory map above
 	ymsnd.add_route(0, "speaker", 0.07);
 	ymsnd.add_route(1, "speaker", 0.07);

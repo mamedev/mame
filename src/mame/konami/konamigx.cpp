@@ -450,7 +450,7 @@ void konamigx_state::esc_w(address_space &space, uint32_t data)
 /**********************************************************************************/
 /* EEPROM handlers */
 
-CUSTOM_INPUT_MEMBER(konamigx_state::gx_rdport1_3_r)
+ioport_value konamigx_state::gx_rdport1_3_r()
 {
 	return (m_gx_rdport1_3 >> 1);
 }

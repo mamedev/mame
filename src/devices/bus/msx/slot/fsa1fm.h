@@ -42,8 +42,8 @@ private:
 	uint8_t m_selected_bank[6];
 	bool m_ram_active[6];
 	uint8_t m_control;
-	std::vector<uint8_t> m_ram;
-	std::vector<uint8_t> m_empty_bank;
+	std::unique_ptr<u8[]> m_ram;
+	std::unique_ptr<u8[]> m_empty_bank;
 };
 
 
@@ -76,7 +76,7 @@ private:
 	required_memory_region m_rom_region;
 	memory_bank_creator m_rombank;
 	u32 m_region_offset;
-	std::vector<u8> m_sram;
+	std::unique_ptr<u8[]> m_sram;
 };
 
 

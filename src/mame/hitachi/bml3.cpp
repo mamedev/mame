@@ -1,17 +1,16 @@
 // license:GPL-2.0+
 // copyright-holders:Angelo Salese, Jonathan Edwards, Christopher Edwards,Robbbert
-/**************************************************************************************
+/**************************************************************************************************
 
-    Basic Master Level 3 (MB-689x) (c) 1980 Hitachi
+Basic Master Level 3 (MB-689x) (c) 1980 Hitachi
 
-    Driver by Angelo Salese, Jonathan Edwards and Christopher Edwards
+TODO:
+- implement sound as a bml3bus slot device;
+- account for hardware differences between MB-6890, MB-6891 and MB-6892
+    (e.g. custom font support on the MB-6892)
+- Verify if anything needs composing from here for Hitachi MB-S1 support;
 
-    TODO:
-    - implement sound as a bml3bus slot device
-    - account for hardware differences between MB-6890, MB-6891 and MB-6892
-      (e.g. custom font support on the MB-6892)
-
-**************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 
@@ -588,6 +587,7 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(bml3_state::nmi_button)
 {
+	// TODO: isn't this supposed to actually raise an NMI, just like earlier Basic Master LV1/2?
 	m_nmi = newval ? 0x80 : 0;
 }
 
@@ -1057,6 +1057,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY    FULLNAME                               FLAGS */
-COMP( 1980, bml3,    0,     0,      bml3,    bml3,  bml3_state, empty_init, "Hitachi", "MB-6890 Basic Master Level 3",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1982, bml3mk2, bml3,  0,      bml3mk2, bml3,  bml3_state, empty_init, "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, bml3mk5, bml3,  0,      bml3mk5, bml3,  bml3_state, empty_init, "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, bml3,    0,     0,      bml3,    bml3,  bml3_state, empty_init, "Hitachi", "Basic Master Level 3 (MB-6890)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, bml3mk2, bml3,  0,      bml3mk2, bml3,  bml3_state, empty_init, "Hitachi", "Basic Master Level 3 Mark 2 (MB-6891)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, bml3mk5, bml3,  0,      bml3mk5, bml3,  bml3_state, empty_init, "Hitachi", "Basic Master Level 3 Mark 5 (MB-6892)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

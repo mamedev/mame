@@ -45963,6 +45963,57 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="dpadherov10" cloneof="dpadhero">
+		<description>D-Pad Hero (version 1.0)</description>
+		<year>2009</year>
+		<publisher>D-Pad Hero Team</publisher>
+		<info name="release" value="20090131" />
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" /> <!-- original download is an iNES file -->
+			<dataarea name="prg" size="131072">
+				<rom name="dpadhero-1.0 prg" size="131072" crc="b824fa19" sha1="c80a2acb8b39982c0764d84051736dd799854712" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="dpadhero chr" size="131072" crc="85db1444" sha1="6384b0eb3e036287393ef98811949252e37233bf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dpadhero">
+		<description>D-Pad Hero (version 1.1)</description>
+		<year>2009</year>
+		<publisher>D-Pad Hero Team</publisher>
+		<info name="release" value="20090204" />
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" /> <!-- original download is an iNES file -->
+			<dataarea name="prg" size="131072">
+				<rom name="dpadhero prg" size="131072" crc="9afe169b" sha1="7b7804e4bcfa0d8c389789a404d7cd62a4f9ed9f" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="dpadhero chr" size="131072" crc="85db1444" sha1="6384b0eb3e036287393ef98811949252e37233bf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dpadhero2">
+		<description>D-Pad Hero II</description>
+		<year>2010</year>
+		<publisher>D-Pad Hero Team</publisher>
+		<info name="release" value="20100514" />
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" /> <!-- original download is an iNES file -->
+			<dataarea name="prg" size="131072">
+				<rom name="dpadhero2 prg" size="131072" crc="0105cfe8" sha1="2a97bc3951777c2f8249c7b565b8b7e38eea93c6" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="dpadhero2 chr" size="131072" crc="f44a6f24" sha1="8db48088aae7b93a8cccfffe07bb86ba23c14051" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="drmariop2" cloneof="drmario">
 		<description>Dr. Mario (prototype, alt 2)</description>
 		<year>1990</year>
@@ -79578,6 +79629,22 @@ be better to redump them properly. -->
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="0x20000">
 				<rom name="xmas22demo.prg" size="0x20000" crc="e43ef334" sha1="a8f31da27ad2cc81e21cf03f84c6d9d805597988" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge? -->
+			<dataarea name="vram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="xmas23" supported="no">
+		<description>8-bit Xmas 2023</description>
+		<year>2023</year>
+		<publisher>retroUSB</publisher>
+		<info name="serial" value="RET-Y3-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="xmas23demo.prg" size="0x20000" crc="7c30674c" sha1="b1aa0d0ab8dab24f7dda27036d8dd12f1d6b7bea" />
 			</dataarea>
 			<!-- 32k VRAM on cartridge? -->
 			<dataarea name="vram" size="0x8000" />

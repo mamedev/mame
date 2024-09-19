@@ -237,7 +237,7 @@ MACHINE_START_MEMBER(_8080bw_state,extra_8080bw)
 /*                                                     */
 /*******************************************************/
 
-CUSTOM_INPUT_MEMBER(invaders_clone_state::sicv_in2_control_r)
+ioport_value invaders_clone_state::sicv_in2_control_r()
 {
 	return m_player_controls[is_cabinet_cocktail() ? 1 : 0]->read() | ioport("P2GATE")->read();
 }
@@ -404,12 +404,12 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-CUSTOM_INPUT_MEMBER(invaders_clone_state::invadpt2_in1_control_r)
+ioport_value invaders_clone_state::invadpt2_in1_control_r()
 {
 	return m_player_controls[0]->read() | (m_player_controls[1]->read() & ~m_cabinet_type->read());
 }
 
-CUSTOM_INPUT_MEMBER(invaders_clone_state::invadpt2_in2_control_r)
+ioport_value invaders_clone_state::invadpt2_in2_control_r()
 {
 	return m_player_controls[1]->read() | (m_player_controls[0]->read() & ~m_cabinet_type->read());
 }
@@ -1504,7 +1504,7 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-CUSTOM_INPUT_MEMBER(rollingc_state::game_select_r)
+ioport_value rollingc_state::game_select_r()
 {
 	// need the joystick left/right inputs to show in two places
 	return bitswap<2>(m_player_controls[0]->read(), 1, 2);

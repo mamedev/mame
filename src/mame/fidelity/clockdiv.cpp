@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/*******************************************************************************
+/*
 
 Fidelity Electronics 6502 dynamic CPU clock divider
 
 Offset-dependent CPU clock divider base class. Used to compensate slow memory
 chips in chess computer models: SC12, AS12, PC, EAS, EAG.
 
-*******************************************************************************/
+*/
 
 #include "emu.h"
 #include "clockdiv.h"

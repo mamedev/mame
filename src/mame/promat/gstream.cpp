@@ -165,7 +165,7 @@ public:
 	void init_x2222();
 
 	int mirror_service_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
+	ioport_value gstream_mirror_r();
 	int x2222_toggle_r();
 
 private:
@@ -232,7 +232,7 @@ int gstream_state::mirror_service_r()
 	return ~result;
 }
 
-CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_r)
+ioport_value gstream_state::gstream_mirror_r()
 {
 	int result;
 

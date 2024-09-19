@@ -54,7 +54,7 @@ public:
 
 	void tail2nos(machine_config &config);
 
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(analog_in_r);
+	template <int N> ioport_value analog_in_r();
 
 protected:
 	virtual void machine_start() override;
@@ -326,7 +326,7 @@ void tail2nos_state::sound_port_map(address_map &map)
 }
 
 template <int N>
-CUSTOM_INPUT_MEMBER(tail2nos_state::analog_in_r)
+ioport_value tail2nos_state::analog_in_r()
 {
 	int delta = m_analog[N]->read();
 

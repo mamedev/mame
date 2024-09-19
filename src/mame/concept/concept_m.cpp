@@ -16,6 +16,7 @@
 #define VLOG(x) do { if (VERBOSE > 1) logerror x; } while (0)
 
 
+#if 0
 /* interrupt priority encoder */
 enum
 {
@@ -27,6 +28,7 @@ enum
 	KEYINT_level,       /* keyboard acia */
 	NMIINT_level            /* reserved */
 };
+#endif
 
 /* Clock interface */
 
@@ -38,13 +40,20 @@ enum
 
 void concept_state::machine_start()
 {
-	/* initialize int state */
-	m_pending_interrupts = 0;
+	// OS will not boot if TDRE is clear on ACIA 0; this fixes that
+	m_acia0->write_cts(0);
+	m_acia0->write_dcd(0);
+	m_acia0->write_dsr(0);
+	m_acia1->write_cts(0);
+	m_acia1->write_dcd(0);
+	m_acia1->write_dsr(0);
+	m_kbdacia->write_cts(0);
+	m_kbdacia->write_dcd(0);
+	m_kbdacia->write_dsr(0);
 
 	/* initialize clock interface */
 	m_clock_enable = false /*true*/;
 
-	save_item(NAME(m_pending_interrupts));
 	save_item(NAME(m_clock_enable));
 	save_item(NAME(m_clock_address));
 }
@@ -52,9 +61,6 @@ void concept_state::machine_start()
 
 void concept_state::machine_reset()
 {
-	// OS will not boot if TDRE is clear on ACIA 0; this fixes that
-	m_acia0->write_cts(CLEAR_LINE);
-	m_acia1->write_cts(CLEAR_LINE);
 }
 
 void concept_state::video_start()
@@ -71,34 +77,6 @@ uint32_t concept_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			line[720-1-x] = (m_videoram[(x+48+y*768)>>4] & (0x8000 >> ((x+48+y*768) & 0xf))) ? 1 : 0;
 	}
 	return 0;
-}
-
-void concept_state::ioc_interrupt(int state)
-{
-	concept_set_interrupt(IOCINT_level, state);
-}
-
-void concept_state::concept_set_interrupt(int level, int state)
-{
-	int interrupt_mask;
-	int final_level;
-
-	if (state)
-		m_pending_interrupts |= 1 << level;
-	else
-		m_pending_interrupts &= ~ (1 << level);
-
-	for (final_level = 7, interrupt_mask = m_pending_interrupts; (final_level > 0) && ! (interrupt_mask & 0x80); final_level--, interrupt_mask <<= 1)
-		;
-
-	if (final_level)
-		/* assert interrupt */
-		m_maincpu->set_input_line(M68K_IRQ_1 + final_level - 1, ASSERT_LINE);
-	else
-	{
-		/* clear all interrupts */
-		m_maincpu->set_input_line(M68K_IRQ_1 + level - 1, CLEAR_LINE);
-	}
 }
 
 /*
@@ -159,14 +137,6 @@ void concept_state::via_out_cb2(int state)
 {
 //  LOG(("via_out_cb2: Sound control written: data=0x%2.2x\n", state));
 	m_speaker->level_w(state);
-}
-
-/*
-    VIA irq -> 68k level 5
-*/
-void concept_state::via_irq_func(int state)
-{
-	concept_set_interrupt(TIMINT_level, state);
 }
 
 uint8_t concept_state::io_r(offs_t offset)

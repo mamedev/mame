@@ -66,7 +66,7 @@ public:
 	void init_galpani4();
 	void init_ryouran();
 
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(paddle_r);
+	template <int P> ioport_value paddle_r();
 
 private:
 	struct hit_t

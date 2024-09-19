@@ -149,7 +149,7 @@ public:
 	uint8_t rescueb_a002_r() { return 0xfc; }
 	template <int Mask> int _4in1_fake_port_r();
 	template <int Mask> int vpool_lives_r();
-	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
+	template <int Mask> ioport_value dkongjrm_coinage_r();
 
 	void init_bullsdrtg();
 	void init_ladybugg();

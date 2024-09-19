@@ -635,7 +635,7 @@ void gi6809_state::gi6809_base(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:bit3", "PA3.IN", 0);
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0, 0.0);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50));
 }
 
 

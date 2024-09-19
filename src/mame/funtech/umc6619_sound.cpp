@@ -2,23 +2,25 @@
 // copyright-holders:Ryan Holtz, superctr
 /***************************************************************************
 
-    Super A'Can sound driver
+    Super A'Can UMC 6619 sound driver
 
     Currently has a number of unknown registers and functionality.
 
 ****************************************************************************/
 
 #include "emu.h"
-#include "acan.h"
+#include "umc6619_sound.h"
 
 #define VERBOSE     (0)
 #include "logmacro.h"
 
-// device type definition
-DEFINE_DEVICE_TYPE(ACANSND, acan_sound_device, "acansound", "Super A'Can Audio")
+#define LIVE_AUDIO_VIEW 0
 
-acan_sound_device::acan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ACANSND, tag, owner, clock)
+// device type definition
+DEFINE_DEVICE_TYPE(UMC6619_SOUND, umc6619_sound_device, "umc6619_sound", "UMC UM6619 Sound Engine")
+
+umc6619_sound_device::umc6619_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, UMC6619_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_timer(nullptr)
@@ -31,11 +33,11 @@ acan_sound_device::acan_sound_device(const machine_config &mconfig, const char *
 }
 
 
-void acan_sound_device::device_start()
+void umc6619_sound_device::device_start()
 {
 	m_stream = stream_alloc(0, 2, clock() / 16 / 5);
 	m_mix = std::make_unique<int32_t[]>((clock() / 16 / 5) * 2);
-	m_timer = timer_alloc(FUNC(acan_sound_device::channel_irq), this);
+	m_timer = timer_alloc(FUNC(umc6619_sound_device::channel_irq), this);
 
 	// register for savestates
 	save_item(NAME(m_active_channels));
@@ -53,21 +55,40 @@ void acan_sound_device::device_start()
 	save_item(STRUCT_MEMBER(m_channels, volume_l));
 	save_item(STRUCT_MEMBER(m_channels, volume_r));
 	save_item(STRUCT_MEMBER(m_channels, one_shot));
+	save_item(STRUCT_MEMBER(m_channels, unk_upper_05));
 	save_item(NAME(m_regs));
 }
 
-void acan_sound_device::device_reset()
+void umc6619_sound_device::device_reset()
 {
 	m_active_channels = 0;
 	m_dma_channels = 0;
 	std::fill(std::begin(m_regs), std::end(m_regs), 0);
+
+	for (auto &channel : m_channels)
+	{
+		channel.pitch = 0;
+		channel.length = 0;
+		channel.start_addr = 0;
+		channel.curr_addr = 0;
+		channel.end_addr = 0;
+		channel.addr_increment = 0;
+		channel.frac = 0;
+		channel.register9 = 0;
+		std::fill(std::begin(channel.envelope), std::end(channel.envelope), 0);
+		channel.volume = 0;
+		channel.volume_l = 0;
+		channel.volume_r = 0;
+		channel.one_shot = false;
+		channel.unk_upper_05 = 0;
+	}
 
 	m_timer->reset();
 	m_timer_irq_handler(0);
 	m_dma_irq_handler(0);
 }
 
-TIMER_CALLBACK_MEMBER(acan_sound_device::channel_irq)
+TIMER_CALLBACK_MEMBER(umc6619_sound_device::channel_irq)
 {
 	if (m_regs[0x14] & 0x40)
 	{
@@ -79,9 +100,44 @@ TIMER_CALLBACK_MEMBER(acan_sound_device::channel_irq)
 	}
 }
 
-void acan_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+std::string umc6619_sound_device::print_audio_state()
+{
+	std::ostringstream outbuffer;
+
+	util::stream_format(outbuffer, "channel | address               | length | pitch | one?   |  vol | DMA? | (unk09)    |\n");
+
+	for (int i = 0; i < 16; i++)
+	{
+		acan_channel &channel = m_channels[i];
+
+		util::stream_format(outbuffer, "%02d: %01d | %04x (%04x-%04x) | %04x | %04x | %d (%02x)| %02x | %02x | %02x %02x %02x %02x|\n"
+			, i
+			, BIT(m_active_channels, i)
+			, channel.curr_addr
+			, (channel.start_addr << 6) & 0xffff
+			, channel.end_addr
+			, channel.length
+			, channel.pitch
+			, channel.one_shot
+			, channel.unk_upper_05
+			, channel.volume
+			, channel.register9
+			, channel.envelope[0]
+			, channel.envelope[1]
+			, channel.envelope[2]
+			, channel.envelope[3]
+		);
+	}
+
+	return outbuffer.str();
+}
+
+void umc6619_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	std::fill_n(&m_mix[0], outputs[0].samples() * 2, 0);
+
+	if (LIVE_AUDIO_VIEW)
+		popmessage(print_audio_state());
 
 	for (int i = 0; i < 16 && m_active_channels != 0; i++)
 	{
@@ -130,7 +186,7 @@ void acan_sound_device::sound_stream_update(sound_stream &stream, std::vector<re
 	}
 }
 
-uint8_t acan_sound_device::read(offs_t offset)
+uint8_t umc6619_sound_device::read(offs_t offset)
 {
 	if (offset == 0x14)
 	{
@@ -142,10 +198,11 @@ uint8_t acan_sound_device::read(offs_t offset)
 		// acknowledge DMA IRQ?
 		m_dma_irq_handler(0);
 	}
+	// TODO: offset 0x15 (read by streaming DMAs, cfr. staiwbbl)
 	return m_regs[offset];
 }
 
-void acan_sound_device::keyon_voice(uint8_t voice)
+void umc6619_sound_device::keyon_voice(uint8_t voice)
 {
 	acan_channel &channel = m_channels[voice];
 	channel.curr_addr = channel.start_addr << 6;
@@ -156,11 +213,12 @@ void acan_sound_device::keyon_voice(uint8_t voice)
 	//printf("Keyon voice %d\n", voice);
 }
 
-void acan_sound_device::write(offs_t offset, uint8_t data)
+void umc6619_sound_device::write(offs_t offset, uint8_t data)
 {
 	const uint8_t upper = (offset >> 4) & 0x0f;
 	const uint8_t lower = offset & 0x0f;
 
+	m_stream->update();
 	m_regs[offset] = data;
 
 	switch (upper)
@@ -237,6 +295,7 @@ void acan_sound_device::write(offs_t offset, uint8_t data)
 		acan_channel &channel = m_channels[lower];
 		channel.length = 0x40 << ((data & 0x0e) >> 1);
 		channel.one_shot = BIT(data, 0);
+		channel.unk_upper_05 = data & 0xf0;
 		LOG("%s: Waveform length and attributes (voice %02x): %02x\n", machine().describe_context(), lower, data);
 		break;
 	}
@@ -284,6 +343,10 @@ void acan_sound_device::write(offs_t offset, uint8_t data)
 		LOG("%s: Volume register (voice %02x) = = %02x\n", machine().describe_context(), lower, data);
 		break;
 	}
+
+	// case 4:
+	// Normally 0x03 for keyon channels, 0x01 for streaming DMAs
+	// (staiwbbl, formduel, sangofgt)
 
 	default:
 		LOG("Unknown sound register: %02x = %02x\n", offset, data);

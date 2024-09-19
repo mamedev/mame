@@ -156,7 +156,7 @@ public:
 	void renegade(machine_config &config);
 	void kuniokunb(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
+	ioport_value mcu_status_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
@@ -439,7 +439,7 @@ uint8_t renegade_state::mcu_reset_r()
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(renegade_state::mcu_status_r)
+ioport_value renegade_state::mcu_status_r()
 {
 	if (m_mcu.found())
 	{

@@ -33,7 +33,7 @@ public:
 
 	int firq_beam_r();
 	int firq_vblank_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(hitnmiss_button1_r);
+	ioport_value hitnmiss_button1_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_showdown();
 	void init_yukon();

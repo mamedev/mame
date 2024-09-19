@@ -219,7 +219,7 @@ public:
 	void kinst(machine_config &config);
 	void kinst2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r) { return BIT(m_dcs->control_r(), 11); }
+	ioport_value sound_status_r() { return BIT(m_dcs->control_r(), 11); }
 
 protected:
 	required_device<mips3_device> m_maincpu;

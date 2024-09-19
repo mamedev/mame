@@ -78,6 +78,7 @@ public:
 			const char *tag,
 			device_t *owner,
 			u32 clock);
+	virtual ~generic_keyboard_device();
 
 	template <typename... T>
 	void set_keyboard_callback(T &&... args)
