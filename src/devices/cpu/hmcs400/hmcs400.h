@@ -12,6 +12,15 @@
 #pragma once
 
 
+// input lines
+
+enum
+{
+	HMCS400_INPUT_LINE_INT0 = 0,
+	HMCS400_INPUT_LINE_INT1
+};
+
+
 class hmcs400_cpu_device : public cpu_device
 {
 public:
@@ -44,7 +53,7 @@ protected:
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * m_divider); }
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 3+2; } // max 3 + interrupt
-	//virtual void execute_set_input(int line, int state) override;
+	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
 
 	// device_memory_interface implementation
@@ -93,6 +102,10 @@ protected:
 	u16 m_d;              // D pins state
 	u16 m_d_mask;
 
+	u8 m_int_line[2];
+	u16 m_irq_flags;
+	u8 m_pmr;
+
 	// I/O handlers
 	devcb_read8::array<8> m_read_r;
 	devcb_write8::array<8> m_write_r;
@@ -111,6 +124,13 @@ protected:
 	int read_d(u8 index);
 	void write_d(u8 index, int state);
 
+	bool access_mode(u8 mem_mask, bool bit_mode = false);
+	u8 irq_control_r(offs_t offset, u8 mem_mask);
+	void irq_control_w(offs_t offset, u8 data, u8 mem_mask);
+	void pmr_w(offs_t offset, u8 data, u8 mem_mask);
+
+	void ext_int_edge(int line);
+	void check_interrupts();
 	void cycle();
 	u16 fetch();
 

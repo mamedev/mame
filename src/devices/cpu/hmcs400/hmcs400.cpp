@@ -13,13 +13,14 @@ They added an extra RAM addressing mode, and interrupt-related opcodes were
 removed (interrupt flags are via memory-mapped I/O).
 
 TODO:
+- add serial interface
+- current I/O ports are hardcoded for HMS402/4/8, which will need to be changed
+  when other MCU types are added
 - do the LAW/LWA opcodes not work on early revisions of HMCS400? the 1988 user
   manual warns that the W register is write-only, and that there is no efficient
   way to save this register when using interrupts
 - what happens when accessing ROM/RAM out of address range? Hitachi documentation
   says 'unused', but maybe it's mirrored?
-- current I/O ports are hardcoded for HMS402/4/8, which will need to be changed
-  when other MCU types are added
 
 */
 
@@ -165,6 +166,8 @@ hd614089_device::hd614089_device(const machine_config &mconfig, const char *tag,
 
 void hmcs400_cpu_device::device_start()
 {
+	assert(HMCS400_INPUT_LINE_INT0 == 0 && HMCS400_INPUT_LINE_INT1 == 1);
+
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 
@@ -186,6 +189,15 @@ void hmcs400_cpu_device::device_start()
 	m_st = 0;
 	m_ca = 0;
 
+	memset(m_r, 0, sizeof(m_r));
+	memset(m_r_mask, 0, sizeof(m_r_mask));
+	m_d = 0;
+	m_d_mask = 0;
+
+	m_int_line[0] = m_int_line[1] = 1;
+	m_irq_flags = 0;
+	m_pmr = 0;
+
 	// register for savestates
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prev_pc));
@@ -204,6 +216,10 @@ void hmcs400_cpu_device::device_start()
 
 	save_item(NAME(m_r));
 	save_item(NAME(m_d));
+
+	save_item(NAME(m_int_line));
+	save_item(NAME(m_irq_flags));
+	save_item(NAME(m_pmr));
 
 	// register state for debugger
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
@@ -232,6 +248,10 @@ void hmcs400_cpu_device::device_reset()
 	m_pc = 0;
 	m_sp = 0x3ff;
 	m_st = 1;
+
+	// clear peripherals
+	m_irq_flags = 0xaaa8; // IM=1, IF=0, IE=0
+	m_pmr = 0;
 
 	// all I/O ports set to input
 	reset_io();
@@ -275,6 +295,10 @@ void hmcs400_cpu_device::program_map(address_map &map)
 
 void hmcs400_cpu_device::data_map(address_map &map)
 {
+	map.unmap_value_high();
+	map(0x000, 0x003).rw(FUNC(hmcs400_cpu_device::irq_control_r), FUNC(hmcs400_cpu_device::irq_control_w));
+	map(0x004, 0x004).w(FUNC(hmcs400_cpu_device::pmr_w));
+
 	map(0x020, 0x020 + m_ram_size - 1).ram();
 	map(0x3c0, 0x3ff).ram();
 }
@@ -311,10 +335,10 @@ void hmcs400_cpu_device::reset_io()
 u8 hmcs400_cpu_device::read_r(u8 index)
 {
 	// reads from write-only or non-existent ports are invalid
-	bool write_only = index == 0 || (index >= 6 && index <= 8);
+	const bool write_only = (index == 0 || (index >= 6 && index <= 8));
 	if (write_only || index > 10)
 	{
-		logerror("read from %s port R%X at $%04X\n", write_only ? "output" : "unknown", index, m_prev_pc);
+		logerror("read from %s port R%X @ $%04X\n", write_only ? "output" : "unknown", index, m_prev_pc);
 		return 0xf;
 	}
 
@@ -324,13 +348,24 @@ u8 hmcs400_cpu_device::read_r(u8 index)
 	if (m_read_r[index].isunset())
 	{
 		inp = m_r_mask[index];
-		logerror("read from unmapped port R%X at $%04X\n", index, m_prev_pc);
+		logerror("read from unmapped port R%X @ $%04X\n", index, m_prev_pc);
+	}
+
+	u8 out = m_r[index];
+
+	// R32/R33 are multiplexed with ext interrupts
+	if (index == 3)
+	{
+		u8 pmr_mask = m_pmr & 0xc;
+		u8 ext_int = m_int_line[1] << 3 | m_int_line[0] << 2;
+		inp = (inp & ~pmr_mask) | (ext_int & pmr_mask);
+		out = (out & ~pmr_mask) | (m_r_mask[index] & pmr_mask);
 	}
 
 	if (m_r_mask[index])
-		return (inp & m_r[index]) & mask;
+		return (inp & out) & mask;
 	else
-		return (inp | m_r[index]) & mask;
+		return (inp | out) & mask;
 }
 
 void hmcs400_cpu_device::write_r(u8 index, u8 data)
@@ -342,10 +377,19 @@ void hmcs400_cpu_device::write_r(u8 index, u8 data)
 		return;
 
 	if (m_write_r[index].isunset())
-		logerror("write $%X to unmapped port R%d at $%04X\n", data, index, m_prev_pc);
+		logerror("write $%X to unmapped port R%d @ $%04X\n", data, index, m_prev_pc);
 
 	m_r[index] = data;
-	m_write_r[index](index, data);
+	u8 out = data;
+
+	// R32/R33 are multiplexed with ext interrupts
+	if (index == 3)
+	{
+		u8 pmr_mask = m_pmr & 0xc;
+		out = (out & ~pmr_mask) | (m_r_mask[index] & pmr_mask);
+	}
+
+	m_write_r[index](index, out);
 }
 
 int hmcs400_cpu_device::read_d(u8 index)
@@ -357,7 +401,7 @@ int hmcs400_cpu_device::read_d(u8 index)
 	if (m_read_d.isunset())
 	{
 		inp = m_d_mask;
-		logerror("read from unmapped port D%d at $%04X\n", index, m_prev_pc);
+		logerror("read from unmapped port D%d @ $%04X\n", index, m_prev_pc);
 	}
 
 	if (m_d_mask & mask)
@@ -372,10 +416,155 @@ void hmcs400_cpu_device::write_d(u8 index, int state)
 	u16 mask = 1 << index;
 
 	if (m_write_d.isunset())
-		logerror("write %d to unmapped port D%d at $%04X\n", state, index, m_prev_pc);
+		logerror("write %d to unmapped port D%d @ $%04X\n", state, index, m_prev_pc);
 
 	m_d = (m_d & ~mask) | (state ? mask : 0);
 	m_write_d(0, m_d, mask);
+}
+
+
+//-------------------------------------------------
+//  interrupts
+//-------------------------------------------------
+
+bool hmcs400_cpu_device::access_mode(u8 mem_mask, bool bit_mode)
+{
+	mem_mask &= 0xf;
+	bool err = true;
+
+	if (bit_mode)
+	{
+		if (population_count_32(mem_mask) == 1)
+			return true;
+		err = mem_mask == 0xf;
+	}
+	else
+	{
+		if (mem_mask == 0xf)
+			return true;
+	}
+
+	if (err)
+		logerror("invalid access to I/O register @ $%04X\n", m_prev_pc);
+
+	return false;
+}
+
+u8 hmcs400_cpu_device::irq_control_r(offs_t offset, u8 mem_mask)
+{
+	// mask out unused bits (RSP is write-only)
+	const u16 unused = 0xcc02;
+	u16 data = m_irq_flags | unused;
+
+	if (!machine().side_effects_disabled())
+	{
+		// can only read one bit at a time
+		if (!access_mode(mem_mask, true))
+			return 0xf;
+
+		if (mem_mask << (offset * 4) & unused)
+			logerror("read from unused IRQ control bit @ $%04X\n", m_prev_pc);
+	}
+
+	return data >> (offset * 4) & 0xf;
+}
+
+void hmcs400_cpu_device::irq_control_w(offs_t offset, u8 data, u8 mem_mask)
+{
+	// can only write one bit at a time
+	if (!access_mode(mem_mask, true))
+		return;
+
+	u16 mask = mem_mask << (offset * 4);
+
+	// ignore writes to unused bits
+	if (mask & 0xcc00)
+		return;
+
+	// ignore writing 1 to flags that can only be cleared
+	if (mask & 0x5556 && data)
+		return;
+
+	// bit 1: RSP (reset SP)
+	if (mask & 0x0002)
+		m_sp = 0x3ff;
+
+	m_irq_flags = (m_irq_flags & ~mask) | (data ? mask : 0);
+}
+
+void hmcs400_cpu_device::pmr_w(offs_t offset, u8 data, u8 mem_mask)
+{
+	if (!access_mode(mem_mask))
+		return;
+
+	u8 prev = m_pmr;
+	m_pmr = data;
+
+	// trigger irq on rising edge if ext int line was low
+	for (int i = 0; i < 2; i++)
+		if (BIT(data & ~prev, i + 2))
+			ext_int_edge(i);
+
+	// refresh R32/R33
+	if ((data ^ prev) & 0xc)
+		write_r(3, m_r[3]);
+}
+
+void hmcs400_cpu_device::check_interrupts()
+{
+	// irq priority and vectors are in the same order as the irq control flags
+	u16 irq = m_irq_flags;
+
+	for (int i = 0; i < 7; i++)
+	{
+		irq >>= 2;
+
+		// do irq when IF=1 and IM=0
+		if ((irq & 3) == 1)
+		{
+			cycle();
+			cycle();
+			push_stack();
+			m_irq_flags &= ~1;
+
+			standard_irq_callback(i, m_pc);
+
+			m_pc = i * 2 + 2;
+			m_prev_pc = m_pc;
+			return;
+		}
+	}
+}
+
+void hmcs400_cpu_device::ext_int_edge(int line)
+{
+	// ext interrupts are masked with PMR2/3
+	if (!m_int_line[line] && BIT(m_pmr, line + 2))
+		m_irq_flags |= 1 << (line * 2 + 2);
+}
+
+void hmcs400_cpu_device::execute_set_input(int line, int state)
+{
+	state = state ? 1 : 0;
+
+	switch (line)
+	{
+		case HMCS400_INPUT_LINE_INT0: case HMCS400_INPUT_LINE_INT1:
+		{
+			// active-low, irq on falling edge
+			state ^= 1;
+			bool irq = (m_int_line[line] && !state);
+			m_int_line[line] = state;
+
+			if (irq)
+				ext_int_edge(line);
+
+			break;
+		}
+
+		default:
+			break;
+	}
 }
 
 
@@ -401,8 +590,13 @@ void hmcs400_cpu_device::execute_run()
 {
 	while (m_icount > 0)
 	{
-		// fetch next opcode
 		m_prev_pc = m_pc;
+
+		// check/handle interrupts
+		if (m_irq_flags & 1)
+			check_interrupts();
+
+		// fetch next opcode
 		debugger_instruction_hook(m_pc);
 		m_op = fetch();
 		m_i = m_op & 0xf;

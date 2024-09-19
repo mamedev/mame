@@ -380,7 +380,7 @@ u8 hmcs43_cpu_device::read_r(u8 index)
 	index &= 7;
 
 	if (index >= 2)
-		logerror("read from %s port R%d at $%04X\n", (index >= 4) ? "unknown" : "output", index, m_prev_pc);
+		logerror("read from %s port R%d @ $%04X\n", (index >= 4) ? "unknown" : "output", index, m_prev_pc);
 
 	return hmcs40_cpu_device::read_r(index);
 }
@@ -392,7 +392,7 @@ void hmcs43_cpu_device::write_r(u8 index, u8 data)
 	if (index != 0 && index < 4)
 		hmcs40_cpu_device::write_r(index, data);
 	else
-		logerror("ineffective write to port R%d = $%X at $%04X\n", index, data & 0xf, m_prev_pc);
+		logerror("ineffective write to port R%d = $%X @ $%04X\n", index, data & 0xf, m_prev_pc);
 }
 
 int hmcs43_cpu_device::read_d(u8 index)
@@ -400,7 +400,7 @@ int hmcs43_cpu_device::read_d(u8 index)
 	index &= 15;
 
 	if (index >= 4)
-		logerror("read from output pin D%d at $%04X\n", index, m_prev_pc);
+		logerror("read from output pin D%d @ $%04X\n", index, m_prev_pc);
 
 	return hmcs40_cpu_device::read_d(index);
 }
@@ -414,7 +414,7 @@ u8 hmcs44_cpu_device::read_r(u8 index)
 	index &= 7;
 
 	if (index >= 6)
-		logerror("read from unknown port R%d at $%04X\n", index, m_prev_pc);
+		logerror("read from unknown port R%d @ $%04X\n", index, m_prev_pc);
 
 	return hmcs40_cpu_device::read_r(index);
 }
@@ -426,7 +426,7 @@ void hmcs44_cpu_device::write_r(u8 index, u8 data)
 	if (index < 6)
 		hmcs40_cpu_device::write_r(index, data);
 	else
-		logerror("ineffective write to port R%d = $%X at $%04X\n", index, data & 0xf, m_prev_pc);
+		logerror("ineffective write to port R%d = $%X @ $%04X\n", index, data & 0xf, m_prev_pc);
 }
 
 // HMCS45:
@@ -438,7 +438,7 @@ u8 hmcs45_cpu_device::read_r(u8 index)
 	index &= 7;
 
 	if (index >= 6)
-		logerror("read from %s port R%d at $%04X\n", (index == 7) ? "unknown" : "output", index, m_prev_pc);
+		logerror("read from %s port R%d @ $%04X\n", (index == 7) ? "unknown" : "output", index, m_prev_pc);
 
 	return hmcs40_cpu_device::read_r(index);
 }
@@ -450,7 +450,7 @@ void hmcs45_cpu_device::write_r(u8 index, u8 data)
 	if (index != 7)
 		hmcs40_cpu_device::write_r(index, data);
 	else
-		logerror("ineffective write to port R%d = $%X at $%04X\n", index, data & 0xf, m_prev_pc);
+		logerror("ineffective write to port R%d = $%X @ $%04X\n", index, data & 0xf, m_prev_pc);
 }
 
 
@@ -482,7 +482,7 @@ void hmcs40_cpu_device::do_interrupt()
 
 void hmcs40_cpu_device::execute_set_input(int line, int state)
 {
-	state = (state) ? 1 : 0;
+	state = state ? 1 : 0;
 
 	// halt/unhalt mcu
 	if (line == HMCS40_INPUT_LINE_HLT && state != m_halt)

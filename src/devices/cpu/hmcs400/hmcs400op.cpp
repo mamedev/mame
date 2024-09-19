@@ -40,7 +40,7 @@ void hmcs400_cpu_device::pop_stack()
 void hmcs400_cpu_device::push_stack()
 {
 	u16 data = (m_pc << 1 & 0x7f00) | (m_pc & 0x7f) | m_ca << 7 | m_st << 15;
-	m_sp |= 0x3c0;
+	m_sp = (m_sp | 0x3c0) & 0x3ff;
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -55,12 +55,12 @@ void hmcs400_cpu_device::push_stack()
 
 void hmcs400_cpu_device::op_illegal()
 {
-	logerror("unknown opcode $%03X at $%04X\n", m_op, m_prev_pc);
+	logerror("unknown opcode $%03X @ $%04X\n", m_op, m_prev_pc);
 }
 
 void hmcs400_cpu_device::op_todo()
 {
-	logerror("unimplemented opcode $%03X at $%04X\n", m_op, m_prev_pc);
+	logerror("unimplemented opcode $%03X @ $%04X\n", m_op, m_prev_pc);
 }
 
 
@@ -577,7 +577,7 @@ void hmcs400_cpu_device::op_rtni()
 {
 	// RTNI: Return from Interrupt
 	op_rtn();
-	op_todo();
+	m_irq_flags |= 1;
 }
 
 

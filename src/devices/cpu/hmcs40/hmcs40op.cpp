@@ -40,7 +40,7 @@ void hmcs40_cpu_device::push_stack()
 
 void hmcs40_cpu_device::op_illegal()
 {
-	logerror("unknown opcode $%03X at $%04X\n", m_op, m_prev_pc);
+	logerror("unknown opcode $%03X @ $%04X\n", m_op, m_prev_pc);
 }
 
 
