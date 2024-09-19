@@ -82,11 +82,11 @@ void thinkpad8xx_state::thinkpad850(machine_config &config)
 
 
 ROM_START(thinkpad850)
-	ROM_REGION(0x80000, "maincpu", 0)
-	ROM_SYSTEM_BIOS( 0, "40h5218", "40H5218 (08-12-1996)" )
-	ROMX_LOAD( "40h5218_ibm_mbm29f040a.u21", 0x00000, 0x80000, CRC(2bc2da24) SHA1(adc36bf18176e0fbfb389249da0b60b381cee764), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "91g0610", "91G0610 (07-03-1995)" )
-	ROMX_LOAD( "91g0610_ibm_mbm29f040a.u21", 0x00000, 0x80000, CRC(169a79c4) SHA1(da74a2f346b732add62d08ca5f34f192cae5d033), ROM_BIOS(1) )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_SYSTEM_BIOS( 0, "91g1671", "v1.01 (91G1671, 09-10-1996)" )
+	ROMX_LOAD( "91g1671_ibm_dakota_v101_mbm29f040a.u21", 0x00000, 0x80000, CRC(5210dbd6) SHA1(8e0bbbe130e6fdb06ef307bb5addbcb993a8a41f), ROM_BIOS(0) ) // Needed for installing Windows NT
+	ROM_SYSTEM_BIOS( 1, "91g0610", "v1.00 (91G0610, 07-03-1995)" )
+	ROMX_LOAD( "91g0610_ibm_dakota_v100_mbm29f040a.u21", 0x00000, 0x80000, CRC(169a79c4) SHA1(da74a2f346b732add62d08ca5f34f192cae5d033), ROM_BIOS(1) )
 
 	ROM_REGION(0xe000, "mcu", 0)
 	ROM_LOAD( "hd6473388.u15", 0x0000, 0xe000, NO_DUMP )
