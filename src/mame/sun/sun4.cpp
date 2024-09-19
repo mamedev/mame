@@ -413,6 +413,7 @@
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
 #include "bus/sunmouse/sunmouse.h"
@@ -568,6 +569,8 @@ protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
+	virtual void scsi_devices_config(machine_config &config) = 0;
+
 	u32 debugger_r(offs_t offset, u32 mem_mask = ~0);
 	void debugger_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -681,6 +684,9 @@ public:
 
 	void sun4(machine_config &config);
 
+protected:
+	virtual void scsi_devices_config(machine_config &config) override;
+
 private:
 	void type1space_map(address_map &map);
 };
@@ -703,6 +709,9 @@ public:
 	void sun4_60(machine_config &config);
 	void sun4_65(machine_config &config);
 	void sun4_75(machine_config &config);
+
+protected:
+	virtual void scsi_devices_config(machine_config &config) override;
 
 private:
 	virtual void machine_start() override;
@@ -1367,6 +1376,7 @@ static void sun_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("tape", NSCSI_TAPE);
 	device.option_add_internal("ncr53c90", NCR53C90);
 	device.set_option_machine_config("cdrom", sun4_cdrom);
 }
@@ -1433,15 +1443,8 @@ void sun4_base_state::sun4_base(machine_config &config)
 	m_rs232[1]->dcd_handler().set(m_scc[1], FUNC(z80scc_device::dcdb_w));
 	m_rs232[1]->cts_handler().set(m_scc[1], FUNC(z80scc_device::ctsb_w));
 
-	NSCSI_BUS(config, "scsibus");
-	NSCSI_CONNECTOR(config, "scsibus:0", sun_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsibus:1", sun_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:2", sun_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:3", sun_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:4", sun_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:5", sun_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, "cdrom");
-	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90", true).set_option_machine_config("ncr53c90", [this] (device_t *device) { ncr53c90(device); });
+	// SCSI
+	scsi_devices_config(config);
 }
 
 void sun4_state::sun4(machine_config &config)
@@ -1464,6 +1467,21 @@ void sun4_state::sun4(machine_config &config)
 	m_mmu->set_rom("user1");
 	m_mmu->set_scc(m_scc[1]);
 	m_maincpu->set_mmu(m_mmu);
+}
+
+void sun4_state::scsi_devices_config(machine_config &config)
+{
+	// sun4 defaults to having a tape device at SCSI ID 4
+
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", sun_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:1", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:2", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", sun_scsi_devices, "tape");
+	NSCSI_CONNECTOR(config, "scsibus:5", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90", true).set_option_machine_config("ncr53c90", [this] (device_t *device) { ncr53c90(device); });
 }
 
 void sun4c_state::sun4c(machine_config &config)
@@ -1618,6 +1636,21 @@ void sun4c_state::sun4_75(machine_config &config)
 
 	m_mmu->set_clock(40'000'000);
 	m_maincpu->set_clock(40'000'000);
+}
+
+void sun4c_state::scsi_devices_config(machine_config &config)
+{
+	// sun4c defaults to having nothing at SCSI ID 4
+
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", sun_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:1", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:2", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90", true).set_option_machine_config("ncr53c90", [this] (device_t *device) { ncr53c90(device); });
 }
 
 /*
