@@ -45106,6 +45106,9 @@ skysharkb                       // bootleg
 twincobr                        // B30 / TP-011 (c) 1987 Taito Corporation (World)
 twincobru                       // B30 / TP-011 (c) 1987 Taito America Corporation + Romstar license (US)
 
+@source:toaplan/twincobr_ms.cpp
+twincobrm                       // bootleg (Modular System)
+
 @source:toaplan/wardner.cpp
 pyros                           // B25 / TP-009 (c) 1987 Taito America Corporation (US)
 wardner                         // B25 / TP-009 (c) 1987 Taito Corporation Japan (World)
