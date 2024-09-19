@@ -73,8 +73,8 @@ public:
 	void psi98(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t memory_r(offs_t offset);
@@ -115,8 +115,8 @@ private:
 	void rs232b_rx_w(int state);
 	void siob_tx_w(int state);
 
-	void psi98_io(address_map &map);
-	void psi98_mem(address_map &map);
+	void psi98_io(address_map &map) ATTR_COLD;
+	void psi98_mem(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_cpu;
 	required_device<z80dma_device> m_dma;

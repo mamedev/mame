@@ -132,9 +132,9 @@ protected:
 	void ioport_w(offs_t offset, u64 data);
 	u32 gpu_r(offs_t offset);
 	void gpu_w(offs_t offset, u32 data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	u32 screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline u32 decode64_32(offs_t offset64, u64 data, u64 mem_mask, offs_t &offset32);
 	[[maybe_unused]] void logbinary(u32 data, int high, int low);
@@ -151,10 +151,10 @@ protected:
 	void gpu_irq_test();
 	void gpu_irq_set(int);
 
-	void atvtrack_main_map(address_map &map);
-	void atvtrack_main_port(address_map &map);
-	void atvtrack_sub_map(address_map &map);
-	void atvtrack_sub_port(address_map &map);
+	void atvtrack_main_map(address_map &map) ATTR_COLD;
+	void atvtrack_main_port(address_map &map) ATTR_COLD;
+	void atvtrack_sub_map(address_map &map) ATTR_COLD;
+	void atvtrack_sub_port(address_map &map) ATTR_COLD;
 
 	bool m_slaverun = false;
 };
@@ -169,11 +169,11 @@ public:
 	void smashdrv(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void smashdrv_main_map(address_map &map);
-	void smashdrv_main_port(address_map &map);
+	void smashdrv_main_map(address_map &map) ATTR_COLD;
+	void smashdrv_main_port(address_map &map) ATTR_COLD;
 };
 
 void atvtrack_state::logbinary(u32 data, int high=31, int low=0)

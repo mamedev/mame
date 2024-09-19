@@ -72,7 +72,7 @@ private:
 	required_device<pit8253_device> m_pit1;
 	required_device<tms9927_device> m_tms;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t tdv2324_main_io_30();
@@ -81,11 +81,11 @@ private:
 
 	// video state
 	required_shared_ptr<uint8_t> m_video_ram;
-	void tdv2324_fdc_mem(address_map &map);
-	void tdv2324_io(address_map &map);
-	void tdv2324_mem(address_map &map);
-	void tdv2324_sub_io(address_map &map);
-	void tdv2324_sub_mem(address_map &map);
+	void tdv2324_fdc_mem(address_map &map) ATTR_COLD;
+	void tdv2324_io(address_map &map) ATTR_COLD;
+	void tdv2324_mem(address_map &map) ATTR_COLD;
+	void tdv2324_sub_io(address_map &map) ATTR_COLD;
+	void tdv2324_sub_mem(address_map &map) ATTR_COLD;
 };
 
 

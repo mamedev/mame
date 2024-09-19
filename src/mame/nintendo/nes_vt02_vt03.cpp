@@ -33,14 +33,14 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint8_t in0_r();
 	virtual uint8_t in1_r();
 	virtual void in0_w(uint8_t data);
 
-	void nes_vt_map(address_map& map);
+	void nes_vt_map(address_map &map) ATTR_COLD;
 
 	optional_ioport m_io0;
 	optional_ioport m_io1;
@@ -91,15 +91,15 @@ public:
 
 	void nes_vt_1mb_majkon(machine_config& config);
 
-	void vt_external_space_map_32mbyte(address_map& map);
-	void vt_external_space_map_16mbyte(address_map& map);
-	void vt_external_space_map_8mbyte(address_map& map);
-	void vt_external_space_map_4mbyte(address_map& map);
-	void vt_external_space_map_2mbyte(address_map& map);
-	void vt_external_space_map_1mbyte(address_map& map);
-	void vt_external_space_map_512kbyte(address_map& map);
+	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_8mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_4mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_2mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_1mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_512kbyte(address_map &map) ATTR_COLD;
 
-	void vt_external_space_map_1mbyte_majkon(address_map& map);
+	void vt_external_space_map_1mbyte_majkon(address_map &map) ATTR_COLD;
 
 	void init_protpp();
 	void init_gamezn2();
@@ -127,7 +127,7 @@ public:
 	void nes_vt_senwld_512kb(machine_config& config);
 
 protected:
-	void vt_external_space_map_senwld_512kbyte(address_map& map);
+	void vt_external_space_map_senwld_512kbyte(address_map &map) ATTR_COLD;
 };
 
 class nes_vt_pjoy_state : public nes_vt_state
@@ -255,8 +255,8 @@ public:
 	void nes_vt_waixing_alt_4mb_sporzpp(machine_config& config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	virtual uint8_t in0_r() override;

@@ -29,8 +29,8 @@ public:
 	void summit(machine_config &config);
 
 private:
-	void sumt_map(address_map &map);
-	void sumt_portmap(address_map &map);
+	void sumt_map(address_map &map) ATTR_COLD;
+	void sumt_portmap(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

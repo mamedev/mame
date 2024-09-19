@@ -216,10 +216,10 @@ private:
 	void moo_objdma();
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
-	void bucky_map(address_map &map);
-	void moo_map(address_map &map);
-	void moobl_map(address_map &map);
-	void sound_map(address_map &map);
+	void bucky_map(address_map &map) ATTR_COLD;
+	void moo_map(address_map &map) ATTR_COLD;
+	void moobl_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

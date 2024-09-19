@@ -93,8 +93,8 @@ private:
 	void i2c_nvram_w(uint8_t data);
 	uint8_t splus_reel_optics_r();
 
-	void splus_iomap(address_map &map);
-	void splus_map(address_map &map);
+	void splus_iomap(address_map &map) ATTR_COLD;
+	void splus_map(address_map &map) ATTR_COLD;
 
 	// EEPROM States
 	int m_sda_dir;

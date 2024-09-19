@@ -56,8 +56,8 @@ public:
 	void hankin(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void ic10_ca2_w(int state);
@@ -76,8 +76,8 @@ private:
 	u8 ic2_a_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
 
 	bool m_timer_sb = false;
 	u8 m_timer_s[3]{};

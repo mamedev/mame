@@ -117,14 +117,14 @@ public:
 	}
 
 	void mirage(machine_config &config);
-	void enmirage_es5503_map(address_map &map);
+	void enmirage_es5503_map(address_map &map) ATTR_COLD;
 
 	void init_mirage();
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 	static void floppy_formats(format_registration &fr);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void coefficients_w(offs_t offset, uint8_t data);
 
 private:
@@ -135,9 +135,9 @@ private:
 	void mirage_via_write_portb(uint8_t data);
 	uint8_t mirage_adc_read();
 
-	void mirage_map(address_map &map);
+	void mirage_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<mc6809e_device> m_maincpu;
 	memory_share_creator<uint8_t> m_sample_ram;

@@ -257,8 +257,8 @@ public:
 	void ncr5380(device_t *device);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m68020_device> m_maincpu;
@@ -295,12 +295,12 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sun3_timer);
 
-	void sun3_mem(address_map &map);
-	void vmetype0space_map(address_map &map);
-	void vmetype0space_novram_map(address_map &map);
-	void vmetype1space_map(address_map &map);
-	void vmetype2space_map(address_map &map);
-	void vmetype3space_map(address_map &map);
+	void sun3_mem(address_map &map) ATTR_COLD;
+	void vmetype0space_map(address_map &map) ATTR_COLD;
+	void vmetype0space_novram_map(address_map &map) ATTR_COLD;
+	void vmetype1space_map(address_map &map) ATTR_COLD;
+	void vmetype2space_map(address_map &map) ATTR_COLD;
+	void vmetype3space_map(address_map &map) ATTR_COLD;
 
 	uint32_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;

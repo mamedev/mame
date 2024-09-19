@@ -123,8 +123,8 @@ public:
 	void punkshot(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// memory pointers
 	optional_shared_ptr<uint16_t> m_spriteram;
@@ -213,16 +213,16 @@ protected:
 	K052109_CB_MEMBER(tmnt_tile_callback);
 	K052109_CB_MEMBER(blswhstl_tile_callback);
 
-	void blswhstl_main_map(address_map &map);
-	void lgtnfght_audio_map(address_map &map);
-	void lgtnfght_main_map(address_map &map);
-	void punkshot_audio_map(address_map &map);
-	void punkshot_main_map(address_map &map);
-	void ssriders_audio_map(address_map &map);
-	void ssriders_main_map(address_map &map);
-	void thndrx2_audio_map(address_map &map);
-	void thndrx2_main_map(address_map &map);
-	void tmnt2_main_map(address_map &map);
+	void blswhstl_main_map(address_map &map) ATTR_COLD;
+	void lgtnfght_audio_map(address_map &map) ATTR_COLD;
+	void lgtnfght_main_map(address_map &map) ATTR_COLD;
+	void punkshot_audio_map(address_map &map) ATTR_COLD;
+	void punkshot_main_map(address_map &map) ATTR_COLD;
+	void ssriders_audio_map(address_map &map) ATTR_COLD;
+	void ssriders_main_map(address_map &map) ATTR_COLD;
+	void thndrx2_audio_map(address_map &map) ATTR_COLD;
+	void thndrx2_main_map(address_map &map) ATTR_COLD;
+	void tmnt2_main_map(address_map &map) ATTR_COLD;
 };
 
 class glfgreat_state : public tmnt2_state
@@ -245,8 +245,8 @@ private:
 	TILE_GET_INFO_MEMBER(glfgreat_get_roz_tile_info);
 	DECLARE_VIDEO_START(glfgreat);
 
-	void glfgreat_audio_map(address_map &map);
-	void glfgreat_main_map(address_map &map);
+	void glfgreat_audio_map(address_map &map) ATTR_COLD;
+	void glfgreat_main_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<4> m_analog_controller;
 
@@ -267,7 +267,7 @@ public:
 	void prmrsocr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void prmrsocr_sound_irq_w(uint16_t data);
@@ -280,8 +280,8 @@ private:
 	DECLARE_VIDEO_START(prmrsocr);
 	K05324X_CB_MEMBER(prmrsocr_sprite_callback);
 
-	void prmrsocr_audio_map(address_map &map);
-	void prmrsocr_main_map(address_map &map);
+	void prmrsocr_audio_map(address_map &map) ATTR_COLD;
+	void prmrsocr_main_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_audiobank;
 
@@ -299,14 +299,14 @@ public:
 	void sunsetbl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void irq_enable_w(u8 data);
 	void sunsetbl_vblank_w(int state);
 	K052109_CB_MEMBER(ssbl_tile_callback);
 
-	void sunsetbl_main_map(address_map &map);
+	void sunsetbl_main_map(address_map &map) ATTR_COLD;
 
 	bool m_irq_enable = false;
 };

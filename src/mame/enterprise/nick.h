@@ -69,16 +69,16 @@ public:
 
 	auto virq_wr_callback() { return m_write_virq.bind(); }
 
-	virtual void vram_map(address_map &map);
-	virtual void vio_map(address_map &map);
+	virtual void vram_map(address_map &map) ATTR_COLD;
+	virtual void vio_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void nick_map(address_map &map);
+	void nick_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

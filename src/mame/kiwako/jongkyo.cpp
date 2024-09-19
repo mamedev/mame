@@ -61,8 +61,8 @@ public:
 	void init_jongkyo();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// misc
@@ -92,9 +92,9 @@ private:
 	uint8_t input_2p_r();
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void decrypted_opcodes_map(address_map &map);
-	void memmap(address_map &map);
-	void portmap(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void memmap(address_map &map) ATTR_COLD;
+	void portmap(address_map &map) ATTR_COLD;
 };
 
 

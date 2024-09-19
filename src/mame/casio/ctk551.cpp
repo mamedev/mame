@@ -268,10 +268,10 @@ public:
 	void apo_w(int state);
 
 private:
-	void ap10_map(address_map& map);
-	void ctk530_map(address_map& map);
-	void gz70sp_map(address_map& map);
-	void ctk601_map(address_map& map);
+	void ap10_map(address_map &map) ATTR_COLD;
+	void ctk530_map(address_map &map) ATTR_COLD;
+	void gz70sp_map(address_map &map) ATTR_COLD;
+	void ctk601_map(address_map &map) ATTR_COLD;
 
 	virtual void driver_start() override;
 

@@ -40,7 +40,7 @@ public:
 	void b16(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
@@ -64,8 +64,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void b16_io(address_map &map);
-	void b16_map(address_map &map);
+	void b16_io(address_map &map) ATTR_COLD;
+	void b16_map(address_map &map) ATTR_COLD;
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])

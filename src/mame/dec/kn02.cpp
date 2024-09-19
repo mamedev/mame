@@ -100,8 +100,8 @@ protected:
 	void cfb_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -117,7 +117,7 @@ private:
 	optional_device<bt459_device> m_bt459;
 	required_device<am79c90_device> m_lance;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u8 *m_vrom_ptr;
 };

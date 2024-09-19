@@ -65,9 +65,9 @@ public:
 	void ax80(machine_config &config);
 
 private:
-	void ax80_map(address_map &map);
+	void ax80_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<upd7810_device> m_maincpu;
 };
 

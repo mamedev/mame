@@ -76,9 +76,9 @@ public:
 	void rng_dual(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* devices */
@@ -156,8 +156,8 @@ private:
 
 	INTERRUPT_GEN_MEMBER(rng_interrupt);
 
-	void rungun_map(address_map &map);
-	void rungun_sound_map(address_map &map);
+	void rungun_map(address_map &map) ATTR_COLD;
+	void rungun_sound_map(address_map &map) ATTR_COLD;
 };
 
 

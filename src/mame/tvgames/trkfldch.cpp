@@ -67,12 +67,12 @@ public:
 	{ }
 
 	void trkfldch(machine_config &config);
-	void vectors_map(address_map &map);
+	void vectors_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual uint8_t unkregs_r(offs_t offset);
 	virtual void unkregs_w(offs_t offset, uint8_t data);
@@ -92,7 +92,7 @@ private:
 	void render_text_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base);
 	void render_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int which);
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void trkfldch_map(address_map &map);
+	void trkfldch_map(address_map &map) ATTR_COLD;
 
 	uint8_t read_vector(offs_t offset);
 
@@ -149,8 +149,8 @@ public:
 
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t unkregs_r(offs_t offset) override;
 	void unkregs_w(offs_t offset, uint8_t data) override;

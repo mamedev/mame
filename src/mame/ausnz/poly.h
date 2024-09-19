@@ -90,13 +90,13 @@ public:
 
 	void init_poly();
 
-	virtual void poly_bank(address_map &map);
+	virtual void poly_bank(address_map &map) ATTR_COLD;
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void poly_mem(address_map &map);
+	void poly_mem(address_map &map) ATTR_COLD;
 
 	uint8_t logical_mem_r(offs_t offset);
 	void logical_mem_w(offs_t offset, uint8_t data);

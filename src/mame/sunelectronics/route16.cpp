@@ -184,9 +184,9 @@ private:
 	void stratvox_dac_w(uint8_t data);
 	DECLARE_MACHINE_START(speakres);
 
-	void speakres_cpu1_map(address_map &map);
-	void stratvox_cpu1_map(address_map &map);
-	void stratvox_cpu2_map(address_map &map);
+	void speakres_cpu1_map(address_map &map) ATTR_COLD;
+	void stratvox_cpu1_map(address_map &map) ATTR_COLD;
+	void stratvox_cpu2_map(address_map &map) ATTR_COLD;
 
 	required_device<sn76477_device> m_sn;
 	required_device<dac_byte_interface> m_dac;

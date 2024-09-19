@@ -57,7 +57,7 @@ public:
 	void mouseatk(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_shared_ptr<uint16_t> m_vram;
 
@@ -78,7 +78,7 @@ protected:
 
 private:
 	// Memory maps
-	void mouseatk_map(address_map &map);
+	void mouseatk_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -99,8 +99,8 @@ public:
 	void maletmad(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_ioport_array<2> m_gun_axis_x;
@@ -140,9 +140,9 @@ private:
 	void sound_bank_w(uint8_t data);
 
 	// Memory maps
-	void tickee_map(address_map &map);
-	void ghoshunt_map(address_map &map);
-	void rapidfir_map(address_map &map);
+	void tickee_map(address_map &map) ATTR_COLD;
+	void ghoshunt_map(address_map &map) ATTR_COLD;
+	void rapidfir_map(address_map &map) ATTR_COLD;
 };
 
 

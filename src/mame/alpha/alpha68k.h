@@ -126,9 +126,9 @@ protected:
 	DECLARE_MACHINE_START(alpha68k_II);
 	DECLARE_MACHINE_RESET(alpha68k_II);
 	void video_bank_w(u8 data);
-	void alpha68k_II_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
+	void alpha68k_II_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 
 	u16 alpha_II_trigger_r(offs_t offset);
 
@@ -170,8 +170,8 @@ public:
 protected:
 	DECLARE_MACHINE_START(alpha68k_V);
 	DECLARE_MACHINE_RESET(alpha68k_V);
-	void alpha68k_III_map(address_map &map);
-	void alpha68k_V_map(address_map &map);
+	void alpha68k_III_map(address_map &map) ATTR_COLD;
+	void alpha68k_V_map(address_map &map) ATTR_COLD;
 	u16 alpha_V_trigger_r(offs_t offset);
 };
 
@@ -255,7 +255,7 @@ public:
 	{}
 
 protected:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void base_config(machine_config &config);
 	void video_config(machine_config &config, u8 tile_transchar, u8 tile_bankshift, bool is_super_stingray);
@@ -264,8 +264,8 @@ protected:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u16 kyros_alpha_trigger_r(offs_t offset);
-	void sound_map(address_map &map);
-	void sound_iomap(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_iomap(address_map &map) ATTR_COLD;
 
 private:
 	u16 m_tile_transchar = 0U;
@@ -294,8 +294,8 @@ private:
 	u8 alpha8511_rw_r();
 	void alpha8511_control_w(u8 data);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs48_cpu_device> m_alpha8511;
 	u8 m_alpha8511_address = 0U;
@@ -327,9 +327,9 @@ public:
 	void init_jongbou2();
 
 private:
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_iomap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_iomap(address_map &map) ATTR_COLD;
 	u16 dial_inputs_r();
 };
 
@@ -366,8 +366,8 @@ public:
 	void init_paddlema();
 
 private:
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class thenextspace_state : public alpha68k_I_state
@@ -381,9 +381,9 @@ public:
 	void init_tnextspc();
 
 private:
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_iomap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_iomap(address_map &map) ATTR_COLD;
 
 	void tnextspc_coin_counters_w(offs_t offset, u16 data);
 	void tnextspc_unknown_w(offs_t offset, u16 data);

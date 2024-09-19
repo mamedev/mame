@@ -117,12 +117,12 @@ public:
 	void coco_sound(machine_config &config);
 	void coco_floating(machine_config &config);
 
-	void coco_floating_map(address_map &map);
+	void coco_floating_map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// changed handlers
 	virtual void pia1_pa_changed(uint8_t data);

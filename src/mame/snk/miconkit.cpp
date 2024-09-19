@@ -73,7 +73,7 @@ public:
 	void smiconk(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -86,10 +86,10 @@ private:
 
 	u8 m_select = 0;
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
-	void smiconk_main_map(address_map &map);
-	void smiconk_io_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void smiconk_main_map(address_map &map) ATTR_COLD;
+	void smiconk_io_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

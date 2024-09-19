@@ -51,7 +51,7 @@ public:
 	void cncchess3(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -60,7 +60,7 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void main_comm_w(u8 data);

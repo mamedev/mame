@@ -107,7 +107,7 @@ public:
 	void init_lvcardsa();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
@@ -123,9 +123,9 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void io_map(address_map &map);
-	void lvcards_map(address_map &map);
-	void lvcardsa_decrypted_opcodes_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void lvcards_map(address_map &map) ATTR_COLD;
+	void lvcardsa_decrypted_opcodes_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -141,16 +141,16 @@ public:
 	void ponttehk(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void control_port_2_w(uint8_t data);
 	void control_port_2a_w(uint8_t data);
 	uint8_t payout_r();
 
-	void lvpoker_map(address_map &map);
-	void ponttehk_map(address_map &map);
+	void lvpoker_map(address_map &map) ATTR_COLD;
+	void ponttehk_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_in2;
 

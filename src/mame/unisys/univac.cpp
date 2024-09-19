@@ -158,7 +158,7 @@ public:
 	void uts20(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 ram_r(offs_t offset);
@@ -185,10 +185,10 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void uts10_io_map(address_map &map);
-	void uts10_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void uts10_io_map(address_map &map) ATTR_COLD;
+	void uts10_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device>     m_maincpu;
 	required_device<nvram_device>   m_nvram;

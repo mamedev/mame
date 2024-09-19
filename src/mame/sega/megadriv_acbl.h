@@ -30,7 +30,7 @@ public:
 protected:
 	uint16_t dsw_r(offs_t offset);
 
-	void md_bootleg_map(address_map &map);
+	void md_bootleg_map(address_map &map) ATTR_COLD;
 
 private:
 	void aladmdb_w(uint16_t data);
@@ -83,10 +83,10 @@ public:
 	void init_barekch();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void ssf2mdb_68k_map(address_map &map);
+	void ssf2mdb_68k_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SEGA_MEGADRIV_ACBL_H

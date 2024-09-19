@@ -92,10 +92,10 @@ private:
 	u32 screen_update_meritum1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_meritum2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void mem_map2(address_map &map);
-	void io_map2(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map2(address_map &map) ATTR_COLD;
+	void io_map2(address_map &map) ATTR_COLD;
 	void mainppi_portb_w(u8);
 	void mainppi_portc_w(u8);
 

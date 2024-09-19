@@ -123,8 +123,8 @@ public:
 	void ccs2422(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	u8 port04_r();
 	u8 port34_r();
@@ -157,9 +157,9 @@ private:
 
 	void port40_w(u8 data);
 
-	void ccs2422_io(address_map &map);
-	void ccs2810_io(address_map &map);
-	void ccs2810_mem(address_map &map);
+	void ccs2422_io(address_map &map) ATTR_COLD;
+	void ccs2810_io(address_map &map) ATTR_COLD;
+	void ccs2810_mem(address_map &map) ATTR_COLD;
 
 	u8 m_power_on_status = 0U;
 };
@@ -176,12 +176,12 @@ public:
 	void ccs300(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
-	void ccs300_io(address_map &map);
-	void ccs300_mem(address_map &map);
+	void ccs300_io(address_map &map) ATTR_COLD;
+	void ccs300_mem(address_map &map) ATTR_COLD;
 	void port40_w(u8 data);
 	required_shared_ptr<u8> m_ram1;
 	required_memory_bank    m_bank1;

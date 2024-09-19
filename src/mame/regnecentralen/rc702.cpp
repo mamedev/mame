@@ -67,8 +67,8 @@ public:
 	void rc702(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t memory_read_byte(offs_t offset);
@@ -86,8 +86,8 @@ private:
 	void rc702_palette(palette_device &palette) const;
 	void kbd_put(u8 data);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	bool m_q_state = false;
 	bool m_qbar_state = false;

@@ -124,19 +124,19 @@ private:
 	void reset_int_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_outtimer);
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	void audio_command_w(u8 data);
 	u8 audio_command_r();
 
-	void locomotp_data(address_map &map);
-	void locomotp_io(address_map &map);
-	void locomotp_map(address_map &map);
-	void zac_1_data(address_map &map);
-	void zac_1_io(address_map &map);
-	void zac_1_map(address_map &map);
-	void audio_data(address_map &map);
-	void audio_io(address_map &map);
+	void locomotp_data(address_map &map) ATTR_COLD;
+	void locomotp_io(address_map &map) ATTR_COLD;
+	void locomotp_map(address_map &map) ATTR_COLD;
+	void zac_1_data(address_map &map) ATTR_COLD;
+	void zac_1_io(address_map &map) ATTR_COLD;
+	void zac_1_map(address_map &map) ATTR_COLD;
+	void audio_data(address_map &map) ATTR_COLD;
+	void audio_io(address_map &map) ATTR_COLD;
 
 	u8 m_t_c = 0U;
 	u8 m_out_offs = 0U;

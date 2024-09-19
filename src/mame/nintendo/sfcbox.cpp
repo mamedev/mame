@@ -142,8 +142,8 @@ public:
 	void sfcbox(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_bios;
@@ -159,10 +159,10 @@ private:
 	void port_83_w(uint8_t data);
 	void snes_map_0_w(uint8_t data);
 	void snes_map_1_w(uint8_t data);
-	void sfcbox_io(address_map &map);
-	void sfcbox_map(address_map &map);
-	void snes_map(address_map &map);
-	void spc_map(address_map &map);
+	void sfcbox_io(address_map &map) ATTR_COLD;
+	void sfcbox_map(address_map &map) ATTR_COLD;
+	void snes_map(address_map &map) ATTR_COLD;
+	void spc_map(address_map &map) ATTR_COLD;
 };
 
 uint32_t sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )

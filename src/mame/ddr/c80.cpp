@@ -102,7 +102,7 @@ private:
 	required_ioport m_row2;
 	output_finder<8> m_digits;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t pio1_pa_r();
 	void pio1_pa_w(uint8_t data);
@@ -116,8 +116,8 @@ private:
 	u8 m_digit = 0;
 	bool m_pio1_a5 = false;
 	u8 m_pio1_brdy = 0;
-	void c80_io(address_map &map);
-	void c80_mem(address_map &map);
+	void c80_io(address_map &map) ATTR_COLD;
+	void c80_mem(address_map &map) ATTR_COLD;
 };
 
 

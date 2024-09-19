@@ -115,7 +115,7 @@ private:
 	void ec_port17_out_w(uint8_t data);
 	void ec_port18_out_w(uint8_t data);
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
 
@@ -125,8 +125,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<stepper_device, 4> m_reel;
 	output_finder<16> m_digits;
-	void memmap(address_map &map);
-	void portmap(address_map &map);
+	void memmap(address_map &map) ATTR_COLD;
+	void portmap(address_map &map) ATTR_COLD;
 };
 
 

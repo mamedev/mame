@@ -140,11 +140,11 @@ public:
 	void zerotrgt_rearrange_gfx( int romsize, int romarea );
 	void cntsteer(machine_config &config);
 	void zerotrgt(machine_config &config);
-	void cntsteer_cpu1_map(address_map &map);
-	void cntsteer_cpu2_map(address_map &map);
-	void gekitsui_cpu1_map(address_map &map);
-	void gekitsui_cpu2_map(address_map &map);
-	void sound_map(address_map &map);
+	void cntsteer_cpu1_map(address_map &map) ATTR_COLD;
+	void cntsteer_cpu2_map(address_map &map) ATTR_COLD;
+	void gekitsui_cpu1_map(address_map &map) ATTR_COLD;
+	void gekitsui_cpu2_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

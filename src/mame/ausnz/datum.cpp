@@ -82,11 +82,11 @@ private:
 	uint8_t pa_r();
 	void pa_w(uint8_t data);
 	void pb_w(uint8_t data);
-	void datum_mem(address_map &map);
+	void datum_mem(address_map &map) ATTR_COLD;
 	uint8_t m_digit = 0U;
 	uint8_t m_seg = 0U;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 	required_device<acia6850_device> m_acia;

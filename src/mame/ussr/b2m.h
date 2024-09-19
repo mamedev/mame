@@ -60,11 +60,11 @@ private:
 	void fdc_drq(int state);
 	static void b2m_floppy_formats(format_registration &fr);
 
-	void b2m_io(address_map &map);
-	void b2m_mem(address_map &map);
-	void b2m_rom_io(address_map &map);
-	void machine_start() override;
-	void machine_reset() override;
+	void b2m_io(address_map &map) ATTR_COLD;
+	void b2m_mem(address_map &map) ATTR_COLD;
+	void b2m_rom_io(address_map &map) ATTR_COLD;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	void postload();
 	void set_bank(int bank);

@@ -18,7 +18,7 @@ public:
 	dafb_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 	virtual ~dafb_base() = default;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u32 vram_r(offs_t offset);
 	void vram_w(offs_t offset, u32 data, u32 mem_mask);
@@ -35,9 +35,9 @@ public:
 	virtual void clockgen_w(offs_t offset, u8 data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override;
 
 	void recalc_ints();
@@ -122,7 +122,7 @@ public:
 protected:
 	dafb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_device<m68000_musashi_device> m_maincpu;
@@ -135,7 +135,7 @@ public:
 	dafb_q950_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual u32 ramdac_r(offs_t offset) override;
@@ -151,7 +151,7 @@ public:
 	dafb_memc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual u8 clockgen_r(offs_t offset) override;
@@ -171,7 +171,7 @@ public:
 	dafb_memcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual u8 clockgen_r(offs_t offset) override;

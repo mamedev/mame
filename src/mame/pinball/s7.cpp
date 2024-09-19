@@ -114,8 +114,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(diag_coin);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_timer);
 
@@ -144,7 +144,7 @@ private:
 	void pia30_ca2_w(int state) { m_io_outputs[19] = state; } //ST4
 	void pia30_cb2_w(int state) { m_io_outputs[18] = state; } //ST3
 	void pia_irq(int state);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	u8 m_strobe = 0U;
 	u8 m_row = 0U;

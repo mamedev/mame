@@ -76,8 +76,8 @@ public:
 	void senterp(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<hd6301y0_cpu_device> m_maincpu;
@@ -89,7 +89,7 @@ protected:
 	emu_timer *m_standbytimer;
 	u8 m_inp_mux = 0;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	u8 input1_r();
@@ -124,7 +124,7 @@ public:
 	void senterpc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<lc7580_device> m_lcd;

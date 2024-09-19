@@ -49,8 +49,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(int_button);
 
 private:
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 	void porta_w(u8);
 	void portc_w(u8);
@@ -67,7 +67,7 @@ private:
 	u16 m_irqs = 0U;
 	bool m_dlart_maintmode = 0;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<t11_device> m_maincpu;
 	required_device<i8255_device> m_ppi;

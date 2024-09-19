@@ -76,14 +76,14 @@ protected:
 	void karatour_vblank_irq(int state);
 	void puzzlet_vblank_irq(int state);
 
-	void balcube_map(address_map &map);
-	void bangball_map(address_map &map);
-	void batlbubl_map(address_map &map);
-	void cpu_space_map(address_map &map);
-	void daitoa_map(address_map &map);
-	void msgogo_map(address_map &map);
-	void puzzlet_map(address_map &map);
-	void ymf278_map(address_map &map);
+	void balcube_map(address_map &map) ATTR_COLD;
+	void bangball_map(address_map &map) ATTR_COLD;
+	void batlbubl_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
+	void daitoa_map(address_map &map) ATTR_COLD;
+	void msgogo_map(address_map &map) ATTR_COLD;
+	void puzzlet_map(address_map &map) ATTR_COLD;
+	void ymf278_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -133,7 +133,7 @@ public:
 	int custom_soundstatus_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void sound_data_w(u8 data);
@@ -148,18 +148,18 @@ private:
 
 	int rxd_r();
 
-	void daitorid_map(address_map &map);
-	void dharma_map(address_map &map);
-	void karatour_map(address_map &map);
-	void kokushi_map(address_map &map);
-	void lastforg_map(address_map &map);
-	void lastfort_map(address_map &map);
-	void pangpoms_map(address_map &map);
-	void poitto_map(address_map &map);
-	void pururun_map(address_map &map);
-	void skyalert_map(address_map &map);
-	void toride2g_map(address_map &map);
-	void upd7810_map(address_map &map);
+	void daitorid_map(address_map &map) ATTR_COLD;
+	void dharma_map(address_map &map) ATTR_COLD;
+	void karatour_map(address_map &map) ATTR_COLD;
+	void kokushi_map(address_map &map) ATTR_COLD;
+	void lastforg_map(address_map &map) ATTR_COLD;
+	void lastfort_map(address_map &map) ATTR_COLD;
+	void pangpoms_map(address_map &map) ATTR_COLD;
+	void poitto_map(address_map &map) ATTR_COLD;
+	void pururun_map(address_map &map) ATTR_COLD;
+	void skyalert_map(address_map &map) ATTR_COLD;
+	void toride2g_map(address_map &map) ATTR_COLD;
+	void upd7810_map(address_map &map) ATTR_COLD;
 
 	// sound related
 	u8   m_sound_data = 0;
@@ -186,7 +186,7 @@ public:
 	void gakusai(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u16 input_r();
@@ -200,10 +200,10 @@ private:
 
 	void oki_bank_set();
 
-	void dokyusei_map(address_map &map);
-	void dokyusp_map(address_map &map);
-	void gakusai2_map(address_map &map);
-	void gakusai_map(address_map &map);
+	void dokyusei_map(address_map &map) ATTR_COLD;
+	void dokyusp_map(address_map &map) ATTR_COLD;
+	void gakusai2_map(address_map &map) ATTR_COLD;
+	void gakusai_map(address_map &map) ATTR_COLD;
 
 	// devices
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -230,7 +230,7 @@ public:
 	void vmetal(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// vmetal
@@ -238,7 +238,7 @@ private:
 	void es8712_reset_w(u8 data);
 	void es8712_irq(int state);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<es8712_device> m_essnd;
@@ -260,14 +260,14 @@ public:
 	void mouja(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void irq_timer_ctrl_w(u16 data);
 	void sound_rombank_w(u8 data);
 
-	void main_map(address_map &map);
-	void oki_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(mouja_irq);
 
@@ -293,7 +293,7 @@ public:
 	void gstrik2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void audiobank_w(u8 data);
@@ -306,9 +306,9 @@ private:
 	DECLARE_VIDEO_START(gstrik2);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<gfxdecode_device> m_gfxdecode;

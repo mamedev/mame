@@ -107,7 +107,7 @@ public:
 	void dbldyn(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -149,12 +149,12 @@ private:
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, uint32_t pri_mask);
 
 	void vblank_irq(int state);
-	void master_map(address_map &map);
-	void masterj_map(address_map &map);
-	void sei80bu_encrypted_full_map(address_map &map);
-	void slave_map(address_map &map);
-	void sound_decrypted_opcodes_map(address_map &map);
-	void sound_map(address_map &map);
+	void master_map(address_map &map) ATTR_COLD;
+	void masterj_map(address_map &map) ATTR_COLD;
+	void sei80bu_encrypted_full_map(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
+	void sound_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -76,9 +76,9 @@ public:
 
 protected:
 	virtual void device_post_load() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void copy_from_nvram();
 	u32 m_current_table_address;
@@ -189,8 +189,8 @@ private:
 		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
 		int transparency, int transparent_color,
 		int scalex, int scaley);
-	void cps3_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
+	void cps3_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_CAPCOM_CPS3_H

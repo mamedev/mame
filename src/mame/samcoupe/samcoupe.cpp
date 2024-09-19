@@ -87,9 +87,9 @@ public:
 	void samcoupe(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -185,10 +185,10 @@ private:
 	uint8_t mem_block_d_r(offs_t offset);
 	void mem_block_d_w(offs_t offset, uint8_t data);
 
-	void mem_map_base(address_map &map);
-	void mem_map(address_map &map);
-	void io_map_base(address_map &map);
-	void io_map(address_map &map);
+	void mem_map_base(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map_base(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	int m_pages; // total internal memory pages (16 or 32)
 };

@@ -128,14 +128,14 @@ public:
 	void init_vpainter();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void socrates_mem(address_map &map);
-	void socrates_io(address_map &map);
-	void socrates_rambank_map(address_map &map);
-	void socrates_rombank_map(address_map &map);
+	void socrates_mem(address_map &map) ATTR_COLD;
+	void socrates_io(address_map &map) ATTR_COLD;
+	void socrates_rambank_map(address_map &map) ATTR_COLD;
+	void socrates_rombank_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
@@ -222,7 +222,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( send_input );
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -231,10 +231,10 @@ private:
 	void video_regs_w(offs_t offset, uint8_t data);
 	uint8_t status_r();
 
-	void iqunlimz_io(address_map &map);
-	void iqunlimz_mem(address_map &map);
-	void iqunlimz_rambank_map(address_map &map);
-	void iqunlimz_rombank_map(address_map &map);
+	void iqunlimz_io(address_map &map) ATTR_COLD;
+	void iqunlimz_mem(address_map &map) ATTR_COLD;
+	void iqunlimz_rambank_map(address_map &map) ATTR_COLD;
+	void iqunlimz_rombank_map(address_map &map) ATTR_COLD;
 
 	int get_color(int index, int y);
 

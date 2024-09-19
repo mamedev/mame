@@ -110,7 +110,7 @@ public:
 	void speedbsk(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -123,10 +123,10 @@ private:
 	output_finder<24> m_lamps;
 	output_finder<> m_start_lamp;
 
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
-	void audio_io_map(address_map &map);
-	void pcm_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void pcm_map(address_map &map) ATTR_COLD;
 
 	void lcd_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);

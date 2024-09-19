@@ -453,12 +453,12 @@ private:
 	void draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int category);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ramdac_map(address_map &map);
-	void sfbonus_io(address_map &map);
-	void sfbonus_map(address_map &map);
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void sfbonus_io(address_map &map) ATTR_COLD;
+	void sfbonus_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

@@ -59,12 +59,12 @@ public:
 	void slam_w(int state);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint8_t videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, uint8_t data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
@@ -95,7 +95,7 @@ private:
 	void tape_set_audio(int track, int bon);
 	void tape_set_motor(int bon);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 class thief_state : public sharkatt_state
@@ -111,7 +111,7 @@ public:
 	void thief(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_region_ptr<uint8_t> m_blitrom;
@@ -142,7 +142,7 @@ private:
 
 	uint16_t fetch_image_addr();
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

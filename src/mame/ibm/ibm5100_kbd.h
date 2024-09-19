@@ -26,8 +26,8 @@ protected:
 
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_matrix_keyboard_interface implementation
 	virtual void key_make(u8 row, u8 column) override;

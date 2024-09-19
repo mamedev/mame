@@ -37,8 +37,8 @@ public:
 	void start_tx(uint8_t dev, bool s_align, bool d_align, bool blitting_opt);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	devcb_read16 m_in_mreq_cb;
 	devcb_write16 m_out_mreq_cb;

@@ -166,8 +166,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<hmcs40_cpu_device> m_maincpu;
@@ -2429,7 +2429,7 @@ public:
 	void cdkong(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<filter_volume_device> m_volume;
@@ -3352,7 +3352,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(game_speed);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cop411_cpu_device> m_audiocpu;
 

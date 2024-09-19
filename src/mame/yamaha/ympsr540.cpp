@@ -50,9 +50,9 @@ private:
 
 	u16 m_pe, m_led, m_scan;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 	u16 adc_sustain_r();
 	u16 adc_midisw_r();

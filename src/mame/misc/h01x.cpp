@@ -56,12 +56,12 @@ public:
 	void h01jce(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void h01x_mem_map(address_map &map);
-	void h01x_io_map(address_map &map);
+	void h01x_mem_map(address_map &map) ATTR_COLD;
+	void h01x_io_map(address_map &map) ATTR_COLD;
 
 	uint8_t mem_0000_r(offs_t offset);
 	void mem_0000_w(uint8_t data);

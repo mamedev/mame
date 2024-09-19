@@ -54,8 +54,8 @@ public:
 	void design6(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i8051_device> m_maincpu;
@@ -63,9 +63,9 @@ private:
 	required_device<roc10937_device> m_vfd;
 	required_ioport_array<4> m_buttons;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void iobanked_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void iobanked_map(address_map &map) ATTR_COLD;
 
 	void port1_w(uint8_t data);
 	uint8_t in2_r();

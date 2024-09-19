@@ -287,8 +287,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(accel_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u8 ram0000_r(offs_t offset);
 	void ram0000_w(offs_t offset, u8 data);
@@ -394,13 +394,13 @@ public:
 	void tk3000(machine_config &config);
 	void apple2ee(machine_config &config);
 	void apple2eepal(machine_config &config);
-	void apple2c_map(address_map &map);
-	void apple2c_memexp_map(address_map &map);
-	void base_map(address_map &map);
-	void laser128_map(address_map &map);
-	void ace500_map(address_map &map);
-	void ace2200_map(address_map &map);
-	void spectred_keyb_map(address_map &map);
+	void apple2c_map(address_map &map) ATTR_COLD;
+	void apple2c_memexp_map(address_map &map) ATTR_COLD;
+	void base_map(address_map &map) ATTR_COLD;
+	void laser128_map(address_map &map) ATTR_COLD;
+	void ace500_map(address_map &map) ATTR_COLD;
+	void ace2200_map(address_map &map) ATTR_COLD;
+	void spectred_keyb_map(address_map &map) ATTR_COLD;
 	void init_laser128();
 	void init_128ex();
 	void init_pal();

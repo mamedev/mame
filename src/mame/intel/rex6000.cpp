@@ -93,8 +93,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(sec_timer);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -111,9 +111,9 @@ protected:
 	uint8_t touchscreen_r(offs_t offset);
 	void touchscreen_w(offs_t offset, uint8_t data);
 
-	void rex6000_banked_map(address_map &map);
-	void rex6000_io(address_map &map);
-	void rex6000_mem(address_map &map);
+	void rex6000_banked_map(address_map &map) ATTR_COLD;
+	void rex6000_io(address_map &map) ATTR_COLD;
+	void rex6000_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -163,12 +163,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_on_irq);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_oz750);
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_oz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void oz750(machine_config &config);
-	void oz750_banked_map(address_map &map);
-	void oz750_io(address_map &map);
+	void oz750_banked_map(address_map &map) ATTR_COLD;
+	void oz750_io(address_map &map) ATTR_COLD;
 private:
 	int oz_wzd_extract_tag(const std::vector<uint8_t> &data, const char *tag, char *dest_buf);
 

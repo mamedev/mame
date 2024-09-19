@@ -31,10 +31,10 @@ private:
 	void asn_w(u8 data);
 	void g_w(u8 data);
 
-	void master_prog(address_map &map);
-	void master_ext(address_map &map);
-	void slave_prog(address_map &map);
-	void slave_ext(address_map &map);
+	void master_prog(address_map &map) ATTR_COLD;
+	void master_ext(address_map &map) ATTR_COLD;
+	void slave_prog(address_map &map) ATTR_COLD;
+	void slave_ext(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_master;
 	required_device<mcs51_cpu_device> m_slave;

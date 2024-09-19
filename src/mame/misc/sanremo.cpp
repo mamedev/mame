@@ -127,7 +127,7 @@ public:
 	void sanremo(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -145,9 +145,9 @@ private:
 	void lamps_w(uint8_t data);
 	void sanremo_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void number1_map(address_map &map);
-	void roadstar_map(address_map &map);
-	void sanremo_portmap(address_map &map);
+	void number1_map(address_map &map) ATTR_COLD;
+	void roadstar_map(address_map &map) ATTR_COLD;
+	void sanremo_portmap(address_map &map) ATTR_COLD;
 };
 
 

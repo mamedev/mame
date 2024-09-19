@@ -89,8 +89,8 @@ public:
 	void init_applix();
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	u16 applix_inputs_r();
 	void palette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void analog_latch_w(u16 data);
@@ -135,11 +135,11 @@ private:
 	u8 m_palette_latch[4]{};
 	required_shared_ptr<u16> m_base;
 
-	void main_mem(address_map &map);
-	void keytronic_pc3270_io(address_map &map);
-	void keytronic_pc3270_program(address_map &map);
-	void sub_io(address_map &map);
-	void sub_mem(address_map &map);
+	void main_mem(address_map &map) ATTR_COLD;
+	void keytronic_pc3270_io(address_map &map) ATTR_COLD;
+	void keytronic_pc3270_program(address_map &map) ATTR_COLD;
+	void sub_io(address_map &map) ATTR_COLD;
+	void sub_mem(address_map &map) ATTR_COLD;
 
 	u8 m_pb = 0U;
 	u8 m_analog_latch = 0U;

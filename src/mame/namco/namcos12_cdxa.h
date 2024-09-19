@@ -27,7 +27,7 @@ public:
 
 	auto psx_int10_callback() { return m_psx_int10_cb.bind(); }
 
-	void psx_map(address_map &map);
+	void psx_map(address_map &map) ATTR_COLD;
 
 	uint32_t sh2_ram_r(offs_t offset);
 	void sh2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -50,12 +50,12 @@ public:
 	void cdrom_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	void sh7014_map(address_map &map);
+	void sh7014_map(address_map &map) ATTR_COLD;
 
 	void audio_dac_w(int state);
 

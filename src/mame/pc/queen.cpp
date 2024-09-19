@@ -60,11 +60,11 @@ private:
 	void bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void intel82439tx_init();
-	void queen_io(address_map &map);
-	void queen_map(address_map &map);
+	void queen_io(address_map &map) ATTR_COLD;
+	void queen_map(address_map &map) ATTR_COLD;
 
 	uint8_t mtxc_config_r(int function, int reg);
 	void mtxc_config_w(int function, int reg, uint8_t data);

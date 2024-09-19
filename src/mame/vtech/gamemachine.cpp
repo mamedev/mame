@@ -127,7 +127,7 @@ public:
 	void gamemach(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -142,8 +142,8 @@ private:
 	u8 m_seg_data = 0;
 	u8 m_sound_data = 0;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	void update_display();
 	void mux1_w(u8 data);

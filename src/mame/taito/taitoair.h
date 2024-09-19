@@ -133,9 +133,9 @@ private:
 	void dsp_flags_w(offs_t offset, u16 data);
 	void dma_regs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset);
@@ -146,10 +146,10 @@ private:
 	void fill_slope(bitmap_ind16 &bitmap, const rectangle &cliprect, u16 header, s32 x1, s32 x2, s32 sl1, s32 sl2, s32 y1, s32 y2, s32 *nx1, s32 *nx2);
 	void fill_poly(bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q);
 
-	void DSP_map_data(address_map &map);
-	void DSP_map_program(address_map &map);
-	void airsys_map(address_map &map);
-	void sound_map(address_map &map);
+	void DSP_map_data(address_map &map) ATTR_COLD;
+	void DSP_map_program(address_map &map) ATTR_COLD;
+	void airsys_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TAITO_TAITOAIR_H

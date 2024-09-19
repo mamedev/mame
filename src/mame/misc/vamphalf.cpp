@@ -151,11 +151,11 @@ public:
 
 	void banked_oki(int chip);
 
-	void common_map(address_map &map);
-	void common_32bit_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void common_32bit_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	u32 m_flip_bit;
 	u8 m_palshift;
@@ -212,18 +212,18 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void handle_flipped_visible_area(screen_device &screen);
-	void aoh_io(address_map &map);
-	void aoh_map(address_map &map);
-	void banked_oki_map(address_map &map);
-	void boonggab_io(address_map &map);
-	void coolmini_io(address_map &map);
-	void jmpbreak_io(address_map &map);
-	void worldadv_io(address_map &map);
-	void mrdig_io(address_map &map);
-	void mrkicker_io(address_map &map);
-	void solitaire_io(address_map &map);
-	void suplup_io(address_map &map);
-	void vamphalf_io(address_map &map);
+	void aoh_io(address_map &map) ATTR_COLD;
+	void aoh_map(address_map &map) ATTR_COLD;
+	void banked_oki_map(address_map &map) ATTR_COLD;
+	void boonggab_io(address_map &map) ATTR_COLD;
+	void coolmini_io(address_map &map) ATTR_COLD;
+	void jmpbreak_io(address_map &map) ATTR_COLD;
+	void worldadv_io(address_map &map) ATTR_COLD;
+	void mrdig_io(address_map &map) ATTR_COLD;
+	void mrkicker_io(address_map &map) ATTR_COLD;
+	void solitaire_io(address_map &map) ATTR_COLD;
+	void suplup_io(address_map &map) ATTR_COLD;
+	void vamphalf_io(address_map &map) ATTR_COLD;
 };
 
 class vamphalf_qdsp_state : public vamphalf_state
@@ -251,10 +251,10 @@ private:
 
 	void yorijori_eeprom_w(u32 data);
 
-	void misncrft_io(address_map &map);
-	void wyvernwg_io(address_map &map);
-	void yorijori_32bit_map(address_map &map);
-	void yorijori_io(address_map &map);
+	void misncrft_io(address_map &map) ATTR_COLD;
+	void wyvernwg_io(address_map &map) ATTR_COLD;
+	void yorijori_32bit_map(address_map &map) ATTR_COLD;
+	void yorijori_io(address_map &map) ATTR_COLD;
 };
 
 class vamphalf_nvram_state : public vamphalf_state
@@ -274,8 +274,8 @@ public:
 
 private:
 
-	void finalgdr_io(address_map &map);
-	void mrkickera_io(address_map &map);
+	void finalgdr_io(address_map &map) ATTR_COLD;
+	void mrkickera_io(address_map &map) ATTR_COLD;
 
 	required_device<nvram_device> m_nvram;
 

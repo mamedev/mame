@@ -31,10 +31,10 @@ public:
 private:
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void char_map(address_map &map);
-	void attr_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void char_map(address_map &map) ATTR_COLD;
+	void attr_map(address_map &map) ATTR_COLD;
 
 	required_device<z180_device> m_maincpu;
 	required_device<scn2674_device> m_avdc;

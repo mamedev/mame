@@ -109,7 +109,7 @@ public:
 	ioport_value power_r() { return m_power ? 1 : 0; }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { m_power = true; }
 
 private:
@@ -126,8 +126,8 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_select = 0;
 
-	void vip_map(address_map &map);
-	void svip_map(address_map &map);
+	void vip_map(address_map &map) ATTR_COLD;
+	void svip_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);

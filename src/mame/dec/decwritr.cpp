@@ -66,10 +66,10 @@ private:
 	uint8_t la120_DC305_r(offs_t offset);
 	void la120_DC305_w(offs_t offset, uint8_t data);
 
-	void la120_io(address_map &map);
-	void la120_mem(address_map &map);
+	void la120_io(address_map &map) ATTR_COLD;
+	void la120_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	//virtual void machine_reset();
 
 	required_device<cpu_device> m_maincpu;

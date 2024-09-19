@@ -108,8 +108,8 @@ public:
 	void konamigq(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	emu_timer *m_dma_timer;
@@ -144,10 +144,10 @@ private:
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_drq(int state);
 
-	void konamigq_dasp_map(address_map &map);
-	void konamigq_k054539_map(address_map &map);
-	void konamigq_map(address_map &map);
-	void konamigq_sound_map(address_map &map);
+	void konamigq_dasp_map(address_map &map) ATTR_COLD;
+	void konamigq_k054539_map(address_map &map) ATTR_COLD;
+	void konamigq_map(address_map &map) ATTR_COLD;
+	void konamigq_sound_map(address_map &map) ATTR_COLD;
 };
 
 /* EEPROM */

@@ -359,8 +359,8 @@ public:
 
 protected:
 	virtual void device_post_load() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	/* devices */
@@ -395,11 +395,11 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs, int chip);
 	void parse_control();
 	u32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip);
-	void darius2_master_map(address_map &map);
-	void darius2_slave_map(address_map &map);
-	void ninjaw_master_map(address_map &map);
-	void ninjaw_slave_map(address_map &map);
-	void sound_map(address_map &map);
+	void darius2_master_map(address_map &map) ATTR_COLD;
+	void darius2_slave_map(address_map &map) ATTR_COLD;
+	void ninjaw_master_map(address_map &map) ATTR_COLD;
+	void ninjaw_slave_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

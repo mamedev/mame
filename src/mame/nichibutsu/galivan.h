@@ -48,7 +48,7 @@ public:
 	void init_youmab();
 
 protected:
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	void galivan_common(machine_config &config);
 	void video_config(machine_config &config);
@@ -112,11 +112,11 @@ private:
 	required_device<filter_biquad_device> m_ymfilter;
 	memory_bank_creator m_rombank;
 
-	void galivan_map(address_map &map);
-	void ninjemak_io_map(address_map &map);
-	void ninjemak_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void galivan_map(address_map &map) ATTR_COLD;
+	void ninjemak_io_map(address_map &map) ATTR_COLD;
+	void ninjemak_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class dangarj_state : public galivan_state
@@ -132,7 +132,7 @@ public:
 private:
 	required_device<nb1412m2_device> m_prot;
 
-	void dangarj_io_map(address_map &map);
+	void dangarj_io_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NICHIBUTSU_GALIVAN_H

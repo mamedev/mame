@@ -77,8 +77,8 @@ public:
 	IRQ_CALLBACK_MEMBER(interrupt_vector);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void int_enable_w(int state);
 
@@ -134,15 +134,15 @@ private:
 	void shuffle_audio(machine_config &config);
 	void tornbase_audio(machine_config &config);
 
-	void blueshrk_io_map(address_map &map);
-	void checkmat_io_map(address_map &map);
-	void dogpatch_io_map(address_map &map);
-	void invad2ct_io_map(address_map &map);
-	void main_map(address_map &map);
-	void maze_io_map(address_map &map);
-	void phantom2_io_map(address_map &map);
-	void shuffle_io_map(address_map &map);
-	void tornbase_io_map(address_map &map);
+	void blueshrk_io_map(address_map &map) ATTR_COLD;
+	void checkmat_io_map(address_map &map) ATTR_COLD;
+	void dogpatch_io_map(address_map &map) ATTR_COLD;
+	void invad2ct_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void maze_io_map(address_map &map) ATTR_COLD;
+	void phantom2_io_map(address_map &map) ATTR_COLD;
+	void shuffle_io_map(address_map &map) ATTR_COLD;
+	void tornbase_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -168,13 +168,13 @@ public:
 	ioport_value erase_input_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void explosion_lamp_w(u8 data);
 	void periscope_lamp_w(u8 data);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_erase_sw;
 	required_ioport m_erase_dip;
@@ -199,7 +199,7 @@ public:
 private:
 	void io_w(offs_t offset, u8 data);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<gunfight_audio_device> m_soundboard;
 };
@@ -218,15 +218,15 @@ public:
 	void m4(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 reversible_shift_result_r();
 	void reversible_shift_count_w(u8 data);
 
-	void boothill_io_map(address_map &map);
-	void gmissile_io_map(address_map &map);
-	void m4_io_map(address_map &map);
+	void boothill_io_map(address_map &map) ATTR_COLD;
+	void gmissile_io_map(address_map &map) ATTR_COLD;
+	void m4_io_map(address_map &map) ATTR_COLD;
 
 	u8 m_rev_shift_res = 0;
 };
@@ -254,10 +254,10 @@ public:
 	ioport_value dip_sw_0_1_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<2> m_gun_port;
 	required_ioport_array<2> m_dip_sw_0_1;
@@ -286,7 +286,7 @@ public:
 	ioport_value dplay_pitch_right_input_r();
 
 private:
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_l_pitch;
 	required_ioport m_r_pitch;
@@ -309,11 +309,11 @@ public:
 	ioport_value controller_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void clowns_io_map(address_map &map);
-	void spacwalk_io_map(address_map &map);
+	void clowns_io_map(address_map &map) ATTR_COLD;
+	void spacwalk_io_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<2> m_controllers;
 	u8 m_controller_select = 0;
@@ -332,14 +332,14 @@ public:
 	void spcenctr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void io_w(offs_t offset, u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<spcenctr_audio_device> m_soundboard;
 	u8 m_trench_width = 0;
@@ -366,7 +366,7 @@ protected:
 	void zzzap_common(machine_config &config);
 
 private:
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -395,7 +395,7 @@ public:
 	ioport_value invaders_in2_control_r();
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 	bool is_cabinet_cocktail();
 
@@ -407,7 +407,7 @@ protected:
 	uint8_t m_flip_screen = 0;
 
 private:
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 class bowler_state : public mw8080bw_state
@@ -435,7 +435,7 @@ public:
 	void bowler(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	output_finder<> m_200_left_light;
@@ -465,7 +465,7 @@ private:
 
 	void audio(machine_config &config);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 

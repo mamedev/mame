@@ -94,8 +94,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void segbank_w(offs_t offset, u8 data);
@@ -106,7 +106,7 @@ private:
 	void u4b_w(u8 data);
 	void u5a_w(u8 data);
 	void nmi_w(int state);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	bool m_dispclk = false;
 	bool m_lampclk = false;

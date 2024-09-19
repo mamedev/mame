@@ -190,7 +190,7 @@ public:
 	ioport_value controls_r();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -222,10 +222,10 @@ private:
 	MC6845_UPDATE_ROW(ssingles_update_row);
 	MC6845_UPDATE_ROW(atamanot_update_row);
 
-	void atamanot_io_map(address_map &map);
-	void atamanot_map(address_map &map);
-	void ssingles_io_map(address_map &map);
-	void ssingles_map(address_map &map);
+	void atamanot_io_map(address_map &map) ATTR_COLD;
+	void atamanot_map(address_map &map) ATTR_COLD;
+	void ssingles_io_map(address_map &map) ATTR_COLD;
+	void ssingles_map(address_map &map) ATTR_COLD;
 };
 
 //fake palette

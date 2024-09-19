@@ -36,7 +36,7 @@ public:
 	void storming(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -74,11 +74,11 @@ private:
 	int draw_layer_daikaiju(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int *previd, int type);
 	void drawbg(bitmap_ind16 &bitmap, const rectangle &cliprect, int type);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t priority);
-	void daikaiju_map(address_map &map);
-	void daikaiju_sound_map(address_map &map);
-	void lsasquad_map(address_map &map);
-	void lsasquad_sound_map(address_map &map);
-	void storming_map(address_map &map);
+	void daikaiju_map(address_map &map) ATTR_COLD;
+	void daikaiju_sound_map(address_map &map) ATTR_COLD;
+	void lsasquad_map(address_map &map) ATTR_COLD;
+	void lsasquad_sound_map(address_map &map) ATTR_COLD;
+	void storming_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TAITO_LSASQAD_H

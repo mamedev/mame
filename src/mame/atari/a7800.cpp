@@ -145,9 +145,9 @@ protected:
 	uint8_t riot_console_button_r();
 	void riot_button_pullup_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void a7800_mem(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void a7800_mem(address_map &map) ATTR_COLD;
 
 	int m_lines;
 	int m_ispal;

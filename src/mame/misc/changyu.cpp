@@ -87,16 +87,16 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void palette_init(palette_device &palette) const;
 
-	void main_map(address_map &map);
-	void main2_map(address_map &map);
-	void prog2_map(address_map &map);
-	void ext2_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main2_map(address_map &map) ATTR_COLD;
+	void prog2_map(address_map &map) ATTR_COLD;
+	void ext2_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	tilemap_t *m_bg_tilemap{};
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void videoram_w(offs_t offset, u8 data);
 };

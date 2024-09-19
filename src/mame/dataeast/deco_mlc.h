@@ -41,8 +41,8 @@ public:
 	void stadhr96(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -99,7 +99,7 @@ private:
 		int scalex, int srcline, int shadowMode);
 	void descramble_sound();
 
-	void avengrgs_map(address_map &map);
-	void decomlc_146_map(address_map &map);
-	void decomlc_no146_map(address_map &map);
+	void avengrgs_map(address_map &map) ATTR_COLD;
+	void decomlc_146_map(address_map &map) ATTR_COLD;
+	void decomlc_no146_map(address_map &map) ATTR_COLD;
 };

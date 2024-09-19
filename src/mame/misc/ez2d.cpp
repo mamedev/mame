@@ -98,8 +98,8 @@ public:
 private:
 	required_device<pentium2_device> m_maincpu;
 
-	void ez2d_map(address_map &map);
-	void ez2d_io(address_map &map);
+	void ez2d_map(address_map &map) ATTR_COLD;
+	void ez2d_io(address_map &map) ATTR_COLD;
 
 	static void winbond_superio_config(device_t *device);
 };

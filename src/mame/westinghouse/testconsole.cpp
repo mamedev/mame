@@ -99,8 +99,8 @@ private:
 			dsp->cu_w(1);
 	}
 
-	void io_map(address_map &map);
-	void program_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 
 	required_device_array<dl1416_device, 4> m_dsp;
 	output_finder<16> m_digit;

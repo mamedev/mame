@@ -99,11 +99,11 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void abc80_mem(address_map &map);
-	void abc80_io(address_map &map);
+	void abc80_mem(address_map &map) ATTR_COLD;
+	void abc80_io(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(scanline_tick);
 	TIMER_CALLBACK_MEMBER(cassette_update);
@@ -213,9 +213,9 @@ public:
 	void tkn80_video(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
 	virtual void draw_scanline(bitmap_rgb32 &bitmap, int y) override;
 	virtual offs_t get_videoram_addr() override;
@@ -229,7 +229,7 @@ protected:
 	uint8_t in3_r();
 	uint8_t in4_r();
 
-	void tkn80_io(address_map &map);
+	void tkn80_io(address_map &map) ATTR_COLD;
 
 	required_memory_region m_rom_e;
 	memory_share_creator<uint8_t> m_char_ram;

@@ -48,7 +48,7 @@ public:
 	void init_ts802();
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	uint8_t port00_r() { return 0x80; };
 	uint8_t port0c_r() { return 1; };
 	uint8_t port0e_r() { return 0; };
@@ -62,8 +62,8 @@ private:
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
 	void kbd_put(u8 data);
-	void ts802_io(address_map &map);
-	void ts802_mem(address_map &map);
+	void ts802_io(address_map &map) ATTR_COLD;
+	void ts802_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_term_data = 0;
 	address_space *m_mem = nullptr;

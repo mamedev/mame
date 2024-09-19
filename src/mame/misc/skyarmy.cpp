@@ -53,8 +53,8 @@ public:
 	void skyarmy(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -81,8 +81,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(nmi_source);
-	void skyarmy_io_map(address_map &map);
-	void skyarmy_map(address_map &map);
+	void skyarmy_io_map(address_map &map) ATTR_COLD;
+	void skyarmy_map(address_map &map) ATTR_COLD;
 };
 
 void skyarmy_state::machine_start()

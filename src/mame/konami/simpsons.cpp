@@ -133,13 +133,13 @@ public:
 	void simpsons(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void bank0000_map(address_map &map);
-	void bank2000_map(address_map &map);
-	void main_map(address_map &map);
-	void z80_map(address_map &map);
+	void bank0000_map(address_map &map) ATTR_COLD;
+	void bank2000_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void z80_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(dma_start);
 	TIMER_CALLBACK_MEMBER(dma_end);

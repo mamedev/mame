@@ -76,8 +76,8 @@ protected:
 	void mr_common();
 	void ms_common();
 	void taito_ay_audio(machine_config &config);
-	void audio_map(address_map &map);
-	void audio_map2(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void audio_map2(address_map &map) ATTR_COLD;
 	u8 pia_pb_r();
 	u8 m_sndcmd = 0x3eU;
 	required_device<m6802_cpu_device> m_audiocpu;
@@ -103,16 +103,16 @@ public:
 	void shock(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
 	void pia_pb_w(u8 data);
 	void pia_cb2_w(int state);
 	void votrax_request(int state);
-	void shock_main_map(address_map &map);
-	void shock_audio_map(address_map &map);
-	void main_map(address_map &map);
+	void shock_main_map(address_map &map) ATTR_COLD;
+	void shock_audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	u8 m_votrax_cmd = 0U;
 	u8 m_io[32]{};
@@ -132,10 +132,10 @@ public:
 	void taitoz(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void mrblkz80_mem_map(address_map &map);
-	void mrblkz80_io_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void mrblkz80_mem_map(address_map &map) ATTR_COLD;
+	void mrblkz80_io_map(address_map &map) ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z);
 	void z80_col_w(u8);
 	void z80_disp_w(u8);

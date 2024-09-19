@@ -66,7 +66,7 @@ public:
 	void smondialb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
@@ -82,8 +82,8 @@ protected:
 	u8 m_board_mux = 0;
 
 	// address maps
-	void smondialb_mem(address_map &map);
-	void smondial2_mem(address_map &map);
+	void smondialb_mem(address_map &map) ATTR_COLD;
+	void smondial2_mem(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	template<int N> void lcd_output_w(u32 data);
@@ -115,7 +115,7 @@ public:
 	void smondiala(machine_config &config);
 
 private:
-	void smondiala_mem(address_map &map);
+	void smondiala_mem(address_map &map) ATTR_COLD;
 
 	// led row/column is switched around, do a trampoline here instead of making a different .lay file
 	virtual void led_w(u8 data) override { smondialb_state::led_w(bitswap<8>(data, 7,6,3,2,5,4,1,0)); }

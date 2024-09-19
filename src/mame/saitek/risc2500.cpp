@@ -86,8 +86,8 @@ public:
 	void montreux(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<arm_cpu_device> m_maincpu;
@@ -110,7 +110,7 @@ private:
 	u32 m_prev_pc = 0;
 	u64 m_prev_cycle = 0;
 
-	void risc2500_mem(address_map &map);
+	void risc2500_mem(address_map &map) ATTR_COLD;
 
 	void lcd_palette(palette_device &palette) const;
 	SED1520_UPDATE_CB(screen_update_cb);

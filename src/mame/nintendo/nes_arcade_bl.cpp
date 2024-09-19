@@ -70,8 +70,8 @@ public:
 	void smb3bl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<rp2a03_device> m_maincpu;
@@ -94,10 +94,10 @@ private:
 	void in0_w(u8 data);
 	void set_mirroring(int mirroring);
 	void reg_w(offs_t offset, u8 data);
-	void nes_cpu_map(address_map &map);
-	void nes_ppu_map(address_map &map);
-	void timer_prg_map(address_map &map);
-	void timer_io_map(address_map &map);
+	void nes_cpu_map(address_map &map) ATTR_COLD;
+	void nes_ppu_map(address_map &map) ATTR_COLD;
+	void timer_prg_map(address_map &map) ATTR_COLD;
+	void timer_io_map(address_map &map) ATTR_COLD;
 };
 
 

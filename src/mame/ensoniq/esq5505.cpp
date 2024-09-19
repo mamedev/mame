@@ -238,8 +238,8 @@ public:
 	void esq5505_otis_irq(int state);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m68000_device> m_maincpu;
@@ -277,13 +277,13 @@ private:
 
 	static void floppy_formats(format_registration &fr);
 
-	void eps_map(address_map &map);
-	void sq1_map(address_map &map);
-	void vfx_map(address_map &map);
-	void vfxsd_map(address_map &map);
+	void eps_map(address_map &map) ATTR_COLD;
+	void sq1_map(address_map &map) ATTR_COLD;
+	void vfx_map(address_map &map) ATTR_COLD;
+	void vfxsd_map(address_map &map) ATTR_COLD;
 
-	void cpu_space_map(address_map &map);
-	void eps_cpu_space_map(address_map &map);
+	void cpu_space_map(address_map &map) ATTR_COLD;
+	void eps_cpu_space_map(address_map &map) ATTR_COLD;
 
 	uint16_t m_analog_values[8];
 

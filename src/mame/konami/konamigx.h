@@ -187,14 +187,14 @@ public:
 	void tbyahhoo(machine_config &config);
 	void gokuparo(machine_config &config);
 	void sexyparo(machine_config &config);
-	void gx_base_memmap(address_map &map);
-	void racinfrc_map(address_map &map);
-	void gx_type1_map(address_map &map);
-	void gx_type2_map(address_map &map);
-	void gx_type3_map(address_map &map);
-	void gx_type4_map(address_map &map);
-	void gxsndmap(address_map &map);
-	void gxtmsmap(address_map &map);
+	void gx_base_memmap(address_map &map) ATTR_COLD;
+	void racinfrc_map(address_map &map) ATTR_COLD;
+	void gx_type1_map(address_map &map) ATTR_COLD;
+	void gx_type2_map(address_map &map) ATTR_COLD;
+	void gx_type3_map(address_map &map) ATTR_COLD;
+	void gx_type4_map(address_map &map) ATTR_COLD;
+	void gxsndmap(address_map &map) ATTR_COLD;
+	void gxtmsmap(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<cpu_device> m_maincpu;

@@ -22,8 +22,8 @@ protected:
 	void key_make(u8 row, u8 column) override;
 	void key_break(u8 row, u8 column) override;
 
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 	ioport_constructor device_input_ports() const override;
 

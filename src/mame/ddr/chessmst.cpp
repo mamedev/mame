@@ -64,7 +64,7 @@ public:
 	void chessmsta(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -77,8 +77,8 @@ private:
 	u16 m_matrix = 0;
 	u8 m_led_data[2] = { 0, 0 };
 
-	void chessmst_io(address_map &map);
-	void chessmst_mem(address_map &map);
+	void chessmst_io(address_map &map) ATTR_COLD;
+	void chessmst_mem(address_map &map) ATTR_COLD;
 
 	void pio1_port_a_w(u8 data);
 	void pio1_port_b_w(u8 data);

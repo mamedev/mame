@@ -26,9 +26,9 @@ public:
 	uint8_t status_r();
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	uint16_t start_address() const { return ((m_crtc_reg[0x0c] << 8) & 0x3f00) | (m_crtc_reg[0x0d] & 0xff); }
 
@@ -57,7 +57,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(dmd_firq);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void decodmd2_map(address_map &map);
+	void decodmd2_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(DECODMD2, decodmd_type2_device)

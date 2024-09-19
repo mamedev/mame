@@ -103,14 +103,14 @@ public:
 	void init_area51a();
 
 protected:
-	void console_base_map(address_map &map);
-	void console_base_gpu_map(address_map &map);
+	void console_base_map(address_map &map) ATTR_COLD;
+	void console_base_gpu_map(address_map &map) ATTR_COLD;
 
 	// device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void sound_start() override;
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	virtual void device_postload();
 
 	void video_config(machine_config &config, const XTAL clock);
@@ -274,16 +274,16 @@ private:
 
 	std::pair<std::error_condition, std::string> quickload_cb(snapshot_image_device &image);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
-	void cpu_space_map(address_map &map);
-	void dsp_map(address_map &map);
-	void dsp_rom_map(address_map &map);
-	void gpu_map(address_map &map);
-	void gpu_rom_map(address_map &map);
-	void jag_gpu_dsp_map(address_map &map);
-	void jaguar_map(address_map &map);
-	void m68020_map(address_map &map);
-	void r3000_map(address_map &map);
-	void r3000_rom_map(address_map &map);
+	void cpu_space_map(address_map &map) ATTR_COLD;
+	void dsp_map(address_map &map) ATTR_COLD;
+	void dsp_rom_map(address_map &map) ATTR_COLD;
+	void gpu_map(address_map &map) ATTR_COLD;
+	void gpu_rom_map(address_map &map) ATTR_COLD;
+	void jag_gpu_dsp_map(address_map &map) ATTR_COLD;
+	void jaguar_map(address_map &map) ATTR_COLD;
+	void m68020_map(address_map &map) ATTR_COLD;
+	void r3000_map(address_map &map) ATTR_COLD;
+	void r3000_rom_map(address_map &map) ATTR_COLD;
 
 	void gpu_suspend() { m_gpu->suspend(SUSPEND_REASON_SPIN, 1); }
 	void gpu_resume() { m_gpu->resume(SUSPEND_REASON_SPIN); }
@@ -384,7 +384,7 @@ public:
 	void init_jaguarcd();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t butch_regs_r16(offs_t offset);
@@ -394,8 +394,8 @@ private:
 
 	uint32_t cd_bios_r(offs_t offset);
 
-	void jaguarcd_map(address_map &map);
-	void jagcd_gpu_dsp_map(address_map &map);
+	void jaguarcd_map(address_map &map) ATTR_COLD;
+	void jagcd_gpu_dsp_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cdrom_image_device> m_cdrom;

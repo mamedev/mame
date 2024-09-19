@@ -177,8 +177,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void aristmk7_io(address_map &map);
-	void aristmk7_map(address_map &map);
+	void aristmk7_io(address_map &map) ATTR_COLD;
+	void aristmk7_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -31,7 +31,7 @@ public:
 	void init_xevios();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_xevious_sr1;
 	required_shared_ptr<uint8_t> m_xevious_sr2;
@@ -58,7 +58,7 @@ protected:
 	void xevious_bs_w(offs_t offset, uint8_t data);
 	uint8_t xevious_bb_r(offs_t offset);
 
-	void xevious_map(address_map &map);
+	void xevious_map(address_map &map) ATTR_COLD;
 };
 
 class battles_state : public xevious_state
@@ -74,13 +74,13 @@ public:
 
 protected:
 	virtual void driver_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void interrupt_4(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_generate);
 
-	void battles_mem4(address_map &map);
+	void battles_mem4(address_map &map) ATTR_COLD;
 
 	// Custom I/O
 	uint8_t customio0_r();

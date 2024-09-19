@@ -167,7 +167,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	void amuzy_map(address_map &map);
+	void amuzy_map(address_map &map) ATTR_COLD;
 
 	u16 status_r(offs_t offset);
 	void status_w(offs_t offset, u16 data, u16 mem_mask = ~0);

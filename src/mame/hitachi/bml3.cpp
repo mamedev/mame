@@ -102,9 +102,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
 
 private:
-	void bml3_mem(address_map &map);
-	void bml3mk2_mem(address_map &map);
-	void bml3mk5_mem(address_map &map);
+	void bml3_mem(address_map &map) ATTR_COLD;
+	void bml3mk2_mem(address_map &map) ATTR_COLD;
+	void bml3mk5_mem(address_map &map) ATTR_COLD;
 	uint8_t mc6845_r(offs_t offset);
 	void mc6845_w(offs_t offset, u8 data);
 	uint8_t keyboard_r();
@@ -153,8 +153,8 @@ private:
 	bool m_cassbit = 0;
 	bool m_cassold = 0;
 	u8 m_cass_data[4]{};
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	void m6845_change_clock(u8 setting);
 	u8 m_crtc_index = 0U;
 	std::unique_ptr<u8[]> m_vram;

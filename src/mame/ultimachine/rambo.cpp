@@ -41,11 +41,11 @@ public:
 	void rambo(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void rambo_prg_map(address_map &map);
-	void rambo_data_map(address_map &map);
+	void rambo_prg_map(address_map &map) ATTR_COLD;
+	void rambo_data_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_port_a = 0;
 	required_device<atmega2560_device> m_maincpu;

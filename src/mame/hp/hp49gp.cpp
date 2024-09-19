@@ -47,8 +47,8 @@ private:
 	required_device<s3c2410_device> m_s3c2410;
 	required_shared_ptr<uint32_t> m_steppingstone;
 	lcd_spi_t m_lcd_spi;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t s3c2410_gpio_port_r(offs_t offset);
 	void s3c2410_gpio_port_w(offs_t offset, uint32_t data);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
@@ -57,7 +57,7 @@ private:
 	void lcd_spi_line_w( int line, int data);
 	int lcd_spi_line_r( int line);
 	required_device<cpu_device> m_maincpu;
-	void hp49gp_map(address_map &map);
+	void hp49gp_map(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************

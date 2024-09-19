@@ -117,7 +117,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(trace_timer);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_cass_data[4]{};
 	uint8_t m_segment = 0U;
@@ -125,7 +125,7 @@ private:
 	uint8_t m_keydata = 0U;
 	bool m_cassbit = 0;
 	bool m_cassold = 0;
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_s;
 	required_device<pia6821_device> m_pia_u;

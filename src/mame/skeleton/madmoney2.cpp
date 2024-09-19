@@ -60,7 +60,7 @@ public:
 	void madmoney2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<m68705p3_device> m_maincpu;

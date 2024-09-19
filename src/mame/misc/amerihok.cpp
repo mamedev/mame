@@ -41,8 +41,8 @@ public:
 	void amerihok(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void control_w(u8 data);
 	void p2_w(u8 data);
@@ -50,8 +50,8 @@ private:
 
 	required_device<z8_device> m_maincpu;
 	required_device<okim6376_device> m_oki;
-	void amerihok_data_map(address_map &map);
-	void amerihok_map(address_map &map);
+	void amerihok_data_map(address_map &map) ATTR_COLD;
+	void amerihok_map(address_map &map) ATTR_COLD;
 
 	u32 m_outputs[2]{};
 	u8 m_old_p2 = 0U;

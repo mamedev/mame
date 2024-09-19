@@ -101,8 +101,8 @@ public:
 	void splndrbt(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -134,7 +134,7 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void copy_bg(bitmap_ind16 &dst_bitmap, const rectangle &cliprect);
 
-	void splndrbt_map(address_map &map);
+	void splndrbt_map(address_map &map) ATTR_COLD;
 
 	void unpack_block(const char *region, int offset, int size);
 	void unpack_region(const char *region);

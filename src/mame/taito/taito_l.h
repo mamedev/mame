@@ -211,7 +211,7 @@ private:
 	void bankg_w(u8 data);
 	int m_horshoes_gfxbank = 0;
 
-	void horshoes_map(address_map &map);
+	void horshoes_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TAITO_TAITO_L_H

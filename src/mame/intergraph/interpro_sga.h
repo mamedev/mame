@@ -13,7 +13,7 @@ public:
 
 	auto berr_callback() { return m_berr_func.bind(); }
 
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 
 	u32 gcsr_r() { return m_gcsr; }
 	void gcsr_w(u32 data) { m_gcsr = data; }
@@ -136,8 +136,8 @@ public:
 	void dcksum1_w(u32 data) { m_dcksum1 = data; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u32 m_gcsr;        // general control/status

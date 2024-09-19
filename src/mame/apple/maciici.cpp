@@ -77,8 +77,8 @@ public:
 	void maciisi(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m68030_device> m_maincpu;
@@ -124,7 +124,7 @@ private:
 
 	uint32_t rom_switch_r(offs_t offset);
 
-	void maciici_map(address_map &map);
+	void maciici_map(address_map &map) ATTR_COLD;
 
 	u16 scc_r(offs_t offset)
 	{

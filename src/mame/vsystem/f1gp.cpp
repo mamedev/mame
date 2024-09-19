@@ -130,13 +130,13 @@ protected:
 	void gfxctrl_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void f1gp_cpu2_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void f1gp_cpu2_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 private:
 	// memory pointers
@@ -152,9 +152,9 @@ private:
 	uint32_t screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_f1gpbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void f1gpbl_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void f1gp_cpu1_map(address_map &map);
-	void f1gpbl_cpu1_map(address_map &map);
-	void f1gpbl_cpu2_map(address_map &map);
+	void f1gp_cpu1_map(address_map &map) ATTR_COLD;
+	void f1gpbl_cpu1_map(address_map &map) ATTR_COLD;
+	void f1gpbl_cpu2_map(address_map &map) ATTR_COLD;
 };
 
 class f1gp2_state : public f1gp_state
@@ -168,8 +168,8 @@ public:
 	void f1gp2(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// video-related
@@ -183,7 +183,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_roz_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void f1gp2_cpu1_map(address_map &map);
+	void f1gp2_cpu1_map(address_map &map) ATTR_COLD;
 };
 
 

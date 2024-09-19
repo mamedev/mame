@@ -95,8 +95,8 @@ public:
 	void init_palmz22();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -115,7 +115,7 @@ private:
 	uint32_t s3c2410_core_pin_r(offs_t offset);
 	uint32_t s3c2410_adc_data_r(offs_t offset);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 

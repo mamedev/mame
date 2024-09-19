@@ -68,8 +68,8 @@ public:
 	void aces1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	int m_input_strobe = 0;
@@ -236,8 +236,8 @@ private:
 
 	TIMER_CALLBACK_MEMBER(m_aces1_irq_timer_callback);
 	TIMER_CALLBACK_MEMBER(m_aces1_nmi_timer_callback);
-	void aces1_map(address_map &map);
-	void aces1_portmap(address_map &map);
+	void aces1_map(address_map &map) ATTR_COLD;
+	void aces1_portmap(address_map &map) ATTR_COLD;
 };
 
 

@@ -60,7 +60,7 @@ public:
 	void nwk_voodoo_1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	uint32_t dsp_comm_sharc_r(int board, int offset);
 	void dsp_comm_sharc_w(int board, int offset, uint32_t data);

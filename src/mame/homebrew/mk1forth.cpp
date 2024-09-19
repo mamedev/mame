@@ -44,9 +44,9 @@ public:
 	void mk1forth(machine_config &config);
 
 private:
-	void ucode_map(address_map &map);
-	void data_map(address_map &map);
-	void stack_map(address_map &map);
+	void ucode_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
+	void stack_map(address_map &map) ATTR_COLD;
 };
 
 void mk1forth_state::ucode_map(address_map &map)

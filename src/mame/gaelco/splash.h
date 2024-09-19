@@ -89,7 +89,7 @@ protected:
 	//roldfrog and funystrp specific
 	void sound_bank_w(uint8_t data);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	DECLARE_MACHINE_START(splash);
 	DECLARE_MACHINE_START(roldfrog);
 	DECLARE_MACHINE_RESET(splash);
@@ -104,12 +104,12 @@ protected:
 	INTERRUPT_GEN_MEMBER(roldfrog_interrupt);
 	void roldfrog_update_irq(  );
 
-	void funystrp_sound_map(address_map &map);
-	void roldfrog_map(address_map &map);
-	void roldfrog_sound_io_map(address_map &map);
-	void roldfrog_sound_map(address_map &map);
-	void splash_map(address_map &map);
-	void splash_sound_map(address_map &map);
+	void funystrp_sound_map(address_map &map) ATTR_COLD;
+	void roldfrog_map(address_map &map) ATTR_COLD;
+	void roldfrog_sound_io_map(address_map &map) ATTR_COLD;
+	void roldfrog_sound_map(address_map &map) ATTR_COLD;
+	void splash_map(address_map &map) ATTR_COLD;
+	void splash_sound_map(address_map &map) ATTR_COLD;
 };
 
 class funystrp_state : public splash_state
@@ -132,7 +132,7 @@ public:
 	void init_ringball();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint16_t spr_read(offs_t offset);
@@ -151,9 +151,9 @@ private:
 	uint32_t screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void funystrp_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void funystrp_map(address_map &map);
-	void funystrp_sound_io_map(address_map &map);
-	void ringball_map(address_map &map);
+	void funystrp_map(address_map &map) ATTR_COLD;
+	void funystrp_sound_io_map(address_map &map) ATTR_COLD;
+	void ringball_map(address_map &map) ATTR_COLD;
 
 	required_device<msm5205_device> m_msm1;
 	required_device<msm5205_device> m_msm2;

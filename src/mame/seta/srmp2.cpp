@@ -145,7 +145,7 @@ private:
 	void srmp3_flags_w(uint8_t data);
 	void srmp3_irq_ack_w(uint8_t data);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	DECLARE_MACHINE_START(srmp2);
 	void srmp2_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(srmp3);
@@ -159,12 +159,12 @@ private:
 
 	uint8_t iox_key_matrix_calc(uint8_t p_side);
 
-	void mjyuugi_map(address_map &map);
-	void rmgoldyh_io_map(address_map &map);
-	void rmgoldyh_map(address_map &map);
-	void srmp2_map(address_map &map);
-	void srmp3_io_map(address_map &map);
-	void srmp3_map(address_map &map);
+	void mjyuugi_map(address_map &map) ATTR_COLD;
+	void rmgoldyh_io_map(address_map &map) ATTR_COLD;
+	void rmgoldyh_map(address_map &map) ATTR_COLD;
+	void srmp2_map(address_map &map) ATTR_COLD;
+	void srmp3_io_map(address_map &map) ATTR_COLD;
+	void srmp3_map(address_map &map) ATTR_COLD;
 };
 
 

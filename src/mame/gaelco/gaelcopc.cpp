@@ -49,7 +49,7 @@ public:
 	void gaelcopc(machine_config &config);
 
 private:
-	void gaelcopc_map(address_map &map);
+	void gaelcopc_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<pentium3_device> m_maincpu;

@@ -101,9 +101,9 @@ private:
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_device<ls259_device> m_latch;
-	void decrypted_opcodes_map(address_map &map);
-	void jrpacmbl_map(address_map &map);
-	void pengo_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void jrpacmbl_map(address_map &map) ATTR_COLD;
+	void pengo_map(address_map &map) ATTR_COLD;
 };
 
 

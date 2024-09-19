@@ -69,11 +69,11 @@ protected:
 	void exidy440_update_firq();
 	void exidy440_bank_select(uint8_t bank);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void exidy440_video(machine_config &config);
-	void exidy440_map(address_map &map);
+	void exidy440_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_imageram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -117,7 +117,7 @@ protected:
 	void topsecex_yscroll_w(uint8_t data);
 	uint32_t screen_update_topsecex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t m_topsecex_yscroll = 0U;

@@ -76,10 +76,10 @@ private:
 	void segment_w(uint8_t data);
 	void digit_w(uint8_t data);
 	uint8_t keyboard_r();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_digit = 0U;
 	uint8_t m_seg = 0U;

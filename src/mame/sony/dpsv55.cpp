@@ -32,7 +32,7 @@ public:
 	void dpsv55(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
@@ -40,7 +40,7 @@ private:
 	void p5_w(u8 data);
 	u8 sci_ssr0_r();
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<mb90641_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;

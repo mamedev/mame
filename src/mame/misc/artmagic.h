@@ -73,24 +73,24 @@ private:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void decrypt_cheesech();
 	void decrypt_ultennis();
 	void execute_blit();
 	void update_irq_state();
 	inline uint16_t *address_to_vram(offs_t *address);
 
-	void main_map(address_map &map);
-	void shtstar_guncpu_io_map(address_map &map);
-	void shtstar_guncpu_map(address_map &map);
-	void shtstar_map(address_map &map);
-	void shtstar_subcpu_map(address_map &map);
-	void shtstar_subcpu_vector_map(address_map &map);
-	void stonebal_map(address_map &map);
-	void stonebal_tms_map(address_map &map);
-	void tms_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void shtstar_guncpu_io_map(address_map &map) ATTR_COLD;
+	void shtstar_guncpu_map(address_map &map) ATTR_COLD;
+	void shtstar_map(address_map &map) ATTR_COLD;
+	void shtstar_subcpu_map(address_map &map) ATTR_COLD;
+	void shtstar_subcpu_vector_map(address_map &map) ATTR_COLD;
+	void stonebal_map(address_map &map) ATTR_COLD;
+	void stonebal_tms_map(address_map &map) ATTR_COLD;
+	void tms_map(address_map &map) ATTR_COLD;
 
 protected:
 	TIMER_CALLBACK_MEMBER(irq_off);

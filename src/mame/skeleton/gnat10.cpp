@@ -53,8 +53,8 @@ public:
 	void gnat10(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 mem_r(offs_t offset);
@@ -65,9 +65,9 @@ private:
 	void baud0_w(u8 data);
 	void baud1_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void video_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void video_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<fd1793_device> m_fdc;

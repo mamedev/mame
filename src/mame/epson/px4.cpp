@@ -143,12 +143,12 @@ protected:
 	void centronics_busy_w(int state) { m_centronics_busy = state; }
 	void centronics_perror_w(int state) { m_centronics_perror = state; }
 
-	void px4_io(address_map &map);
-	void px4_mem(address_map &map);
+	void px4_io(address_map &map) ATTR_COLD;
+	void px4_mem(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
@@ -280,10 +280,10 @@ private:
 	void ramdisk_data_w(uint8_t data);
 	uint8_t ramdisk_control_r();
 
-	void px4p_io(address_map &map);
+	void px4p_io(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<nvram_device> m_rdnvram;
 	required_device<generic_slot_device> m_rdsocket;

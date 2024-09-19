@@ -265,7 +265,7 @@ public:
 	{ }
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -301,7 +301,7 @@ protected:
 	void xscroll_w(uint8_t data);
 	void yscroll_w(uint8_t data);
 
-	void common_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_gfx0_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -322,8 +322,8 @@ public:
 	void witch(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_memory_bank m_mainbank;
@@ -335,9 +335,9 @@ private:
 	uint8_t prot_read_700x(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_gfx1_tile_info);
 
-	void common_map(address_map &map);
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 };
 
 class keirinou_state : public base_state
@@ -351,16 +351,16 @@ public:
 	void keirinou(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_paletteram;
 
 	uint8_t m_bg_bank = 0;
 
-	void common_map(address_map &map);
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	void a002_w(uint8_t data);
 	void palette_w(offs_t offset, uint8_t data);

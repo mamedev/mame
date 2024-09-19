@@ -66,12 +66,12 @@ public:
 	void kisssite(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void mem(address_map &map);
+	void mem(address_map &map) ATTR_COLD;
 };
 
 

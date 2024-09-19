@@ -86,7 +86,7 @@ public:
 	void shisen(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -115,10 +115,10 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_nmi);
 
-	void main_io_map(address_map &map);
-	void main_prg_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_prg_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_prg_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_prg_map(address_map &map) ATTR_COLD;
 };
 
 

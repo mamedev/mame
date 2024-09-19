@@ -115,9 +115,9 @@ public:
 	void init_pasha2();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -157,9 +157,9 @@ private:
 	u16 pasha2_speedup_r(offs_t offset);
 
 	// address maps
-	void pasha2_io(address_map &map);
-	void pasha2_map(address_map &map);
-	void zdrum_audio_map(address_map &map);
+	void pasha2_io(address_map &map) ATTR_COLD;
+	void pasha2_map(address_map &map) ATTR_COLD;
+	void zdrum_audio_map(address_map &map) ATTR_COLD;
 };
 
 

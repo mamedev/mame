@@ -65,9 +65,9 @@ public:
 	void sart3733(machine_config &config);
 
 private:
-	void sart3733_memory(address_map &map);
-	void sart3733_rom(address_map &map);
-	void sart3733_status(address_map &map);
+	void sart3733_memory(address_map &map) ATTR_COLD;
+	void sart3733_rom(address_map &map) ATTR_COLD;
+	void sart3733_status(address_map &map) ATTR_COLD;
 };
 
 

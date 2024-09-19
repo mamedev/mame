@@ -34,10 +34,10 @@ public:
 	void rec_w(int state);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t counter_state_r();
@@ -52,8 +52,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_counter_0_ff);
 	void set_counter_0_ff(int state);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<pit8253_device> m_pit;
 	required_device<timer_device> m_counter_0_timer;

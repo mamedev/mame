@@ -60,12 +60,12 @@ protected:
 	virtual void io_w(u8 data);
 	void mrsdyna_palette(palette_device &palette) const;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void cpu1_map(address_map &map);
-	void cpu2_map(address_map &map);
-	void cpu2_io_map(address_map &map);
+	void cpu1_map(address_map &map) ATTR_COLD;
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void cpu2_io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -98,7 +98,7 @@ protected:
 
 	tilemap_t *m_grid_tilemap = nullptr;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:

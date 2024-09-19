@@ -41,7 +41,7 @@ public:
 	void coco3h(machine_config &config);
 	void coco3dw1(machine_config &config);
 	void coco3(machine_config &config);
-	void coco3_mem(address_map &map);
+	void coco3_mem(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void update_cart_base(uint8_t *cart_base) override;

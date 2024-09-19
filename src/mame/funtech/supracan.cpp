@@ -138,13 +138,13 @@ public:
 	void supracan(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	uint16_t _68k_soundram_r(offs_t offset, uint16_t mem_mask = ~0);
 	void _68k_soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -282,7 +282,7 @@ private:
 
 	void set_sound_irq(uint8_t bit, uint8_t state);
 
-	void host_um6619_map(address_map &map);
+	void host_um6619_map(address_map &map) ATTR_COLD;
 	u8 m_irq_mask = 0;
 	u16 m_frc_control = 0;
 	u16 m_frc_frequency = 0;

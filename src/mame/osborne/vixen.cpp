@@ -107,8 +107,8 @@ public:
 	void init_vixen();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t status_r();
@@ -132,9 +132,9 @@ private:
 	uint8_t oprom_r(offs_t offset);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void bios_mem(address_map &map);
-	void vixen_io(address_map &map);
-	void vixen_mem(address_map &map);
+	void bios_mem(address_map &map) ATTR_COLD;
+	void vixen_io(address_map &map) ATTR_COLD;
+	void vixen_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<fd1797_device> m_fdc;

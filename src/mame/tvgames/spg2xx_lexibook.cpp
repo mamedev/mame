@@ -23,8 +23,8 @@ public:
 	void init_zeus();
 
 protected:
-	//virtual void machine_start() override;
-	//virtual void machine_reset() override;
+	//virtual void machine_start() override ATTR_COLD;
+	//virtual void machine_reset() override ATTR_COLD;
 };
 
 
@@ -38,8 +38,8 @@ public:
 	void lexiseal(machine_config& config);
 
 protected:
-	//virtual void machine_start() override;
-	//virtual void machine_reset() override;
+	//virtual void machine_start() override ATTR_COLD;
+	//virtual void machine_reset() override ATTR_COLD;
 
 	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
@@ -56,8 +56,8 @@ public:
 	void init_vsplus();
 
 protected:
-	//virtual void machine_start() override;
-	//virtual void machine_reset() override;
+	//virtual void machine_start() override ATTR_COLD;
+	//virtual void machine_reset() override ATTR_COLD;
 
 	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };

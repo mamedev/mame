@@ -69,12 +69,12 @@ private:
 	u8 port0d_r();
 	u8 portfc_r();
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_port02_data = 0U;
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_p_rom;
 	required_device_array<ay51013_device, 3> m_uart;

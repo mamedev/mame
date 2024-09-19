@@ -576,9 +576,9 @@ public:
 	required_device<screen_device> m_screen;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<ppc_device> m_maincpu;
@@ -637,9 +637,9 @@ private:
 	void init_taitotz_152();
 	void init_taitotz_111a();
 
-	void landhigh_tlcs900h_mem(address_map &map);
-	void ppc603e_mem(address_map &map);
-	void tlcs900h_mem(address_map &map);
+	void landhigh_tlcs900h_mem(address_map &map) ATTR_COLD;
+	void ppc603e_mem(address_map &map) ATTR_COLD;
+	void tlcs900h_mem(address_map &map) ATTR_COLD;
 };
 
 class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6>

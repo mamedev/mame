@@ -78,11 +78,11 @@ private:
 	void cm_ram1_w(int state);
 	void cm_ram2_w(int state);
 
-	void flicker_memory(address_map &map);
-	void flicker_ram_ports(address_map &map);
-	void flicker_rom(address_map &map);
-	void flicker_rom_ports(address_map &map);
-	void flicker_status(address_map &map);
+	void flicker_memory(address_map &map) ATTR_COLD;
+	void flicker_ram_ports(address_map &map) ATTR_COLD;
+	void flicker_rom(address_map &map) ATTR_COLD;
+	void flicker_rom_ports(address_map &map) ATTR_COLD;
+	void flicker_status(address_map &map) ATTR_COLD;
 
 	required_device<i4004_cpu_device>   m_maincpu;
 	required_ioport                     m_testport;

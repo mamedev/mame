@@ -66,10 +66,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 	std::unique_ptr<u8[]> m_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;

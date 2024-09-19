@@ -148,7 +148,7 @@ public:
 	void bup(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -157,11 +157,11 @@ private:
 	required_ioport_array<2> m_keys;
 	required_ioport m_reset;
 
-	void bup_mem(address_map &map);
-	void mm2_mem(address_map &map);
-	void mm4_mem(address_map &map);
-	void mm5p_mem(address_map &map);
-	void rebel5_mem(address_map &map);
+	void bup_mem(address_map &map) ATTR_COLD;
+	void mm2_mem(address_map &map) ATTR_COLD;
+	void mm4_mem(address_map &map) ATTR_COLD;
+	void mm5p_mem(address_map &map) ATTR_COLD;
+	void rebel5_mem(address_map &map) ATTR_COLD;
 
 	void lcd_irqack_w(u8 data);
 	u8 keys_r(offs_t offset);

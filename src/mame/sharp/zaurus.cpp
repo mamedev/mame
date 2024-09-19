@@ -1431,8 +1431,8 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -1455,7 +1455,7 @@ public:
 private:
 	virtual void device_reset_after_children() override;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<sa1110_periphs_device> m_sa_periphs;
 	required_device<locomo_device> m_locomo;
@@ -1480,7 +1480,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( system_start );
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<pxa255_periphs_device> m_pxa_periphs;
 	required_ioport m_power;

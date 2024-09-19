@@ -41,9 +41,9 @@ public:
 
 protected:
 	// device level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<i8085a_cpu_device> m_audiocpu;
@@ -67,8 +67,8 @@ private:
 	float     m_hihatvol;
 	emu_timer *m_adjuster_timer;
 
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 
 	void c0f8_w(offs_t offset, uint8_t data);
 	void cymbal_ctrl_w(uint8_t data);
@@ -114,16 +114,16 @@ public:
 
 protected:
 	// device level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(sound_irq) { m_audiocpu->set_input_line(0, HOLD_LINE); }
 };

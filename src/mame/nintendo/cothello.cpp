@@ -67,7 +67,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(insert_coin);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -82,7 +82,7 @@ private:
 	emu_timer *m_counter_timer;
 	emu_timer *m_beeper_off;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

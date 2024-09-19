@@ -117,9 +117,9 @@ private:
 	void port00_w(offs_t offset, u8 data);
 	void port06_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void machine_start() override;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 	u8 m_cass_data = 0U;
 	u8 m_last_key = 0U;

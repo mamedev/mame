@@ -90,12 +90,12 @@ private:
 	void p50b_w(u8 data);
 	void p51a_w(u8 data);
 	void p51b_w(u8 data) { };  // volume control
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_row = 0U;
 	u8 m_counter = 0U;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<m6800_cpu_device> m_v1cpu;
 	required_device<pia6821_device> m_pia51;
 	required_device<beep_device> m_beep;
@@ -114,10 +114,10 @@ public:
 private:
 	void clock_w(int state);
 	void disp_w(offs_t, u8);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<i8085a_cpu_device> m_v2cpu;
 };
 

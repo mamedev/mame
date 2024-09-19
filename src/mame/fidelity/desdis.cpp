@@ -78,7 +78,7 @@ public:
 	void init_fdes2100d();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
@@ -92,7 +92,7 @@ protected:
 	u32 m_lcd_data = 0;
 
 	// address maps
-	void fdes2100d_map(address_map &map);
+	void fdes2100d_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_lcd();
@@ -131,8 +131,8 @@ public:
 
 private:
 	// address maps
-	void fdes2265_map(address_map &map);
-	void fdes2325_map(address_map &map);
+	void fdes2265_map(address_map &map) ATTR_COLD;
+	void fdes2325_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers, slightly different (control_w is d0 instead of d7)
 	virtual void control_w(offs_t offset, u8 data) override { desdis_state::control_w(offset, data << 7); }

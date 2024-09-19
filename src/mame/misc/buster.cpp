@@ -38,9 +38,9 @@ public:
 	void coin_output_w(uint8_t data);
 	uint32_t screen_update_buster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void buster(machine_config &config);
-	void mainmap(address_map &map);
+	void mainmap(address_map &map) ATTR_COLD;
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_vram;

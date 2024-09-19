@@ -65,7 +65,7 @@ public:
 	void init_speeddrv();
 
 private:
-	void speeddrv_map(address_map &map);
+	void speeddrv_map(address_map &map) ATTR_COLD;
 
 	required_device<mediagx_device> m_maincpu;
 };

@@ -344,10 +344,10 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(update_ic24);
 
-	void mpu4_memmap(address_map &map);
-	void mpu4_memmap_characteriser(address_map &map);
-	void mpu4_memmap_bootleg_characteriser(address_map &map);
-	void mpu4_memmap_bl_characteriser_blastbank(address_map &map);
+	void mpu4_memmap(address_map &map) ATTR_COLD;
+	void mpu4_memmap_characteriser(address_map &map) ATTR_COLD;
+	void mpu4_memmap_bootleg_characteriser(address_map &map) ATTR_COLD;
+	void mpu4_memmap_bl_characteriser_blastbank(address_map &map) ATTR_COLD;
 
 	void lamp_extend_small(uint8_t data);
 	void lamp_extend_large(uint8_t data, uint8_t column, bool active);

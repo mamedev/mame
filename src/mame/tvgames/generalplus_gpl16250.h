@@ -30,7 +30,7 @@ public:
 
 	void base(machine_config &config);
 
-	void cs_map_base(address_map &map);
+	void cs_map_base(address_map &map) ATTR_COLD;
 
 	virtual uint16_t cs0_r(offs_t offset);
 	virtual void cs0_w(offs_t offset, uint16_t data);
@@ -46,8 +46,8 @@ public:
 	void cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 
 	required_device<sunplus_gcm394_base_device> m_maincpu;
@@ -86,7 +86,7 @@ public:
 
 protected:
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	int m_upperbase = 0;
@@ -108,7 +108,7 @@ public:
 
 protected:
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 };
@@ -125,7 +125,7 @@ public:
 
 protected:
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	int m_upperbase = 0;

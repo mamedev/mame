@@ -32,7 +32,7 @@ public:
 	void wy30p(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void driver_start() override;
 
 private:
@@ -44,8 +44,8 @@ private:
 	void keyboard_reset_w(u8 data);
 	u8 de00_r();
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<eeprom_serial_er5911_device> m_eeprom;
 	required_device<wyse_keyboard_port_device> m_keyboard;

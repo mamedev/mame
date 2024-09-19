@@ -371,7 +371,7 @@ private:
 	{
 		return 0;
 	}
-	void anzterm_mem(address_map &map);
+	void anzterm_mem(address_map &map) ATTR_COLD;
 };
 
 

@@ -49,7 +49,7 @@ protected:
 	void jakks_portb_w(uint16_t data);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint16_t joy_x_read();
 	uint16_t joy_y_read();

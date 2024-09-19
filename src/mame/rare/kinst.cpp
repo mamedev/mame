@@ -227,11 +227,11 @@ protected:
 	required_device<dcs_audio_2k_device> m_dcs;
 	required_device<palette_device> m_palette;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void kinst_map(address_map &map);
-	void kinst2_map(address_map &map);
+	void kinst_map(address_map &map) ATTR_COLD;
+	void kinst2_map(address_map &map) ATTR_COLD;
 
 	uint32_t ide_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ide_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -270,9 +270,9 @@ public:
 	void kinst2uk(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void kinst2uk_map(address_map &map);
+	void kinst2uk_map(address_map &map) ATTR_COLD;
 
 	uint32_t cpld_r(offs_t offset, uint32_t mem_mask);
 	void cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask);

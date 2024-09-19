@@ -192,7 +192,7 @@ public:
 
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void base(machine_config &config);
 	template <uint8_t Which> void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -240,9 +240,9 @@ private:
 	output_finder<8> m_lamps;
 
 	void out_w(uint16_t data);
-	void magic10_map(address_map &map);
-	void magic10a_map(address_map &map);
-	void sgsafari_map(address_map &map);
+	void magic10_map(address_map &map) ATTR_COLD;
+	void magic10a_map(address_map &map) ATTR_COLD;
+	void sgsafari_map(address_map &map) ATTR_COLD;
 };
 
 class magic102_state : public magic10_base_state
@@ -265,7 +265,7 @@ private:
 	uint16_t r();
 	uint16_t m_ret = 0;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 class hotslot_state : public magic10_state
@@ -283,7 +283,7 @@ private:
 	uint16_t copro_r();
 	void copro_w(uint16_t data);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 
@@ -304,7 +304,7 @@ protected:
 
 private:
 	void out_w(uint16_t data);
-	void spetrix_map(address_map &map);
+	void spetrix_map(address_map &map) ATTR_COLD;
 };
 
 /***************************

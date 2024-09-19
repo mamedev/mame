@@ -817,8 +817,8 @@ protected:
 	// 6: -dest
 	// 7: *
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// Called when a Blitter operation does not cause any draws/uploads to be performed.
 	// If multiple draws in a row are performed outside of an active clipping area,

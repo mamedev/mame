@@ -82,7 +82,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { set_power(true); }
 
 private:
@@ -104,8 +104,8 @@ private:
 	u32 m_lcd_data = 0;
 	u8 m_lcd_segs2 = 0;
 
-	void sapphire_map(address_map &map);
-	void sapphire2_map(address_map &map);
+	void sapphire_map(address_map &map) ATTR_COLD;
+	void sapphire2_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void set_power(bool power);

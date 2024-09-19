@@ -52,7 +52,7 @@ private:
 	uint16_t tourtabl_read_input_port(offs_t offset) { return m_tia_inputs[offset]->read(); }
 	uint8_t tourtabl_get_databus_contents(offs_t offset) { return offset; }
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -82,8 +82,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(slam_w);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 port1a_r();
@@ -93,7 +93,7 @@ private:
 	void port2b_w(u8 data);
 	void port3a_w(u8 data);
 	void port3b_w(u8 data);
-	void gts80_map(address_map &map);
+	void gts80_map(address_map &map) ATTR_COLD;
 
 	u8 m_segment = 0U;
 	u8 m_lamprow = 0U;

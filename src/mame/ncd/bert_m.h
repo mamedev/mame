@@ -14,12 +14,12 @@ public:
 
 	bert_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	void set_qlc_mode(bool state);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u16 read(offs_t offset);
 	void write(offs_t offset, u16 data, u16 mem_mask);

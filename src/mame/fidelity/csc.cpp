@@ -253,7 +253,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(rsc_init_board);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
@@ -270,9 +270,9 @@ protected:
 	u8 m_inp_mux = 0;
 
 	// address maps
-	void csc_map(address_map &map);
-	void csce_map(address_map &map);
-	void rsc_map(address_map &map);
+	void csc_map(address_map &map) ATTR_COLD;
+	void csce_map(address_map &map) ATTR_COLD;
+	void rsc_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	u16 read_inputs();

@@ -80,7 +80,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -93,9 +93,9 @@ private:
 	u8 m_matrix = 0;
 	bool m_nmi = false;
 
-	void poly880_io(address_map &map);
-	void poly880_mem(address_map &map);
-	void poly880s_mem(address_map &map);
+	void poly880_io(address_map &map) ATTR_COLD;
+	void poly880_mem(address_map &map) ATTR_COLD;
+	void poly880s_mem(address_map &map) ATTR_COLD;
 
 	void cldig_w(u8 data);
 	void ctc_z0_w(int state);

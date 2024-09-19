@@ -132,9 +132,9 @@ public:
 	void cloud9(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -181,7 +181,7 @@ private:
 	inline void write_vram(uint16_t addr, uint8_t data, uint8_t bitmd, uint8_t pixba);
 	inline void bitmode_autoinc();
 	inline void schedule_next_irq(int curscanline);
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 

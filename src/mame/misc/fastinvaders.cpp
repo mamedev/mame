@@ -71,7 +71,7 @@ private:
 
 	int sid_read();
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(count_ar);
@@ -83,10 +83,10 @@ private:
 	void dark_2_clr(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void fastinvaders_map(address_map &map);
-	void fastinvaders_io_base(address_map &map);
-	void fastinvaders_6845_io(address_map &map);
-	void fastinvaders_8275_io(address_map &map);
+	void fastinvaders_map(address_map &map) ATTR_COLD;
+	void fastinvaders_io_base(address_map &map) ATTR_COLD;
+	void fastinvaders_6845_io(address_map &map) ATTR_COLD;
+	void fastinvaders_8275_io(address_map &map) ATTR_COLD;
 
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

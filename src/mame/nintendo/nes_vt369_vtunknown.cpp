@@ -42,14 +42,14 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint8_t in0_r();
 	virtual uint8_t in1_r();
 	virtual void in0_w(uint8_t data);
 
-	void nes_vt369_vtunknown_map(address_map& map);
+	void nes_vt369_vtunknown_map(address_map &map) ATTR_COLD;
 
 	optional_ioport m_io0;
 	optional_ioport m_io1;
@@ -94,13 +94,13 @@ public:
 	void nes_vt369_vtunknown_4k_ram(machine_config& config);
 	void nes_vt369_vtunknown_4k_ram_16mb(machine_config& config);
 
-	void vt_external_space_map_32mbyte(address_map& map);
-	void vt_external_space_map_16mbyte(address_map& map);
-	void vt_external_space_map_8mbyte(address_map& map);
-	void vt_external_space_map_4mbyte(address_map& map);
-	[[maybe_unused]] void vt_external_space_map_2mbyte(address_map& map);
-	void vt_external_space_map_1mbyte(address_map& map);
-	[[maybe_unused]] void vt_external_space_map_512kbyte(address_map& map);
+	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_8mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_4mbyte(address_map &map) ATTR_COLD;
+	[[maybe_unused]] void vt_external_space_map_2mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_1mbyte(address_map &map) ATTR_COLD;
+	[[maybe_unused]] void vt_external_space_map_512kbyte(address_map &map) ATTR_COLD;
 
 	void init_lxcmcypp();
 
@@ -120,7 +120,7 @@ public:
 	void nes_vt369_vtunknown_bt(machine_config& config);
 	void nes_vt369_vtunknown_bt_2x16mb(machine_config& config);
 
-	void vt_external_space_map_bitboy_2x16mbyte(address_map& map);
+	void vt_external_space_map_bitboy_2x16mbyte(address_map &map) ATTR_COLD;
 
 private:
 
@@ -141,11 +141,11 @@ public:
 	void nes_vt369_vtunknown_fa_4x16mb(machine_config& config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t vt_rom_banked_r(offs_t offset);
-	void vt_external_space_map_fapocket_4x16mbyte(address_map& map);
+	void vt_external_space_map_fapocket_4x16mbyte(address_map &map) ATTR_COLD;
 
 	uint8_t fapocket_412c_r();
 	void fapocket_412c_w(uint8_t data);
@@ -177,7 +177,7 @@ public:
 
 private:
 	uint8_t vt_rom_banked_r(offs_t offset);
-	[[maybe_unused]] void vt_external_space_map_fp_2x32mbyte(address_map& map);
+	[[maybe_unused]] void vt_external_space_map_fp_2x32mbyte(address_map &map) ATTR_COLD;
 };
 
 uint8_t nes_vt369_vtunknown_base_state::vt_rom_r(offs_t offset)

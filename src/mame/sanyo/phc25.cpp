@@ -77,8 +77,8 @@ public:
 	void phc25j(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	virtual void port00_w(uint8_t data);
 	virtual uint8_t port40_r();
@@ -93,8 +93,8 @@ protected:
 	required_device<cassette_image_device> m_cassette;
 
 private:
-	void phc25_mem(address_map &map);
-	void phc25_io(address_map &map);
+	void phc25_mem(address_map &map) ATTR_COLD;
+	void phc25_io(address_map &map) ATTR_COLD;
 
 	uint8_t video_ram_r(offs_t offset);
 	MC6847_GET_CHARROM_MEMBER(char_rom_r);
@@ -121,7 +121,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(rts_changed);
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 	virtual void port00_w(uint8_t data) override;
 	virtual uint8_t port40_r() override;
@@ -137,8 +137,8 @@ private:
 
 	void port20_w(uint8_t data);
 
-	void map1010_mem(address_map &map);
-	void map1010_io(address_map &map);
+	void map1010_mem(address_map &map) ATTR_COLD;
+	void map1010_io(address_map &map) ATTR_COLD;
 };
 
 /* Read/Write Handlers */

@@ -309,7 +309,7 @@ private:
 	uint16_t spc_infifo_data_r();
 	void spc_outfifo_data_w(uint16_t data);
 	int spc_semaphore_r();
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
 	emu_timer *m_outfifo_read_timer = nullptr;
 	void outfifo_check();
@@ -318,9 +318,9 @@ private:
 	uint16_t dsp_outfifo_r();
 	void dectalk_reset(int state);
 
-	void m68k_mem(address_map &map);
-	void tms32010_io(address_map &map);
-	void tms32010_mem(address_map &map);
+	void m68k_mem(address_map &map) ATTR_COLD;
+	void tms32010_io(address_map &map) ATTR_COLD;
+	void tms32010_mem(address_map &map) ATTR_COLD;
 };
 
 

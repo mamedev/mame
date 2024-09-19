@@ -71,10 +71,10 @@ public:
 	void pgm2_lores(machine_config &config);
 	void pgm2(machine_config &config);
 	void pgm2_hires(machine_config &config);
-	void pgm2_map(address_map &map);
-	void pgm2_module_rom_map(address_map &map);
-	void pgm2_ram_rom_map(address_map &map);
-	void pgm2_rom_map(address_map &map);
+	void pgm2_map(address_map &map) ATTR_COLD;
+	void pgm2_module_rom_map(address_map &map) ATTR_COLD;
+	void pgm2_ram_rom_map(address_map &map) ATTR_COLD;
+	void pgm2_rom_map(address_map &map) ATTR_COLD;
 private:
 	u32 unk_startup_r();
 	u32 rtc_r();
@@ -109,9 +109,9 @@ private:
 	void encryption_do_w(u32 data);
 	void sprite_encryption_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

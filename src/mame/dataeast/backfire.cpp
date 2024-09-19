@@ -71,7 +71,7 @@ private:
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
-	void backfire_map(address_map &map);
+	void backfire_map(address_map &map) ATTR_COLD;
 
 	/* memory pointers */
 	memory_share_array_creator<uint16_t, 2> m_spriteram;

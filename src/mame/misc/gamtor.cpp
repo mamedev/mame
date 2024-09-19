@@ -124,7 +124,7 @@ public:
 	void gaminator(machine_config &config);
 
 private:
-	void gaminator_map(address_map &map);
+	void gaminator_map(address_map &map) ATTR_COLD;
 
 	void gamtor_unk_w(uint32_t data);
 

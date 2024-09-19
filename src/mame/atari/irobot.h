@@ -56,10 +56,10 @@ private:
 		uint8_t ramsel;
 	};
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	void irobot_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	void irobot_map(address_map &map) ATTR_COLD;
 
 	void irobot_clearirq_w(uint8_t data);
 	void irobot_clearfirq_w(uint8_t data);

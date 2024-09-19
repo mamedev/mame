@@ -77,8 +77,8 @@ public:
 	void mk98(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -100,8 +100,8 @@ private:
 	uint8_t video_register_r();
 	void video_register_w(uint8_t data);
 
-	void mk98_io(address_map &map);
-	void mk98_map(address_map &map);
+	void mk98_io(address_map &map) ATTR_COLD;
+	void mk98_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<u8> m_p_videoram;
 

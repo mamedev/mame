@@ -46,8 +46,8 @@ private:
 	required_device<pci_root_device> m_pciroot;
 	required_device<isa8_device> m_isabus;
 
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 void paokaipc_state::main_map(address_map &map)

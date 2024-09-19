@@ -119,10 +119,10 @@ private:
 	floppy_image_device *m_floppy;
 	required_device<centronics_device> m_centronics;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	MC6845_UPDATE_ROW(update_row);
@@ -154,8 +154,8 @@ private:
 	void write_centronics_fault(int state);
 	void write_centronics_perror(int state);
 
-	void fp_io(address_map &map);
-	void fp_mem(address_map &map);
+	void fp_io(address_map &map) ATTR_COLD;
+	void fp_mem(address_map &map) ATTR_COLD;
 };
 
 

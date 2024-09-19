@@ -170,9 +170,9 @@ private:
 	void jollyjgr_misc_w(uint8_t data);
 	void jollyjgr_coin_lookout_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void jollyjgr_palette(palette_device &palette) const;
 	uint32_t screen_update_jollyjgr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_fspider(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -182,8 +182,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<palette_device> m_bm_palette;
-	void fspider_map(address_map &map);
-	void jollyjgr_map(address_map &map);
+	void fspider_map(address_map &map) ATTR_COLD;
+	void jollyjgr_map(address_map &map) ATTR_COLD;
 };
 
 

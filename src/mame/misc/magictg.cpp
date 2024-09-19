@@ -161,9 +161,9 @@ public:
 	void magictg(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<mips3_device>       m_mips;
@@ -238,10 +238,10 @@ private:
 
 	void zr36120_reset();
 
-	void adsp_data_map(address_map &map);
-	void adsp_io_map(address_map &map);
-	void adsp_program_map(address_map &map);
-	void magictg_map(address_map &map);
+	void adsp_data_map(address_map &map) ATTR_COLD;
+	void adsp_io_map(address_map &map) ATTR_COLD;
+	void adsp_program_map(address_map &map) ATTR_COLD;
+	void magictg_map(address_map &map) ATTR_COLD;
 
 	uint32_t pci_dev0_r(int function, int reg, uint32_t mem_mask);
 	void pci_dev0_w(int function, int reg, uint32_t data, uint32_t mem_mask);

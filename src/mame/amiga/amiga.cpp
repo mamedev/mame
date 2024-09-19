@@ -241,13 +241,13 @@ public:
 
 	void a1000(machine_config &config);
 	void a1000n(machine_config &config);
-	void a1000_bootrom_map(address_map &map);
-	void a1000_mem(address_map &map);
-	void a1000_overlay_map(address_map &map);
+	void a1000_bootrom_map(address_map &map) ATTR_COLD;
+	void a1000_mem(address_map &map) ATTR_COLD;
+	void a1000_overlay_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<address_map_bank_device> m_bootrom;
@@ -277,10 +277,10 @@ public:
 
 	void a2000(machine_config &config);
 	void a2000n(machine_config &config);
-	void a2000_mem(address_map &map);
+	void a2000_mem(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// amiga_state overrides
 	virtual bool int2_pending() override;
@@ -314,10 +314,10 @@ public:
 
 	void a500n(machine_config &config);
 	void a500(machine_config &config);
-	void a500_mem(address_map &map);
+	void a500_mem(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// amiga_state overrides
 	virtual bool int2_pending() override;
@@ -360,12 +360,12 @@ public:
 
 	void cdtv(machine_config &config);
 	void cdtvn(machine_config &config);
-	void cdtv_mem(address_map &map);
-	void cdtv_rc_mem(address_map &map);
+	void cdtv_mem(address_map &map) ATTR_COLD;
+	void cdtv_rc_mem(address_map &map) ATTR_COLD;
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// amiga_state overrides
 	virtual bool int2_pending() override;
@@ -400,7 +400,7 @@ public:
 
 	void a3000(machine_config &config);
 	void a3000n(machine_config &config);
-	void a3000_mem(address_map &map);
+	void a3000_mem(address_map &map) ATTR_COLD;
 
 protected:
 
@@ -426,10 +426,10 @@ public:
 
 	void a500pn(machine_config &config);
 	void a500p(machine_config &config);
-	void a500p_mem(address_map &map);
+	void a500p_mem(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// amiga_state overrides
 	virtual bool int2_pending() override;
@@ -465,7 +465,7 @@ public:
 
 	void a600n(machine_config &config);
 	void a600(machine_config &config);
-	void a600_mem(address_map &map);
+	void a600_mem(address_map &map) ATTR_COLD;
 
 protected:
 	// amiga_state overrides
@@ -500,7 +500,7 @@ public:
 
 	void a1200(machine_config &config);
 	void a1200n(machine_config &config);
-	void a1200_mem(address_map &map);
+	void a1200_mem(address_map &map) ATTR_COLD;
 
 protected:
 	// amiga_state overrides
@@ -545,9 +545,9 @@ public:
 	void a4000n(machine_config &config);
 	void a4000(machine_config &config);
 	void a400030(machine_config &config);
-	void a400030_mem(address_map &map);
-	void a4000_mem(address_map &map);
-	void a4000t_mem(address_map &map);
+	void a400030_mem(address_map &map) ATTR_COLD;
+	void a4000_mem(address_map &map) ATTR_COLD;
+	void a4000t_mem(address_map &map) ATTR_COLD;
 
 protected:
 
@@ -590,7 +590,7 @@ public:
 
 	void cd32n(machine_config &config);
 	void cd32(machine_config &config);
-	void cd32_mem(address_map &map);
+	void cd32_mem(address_map &map) ATTR_COLD;
 
 protected:
 	// amiga_state overrides

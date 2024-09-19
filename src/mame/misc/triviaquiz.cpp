@@ -52,15 +52,15 @@ public:
 	void triviaquiz(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<tms9995_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 
-	void prg_map(address_map &map);
-	void romboard_map(address_map &map);
-	void io_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void romboard_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 

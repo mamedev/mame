@@ -46,7 +46,7 @@ public:
 	template <int N> int sw_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -55,8 +55,8 @@ private:
 	void allram_w(offs_t offset, u8 data);
 	u8 keyboard_r(offs_t offset);
 
-	void pcpu_map(address_map &map);
-	void vcpu_map(address_map &map);
+	void pcpu_map(address_map &map) ATTR_COLD;
+	void vcpu_map(address_map &map) ATTR_COLD;
 
 	void signal_w(int state);
 

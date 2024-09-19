@@ -94,7 +94,7 @@ private:
 	void kbd_put(u8 data);
 	uint8_t m_term_data = 0;
 	uint16_t m_term_status = 0;
-	void vax11_mem(address_map &map);
+	void vax11_mem(address_map &map) ATTR_COLD;
 };
 
 void vax11_state::term_w(uint16_t data)

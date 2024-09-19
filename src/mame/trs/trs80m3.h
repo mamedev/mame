@@ -63,8 +63,8 @@ public:
 	void init_trs80m4p();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -98,15 +98,15 @@ private:
 	void drq_w(int state);
 	uint32_t screen_update_trs80m3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void cp500_io(address_map &map);
-	void m3_io(address_map &map);
-	void m3_mem(address_map &map);
-	void m4_mem(address_map &map);
-	void m4p_mem(address_map &map);
-	void m4_io(address_map &map);
-	void m4p_io(address_map &map);
-	void m4_banked_mem(address_map &map);
-	void m4p_banked_mem(address_map &map);
+	void cp500_io(address_map &map) ATTR_COLD;
+	void m3_io(address_map &map) ATTR_COLD;
+	void m3_mem(address_map &map) ATTR_COLD;
+	void m4_mem(address_map &map) ATTR_COLD;
+	void m4p_mem(address_map &map) ATTR_COLD;
+	void m4_io(address_map &map) ATTR_COLD;
+	void m4p_io(address_map &map) ATTR_COLD;
+	void m4_banked_mem(address_map &map) ATTR_COLD;
+	void m4p_banked_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_model4 = 0U;
 	uint8_t m_mode = 0U;

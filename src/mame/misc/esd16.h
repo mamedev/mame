@@ -50,9 +50,9 @@ public:
 	void fantstrya(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -91,21 +91,21 @@ private:
 	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info_16x16);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
-	void fantstrya_map(address_map &map);
-	void hedpanic_map(address_map &map);
-	void jumppop_map(address_map &map);
-	void mchampdx_map(address_map &map);
-	void multchmp_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
-	void tangtang_map(address_map &map);
+	void fantstrya_map(address_map &map) ATTR_COLD;
+	void hedpanic_map(address_map &map) ATTR_COLD;
+	void jumppop_map(address_map &map) ATTR_COLD;
+	void mchampdx_map(address_map &map) ATTR_COLD;
+	void multchmp_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void tangtang_map(address_map &map) ATTR_COLD;
 
-	void io_area_dsw(address_map &map, u32 base);
-	void io_area_eeprom(address_map &map, u32 base);
-	void palette_area(address_map &map, u32 base);
-	void sprite_area(address_map &map, u32 base);
-	void vid_attr_area(address_map &map, u32 base);
-	void vram_area(address_map &map, u32 base);
+	void io_area_dsw(address_map &map, u32 base) ATTR_COLD;
+	void io_area_eeprom(address_map &map, u32 base) ATTR_COLD;
+	void palette_area(address_map &map, u32 base) ATTR_COLD;
+	void sprite_area(address_map &map, u32 base) ATTR_COLD;
+	void vid_attr_area(address_map &map, u32 base) ATTR_COLD;
+	void vram_area(address_map &map, u32 base) ATTR_COLD;
 };
 
 #endif // MAME_MISC_ESD16_H

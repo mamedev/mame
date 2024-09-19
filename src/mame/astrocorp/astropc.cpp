@@ -76,8 +76,8 @@ public:
 	void init_astropc();
 
 private:
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ds1287_device> m_rtc;
