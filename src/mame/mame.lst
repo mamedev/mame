@@ -42011,6 +42011,9 @@ d461                            //
 @source:skeleton/daruma.cpp
 ds348                           // Sigtron Daruma
 
+@source:skeleton/dash4.cpp
+dash4                           // (c) 1999 Cross Products Ltd.
+
 @source:skeleton/datacast.cpp
 datacast                        //
 
