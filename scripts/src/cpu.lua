@@ -1414,6 +1414,23 @@ if opt_tool(CPUS, "DIABLO") then
 end
 
 --------------------------------------------------
+-- KL1839VM1
+--@src/devices/cpu/mpk1839/kl1839vm1.h,CPUS["KL1839VM1"] = true
+--------------------------------------------------
+
+if CPUS["KL1839VM1"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1.cpp",
+		MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1.h",
+	}
+end
+
+if opt_tool(CPUS, "KL1839VM1") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1dasm.h")
+end
+
+--------------------------------------------------
 -- Fujitsu MB88xx
 --@src/devices/cpu/mb88xx/mb88xx.h,CPUS["MB88XX"] = true
 --------------------------------------------------
