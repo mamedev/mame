@@ -9,7 +9,7 @@ NOTE: Before exiting MAME, press the OFF button to turn the power off. Otherwise
 NVRAM won't save properly.
 
 The chess engine is by Frans Morsch, similar to the one in Mephisto Europa.
-For some reason, they've put the row leds on the right instead of on the left.
+For some reason, they've put the row LEDs on the right instead of on the left.
 
 Hardware notes:
 - PCB label: 243 600 001
