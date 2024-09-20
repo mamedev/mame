@@ -11,11 +11,12 @@ References:
 - https://github.com/bml3mk5/EmuB-6892/blob/master/src/docs/spec.txt
 
 TODO:
-- bml3mk5: complete IG RAM support;
 - keyboard break NMI (as per bmjr);
+- Move keyboard timer logic as 6845 hsync callback;
 - Cassette relay doesn't work properly, issuing a LOAD won't autostart a load;
 - Cassette baud rate bump (can switch from 600 to 1200 bauds thru $ffd7);
-- implement sound as a bml3bus slot device;
+- implement sound as a bus slot device;
+- implement RAM expansion as (extra?) bus slots, thru $ffe8;
 - soft reset will hang the machine;
 - Hitachi MB-S1 support (bumps memory map, adds an extra I/O layer);
 
@@ -115,6 +116,9 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<bml3bus_device> m_bml3bus;
+	virtual u8 get_attr_mask() { return 0x1f; }
+	virtual u8 get_ig_mode(u8 attr) { return 0; }
+	virtual u8 get_ig_dots(u8 tile, u8 ra, u8 xi) { return 0; }
 private:
 	required_region_ptr<u8> m_p_chargen;
 	required_device<mc6845_device> m_crtc;
@@ -215,6 +219,21 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	virtual u8 get_attr_mask() override { return 0x3f; }
+	virtual u8 get_ig_mode(u8 attr) override { return BIT(attr, 5); }
+	// NOTE: if IG attribute is enabled then the rest of attribute byte is ignored (no reverse etc.).
+    // TODO: if IGMODREG is 1 then the resulting tile will be a white square
+	virtual u8 get_ig_dots(u8 tile, u8 ra, u8 xi) override {
+		u16 base_offset = tile << 3;
+		u8 res = 0;
+		for (int i = 0; i < 3; i++)
+		{
+			if (BIT(m_ig_ram[base_offset + ra + i * 0x800], xi))
+				res |= 1 << i;
+		}
+		return res;
+	}
 private:
 	memory_view m_ig_view;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -252,11 +271,26 @@ MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 		else
 			mem = (ma + x + ra * x_count/40 * 0x400 -0x400) & 0x3fff;
 
-		u8 const color = m_aram[mem] & 7;
-		bool const reverse = BIT(m_aram[mem], 3) ^ (x == cursor_x);
-		bool const graphic = BIT(m_aram[mem], 4);
-
+		u8 const attr = m_aram[mem];
 		u8 const rawbits = m_vram[mem];
+		// HACK: tracer bullet, should be composed in an entirely different way
+		// This will never be hit by regular l3 being a specific feature of mk5,
+		// still expect further headaches for S1 support ...
+		if (get_ig_mode(attr))
+		{
+			for(u8 xi = 0; xi < 8; xi++)
+			{
+				u8 pen = get_ig_dots(rawbits, ra, 7 - xi);
+				bitmap.pix(y, x*8+xi) = palette[pen];
+			}
+
+			continue;
+		}
+
+		u8 const color = attr & 7;
+		bool const reverse = BIT(attr, 3) ^ (x == cursor_x);
+		bool const graphic = BIT(attr, 4);
+
 
 		u8 dots[2] = { 0, 0 };
 		if (graphic)
@@ -404,7 +438,7 @@ void bml3_state::vram_w(offs_t offset, u8 data)
 {
 	m_vram[offset] = data;
 	// color ram is 5-bit
-	m_aram[offset] = m_attr_latch & 0x1f;
+	m_aram[offset] = m_attr_latch & get_attr_mask();
 }
 
 u8 bml3_state::psg_latch_r()
