@@ -26,10 +26,10 @@ TODO:
 #include "emupal.h"
 
 #include "bus/bml3/bml3bus.h"
-#include "bus/bml3/bml3mp1802.h"
-#include "bus/bml3/bml3mp1805.h"
-#include "bus/bml3/bml3kanji.h"
-#include "bus/bml3/bml3rtc.h"
+#include "bus/bml3/mp1802.h"
+#include "bus/bml3/mp1805.h"
+#include "bus/bml3/kanji.h"
+#include "bus/bml3/rtc.h"
 
 #include "screen.h"
 #include "speaker.h"
