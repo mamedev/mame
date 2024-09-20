@@ -60,7 +60,7 @@ public:
 		m_external_rom(*this, "user1"),
 		m_igs_mainram(*this, "igs_mainram"),
 		m_maincpu(*this, "maincpu"),
-		m_ppi(*this, "ppi8255"),
+		m_ppi(*this, "ppi%u", 1U),
 		m_igs017_igs031(*this, "igs017_igs031"),
 		m_screen(*this, "screen"),
 		m_oki(*this, "oki"),
@@ -90,6 +90,7 @@ public:
 	void mgzz_xor(machine_config &config) ATTR_COLD;
 	void oceanpar_xor(machine_config &config) ATTR_COLD;
 	void tripslot_xor(machine_config &config) ATTR_COLD;
+	void extradrw(machine_config &config) ATTR_COLD;
 	void chessc2_xor(machine_config &config) ATTR_COLD;
 
 	void init_sdwx() ATTR_COLD;
@@ -124,7 +125,7 @@ private:
 	optional_shared_ptr<u32> m_igs_mainram;
 
 	required_device<igs027a_cpu_device> m_maincpu;
-	required_device<i8255_device> m_ppi;
+	optional_device_array<i8255_device, 2> m_ppi;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 	required_device<screen_device> m_screen;
 	required_device<okim6295_device> m_oki;
@@ -170,6 +171,7 @@ private:
 	void igs_mahjong_xor_map(address_map &map) ATTR_COLD;
 	void cjddz_xor_map(address_map &map) ATTR_COLD;
 	void tripslot_xor_map(address_map &map) ATTR_COLD;
+	void extradrw_map(address_map &map) ATTR_COLD;
 
 	void oki_128k_map(address_map &map) ATTR_COLD;
 };
@@ -213,7 +215,7 @@ void igs_m027_state::igs_mahjong_map(address_map &map)
 	map(0x3800'0000, 0x3800'7fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
 	map(0x3800'8000, 0x3800'8003).umask32(0x0000'00ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x3800'9000, 0x3800'9003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x3800'9000, 0x3800'9003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 
 	map(0x5000'0000, 0x5000'03ff).umask32(0x0000'00ff).w(FUNC(igs_m027_state::xor_table_w)); // uploads XOR table to external ROM here
 }
@@ -237,6 +239,13 @@ void igs_m027_state::tripslot_xor_map(address_map &map)
 	igs_mahjong_xor_map(map);
 
 	map(0x3800'c000, 0x3800'c003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::tripslot_misc_w));
+}
+
+void igs_m027_state::extradrw_map(address_map &map)
+{
+	igs_mahjong_map(map);
+
+	map(0x3800'a000, 0x3800'a003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 void igs_m027_state::oki_128k_map(address_map &map)
@@ -1636,10 +1645,10 @@ void igs_m027_state::m027(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027_state::interrupt), "screen", 0, 1);
 
-	I8255A(config, m_ppi);
-	m_ppi->tri_pa_callback().set_constant(0x00);
-	m_ppi->tri_pb_callback().set_constant(0x00);
-	m_ppi->tri_pc_callback().set_constant(0x00);
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->tri_pa_callback().set_constant(0x00);
+	m_ppi[0]->tri_pb_callback().set_constant(0x00);
+	m_ppi[0]->tri_pc_callback().set_constant(0x00);
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits(true);
@@ -1665,9 +1674,9 @@ void igs_m027_state::slqz3_xor(machine_config &config)
 
 	m_maincpu->in_port().set(FUNC(igs_m027_state::slqz3_gpio_r)); // what lives here?
 
-	m_ppi->in_pa_callback().set_ioport("TEST");
-	m_ppi->in_pb_callback().set_ioport("JOY");
-	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::mahjong_output_w));
+	m_ppi[0]->in_pa_callback().set_ioport("TEST");
+	m_ppi[0]->in_pb_callback().set_ioport("JOY");
+	m_ppi[0]->out_pc_callback().set(FUNC(igs_m027_state::mahjong_output_w));
 
 	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
@@ -1683,7 +1692,7 @@ void igs_m027_state::qlgs_xor(machine_config &config)
 	m_maincpu->in_port().set_ioport("PLAYER");
 	m_maincpu->out_port().append(m_oki, FUNC(okim6295_device::set_rom_bank)).rshift(3);
 
-	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::io_select_w<0>));
+	m_ppi[0]->out_pc_callback().set(FUNC(igs_m027_state::io_select_w<0>));
 
 	m_igs017_igs031->in_pb_callback().set_ioport("TEST");
 	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
@@ -1695,9 +1704,9 @@ void igs_m027_state::lhdmg_xor(machine_config &config)
 
 	m_maincpu->in_port().set(FUNC(igs_m027_state::lhdmg_gpio_r));
 
-	m_ppi->in_pa_callback().set_ioport("TEST");
-	m_ppi->out_pb_callback().set(FUNC(igs_m027_state::io_select_w<0>));
-	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::mahjong_output_w));
+	m_ppi[0]->in_pa_callback().set_ioport("TEST");
+	m_ppi[0]->out_pb_callback().set(FUNC(igs_m027_state::io_select_w<0>));
+	m_ppi[0]->out_pc_callback().set(FUNC(igs_m027_state::mahjong_output_w));
 
 	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
@@ -1715,10 +1724,10 @@ void igs_m027_state::cjddz_xor(machine_config &config)
 
 	m_oki->set_addrmap(0, &igs_m027_state::oki_128k_map);
 
-	//m_ppi->out_pa_callback().set(...);
-	m_ppi->out_pb_callback().set_ioport("PPIB");
-	m_ppi->out_pc_callback().set_ioport("PPIC");
-	m_ppi->out_pc_callback().append(FUNC(igs_m027_state::io_select_w<0>)).mask(0x1f);
+	//m_ppi[0]->out_pa_callback().set(...);
+	m_ppi[0]->out_pb_callback().set_ioport("PPIB");
+	m_ppi[0]->out_pc_callback().set_ioport("PPIC");
+	m_ppi[0]->out_pc_callback().append(FUNC(igs_m027_state::io_select_w<0>)).mask(0x1f);
 
 	m_igs017_igs031->in_pb_callback().set_ioport("TEST");
 	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
@@ -1737,9 +1746,9 @@ void igs_m027_state::lthy_xor(machine_config &config)
 {
 	m027_xor(config);
 
-	m_ppi->in_pa_callback().set_ioport("TEST");
-	m_ppi->in_pb_callback().set(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
-	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::mahjong_output_w));
+	m_ppi[0]->in_pa_callback().set_ioport("TEST");
+	m_ppi[0]->in_pb_callback().set(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
+	m_ppi[0]->out_pc_callback().set(FUNC(igs_m027_state::mahjong_output_w));
 
 	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
@@ -1759,18 +1768,18 @@ void igs_m027_state::jking02_xor(machine_config &config)
 
 	m_maincpu->in_port().set_ioport("PLAYER");
 
-	m_ppi->out_pa_callback().set(FUNC(igs_m027_state::lamps_w<8>));
-	m_ppi->out_pb_callback().set(FUNC(igs_m027_state::jking02_output_w));
-	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::lamps_w<0>));
+	m_ppi[0]->out_pa_callback().set(FUNC(igs_m027_state::lamps_w<8>));
+	m_ppi[0]->out_pb_callback().set(FUNC(igs_m027_state::jking02_output_w));
+	m_ppi[0]->out_pc_callback().set(FUNC(igs_m027_state::lamps_w<0>));
 }
 
 void igs_m027_state::mgzz_xor(machine_config &config)
 {
 	m027_xor(config);
 
-	m_ppi->out_pa_callback().set(FUNC(igs_m027_state::mahjong_output_w));
-	m_ppi->in_pb_callback().set_ioport("TEST");
-	m_ppi->in_pc_callback().set(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
+	m_ppi[0]->out_pa_callback().set(FUNC(igs_m027_state::mahjong_output_w));
+	m_ppi[0]->in_pb_callback().set_ioport("TEST");
+	m_ppi[0]->in_pc_callback().set(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
 
 	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
@@ -1786,9 +1795,9 @@ void igs_m027_state::oceanpar_xor(machine_config &config)
 	m_maincpu->in_port().set_ioport("PLAYER");
 	m_maincpu->out_port().append(m_oki, FUNC(okim6295_device::set_rom_bank)).rshift(3);
 
-	m_ppi->out_pa_callback().set(m_ticket, FUNC(ticket_dispenser_device::motor_w)).bit(7);
-	m_ppi->out_pb_callback().set(FUNC(igs_m027_state::oceanpar_output_w));
-	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::lamps_w<0>));
+	m_ppi[0]->out_pa_callback().set(m_ticket, FUNC(ticket_dispenser_device::motor_w)).bit(7);
+	m_ppi[0]->out_pb_callback().set(FUNC(igs_m027_state::oceanpar_output_w));
+	m_ppi[0]->out_pc_callback().set(FUNC(igs_m027_state::lamps_w<0>));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
@@ -1802,11 +1811,23 @@ void igs_m027_state::tripslot_xor(machine_config &config)
 	m_maincpu->in_port().set_ioport("PLAYER");
 	m_maincpu->out_port().append(FUNC(igs_m027_state::tripslot_okibank_low_w)).rshift(3);
 
-	m_ppi->out_pa_callback().set(FUNC(igs_m027_state::lamps_w<8>));
-	m_ppi->out_pb_callback().set_ioport("PPIB");
-	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::lamps_w<0>));
+	m_ppi[0]->out_pa_callback().set(FUNC(igs_m027_state::lamps_w<8>));
+	m_ppi[0]->out_pb_callback().set_ioport("PPIB");
+	m_ppi[0]->out_pc_callback().set(FUNC(igs_m027_state::lamps_w<0>));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
+}
+
+void igs_m027_state::extradrw(machine_config &config)
+{
+	m027(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::extradrw_map);
+
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->tri_pa_callback().set_constant(0x00);
+	m_ppi[1]->tri_pb_callback().set_constant(0x00);
+	m_ppi[1]->tri_pc_callback().set_constant(0x00);
 }
 
 void igs_m027_state::chessc2_xor(machine_config &config)
@@ -2953,7 +2974,7 @@ GAMEL( 1999, fruitpara, fruitpar, oceanpar_xor, fruitpara,igs_m027_state, init_f
 GAME(  200?, cjddz,     0,        cjddz_xor,    cjddz,    igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", 0 )
 GAMEL( 2007, tripslot,  0,        tripslot_xor, tripslot, igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
 // this has a 2nd 8255
-GAME(  2001, extradrw,  0,        m027,         base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
+GAME(  2001, extradrw,  0,        extradrw,     base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME(  2002, chessc2,   0,        chessc2_xor,  chessc2,  igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 
