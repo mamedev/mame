@@ -81,8 +81,10 @@ Truck Kyosokyoku (TKK2/VER.A)            (C) Namco,        2000  COH-700     SYS
 
 Wanted Games
 ------------
-Aerosmith - Quest for Fame              (C) Namco,        2001
+Aerosmith - Quest for Fame              (C) Namco,        1999 (flyer date)
 http://www.bandainamcogames.co.jp/am/vg/questforfame/
+https://flyers.arcade-museum.com/videogames/show/2167#gallery-1
+https://flyers.arcade-museum.com/videogames/show/2167#gallery-2
 
 Soul Calibur Ver.B                      (C) Namco,        1998 (flyer date)
 https://flyers.arcade-museum.com/?page=flyer&db=videodb&id=1009&image=1
@@ -91,8 +93,9 @@ Probably doesn't exist
 
 Submarines                              (C) Namco,        1999 (flyer date)
 https://flyers.arcade-museum.com/?page=flyer&db=videodb&id=5531&image=1
-This was cancelled, only the flyer exists.
-It was shown only at an amusement show. Possibly a prototype still exists. Possibly not.
+https://www.youtube.com/watch?v=k-JbUTWcFjg
+Unreleased but was demonstrated at the 1999 Amusement Machine Operator's Union (AMOU) tradeshow in Tokyo.
+Was possibly a sequel to Namco's 1978 'Submarine'.
 
 Tekno Werk                              (C) Namco,        1999
 A music game with two 17-key Yamaha keyboards side by side for 2 players
