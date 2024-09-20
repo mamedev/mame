@@ -197,6 +197,12 @@ void hmcs400_cpu_device::device_start()
 	m_int_line[0] = m_int_line[1] = 1;
 	m_irq_flags = 0;
 	m_pmr = 0;
+	m_prescaler = 0;
+	m_timer_mode[0] = m_timer_mode[1] = 0;
+	m_timer_div[0] = m_timer_div[1] = 0;
+	m_timer_count[0] = m_timer_count[1] = 0;
+	m_timer_load = 0;
+	m_timer_b_low = 0;
 
 	// register for savestates
 	save_item(NAME(m_pc));
@@ -215,11 +221,19 @@ void hmcs400_cpu_device::device_start()
 	save_item(NAME(m_ca));
 
 	save_item(NAME(m_r));
+	save_item(NAME(m_r_mask));
 	save_item(NAME(m_d));
+	save_item(NAME(m_d_mask));
 
 	save_item(NAME(m_int_line));
 	save_item(NAME(m_irq_flags));
 	save_item(NAME(m_pmr));
+	save_item(NAME(m_prescaler));
+	save_item(NAME(m_timer_mode));
+	save_item(NAME(m_timer_div));
+	save_item(NAME(m_timer_count));
+	save_item(NAME(m_timer_load));
+	save_item(NAME(m_timer_b_low));
 
 	// register state for debugger
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
@@ -252,6 +266,13 @@ void hmcs400_cpu_device::device_reset()
 	// clear peripherals
 	m_irq_flags = 0xaaa8; // IM=1, IF=0, IE=0
 	m_pmr = 0;
+
+	m_prescaler = 0;
+	tm_w(0, 0, 0xf);
+	tm_w(1, 0, 0xf);
+	m_timer_count[0] = m_timer_count[1] = 0;
+	m_timer_load = 0;
+	m_timer_b_low = 0;
 
 	// all I/O ports set to input
 	reset_io();
@@ -298,6 +319,9 @@ void hmcs400_cpu_device::data_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000, 0x003).rw(FUNC(hmcs400_cpu_device::irq_control_r), FUNC(hmcs400_cpu_device::irq_control_w));
 	map(0x004, 0x004).w(FUNC(hmcs400_cpu_device::pmr_w));
+	map(0x008, 0x009).w(FUNC(hmcs400_cpu_device::tm_w));
+	map(0x00a, 0x00a).rw(FUNC(hmcs400_cpu_device::tcbl_r), FUNC(hmcs400_cpu_device::tlrl_w));
+	map(0x00b, 0x00b).rw(FUNC(hmcs400_cpu_device::tcbu_r), FUNC(hmcs400_cpu_device::tlru_w));
 
 	map(0x020, 0x020 + m_ram_size - 1).ram();
 	map(0x3c0, 0x3ff).ram();
@@ -475,6 +499,7 @@ void hmcs400_cpu_device::irq_control_w(offs_t offset, u8 data, u8 mem_mask)
 	if (!access_mode(mem_mask, true))
 		return;
 
+	data &= mem_mask;
 	u16 mask = mem_mask << (offset * 4);
 
 	// ignore writes to unused bits
@@ -540,7 +565,13 @@ void hmcs400_cpu_device::ext_int_edge(int line)
 {
 	// ext interrupts are masked with PMR2/3
 	if (!m_int_line[line] && BIT(m_pmr, line + 2))
+	{
 		m_irq_flags |= 1 << (line * 2 + 2);
+
+		// timer B event counter on INT1
+		if (line == 1 && !m_timer_div[1])
+			clock_timer(1);
+	}
 }
 
 void hmcs400_cpu_device::execute_set_input(int line, int state)
@@ -569,12 +600,98 @@ void hmcs400_cpu_device::execute_set_input(int line, int state)
 
 
 //-------------------------------------------------
+//  timers
+//-------------------------------------------------
+
+void hmcs400_cpu_device::tm_w(offs_t offset, u8 data, u8 mem_mask)
+{
+	if (!access_mode(mem_mask))
+		return;
+
+	// TMA/TMB prescaler divide ratio
+	static const int div[2][8] =
+	{
+		{ 0x400, 0x200, 0x100, 0x40, 0x10, 4, 2, 1 },
+		{ 0x400, 0x100, 0x40, 0x10, 4, 2, 1, 0 }
+	};
+
+	m_timer_mode[offset] = data;
+	m_timer_div[offset] = div[offset][data & 7];
+}
+
+void hmcs400_cpu_device::tlrl_w(offs_t offset, u8 data, u8 mem_mask)
+{
+	if (!access_mode(mem_mask))
+		return;
+
+	// TLRL: timer load register lower
+	m_timer_load = (m_timer_load & 0xf0) | (data & 0xf);
+}
+
+void hmcs400_cpu_device::tlru_w(offs_t offset, u8 data, u8 mem_mask)
+{
+	if (!access_mode(mem_mask))
+		return;
+
+	// TLRU: timer load register upper
+	m_timer_load = (m_timer_load & 0x0f) | data << 4;
+	m_timer_count[1] = m_timer_load;
+}
+
+u8 hmcs400_cpu_device::tcbl_r(offs_t offset, u8 mem_mask)
+{
+	if (!access_mode(mem_mask))
+		return 0xf;
+
+	// TCBL: timer counter B lower
+	return m_timer_b_low;
+}
+
+u8 hmcs400_cpu_device::tcbu_r(offs_t offset, u8 mem_mask)
+{
+	if (!access_mode(mem_mask))
+		return 0xf;
+
+	// TCBU: timer counter B upper (latches TCBL)
+	if (!machine().side_effects_disabled())
+		m_timer_b_low = m_timer_count[1] & 0xf;
+
+	return m_timer_count[1] >> 4;
+}
+
+void hmcs400_cpu_device::clock_timer(int timer)
+{
+	if (++m_timer_count[timer] == 0)
+	{
+		// set timer overflow irq flag
+		m_irq_flags |= 1 << (timer * 2 + 6);
+
+		// timer B reload function
+		if (timer == 1 && m_timer_mode[1] & 8)
+			m_timer_count[1] = m_timer_load;
+	}
+}
+
+void hmcs400_cpu_device::clock_prescaler()
+{
+	u16 prev = m_prescaler;
+	m_prescaler = (m_prescaler + 1) & 0x7ff;
+
+	// increment timers based on prescaler divide ratio
+	for (int i = 0; i < 2; i++)
+		if (m_prescaler & ~prev & m_timer_div[i])
+			clock_timer(i);
+}
+
+
+//-------------------------------------------------
 //  execute
 //-------------------------------------------------
 
 void hmcs400_cpu_device::cycle()
 {
 	m_icount--;
+	clock_prescaler();
 }
 
 u16 hmcs400_cpu_device::fetch()

@@ -88,6 +88,7 @@ known chips:
  *A13     HD44840  1982, CXG Computachess II
  *A14     HD44840  1982, CXG Computachess II / Advanced Portachess
 
+ *B29     HD44860  1987, Diamond Bridge Computer (M1011)
  *B55     HD44860  1987, Saitek Pro Bridge 100
 
  *A04     HD44868  1984, SciSys Rapier

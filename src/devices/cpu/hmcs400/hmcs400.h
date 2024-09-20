@@ -147,10 +147,16 @@ protected:
 	u8 m_int_line[2];     // INT0/INT1 pin state
 	u16 m_irq_flags;      // interrupt control bits
 	u8 m_pmr;             // port mode register
+	u16 m_prescaler;      // 11-bit clock prescaler
+	u8 m_timer_mode[2];   // TMA/TMB: timer mode registers
+	u16 m_timer_div[2];   // timer prescaler divide ration derived from TMA/TMB
+	u8 m_timer_count[2];  // TCA/TCA: timer counters
+	u8 m_timer_load;      // timer B reload register
+	u8 m_timer_b_low;     // timer B counter low latch
 
 	// I/O handlers
-	devcb_read8::array<8> m_read_r;
-	devcb_write8::array<8> m_write_r;
+	devcb_read8::array<11> m_read_r;
+	devcb_write8::array<11> m_write_r;
 	devcb_read16 m_read_d;
 	devcb_write16 m_write_d;
 
@@ -170,9 +176,16 @@ protected:
 	u8 irq_control_r(offs_t offset, u8 mem_mask);
 	void irq_control_w(offs_t offset, u8 data, u8 mem_mask);
 	void pmr_w(offs_t offset, u8 data, u8 mem_mask);
+	void tm_w(offs_t offset, u8 data, u8 mem_mask);
+	void tlrl_w(offs_t offset, u8 data, u8 mem_mask);
+	void tlru_w(offs_t offset, u8 data, u8 mem_mask);
+	u8 tcbl_r(offs_t offset, u8 mem_mask);
+	u8 tcbu_r(offs_t offset, u8 mem_mask);
 
 	void ext_int_edge(int line);
 	void check_interrupts();
+	void clock_timer(int timer);
+	void clock_prescaler();
 	void cycle();
 	u16 fetch();
 
