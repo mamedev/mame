@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /*******************************************************************************
 
-    Skeleton driver for Suzuki BH-1000/Hammond GM-1000 sound module.
+    Skeleton driver for Nihon Eniac BH-1000/Hammond GM-1000 sound module.
 
 *******************************************************************************/
 
@@ -106,6 +106,18 @@ void gm1000_state::gm1000(machine_config &config)
 	lcdc.set_function_set_at_any_time(true);
 }
 
+ROM_START(bh1000)
+	ROM_REGION16_LE(0x40000, "program", 0)
+	ROM_LOAD16_BYTE("bh1_mgs71a__u6_sysl__v2.1_bf66.u6", 0x00000, 0x20000, CRC(d003880c) SHA1(5cf727c42dd1b903c0048f147b461676e8c35faf)) // MX27C1000-90
+	ROM_LOAD16_BYTE("bh1_mgs71a__u7_sysh__v2.1_2fac.u7", 0x00001, 0x20000, CRC(989417a1) SHA1(3de4f10a2e7cde5eb93f04bd75db36e194b1d991)) // MX27C1000-90
+
+	ROM_REGION(0x800000, "waves", 0) // DIP42 mask ROMs "© SUZUKI 1993".
+	ROM_LOAD("319-35006_wd06__m531602c-53.u13", 0x000000, 0x200000, CRC(AFCEA840) SHA1(F003B19B83560191BEF03D0D2C1559D77BDAA227))
+	ROM_LOAD("319-35007_wd07__m531602c-52.u14", 0x200000, 0x200000, CRC(1F322DDB) SHA1(5F3B1BE61782B74E4696D23CD551AA07EB709BB7))
+	ROM_LOAD("319-35008_wd08__m531602c-54.u15", 0x200000, 0x200000, CRC(BE9C158B) SHA1(878B08ACE7B54FA27180C9C45D4B90C04B4BB656))
+	ROM_LOAD("319-35009_wd09__m531602c-55.u16", 0x200000, 0x200000, CRC(DEE0B84A) SHA1(C528131182D24C42C9D64D3B7F811FD8FE88C3E5))
+ROM_END
+
 ROM_START(gm1000)
 	ROM_REGION16_LE(0x40000, "program", 0)
 	ROM_LOAD16_BYTE("bh1_mgs71a__u6_sysl__v2.1_bf66.u6", 0x00000, 0x20000, CRC(d003880c) SHA1(5cf727c42dd1b903c0048f147b461676e8c35faf)) // MX27C1000-90
@@ -120,4 +132,5 @@ ROM_END
 
 } // anonymous namespace
 
+SYST(1994, bh1000, 0, 0, gm1000, gm1000, gm1000_state, empty_init, "NIHON ENIAC CO.,LTD.", "Sound Saurus BH-1000", MACHINE_IS_SKELETON)
 SYST(1994, gm1000, 0, 0, gm1000, gm1000, gm1000_state, empty_init, "Suzuki (Hammond license)", "GM-1000 GM Sound Module", MACHINE_IS_SKELETON)
