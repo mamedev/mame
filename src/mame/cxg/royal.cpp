@@ -3,7 +3,7 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-CXG Sphinx Royal (CXG-240)
+CXG Sphinx Royal family
 
 NOTE: Turn the power switch off before exiting MAME, otherwise NVRAM won't save
 properly. Only turn power off when it's the user's turn to move.
@@ -46,7 +46,9 @@ Excluding other brands with the same product name, HD614042SJ02 MCU was used in:
 #include "speaker.h"
 
 // internal artwork
+#include "cxg_granada.lh"
 #include "cxg_royal.lh"
+#include "cxg_supra.lh"
 
 
 namespace {
@@ -66,6 +68,10 @@ public:
 	{ }
 
 	void royal(machine_config &config);
+	void granada(machine_config &config);
+	void supra(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(granada_change_cpu_freq);
 
 protected:
 	virtual void machine_start() override;
@@ -105,6 +111,12 @@ void royal_state::machine_start()
 	save_item(NAME(m_lcd_com));
 	save_item(NAME(m_lcd_segs));
 	save_item(NAME(m_lcd_select));
+}
+
+INPUT_CHANGED_MEMBER(royal_state::granada_change_cpu_freq)
+{
+	// 1992 models run at lower speed
+	m_maincpu->set_unscaled_clock((newval & 1) ? 4_MHz_XTAL : 3.58_MHz_XTAL);
 }
 
 
@@ -227,6 +239,22 @@ static INPUT_PORTS_START( royal )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Sound")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( granada )
+	PORT_INCLUDE( royal )
+
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x01, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, royal_state, granada_change_cpu_freq, 0) // factory set
+	PORT_CONFSETTING(    0x00, "3.58MHz (1992 version)" )
+	PORT_CONFSETTING(    0x01, "4MHz (1988 version)" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( supra )
+	PORT_INCLUDE( royal )
+
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON)
+INPUT_PORTS_END
+
 
 
 /*******************************************************************************
@@ -256,6 +284,7 @@ void royal_state::royal(machine_config &config)
 
 	// video hardware
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(8, 8);
+	m_lcd_pwm->set_bri_levels(0.05);
 	m_lcd_pwm->set_segmask(0xff, 0x7f);
 	m_lcd_pwm->output_digit().set([this](offs_t offset, u64 data) { m_out_digit[offset] = data; });
 
@@ -265,6 +294,19 @@ void royal_state::royal(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
+
+void royal_state::supra(machine_config &config)
+{
+	royal(config);
+	m_maincpu->read_d().set(FUNC(royal_state::input_r)).exor(0x1000);
+	config.set_default_layout(layout_cxg_supra);
+}
+
+void royal_state::granada(machine_config &config)
+{
+	supra(config);
+	config.set_default_layout(layout_cxg_granada);
 }
 
 
@@ -278,6 +320,9 @@ ROM_START( sroyal )
 	ROM_LOAD("1988_105_newcrest_hd614042sj02", 0x0000, 0x2000, CRC(47334ac9) SHA1(b4dc930e34926f1b33f6d247af45627c891202ff) )
 ROM_END
 
+#define rom_granada rom_sroyal
+#define rom_supra rom_sroyal
+
 } // anonymous namespace
 
 
@@ -286,5 +331,7 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1988, sroyal, 0,      0,      royal,   royal, royal_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Chess Software", "Sphinx Royal", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1988, sroyal,  0,      0,      royal,   royal,   royal_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Chess Software", "Sphinx Royal", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, granada, sroyal, 0,      granada, granada, royal_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Chess Software", "Sphinx Granada", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, supra,   sroyal, 0,      supra,   supra,   royal_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Chess Software", "Sphinx Supra", MACHINE_SUPPORTS_SAVE )
