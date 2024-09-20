@@ -5,7 +5,27 @@
 
 #pragma once
 
-enum tlcs90_e_irq {    INTSWI = 0, INTNMI, INTWD,  INT0,   INTT0,  INTT1,  INTT2,  INTT3,  INTT4,  INT1,   INTT5,  INT2,   INTRX,  INTTX,  INTMAX  };
+// TODO: too generic global enum
+enum tlcs90_e_irq
+{
+	INTSWI = 0,
+	INTNMI,
+	INTWD,
+	INT0,
+	INTT0,
+	INTT1,
+	INTT2,
+	INTT3,
+	INTT4,
+	INT1,
+	INTT5,
+	INT2,
+	INTRX,
+	INTTX,
+
+	INTMAX
+};
+
 DECLARE_ENUM_INCDEC_OPERATORS(tlcs90_e_irq)
 
 class tlcs90_device : public cpu_device
@@ -14,8 +34,8 @@ class tlcs90_device : public cpu_device
 	//static constexpr int MAX_ANALOG_INPUTS = 16;
 
 protected:
-	TIMER_CALLBACK_MEMBER( t90_timer_callback );
-	TIMER_CALLBACK_MEMBER( t90_timer4_callback );
+	TIMER_CALLBACK_MEMBER(t90_timer_callback);
+	TIMER_CALLBACK_MEMBER(t90_timer4_callback);
 
 	void tmp90840_regs(address_map &map);
 	void tmp90840_mem(address_map &map);
@@ -25,8 +45,18 @@ protected:
 	void tmp91640_mem(address_map &map);
 	void tmp91641_mem(address_map &map);
 
-	enum _e_op {    UNKNOWN,    NOP,    EX,     EXX,    LD,     LDW,    LDA,    LDI,    LDIR,   LDD,    LDDR,   CPI,    CPIR,   CPD,    CPDR,   PUSH,   POP,    JP,     JR,     CALL,   CALLR,      RET,    RETI,   HALT,   DI,     EI,     SWI,    DAA,    CPL,    NEG,    LDAR,   RCF,    SCF,    CCF,    TSET,   BIT,    SET,    RES,    INC,    DEC,    INCX,   DECX,   INCW,   DECW,   ADD,    ADC,    SUB,    SBC,    AND,    XOR,    OR,     CP,     RLC,    RRC,    RL,     RR,     SLA,    SRA,    SLL,    SRL,    RLD,    RRD,    DJNZ,   MUL,    DIV     };
-
+	enum _e_op
+	{
+		UNKNOWN,
+		NOP,    EX,     EXX,    LD,     LDW,    LDA,    LDI,    LDIR,
+		LDD,    LDDR,   CPI,    CPIR,   CPD,    CPDR,   PUSH,   POP,
+		JP,     JR,     CALL,   CALLR,  RET,    RETI,   HALT,   DI,
+		EI,     SWI,    DAA,    CPL,    NEG,    LDAR,   RCF,    SCF,
+		CCF,    TSET,   BIT,    SET,    RES,    INC,    DEC,    INCX,
+		DECX,   INCW,   DECW,   ADD,    ADC,    SUB,    SBC,    AND,
+		XOR,    OR,     CP,     RLC,    RRC,    RL,     RR,     SLA,
+		SRA,    SLL,    SRL,    RLD,    RRD,    DJNZ,   MUL,    DIV
+	};
 
 public:
 	// configuration
@@ -47,7 +77,6 @@ protected:
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	[[maybe_unused]] void execute_burn(int32_t cycles);
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -103,7 +132,8 @@ protected:
 	void reserved_w(offs_t offset, uint8_t data);
 
 private:
-	enum class e_mode : u8 {
+	enum class e_mode : u8
+	{
 		NONE,   BIT8,   CC,
 		I8,     D8,     R8,
 		I16,    D16,    R16,
@@ -116,13 +146,13 @@ private:
 	devcb_read8::array<MAX_PORTS> m_port_read_cb;
 	devcb_write8::array<MAX_PORTS> m_port_write_cb;
 
-	PAIR        m_prvpc,m_pc,m_sp,m_af,m_bc,m_de,m_hl,m_ix,m_iy;
-	PAIR        m_af2,m_bc2,m_de2,m_hl2;
-	uint8_t       m_halt, m_after_EI;
-	uint16_t      m_irq_state, m_irq_line_state, m_irq_mask;
+	PAIR m_prvpc, m_pc, m_sp, m_af, m_bc, m_de, m_hl, m_ix, m_iy;
+	PAIR m_af2, m_bc2, m_de2, m_hl2;
+	uint8_t m_halt, m_after_EI;
+	uint16_t m_irq_state, m_irq_line_state, m_irq_mask;
 	address_space *m_program;
-	int     m_icount;
-	int         m_extra_cycles;       // extra cycles for interrupts
+	int m_icount;
+	int m_extra_cycles; // extra cycles for interrupts
 
 	uint8_t m_port_latch[MAX_PORTS];
 
@@ -133,13 +163,13 @@ private:
 	uint8_t m_p8cr;
 	uint8_t m_smmod;
 
-	uint32_t      m_ixbase,m_iybase;
+	uint32_t m_ixbase,m_iybase;
 
 	// Timers: 4 x 8-bit + 1 x 16-bit
-	emu_timer   *m_timer[4+1];
-	uint8_t       m_timer_value[4];
-	uint16_t      m_timer4_value;
-	attotime    m_timer_period;
+	emu_timer *m_timer[4+1];
+	uint8_t m_timer_value[4];
+	uint16_t m_timer4_value;
+	attotime m_timer_period;
 	uint8_t m_tmod;
 	uint8_t m_tclk;
 	uint8_t m_trun;
@@ -148,44 +178,44 @@ private:
 	uint16_t m_treg_16bit[2];
 
 	// Work registers
-	uint8_t        m_op;
+	uint8_t m_op;
 
-	e_mode  m_mode1;
-	uint16_t  m_r1,m_r1b;
+	e_mode m_mode1;
+	uint16_t m_r1, m_r1b;
 
-	e_mode  m_mode2;
-	uint16_t  m_r2,m_r2b;
+	e_mode m_mode2;
+	uint16_t m_r2, m_r2b;
 
-	int m_cyc_t,m_cyc_f;
+	int m_cyc_t, m_cyc_f;
 
-	uint32_t  m_addr;
+	uint32_t m_addr;
 
-	inline uint8_t  RM8 (uint32_t a);
+	inline uint8_t RM8(uint32_t a);
 	inline uint16_t RM16(uint32_t a);
-	inline void WM8 (uint32_t a, uint8_t  v);
+	inline void WM8(uint32_t a, uint8_t v);
 	inline void WM16(uint32_t a, uint16_t v);
-	inline uint8_t  RX8 (uint32_t a, uint32_t base);
+	inline uint8_t RX8(uint32_t a, uint32_t base);
 	inline uint16_t RX16(uint32_t a, uint32_t base);
-	inline void WX8 (uint32_t a, uint8_t  v, uint32_t base);
+	inline void WX8(uint32_t a, uint8_t v, uint32_t base);
 	inline void WX16(uint32_t a, uint16_t v, uint32_t base);
-	inline uint8_t  READ8();
+	inline uint8_t READ8();
 	inline uint16_t READ16();
 	void decode();
-	inline uint16_t r8( const uint16_t r );
-	inline void w8( const uint16_t r, uint16_t value );
-	inline uint16_t r16( const uint16_t r );
-	inline void w16( const uint16_t r, uint16_t value );
+	inline uint16_t r8(const uint16_t r);
+	inline void w8(const uint16_t r, uint16_t value);
+	inline uint16_t r16(const uint16_t r);
+	inline void w16(const uint16_t r, uint16_t value);
 	inline uint8_t Read1_8();
 	inline uint16_t Read1_16();
 	inline uint8_t Read2_8();
 	inline uint16_t Read2_16();
-	inline void Write1_8( uint8_t value );
-	inline void Write1_16( uint16_t value );
-	inline void Write2_8( uint8_t value );
-	inline void Write2_16( uint16_t value );
-	inline int Test( uint8_t cond );
-	inline void Push( uint16_t rr );
-	inline void Pop( uint16_t rr );
+	inline void Write1_8(uint8_t value);
+	inline void Write1_16(uint16_t value);
+	inline void Write2_8(uint8_t value);
+	inline void Write2_16(uint16_t value);
+	inline int Test(uint8_t cond);
+	inline void Push(uint16_t rr);
+	inline void Pop(uint16_t rr);
 	inline void halt();
 	inline void leave_halt();
 	inline void raise_irq(int irq);

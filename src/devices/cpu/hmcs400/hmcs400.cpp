@@ -608,7 +608,7 @@ void hmcs400_cpu_device::tm_w(offs_t offset, u8 data, u8 mem_mask)
 	if (!access_mode(mem_mask))
 		return;
 
-	// TMA/TMB prescaler divide ratio
+	// TMA/TMB prescaler divide ratio masks
 	static const int div[2][8] =
 	{
 		{ 0x400, 0x200, 0x100, 0x40, 0x10, 4, 2, 1 },

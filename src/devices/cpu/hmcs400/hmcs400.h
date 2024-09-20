@@ -149,7 +149,7 @@ protected:
 	u8 m_pmr;             // port mode register
 	u16 m_prescaler;      // 11-bit clock prescaler
 	u8 m_timer_mode[2];   // TMA/TMB: timer mode registers
-	u16 m_timer_div[2];   // timer prescaler divide ration derived from TMA/TMB
+	u16 m_timer_div[2];   // timer prescaler divide ratio masks from TMA/TMB
 	u8 m_timer_count[2];  // TCA/TCA: timer counters
 	u8 m_timer_load;      // timer B reload register
 	u8 m_timer_b_low;     // timer B counter low latch
