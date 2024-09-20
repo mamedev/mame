@@ -480,10 +480,8 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	int img_tracks, img_heads;
 	image.get_maximal_geometry(img_tracks, img_heads);
 	if (track_count > img_tracks)
-	{
-		osd_printf_error("d88: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", track_count, img_tracks);
-		return false;
-	}
+		osd_printf_warning("d88: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", track_count, img_tracks);
+
 	if (head_count > img_heads)
 		osd_printf_warning("d88: Floppy disk has excess of heads for this drive that will be discarded (floppy heads=%d, drive heads=%d).\n", head_count, img_heads);
 
