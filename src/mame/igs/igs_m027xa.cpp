@@ -6,8 +6,8 @@
 IGS ARM7 (IGS027A) based Mahjong / Gambling platform(s) with XA sub-cpu
 These games use the IGS027A processor.
 
-Triple Fever (V105US) (tripfevb) causes MAME to exit with
-"Fatal error: ADD.w R0, [R7+#$02]" after paying out tickets.
+Triple Fever (V105US) (tripfevb) hangs after paying out tickets, with the MCU
+apparently attempting serial communication with something.
 
 */
 
