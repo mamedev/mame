@@ -11,10 +11,13 @@ References:
 - https://github.com/bml3mk5/EmuB-6892/blob/master/src/docs/spec.txt
 
 TODO:
+- bml3mk5: complete IG RAM support;
+- keyboard break NMI (as per bmjr);
+- Cassette relay doesn't work properly, issuing a LOAD won't autostart a load;
+- Cassette baud rate bump (can switch from 600 to 1200 bauds thru $ffd7);
 - implement sound as a bml3bus slot device;
-- account for hardware differences between MB-6890, MB-6891 and MB-6892
-    (e.g. custom font support on the MB-6892)
-- Verify if anything needs composing from here for Hitachi MB-S1 support;
+- soft reset will hang the machine;
+- Hitachi MB-S1 support (bumps memory map, adds an extra I/O layer);
 
 **************************************************************************************************/
 
@@ -104,13 +107,15 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
 
 protected:
-	// NOTE: need to override for S1 support, later on
 	virtual void main_map(address_map &map);
-	void system_io(address_map &map);
+	virtual void system_io(address_map &map);
 
-private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<bml3bus_device> m_bml3bus;
+private:
 	required_region_ptr<u8> m_p_chargen;
 	required_device<mc6845_device> m_crtc;
 	required_device<cassette_image_device> m_cassette;
@@ -129,23 +134,23 @@ private:
 
 	uint8_t mc6845_r(offs_t offset);
 	void mc6845_w(offs_t offset, u8 data);
-	uint8_t keyboard_r();
-	void keyboard_w(u8 data);
-	void hres_reg_w(u8 data);
-	void vres_reg_w(u8 data);
+	uint8_t kb_sel_r();
+	void kb_sel_w(u8 data);
+	void mode_sel_w(u8 data);
+	void interlace_sel_w(u8 data);
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, u8 data);
 	[[maybe_unused]] uint8_t psg_latch_r();
 	[[maybe_unused]] void psg_latch_w(u8 data);
-	uint8_t vram_attr_r();
-	void vram_attr_w(u8 data);
-	uint8_t beep_r();
-	void beep_w(u8 data);
+	uint8_t c_reg_sel_r();
+	void c_reg_sel_w(u8 data);
+	uint8_t music_sel_r();
+	void music_sel_w(u8 data);
 	void piaA_w(uint8_t data);
-	uint8_t keyb_nmi_r();
-	void firq_mask_w(u8 data);
-	uint8_t firq_status_r();
-	void relay_w(u8 data);
+	uint8_t kbnmi_r();
+	void time_mask_w(u8 data);
+	uint8_t timer_r();
+	void remote_w(u8 data);
 	void acia_rts_w(int state);
 	void acia_irq_w(int state);
 
@@ -175,8 +180,6 @@ private:
 	bool m_cassbit = 0;
 	bool m_cassold = 0;
 	u8 m_cass_data[4]{};
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	void crtc_change_clock(u8 setting);
 	u8 m_crtc_index = 0U;
 	std::unique_ptr<u8[]> m_vram;
@@ -201,9 +204,24 @@ class bml3mk5_state : public bml3mk2_state
 public:
 	bml3mk5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: bml3mk2_state(mconfig, type, tag)
+		, m_ig_view(*this, "ig_view")
+		, m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	void bml3mk5(machine_config &config);
+protected:
+	virtual void main_map(address_map &map) override;
+	virtual void system_io(address_map &map) override;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+private:
+	memory_view m_ig_view;
+	required_device<gfxdecode_device> m_gfxdecode;
+	std::unique_ptr<u8[]> m_ig_ram;
+	void ig_ram_w(offs_t offset, u8 data);
+
+	u8 m_igen = 0;
 };
 
 MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
@@ -314,7 +332,7 @@ void bml3_state::mc6845_w(offs_t offset, u8 data)
 	}
 }
 
-u8 bml3_state::keyboard_r()
+u8 bml3_state::kb_sel_r()
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	u8 ret = m_keyb_scancode;
@@ -323,7 +341,8 @@ u8 bml3_state::keyboard_r()
 	return ret;
 }
 
-void bml3_state::keyboard_w(u8 data)
+// KB SEL - Keyboard mode register, interrupt control, keyboard LEDs
+void bml3_state::kb_sel_w(u8 data)
 {
 	m_keyb_katakana_led_on = BIT(data, 0);
 	m_keyb_hiragana_led_on = BIT(data, 1);
@@ -348,27 +367,24 @@ void bml3_state::crtc_change_clock(u8 setting)
 	m_crtc->set_unscaled_clock(m6845_clock);
 }
 
-void bml3_state::hres_reg_w(u8 data)
+/*
+ * MODE_SEL - Graphics mode select
+ * cfr. see service manual p.43
+ * x--- ---- "W" bit: 0 = 40 columns, 1 = 80 columns
+ * -x-- ---- "HR" bit: 0 = high resolution, 1 = normal
+ * --x- ---- "C" bit - ACIA mode: 0 = cassette, 1 = RS-232C
+ * ---- -RGB Background colour
+ */
+void bml3_state::mode_sel_w(u8 data)
 {
-	// MODE SEL register (see service manual p.43).
-	/*
-	x--- ---- "W" bit: 0 = 40 columns, 1 = 80 columns
-	-x-- ---- "HR" bit: 0 = high resolution, 1 = normal
-	--x- ---- "C" bit - ACIA mode: 0 = cassette, 1 = RS-232C
-	---- -RGB Background colour
-	*/
-
 	m_hres_reg = data;
 
 	crtc_change_clock((m_hres_reg & 0x80) | (m_vres_reg & 0x08));
 }
 
-void bml3_state::vres_reg_w(u8 data)
+// INTERLACE_SEL - Interlaced video mode
+void bml3_state::interlace_sel_w(u8 data)
 {
-	// The MB-6890 had an interlaced video mode which was used for displaying Japanese (Hiragana and Katakana) text (8x16 character glyph bitmaps).
-	/*
-	---- x--- Interlace select: 0 = non-interlace, 1 = interlace
-	*/
 	m_vres_reg = data;
 
 	crtc_change_clock((m_hres_reg & 0x80) | (m_vres_reg & 0x08));
@@ -378,7 +394,7 @@ void bml3_state::vres_reg_w(u8 data)
 u8 bml3_state::vram_r(offs_t offset)
 {
 	// Bit 7 masks reading back to the latch
-	if (!BIT(m_attr_latch, 7))
+	if (!BIT(m_attr_latch, 7) && !machine().side_effects_disabled())
 		m_attr_latch = m_aram[offset];
 
 	return m_vram[offset];
@@ -415,49 +431,56 @@ void bml3_state::ym2203_w(u8 data)
 	m_ym2203->write(dev_offs, data);
 }
 
-u8 bml3_state::vram_attr_r()
+/*
+ * C-REG-SELECT register
+ * Reads from a VRAM address copy the corresponding 'colour RAM' address to the
+ * low-order 5 bits of this register as a side-effect
+ */
+u8 bml3_state::c_reg_sel_r()
 {
-	// C-REG-SELECT register
-	// Reads from a VRAM address copy the corresponding 'colour RAM' address to the low-order 5 bits of this register as a side-effect
-	// (unless MK bit indicates 'prohibit write')
 	return m_attr_latch;
 }
 
-void bml3_state::vram_attr_w(u8 data)
+/*
+ * C_REG_SEL - Attribute register (character/video mode and colours)
+ * Writes to a VRAM address copy the low-order 5 bits of this register to the corresponding 'colour RAM' address as a side-effect
+ * x--- ---- "MK" bit: 0 = enable write, 1 = prohibit write
+ * ---x ---- "GC" bit: 0 = character, 1 = graphic
+ * ---- x--- "RV" bit: 0 = normal, 1 - reverse
+ * ---- -RGB Foreground colour
+ *
+ */
+void bml3_state::c_reg_sel_w(u8 data)
 {
-	// C-REG-SELECT register
-	// Writes to a VRAM address copy the low-order 5 bits of this register to the corresponding 'colour RAM' address as a side-effect
-	/*
-	x--- ---- "MK" bit: 0 = enable write, 1 = prohibit write
-	---x ---- "GC" bit: 0 = character, 1 = graphic
-	---- x--- "RV" bit: 0 = normal, 1 - reverse
-	---- -RGB Foreground colour
-	*/
 	m_attr_latch = data;
 }
 
-u8 bml3_state::beep_r()
+u8 bml3_state::music_sel_r()
 {
 	return -1; // BEEP status read?
 }
 
-void bml3_state::beep_w(u8 data)
+// MUSIC SEL - Music select: toggle audio output level when rising
+void bml3_state::music_sel_w(u8 data)
 {
 	m_speaker->level_w(BIT(data, 7));
 }
 
-void bml3_state::relay_w(u8 data)
+// REMOTE - Remote relay control for cassette - bit 7
+void bml3_state::remote_w(u8 data)
 {
 	m_cassette->change_state(
-		BIT(data,7) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		BIT(data, 7) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-u8 bml3_state::keyb_nmi_r()
+// KBNMI - Keyboard "Break" key non-maskable interrupt
+u8 bml3_state::kbnmi_r()
 {
 	return m_nmi; // bit 7 used to signal a BREAK key pressure
 }
 
-void bml3_state::firq_mask_w(u8 data)
+// TIME_MASK - Prohibit timer IRQ
+void bml3_state::time_mask_w(u8 data)
 {
 	m_firq_mask = data & 0x80;
 	if(m_firq_mask)
@@ -467,11 +490,15 @@ void bml3_state::firq_mask_w(u8 data)
 	}
 }
 
-u8 bml3_state::firq_status_r()
+// TIMER - System timer enable
+u8 bml3_state::timer_r()
 {
 	u8 res = m_firq_status << 7;
-	m_firq_status = 0;
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		m_firq_status = 0;
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+	}
 	return res;
 }
 
@@ -511,33 +538,20 @@ void bml3_state::system_io(address_map &map)
 	map(0x00c0, 0x00c3).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x00c4, 0x00c5).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x00c6, 0x00c7).rw(FUNC(bml3_state::mc6845_r), FUNC(bml3_state::mc6845_w));
-	// KBNMI - Keyboard "Break" key non-maskable interrupt
-	map(0x00c8, 0x00c8).r(FUNC(bml3_state::keyb_nmi_r)); // keyboard nmi
-	// DIPSW - DIP switches on system mainboard
-	map(0x00c9, 0x00c9).portr("DSW");
-	// TIMER - System timer enable
-	map(0x00ca, 0x00ca).r(FUNC(bml3_state::firq_status_r)); // timer irq
-	// LPFLG - Light pen interrupt
-//  map(0x00cb, 0x00cb)
-	// MODE_SEL - Graphics mode select
-	map(0x00d0, 0x00d0).w(FUNC(bml3_state::hres_reg_w));
-	// TRACE - Trace counter
-//  map(0x00d1, 0x00d1)
-	// REMOTE - Remote relay control for cassette - bit 7
-	map(0x00d2, 0x00d2).w(FUNC(bml3_state::relay_w));
-	// MUSIC_SEL - Music select: toggle audio output level when rising
-	map(0x00d3, 0x00d3).rw(FUNC(bml3_state::beep_r), FUNC(bml3_state::beep_w));
-	// TIME_MASK - Prohibit timer IRQ
-	map(0x00d4, 0x00d4).w(FUNC(bml3_state::firq_mask_w));
-	// LPENBL - Light pen operation enable
-	map(0x00d5, 0x00d5).noprw();
-	// INTERLACE_SEL - Interlaced video mode (manual has "INTERACE SEL"!)
-	map(0x00d6, 0x00d6).w(FUNC(bml3_state::vres_reg_w));
-//  map(0x00d7, 0x00d7) baud select
-	// C_REG_SEL - Attribute register (character/video mode and colours)
-	map(0x00d8, 0x00d8).rw(FUNC(bml3_state::vram_attr_r), FUNC(bml3_state::vram_attr_w));
-	// KB - Keyboard mode register, interrupt control, keyboard LEDs
-	map(0x00e0, 0x00e0).rw(FUNC(bml3_state::keyboard_r), FUNC(bml3_state::keyboard_w));
+	map(0x00c8, 0x00c8).r(FUNC(bml3_state::kbnmi_r));
+	map(0x00c9, 0x00c9).portr("DIPSW");
+	map(0x00ca, 0x00ca).r(FUNC(bml3_state::timer_r));
+//  map(0x00cb, 0x00cb) LPFLG - Light pen interrupt
+	map(0x00d0, 0x00d0).w(FUNC(bml3_state::mode_sel_w));
+//  map(0x00d1, 0x00d1) TRACE - Trace counter
+	map(0x00d2, 0x00d2).w(FUNC(bml3_state::remote_w));
+	map(0x00d3, 0x00d3).rw(FUNC(bml3_state::music_sel_r), FUNC(bml3_state::music_sel_w));
+	map(0x00d4, 0x00d4).w(FUNC(bml3_state::time_mask_w));
+	map(0x00d5, 0x00d5).noprw(); // L/P ENBL - Light pen operation enable
+	map(0x00d6, 0x00d6).w(FUNC(bml3_state::interlace_sel_w));
+//  map(0x00d7, 0x00d7) BANK SEL - baud select
+	map(0x00d8, 0x00d8).rw(FUNC(bml3_state::c_reg_sel_r), FUNC(bml3_state::c_reg_sel_w));
+	map(0x00e0, 0x00e0).rw(FUNC(bml3_state::kb_sel_r), FUNC(bml3_state::kb_sel_w));
 //  map(0x00e8, 0x00e8) bank register
 //  map(0x00e9, 0x00e9) IG mode register
 //  map(0x00ea, 0x00ea) IG enable register
@@ -548,9 +562,46 @@ void bml3_state::system_io(address_map &map)
 #endif
 }
 
+void bml3mk5_state::ig_ram_w(offs_t offset, u8 data)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		if (BIT(m_igen, i))
+			m_ig_ram[offset + 0x800 * i] = data;
+	}
+	m_gfxdecode->gfx(0)->mark_dirty(offset / 8);
+}
+
+void bml3mk5_state::main_map(address_map &map)
+{
+	bml3_state::main_map(map);
+	map(0xa000, 0xa7ff).view(m_ig_view);
+	m_ig_view[0](0xa000, 0xa7ff).writeonly().w(FUNC(bml3mk5_state::ig_ram_w));
+}
+
+void bml3mk5_state::system_io(address_map &map)
+{
+	bml3_state::system_io(map);
+	// IGMODREG
+	map(0x00e9, 0x00e9).lw8(
+		NAME([this] (u8 data) {
+			if (BIT(data, 0))
+				m_ig_view.select(0);
+			else
+				m_ig_view.disable();
+		})
+	);
+	// IGENREG
+	map(0x00ea, 0x00ea).lw8(
+		NAME([this] (u8 data) {
+			m_igen = data & 7;
+		})
+	);
+}
+
 INPUT_CHANGED_MEMBER(bml3_state::nmi_button)
 {
-	// TODO: isn't this supposed to actually raise an NMI, just like earlier Basic Master LV1/2?
+	// TODO: supposed to actually raise an NMI, just like earlier Basic Master LV1/2
 	m_nmi = newval ? 0x80 : 0;
 }
 
@@ -558,7 +609,7 @@ static INPUT_PORTS_START( bml3 )
 
 	// DIP switches (service manual p.88)
 	// Note the NEWON command reboots with a soft override for the DIP switch
-	PORT_START("DSW")
+	PORT_START("DIPSW")
 	PORT_DIPNAME( 0x01, 0x01, "BASIC/terminal mode")
 	PORT_DIPSETTING(0x00, "Terminal mode")
 	PORT_DIPSETTING(0x01, "BASIC mode")
@@ -755,13 +806,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::kansas_r )
 	}
 }
 
-#if 0
-INTERRUPT_GEN_MEMBER(bml3_state::irq)
-{
-	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-}
-#endif
-
 
 INTERRUPT_GEN_MEMBER(bml3_state::timer_firq)
 {
@@ -777,6 +821,9 @@ void bml3_state::machine_start()
 	m_vram = make_unique_clear<u8[]>(0x4000);
 	m_aram = make_unique_clear<u8[]>(0x4000);
 
+	// TODO: this setup is goofy, and bound to fail if things changes downstream.
+	// Should really overlay the ROM region, not the view itself.
+	// Additionally each slot has separate ROM KIL and EXROM KIL signal controls ...
 	m_bml3bus->map_exrom(m_rom_view[0]);
 	m_bml3bus->map_io(m_maincpu->space(AS_PROGRAM));
 
@@ -834,6 +881,22 @@ void bml3_state::machine_reset()
 	m_cassold = 0;
 	m_nmi = 0;
 	m_kbt = 0;
+}
+
+void bml3mk5_state::machine_start()
+{
+	bml3_state::machine_start();
+	m_ig_ram = make_unique_clear<u8[]>(0x800 * 3);
+	m_gfxdecode->gfx(0)->set_source_and_total(m_ig_ram.get(), 0x100);
+
+	save_pointer(NAME(m_ig_ram), 0x800 * 3);
+}
+
+void bml3mk5_state::machine_reset()
+{
+	bml3_state::machine_reset();
+	m_ig_view.disable();
+	m_igen = 0;
 }
 
 void bml3_state::piaA_w(uint8_t data)
@@ -914,6 +977,23 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::kansas_w )
 		m_cassette->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
+// Debugging only
+static const gfx_layout ig_charlayout =
+{
+	8, 8,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(0, 3), RGN_FRAC(1, 3), RGN_FRAC(2, 3) },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	8*8
+};
+
+static GFXDECODE_START( gfx_bml3mk5 )
+	GFXDECODE_ENTRY( nullptr, 0x1800, ig_charlayout, 0, 1 )
+GFXDECODE_END
+
+
 static void bml3_cards(device_slot_interface &device)
 {
 	device.option_add("mp1802", BML3BUS_MP1802);
@@ -921,7 +1001,6 @@ static void bml3_cards(device_slot_interface &device)
 	device.option_add("kanji",  BML3BUS_KANJI);
 	device.option_add("rtc",    BML3BUS_RTC);
 }
-
 
 void bml3_state::bml3(machine_config &config)
 {
@@ -1011,6 +1090,7 @@ void bml3mk5_state::bml3mk5(machine_config &config)
 {
 	bml3mk2_state::bml3mk2(config);
 	// TODO: override bus defaults
+	GFXDECODE(config, "gfxdecode", "palette", gfx_bml3mk5);
 }
 
 
