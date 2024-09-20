@@ -5,60 +5,30 @@
 
 #pragma once
 
-// TODO: too generic global enum
-enum tlcs90_e_irq
-{
-	INTSWI = 0,
-	INTNMI,
-	INTWD,
-	INT0,
-	INTT0,
-	INTT1,
-	INTT2,
-	INTT3,
-	INTT4,
-	INT1,
-	INTT5,
-	INT2,
-	INTRX,
-	INTTX,
-
-	INTMAX
-};
-
-DECLARE_ENUM_INCDEC_OPERATORS(tlcs90_e_irq)
 
 class tlcs90_device : public cpu_device
 {
-	static constexpr int MAX_PORTS = 9;
-	//static constexpr int MAX_ANALOG_INPUTS = 16;
-
-protected:
-	TIMER_CALLBACK_MEMBER(t90_timer_callback);
-	TIMER_CALLBACK_MEMBER(t90_timer4_callback);
-
-	void tmp90840_regs(address_map &map);
-	void tmp90840_mem(address_map &map);
-	void tmp90841_mem(address_map &map);
-	void tmp90844_regs(address_map &map);
-	void tmp90ph44_mem(address_map &map);
-	void tmp91640_mem(address_map &map);
-	void tmp91641_mem(address_map &map);
-
-	enum _e_op
+public:
+	enum tlcs90_e_irq
 	{
-		UNKNOWN,
-		NOP,    EX,     EXX,    LD,     LDW,    LDA,    LDI,    LDIR,
-		LDD,    LDDR,   CPI,    CPIR,   CPD,    CPDR,   PUSH,   POP,
-		JP,     JR,     CALL,   CALLR,  RET,    RETI,   HALT,   DI,
-		EI,     SWI,    DAA,    CPL,    NEG,    LDAR,   RCF,    SCF,
-		CCF,    TSET,   BIT,    SET,    RES,    INC,    DEC,    INCX,
-		DECX,   INCW,   DECW,   ADD,    ADC,    SUB,    SBC,    AND,
-		XOR,    OR,     CP,     RLC,    RRC,    RL,     RR,     SLA,
-		SRA,    SLL,    SRL,    RLD,    RRD,    DJNZ,   MUL,    DIV
+		INTSWI = 0,
+		INTNMI,
+		INTWD,
+		INT0,
+		INTT0,
+		INTT1,
+		INTT2,
+		INTT3,
+		INTT4,
+		INT1,
+		INTT5,
+		INT2,
+		INTRX,
+		INTTX,
+
+		INTMAX
 	};
 
-public:
 	// configuration
 	template <size_t Port> auto port_read() { return m_port_read_cb[Port].bind(); }
 	template <size_t Port> auto port_write() { return m_port_write_cb[Port].bind(); }
@@ -83,6 +53,18 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	// address maps
+	void tmp90840_regs(address_map &map);
+	void tmp90840_mem(address_map &map);
+	void tmp90841_mem(address_map &map);
+	void tmp90844_regs(address_map &map);
+	void tmp90ph44_mem(address_map &map);
+	void tmp91640_mem(address_map &map);
+	void tmp91641_mem(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(t90_timer_callback);
+	TIMER_CALLBACK_MEMBER(t90_timer4_callback);
 
 	// internal registers
 	uint8_t p1_r();
@@ -132,6 +114,19 @@ protected:
 	void reserved_w(offs_t offset, uint8_t data);
 
 private:
+	enum _e_op
+	{
+		UNKNOWN,
+		NOP,    EX,     EXX,    LD,     LDW,    LDA,    LDI,    LDIR,
+		LDD,    LDDR,   CPI,    CPIR,   CPD,    CPDR,   PUSH,   POP,
+		JP,     JR,     CALL,   CALLR,  RET,    RETI,   HALT,   DI,
+		EI,     SWI,    DAA,    CPL,    NEG,    LDAR,   RCF,    SCF,
+		CCF,    TSET,   BIT,    SET,    RES,    INC,    DEC,    INCX,
+		DECX,   INCW,   DECW,   ADD,    ADC,    SUB,    SBC,    AND,
+		XOR,    OR,     CP,     RLC,    RRC,    RL,     RR,     SLA,
+		SRA,    SLL,    SRL,    RLD,    RRD,    DJNZ,   MUL,    DIV
+	};
+
 	enum class e_mode : u8
 	{
 		NONE,   BIT8,   CC,
@@ -140,6 +135,9 @@ private:
 		MI16,   MR16,   MR16D8, MR16R8,
 		R16D8,  R16R8
 	};
+
+	static constexpr int MAX_PORTS = 9;
+	//static constexpr int MAX_ANALOG_INPUTS = 16;
 
 	address_space_config m_program_config;
 
@@ -303,6 +301,8 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
+
+DECLARE_ENUM_INCDEC_OPERATORS(tlcs90_device::tlcs90_e_irq)
 
 DECLARE_DEVICE_TYPE(TMP90840,  tmp90840_device)
 DECLARE_DEVICE_TYPE(TMP90841,  tmp90841_device)
