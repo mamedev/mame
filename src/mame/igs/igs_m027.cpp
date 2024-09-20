@@ -47,6 +47,7 @@
 
 #include "jking02.lh"
 #include "oceanpar.lh"
+#include "tripslot.lh"
 
 
 namespace {
@@ -68,6 +69,7 @@ public:
 		m_ticket(*this, "ticket"),
 		m_io_kbd(*this, "KEY%u", 0U),
 		m_io_dsw(*this, "DSW%u", 1U),
+		m_io_misc(*this, "MISC"),
 		m_out_lamps(*this, "lamp%u", 1U)
 	{ }
 
@@ -87,6 +89,7 @@ public:
 	void zhongguo_xor(machine_config &config) ATTR_COLD;
 	void mgzz_xor(machine_config &config) ATTR_COLD;
 	void oceanpar_xor(machine_config &config) ATTR_COLD;
+	void tripslot_xor(machine_config &config) ATTR_COLD;
 	void chessc2_xor(machine_config &config) ATTR_COLD;
 
 	void init_sdwx() ATTR_COLD;
@@ -131,6 +134,7 @@ private:
 
 	optional_ioport_array<5> m_io_kbd;
 	optional_ioport_array<3> m_io_dsw;
+	optional_ioport m_io_misc;
 
 	output_finder<16> m_out_lamps;
 
@@ -150,6 +154,8 @@ private:
 	void mahjong_output_w(u8 data);
 	void jking02_output_w(u8 data);
 	void oceanpar_output_w(u8 data);
+	void tripslot_misc_w(u8 data);
+	void tripslot_okibank_low_w(u8 data);
 	void oki_128k_bank_w(u8 data);
 
 	u32 slqz3_gpio_r();
@@ -163,6 +169,7 @@ private:
 	void igs_mahjong_map(address_map &map) ATTR_COLD;
 	void igs_mahjong_xor_map(address_map &map) ATTR_COLD;
 	void cjddz_xor_map(address_map &map) ATTR_COLD;
+	void tripslot_xor_map(address_map &map) ATTR_COLD;
 
 	void oki_128k_map(address_map &map) ATTR_COLD;
 };
@@ -223,6 +230,13 @@ void igs_m027_state::cjddz_xor_map(address_map &map)
 	igs_mahjong_xor_map(map);
 
 	map(0x3800'b000, 0x3800'b003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::oki_128k_bank_w));
+}
+
+void igs_m027_state::tripslot_xor_map(address_map &map)
+{
+	igs_mahjong_xor_map(map);
+
+	map(0x3800'c000, 0x3800'c003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::tripslot_misc_w));
 }
 
 void igs_m027_state::oki_128k_map(address_map &map)
@@ -1208,6 +1222,101 @@ INPUT_PORTS_START( fruitpara )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( tripslot )
+	PORT_START("PORTB")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNKNOWN )                 PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)  // shows DIP switch settings
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )             PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)  // also provides access to game setup (coinage, etc.)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )                 PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )           PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )                 PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )                  PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )              PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  PORT_NAME("Stop Reel 4 / Take Score")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )             PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  // also provides access to game setup (coinage, etc.)
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )                PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  // shows DIP switch settings
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )                   PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )                 PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )              PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  PORT_NAME("Stop Reel 3 / Small")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )              PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  PORT_NAME("Stop Reel 2 / Double Up")
+
+	PORT_START("PORTC")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )            PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNKNOWN )                 PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )                  PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)  PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )           PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )            PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP5 )              PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  PORT_NAME("Stop Reel 5 / Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )           PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )                  PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  PORT_NAME("Start / Stop All Reels")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )           PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )                 PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )              PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)  PORT_NAME("Stop Reel 1 / Big")
+
+	PORT_START("PLAYER")
+	PORT_BIT( 0x00001, IP_ACTIVE_LOW, IPT_COIN1 )                PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x00002, IP_ACTIVE_LOW, IPT_COIN2 )                PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x00004, IP_ACTIVE_LOW, IPT_START1 )               PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)  PORT_NAME("Start / Stop All Reels")
+	PORT_BIT( 0x00008, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )           PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)  PORT_NAME("Stop Reel 1 / Big")
+	PORT_BIT( 0x00010, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )           PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)  PORT_NAME("Stop Reel 2 / Double Up")
+	PORT_BIT( 0x00020, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )           PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)  PORT_NAME("Stop Reel 3 / Small")
+	PORT_BIT( 0x00040, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )           PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)  PORT_NAME("Stop Reel 4 / Take Score")
+	PORT_BIT( 0x00080, IP_ACTIVE_LOW, IPT_SLOT_STOP5 )           PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)  PORT_NAME("Stop Reel 5 / Bet")
+	PORT_BIT( 0x000ff, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x0ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10000, IP_ACTIVE_LOW, IPT_UNKNOWN )              PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x10000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )         PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0xe0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("PPIB")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) // coin 1
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<2>) // key-in
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<1>) // coin 2
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<3>) // coin 2
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<4>) // hopper
+
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<0>) // coin 1
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(igs_m027_state, counter_w<4>) // key-out
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x00) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+
+	PORT_START("MISC")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+	// bit 5 does something as well
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Language) )          PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(English) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Spanish) )
+	PORT_DIPNAME( 0x02, 0x02, "Wiring Diagram" )           PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, "36+10" )
+	PORT_DIPSETTING(    0x00, "28-pin" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( chessc2 )
 	// preliminary - game seems to lack an input test and settings are locked out with password
 
@@ -1398,28 +1507,28 @@ template <unsigned Start>
 void igs_m027_state::lamps_w(u8 data)
 {
 	// active high outputs
-	// +------+-------------------------------+---------------+
-	// | lamp | jking02                       | oceanpar      |
-	// |      +---------------+---------------+               |
-	// |      | 36+10         | 28-Pin        |               |
-	// +------+---------------+---------------+---------------+
-	// |  1   | stop 4/start  |               | start         |
-	// |  2   | stop 3/small  |               | stop 2/small  |
-	// |  3   | bet           |               | bet           |
-	// |  4   | stop 1/take   |               | stop 3/take   |
-	// |  5   | stop 2/double |               | stop 1/double |
-	// |  6   | stop all/big  |               | stop all/big  |
-	// |  7   |               |               |               |
-	// |  8   |               |               |               |
-	// |  9   |               | bet           |               |
-	// | 10   |               | start         |               |
-	// | 11   |               |               |               |
-	// | 12   |               | stop 1/take   |               |
-	// | 13   |               | stop 2/big    |               |
-	// | 14   |               | stop 4/double |               |
-	// | 15   |               | stop 3/small  |               |
-	// | 16   |               |               |               |
-	// +------+---------------+---------------+---------------+
+	// +------+-------------------------------+-------------------------------+---------------+
+	// | lamp | jking02                       | tripslot                      | oceanpar      |
+	// |      +---------------+---------------+---------------+---------------+               |
+	// |      | 36+10         | 28-Pin        | 36+10         | 28-Pin        |               |
+	// +------+---------------+---------------+---------------+---------------+---------------+
+	// |  1   | stop 4/start  |               | start         |               | start         |
+	// |  2   | stop 3/small  |               | stop 3/small  |               | stop 2/small  |
+	// |  3   | bet           |               | stop 5/bet    |               | bet           |
+	// |  4   | stop 1/take   |               | stop 4/take   |               | stop 3/take   |
+	// |  5   | stop 2/double |               | stop 2/double |               | stop 1/double |
+	// |  6   | stop all/big  |               | stop 1/big    |               | stop all/big  |
+	// |  7   |               |               |               |               |               |
+	// |  8   |               |               |               |               |               |
+	// |  9   |               | bet           |               | stop 5/bet    |               |
+	// | 10   |               | start         |               | start         |               |
+	// | 11   |               |               |               |               |               |
+	// | 12   |               | stop 1/take   |               | stop 1/big    |               |
+	// | 13   |               | stop 2/big    |               | stop 2/double |               |
+	// | 14   |               | stop 4/double |               | stop 4/take   |               |
+	// | 15   |               | stop 3/small  |               | stop 3/small  |               |
+	// | 16   |               |               |               |               |               |
+	// +------+---------------+---------------+---------------+---------------+---------------+
 	for (unsigned i = 0; 8 > i; ++i)
 		m_out_lamps[Start + i] = BIT(data, i);
 }
@@ -1451,6 +1560,19 @@ void igs_m027_state::oceanpar_output_w(u8 data)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 2)); // one pulse per COINC accepted
 	machine().bookkeeping().coin_counter_w(3, BIT(data, 6)); // one pulse per KEYOUT
 	m_hopper->motor_w(BIT(data, 7));
+}
+
+void igs_m027_state::tripslot_misc_w(u8 data)
+{
+	m_io_misc->write(data);
+	m_io_select[0] = (BIT(data, 5) << 2) | (m_io_select[0] & 0x03);
+	m_oki->set_rom_bank(m_io_select[0]);
+}
+
+void igs_m027_state::tripslot_okibank_low_w(u8 data)
+{
+	m_io_select[0] = (m_io_select[0] & 0x04) | (data & 0x03);
+	m_oki->set_rom_bank(m_io_select[0]);
 }
 
 void igs_m027_state::oki_128k_bank_w(u8 data)
@@ -1670,6 +1792,21 @@ void igs_m027_state::oceanpar_xor(machine_config &config)
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
+}
+
+void igs_m027_state::tripslot_xor(machine_config &config)
+{
+	m027_xor(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::tripslot_xor_map);
+	m_maincpu->in_port().set_ioport("PLAYER");
+	m_maincpu->out_port().append(FUNC(igs_m027_state::tripslot_okibank_low_w)).rshift(3);
+
+	m_ppi->out_pa_callback().set(FUNC(igs_m027_state::lamps_w<8>));
+	m_ppi->out_pb_callback().set_ioport("PPIB");
+	m_ppi->out_pc_callback().set(FUNC(igs_m027_state::lamps_w<0>));
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 void igs_m027_state::chessc2_xor(machine_config &config)
@@ -2814,7 +2951,7 @@ GAMEL( 1999, oceanpara, oceanpar, oceanpar_xor, oceanpara,igs_m027_state, init_o
 GAMEL( 1999, fruitpar,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)",   0, layout_oceanpar )
 GAMEL( 1999, fruitpara, fruitpar, oceanpar_xor, fruitpara,igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", 0, layout_oceanpar )
 GAME(  200?, cjddz,     0,        cjddz_xor,    cjddz,    igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", 0 )
-GAME(  2007, tripslot,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", MACHINE_NOT_WORKING ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
+GAMEL( 2007, tripslot,  0,        tripslot_xor, tripslot, igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
 // this has a 2nd 8255
 GAME(  2001, extradrw,  0,        m027,         base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255

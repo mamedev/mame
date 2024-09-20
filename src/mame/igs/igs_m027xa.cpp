@@ -163,7 +163,7 @@ void igs_m027xa_state::main_map(address_map &map)
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 	map(0x38008000, 0x38008003).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x38009000, 0x38009003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x3800c000, 0x3800c003).w(FUNC(igs_m027xa_state::oki_bank_w));
+	map(0x3800c000, 0x3800c003).umask32(0x000000ff).w(FUNC(igs_m027xa_state::oki_bank_w));
 	map(0x40000014, 0x40000017).w(FUNC(igs_m027xa_state::igs_40000014_w));
 
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027xa_state::xor_table_w));
@@ -394,8 +394,7 @@ u32 igs_m027xa_state::gpio_r()
 
 void igs_m027xa_state::oki_bank_w(offs_t offset, u8 data)
 {
-	if (offset == 0)
-		m_oki->set_rom_bank(data & 7);
+	m_oki->set_rom_bank(data & 7);
 }
 
 template <unsigned Select, unsigned First>
