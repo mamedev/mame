@@ -246,7 +246,8 @@ public:
 		m_rom(*this, "user1"),
 		m_idprom(*this, "idprom"),
 		m_ram(*this, RAM_TAG),
-		m_lance(*this, "lance")
+		m_lance(*this, "lance"),
+		m_diagsw(*this, "diagsw")
 	{ }
 
 	void sun3(machine_config &config);
@@ -274,6 +275,7 @@ private:
 	required_memory_region m_rom, m_idprom;
 	required_device<ram_device> m_ram;
 	required_device<am79c90_device> m_lance;
+	required_ioport m_diagsw;
 
 	uint32_t tl_mmu_r(offs_t offset, uint32_t mem_mask = ~0);
 	void tl_mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -302,6 +304,8 @@ private:
 	void vmetype1space_map(address_map &map);
 	void vmetype2space_map(address_map &map);
 	void vmetype3space_map(address_map &map);
+
+	uint32_t enable_r();
 
 	uint32_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
@@ -474,7 +478,7 @@ uint32_t sun3_state::tl_mmu_r(offs_t offset, uint32_t mem_mask)
 				return m_context<<24;
 
 			case 4: // enable reg
-				return m_enable;
+				return enable_r();
 
 			case 5: // DVMA enable
 				return m_dvma_enable<<24;
@@ -509,7 +513,7 @@ uint32_t sun3_state::tl_mmu_r(offs_t offset, uint32_t mem_mask)
 	}
 
 	// boot mode?
-	if ((fc == M68K_FC_SUPERVISOR_PROGRAM) && !(m_enable & 0x80))
+	if ((fc == M68K_FC_SUPERVISOR_PROGRAM) && !(enable_r() & 0x80))
 	{
 		return m_rom_ptr[offset & 0x3fff];
 	}
@@ -811,6 +815,13 @@ void sun3_state::vmetype3space_map(address_map &map)
 {
 }
 
+uint32_t sun3_state::enable_r()
+{
+	// Incorporate diag switch value.
+	const uint32_t diagsw = m_diagsw->read() << 24;
+	return (m_enable & ~(u32(1) << 24)) | diagsw;
+}
+
 uint32_t sun3_state::irqctrl_r()
 {
 	return m_irqctrl;
@@ -978,6 +989,10 @@ uint32_t sun3_state::bw2_350_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 /* Input ports */
 static INPUT_PORTS_START( sun3 )
+	PORT_START("diagsw")
+	PORT_CONFNAME(1, 0, "Diagnostic Switch")
+	PORT_CONFSETTING(0, "Normal")
+	PORT_CONFSETTING(1, "Diagnostic")
 INPUT_PORTS_END
 
 void sun3_state::machine_start()
