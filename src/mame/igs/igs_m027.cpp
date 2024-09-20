@@ -90,7 +90,6 @@ public:
 	void chessc2_xor(machine_config &config) ATTR_COLD;
 
 	void init_sdwx() ATTR_COLD;
-	void init_chessc2() ATTR_COLD;
 	void init_lhzb4() ATTR_COLD;
 	void init_gonefsh2() ATTR_COLD;
 	void init_cjddz() ATTR_COLD;
@@ -109,8 +108,9 @@ public:
 	void init_lthy() ATTR_COLD;
 	void init_luckycrs() ATTR_COLD;
 	void init_olympic5() ATTR_COLD;
+	void init_tripslot() ATTR_COLD;
 	void init_extradrw() ATTR_COLD;
-	void init_tripshot() ATTR_COLD;
+	void init_chessc2() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -2645,19 +2645,6 @@ void igs_m027_state::init_klxyj()
 	pgm_create_dummy_internal_arm_region();
 }
 
-void igs_m027_state::init_chessc2()
-{
-	chessc2_decrypt(machine());
-	m_igs017_igs031->sdwx_gfx_decrypt();
-	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
-
-	// bypass IGS025 'version' check
-	m_external_rom[0x207d8/4] ^= 0x00000100;
-	// bypass external ROM checksum
-	u32 *ROM2 = &memregion("maincpu")->as_u32();
-	ROM2[(0x168/4)] ^= 0x10000000;
-}
-
 void igs_m027_state::init_lhzb4()
 {
 	lhzb4_decrypt(machine());
@@ -2727,13 +2714,6 @@ void igs_m027_state::init_qlgs()
 }
 
 
-void igs_m027_state::init_extradrw()
-{
-	extradrw_decrypt(machine());
-	m_igs017_igs031->set_text_reverse_bits(false);
-}
-
-
 void igs_m027_state::init_mgzz()
 {
 	mgzz_decrypt(machine());
@@ -2768,13 +2748,6 @@ void igs_m027_state::init_luckycrs()
 	pgm_create_dummy_internal_arm_region();
 }
 
-void igs_m027_state::init_tripshot()
-{
-	tripshot_decrypt(machine());
-	m_igs017_igs031->sdwx_gfx_decrypt();
-	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
-}
-
 void igs_m027_state::init_olympic5()
 {
 	olympic5_decrypt(machine());
@@ -2786,6 +2759,32 @@ void igs_m027_state::init_lhdmg()
 {
 	lhdmg_decrypt(machine());
 	m_igs017_igs031->set_text_reverse_bits(false);
+}
+
+void igs_m027_state::init_tripslot()
+{
+	tripslot_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
+void igs_m027_state::init_extradrw()
+{
+	extradrw_decrypt(machine());
+	m_igs017_igs031->set_text_reverse_bits(false);
+}
+
+void igs_m027_state::init_chessc2()
+{
+	chessc2_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+
+	// bypass IGS025 'version' check
+	m_external_rom[0x207d8/4] ^= 0x00000100;
+	// bypass external ROM checksum
+	u32 *ROM2 = &memregion("maincpu")->as_u32();
+	ROM2[(0x168/4)] ^= 0x10000000;
 }
 
 } // anonymous namespace
@@ -2815,7 +2814,7 @@ GAMEL( 1999, oceanpara, oceanpar, oceanpar_xor, oceanpara,igs_m027_state, init_o
 GAMEL( 1999, fruitpar,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)",   0, layout_oceanpar )
 GAMEL( 1999, fruitpara, fruitpar, oceanpar_xor, fruitpara,igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", 0, layout_oceanpar )
 GAME(  200?, cjddz,     0,        cjddz_xor,    cjddz,    igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", 0 )
-GAME(  2007, tripslot,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_tripshot, ROT0, "IGS", "Triple Slot (V200VE)", MACHINE_NOT_WORKING ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
+GAME(  2007, tripslot,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", MACHINE_NOT_WORKING ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
 // this has a 2nd 8255
 GAME(  2001, extradrw,  0,        m027,         base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255

@@ -6,6 +6,9 @@
 IGS ARM7 (IGS027A) based Mahjong / Gambling platform(s) with XA sub-cpu
 These games use the IGS027A processor.
 
+Triple Fever causes MAME to exit with "Fatal error: ADD.w R0, [R7+#$02]"
+after paying out tickets.
+
 */
 
 #include "emu.h"
@@ -28,6 +31,7 @@ These games use the IGS027A processor.
 #include "speaker.h"
 
 #include "crzybugs.lh"
+#include "tripfev.lh"
 
 #define LOG_DEBUG       (1U << 1)
 //#define VERBOSE         (LOG_DEBUG)
@@ -175,37 +179,75 @@ void igs_m027xa_state::main_xor_map(address_map &map)
 	map(0x08000000, 0x0807ffff).r(FUNC(igs_m027xa_state::external_rom_r)); // Game ROM
 }
 
-static INPUT_PORTS_START( base )
+
+INPUT_PORTS_START( base )
 	PORT_START("TEST0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Play")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )          // COINA
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME("Big")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("TEST1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Stop All Reels")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_NAME("Ticket")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )          // COINC
 
 	PORT_START("TEST2")
-	PORT_BIT( 0x00007, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00008, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )  PORT_NAME("Stop Reel 2 / Small")
-	PORT_BIT( 0x00010, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )  PORT_NAME("Stop Reel 3 / Take Score")
-	PORT_BIT( 0x00020, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )  PORT_NAME("Stop Reel 1 / Double Up")
-	PORT_BIT( 0x001c0, IP_ACTIVE_LOW, IPT_UNUSED )      // IGS031 interrupt in bit 8 - see gpio_r
+	PORT_BIT( 0x001ff, IP_ACTIVE_LOW, IPT_UNUSED )      // IGS031 interrupt in bit 8 - see gpio_r
 	PORT_BIT( 0x00200, IP_ACTIVE_LOW, IPT_CUSTOM )      PORT_READ_LINE_DEVICE_MEMBER("xa", igs_xa_mcu_subcpu_device, irq_r)
 	PORT_BIT( 0xffc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( crzybugs )
+	PORT_INCLUDE(base)
+
+	PORT_MODIFY("TEST0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Play")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME("Big")
+
+	PORT_MODIFY("TEST1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Stop All Reels")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_NAME("Ticket")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+
+	PORT_MODIFY("TEST2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )     PORT_NAME("Stop Reel 2 / Small")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )     PORT_NAME("Stop Reel 3 / Take Score")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )     PORT_NAME("Stop Reel 1 / Double Up")
+
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x01, DEF_STR(On) )
@@ -226,9 +268,8 @@ static INPUT_PORTS_START( base )
 	PORT_DIPSETTING(    0x20, "Both (duplicate)" )
 	PORT_DIPSETTING(    0x40, "Fruit" )
 	PORT_DIPSETTING(    0x60, "Bug" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
 
-	PORT_START("DSW2")
+	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Score Box" )                PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, "10X" )
 	PORT_DIPSETTING(    0x01, "10X (duplicate)" )
@@ -243,22 +284,67 @@ static INPUT_PORTS_START( base )
 	PORT_DIPNAME( 0x30, 0x30, "Hold Pair" )                PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x20, "Regular" )
-	PORT_DIPSETTING(    0x00, "Georgia" )
-	PORT_DIPSETTING(    0x10, "Georgia (duplicate)" )
+	PORT_DIPSETTING(    0x10, "Georgia" )
+	PORT_DIPSETTING(    0x00, "Georgia (duplicate)" )
 	PORT_DIPNAME( 0x40, 0x40, "Auto Hold" )                PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR(No) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+INPUT_PORTS_END
 
-	PORT_START("DSW3")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+INPUT_PORTS_START( tripfev )
+	PORT_INCLUDE(base)
+
+	PORT_MODIFY("TEST0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP5 )     PORT_NAME("Stop Reel 5 / Play")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )     PORT_NAME("Stop Reel 1 / Big")
+
+	PORT_MODIFY("TEST1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Stop All Reels")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_NAME("Ticket")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+
+	PORT_MODIFY("TEST2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )     PORT_NAME("Stop Reel 3 / Small")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )     PORT_NAME("Stop Reel 4 / Take Score")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )     PORT_NAME("Stop Reel 2 / Double Up")
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x01, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x02, "Non Stop" )                 PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x04, 0x04, "Password" )                 PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x08, 0x08, "Odds Table" )               PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x30, 0x30, "Score Box" )                PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, "10X" )
+	PORT_DIPSETTING(    0x10, "10X (duplicate)" )
+	PORT_DIPSETTING(    0x20, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x30, DEF_STR(No) )
+	PORT_DIPNAME( 0x40, 0x40, "Play Score" )               PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x80, 0x80, "Auto Take" )                PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Hand Count" )               PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x06, 0x06, "Hold Pair" )                PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x04, "Regular" )
+	PORT_DIPSETTING(    0x02, "Georgia" )
+	PORT_DIPSETTING(    0x00, "Georgia (duplicate)" )
+	PORT_DIPNAME( 0x08, 0x08, "Auto Ticket" )              PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 INPUT_PORTS_END
 
 
@@ -275,18 +361,18 @@ void igs_m027xa_state::output_w(u8 data)
 void igs_m027xa_state::lamps_w(u8 data)
 {
 	// active high outputs
-	// +------+----------------+
-	// | lamp | crzybugs       |
-	// +------+----------------+
-	// |  1   | stop all/start |
-	// |  2   | stop 2/small   |
-	// |  3   | bet            |
-	// |  4   | stop 3/take    |
-	// |  5   | stop 1/double  |
-	// |  6   | big            |
-	// |  7   |                |
-	// |  8   |                |
-	// +------+----------------+
+	// +------+----------------+----------------+
+	// | lamp | crzybugs       | tripfev        |
+	// +------+----------------+----------------+
+	// |  1   | start/stop all | start/stop all |
+	// |  2   | stop 2/small   | stop 3/small   |
+	// |  3   | bet            | stop 5/play    |
+	// |  4   | stop 3/take    | stop 4/take    |
+	// |  5   | stop 1/double  | stop 2/double  |
+	// |  6   | big            | stop 1/big     |
+	// |  7   |                |                |
+	// |  8   |                |                |
+	// +------+----------------+----------------+
 	for (unsigned i = 0; 8 > i; ++i)
 		m_out_lamps[i] = BIT(data, i);
 }
@@ -728,14 +814,14 @@ void igs_m027xa_state::init_wldfruit()
 GAME(  2008, haunthig,  0,        igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", MACHINE_NOT_WORKING ) // IGS FOR V109US 2008 10 14
 GAME(  2006, haunthiga, haunthig, igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", MACHINE_NOT_WORKING ) // IGS FOR V101US 2006 08 23
 
-GAMEL( 2009, crzybugs,  0,        igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", 0, layout_crzybugs ) // IGS FOR V204US 2009 5 19
-GAMEL( 2006, crzybugsa, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", 0, layout_crzybugs ) // IGS FOR V100US 2006 3 29 but also V202US string
-GAMEL( 2005, crzybugsb, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", 0, layout_crzybugs ) // FOR V100US 2005 7 20 but also V200US string
+GAMEL( 2009, crzybugs,  0,        igs_mahjong_xa_xor, crzybugs, igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", 0, layout_crzybugs ) // IGS FOR V204US 2009 5 19
+GAMEL( 2006, crzybugsa, crzybugs, igs_mahjong_xa_xor, crzybugs, igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", 0, layout_crzybugs ) // IGS FOR V100US 2006 3 29 but also V202US string
+GAMEL( 2005, crzybugsb, crzybugs, igs_mahjong_xa_xor, crzybugs, igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", 0, layout_crzybugs ) // FOR V100US 2005 7 20 but also V200US string
 
-GAME(  2007, crzybugsj, crzybugs, igs_mahjong_xa,     base,     igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_NOT_WORKING ) // IGS FOR V101JP 2007 06 08
+GAME(  2007, crzybugsj, crzybugs, igs_mahjong_xa,     crzybugs, igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_NOT_WORKING ) // IGS FOR V101JP 2007 06 08
 
-GAME(  2006, tripfev,   0,        igs_mahjong_xa_xor, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V108US)", MACHINE_NOT_WORKING )
-GAME(  2006, tripfeva,  tripfev,  igs_mahjong_xa_xor, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", MACHINE_NOT_WORKING ) // IGS FOR V107US 2006 09 07
-GAME(  2006, tripfevb,  tripfev,  igs_mahjong_xa_xor, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V105US)", MACHINE_NOT_WORKING )
+GAMEL( 2006, tripfev,   0,        igs_mahjong_xa_xor, tripfev,  igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V108US)", MACHINE_NOT_WORKING, layout_tripfev )
+GAMEL( 2006, tripfeva,  tripfev,  igs_mahjong_xa_xor, tripfev,  igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", MACHINE_NOT_WORKING, layout_tripfev ) // IGS FOR V107US 2006 09 07
+GAMEL( 2006, tripfevb,  tripfev,  igs_mahjong_xa_xor, tripfev,  igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V105US)", MACHINE_NOT_WORKING, layout_tripfev )
 
-GAME(  200?, wldfruit,  0,        igs_mahjong_xa, base,     igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_NOT_WORKING ) // IGS-----97----V208US
+GAME(  200?, wldfruit,  0,        igs_mahjong_xa,     base,     igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_NOT_WORKING ) // IGS-----97----V208US

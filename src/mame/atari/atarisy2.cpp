@@ -357,7 +357,7 @@ uint8_t atarisy2_state::leta_r(offs_t offset)
 			case 0: // Real
 				break;
 
-			case 1: // Fake Joystick */
+			case 1: // Fake Joystick
 			/* special thanks to MAME Analog+ for the mapping code */
 			{
 				int analogx = ioport("FAKE_JOY_X")->read() - 128;
@@ -734,8 +734,8 @@ void atarisy2_state::switch_6502_w(uint8_t data)
 	m_leds[1] = BIT(data, 3);
 	if (m_tms5220.found())
 	{
-		data = 12 | ((data >> 5) & 1);
-		m_tms5220->set_unscaled_clock(MASTER_CLOCK/4 / (16 - data) / 2);
+		int const divider = 16 - (12 | BIT(data, 5));
+		m_tms5220->set_unscaled_clock(MASTER_CLOCK/4 / divider / 2);
 	}
 }
 
