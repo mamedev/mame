@@ -16656,6 +16656,9 @@ sgalaxyb
 @source:cxg/professor.cpp
 scprof
 
+@source:cxg/royal.cpp
+sroyal
+
 @source:cxg/senterprise.cpp
 senterp
 senterpc
