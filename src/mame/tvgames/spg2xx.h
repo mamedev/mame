@@ -377,6 +377,18 @@ private:
 	required_ioport_array<6> m_io_p1_rows;
 };
 
+class spg2xx_game_ddr33v_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_ddr33v_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void init_ddr33v();
+
+protected:
+private:
+};
 
 
 #endif // MAME_TVGAMES_SPG2XX_H
