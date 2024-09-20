@@ -47,12 +47,12 @@ private:
 	required_ioport m_brightpen_y;
 
 	// radius of circle picked up by the bright pen
-	static constexpr int x_radius = 6;
-	static constexpr int y_radius = 3;
+	static constexpr int PEN_X_RADIUS = 2;
+	static constexpr int PEN_Y_RADIUS = 1;
 	// brightness threshold
-	static constexpr int bright = 0x50;
+	static constexpr int BRIGHTNESS_THRESHOLD = 0x20;
 	// # of CRT scanlines that sustain brightness
-	static constexpr int sustain = 22;
+	static constexpr int SUSTAIN = 22;
 };
 
 //**************************************************************************
@@ -82,41 +82,51 @@ void apple2_brightpen_device::device_start()
 
 int apple2_brightpen_device::sw0_r()
 {
-	int x = m_brightpen_x->read();
-	int y = m_brightpen_y->read();
-	int vpos = m_screen->vpos();
-	int hpos = m_screen->hpos();
+	if (!BIT(m_brightpen_point->read(), 0)) return 0;
 
-	// update the screen if necessary
-	if (!machine().side_effects_disabled()) {
-		if (!m_screen->vblank()) {
-			if (vpos > y - y_radius || (vpos == y - y_radius && hpos >= x - x_radius)) {
+	int pen_x_pos = m_brightpen_x->read();
+	int pen_y_pos = m_brightpen_y->read();
+	int beam_vpos = m_screen->vpos();
+	int beam_hpos = m_screen->hpos();
+
+	// update the screen if the beam position is within the radius of the pen
+	if (!machine().side_effects_disabled())
+	{
+		if (!m_screen->vblank())
+		{
+			if (beam_vpos > pen_y_pos - PEN_Y_RADIUS || (beam_vpos == pen_y_pos - PEN_Y_RADIUS && beam_hpos >= pen_x_pos - PEN_X_RADIUS))
+			{
 				m_screen->update_now();
 			}
 		}
 	}
 
-	int sum = 0;
-	int scanned = 0;
+	int brightness_sum = 0;
+	int pixels_scanned = 0;
 
-	// sum brightness of pixels nearby the gun position
-	for (int i = x - x_radius; i <= x + x_radius; i++) {
-		for (int j = y - y_radius; j <= y + y_radius; j++) {
+	// sum brightness of pixels nearby the pen position
+	for (int i = pen_x_pos - PEN_X_RADIUS; i <= pen_x_pos + PEN_X_RADIUS; i++)
+	{
+		for (int j = pen_y_pos - PEN_Y_RADIUS; j <= pen_y_pos + PEN_Y_RADIUS; j++)
+		{
 			// look at pixels within circular sensor
-			if ((x - i) * (x - i) + (y - j) * (y - j) <= x_radius * y_radius) {
+			if ((pen_x_pos - i) * (pen_x_pos - i) + (pen_y_pos - j) * (pen_y_pos - j) <= PEN_X_RADIUS * PEN_Y_RADIUS)
+			{
 				rgb_t pix = m_screen->pixel(i, j);
 
-				// only detect light if gun position is near, and behind,
-				// where the PPU is drawing on the CRT,
-				if (j <= vpos && j > vpos - sustain && (j != vpos || i <= hpos))
-					sum += pix.r() + pix.g() + pix.b();
-				scanned++;
+				// only detect light if pen position is near, and behind,
+				// where the video generator is drawing on the CRT,
+				if (j <= beam_vpos && j > beam_vpos - SUSTAIN && (j != beam_vpos || i <= beam_hpos))
+				{
+					brightness_sum += pix.r() + pix.g() + pix.b();
+				}
+				pixels_scanned++;
 			}
 		}
 	}
 
 	// light detected if average brightness is above threshold
-	return (sum >= bright * scanned) && BIT(m_brightpen_point->read(), 0);
+	return (brightness_sum >= BRIGHTNESS_THRESHOLD * pixels_scanned);
 }
 
 } // anonymous namespace
