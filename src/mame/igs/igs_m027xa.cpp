@@ -6,8 +6,8 @@
 IGS ARM7 (IGS027A) based Mahjong / Gambling platform(s) with XA sub-cpu
 These games use the IGS027A processor.
 
-Triple Fever causes MAME to exit with "Fatal error: ADD.w R0, [R7+#$02]"
-after paying out tickets.
+Triple Fever (V105US) (tripfevb) causes MAME to exit with
+"Fatal error: ADD.w R0, [R7+#$02]" after paying out tickets.
 
 */
 
@@ -820,8 +820,8 @@ GAMEL( 2005, crzybugsb, crzybugs, igs_mahjong_xa_xor, crzybugs, igs_m027xa_state
 
 GAME(  2007, crzybugsj, crzybugs, igs_mahjong_xa,     crzybugs, igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_NOT_WORKING ) // IGS FOR V101JP 2007 06 08
 
-GAMEL( 2006, tripfev,   0,        igs_mahjong_xa_xor, tripfev,  igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V108US)", MACHINE_NOT_WORKING, layout_tripfev )
-GAMEL( 2006, tripfeva,  tripfev,  igs_mahjong_xa_xor, tripfev,  igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", MACHINE_NOT_WORKING, layout_tripfev ) // IGS FOR V107US 2006 09 07
+GAMEL( 2006, tripfev,   0,        igs_mahjong_xa_xor, tripfev,  igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V108US)", 0, layout_tripfev )
+GAMEL( 2006, tripfeva,  tripfev,  igs_mahjong_xa_xor, tripfev,  igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", 0, layout_tripfev ) // IGS FOR V107US 2006 09 07
 GAMEL( 2006, tripfevb,  tripfev,  igs_mahjong_xa_xor, tripfev,  igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V105US)", MACHINE_NOT_WORKING, layout_tripfev )
 
 GAME(  200?, wldfruit,  0,        igs_mahjong_xa,     base,     igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_NOT_WORKING ) // IGS-----97----V208US
