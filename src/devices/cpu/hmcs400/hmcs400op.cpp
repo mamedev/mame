@@ -676,11 +676,13 @@ void hmcs400_cpu_device::op_sts()
 void hmcs400_cpu_device::op_sby()
 {
 	// SBY: Standby Mode
-	op_todo();
+	m_standby = true;
 }
 
 void hmcs400_cpu_device::op_stop()
 {
 	// STOP: Stop Mode
-	op_todo();
+	m_stop = true;
+	if (m_icount > 0)
+		m_icount = 0;
 }

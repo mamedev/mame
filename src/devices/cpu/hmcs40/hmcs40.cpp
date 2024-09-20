@@ -458,7 +458,7 @@ void hmcs45_cpu_device::write_r(u8 index, u8 data)
 //  interrupt/timer
 //-------------------------------------------------
 
-void hmcs40_cpu_device::do_interrupt()
+void hmcs40_cpu_device::take_interrupt()
 {
 	push_stack();
 	m_ie = 0;
@@ -576,7 +576,7 @@ void hmcs40_cpu_device::execute_run()
 
 		// check/handle interrupt
 		if (m_ie && (m_iri || m_irt) && !m_block_int)
-			do_interrupt();
+			take_interrupt();
 		m_block_int = false;
 
 		// fetch next opcode

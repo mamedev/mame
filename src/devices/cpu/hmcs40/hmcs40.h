@@ -202,7 +202,7 @@ protected:
 
 	void cycle();
 	void increment_tc();
-	void do_interrupt();
+	void take_interrupt();
 
 	// opcode handlers
 	void op_illegal();

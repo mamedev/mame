@@ -166,8 +166,6 @@ hd614089_device::hd614089_device(const machine_config &mconfig, const char *tag,
 
 void hmcs400_cpu_device::device_start()
 {
-	assert(HMCS400_INPUT_LINE_INT0 == 0 && HMCS400_INPUT_LINE_INT1 == 1);
-
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 
@@ -188,6 +186,8 @@ void hmcs400_cpu_device::device_start()
 	m_spy = 0;
 	m_st = 0;
 	m_ca = 0;
+	m_standby = false;
+	m_stop = false;
 
 	memset(m_r, 0, sizeof(m_r));
 	memset(m_r_mask, 0, sizeof(m_r_mask));
@@ -219,6 +219,8 @@ void hmcs400_cpu_device::device_start()
 	save_item(NAME(m_spy));
 	save_item(NAME(m_st));
 	save_item(NAME(m_ca));
+	save_item(NAME(m_standby));
+	save_item(NAME(m_stop));
 
 	save_item(NAME(m_r));
 	save_item(NAME(m_r_mask));
@@ -262,6 +264,8 @@ void hmcs400_cpu_device::device_reset()
 	m_pc = 0;
 	m_sp = 0x3ff;
 	m_st = 1;
+	m_standby = false;
+	m_stop = false;
 
 	// clear peripherals
 	m_irq_flags = 0xaaa8; // IM=1, IF=0, IE=0
@@ -535,29 +539,37 @@ void hmcs400_cpu_device::pmr_w(offs_t offset, u8 data, u8 mem_mask)
 		write_r(3, m_r[3]);
 }
 
+void hmcs400_cpu_device::take_interrupt(int irq)
+{
+	cycle();
+	cycle();
+	push_stack();
+	m_irq_flags &= ~1;
+
+	standard_irq_callback(irq, m_pc);
+
+	u8 vector = irq * 2 + 2;
+	m_prev_pc = m_pc = vector;
+}
+
 void hmcs400_cpu_device::check_interrupts()
 {
-	// irq priority and vectors are in the same order as the irq control flags
-	u16 irq = m_irq_flags;
+	// irq priority is in the same order as the irq control flags
+	u16 irq = m_irq_flags >> 2;
 
 	for (int i = 0; i < 7; i++)
 	{
-		irq >>= 2;
-
-		// do irq when IF=1 and IM=0
+		// pending irq when IF=1 and IM=0
 		if ((irq & 3) == 1)
 		{
-			cycle();
-			cycle();
-			push_stack();
-			m_irq_flags &= ~1;
+			if (m_irq_flags & 1)
+				take_interrupt(i);
 
-			standard_irq_callback(i, m_pc);
-
-			m_pc = i * 2 + 2;
-			m_prev_pc = m_pc;
+			m_standby = false;
 			return;
 		}
+
+		irq >>= 2;
 	}
 }
 
@@ -578,24 +590,16 @@ void hmcs400_cpu_device::execute_set_input(int line, int state)
 {
 	state = state ? 1 : 0;
 
-	switch (line)
-	{
-		case HMCS400_INPUT_LINE_INT0: case HMCS400_INPUT_LINE_INT1:
-		{
-			// active-low, irq on falling edge
-			state ^= 1;
-			bool irq = (m_int_line[line] && !state);
-			m_int_line[line] = state;
+	if (line != 0 && line != 1)
+		return;
 
-			if (irq)
-				ext_int_edge(line);
+	// active-low, irq on falling edge
+	state ^= 1;
+	bool irq = (m_int_line[line] && !state);
+	m_int_line[line] = state;
 
-			break;
-		}
-
-		default:
-			break;
-	}
+	if (irq && !m_stop)
+		ext_int_edge(line);
 }
 
 
@@ -615,7 +619,7 @@ void hmcs400_cpu_device::tm_w(offs_t offset, u8 data, u8 mem_mask)
 		{ 0x400, 0x100, 0x40, 0x10, 4, 2, 1, 0 }
 	};
 
-	m_timer_mode[offset] = data;
+	m_timer_mode[offset] = data & 0xf;
 	m_timer_div[offset] = div[offset][data & 7];
 }
 
@@ -705,13 +709,24 @@ u16 hmcs400_cpu_device::fetch()
 
 void hmcs400_cpu_device::execute_run()
 {
+	// in stop mode, the internal clock is not running
+	if (m_stop)
+	{
+		m_icount = 0;
+		return;
+	}
+
 	while (m_icount > 0)
 	{
 		m_prev_pc = m_pc;
+		check_interrupts();
 
-		// check/handle interrupts
-		if (m_irq_flags & 1)
-			check_interrupts();
+		// in standby mode, opcode execution is halted
+		if (m_standby)
+		{
+			cycle();
+			continue;
+		}
 
 		// fetch next opcode
 		debugger_instruction_hook(m_pc);

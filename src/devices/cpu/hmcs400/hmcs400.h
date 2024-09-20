@@ -138,6 +138,8 @@ protected:
 	u8 m_spy;             // 4-bit SPY register
 	u8 m_st;              // status flag
 	u8 m_ca;              // carry flag
+	bool m_standby;       // standby mode (SBY opcode)
+	bool m_stop;          // stop mode (STOP opcode)
 
 	u8 m_r[10];           // R outputs state
 	u8 m_r_mask[10];
@@ -183,6 +185,7 @@ protected:
 	u8 tcbu_r(offs_t offset, u8 mem_mask);
 
 	void ext_int_edge(int line);
+	void take_interrupt(int irq);
 	void check_interrupts();
 	void clock_timer(int timer);
 	void clock_prescaler();
