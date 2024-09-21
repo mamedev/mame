@@ -38,7 +38,7 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_semaphore_input_r);
+	ioport_value arkanoid_semaphore_input_r();
 	void init_block2();
 	void init_arkblock();
 	void init_hexa();

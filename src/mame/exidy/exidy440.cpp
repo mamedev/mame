@@ -280,7 +280,7 @@ int exidy440_state::firq_vblank_r()
 }
 
 
-CUSTOM_INPUT_MEMBER(exidy440_state::hitnmiss_button1_r)
+ioport_value exidy440_state::hitnmiss_button1_r()
 {
 	/* button 1 shows up in two bits */
 	uint32_t button1 = ioport("HITNMISS_BUTTON1")->read();

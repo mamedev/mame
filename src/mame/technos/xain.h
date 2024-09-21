@@ -39,7 +39,7 @@ public:
 	void xsleenab(machine_config &config);
 
 	int vblank_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
+	ioport_value mcu_status_r();
 
 protected:
 	virtual void machine_start() override;

@@ -2151,6 +2151,19 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
+	<!-- Chex Quest duplicated in mac_cdrom.xml -->
+	<software name="chexquest">
+		<description>Chex Quest</description>
+		<year>1996</year>
+		<publisher>General Mills</publisher>
+		<info name="developer" value="Digital Café" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="chex quest" sha1="c90476cc54dfee86bf358c2eb06091ac5859d63a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- TODO: hangs with SB16 -->
 	<software name="chillman" supported="partial">
@@ -2775,6 +2788,35 @@ Crash at the begining
 		</part>
 	</software>
 
+	<software name="demongate">
+		<description>Demon Gate: 666 New Levels for Doom &amp; Doom II</description>
+		<year>1995</year>
+		<publisher>Laser Magic</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="demon gate" sha1="8660567d6ec553c0be5b886e39a3d35e677adc56" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="depthsdoom">
+		<description>Depths of Doom Trilogy</description>
+		<year>1997</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="id Software" />
+		<info name="Note" value="Disc 3 is &quot;masterlvls&quot;" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="depths of doom - ultimate doom" sha1="3be4f9875d91c780573eacf2fab080c9ab4847f4" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="depths of doom - doom ii" sha1="9332f57c13639bf49db6537b3481105a40231bfb" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Source: http://redump.org/disc/7455/ -->
 	<!-- <rom name="Jungle Strike &amp; Desert Strike (Europe).cue" size="127" crc="0fe06781" sha1="92e7f629fa95fa2adb50fe316416f40b2190977e"/> -->
 	<!-- <rom name="Jungle Strike &amp; Desert Strike (Europe).bin" size="300816096" crc="6679aae1" sha1="eeb65e9632f79795be82f92b6c329b773103c2ee"/> -->
@@ -2937,16 +2979,81 @@ Crash after the copy protection screen (tried with "at486" machine)
 		</part>
 	</software>
 
+	<software name="doom2">
+		<description>Doom II</description>
+		<year>1994</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="id Software" />
+		<info name="language" value="English" />
+		<info name="version" value="1.666" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="doom ii 1.666" sha1="175f5bbf9b35a078c5231dc2f828594bd5ede0b0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="doom2f" cloneof="doom2">
+		<description>Doom II (French)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="id Software" />
+		<info name="language" value="French" />
+		<info name="version" value="1.8" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="doom ii french" sha1="6b90ac4fb26430177c891d02dc68d985db0bdf2a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 95 -->
 	<!-- 256 colors minimum -->
-	<software name="doom2j">
+	<software name="doom2j" cloneof="doom2">
 		<description>Doom II for Windows 95 (Japan)</description>
 		<year>1996</year>
-		<publisher>Id Software / Imagineer</publisher>
+		<publisher>id Software / Imagineer</publisher>
 		<info name="alt_title" value="ドゥームＩＩ" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="doom2j" sha1="61dd4c9a81d4d354a14533dcbd257a5bcffd22c6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Installable/playable on Windows 95/NT4 and up -->
+	<software name="doomcollect">
+		<description>Doom Collector's Edition</description>
+		<year>2003</year>
+		<publisher>Activision</publisher>
+		<notes><![CDATA[
+		DoomWiki shows a release date of January 29, 2003, but the CDs contain timestamps in 2004.
+		]]></notes>
+		<info name="developer" value="id Software" />
+		<info name="language" value="English" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Ultimate Doom, Doom II, Final Doom" />
+			<diskarea name="cdrom">
+				<disk name="doom collectors 2003 d1" sha1="2c4f57cf27f32cbb4733405e185c3b8568fd18b2" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="DOOM³ Preview" />
+			<diskarea name="cdrom">
+				<disk name="doom collectors 2003 d2" sha1="0bf3086f867a107c80975ecb91285b8e9f31f0b3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="doomcollecto" cloneof="doomcollect">
+		<description>Doom Collector's Edition (2001)</description>
+		<year>2001</year>
+		<publisher>Activision</publisher>
+		<info name="developer" value="id Software" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="doom collectors 2001" sha1="7518d8d868543bab6ec7eecaccc4958065abae35" />
 			</diskarea>
 		</part>
 	</software>
@@ -3600,6 +3707,19 @@ This release doesn't have audio speech.
 		</part>
 	</software>
 
+	<software name="finaldoom">
+		<description>Final Doom</description>
+		<year>1996</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="id Software" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="final doom" sha1="6edcdafc36612bb11cbb2b1100561dc161575ed5" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Source: http://redump.org/disc/71267/ -->
 	<!-- <rom name="Flight of the Amazon Queen (Europe) (En,It).cue" size="109" crc="5e8474f8" sha1="68a991ada01834068146886b8d6b2542e7ca2a55"/> -->
 	<!-- <rom name="Flight of the Amazon Queen (Europe) (En,It).bin" size="443196768" crc="c9cf791c" sha1="97dcd74ff7be51f5676f3e1eb5233e6644eab8f9"/> -->
@@ -3921,6 +4041,60 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="heavybarrel_cd" sha1="0d6ea927d897d36f71d49950ccb805e807b92857" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="helltopay">
+		<description>Hell to Pay (Doom II add-on)</description>
+		<year>1996</year>
+		<publisher>WizardWorks</publisher>
+		<info name="developer" value="Wraith Corporation" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="hell to pay" sha1="4e98af7fe2223a6856c839671026bdf4171e0749" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="heretic">
+		<description>Heretic: Shadow of the Serpent Riders</description>
+		<year>1996</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="Raven Software" />
+		<info name="language" value="English" />
+		<info name="version" value="1.3" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="heretic 1.3" sha1="a659b37f21366eb98f497a0ac1f9f07510340aac" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hexen">
+		<description>Hexen: Beyond Heretic</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="Raven Software" />
+		<info name="language" value="English" />
+		<info name="version" value="1.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="hexen 1.0" sha1="846eeccf2ce7026fac43d7c2c140ea6da4baeb31" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hexendk">
+		<description>Hexen: Deathkings of the Dark Citadel</description>
+		<year>1996</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="Raven Software" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="hexen deathkings of the dark citadel" sha1="2ad6849c1e15fdb6a82d3f5027d44ff6168e6af4" />
 			</diskarea>
 		</part>
 	</software>
@@ -4814,6 +4988,18 @@ https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="bundesliga manager professional (1996)(software 2000)(de)[budget]" sha1="9a9454d2aead703de329499d2292dd0bd8495257" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="masterlvls">
+		<description>Master Levels for Doom II</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="id Software" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="master levels for doom ii" sha1="66ad810126ef397aa083bd5d66473480f4bb7efb" />
 			</diskarea>
 		</part>
 	</software>
@@ -6035,6 +6221,34 @@ Includes DOS and Windows installation setup.
 		</part>
 	</software>
 
+	<software name="strife">
+		<description>Strife: Quest for the Sigil</description>
+		<year>1996</year>
+		<publisher>Velocity Incorporated</publisher>
+		<info name="developer" value="Rogue Entertainment" />
+		<info name="language" value="English" />
+		<info name="version" value="1.2" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="strife 1.2" sha1="e5517f358e0ec98116092323bbb2a500554747d0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="strifeo" cloneof="strife">
+		<description>Strife: Quest for the Sigil (v1.1)</description>
+		<year>1996</year>
+		<publisher>Velocity Incorporated</publisher>
+		<info name="developer" value="Rogue Entertainment" />
+		<info name="language" value="English" />
+		<info name="version" value="1.1" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="strife 1.1" sha1="871b875c76c0d716ab5123736e41800fd3b36805" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 3.1 / 95 -->
 	<!-- Runs off CD, no install -->
 	<software name="strmrisk" supported="partial">
@@ -6243,6 +6457,46 @@ Unemulated optional [Gravis Gamepad], [Gravis Gamepad Pro], [Gravis Grip 4-playe
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="complete ultima vii, the (1995)(electronic arts)(m3)[budget cd-rom classics]" sha1="240b3a30d288bf1c51b054bb27187f0457d5a012" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ultdoom">
+		<description>The Ultimate Doom (DOS + Windows)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="id Software" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ulimate doom dos+win95" sha1="bb3b648f11025f5d435377165ab4b0c324ae9e43" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ultdoomdos" cloneof="ultdoom">
+		<description>The Ultimate Doom (DOS)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="id Software" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ulimate doom dos" sha1="8bcf07b1e86b3005e786cccdd4601c4ea1664e9a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="doom_sw" cloneof="ultdoom">
+		<description>Doom Shareware</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="id Software" />
+		<info name="language" value="English" />
+		<info name="version" value="1.8" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="doom shareware" sha1="9a6048f924df4289b9f51e5925f1ef2a9b985095" />
 			</diskarea>
 		</part>
 	</software>

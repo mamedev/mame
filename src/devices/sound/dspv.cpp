@@ -151,11 +151,6 @@ uint32_t dspv_device::execute_max_cycles() const noexcept
 	return 1;
 }
 
-uint32_t dspv_device::execute_input_lines() const noexcept
-{
-	return 0;
-}
-
 void dspv_device::execute_run()
 {
 	if(machine().debug_flags & DEBUG_FLAG_ENABLED)

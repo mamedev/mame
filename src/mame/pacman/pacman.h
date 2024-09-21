@@ -287,7 +287,7 @@ public:
 
 	void clubpacm(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(clubpacm_input_r);
+	ioport_value clubpacm_input_r();
 
 	void init_clubpacma();
 

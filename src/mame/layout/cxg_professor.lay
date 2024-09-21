@@ -420,7 +420,7 @@ authors:hap
 		<repeat count="6">
 			<param name="x" start="10" increment="10" />
 			<param name="i" start="1" increment="1" />
-			<element ref="text_p~i~"><bounds xc="~x~" y="4.8" width="5" height="5" /></element>
+			<element ref="text_p~i~"><bounds xc="~x~" y="3.9" width="6" height="6" /></element>
 			<element ref="white2" blend="multiply"><bounds xc="~x~" y="1" width="10" height="9" /></element>
 			<element ref="cyan"><bounds xc="~x~" y="10" width="8.5" height="1" /></element>
 		</repeat>

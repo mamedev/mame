@@ -203,8 +203,8 @@ public:
 		m_dial(*this, "DIAL")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dial0_r) { return m_dial->read() & 3; }
-	DECLARE_CUSTOM_INPUT_MEMBER(dial1_r) { return m_dial->read() >> 2 & 3; }
+	ioport_value dial0_r() { return m_dial->read() & 3; }
+	ioport_value dial1_r() { return m_dial->read() >> 2 & 3; }
 
 private:
 	required_ioport m_dial;
@@ -366,7 +366,7 @@ public:
 
 	void tshoot(machine_config &config);
 
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(gun_r);
+	template <int P> ioport_value gun_r();
 
 private:
 	virtual void machine_start() override;

@@ -103,7 +103,6 @@ protected:
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return m_r_cycles; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;

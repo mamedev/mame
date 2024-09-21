@@ -12,7 +12,6 @@
 #pragma once
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 
 #include "machine/input_merger.h"
 #include "machine/ucb1200.h"

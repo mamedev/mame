@@ -51,7 +51,7 @@ public:
 	void icecold(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER( test_switch_press );
-	DECLARE_CUSTOM_INPUT_MEMBER( motors_limit_r );
+	ioport_value motors_limit_r();
 
 protected:
 	virtual void machine_start() override;
@@ -225,7 +225,7 @@ void icecold_state::machine_reset()
 	m_ball_gate_sw = 1;
 }
 
-CUSTOM_INPUT_MEMBER( icecold_state::motors_limit_r )
+ioport_value icecold_state::motors_limit_r()
 {
 	uint8_t data = 0;
 

@@ -41,7 +41,7 @@ game over screen uses a RNG register for rain scroll (verify)
 		</part>
 	</software>
 
-	<software name="sonevil" supported="no">
+	<software name="sonevil" supported="partial">
 		<description>The Son of Evil ~ Xie E Zhi Zi</description>
 		<year>1995</year>
 		<publisher>Funtech</publisher>
@@ -69,8 +69,7 @@ Broken [video] during intro, uses bitmap mode with ROZ layer
 		<year>1995</year>
 		<publisher>AV Artisan Corp.</publisher>
 		<notes><![CDATA[
-[video] intro should sprite clip against active display area.
-[video] title animation blanks some sprites.
+[video] title animation glitches some sprites.
 [video] uses per-tile priority during gameplay.
 [sound] noisy channels 13-15 when jump occurs (12 00 0f 79)
 [sound] jump (1f 0f 0e a9) and attack (1f 00 0f 69) channels 11-12 keeps repeating
@@ -84,6 +83,7 @@ Broken [video] during intro, uses bitmap mode with ROZ layer
 		</part>
 	</software>
 
+	<!-- NOTE: supported=no for broken sound -->
 	<software name="staiwbbl" supported="no">
 		<description>Super Taiwanese Baseball League ~ Chao Ji Zhong Hua Zhi Bang Lian Meng</description>
 		<year>1995</year>
@@ -105,12 +105,14 @@ Broken [video] during intro, uses bitmap mode with ROZ layer
 		</part>
 	</software>
 
-	<software name="jttlaugh" supported="no">
+	<software name="jttlaugh" supported="partial">
 		<description>Journey to the Laugh ~ Xi You Ji</description>
 		<year>1995</year>
 		<publisher>Funtech</publisher>
 		<notes><![CDATA[
-Can potentially hang, [maincpu] tight loops for $e80300 bit 7 high (verify)
+[video] Stage 1-6 boss has concealed ROZ layer
+[video] Stage 2-1 logs have wrong sprite priorities, should be behind trunks.
+[video] Stage 2-3 volcano fire balls should go behind volcanoes.
 ]]></notes>
 		<info name="serial" value="F006" />
 		<info name="alt_title" value="嘻遊記" />
@@ -121,13 +123,12 @@ Can potentially hang, [maincpu] tight loops for $e80300 bit 7 high (verify)
 		</part>
 	</software>
 
-	<software name="slghtsag" supported="no">
+	<software name="slghtsag" supported="partial">
 		<description>Super Light Saga - Dragon Force ~ Chao Ji Guang Ming Zhan Shi</description>
 		<year>1996</year>
 		<publisher>Kingformation</publisher>
 		<notes><![CDATA[
-[video] sprites are cutoff at character select
-[video] wrong position for text markers in load game screens
+[video] map screen should add a mosaic on initial transitions
 ]]></notes>
 		<info name="serial" value="F007" />
 		<info name="alt_title" value="超級光明戰史" />
@@ -160,14 +161,15 @@ Can potentially hang, [maincpu] tight loops for $e80300 bit 7 high (verify)
 		</part>
 	</software>
 
-	<software name="gamblord" supported="no">
+	<software name="gamblord" supported="partial">
 		<description>Gambling Lord ~ Du Ba</description>
 		<year>1996</year>
 		<publisher>Funtech</publisher>
 		<notes><![CDATA[
+Erratic gameplay speed, controls [irq 3] as FRC
+few [video] missing/glitched tiles in gameplay, likely related to above.
 [video] intro has a glitchy cloud row strip.
 [video] intro shows some vertical strips of garbage when title screen dragon appears.
-Erratic gameplay speed, controls [irq 3] as FRC, show [video] missing/glitched tiles in gameplay.
 ]]></notes>
 		<info name="serial" value="F009" />
 		<info name="alt_title" value="賭霸" />
@@ -183,16 +185,16 @@ Erratic gameplay speed, controls [irq 3] as FRC, show [video] missing/glitched t
 		</part>
 	</software>
 
-	<software name="magipool" supported="no">
+	<software name="magipool" supported="partial">
 		<description>Magical Pool ~ Mo Bang Zhuang Qiu</description>
 		<year>1996</year>
 		<publisher>Funtech</publisher>
 		<notes><![CDATA[
 Erratic gameplay speed, controls [irq 3] as FRC
 [sound] BGM plays random tune on title (verify, two video refs plays different BGMs there wtf?)
-[video] use layer 1 as clipping effect (sprites goes under it)
-[video] character select has misaligned sprites
-[video] billiard cue sprite cut off left side (should wraparound)
+[video] title screen doesn't cliprect properly against white
+[video] title screen has priority issues with overlapping overlays (layer 1 + ROZ)
+[video] garbage sprites in 1p vs. com gameplay, [DMA]s with invalid dest pointers.
 [sound] main menu selection channel 14 keeps repeating (1f 15 0b dd)
 ]]></notes>
 		<info name="serial" value="F010" />
@@ -211,7 +213,6 @@ Erratic gameplay speed, controls [irq 3] as FRC
 		<notes><![CDATA[
 Uses [video] clipping for layer 1 during intro
 ]]></notes>
-
 		<info name="serial" value="F011" />
 		<info name="alt_title" value="爆爆動物園" />
 		<part name="cart" interface="superacan_cart">

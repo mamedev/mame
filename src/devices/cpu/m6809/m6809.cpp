@@ -452,17 +452,6 @@ uint32_t m6809_base_device::execute_max_cycles() const noexcept
 
 
 //-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t m6809_base_device::execute_input_lines() const noexcept
-{
-	return 3;
-}
-
-
-//-------------------------------------------------
 //  execute_set_input - act on a changed input/
 //  interrupt line
 //-------------------------------------------------

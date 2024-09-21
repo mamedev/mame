@@ -5,9 +5,10 @@
 
 Chess King Master (yes, it's plainly named "Master")
 
-Chess King was a UK business formed by Intelligent Software (aka Intelligent Chess
-Software), so logically, all the programs were by them. According to the manual,
-the chess engine is Cyrus (by Richard Lang).
+Chess King was a UK business formed by Intelligent Software Ltd (later known as
+Intelligent Chess Software Ltd, after the fiasco with the Enterprise home computer),
+so logically, all the programs were by them. According to the manual, the chess
+engine is Cyrus (by Richard Lang).
 
 To start a new game, press CHANGE POSITION, NEW GAME, and CHANGE POSITION again.
 

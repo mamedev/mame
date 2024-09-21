@@ -470,7 +470,7 @@ static INPUT_PORTS_START( ecbackg )
 	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, ecbackg_state, power_off, 0) PORT_NAME("Stop")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, ecbackg_state, power_off, 0) PORT_NAME("Stop")
 
 	PORT_START("BOARD")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, ecbackg_state, init_board, 0) PORT_NAME("Board Reset Backgammon")
@@ -539,7 +539,7 @@ ROM_START( ecbackg )
 	ROM_LOAD("saitek_89_gx4b_c12_31y0rm79p.u1", 0x0000, 0x4000, CRC(d7278545) SHA1(9ece31cdb237067aeec480c066e0917752697a4d) )
 
 	ROM_REGION( 109526, "screen", 0 )
-	ROM_LOAD("ecbackg.svg", 0, 109526, CRC(b8149d74) SHA1(0cc6f1a2c50f53f8d2be73379019d275799d0546) )
+	ROM_LOAD("sbackg.svg", 0, 109526, CRC(b8149d74) SHA1(0cc6f1a2c50f53f8d2be73379019d275799d0546) )
 ROM_END
 
 } // anonymous namespace

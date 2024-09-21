@@ -128,8 +128,8 @@ public:
 	void wwfwfest(machine_config &config);
 	void wwfwfstb(machine_config &config);
 
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(dsw_3f_r);
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(dsw_c0_r);
+	template <int N> ioport_value dsw_3f_r();
+	template <int N> ioport_value dsw_c0_r();
 
 private:
 	/* wwfwfest has an extra layer */

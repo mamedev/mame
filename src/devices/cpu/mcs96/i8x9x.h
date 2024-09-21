@@ -73,7 +73,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
 	virtual void execute_set_input(int linenum, int state) override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

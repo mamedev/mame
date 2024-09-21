@@ -34,7 +34,7 @@ public:
 	{ }
 
 	void crbaloon(machine_config &config);
-	DECLARE_CUSTOM_INPUT_MEMBER(pc3092_r);
+	ioport_value pc3092_r();
 
 protected:
 	virtual void machine_reset() override;

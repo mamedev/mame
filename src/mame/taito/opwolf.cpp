@@ -328,8 +328,8 @@ public:
 	void init_opwolfb();
 	void init_opwolfp();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_x_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_y_r);
+	ioport_value opwolf_gun_x_r();
+	ioport_value opwolf_gun_y_r();
 
 protected:
 	virtual void machine_start() override;
@@ -628,14 +628,14 @@ void opwolf_state::counters_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, ~data & 0x10);
 }
 
-CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_x_r )
+ioport_value opwolf_state::opwolf_gun_x_r()
 {
 	/* P1X - Have to remap 8 bit input value, into 0-319 visible range */
 	int scaled = (ioport(P1X_PORT_TAG)->read() * 320 ) / 256;
 	return (scaled + 0x15 + m_opwolf_gun_xoffs);
 }
 
-CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_y_r )
+ioport_value opwolf_state::opwolf_gun_y_r()
 {
 	return (ioport(P1Y_PORT_TAG)->read() - 0x24 + m_opwolf_gun_yoffs);
 }

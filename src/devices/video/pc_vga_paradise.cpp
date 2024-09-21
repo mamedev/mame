@@ -329,10 +329,10 @@ void wd90c00_vga_device::device_reset()
 	m_pr15 = 0;
 }
 
-CUSTOM_INPUT_MEMBER(wd90c00_vga_device::egasw1_r) { return BIT(m_pr11, 4); }
-CUSTOM_INPUT_MEMBER(wd90c00_vga_device::egasw2_r) { return BIT(m_pr11, 5); }
-CUSTOM_INPUT_MEMBER(wd90c00_vga_device::egasw3_r) { return BIT(m_pr11, 6); }
-CUSTOM_INPUT_MEMBER(wd90c00_vga_device::egasw4_r) { return BIT(m_pr11, 7); }
+ioport_value wd90c00_vga_device::egasw1_r() { return BIT(m_pr11, 4); }
+ioport_value wd90c00_vga_device::egasw2_r() { return BIT(m_pr11, 5); }
+ioport_value wd90c00_vga_device::egasw3_r() { return BIT(m_pr11, 6); }
+ioport_value wd90c00_vga_device::egasw4_r() { return BIT(m_pr11, 7); }
 
 static INPUT_PORTS_START(paradise_vga_sense)
 	PORT_START("VGA_SENSE")

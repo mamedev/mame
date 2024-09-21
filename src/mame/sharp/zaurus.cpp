@@ -1401,7 +1401,6 @@ Note:
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/locomo.h"
 #include "machine/pxa255.h"
 #include "machine/sa1110.h"
@@ -1417,8 +1416,7 @@ Note:
 #define PXA255_CLOCK 400000000
 #define PXA270_CLOCK 416000000
 
-namespace
-{
+namespace {
 
 class zaurus_state : public driver_device
 {

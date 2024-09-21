@@ -1123,7 +1123,7 @@ void xa_cpu::aluop_byte_rd_rsoff8(int alu_op, u8 rd, u8 rs, u8 offset8)
 	}
 }
 
-void xa_cpu::add_word_rd_rsoff8(u8 rd, u8 rs, u8 offset8) { fatalerror("ADD.w %s, [%s+#$%02x]", m_regnames16[rd], m_regnames16[rs], offset8);}
+void xa_cpu::add_word_rd_rsoff8(u8 rd, u8 rs, u8 offset8) { u16 rdval = gr16(rd); u16 fulloffset = util::sext(offset8, 8); u16 address = get_addr(rs) + fulloffset; u16 val = rdat16(address); u16 result = do_add_16(rdval, val); sr16(rd, result); cy(6); }
 void xa_cpu::addc_word_rd_rsoff8(u8 rd, u8 rs, u8 offset8){ fatalerror("ADDC.w %s, [%s+#$%02x]", m_regnames16[rd], m_regnames16[rs], offset8);}
 void xa_cpu::sub_word_rd_rsoff8(u8 rd, u8 rs, u8 offset8) { fatalerror("SUB.w %s, [%s+#$%02x]", m_regnames16[rd], m_regnames16[rs], offset8);}
 void xa_cpu::subb_word_rd_rsoff8(u8 rd, u8 rs, u8 offset8){ fatalerror("SUBB.w %s, [%s+#$%02x]", m_regnames16[rd], m_regnames16[rs], offset8);}

@@ -482,7 +482,7 @@ Notes from Charles MacDonald
 
 /********** READ INPUTS **********/
 
-CUSTOM_INPUT_MEMBER(ms32_state::mahjong_ctrl_r)
+ioport_value ms32_state::mahjong_ctrl_r()
 {
 	u32 mj_input;
 

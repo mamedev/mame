@@ -123,7 +123,7 @@ public:
 
 	void init_littlerb();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(frame_step_r);
+	ioport_value frame_step_r();
 
 protected:
 	virtual void machine_start() override;
@@ -199,7 +199,7 @@ void littlerb_state::main(address_map &map)
 }
 
 // guess according to DASM code and checking the gameplay speed, could be different
-CUSTOM_INPUT_MEMBER(littlerb_state::frame_step_r)
+ioport_value littlerb_state::frame_step_r()
 {
 	uint32_t ret = m_soundframe;
 

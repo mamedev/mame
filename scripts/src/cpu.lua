@@ -856,6 +856,24 @@ if opt_tool(CPUS, "HMCS40") then
 end
 
 --------------------------------------------------
+-- Hitachi HMCS400 series
+--@src/devices/cpu/hmcs400/hmcs400.h,CPUS["HMCS400"] = true
+--------------------------------------------------
+
+if CPUS["HMCS400"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400.cpp",
+		MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400.h",
+		MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400op.cpp",
+	}
+end
+
+if opt_tool(CPUS, "HMCS400") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hmcs400/hmcs400d.h")
+end
+
+--------------------------------------------------
 -- Hitachi SuperH series (SH1/SH2/SH3/SH4)
 --@src/devices/cpu/sh/sh2.h,CPUS["SH"] = true
 --@src/devices/cpu/sh/sh4.h,CPUS["SH"] = true
@@ -1393,6 +1411,23 @@ end
 if opt_tool(CPUS, "DIABLO") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/diablo/diablo1300dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/diablo/diablo1300dasm.h")
+end
+
+--------------------------------------------------
+-- KL1839VM1
+--@src/devices/cpu/mpk1839/kl1839vm1.h,CPUS["KL1839VM1"] = true
+--------------------------------------------------
+
+if CPUS["KL1839VM1"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1.cpp",
+		MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1.h",
+	}
+end
+
+if opt_tool(CPUS, "KL1839VM1") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1dasm.h")
 end
 
 --------------------------------------------------

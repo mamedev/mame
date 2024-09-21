@@ -144,11 +144,9 @@ protected:
 	virtual uint32_t execute_max_cycles() const noexcept override { return 16; }
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
-	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
 	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
-	virtual void execute_burn(int32_t cycles) override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface implementation
@@ -165,6 +163,7 @@ protected:
 
 	virtual uint8_t z180_internal_port_read(uint8_t port);
 	virtual void z180_internal_port_write(uint8_t port, uint8_t data);
+	[[maybe_unused]] void burn_cycles(int32_t cycles);
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;

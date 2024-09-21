@@ -12388,8 +12388,8 @@ public:
 
 	void wtalker(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sensor_r) { return m_dial & 1; }
-	DECLARE_CUSTOM_INPUT_MEMBER(pulse_r) { return (m_pulse > machine().time()) ? 1 : 0; }
+	ioport_value sensor_r() { return m_dial & 1; }
+	ioport_value pulse_r() { return (m_pulse > machine().time()) ? 1 : 0; }
 
 protected:
 	virtual void machine_start() override;

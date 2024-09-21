@@ -224,23 +224,17 @@ void mappy_state::phozon_palette(palette_device &palette) const
 /* convert from 32x32 to 36x28 */
 TILEMAP_MAPPER_MEMBER(mappy_state::superpac_tilemap_scan)
 {
-	int offs;
-
 	row += 2;
 	col -= 2;
 	if (col & 0x20)
-		offs = row + ((col & 0x1f) << 5);
+		return row + ((col & 0x1f) << 5);
 	else
-		offs = col + (row << 5);
-
-	return offs;
+		return col + (row << 5);
 }
 
 /* tilemap is a composition of a 32x60 scrolling portion and two 2x28 fixed portions on the sides */
 TILEMAP_MAPPER_MEMBER(mappy_state::mappy_tilemap_scan)
 {
-	int offs;
-
 	col -= 2;
 	if (col & 0x20)
 	{
@@ -248,14 +242,12 @@ TILEMAP_MAPPER_MEMBER(mappy_state::mappy_tilemap_scan)
 		   mapping from logical to hardware coordinates, which is true to the hardware.
 		   Not doing it that way would cause missing tiles in motos and todruaga */
 		if (row & 0x20)
-			offs = 0x7ff;   // outside visible area
+			return 0x7ff; // outside visible area
 		else
-			offs = ((row + 2) & 0x0f) + (row & 0x10) + ((col & 3) << 5) + 0x780;
+			return ((row + 2) & 0x0f) + (row & 0x10) + ((col & 3) << 5) + 0x780;
 	}
 	else
-		offs = col + (row << 5);
-
-	return offs;
+		return col + (row << 5);
 }
 
 TILE_GET_INFO_MEMBER(mappy_state::superpac_get_tile_info)

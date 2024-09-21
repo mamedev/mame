@@ -504,7 +504,7 @@ void midvunit_state::wheel_board_w(uint32_t data)
 }
 
 
-DECLARE_CUSTOM_INPUT_MEMBER(crusnusa_state::motion_r)
+ioport_value crusnusa_state::motion_r()
 {
 	uint8_t const status = m_motion->read();
 	for (uint8_t bit = 0; bit < 8; bit++)

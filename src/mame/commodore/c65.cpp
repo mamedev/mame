@@ -1411,7 +1411,6 @@ void c65_state::cpu_w(uint8_t data)
 
 void c65_state::c65(machine_config &config)
 {
-	/* basic machine hardware */
 	M4510(config, m_maincpu, MAIN_C65_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c65_state::c65_map);
 	m_maincpu->read_callback().set(FUNC(c65_state::cpu_r));
@@ -1443,8 +1442,6 @@ void c65_state::c65(machine_config &config)
 //  m_cia[1]->pa_rd_callback().set(FUNC(c65_state::c65_cia1_port_a_r));
 	m_cia[1]->pa_wr_callback().set(FUNC(c65_state::cia1_porta_w));
 
-
-	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(FUNC(c65_state::screen_update));
 	// TODO: stub parameters
@@ -1456,7 +1453,6 @@ void c65_state::c65(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(c65_state::palette_init), 0x100);
 
-	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	// 8580 SID

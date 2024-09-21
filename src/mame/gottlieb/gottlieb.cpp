@@ -277,8 +277,8 @@ public:
 	void init_qbert();
 	void init_qbertqub();
 
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(track_delta_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
+	template <int N> ioport_value track_delta_r();
+	ioport_value stooges_joystick_r();
 
 protected:
 	virtual void machine_start() override;
@@ -665,7 +665,7 @@ uint32_t gottlieb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
  *************************************/
 
 template <int N>
-CUSTOM_INPUT_MEMBER(gottlieb_state::track_delta_r)
+ioport_value gottlieb_state::track_delta_r()
 {
 	return (N ? m_track_y : m_track_x)->read() - m_track[N];
 }
@@ -679,7 +679,7 @@ void gottlieb_state::analog_reset_w(u8 data)
 }
 
 
-CUSTOM_INPUT_MEMBER(gottlieb_state::stooges_joystick_r)
+ioport_value gottlieb_state::stooges_joystick_r()
 {
 	static const char *const joyport[] = { "P2JOY", "P3JOY", "P1JOY", nullptr };
 	return (joyport[m_joystick_select & 3] != nullptr) ? ioport(joyport[m_joystick_select & 3])->read() : 0xff;

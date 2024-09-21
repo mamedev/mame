@@ -419,34 +419,35 @@ QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
-	if (image.length() >= 0xfd00)
-		return std::make_pair(image_error::INVALIDLENGTH, std::string());
-
-	/* The right RAM bank must be active */
-
-	/* Avoid loading a program if CP/M-80 is not in memory */
+	// Avoid loading a program if CP/M-80 is not in memory
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
 	{
 		machine_reset();
-		return std::make_pair(image_error::UNSUPPORTED, std::string());
+		return std::make_pair(image_error::UNSUPPORTED, "CP/M must already be running");
 	}
 
-	/* Load image to the TPA (Transient Program Area) */
+	// Check for sufficient RAM based on position of CPM
+	const int mem_avail = 256 * prog_space.read_byte(7) + prog_space.read_byte(6) - 512;
+	if (mem_avail < image.length())
+		return std::make_pair(image_error::UNSPECIFIED, "Insufficient memory available");
+
+	// Load image to the TPA (Transient Program Area)
 	uint16_t quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;
-		if (image.fread( &data, 1) != 1)
-			return std::make_pair(image_error::UNSPECIFIED, std::string());
-		prog_space.write_byte(i+0x100, data);
+		if (image.fread(&data, 1) != 1)
+			return std::make_pair(image_error::UNSPECIFIED, "Problem reading the image at offset " + std::to_string(i));
+		prog_space.write_byte(i + 0x100, data);
 	}
 
-	/* clear out command tail */
-	prog_space.write_byte(0x80, 0);   prog_space.write_byte(0x81, 0);
+	// clear out command tail
+	prog_space.write_byte(0x80, 0);
+	prog_space.write_byte(0x81, 0);
 
-	/* Roughly set SP basing on the BDOS position */
-	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
-	m_maincpu->set_pc(0x100);       // start program
+	// Roughly set SP basing on the BDOS position
+	m_maincpu->set_state_int(Z80_SP, mem_avail + 384);
+	m_maincpu->set_pc(0x100); // start program
 
 	return std::make_pair(std::error_condition(), std::string());
 }
@@ -1134,14 +1135,14 @@ static void smc777_floppies(device_slot_interface &device)
 
 void smc777_state::smc777(machine_config &config)
 {
-    constexpr XTAL MASTER_CLOCK = 32.2238_MHz_XTAL;
+	constexpr XTAL MASTER_CLOCK = 32.2238_MHz_XTAL;
 
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK / 8); // nominally 4.028 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &smc777_state::smc777_mem);
 	m_maincpu->set_addrmap(AS_IO, &smc777_state::smc777_io);
 
-    I8041A(config, "mcu", 6_MHz_XTAL).set_disable();
+	I8041A(config, "mcu", 6_MHz_XTAL).set_disable();
 
 	LS259(config, m_ioctrl);
 	m_ioctrl->q_out_cb<0>().set(FUNC(smc777_state::raminh_w));

@@ -95,7 +95,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
 	DECLARE_INPUT_CHANGED_MEMBER(overlay_switch) { update_overlay(); }
-	DECLARE_CUSTOM_INPUT_MEMBER(overlay_r);
+	ioport_value overlay_r();
 
 protected:
 	virtual void machine_start() override;
@@ -190,7 +190,7 @@ void ggm_state::update_reset(ioport_value state)
     Keypad Overlay
 *******************************************************************************/
 
-CUSTOM_INPUT_MEMBER(ggm_state::overlay_r)
+ioport_value ggm_state::overlay_r()
 {
 	u8 data = m_inputs[5]->read() & 0xf;
 	return (data == 0xf) ? m_overlay : data;

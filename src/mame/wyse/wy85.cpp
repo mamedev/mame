@@ -16,8 +16,10 @@
 #include "cpu/mcs51/mcs51.h"
 #include "machine/er1400.h"
 #include "machine/mc68681.h"
+#include "sound/beep.h"
 #include "video/scn2674.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 namespace {
@@ -32,11 +34,13 @@ public:
 		, m_kybd(*this, "kybd")
 		, m_pvtc(*this, "pvtc")
 		, m_duart(*this, "duart")
+		, m_beeper(*this, "beeper")
 		, m_comm(*this, "comm")
 		, m_pr(*this, "pr")
 		, m_chargen(*this, "chargen")
 		, m_mainram(*this, "mainram")
 		, m_clr_rb(false)
+		, m_tru_inv(false)
 		, m_lc(0)
 	{
 	}
@@ -82,6 +86,7 @@ private:
 	required_device<wyse_keyboard_port_device> m_kybd;
 	required_device<scn2672_device> m_pvtc;
 	required_device<scn2681_device> m_duart;
+	required_device<beep_device> m_beeper;
 	required_device<rs232_port_device> m_comm;
 	required_device<rs232_port_device> m_pr;
 
@@ -92,6 +97,7 @@ private:
 	std::unique_ptr<u8[]> m_fontram;
 
 	bool m_clr_rb;
+	bool m_tru_inv;
 	u8 m_lc;
 };
 
@@ -104,6 +110,8 @@ void wy85_state::machine_start()
 	save_pointer(NAME(m_fontram), 0x800);
 
 	save_item(NAME(m_clr_rb));
+	save_item(NAME(m_tru_inv));
+	save_item(NAME(m_lc));
 }
 
 void wy85_state::machine_reset()
@@ -113,13 +121,28 @@ void wy85_state::machine_reset()
 
 SCN2672_DRAW_CHARACTER_MEMBER(wy85_state::draw_character)
 {
-	u16 a = bitswap<2>(attrcode, 5, 6) << 11 | ((charcode & 0x7f) << 4) | ((m_lc + (m_clr_rb ? 0 : linecount)) & 0xf);
-	u8 c = a >= 0x1800 ? m_fontram[a - 0x1800] : m_chargen[a];
+	if (BIT(attrcode, 0, 2) == 0)
+	{
+		std::fill_n(&bitmap.pix(y, x), 10, rgb_t::black());
+		return;
+	}
 
-	// TODO: attributes
+	u8 lc = m_lc + (m_clr_rb ? 0 : linecount);
+	u16 a = bitswap<2>(attrcode, 5, 6) << 11 | ((charcode & 0x7f) << 4) | (lc & 0xf);
+	u16 c = BIT(attrcode, 3) && (lc & 9) == 9 ? 0x3ff : a >= 0x1800 ? m_fontram[a - 0x1800] << 2 : m_chargen[a] << 2;
+
+	rgb_t fg = !BIT(attrcode, 1) || (BIT(attrcode, 4) && blink) ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
+	bool inv = (BIT(attrcode, 2) != cursor) == m_tru_inv;
+	if (inv && BIT(c, 2))
+		c |= 3;
+	if (BIT(attrcode, 0, 2) == 3)
+		c |= c >> 1;
+	if (inv)
+		c ^= 0x3ff;
+
 	for (int i = 0; i < 10; i++)
 	{
-		bitmap.pix(y, x++) = BIT(c, 7) ? rgb_t::white() : rgb_t::black();
+		bitmap.pix(y, x++) = BIT(c, 9) ? fg : rgb_t::black();
 		c <<= 1;
 	}
 }
@@ -229,6 +252,9 @@ void wy85_state::p1_w(u8 data)
 	m_pr->write_rts(BIT(data, 3));
 
 	m_clr_rb = !BIT(data, 1);
+	m_tru_inv = BIT(data, 6);
+
+	m_beeper->set_state(BIT(data, 5));
 }
 
 u8 wy85_state::p3_r()
@@ -342,6 +368,9 @@ void wy85_state::wy85(machine_config &config)
 	m_duart->outport_cb().set(FUNC(wy85_state::duart_op_w));
 	m_duart->irq_cb().set_inputline(m_maincpu, MCS51_INT1_LINE);
 
+	SPEAKER(config, "speaker").front_center();
+	BEEP(config, m_beeper, 1000).add_route(ALL_OUTPUTS, "speaker", 0.10); // FIXME: not accurate; actually uses same circuit as WY-50 with 74LS14 Schmitt triggers and discrete components
+
 	RS232_PORT(config, m_comm, default_rs232_devices, nullptr); // RS423 port, also RS232 compatible
 	m_comm->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
 	m_comm->cts_handler().set(m_duart, FUNC(scn2681_device::ip0_w));
@@ -369,4 +398,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1985, wy85, 0, 0, wy85, wy85, wy85_state, empty_init, "Wyse Technology", "WY-85", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+COMP(1985, wy85, 0, 0, wy85, wy85, wy85_state, empty_init, "Wyse Technology", "WY-85", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

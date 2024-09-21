@@ -10,7 +10,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "bml3mp1805.h"
+#include "mp1805.h"
 
 #include "softlist_dev.h"
 
@@ -23,7 +23,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(BML3BUS_MP1805, bml3bus_mp1805_device, "bml3mp1805", "Hitachi MP-1805 Floppy Controller Card")
+DEFINE_DEVICE_TYPE(BML3BUS_MP1805, bml3bus_mp1805_device, "bml3mp1805", "Hitachi MP-1805 3\" Floppy Controller Card")
 
 ROM_START( mp1805 )
 	ROM_REGION(0x800, "mp1805_rom", 0)

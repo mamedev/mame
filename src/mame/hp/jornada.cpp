@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/m950x0.h"
 #include "machine/sa1110.h"
 #include "machine/sa1111.h"

@@ -64,11 +64,11 @@ public:
 	void madcrush(machine_config &config);
 
 	int sound_busy_r();
-	template <int Which> DECLARE_CUSTOM_INPUT_MEMBER(gwar_rotary);
-	template <int Which> DECLARE_CUSTOM_INPUT_MEMBER(gwarb_rotary);
-	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_x);
-	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_y);
-	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(snk_bonus_r);
+	template <int Which> ioport_value gwar_rotary();
+	template <int Which> ioport_value gwarb_rotary();
+	ioport_value countryc_trackball_x();
+	ioport_value countryc_trackball_y();
+	template <int Mask> ioport_value snk_bonus_r();
 
 protected:
 	virtual void machine_start() override;

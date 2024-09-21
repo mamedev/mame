@@ -1112,7 +1112,7 @@ static INPUT_PORTS_START( metlsavr )
 	PORT_DIPSETTING(      0x0000, "80 Seconds" )
 INPUT_PORTS_END
 
-CUSTOM_INPUT_MEMBER(tumbleb_state::suprtrio_prot_latch_r)
+ioport_value tumbleb_state::suprtrio_prot_latch_r()
 {
 	return m_suprtrio_prot_latch;
 }

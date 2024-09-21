@@ -16656,6 +16656,11 @@ sgalaxyb
 @source:cxg/professor.cpp
 scprof
 
+@source:cxg/royal.cpp
+granada
+sroyal
+supra
+
 @source:cxg/senterprise.cpp
 senterp
 senterpc
@@ -19704,6 +19709,7 @@ smondial2                       // 1989 Mephisto Super Mondial II
 
 @source:hitachi/b16.cpp
 b16                             //
+b16ex2                          //
 
 @source:hitachi/bmjr.cpp
 bmjr                            //
@@ -19967,6 +19973,9 @@ rtpc015                         // IBM RT PC Model 015
 rtpc020                         // IBM RT PC Model 020
 rtpc025                         // IBM RT PC Model 025
 rtpca25                         // IBM RT PC Model A25
+
+@source:ibm/thinkpad8xx.cpp
+thinkpad850                     // IBM Thinkpad 850
 
 @source:ice/chexx.cpp
 chexx83                         // 1983 ICE
@@ -20310,6 +20319,7 @@ oceanpar                        //
 oceanpara                       //
 olympic5                        // (c) 2005
 olympic5a                       // (c) 2003
+tripslot                        // (c) 2007
 qlgs                            // (c) 1999
 sdwx                            // (c) 2002
 slqz3                           // (c) 1999
@@ -20329,6 +20339,8 @@ crzybugsj                       // (c) 2007
 haunthig                        // (c) 2008
 haunthiga                       // (c) 2006
 tripfev                         // (c) 2006
+tripfeva                        // (c) 2006
+tripfevb                        // (c) 2006
 wldfruit                        // (c) 200?
 
 @source:igs/igs_m036.cpp
@@ -32760,8 +32772,6 @@ expert3t                        //
 expertac                        //
 expertdx                        //
 fsa1fx                          // 1988 MSX2+ Japan
-fsa1gt                          //
-fsa1st                          //
 fsa1wsx                         // 1989 MSX2+ Japan
 fsa1wx                          // 1988 MSX2+ Japan
 fsa1wxa                         // 1988 MSX2+ Japan
@@ -32770,6 +32780,10 @@ hbf1xv                          // 1989 MSX2+ Japan
 phc35j                          // 1989 MSX2+ Japan
 phc70fd                         // 1988 MSX2+ Japan
 phc70fd2                        // 1988 MSX2+ Japan
+
+@source:msx/msxtr.cpp
+fsa1gt                          //
+fsa1st                          //
 
 @source:msx/pengadvb.cpp
 pengadvb                        // (c) 1988 Screen
@@ -38969,6 +38983,9 @@ montreux
 risc2500
 risc2500a
 
+@source:saitek/sbackg.cpp
+sbackg
+
 @source:saitek/schess.cpp
 schess
 
@@ -42366,6 +42383,9 @@ p8000_16                        //
 @source:skeleton/palestra.cpp
 palestra
 
+@source:skeleton/pap2.cpp
+pap2
+
 @source:skeleton/pcksurfer.cpp
 pcksurfer                       // (c) 2006 Datawind
 
@@ -42825,6 +42845,7 @@ nws1580                         // Sony NEWS NWS-1580
 @source:sony/news_r3k.cpp
 nws3260                         // Sony NEWS NWS-3260
 nws3410                         // Sony NEWS NWS-3410
+nws3720                         // Sony NEWS NWS-3720
 
 @source:sony/news_r4k.cpp
 nws5000x                        // Sony NEWS NWS-5000X
@@ -45452,6 +45473,7 @@ zone3d
 ablkickb
 abltenni                        //
 comil                           //
+ddr33v
 decathln
 decathlna
 doraglob                        // (c) 2007 VTech
@@ -46043,6 +46065,9 @@ orionzms                        //
 
 @source:ussr/partner.cpp
 partner                         //
+
+@source:ussr/pk32.cpp
+pk32                            // (c) 1991 Elektronika, USSR
 
 @source:ussr/pk8000.cpp
 hobby                           //

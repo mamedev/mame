@@ -76,7 +76,7 @@ public:
 	void init_outrunb();
 	void init_shangon();
 
-	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
+	ioport_value bankmotor_pos_r();
 
 protected:
 	// PPI read/write handlers

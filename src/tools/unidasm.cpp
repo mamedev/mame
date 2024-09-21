@@ -68,6 +68,7 @@ using util::BIT;
 #include "cpu/hcd62121/hcd62121d.h"
 #include "cpu/hd61700/hd61700d.h"
 #include "cpu/hmcs40/hmcs40d.h"
+#include "cpu/hmcs400/hmcs400d.h"
 #include "cpu/hp2100/hp2100d.h"
 #include "cpu/hpc/hpcdasm.h"
 #include "cpu/hphybrid/hphybrid_dasm.h"
@@ -128,6 +129,7 @@ using util::BIT;
 #include "cpu/mn1610/mn1610d.h"
 #include "cpu/mn1880/mn1880d.h"
 #include "cpu/mn10200/mn102dis.h"
+#include "cpu/mpk1839/kl1839vm1dasm.h"
 #include "cpu/msm65x2/msm65x2d.h"
 #include "cpu/nanoprocessor/nanoprocessor_dasm.h"
 #include "cpu/nec/necdasm.h"
@@ -474,6 +476,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "hd6309",          be,  0, []() -> util::disasm_interface * { return new hd6309_disassembler; } },
 	{ "hd63701",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(63701); } },
 	{ "hmcs40",          le, -1, []() -> util::disasm_interface * { return new hmcs40_disassembler; } },
+	{ "hmcs400",         le, -1, []() -> util::disasm_interface * { return new hmcs400_disassembler; } },
 	{ "hp2100",          be, -1, []() -> util::disasm_interface * { return new hp2100_disassembler; } },
 	{ "hp21mx",          be, -1, []() -> util::disasm_interface * { return new hp21mx_disassembler; } },
 	{ "hp_5061_3001",    be, -1, []() -> util::disasm_interface * { return new hp_5061_3001_disassembler; } },
@@ -506,6 +509,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "jaguargpu",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::GPU); } },
 	{ "konami",          be,  0, []() -> util::disasm_interface * { return new konami_disassembler; } },
 	{ "ks0164",          be,  0, []() -> util::disasm_interface * { return new ks0164_disassembler; } },
+	{ "kl1839vm1",       be,  0, []() -> util::disasm_interface * { return new kl1839vm1_disassembler; } },
 	{ "lc57",            be,  0, []() -> util::disasm_interface * { return new lc57_disassembler; } },
 	{ "lc58",            be, -1, []() -> util::disasm_interface * { return new lc58_disassembler; } },
 	{ "lc8670",          be,  0, []() -> util::disasm_interface * { return new lc8670_disassembler; } },

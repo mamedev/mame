@@ -43,8 +43,8 @@
 class neogeo_base_state : public driver_device
 {
 public:
-	DECLARE_CUSTOM_INPUT_MEMBER(get_memcard_status);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_audio_result);
+	ioport_value get_memcard_status();
+	ioport_value get_audio_result();
 
 protected:
 	neogeo_base_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -222,7 +222,7 @@ private:
 class ngarcade_base_state : public neogeo_base_state
 {
 public:
-	DECLARE_CUSTOM_INPUT_MEMBER(startsel_edge_joy_r);
+	ioport_value startsel_edge_joy_r();
 
 protected:
 	ngarcade_base_state(const machine_config &mconfig, device_type type, const char *tag)

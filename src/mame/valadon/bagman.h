@@ -125,7 +125,7 @@ public:
 		m_old_val{ 0, 0 }
 	{ }
 
-	template <unsigned N> DECLARE_CUSTOM_INPUT_MEMBER(dial_input_r);
+	template <unsigned N> ioport_value dial_input_r();
 
 protected:
 	virtual void machine_start() override;

@@ -184,7 +184,7 @@ INPUT_CHANGED_MEMBER( abc99_device::keyboard_reset )
 //  INPUT_PORTS( abc99 )
 //-------------------------------------------------
 
-CUSTOM_INPUT_MEMBER( abc99_device::cursor_x4_r )
+ioport_value abc99_device::cursor_x4_r()
 {
 	u8 cursor = m_cursor->read();
 	u8 data = 0;
@@ -205,7 +205,7 @@ CUSTOM_INPUT_MEMBER( abc99_device::cursor_x4_r )
 	return data;
 }
 
-CUSTOM_INPUT_MEMBER( abc99_device::cursor_x6_r )
+ioport_value abc99_device::cursor_x6_r()
 {
 	u8 cursor = m_cursor->read();
 	u8 data = 0;

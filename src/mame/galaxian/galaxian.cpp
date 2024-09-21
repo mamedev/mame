@@ -1344,7 +1344,7 @@ INPUT_CHANGED_MEMBER(gmgalax_state::game_changed)
 
 
 template <int N>
-CUSTOM_INPUT_MEMBER(gmgalax_state::port_r)
+ioport_value gmgalax_state::port_r()
 {
 	return (m_selected_game != 0 ? m_glin : m_gmin)[N]->read();
 }
@@ -6250,7 +6250,7 @@ INPUT_PORTS_END
 
 // Coinage Dips are spread across two input ports
 template <int Mask>
-CUSTOM_INPUT_MEMBER(galaxian_state::ckongg_coinage_r)
+ioport_value galaxian_state::ckongg_coinage_r()
 {
 	switch (Mask)
 	{
@@ -6656,7 +6656,7 @@ static INPUT_PORTS_START( scobras )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER(moonwar_state::dial_r)
+ioport_value moonwar_state::dial_r()
 {
 	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
 	// i.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature

@@ -48,7 +48,7 @@ public:
 
 	void ctk2000(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(lcd_r) { return m_lcdc->db_r() >> 4; }
+	ioport_value lcd_r() { return m_lcdc->db_r() >> 4; }
 	void lcd_w(int state) { m_lcdc->db_w(state << 4); }
 
 	void apo_w(int state);

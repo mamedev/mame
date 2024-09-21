@@ -101,7 +101,7 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
+	ioport_value system_type_r();
 
 protected:
 	required_device<gfxdecode_device> m_gfxdecode;

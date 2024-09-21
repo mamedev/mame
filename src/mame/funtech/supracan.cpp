@@ -293,6 +293,8 @@ private:
 
 int supracan_state::get_tilemap_region(int layer)
 {
+	// TODO: anything that refers to 2bpp region (2) can actually be layer 1bpp selectable too
+	// From layer mode bit 7?
 	switch(layer)
 	{
 		case 0:
@@ -301,7 +303,6 @@ int supracan_state::get_tilemap_region(int layer)
 		case 1:
 			static const int layer1_mode[8] = { 2, 1, 1, 1, 2, 2, 2, 2 };
 			return layer1_mode[m_gfx_mode & 7];
-		// HACK: can be 2bpp or 1bpp
 		case 2:
 			return 2;
 		case 3:
@@ -325,13 +326,15 @@ void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int
 
 	uint16_t tile_bank = 0;
 	uint16_t palette_shift = 0;
+	// TODO: convert this to a static table, verify case 7
 	switch (gfx_mode)
 	{
 	case 7:
 		tile_bank = 0x1c00;
 		break;
 
-	case 6: // gambling lord
+	// gamblord
+	case 6:
 		tile_bank = 0x0c00;
 		break;
 
@@ -808,6 +811,24 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 {
 	uint16_t *vram = m_vram;
 
+	// ysizes are normally setting +1, except on higher ranges where values are higher
+	// TODO: check on real HW
+	static const int ysizes_table[16] = {
+		1, 2, 3, 4, 5, 6, 7, 8, 9,
+		// 0x9: speedyd intro dash frame
+		11,
+		// 0xa: A'Can logo
+		12,
+		// 0xb/0xc: jttlaugh stage 1-3 (particularly on the web scrolling jump platforms)
+		16,
+		20,
+		// 0xd: slghtsag character select
+		22,
+		// 0xe/0xf: <unknown>, check me
+		24,
+		26
+	};
+
 	uint32_t skip_count = 0;
 	uint32_t start_word = (m_sprite_base_addr >> 1) + skip_count * 4;
 	uint32_t end_word = start_word + (m_sprite_count - skip_count) * 4;
@@ -836,9 +857,7 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 		if ((vram[i + 0] & 0x4000))
 		{
 			int xsize = 1 << (vram[i + 1] & 7);
-			// TODO: this looks non-linear, particularly at bit 3 ON settings
-			// cfr. A'Can logo, speedyd intro, slghtsag character select
-			int ysize = ((vram[i + 0] & 0x1e00) >> 9) + 1;
+			int ysize = ysizes_table[(vram[i + 0] & 0x1e00) >> 9];
 
 			// HACK: sonevil sets 1x1 tiles in game, and expecting to take this path.
 			// Most likely former condition is wrong, and it just "direct sprite" when latter occurs.
@@ -864,6 +883,12 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 			{
 				// I think the xsize must influence the ysize somehow, there are too many conflicting cases otherwise
 				// there don't appear to be any special markers in the actual looked up tile data to indicate skip / end of list
+
+				//if (((vram[i + 0] & 0x1e00) >> 9) == test_target)
+				//{
+				//    ysize = test_value;
+				//}
+
 
 				for (int ytile = 0; ytile < ysize; ytile++)
 				{
@@ -895,7 +920,7 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 				}
 			}
 
-			// TODO: scaling
+			// TODO: scaling, find places where it occurs
 #if 0
 			if (xscale == 0) continue;
 			uint32_t delta = (1 << 17) / xscale;
@@ -1074,6 +1099,7 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			{
 				int which_tilemap_size = get_tilemap_dimensions(xsize, ysize, layer);
 				bitmap_ind16 &src_bitmap = m_tilemap_sizes[layer][which_tilemap_size]->pixmap();
+				// TODO: per-tile priority, thru ->flagsmap()
 				int gfx_region = get_tilemap_region(layer);
 				int transmask = 0xff;
 
@@ -2034,16 +2060,24 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		{
 			LOGMASKED(LOG_VIDEO, "video_flags = %04x\n", data);
 
-			const int h320_mode = BIT(data, 8);
+			if (data & 0xc00)
+				popmessage("Interlace enable %04x", data & 0xc00);
 
 			// TODO: verify if this support midframe switching
-			if (h320_mode != BIT(m_video_flags, 8))
+			if ((data & 0x300) != (m_video_flags & 0x300))
 			{
 				rectangle visarea = m_screen->visible_area();
+				const int h320_mode = BIT(data, 8);
+				// enabled by sangofgt (224 + 16 borders), magipool wants (240)
+				const int overscan_mode = BIT(data, 9);
+
 				const int htotal = h320_mode ? 455 : 342;
 				const int divider = h320_mode ? 8 : 10;
 
-				visarea.set(0, (h320_mode ? 320 : 256) - 1, 8, 232 - 1);
+				const int vdisplay_start = overscan_mode ? 8 : 0;
+				const int vdisplay_end = overscan_mode ? 232 : 240;
+
+				visarea.set(0, (h320_mode ? 320 : 256) - 1, vdisplay_start, vdisplay_end - 1);
 				m_screen->configure(htotal, 262, visarea, attotime::from_ticks(htotal * 262, U13_CLOCK / divider).as_attoseconds());
 				//m_screen->reset_origin(0, 0);
 			}

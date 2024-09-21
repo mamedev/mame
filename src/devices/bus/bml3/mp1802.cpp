@@ -10,7 +10,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "bml3mp1802.h"
+#include "mp1802.h"
 
 #include "softlist_dev.h"
 
@@ -23,7 +23,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(BML3BUS_MP1802, bml3bus_mp1802_device, "bml3mp1802", "Hitachi MP-1802 Floppy Controller Card")
+DEFINE_DEVICE_TYPE(BML3BUS_MP1802, bml3bus_mp1802_device, "bml3mp1802", "Hitachi MP-1802 5.25\" Floppy Controller Card")
 
 static void mp1802_floppies(device_slot_interface &device)
 {

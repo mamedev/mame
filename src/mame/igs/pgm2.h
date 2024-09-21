@@ -5,26 +5,20 @@
 
 #pragma once
 
-#include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
-#include "sound/ymz770.h"
 #include "igs036crypt.h"
-#include "screen.h"
-#include "speaker.h"
+#include "pgm2_memcard.h"
+
+#include "cpu/arm7/arm7.h"
+#include "machine/atmel_arm_aic.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
-#include "machine/atmel_arm_aic.h"
-#include "pgm2_memcard.h"
+#include "sound/ymz770.h"
+
 #include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
 #include "tilemap.h"
 
-struct kov3_module_key
-{
-	u8 key[8];
-	u8 sum[8];
-	u32 addr_xor; // 22bit
-	u16 data_xor;
-};
 
 class pgm2_state : public driver_device
 {
@@ -75,7 +69,22 @@ public:
 	void pgm2_module_rom_map(address_map &map);
 	void pgm2_ram_rom_map(address_map &map);
 	void pgm2_rom_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_post_load() override;
+
 private:
+	struct kov3_module_key
+	{
+		u8 key[8];
+		u8 sum[8];
+		u32 addr_xor; // 22bit
+		u16 data_xor;
+	};
+
 	u32 unk_startup_r();
 	u32 rtc_r();
 	u32 mcu_r(offs_t offset);
@@ -108,11 +117,6 @@ private:
 	void encryption_w(offs_t offset, u8 data);
 	void encryption_do_w(u32 data);
 	void sprite_encryption_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_post_load() override;
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

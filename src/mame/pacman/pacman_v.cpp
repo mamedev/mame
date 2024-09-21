@@ -169,16 +169,12 @@ void pacman_state::pacman_rbg_palette(palette_device &palette) const
 
 TILEMAP_MAPPER_MEMBER(pacman_state::pacman_scan_rows)
 {
-	int offs;
-
 	row += 2;
 	col -= 2;
 	if (col & 0x20)
-		offs = row + ((col & 0x1f) << 5);
+		return row + ((col & 0x1f) << 5);
 	else
-		offs = col + (row << 5);
-
-	return offs;
+		return col + (row << 5);
 }
 
 TILE_GET_INFO_MEMBER(pacman_state::pacman_get_tile_info)
@@ -543,17 +539,17 @@ Jr. Pac-Man
 
 TILEMAP_MAPPER_MEMBER(pacman_state::jrpacman_scan_rows)
 {
-	int offs;
-
 	row += 2;
 	col -= 2;
-	if ((col & 0x20) && (row & 0x20))
-		offs = 0;
-	else if (col & 0x20)
-		offs = row + (((col&0x3) | 0x38)<< 5);
+	if (col & 0x20)
+	{
+		if (row & 0x20)
+			return 0x77f; // outside visible area
+		else
+			return row + (((col & 0x3) | 0x38) << 5);
+	}
 	else
-		offs = col + (row << 5);
-	return offs;
+		return col + (row << 5);
 }
 
 TILE_GET_INFO_MEMBER(pacman_state::jrpacman_get_tile_info)
@@ -579,8 +575,7 @@ void pacman_state::jrpacman_mark_tile_dirty(int offset)
 	if (offset < 0x20)
 	{
 		/* line color - mark whole line as dirty */
-		int i;
-		for (i = 2 * 0x20; i < 56 * 0x20; i += 0x20)
+		for (int i = 2 * 0x20; i < 56 * 0x20; i += 0x20)
 		{
 			m_bg_tilemap->mark_tile_dirty(offset + i);
 		}

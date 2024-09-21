@@ -83,7 +83,7 @@ public:
 	std::unique_ptr<model2_renderer> m_poly;
 
 	/* Public for access by the ioports */
-	DECLARE_CUSTOM_INPUT_MEMBER(daytona_gearbox_r);
+	ioport_value daytona_gearbox_r();
 
 	/* Public for access by MCFG */
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);

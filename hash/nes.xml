@@ -24626,6 +24626,25 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="micromages">
+		<description>Micro Mages</description>
+		<year>2019</year>
+		<publisher>Morphcat Games</publisher>
+		<info name="serial" value="NES-MM-MCG" />
+		<info name="release" value="20190212" />
+		<part name="cart" interface="nes_cart">
+		<feature name="slot" value="nrom" />
+		<feature name="pcb" value="NES-NROM-256" />
+		<feature name="mirroring" value="horizontal" />
+		<dataarea name="prg" size="32768">
+			<rom name="Micro Mages prg" size="32768" crc="1f4aa740" sha1="c1f0e973815687e06086e57a615abc116aa37e61" />
+		</dataarea>
+		<dataarea name="chr" size="8192">
+			<rom name="Micro Mages chr" size="8192" crc="24144d94" sha1="e08bec8c93dce07262be37c7cceb7019817bea69" />
+		</dataarea>
+		</part>
+	</software>
+
 	<software name="mightmagj" cloneof="mightmag">
 		<description>Might and Magic - Book One - Secret of the Inner Sanctum (Japan)</description>
 		<year>1990</year>

@@ -107,7 +107,7 @@ ROM_END
 class keyboard_base : public device_t, public device_mac_keyboard_interface
 {
 public:
-	CUSTOM_INPUT_MEMBER(host_data_r)
+	ioport_value host_data_r()
 	{
 		return m_host_data_in ^ 0x01;
 	}

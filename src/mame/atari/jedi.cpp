@@ -164,7 +164,7 @@ public:
 		m_mainbank(*this, "mainbank")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(audio_comm_stat_0c01_r);
+	ioport_value audio_comm_stat_0c01_r();
 	void jedi(machine_config &config);
 
 protected:
@@ -264,7 +264,7 @@ u8 jedi_state::audio_comm_stat_r()
 }
 
 
-CUSTOM_INPUT_MEMBER(jedi_state::audio_comm_stat_0c01_r)
+ioport_value jedi_state::audio_comm_stat_0c01_r()
 {
 	return (m_soundlatch->pending_r() << 1) | m_sacklatch->pending_r();
 }

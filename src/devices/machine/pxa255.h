@@ -15,7 +15,6 @@
 #pragma once
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "sound/dmadac.h"
 #include "emupal.h"
 

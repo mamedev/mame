@@ -106,7 +106,7 @@ public:
 	void svip(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_off) { if (newval) m_power = false; }
-	DECLARE_CUSTOM_INPUT_MEMBER(power_r) { return m_power ? 1 : 0; }
+	ioport_value power_r() { return m_power ? 1 : 0; }
 
 protected:
 	virtual void machine_start() override;
@@ -271,7 +271,7 @@ static INPUT_PORTS_START( vip )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(vip_state, power_r)
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, vip_state, power_off, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, vip_state, power_off, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( svip )

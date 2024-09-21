@@ -84,8 +84,8 @@ public:
 
 	void shtzone(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(gun_tl_p1_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gun_tl_p2_r);
+	ioport_value gun_tl_p1_r();
+	ioport_value gun_tl_p2_r();
 
 protected:
 	virtual void machine_start() override;
@@ -194,12 +194,12 @@ void shtzone_state::prg_map(address_map &map)
 	map(0xdc00, 0xdc00).portr("IN1");
 }
 
-CUSTOM_INPUT_MEMBER(shtzone_state::gun_tl_p1_r)
+ioport_value shtzone_state::gun_tl_p1_r()
 {
 	return BIT(m_port_ctrl1->in_r(), 4);
 }
 
-CUSTOM_INPUT_MEMBER(shtzone_state::gun_tl_p2_r)
+ioport_value shtzone_state::gun_tl_p2_r()
 {
 	return BIT(m_port_ctrl2->in_r(), 4);
 }

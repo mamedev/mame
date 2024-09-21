@@ -68,7 +68,7 @@ public:
 	void st1002(machine_config &config);
 	void spiker(machine_config &config);
 	void triviamb(machine_config &config);
-	DECLARE_CUSTOM_INPUT_MEMBER(nstocker_bits_r);
+	ioport_value nstocker_bits_r();
 	void init_otwalls();
 	void init_triviaes();
 	void init_triviaes2();

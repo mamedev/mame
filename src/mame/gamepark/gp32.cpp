@@ -35,7 +35,6 @@
 #include "gp32.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -471,11 +470,11 @@ void gp32_state::s3c240x_check_pending_irq()
 		}
 		m_s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
 		m_s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 	}
 }
 
@@ -487,7 +486,7 @@ void gp32_state::s3c240x_request_irq(uint32_t int_type)
 		m_s3c240x_irq_regs[0] |= (1 << int_type); // SRCPND
 		m_s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
 		m_s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{

@@ -305,7 +305,7 @@ static INPUT_PORTS_START( senterp )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) // "
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, senterp_state, power_off, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, senterp_state, power_off, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( senterpc )
@@ -395,5 +395,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, senterp,  0,       0,      senterp,  senterp,  senterp_state,  empty_init, "CXG Systems / Newcrest Technology", "Super Enterprise (model 210)", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, senterpc, senterp, 0,      senterpc, senterpc, senterpc_state, empty_init, "CXG Systems / Newcrest Technology", "Super Enterprise (model 210.C)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, senterp,  0,       0,      senterp,  senterp,  senterp_state,  empty_init, "CXG Systems / Newcrest Technology / LogiSoft", "Super Enterprise (model 210)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, senterpc, senterp, 0,      senterpc, senterpc, senterpc_state, empty_init, "CXG Systems / Newcrest Technology / LogiSoft", "Super Enterprise (model 210.C)", MACHINE_SUPPORTS_SAVE )
