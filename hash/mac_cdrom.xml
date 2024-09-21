@@ -29,6 +29,29 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+	<!-- Chex Quest duplicated in ibm5170_cdrom.xml -->
+	<software name="chexquest">
+		<description>Chex Quest</description>
+		<year>1996</year>
+		<publisher>General Mills</publisher>
+		<info name="developer" value="Digital Café" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="chex quest" sha1="c90476cc54dfee86bf358c2eb06091ac5859d63a" />
+			</diskarea>
+		</part>
+	</software>
+	<software name="hexen">
+		<description>Hexen: Beyond Heretic</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="Raven Software" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="hexen" sha1="5a77d58f1a7e648779d681ca9136539104e8b6ae" />
+			</diskarea>
+		</part>
+	</software>
 	<software name="mac70a9">
 		<description>System Software 7.0a9 ("Big Bang" pre-release)</description>
 		<year>1991</year>
@@ -153,6 +176,17 @@ PPC750 - PowerPC 750 (G3) CPU
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pwrmaccd" sha1="8fd11f42298af430a4b7e3b056336f2e6eec5ce2"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="ultdoom">
+		<description>The Ultimate Doom</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="id Software" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultimate doom" sha1="145cbe5e43e7d4eb223602e7be6009e09c051f94" />
 			</diskarea>
 		</part>
 	</software>
