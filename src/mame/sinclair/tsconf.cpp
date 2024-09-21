@@ -94,7 +94,7 @@ void tsconf_state::tsconf_io(address_map &map)
 	map(0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
 	map(0x8ff7, 0x8ff7).select(0x7000).w(FUNC(tsconf_state::tsconf_port_f7_w)); // 3:bff7 5:dff7 6:eff7
 	map(0xbff7, 0xbff7).r(FUNC(tsconf_state::tsconf_port_f7_r));
-	map(0x00fb, 0x00fb).mirror(0xff00).lw8(NAME([this](u8 data) { m_dac->data_w(data); }));
+	map(0x00fb, 0x00fb).mirror(0xff00).w(m_dac, FUNC(dac_byte_interface::data_w));
 	map(0x80fd, 0x80fd).mirror(0x3f00).lw8(NAME([this](u8 data) { return m_ay[m_ay_selected]->data_w(data); }));
 	map(0xc0fd, 0xc0fd).mirror(0x3f00).lr8(NAME([this]() { return m_ay[m_ay_selected]->data_r(); }))
 		.w(FUNC(tsconf_state::tsconf_ay_address_w));
