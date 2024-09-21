@@ -2,7 +2,7 @@
 // copyright-holders: Angelo Salese, Jonathan Edwards, Christopher Edwards, Robbbert
 /**************************************************************************************************
 
-Basic Master Level 3 (MB-689x) (c) 1980 Hitachi
+Basic Master Level 3 (MB-689x) "Peach" (c) 1980 Hitachi
 ベーシックマスターレベル3
 
 References:
@@ -16,7 +16,8 @@ TODO:
 - Cassette relay doesn't work properly, issuing a LOAD won't autostart a load;
 - Cassette baud rate bump (can switch from 600 to 1200 bauds thru $ffd7);
 - implement sound as a bus slot device;
-- implement RAM expansion as (extra?) bus slots, thru $ffe8;
+- implement RAM expansion as bus slots (RAM3 at 0x8000-0xbfff, RAM4 at 0xc000-0xefff);
+- bml3mk5: BANK REG $ffe8 (applies EMS for the RAM expansion?);
 - soft reset will hang the machine;
 - Hitachi MB-S1 support (bumps memory map, adds an extra I/O layer);
 
@@ -433,6 +434,8 @@ void bml3_state::vram_w(offs_t offset, u8 data)
 {
 	m_vram[offset] = data;
 	// color ram is 5-bit
+	// NOTE: will break hiwriter with this, "write enable" only on reads!?
+	//if (!BIT(m_attr_latch, 7))
 	m_aram[offset] = m_attr_latch & get_attr_mask();
 }
 
@@ -639,29 +642,29 @@ static INPUT_PORTS_START( bml3 )
 	// DIP switches (service manual p.88)
 	// Note the NEWON command reboots with a soft override for the DIP switch
 	PORT_START("DIPSW")
-	PORT_DIPNAME( 0x01, 0x01, "BASIC/terminal mode")
+	PORT_DIPNAME( 0x01, 0x01, "BASIC/terminal mode") PORT_DIPLOCATION("SW:!1")
 	PORT_DIPSETTING(0x00, "Terminal mode")
 	PORT_DIPSETTING(0x01, "BASIC mode")
-	PORT_DIPNAME( 0x02, 0x02, "Interlaced video")
+	PORT_DIPNAME( 0x02, 0x02, "Interlaced video") PORT_DIPLOCATION("SW:!2")
 	PORT_DIPSETTING(0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(0x02, DEF_STR( On ))
 	// This is overridden by the 'Mode' toggle button
-	PORT_DIPNAME( 0x04, 0x04, "40-/80-column")
+	PORT_DIPNAME( 0x04, 0x04, "40-/80-column") PORT_DIPLOCATION("SW:!3")
 	PORT_DIPSETTING(0x00, "40 chars/line")
 	PORT_DIPSETTING(0x04, "80 chars/line")
-	PORT_DIPNAME( 0x08, 0x00, "Video resolution")
+	PORT_DIPNAME( 0x08, 0x00, "Video resolution") PORT_DIPLOCATION("SW:!4")
 	PORT_DIPSETTING(0x00, "High")
 	PORT_DIPSETTING(0x08, "Low")
-	PORT_DIPNAME( 0x10, 0x00, "Show PF key content")
+	PORT_DIPNAME( 0x10, 0x00, "Show PF key content") PORT_DIPLOCATION("SW:!5")
 	PORT_DIPSETTING(0x00, DEF_STR ( Off ) )
 	PORT_DIPSETTING(0x10, DEF_STR ( On ))
-	PORT_DIPNAME( 0x20, 0x00, "Terminal duplex")
+	PORT_DIPNAME( 0x20, 0x00, "Terminal duplex") PORT_DIPLOCATION("SW:!6")
 	PORT_DIPSETTING(0x00, "Full duplex")
 	PORT_DIPSETTING(0x20, "Half duplex")
-	PORT_DIPNAME( 0x40, 0x00, "Terminal bits")
+	PORT_DIPNAME( 0x40, 0x00, "Terminal bits") PORT_DIPLOCATION("SW:!7")
 	PORT_DIPSETTING(0x00, "8 bits/char")
 	PORT_DIPSETTING(0x40, "7 bits/char")
-	PORT_DIPNAME( 0x80, 0x00, "Hiragana->Katakana")
+	PORT_DIPNAME( 0x80, 0x00, "Hiragana->Katakana") PORT_DIPLOCATION("SW:!8")
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
 
@@ -770,6 +773,16 @@ static INPUT_PORTS_START( bml3 )
 
 	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END)) PORT_CHANGED_MEMBER(DEVICE_SELF, bml3_state, nmi_button, 0)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bml3mk5 )
+	PORT_INCLUDE( bml3 )
+	// No dipswitches on Mark 5
+	PORT_MODIFY("DIPSW")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
+	// TODO: add MODE front panel button here, in place of dipswitch
+	// On regular bml3 there's an extra button that xor content, that is directly routed here
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
@@ -1173,6 +1186,6 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1980, bml3,    0,     0,      bml3,    bml3,  bml3_state,    empty_init, "Hitachi", "Basic Master Level 3 (MB-6890)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1982, bml3mk2, bml3,  0,      bml3mk2, bml3,  bml3mk2_state, empty_init, "Hitachi", "Basic Master Level 3 Mark II (MB-6891)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, bml3mk5, bml3,  0,      bml3mk5, bml3,  bml3mk5_state, empty_init, "Hitachi", "Basic Master Level 3 Mark 5 (MB-6892)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, bml3,    0,     0,      bml3,    bml3,     bml3_state,    empty_init, "Hitachi", "Basic Master Level 3 (MB-6890)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, bml3mk2, bml3,  0,      bml3mk2, bml3,     bml3mk2_state, empty_init, "Hitachi", "Basic Master Level 3 Mark II (MB-6891)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, bml3mk5, bml3,  0,      bml3mk5, bml3mk5,  bml3mk5_state, empty_init, "Hitachi", "Basic Master Level 3 Mark 5 (MB-6892)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
