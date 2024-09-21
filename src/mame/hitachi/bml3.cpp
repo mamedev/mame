@@ -185,7 +185,7 @@ private:
 	bool m_cassbit = 0;
 	bool m_cassold = 0;
 	u8 m_cass_data[4]{};
-	void crtc_change_clock(u8 setting);
+	void crtc_change_clock();
 	u8 m_crtc_index = 0U;
 	std::unique_ptr<u8[]> m_vram;
 	std::unique_ptr<u8[]> m_aram;
@@ -387,19 +387,13 @@ void bml3_state::kb_sel_w(u8 data)
 	m_keyb_nmi_disabled = !BIT(data, 7);
 }
 
-void bml3_state::crtc_change_clock(u8 setting)
+void bml3_state::crtc_change_clock()
 {
-	int m6845_clock = CPU_CLOCK.value();    // CRTC and MPU are synchronous by default
-
-	switch(setting & 0x88)
-	{
-		case 0x00: m6845_clock = C40_CLOCK.value(); break; //320 x 200
-		case 0x08: m6845_clock = C40_CLOCK.value(); break; //320 x 200, interlace
-		case 0x80: m6845_clock = C80_CLOCK.value(); break; //640 x 200
-		case 0x88: m6845_clock = C80_CLOCK.value(); break; //640 x 200, interlace
-	}
-
-	m_crtc->set_unscaled_clock(m6845_clock);
+	const u8 width80 = BIT(m_hres_reg, 7);
+	const u8 interlace = BIT(m_vres_reg, 3);
+	// CRTC and MPU are synchronous by default
+	int clock = (width80 ? C80_CLOCK : C40_CLOCK).value() << interlace;
+	m_crtc->set_unscaled_clock(clock);
 }
 
 /*
@@ -414,7 +408,7 @@ void bml3_state::mode_sel_w(u8 data)
 {
 	m_hres_reg = data;
 
-	crtc_change_clock((m_hres_reg & 0x80) | (m_vres_reg & 0x08));
+	crtc_change_clock();
 }
 
 // INTERLACE_SEL - Interlaced video mode
@@ -422,7 +416,7 @@ void bml3_state::interlace_sel_w(u8 data)
 {
 	m_vres_reg = data;
 
-	crtc_change_clock((m_hres_reg & 0x80) | (m_vres_reg & 0x08));
+	crtc_change_clock();
 }
 
 
@@ -916,6 +910,10 @@ void bml3_state::machine_reset()
 	m_cassold = 0;
 	m_nmi = 0;
 	m_kbt = 0;
+
+	m_hres_reg = 0;
+	m_vres_reg = 0;
+	crtc_change_clock();
 }
 
 void bml3mk5_state::machine_start()

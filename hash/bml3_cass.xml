@@ -9,9 +9,6 @@ license:CC0-1.0
 		<description>BM Tetris</description>
 		<year>1990</year>
 		<publisher>Sakn Soft</publisher>
-		<notes><![CDATA[
-Runs at 30 Hz in-game (verify, interlace?)
-]]></notes>
 		<info name="usage" value="LOAD, press play on tape then RUN. Requires bml3mk5 (uses IG)." />
 		<part name="cass" interface="bml3_cass">
 			<dataarea name="cass" size="5106615">
