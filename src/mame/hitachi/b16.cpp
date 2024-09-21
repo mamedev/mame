@@ -54,6 +54,7 @@ Error codes (TODO: RE them all)
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/upd765.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -70,9 +71,10 @@ public:
 		, m_pit(*this, "pit")
 		, m_intm(*this, "intm")
 		, m_ints(*this, "ints")
-		, m_vram(*this, "vram")
+		, m_dma(*this, "dma")
+		, m_fdc(*this, "fdc")
 		, m_crtc(*this, "crtc")
-		, m_dma(*this, "8237dma")
+		, m_vram(*this, "vram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_char_rom(*this, "pcg")
@@ -94,9 +96,10 @@ private:
 	required_device<pit8253_device> m_pit;
 	required_device<pic8259_device> m_intm;
 	required_device<pic8259_device> m_ints;
-	required_shared_ptr<uint16_t> m_vram;
-	required_device<mc6845_device> m_crtc;
 	required_device<am9517a_device> m_dma;
+	required_device<upd765a_device> m_fdc;
+	required_device<mc6845_device> m_crtc;
+	required_shared_ptr<uint16_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_region_ptr<uint8_t> m_char_rom;
@@ -208,7 +211,9 @@ void b16_state::b16_io(address_map &map)
 	map(0x22, 0x22).w(FUNC(b16_state::crtc_data_w));
 	// b16ex2: jumps to $e0000 if bit 7 high
 	map(0x48, 0x48).lr8(NAME([] () { return 0; }));
-	//0x79 bit 0 DSW?
+	map(0x70, 0x73).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
+//  map(0x78, 0x78).rw bit 0 motor on? bit 2 also used
+//  map(0x79, 0x79) bit 0 DSW? screen mode?
 	map(0x80, 0x81).portr("SYSTEM");
 }
 
@@ -267,10 +272,25 @@ void b16_state::b16(machine_config &config)
 	m_pit->set_clk<2>(XTAL(14'318'181) / 4);
 //  m_pit->out_handler<2>()
 
-    // TODO: wrong type
+	// TODO: wrong type
 	AM9517A(config, m_dma, XTAL(14'318'181)/2);
 	m_dma->in_memr_callback().set(FUNC(b16_state::memory_read_byte));
 	m_dma->out_memw_callback().set(FUNC(b16_state::memory_write_byte));
+
+	PIC8259(config, m_intm);
+	m_intm->out_int_callback().set_inputline(m_maincpu, 0);
+	m_intm->in_sp_callback().set_constant(1);
+//  m_intm->read_slave_ack_callback()
+
+	PIC8259(config, m_ints, 0);
+//  m_ints->out_int_callback().set(m_intm, FUNC(pic8259_device::ir?_w));
+	m_ints->in_sp_callback().set_constant(0);
+
+	UPD765A(config, m_fdc, 8'000'000, true, true);
+//  m_fdc->intrq_wr_callback().set(FUNC(b16_state::intrq_w));
+//  m_fdc->drq_wr_callback().set(FUNC(b16_state::drq_w));
+//  FLOPPY_CONNECTOR(config, "fdc:0", ?_floppies, "525?", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+//  FLOPPY_CONNECTOR(config, "fdc:1", ?_floppies, "525?", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	MC6845(config, m_crtc, XTAL(14'318'181)/5);    /* unknown variant, unknown clock, hand tuned to get ~60 fps */
 	m_crtc->set_screen("screen");
@@ -284,15 +304,6 @@ void b16_state::b16(machine_config &config)
 	screen.set_size(640, 400);
 	screen.set_visarea_full();
 	screen.set_palette(m_palette);
-
-	PIC8259(config, m_intm);
-	m_intm->out_int_callback().set_inputline(m_maincpu, 0);
-	m_intm->in_sp_callback().set_constant(1);
-//  m_intm->read_slave_ack_callback()
-
-	PIC8259(config, m_ints, 0);
-//  m_ints->out_int_callback().set(m_intm, FUNC(pic8259_device::ir?_w));
-	m_ints->in_sp_callback().set_constant(0);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_b16);
 	// TODO: palette format is a guess
@@ -346,3 +357,5 @@ ROM_END
 COMP( 1982?, b16,     0,      0,      b16,     b16,   b16_state, empty_init, "Hitachi", "B16",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1983?, b16ex2,  0,      0,      b16ex2,  b16,   b16_state, empty_init, "Hitachi", "B16 EX-II",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // B16 EX-III known to exist
+// B16LX, LCD variants
+// Ricoh Mr. My Tool (Mr.マイツール), sister variants with 3.5 2HD floppies
