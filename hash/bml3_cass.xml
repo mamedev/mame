@@ -12,7 +12,7 @@ license:CC0-1.0
 		<info name="usage" value="LOAD, press play on tape then RUN. Requires bml3mk5 (uses IG)." />
 		<part name="cass" interface="bml3_cass">
 			<dataarea name="cass" size="5106615">
-                <!-- NOTE: the original .wav won't mount on MAME, this .flac does -->
+				<!-- NOTE: the original .wav won't mount on MAME, this .flac does -->
 				<rom name="tetris_all.flac" size="5106615" crc="696ce3a4" sha1="ba94ad716c7ecbf4434b67e1b79cd0e1012caecb"/>
 			</dataarea>
 		</part>

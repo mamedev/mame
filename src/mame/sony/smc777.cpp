@@ -1135,14 +1135,14 @@ static void smc777_floppies(device_slot_interface &device)
 
 void smc777_state::smc777(machine_config &config)
 {
-    constexpr XTAL MASTER_CLOCK = 32.2238_MHz_XTAL;
+	constexpr XTAL MASTER_CLOCK = 32.2238_MHz_XTAL;
 
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK / 8); // nominally 4.028 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &smc777_state::smc777_mem);
 	m_maincpu->set_addrmap(AS_IO, &smc777_state::smc777_io);
 
-    I8041A(config, "mcu", 6_MHz_XTAL).set_disable();
+	I8041A(config, "mcu", 6_MHz_XTAL).set_disable();
 
 	LS259(config, m_ioctrl);
 	m_ioctrl->q_out_cb<0>().set(FUNC(smc777_state::raminh_w));

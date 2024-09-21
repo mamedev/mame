@@ -2132,7 +2132,7 @@ ROM_START( tak_daig )
 	ROM_LOAD( "robottransformer_unit.bin", 0x600000, 0x200000, CRC(02deddaa) SHA1(7d7b54684f8b0b92daf02738560779c7df627b91) )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
- 
+
 
 // ガチンコ勝負！ パチスロTV
 ROM_START( gcslottv )

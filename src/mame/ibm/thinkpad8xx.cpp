@@ -15,7 +15,7 @@ Hardware for the 850 model:
 -SCSI hard disk and SCSI CD-ROM drive (with a NCR 53C810 PCI-SCSI I/O Processor).
 -Two PC Card expansion slots (with a Ricoh RF53C366L PC Card interface controller and a
  MAX780 Dual-Slot PCMCIA Analog Power Controller).
--Video: 
+-Video:
    -IBM 85G7815 (by Seiko/Epson).
    -Western Digital WD90C24A SVGA LCD controller.
    -Two Hitachi HM51S4260 262144 x 16bit DRAM (1MB of video display memory).

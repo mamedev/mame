@@ -32,10 +32,10 @@ license:CC0-1.0
 	*eM17   - Minna no evio                   (orange)
 	*eM18   - Evio Challenge!                 (red/pink)
 
-	
-	
+
+
 	Cartridge Pinout
-	
+
 	A01|NC
 	A02|GND
 	A03|GND
@@ -87,8 +87,8 @@ license:CC0-1.0
 	B23|D06
 	B24|D05
 	B25|D04
-	B26|GND	
-	
+	B26|GND
+
 	-->
 
 	<software name="em1" supported="no">

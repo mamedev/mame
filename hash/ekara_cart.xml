@@ -10,7 +10,7 @@ license:CC0-1.0
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
 
 	<!-- e-kara cartridge pins
-	
+
 	1  GND
 	2  N/C
 	3  jumper to 22
@@ -55,7 +55,7 @@ license:CC0-1.0
 	42 A17
 	43 A16
 	44 GND
-	
+
 	-->
 
 	<!--
@@ -475,11 +475,11 @@ license:CC0-1.0
 	*JP-02  'Jumping Popira' JP-2
 
 	***********************************************************************************
-	
+
 	The Korean release of e-kara was called i-singer, and was distributed by Sonokong
-	
+
 	At least 15 cartridges exist for it
-	
+
 	It is unknown if the internal ROM is the same as the non-Japanese e-kara units, or if it
 	would have a Korean 'please insert a cartridge' message.  It is also unconfirmed if these
 	cartridges function on non-Korean units.
@@ -1895,7 +1895,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dc0007">
 		<description>Kids' Song Volume 4 (Yuuki Rinrin, Osakana Tengoku, etc.) (Japan) (DC0007-KID)</description>
 		<year>2004</year>
@@ -1909,7 +1909,7 @@ license:CC0-1.0
 				<rom name="dc0007-kid.u1" size="0x100000" crc="c8908d43" sha1="a42010f805c3839b974fa8a6e2a412d68c903324"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="dc0008">
 		<description>Dream Cartridge: Best Artist Vol.7 (Japan) (DC0008-BAT)</description>
@@ -2582,7 +2582,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- ********************************************************************************************************************************************************************** -->
 
 
@@ -3195,7 +3195,7 @@ license:CC0-1.0
 	    ハッスル                      かいけつゾロリ(山寺宏一)              Hustle                          Kaiketsu Zorori (Yamadera Kōichi)
 	    アララの呪文                  ちびまる子ちゃん with 爆チュー問題    Arara no Jumon                  Chibi Maruko-chan with Bakuchū Mondai
 	    ミニハムずの愛の唄            ミニハムず                            Minihams no Ai no Uta           Minihams
-	    ミニモニ。ジャンケンぴょん!   ミニモニ。			        mini-moni Jankenpyon!           mini-moni
+	    ミニモニ。ジャンケンぴょん!   ミニモニ。                            mini-moni Jankenpyon!           mini-moni
 	    大きな古時計                  童謡                                  Ōkina Furudokei                 Dōyō -->
 	<software name="ekaraweb8">
 		<description>e-kara Web cartridge 8M (used, with 8 songs) (Japan)</description>
@@ -3208,7 +3208,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- ********************************************************************************************************************************************************************** -->
 
 

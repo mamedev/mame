@@ -434,10 +434,10 @@ GFXDECODE_END
 */
 TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::ddealer_scanline)
 {
-//	constexpr int SPRDMA_INDEX = 0;  // not used in emulation
-//	constexpr int VSYNC_INDEX  = 1;  // not used in emulation
-//	constexpr int VBLANK_INDEX = 2;  // not used in emulation
-//	constexpr int NOT_USED     = 3;  // not used in emulation
+//  constexpr int SPRDMA_INDEX = 0;  // not used in emulation
+//  constexpr int VSYNC_INDEX  = 1;  // not used in emulation
+//  constexpr int VBLANK_INDEX = 2;  // not used in emulation
+//  constexpr int NOT_USED     = 3;  // not used in emulation
 	constexpr int IPL0_INDEX   = 4;
 	constexpr int IPL1_INDEX   = 5;
 	constexpr int IPL2_INDEX   = 6;

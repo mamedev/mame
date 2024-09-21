@@ -60,11 +60,11 @@ TZX files for ZX81 are just the .P dumps with an additional header on top, so th
 		<year>1982</year>
 		<publisher>Crystal Computing</publisher>
 		<notes><![CDATA[
-ASTRAVOID		LOAD "A"
-BOMBER			LOAD "B"
-SUPER SLALOM	LOAD "SS"
-DUNGEON QUEST	LOAD "DQ"
-SPACE INVADERS	LOAD "SI"
+ASTRAVOID       LOAD "A"
+BOMBER          LOAD "B"
+SUPER SLALOM    LOAD "SS"
+DUNGEON QUEST   LOAD "DQ"
+SPACE INVADERS  LOAD "SI"
 
 When the program has loaded in enter one of the following corresponding to the game you have chosen:
 RAND USR A

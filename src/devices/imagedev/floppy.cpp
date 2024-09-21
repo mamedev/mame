@@ -892,7 +892,7 @@ bool floppy_image_device::floppy_is_hd()
 		return false;
 	u32 variant = m_image->get_variant();
 	return variant == floppy_image::DSHD;
-	
+
 }
 
 bool floppy_image_device::floppy_is_ed()
@@ -901,7 +901,7 @@ bool floppy_image_device::floppy_is_ed()
 		return false;
 	u32 variant = m_image->get_variant();
 	return variant == floppy_image::DSED;
-	
+
 }
 
 void floppy_image_device::track_changed()

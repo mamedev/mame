@@ -79,13 +79,13 @@ void kl1839vm1_device::rest(u32 op)
 }
 
 /*
-	Shift/Rotate
+    Shift/Rotate
 
-	val:
-	va: 0 - Carry read; 1 - Carry write
-	fo: 0 - dw, 1 - w, 2 - b; 3 - dd
-	a_c: 1 - arithmetical, 0 - cyclic
-	l_r: 1 - left, 0 - right
+    val:
+    va: 0 - Carry read; 1 - Carry write
+    fo: 0 - dw, 1 - w, 2 - b; 3 - dd
+    a_c: 1 - arithmetical, 0 - cyclic
+    l_r: 1 - left, 0 - right
 */
 u32 kl1839vm1_device::shr(u32 val, bool va, u8 fo, bool a_c, bool l_r)
 {

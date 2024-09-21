@@ -78,8 +78,8 @@ EPF8452AQC160-3 - Altera FLEX EPF8452AQC160-3 FPGA (QFP160)
          ADM485 - Analog Devices ADM485 +5 V Low Power EIA RS-485 Transceiver (SOIC8)
         PCM1725 - Burr-Brown PCM1725 Stereo Audio Digital to Analog Converter 16 Bits, 96kHz Sampling (SOIC14)
             JP1 - AICA sound block Master Clock source: 2-3 - onboard OSC1 33.8688MHz (default), 1-2 - cart/DIMM connector CN2 pin A48 (alt setting, not used at practice, there is no known devices which provide external AICA clock).
-			JP2 - (not mounted) Fan check: 1-2 - hold reset if fan not working (default), 2-3 - disabled.
-			JP3 - (not mounted) 315-6146 to Maple port 0 comms: 2-3 - enabled (default), 1-2 - disabled.
+            JP2 - (not mounted) Fan check: 1-2 - hold reset if fan not working (default), 2-3 - disabled.
+            JP3 - (not mounted) 315-6146 to Maple port 0 comms: 2-3 - enabled (default), 1-2 - disabled.
             JP4 - Ext.NMI from CN1 A3 goes to: 2-3 - SH-4 NMI (default), 1-2 - SH-4 TCLK.
         CN1/2/3 - Connectors for ROM cart or GDROM DIMM Unit
         CN25/26 - Connectors for Filter Board

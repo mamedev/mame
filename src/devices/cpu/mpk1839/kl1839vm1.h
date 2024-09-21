@@ -75,11 +75,11 @@ private:
 	memory_access<24, 0, 0, ENDIANNESS_BIG>::specific m_sysram;
 	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::specific m_ram;
 	memory_access<6, 2, -2, ENDIANNESS_LITTLE>::specific m_io;
-	PAIR				m_mca;
-	PAIR				m_vma;
-	PAIR				m_vma_tmp; // does we have int reg for this?
-	PAIR				m_rv;
-	PAIR				m_sch;
+	PAIR                m_mca;
+	PAIR                m_vma;
+	PAIR                m_vma_tmp; // does we have int reg for this?
+	PAIR                m_rv;
+	PAIR                m_sch;
 	PAIR                m_rsp;
 	PAIR                m_ppc;    // previous program counter
 	bool                m_fp;
