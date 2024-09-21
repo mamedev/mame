@@ -16,10 +16,10 @@
 #include "tsconfdma.h"
 
 #include "beta_m.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 #include "tilemap.h"
 
 
@@ -39,7 +39,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_cram(*this, "cram")
 		, m_sfile(*this, "sfile")
-		, m_centronics(*this, "centronics")
+		, m_dac(*this, "dac")
 		, m_ay(*this, "ay%u", 0U)
 		, m_mod_ay(*this, "MOD_AY")
 	{
@@ -233,9 +233,9 @@ private:
 	tilemap_t *m_ts_tilemap[3]{};
 	required_device<ram_device> m_cram;
 	required_device<ram_device> m_sfile;
-	required_device<centronics_device> m_centronics;
 	std::vector<sprite_data> m_sprites_cache;
 
+	required_device<dac_byte_interface> m_dac;
 	required_device_array<ym2149_device, 2> m_ay;
 	u8 m_ay_selected;
 	required_ioport m_mod_ay;
