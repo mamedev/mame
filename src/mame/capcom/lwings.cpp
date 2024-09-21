@@ -1032,6 +1032,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( avengers )
 	PORT_INCLUDE( lwings_generic )
 
+	// correct bit order for all versions except avengersc
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
 	PORT_START("DSWA")
 	PORT_SERVICE_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWA:8")
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:7")
@@ -1079,7 +1084,6 @@ static INPUT_PORTS_START( avengers )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
 INPUT_PORTS_END
-
 
 /*************************************
  *
