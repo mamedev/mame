@@ -38,9 +38,10 @@ TODO:
 #include "sound/spkrdev.h"
 #include "sound/ymopn.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 
+#include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -223,7 +224,7 @@ protected:
 	virtual u8 get_attr_mask() override { return 0x3f; }
 	virtual u8 get_ig_mode(u8 attr) override { return BIT(attr, 5); }
 	// NOTE: if IG attribute is enabled then the rest of attribute byte is ignored (no reverse etc.).
-    // TODO: if IGMODREG is 1 then the resulting tile will be a white square
+	// TODO: if IGMODREG is 1 then the resulting tile will be a white square
 	virtual u8 get_ig_dots(u8 tile, u8 ra, u8 xi) override {
 		u16 base_offset = tile << 3;
 		u8 res = 0;
@@ -603,7 +604,7 @@ void bml3mk5_state::ig_ram_w(offs_t offset, u8 data)
 		if (BIT(m_igen, i))
 			m_ig_ram[offset + 0x800 * i] = data;
 	}
-	m_gfxdecode->gfx(0)->mark_dirty(offset / 8);
+	m_gfxdecode->gfx(0)->mark_dirty(offset >> 3);
 }
 
 void bml3mk5_state::main_map(address_map &map)
@@ -1015,16 +1016,16 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::kansas_w )
 static const gfx_layout ig_charlayout =
 {
 	8, 8,
-	RGN_FRAC(1,3),
+	0x100,
 	3,
-	{ RGN_FRAC(0, 3), RGN_FRAC(1, 3), RGN_FRAC(2, 3) },
+	{ 0x1000*8, 0x800*8, 0 },
 	{ STEP8(0, 1) },
 	{ STEP8(0, 8) },
 	8*8
 };
 
 static GFXDECODE_START( gfx_bml3mk5 )
-	GFXDECODE_ENTRY( nullptr, 0x1800, ig_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( nullptr, 0, ig_charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -1065,6 +1066,7 @@ void bml3_state::bml3(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("bml3_cass");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -1101,6 +1103,8 @@ void bml3_state::bml3(machine_config &config)
 	BML3BUS_SLOT(config, "sl4", m_bml3bus, bml3_cards, nullptr);
 	BML3BUS_SLOT(config, "sl5", m_bml3bus, bml3_cards, nullptr);
 	BML3BUS_SLOT(config, "sl6", m_bml3bus, bml3_cards, "kanji");
+
+	SOFTWARE_LIST(config, "cass_list").set_original("bml3_cass");
 
 #if 0
 	// TODO: slot device for sound card
