@@ -814,7 +814,9 @@ IRQ_CALLBACK_MEMBER(tsconf_state::irq_vector)
 {
 	u8 vector = 0xff;
 	if (m_int_mask & 1)
+	{
 		m_int_mask &= ~1;
+	}
 	else if (m_int_mask & 2)
 	{
 		m_int_mask &= ~2;
@@ -827,7 +829,7 @@ IRQ_CALLBACK_MEMBER(tsconf_state::irq_vector)
 	}
 
 	if (!m_int_mask)
-		m_maincpu->set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 	return vector;
 }
@@ -835,8 +837,6 @@ IRQ_CALLBACK_MEMBER(tsconf_state::irq_vector)
 TIMER_CALLBACK_MEMBER(tsconf_state::irq_off)
 {
 	m_int_mask &= ~1;
-	if (!m_int_mask)
-		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 void tsconf_state::update_frame_timer()
@@ -848,10 +848,14 @@ void tsconf_state::update_frame_timer()
 	{
 		next = m_screen->time_until_pos(vpos, hpos << 1);
 		if (next >= m_screen->frame_period())
+		{
 			next = attotime::zero;
+		}
 	}
 	else
+	{
 		next = attotime::never;
+	}
 
 	m_frame_irq_timer->adjust(next);
 }
@@ -867,8 +871,7 @@ void tsconf_state::dma_ready(int line)
 {
 	if (BIT(m_regs[INT_MASK], 2))
 	{
-		if (!m_int_mask)
-			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		m_int_mask |= 4;
 	}
 }
@@ -877,8 +880,7 @@ TIMER_CALLBACK_MEMBER(tsconf_state::irq_frame)
 {
 	if (BIT(m_regs[INT_MASK], 0))
 	{
-		if (!m_int_mask)
-			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
 		m_int_mask |= 1;
 	}
@@ -888,8 +890,7 @@ TIMER_CALLBACK_MEMBER(tsconf_state::irq_scanline)
 {
 	if (BIT(m_regs[INT_MASK], 1))
 	{
-		if (!m_int_mask)
-			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		m_int_mask |= 2;
 	}
 
