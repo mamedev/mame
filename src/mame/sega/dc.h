@@ -12,7 +12,6 @@
 #include "powervr2.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "cpu/sh/sh4.h"
 #include "machine/timer.h"
 #include "sound/aica.h"

@@ -7,8 +7,9 @@
 #pragma once
 
 #include "arm7.h"
-#include "arm7core.h"
+
 #include "machine/vic_pl192.h"
+
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

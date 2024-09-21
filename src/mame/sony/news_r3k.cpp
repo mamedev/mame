@@ -11,10 +11,10 @@
  *   - http://bitsavers.org/pdf/sony/news/Sony_NEWS_Technical_Manual_3ed_199103.pdf
  *
  * TODO:
- *   - lcd controller
- *   - screen params
+ *   - LCD controller
+ *   - screen timing parameters
  *   - floppy density/eject
- *   - centronics port
+ *   - Centronics port
  *   - sound
  *   - other models, including slots/cards
  */

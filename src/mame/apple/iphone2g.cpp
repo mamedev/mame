@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/vic_pl192.h"
 #include "screen.h"
 
@@ -283,8 +282,8 @@ void iphone2g_state::iphone2g(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &iphone2g_state::mem_map);
 
 	PL192_VIC(config, m_vic0);
-	m_vic0->out_irq_cb().set_inputline("maincpu", ARM7_IRQ_LINE);
-	m_vic0->out_fiq_cb().set_inputline("maincpu", ARM7_FIRQ_LINE);
+	m_vic0->out_irq_cb().set_inputline("maincpu", arm7_cpu_device::ARM7_IRQ_LINE);
+	m_vic0->out_fiq_cb().set_inputline("maincpu", arm7_cpu_device::ARM7_FIRQ_LINE);
 
 	IPHONE2G_SPI(config, m_spi[0], XTAL(12'000'000));
 	m_spi[0]->out_irq_cb().set(m_vic0, FUNC(vic_pl192_device::irq_w<0x09>));

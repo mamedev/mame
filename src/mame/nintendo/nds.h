@@ -6,7 +6,6 @@
 #define MAME_NINTENDO_NDS_H
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/bankdev.h"
 #include "machine/timer.h"
 

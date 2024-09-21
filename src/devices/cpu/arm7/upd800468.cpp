@@ -12,6 +12,9 @@
 #include "emu.h"
 #include "upd800468.h"
 
+#include "arm7core.h"
+
+
 DEFINE_DEVICE_TYPE(UPD800468_TIMER, upd800468_timer_device, "upd800468_timer", "NEC uPD800468 timer")
 
 upd800468_timer_device::upd800468_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -12,7 +12,6 @@
 #pragma once
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/acorn_vidc.h"
 #include "machine/at_keybc.h"
 #include "bus/pc_kbd/pc_kbdc.h"

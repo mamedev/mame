@@ -18,8 +18,6 @@ apparently attempting serial communication with something.
 #include "pgmcrypt.h"
 #include "xamcu.h"
 
-#include "cpu/arm7/arm7core.h"
-
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
@@ -44,7 +42,6 @@ class igs_m027xa_state : public driver_device
 public:
 	igs_m027xa_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_igs_mainram(*this, "igs_mainram"),
 		m_maincpu(*this, "maincpu"),
 		m_xa(*this, "xa"),
 		m_ppi(*this, "ppi8255"),
@@ -73,7 +70,6 @@ protected:
 	virtual void video_start() override;
 
 private:
-	optional_shared_ptr<u32> m_igs_mainram;
 	required_device<igs027a_cpu_device> m_maincpu;
 	required_device<igs_xa_mcu_subcpu_device> m_xa;
 	required_device<i8255_device> m_ppi;
@@ -93,8 +89,6 @@ private:
 
 	bool m_irq_from_igs031;
 
-	u32 m_igs_40000014;
-
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void pgm_create_dummy_internal_arm_region();
@@ -111,8 +105,6 @@ private:
 	void output_w(u8 data);
 	void lamps_w(u8 data);
 
-	void igs_40000014_w(offs_t offset, u32 data, u32 mem_mask);
-
 	void xa_irq(int state);
 
 	u32 gpio_r();
@@ -125,8 +117,6 @@ private:
 void igs_m027xa_state::machine_reset()
 {
 	m_irq_from_igs031 = false;
-
-	m_igs_40000014 = 0;
 }
 
 void igs_m027xa_state::machine_start()
@@ -139,8 +129,6 @@ void igs_m027xa_state::machine_start()
 	save_item(NAME(m_io_select));
 
 	save_item(NAME(m_irq_from_igs031));
-
-	save_item(NAME(m_igs_40000014));
 }
 
 void igs_m027xa_state::video_start()
@@ -157,14 +145,13 @@ void igs_m027xa_state::video_start()
 void igs_m027xa_state::main_map(address_map &map)
 {
 	map(0x08000000, 0x0807ffff).rom().region("user1", 0); // Game ROM
-	map(0x10000000, 0x100003ff).ram().share("igs_mainram"); // main RAM for ASIC?
+
 	map(0x18000000, 0x18007fff).ram().mirror(0xf8000).share("nvram");
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 	map(0x38008000, 0x38008003).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x38009000, 0x38009003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x3800c000, 0x3800c003).umask32(0x000000ff).w(FUNC(igs_m027xa_state::oki_bank_w));
-	map(0x40000014, 0x40000017).w(FUNC(igs_m027xa_state::igs_40000014_w));
 
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027xa_state::xor_table_w));
 
@@ -378,12 +365,6 @@ void igs_m027xa_state::lamps_w(u8 data)
 }
 
 
-void igs_m027xa_state::igs_40000014_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	// sets bit 1 before waiting on FIRQ, maybe it's an enable here?
-	m_igs_40000014 = data;
-}
-
 u32 igs_m027xa_state::gpio_r()
 {
 	u32 ret = m_io_test[2].read_safe(0xfffff);
@@ -418,7 +399,7 @@ void igs_m027xa_state::io_select_w(u8 data)
 void igs_m027xa_state::xa_irq(int state)
 {
 	if (state)
-		m_maincpu->trigger_irq(3);
+		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // TODO: when is the IRQ line cleared?
 }
 
 u32 igs_m027xa_state::external_rom_r(offs_t offset)
@@ -438,20 +419,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 {
 	int scanline = param;
 
-	// should be using m_maincpu->trigger_irq with more compelx interrupt logic?
-
 	switch (scanline)
 	{
 	case 0:
-		if (m_igs_40000014 & 1)
-			m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
+		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
 		m_irq_from_igs031 = false;
 		break;
 	case 240:
 		if (m_igs017_igs031->get_irq_enable())
 		{
 			m_irq_from_igs031 = true;
-			m_maincpu->trigger_irq(3);
+			m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // TODO: when is the IRQ line cleared?
 		}
 		break;
 	}

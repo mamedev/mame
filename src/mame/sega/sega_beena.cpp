@@ -1679,15 +1679,15 @@ int32_t sega_9h0_0008_state::rescale_alpha_step(uint8_t step)
 
 void sega_9h0_0008_state::request_irq()
 {
-	m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
-	m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 }
 
 void sega_9h0_0008_state::request_fiq()
 {
 	if (m_requested_fiq) {
-		m_maincpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
-		m_maincpu->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, CLEAR_LINE);
 
 		m_requested_fiq = false;
 	}

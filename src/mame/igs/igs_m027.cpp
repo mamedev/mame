@@ -29,8 +29,6 @@
 #include "mahjong.h"
 #include "pgmcrypt.h"
 
-#include "cpu/arm7/arm7core.h"
-
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
@@ -58,7 +56,6 @@ public:
 	igs_m027_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_external_rom(*this, "user1"),
-		m_igs_mainram(*this, "igs_mainram"),
 		m_maincpu(*this, "maincpu"),
 		m_ppi(*this, "ppi%u", 1U),
 		m_igs017_igs031(*this, "igs017_igs031"),
@@ -77,21 +74,22 @@ public:
 
 	template <unsigned N> void counter_w(int state);
 
-	void m027(machine_config &config) ATTR_COLD;
-	void m027_xor(machine_config &config) ATTR_COLD;
-	void slqz3_xor(machine_config &config) ATTR_COLD;
-	void jking02_xor(machine_config &config) ATTR_COLD;
-	void qlgs_xor(machine_config &config) ATTR_COLD;
-	void lhdmg_xor(machine_config &config) ATTR_COLD;
-	void cjddz_xor(machine_config &config) ATTR_COLD;
-	void lhzb4_xor(machine_config &config) ATTR_COLD;
-	void lthy_xor(machine_config &config) ATTR_COLD;
-	void zhongguo_xor(machine_config &config) ATTR_COLD;
-	void mgzz_xor(machine_config &config) ATTR_COLD;
-	void oceanpar_xor(machine_config &config) ATTR_COLD;
-	void tripslot_xor(machine_config &config) ATTR_COLD;
+	template <bool Xor> void m027_noppi(machine_config &config) ATTR_COLD;
+	template <bool Xor> void m027_1ppi(machine_config &config) ATTR_COLD;
+	template <bool Xor> void m027_2ppis(machine_config &config) ATTR_COLD;
+	void slqz3(machine_config &config) ATTR_COLD;
+	void jking02(machine_config &config) ATTR_COLD;
+	void qlgs(machine_config &config) ATTR_COLD;
+	void lhdmg(machine_config &config) ATTR_COLD;
+	void cjddz(machine_config &config) ATTR_COLD;
+	void lhzb4(machine_config &config) ATTR_COLD;
+	void lthy(machine_config &config) ATTR_COLD;
+	void zhongguo(machine_config &config) ATTR_COLD;
+	void mgzz(machine_config &config) ATTR_COLD;
+	void oceanpar(machine_config &config) ATTR_COLD;
+	void tripslot(machine_config &config) ATTR_COLD;
 	void extradrw(machine_config &config) ATTR_COLD;
-	void chessc2_xor(machine_config &config) ATTR_COLD;
+	void chessc2(machine_config &config) ATTR_COLD;
 
 	void init_sdwx() ATTR_COLD;
 	void init_lhzb4() ATTR_COLD;
@@ -122,7 +120,6 @@ protected:
 
 private:
 	required_region_ptr<u32> m_external_rom;
-	optional_shared_ptr<u32> m_igs_mainram;
 
 	required_device<igs027a_cpu_device> m_maincpu;
 	optional_device_array<i8255_device, 2> m_ppi;
@@ -167,11 +164,11 @@ private:
 
 	void pgm_create_dummy_internal_arm_region() ATTR_COLD;
 
-	void igs_mahjong_map(address_map &map) ATTR_COLD;
-	void igs_mahjong_xor_map(address_map &map) ATTR_COLD;
-	void cjddz_xor_map(address_map &map) ATTR_COLD;
-	void tripslot_xor_map(address_map &map) ATTR_COLD;
-	void extradrw_map(address_map &map) ATTR_COLD;
+	template <bool Xor> void m027_noppi_map(address_map &map) ATTR_COLD;
+	template <bool Xor> void m027_1ppi_map(address_map &map) ATTR_COLD;
+	template <bool Xor> void m027_2ppis_map(address_map &map) ATTR_COLD;
+	void cjddz_map(address_map &map) ATTR_COLD;
+	void tripslot_map(address_map &map) ATTR_COLD;
 
 	void oki_128k_map(address_map &map) ATTR_COLD;
 };
@@ -206,46 +203,50 @@ void igs_m027_state::video_start()
 
 ***************************************************************************/
 
-void igs_m027_state::igs_mahjong_map(address_map &map)
+template <bool Xor>
+void igs_m027_state::m027_noppi_map(address_map &map)
 {
-	map(0x0800'0000, 0x0807'ffff).rom().region("user1", 0); // Game ROM
-	map(0x1000'0000, 0x1000'03ff).ram().share("igs_mainram"); // main RAM for ASIC?
+	if (Xor)
+		map(0x0800'0000, 0x0807'ffff).r(FUNC(igs_m027_state::external_rom_r)); // Game ROM
+	else
+		map(0x0800'0000, 0x0807'ffff).rom().region("user1", 0); // Game ROM
+
 	map(0x1800'0000, 0x1800'7fff).ram().mirror(0x0000f'8000).share("nvram");
 
 	map(0x3800'0000, 0x3800'7fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
-
 	map(0x3800'8000, 0x3800'8003).umask32(0x0000'00ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x3800'9000, 0x3800'9003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 
 	map(0x5000'0000, 0x5000'03ff).umask32(0x0000'00ff).w(FUNC(igs_m027_state::xor_table_w)); // uploads XOR table to external ROM here
 }
 
-void igs_m027_state::igs_mahjong_xor_map(address_map &map)
+template <bool Xor>
+void igs_m027_state::m027_1ppi_map(address_map &map)
 {
-	igs_mahjong_map(map);
+	m027_noppi_map<Xor>(map);
 
-	map(0x0800'0000, 0x0807'ffff).r(FUNC(igs_m027_state::external_rom_r)); // Game ROM
+	map(0x3800'9000, 0x3800'9003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
-void igs_m027_state::cjddz_xor_map(address_map &map)
+template <bool Xor>
+void igs_m027_state::m027_2ppis_map(address_map &map)
 {
-	igs_mahjong_xor_map(map);
+	m027_1ppi_map<Xor>(map);
+
+	map(0x3800'a000, 0x3800'a003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
+
+void igs_m027_state::cjddz_map(address_map &map)
+{
+	m027_1ppi_map<true>(map);
 
 	map(0x3800'b000, 0x3800'b003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::oki_128k_bank_w));
 }
 
-void igs_m027_state::tripslot_xor_map(address_map &map)
+void igs_m027_state::tripslot_map(address_map &map)
 {
-	igs_mahjong_xor_map(map);
+	m027_1ppi_map<true>(map);
 
 	map(0x3800'c000, 0x3800'c003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::tripslot_misc_w));
-}
-
-void igs_m027_state::extradrw_map(address_map &map)
-{
-	igs_mahjong_map(map);
-
-	map(0x3800'a000, 0x3800'a003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 void igs_m027_state::oki_128k_map(address_map &map)
@@ -1459,10 +1460,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027_state::interrupt)
 	int scanline = param;
 
 	if (scanline == 240 && m_igs017_igs031->get_irq_enable())
-		m_maincpu->trigger_irq(3); // source?
+		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // source?
 
 	if (scanline == 0 && m_igs017_igs031->get_nmi_enable())
-		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
+		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
 }
 
 
@@ -1627,10 +1628,11 @@ void igs_m027_state::counter_w(int state)
 }
 
 
-void igs_m027_state::m027(machine_config &config)
+template <bool Xor>
+void igs_m027_state::m027_noppi(machine_config &config)
 {
 	IGS027A(config, m_maincpu, 22'000'000); // Jungle King 2002 has a 22Mhz Xtal, what about the others?
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_mahjong_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::m027_noppi_map<Xor>);
 	m_maincpu->out_port().set(FUNC(igs_m027_state::io_select_w<1>));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1645,11 +1647,6 @@ void igs_m027_state::m027(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027_state::interrupt), "screen", 0, 1);
 
-	I8255A(config, m_ppi[0]);
-	m_ppi[0]->tri_pa_callback().set_constant(0x00);
-	m_ppi[0]->tri_pb_callback().set_constant(0x00);
-	m_ppi[0]->tri_pc_callback().set_constant(0x00);
-
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits(true);
 	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027_state::dsw_r<1, 0>)));
@@ -1661,16 +1658,35 @@ void igs_m027_state::m027(machine_config &config)
 	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
-void igs_m027_state::m027_xor(machine_config &config)
+template <bool Xor>
+void igs_m027_state::m027_1ppi(machine_config &config)
 {
-	m027(config);
+	m027_noppi<Xor>(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_mahjong_xor_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::m027_1ppi_map<Xor>);
+
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->tri_pa_callback().set_constant(0x00);
+	m_ppi[0]->tri_pb_callback().set_constant(0x00);
+	m_ppi[0]->tri_pc_callback().set_constant(0x00);
 }
 
-void igs_m027_state::slqz3_xor(machine_config &config)
+template <bool Xor>
+void igs_m027_state::m027_2ppis(machine_config &config)
 {
-	m027_xor(config);
+	m027_1ppi<Xor>(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::m027_2ppis_map<Xor>);
+
+	I8255A(config, m_ppi[1]);
+	m_ppi[0]->tri_pa_callback().set_constant(0x00);
+	m_ppi[0]->tri_pb_callback().set_constant(0x00);
+	m_ppi[0]->tri_pc_callback().set_constant(0x00);
+}
+
+void igs_m027_state::slqz3(machine_config &config)
+{
+	m027_1ppi<true>(config);
 
 	m_maincpu->in_port().set(FUNC(igs_m027_state::slqz3_gpio_r)); // what lives here?
 
@@ -1685,9 +1701,9 @@ void igs_m027_state::slqz3_xor(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
-void igs_m027_state::qlgs_xor(machine_config &config)
+void igs_m027_state::qlgs(machine_config &config)
 {
-	m027_xor(config);
+	m027_1ppi<true>(config);
 
 	m_maincpu->in_port().set_ioport("PLAYER");
 	m_maincpu->out_port().append(m_oki, FUNC(okim6295_device::set_rom_bank)).rshift(3);
@@ -1698,9 +1714,9 @@ void igs_m027_state::qlgs_xor(machine_config &config)
 	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
 }
 
-void igs_m027_state::lhdmg_xor(machine_config &config)
+void igs_m027_state::lhdmg(machine_config &config)
 {
-	m027_xor(config);
+	m027_1ppi<true>(config);
 
 	m_maincpu->in_port().set(FUNC(igs_m027_state::lhdmg_gpio_r));
 
@@ -1715,11 +1731,11 @@ void igs_m027_state::lhdmg_xor(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
-void igs_m027_state::cjddz_xor(machine_config &config)
+void igs_m027_state::cjddz(machine_config &config)
 {
-	m027_xor(config);
+	m027_1ppi<true>(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::cjddz_xor_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::cjddz_map);
 	m_maincpu->in_port().set_ioport("PLAYER");
 
 	m_oki->set_addrmap(0, &igs_m027_state::oki_128k_map);
@@ -1735,16 +1751,16 @@ void igs_m027_state::cjddz_xor(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
-void igs_m027_state::lhzb4_xor(machine_config &config)
+void igs_m027_state::lhzb4(machine_config &config)
 {
-	cjddz_xor(config);
+	cjddz(config);
 
 	m_oki->set_clock(2'000'000);
 }
 
-void igs_m027_state::lthy_xor(machine_config &config)
+void igs_m027_state::lthy(machine_config &config)
 {
-	m027_xor(config);
+	m027_1ppi<true>(config);
 
 	m_ppi[0]->in_pa_callback().set_ioport("TEST");
 	m_ppi[0]->in_pb_callback().set(NAME((&igs_m027_state::kbd_r<1, 0, 2>)));
@@ -1755,16 +1771,16 @@ void igs_m027_state::lthy_xor(machine_config &config)
 	m_igs017_igs031->in_pc_callback().set_ioport("JOY");
 }
 
-void igs_m027_state::zhongguo_xor(machine_config &config)
+void igs_m027_state::zhongguo(machine_config &config)
 {
-	lthy_xor(config);
+	lthy(config);
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
-void igs_m027_state::jking02_xor(machine_config &config)
+void igs_m027_state::jking02(machine_config &config)
 {
-	m027_xor(config);
+	m027_1ppi<true>(config);
 
 	m_maincpu->in_port().set_ioport("PLAYER");
 
@@ -1773,9 +1789,9 @@ void igs_m027_state::jking02_xor(machine_config &config)
 	m_ppi[0]->out_pc_callback().set(FUNC(igs_m027_state::lamps_w<0>));
 }
 
-void igs_m027_state::mgzz_xor(machine_config &config)
+void igs_m027_state::mgzz(machine_config &config)
 {
-	m027_xor(config);
+	m027_1ppi<true>(config);
 
 	m_ppi[0]->out_pa_callback().set(FUNC(igs_m027_state::mahjong_output_w));
 	m_ppi[0]->in_pb_callback().set_ioport("TEST");
@@ -1788,9 +1804,9 @@ void igs_m027_state::mgzz_xor(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
-void igs_m027_state::oceanpar_xor(machine_config &config)
+void igs_m027_state::oceanpar(machine_config &config)
 {
-	m027_xor(config);
+	m027_1ppi<true>(config);
 
 	m_maincpu->in_port().set_ioport("PLAYER");
 	m_maincpu->out_port().append(m_oki, FUNC(okim6295_device::set_rom_bank)).rshift(3);
@@ -1803,11 +1819,11 @@ void igs_m027_state::oceanpar_xor(machine_config &config)
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
 }
 
-void igs_m027_state::tripslot_xor(machine_config &config)
+void igs_m027_state::tripslot(machine_config &config)
 {
-	m027_xor(config);
+	m027_1ppi<true>(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::tripslot_xor_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::tripslot_map);
 	m_maincpu->in_port().set_ioport("PLAYER");
 	m_maincpu->out_port().append(FUNC(igs_m027_state::tripslot_okibank_low_w)).rshift(3);
 
@@ -1820,19 +1836,20 @@ void igs_m027_state::tripslot_xor(machine_config &config)
 
 void igs_m027_state::extradrw(machine_config &config)
 {
-	m027(config);
+	m027_2ppis<false>(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::extradrw_map);
+	//m_ppi[0]->in_pa_callback().set(...);
+	//m_ppi[0]->in_pb_callback().set(...);
+	//m_ppi[0]->out_pc_callback().set(...);
 
-	I8255A(config, m_ppi[1]);
-	m_ppi[1]->tri_pa_callback().set_constant(0x00);
-	m_ppi[1]->tri_pb_callback().set_constant(0x00);
-	m_ppi[1]->tri_pc_callback().set_constant(0x00);
+	//m_ppi[1]->out_pa_callback().set(...);
+	//m_ppi[1]->out_pb_callback().set(...);
+	//m_ppi[1]->in_pc_callback().set(...);
 }
 
-void igs_m027_state::chessc2_xor(machine_config &config)
+void igs_m027_state::chessc2(machine_config &config)
 {
-	m027_xor(config);
+	m027_noppi<true>(config);
 
 	m_maincpu->in_port().set_ioport("PLAYER");
 }
@@ -2955,37 +2972,37 @@ void igs_m027_state::init_chessc2()
 ***************************************************************************/
 
 // Complete dumps
-GAME(  1999, slqz3,     0,        slqz3_xor,    slqz3,    igs_m027_state, init_slqz3,    ROT0, "IGS", "Shuang Long Qiang Zhu 3 (China, VS107C)", 0 )
-GAME(  1999, qlgs,      0,        qlgs_xor,     qlgs,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Que Long Gaoshou", MACHINE_NODEVICE_LAN )
-GAME(  1999, lhdmg,     0,        lhdmg_xor,    lhdmg,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan", 0 )
-GAME(  1999, lhdmgp,    lhdmg,    lhdmg_xor,    lhdmg,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan Plus", 0 )
-GAME(  1999, lhzb3,     0,        lhdmg_xor,    lhzb3,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III", 0 )
-GAME(  2004, lhzb4,     0,        lhzb4_xor,    lhzb4,    igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4", 0 )
-GAME(  1999, lthy,      0,        lthy_xor,     lthy,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_NODEVICE_LAN )
-GAME(  2000, zhongguo,  0,        zhongguo_xor, zhongguo, igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhongguo Chu Da D", 0 )
-GAMEL( 200?, jking02,   0,        jking02_xor,  jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NODEVICE_LAN, layout_jking02 )
-GAME(  2003, mgzz,      0,        mgzz_xor,     mgzz,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V101CN)", 0 )
-GAME(  2003, mgzza,     mgzz,     mgzz_xor,     mgzza,    igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V100CN)", 0 )
-GAME(  2007, mgcs3,     0,        lhzb4_xor,    mgcs3,    igs_m027_state, init_mgcs3,    ROT0, "IGS", "Manguan Caishen 3 (V101CN)", 0 )
-GAMEL( 1999, oceanpar,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", 0, layout_oceanpar ) // 1999 copyright in ROM
-GAMEL( 1999, oceanpara, oceanpar, oceanpar_xor, oceanpara,igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", 0, layout_oceanpar ) // 1999 copyright in ROM
-GAMEL( 1999, fruitpar,  0,        oceanpar_xor, oceanpar, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)",   0, layout_oceanpar )
-GAMEL( 1999, fruitpara, fruitpar, oceanpar_xor, fruitpara,igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", 0, layout_oceanpar )
-GAME(  200?, cjddz,     0,        cjddz_xor,    cjddz,    igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", 0 )
-GAMEL( 2007, tripslot,  0,        tripslot_xor, tripslot, igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
+GAME(  1999, slqz3,     0,        slqz3,        slqz3,    igs_m027_state, init_slqz3,    ROT0, "IGS", "Shuang Long Qiang Zhu 3 (China, VS107C)", 0 )
+GAME(  1999, qlgs,      0,        qlgs,         qlgs,     igs_m027_state, init_qlgs,     ROT0, "IGS", "Que Long Gaoshou", MACHINE_NODEVICE_LAN )
+GAME(  1999, lhdmg,     0,        lhdmg,        lhdmg,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan", 0 )
+GAME(  1999, lhdmgp,    lhdmg,    lhdmg,        lhdmg,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Da Manguan Plus", 0 )
+GAME(  1999, lhzb3,     0,        lhdmg,        lhzb3,    igs_m027_state, init_lhdmg,    ROT0, "IGS", "Long Hu Zhengba III", 0 )
+GAME(  2004, lhzb4,     0,        lhzb4,        lhzb4,    igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4", 0 )
+GAME(  1999, lthy,      0,        lthy,         lthy,     igs_m027_state, init_lthy,     ROT0, "IGS", "Long Teng Hu Yue", MACHINE_NODEVICE_LAN )
+GAME(  2000, zhongguo,  0,        zhongguo,     zhongguo, igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhongguo Chu Da D", 0 )
+GAMEL( 200?, jking02,   0,        jking02,      jking02,  igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NODEVICE_LAN, layout_jking02 )
+GAME(  2003, mgzz,      0,        mgzz,         mgzz,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V101CN)", 0 )
+GAME(  2003, mgzza,     mgzz,     mgzz,         mgzza,    igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V100CN)", 0 )
+GAME(  2007, mgcs3,     0,        lhzb4,        mgcs3,    igs_m027_state, init_mgcs3,    ROT0, "IGS", "Manguan Caishen 3 (V101CN)", 0 )
+GAMEL( 1999, oceanpar,  0,        oceanpar,     oceanpar, igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V105US)", 0, layout_oceanpar ) // 1999 copyright in ROM
+GAMEL( 1999, oceanpara, oceanpar, oceanpar,     oceanpara,igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", 0, layout_oceanpar ) // 1999 copyright in ROM
+GAMEL( 1999, fruitpar,  0,        oceanpar,     oceanpar, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)",   0, layout_oceanpar )
+GAMEL( 1999, fruitpara, fruitpar, oceanpar,     fruitpara,igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", 0, layout_oceanpar )
+GAME(  200?, cjddz,     0,        cjddz,        cjddz,    igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", 0 )
+GAMEL( 2007, tripslot,  0,        tripslot,     tripslot, igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
 // this has a 2nd 8255
 GAME(  2001, extradrw,  0,        extradrw,     base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
-GAME(  2002, chessc2,   0,        chessc2_xor,  chessc2,  igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME(  2002, chessc2,   0,        chessc2,      chessc2,  igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 
 // Incomplete dumps
-GAME(  1999, amazonia,  0,        m027,         amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_NOT_WORKING )
-GAME(  1999, amazonkp,  amazonia, m027,         amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King Plus (V204BR)", MACHINE_NOT_WORKING )
-GAME(  2005, olympic5,  0,        m027,         base,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V112US)", MACHINE_NOT_WORKING ) // IGS FOR V112US 2005 02 14
-GAME(  2003, olympic5a, olympic5, m027,         base,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V107US)", MACHINE_NOT_WORKING ) // IGS FOR V107US 2003 10 2
-GAME(  200?, luckycrs,  0,        m027,         base,     igs_m027_state, init_luckycrs, ROT0, "IGS", "Lucky Cross (V106SA)", MACHINE_NOT_WORKING )
-GAME(  2003, amazoni2,  0,        m027,         base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_NOT_WORKING )
-GAME(  2002, sdwx,      0,        m027,         base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
-GAME(  200?, klxyj,     0,        m027,         base,     igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji", MACHINE_NOT_WORKING )
+GAME(  1999, amazonia,  0,        m027_1ppi<false>, amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_NOT_WORKING )
+GAME(  1999, amazonkp,  amazonia, m027_1ppi<false>, amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King Plus (V204BR)", MACHINE_NOT_WORKING )
+GAME(  2005, olympic5,  0,        m027_1ppi<false>, base,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V112US)", MACHINE_NOT_WORKING ) // IGS FOR V112US 2005 02 14
+GAME(  2003, olympic5a, olympic5, m027_1ppi<false>, base,     igs_m027_state, init_olympic5, ROT0, "IGS", "Olympic 5 (V107US)", MACHINE_NOT_WORKING ) // IGS FOR V107US 2003 10 2
+GAME(  200?, luckycrs,  0,        m027_1ppi<false>, base,     igs_m027_state, init_luckycrs, ROT0, "IGS", "Lucky Cross (V106SA)", MACHINE_NOT_WORKING )
+GAME(  2003, amazoni2,  0,        m027_1ppi<false>, base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_NOT_WORKING )
+GAME(  2002, sdwx,      0,        m027_1ppi<false>, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
+GAME(  200?, klxyj,     0,        m027_1ppi<false>, base,     igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
-GAME(  200?, gonefsh2,  0,        m027,         base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )
+GAME(  200?, gonefsh2,  0,        m027_noppi<false>,base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )

@@ -82,7 +82,6 @@
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -164,7 +163,7 @@ void easy_karaoke_cartslot_state::machine_start()
 
 void ivl_karaoke_state::machine_reset()
 {
-	m_maincpu->set_state_int(ARM7_R15, 0x04000000);
+	m_maincpu->set_state_int(arm7_cpu_device::ARM7_R15, 0x04000000);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(easy_karaoke_cartslot_state::cart_load)

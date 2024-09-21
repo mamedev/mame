@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "coreutil.h"
 
 /*******************************************************************************
@@ -1126,7 +1125,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 			{
 				LOGMASKED(LOG_IRQS, "triggering IRQ line\n");
 				m_cpu->resume(SUSPEND_REASON_HALT);
-				m_cpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+				m_cpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 				m_irq.line_irq = ASSERT_LINE;
 			}
 		}
@@ -1136,7 +1135,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 			{
 				LOGMASKED(LOG_IRQS, "IRQ: srcpnd %08X intmsk %08X intmod %08X\n", m_irq.regs.srcpnd, m_irq.regs.intmsk, m_irq.regs.intmod);
 				LOGMASKED(LOG_IRQS, "clearing IRQ line\n");
-				m_cpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+				m_cpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 				m_irq.line_irq = CLEAR_LINE;
 			}
 		}
@@ -1150,7 +1149,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 		{
 			LOGMASKED(LOG_IRQS, "asserting FIQ line\n");
 			m_cpu->resume(SUSPEND_REASON_HALT);
-			m_cpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
+			m_cpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, ASSERT_LINE);
 			m_irq.line_fiq = ASSERT_LINE;
 		}
 	}
@@ -1159,7 +1158,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 		if (m_irq.line_fiq != CLEAR_LINE)
 		{
 			LOGMASKED(LOG_IRQS, "clearing FIQ line\n");
-			m_cpu->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
+			m_cpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, CLEAR_LINE);
 			m_irq.line_fiq = CLEAR_LINE;
 		}
 	}

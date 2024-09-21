@@ -19,11 +19,12 @@ public:
 	auto in_port() { return m_in_port_cb.bind(); }
 	auto out_port() { return m_out_port_cb.bind(); }
 
-	void trigger_irq(unsigned num);
-
 protected:
+	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	virtual void execute_set_input(int irqline, int state) override;
 
 private:
 	void onboard_peripherals(address_map &map) ATTR_COLD;
@@ -32,17 +33,22 @@ private:
 	void out_port_w(u8 data);
 	void timer_rate_w(offs_t offset, u8 data);
 	u8 irq_pending_r();
+	void fiq_enable_w(u8 data);
 	void irq_enable_w(u8 data);
 
 	void bus_sizing_w(u8 data);
 
 	template <unsigned N> TIMER_CALLBACK_MEMBER(timer_irq);
+	TIMER_CALLBACK_MEMBER(check_fiq);
 
 	devcb_read32 m_in_port_cb;
 	devcb_write8 m_out_port_cb;
 
 	emu_timer *m_irq_timers[2];
 
+	u8 m_ext_fiq;
+	u8 m_ext_irq;
+	u8 m_fiq_enable;
 	u8 m_irq_enable;
 	u8 m_irq_pending;
 };
