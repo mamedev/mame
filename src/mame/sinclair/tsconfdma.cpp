@@ -5,7 +5,7 @@
     TS-Conf (ZX-Evolution) DMA Controller
 
 TODO:
-* Each memory cycle alligned to 7MHz clock and taking 1 tick
+* Each memory cycle aligned to 7MHz clock and taking 1 tick
 
 **********************************************************************/
 
