@@ -63,7 +63,7 @@ enum
 */
 
 
-class hmcs400_cpu_device : public cpu_device
+class hmcs400_cpu_device : public cpu_device, public device_nvram_interface
 {
 public:
 	virtual ~hmcs400_cpu_device();
@@ -82,6 +82,12 @@ public:
 	// valid options: 4, 8, 16, default to 8
 	auto &set_divider(u8 div) { assert(m_has_div); m_divider = div; return *this; }
 
+	// nvram
+	void nvram_set_battery(int state) { m_nvram_battery = bool(state); } // default is 1 (nvram_enable_backup needs to be true)
+	void nvram_set_default_value(u8 val) { m_nvram_defval = val & 0xf; } // default is 0
+	auto stop_cb() { return m_stop_cb.bind(); } // notifier (not an output pin)
+	int stop_mode() { return m_stop ? 1 : 0; }
+
 protected:
 	// construction
 	hmcs400_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 rom_size, u32 ram_size);
@@ -89,6 +95,11 @@ protected:
 	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// device_nvram_interface implementation
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + m_divider - 1) / m_divider; }
@@ -113,6 +124,10 @@ protected:
 	address_space_config m_data_config;
 	address_space *m_program;
 	address_space *m_data;
+
+	required_shared_ptr_array<u8, 2> m_ram;
+	u8 m_nvram_defval;
+	bool m_nvram_battery; // keeps internal RAM intact after soft power-off
 
 	int m_icount;
 	int m_state_count;
@@ -161,6 +176,7 @@ protected:
 	devcb_write8::array<11> m_write_r;
 	devcb_read16 m_read_d;
 	devcb_write16 m_write_d;
+	devcb_write_line m_stop_cb;
 
 	// misc internal helpers
 	u8 ram_r(u8 mem_mask = 0xf);

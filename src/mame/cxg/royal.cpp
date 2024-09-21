@@ -5,11 +5,12 @@
 
 CXG Sphinx Royal family
 
-NOTE: Turn the power switch off before exiting MAME, otherwise NVRAM won't save
-properly. Only turn power off when it's the user's turn to move.
+NOTE: Turn the power switch (or button in supra's case) off before exiting MAME,
+otherwise NVRAM won't save properly. And only turn the power off when it's the
+user's turn to move, this is warned about in the manual.
 
 TODO:
-- actually add nvram (needs to be added to hmcs400)
+- if/when MAME supports an exit callback, hook up power-off switch/button to that
 
 Hardware notes:
 - HD614042S, 4MHz XTAL
@@ -72,6 +73,7 @@ public:
 	void supra(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(granada_change_cpu_freq);
+	DECLARE_INPUT_CHANGED_MEMBER(supra_on_button);
 
 protected:
 	virtual void machine_start() override;
@@ -92,6 +94,8 @@ private:
 	u8 m_lcd_select = 0;
 
 	// I/O handlers
+	void stop_mode(int state);
+
 	void update_lcd();
 	template<int N> void lcd_segs_w(u8 data);
 	void lcd_com_w(u8 data);
@@ -124,6 +128,26 @@ INPUT_CHANGED_MEMBER(royal_state::granada_change_cpu_freq)
 /*******************************************************************************
     I/O
 *******************************************************************************/
+
+// power
+
+void royal_state::stop_mode(int state)
+{
+	// clear display
+	if (state)
+	{
+		m_lcd_pwm->clear();
+		m_led_pwm->clear();
+	}
+}
+
+INPUT_CHANGED_MEMBER(royal_state::supra_on_button)
+{
+	// stop mode check actually comes from D3 high-impedance state
+	if (newval && m_maincpu->stop_mode())
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
 
 // LCD
 
@@ -252,7 +276,7 @@ static INPUT_PORTS_START( supra )
 	PORT_INCLUDE( royal )
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, royal_state, supra_on_button, 0)
 INPUT_PORTS_END
 
 
@@ -265,6 +289,9 @@ void royal_state::royal(machine_config &config)
 {
 	// basic machine hardware
 	HD614042(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->nvram_enable_backup(true);
+	m_maincpu->stop_cb().set(m_maincpu, FUNC(hmcs400_cpu_device::nvram_set_battery));
+	m_maincpu->stop_cb().append(FUNC(royal_state::stop_mode));
 	m_maincpu->write_r<0>().set(FUNC(royal_state::lcd_segs_w<0>));
 	m_maincpu->read_r<1>().set(FUNC(royal_state::board_r<0>));
 	m_maincpu->read_r<2>().set(FUNC(royal_state::board_r<1>));
@@ -280,7 +307,7 @@ void royal_state::royal(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
-	//m_board->set_nvram_enable(true);
+	m_board->set_nvram_enable(true);
 
 	// video hardware
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(8, 8);

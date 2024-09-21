@@ -71,8 +71,12 @@ DEFINE_DEVICE_TYPE(HD614089, hd614089_device, "hd614089", "Hitachi HD614089") //
 
 hmcs400_cpu_device::hmcs400_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 rom_size, u32 ram_size) :
 	cpu_device(mconfig, type, tag, owner, clock),
+	device_nvram_interface(mconfig, *this),
 	m_program_config("program", ENDIANNESS_LITTLE, 16, 14, -1, address_map_constructor(FUNC(hmcs400_cpu_device::program_map), this)),
 	m_data_config("data", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(FUNC(hmcs400_cpu_device::data_map), this)),
+	m_ram(*this, "ram%u", 0U),
+	m_nvram_defval(0),
+	m_nvram_battery(true),
 	m_rom_size(rom_size),
 	m_ram_size(ram_size),
 	m_has_div(false),
@@ -80,8 +84,12 @@ hmcs400_cpu_device::hmcs400_cpu_device(const machine_config &mconfig, device_typ
 	m_read_r(*this, 0),
 	m_write_r(*this),
 	m_read_d(*this, 0),
-	m_write_d(*this)
-{ }
+	m_write_d(*this),
+	m_stop_cb(*this)
+{
+	// disable nvram by default (set to true if MCU is battery-backed when in stop mode)
+	nvram_enable_backup(false);
+}
 
 hmcs400_cpu_device::~hmcs400_cpu_device() { }
 
@@ -205,6 +213,7 @@ void hmcs400_cpu_device::device_start()
 	m_timer_b_low = 0;
 
 	// register for savestates
+	save_item(NAME(m_nvram_battery));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_sp));
@@ -266,6 +275,7 @@ void hmcs400_cpu_device::device_reset()
 	m_st = 1;
 	m_standby = false;
 	m_stop = false;
+	m_stop_cb(0);
 
 	// clear peripherals
 	m_irq_flags = 0xaaa8; // IM=1, IF=0, IE=0
@@ -327,8 +337,8 @@ void hmcs400_cpu_device::data_map(address_map &map)
 	map(0x00a, 0x00a).rw(FUNC(hmcs400_cpu_device::tcbl_r), FUNC(hmcs400_cpu_device::tlrl_w));
 	map(0x00b, 0x00b).rw(FUNC(hmcs400_cpu_device::tcbu_r), FUNC(hmcs400_cpu_device::tlru_w));
 
-	map(0x020, 0x020 + m_ram_size - 1).ram();
-	map(0x3c0, 0x3ff).ram();
+	map(0x020, 0x020 + m_ram_size - 1).ram().share(m_ram[0]);
+	map(0x3c0, 0x3ff).ram().share(m_ram[1]); // stack
 }
 
 device_memory_interface::space_config_vector hmcs400_cpu_device::memory_space_config() const
@@ -337,6 +347,74 @@ device_memory_interface::space_config_vector hmcs400_cpu_device::memory_space_co
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_data_config)
 	};
+}
+
+
+//-------------------------------------------------
+//  nvram
+//-------------------------------------------------
+
+bool hmcs400_cpu_device::nvram_write(util::write_stream &file)
+{
+	// if it's currently not battery-backed, don't save at all
+	if (!m_nvram_battery)
+		return true;
+
+	std::error_condition err;
+	size_t actual;
+
+	// main RAM and stack area
+	for (auto & ram : m_ram)
+	{
+		std::tie(err, actual) = write(file, &ram[0], ram.bytes());
+		if (err)
+			return false;
+	}
+
+	return true;
+}
+
+bool hmcs400_cpu_device::nvram_read(util::read_stream &file)
+{
+	std::error_condition err;
+	size_t actual;
+
+	// main RAM and stack area
+	for (auto & ram : m_ram)
+	{
+		std::tie(err, actual) = read(file, &ram[0], ram.bytes());
+		if (err || (ram.bytes() != actual))
+			return false;
+	}
+
+	return true;
+}
+
+void hmcs400_cpu_device::nvram_default()
+{
+	if (!nvram_backup_enabled())
+		return;
+
+	// default nvram from mytag:nvram region if it exists
+	memory_region *region = memregion("nvram");
+	if (region != nullptr)
+	{
+		const u32 total = m_ram[0].bytes() + m_ram[1].bytes();
+		if (region->bytes() != total)
+			fatalerror("%s: Wrong region size (expected 0x%x, found 0x%x)", region->name(), total, region->bytes());
+
+		u32 offset = 0;
+		for (auto & ram : m_ram)
+		{
+			std::copy_n(&region->as_u8(offset), ram.bytes(), &ram[0]);
+			offset += ram.bytes();
+		}
+	}
+	else
+	{
+		for (auto & ram : m_ram)
+			std::fill_n(&ram[0], ram.bytes(), m_nvram_defval);
+	}
 }
 
 

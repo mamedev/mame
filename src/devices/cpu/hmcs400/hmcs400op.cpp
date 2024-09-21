@@ -683,6 +683,10 @@ void hmcs400_cpu_device::op_stop()
 {
 	// STOP: Stop Mode
 	m_stop = true;
+
 	if (m_icount > 0)
 		m_icount = 0;
+
+	// all I/O pins go high-impedance
+	m_stop_cb(1);
 }
