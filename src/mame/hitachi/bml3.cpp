@@ -12,13 +12,12 @@ References:
 
 TODO:
 - keyboard break NMI (as per bmjr);
-- Move keyboard timer logic as 6845 hsync callback;
-- Cassette relay doesn't work properly, issuing a LOAD won't autostart a load;
+- Move keyboard timer logic as 6845 hsync callback, fix logic (would key repeat too fast);
 - Cassette baud rate bump (can switch from 600 to 1200 bauds thru $ffd7);
 - implement sound as a bus slot device;
 - implement RAM expansion as bus slots (RAM3 at 0x8000-0xbfff, RAM4 at 0xc000-0xefff);
 - bml3mk5: BANK REG $ffe8 (applies EMS for the RAM expansion?);
-- soft reset will hang the machine;
+- Cassettes requires manual press of play button when issuing a LOAD (verify);
 - Hitachi MB-S1 support (bumps memory map, adds an extra I/O layer);
 
 **************************************************************************************************/

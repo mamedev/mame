@@ -19709,6 +19709,7 @@ smondial2                       // 1989 Mephisto Super Mondial II
 
 @source:hitachi/b16.cpp
 b16                             //
+b16ex2                          //
 
 @source:hitachi/bmjr.cpp
 bmjr                            //
