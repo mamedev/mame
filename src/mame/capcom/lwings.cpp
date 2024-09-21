@@ -144,7 +144,6 @@ private:
 	void avengers_adpcm_w(uint8_t data);
 	uint8_t avengers_adpcm_r();
 	void lwings_bankswitch_w(uint8_t data);
-	uint8_t avengers_m1_r(offs_t offset);
 	uint8_t avengers_soundlatch_ack_r();
 	void lwings_fgvideoram_w(offs_t offset, uint8_t data);
 	void lwings_bg1videoram_w(offs_t offset, uint8_t data);

@@ -352,11 +352,6 @@ authors:hap
 	<element name="text_l3"><text string="THINK" align="1"></text></element>
 	<element name="text_l4"><text string="THREAT" align="1"></text></element>
 
-	<element name="led2" defstate="0">
-		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
-		<disk state="0"><color red="1.0" green="0.1" blue="0.15" alpha="0.17" /></disk>
-	</element>
-
 	<group name="leds">
 		<bounds x="0" y="0" width="20" height="30" />
 
@@ -364,13 +359,14 @@ authors:hap
 			<param name="y" start="10" increment="3" />
 			<param name="i" start="1" increment="1" />
 			<element ref="text_l~i~"><bounds x="12.5" yc="~y~" width="10" height="1.5" /></element>
-			<element ref="cwhite" blend="multiply"><bounds x="12.5" yc="~y~" width="10" height="1.5" /></element>
 		</repeat>
 
-		<element name="2.a" ref="led2"><bounds x="10" yc="10" width="1.5" height="1.5" /></element>
-		<element name="3.a" ref="led2"><bounds x="10" yc="13" width="1.5" height="1.5" /></element>
-		<element name="5.a" ref="led2"><bounds x="10" yc="16" width="1.5" height="1.5" /></element>
-		<element name="4.a" ref="led2"><bounds x="10" yc="19" width="1.5" height="1.5" /></element>
+		<element ref="cwhite" blend="multiply"><bounds x="5" y="5" width="15" height="20" /></element>
+
+		<element name="2.a" ref="led"><bounds x="10" yc="10" width="1.5" height="1.5" /></element>
+		<element name="3.a" ref="led"><bounds x="10" yc="13" width="1.5" height="1.5" /></element>
+		<element name="5.a" ref="led"><bounds x="10" yc="16" width="1.5" height="1.5" /></element>
+		<element name="4.a" ref="led"><bounds x="10" yc="19" width="1.5" height="1.5" /></element>
 	</group>
 
 
@@ -417,7 +413,7 @@ authors:hap
 			<element ref="text_p~i~"><bounds x="9.7" y="~y~" width="2.5" height="2.5" /></element>
 		</repeat>
 
-		<element ref="cwhite" blend="multiply"><bounds x="5" y="5" width="20" height="70" /></element>
+		<element ref="cwhite" blend="multiply"><bounds x="5" y="5" width="15" height="70" /></element>
 
 		<element ref="butw" inputtag="IN.1" inputmask="0x08"><bounds x="10" yc="10.5" width="8" height="1.15" /></element>
 		<element ref="butw" inputtag="IN.1" inputmask="0x40"><bounds x="10" yc="15.5" width="8" height="1.15" /></element>
