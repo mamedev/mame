@@ -4,13 +4,17 @@
 Skeleton driver for IBM ThinkPad Power Series.
 The IBM ThinkPad Power Series (800/820/821/822/823/850/851/860) is a laptop series from the ThinkPad line
 that was manufactured by IBM. It is based on the PowerPC architecture.
-All of the PowerPC ThinkPads could run Windows NT 3.51 and 4.0, AIX 4.1.x, and Solaris Desktop 2.5.1 PowerPC
-Edition. It is also possible to run certain PowerPC versions of Linux on the 800 Series.
+All of the PowerPC ThinkPads could run Windows NT 3.51 and 4.0, AIX 4.1.x, and Solaris Desktop 2.5.1
+PowerPC Edition. It is also possible to run certain PowerPC versions of Linux on the 800 Series.
 830 and 850 models can also run OS/2 Warp PowerPC Edition.
+
+This has no chance of running until MAME's PowerPC CPU core supports little Endian mode and motherboards
+wired for little Endian operating systems.
 
 Hardware for the 850 model:
 -SCSI hard disk and SCSI CD-ROM drive (with a NCR 53C810 PCI-SCSI I/O Processor).
--Two PC Card expansion slots (with a Ricoh RF53C366L PC Card interface controller and a MAX780 Dual-Slot PCMCIA Analog Power Controller).
+-Two PC Card expansion slots (with a Ricoh RF53C366L PC Card interface controller and a
+ MAX780 Dual-Slot PCMCIA Analog Power Controller).
 -Video: 
    -IBM 85G7815 (by Seiko/Epson).
    -Western Digital WD90C24A SVGA LCD controller.
@@ -30,7 +34,8 @@ Hardware for the 850 model:
     -33.333 MHz xtal (tripled for 100MHz system clock).
 -Dallas DS1585S RTC.
 -Intel S82378ZB PCIset.
--National Semiconductor DP87322VF (SuperI/O III, Floppy Disk Controller with Dual UARTs, Enhanced Parallel Port, and IDE Interface).
+-National Semiconductor DP87322VF (SuperI/O III, Floppy Disk Controller with Dual UARTs,
+ Enhanced Parallel Port, and IDE Interface).
 -Motorola XPC105ARX66CD (PowerPC PCI Bridge/Memory Controller).
 -Other ICs: S-MOS 85G7814, S-MOS 85G2680
 
