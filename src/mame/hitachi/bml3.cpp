@@ -924,9 +924,10 @@ void bml3_state::machine_reset()
 	m_nmi = 0;
 	m_kbt = 0;
 
-	m_hres_reg = 0;
-	m_vres_reg = 0;
-	crtc_change_clock();
+	// NOTE: bml3 do not bother with CRTC on soft resets (which is physically tied to front panel).
+	//m_hres_reg = 0;
+	//m_vres_reg = 0;
+	//crtc_change_clock();
 }
 
 void bml3mk5_state::machine_start()
@@ -1080,10 +1081,10 @@ void bml3_state::bml3(machine_config &config)
 	m_cassette->set_interface("bml3_cass");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2400)); /* Service manual specifies "Raster return period" as 2.4 ms (p.64), although the total vertical non-displaying time seems to be 4 ms. */
-	screen.set_size(640, 400);
-	screen.set_visarea(0, 320-1, 0, 200-1);
+	// Service manual specifies "Raster return period" as 2.4 ms (p.64),
+	// although the total vertical non-displaying time seems to be 4 ms.
+	// NOTE: D80_CLOCK x 2 as per MAME interlace limitation
+	screen.set_raw(D80_CLOCK * 2, 1024, 0, 640 - 1, 518, 0, 400 - 1);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
