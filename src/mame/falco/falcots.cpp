@@ -711,4 +711,4 @@ ROM_END
 
 
 COMP(1980, ts1,    0, 0, ts1,    ts1,    falcots_state, empty_init, "Falco Data Products", "TS-1 (v2.13.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
-COMP(1982, ts2624, 0, 0, ts2624, ts2624, falcots_state, empty_init, "Falco Data Products", "TS-2624", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+COMP(1982, ts2624, 0, 0, ts2624, ts2624, falcots_state, empty_init, "Falco Data Products", "TS-2624", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
