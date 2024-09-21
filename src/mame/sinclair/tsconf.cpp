@@ -335,7 +335,13 @@ void tsconf_state::tsconf(machine_config &config)
 
 ROM_START(tsconf)
 	ROM_REGION(0x080000, "maincpu", ROMREGION_ERASEFF) // ROM: 32 * 16KB
-	ROM_LOAD("ts-bios.rom", 0, 0x10000, CRC(b060b0d9) SHA1(820d3539de115141daff220a3cb733fc880d1bab))
+	ROM_DEFAULT_BIOS("v2407")
+
+	ROM_SYSTEM_BIOS(0, "v1", "v1")
+	ROMX_LOAD("ts-bios.rom", 0, 0x10000, CRC(b060b0d9) SHA1(820d3539de115141daff220a3cb733fc880d1bab), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "v2407", "Update 24.07.28")
+	ROMX_LOAD("ts-bios.240728.rom", 0, 0x10000, CRC(19f8ad7b) SHA1(9cee82d4a6212686358a50b0fd5a2981b3323ab6), ROM_BIOS(1))
 ROM_END
 
 //    YEAR  NAME    PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS
