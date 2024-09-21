@@ -569,8 +569,6 @@ protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
-	virtual void scsi_devices_config(machine_config &config) = 0;
-
 	u32 debugger_r(offs_t offset, u32 mem_mask = ~0);
 	void debugger_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -684,9 +682,6 @@ public:
 
 	void sun4(machine_config &config);
 
-protected:
-	virtual void scsi_devices_config(machine_config &config) override;
-
 private:
 	void type1space_map(address_map &map);
 };
@@ -709,9 +704,6 @@ public:
 	void sun4_60(machine_config &config);
 	void sun4_65(machine_config &config);
 	void sun4_75(machine_config &config);
-
-protected:
-	virtual void scsi_devices_config(machine_config &config) override;
 
 private:
 	virtual void machine_start() override;
@@ -1443,8 +1435,15 @@ void sun4_base_state::sun4_base(machine_config &config)
 	m_rs232[1]->dcd_handler().set(m_scc[1], FUNC(z80scc_device::dcdb_w));
 	m_rs232[1]->cts_handler().set(m_scc[1], FUNC(z80scc_device::ctsb_w));
 
-	// SCSI
-	scsi_devices_config(config);
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", sun_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:1", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:2", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90", true).set_option_machine_config("ncr53c90", [this] (device_t *device) { ncr53c90(device); });
 }
 
 void sun4_state::sun4(machine_config &config)
@@ -1455,6 +1454,9 @@ void sun4_state::sun4(machine_config &config)
 	m_maincpu->set_addrmap(0, &sun4_state::debugger_map);
 
 	sun4_base(config);
+
+	// add a tape drive at SCSI ID 4
+	subdevice<nscsi_connector>("scsibus:4")->set_default_option("tape");
 
 	// MMU Type 1 device space
 	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
@@ -1467,21 +1469,6 @@ void sun4_state::sun4(machine_config &config)
 	m_mmu->set_rom("user1");
 	m_mmu->set_scc(m_scc[1]);
 	m_maincpu->set_mmu(m_mmu);
-}
-
-void sun4_state::scsi_devices_config(machine_config &config)
-{
-	// sun4 defaults to having a tape device at SCSI ID 4
-
-	NSCSI_BUS(config, "scsibus");
-	NSCSI_CONNECTOR(config, "scsibus:0", sun_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsibus:1", sun_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:2", sun_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:3", sun_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:4", sun_scsi_devices, "tape");
-	NSCSI_CONNECTOR(config, "scsibus:5", sun_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, "cdrom");
-	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90", true).set_option_machine_config("ncr53c90", [this] (device_t *device) { ncr53c90(device); });
 }
 
 void sun4c_state::sun4c(machine_config &config)
@@ -1636,21 +1623,6 @@ void sun4c_state::sun4_75(machine_config &config)
 
 	m_mmu->set_clock(40'000'000);
 	m_maincpu->set_clock(40'000'000);
-}
-
-void sun4c_state::scsi_devices_config(machine_config &config)
-{
-	// sun4c defaults to having nothing at SCSI ID 4
-
-	NSCSI_BUS(config, "scsibus");
-	NSCSI_CONNECTOR(config, "scsibus:0", sun_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsibus:1", sun_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:2", sun_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:3", sun_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:4", sun_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:5", sun_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, "cdrom");
-	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90", true).set_option_machine_config("ncr53c90", [this] (device_t *device) { ncr53c90(device); });
 }
 
 /*
