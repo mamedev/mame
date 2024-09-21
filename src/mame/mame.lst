@@ -38982,6 +38982,9 @@ montreux
 risc2500
 risc2500a
 
+@source:saitek/sbackg.cpp
+sbackg
+
 @source:saitek/schess.cpp
 schess
 
