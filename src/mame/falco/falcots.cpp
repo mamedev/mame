@@ -17,8 +17,10 @@
 #include "machine/scn_pci.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
+#include "sound/spkrdev.h"
 #include "video/mc6845.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 namespace {
@@ -31,6 +33,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rstbuf(*this, "rstbuf")
 		, m_lineint(*this, "lineint")
+		, m_bell(*this, "bell")
 		, m_crtc(*this, "crtc")
 		, m_blinkcnt(*this, "blinkcnt")
 		, m_vram(*this, "vram")
@@ -52,6 +55,7 @@ private:
 	void load_counters();
 	void row_clock_w(int state);
 	void vsync_w(int state);
+	void bell_toggle_w(int state);
 
 	u8 key_status_r();
 	void key_scan_w(u8 data);
@@ -72,6 +76,7 @@ private:
 	required_device<z80_device> m_maincpu;
 	optional_device<rst_pos_buffer_device> m_rstbuf;
 	required_device<input_merger_device> m_lineint;
+	optional_device<speaker_sound_device> m_bell;
 	required_device<mc6845_device> m_crtc;
 	required_device<ripple_counter_device> m_blinkcnt;
 	required_shared_ptr<u8> m_vram;
@@ -85,6 +90,7 @@ private:
 	u8 m_line_attr = 0;
 	u8 m_brightness = 0;
 	u8 m_key_scan = 0;
+	bool m_bell_toggle = false;
 };
 
 void falcots_state::machine_start()
@@ -96,6 +102,8 @@ void falcots_state::machine_start()
 	save_item(NAME(m_line_attr));
 	save_item(NAME(m_brightness));
 	save_item(NAME(m_key_scan));
+	if (!m_rstbuf.found())
+		save_item(NAME(m_bell_toggle));
 }
 
 void falcots_state::machine_reset()
@@ -119,7 +127,7 @@ MC6845_UPDATE_ROW(falcots_state::ts1_update_row)
 		if (!BIT(attr_code, 5))
 		{
 			if (!BIT(attr_code, 1) || !BIT(m_blinkcnt->count(), 4))
-				dots = ~m_chargen[u16(attr_code & 0x18) << 8 | u16(char_code & 0x7f) << 4 | (m_line_attr & 0x0f)];
+				dots = ~m_chargen[u16(char_code & 0x7f) << 4 | (m_line_attr & 0x0f)];
 			if (BIT(attr_code, 0) && (m_line_attr & 0x0b) == 0x0b)
 				dots = ~dots;
 			if (BIT(attr_code, 2))
@@ -215,6 +223,15 @@ void falcots_state::vsync_w(int state)
 		if (!m_rstbuf.found())
 			m_lineint->in_w<1>(0);
 		load_counters();
+	}
+}
+
+void falcots_state::bell_toggle_w(int state)
+{
+	if (state)
+	{
+		m_bell_toggle = !m_bell_toggle;
+		m_bell->level_w(m_bell_toggle);
 	}
 }
 
@@ -620,8 +637,9 @@ void falcots_state::ts2624(machine_config &config)
 	ctc.set_clk<0>(14.7456_MHz_XTAL / 16);
 	ctc.set_clk<1>(14.7456_MHz_XTAL / 16);
 	ctc.zc_callback<0>().set("dart", FUNC(z80dart_device::rxca_w));
-	ctc.zc_callback<1>().set("dart", FUNC(z80dart_device::txca_w));
-	ctc.zc_callback<2>().set("dart", FUNC(z80dart_device::rxtxcb_w));
+	ctc.zc_callback<0>().append("dart", FUNC(z80dart_device::txca_w));
+	ctc.zc_callback<1>().set("dart", FUNC(z80dart_device::rxtxcb_w));
+	ctc.zc_callback<2>().set(FUNC(falcots_state::bell_toggle_w));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	z80dart_device &dart(Z80DART(config, "dart", 14.7456_MHz_XTAL / 4)); // Z8470AB1
@@ -632,6 +650,9 @@ void falcots_state::ts2624(machine_config &config)
 	dart.out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
 	dart.out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	dart.out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_bell).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(14.7456_MHz_XTAL, 768, 0, 640, 320, 0, 286);
