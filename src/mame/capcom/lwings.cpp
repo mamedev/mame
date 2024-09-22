@@ -210,25 +210,24 @@ uint8_t lwings_state::avengers_adpcm_r()
 
 void lwings_state::lwings_bankswitch_w(uint8_t data)
 {
-//  if (data & 0xe0) printf("bankswitch_w %02x\n", data);
-//  Fireball writes 0x20 on startup, maybe reset soundcpu?
-	m_sprbank = (data & 0x10)>>4; // Fireball only
+	// bit 0 is flip screen
+	flip_screen_set(BIT(~data, 0));
 
-	/* bit 0 is flip screen */
-	flip_screen_set(~data & 0x01);
+	// bits 1 and 2 select ROM bank
+	m_bank1->set_entry(data >> 1 & 3);
 
-	/* bits 1 and 2 select ROM bank */
-	m_bank1->set_entry((data & 0x06) >> 1);
+	// bit 3 enables NMI
+	m_nmi_mask = BIT(data, 3);
 
-	/* bit 3 enables NMI */
-	m_nmi_mask = data & 8;
+	// bit 4: sprite bank (fireball only)
+	m_sprbank = BIT(data, 4);
+	
+	// bit 5 resets the sound CPU
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 
-	/* bit 4 resets the sound CPU */
-	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE );
-
-	/* bits 6 and 7 are coin counters */
-	machine().bookkeeping().coin_counter_w(1, data & 0x40);
-	machine().bookkeeping().coin_counter_w(0, data & 0x80);
+	// bits 6 and 7 are coin counters
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 6));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));
 }
 
 void lwings_state::lwings_interrupt(int state)
@@ -428,7 +427,6 @@ void lwings_state::fball_map(address_map &map)
 
 void lwings_state::fball_oki_bank_w(uint8_t data)
 {
-	//printf("fball_oki_bank_w %02x\n", data);
 	m_samplebank->set_entry((data >> 1) & 0x7);
 }
 
