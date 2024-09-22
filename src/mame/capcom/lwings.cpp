@@ -223,6 +223,9 @@ void lwings_state::lwings_bankswitch_w(uint8_t data)
 	/* bit 3 enables NMI */
 	m_nmi_mask = data & 8;
 
+	/* bit 4 resets the sound CPU */
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE );
+
 	/* bits 6 and 7 are coin counters */
 	machine().bookkeeping().coin_counter_w(1, data & 0x40);
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
