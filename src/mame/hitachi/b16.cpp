@@ -7,7 +7,11 @@ Hitachi B(asic Master?) 16000 series?
 
 TODO:
 - Barely anything is known about the HW;
-- Requires a system disk to make it go further;
+- Requires a compatible system disk to make it go further;
+- hookup proper keyboard;
+- FDC throws disk error, mon_w hookup is unconfirmed, doesn't seem to select a drive ...
+- b16: hangs for checking bit 7 in vblank fashion at $80, either the DMA is at the
+  wrong spot or the earlier variant effectively don't have it.
 - b16ex2: "error message 1101", bypassed between ports $80 and $48
 - b16ex2: confirm kanji hookup;
 
@@ -21,6 +25,7 @@ INTM / INTS 2x uPD8259AC @ 13D / 15D
 Labelless CRTC, Fujitsu 6845 package
 FDC is unpopulated on board, should be a 765 coupled with a SED9420C/AC
 USART is unpopulated on board, assume i8251
+PPI is unpopulated on board
 BDC HN65013G025 @ 2A
 CAL HN6223S @ 12K  - Near bus slots
 CA HN6022B @ 12L   /
@@ -108,6 +113,7 @@ public:
 
 	void b16(machine_config &config);
 	void b16ex2(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(key_pressed);
 
 protected:
 	virtual void video_start() override;
@@ -119,6 +125,7 @@ protected:
 private:
 	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
 	uint8_t m_port78 = 0;
+	uint8_t m_keyb_scancode = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -280,6 +287,8 @@ void b16_state::b16_io(address_map &map)
 	map(0x20, 0x20).w(FUNC(b16_state::crtc_address_w));
 	map(0x22, 0x22).w(FUNC(b16_state::crtc_data_w));
 //  map(0x28, 0x2b) keyboard, likely thru USART
+	map(0x28, 0x28).lr8(NAME([this]() {return m_keyb_scancode; }));
+	map(0x2a, 0x2a).lr8(NAME([]() { return 0x02; }));
 	// Jumper block?
 //  map(0x40, 0x40)
 //  map(0x42, 0x42)
@@ -318,11 +327,47 @@ void b16_state::b16_io(address_map &map)
 		})
 	);
 	map(0x80, 0x89).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write)).umask16(0x00ff);
-//  map(0x8020, 0x8023) external FDC? Checked at FDC irq
+//  map(0x00a0, 0x00bf) DMA upper segments or video clut
+//  map(0x8020, 0x8023) external FDC? Can branch at FDC irq
+}
+
+INPUT_CHANGED_MEMBER(b16_state::key_pressed)
+{
+	m_ints->ir0_w(!newval);
+	m_keyb_scancode = (u8)param | (newval << 7);
 }
 
 
 static INPUT_PORTS_START( b16 )
+	// question marks denotes unknown keys, asterisks for empty chars
+	// KEY0
+	// ?1234567
+	// ? = left arrow (backspace?)
+
+	// KEY1
+	// 890-<backslash>***
+
+	PORT_START("KEY2")
+	// ?qwertyu
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHANGED_MEMBER(DEVICE_SELF, b16_state, key_pressed, 0x10 | 6)
+
+	// KEY3
+	// iop@[***
+
+	PORT_START("KEY4")
+	// asdfghjk
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHANGED_MEMBER(DEVICE_SELF, b16_state, key_pressed, 0x20)
+
+	// KEY5
+	// ?;:]****
+
+	PORT_START("KEY6")
+	// zxcvbnm,
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHANGED_MEMBER(DEVICE_SELF, b16_state, key_pressed, 0x30)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHANGED_MEMBER(DEVICE_SELF, b16_state, key_pressed, 0x31)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHANGED_MEMBER(DEVICE_SELF, b16_state, key_pressed, 0x32)
+//    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHANGED_MEMBER(DEVICE_SELF, b16_state, key_pressed, 0x33)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHANGED_MEMBER(DEVICE_SELF, b16_state, key_pressed, 0x34)
 INPUT_PORTS_END
 
 
