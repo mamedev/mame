@@ -3901,7 +3901,8 @@ static INPUT_PORTS_START( apple2c_common_config )
 INPUT_PORTS_END
 
 	/*
-	  Apple IIe & IIc key matrix (from "Sams ComputerFacts: Apple IIe" and "Sams ComputerFacts: Apple IIc")
+
+	  North American (NAM) Apple IIe & IIc key matrix (from "Sams ComputerFacts: Apple IIe" and "Sams ComputerFacts: Apple IIc")
 
 	      | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  | Y6  | Y7  | Y8  | Y9  |
 	      |     |     |     |     |     |     |     |     |     |     |
@@ -3922,10 +3923,33 @@ INPUT_PORTS_END
 	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
 	  X7  |     |     |     |     |     |     | DEL |DOWN |LEFT |RIGHT|
 	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+
+	  The ISO Apple IIe & IIc key matrix (\| and `~ are swapped)
+
+	      | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  | Y6  | Y7  | Y8  | Y9  |
+	      |     |     |     |     |     |     |     |     |     |     |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X0  | ESC |  1  |  2  |  3  |  4  |  6  |  5  |  7  |  8  |  9  |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X1  | TAB |  Q  |  W  |  E  |  R  |  Y  |  T  |  U  |  I  |  O  |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X2  |  A  |  D  |  S  |  H  |  F  |  G  |  J  |  K  | ;:  |  L  |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X3  |  Z  |  X  |  C  |  V  |  B  |  M  |  N  | ,<  | .>  |  /? |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X4  |     |     |     |     |     |     | `~  | +=  |  0  | -_  |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X5  |     |     |     |     |     |     | \|  |  P  | [{  | ]}  |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X6  |     |     |     |     |     |     |RETRN| UP  | SPC | '"  |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X7  |     |     |     |     |     |     | DEL |DOWN |LEFT |RIGHT|
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+
 	*/
 
 	/*
-	  Original Apple IIe keypad matrix (341-0132-B - 1982)
+	  Original Apple IIe keypad matrix (341-0132-B - 1982, and returned to use with 341-0132-D)
 
 	      | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  |
 	      |     |     |     |     |     |     |
@@ -3939,7 +3963,7 @@ INPUT_PORTS_END
 	  X7  | KP? |KPSPC| KP( | KP- |KPENT| KP, |
 	  ----+-----+-----+-----+-----+-----+-----+
 
-	      Note: KP ? is labeled as Print on the physical keypad, where ? is a shortcut for PRINT in Applesoft Basic
+	      Note: KP ? is labeled as Print on the physical keypad (P/N: A2M2003), where ? is a shortcut for PRINT in Applesoft Basic
 
 	*/
 
@@ -3957,6 +3981,8 @@ INPUT_PORTS_END
 	  ----+-----+-----+-----+-----+-----+-----+
 	  X7  |KPEsc|KPRGT| KP( | KP- |KPENT| KP, |
 	  ----+-----+-----+-----+-----+-----+-----+
+
+	      Note: It is unknown if Apple released any numeric keypads with up, down arrows
 	*/
 
 	/*
@@ -3982,6 +4008,92 @@ INPUT_PORTS_END
 	  X7  |     |     |     | KP- |KPENT|     | DEL |DOWN |LEFT |RIGHT|
 	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
 	*/
+
+	/*
+	      Keyboard ROMs contain tables of physical key to ASCII code translation.  The tables factor in whether the lock, shift, and control keys are pressed.
+	      The following Apple IIe/IIc keyboard layouts are known to exist:
+
+	     - North American (NAM)
+	     -- US English QWERTY
+	     -- US English DVORAK
+	     -- Western hemisphere French QWERTY
+	     -- Western hemisphere Spanish QWERTY
+	     --- original as documented in Apple // Supplement to the Owner's Manual (1982) - document 030-0535-A
+	     --- revised as documented in Apple IIe Technical Reference Manual (1989) - document 030-1194-B
+	     - ISO
+	     -- US English QWERTY
+	     -- UK English QWERTY
+	     -- French AZERTY
+	     -- Italian QZERTY
+	     -- German QWERTZ
+	     -- Swedish QWERTY
+	     -- Spanish QWERTY
+
+	     The table below lists keyboard ROMs believed to exist.  Notes:
+	     - Good dumps are required to complete/correct this table
+	     - The 342- prefix is used below, but in some cases, it could be 341, or both 342/341.  It is believed that the content is identical when both ROMs are avaiable.
+	     - SL: shift lock instead of caps lock
+	     - SC: shift cancels the lock when both are activated
+
+	     ROM ID     Year Type Primary Language/Layout Alternate Language/Layout         Countries     Keypad Layout Verified
+	     ========== ==== ==== ======================= =========================         ============= ============= ========
+	     342-0132-A 1982 NAM  US QWERTY               ?                                 US            original      no
+	     342-0132-B 1982 NAM  US QWERTY               US DVORAK (original)              US, AU        original      yes
+	     342-0132-C 1983 NAM  US QWERTY               US DVORAK (revised)               US, AU        revised       yes
+	     342-0132-D 1984 NAM  US QWERTY               US DVORAK (revised)               US, AU        original      yes
+	     342-0150-A 1982 ISO  UK QWERTY               US QWERTY                         UK, NL, AU    original      yes
+	     342-0151-A 1982 ISO  German QWERTZ           US QWERTY                         DE            original      yes
+	     342-0152-A 1982 ISO  Swedish QWERTY          US QWERTY                         SE, FI        original      yes
+	     342-0153-A 1982 ISO  French AZERTY           US QWERTY                         FR, BE        original      yes
+	     342-0154-A 1982 ISO  Italian QZERTY          US QWERTY                         IT            original      no
+	     342-0155-A 1982 ISO  US QWERTY               Western Spanish QWERTY (original) Latin America original      no (order may be reversed)
+	     342-0211-A 1982 ISO  Spanish QWERTY          US QWERTY                         ES, PT        original      yes
+	     342-0283-A 1983 ISO  French AZERTY (SL)      US QWERTY                         FR            original      no
+	     342-0284-A 198? ISO  Italian QZERTY (SL)     US QWERTY                         IT            original      no
+	     342-0292-A 198? NAM  US QWERTY               Western French QWERTY             CA            original      no (order may be reversed)
+	     342-0???-A 198? NAM  US QWERTY               Western Spanish QWERTY (revised)  Latin America original      no (order may be reversed)
+	     342-0326-A 1985 ISO  French AZERTY (SL, SC)  US QWERTY                         FR, BE        original      partial (only the French half of the ROM has been located)
+	     342-0327-A 1985 ISO  German QWERTZ           US QWERTY                         DE            original      no
+	     342-0329-A 1985 ISO  Italian QZERTY (SL)     US QWERTY                         IT            original      no
+
+	     The table below lists video character generator ROMs believed to exist.  Notes:
+	     - Good dumps are required to complete/correct this table
+	     - The 342- prefix is used below, but in some cases, it could be 341, or both 342/341.  It is believed that the content is identical when both ROMs are avaiable.
+	     - Western French and Spanish ROMs have the same character sets as the European French and Spanish ROMs.  The differences may be the order of primary vs. altertnate languages, but this needs confirmation.
+
+	     ROM ID     Primary Language Alternate Language MouseText Countries     Verified
+	     ========== ================ ================== ========= ============= ========
+	     342-0133-A US English       none               no        US, AU        yes
+	     342-0160-A UK English       US English         no        UK, NL, AU    yes
+	     342-0161-A German           US English         no        DE            yes
+	     342-0162-A Swedish          US English         no        SE            yes
+	     342-0163-A French           US English         no        FR, BE        no
+	     342-0164-A Italian          US English         no        IT            no
+	     342-0165-A US English       Spanish            no        Latin America no (order may be reversed)
+	     342-0166-A US English       French             no        CA            no (order may be reversed)
+	     342-0167-A US English       Spanish            no        Latin America no (order may be reversed)
+	     342-0168-A US English       French             no        CA            no (order may be reversed)
+	     342-0212-A Spanish          US English         no        ES, PT        yes
+	     342-0265-A US English       none               yes       US, AU        yes
+	     342-0273-A UK English       US English         yes       UK, NL, AU    yes
+	     342-0274-A French           US English         yes       FR, BE        yes
+	     342-0275-A German           US English         yes       DE            no
+	     342-0276-A Italian          US English         yes       IT            no
+	     342-0306-A US English       French             yes       CA            no (order may be reversed)
+	     342-0307-A US English       Spanish            yes       Latin America no (order may be reversed)
+	     342-0nnn-A Swedish          US English         yes       SE            no
+	     342-0nnn-A Spanish          US English         yes       ES, PT        no
+
+	     References:
+	         - Apple // Supplement to the Owner's Manual (1982) - document 030-0535-A
+	         - Apple //e Enhancement Kit - Dealer's Installation Instructions - document 030-1142-A
+	         - Apple IIe Technical Reference Manual (1989) - document 030-1194-B
+	         - Apple IIc Reference Manual (1984) - document 030-1022-B
+	         - Apple IIc Technical Reference Manual (1987) - document 030-1238-B
+	         - Apple IIc Technical Reference - Second Edition (1989)
+
+	*/
+
 
 static INPUT_PORTS_START( apple2e_common )
 	PORT_START("X0")
@@ -4686,7 +4798,7 @@ static INPUT_PORTS_START( apple2euk_common )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CODE(KEYCODE_BACKSLASH2)  PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('p')
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
@@ -4778,7 +4890,7 @@ static INPUT_PORTS_START( apple2ees )
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)  PORT_CHAR('G') PORT_CHAR('g')
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)  PORT_CHAR('J') PORT_CHAR('j')
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)  PORT_CHAR('K') PORT_CHAR('k')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0xf1) PORT_CHAR(0xf1)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0xd1) PORT_CHAR(0xf1) // capital and lowercase N with tilde
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('L') PORT_CHAR('l')
 
 	PORT_START("X3")
@@ -4800,7 +4912,7 @@ static INPUT_PORTS_START( apple2ees )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('<') PORT_CHAR('>')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)      PORT_CHAR(0xba) PORT_CHAR(0xa7) // ordinal superscript / section sign
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('`') PORT_CHAR(0xbf)  // inverted question mark
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR('=')
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('\'') PORT_CHAR('?')
@@ -4812,7 +4924,7 @@ static INPUT_PORTS_START( apple2ees )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CODE(KEYCODE_BACKSLASH2)  PORT_CHAR('<') PORT_CHAR('>')
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('p')
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('~') PORT_CHAR('^')
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*')
@@ -4827,7 +4939,7 @@ static INPUT_PORTS_START( apple2ees )
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)        PORT_CODE(KEYCODE_UP)
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR(0xc7) PORT_CHAR(0xa1) // c with cedilla / inverted exclamation point
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR(0xe7) PORT_CHAR(0xa1) // c with cedilla / inverted exclamation point
 
 	PORT_START("X7")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -4919,8 +5031,8 @@ static INPUT_PORTS_START( apple2efr )   // French AZERTY keyboard (Apple uses th
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('>') PORT_CHAR('<')   // actually the key between left shift and W
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('_') PORT_CHAR('-')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)  PORT_CHAR('`') PORT_CHAR(0xa3) // UK pound (actually to the left of the return key on the QSDF row)
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('_') PORT_CHAR('-')
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR(0xe0) // a with grave
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR(0xb0) PORT_CHAR(')') // degree symbol
 
@@ -4931,8 +5043,8 @@ static INPUT_PORTS_START( apple2efr )   // French AZERTY keyboard (Apple uses th
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(0xa3) PORT_CHAR('`')  // UK pound (actually to the left of the return key on the QSDF row)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('p')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CODE(KEYCODE_BACKSLASH2)  PORT_CHAR('>') PORT_CHAR('<')  // actually the key between left shift and W
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)          PORT_CHAR('P') PORT_CHAR('p')
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0xa8) PORT_CHAR('^') // diaresis
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('$') PORT_CHAR('*')
 
