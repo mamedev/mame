@@ -9,9 +9,7 @@ TODO:
 - Barely anything is known about the HW;
 - Requires a system disk to make it go further;
 - b16ex2: "error message 1101", bypassed between ports $80 and $48
-- b16ex2: prints gibberish before the "insert disk" screen, uses $b4000 for the upper tile bank
-  in an unidentified kanji format (so bit 7 high for lr, then low)
-  \- 0x2517 - 0x2519 - 0x2526 - 0x2d00 - 0x254f - 0x26b0 - 0x23e6
+- b16ex2: confirm kanji hookup;
 
 ===================================================================================================
 
@@ -56,6 +54,7 @@ Error codes (TODO: RE them all)
 #include "machine/pit8253.h"
 #include "machine/upd765.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -77,7 +76,7 @@ public:
 		, m_vram(*this, "vram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_char_rom(*this, "pcg")
+		, m_kanji_rom(*this, "kanji")
 	{ }
 
 	void b16(machine_config &config);
@@ -91,6 +90,7 @@ protected:
 	void b16ex2_map(address_map &map);
 private:
 	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
+	uint8_t m_port78 = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -102,9 +102,12 @@ private:
 	required_shared_ptr<uint16_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_region_ptr<uint8_t> m_char_rom;
+	required_region_ptr<uint8_t> m_kanji_rom;
 
-	void pcg_w(offs_t offset, uint8_t data);
+	std::unique_ptr<u8[]> m_ig_ram;
+
+	u8 ig_ram_r(offs_t offset);
+	void ig_ram_w(offs_t offset, uint8_t data);
 	void crtc_address_w(uint8_t data);
 	void crtc_data_w(uint8_t data);
 	uint8_t memory_read_byte(offs_t offset);
@@ -133,6 +136,9 @@ private:
 
 void b16_state::video_start()
 {
+	m_ig_ram = make_unique_clear<u8[]>(0x4000);
+	m_gfxdecode->gfx(1)->set_source_and_total(m_ig_ram.get(), 0x200 * 2);
+
 	save_item(NAME(m_crtc_vreg));
 	save_item(NAME(m_crtc_index));
 }
@@ -140,21 +146,44 @@ void b16_state::video_start()
 
 uint32_t b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for(int y=0;y<mc6845_v_display;y++)
+	// TODO: convert to scanline renderer
+	for(int y = 0; y < mc6845_v_display; y++)
 	{
-		for(int x=0;x<mc6845_h_display;x++)
+		for(int x = 0; x < mc6845_h_display; x++)
 		{
-			int const tile = m_vram[x+y*mc6845_h_display] & 0xff;
-			int const color = (m_vram[x+y*mc6845_h_display] & 0x700) >> 8;
+			const u32 tile_offset = x + y * mc6845_h_display;
+			const u16 lo_vram = m_vram[tile_offset];
+			const u16 hi_vram = m_vram[tile_offset + 0x4000 / 2];
+			const u16 tile = lo_vram & 0x00ff;
+			const u8 color = (lo_vram & 0x0700) >> 8;
 
-			for(int yi=0;yi<mc6845_tile_height;yi++)
+			for(int yi = 0; yi < mc6845_tile_height; yi++)
 			{
-				for(int xi=0;xi<8;xi++)
+				u8 gfx_data = 0;
+				// TODO: incorrect select (will print gibberish after the system bootup message)
+				// system doesn't bother to clear kanji upper addresses, may opt-out thru a global register.
+				if (BIT(hi_vram, 5))
 				{
-					int const pen = (m_char_rom[tile*16+yi] >> (7-xi) & 1) ? color : 0;
+					// TODO: apply bitswap at device_init time, move this calculation out of this inner loop.
+					const u16 lr = BIT(hi_vram, 7) ^ 1;
+					const u16 kanji_bank = (hi_vram & 0x1f);
+					const u32 kanji_offset = bitswap<13>(tile + (kanji_bank << 8), 12, 7, 6, 5, 11, 10, 9, 8, 4, 3, 2, 1, 0) << 4;
+					gfx_data = m_kanji_rom[((kanji_offset + yi) << 1) + lr];
+				}
+				else
+				{
+					gfx_data = m_ig_ram[(tile << 4) + yi];
+				}
 
-					if(y*mc6845_tile_height < 400 && x*8+xi < 640) /* TODO: safety check */
-						bitmap.pix(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(pen);
+				for(int xi = 0; xi < 8; xi++)
+				{
+					const int res_x = x * 8 + xi;
+					const int res_y = y * mc6845_tile_height + yi;
+					if (!cliprect.contains(res_x, res_y))
+						continue;
+
+					int const pen = BIT(gfx_data, 7 - xi) ? color : 0;
+					bitmap.pix(res_y, res_x) = m_palette->pen(pen);
 				}
 			}
 		}
@@ -163,20 +192,30 @@ uint32_t b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-void b16_state::pcg_w(offs_t offset, uint8_t data)
+u8 b16_state::ig_ram_r(offs_t offset)
 {
-	m_char_rom[offset] = data;
+	// swap bit 0 for now, so we can see a setup thru debugger later on.
+	// SW does mov ah,0 -> stosw when uploading.
+	const u16 ig_offset = bitswap<13>(offset, 0, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1);
+	return m_ig_ram[ig_offset];
+}
 
-	m_gfxdecode->gfx(0)->mark_dirty(offset >> 4);
+void b16_state::ig_ram_w(offs_t offset, uint8_t data)
+{
+	const u16 ig_offset = bitswap<13>(offset, 0, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1);
+	m_ig_ram[ig_offset] = data;
+
+	m_gfxdecode->gfx(1)->mark_dirty(ig_offset >> 4);
 }
 
 void b16_state::b16_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000, 0x9ffff).ram(); // probably not all of it.
+	// TODO: amount of work RAM depends on model type
+	map(0x00000, 0x9ffff).ram();
 	map(0xa0000, 0xaffff).ram(); // bitmap?
 	map(0xb0000, 0xb7fff).ram().share("vram");
-	map(0xb8000, 0xbbfff).w(FUNC(b16_state::pcg_w)).umask16(0x00ff); // pcg
+	map(0xb8000, 0xbbfff).rw(FUNC(b16_state::ig_ram_r), FUNC(b16_state::ig_ram_w)).umask16(0xffff);
 	map(0xfc000, 0xfffff).rom().region("ipl", 0);
 }
 
@@ -209,11 +248,33 @@ void b16_state::b16_io(address_map &map)
 	map(0x18, 0x1b).rw(m_ints, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x20, 0x20).w(FUNC(b16_state::crtc_address_w));
 	map(0x22, 0x22).w(FUNC(b16_state::crtc_data_w));
-	// b16ex2: jumps to $e0000 if bit 7 high
+	// Jumper block?
+//  map(0x40, 0x40)
+//  map(0x42, 0x42)
+//  map(0x44, 0x44)
+	// b16ex2: jumps to $e0000 if bit 7 high, noisy on bit 4
 	map(0x48, 0x48).lr8(NAME([] () { return 0; }));
 	map(0x70, 0x73).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
-//  map(0x78, 0x78).rw bit 0 motor on? bit 2 also used
-//  map(0x79, 0x79) bit 0 DSW? screen mode?
+	map(0x78, 0x78).lrw8(
+		NAME([this] () {
+			return m_port78;
+		}),
+		NAME([this] (u8 data) {
+			logerror("Port $78 %02x\n", data);
+			// bit 0: motor on?
+			// bit 2: FDC reset?
+			m_port78 = data;
+		})
+	);
+	map(0x79, 0x79).lrw8(
+		NAME([this] () {
+			// bit 0 read at POST
+			return 0;
+		}),
+		NAME([this] (u8 data) {
+			logerror("Port $79 write %02x\n", data);
+		})
+	);
 	map(0x80, 0x81).portr("SYSTEM");
 }
 
@@ -227,7 +288,7 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout b16_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 16,
 	RGN_FRAC(1,1),
@@ -238,8 +299,21 @@ static const gfx_layout b16_charlayout =
 	8*16
 };
 
+static const gfx_layout kanjilayout =
+{
+	16, 16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP16(0,1) },
+	{ STEP16(0,8*2) },
+	16*16
+};
+
+
 static GFXDECODE_START( gfx_b16 )
-	GFXDECODE_ENTRY( "pcg", 0x0000, b16_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "kanji", 0x0000, kanjilayout, 0, 1 )
+	GFXDECODE_ENTRY( nullptr, 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 uint8_t b16_state::memory_read_byte(offs_t offset)
@@ -257,8 +331,9 @@ void b16_state::memory_write_byte(offs_t offset, uint8_t data)
 
 void b16_state::b16(machine_config &config)
 {
-	/* basic machine hardware */
-	I8086(config, m_maincpu, XTAL(14'318'181)/2); // unknown xtal, should be 8088 for base machine?
+	// TODO: attached ROM may be B16 EX instead, with 8086-2 (8 MHz)
+	// Original B16 should be I8088
+	I8086(config, m_maincpu, XTAL(14'318'181)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &b16_state::b16_map);
 	m_maincpu->set_addrmap(AS_IO, &b16_state::b16_io);
 	m_maincpu->set_irq_acknowledge_callback(m_intm, FUNC(pic8259_device::inta_cb));
@@ -324,6 +399,11 @@ void b16_state::b16ex2(machine_config &config)
 //  m_pit->out_handler<1>()
 	m_pit->set_clk<2>(XTAL(16'000'000) / 2);
 //  m_pit->out_handler<2>()
+
+	m_palette->set_entries(16);
+
+	// 512~1.5M RAM
+	// 5.25" FDD x 2
 }
 
 
@@ -331,7 +411,7 @@ ROM_START( b16 )
 	ROM_REGION16_LE( 0x4000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(7c1c93d5) SHA1(2a1e63a689c316ff836f21646166b38714a18e03) )
 
-	ROM_REGION( 0x4000/2, "pcg", ROMREGION_ERASE00 )
+	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( b16ex2 )
@@ -341,21 +421,25 @@ ROM_START( b16ex2 )
 	// M27128-H
 	ROM_LOAD16_BYTE( "j5c-0072.6b", 0x0000, 0x4000, CRC(5f3c85ca) SHA1(4988d8e1e763268a62f2a86104db4d106babd242))
 
-	ROM_REGION( 0x4000/2, "pcg", ROMREGION_ERASE00 )
-
 	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASE00 )
 	// Both HN62301AP, sockets labeled "KANJI1" and "KANJI2"
-	ROM_LOAD( "7l1.11f", 0x00000, 0x20000, NO_DUMP )
-	ROM_LOAD( "7m1.12f", 0x20000, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "7l1.11f", 0x00001, 0x20000, CRC(a31b3efd) SHA1(818b9fbb5109779bb3d66f76a93cc087c3b21698) )
+	ROM_LOAD16_BYTE( "7m1.12f", 0x00000, 0x20000, CRC(9eff324e) SHA1(2dfe14cc4b884eb6bb3c953d0ba9677d663b256e) )
 ROM_END
 
 } // anonymous namespace
 
 
-// TODO: pinpoint MB SKU for both
+// TODO: pinpoint MB SKU for all
 // Original would be MB-16001, flyer shows a "Basic Master" subtitle
 COMP( 1982?, b16,     0,      0,      b16,     b16,   b16_state, empty_init, "Hitachi", "B16",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// B16 EX 8086-2
+// B16 SX superimpose option, 3.5" x 1.2MB floppies
+
 COMP( 1983?, b16ex2,  0,      0,      b16ex2,  b16,   b16_state, empty_init, "Hitachi", "B16 EX-II",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// B16 EX-III known to exist
-// B16LX, LCD variants
+// B16 MX-II, 1~2MB RAM + 640x494 extra video mode + support for M[ultiuser?]DOS
+
+// B16 EX-III, 386 based? <fill me>
+
+// B16 LX, LCD variants
 // Ricoh Mr. My Tool (Mr.マイツール), sister variants with 3.5 2HD floppies

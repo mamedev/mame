@@ -537,8 +537,8 @@ void fastinvaders_state::fastinvaders_8275_io(address_map &map)
 {
 	fastinvaders_io_base(map);
 
-	map(0x20, 0x21).rw(m_crtc8275, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x10, 0x1f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0x20, 0x21).rw(m_crtc8275, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x30, 0x33).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x40, 0x4f).w(FUNC(fastinvaders_state::io_40_w));  //ds4   //latch
 	//map(0x50, 0x50).r(FUNC(fastinvaders_state::io_50_r));//latch
