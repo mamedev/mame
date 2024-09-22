@@ -20,6 +20,7 @@ DMAC uPD8257C-5 @ 18B
 INTM / INTS 2x uPD8259AC @ 13D / 15D
 Labelless CRTC, Fujitsu 6845 package
 FDC is unpopulated on board, should be a 765 coupled with a SED9420C/AC
+USART is unpopulated on board, assume i8251
 BDC HN65013G025 @ 2A
 CAL HN6223S @ 12K  - Near bus slots
 CA HN6022B @ 12L   /
@@ -40,6 +41,30 @@ Centronics port CN9, Serial port CN8
 
 ===================================================================================================
 
+irq vectors
+
+intm
+ir0 pit timer (does work RAM logic only)
+ir1 FDC irq
+ir2 ?
+ir3 vblank?
+ir4 ?
+ir5 ?
+ir6 slave ack
+ir7 ?
+
+ints
+ir0 keyboard
+ir1 ?
+ir2 ?
+ir3 device at I/O $38 / $3a
+ir4 device at I/O $4c / $4e
+ir5 ?
+ir6 ?
+ir7 ?
+
+===================================================================================================
+
 Error codes (TODO: RE them all)
 0301 PIT failure
 1101 b16ex2 bus config error?
@@ -49,7 +74,8 @@ Error codes (TODO: RE them all)
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
-#include "machine/am9517a.h"
+#include "imagedev/floppy.h"
+#include "machine/i8257.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/upd765.h"
@@ -57,7 +83,7 @@ Error codes (TODO: RE them all)
 
 #include "emupal.h"
 #include "screen.h"
-
+#include "softlist_dev.h"
 
 namespace {
 
@@ -71,12 +97,13 @@ public:
 		, m_intm(*this, "intm")
 		, m_ints(*this, "ints")
 		, m_dma(*this, "dma")
-		, m_fdc(*this, "fdc")
 		, m_crtc(*this, "crtc")
 		, m_vram(*this, "vram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_kanji_rom(*this, "kanji")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:%u", 0U)
 	{ }
 
 	void b16(machine_config &config);
@@ -84,6 +111,7 @@ public:
 
 protected:
 	virtual void video_start() override;
+	virtual void machine_reset() override;
 
 	void b16_map(address_map &map);
 	void b16_io(address_map &map);
@@ -96,13 +124,14 @@ private:
 	required_device<pit8253_device> m_pit;
 	required_device<pic8259_device> m_intm;
 	required_device<pic8259_device> m_ints;
-	required_device<am9517a_device> m_dma;
-	required_device<upd765a_device> m_fdc;
+	required_device<i8257_device> m_dma;
 	required_device<mc6845_device> m_crtc;
 	required_shared_ptr<uint16_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_region_ptr<uint8_t> m_kanji_rom;
+	required_device<upd765a_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
 
 	std::unique_ptr<u8[]> m_ig_ram;
 
@@ -114,6 +143,8 @@ private:
 	void memory_write_byte(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	static void floppy_formats(format_registration &fr);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -242,12 +273,13 @@ void b16_state::crtc_data_w(uint8_t data)
 void b16_state::b16_io(address_map &map)
 {
 	map.unmap_value_high();
-//  map(0x00, 0x07).umask16(0x00ff); // DMA device? PIT mirror?
+//  map(0x00, 0x07).umask16(0x00ff); // PIT mirror?
 	map(0x08, 0x0f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x10, 0x13).rw(m_intm, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x18, 0x1b).rw(m_ints, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x20, 0x20).w(FUNC(b16_state::crtc_address_w));
 	map(0x22, 0x22).w(FUNC(b16_state::crtc_data_w));
+//  map(0x28, 0x2b) keyboard, likely thru USART
 	// Jumper block?
 //  map(0x40, 0x40)
 //  map(0x42, 0x42)
@@ -255,6 +287,7 @@ void b16_state::b16_io(address_map &map)
 	// b16ex2: jumps to $e0000 if bit 7 high, noisy on bit 4
 	map(0x48, 0x48).lr8(NAME([] () { return 0; }));
 	map(0x70, 0x73).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
+//    map(0x74, 0x74).rw(m_fdc, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
 	map(0x78, 0x78).lrw8(
 		NAME([this] () {
 			return m_port78;
@@ -264,6 +297,15 @@ void b16_state::b16_io(address_map &map)
 			// bit 0: motor on?
 			// bit 2: FDC reset?
 			m_port78 = data;
+			{
+				floppy_image_device *floppy = m_floppy[0]->get_device();
+
+				if (floppy != nullptr && BIT(data, 0))
+				{
+					floppy->mon_w(1);
+					floppy->mon_w(0);
+				}
+			}
 		})
 	);
 	map(0x79, 0x79).lrw8(
@@ -275,14 +317,12 @@ void b16_state::b16_io(address_map &map)
 			logerror("Port $79 write %02x\n", data);
 		})
 	);
-	map(0x80, 0x81).portr("SYSTEM");
+	map(0x80, 0x89).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write)).umask16(0x00ff);
+//  map(0x8020, 0x8023) external FDC? Checked at FDC irq
 }
 
 
 static INPUT_PORTS_START( b16 )
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -328,46 +368,68 @@ void b16_state::memory_write_byte(offs_t offset, uint8_t data)
 	return prog_space.write_byte(offset, data);
 }
 
+static void b16_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	// TODO: at least PC-98 3.5" x 1.2MB format
+}
+
+void b16_state::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+//  fr.add(FLOPPY_NASLITE_FORMAT);
+//  fr.add(FLOPPY_IBMXDF_FORMAT);
+}
+
+void b16_state::machine_reset()
+{
+	floppy_image_device *floppy = m_floppy[0]->get_device();
+
+	if (floppy != nullptr)
+		floppy->set_rpm(300);
+	m_fdc->set_rate(250000);
+
+}
 
 void b16_state::b16(machine_config &config)
 {
 	// TODO: attached ROM may be B16 EX instead, with 8086-2 (8 MHz)
 	// Original B16 should be I8088
-	I8086(config, m_maincpu, XTAL(14'318'181)/2);
+	I8086(config, m_maincpu, XTAL(16'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &b16_state::b16_map);
 	m_maincpu->set_addrmap(AS_IO, &b16_state::b16_io);
 	m_maincpu->set_irq_acknowledge_callback(m_intm, FUNC(pic8259_device::inta_cb));
 
 	PIT8253(config, m_pit);
 	// TODO: unconfirmed, just enough to make it surpass POST checks
-	m_pit->set_clk<0>(XTAL(14'318'181) / 8);
-//  m_pit->out_handler<0>()
-	m_pit->set_clk<1>(XTAL(14'318'181) / 4);
+	m_pit->set_clk<0>(XTAL(16'000'000) / 8);
+	m_pit->out_handler<0>().set(m_intm, FUNC(pic8259_device::ir0_w));
+	m_pit->set_clk<1>(XTAL(16'000'000) / 4);
 //  m_pit->out_handler<1>()
-	m_pit->set_clk<2>(XTAL(14'318'181) / 4);
+	m_pit->set_clk<2>(XTAL(16'000'000) / 4);
 //  m_pit->out_handler<2>()
 
-	// TODO: wrong type
-	AM9517A(config, m_dma, XTAL(14'318'181)/2);
-	m_dma->in_memr_callback().set(FUNC(b16_state::memory_read_byte));
-	m_dma->out_memw_callback().set(FUNC(b16_state::memory_write_byte));
+	I8257(config, m_dma, XTAL(16'000'000));
+	m_dma->in_memr_cb().set(FUNC(b16_state::memory_read_byte));
+	m_dma->out_memw_cb().set(FUNC(b16_state::memory_write_byte));
 
 	PIC8259(config, m_intm);
 	m_intm->out_int_callback().set_inputline(m_maincpu, 0);
 	m_intm->in_sp_callback().set_constant(1);
-//  m_intm->read_slave_ack_callback()
+	m_intm->read_slave_ack_callback().set(m_ints, FUNC(pic8259_device::acknowledge));
 
 	PIC8259(config, m_ints, 0);
-//  m_ints->out_int_callback().set(m_intm, FUNC(pic8259_device::ir?_w));
+	m_ints->out_int_callback().set(m_intm, FUNC(pic8259_device::ir6_w));
 	m_ints->in_sp_callback().set_constant(0);
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
-//  m_fdc->intrq_wr_callback().set(FUNC(b16_state::intrq_w));
-//  m_fdc->drq_wr_callback().set(FUNC(b16_state::drq_w));
-//  FLOPPY_CONNECTOR(config, "fdc:0", ?_floppies, "525?", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-//  FLOPPY_CONNECTOR(config, "fdc:1", ?_floppies, "525?", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	UPD765A(config, m_fdc, 8'000'000, false, false);
+	m_fdc->intrq_wr_callback().set(m_intm, FUNC(pic8259_device::ir1_w));
+	m_fdc->drq_wr_callback().set([this] (int state) { logerror("drq %d\n", state);});
+	FLOPPY_CONNECTOR(config, "fdc:0", b16_floppies, "525dd", b16_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", b16_floppies, "525dd", b16_state::floppy_formats).enable_sound(true);
 
-	MC6845(config, m_crtc, XTAL(14'318'181)/5);    /* unknown variant, unknown clock, hand tuned to get ~60 fps */
+	/* unknown variant, unknown clock, hand tuned to get ~60 fps */
+	MC6845(config, m_crtc, XTAL(16'000'000)/6);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
@@ -383,6 +445,9 @@ void b16_state::b16(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_b16);
 	// TODO: palette format is a guess
 	PALETTE(config, m_palette, palette_device::BRG_3BIT).set_entries(8);
+
+	// Unconfirmed, just to have something to load with
+	SOFTWARE_LIST(config, "pc_disk_list").set_compatible("ibm5150");
 }
 
 void b16_state::b16ex2(machine_config &config)
@@ -391,6 +456,7 @@ void b16_state::b16ex2(machine_config &config)
 	I80286(config.replace(), m_maincpu, XTAL(16'000'000) / 2); // A80286-8 / S
 	m_maincpu->set_addrmap(AS_PROGRAM, &b16_state::b16ex2_map);
 	m_maincpu->set_addrmap(AS_IO, &b16_state::b16_io);
+	m_maincpu->set_irq_acknowledge_callback(m_intm, FUNC(pic8259_device::inta_cb));
 
 	// TODO: as above
 	m_pit->set_clk<0>(XTAL(16'000'000) / 4);
