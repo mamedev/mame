@@ -7523,6 +7523,81 @@ Incredibly slow in tearing down even on pcipcs7 (bypass with fast forward)
 		</part>
 	</software>
 
+	<!-- Did Service Pack 1 ever have a CD-ROM release? -->
+	<software name="winnt40sp2">
+		<description>Windows NT 4.0 Service Pack 2</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="19961213" />
+		<info name="language" value="English" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 4.0 service pack 2" sha1="e07721ee9bae4ca89af067b46115a65926c0c8ba" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt40sp3">
+		<description>Windows NT 4.0 Service Pack 3</description>
+		<year>1997</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="19970512" />
+		<info name="language" value="English" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 4.0 service pack 3" sha1="c23ad3b3d1fb8f1f9f81ed70e6c717b56344da04" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt40sp4">
+		<description>Windows NT 4.0 Service Pack 4</description>
+		<year>1998</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="19981015" />
+		<info name="language" value="English" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 4.0 service pack 4" sha1="10d1b7ce191612ca9412baa8e45eaa07737f7bd4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt40sp5">
+		<description>Windows NT 4.0 Service Pack 5</description>
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+		ISO file CRC32 hash is not 0xffffffff.  Microsoft actually shipped this image, it's an exception. :-)
+		]]></notes>
+		<info name="release" value="19990526" />
+		<info name="language" value="English" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 4.0 service pack 5" sha1="528de2cb8b9a08cb5f599e49042430b6f16138e4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Does the plain "Service Pack 6" (not 6a) exist anywhere? -->
+	<software name="winnt40sp6">
+		<description>Windows NT 4.0 Service Pack 6a</description>
+		<year>2000</year>
+		<publisher>Microsoft</publisher>
+		<info name="release" value="20000801" />
+		<info name="language" value="English" />
+		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt 4.0 service pack 6a" sha1="8a08d51c2a131940fe7d02656bb71ca968e61835" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 2000 floppy images are on the CD-ROM in the \bootdisk directory.
 
 	In an effort of making the list not balloon out, only "Select" editions are here.  They do not require key entry. -->
