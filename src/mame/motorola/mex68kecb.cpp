@@ -232,5 +232,5 @@ ROM_END
 
 
 // Driver
-//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY     FULLNAME            FLAGS
-COMP( 1981, mex68kecb, 0,      0,      mex68kecb, mex68kecb, mex68kecb_state, empty_init, "Motorola", "Motorola 68K ECB", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY     FULLNAME                            FLAGS
+COMP( 1981, mex68kecb, 0,      0,      mex68kecb, mex68kecb, mex68kecb_state, empty_init, "Motorola", "68000 Educational Computer Board", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
