@@ -88,7 +88,7 @@ Error codes (TODO: RE them all)
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist_dev.h"
+//#include "softlist_dev.h"
 
 namespace {
 
@@ -117,6 +117,7 @@ public:
 
 protected:
 	virtual void video_start() override;
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void b16_map(address_map &map);
@@ -150,6 +151,9 @@ private:
 	void memory_write_byte(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TIMER_CALLBACK_MEMBER( tc_tick_cb );
+	emu_timer *m_timer_tc;
 
 	static void floppy_formats(format_registration &fr);
 };
@@ -296,24 +300,31 @@ void b16_state::b16_io(address_map &map)
 	// b16ex2: jumps to $e0000 if bit 7 high, noisy on bit 4
 	map(0x48, 0x48).lr8(NAME([] () { return 0; }));
 	map(0x70, 0x73).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
-//    map(0x74, 0x74).rw(m_fdc, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
+	map(0x74, 0x74).lw8(
+		NAME([this] (u8 data) {
+			floppy_image_device *floppy = m_floppy[0]->get_device();
+
+			// motor on strobe?
+			if (floppy != nullptr)
+			{
+				floppy->mon_w(1);
+				floppy->mon_w(0);
+			}
+		})
+	);
 	map(0x78, 0x78).lrw8(
 		NAME([this] () {
 			return m_port78;
 		}),
 		NAME([this] (u8 data) {
 			logerror("Port $78 %02x\n", data);
-			// bit 0: motor on?
+			// bit 0: TC strobe?
 			// bit 2: FDC reset?
 			m_port78 = data;
+			if (BIT(data, 0))
 			{
-				floppy_image_device *floppy = m_floppy[0]->get_device();
-
-				if (floppy != nullptr && BIT(data, 0))
-				{
-					floppy->mon_w(1);
-					floppy->mon_w(0);
-				}
+				m_fdc->tc_w(true);
+				m_timer_tc->adjust(attotime::zero);
 			}
 		})
 	);
@@ -421,9 +432,24 @@ static void b16_floppies(device_slot_interface &device)
 
 void b16_state::floppy_formats(format_registration &fr)
 {
-	fr.add_pc_formats();
-//  fr.add(FLOPPY_NASLITE_FORMAT);
-//  fr.add(FLOPPY_IBMXDF_FORMAT);
+	fr.add_mfm_containers();
+//  fr.add(FLOPPY_PC98_FORMAT);
+//  fr.add(FLOPPY_PC98FDI_FORMAT);
+//  fr.add(FLOPPY_FDD_FORMAT);
+//  fr.add(FLOPPY_DCP_FORMAT);
+//  fr.add(FLOPPY_DIP_FORMAT);
+//  fr.add(FLOPPY_NFD_FORMAT);
+}
+
+TIMER_CALLBACK_MEMBER( b16_state::tc_tick_cb )
+{
+//  logerror("tc off\n");
+	m_fdc->tc_w(false);
+}
+
+void b16_state::machine_start()
+{
+	m_timer_tc = timer_alloc(FUNC(b16_state::tc_tick_cb), this);
 }
 
 void b16_state::machine_reset()
@@ -467,7 +493,9 @@ void b16_state::b16(machine_config &config)
 	m_ints->out_int_callback().set(m_intm, FUNC(pic8259_device::ir6_w));
 	m_ints->in_sp_callback().set_constant(0);
 
-	UPD765A(config, m_fdc, 8'000'000, false, false);
+	// clock unconfirmed, definitely want the ready line on
+	// would stop at `SEARCH_ADDRESS_MARK_HEADER` otherwise
+	UPD765A(config, m_fdc, XTAL(16'000'000) / 2, true, false);
 	m_fdc->intrq_wr_callback().set(m_intm, FUNC(pic8259_device::ir1_w));
 	m_fdc->drq_wr_callback().set([this] (int state) { logerror("drq %d\n", state);});
 	FLOPPY_CONNECTOR(config, "fdc:0", b16_floppies, "525dd", b16_state::floppy_formats).enable_sound(true);
@@ -490,9 +518,6 @@ void b16_state::b16(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_b16);
 	// TODO: palette format is a guess
 	PALETTE(config, m_palette, palette_device::BRG_3BIT).set_entries(8);
-
-	// Unconfirmed, just to have something to load with
-	SOFTWARE_LIST(config, "pc_disk_list").set_compatible("ibm5150");
 }
 
 void b16_state::b16ex2(machine_config &config)
