@@ -309,7 +309,7 @@ void b16_state::b16_io(address_map &map)
 		})
 	);
 	map(0x79, 0x79).lrw8(
-		NAME([this] () {
+		NAME([] () {
 			// bit 0 read at POST
 			return 0;
 		}),
