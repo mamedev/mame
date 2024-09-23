@@ -13,13 +13,15 @@ license:CC0-1.0
 		<publisher>IBM</publisher>
 		<sharedfeat name="compatibility" value="800,820,850" />
 		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="AIX 4 Volume 1 of 2" />
 			<diskarea name="cdrom">
 				<disk name="aix_4.1.5_disc_01" sha1="4c49c8190e33c2c7f13a74d7332d384edd6b3042" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="AIX 4 Volume 2 of 2" />
 			<diskarea name="cdrom">
-				<disk name="aix_4.1.5_disc_01" sha1="228afedd90619e89c6b466b4970bda0e5a3e9a13" />
+				<disk name="aix_4.1.5_disc_02" sha1="228afedd90619e89c6b466b4970bda0e5a3e9a13" />
 			</diskarea>
 		</part>
 	</software>
