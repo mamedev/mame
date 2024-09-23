@@ -19,7 +19,7 @@ license:CC0-1.0
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="aix_4.1.5_disc_01" sha1="228afedd90619e89c6b466b4970bda0e5a3e9a13" />
+				<disk name="aix_4.1.5_disc_02" sha1="228afedd90619e89c6b466b4970bda0e5a3e9a13" />
 			</diskarea>
 		</part>
 	</software>
