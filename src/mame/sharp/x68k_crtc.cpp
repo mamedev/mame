@@ -278,7 +278,7 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::vblank_irq)
 	if (val == 0)  // V-DISP off
 	{
 		m_vblank = 0;
-		vblank_line = m_vend + 1;
+		vblank_line = m_vend + (gfx_double_scan() ? 2 : 1);
 		if (vblank_line > m_vtotal)
 			vblank_line = m_vtotal;
 		irq_time = screen().time_until_pos(vblank_line, 2);
