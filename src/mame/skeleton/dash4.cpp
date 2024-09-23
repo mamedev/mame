@@ -17,6 +17,9 @@ to the development of complex applications in C++.
 It came bundled with the Altera Design Software for PCs "Quartus II":
 https://archive.org/details/altera-quartus-ii-version-2.2-manuals-software/
 
+Also, it came with a MemoHASP-1 parallel port security dongle labeled:
+"MemoHASP-1 R3b CCYRW NA 23967", "HASP ID= 75BB4C39", "SH4".
+
 DASH4 Rev. B PCB (1999):
       ____________________________________________________________________
      |                                  _____________       ______       |
