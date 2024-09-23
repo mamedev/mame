@@ -69,10 +69,10 @@ void bullion2_state::bullion2(machine_config &config)
 }
 
 ROM_START( bullion2 )
-	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "inder_sa_m-17_bullion_2_rom_0_020584.ci19", 0x00000, 0x10000, CRC(fb13407c) SHA1(16a3cdcbe87f17c4bb6a78a8ac47f58d25a4483f) )
-	ROM_LOAD( "inder_sa_m-17_bullion_2_rom_1_020584.ci20", 0x10000, 0x10000, CRC(4857aa2d) SHA1(4f80fde62ce0d0f85df009ac5c1021263049b95a) )
-	ROM_LOAD( "inder_sa_m-17_bullion_2_rom_2_020584.ci21", 0x20000, 0x10000, CRC(2f607456) SHA1(a52ad5e8aeeb7e67ff07569377f19de46ee185ea) )
+	ROM_REGION( 0x3000, "maincpu", 0 )
+	ROM_LOAD( "inder_sa_m-17_bullion_2_rom_0_020584.ci19", 0x0000, 0x1000, CRC(fb13407c) SHA1(16a3cdcbe87f17c4bb6a78a8ac47f58d25a4483f) )
+	ROM_LOAD( "inder_sa_m-17_bullion_2_rom_1_020584.ci20", 0x1000, 0x1000, CRC(4857aa2d) SHA1(4f80fde62ce0d0f85df009ac5c1021263049b95a) )
+	ROM_LOAD( "inder_sa_m-17_bullion_2_rom_2_020584.ci21", 0x2000, 0x1000, CRC(2f607456) SHA1(a52ad5e8aeeb7e67ff07569377f19de46ee185ea) )
 ROM_END
 
 
