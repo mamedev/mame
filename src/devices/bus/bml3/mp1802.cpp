@@ -79,12 +79,12 @@ const tiny_rom_entry *bml3bus_mp1802_device::device_rom_region() const
 	return ROM_NAME( mp1802 );
 }
 
-uint8_t bml3bus_mp1802_device::bml3_mp1802_r()
+uint8_t bml3bus_mp1802_device::read()
 {
 	return (m_fdc->drq_r() ? 0x00 : 0x80) | (m_fdc->intrq_r() ? 0x00 : 0x40);
 }
 
-void bml3bus_mp1802_device::bml3_mp1802_w(uint8_t data)
+void bml3bus_mp1802_device::write(uint8_t data)
 {
 	floppy_image_device *floppy = m_floppy[data & 0x03]->get_device();
 
@@ -126,7 +126,7 @@ void bml3bus_mp1802_device::device_start()
 
 void bml3bus_mp1802_device::device_reset()
 {
-	bml3_mp1802_w(0);
+	write(0);
 }
 
 void bml3bus_mp1802_device::map_exrom(address_space_installer &space)
@@ -139,5 +139,5 @@ void bml3bus_mp1802_device::map_io(address_space_installer &space)
 {
 	// install into memory
 	space.install_readwrite_handler(0xff00, 0xff03, read8sm_delegate(*m_fdc, FUNC(mb8866_device::read)), write8sm_delegate(*m_fdc, FUNC(mb8866_device::write)));
-	space.install_readwrite_handler(0xff04, 0xff04, read8smo_delegate(*this, FUNC(bml3bus_mp1802_device::bml3_mp1802_r)), write8smo_delegate(*this, FUNC(bml3bus_mp1802_device::bml3_mp1802_w)));
+	space.install_readwrite_handler(0xff04, 0xff04, read8smo_delegate(*this, FUNC(bml3bus_mp1802_device::read)), write8smo_delegate(*this, FUNC(bml3bus_mp1802_device::write)));
 }

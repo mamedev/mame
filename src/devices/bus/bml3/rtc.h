@@ -29,8 +29,8 @@ public:
 	// construction/destruction
 	bml3bus_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t bml3_rtc_r(offs_t offset);
-	void bml3_rtc_w(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
