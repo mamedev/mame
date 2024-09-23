@@ -11,12 +11,11 @@ References:
 - https://github.com/bml3mk5/EmuB-6892/blob/master/src/docs/spec.txt
 
 TODO:
-- keyboard break can NMI (as per bmjr);
+- keyboard break NMI (as per bmjr);
 - Move keyboard timer logic as 6845 hsync callback, fix logic (would key repeat too fast);
 - Cassette baud rate bump (can switch from 600 to 1200 bauds thru $ffd7);
+- implement sound as a bus slot device;
 - implement RAM expansion as bus slots (RAM3 at 0x8000-0xbfff, RAM4 at 0xc000-0xefff);
-- implement sound as a bus slot device (needs SW or a working example);
-- bus slots needs to use input_merger on NMI/IRQ/FIRQ;
 - bml3mk5: BANK REG $ffe8 (applies EMS for the RAM expansion?);
 - Cassettes requires manual press of play button when issuing a LOAD (verify);
 - Hitachi MB-S1 support (bumps memory map, adds an extra I/O layer);
@@ -34,7 +33,6 @@ TODO:
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
-#include "machine/bankdev.h"
 #include "machine/clock.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
@@ -46,7 +44,6 @@ TODO:
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#include "mbs1_mmu.h"
 
 namespace {
 
@@ -92,12 +89,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_bml3bus(*this, "bml3bus")
-		, m_banka(*this, "banka")
-		, m_bankc(*this, "bankc")
-		, m_banke(*this, "banke")
-		, m_bankf(*this, "bankf")
-		, m_bankg(*this, "bankg")
-		, m_rom_view(*this, "rom")
 		, m_p_chargen(*this, "chargen")
 		, m_crtc(*this, "crtc")
 		, m_cassette(*this, "cassette")
@@ -105,6 +96,12 @@ public:
 		, m_ym2203(*this, "ym2203")
 		, m_acia(*this, "acia")
 		, m_palette(*this, "palette")
+		, m_rom_view(*this, "rom")
+		, m_banka(*this, "banka")
+		, m_bankc(*this, "bankc")
+		, m_banke(*this, "banke")
+		, m_bankf(*this, "bankf")
+		, m_bankg(*this, "bankg")
 		, m_io_keyboard(*this, "X%u", 0U)
 	{ }
 
@@ -120,20 +117,9 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<bml3bus_device> m_bml3bus;
-	memory_view m_banka;
-	memory_view m_bankc;
-	memory_view m_banke;
-	memory_view m_bankf;
-	memory_view m_bankg;
-	memory_view m_rom_view;
-
 	virtual u8 get_attr_mask() { return 0x1f; }
 	virtual u8 get_ig_mode(u8 attr) { return 0; }
 	virtual u8 get_ig_dots(u8 tile, u8 ra, u8 xi) { return 0; }
-
-	uint8_t vram_r(offs_t offset);
-	void vram_w(offs_t offset, u8 data);
-
 private:
 	required_region_ptr<u8> m_p_chargen;
 	required_device<mc6845_device> m_crtc;
@@ -142,7 +128,13 @@ private:
 	optional_device<ym2203_device> m_ym2203;
 	required_device<acia6850_device> m_acia;
 	required_device<palette_device> m_palette;
+	memory_view m_rom_view;
 	//memory_view m_bank4;
+	memory_view m_banka;
+	memory_view m_bankc;
+	memory_view m_banke;
+	memory_view m_bankf;
+	memory_view m_bankg;
 	required_ioport_array<4> m_io_keyboard;
 
 	uint8_t mc6845_r(offs_t offset);
@@ -151,6 +143,8 @@ private:
 	void kb_sel_w(u8 data);
 	void mode_sel_w(u8 data);
 	void interlace_sel_w(u8 data);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, u8 data);
 	[[maybe_unused]] uint8_t psg_latch_r();
 	[[maybe_unused]] void psg_latch_w(u8 data);
 	uint8_t c_reg_sel_r();
@@ -241,36 +235,13 @@ protected:
 		}
 		return res;
 	}
-
-	void ig_ram_w(offs_t offset, u8 data);
-
-	memory_view m_ig_view;
 private:
+	memory_view m_ig_view;
 	required_device<gfxdecode_device> m_gfxdecode;
 	std::unique_ptr<u8[]> m_ig_ram;
+	void ig_ram_w(offs_t offset, u8 data);
 
 	u8 m_igen = 0;
-};
-
-class mbs1_state : public bml3mk5_state
-{
-public:
-	mbs1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: bml3mk5_state(mconfig, type, tag)
-		, m_mmu(*this, "mmu")
-	{ }
-
-	void mbs1(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-//  virtual void main_map(address_map &map) override;
-	virtual void system_io(address_map &map) override;
-	void s1_map(address_map &map);
-	void s1_ext_map(address_map &map);
-private:
-	required_device<mbs1_mmu_device> m_mmu;
 };
 
 MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
@@ -1171,70 +1142,6 @@ void bml3mk5_state::bml3mk5(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_bml3mk5);
 }
 
-void mbs1_state::s1_map(address_map &map)
-{
-	map(0x0000, 0xffff).rw(m_mmu, FUNC(mbs1_mmu_device::read), FUNC(mbs1_mmu_device::write));
-}
-
-// TODO: sloppily enough, a memory_view can't see that is actually on higher base
-// so using just map(0xf0000, 0xfffff).m(*this, FUNC(mbs1_state::main_map));
-// will just punt with "A memory_view must be installed at its configuration address."
-void mbs1_state::s1_ext_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0xf0000, 0xf03ff).ram();
-	map(0xf0400, 0xf43ff).rw(FUNC(mbs1_state::vram_r), FUNC(mbs1_state::vram_w));
-	map(0xf4400, 0xf7fff).ram();
-	map(0xf8000, 0xf9fff).ram();
-	map(0xfa000, 0xfbfff).view(m_banka);
-	m_banka[0](0xfa000, 0xfbfff).readonly().share("rama");
-	map(0xfa000, 0xfbfff).writeonly().share("rama");
-	map(0xfc000, 0xfdfff).view(m_bankc);
-	m_bankc[0](0xfc000, 0xfdfff).readonly().share("ramc");
-	map(0xfc000, 0xfdfff).writeonly().share("ramc");
-	map(0xfe000, 0xfefff).view(m_banke);
-	m_banke[0](0xfe000, 0xfefff).readonly().share("rame");
-	map(0xfe000, 0xfefff).writeonly().share("rame");
-	map(0xff000, 0xffeff).view(m_bankf);
-	m_bankf[0](0xff000, 0xffeff).readonly().share("ramf");
-	map(0xff000, 0xffeff).writeonly().share("ramf");
-	map(0xffff0, 0xfffff).view(m_bankg);
-	m_bankg[0](0xffff0, 0xfffff).readonly().share("ramg");
-	map(0xffff0, 0xfffff).writeonly().share("ramg");
-	map(0xf8000, 0xfffff).view(m_rom_view);
-	m_rom_view[0](0xfa000, 0xffeff).rom().region("maincpu", 0xa000);
-	m_rom_view[0](0xffff0, 0xfffff).rom().region("maincpu", 0xfff0);
-	map(0xfff00, 0xfffef).m(*this, FUNC(mbs1_state::system_io));
-	map(0xfa000, 0xfa7ff).view(m_ig_view);
-	m_ig_view[0](0xfa000, 0xfa7ff).writeonly().w(FUNC(mbs1_state::ig_ram_w));
-
-}
-
-void mbs1_state::system_io(address_map &map)
-{
-	bml3mk5_state::system_io(map);
-}
-
-void mbs1_state::machine_start()
-{
-	bml3mk5_state::machine_start();
-}
-
-
-void mbs1_state::machine_reset()
-{
-	bml3mk5_state::machine_reset();
-}
-
-
-void mbs1_state::mbs1(machine_config &config)
-{
-	bml3mk5_state::bml3mk5(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mbs1_state::s1_map);
-
-	MBS1_MMU(config, m_mmu, 0);
-	m_mmu->set_map(&mbs1_state::s1_ext_map);
-}
 
 /* ROM definition */
 // floppy-drive slot devices expect "maincpu" is sized 0x10000.
@@ -1276,29 +1183,9 @@ ROM_START( bml3mk5 )
 	ROM_LOAD("font.rom", 0x0000, 0x1000, BAD_DUMP CRC(0b6f2f10) SHA1(dc411b447ca414e94843636d8b5f910c954581fb) ) // handcrafted
 ROM_END
 
-ROM_START( mbs1 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD("rom1.rom", 0xa000, 0x5f00, CRC(b23b0530) SHA1(cb9a8352d2ba0fc0085e4219cd07c91c8447ab75) )
-	ROM_LOAD("rom2.rom", 0xfff0, 0x0010, CRC(63b9adb2) SHA1(62b950671b533d18bca36eae362f2bc26638b587) )
-
-	ROM_REGION( 0x8000, "s1boot", ROMREGION_ERASEFF )
-	ROM_LOAD("s1rom2.rom", 0x0000, 0x7e00, CRC(e266108c) SHA1(18af24fa8f123960562fbe1c58e209d06d62c205) )
-	ROM_LOAD("s1romi.rom", 0x7ff0, 0x0010, CRC(81cc0e4d) SHA1(7e52264e0fdb5cb9a3489c70842f4d12146060ba) )
-
-	ROM_REGION( 0x8000, "s1basic", ROMREGION_ERASEFF )
-	ROM_LOAD("s1bas1.rom", 0x0000, 0x8000, CRC(efb80721) SHA1(81c926f9fa658012cd04b30176aad800db46594e) )
-
-	ROM_REGION( 0x8000, "dictionary", ROMREGION_ERASEFF )
-	ROM_LOAD("s1dic.rom", 0x0000, 0x8000, NO_DUMP )
-
-	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD("font.rom", 0x0000, 0x1000, CRC(d1f27c5a) SHA1(a3abbdea9f6656bd795fd35ee806a54d7be35de0) )
-ROM_END
-
 } // anonymous namespace
 
 
 COMP( 1980, bml3,    0,     0,      bml3,    bml3,     bml3_state,    empty_init, "Hitachi", "Basic Master Level 3 (MB-6890)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1982, bml3mk2, bml3,  0,      bml3mk2, bml3,     bml3mk2_state, empty_init, "Hitachi", "Basic Master Level 3 Mark II (MB-6891)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1983, bml3mk5, bml3,  0,      bml3mk5, bml3mk5,  bml3mk5_state, empty_init, "Hitachi", "Basic Master Level 3 Mark 5 (MB-6892)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1984, mbs1,    0,     0,      mbs1,    bml3mk5,  mbs1_state,    empty_init, "Hitachi", "MB-S1", MACHINE_NOT_WORKING )
