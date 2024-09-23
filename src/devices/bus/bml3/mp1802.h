@@ -32,8 +32,8 @@ public:
 	// construction/destruction
 	bml3bus_mp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t bml3_mp1802_r();
-	void bml3_mp1802_w(uint8_t data);
+	uint8_t read();
+	void write(uint8_t data);
 
 protected:
 	virtual void device_start() override;

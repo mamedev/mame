@@ -35,7 +35,7 @@ void bml3bus_rtc_device::device_add_mconfig(machine_config &config)
 }
 
 
-uint8_t bml3bus_rtc_device::bml3_rtc_r(offs_t offset)
+uint8_t bml3bus_rtc_device::read(offs_t offset)
 {
 	uint8_t data = 0x00;
 
@@ -53,7 +53,7 @@ uint8_t bml3bus_rtc_device::bml3_rtc_r(offs_t offset)
 	return data | 0xf0; // return low nibble only
 }
 
-void bml3bus_rtc_device::bml3_rtc_w(offs_t offset, uint8_t data)
+void bml3bus_rtc_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -105,5 +105,5 @@ void bml3bus_rtc_device::device_start()
 void bml3bus_rtc_device::map_io(address_space_installer &space)
 {
 	// install into memory
-	space.install_readwrite_handler(0xff38, 0xff3a, read8sm_delegate(*this, FUNC(bml3bus_rtc_device::bml3_rtc_r)), write8sm_delegate(*this, FUNC(bml3bus_rtc_device::bml3_rtc_w)));
+	space.install_readwrite_handler(0xff38, 0xff3a, read8sm_delegate(*this, FUNC(bml3bus_rtc_device::read)), write8sm_delegate(*this, FUNC(bml3bus_rtc_device::write)));
 }
