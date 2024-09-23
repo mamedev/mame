@@ -38939,10 +38939,6 @@ cp2000
 @source:saitek/delta1.cpp
 ccdelta1
 
-@source:saitek/ecbackg.cpp
-ecbackg
-sbackgc
-
 @source:saitek/edames.cpp
 edames
 
@@ -38985,6 +38981,10 @@ renaissaa
 montreux
 risc2500
 risc2500a
+
+@source:saitek/sbackgc.cpp
+ecbackg
+sbackgc
 
 @source:saitek/schess.cpp
 schess
