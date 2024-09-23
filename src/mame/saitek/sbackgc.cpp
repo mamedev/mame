@@ -6,7 +6,8 @@
 Saitek Sensory Backgammon Computer / Electronic Champion Backgammon
 
 NOTE: Before exiting MAME, change the power switch from GO to STOP. Otherwise,
-NVRAM won't save properly.
+NVRAM won't save properly. For sbackgc, only turn it off when it's the user's
+turn to move.
 
 These were supposedly programmed by Eric van Riet Paap (not sure about Sensory,
 but pretty certain about Champion). The Champion program got 3rd place in the
@@ -457,11 +458,11 @@ void sbackgc_state::leds_w(u8 data)
 
 u8 sbackgc_state::buttons_r()
 {
-	u8 data = 0;
+	u8 data = 0xf;
 
 	for (int i = 0; i < 4; i++)
 		if (m_inp_mux & m_inputs[i]->read())
-			data |= 1 << i;
+			data ^= 1 << i;
 
 	return data;
 }
@@ -469,25 +470,27 @@ u8 sbackgc_state::buttons_r()
 u8 sbackgc_state::input1_r()
 {
 	// R90-R93: multiplexed inputs
-	// read buttons (high)
-	u8 data = buttons_r() & 0xc;
+	u8 data = 0xf;
 
 	// read board
 	for (int i = 0; i < 4; i++)
 		if (m_inp_mux & board_r(i))
-			data |= 1 << i;
+			data ^= 1 << i;
 
-	return ~data;
+	// read buttons (high)
+	return data & (buttons_r() | 3);
 }
 
 u16 sbackgc_state::input2_r()
 {
 	// D11,D12: read buttons (low)
-	u16 data = ~buttons_r() << 11 & 0x1800;
+	u16 data = buttons_r() << 11 & 0x1800;
 
 	// D13: power switch state
+	data |= m_power ? 0x2000 : 0;
+
 	// D15: freq sel (3MHz or 5MHz)
-	return data | (m_power ? 0x2000 : 0) | 0x800f;
+	return data | 0x800f;
 }
 
 void sbackgc_state::control_w(u16 data)
