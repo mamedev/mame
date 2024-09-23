@@ -45702,6 +45702,7 @@ trkfldch                        // (c) 2007 Konami
 tvgame                          // 2011
 
 @source:tvgames/xavix.cpp
+bistro                          //
 ddrfammt                        //
 ekara                           //
 ekaraa                          //
@@ -45719,6 +45720,7 @@ epo_epp2
 epo_epp3                        //
 epo_eppk                        //
 epo_esdx                        //
+epo_esht                        //
 epo_guru                        //
 epo_tenn                        //
 epo_tfp2                        //
