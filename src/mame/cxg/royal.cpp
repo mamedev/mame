@@ -18,8 +18,8 @@ Hardware notes:
 - chessboard buttons, 16+4 LEDs, piezo
 
 Royal has 2 LCD panels, Supra has 1 (D12 pin is low), Granada and others have 0.
-The LCD panel has 4 7segs and 2 unused segments: an x in the middle, and a white
-square under the first digit.
+The LCD panel has 4 7segs (no DP) and 2 unused segments: an x in the middle, and
+a white square under the first digit.
 
 The 1992 versions by National Telecommunications System Ltd (Granada CXG-347,
 Sierra, Seville) have a lower-speed 3.58MHz XTAL, but since none of them have
@@ -203,7 +203,8 @@ template<int N>
 void royal_state::input_w(u8 data)
 {
 	// R3x,R4x: input mux, LED data
-	m_inp_mux = (m_inp_mux & ~(0xf << (N*4))) | (data << (N*4));
+	const u8 shift = 4 * N;
+	m_inp_mux = (m_inp_mux & ~(0xf << shift)) | (data << shift);
 	m_led_pwm->write_mx(~m_inp_mux);
 }
 
