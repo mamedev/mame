@@ -41950,6 +41950,9 @@ bp1200                          // (c) 1991 BP Microsystems
 @source:skeleton/br8641.cpp
 br8641                          //
 
+@source:skeleton/bullion2.cpp
+bullion2                        // (c) 1984 Inder
+
 @source:skeleton/busicom.cpp
 busicom                         //
 
