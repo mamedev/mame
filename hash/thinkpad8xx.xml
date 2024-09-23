@@ -53,8 +53,8 @@ license:CC0-1.0
 		<part name="flop" interface="floppy">
 			<feature name="part_id" value="Solaris MDB Boot 2.5.1 Release PowerPC Platform Edition (IBM Hardware Platform)"/>
 			<feature name="part_number" value="702-4348-06"/>
-			<dataarea name="flop" size="168000">
-				<rom name="solaris_2_5_1_mdb_boot_ppc_ibm.img" size="168000" crc="b45832e2" sha1="be9e11364816ab5f3362396ed0f457d4a2e61188" />
+			<dataarea name="flop" size="1474560">
+				<rom name="solaris_2_5_1_mdb_boot_ppc_ibm.img" size="1474560" crc="b45832e2" sha1="be9e11364816ab5f3362396ed0f457d4a2e61188" />
 			</dataarea>
 		</part>
 		<part name="cdrom1" interface="cdrom">
@@ -79,8 +79,8 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="800,820,850" />
 		<part name="flop" interface="floppy">
 			<feature name="part_id" value="Windows NT ARC Boot Firmware v1.51"/>
-			<dataarea name="flop" size="168000">
-				<rom name="winnt_arc_151.img" size="168000" crc="98db8c77" sha1="56be119ce7a0020bf4caabd099d2eae8e249305c" />
+			<dataarea name="flop" size="1474560">
+				<rom name="winnt_arc_151.img" size="1474560" crc="98db8c77" sha1="56be119ce7a0020bf4caabd099d2eae8e249305c" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
