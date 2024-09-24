@@ -17,6 +17,7 @@ public:
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
+	u8 bank_r(offs_t offset);
 	void bank_w(offs_t offset, u8 data);
 
 protected:

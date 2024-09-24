@@ -46,8 +46,13 @@ void mbs1_mmu_device::device_start()
 void mbs1_mmu_device::device_reset()
 {
 	// Mark 5 mode
-	for (int i = 0; i < 16; i++)
+//  for (int i = 0; i < 16; i++)
+//      m_bank_latch[i] = 0xf0 | i;
+
+	for (int i = 0; i < 14; i++)
 		m_bank_latch[i] = 0xf0 | i;
+	m_bank_latch[0xe] = 0x84;
+	m_bank_latch[0xf] = 0xef;
 }
 
 u8 mbs1_mmu_device::read(offs_t offset)
@@ -58,6 +63,11 @@ u8 mbs1_mmu_device::read(offs_t offset)
 void mbs1_mmu_device::write(offs_t offset, u8 data)
 {
 	m_space->write_byte((offset & 0xfff) | (m_bank_latch[offset >> 12] << 12), data);
+}
+
+u8 mbs1_mmu_device::bank_r(offs_t offset)
+{
+	return m_bank_latch[offset];
 }
 
 void mbs1_mmu_device::bank_w(offs_t offset, u8 data)

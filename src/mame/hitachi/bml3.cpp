@@ -269,6 +269,7 @@ protected:
 	virtual void system_io(address_map &map) override;
 	void s1_map(address_map &map);
 	void s1_ext_map(address_map &map);
+	void s1_ext_io(address_map &map);
 private:
 	required_device<mbs1_mmu_device> m_mmu;
 };
@@ -1182,6 +1183,22 @@ void mbs1_state::s1_map(address_map &map)
 void mbs1_state::s1_ext_map(address_map &map)
 {
 	map.unmap_value_high();
+//  map(0x00000, 0x7ffff) extended RAM
+
+//  map(0x84000, 0x8ffff) mirror of main work RAM +$4000
+	map(0x84000, 0x8ffff).ram();
+//  map(0xb0000, 0xb3fff) GVRAM
+//  map(0xb4000, 0xbbfff) extra GVRAM banks
+//  map(0xbc000, 0xbc7ff).mirror(0x800) TVRAM
+//  map(0xc0000, 0xc6fff) ROM for MPC-CM01 (card?)
+//  map(0xc7000, 0xc7fff) EEPROM for MPC-CM01
+	map(0xd0000, 0xd7fff).rom().region("dictionary", 0);
+	map(0xe0000, 0xe7fff).rom().region("s1basic", 0);
+//  map(0xe2000, 0xe2fff) view overlay for MPC-CM01
+	map(0xe8000, 0xeffff).rom().region("s1boot", 0);
+	map(0xefe00, 0xefeff).m(*this, FUNC(mbs1_state::s1_ext_io));
+	map(0xeff00, 0xeffff).m(*this, FUNC(mbs1_state::system_io));
+
 	map(0xf0000, 0xf03ff).ram();
 	map(0xf0400, 0xf43ff).rw(FUNC(mbs1_state::vram_r), FUNC(mbs1_state::vram_w));
 	map(0xf4400, 0xf7fff).ram();
@@ -1210,9 +1227,29 @@ void mbs1_state::s1_ext_map(address_map &map)
 
 }
 
+// relative to $efe00
+void mbs1_state::s1_ext_io(address_map &map)
+{
+	map(0x00, 0x0f).rw(m_mmu, FUNC(mbs1_mmu_device::bank_r), FUNC(mbs1_mmu_device::bank_w));
+//  map(0x10, 0x10) FUSE (w/o)
+//  map(0x11, 0x11) OS-9 address segment
+//  map(0x18, 0x18) TRAP (r/o)
+//  map(0x19, 0x19) BUS control
+//  map(0x1a, 0x1b) Pro-control / Acc-control for MPC-68008
+//  map(0x20, 0x20) BMSK color (w/o)
+//  map(0x21, 0x21) Active graphic plane
+//  map(0x23, 0x23) Display page
+//  map(0x24, 0x24) SCRN mode
+//  map(0x25, 0x27) BRG graphic color
+//  map(0x28, 0x2f) palette
+//  map(0x40, 0x41) PIA 1 (DE-9)
+//  map(0x42, 0x43) PIA 2 (Printer, mirror of 0xffc2-c3)
+}
+
 void mbs1_state::system_io(address_map &map)
 {
 	bml3mk5_state::system_io(map);
+//  map(0xeffeb, 0xeffeb) system mode switches
 }
 
 void mbs1_state::machine_start()
