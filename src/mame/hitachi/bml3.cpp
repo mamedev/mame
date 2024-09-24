@@ -924,10 +924,6 @@ void bml3mk5_state::bml3mk5(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_bml3mk5);
 }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 /* ROM definition */
 // floppy-drive slot devices expect "maincpu" is sized 0x10000.
 ROM_START( bml3 )
@@ -968,12 +964,6 @@ ROM_START( bml3mk5 )
 	ROM_LOAD("font.rom", 0x0000, 0x1000, BAD_DUMP CRC(0b6f2f10) SHA1(dc411b447ca414e94843636d8b5f910c954581fb) ) // handcrafted
 ROM_END
 
-<<<<<<< HEAD
-=======
-} // anonymous namespace
-
-
->>>>>>> master
 COMP( 1980, bml3,    0,     0,      bml3,    bml3,     bml3_state,    empty_init, "Hitachi", "Basic Master Level 3 (MB-6890)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1982, bml3mk2, bml3,  0,      bml3mk2, bml3,     bml3mk2_state, empty_init, "Hitachi", "Basic Master Level 3 Mark II (MB-6891)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1983, bml3mk5, bml3,  0,      bml3mk5, bml3mk5,  bml3mk5_state, empty_init, "Hitachi", "Basic Master Level 3 Mark 5 (MB-6892)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
