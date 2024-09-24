@@ -42149,6 +42149,7 @@ rp200
 gimix                           //
 
 @source:skeleton/gm1000.cpp
+bh1000
 gm1000                          //
 
 @source:skeleton/gnat10.cpp
