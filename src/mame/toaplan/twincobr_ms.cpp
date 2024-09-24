@@ -7,8 +7,7 @@
     As with most of the 'Modular System' setups, the hardware is heavily modified from the original
     and consists of a multi-board stack in a cage, hence different driver.
 
-    This set was assembled from a stack of loose PCBs, so for this game the Modular System cage contains
-    7 boards:
+    For this game the Modular System cage contains 7 boards:
 
     MOD-6/1   - MC68000P10, 3 ROMs, RAMs, 20 MHz Xtal.
     MOD 1/3   - Sound board (Z840006PSC, 2 x YM2203C, 2 x Y3014B, 1 ROM). Two 8 dip switches banks.
