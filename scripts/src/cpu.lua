@@ -1422,6 +1422,8 @@ if CPUS["KL1839VM1"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1.cpp",
 		MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1.h",
+		MAME_DIR .. "src/devices/cpu/vax/vaxdasm.cpp",
+		MAME_DIR .. "src/devices/cpu/vax/vaxdasm.h",
 	}
 end
 

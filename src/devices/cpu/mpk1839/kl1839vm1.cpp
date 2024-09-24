@@ -5,6 +5,8 @@
 
 #include "kl1839vm1.h"
 #include "kl1839vm1dasm.h"
+#include "cpu/vax/vaxdasm.h"
+#include <regex>
 
 
 #define VERBOSE ( LOG_GENERAL )
@@ -12,15 +14,13 @@
 
 #define UNIMPLEMENTED(msg) LOG("Unimplemented: %s\n", msg)
 
-#define MCA    m_mca.w.l // Micro Command Address
-#define VMA    m_vma.d   // Virtual Memory Address
-#define RV     m_rv.d
-#define SCH    m_sch.b.l // Program Counter
-#define RSP    m_rsp.b.l
+#define RV     m_rv.d    // Return Address
+#define SCH    m_sch.b.l // Counter
+#define RSP    m_rsp.b.l // Flags
 
 #define K(x)   m_consts[x & 0x0f]
-#define PCM    K(5)
-#define RC     K(6)
+#define PCM    K(5)      // Microcode PC
+#define RC     K(6)      // Constant
 
 /* registers of various sizes */
 #define R(x)   m_reg[x].d
@@ -50,6 +50,7 @@ kl1839vm1_device::kl1839vm1_device(const machine_config &mconfig,  const char *t
 	, m_sysram_config("sysram", ENDIANNESS_BIG, 8, 24, 0)
 	, m_ram_config("ram", ENDIANNESS_LITTLE, 8, 24, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 6, -2)
+	, m_in_cmd_decode_cb(*this, 0)
 {
 }
 
@@ -241,7 +242,7 @@ void kl1839vm1_device::ma(u32 op)
 	const bool py = BIT(op, 2);
 	const bool px = BIT(op, 1);
 
-	if (am==5 || am==8 || am>=0xd)
+	if (am==8 || am>=0xd)
 		UNIMPLEMENTED("Read regs with data mirror");
 
 	if (po | py | px)
@@ -254,7 +255,7 @@ void kl1839vm1_device::ma(u32 op)
 	{
 		kob_data = R(x);
 	}
-	kob_process(no, fo, kob, kob_data);
+	kob_process(no, fo, kob, kob_data, R(x));
 }
 
 void kl1839vm1_device::mb(u32 op)
@@ -284,7 +285,7 @@ void kl1839vm1_device::mb(u32 op)
 	{
 		kob_data = R(x);
 	}
-	kob_process(no, fo, kob, kob_data);
+	kob_process(no, fo, kob, kob_data, R(x));
 }
 
 void kl1839vm1_device::mc(u32 op)
@@ -315,7 +316,7 @@ void kl1839vm1_device::mk(u32 op)
 	const bool ret = BIT(op, 17);
 	if (!ret)
 	{
-		RV = MCA;
+		RV = PCM;
 	}
 
 	if ((op & 0xfe000000) == 0xe0000000)
@@ -323,19 +324,19 @@ void kl1839vm1_device::mk(u32 op)
 		if (BIT(~op, 16)) // madr == 0
 		{
 			const u16 addr = BIT(op, 2, 14);
-			MCA = addr;
+			PCM = addr;
 		}
 		else
 		{
 			u16 addr_hi = BIT(op, 8, 8) << 6;
-			MCA = addr_hi | (R(0x18) & 0x3f);
+			PCM = addr_hi | (R(0x18) & 0x3f);
 		}
 	}
 	else if ((op & 0xfe000000) == 0xe2000000)
 	{
 		u16 addr_hi = BIT(op, 8, 8) << 6;
 		//u8 rpp = BIT(op, 2, 4); // TODO rpp irq code
-		MCA = addr_hi;
+		PCM = addr_hi;
 	}
 }
 
@@ -371,9 +372,9 @@ void kl1839vm1_device::yp(u32 op)
 	{
 		if (!ret)
 		{
-			RV = MCA;
+			RV = PCM;
 		}
-		MCA = addr;
+		PCM = addr;
 	}
 }
 
@@ -398,14 +399,14 @@ void kl1839vm1_device::psch(u32 op)
 	if (madr)
 	{
 		const u16 addr_hi = BIT(op, 8, 8) << 6;
-		MCA = addr_hi | (R(0x18) & 0x3f);
+		PCM = addr_hi | (R(0x18) & 0x3f);
 	}
 	else
 	{
 		if (SCH--)
 		{
 			const u16 addr = BIT(op, 2, 14);
-			MCA = addr;
+			PCM = addr;
 		}
 
 	}
@@ -413,7 +414,7 @@ void kl1839vm1_device::psch(u32 op)
 
 void kl1839vm1_device::rts(u32 op)
 {
-	MCA = RV;
+	PCM = RV;
 }
 
 void kl1839vm1_device::acc(u32 op)
@@ -463,7 +464,7 @@ void kl1839vm1_device::srf(u32 op)
 	}
 	if (BIT(op, 4)) // OCT
 	{
-		--MCA;
+		//--PCM;
 	}
 	if (BIT(op, 2)) // JDZRA
 	{
@@ -479,16 +480,21 @@ void kl1839vm1_device::invalid(u32 op)
 {
 }
 
-void kl1839vm1_device::kob_process(u8 no, u8 fo, u8 kob, u32 data)
+void kl1839vm1_device::kob_process(u8 no, u8 fo, u8 kob, u32 kob_data, u32 data)
 {
 	switch (kob) {
 		case 0b001: // Data Read
 		case 0b010: // Data Write
 		case 0b011: // Read-Modify-Write
-			m_vma_tmp.d = (no << 30) | (fo << 28) | (kob << 24) | data;
+			m_vma_tmp.d = (no << 30) | (fo << 28) | (kob << 24) | kob_data;
 			break;
 		case 0b100: // Write Accum R(17)
+			R(0x17) = data;
+			break;
 		case 0b101: // Read Command
+			PCM = m_in_cmd_decode_cb(data);
+			PC += 4;
+			break;
 		case 0b110: // Offset Write
 			UNIMPLEMENTED("KOB");
 			break;
@@ -545,13 +551,13 @@ void kl1839vm1_device::decode_op(u32 op)
 
 void kl1839vm1_device::device_start()
 {
+	m_vax_dasm = std::make_unique<vax_disassembler>();
+
 	space(AS_OPCODES).cache(m_microcode);
 	space(AS_DATA).specific(m_sysram);
 	space(AS_PROGRAM).specific(m_ram);
 	space(AS_IO).specific(m_io);
 
-	save_item(NAME(m_mca));
-	save_item(NAME(m_vma));
 	save_item(NAME(m_vma_tmp));
 	save_item(NAME(m_rv));
 	save_item(NAME(m_sch));
@@ -562,15 +568,14 @@ void kl1839vm1_device::device_start()
 	save_pointer(NAME(m_consts), 0x10);
 
 	// Register debugger state
-	state_add(KL1839_MCA, "MCA", MCA).formatstr("%04X");
-	state_add(KL1839_VMA, "VMA", VMA).formatstr("%08X");
+	state_add(KL1839_PCM, "PCM",  PCM).formatstr("%08X");
+	state_add(KL1839_RSP, "RSP",  RSP).formatstr("%08s");
+	state_add(KL1839_IF,  "cond", m_fp).formatstr("%08s");
+	state_add(KL1839_RC,  "RC",   RC).formatstr("%08X");
+	state_add(KL1839_RV,  "RV",   RV).formatstr("%08X");
+	state_add(KL1839_SCH, "SCH",  SCH).formatstr("%02X");
 	state_add_divider(-1);
-	state_add(KL1839_IF,  "cond",  m_fp).formatstr("%08s");
-	state_add(KL1839_RSP, "RSP",   RSP).formatstr("%08s");
-	state_add(KL1839_PCM, "PCM",   PCM).formatstr("%08X");
-	state_add(KL1839_RC,  "RC",    RC).formatstr("%08X");
-	state_add(KL1839_RV,  "RV",    RV).formatstr("%08X");
-	state_add(KL1839_SCH, "SCH",   SCH).formatstr("%02X");
+	state_add(VAX_INST,   "INST", PC).formatstr("%20s");
 	state_add_divider(-1);
 	state_add(VAX_AP, "AP", AP).formatstr("%08X");
 	state_add(VAX_FP, "FP", FP).formatstr("%08X");
@@ -605,7 +610,7 @@ void kl1839vm1_device::device_start()
 	state_add(VAX_PSL, "PSL", PSL).formatstr("%08X");
 	state_add(VAX_BO,  "BO",  BO).formatstr("%08X");
 
-	state_add(STATE_GENPC, "GENPC", MCA).noshow(); // ???
+	state_add(STATE_GENPC, "GENPC", PCM).noshow(); // ???
 	state_add(STATE_GENPCBASE, "CURPC", m_ppc.d).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", PSW).formatstr("%8s").noshow();
 
@@ -643,6 +648,17 @@ void kl1839vm1_device::state_string_export(const device_state_entry &entry, std:
 		case KL1839_IF:
 			str = string_format("FP%d", m_fp);
 			break;
+		case VAX_INST:
+			{
+				address_space &m_space = space(AS_PROGRAM);
+				std::ostringstream buffer;
+				disasm_data_buffer databuf(m_space);
+				m_vax_dasm->disassemble(buffer, PC, databuf, databuf);
+
+				std::regex reg("\\s+");
+				str = regex_replace(buffer.str(), reg, " ");
+			}
+			break;
 	}
 }
 
@@ -651,8 +667,7 @@ void kl1839vm1_device::device_reset()
 	for (auto &reg : m_reg)
 		reg.d = 0;
 
-	m_ppc.d = MCA = 0x2000;
-	VMA = 0;
+	m_ppc.d = PCM = 0x2000;
 	m_fp = false;
 	RSP = 0;
 	m_vma_tmp.d = 0;
@@ -668,12 +683,12 @@ void kl1839vm1_device::execute_run()
 {
 	do
 	{
-		m_ppc.d = MCA;
+		m_ppc.d = PCM;
 		debugger_instruction_hook(m_ppc.d);
 
-		u32 op = m_microcode.read_dword(MCA);
+		u32 op = m_microcode.read_dword(PCM);
 		m_icount -= 2;
-		++MCA &= 0x3fff;
+		++PCM &= 0x3fff;
 
 		decode_op(op);
 	} while (m_icount > 0);
