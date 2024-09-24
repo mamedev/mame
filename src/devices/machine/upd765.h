@@ -595,6 +595,7 @@ public:
 	hd63266f_device(const machine_config &mconfig, const char *tag, device_t* owner, uint32_t clock);
 
 	virtual void map(address_map &map) override ATTR_COLD;
+	virtual uint8_t get_st3(floppy_info &fi) override;
 	auto inp_rd_callback() { return inp_cb.bind(); } // this is really the ts signal
 
 	void rate_w(u8 state) { state ? set_rate(500000) : set_rate(250000); }

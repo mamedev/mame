@@ -12,7 +12,7 @@
     H8/3044         32K         2K
     H8/3045         64K         2K
     H8/3047         96K         4K
-    H8/3048        192K         4K
+    H8/3048        128K         4K
 
     The 3394, 3396, and 3997 variants are the mask-rom versions.
 
@@ -34,6 +34,9 @@
 class h83048_device : public h8h_device {
 public:
 	h83048_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	auto tend0() { return m_tend_cb[0].bind(); }
+	auto tend1() { return m_tend_cb[1].bind(); }
 
 	auto read_port1()  { return m_read_port [PORT_1].bind(); }
 	auto write_port1() { return m_write_port[PORT_1].bind(); }
@@ -89,6 +92,8 @@ protected:
 	required_device<h8h_timer16_channel_device> m_timer16_3;
 	required_device<h8h_timer16_channel_device> m_timer16_4;
 	required_device<h8_watchdog_device> m_watchdog;
+
+	devcb_write_line::array<2> m_tend_cb;
 
 	u32 m_ram_start;
 	u8 m_syscr;

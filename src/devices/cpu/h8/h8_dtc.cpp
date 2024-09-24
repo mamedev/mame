@@ -214,7 +214,6 @@ void h8_dtc_device::writeback_done(int vector)
 			m_intc->internal_interrupt(vector);
 		} else {
 			logerror("Software dtc done\n");
-			exit(0);
 		}
 	}
 
