@@ -4,7 +4,8 @@
 
   Hitachi HMCS40 MCU family disassembler
 
-  NOTE: start offset(basepc) is $3F, not 0
+  NOTE: start offset(basepc) is $3F, not 0. In other words, if you want a full
+  disasm from MAME's debugger: dasm x.asm,3f,1000
 
 */
 
