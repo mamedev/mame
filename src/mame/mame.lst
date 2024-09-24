@@ -42379,9 +42379,6 @@ p8000_16                        //
 @source:skeleton/palestra.cpp
 palestra
 
-@source:skeleton/pap2.cpp
-pap2
-
 @source:skeleton/pcksurfer.cpp
 pcksurfer                       // (c) 2006 Datawind
 
