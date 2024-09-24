@@ -45,8 +45,6 @@ void mbs1_mmu_device::device_start()
 
 void mbs1_mmu_device::device_reset()
 {
-	// Mark 5 mode
-
 }
 
 // TODO: should not reset everything when in user mode
@@ -62,6 +60,7 @@ void mbs1_mmu_device::init_banks(bool system_type, bool user_mode)
 	}
 	else
 	{
+		// Level 3 mode
 		for (i = 0; i < 16; i++)
 			m_bank_latch[i] = 0xf0 | i;
 	}

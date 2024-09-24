@@ -29,7 +29,7 @@ protected:
 	virtual void device_reset() override;
 private:
 	const address_space_config m_space_config;
-	address_space *     m_space;
+	address_space *m_space;
 
 	u8 m_bank_latch[16]{};
 };

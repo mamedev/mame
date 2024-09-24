@@ -4,7 +4,9 @@
 
 MB-S1 (c) 1984 Hitachi
 
-
+TODO:
+- Cassette won't load, not even in Level 3 mode;
+- Many features missing;
 
 **************************************************************************************************/
 
