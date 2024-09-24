@@ -404,7 +404,7 @@ void dcs_audio_device::dsio_data_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).m(m_ram_map, FUNC(address_map_bank_device::amap16));
-	map(0x2000, 0x3fdf).ram().share(m_internal_data_ram);
+	map(0x2000, 0x3fdf).ram();
 	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
@@ -444,7 +444,7 @@ void dcs_audio_device::denver_data_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).m(m_ram_map, FUNC(address_map_bank_device::amap16));
-	map(0x2000, 0x3fdf).ram().share(m_internal_data_ram);
+	map(0x2000, 0x3fdf).ram();
 	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
@@ -693,7 +693,6 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_bootrom(*this, DEVICE_SELF),
 	m_internal_program_ram(*this, "dcsint"),
 	m_external_program_ram(*this, "dcsext"),
-	m_internal_data_ram(*this, "dcsint_data"),
 	m_iram(*this, "iram"),
 	m_data_bank(*this, "databank"),
 	m_rom_page(*this, "rompage"),
