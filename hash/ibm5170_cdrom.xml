@@ -3314,6 +3314,21 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/29283/ -->
+	<!-- <rom name="Cricket96.cue" size="341" crc="bf3628e5" sha1="405b1c3d89b228805638560b658694fd64e67542"/> -->
+	<!-- <rom name="Cricket96.bin" size="82938576" crc="499c6b9d" sha1="5db2f8feb41ba76fb287451a8d202fba5ee81125"/> -->
+	<software name="eacric96">
+		<description>EA Sports Cricket 96 (South Africa)</description>
+		<year>1995</year>
+		<publisher>Electronic Arts</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Cricket96" sha1="50ad5ca0290594332e740abf829c6cfa4f5b4bd8" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="elecpop">
 		<description>Electronic Popple (Japan)</description>
 		<year>1997</year>
