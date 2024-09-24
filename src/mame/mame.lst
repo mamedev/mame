@@ -19718,6 +19718,8 @@ bmjr                            //
 bml3                            //
 bml3mk2                         //
 bml3mk5                         //
+
+@source:hitachi/mbs1.cpp
 mbs1                            //
 
 @source:homebrew/4004clk.cpp

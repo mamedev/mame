@@ -46,13 +46,25 @@ void mbs1_mmu_device::device_start()
 void mbs1_mmu_device::device_reset()
 {
 	// Mark 5 mode
-//  for (int i = 0; i < 16; i++)
-//      m_bank_latch[i] = 0xf0 | i;
 
-	for (int i = 0; i < 14; i++)
-		m_bank_latch[i] = 0xf0 | i;
-	m_bank_latch[0xe] = 0x84;
-	m_bank_latch[0xf] = 0xef;
+}
+
+// TODO: should not reset everything when in user mode
+void mbs1_mmu_device::init_banks(bool system_type, bool user_mode)
+{
+	int i;
+	if (system_type == true)
+	{
+		for (i = 0; i < 14; i++)
+			m_bank_latch[i] = 0xf0 | i;
+		m_bank_latch[0xe] = 0x84;
+		m_bank_latch[0xf] = 0xef;
+	}
+	else
+	{
+		for (i = 0; i < 16; i++)
+			m_bank_latch[i] = 0xf0 | i;
+	}
 }
 
 u8 mbs1_mmu_device::read(offs_t offset)

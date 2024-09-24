@@ -20,6 +20,8 @@ public:
 	u8 bank_r(offs_t offset);
 	void bank_w(offs_t offset, u8 data);
 
+	void init_banks(bool system_type, bool user_mode);
+
 protected:
 	virtual space_config_vector memory_space_config() const override;
 
