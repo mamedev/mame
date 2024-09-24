@@ -16,7 +16,7 @@
 hmcs40_disassembler::hmcs40_disassembler()
 {
 	// init lfsr pc lut
-	for (u32 i = 0, pc = 0; i < 0x40; i++)
+	for (u32 i = 0, pc = 0x3f; i < 0x40; i++)
 	{
 		m_l2r[i] = pc;
 		m_r2l[pc] = i;

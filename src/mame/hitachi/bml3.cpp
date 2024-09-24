@@ -11,12 +11,11 @@ References:
 - https://github.com/bml3mk5/EmuB-6892/blob/master/src/docs/spec.txt
 
 TODO:
-- keyboard break can NMI (as per bmjr);
+- keyboard break NMI (as per bmjr);
 - Move keyboard timer logic as 6845 hsync callback, fix logic (would key repeat too fast);
 - Cassette baud rate bump (can switch from 600 to 1200 bauds thru $ffd7);
+- implement sound as a bus slot device;
 - implement RAM expansion as bus slots (RAM3 at 0x8000-0xbfff, RAM4 at 0xc000-0xefff);
-- implement sound as a bus slot device (needs SW or a working example);
-- bus slots needs to use input_merger on NMI/IRQ/FIRQ;
 - bml3mk5: BANK REG $ffe8 (applies EMS for the RAM expansion?);
 - Cassettes requires manual press of play button when issuing a LOAD (verify);
 
@@ -925,6 +924,10 @@ void bml3mk5_state::bml3mk5(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_bml3mk5);
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 /* ROM definition */
 // floppy-drive slot devices expect "maincpu" is sized 0x10000.
 ROM_START( bml3 )
@@ -965,6 +968,12 @@ ROM_START( bml3mk5 )
 	ROM_LOAD("font.rom", 0x0000, 0x1000, BAD_DUMP CRC(0b6f2f10) SHA1(dc411b447ca414e94843636d8b5f910c954581fb) ) // handcrafted
 ROM_END
 
+<<<<<<< HEAD
+=======
+} // anonymous namespace
+
+
+>>>>>>> master
 COMP( 1980, bml3,    0,     0,      bml3,    bml3,     bml3_state,    empty_init, "Hitachi", "Basic Master Level 3 (MB-6890)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1982, bml3mk2, bml3,  0,      bml3mk2, bml3,     bml3mk2_state, empty_init, "Hitachi", "Basic Master Level 3 Mark II (MB-6891)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1983, bml3mk5, bml3,  0,      bml3mk5, bml3mk5,  bml3mk5_state, empty_init, "Hitachi", "Basic Master Level 3 Mark 5 (MB-6892)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
