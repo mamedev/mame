@@ -2,6 +2,7 @@
 // copyright-holders:
 
 /*
+
 This skeleton driver hosts 2 unidentified Chang Yu Electronic (CYE) games. The PCBs,
 while sharing most components, differ, so they may very well go in different drivers when emulated.
 
@@ -87,16 +88,16 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_videoram;
 
+	tilemap_t *m_bg_tilemap = nullptr;
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void palette_init(palette_device &palette) const ATTR_COLD;
 
 	void main_map(address_map &map) ATTR_COLD;
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void videoram_w(offs_t offset, u8 data);
 
-	tilemap_t *m_bg_tilemap = nullptr;
 };
 
 
@@ -114,6 +115,7 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
+	virtual void video_start() override ATTR_COLD;
 private:
 	void main2_map(address_map &map) ATTR_COLD;
 	void ext2_map(address_map &map) ATTR_COLD;
@@ -129,6 +131,16 @@ private:
 
 	u8 m_mcu_cmd = 0;
 };
+
+void changyu_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(changyu_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 72, 28);
+}
+
+void changyu2_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(changyu2_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+}
 
 
 void changyu_state::palette_init(palette_device &palette) const
@@ -152,6 +164,12 @@ TILE_GET_INFO_MEMBER(changyu_state::get_bg_tile_info)
 	int const color = attr >> 4;
 
 	tileinfo.set(0, code, color, 0 );
+}
+
+uint32_t changyu_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
 }
 
 void changyu_state::videoram_w(offs_t offset, u8 data)
@@ -193,12 +211,6 @@ TIMER_CALLBACK_MEMBER(changyu2_state::set_mcu_cmd)
 	m_mcu_cmd = u8(u32(param));
 }
 
-uint32_t changyu_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-	return 0;
-}
 
 void changyu_state::common_map(address_map &map)
 {
@@ -211,6 +223,15 @@ void changyu_state::common_map(address_map &map)
 void changyu_state::main_map(address_map &map)
 {
 	common_map(map);
+	map(0x0800, 0x0800).portr("IN0");
+	map(0x0808, 0x0808).portr("IN1");
+	map(0x0810, 0x0810).portr("IN2");
+	map(0x0818, 0x0818).portr("IN3");
+
+	map(0x0838, 0x0838).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x0839, 0x0839).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+
+	map(0x1000, 0x1fff).ram().w(FUNC(changyu_state::videoram_w)).share("videoram");
 
 	map(0x3000, 0x37ff).ram();
 
@@ -220,6 +241,11 @@ void changyu_state::main_map(address_map &map)
 void changyu2_state::main2_map(address_map &map)
 {
 	common_map(map);
+
+	map(0x2000, 0x2000).portr("IN0");
+	map(0x2008, 0x2008).portr("IN1");
+	map(0x2010, 0x2010).portr("IN2");
+	map(0x2018, 0x2018).portr("IN3");
 
 	map(0x2030, 0x2030).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x2031, 0x2031).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -251,14 +277,34 @@ static INPUT_PORTS_START( changyu )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // enables some kind of meters in-game
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) // resets on attract, no effect in gameplay?
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_NAME("Clear Meters") // in bookkeeping menu
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stand / Pass")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("Bet All")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start / Hit")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Bet 3")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Bet 1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Bet 2")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 
 	PORT_START("DSW0") // dips' listing available
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW0:1")
@@ -291,6 +337,80 @@ static INPUT_PORTS_START( changyu )
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
 INPUT_PORTS_END
 
+// similar to above, with some shuffling.
+static INPUT_PORTS_START( changyu2 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start / Hit")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // freezes with no cards when soft reset if high
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_NAME("Clear Meters")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stand / Pass")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("Bet All")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Bet 1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Bet 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Bet 3")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW0")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW0:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW0:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW0:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW0:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW0:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW0:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW0:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW0:8")
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
+INPUT_PORTS_END
+
+
 
 void changyu_state::machine_start()
 {
@@ -301,13 +421,6 @@ void changyu2_state::machine_start()
 	changyu_state::machine_start();
 
 	save_item(NAME(m_mcu_cmd));
-}
-
-void changyu_state::video_start()
-{
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(changyu_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-
-//  m_bg_tilemap->set_transparent_pen(0);
 }
 
 static GFXDECODE_START( gfx_changyu )
@@ -431,5 +544,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1989, changyu,  0, changyu,  changyu, changyu_state,  empty_init, ROT0, "Chang Yu Electronic", "unknown Chang Yu Electronic gambling game 1", MACHINE_IS_SKELETON ) // Wing Co. in GFX1, year taken from start of maincpu ROM
-GAME( 19??, changyu2, 0, changyu2, changyu, changyu2_state, empty_init, ROT0, "Chang Yu Electronic", "unknown Chang Yu Electronic gambling game 2", MACHINE_IS_SKELETON ) // Wing Co. in GFX1
+// No copyright for both, are these really bootlegs?
+GAME( 1989, changyu,  0, changyu,  changyu, changyu_state,  empty_init, ROT0, "Chang Yu Electronic", "Mayo no 21", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Wing Co. in GFX1, year taken from start of maincpu ROM
+GAME( 19??, changyu2, 0, changyu2, changyu2,changyu2_state, empty_init, ROT0, "Chang Yu Electronic", "999", MACHINE_NOT_WORKING ) // Wing Co. in GFX1
