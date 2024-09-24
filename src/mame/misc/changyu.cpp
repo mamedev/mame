@@ -45,6 +45,7 @@ main PCB (marked 9101):
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
 #include "sound/ymopl.h"
@@ -71,10 +72,14 @@ public:
 	{
 	}
 
-	void changyu(machine_config &config);
-	void changyu2(machine_config &config);
+	void changyu(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+	void common_map(address_map &map) ATTR_COLD;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	required_device<mc6845_device> m_crtc;
@@ -83,23 +88,48 @@ protected:
 	required_shared_ptr<uint8_t> m_videoram;
 
 private:
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void palette_init(palette_device &palette) const;
+	void palette_init(palette_device &palette) const ATTR_COLD;
 
-	void main_map(address_map &map);
-	void main2_map(address_map &map);
-	void prog2_map(address_map &map);
-	void ext2_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-
-	tilemap_t *m_bg_tilemap{};
-
-	virtual void video_start() override;
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void videoram_w(offs_t offset, u8 data);
+
+	tilemap_t *m_bg_tilemap = nullptr;
 };
+
+
+class changyu2_state : public changyu_state
+{
+public:
+	changyu2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: changyu_state(mconfig, type, tag)
+		, m_mcu_response_latch(*this, "mcu_response")
+	{
+	}
+
+	void changyu2(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	void main2_map(address_map &map) ATTR_COLD;
+	void ext2_map(address_map &map) ATTR_COLD;
+
+	void mcu_cmd_w(u8 data);
+	void mcu_ctrl_w(u8 data);
+	u8 mcu_status_r();
+	u8 mcu_cmd_r();
+	u8 mcu_p1_r();
+	TIMER_CALLBACK_MEMBER(set_mcu_cmd);
+
+	required_device<generic_latch_8_device> m_mcu_response_latch;
+
+	u8 m_mcu_cmd = 0;
+};
+
 
 void changyu_state::palette_init(palette_device &palette) const
 {
@@ -130,11 +160,37 @@ void changyu_state::videoram_w(offs_t offset, u8 data)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-void changyu_state::video_start()
+void changyu2_state::mcu_cmd_w(u8 data)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(changyu_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	machine().scheduler().perfect_quantum(attotime::from_usec(50)); // enough time for the MCU to take the interrupt about to be triggered
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(changyu2_state::set_mcu_cmd), this), s32(u32(data)));
+}
 
-//  m_bg_tilemap->set_transparent_pen(0);
+void changyu2_state::mcu_ctrl_w(u8 data)
+{
+	// other bits unknown
+	m_mcu->set_input_line(MCS51_INT0_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+u8 changyu2_state::mcu_status_r()
+{
+	// other bits unknown
+	return m_mcu_response_latch->pending_r() ? 0x01 : 0x00;
+}
+
+u8 changyu2_state::mcu_cmd_r()
+{
+	return m_mcu_cmd;
+}
+
+u8 changyu2_state::mcu_p1_r()
+{
+	return m_mcu_response_latch->pending_r() ? 0x7f : 0xff;
+}
+
+TIMER_CALLBACK_MEMBER(changyu2_state::set_mcu_cmd)
+{
+	m_mcu_cmd = u8(u32(param));
 }
 
 uint32_t changyu_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -144,36 +200,42 @@ uint32_t changyu_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
+void changyu_state::common_map(address_map &map)
+{
+	map.unmap_value_high();
+
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1fff).ram().w(FUNC(changyu_state::videoram_w)).share(m_videoram);
+}
+
 void changyu_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1fff).ram().w(FUNC(changyu_state::videoram_w)).share("videoram");
+	common_map(map);
+
 	map(0x3000, 0x37ff).ram();
+
 	map(0x8000, 0xffff).rom().region("boot_rom", 0x8000);
 }
 
-void changyu_state::main2_map(address_map &map)
+void changyu2_state::main2_map(address_map &map)
 {
-	map.unmap_value_high();
-	main_map(map);
+	common_map(map);
+
 	map(0x2030, 0x2030).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x2031, 0x2031).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2038, 0x2038).w(FUNC(changyu2_state::mcu_cmd_w));
 	map(0x2800, 0x2801).w("ymsnd", FUNC(ym2413_device::write));
-
-	map(0x3000, 0x37ff).unmaprw();
+	map(0x2808, 0x2808).r(FUNC(changyu2_state::mcu_status_r));
+	map(0x2020, 0x2020).r(m_mcu_response_latch, FUNC(generic_latch_8_device::read));
+	map(0x3000, 0x3000).w(FUNC(changyu2_state::mcu_ctrl_w));
 
 	map(0x6000, 0xffff).rom().region("boot_rom", 0x6000);
 }
 
-void changyu_state::prog2_map(address_map &map)
+void changyu2_state::ext2_map(address_map &map)
 {
-
-	map(0x0000, 0xfff).rom().region("mcu", 0);
-}
-
-
-void changyu_state::ext2_map(address_map &map)
-{
+	map(0x0300, 0x0300).r(FUNC(changyu2_state::mcu_cmd_r));
+	map(0x0400, 0x0400).w(m_mcu_response_latch, FUNC(generic_latch_8_device::write));
 	map(0x0502, 0x0503).w("ay", FUNC(ay8910_device::data_address_w));
 }
 
@@ -234,6 +296,20 @@ void changyu_state::machine_start()
 {
 }
 
+void changyu2_state::machine_start()
+{
+	changyu_state::machine_start();
+
+	save_item(NAME(m_mcu_cmd));
+}
+
+void changyu_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(changyu_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+//  m_bg_tilemap->set_transparent_pen(0);
+}
+
 static GFXDECODE_START( gfx_changyu )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar, 0, 16 )
 GFXDECODE_END
@@ -267,22 +343,24 @@ void changyu_state::changyu(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay", XTAL(12'000'000 / 6)).add_route(ALL_OUTPUTS, "mono", 1.00); // divisor not verified
+	AY8910(config, "ay", XTAL(12'000'000 / 6)).add_route(ALL_OUTPUTS, "mono", 0.9); // divisor not verified
 
-	HC55516(config, "voice", XTAL(12'000'000 / 6)).add_route(ALL_OUTPUTS, "mono", 1.00); // UM5100 is a HC55536 with ROM hook-up, divisor not verified
+	HC55516(config, "voice", XTAL(12'000'000 / 6)).add_route(ALL_OUTPUTS, "mono", 0.9); // UM5100 is a HC55536 with ROM hook-up, divisor not verified
 }
 
-void changyu_state::changyu2(machine_config &config)
+void changyu2_state::changyu2(machine_config &config)
 {
 	changyu(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &changyu_state::main2_map);
 
-	I87C51(config.replace(), m_mcu, XTAL(8'000'000));
-//  m_mcu->set_disable();
-	m_mcu->set_addrmap(AS_PROGRAM, &changyu_state::prog2_map);
-	m_mcu->set_addrmap(AS_IO, &changyu_state::ext2_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &changyu2_state::main2_map);
 
-	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
+	auto &mcu(I87C51(config.replace(), m_mcu, XTAL(8'000'000)));
+	mcu.set_addrmap(AS_IO, &changyu2_state::ext2_map);
+	mcu.port_in_cb<0>().set(FUNC(changyu2_state::mcu_p1_r));
+
+	GENERIC_LATCH_8(config, m_mcu_response_latch);
+
+	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.9);
 }
 
 ROM_START( changyu )
@@ -353,5 +431,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1989, changyu,  0, changyu,  changyu, changyu_state, empty_init, ROT0, "Chang Yu Electronic", "unknown Chang Yu Electronic gambling game 1", MACHINE_IS_SKELETON ) // Wing Co. in GFX1, year taken from start of maincpu ROM
-GAME( 19??, changyu2, 0, changyu2, changyu, changyu_state, empty_init, ROT0, "Chang Yu Electronic", "unknown Chang Yu Electronic gambling game 2", MACHINE_IS_SKELETON ) // Wing Co. in GFX1
+GAME( 1989, changyu,  0, changyu,  changyu, changyu_state,  empty_init, ROT0, "Chang Yu Electronic", "unknown Chang Yu Electronic gambling game 1", MACHINE_IS_SKELETON ) // Wing Co. in GFX1, year taken from start of maincpu ROM
+GAME( 19??, changyu2, 0, changyu2, changyu, changyu2_state, empty_init, ROT0, "Chang Yu Electronic", "unknown Chang Yu Electronic gambling game 2", MACHINE_IS_SKELETON ) // Wing Co. in GFX1
