@@ -223,7 +223,7 @@ Uses [video] clipping for layer 1 during intro
 	</software>
 
 	<software name="rebelst" supported="no">
-		<description>Rebel Star</description>
+		<description>Rebel Star ~ Pàn Xīng</description>
 		<year>1996</year>
 		<publisher>Horng Shen Information Co., Ltd</publisher>
 		<info name="serial" value="F012" />
@@ -231,6 +231,10 @@ Uses [video] clipping for layer 1 during intro
 		<part name="cart" interface="superacan_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="f012 - rebel star.bin" size="2097152" crc="a3469172" sha1="3a1b093d7aee6d5b1f260723499d4c283a2a0169" />
+			</dataarea>
+
+			<!-- TODO: unconfirmed size -->
+			<dataarea name="nvram" size="0x8000">
 			</dataarea>
 		</part>
 	</software>
