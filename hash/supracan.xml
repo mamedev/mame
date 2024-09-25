@@ -222,8 +222,18 @@ Uses [video] clipping for layer 1 during intro
 		</part>
 	</software>
 
-	<!-- F012 - Rebel Star / 叛星 -->
-	<!-- presumably uses blending during gameplay -->
+	<software name="rebelst" supported="no">
+		<description>Rebel Star</description>
+		<year>1996</year>
+		<publisher>Horng Shen Information Co., Ltd</publisher>
+		<info name="serial" value="F012" />
+		<info name="alt_title" value="叛星" />
+		<part name="cart" interface="superacan_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="f012 - rebel star.bin" size="2097152" crc="a3469172" sha1="3a1b093d7aee6d5b1f260723499d4c283a2a0169" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- Unreleased Super A'can carts -->
 	<!-- Dinosaur Wars -->
