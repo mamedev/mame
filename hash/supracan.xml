@@ -223,6 +223,7 @@ Erratic gameplay speed, controls [irq 3] as FRC
 		<publisher>Funtech</publisher>
 		<notes><![CDATA[
 Uses [video] clipping for layer 1 during intro
+Should use unemulated [video] interlace (verify on HW)
 ]]></notes>
 		<info name="serial" value="F011" />
 		<info name="alt_title" value="爆爆動物園" />
@@ -237,6 +238,10 @@ Uses [video] clipping for layer 1 during intro
 		<description>Rebel Star ~ Pàn Xīng</description>
 		<year>1996</year>
 		<publisher>Horng Shen Information Co., Ltd</publisher>
+        <notes><![CDATA[
+[video] ROZ layer is concealed on intro.
+[video] ROZ layer should blend hex grids, draws solid squares.
+]]></notes>
 		<info name="serial" value="F012" />
 		<info name="alt_title" value="叛星" />
 		<part name="cart" interface="superacan_cart">

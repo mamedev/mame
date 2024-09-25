@@ -324,51 +324,9 @@ void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int
 
 	count += base;
 
-	uint16_t tile_bank = 0;
-	uint16_t palette_shift = 0;
-	// TODO: convert this to a static table, verify case 7
-	switch (gfx_mode)
-	{
-	case 7:
-		tile_bank = 0x1c00;
-		break;
-
-	// gamblord
-	case 6:
-		tile_bank = 0x0c00;
-		break;
-
-	case 4:
-		tile_bank = 0x800;
-		break;
-
-	case 2:
-		tile_bank = 0x400;
-		break;
-
-	case 1:
-		// formduel gameplay (for layer 2 -> 0x1400)
-		tile_bank = 0x200;
-		break;
-
-	case 0:
-		tile_bank = 0;
-		break;
-
-	default:
-		LOGMASKED(LOG_UNKNOWNS, "Unsupported tilemap mode: %d\n", (m_tilemap_mode[layer] & 0x7000) >> 12);
-		break;
-	}
-
-	if (region == 0)
-		tile_bank >>= 1;
-
+	const u16 tile_bank = gfx_mode << (8 + region);
 	// speedyd and slghtsag hints that text layer color offsets in steps of 4
-	if (region == 2)
-		palette_shift = 2;
-
-	if (layer == 2)
-		tile_bank = (0x1000 | (tile_bank << 1)) & 0x1c00;
+	const u16 palette_shift = (region == 2) ? 2 : 0;
 
 	u8 palette_base = ((vram[count] & 0xf000) >> 12);
 
@@ -833,6 +791,10 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 	uint32_t start_word = (m_sprite_base_addr >> 1) + skip_count * 4;
 	uint32_t end_word = start_word + (m_sprite_count - skip_count) * 4;
 	int region = (m_sprite_flags & 1) ? 0 : 1; // 8bpp : 4bpp
+	// As per tilemaps banking is halved with 8bpp sprites
+	// - rebelst during gameplay
+	// - A'Can logo and slghtsag don't set any bank number.
+	const u16 bank_size = 0x100 << region;
 
 	static const uint16_t VRAM_MASK = 0xffff;
 
@@ -864,7 +826,7 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 			// magipool also wants latter, for the shot markers to work.
 			if (sprite_ptr & 0x8000 || (xsize == 1 && ysize == 1))
 			{
-				int tile = (bank * 0x200) + (sprite_ptr & 0x03ff);
+				int tile = (bank * bank_size) + (sprite_ptr & 0x03ff);
 
 				int palette = (sprite_ptr & 0xf000) >> 12; // this might not be correct, due to the & 0x8000 condition above this would force all single tile sprites to be using palette >= 0x8 only
 
@@ -883,19 +845,12 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 			{
 				// I think the xsize must influence the ysize somehow, there are too many conflicting cases otherwise
 				// there don't appear to be any special markers in the actual looked up tile data to indicate skip / end of list
-
-				//if (((vram[i + 0] & 0x1e00) >> 9) == test_target)
-				//{
-				//    ysize = test_value;
-				//}
-
-
 				for (int ytile = 0; ytile < ysize; ytile++)
 				{
 					for (int xtile = 0; xtile < xsize; xtile++)
 					{
 						uint16_t data = vram[((sprite_ptr << 1) + ytile * xsize + xtile) & VRAM_MASK];
-						int tile = (bank * 0x200) + (data & 0x03ff);
+						int tile = (bank * bank_size) + (data & 0x03ff);
 						int palette = (data & 0xf000) >> 12;
 
 						int xpos = sprite_xflip ? (x - (xtile + 1) * 8 + xsize * 8) : (x + xtile * 8);
