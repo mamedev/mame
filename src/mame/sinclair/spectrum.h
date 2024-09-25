@@ -54,7 +54,6 @@ public:
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_snapshot(*this, "snapshot"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
 		m_specmem(*this, "specmem"),
@@ -155,7 +154,6 @@ protected:
 	void spectrum_map(address_map &map);
 	void spectrum_data(address_map &map);
 
-	optional_device<snapshot_image_device> m_snapshot;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	optional_device<address_map_bank_device> m_specmem;
