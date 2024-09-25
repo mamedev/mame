@@ -25,7 +25,7 @@ public:
 
 	auto irq_wr_callback() { return m_write_irq.bind(); }
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// I/O operations
 	void tx_w(uint8_t data);

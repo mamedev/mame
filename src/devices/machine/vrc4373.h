@@ -31,7 +31,7 @@ public:
 	void set_ram_size(int size) { m_ram_size = size; }
 	void set_simm0_size(int size) { m_simm0_size = size; }
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	uint32_t pcictrl_r(offs_t offset, uint32_t mem_mask = ~0);
 	void pcictrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -48,17 +48,17 @@ public:
 	uint32_t master_io_r(offs_t offset, uint32_t mem_mask = ~0);
 	void master_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	virtual void target1_map(address_map &map);
+	virtual void target1_map(address_map &map) ATTR_COLD;
 	uint32_t target1_r(offs_t offset, uint32_t mem_mask = ~0);
 	void target1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	virtual void target2_map(address_map &map);
+	virtual void target2_map(address_map &map) ATTR_COLD;
 	uint32_t target2_r(offs_t offset, uint32_t mem_mask = ~0);
 	void target2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -73,7 +73,7 @@ private:
 		AS_PCI_IO = 2
 	};
 
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	void map_cpu_space();
 

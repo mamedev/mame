@@ -246,11 +246,11 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void recompute_params() override;
 
-	virtual void io_3cx_map(address_map &map) override;
+	virtual void io_3cx_map(address_map &map) override ATTR_COLD;
 
-	virtual void crtc_map(address_map &map) override;
-	virtual void gc_map(address_map &map) override;
-	virtual void sequencer_map(address_map &map) override;
+	virtual void crtc_map(address_map &map) override ATTR_COLD;
+	virtual void gc_map(address_map &map) override ATTR_COLD;
+	virtual void sequencer_map(address_map &map) override ATTR_COLD;
 
 	void io_isa_map(address_map &map) ATTR_COLD;
 private:

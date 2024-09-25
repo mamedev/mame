@@ -54,20 +54,20 @@ public:
 	 ****************************************************************************/
 	void set_config(u16 data);
 
-	void core_regs(address_map &map, u8 mirror = 0);
+	void core_regs(address_map &map, u8 mirror = 0) ATTR_COLD;
 
-	void ram_6(address_map &map);
-	void rom_9(address_map &map);
-	void ram_7(address_map &map);
-	void rom_10(address_map &map);
+	void ram_6(address_map &map) ATTR_COLD;
+	void rom_9(address_map &map) ATTR_COLD;
+	void ram_7(address_map &map) ATTR_COLD;
+	void rom_10(address_map &map) ATTR_COLD;
 
 protected:
 	// construction/destruction
 	pic16x8x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, address_map_constructor program_map, address_map_constructor data_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	/**************************************************************************

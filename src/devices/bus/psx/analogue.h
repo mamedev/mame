@@ -14,7 +14,7 @@ class psx_analog_controller_device :    public device_t,
 										public device_psx_controller_interface
 {
 public:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	DECLARE_INPUT_CHANGED_MEMBER(change_mode);
 protected:
 	enum class model { JOYSTICK, DUALSHOCK };
@@ -22,7 +22,7 @@ protected:
 	psx_analog_controller_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, model mod);
 
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	virtual bool get_pad(int count, uint8_t *odata, uint8_t idata) override;

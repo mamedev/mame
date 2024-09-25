@@ -160,7 +160,7 @@ public:
 	void init();
 
 protected:
-	virtual void cpu_map(address_map &map) override;
+	virtual void cpu_map(address_map &map) override ATTR_COLD;
 
 	required_device<m48t02_device> m_rtc;
 	required_device<mb89352_device> m_spc;
@@ -186,7 +186,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void cpu_map(address_map &map) override;
+	virtual void cpu_map(address_map &map) override ATTR_COLD;
 
 	required_device<mc146818_device> m_rtc;
 	required_device_array<mb89352_device, 2> m_spc;

@@ -80,7 +80,7 @@ public:
 protected:
 	spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t sprite_limit, address_map_constructor internal);
 
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 
 	void fiq_vector_w(uint8_t data);
 	void videoirq_w(int state);
@@ -94,8 +94,8 @@ protected:
 
 	uint16_t space_r(offs_t offset);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// TODO: these are fixed values, put them in relevant devices?
 	uint16_t m_sprite_limit;
@@ -161,7 +161,7 @@ public:
 
 	spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 };
 

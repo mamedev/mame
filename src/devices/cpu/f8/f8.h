@@ -33,8 +33,8 @@ protected:
 	};
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface implementation
 	virtual u32 execute_min_cycles() const noexcept override { return 4; }
@@ -52,7 +52,7 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 
 	address_space_config m_program_config;
 	address_space_config m_regs_config;

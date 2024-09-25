@@ -31,11 +31,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual bool overrides_rom() override { return true; }
 	virtual void romsel_w(offs_t offset, uint8_t data) override { m_romsel = data & 0x0f; }
@@ -60,10 +60,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual bool overrides_rom() override { return true; }
 	virtual void romsel_w(offs_t offset, uint8_t data) override { m_romsel = data & 0x0f; }

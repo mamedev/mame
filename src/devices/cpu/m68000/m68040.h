@@ -19,7 +19,7 @@ public:
 	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 class m68lc040_device : public m68000_musashi_device
@@ -34,7 +34,7 @@ public:
 	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 class m68040_device : public m68000_musashi_device
@@ -49,7 +49,7 @@ public:
 	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(M68EC040, m68ec040_device)

@@ -20,7 +20,7 @@ public:
 	u8 *get_ram_base() { return &m_ram[0]; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	u8 read_mapper_bank(offs_t offset);

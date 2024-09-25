@@ -27,7 +27,7 @@ public:
 	ioport_value in_r();
 	int clutch_r();
 	uint8_t m_gearbox_state = 0;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 protected:
 	// device-level overrides

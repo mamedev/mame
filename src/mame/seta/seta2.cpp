@@ -681,7 +681,7 @@ class funcube_touchscreen_device : public device_t,
 public:
 	funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	auto tx_cb() { return m_tx_cb.bind(); }
 
 protected:

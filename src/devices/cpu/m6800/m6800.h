@@ -42,8 +42,8 @@ protected:
 	m6800_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const m6800_cpu_device::op_func *insn, const u8 *cycles, address_map_constructor internal);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
@@ -375,7 +375,7 @@ protected:
 	bool m_ram_enable;
 
 private:
-	void ram_map(address_map &map);
+	void ram_map(address_map &map) ATTR_COLD;
 };
 
 

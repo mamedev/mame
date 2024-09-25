@@ -65,7 +65,7 @@ public:
 	void buttons(int bstate);
 
 protected:
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 
 private:
 	required_device<v9938_device> m_v9938;

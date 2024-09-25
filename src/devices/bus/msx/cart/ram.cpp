@@ -252,7 +252,7 @@ protected:
 		, m_bank_mask(0)
 	{ }
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	template <int Bank> void bank_w(u8 data);
 
@@ -357,8 +357,8 @@ public:
 	{ }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<sn76496_base_device> m_sn76489a;
@@ -413,9 +413,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(mode_callback);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	static constexpr u8 MODE_RO = 0;

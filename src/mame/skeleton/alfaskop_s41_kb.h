@@ -26,8 +26,8 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 
 	required_device<m6802_cpu_device> m_mcu;
 	required_device<mc6846_device> m_mc6846;

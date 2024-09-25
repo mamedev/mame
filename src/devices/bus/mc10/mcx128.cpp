@@ -72,24 +72,24 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	u8 control_register_read(offs_t offset);
 	void control_register_write(offs_t offset, u8 data);
 
 	void write_ram_mirror(address_space &space, offs_t offset, u8 data);
 
-	void view_map0(address_map &map);
-	void view_map1(address_map &map);
-	void view_map2(address_map &map);
-	void view_map3(address_map &map);
-	void view_map4(address_map &map);
-	void view_map5(address_map &map);
-	void view_map6(address_map &map);
-	void view_map7(address_map &map);
+	void view_map0(address_map &map) ATTR_COLD;
+	void view_map1(address_map &map) ATTR_COLD;
+	void view_map2(address_map &map) ATTR_COLD;
+	void view_map3(address_map &map) ATTR_COLD;
+	void view_map4(address_map &map) ATTR_COLD;
+	void view_map5(address_map &map) ATTR_COLD;
+	void view_map6(address_map &map) ATTR_COLD;
+	void view_map7(address_map &map) ATTR_COLD;
 
 
 private:

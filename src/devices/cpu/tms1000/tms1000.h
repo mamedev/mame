@@ -68,12 +68,12 @@ public:
 protected:
 	tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
 
-	void rom_9bitm(address_map &map);
-	void ram_32x4(address_map &map);
+	void rom_9bitm(address_map &map) ATTR_COLD;
+	void ram_32x4(address_map &map) ATTR_COLD;
 
 	// overrides
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual u32 decode_micro(offs_t offset);
@@ -100,7 +100,7 @@ public:
 protected:
 	tms1070_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void write_o_output(u16 data) override { tms1000_cpu_device::write_o_output(bitswap<10>(data,0,1,9,8,7,6,5,4,3,2)); }
 };
 

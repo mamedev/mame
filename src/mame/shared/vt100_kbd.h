@@ -38,7 +38,7 @@ protected:
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual bool scan_enabled() const { return m_uart->tbmt_r(); }
 	virtual void scan_start() { }
@@ -77,7 +77,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual bool scan_enabled() const override { return m_scan_enable; }
 	virtual void scan_start() override { m_scan_enable = true; }

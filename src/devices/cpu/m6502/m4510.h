@@ -54,8 +54,8 @@ protected:
 
 	uint8_t pullup, floating, dir, port, drive;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	inline uint32_t map(uint16_t adr) {

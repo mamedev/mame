@@ -35,20 +35,20 @@ protected:
 	dmv_k230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// dmvcart_interface overrides
 	virtual void hold_w(int state) override;
 	virtual void switch16_w(int state) override;
 	virtual bool av16bit() override;
 
-	void k230_io(address_map &map);
-	void k230_mem(address_map &map);
+	void k230_io(address_map &map) ATTR_COLD;
+	void k230_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_memory_region      m_rom;
@@ -75,7 +75,7 @@ public:
 	dmv_k231_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 
@@ -90,12 +90,12 @@ public:
 
 protected:
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// dmvcart_interface overrides
 	virtual void hold_w(int state) override;
@@ -107,7 +107,7 @@ private:
 	uint8_t snr_r();
 	void snr_w(uint8_t data);
 
-	void k234_mem(address_map &map);
+	void k234_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -122,9 +122,9 @@ public:
 
 protected:
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	void timint_w(int state) override  { m_pic->ir0_w(state); }
 	void keyint_w(int state) override  { m_pic->ir1_w(state); }
@@ -141,7 +141,7 @@ private:
 	required_device<pic8259_device> m_pic;
 	required_ioport m_dsw;
 
-	void k235_io(address_map &map);
+	void k235_io(address_map &map) ATTR_COLD;
 };
 
 // device type definition

@@ -1008,7 +1008,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(vm_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(prt_busy_timer);
 
-	virtual void cpu_mem_map(address_map &map) override;
+	virtual void cpu_mem_map(address_map &map) override ATTR_COLD;
 	virtual void unmap_optroms(address_space &space) override;
 
 	required_device<screen_device> m_screen;
@@ -1636,8 +1636,8 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void cpu_mem_map(address_map &map) override;
-	virtual void rombank_mem_map(address_map &map) override;
+	virtual void cpu_mem_map(address_map &map) override ATTR_COLD;
+	virtual void rombank_mem_map(address_map &map) override ATTR_COLD;
 	virtual void unmap_optroms(address_space &space) override;
 
 private:
@@ -2250,7 +2250,7 @@ public:
 	hp86_int_state(const machine_config &mconfig, device_type type, const char *tag);
 
 protected:
-	virtual void rombank_mem_map(address_map &map) override;
+	virtual void rombank_mem_map(address_map &map) override ATTR_COLD;
 	virtual void unmap_optroms(address_space &space) override;
 };
 

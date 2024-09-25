@@ -13,7 +13,7 @@ class aic6250_device : public nscsi_device, public nscsi_slot_card_interface
 public:
 	aic6250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	auto int_cb() { return m_int_cb.bind(); }
 	auto breq_cb() { return m_breq_cb.bind(); }
@@ -37,8 +37,8 @@ protected:
 	aic6250_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// standard device_interface overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// ncsci_device overrides
 	virtual void scsi_ctrl_changed() override;

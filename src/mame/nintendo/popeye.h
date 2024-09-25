@@ -136,7 +136,7 @@ public:
 
 protected:
 	virtual void decrypt_rom() override;
-	virtual void maincpu_program_map(address_map &map) override;
+	virtual void maincpu_program_map(address_map &map) override ATTR_COLD;
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
 	virtual bool bootleg_sprites() const override { return true; }
@@ -156,7 +156,7 @@ protected:
 	virtual void driver_start() override;
 	virtual void refresh_w(offs_t offset, uint8_t data) override;
 	virtual void screen_vblank(int state) override;
-	virtual void maincpu_program_map(address_map &map) override;
+	virtual void maincpu_program_map(address_map &map) override ATTR_COLD;
 	virtual void decrypt_rom() override;
 	virtual void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	virtual void background_w(offs_t offset, uint8_t data) override;
@@ -167,7 +167,7 @@ class tpp2_noalu_state : public tpp2_state
 	using tpp2_state::tpp2_state;
 
 protected:
-	virtual void maincpu_program_map(address_map &map) override;
+	virtual void maincpu_program_map(address_map &map) override ATTR_COLD;
 };
 
 #endif // MAME_NINTENDO_POPEYE_H

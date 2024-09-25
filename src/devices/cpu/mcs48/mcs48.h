@@ -138,9 +138,9 @@ protected:
 	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int rom_size, int ram_size, u8 feature_mask, const mcs48_ophandler *opcode_table);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override { update_regptr(); }
 
 	// device_execute_interface overrides
@@ -226,8 +226,8 @@ protected:
 	static const mcs48_ophandler s_i8022_opcodes[256];
 	const mcs48_ophandler *const m_opcode_table;
 
-	void program_map(address_map &map);
-	void data_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	// ROM is mapped to AS_PROGRAM
 	u8 program_r(offs_t a)      { return m_program.read_byte(a); }

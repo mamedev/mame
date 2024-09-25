@@ -98,8 +98,8 @@ protected:
 	hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrwidth);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return m_r_cycles; }
@@ -253,8 +253,8 @@ public:
 	void set_9845_boot_mode(bool mode) { m_boot_mode = mode; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	// TODO: fix
 	virtual uint32_t execute_max_cycles() const noexcept override { return 237; }       // FMP 15
 
@@ -278,7 +278,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	// TODO: fix

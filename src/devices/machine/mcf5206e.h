@@ -39,8 +39,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override { }
 	virtual space_config_vector memory_space_config() const override;
 
@@ -147,7 +147,7 @@ private:
 	uint8_t MBDR_r(offs_t offset);
 	void MBDR_w(offs_t offset, uint8_t data);
 
-	void coldfire_regs_map(address_map &map);
+	void coldfire_regs_map(address_map &map) ATTR_COLD;
 
 	enum
 	{

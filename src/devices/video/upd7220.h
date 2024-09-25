@@ -85,10 +85,10 @@ protected:
 	upd7220_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 	virtual int translate_command(uint8_t data);
@@ -134,7 +134,7 @@ private:
 	void draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int mixed);
 	void update_graphics(bitmap_rgb32 &bitmap, const rectangle &cliprect, int force_bitmap);
 
-	void upd7220_vram(address_map &map);
+	void upd7220_vram(address_map &map) ATTR_COLD;
 
 	display_pixels_delegate     m_display_cb;
 	draw_text_delegate          m_draw_text_cb;
@@ -223,7 +223,7 @@ public:
 	upd7220a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual int translate_command(uint8_t data) override;
 };

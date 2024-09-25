@@ -192,8 +192,8 @@ template <unsigned ST1> void ns32202_device::map(address_map &map)
 	map(0x1f, 0x1f).rw(FUNC(ns32202_device::ccvh_r<1>), FUNC(ns32202_device::ccvh_w<1>));
 }
 
-template void ns32202_device::map<0>(address_map &map);
-template void ns32202_device::map<1>(address_map &map);
+template void ns32202_device::map<0>(address_map &map) ATTR_COLD;
+template void ns32202_device::map<1>(address_map &map) ATTR_COLD;
 
 /*
  * Set (and clear, for level-triggered interrupts) interrupt pending state

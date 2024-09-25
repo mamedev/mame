@@ -14,9 +14,9 @@ public:
 	wd90c26_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void crtc_map(address_map &map) override;
-	virtual void gc_map(address_map &map) override;
-	virtual void sequencer_map(address_map &map) override;
+	virtual void crtc_map(address_map &map) override ATTR_COLD;
+	virtual void gc_map(address_map &map) override ATTR_COLD;
+	virtual void sequencer_map(address_map &map) override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(WD90C26, wd90c26_vga_device)

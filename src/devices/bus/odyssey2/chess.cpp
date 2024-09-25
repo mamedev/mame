@@ -30,8 +30,8 @@ public:
 	o2_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void cart_init() override;
 
@@ -50,8 +50,8 @@ private:
 
 	u8 internal_rom_r(offs_t offset) { return m_exrom[offset]; }
 
-	void chess_io(address_map &map);
-	void chess_mem(address_map &map);
+	void chess_io(address_map &map) ATTR_COLD;
+	void chess_mem(address_map &map) ATTR_COLD;
 };
 
 o2_chess_device::o2_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :

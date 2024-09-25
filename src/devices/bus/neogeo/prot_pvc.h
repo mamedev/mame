@@ -31,8 +31,8 @@ public:
 	void kof2003h_decrypt_68k(uint8_t* rom, uint32_t size);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 #endif // MAME_BUS_NEOGEO_PROT_PVC_H

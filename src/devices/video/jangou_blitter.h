@@ -20,8 +20,8 @@ public:
 	jangou_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	void blit_v1_regs(address_map &map);
-	void blit_v2_regs(address_map &map);
+	void blit_v1_regs(address_map &map) ATTR_COLD;
+	void blit_v2_regs(address_map &map) ATTR_COLD;
 
 	void vregs_w(offs_t offset, uint8_t data);
 	void bltflip_w(uint8_t data);
@@ -31,8 +31,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_blit_buffer[256 * 256];

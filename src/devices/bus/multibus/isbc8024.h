@@ -25,15 +25,15 @@ public:
 
 protected:
 	// device_t overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void cpu_mem_map(address_map &map);
-	void cpu_pio_map(address_map &map);
+	void cpu_mem_map(address_map &map) ATTR_COLD;
+	void cpu_pio_map(address_map &map) ATTR_COLD;
 
 	void bus_mem_w(offs_t offset, u8 data) { m_bus->space(AS_PROGRAM).write_byte(offset, data); }
 	u8 bus_mem_r(offs_t offset) { return m_bus->space(AS_PROGRAM).read_byte(offset); }

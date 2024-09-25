@@ -93,8 +93,8 @@ public:
 	{ }
 
 protected:
-	virtual void main_map(address_map &map) override;
-	virtual void audio_io(address_map &map) override;
+	virtual void main_map(address_map &map) override ATTR_COLD;
+	virtual void audio_io(address_map &map) override ATTR_COLD;
 };
 
 

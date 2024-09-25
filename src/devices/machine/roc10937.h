@@ -45,8 +45,8 @@ protected:
 	uint8_t m_cursor;
 	uint32_t m_chars[16];
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:

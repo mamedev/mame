@@ -76,7 +76,7 @@ protected:
 	pc80s31k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-	virtual void fdc_io(address_map &map) override;
+	virtual void fdc_io(address_map &map) override ATTR_COLD;
 
 private:
 	void drive_mode_w(u8 data);

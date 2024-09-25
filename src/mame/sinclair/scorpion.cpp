@@ -106,7 +106,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	virtual void scorpion_ioext(address_map &map) override;
+	virtual void scorpion_ioext(address_map &map) override ATTR_COLD;
 	virtual void ay_address_w(u8 data) override;
 
 	virtual void scorpion_update_memory() override;
@@ -136,7 +136,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	virtual void scorpion_ioext(address_map &map) override;
+	virtual void scorpion_ioext(address_map &map) override ATTR_COLD;
 	void global_cfg_w(u8 data);
 	u8 port_78fd_r();
 	u8 port_7afd_r();

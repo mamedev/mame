@@ -30,8 +30,8 @@ public:
 	void write(offs_t offset, uint16_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void gpio_in(const uint16_t line, const int state);
 	void update_gpio_direction(const uint16_t old_dir);

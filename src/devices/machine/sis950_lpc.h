@@ -65,8 +65,8 @@ public:
 	void pc_irq15_w(int state);
 
 protected:
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 //  virtual void reset_all_mappings() override;
@@ -74,10 +74,10 @@ protected:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
-	template <unsigned N> void memory_map(address_map &map);
-	void io_map(address_map &map);
+	template <unsigned N> void memory_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	virtual bool map_first() const override { return true; }
 

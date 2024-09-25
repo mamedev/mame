@@ -27,7 +27,7 @@ protected:
 	wyse_gate_array_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// wyse_keyboard_interface overrides
 	virtual bool wysekbd_read_data() override;
@@ -55,7 +55,7 @@ public:
 	wy85_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0U);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual u8 wysekbd_get_id() override;
 };
 
@@ -68,7 +68,7 @@ public:
 	wy30_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0U);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual u8 wysekbd_get_id() override;
 };
 
@@ -81,7 +81,7 @@ public:
 	wy60_ascii_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0U);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual u8 wysekbd_get_id() override;
 };
 
@@ -96,9 +96,9 @@ public:
 protected:
 	wyse_at_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_resolve_objects() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual u8 wysekbd_get_id() override;
 	virtual void wysekbd_update_leds(u8 index) override;
 
@@ -118,7 +118,7 @@ public:
 	wyse_316x_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0U);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual u8 wysekbd_get_id() override;
 
 private:
@@ -134,7 +134,7 @@ public:
 	wyse_pce_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0U);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual u8 wysekbd_get_id() override;
 };
 
@@ -147,7 +147,7 @@ public:
 	wyse_pceint_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0U);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual u8 wysekbd_get_id() override;
 };
 

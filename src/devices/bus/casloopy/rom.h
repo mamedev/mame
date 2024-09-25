@@ -29,7 +29,7 @@ public:
 protected:
 	casloopy_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	const u16 *m_rom_base;
@@ -48,7 +48,7 @@ public:
 	casloopy_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 // device type definition

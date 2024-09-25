@@ -86,10 +86,10 @@ public:
 	void sck_w(int state);
 
 protected:
-	void upd_internal_128_ram_map(address_map &map);
-	void upd_internal_256_ram_map(address_map &map);
-	void upd_internal_4096_rom_128_ram_map(address_map &map);
-	void upd_internal_4096_rom_256_ram_map(address_map &map);
+	void upd_internal_128_ram_map(address_map &map) ATTR_COLD;
+	void upd_internal_256_ram_map(address_map &map) ATTR_COLD;
+	void upd_internal_4096_rom_128_ram_map(address_map &map) ATTR_COLD;
+	void upd_internal_4096_rom_256_ram_map(address_map &map) ATTR_COLD;
 
 	// flags
 	enum
@@ -136,8 +136,8 @@ protected:
 	upd7810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 3 - 1) / 3; }
@@ -1401,8 +1401,8 @@ public:
 	upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -1422,8 +1422,8 @@ public:
 protected:
 	upd78c05_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

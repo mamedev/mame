@@ -40,7 +40,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	msx_audio_kb_port_interface *m_keyboard;
 };

@@ -27,14 +27,14 @@ public:
 	// construction/destruction
 	msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -67,7 +67,7 @@ private:
 	uint8_t dr_r();
 	void dr_w(uint8_t data);
 
-	void msm6255(address_map &map);
+	void msm6255(address_map &map) ATTR_COLD;
 
 	const address_space_config m_space_config;
 

@@ -44,8 +44,8 @@ public:
 	bool fifo_available(uint32_t count) const { return (BUFFER_SIZE - m_end) >= count; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_run() override;
 
 	uint32_t calculate_unpack_count();

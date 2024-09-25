@@ -34,7 +34,7 @@ public:
 	int handle_down_r();
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device-level overrides
 //  virtual void device_validity_check(validity_checker &valid) const;

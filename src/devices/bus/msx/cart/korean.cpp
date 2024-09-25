@@ -21,7 +21,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void bank_w(u8 data);
@@ -96,7 +96,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void bank_w(offs_t offset, u8 data);
@@ -167,8 +167,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void banking(u8 data);
@@ -257,7 +257,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void bank_w(offs_t offset, u8 data);
@@ -325,7 +325,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void bank_w(u8 data);

@@ -25,9 +25,9 @@ protected:
 	kc_8k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// kcexp_interface overrides
 	virtual uint8_t module_id_r() override { return 0xfb; }
@@ -75,7 +75,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// kcexp_interface overrides
 	virtual uint8_t module_id_r() override { return 0x01; }

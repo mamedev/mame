@@ -60,7 +60,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 	virtual void write_sync(s32 param);
@@ -86,7 +86,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 	virtual void write_sync(s32 param) override;
@@ -117,7 +117,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 	void write_sync(s32 param);
@@ -147,11 +147,11 @@ protected:
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override { m_votrax->set_unscaled_clock(m_speech_clock); }
 
-	virtual void r1_map(address_map &map) override;
+	virtual void r1_map(address_map &map) override ATTR_COLD;
 
 	// internal communications
 	u32 convert_speech_clock(u8 data);
@@ -257,7 +257,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 private:

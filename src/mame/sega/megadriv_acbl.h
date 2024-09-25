@@ -58,7 +58,7 @@ public:
 	void md_boot_mcu(machine_config &config);
 
 private:
-	void md_boot_mcu_map(address_map &map);
+	void md_boot_mcu_map(address_map &map) ATTR_COLD;
 
 	uint16_t mcu_r();
 	void mcu_w(uint16_t data);

@@ -56,7 +56,7 @@ public:
 		host.set_tag(std::forward<T>(jvs_host_tag));
 	}
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 /////////////////////////////////////////////
@@ -73,7 +73,7 @@ public:
 		host.set_tag(std::forward<T>(jvs_host_tag));
 	}
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 /////////////////////////////////////////////
@@ -90,7 +90,7 @@ public:
 		host.set_tag(std::forward<T>(jvs_host_tag));
 	}
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 /////////////////////////////////////////////
@@ -107,7 +107,7 @@ public:
 		host.set_tag(std::forward<T>(jvs_host_tag));
 	}
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 /////////////////////////////////////////////
@@ -124,7 +124,7 @@ public:
 		host.set_tag(std::forward<T>(jvs_host_tag));
 	}
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(KONAMI_WINDY2_JVS_IO_2L6B_PANEL,  windy2_2l6b_device)

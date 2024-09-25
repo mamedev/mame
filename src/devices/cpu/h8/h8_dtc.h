@@ -61,8 +61,8 @@ protected:
 	int m_irq;
 	h8_dtc_state m_states[92];
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u8 m_dtcer[6], m_dtvecr;
 	int m_cur_active_vector;

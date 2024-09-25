@@ -175,7 +175,7 @@ private:
 	void fdc_inv_w(offs_t offset, uint8_t data);
 
 
-	virtual void poly_bank(address_map &map) override;
+	virtual void poly_bank(address_map &map) override ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 

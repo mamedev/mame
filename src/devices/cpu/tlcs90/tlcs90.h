@@ -38,8 +38,8 @@ protected:
 	tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
@@ -55,13 +55,13 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// address maps
-	void tmp90840_regs(address_map &map);
-	void tmp90840_mem(address_map &map);
-	void tmp90841_mem(address_map &map);
-	void tmp90844_regs(address_map &map);
-	void tmp90ph44_mem(address_map &map);
-	void tmp91640_mem(address_map &map);
-	void tmp91641_mem(address_map &map);
+	void tmp90840_regs(address_map &map) ATTR_COLD;
+	void tmp90840_mem(address_map &map) ATTR_COLD;
+	void tmp90841_mem(address_map &map) ATTR_COLD;
+	void tmp90844_regs(address_map &map) ATTR_COLD;
+	void tmp90ph44_mem(address_map &map) ATTR_COLD;
+	void tmp91640_mem(address_map &map) ATTR_COLD;
+	void tmp91641_mem(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(t90_timer_callback);
 	TIMER_CALLBACK_MEMBER(t90_timer4_callback);

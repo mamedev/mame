@@ -16,16 +16,16 @@ class fp1020fd_device : public fp1060io_exp_device
 public:
 	fp1020fd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void io_map(address_map &map) override;
+	virtual void io_map(address_map &map) override ATTR_COLD;
 	virtual u8 get_id() override { return 0x04; };
 
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<upd765a_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;

@@ -17,7 +17,7 @@ public:
 	uint8_t dma_param_r(offs_t offset);
 	void dma_param_w(offs_t offset, uint8_t data);
 
-	virtual void map(address_map& map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 protected:
 	// device-level overrides

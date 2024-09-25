@@ -41,12 +41,12 @@ protected:
 
 	vme_sys68k_cpu20_card_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, fc_board_t board_id);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(grant_bus);
 
@@ -65,8 +65,8 @@ private:
 	uint8_t pitb_r();
 	uint8_t pitc_r();
 
-	void cpu20_mem(address_map &map);
-	void cpu_space_map(address_map &map);
+	void cpu20_mem(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	required_device<pit68230_device> m_pit;
 	required_device<bim68153_device> m_bim;
@@ -97,7 +97,7 @@ protected:
 	{ }
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class vme_sys68k_cpu21s_card_device : public vme_sys68k_cpu20_card_device_base
@@ -111,7 +111,7 @@ protected:
 	{ }
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class vme_sys68k_cpu21_card_device : public vme_sys68k_cpu20_card_device_base
@@ -125,7 +125,7 @@ protected:
 	{ }
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class vme_sys68k_cpu21a_card_device : public vme_sys68k_cpu20_card_device_base
@@ -139,7 +139,7 @@ protected:
 	{ }
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class vme_sys68k_cpu21ya_card_device : public vme_sys68k_cpu20_card_device_base
@@ -153,7 +153,7 @@ protected:
 	{ }
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class vme_sys68k_cpu21b_card_device : public vme_sys68k_cpu20_card_device_base
@@ -167,7 +167,7 @@ protected:
 	{ }
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class vme_sys68k_cpu21yb_card_device : public vme_sys68k_cpu20_card_device_base
@@ -181,7 +181,7 @@ protected:
 	{ }
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 

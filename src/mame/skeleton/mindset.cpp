@@ -158,8 +158,8 @@ public:
 	mindset_sound_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~mindset_sound_module() = default;
 
-	virtual void map(address_map &map) override;
-	virtual void idmap(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
+	virtual void idmap(address_map &map) override ATTR_COLD;
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
@@ -256,8 +256,8 @@ public:
 	mindset_rs232_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~mindset_rs232_module() = default;
 
-	virtual void map(address_map &map) override;
-	virtual void idmap(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
+	virtual void idmap(address_map &map) override ATTR_COLD;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

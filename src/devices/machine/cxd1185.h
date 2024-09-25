@@ -20,7 +20,7 @@ public:
 	auto drq_out_cb() { return m_drq_out_cb.bind(); }
 	auto port_out_cb() { return m_port_out_cb.bind(); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	// dma and port handlers
 	u8 dma_r();
@@ -29,8 +29,8 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// ncsci_device overrides
 	virtual void scsi_ctrl_changed() override;

@@ -27,7 +27,7 @@ public:
 	auto extint_wr_callback() { return m_write_extint.bind(); }
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	uint8_t read(offs_t offset, uint8_t data);
 	void write(offs_t offset, uint8_t data);

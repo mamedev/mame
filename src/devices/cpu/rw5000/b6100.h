@@ -59,8 +59,8 @@ protected:
 	virtual u8 sr_page() override { return 15; }
 	virtual u16 decode_digit(u8 data) override;
 
-	void program_896x8(address_map &map);
-	void data_48x4(address_map &map);
+	void program_896x8(address_map &map) ATTR_COLD;
+	void data_48x4(address_map &map) ATTR_COLD;
 
 	// opcode handlers
 	virtual void op_tkbs() override;

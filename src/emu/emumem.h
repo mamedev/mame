@@ -2458,7 +2458,7 @@ public:
 
 	// setup
 	void prepare_map();
-	void prepare_device_map(address_map &map);
+	void prepare_device_map(address_map &map) ATTR_COLD;
 	void populate_from_map(address_map *map = nullptr);
 
 	template<int Width, int AddrShift> handler_entry_read_unmapped <Width, AddrShift> *get_unmap_r() const { return static_cast<handler_entry_read_unmapped <Width, AddrShift> *>(m_unmap_r); }
@@ -2474,7 +2474,7 @@ protected:
 	virtual std::pair<void *, void *> get_cache_info() = 0;
 	virtual std::pair<const void *, const void *> get_specific_info() = 0;
 
-	void prepare_map_generic(address_map &map, bool allow_alloc);
+	void prepare_map_generic(address_map &map, bool allow_alloc) ATTR_COLD;
 
 	// private state
 	device_t &              m_device;           // reference to the owning device
@@ -2646,8 +2646,8 @@ public:
 		int m_id;
 
 		memory_view_entry(const address_space_config &config, memory_manager &manager, memory_view &view, int id);
-		void prepare_map_generic(address_map &map, bool allow_alloc);
-		void prepare_device_map(address_map &map);
+		void prepare_map_generic(address_map &map, bool allow_alloc) ATTR_COLD;
+		void prepare_device_map(address_map &map) ATTR_COLD;
 
 		void check_range_optimize_all(const char *function, int width, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror, u64 &nunitmask, int &ncswidth);
 		void check_range_optimize_mirror(const char *function, offs_t addrstart, offs_t addrend, offs_t addrmirror, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror);

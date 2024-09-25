@@ -115,10 +115,10 @@ template <u8 ch> void paula_8364_device::audio_channel_map(address_map &map)
 }
 
 // Instantiate channel maps
-template void paula_8364_device::audio_channel_map<0>(address_map &map);
-template void paula_8364_device::audio_channel_map<1>(address_map &map);
-template void paula_8364_device::audio_channel_map<2>(address_map &map);
-template void paula_8364_device::audio_channel_map<3>(address_map &map);
+template void paula_8364_device::audio_channel_map<0>(address_map &map) ATTR_COLD;
+template void paula_8364_device::audio_channel_map<1>(address_map &map) ATTR_COLD;
+template void paula_8364_device::audio_channel_map<2>(address_map &map) ATTR_COLD;
+template void paula_8364_device::audio_channel_map<3>(address_map &map) ATTR_COLD;
 
 template <u8 ch> void paula_8364_device::audxlch_w(u16 data)
 {

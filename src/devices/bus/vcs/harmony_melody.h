@@ -19,9 +19,9 @@ public:
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 
 private:
@@ -29,7 +29,7 @@ private:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 	uint8_t read8_r(offs_t offset);
-	void harmony_arm7_map(address_map &map);
+	void harmony_arm7_map(address_map &map) ATTR_COLD;
 
 	required_device<lpc210x_device> m_cpu;
 	uint8_t m_base_bank;

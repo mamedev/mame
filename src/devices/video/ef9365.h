@@ -60,9 +60,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_config_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -90,7 +90,7 @@ private:
 	void dump_bitplanes_word();
 	void update_interrupts();
 
-	void ef9365_map(address_map &map);
+	void ef9365_map(address_map &map) ATTR_COLD;
 
 	// internal state
 	required_region_ptr<uint8_t> m_charset;
