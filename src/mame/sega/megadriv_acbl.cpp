@@ -684,7 +684,7 @@ INPUT_PORTS_START( srmdb )
 	PORT_DIPSETTING(    0x00, "6" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( barekch ) // TODO: identify dips. PCB has 3 x 8-dip banks, but probably most unused
+INPUT_PORTS_START( barekch ) // TODO: identify DIP switches. PCB has 3 x 8-switch banks, but probably most unused
 	PORT_INCLUDE( md_common )
 
 	PORT_MODIFY("PAD1")
@@ -806,24 +806,24 @@ INPUT_PORTS_END
 INPUT_PORTS_START( barek2 )
 	PORT_INCLUDE( md_common )
 
-	PORT_START("dsw")
+	PORT_START("DSW")
 	PORT_DIPNAME(0x0f, 0x0f, DEF_STR( Coinage ))
+	PORT_DIPSETTING(   0x05, DEF_STR( 6C_1C ))
+	PORT_DIPSETTING(   0x06, DEF_STR( 5C_1C ))
+	PORT_DIPSETTING(   0x07, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(   0x08, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(   0x01, DEF_STR( 8C_3C ))
+	PORT_DIPSETTING(   0x09, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(   0x02, DEF_STR( 5C_3C ))
+	PORT_DIPSETTING(   0x03, DEF_STR( 3C_2C ))
 	PORT_DIPSETTING(   0x0f, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(   0x00, DEF_STR( 1C_1C )) // duplicate
+	PORT_DIPSETTING(   0x04, DEF_STR( 2C_3C ))
 	PORT_DIPSETTING(   0x0e, DEF_STR( 1C_2C ))
 	PORT_DIPSETTING(   0x0d, DEF_STR( 1C_3C ))
 	PORT_DIPSETTING(   0x0c, DEF_STR( 1C_4C ))
 	PORT_DIPSETTING(   0x0b, DEF_STR( 1C_5C ))
 	PORT_DIPSETTING(   0x0a, DEF_STR( 1C_6C ))
-	PORT_DIPSETTING(   0x09, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(   0x08, DEF_STR( 3C_1C ))
-	PORT_DIPSETTING(   0x07, DEF_STR( 4C_1C ))
-	PORT_DIPSETTING(   0x06, DEF_STR( 5C_1C ))
-	PORT_DIPSETTING(   0x05, DEF_STR( 6C_1C ))
-	PORT_DIPSETTING(   0x04, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(   0x03, DEF_STR( 3C_2C ))
-	PORT_DIPSETTING(   0x02, DEF_STR( 5C_3C ))
-	PORT_DIPSETTING(   0x01, DEF_STR( 8C_3C ))
-	PORT_DIPSETTING(   0x00, DEF_STR( 1C_1C )) // duplicate
 	PORT_DIPNAME(0x30, 0x30, DEF_STR( Lives ))
 	PORT_DIPSETTING(   0x30, "1" )
 	PORT_DIPSETTING(   0x20, "2" )
@@ -835,7 +835,7 @@ INPUT_PORTS_START( barek2 )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ))
 
-	PORT_START("in0")
+	PORT_START("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
@@ -966,9 +966,9 @@ void md_boot_mcu_state::md_boot_mcu(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_mcu_state::md_boot_mcu_map);
 
-	PIC16C57(config, m_mcu, 4000000); // unknown clock
+	PIC16C57(config, m_mcu, 4'000'000); // unknown clock
 	m_mcu->write_a().set(FUNC(md_boot_mcu_state::mcu_porta_w));
-	m_mcu->read_b().set_ioport("in0");
+	m_mcu->read_b().set_ioport("IN0");
 	m_mcu->write_b().set(FUNC(md_boot_mcu_state::mcu_portb_w));
 	m_mcu->read_c().set(FUNC(md_boot_mcu_state::mcu_portc_r));
 	m_mcu->write_c().set(FUNC(md_boot_mcu_state::mcu_portc_w));

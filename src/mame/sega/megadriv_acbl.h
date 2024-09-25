@@ -45,14 +45,14 @@ private:
 	int m_aladmdb_mcu_port = 0;
 };
 
-// for games with emulated pic mcu
+// for games with emulated PIC microcontroller
 class md_boot_mcu_state : public md_boot_state
 {
 public:
 	md_boot_mcu_state(const machine_config &mconfig, device_type type, const char *tag) :
 		md_boot_state(mconfig, type, tag),
 		m_mcu(*this, "mcu"),
-		m_dsw(*this, "dsw")
+		m_dsw(*this, "DSW")
 	{ }
 
 	void md_boot_mcu(machine_config &config);
@@ -71,12 +71,12 @@ private:
 	required_device<pic16c57_device> m_mcu;
 	required_ioport m_dsw;
 
-	uint8_t m_mcu_porta;
-	uint8_t m_mcu_portc;
-	uint8_t m_mcu_in_latch_msb;
-	uint8_t m_mcu_in_latch_lsb;
-	uint8_t m_mcu_out_latch_msb;
-	uint8_t m_mcu_out_latch_lsb;
+	uint8_t m_mcu_porta = 0;
+	uint8_t m_mcu_portc = 0;
+	uint8_t m_mcu_in_latch_msb = 0;
+	uint8_t m_mcu_in_latch_lsb = 0;
+	uint8_t m_mcu_out_latch_msb = 0;
+	uint8_t m_mcu_out_latch_lsb = 0;
 };
 
 class md_sonic3bl_state : public md_boot_state
