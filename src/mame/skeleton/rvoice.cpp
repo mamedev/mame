@@ -35,7 +35,7 @@ public:
 
 private:
 	required_device<hd6301y_cpu_device> m_maincpu;
-	void hd63701_main_mem(address_map &map);
+	void hd63701_main_mem(address_map &map) ATTR_COLD;
 };
 
 

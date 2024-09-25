@@ -48,7 +48,7 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -164,9 +164,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inc);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void istrebiteli_palette(palette_device &palette) const;
@@ -203,10 +203,10 @@ private:
 	uint8_t m_tileram[16]{};
 	uint8_t m_road_scroll = 0;
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void moto_io_map(address_map &map);
-	void moto_mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void moto_io_map(address_map &map) ATTR_COLD;
+	void moto_mem_map(address_map &map) ATTR_COLD;
 };
 
 void istrebiteli_state::machine_start()

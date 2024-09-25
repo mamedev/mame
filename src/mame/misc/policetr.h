@@ -46,12 +46,12 @@ protected:
 		m_speedup_addr(speedup_addr) { }
 
 	virtual void driver_start() override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void mem(address_map &map);
+	void mem(address_map &map) ATTR_COLD;
 
-	void ramdac_map(address_map& map);
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 	void control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -128,7 +128,7 @@ protected:
 		: policetr_state(mconfig, type, tag, speedup_pc, speedup_addr)
 	{ }
 
-	void mem(address_map &map);
+	void mem(address_map &map) ATTR_COLD;
 };
 
 class sshoot17_state : public sshooter_state

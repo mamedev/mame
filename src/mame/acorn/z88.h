@@ -62,8 +62,8 @@ public:
 	void z88(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint8_t kb_r(offs_t offset);
 	UPD65031_MEMORY_UPDATE(bankswitch_update);
 	UPD65031_SCREEN_UPDATE(lcd_update);
@@ -76,9 +76,9 @@ private:
 
 	void z88_palette(palette_device &palette) const;
 
-	void z88_io(address_map &map);
-	void z88_mem(address_map &map);
-	void z88_map(address_map &map);
+	void z88_io(address_map &map) ATTR_COLD;
+	void z88_mem(address_map &map) ATTR_COLD;
+	void z88_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;

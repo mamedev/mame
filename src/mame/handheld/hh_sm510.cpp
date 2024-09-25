@@ -6874,7 +6874,7 @@ public:
 	void tgaiden(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// R2 connects to a single LED behind the screen

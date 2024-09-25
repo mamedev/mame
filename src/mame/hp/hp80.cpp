@@ -153,12 +153,12 @@ public:
 protected:
 	void hp80_base(machine_config &config);
 
-	virtual void cpu_mem_map(address_map &map);
-	virtual void rombank_mem_map(address_map &map);
+	virtual void cpu_mem_map(address_map &map) ATTR_COLD;
+	virtual void rombank_mem_map(address_map &map) ATTR_COLD;
 	virtual void unmap_optroms(address_space &space);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t intack_r();
 
@@ -990,8 +990,8 @@ public:
 	void hp85(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_w(int state);
@@ -1633,8 +1633,8 @@ public:
 	void hp86(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void cpu_mem_map(address_map &map) override;
 	virtual void rombank_mem_map(address_map &map) override;

@@ -63,7 +63,7 @@ public:
 	void ibm5550(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -75,8 +75,8 @@ private:
 	required_shared_ptr<uint16_t> m_gfxram;
 	required_device<palette_device> m_palette;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -190,8 +190,8 @@ public:
 	void mcatadv(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -218,11 +218,11 @@ private:
 	void screen_vblank(int state);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_tilemap_part(screen_device &screen, int layer, int i, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
-	void mcatadv_sound_io_map(address_map &map);
-	void mcatadv_sound_map(address_map &map);
-	void nost_sound_io_map(address_map &map);
-	void nost_sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void mcatadv_sound_io_map(address_map &map) ATTR_COLD;
+	void mcatadv_sound_map(address_map &map) ATTR_COLD;
+	void nost_sound_io_map(address_map &map) ATTR_COLD;
+	void nost_sound_map(address_map &map) ATTR_COLD;
 };
 
 

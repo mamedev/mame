@@ -30,8 +30,8 @@ public:
 	void vx600(machine_config &config);
 
 private:
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	required_device<upd78310_device> m_maincpu;
 	required_device<upd78c11_device> m_subcpu;

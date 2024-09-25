@@ -41,12 +41,12 @@ private:
 	void apple10_palette(palette_device &palette) const;
 	void crystalc_palette(palette_device &palette) const;
 	uint32_t screen_update_snookr10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void crystalc_map(address_map &map);
-	void snookr10_map(address_map &map);
-	void tenballs_map(address_map &map);
+	void crystalc_map(address_map &map) ATTR_COLD;
+	void snookr10_map(address_map &map) ATTR_COLD;
+	void tenballs_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	int m_outportl = 0;
 	int m_outporth = 0;

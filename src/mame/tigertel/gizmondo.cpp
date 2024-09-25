@@ -60,15 +60,15 @@ public:
 private:
 	uint32_t m_port[9];
 	required_device<s3c2440_device> m_s3c2440;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<gf4500_device> m_gf4500;
 	uint32_t s3c2440_gpio_port_r(offs_t offset);
 	void s3c2440_gpio_port_w(offs_t offset, uint32_t data);
 
 	bitmap_rgb32 m_bitmap;
-	void gizmondo_map(address_map &map);
+	void gizmondo_map(address_map &map) ATTR_COLD;
 };
 
 

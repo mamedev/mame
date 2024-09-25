@@ -113,9 +113,9 @@ public:
 	void fuusen_init();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void konmedal_palette(palette_device &palette) const;
@@ -152,9 +152,9 @@ private:
 	void shuri_irq_w(uint8_t data);
 	void mario_scrollhack_w(uint8_t data);
 
-	void ddboy_main(address_map &map);
-	void medal_main(address_map &map);
-	void shuriboy_main(address_map &map);
+	void ddboy_main(address_map &map) ATTR_COLD;
+	void medal_main(address_map &map) ATTR_COLD;
+	void shuriboy_main(address_map &map) ATTR_COLD;
 
 	void machine_start_common();
 

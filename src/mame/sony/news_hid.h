@@ -22,14 +22,14 @@ public:
 	};
 	template <news_hid_device Device> auto irq_out() { return m_irq_out_cb[Device].bind(); }
 
-	void map(address_map &map);
-	void map_68k(address_map &map);
-	void map_apbus(address_map &map);
+	void map(address_map &map) ATTR_COLD;
+	void map_68k(address_map &map) ATTR_COLD;
+	void map_apbus(address_map &map) ATTR_COLD;
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_matrix_keyboard_interface overrides

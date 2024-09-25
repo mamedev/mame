@@ -107,16 +107,16 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	void reset_hard();
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	virtual void spectrum_128_update_memory() override {}
 
 	u8 do_m1(offs_t offset);
 	void do_mf_nmi();
 	void leave_nmi(int status);
-	void map_fetch(address_map &map);
-	void map_mem(address_map &map);
-	void map_io(address_map &map);
-	void map_regs(address_map &map);
+	void map_fetch(address_map &map) ATTR_COLD;
+	void map_mem(address_map &map) ATTR_COLD;
+	void map_io(address_map &map) ATTR_COLD;
+	void map_regs(address_map &map) ATTR_COLD;
 	u8 reg_r(offs_t reg);
 	void reg_w(offs_t reg, u8 data);
 	void mmu_w(offs_t bank, u8 data);

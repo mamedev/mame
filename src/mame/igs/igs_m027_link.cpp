@@ -149,7 +149,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void host_map(address_map &map);
+	void host_map(address_map &map) ATTR_COLD;
 };
 
 class extension_state : public driver_device
@@ -169,7 +169,7 @@ public:
 	void init_mgcs2l();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -178,8 +178,8 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void cjsll_map(address_map &map);
-	void mgcs2l_map(address_map &map);
+	void cjsll_map(address_map &map) ATTR_COLD;
+	void mgcs2l_map(address_map &map) ATTR_COLD;
 
 	void decrypt();
 };

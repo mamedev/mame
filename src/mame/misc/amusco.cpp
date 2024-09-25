@@ -124,8 +124,8 @@ public:
 	void coin_irq(int state);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -142,8 +142,8 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 	void amusco_palette(palette_device &palette) const;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint8_t []> m_videoram{};
 	tilemap_t *m_bg_tilemap = nullptr;

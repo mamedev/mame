@@ -116,8 +116,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
@@ -158,7 +158,7 @@ public:
 	void albert(machine_config &config);
 	void ivelultr(machine_config &config);
 	void apple2p(machine_config &config);
-	void apple2_map(address_map &map);
+	void apple2_map(address_map &map) ATTR_COLD;
 
 private:
 	int m_speaker_state, m_cassette_state;

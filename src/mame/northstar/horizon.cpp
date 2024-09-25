@@ -78,10 +78,10 @@ public:
 private:
 	uint8_t ff_r();
 
-	void horizon_io(address_map &map);
-	void horizon_mem(address_map &map);
+	void horizon_io(address_map &map) ATTR_COLD;
+	void horizon_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart_l;
 	required_device<i8251_device> m_usart_r;

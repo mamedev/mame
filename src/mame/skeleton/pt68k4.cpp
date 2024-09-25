@@ -107,8 +107,8 @@ public:
 	void pt68k4(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t hiram_r(offs_t offset);
@@ -129,8 +129,8 @@ private:
 	void keyboard_clock_w(int state);
 	void keyboard_data_w(int state);
 
-	void pt68k2_mem(address_map &map);
-	void pt68k4_mem(address_map &map);
+	void pt68k2_mem(address_map &map) ATTR_COLD;
+	void pt68k4_mem(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint16_t> m_p_base;
 	required_device<cpu_device> m_maincpu;

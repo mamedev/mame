@@ -85,8 +85,8 @@ public:
 	void by17(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_u10a = 0U;
@@ -139,7 +139,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
 
-	void by17_map(address_map &map);
+	void by17_map(address_map &map) ATTR_COLD;
 };
 
 

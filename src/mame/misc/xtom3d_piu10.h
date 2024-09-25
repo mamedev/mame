@@ -20,10 +20,10 @@ public:
 	template <typename... T> void add_route(T &&... args) { m_dac3350a.lookup()->add_route(std::forward<T>(args)...); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	void remap(int space_id, offs_t start, offs_t end) override;

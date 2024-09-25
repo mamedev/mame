@@ -72,7 +72,7 @@ public:
 	int spriteram_bit_r();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -126,10 +126,10 @@ private:
 	void draw_sprites();
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
 
-	void limenko_io_map(address_map &map);
-	void limenko_map(address_map &map);
-	void spotty_io_map(address_map &map);
-	void spotty_map(address_map &map);
+	void limenko_io_map(address_map &map) ATTR_COLD;
+	void limenko_map(address_map &map) ATTR_COLD;
+	void spotty_io_map(address_map &map) ATTR_COLD;
+	void spotty_map(address_map &map) ATTR_COLD;
 
 	// spotty audiocpu
 	uint8_t audiocpu_p1_r();

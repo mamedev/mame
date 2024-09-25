@@ -39,8 +39,8 @@ public:
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 	const address_space_config m_space_config;
@@ -48,7 +48,7 @@ protected:
 //  address_space *m_host_space;
 
 private:
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 
 	void a1_base_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void a1_xstep_w(offs_t offset, u16 data, u16 mem_mask = ~0);

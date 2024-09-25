@@ -51,7 +51,7 @@ public:
 	void chess2001(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -64,7 +64,7 @@ private:
 	u16 m_inp_mux = 0;
 	int m_dac_data = 0;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void speaker_w(u8 data);

@@ -140,12 +140,12 @@ private:
 	uint8_t jamma_if_control_latch_r();
 	uint8_t jamma_if_read_dsw(offs_t offset);
 	virtual uint8_t joy_read() override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<discrete_device> m_discrete;
 
-	void pce_io(address_map &map);
-	void pce_mem(address_map &map);
-	void z80_map(address_map &map);
+	void pce_io(address_map &map) ATTR_COLD;
+	void pce_mem(address_map &map) ATTR_COLD;
+	void z80_map(address_map &map) ATTR_COLD;
 };
 
 #define UAPCE_SOUND_EN  NODE_10

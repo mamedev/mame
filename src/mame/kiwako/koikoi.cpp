@@ -84,15 +84,15 @@ private:
 	uint8_t input_r();
 	void unknown_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void koikoi_palette(palette_device &palette) const;
 	uint32_t screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void koikoi_io_map(address_map &map);
-	void koikoi_map(address_map &map);
+	void koikoi_io_map(address_map &map) ATTR_COLD;
+	void koikoi_map(address_map &map) ATTR_COLD;
 };
 
 

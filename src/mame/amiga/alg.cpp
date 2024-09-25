@@ -103,11 +103,11 @@ private:
 
 	DECLARE_VIDEO_START(alg);
 
-	void a500_mem(address_map &map);
-	void main_map_picmatic(address_map &map);
-	void main_map_r1(address_map &map);
-	void main_map_r2(address_map &map);
-	void overlay_512kb_map(address_map &map);
+	void a500_mem(address_map &map) ATTR_COLD;
+	void main_map_picmatic(address_map &map) ATTR_COLD;
+	void main_map_r1(address_map &map) ATTR_COLD;
+	void main_map_r2(address_map &map) ATTR_COLD;
+	void overlay_512kb_map(address_map &map) ATTR_COLD;
 };
 
 

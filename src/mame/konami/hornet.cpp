@@ -428,8 +428,8 @@ public:
 	void init_gradius4();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// TODO: Needs verification on real hardware
@@ -492,15 +492,15 @@ private:
 
 	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_irq);
-	void hornet_map(address_map &map);
-	void hornet_lan_map(address_map &map);
-	void terabrst_map(address_map &map);
-	void sscope_map(address_map &map);
-	void sscope2_map(address_map &map);
-	void gn680_memmap(address_map &map);
-	void sharc0_map(address_map &map);
-	void sharc1_map(address_map &map);
-	void sound_memmap(address_map &map);
+	void hornet_map(address_map &map) ATTR_COLD;
+	void hornet_lan_map(address_map &map) ATTR_COLD;
+	void terabrst_map(address_map &map) ATTR_COLD;
+	void sscope_map(address_map &map) ATTR_COLD;
+	void sscope2_map(address_map &map) ATTR_COLD;
+	void gn680_memmap(address_map &map) ATTR_COLD;
+	void sharc0_map(address_map &map) ATTR_COLD;
+	void sharc1_map(address_map &map) ATTR_COLD;
+	void sound_memmap(address_map &map) ATTR_COLD;
 };
 
 

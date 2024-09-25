@@ -47,7 +47,7 @@ public:
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint16_t cs4031_ior(offs_t offset);
 	void cs4031_iow(offs_t offset, uint16_t data);
@@ -55,8 +55,8 @@ public:
 	void cs4031_tc(offs_t offset, uint8_t data) { m_isabus->eop_w(offset, data); }
 	void cs4031_spkr(int state) { m_speaker->level_w(state); }
 	void ct486(machine_config &config);
-	void ct486_io(address_map &map);
-	void ct486_map(address_map &map);
+	void ct486_io(address_map &map) ATTR_COLD;
+	void ct486_map(address_map &map) ATTR_COLD;
 };
 
 

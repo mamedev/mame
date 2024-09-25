@@ -74,7 +74,7 @@ private:
 
 	INTERRUPT_GEN_MEMBER(irq_gen);
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 INTERRUPT_GEN_MEMBER(elcirculo_state::irq_gen)

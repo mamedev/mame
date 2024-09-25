@@ -63,7 +63,7 @@ public:
 
 protected:
 	virtual void device_start() override {}
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void tra_callback() override { m_tx_cb(transmit_register_get_data_bit()); }
 	virtual void tra_complete() override { m_tx_irq_cb(1); }
@@ -115,8 +115,8 @@ public:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	enum
@@ -127,8 +127,8 @@ private:
 		FIRQ_TX1 = (1<<3)  // UART 1 Tx (MIDI)
 	};
 
-	void maincpu_map(address_map &map);
-	void sound_map(address_map &map);
+	void maincpu_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	template <int Shift> u8 time_r();
 

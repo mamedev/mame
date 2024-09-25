@@ -81,7 +81,7 @@ protected:
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void cpu2_map(address_map &map);
+	void cpu2_map(address_map &map) ATTR_COLD;
 
 };
 
@@ -120,8 +120,8 @@ public:
 	void init_gladiatr();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_memory_bank m_mainbank;
@@ -161,10 +161,10 @@ private:
 
 	u32 screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void gladiatr_cpu1_io(address_map &map);
-	void gladiatr_cpu1_map(address_map &map);
-	void gladiatr_cpu2_io(address_map &map);
-	void gladiatr_cpu3_map(address_map &map);
+	void gladiatr_cpu1_io(address_map &map) ATTR_COLD;
+	void gladiatr_cpu1_map(address_map &map) ATTR_COLD;
+	void gladiatr_cpu2_io(address_map &map) ATTR_COLD;
+	void gladiatr_cpu3_map(address_map &map) ATTR_COLD;
 };
 
 class ppking_state : public gladiatr_state_base
@@ -182,8 +182,8 @@ public:
 	void ppking(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<u8>    m_nvram;
@@ -216,8 +216,8 @@ private:
 
 	u32 screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ppking_cpu1_io(address_map &map);
-	void ppking_cpu1_map(address_map &map);
-	void ppking_cpu2_io(address_map &map);
-	void ppking_cpu3_map(address_map &map);
+	void ppking_cpu1_io(address_map &map) ATTR_COLD;
+	void ppking_cpu1_map(address_map &map) ATTR_COLD;
+	void ppking_cpu2_io(address_map &map) ATTR_COLD;
+	void ppking_cpu3_map(address_map &map) ATTR_COLD;
 };

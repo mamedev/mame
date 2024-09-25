@@ -153,17 +153,17 @@ private:
 	void flipscreen_w(int state);
 	void flipchars_w(int state);
 	void nyny_ay8910_37_port_a_w(uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(update_pia_1);
 	void ic48_1_74123_output_changed(int state);
 	inline void shift_star_generator(  );
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_END_UPDATE(crtc_end_update);
-	void audio_1_map(address_map &map);
-	void audio_2_map(address_map &map);
-	void main_map(address_map &map);
+	void audio_1_map(address_map &map) ATTR_COLD;
+	void audio_2_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

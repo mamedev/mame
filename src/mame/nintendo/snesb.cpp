@@ -210,16 +210,16 @@ private:
 
 	DECLARE_MACHINE_RESET(ffight2b);
 	DECLARE_MACHINE_RESET(wldgunsb);
-	void snesb_map(address_map &map);
-	void spc_map(address_map &map);
-	void endless_map(address_map &map);
-	void extrainp_map(address_map &map);
-	void kinstb_map(address_map &map);
-	void rushbets_map(address_map &map);
-	void sblast2b_map(address_map &map);
-	void venom_map(address_map &map);
-	void wldgunsb_map(address_map &map);
-	void tmntmwb_map(address_map &map);
+	void snesb_map(address_map &map) ATTR_COLD;
+	void spc_map(address_map &map) ATTR_COLD;
+	void endless_map(address_map &map) ATTR_COLD;
+	void extrainp_map(address_map &map) ATTR_COLD;
+	void kinstb_map(address_map &map) ATTR_COLD;
+	void rushbets_map(address_map &map) ATTR_COLD;
+	void sblast2b_map(address_map &map) ATTR_COLD;
+	void venom_map(address_map &map) ATTR_COLD;
+	void wldgunsb_map(address_map &map) ATTR_COLD;
+	void tmntmwb_map(address_map &map) ATTR_COLD;
 };
 
 

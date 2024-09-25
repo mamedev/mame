@@ -98,12 +98,12 @@ public:
 	void homelab2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	u32 screen2_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	INTERRUPT_GEN_MEMBER(homelab_frame);
-	void homelab2_mem(address_map &map);
+	void homelab2_mem(address_map &map) ATTR_COLD;
 	u8 cass2_r();
 	u8 mem3800_r();
 	void mem3800_w(offs_t offset, u8 data);
@@ -138,17 +138,17 @@ public:
 	int cass3_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 exxx_r(offs_t offset);
 	void port7f_w(u8 data);
 	void portff_w(u8 data);
-	void homelab3_io(address_map &map);
-	void homelab3_mem(address_map &map);
-	void brailab4_io(address_map &map);
-	void brailab4_mem(address_map &map);
+	void homelab3_io(address_map &map) ATTR_COLD;
+	void homelab3_mem(address_map &map) ATTR_COLD;
+	void brailab4_io(address_map &map) ATTR_COLD;
+	void brailab4_mem(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<u8[]> m_ram;
 };

@@ -67,8 +67,8 @@ protected:
 			device_t *owner,
 			u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 
 	// flip latching (set when declaring device in MCFG )  probably needs figuring out properly, only brapboys wants it?
@@ -127,7 +127,7 @@ public:
 	int get_sprite_type(void) override{ return 0; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(KANEKO_VU002_SPRITE, kaneko_vu002_sprite_device)
@@ -146,7 +146,7 @@ public:
 	int get_sprite_type(void) override{ return 1; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(KANEKO_KC002_SPRITE, kaneko_kc002_sprite_device)

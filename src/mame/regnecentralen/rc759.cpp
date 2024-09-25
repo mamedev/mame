@@ -77,8 +77,8 @@ public:
 	void rc759(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i80186_cpu_device> m_maincpu;
@@ -139,8 +139,8 @@ private:
 
 	uint8_t irq_callback();
 
-	void rc759_io(address_map &map);
-	void rc759_map(address_map &map);
+	void rc759_io(address_map &map) ATTR_COLD;
+	void rc759_map(address_map &map) ATTR_COLD;
 
 	std::vector<uint8_t> m_nvram_mem;
 

@@ -107,7 +107,7 @@ public:
 	void aquarium(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -150,9 +150,9 @@ private:
 	u8 snd_bitswap(u8 scrambled_data);
 	void aquarium_colpri_cb(u32 &colour, u32 &pri_mask);
 
-	void main_map(address_map &map);
-	void snd_map(address_map &map);
-	void snd_portmap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void snd_map(address_map &map) ATTR_COLD;
+	void snd_portmap(address_map &map) ATTR_COLD;
 };
 
 

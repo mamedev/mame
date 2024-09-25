@@ -188,17 +188,17 @@ public:
 	void init_hatris();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_memory_bank m_soundbank;
 
-	void sound_portmap(address_map &map);
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
-	void sound_map(address_map &map);
+	void sound_portmap(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 private:
 	void bankswitch_w(uint8_t data);
@@ -220,7 +220,7 @@ public:
 	void init_pipedrm();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<vsystem_spr2_device> m_spr_old;
@@ -230,7 +230,7 @@ private:
 
 	void sound_bankswitch_w(uint8_t data);
 
-	void sound_portmap(address_map &map);
+	void sound_portmap(address_map &map) ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

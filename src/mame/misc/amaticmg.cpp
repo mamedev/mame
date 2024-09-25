@@ -466,8 +466,8 @@ public:
 	void init_am_mg5hu();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_attr;
@@ -499,10 +499,10 @@ private:
 	void encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress);
 	void decrypt(int key1, int key2);
 
-	void amaticmg2_portmap(address_map &map);
-	void amaticmg4_portmap(address_map &map);
-	void amaticmg_map(address_map &map);
-	void amaticmg_portmap(address_map &map);
+	void amaticmg2_portmap(address_map &map) ATTR_COLD;
+	void amaticmg4_portmap(address_map &map) ATTR_COLD;
+	void amaticmg_map(address_map &map) ATTR_COLD;
+	void amaticmg_portmap(address_map &map) ATTR_COLD;
 };
 
 

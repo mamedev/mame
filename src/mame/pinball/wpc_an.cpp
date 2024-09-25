@@ -125,10 +125,10 @@ public:
 
 private:
 	// driver_device overrides
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
-	void wpc_an_map(address_map &map);
+	void wpc_an_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(vblank_tick);
 	TIMER_CALLBACK_MEMBER(trigger_irq);

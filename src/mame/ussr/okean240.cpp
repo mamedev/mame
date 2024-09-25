@@ -121,11 +121,11 @@ private:
 	void kbd_put(u8 data);
 	u32 screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void okean240_io(address_map &map);
-	void okean240_mem(address_map &map);
+	void okean240_io(address_map &map) ATTR_COLD;
+	void okean240_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
 	u8 m_term_data = 0U;
 	u8 m_j = 0U;

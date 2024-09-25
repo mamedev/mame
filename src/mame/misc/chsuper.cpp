@@ -59,7 +59,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	int m_tilexor = 0;
@@ -78,10 +78,10 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void losttrea_portmap(address_map &map);
-	void portmap(address_map &map);
-	void prg_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void losttrea_portmap(address_map &map) ATTR_COLD;
+	void portmap(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 };
 
 

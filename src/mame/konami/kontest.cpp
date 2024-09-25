@@ -59,14 +59,14 @@ private:
 	// member functions
 	void control_w(uint8_t data);
 
-	void kontest_io(address_map &map);
-	void kontest_map(address_map &map);
+	void kontest_io(address_map &map) ATTR_COLD;
+	void kontest_map(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void kontest_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(kontest_interrupt);

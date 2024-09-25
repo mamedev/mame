@@ -34,7 +34,7 @@ private:
 	void leds_w(offs_t offset, u8 data);
 	void dsp_w(offs_t offset, u8 data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<upd7810_device> m_maincpu;
 	required_device_array<tms32010_device, 2> m_dsp;

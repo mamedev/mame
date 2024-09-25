@@ -156,9 +156,9 @@ public:
 	void manohman(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	void mem_map(address_map &map);
-	void cpu_space_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;

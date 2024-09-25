@@ -43,8 +43,8 @@ public:
 	void dps1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void portb2_w(u8 data);
@@ -58,8 +58,8 @@ private:
 	void portff_w(u8 data);
 	void fdc_drq_w(int state);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	bool m_dma_dir = 0;
 	u16 m_dma_adr = 0U;

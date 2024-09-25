@@ -29,7 +29,7 @@ public:
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<pic17c4x_device> m_maincpu;
 	required_device<pic17c4x_device> m_slavecpu;

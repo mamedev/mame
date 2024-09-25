@@ -67,7 +67,7 @@ private:
 	required_ioport_array<4> m_inputs;
 	optional_ioport m_reset;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	u8 input_r();
 };

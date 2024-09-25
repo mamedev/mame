@@ -97,7 +97,7 @@ public:
 	int warp1_protection_r() { return m_audio_data[0] & 1; }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -112,7 +112,7 @@ private:
 	required_shared_ptr<u8> m_videoram;
 	required_ioport_array<3> m_inputs;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// video
 	u8 m_flipscreen = 0;

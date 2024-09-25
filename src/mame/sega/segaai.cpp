@@ -160,7 +160,7 @@ public:
 	void segaai(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	static constexpr u8 VECTOR_V9938 = 0xf8;
@@ -178,8 +178,8 @@ private:
 	static constexpr u8 UPD7759_MODE = 0x01;
 	static constexpr u8 UPD7759_BANK = 0x02;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 	void update_irq_state();
 	u32 get_vector() { return m_vector; }
 	void vdp_interrupt(int state);

@@ -73,12 +73,12 @@ public:
 	void hds200(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
@@ -91,9 +91,9 @@ private:
 	required_memory_bank m_rombank;
 
 	uint8_t attr_r(offs_t offset);
-	void attrram_map(address_map &map);
+	void attrram_map(address_map &map) ATTR_COLD;
 	uint8_t char_r(offs_t offset);
-	void charram_map(address_map &map);
+	void charram_map(address_map &map) ATTR_COLD;
 
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 

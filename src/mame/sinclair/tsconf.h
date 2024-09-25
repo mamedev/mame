@@ -192,9 +192,9 @@ private:
 	u8 beta_enable_r(offs_t offset);
 	u8 beta_disable_r(offs_t offset);
 
-	void tsconf_io(address_map &map);
-	void tsconf_mem(address_map &map);
-	void tsconf_switch(address_map &map);
+	void tsconf_io(address_map &map) ATTR_COLD;
+	void tsconf_mem(address_map &map) ATTR_COLD;
+	void tsconf_switch(address_map &map) ATTR_COLD;
 
 	u8 mem_bank_read(u8 bank, offs_t offset);
 	template <u8 Bank>

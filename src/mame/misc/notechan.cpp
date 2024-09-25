@@ -318,8 +318,8 @@ private:
 	void out_f9_w(uint8_t data);
 	void out_fa_w(uint8_t data);
 	void out_ff_w(uint8_t data);
-	void notechan_map(address_map &map);
-	void notechan_port_map(address_map &map);
+	void notechan_map(address_map &map) ATTR_COLD;
+	void notechan_port_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_lamps.resolve(); }
 

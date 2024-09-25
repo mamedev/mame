@@ -31,7 +31,7 @@ public:
 	void e9161(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<m68000_device> m_maincpu;
 	required_device<hd63450_device> m_dmac;

@@ -135,8 +135,8 @@ private:
 	required_ioport m_battery;
 	required_shared_ptr<u8> m_video_ram;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void io_w(offs_t offset, u8 data);
 	u8 io_r(offs_t offset);
@@ -149,8 +149,8 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(card_load);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(card_unload);
 
-	void pda600_io(address_map &map);
-	void pda600_mem(address_map &map);
+	void pda600_io(address_map &map) ATTR_COLD;
+	void pda600_mem(address_map &map) ATTR_COLD;
 
 	emu_timer * m_csio_clk_timer;
 	emu_timer * m_serl_clk_timer;

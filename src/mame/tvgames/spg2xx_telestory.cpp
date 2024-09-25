@@ -23,10 +23,10 @@ public:
 	void telestory(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void mem_map_4m_tsram(address_map& map);
+	void mem_map_4m_tsram(address_map &map) ATTR_COLD;
 
 	uint16_t porta_r();
 	uint16_t portb_r();

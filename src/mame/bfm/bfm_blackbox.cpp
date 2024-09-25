@@ -89,7 +89,7 @@ protected:
 
 	void blackbox_base(machine_config &config);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi) { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq) { m_maincpu->pulse_input_line(M6800_IRQ_LINE, attotime::from_usec(2500)); }
@@ -112,7 +112,7 @@ protected:
 	template <unsigned Digit> uint8_t out_disp_r(address_space &space);
 	void payout_w(uint8_t payout, uint8_t enable, bool state);
 
-	void blackbox_base_map(address_map &map);
+	void blackbox_base_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_out_data;
 	uint8_t m_input_en[6];
@@ -179,8 +179,8 @@ protected:
 	uint8_t out_lamps2_buzzer_r(address_space &space);
 	uint8_t out_bellt_in_select_r(address_space &space);
 
-	void blackbox_em_map(address_map &map);
-	void blackbox_em_bellt_map(address_map &map);
+	void blackbox_em_map(address_map &map) ATTR_COLD;
+	void blackbox_em_bellt_map(address_map &map) ATTR_COLD;
 
 	bool m_buzzer_on;
 	bool m_in_extra_select[8];
@@ -204,7 +204,7 @@ private:
 	void out_lamps1_beeper_w(address_space &space, uint8_t data);
 	uint8_t out_lamps1_beeper_r(address_space &space);
 
-	void blackbox_em_21up_map(address_map &map);
+	void blackbox_em_21up_map(address_map &map) ATTR_COLD;
 
 	bool m_beeper_on;
 	int16_t m_beep_sample_data[477];
@@ -235,7 +235,7 @@ private:
 	uint8_t prot_r();
 	void prot_reset_w(uint8_t data) { m_prot_index = 0; }
 
-	void blackbox_em_admc_map(address_map &map);
+	void blackbox_em_admc_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_prot_index;
 	uint8_t m_sound_value;
@@ -255,7 +255,7 @@ protected:
 	void out_meters_w(address_space &space, uint8_t data);
 	uint8_t out_meters_r(address_space &space);
 
-	void blackbox_em_opto_map(address_map &map);
+	void blackbox_em_opto_map(address_map &map) ATTR_COLD;
 };
 
 class blackbox_em_opto_sndgen_state : public blackbox_em_opto_state
@@ -274,7 +274,7 @@ private:
 	uint8_t out_tone_r(address_space &space);
 	uint8_t out_mute_r(address_space &space);
 
-	void blackbox_em_opto_sndgen_map(address_map &map);
+	void blackbox_em_opto_sndgen_map(address_map &map) ATTR_COLD;
 
 	required_device<beep_device> m_beep;
 };
@@ -294,7 +294,7 @@ protected:
 	void out_tone_w(address_space &space, uint8_t data);
 	uint8_t out_tone_r(address_space &space);
 
-	void blackbox_em_opto_aux_map(address_map &map);
+	void blackbox_em_opto_aux_map(address_map &map) ATTR_COLD;
 
 	required_device<beep_device> m_beep;
 };
@@ -320,7 +320,7 @@ private:
 	void tms1000_r_w(uint32_t data);
 	void tms1000_o_w(uint16_t data);
 
-	void blackbox_em_opto_music_map(address_map &map);
+	void blackbox_em_opto_music_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_k_cols;
 	uint8_t m_r_bits;
@@ -343,7 +343,7 @@ public:
 	void blackbox_em_opto_club(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void out_triacs1_w(address_space &space, uint8_t data);
 	void out_triacs2_w(address_space &space, uint8_t data);
@@ -353,7 +353,7 @@ private:
 	uint8_t out_meters_r(address_space &space);
 	void update_payout(uint8_t payout);
 
-	void blackbox_em_opto_club_map(address_map &map);
+	void blackbox_em_opto_club_map(address_map &map) ATTR_COLD;
 
 	bool m_payout_en[2];
 };

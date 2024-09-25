@@ -23,7 +23,7 @@ public:
 	void lg(machine_config &config);
 
 private:
-	void lg_dvd_map(address_map &map);
+	void lg_dvd_map(address_map &map) ATTR_COLD;
 
 	required_device<i80c52_device> m_maincpu;
 };

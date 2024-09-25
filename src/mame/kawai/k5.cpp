@@ -25,8 +25,8 @@ public:
 	void k5(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
-	void lcd_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void lcd_map(address_map &map) ATTR_COLD;
 
 	required_device<v40_device> m_maincpu;
 };

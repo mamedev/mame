@@ -349,12 +349,12 @@ public:
 	void interpro(machine_config &config);
 	static void interpro_scsi_adapter(device_t *device);
 	static void interpro_cdrom(device_t *device);
-	void interpro_boot_map(address_map &map);
-	void interpro_common_map(address_map &map);
+	void interpro_boot_map(address_map &map) ATTR_COLD;
+	void interpro_common_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	output_finder<> m_diag_led;
 	emu_timer *m_reset_timer = nullptr;
@@ -416,14 +416,14 @@ public:
 
 	void emerald(machine_config &config);
 	void ip6000(machine_config &config);
-	void interpro_82586_map(address_map &map);
-	void emerald_base_map(address_map &map);
-	void emerald_main_map(address_map &map);
-	void emerald_io_map(address_map &map);
+	void interpro_82586_map(address_map &map) ATTR_COLD;
+	void emerald_base_map(address_map &map) ATTR_COLD;
+	void emerald_main_map(address_map &map) ATTR_COLD;
+	void emerald_io_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u16 m_ctrl1 = 0;
@@ -486,14 +486,14 @@ public:
 
 	void turquoise(machine_config &config);
 	void ip2000(machine_config &config);
-	void interpro_82586_map(address_map &map);
-	void turquoise_base_map(address_map &map);
-	void turquoise_main_map(address_map &map);
-	void turquoise_io_map(address_map &map);
+	void interpro_82586_map(address_map &map) ATTR_COLD;
+	void turquoise_base_map(address_map &map) ATTR_COLD;
+	void turquoise_main_map(address_map &map) ATTR_COLD;
+	void turquoise_io_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u16 m_ctrl1 = 0;
@@ -551,14 +551,14 @@ public:
 
 	void sapphire(machine_config &config);
 
-	void interpro_82596_map(address_map &map);
-	void sapphire_base_map(address_map &map);
-	void sapphire_main_map(address_map &map);
-	void sapphire_io_map(address_map &map);
+	void interpro_82596_map(address_map &map) ATTR_COLD;
+	void sapphire_base_map(address_map &map) ATTR_COLD;
+	void sapphire_main_map(address_map &map) ATTR_COLD;
+	void sapphire_io_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u16 m_ctrl1 = 0;

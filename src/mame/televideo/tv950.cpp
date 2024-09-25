@@ -69,8 +69,8 @@ public:
 	void tv950(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void via_a_w(uint8_t data);
@@ -83,7 +83,7 @@ private:
 	void row_addr_w(uint8_t data);
 	void via_crtc_reset_w(int state);
 
-	void tv950_mem(address_map &map);
+	void tv950_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_via_row = 0;
 	uint8_t m_attr_row = 0;

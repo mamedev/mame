@@ -40,9 +40,9 @@ public:
 	void powerbal(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	u8 m_tilebank = 0;
 	s8 m_bg_yoffset = 0;
@@ -53,12 +53,12 @@ protected:
 	void tile_banking_w(u16 data);
 	void oki_banking(u16 data);
 
-	void oki_map(address_map &map);
+	void oki_map(address_map &map) ATTR_COLD;
 
 private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class atombjt_state : public powerbal_state
@@ -71,12 +71,12 @@ public:
 	void atombjt(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void tile_banking_w(u16 data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class magicstk_state : public powerbal_state
@@ -100,7 +100,7 @@ private:
 
 	void coin_eeprom_w(u8 data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 void magicstk_state::coin_eeprom_w(u8 data)

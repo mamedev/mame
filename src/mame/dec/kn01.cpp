@@ -93,12 +93,12 @@ public:
 	void pmin(machine_config &config) { kn01(config, 25_MHz_XTAL / 2); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void kn01(machine_config &config, XTAL clock);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u16 status_r();
 	void control_w(u16 data);

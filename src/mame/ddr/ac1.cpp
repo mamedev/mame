@@ -57,14 +57,14 @@ private:
 	u8 ac1_port_b_r();
 	u8 ac1_port_a_r();
 	bool has_lowercase = 0;
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 	void ac1_port_a_w(u8 data);
 	void ac1_port_b_w(u8 data);
 
-	void ac1_32_mem(address_map &map);
-	void ac1_io(address_map &map);
-	void ac1scch_io(address_map &map);
-	void ac1_mem(address_map &map);
+	void ac1_32_mem(address_map &map) ATTR_COLD;
+	void ac1_io(address_map &map) ATTR_COLD;
+	void ac1scch_io(address_map &map) ATTR_COLD;
+	void ac1_mem(address_map &map) ATTR_COLD;
 
 	required_device<cassette_image_device> m_cassette;
 	required_device<cpu_device> m_maincpu;

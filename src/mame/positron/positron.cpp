@@ -67,8 +67,8 @@ public:
 	void positron(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(fuse_update); // TODO: Does nothing
 
@@ -78,9 +78,9 @@ private:
 	emu_timer *m_fuse_timer = nullptr;
 	bool m_fuse_timer_running = false;
 
-	void positron_map(address_map &map);
-	void positron_fetch(address_map &map);
-	void mmu_map(address_map &map);
+	void positron_map(address_map &map) ATTR_COLD;
+	void positron_fetch(address_map &map) ATTR_COLD;
+	void mmu_map(address_map &map) ATTR_COLD;
 
 	uint8_t mmu_r(offs_t offset);
 	void mmu_w(offs_t offset, uint8_t data);

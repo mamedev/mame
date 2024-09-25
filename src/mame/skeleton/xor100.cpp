@@ -110,11 +110,11 @@ private:
 	void write_centronics_busy(int state);
 	void write_centronics_select(int state);
 
-	void xor100_io(address_map &map);
-	void xor100_mem(address_map &map);
+	void xor100_io(address_map &map) ATTR_COLD;
+	void xor100_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void bankswitch();
 	void post_load();

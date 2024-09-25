@@ -48,8 +48,8 @@ public:
 		void mdisk(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	TIMER_CALLBACK_MEMBER(rom_timer_callback);
@@ -66,8 +66,8 @@ private:
 	required_device<i8271_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 
-	void mdisk_mem(address_map &map);
-	void mdisk_io(address_map &map);
+	void mdisk_mem(address_map &map) ATTR_COLD;
+	void mdisk_io(address_map &map) ATTR_COLD;
 
 	emu_timer *m_rom_timer;
 

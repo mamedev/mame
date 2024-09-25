@@ -33,7 +33,7 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 	void sigma21_palette(palette_device &palette);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };

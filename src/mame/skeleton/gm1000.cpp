@@ -31,7 +31,7 @@ public:
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<m37702s1_device> m_maincpu;
 	memory_share_creator<u8> m_nvram;

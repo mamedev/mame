@@ -125,8 +125,8 @@ public:
 	void p2(machine_config &config); // multi-mode sound card
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 gts1_solenoid_r(offs_t offset);
@@ -143,9 +143,9 @@ private:
 	void gts1_do_w(u8 data);
 	void nvram_w();
 
-	void gts1_map(address_map &map);
-	void gts1_data(address_map &map);
-	void gts1_io(address_map &map);
+	void gts1_map(address_map &map) ATTR_COLD;
+	void gts1_data(address_map &map) ATTR_COLD;
+	void gts1_io(address_map &map) ATTR_COLD;
 
 	required_device<pps4_2_device> m_maincpu;
 	required_region_ptr<u8> m_pm;

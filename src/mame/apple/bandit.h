@@ -30,8 +30,8 @@ public:
 protected:
 	bandit_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void reset_all_mappings() override;
 
@@ -45,7 +45,7 @@ protected:
 	u32 m_last_config_address;
 
 private:
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 	virtual u32 be_config_address_r();
 	virtual void be_config_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 be_config_data_r(offs_t offset, u32 mem_mask = ~0);

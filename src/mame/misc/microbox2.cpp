@@ -61,7 +61,7 @@ public:
 	void microbx2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -75,19 +75,19 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport m_sw1;
 
-	void upd7220_map(address_map &map);
+	void upd7220_map(address_map &map) ATTR_COLD;
 
 	UPD7220_DISPLAY_PIXELS_MEMBER(display_pixels);
 
-	void mem_map(address_map &map);
-	void ram_map(address_map &map);
-	void rom0_map(address_map &map);
-	void rom1_map(address_map &map);
-	void rom2_map(address_map &map);
-	void io0_map(address_map &map);
-	void io1_map(address_map &map);
-	void io2_map(address_map &map);
-	void boot_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void ram_map(address_map &map) ATTR_COLD;
+	void rom0_map(address_map &map) ATTR_COLD;
+	void rom1_map(address_map &map) ATTR_COLD;
+	void rom2_map(address_map &map) ATTR_COLD;
+	void io0_map(address_map &map) ATTR_COLD;
+	void io1_map(address_map &map) ATTR_COLD;
+	void io2_map(address_map &map) ATTR_COLD;
+	void boot_map(address_map &map) ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 

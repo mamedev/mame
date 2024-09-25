@@ -158,15 +158,15 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_key);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void osborne1_base(machine_config &config);
 
-	void osborne1_mem(address_map &map);
-	void osborne1_op(address_map &map);
-	void osborne1_io(address_map &map);
+	void osborne1_mem(address_map &map) ATTR_COLD;
+	void osborne1_op(address_map &map) ATTR_COLD;
+	void osborne1_io(address_map &map) ATTR_COLD;
 
 	u8 bank2_peripherals_r(offs_t offset);
 	void bank2_peripherals_w(offs_t offset, u8 data);
@@ -267,10 +267,10 @@ public:
 	void osborne1sp(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void osborne1sp_mem(address_map &map);
+	void osborne1sp_mem(address_map &map) ATTR_COLD;
 
 	u8 bank2_peripherals_r(offs_t offset);
 	void bank2_peripherals_w(offs_t offset, u8 data);
@@ -297,7 +297,7 @@ public:
 	void osborne1nv(machine_config &config);
 
 private:
-	void osborne1nv_io(address_map &map);
+	void osborne1nv_io(address_map &map) ATTR_COLD;
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr_changed);

@@ -137,9 +137,9 @@ protected:
 		m_xtal(xtal)
 	{ }
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void a2600_mem(address_map &map);
+	void a2600_mem(address_map &map) ATTR_COLD;
 
 	void a2600_base_ntsc(machine_config &config);
 	void a2600_base_pal(machine_config &config);
@@ -217,11 +217,11 @@ public:
 	void a2600_pop(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void memory_map(address_map &map);
+	void memory_map(address_map &map) ATTR_COLD;
 
 	uint8_t rom_switch_r(offs_t offset);
 	void rom_switch_w(offs_t offset, uint8_t data);
@@ -248,13 +248,13 @@ public:
 	void tvboyn(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void bank_write(offs_t offset, uint8_t data);
 
-	void tvboy_mem(address_map &map);
+	void tvboy_mem(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_crom;
 	required_region_ptr<uint8_t> m_rom;

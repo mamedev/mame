@@ -36,7 +36,7 @@ public:
 	void _4004clk(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<i4004_cpu_device> m_maincpu;
@@ -47,11 +47,11 @@ private:
 	void nixie_w(offs_t offset, uint8_t data);
 	void neon_w(uint8_t data);
 
-	void _4004clk_mem(address_map &map);
-	void _4004clk_mp(address_map &map);
-	void _4004clk_rom(address_map &map);
-	void _4004clk_rp(address_map &map);
-	void _4004clk_stat(address_map &map);
+	void _4004clk_mem(address_map &map) ATTR_COLD;
+	void _4004clk_mp(address_map &map) ATTR_COLD;
+	void _4004clk_rom(address_map &map) ATTR_COLD;
+	void _4004clk_rp(address_map &map) ATTR_COLD;
+	void _4004clk_stat(address_map &map) ATTR_COLD;
 
 	static constexpr uint8_t nixie_to_num(uint16_t val)
 	{

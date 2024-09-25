@@ -50,11 +50,11 @@ public:
 	void blocktax(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint32_t screen_update_blocktax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	[[maybe_unused]] void blocktax_map(address_map &map);
+	[[maybe_unused]] void blocktax_map(address_map &map) ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 };
 

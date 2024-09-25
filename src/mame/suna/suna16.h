@@ -59,7 +59,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(bssoccer_interrupt);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	DECLARE_MACHINE_START(bestbest);
 	DECLARE_MACHINE_START(bssoccer);
 	DECLARE_MACHINE_START(sunaq);
@@ -70,22 +70,22 @@ private:
 	uint32_t screen_update_bestbest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t *sprites, int gfx);
 
-	void bestbest_map(address_map &map);
-	void bestbest_pcm_1_iomap(address_map &map);
-	void bestbest_pcm_1_map(address_map &map);
-	void bestbest_sound_map(address_map &map);
-	void bssoccer_map(address_map &map);
-	void bssoccer_pcm_1_io_map(address_map &map);
-	void bssoccer_pcm_1_map(address_map &map);
-	void bssoccer_pcm_2_io_map(address_map &map);
-	void bssoccer_pcm_2_map(address_map &map);
-	void bssoccer_sound_map(address_map &map);
-	void sunaq_map(address_map &map);
-	void sunaq_sound_map(address_map &map);
-	void uballoon_map(address_map &map);
-	void uballoon_pcm_1_io_map(address_map &map);
-	void uballoon_pcm_1_map(address_map &map);
-	void uballoon_sound_map(address_map &map);
+	void bestbest_map(address_map &map) ATTR_COLD;
+	void bestbest_pcm_1_iomap(address_map &map) ATTR_COLD;
+	void bestbest_pcm_1_map(address_map &map) ATTR_COLD;
+	void bestbest_sound_map(address_map &map) ATTR_COLD;
+	void bssoccer_map(address_map &map) ATTR_COLD;
+	void bssoccer_pcm_1_io_map(address_map &map) ATTR_COLD;
+	void bssoccer_pcm_1_map(address_map &map) ATTR_COLD;
+	void bssoccer_pcm_2_io_map(address_map &map) ATTR_COLD;
+	void bssoccer_pcm_2_map(address_map &map) ATTR_COLD;
+	void bssoccer_sound_map(address_map &map) ATTR_COLD;
+	void sunaq_map(address_map &map) ATTR_COLD;
+	void sunaq_sound_map(address_map &map) ATTR_COLD;
+	void uballoon_map(address_map &map) ATTR_COLD;
+	void uballoon_pcm_1_io_map(address_map &map) ATTR_COLD;
+	void uballoon_pcm_1_map(address_map &map) ATTR_COLD;
+	void uballoon_sound_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_pcm1;

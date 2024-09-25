@@ -55,8 +55,8 @@ protected:
 			char const *tag,
 			device_t *owner,
 			u32 clock);
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void key_make(u8 row, u8 column) override;
 	virtual void key_repeat(u8 row, u8 column) override;
 	virtual void send_key(u16 code);

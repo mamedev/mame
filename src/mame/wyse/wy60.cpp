@@ -44,7 +44,7 @@ public:
 	void wy60(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void driver_start() override;
 
 private:
@@ -63,9 +63,9 @@ private:
 	u8 p3_r();
 	void ea_w(int state);
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
-	void row_buffer_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
+	void row_buffer_map(address_map &map) ATTR_COLD;
 
 	required_device<i2cmem_device> m_eeprom;
 	required_device<wyse_keyboard_port_device> m_keyboard;

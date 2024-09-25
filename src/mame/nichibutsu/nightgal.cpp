@@ -101,24 +101,24 @@ private:
 
 	void ngalsumr_prot_latch_w(uint8_t data);
 	uint8_t ngalsumr_prot_value_r();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void nightgal_palette(palette_device &palette) const;
 	uint32_t screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void common_nsc_map(address_map &map);
-	void common_sexygal_io(address_map &map);
-	void royalqn_io(address_map &map);
-	void royalqn_map(address_map &map);
-	void royalqn_nsc_map(address_map &map);
-	void sexygal_audio_map(address_map &map);
-	void sexygal_io(address_map &map);
-	void sexygal_map(address_map &map);
-	void sexygal_nsc_map(address_map &map);
-	void sgaltrop_io(address_map &map);
-	void sgaltrop_nsc_map(address_map &map);
-	void sweetgal_map(address_map &map);
+	void common_nsc_map(address_map &map) ATTR_COLD;
+	void common_sexygal_io(address_map &map) ATTR_COLD;
+	void royalqn_io(address_map &map) ATTR_COLD;
+	void royalqn_map(address_map &map) ATTR_COLD;
+	void royalqn_nsc_map(address_map &map) ATTR_COLD;
+	void sexygal_audio_map(address_map &map) ATTR_COLD;
+	void sexygal_io(address_map &map) ATTR_COLD;
+	void sexygal_map(address_map &map) ATTR_COLD;
+	void sexygal_nsc_map(address_map &map) ATTR_COLD;
+	void sgaltrop_io(address_map &map) ATTR_COLD;
+	void sgaltrop_nsc_map(address_map &map) ATTR_COLD;
+	void sweetgal_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_io_cr_clear;
 	required_ioport m_io_coins;

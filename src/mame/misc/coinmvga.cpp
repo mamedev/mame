@@ -255,7 +255,7 @@ public:
 	void coinmvga(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t i2c_r();
@@ -269,9 +269,9 @@ private:
 	required_device_array<gfxdecode_device, 2> m_gfxdecode;
 	required_device_array<palette_device, 2> m_palette;
 
-	void coinmvga_map(address_map &map);
-	void ramdac2_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void coinmvga_map(address_map &map) ATTR_COLD;
+	void ramdac2_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 };
 
 

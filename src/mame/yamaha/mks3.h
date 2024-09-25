@@ -25,8 +25,8 @@ public:
 	auto write_clk() { return m_write_clk.bind(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override;
 
 private:

@@ -59,7 +59,7 @@ public:
 	INPUT_CHANGED_MEMBER(set_coin_flag);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(refresh_end);
 
@@ -100,9 +100,9 @@ private:
 
 	void refresh();
 
-	void memmap(address_map &map);
-	void sound_memmap(address_map &map);
-	void sound_portmap(address_map &map);
+	void memmap(address_map &map) ATTR_COLD;
+	void sound_memmap(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 };
 
 

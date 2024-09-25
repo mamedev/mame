@@ -70,18 +70,18 @@ private:
 	required_device<scn2661c_device> m_epci;
 	required_device<input_merger_device> m_epci_irq;
 	required_device<rs232_port_device> m_rs232;
-	void dtc03_io(address_map &map);
-	void dtc03_mem(address_map &map);
-	void dsp_io(address_map &map);
-	void dsp_mem(address_map &map);
+	void dtc03_io(address_map &map) ATTR_COLD;
+	void dtc03_mem(address_map &map) ATTR_COLD;
+	void dsp_io(address_map &map) ATTR_COLD;
+	void dsp_mem(address_map &map) ATTR_COLD;
 
 	u16 m_dsp_dma;
 	u8 m_bio;
 	u16 m_ctl;
 	attotime m_dbgclk;
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	void dac_w(uint16_t data);
 	uint16_t dsp_dma_r();

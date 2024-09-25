@@ -279,8 +279,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void pc8_io(address_map &map);
-	void pc8_map(address_map &map);
+	void pc8_io(address_map &map) ATTR_COLD;
+	void pc8_map(address_map &map) ATTR_COLD;
 };
 
 void ibmpc_state::pc8_map(address_map &map)

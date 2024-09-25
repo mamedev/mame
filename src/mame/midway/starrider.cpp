@@ -345,10 +345,10 @@ private:
 	template <unsigned N> void sound_fifo_or(int state);
 	template <unsigned N> void sound_fifo_flag(int state);
 
-	void main_memory(address_map &map);
-	void main_banks(address_map &map);
-	void pif_memory(address_map &map);
-	void sound_memory(address_map &map);
+	void main_memory(address_map &map) ATTR_COLD;
+	void main_banks(address_map &map) ATTR_COLD;
+	void pif_memory(address_map &map) ATTR_COLD;
+	void sound_memory(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_main_cpu;
 	required_device<pia6821_device> m_main_pia1;

@@ -175,10 +175,10 @@ private:
 	tilemap_t *m_scroll_tilemap[2]{};
 	tilemap_t *m_rotate_tilemap[2]{};
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	template <int which> u32 screen_update_dual(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void bnstars_map(address_map &map);
-	void bnstars_sound_map(address_map &map);
+	void bnstars_map(address_map &map) ATTR_COLD;
+	void bnstars_sound_map(address_map &map) ATTR_COLD;
 
 	void bnstars1_mahjong_select_w(u32 data);
 

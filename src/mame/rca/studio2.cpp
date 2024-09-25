@@ -264,8 +264,8 @@ protected:
 	required_ioport m_b;
 	required_device<screen_device> m_screen;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t dispon_r();
 	void keylatch_w(uint8_t data);
@@ -279,8 +279,8 @@ protected:
 	/* keyboard state */
 	uint8_t m_keylatch = 0;
 
-	void studio2_io_map(address_map &map);
-	void studio2_map(address_map &map);
+	void studio2_io_map(address_map &map) ATTR_COLD;
+	void studio2_map(address_map &map) ATTR_COLD;
 };
 
 class visicom_state : public studio2_state
@@ -300,11 +300,11 @@ private:
 	required_shared_ptr<uint8_t> m_color0_ram;
 	required_shared_ptr<uint8_t> m_color1_ram;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void dma_w(offs_t offset, uint8_t data);
-	void visicom_io_map(address_map &map);
-	void visicom_map(address_map &map);
+	void visicom_io_map(address_map &map) ATTR_COLD;
+	void visicom_map(address_map &map) ATTR_COLD;
 };
 
 class mpt02_state : public studio2_state
@@ -321,8 +321,8 @@ public:
 private:
 	required_device<cdp1864_device> m_cti;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void dma_w(offs_t offset, uint8_t data);
 	int rdata_r();
@@ -332,8 +332,8 @@ private:
 	/* video state */
 	required_shared_ptr<uint8_t> m_color_ram;
 	uint8_t m_color = 0;
-	void mpt02_io_map(address_map &map);
-	void mpt02_map(address_map &map);
+	void mpt02_io_map(address_map &map) ATTR_COLD;
+	void mpt02_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -67,7 +67,7 @@ protected:
 
 	void m62_start(tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2);
 
-	void kungfum_io_map(address_map &map);
+	void kungfum_io_map(address_map &map) ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -131,9 +131,9 @@ private:
 	TILE_GET_INFO_MEMBER(get_horizon_bg_tile_info);
 	DECLARE_MACHINE_START(battroad);
 	void machine_init_save();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void m62_spr(palette_device &palette) const;
 	void m62_chr(palette_device &palette) const;
 	void m62_lotlot_fg(palette_device &palette) const;
@@ -171,24 +171,24 @@ private:
 	required_device<palette_device> m_spr_palette;
 	required_device<palette_device> m_chr_palette;
 
-	void battroad_io_map(address_map &map);
-	void battroad_map(address_map &map);
-	void horizon_map(address_map &map);
-	void kidniki_io_map(address_map &map);
-	void kidniki_map(address_map &map);
-	void kungfum_map(address_map &map);
-	void ldrun2_io_map(address_map &map);
-	void ldrun2_map(address_map &map);
-	void ldrun3_io_map(address_map &map);
-	void ldrun3_map(address_map &map);
-	void ldrun4_io_map(address_map &map);
-	void ldrun4_map(address_map &map);
-	void ldrun_map(address_map &map);
-	void lotlot_map(address_map &map);
-	void spelunk2_map(address_map &map);
-	void spelunkr_map(address_map &map);
-	void youjyudn_io_map(address_map &map);
-	void youjyudn_map(address_map &map);
+	void battroad_io_map(address_map &map) ATTR_COLD;
+	void battroad_map(address_map &map) ATTR_COLD;
+	void horizon_map(address_map &map) ATTR_COLD;
+	void kidniki_io_map(address_map &map) ATTR_COLD;
+	void kidniki_map(address_map &map) ATTR_COLD;
+	void kungfum_map(address_map &map) ATTR_COLD;
+	void ldrun2_io_map(address_map &map) ATTR_COLD;
+	void ldrun2_map(address_map &map) ATTR_COLD;
+	void ldrun3_io_map(address_map &map) ATTR_COLD;
+	void ldrun3_map(address_map &map) ATTR_COLD;
+	void ldrun4_io_map(address_map &map) ATTR_COLD;
+	void ldrun4_map(address_map &map) ATTR_COLD;
+	void ldrun_map(address_map &map) ATTR_COLD;
+	void lotlot_map(address_map &map) ATTR_COLD;
+	void spelunk2_map(address_map &map) ATTR_COLD;
+	void spelunkr_map(address_map &map) ATTR_COLD;
+	void youjyudn_io_map(address_map &map) ATTR_COLD;
+	void youjyudn_map(address_map &map) ATTR_COLD;
 };
 
 INPUT_PORTS_EXTERN( m62_common );

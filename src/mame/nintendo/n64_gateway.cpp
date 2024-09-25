@@ -73,15 +73,15 @@ public:
 		n64_state(mconfig, type, tag)
 	{ }
 
-	void n64_lodgenet_map(address_map &map);
+	void n64_lodgenet_map(address_map &map) ATTR_COLD;
 	void n64_lodgenet(machine_config &config);
 
 private:
-	void n64_map(address_map &map);
+	void n64_map(address_map &map) ATTR_COLD;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void rsp_imem_map(address_map &map);
-	void rsp_dmem_map(address_map &map);
+	void rsp_imem_map(address_map &map) ATTR_COLD;
+	void rsp_dmem_map(address_map &map) ATTR_COLD;
 };
 
 void n64_gateway_state::n64_lodgenet_map(address_map &map)

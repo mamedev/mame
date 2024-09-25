@@ -67,8 +67,8 @@ public:
 
 protected:
 	virtual void device_post_load() override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// Devices
@@ -121,11 +121,11 @@ private:
 	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void bmcpokr_mem(address_map &map);
-	void fengyunh_map(address_map &map);
-	void mjmaglmp_map(address_map &map);
-	void ramdac_map(address_map &map);
-	void shendeng_map(address_map &map);
+	void bmcpokr_mem(address_map &map) ATTR_COLD;
+	void fengyunh_map(address_map &map) ATTR_COLD;
+	void mjmaglmp_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void shendeng_map(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************

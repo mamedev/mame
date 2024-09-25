@@ -128,7 +128,7 @@ public:
 	template <uint16_t Reset_addr> void init_magjack();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void output_w(u16 data);
@@ -142,7 +142,7 @@ private:
 	void fg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template <int Layer> void reel_vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	u8 palette_ram_r(offs_t offset);
 	void palette_ram_w(offs_t offset, u8 data);

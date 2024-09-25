@@ -109,8 +109,8 @@ private:
 	TILE_GET_INFO_MEMBER(zaxxon_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(razmataz_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(congo_get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void zaxxon_palette(palette_device &palette);
 	DECLARE_VIDEO_START(razmataz);
 	DECLARE_VIDEO_START(congo);
@@ -131,11 +131,11 @@ private:
 	inline int find_minimum_x(uint8_t value, int flip);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t flipxmask, uint16_t flipymask);
 
-	void congo_map(address_map &map);
-	void congo_sound_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
-	void ixion_map(address_map &map);
-	void zaxxon_map(address_map &map);
+	void congo_map(address_map &map) ATTR_COLD;
+	void congo_sound_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void ixion_map(address_map &map) ATTR_COLD;
+	void zaxxon_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SEGA_ZAXXON_H

@@ -76,9 +76,9 @@ public:
 	int hopper_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -120,9 +120,9 @@ protected:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void _3super8_portmap(address_map &map);
-	void program_map(address_map &map);
-	void spoker_portmap(address_map &map);
+	void _3super8_portmap(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
+	void spoker_portmap(address_map &map) ATTR_COLD;
 };
 
 class spokeru_state : public spoker_state
@@ -135,15 +135,15 @@ public:
 	void init_spokeru();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	void portmap(address_map &map);
+	void portmap(address_map &map) ATTR_COLD;
 
 	void coins_w(uint8_t data);
 	void nmi_video_leds_w(uint8_t data);
 
 private:
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 class jinhulu2_state : public spokeru_state
@@ -160,7 +160,7 @@ public:
 private:
 	void nmi_w(uint8_t data);
 
-	void portmap(address_map &map);
+	void portmap(address_map &map) ATTR_COLD;
 };
 
 class jb_state : public spokeru_state
@@ -175,7 +175,7 @@ public:
 	void jb(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr_array<uint8_t, 3> m_reel_ram;
@@ -187,7 +187,7 @@ private:
 	template<uint8_t Reel> void reel_ram_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void portmap(address_map &map);
+	void portmap(address_map &map) ATTR_COLD;
 };
 
 

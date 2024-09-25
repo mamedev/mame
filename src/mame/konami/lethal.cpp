@@ -308,16 +308,16 @@ private:
 	uint8_t guns_r(offs_t offset);
 	uint8_t gunsaux_r();
 	void lethalen_palette_control(offs_t offset, uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lethalen_interrupt);
 	K05324X_CB_MEMBER(sprite_callback);
 	K056832_CB_MEMBER(tile_callback);
-	void bank4000_map(address_map &map);
-	void le_main(address_map &map);
-	void le_sound(address_map &map);
+	void bank4000_map(address_map &map) ATTR_COLD;
+	void le_main(address_map &map) ATTR_COLD;
+	void le_sound(address_map &map) ATTR_COLD;
 };
 
 

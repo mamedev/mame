@@ -15,7 +15,7 @@ public:
 protected:
 	wyse_parallel_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	optional_ioport_array<16> m_key_matrix;

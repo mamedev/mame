@@ -84,9 +84,9 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sm7238_io(address_map &map);
-	void sm7238_mem(address_map &map);
-	void videobank_map(address_map &map);
+	void sm7238_io(address_map &map) ATTR_COLD;
+	void sm7238_mem(address_map &map) ATTR_COLD;
+	void videobank_map(address_map &map) ATTR_COLD;
 
 	void recompute_parameters();
 
@@ -98,7 +98,7 @@ private:
 		bool reverse = false;
 	} m_video;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;

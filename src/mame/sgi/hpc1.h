@@ -32,12 +32,12 @@ public:
 	template <unsigned N> void write_drq(int state);
 	void write_int(int state);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
@@ -97,7 +97,7 @@ protected:
 	u8 aux_r();
 	void aux_w(u8 data);
 
-	void pbus_map(address_map &map);
+	void pbus_map(address_map &map) ATTR_COLD;
 
 private:
 	address_space_config const m_pbus;

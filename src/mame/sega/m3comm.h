@@ -21,7 +21,7 @@ public:
 	// construction/destruction
 	m3comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void m3_map(address_map &map);
+	void m3_map(address_map &map) ATTR_COLD;
 
 	uint16_t ctrl_r(offs_t offset, uint16_t mem_mask = ~0);
 	void ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -39,13 +39,13 @@ public:
 	uint16_t naomi_r(offs_t offset);
 	void naomi_w(offs_t offset, uint16_t data);
 
-	void m3comm_mem(address_map &map);
+	void m3comm_mem(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(trigger_irq5);
 

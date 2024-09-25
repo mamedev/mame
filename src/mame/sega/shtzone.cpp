@@ -88,8 +88,8 @@ public:
 	ioport_value gun_tl_p2_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:
@@ -108,7 +108,7 @@ private:
 	uint8_t cart_r(offs_t offset);
 	void int_callback(int state);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 

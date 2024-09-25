@@ -32,8 +32,8 @@ public:
 	void pcherc(machine_config &config);
 	void pcmda(machine_config &config);
 	void pcv20(machine_config &config);
-	void pc8_io(address_map &map);
-	void pc8_map(address_map &map);
+	void pc8_io(address_map &map) ATTR_COLD;
+	void pc8_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

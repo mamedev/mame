@@ -584,7 +584,7 @@ public:
 	void irrmaze(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual void device_post_load() override;
 	virtual void output_strobe(uint8_t bits, uint8_t data) { }
@@ -679,7 +679,7 @@ public:
 	void sbp(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual void output_strobe(uint8_t bits, uint8_t data) override;
 	virtual void set_outputs() override;
@@ -709,7 +709,7 @@ public:
 	void mv6f(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual void output_strobe(uint8_t bits, uint8_t data) override;
 	virtual void set_outputs() override;
@@ -732,11 +732,11 @@ public:
 	void aes_ntsc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual void device_post_load() override;
 
-	void aes_main_map(address_map &map);
+	void aes_main_map(address_map &map) ATTR_COLD;
 };
 
 

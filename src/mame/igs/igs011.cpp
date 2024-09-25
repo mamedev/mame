@@ -144,8 +144,8 @@ public:
 	void drgnwrld_igs012(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* devices */
@@ -294,16 +294,16 @@ private:
 	void drgnwrld_gfx_decrypt();
 	void prot_mem_range_set();
 
-	void drgnwrld_mem(address_map &map);
-	void drgnwrld_igs012_mem(address_map &map);
-	void lhb_mem(address_map &map);
-	void lhb2_mem(address_map &map);
-	void nkishusp_mem(address_map &map);
-	void tygn_mem(address_map &map);
-	void vbowl_mem(address_map &map);
-	void vbowlhk_mem(address_map &map);
-	void wlcc_mem(address_map &map);
-	void xymg_mem(address_map &map);
+	void drgnwrld_mem(address_map &map) ATTR_COLD;
+	void drgnwrld_igs012_mem(address_map &map) ATTR_COLD;
+	void lhb_mem(address_map &map) ATTR_COLD;
+	void lhb2_mem(address_map &map) ATTR_COLD;
+	void nkishusp_mem(address_map &map) ATTR_COLD;
+	void tygn_mem(address_map &map) ATTR_COLD;
+	void vbowl_mem(address_map &map) ATTR_COLD;
+	void vbowlhk_mem(address_map &map) ATTR_COLD;
+	void wlcc_mem(address_map &map) ATTR_COLD;
+	void xymg_mem(address_map &map) ATTR_COLD;
 };
 
 

@@ -211,15 +211,15 @@ public:
 	void base(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 
 	uint8_t m_nmi_enable = 0;
 
-	void base_main_map(address_map &map);
+	void base_main_map(address_map &map) ATTR_COLD;
 
 private:
 	// devices
@@ -267,7 +267,7 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void adpcm_int(int state);
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class original_state : public base_state
@@ -282,7 +282,7 @@ public:
 	void firetrap(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -300,7 +300,7 @@ private:
 	void mcu_p3_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class bootleg_state : public base_state
@@ -314,8 +314,8 @@ public:
 	void firetrapbl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// misc
@@ -326,7 +326,7 @@ private:
 	uint8_t coin_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

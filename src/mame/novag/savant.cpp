@@ -64,8 +64,8 @@ public:
 	void savant(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -87,10 +87,10 @@ private:
 	u64 m_lcd_data = 0;
 
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
-	void mcu_map(address_map &map);
-	void mcu_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
+	void mcu_map(address_map &map) ATTR_COLD;
+	void mcu_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void nvram_w(offs_t offset, u8 data);

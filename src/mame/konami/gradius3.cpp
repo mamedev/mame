@@ -87,9 +87,9 @@ private:
 	uint16_t gradius3_gfxrom_r(offs_t offset);
 	void gradius3_gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_bank_w(uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_gradius3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cpuA_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gradius3_sub_scanline);
@@ -97,9 +97,9 @@ private:
 	void volume_callback(uint8_t data);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	void gradius3_map(address_map &map);
-	void gradius3_map2(address_map &map);
-	void gradius3_s_map(address_map &map);
+	void gradius3_map(address_map &map) ATTR_COLD;
+	void gradius3_map2(address_map &map) ATTR_COLD;
+	void gradius3_s_map(address_map &map) ATTR_COLD;
 };
 
 

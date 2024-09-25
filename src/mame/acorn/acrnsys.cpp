@@ -96,8 +96,8 @@ public:
 	void acrnsys5(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void kbd_put(u8 data);
@@ -106,9 +106,9 @@ private:
 	uint8_t kbd_r();
 	void bus_nmi_w(int state);
 
-	void a6502_mem(address_map &map);
-	void a6809_mem(address_map &map);
-	void a6502a_mem(address_map &map);
+	void a6502_mem(address_map &map) ATTR_COLD;
+	void a6809_mem(address_map &map) ATTR_COLD;
+	void a6502a_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_irqs;

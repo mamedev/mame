@@ -206,9 +206,9 @@ private:
 	void pb_w(u8 data);
 	u8 pb_r();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void mu80_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void mu80_map(address_map &map) ATTR_COLD;
 };
 
 void mu80_state::machine_start()

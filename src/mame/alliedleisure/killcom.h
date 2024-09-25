@@ -35,9 +35,9 @@ public:
 	void piratetr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<via6522_device, 3> m_via;
@@ -85,8 +85,8 @@ private:
 	TIMER_CALLBACK_MEMBER(hblank_callback);
 	uint8_t leprechn_videoram_r();
 
-	void killcom_main_map(address_map &map);
-	void killcom_audio_map(address_map &map);
-	void leprechn_audio_map(address_map &map);
-	void piratetr_main_map(address_map &map);
+	void killcom_main_map(address_map &map) ATTR_COLD;
+	void killcom_audio_map(address_map &map) ATTR_COLD;
+	void leprechn_audio_map(address_map &map) ATTR_COLD;
+	void piratetr_main_map(address_map &map) ATTR_COLD;
 };

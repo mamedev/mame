@@ -58,9 +58,9 @@ private:
 	uint8_t m_clock_address = 0U;
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t via_in_a();
@@ -69,7 +69,7 @@ private:
 	void via_out_b(uint8_t data);
 	void via_out_cb2(int state);
 
-	void concept_memmap(address_map &map);
+	void concept_memmap(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_CONCEPT_CONCEPT_H

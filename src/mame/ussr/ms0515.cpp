@@ -86,8 +86,8 @@ public:
 	void ms0515(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void ms0515_palette(palette_device &palette) const;
@@ -115,7 +115,7 @@ private:
 	void irq9_w(int state);
 	void irq11_w(int state);
 
-	void ms0515_mem(address_map &map);
+	void ms0515_mem(address_map &map) ATTR_COLD;
 
 	void irq_encoder(int irq, int state);
 

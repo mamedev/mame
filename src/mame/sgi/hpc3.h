@@ -59,7 +59,7 @@ public:
 	auto eeprom_pre_cb() { return m_eeprom_pre_cb.bind(); }
 	auto dma_complete_int_cb() { return m_dma_complete_int_cb.bind(); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	void enet_rxrdy_w(int state);
 	void enet_intr_in_w(int state);
@@ -68,8 +68,8 @@ public:
 	void scsi1_drq(int state);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 

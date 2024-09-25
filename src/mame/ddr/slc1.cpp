@@ -86,7 +86,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -98,8 +98,8 @@ private:
 	u8 m_select = 0;
 	u8 m_segment = 0;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	u8 input_r();
 	void control_w(offs_t offset, u8 data);

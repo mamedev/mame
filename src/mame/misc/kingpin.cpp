@@ -62,14 +62,14 @@ public:
 	void dealracl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void sound_nmi_w(uint8_t data);
-	void kingpin_io_map(address_map &map);
-	void kingpin_program_map(address_map &map);
-	void kingpin_sound_map(address_map &map);
-	void dealracl_program_map(address_map &map);
+	void kingpin_io_map(address_map &map) ATTR_COLD;
+	void kingpin_program_map(address_map &map) ATTR_COLD;
+	void kingpin_sound_map(address_map &map) ATTR_COLD;
+	void dealracl_program_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

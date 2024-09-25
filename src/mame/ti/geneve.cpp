@@ -342,13 +342,13 @@ private:
 	uint8_t memread(offs_t offset);
 	void memwrite(offs_t offset, uint8_t data);
 
-	void crumap(address_map &map);
-	void memmap(address_map &map);
-	void memmap_setaddress(address_map &map);
+	void crumap(address_map &map) ATTR_COLD;
+	void memmap(address_map &map) ATTR_COLD;
+	void memmap_setaddress(address_map &map) ATTR_COLD;
 
 	// General device lifecycle
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// Members
 	int  m_inta = 0;

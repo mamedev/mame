@@ -78,7 +78,7 @@ public:
 
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void common_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
 
 	required_device<hyperstone_device>  m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -98,7 +98,7 @@ public:
 
 protected:
 	uint32_t input_port_1_r();
-	void mosaicf2_io(address_map &map);
+	void mosaicf2_io(address_map &map) ATTR_COLD;
 };
 
 class royalpk2_state : public fe132_state
@@ -115,12 +115,12 @@ public:
 	void royalpk2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void royalpk2_io(address_map &map);
-	void royalpk2_map(address_map &map);
-	void oki_map(address_map &map);
+	void royalpk2_io(address_map &map) ATTR_COLD;
+	void royalpk2_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 
 	void protection_seed_w(offs_t offset, uint32_t data);
 	uint32_t protection_response_r();

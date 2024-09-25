@@ -85,9 +85,9 @@ public:
 	void init_spectrum();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// until machine/spec_snqk.cpp gets somehow disentangled
 	virtual void plus3_update_memory() { }
@@ -148,11 +148,11 @@ protected:
 	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-	void spectrum_io(address_map &map);
-	void spectrum_clone_io(address_map &map);
-	void spectrum_opcodes(address_map &map);
-	void spectrum_map(address_map &map);
-	void spectrum_data(address_map &map);
+	void spectrum_io(address_map &map) ATTR_COLD;
+	void spectrum_clone_io(address_map &map) ATTR_COLD;
+	void spectrum_opcodes(address_map &map) ATTR_COLD;
+	void spectrum_map(address_map &map) ATTR_COLD;
+	void spectrum_data(address_map &map) ATTR_COLD;
 
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;

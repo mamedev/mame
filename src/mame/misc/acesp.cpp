@@ -54,11 +54,11 @@ public:
 	void init_ace_cr();
 
 private:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_fixfreq);
 
-	void ace_sp_map(address_map &map);
+	void ace_sp_map(address_map &map) ATTR_COLD;
 
 	void dmd_w(offs_t offset, uint8_t data);
 	void sevenseg_w(offs_t offset, uint8_t data);

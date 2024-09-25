@@ -81,6 +81,8 @@ protected:
 
 	void common_map(address_map &map) ATTR_COLD;
 
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	required_device<mc6845_device> m_crtc;
@@ -89,7 +91,7 @@ protected:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	tilemap_t *m_bg_tilemap = nullptr;
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void palette_init(palette_device &palette) const ATTR_COLD;
@@ -97,7 +99,6 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 
 	void videoram_w(offs_t offset, u8 data);
-
 };
 
 
@@ -114,8 +115,8 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-
 	virtual void video_start() override ATTR_COLD;
+
 private:
 	void main2_map(address_map &map) ATTR_COLD;
 	void ext2_map(address_map &map) ATTR_COLD;

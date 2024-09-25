@@ -131,20 +131,20 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	void master_io(address_map &map);
-	void master_memory(address_map &map);
-	void slave_io(address_map &map);
-	void slave_memory(address_map &map);
-	void sound_io(address_map &map);
-	void sound_memory(address_map &map);
+	void master_io(address_map &map) ATTR_COLD;
+	void master_memory(address_map &map) ATTR_COLD;
+	void slave_io(address_map &map) ATTR_COLD;
+	void slave_memory(address_map &map) ATTR_COLD;
+	void sound_io(address_map &map) ATTR_COLD;
+	void sound_memory(address_map &map) ATTR_COLD;
 
 	// Devices
 	required_device<cpu_device> m_mastercpu;

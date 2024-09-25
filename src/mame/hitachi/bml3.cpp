@@ -109,17 +109,19 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
 
 protected:
-	virtual void main_map(address_map &map);
-	virtual void system_io(address_map &map);
+	virtual void main_map(address_map &map) ATTR_COLD;
+	virtual void system_io(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<bml3bus_device> m_bml3bus;
 	virtual u8 get_attr_mask() { return 0x1f; }
 	virtual u8 get_ig_mode(u8 attr) { return 0; }
 	virtual u8 get_ig_dots(u8 tile, u8 ra, u8 xi) { return 0; }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<bml3bus_device> m_bml3bus;
+
 private:
 	required_region_ptr<u8> m_p_chargen;
 	required_device<mc6845_device> m_crtc;
@@ -214,18 +216,20 @@ public:
 	{ }
 
 	void bml3mk5(machine_config &config);
-protected:
-	virtual void main_map(address_map &map) override;
-	virtual void system_io(address_map &map) override;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+protected:
+	virtual void main_map(address_map &map) override ATTR_COLD;
+	virtual void system_io(address_map &map) override ATTR_COLD;
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual u8 get_attr_mask() override { return 0x3f; }
 	virtual u8 get_ig_mode(u8 attr) override { return BIT(attr, 5); }
 	// NOTE: if IG attribute is enabled then the rest of attribute byte is ignored (no reverse etc.).
 	// TODO: if IGMODREG is 1 then the resulting tile will be a white square
-	virtual u8 get_ig_dots(u8 tile, u8 ra, u8 xi) override {
+	virtual u8 get_ig_dots(u8 tile, u8 ra, u8 xi) override
+	{
 		u16 base_offset = tile << 3;
 		u8 res = 0;
 		for (int i = 0; i < 3; i++)
@@ -235,6 +239,7 @@ protected:
 		}
 		return res;
 	}
+
 private:
 	memory_view m_ig_view;
 	required_device<gfxdecode_device> m_gfxdecode;

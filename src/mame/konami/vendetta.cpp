@@ -135,8 +135,8 @@ public:
 	int obj_busy_r() { return m_obj_busy->enabled() ? 1 : 0; }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// video-related
@@ -184,9 +184,9 @@ private:
 	void banking_callback(uint8_t data);
 	K053246_CB_MEMBER(sprite_callback);
 
-	void esckids_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void esckids_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -54,7 +54,7 @@ public:
 	void apo_w(int state);
 
 private:
-	void ctk2000_map(address_map &map);
+	void ctk2000_map(address_map &map) ATTR_COLD;
 
 	virtual void driver_start() override;
 	virtual void driver_reset() override;

@@ -78,7 +78,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t nascom1_port_00_r();
 	void nascom1_port_00_w(uint8_t data);
@@ -118,8 +118,8 @@ public:
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
-	void nascom1_io(address_map &map);
-	void nascom1_mem(address_map &map);
+	void nascom1_io(address_map &map) ATTR_COLD;
+	void nascom1_mem(address_map &map) ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(nascom1_kansas_r);
 	void nascom1_kansas_w(int state);
 	u16 m_cass_cnt[2];
@@ -145,7 +145,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(cass_speed);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(nascom2_kansas_r);
@@ -158,9 +158,9 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket1_load) { return load_cart(image, m_socket1, 1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket2_load) { return load_cart(image, m_socket2, 2); }
 
-	void nascom2_io(address_map &map);
-	void nascom2_mem(address_map &map);
-	void nascom2c_mem(address_map &map);
+	void nascom2_io(address_map &map) ATTR_COLD;
+	void nascom2_mem(address_map &map) ATTR_COLD;
+	void nascom2c_mem(address_map &map) ATTR_COLD;
 
 	required_device<clock_device> m_clock;
 	required_device<nasbus_device> m_nasbus;

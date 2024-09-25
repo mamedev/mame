@@ -48,8 +48,8 @@ public:
 	void wy85(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
@@ -68,8 +68,8 @@ private:
 	u8 p3_r();
 	void p3_w(u8 data);
 
-	void prg_map(address_map &map);
-	void io_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	u8 pvtc_char_r(offs_t offset);
 	u8 pvtc_attr_r(offs_t offset);
@@ -78,8 +78,8 @@ private:
 	u8 pvtc_attrbuf_r(offs_t offset);
 	void pvtc_attrbuf_w(offs_t offset, u8 data);
 
-	void char_row_buffer_map(address_map &map);
-	void attr_row_buffer_map(address_map &map);
+	void char_row_buffer_map(address_map &map) ATTR_COLD;
+	void attr_row_buffer_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<er1400_device> m_earom;

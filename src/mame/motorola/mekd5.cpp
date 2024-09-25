@@ -116,8 +116,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(keypad_changed);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void trace_timer_clear_w(int state);
 
@@ -135,7 +135,7 @@ private:
 	void write_f9_clock(int state);
 	void write_f13_clock(int state);
 
-	void mekd5_mem(address_map &map);
+	void mekd5_mem(address_map &map) ATTR_COLD;
 
 	bool keypad_key_pressed();
 

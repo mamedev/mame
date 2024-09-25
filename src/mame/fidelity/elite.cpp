@@ -133,8 +133,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices/pointers
 	optional_device<i8255_device> m_ppi8255;
@@ -152,10 +152,10 @@ protected:
 	u8 m_inp_mux = 0;
 
 	// address maps
-	void pc_map(address_map &map);
-	void eas_map(address_map &map);
-	void eag_map(address_map &map);
-	void eag2100_map(address_map &map);
+	void pc_map(address_map &map) ATTR_COLD;
+	void eas_map(address_map &map) ATTR_COLD;
+	void eag_map(address_map &map) ATTR_COLD;
+	void eag2100_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();

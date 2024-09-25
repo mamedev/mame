@@ -68,8 +68,8 @@ public:
 	void gl2000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t key_matrix_r(offs_t offset);
 	void key_matrix_w(uint8_t data);
@@ -81,8 +81,8 @@ protected:
 	void pc2000_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void pc2000_io(address_map &map);
-	void pc2000_mem(address_map &map);
+	void pc2000_io(address_map &map) ATTR_COLD;
+	void pc2000_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<hd44780_device> m_lcdc;
@@ -119,9 +119,9 @@ public:
 	void gl3000s(machine_config &config);
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gl3000s_io(address_map &map);
+	void gl3000s_io(address_map &map) ATTR_COLD;
 
 private:
 	int sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc, int start_x);
@@ -147,7 +147,7 @@ public:
 	void gl4000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	HD44780_PIXEL_UPDATE(gl4000_pixel_update);
 };
 

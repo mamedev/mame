@@ -87,8 +87,8 @@ public:
 	void kamikaze(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device_array<i8255_device, 2>  m_ppi8255;
 	uint8_t m_flip_yoffs = 32; // the flip screen logic adds 32 to the Y after flipping
@@ -103,8 +103,8 @@ private:
 	TIMER_CALLBACK_MEMBER(int_off);
 	TIMER_CALLBACK_MEMBER(int_gen);
 
-	void prg_map(address_map &map);
-	void port_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void port_map(address_map &map) ATTR_COLD;
 
 	emu_timer *m_int_timer = nullptr;
 	emu_timer *m_int_off_timer = nullptr;
@@ -120,7 +120,7 @@ public:
 	void spcking2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void sound1_w(uint8_t data);
@@ -145,8 +145,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void color_latch_w(uint8_t data);
@@ -154,8 +154,8 @@ private:
 	void sound1_w(uint8_t data);
 	void sound2_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void prg_map(address_map &map);
-	void port_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void port_map(address_map &map) ATTR_COLD;
 
 	memory_share_creator<uint8_t> m_colorram;
 	uint8_t m_color_latch = 0;

@@ -97,13 +97,13 @@ protected:
 	void sms_ctrl1_th_input(int state);
 	void sms_ctrl2_th_input(int state);
 
-	void sms_io(address_map &map);
-	void sms_mem(address_map &map);
-	void smsj_io(address_map &map);
-	void smskr_io(address_map &map);
+	void sms_io(address_map &map) ATTR_COLD;
+	void sms_mem(address_map &map) ATTR_COLD;
+	void smsj_io(address_map &map) ATTR_COLD;
+	void smskr_io(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint8_t read_bus(unsigned int bank, uint16_t base_addr, uint16_t offset);
 	void setup_bios();
 	void setup_media_slots();
@@ -203,8 +203,8 @@ public:
 	void smsj(machine_config &config);
 
 protected:
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
 private:
 	uint8_t sscope_r(offs_t offset);
@@ -214,7 +214,7 @@ private:
 	uint32_t screen_update_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void sms1_mem(address_map &map);
+	void sms1_mem(address_map &map) ATTR_COLD;
 
 	// for 3D glass binocular hack
 	required_device<screen_device> m_left_lcd;
@@ -244,8 +244,8 @@ public:
 	void sms_sdisp(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:
@@ -257,7 +257,7 @@ private:
 	uint8_t store_cart_peek(offs_t offset);
 
 	void sms_store_int_callback(int state);
-	void sms_store_mem(address_map &map);
+	void sms_store_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_control_cpu;
 	required_device_array<sega8_cart_slot_device, 16> m_slots;
@@ -279,13 +279,13 @@ public:
 	void sg1000m3(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t sg1000m3_peripheral_r(offs_t offset);
 	void sg1000m3_peripheral_w(offs_t offset, uint8_t data);
 
-	void sg1000m3_io(address_map &map);
+	void sg1000m3_io(address_map &map) ATTR_COLD;
 
 	required_device<sg1000_expansion_slot_device> m_sgexpslot;
 };
@@ -306,10 +306,10 @@ public:
 	void gamegeaj(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
 private:
 	template <typename X> static void screen_gg_raw_params(screen_device &screen, X &&pixelclock);
@@ -326,7 +326,7 @@ private:
 	uint32_t screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void gg_io(address_map &map);
+	void gg_io(address_map &map) ATTR_COLD;
 
 	memory_view m_io_view;
 

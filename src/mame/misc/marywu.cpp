@@ -42,7 +42,7 @@ public:
 	void marywu(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void display_7seg_data_w(uint8_t data);
@@ -52,8 +52,8 @@ private:
 	void ay2_port_a_w(uint8_t data);
 	void ay2_port_b_w(uint8_t data);
 	uint8_t keyboard_r();
-	void io_map(address_map &map);
-	void program_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_selected_7seg_module = 0;
 

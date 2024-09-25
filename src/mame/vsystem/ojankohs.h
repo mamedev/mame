@@ -44,9 +44,9 @@ protected:
 		m_dsw(*this, "dsw%u", 1U)
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void common_state_saving();
 
@@ -107,8 +107,8 @@ private:
 	uint8_t dipsw2_r();
 	void gfxreg_w(uint8_t data);
 
-	void io_map(address_map &map);
-	void map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void map(address_map &map) ATTR_COLD;
 };
 
 class ojankoy_state : public ojankohs_state
@@ -125,9 +125,9 @@ protected:
 		ojankohs_state(mconfig, type, tag, vramsize, pramsize)
 	{ }
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	void rombank_adpcm_reset_w(uint8_t data);
 
@@ -135,7 +135,7 @@ private:
 	void coinctr_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 class ccasino_state : public ojankoy_state
@@ -158,7 +158,7 @@ private:
 	uint8_t dipsw4_r();
 	void coinctr_w(uint8_t data);
 	void palette_w(offs_t offset, uint8_t data);
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 class ojankoc_state : public ojankohs_state
@@ -171,8 +171,8 @@ public:
 	void ojankoc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void ctrl_w(uint8_t data);
@@ -182,8 +182,8 @@ private:
 	void videoram_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void flipscreen(uint8_t data);
-	void io_map(address_map &map);
-	void map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_VSYSTEM_OJANKOHS_H

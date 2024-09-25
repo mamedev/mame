@@ -1085,7 +1085,7 @@ public:
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void goldnpkr_videoram_w(offs_t offset, uint8_t data);
 	void goldnpkr_colorram_w(offs_t offset, uint8_t data);
@@ -1121,23 +1121,23 @@ private:
 	DECLARE_MACHINE_RESET(mondial);
 	DECLARE_MACHINE_RESET(lespendu);
 
-	void genie_map(address_map &map);
-	void goldnpkr_map(address_map &map);
-	void mondial_map(address_map &map);
-	void witchcdj_map(address_map &map);
-	void pottnpkr_map(address_map &map);
-	void wcrdxtnd_map(address_map &map);
-	void wildcard_map(address_map &map);
-	void wildcrdb_map(address_map &map);
-	void wildcrdb_mcu_io_map(address_map &map);
-	void wildcrdb_mcu_map(address_map &map);
-	void wildcrdb_mcu_decrypted_opcodes_map(address_map &map);
-	void witchcrd_falcon_map(address_map &map);
-	void witchcrd_map(address_map &map);
-	void super21p_map(address_map &map);
-	void op5cards_map(address_map &map);
-	void icp_ext_map(address_map &map);
-	void lespendu_map(address_map &map);
+	void genie_map(address_map &map) ATTR_COLD;
+	void goldnpkr_map(address_map &map) ATTR_COLD;
+	void mondial_map(address_map &map) ATTR_COLD;
+	void witchcdj_map(address_map &map) ATTR_COLD;
+	void pottnpkr_map(address_map &map) ATTR_COLD;
+	void wcrdxtnd_map(address_map &map) ATTR_COLD;
+	void wildcard_map(address_map &map) ATTR_COLD;
+	void wildcrdb_map(address_map &map) ATTR_COLD;
+	void wildcrdb_mcu_io_map(address_map &map) ATTR_COLD;
+	void wildcrdb_mcu_map(address_map &map) ATTR_COLD;
+	void wildcrdb_mcu_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void witchcrd_falcon_map(address_map &map) ATTR_COLD;
+	void witchcrd_map(address_map &map) ATTR_COLD;
+	void super21p_map(address_map &map) ATTR_COLD;
+	void op5cards_map(address_map &map) ATTR_COLD;
+	void icp_ext_map(address_map &map) ATTR_COLD;
+	void lespendu_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -1171,8 +1171,8 @@ private:
 	void mcu_command_w(uint8_t data);
 	void mcu_portb_w(uint8_t data);
 	void mcu_portc_w(uint8_t data);
-	void megadpkr_banked_map(address_map &map);
-	void megadpkr_map(address_map &map);
+	void megadpkr_banked_map(address_map &map) ATTR_COLD;
+	void megadpkr_map(address_map &map) ATTR_COLD;
 
 	required_region_ptr<uint8_t> m_cpubank;
 

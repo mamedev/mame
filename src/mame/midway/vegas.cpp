@@ -387,8 +387,8 @@ public:
 	ioport_value gearshift_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static constexpr unsigned SYSTEM_CLOCK = 100000000;
@@ -468,13 +468,13 @@ private:
 
 	std::string sioIRQString(uint8_t data);
 
-	void vegas_cs2_map(address_map &map);
-	void vegas_cs3_map(address_map &map);
-	void vegas_cs4_map(address_map &map);
-	void vegas_cs5_map(address_map &map);
-	void vegas_cs6_map(address_map &map);
-	void vegas_cs7_map(address_map &map);
-	void vegas_cs8_map(address_map &map);
+	void vegas_cs2_map(address_map &map) ATTR_COLD;
+	void vegas_cs3_map(address_map &map) ATTR_COLD;
+	void vegas_cs4_map(address_map &map) ATTR_COLD;
+	void vegas_cs5_map(address_map &map) ATTR_COLD;
+	void vegas_cs6_map(address_map &map) ATTR_COLD;
+	void vegas_cs7_map(address_map &map) ATTR_COLD;
+	void vegas_cs8_map(address_map &map) ATTR_COLD;
 
 	static void hdd_config(device_t *device);
 };

@@ -73,8 +73,8 @@ public:
 	void petaco(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 sw_r();
@@ -88,10 +88,10 @@ private:
 	void p2a_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[56U+i] = BIT(data, i); }
 	void p2b_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[64U+i] = BIT(data, i); }
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void petaco_map(address_map &map);
-	void petaco_io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void petaco_map(address_map &map) ATTR_COLD;
+	void petaco_io_map(address_map &map) ATTR_COLD;
 
 	void petaco_sol0(u8 data) {}
 	void petaco_sol1(u8 data) {}

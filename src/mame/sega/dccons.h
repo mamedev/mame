@@ -45,10 +45,10 @@ public:
 	void dc_base(machine_config &config);
 	void dc(machine_config &config);
 	void dc_fish(machine_config &config);
-	void aica_map(address_map &map);
-	void dc_audio_map(address_map &map);
-	void dc_map(address_map &map);
-	void dc_port(address_map &map);
+	void aica_map(address_map &map) ATTR_COLD;
+	void dc_audio_map(address_map &map) ATTR_COLD;
+	void dc_map(address_map &map) ATTR_COLD;
+	void dc_port(address_map &map) ATTR_COLD;
 private:
 	uint32_t g1bus_regs[0x100/4]{}; // DC-only
 

@@ -69,8 +69,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void prg_map(address_map &map);
-	void dec0_s_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void dec0_s_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -87,8 +87,8 @@ public:
 	void triothep(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// misc
@@ -100,7 +100,7 @@ private:
 	void control_select_w(uint8_t data);
 	uint8_t control_r();
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 

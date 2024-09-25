@@ -80,18 +80,18 @@ public:
 	void rs_config_base(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint8_t interrupt_ctrl_r(offs_t offset);
 	void interrupt_ctrl_w(offs_t offset, uint8_t data);
 	uint8_t nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, uint8_t data);
 
-	void cpu_map_base(address_map &map);
-	void io_map(address_map &map);
-	void dsp_map_base(address_map &map);
+	void cpu_map_base(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void dsp_map_base(address_map &map) ATTR_COLD;
 
 	required_device<i486_device>     m_maincpu;
 	required_device<tms3203x_device> m_dsp;
@@ -172,8 +172,8 @@ private:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	nscsi_connector &add_rastersp_scsi_slot(machine_config &config, const char *tag, const char *default_slot);
 	static void ncr53c700_config(device_t *device);
-	void cpu_map(address_map &map);
-	void dsp_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void dsp_map(address_map &map) ATTR_COLD;
 	uint8_t interrupt_status_r(offs_t offset);
 
 	std::unique_ptr<uint8_t[]>   m_nvram8;
@@ -208,8 +208,8 @@ public:
 	int meter_pulse_r();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_ioport m_io_track_x;
@@ -222,8 +222,8 @@ private:
 	void aux_port3_w(offs_t offset, uint8_t data);
 	void aux_port4_w(offs_t offset, uint8_t data);
 
-	void cpu_map(address_map &map);
-	void dsp_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void dsp_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(trackball_timer);
 	void trackball_rts(int state);

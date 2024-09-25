@@ -197,12 +197,12 @@ private:
 	void ptm2_irq(int state);
 	void audiocpu_irq_update();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void jwildb52_hd63484_map(address_map &map);
-	void jwildb52_map(address_map &map);
-	void sound_prog_map(address_map &map);
+	void jwildb52_hd63484_map(address_map &map) ATTR_COLD;
+	void jwildb52_map(address_map &map) ATTR_COLD;
+	void sound_prog_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device>     m_maincpu;
 	required_device<cpu_device>     m_audiocpu;

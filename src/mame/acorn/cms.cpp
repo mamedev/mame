@@ -71,8 +71,8 @@ public:
 	void cms6502(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void map_select_w(uint8_t data);
@@ -86,7 +86,7 @@ private:
 	required_device<input_merger_device> m_irqs;
 	required_device<acorn_bus_device> m_bus;
 
-	void cms6502_mem(address_map &map);
+	void cms6502_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_map_select;
 	uint8_t m_page_select[4];

@@ -188,8 +188,8 @@ public:
 	void rastan(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_memory_bank m_audiobank;
@@ -219,8 +219,8 @@ private:
 	void colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void msm5205_vck(int state);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

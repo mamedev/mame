@@ -35,7 +35,7 @@ public:
 	void _600cat(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 

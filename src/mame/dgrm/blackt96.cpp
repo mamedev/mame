@@ -111,9 +111,9 @@ public:
 
 protected:
 	// overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// driver variables
@@ -157,8 +157,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tile_callback(int &tile, int& fx, int& fy, int& region);
 
-	void blackt96_map(address_map &map);
-	void oki1_map(address_map &map);
+	void blackt96_map(address_map &map) ATTR_COLD;
+	void oki1_map(address_map &map) ATTR_COLD;
 };
 
 TILE_GET_INFO_MEMBER(blackt96_state::get_tx_tile_info)

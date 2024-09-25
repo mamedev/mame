@@ -33,8 +33,8 @@ public:
 	void magnum(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(keypress);
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void beep_w(u8 data);
@@ -45,9 +45,9 @@ private:
 	void rtcirq_w(int state);
 
 	void check_irq();
-	void magnum_io(address_map &map);
-	void magnum_map(address_map &map);
-	void magnum_lcdc(address_map &map);
+	void magnum_io(address_map &map) ATTR_COLD;
+	void magnum_map(address_map &map) ATTR_COLD;
+	void magnum_lcdc(address_map &map) ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;

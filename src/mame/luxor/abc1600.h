@@ -106,8 +106,8 @@ private:
 	required_device<abcbus_slot_device> m_bus2;
 	required_device<abc_keyboard_port_device> m_kb;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 
@@ -140,7 +140,7 @@ private:
 
 	void nmi_w(int state);
 
-	void cpu_space_map(address_map &map);
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	void update_br();
 	void update_pren0(int state);
@@ -160,8 +160,8 @@ private:
 	int m_dbrq1 = CLEAR_LINE;
 	int m_dbrq2 = CLEAR_LINE;
 
-	void abc1600_mem(address_map &map);
-	void mac_mem(address_map &map);
+	void abc1600_mem(address_map &map) ATTR_COLD;
+	void mac_mem(address_map &map) ATTR_COLD;
 
 	// peripherals
 	int m_cs7 = 0;                  // card select address bit 7

@@ -32,8 +32,8 @@ public:
 	void bkungfu(machine_config& config);
 
 private:
-	void mem_map(address_map& map);
-	void io_map(address_map& map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint8_t bkungfu_blitter_r(offs_t offset);
 	void bkungfu_blitter_w(offs_t offset, uint8_t data);

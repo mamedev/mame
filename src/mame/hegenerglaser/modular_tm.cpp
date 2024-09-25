@@ -71,8 +71,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -83,8 +83,8 @@ private:
 	emu_timer *m_boot_timer;
 
 	// address maps
-	void mmtm_2m_map(address_map &map);
-	void mmtm_8m_map(address_map &map);
+	void mmtm_2m_map(address_map &map) ATTR_COLD;
+	void mmtm_8m_map(address_map &map) ATTR_COLD;
 
 	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
 	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }

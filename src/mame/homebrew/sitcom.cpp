@@ -68,14 +68,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(update_buttons);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void update_ppi_pa(uint8_t data);
 	virtual void update_ppi_pb(uint8_t data);
 
-	void sitcom_mem(address_map &map);
-	void sitcom_io(address_map &map);
+	void sitcom_mem(address_map &map) ATTR_COLD;
+	void sitcom_io(address_map &map) ATTR_COLD;
 
 	template <unsigned D> void update_ds(offs_t offset, uint16_t data) { m_digits[(D << 2) | offset] = data; }
 	void update_rxd(int state)          { m_rxd = bool(state); }
@@ -120,8 +120,8 @@ public:
 	void sitcomtmr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void update_ppi_pa(uint8_t data) override;
 	virtual void update_ppi_pb(uint8_t data) override;

@@ -96,19 +96,19 @@ private:
 	void unk_w(uint8_t data);
 	void port_b_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void bking_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(bking3);
 	DECLARE_MACHINE_RESET(bking3);
 	DECLARE_MACHINE_RESET(common);
 	uint32_t screen_update_bking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank_bking(int state);
-	void bking3_io_map(address_map &map);
-	void bking_audio_map(address_map &map);
-	void bking_io_map(address_map &map);
-	void bking_map(address_map &map);
+	void bking3_io_map(address_map &map) ATTR_COLD;
+	void bking_audio_map(address_map &map) ATTR_COLD;
+	void bking_io_map(address_map &map) ATTR_COLD;
+	void bking_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TAITO_BKING_H

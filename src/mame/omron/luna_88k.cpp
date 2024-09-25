@@ -85,13 +85,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(abort) { irq(0, 7, newval); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void cpu_map(address_map &map);
+	virtual void cpu_map(address_map &map) ATTR_COLD;
 
-	void iop_map_mem(address_map &map);
-	void iop_map_pio(address_map &map);
+	void iop_map_mem(address_map &map) ATTR_COLD;
+	void iop_map_pio(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
@@ -185,7 +185,7 @@ public:
 	void init();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void cpu_map(address_map &map) override;
 
 	required_device<mc146818_device> m_rtc;

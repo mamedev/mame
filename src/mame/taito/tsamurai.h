@@ -29,8 +29,8 @@ public:
 	void tsamurai(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// common
 	void nmi_enable_w(int state);
@@ -60,10 +60,10 @@ protected:
 
 	void vblank_irq(int state);
 
-	void main_map(address_map &map);
-	void sound1_map(address_map &map);
-	void sound2_map(address_map &map);
-	void z80_io_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound1_map(address_map &map) ATTR_COLD;
+	void sound2_map(address_map &map) ATTR_COLD;
+	void z80_io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -107,15 +107,15 @@ public:
 	void vsgongf(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	optional_device<generic_latch_8_device> m_soundlatch; // vsgongf only
 
-	void sound_vsgongf_map(address_map &map);
-	void vsgongf_audio_io_map(address_map &map);
-	void vsgongf_map(address_map &map);
+	void sound_vsgongf_map(address_map &map) ATTR_COLD;
+	void vsgongf_audio_io_map(address_map &map) ATTR_COLD;
+	void vsgongf_map(address_map &map) ATTR_COLD;
 
 	// vsgongf specific
 	void vsgongf_color_w(uint8_t data);
@@ -148,8 +148,8 @@ public:
 	void init_the26thz();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual TILE_GET_INFO_MEMBER(get_bg_tile_info) override;
 	virtual TILE_GET_INFO_MEMBER(get_fg_tile_info) override;
@@ -162,12 +162,12 @@ private:
 	void m660_sound_command3_w(uint8_t data);
 	uint8_t m660_sound_command3_r();
 
-	void m660_map(address_map &map);
-	void sound1_m660_map(address_map &map);
-	void sound2_m660_map(address_map &map);
-	void sound3_m660_io_map(address_map &map);
-	void sound3_m660_map(address_map &map);
-	void z80_m660_io_map(address_map &map);
+	void m660_map(address_map &map) ATTR_COLD;
+	void sound1_m660_map(address_map &map) ATTR_COLD;
+	void sound2_m660_map(address_map &map) ATTR_COLD;
+	void sound3_m660_io_map(address_map &map) ATTR_COLD;
+	void sound3_m660_map(address_map &map) ATTR_COLD;
+	void z80_m660_io_map(address_map &map) ATTR_COLD;
 
 	//m660 specific
 	int m_textbank2 = 0;

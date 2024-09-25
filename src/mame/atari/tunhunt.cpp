@@ -82,8 +82,8 @@ public:
 
 protected:
 	virtual void machine_start() override { m_led.resolve(); }
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -140,7 +140,7 @@ private:
 	void draw_motion_object(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_shell(bitmap_ind16 &bitmap, const rectangle &cliprect, int picture_code, int hposition, int vstart, int vstop, int vstretch, int hstretch);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

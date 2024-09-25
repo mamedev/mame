@@ -79,9 +79,9 @@ private:
 	void FlashCmd_w(uint8_t data);
 	void FlashAddr_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void crospuzl_mem(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void crospuzl_mem(address_map &map) ATTR_COLD;
 
 	// PIO
 	uint32_t m_PIO = 0;

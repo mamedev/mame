@@ -118,8 +118,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_rst65);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void i8155_porta_w(uint8_t data);
 	uint8_t i8155_portb_r();
@@ -155,12 +155,12 @@ public:
 	void hektor2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void hektor_mem(address_map &map);
-	void hektor_io(address_map &map);
-	void hektor2_mem(address_map &map);
+	void hektor_mem(address_map &map) ATTR_COLD;
+	void hektor_io(address_map &map) ATTR_COLD;
+	void hektor2_mem(address_map &map) ATTR_COLD;
 
 	void i8155_portc_w(uint8_t data);
 
@@ -186,11 +186,11 @@ public:
 	void hektor3(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void hektor3_mem(address_map &map);
-	void hektor3_io(address_map &map);
+	void hektor3_mem(address_map &map) ATTR_COLD;
+	void hektor3_io(address_map &map) ATTR_COLD;
 
 	void i8155_portc_w(uint8_t data);
 	MC6845_UPDATE_ROW(crtc_update_row);

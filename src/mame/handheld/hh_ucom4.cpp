@@ -133,8 +133,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<ucom4_cpu_device> m_maincpu;

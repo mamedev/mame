@@ -81,9 +81,9 @@ private:
 	DECLARE_MACHINE_START(scregg);
 	DECLARE_MACHINE_RESET(scregg);
 	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
-	void dommy_map(address_map &map);
+	void dommy_map(address_map &map) ATTR_COLD;
 
-	void eggs_map(address_map &map);
+	void eggs_map(address_map &map) ATTR_COLD;
 };
 
 

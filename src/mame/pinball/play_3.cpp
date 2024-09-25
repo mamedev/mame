@@ -120,13 +120,13 @@ private:
 	u8 port02_a_r();
 	int clear_a_r();
 
-	void terrlake_io(address_map &map);
-	void audio_io_map(address_map &map);
-	void audio_mem_map(address_map &map);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void flashman_io(address_map &map);
-	void sklflite_io(address_map &map);
+	void terrlake_io(address_map &map) ATTR_COLD;
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void audio_mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void flashman_io(address_map &map) ATTR_COLD;
+	void sklflite_io(address_map &map) ATTR_COLD;
 
 	u8 m_resetcnt = 0U;
 	u8 m_resetcnt_a = 0U;
@@ -137,8 +137,8 @@ private:
 	u8 m_kbdrow = 0U;
 	u8 m_segment[5]{};
 	bool m_disp_sw = false;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<cosmac_device> m_maincpu;
 	optional_device<cosmac_device> m_audiocpu;
 	required_device<ttl7474_device> m_4013a;

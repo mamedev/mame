@@ -22,7 +22,7 @@ public:
 	mn89304_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void palette_update() override;
 	virtual void recompute_params() override;
@@ -124,15 +124,15 @@ private:
 	uint8_t m_mstat;
 	uint8_t m_sstat;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t cpanel_left_buttons_r(offs_t offset);
 	uint8_t cpanel_right_buttons_r(offs_t offset);
 	void cpanel_leds_w(offs_t offset, uint8_t data);
 
-	void maincpu_mem(address_map &map);
-	void subcpu_mem(address_map &map);
+	void maincpu_mem(address_map &map) ATTR_COLD;
+	void subcpu_mem(address_map &map) ATTR_COLD;
 };
 
 void kn5000_state::maincpu_mem(address_map &map)

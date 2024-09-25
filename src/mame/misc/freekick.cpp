@@ -137,9 +137,9 @@ public:
 		m_spinner(*this, "IN%u", 2U) { }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// memory pointers
 	required_shared_ptr<uint8_t> m_videoram;
@@ -180,8 +180,8 @@ public:
 	void freekick(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_region_ptr<uint8_t> m_sound_data;
@@ -197,8 +197,8 @@ private:
 	uint8_t snd_rom_r();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void io_map(address_map &map);
-	void program_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 class pbillrd_state : public base_state
@@ -223,14 +223,14 @@ protected:
 
 	std::unique_ptr<uint8_t[]> m_decrypted_opcodes;
 
-	void decrypted_opcodes_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
 private:
 	void bankswitch_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void program_map(address_map &map);
-	void pbillrdbl_program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void pbillrdbl_program_map(address_map &map) ATTR_COLD;
 };
 
 class gigas_state : public pbillrd_state
@@ -253,10 +253,10 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gigas_io_map(address_map &map);
-	void gigas_program_map(address_map &map);
-	void omega_io_map(address_map &map);
-	void omega_program_map(address_map &map);
+	void gigas_io_map(address_map &map) ATTR_COLD;
+	void gigas_program_map(address_map &map) ATTR_COLD;
+	void omega_io_map(address_map &map) ATTR_COLD;
+	void omega_program_map(address_map &map) ATTR_COLD;
 };
 
 class oigas_state : public gigas_state
@@ -269,8 +269,8 @@ public:
 	void oigas(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t m_inval = 0;
@@ -281,7 +281,7 @@ private:
 	uint8_t _3_r();
 	uint8_t _2_r();
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 

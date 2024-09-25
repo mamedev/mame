@@ -61,11 +61,11 @@ public:
 	void gs662(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void common_main(address_map &map);
+	void common_main(address_map &map) ATTR_COLD;
 
 	uint16_t vrom_r(offs_t offset)
 	{
@@ -138,11 +138,11 @@ private:
 		return m_k056832->rom_word_r(offset);
 	}
 
-	void kzaurus_main(address_map &map);
-	void koropens_main(address_map &map);
-	void pwrchanc_main(address_map &map);
-	void spcpokan_main(address_map &map);
-	void gs662_main(address_map &map);
+	void kzaurus_main(address_map &map) ATTR_COLD;
+	void koropens_main(address_map &map) ATTR_COLD;
+	void pwrchanc_main(address_map &map) ATTR_COLD;
+	void spcpokan_main(address_map &map) ATTR_COLD;
+	void gs662_main(address_map &map) ATTR_COLD;
 
 	static constexpr int NUM_LAYERS = 4;
 
@@ -160,12 +160,12 @@ public:
 	void slot(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void tilemap_draw(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, int layer, int i) override;
 
 private:
-	void slot_main(address_map &map);
+	void slot_main(address_map &map) ATTR_COLD;
 };
 
 void konmedal68k_state::video_start()

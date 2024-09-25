@@ -71,7 +71,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void pia0b_w(u8);
 	void pia1b_w(u8);
@@ -79,8 +79,8 @@ private:
 	bool m_cassbit = 0;
 	bool m_cassold = 0;
 	u8 m_cass_data[4]{};
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<pia6821_device> m_pia0;

@@ -46,8 +46,8 @@ public:
 	void ts2624(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	MC6845_UPDATE_ROW(ts1_update_row);
@@ -68,10 +68,10 @@ private:
 	void bell_w(u8 data);
 	void control_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void ts1_mem_map(address_map &map);
-	void ts1_io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void ts1_mem_map(address_map &map) ATTR_COLD;
+	void ts1_io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	optional_device<rst_pos_buffer_device> m_rstbuf;

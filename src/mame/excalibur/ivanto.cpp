@@ -66,7 +66,7 @@ public:
 	void ivanto(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { m_dac->write(0x80); }
 
 private:
@@ -85,7 +85,7 @@ private:
 	u8 m_lcd_com = 0;
 	emu_timer *m_irqtimer;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);

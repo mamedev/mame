@@ -49,8 +49,8 @@ public:
 	void init_s1945iiibl();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -126,11 +126,11 @@ private:
 	void psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 	u32 const code, u16 const color, u8 const flipx, u8 const flipy, s32 const offsx, s32 const offsy,
 	s16 const alpha, u32 const zoomx, u32 const zoomy, u8 const wide, u8 const high, u16 const z);
-	void ps3v1_map(address_map &map);
-	void ps5_map(address_map &map);
-	void ps5_mahjong_map(address_map &map);
-	void s1945iiibl_map(address_map &map);
-	void s1945iiibla_map(address_map &map);
+	void ps3v1_map(address_map &map) ATTR_COLD;
+	void ps5_map(address_map &map) ATTR_COLD;
+	void ps5_mahjong_map(address_map &map) ATTR_COLD;
+	void s1945iiibl_map(address_map &map) ATTR_COLD;
+	void s1945iiibla_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_PSIKYO_PSIKYOSH_H

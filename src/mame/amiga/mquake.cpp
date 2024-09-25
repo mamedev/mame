@@ -65,10 +65,10 @@ private:
 	uint16_t coin_chip_r(offs_t offset, uint16_t mem_mask = ~0);
 	void coin_chip_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void a500_mem(address_map &map);
-	void main_map(address_map &map);
-	void mquake_es5503_map(address_map &map);
-	void overlay_512kb_map(address_map &map);
+	void a500_mem(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void mquake_es5503_map(address_map &map) ATTR_COLD;
+	void overlay_512kb_map(address_map &map) ATTR_COLD;
 
 	required_device<es5503_device> m_es5503;
 	required_region_ptr<uint8_t> m_es5503_rom;

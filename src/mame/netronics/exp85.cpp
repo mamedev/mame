@@ -85,7 +85,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_rst75 );
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t i8355_a_r();
 	void i8355_a_w(uint8_t data);
@@ -94,8 +94,8 @@ private:
 
 	void status_out(u8 status);
 
-	void exp85_io(address_map &map);
-	void exp85_mem(address_map &map);
+	void exp85_io(address_map &map) ATTR_COLD;
+	void exp85_mem(address_map &map) ATTR_COLD;
 
 	void to_change(int to);
 
