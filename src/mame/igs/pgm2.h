@@ -66,7 +66,7 @@ public:
 	void pgm2(machine_config &config) ATTR_COLD;
 	void pgm2_hires(machine_config &config) ATTR_COLD;
 	void pgm2_map(address_map &map) ATTR_COLD;
-	void pgm2_module_rom_map(address_map &ma ATTR_COLDp);
+	void pgm2_module_rom_map(address_map &map) ATTR_COLD;
 	void pgm2_ram_rom_map(address_map &map) ATTR_COLD;
 	void pgm2_rom_map(address_map &map) ATTR_COLD;
 
