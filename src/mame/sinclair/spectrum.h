@@ -193,25 +193,25 @@ protected:
 	void update_paging();
 	void page_basicrom();
 	void border_update(int data);
-	void setup_sp(uint8_t *snapdata, uint32_t snapsize);
-	void setup_sna(uint8_t *snapdata, uint32_t snapsize);
-	void setup_ach(uint8_t *snapdata, uint32_t snapsize);
-	void setup_prg(uint8_t *snapdata, uint32_t snapsize);
-	void setup_plusd(uint8_t *snapdata, uint32_t snapsize);
-	void setup_sem(uint8_t *snapdata, uint32_t snapsize);
-	void setup_sit(uint8_t *snapdata, uint32_t snapsize);
-	void setup_zx(uint8_t *snapdata, uint32_t snapsize);
-	void setup_snp(uint8_t *snapdata, uint32_t snapsize);
-	void snx_decompress_block(address_space &space, uint8_t *source, uint16_t dest, uint16_t size);
-	void setup_snx(uint8_t *snapdata, uint32_t snapsize);
-	void setup_frz(uint8_t *snapdata, uint32_t snapsize);
-	void z80_decompress_block(address_space &space, uint8_t *source, uint16_t dest, uint16_t size);
-	void setup_z80(uint8_t *snapdata, uint32_t snapsize);
+	void setup_sp(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_sna(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_ach(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_prg(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_plusd(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_sem(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_sit(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_zx(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_snp(const uint8_t *snapdata, uint32_t snapsize);
+	void snx_decompress_block(address_space &space, const uint8_t *source, uint16_t dest, uint16_t size);
+	void setup_snx(const uint8_t *snapdata, uint32_t snapsize);
+	void setup_frz(const uint8_t *snapdata, uint32_t snapsize);
+	void z80_decompress_block(address_space &space, const uint8_t *source, uint16_t dest, uint16_t size);
+	void setup_z80(const uint8_t *snapdata, uint32_t snapsize);
 
 	// quickload helpers
 	void log_quickload(const char *type, uint32_t start, uint32_t length, uint32_t exec, const char *exec_format);
-	void setup_scr(uint8_t *quickdata, uint32_t quicksize);
-	void setup_raw(uint8_t *quickdata, uint32_t quicksize);
+	void setup_scr(const uint8_t *quickdata, uint32_t quicksize);
+	void setup_raw(const uint8_t *quickdata, uint32_t quicksize);
 };
 
 /*----------- defined in drivers/spectrum.cpp -----------*/
