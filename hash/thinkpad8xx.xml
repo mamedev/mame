@@ -13,13 +13,15 @@ license:CC0-1.0
 		<publisher>IBM</publisher>
 		<sharedfeat name="compatibility" value="800,820,850" />
 		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="AIX 4 Volume 1 of 2" />
 			<diskarea name="cdrom">
 				<disk name="aix_4.1.5_disc_01" sha1="4c49c8190e33c2c7f13a74d7332d384edd6b3042" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="AIX 4 Volume 2 of 2" />
 			<diskarea name="cdrom">
-				<disk name="aix_4.1.5_disc_01" sha1="228afedd90619e89c6b466b4970bda0e5a3e9a13" />
+				<disk name="aix_4.1.5_disc_02" sha1="228afedd90619e89c6b466b4970bda0e5a3e9a13" />
 			</diskarea>
 		</part>
 	</software>
@@ -53,8 +55,8 @@ license:CC0-1.0
 		<part name="flop" interface="floppy">
 			<feature name="part_id" value="Solaris MDB Boot 2.5.1 Release PowerPC Platform Edition (IBM Hardware Platform)"/>
 			<feature name="part_number" value="702-4348-06"/>
-			<dataarea name="flop" size="168000">
-				<rom name="solaris_2_5_1_mdb_boot_ppc_ibm.img" size="168000" crc="b45832e2" sha1="be9e11364816ab5f3362396ed0f457d4a2e61188" />
+			<dataarea name="flop" size="1474560">
+				<rom name="solaris_2_5_1_mdb_boot_ppc_ibm.img" size="1474560" crc="b45832e2" sha1="be9e11364816ab5f3362396ed0f457d4a2e61188" />
 			</dataarea>
 		</part>
 		<part name="cdrom1" interface="cdrom">
@@ -79,8 +81,8 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="800,820,850" />
 		<part name="flop" interface="floppy">
 			<feature name="part_id" value="Windows NT ARC Boot Firmware v1.51"/>
-			<dataarea name="flop" size="168000">
-				<rom name="winnt_arc_151.img" size="168000" crc="98db8c77" sha1="56be119ce7a0020bf4caabd099d2eae8e249305c" />
+			<dataarea name="flop" size="1474560">
+				<rom name="winnt_arc_151.img" size="1474560" crc="98db8c77" sha1="56be119ce7a0020bf4caabd099d2eae8e249305c" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
