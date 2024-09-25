@@ -47,7 +47,7 @@
 u32 pgm_arm_type2_state::arm7_latch_arm_r(offs_t offset, u32 mem_mask)
 {
 	if (!machine().side_effects_disabled())
-		m_prot->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE ); // guess
+		m_prot->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, CLEAR_LINE); // guess
 
 	LOGPROT("%s ARM7: Latch read: %08x (%08x)\n", machine().describe_context(), m_kov2_latchdata_68k_w, mem_mask);
 	return m_kov2_latchdata_68k_w;
@@ -83,7 +83,7 @@ void pgm_arm_type2_state::arm7_latch_68k_w(offs_t offset, u16 data, u16 mem_mask
 	LOGPROT("%s M68K: Latch write: %04x (%04x)\n", machine().describe_context(), data & 0x0000ffff, mem_mask);
 	COMBINE_DATA(&m_kov2_latchdata_68k_w);
 
-	m_prot->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE ); // guess
+	m_prot->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, ASSERT_LINE); // guess
 }
 
 u16 pgm_arm_type2_state::arm7_ram_r(offs_t offset, u16 mem_mask)
@@ -236,7 +236,7 @@ u32 pgm_arm_type2_state::ddp2_speedup_r(address_space &space)
 	if (pc == 0x080109b4)
 	{
 		/* if we've hit the loop where this is read and both values are 0 then the only way out is an interrupt */
-		int r4 = (m_prot->state_int(ARM7_R4));
+		int r4 = (m_prot->state_int(arm7_cpu_device::ARM7_R4));
 		r4 += 0xe;
 
 		if (r4 == 0x18002f9e)

@@ -16193,17 +16193,11 @@ galgame4p                       // (c) 1998 Creative Electronics & Software (CES
 galgbios                        // (c) 1998 Creative Electronics & Software (CES)
 
 @source:chess/ave_arb.cpp
-arb                             //
-arbv2                           //
-
-@source:chess/cking_master.cpp
-ckmaster                        //
-
-@source:chess/cking_triomphe.cpp
-triomphe
+arb
+arbv2
 
 @source:chess/compuchess.cpp
-ccmk1                           // Chess Champion MK I
+ccmk1
 cmpchess
 cmpchess2
 cncchess
@@ -16235,6 +16229,12 @@ tascr30
 tascr30a
 tascr30b
 tascr30g
+
+@source:chessking/master.cpp
+master
+
+@source:chessking/triomphe.cpp
+triomphe
 
 @source:chromatics/cgc7900.cpp
 cgc7900                         //
@@ -16655,6 +16655,11 @@ sgalaxyb
 
 @source:cxg/professor.cpp
 scprof
+
+@source:cxg/royal.cpp
+granada
+sroyal
+supra
 
 @source:cxg/senterprise.cpp
 senterp
@@ -19704,6 +19709,7 @@ smondial2                       // 1989 Mephisto Super Mondial II
 
 @source:hitachi/b16.cpp
 b16                             //
+b16ex2                          //
 
 @source:hitachi/bmjr.cpp
 bmjr                            //
@@ -19967,6 +19973,9 @@ rtpc015                         // IBM RT PC Model 015
 rtpc020                         // IBM RT PC Model 020
 rtpc025                         // IBM RT PC Model 025
 rtpca25                         // IBM RT PC Model A25
+
+@source:ibm/thinkpad8xx.cpp
+thinkpad850                     // IBM Thinkpad 850
 
 @source:ice/chexx.cpp
 chexx83                         // 1983 ICE
@@ -28761,8 +28770,10 @@ draw88pkr                       // 1988, BTE, Inc.
 amhbattl
 boobood
 docchift
+fishbatl
 mmhammer
 shpchamp
+wanpakup
 wwdash
 zenponta
 
@@ -38928,9 +38939,6 @@ cp2000
 @source:saitek/delta1.cpp
 ccdelta1
 
-@source:saitek/ecbackg.cpp
-ecbackg
-
 @source:saitek/edames.cpp
 edames
 
@@ -38973,6 +38981,10 @@ renaissaa
 montreux
 risc2500
 risc2500a
+
+@source:saitek/sbackgc.cpp
+ecbackg
+sbackgc
 
 @source:saitek/schess.cpp
 schess
@@ -42137,6 +42149,7 @@ rp200
 gimix                           //
 
 @source:skeleton/gm1000.cpp
+bh1000
 gm1000                          //
 
 @source:skeleton/gnat10.cpp
@@ -42370,6 +42383,9 @@ p8000_16                        //
 
 @source:skeleton/palestra.cpp
 palestra
+
+@source:skeleton/pap2.cpp
+pap2
 
 @source:skeleton/pcksurfer.cpp
 pcksurfer                       // (c) 2006 Datawind
@@ -45458,6 +45474,7 @@ zone3d
 ablkickb
 abltenni                        //
 comil                           //
+ddr33v
 decathln
 decathlna
 doraglob                        // (c) 2007 VTech
@@ -46049,6 +46066,9 @@ orionzms                        //
 
 @source:ussr/partner.cpp
 partner                         //
+
+@source:ussr/pk32.cpp
+pk32                            // (c) 1991 Elektronika, USSR
 
 @source:ussr/pk8000.cpp
 hobby                           //

@@ -7,7 +7,7 @@ license:CC0-1.0
 
 
 	<software name="top20v1" supported="partial">
-		<description>Karaoke Studio - Senyou Cassette - Top Hit 20 Vol. 1 (Jpn)</description>
+		<description>Karaoke Studio - Senyou Cassette - Top Hit 20 Vol. 1 (Japan)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-KARAOKE-VOL1"/>
@@ -22,7 +22,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="top20v2" supported="partial">
-		<description>Karaoke Studio - Senyou Cassette - Top Hit 20 Vol. 2 (Jpn)</description>
+		<description>Karaoke Studio - Senyou Cassette - Top Hit 20 Vol. 2 (Japan)</description>
 		<year>1988</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-KARAOKE-VOL2"/>

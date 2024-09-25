@@ -193,7 +193,7 @@ void zoomer_state::maincpu_ems_map(address_map &map)
 {
 	map(0x0000000, 0x00fffff).ram().share("nvram");
 	map(0x0400000, 0x07fffff).rom().region("maincpu", 0);
-//	map(0x1000000, 0x1ffffff) - TODO: PCMCIA
+	//map(0x1000000, 0x1ffffff) - TODO: PCMCIA
 }
 
 void zoomer_state::maincpu_io_map(address_map &map)

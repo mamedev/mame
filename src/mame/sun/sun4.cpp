@@ -413,6 +413,7 @@
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
 #include "bus/sunmouse/sunmouse.h"
@@ -1367,6 +1368,7 @@ static void sun_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("tape", NSCSI_TAPE);
 	device.option_add_internal("ncr53c90", NCR53C90);
 	device.set_option_machine_config("cdrom", sun4_cdrom);
 }
@@ -1452,6 +1454,9 @@ void sun4_state::sun4(machine_config &config)
 	m_maincpu->set_addrmap(0, &sun4_state::debugger_map);
 
 	sun4_base(config);
+
+	// add a tape drive at SCSI ID 4
+	subdevice<nscsi_connector>("scsibus:4")->set_default_option("tape");
 
 	// MMU Type 1 device space
 	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);

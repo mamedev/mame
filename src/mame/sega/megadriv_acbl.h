@@ -4,6 +4,7 @@
 #define MAME_SEGA_MEGADRIV_ACBL_H
 
 #include "megadriv.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 
 
 class md_boot_state : public md_ctrl_state
@@ -19,7 +20,6 @@ public:
 
 	void init_aladmdb();
 	void init_srmdb();
-	void init_barek2();
 	void init_barek2ch();
 	void init_barek3();
 	void init_barek3a();
@@ -35,7 +35,6 @@ protected:
 private:
 	void aladmdb_w(uint16_t data);
 	uint16_t aladmdb_r();
-	uint16_t barek2mb_r();
 	uint16_t barek3mba_r();
 	uint16_t jparkmb_r();
 	uint16_t twinktmb_r();
@@ -44,6 +43,40 @@ private:
 
 	// bootleg specific
 	int m_aladmdb_mcu_port = 0;
+};
+
+// for games with emulated pic mcu
+class md_boot_mcu_state : public md_boot_state
+{
+public:
+	md_boot_mcu_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_boot_state(mconfig, type, tag),
+		m_mcu(*this, "mcu"),
+		m_dsw(*this, "dsw")
+	{ }
+
+	void md_boot_mcu(machine_config &config);
+
+private:
+	void md_boot_mcu_map(address_map &map);
+
+	uint16_t mcu_r();
+	void mcu_w(uint16_t data);
+
+	void mcu_porta_w(uint8_t data);
+	uint8_t mcu_portc_r();
+	void mcu_portb_w(uint8_t data);
+	void mcu_portc_w(uint8_t data);
+
+	required_device<pic16c57_device> m_mcu;
+	required_ioport m_dsw;
+
+	uint8_t m_mcu_porta;
+	uint8_t m_mcu_portc;
+	uint8_t m_mcu_in_latch_msb;
+	uint8_t m_mcu_in_latch_lsb;
+	uint8_t m_mcu_out_latch_msb;
+	uint8_t m_mcu_out_latch_lsb;
 };
 
 class md_sonic3bl_state : public md_boot_state

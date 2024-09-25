@@ -6,6 +6,9 @@
 IGS ARM7 (IGS027A) based Mahjong / Gambling platform(s) with XA sub-cpu
 These games use the IGS027A processor.
 
+Triple Fever (V105US) (tripfevb) hangs after paying out tickets, with the MCU
+apparently attempting serial communication with something.
+
 */
 
 #include "emu.h"
@@ -14,8 +17,6 @@ These games use the IGS027A processor.
 #include "igs027a.h"
 #include "pgmcrypt.h"
 #include "xamcu.h"
-
-#include "cpu/arm7/arm7core.h"
 
 #include "machine/i8255.h"
 #include "machine/nvram.h"
@@ -28,6 +29,7 @@ These games use the IGS027A processor.
 #include "speaker.h"
 
 #include "crzybugs.lh"
+#include "tripfev.lh"
 
 #define LOG_DEBUG       (1U << 1)
 //#define VERBOSE         (LOG_DEBUG)
@@ -40,7 +42,6 @@ class igs_m027xa_state : public driver_device
 public:
 	igs_m027xa_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_igs_mainram(*this, "igs_mainram"),
 		m_maincpu(*this, "maincpu"),
 		m_xa(*this, "xa"),
 		m_ppi(*this, "ppi8255"),
@@ -69,7 +70,6 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	optional_shared_ptr<u32> m_igs_mainram;
 	required_device<igs027a_cpu_device> m_maincpu;
 	required_device<igs_xa_mcu_subcpu_device> m_xa;
 	required_device<i8255_device> m_ppi;
@@ -89,8 +89,6 @@ private:
 
 	bool m_irq_from_igs031;
 
-	u32 m_igs_40000014;
-
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void pgm_create_dummy_internal_arm_region();
@@ -107,8 +105,6 @@ private:
 	void output_w(u8 data);
 	void lamps_w(u8 data);
 
-	void igs_40000014_w(offs_t offset, u32 data, u32 mem_mask);
-
 	void xa_irq(int state);
 
 	u32 gpio_r();
@@ -121,8 +117,6 @@ private:
 void igs_m027xa_state::machine_reset()
 {
 	m_irq_from_igs031 = false;
-
-	m_igs_40000014 = 0;
 }
 
 void igs_m027xa_state::machine_start()
@@ -135,8 +129,6 @@ void igs_m027xa_state::machine_start()
 	save_item(NAME(m_io_select));
 
 	save_item(NAME(m_irq_from_igs031));
-
-	save_item(NAME(m_igs_40000014));
 }
 
 void igs_m027xa_state::video_start()
@@ -153,14 +145,13 @@ void igs_m027xa_state::video_start()
 void igs_m027xa_state::main_map(address_map &map)
 {
 	map(0x08000000, 0x0807ffff).rom().region("user1", 0); // Game ROM
-	map(0x10000000, 0x100003ff).ram().share("igs_mainram"); // main RAM for ASIC?
+
 	map(0x18000000, 0x18007fff).ram().mirror(0xf8000).share("nvram");
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 	map(0x38008000, 0x38008003).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x38009000, 0x38009003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x3800c000, 0x3800c003).w(FUNC(igs_m027xa_state::oki_bank_w));
-	map(0x40000014, 0x40000017).w(FUNC(igs_m027xa_state::igs_40000014_w));
+	map(0x3800c000, 0x3800c003).umask32(0x000000ff).w(FUNC(igs_m027xa_state::oki_bank_w));
 
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027xa_state::xor_table_w));
 
@@ -175,37 +166,75 @@ void igs_m027xa_state::main_xor_map(address_map &map)
 	map(0x08000000, 0x0807ffff).r(FUNC(igs_m027xa_state::external_rom_r)); // Game ROM
 }
 
-static INPUT_PORTS_START( base )
+
+INPUT_PORTS_START( base )
 	PORT_START("TEST0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Play")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )          // COINA
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME("Big")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("TEST1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Stop All Reels")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_NAME("Ticket")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )          // COINC
 
 	PORT_START("TEST2")
-	PORT_BIT( 0x00007, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00008, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )  PORT_NAME("Stop Reel 2 / Small")
-	PORT_BIT( 0x00010, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )  PORT_NAME("Stop Reel 3 / Take Score")
-	PORT_BIT( 0x00020, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )  PORT_NAME("Stop Reel 1 / Double Up")
-	PORT_BIT( 0x001c0, IP_ACTIVE_LOW, IPT_UNUSED )      // IGS031 interrupt in bit 8 - see gpio_r
+	PORT_BIT( 0x001ff, IP_ACTIVE_LOW, IPT_UNUSED )      // IGS031 interrupt in bit 8 - see gpio_r
 	PORT_BIT( 0x00200, IP_ACTIVE_LOW, IPT_CUSTOM )      PORT_READ_LINE_DEVICE_MEMBER("xa", igs_xa_mcu_subcpu_device, irq_r)
 	PORT_BIT( 0xffc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( crzybugs )
+	PORT_INCLUDE(base)
+
+	PORT_MODIFY("TEST0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Play")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME("Big")
+
+	PORT_MODIFY("TEST1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Stop All Reels")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_NAME("Ticket")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+
+	PORT_MODIFY("TEST2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )     PORT_NAME("Stop Reel 2 / Small")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )     PORT_NAME("Stop Reel 3 / Take Score")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )     PORT_NAME("Stop Reel 1 / Double Up")
+
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x01, DEF_STR(On) )
@@ -226,9 +255,8 @@ static INPUT_PORTS_START( base )
 	PORT_DIPSETTING(    0x20, "Both (duplicate)" )
 	PORT_DIPSETTING(    0x40, "Fruit" )
 	PORT_DIPSETTING(    0x60, "Bug" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
 
-	PORT_START("DSW2")
+	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Score Box" )                PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, "10X" )
 	PORT_DIPSETTING(    0x01, "10X (duplicate)" )
@@ -243,22 +271,67 @@ static INPUT_PORTS_START( base )
 	PORT_DIPNAME( 0x30, 0x30, "Hold Pair" )                PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x20, "Regular" )
-	PORT_DIPSETTING(    0x00, "Georgia" )
-	PORT_DIPSETTING(    0x10, "Georgia (duplicate)" )
+	PORT_DIPSETTING(    0x10, "Georgia" )
+	PORT_DIPSETTING(    0x00, "Georgia (duplicate)" )
 	PORT_DIPNAME( 0x40, 0x40, "Auto Hold" )                PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR(No) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+INPUT_PORTS_END
 
-	PORT_START("DSW3")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+INPUT_PORTS_START( tripfev )
+	PORT_INCLUDE(base)
+
+	PORT_MODIFY("TEST0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP5 )     PORT_NAME("Stop Reel 5 / Play")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )     PORT_NAME("Stop Reel 1 / Big")
+
+	PORT_MODIFY("TEST1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Stop All Reels")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_NAME("Ticket")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+
+	PORT_MODIFY("TEST2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )     PORT_NAME("Stop Reel 3 / Small")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )     PORT_NAME("Stop Reel 4 / Take Score")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )     PORT_NAME("Stop Reel 2 / Double Up")
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x01, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x02, "Non Stop" )                 PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x04, 0x04, "Password" )                 PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x08, 0x08, "Odds Table" )               PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x30, 0x30, "Score Box" )                PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, "10X" )
+	PORT_DIPSETTING(    0x10, "10X (duplicate)" )
+	PORT_DIPSETTING(    0x20, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x30, DEF_STR(No) )
+	PORT_DIPNAME( 0x40, 0x40, "Play Score" )               PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x80, 0x80, "Auto Take" )                PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Hand Count" )               PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x06, 0x06, "Hold Pair" )                PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x04, "Regular" )
+	PORT_DIPSETTING(    0x02, "Georgia" )
+	PORT_DIPSETTING(    0x00, "Georgia (duplicate)" )
+	PORT_DIPNAME( 0x08, 0x08, "Auto Ticket" )              PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 INPUT_PORTS_END
 
 
@@ -275,28 +348,22 @@ void igs_m027xa_state::output_w(u8 data)
 void igs_m027xa_state::lamps_w(u8 data)
 {
 	// active high outputs
-	// +------+----------------+
-	// | lamp | crzybugs       |
-	// +------+----------------+
-	// |  1   | stop all/start |
-	// |  2   | stop 2/small   |
-	// |  3   | bet            |
-	// |  4   | stop 3/take    |
-	// |  5   | stop 1/double  |
-	// |  6   | big            |
-	// |  7   |                |
-	// |  8   |                |
-	// +------+----------------+
+	// +------+----------------+----------------+
+	// | lamp | crzybugs       | tripfev        |
+	// +------+----------------+----------------+
+	// |  1   | start/stop all | start/stop all |
+	// |  2   | stop 2/small   | stop 3/small   |
+	// |  3   | bet            | stop 5/play    |
+	// |  4   | stop 3/take    | stop 4/take    |
+	// |  5   | stop 1/double  | stop 2/double  |
+	// |  6   | big            | stop 1/big     |
+	// |  7   |                |                |
+	// |  8   |                |                |
+	// +------+----------------+----------------+
 	for (unsigned i = 0; 8 > i; ++i)
 		m_out_lamps[i] = BIT(data, i);
 }
 
-
-void igs_m027xa_state::igs_40000014_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	// sets bit 1 before waiting on FIRQ, maybe it's an enable here?
-	m_igs_40000014 = data;
-}
 
 u32 igs_m027xa_state::gpio_r()
 {
@@ -308,8 +375,7 @@ u32 igs_m027xa_state::gpio_r()
 
 void igs_m027xa_state::oki_bank_w(offs_t offset, u8 data)
 {
-	if (offset == 0)
-		m_oki->set_rom_bank(data & 7);
+	m_oki->set_rom_bank(data & 7);
 }
 
 template <unsigned Select, unsigned First>
@@ -333,7 +399,7 @@ void igs_m027xa_state::io_select_w(u8 data)
 void igs_m027xa_state::xa_irq(int state)
 {
 	if (state)
-		m_maincpu->trigger_irq(3);
+		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // TODO: when is the IRQ line cleared?
 }
 
 u32 igs_m027xa_state::external_rom_r(offs_t offset)
@@ -353,20 +419,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs_m027xa_state::interrupt)
 {
 	int scanline = param;
 
-	// should be using m_maincpu->trigger_irq with more compelx interrupt logic?
-
 	switch (scanline)
 	{
 	case 0:
-		if (m_igs_40000014 & 1)
-			m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
+		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time()); // vbl?
 		m_irq_from_igs031 = false;
 		break;
 	case 240:
 		if (m_igs017_igs031->get_irq_enable())
 		{
 			m_irq_from_igs031 = true;
-			m_maincpu->trigger_irq(3);
+			m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time()); // TODO: when is the IRQ line cleared?
 		}
 		break;
 	}
@@ -728,14 +791,14 @@ void igs_m027xa_state::init_wldfruit()
 GAME(  2008, haunthig,  0,        igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", MACHINE_NOT_WORKING ) // IGS FOR V109US 2008 10 14
 GAME(  2006, haunthiga, haunthig, igs_mahjong_xa,     base,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", MACHINE_NOT_WORKING ) // IGS FOR V101US 2006 08 23
 
-GAMEL( 2009, crzybugs,  0,        igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", 0, layout_crzybugs ) // IGS FOR V204US 2009 5 19
-GAMEL( 2006, crzybugsa, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", 0, layout_crzybugs ) // IGS FOR V100US 2006 3 29 but also V202US string
-GAMEL( 2005, crzybugsb, crzybugs, igs_mahjong_xa_xor, base,     igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", 0, layout_crzybugs ) // FOR V100US 2005 7 20 but also V200US string
+GAMEL( 2009, crzybugs,  0,        igs_mahjong_xa_xor, crzybugs, igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", 0, layout_crzybugs ) // IGS FOR V204US 2009 5 19
+GAMEL( 2006, crzybugsa, crzybugs, igs_mahjong_xa_xor, crzybugs, igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", 0, layout_crzybugs ) // IGS FOR V100US 2006 3 29 but also V202US string
+GAMEL( 2005, crzybugsb, crzybugs, igs_mahjong_xa_xor, crzybugs, igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", 0, layout_crzybugs ) // FOR V100US 2005 7 20 but also V200US string
 
-GAME(  2007, crzybugsj, crzybugs, igs_mahjong_xa,     base,     igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_NOT_WORKING ) // IGS FOR V101JP 2007 06 08
+GAME(  2007, crzybugsj, crzybugs, igs_mahjong_xa,     crzybugs, igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_NOT_WORKING ) // IGS FOR V101JP 2007 06 08
 
-GAME(  2006, tripfev,   0,        igs_mahjong_xa_xor, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V108US)", MACHINE_NOT_WORKING )
-GAME(  2006, tripfeva,  tripfev,  igs_mahjong_xa_xor, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", MACHINE_NOT_WORKING ) // IGS FOR V107US 2006 09 07
-GAME(  2006, tripfevb,  tripfev,  igs_mahjong_xa_xor, base,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V105US)", MACHINE_NOT_WORKING )
+GAMEL( 2006, tripfev,   0,        igs_mahjong_xa_xor, tripfev,  igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V108US)", 0, layout_tripfev )
+GAMEL( 2006, tripfeva,  tripfev,  igs_mahjong_xa_xor, tripfev,  igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", 0, layout_tripfev ) // IGS FOR V107US 2006 09 07
+GAMEL( 2006, tripfevb,  tripfev,  igs_mahjong_xa_xor, tripfev,  igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V105US)", MACHINE_NOT_WORKING, layout_tripfev )
 
-GAME(  200?, wldfruit,  0,        igs_mahjong_xa, base,     igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_NOT_WORKING ) // IGS-----97----V208US
+GAME(  200?, wldfruit,  0,        igs_mahjong_xa,     base,     igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_NOT_WORKING ) // IGS-----97----V208US

@@ -6,9 +6,8 @@
 #pragma once
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
-#include "machine/intelfsh.h"
 #include "machine/i2cmem.h"
+#include "machine/intelfsh.h"
 #include "machine/terminal.h"
 
 

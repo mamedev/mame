@@ -8,11 +8,12 @@ Chess King Master (yes, it's plainly named "Master")
 Chess King was a UK business formed by Intelligent Software Ltd (later known as
 Intelligent Chess Software Ltd, after the fiasco with the Enterprise home computer),
 so logically, all the programs were by them. According to the manual, the chess
-engine is Cyrus (by Richard Lang).
+engine of Master is Cyrus (by Richard Lang).
 
 To start a new game, press CHANGE POSITION, NEW GAME, and CHANGE POSITION again.
 
 Hardware notes:
+- PCB label: COPYRIGHT CHESS KING
 - Z80 CPU(NEC D780C-1) @ 4MHz(8MHz XTAL), IRQ from 555 timer
 - 8KB ROM(NEC D2764C-3), 2KB RAM(NEC D4016C), ROM is scrambled for easy PCB placement
 - simple I/O via 2*74373 and a 74145
@@ -50,7 +51,6 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine configs
 	void master(machine_config &config);
 
 	void init_master();
@@ -222,7 +222,7 @@ void master_state::master(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, 8_MHz_XTAL/2);
-	m_maincpu->z80_set_m1_cycles(5); // 1 WAIT CLK per M1
+	m_maincpu->z80_set_m1_cycles(4+1); // 1 WAIT CLK per M1
 	m_maincpu->set_addrmap(AS_PROGRAM, &master_state::main_trampoline);
 	ADDRESS_MAP_BANK(config, "mainmap").set_map(&master_state::main_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
@@ -249,7 +249,7 @@ void master_state::master(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( ckmaster )
+ROM_START( master )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("d2764c-3.ic2", 0x0000, 0x2000, CRC(59cbec9e) SHA1(2e0629e65778da62bed857406b91a334698d2fe8) ) // no custom label
 ROM_END
@@ -262,5 +262,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY, FULLNAME, FLAGS
-SYST( 1983, ckmaster, 0,      0,      master,  master, master_state, init_master, "Chess King / Intelligent Software", "Master (Chess King)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY, FULLNAME, FLAGS
+SYST( 1983, master, 0,      0,      master,  master, master_state, init_master, "Chess King / Intelligent Software", "Master (Chess King)", MACHINE_SUPPORTS_SAVE )

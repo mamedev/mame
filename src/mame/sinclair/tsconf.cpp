@@ -30,8 +30,6 @@ FAQ-RUS: https://forum.tslabs.info/viewtopic.php?f=35&t=157
 TODO:
 - Ram cache
 - VDos
-- INTs not perfect. Currently all signals are invalidated after 32t(3.5MHz). Must only do so for frame, not scanline/DMA
-- Palette change in the middle of the frame e.g. zapili-c0
 
  ****************************************************************************/
 
@@ -96,9 +94,9 @@ void tsconf_state::tsconf_io(address_map &map)
 	map(0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
 	map(0x8ff7, 0x8ff7).select(0x7000).w(FUNC(tsconf_state::tsconf_port_f7_w)); // 3:bff7 5:dff7 6:eff7
 	map(0xbff7, 0xbff7).r(FUNC(tsconf_state::tsconf_port_f7_r));
-	map(0x00fb, 0x00fb).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x8000, 0x8000).mirror(0x3ffd).lw8(NAME([this](u8 data) { return m_ay[m_ay_selected]->data_w(data); }));
-	map(0xc000, 0xc000).mirror(0x3ffd).lr8(NAME([this]() { return m_ay[m_ay_selected]->data_r(); }))
+	map(0x00fb, 0x00fb).mirror(0xff00).w(m_dac, FUNC(dac_byte_interface::data_w));
+	map(0x80fd, 0x80fd).mirror(0x3f00).lw8(NAME([this](u8 data) { return m_ay[m_ay_selected]->data_w(data); }));
+	map(0xc0fd, 0xc0fd).mirror(0x3f00).lr8(NAME([this]() { return m_ay[m_ay_selected]->data_r(); }))
 		.w(FUNC(tsconf_state::tsconf_ay_address_w));
 }
 
@@ -117,9 +115,9 @@ void tsconf_state::tsconf_bank_w(offs_t offset, u8 data)
 
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8,          // 8 x 8 characters */
-	96,            // 96 characters */
-	1,             // 1 bits per pixel */
+	8, 8,          // 8 x 8 characters
+	96,            // 96 characters
+	1,             // 1 bits per pixel
 	{0},           // no bitplanes
 	{STEP8(0, 1)}, // x offsets
 	{STEP8(0, 8)}, // y offsets
@@ -145,8 +143,7 @@ static const gfx_layout tsconf_tile_16cpp_layout =
 	4,
 	{STEP4(0, 1)},
 	{STEP8(0, 4)},
-	{STEP8(0, 256 * 8)},
-	// Much more tiles when needed. Because tiles are in RAW format but we don't know region properties.
+	{STEP8(0, 256 * 8)}, // Much more tiles when needed. Because tiles are in RAW format but we don't know region properties.
 	8 * 4
 };
 
@@ -287,7 +284,7 @@ void tsconf_state::tsconf(machine_config &config)
 
 	GLUKRS(config, m_glukrs);
 
-	TSCONF_DMA(config, m_dma, 14_MHz_XTAL / 2);
+	TSCONF_DMA(config, m_dma, 14_MHz_XTAL * 2);
 	m_dma->in_mreq_callback().set(FUNC(tsconf_state::ram_read16));
 	m_dma->out_mreq_callback().set(FUNC(tsconf_state::ram_write16));
 	m_dma->in_spireq_callback().set(FUNC(tsconf_state::spi_read16));
@@ -314,9 +311,7 @@ void tsconf_state::tsconf(machine_config &config)
 		.add_route(1, "rspeaker", 0.25)
 		.add_route(2, "rspeaker", 0.50);
 
-	CENTRONICS(config, m_centronics, centronics_devices, "covox");
-	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
-	m_centronics->set_output_latch(cent_data_out);
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.75);;
 
 	PALETTE(config, "palette", FUNC(tsconf_state::tsconf_palette), 256);
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(0), 448, 320, with_vblank(0), 320);
@@ -335,7 +330,13 @@ void tsconf_state::tsconf(machine_config &config)
 
 ROM_START(tsconf)
 	ROM_REGION(0x080000, "maincpu", ROMREGION_ERASEFF) // ROM: 32 * 16KB
-	ROM_LOAD("ts-bios.rom", 0, 0x10000, CRC(b060b0d9) SHA1(820d3539de115141daff220a3cb733fc880d1bab))
+	ROM_DEFAULT_BIOS("v2407")
+
+	ROM_SYSTEM_BIOS(0, "v1", "v1")
+	ROMX_LOAD("ts-bios.rom", 0, 0x10000, CRC(b060b0d9) SHA1(820d3539de115141daff220a3cb733fc880d1bab), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "v2407", "Update 24.07.28")
+	ROMX_LOAD("ts-bios.240728.rom", 0, 0x10000, CRC(19f8ad7b) SHA1(9cee82d4a6212686358a50b0fd5a2981b3323ab6), ROM_BIOS(1))
 ROM_END
 
 //    YEAR  NAME    PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS

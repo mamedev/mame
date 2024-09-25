@@ -7,9 +7,10 @@
 #pragma once
 
 #include "arm7.h"
-#include "arm7core.h"
+
 #include "machine/gt913_kbd.h"
 #include "machine/vic_pl192.h"
+
 
 /***************************************************************************
     TYPE DEFINITIONS

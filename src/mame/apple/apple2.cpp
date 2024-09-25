@@ -1155,7 +1155,7 @@ void apple2_state::apple2_common(machine_config &config)
 	m_softlatch->q_out_cb<6>().append(m_video, FUNC(a2_video_device::an2_w));
 	m_softlatch->q_out_cb<7>().set(m_gameio, FUNC(apple2_gameio_device::an3_w));
 
-	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::iiandplus_options, nullptr);
+	APPLE2_GAMEIO(config, m_gameio, m_screen, apple2_gameio_device::iiandplus_options, nullptr);
 
 	/* keyboard controller */
 	AY3600(config, m_ay3600, 0);

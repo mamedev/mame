@@ -154,12 +154,12 @@ private:
 	u8 m_lcd_com = 0;
 
 	// I/O handlers
+	void standby(int state);
+
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void update_lcd();
 	template <int N> void lcd_segs_w(u8 data);
 	void lcd_com_w(u8 data);
-
-	void standby(int state);
 
 	void p2_w(u8 data);
 	u8 p4_r();

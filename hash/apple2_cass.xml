@@ -2983,4 +2983,21 @@ To load and run a tape:
 		</part>
 	</software>
 
+	<software name="wheeldeal" supported="no">
+		<description>Wheeler Dealers</description>
+		<year>1978</year>
+		<publisher>Speakeasy Software</publisher>
+		<info name="programmer" value="Danielle Bunten Berry" />
+		<info name="usage" value="Requires a 16K Apple ][ or later. Shipped with special hardware controllers, but joystick or paddeles can be used by defining directional movement (not button press) to each player." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-05-09-->
+		<!--simulation game-->
+		<part name="cass" interface="apple2_cass">
+			<feature name="part_id" value="Wheeler Dealers" />
+			<dataarea name="cass" size="6462138">
+				<rom name="wheeler dealers (1978) (speakeasy software, ltd.).wav" size="6462138" crc="83abeab4" sha1="5af05f91a712d5e2ccaa03606d269574405fecfa" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

@@ -63,7 +63,6 @@ check more info and photo from cjdh2.zip!!!
 #include "igs036crypt.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "sound/okim6295.h"
 #include "sound/tt5665.h"
 

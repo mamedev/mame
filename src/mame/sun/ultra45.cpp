@@ -66,7 +66,7 @@ ROM_START(ultra45)
 	    Watchdog = Disabled
 	    Power-up timer = Disabled
 	    MCLR pin = Disabled
-	    Brown-out Reset enabled and always on */    
+	    Brown-out Reset enabled and always on */
 	ROM_REGION(0x004000, "pic1", 0)
 	ROM_LOAD("972a_pic16f777.u13",                     0x000000, 0x004000, CRC(a1d4b342) SHA1(564926990cf28a1f88a8a374f16ac172f7b8c8f7) )
 

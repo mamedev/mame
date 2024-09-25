@@ -57,7 +57,7 @@ void tripfev_decrypt(running_machine &machine);
 void wldfruit_decrypt(running_machine &machine);
 void lthy_decrypt(running_machine &machine);
 void lhdmg_decrypt(running_machine &machine);
-void tripshot_decrypt(running_machine &machine);
+void tripslot_decrypt(running_machine &machine);
 void extradrw_decrypt(running_machine &machine);
 
 #endif // MAME_IGS_PGMCRYPT_H

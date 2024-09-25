@@ -13,13 +13,14 @@ They added an extra RAM addressing mode, and interrupt-related opcodes were
 removed (interrupt flags are via memory-mapped I/O).
 
 TODO:
+- add serial interface
+- current I/O ports are hardcoded for HMS402/4/8, which will need to be changed
+  when other MCU types are added
 - do the LAW/LWA opcodes not work on early revisions of HMCS400? the 1988 user
   manual warns that the W register is write-only, and that there is no efficient
   way to save this register when using interrupts
 - what happens when accessing ROM/RAM out of address range? Hitachi documentation
   says 'unused', but maybe it's mirrored?
-- current I/O ports are hardcoded for HMS402/4/8, which will need to be changed
-  when other MCU types are added
 
 */
 
@@ -70,8 +71,12 @@ DEFINE_DEVICE_TYPE(HD614089, hd614089_device, "hd614089", "Hitachi HD614089") //
 
 hmcs400_cpu_device::hmcs400_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 rom_size, u32 ram_size) :
 	cpu_device(mconfig, type, tag, owner, clock),
+	device_nvram_interface(mconfig, *this),
 	m_program_config("program", ENDIANNESS_LITTLE, 16, 14, -1, address_map_constructor(FUNC(hmcs400_cpu_device::program_map), this)),
 	m_data_config("data", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(FUNC(hmcs400_cpu_device::data_map), this)),
+	m_ram(*this, "ram%u", 0U),
+	m_nvram_defval(0),
+	m_nvram_battery(true),
 	m_rom_size(rom_size),
 	m_ram_size(ram_size),
 	m_has_div(false),
@@ -79,8 +84,12 @@ hmcs400_cpu_device::hmcs400_cpu_device(const machine_config &mconfig, device_typ
 	m_read_r(*this, 0),
 	m_write_r(*this),
 	m_read_d(*this, 0),
-	m_write_d(*this)
-{ }
+	m_write_d(*this),
+	m_stop_cb(*this)
+{
+	// disable nvram by default (set to true if MCU is battery-backed when in stop mode)
+	nvram_enable_backup(false);
+}
 
 hmcs400_cpu_device::~hmcs400_cpu_device() { }
 
@@ -185,8 +194,26 @@ void hmcs400_cpu_device::device_start()
 	m_spy = 0;
 	m_st = 0;
 	m_ca = 0;
+	m_standby = false;
+	m_stop = false;
+
+	memset(m_r, 0, sizeof(m_r));
+	memset(m_r_mask, 0, sizeof(m_r_mask));
+	m_d = 0;
+	m_d_mask = 0;
+
+	m_int_line[0] = m_int_line[1] = 1;
+	m_irq_flags = 0;
+	m_pmr = 0;
+	m_prescaler = 0;
+	m_timer_mode[0] = m_timer_mode[1] = 0;
+	m_timer_div[0] = m_timer_div[1] = 0;
+	m_timer_count[0] = m_timer_count[1] = 0;
+	m_timer_load = 0;
+	m_timer_b_low = 0;
 
 	// register for savestates
+	save_item(NAME(m_nvram_battery));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_sp));
@@ -201,9 +228,23 @@ void hmcs400_cpu_device::device_start()
 	save_item(NAME(m_spy));
 	save_item(NAME(m_st));
 	save_item(NAME(m_ca));
+	save_item(NAME(m_standby));
+	save_item(NAME(m_stop));
 
 	save_item(NAME(m_r));
+	save_item(NAME(m_r_mask));
 	save_item(NAME(m_d));
+	save_item(NAME(m_d_mask));
+
+	save_item(NAME(m_int_line));
+	save_item(NAME(m_irq_flags));
+	save_item(NAME(m_pmr));
+	save_item(NAME(m_prescaler));
+	save_item(NAME(m_timer_mode));
+	save_item(NAME(m_timer_div));
+	save_item(NAME(m_timer_count));
+	save_item(NAME(m_timer_load));
+	save_item(NAME(m_timer_b_low));
 
 	// register state for debugger
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
@@ -232,6 +273,20 @@ void hmcs400_cpu_device::device_reset()
 	m_pc = 0;
 	m_sp = 0x3ff;
 	m_st = 1;
+	m_standby = false;
+	m_stop = false;
+	m_stop_cb(0);
+
+	// clear peripherals
+	m_irq_flags = 0xaaa8; // IM=1, IF=0, IE=0
+	m_pmr = 0;
+
+	m_prescaler = 0;
+	tm_w(0, 0, 0xf);
+	tm_w(1, 0, 0xf);
+	m_timer_count[0] = m_timer_count[1] = 0;
+	m_timer_load = 0;
+	m_timer_b_low = 0;
 
 	// all I/O ports set to input
 	reset_io();
@@ -275,8 +330,15 @@ void hmcs400_cpu_device::program_map(address_map &map)
 
 void hmcs400_cpu_device::data_map(address_map &map)
 {
-	map(0x020, 0x020 + m_ram_size - 1).ram();
-	map(0x3c0, 0x3ff).ram();
+	map.unmap_value_high();
+	map(0x000, 0x003).rw(FUNC(hmcs400_cpu_device::irq_control_r), FUNC(hmcs400_cpu_device::irq_control_w));
+	map(0x004, 0x004).w(FUNC(hmcs400_cpu_device::pmr_w));
+	map(0x008, 0x009).w(FUNC(hmcs400_cpu_device::tm_w));
+	map(0x00a, 0x00a).rw(FUNC(hmcs400_cpu_device::tcbl_r), FUNC(hmcs400_cpu_device::tlrl_w));
+	map(0x00b, 0x00b).rw(FUNC(hmcs400_cpu_device::tcbu_r), FUNC(hmcs400_cpu_device::tlru_w));
+
+	map(0x020, 0x020 + m_ram_size - 1).ram().share(m_ram[0]);
+	map(0x3c0, 0x3ff).ram().share(m_ram[1]); // stack
 }
 
 device_memory_interface::space_config_vector hmcs400_cpu_device::memory_space_config() const
@@ -285,6 +347,74 @@ device_memory_interface::space_config_vector hmcs400_cpu_device::memory_space_co
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_data_config)
 	};
+}
+
+
+//-------------------------------------------------
+//  nvram
+//-------------------------------------------------
+
+bool hmcs400_cpu_device::nvram_write(util::write_stream &file)
+{
+	// if it's currently not battery-backed, don't save at all
+	if (!m_nvram_battery)
+		return true;
+
+	std::error_condition err;
+	size_t actual;
+
+	// main RAM and stack area
+	for (auto & ram : m_ram)
+	{
+		std::tie(err, actual) = write(file, &ram[0], ram.bytes());
+		if (err)
+			return false;
+	}
+
+	return true;
+}
+
+bool hmcs400_cpu_device::nvram_read(util::read_stream &file)
+{
+	std::error_condition err;
+	size_t actual;
+
+	// main RAM and stack area
+	for (auto & ram : m_ram)
+	{
+		std::tie(err, actual) = read(file, &ram[0], ram.bytes());
+		if (err || (ram.bytes() != actual))
+			return false;
+	}
+
+	return true;
+}
+
+void hmcs400_cpu_device::nvram_default()
+{
+	if (!nvram_backup_enabled())
+		return;
+
+	// default nvram from mytag:nvram region if it exists
+	memory_region *region = memregion("nvram");
+	if (region != nullptr)
+	{
+		const u32 total = m_ram[0].bytes() + m_ram[1].bytes();
+		if (region->bytes() != total)
+			fatalerror("%s: Wrong region size (expected 0x%x, found 0x%x)", region->name(), total, region->bytes());
+
+		u32 offset = 0;
+		for (auto & ram : m_ram)
+		{
+			std::copy_n(&region->as_u8(offset), ram.bytes(), &ram[0]);
+			offset += ram.bytes();
+		}
+	}
+	else
+	{
+		for (auto & ram : m_ram)
+			std::fill_n(&ram[0], ram.bytes(), m_nvram_defval);
+	}
 }
 
 
@@ -298,39 +428,50 @@ void hmcs400_cpu_device::reset_io()
 	m_d_mask = m_d = 0x000f;
 	m_write_d(m_d_mask);
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 11; i++)
 	{
 		// R0-R2 and RA are high-voltage
 		u8 mask = (i >= 3 && i <= 9) ? 0xf : 0;
 
 		m_r_mask[i] = m_r[i] = mask;
-		m_write_r[i](i, mask);
+		m_write_r[i](i, mask, 0xf);
 	}
 }
 
 u8 hmcs400_cpu_device::read_r(u8 index)
 {
 	// reads from write-only or non-existent ports are invalid
-	bool write_only = index == 0 || (index >= 6 && index <= 8);
+	const bool write_only = (index == 0 || (index >= 6 && index <= 8));
 	if (write_only || index > 10)
 	{
-		logerror("read from %s port R%X at $%04X\n", write_only ? "output" : "unknown", index, m_prev_pc);
+		logerror("read from %s port R%X @ $%04X\n", write_only ? "output" : "unknown", index, m_prev_pc);
 		return 0xf;
 	}
 
 	u8 mask = (index == 10) ? 3 : 0xf; // port A is 2-bit
-	u8 inp = m_read_r[index](index);
+	u8 inp = m_read_r[index](index, mask);
 
 	if (m_read_r[index].isunset())
 	{
 		inp = m_r_mask[index];
-		logerror("read from unmapped port R%X at $%04X\n", index, m_prev_pc);
+		logerror("read from unmapped port R%X @ $%04X\n", index, m_prev_pc);
+	}
+
+	u8 out = m_r[index];
+
+	// R32/R33 are multiplexed with ext interrupts
+	if (index == 3)
+	{
+		u8 pmr_mask = m_pmr & 0xc;
+		u8 ext_int = m_int_line[1] << 3 | m_int_line[0] << 2;
+		inp = (inp & ~pmr_mask) | (ext_int & pmr_mask);
+		out = (out & ~pmr_mask) | (m_r_mask[index] & pmr_mask);
 	}
 
 	if (m_r_mask[index])
-		return (inp & m_r[index]) & mask;
+		return (inp & out) & mask;
 	else
-		return (inp | m_r[index]) & mask;
+		return (inp | out) & mask;
 }
 
 void hmcs400_cpu_device::write_r(u8 index, u8 data)
@@ -342,10 +483,19 @@ void hmcs400_cpu_device::write_r(u8 index, u8 data)
 		return;
 
 	if (m_write_r[index].isunset())
-		logerror("write $%X to unmapped port R%d at $%04X\n", data, index, m_prev_pc);
+		logerror("write $%X to unmapped port R%d @ $%04X\n", data, index, m_prev_pc);
 
 	m_r[index] = data;
-	m_write_r[index](index, data);
+	u8 out = data;
+
+	// R32/R33 are multiplexed with ext interrupts
+	if (index == 3)
+	{
+		u8 pmr_mask = m_pmr & 0xc;
+		out = (out & ~pmr_mask) | (m_r_mask[index] & pmr_mask);
+	}
+
+	m_write_r[index](index, out, 0xf);
 }
 
 int hmcs400_cpu_device::read_d(u8 index)
@@ -357,7 +507,7 @@ int hmcs400_cpu_device::read_d(u8 index)
 	if (m_read_d.isunset())
 	{
 		inp = m_d_mask;
-		logerror("read from unmapped port D%d at $%04X\n", index, m_prev_pc);
+		logerror("read from unmapped port D%d @ $%04X\n", index, m_prev_pc);
 	}
 
 	if (m_d_mask & mask)
@@ -372,10 +522,247 @@ void hmcs400_cpu_device::write_d(u8 index, int state)
 	u16 mask = 1 << index;
 
 	if (m_write_d.isunset())
-		logerror("write %d to unmapped port D%d at $%04X\n", state, index, m_prev_pc);
+		logerror("write %d to unmapped port D%d @ $%04X\n", state, index, m_prev_pc);
 
 	m_d = (m_d & ~mask) | (state ? mask : 0);
 	m_write_d(0, m_d, mask);
+}
+
+
+//-------------------------------------------------
+//  interrupts
+//-------------------------------------------------
+
+bool hmcs400_cpu_device::access_mode(u8 mem_mask, bool bit_mode)
+{
+	mem_mask &= 0xf;
+	bool err = true;
+
+	if (bit_mode)
+	{
+		if (population_count_32(mem_mask) == 1)
+			return true;
+		err = mem_mask == 0xf;
+	}
+	else
+	{
+		if (mem_mask == 0xf)
+			return true;
+	}
+
+	if (err)
+		logerror("invalid access to I/O register @ $%04X\n", m_prev_pc);
+
+	return false;
+}
+
+u8 hmcs400_cpu_device::irq_control_r(offs_t offset, u8 mem_mask)
+{
+	// mask out unused bits (RSP is write-only)
+	const u16 unused = 0xcc02;
+	u16 data = m_irq_flags | unused;
+
+	if (!machine().side_effects_disabled())
+	{
+		// can only read one bit at a time
+		if (!access_mode(mem_mask, true))
+			return 0xf;
+
+		if (mem_mask << (offset * 4) & unused)
+			logerror("read from unused IRQ control bit @ $%04X\n", m_prev_pc);
+	}
+
+	return data >> (offset * 4) & 0xf;
+}
+
+void hmcs400_cpu_device::irq_control_w(offs_t offset, u8 data, u8 mem_mask)
+{
+	// can only write one bit at a time
+	if (!access_mode(mem_mask, true))
+		return;
+
+	data &= mem_mask;
+	u16 mask = mem_mask << (offset * 4);
+
+	// ignore writes to unused bits
+	if (mask & 0xcc00)
+		return;
+
+	// ignore writing 1 to flags that can only be cleared
+	if (mask & 0x5556 && data)
+		return;
+
+	// bit 1: RSP (reset SP)
+	if (mask & 0x0002)
+		m_sp = 0x3ff;
+
+	m_irq_flags = (m_irq_flags & ~mask) | (data ? mask : 0);
+}
+
+void hmcs400_cpu_device::pmr_w(offs_t offset, u8 data, u8 mem_mask)
+{
+	if (!access_mode(mem_mask))
+		return;
+
+	u8 prev = m_pmr;
+	m_pmr = data;
+
+	// trigger irq on rising edge if ext int line was low
+	for (int i = 0; i < 2; i++)
+		if (BIT(data & ~prev, i + 2))
+			ext_int_edge(i);
+
+	// refresh R32/R33
+	if ((data ^ prev) & 0xc)
+		write_r(3, m_r[3]);
+}
+
+void hmcs400_cpu_device::take_interrupt(int irq)
+{
+	cycle();
+	cycle();
+	push_stack();
+	m_irq_flags &= ~1;
+
+	standard_irq_callback(irq, m_pc);
+
+	u8 vector = irq * 2 + 2;
+	m_prev_pc = m_pc = vector;
+}
+
+void hmcs400_cpu_device::check_interrupts()
+{
+	// irq priority is in the same order as the irq control flags
+	u16 irq = m_irq_flags >> 2;
+
+	for (int i = 0; i < 7; i++)
+	{
+		// pending irq when IF=1 and IM=0
+		if ((irq & 3) == 1)
+		{
+			if (m_irq_flags & 1)
+				take_interrupt(i);
+
+			m_standby = false;
+			return;
+		}
+
+		irq >>= 2;
+	}
+}
+
+void hmcs400_cpu_device::ext_int_edge(int line)
+{
+	// ext interrupts are masked with PMR2/3
+	if (!m_int_line[line] && BIT(m_pmr, line + 2))
+	{
+		m_irq_flags |= 1 << (line * 2 + 2);
+
+		// timer B event counter on INT1
+		if (line == 1 && !m_timer_div[1])
+			clock_timer(1);
+	}
+}
+
+void hmcs400_cpu_device::execute_set_input(int line, int state)
+{
+	state = state ? 1 : 0;
+
+	if (line != 0 && line != 1)
+		return;
+
+	// active-low, irq on falling edge
+	state ^= 1;
+	bool irq = (m_int_line[line] && !state);
+	m_int_line[line] = state;
+
+	if (irq && !m_stop)
+		ext_int_edge(line);
+}
+
+
+//-------------------------------------------------
+//  timers
+//-------------------------------------------------
+
+void hmcs400_cpu_device::tm_w(offs_t offset, u8 data, u8 mem_mask)
+{
+	if (!access_mode(mem_mask))
+		return;
+
+	// TMA/TMB prescaler divide ratio masks
+	static const int div[2][8] =
+	{
+		{ 0x400, 0x200, 0x100, 0x40, 0x10, 4, 2, 1 },
+		{ 0x400, 0x100, 0x40, 0x10, 4, 2, 1, 0 }
+	};
+
+	m_timer_mode[offset] = data & 0xf;
+	m_timer_div[offset] = div[offset][data & 7];
+}
+
+void hmcs400_cpu_device::tlrl_w(offs_t offset, u8 data, u8 mem_mask)
+{
+	if (!access_mode(mem_mask))
+		return;
+
+	// TLRL: timer load register lower
+	m_timer_load = (m_timer_load & 0xf0) | (data & 0xf);
+}
+
+void hmcs400_cpu_device::tlru_w(offs_t offset, u8 data, u8 mem_mask)
+{
+	if (!access_mode(mem_mask))
+		return;
+
+	// TLRU: timer load register upper
+	m_timer_load = (m_timer_load & 0x0f) | data << 4;
+	m_timer_count[1] = m_timer_load;
+}
+
+u8 hmcs400_cpu_device::tcbl_r(offs_t offset, u8 mem_mask)
+{
+	if (!access_mode(mem_mask))
+		return 0xf;
+
+	// TCBL: timer counter B lower
+	return m_timer_b_low;
+}
+
+u8 hmcs400_cpu_device::tcbu_r(offs_t offset, u8 mem_mask)
+{
+	if (!access_mode(mem_mask))
+		return 0xf;
+
+	// TCBU: timer counter B upper (latches TCBL)
+	if (!machine().side_effects_disabled())
+		m_timer_b_low = m_timer_count[1] & 0xf;
+
+	return m_timer_count[1] >> 4;
+}
+
+void hmcs400_cpu_device::clock_timer(int timer)
+{
+	if (++m_timer_count[timer] == 0)
+	{
+		// set timer overflow irq flag
+		m_irq_flags |= 1 << (timer * 2 + 6);
+
+		// timer B reload function
+		if (timer == 1 && m_timer_mode[1] & 8)
+			m_timer_count[1] = m_timer_load;
+	}
+}
+
+void hmcs400_cpu_device::clock_prescaler()
+{
+	u16 prev = m_prescaler;
+	m_prescaler = (m_prescaler + 1) & 0x7ff;
+
+	// increment timers based on prescaler divide ratio
+	for (int i = 0; i < 2; i++)
+		if (m_prescaler & ~prev & m_timer_div[i])
+			clock_timer(i);
 }
 
 
@@ -386,6 +773,7 @@ void hmcs400_cpu_device::write_d(u8 index, int state)
 void hmcs400_cpu_device::cycle()
 {
 	m_icount--;
+	clock_prescaler();
 }
 
 u16 hmcs400_cpu_device::fetch()
@@ -399,10 +787,26 @@ u16 hmcs400_cpu_device::fetch()
 
 void hmcs400_cpu_device::execute_run()
 {
+	// in stop mode, the internal clock is not running
+	if (m_stop)
+	{
+		m_icount = 0;
+		return;
+	}
+
 	while (m_icount > 0)
 	{
-		// fetch next opcode
 		m_prev_pc = m_pc;
+		check_interrupts();
+
+		// in standby mode, opcode execution is halted
+		if (m_standby)
+		{
+			cycle();
+			continue;
+		}
+
+		// fetch next opcode
 		debugger_instruction_hook(m_pc);
 		m_op = fetch();
 		m_i = m_op & 0xf;

@@ -33,7 +33,6 @@ M30624FG (M16C/62A family) needs CPU core and dumping of internal ROM
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "emupal.h"
 #include "screen.h"
 

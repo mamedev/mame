@@ -113,7 +113,7 @@ void arm7_cpu_device::arm7_check_irq_state()
 	// Data Abort
 	if (m_pendingAbtD)
 	{
-		if (MODE26) fatalerror( "ARM7: pendingAbtD (todo)\n");
+		if (MODE26) fatalerror("ARM7: pendingAbtD (todo)\n");
 		SwitchMode(eARM7_MODE_ABT);             /* Set ABT mode so PC is saved to correct R14 bank */
 		SetRegister(14, pc - 8 + 8);                   /* save PC to R14 */
 		SetRegister(SPSR, cpsr);               /* Save current CPSR */
@@ -129,7 +129,8 @@ void arm7_cpu_device::arm7_check_irq_state()
 	// FIQ
 	if (m_pendingFiq && (cpsr & F_MASK) == 0)
 	{
-		if (MODE26) fatalerror( "pendingFiq (todo)\n");
+		standard_irq_callback(ARM7_FIRQ_LINE, pc);
+		if (MODE26) fatalerror("pendingFiq (todo)\n");
 		SwitchMode(eARM7_MODE_FIQ);             /* Set FIQ mode so PC is saved to correct R14 bank */
 		SetRegister(14, pc - 4 + 4);                   /* save PC to R14 */
 		SetRegister(SPSR, cpsr);               /* Save current CPSR */
@@ -144,6 +145,7 @@ void arm7_cpu_device::arm7_check_irq_state()
 	// IRQ
 	if (m_pendingIrq && (cpsr & I_MASK) == 0)
 	{
+		standard_irq_callback(ARM7_IRQ_LINE, pc);
 		SwitchMode(eARM7_MODE_IRQ);             /* Set IRQ mode so PC is saved to correct R14 bank */
 		SetRegister(14, pc - 4 + 4);                   /* save PC to R14 */
 		if (MODE32)
@@ -168,7 +170,7 @@ void arm7_cpu_device::arm7_check_irq_state()
 	// Prefetch Abort
 	if (m_pendingAbtP)
 	{
-		if (MODE26) fatalerror( "pendingAbtP (todo)\n");
+		if (MODE26) fatalerror("pendingAbtP (todo)\n");
 		SwitchMode(eARM7_MODE_ABT);             /* Set ABT mode so PC is saved to correct R14 bank */
 		SetRegister(14, pc - 4 + 4);                   /* save PC to R14 */
 		SetRegister(SPSR, cpsr);               /* Save current CPSR */
@@ -184,7 +186,7 @@ void arm7_cpu_device::arm7_check_irq_state()
 	// Undefined instruction
 	if (m_pendingUnd)
 	{
-		if (MODE26) printf( "ARM7: pendingUnd (todo)\n");
+		if (MODE26) printf("ARM7: pendingUnd (todo)\n");
 		SwitchMode(eARM7_MODE_UND);             /* Set UND mode so PC is saved to correct R14 bank */
 		// compensate for prefetch (should this also be done for normal IRQ?)
 		if (T_IS_SET(GET_CPSR))

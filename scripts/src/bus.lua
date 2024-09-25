@@ -3141,6 +3141,8 @@ end
 
 if (BUSES["A2GAMEIO"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/a2gameio/brightpen.cpp",
+		MAME_DIR .. "src/devices/bus/a2gameio/brightpen.h",
 		MAME_DIR .. "src/devices/bus/a2gameio/computereyes.cpp",
 		MAME_DIR .. "src/devices/bus/a2gameio/computereyes.h",
 		MAME_DIR .. "src/devices/bus/a2gameio/gameio.cpp",
@@ -4235,14 +4237,14 @@ if (BUSES["BML3"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bml3/bml3bus.cpp",
 		MAME_DIR .. "src/devices/bus/bml3/bml3bus.h",
-		MAME_DIR .. "src/devices/bus/bml3/bml3mp1802.cpp",
-		MAME_DIR .. "src/devices/bus/bml3/bml3mp1802.h",
-		MAME_DIR .. "src/devices/bus/bml3/bml3mp1805.cpp",
-		MAME_DIR .. "src/devices/bus/bml3/bml3mp1805.h",
-		MAME_DIR .. "src/devices/bus/bml3/bml3kanji.cpp",
-		MAME_DIR .. "src/devices/bus/bml3/bml3kanji.h",
-		MAME_DIR .. "src/devices/bus/bml3/bml3rtc.cpp",
-		MAME_DIR .. "src/devices/bus/bml3/bml3rtc.h",
+		MAME_DIR .. "src/devices/bus/bml3/mp1802.cpp",
+		MAME_DIR .. "src/devices/bus/bml3/mp1802.h",
+		MAME_DIR .. "src/devices/bus/bml3/mp1805.cpp",
+		MAME_DIR .. "src/devices/bus/bml3/mp1805.h",
+		MAME_DIR .. "src/devices/bus/bml3/kanji.cpp",
+		MAME_DIR .. "src/devices/bus/bml3/kanji.h",
+		MAME_DIR .. "src/devices/bus/bml3/rtc.cpp",
+		MAME_DIR .. "src/devices/bus/bml3/rtc.h",
 	}
 end
 

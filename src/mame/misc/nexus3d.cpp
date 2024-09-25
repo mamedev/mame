@@ -15,7 +15,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/nandflash.h"
 #include "emupal.h"
 #include "screen.h"
@@ -125,9 +124,9 @@ void nexus3d_state::IntReq(int level)
 	uint32_t inten = m_intmask ^ 0xffffffff;
 
 	if (m_intpend & inten)
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 	else
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 }
 
 

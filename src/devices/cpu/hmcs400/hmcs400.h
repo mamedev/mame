@@ -12,7 +12,58 @@
 #pragma once
 
 
-class hmcs400_cpu_device : public cpu_device
+// input lines
+
+enum
+{
+	HMCS400_INPUT_LINE_INT0 = 0,
+	HMCS400_INPUT_LINE_INT1
+};
+
+
+// pinout reference
+
+/*
+                _________________
+        D11  1 |*                | 64 D10
+        D12  2 |                 | 63 D9
+        D13  3 |                 | 62 D8
+        D14  4 |                 | 61 D7
+        D15  5 |                 | 60 D6
+        R00  6 |                 | 59 D5
+        R01  7 |                 | 58 D4
+        R02  8 |                 | 57 D3
+        R03  9 |                 | 56 D2
+        R10 10 |                 | 55 D1
+        R11 11 |                 | 54 D0
+        R12 12 |                 | 53 GND
+        R13 13 |                 | 52 OSC2
+        R20 14 |    HD61402x     | 51 OSC1
+        R21 15 |    HD61404x     | 50 _TEST
+        R22 16 |    HD61408x     | 49 RESET
+        R23 17 |                 | 48 R93
+        RA0 18 |     DP-64S      | 47 R92
+  RA1/Vdisp 19 |     DC-64S      | 46 R91
+        R30 20 |                 | 45 R90
+        R31 21 |                 | 44 R83
+  R32/_INT0 22 |                 | 43 R82
+  R33/_INT1 23 |                 | 42 R81
+        R50 24 |                 | 41 R80
+        R51 25 |                 | 40 R73
+        R52 26 |                 | 39 R72
+        R53 27 |                 | 38 R71
+        R60 28 |                 | 37 R70
+        R61 29 |                 | 36 R43
+        R62 30 |                 | 35 R42/SO
+        R63 31 |                 | 34 R41/SI
+        Vcc 32 |_________________| 33 R40/_SCK
+
+        (see datasheets for FP-64 pinouts)
+
+*/
+
+
+class hmcs400_cpu_device : public cpu_device, public device_nvram_interface
 {
 public:
 	virtual ~hmcs400_cpu_device();
@@ -31,6 +82,12 @@ public:
 	// valid options: 4, 8, 16, default to 8
 	auto &set_divider(u8 div) { assert(m_has_div); m_divider = div; return *this; }
 
+	// nvram
+	void nvram_set_battery(int state) { m_nvram_battery = bool(state); } // default is 1 (nvram_enable_backup needs to be true)
+	void nvram_set_default_value(u8 val) { m_nvram_defval = val & 0xf; } // default is 0
+	auto stop_cb() { return m_stop_cb.bind(); } // notifier (not an output pin)
+	int stop_mode() { return m_stop ? 1 : 0; }
+
 protected:
 	// construction
 	hmcs400_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 rom_size, u32 ram_size);
@@ -39,12 +96,17 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device_nvram_interface implementation
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+
 	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + m_divider - 1) / m_divider; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * m_divider); }
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 3+2; } // max 3 + interrupt
-	//virtual void execute_set_input(int line, int state) override;
+	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
 
 	// device_memory_interface implementation
@@ -62,6 +124,10 @@ protected:
 	address_space_config m_data_config;
 	address_space *m_program;
 	address_space *m_data;
+
+	required_shared_ptr_array<u8, 2> m_ram;
+	u8 m_nvram_defval;
+	bool m_nvram_battery; // keeps internal RAM intact after soft power-off
 
 	int m_icount;
 	int m_state_count;
@@ -87,17 +153,30 @@ protected:
 	u8 m_spy;             // 4-bit SPY register
 	u8 m_st;              // status flag
 	u8 m_ca;              // carry flag
+	bool m_standby;       // standby mode (SBY opcode)
+	bool m_stop;          // stop mode (STOP opcode)
 
-	u8 m_r[10];           // R outputs state
-	u8 m_r_mask[10];
+	u8 m_r[11];           // R outputs state
+	u8 m_r_mask[11];
 	u16 m_d;              // D pins state
 	u16 m_d_mask;
 
+	u8 m_int_line[2];     // INT0/INT1 pin state
+	u16 m_irq_flags;      // interrupt control bits
+	u8 m_pmr;             // port mode register
+	u16 m_prescaler;      // 11-bit clock prescaler
+	u8 m_timer_mode[2];   // TMA/TMB: timer mode registers
+	u16 m_timer_div[2];   // timer prescaler divide ratio masks from TMA/TMB
+	u8 m_timer_count[2];  // TCA/TCA: timer counters
+	u8 m_timer_load;      // timer B reload register
+	u8 m_timer_b_low;     // timer B counter low latch
+
 	// I/O handlers
-	devcb_read8::array<8> m_read_r;
-	devcb_write8::array<8> m_write_r;
+	devcb_read8::array<11> m_read_r;
+	devcb_write8::array<11> m_write_r;
 	devcb_read16 m_read_d;
 	devcb_write16 m_write_d;
+	devcb_write_line m_stop_cb;
 
 	// misc internal helpers
 	u8 ram_r(u8 mem_mask = 0xf);
@@ -111,6 +190,21 @@ protected:
 	int read_d(u8 index);
 	void write_d(u8 index, int state);
 
+	bool access_mode(u8 mem_mask, bool bit_mode = false);
+	u8 irq_control_r(offs_t offset, u8 mem_mask);
+	void irq_control_w(offs_t offset, u8 data, u8 mem_mask);
+	void pmr_w(offs_t offset, u8 data, u8 mem_mask);
+	void tm_w(offs_t offset, u8 data, u8 mem_mask);
+	void tlrl_w(offs_t offset, u8 data, u8 mem_mask);
+	void tlru_w(offs_t offset, u8 data, u8 mem_mask);
+	u8 tcbl_r(offs_t offset, u8 mem_mask);
+	u8 tcbu_r(offs_t offset, u8 mem_mask);
+
+	void ext_int_edge(int line);
+	void take_interrupt(int irq);
+	void check_interrupts();
+	void clock_timer(int timer);
+	void clock_prescaler();
 	void cycle();
 	u16 fetch();
 

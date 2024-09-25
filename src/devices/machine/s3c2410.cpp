@@ -11,8 +11,6 @@
 #include "emu.h"
 #include "s3c2410.h"
 
-#include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "screen.h"
 
 

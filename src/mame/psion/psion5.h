@@ -15,7 +15,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "etna.h"
 #include "sound/spkrdev.h"
 

@@ -14,7 +14,6 @@
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/intelfsh.h"
 #include "video/pcd8544.h"
 
@@ -242,7 +241,7 @@ void noki3310_state::machine_reset()
 {
 	// according to the boot rom disassembly here http://www.nokix.pasjagsm.pl/help/blacksphere/sub_100hardware/sub_arm/sub_bootrom.htm
 	// flash entry point is at 0x200040, we can probably reassemble the above code, but for now this should be enough.
-	m_maincpu->set_state_int(ARM7_R15, 0x200040);
+	m_maincpu->set_state_int(arm7_cpu_device::ARM7_R15, 0x200040);
 
 	memset(m_mad2_regs, 0, 0x100);
 	m_mad2_regs[0x01] = 0x01;   // power-on flag

@@ -4,9 +4,12 @@
 #ifndef MAME_GAMEPARK_GP32_H
 #define MAME_GAMEPARK_GP32_H
 
+#pragma once
+
+#include "machine/nvram.h"
 #include "machine/smartmed.h"
 #include "sound/dac.h"
-#include "machine/nvram.h"
+
 #include "emupal.h"
 #include "screen.h"
 

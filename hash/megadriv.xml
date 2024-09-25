@@ -36583,7 +36583,7 @@ Jumps to invalid address, needs own slot type with mountable carts
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="par2" supported="no">
 		<description>Pro Action Replay 2 (Europe)</description>
 		<year>1994</year>

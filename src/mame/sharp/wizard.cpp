@@ -62,7 +62,6 @@ More info:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/arm7/arm7.h" // wrong, needs CPU core
-#include "cpu/arm7/arm7core.h"
 
 #include "screen.h"
 #include "softlist_dev.h"

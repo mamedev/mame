@@ -130,6 +130,7 @@
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 #include "cpu/m68000/m68030.h"
 #include "imagedev/floppy.h"
 #include "machine/icm7170.h"
@@ -592,6 +593,7 @@ static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("tape", NSCSI_TAPE);
 	device.set_option_machine_config("cdrom", sun_cdrom);
 }
 
@@ -629,7 +631,7 @@ void sun3x_state::sun3_80(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, "tape");
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsibus:7").option_set("esp", NCR53C90).clock(20000000/2); // Emulex 2400138 (68-pin PLCC)

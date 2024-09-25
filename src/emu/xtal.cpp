@@ -57,17 +57,17 @@ const double XTAL::known_xtals[] = {
 /*
     Frequency       Sugarvassed            Examples
     -----------  ----------------------    ---------------------------------------- */
-	     32'768, // 32.768_kHz_XTAL        Used to drive RTC chips
-	     38'400, // 38.4_kHz_XTAL          Resonator
-	    384'000, // 384_kHz_XTAL           Resonator - Commonly used for driving OKI MSM5205
-	    400'000, // 400_kHz_XTAL           Resonator - OKI MSM5205 on Great Swordman h/w
-	    430'000, // 430_kHz_XTAL           Resonator
-	    455'000, // 455_kHz_XTAL           Resonator - OKI MSM5205 on Gladiator h/w
-	    500'000, // 500_kHz_XTAL           Resonator - MIDI clock on various synthesizers (31250 * 16)
-	    512'000, // 512_kHz_XTAL           Resonator - Toshiba TC8830F
-	    600'000, // 600_kHz_XTAL           -
-	    640'000, // 640_kHz_XTAL           Resonator - NEC UPD7759, Texas Instruments Speech Chips @ 8khz
-	    960'000, // 960_kHz_XTAL           Resonator - Xerox Notetaker Keyboard UART
+		 32'768, // 32.768_kHz_XTAL        Used to drive RTC chips
+		 38'400, // 38.4_kHz_XTAL          Resonator
+		384'000, // 384_kHz_XTAL           Resonator - Commonly used for driving OKI MSM5205
+		400'000, // 400_kHz_XTAL           Resonator - OKI MSM5205 on Great Swordman h/w
+		430'000, // 430_kHz_XTAL           Resonator
+		455'000, // 455_kHz_XTAL           Resonator - OKI MSM5205 on Gladiator h/w
+		500'000, // 500_kHz_XTAL           Resonator - MIDI clock on various synthesizers (31250 * 16)
+		512'000, // 512_kHz_XTAL           Resonator - Toshiba TC8830F
+		600'000, // 600_kHz_XTAL           -
+		640'000, // 640_kHz_XTAL           Resonator - NEC UPD7759, Texas Instruments Speech Chips @ 8khz
+		960'000, // 960_kHz_XTAL           Resonator - Xerox Notetaker Keyboard UART
 	  1'000'000, // 1_MHz_XTAL             Used to drive OKI M6295 chips
 	  1'008'000, // 1.008_MHz_XTAL         Acorn Microcomputer (System 1)
 	  1'056'000, // 1.056_MHz_XTAL         Resonator - OKI M6295 on Trio The Punch h/w

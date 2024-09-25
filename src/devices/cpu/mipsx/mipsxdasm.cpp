@@ -10,7 +10,7 @@ constexpr bool SHOW_R0_AS_0 = false;
 
 char const *const REGNAMES[32] = {
 		"r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",
-		"r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15"
+		"r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15",
 		"r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
 		"r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31" };
 
@@ -55,16 +55,36 @@ constexpr int get_sq(u32 opcode)
 	return BIT(opcode, 16, 1);
 }
 
-constexpr int get_asr_amount(int shift)
+constexpr int get_shift_amount(int shift)
 {
-	// TODO
-	return shift;
-}
-
-constexpr int get_sh_amount(int shift)
-{
-	// TODO
-	return shift;
+	switch (shift & 0xf)
+	{
+	case 0x1:
+	{
+		shift = ((shift & 0x70) >> 2) + 0;
+		break;
+	}
+	case 0x2:
+	{
+		shift = ((shift & 0x70) >> 2) + 1;
+		break;
+	}
+	case 0x4:
+	{
+		shift = ((shift & 0x70) >> 2) + 2;
+		break;
+	}
+	case 0x8:
+	{
+		shift = ((shift & 0x70) >> 2) + 3;
+		break;
+	}
+	default:
+	{
+		return 0;
+	}
+	}
+	return 32 - shift;
 }
 
 
@@ -144,7 +164,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 		default:
 		{
-			util::stream_format(stream, "Unhandled TY0 (%08x)", opcode);
+			util::stream_format(stream, "unknown TY0 (%08x)", opcode);
 			break;
 		}
 		}
@@ -153,7 +173,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 	case 1:
 	{
-		u8 op = get_op(opcode);
+		const u8 op = get_op(opcode);
 
 		switch (op)
 		{
@@ -170,7 +190,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 				}
 				else
 				{
-					util::stream_format(stream, "illegal mstart form");
+					util::stream_format(stream, "invalid mstart TY1 OP0 (%02x, %02x, %02x %03x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode));
 				}
 			}
 			else if (comp == 0x099)
@@ -183,7 +203,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			}
 			else
 			{
-				util::stream_format(stream, "unknown TY1 subcase 0 (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode));
+				util::stream_format(stream, "unknown TY1 OP0 (%02x, %02x, %02x %03x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode));
 			}
 			break;
 		}
@@ -200,28 +220,53 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			{
 				util::stream_format(stream, "rotlb %s,%s,%s", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 			}
-			else if ((comp & 0xf80) == 0x200)
-			{
-				int shift = get_sh_amount(get_compute_compfunc(opcode) & 0x7f);
-				util::stream_format(stream, "sh %s,%s,%s,#%d", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)), shift);
-			}
 			else if ((comp & 0xf80) == 0x100)
 			{
 				const u8 src2 = get_src2_dest(opcode);
 
 				if (src2 == 0x0)
 				{
-					int shift = get_asr_amount((get_compute_compfunc(opcode) & 0x7f));
-					util::stream_format(stream, "asr %s,%s,#%d", get_regname(get_src1(opcode)), get_regname(get_compute_dest(opcode)), shift);
+					const int shift = get_shift_amount((get_compute_compfunc(opcode) & 0x7f));
+					if(shift != 0)
+					{
+						util::stream_format(stream, "asr %s,%s,#%d", get_regname(get_src1(opcode)), get_regname(get_compute_dest(opcode)), shift);
+					}
+					else
+					{
+						util::stream_format(stream, "asr %s,%s,#invalid (%02x)", get_regname(get_src1(opcode)), get_regname(get_compute_dest(opcode)), get_compute_compfunc(opcode) & 0x7f);
+					}
 				}
 				else
 				{
-					util::stream_format(stream, "illegal asr form");
+					util::stream_format(stream, "invalid asr TY1 OP1 (%02x, %02x, %02x %03x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode));
+				}
+			}
+			else if ((comp & 0xf80) == 0x200)
+			{
+				const int shift = get_shift_amount(get_compute_compfunc(opcode) & 0x7f);
+				if(shift != 0)
+				{
+					if (get_src1(opcode) == 0)
+					{
+						util::stream_format(stream, "lsl %s,%s,#%d", get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)), 32 - shift);
+					}
+					else if (get_src2_dest(opcode) == 0)
+					{
+						util::stream_format(stream, "lsr %s,%s,#%d", get_regname(get_src1(opcode)), get_regname(get_compute_dest(opcode)), shift);
+					}
+					else
+					{
+						util::stream_format(stream, "sh %s,%s,%s,#%d", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)), shift);
+					}
+				}
+				else
+				{
+					util::stream_format(stream, "sh %s,%s,%s,#invalid (%02x)", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)), get_compute_compfunc(opcode) & 0x7f);
 				}
 			}
 			else
 			{
-				util::stream_format(stream, "unknown TY1 subcase 1 (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode));
+				util::stream_format(stream, "unknown TY1 OP1 (%02x, %02x, %02x %03x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode));
 			}
 			break;
 		}
@@ -232,7 +277,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 			if (comp == 0x00b)
 			{
-				util::stream_format(stream, "blc %s,%s,%s", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
+				util::stream_format(stream, "bic %s,%s,%s", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 			}
 			else if (comp == 0x00f)
 			{
@@ -242,24 +287,24 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 				}
 				else
 				{
-					util::stream_format(stream, "illegal not form");
+					util::stream_format(stream, "invalid not TY1 OP4 (%02x, %02x, %02x %03x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode));
 				}
 			}
 			else if (comp == 0x019)
 			{
-				u8 src2 = get_src2_dest(opcode);
-				if (src2 == 0)
+				const u8 src1 = get_src1(opcode);
+				const u8 src2 = get_src2_dest(opcode);
+				if ((src1 == 0) || (src2 == 0))
 				{
-					const u8 src1 = get_src1(opcode);
 					const u8 dest = get_compute_dest(opcode);
-
-					if ((src1 == 0) && (dest == 0))
+					if (dest == 0)
 					{
 						util::stream_format(stream, "nop");
 					}
 					else
 					{
-						util::stream_format(stream, "mov %s,%s", get_regname(get_src1(opcode)), get_regname(get_compute_dest(opcode)));
+						// manuals say src2==0 for mov, but actual ROMs use src1==0
+						util::stream_format(stream, "mov %s,%s", get_regname(get_src1(opcode) | get_src2_dest(opcode)), get_regname(get_compute_dest(opcode)));
 					}
 				}
 				else
@@ -289,14 +334,14 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			}
 			else
 			{
-				util::stream_format(stream, "unknown compute (%02x, %02x, %02x %04x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode));
+				util::stream_format(stream, "unknown TY1 OP4 (%02x, %02x, %02x %03x)", get_src1(opcode), get_src2_dest(opcode), get_compute_dest(opcode), get_compute_compfunc(opcode));
 			}
 			break;
 		}
 
 		default:
 		{
-			util::stream_format(stream, "Unhandled TY1 (%08x)", opcode);
+			util::stream_format(stream, "unknown TY1 (%08x)", opcode);
 			break;
 		}
 		}
@@ -336,6 +381,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 			// stt - Store Through
 			// stt Offset[rSrc1], rDest
+			// maybe "store byte" on ES3210 and ES3890
 			util::stream_format(stream, "stt 0x%08x[%s],%s", imm17, get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
 			break;
 		}
@@ -343,11 +389,12 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 			// ldf - Load Floating Point
 			// ldf Offset[rSrc1], rDest
+			// maybe "load byte" on ES3210 and ES3890
 			util::stream_format(stream, "ldf 0x%08x[%s],%s", imm17, get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
 			break;
 
 		}
-		case 5: // movfrc or aluc
+		case 5: // movfrc or aluc, maybe "load byte" on ES3210 and ES3890
 		{
 			// this is just a suggested form
 			const u8 c2 =   BIT(opcode, 0, 4);
@@ -359,11 +406,11 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 			if (src == 0)
 			{
-				util::stream_format(stream, "movfrc %s,(%02x,%02x,%02x,%02x)", get_regname(dest), op, func, c1, c2);
+				util::stream_format(stream, "movfrc (%02x,%02x,%02x,%02x),%s", op, func, c1, c2, get_regname(dest));
 			}
 			else
 			{
-				util::stream_format(stream, "illegal movfrc form");
+				util::stream_format(stream, "movfrc 0x%08x[%s],%s", imm17, get_regname(src), get_regname(dest));
 			}
 			break;
 
@@ -375,7 +422,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			util::stream_format(stream, "stf 0x%08x[%s],%s", imm17, get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)));
 			break;
 		}
-		case 7: // movtoc
+		case 7: // movtoc, maybe "store byte" on ES3210
 		{
 			// this is just a suggested form
 			const u8 c2 =   BIT(opcode, 0, 4);
@@ -392,15 +439,15 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			else
 			{
 				//util::stream_format(stream, "illegal movtoc form");
-				// this form appears to be used
-				util::stream_format(stream, "movtoc %s,(%02x,%02x,%02x,%02x) (src1 == %s)", get_regname(dest), op, func, c1, c2, get_regname(src));
+				//util::stream_format(stream, "movtoc %s,(%02x,%02x,%02x,%02x) (src1 == %s)", get_regname(dest), op, func, c1, c2, get_regname(src));
+				util::stream_format(stream, "movtoc 0x%08x[%s],%s", imm17, get_regname(src), get_regname(dest));
 			}
 			break;
 
 		}
 		default:
 		{
-			util::stream_format(stream, "Unhandled TY2 (%08x)", opcode);
+			util::stream_format(stream, "unknown TY2 (%08x)", opcode);
 			break;
 		}
 		}
@@ -417,7 +464,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 			// jspci - Jump Indexed and Store PC
 			// jspci rSrc1,#Immed,Rdest
-			const int imm17 = util::sext(opcode, 17) * 2;
+			const int imm17 = util::sext(opcode, 17) * 4;
 			util::stream_format(stream, "jspci %s,#%02x,%s", get_regname(get_src1(opcode)), imm17, get_regname(get_src2_dest(opcode)));
 			break;
 		}
@@ -431,7 +478,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 			}
 			else
 			{
-				util::stream_format(stream, "illegal hsc form");
+				util::stream_format(stream, "invalid hsc TY3 OP1 (%08x)", opcode);
 			}
 			break;
 		}
@@ -457,12 +504,12 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 				}
 				else
 				{
-					util::stream_format(stream, "illegal movtos form");
+					util::stream_format(stream, "invalid movtos TY3 OP2 (%08x)", opcode);
 				}
 			}
 			else
 			{
-				util::stream_format(stream, "illegal movtos form");
+				util::stream_format(stream, "invalid movtos TY3 OP2 (%08x)", opcode);
 			}
 			break;
 
@@ -488,12 +535,12 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 				}
 				else
 				{
-					util::stream_format(stream, "illegal movfrs form");
+					util::stream_format(stream, "invalid movfrs TY3 OP3 (%08x)", opcode);
 				}
 			}
 			else
 			{
-				util::stream_format(stream, "illegal movfrs form");
+				util::stream_format(stream, "invalid movfrs TY3 OP3 (%08x)", opcode);
 			}
 			break;
 
@@ -502,7 +549,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		case 4:
 		{
 			const int imm17 = util::sext(opcode, 17);
-			util::stream_format(stream, "addi %s,%s,0x%08x", get_regname(get_src1(opcode)), get_regname(get_src2_dest(opcode)), imm17);
+			util::stream_format(stream, "addi %s,#0x%08x,%s", get_regname(get_src1(opcode)), imm17, get_regname(get_src2_dest(opcode)));
 			break;
 		}
 
@@ -520,12 +567,12 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 				}
 				else
 				{
-					util::stream_format(stream, "illegal jpc form");
+					util::stream_format(stream, "invalid jpc TY3 OP5 (%08x)", opcode);
 				}
 			}
 			else
 			{
-				util::stream_format(stream, "illegal jpc form");
+				util::stream_format(stream, "invalid jpc TY3 OP5 (%08x)", opcode);
 			}
 			break;
 		}
@@ -534,12 +581,12 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 		{
 			if ((opcode & 0x07fff807) == 0x00000003)
 			{
-				const int vector = (opcode & 0x000007f8) >> 3;
-				util::stream_format(stream, "trap %02x", vector);
+				const u8 vector = ~((opcode & 0x000007f8) >> 3);
+				util::stream_format(stream, "trap 0x%02x", vector);
 			}
 			else
 			{
-				util::stream_format(stream, "illegal trap form");
+				util::stream_format(stream, "invalid trap TY3 OP6 (%08x)", opcode);
 			}
 			break;
 		}
@@ -558,19 +605,19 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 				}
 				else
 				{
-					util::stream_format(stream, "illegal jpcrs form");
+					util::stream_format(stream, "invalid jpcrs TY3 OP7 (%08x)", opcode);
 				}
 			}
 			else
 			{
-				util::stream_format(stream, "illegal jpcrs form");
+				util::stream_format(stream, "invalid jpcrs TY3 OP7 (%08x)", opcode);
 			}
 			break;
 		}
 
 		default:
 		{
-			util::stream_format(stream, "Unhandled TY3 (%08x)", opcode);
+			util::stream_format(stream, "unknown TY3 (%08x)", opcode);
 			break;
 		}
 		}
@@ -579,7 +626,7 @@ offs_t mipsx_disassembler::disassemble(std::ostream& stream, offs_t pc, const da
 
 	default:
 	{
-		util::stream_format(stream, "Unhandled (%08x)", opcode);
+		util::stream_format(stream, "unknown (%08x)", opcode);
 		break;
 	}
 	}

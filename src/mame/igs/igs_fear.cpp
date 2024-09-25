@@ -11,7 +11,6 @@
 #include "pgmcrypt.h"
 #include "xamcu.h"
 
-#include "cpu/arm7/arm7core.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/v3021.h"
@@ -63,7 +62,6 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 	void main_xor_map(address_map &map) ATTR_COLD;
 
-	void sound_irq(int state);
 	void vblank_irq(int state);
 
 	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int height, int width, int palette, int flipx, int romoffset);
@@ -341,18 +339,9 @@ INPUT_PORTS_START( superkds )
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
-void igs_fear_state::sound_irq(int state)
-{
-	LOGMASKED(LOG_DEBUG, "sound irq = %d\n", state);
-	if (state)
-		m_maincpu->trigger_irq(3);
-}
-
 void igs_fear_state::vblank_irq(int state)
 {
-	if (state)
-		if (m_screen->frame_number() & 1)
-			m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, (state && m_screen->frame_number() & 1) ? 1 : 0);
 }
 
 
@@ -479,7 +468,7 @@ void igs_fear_state::igs_fear(machine_config &config)
 
 	/* sound hardware */
 	IGS_XA_ICS_SOUND(config, m_xa, 50'000'000/3);
-	m_xa->irq().set(FUNC(igs_fear_state::sound_irq));
+	m_xa->irq().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 }
 
 void igs_fear_state::igs_fear_xor(machine_config &config)

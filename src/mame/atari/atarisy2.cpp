@@ -339,48 +339,6 @@ void atarisy2_state::bankselect_w(offs_t offset, uint16_t data)
 }
 
 
-void atarisy2_state::device_post_load()
-{
-}
-
-
-
-/*************************************
- *
- *  I/O read dispatch.
- *
- *************************************/
-
-uint16_t atarisy2_state::switch_r()
-{
-	return ioport("1800")->read() | (ioport("1801")->read() << 8);
-}
-
-
-uint8_t atarisy2_state::switch_6502_r()
-{
-	int result = ioport("1840")->read();
-
-	if (m_tms5220.found() && (m_tms5220->readyq_r() == 0))
-		result &= ~0x04;
-	if (!(ioport("1801")->read() & 0x80)) result |= 0x10;
-
-	return result;
-}
-
-
-void atarisy2_state::switch_6502_w(uint8_t data)
-{
-	m_leds[0] = BIT(data, 2);
-	m_leds[1] = BIT(data, 3);
-	if (m_tms5220.found())
-	{
-		data = 12 | ((data >> 5) & 1);
-		m_tms5220->set_unscaled_clock(MASTER_CLOCK/4 / (16 - data) / 2);
-	}
-}
-
-
 
 /*************************************
  *
@@ -392,14 +350,14 @@ uint8_t atarisy2_state::leta_r(offs_t offset)
 {
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
 
-	if (offset <= 1 && m_pedal_count == -1)   // 720
+	if (offset <= 1 && m_pedal_count == -1) // 720
 	{
 		switch (ioport("SELECT")->read())
 		{
 			case 0: // Real
 				break;
 
-			case 1: // Fake Joystick */
+			case 1: // Fake Joystick
 			/* special thanks to MAME Analog+ for the mapping code */
 			{
 				int analogx = ioport("FAKE_JOY_X")->read() - 128;
@@ -684,7 +642,12 @@ void atarisy2_state::sndrst_6502_w(uint8_t data)
 
 	if (m_tms5220.found())
 	{
-		m_tms5220->reset(); // technically what happens is the tms5220 gets a long stream of 0xFF written to it when sound_reset_state is 0 which halts the chip after a few frames, but this works just as well, even if it isn't exactly true to hardware... The hardware may not have worked either, the resistors to pull input to 0xFF are fighting against the ls263 gate holding the latched value to be sent to the chip.
+		// Technically what happens is the tms5220 gets a long stream of 0xFF written to it
+		// when sound_reset_state is 0, which halts the chip after a few frames, but this works
+		// just as well, even if it isn't exactly true to hardware...
+		// The hardware may not have worked either, the resistors to pull input to 0xFF are
+		// fighting against the ls263 gate holding the latched value to be sent to the chip.
+		m_tms5220->reset();
 	}
 	mixer_w(0);
 }
@@ -752,6 +715,7 @@ void atarisy2_state::tms5220_strobe_w(offs_t offset, uint8_t data)
 	}
 }
 
+
 /*************************************
  *
  *  Misc. sound
@@ -762,6 +726,17 @@ void atarisy2_state::coincount_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
 	machine().bookkeeping().coin_counter_w(1, (data >> 1) & 1);
+}
+
+void atarisy2_state::switch_6502_w(uint8_t data)
+{
+	m_leds[0] = BIT(data, 2);
+	m_leds[1] = BIT(data, 3);
+	if (m_tms5220.found())
+	{
+		int const divider = 16 - (12 | BIT(data, 5));
+		m_tms5220->set_unscaled_clock(MASTER_CLOCK/4 / divider / 2);
+	}
 }
 
 
@@ -788,7 +763,7 @@ void atarisy2_state::main_map(address_map &map)
 	map(0013200, 0013200).mirror(00176).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0013400, 0013401).mirror(00176).w(FUNC(atarisy2_state::xscroll_w)).share("xscroll");
 	map(0013600, 0013601).mirror(00176).w(FUNC(atarisy2_state::yscroll_w)).share("yscroll");
-	map(0014000, 0014001).mirror(01776).r(FUNC(atarisy2_state::switch_r));
+	map(0014000, 0014001).mirror(01776).portr("IN0");
 	map(0014000, 0014000).mirror(01776).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0016000, 0016001).mirror(01776).r(FUNC(atarisy2_state::sound_r));
 	map(0020000, 0037777).view(m_vmmu);
@@ -816,7 +791,7 @@ void atarisy2_state::sound_map(address_map &map)
 	map(0x1800, 0x180f).mirror(0x2780).rw(m_pokey[0], FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1810, 0x1813).mirror(0x278c).r(FUNC(atarisy2_state::leta_r));
 	map(0x1830, 0x183f).mirror(0x2780).rw(m_pokey[1], FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x1840, 0x1840).mirror(0x278f).r(FUNC(atarisy2_state::switch_6502_r));
+	map(0x1840, 0x1840).mirror(0x278f).portr("IN1");
 	map(0x1850, 0x1851).mirror(0x278e).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x1860, 0x1860).mirror(0x278f).r(FUNC(atarisy2_state::sound_6502_r));
 	map(0x1870, 0x1870).mirror(0x2781).w(FUNC(atarisy2_state::tms5220_w));
@@ -838,29 +813,27 @@ void atarisy2_state::sound_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( paperboy )
-	PORT_START("1840")  /*(sound) */
+	PORT_START("IN0") // T11
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", generic_latch_8_device, pending_r) // P2TALK
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // P1TALK
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x7f00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
+
+	PORT_START("IN1") // 6502
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // P1TALK
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", generic_latch_8_device, pending_r) // P2TALK
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("tms", tms5220_device, readyq_r)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CONDITION("IN0", 0x8000, EQUALS, 0x8000) // self-test
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
-
-	PORT_START("1800")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", generic_latch_8_device, pending_r) // P2TALK
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // P1TALK
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START("1801")
-	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("ADC0")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -1009,16 +982,17 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ssprint )
 	PORT_INCLUDE( paperboy )
 
-	PORT_MODIFY("1840")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
-
-	PORT_MODIFY("1800")
+	PORT_MODIFY("IN0")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
 	PORT_MODIFY("ADC0")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_INVERT PORT_PLAYER(1)
@@ -1071,16 +1045,16 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( csprint )
 	PORT_INCLUDE( ssprint )
 
-	PORT_MODIFY("1840")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
-
-	PORT_MODIFY("1800")
+	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_MODIFY("ADC2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1098,15 +1072,15 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( apb )
 	PORT_INCLUDE( paperboy )
 
-	PORT_MODIFY("1840")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-
-	PORT_MODIFY("1800")
+	PORT_MODIFY("IN0")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 
 	PORT_MODIFY("ADC0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
