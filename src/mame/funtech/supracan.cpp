@@ -735,6 +735,9 @@ void supracan_state::draw_sprite_tile_masked(bitmap_ind16 &dst, bitmap_ind8 &mas
 			const uint32_t srcdata = *srcp;
 			if (srcdata != 0 && *maskp != 0)
 			{
+				// TODO: this is really color mix
+				// rebelst select attack screens draws with this path with no "*maskp" set,
+				// and expect *dstp to add up not just set.
 				*dstp = (uint16_t)(srcdata + color);
 				*priop = (*priop & 0xf0) | (uint8_t)prio;
 			}
@@ -1017,7 +1020,7 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	// - boomzoo (title) wants 0x00
 	// - sangofgt (1st fighter stage) wants 0x00
 	// - sonevil (intro) wants 0x00
-	// TODO: layer overlay happens from mixing registers (A'Can BIOS sets 0x02 there)
+	// - back layer overlay happens from mixing registers (A'Can BIOS sets 0x02 there)
 	bitmap.fill(0x00, cliprect);
 
 	draw_sprites(m_sprite_final_bitmap, m_sprite_mask_bitmap, m_prio_bitmap, cliprect);

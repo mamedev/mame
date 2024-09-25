@@ -238,9 +238,10 @@ Should use unemulated [video] interlace (verify on HW)
 		<description>Rebel Star ~ Pàn Xīng</description>
 		<year>1996</year>
 		<publisher>Horng Shen Information Co., Ltd</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 [video] ROZ layer is concealed on intro.
 [video] ROZ layer should blend hex grids, draws solid squares.
+[video] select attack screens should blend as well (uses sprites)
 ]]></notes>
 		<info name="serial" value="F012" />
 		<info name="alt_title" value="叛星" />
