@@ -24842,6 +24842,7 @@ tmnt24pu                        // GX063 (c) 1991 (US)
 tmht22pe                        // GX063 (c) 1991 (UK)
 tmht24pe                        // GX063 (c) 1991 (UK)
 tmnt2a                          // GX063 (c) 1991 (Asia)
+tmnt2o                          // GX063 (c) 1991 (Oceania)
 trigon                          // GX939 (c) 1990 (Japan)
 
 @source:konami/tp84.cpp
@@ -29274,6 +29275,7 @@ cowtippa                        //
 @source:misc/crazybal.cpp
 crazybal                        // EGS
 crazybala                       // EGS
+crazybalb                       // EGS
 
 @source:misc/cromptons.cpp
 ffruits                         //
@@ -43842,6 +43844,7 @@ megablst                        // 1989.?? C11 (c) 1989 Taito Corporation Japan 
 megablstj                       // 1989.11 C11 (c) 1989 Taito Corporation (Japan)
 megablstu                       // 1989.?? C11 (c) 1989 Taito America Corporation (US)
 metalb                          // 1991.?? D16? (c) 1991 Taito Corporation Japan (World)
+metalba                         // 1991.?? D16? (c) 1991 Taito Corporation Japan (World)
 metalbj                         // 1991.11 D12 (c) 1991 Taito Corporation (Japan)
 mizubaku                        // 1990.08 C49 (c) 1990 Taito Corporation (Japan)
 mjnquest                        // 1991.05 C77 (c) 1990 Taito Corporation (Japan)
