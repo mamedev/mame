@@ -1333,7 +1333,7 @@ template <unsigned ch> void supracan_state::dma_w(offs_t offset, uint16_t data, 
 			for (int i = 0; i <= m_dma_regs.count[ch]; i++)
 			{
 				// staiwbbl wants to fill both VRAM and work RAM at startup,
-				// and expects to transfer word for VRAM, byte for work RAM.
+				// and expects to transfer full count size for VRAM, half for work RAM.
 				// Not providing this will cause all kinds of video and logic glitches.
 				// TODO: pinpoint DMA modes here (at least upper bits 14-13 should do)
 				if (data == 0xa800)
@@ -1345,7 +1345,9 @@ template <unsigned ch> void supracan_state::dma_w(offs_t offset, uint16_t data, 
 					}
 					else
 					{
-						mem.write_byte(m_dma_regs.dest[ch], mem.read_byte(m_dma_regs.source[ch]));
+						// rebelst expects D8-D15 to be transfered for the ROZ layer hex grids.
+						const u8 src_byte = m_dma_regs.dest[ch] & 1;
+						mem.write_byte(m_dma_regs.dest[ch], mem.read_byte(m_dma_regs.source[ch] + src_byte));
 						m_dma_regs.dest[ch]   += dest_dec ? -1 : 1;
 					}
 				}
