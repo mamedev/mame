@@ -54,8 +54,8 @@ template <u8 Port> void z8038_device::zbus_map(address_map &map)
 }
 
 // instantiate maps for port 1 and 2
-template void z8038_device::zbus_map<1>(address_map &map) ATTR_COLD;
-template void z8038_device::zbus_map<2>(address_map &map) ATTR_COLD;
+template void z8038_device::zbus_map<1>(address_map &map);
+template void z8038_device::zbus_map<2>(address_map &map);
 
 void z8038_device::device_start()
 {
