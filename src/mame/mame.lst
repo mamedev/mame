@@ -16193,17 +16193,11 @@ galgame4p                       // (c) 1998 Creative Electronics & Software (CES
 galgbios                        // (c) 1998 Creative Electronics & Software (CES)
 
 @source:chess/ave_arb.cpp
-arb                             //
-arbv2                           //
-
-@source:chess/cking_master.cpp
-ckmaster                        //
-
-@source:chess/cking_triomphe.cpp
-triomphe
+arb
+arbv2
 
 @source:chess/compuchess.cpp
-ccmk1                           // Chess Champion MK I
+ccmk1
 cmpchess
 cmpchess2
 cncchess
@@ -16235,6 +16229,12 @@ tascr30
 tascr30a
 tascr30b
 tascr30g
+
+@source:chessking/master.cpp
+master
+
+@source:chessking/triomphe.cpp
+triomphe
 
 @source:chromatics/cgc7900.cpp
 cgc7900                         //

@@ -48,7 +48,6 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine configs
 	void chess2001(machine_config &config);
 
 protected:
@@ -65,7 +64,6 @@ private:
 	u16 m_inp_mux = 0;
 	int m_dac_data = 0;
 
-	// address maps
 	void main_map(address_map &map);
 
 	// I/O handlers

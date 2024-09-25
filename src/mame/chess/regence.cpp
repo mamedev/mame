@@ -56,7 +56,6 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_off);
 
-	// machine configs
 	void regence(machine_config &config);
 
 protected:
@@ -75,7 +74,6 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_led_data = 0;
 
-	// address maps
 	void main_map(address_map &map);
 
 	// I/O handlers

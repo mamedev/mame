@@ -1338,7 +1338,7 @@ void lwings_state::avengers(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_clock(12_MHz_XTAL/2);
-	m_maincpu->z80_set_m1_cycles(6); // 2 WAIT states per M1? (needed to keep in sync with MCU)
+	m_maincpu->z80_set_m1_cycles(4+2); // 2 WAIT states per M1? (needed to keep in sync with MCU)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::avengers_map);
 
 	I8751(config, m_mcu, 12_MHz_XTAL/2);
