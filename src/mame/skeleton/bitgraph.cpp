@@ -108,6 +108,7 @@ public:
 		, m_earom(*this, EAROM_TAG)
 		, m_centronics(*this, "centronics")
 		, m_screen(*this, "screen")
+		, m_videoram(*this, "videoram")
 	{ }
 
 	void bitgrpha(machine_config &config);
@@ -166,8 +167,8 @@ protected:
 	required_device<er2055_device> m_earom;
 	optional_device<centronics_device> m_centronics;
 	required_device<screen_device> m_screen;
+	required_shared_ptr<uint16_t> m_videoram;
 
-	uint8_t *m_videoram = nullptr;
 	uint8_t m_misccr = 0;
 	uint8_t m_pia_a = 0;
 	uint8_t m_pia_b = 0;
@@ -189,7 +190,7 @@ void bitgraph_state::bitgrapha_mem(address_map &map)
 	map(0x010020, 0x010027).rw(FUNC(bitgraph_state::adlc_r), FUNC(bitgraph_state::adlc_w)).umask16(0xff00);
 	map(0x010028, 0x01002f).rw(FUNC(bitgraph_state::pia_r), FUNC(bitgraph_state::pia_w)).umask16(0xff00);    // EAROM, PSG
 	map(0x010030, 0x010031).w(FUNC(bitgraph_state::baud_write));
-	map(0x3e0000, 0x3fffff).ram();
+	map(0x3e0000, 0x3fffff).ram().share("videoram");
 }
 
 void bitgraph_state::bitgraphb_mem(address_map &map)
@@ -208,7 +209,8 @@ void bitgraph_state::bitgraphb_mem(address_map &map)
 	map(0x010030, 0x010031).w(FUNC(bitgraph_state::baud_write));
 //  map(0x010030, 0x010037).r(FUNC(bitgraph_state::ppu_read)).umask16(0x00ff);
 	map(0x010038, 0x01003f).w(FUNC(bitgraph_state::ppu_write)).umask16(0x00ff);
-	map(0x380000, 0x3fffff).ram();
+	map(0x380000, 0x3dffff).ram();
+	map(0x3e0000, 0x3fffff).ram().share("videoram");
 }
 
 static INPUT_PORTS_START(bitgraph)
@@ -384,14 +386,8 @@ uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 		for (int x = 0; x < 1024 / 8; x += 2)
 		{
-			uint8_t gfx = m_videoram[(x + 1) | (y << 7)];
-			for (int i = 7; i >= 0; i--)
-			{
-				*p++ = BIT(gfx, i);
-			}
-
-			gfx = m_videoram[x | (y << 7)];
-			for (int i = 7; i >= 0; i--)
+			uint16_t gfx = m_videoram[(x >> 1) | (y << 6)];
+			for (int i = 15; i >= 0; i--)
 			{
 				*p++ = BIT(gfx, i);
 			}
@@ -458,7 +454,6 @@ template <unsigned Offset> void bitgraph_state::ppu_i8243_w(uint8_t data)
 
 void bitgraph_state::machine_start()
 {
-	m_videoram = (uint8_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x3e0000);
 }
 
 void bitgraph_state::machine_reset()
