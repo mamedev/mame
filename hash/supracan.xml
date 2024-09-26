@@ -17,7 +17,7 @@ Unreleased Super A'can carts:
 	<software name="formduel" supported="no">
 		<description>Formosa Duel ~ Formosa Da Dui Jue</description>
 		<year>1995</year>
-		<publisher>AV Artisan Corp.</publisher>
+		<publisher>AV Artisan</publisher>
 		<notes><![CDATA[
 [sound] noisy channels 13-15 starting from character screen, supposed to release after a while (12 00 0f 79)
 game over screen uses a RNG register for rain scroll (verify)
@@ -78,7 +78,7 @@ Broken [video] during intro, uses bitmap mode with ROZ layer
 	<software name="speedyd" supported="no">
 		<description>Speedy Dragon ~ Yin Su Fei Long</description>
 		<year>1995</year>
-		<publisher>AV Artisan Corp.</publisher>
+		<publisher>AV Artisan</publisher>
 		<notes><![CDATA[
 [video] title animation glitches some sprites.
 [video] uses per-tile priority during gameplay.
@@ -237,10 +237,10 @@ Should use unemulated [video] interlace (verify on HW)
 	<software name="rebelst" supported="no">
 		<description>Rebel Star ~ Pàn Xīng</description>
 		<year>1996</year>
-		<publisher>Horng Shen Information Co., Ltd</publisher>
+		<publisher>Horng Shen Information</publisher>
 		<notes><![CDATA[
 [video] ROZ layer is concealed on intro.
-[video] ROZ layer should blend hex grids, draws solid squares.
+[video] ROZ layer should blend hex grids.
 [video] select attack screens should blend as well (uses sprites)
 ]]></notes>
 		<info name="serial" value="F012" />
