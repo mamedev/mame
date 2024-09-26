@@ -531,7 +531,7 @@ uint8_t mc68340_duart_device::read(offs_t offset)
 uint8_t sc28c94_device::read(offs_t offset)
 {
 	uint8_t r = 0;
-	offset &= 0x1f;
+	offset &= 0x3f;
 
 	if (offset < 0x10)
 	{
@@ -696,7 +696,7 @@ void mc68340_duart_device::write(offs_t offset, uint8_t data)
 
 void sc28c94_device::write(offs_t offset, uint8_t data)
 {
-	offset &= 0x1f;
+	offset &= 0x3f;
 
 	if (offset < 0x10)
 	{
@@ -712,10 +712,10 @@ void sc28c94_device::write(offs_t offset, uint8_t data)
 		m_chanC->write_chan_reg(offset&3, data);
 		break;
 
-	case 0x18: /* MRC */
-	case 0x19: /* CSRC */
-	case 0x1a: /* CRC */
-	case 0x1b: /* THRC */
+	case 0x18: /* MRD */
+	case 0x19: /* CSRD */
+	case 0x1a: /* CRD */
+	case 0x1b: /* THRD */
 		m_chanD->write_chan_reg(offset&3, data);
 		break;
 	}
