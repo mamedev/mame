@@ -41992,6 +41992,9 @@ trmavia                         //
 @source:skeleton/ckz80.cpp
 ckz80                           //
 
+@source:skeleton/cle68k.cpp
+dmndhrt                         //
+
 @source:skeleton/clxvme186.cpp
 clxvme186                       //
 
