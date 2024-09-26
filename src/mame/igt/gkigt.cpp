@@ -108,12 +108,12 @@ class igt_gameking_state : public driver_device
 {
 public:
 	igt_gameking_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette"),
-		m_screen(*this, "screen"),
-		m_vram(*this, "vram"),
-		m_quart1(*this, "quart1")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
+		, m_vram(*this, "vram")
+		, m_quart(*this, "quart%u", 1U)
 	{ }
 
 	void igt_gameking(machine_config &config);
@@ -121,23 +121,14 @@ public:
 
 private:
 	virtual void video_start() override ATTR_COLD;
-	uint32_t screen_update_igt_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	uint32_t igt_gk_28010008_r()
-	{
-		return machine().rand();  // don't quite understand this one
-	};
-
-	uint32_t uart_status_r();
-	void uart_w(uint32_t data);
 	void irq_enable_w(uint8_t data);
 	void irq_ack_w(uint8_t data);
 	uint8_t irq_vector_r();
-	void unk_w(uint8_t data);
-	uint8_t frame_number_r();
 	void vblank_irq(int state);
 
 	uint8_t timer_r();
@@ -151,7 +142,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint32_t> m_vram;
-	required_device<sc28c94_device> m_quart1;
+	required_device_array<sc28c94_device, 2> m_quart;
 
 	uint8_t m_irq_enable = 0;
 	uint8_t m_irq_pend = 0;
@@ -162,39 +153,27 @@ void igt_gameking_state::video_start()
 {
 }
 
-uint32_t igt_gameking_state::screen_update_igt_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igt_gameking_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	for(int y = 0; y < 480; y++)
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for(int x = 0; x < 640; x+=4)
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=4)
 		{
-			for(int xi=0;xi<4;xi++)
+			const u32 gfx_data = m_vram[(x + y * 1024) / 4];
+
+			for(int xi = 0; xi < 4; xi++)
 			{
-				uint32_t const color = (m_vram[(x+y*1024)/4] >> (xi*8)) & 0xff;
-
-				if(cliprect.contains(x+xi, y))
-					bitmap.pix(y, x+xi) = m_palette->pen(color);
-
+				uint32_t const color = (gfx_data >> (xi*8)) & 0xff;
+				bitmap.pix(y, x+xi) = m_palette->pen(color);
 			}
 		}
 	}
 
-
 	return 0;
 }
 
-
-uint32_t igt_gameking_state::uart_status_r()
-{
-	return 0x00040004;
-}
-
-void igt_gameking_state::uart_w(uint32_t data)
-{
-	printf("%c", (data>>16) & 0x7f);
-}
 
 void igt_gameking_state::irq_enable_w(uint8_t data)
 {
@@ -213,24 +192,11 @@ uint8_t igt_gameking_state::irq_vector_r()
 	return m_irq_pend;
 }
 
-uint8_t igt_gameking_state::frame_number_r()
-{
-	// TODO: likely not right, checked in irq 0
-	return 0;//m_screen->frame_number() & 7;
-}
-
-void igt_gameking_state::unk_w(uint8_t data)
-{
-	// bit 7 toggled, unknown purpose
-}
-
-
 void igt_gameking_state::igt_gameking_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).flags(i960_cpu_device::BURST).rom().region("maincpu", 0);
 	map(0x08000000, 0x081fffff).flags(i960_cpu_device::BURST).rom().region("game", 0);
 	map(0x08200000, 0x083fffff).flags(i960_cpu_device::BURST).rom().region("plx", 0);
-
 
 	// it's unclear how much of this is saved and how much total RAM there is.
 	map(0x10000000, 0x1001ffff).flags(i960_cpu_device::BURST).ram().share("nvram");
@@ -246,26 +212,22 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 	// 28050000: SOUND SEL
 	// 28060000: COLOR SEL
 	// 28070000: OUT SEL
-//  map(0x28010000, 0x2801007f).rw("quart1", FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
-	map(0x28010008, 0x2801000b).r(FUNC(igt_gameking_state::uart_status_r));
-	map(0x2801001c, 0x2801001f).nopw();
-	map(0x28010030, 0x28010033).r(FUNC(igt_gameking_state::uart_status_r)); // channel D
-	map(0x28010034, 0x28010037).w(FUNC(igt_gameking_state::uart_w));       // channel D
+	map(0x28010000, 0x2801007f).rw(m_quart[0], FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
 	map(0x28020000, 0x280205ff).flags(i960_cpu_device::BURST).ram();       // CMOS?
-//  map(0x28020000, 0x2802007f).r(FUNC(igt_gameking_state::igt_gk_28010008_r)).nopw();
 	map(0x28030000, 0x28030003).portr("IN0");
-//  map(0x28040000, 0x2804007f).rw("quart2", FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
-	map(0x2804000a, 0x2804000a).w(FUNC(igt_gameking_state::unk_w));
+	map(0x28040000, 0x2804007f).rw(m_quart[1], FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
+    // TODO: these overlays should come from the QUART device
+//  map(0x2804000a, 0x2804000a).w(FUNC(igt_gameking_state::unk_w));
 	map(0x28040008, 0x28040008).rw(FUNC(igt_gameking_state::irq_vector_r), FUNC(igt_gameking_state::irq_enable_w));
-	map(0x28040018, 0x2804001b).portr("IN1").nopw();
-	map(0x2804001c, 0x2804001f).portr("IN4").nopw();
-	map(0x28040028, 0x2804002b).nopr();
+//  map(0x28040018, 0x2804001b).portr("IN1").nopw();
+//  map(0x2804001c, 0x2804001f).portr("IN4").nopw();
+//  map(0x28040028, 0x2804002b).nopr();
 	map(0x2804002a, 0x2804002a).w(FUNC(igt_gameking_state::irq_ack_w));
 //  map(0x28040038, 0x2804003b).r(FUNC(igt_gameking_state::timer_r)).umask32(0x00ff0000);
 	map(0x28040038, 0x2804003b).portr("IN2").nopw();
-	map(0x2804003c, 0x2804003f).portr("IN3").nopw();
-	map(0x28040050, 0x28040050).r(FUNC(igt_gameking_state::frame_number_r));
-	map(0x28040054, 0x28040057).nopw();
+//  map(0x2804003c, 0x2804003f).portr("IN3").nopw();
+//  map(0x28040050, 0x28040050).r(FUNC(igt_gameking_state::frame_number_r));
+//  map(0x28040054, 0x28040057).nopw();
 //  map(0x28040054, 0x28040057).w(FUNC(igt_gameking_state::irq_ack_w).umask32(0x000000ff);
 
 	map(0x28050000, 0x28050003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x00ff00ff);
@@ -425,24 +387,20 @@ static INPUT_PORTS_START( igt_gameking )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x010000, 0x010000, "Door M" ) // Door M
+	PORT_DIPNAME( 0x010000, 0x000000, "Door M" ) // Door M
 	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x020000, 0x020000, "Door C" ) // Door C
+	PORT_DIPNAME( 0x020000, 0x000000, "Door C" ) // Door C
 	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x040000, 0x040000, "Door B" ) // Door B
+	PORT_DIPNAME( 0x040000, 0x000000, "Door B" ) // Door B
 	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x100000, 0x100000, "Attendant key" ) // key switch
-	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x200000, 0x200000, "test switch" ) // test switch
-	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_BIT( 0x100000, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Attendant key")
+	PORT_BIT( 0x200000, IP_ACTIVE_LOW, IPT_SERVICE ) // Test switch
 	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x400000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
@@ -555,22 +513,6 @@ static INPUT_PORTS_START( igt_gameking )
 
 INPUT_PORTS_END
 
-static const gfx_layout igt_gameking_layout =
-{
-	16,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 0*4,1*4,2*4,3*4,4*4,5*4,6*4,7*4,8*4,9*4,10*4,11*4,12*4,13*4,14*4,15*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	8*64
-};
-
-
-static GFXDECODE_START( gfx_igt_gameking )
-	GFXDECODE_ENTRY( "cg", 0, igt_gameking_layout,   0x0, 1  )
-GFXDECODE_END
-
 void igt_gameking_state::ramdac_map(address_map &map)
 {
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
@@ -583,7 +525,7 @@ void igt_gameking_state::machine_start()
 void igt_gameking_state::machine_reset()
 {
 	m_timer_count = 0;
-	m_quart1->ip2_w(1); // needs to be high
+	m_quart[0]->ip2_w(1); // needs to be high
 }
 
 void igt_gameking_state::vblank_irq(int state)
@@ -610,27 +552,25 @@ void igt_gameking_state::igt_gameking(machine_config &config)
 	I960(config, m_maincpu, XTAL(24'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igt_gameking_state::igt_gameking_map);
 
-	SC28C94(config, m_quart1, XTAL(24'000'000) / 6);
-	m_quart1->d_tx_cb().set("diag", FUNC(rs232_port_device::write_txd));
-
-	sc28c94_device &quart2(SC28C94(config, "quart2", XTAL(24'000'000) / 6));
-	quart2.irq_cb().set_inputline(m_maincpu, I960_IRQ0);
-
-	rs232_port_device &diag(RS232_PORT(config, "diag", default_rs232_devices, nullptr));
-	diag.rxd_handler().set("quart1", FUNC(sc28c94_device::rx_d_w));
-	diag.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
-
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_igt_gameking);
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(1024, 512);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
-	m_screen->set_screen_update(FUNC(igt_gameking_state::screen_update_igt_gameking));
+	m_screen->set_screen_update(FUNC(igt_gameking_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(igt_gameking_state::vblank_irq));
 	// Xilinx used as video chip XTAL(26'666'666) on board
+
+	SC28C94(config, m_quart[0], XTAL(24'000'000) / 6);
+	m_quart[0]->d_tx_cb().set("diag", FUNC(rs232_port_device::write_txd));
+
+	SC28C94(config, m_quart[1], XTAL(24'000'000) / 6);
+	m_quart[1]->irq_cb().set_inputline(m_maincpu, I960_IRQ0);
+
+	rs232_port_device &diag(RS232_PORT(config, "diag", default_rs232_devices, "terminal"));
+	diag.rxd_handler().set(m_quart[0], FUNC(sc28c94_device::rx_d_w));
+	diag.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	PALETTE(config, m_palette).set_entries(0x100);
 
