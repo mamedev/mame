@@ -7686,4 +7686,29 @@ Wave Studio v3.12
 		</part>
 	</software>
 
+	<software name="zorknem">
+		<description>Zork Nemesis: The Forbidden Lands</description>
+		<year>1996</year>
+		<publisher>Activision</publisher>
+		<info name="language" value="English" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="I" />
+			<diskarea name="cdrom">
+				<disk name="zork nemesis i" sha1="85a6cac392f3648ba02320455690df1196b0bd79" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="II" />
+			<diskarea name="cdrom">
+				<disk name="zork nemesis ii" sha1="566903d9419cb929ed6fd4f230b71bbfb608245a" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="III" />
+			<diskarea name="cdrom">
+				<disk name="zork nemesis iii" sha1="356fcaef31915484cb444529159cb9b69caefef5" />
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>
