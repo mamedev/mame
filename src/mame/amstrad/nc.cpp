@@ -112,8 +112,8 @@ public:
 	void nc_base(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void update_interrupts();
 
@@ -129,7 +129,7 @@ protected:
 	template<int N> uint8_t pcmcia_r(offs_t offset);
 	template<int N> void pcmcia_w(offs_t offset, uint8_t data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -204,10 +204,10 @@ public:
 	void nc150(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	void display_memory_start_w(uint8_t data);
 	void card_wait_control_w(uint8_t data);
@@ -238,15 +238,15 @@ public:
 	void nc200(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<mc146818_device> m_rtc;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	void display_memory_start_w(uint8_t data);
 	void card_wait_control_w(uint8_t data);

@@ -167,7 +167,7 @@ protected:
 	void pico_68k_io_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_cause_irq(int state);
 
-	void pico_mem(address_map &map);
+	void pico_mem(address_map &map) ATTR_COLD;
 };
 
 class pico_state : public pico_base_state
@@ -182,7 +182,7 @@ public:
 	void pico_pal(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<pico_cart_slot_device> m_picocart;
@@ -587,8 +587,8 @@ public:
 	void copera(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	void copera_pcm_cb(int state);
 	uint16_t copera_io_read(offs_t offset);
@@ -597,7 +597,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(process_ext_timer);
 
 private:
-	void copera_mem(address_map &map);
+	void copera_mem(address_map &map) ATTR_COLD;
 
 	required_device<copera_cart_slot_device> m_picocart;
 

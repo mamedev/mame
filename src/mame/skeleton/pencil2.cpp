@@ -125,10 +125,10 @@ private:
 	u8 porte2_r();
 	void write_centronics_ack(int state);
 	void write_centronics_busy(int state);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	int m_centronics_busy = 0;
 	int m_centronics_ack = 0;
 	bool m_cass_state = false;

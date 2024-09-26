@@ -45,8 +45,8 @@ public:
 	void skyraid(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_pos_ram;
@@ -86,7 +86,7 @@ private:
 	void draw_missiles(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_trapezoid(bitmap_ind16& dst, bitmap_ind16& src);
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 

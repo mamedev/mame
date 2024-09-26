@@ -58,8 +58,8 @@ public:
 	void init_starforc();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* devices */
@@ -128,12 +128,12 @@ private:
 	void draw_radar(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,int priority);
 
-	void decrypted_opcodes_map(address_map &map);
-	void senjyo_map(address_map &map);
-	void senjyo_sound_io_map(address_map &map);
-	void senjyo_sound_map(address_map &map);
-	void starforb_map(address_map &map);
-	void starforb_sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void senjyo_map(address_map &map) ATTR_COLD;
+	void senjyo_sound_io_map(address_map &map) ATTR_COLD;
+	void senjyo_sound_map(address_map &map) ATTR_COLD;
+	void starforb_map(address_map &map) ATTR_COLD;
+	void starforb_sound_map(address_map &map) ATTR_COLD;
 };
 
 

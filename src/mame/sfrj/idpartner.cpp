@@ -52,8 +52,8 @@ public:
 	void int_w(int state);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;
@@ -160,12 +160,12 @@ public:
 	void partner1fg(machine_config &config);
 	void partnerwfg(machine_config &config);
 
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void update_bank();
 

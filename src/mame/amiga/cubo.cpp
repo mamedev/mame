@@ -366,8 +366,8 @@ public:
 	uint16_t m_potgo_value = 0;
 
 	void cubo(machine_config &config);
-	void cubo_mem(address_map &map);
-	void overlay_2mb_map32(address_map &map);
+	void cubo_mem(address_map &map) ATTR_COLD;
+	void overlay_2mb_map32(address_map &map) ATTR_COLD;
 protected:
 	virtual void rs232_tx(int state) override;
 	virtual void potgo_w(uint16_t data) override;

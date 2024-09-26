@@ -50,8 +50,8 @@ private:
 	required_ioport m_peny;
 
 	uint32_t m_port[9] = { };
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	uint32_t s3c2440_gpio_port_r(offs_t offset);
 	void s3c2440_gpio_port_w(offs_t offset, uint32_t data);
@@ -63,7 +63,7 @@ private:
 	void s3c2440_i2s_data_w(offs_t offset, uint16_t data);
 	uint32_t s3c2440_adc_data_r(offs_t offset);
 
-	void mini2440_map(address_map &map);
+	void mini2440_map(address_map &map) ATTR_COLD;
 };
 
 inline void mini2440_state::verboselog(int n_level, const char *s_fmt, ...)

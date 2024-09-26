@@ -172,8 +172,8 @@ protected:
 
 	// overrides
 	virtual void driver_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t rom_r(offs_t offset);
 	void rom_w(offs_t offset, uint8_t data);
@@ -193,8 +193,8 @@ protected:
 	uint8_t keyboard_data_r();
 	uint16_t get_key();
 
-	void attache_io(address_map &map);
-	void attache_map(address_map &map);
+	void attache_io(address_map &map) ATTR_COLD;
+	void attache_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_memory_region m_rom;
@@ -273,11 +273,11 @@ private:
 	void ppi_irq(int state);
 	void x86_dsr(int state);
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	[[maybe_unused]] void attache816_io(address_map &map);
-	void attache_x86_io(address_map &map);
-	void attache_x86_map(address_map &map);
+	[[maybe_unused]] void attache816_io(address_map &map) ATTR_COLD;
+	void attache_x86_io(address_map &map) ATTR_COLD;
+	void attache_x86_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_extcpu;
 	required_device<i8255_device> m_ppi;

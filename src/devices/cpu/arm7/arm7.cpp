@@ -1460,12 +1460,10 @@ void arm7_cpu_device::execute_run()
 		/* handle Thumb instructions if active */
 		if (T_IS_SET(m_r[eCPSR]))
 		{
-			offs_t raddr;
-
 			pc = m_r[eR15];
 
 			// "In Thumb state, bit [0] is undefined and must be ignored. Bits [31:1] contain the PC."
-			raddr = pc & (~1);
+			offs_t const raddr = pc & ~uint32_t(1);
 
 			if (!insn_fetch_thumb(raddr, insn))
 			{
@@ -1477,12 +1475,10 @@ void arm7_cpu_device::execute_run()
 		}
 		else
 		{
-			offs_t raddr;
-
 			/* load 32 bit instruction */
 
 			// "In ARM state, bits [1:0] of r15 are undefined and must be ignored. Bits [31:2] contain the PC."
-			raddr = pc & (~3);
+			offs_t const raddr = pc & ~uint32_t(3);
 
 			if (!insn_fetch_arm(raddr, insn))
 			{

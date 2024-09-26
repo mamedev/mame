@@ -34,14 +34,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_changed);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<6> m_keypad;
 	output_finder<6> m_digit;
 
-	void mps65_map(address_map &map);
+	void mps65_map(address_map &map) ATTR_COLD;
 
 	uint8_t pa_r();
 	void pa_w(uint8_t data);

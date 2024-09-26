@@ -339,8 +339,8 @@ protected:
 
 	uint8_t rom_ae1f_r();
 
-	virtual void machine_start() override;
-	void main_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;

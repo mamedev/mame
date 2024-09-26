@@ -86,8 +86,8 @@ public:
 	void xmenabl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// video-related
 	uint8_t m_layer_colorbase[3]{};
@@ -125,11 +125,11 @@ private:
 	K052109_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 
-	void base_main_map(address_map &map);
-	void bootleg_main_map(address_map &map);
-	void main_map(address_map &map);
-	void oki_map(address_map &map);
-	void sound_map(address_map &map);
+	void base_main_map(address_map &map) ATTR_COLD;
+	void bootleg_main_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	void bootleg_sound_hardware(machine_config &config);
 };
@@ -148,7 +148,7 @@ public:
 	int frame_r();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	std::unique_ptr<bitmap_ind16> m_screen_bitmap[2]; // 0 left screen, 1 right screen
@@ -159,7 +159,7 @@ private:
 	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

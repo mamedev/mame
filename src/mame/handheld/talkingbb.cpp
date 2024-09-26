@@ -131,7 +131,7 @@ public:
 	void talkingbb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -143,8 +143,8 @@ private:
 	u8 m_bank = 0;
 	u8 m_inp_mux = 0;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void bank_w(u8 data);

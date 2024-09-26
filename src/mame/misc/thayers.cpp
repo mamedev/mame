@@ -53,11 +53,11 @@ public:
 	void thayers(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void thayers_map(address_map &map);
-	void thayers_io_map(address_map &map);
+	void thayers_map(address_map &map) ATTR_COLD;
+	void thayers_io_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(firstirq_tick);
 	TIMER_CALLBACK_MEMBER(intrq_tick);

@@ -79,8 +79,8 @@ public:
 	void mc68000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m68000_device> m_maincpu;
@@ -108,8 +108,8 @@ private:
 	bool m_ibmkbd_data;
 	uint8_t m_ibmkbd_bits;
 
-	void mem_map(address_map &map);
-	void vector_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void vector_map(address_map &map) ATTR_COLD;
 	uint16_t memory_r(offs_t offset, uint16_t mem_mask = ~0);
 	void memory_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 

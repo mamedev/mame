@@ -269,8 +269,8 @@ public:
 	template <int N> ioport_value input_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<i80c32_device> m_maincpu;
@@ -357,8 +357,8 @@ private:
 	void peplus_palette(palette_device &palette) const;
 	void handle_lightpen();
 
-	void main_iomap(address_map &map);
-	void main_map(address_map &map);
+	void main_iomap(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 static const uint8_t  id_022[8] = { 0x00, 0x01, 0x04, 0x09, 0x13, 0x16, 0x18, 0x00 };

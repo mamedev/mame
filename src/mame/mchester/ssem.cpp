@@ -33,14 +33,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(panel_check);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	inline uint32_t reverse(uint32_t v);
 	std::string read_line(device_image_interface &image);
 
-	void ssem_map(address_map &map);
+	void ssem_map(address_map &map) ATTR_COLD;
 
 	template <typename Format, typename... Params>
 	void glyph_print(bitmap_rgb32 &bitmap, int32_t x, int32_t y, Format &&fmt, Params &&...args);

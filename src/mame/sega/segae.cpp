@@ -347,14 +347,14 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void banked_decrypted_opcodes_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
-	void io_map(address_map &map);
-	void systeme_map(address_map &map);
-	void vdp1_map(address_map &map);
-	void vdp2_map(address_map &map);
+	void banked_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void systeme_map(address_map &map) ATTR_COLD;
+	void vdp1_map(address_map &map) ATTR_COLD;
+	void vdp2_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// Devices
 	required_device<cpu_device>          m_maincpu;

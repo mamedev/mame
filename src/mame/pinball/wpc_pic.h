@@ -25,8 +25,8 @@ protected:
 	uint8_t mem[16]{}, chk[3]{}, curcmd = 0, scrambler = 0, count = 0, chk_count = 0, cmpchk[3]{};
 	const char *serial;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void serial_to_pic();
 	void check_game_id();

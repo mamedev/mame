@@ -58,12 +58,12 @@ public:
 	{ }
 
 	void bingowav(machine_config &config);
-	void bingowav_audio_map(address_map &map);
-	void bingowav_control_map(address_map &map);
-	void bingowav_drive_map(address_map &map);
-	void bingowav_main_map(address_map &map);
+	void bingowav_audio_map(address_map &map) ATTR_COLD;
+	void bingowav_control_map(address_map &map) ATTR_COLD;
+	void bingowav_drive_map(address_map &map) ATTR_COLD;
+	void bingowav_main_map(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

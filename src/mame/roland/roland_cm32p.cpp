@@ -313,8 +313,8 @@ public:
 	void init_cm32p();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i8x9x_device> cpu;
@@ -349,7 +349,7 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(card_load);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(card_unload);
 
-	void cm32p_map(address_map &map);
+	void cm32p_map(address_map &map) ATTR_COLD;
 
 	void descramble_rom_internal(u8* dst, const u8* src);
 	void descramble_rom_external(u8* dst, const u8* src);

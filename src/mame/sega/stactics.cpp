@@ -92,8 +92,8 @@ public:
 	ioport_value get_rng();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t vert_pos_r();
@@ -122,7 +122,7 @@ private:
 	void update_artwork();
 	void move_motor();
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_outlatch;

@@ -59,7 +59,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -76,7 +76,7 @@ private:
 	u8 m_led_data[2] = { };
 	u16 m_lcd_data[4] = { };
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	template<int N> void lcd_output_w(offs_t offset, u16 data);

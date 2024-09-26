@@ -124,8 +124,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void round_leds_w(offs_t, u8);
@@ -138,8 +138,8 @@ private:
 	void digit_w(u8 data);
 	void status_callback(u8 data);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	void reset_banks();
 
 	u8 m_digit = 0U;

@@ -193,8 +193,8 @@ public:
 	void skattva(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<microtouch_device> m_microtouch;
@@ -216,16 +216,16 @@ private:
 	//INTERRUPT_GEN_MEMBER(adp_int);
 	void skattva_nvram_init(nvram_device &nvram, void *base, size_t size);
 
-	void adp_hd63484_map(address_map &map);
-	void fc7_map(address_map &map);
-	void fashiong_hd63484_map(address_map &map);
-	void fstation_hd63484_map(address_map &map);
-	void fstation_mem(address_map &map);
-	void funland_mem(address_map &map);
-	void quickjac_mem(address_map &map);
-	void ramdac_map(address_map &map);
-	void skattv_mem(address_map &map);
-	void skattva_mem(address_map &map);
+	void adp_hd63484_map(address_map &map) ATTR_COLD;
+	void fc7_map(address_map &map) ATTR_COLD;
+	void fashiong_hd63484_map(address_map &map) ATTR_COLD;
+	void fstation_hd63484_map(address_map &map) ATTR_COLD;
+	void fstation_mem(address_map &map) ATTR_COLD;
+	void funland_mem(address_map &map) ATTR_COLD;
+	void quickjac_mem(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void skattv_mem(address_map &map) ATTR_COLD;
+	void skattva_mem(address_map &map) ATTR_COLD;
 };
 
 void adp_state::skattva_nvram_init(nvram_device &nvram, void *base, size_t size)

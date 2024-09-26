@@ -63,7 +63,7 @@ public:
 	void bowltry(machine_config &config);
 
 protected:
-	void bowltry_map(address_map &map);
+	void bowltry_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update_bowltry(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

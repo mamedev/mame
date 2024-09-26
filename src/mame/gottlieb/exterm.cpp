@@ -96,7 +96,7 @@ public:
 	void exterm(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<tms34010_device> m_maincpu;
@@ -121,8 +121,8 @@ private:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg_slave);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg_slave);
 
-	void master_map(address_map &map);
-	void slave_map(address_map &map);
+	void master_map(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -111,7 +111,7 @@ public:
 	void popobear(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -138,7 +138,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
 	void postload();
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

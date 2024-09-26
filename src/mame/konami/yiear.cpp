@@ -134,9 +134,9 @@ public:
 	void yiear(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -173,8 +173,8 @@ private:
 	INTERRUPT_GEN_MEMBER(nmi_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void vlm_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void vlm_map(address_map &map) ATTR_COLD;
 };
 
 

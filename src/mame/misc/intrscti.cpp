@@ -44,12 +44,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_intrscti(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void intrscti_io_map(address_map &map);
-	void intrscti_map(address_map &map);
-	void intrscti_sub_io_map(address_map &map);
-	void intrscti_sub_map(address_map &map);
+	void intrscti_io_map(address_map &map) ATTR_COLD;
+	void intrscti_map(address_map &map) ATTR_COLD;
+	void intrscti_sub_io_map(address_map &map) ATTR_COLD;
+	void intrscti_sub_map(address_map &map) ATTR_COLD;
 };
 
 void intrscti_state::video_start()

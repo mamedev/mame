@@ -5044,7 +5044,7 @@ ROM_START( scross )
 	ROM_LOAD( "mpr-15031.ic1", 0x000000, 0x100000, CRC(6af139dc) SHA1(2378c2ad0c52c114eb93206a6fbee723c038d030) )
 	ROM_LOAD( "mpr-15032.ic2", 0x200000, 0x100000, CRC(915d6096) SHA1(e1f670949b1254f5a3c3131993ca9b3baa4d9f6b) )
 
-	ROM_REGION( 0x20000, "user2", 0 ) /*  comms board? - might not belong to this game, just going based on epr number  */
+	ROM_REGION( 0x20000, "user2", 0 ) /* comms board confirmed */
 	ROM_LOAD( "epr-15033.ic17", 0x00000, 0x20000, CRC(dc19ac00) SHA1(16bbb5af034e5419673e637be30283b73ab7b290) )
 ROM_END
 
@@ -5113,6 +5113,9 @@ ROM_START( scrossu )
 	ROM_REGION( 0x400000, "mainpcb:sega", 0 ) /* Sega PCM sound data */
 	ROM_LOAD( "mpr-15031.ic1", 0x000000, 0x100000, CRC(6af139dc) SHA1(2378c2ad0c52c114eb93206a6fbee723c038d030) )
 	ROM_LOAD( "mpr-15032.ic2", 0x200000, 0x100000, CRC(915d6096) SHA1(e1f670949b1254f5a3c3131993ca9b3baa4d9f6b) )
+
+	ROM_REGION( 0x20000, "user2", 0 ) /* comms board confirmed */
+	ROM_LOAD( "epr-15033.ic17", 0x00000, 0x20000, CRC(dc19ac00) SHA1(16bbb5af034e5419673e637be30283b73ab7b290) )
 ROM_END
 
 

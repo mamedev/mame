@@ -55,7 +55,7 @@ protected:
 	void base_configure(machine_config &config);
 	void fds_configure();
 
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 
 	bool ports_enabled_high() const { return bool(m_port0 & 0x80); }
 	bool ports_enabled_low() const { return !(m_port0 & 0x80); }
@@ -83,8 +83,8 @@ protected:
 	virtual void update_screen(bitmap_ind16 &bitmap) const = 0;
 	uint32_t screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void rm380z_io(address_map &map);
-	void rm380z_mem(address_map &map);
+	void rm380z_io(address_map &map) ATTR_COLD;
+	void rm380z_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_port0 = 0;
 	uint8_t m_port0_kbd = 0;
@@ -115,7 +115,7 @@ public:
 	void rm380z34d(machine_config &config) { rm380z34e(config); fds_configure(); }
 
 protected:
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 
 	void port_write(offs_t offset, uint8_t data) override;
 	uint8_t port_read(offs_t offset) override;
@@ -184,7 +184,7 @@ protected:
 	static inline constexpr int RM380Z_VIDEOMODE_40COL = 0x01;
 	static inline constexpr int RM380Z_VIDEOMODE_80COL = 0x02;
 
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 
 	void port_write(offs_t offset, uint8_t data) override;
 	uint8_t port_read(offs_t offset) override;
@@ -227,7 +227,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
 
 protected:
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 
 	void port_write(offs_t offset, uint8_t data) override;
 	uint8_t port_read(offs_t offset) override;
@@ -277,13 +277,13 @@ public:
 	void rm480za(machine_config &config) { rm480z(config); }
 
 protected:
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 
 	void update_screen(bitmap_ind16 &bitmap) const override;
 
 private:
-	void rm480z_io(address_map &map);
-	void rm480z_mem(address_map &map);
+	void rm480z_io(address_map &map) ATTR_COLD;
+	void rm480z_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_RM_RM380Z_H

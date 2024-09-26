@@ -275,7 +275,7 @@ public:
 	DECLARE_MACHINE_START( pet40 );
 	DECLARE_MACHINE_RESET( pet40 );
 
-	void pet2001_mem(address_map &map);
+	void pet2001_mem(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<m6502_device> m_maincpu;
@@ -456,7 +456,7 @@ private:
 	void write(offs_t offset, uint8_t data);
 
 	uint8_t m_cr;
-	void cbm8296_mem(address_map &map);
+	void cbm8296_mem(address_map &map) ATTR_COLD;
 };
 
 

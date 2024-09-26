@@ -71,7 +71,7 @@ private:
 	template <unsigned N> u8 lcd_data_r(offs_t offset);
 	template <unsigned N> void lcd_data_w(offs_t offset, u8 data);
 
-	void lcd_map(address_map &map);
+	void lcd_map(address_map &map) ATTR_COLD;
 
 	uint8_t keyb_r(offs_t offset);
 	void keyb_w(offs_t offset, uint8_t data);
@@ -80,14 +80,14 @@ private:
 	int sid_r();
 
 	void palette_init(palette_device &palette) const;
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 };
 
 void fp200_state::video_start()

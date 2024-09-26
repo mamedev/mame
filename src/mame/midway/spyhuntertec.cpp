@@ -57,9 +57,9 @@ public:
 	void init_spyhuntertec();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -119,10 +119,10 @@ private:
 
 	uint8_t m_analog_select = 0;
 	uint8_t m_analog_count = 0;
-	void spyhuntertec_map(address_map &map);
-	void spyhuntertec_portmap(address_map &map);
-	void spyhuntertec_sound_map(address_map &map);
-	void spyhuntertec_sound_portmap(address_map &map);
+	void spyhuntertec_map(address_map &map) ATTR_COLD;
+	void spyhuntertec_portmap(address_map &map) ATTR_COLD;
+	void spyhuntertec_sound_map(address_map &map) ATTR_COLD;
+	void spyhuntertec_sound_portmap(address_map &map) ATTR_COLD;
 };
 
 void spyhuntertec_state::ay1_porta_w(uint8_t data)

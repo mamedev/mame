@@ -28,12 +28,12 @@ public:
 	void gbadv(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 
-	void gba_map(address_map &map);
+	void gba_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<dac_byte_interface> m_ldaca;
@@ -98,9 +98,9 @@ public:
 	void gbadv_cons(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void gba_cons_map(address_map &map);
+	void gba_cons_map(address_map &map) ATTR_COLD;
 
 	uint32_t gba_bios_r(offs_t offset, uint32_t mem_mask = ~0);
 
@@ -121,7 +121,7 @@ public:
 
 protected:
 
-	void gba_robotech_map(address_map &map);
+	void gba_robotech_map(address_map &map) ATTR_COLD;
 };
 
 

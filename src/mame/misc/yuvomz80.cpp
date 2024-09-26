@@ -55,11 +55,11 @@ public:
 	void hexaprsz(machine_config &config);
 
 private:
-	void audio_mem_map(address_map &map);
-	void audio_io_map(address_map &map);
-	void hexaprsz_audio_io_map(address_map &map);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void audio_mem_map(address_map &map) ATTR_COLD;
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void hexaprsz_audio_io_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };

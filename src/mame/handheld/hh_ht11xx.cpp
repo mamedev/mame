@@ -65,7 +65,7 @@ public:
 	void brke23p2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void segment_w(offs_t offset, u64 data);
 
@@ -87,7 +87,7 @@ public:
 	void ga888(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void segment_w(offs_t offset, u64 data);
 

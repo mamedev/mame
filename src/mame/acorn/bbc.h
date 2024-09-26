@@ -198,20 +198,20 @@ public:
 	void bbcb_us(machine_config &config);
 	void sist1(machine_config &config);
 
-	void bbca_mem(address_map &map);
-	void bbc_base(address_map &map);
-	void bbcb_mem(address_map &map);
+	void bbca_mem(address_map &map) ATTR_COLD;
+	void bbc_base(address_map &map) ATTR_COLD;
+	void bbcb_mem(address_map &map) ATTR_COLD;
 
 	void init_bbc();
 	void init_ltmp();
 	void init_cfa();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -411,12 +411,12 @@ public:
 	void reutapm(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void bbcbp_mem(address_map &map);
-	void reutapm_mem(address_map &map);
-	void bbcbp_fetch(address_map &map);
+	void bbcbp_mem(address_map &map) ATTR_COLD;
+	void reutapm_mem(address_map &map) ATTR_COLD;
+	void bbcbp_fetch(address_map &map) ATTR_COLD;
 };
 
 
@@ -448,16 +448,16 @@ public:
 	static void mpc_prisma_default(device_t *device);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void bbcm_mem(address_map &map);
-	void bbcm_bankdev(address_map &map);
-	void bbcmet_bankdev(address_map &map);
-	void bbcmc_mem(address_map &map);
-	void bbcmc_bankdev(address_map &map);
-	void autoc15_bankdev(address_map &map);
-	void bbcm_fetch(address_map &map);
+	void bbcm_mem(address_map &map) ATTR_COLD;
+	void bbcm_bankdev(address_map &map) ATTR_COLD;
+	void bbcmet_bankdev(address_map &map) ATTR_COLD;
+	void bbcmc_mem(address_map &map) ATTR_COLD;
+	void bbcmc_bankdev(address_map &map) ATTR_COLD;
+	void autoc15_bankdev(address_map &map) ATTR_COLD;
+	void bbcm_fetch(address_map &map) ATTR_COLD;
 
 	output_finder<> m_power_led;
 };

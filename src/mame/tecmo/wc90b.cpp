@@ -128,8 +128,8 @@ public:
 	void init_wc90b();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_fg_tilemap;
@@ -155,8 +155,8 @@ protected:
 	void bankswitch_w(uint8_t data);
 	void adpcm_int(int state);
 
-	void sound_map(address_map &map);
-	void sub_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
@@ -166,7 +166,7 @@ private:
 	optional_shared_ptr_array<uint8_t, 2> m_scrolly;
 	optional_shared_ptr<uint8_t> m_scroll_x_lo;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_msm5205next;
 	uint8_t m_toggle;
@@ -201,7 +201,7 @@ private:
 	void master_irq_ack_w(uint8_t data);
 	required_shared_ptr<uint8_t> m_bgscroll;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -333,29 +333,29 @@ public:
 	void goldfrui(machine_config &config);
 	void goldstar(machine_config &config);
 	void goldstbl(machine_config &config);
-	void bonusch_portmap(address_map &map);
-	void feverch_portmap(address_map &map);
-	void cm_map(address_map &map);
-	void crazybon_portmap(address_map &map);
-	void flaming7_map(address_map &map);
-	void goldstar_map(address_map &map);
-	void goldstar_readport(address_map &map);
-	void kkotnoli_map(address_map &map);
-	void ladylinr_map(address_map &map);
-	void lucky8_map(address_map &map);
-	void common_decrypted_opcodes_map(address_map &map);
-	void super972_decrypted_opcodes_map(address_map &map);
-	void mbstar_map(address_map &map);
-	void megaline_portmap(address_map &map);
-	void ncb3_readwriteport(address_map &map);
-	void nfm_map(address_map &map);
-	void jkrmast_map(address_map &map);
-	void jkrmast_portmap(address_map &map);
-	void pkrmast_portmap(address_map &map);
-	void ramdac_map(address_map &map);
-	void wcat3_map(address_map &map);
-	void wcherry_map(address_map &map);
-	void wcherry_readwriteport(address_map &map);
+	void bonusch_portmap(address_map &map) ATTR_COLD;
+	void feverch_portmap(address_map &map) ATTR_COLD;
+	void cm_map(address_map &map) ATTR_COLD;
+	void crazybon_portmap(address_map &map) ATTR_COLD;
+	void flaming7_map(address_map &map) ATTR_COLD;
+	void goldstar_map(address_map &map) ATTR_COLD;
+	void goldstar_readport(address_map &map) ATTR_COLD;
+	void kkotnoli_map(address_map &map) ATTR_COLD;
+	void ladylinr_map(address_map &map) ATTR_COLD;
+	void lucky8_map(address_map &map) ATTR_COLD;
+	void common_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void super972_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void mbstar_map(address_map &map) ATTR_COLD;
+	void megaline_portmap(address_map &map) ATTR_COLD;
+	void ncb3_readwriteport(address_map &map) ATTR_COLD;
+	void nfm_map(address_map &map) ATTR_COLD;
+	void jkrmast_map(address_map &map) ATTR_COLD;
+	void jkrmast_portmap(address_map &map) ATTR_COLD;
+	void pkrmast_portmap(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void wcat3_map(address_map &map) ATTR_COLD;
+	void wcherry_map(address_map &map) ATTR_COLD;
+	void wcherry_readwriteport(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
@@ -481,22 +481,22 @@ public:
 	void super7(machine_config &config);
 	void animalhs(machine_config &config);
 	void eldoraddoa(machine_config &config);
-	void animalhs_map(address_map &map);
-	void animalhs_portmap(address_map &map);
-	void amcoe1_portmap(address_map &map);
-	void amcoe2_portmap(address_map &map);
-	void cm_portmap(address_map &map);
-	void cm97_portmap(address_map &map);
-	void cmast91_portmap(address_map &map);
-	void cmast92_map(address_map &map);
-	void cmast92_portmap(address_map &map);
-	void cmtetrisb_portmap(address_map &map);
-	void cmtetriskr_portmap(address_map &map);
-	void cmv4zg_portmap(address_map &map);
-	void eldoraddoa_portmap(address_map &map);
-	void super7_portmap(address_map &map);
-	void chryangl_decrypted_opcodes_map(address_map &map);
-	void ss2001_portmap(address_map &map);
+	void animalhs_map(address_map &map) ATTR_COLD;
+	void animalhs_portmap(address_map &map) ATTR_COLD;
+	void amcoe1_portmap(address_map &map) ATTR_COLD;
+	void amcoe2_portmap(address_map &map) ATTR_COLD;
+	void cm_portmap(address_map &map) ATTR_COLD;
+	void cm97_portmap(address_map &map) ATTR_COLD;
+	void cmast91_portmap(address_map &map) ATTR_COLD;
+	void cmast92_map(address_map &map) ATTR_COLD;
+	void cmast92_portmap(address_map &map) ATTR_COLD;
+	void cmtetrisb_portmap(address_map &map) ATTR_COLD;
+	void cmtetriskr_portmap(address_map &map) ATTR_COLD;
+	void cmv4zg_portmap(address_map &map) ATTR_COLD;
+	void eldoraddoa_portmap(address_map &map) ATTR_COLD;
+	void super7_portmap(address_map &map) ATTR_COLD;
+	void chryangl_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void ss2001_portmap(address_map &map) ATTR_COLD;
 
 protected:
 	// installed by various driver init handlers to get stuff to work
@@ -555,7 +555,7 @@ public:
 	void bingownga(machine_config &config);
 	void mbstar(machine_config &config);
 	void flam7_tw(machine_config &config);
-	void magodds_map(address_map &map);
+	void magodds_map(address_map &map) ATTR_COLD;
 
 protected:
 	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
@@ -567,7 +567,7 @@ private:
 	uint8_t m_nmi_enable = 0U;
 	uint8_t m_vidreg = 0U;
 
-	void nd8lines_map(address_map &map);
+	void nd8lines_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -594,9 +594,9 @@ public:
 	void cb3c(machine_config &config);
 	void cb3e(machine_config &config);
 	void ncb3(machine_config &config);
-	void ncb3_map(address_map &map);
-	void chryangla_map(address_map &map);
-	void chryangla_decrypted_opcodes_map(address_map &map);
+	void ncb3_map(address_map &map) ATTR_COLD;
+	void chryangla_map(address_map &map) ATTR_COLD;
+	void chryangla_decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
 protected:
 	void do_blockswaps(uint8_t *rom);
@@ -630,8 +630,8 @@ public:
 	uint32_t screen_update_sangho(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void star100(machine_config &config);
-	void star100_map(address_map &map);
-	void star100_readport(address_map &map);
+	void star100_map(address_map &map) ATTR_COLD;
+	void star100_readport(address_map &map) ATTR_COLD;
 protected:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -681,11 +681,11 @@ public:
 	void feverch(machine_config &config);
 	void rolling(machine_config &config);
 
-	void bonusch_map(address_map &map);
-	void feverch_map(address_map &map);
-	void megaline_map(address_map &map);
-	void unkch_map(address_map &map);
-	void unkch_portmap(address_map &map);
+	void bonusch_map(address_map &map) ATTR_COLD;
+	void feverch_map(address_map &map) ATTR_COLD;
+	void megaline_map(address_map &map) ATTR_COLD;
+	void unkch_map(address_map &map) ATTR_COLD;
+	void unkch_portmap(address_map &map) ATTR_COLD;
 protected:
 	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel2_tile_info);

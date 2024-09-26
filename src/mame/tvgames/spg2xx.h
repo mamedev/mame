@@ -54,8 +54,8 @@ public:
 	void init_itvphone();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void decrypt_ac_ff(uint16_t* ROM, int size);
 
@@ -79,9 +79,9 @@ protected:
 	optional_memory_bank m_bank;
 
 
-	virtual void mem_map_4m(address_map &map);
-	virtual void mem_map_2m(address_map &map);
-	virtual void mem_map_1m(address_map &map);
+	virtual void mem_map_4m(address_map &map) ATTR_COLD;
+	virtual void mem_map_2m(address_map &map) ATTR_COLD;
+	virtual void mem_map_1m(address_map &map) ATTR_COLD;
 
 	uint32_t m_current_bank;
 
@@ -217,8 +217,8 @@ public:
 	void gssytts(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
@@ -226,7 +226,7 @@ protected:
 
 private:
 
-	void mem_map_upperbank(address_map& map);
+	void mem_map_upperbank(address_map &map) ATTR_COLD;
 };
 
 class spg2xx_game_senwfit_state : public spg2xx_game_gssytts_state
@@ -288,14 +288,14 @@ public:
 	void wfcentro(machine_config &config);
 
 protected:
-//  virtual void machine_start() override;
-//  virtual void machine_reset() override;
+//  virtual void machine_start() override ATTR_COLD;
+//  virtual void machine_reset() override ATTR_COLD;
 
 //  virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 private:
 
-	void mem_map_wfcentro(address_map& map);
+	void mem_map_wfcentro(address_map &map) ATTR_COLD;
 };
 
 
@@ -312,7 +312,7 @@ protected:
 
 private:
 
-	void mem_map_lexiart(address_map& map);
+	void mem_map_lexiart(address_map &map) ATTR_COLD;
 };
 
 

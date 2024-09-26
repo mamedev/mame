@@ -25,8 +25,8 @@ public:
 	void daifugo(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -59,9 +59,9 @@ private:
 
 	uint8_t iox_key_matrix_calc(uint8_t p_side);
 
-	void speedatk_io(address_map &map);
-	void speedatk_mem(address_map &map);
-	void daifugo_mem(address_map &map);
+	void speedatk_io(address_map &map) ATTR_COLD;
+	void speedatk_mem(address_map &map) ATTR_COLD;
+	void daifugo_mem(address_map &map) ATTR_COLD;
 };
 
 

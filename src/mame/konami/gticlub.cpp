@@ -272,8 +272,8 @@ protected:
 		, m_cg_view(*this, "cg_view")
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
@@ -305,7 +305,7 @@ protected:
 
 	int adc1038_input_callback(int input);
 
-	void sound_memmap(address_map &map);
+	void sound_memmap(address_map &map) ATTR_COLD;
 
 	emu_timer *m_sound_irq_timer = nullptr;
 };
@@ -331,8 +331,8 @@ protected:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void gticlub_map(address_map &map);
-	void sharc_map(address_map &map);
+	void gticlub_map(address_map &map) ATTR_COLD;
+	void sharc_map(address_map &map) ATTR_COLD;
 
 #if DEBUG_GTI
 	uint8_t m_tick = 0;
@@ -357,7 +357,7 @@ private:
 
 	void gn680_sysctrl_w(uint16_t data);
 
-	void gn680_memmap(address_map &map);
+	void gn680_memmap(address_map &map) ATTR_COLD;
 };
 
 // with Voodoo based video board
@@ -381,9 +381,9 @@ private:
 
 	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void hangplt_map(address_map &map);
-	void hangplt_sharc0_map(address_map &map);
-	void hangplt_sharc1_map(address_map &map);
+	void hangplt_map(address_map &map) ATTR_COLD;
+	void hangplt_sharc0_map(address_map &map) ATTR_COLD;
+	void hangplt_sharc1_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -335,8 +335,8 @@ public:
 	ioport_value gearshift_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<nvram_device> m_nvram;
@@ -438,13 +438,13 @@ private:
 	void update_widget_irq();
 	void init_common(int config);
 
-	void seattle_cs0_map(address_map &map);
-	void seattle_cs1_map(address_map &map);
-	void seattle_cs2_map(address_map &map);
-	void seattle_cs3_map(address_map &map);
-	void widget_cs3_map(address_map &map);
-	void carnevil_cs3_map(address_map &map);
-	void flagstaff_cs3_map(address_map &map);
+	void seattle_cs0_map(address_map &map) ATTR_COLD;
+	void seattle_cs1_map(address_map &map) ATTR_COLD;
+	void seattle_cs2_map(address_map &map) ATTR_COLD;
+	void seattle_cs3_map(address_map &map) ATTR_COLD;
+	void widget_cs3_map(address_map &map) ATTR_COLD;
+	void carnevil_cs3_map(address_map &map) ATTR_COLD;
+	void flagstaff_cs3_map(address_map &map) ATTR_COLD;
 
 	static void hdd_config(device_t *device);
 };

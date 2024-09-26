@@ -188,8 +188,8 @@ public:
 	ioport_value p2_controls_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -223,10 +223,10 @@ private:
 	void create_interrupt_timers();
 	void start_interrupt_timers();
 
-	void enigma2_audio_cpu_map(address_map &map);
-	void enigma2_main_cpu_map(address_map &map);
-	void enigma2a_main_cpu_io_map(address_map &map);
-	void enigma2a_main_cpu_map(address_map &map);
+	void enigma2_audio_cpu_map(address_map &map) ATTR_COLD;
+	void enigma2_main_cpu_map(address_map &map) ATTR_COLD;
+	void enigma2a_main_cpu_io_map(address_map &map) ATTR_COLD;
+	void enigma2a_main_cpu_map(address_map &map) ATTR_COLD;
 };
 
 

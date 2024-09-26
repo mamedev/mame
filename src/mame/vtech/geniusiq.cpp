@@ -187,8 +187,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(send_mouse_input);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	enum
@@ -222,7 +222,7 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(cart_unload);
 
-	void geniusiq_mem(address_map &map);
+	void geniusiq_mem(address_map &map) ATTR_COLD;
 
 	uint16_t      m_gfx_y = 0;
 	uint16_t      m_gfx_x = 0;

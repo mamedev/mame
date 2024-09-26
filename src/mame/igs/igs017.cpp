@@ -104,8 +104,8 @@ public:
 	u8 data_r();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -172,8 +172,8 @@ public:
 	void dump(const char *filename, u32 string_addr, u32 xor_addr, bool is_16bits) const;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_memory_region m_region_key;
@@ -321,8 +321,8 @@ public:
 	void set_val_xor(u16 val_xor);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u8 m_m3 = 0, m_mf = 0;
@@ -486,8 +486,8 @@ public:
 	void dec_w(u8 data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u8 m_val = 0;
@@ -554,8 +554,8 @@ public:
 	void inc_w(u8 data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u8 m_val = 0;
@@ -675,9 +675,9 @@ public:
 	void init_tjsb();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	int m_remap_addr;
@@ -851,46 +851,46 @@ private:
 	void spkrform_patch_rom();
 
 	// Memory maps
-	void decrypted_opcodes_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
-	void igs_bitswap_mux_map(address_map &map);
-	void igs_fixed_data_mux_map(address_map &map);
-	void igs_string_mux_map(address_map &map);
+	void igs_bitswap_mux_map(address_map &map) ATTR_COLD;
+	void igs_fixed_data_mux_map(address_map &map) ATTR_COLD;
+	void igs_string_mux_map(address_map &map) ATTR_COLD;
 
-	void cpoker2_io(address_map &map);
-	void cpoker2_map(address_map &map);
-	void cpoker2_mux_map(address_map &map);
-	void happyskl_io(address_map &map);
-	void happyskl_mux_map(address_map &map);
-	void iqblocka_io(address_map &map);
-	void iqblocka_map(address_map &map);
-	void iqblocka_mux_map(address_map &map);
-	void iqblockf_mux_map(address_map &map);
-	void lhzb2_map(address_map &map);
-	void lhzb2_mux_map(address_map &map);
-	void lhzb2a_map(address_map &map);
-	void lhzb2a_mux_map(address_map &map);
-	void mgcs_map(address_map &map);
-	void mgcs_mux_map(address_map &map);
-	void mgcsa_map(address_map &map);
-	void mgdh_mux_map(address_map &map);
-	void mgdh_map(address_map &map);
-	void mgdha_mux_map(address_map &map);
-	void sdmg2_map(address_map &map);
-	void sdmg2_mux_map(address_map &map);
-	void sdmg2p_map(address_map &map);
-	void sdmg2p_mux_map(address_map &map);
-	void slqz2_map(address_map &map);
-	void slqz2_mux_map(address_map &map);
-	void spkrform_io(address_map &map);
-	void spkrform_mux_map(address_map &map);
-	void starzan_io(address_map &map);
-	void starzan_mux_map(address_map &map);
-	void tarzan_io(address_map &map);
-	void tarzan_mux_map(address_map &map);
-	void tjsb_io(address_map &map);
-	void tjsb_map(address_map &map);
-	void tjsb_mux_map(address_map &map);
+	void cpoker2_io(address_map &map) ATTR_COLD;
+	void cpoker2_map(address_map &map) ATTR_COLD;
+	void cpoker2_mux_map(address_map &map) ATTR_COLD;
+	void happyskl_io(address_map &map) ATTR_COLD;
+	void happyskl_mux_map(address_map &map) ATTR_COLD;
+	void iqblocka_io(address_map &map) ATTR_COLD;
+	void iqblocka_map(address_map &map) ATTR_COLD;
+	void iqblocka_mux_map(address_map &map) ATTR_COLD;
+	void iqblockf_mux_map(address_map &map) ATTR_COLD;
+	void lhzb2_map(address_map &map) ATTR_COLD;
+	void lhzb2_mux_map(address_map &map) ATTR_COLD;
+	void lhzb2a_map(address_map &map) ATTR_COLD;
+	void lhzb2a_mux_map(address_map &map) ATTR_COLD;
+	void mgcs_map(address_map &map) ATTR_COLD;
+	void mgcs_mux_map(address_map &map) ATTR_COLD;
+	void mgcsa_map(address_map &map) ATTR_COLD;
+	void mgdh_mux_map(address_map &map) ATTR_COLD;
+	void mgdh_map(address_map &map) ATTR_COLD;
+	void mgdha_mux_map(address_map &map) ATTR_COLD;
+	void sdmg2_map(address_map &map) ATTR_COLD;
+	void sdmg2_mux_map(address_map &map) ATTR_COLD;
+	void sdmg2p_map(address_map &map) ATTR_COLD;
+	void sdmg2p_mux_map(address_map &map) ATTR_COLD;
+	void slqz2_map(address_map &map) ATTR_COLD;
+	void slqz2_mux_map(address_map &map) ATTR_COLD;
+	void spkrform_io(address_map &map) ATTR_COLD;
+	void spkrform_mux_map(address_map &map) ATTR_COLD;
+	void starzan_io(address_map &map) ATTR_COLD;
+	void starzan_mux_map(address_map &map) ATTR_COLD;
+	void tarzan_io(address_map &map) ATTR_COLD;
+	void tarzan_mux_map(address_map &map) ATTR_COLD;
+	void tjsb_io(address_map &map) ATTR_COLD;
+	void tjsb_map(address_map &map) ATTR_COLD;
+	void tjsb_mux_map(address_map &map) ATTR_COLD;
 };
 
 void igs017_state::machine_start()

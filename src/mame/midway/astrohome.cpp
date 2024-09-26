@@ -43,13 +43,13 @@ public:
 	void init_astrocde();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t inputs_r(offs_t offset);
 
-	void astrocade_io(address_map &map);
-	void astrocade_mem(address_map &map);
+	void astrocade_io(address_map &map) ATTR_COLD;
+	void astrocade_mem(address_map &map) ATTR_COLD;
 
 	required_device<astrocade_cart_slot_device> m_cart;
 	required_device<astrocade_exp_device> m_exp;

@@ -52,7 +52,7 @@ public:
 	void amico2k(machine_config &config);
 
 private:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 	uint8_t ppi_pa_r();
 	void ppi_pa_w(uint8_t data);
@@ -62,7 +62,7 @@ private:
 	// timers
 	emu_timer *m_led_refresh_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(led_refresh);
-	void amico2k_mem(address_map &map);
+	void amico2k_mem(address_map &map) ATTR_COLD;
 
 	int m_ls145_p = 0;
 	uint8_t m_segment = 0U;

@@ -71,7 +71,7 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<3> m_io_keyboard;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t pio_pa_r();
 	void pio_pb_w(uint8_t data);
@@ -110,9 +110,9 @@ private:
 	void init_vcs80();
 	TIMER_DEVICE_CALLBACK_MEMBER(vcs80_keyboard_tick);
 
-	void bd_map(address_map &map);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void bd_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 

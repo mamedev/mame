@@ -80,16 +80,16 @@ private:
 	void serial_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_outtimer);
-	void zac_2_data(address_map &map);
-	void zac_2_io(address_map &map);
-	void zac_2_map(address_map &map);
+	void zac_2_data(address_map &map) ATTR_COLD;
+	void zac_2_io(address_map &map) ATTR_COLD;
+	void zac_2_map(address_map &map) ATTR_COLD;
 
 	u8 m_row = 0U;
 	u8 m_t_c = 0U;
 	u8 m_out_offs = 0U;
 	u8 m_game = 0U;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<u8> m_p_ram;
 	required_ioport_array<8> m_io_keyboard;

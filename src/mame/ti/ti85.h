@@ -183,8 +183,8 @@ private:
 	uint8_t ti83pse_port_0021_r();
 	uint8_t ti84pse_port_0055_r();
 	uint8_t ti84pse_port_0056_r();
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void ti85_palette(palette_device &palette);
 	DECLARE_MACHINE_RESET(ti85);
 	DECLARE_MACHINE_RESET(ti83p);
@@ -242,20 +242,20 @@ private:
 
 	ti83pse_timer m_ctimer[3];
 
-	void ti81_io(address_map &map);
-	void ti81_mem(address_map &map);
-	void ti81v2_io(address_map &map);
-	void ti82_io(address_map &map);
-	void ti83_io(address_map &map);
-	void ti83p_asic_mem(address_map &map);
-	void ti83p_banked_mem(address_map &map);
-	void ti83p_io(address_map &map);
-	void ti83pse_banked_mem(address_map &map);
-	void ti83pse_io(address_map &map);
-	void ti84p_banked_mem(address_map &map);
-	void ti85_io(address_map &map);
-	void ti86_io(address_map &map);
-	void ti86_mem(address_map &map);
+	void ti81_io(address_map &map) ATTR_COLD;
+	void ti81_mem(address_map &map) ATTR_COLD;
+	void ti81v2_io(address_map &map) ATTR_COLD;
+	void ti82_io(address_map &map) ATTR_COLD;
+	void ti83_io(address_map &map) ATTR_COLD;
+	void ti83p_asic_mem(address_map &map) ATTR_COLD;
+	void ti83p_banked_mem(address_map &map) ATTR_COLD;
+	void ti83p_io(address_map &map) ATTR_COLD;
+	void ti83pse_banked_mem(address_map &map) ATTR_COLD;
+	void ti83pse_io(address_map &map) ATTR_COLD;
+	void ti84p_banked_mem(address_map &map) ATTR_COLD;
+	void ti85_io(address_map &map) ATTR_COLD;
+	void ti86_io(address_map &map) ATTR_COLD;
+	void ti86_mem(address_map &map) ATTR_COLD;
 	//address_space &asic;
 };
 

@@ -164,8 +164,8 @@ protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<address_map_bank_device> m_upperbank;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 protected:
 	int m_speaker_state;
@@ -213,11 +213,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_irq);
 	uint8_t keyb_data_r();
 
-	void agat7_map(address_map &map);
-	void inhbank_map(address_map &map);
+	void agat7_map(address_map &map) ATTR_COLD;
+	void inhbank_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 };
@@ -237,11 +237,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_irq);
 	uint8_t keyb_data_r();
 
-	void agat9_map(address_map &map);
-	void inhbank_map(address_map &map);
+	void agat9_map(address_map &map) ATTR_COLD;
+	void inhbank_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t c090_r(offs_t offset);
 	void c090_w(offs_t offset, uint8_t data);

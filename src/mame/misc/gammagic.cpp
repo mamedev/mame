@@ -73,12 +73,12 @@ public:
 	void gammagic(machine_config &config);
 
 private:
-	void gammagic_io(address_map &map);
-	void gammagic_map(address_map &map);
+	void gammagic_io(address_map &map) ATTR_COLD;
+	void gammagic_map(address_map &map) ATTR_COLD;
 
 	static void smc_superio_config(device_t *device);
 
-	void v8000_map(address_map &map);
+	void v8000_map(address_map &map) ATTR_COLD;
 };
 
 void gammagic_state::gammagic_map(address_map &map)

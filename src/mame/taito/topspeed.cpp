@@ -210,8 +210,8 @@ public:
 	ioport_value brake_pedal_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_shared_ptr<u16> m_spritemap;
@@ -267,10 +267,10 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void cpua_map(address_map &map);
-	void cpub_map(address_map &map);
-	void z80_io(address_map &map);
-	void z80_prg(address_map &map);
+	void cpua_map(address_map &map) ATTR_COLD;
+	void cpub_map(address_map &map) ATTR_COLD;
+	void z80_io(address_map &map) ATTR_COLD;
+	void z80_prg(address_map &map) ATTR_COLD;
 };
 
 

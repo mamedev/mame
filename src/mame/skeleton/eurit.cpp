@@ -32,7 +32,7 @@ public:
 	void eurit30(machine_config &mconfig);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -40,7 +40,7 @@ private:
 	void key_scan_w(u8 data);
 	u8 key_matrix_r();
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void palette_init(palette_device &palette);
 

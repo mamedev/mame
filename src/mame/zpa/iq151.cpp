@@ -99,14 +99,14 @@ private:
 	void cartslot_w(offs_t offset, uint8_t data);
 	uint8_t cartslot_io_r(offs_t offset);
 	void cartslot_io_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(iq151_vblank_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_timer);
-	void iq151_io(address_map &map);
-	void iq151_mem(address_map &map);
+	void iq151_io(address_map &map) ATTR_COLD;
+	void iq151_mem(address_map &map) ATTR_COLD;
 
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;

@@ -97,12 +97,12 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void de_bg_audio(machine_config &config);
-	void audio_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
 	void ym2151_irq_w(int state);
 	void msm5205_irq_w(int state);
 	uint8_t sound_latch_r();

@@ -75,9 +75,9 @@ public:
 	void init_mjsenpu();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* devices */
@@ -112,8 +112,8 @@ private:
 	uint32_t screen_update_mjsenpu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<palette_device> m_palette;
-	void mjsenpu_32bit_map(address_map &map);
-	void mjsenpu_io(address_map &map);
+	void mjsenpu_32bit_map(address_map &map) ATTR_COLD;
+	void mjsenpu_io(address_map &map) ATTR_COLD;
 };
 
 

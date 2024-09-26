@@ -39,7 +39,7 @@ public:
 	void tim011(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_tim011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void print_w(uint8_t data);
 	void scroll_w(uint8_t data);
@@ -54,8 +54,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<bus::tim011::exp_slot_device> m_exp;
 
-	void tim011_io(address_map &map);
-	void tim011_mem(address_map &map);
+	void tim011_io(address_map &map) ATTR_COLD;
+	void tim011_mem(address_map &map) ATTR_COLD;
 	void tim011_palette(palette_device &palette) const;
 };
 

@@ -42,8 +42,8 @@ public:
 	void cbombers(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	struct uf_tempsprite
@@ -100,9 +100,9 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const u32 *primasks,int x_offs,int y_offs);
 	void draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const u8* pritable,int x_offs,int y_offs);
 
-	void cbombers_cpua_map(address_map &map);
-	void cbombers_cpub_map(address_map &map);
-	void undrfire_map(address_map &map);
+	void cbombers_cpua_map(address_map &map) ATTR_COLD;
+	void cbombers_cpub_map(address_map &map) ATTR_COLD;
+	void undrfire_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TAITO_UNDRFIRE_H

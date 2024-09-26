@@ -94,8 +94,8 @@ public:
 	void qtsbc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 memory_r(offs_t offset);
@@ -105,8 +105,8 @@ private:
 	void rts_loopback_w(int state);
 	void dtr_loopback_w(int state);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;

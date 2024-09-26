@@ -454,13 +454,13 @@ private:
 	required_device<sda5708_device> m_display;
 	required_device<hct259_device> m_ip16_74259;
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	void sda5708_reset(uint8_t data);
 	void sda5708_clk(uint8_t data);
 	void write_pa(uint8_t data);
 
-	void dbox_map(address_map &map);
+	void dbox_map(address_map &map) ATTR_COLD;
 
 #if LOCALFLASH
 	uint16_t sysflash_r(offs_t offset);

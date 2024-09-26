@@ -75,10 +75,10 @@ public:
 	void rs232_dcd_w(int state);
 
 	void cgenie(machine_config &config);
-	void cgenie_io(address_map &map);
-	void cgenie_mem(address_map &map);
+	void cgenie_io(address_map &map) ATTR_COLD;
+	void cgenie_mem(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

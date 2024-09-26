@@ -93,11 +93,11 @@ private:
 	MC6845_UPDATE_ROW(pyl601a_update_row);
 	uint8_t selectedline(uint16_t data);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
 	static void floppy_formats(format_registration &fr);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_rom_page = 0U;
 	uint32_t m_vdisk_addr = 0U;

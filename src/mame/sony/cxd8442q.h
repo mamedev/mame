@@ -80,8 +80,8 @@ protected:
 public:
 	cxd8442q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void map(address_map &map);
-	void map_fifo_ram(address_map &map);
+	void map(address_map &map) ATTR_COLD;
+	void map_fifo_ram(address_map &map) ATTR_COLD;
 
 	auto out_int_callback() { return out_irq.bind(); }
 
@@ -115,8 +115,8 @@ protected:
 	void irq_check();
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// FIFO operations
 	uint32_t read_fifo_size(offs_t offset);

@@ -34,12 +34,12 @@ public:
 	void attn_w(uint16_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	void altos586_hdc_io(address_map &map);
-	void altos586_hdc_mem(address_map &map);
+	void altos586_hdc_io(address_map &map) ATTR_COLD;
+	void altos586_hdc_mem(address_map &map) ATTR_COLD;
 
 private:
 	// Disk controller registers on IOP's I/O bus.

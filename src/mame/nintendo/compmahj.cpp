@@ -54,8 +54,8 @@ public:
 private:
 	required_device<lh5801_cpu_device> m_maincpu;
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	u8 ita_r();
 };

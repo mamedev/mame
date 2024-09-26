@@ -83,8 +83,8 @@ public:
 	void init_phantom();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
@@ -111,7 +111,7 @@ protected:
 	u8 m_pieces_map[0x80][0x80] = { };
 
 	// address maps
-	virtual void main_map(address_map &map);
+	virtual void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_lcd(u8 select);
@@ -206,8 +206,8 @@ public:
 	void cphantom(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<dac_8bit_r2r_device> m_speech;

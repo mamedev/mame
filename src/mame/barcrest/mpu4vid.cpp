@@ -275,9 +275,9 @@ public:
 	void init_bwbhack();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<m68000_base_device> m_videocpu;
@@ -320,18 +320,18 @@ private:
 	uint8_t vram_r(offs_t offset);
 	void ic3ss_vid_w(offs_t offset, uint8_t data);
 
-	void bwbvidoki_68k_base_map(address_map &map);
-	void bwbvidoki_68k_map(address_map &map);
-	void bwbvidoki_68k_bt471_map(address_map &map);
-	void bwbvid_68k_map(address_map &map);
-	void mpu4_68k_map_base(address_map &map);
-	void mpu4_68k_map(address_map &map);
-	void mpu4_68k_map_strike(address_map &map);
-	void mpu4_vram(address_map &map);
-	void mpu4oki_68k_map(address_map &map);
+	void bwbvidoki_68k_base_map(address_map &map) ATTR_COLD;
+	void bwbvidoki_68k_map(address_map &map) ATTR_COLD;
+	void bwbvidoki_68k_bt471_map(address_map &map) ATTR_COLD;
+	void bwbvid_68k_map(address_map &map) ATTR_COLD;
+	void mpu4_68k_map_base(address_map &map) ATTR_COLD;
+	void mpu4_68k_map(address_map &map) ATTR_COLD;
+	void mpu4_68k_map_strike(address_map &map) ATTR_COLD;
+	void mpu4_vram(address_map &map) ATTR_COLD;
+	void mpu4oki_68k_map(address_map &map) ATTR_COLD;
 
-	void mpu4_6809_map(address_map &map);
-	void mpu4_6809_german_map(address_map &map);
+	void mpu4_6809_map(address_map &map) ATTR_COLD;
+	void mpu4_6809_german_map(address_map &map) ATTR_COLD;
 
 	uint8_t vidcharacteriser_4k_lookup_r(offs_t offset);
 

@@ -99,10 +99,10 @@ public:
 	void init_gunbustr();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(trigger_irq5);
 

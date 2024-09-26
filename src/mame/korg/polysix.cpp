@@ -25,7 +25,7 @@ protected:
 	{
 	}
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<mcs48_cpu_device> m_progmcu;
 	required_device<mcs48_cpu_device> m_keymcu;
@@ -46,7 +46,7 @@ private:
 	u8 ext_r(offs_t offset);
 	void ext_w(offs_t offset, u8 data);
 
-	void prog_ext_map(address_map &map);
+	void prog_ext_map(address_map &map) ATTR_COLD;
 };
 
 class poly61_state : public ps6_base_state
@@ -65,7 +65,7 @@ private:
 	u8 ext_r(offs_t offset);
 	void ext_w(offs_t offset, u8 data);
 
-	void prog_ext_map(address_map &map);
+	void prog_ext_map(address_map &map) ATTR_COLD;
 
 	required_device_array<i8255_device, 3> m_ppi;
 	required_device_array<pit8253_device, 4> m_pit;

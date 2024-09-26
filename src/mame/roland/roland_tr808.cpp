@@ -33,7 +33,7 @@ public:
 	void tr808(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<ucom4_cpu_device> m_maincpu;

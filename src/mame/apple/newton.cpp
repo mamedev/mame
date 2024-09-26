@@ -47,7 +47,7 @@ public:
 	void mp2100(machine_config &config);
 
 protected:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint32_t tick_count_r();
 

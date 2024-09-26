@@ -38,8 +38,8 @@ public:
 	void init_atomiswave();
 
 protected:
-	virtual void aw_map(address_map &map);
-	void aw_port(address_map &map);
+	virtual void aw_map(address_map &map) ATTR_COLD;
+	void aw_port(address_map &map) ATTR_COLD;
 
 private:
 	required_device<macronix_29l001mc_device> m_awflash;

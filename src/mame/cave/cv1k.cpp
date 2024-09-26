@@ -231,7 +231,7 @@ public:
 	void init_ddpdfk();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<sh34_base_device> m_maincpu;
@@ -258,9 +258,9 @@ private:
 	uint64_t speedup_r();
 	void install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_typed);
 
-	void cv1k_d_map(address_map &map);
-	void cv1k_map(address_map &map);
-	void cv1k_port(address_map &map);
+	void cv1k_d_map(address_map &map) ATTR_COLD;
+	void cv1k_map(address_map &map) ATTR_COLD;
+	void cv1k_port(address_map &map) ATTR_COLD;
 };
 
 

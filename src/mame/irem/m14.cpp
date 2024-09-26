@@ -99,15 +99,15 @@ private:
 
 	TILE_GET_INFO_MEMBER(m14_get_tile_info);
 	void draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void m14_palette(palette_device &palette) const;
 	uint32_t screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m14_irq);
 
-	void m14_io_map(address_map &map);
-	void m14_map(address_map &map);
+	void m14_io_map(address_map &map) ATTR_COLD;
+	void m14_map(address_map &map) ATTR_COLD;
 
 	/* video-related */
 	tilemap_t  *m_m14_tilemap = nullptr;

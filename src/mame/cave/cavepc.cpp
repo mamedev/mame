@@ -73,8 +73,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void cavepc_io(address_map &map);
-	void cavepc_map(address_map &map);
+	void cavepc_io(address_map &map) ATTR_COLD;
+	void cavepc_map(address_map &map) ATTR_COLD;
 };
 
 /*****************************************************************************/

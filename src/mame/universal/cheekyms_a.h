@@ -24,8 +24,8 @@ public:
 	void coin_extra_w(int state);   // 16
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_device<netlist_mame_logic_input_device>    m_mute;

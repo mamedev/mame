@@ -36,7 +36,7 @@ There's also model 082, it looks nearly identical to model 680, but hardware is
 unknown. Handheld Champion Backgammon (model 682) has a HD6301Y0F.
 
 TODO:
-- is Sensory Backgammon Computer model 082 on a different MCU?
+- is Sensory Backgammon Computer model 082 on a different MCU? maybe NEC uCOM-75?
 - if/when MAME supports an exit callback, hook up power-off switch to that
 
 *******************************************************************************/
@@ -66,6 +66,7 @@ class sbackgc_base_state : public driver_device
 public:
 	sbackgc_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
 		m_led_pwm(*this, "led_pwm"),
 		m_lcd_pwm(*this, "lcd_pwm"),
@@ -81,10 +82,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_off) { if (newval) m_power = false; }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { m_power = true; }
 
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
@@ -135,15 +137,12 @@ class sbackgc_state : public sbackgc_base_state
 {
 public:
 	sbackgc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		sbackgc_base_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		sbackgc_base_state(mconfig, type, tag)
 	{ }
 
 	void sbackgc(machine_config &config);
 
 private:
-	required_device<hmcs400_cpu_device> m_maincpu;
-
 	// I/O handlers
 	template <int N> void leds_w(u8 data);
 	u8 buttons_r();
@@ -159,15 +158,12 @@ class ecbackg_state : public sbackgc_base_state
 {
 public:
 	ecbackg_state(const machine_config &mconfig, device_type type, const char *tag) :
-		sbackgc_base_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		sbackgc_base_state(mconfig, type, tag)
 	{ }
 
 	void ecbackg(machine_config &config);
 
 private:
-	required_device<hd6301y0_cpu_device> m_maincpu;
-
 	// I/O handlers
 	u8 p2_r();
 	void p2_w(u8 data);
@@ -647,26 +643,26 @@ void sbackgc_base_state::shared(machine_config &config)
 
 void sbackgc_state::sbackgc(machine_config &config)
 {
-	shared(config);
-
 	// basic machine hardware
-	HD614085(config, m_maincpu, 5'000'000); // approximation, no XTAL
-	m_maincpu->nvram_enable_backup(true);
-	m_maincpu->stop_cb().set(m_maincpu, FUNC(hmcs400_cpu_device::nvram_set_battery));
-	m_maincpu->stop_cb().append([this](int state) { if (state) clear_display(); });
-	m_maincpu->write_r<0>().set(FUNC(sbackgc_state::lcd_com_w));
-	m_maincpu->write_r<1>().set(FUNC(sbackgc_state::leds_w<0>));
-	m_maincpu->write_r<2>().set(FUNC(sbackgc_state::leds_w<1>));
-	m_maincpu->write_r<3>().set(FUNC(sbackgc_state::lcd_segs_w<0>));
-	m_maincpu->write_r<4>().set(FUNC(sbackgc_state::lcd_segs_w<1>));
-	m_maincpu->write_r<5>().set(FUNC(sbackgc_state::lcd_segs_w<2>));
-	m_maincpu->write_r<6>().set(FUNC(sbackgc_state::lcd_segs_w<3>));
-	m_maincpu->write_r<7>().set(FUNC(sbackgc_state::lcd_segs_w<4>));
-	m_maincpu->write_r<8>().set(FUNC(sbackgc_state::lcd_segs_w<5>));
-	m_maincpu->read_r<9>().set(FUNC(sbackgc_state::input1_r));
-	m_maincpu->read_r<10>().set_ioport("IN.4").exor(1);
-	m_maincpu->write_d().set(FUNC(sbackgc_state::control_w));
-	m_maincpu->read_d().set(FUNC(sbackgc_state::input2_r));
+	hmcs400_cpu_device &maincpu(HD614085(config, m_maincpu, 5'000'000)); // approximation, no XTAL
+	maincpu.nvram_enable_backup(true);
+	maincpu.stop_cb().set(maincpu, FUNC(hmcs400_cpu_device::nvram_set_battery));
+	maincpu.stop_cb().append([this](int state) { if (state) clear_display(); });
+	maincpu.write_r<0x0>().set(FUNC(sbackgc_state::lcd_com_w));
+	maincpu.write_r<0x1>().set(FUNC(sbackgc_state::leds_w<0>));
+	maincpu.write_r<0x2>().set(FUNC(sbackgc_state::leds_w<1>));
+	maincpu.write_r<0x3>().set(FUNC(sbackgc_state::lcd_segs_w<0>));
+	maincpu.write_r<0x4>().set(FUNC(sbackgc_state::lcd_segs_w<1>));
+	maincpu.write_r<0x5>().set(FUNC(sbackgc_state::lcd_segs_w<2>));
+	maincpu.write_r<0x6>().set(FUNC(sbackgc_state::lcd_segs_w<3>));
+	maincpu.write_r<0x7>().set(FUNC(sbackgc_state::lcd_segs_w<4>));
+	maincpu.write_r<0x8>().set(FUNC(sbackgc_state::lcd_segs_w<5>));
+	maincpu.read_r<0x9>().set(FUNC(sbackgc_state::input1_r));
+	maincpu.read_r<0xa>().set_ioport("IN.4").exor(1);
+	maincpu.write_d().set(FUNC(sbackgc_state::control_w));
+	maincpu.read_d().set(FUNC(sbackgc_state::input2_r));
+
+	shared(config);
 
 	m_lcd_pwm->set_bri_levels(0.05);
 	config.set_default_layout(layout_saitek_sbackgc);
@@ -674,21 +670,21 @@ void sbackgc_state::sbackgc(machine_config &config)
 
 void ecbackg_state::ecbackg(machine_config &config)
 {
-	shared(config);
-
 	// basic machine hardware
-	HD6301Y0(config, m_maincpu, 4'000'000); // approximation, no XTAL
-	m_maincpu->nvram_enable_backup(true);
-	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6301y0_cpu_device::nvram_set_battery));
-	m_maincpu->standby_cb().append([this](int state) { if (state) clear_display(); });
-	m_maincpu->out_p1_cb().set(FUNC(ecbackg_state::lcd_segs_w<0>));
-	m_maincpu->in_p2_cb().set(FUNC(ecbackg_state::p2_r));
-	m_maincpu->out_p2_cb().set(FUNC(ecbackg_state::p2_w));
-	m_maincpu->out_p3_cb().set(FUNC(ecbackg_state::lcd_segs_w<1>));
-	m_maincpu->out_p4_cb().set(FUNC(ecbackg_state::lcd_segs_w<2>));
-	m_maincpu->in_p5_cb().set(FUNC(ecbackg_state::p5_r));
-	m_maincpu->out_p6_cb().set(FUNC(ecbackg_state::p6_w));
-	m_maincpu->out_p7_cb().set(FUNC(ecbackg_state::lcd_com_w));
+	hd6301y0_cpu_device &maincpu(HD6301Y0(config, m_maincpu, 4'000'000)); // approximation, no XTAL
+	maincpu.nvram_enable_backup(true);
+	maincpu.standby_cb().set(maincpu, FUNC(hd6301y0_cpu_device::nvram_set_battery));
+	maincpu.standby_cb().append([this](int state) { if (state) clear_display(); });
+	maincpu.out_p1_cb().set(FUNC(ecbackg_state::lcd_segs_w<0>));
+	maincpu.in_p2_cb().set(FUNC(ecbackg_state::p2_r));
+	maincpu.out_p2_cb().set(FUNC(ecbackg_state::p2_w));
+	maincpu.out_p3_cb().set(FUNC(ecbackg_state::lcd_segs_w<1>));
+	maincpu.out_p4_cb().set(FUNC(ecbackg_state::lcd_segs_w<2>));
+	maincpu.in_p5_cb().set(FUNC(ecbackg_state::p5_r));
+	maincpu.out_p6_cb().set(FUNC(ecbackg_state::p6_w));
+	maincpu.out_p7_cb().set(FUNC(ecbackg_state::lcd_com_w));
+
+	shared(config);
 
 	config.set_default_layout(layout_saitek_ecbackg);
 }

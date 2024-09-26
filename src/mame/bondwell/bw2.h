@@ -61,7 +61,7 @@ public:
 	required_memory_region m_rom;
 	required_ioport_array<10> m_y;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -93,9 +93,9 @@ public:
 	void write_centronics_busy(int state);
 	int m_centronics_busy;
 	void bw2(machine_config &config);
-	void bw2_io(address_map &map);
-	void bw2_mem(address_map &map);
-	void lcdc_map(address_map &map);
+	void bw2_io(address_map &map) ATTR_COLD;
+	void bw2_mem(address_map &map) ATTR_COLD;
+	void lcdc_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_BONDWELL_BW2_H

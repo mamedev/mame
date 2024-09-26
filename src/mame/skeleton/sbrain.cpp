@@ -85,8 +85,8 @@ public:
 	void sagafox(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 mem_r(offs_t offset);
@@ -115,10 +115,10 @@ private:
 	void external_rxc_w(int state);
 	void internal_txc_rxc_w(int state);
 
-	void main_io_map(address_map &map);
-	void main_mem_map(address_map &map);
-	void sub_io_map(address_map &map);
-	void sub_mem_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_mem_map(address_map &map) ATTR_COLD;
+	void sub_io_map(address_map &map) ATTR_COLD;
+	void sub_mem_map(address_map &map) ATTR_COLD;
 
 	bool m_busak = false;
 	u8 m_keydown = 0U;

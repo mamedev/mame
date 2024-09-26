@@ -387,8 +387,8 @@ public:
 	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_prev) { if (newval) switch_change(Sel, param, false); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<tms1k_base_device> m_maincpu;
@@ -987,7 +987,7 @@ public:
 	void bcheetah(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	output_finder<> m_motor1;
@@ -1870,7 +1870,7 @@ public:
 	void cchime(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<filter_volume_device> m_volume;
@@ -2608,7 +2608,7 @@ public:
 	void h2hhockey(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<timer_device> m_cap_discharge;
@@ -3081,7 +3081,7 @@ public:
 	void quizwizc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u16 m_pinout = 0x07; // cartridge R pins
@@ -3272,7 +3272,7 @@ public:
 	void tc4(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 m_pinout = 0xf; // cartridge K pins
@@ -3453,7 +3453,7 @@ public:
 	void litelrn(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<filter_volume_device> m_volume;
@@ -5947,7 +5947,7 @@ public:
 	void mmarvin(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<filter_volume_device> m_volume;
@@ -7406,7 +7406,7 @@ public:
 	void skywriter(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	std::unique_ptr<u16[]> m_pixbuf;
@@ -9748,7 +9748,7 @@ public:
 	void bigtrak(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	output_finder<> m_left_motor_forward;
@@ -9973,7 +9973,7 @@ public:
 	void mbdtower(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	output_finder<> m_motor_pos_out;
@@ -12392,7 +12392,7 @@ public:
 	ioport_value pulse_r() { return (m_pulse > machine().time()) ? 1 : 0; }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	memory_share_creator<u8> m_nvram;
@@ -15332,7 +15332,7 @@ public:
 	void playmaker(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 m_notch = 0; // cartridge K1/K2
@@ -16358,7 +16358,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<tms1025_device> m_expander;
@@ -17258,7 +17258,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(k4_button) { update_halt(); }
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void update_halt();

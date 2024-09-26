@@ -41,8 +41,8 @@ public:
 	void init_namco86();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void bankswitch1_w(uint8_t data);
@@ -79,18 +79,18 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void scroll_w(offs_t offset, int data, int layer);
 
-	void common_mcu_map(address_map &map);
-	void cpu1_map(address_map &map);
-	void genpeitd_cpu2_map(address_map &map);
-	void genpeitd_mcu_map(address_map &map);
-	void hopmappy_cpu2_map(address_map &map);
-	void hopmappy_mcu_map(address_map &map);
-	void roishtar_cpu2_map(address_map &map);
-	void roishtar_mcu_map(address_map &map);
-	void rthunder_cpu2_map(address_map &map);
-	void rthunder_mcu_map(address_map &map);
-	void wndrmomo_cpu2_map(address_map &map);
-	void wndrmomo_mcu_map(address_map &map);
+	void common_mcu_map(address_map &map) ATTR_COLD;
+	void cpu1_map(address_map &map) ATTR_COLD;
+	void genpeitd_cpu2_map(address_map &map) ATTR_COLD;
+	void genpeitd_mcu_map(address_map &map) ATTR_COLD;
+	void hopmappy_cpu2_map(address_map &map) ATTR_COLD;
+	void hopmappy_mcu_map(address_map &map) ATTR_COLD;
+	void roishtar_cpu2_map(address_map &map) ATTR_COLD;
+	void roishtar_mcu_map(address_map &map) ATTR_COLD;
+	void rthunder_cpu2_map(address_map &map) ATTR_COLD;
+	void rthunder_mcu_map(address_map &map) ATTR_COLD;
+	void wndrmomo_cpu2_map(address_map &map) ATTR_COLD;
+	void wndrmomo_mcu_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_cpu1;
 	required_device<cpu_device> m_cpu2;

@@ -47,11 +47,11 @@ private:
 	INTERRUPT_GEN_MEMBER(homez80_interrupt);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	bool m_irq = 0;
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_p_chargen;

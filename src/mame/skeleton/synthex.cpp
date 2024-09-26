@@ -33,7 +33,7 @@ public:
 	void synthex(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 ram2_r(offs_t offset);
@@ -55,7 +55,7 @@ private:
 
 	virtual void driver_start() override;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_midiacia;

@@ -239,8 +239,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	required_address_space m_memory_space;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_memory;
@@ -492,8 +492,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual TIMER_CALLBACK_MEMBER(interrupt_check) override;
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) override;

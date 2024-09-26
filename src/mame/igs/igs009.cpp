@@ -68,9 +68,9 @@ public:
 	int hopper_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	template<uint8_t Reel> void reel_ram_w(offs_t offset, uint8_t data);
@@ -95,9 +95,9 @@ private:
 	DECLARE_VIDEO_START(gp98);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gp98_portmap(address_map &map);
-	void jingbell_map(address_map &map);
-	void jingbell_portmap(address_map &map);
+	void gp98_portmap(address_map &map) ATTR_COLD;
+	void jingbell_map(address_map &map) ATTR_COLD;
+	void jingbell_portmap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

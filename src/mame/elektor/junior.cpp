@@ -68,9 +68,9 @@ private:
 	u8 m_digit = 0U;
 	u8 m_seg = 0U;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<mos6532_device> m_riot;
 	required_device<cpu_device> m_maincpu;

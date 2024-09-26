@@ -107,12 +107,12 @@ private:
 
 	static void floppies(device_slot_interface &device);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void mpc3000_map(address_map &map);
-	void mpc3000_io_map(address_map &map);
-	void mpc3000_sub_map(address_map &map);
+	void mpc3000_map(address_map &map) ATTR_COLD;
+	void mpc3000_io_map(address_map &map) ATTR_COLD;
+	void mpc3000_sub_map(address_map &map) ATTR_COLD;
 
 	uint16_t dsp_0008_hack_r();
 	void dsp_0008_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

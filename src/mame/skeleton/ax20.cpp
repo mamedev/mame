@@ -46,15 +46,15 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<i8272a_device> m_fdc;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t unk_r();
 	void tc_w(uint8_t data);
 	void ctl_w(uint8_t data);
 
-	void ax20_io(address_map &map);
-	void ax20_map(address_map &map);
+	void ax20_io(address_map &map) ATTR_COLD;
+	void ax20_map(address_map &map) ATTR_COLD;
 };
 
 uint8_t ax20_state::unk_r()

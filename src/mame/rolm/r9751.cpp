@@ -122,7 +122,7 @@ private:
 	uint8_t smioc_dma_r(offs_t offset);
 	void smioc_dma_w(offs_t offset, uint8_t data);
 
-	void r9751_mem(address_map &map);
+	void r9751_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pdc_device> m_pdc;
@@ -151,7 +151,7 @@ private:
 	uint32_t debug_a5_20();
 	[[maybe_unused]] void UnifiedTrace(u32 address, u32 data, const char* operation="Read", const char* Device="SMIOC", const char* RegisterName=nullptr, const char* extraText=nullptr);
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	void trace_device(int address, int data, const char* direction);
 
 	void system_trace_init();

@@ -77,8 +77,8 @@ public:
 	void jps(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 porta_r();
@@ -94,8 +94,8 @@ private:
 	void vck_w(int state);
 	IRQ_CALLBACK_MEMBER(sound_int_cb);
 
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
 
 	void update_display();
 

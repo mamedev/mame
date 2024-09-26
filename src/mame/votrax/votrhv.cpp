@@ -99,8 +99,8 @@ public:
 	void pho_done(int state);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<input_merger_device> m_reset;
 
@@ -113,7 +113,7 @@ protected:
 	bool m_scanflag;
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<votrax_sc01_device> m_votrax;
@@ -141,8 +141,8 @@ public:
 	{ }
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void key_check() override;
 	virtual uint8_t input_r() override;

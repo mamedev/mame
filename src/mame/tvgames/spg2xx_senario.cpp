@@ -30,8 +30,8 @@ public:
 	{ }
 
 protected:
-	//virtual void machine_start() override;
-	//virtual void machine_reset() override;
+	//virtual void machine_start() override ATTR_COLD;
+	//virtual void machine_reset() override ATTR_COLD;
 
 private:
 };
@@ -44,11 +44,11 @@ public:
 	{ }
 
 	void senbbs(machine_config& config);
-	void mem_map_flash(address_map &map);
+	void mem_map_flash(address_map &map) ATTR_COLD;
 
 protected:
-	//virtual void machine_start() override;
-	//virtual void machine_reset() override;
+	//virtual void machine_start() override ATTR_COLD;
+	//virtual void machine_reset() override ATTR_COLD;
 
 private:
 };
@@ -62,11 +62,11 @@ public:
 	{ }
 
 	void sencosmo(machine_config& config);
-	void mem_map_flash_bypass(address_map& map);
+	void mem_map_flash_bypass(address_map &map) ATTR_COLD;
 
 protected:
-	//virtual void machine_start() override;
-	//virtual void machine_reset() override;
+	//virtual void machine_start() override ATTR_COLD;
+	//virtual void machine_reset() override ATTR_COLD;
 
 	uint16_t read_bypass(offs_t offset) { return m_romregion[offset]; }
 	void write_bypass(offs_t offset, uint16_t data) { logerror("Write to ROM area %08x %04x\n", offset, data); }
@@ -87,8 +87,8 @@ public:
 	void senmil(machine_config& config);
 
 protected:
-	//virtual void machine_start() override;
-	//virtual void machine_reset() override;
+	//virtual void machine_start() override ATTR_COLD;
+	//virtual void machine_reset() override ATTR_COLD;
 
 	uint16_t portc_r();
 

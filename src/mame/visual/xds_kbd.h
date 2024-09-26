@@ -38,8 +38,8 @@ public:
 protected:
 	// device_t overrides
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_buffered_serial_interface overrides
 	virtual void tra_callback() override;

@@ -645,20 +645,20 @@ public:
 	void init_racjamdx();
 	void init_bujutsu();
 	void init_cobra();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cobra_vblank);
 	void cobra_video_exit();
 	int decode_debug_state_value(int v);
 	void cobra(machine_config &config);
 	void bujutsu(machine_config &config);
-	void cobra_gfx_map(address_map &map);
-	void cobra_main_map(address_map &map);
-	void cobra_sub_map(address_map &map);
+	void cobra_gfx_map(address_map &map) ATTR_COLD;
+	void cobra_main_map(address_map &map) ATTR_COLD;
+	void cobra_sub_map(address_map &map) ATTR_COLD;
 
-	void rf5c400_map(address_map& map);
+	void rf5c400_map(address_map &map) ATTR_COLD;
 
 	uint32_t mpc106_pci_r(int function, int reg, uint32_t mem_mask);
 	void mpc106_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);

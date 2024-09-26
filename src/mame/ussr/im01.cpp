@@ -117,7 +117,7 @@ public:
 	void im05(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -129,9 +129,9 @@ private:
 	u16 m_inp_mux = 0;
 	u16 m_digit_data = 0;
 
-	void im01_map(address_map &map);
-	void im01t_map(address_map &map);
-	void im05_map(address_map &map);
+	void im01_map(address_map &map) ATTR_COLD;
+	void im01t_map(address_map &map) ATTR_COLD;
+	void im05_map(address_map &map) ATTR_COLD;
 
 	u8 irq_callback(offs_t offset);
 	INTERRUPT_GEN_MEMBER(interrupt);

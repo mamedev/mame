@@ -55,8 +55,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(data_sw_changed);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void update_serial_settings();
@@ -71,8 +71,8 @@ private:
 	int xrdy_eoc_r();
 	u8 chargen_r(offs_t offset);
 
-	void rom_1k(address_map &map);
-	void ram_2k(address_map &map);
+	void rom_1k(address_map &map) ATTR_COLD;
+	void ram_2k(address_map &map) ATTR_COLD;
 
 	required_device<vt5x_cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;

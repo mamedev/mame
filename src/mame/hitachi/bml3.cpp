@@ -25,7 +25,6 @@ TODO:
 
 #include "bml3.h"
 
-
 MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();

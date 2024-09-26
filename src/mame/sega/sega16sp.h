@@ -64,7 +64,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// internal state
 	bool m_flip;                 // screen flip?

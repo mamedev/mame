@@ -87,8 +87,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
@@ -107,7 +107,7 @@ protected:
 	u8 m_lcd_data = 0;
 
 	// address maps
-	void sexpert_map(address_map &map);
+	void sexpert_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	virtual void lcd_control_w(u8 data);
@@ -160,13 +160,13 @@ public:
 	void sforteb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	emu_timer *m_beeptimer = nullptr;
 
 	// address maps
-	void sforte_map(address_map &map);
+	void sforte_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	virtual void lcd_control_w(u8 data) override;

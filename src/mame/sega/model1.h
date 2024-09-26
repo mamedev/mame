@@ -96,8 +96,8 @@ public:
 
 private:
 	// Machine
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
@@ -143,7 +143,7 @@ private:
 	void r360_w(uint8_t data);
 
 	// Rendering
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	u16 model1_listctl_r(offs_t offset);
 	void model1_listctl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
@@ -193,17 +193,17 @@ private:
 		lightparam_t lightparams[32];
 	};
 
-	void model1_io(address_map &map);
-	void model1_mem(address_map &map);
-	void model1_comm_mem(address_map &map);
+	void model1_io(address_map &map) ATTR_COLD;
+	void model1_mem(address_map &map) ATTR_COLD;
+	void model1_comm_mem(address_map &map) ATTR_COLD;
 
-	void copro_prog_map(address_map &map);
-	void copro_data_map(address_map &map);
-	void copro_external_map(address_map &map);
-	void copro_io_map(address_map &map);
-	void copro_rf_map(address_map &map);
+	void copro_prog_map(address_map &map) ATTR_COLD;
+	void copro_data_map(address_map &map) ATTR_COLD;
+	void copro_external_map(address_map &map) ATTR_COLD;
+	void copro_io_map(address_map &map) ATTR_COLD;
+	void copro_rf_map(address_map &map) ATTR_COLD;
 
-	void polhemus_map(address_map &map);
+	void polhemus_map(address_map &map) ATTR_COLD;
 
 	// Machine
 	void irq_raise(int level);

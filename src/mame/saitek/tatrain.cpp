@@ -80,7 +80,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(tatraina_change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers

@@ -120,8 +120,8 @@ public:
 	void clk_write(int state);  // CLK signal (active high)
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_region_ptr<u16> m_region_key;
@@ -212,8 +212,8 @@ public:
 	void init_showhand();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -257,11 +257,11 @@ private:
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void luckycoin_map(address_map &map);
-	void showhanc_map(address_map &map);
-	void showhand_map(address_map &map);
-	void skilldrp_map(address_map &map);
-	void speeddrp_map(address_map &map);
+	void luckycoin_map(address_map &map) ATTR_COLD;
+	void showhanc_map(address_map &map) ATTR_COLD;
+	void showhand_map(address_map &map) ATTR_COLD;
+	void skilldrp_map(address_map &map) ATTR_COLD;
+	void speeddrp_map(address_map &map) ATTR_COLD;
 };
 
 // Simpler encryption. No IRQs.
@@ -281,10 +281,10 @@ public:
 private:
 	u16 video_flags_r();
 
-	void magibomb_base_map(address_map &map, u32 base_offs);
-	void magibomb_map(address_map &map);
-	void magibombb_map(address_map &map);
-	void magibombf_map(address_map &map);
+	void magibomb_base_map(address_map &map, u32 base_offs) ATTR_COLD;
+	void magibomb_map(address_map &map) ATTR_COLD;
+	void magibombb_map(address_map &map) ATTR_COLD;
+	void magibombf_map(address_map &map) ATTR_COLD;
 };
 
 // Heavier encryption. CPU Code protection.
@@ -329,7 +329,7 @@ public:
 	virtual void eeprom_w(u8 data) override;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	struct decryption_info {
 		struct {
@@ -354,17 +354,17 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_1_2_scanline_cb);
 
-	void dinodino_map(address_map &map);
-	void gostop_map(address_map &map);
-	void hacher_map(address_map &map);
-	void hapfarm_map(address_map &map);
-	void magibombd_map(address_map &map);
-	void magibombg_map(address_map &map);
-	void monkeyl_map(address_map &map);
-	void speedmst_map(address_map &map);
-	void winbingo_map(address_map &map);
-	void wwitch_map(address_map &map);
-	void zoo_map(address_map &map);
+	void dinodino_map(address_map &map) ATTR_COLD;
+	void gostop_map(address_map &map) ATTR_COLD;
+	void hacher_map(address_map &map) ATTR_COLD;
+	void hapfarm_map(address_map &map) ATTR_COLD;
+	void magibombd_map(address_map &map) ATTR_COLD;
+	void magibombg_map(address_map &map) ATTR_COLD;
+	void monkeyl_map(address_map &map) ATTR_COLD;
+	void speedmst_map(address_map &map) ATTR_COLD;
+	void winbingo_map(address_map &map) ATTR_COLD;
+	void wwitch_map(address_map &map) ATTR_COLD;
+	void zoo_map(address_map &map) ATTR_COLD;
 
 	static const decryption_info gostop_table;
 	static const decryption_info v102_px005_table;
@@ -391,8 +391,8 @@ public:
 private:
 	required_device<ramdac_device> m_ramdac;
 
-	void astoneag_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void astoneag_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 	static const decryption_info v102_px012_table;
 	void interleave_sprites_16x32();

@@ -28,8 +28,8 @@ public:
 	void cbnt2039(machine_config &config);
 
 private:
-	void bcp_prog_map(address_map &map);
-	void bcp_data_map(address_map &map);
+	void bcp_prog_map(address_map &map) ATTR_COLD;
+	void bcp_data_map(address_map &map) ATTR_COLD;
 
 	required_device<dp8344_device> m_bcp;
 };

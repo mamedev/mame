@@ -810,15 +810,15 @@ private:
 	void spi_int_ack_w(uint8_t data);
 	uint8_t spi_data_r();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	TIMER_CALLBACK_MEMBER(mk5_2KHz_callback);
 	TIMER_CALLBACK_MEMBER(spi_timer);
 
-	void aristmk5_arm_map(address_map &map);
-	void aristmk5_drame_map(address_map &map);
-	void aristmk5_map(address_map &map);
-	void aristmk5_usa_map(address_map &map);
+	void aristmk5_arm_map(address_map &map) ATTR_COLD;
+	void aristmk5_drame_map(address_map &map) ATTR_COLD;
+	void aristmk5_map(address_map &map) ATTR_COLD;
+	void aristmk5_usa_map(address_map &map) ATTR_COLD;
 
 	required_device<arm_cpu_device> m_maincpu;
 	required_device<acorn_ioc_device> m_ioc;

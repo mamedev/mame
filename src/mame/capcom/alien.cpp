@@ -144,8 +144,8 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void alien_map(address_map &map);
-	void masmario2_map(address_map &map);
+	void alien_map(address_map &map) ATTR_COLD;
+	void masmario2_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<sh4_device> m_maincpu;
@@ -159,8 +159,8 @@ private:
 	required_ioport m_io_in0;
 	required_ioport m_io_in1;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	template <unsigned N> void gpu_irq_w(int state);
 	INTERRUPT_GEN_MEMBER(sio_irq_w);

@@ -62,7 +62,7 @@ public:
 	void scorpio68(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -81,8 +81,8 @@ private:
 	u8 m_lcd_data = 0;
 
 	// address maps
-	void diablo68_map(address_map &map);
-	void scorpio68_map(address_map &map);
+	void diablo68_map(address_map &map) ATTR_COLD;
+	void scorpio68_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void control_w(u8 data);

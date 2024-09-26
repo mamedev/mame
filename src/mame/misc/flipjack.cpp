@@ -115,7 +115,7 @@ public:
 	void coin_nmi_w(int state);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -142,10 +142,10 @@ private:
 	void flipjack_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW(update_row);
 
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

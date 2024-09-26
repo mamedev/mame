@@ -207,7 +207,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -435,12 +435,12 @@ private:
 	int m_seq_bank = 0;
 	uint8_t m_seqram[0x10000]{};
 	uint8_t m_dosram[0x2000]{};
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void send_through_panel(uint8_t data);
-	void esq1_map(address_map &map);
-	void sq80_map(address_map &map);
-	void sq80_es5503_map(address_map &map);
+	void esq1_map(address_map &map) ATTR_COLD;
+	void sq80_map(address_map &map) ATTR_COLD;
+	void sq80_es5503_map(address_map &map) ATTR_COLD;
 
 	bool kpc_calibrated = false;  // sq80 requires keyboard calibration acknowledgement
 	int m_adc_target = 0;     // adc poll target (index into the table below)

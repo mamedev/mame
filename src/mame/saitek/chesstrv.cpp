@@ -78,7 +78,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(battery) { update_display(); }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -93,8 +93,8 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_7seg_data = 0;
 
-	void chesstrv_mem(address_map &map);
-	void chesstrv_io(address_map &map);
+	void chesstrv_mem(address_map &map) ATTR_COLD;
+	void chesstrv_io(address_map &map) ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(computing) { m_computing = 1; }
 

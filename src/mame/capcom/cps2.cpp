@@ -718,13 +718,13 @@ private:
 	uint32_t screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_MACHINE_START(cps2);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	void cps2_map(address_map &map);
-	void cps2_comm_map(address_map &map);
-	void dead_cps2_map(address_map &map);
-	void dead_cps2_comm_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
+	void cps2_map(address_map &map) ATTR_COLD;
+	void cps2_comm_map(address_map &map) ATTR_COLD;
+	void dead_cps2_map(address_map &map) ATTR_COLD;
+	void dead_cps2_comm_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
 	void init_cps2_video();
 	void init_cps2crypt();

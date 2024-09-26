@@ -64,11 +64,11 @@ private:
 	void bank2_w(uint8_t data);
 	uint8_t audio_r(offs_t offset);
 	void dma8237_1_dack_w(uint8_t data);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
 	static void pcat_dyn_sb_conf(device_t *device);
-	void pcat_io(address_map &map);
-	void pcat_map(address_map &map);
+	void pcat_io(address_map &map) ATTR_COLD;
+	void pcat_map(address_map &map) ATTR_COLD;
 };
 
 void pcat_dyn_state::machine_start()

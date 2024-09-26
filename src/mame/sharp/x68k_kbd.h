@@ -16,8 +16,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void key_make(uint8_t row, uint8_t column) override;
 	virtual void key_repeat(uint8_t row, uint8_t column) override;
 	virtual void key_break(uint8_t row, uint8_t column) override;

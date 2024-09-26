@@ -39,7 +39,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	uint32_t screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mpu4plasma_map(address_map &map);
+	void mpu4plasma_map(address_map &map) ATTR_COLD;
 };
 
 #include "mpu4plasma.lh"

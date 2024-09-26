@@ -38,7 +38,7 @@ public:
 	void korg707(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -52,7 +52,7 @@ private:
 	void line_mute_w(u8 data);
 	void led_data_w(offs_t offset, u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void palette_init_ds8(palette_device &palette);
 

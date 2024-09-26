@@ -30,19 +30,19 @@
 #define IGS27_CRYPT1_ALT \
 	if ((i & 0x040080) != 0x000080) x ^= 0x0001;
 #define IGS27_CRYPT1_ALT2 \
-	if ((i & 0x0480) != 0x0080) x ^= 0x0001;
+	if ((i & 0x000480) != 0x000080) x ^= 0x0001;
 #define IGS27_CRYPT2 \
 	if ((i & 0x104008) == 0x104008) x ^= 0x0002;
 #define IGS27_CRYPT2_ALT \
 	if ((i & 0x004008) == 0x004008) x ^= 0x0002;
 #define IGS27_CRYPT2_ALT2 \
-	if((i & 0x004008) == 0x004008 && (i & 0x180000) != 0x000000) x ^= 0x0002;
+	if ((i & 0x004008) == 0x004008 && (i & 0x180000) != 0x000000) x ^= 0x0002;
 #define IGS27_CRYPT2_ALT3 \
-	if((i & 0x84008) == 0x84008) x ^= 0x0002;
+	if ((i & 0x084008) == 0x084008) x ^= 0x0002;
 #define IGS27_CRYPT3 \
 	if ((i & 0x080030) == 0x080010) x ^= 0x0004;
 #define IGS27_CRYPT3_ALT \
-	if((i & 0x000030) == 0x000010 && (i & 0x180000) != 0x080000) x ^= 0x0004;
+	if ((i & 0x000030) == 0x000010 && (i & 0x180000) != 0x080000) x ^= 0x0004;
 #define IGS27_CRYPT3_ALT2 \
 	if ((i & 0x000030) == 0x000010) x ^= 0x0004;
 // ket - due to address starting at 0 and not 100000/2!
@@ -55,7 +55,7 @@
 #define IGS27_CRYPT5 \
 	if ((i & 0x008100) == 0x008000) x ^= 0x0010;
 #define IGS27_CRYPT5_ALT \
-	if ((i & 0x48100) == 0x48000) x ^= 0x0010;
+	if ((i & 0x048100) == 0x048000) x ^= 0x0010;
 #define IGS27_CRYPT6 \
 	if ((i & 0x002004) != 0x000004) x ^= 0x0020;
 #define IGS27_CRYPT6_ALT \
@@ -63,7 +63,7 @@
 #define IGS27_CRYPT7 \
 	if ((i & 0x011800) != 0x010000) x ^= 0x0040;
 #define IGS27_CRYPT7_ALT \
-	if ((i & 0x01800) != 0x00000) x ^= 0x0040;
+	if ((i & 0x001800) != 0x000000) x ^= 0x0040;
 #define IGS27_CRYPT8 \
 	if ((i & 0x004820) == 0x004820) x ^= 0x0080;
 #define IGS27_CRYPT8_ALT \

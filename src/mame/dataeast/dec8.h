@@ -39,8 +39,8 @@ protected:
 		m_bg_ram(*this, "bg_ram")
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(audiocpu_nmi_clear);
 
@@ -60,8 +60,8 @@ protected:
 	void set_screen_raw_params_data_east(machine_config &config);
 
 	void allocate_buffered_spriteram16();
-	void dec8_s_map(address_map &map);
-	void oscar_s_map(address_map &map);
+	void dec8_s_map(address_map &map) ATTR_COLD;
+	void oscar_s_map(address_map &map) ATTR_COLD;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -106,8 +106,8 @@ protected:
 	{
 	}
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(mcu_irq_clear);
 
@@ -149,7 +149,7 @@ public:
 	void srdarwin(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void mcu_to_main_w(u8 data);
@@ -162,7 +162,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 // with 'karnov' sprite hardware
@@ -185,8 +185,8 @@ public:
 	void init_meikyuhbl();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void ghostb_bank_w(u8 data);
 	void gondo_scroll_w(offs_t offset, u8 data);
@@ -226,13 +226,13 @@ private:
 
 	void shackled_coin_irq(int state);
 
-	void lastmisn_map(address_map &map);
-	void lastmisn_sub_map(address_map &map);
-	void garyoret_map(address_map &map);
-	void meikyuh_map(address_map &map);
-	void shackled_map(address_map &map);
-	void shackled_sub_map(address_map &map);
-	void ym3526_s_map(address_map &map);
+	void lastmisn_map(address_map &map) ATTR_COLD;
+	void lastmisn_sub_map(address_map &map) ATTR_COLD;
+	void garyoret_map(address_map &map) ATTR_COLD;
+	void meikyuh_map(address_map &map) ATTR_COLD;
+	void shackled_map(address_map &map) ATTR_COLD;
+	void shackled_sub_map(address_map &map) ATTR_COLD;
+	void ym3526_s_map(address_map &map) ATTR_COLD;
 
 	bool     m_secclr = false;
 	bool     m_nmi_enable = false;
@@ -252,7 +252,7 @@ public:
 	void gondo(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	template<unsigned Which> u8 player_io_r(offs_t offset);
@@ -261,7 +261,7 @@ private:
 
 	void gondo_colpri_cb(u32 &colour, u32 &pri_mask);
 
-	void gondo_map(address_map &map);
+	void gondo_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<2> m_analog_io;
 	required_ioport_array<4> m_in_io;
@@ -298,10 +298,10 @@ private:
 	void cobracom_colpri_cb(u32 &colour, u32 &pri_mask);
 	void oscar_tile_cb(tile_data &tileinfo, u32 &tile, u32 &colour, u32 &flags);
 
-	void cobra_map(address_map &map);
-	void oscar_map(address_map &map);
-	void oscarbl_s_opcodes_map(address_map &map);
-	void oscar_sub_map(address_map &map);
+	void cobra_map(address_map &map) ATTR_COLD;
+	void oscar_map(address_map &map) ATTR_COLD;
+	void oscarbl_s_opcodes_map(address_map &map) ATTR_COLD;
+	void oscar_sub_map(address_map &map) ATTR_COLD;
 
 	required_device<deco_mxc06_device> m_spritegen_mxc;
 };
@@ -320,8 +320,8 @@ public:
 	void csilver(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void scroll_w(offs_t offset, u8 data);
@@ -332,9 +332,9 @@ private:
 	u8 adpcm_reset_r();
 	void adpcm_int(int state);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	required_device<msm5205_device> m_msm;
 	required_memory_bank m_soundbank;

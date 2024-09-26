@@ -67,8 +67,8 @@ public:
 	void tv910(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
@@ -88,7 +88,7 @@ private:
 	void ay3600_data_ready_w(int state);
 	void ay3600_ako_w(int state);
 
-	void tv910_mem(address_map &map);
+	void tv910_mem(address_map &map) ATTR_COLD;
 
 	required_device<m6502_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;

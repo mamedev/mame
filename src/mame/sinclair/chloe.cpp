@@ -66,12 +66,12 @@ protected:
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	void map_regs(address_map &map);
-	void map_fetch(address_map &map);
-	void map_mem(address_map &map);
-	void map_io(address_map &map);
+	void map_regs(address_map &map) ATTR_COLD;
+	void map_fetch(address_map &map) ATTR_COLD;
+	void map_mem(address_map &map) ATTR_COLD;
+	void map_io(address_map &map) ATTR_COLD;
 
 	u8 kbd_fe_r(offs_t offset);
 	u8 divmmc_neutral_r(offs_t offset);

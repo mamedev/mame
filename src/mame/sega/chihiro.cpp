@@ -527,7 +527,7 @@ public:
 	void set_region(const char *_region_tag, int _region_offset);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 private:
 	void process_jvs_packet();
 
@@ -585,7 +585,7 @@ public:
 	void set_region(const char *_region_tag, int _region_offset);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 private:
 	void process_packet();
 
@@ -641,7 +641,7 @@ private:
 	uint32_t mediaboard_r(offs_t offset, uint32_t mem_mask = ~0);
 	void mediaboard_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void baseboard_ide_event(int type, uint8_t *read, uint8_t *write);
 	uint8_t *baseboard_ide_dimmboard(uint32_t lba);
 	void dword_write_le(uint8_t *addr, uint32_t d);
@@ -660,8 +660,8 @@ private:
 
 	static void an2131qc_configuration(device_t *device);
 	static void an2131sc_configuration(device_t *device);
-	void chihiro_map(address_map &map);
-	void chihiro_map_io(address_map &map);
+	void chihiro_map(address_map &map) ATTR_COLD;
+	void chihiro_map_io(address_map &map) ATTR_COLD;
 
 	void jamtable_disasm(address_space &space, uint32_t address, uint32_t size);
 	void jamtable_disasm_command(const std::vector<std::string_view> &params);
@@ -1532,8 +1532,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	uint8_t read_buffer[0x20]{};
 	uint8_t write_buffer[0x20]{};
@@ -1866,10 +1866,10 @@ class sega_network_board : public device_t
 public:
 	sega_network_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(SEGA_NETWORK_BOARD, sega_network_board, "seganetw", "Sega Network Board")

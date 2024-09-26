@@ -27,8 +27,8 @@ protected:
 		, m_dsp_rom(*this, "dspdata")
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	static constexpr unsigned NVRAM_UNLOCK_SEQ_LEN = 10;
 
@@ -86,7 +86,7 @@ public:
 	void amerdart(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<palette_device> m_palette;
@@ -106,9 +106,9 @@ private:
 
 	int amerdart_trackball_direction(int num, int data);
 
-	void dsp_io_map(address_map &map);
-	void dsp_pgm_map(address_map &map);
-	void main_map(address_map &map);
+	void dsp_io_map(address_map &map) ATTR_COLD;
+	void dsp_pgm_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class _9ballsht_state : public coolpool_base_state
@@ -132,12 +132,12 @@ protected:
 
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
 
-	void dsp_io_base_map(address_map &map);
-	void dsp_pgm_map(address_map &map);
+	void dsp_io_base_map(address_map &map) ATTR_COLD;
+	void dsp_pgm_map(address_map &map) ATTR_COLD;
 
 private:
-	void nballsht_dsp_io_map(address_map &map);
-	void nballsht_map(address_map &map);
+	void nballsht_dsp_io_map(address_map &map) ATTR_COLD;
+	void nballsht_map(address_map &map) ATTR_COLD;
 };
 
 class coolpool_state : public _9ballsht_state
@@ -159,8 +159,8 @@ private:
 
 	uint16_t coolpool_input_r(offs_t offset);
 
-	void coolpool_dsp_io_map(address_map &map);
-	void coolpool_map(address_map &map);
+	void coolpool_dsp_io_map(address_map &map) ATTR_COLD;
+	void coolpool_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_MISC_COOLPOOL_H

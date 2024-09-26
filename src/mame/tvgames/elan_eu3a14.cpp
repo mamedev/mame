@@ -126,14 +126,14 @@ private:
 	// for callback
 	uint8_t read_full_space(offs_t offset);
 
-	void bank_map(address_map &map);
-	void radica_eu3a14_map(address_map &map);
+	void bank_map(address_map &map) ATTR_COLD;
+	void radica_eu3a14_map(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<elan_eu3a14sys_device> m_sys;

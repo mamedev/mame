@@ -94,13 +94,13 @@ private:
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 	void crtc_drq_w(int state);
 
-	void k7658_io(address_map &map);
-	void k7658_mem(address_map &map);
-	void rt1715_base_io(address_map &map);
-	void rt1715_io(address_map &map);
-	void rt1715w_io(address_map &map);
-	void rt1715_mem(address_map &map);
-	void rt1715w_mem(address_map &map);
+	void k7658_io(address_map &map) ATTR_COLD;
+	void k7658_mem(address_map &map) ATTR_COLD;
+	void rt1715_base_io(address_map &map) ATTR_COLD;
+	void rt1715_io(address_map &map) ATTR_COLD;
+	void rt1715w_io(address_map &map) ATTR_COLD;
+	void rt1715_mem(address_map &map) ATTR_COLD;
+	void rt1715w_mem(address_map &map) ATTR_COLD;
 
 	DECLARE_MACHINE_START(rt1715);
 	DECLARE_MACHINE_RESET(rt1715);

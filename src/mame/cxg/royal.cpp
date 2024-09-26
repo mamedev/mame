@@ -76,7 +76,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(supra_on_button);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -293,15 +293,15 @@ void royal_state::royal(machine_config &config)
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->stop_cb().set(m_maincpu, FUNC(hmcs400_cpu_device::nvram_set_battery));
 	m_maincpu->stop_cb().append(FUNC(royal_state::stop_mode));
-	m_maincpu->write_r<0>().set(FUNC(royal_state::lcd_segs_w<0>));
-	m_maincpu->read_r<1>().set(FUNC(royal_state::board_r<0>));
-	m_maincpu->read_r<2>().set(FUNC(royal_state::board_r<1>));
-	m_maincpu->write_r<3>().set(FUNC(royal_state::input_w<0>));
-	m_maincpu->write_r<4>().set(FUNC(royal_state::input_w<1>));
-	m_maincpu->write_r<5>().set(FUNC(royal_state::lcd_com_w));
-	m_maincpu->write_r<6>().set(FUNC(royal_state::lcd_segs_w<3>));
-	m_maincpu->write_r<7>().set(FUNC(royal_state::lcd_segs_w<2>));
-	m_maincpu->write_r<8>().set(FUNC(royal_state::lcd_segs_w<1>));
+	m_maincpu->write_r<0x0>().set(FUNC(royal_state::lcd_segs_w<0>));
+	m_maincpu->read_r<0x1>().set(FUNC(royal_state::board_r<0>));
+	m_maincpu->read_r<0x2>().set(FUNC(royal_state::board_r<1>));
+	m_maincpu->write_r<0x3>().set(FUNC(royal_state::input_w<0>));
+	m_maincpu->write_r<0x4>().set(FUNC(royal_state::input_w<1>));
+	m_maincpu->write_r<0x5>().set(FUNC(royal_state::lcd_com_w));
+	m_maincpu->write_r<0x6>().set(FUNC(royal_state::lcd_segs_w<3>));
+	m_maincpu->write_r<0x7>().set(FUNC(royal_state::lcd_segs_w<2>));
+	m_maincpu->write_r<0x8>().set(FUNC(royal_state::lcd_segs_w<1>));
 	m_maincpu->write_d().set(FUNC(royal_state::control_w));
 	m_maincpu->read_d().set(FUNC(royal_state::input_r));
 

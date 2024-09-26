@@ -40,11 +40,11 @@ public:
 
 	void teradrive(machine_config &config);
 	void at_softlists(machine_config &config);
-	void teradrive_io(address_map &map);
-	void teradrive_map(address_map &map);
+	void teradrive_io(address_map &map) ATTR_COLD;
+	void teradrive_map(address_map &map) ATTR_COLD;
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 private:
 	u16 m_heartbeat = 0;

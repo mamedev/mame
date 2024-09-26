@@ -52,15 +52,15 @@ public:
 	void cpzodiac(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_memory_bank m_bank;
 
-	void main_map(address_map &map);
-	void main_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

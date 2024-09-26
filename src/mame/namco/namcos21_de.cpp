@@ -63,9 +63,9 @@ public:
 	void configure_c148_standard(machine_config &config);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 
@@ -116,12 +116,12 @@ private:
 
 	void configure_c68_namcos21(machine_config &config);
 
-	void driveyes_common_map(address_map &map);
-	void driveyes_master_map(address_map &map);
-	void driveyes_slave_map(address_map &map);
+	void driveyes_common_map(address_map &map) ATTR_COLD;
+	void driveyes_master_map(address_map &map) ATTR_COLD;
+	void driveyes_slave_map(address_map &map) ATTR_COLD;
 
-	void sound_map(address_map &map);
-	void c140_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void c140_map(address_map &map) ATTR_COLD;
 };
 
 

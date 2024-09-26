@@ -61,7 +61,7 @@ public:
 	ioport_value battery_sensor_r();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -107,9 +107,9 @@ private:
 	K056832_CB_MEMBER(qdrmfgp_tile_callback);
 	K056832_CB_MEMBER(qdrmfgp2_tile_callback);
 
-	void qdrmfgp2_map(address_map &map);
-	void qdrmfgp_k054539_map(address_map &map);
-	void qdrmfgp_map(address_map &map);
+	void qdrmfgp2_map(address_map &map) ATTR_COLD;
+	void qdrmfgp_k054539_map(address_map &map) ATTR_COLD;
+	void qdrmfgp_map(address_map &map) ATTR_COLD;
 };
 
 

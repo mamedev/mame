@@ -45,8 +45,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void pullttrig_io(address_map &map);
-	void pullttrig_map(address_map &map);
+	void pullttrig_io(address_map &map) ATTR_COLD;
+	void pullttrig_map(address_map &map) ATTR_COLD;
 };
 
 

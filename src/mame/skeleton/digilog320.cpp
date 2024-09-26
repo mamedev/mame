@@ -98,8 +98,8 @@ public:
 	void digilog320(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i80186_cpu_device> m_maincpu;
@@ -114,10 +114,10 @@ private:
 	required_shared_ptr<uint16_t> m_vram;
 	required_region_ptr<uint8_t> m_chargen;
 
-	void main_mem_map(address_map &map);
-	void main_io_map(address_map &map);
-	void sub_mem_map(address_map &map);
-	void sub_io_map(address_map &map);
+	void main_mem_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void sub_mem_map(address_map &map) ATTR_COLD;
+	void sub_io_map(address_map &map) ATTR_COLD;
 
 	MC6845_UPDATE_ROW(update_row);
 

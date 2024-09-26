@@ -76,11 +76,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_w);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void maincpu_map(address_map &map);
+	void maincpu_map(address_map &map) ATTR_COLD;
 
 	void port_b_w(uint8_t data);
 	void port_c_w(uint8_t data);

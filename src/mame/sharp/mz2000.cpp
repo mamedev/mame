@@ -112,8 +112,8 @@ private:
 	void timer_w(uint8_t data);
 	void mz2000_tvram_attr_w(uint8_t data);
 	void mz2000_gvram_mask_w(uint8_t data);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
@@ -127,9 +127,9 @@ private:
 	uint8_t mz2000_pio1_portb_r();
 	uint8_t mz2000_pio1_porta_r();
 
-	void mz2000_io(address_map &map);
-	void mz2000_map(address_map &map);
-	void mz80b_io(address_map &map);
+	void mz2000_io(address_map &map) ATTR_COLD;
+	void mz2000_map(address_map &map) ATTR_COLD;
+	void mz80b_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

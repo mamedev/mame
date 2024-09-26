@@ -26,9 +26,9 @@ public:
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
 protected:
-	void device_add_mconfig(machine_config &config) override;
-	void device_start() override;
-	void device_reset() override;
+	void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 	void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 private:

@@ -97,9 +97,9 @@ public:
 	void buraikenb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -176,17 +176,17 @@ private:
 	void lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	void avengers_adpcm_io_map(address_map &map);
-	void avengers_map(address_map &map);
-	void buraikenb_map(address_map &map);
-	void fball_map(address_map &map);
-	void fball_oki_map(address_map &map);
-	void fball_sound_map(address_map &map);
-	void lwings_map(address_map &map);
-	void lwings_sound_map(address_map &map);
-	void trojan_adpcm_io_map(address_map &map);
-	void trojan_adpcm_map(address_map &map);
-	void trojan_map(address_map &map);
+	void avengers_adpcm_io_map(address_map &map) ATTR_COLD;
+	void avengers_map(address_map &map) ATTR_COLD;
+	void buraikenb_map(address_map &map) ATTR_COLD;
+	void fball_map(address_map &map) ATTR_COLD;
+	void fball_oki_map(address_map &map) ATTR_COLD;
+	void fball_sound_map(address_map &map) ATTR_COLD;
+	void lwings_map(address_map &map) ATTR_COLD;
+	void lwings_sound_map(address_map &map) ATTR_COLD;
+	void trojan_adpcm_io_map(address_map &map) ATTR_COLD;
+	void trojan_adpcm_map(address_map &map) ATTR_COLD;
+	void trojan_map(address_map &map) ATTR_COLD;
 };
 
 /* Avengers runs on hardware almost identical to Trojan, but with a protection
@@ -1338,7 +1338,7 @@ void lwings_state::avengers(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_clock(12_MHz_XTAL/2);
-	m_maincpu->z80_set_m1_cycles(6); // 2 WAIT states per M1? (needed to keep in sync with MCU)
+	m_maincpu->z80_set_m1_cycles(4+2); // 2 WAIT states per M1? (needed to keep in sync with MCU)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::avengers_map);
 
 	I8751(config, m_mcu, 12_MHz_XTAL/2);

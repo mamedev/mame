@@ -36,7 +36,7 @@ public:
 
 protected:
 	// device overrides
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual void device_post_load() override;
 

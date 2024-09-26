@@ -50,7 +50,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(break_handler);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 pa_r();
@@ -59,7 +59,7 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_input);
 
-	void hr84_mem(address_map &map);
+	void hr84_mem(address_map &map) ATTR_COLD;
 
 	required_device<pia6821_device> m_pia0;
 	required_device<cpu_device> m_maincpu;

@@ -240,8 +240,8 @@ public:
 	void init_twcup94b();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -287,10 +287,10 @@ private:
 	void screen_vblank(int state);
 
 	void mcu_init();
-	void gstriker_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
-	void twcup94_map(address_map &map);
+	void gstriker_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void twcup94_map(address_map &map) ATTR_COLD;
 };
 
 

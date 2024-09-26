@@ -62,8 +62,8 @@ private:
 	required_ioport_array<2> m_keys;
 	required_ioport m_reset;
 
-	void amsterd_mem(address_map &map);
-	void dallas32_mem(address_map &map);
+	void amsterd_mem(address_map &map) ATTR_COLD;
+	void dallas32_mem(address_map &map) ATTR_COLD;
 
 	void led_w(offs_t offset, u8 data);
 	void dac_w(u8 data);

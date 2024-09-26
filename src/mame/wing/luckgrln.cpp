@@ -113,8 +113,8 @@ public:
 	void luckgrln(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr_array<uint8_t, 4> m_reel_ram;
@@ -147,11 +147,11 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq);
 
-	void _7smash_io(address_map &map);
-	void _7smash_map(address_map &map);
-	void common_portmap(address_map &map);
-	void luckgrln_io(address_map &map);
-	void mainmap(address_map &map);
+	void _7smash_io(address_map &map) ATTR_COLD;
+	void _7smash_map(address_map &map) ATTR_COLD;
+	void common_portmap(address_map &map) ATTR_COLD;
+	void luckgrln_io(address_map &map) ATTR_COLD;
+	void mainmap(address_map &map) ATTR_COLD;
 };
 
 

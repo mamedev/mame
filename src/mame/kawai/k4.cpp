@@ -25,7 +25,7 @@ public:
 	void k4(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<upd78310_device> m_mpu;
 };

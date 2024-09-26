@@ -277,8 +277,8 @@ public:
 
 protected:
 	virtual void driver_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -286,7 +286,7 @@ private:
 
 	void p22_w(int state);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<hd6303x_cpu_device> m_maincpu;
 	required_device<m58990_device> m_adc;

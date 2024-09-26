@@ -46,8 +46,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -79,7 +79,7 @@ private:
 	uint32_t s3c44b0_gpio_port_r(offs_t offset);
 	void s3c44b0_gpio_port_w(offs_t offset, uint32_t data);
 	//void s3c44b0_i2s_data_w(offs_t offset, uint16_t data);
-	void juicebox_map(address_map &map);
+	void juicebox_map(address_map &map) ATTR_COLD;
 };
 
 inline void juicebox_state::verboselog(int n_level, const char *s_fmt, ...)

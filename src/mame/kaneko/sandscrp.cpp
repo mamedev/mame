@@ -131,16 +131,16 @@ private:
 	void bankswitch_w(u8 data);
 	u8 latchstatus_r();
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void update_irq_state();
-	void sandscrp_mem(address_map &map);
-	void sandscrp_soundmem(address_map &map);
-	void sandscrp_soundport(address_map &map);
+	void sandscrp_mem(address_map &map) ATTR_COLD;
+	void sandscrp_soundmem(address_map &map) ATTR_COLD;
+	void sandscrp_soundport(address_map &map) ATTR_COLD;
 };
 
 

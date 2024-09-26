@@ -153,8 +153,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_callback);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 
@@ -203,9 +203,9 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_ngp_cart);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(unload_ngp_cart);
 
-	void ngp_mem(address_map &map);
-	void z80_io(address_map &map);
-	void z80_mem(address_map &map);
+	void ngp_mem(address_map &map) ATTR_COLD;
+	void z80_io(address_map &map) ATTR_COLD;
+	void z80_mem(address_map &map) ATTR_COLD;
 
 	bool m_nvram_loaded = false;
 	required_ioport m_io_controls;

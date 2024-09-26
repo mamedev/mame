@@ -54,8 +54,8 @@ private:
 	void ay_bout_w(uint8_t data);
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
-	void tonton_io(address_map &map);
-	void tonton_map(address_map &map);
+	void tonton_io(address_map &map) ATTR_COLD;
+	void tonton_map(address_map &map) ATTR_COLD;
 };
 
 #define MAIN_CLOCK      XTAL(21'477'272)

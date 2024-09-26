@@ -78,7 +78,7 @@ private:
 	uint8_t m_riot_port_a;
 	uint8_t m_riot_port_b;
 	emu_timer *m_led_update;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_r);
@@ -100,7 +100,7 @@ private:
 	std::unique_ptr<u8[]> m_riot_ram;
 	std::unique_ptr<u8[]> m_dummy_ram;
 	bool m_cb2 = false;
-	void sym1_map(address_map &map);
+	void sym1_map(address_map &map) ATTR_COLD;
 
 	required_device<m6502_device> m_maincpu;
 	required_device<ram_device> m_ram;

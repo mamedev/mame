@@ -123,8 +123,8 @@ private:
 	uint8_t tigerhb1_prot_r();
 	void tigerhb1_prot_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
@@ -140,22 +140,22 @@ private:
 	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(sound_nmi);
 
-	void getstar_map(address_map &map);
-	void getstarb1_io_map(address_map &map);
-	void getstarb2_io_map(address_map &map);
-	void io_map_mcu(address_map &map);
-	void io_map_nomcu(address_map &map);
-	void perfrman_map(address_map &map);
-	void perfrman_sound_map(address_map &map);
-	void slapfigh_map(address_map &map);
-	void slapfigh_map_mcu(address_map &map);
-	void slapfighb1_map(address_map &map);
-	void slapfighb2_map(address_map &map);
-	void tigerh_map(address_map &map);
-	void tigerh_map_mcu(address_map &map);
-	void tigerh_sound_map(address_map &map);
-	void tigerhb1_map(address_map &map);
-	void tigerhb2_map(address_map &map);
+	void getstar_map(address_map &map) ATTR_COLD;
+	void getstarb1_io_map(address_map &map) ATTR_COLD;
+	void getstarb2_io_map(address_map &map) ATTR_COLD;
+	void io_map_mcu(address_map &map) ATTR_COLD;
+	void io_map_nomcu(address_map &map) ATTR_COLD;
+	void perfrman_map(address_map &map) ATTR_COLD;
+	void perfrman_sound_map(address_map &map) ATTR_COLD;
+	void slapfigh_map(address_map &map) ATTR_COLD;
+	void slapfigh_map_mcu(address_map &map) ATTR_COLD;
+	void slapfighb1_map(address_map &map) ATTR_COLD;
+	void slapfighb2_map(address_map &map) ATTR_COLD;
+	void tigerh_map(address_map &map) ATTR_COLD;
+	void tigerh_map_mcu(address_map &map) ATTR_COLD;
+	void tigerh_sound_map(address_map &map) ATTR_COLD;
+	void tigerhb1_map(address_map &map) ATTR_COLD;
+	void tigerhb2_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TOAPLAN_SLAPFGHT_H

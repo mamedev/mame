@@ -182,13 +182,13 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void dgpix_base(machine_config &config);
 
-	void base_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
 
 	u16 flash_r(offs_t offset);
 	void flash_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -199,7 +199,7 @@ protected:
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 vram_r(offs_t offset);
@@ -244,7 +244,7 @@ public:
 	void init_fmaniac3();
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -262,10 +262,10 @@ public:
 	void init_btplay2k();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void sound_bank_w(u16 data);
 

@@ -59,7 +59,7 @@ public:
 	// construction/destruction
 	isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(ISA8_CGA_FILETTO, isa8_cga_filetto_device, "filetto_cga", "ISA8_CGA_FILETTO")
@@ -100,8 +100,8 @@ public:
 	void filetto(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sample_tick);
 
@@ -132,9 +132,9 @@ private:
 	required_device<address_map_bank_device> m_bank;
 	required_device<hc55516_device> m_cvsd;
 	required_memory_region m_samples;
-	void bank_map(address_map &map);
-	void filetto_io(address_map &map);
-	void filetto_map(address_map &map);
+	void bank_map(address_map &map) ATTR_COLD;
+	void filetto_io(address_map &map) ATTR_COLD;
+	void filetto_map(address_map &map) ATTR_COLD;
 };
 
 

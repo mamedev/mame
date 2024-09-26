@@ -143,7 +143,7 @@ public:
 	int rndbit_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_ram_attr;
 	required_shared_ptr<uint8_t> m_ram_video;
@@ -153,7 +153,7 @@ protected:
 	uint8_t palette_r(offs_t offset);
 	void palette_w(offs_t offset, uint8_t data);
 
-	void bigappg_io_map(address_map &map);
+	void bigappg_io_map(address_map &map) ATTR_COLD;
 
 private:
 	memory_share_creator<uint8_t> m_ram_palette;
@@ -175,12 +175,12 @@ private:
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_no_u40);
-	void bigappg_map(address_map &map);
-	void couple_map(address_map &map);
-	void riviera_map(address_map &map);
-	void misdraw_map(address_map &map);
-	void pitboss_map(address_map &map);
-	void pitboss_io_map(address_map &map);
+	void bigappg_map(address_map &map) ATTR_COLD;
+	void couple_map(address_map &map) ATTR_COLD;
+	void riviera_map(address_map &map) ATTR_COLD;
+	void misdraw_map(address_map &map) ATTR_COLD;
+	void pitboss_map(address_map &map) ATTR_COLD;
+	void pitboss_io_map(address_map &map) ATTR_COLD;
 };
 
 class merit_banked_state : public merit_state
@@ -194,14 +194,14 @@ public:
 	void casino5(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_memory_bank_array<2> m_rombank;
 
 	void bank_w(uint8_t data);
 
-	void casino5_map(address_map &map);
+	void casino5_map(address_map &map) ATTR_COLD;
 };
 
 class merit_quiz_state : public merit_state
@@ -222,7 +222,7 @@ public:
 	template <uint8_t Key> void init_key();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	memory_bank_creator m_questions_bank;
@@ -235,12 +235,12 @@ private:
 	void med_offset_w(offs_t offset, uint8_t data);
 	void high_offset_w(offs_t offset, uint8_t data);
 
-	void dtrvwz5_map(address_map &map);
-	void phrcraze_io_map(address_map &map);
-	void phrcraze_map(address_map &map);
-	void tictac_map(address_map &map);
-	void trvwhiz_map(address_map &map);
-	void trvwhziv_map(address_map &map);
+	void dtrvwz5_map(address_map &map) ATTR_COLD;
+	void phrcraze_io_map(address_map &map) ATTR_COLD;
+	void phrcraze_map(address_map &map) ATTR_COLD;
+	void tictac_map(address_map &map) ATTR_COLD;
+	void trvwhiz_map(address_map &map) ATTR_COLD;
+	void trvwhziv_map(address_map &map) ATTR_COLD;
 };
 
 

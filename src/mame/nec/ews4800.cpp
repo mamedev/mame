@@ -59,11 +59,11 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	u16 lance_r(offs_t offset, u16 mem_mask = 0xffff);
 	void lance_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);

@@ -94,10 +94,10 @@ public:
 	void init_moonwarp();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void sound_reset() override;
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -153,9 +153,9 @@ private:
 	void create_nmi_timer();
 	void start_nmi_timer();
 	void get_pens(rgb_t *pens);
-	void berzerk_io_map(address_map &map);
-	void berzerk_map(address_map &map);
-	void frenzy_map(address_map &map);
+	void berzerk_io_map(address_map &map) ATTR_COLD;
+	void berzerk_map(address_map &map) ATTR_COLD;
+	void frenzy_map(address_map &map) ATTR_COLD;
 };
 
 

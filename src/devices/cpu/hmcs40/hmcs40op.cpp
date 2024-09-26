@@ -465,7 +465,11 @@ void hmcs40_cpu_device::op_lpu()
 	if (m_s)
 	{
 		m_block_int = true;
-		m_page = m_op & 0x1f;
+		m_pc_upper = m_op & 0x1f;
+
+		// on HMCS46/47, also latches bank from R70
+		if (m_family == HMCS46_FAMILY || m_family == HMCS47_FAMILY)
+			m_pc_upper |= ~m_r[7] << 5 & 0x20;
 	}
 	else
 		m_op |= 0x400; // indicate unhandled LPU

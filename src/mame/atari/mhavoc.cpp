@@ -238,8 +238,8 @@ public:
 	int clock_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_shared_ptr_array<uint8_t, 2> m_zram;
 	required_memory_bank m_rambank;
@@ -262,7 +262,7 @@ private:
 	void dual_pokey_w(offs_t offset, uint8_t data);
 	void out_0_w(uint8_t data);
 
-	void alpha_map(address_map &map);
+	void alpha_map(address_map &map) ATTR_COLD;
 };
 
 class mhavoc_state : public alphaone_state
@@ -284,12 +284,12 @@ public:
 	int alpha_xmtd_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_gamma;
 
-	void gamma_map(address_map &map);
+	void gamma_map(address_map &map) ATTR_COLD;
 
 private:
 	required_ioport m_coin;
@@ -317,7 +317,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(delayed_gamma_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(cpu_irq_clock);
-	void alpha_map(address_map &map);
+	void alpha_map(address_map &map) ATTR_COLD;
 };
 
 class mhavocrv_state : public mhavoc_state
@@ -331,7 +331,7 @@ public:
 	void mhavocrv(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<tms5220_device> m_tms;
@@ -341,7 +341,7 @@ private:
 	void speech_data_w(uint8_t data);
 	void speech_strobe_w(uint8_t data);
 
-	void gamma_map(address_map &map);
+	void gamma_map(address_map &map) ATTR_COLD;
 };
 
 

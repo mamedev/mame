@@ -188,9 +188,9 @@ public:
 	void init_djboyj();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	//static constexpr unsigned PROT_OUTPUT_BUFFER_SIZE = 8;
@@ -216,12 +216,12 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	void mastercpu_am(address_map &map);
-	void mastercpu_port_am(address_map &map);
-	void slavecpu_am(address_map &map);
-	void slavecpu_port_am(address_map &map);
-	void soundcpu_am(address_map &map);
-	void soundcpu_port_am(address_map &map);
+	void mastercpu_am(address_map &map) ATTR_COLD;
+	void mastercpu_port_am(address_map &map) ATTR_COLD;
+	void slavecpu_am(address_map &map) ATTR_COLD;
+	void slavecpu_port_am(address_map &map) ATTR_COLD;
+	void soundcpu_am(address_map &map) ATTR_COLD;
+	void soundcpu_port_am(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_mastercpu;

@@ -62,9 +62,9 @@ private:
 	void so_w(int state);
 	void dav_w(int state);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	u8 m_page = 0;
 	u8 m_attr = 0;

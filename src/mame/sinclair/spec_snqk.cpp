@@ -130,7 +130,8 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 	}
 	else if (image.is_filetype("sp"))
 	{
-		if ((snapshot_data[0] != 'S' && snapshot_data[1] != 'P') && (snapshot_size != SP_NEW_SIZE_16K && snapshot_size != SP_NEW_SIZE_48K))
+		if ((snapshot_data[0] != 'S' || snapshot_data[1] != 'P')
+			|| (snapshot_size != SP_NEW_SIZE_16K && snapshot_size != SP_NEW_SIZE_48K))
 		{
 			if (snapshot_size != SP_OLD_SIZE)
 				return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SP file size");
@@ -160,9 +161,9 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 	}
 	else if (image.is_filetype("sem"))
 	{
-		if (snapshot_data[0] != 0x05 && snapshot_data[1] != 'S' &&
-			snapshot_data[2] != 'P' && snapshot_data[3] != 'E' &&
-			snapshot_data[4] != 'C' && snapshot_data[5] != '1')
+		if (snapshot_data[0] != 0x05 || snapshot_data[1] != 'S'
+			|| snapshot_data[2] != 'P' || snapshot_data[3] != 'E'
+			|| snapshot_data[4] != 'C' || snapshot_data[5] != '1')
 		{
 			if (snapshot_size != SEM_SIZE)
 				return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SEM file size");
@@ -192,8 +193,8 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 	}
 	else if (image.is_filetype("snx"))
 	{
-		if (snapshot_data[0] != 'X' && snapshot_data[1] != 'S' &&
-			snapshot_data[2] != 'N' && snapshot_data[3] != 'A')
+		if (snapshot_data[0] != 'X' || snapshot_data[1] != 'S'
+			|| snapshot_data[2] != 'N' || snapshot_data[3] != 'A')
 			return std::make_pair(image_error::INVALIDIMAGE, "Invalid .SNX file header");
 
 		setup_snx(&snapshot_data[0], snapshot_size);
@@ -285,7 +286,7 @@ void spectrum_state::border_update(int data)
 #endif
 }
 
-void spectrum_state::setup_sp(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_sp(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i, SP_OFFSET;
 	uint8_t intr;
@@ -484,7 +485,7 @@ void spectrum_state::setup_sp(uint8_t *snapdata, uint32_t snapsize)
  *      in which case it is included twice.
  *
  *******************************************************************/
-void spectrum_state::setup_sna(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_sna(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i, j, usedbanks[8];
 	long bank_offset;
@@ -702,7 +703,7 @@ void spectrum_state::setup_sna(uint8_t *snapdata, uint32_t snapsize)
  *      16640   49152   RAM dump
  *
  *******************************************************************/
-void spectrum_state::setup_ach(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_ach(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
 	uint8_t intr;
@@ -833,7 +834,7 @@ void spectrum_state::setup_ach(uint8_t *snapdata, uint32_t snapsize)
  *      suffer from the same "top of the stack" bug as well as .SNA images.
  *
  *******************************************************************/
-void spectrum_state::setup_prg(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_prg(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
 	uint8_t intr;
@@ -1001,7 +1002,7 @@ void spectrum_state::setup_prg(uint8_t *snapdata, uint32_t snapsize)
  *      suffer from the same "top of the stack" bug as well as .SNA images.
  *
  *******************************************************************/
-void spectrum_state::setup_plusd(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_plusd(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i, j;
 	uint8_t intr;
@@ -1167,7 +1168,7 @@ void spectrum_state::setup_plusd(uint8_t *snapdata, uint32_t snapsize)
  *      Following these data, there are optional POKE blocks
  *
  *******************************************************************/
-void spectrum_state::setup_sem(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_sem(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
 	uint8_t intr;
@@ -1284,7 +1285,7 @@ void spectrum_state::setup_sem(uint8_t *snapdata, uint32_t snapsize)
  *      16412   49152   RAM dump
  *
  *******************************************************************/
-void spectrum_state::setup_sit(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_sit(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
 	uint8_t intr;
@@ -1412,7 +1413,7 @@ void spectrum_state::setup_sit(uint8_t *snapdata, uint32_t snapsize)
  *      49476   10      0x00 (reserved for future use)
  *
  *******************************************************************/
-void spectrum_state::setup_zx(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_zx(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
 	uint8_t intr;
@@ -1542,7 +1543,7 @@ void spectrum_state::setup_zx(uint8_t *snapdata, uint32_t snapsize)
  *      49181   2       HL'
  *
  *******************************************************************/
-void spectrum_state::setup_snp(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_snp(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
 	uint8_t intr;
@@ -1720,7 +1721,7 @@ void spectrum_state::setup_snp(uint8_t *snapdata, uint32_t snapsize)
  *                      length of the block.
  *
  *******************************************************************/
-void spectrum_state::snx_decompress_block(address_space &space, uint8_t *source, uint16_t dest, uint16_t size)
+void spectrum_state::snx_decompress_block(address_space &space, const uint8_t *source, uint16_t dest, uint16_t size)
 {
 	uint8_t counthi, countlo, compress, fill;
 	uint16_t block = 0, count, i, j, numbytes;
@@ -1766,7 +1767,7 @@ void spectrum_state::snx_decompress_block(address_space &space, uint8_t *source,
 	}
 }
 
-void spectrum_state::setup_snx(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_snx(const uint8_t *snapdata, uint32_t snapsize)
 {
 	uint8_t intr;
 	uint16_t data, addr;
@@ -1917,7 +1918,7 @@ void spectrum_state::setup_snx(uint8_t *snapdata, uint32_t snapsize)
  *      The 8 16K banks are stored in the order 5, 2, 0, 1, 3, 4, 6, 7
  *
  *******************************************************************/
-void spectrum_state::setup_frz(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_frz(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i, j;
 	uint8_t intr;
@@ -2029,7 +2030,7 @@ void spectrum_state::setup_frz(uint8_t *snapdata, uint32_t snapsize)
 	//logerror("Snapshot loaded.\nExecution resuming at bank:%d %s\n", m_port_7ffd_data & 0x07, m_maincpu->state_string(Z80_PC).c_str());
 }
 
-void spectrum_state::z80_decompress_block(address_space &space, uint8_t *source, uint16_t dest, uint16_t size)
+void spectrum_state::z80_decompress_block(address_space &space, const uint8_t *source, uint16_t dest, uint16_t size)
 {
 	uint8_t ch;
 	int i;
@@ -2089,7 +2090,7 @@ void spectrum_state::z80_decompress_block(address_space &space, uint8_t *source,
 	while (size > 0);
 }
 
-static SPECTRUM_Z80_SNAPSHOT_TYPE spectrum_identify_z80 (uint8_t *snapdata, uint32_t snapsize)
+static SPECTRUM_Z80_SNAPSHOT_TYPE spectrum_identify_z80 (const uint8_t *snapdata, uint32_t snapsize)
 {
 	uint8_t lo, hi, data;
 
@@ -2137,7 +2138,7 @@ static SPECTRUM_Z80_SNAPSHOT_TYPE spectrum_identify_z80 (uint8_t *snapdata, uint
 }
 
 // supports 48k & 128k .Z80 files
-void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_z80(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
 	uint8_t lo, hi, data;
@@ -2289,7 +2290,6 @@ void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
 	}
 	else
 	{
-		uint8_t *pSource;
 		int header_size;
 
 		header_size = 30 + 2 + ((snapdata[30] & 0x0ff) | ((snapdata[31] & 0x0ff) << 8));
@@ -2311,29 +2311,28 @@ void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
 			ay8912->address_w(snapdata[38]);
 		}
 
-		pSource = snapdata + header_size;
-
 		if (z80_type == SPECTRUM_Z80_SNAPSHOT_48K)
 			// Ensure 48K Basic ROM is used
 			page_basicrom();
 
+		const uint8_t *p_source = snapdata + header_size;
 		do
 		{
 			unsigned short length;
 			uint8_t page;
-			int Dest = 0;
+			int dest = 0;
 
-			length = (pSource[0] & 0x0ff) | ((pSource[1] & 0x0ff) << 8);
-			page = pSource[2];
+			length = (p_source[0] & 0x0ff) | ((p_source[1] & 0x0ff) << 8);
+			page = p_source[2];
 
 			if (z80_type == SPECTRUM_Z80_SNAPSHOT_48K || z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068)
 			{
 				switch (page)
 				{
-					case 4: Dest = 0x08000; break;
-					case 5: Dest = 0x0c000; break;
-					case 8: Dest = 0x04000; break;
-					default: Dest = 0; break;
+					case 4: dest = 0x08000; break;
+					case 5: dest = 0x0c000; break;
+					case 8: dest = 0x04000; break;
+					default: dest = 0; break;
 				}
 			}
 			else
@@ -2344,14 +2343,14 @@ void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
 					// Page the appropriate bank into 0xc000 - 0xfff
 					m_port_7ffd_data = page - 3;
 					update_paging();
-					Dest = 0x0c000;
+					dest = 0x0c000;
 				}
 				else
 					// Other values correspond to ROM pages
-					Dest = 0x0;
+					dest = 0x0;
 			}
 
-			if (Dest != 0)
+			if (dest != 0)
 			{
 				if (length == 0x0ffff)
 				{
@@ -2360,21 +2359,21 @@ void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
 
 					// not compressed
 					for (i = 0; i < 16384; i++)
-						space.write_byte(i + Dest, pSource[i]);
+						space.write_byte(i + dest, p_source[i]);
 				}
 				else
 				{
 					logerror("Compressed\n");
 
 					// block is compressed
-					z80_decompress_block(space, &pSource[3], Dest, 16384);
+					z80_decompress_block(space, &p_source[3], dest, 16384);
 				}
 			}
 
 			// go to next block
-			pSource += (3 + length);
+			p_source += (3 + length);
 		}
-		while ((pSource - snapdata) < snapsize);
+		while ((p_source - snapdata) < snapsize);
 
 		if ((m_port_7ffd_data != -1) && (z80_type != SPECTRUM_Z80_SNAPSHOT_48K))
 		{
@@ -2451,7 +2450,7 @@ QUICKLOAD_LOAD_MEMBER(spectrum_state::quickload_cb)
  *      SAVE "filename" CODE 16384,6144
  *
  *******************************************************************/
-void spectrum_state::setup_scr(uint8_t *quickdata, uint32_t quicksize)
+void spectrum_state::setup_scr(const uint8_t *quickdata, uint32_t quicksize)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -2487,7 +2486,7 @@ void spectrum_state::setup_scr(uint8_t *quickdata, uint32_t quicksize)
  *      However, no image of such type has ever surfaced.
  *
  *******************************************************************/
-void spectrum_state::setup_raw(uint8_t *quickdata, uint32_t quicksize)
+void spectrum_state::setup_raw(const uint8_t *quickdata, uint32_t quicksize)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 

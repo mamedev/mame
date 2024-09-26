@@ -101,19 +101,19 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
 private:
 	// Managed memory access from the bus (IOP and HDC)
-	void bus_mem(address_map &map);
+	void bus_mem(address_map &map) ATTR_COLD;
 	u16 bus_mem_r(offs_t offset, u16 mem_mask);
 	void bus_mem_w(offs_t offset, u16 data, u16 mem_mask);
 
 	// Managed I/O access from the bus (IOP and HDC)
-	void bus_io(address_map &map);
+	void bus_io(address_map &map) ATTR_COLD;
 	u16 bus_io_r(offs_t offset, u16 mem_mask);
 	void bus_io_w(offs_t offset, u16 data, u16 mem_mask);
 
@@ -395,7 +395,7 @@ public:
 
 protected:
 	// driver_device implementation
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;

@@ -41,8 +41,8 @@ public:
 	void driver_init();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(trigger_int6);
 
@@ -108,9 +108,9 @@ private:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
-	void opwolf3_map(address_map &map);
-	void slapshot_map(address_map &map);
-	void sound_map(address_map &map);
+	void opwolf3_map(address_map &map) ATTR_COLD;
+	void slapshot_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TAITO_SLAPSHOT_H

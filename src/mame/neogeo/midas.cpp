@@ -92,9 +92,9 @@ public:
 	void init_livequiz();
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t ret_ffff();
@@ -120,8 +120,8 @@ private:
 
 	void screen_vblank(int state);
 
-	void hammer_map(address_map &map);
-	void livequiz_map(address_map &map);
+	void hammer_map(address_map &map) ATTR_COLD;
+	void livequiz_map(address_map &map) ATTR_COLD;
 };
 
 

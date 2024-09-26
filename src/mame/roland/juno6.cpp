@@ -35,7 +35,7 @@ public:
 	void juno6(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 keyboard_r();
@@ -43,7 +43,7 @@ private:
 	void db_w(u8 data);
 	void p2_w(u8 data);
 
-	void ext_map(address_map &map);
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device_array<pit8253_device, 2> m_pit;

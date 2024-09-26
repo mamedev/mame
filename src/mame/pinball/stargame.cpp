@@ -64,16 +64,16 @@ private:
 	u8 csw1_r();
 	u8 csw2_r();
 
-	void audiocpu_io(address_map &map);
-	void audiocpu_map(address_map &map);
-	void maincpu_io(address_map &map);
-	void maincpu_map(address_map &map);
+	void audiocpu_io(address_map &map) ATTR_COLD;
+	void audiocpu_map(address_map &map) ATTR_COLD;
+	void maincpu_io(address_map &map) ATTR_COLD;
+	void maincpu_map(address_map &map) ATTR_COLD;
 	u8 m_segment[5]{};
 	u8 m_game = 0U;
 	u8 m_row = 0U;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<z80ctc_device> m_ctc;

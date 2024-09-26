@@ -61,7 +61,7 @@ public:
 	void commander(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -75,8 +75,8 @@ private:
 	output_finder<2, 52> m_out_lcd;
 
 	// address maps
-	void dominator_map(address_map &map);
-	void galaxy_map(address_map &map);
+	void dominator_map(address_map &map) ATTR_COLD;
+	void galaxy_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void lcd_output_w(offs_t offset, u64 data);

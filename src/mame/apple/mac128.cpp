@@ -195,8 +195,8 @@ private:
 
 	optional_ioport m_mouse0, m_mouse1, m_mouse2;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void scc_mouse_irq( int x, int y );
 	void set_via_interrupt(int value);
@@ -241,9 +241,9 @@ private:
 	void mac_via_irq(int state);
 	void update_volume();
 
-	void mac512ke_map(address_map &map);
-	void macplus_map(address_map &map);
-	void macse_map(address_map &map);
+	void mac512ke_map(address_map &map) ATTR_COLD;
+	void macplus_map(address_map &map) ATTR_COLD;
+	void macse_map(address_map &map) ATTR_COLD;
 
 	floppy_image_device *m_cur_floppy;
 	int m_hdsel, m_devsel;

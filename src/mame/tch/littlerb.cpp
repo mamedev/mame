@@ -126,7 +126,7 @@ public:
 	ioport_value frame_step_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -146,7 +146,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_step_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_cb);
 
-	void main(address_map &map);
+	void main(address_map &map) ATTR_COLD;
 };
 
 void littlerb_state::machine_start()
