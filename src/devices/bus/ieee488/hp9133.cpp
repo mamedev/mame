@@ -36,11 +36,11 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_ieee488_interface implementation
 	virtual void ieee488_eoi(int state) override;
@@ -126,7 +126,7 @@ private:
 
 	void dma_ram_w(uint8_t data);
 	uint8_t dma_ram_r(offs_t offset);
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 	void floppy_index_cb(floppy_image_device *floppy, int state);
 	void hdc_bcs_cb(int state);
 	void hdc_bcr_cb(int state);

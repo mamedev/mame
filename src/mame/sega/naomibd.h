@@ -12,7 +12,7 @@ class naomi_board : public naomi_g1_device
 {
 public:
 	// Can be patched in the underlying class
-	virtual void submap(address_map &map) override;
+	virtual void submap(address_map &map) override ATTR_COLD;
 
 	void rom_offseth_w(uint16_t data);          // 5f7000
 	void rom_offsetl_w(uint16_t data);          // 5f7004

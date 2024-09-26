@@ -38,7 +38,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	void recalc_ints();
 	void recalc_mode();
@@ -136,7 +136,7 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual u32 ramdac_r(offs_t offset) override;
 	virtual void ramdac_w(offs_t offset, u32 data) override;
@@ -152,7 +152,7 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual u8 clockgen_r(offs_t offset) override;
 	virtual void clockgen_w(offs_t offset, u8 data) override;
@@ -172,7 +172,7 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual u8 clockgen_r(offs_t offset) override;
 	virtual void clockgen_w(offs_t offset, u8 data) override;

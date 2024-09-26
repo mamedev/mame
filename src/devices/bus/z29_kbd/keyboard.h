@@ -48,7 +48,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// called from keyboard
 	void transmit_data(bool state) { m_keyin_callback(state); }

@@ -67,8 +67,8 @@ public:
 	void clock_active(int state) { m_clock_active = state ? 1U : 0U; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	using device_t::logerror;
 

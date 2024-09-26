@@ -30,11 +30,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset_after_children() override { reset_w(1); }
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	required_device<arm_cpu_device> m_maincpu;
@@ -56,7 +56,7 @@ private:
 	u8 internal_r() { return m_latch[0]; }
 	void internal_w(u8 data) { m_latch[1] = data & 1; m_data_out(m_latch[1]); }
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

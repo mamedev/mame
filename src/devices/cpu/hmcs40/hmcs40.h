@@ -106,8 +106,8 @@ protected:
 	hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, u16 polarity, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
@@ -125,11 +125,11 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// memory maps
-	void program_1k(address_map &map);
-	void program_2k(address_map &map);
-	void data_80x4(address_map &map);
-	void data_160x4(address_map &map);
-	void data_256x4(address_map &map);
+	void program_1k(address_map &map) ATTR_COLD;
+	void program_2k(address_map &map) ATTR_COLD;
+	void data_80x4(address_map &map) ATTR_COLD;
+	void data_160x4(address_map &map) ATTR_COLD;
+	void data_256x4(address_map &map) ATTR_COLD;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;

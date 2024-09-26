@@ -27,7 +27,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override { m_stream->update(); m_stream->set_sample_rate(clock()); }
 	virtual void rom_bank_pre_change() override { m_stream->update(); }
 

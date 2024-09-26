@@ -13,7 +13,7 @@ class aw_rom_board : public naomi_g1_device
 public:
 	aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void submap(address_map &map) override;
+	virtual void submap(address_map &map) override ATTR_COLD;
 
 	void epr_offsetl_w(uint16_t data);          // 5f7000
 	void epr_offseth_w(uint16_t data);          // 5f7004

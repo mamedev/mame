@@ -29,16 +29,16 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
 	void write(offs_t offset, uint8_t data);
 
-	void io_map(address_map &map);
-	void xmem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void xmem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_banks_enabled;
 

@@ -19,7 +19,7 @@ public:
 
 	naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void submap(address_map &map) override;
+	virtual void submap(address_map &map) override ATTR_COLD;
 
 	uint16_t m4_id_r();
 protected:

@@ -257,8 +257,8 @@ protected:
 	sh34_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
@@ -685,12 +685,12 @@ public:
 	void sh3_internal_high_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t sh3_internal_high_r(offs_t offset, uint32_t mem_mask = ~0);
 
-	void sh3_internal_map(address_map &map);
+	void sh3_internal_map(address_map &map) ATTR_COLD;
 protected:
 	// construction/destruction
 	sh3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
 
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -713,13 +713,13 @@ public:
 	virtual uint32_t sh4_getsqremap(uint32_t address) override;
 	sh4_utlb m_utlb[64];
 
-	void sh4_internal_map(address_map &map);
+	void sh4_internal_map(address_map &map) ATTR_COLD;
 protected:
 	// construction/destruction
 	sh4_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 

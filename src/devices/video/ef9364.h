@@ -59,8 +59,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_config_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -74,7 +74,7 @@ private:
 	void set_video_mode(void);
 	void draw_border(uint16_t line);
 
-	void ef9364(address_map &map);
+	void ef9364(address_map &map) ATTR_COLD;
 
 	// internal state
 

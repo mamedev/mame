@@ -98,20 +98,20 @@ public:
 
 	void clock_w(int state);
 
-	void data_4bit(address_map &map);
-	void data_5bit(address_map &map);
-	void data_6bit(address_map &map);
-	void data_7bit(address_map &map);
-	void program_10bit(address_map &map);
-	void program_11bit(address_map &map);
-	void program_9bit(address_map &map);
+	void data_4bit(address_map &map) ATTR_COLD;
+	void data_5bit(address_map &map) ATTR_COLD;
+	void data_6bit(address_map &map) ATTR_COLD;
+	void data_7bit(address_map &map) ATTR_COLD;
+	void program_10bit(address_map &map) ATTR_COLD;
+	void program_11bit(address_map &map) ATTR_COLD;
+	void program_9bit(address_map &map) ATTR_COLD;
 
 protected:
 	mb88_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int data_width);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }

@@ -317,7 +317,7 @@ protected:
 	void common_map(address_map &map) ATTR_COLD;
 	void d000_rom_map(address_map &map) ATTR_COLD;
 	void d000_ram_map(address_map &map) ATTR_COLD;
-	virtual void sound_map(address_map &map) override;
+	virtual void sound_map(address_map &map) override ATTR_COLD;
 
 	void video_control_w(u8 data);
 };

@@ -24,12 +24,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	uint8_t dack_r(int line) override;
 	void dack_w(int line, uint8_t data) override;
@@ -81,8 +81,8 @@ private:
 	uint8_t dsp_wbuf_status_r(offs_t offset);
 	uint8_t dsp_rbuf_status_r(offs_t offset);
 
-	void sb16_io(address_map &map);
-	void host_io(address_map &map);
+	void sb16_io(address_map &map) ATTR_COLD;
+	void host_io(address_map &map) ATTR_COLD;
 
 	void control_timer(bool start);
 

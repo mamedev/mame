@@ -49,8 +49,8 @@ public:
 
 protected:
 	// device-specific overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -96,15 +96,15 @@ public:
 
 protected:
 	// device-specific overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void lcd_palette(palette_device &palette) const;
 
 private:
 	// internal configuration
-	void ram_map(address_map &map);
+	void ram_map(address_map &map) ATTR_COLD;
 
 	// internal LCD controller
 	required_device<t6963c_device> m_lcdc;

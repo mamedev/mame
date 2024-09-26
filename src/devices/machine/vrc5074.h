@@ -24,7 +24,7 @@ public:
 	vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	required_device<ns16550_device> m_uart;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
@@ -35,7 +35,7 @@ public:
 
 	void set_map(int id, const address_map_constructor &map, device_t *device);
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 	uint32_t sdram_addr_r();
 	void sdram_addr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
@@ -60,7 +60,7 @@ public:
 	uint32_t pci1_r(offs_t offset, uint32_t mem_mask = ~0);
 	void pci1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	virtual void target1_map(address_map &map);
+	virtual void target1_map(address_map &map) ATTR_COLD;
 	uint32_t target1_r(offs_t offset, uint32_t mem_mask = ~0);
 	void target1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
@@ -70,8 +70,8 @@ public:
 protected:
 	address_space *m_cpu_space;
 	virtual space_config_vector memory_space_config() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	enum
@@ -85,8 +85,8 @@ private:
 
 	address_space_config m_mem_config, m_io_config;
 
-	void cpu_map(address_map &map);
-	void serial_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void serial_map(address_map &map) ATTR_COLD;
 
 	void map_cpu_space();
 

@@ -32,7 +32,7 @@ protected:
 		m_data = data;
 	}
 
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	char m_manufacturer[8];
 	char m_product[16];

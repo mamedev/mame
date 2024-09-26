@@ -39,9 +39,9 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static const std::string_view s_interrupt_names[8];
@@ -78,7 +78,7 @@ private:
 	u8 device_reg_r(offs_t offset);
 	void device_reg_w(offs_t offset, u8 data);
 
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 
 	// internal CPU
 	required_device<r65c02_device> m_iopcpu;

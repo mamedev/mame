@@ -134,9 +134,9 @@ protected:
 	// device_t overrides
 	virtual void device_config_complete() override;
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 	virtual void device_pre_save() override;
 	//virtual void device_clock_changed() override;
@@ -198,7 +198,7 @@ protected:
 	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
 
 	// device_t overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// device_execute_interface overrides
@@ -300,11 +300,11 @@ protected:
 	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
 
 	// device_t overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 	virtual void device_validity_check(validity_checker &valid) const override;
-	//virtual void device_reset() override;
+	//virtual void device_reset() override ATTR_COLD;
 
 private:
 	std::map<int, netlist_mame_stream_output_device *> m_out;
@@ -401,7 +401,7 @@ public:
 		netlist::netlist_state_t &nlstate) const override;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sync_callback);
 
@@ -433,7 +433,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void pre_parse_action(netlist::nlparse_t &parser) override;
 	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
 
@@ -462,7 +462,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void pre_parse_action(netlist::nlparse_t &parser) override;
 	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
 
@@ -502,7 +502,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sync_callback);
 
@@ -544,7 +544,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sync_callback);
 
@@ -573,7 +573,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sync_callback);
 
@@ -602,7 +602,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
 private:
 	uint32_t m_channel;
@@ -640,8 +640,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
 	virtual void pre_parse_action(netlist::nlparse_t &parser) override;
 

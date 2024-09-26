@@ -70,8 +70,8 @@ public:
 protected:
 	i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int data_width);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void execute_set_input(int linenum, int state) override;
 
@@ -81,7 +81,7 @@ protected:
 	virtual void do_exec_partial() override;
 	virtual void internal_update(u64 current_time) override;
 
-	void internal_regs(address_map &map);
+	void internal_regs(address_map &map) ATTR_COLD;
 	void ad_command_w(u8 data);
 	u8 ad_result_r(offs_t offset);
 	void hsi_mode_w(u8 data);

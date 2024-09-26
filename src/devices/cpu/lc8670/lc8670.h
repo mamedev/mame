@@ -82,7 +82,7 @@ public:
 
 	template <typename... T> void set_lcd_update_cb(T &&... args) { m_lcd_update_func.set(std::forward<T>(args)...); }
 
-	void lc8670_internal_map(address_map &map);
+	void lc8670_internal_map(address_map &map) ATTR_COLD;
 protected:
 	enum
 	{
@@ -91,8 +91,8 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }

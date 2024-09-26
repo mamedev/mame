@@ -27,8 +27,8 @@ protected:
 	virtual void device_start() override { }
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_archimedes_podule_interface overrides
 	virtual void ioc_map(address_map &map) override

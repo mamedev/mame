@@ -14,12 +14,12 @@ class a800_rom_bbsb_device : public a800_rom_device
 public:
 	a800_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void cart_map(address_map &map) override;
+	virtual void cart_map(address_map &map) override ATTR_COLD;
 	virtual std::tuple<int, int> get_initial_rd_state() override { return std::make_tuple(1, 1); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	int m_banks[2];
 
@@ -33,11 +33,11 @@ class a5200_rom_bbsb_device : public a5200_rom_device
 public:
 	a5200_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void cart_map(address_map &map) override;
+	virtual void cart_map(address_map &map) override ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	int m_banks[2];
 

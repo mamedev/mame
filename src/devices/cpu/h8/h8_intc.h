@@ -63,8 +63,8 @@ protected:
 
 	h8_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void get_priority(int vect, int &icr_pri, int &ipr_pri) const;
 	void update_irq_state();
@@ -106,8 +106,8 @@ protected:
 
 	h8h_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void get_priority(int vect, int &icr_pri, int &ipr_pri) const override;
 };
@@ -132,8 +132,8 @@ private:
 	static const int vector_to_slot[];
 	u8 m_ipr[11];
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void get_priority(int vect, int &icr_pri, int &ipr_pri) const override;
 	virtual void update_irq_types() override;
@@ -151,7 +151,7 @@ public:
 	void clear_interrupt(int vector);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(H8_INTC,    h8_intc_device)

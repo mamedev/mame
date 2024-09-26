@@ -29,7 +29,7 @@ public:
 		device_t *owner,
 		u32 clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	auto out_callback() { return m_keyboard_cb.bind(); }
 	auto out_meta_callback() { return m_out_meta_cb.bind(); }

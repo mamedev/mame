@@ -120,8 +120,8 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void cpu_pgm_map(address_map &map) override;
-	virtual void cpu_ioc_map(address_map &map) override;
+	virtual void cpu_pgm_map(address_map &map) override ATTR_COLD;
+	virtual void cpu_ioc_map(address_map &map) override ATTR_COLD;
 
 	virtual void da0_ctl_w(u8 data) override;
 

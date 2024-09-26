@@ -704,7 +704,7 @@ protected:
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void device_resolve_objects() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	void namcos10_base(machine_config &config);
 	void namcos10_exio(machine_config &config);

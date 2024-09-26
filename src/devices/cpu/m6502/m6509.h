@@ -36,8 +36,8 @@ protected:
 		virtual void write_9(uint16_t adr, uint8_t val) override;
 	};
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual offs_t pc_to_external(u16 pc) override;
 
 	uint8_t bank_i, bank_y;

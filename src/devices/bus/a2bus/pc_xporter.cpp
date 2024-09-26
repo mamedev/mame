@@ -114,9 +114,9 @@ public:
 protected:
 	a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
@@ -188,8 +188,8 @@ private:
 
 	void pc_select_dma_channel(int channel, bool state);
 
-	void pc_io(address_map &map);
-	void pc_map(address_map &map);
+	void pc_io(address_map &map) ATTR_COLD;
+	void pc_map(address_map &map) ATTR_COLD;
 };
 
 void a2bus_pcxporter_device::pc_map(address_map &map)

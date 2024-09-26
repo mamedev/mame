@@ -26,13 +26,13 @@ protected:
 			u32 clock,
 			address_map_constructor internal_map);
 
-	template <offs_t RomBytes> void memory_map(address_map &map);
+	template <offs_t RomBytes> void memory_map(address_map &map) ATTR_COLD;
 
 protected:
-	void device_reset() override;
+	void device_reset() override ATTR_COLD;
 
 private:
-	void peripheral_map(address_map &map);
+	void peripheral_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -419,7 +419,7 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void device_resolve_objects() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	uint32_t screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -495,7 +495,7 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void device_resolve_objects() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	void firebeat_spu_base(machine_config &config);
 	void firebeat_spu_map(address_map &map) ATTR_COLD;
@@ -557,7 +557,7 @@ public:
 	void init_ppp_overseas();
 
 private:
-	virtual void device_resolve_objects() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	void firebeat_ppp_map(address_map &map) ATTR_COLD;
 
@@ -602,7 +602,7 @@ public:
 	void firebeat_kbm(machine_config &config);
 
 private:
-	virtual void device_resolve_objects() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	void firebeat_kbm_map(address_map &map) ATTR_COLD;
 

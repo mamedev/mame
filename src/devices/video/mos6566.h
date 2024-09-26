@@ -231,8 +231,8 @@ protected:
 	mos6566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_run() override;
 
 	inline void set_interrupt( int mask );
@@ -260,8 +260,8 @@ protected:
 	void draw_graphics();
 	void draw_sprites();
 
-	void mos6566_colorram_map(address_map &map);
-	void mos6566_videoram_map(address_map &map);
+	void mos6566_colorram_map(address_map &map) ATTR_COLD;
+	void mos6566_videoram_map(address_map &map) ATTR_COLD;
 
 	int m_icount;
 	const int m_variant;

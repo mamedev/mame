@@ -12,7 +12,7 @@ class octopus_keyboard_device : public buffered_rs232_device<16U>, protected dev
 {
 public:
 	octopus_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;

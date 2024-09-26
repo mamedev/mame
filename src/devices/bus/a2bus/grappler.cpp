@@ -76,8 +76,8 @@ protected:
 
 protected:
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// helpers
 	void set_rom_bank(u16 rom_bank);
@@ -241,9 +241,9 @@ public:
 protected:
 	// device_t implementation
 	virtual tiny_rom_entry const *device_rom_region() const override { return ROM_NAME(grappler); }
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// printer status inputs
@@ -446,9 +446,9 @@ protected:
 	a2bus_grapplerplus_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// ACK latch set input
 	void ack_w(int state);
@@ -631,9 +631,9 @@ public:
 protected:
 	// device_t implementation
 	virtual tiny_rom_entry const *device_rom_region() const override { return ROM_NAME(grapplerplus); }
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// a2bus_grapplerplus_device_base implementation
@@ -855,10 +855,10 @@ protected:
 
 	// device_t implementation
 	virtual tiny_rom_entry const *device_rom_region() const override { return ROM_NAME(bufgrapplerplus); }
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// helpers
 	template <typename T> void device_add_mconfig(machine_config &config, T &&mcu_clock);
@@ -871,7 +871,7 @@ private:
 	void buf_ack_w(int state);
 
 	// MCU I/O handlers
-	void mcu_io(address_map &map);
+	void mcu_io(address_map &map) ATTR_COLD;
 	void mcu_p2_w(u8 data);
 	u8 mcu_bus_r();
 	void mcu_bus_w(u8 data);

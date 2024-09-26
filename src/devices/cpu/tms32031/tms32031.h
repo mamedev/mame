@@ -144,13 +144,13 @@ protected:
 
 	// construction/destruction
 	tms3203x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, int clock_per_inst, address_map_constructor internal_map);
-	void common_3203x(address_map &map);
+	void common_3203x(address_map &map) ATTR_COLD;
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override;
@@ -803,7 +803,7 @@ class tms32030_device : public tms3203x_device
 public:
 	// construction/destruction
 	tms32030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void internal_32030(address_map &map);
+	void internal_32030(address_map &map) ATTR_COLD;
 };
 
 
@@ -814,7 +814,7 @@ class tms32031_device : public tms3203x_device
 public:
 	// construction/destruction
 	tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void internal_32031(address_map &map);
+	void internal_32031(address_map &map) ATTR_COLD;
 };
 
 
@@ -825,7 +825,7 @@ class tms32032_device : public tms3203x_device
 public:
 	// construction/destruction
 	tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void internal_32032(address_map &map);
+	void internal_32032(address_map &map) ATTR_COLD;
 };
 
 
@@ -836,7 +836,7 @@ class tms32033_device : public tms3203x_device
 public:
 	// construction/destruction
 	tms32033_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void internal_32033(address_map &map);
+	void internal_32033(address_map &map) ATTR_COLD;
 };
 
 

@@ -47,9 +47,9 @@ protected:
 	mn1400_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
@@ -64,10 +64,10 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
-	void program_1kx8(address_map &map);
-	void program_2kx8(address_map &map);
-	void data_64x4(address_map &map);
-	void data_128x4(address_map &map);
+	void program_1kx8(address_map &map) ATTR_COLD;
+	void program_2kx8(address_map &map) ATTR_COLD;
+	void data_64x4(address_map &map) ATTR_COLD;
+	void data_128x4(address_map &map) ATTR_COLD;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;

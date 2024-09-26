@@ -38,7 +38,7 @@ protected:
 	virtual void map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
 						   u64 io_window_start, u64 io_window_end, u64 io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 

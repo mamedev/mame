@@ -32,7 +32,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_ieee488_interface overrides
 	virtual void ieee488_eoi(int state) override;

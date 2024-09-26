@@ -22,7 +22,7 @@ public:
 	kim1bus_k1016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	std::unique_ptr<u8[]> m_ram;

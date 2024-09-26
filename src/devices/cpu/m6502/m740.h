@@ -37,8 +37,8 @@ public:
 	};
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 

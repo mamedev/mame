@@ -144,7 +144,7 @@ class isa16_calchase_jamma_if : public device_t, public device_isa16_card_interf
 public:
 	// construction/destruction
 	isa16_calchase_jamma_if(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	ioport_value heartbeat_r();
 

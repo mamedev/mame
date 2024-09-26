@@ -39,12 +39,12 @@ public:
 	void set_isatag(const char *tag) { m_isatag = tag; }
 	void set_biostag(const char *tag) { m_biostag = tag; }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 

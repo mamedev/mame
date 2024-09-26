@@ -23,8 +23,8 @@ public:
 protected:
 	geforce256_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_start() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 };
 
 class geforce256_ddr_device : public geforce256_device
@@ -33,7 +33,7 @@ public:
 	geforce256_ddr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 class quadro_device : public geforce256_device
@@ -45,7 +45,7 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::PROTECTION; }
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 

@@ -420,7 +420,7 @@ protected:
 
 	void a800xl_mem(address_map &map) ATTR_COLD;
 
-	virtual void area_a000_map(address_map &map) override;
+	virtual void area_a000_map(address_map &map) override ATTR_COLD;
 
 	memory_view m_basic_view;
 };

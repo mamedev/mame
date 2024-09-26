@@ -43,7 +43,7 @@ public:
 	uint8_t io_control_r(offs_t offset);
 	void io_control_w(offs_t offset, uint8_t data);
 
-	void mn1020012a_internal_map(address_map &map);
+	void mn1020012a_internal_map(address_map &map) ATTR_COLD;
 protected:
 	static constexpr unsigned MN10200_NUM_PRESCALERS = 2;
 	static constexpr unsigned MN10200_NUM_TIMERS_8BIT = 10;
@@ -54,8 +54,8 @@ protected:
 	mn10200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; } // internal /2 divider

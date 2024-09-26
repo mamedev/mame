@@ -61,7 +61,7 @@ public:
 	   { }
 
 protected:
-	virtual void aw_map(address_map &map) override;
+	virtual void aw_map(address_map &map) override ATTR_COLD;
 private:
 	uint64_t allnet_hack_r(offs_t offset, uint64_t mem_mask = ~0);
 };

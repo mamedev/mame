@@ -215,9 +215,9 @@ private:
 	void msm_volume_w(uint8_t data);
 	template <uint8_t N> void ay_volume_w(uint8_t data);
 
-	virtual void program_map(address_map &map) override;
+	virtual void program_map(address_map &map) override ATTR_COLD;
 	virtual void io_map(address_map &map) override { }
-	virtual void sound_map(address_map &map) override;
+	virtual void sound_map(address_map &map) override ATTR_COLD;
 
 	required_device<ta7630_device> m_ta7630;
 	required_device<msm5232_device> m_msm;

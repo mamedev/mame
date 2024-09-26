@@ -24,8 +24,8 @@ protected:
 	z80cpu_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void addrmap_mem(address_map &map) { map.unmap_value_high(); }
 	void addrmap_io(address_map &map) { map.unmap_value_high(); }
@@ -64,8 +64,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_resolve_objects() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	virtual void card_int_w(int state) override { m_maincpu->set_input_line(INPUT_LINE_IRQ0, state); }
 };
@@ -100,8 +100,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_resolve_objects() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	virtual void card_int_w(int state) override { m_maincpu->set_input_line(INPUT_LINE_IRQ0, state); }
 	virtual void card_nmi_w(int state) override { m_maincpu->set_input_line(INPUT_LINE_NMI, state); }

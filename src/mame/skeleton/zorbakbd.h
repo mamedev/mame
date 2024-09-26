@@ -27,8 +27,8 @@ protected:
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 
 	required_ioport_array<16>       m_rows;
 	required_device<beep_device>    m_beeper;

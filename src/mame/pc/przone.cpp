@@ -49,7 +49,7 @@ class isa16_przone_jamma_if : public device_t, public device_isa16_card_interfac
 public:
 	// construction/destruction
 	isa16_przone_jamma_if(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;

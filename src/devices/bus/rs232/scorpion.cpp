@@ -60,18 +60,18 @@ public:
 	virtual void input_rts(int state) override { m_rts = state; }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<hd6301x_cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
 	required_device<pcf8573_device> m_rtc;
 
-	void scorpion_map(address_map &map);
+	void scorpion_map(address_map &map) ATTR_COLD;
 
 	uint8_t port2_r();
 	uint8_t port5_r();

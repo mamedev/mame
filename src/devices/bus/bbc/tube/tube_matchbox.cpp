@@ -74,13 +74,13 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual uint8_t host_r(offs_t offset) override;
 	virtual void host_w(offs_t offset, uint8_t data) override;
@@ -104,7 +104,7 @@ private:
 	memory_view m_m65c102_view;
 	required_memory_bank_array<8> m_m65c102_bank;
 
-	void m65c102_mem(address_map &map);
+	void m65c102_mem(address_map &map) ATTR_COLD;
 	void m65c102_reset(uint8_t dip);
 	void m65c102_bank_w(offs_t offset, uint8_t data);
 
@@ -113,9 +113,9 @@ private:
 	required_region_ptr<uint8_t> m_z80_rom;
 	memory_view m_z80_view;
 
-	void z80_opcodes(address_map &map);
-	void z80_io(address_map &map);
-	void z80_mem(address_map &map);
+	void z80_opcodes(address_map &map) ATTR_COLD;
+	void z80_io(address_map &map) ATTR_COLD;
+	void z80_mem(address_map &map) ATTR_COLD;
 	void z80_reset(uint8_t dip);
 	uint8_t z80_opcode_r(offs_t offset);
 
@@ -123,8 +123,8 @@ private:
 	required_device<i80286_cpu_device> m_i80286;
 	required_region_ptr<uint16_t> m_i80286_rom;
 
-	void i80286_io(address_map &map);
-	void i80286_mem(address_map &map);
+	void i80286_io(address_map &map) ATTR_COLD;
+	void i80286_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_irq_latch;
 
@@ -133,7 +133,7 @@ private:
 	required_region_ptr<uint8_t> m_m6809_rom;
 	memory_passthrough_handler m_m6809_rom_shadow_tap;
 
-	void m6809_mem(address_map &map);
+	void m6809_mem(address_map &map) ATTR_COLD;
 	void m6809_reset();
 	uint8_t m6809_mem_r(offs_t offset);
 	bool m_m6809_rom_enabled;
@@ -145,14 +145,14 @@ private:
 	memory_passthrough_handler m_m68000_rom_shadow_tap;
 	memory_view m_m68000_view;
 
-	void m68000_mem(address_map &map);
+	void m68000_mem(address_map &map) ATTR_COLD;
 	void m68000_reset();
 
 	// PDP-11
 	required_device<t11_device> m_pdp11;
 	required_region_ptr<uint16_t> m_pdp11_rom;
 
-	void pdp11_mem(address_map &map);
+	void pdp11_mem(address_map &map) ATTR_COLD;
 	void pdp11_reset();
 	//uint8_t irq_callback(offs_t offset);
 	void pdp11_irq_encoder(int irq, int state);
@@ -164,7 +164,7 @@ private:
 	required_region_ptr<uint32_t> m_arm2_rom;
 	memory_passthrough_handler m_arm2_rom_shadow_tap;
 
-	void arm2_mem(address_map &map);
+	void arm2_mem(address_map &map) ATTR_COLD;
 	void arm2_reset();
 
 	// 32016
@@ -173,7 +173,7 @@ private:
 	memory_passthrough_handler m_ns32016_rom_shadow_tap;
 	memory_view m_ns32016_view;
 
-	void ns32016_mem(address_map &map);
+	void ns32016_mem(address_map &map) ATTR_COLD;
 	void ns32016_reset();
 };
 

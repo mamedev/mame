@@ -129,7 +129,7 @@ public:
 	{ }
 
 protected:
-	virtual void main_map(address_map &map) override;
+	virtual void main_map(address_map &map) override ATTR_COLD;
 private:
 	// FIXME: should really use IPT_OUTPUT instead of subclassing
 	virtual void ca00_w(offs_t offset, u8 data) override;

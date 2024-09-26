@@ -38,7 +38,7 @@ public:
 	void draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rectangle &cliprect, bool flipscreen);
 
 protected:
-	virtual void device_resolve_objects() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 private:

@@ -24,13 +24,13 @@ public:
 	robotron_k7071_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	void cpu_mem(address_map &map);
-	virtual void cpu_pio(address_map &map);
+	void cpu_mem(address_map &map) ATTR_COLD;
+	virtual void cpu_pio(address_map &map) ATTR_COLD;
 
 private:
 	required_device<z80_device> m_cpu;

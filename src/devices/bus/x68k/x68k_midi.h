@@ -25,15 +25,15 @@ public:
 	x68k_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	uint8_t x68k_midi_reg_r(offs_t offset);
 	void x68k_midi_reg_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_x68k_expansion_card_interface overrides
 	virtual uint8_t iack4() override;

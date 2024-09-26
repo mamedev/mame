@@ -59,7 +59,7 @@ protected:
 	hlcd0515_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 colmax);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_nvram_interface implementation
 	virtual void nvram_default() override { internal_clear(); }

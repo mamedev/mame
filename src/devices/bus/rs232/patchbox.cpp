@@ -91,7 +91,7 @@ protected:
 		m_dce_port->txc_handler().set(FUNC(rs232_patch_box_device::signal_in<TXC>));
 	}
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void device_resolve_objects() override
 	{

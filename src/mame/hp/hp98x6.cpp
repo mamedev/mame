@@ -331,7 +331,7 @@ private:
 	static inline constexpr unsigned TEXT_VRAM_SIZE = 2048;
 	static inline constexpr unsigned GRAPHIC_VRAM_SIZE = 16384;
 
-	virtual void cpu_mem_map(address_map &map) override;
+	virtual void cpu_mem_map(address_map &map) override ATTR_COLD;
 	uint16_t text_r(offs_t offset);
 	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t graphic_r(offs_t offset, uint16_t mem_mask);
@@ -864,7 +864,7 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(fdc_ram_io);
 
 	void hp9826_36(machine_config &mconfig, unsigned dot_clock, int char_width);
-	virtual void cpu_mem_map(address_map &map) override;
+	virtual void cpu_mem_map(address_map &map) override ATTR_COLD;
 	virtual void cpu_reset_w(int state) override;
 	unsigned get_sel_floppy() const;
 	floppy_image_device *get_drive(unsigned idx) const;
@@ -1278,7 +1278,7 @@ private:
 	static inline constexpr unsigned TEXT_VRAM_SIZE = 2048;
 	static inline constexpr unsigned GRAPHIC_VRAM_SIZE = 16384;
 
-	virtual void cpu_mem_map(address_map &map) override;
+	virtual void cpu_mem_map(address_map &map) override ATTR_COLD;
 	uint16_t text_r(offs_t offset, uint16_t mem_mask);
 	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t graphic_r(offs_t offset, uint16_t mem_mask);
@@ -1457,7 +1457,7 @@ private:
 	static inline constexpr unsigned TEXT_VRAM_SIZE = 2048;
 	static inline constexpr unsigned GRAPHIC_VRAM_SIZE = 16384;
 
-	virtual void cpu_mem_map(address_map &map) override;
+	virtual void cpu_mem_map(address_map &map) override ATTR_COLD;
 	uint16_t text_r(offs_t offset, uint16_t mem_mask);
 	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t graphic_r(offs_t offset, uint16_t mem_mask);
@@ -1809,7 +1809,7 @@ private:
 	static inline constexpr unsigned TEXT_VRAM_SIZE = 2048;
 	static inline constexpr unsigned GRAPHIC_VRAM_SIZE = 131072;
 
-	virtual void cpu_mem_map(address_map &map) override;
+	virtual void cpu_mem_map(address_map &map) override ATTR_COLD;
 	uint16_t text_r(offs_t offset, uint16_t mem_mask);
 	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t graphic_r(offs_t offset, uint16_t mem_mask);

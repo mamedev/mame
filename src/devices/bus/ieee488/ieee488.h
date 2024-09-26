@@ -122,8 +122,8 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	class daisy_entry
 	{
@@ -199,7 +199,7 @@ public:
 	int get_address() { return m_address; }
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 protected:
 	int m_address;

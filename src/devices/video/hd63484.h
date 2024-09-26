@@ -40,13 +40,13 @@ public:
 	uint8_t read8(offs_t offset);
 
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	inline uint16_t readword(offs_t address);
 	inline void writeword(offs_t address, uint16_t data);

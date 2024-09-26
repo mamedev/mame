@@ -35,8 +35,8 @@ protected:
 	kp63_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 num_counters, u8 mode_mask);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static const char *const s_count_modes[4];

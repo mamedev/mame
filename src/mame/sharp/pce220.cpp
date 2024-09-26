@@ -105,7 +105,7 @@ protected:
 	uint8_t m_port18;
 	uint8_t m_battery_sel;
 
-	virtual void device_resolve_objects() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 

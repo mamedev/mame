@@ -43,10 +43,10 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void pk32_map_microcode(address_map &map);
-	void pk32_map_sysram(address_map &map);
-	void pk32_map_ram(address_map &map);
-	void pk32_map_io(address_map &map);
+	void pk32_map_microcode(address_map &map) ATTR_COLD;
+	void pk32_map_sysram(address_map &map) ATTR_COLD;
+	void pk32_map_ram(address_map &map) ATTR_COLD;
+	void pk32_map_io(address_map &map) ATTR_COLD;
 
 	required_device<kl1839vm1_device> m_maincpu;
 	required_device<ram_device> m_ram;

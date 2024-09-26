@@ -46,8 +46,8 @@ protected:
 	v25_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override { notify_clock_changed(); }
 
 	// device_execute_interface overrides
@@ -172,7 +172,7 @@ private:
 	void nec_trap();
 	void external_int();
 
-	void ida_sfr_map(address_map &map);
+	void ida_sfr_map(address_map &map) ATTR_COLD;
 	uint8_t read_irqcontrol(int /*INTSOURCES*/ source, uint8_t priority);
 	void write_irqcontrol(int /*INTSOURCES*/ source, uint8_t d);
 	uint8_t p0_r();

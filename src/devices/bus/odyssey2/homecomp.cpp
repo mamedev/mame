@@ -43,10 +43,10 @@ public:
 	o2_homecomp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void cart_init() override;
 
@@ -71,8 +71,8 @@ private:
 	u8 internal_io_r(offs_t offset);
 	u8 internal_rom_r(offs_t offset) { return m_exrom[offset]; }
 
-	void homecomp_io(address_map &map);
-	void homecomp_mem(address_map &map);
+	void homecomp_io(address_map &map) ATTR_COLD;
+	void homecomp_mem(address_map &map) ATTR_COLD;
 };
 
 o2_homecomp_device::o2_homecomp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :

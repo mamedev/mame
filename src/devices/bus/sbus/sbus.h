@@ -40,8 +40,8 @@ protected:
 
 	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// configuration
 	required_device<sbus_device> m_sbus;
@@ -94,7 +94,7 @@ protected:
 	sbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// internal state
 	required_device<sparc_base_device> m_maincpu;
@@ -107,9 +107,9 @@ protected:
 	device_sbus_card_interface *m_device_list[3];
 
 private:
-	void slot1_timeout_map(address_map &map);
-	void slot2_timeout_map(address_map &map);
-	void slot3_timeout_map(address_map &map);
+	void slot1_timeout_map(address_map &map) ATTR_COLD;
+	void slot2_timeout_map(address_map &map) ATTR_COLD;
+	void slot3_timeout_map(address_map &map) ATTR_COLD;
 
 	template <unsigned Slot> uint32_t slot_timeout_r();
 	template <unsigned Slot> void slot_timeout_w(uint32_t data);

@@ -213,7 +213,7 @@ private:
 	required_device<dac_8bit_r2r_device> m_speech;
 	output_finder<> m_eye_led;
 
-	virtual void main_map(address_map &map) override;
+	virtual void main_map(address_map &map) override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 	virtual void control_w(offs_t offset, u8 data) override;

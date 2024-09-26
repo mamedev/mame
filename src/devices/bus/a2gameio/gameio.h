@@ -82,8 +82,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	optional_device<screen_device> m_screen;
 

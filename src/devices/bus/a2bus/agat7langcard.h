@@ -30,8 +30,8 @@ public:
 protected:
 	a2bus_agat7langcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_cnxx(uint8_t offset) override;

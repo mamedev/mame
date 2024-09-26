@@ -46,7 +46,7 @@ public:
 		m_keyboard_cb.set(std::forward<T>(args)...);
 	}
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 protected:
 	grid_keyboard_device(

@@ -31,10 +31,10 @@ public:
 
 protected:
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_pce_control_port_interface overrides
 	virtual u8 peripheral_r() override;

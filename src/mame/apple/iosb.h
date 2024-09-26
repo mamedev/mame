@@ -170,7 +170,7 @@ public:
 	// construction/destruction
 	primetimeii_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 	void ata_irq_w(int state);
 

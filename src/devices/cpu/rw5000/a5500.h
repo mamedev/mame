@@ -33,8 +33,8 @@ protected:
 	virtual void reset_pc() override { set_pc(0, 0); }
 	virtual u8 sr_page() override { return 15; }
 
-	void program_768x8(address_map &map);
-	void data_48x4(address_map &map);
+	void program_768x8(address_map &map) ATTR_COLD;
+	void data_48x4(address_map &map) ATTR_COLD;
 };
 
 
