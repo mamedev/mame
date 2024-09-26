@@ -11622,7 +11622,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="gladmort">
-		<description>GladMort (demo 2)</description>
+		<description>GladMort (demo²)</description>
 		<year>2024</year>
 		<publisher>PixelHeart</publisher>
 		<sharedfeat name="release" value="MVS,AES" />
