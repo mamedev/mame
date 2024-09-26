@@ -421,23 +421,7 @@ private:
 
 	uint8_t pal_ntsc_r();
 
-	uint8_t lightgun_r(offs_t offset)
-	{
-		if (!m_lightgun[offset])
-			return 0xff;
-
-		uint16_t ret = m_lightgun[offset>>1]->read();
-
-		if (offset & 1)
-			ret >>= 8;
-		else
-			ret &= 0xff;
-
-		if (offset == 0)
-			ret += 0x20;
-
-		return ret;
-	}
+	virtual uint8_t lightgun_r(offs_t offset) { logerror("%s: unhandled lightgun_r %d\n", machine().describe_context(), offset); return 0xff;  }
 
 	uint8_t xavix_memoryemu_txarray_r(offs_t offset);
 	void xavix_memoryemu_txarray_w(offs_t offset, uint8_t data);
@@ -662,6 +646,22 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(gun_fired);
 	DECLARE_INPUT_CHANGED_MEMBER(gun2_fired);
+
+private:
+	virtual uint8_t lightgun_r(offs_t offset) override
+	{
+		uint16_t ret = m_lightgun[offset>>1]->read();
+
+		if (offset & 1)
+			ret >>= 8;
+		else
+			ret &= 0xff;
+
+		if (offset == 0)
+			ret += 0x20;
+
+		return ret;
+	}
 
 };
 
