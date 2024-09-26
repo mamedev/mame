@@ -566,67 +566,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="freedos10">
-		<description>FreeDOS 1.0 (bootdisk)</description>
-		<year>2006</year>
-		<publisher>The FreeDOS Project</publisher>
-		<info name="version" value="1.0"/>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="fdboot.img" size="1474560" crc="5160c4c9" sha1="813fa09f2278b0b83b67c6d2bda68a46cd83234d"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="freedos12">
-		<description>FreeDOS 1.2 (bootdisk)</description>
-		<year>2016</year>
-		<publisher>The FreeDOS Project</publisher>
-		<info name="version" value="1.2"/>
-		<part name="flop" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="FLOPPY.img" size="1474560" crc="e8b32691" sha1="2dd8bb9751176533dd7d00160a5eed0d8cbb4725"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="freedos13rc1">
-		<description>FreeDOS 1.3 Release Candidate 1 (bootdisk)</description>
-		<year>2019</year>
-		<publisher>The FreeDOS Project</publisher>
-		<info name="version" value="1.3-RC1"/>
-		<part name="flop" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="FD13FLOP.IMG" size="1474560" crc="27efbe97" sha1="7a4e3b21c7c6eacd38fadd5b4f43db0c7a756dd8"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="freedos13rc2">
-		<description>FreeDOS 1.3 Release Candidate 2 (bootdisk)</description>
-		<year>2019</year>
-		<publisher>The FreeDOS Project</publisher>
-		<info name="version" value="1.3-RC2"/>
-		<part name="flop" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="FD13FLOP.IMG" size="1474560" crc="280b9f4a" sha1="8d03e815712e3f885e7beb849552bb16d60a3b58"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="freedos13rc3">
-		<description>FreeDOS 1.3 Release Candidate 3 (bootdisk)</description>
-		<year>2020</year>
-		<publisher>The FreeDOS Project</publisher>
-		<info name="version" value="1.3-RC3"/>
-		<part name="flop" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="FD13FLOP.IMG" size="1474560" crc="128677ac" sha1="1adc07c319efd8976913cb29f1050401d12ff505"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="freedos13rc3_35" cloneof="freedos13rc3">
+	<software name="freedos13rc3_35">
 		<description>FreeDOS 1.3 Release Candidate 3 (Floppy-Only Edition)</description>
 		<year>2020</year>
 		<publisher>The FreeDOS Project</publisher>
@@ -675,19 +615,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="freedos13rc4">
-		<description>FreeDOS 1.3 Release Candidate 4 (bootdisk)</description>
-		<year>2021</year>
-		<publisher>The FreeDOS Project</publisher>
-		<info name="version" value="1.3-RC4"/>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="FD13FLOP.img" size="1474560" crc="866dceed" sha1="7dfeecef443b2f0f69de0d508e5a17490961ebcf"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="freedos13rc4_120" cloneof="freedos13rc4">
+	<software name="freedos13rc4_120" cloneof="freedos13rc4_144">
 		<description>FreeDOS 1.3 Release Candidate 4 (Floppy-Only Edition, 5.25" 1.2MB)</description>
 		<year>2021</year>
 		<publisher>The FreeDOS Project</publisher>
@@ -754,7 +682,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="freedos13rc4_144" cloneof="freedos13rc4">
+	<software name="freedos13rc4_144">
 		<description>FreeDOS 1.3 Release Candidate 4 (Floppy-Only Edition, 3.5" 1.44MB)</description>
 		<year>2021</year>
 		<publisher>The FreeDOS Project</publisher>
