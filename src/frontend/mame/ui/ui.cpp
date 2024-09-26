@@ -188,7 +188,7 @@ struct mame_ui_manager::active_pointer
 };
 
 
-struct mame_ui_manager::pointer_options
+class mame_ui_manager::pointer_options
 {
 public:
 	pointer_options()
