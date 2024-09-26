@@ -25,8 +25,8 @@ public:
 	void zevio(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -37,7 +37,7 @@ private:
 	uint32_t z900b0014_r();
 	uint32_t zb8000024_r();
 
-	void arm_map(address_map &map);
+	void arm_map(address_map &map) ATTR_COLD;
 };
 
 uint32_t zevio_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

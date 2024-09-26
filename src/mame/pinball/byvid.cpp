@@ -105,8 +105,8 @@ public:
 	void granny(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	u8 m_mpu_to_vid = 0U;
 	u8 m_vid_to_mpu = 0U;
 	u8 m_u7a = 0U;
@@ -167,9 +167,9 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	void granny_crtc_w(offs_t offset, u8 data);
 	uint32_t screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void granny_map(address_map &map);
-	void main_map(address_map &map);
-	void video_map(address_map &map);
+	void granny_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void video_map(address_map &map) ATTR_COLD;
 };
 
 

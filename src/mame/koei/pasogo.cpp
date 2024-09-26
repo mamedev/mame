@@ -171,8 +171,8 @@ private:
 		} pmu;
 	} m_vg230;
 
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
@@ -181,9 +181,9 @@ private:
 	memory_region *m_cart_rom = nullptr;
 	uint8_t m_ems_index = 0;
 	uint16_t m_ems_bank[28]{};
-	void emsbank_map(address_map &map);
-	void pasogo_io(address_map &map);
-	void pasogo_mem(address_map &map);
+	void emsbank_map(address_map &map) ATTR_COLD;
+	void pasogo_io(address_map &map) ATTR_COLD;
+	void pasogo_mem(address_map &map) ATTR_COLD;
 };
 
 

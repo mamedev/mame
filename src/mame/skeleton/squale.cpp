@@ -153,8 +153,8 @@ private:
 	void pia_u75_cb2_w(int state);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t keyboard_line = 0U;
 	uint8_t fdc_sel0 = 0U;
@@ -166,7 +166,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(squale_scanline);
 
-	void squale_mem(address_map &map);
+	void squale_mem(address_map &map) ATTR_COLD;
 
 	required_device<acia6850_device> m_acia;
 	required_device<ay8910_device> m_ay8910;

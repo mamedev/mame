@@ -113,8 +113,8 @@ public:
 	bool m_flip_screen = false;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u8 m_gfxregion8x8;
 	u8 m_gfxregion16x16;

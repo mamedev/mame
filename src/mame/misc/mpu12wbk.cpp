@@ -469,7 +469,7 @@ public:
 	void init_mpu12wbk();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	virtual void machine_start() override { m_lamps.resolve(); }
 
 private:
@@ -489,7 +489,7 @@ private:
 	void crtc_vs(int state);
 
 	uint32_t screen_update_mpu12wbk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void mpu12wbk_map(address_map &map);
+	void mpu12wbk_map(address_map &map) ATTR_COLD;
 	uint32_t m_frames = 0;
 };
 

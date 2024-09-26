@@ -28,14 +28,14 @@ public:
 	void clxvme186(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void unknown_w(u16 data);
 	u8 sasi_status_r();
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 };

@@ -150,7 +150,7 @@ public:
 	void ltcasino(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<pia6821_device, 2> m_pia;
@@ -167,7 +167,7 @@ protected:
 	tilemap_t *m_tilemap;
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(tile_info);
@@ -190,7 +190,7 @@ public:
 	void mv4in1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void palette(palette_device &palette) const;

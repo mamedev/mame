@@ -42,10 +42,10 @@ public:
 	void init_indiana();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void indiana_mem(address_map &map);
+	void indiana_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };

@@ -89,8 +89,8 @@ public:
 	void hhtiger(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t disable_rom_r();
 	uint8_t read(offs_t offset);
@@ -121,10 +121,10 @@ private:
 	void via_1_out_ca2(int state);
 	void via_1_out_cb2(int state);
 
-	void z80_mem(address_map &map);
-	void z80_io(address_map &map);
-	void m6809_mem(address_map &map);
-	void upd7220_map(address_map &map);
+	void z80_mem(address_map &map) ATTR_COLD;
+	void z80_io(address_map &map) ATTR_COLD;
+	void m6809_mem(address_map &map) ATTR_COLD;
+	void upd7220_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_memory_region m_rom_z80;

@@ -109,8 +109,8 @@ public:
 	void alphatp2(machine_config &config);
 	void alphatp2u(machine_config &config);
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 
@@ -132,9 +132,9 @@ private:
 	void beep_w(u8 data);
 	void bank_w(u8 data);
 
-	void alphatp2_io(address_map &map);
-	void alphatp2_map(address_map &map);
-	void alphatp2_mem(address_map &map);
+	void alphatp2_io(address_map &map) ATTR_COLD;
+	void alphatp2_map(address_map &map) ATTR_COLD;
+	void alphatp2_mem(address_map &map) ATTR_COLD;
 
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<i8041a_device> m_kbdmcu;
@@ -182,8 +182,8 @@ public:
 	void alphatp3(machine_config &config);
 	void alphatp30(machine_config &config);
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -216,11 +216,11 @@ private:
 
 	u8* vramext_addr_xlate(offs_t offset);
 
-	void alphatp30_8088_io(address_map &map);
-	void alphatp30_8088_map(address_map &map);
-	void alphatp3_io(address_map &map);
-	void alphatp3_map(address_map &map);
-	void alphatp3_mem(address_map &map);
+	void alphatp30_8088_io(address_map &map) ATTR_COLD;
+	void alphatp30_8088_map(address_map &map) ATTR_COLD;
+	void alphatp3_io(address_map &map) ATTR_COLD;
+	void alphatp3_map(address_map &map) ATTR_COLD;
+	void alphatp3_mem(address_map &map) ATTR_COLD;
 
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<i8041a_device> m_kbdmcu;

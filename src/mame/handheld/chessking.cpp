@@ -63,7 +63,7 @@ public:
 	void chesskng(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -78,8 +78,8 @@ private:
 	uint8_t m_cart_bank = 0;
 	uint16_t m_beeper_freq = 0;
 
-	void chesskng_map(address_map &map);
-	void chesskng_io(address_map &map);
+	void chesskng_map(address_map &map) ATTR_COLD;
+	void chesskng_io(address_map &map) ATTR_COLD;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	uint8_t cartridge_r(offs_t offset);

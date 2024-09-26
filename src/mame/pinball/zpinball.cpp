@@ -46,8 +46,8 @@ public:
 	void eballchps(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 pal_r();
@@ -71,8 +71,8 @@ private:
 	void o5_w(u8 data);
 	void o6_w(u8 data);
 
-	void zpu_mem(address_map &map);
-	void zpu_io(address_map &map);
+	void zpu_mem(address_map &map) ATTR_COLD;
+	void zpu_io(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_zpumpu;
 	required_device<z80ctc_device> m_zpuctc;

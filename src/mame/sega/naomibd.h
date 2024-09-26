@@ -30,8 +30,8 @@ public:
 protected:
 	naomi_board(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void dma_get_position(uint8_t *&base, uint32_t &limit, bool to_mainram) override;
 	virtual void dma_advance(uint32_t size) override;

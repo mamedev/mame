@@ -46,8 +46,8 @@ protected:
 	static constexpr uint8_t AT_BLINK       = 0x04;
 	static constexpr uint8_t AT_BLINKED     = 0x80;   // set when character should be blinked off
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	output_helper::ptr m_vfds;
 	int m_cursx = 0, m_cursy = 0;
@@ -67,7 +67,7 @@ public:
 	virtual void write_char(int data) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 };
@@ -80,7 +80,7 @@ public:
 	virtual bool write_contents(std::ostream &o) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class esq2x40_sq1_device : public esqvfd_device {
@@ -90,7 +90,7 @@ public:
 	virtual void write_char(int data) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	bool m_wait87shift, m_wait88shift;

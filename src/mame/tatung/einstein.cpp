@@ -112,8 +112,8 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_timer_callback);
@@ -148,9 +148,9 @@ private:
 	uint8_t alpha_lock_r();
 	void alpha_lock_w(uint8_t data);
 
-	void einstein_io(address_map &map);
-	void einstein_mem(address_map &map);
-	void einst256_io(address_map &map);
+	void einstein_io(address_map &map) ATTR_COLD;
+	void einstein_mem(address_map &map) ATTR_COLD;
+	void einst256_io(address_map &map) ATTR_COLD;
 
 	void einstein_scan_keyboard();
 

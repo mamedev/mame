@@ -88,8 +88,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void segbank_w(u8 data);
@@ -106,8 +106,8 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void palette_init(palette_device &palette);
 	required_device<palette_device> m_palette;
-	void dmd_map(address_map &map);
-	void mem_map(address_map &map);
+	void dmd_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_row = 0U; // for lamps and switches
 	u8 m_segment = 0U;

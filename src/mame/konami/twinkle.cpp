@@ -333,8 +333,8 @@ public:
 	void twinkle_dvd_type2(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void twinkle_io_w(offs_t offset, uint8_t data);
 	uint8_t twinkle_io_r(offs_t offset);
@@ -355,9 +355,9 @@ private:
 	void scsi_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
 	void scsi_drq(int state);
 
-	void main_map(address_map &map);
-	void rf5c400_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void rf5c400_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(scsi_dma_transfer);
 

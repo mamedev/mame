@@ -135,7 +135,7 @@ private:
 	void flagrall_soundbanks_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
@@ -143,9 +143,9 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void k3_map(address_map &map);
-	void flagrall_map(address_map &map);
-	void k3_base_map(address_map &map);
+	void k3_map(address_map &map) ATTR_COLD;
+	void flagrall_map(address_map &map) ATTR_COLD;
+	void k3_base_map(address_map &map) ATTR_COLD;
 
 	// devices
 	optional_device_array<okim6295_device, 2> m_oki;

@@ -99,8 +99,8 @@ public:
 	void stlforce(machine_config &config);
 	void mortalr(machine_config &config);
 
-	void program_map(address_map &map);
-	void mortalr_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void mortalr_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 
@@ -123,7 +123,7 @@ public:
 	void twinbrat(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_memory_bank m_okibank;
@@ -132,8 +132,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void program_map(address_map &map);
-	void oki_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -65,9 +65,9 @@ public:
 	void init_wldfruit();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<igs027a_cpu_device> m_maincpu;
@@ -92,8 +92,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void pgm_create_dummy_internal_arm_region();
-	void main_map(address_map &map);
-	void main_xor_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_xor_map(address_map &map) ATTR_COLD;
 
 	u32 external_rom_r(offs_t offset);
 

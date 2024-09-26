@@ -195,8 +195,8 @@ private:
 	uint16_t irq1_ack_r();
 	uint16_t irq2_ack_r();
 	uint16_t irq4_ack_r();
-	void mcu_map(address_map &map);
-	void pntnpuzl_map(address_map &map);
+	void mcu_map(address_map &map) ATTR_COLD;
+	void pntnpuzl_map(address_map &map) ATTR_COLD;
 };
 
 

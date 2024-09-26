@@ -163,9 +163,9 @@ private:
 	uint8_t dict_rom_r(offs_t offset);
 
 	uint8_t mz2500_cg_latch_compare();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void mz2500_palette(palette_device &palette) const;
 	uint32_t screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mz2500_vbl);
@@ -201,9 +201,9 @@ private:
 	static uint8_t pal_256_param(int index, int param);
 	void reset_banks(uint8_t type);
 
-	void mz2500_io(address_map &map);
-	void mz2500_map(address_map &map);
-	void mz2500_bank_window_map(address_map &map);
+	void mz2500_io(address_map &map) ATTR_COLD;
+	void mz2500_map(address_map &map) ATTR_COLD;
+	void mz2500_bank_window_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SHARP_MZ2500_H

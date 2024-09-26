@@ -83,8 +83,8 @@ public:
 	void cham24(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<rp2a03_device> m_maincpu;
@@ -105,8 +105,8 @@ private:
 	void cham24_in0_w(u8 data);
 	void cham24_mapper_w(offs_t offset, u8 data);
 	void cham24_set_mirroring(int mirroring);
-	void cham24_map(address_map &map);
-	void cham24_ppu_map(address_map &map);
+	void cham24_map(address_map &map) ATTR_COLD;
+	void cham24_ppu_map(address_map &map) ATTR_COLD;
 };
 
 

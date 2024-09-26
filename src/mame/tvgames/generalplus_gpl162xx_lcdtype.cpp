@@ -60,8 +60,8 @@ public:
 	void gpl162xx_lcdtype(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -72,7 +72,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	required_region_ptr<uint8_t> m_spirom;
 

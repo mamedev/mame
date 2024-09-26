@@ -27,7 +27,7 @@ public:
 	void st22xx_dphh8213(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<st2205u_base_device> m_maincpu;
 
@@ -36,8 +36,8 @@ private:
 	void portb_w(u8 data);
 	void porta_w(u8 data);
 
-	void st22xx_bbl338_map(address_map &map);
-	void st22xx_dphh8213_map(address_map &map);
+	void st22xx_bbl338_map(address_map &map) ATTR_COLD;
+	void st22xx_dphh8213_map(address_map &map) ATTR_COLD;
 
 	required_device<screen_device> m_screen;
 	required_device<bl_handhelds_lcdc_device> m_lcdc;
@@ -57,8 +57,8 @@ public:
 	}
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 sim152_r();

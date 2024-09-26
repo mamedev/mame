@@ -54,8 +54,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_on);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -72,9 +72,9 @@ private:
 
 	void palette_init(palette_device &palette);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void asic1_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void asic1_map(address_map &map) ATTR_COLD;
 
 	uint8_t port_data_r();
 	void port_data_w(uint8_t data);

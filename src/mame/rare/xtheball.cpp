@@ -57,12 +57,12 @@ private:
 	uint16_t analogx_r();
 	uint16_t analogy_watchdog_r();
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

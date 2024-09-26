@@ -123,8 +123,8 @@ public:
 	void grid1101(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -153,9 +153,9 @@ private:
 
 	void kbd_put(u16 data);
 
-	void grid1101_io(address_map &map);
-	void grid1101_map(address_map &map);
-	void grid1121_map(address_map &map);
+	void grid1101_io(address_map &map) ATTR_COLD;
+	void grid1101_map(address_map &map) ATTR_COLD;
+	void grid1121_map(address_map &map) ATTR_COLD;
 
 	bool m_kbd_ready = false;
 	uint16_t m_kbd_data = 0;

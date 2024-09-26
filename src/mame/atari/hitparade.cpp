@@ -52,7 +52,7 @@ public:
 	void hitpar(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<tms1k_base_device> m_maincpu;

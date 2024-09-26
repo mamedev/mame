@@ -96,8 +96,8 @@ private:
 
 	required_device<palette_device> m_palette;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint16_t i8259_r(offs_t offset);
 	void i8259_w(offs_t offset, uint16_t data);
@@ -109,9 +109,9 @@ private:
 	void int_w(int state);
 	MC6845_UPDATE_ROW(update_row);
 
-	void m20_data_mem(address_map &map);
-	void m20_io(address_map &map);
-	void m20_program_mem(address_map &map);
+	void m20_data_mem(address_map &map) ATTR_COLD;
+	void m20_io(address_map &map) ATTR_COLD;
+	void m20_program_mem(address_map &map) ATTR_COLD;
 
 	offs_t m_memsize = 0;
 	uint8_t m_port21 = 0;

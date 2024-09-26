@@ -29,7 +29,7 @@ public:
 	void power_off_w(int state);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	EPL43102_UPDATE_CB(lcd_update);
@@ -38,7 +38,7 @@ private:
 	u8 portc_r();
 	void portc_w(u8 data);
 
-	void prog_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
 
 	void palette_init(palette_device &palette);
 

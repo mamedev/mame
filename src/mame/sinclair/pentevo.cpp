@@ -72,13 +72,13 @@ public:
 	void pentevo(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
-	void video_start() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+	void video_start() override ATTR_COLD;
 
 private:
 	void init_mem_write();
-	void pentevo_io(address_map &map);
+	void pentevo_io(address_map &map) ATTR_COLD;
 
 	void atm_port_ff_w(offs_t offset, u8 data) override;
 	void pentevo_port_7f7_w(offs_t offset, u8 data);

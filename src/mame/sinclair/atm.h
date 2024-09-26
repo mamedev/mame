@@ -37,13 +37,13 @@ protected:
 	static constexpr u16 PEN_RAMNROM_MASK = 1 << 14; // 1-RAM, 0-ROM
 	static constexpr u16 PEN_DOS7FFD_MASK = 1 << 15;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void atm_io(address_map &map);
-	void atm_mem(address_map &map);
-	void atm_switch(address_map &map);
+	void atm_io(address_map &map) ATTR_COLD;
+	void atm_mem(address_map &map) ATTR_COLD;
+	void atm_switch(address_map &map) ATTR_COLD;
 	template <u8 Bank> void atm_ram_w(offs_t offset, u8 data);
 
 	u8 beta_neutral_r(offs_t offset);

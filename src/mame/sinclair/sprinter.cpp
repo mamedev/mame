@@ -113,9 +113,9 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
 
-	void map_io(address_map &map);
-	void map_mem(address_map &map);
-	void map_fetch(address_map &map);
+	void map_io(address_map &map) ATTR_COLD;
+	void map_mem(address_map &map) ATTR_COLD;
+	void map_fetch(address_map &map) ATTR_COLD;
 	u8 m1_r(offs_t offset);
 
 	void init_taps();

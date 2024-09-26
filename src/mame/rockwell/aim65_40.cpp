@@ -95,7 +95,7 @@ public:
 	void aim65_40(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 

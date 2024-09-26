@@ -154,8 +154,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_timer);
 
@@ -179,9 +179,9 @@ private:
 	void pia28_cb2_w(int state) { m_comma12 = state; } // comma1&2
 	void pia_irq(int state);
 
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
-	void scrzy_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void scrzy_map(address_map &map) ATTR_COLD;
 
 	u8 m_sound_data = 0U;
 	u8 m_strobe = 0U;

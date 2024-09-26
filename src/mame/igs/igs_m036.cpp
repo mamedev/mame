@@ -95,7 +95,7 @@ private:
 
 	void pgm_create_dummy_internal_arm_region(void);
 
-	void igs_m036_map(address_map &map);
+	void igs_m036_map(address_map &map) ATTR_COLD;
 };
 
 

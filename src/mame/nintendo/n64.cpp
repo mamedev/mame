@@ -28,8 +28,8 @@ public:
 
 private:
 	uint32_t dd_null_r();
-	void n64_map(address_map &map);
-	void n64dd_map(address_map &map);
+	void n64_map(address_map &map) ATTR_COLD;
+	void n64dd_map(address_map &map) ATTR_COLD;
 
 	DECLARE_MACHINE_START(n64dd);
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
@@ -37,8 +37,8 @@ private:
 	void mempak_format(uint8_t* pak);
 	std::error_condition disk_load(device_image_interface &image);
 	void disk_unload(device_image_interface &image);
-	void rsp_imem_map(address_map &map);
-	void rsp_dmem_map(address_map &map);
+	void rsp_imem_map(address_map &map) ATTR_COLD;
+	void rsp_dmem_map(address_map &map) ATTR_COLD;
 };
 
 uint32_t n64_console_state::dd_null_r()

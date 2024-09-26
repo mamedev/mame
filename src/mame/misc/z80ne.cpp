@@ -224,8 +224,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(z80ne_reset);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void base_reset();
 	void save_state_vars();
@@ -275,8 +275,8 @@ protected:
 	cassette_image_device *cassette_device_image();
 
 private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 class z80net_state : public z80ne_state
@@ -298,7 +298,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(z80net_nmi);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	int lx387_shift_r();
 	int lx387_control_r();
@@ -314,10 +314,10 @@ protected:
 
 	void reset_lx387();
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 class z80netb_state : public z80net_state
@@ -331,10 +331,10 @@ public:
 	void z80netb(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 class z80netf_state : public z80netb_state
@@ -352,8 +352,8 @@ public:
 	void z80netf(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void driver_start() override;
 
 	struct wd17xx_state_t
@@ -364,8 +364,8 @@ private:
 		uint8_t head = 0;  /* current head */
 	};
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	void lx390_motor_w(uint8_t data);
 	uint8_t lx390_fdc_r(offs_t offset);

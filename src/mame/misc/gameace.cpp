@@ -99,8 +99,8 @@ public:
 	void init_hotbody();
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -139,9 +139,9 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	void main_program_map(address_map &map);
-	void main_port_map(address_map &map);
-	void sound_program_map(address_map &map);
+	void main_program_map(address_map &map) ATTR_COLD;
+	void main_port_map(address_map &map) ATTR_COLD;
+	void sound_program_map(address_map &map) ATTR_COLD;
 
 	void decode_cpu();
 	void decode_sprites();

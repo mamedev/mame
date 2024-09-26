@@ -16,7 +16,7 @@ public:
 	wpc_dmd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~wpc_dmd_device();
 
-	void registers(address_map &map);
+	void registers(address_map &map) ATTR_COLD;
 
 	void bank0_w(uint8_t data);
 	void bank2_w(uint8_t data);
@@ -36,9 +36,9 @@ protected:
 	uint8_t cur_scanline, visible_page, firq_scanline;
 	std::vector<uint8_t> ram, screen_buffer, bitcounts;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);

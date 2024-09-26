@@ -413,8 +413,8 @@ public:
 	void kurukuru(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -435,14 +435,14 @@ private:
 	void ym2149_bout_w(uint8_t data);
 
 	void kurukuru_msm5205_vck(int state);
-	void kurukuru_audio_io(address_map &map);
-	void kurukuru_audio_map(address_map &map);
-	void kurukuru_io(address_map &map);
-	void kurukuru_map(address_map &map);
-	void ppj_audio_io(address_map &map);
-	void ppj_audio_map(address_map &map);
-	void ppj_io(address_map &map);
-	void ppj_map(address_map &map);
+	void kurukuru_audio_io(address_map &map) ATTR_COLD;
+	void kurukuru_audio_map(address_map &map) ATTR_COLD;
+	void kurukuru_io(address_map &map) ATTR_COLD;
+	void kurukuru_map(address_map &map) ATTR_COLD;
+	void ppj_audio_io(address_map &map) ATTR_COLD;
+	void ppj_audio_map(address_map &map) ATTR_COLD;
+	void ppj_io(address_map &map) ATTR_COLD;
+	void ppj_map(address_map &map) ATTR_COLD;
 };
 
 #define MAIN_CLOCK      XTAL(21'477'272)

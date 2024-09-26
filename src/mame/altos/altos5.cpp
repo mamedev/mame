@@ -47,8 +47,8 @@ public:
 	void altos5(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -66,8 +66,8 @@ private:
 	void busreq_w(int state);
 	void fdc_intrq_w(int state);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_port08 = 0U;
 	uint8_t m_port09 = 0U;

@@ -77,11 +77,11 @@ private:
 	// External Peripheral Mapping, mapped at 0xfffe6008, offset 0x26008/4
 	static inline constexpr uint32_t APB_EPM = 38914;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	void arm7_map(address_map &map);
+	void arm7_map(address_map &map) ATTR_COLD;
 	void apb_bridge_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void apb_remap(uint32_t data);
 

@@ -53,8 +53,8 @@ public:
 	void generalplus_gpl_unknown(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -119,7 +119,7 @@ private:
 	uint16_t m_3005;
 	uint16_t m_3050;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 uint32_t generalplus_gpl_unknown_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

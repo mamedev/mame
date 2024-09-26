@@ -54,8 +54,8 @@ public:
 	void marblmd2(machine_config &config);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -65,7 +65,7 @@ private:
 	required_device<atari_vad_device> m_vad;
 	required_device<atari_motion_objects_device> m_mob;
 
-	void marblmd2_map(address_map &map);
+	void marblmd2_map(address_map &map) ATTR_COLD;
 
 	void latch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 

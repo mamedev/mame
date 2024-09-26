@@ -65,9 +65,9 @@ public:
 	void pc8801(machine_config &config);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t mem_r(offs_t offset);
 	void mem_w(offs_t offset, uint8_t data);
@@ -81,7 +81,7 @@ protected:
 
 	virtual uint8_t cdbios_rom_r(offs_t offset);
 	virtual bool cdbios_rom_enable();
-	virtual void main_io(address_map &map);
+	virtual void main_io(address_map &map) ATTR_COLD;
 
 //  required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -107,7 +107,7 @@ protected:
 	uint8_t m_gfx_ctrl = 0;
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_hi_work_ram;
@@ -250,13 +250,13 @@ public:
 	void pc8801fh(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void main_io(address_map &map) override;
 
 private:
 	required_device<ym2608_device> m_opna;
-	void opna_map(address_map &map);
+	void opna_map(address_map &map) ATTR_COLD;
 
 	uint8_t cpuclock_r();
 	uint8_t baudrate_r();
@@ -277,8 +277,8 @@ public:
 	void pc8801ma(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void main_io(address_map &map) override;
 
@@ -306,8 +306,8 @@ public:
 	void pc8801mc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void main_io(address_map &map) override;
 

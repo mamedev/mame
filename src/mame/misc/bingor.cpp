@@ -537,7 +537,7 @@ public:
 	void vip2000(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint16_t> m_blit_ram;
@@ -549,13 +549,13 @@ private:
 
 	void vip2000_outputs_w(uint16_t data);
 
-	void bingor2_map(address_map &map);
-	void bingor_io(address_map &map);
-	void bingor_map(address_map &map);
-	void slave_io(address_map &map);
-	void slave_map(address_map &map);
-	void vip2000_io(address_map &map);
-	void vip2000_map(address_map &map);
+	void bingor2_map(address_map &map) ATTR_COLD;
+	void bingor_io(address_map &map) ATTR_COLD;
+	void bingor_map(address_map &map) ATTR_COLD;
+	void slave_io(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
+	void vip2000_io(address_map &map) ATTR_COLD;
+	void vip2000_map(address_map &map) ATTR_COLD;
 };
 
 

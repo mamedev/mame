@@ -111,7 +111,7 @@ protected:
 
 	void update_firewire_irq();
 
-	void zeus2_map(address_map &map);
+	void zeus2_map(address_map &map) ATTR_COLD;
 	void midzeus2(machine_config &config);
 
 	uint32_t    m_disk_asic[0x10]{};
@@ -162,7 +162,7 @@ private:
 	uint32_t analog_r(offs_t offset);
 	void analog_w(uint32_t data);
 
-	void crusnexo_map(address_map &map);
+	void crusnexo_map(address_map &map) ATTR_COLD;
 
 	uint8_t     m_keypad_select = 0;
 	uint8_t     m_crusnexo_leds_select = 0;
@@ -192,7 +192,7 @@ private:
 	uint32_t trackball_r(offs_t offset);
 	uint32_t grid_keypad_r(offs_t offset);
 
-	void thegrid_map(address_map &map);
+	void thegrid_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_io_49way_x;
 	required_ioport m_io_49way_y;

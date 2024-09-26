@@ -29,8 +29,8 @@ public:
 	void chiptune(machine_config &config);
 
 protected:
-	void prg_map(address_map &map);
-	void data_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	required_device<atmega88_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;

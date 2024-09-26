@@ -196,9 +196,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(kbd_reset);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
@@ -227,8 +227,8 @@ private:
 
 	MC6845_UPDATE_ROW(update_row);
 
-	void z100_io(address_map &map);
-	void z100_mem(address_map &map);
+	void z100_io(address_map &map) ATTR_COLD;
+	void z100_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;

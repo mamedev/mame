@@ -37,8 +37,8 @@ private:
 	void duart_output_w(uint8_t data);
 	void ay8910_portb_w(uint8_t data);
 
-	void mem_map(address_map &map);
-	void fc7_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void fc7_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

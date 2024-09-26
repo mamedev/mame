@@ -95,7 +95,7 @@ protected:
 	void popeye_portB_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void driver_start() override;
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	virtual void tnx1_palette(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void screen_vblank(int state);
@@ -105,9 +105,9 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void maincpu_common_map(address_map &map);
-	virtual void maincpu_program_map(address_map &map);
-	void maincpu_io_map(address_map &map);
+	void maincpu_common_map(address_map &map) ATTR_COLD;
+	virtual void maincpu_program_map(address_map &map) ATTR_COLD;
+	void maincpu_io_map(address_map &map) ATTR_COLD;
 
 	virtual bool bootleg_sprites() const { return false; }
 };
@@ -137,7 +137,7 @@ public:
 protected:
 	virtual void decrypt_rom() override;
 	virtual void maincpu_program_map(address_map &map) override;
-	void decrypted_opcodes_map(address_map& map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
 	virtual bool bootleg_sprites() const override { return true; }
 };

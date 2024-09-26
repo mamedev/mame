@@ -28,7 +28,7 @@ public:
 private:
 	void add_ympcm(machine_config &config);
 
-	void memmap_ympcm(address_map &map);
+	void memmap_ympcm(address_map &map) ATTR_COLD;
 
 	DECLARE_MACHINE_START(mpu4redpoint);
 

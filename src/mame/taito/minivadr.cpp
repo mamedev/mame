@@ -56,7 +56,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	uint32_t screen_update_minivadr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void minivadr_map(address_map &map);
+	void minivadr_map(address_map &map) ATTR_COLD;
 };
 
 /*************************************

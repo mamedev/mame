@@ -25,7 +25,7 @@ public:
 	void jakks_mpac(machine_config& config);
 
 private:
-	void mem_map_2m_mkram(address_map& map);
+	void mem_map_2m_mkram(address_map &map) ATTR_COLD;
 	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 

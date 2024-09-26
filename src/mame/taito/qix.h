@@ -66,7 +66,7 @@ public:
 	void init_kram3();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	/* devices */
 	required_device<mc6809e_device> m_maincpu;
@@ -133,11 +133,11 @@ protected:
 	void kram3_lic_maincpu_changed(int state);
 	void kram3_lic_videocpu_changed(int state);
 
-	void audio_map(address_map &map);
-	void kram3_main_map(address_map &map);
-	void kram3_video_map(address_map &map);
-	void main_map(address_map &map);
-	void qix_video_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void kram3_main_map(address_map &map) ATTR_COLD;
+	void kram3_video_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void qix_video_map(address_map &map) ATTR_COLD;
 };
 
 class slither_state : public qix_state
@@ -154,7 +154,7 @@ public:
 	void slither_audio(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t trak_lr_r();
@@ -165,7 +165,7 @@ private:
 	void slither_videoram_w(offs_t offset, uint8_t data);
 	void slither_addresslatch_w(offs_t offset, uint8_t data);
 
-	void slither_video_map(address_map &map);
+	void slither_video_map(address_map &map) ATTR_COLD;
 
 	required_device_array<sn76489_device, 2> m_sn;
 	required_ioport_array<4> m_trak;
@@ -185,7 +185,7 @@ public:
 	void mcu(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	optional_device<m68705p_device> m_mcu;
 	required_ioport m_coin;
@@ -218,13 +218,13 @@ public:
 	void video(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void bankswitch_w(uint8_t data);
 
-	void main_map(address_map &map);
-	void video_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void video_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_vidbank;
 };

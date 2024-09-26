@@ -105,8 +105,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 port1_r();
@@ -128,7 +128,7 @@ private:
 	void pia1_cb2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(pia0_timer);
 
-	void by6803_map(address_map &map);
+	void by6803_map(address_map &map) ATTR_COLD;
 
 	u8 m_pia0_a = 0U;
 	u8 m_pia0_b = 0U;

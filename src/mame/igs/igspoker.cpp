@@ -130,8 +130,8 @@ public:
 
 protected:
 	virtual void machine_start() override { m_led.resolve(); m_lamps.resolve(); }
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t irqack_r();
@@ -153,10 +153,10 @@ private:
 	uint32_t screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void cpokerpk_io_map(address_map &map);
-	void igspoker_io_map(address_map &map);
-	void igspoker_prg_map(address_map &map);
-	void number10_io_map(address_map &map);
+	void cpokerpk_io_map(address_map &map) ATTR_COLD;
+	void igspoker_io_map(address_map &map) ATTR_COLD;
+	void igspoker_prg_map(address_map &map) ATTR_COLD;
+	void number10_io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_bg_tile_ram;

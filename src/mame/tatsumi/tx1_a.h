@@ -67,15 +67,15 @@ protected:
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-	void tx1_sound_io(address_map &map);
-	void tx1_sound_prg(address_map &map);
+	void tx1_sound_io(address_map &map) ATTR_COLD;
+	void tx1_sound_prg(address_map &map) ATTR_COLD;
 
 	// internal state
 	required_device<cpu_device> m_audiocpu;
@@ -144,9 +144,9 @@ protected:
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -158,8 +158,8 @@ protected:
 	uint8_t bb_analog_r(offs_t offset);
 	void bb_coin_cnt_w(uint8_t data);
 
-	void buggyboy_sound_io(address_map &map);
-	void buggyboy_sound_prg(address_map &map);
+	void buggyboy_sound_io(address_map &map) ATTR_COLD;
+	void buggyboy_sound_prg(address_map &map) ATTR_COLD;
 
 	required_device_array<ym2149_device, 2> m_ym;
 };
@@ -172,13 +172,13 @@ public:
 protected:
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void ym2_b_w(uint8_t data) override;
 
 	uint8_t bbjr_analog_r(offs_t offset);
 
-	void buggybjr_sound_prg(address_map &map);
+	void buggybjr_sound_prg(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(TX1_SOUND, tx1_sound_device)

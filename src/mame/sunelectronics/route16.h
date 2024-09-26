@@ -37,7 +37,7 @@ public:
 	void init_vscompmj();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void out0_w(uint8_t data);
 	void out1_w(uint8_t data);
@@ -57,13 +57,13 @@ protected:
 	uint32_t screen_update_jongpute(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-	void cpu1_io_map(address_map &map);
-	void route16_cpu1_map(address_map &map);
-	void route16_cpu2_map(address_map &map);
-	void routex_cpu1_map(address_map &map);
-	void jongpute_cpu1_map(address_map &map);
-	void vscompmj_cpu1_map(address_map &map);
-	void vscompmj_decrypted_opcodes(address_map &map);
+	void cpu1_io_map(address_map &map) ATTR_COLD;
+	void route16_cpu1_map(address_map &map) ATTR_COLD;
+	void route16_cpu2_map(address_map &map) ATTR_COLD;
+	void routex_cpu1_map(address_map &map) ATTR_COLD;
+	void jongpute_cpu1_map(address_map &map) ATTR_COLD;
+	void vscompmj_cpu1_map(address_map &map) ATTR_COLD;
+	void vscompmj_decrypted_opcodes(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<cpu_device> m_cpu1;

@@ -88,7 +88,7 @@ protected:
 	void ladybug_palette(palette_device &palette) const;
 	u32 screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ladybug_map(address_map &map);
+	void ladybug_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 
@@ -113,7 +113,7 @@ public:
 	void dorodon(machine_config &config);
 
 protected:
-	void decrypted_opcodes_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
 private:
 	required_shared_ptr<u8> m_decrypted_opcodes;

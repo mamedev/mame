@@ -26,7 +26,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	static constexpr u8 MANUFACTURER_ID = 0xf7;

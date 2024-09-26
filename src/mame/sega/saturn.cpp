@@ -522,9 +522,9 @@ private:
 	required_device<saturn_control_port_device> m_ctrl1;
 	required_device<saturn_control_port_device> m_ctrl2;
 
-	void saturn_mem(address_map &map);
-	void sound_mem(address_map &map);
-	void scsp_mem(address_map &map);
+	void saturn_mem(address_map &map) ATTR_COLD;
+	void sound_mem(address_map &map) ATTR_COLD;
+	void scsp_mem(address_map &map) ATTR_COLD;
 };
 
 

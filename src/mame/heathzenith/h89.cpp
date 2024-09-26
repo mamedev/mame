@@ -140,15 +140,15 @@ protected:
 	void update_gpp(u8 gpp);
 	void port_f2_w(u8 data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
 
-	void h89_mem(address_map &map);
-	void map_fetch(address_map &map);
+	void h89_mem(address_map &map) ATTR_COLD;
+	void map_fetch(address_map &map) ATTR_COLD;
 	u8 m1_r(offs_t offset);
 
-	void h89_base_io(address_map &map);
+	void h89_base_io(address_map &map) ATTR_COLD;
 
 	void set_wait_state(int data);
 
@@ -179,7 +179,7 @@ public:
 protected:
 	required_device<heath_h_88_cass_device> m_cassette;
 
-	void h88_io(address_map &map);
+	void h88_io(address_map &map) ATTR_COLD;
 };
 
 
@@ -202,7 +202,7 @@ public:
 protected:
 	required_device<heath_z37_fdc_device> m_h37;
 
-	void h89_io(address_map &map);
+	void h89_io(address_map &map) ATTR_COLD;
 };
 
 
@@ -220,7 +220,7 @@ public:
 protected:
 	required_device<sigmasoft_parallel_port> m_sigma_parallel;
 
-	void h89_sigmasoft_io(address_map &map);
+	void h89_sigmasoft_io(address_map &map) ATTR_COLD;
 };
 
 
@@ -258,7 +258,7 @@ public:
 protected:
 	required_device<mms77316_fdc_device> m_mms316;
 
-	void h89_mms_io(address_map &map);
+	void h89_mms_io(address_map &map) ATTR_COLD;
 };
 
 

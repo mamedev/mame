@@ -76,7 +76,7 @@ public:
 	void riot(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -128,10 +128,10 @@ private:
 	void screen_vblank(int state);
 
 	void save_state();
-	void common_map(address_map& map);
-	void fstarfrc_map(address_map &map);
-	void ginkun_map(address_map &map);
-	void sound_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void fstarfrc_map(address_map &map) ATTR_COLD;
+	void ginkun_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

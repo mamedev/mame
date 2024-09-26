@@ -135,12 +135,12 @@ public:
 	void base(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 
-	void base_main_map(address_map &map);
+	void base_main_map(address_map &map) ATTR_COLD;
 
 private:
 	// devices
@@ -173,7 +173,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline rgb_t pen_for_pixel(uint8_t const *src, uint8_t pix);
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class capbowl_state : public capbowl_base_state
@@ -187,14 +187,14 @@ public:
 	void capbowl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_memory_bank m_mainbank;
 
 	void rom_select_w(uint8_t data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class bowlrama_state : public capbowl_base_state
@@ -208,8 +208,8 @@ public:
 	void bowlrama(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_region_ptr<uint8_t> m_blitrom;
@@ -220,7 +220,7 @@ private:
 	void blitter_w(offs_t offset, uint8_t data);
 	uint8_t blitter_r(offs_t offset);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -74,15 +74,15 @@ private:
 	optional_device<esq_5505_5510_pump_device> m_pump;
 	required_device<esq2x40_sq1_device> m_sq1vfd;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void esq5506_otto_irq(int state);
 	u16 esq5506_read_adc();
 	void es5506_clock_changed(u32 data);
 
-	void asr_map(address_map &map);
-	void asrx_map(address_map &map);
+	void asr_map(address_map &map) ATTR_COLD;
+	void asrx_map(address_map &map) ATTR_COLD;
 };
 
 void esqasr_state::machine_start()

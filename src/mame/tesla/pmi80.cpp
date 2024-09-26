@@ -66,15 +66,15 @@ private:
 	void keyboard_w(uint8_t data);
 	void leds_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_keyrow = 0U;
 	bool m_ledready = false;
 	bool m_cassbit = false, m_cassold = false;
 	u16 m_cass_cnt = 0U;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi1;
 	required_device<cassette_image_device> m_cass;

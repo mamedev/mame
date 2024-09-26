@@ -192,14 +192,14 @@ protected:
 	void sega_9h0_0008(machine_config &config);
 
 	virtual void device_post_load() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void install_game_rom();
 	virtual void update_sensors(offs_t offset);
 
-	void beena_arm7_map(address_map &map);
+	void beena_arm7_map(address_map &map) ATTR_COLD;
 
 	void request_irq();
 	void request_fiq();
@@ -2009,8 +2009,8 @@ private:
 		WRITE_DATA,
 	};
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void install_game_rom() override;
 

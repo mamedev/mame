@@ -95,8 +95,8 @@ public:
 	void cirsa910510(machine_config &config);
 
 private:
-	void io_map(address_map &map);
-	void main_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };

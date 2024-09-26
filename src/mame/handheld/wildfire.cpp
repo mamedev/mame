@@ -64,7 +64,7 @@ public:
 	void wildfire(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<amis2000_base_device> m_maincpu;

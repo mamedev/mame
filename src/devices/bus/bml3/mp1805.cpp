@@ -66,14 +66,14 @@ const tiny_rom_entry *bml3bus_mp1805_device::device_rom_region() const
 	return ROM_NAME( mp1805 );
 }
 
-uint8_t bml3bus_mp1805_device::bml3_mp1805_r()
+uint8_t bml3bus_mp1805_device::read()
 {
 	// TODO: read supported or not?
 	//  return mc6843_drq_r(m_mc6843) ? 0x00 : 0x80;
 	return -1;
 }
 
-void bml3bus_mp1805_device::bml3_mp1805_w(uint8_t data)
+void bml3bus_mp1805_device::write(uint8_t data)
 {
 	// b7 b6 b5 b4 b3 b2 b1 b0
 	// MT ?  ?  ?  D3 D2 D1 D0
@@ -159,5 +159,5 @@ void bml3bus_mp1805_device::map_io(address_space_installer &space)
 {
 	// install into memory
 	space.install_device(0xff18, 0xff1f, *m_mc6843, &mc6843_device::map);
-	space.install_readwrite_handler(0xff20, 0xff20, read8smo_delegate(*this, FUNC(bml3bus_mp1805_device::bml3_mp1805_r)), write8smo_delegate(*this, FUNC(bml3bus_mp1805_device::bml3_mp1805_w)));
+	space.install_readwrite_handler(0xff20, 0xff20, read8smo_delegate(*this, FUNC(bml3bus_mp1805_device::read)), write8smo_delegate(*this, FUNC(bml3bus_mp1805_device::write)));
 }

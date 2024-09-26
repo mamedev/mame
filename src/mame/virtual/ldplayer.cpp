@@ -45,8 +45,8 @@ public:
 
 protected:
 	// device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// callback hook
 	chd_file *get_disc();
@@ -115,8 +115,8 @@ public:
 			void pr8210(machine_config &config);
 protected:
 	// device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// command execution hook
 	virtual void execute_command(int command) override;

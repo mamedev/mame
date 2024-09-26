@@ -48,8 +48,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -60,8 +60,8 @@ private:
 	u8 m_io[2] = { };
 	u8 m_4042 = 0;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	void update_reset(ioport_value state);
 

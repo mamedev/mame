@@ -49,8 +49,8 @@ public:
 	void prehisle(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void soundcmd_w(u16 data);
@@ -67,9 +67,9 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_program_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_program_map(address_map &map);
+	void main_program_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_program_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<u16> m_tx_vram;
 	required_shared_ptr<u16> m_spriteram;

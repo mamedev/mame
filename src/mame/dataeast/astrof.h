@@ -47,7 +47,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(service_coin_inserted);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* video-related */
@@ -107,7 +107,7 @@ private:
 	void tomahawk_set_video_control_2( uint8_t data );
 	void video_update_common( bitmap_rgb32 &bitmap, const rectangle &cliprect, pen_t *pens, int num_pens );
 	void base(machine_config &config);
-	void astrof_map(address_map &map);
-	void spfghmk2_map(address_map &map);
-	void tomahawk_map(address_map &map);
+	void astrof_map(address_map &map) ATTR_COLD;
+	void spfghmk2_map(address_map &map) ATTR_COLD;
+	void tomahawk_map(address_map &map) ATTR_COLD;
 };

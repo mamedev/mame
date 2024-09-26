@@ -29,7 +29,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -186,8 +186,8 @@ public:
 	void pv1000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void io_w(offs_t offset, uint8_t data);
@@ -224,8 +224,8 @@ private:
 	TIMER_CALLBACK_MEMBER(d65010_busrq_off_cb);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void pv1000_mem(address_map &map);
-	void pv1000_io(address_map &map);
+	void pv1000_mem(address_map &map) ATTR_COLD;
+	void pv1000_io(address_map &map) ATTR_COLD;
 };
 
 

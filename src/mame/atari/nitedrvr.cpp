@@ -77,8 +77,8 @@ public:
 	void nitedrvr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices
@@ -121,7 +121,7 @@ private:
 	void draw_roadway(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int steering();
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

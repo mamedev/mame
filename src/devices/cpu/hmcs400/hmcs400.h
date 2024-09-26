@@ -156,8 +156,8 @@ protected:
 	bool m_standby;       // standby mode (SBY opcode)
 	bool m_stop;          // stop mode (STOP opcode)
 
-	u8 m_r[10];           // R outputs state
-	u8 m_r_mask[10];
+	u8 m_r[11];           // R outputs state
+	u8 m_r_mask[11];
 	u16 m_d;              // D pins state
 	u16 m_d_mask;
 

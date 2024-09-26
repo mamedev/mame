@@ -53,15 +53,15 @@ private:
 	uint32_t screen_update_mz80a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tempo_callback);
 
-	void mz80k_io(address_map &map);
-	void mz80k_mem(address_map &map);
+	void mz80k_io(address_map &map) ATTR_COLD;
+	void mz80k_mem(address_map &map) ATTR_COLD;
 	bool m_mz80k_vertical = false;
 	bool m_mz80k_tempo_strobe = false;
 	uint8_t m_speaker_level = 0;
 	bool m_prev_state = false;
 	uint8_t m_mz80k_cursor_cnt = 0;
 	uint8_t m_mz80k_keyboard_line = 0;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<i8255_device> m_ppi;

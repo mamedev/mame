@@ -70,7 +70,7 @@ public:
 	void monzagp(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t port_r(offs_t offset);
@@ -82,8 +82,8 @@ private:
 	void monzagp_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void program_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 
 	required_device<i8035_device> m_maincpu;
 	required_device<dp8350_device> m_crtc;

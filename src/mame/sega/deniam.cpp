@@ -80,9 +80,9 @@ public:
 	void init_logicpro();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -101,7 +101,7 @@ protected:
 	u8 m_fg_page_reg = 0;
 
 	void common_init();
-	void base_main_map(address_map &map);
+	void base_main_map(address_map &map) ATTR_COLD;
 
 private:
 	// devices
@@ -138,7 +138,7 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_bg_page(int page, int value);
 	void set_fg_page(int page, int value);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class deniamb_state : public deniamc_state
@@ -161,9 +161,9 @@ private:
 
 	void oki_rom_bank_w(u8 data);
 
-	void main_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

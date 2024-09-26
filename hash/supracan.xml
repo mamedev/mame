@@ -2,12 +2,22 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
+
+All known released games are dumped.
+
+Unreleased Super A'can carts:
+- Dinosaur Wars
+- City Escape
+- Quick Fighting Attack
+- Journey to the Center of the Earth
+
 -->
+
 <softwarelist name="supracan" description="Funtech Super A'Can cartridges">
 	<software name="formduel" supported="no">
 		<description>Formosa Duel ~ Formosa Da Dui Jue</description>
 		<year>1995</year>
-		<publisher>AV Artisan Corp.</publisher>
+		<publisher>AV Artisan</publisher>
 		<notes><![CDATA[
 [sound] noisy channels 13-15 starting from character screen, supposed to release after a while (12 00 0f 79)
 game over screen uses a RNG register for rain scroll (verify)
@@ -16,7 +26,7 @@ game over screen uses a RNG register for rain scroll (verify)
 		<info name="alt_title" value="福爾摩沙大對決" />
 		<part name="cart" interface="superacan_cart">
 			<dataarea name="rom" width="16" endianness="big" size="0x100000">
-				<rom loadflag="load16_word_swap" name="Formosa Duel (Taiwan).bin" size="0x100000" crc="b2bf31dc" sha1="8d0680e1322af21b20d5cee2c100b05cf4217815" offset="0" />
+				<rom loadflag="load16_word_swap" name="Formosa Duel (Taiwan).bin" size="0x100000" crc="b2bf31dc" sha1="8d0680e1322af21b20d5cee2c100b05cf4217815" />
 			</dataarea>
 		</part>
 	</software>
@@ -35,8 +45,8 @@ game over screen uses a RNG register for rain scroll (verify)
 		<info name="serial" value="F002" />
 		<info name="alt_title" value="三國志 武將爭霸" />
 		<part name="cart" interface="superacan_cart">
-			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom loadflag="load16_word_swap" name="sangofgt.bin" size="3145728" crc="a4de6dde" sha1="f4bed63775130a75eb9c50b32e0cf50d1a7b8f50" offset="0" />
+			<dataarea name="rom" width="16" endianness="big" size="0x300000">
+				<rom loadflag="load16_word_swap" name="sangofgt.bin" size="0x300000" crc="a4de6dde" sha1="f4bed63775130a75eb9c50b32e0cf50d1a7b8f50" />
 			</dataarea>
 		</part>
 	</software>
@@ -55,9 +65,10 @@ Broken [video] during intro, uses bitmap mode with ROZ layer
 		<info name="serial" value="F003" />
 		<info name="alt_title" value="邪惡之子" />
 		<part name="cart" interface="superacan_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom loadflag="load16_word_swap" name="16005.cu5" size="2097152" crc="9f6119a7" sha1="67ae9e7f99e1c3054ea54d53dbbba7792ef45134" offset="0" />
+			<dataarea name="rom" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="16005.cu5" size="0x200000" crc="9f6119a7" sha1="67ae9e7f99e1c3054ea54d53dbbba7792ef45134" />
 			</dataarea>
+
 			<!-- TODO: unconfirmed size -->
 			<dataarea name="nvram" size="0x8000">
 			</dataarea>
@@ -67,7 +78,7 @@ Broken [video] during intro, uses bitmap mode with ROZ layer
 	<software name="speedyd" supported="no">
 		<description>Speedy Dragon ~ Yin Su Fei Long</description>
 		<year>1995</year>
-		<publisher>AV Artisan Corp.</publisher>
+		<publisher>AV Artisan</publisher>
 		<notes><![CDATA[
 [video] title animation glitches some sprites.
 [video] uses per-tile priority during gameplay.
@@ -77,8 +88,8 @@ Broken [video] during intro, uses bitmap mode with ROZ layer
 		<info name="serial" value="F004" />
 		<info name="alt_title" value="音速飛龍" />
 		<part name="cart" interface="superacan_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom loadflag="load16_word_swap" name="speedydgn.bin" size="2097152" crc="f631383c" sha1="fbd62b5d287aa82ef27f400ab2a6b3da0308192a" offset="0" />
+			<dataarea name="rom" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="speedydgn.bin" size="0x200000" crc="f631383c" sha1="fbd62b5d287aa82ef27f400ab2a6b3da0308192a" />
 			</dataarea>
 		</part>
 	</software>
@@ -96,8 +107,8 @@ Broken [video] during intro, uses bitmap mode with ROZ layer
 		<info name="serial" value="F005" />
 		<info name="alt_title" value="超級中華職棒聯盟" />
 		<part name="cart" interface="superacan_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom loadflag="load16_word_swap" name="16005.0" size="2097152" crc="ccf6829b" sha1="17a413803d8749fbe9643ca56d703afd64569b9f" offset="0" />
+			<dataarea name="rom" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="16005.0" size="0x200000" crc="ccf6829b" sha1="17a413803d8749fbe9643ca56d703afd64569b9f" />
 			</dataarea>
 			<!-- TODO: unconfirmed size -->
 			<dataarea name="nvram" size="0x8000">
@@ -117,8 +128,8 @@ Broken [video] during intro, uses bitmap mode with ROZ layer
 		<info name="serial" value="F006" />
 		<info name="alt_title" value="嘻遊記" />
 		<part name="cart" interface="superacan_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom loadflag="load16_word_swap" name="16002.cu2" size="2097152" crc="cee25eea" sha1="fc82fc3a7d55571494cd62d8807160e22cf437bc" offset="0" />
+			<dataarea name="rom" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="16002.cu2" size="0x200000" crc="cee25eea" sha1="fc82fc3a7d55571494cd62d8807160e22cf437bc" />
 			</dataarea>
 		</part>
 	</software>
@@ -133,9 +144,9 @@ Broken [video] during intro, uses bitmap mode with ROZ layer
 		<info name="serial" value="F007" />
 		<info name="alt_title" value="超級光明戰史" />
 		<part name="cart" interface="superacan_cart">
-			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom loadflag="load16_word_swap" name="16007.0" size="2097152" crc="56c1c3fb" sha1="249e2ad6d8d40ecd31eda5a1bd5e5d0f47174a27" offset="000000" />
-				<rom loadflag="load16_word_swap" name="08007.1" size="1048576" crc="fc79f05f" sha1="7ce2e23ea3fd25764935708be4d47bf1a9843938" offset="0x200000" />
+			<dataarea name="rom" width="16" endianness="big" size="0x300000">
+				<rom loadflag="load16_word_swap" name="16007.0" offset="0x000000" size="0x200000" crc="56c1c3fb" sha1="249e2ad6d8d40ecd31eda5a1bd5e5d0f47174a27" />
+				<rom loadflag="load16_word_swap" name="08007.1" offset="0x200000" size="0x100000" crc="fc79f05f" sha1="7ce2e23ea3fd25764935708be4d47bf1a9843938" />
 			</dataarea>
 
 			<!-- TODO: unconfirmed size -->
@@ -151,8 +162,8 @@ Broken [video] during intro, uses bitmap mode with ROZ layer
 		<info name="serial" value="F008" />
 		<info name="alt_title" value="非洲探險" />
 		<part name="cart" interface="superacan_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom loadflag="load16_word_swap" name="08003.bin" size="1048576" crc="dc3b7b84" sha1="6dcbd7923203da7892915595d65ee668afbf0339" offset="0" />
+			<dataarea name="rom" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_word_swap" name="08003.bin" size="0x100000" crc="dc3b7b84" sha1="6dcbd7923203da7892915595d65ee668afbf0339" />
 			</dataarea>
 
 			<!-- TODO: unconfirmed size -->
@@ -174,8 +185,8 @@ few [video] missing/glitched tiles in gameplay, likely related to above.
 		<info name="serial" value="F009" />
 		<info name="alt_title" value="賭霸" />
 		<part name="cart" interface="superacan_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom loadflag="load16_word_swap" name="16006.bin" size="2097152" crc="ac4fa721" sha1="0fda223817f0b50f0ce9687076d29df3d1b86960" offset="0" />
+			<dataarea name="rom" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="16006.bin" size="0x200000" crc="ac4fa721" sha1="0fda223817f0b50f0ce9687076d29df3d1b86960" />
 			</dataarea>
 
 			<!-- TODO: unconfirmed size and actual presence -->
@@ -200,8 +211,8 @@ Erratic gameplay speed, controls [irq 3] as FRC
 		<info name="serial" value="F010" />
 		<info name="alt_title" value="魔棒撞球" />
 		<part name="cart" interface="superacan_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom loadflag="load16_word_swap" name="08004.bin" size="2097152" crc="aed4e4f8" sha1="6be79db9006c46ea21f5dbe1add755ce2e413796" offset="0" />
+			<dataarea name="rom" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="08004.bin" size="0x200000" crc="aed4e4f8" sha1="6be79db9006c46ea21f5dbe1add755ce2e413796" />
 			</dataarea>
 		</part>
 	</software>
@@ -212,23 +223,37 @@ Erratic gameplay speed, controls [irq 3] as FRC
 		<publisher>Funtech</publisher>
 		<notes><![CDATA[
 Uses [video] clipping for layer 1 during intro
+Should use unemulated [video] interlace (verify on HW)
 ]]></notes>
 		<info name="serial" value="F011" />
 		<info name="alt_title" value="爆爆動物園" />
 		<part name="cart" interface="superacan_cart">
-			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom loadflag="load16_word_swap" name="boomzoo.bin" size="524288" crc="6099bb44" sha1="0b5fbe2117bb77a827453c5489b3af691e5c7ade" offset="0" />
+			<dataarea name="rom" width="16" endianness="big" size="0x80000">
+				<rom loadflag="load16_word_swap" name="boomzoo.bin" size="0x80000" crc="6099bb44" sha1="0b5fbe2117bb77a827453c5489b3af691e5c7ade" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- F012 - Rebel Star / 叛星 -->
-	<!-- presumably uses blending during gameplay -->
+	<software name="rebelst" supported="no">
+		<description>Rebel Star ~ Pàn Xīng</description>
+		<year>1996</year>
+		<publisher>Horng Shen Information</publisher>
+		<notes><![CDATA[
+[video] ROZ layer is concealed on intro.
+[video] ROZ layer should blend hex grids.
+[video] select attack screens should blend as well (uses sprites)
+]]></notes>
+		<info name="serial" value="F012" />
+		<info name="alt_title" value="叛星" />
+		<part name="cart" interface="superacan_cart">
+			<dataarea name="rom" width="16" endianness="big" size="0x200000">
+				<rom name="f012 - rebel star.bin" size="0x200000" crc="a3469172" sha1="3a1b093d7aee6d5b1f260723499d4c283a2a0169" />
+			</dataarea>
 
-	<!-- Unreleased Super A'can carts -->
-	<!-- Dinosaur Wars -->
-	<!-- City Escape -->
-	<!-- Quick Fighting Attack -->
-	<!-- Journey to the Center of the Earth -->
+			<!-- TODO: unconfirmed size -->
+			<dataarea name="nvram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

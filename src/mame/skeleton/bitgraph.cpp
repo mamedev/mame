@@ -114,8 +114,8 @@ public:
 	void bitgrphb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t pia_r(offs_t offset);
 	void pia_w(offs_t offset, uint8_t data);
@@ -148,9 +148,9 @@ protected:
 	void bg_motherboard(machine_config &config);
 	[[maybe_unused]] void bg_ppu(machine_config &config);
 
-	void bitgrapha_mem(address_map &map);
-	void bitgraphb_mem(address_map &map);
-	void ppu_io(address_map &map);
+	void bitgrapha_mem(address_map &map) ATTR_COLD;
+	void bitgraphb_mem(address_map &map) ATTR_COLD;
+	void ppu_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;

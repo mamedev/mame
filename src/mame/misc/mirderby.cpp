@@ -127,11 +127,11 @@ private:
 	required_device<i8255_device> m_coin_ppi;
 	required_device<pit8253_device> m_coin_pit;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void screen_vblank(int state);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint8_t prot_r();
 	void prot_w(uint8_t data);
@@ -141,13 +141,13 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void videoram_w(offs_t offset, u8 data);
 
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
-	void shared_map(address_map &map);
+	void shared_map(address_map &map) ATTR_COLD;
 
-	void x70coin_map(address_map &map);
-	void x70coin_io(address_map &map);
+	void x70coin_map(address_map &map) ATTR_COLD;
+	void x70coin_io(address_map &map) ATTR_COLD;
 
 	tilemap_t *m_bg_tilemap{};
 //  int m_visible_page = 0;

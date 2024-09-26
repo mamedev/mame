@@ -85,17 +85,17 @@ public:
 	int sync49_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void cz1_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
-	void mz1_main_map(address_map &map);
-	void cz1_main_map(address_map &map);
-	void sub_map(address_map &map);
-	void mcu_map(address_map &map);
+	void mz1_main_map(address_map &map) ATTR_COLD;
+	void cz1_main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void mcu_map(address_map &map) ATTR_COLD;
 
 	// main CPU r/w methods
 	u8 keys_r();

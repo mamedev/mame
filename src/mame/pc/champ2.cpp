@@ -43,8 +43,8 @@ public:
 	void init_at();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void init_at_common(int xmsbase);
 
 private:
@@ -52,9 +52,9 @@ private:
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
 	required_device_array<address_map_bank_device, 2> m_bank;
-	void bank_map(address_map &map);
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void bank_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

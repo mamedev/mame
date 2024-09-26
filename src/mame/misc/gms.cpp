@@ -143,7 +143,7 @@ public:
 	void init_super555();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	optional_shared_ptr_array<uint16_t, 2> m_vidram;
 	required_shared_ptr_array<uint16_t, 4> m_reelram;
@@ -163,7 +163,7 @@ protected:
 	tilemap_t *m_reel_tilemap[4];
 	tilemap_t *m_tilemap[2]{};
 
-	void super555_mem(address_map &map);
+	void super555_mem(address_map &map) ATTR_COLD;
 
 	template <uint8_t Which> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	template <uint8_t Which> void reelram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -173,10 +173,10 @@ private:
 	uint16_t m_input_matrix = 0;
 	//uint16_t m_prot_data = 0;
 
-	void mcu_io(address_map &map);
-	void rbmk_mem(address_map &map);
-	void rbspm_mem(address_map &map);
-	void ssanguoj_mem(address_map &map);
+	void mcu_io(address_map &map) ATTR_COLD;
+	void rbmk_mem(address_map &map) ATTR_COLD;
+	void rbspm_mem(address_map &map) ATTR_COLD;
+	void ssanguoj_mem(address_map &map) ATTR_COLD;
 
 	uint16_t unk_r();
 	uint16_t input_matrix_r();
@@ -206,10 +206,10 @@ public:
 	void magslot(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	void magslot_mem(address_map &map);
+	void magslot_mem(address_map &map) ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_tile1_info);
 };

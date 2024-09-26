@@ -29,8 +29,8 @@ public:
 	isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	uint8_t bg_bank_r();
 	void bg_bank_w(uint8_t data);
@@ -135,8 +135,8 @@ public:
 	void tetriskr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sample_tick);
 
@@ -150,8 +150,8 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
-	void tetriskr_io(address_map &map);
-	void tetriskr_map(address_map &map);
+	void tetriskr_io(address_map &map) ATTR_COLD;
+	void tetriskr_map(address_map &map) ATTR_COLD;
 };
 
 uint8_t tetriskr_state::port_a_r()

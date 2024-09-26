@@ -393,8 +393,8 @@ public:
 	int vblank_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	inline int scanline_to_v(int scanline);
@@ -420,14 +420,14 @@ private:
 	void output_w(uint8_t data);
 	void palette_w(offs_t offset, uint8_t data);
 
-	void trampoline_map(address_map &map);
+	void trampoline_map(address_map &map) ATTR_COLD;
 	u8 trampoline_r(offs_t offset);
 	void trampoline_w(offs_t offset, uint8_t data);
 
-	void base_map(address_map &map);
-	void missile_map(address_map &map);
-	void missilea_map(address_map &map);
-	void mcombat_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
+	void missile_map(address_map &map) ATTR_COLD;
+	void missilea_map(address_map &map) ATTR_COLD;
+	void mcombat_map(address_map &map) ATTR_COLD;
 
 	required_device<m6502_device> m_maincpu;
 	required_device<address_map_bank_device> m_mainmap;

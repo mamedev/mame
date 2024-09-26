@@ -47,8 +47,8 @@ private:
 	void output_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
-	void main_map(address_map &map);
-	void tc0091lvc_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void tc0091lvc_map(address_map &map) ATTR_COLD;
 };
 
 void dfruit_state::screen_vblank(int state)

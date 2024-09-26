@@ -47,7 +47,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(battery) { m_battery = newval; }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -63,8 +63,8 @@ private:
 	u64 m_lcd_data[2] = { };
 
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	template<int N> void lcd_output_w(u64 data);

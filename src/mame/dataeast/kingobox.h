@@ -71,8 +71,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(ringking_get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	DECLARE_VIDEO_START(kingofb);
 	void kingofb_palette(palette_device &palette);
 	DECLARE_VIDEO_START(ringking);
@@ -91,15 +91,15 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void kingobox_map(address_map &map);
-	void kingobox_sound_io_map(address_map &map);
-	void kingobox_sound_map(address_map &map);
-	void kingobox_sprite_map(address_map &map);
-	void kingobox_video_map(address_map &map);
-	void ringking_map(address_map &map);
-	void ringking_sound_io_map(address_map &map);
-	void ringking_sprite_map(address_map &map);
-	void ringking_video_map(address_map &map);
+	void kingobox_map(address_map &map) ATTR_COLD;
+	void kingobox_sound_io_map(address_map &map) ATTR_COLD;
+	void kingobox_sound_map(address_map &map) ATTR_COLD;
+	void kingobox_sprite_map(address_map &map) ATTR_COLD;
+	void kingobox_video_map(address_map &map) ATTR_COLD;
+	void ringking_map(address_map &map) ATTR_COLD;
+	void ringking_sound_io_map(address_map &map) ATTR_COLD;
+	void ringking_sprite_map(address_map &map) ATTR_COLD;
+	void ringking_video_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_DATAEAST_KINGOBOX_H

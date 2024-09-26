@@ -85,7 +85,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sc9c_change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
@@ -98,8 +98,8 @@ protected:
 	u8 m_led_data = 0;
 
 	// address maps
-	void sc9_map(address_map &map);
-	void sc9d_map(address_map &map);
+	void sc9_map(address_map &map) ATTR_COLD;
+	void sc9d_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void control_w(u8 data);

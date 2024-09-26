@@ -90,8 +90,8 @@ protected:
 	void clock2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(snd_off_callback) { m_1863->set_output_gain(0, 0.00); }
 
-	void play_2_io(address_map &map);
-	void play_2_map(address_map &map);
+	void play_2_io(address_map &map) ATTR_COLD;
+	void play_2_map(address_map &map) ATTR_COLD;
 
 	u8 m_resetcnt = 0U;
 	u8 m_kbdrow = 0U;
@@ -101,8 +101,8 @@ protected:
 	u8 m_old_solenoids[8]{};
 	u8 m_soundlatch = 0U;
 	bool m_snd_on = false;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<cosmac_device> m_maincpu;
 	required_device<ttl7474_device> m_4013a;
 	required_device<ttl7474_device> m_4013b;
@@ -126,7 +126,7 @@ public:
 	void init_zira();
 
 private:
-	void zira_sound_map(address_map &map);
+	void zira_sound_map(address_map &map) ATTR_COLD;
 	void sound_d_w(u8 data);
 	void sound_g_w(u8 data);
 	u8 psg_r();

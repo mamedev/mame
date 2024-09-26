@@ -83,7 +83,7 @@ public:
 	void tstar432(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -97,8 +97,8 @@ private:
 	u8 m_inp_mux = 0;
 
 	// address maps
-	void sstar28k_map(address_map &map);
-	void tstar432_map(address_map &map);
+	void sstar28k_map(address_map &map) ATTR_COLD;
+	void tstar432_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void control_w(u8 data);

@@ -87,8 +87,8 @@ private:
 	required_ioport_array<6> m_in;
 	output_finder<> m_lamp;
 
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint8_t mux_r();
 	void mux_w(uint8_t data);

@@ -73,8 +73,8 @@ public:
 	void onetwo(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -98,10 +98,10 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	static rgb_t BBBGGGGGxBBRRRRR(uint32_t raw);
-	void main_cpu(address_map &map);
-	void main_cpu_io(address_map &map);
-	void sound_cpu(address_map &map);
-	void sound_cpu_io(address_map &map);
+	void main_cpu(address_map &map) ATTR_COLD;
+	void main_cpu_io(address_map &map) ATTR_COLD;
+	void sound_cpu(address_map &map) ATTR_COLD;
+	void sound_cpu_io(address_map &map) ATTR_COLD;
 };
 
 

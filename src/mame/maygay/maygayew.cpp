@@ -116,7 +116,7 @@ public:
 	void maygayew(machine_config &config);
 
 private:
-	void maygayew_map(address_map &map);
+	void maygayew_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };

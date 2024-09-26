@@ -58,15 +58,15 @@ public:
 	void fsa1st(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void turbor(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
 	void turbor_add_softlists(machine_config &config);
-	void s1990_mem_map(address_map &map);
-	void s1990_io_map(address_map &map);
-	void cpu_mem_map(address_map &map);
-	void cpu_io_map(address_map &map);
+	void s1990_mem_map(address_map &map) ATTR_COLD;
+	void s1990_io_map(address_map &map) ATTR_COLD;
+	void cpu_mem_map(address_map &map) ATTR_COLD;
+	void cpu_io_map(address_map &map) ATTR_COLD;
 
 	virtual void setup_slot_spaces(msx_internal_slot_interface &device) override;
 	virtual address_space& get_io_space() override;
@@ -120,7 +120,7 @@ private:
 	bool m_rxrdy;
 	bool m_timer2_ff;
 
-	void s1990_io_map(address_map &map);
+	void s1990_io_map(address_map &map) ATTR_COLD;
 	void dtr_w(int state);
 	void rts_w(int state);
 	void rxrdy_w(int state);

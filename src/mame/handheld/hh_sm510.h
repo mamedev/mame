@@ -81,8 +81,8 @@ protected:
 	TIMER_CALLBACK_MEMBER(display_decay_tick);
 	emu_timer *m_display_decay_timer = nullptr;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// machine configs
 	void mcfg_cpu_common(machine_config &config);

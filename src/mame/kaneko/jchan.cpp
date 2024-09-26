@@ -222,13 +222,13 @@ private:
 	void sub2main_cmd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template<int Chip> void sknsspr_sprite32regs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank);
-	void jchan_main(address_map &map);
-	void jchan_sub(address_map &map);
+	void jchan_main(address_map &map) ATTR_COLD;
+	void jchan_sub(address_map &map) ATTR_COLD;
 };
 
 

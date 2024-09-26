@@ -90,13 +90,13 @@ private:
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K053246_CB_MEMBER(sprite_callback);
-	void overdriv_master_map(address_map &map);
-	void overdriv_slave_map(address_map &map);
-	void overdriv_sound_map(address_map &map);
+	void overdriv_master_map(address_map &map) ATTR_COLD;
+	void overdriv_slave_map(address_map &map) ATTR_COLD;
+	void overdriv_sound_map(address_map &map) ATTR_COLD;
 
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	/* video-related */
 	int       m_zoom_colorbase[2]{};

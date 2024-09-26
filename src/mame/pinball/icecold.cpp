@@ -54,8 +54,8 @@ public:
 	ioport_value motors_limit_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void scanlines_w(uint8_t data);
@@ -98,7 +98,7 @@ private:
 	int     m_lmotor = 0;           // left motor position (0-100)
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_sint_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_motors_timer);
-	void icecold_map(address_map &map);
+	void icecold_map(address_map &map) ATTR_COLD;
 };
 
 void icecold_state::icecold_map(address_map &map)

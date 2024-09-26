@@ -66,7 +66,7 @@ public:
 	void sam(machine_config &config);
 
 private:
-	void sam_map(address_map &map);
+	void sam_map(address_map &map) ATTR_COLD;
 };
 
 void sam_state::sam_map(address_map &map)

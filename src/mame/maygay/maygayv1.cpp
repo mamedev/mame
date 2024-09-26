@@ -225,9 +225,9 @@ public:
 	void init_screenpl();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void i82716_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -247,8 +247,8 @@ private:
 	void sound_p3_w(uint8_t data);
 	void duart_irq_handler(int state);
 	void duart_txa(int state);
-	void main_map(address_map &map);
-	void cpu_space_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8052_device> m_soundcpu;

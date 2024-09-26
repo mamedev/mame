@@ -281,9 +281,9 @@ public:
 	ioport_value stooges_joystick_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void analog_reset_w(u8 data);
@@ -317,11 +317,11 @@ private:
 	void audio_handle_zero_crossing(const attotime &zerotime, bool logit);
 	void laserdisc_audio_process(int samplerate, int samples, const int16_t *ch0, const int16_t *ch1);
 
-	void gottlieb_base_map(address_map &map);
-	void gottlieb_ram_map(address_map &map);
-	void gottlieb_ram_rom_map(address_map &map);
-	void gottlieb_rom_map(address_map &map);
-	void reactor_map(address_map &map);
+	void gottlieb_base_map(address_map &map) ATTR_COLD;
+	void gottlieb_ram_map(address_map &map) ATTR_COLD;
+	void gottlieb_ram_rom_map(address_map &map) ATTR_COLD;
+	void gottlieb_rom_map(address_map &map) ATTR_COLD;
+	void reactor_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

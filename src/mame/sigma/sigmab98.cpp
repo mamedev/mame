@@ -152,7 +152,7 @@ public:
 	{ }
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	// TODO: unify these handlers
 	void vregs_w(offs_t offset, uint8_t data);
@@ -220,9 +220,9 @@ protected:
 
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
 
-	void dodghero_mem_map(address_map &map);
-	void gegege_io_map(address_map &map);
-	void gegege_mem_map(address_map &map);
+	void dodghero_mem_map(address_map &map) ATTR_COLD;
+	void gegege_io_map(address_map &map) ATTR_COLD;
+	void gegege_mem_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_leds.resolve(); }
 
@@ -275,8 +275,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(rockman_timer_irq);
 
-	void lufykzku_io_map(address_map &map);
-	void lufykzku_mem_map(address_map &map);
+	void lufykzku_io_map(address_map &map) ATTR_COLD;
+	void lufykzku_mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_vblank_vector = 0;
 	uint8_t m_timer0_vector = 0;
@@ -330,13 +330,13 @@ private:
 	uint8_t eeprom_r();
 	void eeprom_w(uint8_t data);
 
-	void animalc_io(address_map &map);
-	void animalc_map(address_map &map);
-	void gocowboy_io(address_map &map);
-	void gocowboy_map(address_map &map);
-	void haekaka_map(address_map &map);
-	void itazuram_map(address_map &map);
-	void tdoboon_map(address_map &map);
+	void animalc_io(address_map &map) ATTR_COLD;
+	void animalc_map(address_map &map) ATTR_COLD;
+	void gocowboy_io(address_map &map) ATTR_COLD;
+	void gocowboy_map(address_map &map) ATTR_COLD;
+	void haekaka_map(address_map &map) ATTR_COLD;
+	void itazuram_map(address_map &map) ATTR_COLD;
+	void tdoboon_map(address_map &map) ATTR_COLD;
 
 	// Required devices
 	required_device<kl5c80a12_device> m_maincpu;

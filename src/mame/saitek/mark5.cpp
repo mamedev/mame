@@ -83,8 +83,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(cb_enable) { if (!newval) m_display[3]->clear(); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -110,8 +110,8 @@ private:
 	bool board_active() { return machine().time() > m_board_init_time; }
 
 	// address maps
-	void mark5_map(address_map &map);
-	void mark6_map(address_map &map);
+	void mark5_map(address_map &map) ATTR_COLD;
+	void mark6_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void nvram_w(offs_t offset, u8 data);

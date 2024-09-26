@@ -82,8 +82,8 @@ public:
 	void init_1();
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	u8 ppic_r();
 	void ppia_w(u8 data);
 	void ppib_w(u8 data);
@@ -114,12 +114,12 @@ private:
 	void q9a_w(int state);
 	void qc9b_w(int state);
 	void update_mus();
-	void brvteam_map(address_map &map);
-	void canasta_map(address_map &map);
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
-	void lapbylap_main_map(address_map &map);
-	void lapbylap_audio_map(address_map &map);
+	void brvteam_map(address_map &map) ATTR_COLD;
+	void canasta_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void lapbylap_main_map(address_map &map) ATTR_COLD;
+	void lapbylap_audio_map(address_map &map) ATTR_COLD;
 
 	bool m_pc0 = false;
 	u8 m_game = 0U;

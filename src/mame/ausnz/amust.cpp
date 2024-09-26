@@ -136,10 +136,10 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void machine_reset() override;
-	void machine_start() override;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	void do_int();
 
 	u8 m_port04 = 0U;

@@ -70,7 +70,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_info);
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	DECLARE_MACHINE_START(lastduel);
 	DECLARE_VIDEO_START(lastduel);
 	DECLARE_MACHINE_START(madgear);
@@ -80,10 +80,10 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(lastduel_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(madgear_timer_cb);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
-	void lastduel_map(address_map &map);
-	void madgear_map(address_map &map);
-	void madgear_sound_map(address_map &map);
-	void sound_map(address_map &map);
+	void lastduel_map(address_map &map) ATTR_COLD;
+	void madgear_map(address_map &map) ATTR_COLD;
+	void madgear_sound_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_CAPCOM_LASTDUEL_H

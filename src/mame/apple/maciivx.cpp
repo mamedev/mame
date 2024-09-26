@@ -76,9 +76,9 @@ public:
 	void maciiv_base(machine_config &config);
 	void maciivx(machine_config &config);
 	void maciivi(machine_config &config);
-	void base_map(address_map &map);
-	void maciivx_map(address_map &map);
-	void maciivi_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
+	void maciivx_map(address_map &map) ATTR_COLD;
+	void maciivi_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<m68030_device> m_maincpu;
@@ -94,7 +94,7 @@ private:
 	required_device<z80scc_device> m_scc;
 	required_device<egret_device> m_egret;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	u16 scc_r(offs_t offset)
 	{

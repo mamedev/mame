@@ -74,8 +74,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_button);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<cop400_cpu_device> m_maincpu;
@@ -600,7 +600,7 @@ public:
 	int motor_switch_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	output_finder<> m_motor_pos_out;
@@ -1118,8 +1118,8 @@ public:
 	ioport_value switch_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cop400_cpu_device> m_subcpu;
@@ -2314,7 +2314,7 @@ public:
 	void scat(machine_config &config);
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void update_display();
 	void write_d(u8 data);

@@ -38,9 +38,9 @@ public:
 	void tceptor(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -116,12 +116,12 @@ private:
 	inline uint8_t fix_input0(uint8_t in1, uint8_t in2);
 	inline uint8_t fix_input1(uint8_t in1, uint8_t in2);
 
-	void m6502_a_map(address_map &map);
-	void m6502_b_map(address_map &map);
-	void m6809_map(address_map &map);
-	void m68k_map(address_map &map);
-	void mcu_io_map(address_map &map);
-	void mcu_map(address_map &map);
+	void m6502_a_map(address_map &map) ATTR_COLD;
+	void m6502_b_map(address_map &map) ATTR_COLD;
+	void m6809_map(address_map &map) ATTR_COLD;
+	void m68k_map(address_map &map) ATTR_COLD;
+	void mcu_io_map(address_map &map) ATTR_COLD;
+	void mcu_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NAMCO_TCEPTOR_H

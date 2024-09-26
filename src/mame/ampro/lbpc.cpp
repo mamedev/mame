@@ -62,8 +62,8 @@ public:
 	int hsi_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 exp_dack1_r();
@@ -81,8 +81,8 @@ private:
 	u8 port62_r();
 	void tout2_w(int state);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<v40_device> m_maincpu;
 	required_device<isa8_device> m_expbus;

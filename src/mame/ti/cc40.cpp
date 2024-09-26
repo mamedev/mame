@@ -126,8 +126,8 @@ public:
 	void cc40p(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:
@@ -177,8 +177,8 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	HD44780_PIXEL_UPDATE(cc40_pixel_update);
 
-	void cc40_map(address_map &map);
-	void cc40p_map(address_map &map);
+	void cc40_map(address_map &map) ATTR_COLD;
+	void cc40p_map(address_map &map) ATTR_COLD;
 };
 
 

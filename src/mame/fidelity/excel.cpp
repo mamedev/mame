@@ -226,7 +226,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(fexcelp_change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -244,8 +244,8 @@ private:
 	u8 m_speech_bank = 0;
 
 	// address maps
-	void fexcel_map(address_map &map);
-	void fexcelb_map(address_map &map);
+	void fexcel_map(address_map &map) ATTR_COLD;
+	void fexcelb_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void speech_w(u8 data, u8 mask);

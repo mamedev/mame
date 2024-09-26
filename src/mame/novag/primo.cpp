@@ -113,7 +113,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(snova_power_off);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { m_power = true; }
 
 private:
@@ -133,9 +133,9 @@ private:
 	u8 m_select = 0;
 	u8 m_led_data = 0;
 
-	void primo_map(address_map &map);
-	void supremo_map(address_map &map);
-	void snova_map(address_map &map);
+	void primo_map(address_map &map) ATTR_COLD;
+	void supremo_map(address_map &map) ATTR_COLD;
+	void snova_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void standby(int state);

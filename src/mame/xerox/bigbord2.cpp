@@ -140,16 +140,16 @@ private:
 	u8 io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	u8 crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, uint16_t ac_cnt, bool ac_curs);
 	u8 m_term_data = 0U;
 	u8 m_term_status = 0U;
 	uint16_t m_cnt = 0U;
 	bool m_cc[8]{};
 	floppy_image_device *m_floppy;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	address_space *m_mem;
 	address_space *m_io;
 	std::unique_ptr<u8[]> m_vram; // video ram 2k

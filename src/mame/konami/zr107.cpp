@@ -253,11 +253,11 @@ protected:
 	void k054539_irq_gen(int state);
 	double adc0838_callback(uint8_t input);
 
-	void sharc_memmap(address_map &map);
-	void sound_memmap(address_map &map);
+	void sharc_memmap(address_map &map) ATTR_COLD;
+	void sound_memmap(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 class midnrun_state : public zr107_state
@@ -271,10 +271,10 @@ public:
 	void midnrun(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	void main_memmap(address_map &map);
+	void main_memmap(address_map &map) ATTR_COLD;
 
 	K056832_CB_MEMBER(tile_callback);
 
@@ -295,7 +295,7 @@ public:
 	void jetwave(machine_config &config);
 
 private:
-	void main_memmap(address_map &map);
+	void main_memmap(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

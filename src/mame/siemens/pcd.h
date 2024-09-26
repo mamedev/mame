@@ -39,10 +39,10 @@ public:
 	void vram_w(offs_t offset, uint8_t data);
 
 protected:
-	void device_start() override;
-	void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
@@ -91,15 +91,15 @@ public:
 	uint8_t unk_r();
 	void p1_w(uint8_t data);
 
-	void pcx_vid_io(address_map &map);
-	void pcx_vid_map(address_map &map);
-	void pcx_char_ram(address_map &map);
-	void pcx_attr_ram(address_map &map);
+	void pcx_vid_io(address_map &map) ATTR_COLD;
+	void pcx_vid_map(address_map &map) ATTR_COLD;
+	void pcx_char_ram(address_map &map) ATTR_COLD;
+	void pcx_attr_ram(address_map &map) ATTR_COLD;
 protected:
-	void device_start() override;
-	void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<scn2672_device> m_crtc;

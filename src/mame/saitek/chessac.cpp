@@ -63,7 +63,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers

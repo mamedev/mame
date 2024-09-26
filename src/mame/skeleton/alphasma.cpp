@@ -52,8 +52,8 @@ protected:
 	required_ioport_array<16> m_keyboard;
 	required_ioport m_battery_status;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void alphasmart_palette(palette_device &palette) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -66,7 +66,7 @@ protected:
 	void port_d_w(uint8_t data);
 	void update_lcdc(bool lcdc0, bool lcdc1);
 
-	void alphasmart_mem(address_map &map);
+	void alphasmart_mem(address_map &map) ATTR_COLD;
 
 	uint8_t           m_matrix[2];
 	uint8_t           m_port_a;
@@ -87,13 +87,13 @@ public:
 	void asma2k(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void lcd_ctrl_w(uint8_t data);
 	virtual void port_a_w(uint8_t data) override;
 
-	void asma2k_mem(address_map &map);
+	void asma2k_mem(address_map &map) ATTR_COLD;
 
 	memory_view m_io_view;
 	required_memory_bank m_dictbank;

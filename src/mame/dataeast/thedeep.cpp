@@ -96,8 +96,8 @@ public:
 	void thedeep(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -144,8 +144,8 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************

@@ -74,7 +74,7 @@ protected:
 			device_t *owner,
 			u32 clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual TILE_GET_INFO_MEMBER(tile_info);
 
@@ -117,7 +117,7 @@ public:
 	void set_colorrom_length(int length) { m_colorrom_length = length; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual TILE_GET_INFO_MEMBER(tile_info) override;
 
@@ -145,7 +145,7 @@ public:
 	void set_scrolly(int value) { m_tilemap->set_scrolly(value); }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(tile_info);

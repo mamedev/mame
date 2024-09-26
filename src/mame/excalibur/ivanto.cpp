@@ -8,8 +8,8 @@ Excalibur Ivan The Terrible (model 701E, H8/3256 version)
 This is the first version, see ivant.cpp for the newer version. It was produced
 in a factory owned by Eric White's company (ex-CXG), hence it's not that strange
 that the LCD is the same as the one in CXG Sphinx Legend and Krypton Challenge.
-Ron Nelson was reluctant about it, since it was the same person that bootlegged
-his Chess Challenger 10.
+Ron Nelson was reluctant about it, since Eric White was the same person that
+bootlegged his Fidelity Chess Challenger 10.
 
 Hardware notes:
 - PCB label: EXCALIBUR ELECTRONICS, INC. 6/28/96, IVANT
@@ -66,7 +66,7 @@ public:
 	void ivanto(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { m_dac->write(0x80); }
 
 private:
@@ -85,7 +85,7 @@ private:
 	u8 m_lcd_com = 0;
 	emu_timer *m_irqtimer;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);

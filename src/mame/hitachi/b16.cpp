@@ -116,13 +116,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_pressed);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void b16_map(address_map &map);
-	void b16_io(address_map &map);
-	void b16ex2_map(address_map &map);
+	void b16_map(address_map &map) ATTR_COLD;
+	void b16_io(address_map &map) ATTR_COLD;
+	void b16ex2_map(address_map &map) ATTR_COLD;
+
 private:
 	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
 	uint8_t m_port78 = 0;

@@ -65,8 +65,8 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<s2650_device> m_maincpu;
@@ -78,7 +78,7 @@ private:
 	required_device<cassette_image_device> m_cass;
 	output_finder<11> m_lamps;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void lamps1_w(uint8_t data);
 	void lamps2_w(uint8_t data);

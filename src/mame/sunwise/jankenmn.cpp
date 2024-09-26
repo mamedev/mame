@@ -180,10 +180,10 @@ private:
 	void lamps2_w(uint8_t data);
 	void lamps3_w(uint8_t data);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void jankenmn_map(address_map &map);
-	void jankenmn_port_map(address_map &map);
+	void jankenmn_map(address_map &map) ATTR_COLD;
+	void jankenmn_port_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	output_finder<2> m_digits;

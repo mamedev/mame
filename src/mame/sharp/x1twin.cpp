@@ -46,10 +46,10 @@ public:
 
 private:
 	uint32_t screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void pce_io(address_map &map);
-	void pce_mem(address_map &map);
-	void x1_io(address_map &map);
-	void x1_mem(address_map &map);
+	void pce_io(address_map &map) ATTR_COLD;
+	void pce_mem(address_map &map) ATTR_COLD;
+	void x1_io(address_map &map) ATTR_COLD;
+	void x1_mem(address_map &map) ATTR_COLD;
 };
 
 

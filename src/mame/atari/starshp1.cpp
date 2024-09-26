@@ -75,8 +75,8 @@ public:
 	ioport_value collision_latch_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -150,7 +150,7 @@ private:
 	int spaceship_collision(bitmap_ind16 &bitmap, const rectangle &rect);
 	int point_in_circle(int x, int y, int center_x, int center_y, int r);
 	int circle_collision(const rectangle &rect);
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -180,9 +180,9 @@ public:
 
 protected:
 	virtual void device_post_load() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -251,11 +251,11 @@ private:
 	void update_psg1(int port);
 	void update_da();
 	void adpcm_int(int state);
-	void darius_cpub_map(address_map &map);
-	void darius_map(address_map &map);
-	void darius_sound2_io_map(address_map &map);
-	void darius_sound2_map(address_map &map);
-	void darius_sound_map(address_map &map);
+	void darius_cpub_map(address_map &map) ATTR_COLD;
+	void darius_map(address_map &map) ATTR_COLD;
+	void darius_sound2_io_map(address_map &map) ATTR_COLD;
+	void darius_sound2_map(address_map &map) ATTR_COLD;
+	void darius_sound_map(address_map &map) ATTR_COLD;
 };
 
 

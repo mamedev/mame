@@ -33,8 +33,8 @@ public:
 
 protected:
 	// address maps for program memory and io memory
-	void gsz80_mem(address_map &map);
-	void gsz80_io(address_map &map);
+	void gsz80_mem(address_map &map) ATTR_COLD;
+	void gsz80_io(address_map &map) ATTR_COLD;
 
 	// two member devices required here
 	required_device<cpu_device> m_maincpu;

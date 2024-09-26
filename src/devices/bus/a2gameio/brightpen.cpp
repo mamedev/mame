@@ -126,7 +126,7 @@ int apple2_brightpen_device::sw0_r()
 	}
 
 	// light detected if average brightness is above threshold
-	return (brightness_sum >= BRIGHTNESS_THRESHOLD * pixels_scanned);
+	return brightness_sum >= BRIGHTNESS_THRESHOLD * pixels_scanned;
 }
 
 } // anonymous namespace

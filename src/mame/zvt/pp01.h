@@ -41,8 +41,8 @@ public:
 	void pp01(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_video_scroll = 0;
@@ -73,8 +73,8 @@ private:
 	uint8_t ppi1_portc_r();
 	void video_w(uint8_t block,uint16_t offset,uint8_t data,uint8_t part);
 	void set_memory(uint8_t block, uint8_t data);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;

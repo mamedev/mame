@@ -106,8 +106,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<tms70c46_device> m_maincpu;
@@ -131,7 +131,7 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	HD44780_PIXEL_UPDATE(ti74_pixel_update);
 	HD44780_PIXEL_UPDATE(ti95_pixel_update);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

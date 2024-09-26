@@ -49,7 +49,7 @@ public:
 	ioport_value mode_in() { return m_sw_mode; }
 
 private:
-	void sk1_memory(address_map &map);
+	void sk1_memory(address_map &map) ATTR_COLD;
 
 	virtual void driver_start() override;
 

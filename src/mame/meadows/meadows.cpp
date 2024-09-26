@@ -174,8 +174,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<s2650_device> m_maincpu;
@@ -219,11 +219,11 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip);
 	void sh_update();
 	SAMPLES_START_CB_MEMBER(sh_start);
-	void audio_map(address_map &map);
-	void bowl3d_main_map(address_map &map);
-	void meadows_main_map(address_map &map);
-	void minferno_data_map(address_map &map);
-	void minferno_main_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void bowl3d_main_map(address_map &map) ATTR_COLD;
+	void meadows_main_map(address_map &map) ATTR_COLD;
+	void minferno_data_map(address_map &map) ATTR_COLD;
+	void minferno_main_map(address_map &map) ATTR_COLD;
 };
 
 

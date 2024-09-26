@@ -72,12 +72,12 @@ private:
 	void ace_characterram_w(offs_t offset, uint8_t data);
 	void ace_scoreram_w(offs_t offset, uint8_t data);
 	uint8_t unk_r();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ace_postload();
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 

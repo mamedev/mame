@@ -157,13 +157,13 @@ public:
 	}
 
 	void macprtb(machine_config &config);
-	void macprtb_map(address_map &map);
+	void macprtb_map(address_map &map) ATTR_COLD;
 
 	void init_macprtb();
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;

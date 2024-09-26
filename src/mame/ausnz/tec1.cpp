@@ -102,7 +102,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	u8 kbd_r();
 	u8 latch_r();
 	void tec1_digit_w(u8 data);
@@ -112,10 +112,10 @@ private:
 	bool m_key_pressed = 0;
 	u8 m_seg = 0U;
 	u8 m_digit = 0U;
-	void tec1_io(address_map &map);
-	void tec1_map(address_map &map);
-	void tecjmon_io(address_map &map);
-	void tecjmon_map(address_map &map);
+	void tec1_io(address_map &map) ATTR_COLD;
+	void tec1_map(address_map &map) ATTR_COLD;
+	void tecjmon_io(address_map &map) ATTR_COLD;
+	void tecjmon_map(address_map &map) ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<cassette_image_device> m_cass;

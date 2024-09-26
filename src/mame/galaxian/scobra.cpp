@@ -83,21 +83,21 @@ private:
 	void hustler_ppi8255_0_w(offs_t offset, uint8_t data);
 	void hustler_ppi8255_1_w(offs_t offset, uint8_t data);
 
-	void hustler_map(address_map &map);
-	void hustler_sound_io_map(address_map &map);
-	void hustler_sound_map(address_map &map);
-	void hustlerb_map(address_map &map);
-	void hustlerb_sound_io_map(address_map &map);
-	void hustlerb_sound_map(address_map &map);
-	void hustlerb6_map(address_map &map);
-	void mimonkeyug_map(address_map &map);
-	void minefldfe_map(address_map &map);
-	void rescuefe_map(address_map &map);
-	void scobra_sound_io_map(address_map &map);
-	void scobra_sound_map(address_map &map);
-	void tazmani3_map(address_map &map);
-	void type1_map(address_map &map);
-	void type2_map(address_map &map);
+	void hustler_map(address_map &map) ATTR_COLD;
+	void hustler_sound_io_map(address_map &map) ATTR_COLD;
+	void hustler_sound_map(address_map &map) ATTR_COLD;
+	void hustlerb_map(address_map &map) ATTR_COLD;
+	void hustlerb_sound_io_map(address_map &map) ATTR_COLD;
+	void hustlerb_sound_map(address_map &map) ATTR_COLD;
+	void hustlerb6_map(address_map &map) ATTR_COLD;
+	void mimonkeyug_map(address_map &map) ATTR_COLD;
+	void minefldfe_map(address_map &map) ATTR_COLD;
+	void rescuefe_map(address_map &map) ATTR_COLD;
+	void scobra_sound_io_map(address_map &map) ATTR_COLD;
+	void scobra_sound_map(address_map &map) ATTR_COLD;
+	void tazmani3_map(address_map &map) ATTR_COLD;
+	void type1_map(address_map &map) ATTR_COLD;
+	void type2_map(address_map &map) ATTR_COLD;
 
 	optional_shared_ptr<uint8_t> m_soundram;
 };

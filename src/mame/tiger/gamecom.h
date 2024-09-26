@@ -238,8 +238,8 @@ public:
 	void init_gamecom();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t gamecom_internal_r(offs_t offset);
@@ -257,7 +257,7 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart1_load );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart2_load );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gamecom_mem_map(address_map &map);
+	void gamecom_mem_map(address_map &map) ATTR_COLD;
 
 	void gamecom_set_mmu(uint8_t mmu, uint8_t data);
 	void handle_stylus_press(int column);

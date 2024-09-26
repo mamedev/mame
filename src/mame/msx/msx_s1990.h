@@ -53,8 +53,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(pause_callback);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;

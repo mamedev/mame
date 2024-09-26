@@ -167,7 +167,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -189,15 +189,15 @@ private:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
-	void amuse1_map(address_map &map);
-	void amuse_map(address_map &map);
-	void findout_map(address_map &map);
-	void gepoker_map(address_map &map);
-	void getrivia_map(address_map &map);
-	void gselect_map(address_map &map);
-	void quizvid_map(address_map &map);
-	void sprtauth_map(address_map &map);
-	void suprpokr_map(address_map &map);
+	void amuse1_map(address_map &map) ATTR_COLD;
+	void amuse_map(address_map &map) ATTR_COLD;
+	void findout_map(address_map &map) ATTR_COLD;
+	void gepoker_map(address_map &map) ATTR_COLD;
+	void getrivia_map(address_map &map) ATTR_COLD;
+	void gselect_map(address_map &map) ATTR_COLD;
+	void quizvid_map(address_map &map) ATTR_COLD;
+	void sprtauth_map(address_map &map) ATTR_COLD;
+	void suprpokr_map(address_map &map) ATTR_COLD;
 
 	bitmap_ind16 m_bitmap;
 

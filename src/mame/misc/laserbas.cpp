@@ -89,8 +89,8 @@ public:
 	void laserbas(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -126,8 +126,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(laserbas_scanline);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void laserbas_io(address_map &map);
-	void laserbas_memory(address_map &map);
+	void laserbas_io(address_map &map) ATTR_COLD;
+	void laserbas_memory(address_map &map) ATTR_COLD;
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(  laserbas_state::laserbas_scanline )

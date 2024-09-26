@@ -61,7 +61,7 @@ public:
 	ioport_value bg_collision_r() { return m_collision_background; }
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -91,7 +91,7 @@ private:
 	int sprite_collision(int first, int second);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

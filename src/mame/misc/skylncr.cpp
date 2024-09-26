@@ -173,8 +173,8 @@ public:
 	int mbutrfly_prot_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void videoram_w(offs_t offset, uint8_t data);
@@ -193,13 +193,13 @@ private:
 	template<uint8_t Which> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-	void bdream97_opcode_map(address_map &map);
-	void olymp_opcode_map(address_map &map);
-	void io_map_mbutrfly(address_map &map);
-	void io_map_skylncr(address_map &map);
-	void mem_map(address_map &map);
-	void ramdac2_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void bdream97_opcode_map(address_map &map) ATTR_COLD;
+	void olymp_opcode_map(address_map &map) ATTR_COLD;
+	void io_map_mbutrfly(address_map &map) ATTR_COLD;
+	void io_map_skylncr(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void ramdac2_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 	tilemap_t *m_tmap = nullptr;
 	required_shared_ptr<uint8_t> m_videoram;

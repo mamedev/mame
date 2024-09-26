@@ -96,8 +96,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<rp2a03_device> m_maincpu;
@@ -135,8 +135,8 @@ private:
 	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
 	void famibox_cartswitch(u8 data);
 	void famibox_reset();
-	void famibox_map(address_map &map);
-	void famibox_ppu_map(address_map &map);
+	void famibox_map(address_map &map) ATTR_COLD;
+	void famibox_ppu_map(address_map &map) ATTR_COLD;
 };
 
 /******************************************************

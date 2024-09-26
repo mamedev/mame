@@ -202,7 +202,7 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void ps2_map(address_map &map);
+	void ps2_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<r5900_device> m_maincpu;
@@ -216,7 +216,7 @@ private:
 	required_shared_ptr<uint64_t> m_ram;
 
 	// driver_device overrides
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 };
 
 

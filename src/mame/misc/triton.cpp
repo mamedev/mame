@@ -66,8 +66,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(charset_changed);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -89,8 +89,8 @@ private:
 	required_ioport m_modifiers;
 	required_ioport m_config;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	IRQ_CALLBACK_MEMBER(inta_cb);
 

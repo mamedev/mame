@@ -50,11 +50,11 @@ public:
 
 private:
 	uint32_t ertictac_podule_r(offs_t offset);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(ertictac_podule_irq);
-	void ertictac_arm_map(address_map &map);
-	void ertictac_map(address_map &map);
+	void ertictac_arm_map(address_map &map) ATTR_COLD;
+	void ertictac_map(address_map &map) ATTR_COLD;
 
 	required_device<arm_cpu_device> m_maincpu;
 	required_device<acorn_ioc_device> m_ioc;

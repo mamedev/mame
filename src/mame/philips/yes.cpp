@@ -26,8 +26,8 @@ private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<wd2793_device> m_fdc;
 	required_device<hd6845s_device> m_crtc;
-	void io_map(address_map &map);
-	void program_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 	MC6845_UPDATE_ROW(crtc_update_row);
 };
 

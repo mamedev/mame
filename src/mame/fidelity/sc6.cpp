@@ -139,8 +139,8 @@ public:
 	void gambitv(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -157,8 +157,8 @@ private:
 	u8 m_speech_data = 0;
 
 	// address maps
-	void msc_map(address_map &map);
-	void sc6_map(address_map &map);
+	void msc_map(address_map &map) ATTR_COLD;
+	void sc6_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void mux_w(u8 data);

@@ -206,8 +206,8 @@ private:
 		m_coinlamp_outputs.resolve();
 	}
 
-	void oxo_memmap(address_map &map);
-	void oxo_portmap(address_map &map);
+	void oxo_memmap(address_map &map) ATTR_COLD;
+	void oxo_portmap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<stepper_device, 4> m_reels;

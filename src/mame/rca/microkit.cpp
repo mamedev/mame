@@ -51,11 +51,11 @@ private:
 	void ram_w(offs_t offset, uint8_t data);
 	uint8_t ram_r(offs_t offset);
 
-	void microkit_io(address_map &map);
-	void microkit_mem(address_map &map);
+	void microkit_io(address_map &map) ATTR_COLD;
+	void microkit_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	std::unique_ptr<uint8_t[]> m_ram;
 	uint8_t m_resetcnt = 0U;
 	bool m_a15 = 1;

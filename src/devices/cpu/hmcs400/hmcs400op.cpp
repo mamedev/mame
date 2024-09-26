@@ -34,12 +34,12 @@ void hmcs400_cpu_device::pop_stack()
 		m_ca = BIT(data, 7);
 		m_st = BIT(data, 15);
 	}
-	m_pc = (data & 0x7f00) >> 1 | (data & 0x7f);
+	m_pc = (~data & 0x7f00) >> 1 | (~data & 0x7f);
 }
 
 void hmcs400_cpu_device::push_stack()
 {
-	u16 data = (m_pc << 1 & 0x7f00) | (m_pc & 0x7f) | m_ca << 7 | m_st << 15;
+	u16 data = (~m_pc << 1 & 0x7f00) | (~m_pc & 0x7f) | m_ca << 7 | m_st << 15;
 	m_sp = (m_sp | 0x3c0) & 0x3ff;
 
 	for (int i = 0; i < 4; i++)

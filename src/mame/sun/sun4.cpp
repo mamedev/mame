@@ -566,8 +566,8 @@ public:
 	void sun4_base(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	u32 debugger_r(offs_t offset, u32 mem_mask = ~0);
 	void debugger_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -601,23 +601,23 @@ protected:
 
 	void ncr53c90(device_t *device);
 
-	void debugger_map(address_map &map);
-	void system_asi_map(address_map &map);
-	void segment_asi_map(address_map &map);
-	void page_asi_map(address_map &map);
-	void hw_segment_flush_asi_map(address_map &map);
-	void hw_page_flush_asi_map(address_map &map);
-	void hw_context_flush_asi_map(address_map &map);
-	void user_insn_asi_map(address_map &map);
-	void super_insn_asi_map(address_map &map);
-	void user_data_asi_map(address_map &map);
-	void super_data_asi_map(address_map &map);
-	void sw_segment_flush_asi_map(address_map &map);
-	void sw_page_flush_asi_map(address_map &map);
-	void sw_context_flush_asi_map(address_map &map);
-	void hw_flush_all_asi_map(address_map &map);
+	void debugger_map(address_map &map) ATTR_COLD;
+	void system_asi_map(address_map &map) ATTR_COLD;
+	void segment_asi_map(address_map &map) ATTR_COLD;
+	void page_asi_map(address_map &map) ATTR_COLD;
+	void hw_segment_flush_asi_map(address_map &map) ATTR_COLD;
+	void hw_page_flush_asi_map(address_map &map) ATTR_COLD;
+	void hw_context_flush_asi_map(address_map &map) ATTR_COLD;
+	void user_insn_asi_map(address_map &map) ATTR_COLD;
+	void super_insn_asi_map(address_map &map) ATTR_COLD;
+	void user_data_asi_map(address_map &map) ATTR_COLD;
+	void super_data_asi_map(address_map &map) ATTR_COLD;
+	void sw_segment_flush_asi_map(address_map &map) ATTR_COLD;
+	void sw_page_flush_asi_map(address_map &map) ATTR_COLD;
+	void sw_context_flush_asi_map(address_map &map) ATTR_COLD;
+	void hw_flush_all_asi_map(address_map &map) ATTR_COLD;
 
-	void type1space_base_map(address_map &map);
+	void type1space_base_map(address_map &map) ATTR_COLD;
 
 	required_device<sparc_base_device> m_maincpu;
 	required_device<sun4_mmu_base_device> m_mmu;
@@ -683,7 +683,7 @@ public:
 	void sun4(machine_config &config);
 
 private:
-	void type1space_map(address_map &map);
+	void type1space_map(address_map &map) ATTR_COLD;
 };
 
 class sun4c_state : public sun4_base_state
@@ -706,12 +706,12 @@ public:
 	void sun4_75(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	template <int Line> void sbus_irq_w(int state);
 
-	void type1space_map(address_map &map);
+	void type1space_map(address_map &map) ATTR_COLD;
 
 	required_device<sbus_device> m_sbus;
 	required_device_array<sbus_slot_device, 3> m_sbus_slot;

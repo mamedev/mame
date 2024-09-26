@@ -133,7 +133,7 @@ public:
 	void mephisto3(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { m_reset = true; }
 
 private:
@@ -154,14 +154,14 @@ private:
 	u8 m_esb_select = 0;
 
 	// address maps
-	void mephisto_map(address_map &map);
-	void mephistoj_map(address_map &map);
-	void mephisto2_map(address_map &map);
-	void mephistoe2_map(address_map &map);
-	void mephistoe2a_map(address_map &map);
-	void mephisto3_map(address_map &map);
-	void mephisto_io(address_map &map);
-	void mephistoj_io(address_map &map);
+	void mephisto_map(address_map &map) ATTR_COLD;
+	void mephistoj_map(address_map &map) ATTR_COLD;
+	void mephisto2_map(address_map &map) ATTR_COLD;
+	void mephistoe2_map(address_map &map) ATTR_COLD;
+	void mephistoe2a_map(address_map &map) ATTR_COLD;
+	void mephisto3_map(address_map &map) ATTR_COLD;
+	void mephisto_io(address_map &map) ATTR_COLD;
+	void mephistoj_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	int clear_r();

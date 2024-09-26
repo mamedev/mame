@@ -167,7 +167,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	void amuzy_map(address_map &map);
+	void amuzy_map(address_map &map) ATTR_COLD;
 
 	u16 status_r(offs_t offset);
 	void status_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -386,12 +386,36 @@ ROM_START( boobood ) // ブーブードンパッチ, HA9019-0
 	ROM_LOAD( "29lv160.u3", 0x000000, 0x200000, CRC(684523f0) SHA1(ca96918abde4ec63f33d82cf30b121f2ac05f68d) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
+ROM_START( fishbatl ) // フィッシャーマンバトル, HA9008-0
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "29f400.u1", 0x000000, 0x080000, CRC(9d6a8322) SHA1(4819370bb1f092f1c018353f153e623e0297a263) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "29f016a.u2", 0x000000, 0x200000, CRC(95f664f8) SHA1(050f074f7646336b6ce7f5e9c34d50d68d0a9a00) )
+
+	ROM_REGION(0x200000, "gfx", 0 )
+	ROM_LOAD( "29lv160.u3", 0x000000, 0x200000, CRC(dc8f6b48) SHA1(75f92d38b1e716e3c1c0cdb25f444671789dd23a) )
+ROM_END
+
+ROM_START( wanpakup ) // わんぱくパイレーツ, HA9020-0
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "29f400.u1", 0x000000, 0x080000, CRC(8280d58f) SHA1(2be99ae6ddae795495a09fcbab55c880a0adb890) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "29f016a.u2", 0x000000, 0x200000, CRC(ae4b65ad) SHA1(5afb0dbaa37ba90c03ed18929062f6e2c136dca0) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION(0x200000, "gfx", 0 )
+	ROM_LOAD( "29lv160.u3", 0x000000, 0x200000, CRC(91fe39d5) SHA1(e900824a9edc47edb9444812daa2e416f8365e0c) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+ROM_END
+
 }   // anonymous namespace
 
-GAME( 2005, boobood,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Boo Boo Donpatchi (Japan)",  MACHINE_NOT_WORKING )
-GAME( 2005, zenponta,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Zenigata Ponta (Japan)",  MACHINE_NOT_WORKING )
-GAME( 2006, amhbattl,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Acchi Muite Hoi Battle (Japan)",  MACHINE_NOT_WORKING )
-GAME( 2007, docchift,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Docchi Fighter (Japan)",  MACHINE_NOT_WORKING )
-GAME( 2007, wwdash,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wan Wan Dash (Japan)",  MACHINE_NOT_WORKING )
-GAME( 2008, mmhammer,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Mogu Mogu Hammer (Japan)",  MACHINE_NOT_WORKING )
-GAME( 2008, shpchamp,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Shippe Champion (Japan)",  MACHINE_NOT_WORKING )
+GAME( 2005, boobood,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Boo Boo Donpatchi (Japan, ver 1.01)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, fishbatl,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Fisherman Battle (Japan, ver 1.03)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, zenponta,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Zenigata Ponta (Japan, ver 1.02)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006, amhbattl,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Acchi Muite Hoi Battle (Japan, ver 1.04)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006, wanpakup,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wanpaku Pirates (Japan, ver 1.00)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2007, docchift,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Docchi Fighter (Japan, ver 1.02)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2007, wwdash,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wan Wan Dash (Japan, ver 1.01)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2008, mmhammer,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Mogu Mogu Hammer (Japan, ver 1.01)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2008, shpchamp,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Shippe Champion (Japan, ver 1.02)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

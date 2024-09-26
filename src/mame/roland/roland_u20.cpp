@@ -28,7 +28,7 @@ public:
 	void u220(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<i8x9x_device> m_maincpu;
 	required_device<mb87419_mb87420_device> m_pcm;

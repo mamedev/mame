@@ -31,7 +31,7 @@ private:
 
 	u8 novram_recall_r();
 	u8 novram_store_r();
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<x2210_device> m_novram;

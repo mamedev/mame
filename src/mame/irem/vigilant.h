@@ -67,9 +67,9 @@ private:
 	// kikcubic
 	void kikcubic_coin_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
 	uint32_t screen_update_vigilant(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kikcubic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -83,14 +83,14 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void vigilant_postload();
 
-	void buccanrs_sound_io_map(address_map &map);
-	void kikcubic_io_map(address_map &map);
-	void kikcubic_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
-	void vigilant_io_map(address_map &map);
-	void vigilant_map(address_map &map);
-	void bowmen_io_map(address_map &map);
+	void buccanrs_sound_io_map(address_map &map) ATTR_COLD;
+	void kikcubic_io_map(address_map &map) ATTR_COLD;
+	void kikcubic_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void vigilant_io_map(address_map &map) ATTR_COLD;
+	void vigilant_map(address_map &map) ATTR_COLD;
+	void bowmen_io_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_IREM_VIGILANT_H

@@ -50,8 +50,8 @@ public:
 	template <int Mask> int starspnr_payout_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(refresh_tick);
 
@@ -67,8 +67,8 @@ private:
 	INTERRUPT_GEN_MEMBER(vblank);
 	void update_irq(int vpos);
 
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;

@@ -55,9 +55,9 @@ public:
 private:
 	void add_ym2413(machine_config& config);
 
-	void memmap_ym2413(address_map &map);
-	void memmap_characteriser_ym2413(address_map &map);
-	void memmap_bootleg_characteriser_ym2413(address_map &map);
+	void memmap_ym2413(address_map &map) ATTR_COLD;
+	void memmap_characteriser_ym2413(address_map &map) ATTR_COLD;
+	void memmap_bootleg_characteriser_ym2413(address_map &map) ATTR_COLD;
 
 	DECLARE_MACHINE_START(mpu4yam);
 

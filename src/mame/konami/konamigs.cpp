@@ -88,16 +88,16 @@ protected:
 	required_device<screen_device> m_screen;
 	optional_device<hopper_device> m_hopper;
 
-	void main_map_common(address_map &map);
-	void main_map(address_map &map);
-	void main_map_medal(address_map &map);
-	void main_port(address_map &map);
-	void main_port_medal(address_map &map);
-	void ymz280b_map(address_map &map);
-	void ymz280b_map_medal(address_map &map);
+	void main_map_common(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_map_medal(address_map &map) ATTR_COLD;
+	void main_port(address_map &map) ATTR_COLD;
+	void main_port_medal(address_map &map) ATTR_COLD;
+	void ymz280b_map(address_map &map) ATTR_COLD;
+	void ymz280b_map_medal(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u8 ymzram_r(offs_t offset);
 	void ymzram_w(offs_t offset, u8 data);

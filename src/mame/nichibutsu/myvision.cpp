@@ -60,11 +60,11 @@ private:
 	void ay_port_a_w(uint8_t data);
 	void ay_port_b_w(uint8_t data);
 
-	void myvision_io(address_map &map);
-	void myvision_mem(address_map &map);
+	void myvision_io(address_map &map) ATTR_COLD;
+	void myvision_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	uint8_t m_column;

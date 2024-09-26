@@ -107,8 +107,8 @@ public:
 	void init_vega();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	struct vega_obj
@@ -175,8 +175,8 @@ private:
 	void vega_palette(palette_device &palette) const;
 	void draw_tilemap(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vega_io_map(address_map &map);
-	void vega_map(address_map &map);
+	void vega_io_map(address_map &map) ATTR_COLD;
+	void vega_map(address_map &map) ATTR_COLD;
 };
 
 void vega_state::extern_w(offs_t offset, uint8_t data)

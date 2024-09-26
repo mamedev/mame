@@ -84,12 +84,12 @@ public:
 	void de_type3(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void de_bg_audio(machine_config &config);
-	void audio_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
 
 	void sample_w(uint8_t data);
 	void pia34_pa_w(uint8_t data) { }

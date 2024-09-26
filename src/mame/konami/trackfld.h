@@ -69,16 +69,16 @@ private:
 	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; }
 	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); }
 
-	void hyprolyb_sound_map(address_map &map);
-	void main_map(address_map &map);
-	void mastkin_map(address_map &map);
-	void reaktor_io_map(address_map &map);
-	void reaktor_map(address_map &map);
-	void sound_map(address_map &map);
-	void vlm_map(address_map &map);
-	void wizzquiz_map(address_map &map);
-	void yieartf_map(address_map &map);
-	void hyprolyb_adpcm_map(address_map &map);
+	void hyprolyb_sound_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void mastkin_map(address_map &map) ATTR_COLD;
+	void reaktor_io_map(address_map &map) ATTR_COLD;
+	void reaktor_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void vlm_map(address_map &map) ATTR_COLD;
+	void wizzquiz_map(address_map &map) ATTR_COLD;
+	void yieartf_map(address_map &map) ATTR_COLD;
+	void hyprolyb_adpcm_map(address_map &map) ATTR_COLD;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram2;

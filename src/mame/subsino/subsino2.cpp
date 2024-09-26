@@ -149,7 +149,7 @@ public:
 	void init_tbonusal();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void ss9601_byte_lo_w(uint8_t data);
@@ -227,17 +227,17 @@ private:
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
 	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void bishjan_map(address_map &map);
-	void mtrain_io(address_map &map);
-	void mtrain_base_map(address_map &map);
-	void mtrain_map(address_map &map);
-	void tbonusal_map(address_map &map);
-	void new2001_map(address_map &map);
-	void ramdac_map(address_map &map);
-	void saklove_io(address_map &map);
-	void saklove_map(address_map &map);
-	void xplan_io(address_map &map);
-	void xplan_map(address_map &map);
+	void bishjan_map(address_map &map) ATTR_COLD;
+	void mtrain_io(address_map &map) ATTR_COLD;
+	void mtrain_base_map(address_map &map) ATTR_COLD;
+	void mtrain_map(address_map &map) ATTR_COLD;
+	void tbonusal_map(address_map &map) ATTR_COLD;
+	void new2001_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void saklove_io(address_map &map) ATTR_COLD;
+	void saklove_map(address_map &map) ATTR_COLD;
+	void xplan_io(address_map &map) ATTR_COLD;
+	void xplan_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_leds.resolve(); }
 

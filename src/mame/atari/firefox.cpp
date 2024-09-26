@@ -107,10 +107,10 @@ private:
 	void set_rgba( int start, int index, unsigned char *palette_ram );
 	void firq_gen(philips_22vp931_device &laserdisc, int state);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<philips_22vp931_device> m_laserdisc;
 	required_shared_ptr<unsigned char> m_tileram;

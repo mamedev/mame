@@ -49,7 +49,7 @@ public:
 	void triomphe(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -61,6 +61,7 @@ private:
 
 	u16 m_inp_mux = 0;
 
+	// I/O handlers
 	u8 input_r();
 	void board_w(u8 data);
 	void control_w(u8 data);

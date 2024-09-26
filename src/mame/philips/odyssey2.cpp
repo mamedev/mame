@@ -165,8 +165,8 @@ protected:
 	u8 m_p1 = 0xff;
 	u8 m_p2 = 0xff;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void adjust_palette();
 
@@ -178,8 +178,8 @@ protected:
 	void p2_write(u8 data);
 	int t1_read();
 
-	void odyssey2_io(address_map &map);
-	void odyssey2_mem(address_map &map);
+	void odyssey2_io(address_map &map) ATTR_COLD;
+	void odyssey2_mem(address_map &map) ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -199,7 +199,7 @@ public:
 	void odyssey3(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual u8 io_read(offs_t offset) override;
 	virtual void io_write(offs_t offset, u8 data) override;

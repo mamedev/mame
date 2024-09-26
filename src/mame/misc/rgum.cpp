@@ -54,8 +54,8 @@ public:
 	int heartbeat_r();
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_vram;
@@ -77,7 +77,7 @@ private:
 	uint8_t upd_reset_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

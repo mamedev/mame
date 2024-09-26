@@ -80,7 +80,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { set_power(true); }
 
 private:
@@ -105,8 +105,8 @@ private:
 	u32 m_lcd_data = 0;
 	u8 m_lcd_segs2 = 0;
 
-	void diamond_map(address_map &map);
-	void diamond2_map(address_map &map);
+	void diamond_map(address_map &map) ATTR_COLD;
+	void diamond2_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void standby(int state);

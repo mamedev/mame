@@ -53,7 +53,7 @@ public:
 	void sdgndmps(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -96,8 +96,8 @@ private:
 	uint32_t screen_update_dcon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t pri_cb(uint8_t pri, uint8_t ext);
-	void dcon_map(address_map &map);
-	void sdgndmps_map(address_map &map);
+	void dcon_map(address_map &map) ATTR_COLD;
+	void sdgndmps_map(address_map &map) ATTR_COLD;
 };
 
 

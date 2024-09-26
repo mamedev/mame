@@ -685,8 +685,8 @@ public:
 	auto tx_cb() { return m_tx_cb.bind(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void tra_complete() override;
 	virtual void tra_callback() override;

@@ -391,8 +391,8 @@ public:
 	void lindbergh(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 lindbergh_state::lindbergh_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag)

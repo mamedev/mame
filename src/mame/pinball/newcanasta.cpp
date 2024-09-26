@@ -27,7 +27,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void newcanasta_map(address_map &map);
+	void newcanasta_map(address_map &map) ATTR_COLD;
 };
 
 

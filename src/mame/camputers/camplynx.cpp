@@ -215,16 +215,16 @@ private:
 	u8 port82_r(); // cassin for 128k
 	void port82_w(u8 data); // banking 128k
 	void port84_w(u8 data); // dac port 48k
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	static void camplynx_floppy_formats(format_registration &fr);
 	MC6845_UPDATE_ROW(lynx48k_update_row);
 	MC6845_UPDATE_ROW(lynx128k_update_row);
-	void lynx128k_io(address_map &map);
-	void lynx128k_mem(address_map &map);
-	void lynx48k_io(address_map &map);
-	void lynx48k_mem(address_map &map);
-	void lynx96k_io(address_map &map);
+	void lynx128k_io(address_map &map) ATTR_COLD;
+	void lynx128k_mem(address_map &map) ATTR_COLD;
+	void lynx48k_io(address_map &map) ATTR_COLD;
+	void lynx48k_mem(address_map &map) ATTR_COLD;
+	void lynx96k_io(address_map &map) ATTR_COLD;
 	u8 m_port58 = 0U;
 	u8 m_port80 = 0U;
 	u8 m_bankdata = 0U;

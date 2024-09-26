@@ -133,7 +133,7 @@ public:
 	void init_mirax();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -169,8 +169,8 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void vblank_irq(int state);
-	void mirax_main_map(address_map &map);
-	void mirax_sound_map(address_map &map);
+	void mirax_main_map(address_map &map) ATTR_COLD;
+	void mirax_sound_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -66,9 +66,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(tilt_pressed);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:
@@ -120,11 +120,11 @@ private:
 	void draw_sprites(bitmap_ind16 &bmp, const rectangle &clip, uint8_t *ram, int pri);
 
 	INTERRUPT_GEN_MEMBER(p3_interrupt);
-	void bank_map(address_map &map);
-	void p1_map(address_map &map);
-	void p2_map(address_map &map);
-	void p3_io_map(address_map &map);
-	void p3_map(address_map &map);
+	void bank_map(address_map &map) ATTR_COLD;
+	void p1_map(address_map &map) ATTR_COLD;
+	void p2_map(address_map &map) ATTR_COLD;
+	void p3_io_map(address_map &map) ATTR_COLD;
+	void p3_map(address_map &map) ATTR_COLD;
 };
 
 

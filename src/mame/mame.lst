@@ -16193,17 +16193,11 @@ galgame4p                       // (c) 1998 Creative Electronics & Software (CES
 galgbios                        // (c) 1998 Creative Electronics & Software (CES)
 
 @source:chess/ave_arb.cpp
-arb                             //
-arbv2                           //
-
-@source:chess/cking_master.cpp
-ckmaster                        //
-
-@source:chess/cking_triomphe.cpp
-triomphe
+arb
+arbv2
 
 @source:chess/compuchess.cpp
-ccmk1                           // Chess Champion MK I
+ccmk1
 cmpchess
 cmpchess2
 cncchess
@@ -16235,6 +16229,12 @@ tascr30
 tascr30a
 tascr30b
 tascr30g
+
+@source:chessking/master.cpp
+master
+
+@source:chessking/triomphe.cpp
+triomphe
 
 @source:chromatics/cgc7900.cpp
 cgc7900                         //
@@ -24842,6 +24842,7 @@ tmnt24pu                        // GX063 (c) 1991 (US)
 tmht22pe                        // GX063 (c) 1991 (UK)
 tmht24pe                        // GX063 (c) 1991 (UK)
 tmnt2a                          // GX063 (c) 1991 (Asia)
+tmnt2o                          // GX063 (c) 1991 (Oceania)
 trigon                          // GX939 (c) 1990 (Japan)
 
 @source:konami/tp84.cpp
@@ -28770,8 +28771,10 @@ draw88pkr                       // 1988, BTE, Inc.
 amhbattl
 boobood
 docchift
+fishbatl
 mmhammer
 shpchamp
+wanpakup
 wwdash
 zenponta
 
@@ -29272,6 +29275,7 @@ cowtippa                        //
 @source:misc/crazybal.cpp
 crazybal                        // EGS
 crazybala                       // EGS
+crazybalb                       // EGS
 
 @source:misc/cromptons.cpp
 ffruits                         //
@@ -38937,9 +38941,6 @@ cp2000
 @source:saitek/delta1.cpp
 ccdelta1
 
-@source:saitek/ecbackg.cpp
-ecbackg
-
 @source:saitek/edames.cpp
 edames
 
@@ -38983,8 +38984,9 @@ montreux
 risc2500
 risc2500a
 
-@source:saitek/sbackg.cpp
-sbackg
+@source:saitek/sbackgc.cpp
+ecbackg
+sbackgc
 
 @source:saitek/schess.cpp
 schess
@@ -42149,6 +42151,7 @@ rp200
 gimix                           //
 
 @source:skeleton/gm1000.cpp
+bh1000
 gm1000                          //
 
 @source:skeleton/gnat10.cpp
@@ -42382,9 +42385,6 @@ p8000_16                        //
 
 @source:skeleton/palestra.cpp
 palestra
-
-@source:skeleton/pap2.cpp
-pap2
 
 @source:skeleton/pcksurfer.cpp
 pcksurfer                       // (c) 2006 Datawind
@@ -43844,6 +43844,7 @@ megablst                        // 1989.?? C11 (c) 1989 Taito Corporation Japan 
 megablstj                       // 1989.11 C11 (c) 1989 Taito Corporation (Japan)
 megablstu                       // 1989.?? C11 (c) 1989 Taito America Corporation (US)
 metalb                          // 1991.?? D16? (c) 1991 Taito Corporation Japan (World)
+metalba                         // 1991.?? D16? (c) 1991 Taito Corporation Japan (World)
 metalbj                         // 1991.11 D12 (c) 1991 Taito Corporation (Japan)
 mizubaku                        // 1990.08 C49 (c) 1990 Taito Corporation (Japan)
 mjnquest                        // 1991.05 C77 (c) 1990 Taito Corporation (Japan)

@@ -25,7 +25,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_nvram_interface overrides

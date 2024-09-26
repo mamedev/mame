@@ -535,8 +535,8 @@ public:
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	void clcd(machine_config &config);
-	void clcd_banked_mem(address_map &map);
-	void clcd_mem(address_map &map);
+	void clcd_banked_mem(address_map &map) ATTR_COLD;
+	void clcd_mem(address_map &map) ATTR_COLD;
 private:
 	required_device<m65c02_device> m_maincpu;
 	required_device<mos6551_device> m_acia;

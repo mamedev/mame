@@ -221,8 +221,8 @@ public:
 	void crt250_crt252_crt258(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device_array<z80pio_device, 2> m_z80pio;
@@ -278,12 +278,12 @@ private:
 	uint8_t binary_to_BCD(uint8_t data);
 	[[maybe_unused]] void vdp0_interrupt(int state);
 	[[maybe_unused]] void vdp1_interrupt(int state);
-	void crt250_crt258_io_map(address_map &map);
-	void crt250_io_map(address_map &map);
-	void crt250_map(address_map &map);
-	void crt250_questions_map(address_map &map);
-	void io_map(address_map &map);
-	void map(address_map &map);
+	void crt250_crt258_io_map(address_map &map) ATTR_COLD;
+	void crt250_io_map(address_map &map) ATTR_COLD;
+	void crt250_map(address_map &map) ATTR_COLD;
+	void crt250_questions_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void map(address_map &map) ATTR_COLD;
 };
 
 

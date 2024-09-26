@@ -29,8 +29,8 @@ public:
 	void st2202_power_w(int state);
 
 private:
-	void inteladv_map(address_map &map);
-	void dyndesk_map(address_map &map);
+	void inteladv_map(address_map &map) ATTR_COLD;
+	void dyndesk_map(address_map &map) ATTR_COLD;
 
 	required_device<st2xxx_device> m_maincpu;
 };
