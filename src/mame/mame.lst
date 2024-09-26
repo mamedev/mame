@@ -27967,6 +27967,7 @@ sspeedr                         // 1979 Midway
 
 @source:midway/starrider.cpp
 starridr                        //
+starridrp3                      //
 
 @source:midway/tmaster.cpp
 tm                              // (c) 1996 Midway Games
