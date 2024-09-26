@@ -7,26 +7,15 @@
 #pragma once
 
 #include "bus/bml3/bml3bus.h"
-#include "bus/bml3/kanji.h"
-#include "bus/bml3/mp1802.h"
-#include "bus/bml3/mp1805.h"
-#include "bus/bml3/rtc.h"
-#include "cpu/m6809/m6809.h"
 #include "imagedev/cassette.h"
-#include "machine/6821pia.h"
 #include "machine/6850acia.h"
-#include "machine/clock.h"
-#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "sound/ymopn.h"
+#include "machine/timer.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
-#include "screen.h"
-#include "softlist_dev.h"
-#include "speaker.h"
 
-namespace {
 
 // System clock definitions, from the MB-6890 servce manual, p.48:
 
@@ -61,7 +50,7 @@ namespace {
 // / 6720   // 2400
 // / 3360   // 4800
 // / 1680   // 9600
-} // anonymous namespace
+
 
 class bml3_state : public driver_device
 {
@@ -223,6 +212,7 @@ protected:
 	void ig_ram_w(offs_t offset, u8 data);
 
 	memory_view m_ig_view;
+
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	std::unique_ptr<u8[]> m_ig_ram;

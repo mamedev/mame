@@ -20,6 +20,9 @@ TODO:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class mbs1_state : public bml3mk5_state
 {
 public:
@@ -30,16 +33,17 @@ public:
 		, m_system_mode(*this, "SYSTEM_MODE")
 	{ }
 
-	void mbs1(machine_config &config);
+	void mbs1(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
 //  virtual void main_map(address_map &map) override ATTR_COLD;
 	virtual void system_io(address_map &map) override ATTR_COLD;
-	void s1_map(address_map &map);
-	void s1_mmu_map(address_map &map);
-	void s1_ext_io(address_map &map);
+	void s1_map(address_map &map) ATTR_COLD;
+	void s1_mmu_map(address_map &map) ATTR_COLD;
+	void s1_ext_io(address_map &map) ATTR_COLD;
 
 	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
 
@@ -64,7 +68,7 @@ MC6845_UPDATE_ROW( mbs1_state::crtc_update_row )
 	u8 const bgcolor = 0; //m_hres_reg & 7;
 
 	// TODO: WIDTH80, pinpoint bit used
-	for(u8 x=0; x<x_count; x+= 2)
+	for (u8 x = 0; x < x_count; x += 2)
 	{
 		u16 mem = ((ma + x) >> 1) & 0x7ff;
 
@@ -77,15 +81,10 @@ MC6845_UPDATE_ROW( mbs1_state::crtc_update_row )
 
 		u8 gfx_data = m_p_chargen[(tile<<4)|(ra<<1)|tile_bank];
 
-		for(u8 xi = 0; xi< 8; xi++)
+		for (u8 xi = 0; xi < 8; xi++)
 		{
-			u8 pen;
-			if(reverse)
-				pen = (gfx_data >> (7-xi) & 1) ? bgcolor : color;
-			else
-				pen = (gfx_data >> (7-xi) & 1) ? color : bgcolor;
-
-			const int res_x = x * 8 + xi * 2;
+			u8 const pen = BIT(reverse ? ~gfx_data : gfx_data, 7 - xi) ? color : bgcolor;
+			int const res_x = x * 8 + xi * 2;
 			bitmap.pix(y, res_x + 0) = palette[pen];
 			bitmap.pix(y, res_x + 1) = palette[pen];
 		}
@@ -341,6 +340,7 @@ ROM_START( mbs1 )
 	ROM_LOAD("font.rom", 0x0000, 0x1000, CRC(d1f27c5a) SHA1(a3abbdea9f6656bd795fd35ee806a54d7be35de0) )
 ROM_END
 
+} // anonymous namespace
+
 
 COMP( 1984, mbs1,    0,     0,      mbs1,    mbs1,  mbs1_state,    empty_init, "Hitachi", "MB-S1", MACHINE_NOT_WORKING )
-

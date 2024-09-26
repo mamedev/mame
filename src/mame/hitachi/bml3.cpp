@@ -22,8 +22,20 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
-
 #include "bml3.h"
+
+#include "bus/bml3/kanji.h"
+#include "bus/bml3/mp1802.h"
+#include "bus/bml3/mp1805.h"
+#include "bus/bml3/rtc.h"
+#include "cpu/m6809/m6809.h"
+#include "machine/6821pia.h"
+#include "machine/clock.h"
+
+#include "screen.h"
+#include "softlist_dev.h"
+#include "speaker.h"
+
 
 MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 {

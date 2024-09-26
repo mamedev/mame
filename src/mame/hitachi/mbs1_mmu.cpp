@@ -20,12 +20,20 @@ TODO:
 #include "emu.h"
 #include "mbs1_mmu.h"
 
+#include <algorithm>
+
+
 DEFINE_DEVICE_TYPE(MBS1_MMU, mbs1_mmu_device, "mbs1_mmu", "Hitachi MB-S1 MMU")
 
 mbs1_mmu_device::mbs1_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MBS1_MMU, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("memory_map", ENDIANNESS_BIG, 8, 20, 0)
+{
+	std::fill(std::begin(m_bank_latch), std::end(m_bank_latch), 0);
+}
+
+mbs1_mmu_device::~mbs1_mmu_device()
 {
 }
 
@@ -38,7 +46,7 @@ device_memory_interface::space_config_vector mbs1_mmu_device::memory_space_confi
 
 void mbs1_mmu_device::device_start()
 {
-	m_space = &space();
+	space().specific(m_space);
 
 	save_pointer(NAME(m_bank_latch), 16);
 }
@@ -50,10 +58,9 @@ void mbs1_mmu_device::device_reset()
 // TODO: should not reset everything when in user mode
 void mbs1_mmu_device::init_banks(bool system_type, bool user_mode)
 {
-	int i;
 	if (system_type == true)
 	{
-		for (i = 0; i < 14; i++)
+		for (int i = 0; i < 14; i++)
 			m_bank_latch[i] = 0xf0 | i;
 		m_bank_latch[0xe] = 0x84;
 		m_bank_latch[0xf] = 0xef;
@@ -61,19 +68,19 @@ void mbs1_mmu_device::init_banks(bool system_type, bool user_mode)
 	else
 	{
 		// Level 3 mode
-		for (i = 0; i < 16; i++)
+		for (int i = 0; i < 16; i++)
 			m_bank_latch[i] = 0xf0 | i;
 	}
 }
 
 u8 mbs1_mmu_device::read(offs_t offset)
 {
-	return m_space->read_byte((offset & 0xfff) | (m_bank_latch[offset >> 12] << 12));
+	return m_space.read_byte((offset & 0xfff) | (m_bank_latch[offset >> 12] << 12));
 }
 
 void mbs1_mmu_device::write(offs_t offset, u8 data)
 {
-	m_space->write_byte((offset & 0xfff) | (m_bank_latch[offset >> 12] << 12), data);
+	m_space.write_byte((offset & 0xfff) | (m_bank_latch[offset >> 12] << 12), data);
 }
 
 u8 mbs1_mmu_device::bank_r(offs_t offset)
