@@ -724,6 +724,7 @@ void sc28c94_device::write(offs_t offset, uint8_t data)
 void xr68c681_device::write(offs_t offset, uint8_t data)
 {
 	if (offset == 0x02) /* CRA */
+	{
 		switch (data >> 4)
 		{
 		case 0x08: /* set RX extend bit */
@@ -757,8 +758,9 @@ void xr68c681_device::write(offs_t offset, uint8_t data)
 			data &= 0x0f;
 			break;
 		}
-
+	}
 	else if (offset == 0x0a) /* CRB */
+	{
 		switch (data >> 4)
 		{
 		case 0x08: /* set RX extend bit */
@@ -792,6 +794,7 @@ void xr68c681_device::write(offs_t offset, uint8_t data)
 			data &= 0x0f;
 			break;
 		}
+	}
 
 	mc68681_device::write(offset, data); /* pass on 68681 command */
 }
@@ -1096,7 +1099,6 @@ int mc68340_duart_device::calc_baud(int ch, bool rx, uint8_t data)
 int xr68c681_device::calc_baud(int ch, bool rx, uint8_t data)
 {
 	int baud_rate;
-
 
 	baud_rate = baud_rate_ACR_0[data & 0x0f];
 
