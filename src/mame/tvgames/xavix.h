@@ -85,6 +85,7 @@ public:
 		m_mouse0y(*this, "MOUSE0Y"),
 		m_mouse1x(*this, "MOUSE1X"),
 		m_mouse1y(*this, "MOUSE1Y"),
+		m_lightgun(*this, "GUN1_%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
@@ -202,6 +203,7 @@ protected:
 	optional_ioport m_mouse0y;
 	optional_ioport m_mouse1x;
 	optional_ioport m_mouse1y;
+	optional_ioport_array<2> m_lightgun;
 	required_device<xavix_device> m_maincpu;
 	optional_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
@@ -419,6 +421,24 @@ private:
 
 	uint8_t pal_ntsc_r();
 
+	uint8_t lightgun_r(offs_t offset)
+	{
+		if (!m_lightgun[offset])
+			return 0xff;
+
+		uint16_t ret = m_lightgun[offset>>1]->read();
+
+		if (offset & 1)
+			ret >>= 8;
+		else
+			ret &= 0xff;
+
+		if (offset == 0)
+			ret += 0x20;
+
+		return ret;
+	}
+
 	uint8_t xavix_memoryemu_txarray_r(offs_t offset);
 	void xavix_memoryemu_txarray_w(offs_t offset, uint8_t data);
 	uint8_t m_txarray[3]{};
@@ -631,6 +651,18 @@ protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
+};
+
+class xavix_i2c_tomshoot_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_tomshoot_state(const machine_config& mconfig, device_type type, const char* tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(gun_fired);
+	DECLARE_INPUT_CHANGED_MEMBER(gun2_fired);
+
 };
 
 class xavix_i2c_ltv_tam_state : public xavix_i2c_state
