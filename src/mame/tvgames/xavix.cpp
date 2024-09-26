@@ -2176,6 +2176,7 @@ ROM_START( tak_daig )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
+// ASKJ MAIN-09 PCB
 ROM_START( epo_quiz )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "quizmaster.u1", 0x000000, 0x400000, CRC(e91868b8) SHA1(0128603d755731dafe328b142292dc6e5fe00d78) )
@@ -2301,7 +2302,7 @@ CONS( 2002, epo_dmon, 0,           0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_sta
 CONS( 2003, epo_crok,  0,          0,  xavix_i2c_24lc04, xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Croket! Itada Kinka! Banker Battle!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // オールスター感謝祭　超豪華！クイズ決定版～赤坂５丁目体感スタジオ～
-CONS( 2004, epo_quiz,  0,          0,  xavix,            epo_quiz, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "All-Star Thanksgiving Super Luxurious! Definitive Quiz Edition ~ Akasaka 5-Chome Experience Studio",  MACHINE_IMPERFECT_SOUND )
+CONS( 2004, epo_quiz,  0,          0,  xavix,            epo_quiz, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "All-Star Thanksgiving Super Luxurious! Definitive Quiz Edition ~ Akasaka 5-Chome Experience Studio", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2005, has_wamg,  0,          0,  xavix,            has_wamg, xavix_state,          init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
