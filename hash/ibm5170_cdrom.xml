@@ -6790,7 +6790,6 @@ Incredibly slow in tearing down even on pcipcs7 (bypass with fast forward)
 		</part>
 	</software>
 
-
 	<software name="freedos10">
 		<description>FreeDOS 1.0</description>
 		<year>2006</year>
@@ -6819,6 +6818,12 @@ Incredibly slow in tearing down even on pcipcs7 (bypass with fast forward)
 			<diskarea name="cdrom">
 				<disk name="fd10fullws" sha1="bfdfe1b9e3c4d697e69ea47dd436b6d291bee5bd"/>
 			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot Floppy" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="fdboot.img" size="1474560" crc="5160c4c9" sha1="813fa09f2278b0b83b67c6d2bda68a46cd83234d"/>
+			</dataarea>
 		</part>
 	</software>
 
@@ -6881,6 +6886,12 @@ Incredibly slow in tearing down even on pcipcs7 (bypass with fast forward)
 			<diskarea name="cdrom">
 				<disk name="fd12lgcy" sha1="86ff1e0c49029c68ad24a0110e32929ec26b2760"/>
 			</diskarea>
+		</part>
+		<part name="flop" interface="floppy_3_5">
+			<feature name="part_id" value="Boot Floppy" />
+			<dataarea name="flop" size="1474560">
+				<rom name="FLOPPY.img" size="1474560" crc="e8b32691" sha1="2dd8bb9751176533dd7d00160a5eed0d8cbb4725"/>
+			</dataarea>
 		</part>
 	</software>
 

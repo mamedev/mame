@@ -566,31 +566,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="freedos10">
-		<description>FreeDOS 1.0 (bootdisk)</description>
-		<year>2006</year>
-		<publisher>The FreeDOS Project</publisher>
-		<info name="version" value="1.0"/>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="fdboot.img" size="1474560" crc="5160c4c9" sha1="813fa09f2278b0b83b67c6d2bda68a46cd83234d"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="freedos12">
-		<description>FreeDOS 1.2 (bootdisk)</description>
-		<year>2016</year>
-		<publisher>The FreeDOS Project</publisher>
-		<info name="version" value="1.2"/>
-		<part name="flop" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="FLOPPY.img" size="1474560" crc="e8b32691" sha1="2dd8bb9751176533dd7d00160a5eed0d8cbb4725"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="freedos13_120" cloneof="freedos13">
 	<software name="freedos13_120" cloneof="freedos13_144">
 		<description>FreeDOS 1.3 (Floppy-Only Edition, 5.25" 1.2MB)</description>
 		<year>2022</year>
