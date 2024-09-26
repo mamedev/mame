@@ -384,9 +384,9 @@ uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		uint16_t *p = &bitmap.pix(y);
 
-		for (int x = 0; x < 1024 / 8; x += 2)
+		for (int x = 0; x < 1024 / 16; x++)
 		{
-			uint16_t gfx = m_videoram[(x >> 1) | (y << 6)];
+			uint16_t gfx = m_videoram[x | (y << 6)];
 			for (int i = 15; i >= 0; i--)
 			{
 				*p++ = BIT(gfx, i);
