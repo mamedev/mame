@@ -3,11 +3,13 @@
 /*
 
 TODO:
-- hookup QUART devices, and fix "QUART COUNTER NOT RUNNING" error message;
-- interrupt system;
+- complete QUART devices, and fix "QUART COUNTER NOT RUNNING" error message;
+\- ms3/ms72c can't possibly use SC28C94, that's a '98 chip. Do they map earlier variants?
+- interrupt system, wants IAC mode from i960;
+\- ms3/ms72c/bmoonii acks irq0 from quart2 CIR block only;
 - understand what's "netflex" device;
-- ms72c has extra checks?
 - CMOS never get properly initialized?
+- Eventually uses a touchscreen;
 
 Game King board types:
 
@@ -126,12 +128,6 @@ private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void irq_enable_w(uint8_t data);
-	void irq_ack_w(uint8_t data);
-	uint8_t irq_vector_r();
-	void vblank_irq(int state);
-
-	uint8_t timer_r();
 	uint16_t version_r();
 
 	void igt_gameking_map(address_map &map) ATTR_COLD;
@@ -143,10 +139,6 @@ private:
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint32_t> m_vram;
 	required_device_array<sc28c94_device, 2> m_quart;
-
-	uint8_t m_irq_enable = 0;
-	uint8_t m_irq_pend = 0;
-	uint8_t m_timer_count = 0;
 };
 
 void igt_gameking_state::video_start()
@@ -171,25 +163,9 @@ uint32_t igt_gameking_state::screen_update(screen_device &screen, bitmap_ind16 &
 		}
 	}
 
+	// TODO: tilemap at $18100000
+
 	return 0;
-}
-
-
-void igt_gameking_state::irq_enable_w(uint8_t data)
-{
-	m_irq_enable = data;
-}
-
-void igt_gameking_state::irq_ack_w(uint8_t data)
-{
-	//logerror("%02x\n",data);
-	m_maincpu->set_input_line(I960_IRQ0,CLEAR_LINE);
-	m_irq_pend = 0;
-}
-
-uint8_t igt_gameking_state::irq_vector_r()
-{
-	return m_irq_pend;
 }
 
 void igt_gameking_state::igt_gameking_map(address_map &map)
@@ -203,6 +179,7 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 	map(0x10020000, 0x17ffffff).flags(i960_cpu_device::BURST).ram();
 
 	map(0x18000000, 0x181fffff).flags(i960_cpu_device::BURST).ram().share("vram"); // igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
+//  map(0x18200000, 0x18200003) video related?
 
 	// 28000000: MEZ2 SEL, also connected to ymz chip select?
 	// 28010000: first 28C94 QUART (QRT1 SEL)
@@ -214,21 +191,10 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 	// 28070000: OUT SEL
 	map(0x28010000, 0x2801007f).rw(m_quart[0], FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
 	map(0x28020000, 0x280205ff).flags(i960_cpu_device::BURST).ram();       // CMOS?
-	map(0x28030000, 0x28030003).portr("IN0");
+	map(0x28030000, 0x28030003).nopr();
 	map(0x28040000, 0x2804007f).rw(m_quart[1], FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
-    // TODO: these overlays should come from the QUART device
-//  map(0x2804000a, 0x2804000a).w(FUNC(igt_gameking_state::unk_w));
-	map(0x28040008, 0x28040008).rw(FUNC(igt_gameking_state::irq_vector_r), FUNC(igt_gameking_state::irq_enable_w));
-//  map(0x28040018, 0x2804001b).portr("IN1").nopw();
-//  map(0x2804001c, 0x2804001f).portr("IN4").nopw();
-//  map(0x28040028, 0x2804002b).nopr();
-	map(0x2804002a, 0x2804002a).w(FUNC(igt_gameking_state::irq_ack_w));
-//  map(0x28040038, 0x2804003b).r(FUNC(igt_gameking_state::timer_r)).umask32(0x00ff0000);
+	// TODO: this overlay should come from the QUART device
 	map(0x28040038, 0x2804003b).portr("IN2").nopw();
-//  map(0x2804003c, 0x2804003f).portr("IN3").nopw();
-//  map(0x28040050, 0x28040050).r(FUNC(igt_gameking_state::frame_number_r));
-//  map(0x28040054, 0x28040057).nopw();
-//  map(0x28040054, 0x28040057).w(FUNC(igt_gameking_state::irq_ack_w).umask32(0x000000ff);
 
 	map(0x28050000, 0x28050003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x00ff00ff);
 	map(0x28060000, 0x28060000).w("ramdac", FUNC(ramdac_device::index_w));
@@ -240,77 +206,20 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 	map(0xa1000000, 0xa1011fff).flags(i960_cpu_device::BURST).ram(); // used by gkkey for restart IAC
 }
 
+// TODO: unknown value required, checked at "Cold powerup machine setup"
+// comes from Xilinx?
 uint16_t igt_gameking_state::version_r()
 {
-	// TODO: unknown value required, checked at "Cold powerup machine setup"
 	return 0xf777;
-}
-
-uint8_t igt_gameking_state::timer_r()
-{
-	// TODO: ms72c 8011ab0 "init_io" check, gets printed as "New security latch value = %x"
-	return m_timer_count++;
 }
 
 void igt_gameking_state::igt_ms72c_map(address_map &map)
 {
 	igt_gameking_map(map);
 	map(0x18200000, 0x18200001).r(FUNC(igt_gameking_state::version_r));
-	map(0x2804003a, 0x2804003a).r(FUNC(igt_gameking_state::timer_r));
 }
 
 static INPUT_PORTS_START( igt_gameking )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x010000, 0x010000, "IN0-1" )
-	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x400000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x800000, 0x800000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x800000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x01, "IN1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -513,6 +422,22 @@ static INPUT_PORTS_START( igt_gameking )
 
 INPUT_PORTS_END
 
+// TODO: wrong decoding
+static const gfx_layout igt_gameking_layout =
+{
+	16,8,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0, 1) },
+	{ STEP16(0, 4) },
+	{ STEP8(0, 4*16) },
+	16*8*4
+};
+
+static GFXDECODE_START( gfx_igt_gameking )
+	GFXDECODE_ENTRY( "cg", 0, igt_gameking_layout,   0x0, 16  )
+GFXDECODE_END
+
 void igt_gameking_state::ramdac_map(address_map &map)
 {
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
@@ -524,18 +449,7 @@ void igt_gameking_state::machine_start()
 
 void igt_gameking_state::machine_reset()
 {
-	m_timer_count = 0;
 	m_quart[0]->ip2_w(1); // needs to be high
-}
-
-void igt_gameking_state::vblank_irq(int state)
-{
-	if (state && BIT(m_irq_enable, 3))
-	{
-		m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
-		//machine().debug_break();
-		m_irq_pend = 8;
-	}
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -559,7 +473,7 @@ void igt_gameking_state::igt_gameking(machine_config &config)
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
 	m_screen->set_screen_update(FUNC(igt_gameking_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(igt_gameking_state::vblank_irq));
+//  m_screen->screen_vblank().set_inputline(m_maincpu, I960_IRQ2);
 	// Xilinx used as video chip XTAL(26'666'666) on board
 
 	SC28C94(config, m_quart[0], XTAL(24'000'000) / 6);
@@ -577,6 +491,8 @@ void igt_gameking_state::igt_gameking(machine_config &config)
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &igt_gameking_state::ramdac_map);
 
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_igt_gameking);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -589,6 +505,10 @@ void igt_gameking_state::igt_ms72c(machine_config &config)
 {
 	igt_gameking(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igt_gameking_state::igt_ms72c_map);
+
+	// TODO: pinpoint enable/acknowledge
+	// clears $280201fc from there
+//  m_screen->screen_vblank().set_inputline(m_maincpu, I960_IRQ2);
 }
 
 ROM_START( ms3 )
