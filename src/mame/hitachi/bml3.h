@@ -90,11 +90,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
 
 protected:
-	virtual void main_map(address_map &map);
-	virtual void system_io(address_map &map);
+	virtual void main_map(address_map &map) ATTR_COLD;
+	virtual void system_io(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<bml3bus_device> m_bml3bus;
@@ -199,11 +199,11 @@ public:
 
 	void bml3mk5(machine_config &config);
 protected:
-	virtual void main_map(address_map &map) override;
-	virtual void system_io(address_map &map) override;
+	virtual void main_map(address_map &map) override ATTR_COLD;
+	virtual void system_io(address_map &map) override ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual u8 get_attr_mask() override { return 0x3f; }
 	virtual u8 get_ig_mode(u8 attr) override { return BIT(attr, 5); }

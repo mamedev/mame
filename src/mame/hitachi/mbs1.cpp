@@ -33,10 +33,10 @@ public:
 	void mbs1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-//  virtual void main_map(address_map &map) override;
-	virtual void system_io(address_map &map) override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+//  virtual void main_map(address_map &map) override ATTR_COLD;
+	virtual void system_io(address_map &map) override ATTR_COLD;
 	void s1_map(address_map &map);
 	void s1_mmu_map(address_map &map);
 	void s1_ext_io(address_map &map);
