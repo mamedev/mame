@@ -544,26 +544,12 @@ static INPUT_PORTS_START( xavix_i2c )
 INPUT_PORTS_END
 
 
-INPUT_CHANGED_MEMBER(xavix_i2c_tomshoot_state::gun_fired)
-{
-	if (newval)
-		ioevent_trg01(newval); // causes reads from 0x6ffc
-}
-
-INPUT_CHANGED_MEMBER(xavix_i2c_tomshoot_state::gun2_fired)
-{
-	if (newval)
-		ioevent_trg02(newval); // causes reads from 0x7b18
-}
-
-// the 2nd gun probably uses a different ioevent_trg and reads from 0x7b18 (needs checking)
-
 static INPUT_PORTS_START( tomshoot )
 	PORT_INCLUDE(xavix_i2c)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, xavix_i2c_tomshoot_state, gun_fired, 0)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, xavix_i2c_tomshoot_state, gun2_fired, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 
 	PORT_START("GUN1_0")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(1)

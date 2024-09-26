@@ -135,6 +135,8 @@ public:
 	void ioevent_trg04(int state);
 	void ioevent_trg08(int state);
 
+	virtual void xavix_interrupt_extra() { }
+
 	int m_rgnlen = 0;
 	uint8_t* m_rgn = nullptr;
 
@@ -644,8 +646,12 @@ public:
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(gun_fired);
-	DECLARE_INPUT_CHANGED_MEMBER(gun2_fired);
+	void xavix_interrupt_extra() override
+	{
+		ioevent_trg01(1); // causes reads from the lightgun 1 port
+		//ioevent_trg02(1); // causes reads from the lightgun 2 port
+	}
+
 
 private:
 	virtual uint8_t lightgun_r(offs_t offset) override
