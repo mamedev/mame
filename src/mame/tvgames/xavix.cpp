@@ -1076,6 +1076,15 @@ static INPUT_PORTS_START( tak_geig )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tak_gin )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( rad_bb )
 	PORT_INCLUDE(xavix)
@@ -2241,6 +2250,13 @@ ROM_START( tvpc_dor )
 	ROM_LOAD( "tvpc_doreamon.u3", 0x000000, 0x400000, CRC(6f2edbb2) SHA1(98fa86f85e00aa40e7a585ff0bc930cb5ca88362) )
 ROM_END
 
+ROM_START( tak_gin ) // dumped from a PCB with 1x ROM Glob with TSOP pads, 1x unknown glob, 1x CPU glob.  It also exists in a configuration with just 1x ROM glob (no pads) and 1x CPU glob - unknown if code is the same
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "snowboard.bin", 0x000000, 0x200000, CRC(79fdeae3) SHA1(ab08790e95cdccf3541ecbddb87ebf0dedb3718b) )
+ROM_END
+
+
+
 /* XaviX hardware titles (1st Generation)
 
     These use
@@ -2341,6 +2357,9 @@ CONS( 2004, epo_quiz,  0,          0,  xavix,            epo_quiz, xavix_state, 
 CONS( 2005, has_wamg,  0,          0,  xavix,            has_wamg, xavix_state,          init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2002, tak_geig,  0,          0,  xavix_nv,         tak_geig, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Geigeki Go Go Shooting (Japan)", MACHINE_IMPERFECT_SOUND )
+
+// 爆進スノボ ギンギンボーダーズ 
+CONS( 2001, tak_gin,   0,          0,  xavix,            tak_gin,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Gin-gin Boarders (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // was also distributed by Atlus as an arcade cabinet in 2005, ROM almost certainly different (this one will auto-power off after inactivity, an arcade wouldn't do that)
 CONS( 2003, jarajal,   0,          0,  xavix_nv,         jarajal,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Jara-Ja Land (Japan, home version)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
