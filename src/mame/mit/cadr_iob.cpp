@@ -7,7 +7,6 @@ CADR I/O Board emulation
 The I/O Board makes the keyboard, mouse, and chaosnet available on the Unibus.
 
 TODO:
-- Mouse
 - Chaosnet
 - Generak purpose I/O
 - Serial I/O
@@ -34,6 +33,9 @@ cadr_iob_device::cadr_iob_device(const machine_config &mconfig, const char *tag,
 	, m_i8748(*this, "i8748")
 	, m_irq_vector_cb(*this)
 	, m_keyboard(*this, "KEY.%u", 0)
+	, m_mouse_x(*this, "MOUSE_X")
+	, m_mouse_y(*this, "MOUSE_Y")
+	, m_mouse_buttons(*this, "MOUSE_BUTTONS")
 	, m_speaker(*this, "speaker")
 {
 }
@@ -224,6 +226,18 @@ static INPUT_PORTS_START(keyboard)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R.HYPER") // f2 02 fa
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) // f2 02 fc
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN) // f2 02 fe
+
+
+	PORT_START("MOUSE_X")
+	PORT_BIT(0xfff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, cadr_iob_device, mouse_changed, 1)
+
+	PORT_START("MOUSE_Y")
+	PORT_BIT(0xfff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, cadr_iob_device, mouse_changed, 2)
+
+	PORT_START("MOUSE_BUTTONS")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left mouse button")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Middle mouse button")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right mouse button")
 INPUT_PORTS_END
 
 
@@ -277,7 +291,6 @@ void cadr_iob_device::write(offs_t offset, u32 data)
 		m_speaker->level_w(m_speaker_data);
 		break;
 	case 0x05:
-		// written: 4
 		m_csr = (m_csr & 0xf0) | (data & 0x0f);
 		break;
 	case 0x0a:
@@ -324,12 +337,12 @@ u32 cadr_iob_device::read(offs_t offset)
 		// ---x---- -------- - tail switch
 		// ----xxxx xxxxxxxx - Y position of the mouse
 		m_csr &= ~0x10;
-		break;
+		return ((m_mouse_buttons->read() & 0x07) << 12) | (m_mouse_y->read() & 0xfff);
 	case 0x03: // mouse x
 		// xx------ -------- - raw Y encoder inputs
 		// --xx---- -------- - raw X encoder inputs
 		// ----xxxx xxxxxxxx - X position of the mouse
-		break;
+		return m_mouse_x->read() & 0xfff;
 	case 0x04: // beeper
 		m_speaker_data ^= 1;
 		m_speaker->level_w(m_speaker_data);
@@ -359,6 +372,14 @@ u32 cadr_iob_device::read(offs_t offset)
 		break;
 	}
 	return 0;
+}
+
+
+INPUT_CHANGED_MEMBER(cadr_iob_device::mouse_changed)
+{
+	m_csr |= 0x10;
+	if (BIT(m_csr, 1))
+		m_irq_vector_cb(IRQ_VECTOR_MOUSE);
 }
 
 

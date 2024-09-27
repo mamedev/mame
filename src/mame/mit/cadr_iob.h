@@ -23,6 +23,7 @@ public:
 
 	void write(offs_t offset, u32 data);
 	u32 read(offs_t offset);
+	DECLARE_INPUT_CHANGED_MEMBER(mouse_changed);
 
 protected:
 	// device-level overrides
@@ -34,6 +35,7 @@ protected:
 
 private:
 	static constexpr u16 IRQ_VECTOR_KEYBOARD = 0xb0;
+	static constexpr u16 IRQ_VECTOR_MOUSE = 0xb4;
 	static constexpr u16 IRQ_VECTOR_CLOCK = 0xbc;
 
 	u8 mcu_bus_r();
@@ -45,6 +47,9 @@ private:
 	required_device<i8748_device> m_i8748;
 	devcb_write16 m_irq_vector_cb;
 	required_ioport_array<16> m_keyboard;
+	required_ioport m_mouse_x;
+	required_ioport m_mouse_y;
+	required_ioport m_mouse_buttons;
 	required_device<speaker_sound_device> m_speaker;
 	emu_timer *m_clock_timer;
 	u8 m_p1;
