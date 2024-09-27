@@ -690,24 +690,6 @@ private:
 	uint8_t tam_anport3_r() { return m_mouse1y->read()^0x7f; }
 };
 
-
-
-class xavix_i2c_lotr_state : public xavix_i2c_state
-{
-public:
-	xavix_i2c_lotr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
-	{ }
-
-	int camera_r();
-
-protected:
-	//virtual void write_io1(uint8_t data, uint8_t direction) override;
-};
-
-
-
-
 class xavix_mtrk_state : public xavix_state
 {
 public:
@@ -1047,17 +1029,6 @@ protected:
 	required_ioport m_extra2;
 	required_ioport m_extra3;
 
-};
-
-class xavix_duelmast_state : public xavix_i2c_state
-{
-public:
-	xavix_duelmast_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
-	{ }
-
-protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
 };
 
 
