@@ -186,9 +186,9 @@ void xavix_state::update_pen(int pen, uint8_t shval, uint8_t lval)
 	// lower overall brightness slightly, or some palette entries in tak_gin end up washed out / with identical colours, losing details
 	// the darkest colours in certain flags still look wrong however, and appear nearly black
 	// this might suggest the overall palette conversion needs work
-	r1 = r1 * 0.96f;
-	g1 = g1 * 0.96f;
-	b1 = b1 * 0.96f;
+	r1 = r1 * 0.92f;
+	g1 = g1 * 0.92f;
+	b1 = b1 * 0.92f;
 
 	if(r1 < 0)
 		r1 = 0;
