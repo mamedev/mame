@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="cadr" description="MIT CADR hard disk images">
+
+	<software name="sys100">
+		<description>System 100.0</description>
+		<year>19??</year>
+		<publisher>MIT</publisher>
+		<part name="hdd" interface="hdd">
+			<diskarea name="harddriv">
+				<disk name="sys100" sha1="e9e3efeaa3bf40456570c1b3a010123b2878280d" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sys300">
+		<description>System 300.0</description>
+		<year>19??</year>
+		<publisher>MIT</publisher>
+		<part name="hdd" interface="hdd">
+			<diskarea name="harddriv">
+				<disk name="sys300" sha1="aaa5fe8572c0ad8bfb234c0940b347eb3d872205" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+</softwarelist>

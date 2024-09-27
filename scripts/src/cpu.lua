@@ -404,6 +404,23 @@ if opt_tool(CPUS, "JAGUAR") then
 end
 
 --------------------------------------------------
+-- MIT CADR cpu
+--@src/devices/cpu/cadr/cadr.h,CPUS["CADR"] = true
+--------------------------------------------------
+
+if CPUS["CADR"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/cadr/cadr.cpp",
+		MAME_DIR .. "src/devices/cpu/cadr/cadr.h",
+	}
+end
+
+if opt_tool(CPUS, "CADR") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cadr/cadr_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cadr/cadr_dasm.h")
+end
+
+--------------------------------------------------
 -- Simutrek Cube Quest bit-sliced CPUs
 --@src/devices/cpu/cubeqcpu/cubeqcpu.h,CPUS["CUBEQCPU"] = true
 --------------------------------------------------

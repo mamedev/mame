@@ -32421,6 +32421,9 @@ tx0_64kw                        // April 1956 MIT TX-0 (64kw RAM)
 tx0_8kwo                        // 1959 MIT TX-0 (8kw RAM)
 tx0_8kw                         // 1962 MIT TX-0 (8kw RAM)
 
+@source:mit/cadr.cpp
+cadr                            //
+
 @source:mits/altair.cpp
 al8800bt                        //
 
