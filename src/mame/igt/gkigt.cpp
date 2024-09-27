@@ -10,6 +10,16 @@ TODO:
 - understand what's "netflex" device;
 - CMOS never get properly initialized?
 - Eventually uses a touchscreen;
+- Hangs on soft reset;
+
+gkigt4 debug hang points:
+bp 8035d58,1,{r8=1;g} ; skip QUART not running (will save to NVRAM afterwards)
+bp 802491c,1,{g4=1;g} ; buffer at $10000308, irq?
+bp 80249f4,1,{g4=1;g} ; ^
+bp 80773f4,1,{g4=0;g} ; senet irq 2
+bp 8177f48,1,{ip+=4;g} ; EEPROM CRC error / identification failure
+
+===================================================================================================
 
 Game King board types:
 
@@ -149,6 +159,23 @@ uint32_t igt_gameking_state::screen_update(screen_device &screen, bitmap_ind16 &
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
+	const u32 fg_base_offset = 0x100000;
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=4)
+		{
+			// TODO: format is quite the mystery
+			// 15-8 / 7-0 color cluts, 31-16 fill mask?
+			const u32 gfx_data = m_vram[(fg_base_offset + x + (y >> 2) * 1024) / 4];
+
+			uint32_t const color = (gfx_data >> (8)) & 0xff;
+			for(int xi = 0; xi < 4; xi++)
+			{
+				bitmap.pix(y, x+xi) = m_palette->pen(color);
+			}
+		}
+	}
+
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=4)
@@ -158,12 +185,13 @@ uint32_t igt_gameking_state::screen_update(screen_device &screen, bitmap_ind16 &
 			for(int xi = 0; xi < 4; xi++)
 			{
 				uint32_t const color = (gfx_data >> (xi*8)) & 0xff;
-				bitmap.pix(y, x+xi) = m_palette->pen(color);
+				if (color)
+					bitmap.pix(y, x+xi) = m_palette->pen(color);
 			}
 		}
 	}
 
-	// TODO: tilemap at $18100000
+
 
 	return 0;
 }
@@ -174,12 +202,23 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 	map(0x08000000, 0x081fffff).flags(i960_cpu_device::BURST).rom().region("game", 0);
 	map(0x08200000, 0x083fffff).flags(i960_cpu_device::BURST).rom().region("plx", 0);
 
+//  map(0x0ac00000, 0x0ac0000f) - board identifiers?
+//  map(0x0ae00000, 0x0ae0000f) /
+
 	// it's unclear how much of this is saved and how much total RAM there is.
 	map(0x10000000, 0x1001ffff).flags(i960_cpu_device::BURST).ram().share("nvram");
 	map(0x10020000, 0x17ffffff).flags(i960_cpu_device::BURST).ram();
 
 	map(0x18000000, 0x181fffff).flags(i960_cpu_device::BURST).ram().share("vram"); // igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
 //  map(0x18200000, 0x18200003) video related?
+	map(0x18200000, 0x18200001).lr16(
+		NAME([this] () {
+			u16 res = m_screen->vpos();
+			if (m_screen->vpos() >= 480)
+				res |= 0x400;
+			return res;
+		}
+	));
 
 	// 28000000: MEZ2 SEL, also connected to ymz chip select?
 	// 28010000: first 28C94 QUART (QRT1 SEL)
@@ -207,7 +246,7 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 }
 
 // TODO: unknown value required, checked at "Cold powerup machine setup"
-// comes from Xilinx?
+// should really be just like above and be video related flags?
 uint16_t igt_gameking_state::version_r()
 {
 	return 0xf777;
@@ -422,7 +461,7 @@ static INPUT_PORTS_START( igt_gameking )
 
 INPUT_PORTS_END
 
-// TODO: wrong decoding
+// TODO: wrong decoding, gfxs inside have variable pitches (is this really decodable?)
 static const gfx_layout igt_gameking_layout =
 {
 	16,8,
@@ -507,7 +546,7 @@ void igt_gameking_state::igt_ms72c(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igt_gameking_state::igt_ms72c_map);
 
 	// TODO: pinpoint enable/acknowledge
-	// clears $280201fc from there
+	// clears $280201fc from there, from SENET RTC?
 //  m_screen->screen_vblank().set_inputline(m_maincpu, I960_IRQ2);
 }
 
