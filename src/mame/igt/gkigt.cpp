@@ -103,16 +103,17 @@ More chips (from eBay auction):
 */
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i960/i960.h"
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
-#include "video/ramdac.h"
 #include "sound/ymz280b.h"
-#include "bus/rs232/rs232.h"
+#include "video/ramdac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
+#include "tilemap.h"
 
 namespace {
 
@@ -125,6 +126,8 @@ public:
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_vram(*this, "vram")
+		, m_bg_vram(*this, "bg_vram")
+		, m_gfxdecode(*this, "gfxdecode")
 		, m_quart(*this, "quart%u", 1U)
 	{ }
 
@@ -138,7 +141,7 @@ private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	uint16_t version_r();
+	[[maybe_unused]] uint16_t version_r();
 
 	void igt_gameking_map(address_map &map) ATTR_COLD;
 	void igt_ms72c_map(address_map &map) ATTR_COLD;
@@ -148,33 +151,42 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint32_t> m_vram;
+	required_shared_ptr<uint32_t> m_bg_vram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device_array<sc28c94_device, 2> m_quart;
+
+	tilemap_t *m_bg_tilemap = nullptr;
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void bg_vram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 };
+
+
 
 void igt_gameking_state::video_start()
 {
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igt_gameking_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 4, 4, 256, 128);
+}
+
+TILE_GET_INFO_MEMBER(igt_gameking_state::get_bg_tile_info)
+{
+	const u32 entry = m_bg_vram[tile_index];
+	int const tile = (entry & 0xffff) | (BIT(entry, 19) << 16);
+	int const color = (entry >> 24) & 0xf;
+
+	tileinfo.set(0, tile, color, 0);
+}
+
+void igt_gameking_state::bg_vram_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_bg_vram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 uint32_t igt_gameking_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	const u32 fg_base_offset = 0x100000;
-	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=4)
-		{
-			// TODO: format is quite the mystery
-			// 15-8 / 7-0 color cluts, 31-16 fill mask?
-			const u32 gfx_data = m_vram[(fg_base_offset + x + (y >> 2) * 1024) / 4];
-
-			uint32_t const color = (gfx_data >> (8)) & 0xff;
-			for(int xi = 0; xi < 4; xi++)
-			{
-				bitmap.pix(y, x+xi) = m_palette->pen(color);
-			}
-		}
-	}
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -209,7 +221,11 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 	map(0x10000000, 0x1001ffff).flags(i960_cpu_device::BURST).ram().share("nvram");
 	map(0x10020000, 0x17ffffff).flags(i960_cpu_device::BURST).ram();
 
-	map(0x18000000, 0x181fffff).flags(i960_cpu_device::BURST).ram().share("vram"); // igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
+	// igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
+	map(0x18000000, 0x180fffff).flags(i960_cpu_device::BURST).ram().share("vram");
+	map(0x18100000, 0x1811ffff).flags(i960_cpu_device::BURST).ram().w(FUNC(igt_gameking_state::bg_vram_w)).share("bg_vram");
+	map(0x18120000, 0x181fffff).ram();
+
 //  map(0x18200000, 0x18200003) video related?
 	map(0x18200000, 0x18200001).lr16(
 		NAME([this] () {
@@ -255,7 +271,7 @@ uint16_t igt_gameking_state::version_r()
 void igt_gameking_state::igt_ms72c_map(address_map &map)
 {
 	igt_gameking_map(map);
-	map(0x18200000, 0x18200001).r(FUNC(igt_gameking_state::version_r));
+//  map(0x18200000, 0x18200001).r(FUNC(igt_gameking_state::version_r));
 }
 
 static INPUT_PORTS_START( igt_gameking )
@@ -461,16 +477,16 @@ static INPUT_PORTS_START( igt_gameking )
 
 INPUT_PORTS_END
 
-// TODO: wrong decoding, gfxs inside have variable pitches (is this really decodable?)
+// TODO: incomplete decoding
 static const gfx_layout igt_gameking_layout =
 {
-	16,8,
+	4,4,
 	RGN_FRAC(1,1),
 	4,
-	{ STEP4(0, 1) },
-	{ STEP16(0, 4) },
-	{ STEP8(0, 4*16) },
-	16*8*4
+	{ 0, 1, 2, 3 },
+	{ 4, 0, 12, 8 },
+	{ STEP4(0, 4*4) },
+	4*4*4
 };
 
 static GFXDECODE_START( gfx_igt_gameking )
@@ -530,7 +546,7 @@ void igt_gameking_state::igt_gameking(machine_config &config)
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &igt_gameking_state::ramdac_map);
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_igt_gameking);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igt_gameking);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
