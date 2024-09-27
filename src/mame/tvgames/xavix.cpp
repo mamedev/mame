@@ -543,6 +543,16 @@ static INPUT_PORTS_START( xavix_i2c )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( epo_mms )
+	PORT_INCLUDE(xavix_i2c)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pad 1 - Pink")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pad 2 - Orange")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Pad 3 - Purple")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pad 4 - Green")
+
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( tomshoot )
 	PORT_INCLUDE(xavix_i2c)
@@ -2028,6 +2038,11 @@ ROM_START( epo_crok )
 	ROM_LOAD("sgm3244.u2", 0x000000, 0x400000, CRC(a801779b) SHA1(e6e4235dc7c7db3073737b10ba4bc5b00deca2c3) )
 ROM_END
 
+ROM_START( epo_mms )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("mmnj-main-4.u4", 0x000000, 0x400000, CRC(22f14ca2) SHA1(122e735eb7c54a22de16f65cd43d2cae788e0102) )
+ROM_END
+
 ROM_START( tak_geig )
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("geigeki.bin", 0x000000, 0x400000, CRC(bd0c3576) SHA1(06f614dbec0225ce4ed866b98450912986d72faf) )
@@ -2316,6 +2331,9 @@ CONS( 2005, epo_guru,  0,          0,  xavix_guru,       epo_guru, xavix_guru_st
 CONS( 2002, epo_dmon, 0,           0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Doraemon Wakuwaku Kuukihou (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // full / proper title?
 
 CONS( 2003, epo_crok,  0,          0,  xavix_i2c_24lc04, xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Croket! Itada Kinka! Banker Battle!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// ミニモニ。ステージ！ダンスだぴょん！
+CONS( 2002, epo_mms,   0,          0,  xavix_i2c_24c02,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Mini-Moni Stage! Dance Dapyon! (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 // オールスター感謝祭　超豪華！クイズ決定版～赤坂５丁目体感スタジオ～
 CONS( 2004, epo_quiz,  0,          0,  xavix,            epo_quiz, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "All-Star Thanksgiving Super Luxurious! Definitive Quiz Edition ~ Akasaka 5-Chome Experience Studio", MACHINE_IMPERFECT_SOUND )
