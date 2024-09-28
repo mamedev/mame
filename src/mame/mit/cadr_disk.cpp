@@ -78,6 +78,20 @@ TIMER_CALLBACK_MEMBER(cadr_disk_device::disk_done_callback)
 }
 
 
+void cadr_disk_device::map(address_map &map)
+{
+	printf("cadr_disk_device: adding map\n");
+	map(0x01, 0x01).r(FUNC(cadr_disk_device::memory_address_r));
+	// 3dfffc / 17377774
+	map(0x04, 0x04).rw(FUNC(cadr_disk_device::status_r), FUNC(cadr_disk_device::command_w));
+	// 3dfffd / 17377775
+	map(0x05, 0x05).rw(FUNC(cadr_disk_device::command_list_r), FUNC(cadr_disk_device::command_list_w));
+	// 3dfffe / 17377776
+	map(0x06, 0x06).rw(FUNC(cadr_disk_device::disk_address_r), FUNC(cadr_disk_device::disk_address_w));
+	// 3dffff / 17377777
+	map(0x07, 0x07).rw(FUNC(cadr_disk_device::error_correction_r), FUNC(cadr_disk_device::start_w));
+}
+
 // xxxxxxxx -------- -------- -------- Block counter of unit
 //          x------- -------- -------- Internal parity error
 //           x------ -------- -------- Read compare difference

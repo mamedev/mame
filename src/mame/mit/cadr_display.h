@@ -27,13 +27,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	// Docs mention a 768x900 display, but this displays the entire screen.
+	// CPT monitor was 768x896.
 	static constexpr u16 SCREEN_WIDTH = 768;
-	static constexpr u16 SCREEN_HEIGHT = 939; // Docs mention a 768x900 display, but this displays the entire screen
+	static constexpr u16 SCREEN_HEIGHT = 939; 
 	static constexpr u16 VIDEO_RAM_SIZE = 32 * 1024;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

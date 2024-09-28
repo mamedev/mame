@@ -11,7 +11,8 @@ TODO:
 - Generak purpose I/O
 - Serial I/O
 - Where is the REPEAT key mapped? And how should it be used?
-- Caps lock is not working?
+- Caps lock is not working
+- The keyboard and I/O board actually communicate through a serial connection.
 
 **********************************************************************************/
 #include "emu.h"
@@ -281,9 +282,8 @@ void cadr_iob_device::device_reset()
 }
 
 
-void cadr_iob_device::write(offs_t offset, u32 data)
+void cadr_iob_device::write(offs_t offset, u16 data)
 {
-//	printf("cadr_iob_device::write %x, %x\n", offset, data);
 	switch (offset)
 	{
 	case 0x04:
@@ -308,21 +308,8 @@ void cadr_iob_device::write(offs_t offset, u32 data)
 }
 
 
-u32 cadr_iob_device::read(offs_t offset)
+u16 cadr_iob_device::read(offs_t offset)
 {
-	// 3e840, 3e842 - 1f420 - IOB
-	// 3e844 - 1f422 - mouse y
-	// 3e846 - 1f423 - mouse x
-	// - 1f425 - read when checking irqs?
-	// 3e850, 3e852 - 1f428,1f429 - microsecond clock
-	// 3e854? - 1f42a - 60hz clock - read only?
-	// 3e854? - interval timer - write only
-	// 3e856 - 1f42b - general purpose i/o
-	// 3e860-3e86a - 1f430 - chaos net
-	// 3e870-3e876 - 1f438 - serial i/o
-	// 3ec00-3ec1a - 1f600-1f60f - diag
-	// - 1f610 - read when checking irqs?
-
 	switch (offset)
 	{
 	case 0x00: // keyboard low
@@ -402,10 +389,7 @@ void cadr_iob_device::mcu_bus_w(u8 data)
 		m_keyboard_data = m_bus >> 1;
 		m_csr |= 0x20;
 		if (BIT(m_csr, 2))
-		{
-//			printf("keyboard trigger irq + vector\n");
 			m_irq_vector_cb(IRQ_VECTOR_KEYBOARD);
-		}
 		break;
 	case 0x60:
 		m_bus = (m_bus & 0xff00ffff) | (data << 16);

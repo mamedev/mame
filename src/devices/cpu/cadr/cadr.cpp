@@ -162,14 +162,14 @@ void cadr_cpu_device::program_map(address_map &map)
 }
 
 
-u32 cadr_cpu_device::diag_r(offs_t offset)
+u16 cadr_cpu_device::diag_r(offs_t offset)
 {
 	LOGMASKED(LOG_TRACE, "diag_r %02x\n", offset);
 	return 0;
 }
 
 
-void cadr_cpu_device::diag_w(offs_t offset, u32 data)
+void cadr_cpu_device::diag_w(offs_t offset, u16 data)
 {
 	LOGMASKED(LOG_TRACE, "daig_w: %02x, %04x\n", offset, data);
 

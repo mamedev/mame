@@ -29,11 +29,12 @@ public:
 	void command_list_w(u32 data);
 	void disk_address_w(u32 data);
 	void start_w(u32 data);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	TIMER_CALLBACK_MEMBER(disk_done_callback);

@@ -11,13 +11,13 @@ class cadr_cpu_device : public cpu_device
 public:
 	cadr_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	u32 diag_r(offs_t offset);
-	void diag_w(offs_t offset, u32 data);
+	u16 diag_r(offs_t offset);
+	void diag_w(offs_t offset, u16 data);
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual u32 execute_min_cycles() const noexcept override { return 1; } // TODO
