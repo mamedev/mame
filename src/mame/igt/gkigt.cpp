@@ -4,19 +4,24 @@
 
 TODO:
 - complete QUART devices, and fix "QUART COUNTER NOT RUNNING" error message;
-\- ms3/ms72c can't possibly use SC28C94, that's a '98 chip. Do they map earlier variants?
 - interrupt system, wants IAC mode from i960;
 \- ms3/ms72c/bmoonii acks irq0 from quart2 CIR block only;
+- SENET, CMOS + RTC?
+\- bmoonii main board has an Actel A1020B + CY7C128A static RAM;
+\- all games will eventually print "RTC device: SOFTWARE", expecting an optional device somewhere;
 - understand what's "netflex" device;
 - CMOS never get properly initialized?
 - Eventually uses a touchscreen;
+- watchdog (ADM691AAN on bmoonii board);
+- All games are silent;
+\- bmoonii has a YM2413 on main board, tied with a XTAL(3'579'545).
 - Hangs on soft reset;
 
 gkigt4 debug hang points:
 bp 8035d58,1,{r8=1;g} ; skip QUART not running (will save to NVRAM afterwards)
 bp 802491c,1,{g4=1;g} ; buffer at $10000308, irq?
 bp 80249f4,1,{g4=1;g} ; ^
-bp 80773f4,1,{g4=0;g} ; senet irq 2
+bp 80773f4,1,{g4=0;g} ; irq 2?
 bp 8177f48,1,{ip+=4;g} ; EEPROM CRC error / identification failure
 
 ===================================================================================================
@@ -203,8 +208,6 @@ uint32_t igt_gameking_state::screen_update(screen_device &screen, bitmap_ind16 &
 		}
 	}
 
-
-
 	return 0;
 }
 
@@ -263,6 +266,7 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 
 // TODO: unknown value required, checked at "Cold powerup machine setup"
 // should really be just like above and be video related flags?
+// NOTE: maps to the lower 8-bit than the video flags hooked above ...
 uint16_t igt_gameking_state::version_r()
 {
 	return 0xf777;
@@ -271,7 +275,7 @@ uint16_t igt_gameking_state::version_r()
 void igt_gameking_state::igt_ms72c_map(address_map &map)
 {
 	igt_gameking_map(map);
-//  map(0x18200000, 0x18200001).r(FUNC(igt_gameking_state::version_r));
+//  map(0x18200003, 0x18200003).lr8(FUNC(igt_gameking_state::version_r));
 }
 
 static INPUT_PORTS_START( igt_gameking )
@@ -562,7 +566,7 @@ void igt_gameking_state::igt_ms72c(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igt_gameking_state::igt_ms72c_map);
 
 	// TODO: pinpoint enable/acknowledge
-	// clears $280201fc from there, from SENET RTC?
+	// clears a bit in $280201fc from there, may really expect vectored irqs from i960 instead ...
 //  m_screen->screen_vblank().set_inputline(m_maincpu, I960_IRQ2);
 }
 
