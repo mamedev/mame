@@ -20605,6 +20605,7 @@ drw80pkr                        // (c) 1982 IGT
 
 @source:igt/gkigt.cpp
 bmoonii                         //
+dblheart                        //
 gkigt4                          //
 gkigt43                         //
 gkigt43n                        //
@@ -20614,8 +20615,11 @@ gkigtez                         //
 gkigtezms                       //
 gkkey                           //
 igtsc                           //
-ms72c                           //
+ms14                            //
 ms3                             //
+ms5                             //
+ms72c                           //
+mystjag                         //
 
 @source:igt/peplus.cpp
 im1p1952                        // (c) 1995 IGT - International Game Technology

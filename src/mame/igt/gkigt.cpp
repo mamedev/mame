@@ -2,6 +2,8 @@
 // copyright-holders:David Haywood, R. Belmont, Angelo Salese, Dirk Best
 /*
 
+IGT Gameking 960
+
 TODO:
 - complete QUART devices, and fix "QUART COUNTER NOT RUNNING" error message;
 - interrupt system, wants IAC mode from i960;
@@ -9,6 +11,9 @@ TODO:
 - SENET, CMOS + RTC?
 \- bmoonii main board has an Actel A1020B + CY7C128A static RAM;
 \- all games will eventually print "RTC device: SOFTWARE", expecting an optional device somewhere;
+- bmoonii, ms5, ms14, dblheart, mystjag: crashes in i960 with unhandled 00 after RAM error.
+\- Do they all need NVRAM setchips?
+\- Crash may be related to lack of irq service;
 - understand what's "netflex" device;
 - CMOS never get properly initialized?
 - Eventually uses a touchscreen;
@@ -172,6 +177,9 @@ void igt_gameking_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igt_gameking_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 4, 4, 256, 128);
 }
 
+// TODO: incomplete, several missing bit meanings
+// ms14 uses bit 16 for something, currently draws solid white
+// (concealing bitmap layer, would be ROM unmapped space)
 TILE_GET_INFO_MEMBER(igt_gameking_state::get_bg_tile_info)
 {
 	const u32 entry = m_bg_vram[tile_index];
@@ -570,6 +578,31 @@ void igt_gameking_state::igt_ms72c(machine_config &config)
 //  m_screen->screen_vblank().set_inputline(m_maincpu, I960_IRQ2);
 }
 
+// TODO: standardize ROM labels
+// `${socket_name}_${printed_label}.${ROM position}`, ms14 for an example
+
+ROM_START( ms14 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "config_1b5117ax.u8",  0x000000, 0x080000, CRC(0b533749) SHA1(54b37ddcc705dcd92932a9eed5ffb25c55fa0c49) )
+
+	ROM_REGION32_LE( 0x200000, "game", 0 )
+	ROM_LOAD16_BYTE( "gme1_da5017ax.u21", 0x000000, 0x100000, CRC(b7f50a77) SHA1(0f860083b5e354bf904fdfd3c5545650ce5a9ad2) )
+	ROM_LOAD16_BYTE( "gme2_da5017ax.u5",  0x000001, 0x100000, CRC(11974fe5) SHA1(f091458a43303ce147ad79212706ef15921f7cfa) )
+
+	ROM_REGION( 0x100000, "cg", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "cg1_1g5043ax.u48", 0x000000, 0x040000, CRC(4d81e8dd) SHA1(fd9afb1179f863536b65613e9168924247822e63) )
+	ROM_LOAD16_BYTE( "cg2_1g5043ax.u47", 0x000001, 0x040000, CRC(025695be) SHA1(ed846c1a8bf0c23ae710af6281fdd2612ba08c51) )
+
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
+	ROM_LOAD16_BYTE( "px1_1g5043ax.u20", 0x000000, 0x100000, CRC(70829422) SHA1(78e4d40cff86f197334746a68dc08fa2af42a058) )
+	ROM_LOAD16_BYTE( "px2_1g5043ax.u4",  0x000001, 0x100000, CRC(968d70e4) SHA1(a786fb12fa242fa5c3052fbadf897e8f4091c506)
+ )
+
+	ROM_REGION32_LE( 0x200000, "snd", 0 )
+	ROM_LOAD( "snd_1h5005ax.u6",  0x000000, 0x100000, CRC(8cee9699) SHA1(e40daebf15499abf0eface4ff277c8cbdd5f43be)
+ )
+ROM_END
+
 ROM_START( ms3 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "3b5060ax.u8",  0x000000, 0x080000, CRC(aff8d874) SHA1(1cb972759ee12c944a1cfdbe68848c9b2e64a4d3) )
@@ -591,6 +624,26 @@ ROM_START( ms3 )
 
 	ROM_REGION( 0x20000, "nvram", 0 )
 	ROM_LOAD( "nvram",        0x000000, 0x020000, CRC(acbbc6d9) SHA1(6e86d24ad3793b41f1f23f80f9bdb22767abc3bf) )
+ROM_END
+
+ROM_START( ms5 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "config_1b5045ba.u8",  0x000000, 0x080000, CRC(c13a579f) SHA1(320c2a34f51db05e79687ffbb3ae740fb634db15) )
+
+	ROM_REGION32_LE( 0x200000, "game", 0 )
+	ROM_LOAD16_BYTE( "gme1_da5017ax.u21", 0x000000, 0x100000, CRC(b7f50a77) SHA1(0f860083b5e354bf904fdfd3c5545650ce5a9ad2) )
+	ROM_LOAD16_BYTE( "gme2_da5017ax.u5",  0x000001, 0x100000, CRC(11974fe5) SHA1(f091458a43303ce147ad79212706ef15921f7cfa) )
+
+	ROM_REGION( 0x100000, "cg", 0 )
+	ROM_LOAD16_BYTE( "cg1_1g5013bx.u48", 0x000000, 0x040000, CRC(6ad179a3) SHA1(645b04873bfb38222c5a80326c8ad9bf897e75a2 ) )
+	ROM_LOAD16_BYTE( "cg2_1g5013bx.u47", 0x000001, 0x040000, CRC(e3a00dc2) SHA1(0afae4ca882f39845fca679187dd9005088a39c2 ) )
+
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
+	ROM_LOAD16_BYTE( "px1_1g5013bx.u20", 0x000000, 0x100000, CRC(d9801616) SHA1(87e449afa454d2ed8a415be648c62a95d36b43e3) )
+	ROM_LOAD16_BYTE( "px2_1g5013bx.u4",  0x000001, 0x100000, CRC(61271927) SHA1(12fd97d11a569cfe6edb476e186edddb55203344) )
+
+	ROM_REGION32_LE( 0x200000, "snd", 0 )
+	ROM_LOAD( "snd_1h5011bx.u6",  0x000000, 0x100000, CRC(79b98d9c) SHA1(e6557eadd53f0fbaa07ced09a6edf6dceeffaa42) )
 ROM_END
 
 ROM_START( ms72c )
@@ -635,6 +688,49 @@ ROM_START( bmoonii )
 	ROM_REGION32_LE( 0x200000, "snd", 0 )
 	ROM_LOAD( "sound-1h5025ax.u6", 0x000000, 0x080000, CRC(2502d6f6) SHA1(efe1177a6c02778df8ed62e52d1083c105ebe2ce) )
 ROM_END
+
+ROM_START( dblheart )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "config_1b5154ax.u8",  0x000000, 0x080000, CRC(53ec9b2b) SHA1(0a2f277a59e9b61df1f38e5c9d7f53bd9d28caf3) )
+
+	ROM_REGION32_LE( 0x200000, "game", 0 )
+	ROM_LOAD16_BYTE( "gme1_ca5017ax.u21", 0x000000, 0x100000, CRC(bab3994f) SHA1(4ec2cbe92e2f2019970d6bb7fa9fbd767b3001b2) )
+	ROM_LOAD16_BYTE( "gme2_ca5017ax.u5",  0x000001, 0x100000, CRC(f1898f14) SHA1(9bcd4ebe09d6f982cb12dc9a6d070cd1195e3320) )
+
+	ROM_REGION( 0x100000, "cg", 0 )
+	ROM_LOAD16_BYTE( "cg1_1g5077ax.u48", 0x000000, 0x040000, CRC(18870d22) SHA1(4ead7a84a2e2d3b2e6141ef6f99a5f586779867b) )
+	ROM_LOAD16_BYTE( "cg2_1g5077ax.u47", 0x000001, 0x040000, CRC(02395605) SHA1(adbc44d8595ad86265df96d1645b18228081146f) )
+
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
+	ROM_LOAD16_BYTE( "px1_1g5077ax.u20", 0x000000, 0x80000, CRC(85598395) SHA1(9b6d09668ff08140a257b75eb41932c6ccca3f4d) )
+	ROM_LOAD16_BYTE( "px2_1g5077ax.u4",  0x000001, 0x80000, CRC(339e2f5e) SHA1(b54076c2775e28c91c76c93ea456ebf52b3fede8) )
+
+	ROM_REGION32_LE( 0x200000, "snd", 0 )
+	ROM_LOAD( "snd_1h5033ax.u6",  0x000000, 0x080000, CRC(daba6d27) SHA1(b6aaf6436e65a5ad7e28c40a93e2d9de5a806885) )
+ROM_END
+
+ROM_START( mystjag )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "config_1b5157ax.u8",  0x000000, 0x080000, CRC(6032a97b) SHA1(6a825d387f972252d574235ed8e461f52088e125) )
+
+	ROM_REGION32_LE( 0x200000, "game", 0 )
+	ROM_LOAD16_BYTE( "gme1_ca5017ax.u21", 0x000000, 0x100000, CRC(bab3994f) SHA1(4ec2cbe92e2f2019970d6bb7fa9fbd767b3001b2) )
+	ROM_LOAD16_BYTE( "gme2_ca5017ax.u5",  0x000001, 0x100000, CRC(f1898f14) SHA1(9bcd4ebe09d6f982cb12dc9a6d070cd1195e3320) )
+
+	ROM_REGION( 0x100000, "cg", 0 )
+	ROM_LOAD16_BYTE( "cg1_2g5116xx.u48", 0x000000, 0x040000, CRC(4a1ebbc5) SHA1(f37f1b141338dd872734ecaca8fdfb2c12bcc2cf) )
+	ROM_LOAD16_BYTE( "cg2_2g5116xx.u47", 0x000001, 0x040000, CRC(d227f254) SHA1(3ec6839c43fe368c1e318037d45d7ea796718dde) )
+
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
+	ROM_LOAD16_BYTE( "px1_2g5116xx.u20", 0x000000, 0x100000, CRC(a40abd1a) SHA1(177b7cbae5c9f7e2063fe1641e203502b4a4c927)
+ )
+	ROM_LOAD16_BYTE( "px2_2g5116xx.u4",  0x000001, 0x100000, CRC(55906b92) SHA1(f4c5d5c0e2b2407b9d4383dba7e28cc8341bafc2)
+ )
+
+	ROM_REGION32_LE( 0x200000, "snd", 0 )
+	ROM_LOAD( "snd_1h5152xx.u6",  0x000000, 0x100000, CRC(e459e0be) SHA1(21089fd03a1ea8e4ca3963988647fa4414390d0c) )
+ROM_END
+
 
 ROM_START( gkigt4 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -783,7 +879,6 @@ ROM_START( gkigt5p )
 	ROM_LOAD( "swc00046 snd2 2 of 2,2-80.rom2", 0x100000, 0x100000, CRC(a7ef9b46) SHA1(031373fb8e39c4ed828a58bb63a9395a205c6b6b) )
 ROM_END
 
-
 ROM_START( igtsc )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "i0000838 base,1-4002.bin", 0x00000, 0x80000, CRC(7b66f0d5) SHA1(a13e7fa4062668ff7acb15e58025eeb401754898) )
@@ -805,7 +900,6 @@ ROM_START( igtsc )
 	// uses a SIMM
 	ROM_LOAD( "dss00076.simm", 0x000000, 0xfd7f81, BAD_DUMP CRC(5dd889b4) SHA1(9a6cb7599d268d110645ac8fe5d41a733cbaadc5) ) // should be 0x1000000
 ROM_END
-
 
 ROM_START( gkkey )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -846,15 +940,19 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1998, ms3,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 3",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, bmoonii,   0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Blue Moon II",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2000, ms72c,     0,      igt_ms72c,    igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 7 2c",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt4,    0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt4ms,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x, MS)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt43,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt43n,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3, NJ)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigtez,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, ms14,      0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 14", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, bmoonii,   0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Blue Moon II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, dblheart,  0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Double Hearts", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, ms3,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, ms5,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 5", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, mystjag,   0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Mystic Jaguar", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, ms72c,     0,      igt_ms72c,    igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 7 2c", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt4,    0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt4ms,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt43,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt43n,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3, NJ)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigtez,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigtezms, gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt5p,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Triple-Five Play)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, igtsc,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Super Cherry",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // SIMM dumps are bad.
-GAME( 2003, gkkey,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Set Chips)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // only 2 are good dumps
+GAME( 2003, igtsc,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Super Cherry", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // SIMM dumps are bad.
+GAME( 2003, gkkey,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Set Chips)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // only 2 are good dumps
