@@ -84,11 +84,17 @@
 #define MAXRAM 0x200000	// +1MB
 //#define MAXRAM 0x400000	// +3MB (which was never a Thing)
 
+// have m_readXX / m_writeXX use MMU translation
+// OR
+// do MMU translation inside memory_r / memory_w
+#define USE_MMUxx
 
 class m68010_tekmmu_device : public m68010_device
 {
 	using m68010_device::m68010_device;
 
+	bool buserror_occurred = false;
+	
 	// HACK
 	u8 *m_map_control = nullptr;
 	u16 *m_map = nullptr;
@@ -98,29 +104,230 @@ class m68010_tekmmu_device : public m68010_device
 	{
 	
 	target_space = &space(spacenum);
-	
+
+		//if (m_emmu_enabled)
 		if (spacenum == AS_PROGRAM)
-		if (FUNCTION_CODE_USER_PROGRAM)			// only in User mode
+		if ((get_fc() & 4) == 0)			// only in User mode
 		if (BIT(*m_map_control, MAP_VM_ENABLE))
 		{
 			if (intention == TR_WRITE)
 			if (BIT(m_map[address >> 12], 14) == 0)	// read only
 			{
+				LOG("memory_translate: write fail\n");
 				return false;
 			}
-		
-			LOG("memory_translate: map %08x => paddr(%08x)\n",(address), (BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12) ) );
-		
-			address = BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12);
+
+			// dont try and translate a null page
+			if (BIT(m_map[address >> 12], 11, 3) != 0)
+			{
+				LOG("memory_translate: map %08x => paddr(%08x)\n",(address), (BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12) ) );
+			
+				address = BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12);
+			}
 		}
 		
 		return true;
 	}
 
+	u32 mmu_translate_address(offs_t address, u8 rw)
+	{
+	
+		if (!buserror_occurred)
+		if (*m_map_control & (1 << MAP_BLOCK_ACCESS))
+		if ((get_fc() & 4) == 0)				// only in User mode
+		if (BIT(*m_map_control, MAP_VM_ENABLE))
+		{
+			LOG("mmu_translate_address: map %08x => paddr(%08x) fc(%d) pc(%08x)\n",(address), BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12), get_fc(), pc());
+
+			if (rw)
+			{
+				// is !cpuWr
+				*m_map_control &= ~(1 << MAP_CPU_WR);
+			}
+			else
+			{
+				// is cpuWr
+				*m_map_control |= (1 << MAP_CPU_WR);
+			}
+
+			// matching pid
+			if (BIT(m_map[address >> 12], 11, 3) != (*m_map_control & 7))
+			{
+				*m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
+
+				LOG("mmu_translate_address: bus error: PID(%d) != %d %08x fc(%d) pc(%08x)\n", BIT(m_map[address >> 12], 11, 3), (*m_map_control & 7), address, get_fc(), pc());
+				buserror_occurred = true;
+				set_buserror_details(address, rw, get_fc(), true);
+				return address;
+			}
+			else
+			{
+				*m_map_control |= (1 << MAP_BLOCK_ACCESS);
+			}
+
+			// write enabled?
+			if ((rw==0) && BIT(m_map[address >> 12], 14) == 0)	// read only page
+			{
+				*m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
+
+				LOG("mmu_translate_address: bus error: %08x fc(%d) pc(%08x)\n",(address), get_fc(), pc());
+				buserror_occurred = true;
+				set_buserror_details(address, rw, get_fc(), true);
+				return address;
+			}
+		
+			address = BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12);
+		}
+
+		buserror_occurred = false;
+
+		return address;
+	}
+
+u16 PTEread(offs_t address)
+{
+	// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
+	if (!BIT(*m_map_control, MAP_SYS_WR_ENABLE))
+	{
+			LOG("PTEread: bus error: PID(%d) %08x fc(%d) pc(%08x)\n", BIT(m_map[(address >> 12) & 0x7ff], 11, 3), (address), get_fc(), pc());
+			buserror_occurred = true;
+			set_buserror_details(address, 1, get_fc(), true);
+			return 0;
+	}
+
+	return m_map[(address>>12) & 0x7ff];
+}
+
+void PTEwrite(offs_t address, u16 data)
+{
+	if (((address>>12) & 0x7ff) < 20)
+		LOG("PTEwrite: %08x  <= %04x paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
+		(address>>12) & 0x7ff, data,
+		(BIT(data, 0, 12)<<12), BIT(data, 11, 3), data & 0x8000 ? 1 : 0, data & 0x4000 ? 1 : 0);
+
+	if (BIT(*m_map_control, MAP_SYS_WR_ENABLE))
+	{
+		m_map[(address>>12) & 0x7ff] = data;
+	}
+}
+
+#ifdef USE_MMU
+	void init16(address_space &space, address_space &ospace)
+#else
+	void init16XXXXXX(address_space &space, address_space &ospace)
+#endif
+	{
+		LOG("m68010_tekmmu_device::init16: \n");
+		m_space = &space;
+		m_ospace = &ospace;
+		ospace.cache(m_oprogram16);
+		space.specific(m_program16);
+
+		m_readimm16 = [this](offs_t address) -> u16  {
+			if (address & 0x800000)
+				return PTEread(address);
+			else
+			{
+				u32 address0 = mmu_translate_address(address, 1);
+				if (m_mmu_tmp_buserror_occurred)
+					return ~0;
+				return m_oprogram16.read_word(address0);
+			}
+		};
+		m_read8   = [this](offs_t address) -> u8     {
+			u32 address0 = mmu_translate_address(address, 1);
+			if (m_mmu_tmp_buserror_occurred)
+				return ~0;
+			return m_program16.read_byte(address0);
+		};
+		m_read16  = [this](offs_t address) -> u16    {
+			if (address & 0x800000)
+				return PTEread(address);
+			else
+			{
+				u32 address0 = mmu_translate_address(address, 1);
+				if (m_mmu_tmp_buserror_occurred)
+					return ~0;
+				return m_program16.read_word(address0);
+			}
+		};
+		m_read32  = [this](offs_t address) -> u32    {
+			u32 address0 = mmu_translate_address(address, 1);
+			if (m_mmu_tmp_buserror_occurred)
+				return ~0;
+			return m_program16.read_dword(address0);
+		};
+		
+		m_write8  = [this](offs_t address, u8 data)  {
+			u32 address0 = mmu_translate_address(address, 0);
+			if (m_mmu_tmp_buserror_occurred)
+				return;
+			m_program16.write_word(address0 & ~1, data | (data << 8), address0 & 1 ? 0x00ff : 0xff00);
+		};
+		m_write16 = [this](offs_t address, u16 data) {
+			if (address & 0x800000)
+				PTEwrite(address, data);
+			else
+			{
+				u32 address0 = mmu_translate_address(address, 0);
+				if (m_mmu_tmp_buserror_occurred)
+					return;
+				m_program16.write_word(address0, data);
+			}
+		};
+		m_write32 = [this](offs_t address, u32 data) {
+			if (address & 0x800000)
+				LOG("m_write32 to PTE!!!!!\n");
+			else
+			{
+				u32 address0 = mmu_translate_address(address, 0);
+				if (m_mmu_tmp_buserror_occurred)
+					return;
+				m_program16.write_dword(address0, data);
+			}
+		};
+	}
+
+	void init_cpu_m68010(void)
+	{
+		LOG("m68010_tekmmu_device::init_cpu_m68010\n");
+		init_cpu_common();
+		m_cpu_type         = CPU_TYPE_010;
+
+		init16(*m_program, *m_oprogram);
+		m_sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+		m_state_table      = m68ki_instruction_state_table[2];
+		m_cyc_instruction  = m68ki_cycles[2];
+		m_cyc_exception    = m68ki_exception_cycle_table[2];
+		m_cyc_bcc_notake_b = -4;
+		m_cyc_bcc_notake_w = 0;
+		m_cyc_dbcc_f_noexp = 0;
+		m_cyc_dbcc_f_exp   = 6;
+		m_cyc_scc_r_true   = 0;
+		m_cyc_movem_w      = 4;
+		m_cyc_movem_l      = 8;
+		m_cyc_shift        = 2;
+		m_cyc_reset        = 130;
+		m_has_pmmu         = 0;
+		m_has_fpu          = 0;
+
+		define_state();
+	}
+
+	void device_start() override
+	{
+		//m68010_device::device_start();
+		m68000_musashi_device::device_start();
+		init_cpu_m68010();
+		
+		LOG("m68010_tekmmu_device::device_start: setting emmu\n");
+		set_emmu_enable(true);
+	}
+
 public:
 	void linktoMMU(u8 *map_control, u16 *map)
 	{
-		LOG("linktoMMU: %p %p\n",map_control, map);
+		LOG("m68010_tekmmu_device::linktoMMU: control(%p) map(%p) m_emmu_enabled(%d)\n",map_control, map, m_emmu_enabled);
 		
 		m_map_control = map_control;
 		m_map = map;
@@ -319,8 +526,6 @@ void tek440x_state::machine_start()
 
 	m_maincpu->linktoMMU(&m_map_control, &m_map[0]);
 
-	// AB is this needed for external MMU?
-	m_maincpu->set_emmu_enable(true);
 }
 
 
@@ -403,8 +608,10 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 					m_latched_map_control = 0;
 				}
 		}
-		
+
 		const offs_t offset0 = offset;
+
+#ifndef USE_MMU
 		if (!inbuserr)														// not in buserr interrupt
 		if ((m_maincpu->get_fc() & 4) == 0)			// only in User mode
 		if (BIT(m_map_control, MAP_VM_ENABLE))
@@ -438,6 +645,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 			
 			offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
 		}
+#endif
 
 		// NB byte memory limit, offset is *word* offset
 		if (offset < OFF8_TO_OFF16(0x600000) && offset >= OFF8_TO_OFF16(MAXRAM))
@@ -467,6 +675,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 	
 	const offs_t offset0 = offset;
+#ifndef USE_MMU
 	if ((m_maincpu->get_fc() & 4) == 0)			// only in User mode
 	if (BIT(m_map_control, MAP_VM_ENABLE))
 	{
@@ -520,6 +729,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		
 		offset = BIT(offset, 0, 11) | (BIT(m_map[offset >> 11], 0, 11) << 11);
 	}
+#endif
 
 	// NB byte memory limit, offset is *word* offset
 	if (offset < OFF8_TO_OFF16(0x600000) && offset >= OFF8_TO_OFF16(MAXRAM) && !machine().side_effects_disabled())
@@ -531,6 +741,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 
 	//LOG("memory_w: %08x <= %04x\n",  OFF16_TO_OFF8(offset), data);
+inbuserr = 0;
 
 	m_vm->write16(offset, data, mem_mask);
 }
@@ -540,7 +751,7 @@ u16 tek440x_state::map_r(offs_t offset)
 	if (!machine().side_effects_disabled())
 	{
 		if ((offset>>11) < 0x20)
-			LOG("map_r 0x%08x => %04x\n",offset>>11, m_map[offset >> 11] );
+			LOG("map_r 0x%08x => %04x\n",offset>>11, m_map[(offset >> 11)&0x7ff] );
 
 		// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
 		if (!BIT(m_map_control, MAP_SYS_WR_ENABLE))
@@ -561,7 +772,7 @@ void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 	if ((offset>>11) < 0x20)
 	{
 		LOG("map_w: %08x  <= %04x paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
-			offset>>11, data,
+			(offset >> 11) & 0x7ff, data,
 			OFF16_TO_OFF8(BIT(data, 0, 11)<<11),BIT(data, 11, 3), data & 0x8000 ? 1 : 0, data & 0x4000 ? 1 : 0,
 			m_maincpu->pc());
 	}
@@ -860,13 +1071,13 @@ void tek440x_state::vblank(int state)
 u8 tek440x_state::rtc_r(offs_t offset)
 {
 	LOG("rtc_r %08x\n", offset);
+	
 	return 0;
 }
 
 void tek440x_state::rtc_w(offs_t offset, u8 data)
 {
 	LOG("rtc_w %08x\n", offset);
-
 }
 
 
@@ -975,7 +1186,9 @@ void tek440x_state::physical_map(address_map &map)
 	map(0x7b8100, 0x7b8103).rw(FUNC(tek440x_state::timer_r), FUNC(tek440x_state::timer_w));
 	
 	// 7ba000-7bbfff: MC146818 RTC
-	map(0x7ba000, 0x7ba103).rw(FUNC(tek440x_state::rtc_r), FUNC(tek440x_state::rtc_w));
+	map(0x7ba000, 0x7ba000).rw(m_rtc, FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
+	map(0x7ba100, 0x7ba103).rw(FUNC(tek440x_state::rtc_r), FUNC(tek440x_state::rtc_w));
+
 	
 	map(0x7bc000, 0x7bc000).lw8(
 		[this](u8 data)
