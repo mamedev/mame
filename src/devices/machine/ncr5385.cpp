@@ -23,7 +23,7 @@
 #define LOG_DMA      (1U << 4)
 #define LOG_COMMAND  (1U << 5)
 
-//#define VERBOSE (LOG_GENERAL|LOG_REGW|LOG_REGR|LOG_STATE|LOG_DMA|LOG_COMMAND)
+#define VERBOSE (LOG_GENERAL|LOG_REGW|LOG_REGR|LOG_STATE|LOG_DMA|LOG_COMMAND)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NCR5385, ncr5385_device, "ncr5385", "NCR 5385 SCSI Protocol Controller")
@@ -687,6 +687,8 @@ int ncr5385_device::state_step()
 			else
 				m_sbx = false;
 
+			delay = 5'000;	// AB 5ns, does this help??
+			
 			// clear ACK except after last byte of message input phase
 			if (!remaining() && (ctrl & S_PHASE_MASK) == S_PHASE_MSG_IN)
 			{
@@ -766,7 +768,7 @@ int ncr5385_device::state_step()
 			else
 				m_sbx = false;
 
-			delay = 3'500;		// >=3.5ms delay works, < 3.5ms fails
+			delay = 3'500;		// >=3.5us delay works, < 3.5us fails
 			
 			// clear data and ACK
 			scsi_bus->data_w(scsi_refid, 0);
