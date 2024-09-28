@@ -8,18 +8,18 @@ TODO:
 - complete QUART devices, and fix "QUART COUNTER NOT RUNNING" error message;
 - interrupt system, wants IAC mode from i960;
 \- ms3/ms72c/bmoonii acks irq0 from quart2 CIR block only;
-- SENET, CMOS + RTC?
+- SENET device. Ties a i2c-like bus named netflex for comms with ticket printers, bill acceptors, touch screen ...
 \- bmoonii main board has an Actel A1020B + CY7C128A static RAM;
-\- all games will eventually print "RTC device: SOFTWARE", expecting an optional device somewhere;
+\- CMOS never get properly initialized, tied on SENET?
+- all games will eventually print "RTC device: SOFTWARE", expecting an optional device somewhere. Later boards have a RTC62423;
 - bmoonii, ms5, ms14, dblheart, mystjag: crashes in i960 with unhandled 00 after RAM error.
 \- Do they all need NVRAM setchips?
 \- Crash may be related to lack of irq service;
-- understand what's "netflex" device;
-- CMOS never get properly initialized?
-- Eventually uses a touchscreen;
 - watchdog (ADM691AAN on bmoonii board);
 - All games are silent;
 \- bmoonii has a YM2413 on main board, tied with a XTAL(3'579'545).
+\- some extra stuff routes thru QUART chips (namely SRESET comes from there)
+\- ymz should require snd roms being hooked up to its internal memory map thru ROM_COPY;
 - Hangs on soft reset;
 
 gkigt4 debug hang points:
@@ -119,6 +119,7 @@ More chips (from eBay auction):
 #include "machine/nvram.h"
 #include "sound/ymz280b.h"
 #include "video/ramdac.h"
+#include "sound/ymopl.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -139,6 +140,7 @@ public:
 		, m_bg_vram(*this, "bg_vram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_quart(*this, "quart%u", 1U)
+		, m_opll(*this, "opll")
 	{ }
 
 	void igt_gameking(machine_config &config);
@@ -164,6 +166,7 @@ private:
 	required_shared_ptr<uint32_t> m_bg_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device_array<sc28c94_device, 2> m_quart;
+	required_device<ym2413_device> m_opll;
 
 	tilemap_t *m_bg_tilemap = nullptr;
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -255,6 +258,7 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 	// 28050000: SOUND SEL
 	// 28060000: COLOR SEL
 	// 28070000: OUT SEL
+	map(0x28000000, 0x28000003).rw(m_opll, FUNC(ym2413_device::read), FUNC(ym2413_device::write)).umask32(0x00ff00ff);
 	map(0x28010000, 0x2801007f).rw(m_quart[0], FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
 	map(0x28020000, 0x280205ff).flags(i960_cpu_device::BURST).ram();       // CMOS?
 	map(0x28030000, 0x28030003).nopr();
@@ -540,10 +544,10 @@ void igt_gameking_state::igt_gameking(machine_config &config)
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
 	m_screen->set_screen_update(FUNC(igt_gameking_state::screen_update));
 	m_screen->set_palette(m_palette);
-//  m_screen->screen_vblank().set_inputline(m_maincpu, I960_IRQ2);
 	// Xilinx used as video chip XTAL(26'666'666) on board
 
 	SC28C94(config, m_quart[0], XTAL(24'000'000) / 6);
+	m_quart[0]->irq_cb().set_inputline(m_maincpu, I960_IRQ3);
 	m_quart[0]->d_tx_cb().set("diag", FUNC(rs232_port_device::write_txd));
 
 	SC28C94(config, m_quart[1], XTAL(24'000'000) / 6);
@@ -563,6 +567,8 @@ void igt_gameking_state::igt_gameking(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
+	YM2413(config, m_opll, XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
+
 	YMZ280B(config, "ymz", XTAL(16'934'400)).add_route(ALL_OUTPUTS, "mono", 1.0); // enhanced sound on optional Media-Lite sub board
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
@@ -575,6 +581,7 @@ void igt_gameking_state::igt_ms72c(machine_config &config)
 
 	// TODO: pinpoint enable/acknowledge
 	// clears a bit in $280201fc from there, may really expect vectored irqs from i960 instead ...
+	// irq2 comes from SENET device
 //  m_screen->screen_vblank().set_inputline(m_maincpu, I960_IRQ2);
 }
 
