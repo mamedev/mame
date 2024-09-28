@@ -2,7 +2,7 @@
 // copyright-holders:
 
 /*
-    Power Spikes (Modular System)
+    Last Duel (Modular System)
 
     As with most of the 'Modular System' setups, the hardware is heavily modified from the original
     and consists of a multi-board stack in a cage, hence different driver.
