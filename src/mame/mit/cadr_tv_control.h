@@ -6,13 +6,13 @@
 #pragma once
 
 
-DECLARE_DEVICE_TYPE(CADR_DISPLAY, cadr_display_device)
+DECLARE_DEVICE_TYPE(CADR_TV_CONTROL, cadr_tv_control_device)
 
 
-class cadr_display_device : public device_t
+class cadr_tv_control_device : public device_t
 {
 public:
-	cadr_display_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cadr_tv_control_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
 	auto irq_callback() { return m_irq_cb.bind(); }

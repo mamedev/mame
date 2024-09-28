@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol
 /**********************************************************************************
 
-CADR display emulation
+CADR TV Control emulation
 
 The TV control contains sync ram which looks like it can be configured to
 generate output to different types of TV displays.
@@ -19,7 +19,7 @@ Grayscale monitor: 454x576, 16 scales of gray.
 
 **********************************************************************************/
 #include "emu.h"
-#include "cadr_display.h"
+#include "cadr_tv_control.h"
 
 #include "screen.h"
 
@@ -28,27 +28,27 @@ Grayscale monitor: 454x576, 16 scales of gray.
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(CADR_DISPLAY, cadr_display_device, "cadr_display", "CADR display")
+DEFINE_DEVICE_TYPE(CADR_TV_CONTROL, cadr_tv_control_device, "cadr_tv_control", "CADR TV Control")
 
 
-cadr_display_device::cadr_display_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, CADR_DISPLAY, tag, owner, clock)
+cadr_tv_control_device::cadr_tv_control_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, CADR_TV_CONTROL, tag, owner, clock)
 	, m_irq_cb(*this)
 {
 }
 
-void cadr_display_device::device_add_mconfig(machine_config &config)
+void cadr_tv_control_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(0);
-	screen.set_screen_update(FUNC(cadr_display_device::screen_update));
+	screen.set_screen_update(FUNC(cadr_tv_control_device::screen_update));
 	screen.set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	screen.set_visarea_full();
 }
 
 
-uint32_t cadr_display_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cadr_tv_control_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const u32 black = 0x000000;
 	const u32 white = 0xffffff;
@@ -70,7 +70,7 @@ uint32_t cadr_display_device::screen_update(screen_device &screen, bitmap_rgb32 
 }
 
 
-void cadr_display_device::device_start()
+void cadr_tv_control_device::device_start()
 {
 	m_video_ram = std::make_unique<u32[]>(VIDEO_RAM_SIZE);
 	m_sync_ram = std::make_unique<u8[]>(SYNC_RAM_SIZE);
@@ -81,12 +81,12 @@ void cadr_display_device::device_start()
 	save_item(NAME(m_sync_csr));
 	save_item(NAME(m_sync_address));
 
-	m_60hz_timer = timer_alloc(FUNC(cadr_display_device::tv_60hz_callback), this);
+	m_60hz_timer = timer_alloc(FUNC(cadr_tv_control_device::tv_60hz_callback), this);
 	m_60hz_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
 
 
-void cadr_display_device::device_reset()
+void cadr_tv_control_device::device_reset()
 {
 	m_status = 0;
 	m_sync_csr = 0;
@@ -94,26 +94,26 @@ void cadr_display_device::device_reset()
 }
 
 
-TIMER_CALLBACK_MEMBER(cadr_display_device::tv_60hz_callback)
+TIMER_CALLBACK_MEMBER(cadr_tv_control_device::tv_60hz_callback)
 {
 	m_status |= 0x10;
 	m_irq_cb(ASSERT_LINE);
 }
 
 
-u32 cadr_display_device::video_ram_read(offs_t offset)
+u32 cadr_tv_control_device::video_ram_read(offs_t offset)
 {
 	return m_video_ram[offset & VIDEO_RAM_MASK];
 }
 
 
-void cadr_display_device::video_ram_write(offs_t offset, u32 data)
+void cadr_tv_control_device::video_ram_write(offs_t offset, u32 data)
 {
 	m_video_ram[offset & VIDEO_RAM_MASK] = data;
 }
 
 
-u32 cadr_display_device::tv_control_r(offs_t offset)
+u32 cadr_tv_control_device::tv_control_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -126,7 +126,7 @@ u32 cadr_display_device::tv_control_r(offs_t offset)
 }
 
 
-void cadr_display_device::tv_control_w(offs_t offset, u32 data)
+void cadr_tv_control_device::tv_control_w(offs_t offset, u32 data)
 {
 	switch (offset)
 	{

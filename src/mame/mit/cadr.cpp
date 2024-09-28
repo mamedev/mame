@@ -15,8 +15,8 @@ TODO:
 **********************************************************************************/
 #include "emu.h"
 #include "cadr_disk.h"
-#include "cadr_display.h"
 #include "cadr_iob.h"
+#include "cadr_tv_control.h"
 
 #include "cpu/cadr/cadr.h"
 #include "machine/input_merger.h"
@@ -39,7 +39,7 @@ public:
 		, m_mainirq(*this, "mainirq")
 		, m_xbusirq(*this, "xbusirq")
 		, m_iob(*this, "iob")
-		, m_display(*this, "display")
+		, m_tv_control(*this, "display")
 	{ }
 
 	void cadr(machine_config &config);
@@ -67,7 +67,7 @@ private:
 	required_device<input_merger_any_high_device> m_mainirq;
 	required_device<input_merger_any_high_device> m_xbusirq;
 	required_device<cadr_iob_device> m_iob;
-	required_device<cadr_display_device> m_display;
+	required_device<cadr_tv_control_device> m_tv_control;
 
 	// x------- -------- - Unibus interrupt request line (accepted)
 	// -x------ -------- - Xbus interrupt request line
@@ -111,10 +111,10 @@ void cadr_state::mem_map(address_map &map)
 	// 17377774 - 17377777 / 3dfffc - 3dffff - first disk control
 
 	// 3c0000 - main tv
-	map(0x3c0000, 0x3c7fff).rw(m_display, FUNC(cadr_display_device::video_ram_read), FUNC(cadr_display_device::video_ram_write));
+	map(0x3c0000, 0x3c7fff).rw(m_tv_control, FUNC(cadr_tv_control_device::video_ram_read), FUNC(cadr_tv_control_device::video_ram_write));
 
 	// 3dfff0-3dfff7 - TV control
-	map(0x3dfff0, 0x3dfff7).rw(m_display, FUNC(cadr_display_device::tv_control_r), FUNC(cadr_display_device::tv_control_w));
+	map(0x3dfff0, 0x3dfff7).rw(m_tv_control, FUNC(cadr_tv_control_device::tv_control_r), FUNC(cadr_tv_control_device::tv_control_w));
 
 	// Don't know why but using map is not working
 //	map(0x3dfff8, 0x3dffff).m(m_disk_controller, FUNC(cadr_disk_device::map));
@@ -240,8 +240,8 @@ void cadr_state::cadr(machine_config &config)
 	CADR_IOB(config, m_iob, 0);
 	m_iob->irq_vector_callback().set(FUNC(cadr_state::unibus_irq_and_vector));
 
-	CADR_DISPLAY(config, m_display, 0);
-	m_display->irq_callback().set(m_xbusirq, FUNC(input_merger_device::in_w<IRQ_SOURCE_DISPLAY>));
+	CADR_TV_CONTROL(config, m_tv_control, 0);
+	m_tv_control->irq_callback().set(m_xbusirq, FUNC(input_merger_device::in_w<IRQ_SOURCE_DISPLAY>));
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("cadr");
 }
