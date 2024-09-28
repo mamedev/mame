@@ -4,11 +4,23 @@
 
 CADR display emulation
 
+The TV control contains sync ram which looks like it can be configured to
+generate output to different types of TV displays.
+
+This currently emulates a 768x939 monochrome display.
+
+Other information about displays:
+
+Color screen: 454x576, 16 colors, RGB.
+Grayscale monitor: 454x576, 16 scales of gray.
+'CPT' monitor: 768x896, monochrome?
+
+60MHz and 64Mhz clocks are mentioned in the docs, as well as 64.69Hz default refresh rate.
+
 **********************************************************************************/
 #include "emu.h"
 #include "cadr_display.h"
 
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -21,7 +33,6 @@ DEFINE_DEVICE_TYPE(CADR_DISPLAY, cadr_display_device, "cadr_display", "CADR disp
 
 cadr_display_device::cadr_display_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, CADR_DISPLAY, tag, owner, clock)
-	, m_palette(*this, "palette")
 	, m_irq_cb(*this)
 {
 }
@@ -34,25 +45,25 @@ void cadr_display_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update(FUNC(cadr_display_device::screen_update));
 	screen.set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	screen.set_visarea_full();
-	screen.set_palette(m_palette);
-
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
 }
 
 
-uint32_t cadr_display_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cadr_display_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const u32 black = 0x000000;
+	const u32 white = 0xffffff;
+
 	for (int y = 0; y < SCREEN_HEIGHT; y++)
 	{
 		const u16 line_start = y * (SCREEN_WIDTH / 32);
+
 		for (int x = 0; x < (SCREEN_WIDTH / 32); x++)
 		{
 			const u32 d = m_video_ram[line_start + x];
 			const u32 xs = x * 32;
+
 			for (int i = 0; i < 32; i++)
-			{
-				bitmap.pix(y, xs + i) = BIT(d, i);
-			}
+				bitmap.pix(y, xs + i) = BIT(d, i) ? white : black;
 		}
 	}
 	return 0;
@@ -62,11 +73,13 @@ uint32_t cadr_display_device::screen_update(screen_device &screen, bitmap_ind16 
 void cadr_display_device::device_start()
 {
 	m_video_ram = std::make_unique<u32[]>(VIDEO_RAM_SIZE);
+	m_sync_ram = std::make_unique<u8[]>(SYNC_RAM_SIZE);
 
 	save_pointer(NAME(m_video_ram), VIDEO_RAM_SIZE);
+	save_pointer(NAME(m_sync_ram), SYNC_RAM_SIZE);
 	save_item(NAME(m_status));
-
-	m_bitmap.allocate(SCREEN_WIDTH, SCREEN_HEIGHT, BITMAP_FORMAT_IND16);
+	save_item(NAME(m_sync_csr));
+	save_item(NAME(m_sync_address));
 
 	m_60hz_timer = timer_alloc(FUNC(cadr_display_device::tv_60hz_callback), this);
 	m_60hz_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
@@ -76,6 +89,8 @@ void cadr_display_device::device_start()
 void cadr_display_device::device_reset()
 {
 	m_status = 0;
+	m_sync_csr = 0;
+	m_sync_address = 0;
 }
 
 
@@ -88,26 +103,51 @@ TIMER_CALLBACK_MEMBER(cadr_display_device::tv_60hz_callback)
 
 u32 cadr_display_device::video_ram_read(offs_t offset)
 {
-	return m_video_ram[offset & (VIDEO_RAM_SIZE - 1)];
+	return m_video_ram[offset & VIDEO_RAM_MASK];
 }
 
 
 void cadr_display_device::video_ram_write(offs_t offset, u32 data)
 {
-	m_video_ram[offset & (VIDEO_RAM_SIZE - 1)] = data;
+	m_video_ram[offset & VIDEO_RAM_MASK] = data;
 }
 
 
-u32 cadr_display_device::status_r()
+u32 cadr_display_device::tv_control_r(offs_t offset)
 {
-	return m_status;
+	switch (offset)
+	{
+	case 0x00:
+		return m_status;
+	case 0x01: // DATA
+		return m_sync_ram[m_sync_address & SYNC_RAM_MASK];
+	}
+	return 0;
 }
 
 
-void cadr_display_device::status_w(u32 data)
+void cadr_display_device::tv_control_w(offs_t offset, u32 data)
 {
-	m_status = data;
-	m_status &= ~0x10;
-	m_irq_cb(CLEAR_LINE);
-}
+	switch (offset)
+	{
+	case 0x00:
+		m_status = data;
+		m_status &= ~0x10;
+		m_irq_cb(CLEAR_LINE);
+		break;
+	case 0x01: // DATA
+		m_sync_ram[m_sync_address & SYNC_RAM_MASK] = data;
+		break;
+	case 0x02: // ADR
+		m_sync_address = data;
+		break;
+	case 0x03: // Sync control/status
+		// 200 is written to enable Sync RAM, disable SYNC, and/or enable SYNC.
+		m_sync_csr = data;
+		break;
 
+	// unknown
+	case 0x04: // Related to writing the color map
+		break;
+	}
+}

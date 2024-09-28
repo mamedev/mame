@@ -113,21 +113,8 @@ void cadr_state::mem_map(address_map &map)
 	// 3c0000 - main tv
 	map(0x3c0000, 0x3c7fff).rw(m_display, FUNC(cadr_display_device::video_ram_read), FUNC(cadr_display_device::video_ram_write));
 
-	// 3dfff0-3dfff7 - TV
-	// 3dfff1 ?
-	// 3dfff2 ?
-	// 3dfff3 ?
-	map(0x3dfff0, 0x3dfff0).rw(m_display, FUNC(cadr_display_device::status_r), FUNC(cadr_display_device::status_w));
-	// color map?
-	map(0x3dfff1, 0x3dfff7).lrw32(
-		NAME([this] (offs_t offset, u32 mem_mask) {
-			LOG("0x3dfff1-0x3dfff7: tv? read %08x (%o)\n", 0x3dfff1 + offset, 0x3dfff1 + offset);
-			return 0;
-		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOG("0x3dfff1-0x3dfff7: tv? write %08x(%o), data %08x (%o)\n", 0x3dfff1 + offset, 0x3dfff1 + offset, data, data);
-		})
-	);
+	// 3dfff0-3dfff7 - TV control
+	map(0x3dfff0, 0x3dfff7).rw(m_display, FUNC(cadr_display_device::tv_control_r), FUNC(cadr_display_device::tv_control_w));
 
 	// Don't know why but using map is not working
 //	map(0x3dfff8, 0x3dffff).m(m_disk_controller, FUNC(cadr_disk_device::map));
@@ -141,6 +128,7 @@ void cadr_state::mem_map(address_map &map)
 	map(0x3dfffe, 0x3dfffe).rw(m_disk_controller, FUNC(cadr_disk_device::disk_address_r), FUNC(cadr_disk_device::disk_address_w));
 	// 3dffff / 17377777
 	map(0x3dffff, 0x3dffff).rw(m_disk_controller, FUNC(cadr_disk_device::error_correction_r), FUNC(cadr_disk_device::start_w));
+
 
 	// Unibus - 16 bit bus
 
@@ -179,6 +167,7 @@ void cadr_state::mem_map(address_map &map)
 				m_mainirq->in_w<IRQ_SOURCE_UNIBUS>(CLEAR_LINE);
 		})
 	).umask32(0x0000ffff);
+
 	// 3ff612 - 766044 - (clear) bus error status
 	map(0x3ff612, 0x3ff612).lrw16(
 		NAME([this] () {
