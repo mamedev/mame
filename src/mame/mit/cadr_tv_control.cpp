@@ -33,18 +33,19 @@ DEFINE_DEVICE_TYPE(CADR_TV_CONTROL, cadr_tv_control_device, "cadr_tv_control", "
 
 cadr_tv_control_device::cadr_tv_control_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, CADR_TV_CONTROL, tag, owner, clock)
+	, m_screen(*this, "screen")
 	, m_irq_cb(*this)
 {
 }
 
 void cadr_tv_control_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(0);
-	screen.set_screen_update(FUNC(cadr_tv_control_device::screen_update));
-	screen.set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
-	screen.set_visarea_full();
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(0);
+	m_screen->set_screen_update(FUNC(cadr_tv_control_device::screen_update));
+	m_screen->set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
+	m_screen->set_visarea_full();
 }
 
 
@@ -118,7 +119,8 @@ u32 cadr_tv_control_device::tv_control_r(offs_t offset)
 	switch (offset)
 	{
 	case 0x00:
-		return m_status;
+		// -------- --x----- 0 = vertical retrace
+		return (m_status & ~0x20) | (m_screen->vblank() ? 0 : 0x20);
 	case 0x01: // DATA
 		return m_sync_ram[m_sync_address & SYNC_RAM_MASK];
 	}

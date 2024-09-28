@@ -6,6 +6,9 @@
 #pragma once
 
 
+#include "screen.h"
+
+
 DECLARE_DEVICE_TYPE(CADR_TV_CONTROL, cadr_tv_control_device)
 
 
@@ -41,6 +44,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(tv_60hz_callback);
 
+	required_device<screen_device> m_screen;
 	devcb_write_line m_irq_cb;
 	emu_timer *m_60hz_timer;
 	u32 m_status;
