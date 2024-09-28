@@ -15925,6 +15925,9 @@ ledstorm                        // 1988 (c) 1988 (US)
 madgear                         // 2/1989 (c) 1989 (US)
 madgearj                        // 2/1989 (c) 1989 (Japan)
 
+@source:capcom/lastduel_ms.cpp
+lastduelm                       // bootleg (Modular System)
+
 @source:capcom/lwings.cpp
 avengers                        // 2/1987 (c) 1987 (US)
 avengersa                       // 2/1987 (c) 1987 (US)
@@ -45129,6 +45132,9 @@ skysharkb                       // bootleg
 twincobr                        // B30 / TP-011 (c) 1987 Taito Corporation (World)
 twincobru                       // B30 / TP-011 (c) 1987 Taito America Corporation + Romstar license (US)
 
+@source:toaplan/twincobr_ms.cpp
+twincobrm                       // bootleg (Modular System)
+
 @source:toaplan/wardner.cpp
 pyros                           // B25 / TP-009 (c) 1987 Taito America Corporation (US)
 wardner                         // B25 / TP-009 (c) 1987 Taito Corporation Japan (World)
@@ -46340,6 +46346,9 @@ turbofrco                       // (c) 1991 Video System Co.
 turbofrcu                       // (c) 1991 Video System Co. (US)
 turbofrcua                      // (c) 1991 Video System Co. (US)
 wbbc97                          // (c) 1997 Comad
+
+@source:vsystem/pspikes_ms.cpp
+pspikesm                        // bootleg (Modular System)
 
 @source:vsystem/rpunch.cpp
 rabiolep                        // (c) 1987 V-System Co. (Japan)
