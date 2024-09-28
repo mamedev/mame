@@ -5732,8 +5732,8 @@ ROM_START( tarzanb ) // V110 TARZAN C
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "t.z._v110.u19", 0x00000, 0x40000, CRC(16026d12) SHA1(df08641b4bc1437648f0a8cd5f7a8a4786c07041) )
 
-	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
-	ROM_LOAD( "igs_a2103_cg_v100f.u15", 0x00000, 0x400000, BAD_DUMP CRC(dcbff16f) SHA1(2bf77ef4448c26124c8d8d18bb7ffe4105cfa940) ) // using tarzanc's one for now, but versions differ
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", ROMREGION_ERASE00 )
+	ROM_LOAD( "igs_a2103_cg_v100f.u15", 0x000000, 0x200000, CRC(afe56ed5) SHA1(656cee6a59f2930eec9acd11b84b416cc7354e01) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "t.z._text_u5.u5", 0x00000, 0x80000, CRC(1724e039) SHA1(d628499b61f98f7c9034d70b82ee25e002190ece) )
