@@ -5129,14 +5129,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Dig Dug</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<info name="serial" value="CX2677" />
+		<info name="programmer" value="Douglas B. Macrae" />
+		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="a2600_cart">
-			<!-- SuperChip -->
-			<feature name="slot" value="a26_f6" />
-			<dataarea name="rom" size="16384">
-				<rom name="dig dug (1983) (atari - gcc, douglas b. macrae) (cx2677).bin" size="16384" crc="ee7b80d1" sha1="79e746524520da546249149c33614fc23a4f2a51"/>
-			</dataarea>
-			<dataarea name="ram" size="128">
-			</dataarea>
+		<!-- SuperChip CO20231-01 -->
+		<feature name="slot" value="a26_f6" />
+		<dataarea name="rom" size="16384">
+			<rom name="co25077-22.bin" size="16384" crc="ee7b80d1" sha1="79e746524520da546249149c33614fc23a4f2a51"/>
+		</dataarea>
+		<dataarea name="ram" size="128">
+		</dataarea>
 		</part>
 	</software>
 
@@ -5149,6 +5152,25 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="dig dug (1983) (atari - gcc, douglas b. macrae) (cx2677, cx2677p) (pal).bin" size="16384" crc="de5c5553" sha1="816abcef9cc8fca5007cc400534e84d00285f199"/>
+			</dataarea>
+			<dataarea name="ram" size="128">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digdugea" cloneof="digdug">
+		<description>Dig Dug (PAL, alt)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="2677" />
+		<!-- Actual silver label only has 2677 and end label has DIG DUG TM  P" -->
+		<info name="programmer" value="Douglas B. Macrae" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+		<!-- SuperChip CO20231-01 -->
+		<feature name="slot" value="a26_f6" />
+			<dataarea name="rom" size="16384">
+				<rom name="co26077-29(pal).bin" size="16384" crc="8c550791" sha1="8d991206e286aa781433c68a56eea6b2f97bab2d"/>
 			</dataarea>
 			<dataarea name="ram" size="128">
 			</dataarea>
