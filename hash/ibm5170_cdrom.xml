@@ -8165,7 +8165,7 @@ Incredibly slow in tearing down even on pcipcs7 (bypass with fast forward)
 		<year>2000</year>
 		<publisher>Microsoft</publisher>
 		<info name="release" value="20000518" />
-		<info name="language" value="Chinese (Simplified), Chinese (Traditional), Spanish, French, German, Italian, Japanese, Korean, Dutch, Swedish, Arabic, Portuguese (Brazil), Portuguese (Europe), Czech, Danish, Finnish, Hebrew, Hungarian, Norwegian, Polish, Russian, Turkish" />
+		<info name="language" value="Arabic/Chinese (Simplified)/Chinese (Traditional)/Czech/Danish/Dutch/French/Finnish/German/Hebrew/Hungarian/Italian/Japanese/Korean/Norwegian/Polish/Portuguese (Brazil)/Portuguese (Europe)/Russian/Spanish/Swedish/Turkish" />
 		<info name="usage" value="Installs on the US-English version of Windows 2000; disc 1 is the Windows 2000 install disc" />
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="Disc 2" />
