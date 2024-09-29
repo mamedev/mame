@@ -32212,6 +32212,9 @@ tomsadvs                        //
 toratora                        // (c) 1980 Game Plan
 toratorab                       // (c) 1980 Game Plan
 
+@source:misc/triplex.cpp
+triplex                         // Torch Triple X
+
 @source:misc/triton.cpp
 triton41                        // 1978 Transam Triton L4.1
 triton51                        // 1979 Transam Triton L5.1
