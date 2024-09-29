@@ -21052,10 +21052,14 @@ Missing [7220] text selector for choices
 		</part>
 	</software>
 
-	<software name="gage">
+	<software name="gage" supported="no">
 		<description>Gage</description>
 		<year>1992</year>
 		<publisher>Ｍ．Ｎ．Ｍ．ソフトウェア (M.N.M. Software)</publisher>
+		<notes><![CDATA[
+Hangs on "Welcome to world of Mick Albart" message, [FDC] copy protection?
+Has a seizure when entering gameplay
+]]></notes>
 		<info name="alt_title" value="ゲイジ" />
 		<info name="release" value="19920925" />
 		<part name="flop1" interface="floppy_5_25">
@@ -39244,12 +39248,17 @@ No [PC9801-86] sound
 		</part>
 	</software>
 
-	<software name="sangofgt">
+	<software name="sangofgt" supported="no">
+		<!-- Sangoku Bushou Souha a.k.a. Sango Fighter -->
 		<description>Sangokushi Fighters</description>
 		<year>1995</year>
 		<publisher>イマジニア (Imagineer)</publisher>
+		<notes><![CDATA[
+Cannot install, gets stuck at "please insert disk and press mouse" prompt
+]]></notes>
 		<info name="alt_title" value="三國武将争覇" />
 		<info name="release" value="19950609" />
+		<info name="usage" value="Requires pc9821 minimum, needs HDD install from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -41403,10 +41412,13 @@ No [PC9801-86] sound
 		</part>
 	</software>
 
-	<software name="spindiz2">
+	<software name="spindiz2" supported="no">
 		<description>Spindizzy II</description>
 		<year>1991</year>
 		<publisher>アルシスソフト (Arsys Software)</publisher>
+		<notes><![CDATA[
+Hangs on new game after selecting any stage, waits for an irq to happen
+]]></notes>
 		<info name="alt_title" value="スピンディジー２" />
 		<info name="release" value="19910927" />
 		<part name="flop1" interface="floppy_5_25">
