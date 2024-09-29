@@ -611,13 +611,13 @@ To load and run a tape:
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Breakout" />
 			<dataarea name="cass" size="1127548">
-				<rom name="color graphics (1978)(apple computer).wav" size="1127548" crc="f829f060" sha1="e1b5b432ad2bf1974c934ac57d08a625181e6b9c"/>
+				<rom name="breakout (1978)(apple computer).wav" size="1127548" crc="f829f060" sha1="e1b5b432ad2bf1974c934ac57d08a625181e6b9c"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Color Graphics" />
 			<dataarea name="cass" size="1544236">
-				<rom name="breakout (1978)(apple computer).wav" size="1544236" crc="64441f07" sha1="37da93d0a057a718031395f6c83c57c9a8d3daf0"/>
+				<rom name="color graphics (1978)(apple computer).wav" size="1544236" crc="64441f07" sha1="37da93d0a057a718031395f6c83c57c9a8d3daf0"/>
 			</dataarea>
 		</part>
 	</software>
