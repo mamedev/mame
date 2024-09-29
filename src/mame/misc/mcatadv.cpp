@@ -21,8 +21,8 @@ Magical Cat (C) 1993 Wintechno
 Board Name: LINDA5
 
  Main CPU: 68000-16
- Sound CPU: Z80
- Sound Chip: YMF286-K
+ Sound CPU: Z0840004PSC
+ Sound Chip: YMF286-K & Y3016-F
 
  Custom: FACE FX1037 x1
          038 x2 (As in Cave)
