@@ -14,13 +14,13 @@ TODO:
 - all games will eventually print "RTC device: SOFTWARE", expecting an optional device somewhere. Later boards have a RTC62423;
 - bmoonii, ms5, ms14, dblheart, mystjag: crashes in i960 with unhandled 00 after RAM error.
 \- Do they all need NVRAM setchips?
-\- Crash may be related to lack of irq service;
-- watchdog (ADM691AAN on bmoonii board);
+\- Should probably not get there, the watchdog would kick much earlier ...
+- watchdog (ADM691AAN on bmoonii board, "Telltale");
+\- All games hangs on soft reset;
 - All games are silent;
 \- bmoonii has a YM2413 on main board, tied with a XTAL(3'579'545).
 \- some extra stuff routes thru QUART chips (namely SRESET comes from there)
 \- ymz should require snd roms being hooked up to its internal memory map thru ROM_COPY;
-- Hangs on soft reset;
 
 gkigt4 debug hang points:
 bp 8035d58,1,{r8=1;g} ; skip QUART not running (will save to NVRAM afterwards)
@@ -28,6 +28,11 @@ bp 802491c,1,{g4=1;g} ; buffer at $10000308, irq?
 bp 80249f4,1,{g4=1;g} ; ^
 bp 80773f4,1,{g4=0;g} ; irq 2?
 bp 8177f48,1,{ip+=4;g} ; EEPROM CRC error / identification failure
+
+workaround for init crashes:
+`Fatal error: I960: <logged IP>: Unhandled 00`
+bp <logged IP>,1,{ ip|=0x08000000;hardreset } ; the first time around,
+                                              ; will initialize NVRAM stack to valid values
 
 ===================================================================================================
 
@@ -153,10 +158,7 @@ private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	[[maybe_unused]] uint16_t version_r();
-
 	void igt_gameking_map(address_map &map) ATTR_COLD;
-	void igt_ms72c_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
@@ -181,12 +183,13 @@ void igt_gameking_state::video_start()
 }
 
 // TODO: incomplete, several missing bit meanings
-// ms14 uses bit 16 for something, currently draws solid white
-// (concealing bitmap layer, would be ROM unmapped space)
+// - for banking bit 19 is trusted by gkigt4, bit 16 for ms3, 18-17 assumed to be linear
+// - bits 15-12 are always 0xf?
+// - bits 23-20 used, unknown purpose (at least 1 bit of extra tile bank)
 TILE_GET_INFO_MEMBER(igt_gameking_state::get_bg_tile_info)
 {
 	const u32 entry = m_bg_vram[tile_index];
-	int const tile = (entry & 0xffff) | (BIT(entry, 19) << 16);
+	int const tile = (entry & 0x0fff) | (entry & 0x000f'0000) >> 4;
 	int const color = (entry >> 24) & 0xf;
 
 	tileinfo.set(0, tile, color, 0);
@@ -231,7 +234,9 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 //  map(0x0ac00000, 0x0ac0000f) - board identifiers?
 //  map(0x0ae00000, 0x0ae0000f) /
 
-	// it's unclear how much of this is saved and how much total RAM there is.
+	// TODO: fix ranges between CMOS and regular work RAM
+	// - bmoonii PCB has two M48Z128Y (-> 0x20000 x2)
+	// - ms3 maps CMOS ranges at 0x1002'0000-0x1003'ffff only
 	map(0x10000000, 0x1001ffff).flags(i960_cpu_device::BURST).ram().share("nvram");
 	map(0x10020000, 0x17ffffff).flags(i960_cpu_device::BURST).ram();
 
@@ -249,45 +254,58 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 			return res;
 		}
 	));
+	map(0x18200002, 0x18200003).lr16(
+		NAME([this] () {
+			// TODO: unknown value required, checked at "Cold powerup machine setup" in some games
+			// coming from Xilinx anyway?
+
+			logerror("%s: version read\n", machine().describe_context());
+			return 0x0038;
+		}
+	));
 
 	// 28000000: MEZ2 SEL, also connected to ymz chip select?
-	// 28010000: first 28C94 QUART (QRT1 SEL)
-	// 28020000: SENET SEL
-	// 28030000: WCHDOG SEL
-	// 28040000: second 28C94 QUART (QRT2 SEL)
-	// 28050000: SOUND SEL
-	// 28060000: COLOR SEL
-	// 28070000: OUT SEL
 	map(0x28000000, 0x28000003).rw(m_opll, FUNC(ym2413_device::read), FUNC(ym2413_device::write)).umask32(0x00ff00ff);
+	// 28010000: first 28C94 QUART (QRT1 SEL)
 	map(0x28010000, 0x2801007f).rw(m_quart[0], FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
-	map(0x28020000, 0x280205ff).flags(i960_cpu_device::BURST).ram();       // CMOS?
+	// 28020000: SENET SEL
+	map(0x280201fa, 0x280201fa).lrw8(
+		NAME([this] () {
+			logerror("SENET $1fa read\n");
+			return 0;
+		}),
+		NAME([this] (u8 data) {
+			logerror("SENET $1fa write %02x\n", data);
+		})
+	);
+	map(0x280201fc, 0x280201fc).lrw8(
+		NAME([this] () {
+			logerror("SENET $1fc read\n");
+			return 0;
+		}),
+		NAME([this] (u8 data) {
+			logerror("SENET $1fc write %02x\n", data);
+		})
+	);
+//  map(0x28020000, 0x280205ff).flags(i960_cpu_device::BURST).ram();
+	// 28030000: WCHDOG SEL
 	map(0x28030000, 0x28030003).nopr();
+	// 28040000: second 28C94 QUART (QRT2 SEL)
 	map(0x28040000, 0x2804007f).rw(m_quart[1], FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
-	// TODO: this overlay should come from the QUART device
+	// TODO: these overlays should come from the QUART devices
+	map(0x28010038, 0x2801003b).portr("IN1").nopw();
 	map(0x28040038, 0x2804003b).portr("IN2").nopw();
-
+	// 28050000: SOUND SEL
 	map(0x28050000, 0x28050003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x00ff00ff);
+	// 28060000: COLOR SEL
 	map(0x28060000, 0x28060000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x28060002, 0x28060002).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x28060004, 0x28060004).w("ramdac", FUNC(ramdac_device::mask_w));
+	// 28070000: OUT SEL
 
 	map(0x3b000000, 0x3b1fffff).flags(i960_cpu_device::BURST).rom().region("snd", 0);
 
 	map(0xa1000000, 0xa1011fff).flags(i960_cpu_device::BURST).ram(); // used by gkkey for restart IAC
-}
-
-// TODO: unknown value required, checked at "Cold powerup machine setup"
-// should really be just like above and be video related flags?
-// NOTE: maps to the lower 8-bit than the video flags hooked above ...
-uint16_t igt_gameking_state::version_r()
-{
-	return 0xf777;
-}
-
-void igt_gameking_state::igt_ms72c_map(address_map &map)
-{
-	igt_gameking_map(map);
-//  map(0x18200003, 0x18200003).lr8(FUNC(igt_gameking_state::version_r));
 }
 
 static INPUT_PORTS_START( igt_gameking )
@@ -490,10 +508,8 @@ static INPUT_PORTS_START( igt_gameking )
 	PORT_DIPSETTING(    0x800000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
 	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 INPUT_PORTS_END
 
-// TODO: incomplete decoding
 static const gfx_layout igt_gameking_layout =
 {
 	4,4,
@@ -557,6 +573,9 @@ void igt_gameking_state::igt_gameking(machine_config &config)
 	diag.rxd_handler().set(m_quart[0], FUNC(sc28c94_device::rx_d_w));
 	diag.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
+	// TODO: SENET here
+	// uses I960_IRQ2
+
 	PALETTE(config, m_palette).set_entries(0x100);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
@@ -574,16 +593,6 @@ void igt_gameking_state::igt_gameking(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 }
 
-void igt_gameking_state::igt_ms72c(machine_config &config)
-{
-	igt_gameking(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &igt_gameking_state::igt_ms72c_map);
-
-	// TODO: pinpoint enable/acknowledge
-	// clears a bit in $280201fc from there, may really expect vectored irqs from i960 instead ...
-	// irq2 comes from SENET device
-//  m_screen->screen_vblank().set_inputline(m_maincpu, I960_IRQ2);
-}
 
 // TODO: standardize ROM labels
 // `${socket_name}_${printed_label}.${ROM position}`, ms14 for an example
@@ -953,7 +962,7 @@ GAME( 1998, dblheart,  0,      igt_gameking, igt_gameking, igt_gameking_state, e
 GAME( 1998, ms3,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1998, ms5,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 5", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1999, mystjag,   0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Mystic Jaguar", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2000, ms72c,     0,      igt_ms72c,    igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 7 2c", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, ms72c,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 7 2c", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt4,    0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt4ms,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt43,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
