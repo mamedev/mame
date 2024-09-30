@@ -303,6 +303,42 @@ ROM_START( hwparty )
 ROM_END
 
 
+// The following games use an Artemis II sub board and may need to be moved to a separate driver
+// The Artemis II sub board has 2x M68K ROMs and 2x LY621024SL RAMs on the upper side,
+// while on the back side there are the following components: ASTRO V102PX encrypted M68K (002 for carnivac, 001 for santacl),
+// Astro ROHS (GFX chip?) and 2x LY621024SL RAMs.
+
+
+// main PCB: unmarked with AMD Geode CS5536AD, W83627HG-AW IOC, RTL8100C ethernet controller, big heat-sinked chip,
+// 4x HY5DU121622CTP SRAM (mounted on SO-DIMM), Realtek ALC203 + Yamaha YDA138-E (mounted on Yamaha_Audio_A riser board)
+// with 24.576 MHz XTAL, Trascend Compact Flash
+ROM_START( carnivac )
+	ROM_REGION32_LE(0x80000, "pci:12.0", 0)
+	ROM_LOAD( "phoenixbios.u8", 0x00000, 0x80000, CRC(aeb6cac5) SHA1(1b12b0d20d6451ac36ab5976d1e977034212e3a0) )
+
+	ROM_REGION(0x20000, "rom", 0) // on subboard
+	ROM_LOAD16_BYTE( "1_caus-014.tu1", 0x00000, 0x010000, CRC(131947d1) SHA1(521751c5a8a0e6031de7998ed64a8be3d6f0a290) )
+	ROM_LOAD16_BYTE( "2_caus-014.tu3", 0x00001, 0x010000, CRC(22d6209d) SHA1(621786d49e7fd38ce1b7665664f7b97604fedbd5) )
+
+	ROM_REGION(0x10000000, "drive", 0)
+	ROM_LOAD( "carnival_us.004.d.img", 0x0000, 0xf618000, CRC(566b9fbf) SHA1(14364b05151db60b1882c2230d896ac8c632395b) )
+ROM_END
+
+// main PCB: Astro AS-LX800 A5 with AMD Geode CS5536AD, big heat-sinked chip, 4x HY5DU121622CTP SRAM (directly on PCB),
+// Realtek ALC203 + Yamaha YDA138-E with 24.576 MHz XTAL (directly on PCB), Trascend Compact Flash
+ROM_START( santacl )
+	ROM_REGION32_LE(0x80000, "pci:12.0", 0)
+	ROM_LOAD( "phoenixbios.u30", 0x00000, 0x80000, CRC(4e24ffdb) SHA1(8b4bba02183da5eae27755b86eca830d06fe05ae) )
+
+	ROM_REGION(0x20000, "rom", 0) // on subboard
+	ROM_LOAD16_BYTE( "1_scin-020.tu1", 0x00000, 0x010000, CRC(b05e9c50) SHA1(2e67d144497f0b531d94e97107e8c2b238e46363) )
+	ROM_LOAD16_BYTE( "2_scin-020.tu3", 0x00001, 0x010000, CRC(97821e0d) SHA1(ec2a44916799c2f92b9c6db75cffe22cd2dd61ef) )
+
+	ROM_REGION(0x20000000, "drive", 0)
+	ROM_LOAD( "santa_claus_in.001.07.a.img", 0x0000, 0x1e6c6000, CRC(c89732de) SHA1(499f49b97baeef9681a0f9e4538e74676d4379c4) )
+ROM_END
+
+
 void astropc_state::init_astropc()
 {
 }
@@ -310,17 +346,24 @@ void astropc_state::init_astropc()
 } // anonymous namespace
 
 
-GAME( 2005,  blackbd,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Black Beard (Russia, set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005?, blackbda, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Black Beard (Russia, set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005,  blackbdb, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Black Beard (Russia, set 3)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// Pallas games
 
-GAME( 2005,  dslayrr,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Dragon Slayer (Russia, v15.B, 2005/08/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2006,  dslayrra, dslayrr, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Dragon Slayer (Russia, v16.B, 2005/11/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  blackbd,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Black Beard (Russia, set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005?, blackbda, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Black Beard (Russia, set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  blackbdb, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Black Beard (Russia, set 3)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2005,  hwparty,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Halloween Party (US.23.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  dslayrr,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Dragon Slayer (Russia, v15.B, 2005/08/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006,  dslayrra, dslayrr, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Dragon Slayer (Russia, v16.B, 2005/11/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2004,  hawaii,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Hawaii (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  hwparty,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Halloween Party (US.23.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2005,  oligam,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Olympian Games (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2004,  hawaii,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Hawaii (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2005,  rasce,    0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Ra's Scepter (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  oligam,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Olympian Games (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+GAME( 2005,  rasce,    0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Ra's Scepter (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+
+// Artemis II games
+GAME( 2009,  carnivac, 0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Carnival (Astro Corp., US.004.D)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2009,  santacl,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Santa Claus (IN.001.07.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

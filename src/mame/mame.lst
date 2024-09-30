@@ -1438,12 +1438,14 @@ zoo                             // (c) 2004  Astro Corp.
 blackbd                         //
 blackbda                        //
 blackbdb                        //
+carnivac                        //
 dslayrr                         //
 dslayrra                        //
 hawaii                          //
 hwparty                         //
 oligam                          //
 rasce                           //
+santacl                         //
 
 @source:astrocorp/hummer.cpp
 jackvent
@@ -27085,15 +27087,39 @@ ep_xtraa                        //
 
 @source:maygay/maygayew.cpp
 mg_alad                         // Aladdin's Cave
+mg_alada                        //
+mg_aladb                        //
+mg_aladc                        //
 mg_bb                           // Big Break
+mg_bba                          //
+mg_bbb                          //
 mg_ewg                          // Each Way Gambler
+mg_ewga                         //
+mg_ewgb                         //
+mg_ewgc                         //
+mg_ewgd                         //
+mg_ewge                         //
+mg_ewgf                         //
+mg_ewgg                         //
 mg_gbr                          // Guinness Book Of Records
+mg_gbra                         //
+mg_gbrb                         //
 mg_jv                           // Jack & Vera
+mg_jva                          //
+mg_jvb                          //
+mg_jvc                          //
 mg_kf                           // Krypton Factor
+mg_kfa                          //
 mg_lug                          // London Underground
+mg_luga                         //
 mg_pbw                          // Pinball Wizard
+mg_pbwa                         //
+mg_pbwb                         //
 mg_risk                         // Risk
+mg_riska                        //
+mg_riskb                        //
 mg_scl                          // Super Clue
+mg_scla                         //
 
 @source:maygay/maygayv1.cpp
 mv1bon                          // Believe It Or Not

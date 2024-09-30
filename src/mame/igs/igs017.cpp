@@ -5739,7 +5739,7 @@ ROM_START( tarzanb ) // V110 TARZAN C
 	ROM_LOAD( "t.z._text_u5.u5", 0x00000, 0x80000, CRC(1724e039) SHA1(d628499b61f98f7c9034d70b82ee25e002190ece) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "igs_s2102_sp_v102.u14", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) ) // not dumped for this set, but same markings as tarzanc's one
+	ROM_LOAD( "igs_s2102_sp_v102.u14", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
 
 	ROM_REGION( 0x2dd * 2, "plds", ROMREGION_ERASE )
 	ROM_LOAD( "eg.u20", 0x000, 0x2dd, NO_DUMP )
