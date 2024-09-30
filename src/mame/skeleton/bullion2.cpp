@@ -3,8 +3,52 @@
 
 /*
   Skeleton driver for Inder "Bullion 2" slot machine.
-  The hardware for Bullion 3 (undumped) is almost the same.
-  Complete manual with schematics and dip switches can be downloaded from https://www.recreativas.org/manuales/tragaperras
+  The hardware for Bullion 3 (undumped) is almost the same, the main difference is that Bullion 2 has three reels,
+  and Bullion 3 has four.
+
+  Reels sequence for Bullion 2:
+
+      +--------+--------+--------+
+      |  BAR   |  BELL  | GRAPE  | <- Default after reset
+      +--------+--------+--------+
+      | MELON  | CHERRY |  PLUM  |
+      +--------+--------+--------+
+      | GRAPE  | CHERRY | MELON  |
+      +--------+--------+--------+
+      |  BELL  | BANANA | LEMON  |
+      +--------+--------+--------+
+      |  PLUM  | GRAPE  | CHERRY |
+      +--------+--------+--------+
+      | BANANA |  BAR   |  BELL  |
+      +--------+--------+--------+
+      | LEMON  | LEMON  |  BAR   |
+      +--------+--------+--------+
+      | CHERRY |  PLUM  | BANANA |
+      +--------+--------+--------+
+
+  Dip switches for Bullion 2:
+
+      DIP1 -> |ON |HOPPER| default ON
+      DIP2 |  |OFF|PULSES|
+      DIP3 | 
+      DIP4 |     |ON |DEMO SOUND   | default ON
+      DIP5 |  /->|OFF|NO DEMO SOUND|
+      DIP6 --/ 
+      DIP7 --> |OFF    |OFF    |ON     |ON     | default ON
+      DIP8 --> |OFF    |ON     |OFF    |ON     | default ON
+               |LONGER |LONG   |SHORT  |SHORTER|
+               |      REELS SPINNING TIME      |
+
+  Dip switches 2, 3, 4, 5 unused (default ON).
+
+  Also, you can change the plug on the percentages PCB to change the payments:
+      Plug A = 78%
+      Plug B = 80% default
+      Plug C = 82%
+      Plug D = 84%
+  
+  Complete manual (for both Bullion 2 and Bullion 3) with schematics and dip switches can be downloaded from:
+      https://www.recreativas.org/manuales/tragaperras
 */
 
 #include "emu.h"
