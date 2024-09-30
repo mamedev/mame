@@ -42651,6 +42651,9 @@ tulip1                          // (c) 1983 CompuData
 cobrasd                         // (c) 1998 TourVisión
 cobrasda                        // (c) 1997 TourVisión
 
+@source:skeleton/tvdear.cpp
+tvdear                          // (c)1996 Takara
+
 @source:skeleton/unistar.cpp
 unistar                         //
 
