@@ -142,12 +142,12 @@ ALLOW_SAVE_TYPE(spi_sdcard_device::sd_state);
 
 DEFINE_DEVICE_TYPE(SPI_SDCARD, spi_sdcard_device, "spi_sdcard", "SD Card (SPI interface)")
 
-spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	spi_sdcard_device(mconfig, SPI_SDCARD, tag, owner, clock)
 {
 }
 
-spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	write_miso(*this),
 	m_image(*this, "image"),
@@ -158,7 +158,7 @@ spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type 
 	m_state(SD_STATE_IDLE),
 	m_ss(0), m_in_bit(0), m_clk_state(0),
 	m_in_latch(0), m_out_latch(0xff), m_cur_bit(0),
-	m_out_count(0), m_out_ptr(0), m_write_ptr(0), m_blknext(0),
+	m_out_delay(0), m_out_count(0), m_out_ptr(0), m_write_ptr(0), m_xferblk(512), m_blknext(0),
 	m_bACMD(false)
 {
 	std::fill(std::begin(m_csd), std::end(m_csd), 0);
@@ -170,18 +170,22 @@ spi_sdcard_device::~spi_sdcard_device()
 
 void spi_sdcard_device::device_start()
 {
-	save_item(NAME(m_state));
-	save_item(NAME(m_data));
+	m_data = make_unique_clear<u8 []>(2048 + 8);
+
+	save_pointer(NAME(m_data), 2048 + 8);
 	save_item(NAME(m_cmd));
+	save_item(NAME(m_state));
 	save_item(NAME(m_ss));
 	save_item(NAME(m_in_bit));
 	save_item(NAME(m_clk_state));
 	save_item(NAME(m_in_latch));
 	save_item(NAME(m_out_latch));
 	save_item(NAME(m_cur_bit));
+	save_item(NAME(m_out_delay));
 	save_item(NAME(m_out_count));
 	save_item(NAME(m_out_ptr));
 	save_item(NAME(m_write_ptr));
+	save_item(NAME(m_xferblk));
 	save_item(NAME(m_blknext));
 	save_item(NAME(m_bACMD));
 }
@@ -190,17 +194,17 @@ std::error_condition spi_sdcard_device::image_loaded(device_image_interface &ima
 {
 	// need block size and total blocks to create CSD
 	auto const info = m_image->get_info();
-	uint64_t const total_blocks = uint64_t(info.cylinders) * info.heads * info.sectors;
+	u64 const total_blocks = u64(info.cylinders) * info.heads * info.sectors;
 	if (!total_blocks)
 	{
-		osd_printf_error("%s: SD card cannot mount a zero-block image\n", tag());
+		osd_printf_error("%s: SD Card cannot mount a zero-block image\n", tag());
 		return image_error::INVALIDIMAGE;
 	}
 
 	// ensure block size can be expressed in the CSD
 	if ((info.sectorbytes & (info.sectorbytes - 1)) || !info.sectorbytes || (512 > info.sectorbytes) || (2048 < info.sectorbytes))
 	{
-		osd_printf_error("%s: SD card cannot use sector size %u (must be a power of 2 from 512 to 2048)\n", tag());
+		osd_printf_error("%s: SD Card cannot use sector size %u (must be a power of 2 from 512 to 2048)\n", tag());
 		return image_error::INVALIDIMAGE;
 	}
 	u8 block_size_exp = 0;
@@ -208,22 +212,32 @@ std::error_condition spi_sdcard_device::image_loaded(device_image_interface &ima
 		++block_size_exp;
 
 	// see how we can express the total block count
-	uint64_t total_mant = total_blocks;
-	uint8_t total_exp = 0;
+	u64 total_mant = total_blocks;
+	u8 total_exp = 0;
 	while (!BIT(total_mant, 0))
 	{
 		total_mant >>= 1;
 		++total_exp;
 	}
 	bool const sd_ok = (2 <= total_exp) && ((1 << 12) >= (total_mant << ((9 < total_exp) ? (total_exp - 9) : 0)));
-	bool const sdhc_ok = (512 == info.sectorbytes) && (10 <= total_exp) && ((uint32_t(1) << 16) >= (total_mant << (total_exp - 10)));
+	bool const sdhc_ok = (512 == info.sectorbytes) && (10 <= total_exp) && ((u32(1) << 16) >= (total_mant << (total_exp - 10)));
 	if (!sd_ok && !sdhc_ok)
 	{
-		osd_printf_error("%s: image size %u blocks of %u bytes is not supported by SD or SDHC\n", tag(), total_blocks, info.sectorbytes);
+		osd_printf_error("%s: SD Card image size %u blocks of %u bytes is not supported by SD or SDHC\n", tag(), total_blocks, info.sectorbytes);
 		return image_error::INVALIDIMAGE;
 	}
 
-	m_blksize = info.sectorbytes;
+	try
+	{
+		m_sectorbuf.resize(info.sectorbytes);
+	}
+	catch (std::bad_alloc const &)
+	{
+		osd_printf_error("%s: Error allocating %u-byte SD Card sector buffer\n", tag(), info.sectorbytes);
+		return std::errc::not_enough_memory;
+	}
+
+	m_blksize = m_xferblk = info.sectorbytes;
 
 	// set up common CSD fields
 	m_csd[0]  =  0x00;                                       // 127: CSD_STRUCTURE:2 (00b) 0:6
@@ -233,7 +247,7 @@ std::error_condition spi_sdcard_device::image_loaded(device_image_interface &ima
 	m_csd[4]  =  0x5b;                                       //  95: CCC:12 (01x110110101b)
 	m_csd[5]  =  0x50;                                       //      .. READ_BL_LN:4
 	m_csd[5]  |= block_size_exp;
-	m_csd[6]  =  0x80;                                       //  79: READ_BL_PARTIAL:1 WRITE_BLK_MISALIGN:1 READ_BLK_MISALIGN:1 DSR_IMP:1 0:2 C_SIZE:12
+	m_csd[6]  =  0x00;                                       //  79: READ_BL_PARTIAL:1 WRITE_BLK_MISALIGN:1 READ_BLK_MISALIGN:1 DSR_IMP:1 0:2 C_SIZE:12
 	m_csd[7]  =  0x00;                                       //      ..
 	m_csd[8]  =  0x00;                                       //      .. VDD_R_CURR_MIN:3 VDD_R_CURR_MAX:3
 	m_csd[9]  =  0x00;                                       //  55: VDD_W_CURR_MIN:3 VDD_W_CURR_MAX:3 C_SIZE_MUL:3
@@ -248,9 +262,9 @@ std::error_condition spi_sdcard_device::image_loaded(device_image_interface &ima
 
 	if (sdhc_ok && ((SD_TYPE_HC == m_preferred_type) || !sd_ok))
 	{
-		uint32_t const c_size = (total_blocks >> 10) - 1;
+		u32 const c_size = (total_blocks >> 10) - 1;
 		osd_printf_verbose(
-				"%s: mounted as SDHC, %u blocks of %u bytes, device size ((%u + 1) << 10) * (1 << %u)\n",
+				"%s: SD Card image mounted as SDHC, %u blocks of %u bytes, device size ((%u + 1) << 10) * (1 << %u)\n",
 				tag(),
 				total_blocks, info.sectorbytes,
 				c_size, block_size_exp);
@@ -267,10 +281,10 @@ std::error_condition spi_sdcard_device::image_loaded(device_image_interface &ima
 	}
 	else
 	{
-		uint8_t const c_size_mult = std::min<uint8_t>(total_exp, 9) - 2;
-		uint16_t const c_size = (total_blocks >> (c_size_mult + 2)) - 1;
+		u8 const c_size_mult = std::min<u8>(total_exp, 9) - 2;
+		u16 const c_size = (total_blocks >> (c_size_mult + 2)) - 1;
 		osd_printf_verbose(
-				"%s: mounted as SD, %u blocks of %u bytes, device size ((%u + 1) << (%u + 2)) * (1 << %u)\n",
+				"%s: SD Card image mounted as SD, %u blocks of %u bytes, device size ((%u + 1) << (%u + 2)) * (1 << %u)\n",
 				tag(),
 				total_blocks, info.sectorbytes,
 				c_size, c_size_mult, block_size_exp);
@@ -281,7 +295,8 @@ std::error_condition spi_sdcard_device::image_loaded(device_image_interface &ima
 		m_csd[0]  |= CSD_STRUCTURE_V10 << 6;                 // 127: CSD_STRUCTURE:2 (00b) 0:6
 		m_csd[1]  =  TAAC_UNIT_1MS | TAAC_VALUE_1_5;         // 119: TAAC:8
 
-		m_csd[6]  |= BIT(c_size, 10, 2);                     //  79: READ_BL_PARTIAL:1 WRITE_BLK_MISALIGN:1 READ_BLK_MISALIGN:1 DSR_IMP:1 0:2 C_SIZE:12
+		m_csd[6]  |= 0x80;                                   //  79: READ_BL_PARTIAL:1 WRITE_BLK_MISALIGN:1 READ_BLK_MISALIGN:1 DSR_IMP:1 0:2 C_SIZE:12
+		m_csd[6]  |= BIT(c_size, 10, 2);
 		m_csd[7]  |= BIT(c_size, 2, 8);                      //      ..
 		m_csd[8]  |= BIT(c_size, 0, 2) << 6;                 //      .. VDD_R_CURR_MIN:3 VDD_R_CURR_MAX:3
 		m_csd[8]  |= VDD_CURR_MIN_100MA << 3;
@@ -312,8 +327,9 @@ void spi_sdcard_device::device_add_mconfig(machine_config &config)
 	m_image->set_device_unload(FUNC(spi_sdcard_device::image_unloaded));
 }
 
-void spi_sdcard_device::send_data(u16 count, sd_state new_state)
+void spi_sdcard_device::send_data(u16 count, sd_state new_state, u8 delay)
 {
+	m_out_delay = delay;
 	m_out_ptr = 0;
 	m_out_count = count;
 	change_state(new_state);
@@ -359,9 +375,10 @@ void spi_sdcard_device::latch_in()
 		else if (m_state == SD_STATE_WRITE_DATA)
 		{
 			m_data[m_write_ptr++] = m_in_latch;
-			if (m_write_ptr == (m_blksize + 2))
+			if (m_write_ptr == (m_xferblk + 2))
 			{
 				LOG("writing LBA %x, data %02x %02x %02x %02x\n", m_blknext, m_data[0], m_data[1], m_data[2], m_data[3]);
+				// TODO: this is supposed to be a CRC response, the actual write will take some time
 				if (m_image->write(m_blknext, &m_data[0]))
 				{
 					m_data[0] = DATA_RESPONSE_OK;
@@ -372,7 +389,7 @@ void spi_sdcard_device::latch_in()
 				}
 				m_data[1] = 0x01;
 
-				send_data(2, SD_STATE_IDLE);
+				send_data(2, SD_STATE_IDLE, 0); // zero delay - must immediately follow the data
 			}
 		}
 		else // receive CMD
@@ -385,6 +402,7 @@ void spi_sdcard_device::latch_in()
 				do_command();
 				if (m_state == SD_STATE_DATA_MULTI && m_out_count == 0)
 				{
+					// FIXME: support multi-block read when transfer size is smaller than block size
 					m_data[0] = 0xfe; // data token
 					m_image->read(m_blknext++, &m_data[1]);
 					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[1], m_blksize);
@@ -411,13 +429,13 @@ void spi_sdcard_device::shift_out()
 	m_cur_bit &= 0x07;
 	if (m_cur_bit == 0)
 	{
-		if (m_out_ptr < SPI_DELAY_RESPONSE)
+		if (m_out_ptr < m_out_delay)
 		{
 			m_out_ptr++;
 		}
 		else if (m_out_count > 0)
 		{
-			m_out_latch = m_data[m_out_ptr - SPI_DELAY_RESPONSE];
+			m_out_latch = m_data[m_out_ptr - m_out_delay];
 			m_out_ptr++;
 			LOGMASKED(LOG_SPI, "SDCARD: latching %02x (start of shift)\n", m_out_latch);
 			m_out_count--;
@@ -471,16 +489,16 @@ void spi_sdcard_device::do_command()
 			break;
 
 		case 10: // CMD10 - SEND_CID
-			m_data[0] = 0x00; // initial R1 response
-			m_data[1] = 0xff; // throwaway byte before data transfer
-			m_data[2] = 0xfe; // data token
-			m_data[3] = 'M';  // Manufacturer ID - we'll use M for MAME
-			m_data[4] = 'M';  // OEM ID - MD for MAMEdev
-			m_data[5] = 'D';
-			m_data[6] = 'M'; // Product Name - "MCARD"
-			m_data[7] = 'C';
-			m_data[8] = 'A';
-			m_data[9] = 'R';
+			m_data[0]  = 0x00; // initial R1 response
+			m_data[1]  = 0xff; // throwaway byte before data transfer
+			m_data[2]  = 0xfe; // data token
+			m_data[3]  = 'M';  // Manufacturer ID - we'll use M for MAME
+			m_data[4]  = 'M';  // OEM ID - MD for MAMEdev
+			m_data[5]  = 'D';
+			m_data[6]  = 'M'; // Product Name - "MCARD"
+			m_data[7]  = 'C';
+			m_data[8]  = 'A';
+			m_data[9]  = 'R';
 			m_data[10] = 'D';
 			m_data[11] = 0x10; // Product Revision in BCD (1.0)
 			{
@@ -509,17 +527,22 @@ void spi_sdcard_device::do_command()
 			break;
 
 		case 16: // CMD16 - SET_BLOCKLEN
-			m_blksize = get_u16be(&m_cmd[3]);
-			if (m_image->exists() && m_image->set_block_size(m_blksize))
+			if (m_image->exists())
 			{
-				m_data[0] = 0;
+				u16 const blocklen = get_u16be(&m_cmd[3]);
+				if (blocklen && ((m_type == SD_TYPE_V2) || (blocklen == m_blksize)) && (blocklen <= m_blksize))
+				{
+					m_xferblk = blocklen;
+					m_data[0] = 0x00;
+				}
+				else
+				{
+					m_data[0] = 0x40; // parameter error
+				}
 			}
 			else
 			{
-				m_data[0] = 0xff; // indicate an error
-				// if false was returned, it means the hard disk is a CHD file, and we can't resize the
-				// blocks on CHD files.
-				logerror("spi_sdcard: Couldn't change block size to %d, wrong CHD file?", m_blksize);
+				m_data[0] = 0xff; // show an error
 			}
 			send_data(1, SD_STATE_TRAN);
 			break;
@@ -533,53 +556,101 @@ void spi_sdcard_device::do_command()
 				m_data[1] = 0xff;
 				m_data[2] = 0xfe; // data token
 				u32 blk = get_u32be(&m_cmd[1]);
-				if (m_type == SD_TYPE_V2)
+				if ((m_type == SD_TYPE_V2) && ((blk / m_blksize) != ((blk + (m_xferblk - 1)) / m_blksize)))
 				{
-					blk /= m_blksize;
+					LOG("rejecting read of %u bytes at %u that crosses %u-byte block boundary\n", m_xferblk, blk, m_blksize);
+					m_data[0] = 0x40; // parameter error
+					send_data(1, SD_STATE_TRAN);
 				}
-				m_image->read(blk, &m_data[3]);
+				else if (m_xferblk == m_blksize)
 				{
-					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], m_blksize);
-					put_u16be(&m_data[m_blksize + 3], crc16);
-					LOG("reading LBA %x: [0] %02x %02x .. [%d] %02x %02x [crc16] %04x\n", blk, m_data[3], m_data[4], m_blksize - 2, m_data[m_blksize + 1], m_data[m_blksize + 2], crc16);
+					// optimise for reading an entire block
+					if (m_type == SD_TYPE_V2)
+					{
+						blk /= m_blksize;
+					}
+					m_image->read(blk, &m_data[3]);
+					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], m_xferblk);
+					put_u16be(&m_data[m_xferblk + 3], crc16);
+					LOG("reading LBA %x: [0] %02x %02x .. [%d] %02x %02x [crc16] %04x\n", blk, m_data[3], m_data[4], m_xferblk - 2, m_data[m_xferblk + 1], m_data[m_xferblk + 2], crc16);
+					send_data(3 + m_xferblk + 2, SD_STATE_DATA);
 				}
-				send_data(3 + m_blksize + 2, SD_STATE_DATA);
+				else
+				{
+					assert(m_type == SD_TYPE_V2);
+					m_image->read(blk / m_blksize, &m_sectorbuf[0]);
+					std::copy_n(&m_sectorbuf[blk % m_blksize], m_xferblk, &m_data[3]);
+					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], m_xferblk);
+					put_u16be(&m_data[m_xferblk + 3], crc16);
+					LOG("reading LBA %x+%x: [0] %02x %02x .. [%d] %02x %02x [crc16] %04x\n", blk / m_blksize, blk % m_blksize, m_data[3], m_data[4], m_xferblk - 2, m_data[m_xferblk + 1], m_data[m_xferblk + 2], crc16);
+					send_data(3 + m_xferblk + 2, SD_STATE_DATA);
+				}
 			}
 			else
 			{
 				m_data[0] = 0xff; // show an error
-				send_data(1, SD_STATE_DATA);
+				send_data(1, SD_STATE_TRAN);
 			}
 			break;
 
 		case 18: // CMD18 - CMD_READ_MULTIPLE_BLOCK
 			if (m_image->exists())
 			{
-				m_data[0] = 0x00; // initial R1 response
-				// data token occurs some time after the R1 response.  A2SD
-				// expects at least 1 byte of space between R1 and the data
-				// packet.
-				m_blknext = get_u32be(&m_cmd[1]);
-				if (m_type == SD_TYPE_V2)
+				if (m_xferblk == m_blksize)
 				{
-					m_blknext /= m_blksize;
+					m_data[0] = 0x00; // initial R1 response
+					// data token occurs some time after the R1 response.  A2SD
+					// expects at least 1 byte of space between R1 and the data
+					// packet.
+					m_blknext = get_u32be(&m_cmd[1]);
+					if (m_type == SD_TYPE_V2)
+					{
+						m_blknext /= m_xferblk;
+					}
+					send_data(1, SD_STATE_DATA_MULTI);
+				}
+				else
+				{
+					// FIXME: support multi-block read when transfer size is smaller than block size
+					m_data[0] = 0x40; // parameter error
+					send_data(1, SD_STATE_TRAN);
 				}
 			}
 			else
 			{
 				m_data[0] = 0xff; // show an error
+				send_data(1, SD_STATE_TRAN);
 			}
-			send_data(1, SD_STATE_DATA_MULTI);
 			break;
 
 		case 24: // CMD24 - WRITE_BLOCK
-			m_data[0] = 0;
-			m_blknext = get_u32be(&m_cmd[1]);
-			if (m_type == SD_TYPE_V2)
+			if (m_xferblk != m_blksize)
 			{
-				m_blknext /= m_blksize;
+				// partial block write not supported
+				LOG("rejecting write of %u bytes that is not a full %u-byte block\n", m_xferblk, m_blksize);
+				m_data[0] = 0x40; // parameter error
+				send_data(1, SD_STATE_TRAN);
 			}
-			send_data(1, SD_STATE_WRITE_WAITFE);
+			else
+			{
+				m_blknext = get_u32be(&m_cmd[1]);
+				if ((m_type == SD_TYPE_V2) && (m_blknext % m_blksize))
+				{
+					// misaligned write not supported
+					LOG("rejecting write of %u bytes at %u that crosses %u-byte block boundary\n", m_xferblk, m_blknext, m_blksize);
+					m_data[0] = 0x40; // parameter error
+					send_data(1, SD_STATE_TRAN);
+				}
+				else
+				{
+					if (m_type == SD_TYPE_V2)
+					{
+						m_blknext /= m_xferblk;
+					}
+					m_data[0] = 0;
+					send_data(1, SD_STATE_WRITE_WAITFE);
+				}
+			}
 			break;
 
 		case 41:
