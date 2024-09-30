@@ -1,18 +1,16 @@
-// license:BSD-3-Clause
-// copyright-holders:Angelo Salese
-/**********************************************************************************************
+// license: BSD-3-Clause
+// copyright-holders: Angelo Salese
+/**************************************************************************************************
 
 M14 Hardware (c) 1979 Irem
-
-driver by Angelo Salese
+アイレム『PTリーチ麻雀』
 
 TODO:
 - Actual discrete sound emulation;
-- Colors might be not 100% accurate (needs screenshots from the real thing);
-- What are the high 4 bits in the colorram for? They are used on the mahjong tiles only,
-  left-over or something more important?
-- I/Os are grossly mapped;
-- ball and paddle drawing are a guesswork;
+- Colors might be not 100% accurate (needs video references);
+- Complete dipswitches;
+- Complete outputs;
+- To start a game needs holding start for a bit too long compared to standard (verify);
 
 Notes:
 - Unlike most Arcade games, if you call a ron but you don't have a legit hand you'll automatically
@@ -20,7 +18,7 @@ Notes:
 - After getting a completed hand, press start 1 + ron + discard at the same time to go back
   into attract mode (!);
 
-==============================================================================================
+===================================================================================================
 x (Mystery Rom)
 (c)1978-1981? Irem?
 PCB No. :M14S-2
@@ -46,13 +44,14 @@ mgpa10.bin
 Dumped by Chackn
 01/30/2000
 
-**********************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "sound/samples.h"
+
 #include "emupal.h"
 #include "screen.h"
-#include "sound/samples.h"
 #include "speaker.h"
 #include "tilemap.h"
 
@@ -62,24 +61,24 @@ namespace {
 class m14_state : public driver_device
 {
 public:
-	m14_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_video_ram(*this, "video_ram"),
-		m_color_ram(*this, "color_ram"),
-		m_samples(*this, "samples")
+	m14_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_video_ram(*this, "video_ram")
+		, m_color_ram(*this, "color_ram")
+		, m_samples(*this, "samples")
 	{ }
 
 	void m14(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
+	ioport_value rng_r();
 
 private:
-	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -88,32 +87,28 @@ private:
 	required_shared_ptr<uint8_t> m_color_ram;
 	required_device<samples_device> m_samples;
 
-	void m14_vram_w(offs_t offset, uint8_t data);
-	void m14_cram_w(offs_t offset, uint8_t data);
-	uint8_t m14_rng_r();
+	void vram_w(offs_t offset, uint8_t data);
+	void cram_w(offs_t offset, uint8_t data);
 	void output_w(uint8_t data);
 	void ball_x_w(uint8_t data);
 	void ball_y_w(uint8_t data);
 	void paddle_x_w(uint8_t data);
 	void sound_w(uint8_t data);
 
-	TILE_GET_INFO_MEMBER(m14_get_tile_info);
-	void draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+
+	void io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+
 	virtual void video_start() override ATTR_COLD;
-	void m14_palette(palette_device &palette) const;
-	uint32_t screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(m14_irq);
+	tilemap_t *m_tilemap = nullptr;
+	TILE_GET_INFO_MEMBER(m14_get_tile_info);
+	void palette_init(palette_device &palette) const;
+	void draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void m14_io_map(address_map &map) ATTR_COLD;
-	void m14_map(address_map &map) ATTR_COLD;
-
-	/* video-related */
-	tilemap_t  *m_m14_tilemap = nullptr;
-
-	/* input-related */
-	//uint8_t m_hop_mux;
 	uint8_t m_ballx = 0, m_bally = 0;
 	uint8_t m_paddlex = 0;
 };
@@ -125,9 +120,10 @@ private:
  *
  *************************************/
 
-void m14_state::m14_palette(palette_device &palette) const
+void m14_state::palette_init(palette_device &palette) const
 {
-	const rgb_t green_pen = rgb_t(pal1bit(0), pal1bit(1), pal1bit(0));
+	// TODO: background color is unconfirmed
+	const rgb_t green_pen = rgb_t(pal1bit(0), pal3bit(3), pal1bit(0));
 
 	for (int i = 0; i < 0x20; i++)
 	{
@@ -143,72 +139,62 @@ void m14_state::m14_palette(palette_device &palette) const
 
 TILE_GET_INFO_MEMBER(m14_state::m14_get_tile_info)
 {
-	int code = m_video_ram[tile_index];
-	int color = m_color_ram[tile_index] & 0x0f;
+	u8 code = m_video_ram[tile_index];
+	// TODO: colorram & 0xf0 used on tiles (background pen select?)
+	u8 color = m_color_ram[tile_index] & 0x0f;
 
-	/* colorram & 0xf0 used but unknown purpose*/
-
-	tileinfo.set(0,
-			code,
-			color,
-			0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void m14_state::video_start()
 {
-	m_m14_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m14_state::m14_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m14_state::m14_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 void m14_state::draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//const rgb_t white_pen =  rgb_t::white();
-	const uint8_t white_pen = 0x1f;
+	const u8 white_pen = 0x1f;
 	const int xoffs = -8; // matches left-right wall bounces
 	const int p_ybase = 184; // matches ball bounce to paddle
 
-	// draw ball
-	for(int xi=0;xi<4;xi++)
-		for(int yi=0;yi<4;yi++)
-		{
-			const int resx = flip_screen() ?  32*8-(m_ballx+xi+xoffs) : m_ballx+xi+xoffs;
-			const int resy = flip_screen() ?  28*8-(m_bally+yi) :       m_bally+yi;
+	rectangle ball_clip;
+	ball_clip.min_x = flip_screen() ? 32 * 8 - (m_ballx + xoffs) : m_ballx + xoffs;
+	ball_clip.max_x = ball_clip.min_x + 4;
+	ball_clip.min_y = flip_screen() ? 28 * 8 - (m_bally) : m_bally;
+	ball_clip.max_y = ball_clip.min_y + 4;
+	ball_clip &= cliprect;
+	bitmap.fill(white_pen, ball_clip);
 
-			if(cliprect.contains(resx,resy))
-				bitmap.pix(resy, resx) = m_palette->pen(white_pen);
-		}
-
-	// draw paddle
-	for(int xi=0;xi<16;xi++)
-		for(int yi=0;yi<4;yi++)
-		{
-			const int resx = flip_screen() ? 32*8-(m_paddlex+xi+xoffs) : (m_paddlex+xi+xoffs);
-			const int resy = flip_screen() ? 28*8-(p_ybase+yi) :         p_ybase+yi;
-
-			if(cliprect.contains(resx,resy))
-				bitmap.pix(resy, resx) = m_palette->pen(white_pen);
-		}
+	rectangle paddle_clip;
+	paddle_clip.min_x = flip_screen() ? 32 * 8 - (m_paddlex + xoffs) : m_paddlex + xoffs;
+	paddle_clip.max_x = paddle_clip.min_x + 12;
+	paddle_clip.min_y = flip_screen() ? 28 * 8 - (p_ybase) : p_ybase;
+	paddle_clip.max_y = paddle_clip.min_y + 4;
+	paddle_clip &= cliprect;
+	bitmap.fill(white_pen, paddle_clip);
 }
 
 
-uint32_t m14_state::screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m14_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_m14_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_ball_and_paddle(bitmap,cliprect);
 
 	return 0;
 }
 
 
-void m14_state::m14_vram_w(offs_t offset, uint8_t data)
+void m14_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[offset] = data;
-	m_m14_tilemap->mark_tile_dirty(offset);
+	m_tilemap->mark_tile_dirty(offset);
 }
 
-void m14_state::m14_cram_w(offs_t offset, uint8_t data)
+void m14_state::cram_w(offs_t offset, uint8_t data)
 {
 	m_color_ram[offset] = data;
-	m_m14_tilemap->mark_tile_dirty(offset);
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 /*************************************
@@ -216,13 +202,6 @@ void m14_state::m14_cram_w(offs_t offset, uint8_t data)
  *  I/O
  *
  *************************************/
-
-uint8_t m14_state::m14_rng_r()
-{
-	/* graphic artifacts happens if this doesn't return random values. */
-	/* guess directly tied to screen frame number */
-	return (m_screen->frame_number() & 0x7f) | (ioport("IN1")->read() & 0x80);
-}
 
 void m14_state::output_w(uint8_t data)
 {
@@ -298,20 +277,20 @@ void m14_state::sound_w(uint8_t data)
  *
  *************************************/
 
-void m14_state::m14_map(address_map &map)
+void m14_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0xe000, 0xe3ff).ram().w(FUNC(m14_state::m14_vram_w)).share("video_ram");
-	map(0xe400, 0xe7ff).ram().w(FUNC(m14_state::m14_cram_w)).share("color_ram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(m14_state::vram_w)).share("video_ram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(m14_state::cram_w)).share("color_ram");
 }
 
-void m14_state::m14_io_map(address_map &map)
+void m14_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0xf8, 0xf8).portr("AN_PADDLE").w(FUNC(m14_state::ball_x_w));
 	map(0xf9, 0xf9).portr("IN0").w(FUNC(m14_state::ball_y_w));
-	map(0xfa, 0xfa).r(FUNC(m14_state::m14_rng_r)).w(FUNC(m14_state::paddle_x_w));
+	map(0xfa, 0xfa).portr("IN1").w(FUNC(m14_state::paddle_x_w));
 	map(0xfb, 0xfb).portr("DSW").w(FUNC(m14_state::output_w));
 	map(0xfc, 0xfc).w(FUNC(m14_state::sound_w));
 }
@@ -322,18 +301,27 @@ void m14_state::m14_io_map(address_map &map)
  *
  *************************************/
 
+// Coin A insertion causes a rst6.5 (vector 0x34)
 INPUT_CHANGED_MEMBER(m14_state::left_coin_inserted)
 {
-	/* left coin insertion causes a rst6.5 (vector 0x34) */
 	if (newval)
 		m_maincpu->set_input_line(I8085_RST65_LINE, HOLD_LINE);
 }
 
+// Coin B insertion causes a rst5.5 (vector 0x2c)
 INPUT_CHANGED_MEMBER(m14_state::right_coin_inserted)
 {
-	/* right coin insertion causes a rst5.5 (vector 0x2c) */
 	if (newval)
 		m_maincpu->set_input_line(I8085_RST55_LINE, HOLD_LINE);
+}
+
+/*
+ * graphic artifacts happens if this doesn't return random values.
+ * guess directly tied to screen frame number
+ */
+ioport_value m14_state::rng_r()
+{
+	return m_screen->frame_number() & 0x7f;
 }
 
 static INPUT_PORTS_START( m14 )
@@ -343,6 +331,8 @@ static INPUT_PORTS_START( m14 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Fire / Discard")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Ron")
+	// Coinage displays as "yen amount" | "number of tokens" | "number of turns"
+	// cfr. flyer
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x04, u8"Coin A 5\u30de\u30a4 Coin B 1\u30de\u30a4" )
 	PORT_DIPSETTING(    0x00, u8"Coin A & B 1\u30de\u30a4" )
@@ -359,6 +349,7 @@ static INPUT_PORTS_START( m14 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN1")
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(m14_state, rng_r)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Reach")
 
 	PORT_START("DSW") // this whole port is stored at work ram $2112.
@@ -388,15 +379,15 @@ static INPUT_PORTS_START( m14 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, m14_state,left_coin_inserted, 0) //coin x 5
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, m14_state,right_coin_inserted, 0) //coin x 1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, m14_state,left_coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, m14_state,right_coin_inserted, 0)
 INPUT_PORTS_END
 
 static GFXDECODE_START( gfx_m14 )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,     0, 0x10 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(m14_state::m14_irq)
+INTERRUPT_GEN_MEMBER(m14_state::vblank_irq)
 {
 	device.execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
@@ -418,25 +409,22 @@ void m14_state::machine_reset()
 
 void m14_state::m14(machine_config &config)
 {
-	/* basic machine hardware */
 	I8085A(config, m_maincpu, 6000000); //guess: 6 Mhz internally divided by 2
-	m_maincpu->set_addrmap(AS_PROGRAM, &m14_state::m14_map);
-	m_maincpu->set_addrmap(AS_IO, &m14_state::m14_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(m14_state::m14_irq));
+	m_maincpu->set_addrmap(AS_PROGRAM, &m14_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &m14_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(m14_state::vblank_irq));
 
-	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); //not accurate
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
-	m_screen->set_screen_update(FUNC(m14_state::screen_update_m14));
+	m_screen->set_screen_update(FUNC(m14_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m14);
-	PALETTE(config, m_palette, FUNC(m14_state::m14_palette), 0x20);
+	PALETTE(config, m_palette, FUNC(m14_state::palette_init), 0x20);
 
-	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(5);
@@ -474,4 +462,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1979, ptrmj, 0, m14, m14, m14_state, empty_init, ROT0, "Irem", "PT Reach Mahjong (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // was already Irem according to the official flyer
+GAME( 1979, ptrmj, 0, m14, m14, m14_state, empty_init, ROT0, "Irem", "PT Reach Mahjong (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // was already Irem according to the official flyer
