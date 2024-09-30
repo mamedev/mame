@@ -390,7 +390,9 @@ void cadr_cpu_device::alu_operation(u32 &res, u32 &carry_out)
 		case 0x00: // mult step
 			LOGMASKED(LOG_TRACE, "mult-step, a=0x%x(%o), m=0x%x(%o), q=%08x\n", m_a, m_a, m_m, m_m, m_q);
 			if (BIT(m_q, 0))
+			{
 				add32(m_a, m_m, BIT(m_op, 2), res, carry_out);
+			}
 			else
 			{
 				LOGMASKED(LOG_TRACE, "mult-step else m=%x\n", m_m);
@@ -410,9 +412,7 @@ void cadr_cpu_device::alu_operation(u32 &res, u32 &carry_out)
 			break;
 		case 0x05: // remainder correction
 			if (BIT(m_q, 0))
-			{
 				res = m_m;
-			}
 			else
 				add32(m_a, m_m, BIT(m_op, 2), res, carry_out);
 			break;

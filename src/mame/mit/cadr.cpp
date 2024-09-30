@@ -10,7 +10,8 @@ TODO:
 - There single disk configuration using 1 disk controller board and multiple
   disks by using a configuration with 2 disk controller boards. The actual
   differences are not described.
-- Xbus irq status is not set/reset in interrupt status.
+- Input and execution on system 300 is a bit unreliable and can someimtes cause
+  the emulated system to hang.
 
 **********************************************************************************/
 #include "emu.h"
@@ -97,13 +98,15 @@ void cadr_state::mem_map(address_map &map)
 	map(0x000000, 0x1fffff).ram(); // 128KB - ~4MB
 
 	// Xbus I/O
+	//
+	// Devices mentioned in documentation:
 	// 17000000 - 17077777 / 3c0000 - 3c7fff - main tv screen
 	// 17100000 - 17107777 / 3c8000 - 3c8fff - convolution box
 	// 17110000 - 17110017 / 3c9000 - 3c900f - scheme chip interface
 	// 17140000 - 17177777 / 3cc000 - 3cffff - audio i/o memory
 	// 17200000 - 17277777 / 3d0000 - 3d7fff - color tv
-	// 17377500 - 17377537 / 3dff40 - 3dff5f - grey tv (and frame grabber)
-	// 17377600 - 17377677 / 3dff80 - 3dffbf  - vision hardware control
+	// 17377500 - 17377537 / 3dff40 - 3dff5f - grayscale tv (and frame grabber)
+	// 17377600 - 17377677 / 3dff80 - 3dffbf - vision hardware control
 	// 17377740 - 17377747 / 3dffe0 - 3dffe7 - audio i/o control
 	// 17377750 - 17377757 / 3dffe8 - 3dffef - color tv control
 	// 17377760 - 17377767 / 3dfff0 - 3dfff7 - main tv control
@@ -262,4 +265,4 @@ ROM_END
 
 } // anonymous namespace
 
-COMP(1976, cadr, 0, 0, cadr, cadr, cadr_state, empty_init, "MIT", "CADR", MACHINE_NOT_WORKING)
+COMP(1978, cadr, 0, 0, cadr, cadr, cadr_state, empty_init, "MIT", "CADR", MACHINE_NOT_WORKING)

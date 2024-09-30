@@ -24,6 +24,7 @@ TODO:
 
 
 //#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 
@@ -258,6 +259,11 @@ void cadr_disk_device::start_w(u32 data)
 			m_cyl = sector / info.heads;
 			m_status |= 1;
 			m_disk_timer->adjust(attotime::from_msec(6));
+		}
+		else
+		{
+			m_status |= 0x8200; // The timeout bit is checked for a unit that is not present?
+			m_status |= 1;
 		}
 		break;
 

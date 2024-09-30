@@ -39,6 +39,38 @@ private:
 	static constexpr u16 IRQ_VECTOR_CHAOSNET = 0xb8;
 	static constexpr u16 IRQ_VECTOR_CLOCK = 0xbc;
 
+	static constexpr int CSR_REMOTE_MOUSE_ENABLE_BIT = 0;
+	static constexpr int CSR_MOUSE_IRQ_ENABLE_BIT = 1;
+	static constexpr int CSR_KEYBOARD_IRQ_ENABLE_BIT = 2;
+	static constexpr int CSR_CLOCK_IRQ_ENABLE_BIT = 3;
+	static constexpr int CSR_MOUSE_READY_BIT = 4;
+	static constexpr u16 CSR_MOUSE_READY = 1 << CSR_MOUSE_READY_BIT;
+	static constexpr int CSR_KEYBOARD_READY_BIT = 5;
+	static constexpr u16 CSR_KEYBOARD_READY = 1 << CSR_KEYBOARD_READY_BIT;
+	static constexpr int CSR_CLOCK_READY_BIT = 6;
+	static constexpr u16 CSR_CLOCK_READY = 1 << CSR_CLOCK_READY_BIT;
+
+	static constexpr int CHAOSNET_TIMER_IRQ_ENABLE_BIT = 0;
+	static constexpr u16 CHAOSNET_TIMER_IRQ_ENABLE = 1 << CHAOSNET_TIMER_IRQ_ENABLE_BIT;
+	static constexpr int CHAOSNET_LOOPBACK_BIT = 1;
+	static constexpr u16 CHAOSNET_LOOKBACK = 1 << CHAOSNET_LOOPBACK_BIT;
+	static constexpr int CHAOSNET_ANY_DESTINATION_BIT = 2;
+	static constexpr u16 CHAOSNET_ANY_DESTINATION = 1 << CHAOSNET_ANY_DESTINATION_BIT;
+	static constexpr int CHAOSNET_RESET_RECEIVE_BIT = 3;
+	static constexpr int CHAOSNET_RECEIVE_IRQ_ENABLE_BIT = 4;
+	static constexpr u16 CHAOSNET_RECEIVE_IRQ_ENABLE = 1 << CHAOSNET_RECEIVE_IRQ_ENABLE_BIT;
+	static constexpr int CHAOSNET_TRANSMIT_IRQ_ENABLE_BIT = 5;
+	static constexpr u16 CHAOSNET_TRANSMIT_IRQ_ENABLE = 1 << CHAOSNET_TRANSMIT_IRQ_ENABLE_BIT;
+	static constexpr int CHAOSNET_TRANSMIT_ABORTED_BIT = 6;
+	static constexpr u16 CHAOSNET_TRANSMIT_ABORTED = 1 << CHAOSNET_TRANSMIT_ABORTED_BIT;
+	static constexpr int CHAOSNET_TRANSMIT_DONE_BIT = 7;
+	static constexpr u16 CHAOSNET_TRANSMIT_DONE = 1 << CHAOSNET_TRANSMIT_DONE_BIT;
+	static constexpr int CHAOSNET_RESET_TRANSMIT_BIT = 8;
+	static constexpr u16 CHAOSNET_LOST_COUNT = 0x1e00;
+	static constexpr int CHAOSNET_RESET_BIT = 13;
+	static constexpr int CHAOSNET_RECEIVE_DONE_BIT = 15;
+	static constexpr u16 CHAOSNET_RECEIVE_DONE = 1 << CHAOSNET_RECEIVE_DONE_BIT;
+
 	u8 mcu_bus_r();
 	void mcu_bus_w(u8 data);
 	void mcu_p1_w(u8 data);
@@ -60,6 +92,9 @@ private:
 	u8 m_speaker_data;
 	u32 m_microsecond_clock_buffer;
 	u16 m_clock;
+	u16 m_chaos_csr;
+	u16 m_chaos_transmit;
+	u16 m_chaos_receive;
 };
 
 #endif // MAME_MIT_CADR_IOB_H

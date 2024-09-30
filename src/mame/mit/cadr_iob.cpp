@@ -8,7 +8,7 @@ The I/O Board makes the keyboard, mouse, and chaosnet available on the Unibus.
 
 TODO:
 - Chaosnet
-- Generak purpose I/O
+- General purpose I/O
 - Serial I/O
 - Where is the REPEAT key mapped? And how should it be used?
 - Caps lock is not working
@@ -257,6 +257,9 @@ void cadr_iob_device::device_start()
 	save_item(NAME(m_speaker_data));
 	save_item(NAME(m_microsecond_clock_buffer));
 	save_item(NAME(m_clock));
+	save_item(NAME(m_chaos_csr));
+	save_item(NAME(m_chaos_transmit));
+	save_item(NAME(m_chaos_receive));
 
 	m_clock_timer = timer_alloc(FUNC(cadr_iob_device::clock_callback), this);
 }
@@ -264,8 +267,8 @@ void cadr_iob_device::device_start()
 
 TIMER_CALLBACK_MEMBER(cadr_iob_device::clock_callback)
 {
-	m_csr |= 0x40;
-	if (BIT(m_csr, 3))
+	m_csr |= CSR_CLOCK_READY;
+	if (BIT(m_csr, CSR_CLOCK_IRQ_ENABLE_BIT))
 		m_irq_vector_cb(IRQ_VECTOR_CLOCK);
 }
 
@@ -277,6 +280,9 @@ void cadr_iob_device::device_reset()
 	m_csr = 0;
 	m_microsecond_clock_buffer = 0;
 	m_clock = 0;
+	m_chaos_csr = CHAOSNET_TRANSMIT_DONE;
+	m_chaos_transmit = 0;
+	m_chaos_receive = 0;
 	m_speaker_data = 0;
 	m_speaker->level_w(m_speaker_data);
 }
@@ -294,13 +300,52 @@ void cadr_iob_device::write(offs_t offset, u16 data)
 		m_csr = (m_csr & 0xf0) | (data & 0x0f);
 		break;
 	case 0x0a:
-		m_csr &= ~0x40;
+		m_csr &= ~CSR_CLOCK_READY;
 		m_clock = data;
 		m_clock_timer->adjust(attotime::from_msec(m_clock << 4));
 		break;
 	case 0x0b: // general purpose i/o
 		break;
+	case 0x10: // chaosnet csr
+		// --x----- -------- Reset receiver, transmitter and interrupt
+		// -------x -------- Clear transmitter
+		// -------- --x----- Transmit interrupt enable
+		// -------- ---x---- Receive interrupt enable
+		// -------- ----x--- Clear receiver
+		// -------- -----x-- Match any destination
+		// -------- ------x- Loopback
+		// -------- -------x Timer interrupt enable (not implemented)
+		{
+			const u16 bits_to_store = CHAOSNET_RECEIVE_IRQ_ENABLE | CHAOSNET_TRANSMIT_IRQ_ENABLE |
+				CHAOSNET_ANY_DESTINATION | CHAOSNET_LOOKBACK | CHAOSNET_TIMER_IRQ_ENABLE;
+			m_chaos_csr = (m_chaos_csr & ~bits_to_store) | (data & bits_to_store);
+		}
+		if (BIT(data, CHAOSNET_RESET_RECEIVE_BIT))
+		{
+			// TODO Clear and enable receiver
+			m_chaos_csr = (m_chaos_csr & ~CHAOSNET_RECEIVE_DONE);
+			// Clear lost count
+			m_chaos_csr = (m_chaos_csr & ~CHAOSNET_LOST_COUNT);
+		}
+		if (BIT(data, CHAOSNET_TRANSMIT_IRQ_ENABLE_BIT))
+			m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
+		if (BIT(data, CHAOSNET_RESET_TRANSMIT_BIT))
+		{
+			// TODO Reset the transmitter
+			m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
+		}
+		if (BIT(data, CHAOSNET_RESET_BIT))
+		{
+			// TODO Stop transmitter
+			// TODO Clear and enable receiver
+			m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
+			// Clear interrupt enables and receive done
+			m_chaos_csr = m_chaos_csr & ~(CHAOSNET_RECEIVE_DONE | CHAOSNET_RECEIVE_IRQ_ENABLE | CHAOSNET_TRANSMIT_IRQ_ENABLE);
+		}
+		break;
 	case 0x12: // store word in transmit buffer
+		m_chaos_transmit = data;
+		m_chaos_csr &= ~CHAOSNET_TRANSMIT_DONE;
 		break;
 	default:
 		break;
@@ -313,7 +358,7 @@ u16 cadr_iob_device::read(offs_t offset)
 	switch (offset)
 	{
 	case 0x00: // keyboard low
-		m_csr &= ~0x20;
+		m_csr &= ~CSR_KEYBOARD_READY;
 		return m_keyboard_data & 0xffff;
 	case 0x01: // keyboard high
 		return m_keyboard_data >> 16;
@@ -323,7 +368,7 @@ u16 cadr_iob_device::read(offs_t offset)
 		// --x----- -------- - middle switch
 		// ---x---- -------- - tail switch
 		// ----xxxx xxxxxxxx - Y position of the mouse
-		m_csr &= ~0x10;
+		m_csr &= ~CSR_MOUSE_READY;
 		return ((m_mouse_buttons->read() & 0x07) << 12) | (m_mouse_y->read() & 0xfff);
 	case 0x03: // mouse x
 		// xx------ -------- - raw Y encoder inputs
@@ -346,17 +391,28 @@ u16 cadr_iob_device::read(offs_t offset)
 	case 0x0b: // general purpose i/o
 		break;
 	case 0x10: // chaos net csr 764140
-		// Bits 4 and 3 checked
-		break;
+		// x------- -------- Receive done
+		// -x------ -------- CRC error
+		// ---xxxx- -------- Lost count
+		// -------- x------- Transmit done
+		// -------- -x------ Transmit aborted
+		// -------- --x----- Transmit interrupt enable
+		// -------- ---x---- Receive interrupt enable
+		// -------- -----x-- Match any destination
+		// -------- ------x- Loopback
+		// -------- -------x Timer interrupt enable (not implemented)
+		return m_chaos_csr & ~CHAOSNET_TRANSMIT_DONE; // sys300 does not boot if transmit done stays enabled
 	case 0x11: // chaos net my address
 		// TODO: Address is configured using dip switches
 		return 0x101;
 	case 0x12: // next word from receive buffer
-		break;
+		return m_chaos_receive;
 	case 0x13: // count of bits remaining in the receive buffer
 		break;
 	case 0x15: // host number of this interface
-		break;
+		// TODO Start transmission
+		m_chaos_csr &= ~CHAOSNET_TRANSMIT_DONE;
+		return 0x101;
 	}
 	return 0;
 }
@@ -365,14 +421,14 @@ u16 cadr_iob_device::read(offs_t offset)
 INPUT_CHANGED_MEMBER(cadr_iob_device::mouse_changed)
 {
 	m_csr |= 0x10;
-	if (BIT(m_csr, 1))
+	if (BIT(m_csr, CSR_MOUSE_IRQ_ENABLE_BIT))
 		m_irq_vector_cb(IRQ_VECTOR_MOUSE);
 }
 
 
 u8 cadr_iob_device::mcu_bus_r()
 {
-	// bit 0 is checked by mcu
+	// bit 0 is checked by mcu (data/clock?)
 	return 0xff;
 }
 
@@ -387,8 +443,8 @@ void cadr_iob_device::mcu_bus_w(u8 data)
 	case 0x40:
 		m_bus = (m_bus & 0xffffff00) | data;
 		m_keyboard_data = m_bus >> 1;
-		m_csr |= 0x20;
-		if (BIT(m_csr, 2))
+		m_csr |= CSR_KEYBOARD_READY;
+		if (BIT(m_csr, CSR_KEYBOARD_IRQ_ENABLE_BIT))
 			m_irq_vector_cb(IRQ_VECTOR_KEYBOARD);
 		break;
 	case 0x60:

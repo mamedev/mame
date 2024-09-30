@@ -5,10 +5,23 @@ license:CC0-1.0
 -->
 <softwarelist name="cadr" description="MIT CADR hard disk images">
 
-	<software name="sys100">
-		<description>System 100.0</description>
+	<software name="sys78" supported="no">
+		<description>System 78.48</description>
 		<year>19??</year>
 		<publisher>MIT</publisher>
+		<notes>Hangs after entering date and time</notes>
+		<part name="hdd" interface="hdd">
+			<diskarea name="harddriv">
+				<disk name="sys78" sha1="8dd933b7a26dd13d01e1fe9573224d21778cf26f" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sys100" supported="no">
+		<description>System 100.0</description>
+		<year>202?</year>
+		<publisher>MIT</publisher>
+		<notes>Network/Chaosnet is not implemented.</notes>
 		<part name="hdd" interface="hdd">
 			<diskarea name="harddriv">
 				<disk name="sys100" sha1="e9e3efeaa3bf40456570c1b3a010123b2878280d" writeable="yes"/>
@@ -16,14 +29,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sys300">
+	<software name="sys300" supported="no">
 		<description>System 300.0</description>
-		<year>19??</year>
+		<year>2023</year>
 		<publisher>MIT</publisher>
+		<notes>Network/Chaosnet is not emulated. The system can sometimes become unresponsive.</notes>
 		<part name="hdd" interface="hdd">
 			<diskarea name="harddriv">
 				<disk name="sys300" sha1="aaa5fe8572c0ad8bfb234c0940b347eb3d872205" writeable="yes"/>
 			</diskarea>
 		</part>
 	</software>
+
 </softwarelist>
