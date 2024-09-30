@@ -12,8 +12,8 @@
 #pragma once
 
 #include "sound/samples.h"
-#include "screen.h"
 
+// forward declarations
 class floppy_image;
 class floppy_image_format_t;
 

@@ -22,6 +22,7 @@ Research Machines RM 380Z
 #include "video/sn74s262.h"
 
 #include "emupal.h"
+#include "screen.h"
 
 //
 //
