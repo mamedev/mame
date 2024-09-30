@@ -776,8 +776,10 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 	// TODO: check on real HW
 	static const int ysizes_table[16] = {
 		1, 2, 3, 4, 5, 6, 7, 8, 9,
-		// 0x9: speedyd intro dash frame
-		11,
+		// 0x9: speedyd intro dash frame, speedyd bonus stages, boomzoo intro
+		// 11 would be more logical for former, except it will break latter and
+		// is confirmed to "cut" feet anyway.
+		10,
 		// 0xa: A'Can logo
 		12,
 		// 0xb/0xc: jttlaugh stage 1-3 (particularly on the web scrolling jump platforms)
@@ -819,7 +821,7 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 		if (y >= 0x180) y -= 0x200;
 		if (x >= 0x180) x -= 0x200;
 
-		if ((vram[i + 0] & 0x4000))
+		if ((vram[i + 0] & 0x4000) && sprite_ptr)
 		{
 			int xsize = 1 << (vram[i + 1] & 7);
 			int ysize = ysizes_table[(vram[i + 0] & 0x1e00) >> 9];
@@ -853,6 +855,10 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 					for (int xtile = 0; xtile < xsize; xtile++)
 					{
 						uint16_t data = vram[((sprite_ptr << 1) + ytile * xsize + xtile) & VRAM_MASK];
+						// magipool will draw garbage during gameplay if we don't skip empty entries.
+						// NOTE: sets up both main table pointer and sub entries
+						if (data == 0)
+							continue;
 						int tile = (bank * bank_size) + (data & 0x03ff);
 						int palette = (data & 0xf000) >> 12;
 
