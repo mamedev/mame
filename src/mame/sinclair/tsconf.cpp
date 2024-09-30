@@ -294,6 +294,7 @@ void tsconf_state::tsconf(machine_config &config)
 
 	BETA_DISK(config, m_beta, 0);
 	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(tsconf_state::tsconf_spi_miso_w));
 
 	SPEAKER(config, "lspeaker").front_left();

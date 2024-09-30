@@ -105,7 +105,7 @@ private:
 	required_device<address_map_bank_device> m_regs_map;
 	required_device<device_palette_interface> m_palette;
 	required_device<screen_ula_plus_device> m_ula;
-	required_device<spi_sdcard_sdhc_device> m_sdcard;
+	required_device<spi_sdcard_device> m_sdcard;
 	required_ioport_array<8> m_io_line;
 	required_ioport_array<3> m_io_mouse;
 	required_device_array<ay8912_device, 2> m_ay;
@@ -921,6 +921,7 @@ void chloe_state::chloe(machine_config &config)
 	*/
 
 	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(chloe_state::spi_miso_w));
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_chloe);

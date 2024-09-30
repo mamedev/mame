@@ -12,13 +12,64 @@
 #include "emu.h"
 #include "mastersd.h"
 
+#include "machine/spi_sdcard.h"
+
+
+namespace {
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(BBC_MASTERSD, bbc_mastersd_device, "bbc_mastersd", "MasterSD BBC Master SD Cartridge")
-DEFINE_DEVICE_TYPE(BBC_MASTERSDR2, bbc_mastersdr2_device, "bbc_mastersdr2", "MasterSD R2 BBC Master SD Cartridge")
+// ======================> bbc_mastersd_device
+
+class bbc_mastersd_device : public device_t, public device_bbc_cart_interface
+{
+public:
+	// construction/destruction
+	bbc_mastersd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	bbc_mastersd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	// device_bbc_cart_interface implementation
+	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;
+	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) override;
+
+	TIMER_CALLBACK_MEMBER(spi_clock);
+
+	required_device<spi_sdcard_device> m_sdcard;
+
+	emu_timer *m_spi_clock;
+	bool m_spi_clock_state;
+	bool m_spi_clock_sysclk;
+	int m_spi_clock_cycles;
+	int m_in_bit;
+	uint8_t m_in_latch;
+	uint8_t m_out_latch;
+
+	std::unique_ptr<uint8_t[]> m_ram;
+};
+
+
+// ======================> bbc_mastersdr2_device
+
+class bbc_mastersdr2_device : public bbc_mastersd_device
+{
+public:
+	// construction/destruction
+	bbc_mastersdr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_bbc_cart_interface implementation
+	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;
+	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) override;
+};
 
 
 //-------------------------------------------------
@@ -28,6 +79,7 @@ DEFINE_DEVICE_TYPE(BBC_MASTERSDR2, bbc_mastersdr2_device, "bbc_mastersdr2", "Mas
 void bbc_mastersd_device::device_add_mconfig(machine_config &config)
 {
 	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set([this](int state) { m_in_bit = state; });
 }
 
@@ -245,3 +297,13 @@ TIMER_CALLBACK_MEMBER(bbc_mastersd_device::spi_clock)
 		m_spi_clock->adjust(attotime::never);
 	}
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_MASTERSD, device_bbc_cart_interface, bbc_mastersd_device, "bbc_mastersd", "MasterSD BBC Master SD Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_MASTERSDR2, device_bbc_cart_interface, bbc_mastersdr2_device, "bbc_mastersdr2", "MasterSD R2 BBC Master SD Cartridge")

@@ -106,7 +106,7 @@ protected:
 	memory_bank_creator m_bank_ram;
 	memory_view m_view;
 	required_device_array<dac_word_interface, 2> m_dac;
-	required_device<spi_sdcard_sdhc_device> m_sdcard;
+	required_device<spi_sdcard_device> m_sdcard;
 	output_finder<> m_neogs_led;
 
 private:
@@ -411,6 +411,7 @@ void neogs_device::device_add_mconfig(machine_config &config)
 	m_maincpu->irqack_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0, CLEAR_LINE);
 
 	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set([this](int state) { m_spi_data_in_latch <<= 1; m_spi_data_in_latch |= state; });
 
 	SPEAKER(config, "lspeaker").front_left();

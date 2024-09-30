@@ -4573,6 +4573,17 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/spi_psram.h,MACHINES["SPIPSRAM"] = true
+---------------------------------------------------
+if (MACHINES["SPIPSRAM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/spi_psram.cpp",
+		MAME_DIR .. "src/devices/machine/spi_psram.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/spi_sdcard.h,MACHINES["SPISDCARD"] = true
 ---------------------------------------------------
 if (MACHINES["SPISDCARD"]~=null) then

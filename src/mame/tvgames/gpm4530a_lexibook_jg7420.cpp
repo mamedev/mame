@@ -33,7 +33,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<spi_sdcard_sdhc_device> m_sdcard;
+	required_device<spi_sdcard_device> m_sdcard;
 
 	uint32_t screen_update_gpm4530a_lexibook(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -74,6 +74,7 @@ void gpm4530a_lexibook_state::gpm4530a_lexibook(machine_config &config)
 	m_screen->set_screen_update(FUNC(gpm4530a_lexibook_state::screen_update_gpm4530a_lexibook));
 
 	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

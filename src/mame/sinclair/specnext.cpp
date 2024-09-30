@@ -296,7 +296,7 @@ private:
 	required_device<specnext_ctc_device> m_ctc;
 	required_device<specnext_dma_device> m_dma;
 	required_device<i2cmem_device> m_i2cmem;
-	required_device<spi_sdcard_sdhc_device> m_sdcard;
+	required_device<spi_sdcard_device> m_sdcard;
 	required_device_array<ym2149_device, 3> m_ay;
 	required_device_array<dac_byte_interface, 4> m_dac;
 	required_device<device_palette_interface> m_palette;
@@ -3467,6 +3467,7 @@ void specnext_state::tbblue(machine_config &config)
 	I2C_24C01(config, m_i2cmem).set_address(0xd0); // RTC + DEFAULT_ALL_0; confitm size
 
 	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(specnext_state::spi_miso_w));
 
 	SPEAKER(config, "lspeaker").front_left();

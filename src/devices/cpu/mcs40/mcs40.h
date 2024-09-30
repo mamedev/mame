@@ -254,6 +254,7 @@ public:
 	template <unsigned N> auto cm_ram_cb() { return mcs40_cpu_device_base::cm_ram_cb<N>(); }
 
 	i4004_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	virtual ~i4004_cpu_device();
 
 protected:
 	using mcs40_cpu_device_base::mcs40_cpu_device_base;
@@ -282,6 +283,7 @@ public:
 	using mcs40_cpu_device_base::stp_ack_cb;
 
 	i4040_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	virtual ~i4040_cpu_device();
 
 protected:
 	// device_disasm_interface implementation
