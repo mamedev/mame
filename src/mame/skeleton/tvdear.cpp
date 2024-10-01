@@ -42,7 +42,7 @@ void tvdear_state::tvdear(machine_config &config)
 
 ROM_START(tvdear)
 	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD("d23c160000.u5", 0x00000, 0x200000, CRC(9bb22f7d) SHA1(a9b623e04a9b75d2624201d91d3a57248ae8e268) )
+	ROM_LOAD("d23c160000.u5", 0x00000, 0x200000, CRC(41ec9890) SHA1(20cfdfec7eeb39a9ce971f23fdc97b42a5d68301) )
 
 	ROM_REGION(0x20000, "cart", 0) // TODO: move this to a software list
 	ROM_LOAD("lc371100.u15", 0x00000, 0x20000, CRC(f70696d1) SHA1(21da45720a48e18fd6173f2482bd7db4988d1548) )
