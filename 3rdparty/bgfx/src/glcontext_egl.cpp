@@ -15,6 +15,10 @@
 #			include <bcm_host.h>
 #		endif // BX_PLATFORM_RPI
 
+#if defined(WL_EGL_PLATFORM)
+#	include <wayland-egl.h>
+#endif
+
 namespace bgfx { namespace gl
 {
 #ifndef EGL_CONTEXT_FLAG_NO_ERROR_BIT_KHR
@@ -316,6 +320,14 @@ EGL_IMPORT
 			vc_dispmanx_update_submit_sync(dispmanUpdate);
 #	endif // BX_PLATFORM_ANDROID
 
+#	if BX_PLATFORM_LINUX && defined(WL_EGL_PLATFORM)
+			if (g_platformData.type == NativeWindowHandleType::Wayland) {
+				// A wl_surface needs to be first wrapped in a wl_egl_window
+				// before it can be used to create the EGLSurface.
+				m_egl_window = wl_egl_window_create((wl_surface*)nwh, _width, _height);
+				nwh = m_egl_window;
+			}
+#	endif
 			if (headless)
 			{
 				EGLint pbAttribs[] =
@@ -417,6 +429,11 @@ EGL_IMPORT
 			eglMakeCurrent(m_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 			eglDestroyContext(m_display, m_context);
 			eglDestroySurface(m_display, m_surface);
+#	if BX_PLATFORM_LINUX && defined(WL_EGL_PLATFORM)
+			if (m_egl_window) {
+				wl_egl_window_destroy(m_egl_window);
+			}
+#	endif
 			eglTerminate(m_display);
 			m_context = NULL;
 		}
@@ -447,6 +464,10 @@ EGL_IMPORT
 		}
 #	elif BX_PLATFORM_EMSCRIPTEN
 		EMSCRIPTEN_CHECK(emscripten_set_canvas_element_size(HTML5_TARGET_CANVAS_SELECTOR, _width, _height) );
+#	elif BX_PLATFORM_LINUX && defined(WL_EGL_PLATFORM)
+		if (NULL != m_egl_window) {
+			wl_egl_window_resize(m_egl_window, _width, _height, 0, 0);
+		}
 #	else
 		BX_UNUSED(_width, _height);
 #	endif // BX_PLATFORM_*
