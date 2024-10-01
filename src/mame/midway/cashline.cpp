@@ -112,6 +112,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/msm6242.h"
+#include "machine/mc68681.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 
@@ -156,7 +157,10 @@ void cashline_state::cashline( machine_config &config )
 
 	// Sound hardware
 	SPEAKER( config, "mono" ).front_center();
+
 	YM2149( config, "ym", 3.6864_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.3 );
+
+	XR68C681( config, "duart", 3.6864_MHz_XTAL );
 
 	// Coin acceptor
 	I80C51(config, m_coincpu, 6_MHz_XTAL); // MHS S-80C51CCMA-12
