@@ -39,8 +39,8 @@ namespace bgfx { namespace gl
 			, m_display(NULL)
 			, m_surface(NULL)
 #if BX_PLATFORM_LINUX
-			, m_waylandEglLibrary(NULL)
-			, m_egl_window(NULL)
+			, m_waylandEglDll(NULL)
+			, m_eglWindow(NULL)
 #endif
 			, m_msaaContext(false)
 		{
@@ -63,15 +63,15 @@ namespace bgfx { namespace gl
 			return NULL != m_context;
 		}
 
-		void* m_eglLibrary;
+		void* m_eglDll;
 		SwapChainGL* m_current;
 		EGLConfig  m_config;
 		EGLContext m_context;
 		EGLDisplay m_display;
 		EGLSurface m_surface;
 #if BX_PLATFORM_LINUX
-		void *m_waylandEglLibrary;
-		struct wl_egl_window *m_egl_window;
+		void*  m_waylandEglDll;
+		struct wl_egl_window *m_eglWindow;
 #endif
 		// true when MSAA is handled by the context instead of using MSAA FBO
 		bool m_msaaContext;
