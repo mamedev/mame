@@ -19982,6 +19982,9 @@ rtpc020                         // IBM RT PC Model 020
 rtpc025                         // IBM RT PC Model 025
 rtpca25                         // IBM RT PC Model A25
 
+@source:ibm/thinkpad600.cpp
+thinkpad600e                    // IBM Thinkpad 600E
+
 @source:ibm/thinkpad8xx.cpp
 thinkpad850                     // IBM Thinkpad 850
 
