@@ -17742,17 +17742,6 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
-	<software name="unkact2">
-		<description>Unknown Activision Game #2 (prototype)</description>
-		<year>1983</year>
-		<publisher>Activision</publisher>
-		<part name="cart" interface="a2600_cart">
-			<dataarea name="rom" size="4096">
-				<rom name="unknown activision game #2 (1983) (activision) (prototype).bin" size="4096" crc="5c009ea0" sha1="a25c4b33e1c86895cb63635bd6ca5b8379a206b3"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="unkuniv">
 		<description>Unknown Universal Game (prototype)</description>
 		<year>1983</year>

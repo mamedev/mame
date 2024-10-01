@@ -41,6 +41,7 @@ TODO:
 #include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
 #include "video/mc6845.h"
@@ -70,6 +71,7 @@ public:
 	whtm68k_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_bgram(*this, "bgram"),
 		m_fgram(*this, "fgram")
@@ -82,12 +84,16 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
+
 	required_shared_ptr<uint16_t> m_bgram;
 	required_shared_ptr<uint16_t> m_fgram;
 
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -101,6 +107,18 @@ private:
 	void ramdac_map(address_map &map) ATTR_COLD;
 	void ramdac2_map(address_map &map) ATTR_COLD;
 };
+
+
+TIMER_DEVICE_CALLBACK_MEMBER(whtm68k_state::scanline_cb)
+{
+	int const scanline = param;
+
+	if (scanline == 256)
+		m_maincpu->set_input_line(3, HOLD_LINE);
+
+	if (scanline == 0)
+		m_maincpu->set_input_line(1, HOLD_LINE);
+}
 
 
 void whtm68k_state::video_start()
@@ -270,7 +288,8 @@ void whtm68k_state::unkwht(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &whtm68k_state::main_program_map);
-	m_maincpu->set_vblank_int("screen", FUNC(whtm68k_state::irq1_line_hold));
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(whtm68k_state::scanline_cb), "screen", 0, 1);
 
 	i80c32_device &audiocpu(I80C32(config, "audiocpu", 12_MHz_XTAL));
 	audiocpu.set_addrmap(AS_PROGRAM, &whtm68k_state::audio_program_map);
