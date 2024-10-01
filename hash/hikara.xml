@@ -366,6 +366,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- the presentation on this is almost the same as a 10 song user cartridge, but it's a standalone, non-reprogrammable release -->
+	<!-- 2009 date is from cart label, shows 2008 when running -->
 	<software name="pizzala" supported="no">
 		<description>Hi-kara PIZZA-LA</description>
 		<year>2009</year>
