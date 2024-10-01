@@ -69,4 +69,4 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 1995, tvdear,  0,          0,  tvdear,  tvdear, tvdear_state, empty_init, "Takara", "TV Dear Multi Word Processor", MACHINE_IS_SKELETON ) // テレビディア マルチワープロ
+CONS( 1995, tvdear,  0,          0,  tvdear,  tvdear, tvdear_state, empty_init, "Takara", "TV Dear Multi Word Processor", MACHINE_IS_SKELETON | MACHINE_NODEVICE_PRINTER ) // テレビディア マルチワープロ
