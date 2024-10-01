@@ -5,6 +5,7 @@
 
 #include "emu.h"
 #include "cpu/nec/v25.h"
+#include "softlist_dev.h"
 
 namespace {
 
@@ -20,15 +21,31 @@ public:
 	void tvdear(machine_config &config);
 
 private:
+	void output_500_w(u8 data);
+
 	void mem_map(address_map &map);
+	void io_map(address_map &map);
 
 	required_device<v25_device> m_maincpu;
 };
 
 
+void tvdear_state::output_500_w(u8 data)
+{
+	if (data != 0)
+		logerror("%s: OUT 500h, %02Xh\n", machine().describe_context(), data);
+}
+
 void tvdear_state::mem_map(address_map &map)
 {
-	map(0xe0000, 0xfffff).rom().region("maincpu", 0xe0000); // wrong
+	map(0x00000, 0x07fff).ram();
+	map(0x10000, 0x17fff).ram();
+	map(0x80000, 0xfffff).rom().region("maincpu", 0x080000);
+}
+
+void tvdear_state::io_map(address_map &map)
+{
+	map(0x0500, 0x0500).w(FUNC(tvdear_state::output_500_w));
 }
 
 static INPUT_PORTS_START(tvdear)
@@ -36,18 +53,20 @@ INPUT_PORTS_END
 
 void tvdear_state::tvdear(machine_config &config)
 {
-	V25(config, m_maincpu, 16000000);
+	V25(config, m_maincpu, 16000000); // NEC D70320DGJ-8; XTAL marked 16AKSS5HT
 	m_maincpu->set_addrmap(AS_PROGRAM, &tvdear_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &tvdear_state::io_map);
+
+	//MB90076(config, "tvvc", 14318181); // XTAL marked 14AKSS5JT
+
+	SOFTWARE_LIST(config, "cart_list").set_original("tvdear");
 }
 
 ROM_START(tvdear)
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD("d23c160000.u5", 0x00000, 0x200000, CRC(41ec9890) SHA1(20cfdfec7eeb39a9ce971f23fdc97b42a5d68301) )
-
-	ROM_REGION(0x20000, "cart", 0) // TODO: move this to a software list
-	ROM_LOAD("lc371100.u15", 0x00000, 0x20000, CRC(f70696d1) SHA1(21da45720a48e18fd6173f2482bd7db4988d1548) )
 ROM_END
 
 } // anonymous namespace
 
-CONS( 1996, tvdear,  0,          0,  tvdear,  tvdear, tvdear_state, empty_init, "Takara", "TV Dear", MACHINE_IS_SKELETON )
+CONS( 1996, tvdear,  0,          0,  tvdear,  tvdear, tvdear_state, empty_init, "Takara", "TV Dear Multi Word Processor", MACHINE_IS_SKELETON )
