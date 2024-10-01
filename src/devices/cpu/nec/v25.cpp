@@ -218,6 +218,14 @@ void v25_common_device::device_reset()
 	m_TM0 = m_MD0 = m_TM1 = m_MD1 = 0;
 	m_TMC0 = m_TMC1 = 0;
 
+	for (int i = 0; i < 2; i++)
+	{
+		m_scm[i] = 0;
+		m_scc[i] = 0;
+		m_brg[i] = 0;
+		m_sce[i] = 0;
+	}
+
 	m_RAMEN = 1;
 	m_TB = 20;
 	m_PCK = 8;
@@ -618,6 +626,10 @@ void v25_common_device::device_start()
 	save_item(NAME(m_MD1));
 	save_item(NAME(m_TMC0));
 	save_item(NAME(m_TMC1));
+	save_item(NAME(m_scm));
+	save_item(NAME(m_scc));
+	save_item(NAME(m_brg));
+	save_item(NAME(m_sce));
 	save_item(NAME(m_RAMEN));
 	save_item(NAME(m_TB));
 	save_item(NAME(m_PCK));

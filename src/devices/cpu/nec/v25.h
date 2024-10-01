@@ -118,6 +118,12 @@ private:
 	uint8_t   m_TMC0, m_TMC1;
 	emu_timer *m_timers[4];
 
+	/* serial interface related */
+	uint8_t   m_scm[2];
+	uint8_t   m_scc[2];
+	uint8_t   m_brg[2];
+	uint8_t   m_sce[2];
+
 	/* system control */
 	uint8_t   m_RAMEN, m_TB, m_PCK; /* PRC register */
 	uint8_t   m_RFM;
@@ -203,6 +209,13 @@ private:
 	void srms0_w(uint8_t d);
 	uint8_t stms0_r();
 	void stms0_w(uint8_t d);
+	uint8_t scm0_r();
+	void scm0_w(uint8_t d);
+	uint8_t scc0_r();
+	void scc0_w(uint8_t d);
+	uint8_t brg0_r();
+	void brg0_w(uint8_t d);
+	uint8_t sce0_r();
 	uint8_t seic0_r();
 	void seic0_w(uint8_t d);
 	uint8_t sric0_r();
@@ -213,6 +226,13 @@ private:
 	void srms1_w(uint8_t d);
 	uint8_t stms1_r();
 	void stms1_w(uint8_t d);
+	uint8_t scm1_r();
+	void scm1_w(uint8_t d);
+	uint8_t scc1_r();
+	void scc1_w(uint8_t d);
+	uint8_t brg1_r();
+	void brg1_w(uint8_t d);
+	uint8_t sce1_r();
 	uint8_t seic1_r();
 	void seic1_w(uint8_t d);
 	uint8_t sric1_r();
