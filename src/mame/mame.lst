@@ -42108,6 +42108,9 @@ elzet80p                        //
 @source:skeleton/epic14e.cpp
 epic14e                         //
 
+@source:skeleton/epoch_tv_globe.cpp
+eptvglob
+
 @source:skeleton/esprit.cpp
 esprit                          // Hazeltine Esprit
 esprit3                         // Hazeltine Esprit III
