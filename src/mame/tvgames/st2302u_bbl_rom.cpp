@@ -380,11 +380,20 @@ ROM_START( dphh8213 )
 	ROM_FILL( 0x00009f, 2, 0xea ) // NOP out SPI check
 ROM_END
 
+ROM_START( class200 )
+	// uncertain if internal area is used
+
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD( "m29w320eb.bin", 0x000000, 0x400000, CRC(3067b5f6) SHA1(9a159b16898054a74cfb32b5c597b505132f004e) )
+ROM_END
+
 } // anonymous namespace
 
 
 // this is uses a higher resolution display than the common units, but not as high as the SunPlus based ones
-COMP( 201?, bbl338, 0,      0,      st22xx_bbl338, dphh8213, st22xx_bbl338_sim_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_IS_SKELETON )
+COMP( 201?, bbl338,   0,      0,      st22xx_bbl338, dphh8213, st22xx_bbl338_sim_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_IS_SKELETON )
+// also appears to be the higher resolution display
+COMP( 201?, class200, 0,      0,      st22xx_dphh8213, dphh8213, st22xx_bbl338_state, empty_init, "<unknown>", "Color LCD Classic Game 200-in-1", MACHINE_IS_SKELETON ) // no manufacturer name or product code anywhere
 
 // Language controlled by port bit, set at factory, low resolution
 COMP( 201?, dphh8213, 0,      0,      st22xx_dphh8213, dphh8213, st22xx_bbl338_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 20-in-1 - Model 8213", MACHINE_IS_SKELETON )
