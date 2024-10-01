@@ -15,10 +15,6 @@
 #			include <bcm_host.h>
 #		endif // BX_PLATFORM_RPI
 
-#if defined(WL_EGL_PLATFORM)
-#	include <wayland-egl.h>
-#endif
-
 namespace bgfx { namespace gl
 {
 #ifndef EGL_CONTEXT_FLAG_NO_ERROR_BIT_KHR
