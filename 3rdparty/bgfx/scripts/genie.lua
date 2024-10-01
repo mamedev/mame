@@ -22,7 +22,7 @@ newoption {
 
 newoption {
 	trigger = "with-wayland",
-	description = "Use Wayland backend.",
+	description = "Enable Wayland support.",
 }
 
 newoption {
@@ -256,13 +256,6 @@ function exampleProjectDefaults()
 		defines { "ENTRY_CONFIG_USE_SDL=1" }
 		links   { "SDL2" }
 
-		configuration { "linux or freebsd" }
-			if _OPTIONS["with-wayland"]  then
-				links {
-					"wayland-egl",
-				}
-			end
-
 		configuration { "osx*" }
 			libdirs { "$(SDL2_DIR)/lib" }
 
@@ -274,19 +267,13 @@ function exampleProjectDefaults()
 		links   { "glfw3" }
 
 		configuration { "linux or freebsd" }
-			if _OPTIONS["with-wayland"] then
-				links {
-					"wayland-egl",
-				}
-			else
-				links {
-					"Xrandr",
-					"Xinerama",
-					"Xi",
-					"Xxf86vm",
-					"Xcursor",
-				}
-			end
+			links {
+				"Xrandr",
+				"Xinerama",
+				"Xi",
+				"Xxf86vm",
+				"Xcursor",
+			}
 
 		configuration { "osx*" }
 			linkoptions {
