@@ -45679,14 +45679,16 @@ bbl338
 dphh8213
 
 @source:tvgames/st2302u_bbl_spi.cpp
-bbl380
-mc_cb203
-rhhc152
-ragc153
-dphh8630
-dgun2953
-supreme
 arcade10
+bbl380
+dgun2953
+dphh8630
+mc_cb203
+pg118
+ragc153
+rhhc152
+supreme
+toumapet
 
 @source:tvgames/titan_soc.cpp
 colecofl
