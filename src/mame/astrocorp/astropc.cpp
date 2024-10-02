@@ -365,5 +365,5 @@ GAME( 2005,  rasce,    0,       astropc, astropc, astropc_state, init_astropc, R
 
 
 // Artemis II games
-GAME( 2009,  carnivac, 0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Carnival (Astro Corp., US.004.D)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2009,  santacl,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Santa Claus (IN.001.07.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2009,  carnivac, 0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Carnival (Astro Corp., US.004.D)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2009,  santacl,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Santa Claus (IN.001.07.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

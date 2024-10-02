@@ -3441,7 +3441,7 @@ ROM_START( v4redhtpunk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rhp20ac6", 0x0000, 0x010000, CRC(d6a842b4) SHA1(94f6cc6a9e0efa8a2eeee14f981f9d2407dfb092) )
 
-	ROM_REGION( 0x800000, "video", 0 ) // none of the ROMs are have are commpatible with this?
+	ROM_REGION( 0x800000, "video", 0 ) // none of the ROMs we have are compatible with this?
 	ROM_LOAD("video_board_roms", 0x0000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
@@ -5440,6 +5440,26 @@ ROM_START( v4bulblxc )
 
 	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
 	/* none present */
+ROM_END
+
+ROM_START( v4bulblxd )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // main PCB wasn't present
+	ROM_LOAD( "program.bin", 0x00000, 0x010000, NO_DUMP )
+
+	ROM_REGION( 0x800000, "video", 0 ) // on BARCREST VIDEO MEMORY CARD 681868 18185-2 PCB
+	ROM_LOAD16_BYTE( "bvm_____.1_1.ic9",  0x000000, 0x010000, CRC(c3868e84) SHA1(991bad401a2853c3ea95adf9861c565fedc22b3a) ) // 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "bvm_____.1_2.ic1",  0x000001, 0x010000, CRC(e97ba9ff) SHA1(40afefb7215ef968613b06e2aeb345b0f8bbc2c1) ) // 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "bvm_____.1_3.ic10", 0x020000, 0x010000, CRC(4277e41c) SHA1(f2cab567be22714de42aff14755fda05d353a4fa) )
+	ROM_LOAD16_BYTE( "bvm_____.1_4.ic2",  0x020001, 0x010000, CRC(d1d8e1f1) SHA1(e875085257782ba97058e637f15dc1d1b7ff63ba) )
+	ROM_LOAD16_BYTE( "bvm_____.1_5.ic11", 0x040000, 0x010000, CRC(5aa44716) SHA1(256972701112bfd446d5f5fcdf741c6240ca6b3b) )
+	ROM_LOAD16_BYTE( "bvm_____.1_6.ic3",  0x040001, 0x010000, CRC(ff698218) SHA1(f8dcd49ccdb47a6cf0d4012d22f2adf689d7f5e1) )
+	// 10 more empty ROM sockets
+
+	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 )
+	// none present
+
+	ROM_REGION( 0x117, "plds", 0 ) // on BARCREST VIDEO MEMORY CARD 681868 18185-2 PCB
+	ROM_LOAD( "bvm__.g.ic18", 0x000, 0x117, NO_DUMP ) // GAL16V8
 ROM_END
 
 
@@ -8805,10 +8825,11 @@ GAME(  1994, v4pzteta,   v4pztet,  bwbvid,     v4pztet,    mpu4vid_state, init_b
 GAME(  1994, v4pztetb,   v4pztet,  bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Prize Tetris (BWB) (Showcase) (MPU4 Video)",GAME_FLAGS_OK ) // screen telling you to exchange tickets for prizes in the 'showcase' during attract
 GAME(  1994, v4pztetc,   v4pztet,  bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Prize Tetris (BWB) (Showcase) (Datapak) (MPU4 Video)",GAME_FLAGS_OK )
 // this appears to be a version of Prize Tetris without the Tetris license. These don't have proper alarms, eg coin1 stuck is 'undefined'
-GAME(  1994, v4bulblx,   0,        bwbvid,     v4bulblx,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Bullion Blox (BWB) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1994, v4bulblxb,  v4bulblx, bwbvid,     v4bulblx,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Bullion Blox (BWB) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  1994, v4bulblxa,  v4bulblx, bwbvid,     v4bulblx,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Bullion Blox (BWB) (Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1994, v4bulblxc,  v4bulblx, bwbvid,     v4bulblx,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Bullion Blox (BWB) (Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  1994, v4bulblx,   0,        bwbvid,     v4bulblx,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Bullion Blox (BWB) (BV_50___.2__) (MPU4 Video)",GAME_FLAGS )
+GAME(  1994, v4bulblxb,  v4bulblx, bwbvid,     v4bulblx,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Bullion Blox (BWB) (BV_1P___.2__) (MPU4 Video)",GAME_FLAGS )
+GAME(  1994, v4bulblxd,  v4bulblx, bwbvid,     v4bulblx,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Bullion Blox (BWB) (BVM_____.1__) (MPU4 Video)",GAME_FLAGS )
+GAME(  1994, v4bulblxa,  v4bulblx, bwbvid,     v4bulblx,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Bullion Blox (BWB) (Datapak) (BV_50___.2__) (MPU4 Video)",GAME_FLAGS )
+GAME(  1994, v4bulblxc,  v4bulblx, bwbvid,     v4bulblx,   mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Bullion Blox (BWB) (Datapak) (BV_1P___.2__) (MPU4 Video)",GAME_FLAGS )
 
 // doesn't have payout so no shelf error (no payout on prototype?), runs with door closed
 
