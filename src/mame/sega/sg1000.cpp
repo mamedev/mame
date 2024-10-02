@@ -136,15 +136,15 @@ public:
 protected:
 	required_device_array<sms_control_port_device, 2> m_ctrlports;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t peripheral_r(offs_t offset);
 	void peripheral_w(offs_t offset, uint8_t data);
 
-	void sg1000_map(address_map &map);
-	void sg1000_io_map(address_map &map);
-	void sc3000_map(address_map &map);
-	void sc3000_io_map(address_map &map);
+	void sg1000_map(address_map &map) ATTR_COLD;
+	void sg1000_io_map(address_map &map) ATTR_COLD;
+	void sc3000_map(address_map &map) ATTR_COLD;
+	void sc3000_io_map(address_map &map) ATTR_COLD;
 };
 
 class omv_state : public sg1000_state_base
@@ -160,8 +160,8 @@ private:
 	uint8_t omv_r(offs_t offset);
 	void omv_w(offs_t offset, uint8_t data);
 
-	void omv_map(address_map &map);
-	void omv_io_map(address_map &map);
+	void omv_map(address_map &map) ATTR_COLD;
+	void omv_io_map(address_map &map) ATTR_COLD;
 };
 
 class omv2000_state : public omv_state
@@ -179,7 +179,7 @@ public:
 private:
 	required_device<sms_control_port_device> m_ctrl2;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 class sc3000_state : public sg1000_state
@@ -192,7 +192,7 @@ public:
 	void sc3000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void sc3000_base(machine_config &config);
 };
@@ -216,15 +216,15 @@ private:
 
 	int m_centronics_busy = 0;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void write_centronics_busy(int state);
 	uint8_t ppi_pa_r();
 	void ppi_pc_w(uint8_t data);
 
-	void sf7000_io_map(address_map &map);
-	void sf7000_map(address_map &map);
+	void sf7000_io_map(address_map &map) ATTR_COLD;
+	void sf7000_map(address_map &map) ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 };
@@ -394,7 +394,7 @@ INPUT_CHANGED_MEMBER( sg1000_state::trigger_nmi )
 }
 
 /*-------------------------------------------------
-    CUSTOM_INPUT_MEMBER( ctrl2_r )
+    ioport_value ctrl2_r()
 -------------------------------------------------*/
 
 template <unsigned Shift>

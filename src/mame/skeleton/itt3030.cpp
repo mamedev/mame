@@ -244,8 +244,8 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// screen updates
@@ -269,9 +269,9 @@ private:
 	void fdchld_w(int state);
 	void itt3030_palette(palette_device &palette) const;
 
-	void itt3030_io(address_map &map);
-	void itt3030_map(address_map &map);
-	void lower48_map(address_map &map);
+	void itt3030_io(address_map &map) ATTR_COLD;
+	void itt3030_map(address_map &map) ATTR_COLD;
+	void lower48_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

@@ -51,8 +51,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ti68k_on_key);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// hardware versions
@@ -102,11 +102,11 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ti68k_timer_callback);
 
-	void ti89_mem(address_map &map);
-	void ti89t_mem(address_map &map);
-	void ti92_mem(address_map &map);
-	void ti92p_mem(address_map &map);
-	void v200_mem(address_map &map);
+	void ti89_mem(address_map &map) ATTR_COLD;
+	void ti89t_mem(address_map &map) ATTR_COLD;
+	void ti92_mem(address_map &map) ATTR_COLD;
+	void ti92p_mem(address_map &map) ATTR_COLD;
+	void v200_mem(address_map &map) ATTR_COLD;
 };
 
 

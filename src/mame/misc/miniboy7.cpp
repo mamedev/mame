@@ -253,8 +253,8 @@ public:
 	void miniboy7(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void ay_pa_w(uint8_t data);
@@ -267,7 +267,7 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void miniboy7_palette(palette_device &palette) const;
 
-	void miniboy7_map(address_map &map);
+	void miniboy7_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_videoram_a;
 	required_shared_ptr<uint8_t> m_colorram_a;

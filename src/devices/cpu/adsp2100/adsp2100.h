@@ -213,8 +213,8 @@ protected:
 	adsp21xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	// device_execute_interface overrides
@@ -476,9 +476,6 @@ public:
 	adsp2100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device_execute_interface overrides
-	virtual uint32_t execute_input_lines() const noexcept override;
-
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
@@ -499,9 +496,6 @@ public:
 protected:
 	adsp2101_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype);
 
-	// device_execute_interface overrides
-	virtual uint32_t execute_input_lines() const noexcept override;
-
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
@@ -520,9 +514,6 @@ public:
 	adsp2181_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device_execute_interface overrides
-	virtual uint32_t execute_input_lines() const noexcept override;
-
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 

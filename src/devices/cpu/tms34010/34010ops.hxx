@@ -180,6 +180,7 @@ void tms340x0_device::cmp_xy_b(uint16_t op) { CMP_XY(B); }
 void tms340x0_device::cpw_a(uint16_t op) { CPW(A); }
 void tms340x0_device::cpw_b(uint16_t op) { CPW(B); }
 
+// TODO: Handle cycles properly, currently we assume power of two
 #define CVXYL(R)                                    \
 {                                                   \
 	R##REG(DSTREG(op)) = DXYTOL(R##REG_XY(SRCREG(op)));     \
@@ -2117,7 +2118,7 @@ void tms34020_device::clip(uint16_t op)
 	bool is_b = wend.y > daddr.y;
 	if (!(is_l || is_r || is_t || is_b))
 	{
-		// ...no itersection, set flags and return
+		// ...no intersection, set flags and return
 		m_st |= STBIT_Z | STBIT_V;
 		// TODO: manual does not specify cycles, only states that this is complex instruction
 		COUNT_CYCLES(3);
@@ -2245,7 +2246,34 @@ void tms34020_device::cvdxyl_a(uint16_t op)
 
 void tms34020_device::cvdxyl_b(uint16_t op)
 {
-	logerror("020:cvdxyl_b\n");
+	// Convert destination XY address to linear
+	// (Y half of Rd x DPTCH) + (X half of Rd x PSIZE) + (A4 or B4) ->  Rd
+	const XY rd = BREG_XY(DSTREG(op));
+	const off_t dptch = DPTCH();
+	const off_t offset = BREG(4);
+
+	const off_t result = (rd.y * dptch) + (rd.x << m_pixelshift) + offset;
+	// logerror("020:cvdxyl_b: PC=0x%08x: DADDR=%x, x=%x, y=%x, DPTCH=%d, PIXELSIZE=%d, OFFSET=%d, result: %x\n",
+	// m_pc, rd, rd.x, rd.y, dptch, m_pixelshift, offset, result);
+
+	DADDR() = result;
+
+	// Handle cycles related to pitch:
+	switch (population_count_32(dptch))
+	{
+		// power of 2: 2 clocks
+		case 1:
+			COUNT_CYCLES(2);
+			break;
+		// 2 powers of 2: 3 clocks
+		case 2:
+			COUNT_CYCLES(3);
+			break;
+		// arbitrary: 14 clocks
+		default:
+			COUNT_CYCLES(14);
+			break;
+	}
 }
 
 void tms34020_device::cvmxyl_a(uint16_t op)
@@ -2413,7 +2441,7 @@ void tms34020_device::setcdp(uint16_t op)
 	// Check whether we're dealing with an even number
 	if ((dptch & 1) == 0)
 	{
-		switch(population_count_32(dptch))
+		switch (population_count_32(dptch))
 		{
 			// .. only single bit set, pitch is power of two!
 			case 1:
@@ -2472,15 +2500,21 @@ void tms34020_device::trapl(uint16_t op)
 
 void tms34020_device::vblt_b_l(uint16_t op)
 {
+	// Linear VRAM pixel block transfer
+	// logerror("020:vblt_b_l: SADDR=0x%x, SPTCH=%d, DADDR=0x%x, DPTCH=%d, DYDX=(%dx%d), TEMP=%x\n", SADDR(), SPTCH(), DADDR(), DPTCH(), DYDX_X(), DYDX_Y(), TEMP());
 	logerror("020:vblt_b_l\n");
 }
 
 void tms34020_device::vfill_l(uint16_t op)
 {
+	// Linear VRAM fast fill
+	// logerror("020:vfill_l: DADDR=0x%x, DPTCH=%d, DYDX=(%dx%d)\n", DADDR(), DPTCH(), DYDX_X(), DYDX_Y());
 	logerror("020:vfill_l\n");
 }
 
 void tms34020_device::vlcol(uint16_t op)
 {
+	// Latch COLOR1 into the VRAM color registers
+	//logerror("020:vlcol: COLOR1=%x\n", COLOR1());
 	logerror("020:vlcol\n");
 }

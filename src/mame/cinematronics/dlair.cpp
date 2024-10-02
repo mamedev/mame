@@ -130,15 +130,15 @@ private:
 	void led_den2_w(offs_t offset, uint8_t data);
 	uint8_t laserdisc_r();
 	void laserdisc_w(uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void dleuro_palette(palette_device &palette) const;
 	uint32_t screen_update_dleuro(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void write_speaker(int state);
 
-	void dleuro_io_map(address_map &map);
-	void dleuro_map(address_map &map);
-	void dlus_map(address_map &map);
+	void dleuro_io_map(address_map &map) ATTR_COLD;
+	void dleuro_map(address_map &map) ATTR_COLD;
+	void dlus_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	optional_device<speaker_sound_device> m_speaker;

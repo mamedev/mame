@@ -70,24 +70,24 @@ public:
 	 */
 	void set_config(u16 data);
 
-	void core_regs(address_map &map, u8 mirror = 0);
-	void ram_5_2ports(address_map &map);
-	void ram_5_3ports(address_map &map);
-	void ram_1655_3ports(address_map &map);
-	void ram_5_4ports(address_map &map);
-	void ram_7_2ports(address_map &map);
-	void ram_7_3ports(address_map &map);
-	void rom_10(address_map &map);
-	void rom_11(address_map &map);
-	void rom_9(address_map &map);
+	void core_regs(address_map &map, u8 mirror = 0) ATTR_COLD;
+	void ram_5_2ports(address_map &map) ATTR_COLD;
+	void ram_5_3ports(address_map &map) ATTR_COLD;
+	void ram_1655_3ports(address_map &map) ATTR_COLD;
+	void ram_5_4ports(address_map &map) ATTR_COLD;
+	void ram_7_2ports(address_map &map) ATTR_COLD;
+	void ram_7_3ports(address_map &map) ATTR_COLD;
+	void rom_10(address_map &map) ATTR_COLD;
+	void rom_11(address_map &map) ATTR_COLD;
+	void rom_9(address_map &map) ATTR_COLD;
 
 protected:
 	// construction/destruction
 	pic16c5x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int data_width, int picmodel, address_map_constructor data_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	/**************************************************************************
@@ -101,7 +101,6 @@ protected:
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 2; }
-	virtual u32 execute_input_lines() const noexcept override { return 1; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == PIC16C5x_RTCC; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int line, int state) override;

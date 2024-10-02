@@ -124,13 +124,13 @@ private:
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_starfield_tile_info);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	void warpsped_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_circles(bitmap_ind16 &bitmap);
-	void warpspeed_io_map(address_map &map);
-	void warpspeed_map(address_map &map);
+	void warpspeed_io_map(address_map &map) ATTR_COLD;
+	void warpspeed_map(address_map &map) ATTR_COLD;
 };
 
 void warpspeed_state::hardware_w(offs_t offset, uint8_t data)

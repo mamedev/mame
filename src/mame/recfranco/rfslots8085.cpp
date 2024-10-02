@@ -158,13 +158,13 @@ public:
 	int reel_opto_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	// Main MCU Interface
 	u8 sid_r();
@@ -845,8 +845,8 @@ void rfslots8085_state::rf53_3297(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	HOPPER(config, m_hopper[0], attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);  // hopper motor 25 Pts.
-	HOPPER(config, m_hopper[1], attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);  // hopper motor 100 Pts.
+	HOPPER(config, m_hopper[0], attotime::from_msec(150));  // hopper motor 25 Pts.
+	HOPPER(config, m_hopper[1], attotime::from_msec(150));  // hopper motor 100 Pts.
 
 	add_em_reels(config, 100, attotime::from_double(2));
 

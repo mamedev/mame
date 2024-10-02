@@ -35,6 +35,7 @@ Year + Game                   PCB        Sound         Chips
 96 Virtua Bowling V101XCM     NO-0101-1  ICS2115       IGS011 IGS003e IGS012
 96 Virtua Bowling V101HJS     NO-0101-?  ICS2115       IGS011 IGS003e?IGS012
 96 Long Hu Bang II V185H      NO-0115    M6295 YM2413  IGS011 8255
+96 Te Yi Gong Neng            NO-0127-2  M6295 YM2413  IGS011 IGS003A
 96 Wanli Changcheng           ?
 96 Xingyun Man Guan           ?
 98 Mj Nenrikishu SP V250J     NO-0115-5  M6295 YM2413  IGS011 8255
@@ -128,10 +129,12 @@ public:
 	void init_vbowlj();
 	void init_vbowlhk();
 	void init_ryukobou();
+	void init_tygn();
 
 	void igs011_base(machine_config &config);
 	void drgnwrld(machine_config &config);
 	void nkishusp(machine_config &config);
+	void tygn(machine_config &config);
 	void wlcc(machine_config &config);
 	void vbowl(machine_config &config);
 	void vbowlhk(machine_config &config);
@@ -141,8 +144,8 @@ public:
 	void drgnwrld_igs012(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* devices */
@@ -285,20 +288,22 @@ private:
 	void vbowlhk_decrypt();
 	void dbc_decrypt();
 	void ryukobou_decrypt();
+	void tygn_decrypt();
 	void lhb2_gfx_decrypt();
 	void vbowl_gfx_decrypt();
 	void drgnwrld_gfx_decrypt();
 	void prot_mem_range_set();
 
-	void drgnwrld_mem(address_map &map);
-	void drgnwrld_igs012_mem(address_map &map);
-	void lhb_mem(address_map &map);
-	void lhb2_mem(address_map &map);
-	void nkishusp_mem(address_map &map);
-	void vbowl_mem(address_map &map);
-	void vbowlhk_mem(address_map &map);
-	void wlcc_mem(address_map &map);
-	void xymg_mem(address_map &map);
+	void drgnwrld_mem(address_map &map) ATTR_COLD;
+	void drgnwrld_igs012_mem(address_map &map) ATTR_COLD;
+	void lhb_mem(address_map &map) ATTR_COLD;
+	void lhb2_mem(address_map &map) ATTR_COLD;
+	void nkishusp_mem(address_map &map) ATTR_COLD;
+	void tygn_mem(address_map &map) ATTR_COLD;
+	void vbowl_mem(address_map &map) ATTR_COLD;
+	void vbowlhk_mem(address_map &map) ATTR_COLD;
+	void wlcc_mem(address_map &map) ATTR_COLD;
+	void xymg_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -904,6 +909,39 @@ void igs011_state::nkishusp_decrypt()
 	}
 
 	memcpy(src,&result_data[0],rom_size);
+}
+
+
+void igs011_state::tygn_decrypt()
+{
+	int rom_size = 0x80000;
+	u16 *src = (u16 *) (m_maincpu_region->base());
+	std::vector<u16> result_data(rom_size / 2);
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = src[i];
+
+		int j = bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 0, 2, 9, 5, 12, 14, 11, 8, 6, 3, 4, 16, 15, 13, 10, 7, 1);
+
+		if ((j & 0x0280 / 2) || ((j & 0x0024 / 2) == 0x24 / 2))
+			x ^= 0x0004;
+
+		if (j & 0x4000 / 2)
+		{
+			if ((((j & 0x100 / 2) == 0x000 / 2) ^ ((j & 0x128 / 2) == 0x028 / 2)) || ((j & 0x108 / 2) == 0x100 / 2))
+				x ^= 0x0020;
+		}
+		else
+			x ^= 0x0020;
+
+		if (!(j & 0x8000 / 2) && (j & 0x2000 / 2))
+			x ^= 0x0008;
+
+		result_data[j] = x;
+	}
+
+	memcpy(src, &result_data[0], rom_size);
 }
 
 
@@ -2451,6 +2489,38 @@ void igs011_state::init_lhb2()
 */
 }
 
+void igs011_state::init_tygn()
+{
+	tygn_decrypt();
+
+	lhb2_gfx_decrypt();
+
+	// PROTECTION CHECKS (similar to nkishusp)
+
+	u16 *rom = (u16 *) m_maincpu_region->base();
+
+	rom[0x036d8/2]  =   0x6042;     // 0036d8: 660E      bne     $36e8 (ROM test)
+
+	//TODO: are the following patches needed? in that case the ones after the blank line should be adapted to the tygn offsets
+	//rom[0x1c6a0/2]  =   0x6034;     // 01c6a0: 6734      beq     $1c6d6
+	//rom[0x2412a/2]  =   0x6036;     // 02412a: 6736      beq     $24162
+	//rom[0x26de6/2]  =   0x6038;     // 026de6: 6e38      bgt     $26e20 (system error)
+	//rom[0x2da36/2]  =   0x6036;     // 02da36: 6736      beq     $2da6e
+
+	//rom[0x2ff20/2]  =   0x6036;     // 02ff20: 6736      beq     $2ff58
+	//rom[0x3151c/2]  =   0x6036;     // 03151c: 6736      beq     $31554
+	//rom[0x33dfc/2]  =   0x6036;     // 033dfc: 6736      beq     $33e34
+	//rom[0x3460e/2]  =   0x6038;     // 03460e: 6e38      bgt     $34648 (system error)
+	//rom[0x3f09e/2]  =   0x6034;     // 03f09e: 6734      beq     $3f0d4
+	//rom[0x406a8/2]  =   0x6036;     // 0406a8: 6736      beq     $406e0
+	//rom[0x4376a/2]  =   0x6034;     // 04376a: 6734      beq     $437a0
+	//rom[0x462d6/2]  =   0x6034;     // 0462d6: 6734      beq     $4630c
+	//rom[0x471ec/2]  =   0x6036;     // 0471ec: 6e36      bgt     $47224 (system error)
+	//rom[0x49c46/2]  =   0x6000;     // 049c46: 6700 0444 beq     $4a08c
+	//rom[0x4a2b6/2]  =   0x6036;     // 04a2b6: 6736      beq     $4a2ee
+	//rom[0x4c67a/2]  =   0x6038;     // 04c67a: 6e38      bgt     $4c6b4 (system error)
+}
+
 void igs011_state::init_vbowl()
 {
 	u16 *rom = (u16 *) m_maincpu_region->base();
@@ -2818,6 +2888,14 @@ void igs011_state::nkishusp_mem(address_map &map)
 	map(0xa5b800, 0xa5b801).w(FUNC(igs011_state::igs011_blit_pen_w));
 	map(0xa5c000, 0xa5c001).w(FUNC(igs011_state::igs011_blit_depth_w));
 	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_dips_r<3>));
+}
+
+void igs011_state::tygn_mem(address_map &map)
+{
+	nkishusp_mem(map);
+
+	map(0x208000, 0x208001).nopr(); // TODO
+	map(0x208002, 0x208003).rw(FUNC(igs011_state::drgnwrld_igs003_r), FUNC(igs011_state::lhb2_igs003_w));
 }
 
 
@@ -3458,6 +3536,86 @@ static INPUT_PORTS_START( nkishusp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+// basically same game as lhb2 and nkishusp but with joystick controls
+static INPUT_PORTS_START( tygn )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, "Pay Out (%)" ) PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPSETTING(    0x07, "50" )
+	PORT_DIPSETTING(    0x06, "54" )
+	PORT_DIPSETTING(    0x05, "58" )
+	PORT_DIPSETTING(    0x04, "62" )
+	PORT_DIPSETTING(    0x03, "66" )
+	PORT_DIPSETTING(    0x02, "70" )
+	PORT_DIPSETTING(    0x01, "74" )
+	PORT_DIPSETTING(    0x00, "78" )
+	PORT_DIPNAME( 0x08, 0x08, "Minimum Bet" ) PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("DSW1:8")
+
+	PORT_START("DSW2") // not shown in test mode
+	PORT_DIPUNKNOWN( 0x01, 0x01 ) PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPUNKNOWN( 0x02, 0x02 ) PORT_DIPLOCATION("DSW2:2")
+	PORT_DIPUNKNOWN( 0x04, 0x04 ) PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPUNKNOWN( 0x08, 0x08 ) PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPUNKNOWN( 0x10, 0x10 ) PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPUNKNOWN( 0x20, 0x20 ) PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("DSW2:8")
+
+	PORT_START("DSW3") // only 2 out of 4 DIP banks phisically present
+	PORT_DIPNAME( 0xff, 0xff, DEF_STR( Unused ) )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW ) // keep pressed while booting
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) // stats
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // ok
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) // ok
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) // ok
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) // ok
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // ok
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // selects input test in test mode
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) // selects image test in test mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) // selects audio test in test mode
+
+	PORT_START("IN1") // probably unused
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2") // probably unused
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -4176,6 +4334,13 @@ void igs011_state::nkishusp(machine_config &config)
 }
 
 
+void igs011_state::tygn(machine_config &config)
+{
+	nkishusp(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::tygn_mem);
+}
+
+
 void igs011_state::sound_irq(int state)
 {
 //   m_maincpu->set_input_line(3, state);
@@ -4805,6 +4970,63 @@ ROM_START( nkishusp )
 	ROM_LOAD( "sp.u38", 0x00000, 0x80000, CRC(d80e28e2) SHA1(c03441686e770227db6a2a41922fbb4284710571) )
 ROM_END
 
+/*********************************************************************************
+
+Te Yi Gong Neng, IGS 1996
+
+This is the joystick version of LHB2
+
+PCB Layout
+----------
+
+IGS PCB NO- 0127-2
+|-----------------------------------------|
+|UPC1242          U3587   K668   S0503.U42|
+|                     3.579545MHz         |
+|                            SW1          |
+|   M0502.U3                 SW2          |
+|                            SW3          |
+|                            SW4          |
+|                                   6164  |
+|J                                        |
+|A  M0501.U7             PAL        6164  |
+|M                       PAL              |
+|M                       PAL              |
+|A                       PAL      IGS011  |
+|                        PAL              |
+|                                         |
+|     68000            22MHz   KM428C256  |
+|           27C4096.U13                   |
+|    T518B  IGS003A     6164   KM428C256  |
+| SW5  BATTERY          6164              |
+|-----------------------------------------|
+Notes:
+      68000 - Clock 7.33333MHz [22/3]
+       K668 - Oki M6295 clone. Clock 1.047619048MHz [22/21]
+      U3587 - This is a YM2412 clone. Clock input 3.579545MHz
+  SW1/2/3/4 - 8-Position DIP Switch. SW3 and SW4 not populated
+        SW5 - Reset / NVRAM Clear
+       6164 - 8kBx8-bit SRAM
+  KM428C256 - Dual-Port Video RAM with 256kBx8-bit DRAM and 512x8 SAM (Serial Access Memory).
+              This is the same type of RAM used on Midway T-Unit hardware but 2X larger.
+
+*********************************************************************************/
+
+ROM_START( tygn ) // GFX ROMs same as lhb2 and nkishusp, sound ROM same as lhb2
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "27c4096.u13", 0x00000, 0x80000, CRC(25b1de1e) SHA1(7c3d0458b30db614e551fdf0db3f93fa44fcb758) )
+
+	ROM_REGION( 0x800000, "blitter", ROMREGION_ERASEFF )
+	ROM_LOAD( "m0501.u7", 0x000000, 0x200000, CRC(1c952bd6) SHA1(a6b6f1cdfb29647e81c032ffe59c94f1a10ceaf8) )
+
+	ROM_REGION( 0x200000, "blitter_hi", ROMREGION_ERASEFF ) // high order bit of graphics (5th bit)
+	ROM_LOAD( "m0502.u3", 0x00000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s0502.u42", 0x00000, 0x80000, CRC(c9609c9c) SHA1(f036e682b792033409966e84292a69275eaa05e5) )
+ROM_END
+
+
 /***************************************************************************
 
 Virtua Bowling by IGS
@@ -4912,7 +5134,7 @@ ROM_START( xymg )
 	ROM_CONTINUE(          0x00000, 0x80000 ) // 1ST+2ND IDENTICAL
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /***************************************************************************
@@ -4935,6 +5157,7 @@ GAME( 1995, lhbv33c,       lhb,      lhb,             lhb,       igs011_state, i
 GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_state, init_dbc,          ROT0, "IGS",                     "Daai Baan Sing (Hong Kong, V027H)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tygn,          lhb2,     tygn,            tygn,      igs011_state, init_tygn,         ROT0, "IGS",                     "Te Yi Gong Neng (China, V632C)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // needs correct IGS003 routines
 GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Man Guan (China, V651C)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1996, wlcc,          xymg,     wlcc,            wlcc,      igs011_state, init_wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1996, vbowl,         0,        vbowl,           vbowl,     igs011_state, init_vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

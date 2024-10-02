@@ -25,8 +25,8 @@ public:
 	void pc9821(machine_config &config);
 
 protected:
-	void pc9821_io(address_map &map);
-	void pc9821_map(address_map &map);
+	void pc9821_io(address_map &map) ATTR_COLD;
+	void pc9821_map(address_map &map) ATTR_COLD;
 
 	DECLARE_MACHINE_START(pc9821);
 	DECLARE_MACHINE_RESET(pc9821);
@@ -77,7 +77,7 @@ public:
 	void pc9821ap2(machine_config &config);
 
 protected:
-	void pc9821as_io(address_map &map);
+	void pc9821as_io(address_map &map) ATTR_COLD;
 
 private:
 	DECLARE_MACHINE_START(pc9821ap2);
@@ -105,8 +105,8 @@ public:
 	void pc9821cx3(machine_config &config);
 
 protected:
-	void pc9821cx3_map(address_map &map);
-	void pc9821cx3_io(address_map &map);
+	void pc9821cx3_map(address_map &map) ATTR_COLD;
+	void pc9821cx3_io(address_map &map) ATTR_COLD;
 
 private:
 	void remote_addr_w(offs_t offset, u8 data);

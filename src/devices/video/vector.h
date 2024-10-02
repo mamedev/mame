@@ -39,7 +39,7 @@ public:
 	void add_point(int x, int y, rgb_t color, int intensity);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	/* The vertices are buffered here */

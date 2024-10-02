@@ -21052,10 +21052,14 @@ Missing [7220] text selector for choices
 		</part>
 	</software>
 
-	<software name="gage">
+	<software name="gage" supported="no">
 		<description>Gage</description>
 		<year>1992</year>
 		<publisher>Ｍ．Ｎ．Ｍ．ソフトウェア (M.N.M. Software)</publisher>
+		<notes><![CDATA[
+Hangs on "Welcome to world of Mick Albart" message, [FDC] copy protection?
+Has a seizure when entering gameplay
+]]></notes>
 		<info name="alt_title" value="ゲイジ" />
 		<info name="release" value="19920925" />
 		<part name="flop1" interface="floppy_5_25">
@@ -39244,12 +39248,17 @@ No [PC9801-86] sound
 		</part>
 	</software>
 
-	<software name="sangofgt">
-		<description>Sangokushi Fighters</description>
+	<software name="sangofgt" supported="no">
+		<!-- Sangoku Bushou Souha a.k.a. Sango Fighter -->
+		<description>Sangoku Bushō Sōha</description>
 		<year>1995</year>
 		<publisher>イマジニア (Imagineer)</publisher>
+		<notes><![CDATA[
+Cannot install, gets stuck at "please insert disk and press mouse" prompt
+]]></notes>
 		<info name="alt_title" value="三國武将争覇" />
 		<info name="release" value="19950609" />
+		<info name="usage" value="Requires pc9821 minimum, needs HDD install from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -41374,39 +41383,46 @@ No [PC9801-86] sound
 	<software name="spcstage">
 		<description>Special Stage - Paris-Dakar Sabaku no Shissou</description>
 		<year>1992</year>
+		<!-- Takeru alt label? -->
 		<publisher>アレックス (Allex)</publisher>
 		<info name="alt_title" value="スペシャルステージ ～パリダカール砂漠の疾走～" />
 		<info name="release" value="19920330" />
+		<!-- TODO: game indicates labels by their initials (RM = Rally Map) -->
+		<!-- Are those visible on disks, or it's just implicit by the katakana? -->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="special stage - paris-dakar sabaku no shissou [main-system].fdi" size="1265664" crc="da92f10c" sha1="66c498e854ee58d32df5f7dabd528f10c956b033" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Opening"/>
+			<feature name="part_id" value="Bootup Opening"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="special stage - paris-dakar sabaku no shissou [bootup - opening].fdi" size="1265664" crc="ccef8104" sha1="6d4519698534a27a189a9add19e688a71eedc2e9" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Map"/>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Rally Map"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="special stage - paris-dakar sabaku no shissou [rally-map].fdi" size="1265664" crc="04f4256f" sha1="186907cbbbe48537c3e254dec14837cca3bd9ce1" offset="0" />
 			</dataarea>
 		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Main System"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="special stage - paris-dakar sabaku no shissou [main-system].fdi" size="1265664" crc="da92f10c" sha1="66c498e854ee58d32df5f7dabd528f10c956b033" offset="0" />
+			</dataarea>
+		</part>
+		<!-- baddump: empty floppy, game release has 3 disks only -->
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="User"/>
+			<feature name="part_id" value="User Disk"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="special stage - paris-dakar sabaku no shissou [user].fdi" size="1265664" crc="0a16e242" sha1="93061859c7641620a0890b90c84f6e6ad1852ad0" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="spindiz2">
+	<software name="spindiz2" supported="no">
 		<description>Spindizzy II</description>
 		<year>1991</year>
 		<publisher>アルシスソフト (Arsys Software)</publisher>
+		<notes><![CDATA[
+Hangs on new game after selecting any stage, waits for an irq to happen
+]]></notes>
 		<info name="alt_title" value="スピンディジー２" />
 		<info name="release" value="19910927" />
 		<part name="flop1" interface="floppy_5_25">

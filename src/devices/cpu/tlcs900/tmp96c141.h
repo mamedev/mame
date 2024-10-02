@@ -76,8 +76,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -89,7 +89,7 @@ protected:
 	virtual void tlcs900_handle_timers() override;
 
 private:
-	void internal_mem(address_map &map);
+	void internal_mem(address_map &map) ATTR_COLD;
 };
 
 // device type declaration

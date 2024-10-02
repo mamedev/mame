@@ -96,8 +96,8 @@ public:
 	required_device<isa8_device> m_bus;
 	required_ioport m_lk;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void update_speaker();
 	void update_fdc_int();
@@ -199,14 +199,14 @@ public:
 		, m_vdu(*this, AMS40041_TAG)
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void pc1512hd(machine_config &config);
 	void pc1512(machine_config &config);
 	void pc1512dd(machine_config &config);
-	void pc1512_io(address_map &map);
-	void pc1512_mem(address_map &map);
+	void pc1512_io(address_map &map) ATTR_COLD;
+	void pc1512_mem(address_map &map) ATTR_COLD;
 
 	required_device<ams40041_device> m_vdu;
 };
@@ -220,7 +220,7 @@ public:
 		, m_opt(0)
 	{ }
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t io_r(offs_t offset);
 	uint8_t printer_r(offs_t offset);
@@ -231,8 +231,8 @@ public:
 	void pc1640hd(machine_config &config);
 	void pc1640(machine_config &config);
 	void pc1640dd(machine_config &config);
-	void pc1640_io(address_map &map);
-	void pc1640_mem(address_map &map);
+	void pc1640_io(address_map &map) ATTR_COLD;
+	void pc1640_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_AMSTRAD_PC1512_H

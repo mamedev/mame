@@ -29,7 +29,7 @@ public:
 	}
 	namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	template <typename T> void set_hostcpu(T &&tag, bool is_master)
 	{
@@ -87,8 +87,8 @@ protected:
 	void cpu_irq_trigger();
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	devcb_write8 m_out_ext1_cb;

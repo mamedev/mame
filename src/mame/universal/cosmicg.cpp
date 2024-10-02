@@ -46,8 +46,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void cosmicg_palette(palette_device &palette);
@@ -58,8 +58,8 @@ private:
 	u8 cosmicg_port_1_r(offs_t offset);
 	void cosmic_color_register_w(offs_t offset, u8 data);
 
-	void mem_map(address_map &map);
-	void cru_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void cru_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;

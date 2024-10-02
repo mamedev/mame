@@ -57,8 +57,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t mcu_porta_r();
@@ -74,7 +74,7 @@ private:
 	bool atari_input_disabled() const { return !BIT(m_portb_out, 7); }
 	void mmu(uint8_t new_mmu);
 
-	void a600xl_mem(address_map &map);
+	void a600xl_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_portb_out;
 	uint8_t m_portc_out;

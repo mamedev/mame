@@ -128,7 +128,7 @@ public:
 
 	void init_bnstars();
 
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+	template <int P> ioport_value mahjong_ctrl_r();
 
 private:
 
@@ -175,10 +175,10 @@ private:
 	tilemap_t *m_scroll_tilemap[2]{};
 	tilemap_t *m_rotate_tilemap[2]{};
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	template <int which> u32 screen_update_dual(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void bnstars_map(address_map &map);
-	void bnstars_sound_map(address_map &map);
+	void bnstars_map(address_map &map) ATTR_COLD;
+	void bnstars_sound_map(address_map &map) ATTR_COLD;
 
 	void bnstars1_mahjong_select_w(u32 data);
 
@@ -436,7 +436,7 @@ template <int chip> void ms32_bnstars_state::palette_ram_w(offs_t offset, u16 da
 }
 
 template <int P>
-CUSTOM_INPUT_MEMBER(ms32_bnstars_state::mahjong_ctrl_r)
+ioport_value ms32_bnstars_state::mahjong_ctrl_r()
 {
 	required_ioport_array<4> &keys = (P == 0) ? m_p1_keys : m_p2_keys;
 	// different routing than other ms32.cpp mahjong games, using 0x2080 as mask

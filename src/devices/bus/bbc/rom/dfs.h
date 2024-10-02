@@ -27,7 +27,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_bbc_rom_interface overrides
 	virtual uint8_t read(offs_t offset) override;

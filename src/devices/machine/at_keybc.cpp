@@ -291,6 +291,10 @@ at_kbc_device_base::at_kbc_device_base(machine_config const &mconfig, device_typ
 {
 }
 
+at_kbc_device_base::~at_kbc_device_base()
+{
+}
+
 void at_kbc_device_base::device_start()
 {
 	save_item(NAME(m_hot_res));
@@ -376,6 +380,10 @@ at_keyboard_controller_device::at_keyboard_controller_device(machine_config cons
 {
 }
 
+at_keyboard_controller_device::~at_keyboard_controller_device()
+{
+}
+
 tiny_rom_entry const *at_keyboard_controller_device::device_rom_region() const
 {
 	return ROM_NAME(at_kbc);
@@ -449,6 +457,10 @@ ps2_keyboard_controller_device::ps2_keyboard_controller_device(machine_config co
 	, m_aux_irq(0U)
 	, m_aux_clk_in(1U), m_aux_clk_out(1U), m_aux_data_in(1U), m_aux_data_out(1U)
 	, m_p2_data(0xffU)
+{
+}
+
+ps2_keyboard_controller_device::~ps2_keyboard_controller_device()
 {
 }
 

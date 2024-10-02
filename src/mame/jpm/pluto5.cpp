@@ -210,12 +210,12 @@ private:
 	uint16_t pluto5_mem_r(offs_t offset, uint16_t mem_mask = ~0);
 	void pluto5_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void pluto5_map(address_map &map);
+	void pluto5_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 uint16_t pluto5_state::pluto5_mem_r(offs_t offset, uint16_t mem_mask)

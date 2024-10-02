@@ -36,8 +36,8 @@ public:
 	void init_reactmd();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	bool m_md_is_running;
@@ -49,7 +49,7 @@ private:
 	uint32_t screen_update_hybrid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank_hybrid(int state);
 
-	void megadriv_sunplus_map(address_map &map);
+	void megadriv_sunplus_map(address_map &map) ATTR_COLD;
 };
 
 

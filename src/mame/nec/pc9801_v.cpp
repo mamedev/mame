@@ -115,7 +115,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 			tile <<= 8;
 			tile |= (knj_tile & 0x7f);
 			kanji_sel = 1;
-			if((tile & 0x7c00) == 0x0800) // 8x16 charset selector
+			if(((tile & 0x7c00) == 0x0800) || ((tile & 0xfe00) == 0x5600)) // 8x16 charset selector
 				x_step = 1;
 			else
 				x_step = 2;

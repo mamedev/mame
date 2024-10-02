@@ -69,26 +69,26 @@ public:
 
 	void keys_w(int state) { m_key_sel = state; }
 	void keys_mux_w(int state) { m_key_mux = state; }
-	template <int Row> DECLARE_CUSTOM_INPUT_MEMBER(keys_row_r);
+	template <int Row> ioport_value keys_row_r();
 	template <int Row> u8 keys_analog_r();
 
 	DECLARE_INPUT_CHANGED_MEMBER(rhythm_w);
-	template <int Bit> DECLARE_CUSTOM_INPUT_MEMBER(rhythm_r) { return m_rhythm >> Bit; }
+	template <int Bit> ioport_value rhythm_r() { return m_rhythm >> Bit; }
 	DECLARE_INPUT_CHANGED_MEMBER(mode_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(mode_r) { return m_mode; }
+	ioport_value mode_r() { return m_mode; }
 
 	void cassette_w(int state);
 	void cassette_motor_w(int state);
-	DECLARE_CUSTOM_INPUT_MEMBER(cassette_r);
+	ioport_value cassette_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void cz230s_map(address_map &map);
-	void cz230s_pcm_map(address_map &map);
-	void sz1_map(address_map &map);
+	void cz230s_map(address_map &map) ATTR_COLD;
+	void cz230s_pcm_map(address_map &map) ATTR_COLD;
+	void sz1_map(address_map &map) ATTR_COLD;
 
 	void pcm_w(offs_t offset, u8 data);
 	template <int Num> void led_w(u8 data);
@@ -491,7 +491,7 @@ u8 cz230s_state::keys_r()
 
 /**************************************************************************/
 template <int Row>
-CUSTOM_INPUT_MEMBER(cz230s_state::keys_row_r)
+ioport_value cz230s_state::keys_row_r()
 {
 	u8 data = 0xff;
 
@@ -536,7 +536,7 @@ void cz230s_state::cassette_motor_w(int state)
 }
 
 /**************************************************************************/
-CUSTOM_INPUT_MEMBER(cz230s_state::cassette_r)
+ioport_value cz230s_state::cassette_r()
 {
 	return m_cassette->input() > 0 ? 0 : 1;
 }

@@ -240,12 +240,12 @@ public:
 	void magicard_base(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void ramdac_map(address_map &map);
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 	void dram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t dram_r(offs_t offset, uint16_t mem_mask);
@@ -277,7 +277,7 @@ protected:
 private:
 	output_finder<8> m_lamps;
 
-	void scc66470_map(address_map &map);
+	void scc66470_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint16_t []> m_dram;
 
@@ -299,10 +299,10 @@ public:
 	void init_dallaspk();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void magicard_map(address_map &map);
+	void magicard_map(address_map &map) ATTR_COLD;
 	uint8_t nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, uint8_t data);
 	uint8_t read_ds1207(offs_t offset);
@@ -332,10 +332,10 @@ public:
 	void simpbest(machine_config &config);
 
 private:
-	void hotslots_map_base(address_map &map);
-	void hotslots_map(address_map &map);
-	void puzzleme_map(address_map &map);
-	void simpbest_map(address_map &map);
+	void hotslots_map_base(address_map &map) ATTR_COLD;
+	void hotslots_map(address_map &map) ATTR_COLD;
+	void puzzleme_map(address_map &map) ATTR_COLD;
+	void simpbest_map(address_map &map) ATTR_COLD;
 
 	uint8_t read_ds1207_ds2401(offs_t offset);
 	void write_ds1207_ds2401(offs_t offset, uint8_t data);

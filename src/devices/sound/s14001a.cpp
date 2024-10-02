@@ -247,7 +247,7 @@ void s14001a_device::device_start()
 	m_bPPQCarryP2 = false;
 	m_bRepeatCarryP2 = false;
 	m_bLengthCarryP2 = false;
-	m_RomAddrP1 = 0;
+	m_uRomAddrP1 = 0;
 	m_uRomAddrP2 = 0;
 	m_bBusyP1 = false;
 	m_bStart = false;
@@ -283,7 +283,7 @@ void s14001a_device::device_start()
 	save_item(NAME(m_bPPQCarryP2));
 	save_item(NAME(m_bRepeatCarryP2));
 	save_item(NAME(m_bLengthCarryP2));
-	save_item(NAME(m_RomAddrP1));
+	save_item(NAME(m_uRomAddrP1));
 
 	save_item(NAME(m_uOutputP2));
 	save_item(NAME(m_uRomAddrP2));
@@ -333,15 +333,9 @@ void s14001a_device::data_w(u8 data)
 void s14001a_device::start_w(int state)
 {
 	m_stream->update();
-	m_bStart = (state != 0);
-	if (m_bStart)
+	if (state && !m_bStart)
 		m_uStateP1 = states::WORDWAIT;
-}
-
-void s14001a_device::set_clock(u32 clock)
-{
-	m_stream->update();
-	m_stream->set_sample_rate(clock);
+	m_bStart = (state != 0);
 }
 
 
@@ -385,7 +379,7 @@ bool s14001a_device::Clock()
 		m_uDeltaOldP2  = m_uDeltaOldP1;
 
 		m_uOutputP2    = m_uOutputP1;
-		m_uRomAddrP2   = m_RomAddrP1;
+		m_uRomAddrP2   = m_uRomAddrP1;
 
 		// setup carries from phase 2 values
 		m_bDAR04To00CarryP2 = m_uDAR04To00P2 == 0x1f;
@@ -415,7 +409,7 @@ bool s14001a_device::Clock()
 		// all other bits forced to 0.  04 to 08 makes a multiply by two.
 		m_uDAR13To05P1 = (m_uWord & 0x3c) >> 2;
 		m_uDAR04To00P1 = (m_uWord & 0x03) << 3;
-		m_RomAddrP1 = (m_uDAR13To05P1 << 3) | (m_uDAR04To00P1 >> 2); // remove lower two bits
+		m_uRomAddrP1 = (m_uDAR13To05P1 << 3) | (m_uDAR04To00P1 >> 2); // remove lower two bits
 
 		m_uOutputP1 = 7;
 		m_uStateP1  = m_bStart ? states::WORDWAIT : states::CWARMSB;
@@ -434,7 +428,7 @@ bool s14001a_device::Clock()
 		m_uDAR04To00P1 += 4;
 		if (m_uDAR04To00P1 >= 32)
 			m_uDAR04To00P1 = 0; // emulate 5 bit counter
-		m_RomAddrP1 = (m_uDAR13To05P1 << 3) | (m_uDAR04To00P1 >> 2); // remove lower two bits
+		m_uRomAddrP1 = (m_uDAR13To05P1 << 3) | (m_uDAR04To00P1 >> 2); // remove lower two bits
 
 		m_uOutputP1 = 7;
 		m_uStateP1  = m_bStart ? states::WORDWAIT : states::CWARLSB;
@@ -442,7 +436,7 @@ bool s14001a_device::Clock()
 
 	case states::CWARLSB:
 		m_uCWARP1   = m_uCWARP2 | (ReadMem(m_uRomAddrP2, m_bPhase1) >> 4); // setup in previous state
-		m_RomAddrP1 = m_uCWARP1;
+		m_uRomAddrP1 = m_uCWARP1;
 
 		m_uOutputP1 = 7;
 		m_uStateP1  = m_bStart ? states::WORDWAIT : states::DARMSB;
@@ -452,7 +446,7 @@ bool s14001a_device::Clock()
 		m_uDAR13To05P1 = ReadMem(m_uRomAddrP2, m_bPhase1) << 1; // 9 bit counter, 8 MSBs from ROM, lsb zeroed
 		m_uDAR04To00P1 = 0;
 		m_uCWARP1++;
-		m_RomAddrP1 = m_uCWARP1;
+		m_uRomAddrP1 = m_uCWARP1;
 
 		m_uOutputP1 = 7;
 		m_uStateP1  = m_bStart ? states::WORDWAIT : states::CTRLBITS;
@@ -469,7 +463,7 @@ bool s14001a_device::Clock()
 		m_uLengthP1  = (data & 0x1f) << 2; // includes external length and repeat
 		m_uDAR04To00P1 = 0;
 		m_uCWARP1++; // gets ready for next DARMSB
-		m_RomAddrP1  = (m_uDAR13To05P1 << 3) | (m_uDAR04To00P1 >> 2); // remove lower two bits
+		m_uRomAddrP1  = (m_uDAR13To05P1 << 3) | (m_uDAR04To00P1 >> 2); // remove lower two bits
 
 		m_uOutputP1 = 7;
 		m_uStateP1  = m_bStart ? states::WORDWAIT : states::PLAY;
@@ -540,11 +534,11 @@ bool s14001a_device::Clock()
 				m_uDAR13To05P1 = 0; // emulate 9 bit counter
 		}
 
-		// construct m_RomAddrP1
-		m_RomAddrP1 = m_uDAR04To00P1;
+		// construct m_uRomAddrP1
+		m_uRomAddrP1 = m_uDAR04To00P1;
 		if (m_bVoicedP2 && m_uLengthP1 & 0x1) // mirroring
-			m_RomAddrP1 ^= 0x1f; // count backwards
-		m_RomAddrP1 = (m_uDAR13To05P1 << 3) | m_RomAddrP1 >> 2;
+			m_uRomAddrP1 ^= 0x1f; // count backwards
+		m_uRomAddrP1 = (m_uDAR13To05P1 << 3) | m_uRomAddrP1 >> 2;
 
 		// next state
 		if (m_bStart)
@@ -554,7 +548,7 @@ bool s14001a_device::Clock()
 		else if (m_bLengthCarryP2)
 		{
 			m_uStateP1  = states::DARMSB;
-			m_RomAddrP1 = m_uCWARP1; // output correct address
+			m_uRomAddrP1 = m_uCWARP1; // output correct address
 		}
 		else
 			m_uStateP1 = states::PLAY;

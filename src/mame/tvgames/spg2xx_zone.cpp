@@ -24,8 +24,8 @@ public:
 	void init_zone100();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t m_w60_controller_input = 0;
 	uint16_t m_w60_porta_data = 0;
@@ -56,11 +56,11 @@ public:
 
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	virtual void mem_map_z40(address_map &map);
+	virtual void mem_map_z40(address_map &map) ATTR_COLD;
 	uint16_t z40_rom_r(offs_t offset);
 	uint16_t zone40_porta_r();
 	void zone40_porta_w(uint16_t data);

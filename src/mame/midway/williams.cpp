@@ -1385,7 +1385,7 @@ INPUT_PORTS_END
 
 
 template <int P>
-CUSTOM_INPUT_MEMBER(tshoot_state::gun_r)
+ioport_value tshoot_state::gun_r()
 {
 	int data = m_gun[P]->read();
 	return (data & 0x3f) ^ ((data & 0x3f) >> 1);
@@ -1777,10 +1777,10 @@ void williams_state::lottofun(machine_config &config)
 	williams_b1(config);
 
 	// pia
-	m_pia[0]->writepb_handler().set("ticket", FUNC(ticket_dispenser_device::motor_w)).bit(7);
+	m_pia[0]->writepb_handler().set("ticket", FUNC(ticket_dispenser_device::motor_w)).bit(7).invert();
 	m_pia[0]->ca2_handler().set([this](int state) { machine().bookkeeping().coin_lockout_global_w(state); });
 
-	TICKET_DISPENSER(config, "ticket", attotime::from_msec(70), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(70));
 }
 
 

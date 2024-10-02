@@ -57,7 +57,7 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<6> m_inputs;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void led_w(offs_t offset, u8 data);
 	void digit_w(offs_t offset, u8 data);

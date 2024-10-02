@@ -57,7 +57,7 @@ private:
 	required_device<m68000_base_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 

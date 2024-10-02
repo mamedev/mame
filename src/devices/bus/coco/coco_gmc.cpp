@@ -39,7 +39,7 @@ namespace
 	public:
 		// construction/destruction
 		coco_pak_gmc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-		virtual void device_add_mconfig(machine_config &config) override;
+		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	protected:
 		// device-level overrides

@@ -71,7 +71,7 @@ public:
 
 protected:
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	void update_cd1(int state);
 	void update_cd2(int state);

@@ -25,8 +25,8 @@ public:
 	uint32_t get_bank_base() {return m_bank_base; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t m_overlay;

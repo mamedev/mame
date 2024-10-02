@@ -80,9 +80,9 @@ public:
 	void gfire2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -111,10 +111,10 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gfire2_io_map(address_map &map);
-	void gfire2_map(address_map &map);
-	void mosaic_io_map(address_map &map);
-	void mosaic_map(address_map &map);
+	void gfire2_io_map(address_map &map) ATTR_COLD;
+	void gfire2_map(address_map &map) ATTR_COLD;
+	void mosaic_io_map(address_map &map) ATTR_COLD;
+	void mosaic_map(address_map &map) ATTR_COLD;
 };
 
 

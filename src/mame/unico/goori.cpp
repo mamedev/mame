@@ -82,11 +82,11 @@ public:
 	void goori(machine_config& config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	void goori_map(address_map& map);
+	void goori_map(address_map &map) ATTR_COLD;
 
 	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

@@ -131,7 +131,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(horizontal_tile_info);
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	void statriv2_palette(palette_device &palette) const;
 	void check_coin_status();
 	DECLARE_VIDEO_START(vertical);
@@ -139,9 +139,9 @@ private:
 	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
 	INTERRUPT_GEN_MEMBER(tripdraw_interrupt);
 
-	void statriv2_map(address_map &map);
-	void statusbj_io_map(address_map &map);
-	void statriv2_io_map(address_map &map);
+	void statriv2_map(address_map &map) ATTR_COLD;
+	void statusbj_io_map(address_map &map) ATTR_COLD;
+	void statriv2_io_map(address_map &map) ATTR_COLD;
 };
 
 

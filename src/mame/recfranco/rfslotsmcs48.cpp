@@ -89,7 +89,7 @@ public:
 	void babyfrts(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	memory_share_creator<uint8_t> m_data_ram;
 
 	required_device<i8035_device> m_maincpu;
@@ -104,11 +104,11 @@ protected:
 	output_finder<50> m_outbit;
 
 private:
-	void main_program_map(address_map &map);
-	void main_io_map(address_map &map);
-	void soundaj_program_map(address_map &map);
-	void soundbf_program_map(address_map &map);
-	void sound_io_map(address_map &map);
+	void main_program_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void soundaj_program_map(address_map &map) ATTR_COLD;
+	void soundbf_program_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
 
 	// Main MCU Interface
 	u8 main_io_r(offs_t offset);
@@ -728,7 +728,7 @@ void rfslotsmcs48_state::rf_3115_base(machine_config &config)
 	NVRAM(config, "data_ram", nvram_device::DEFAULT_ALL_0);
 
 	// Hopper device
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	SPEAKER(config, "mono").front_center();
 }

@@ -141,7 +141,7 @@ public:
 	int prot_r();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -177,7 +177,7 @@ private:
 	void decrypt_p();
 	void decrypt_s();
 	void decrypt_oki();
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 

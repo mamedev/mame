@@ -58,7 +58,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
@@ -75,7 +75,7 @@ public:
 	slc1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_speaker(*this, "speaker")
+		, m_dac(*this, "dac")
 		, m_inputs(*this, "IN.%u", 0U)
 		, m_display(*this, "display")
 		, m_busyled(*this, "busy_led")
@@ -86,11 +86,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<3> m_inputs;
 	required_device<pwm_display_device> m_display;
 	output_finder<> m_busyled;
@@ -98,8 +98,8 @@ private:
 	u8 m_select = 0;
 	u8 m_segment = 0;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	u8 input_r();
 	void control_w(offs_t offset, u8 data);
@@ -128,7 +128,7 @@ void slc1_state::control_w(offs_t offset, u8 data)
 	// 7442 0-1,3-6: digit select
 	// 7442 3-5: keypad select
 	// 7442 9: speaker out
-	m_speaker->level_w(BIT(sel, 9));
+	m_dac->write(BIT(sel, 9));
 
 	// a0-a2+d7: digit segment data
 	u8 mask = 1 << (offset & 7);
@@ -222,8 +222,8 @@ void slc1_state::slc1(machine_config &config)
 	config.set_default_layout(layout_slc1);
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 

@@ -87,7 +87,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	required_address_space m_program;
 	required_address_space m_io;

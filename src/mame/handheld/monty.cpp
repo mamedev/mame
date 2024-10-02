@@ -19,7 +19,7 @@ is blue and says Master Monty at the top.  Both of these versions are hand-upgra
 by adding chips and wires to the inside of the game.
 
 Hardware notes:
-- Z80 @ ~3.58MHz
+- Z80, 3.58MT ceramic resonator
 - 2KB SRAM, 16KB ROM(32KB on mmonty)
 - 2*16KB ROM sockets for vocabulary expansion
 - 2*SED1503F, 40*32 LCD screen, beeper
@@ -61,21 +61,21 @@ public:
 	void mmonty(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
 	required_device_array<sed1503_device, 2> m_lcd;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<6> m_inputs;
 
 	u64 m_lcd_data[32] = { };
 	int m_lcd_cs = 0;
 	int m_halt = 0;
 
-	void monty_mem(address_map &map);
-	void mmonty_mem(address_map &map);
-	void monty_io(address_map &map);
+	void monty_mem(address_map &map) ATTR_COLD;
+	void mmonty_mem(address_map &map) ATTR_COLD;
+	void monty_io(address_map &map) ATTR_COLD;
 
 	template<int N> void lcd_output_w(offs_t offset, u64 data) { m_lcd_data[N << 4 | offset] = data; } // buffer for screen_update
 	u32 screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
@@ -233,7 +233,7 @@ INPUT_PORTS_END
 void monty_state::monty(machine_config &config)
 {
 	// Basic machine hardware
-	Z80(config, m_maincpu, 3.579545_MHz_XTAL); // Ceramic resonator labeled 3.58MT
+	Z80(config, m_maincpu, 3.58_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &monty_state::monty_mem);
 	m_maincpu->set_addrmap(AS_IO, &monty_state::monty_io);
 	m_maincpu->halt_cb().set(FUNC(monty_state::halt_changed));

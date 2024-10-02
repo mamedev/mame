@@ -40,6 +40,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
+#include "imagedev/snapquik.h"
 #include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/mc146818.h"
@@ -50,13 +51,12 @@
 #include "machine/upd765.h"
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
-#include "speaker.h"
 #include "video/upd7220.h"
-#include "emupal.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
-#include "imagedev/snapquik.h"
+#include "speaker.h"
 
 
 namespace {
@@ -105,10 +105,10 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void update_memory_mapping();
 
@@ -149,15 +149,15 @@ private:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	void qx10_palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const;
 	void dma_hrq_changed(int state);
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
-	void qx10_io(address_map &map);
-	void qx10_mem(address_map &map);
-	void upd7220_map(address_map &map);
+	void qx10_io(address_map &map) ATTR_COLD;
+	void qx10_mem(address_map &map) ATTR_COLD;
+	void upd7220_map(address_map &map) ATTR_COLD;
 
 	required_device<pit8253_device> m_pit_1;
 	required_device<pit8253_device> m_pit_2;
@@ -184,6 +184,8 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
+
+	bitmap_rgb32 m_bitmap;
 
 	/* FDD */
 	int     m_fdcint = 0;
@@ -239,13 +241,8 @@ UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
 		pen = ((gfx[0] >> xi) & 1) ? 1 : 0;
 		pen|= ((gfx[1] >> xi) & 1) ? 2 : 0;
 		pen|= ((gfx[2] >> xi) & 1) ? 4 : 0;
-		for (int z = 0; z <= m_zoom; ++z)
-		{
-			int xval = ((x+xi)*(m_zoom+1))+z;
-			if (xval >= bitmap.cliprect().width() * 2)
-				continue;
-			bitmap.pix(y, xval) = palette[pen];
-		}
+
+		bitmap.pix(y, x+xi) = palette[pen];
 	}
 }
 
@@ -259,7 +256,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 		int tile = m_video_ram[((addr+x)*2) >> 1] & 0xff;
 		int attr = m_video_ram[((addr+x)*2) >> 1] >> 8;
 
-		uint8_t color = (m_color_mode) ? 1 : (attr & 4) ? 2 : 1; /* TODO: color mode */
+		// TODO: color mode support
+		uint8_t color = (m_color_mode) ? 1 : (attr & 4) ? 2 : 1;
 
 		for (int yi = 0; yi < lr; yi++)
 		{
@@ -268,17 +266,19 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 			if(attr & 8)
 				tile_data^=0xff;
 
-			if(cursor_on && cursor_addr == addr+x) //TODO
+			if(cursor_on && cursor_addr == addr+x)
 				tile_data^=0xff;
 
-			if(attr & 0x80 && m_screen->frame_number() & 0x10) //TODO: check for blinking interval
+			 //TODO: check for blinking interval
+			if(attr & 0x80 && m_screen->frame_number() & 0x10)
 				tile_data=0;
 
 			for (int xi = 0; xi < 8; xi++)
 			{
-				int res_x = ((x * 8) + xi) * (m_zoom + 1);
-				int res_y = y + (yi * (m_zoom + 1));
+				int res_x = ((x * 8) + xi);
+				int res_y = y + yi;
 
+				// TODO: cpm22mf:flop2 display random character test will go out of bounds here
 				if(!m_screen->visible_area().contains(res_x, res_y))
 					continue;
 
@@ -288,14 +288,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 				else
 					pen = ((tile_data >> xi) & 1) ? color : 0;
 
-				for (int zx = 0; zx <= m_zoom; ++zx)
-				{
-					for (int zy = 0; zy <= m_zoom; ++zy)
-					{
-						if(pen)
-							bitmap.pix(res_y+zy, res_x+zx) = palette[pen];
-					}
-				}
+				if (pen)
+					bitmap.pix(res_y, res_x) = palette[pen];
 			}
 		}
 	}
@@ -303,9 +297,17 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 
 uint32_t qx10_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	m_bitmap.fill(m_palette->black_pen(), cliprect);
 
-	m_hgdc->screen_update(screen, bitmap, cliprect);
+	m_hgdc->screen_update(screen, m_bitmap, cliprect);
+	// cpm22mf:flop2 will test this under Zoom Test
+	const u32 pixel_size = 0x10000 / (m_zoom+1);
+	copyrozbitmap(
+		bitmap, cliprect, m_bitmap,
+		0, 0,
+		pixel_size, 0, 0, pixel_size,
+		false
+	);
 
 	return 0;
 }
@@ -813,7 +815,7 @@ void qx10_state::machine_reset()
 	{
 		int i;
 
-		/* TODO: is there a bit that sets this up? */
+		// TODO: expose to slot monitor option
 		m_color_mode = ioport("CONFIG")->read() & 1;
 
 		if(m_color_mode) //color
@@ -855,9 +857,12 @@ void qx10_state::video_start()
 {
 	// allocate memory
 	m_video_ram = make_unique_clear<uint16_t[]>(0x30000);
+
+	m_screen->register_screen_bitmap(m_bitmap);
+
 }
 
-void qx10_state::qx10_palette(palette_device &palette) const
+void qx10_state::palette_init(palette_device &palette) const
 {
 	// ...
 }
@@ -902,7 +907,7 @@ void qx10_state::qx10(machine_config &config)
 	m_screen->set_screen_update(FUNC(qx10_state::screen_update));
 	m_screen->set_raw(16.67_MHz_XTAL, 872, 152, 792, 421, 4, 404);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_qx10);
-	PALETTE(config, m_palette, FUNC(qx10_state::qx10_palette), 8);
+	PALETTE(config, m_palette, FUNC(qx10_state::palette_init), 8);
 
 	/* Devices */
 

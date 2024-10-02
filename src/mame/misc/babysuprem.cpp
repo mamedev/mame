@@ -67,8 +67,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(test_pressed);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -98,7 +98,7 @@ private:
 	void u9_w(offs_t offset, uint8_t data);
 	void u10_w(offs_t offset, uint8_t data);
 
-	void bsuprem_map(address_map &map);
+	void bsuprem_map(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(mains_irq);
 
@@ -183,9 +183,9 @@ void bsuprem_state::bsuprem(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	HOPPER(config, m_hopper_5, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	HOPPER(config, m_hopper_25, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	HOPPER(config, m_hopper_100, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper_5, attotime::from_msec(50));
+	HOPPER(config, m_hopper_25, attotime::from_msec(50));
+	HOPPER(config, m_hopper_100, attotime::from_msec(50));
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();

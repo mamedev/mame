@@ -520,15 +520,15 @@ public:
 
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	memory_share_creator<uint8_t> m_data_ram;
 
 private:
-	void audio_program_map(address_map &map);
-	void audio_io_map(address_map &map);
-	void main_program_map(address_map &map);
-	void main_io_map(address_map &map);
+	void audio_program_map(address_map &map) ATTR_COLD;
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void main_program_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
 
 	// Main MCU Interface
 	u8 main_io_r(offs_t offset);
@@ -1237,7 +1237,7 @@ void interflip8035_state::interflip(machine_config &config)
 	add_em_reels(config, 20, attotime::from_double(2));
 
 	// hopper device
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	// sound stuff
 	SPEAKER(config, "mono").front_center();

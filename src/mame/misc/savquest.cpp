@@ -100,8 +100,8 @@ protected:
 	// driver_device overrides
 //  virtual void video_start();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	std::unique_ptr<uint32_t[]> m_bios_f0000_ram;
@@ -148,8 +148,8 @@ private:
 	uint8_t smram_r(offs_t offset);
 	void smram_w(offs_t offset, uint8_t data);
 
-	void savquest_io(address_map &map);
-	void savquest_map(address_map &map);
+	void savquest_io(address_map &map) ATTR_COLD;
+	void savquest_map(address_map &map) ATTR_COLD;
 
 	void intel82439tx_init();
 	void vid_3dfx_init();

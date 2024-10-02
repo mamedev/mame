@@ -48,8 +48,8 @@ public:
 	void marc101(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t porta_r();
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
@@ -107,8 +107,8 @@ public:
 	void init_m527();
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t porta_r() override;
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
@@ -1002,7 +1002,7 @@ CONS( 2014, marc101,     0,        0, marc101, m489,  spg2xx_game_marc101_state,
 
 CONS( 200?, ddmsup,      0,        0, ddmsup, ddmsup,  spg2xx_game_ddmsup_state, empty_init,    "Senario", "Double Dance Mania: Supreme / Dance Supreme", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // titlescreen is just 'Dance Supreme'
 
-CONS( 200?, ddmmeg12,    0,        0, ddmsup, ddmsup,  spg2xx_game_ddmsup_state,  empty_init,    "Senario",  "Double Dance Mania: Mega 12",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, ddmmeg12,    0,        0, ddmsup, ddmsup,  spg2xx_game_ddmsup_state,  empty_init,    "Senario",  "Double Dance Mania: Mega 12",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2015, marc250,     0,        0, marc101, m489,  spg2xx_game_marc250_state, init_m527, "Millennium 2000 GmbH", "Millennium Arcade 250 (M527)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

@@ -1315,8 +1315,8 @@ void playmark_state::hotmind(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,hotmind)
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_token,  attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(350));
+	TICKET_DISPENSER(config, m_token,  attotime::from_msec(350));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1356,8 +1356,8 @@ void playmark_state::luckboomh(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,luckboomh)
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	TICKET_DISPENSER(config, m_token,  attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(350));
+	TICKET_DISPENSER(config, m_token,  attotime::from_msec(350));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

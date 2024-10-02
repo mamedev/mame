@@ -283,15 +283,6 @@ uint32_t tms9980a_device::execute_max_cycles() const noexcept
 	return 136;
 }
 
-uint32_t tms9980a_device::execute_input_lines() const noexcept
-{
-	return 8;
-}
-
-// clocks to cycles, cycles to clocks = id
-// execute_default_irq_vector = 0
-// execute_burn = nop
-
 // device_disasm_interface overrides
 
 std::unique_ptr<util::disasm_interface> tms9980a_device::create_disassembler()

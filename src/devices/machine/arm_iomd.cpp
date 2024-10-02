@@ -427,7 +427,7 @@ inline u8 arm_iomd_device::update_irqa_type(u8 data)
 inline void arm_iomd_device::flush_irq(unsigned Which)
 {
 	if (m_irq_status[Which] & m_irq_mask[Which])
-		m_host_cpu->pulse_input_line(ARM7_IRQ_LINE, m_host_cpu->minimum_quantum_time());
+		m_host_cpu->pulse_input_line(arm7_cpu_device::ARM7_IRQ_LINE, m_host_cpu->minimum_quantum_time());
 }
 
 template <unsigned Which> inline void arm_iomd_device::trigger_irq(u8 irq_type)

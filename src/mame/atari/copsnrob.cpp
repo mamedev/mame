@@ -96,8 +96,8 @@ public:
 	void copsnrob(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_trucky;
@@ -117,7 +117,7 @@ private:
 
 	uint8_t m_misc = 0U;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint8_t misc_r();
 	void misc2_w(uint8_t data);

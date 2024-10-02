@@ -63,7 +63,6 @@ check more info and photo from cjdh2.zip!!!
 #include "igs036crypt.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "sound/okim6295.h"
 #include "sound/tt5665.h"
 
@@ -96,7 +95,7 @@ private:
 
 	void pgm_create_dummy_internal_arm_region(void);
 
-	void igs_m036_map(address_map &map);
+	void igs_m036_map(address_map &map) ATTR_COLD;
 };
 
 

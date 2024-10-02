@@ -71,10 +71,10 @@ public:
 protected:
 	void ip20(machine_config &config);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	required_device<r4000_base_device> m_cpu;
 	required_device<eeprom_serial_93cxx_device> m_eerom;

@@ -54,7 +54,7 @@ public:
 	void cforte(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -69,7 +69,7 @@ private:
 	u8 m_led_select = 0;
 
 	// address maps
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();
@@ -93,7 +93,7 @@ void cforte_state::machine_start()
     I/O
 *******************************************************************************/
 
-// HLCD0538
+// LCD
 
 void cforte_state::lcd_output_w(u64 data)
 {
@@ -115,7 +115,7 @@ void cforte_state::lcd_output_w(u64 data)
 }
 
 
-// TTL/generic
+// misc
 
 void cforte_state::update_display()
 {
@@ -135,9 +135,9 @@ void cforte_state::control_w(u8 data)
 	// d0: HLCD0538 data in
 	// d1: HLCD0538 clk
 	// d2: HLCD0538 lcd
-	m_lcd->data_w(data & 1);
-	m_lcd->clk_w(data >> 1 & 1);
-	m_lcd->lcd_w(data >> 2 & 1);
+	m_lcd->data_w(BIT(data, 0));
+	m_lcd->clk_w(BIT(data, 1));
+	m_lcd->lcd_w(BIT(data, 2));
 
 	// d3: ? (goes high at power-off NMI)
 
@@ -146,7 +146,7 @@ void cforte_state::control_w(u8 data)
 	update_display();
 
 	// d7: enable beeper
-	m_beeper->set_state(data >> 7 & 1);
+	m_beeper->set_state(BIT(data, 7));
 }
 
 u8 cforte_state::input1_r()
@@ -171,7 +171,6 @@ u8 cforte_state::input2_r()
 			data |= m_inputs[i]->read() << 6;
 
 	// other: ?
-
 	return ~data;
 }
 
@@ -293,5 +292,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, cfortea, 0,       0,      cforte,  cforte, cforte_state, empty_init, "Novag Industries", "Constellation Forte (version A)", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, cforteb, cfortea, 0,      cforte,  cforte, cforte_state, empty_init, "Novag Industries", "Constellation Forte (version B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, cfortea, 0,       0,      cforte,  cforte, cforte_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Constellation Forte (version A)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, cforteb, cfortea, 0,      cforte,  cforte, cforte_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Constellation Forte (version B)", MACHINE_SUPPORTS_SAVE )

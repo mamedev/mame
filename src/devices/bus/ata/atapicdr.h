@@ -46,9 +46,9 @@ protected:
 	atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void perform_diagnostic() override;
 	virtual void identify_packet_device() override;
@@ -73,7 +73,7 @@ public:
 
 protected:
 	atapi_fixed_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class atapi_dvdrom_device : public atapi_cdrom_device
@@ -82,7 +82,7 @@ public:
 	atapi_dvdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class atapi_fixed_dvdrom_device : public atapi_cdrom_device
@@ -91,7 +91,7 @@ public:
 	atapi_fixed_dvdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 // device type definition

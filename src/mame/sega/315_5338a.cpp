@@ -47,7 +47,7 @@ sega_315_5338a_device::sega_315_5338a_device(const machine_config &mconfig, cons
 void sega_315_5338a_device::device_start()
 {
 	// register for save states
-	save_pointer(NAME(m_port_value), 7);
+	save_item(NAME(m_port_value));
 	save_item(NAME(m_port_config));
 	save_item(NAME(m_serial_output));
 	save_item(NAME(m_address));

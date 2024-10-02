@@ -70,8 +70,8 @@ protected:
 	void internal_write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void set_irq(int state);
 	virtual void set_dmarq(int state);

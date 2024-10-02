@@ -33,8 +33,8 @@ public:
 protected:
 	msm665xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor mem_map, address_map_constructor data_map);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -88,7 +88,7 @@ public:
 	msm66573_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 private:
-	void data_map(address_map &map);
+	void data_map(address_map &map) ATTR_COLD;
 };
 
 

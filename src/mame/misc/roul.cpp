@@ -91,7 +91,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t blitter_status_r();
@@ -102,10 +102,10 @@ private:
 	void roul_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void roul_cpu_io_map(address_map &map);
-	void roul_map(address_map &map);
-	void sound_cpu_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void roul_cpu_io_map(address_map &map) ATTR_COLD;
+	void roul_map(address_map &map) ATTR_COLD;
+	void sound_cpu_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;

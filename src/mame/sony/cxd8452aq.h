@@ -21,7 +21,7 @@ class cxd8452aq_device : public device_t, public device_memory_interface
 public:
 	cxd8452aq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	template <typename... T>
 	void set_apbus_address_translator(T &&...args) { m_apbus_virt_to_phys_callback.set(std::forward<T>(args)...); }
@@ -78,11 +78,11 @@ protected:
 	emu_timer *m_dma_check;
 
 	// Bus configuration
-	void sonic_bus_map(address_map &map);
+	void sonic_bus_map(address_map &map) ATTR_COLD;
 
 	// overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 	// Bus access

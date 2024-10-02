@@ -53,7 +53,7 @@ public:
 	void init_maygayep();
 
 private:
-	void maygayep_map(address_map &map);
+	void maygayep_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

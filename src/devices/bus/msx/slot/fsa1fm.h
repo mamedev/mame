@@ -24,8 +24,8 @@ public:
 	void set_rom_start(const char *region, uint32_t offset) { m_rom_region.set_tag(region); m_region_offset = offset; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static constexpr size_t RAM_SIZE = 0x2000;
@@ -42,8 +42,8 @@ private:
 	uint8_t m_selected_bank[6];
 	bool m_ram_active[6];
 	uint8_t m_control;
-	std::vector<uint8_t> m_ram;
-	std::vector<uint8_t> m_empty_bank;
+	std::unique_ptr<u8[]> m_ram;
+	std::unique_ptr<u8[]> m_empty_bank;
 };
 
 
@@ -56,10 +56,10 @@ public:
 	void set_rom_start(const char *region, uint32_t offset) { m_rom_region.set_tag(region); m_region_offset = offset; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	static constexpr size_t SRAM_SIZE = 0x2000;
@@ -76,7 +76,7 @@ private:
 	required_memory_region m_rom_region;
 	memory_bank_creator m_rombank;
 	u32 m_region_offset;
-	std::vector<u8> m_sram;
+	std::unique_ptr<u8[]> m_sram;
 };
 
 

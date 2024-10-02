@@ -27,13 +27,13 @@ public:
 	// input lines
 	template <unsigned Channel> void drq_w(int state);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	template <unsigned Channel> u32 load_address_r() { return m_channel[Channel].load_address; }
 	template <unsigned Channel> u32 diag_r() { return 0; }

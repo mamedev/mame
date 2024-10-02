@@ -61,7 +61,7 @@ public:
 	ram_device &set_default_value(u8 default_value) { m_default_value = default_value; return *this; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:

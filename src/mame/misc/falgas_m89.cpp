@@ -108,7 +108,7 @@ public:
 	void falgasm87(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<i8085a_cpu_device> m_maincpu;
 
@@ -116,8 +116,8 @@ private:
 	void psg_pa_w(u8 data);
 	u8 psg_pb_r();
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<4> m_inputs;
 
@@ -138,9 +138,9 @@ public:
 private:
 	required_device<i8085a_cpu_device> m_videocpu;
 
-	void main_io_map(address_map &map);
-	void video_mem_map(address_map &map);
-	void video_io_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void video_mem_map(address_map &map) ATTR_COLD;
+	void video_io_map(address_map &map) ATTR_COLD;
 };
 
 void falgasm89_state::machine_start()

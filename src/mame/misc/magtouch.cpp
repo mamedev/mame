@@ -111,11 +111,11 @@ private:
 	uint8_t magtouch_io_r(offs_t offset);
 	void magtouch_io_w(offs_t offset, uint8_t data);
 	void dma8237_1_dack_w(uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	static void magtouch_sb_conf(device_t *device);
-	void magtouch_io(address_map &map);
-	void magtouch_map(address_map &map);
+	void magtouch_io(address_map &map) ATTR_COLD;
+	void magtouch_map(address_map &map) ATTR_COLD;
 };
 
 /*************************************

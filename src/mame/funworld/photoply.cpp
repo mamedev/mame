@@ -94,8 +94,8 @@ private:
 
 	static void winbond_superio_config(device_t *device);
 
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 #if 0

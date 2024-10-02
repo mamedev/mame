@@ -81,8 +81,10 @@ Truck Kyosokyoku (TKK2/VER.A)            (C) Namco,        2000  COH-700     SYS
 
 Wanted Games
 ------------
-Aerosmith - Quest for Fame              (C) Namco,        2001
+Aerosmith - Quest for Fame              (C) Namco,        1999 (flyer date)
 http://www.bandainamcogames.co.jp/am/vg/questforfame/
+https://flyers.arcade-museum.com/videogames/show/2167#gallery-1
+https://flyers.arcade-museum.com/videogames/show/2167#gallery-2
 
 Soul Calibur Ver.B                      (C) Namco,        1998 (flyer date)
 https://flyers.arcade-museum.com/?page=flyer&db=videodb&id=1009&image=1
@@ -91,8 +93,9 @@ Probably doesn't exist
 
 Submarines                              (C) Namco,        1999 (flyer date)
 https://flyers.arcade-museum.com/?page=flyer&db=videodb&id=5531&image=1
-This was cancelled, only the flyer exists.
-It was shown only at an amusement show. Possibly a prototype still exists. Possibly not.
+https://www.youtube.com/watch?v=k-JbUTWcFjg
+Unreleased but was demonstrated at the 1999 Amusement Machine Operator's Union (AMOU) tradeshow in Tokyo.
+Was possibly a sequel to Namco's 1978 'Submarine'.
 
 Tekno Werk                              (C) Namco,        1999
 A music game with two 17-key Yamaha keyboards side by side for 2 players
@@ -1154,17 +1157,17 @@ public:
 	void init_alt_bank1();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void jvsmap(address_map &map);
-	void namcos12_map(address_map &map);
-	void plarailjvsmap(address_map &map);
-	void ptblank2_map(address_map &map);
-	void s12h8rwjvsmap(address_map &map);
-	void s12h8rwmap(address_map &map);
-	void tdjvsmap(address_map &map);
-	void tektagt_map(address_map &map);
+	void jvsmap(address_map &map) ATTR_COLD;
+	void namcos12_map(address_map &map) ATTR_COLD;
+	void plarailjvsmap(address_map &map) ATTR_COLD;
+	void ptblank2_map(address_map &map) ATTR_COLD;
+	void s12h8rwjvsmap(address_map &map) ATTR_COLD;
+	void s12h8rwmap(address_map &map) ATTR_COLD;
+	void tdjvsmap(address_map &map) ATTR_COLD;
+	void tektagt_map(address_map &map) ATTR_COLD;
 
 	uint16_t s12_mcu_gun_h_r();
 	uint16_t s12_mcu_gun_v_r();
@@ -1242,7 +1245,7 @@ public:
 	void kartduel(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 
@@ -1262,7 +1265,7 @@ public:
 	void init_truckk();
 
 private:
-	void cdxa_psx_map(address_map &map);
+	void cdxa_psx_map(address_map &map) ATTR_COLD;
 
 	required_device<namcos12_cdxa_device> m_cdxa_pcb;
 };

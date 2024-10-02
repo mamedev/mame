@@ -59,7 +59,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual state ds1wire_next_state(state prev_state, u8 command, u16 index, u8 data) = 0;
 	virtual u8 ds1wire_read_rom(u16 index) const = 0;
@@ -105,7 +105,7 @@ protected:
 	ds2430a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual bool nvram_read(util::read_stream &file) override;

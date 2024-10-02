@@ -111,8 +111,8 @@ public:
 	void indy_4610(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	template <uint32_t addr_base> uint64_t bus_error_r(offs_t offset, uint64_t mem_mask = ~0);
 	template <uint32_t addr_base> void bus_error_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
@@ -120,14 +120,14 @@ protected:
 	uint8_t volume_r(offs_t offset);
 	void volume_w(offs_t offset, uint8_t data);
 
-	void ip24_map(address_map &map);
-	void ip24_base_map(address_map &map);
-	void pio0_map(address_map &map);
-	void pio1_map(address_map &map);
-	void pio2_map(address_map &map);
-	void pio3_map(address_map &map);
-	void pio5_map(address_map &map);
-	void pio6_map(address_map &map);
+	void ip24_map(address_map &map) ATTR_COLD;
+	void ip24_base_map(address_map &map) ATTR_COLD;
+	void pio0_map(address_map &map) ATTR_COLD;
+	void pio1_map(address_map &map) ATTR_COLD;
+	void pio2_map(address_map &map) ATTR_COLD;
+	void pio3_map(address_map &map) ATTR_COLD;
+	void pio5_map(address_map &map) ATTR_COLD;
+	void pio6_map(address_map &map) ATTR_COLD;
 
 	void wd33c93(device_t *device);
 
@@ -169,9 +169,9 @@ private:
 
 	void wd33c93_2(device_t *device);
 
-	void ip22_map(address_map &map);
-	void pio4_map(address_map &map);
-	void pio6_map(address_map &map);
+	void ip22_map(address_map &map) ATTR_COLD;
+	void pio4_map(address_map &map) ATTR_COLD;
+	void pio6_map(address_map &map) ATTR_COLD;
 
 	required_device<wd33c93b_device> m_scsi_ctrl2;
 };

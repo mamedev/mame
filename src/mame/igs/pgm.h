@@ -11,7 +11,6 @@
 #include "pgmcrypt.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
@@ -54,8 +53,8 @@ public:
 	void pgmbase(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	/* memory pointers */
 	required_shared_ptr<u16> m_mainram;
@@ -69,8 +68,8 @@ protected:
 	/* hack */
 	int m_irq4_disabled = 0;
 
-	void pgm_base_mem(address_map &map);
-	void pgm_mem(address_map &map);
+	void pgm_base_mem(address_map &map) ATTR_COLD;
+	void pgm_mem(address_map &map) ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -140,9 +139,9 @@ private:
 	void draw_sprite_new_basic(int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri);
 	void draw_sprites(bitmap_ind16& spritebitmap, const rectangle &cliprect, bitmap_ind8& priority_bitmap);
 	void get_sprites();
-	void pgm_basic_mem(address_map &map);
-	void pgm_z80_io(address_map &map);
-	void pgm_z80_mem(address_map &map);
+	void pgm_basic_mem(address_map &map) ATTR_COLD;
+	void pgm_z80_io(address_map &map) ATTR_COLD;
+	void pgm_z80_mem(address_map &map) ATTR_COLD;
 };
 
 

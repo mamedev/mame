@@ -41,20 +41,21 @@ void msx_slot_panasonic08_device::device_start()
 		fatalerror("Memory region '%s' is too small for the panasonic08 firmware\n", m_rom_region.finder_tag());
 	}
 
-	m_sram.resize(SRAM_SIZE);
+	m_sram = std::make_unique<u8[]>(SRAM_SIZE);
 
 	m_nvram->set_base(&m_sram[0], SRAM_SIZE);
 
 	save_item(NAME(m_selected_bank));
 	save_item(NAME(m_control));
+	save_pointer(NAME(m_sram), SRAM_SIZE);
 
 	for (int i = 0; i < 6; i++)
 	{
 		m_bank[i]->configure_entries(0, 0x100, m_rom_region->base() + m_region_offset, 0x2000);
-		m_bank[i]->configure_entry(0x80, m_sram.data());
-		m_bank[i]->configure_entry(0x81, m_sram.data() + 0x2000);
-		m_bank[i]->configure_entry(0x82, m_sram.data());
-		m_bank[i]->configure_entry(0x83, m_sram.data() + 0x2000);
+		m_bank[i]->configure_entry(0x80, &m_sram[0]);
+		m_bank[i]->configure_entry(0x81, &m_sram[0x2000]);
+		m_bank[i]->configure_entry(0x82, &m_sram[0]);
+		m_bank[i]->configure_entry(0x83, &m_sram[0x2000]);
 	}
 
 	page(0)->install_view(0x0000, 0x1fff, m_view[0]);

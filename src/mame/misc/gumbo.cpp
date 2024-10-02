@@ -72,7 +72,7 @@ public:
 	void gumbo(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -92,9 +92,9 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void dblpoint_map(address_map &map);
-	void gumbo_map(address_map &map);
-	void mspuzzle_map(address_map &map);
+	void dblpoint_map(address_map &map) ATTR_COLD;
+	void gumbo_map(address_map &map) ATTR_COLD;
+	void mspuzzle_map(address_map &map) ATTR_COLD;
 };
 
 

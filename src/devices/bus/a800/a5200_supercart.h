@@ -14,11 +14,11 @@ class a5200_rom_supercart_device : public a5200_rom_device
 public:
 	a5200_rom_supercart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void cart_map(address_map &map) override;
+	virtual void cart_map(address_map &map) override ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u8 m_bank;
 	u8 m_bank_mask;

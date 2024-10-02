@@ -57,7 +57,7 @@ public:
 	void init_hstennis();
 
 	int special_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
+	ioport_value gtg_mux();
 
 protected:
 	static constexpr u32 VRAM_SIZE = 0x40000;
@@ -114,9 +114,9 @@ protected:
 	void pia_porta_out(u8 data);
 	void ym2203_portb_out(u8 data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	u32 screen_update_2layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update_2page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -146,15 +146,15 @@ protected:
 	void itech8_core_devices(machine_config &config);
 	void itech8_core_lo(machine_config &config);
 	void itech8_core_hi(machine_config &config);
-	void common_hi_map(address_map &map);
-	void common_lo_map(address_map &map);
-	void gtg2_map(address_map &map);
-	void ninclown_map(address_map &map);
-	void rimrockn_map(address_map &map);
-	void sound2203_map(address_map &map);
-	void sound2608b_map(address_map &map);
-	void sound3812_external_map(address_map &map);
-	void sound3812_map(address_map &map);
+	void common_hi_map(address_map &map) ATTR_COLD;
+	void common_lo_map(address_map &map) ATTR_COLD;
+	void gtg2_map(address_map &map) ATTR_COLD;
+	void ninclown_map(address_map &map) ATTR_COLD;
+	void rimrockn_map(address_map &map) ATTR_COLD;
+	void sound2203_map(address_map &map) ATTR_COLD;
+	void sound2608b_map(address_map &map) ATTR_COLD;
+	void sound3812_external_map(address_map &map) ATTR_COLD;
+	void sound3812_map(address_map &map) ATTR_COLD;
 };
 
 // with sensor hardware
@@ -173,7 +173,7 @@ public:
 	void slikshot_hi(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	optional_device<cpu_device> m_subcpu;
@@ -221,10 +221,10 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mem_hi_map(address_map &map);
-	void mem_lo_map(address_map &map);
-	void z80_io_map(address_map &map);
-	void z80_mem_map(address_map &map);
+	void mem_hi_map(address_map &map) ATTR_COLD;
+	void mem_lo_map(address_map &map) ATTR_COLD;
+	void z80_io_map(address_map &map) ATTR_COLD;
+	void z80_mem_map(address_map &map) ATTR_COLD;
 };
 
 // with additional timer
@@ -237,7 +237,7 @@ public:
 	}
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	emu_timer *m_behind_beam_update_timer = nullptr;
@@ -258,8 +258,8 @@ public:
 	void grmatch(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device_array<palette_device, 2> m_palette;
@@ -274,5 +274,5 @@ private:
 
 	TIMER_CALLBACK_MEMBER(palette_update);
 
-	void grmatch_map(address_map &map);
+	void grmatch_map(address_map &map) ATTR_COLD;
 };

@@ -26,7 +26,7 @@ public:
 	void rp200(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<h83003_device> m_maincpu;
 };

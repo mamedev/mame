@@ -25,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(DAVE, dave_device, "dave", "Inteligent Designs DAVE")
+DEFINE_DEVICE_TYPE(DAVE, dave_device, "dave", "Intelligent Designs DAVE")
 
 
 void dave_device::z80_program_map(address_map &map)

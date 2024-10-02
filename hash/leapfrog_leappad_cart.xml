@@ -199,9 +199,9 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="smartguid4" supported="no">
-		<description>FUN-damentals Series - Smart Guide to 4rd Grade (UK)</description>
+		<description>FUN-damentals Series - Smart Guide to 4th Grade (UK)</description>
 		<year>2002</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-00534"/>
@@ -212,7 +212,7 @@ license:CC0-1.0
 				<rom name="500-00534.u1" size="0x400000" crc="0944792f" sha1="f013394ebddb6d89c2feeb3d645c170e2d7be746" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="smartguid5" supported="no">
 		<description>FUN-damentals Series - Smart Guide to 5th Grade (UK)</description>
@@ -1149,7 +1149,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="goochoco" supported="no">
 		<description>Okaasan to Issho: Goo Choco Lantan: Spoo no Fushigi na Oto no Daibouken! (Japan)</description>
 		<year>2002</year>
@@ -1161,7 +1161,7 @@ license:CC0-1.0
 				<rom name="9p4-0113a.u1" size="0x200000" crc="04c4174a" sha1="c9e4a1f22a69f7d60e1d1b11bca8338546e52271" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="kumpoohj" supported="no">
 		<description>Kuma no Pooh-san Hachimitsu no tsubo ga ippai Pooh-san to kazu·katachi (Japan)</description>
@@ -1179,7 +1179,7 @@ license:CC0-1.0
 	<software name="dis1bf" supported="no">
 		<description>Disney's World of English 1: Birthday Fun (Japan)</description>
 		<year>200?</year>
-		<publisher>LeapFrog / Disney</publisher>	
+		<publisher>LeapFrog / Disney</publisher>
 		<info name="serial" value="500-10047"/>
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x800000">

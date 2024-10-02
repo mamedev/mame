@@ -1739,17 +1739,6 @@ uint32_t esrip_device::execute_max_cycles() const noexcept
 
 
 //-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t esrip_device::execute_input_lines() const noexcept
-{
-	return 0;
-}
-
-
-//-------------------------------------------------
 //  execute_set_input - act on a changed input/
 //  interrupt line
 //-------------------------------------------------

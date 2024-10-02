@@ -12,7 +12,6 @@
 #include "s3c44b0.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "screen.h"
 
 #include <algorithm>
@@ -891,7 +890,7 @@ void s3c44b0_device::check_pending_irq()
 		m_irq.regs.i_ispr |= (1 << int_type);
 		if (m_irq.line_irq != ASSERT_LINE)
 		{
-			m_cpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+			m_cpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 			m_irq.line_irq = ASSERT_LINE;
 		}
 	}
@@ -899,7 +898,7 @@ void s3c44b0_device::check_pending_irq()
 	{
 		if (m_irq.line_irq != CLEAR_LINE)
 		{
-			m_cpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+			m_cpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 			m_irq.line_irq = CLEAR_LINE;
 		}
 	}
@@ -909,7 +908,7 @@ void s3c44b0_device::check_pending_irq()
 	{
 		if (m_irq.line_fiq != ASSERT_LINE)
 		{
-			m_cpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
+			m_cpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, ASSERT_LINE);
 			m_irq.line_fiq = ASSERT_LINE;
 		}
 	}
@@ -917,7 +916,7 @@ void s3c44b0_device::check_pending_irq()
 	{
 		if (m_irq.line_fiq != CLEAR_LINE)
 		{
-			m_cpu->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
+			m_cpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, CLEAR_LINE);
 			m_irq.line_fiq = CLEAR_LINE;
 		}
 	}
@@ -1106,9 +1105,8 @@ void s3c44b0_device::pwm_start(int timer)
 		break;
 		default :
 		{
-			cnt = cmp = auto_reload = 0;
+			fatalerror("Invalid timer index %d!", timer);
 		}
-		break;
 	}
 //  hz = freq / (cnt - cmp + 1);
 	if (cnt < 2)

@@ -136,11 +136,6 @@ uint32_t xavix2_device::execute_max_cycles() const noexcept
 	return 5;
 }
 
-uint32_t xavix2_device::execute_input_lines() const noexcept
-{
-	return 1;
-}
-
 u32 xavix2_device::check_interrupt(u32 cpc)
 {
 	if(m_int_line && ((m_hr[4] & F_I) || m_wait)) {

@@ -82,7 +82,6 @@
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -106,8 +105,8 @@ public:
 	void ivl_karaoke_base(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -117,7 +116,7 @@ private:
 
 	uint32_t a000004_r();
 
-	void arm_map(address_map &map);
+	void arm_map(address_map &map) ATTR_COLD;
 };
 
 class easy_karaoke_cartslot_state : public ivl_karaoke_state
@@ -132,7 +131,7 @@ public:
 	void easy_karaoke(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
@@ -164,7 +163,7 @@ void easy_karaoke_cartslot_state::machine_start()
 
 void ivl_karaoke_state::machine_reset()
 {
-	m_maincpu->set_state_int(ARM7_R15, 0x04000000);
+	m_maincpu->set_state_int(arm7_cpu_device::ARM7_R15, 0x04000000);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(easy_karaoke_cartslot_state::cart_load)

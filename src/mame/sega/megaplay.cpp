@@ -63,7 +63,7 @@ public:
 	int start2_r();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 
@@ -88,8 +88,8 @@ private:
 
 	uint32_t screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void megaplay_bios_io_map(address_map &map);
-	void megaplay_bios_map(address_map &map);
+	void megaplay_bios_io_map(address_map &map) ATTR_COLD;
+	void megaplay_bios_map(address_map &map) ATTR_COLD;
 
 	uint32_t m_bios_mode = 0;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
 

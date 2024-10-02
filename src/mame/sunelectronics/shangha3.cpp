@@ -76,7 +76,7 @@ public:
 	void init_shangha3();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -107,7 +107,7 @@ private:
 	uint16_t prot_r();
 	void prot_w(uint16_t data);
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 class heberpop_state : public shangha3_state
@@ -127,13 +127,13 @@ protected:
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	void sound_program_map(address_map &map);
-	void sound_io_map(address_map &map);
+	void sound_program_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
 
 private:
 	void coinctrl_w(uint8_t data);
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 class blocken_state : public heberpop_state
@@ -153,8 +153,8 @@ private:
 
 	void coinctrl_w(uint8_t data);
 
-	void program_map(address_map &map);
-	void oki_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 };
 
 

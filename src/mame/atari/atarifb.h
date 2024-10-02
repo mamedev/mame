@@ -79,15 +79,15 @@ private:
 	void draw_playfield_and_alpha( bitmap_ind16 &bitmap, const rectangle &cliprect, int playfield_x_offset, int playfield_y_offset );
 	void draw_sprites_atarifb( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites_soccer( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void abaseb_map(address_map &map);
-	void atarifb4_map(address_map &map);
-	void atarifb_map(address_map &map);
-	void soccer_map(address_map &map);
+	void abaseb_map(address_map &map) ATTR_COLD;
+	void atarifb4_map(address_map &map) ATTR_COLD;
+	void atarifb_map(address_map &map) ATTR_COLD;
+	void soccer_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* devices */

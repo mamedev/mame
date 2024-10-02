@@ -11,13 +11,13 @@ license:CC0-1.0
 		</led7seg>
 	</element>
 
-	<element name="led" defstate="0">
+	<element name="led" defstate="1">
 		<text string=""></text>
-		<disk state="0">
+		<disk state="1">
 				<color red="0.1" green="0.025" blue="0.028" />
 				<bounds x="0.25" y="0.25" width="0.5" height="0.5" />
 		</disk>
-		<disk state="1">
+		<disk state="0">
 				<color red="1.0" green="0.25" blue="0.28" />
 				<bounds x="0.25" y="0.25" width="0.5" height="0.5" />
 		</disk>

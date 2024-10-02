@@ -196,7 +196,7 @@ void taitosj_state::sound_semaphore2_w(uint8_t data)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::sound_semaphore2_w_cb), this), data);
 }
 
-CUSTOM_INPUT_MEMBER(taitosj_state::input_port_4_f0_r)
+ioport_value taitosj_state::input_port_4_f0_r()
 {
 	return m_input_port_4_f0;
 }
@@ -255,7 +255,7 @@ void taitosj_state::main_mcu_map(address_map &map)
 // seems the most logical way to do the gears
 
 template <int Player>
-CUSTOM_INPUT_MEMBER(taitosj_state::kikstart_gear_r)
+ioport_value taitosj_state::kikstart_gear_r()
 {
 	// gear MUST be 1, 2 or 3
 	if (m_gear[Player]->read() & 0x01) m_kikstart_gears[Player] = 0x02;

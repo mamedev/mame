@@ -33,9 +33,9 @@ public:
 	void set_master_osc(double mosc) { m_mosc = mosc; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<input_merger_device> m_irq_merger;
 	required_device_array<pia6821_device, 2> m_pia;

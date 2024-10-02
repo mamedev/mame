@@ -75,7 +75,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(hang_up);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	static constexpr int CD_DELAY = 250;
@@ -91,12 +91,12 @@ private:
 
 	emu_timer *m_timer; // Carrier Detect Timer
 	uint8_t sam_read(offs_t offset);
-	void mem_map(address_map &map);
-	void rom_map(address_map &map);
-	void static_ram_map(address_map &map);
-	void io0_map(address_map &map);
-	void io1_map(address_map &map);
-	void boot_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void rom_map(address_map &map) ATTR_COLD;
+	void static_ram_map(address_map &map) ATTR_COLD;
+	void io0_map(address_map &map) ATTR_COLD;
+	void io1_map(address_map &map) ATTR_COLD;
+	void boot_map(address_map &map) ATTR_COLD;
 	void ff20_write(offs_t offset, uint8_t data);
 	void configure_sam();
 	uint8_t pia0_pa_r();

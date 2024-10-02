@@ -78,7 +78,7 @@ public:
 
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void common_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
 
 	required_device<hyperstone_device>  m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -98,7 +98,7 @@ public:
 
 protected:
 	uint32_t input_port_1_r();
-	void mosaicf2_io(address_map &map);
+	void mosaicf2_io(address_map &map) ATTR_COLD;
 };
 
 class royalpk2_state : public fe132_state
@@ -114,15 +114,13 @@ public:
 
 	void royalpk2(machine_config &config);
 
-	int hopper_r();
-
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void royalpk2_io(address_map &map);
-	void royalpk2_map(address_map &map);
-	void oki_map(address_map &map);
+	void royalpk2_io(address_map &map) ATTR_COLD;
+	void royalpk2_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 
 	void protection_seed_w(offs_t offset, uint32_t data);
 	uint32_t protection_response_r();
@@ -313,7 +311,7 @@ static INPUT_PORTS_START( royalpk2 )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Medal Clear") PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Operator Gift") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(royalpk2_state, hopper_r)
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Over Flow") PORT_CODE(KEYCODE_O)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Medal Empty") PORT_CODE(KEYCODE_L)
 
@@ -336,11 +334,6 @@ void royalpk2_state::royalpk2_map(address_map &map)
 	map(0x40000000, 0x4003ffff).ram().share("videoram");
 	map(0x80000000, 0x807fffff).rom().region("user2", 0);
 	map(0xfff00000, 0xffffffff).rom().region("user1", 0);
-}
-
-int royalpk2_state::hopper_r()
-{
-	return m_hopper->line_r() ? 0 : 1;
 }
 
 void royalpk2_state::royalpk2_io(address_map &map)
@@ -477,7 +470,7 @@ void royalpk2_state::royalpk2(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

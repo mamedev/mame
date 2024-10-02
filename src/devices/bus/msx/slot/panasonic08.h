@@ -21,10 +21,10 @@ public:
 	void set_rom_start(const char *region, u32 offset) { m_rom_region.set_tag(region); m_region_offset = offset; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	static constexpr size_t SRAM_SIZE = 0x4000;
@@ -41,7 +41,7 @@ private:
 	u32 m_region_offset;
 	u8 m_selected_bank[6];
 	u8 m_control;
-	std::vector<uint8_t> m_sram;
+	std::unique_ptr<u8[]> m_sram;
 };
 
 

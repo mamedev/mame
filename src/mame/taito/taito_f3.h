@@ -90,9 +90,9 @@ public:
 	void init_scfinals();
 	void init_pbobbl2x();
 
-	template <int Num> DECLARE_CUSTOM_INPUT_MEMBER(f3_analog_r);
-	template <int Num> DECLARE_CUSTOM_INPUT_MEMBER(f3_coin_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(eeprom_read);
+	template <int Num> ioport_value f3_analog_r();
+	template <int Num> ioport_value f3_coin_r();
+	ioport_value eeprom_read();
 
 protected:
 	using fixed8 = s32;
@@ -157,9 +157,9 @@ protected:
 
 	static const F3config f3_config_table[];
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	virtual void device_post_load(void) override;
 
 	TIMER_CALLBACK_MEMBER(trigger_int3);
@@ -412,8 +412,8 @@ protected:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
-	void bubsympb_map(address_map &map);
-	void f3_map(address_map &map);
+	void bubsympb_map(address_map &map) ATTR_COLD;
+	void f3_map(address_map &map) ATTR_COLD;
 
 	void tile_decode();
 
@@ -452,7 +452,7 @@ private:
 
 	INTERRUPT_GEN_MEMBER(interrupt2);
 
-	void bubsympb_oki_map(address_map &map);
+	void bubsympb_oki_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TAITO_TAITO_F3_H

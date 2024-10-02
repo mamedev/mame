@@ -3,6 +3,7 @@
 #include "emu.h"
 #include "memorywindow.h"
 
+#include "debugger.h"
 #include "debug/dvmemory.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"

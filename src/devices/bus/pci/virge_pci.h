@@ -34,24 +34,24 @@ public:
 	virge_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virge_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void lfb_map(address_map &map);
-	void mmio_map(address_map& map);
+	void lfb_map(address_map &map) ATTR_COLD;
+	void mmio_map(address_map &map) ATTR_COLD;
 
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
 	uint32_t base_address_r();
 	void base_address_w(offs_t offset, uint32_t data);
 
-	void legacy_io_map(address_map &map);
+	void legacy_io_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	void postload(void);
 
@@ -78,9 +78,9 @@ public:
 	virgedx_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 //  required_device<s3virge_vga_device> m_vga;
 //  required_memory_region m_bios;

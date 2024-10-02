@@ -59,12 +59,12 @@ protected:
 	gottlieb_sound_p2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void write_sync(s32 param);
-	void p2_map(address_map &map);
+	void p2_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<m6503_device> m_cpu;
@@ -85,15 +85,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void write_sync(s32 param) override;
 
 private:
 	void r6530b_w(u8 data);
-	void p3_map(address_map &map);
+	void p3_map(address_map &map) ATTR_COLD;
 
 	bool m_irqclock;
 	bool m_irqenable;
@@ -116,13 +116,13 @@ protected:
 	gottlieb_sound_r1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	void write_sync(s32 param);
 
-	virtual void r1_map(address_map &map);
+	virtual void r1_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<mc1408_device> m_dac;
@@ -146,12 +146,12 @@ protected:
 	gottlieb_sound_speech_r1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override { m_votrax->set_unscaled_clock(m_speech_clock); }
 
-	virtual void r1_map(address_map &map) override;
+	virtual void r1_map(address_map &map) override ATTR_COLD;
 
 	// internal communications
 	u32 convert_speech_clock(u8 data);
@@ -177,7 +177,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 
@@ -197,8 +197,8 @@ protected:
 	gottlieb_sound_p4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	void write_sync(s32 param);
 	TIMER_CALLBACK_MEMBER(set_nmi);
@@ -213,8 +213,8 @@ protected:
 	void speech_ctrl_w(u8 data);
 	void psg_latch_w(u8 data);
 
-	void p4_dmap(address_map &map);
-	void p4_ymap(address_map &map);
+	void p4_dmap(address_map &map) ATTR_COLD;
+	void p4_ymap(address_map &map) ATTR_COLD;
 
 	// internal helpers
 	void nmi_timer_adjust();
@@ -256,17 +256,17 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// internal communications
 	void sp0250_latch_w(u8 data);
 	void speech_control_w(u8 data);
 
-	void r2_dmap(address_map &map);
-	void r2_ymap(address_map &map);
+	void r2_dmap(address_map &map) ATTR_COLD;
+	void r2_ymap(address_map &map) ATTR_COLD;
 
 	// devices
 	optional_device<sp0250_device> m_sp0250;
@@ -290,10 +290,10 @@ protected:
 	gottlieb_sound_p5_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
-	void p5_ymap(address_map &map);
+	void p5_ymap(address_map &map) ATTR_COLD;
 
 	optional_device<ym2151_device> m_ym2151;
 };
@@ -310,11 +310,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
-	void p6_dmap(address_map &map);
+	void p6_dmap(address_map &map) ATTR_COLD;
 	u8 d2_data_r();
 };
 
@@ -330,11 +330,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
-	void p7_ymap(address_map &map);
+	void p7_ymap(address_map &map) ATTR_COLD;
 	void y_ctrl_w(u8);
 	void y_latch_w(u8);
 

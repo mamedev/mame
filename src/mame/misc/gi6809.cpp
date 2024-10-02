@@ -125,20 +125,20 @@ public:
 	void init_cast();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void gi6809_base(machine_config &config);
 
 private:
 
 	// Address Maps
-	void glckmain_map(address_map &map);
-	void glckslave_map(address_map &map);
-	void castmain_map(address_map &map);
-	void castslave_map(address_map &map);
-	void jestmain_map(address_map &map);
-	void jestslave_map(address_map &map);
+	void glckmain_map(address_map &map) ATTR_COLD;
+	void glckslave_map(address_map &map) ATTR_COLD;
+	void castmain_map(address_map &map) ATTR_COLD;
+	void castslave_map(address_map &map) ATTR_COLD;
+	void jestmain_map(address_map &map) ATTR_COLD;
+	void jestslave_map(address_map &map) ATTR_COLD;
 
 	// Devices
 	required_device<cpu_device> m_maincpu;
@@ -635,7 +635,7 @@ void gi6809_state::gi6809_base(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:bit3", "PA3.IN", 0);
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0, 0.0);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50));
 }
 
 

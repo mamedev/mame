@@ -234,7 +234,7 @@ void sm530_device::execute_one()
 			}
 			break; // 0xfc
 
-	} // big switch
+	} // 0xf0
 
 	// SABM/SABL is only valid for 1 step
 	m_bmask = (m_op == 0x72) ? 0x40 : ((m_op == 0x73) ? 0x08 : 0);

@@ -123,8 +123,8 @@ public:
 	void punkshot(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// memory pointers
 	optional_shared_ptr<uint16_t> m_spriteram;
@@ -213,16 +213,16 @@ protected:
 	K052109_CB_MEMBER(tmnt_tile_callback);
 	K052109_CB_MEMBER(blswhstl_tile_callback);
 
-	void blswhstl_main_map(address_map &map);
-	void lgtnfght_audio_map(address_map &map);
-	void lgtnfght_main_map(address_map &map);
-	void punkshot_audio_map(address_map &map);
-	void punkshot_main_map(address_map &map);
-	void ssriders_audio_map(address_map &map);
-	void ssriders_main_map(address_map &map);
-	void thndrx2_audio_map(address_map &map);
-	void thndrx2_main_map(address_map &map);
-	void tmnt2_main_map(address_map &map);
+	void blswhstl_main_map(address_map &map) ATTR_COLD;
+	void lgtnfght_audio_map(address_map &map) ATTR_COLD;
+	void lgtnfght_main_map(address_map &map) ATTR_COLD;
+	void punkshot_audio_map(address_map &map) ATTR_COLD;
+	void punkshot_main_map(address_map &map) ATTR_COLD;
+	void ssriders_audio_map(address_map &map) ATTR_COLD;
+	void ssriders_main_map(address_map &map) ATTR_COLD;
+	void thndrx2_audio_map(address_map &map) ATTR_COLD;
+	void thndrx2_main_map(address_map &map) ATTR_COLD;
+	void tmnt2_main_map(address_map &map) ATTR_COLD;
 };
 
 class glfgreat_state : public tmnt2_state
@@ -245,8 +245,8 @@ private:
 	TILE_GET_INFO_MEMBER(glfgreat_get_roz_tile_info);
 	DECLARE_VIDEO_START(glfgreat);
 
-	void glfgreat_audio_map(address_map &map);
-	void glfgreat_main_map(address_map &map);
+	void glfgreat_audio_map(address_map &map) ATTR_COLD;
+	void glfgreat_main_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<4> m_analog_controller;
 
@@ -267,7 +267,7 @@ public:
 	void prmrsocr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void prmrsocr_sound_irq_w(uint16_t data);
@@ -280,8 +280,8 @@ private:
 	DECLARE_VIDEO_START(prmrsocr);
 	K05324X_CB_MEMBER(prmrsocr_sprite_callback);
 
-	void prmrsocr_audio_map(address_map &map);
-	void prmrsocr_main_map(address_map &map);
+	void prmrsocr_audio_map(address_map &map) ATTR_COLD;
+	void prmrsocr_main_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_audiobank;
 
@@ -299,14 +299,14 @@ public:
 	void sunsetbl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void irq_enable_w(u8 data);
 	void sunsetbl_vblank_w(int state);
 	K052109_CB_MEMBER(ssbl_tile_callback);
 
-	void sunsetbl_main_map(address_map &map);
+	void sunsetbl_main_map(address_map &map) ATTR_COLD;
 
 	bool m_irq_enable = false;
 };
@@ -3361,6 +3361,34 @@ ROM_START( tmnt2a )
 	ROM_LOAD( "tmnt2_ada.nv", 0x0000, 0x080, CRC(063068a0) SHA1(c1da5319428fd8fb60305a2d7cc166596b2fe5a4) )
 ROM_END
 
+ROM_START( tmnt2o )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 4*128k for 68000 code */
+	ROM_LOAD16_BYTE( "063oaa02.8e",  0x000000, 0x20000, CRC(07067dbf) SHA1(3ffd6f09b24dfd9a403097cbba19ae7b51110dc5) )
+	ROM_LOAD16_BYTE( "063oaa03.8g",  0x000001, 0x20000, CRC(b0fadf6b) SHA1(8dde410d323dd6dd5b08b32b5363875782b45191) )
+	ROM_LOAD16_BYTE( "063oaa04.10e", 0x040000, 0x20000, CRC(b5eb7c49) SHA1(72193d8a334f22cf7a617e42eaebce45b8eb83f2) )
+	ROM_LOAD16_BYTE( "063oaa05.10g", 0x040001, 0x20000, CRC(bd4dcca4) SHA1(3b47c086fccefe172746c00af88e1f98914c6567) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "063b01.2f", 0x0000, 0x10000, CRC(364f548a) SHA1(e0636e27d4fc48b2ccb1417b63d2b68d9e272c06) )
+
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "063b12.16k", 0x000000, 0x080000, CRC(d3283d19) SHA1(49e4daa9cbe4d99bf71fcee6237cb434a0d55312) )
+	ROM_LOAD32_WORD( "063b11.12k", 0x000002, 0x080000, CRC(6ebc0c15) SHA1(e6848405076937fbf8ec6d318293a0ff922725f4) )
+
+	ROM_REGION( 0x400000, "k053245", 0 )    /* sprites */
+	ROM_LOAD32_WORD( "063b09.7l", 0x000000, 0x100000, CRC(2d7a9d2a) SHA1(a26f9c1a07152bc8c7bcd797d4485bf848f5e2a0) )
+	ROM_LOAD32_WORD( "063b07.3l", 0x000002, 0x100000, CRC(d9bee7bf) SHA1(7bbb65138fbd216b80412783e6f0072742101440) )
+	ROM_LOAD32_WORD( "063b10.7k", 0x200000, 0x080000, CRC(f2dd296e) SHA1(a2aad10bfb0904dd73c2ee11049648c94de7f4d5) )
+	ROM_LOAD32_WORD( "063b08.3k", 0x200002, 0x080000, CRC(3b1ae36f) SHA1(9e69cae8b517497ac77c4d148f56f2bb6a23de89) )
+	/* second half empty */
+
+	ROM_REGION( 0x200000, "k053260", 0 )    /* samples for the 053260 */
+	ROM_LOAD( "063b06.1d",  0x0000, 0x200000, CRC(1e510aa5) SHA1(02b9bd6bb6b098026a620e4d671c40a31ad9e318) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "tmnt2_oaa.nv", 0x0000, 0x080, CRC(e3858340) SHA1(6bac93b5485d68dfd2e15615fa7e95d631e9bf67) )
+ROM_END
+
 ROM_START( qgakumon )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 4*256k for 68000 code */
 	ROM_LOAD16_BYTE( "248jaa02.8e",  0x000000, 0x40000, CRC(fab79410) SHA1(8b1a8946ee65505608cf026c9fca87365ccef089) )
@@ -3914,6 +3942,7 @@ GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, glfgreat_state, empty_in
 
 GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  tmnt2_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  tmnt2_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt2o,      tmnt2,    tmnt2,    ssrid4ps,  tmnt2_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver OAA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders,  tmnt2_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmht24pe,    tmnt2,    tmnt2,    ssridr4p,  tmnt2_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (4 Players ver EAA)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders,  tmnt2_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", MACHINE_SUPPORTS_SAVE )

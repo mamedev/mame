@@ -199,8 +199,8 @@ protected:
 	cammu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	enum access_size : u8
 	{
@@ -295,7 +295,7 @@ public:
 protected:
 	cammu_c4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual bool get_access(const access_type mode, const u32 pte, const u32 ssw) const override;
 	virtual u32 get_pdo(const bool user) const override { return user ? m_u_pdo : m_s_pdo; }
@@ -320,7 +320,7 @@ class cammu_c4t_device : public cammu_c4_device
 public:
 	cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 	u32 ram_line_r() { return m_ram_line; }
 	void ram_line_w(u32 data) { m_ram_line = data; }
@@ -384,7 +384,7 @@ public:
 	void tlb_ra_line_w(u32 data) { m_tlb_ra_line = data; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual bool get_alignment() const override { return (m_control & CNTL_ATD) == 0; }
 	virtual system_tag_t get_ust_space() const override { return system_tag_t((m_control & (CNTL_IOTS | CNTL_UST)) >> 4); }
@@ -410,7 +410,7 @@ class cammu_c4i_device : public cammu_c4_device
 public:
 	cammu_c4i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 	enum control_mask : u32
 	{
@@ -486,7 +486,7 @@ public:
 	void test_address_w(u32 data) { m_test_address = data; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual bool get_alignment() const override { return (m_control & CNTL_ATD) == 0; }
 	// FIXME: don't really know how unmapped mode works on c4i
@@ -511,8 +511,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
-	virtual void device_start() override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// translation lookaside buffer and register access
 	virtual u32 cammu_r(const u32 address) override;

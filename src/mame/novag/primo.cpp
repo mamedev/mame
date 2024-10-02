@@ -113,7 +113,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(snova_power_off);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { m_power = true; }
 
 private:
@@ -133,9 +133,9 @@ private:
 	u8 m_select = 0;
 	u8 m_led_data = 0;
 
-	void primo_map(address_map &map);
-	void supremo_map(address_map &map);
-	void snova_map(address_map &map);
+	void primo_map(address_map &map) ATTR_COLD;
+	void supremo_map(address_map &map) ATTR_COLD;
+	void snova_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void standby(int state);
@@ -316,7 +316,7 @@ static INPUT_PORTS_START( primo )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, primo_state, primo_power_off, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, primo_state, primo_power_off, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( supremo )
@@ -352,7 +352,7 @@ static INPUT_PORTS_START( snova )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, primo_state, snova_power_off, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, primo_state, snova_power_off, 0)
 INPUT_PORTS_END
 
 
@@ -479,9 +479,9 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, nprimo,  0,      0,      primo,   primo,   primo_state, empty_init, "Novag Industries", "Primo (Novag)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, nprimo,  0,      0,      primo,   primo,   primo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Primo (Novag)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1988, supremo, 0,      0,      supremo, supremo, primo_state, empty_init, "Novag Industries", "Supremo", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, supremo, 0,      0,      supremo, supremo, primo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Supremo", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1990, nsnova,  0,      0,      snova,   snova,   primo_state, empty_init, "Novag Industries", "Super Nova (Novag, set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1990, nsnovaa, nsnova, 0,      snova,   snova,   primo_state, empty_init, "Novag Industries", "Super Nova (Novag, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, nsnova,  0,      0,      snova,   snova,   primo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Super Nova (Novag, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, nsnovaa, nsnova, 0,      snova,   snova,   primo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Super Nova (Novag, set 2)", MACHINE_SUPPORTS_SAVE )

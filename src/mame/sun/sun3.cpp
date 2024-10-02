@@ -192,6 +192,7 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 #include "machine/ncr5380.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
@@ -245,7 +246,8 @@ public:
 		m_rom(*this, "user1"),
 		m_idprom(*this, "idprom"),
 		m_ram(*this, RAM_TAG),
-		m_lance(*this, "lance")
+		m_lance(*this, "lance"),
+		m_diagsw(*this, "diagsw")
 	{ }
 
 	void sun3(machine_config &config);
@@ -257,8 +259,8 @@ public:
 	void ncr5380(device_t *device);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m68020_device> m_maincpu;
@@ -273,6 +275,7 @@ private:
 	required_memory_region m_rom, m_idprom;
 	required_device<ram_device> m_ram;
 	required_device<am79c90_device> m_lance;
+	required_ioport m_diagsw;
 
 	uint32_t tl_mmu_r(offs_t offset, uint32_t mem_mask = ~0);
 	void tl_mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -295,12 +298,14 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sun3_timer);
 
-	void sun3_mem(address_map &map);
-	void vmetype0space_map(address_map &map);
-	void vmetype0space_novram_map(address_map &map);
-	void vmetype1space_map(address_map &map);
-	void vmetype2space_map(address_map &map);
-	void vmetype3space_map(address_map &map);
+	void sun3_mem(address_map &map) ATTR_COLD;
+	void vmetype0space_map(address_map &map) ATTR_COLD;
+	void vmetype0space_novram_map(address_map &map) ATTR_COLD;
+	void vmetype1space_map(address_map &map) ATTR_COLD;
+	void vmetype2space_map(address_map &map) ATTR_COLD;
+	void vmetype3space_map(address_map &map) ATTR_COLD;
+
+	uint32_t enable_r();
 
 	uint32_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
@@ -333,6 +338,7 @@ static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("tape", NSCSI_TAPE);
 	device.set_option_machine_config("cdrom", sun_cdrom);
 }
 
@@ -472,7 +478,7 @@ uint32_t sun3_state::tl_mmu_r(offs_t offset, uint32_t mem_mask)
 				return m_context<<24;
 
 			case 4: // enable reg
-				return m_enable;
+				return enable_r();
 
 			case 5: // DVMA enable
 				return m_dvma_enable<<24;
@@ -507,7 +513,7 @@ uint32_t sun3_state::tl_mmu_r(offs_t offset, uint32_t mem_mask)
 	}
 
 	// boot mode?
-	if ((fc == M68K_FC_SUPERVISOR_PROGRAM) && !(m_enable & 0x80))
+	if ((fc == M68K_FC_SUPERVISOR_PROGRAM) && !(enable_r() & 0x80))
 	{
 		return m_rom_ptr[offset & 0x3fff];
 	}
@@ -809,6 +815,13 @@ void sun3_state::vmetype3space_map(address_map &map)
 {
 }
 
+uint32_t sun3_state::enable_r()
+{
+	// Incorporate diag switch value.
+	const uint32_t diagsw = m_diagsw->read() << 24;
+	return (m_enable & ~(u32(1) << 24)) | diagsw;
+}
+
 uint32_t sun3_state::irqctrl_r()
 {
 	return m_irqctrl;
@@ -976,6 +989,10 @@ uint32_t sun3_state::bw2_350_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 /* Input ports */
 static INPUT_PORTS_START( sun3 )
+	PORT_START("diagsw")
+	PORT_CONFNAME(1, 0, "Diagnostic Switch")
+	PORT_CONFSETTING(0, "Normal")
+	PORT_CONFSETTING(1, "Diagnostic")
 INPUT_PORTS_END
 
 void sun3_state::machine_start()
@@ -1061,7 +1078,7 @@ void sun3_state::sun3(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, "tape");
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsibus:7").option_set("sbc", NCR5380).machine_config([this] (device_t *device) { ncr5380(device); });
@@ -1167,7 +1184,7 @@ void sun3_state::sun3_50(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, "tape");
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsibus:7").option_set("sbc", NCR5380).machine_config([this] (device_t *device) { ncr5380(device); });

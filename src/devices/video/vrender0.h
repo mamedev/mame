@@ -17,7 +17,7 @@ public:
 	vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_areas(uint16_t *textureram, uint16_t *frameram);
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 	void execute_flipping();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	auto idleskip_cb() { return m_idleskip_cb.bind(); }
@@ -27,8 +27,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	int vrender0_ProcessPacket(uint32_t PacketPtr);

@@ -14,7 +14,6 @@
 
 #include "tube.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/ram.h"
 #include "machine/tube.h"
 
@@ -48,12 +47,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual uint8_t host_r(offs_t offset) override;
 	virtual void host_w(offs_t offset, uint8_t data) override;
@@ -65,7 +64,7 @@ private:
 	required_device<ram_device> m_ram;
 	memory_view m_bank0_view;
 
-	void arm7_map(address_map& map);
+	void arm7_map(address_map &map) ATTR_COLD;
 
 	void prst_w(int state);
 

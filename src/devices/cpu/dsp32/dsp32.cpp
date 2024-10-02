@@ -553,17 +553,6 @@ uint32_t dsp32c_device::execute_max_cycles() const noexcept
 }
 
 
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t dsp32c_device::execute_input_lines() const noexcept
-{
-	return 2;
-}
-
-
 void dsp32c_device::execute_set_input(int inputnum, int state)
 {
 }

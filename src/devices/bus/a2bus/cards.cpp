@@ -41,6 +41,7 @@
 #include "a2ultraterm.h"
 #include "a2videoterm.h"
 #include "a2vulcan.h"
+#include "a2wico_trackball.h"
 #include "a2zipdrive.h"
 #include "booti.h"
 #include "byte8251.h"
@@ -153,6 +154,7 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("grafex", A2BUS_GRAFEX);                 // Grafex card (uPD7220 graphics)
 	device.option_add("excel9", A2BUS_EXCEL9);                 // Excel-9 (6809 coprocessor)
 	device.option_add("vistaa800", A2BUS_VISTAA800);           // Vista A800 8" Disk Controller Card
+	device.option_add("wicotrackball", A2BUS_WICOTRACKBALL);   // Wico Trackball
 }
 
 void apple2e_cards(device_slot_interface &device)
@@ -234,6 +236,7 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("pdromdrive", A2BUS_PRODOSROMDRIVE);     // ProDOS ROM Drive
 	device.option_add("superdrive", A2BUS_SUPERDRIVE);         // Apple II 3.5" Disk Controller
 	device.option_add("vistaa800", A2BUS_VISTAA800);           // Vista A800 8" Disk Controller Card
+	device.option_add("wicotrackball", A2BUS_WICOTRACKBALL);   // Wico Trackball
 }
 
 void apple2gs_cards(device_slot_interface &device)
@@ -309,6 +312,7 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("grafex", A2BUS_GRAFEX);                 // Grafex card (uPD7220 graphics)
 	device.option_add("pdromdrive", A2BUS_PRODOSROMDRIVE);     // ProDOS ROM Drive
 	device.option_add("superdrive", A2BUS_SUPERDRIVE);         // Apple II 3.5" Disk Controller
+	device.option_add("wicotrackball", A2BUS_WICOTRACKBALL);   // Wico Trackball
 }
 
 void apple3_cards(device_slot_interface &device)

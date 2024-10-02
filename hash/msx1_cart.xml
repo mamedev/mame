@@ -17798,18 +17798,17 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<!-- Software does not start -->
-	<software name="xy" supported="no">
+	<software name="xy">
 		<description>X &amp; Y (Arab)</description>
 		<year>1987</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="alt_title" value="س و ص"/>
-		<info name="serial" value="M022" />
-		<info name="usage" value="Requires an Arabic MSX" />
+		<info name="serial" value="M022"/>
+		<info name="usage" value="Does not work on all MSX models. Systems known to work include: ax170, hx10, phc23."/>
 		<part name="cart" interface="msx_cart">
-			<feature name="start_page" value="2"/>
-			<dataarea name="rom" size="0x8000">
-				<rom name="x y (1987)(al alamiah).rom" size="0x8000" crc="a2541660" sha1="4666e2fe5d8ed47c990a39cc345c744202228924" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="x y - al alamiah.rom" size="0x8000" crc="a2541660" sha1="4666e2fe5d8ed47c990a39cc345c744202228924"/>
+				<rom size="0x8000" offset="0x8000" loadflag="reload"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19247,6 +19246,18 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="4mastmel">
+		<description>The 4 Masters of Melody</description>
+		<year>2019</year>
+		<publisher>Clube MSX</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="the 4 masters of melody - matra.rom" size="0x4000" crc="56dc456b" sha1="74094836d6deeebd70ead949553b8d7918716ab2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="acegun">
 		<description>Ace Gun</description>
 		<year>2020</year>
@@ -19562,6 +19573,18 @@ legacy FM implementations cannot find it.
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="balloon city - ag software (2007).rom" size="0x4000" crc="e442c99a" sha1="c46f85f21f780f126a0d61848071fcdcf84f15b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlgojo">
+		<description>The Battle on Gojo Ohashi</description>
+		<year>2020</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="the battle on gojo ohashi - matra.rom" size="0x10000" crc="5d1e5d4e" sha1="1086d8795f344753d55cf358e3c274f14e408751"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21831,6 +21854,18 @@ legacy FM implementations cannot find it.
 			<feature name="slot" value="konami" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="genesis dawn of a new day - retroworks (2012) (alt).rom" size="0x20000" crc="21c3999f" sha1="ff79f5f9c29041083c2359f85dd75b02fe07bfc6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghost">
+		<description>Ghost</description>
+		<year>2017</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="ghost - matra.rom" size="0x10000" crc="48efb417" sha1="d26ea45f0b84f65df21fe54573ef2c37e21bc591"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24512,6 +24547,18 @@ legacy FM implementations cannot find it.
 			<feature name="start_page" value="0"/>
 			<dataarea name="rom" size="0x10000">
 				<rom name="princess quest - matra.rom" size="0x10000" crc="aa31ac36" sha1="405db36a0b57fa4871a7991ebe72695793d3b7c9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prsnrwar">
+		<description>Prisoner of War</description>
+		<year>2018</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="prisoner of war - matra.rom" size="0x10000" crc="49efb097" sha1="f07f68e873689e1d7083e21b805b8a5b174f50d2"/>
 			</dataarea>
 		</part>
 	</software>

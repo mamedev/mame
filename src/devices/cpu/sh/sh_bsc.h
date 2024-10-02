@@ -38,8 +38,8 @@ public:
 protected:
 	u16 m_bcr1, m_bcr2, m_wcr1, m_wcr2, m_dcr, m_rtcsr, m_rtcnt, m_rtcor;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(SH_BSC, sh_bsc_device)

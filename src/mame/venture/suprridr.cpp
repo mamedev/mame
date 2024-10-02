@@ -116,12 +116,12 @@ public:
 
 	void suprridr(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(control_r);
+	ioport_value control_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -162,10 +162,10 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -478,7 +478,7 @@ void suprridr_state::sound_portmap(address_map &map)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(suprridr_state::control_r)
+ioport_value suprridr_state::control_r()
 {
 	// screen flip multiplexes controls
 

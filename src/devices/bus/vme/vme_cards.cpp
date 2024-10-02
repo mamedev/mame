@@ -14,6 +14,7 @@
 #include "mvme181.h"
 #include "mvme187.h"
 #include "mvme327a.h"
+#include "mvme328.h"
 #include "mvme350.h"
 #include "mzr8105.h"
 #include "mzr8300.h"
@@ -40,6 +41,7 @@ void vme_cards(device_slot_interface &device)
 	device.option_add("mvme181",          VME_MVME181);
 	device.option_add("mvme187",          VME_MVME187);
 	device.option_add("mvme327a",         VME_MVME327A);
+	device.option_add("mvme328",          VME_MVME328);
 	device.option_add("mvme350",          VME_MVME350);
 	device.option_add("mzr8105",          VME_MZR8105);
 	device.option_add("mzr8300",          VME_MZR8300);

@@ -8,13 +8,12 @@ preliminary driver by Angelo Salese
 
 TODO:
 - laserdisc hook-up and 6850 comms;
-- "RAM TEST ERROR 5J" in Bega's Battle and Cobra Command
-- "SOUND TEST READ ERROR"
-- color offset number origin is unknown;
-- Bega's Battle VBLANK hack (ld/framework fault most likely)
-- CPU clocks
-- dip-switches
-- clean-ups
+- "SOUND TEST READ ERROR";
+- video color offsets are a mystery, where it gets calculated from?
+- Bega's Battle VBLANK hack;
+- CPU clocks;
+- dip-switches;
+- clean-ups;
 
 ***************************************************************************
 
@@ -116,6 +115,7 @@ Sound processor - 6502
 #include "machine/6850acia.h"
 #include "emupal.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 namespace {
 
@@ -133,10 +133,8 @@ public:
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
 		, m_soundlatch2(*this, "soundlatch2")
-		, m_vram0(*this, "vram0")
-		, m_attr0(*this, "attr0")
-		, m_vram1(*this, "vram1")
-		, m_attr1(*this, "attr1")
+		, m_vram(*this, "vram%u", 0U)
+		, m_attr(*this, "attr%u", 0U)
 	{ }
 
 	void rblaster(machine_config &config);
@@ -145,7 +143,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -157,36 +156,72 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
-	required_shared_ptr<uint8_t> m_vram0;
-	required_shared_ptr<uint8_t> m_attr0;
-	required_shared_ptr<uint8_t> m_vram1;
-	required_shared_ptr<uint8_t> m_attr1;
+	required_shared_ptr_array<uint8_t, 2> m_vram;
+	required_shared_ptr_array<uint8_t, 2> m_attr;
 
 	int m_nmimask = 0;
+	tilemap_t *m_tilemap[2];
+
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	uint8_t acia_status_hack_r();
 	uint8_t sound_status_r();
-	void decold_sound_cmd_w(uint8_t data);
-	uint32_t screen_update_rblaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	[[maybe_unused]] void nmimask_w(uint8_t data);
-	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
-	void rblaster_map(address_map &map);
-	void rblaster_sound_map(address_map &map);
+
+	template <unsigned N> void vram_w(offs_t offset, u8 data);
+	template <unsigned N> void attr_w(offs_t offset, u8 data);
+	template <unsigned N> TILE_GET_INFO_MEMBER(get_tile_info);
+
+	INTERRUPT_GEN_MEMBER(sound_interrupt);
 };
 
+template <unsigned N> void deco_ld_state::vram_w(offs_t offset, u8 data)
+{
+	m_vram[N][offset] = data;
+	m_tilemap[N]->mark_tile_dirty(offset);
+}
+
+template <unsigned N> void deco_ld_state::attr_w(offs_t offset, u8 data)
+{
+	m_attr[N][offset] = data;
+	m_tilemap[N]->mark_tile_dirty(offset);
+}
+
+template <unsigned N> TILE_GET_INFO_MEMBER(deco_ld_state::get_tile_info)
+{
+	u8 attr = m_attr[N][tile_index];
+	u16 tile = m_vram[N][tile_index] | (attr & 3) << 8;
+	tileinfo.set(0, tile, 5, 0);
+}
+
+
+void deco_ld_state::video_start()
+{
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(deco_ld_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(deco_ld_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[1]->set_transparent_pen(0);
+
+	// flush palette to all black: ends up using a very similar pattern than the MAME default one ...
+	for (int i = 0; i < 0x800; i++)
+		m_palette->set_pen_color(i, 0, 0, 0);
+}
+
+/*
+[+0] ---- -x-- flip X
+[+0] ---- --x- flip Y
+[+0] ---- ---x enable this sprite
+[+1] tile number
+[+2] y coord
+[+3] x coord
+*/
 void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-
-	/*
-	[+0] ---- -x-- flip X
-	[+0] ---- --x- flip Y
-	[+0] ---- ---x enable this sprite
-	[+1] tile number
-	[+2] y coord
-	[+3] x coord
-	*/
 
 	for (int i = 0; i < 0x20; i += 4)
 	{
@@ -196,7 +231,7 @@ void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		int spr_offs = spriteram[i + 1] | tile_bank;
 		int x = spriteram[i + 3];
 		int y = spriteram[i + 2];
-		int col = 6; /* TODO */
+		int col = 6;
 		int fx = (spriteram[i] & 0x04) ? 1 : 0;
 		int fy = (spriteram[i] & 0x02) ? 1 : 0;
 
@@ -211,7 +246,7 @@ void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		int spr_offs = spriteram[i + 1] | tile_bank;
 		int x = spriteram[i + 3];
 		int y = spriteram[i + 2];
-		int col = 6; /* TODO */
+		int col = 6;
 		int fx = (spriteram[i] & 0x04) ? 1 : 0;
 		int fy = (spriteram[i] & 0x02) ? 1 : 0;
 
@@ -219,48 +254,19 @@ void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 	}
 }
 
-uint32_t deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t deco_ld_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-
 	bitmap.fill(0, cliprect);
 
-	draw_sprites(bitmap, cliprect, m_vram1, 0x000);
-	draw_sprites(bitmap, cliprect, m_vram0, 0x100);
+	draw_sprites(bitmap, cliprect, m_vram[1], 0x000);
+	draw_sprites(bitmap, cliprect, m_vram[0], 0x100);
 
-	for (int y = 0; y < 32; y++)
-	{
-		for (int x = 0; x < 32; x++)
-		{
-			int attr = m_attr0[x + y * 32];
-			int tile = m_vram0[x + y * 32] | ((attr & 3) << 8);
-			int colour = (6 & 0x7); /* TODO */
-
-			gfx->transpen(bitmap, cliprect, tile | 0x400, colour, 0, 0, x * 8, y * 8, 0);
-		}
-	}
-
-	for (int y = 0; y < 32; y++)
-	{
-		for (int x = 0; x < 32; x++)
-		{
-			int attr = m_attr1[x + y * 32];
-			int tile = m_vram1[x + y * 32] | ((attr & 3) << 8);
-			int colour = (6 & 0x7); /* TODO */
-
-			gfx->transpen(bitmap, cliprect, tile, colour, 0, 0, x * 8, y * 8, 0);
-		}
-	}
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
-
-void deco_ld_state::decold_sound_cmd_w(uint8_t data)
-{
-	m_soundlatch->write(data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
 
 /* unknown, but certainly related to audiocpu somehow */
 uint8_t deco_ld_state::sound_status_r()
@@ -274,25 +280,23 @@ uint8_t deco_ld_state::acia_status_hack_r()
 	return 0xff;
 }
 
-void deco_ld_state::rblaster_map(address_map &map)
+void deco_ld_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1000).portr("IN0").nopw(); // (w) coin lockout
 	map(0x1001, 0x1001).portr("DSW1");
 	map(0x1002, 0x1002).portr("DSW2");
 	map(0x1003, 0x1003).portr("IN1");
-	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(FUNC(deco_ld_state::decold_sound_cmd_w));
+	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1005, 0x1005).r(FUNC(deco_ld_state::sound_status_r));
 	//map(0x1006, 0x1007).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x1006, 0x1006).r(FUNC(deco_ld_state::acia_status_hack_r));
 	map(0x1007, 0x1007).rw(m_laserdisc, FUNC(sony_ldp1000_device::status_r), FUNC(sony_ldp1000_device::command_w));
 	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x2000, 0x27ff).ram();
-	map(0x2800, 0x2bff).ram().share("vram0");
-	map(0x2c00, 0x2fff).ram().share("attr0");
-	map(0x3000, 0x37ff).ram();
-	map(0x3800, 0x3bff).ram().share("vram1");
-	map(0x3c00, 0x3fff).ram().share("attr1");
+	map(0x2000, 0x23ff).mirror(0x800).ram().w(FUNC(deco_ld_state::vram_w<0>)).share(m_vram[0]);
+	map(0x2400, 0x27ff).mirror(0x800).ram().w(FUNC(deco_ld_state::attr_w<0>)).share(m_attr[0]);
+	map(0x3000, 0x33ff).mirror(0x800).ram().w(FUNC(deco_ld_state::vram_w<1>)).share(m_vram[1]);
+	map(0x3400, 0x37ff).mirror(0x800).ram().w(FUNC(deco_ld_state::attr_w<1>)).share(m_attr[1]);
 	map(0x4000, 0xffff).rom();
 }
 
@@ -310,7 +314,7 @@ INTERRUPT_GEN_MEMBER(deco_ld_state::sound_interrupt)
 }
 
 
-void deco_ld_state::rblaster_sound_map(address_map &map)
+void deco_ld_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
 	map(0x2000, 0x2000).w("ay1", FUNC(ay8910_device::data_w));
@@ -367,16 +371,17 @@ static INPUT_PORTS_START( begas )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(deco_ld_state, begas_vblank_r) // TODO: IPT_VBLANK doesn't seem to work fine?
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	// should be coinage
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
@@ -385,28 +390,28 @@ static INPUT_PORTS_START( begas )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, deco_ld_state,coin_inserted, 0)
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -418,7 +423,7 @@ static INPUT_PORTS_START( cobra )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	/* TODO: dips */
+	// TODO: different dips
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rblaster )
@@ -427,7 +432,7 @@ static INPUT_PORTS_START( rblaster )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	/* TODO: dips */
+	// TODO: different dips
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -467,17 +472,17 @@ void deco_ld_state::rblaster(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 8000000/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &deco_ld_state::rblaster_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &deco_ld_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(deco_ld_state::irq0_line_hold));
 
 	M6502(config, m_audiocpu, 8000000/2);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &deco_ld_state::rblaster_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &deco_ld_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(deco_ld_state::sound_interrupt), attotime::from_hz(640));
 
 //  config.set_maximum_quantum(attotime::from_hz(6000));
 
 	SONY_LDP1000(config, m_laserdisc, 0);
-	m_laserdisc->set_overlay(256, 256, FUNC(deco_ld_state::screen_update_rblaster));
+	m_laserdisc->set_overlay(256, 256, FUNC(deco_ld_state::screen_update));
 	//m_laserdisc->set_overlay_clip(0, 256-1, 8, 240-1);
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
@@ -492,11 +497,13 @@ void deco_ld_state::rblaster(machine_config &config)
 	//m_acia->rxd_handler().set("laserdisc", FUNC(sony_ldp1000_device::read));
 
 	/* sound hardware */
-	/* TODO: mixing */
+	// TODO: mixing with laserdisc
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
+
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
@@ -652,9 +659,9 @@ ROM_START( cobraa )
 //  ROM_LOAD( "lp4-2-pal10l8.d6.jed",       0x0000, 0x00249, CRC(309b3ce5) SHA1(04f185911d33730004c7cd44a693dd1b69b82032) )
 	ROM_LOAD( "lp4-2-pal10l8.d6.bin",       0x0000, 0x0002c, CRC(e594fd13) SHA1(4bb8a9b7cf8f8eaa3c9f290b6e5085a10c927e20) )
 
-	ROM_REGION( 0x20, "proms", 0 )
+	ROM_REGION( 0x40, "proms", 0 )
 	ROM_LOAD( "vd0-c.h15",        0x0000, 0x00020, CRC(02c27aa0) SHA1(e7b814aabbfbcd992f78254b29b6ab6fa8115429) )
-	ROM_LOAD( "vd0-t.f6",         0x0000, 0x00020, CRC(78449942) SHA1(584e25f7bffccd943c4db1edf05552f7989e08a4) )
+	ROM_LOAD( "vd0-t.f6",         0x0020, 0x00020, CRC(78449942) SHA1(584e25f7bffccd943c4db1edf05552f7989e08a4) )
 ROM_END
 
 } // anonymous namespace

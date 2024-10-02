@@ -101,8 +101,8 @@ public:
 	void sliver(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:
@@ -145,11 +145,11 @@ private:
 	void blit_gfx();
 	void render_jpeg();
 
-	void oki_map(address_map &map);
-	void ramdac_map(address_map &map);
-	void sliver_map(address_map &map);
-	void soundmem_io(address_map &map);
-	void soundmem_prg(address_map &map);
+	void oki_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void sliver_map(address_map &map) ATTR_COLD;
+	void soundmem_io(address_map &map) ATTR_COLD;
+	void soundmem_prg(address_map &map) ATTR_COLD;
 };
 
 void sliver_state::machine_start()

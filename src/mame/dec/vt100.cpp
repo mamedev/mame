@@ -104,17 +104,17 @@ private:
 	u8 video_ram_r(offs_t offset);
 	void uart_clock_w(u8 data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	u32 screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(vt102_irq_callback);
-	void vt100_mem(address_map &map);
-	void vt100_io(address_map &map);
-	void vt102_io(address_map &map);
-	void stp_mem(address_map &map);
-	void stp_io(address_map &map);
-	void vt180_mem(address_map &map);
-	void vt180_io(address_map &map);
+	void vt100_mem(address_map &map) ATTR_COLD;
+	void vt100_io(address_map &map) ATTR_COLD;
+	void vt102_io(address_map &map) ATTR_COLD;
+	void stp_mem(address_map &map) ATTR_COLD;
+	void stp_io(address_map &map) ATTR_COLD;
+	void vt180_mem(address_map &map) ATTR_COLD;
+	void vt180_io(address_map &map) ATTR_COLD;
 };
 
 

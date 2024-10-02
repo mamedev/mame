@@ -18,28 +18,17 @@
  *
  ****************************************************************/
 
-#define RUN_VCO_VOLTAGE     (0.0)   /* 5 in schematics */
+#define ACTIVEHIGH_PORT_BIT(P,A,D) ((P & (~(1 << A))) | (D << A))
 
-#define USE_8039    (0)         /* set to 1 to try 8039 hack */
+#define MCU_T_R(N) ((m_soundlatch2->read() >> (N)) & 1)
+#define MCU_T_W_AH(N,D) do { m_portT = ACTIVEHIGH_PORT_BIT(m_portT,N,D); m_soundlatch2->write(m_portT); } while (0)
 
-#define ACTIVELOW_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | ((D ^ 1) << A))
-#define ACTIVEHIGH_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | (D << A))
+#define MCU_P1_R() (m_soundlatch3->read())
+#define MCU_P2_R() (m_soundlatch4->read())
+#define MCU_P1_W(D) m_soundlatch3->write(D)
+#define MCU_P2_W(D) do { set_ea(((D) & 0x20) ? 0 : 1); m_soundlatch4->write(D); } while (0)
 
-#define I8035_T_R(N) ((m_soundlatch2->read() >> (N)) & 1)
-#define I8035_T_W_AH(N,D) do { m_portT = ACTIVEHIGH_PORT_BIT(m_portT,N,D); m_soundlatch2->write(m_portT); } while (0)
-
-#define I8035_P1_R() (m_soundlatch3->read())
-#define I8035_P2_R() (m_soundlatch4->read())
-#define I8035_P1_W(D) m_soundlatch3->write(D)
-
-#if (USE_8039)
-#define I8035_P2_W(D) do { m_soundlatch4->write(D); } while (0)
-#else
-#define I8035_P2_W(D) do { set_ea(((D) & 0x20) ? 0 : 1);  m_soundlatch4->write(D); } while (0)
-#endif
-
-#define I8035_P1_W_AH(B,D) I8035_P1_W(ACTIVEHIGH_PORT_BIT(I8035_P1_R(),B,(D)))
-#define I8035_P2_W_AH(B,D) I8035_P2_W(ACTIVEHIGH_PORT_BIT(I8035_P2_R(),B,(D)))
+#define MCU_P1_W_AH(B,D) MCU_P1_W(ACTIVEHIGH_PORT_BIT(MCU_P1_R(),B,(D)))
 
 
 #if OLD_SOUND
@@ -395,6 +384,7 @@ static DISCRETE_SOUND_START(mario_discrete)
 
 DISCRETE_SOUND_END
 #endif
+
 /****************************************************************
  *
  * EA / Banking
@@ -403,10 +393,7 @@ DISCRETE_SOUND_END
 
 void mario_state::set_ea(int ea)
 {
-	//printf("ea: %d\n", ea);
-	//m_audiocpu->set_input_line(MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
-	if (m_eabank != nullptr)
-		membank(m_eabank)->set_entry(ea);
+	m_audiocpu->set_input_line(MCS48_INPUT_EA, ea ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /****************************************************************
@@ -417,27 +404,14 @@ void mario_state::set_ea(int ea)
 
 void mario_state::sound_start()
 {
-	uint8_t *SND = memregion("audiocpu")->base();
-
-#if USE_8039
-	SND[0x1001] = 0x01;
-#endif
-
-	m_eabank = nullptr;
 	if (m_audiocpu->type() != Z80)
 	{
+		uint8_t *SND = memregion("audiocpu")->base();
 
-		m_eabank = "bank1";
-		m_audiocpu->space(AS_PROGRAM).install_read_bank(0x000, 0x7ff, membank("bank1"));
-		membank("bank1")->configure_entry(0, &SND[0]);
-		membank("bank1")->configure_entry(1, &SND[0x1000]);
-
-#if !USE_8039
 		// Hack to bootstrap MCU program into external MB1
 		SND[0x0000] = 0xf5;
 		SND[0x0001] = 0x04;
 		SND[0x0002] = 0x00;
-#endif
 	}
 
 	save_item(NAME(m_last));
@@ -446,17 +420,10 @@ void mario_state::sound_start()
 
 void mario_state::sound_reset()
 {
-#if USE_8039
-	set_ea(1);
-#endif
-
-	/* FIXME: convert to latch8 */
 	m_soundlatch->clear_w();
 	if (m_soundlatch2) m_soundlatch2->clear_w();
 	if (m_soundlatch3) m_soundlatch3->clear_w();
 	if (m_soundlatch4) m_soundlatch4->clear_w();
-	if (m_soundlatch3) I8035_P1_W(0x00); /* Input port */
-	if (m_soundlatch4) I8035_P2_W(0xff); /* Port is in high impedance state after reset */
 
 	m_last = 0;
 }
@@ -469,34 +436,32 @@ void mario_state::sound_reset()
 
 uint8_t mario_state::mario_sh_p1_r()
 {
-	return I8035_P1_R();
+	return MCU_P1_R();
 }
 
 uint8_t mario_state::mario_sh_p2_r()
 {
-	return I8035_P2_R() & 0xEF; /* Bit 4 connected to GND! */
+	return MCU_P2_R() & 0xef; /* Bit 4 connected to GND! */
 }
 
 int mario_state::mario_sh_t0_r()
 {
-	return I8035_T_R(0);
+	return MCU_T_R(0);
 }
 
 int mario_state::mario_sh_t1_r()
 {
-	return I8035_T_R(1);
+	return MCU_T_R(1);
 }
 
 uint8_t mario_state::mario_sh_tune_r(offs_t offset)
 {
-	uint8_t *SND = memregion("audiocpu")->base();
-	uint16_t mask = memregion("audiocpu")->bytes()-1;
-	uint8_t p2 = I8035_P2_R();
+	uint8_t p2 = MCU_P2_R();
 
 	if ((p2 >> 7) & 1)
 		return m_soundlatch->read();
 	else
-		return (SND[(0x1000 + (p2 & 0x0f) * 256 + offset) & mask]);
+		return m_soundrom[(p2 & 0x0f) << 8 | offset];
 }
 
 void mario_state::mario_sh_sound_w(uint8_t data)
@@ -510,12 +475,12 @@ void mario_state::mario_sh_sound_w(uint8_t data)
 
 void mario_state::mario_sh_p1_w(uint8_t data)
 {
-	I8035_P1_W(data);
+	MCU_P1_W(data);
 }
 
 void mario_state::mario_sh_p2_w(uint8_t data)
 {
-	I8035_P2_W(data);
+	MCU_P2_W(data);
 }
 
 /****************************************************************
@@ -574,26 +539,26 @@ void mario_state::mario_sh3_w(offs_t offset, uint8_t data)
 				m_audiocpu->set_input_line(0,CLEAR_LINE);
 			break;
 		case 1: /* get coin */
-			I8035_T_W_AH(0,data & 1);
+			MCU_T_W_AH(0,data & 1);
 			break;
 		case 2: /* ice */
-			I8035_T_W_AH(1, data & 1);
+			MCU_T_W_AH(1, data & 1);
 			break;
 		case 3: /* crab */
-			I8035_P1_W_AH(0, data & 1);
+			MCU_P1_W_AH(0, data & 1);
 			break;
 		case 4: /* turtle */
-			I8035_P1_W_AH(1, data & 1);
+			MCU_P1_W_AH(1, data & 1);
 			break;
 		case 5: /* fly */
-			I8035_P1_W_AH(2, data & 1);
+			MCU_P1_W_AH(2, data & 1);
 			break;
 		case 6: /* coin */
-			I8035_P1_W_AH(3, data & 1);
+			MCU_P1_W_AH(3, data & 1);
 			break;
 		case 7: /* skid */
 #if OLD_SOUND
-			m_discrete->write(space, DS_SOUND7_INP, data & 1);
+			m_discrete->write(DS_SOUND7_INP, data & 1);
 #else
 			m_audio_snd7->write((data & 1) ^ 1);
 #endif
@@ -609,8 +574,7 @@ void mario_state::mario_sh3_w(offs_t offset, uint8_t data)
 
 void mario_state::mario_sound_map(address_map &map)
 {
-	map(0x0000, 0x07ff).bankr("bank1");
-	map(0x0800, 0x0fff).rom();
+	map(0x0000, 0x0fff).rom().region(m_soundrom, 0);
 }
 
 void mario_state::mario_sound_io_map(address_map &map)
@@ -635,11 +599,7 @@ void mario_state::masao_sound_map(address_map &map)
 
 void mario_state::mario_audio(machine_config &config)
 {
-#if USE_8039
-	i8039_device &audiocpu(I8039(config, "audiocpu", I8035_CLOCK));     /* 730 kHz */
-#else
-	m58715_device &audiocpu(M58715(config, m_audiocpu, I8035_CLOCK));   /* 730 kHz */
-#endif
+	m58715_device &audiocpu(M58715(config, m_audiocpu, MCU_CLOCK)); /* 730 kHz */
 	audiocpu.set_addrmap(AS_PROGRAM, &mario_state::mario_sound_map);
 	audiocpu.set_addrmap(AS_IO, &mario_state::mario_sound_io_map);
 	audiocpu.p1_in_cb().set(FUNC(mario_state::mario_sh_p1_r));

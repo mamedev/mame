@@ -54,8 +54,8 @@ public:
 	void design6(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i8051_device> m_maincpu;
@@ -63,9 +63,9 @@ private:
 	required_device<roc10937_device> m_vfd;
 	required_ioport_array<4> m_buttons;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void iobanked_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void iobanked_map(address_map &map) ATTR_COLD;
 
 	void port1_w(uint8_t data);
 	uint8_t in2_r();
@@ -354,9 +354,9 @@ ROM_START( designe )
 ROM_END
 
 
-// Different Azkoyen vending machines on similar hardware
+// Different Azkoyen tobacco vending machines on similar hardware
 
-/* Azkoyen models T6, T8, and T12 (Azkoyen PCB 104-4455-02-80/1). MCS-48-based. Unknown display.
+/* Azkoyen models T6, T8, and T12 (Azkoyen PCB 104-4455-02-80/1). MCS-48-based.
   ___________________________________________________________
  |                                       __________         |
 _|_           ___                       | BATT    |        _|_
@@ -377,13 +377,16 @@ _|_              | NEC D8279C-5      |      |____________| =|
  |=      |..|                        |  |    |  |          =|
  |                                   |__|    |__|          =|
  |__________________________________________________________|
+
 */
 
+// T6 uses a 4 digits 7-segments display.
 ROM_START( azkoyent6 )
 	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD("43504560-0_t-6.u04",   0x0000, 0x2000, CRC(a4289b26) SHA1(40587094b11c6cf9308673ffac2ed9d445d458e9))
 ROM_END
 
+// T8 uses a 3 digits 7-segments display.
 ROM_START( azkoyent8 )
 	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD("43504570-2_t8_3.u04",  0x0000, 0x2000, CRC(76ac54bf) SHA1(da4c4a9f1c9c85d59169d62682bb7b73a9dd133b))

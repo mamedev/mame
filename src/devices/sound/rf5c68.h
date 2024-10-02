@@ -36,12 +36,12 @@ public:
 	u8 rf5c68_mem_r(offs_t offset);
 	void rf5c68_mem_w(offs_t offset, u8 data);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 protected:
 	rf5c68_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int output_bits);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
@@ -86,7 +86,7 @@ class rf5c164_device : public rf5c68_device
 public:
 	rf5c164_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void rf5c164_map(address_map &map);
+	void rf5c164_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(RF5C68, rf5c68_device)

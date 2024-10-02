@@ -83,7 +83,7 @@ private:
 	void scanline_irq(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
-	void wpc_dcs_map(address_map &map);
+	void wpc_dcs_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -96,7 +96,7 @@ private:
 	required_ioport_array<8> m_io_keyboard;
 
 	// driver_device overrides
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t m_firq_src = 0U, m_zc = 0U, m_row = 0U;
 	uint16_t m_rtc_base_day = 0U;

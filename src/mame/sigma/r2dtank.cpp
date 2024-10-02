@@ -84,7 +84,7 @@ public:
 	int ttl74123_output_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -118,8 +118,8 @@ private:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void r2dtank_audio_map(address_map &map);
-	void r2dtank_main_map(address_map &map);
+	void r2dtank_audio_map(address_map &map) ATTR_COLD;
+	void r2dtank_main_map(address_map &map) ATTR_COLD;
 };
 
 

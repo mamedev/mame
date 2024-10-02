@@ -102,15 +102,15 @@ private:
 	void prosport_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void boomrang_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void prosoccr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void deco16_io_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
-	void liberatb_map(address_map &map);
-	void liberate_map(address_map &map);
-	void liberate_sound_map(address_map &map);
-	void prosoccr_io_map(address_map &map);
-	void prosoccr_map(address_map &map);
-	void prosoccr_sound_map(address_map &map);
-	void prosport_map(address_map &map);
+	void deco16_io_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void liberatb_map(address_map &map) ATTR_COLD;
+	void liberate_map(address_map &map) ATTR_COLD;
+	void liberate_sound_map(address_map &map) ATTR_COLD;
+	void prosoccr_io_map(address_map &map) ATTR_COLD;
+	void prosoccr_map(address_map &map) ATTR_COLD;
+	void prosoccr_sound_map(address_map &map) ATTR_COLD;
+	void prosport_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_DATAEAST_LIBERATE_H

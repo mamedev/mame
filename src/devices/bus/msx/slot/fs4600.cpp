@@ -36,10 +36,11 @@ void msx_slot_fs4600_device::device_start()
 		fatalerror("Memory region '%s' is too small for the FS4600 firmware\n", m_rom_region.finder_tag());
 	}
 
-	m_sram.resize(SRAM_SIZE);
-	m_nvram->set_base(m_sram.data(), SRAM_SIZE);
+	m_sram = std::make_unique<u8[]>(SRAM_SIZE);
+	m_nvram->set_base(&m_sram[0], SRAM_SIZE);
 
 	save_item(NAME(m_sram_address));
+	save_pointer(NAME(m_sram), SRAM_SIZE);
 
 	for (int i = 0; i < 3; i++)
 		m_rombank[i]->configure_entries(0, 0x40, m_rom_region->base() + m_region_offset, 0x4000);

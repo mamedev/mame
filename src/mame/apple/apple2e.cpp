@@ -287,8 +287,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(accel_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u8 ram0000_r(offs_t offset);
 	void ram0000_w(offs_t offset, u8 data);
@@ -394,13 +394,13 @@ public:
 	void tk3000(machine_config &config);
 	void apple2ee(machine_config &config);
 	void apple2eepal(machine_config &config);
-	void apple2c_map(address_map &map);
-	void apple2c_memexp_map(address_map &map);
-	void base_map(address_map &map);
-	void laser128_map(address_map &map);
-	void ace500_map(address_map &map);
-	void ace2200_map(address_map &map);
-	void spectred_keyb_map(address_map &map);
+	void apple2c_map(address_map &map) ATTR_COLD;
+	void apple2c_memexp_map(address_map &map) ATTR_COLD;
+	void base_map(address_map &map) ATTR_COLD;
+	void laser128_map(address_map &map) ATTR_COLD;
+	void ace500_map(address_map &map) ATTR_COLD;
+	void ace2200_map(address_map &map) ATTR_COLD;
+	void spectred_keyb_map(address_map &map) ATTR_COLD;
 	void init_laser128();
 	void init_128ex();
 	void init_pal();
@@ -1037,6 +1037,13 @@ void apple2e_state::machine_start()
 	m_joystick_x1_time = m_joystick_x2_time = m_joystick_y1_time = m_joystick_y2_time = 0;
 	m_reset_latch = false;
 
+	last_mx = 0;
+	last_my = 0;
+	count_x = 0;
+	count_y = 0;
+	m_x0 = false;
+	m_y0 = false;
+
 	// setup save states
 	save_item(NAME(m_speaker_state));
 	save_item(NAME(m_cassette_state));
@@ -1165,6 +1172,8 @@ void apple2e_state::machine_reset()
 	m_xy = false;
 	m_x0edge = false;
 	m_y0edge = false;
+	m_x1 = false;
+	m_y1 = false;
 	m_xirq = false;
 	m_yirq = false;
 	m_mockingboard4c = false;
@@ -2681,6 +2690,7 @@ void apple2e_state::c000_iic_w(offs_t offset, u8 data)
 void apple2e_state::update_iic_mouse()
 {
 	int new_mx, new_my;
+	bool raise_mousexy_irq = false;
 
 	// read the axes and check for changes
 	new_mx = m_mousex->read();
@@ -2750,13 +2760,14 @@ void apple2e_state::update_iic_mouse()
 			if (m_xy)
 			{
 				m_xirq = true;
-				raise_irq(IRQ_MOUSEXY);
+				raise_mousexy_irq = true;
 			}
 		}
 
 		m_x0 = !m_x0;
 	}
-	else if (count_y)
+
+	if (count_y)
 	{
 		if (count_y < 0)
 		{
@@ -2776,11 +2787,16 @@ void apple2e_state::update_iic_mouse()
 			if (m_xy)
 			{
 				m_yirq = true;
-				raise_irq(IRQ_MOUSEXY);
+				raise_mousexy_irq = true;
 			}
 		}
 
 		m_y0 = !m_y0;
+	}
+
+	if (raise_mousexy_irq)
+	{
+		raise_irq(IRQ_MOUSEXY);
 	}
 }
 
@@ -4374,10 +4390,10 @@ static INPUT_PORTS_START( apple2c )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
 
 	PORT_START(MOUSE_XAXIS_TAG) /* Mouse - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START(MOUSE_YAXIS_TAG) /* Mouse - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( laser128 )
@@ -4397,10 +4413,10 @@ static INPUT_PORTS_START( laser128 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
 
 	PORT_START(MOUSE_XAXIS_TAG) /* Mouse - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START(MOUSE_YAXIS_TAG) /* Mouse - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ace500 )
@@ -4438,10 +4454,10 @@ static INPUT_PORTS_START( ace500 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
 
 	PORT_START(MOUSE_XAXIS_TAG) /* Mouse - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START(MOUSE_YAXIS_TAG) /* Mouse - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2cp )
@@ -4453,10 +4469,10 @@ static INPUT_PORTS_START( apple2cp )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
 
 	PORT_START(MOUSE_XAXIS_TAG) /* Mouse - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START(MOUSE_YAXIS_TAG) /* Mouse - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(40) PORT_KEYDELTA(0) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2euk )

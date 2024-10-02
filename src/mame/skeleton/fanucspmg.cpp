@@ -621,11 +621,11 @@ private:
 	uint8_t m_vram[24576];
 	uint8_t m_video_ctrl;
 
-	void maincpu_io(address_map &map);
-	void maincpu_mem(address_map &map);
-	void subcpu_mem(address_map &map);
+	void maincpu_io(address_map &map) ATTR_COLD;
+	void maincpu_mem(address_map &map) ATTR_COLD;
+	void subcpu_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	int32_t m_vram_bank;
 	uint8_t m_vbl_ctrl;
 	uint8_t m_keyboard_row;

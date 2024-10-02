@@ -92,10 +92,10 @@ public:
 	required_device<address_map_bank_device> m_iodecode;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
 private:
 	uint8_t iodecode_r(offs_t offset);
@@ -117,9 +117,9 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void mbc55x_palette(palette_device &palette) const;
 
-	void mbc55x_io(address_map &map);
-	void mbc55x_mem(address_map &map);
-	void mbc55x_iodecode(address_map &map);
+	void mbc55x_io(address_map &map) ATTR_COLD;
+	void mbc55x_mem(address_map &map) ATTR_COLD;
+	void mbc55x_iodecode(address_map &map) ATTR_COLD;
 
 	void set_ram_size();
 

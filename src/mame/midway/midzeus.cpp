@@ -111,7 +111,7 @@ protected:
 
 	void update_firewire_irq();
 
-	void zeus2_map(address_map &map);
+	void zeus2_map(address_map &map) ATTR_COLD;
 	void midzeus2(machine_config &config);
 
 	uint32_t    m_disk_asic[0x10]{};
@@ -140,7 +140,7 @@ public:
 
 	void crusnexo(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
+	ioport_value keypad_r();
 
 protected:
 	virtual void machine_start() override
@@ -162,7 +162,7 @@ private:
 	uint32_t analog_r(offs_t offset);
 	void analog_w(uint32_t data);
 
-	void crusnexo_map(address_map &map);
+	void crusnexo_map(address_map &map) ATTR_COLD;
 
 	uint8_t     m_keypad_select = 0;
 	uint8_t     m_crusnexo_leds_select = 0;
@@ -186,13 +186,13 @@ public:
 
 	void thegrid(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(custom_49way_r);
+	ioport_value custom_49way_r();
 
 private:
 	uint32_t trackball_r(offs_t offset);
 	uint32_t grid_keypad_r(offs_t offset);
 
-	void thegrid_map(address_map &map);
+	void thegrid_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_io_49way_x;
 	required_ioport m_io_49way_y;
@@ -668,7 +668,7 @@ void midzeus_state::tms32032_control_w(offs_t offset, uint32_t data, uint32_t me
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(thegrid_state::custom_49way_r)
+ioport_value thegrid_state::custom_49way_r()
 {
 	static const uint8_t translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
 	return (translate49[m_io_49way_y->read() >> 4] << 4) | translate49[m_io_49way_x->read() >> 4];
@@ -682,7 +682,7 @@ void crusnexo_state::keypad_select_w(offs_t offset, uint32_t data)
 }
 
 
-CUSTOM_INPUT_MEMBER(crusnexo_state::keypad_r)
+ioport_value crusnexo_state::keypad_r()
 {
 	uint32_t bits = m_io_keypad->read();
 	uint8_t select = m_keypad_select;

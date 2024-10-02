@@ -192,14 +192,14 @@ protected:
 	void sega_9h0_0008(machine_config &config);
 
 	virtual void device_post_load() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void install_game_rom();
 	virtual void update_sensors(offs_t offset);
 
-	void beena_arm7_map(address_map &map);
+	void beena_arm7_map(address_map &map) ATTR_COLD;
 
 	void request_irq();
 	void request_fiq();
@@ -1679,15 +1679,15 @@ int32_t sega_9h0_0008_state::rescale_alpha_step(uint8_t step)
 
 void sega_9h0_0008_state::request_irq()
 {
-	m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
-	m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 }
 
 void sega_9h0_0008_state::request_fiq()
 {
 	if (m_requested_fiq) {
-		m_maincpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
-		m_maincpu->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, CLEAR_LINE);
 
 		m_requested_fiq = false;
 	}
@@ -2009,8 +2009,8 @@ private:
 		WRITE_DATA,
 	};
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void install_game_rom() override;
 

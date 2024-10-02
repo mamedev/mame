@@ -59,8 +59,8 @@ public:
 	void mm2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i80186_cpu_device> m_maincpu;
@@ -81,9 +81,9 @@ private:
 	required_device<rs232_port_device> m_rs232b;
 	required_device<palette_device> m_palette;
 
-	void mm2_map(address_map &map);
-	void mm2_io_map(address_map &map);
-	void vpac_mem(address_map &map);
+	void mm2_map(address_map &map) ATTR_COLD;
+	void mm2_io_map(address_map &map) ATTR_COLD;
+	void vpac_mem(address_map &map) ATTR_COLD;
 
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

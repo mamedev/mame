@@ -1650,9 +1650,9 @@ public:
 	uint32_t m_tile_mask;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void update_main_interrupts(uint32_t cause);
@@ -1743,14 +1743,14 @@ private:
 	void render_one_model(const namcos23_render_entry *re);
 	void render_run(bitmap_rgb32 &bitmap);
 
-	void gmen_mips_map(address_map &map);
-	void gmen_sh2_map(address_map &map);
-	void gorgon_map(address_map &map);
-	void s23_map(address_map &map);
-	void s23h8rwmap(address_map &map);
-	void s23iobrdmap(address_map &map);
-	void motoxgo_exio_map(address_map &map);
-	void timecrs2iobrdmap(address_map &map);
+	void gmen_mips_map(address_map &map) ATTR_COLD;
+	void gmen_sh2_map(address_map &map) ATTR_COLD;
+	void gorgon_map(address_map &map) ATTR_COLD;
+	void s23_map(address_map &map) ATTR_COLD;
+	void s23h8rwmap(address_map &map) ATTR_COLD;
+	void s23iobrdmap(address_map &map) ATTR_COLD;
+	void motoxgo_exio_map(address_map &map) ATTR_COLD;
+	void timecrs2iobrdmap(address_map &map) ATTR_COLD;
 
 	required_device<mips3_device> m_maincpu;
 	required_device<h83002_device> m_subcpu;

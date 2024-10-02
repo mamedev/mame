@@ -59,7 +59,6 @@
 
 #include "bus/ata/gdrom.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "cpu/sh/sh4.h"
 #include "imagedev/cdromimg.h"
 #include "machine/aicartc.h"

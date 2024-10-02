@@ -90,9 +90,9 @@ public:
 	void init_hnfubuki();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// video-related
@@ -132,11 +132,11 @@ private:
 	void draw_layer_interleaved(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t row, uint16_t y, uint8_t x_count, int left_pixmap, int right_pixmap, int palbase, bool transp);
 	void irqhandler(int state);
 
-	void hnayayoi_map(address_map &map);
-	void hnayayoi_io_map(address_map &map);
-	void hnfubuki_map(address_map &map);
-	void untoucha_map(address_map &map);
-	void untoucha_io_map(address_map &map);
+	void hnayayoi_map(address_map &map) ATTR_COLD;
+	void hnayayoi_io_map(address_map &map) ATTR_COLD;
+	void hnfubuki_map(address_map &map) ATTR_COLD;
+	void untoucha_map(address_map &map) ATTR_COLD;
+	void untoucha_io_map(address_map &map) ATTR_COLD;
 };
 
 

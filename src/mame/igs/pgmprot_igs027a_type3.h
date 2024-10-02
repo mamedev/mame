@@ -25,7 +25,7 @@ public:
 	void pgm_arm_type3_33_8688m(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// svg
@@ -66,8 +66,8 @@ private:
 	u32 happy6_speedup_r();
 	u32 svg_speedup_r();
 	u32 svgpcb_speedup_r();
-	void _55857G_arm7_map(address_map &map);
-	void svg_68k_mem(address_map &map);
+	void _55857G_arm7_map(address_map &map) ATTR_COLD;
+	void svg_68k_mem(address_map &map) ATTR_COLD;
 };
 
 INPUT_PORTS_EXTERN(theglad);

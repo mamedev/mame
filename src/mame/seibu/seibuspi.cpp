@@ -554,7 +554,8 @@ SXX2C ROM SUB10 (C)1998
 -------------------------------------
 Notes:
 *     : These ROMs are surface mounted
-61256 : 32k x8 SRAM (x2)
+61256 : 32k x8 SRAM (x2). These are tied to the RISE11 chip with RAM A11-A14 tied to vcc/gnd so
+        these RAMs are configured as 2kB each and the RISE11 has a total of 4kB connected to it.
 RISE11: SEIBU custom stamped 'RISE11' (QFP240)
 PAL1  : PALCE 16V8 stamped 'SPI ROM 10-2'
 PAL2  : PALCE 16V8 stamped 'SPI ROM 10-1'
@@ -1205,7 +1206,7 @@ void seibuspi_state::ymf_irqhandler(int state)
 }
 
 template <int N>
-CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
+ioport_value seibuspi_state::ejanhs_encode()
 {
 	/* E-Jan Highschool has a keyboard with the following keys
 	The keys are encoded with 3 bits for each input port

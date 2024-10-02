@@ -15,21 +15,30 @@
         - flip screen support;
         - according to a side-by-side test, sound should be "darker" by some octaves,
           likely that a sound filter is needed;
-    cntsteer specific:
-        - In Back Rotate Test, rotation is tested with the following arrangement (upper bits of rotation parameter):
+        - tilemap paging may be wrong
+          Maybe upper scroll bits also controls startdx/dy?
+    zerotrgt:
+        - ROZ is misaligned in attract mode ranking (should be X +576 not -576)
+        - ROZ doesn't align with tanks in stage 2 (red circles should follow them)
+    cntsteer:
+        - In Back Rotate Test, rotation is tested with the following arrangement
+          (upper bits of rotation parameter):
           04 -> 05 -> 02 -> 03 -> 00 -> 01 -> 06 -> 07 -> 04 and backwards
           Anything with bit 0 set is tested from 0xff to 0, with bit 0 clear that's 0 -> 0xff, fun.
-    - Understand how irq communication works between CPUs. Buffer $415-6 seems involved in the protocol.
-      We currently have slave CPU irq hooked up to vblank, might or might not be correct.
-    - invert order between maincpu and subcpu, subcpu is clearly the master CPU here.
-    - understand why background mirroring causes wrong gfxs on title screen_device.
-      Probably area 0x2000-0x2fff enables tile bank bit 8 and write addresses have same mapping as reading.
-      A preliminary decoding is in tilelayout_swap;
-    - tilemap flashing when gameplay timer is running out;
-    - tilemap scrolling, correct only for title screen.
-      Maybe upper scroll bits also controls startdx/dy?
+        - scrolling goes backwards on gameplay;
+        - tilemap should flash when gameplay timer is running out;
+        - understand why background mirroring causes wrong gfxs at end of title screen sequence.
+          Uses $2000-$2fff and should just draw the same USA flag as the ones shown at start of the
+          sequence;
+        - color decoding slightly off, needs resnet;
+        - Understand how irq communication works between CPUs. Buffer $415-6 seems involved in the
+          protocol.
+          We currently have slave CPU irq hooked up to vblank, might or might not be correct.
+        - sound keeps ringing once it start executing SOUND TEST;
     cleanup
-        - split into driver/video;
+        - split state objects, consider using composable devices rather than inherit one with the
+          other (has HMC20 + VSC30 custom chips);
+        - Document PCB components for both;
 
 
 ***************************************************************************************/
@@ -104,7 +113,6 @@ public:
 	void cntsteer_background_w(offs_t offset, uint8_t data);
 	uint8_t cntsteer_background_mirror_r(offs_t offset);
 	void gekitsui_sub_irq_ack(uint8_t data);
-	void cntsteer_sound_w(uint8_t data);
 	void zerotrgt_ctrl_w(offs_t offset, uint8_t data);
 	void cntsteer_sub_irq_w(uint8_t data);
 	void cntsteer_sub_nmi_w(uint8_t data);
@@ -132,11 +140,11 @@ public:
 	void zerotrgt_rearrange_gfx( int romsize, int romarea );
 	void cntsteer(machine_config &config);
 	void zerotrgt(machine_config &config);
-	void cntsteer_cpu1_map(address_map &map);
-	void cntsteer_cpu2_map(address_map &map);
-	void gekitsui_cpu1_map(address_map &map);
-	void gekitsui_cpu2_map(address_map &map);
-	void sound_map(address_map &map);
+	void cntsteer_cpu1_map(address_map &map) ATTR_COLD;
+	void cntsteer_cpu2_map(address_map &map) ATTR_COLD;
+	void gekitsui_cpu1_map(address_map &map) ATTR_COLD;
+	void gekitsui_cpu2_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -484,6 +492,7 @@ void cntsteer_state::cntsteer_vregs_w(offs_t offset, uint8_t data)
 		case 0: m_scrolly = data; break;
 		case 1: m_scrollx = data; break;
 		case 2: m_bg_bank = (data & 0x01) << 9;
+				// crosses above, verified to be correct by service mode BACK CG PALLETE TEST item
 				m_bg_color_bank = (data & 7);
 				m_bg_tilemap->mark_all_dirty();
 				break;
@@ -515,13 +524,13 @@ void cntsteer_state::cntsteer_background_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-/* checks area 0x2000-0x2fff with this address config. */
+/* checks area $2000-$2fff with this address config. */
 uint8_t cntsteer_state::cntsteer_background_mirror_r(offs_t offset)
 {
 	return m_videoram2[bitswap<16>(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6)];
 }
 
-// TODO: on write prolly selects bit 8 of tile bank (which needs better decoding too)
+// TODO: $2000-$2fff on write most likely also selects the alt rotated tiles at 0x1**/0x3**
 
 /*************************************
  *
@@ -532,12 +541,6 @@ uint8_t cntsteer_state::cntsteer_background_mirror_r(offs_t offset)
 void cntsteer_state::gekitsui_sub_irq_ack(uint8_t data)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-}
-
-void cntsteer_state::cntsteer_sound_w(uint8_t data)
-{
-	m_soundlatch->write(data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 void cntsteer_state::zerotrgt_ctrl_w(offs_t offset, uint8_t data)
@@ -625,7 +628,7 @@ void cntsteer_state::gekitsui_cpu2_map(address_map &map)
 	map(0x3003, 0x3003).portr("COINS");
 	map(0x3000, 0x3004).w(FUNC(cntsteer_state::zerotrgt_vregs_w));
 	map(0x3005, 0x3005).w(FUNC(cntsteer_state::gekitsui_sub_irq_ack));
-	map(0x3007, 0x3007).w(FUNC(cntsteer_state::cntsteer_sound_w));
+	map(0x3007, 0x3007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -652,8 +655,7 @@ void cntsteer_state::cntsteer_cpu2_map(address_map &map)
 	map(0x3000, 0x3004).w(FUNC(cntsteer_state::cntsteer_vregs_w));
 	map(0x3005, 0x3005).w(FUNC(cntsteer_state::gekitsui_sub_irq_ack));
 	map(0x3006, 0x3006).w(FUNC(cntsteer_state::cntsteer_main_irq_w));
-	map(0x3007, 0x3007).w(FUNC(cntsteer_state::cntsteer_sound_w));
-	map(0x3007, 0x3007).nopr(); //m6809 bug.
+	map(0x3007, 0x3007).nopr().w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -985,7 +987,6 @@ void cntsteer_state::cntsteer(machine_config &config)
 
 	MC6809E(config, m_subcpu, 2000000);       /* MC68B09E */
 	m_subcpu->set_addrmap(AS_PROGRAM, &cntsteer_state::cntsteer_cpu2_map);
-//  m_subcpu->set_disable();
 
 	M6502(config, m_audiocpu, XTAL(12'000'000)/8);        /* ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cntsteer_state::sound_map);
@@ -1016,6 +1017,7 @@ void cntsteer_state::cntsteer(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	ay8910_device &ay1(YM2149(config, "ay1", XTAL(12'000'000)/8));
 	ay1.port_a_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
@@ -1063,6 +1065,7 @@ void cntsteer_state::zerotrgt(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
@@ -1291,4 +1294,4 @@ void cntsteer_state::init_zerotrgt()
 GAME( 1985, zerotrgt,  0,        zerotrgt, zerotrgt,  cntsteer_state, init_zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World, CW)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
 GAME( 1985, zerotrgta, zerotrgt, zerotrgt, zerotrgta, cntsteer_state, init_zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World, CT)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gekitsui,  zerotrgt, zerotrgt, zerotrgta, cntsteer_state, init_zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)",     MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cntsteer,  0,        cntsteer, cntsteer,  cntsteer_state, init_zerotrgt, ROT270, "Data East Corporation", "Counter Steer (Japan)",   MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_WRONG_COLORS|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cntsteer,  0,        cntsteer, cntsteer,  cntsteer_state, init_zerotrgt, ROT270, "Data East Corporation", "Counter Steer (Japan)",   MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_COLORS|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )

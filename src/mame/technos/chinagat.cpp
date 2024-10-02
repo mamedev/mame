@@ -277,9 +277,9 @@ public:
 	void saiyugoub2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// for Sai Yu Gou Ma Roku
@@ -311,12 +311,12 @@ private:
 	int saiyugoub1_m5205_irq_r();
 	void saiyugoub1_m5205_irq_w(int state);
 
-	void i8748_map(address_map &map);
-	void main_map(address_map &map);
-	void saiyugoub1_sound_map(address_map &map);
-	void sound_map(address_map &map);
-	void sub_map(address_map &map);
-	void ym2203c_sound_map(address_map &map);
+	void i8748_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void saiyugoub1_sound_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void ym2203c_sound_map(address_map &map) ATTR_COLD;
 };
 
 

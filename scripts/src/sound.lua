@@ -1765,3 +1765,15 @@ if (SOUNDS["CF61909"]~=null) then
 		MAME_DIR .. "src/devices/sound/cf61909.h",
 	}
 end
+
+---------------------------------------------------
+-- NEC uPD65043GF-U01
+--@src/devices/sound/upd65043gfu01.h,SOUNDS["UPD65043GFU01"] = true
+---------------------------------------------------
+
+if (SOUNDS["UPD65043GFU01"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/upd65043gfu01.cpp",
+		MAME_DIR .. "src/devices/sound/upd65043gfu01.h",
+	}
+end

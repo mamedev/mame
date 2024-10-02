@@ -53,7 +53,7 @@ public:
 	void meyc8088(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -82,7 +82,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
-	void meyc8088_map(address_map &map);
+	void meyc8088_map(address_map &map) ATTR_COLD;
 };
 
 

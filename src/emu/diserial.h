@@ -141,8 +141,10 @@ private:
 	u8 m_df_word_length;
 	// parity state
 	u8 m_df_parity;
-	// number of stop bits
+	// number of TX stop bits
 	u8 m_df_stop_bit_count;
+	// min. number of RX stop bits
+	u8 m_df_min_rx_stop_bit_count;
 
 	// Receive register
 	/* data */

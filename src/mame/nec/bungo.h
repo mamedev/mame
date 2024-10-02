@@ -27,10 +27,10 @@ public:
 	void mini5sx_config(machine_config &config);
 
 protected:
-	void mini5sx_map(address_map &map);
-	void mini5sx_io(address_map &map);
+	void mini5sx_map(address_map &map) ATTR_COLD;
+	void mini5sx_io(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 private:
 	required_device<v33_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;

@@ -78,8 +78,8 @@ protected:
 			device_t *owner,
 			uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	uint32_t get_region_mask(uint8_t* rgn, uint32_t rgn_size);
 	uint8_t* m_region_sprites = nullptr; uint32_t m_region_sprites_size = 0;
 	uint8_t* m_region_fixed = nullptr; uint32_t m_region_fixed_size = 0;
@@ -132,7 +132,7 @@ public:
 	virtual void set_sprite_region(uint8_t* region_sprites, uint32_t region_sprites_size) override;
 
 	protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 };
 

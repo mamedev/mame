@@ -235,7 +235,7 @@ template <unsigned Rows>
 class peripheral_base : public device_t, public device_mac_keyboard_interface
 {
 public:
-	CUSTOM_INPUT_MEMBER(columns_r)
+	ioport_value columns_r()
 	{
 		ioport_value result(make_bitmask<ioport_value>(Rows));
 		for (unsigned i = 0U; Rows > i; ++i)
@@ -247,7 +247,7 @@ public:
 		return result ^ make_bitmask<ioport_value>(Rows);
 	}
 
-	CUSTOM_INPUT_MEMBER(host_data_r)
+	ioport_value host_data_r()
 	{
 		return m_host_data_in ^ 0x01;
 	}
@@ -402,12 +402,12 @@ protected:
 class keypad_base : public peripheral_base<3>
 {
 public:
-	CUSTOM_INPUT_MEMBER(keyboard_clock_r)
+	ioport_value keyboard_clock_r()
 	{
 		return m_keyboard_clock_in ^ 0x01;
 	}
 
-	CUSTOM_INPUT_MEMBER(keyboard_data_r)
+	ioport_value keyboard_data_r()
 	{
 		return m_keyboard_data_in ^ 0x01;
 	}

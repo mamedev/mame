@@ -29,7 +29,7 @@ protected:
 
 	optional_device<i2cmem_device> m_eeprom;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// cartridge interface
 	virtual uint8_t read(offs_t offset, int _8000, int _a000, int _c000, int _e000) override;
@@ -45,7 +45,7 @@ public:
 	colecovision_activision_256b_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class colecovision_activision_32k_cartridge_device : public colecovision_activision_cartridge_device
@@ -54,7 +54,7 @@ public:
 	colecovision_activision_32k_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 // device type declaration

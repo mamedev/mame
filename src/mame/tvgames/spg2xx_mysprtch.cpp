@@ -23,11 +23,11 @@ public:
 	void init_mgt20in1();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
-	void mem_map_mysprtch(address_map& map);
+	void mem_map_mysprtch(address_map &map) ATTR_COLD;
 
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask) override;
 
@@ -50,7 +50,7 @@ public:
 	{ }
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask) override;
 
 private:

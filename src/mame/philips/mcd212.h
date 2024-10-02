@@ -49,15 +49,15 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	template <int Channel> int ram_dtack_cycle_count();
 	int rom_dtack_cycle_count();
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(ica_tick);
 	TIMER_CALLBACK_MEMBER(dca_tick);

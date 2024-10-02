@@ -141,9 +141,9 @@ public:
 	void divebomb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_spritecpu;
@@ -185,12 +185,12 @@ private:
 	template<int Chip> void rozcpu_wrap_enable_w(uint8_t data);
 	template<int Chip> void rozcpu_enable_w(uint8_t data);
 	void rozcpu_pal_w(uint8_t data);
-	void fgcpu_iomap(address_map &map);
-	void fgcpu_map(address_map &map);
-	void rozcpu_iomap(address_map &map);
-	void rozcpu_map(address_map &map);
-	void spritecpu_iomap(address_map &map);
-	void spritecpu_map(address_map &map);
+	void fgcpu_iomap(address_map &map) ATTR_COLD;
+	void fgcpu_map(address_map &map) ATTR_COLD;
+	void rozcpu_iomap(address_map &map) ATTR_COLD;
+	void rozcpu_map(address_map &map) ATTR_COLD;
+	void spritecpu_iomap(address_map &map) ATTR_COLD;
+	void spritecpu_map(address_map &map) ATTR_COLD;
 };
 
 

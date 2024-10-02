@@ -2812,6 +2812,42 @@ ROM_START( dotrone )
 	ROM_LOAD( "edotlamp.u2",  0x0020, 0x0020, CRC(fb58b867) SHA1(45beb55f2c2e9197f091fc06e9a2f595e57e5c93) )    // lamp sequencer PROM
 ROM_END
 
+ROM_START( dotronep ) // BTANB: upon boot up, you get a "SOUND BOARD INTERFACE ERROR" message
+	ROM_REGION( 0x10000, "maincpu", 0 ) // all 27128s
+	ROM_LOAD( "pgm0_8-9.1c", 0x00000, 0x4000, CRC(a997e93d) SHA1(bf32c8b7e0ab2acabf177d686dbb3696d259e6af) )
+	ROM_LOAD( "pgm1_8-9.2c", 0x04000, 0x4000, CRC(31e5c11e) SHA1(9443c22ed436dcafbea86fdb9ecbaa61659960d9) )
+	ROM_LOAD( "pgm2_8-9.3c", 0x08000, 0x4000, CRC(5162fe8d) SHA1(82cf3c6af339bf81e22294ff91e99ca9e08b86f2) )
+	ROM_LOAD( "pgm3_8-9.4c", 0x0c000, 0x4000, CRC(4e7085e1) SHA1(c26363ae9c2dc422f79200d4d7829c8ca3b2fa18) )
+
+	ROM_REGION( 0x10000, "ssio:cpu", 0 ) // all 2532s
+	ROM_LOAD( "0_8-9.a7",  0x00000, 0x1000, CRC(872160b3) SHA1(824fd62fc086399db5a52f0d14b4b0022c8a67a2) )
+	ROM_LOAD( "1_8-9.a8",  0x01000, 0x1000, CRC(d9c3d4ca) SHA1(02128979a1445a6e757c98aee5d486ef4c6add5a) )
+	ROM_LOAD( "2_8-9.a9",  0x02000, 0x1000, CRC(78cc8bad) SHA1(eef57ded6392d9d68756c2e0686456584144494a) )
+	ROM_LOAD( "3_8-9.a10", 0x03000, 0x1000, CRC(b369ec5a) SHA1(5e9d410f060bfa417f3a399b3704e2251fb601e5) )
+
+	ROM_REGION( 0x10000, "snt:cpu", 0 ) // all 2532s
+	ROM_LOAD( "pre_aug_19.u3", 0x09000, 0x1000, CRC(c3d0f762) SHA1(a1857641c35b5bcb33f29fe79a1a581c4cbf129b) )
+	ROM_LOAD( "pre.u4",        0x0a000, 0x1000, CRC(7ca79b43) SHA1(c995e1e67d70706a090eb777e9fec0f1ba03f82d) )
+	ROM_LOAD( "pre.u5",        0x0b000, 0x1000, CRC(24e9618e) SHA1(eb245ff381a76b314a0ed3519e140444afae341c) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 ) // all 2764s
+	ROM_LOAD( "bg0_8-9.6f", 0x00000, 0x2000, CRC(40167124) SHA1(782c8192dd58a3f23ff2338452dd03206d79030a) )
+	ROM_LOAD( "bg1_8-9.5f", 0x02000, 0x2000, CRC(bb2d7a5d) SHA1(8044be9ffca9520fd77e0da492147e553f9f7da3) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 ) // all 2764s
+	ROM_LOAD( "cp4_fg7-8-9-83.a7", 0x00000, 0x2000, CRC(1e689f9c) SHA1(1ea79ba810eedb03581aa84dd27c52a53f542636) )
+	ROM_LOAD( "cp3_fg8-8-9-83.a8", 0x02000, 0x2000, CRC(172685ee) SHA1(52499af5540b401d3deed4667bb082c16d47e088) )
+	ROM_LOAD( "cp6_fg5-8-9-83.a5", 0x04000, 0x2000, CRC(4326041b) SHA1(77f365686edae474927b2eced0398389ea0fd169) )
+	ROM_LOAD( "cp5_fg6-8-9-83.a6", 0x06000, 0x2000, CRC(1df69f11) SHA1(2ca2d97b619751206b2411663159fc36577440e1) )
+	ROM_LOAD( "cp8_fg3-8-9-83.a3", 0x08000, 0x2000, CRC(7587a8fd) SHA1(95da15f103596e7a4d9c3602539e5222846dccf6) )
+	ROM_LOAD( "cp7_fg4-8-9-83.a4", 0x0a000, 0x2000, CRC(6e1af64f) SHA1(09c3c13baed7a18d02a254741461bc1b9d46002f) )
+	ROM_LOAD( "cp10_fg1.a1",       0x0c000, 0x2000, CRC(759f36a7) SHA1(e295e009b7f00f5a7a8c664a4117f17020ceddf6) )
+	ROM_LOAD( "cp9_fg2-8-9-83.a2", 0x0e000, 0x2000, CRC(80ba9553) SHA1(72cdf373280ba62d01af7269121f6270c4a303d1) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "1f26.u2", 0x0020, 0x0020, CRC(fb58b867) SHA1(45beb55f2c2e9197f091fc06e9a2f595e57e5c93) )    // lamp sequencer PROM (N82S123)
+ROM_END
+
 
 ROM_START( nflfoot )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3113,6 +3149,7 @@ GAME(  1983, dotrona,   dotron,   mcr_91490,     dotron,    mcr_state,         i
 
 /* 91490 CPU board + 91464 video gen + 91657 sound I/O + Squawk n' Talk */
 GAME(  1983, dotrone,   dotron,   mcr_91490_snt, dotrone,   mcr_state,         init_dotrone,   ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Environmental)", MACHINE_SUPPORTS_SAVE )
+GAME(  1983, dotronep,  dotron,   mcr_91490_snt, dotrone,   mcr_state,         init_dotrone,   ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Environmental, prototype, 8/9/83)", MACHINE_SUPPORTS_SAVE )
 
 /* 91490 CPU board + 91464 video gen + 91657 sound I/O + Squawk n' Talk + IPU laserdisk interface */
 GAME(  1983, nflfoot,   0,        mcr_91490_ipu, nflfoot,   mcr_nflfoot_state, init_nflfoot,   ROT0,  "Bally Midway", "NFL Football", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

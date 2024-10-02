@@ -34,8 +34,8 @@ public:
 	void inteact_214b_uio_b_attribute_w(uint8_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	devcb_write8 m_porta_out;

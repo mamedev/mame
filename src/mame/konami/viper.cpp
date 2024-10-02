@@ -82,9 +82,9 @@
       ds2430.
     - Voodoo 3 has issues with LOD minimums, cfr. mocapglf where card check don't display a bar
       near the percentage;
-    - convert i2c to be a real i2c-complaint device;
+    - convert i2c to be a real i2c-compliant device;
     - hookup adc0838, reads from i2c;
-    - convert epic to be a device, make it input_merger/irq_callback complaint;
+    - convert epic to be a device, make it input_merger/irq_callback compliant;
     - (more intermediate steps for proper PCI conversions here)
     - jpark3: attract mode demo play acts weird, the dinosaur gets submerged
       and camera doesn't really know what to do, CPU core bug?
@@ -465,14 +465,14 @@ public:
 	int ds2430_combined_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<voodoo_3_device> m_voodoo;
 private:
-	void mpc8240_soc_map(address_map &map);
+	void mpc8240_soc_map(address_map &map) ATTR_COLD;
 
 	void unk2_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t voodoo3_io_r(offs_t offset, uint64_t mem_mask = ~0);
@@ -515,9 +515,9 @@ private:
 	uint32_t m_voodoo3_pci_reg[0x100];
 	uint32_t m_mpc8240_regs[256/4];
 
-	void viper_map(address_map &map);
-	void viper_ppp_map(address_map &map);
-	void omz3d_map(address_map &map);
+	void viper_map(address_map &map) ATTR_COLD;
+	void viper_ppp_map(address_map &map) ATTR_COLD;
+	void omz3d_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(i2c_timer_callback);
@@ -653,7 +653,7 @@ public:
 
 protected:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 private:
 	std::unique_ptr<bitmap_rgb32> m_voodoo_buf;
 	std::unique_ptr<bitmap_rgb32> m_ttl_buf;

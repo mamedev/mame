@@ -128,7 +128,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/acorn_vidc.h"
 #include "machine/arm_iomd.h"
 #include "machine/i2cmem.h"
@@ -170,8 +169,8 @@ protected:
 	required_device<qs1000_device> m_qs1000;
 
 	void init_common();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	typedef void (ssfindo_state::*speedup_func)();
 	speedup_func m_speedup{};
@@ -206,8 +205,8 @@ private:
 	void ssfindo_speedups();
 	void ppcar_speedups();
 
-	void ppcar_map(address_map &map);
-	void ssfindo_map(address_map &map);
+	void ppcar_map(address_map &map) ATTR_COLD;
+	void ssfindo_map(address_map &map) ATTR_COLD;
 
 	uint8_t iolines_r();
 	void iolines_w(uint8_t data);
@@ -231,7 +230,7 @@ protected:
 private:
 	bool m_i2cdata_hack = false;
 
-	void tetfight_map(address_map &map);
+	void tetfight_map(address_map &map) ATTR_COLD;
 
 	int iocr_od0_r();
 	int iocr_od1_r();

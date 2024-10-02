@@ -86,9 +86,11 @@ CHIP #  POSITION   TYPE
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
+
 #include "flower_a.h"
 #include "emupal.h"
 #include "screen.h"
@@ -97,8 +99,6 @@ CHIP #  POSITION   TYPE
 
 
 namespace {
-
-#define MASTER_CLOCK XTAL(18'432'000)
 
 class flower_state : public driver_device
 {
@@ -124,6 +124,12 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
 	void flipscreen_w(int state);
 	void coin_counter_w(int state);
@@ -140,14 +146,8 @@ private:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void audio_map(address_map &map);
-	void shared_map(address_map &map);
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void video_start() override;
+	void audio_map(address_map &map) ATTR_COLD;
+	void shared_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_mastercpu;
 	required_device<cpu_device> m_slavecpu;
@@ -505,6 +505,8 @@ void flower_state::slave_irq_ack_w(int state)
 
 void flower_state::flower(machine_config &config)
 {
+	constexpr XTAL MASTER_CLOCK = 18.432_MHz_XTAL;
+
 	Z80(config, m_mastercpu, MASTER_CLOCK / 4); // divider unknown
 	m_mastercpu->set_addrmap(AS_PROGRAM, &flower_state::shared_map);
 
@@ -515,7 +517,7 @@ void flower_state::flower(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &flower_state::audio_map);
 	m_audiocpu->set_periodic_int(FUNC(flower_state::irq0_line_hold), attotime::from_hz(90));
 
-	config.set_perfect_quantum(m_mastercpu);
+	config.set_maximum_quantum(attotime::from_hz(m_mastercpu->clock() / 4));
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // M74LS259P @ 11K
 	outlatch.q_out_cb<0>().set_nop();
@@ -632,5 +634,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1986, flower,  0,      flower, flower, flower_state, empty_init, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
-GAME( 1986, flowerj, flower, flower, flower, flower_state, empty_init, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flower,  0,      flower, flower, flower_state, empty_init, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1986, flowerj, flower, flower, flower, flower_state, empty_init, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )

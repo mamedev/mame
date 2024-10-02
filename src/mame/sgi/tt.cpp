@@ -44,8 +44,8 @@ public:
 	void pi4d70(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void tt12(machine_config &config, XTAL clock);
 

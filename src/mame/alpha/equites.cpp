@@ -372,8 +372,8 @@ protected:
 	memory_share_creator<uint8_t> m_fg_videoram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint16_t spriteram_kludge_r();
 	uint8_t fg_videoram_r(offs_t offset);
@@ -391,9 +391,9 @@ protected:
 	void unpack_block(const char *region, int offset, int size);
 	void unpack_region(const char *region);
 
-	void bngotime_map(address_map &map);
-	void equites_map(address_map &map);
-	void common_map(address_map &map);
+	void bngotime_map(address_map &map) ATTR_COLD;
+	void equites_map(address_map &map) ATTR_COLD;
+	void common_map(address_map &map) ATTR_COLD;
 
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -412,10 +412,10 @@ public:
 	void gekisou(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void gekisou_map(address_map &map);
+	void gekisou_map(address_map &map) ATTR_COLD;
 	void unknown_bit_w(offs_t offset, uint16_t data);
 
 	int m_unknown_bit = 0;

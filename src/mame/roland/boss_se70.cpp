@@ -24,7 +24,7 @@ public:
 	void se70(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<h8510_device> m_maincpu;
 };

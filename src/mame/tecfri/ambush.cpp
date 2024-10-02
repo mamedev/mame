@@ -104,9 +104,9 @@ private:
 	void coin_counter_2_w(int state);
 	void output_latches_w(offs_t offset, uint8_t data);
 
-	void bootleg_map(address_map &map);
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
+	void bootleg_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
 
 	void register_save_states();
 

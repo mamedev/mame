@@ -10,6 +10,12 @@
 
 #include "z80.inc"
 
+#define LOG_INT   (1U << 1) // z80.lst
+
+//#define VERBOSE (LOG_INT)
+#include "logmacro.h"
+
+
 DEFINE_DEVICE_TYPE(Z80N, z80n_device, "z80n", "Z80N")
 
 std::unique_ptr<util::disasm_interface> z80n_device::create_disassembler()

@@ -160,9 +160,9 @@ public:
 protected:
 	void hp98xx_base(machine_config &config);
 
-	virtual void machine_start() override;
-	virtual void device_reset() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void print_line();
 
 	required_device<hp_09825_67907_cpu_device> m_cpu;
@@ -202,7 +202,7 @@ private:
 	// SC of slots
 	int m_slot_sc[ 3 ];
 
-	void cpu_io_map(address_map &map);
+	void cpu_io_map(address_map &map) ATTR_COLD;
 
 	uint16_t kb_scancode_r();
 	void disp_w(uint16_t data);
@@ -923,7 +923,7 @@ public:
 protected:
 	void hp9825_base(machine_config &config);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual void print_line() override;
 
@@ -1053,12 +1053,12 @@ public:
 	void hp9825a(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<ram_device> m_ram;
 
-	void cpu_mem_map(address_map &map);
+	void cpu_mem_map(address_map &map) ATTR_COLD;
 };
 
 void hp9825a_state::hp9825a(machine_config &config)
@@ -1108,10 +1108,10 @@ public:
 	void hp9825b(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void cpu_mem_map(address_map &map);
+	void cpu_mem_map(address_map &map) ATTR_COLD;
 };
 
 void hp9825b_state::hp9825b(machine_config &config)
@@ -1165,8 +1165,8 @@ public:
 	void hp9825t(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void device_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -1188,9 +1188,9 @@ private:
 	uint8_t m_special_opt;  // U42
 	uint16_t m_fetch_addr;
 
-	void cpu_mem_map(address_map &map);
-	void ram_mem_map(address_map &map);
-	void rom_mem_map(address_map &map);
+	void cpu_mem_map(address_map &map) ATTR_COLD;
+	void ram_mem_map(address_map &map) ATTR_COLD;
+	void rom_mem_map(address_map &map) ATTR_COLD;
 	uint16_t cpu_mem_r(offs_t offset, uint16_t mem_mask = ~0);
 	void cpu_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void stm(uint8_t cycle_type);
@@ -1420,12 +1420,12 @@ public:
 	void hp9831(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<ram_device> m_ram;
 
-	void cpu_mem_map(address_map &map);
+	void cpu_mem_map(address_map &map) ATTR_COLD;
 };
 
 void hp9831_state::hp9831(machine_config &config)

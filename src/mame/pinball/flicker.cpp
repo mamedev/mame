@@ -61,7 +61,7 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(coins_in);
+	ioport_value coins_in();
 
 	DECLARE_INPUT_CHANGED_MEMBER(test_changed);
 
@@ -78,11 +78,11 @@ private:
 	void cm_ram1_w(int state);
 	void cm_ram2_w(int state);
 
-	void flicker_memory(address_map &map);
-	void flicker_ram_ports(address_map &map);
-	void flicker_rom(address_map &map);
-	void flicker_rom_ports(address_map &map);
-	void flicker_status(address_map &map);
+	void flicker_memory(address_map &map) ATTR_COLD;
+	void flicker_ram_ports(address_map &map) ATTR_COLD;
+	void flicker_rom(address_map &map) ATTR_COLD;
+	void flicker_rom_ports(address_map &map) ATTR_COLD;
+	void flicker_status(address_map &map) ATTR_COLD;
 
 	required_device<i4004_cpu_device>   m_maincpu;
 	required_ioport                     m_testport;
@@ -379,7 +379,7 @@ void flicker_state::cm_ram2_w(int state)
 }
 
 
-CUSTOM_INPUT_MEMBER(flicker_state::coins_in)
+ioport_value flicker_state::coins_in()
 {
 	u8 const coins(m_coinport->read());
 	return BIT(coins, 7) ? (coins & 0x3f) : 0;

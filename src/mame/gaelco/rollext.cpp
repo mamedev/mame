@@ -456,12 +456,12 @@ private:
 	required_ioport m_eeprom_out;
 
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void preprocess_texture_data();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void memmap(address_map &map);
+	void memmap(address_map &map) ATTR_COLD;
 };
 
 void rollext_state::preprocess_texture_data()

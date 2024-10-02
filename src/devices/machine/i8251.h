@@ -66,8 +66,8 @@ protected:
 			uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void command_w(uint8_t data);
 	void mode_w(uint8_t data);
@@ -158,8 +158,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// TODO: currently unimplemented interrupt masking
 	u8 simk_r() { return m_simk; }

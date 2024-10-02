@@ -104,8 +104,8 @@ public:
 private:
 	required_device<pentium_device> m_maincpu;
 
-	void odyssey_map(address_map &map);
-	void odyssey_io(address_map &map);
+	void odyssey_map(address_map &map) ATTR_COLD;
+	void odyssey_io(address_map &map) ATTR_COLD;
 
 	static void national_superio_config(device_t *device);
 };

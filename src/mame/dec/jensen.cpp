@@ -71,14 +71,14 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	void local_memory(address_map &map);
-	void local_io(address_map &map);
-	void eisa_memory(address_map &map);
-	void eisa_io(address_map &map);
+	void local_memory(address_map &map) ATTR_COLD;
+	void local_io(address_map &map) ATTR_COLD;
+	void eisa_memory(address_map &map) ATTR_COLD;
+	void eisa_io(address_map &map) ATTR_COLD;
 
 private:
 	// devices

@@ -113,7 +113,7 @@ public:
 	void trvmadns(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -126,9 +126,9 @@ private:
 	required_shared_ptr<uint8_t> m_tileram;
 	required_shared_ptr<uint8_t> m_paletteram;
 
-	void cpu_map(address_map &map);
-	void romboard_map(address_map &map);
-	void io_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void romboard_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	void unknown_w(uint8_t data);
 	void lamps_w(uint8_t data);

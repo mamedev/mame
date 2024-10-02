@@ -75,14 +75,13 @@ protected:
 			address_map_constructor &&data_map);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) >> 1; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return cycles << 1; }
-	virtual u32 execute_input_lines() const noexcept override { return 5U; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -180,7 +179,7 @@ private:
 	using recompiler_ptr = std::unique_ptr<recompiler>;
 
 	// internal address maps
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 
 	// instruction execution
 	template <bool Debugger, bool Caching> void execute_some_rom();
@@ -348,7 +347,7 @@ protected:
 	virtual void external_memory_enable(address_space &space, bool enable) override;
 
 	// internal address maps
-	void data_map(address_map &map);
+	void data_map(address_map &map) ATTR_COLD;
 
 private:
 	required_region_ptr<u16>    m_rom;
@@ -366,7 +365,7 @@ protected:
 	virtual void external_memory_enable(address_space &space, bool enable) override;
 
 	// internal address maps
-	void data_map(address_map &map);
+	void data_map(address_map &map) ATTR_COLD;
 
 private:
 	required_region_ptr<u16>    m_rom;

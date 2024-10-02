@@ -68,16 +68,13 @@ Hold service credit (9) and reset (F3) to enter service mode.
 
 
 TODO:
-- correct decode for 1st layer in sc2in1 and magslot (magslot also uses more videoram for tilemap 1)
-- cots and magslot seem to toggle between two tilemap 1 modes with 0 or 1 writes to 0x300000 (other dumped games always write 1)
-  1 only uses 0x940c00-0x940fff RAM, while 0 uses the whole 0x940000-0x940fff. 0 seems to be reels related.
-- fix 1st tilemap transparency enable
 - correct EEPROM hookup for all games (this would get rid of a lot of ROM patches)
-- hookup MCU and YM2151 sound for the mahjong games
-- hookup PIC16F84 for rbspm once a CPU core is available
+- hookup MCU and YM2151 / YM3812 sound for the mahjong games
+- hookup PIC16F84 for rbspm
 - emulate protection devices correctly instead of patching
 - hookup lamps and do layouts
 - keyboard inputs for mahjong games
+- use real values for reel tilemaps offsets instead of hardcoded ones (would fix magslot)
 
 Video references:
 rbspm: https://www.youtube.com/watch?v=pPk-6N1wXoE
@@ -89,6 +86,7 @@ super555: https://www.youtube.com/watch?v=CCUKdbQ5O-U
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
+#include "cpu/pic16x8x/pic16x8x.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
@@ -103,7 +101,7 @@ super555: https://www.youtube.com/watch?v=CCUKdbQ5O-U
 // configurable logging
 #define LOG_TILEATTR (1U << 1)
 
-//#define VERBOSE (LOG_GENERAL | LOG_TILEATTR)
+// #define VERBOSE (LOG_GENERAL | LOG_TILEATTR)
 
 #include "logmacro.h"
 
@@ -118,7 +116,8 @@ public:
 	gms_2layers_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_vidram(*this, "vidram%u", 1U)
-		, m_scrolly(*this, "scrolly")
+		, m_reelram(*this, "reelram%u", 1U)
+		, m_scrolly(*this, "scrolly%u", 1U)
 		, m_maincpu(*this, "maincpu")
 		, m_mcu(*this, "mcu")
 		, m_eeprom(*this, "eeprom")
@@ -135,7 +134,6 @@ public:
 	void ssanguoj(machine_config &config);
 
 	void super555(machine_config &config);
-	void train(machine_config &config);
 
 	void init_ballch();
 	void init_cots();
@@ -145,10 +143,11 @@ public:
 	void init_super555();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	optional_shared_ptr_array<uint16_t, 3> m_vidram;
-	optional_shared_ptr<uint16_t> m_scrolly;
+	optional_shared_ptr_array<uint16_t, 2> m_vidram;
+	required_shared_ptr_array<uint16_t, 4> m_reelram;
+	required_shared_ptr_array<uint16_t, 4> m_scrolly;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<at89c4051_device> m_mcu;
@@ -159,35 +158,38 @@ protected:
 	optional_device<ym2151_device> m_ymsnd;
 	optional_ioport_array<4> m_dsw;
 
+	uint16_t m_reels_toggle = 0;
 	uint16_t m_tilebank = 0;
-	tilemap_t *m_tilemap[3]{};
+	tilemap_t *m_reel_tilemap[4];
+	tilemap_t *m_tilemap[2]{};
 
-	void super555_mem(address_map &map);
+	void super555_mem(address_map &map) ATTR_COLD;
 
 	template <uint8_t Which> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	template <uint8_t Which> void reelram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 private:
 	uint8_t m_mux_data = 0;
 	uint16_t m_input_matrix = 0;
 	//uint16_t m_prot_data = 0;
 
-	void mcu_io(address_map &map);
-	void rbmk_mem(address_map &map);
-	void rbspm_mem(address_map &map);
-	void ssanguoj_mem(address_map &map);
+	void mcu_io(address_map &map) ATTR_COLD;
+	void rbmk_mem(address_map &map) ATTR_COLD;
+	void rbspm_mem(address_map &map) ATTR_COLD;
+	void ssanguoj_mem(address_map &map) ATTR_COLD;
 
 	uint16_t unk_r();
 	uint16_t input_matrix_r();
 	void input_matrix_w(uint16_t data);
 	void tilebank_w(uint16_t data);
+	void reels_toggle_w(uint16_t data);
 	uint8_t mcu_io_r(offs_t offset);
 	void mcu_io_w(offs_t offset, uint8_t data);
 	void mcu_io_mux_w(uint8_t data);
 	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_VIDEO_START(train) { video_start(); m_tilemap[0]->set_transparent_pen(0); } // TODO: this shouldn't be needed
+	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile0_info);
-	TILE_GET_INFO_MEMBER(get_tile1_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -204,13 +206,12 @@ public:
 	void magslot(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	void magslot_mem(address_map &map);
+	void magslot_mem(address_map &map) ATTR_COLD;
 
-	TILE_GET_INFO_MEMBER(get_tile2_info);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TILE_GET_INFO_MEMBER(get_tile1_info);
 };
 
 uint16_t gms_2layers_state::unk_r()
@@ -251,6 +252,14 @@ void gms_2layers_state::tilebank_w(uint16_t data)
 		LOGTILEATTR("unknown tilemap attribute: %04x\n", m_tilebank & 0xf1c0);
 }
 
+void gms_2layers_state::reels_toggle_w(uint16_t data)
+{
+	m_reels_toggle = BIT(data, 0);
+
+	if (m_reels_toggle & 0xfffe)
+		logerror("unknown reels toggle attribute: %04x\n", m_reels_toggle);
+}
+
 template <uint8_t Which>
 void gms_2layers_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -258,9 +267,16 @@ void gms_2layers_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_tilemap[Which]->mark_tile_dirty(offset);
 }
 
+template <uint8_t Which>
+void gms_2layers_state::reelram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_reelram[Which][offset]);
+	m_reel_tilemap[Which]->mark_tile_dirty(offset);
+}
+
 void gms_2layers_state::input_matrix_w(uint16_t data)
 {
-	m_input_matrix = data;
+	m_input_matrix = data & 0x7fff;
 
 	m_oki->set_rom_bank(BIT(data, 15));
 }
@@ -282,13 +298,19 @@ void gms_2layers_state::rbmk_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().nopw();
 	map(0x100000, 0x10ffff).ram();
+	map(0x200000, 0x200001).w(FUNC(gms_2layers_state::reels_toggle_w));
 	map(0x500000, 0x50ffff).ram();
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x940000, 0x940bff).ram();
-	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
-	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access
-	map(0x980380, 0x9803ff).ram().share(m_scrolly);
-	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<1>)).share(m_vidram[1]);
+	map(0x940000, 0x9403ff).ram().w(FUNC(gms_2layers_state::reelram_w<0>)).share(m_reelram[0]);
+	map(0x940400, 0x9407ff).ram().w(FUNC(gms_2layers_state::reelram_w<1>)).share(m_reelram[1]);
+	map(0x940800, 0x940bff).ram().w(FUNC(gms_2layers_state::reelram_w<2>)).share(m_reelram[2]);
+	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::reelram_w<3>)).share(m_reelram[3]);
+	map(0x980000, 0x983fff).ram(); // 0x2048  words ???, byte access
+	map(0x980180, 0x9801ff).ram().share(m_scrolly[0]);
+	map(0x980280, 0x9802ff).ram().share(m_scrolly[1]);
+	map(0x980300, 0x98037f).ram().share(m_scrolly[2]);
+	map(0x980380, 0x9803ff).ram().share(m_scrolly[3]);
+	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
 	map(0xb00000, 0xb00001).w(FUNC(gms_2layers_state::eeprom_w));
 	map(0xc00000, 0xc00001).rw(FUNC(gms_2layers_state::input_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
 	map(0xc08000, 0xc08001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w));
@@ -302,7 +324,7 @@ void gms_2layers_state::rbmk_mem(address_map &map)
 void gms_2layers_state::rbspm_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x200000, 0x200001).w(FUNC(gms_2layers_state::eeprom_w)); // wrong
+	map(0x200000, 0x200001).w(FUNC(gms_2layers_state::reels_toggle_w));
 	map(0x300000, 0x300001).rw(FUNC(gms_2layers_state::input_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
 	map(0x308000, 0x308001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w)); // ok
 	map(0x310000, 0x310001).portr("IN2");
@@ -311,25 +333,36 @@ void gms_2layers_state::rbspm_mem(address_map &map)
 	map(0x328000, 0x328000).w(m_oki, FUNC(okim6295_device::write));
 	map(0x340002, 0x340003).nopw();
 	map(0x500000, 0x50ffff).ram();
-	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // if removed fails gfx test?
-	map(0x940000, 0x940bff).ram();
-	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]); // if removed fails palette test?
-	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access, u25 and u26 according to test mode
-	map(0x980380, 0x9803ff).ram().share(m_scrolly);
-	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<1>)).share(m_vidram[1]);
+	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x940000, 0x9403ff).ram().w(FUNC(gms_2layers_state::reelram_w<0>)).share(m_reelram[0]);
+	map(0x940400, 0x9407ff).ram().w(FUNC(gms_2layers_state::reelram_w<1>)).share(m_reelram[1]);
+	map(0x940800, 0x940bff).ram().w(FUNC(gms_2layers_state::reelram_w<2>)).share(m_reelram[2]);
+	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::reelram_w<3>)).share(m_reelram[3]);
+	map(0x980000, 0x983fff).ram(); // 0x2048  words ???, byte access, u25 and u26 according to test mode
+	map(0x980180, 0x9801ff).ram().share(m_scrolly[0]);
+	map(0x980280, 0x9802ff).ram().share(m_scrolly[1]);
+	map(0x980300, 0x98037f).ram().share(m_scrolly[2]);
+	map(0x980380, 0x9803ff).ram().share(m_scrolly[3]);
+	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
 }
 
 void gms_2layers_state::ssanguoj_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().nopw();
 	map(0x100000, 0x10ffff).ram();
+	map(0x200000, 0x200001).w(FUNC(gms_2layers_state::reels_toggle_w));
 	map(0x800000, 0x80ffff).ram();
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x940000, 0x940bff).ram();
-	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
-	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access
-	map(0x980380, 0x9803ff).ram().share(m_scrolly);
-	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<1>)).share(m_vidram[1]);
+	map(0x940000, 0x9403ff).ram().w(FUNC(gms_2layers_state::reelram_w<0>)).share(m_reelram[0]);
+	map(0x940400, 0x9407ff).ram().w(FUNC(gms_2layers_state::reelram_w<1>)).share(m_reelram[1]);
+	map(0x940800, 0x940bff).ram().w(FUNC(gms_2layers_state::reelram_w<2>)).share(m_reelram[2]);
+	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::reelram_w<3>)).share(m_reelram[3]);
+	map(0x980000, 0x983fff).ram(); // 0x2048  words ???, byte access, u25 and u26 according to test mode
+	map(0x980180, 0x9801ff).ram().share(m_scrolly[0]);
+	map(0x980280, 0x9802ff).ram().share(m_scrolly[1]);
+	map(0x980300, 0x98037f).ram().share(m_scrolly[2]);
+	map(0x980380, 0x9803ff).ram().share(m_scrolly[3]);
+	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
 	map(0xa00000, 0xa00001).rw(FUNC(gms_2layers_state::input_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
 	map(0xa08000, 0xa08001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w));
 	map(0xa10000, 0xa10001).portr("IN2");
@@ -344,6 +377,7 @@ void gms_2layers_state::super555_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram();
+	map(0x300000, 0x300001).w(FUNC(gms_2layers_state::reels_toggle_w));
 	map(0x600000, 0x600001).rw(FUNC(gms_2layers_state::input_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
 	map(0x608000, 0x608001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w)); // ok
 	map(0x610000, 0x610001).portr("IN2");
@@ -353,11 +387,16 @@ void gms_2layers_state::super555_mem(address_map &map)
 	map(0x628000, 0x628000).w(m_oki, FUNC(okim6295_device::write));
 	map(0x638000, 0x638001).nopw(); // lamps / outputs?
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x940000, 0x940bff).ram();
-	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
-	map(0x980000, 0x983fff).ram();
-	map(0x980380, 0x9803ff).ram().share(m_scrolly);
-	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<1>)).share(m_vidram[1]);
+	map(0x940000, 0x9403ff).ram().w(FUNC(gms_2layers_state::reelram_w<0>)).share(m_reelram[0]);
+	map(0x940400, 0x9407ff).ram().w(FUNC(gms_2layers_state::reelram_w<1>)).share(m_reelram[1]);
+	map(0x940800, 0x940bff).ram().w(FUNC(gms_2layers_state::reelram_w<2>)).share(m_reelram[2]);
+	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::reelram_w<3>)).share(m_reelram[3]);
+	map(0x980000, 0x983fff).ram(); // 0x2048  words ???, byte access, u25 and u26 according to test mode
+	map(0x980180, 0x9801ff).ram().share(m_scrolly[0]);
+	map(0x980280, 0x9802ff).ram().share(m_scrolly[1]);
+	map(0x980300, 0x98037f).ram().share(m_scrolly[2]);
+	map(0x980380, 0x9803ff).ram().share(m_scrolly[3]);
+	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
 	//map(0xf00000, 0xf00001).w(FUNC(gms_2layers_state::eeprom_w)); // wrong?
 }
 
@@ -365,7 +404,7 @@ void gms_3layers_state::magslot_mem(address_map &map)
 {
 	super555_mem(map);
 
-	map(0x9e0000, 0x9e0fff).ram().w(FUNC(gms_3layers_state::vram_w<2>)).share(m_vidram[2]);
+	map(0x9e0000, 0x9e0fff).ram().w(FUNC(gms_3layers_state::vram_w<1>)).share(m_vidram[1]);
 }
 
 uint8_t gms_2layers_state::mcu_io_r(offs_t offset)
@@ -447,7 +486,7 @@ static INPUT_PORTS_START( rbmk )
 
 	// Only 4 DIP banks are actually populated on PCBs (2 empty spaces), but test mode reads all 6.
 	// Dips based on manuals for both rbmk and rbspm
-	PORT_START("DSW1")   // 16bit, in test mode first 8 are recognised as dsw1, second 8 as dsw4.
+	PORT_START("DSW1")   // 16bit, in test mode first 8 are recognized as dsw1, second 8 as dsw4.
 	PORT_DIPNAME( 0x0007, 0x0000, "Pay Out Rate" ) PORT_DIPLOCATION("DSW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, "70%" )
 	PORT_DIPSETTING(      0x0001, "75%" )
@@ -496,7 +535,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x0000, "Chess" )
 
 
-	PORT_START("DSW2")   // 16bit, in test mode first 8 are recognised as dsw2, second 8 as dsw5
+	PORT_START("DSW2")   // 16bit, in test mode first 8 are recognized as dsw2, second 8 as dsw5
 	PORT_DIPNAME( 0x0007, 0x0000, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW2:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_2C ) )
@@ -545,7 +584,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("DSW3")      // 16bit, in test mode first 8 are recognised as dsw3, second 8 as dsw6
+	PORT_START("DSW3")      // 16bit, in test mode first 8 are recognized as dsw3, second 8 as dsw6
 	PORT_DIPNAME( 0x0003, 0x0000, "Min Bet" ) PORT_DIPLOCATION("DSW3:1,2")
 	PORT_DIPSETTING(      0x0000, "1" )
 	PORT_DIPSETTING(      0x0001, "2" )
@@ -643,7 +682,7 @@ static INPUT_PORTS_START( ssanguoj )
 
 	// Only 4 DIP banks are actually populated on PCBs (2 empty spaces), but test mode reads all 6.
 	// TODO: dips
-	PORT_START("DSW1")   // 16bit, in test mode first 8 are recognised as dsw1, second 8 as dsw4.
+	PORT_START("DSW1")   // 16bit, in test mode first 8 are recognized as dsw1, second 8 as dsw4.
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -694,7 +733,7 @@ static INPUT_PORTS_START( ssanguoj )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 
-	PORT_START("DSW2")   // 16bit, in test mode first 8 are recognised as dsw2, second 8 as dsw5
+	PORT_START("DSW2")   // 16bit, in test mode first 8 are recognized as dsw2, second 8 as dsw5
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -744,7 +783,7 @@ static INPUT_PORTS_START( ssanguoj )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("DSW3")      // 16bit, in test mode first 8 are recognised as dsw3, second 8 as dsw6
+	PORT_START("DSW3")      // 16bit, in test mode first 8 are recognized as dsw3, second 8 as dsw6
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1465,7 +1504,7 @@ static const gfx_layout rbmk32_layout =
 	32*32
 };
 
-static const gfx_layout magslot32_layout = // TODO: probably not 100% correct
+static const gfx_layout magslot32_layout =
 {
 	8,32,
 	RGN_FRAC(1,1),
@@ -1479,24 +1518,34 @@ static const gfx_layout magslot32_layout = // TODO: probably not 100% correct
 
 
 static GFXDECODE_START( gfx_rbmk )
-	GFXDECODE_ENTRY( "gfx1", 0, rbmk32_layout,            0x0, 16  )
+	GFXDECODE_ENTRY( "gfx1", 0, rbmk32_layout,            0x0, 32  )
 	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_lsb,   0x100, 16  )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_magslot )
-	GFXDECODE_ENTRY( "gfx1", 0, magslot32_layout,         0x000, 16  )
+	GFXDECODE_ENTRY( "gfx1", 0, magslot32_layout,         0x000, 32  )
 	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_lsb,     0x100, 16  )
 	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_lsb,     0x400, 16  )
 GFXDECODE_END
 
 void gms_2layers_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gms_2layers_state::get_tile0_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gms_2layers_state::get_tile1_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gms_2layers_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gms_2layers_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gms_2layers_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gms_2layers_state::get_reel_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gms_2layers_state::get_tile0_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	for (uint8_t i = 0; i < 4; i++)
+	{
+		m_reel_tilemap[i]->set_scroll_cols(64);
+		m_reel_tilemap[i]->set_transparent_pen(0);
+	}
 
 	//m_tilemap[0]->set_transparent_pen(0);
-	m_tilemap[1]->set_transparent_pen(0);
+	m_tilemap[0]->set_transparent_pen(0);
 
+	save_item(NAME(m_reels_toggle));
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_input_matrix));
@@ -1506,64 +1555,96 @@ void gms_3layers_state::video_start()
 {
 	gms_2layers_state::video_start();
 
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gms_3layers_state::get_tile2_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gms_3layers_state::get_tile1_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	m_tilemap[2]->set_transparent_pen(0);
+	m_tilemap[1]->set_transparent_pen(0);
+}
+
+template <uint8_t Which>
+TILE_GET_INFO_MEMBER(gms_2layers_state::get_reel_tile_info)
+{
+	const int tile = m_reelram[Which][tile_index];
+	tileinfo.set(0, (tile & 0x0fff) + ((m_tilebank & 0x10) >> 4) * 0x1000, tile >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(gms_2layers_state::get_tile0_info)
 {
 	const int tile = m_vidram[0][tile_index];
-	tileinfo.set(0, (tile & 0x0fff) + ((m_tilebank & 0x10) >> 4) * 0x1000, tile >> 12, 0);
-}
-
-TILE_GET_INFO_MEMBER(gms_2layers_state::get_tile1_info)
-{
-	const int tile = m_vidram[1][tile_index];
 	tileinfo.set(1, (tile & 0x0fff) + ((m_tilebank >> 1) & 3) * 0x1000, tile >> 12, 0);
 }
 
-TILE_GET_INFO_MEMBER(gms_3layers_state::get_tile2_info)
+TILE_GET_INFO_MEMBER(gms_3layers_state::get_tile1_info)
 {
-	const int tile = m_vidram[2][tile_index];
+	const int tile = m_vidram[1][tile_index];
 	tileinfo.set(2, (tile & 0x0fff) + ((m_tilebank >> 9) & 3) * 0x1000, tile >> 12, 0);
 }
 
 
 uint32_t gms_2layers_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	if (m_reels_toggle == 0)
+	{
+		 // TODO: values hardcoded for cots, don't work correctly for magslot. Find the registers!
+		const rectangle visible1(0 * 8, 64 * 8 - 1, 0 * 8, 10 * 8 - 1);
+		const rectangle visible2(0 * 8, 64 * 8 - 1, 10 * 8, 18 * 8 - 1);
+		const rectangle visible3(0 * 8, 64 * 8 - 1, 18 * 8, 24 * 8 - 1);
+		const rectangle visible4(0 * 8, 64 * 8 - 1, 24 * 8, 32 * 8 - 1);
 
-	for (int i = 0; i < 64; i++)
-		m_tilemap[0]->set_scrolly(i, m_scrolly[i]);
+		for (int i = 3; i >=  0; i--)
+			for (int j = 0; j < 64; j++)
+				m_reel_tilemap[i]->set_scrolly(j, m_scrolly[i][j]);
 
-	if (BIT(m_tilebank, 3) && BIT(m_tilebank, 5))
-		m_tilemap[0]->draw(screen, bitmap, cliprect);
+		if (BIT(m_tilebank, 3) && BIT(m_tilebank, 5))
+		{
+			for (int i = 3; i >=  0; i--)
+				m_reel_tilemap[i]->set_transparent_pen(0xff);
+			 m_reel_tilemap[0]->draw(screen, bitmap, visible1);
+			 m_reel_tilemap[1]->draw(screen, bitmap, visible2);
+			 m_reel_tilemap[2]->draw(screen, bitmap, visible3);
+			 m_reel_tilemap[3]->draw(screen, bitmap, visible4);
+		}
 
-	if (BIT(m_tilebank, 0))
-		m_tilemap[1]->draw(screen, bitmap, cliprect);
+		if (BIT(m_tilebank, 0))
+			m_tilemap[0]->draw(screen, bitmap, cliprect);
 
-	if (BIT(m_tilebank, 3) && !BIT(m_tilebank, 5))
-		m_tilemap[0]->draw(screen, bitmap, cliprect);
+		if (BIT(m_tilebank, 3) && !BIT(m_tilebank, 5))
+		{
+			for (int i = 3; i >=  0; i--)
+				m_reel_tilemap[i]->set_transparent_pen(0x00);
+			 m_reel_tilemap[0]->draw(screen, bitmap, visible1);
+			 m_reel_tilemap[1]->draw(screen, bitmap, visible2);
+			 m_reel_tilemap[2]->draw(screen, bitmap, visible3);
+			 m_reel_tilemap[3]->draw(screen, bitmap, visible4);
+		}
 
-	return 0;
-}
+		if (BIT(m_tilebank, 11))
+			if (m_tilemap[1])
+				m_tilemap[1]->draw(screen, bitmap, cliprect);
+	}
+	else
+	{
+		for (int j = 0; j < 64; j++)
+			m_reel_tilemap[3]->set_scrolly(j, m_scrolly[3][j]);
 
-uint32_t gms_3layers_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	for (int i = 0; i < 64; i++)
-		m_tilemap[0]->set_scrolly(i, m_scrolly[i]);
+		if (BIT(m_tilebank, 3) && BIT(m_tilebank, 5))
+		{
+			m_reel_tilemap[3]->draw(screen, bitmap, cliprect);
+			m_reel_tilemap[3]->set_transparent_pen(0xff);
+		}
 
-	if (BIT(m_tilebank, 3) && BIT(m_tilebank, 5))
-		m_tilemap[0]->draw(screen, bitmap, cliprect);
+		if (BIT(m_tilebank, 0))
+			m_tilemap[0]->draw(screen, bitmap, cliprect);
 
-	if (BIT(m_tilebank, 0))
-		m_tilemap[1]->draw(screen, bitmap, cliprect);
+		if (BIT(m_tilebank, 3) && !BIT(m_tilebank, 5))
+		{
+			m_reel_tilemap[3]->draw(screen, bitmap, cliprect);
+			m_reel_tilemap[3]->set_transparent_pen(0x00);
+		}
 
-	if (BIT(m_tilebank, 3) && !BIT(m_tilebank, 5))
-		m_tilemap[0]->draw(screen, bitmap, cliprect);
-
-	if (BIT(m_tilebank, 11))
-		m_tilemap[2]->draw(screen, bitmap, cliprect);
+		if (BIT(m_tilebank, 11))
+			if (m_tilemap[1])
+				m_tilemap[1]->draw(screen, bitmap, cliprect);
+	}
 
 	return 0;
 }
@@ -1610,7 +1691,7 @@ void gms_2layers_state::rbspm(machine_config &config)
 	rbmk(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gms_2layers_state::rbspm_mem);
 
-	// PIC16F84 but no CPU core available
+	PIC16F84(config, "pic", 4'000'000).set_disable(); // TODO: hook up, verify clock
 }
 
 void gms_2layers_state::ssanguoj(machine_config &config)
@@ -1637,19 +1718,10 @@ void gms_2layers_state::super555(machine_config &config)
 	config.device_remove("ymsnd");
 }
 
-void gms_2layers_state::train(machine_config &config)
-{
-	super555(config);
-
-	MCFG_VIDEO_START_OVERRIDE(gms_2layers_state, train)
-}
-
 void gms_3layers_state::magslot(machine_config &config)
 {
 	super555(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gms_3layers_state::magslot_mem);
-
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(gms_3layers_state::screen_update));
 
 	m_gfxdecode->set_info(gfx_magslot);
 }
@@ -1693,7 +1765,7 @@ ROM_START( rbspm ) // PCB NO.6899-B
 	ROM_REGION( 0x1000, "mcu", 0 ) // protected MCU
 	ROM_LOAD( "mj-dfmj_at89c51.bin", 0x0000, 0x1000, CRC(c6c48161) SHA1(c3ecf998820d758286b18896ff7860221dd0cf43) ) // decapped
 
-	ROM_REGION( 0x880, "pic", 0 ) // pic was populated on this board
+	ROM_REGION( 0x4280, "pic", 0 ) // pic was populated on this board
 	ROM_LOAD( "c016_pic16f84_code.bin", 0x000, 0x800, CRC(1eb5cd2b) SHA1(9e747235e39eaea337f9325fa55fbfec1c03168d) )
 	ROM_LOAD( "c016_pic16f84_data.bin", 0x800, 0x080, CRC(ee882e11) SHA1(aa5852a95a89b17270bb6f315dfa036f9f8155cf) )
 
@@ -2052,17 +2124,17 @@ void gms_2layers_state::init_sscs()
 
 // mahjong
 GAME( 1998, rbmk,     0, rbmk,     rbmk,     gms_2layers_state, empty_init,    ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // misses YM2151 hookup
-GAME( 1998, rbspm,    0, rbspm,    rbspm,    gms_2layers_state, init_rbspm,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",              MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
+GAME( 1998, rbspm,    0, rbspm,    rbspm,    gms_2layers_state, init_rbspm,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",              MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Misses YM2151 hookup
 GAME( 1998, ssanguoj, 0, ssanguoj, ssanguoj, gms_2layers_state, init_ssanguoj, ROT0,  "GMS", "Shizhan Sanguo Ji Jiaqiang Ban (Version 8.9 980413)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. YM3812 isn't hooked up (goes through undumped MCU).
 
 // card games
-GAME( 1999, super555, 0, super555, super555, gms_2layers_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",                    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
-GAME( 1999, sscs,     0, super555, sscs,     gms_2layers_state, init_sscs,     ROT0,  "GMS", "San Se Caishen (Version 0502)",                       MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now, inputs / DIPs to be figured out
-GAME( 2001, sc2in1,   0, magslot,  sc2in1,   gms_3layers_state, init_sc2in1,   ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
+GAME( 1999, super555, 0, super555, super555, gms_2layers_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",                    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
+GAME( 1999, sscs,     0, super555, sscs,     gms_2layers_state, init_sscs,     ROT0,  "GMS", "San Se Caishen (Version 0502)",                       MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
+GAME( 2001, sc2in1,   0, magslot,  sc2in1,   gms_3layers_state, init_sc2in1,   ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)",           MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 
 // slot, on slightly different PCB
-GAME( 2003, magslot,  0, magslot,  magslot,  gms_3layers_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // needs implementing of 3rd GFX layer, correct GFX decode for 1st layer, inputs
+GAME( 2003, magslot,  0, magslot,  magslot,  gms_3layers_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // reel / tilemaps priorities are wrong, inputs to be verified. Also needs EEPROM support.
 
 // train games
-GAME( 2002, ballch,   0, train,    ballch,   gms_2layers_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
-GAME( 2005, cots,     0, train,    cots,     gms_2layers_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now
+GAME( 2002, ballch,   0, super555, ballch,   gms_2layers_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
+GAME( 2005, cots,     0, super555, cots,     gms_2layers_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.

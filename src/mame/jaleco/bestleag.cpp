@@ -72,14 +72,14 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(bsb_bg_scan);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update_bestleag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bestleaw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void bestleag(machine_config &config);
 	void bestleaw(machine_config &config);
-	void bestleag_map(address_map &map);
+	void bestleag_map(address_map &map) ATTR_COLD;
 };
 
 

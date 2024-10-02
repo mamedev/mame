@@ -29,13 +29,13 @@
 
     [2] Preliminary 8600 User Manual
         Section 7. System Specs.
-	4.5. Rigid Disk Controllers and Interface
-	Specification Revision 4.2, May 27, 1982, Page 52-62
+    4.5. Rigid Disk Controllers and Interface
+    Specification Revision 4.2, May 27, 1982, Page 52-62
 
     [3] Preliminary 8600 User Manual
         Section 7. System Specs.
-	A. Rigid Disk Controller Documentation
-	Specification Revision 4.2, May 27, 1982, Page 95-108
+    A. Rigid Disk Controller Documentation
+    Specification Revision 4.2, May 27, 1982, Page 95-108
 
     Note: The Altos 8600 manuals [2] and [3] describe a controller
     wired differently (the 8089 seems to be in local mode, not remote),
@@ -369,13 +369,13 @@ void altos586_hdc_device::attn_w(uint16_t data)
 
 void altos586_hdc_device::device_start()
 {
-        save_item(NAME(m_status));
-        save_item(NAME(m_seek_status));
-        save_item(NAME(m_cyl_latch));
-        save_item(NAME(m_cyl[0]));
-        save_item(NAME(m_cyl[1]));
-        save_pointer(NAME(m_sector), std::size(m_sector));
-        save_item(NAME(m_secoffset));
-        save_item(NAME(m_drive));
-        save_item(NAME(m_head));
+	save_item(NAME(m_status));
+	save_item(NAME(m_seek_status));
+	save_item(NAME(m_cyl_latch));
+	save_item(NAME(m_cyl[0]));
+	save_item(NAME(m_cyl[1]));
+	save_pointer(NAME(m_sector), std::size(m_sector));
+	save_item(NAME(m_secoffset));
+	save_item(NAME(m_drive));
+	save_item(NAME(m_head));
 }

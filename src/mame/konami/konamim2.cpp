@@ -281,10 +281,10 @@ public:
 
 	static void cr589_config(device_t *device);
 
-	void m2_map(address_map &map);
+	void m2_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 public:
 	void ppc1_int(int state);

@@ -48,10 +48,10 @@ protected:
 	void sound_command_w(u32 data);
 	void irq_raise(int level, bool state);
 	void irq_init();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void base_sound_map(address_map &map);
+	void base_sound_map(address_map &map) ATTR_COLD;
 
 private:
 	u32 m_to_main = 0;
@@ -93,7 +93,7 @@ public:
 	void init_bnstars();
 	void init_ss92046_01();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+	ioport_value mahjong_ctrl_r();
 
 protected:
 	required_device<jaleco_ms32_sysctrl_device> m_sysctrl;
@@ -104,10 +104,10 @@ protected:
 	required_device<ymf271_device> m_ymf;
 
 	void flipscreen_w(int state);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	void ms32_map(address_map &map);
-	void ms32_sound_map(address_map &map);
+	void ms32_map(address_map &map) ATTR_COLD;
+	void ms32_sound_map(address_map &map) ATTR_COLD;
 
 private:
 	required_shared_ptr<u32> m_roz_ctrl;
@@ -185,7 +185,7 @@ public:
 	void init_f1superb();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 private:
 	TILE_GET_INFO_MEMBER(get_ms32_extra_tile_info);
 
@@ -194,7 +194,7 @@ private:
 
 	memory_share_creator<u16> m_road_vram;
 
-	void f1superb_map(address_map &map);
+	void f1superb_map(address_map &map) ATTR_COLD;
 
 	void road_vram_w16(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 road_vram_r16(offs_t offset);

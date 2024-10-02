@@ -2,23 +2,19 @@
 // copyright-holders:Angelo Salese, David Haywood
 /*******************************************************************************************
 
-    Dream 9 Final (c) 1992 Excellent Systems
+Dream 9 Final (c) 1992 Excellent Systems
 
-    driver by Angelo Salese & David Haywood
-
-    TODO:
-    - What does the ES8712 control? There's definitely no ADPCM chip or sample ROM here;
-    - Main CPU banking is wrong;
-    - Some inputs not understood;
-    - A bunch of missing port outputs (including payout);
-    - screen disable? Start-up fading looks horrible;
-    - Game looks IGS-esque, is there any correlation?
+TODO:
+- What does the ES8712 control? There's definitely no ADPCM chip or sample ROM here;
+- lamps;
+- Start-up fading looks horrible, video timings? btanb?
+- Game looks IGS-esque, is there any correlation?
 
 ============================================================================================
 
-    PCB: ES-9112
+PCB: ES-9112
 
-    Main Chips: Z80, ES8712, 24Mhz OSC, RTC62421B 9262, YM2413, 4x8DSW
+Main Chips: Z80, ES8712, 24Mhz OSC, RTC62421B 9262, YM2413, 4x8DSW
 
 *******************************************************************************************/
 
@@ -27,6 +23,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/es8712.h"
 #include "sound/ymopl.h"
 #include "emupal.h"
@@ -40,25 +37,27 @@ namespace {
 class d9final_state : public driver_device
 {
 public:
-	d9final_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_lo_vram(*this, "lo_vram"),
-		m_hi_vram(*this, "hi_vram"),
-		m_cram(*this, "cram"),
-		m_mainbank(*this, "mainbank")
+	d9final_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_hopper(*this, "hopper")
+		, m_lo_vram(*this, "lo_vram")
+		, m_hi_vram(*this, "hi_vram")
+		, m_cram(*this, "cram")
+		, m_mainbank(*this, "mainbank")
 	{ }
 
 	void d9final(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<ticket_dispenser_device> m_hopper;
 
 	required_shared_ptr<uint8_t> m_lo_vram;
 	required_shared_ptr<uint8_t> m_hi_vram;
@@ -67,17 +66,17 @@ private:
 
 	tilemap_t *m_sc0_tilemap;
 
-	void sc0_lovram(offs_t offset, uint8_t data);
-	void sc0_hivram(offs_t offset, uint8_t data);
-	void sc0_cram(offs_t offset, uint8_t data);
 	void bank_w(uint8_t data);
 	uint8_t prot_latch_r();
 
+	void sc0_lovram(offs_t offset, uint8_t data);
+	void sc0_hivram(offs_t offset, uint8_t data);
+	void sc0_cram(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -153,12 +152,29 @@ void d9final_state::prg_map(address_map &map)
 void d9final_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-//  map(0x00, 0x00).nopw(); //bit 0: irq enable? screen enable?
-	map(0x00, 0x00).portr("DSWA");
-	map(0x20, 0x20).portr("DSWB");
+	map(0x00, 0x00).portr("DSWA").lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			machine().bookkeeping().coin_lockout_global_w(!BIT(data, 0));
+			// bit 1: bet lamp
+			// bit 2-3: take score & double up lamps
+			// bit 4: big lamp
+			// bit 5: small lamp (lit for instruction sheet in bet phase)
+			// bit 6: start lamp
+			// bit 7: payout lamp
+		})
+	);
+	map(0x20, 0x20).portr("DSWB").lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// NOTE: keyin goes to coin counter 2, coin 2 and 3 to 1 & 2
+			for (int i = 0; i < 4; i++)
+				machine().bookkeeping().coin_counter_w(i, BIT(data, i));
+
+			m_hopper->motor_w(BIT(data, 7));
+		})
+	);
 	map(0x40, 0x40).portr("DSWC");
 	map(0x40, 0x41).w("ymsnd", FUNC(ym2413_device::write));
-	map(0x60, 0x60).portr("DSWD");
+	map(0x60, 0x60).portr("DSWD").nopw(); // write: irq ack? shadows bank_w writes, twice, at line ~8
 	map(0x80, 0x80).portr("IN0");
 	map(0xa0, 0xa0).portr("IN1").w(FUNC(d9final_state::bank_w));
 	map(0xe0, 0xe0).portr("IN2");
@@ -167,9 +183,11 @@ void d9final_state::io_map(address_map &map)
 static INPUT_PORTS_START( d9final )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
-	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 
@@ -310,7 +328,6 @@ void d9final_state::machine_start()
 
 void d9final_state::d9final(machine_config &config)
 {
-	// basic machine hardware
 	Z80(config, m_maincpu, 24000000 / 4); /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &d9final_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &d9final_state::io_map);
@@ -318,7 +335,8 @@ void d9final_state::d9final(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // Sharp LH5116D-10 + battery
 
-	// video hardware
+	HOPPER(config, m_hopper, attotime::from_msec(20));
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));

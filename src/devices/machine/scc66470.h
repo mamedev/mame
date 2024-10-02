@@ -39,12 +39,12 @@ public:
 	int dram_dtack_cycles();
 	void dram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t dram_r(offs_t offset, uint16_t mem_mask = ~0);
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	void set_vectors(uint16_t *src);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 	devcb_write_line m_irqcallback;
@@ -71,7 +71,7 @@ protected:
 	uint8_t m_csr_r;
 
 private:
-	void scc66470_vram(address_map &map);
+	void scc66470_vram(address_map &map) ATTR_COLD;
 	void set_vsr(uint32_t vsr);
 	void set_dcp(uint32_t dcp);
 	uint32_t get_vsr();

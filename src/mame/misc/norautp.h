@@ -56,7 +56,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void ppi2_obf_w(int state);
@@ -67,26 +67,26 @@ private:
 	void counterlamps_w(uint8_t data);
 	void norautp_palette(palette_device &palette) const;
 	uint32_t screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cgidjp_map(address_map &map);
-	void cgidjp_opcodes_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
-	void dphl_map(address_map &map);
-	void dphla_map(address_map &map);
-	void dphltest_map(address_map &map);
-	void drhl_map(address_map &map);
-	void kimbldhl_map(address_map &map);
-	void kimble_map(address_map &map);
-	void newhilop_map(address_map &map);
-	void noraut3_map(address_map &map);
-	void noraut3_decrypted_opcodes_map(address_map &map);
-	void norautp_map(address_map &map);
-	void norautp_portmap(address_map &map);
-	void norautx4_map(address_map &map);
-	void norautx8_map(address_map &map);
-	void norautxp_map(address_map &map);
-	void norautxp_portmap(address_map &map);
-	void nortest1_map(address_map &map);
-	void ssjkrpkr_map(address_map &map);
+	void cgidjp_map(address_map &map) ATTR_COLD;
+	void cgidjp_opcodes_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void dphl_map(address_map &map) ATTR_COLD;
+	void dphla_map(address_map &map) ATTR_COLD;
+	void dphltest_map(address_map &map) ATTR_COLD;
+	void drhl_map(address_map &map) ATTR_COLD;
+	void kimbldhl_map(address_map &map) ATTR_COLD;
+	void kimble_map(address_map &map) ATTR_COLD;
+	void newhilop_map(address_map &map) ATTR_COLD;
+	void noraut3_map(address_map &map) ATTR_COLD;
+	void noraut3_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void norautp_map(address_map &map) ATTR_COLD;
+	void norautp_portmap(address_map &map) ATTR_COLD;
+	void norautx4_map(address_map &map) ATTR_COLD;
+	void norautx8_map(address_map &map) ATTR_COLD;
+	void norautxp_map(address_map &map) ATTR_COLD;
+	void norautxp_portmap(address_map &map) ATTR_COLD;
+	void nortest1_map(address_map &map) ATTR_COLD;
+	void ssjkrpkr_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint16_t[]> m_np_vram;
 	required_device<cpu_device> m_maincpu;

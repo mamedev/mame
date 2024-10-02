@@ -413,8 +413,8 @@ public:
 	void kurukuru(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -435,23 +435,20 @@ private:
 	void ym2149_bout_w(uint8_t data);
 
 	void kurukuru_msm5205_vck(int state);
-	void kurukuru_audio_io(address_map &map);
-	void kurukuru_audio_map(address_map &map);
-	void kurukuru_io(address_map &map);
-	void kurukuru_map(address_map &map);
-	void ppj_audio_io(address_map &map);
-	void ppj_audio_map(address_map &map);
-	void ppj_io(address_map &map);
-	void ppj_map(address_map &map);
+	void kurukuru_audio_io(address_map &map) ATTR_COLD;
+	void kurukuru_audio_map(address_map &map) ATTR_COLD;
+	void kurukuru_io(address_map &map) ATTR_COLD;
+	void kurukuru_map(address_map &map) ATTR_COLD;
+	void ppj_audio_io(address_map &map) ATTR_COLD;
+	void ppj_audio_map(address_map &map) ATTR_COLD;
+	void ppj_io(address_map &map) ATTR_COLD;
+	void ppj_map(address_map &map) ATTR_COLD;
 };
 
 #define MAIN_CLOCK      XTAL(21'477'272)
 #define CPU_CLOCK       MAIN_CLOCK/6
 #define YM2149_CLOCK    MAIN_CLOCK/6/2  // '/SEL' pin tied to GND, so internal divisor x2 is active
 #define M5205_CLOCK     XTAL(384'000)
-
-#define HOPPER_PULSE    50          // time between hopper pulses in milliseconds
-#define VDP_MEM         0x30000
 
 
 /*************************************************
@@ -861,11 +858,11 @@ void kurukuru_state::kurukuru(machine_config &config)
 	// video hardware
 	v9938_device &v9938(V9938(config, "v9938", MAIN_CLOCK));
 	v9938.set_screen_ntsc("screen");
-	v9938.set_vram_size(VDP_MEM);
+	v9938.set_vram_size(0x30000);
 	v9938.int_cb().set_inputline("maincpu", 0);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	TICKET_DISPENSER(config, "hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, "hopper", attotime::from_msec(50));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

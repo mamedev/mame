@@ -29,16 +29,16 @@ public:
 	void set_tray_close();
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
 	const address_space_config      m_space_config;
 
-	void io_regs(address_map &map);
+	void io_regs(address_map &map) ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER( stv_sector_cb );
 	TIMER_DEVICE_CALLBACK_MEMBER( stv_sh1_sim );

@@ -100,9 +100,9 @@ protected:
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == M68K_LINE_BUSERROR || (m_interrupt_mixer ? inputnum == M68K_IRQ_7 : false); }
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 	virtual void device_pre_save() override;
 	virtual void device_post_load() override;
 
@@ -295,7 +295,7 @@ protected:
 	void init_cpu_scc68070(void);
 	void init_cpu_coldfire(void);
 
-	void default_autovectors_map(address_map &map);
+	void default_autovectors_map(address_map &map) ATTR_COLD;
 
 	void m68ki_exception_interrupt(u32 int_level);
 

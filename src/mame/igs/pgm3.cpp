@@ -48,7 +48,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -68,13 +67,13 @@ public:
 
 private:
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_pgm3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank_pgm3(int state);
 	required_device<cpu_device> m_maincpu;
-	void pgm3_map(address_map &map);
+	void pgm3_map(address_map &map) ATTR_COLD;
 };
 
 void pgm3_state::pgm3_map(address_map &map)

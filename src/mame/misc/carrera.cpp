@@ -78,8 +78,8 @@ private:
 	uint8_t unknown_r();
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void prg_map(address_map &map);
-	void io_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_tileram;
 	required_device<cpu_device> m_maincpu;

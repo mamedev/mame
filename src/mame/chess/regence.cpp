@@ -56,12 +56,11 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_off);
 
-	// machine configs
 	void regence(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override { m_power = true; }
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { m_power = true; }
 
 private:
 	// devices/pointers
@@ -75,8 +74,7 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_led_data = 0;
 
-	// address maps
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();
@@ -193,7 +191,7 @@ static INPUT_PORTS_START( regence ) // see comments for German version labels
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, regence_state, power_off, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, regence_state, power_off, 0)
 INPUT_PORTS_END
 
 

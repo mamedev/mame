@@ -68,7 +68,7 @@ void crbaloon_state::pc3092_w(offs_t offset, uint8_t data)
 }
 
 
-CUSTOM_INPUT_MEMBER(crbaloon_state::pc3092_r)
+ioport_value crbaloon_state::pc3092_r()
 {
 	uint32_t ret;
 

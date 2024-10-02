@@ -52,14 +52,14 @@ public:
 	void challenge_gear(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint32_t screen_update_challenge_gear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 
 	//required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;

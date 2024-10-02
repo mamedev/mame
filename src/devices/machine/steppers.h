@@ -82,8 +82,8 @@ protected:
 	stepper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	uint8_t m_pattern;      /* coil pattern */
 	uint8_t m_old_pattern;  /* old coil pattern */
@@ -112,7 +112,7 @@ public:
 	reel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void advance_phase() override;
 
 	void set_reel_type(uint8_t type)

@@ -125,14 +125,13 @@ public:
 	void init_cpoker300us();
 	void init_igs_ncs2();
 	void init_cpokerpk();
-	void init_kungfua();
 
 	int hopper_r();
 
 protected:
 	virtual void machine_start() override { m_led.resolve(); m_lamps.resolve(); }
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t irqack_r();
@@ -154,10 +153,10 @@ private:
 	uint32_t screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void cpokerpk_io_map(address_map &map);
-	void igspoker_io_map(address_map &map);
-	void igspoker_prg_map(address_map &map);
-	void number10_io_map(address_map &map);
+	void cpokerpk_io_map(address_map &map) ATTR_COLD;
+	void igspoker_io_map(address_map &map) ATTR_COLD;
+	void igspoker_prg_map(address_map &map) ATTR_COLD;
+	void number10_io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_bg_tile_ram;
@@ -2964,76 +2963,7 @@ void igspoker_state::init_pktet346()
 	rom[0xbb0c] = 0xc3;
 }
 
-/*
-
-Cherry master looking board
-
-Big chip with no markings at U80 stickered  KUNG FU
-                                            V1.0
-                                            1992
-
-Board silkscreend on top                    PCB NO.0013-B
-
-.45 27010   stickered   6
-.44 27010   stickered   5
-.43 27010   stickered   4
-.42 27128   stickered   3
-.41 27128   stickered   2
-.40 27128   stickered   1
-.98 27256   stickered   7   couldn't read chip, but board was silkscreened 27c256
-.97 27512   stickered   ?   looked like Japanese writing
-.38 74s287
-.46 18cv8               <--- same checksum as .48
-.47 pal16l8a            <--- checksum was 0
-.48 18cv8               <--- same checksum as .46
-
-unknown 24 pin chip @ u29
-open 24 pin socket @ u54
-12 MHz crystal
-
-5 x DSW8
-3 x NEC D8255AC
-
-*/
-
-ROM_START( kungfua )
-	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
-	// u97 contains leftover x86 code at 0-3fff (compiled with Borland Turbo-C).
-	// You can rename the rom to kungfu.exe and run it (DOS MZ executable)!
-	// The rest is Z80 code, so the CPU at u80 is probably a variant with internal ROM.
-	ROM_LOAD( "kungfu-internal.u80", 0x00000, 0x04000, NO_DUMP )
-	ROM_LOAD( "kungfu.u97",          0x00000, 0x10000, CRC(5c8e16de) SHA1(4af3795753d6e08f528b861d3a771c782e173556) )
-	ROM_LOAD( "kungfu-7.u98",        0x10000, 0x08000, CRC(1d3f0c79) SHA1(0a33798b69fbdc0fb7c47c51f5759e42acd2c608) )
-
-	ROM_REGION( 0x60000, "gfx1", 0 )
-	ROM_LOAD( "kungfu-4.u43", 0x00000, 0x20000, CRC(df4afedb) SHA1(56ab18c46a199653c284417a8e9edc9f32374318) )
-	ROM_LOAD( "kungfu-5.u44", 0x20000, 0x20000, CRC(25c9c98e) SHA1(2d3a399d8d53ee5cb8106d2b35d1ab1778439f81) )
-	ROM_LOAD( "kungfu-6.u45", 0x40000, 0x20000, CRC(f1ec5f0d) SHA1(0aa888e13312ed5d98953c81f03a61c6175c7fec) )
-
-	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASE00 )
-	ROM_LOAD( "kungfu-1.u40", 0x00000, 0x4000, CRC(abaada6b) SHA1(a6b910db7451e8ca737f43f32dfc8fc5ecf865f4) )
-	ROM_LOAD( "kungfu-2.u41", 0x10000, 0x4000, CRC(927b3060) SHA1(a780ea5aaee04287cc9533c2d258dc18f8426530) )
-	ROM_LOAD( "kungfu-3.u42", 0x20000, 0x4000, CRC(bbf78e03) SHA1(06fee093e75e2611d00c076c2e0a681938fa8b74) )
-
-	ROM_REGION( 0x1000, "plds", 0 )
-	ROM_LOAD( "kungfu.u38", 0x000, 0x100, CRC(2074f729) SHA1(eb9a60dec57a029ae6d3fc53aa7bc78e8ac34392) )
-	ROM_LOAD( "kungfu.u46", 0x000, 0xde1, CRC(5d4aacaf) SHA1(733546ce0585c40833e1c34504c33219a2bea0a9) )
-	ROM_LOAD( "kungfu.u47", 0x000, 0xaee, CRC(5c7e25b5) SHA1(7d37e4abfe1256bd9cb168e0f02e651118dfb304) )
-	ROM_LOAD( "kungfu.u48", 0x000, 0xde1, CRC(5d4aacaf) SHA1(733546ce0585c40833e1c34504c33219a2bea0a9) )
-ROM_END
-
-void igspoker_state::init_kungfua()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-	for (int A = 0x4000; A < 0x10000; A++)
-	{
-		rom[A] = rom[A] ^ 0x01;
-	}
-	memset( &rom[0xf000], 0, 0x1000);
-}
-
-} // Anonymous namespace
+} // anonymous namespace
 
 
 GAMEL( 1993?,cpoker,      0,      igspoker, cpoker,   igspoker_state, init_cpoker,      ROT0, "IGS",                  "Champion Poker (v220I)",                       0, layout_igspoker )
@@ -3068,5 +2998,3 @@ GAMEL( 1998, stellecu,    0,        number10, number10, igspoker_state, empty_in
 GAMEL( 1993?,pktet346,    0,        pktetris, pktet346, igspoker_state, init_pktet346,  ROT0, "IGS",                  "PK Tetris (v346I)",                            0, layout_igspoker )
 GAMEL( 199?, igstet341,   pktet346, pktetris, igstet341,igspoker_state, init_tet341,    ROT0, "IGS",                  "Tetris (v341R)",                               0, layout_igspoker )
 GAMEL( 199?, igstet342,   pktet346, pktetris, igstet341,igspoker_state, init_tet341,    ROT0, "IGS",                  "Tetris (v342R)",                               0, layout_igspoker )
-
-GAMEL( 1992, kungfua,    kungfu,    igspoker, cpoker,   igspoker_state, init_kungfua,   ROT0, "IGS",                  "Kung Fu Fighters (IGS, v100)",                 MACHINE_NOT_WORKING, layout_igspoker ) // missing internal ROM dump

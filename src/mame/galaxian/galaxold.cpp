@@ -1102,7 +1102,7 @@ INPUT_PORTS_END
 
 // Coinage Dips are spread across two input ports
 template <int Mask>
-CUSTOM_INPUT_MEMBER(galaxold_state::dkongjrm_coinage_r)
+ioport_value galaxold_state::dkongjrm_coinage_r()
 {
 	switch (Mask)
 	{

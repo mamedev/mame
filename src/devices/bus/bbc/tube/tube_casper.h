@@ -30,11 +30,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual uint8_t host_r(offs_t offset) override;
 	virtual void host_w(offs_t offset, uint8_t data) override;
@@ -44,7 +44,7 @@ private:
 	required_device_array<via6522_device, 2> m_via;
 	required_memory_region m_casper_rom;
 
-	void tube_casper_mem(address_map &map);
+	void tube_casper_mem(address_map &map) ATTR_COLD;
 };
 
 

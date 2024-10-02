@@ -99,8 +99,8 @@ public:
 	void mlanding(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static constexpr u32 c_dma_bank_words = 0x2000;
@@ -173,13 +173,13 @@ private:
 	u32 exec_dma();
 	void msm5205_update(unsigned chip);
 
-	void audio_map_io(address_map &map);
-	void audio_map_prog(address_map &map);
-	void dsp_map_data(address_map &map);
-	void dsp_map_prog(address_map &map);
-	void main_map(address_map &map);
-	void mecha_map_prog(address_map &map);
-	void sub_map(address_map &map);
+	void audio_map_io(address_map &map) ATTR_COLD;
+	void audio_map_prog(address_map &map) ATTR_COLD;
+	void dsp_map_data(address_map &map) ATTR_COLD;
+	void dsp_map_prog(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void mecha_map_prog(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 };
 
 

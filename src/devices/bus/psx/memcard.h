@@ -31,8 +31,8 @@ public:
 	bool ack_r() { return m_ack; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void read_card(const unsigned short addr, unsigned char *buf);

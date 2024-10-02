@@ -69,11 +69,11 @@ private:
 	CDP1869_CHAR_RAM_WRITE_MEMBER(char_ram_w);
 	CDP1869_PCB_READ_MEMBER(pcb_r);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void cdp1869_page_ram(address_map &map);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void cdp1869_page_ram(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint8_t[]> m_charram;           /* character generator ROM */
 	bool m_reset = false;                /* CPU mode */

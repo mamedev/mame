@@ -272,9 +272,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	void namcos22_textram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -403,15 +403,15 @@ protected:
 	INTERRUPT_GEN_MEMBER(dsp_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(dsp_serial_pulse);
 
-	void iomcu_s22_program(address_map &map);
-	void master_dsp_data(address_map &map);
-	void master_dsp_io(address_map &map);
-	void master_dsp_program(address_map &map);
-	void mcu_s22_program(address_map &map);
-	void namcos22_am(address_map &map);
-	void slave_dsp_data(address_map &map);
-	void slave_dsp_io(address_map &map);
-	void slave_dsp_program(address_map &map);
+	void iomcu_s22_program(address_map &map) ATTR_COLD;
+	void master_dsp_data(address_map &map) ATTR_COLD;
+	void master_dsp_io(address_map &map) ATTR_COLD;
+	void master_dsp_program(address_map &map) ATTR_COLD;
+	void mcu_s22_program(address_map &map) ATTR_COLD;
+	void namcos22_am(address_map &map) ATTR_COLD;
+	void slave_dsp_data(address_map &map) ATTR_COLD;
+	void slave_dsp_io(address_map &map) ATTR_COLD;
+	void slave_dsp_program(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_master;
@@ -534,7 +534,7 @@ public:
 	void init_airco22();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual void init_tables() override;
 	virtual void draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
@@ -571,8 +571,8 @@ protected:
 	INTERRUPT_GEN_MEMBER(namcos22s_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq);
 
-	void mcu_program(address_map &map);
-	void namcos22s_am(address_map &map);
+	void mcu_program(address_map &map) ATTR_COLD;
+	void namcos22s_am(address_map &map) ATTR_COLD;
 
 	int m_spotram_enable = 0;
 	int m_spotram_address = 0;
@@ -602,7 +602,7 @@ public:
 protected:
 	required_device<timer_device> m_motor_timer;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void alpine_mcu_port4_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(alpine_steplock_callback);
@@ -625,7 +625,7 @@ private:
 	required_memory_bank m_rombank;
 
 	void rombank_w(u32 data);
-	void alpines_am(address_map &map);
+	void alpines_am(address_map &map) ATTR_COLD;
 };
 
 class timecris_state : public namcos22s_state
@@ -640,7 +640,7 @@ public:
 
 private:
 	u16 gun_r(offs_t offset);
-	void timecris_am(address_map &map);
+	void timecris_am(address_map &map) ATTR_COLD;
 };
 
 class propcycl_state : public namcos22s_state
@@ -667,14 +667,22 @@ class adillor_state : public namcos22s_state
 public:
 	adillor_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcos22s_state(mconfig, type, tag),
-		m_trackball_interrupt(*this, "trackball_int%u", 0)
+		m_trackball_interrupt(*this, "trackball_int%u", 0),
+		m_config_switches(*this, "DEV")
 	{ }
 
 	void adillor(machine_config &config);
 	void init_adillor();
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	required_device_array<timer_device, 2> m_trackball_interrupt;
+	required_ioport m_config_switches;
+
+	u32 m_trackball_count[2] = { };
+	s32 m_trackball_residual[2] = { };
 
 	TIMER_DEVICE_CALLBACK_MEMBER(trackball_update);
 	TIMER_DEVICE_CALLBACK_MEMBER(trackball_interrupt);

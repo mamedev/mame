@@ -13,6 +13,7 @@
   - add flipscreen according to schematics
   - pitboss: dip switches
   - general - add named output notifiers
+  - tictacuk: coins aren't accepted. Different coin detection logic?
 
 Notes: it's important that "questions" is 0xa0000 bytes with empty space filled
        with 0xff, because the built-in ROMs test checks how many question ROMs
@@ -142,7 +143,7 @@ public:
 	int rndbit_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_ram_attr;
 	required_shared_ptr<uint8_t> m_ram_video;
@@ -152,7 +153,7 @@ protected:
 	uint8_t palette_r(offs_t offset);
 	void palette_w(offs_t offset, uint8_t data);
 
-	void bigappg_io_map(address_map &map);
+	void bigappg_io_map(address_map &map) ATTR_COLD;
 
 private:
 	memory_share_creator<uint8_t> m_ram_palette;
@@ -174,12 +175,12 @@ private:
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_no_u40);
-	void bigappg_map(address_map &map);
-	void couple_map(address_map &map);
-	void riviera_map(address_map &map);
-	void misdraw_map(address_map &map);
-	void pitboss_map(address_map &map);
-	void pitboss_io_map(address_map &map);
+	void bigappg_map(address_map &map) ATTR_COLD;
+	void couple_map(address_map &map) ATTR_COLD;
+	void riviera_map(address_map &map) ATTR_COLD;
+	void misdraw_map(address_map &map) ATTR_COLD;
+	void pitboss_map(address_map &map) ATTR_COLD;
+	void pitboss_io_map(address_map &map) ATTR_COLD;
 };
 
 class merit_banked_state : public merit_state
@@ -193,14 +194,14 @@ public:
 	void casino5(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_memory_bank_array<2> m_rombank;
 
 	void bank_w(uint8_t data);
 
-	void casino5_map(address_map &map);
+	void casino5_map(address_map &map) ATTR_COLD;
 };
 
 class merit_quiz_state : public merit_state
@@ -221,7 +222,7 @@ public:
 	template <uint8_t Key> void init_key();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	memory_bank_creator m_questions_bank;
@@ -234,12 +235,12 @@ private:
 	void med_offset_w(offs_t offset, uint8_t data);
 	void high_offset_w(offs_t offset, uint8_t data);
 
-	void dtrvwz5_map(address_map &map);
-	void phrcraze_io_map(address_map &map);
-	void phrcraze_map(address_map &map);
-	void tictac_map(address_map &map);
-	void trvwhiz_map(address_map &map);
-	void trvwhziv_map(address_map &map);
+	void dtrvwz5_map(address_map &map) ATTR_COLD;
+	void phrcraze_io_map(address_map &map) ATTR_COLD;
+	void phrcraze_map(address_map &map) ATTR_COLD;
+	void tictac_map(address_map &map) ATTR_COLD;
+	void trvwhiz_map(address_map &map) ATTR_COLD;
+	void trvwhziv_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -2620,16 +2621,16 @@ ROM_START( tictac ) // verfied by 2 separate PCB sets
 	ROM_LOAD( "ttt1_u40b.u40",    0x00000, 0x2000, CRC(ab0088eb) SHA1(23a05a4dc11a8497f4fc7e4a76085af15ff89cea) )
 
 	ROM_REGION( 0xa0000, "questions", ROMREGION_ERASEFF ) // question ROMs had no labels - verified by 2 separate PCB sets
-	ROM_LOAD( "01.1", 0x08000, 0x8000, CRC(ed465fad) SHA1(db190ee924071372a108deb33e17cbc7572a55ba) ) // Trivia categories are:
-	ROM_LOAD( "02.2", 0x18000, 0x8000, CRC(ff8a9c6a) SHA1(de9ecbb48aa82ac53e4adce7dbcfc75821a69aa6) ) // Sex IV, Trivia Twist, T.V./Movies/Music, Sports Quiz & Around The World
-	ROM_LOAD( "03.3", 0x28000, 0x8000, CRC(e416dd8a) SHA1(3bfeef915c8862ec74ad2cda820daaf6daee3ee3) ) // likely labeled as: sex-008, spo-008 ect...
-	ROM_LOAD( "04.4", 0x38000, 0x8000, CRC(08503d1f) SHA1(ae33d0007235b14f3c06c32f8a598a9c81d78903) )
-	ROM_LOAD( "05.5", 0x48000, 0x8000, CRC(cc80e9e5) SHA1(81fb7cba3f6aad5d5a590008e3dd2a4f0aafaf3f) )
-	ROM_LOAD( "06.6", 0x58000, 0x8000, CRC(460e90fc) SHA1(be627ced5b24f040ca4c43475c3bc79013a5ef97) )
-	ROM_LOAD( "07.7", 0x68000, 0x8000, CRC(ef47fc5d) SHA1(78e4326049bc7a2c43046bfa6baeef8f3b21395b) )
-	ROM_LOAD( "08.8", 0x78000, 0x8000, CRC(3e1cf5fa) SHA1(abb3b2ff4914a9990c33808c6d554922f7ebd174) )
-	ROM_LOAD( "09.9", 0x88000, 0x8000, CRC(64c6e9f0) SHA1(58656625f985330b8bf63eefc820ada3ce8ad91f) )
-	ROM_LOAD( "0a.a", 0x98000, 0x8000, CRC(acf8e187) SHA1(dad6fc6f75a98a1d1b0cd5f789be4850140877f3) )
+	ROM_LOAD( "twt-008_01.3", 0x08000, 0x8000, CRC(e416dd8a) SHA1(3bfeef915c8862ec74ad2cda820daaf6daee3ee3) ) // Trivia categories are:
+	ROM_LOAD( "twt-008_02.4", 0x18000, 0x8000, CRC(08503d1f) SHA1(ae33d0007235b14f3c06c32f8a598a9c81d78903) ) // Trivia Twist, T.V./Movies/Music, Sports Quiz, Around The World & Sex IV
+	ROM_LOAD( "tmm-008_01.5", 0x28000, 0x8000, CRC(cc80e9e5) SHA1(81fb7cba3f6aad5d5a590008e3dd2a4f0aafaf3f) ) // ROM labels need to be verified, current use is only to distinguish between categories.
+	ROM_LOAD( "tmm-008_02.6", 0x38000, 0x8000, CRC(460e90fc) SHA1(be627ced5b24f040ca4c43475c3bc79013a5ef97) )
+	ROM_LOAD( "spo-008_01.7", 0x48000, 0x8000, CRC(ef47fc5d) SHA1(78e4326049bc7a2c43046bfa6baeef8f3b21395b) )
+	ROM_LOAD( "spo-008_02.8", 0x58000, 0x8000, CRC(3e1cf5fa) SHA1(abb3b2ff4914a9990c33808c6d554922f7ebd174) )
+	ROM_LOAD( "atw-008_01.9", 0x68000, 0x8000, CRC(64c6e9f0) SHA1(58656625f985330b8bf63eefc820ada3ce8ad91f) )
+	ROM_LOAD( "atw-008_02.a", 0x78000, 0x8000, CRC(acf8e187) SHA1(dad6fc6f75a98a1d1b0cd5f789be4850140877f3) )
+	ROM_LOAD( "sex-008_01.1", 0x88000, 0x8000, CRC(ed465fad) SHA1(db190ee924071372a108deb33e17cbc7572a55ba) )
+	ROM_LOAD( "sex-008_02.2", 0x98000, 0x8000, CRC(ff8a9c6a) SHA1(de9ecbb48aa82ac53e4adce7dbcfc75821a69aa6) )
 
 	ROM_REGION( 0x0100, "prom", 0 ) // BPROM on Question ROM board used as KEY to decode questions
 	ROM_LOAD( "sc-008", 0x00000, 0x0100, CRC(63e61cf6) SHA1(3781a2708c40399eb9f942cd6211a854482424e5) ) // 74S287 (==N82S129N) BPROM
@@ -2662,6 +2663,34 @@ ROM_START( tictaca )
 	ROM_REGION( 0x0100, "prom", 0 ) // BPROM on Question ROM board used as KEY to decode questions
 	ROM_LOAD( "sc-004", 0x00000, 0x0100, NO_DUMP ) // 74S287 (==N82S129N) BPROM
 ROM_END
+
+
+ROM_START( tictacuk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "6221-25_u5-0e.u5", 0x00000, 0x8000, CRC(a842db99) SHA1(75c4a29e9c98d50e85a0d8c5c1378cd4c0e4a035) ) // 6221-25 U5-0E 05/08/86
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "ttt1_u39.u39", 0x00000, 0x2000, CRC(dd79e824) SHA1(d65ee1c758293ddf8a5f4913878a2867ba526e68) )
+	ROM_LOAD( "ttt1_u38.u38", 0x02000, 0x2000, CRC(e1bf0fab) SHA1(291261ea817c42d6e8a19c17a2d3706fed7d78c4) )
+	ROM_LOAD( "ttt1_u37.u37", 0x04000, 0x2000, CRC(94f9c7f8) SHA1(494389983fb62fe2d772c276e659b6b20c531933) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "ttt1_u40b.u40",    0x00000, 0x2000, CRC(ab0088eb) SHA1(23a05a4dc11a8497f4fc7e4a76085af15ff89cea) )
+
+	ROM_REGION( 0xa0000, "questions", ROMREGION_ERASEFF )
+	ROM_LOAD( "uk2-06_sp2-1.1", 0x08000, 0x8000, CRC(ec9857c5) SHA1(3d6dd687b99abe1859a0624d8bcf6dbe928103a7) ) // Trivia categories are:
+	ROM_LOAD( "uk2-06_sp2-2.2", 0x18000, 0x8000, CRC(8b0660ea) SHA1(d4c1f35dc09efe0fa1d680b004a95b3f61dc03fc) ) // Sports II, Around The World, Rock 'N Pop Music & Telly/Movies/Music
+	ROM_LOAD( "uk2-06_atw-1.3", 0x28000, 0x8000, CRC(c805807e) SHA1(eecb46f6f0dd5f3cc8f7123efa18cb403dbbd009) )
+	ROM_LOAD( "uk2-06_atw-2.4", 0x38000, 0x8000, CRC(276698f2) SHA1(d61863bdb94e4778a7c4e4e05d14d96b9d92cfcc) )
+	ROM_LOAD( "uk2-06_rnp-1.5", 0x48000, 0x8000, CRC(814ec1da) SHA1(c3d01111c2327a9bf42bb4d4e9fb788a05d58f4d) )
+	ROM_LOAD( "uk2-06_rnp-2.6", 0x58000, 0x8000, CRC(f1d69d57) SHA1(5e5507b7c8f1903332d29371080516e0166ac139) )
+	ROM_LOAD( "uk2-06_tmm-1.7", 0x68000, 0x8000, CRC(a46140a0) SHA1(2e61715943ada6775fdfae1bdf616c5506db2226) )
+	ROM_LOAD( "uk2-06_tmm-2.8", 0x78000, 0x8000, CRC(3b77e3e5) SHA1(69e573d63284cc06b03097c711597362fa1b307c) )
+
+	ROM_REGION( 0x0100, "prom", 0 ) // BPROM on Question ROM board used as KEY to decode questions
+	ROM_LOAD( "sc-006", 0x00000, 0x0100, CRC(145f7f61) SHA1(f6967466791895710107987e9438177706d7b2a0) ) // 74S287 (==N82S129N) BPROM
+ROM_END
+
 
 ROM_START( tictacv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3029,6 +3058,7 @@ GAME( 1985, trvwz4va,   trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_k
 
 GAME( 1985, tictac,     0,        tictac,   tictac,   merit_quiz_state,   init_key<8>,  ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C, 07/07/86)",                MACHINE_SUPPORTS_SAVE ) // all new trivia categories
 GAME( 1985, tictaca,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>,  ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C, 02/11/86)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tictacuk,   tictac,   tictac,   tictac,   merit_quiz_state,   init_key<6>,  ROT0,  "Merit / Barcrest", "Tic Tac Trivia (6221-25, U5-0E, 05/08/86, UK)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different trivia categories
 GAME( 1985, tictacv,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>,  ROT90, "Merit", "Tic Tac Trivia (6221-22, U5-0, Vertical)",                 MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, phrcraze,   0,        phrcraze, phrcrazs, merit_quiz_state,   init_key<7>,  ROT0,  "Merit", "Phraze Craze (6221-40, U5-3A, Expanded Questions)",        MACHINE_SUPPORTS_SAVE )

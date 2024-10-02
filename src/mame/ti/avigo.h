@@ -55,8 +55,8 @@ public:
 
 protected:
 	// defined in drivers/avigo.cpp
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void refresh_ints();
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
 
@@ -79,7 +79,7 @@ protected:
 	uint8_t port_04_r();
 
 	// defined in video/avigo.cpp
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t vid_memory_r(offs_t offset);
 	void vid_memory_w(offs_t offset, uint8_t data);
@@ -88,9 +88,9 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(avigo_1hz_timer);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-	void avigo_banked_map(address_map &map);
-	void avigo_io(address_map &map);
-	void avigo_mem(address_map &map);
+	void avigo_banked_map(address_map &map) ATTR_COLD;
+	void avigo_io(address_map &map) ATTR_COLD;
+	void avigo_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;

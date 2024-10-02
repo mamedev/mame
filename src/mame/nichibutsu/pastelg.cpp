@@ -66,7 +66,7 @@ public:
 	{ }
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
@@ -83,7 +83,7 @@ protected:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 
 private:
 	uint8_t m_blitter_destx = 0;
@@ -121,7 +121,7 @@ private:
 	void romsel_w(uint8_t data);
 	uint16_t blitter_src_addr_r();
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 class threeds_state : public pastelg_common_state
@@ -136,7 +136,7 @@ public:
 	void threeds(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_ioport_array<5> m_p1_keys;
@@ -151,7 +151,7 @@ private:
 	void output_w(uint8_t data);
 	uint8_t rom_readback_r();
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 

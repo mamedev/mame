@@ -86,14 +86,14 @@ public:
 	void alphatpc16(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void apc16_io(address_map &map);
-	void apc16_map(address_map &map);
-	void apc16_z80_io(address_map &map);
-	void apc16_z80_map(address_map &map);
-	void ef9345(address_map &map);
+	void apc16_io(address_map &map) ATTR_COLD;
+	void apc16_map(address_map &map) ATTR_COLD;
+	void apc16_z80_io(address_map &map) ATTR_COLD;
+	void apc16_z80_map(address_map &map) ATTR_COLD;
+	void ef9345(address_map &map) ATTR_COLD;
 
 	u8 p1_r();
 	void p1_w(u8 data);

@@ -130,13 +130,13 @@ private:
 	DECLARE_MACHINE_RESET(r2dx_v33);
 	DECLARE_MACHINE_RESET(nzeroteam);
 
-	void nzerotea_map(address_map &map);
-	void nzeroteam_base_map(address_map &map);
-	void r2dx_oki_map(address_map &map);
-	void rdx_v33_map(address_map &map);
-	void zerotm2k_map(address_map &map);
+	void nzerotea_map(address_map &map) ATTR_COLD;
+	void nzeroteam_base_map(address_map &map) ATTR_COLD;
+	void r2dx_oki_map(address_map &map) ATTR_COLD;
+	void rdx_v33_map(address_map &map) ATTR_COLD;
+	void zerotm2k_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void r2dx_setbanking();
 

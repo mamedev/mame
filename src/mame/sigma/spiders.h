@@ -34,7 +34,7 @@ private:
 	void flipscreen_w(int state);
 	void gfx_rom_intf_w(uint8_t data);
 	uint8_t gfx_rom_r();
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(update_pia_1);
 	void ic60_74123_output_changed(int state);
 	void spiders_audio_command_w(uint8_t data);
@@ -45,8 +45,8 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void spiders_audio(machine_config &config);
-	void spiders_audio_map(address_map &map);
-	void spiders_main_map(address_map &map);
+	void spiders_audio_map(address_map &map) ATTR_COLD;
+	void spiders_main_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_ram;
 	required_device<discrete_device> m_discrete;

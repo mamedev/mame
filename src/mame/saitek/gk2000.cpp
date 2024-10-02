@@ -23,6 +23,7 @@ BTANB:
 ================================================================================
 
 Saitek GK 2000 family
+---------------------
 
 Hardware notes:
 
@@ -47,6 +48,7 @@ Travel Champion 2080 and Tandy Mega 2050X are 14MHz instead of 20MHz.
 ================================================================================
 
 Saitek Centurion family
+-----------------------
 
 This is the program with the infamous H8 bug, not named after the MCU, but after
 the H8 square. The piece on H8 is moved immediately, regardless of playing level,
@@ -135,7 +137,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(centurion_change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -152,17 +154,23 @@ private:
 	u8 m_lcd_com = 0;
 
 	// I/O handlers
+	void standby(int state);
+
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void update_lcd();
 	template <int N> void lcd_segs_w(u8 data);
 	void lcd_com_w(u8 data);
 
-	void standby(int state);
-
 	void p2_w(u8 data);
 	u8 p4_r();
 	void p5_w(u8 data);
 };
+
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
 
 void gk2000_state::machine_start()
 {

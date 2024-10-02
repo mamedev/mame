@@ -62,14 +62,14 @@ public:
 	void dealracl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void sound_nmi_w(uint8_t data);
-	void kingpin_io_map(address_map &map);
-	void kingpin_program_map(address_map &map);
-	void kingpin_sound_map(address_map &map);
-	void dealracl_program_map(address_map &map);
+	void kingpin_io_map(address_map &map) ATTR_COLD;
+	void kingpin_program_map(address_map &map) ATTR_COLD;
+	void kingpin_sound_map(address_map &map) ATTR_COLD;
+	void dealracl_program_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -176,7 +176,7 @@ static INPUT_PORTS_START( kingpin )
 	PORT_START("IN1")
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 )    PORT_NAME("Quit")
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 )    PORT_NAME("Odd")
-	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )     PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
+	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )    PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
@@ -240,7 +240,7 @@ void kingpin_state::kingpin(machine_config &config)
 
 	AY8912(config, "aysnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	config.set_default_layout(layout_kingpin);
 }

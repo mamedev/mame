@@ -151,15 +151,15 @@ public:
 	void lola8(machine_config &config);
 
 private:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 	u8 port_b_r();
 	void port_a_w(u8 data);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_region_ptr<u8> m_p_chargen;
 protected:
@@ -176,10 +176,10 @@ public:
 	void lola8nk(machine_config &config);
 
 private:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 	u8 port_b_r();
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 class lola8a_state : public lola8_base_state
@@ -192,16 +192,16 @@ public:
 	void lola8a(machine_config &config);
 
 private:
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 	u8 port_a_r();
 	void port_b_w(u8 data);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_portb = 0U;
 };

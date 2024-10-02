@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 ##
 ## license:BSD-3-Clause
 ## copyright-holders:Vas Crabb
@@ -6,6 +6,7 @@
 from . import dbaccess
 from . import htmltmpl
 
+import html
 import inspect
 import json
 import mimetypes
@@ -13,21 +14,14 @@ import os.path
 import re
 import sys
 import urllib
+import urllib.parse
 import wsgiref.util
 
-try:
-    import html
-    htmlescape = html.escape
-except ImportError:
-    import cgi
-    htmlescape = cgi.escape
-
-try:
-    import urllib.parse as urlparse
-    urlquote = urlparse.quote
-except ImportError:
-    import urlparse
-    urlquote = urllib.quote
+htmlescape = html.escape
+shiftpath = wsgiref.util.shift_path_info
+urljoin = urllib.parse.urljoin
+urlparsequery = urllib.parse.parse_qs
+urlquote = urllib.parse.quote
 
 
 class HandlerBase(object):
@@ -45,7 +39,7 @@ class HandlerBase(object):
             505: 'HTTP Version Not Supported' }
 
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(HandlerBase, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.app = app
         self.js_escape = app.js_escape
         self.application_uri = application_uri
@@ -58,7 +52,7 @@ class HandlerBase(object):
 
 class ErrorPageHandler(HandlerBase):
     def __init__(self, code, app, application_uri, environ, start_response, **kwargs):
-        super(ErrorPageHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
         self.code = code
         self.start_response('%d %s' % (self.code, self.STATUS_MESSAGE[code]), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
 
@@ -70,9 +64,9 @@ class AssetHandler(HandlerBase):
     EXTENSIONMAP = { '.js': 'application/javascript', '.svg': 'image/svg+xml' }
 
     def __init__(self, directory, app, application_uri, environ, start_response, **kwargs):
-        super(AssetHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
         self.directory = directory
-        self.asset = wsgiref.util.shift_path_info(environ)
+        self.asset = shiftpath(environ)
 
     def __iter__(self):
         if not self.asset:
@@ -105,20 +99,20 @@ class AssetHandler(HandlerBase):
 
 class QueryPageHandler(HandlerBase):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(QueryPageHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
         self.dbcurs = app.dbconn.cursor()
 
     def machine_href(self, shortname):
-        return htmlescape(urlparse.urljoin(self.application_uri, 'machine/%s' % (urlquote(shortname), )), True)
+        return htmlescape(urljoin(self.application_uri, 'machine/%s' % (urlquote(shortname), )), True)
 
     def sourcefile_href(self, sourcefile):
-        return htmlescape(urlparse.urljoin(self.application_uri, 'sourcefile/%s' % (urlquote(sourcefile), )), True)
+        return htmlescape(urljoin(self.application_uri, 'sourcefile/%s' % (urlquote(sourcefile), )), True)
 
     def softwarelist_href(self, softwarelist):
-        return htmlescape(urlparse.urljoin(self.application_uri, 'softwarelist/%s' % (urlquote(softwarelist), )), True)
+        return htmlescape(urljoin(self.application_uri, 'softwarelist/%s' % (urlquote(softwarelist), )), True)
 
     def software_href(self, softwarelist, software):
-        return htmlescape(urlparse.urljoin(self.application_uri, 'softwarelist/%s/%s' % (urlquote(softwarelist), urlquote(software))), True)
+        return htmlescape(urljoin(self.application_uri, 'softwarelist/%s/%s' % (urlquote(softwarelist), urlquote(software))), True)
 
     def bios_data(self, machine):
         result = { }
@@ -197,8 +191,8 @@ class QueryPageHandler(HandlerBase):
 
 class MachineRpcHandlerBase(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(MachineRpcHandlerBase, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
-        self.shortname = wsgiref.util.shift_path_info(environ)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        self.shortname = shiftpath(environ)
 
     def __iter__(self):
         if not self.shortname:
@@ -222,8 +216,8 @@ class MachineRpcHandlerBase(QueryPageHandler):
 
 class MachineHandler(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(MachineHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
-        self.shortname = wsgiref.util.shift_path_info(environ)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        self.shortname = shiftpath(environ)
 
     def __iter__(self):
         if not self.shortname:
@@ -250,7 +244,7 @@ class MachineHandler(QueryPageHandler):
         description = machine_info['description']
         yield htmltmpl.MACHINE_PROLOGUE.substitute(
                 app=self.js_escape(htmlescape(self.application_uri, True)),
-                assets=self.js_escape(htmlescape(urlparse.urljoin(self.application_uri, 'static'), True)),
+                assets=self.js_escape(htmlescape(urljoin(self.application_uri, 'static'), True)),
                 sourcehref=self.sourcefile_href(machine_info['sourcefile']),
                 description=htmlescape(description),
                 shortname=htmlescape(self.shortname),
@@ -470,7 +464,7 @@ class MachineHandler(QueryPageHandler):
 
 class SourceFileHandler(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(SourceFileHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
 
     def __iter__(self):
         self.filename = self.environ['PATH_INFO']
@@ -514,7 +508,7 @@ class SourceFileHandler(QueryPageHandler):
             heading = self.linked_title(pattern)
             title = 'Source Files: ' + htmlescape(pattern)
         yield htmltmpl.SOURCEFILE_LIST_PROLOGUE.substitute(
-                assets=htmlescape(urlparse.urljoin(self.application_uri, 'static'), True),
+                assets=htmlescape(urljoin(self.application_uri, 'static'), True),
                 title=title,
                 heading=heading).encode('utf-8')
         for filename, machines in self.dbcurs.get_sourcefiles(pattern):
@@ -525,7 +519,7 @@ class SourceFileHandler(QueryPageHandler):
 
     def sourcefile_page(self, id):
         yield htmltmpl.SOURCEFILE_PROLOGUE.substitute(
-                assets=htmlescape(urlparse.urljoin(self.application_uri, 'static'), True),
+                assets=htmlescape(urljoin(self.application_uri, 'static'), True),
                 filename=htmlescape(self.filename),
                 title=self.linked_title(self.filename)).encode('utf-8')
 
@@ -558,13 +552,13 @@ class SourceFileHandler(QueryPageHandler):
         parts = filename.split('/')
         final = parts[-1]
         del parts[-1]
-        uri = urlparse.urljoin(self.application_uri, 'sourcefile')
+        uri = urljoin(self.application_uri, 'sourcefile')
         title = ''
         for part in parts:
-            uri = urlparse.urljoin(uri + '/', urlquote(part))
+            uri = urljoin(uri + '/', urlquote(part))
             title += '<a href="{0}">{1}</a>/'.format(htmlescape(uri, True), htmlescape(part))
         if linkfinal:
-            uri = urlparse.urljoin(uri + '/', urlquote(final))
+            uri = urljoin(uri + '/', urlquote(final))
             return title + '<a href="{0}">{1}</a>'.format(htmlescape(uri, True), htmlescape(final))
         else:
             return title + final
@@ -583,9 +577,9 @@ class SourceFileHandler(QueryPageHandler):
 
 class SoftwareListHandler(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(SoftwareListHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
-        self.shortname = wsgiref.util.shift_path_info(environ)
-        self.software = wsgiref.util.shift_path_info(environ)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        self.shortname = shiftpath(environ)
+        self.software = shiftpath(environ)
 
     def __iter__(self):
         if self.environ['PATH_INFO']:
@@ -627,7 +621,7 @@ class SoftwareListHandler(QueryPageHandler):
         else:
             title = heading = 'Software Lists: ' + htmlescape(pattern)
         yield htmltmpl.SOFTWARELIST_LIST_PROLOGUE.substitute(
-                assets=htmlescape(urlparse.urljoin(self.application_uri, 'static'), True),
+                assets=htmlescape(urljoin(self.application_uri, 'static'), True),
                 title=title,
                 heading=heading).encode('utf-8')
         for shortname, description, total, supported, partiallysupported, unsupported in self.dbcurs.get_softwarelists(pattern):
@@ -649,7 +643,7 @@ class SoftwareListHandler(QueryPageHandler):
             title = 'Software List: %s (%s): %s' % (htmlescape(softwarelist_info['description']), htmlescape(softwarelist_info['shortname']), htmlescape(pattern))
             heading = '<a href="%s">%s</a>: %s' % (self.softwarelist_href(softwarelist_info['shortname']), htmlescape(softwarelist_info['description']), htmlescape(pattern))
         yield htmltmpl.SOFTWARELIST_PROLOGUE.substitute(
-                assets=htmlescape(urlparse.urljoin(self.application_uri, 'static'), True),
+                assets=htmlescape(urljoin(self.application_uri, 'static'), True),
                 title=title,
                 heading=heading,
                 shortname=htmlescape(softwarelist_info['shortname']),
@@ -707,7 +701,7 @@ class SoftwareListHandler(QueryPageHandler):
 
     def software_page(self, software_info):
         yield htmltmpl.SOFTWARE_PROLOGUE.substitute(
-                assets=htmlescape(urlparse.urljoin(self.application_uri, 'static'), True),
+                assets=htmlescape(urljoin(self.application_uri, 'static'), True),
                 title=htmlescape(software_info['description']),
                 heading=htmlescape(software_info['description']),
                 softwarelisthref=self.softwarelist_href(self.shortname),
@@ -794,7 +788,7 @@ class SoftwareListHandler(QueryPageHandler):
 
 class RomIdentHandler(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(QueryPageHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
         self.dbcurs = app.dbconn.cursor()
 
     def __iter__(self):
@@ -811,7 +805,7 @@ class RomIdentHandler(QueryPageHandler):
     def form_page(self):
         yield htmltmpl.ROMIDENT_PAGE.substitute(
                 app=self.js_escape(htmlescape(self.application_uri, True)),
-                assets=self.js_escape(htmlescape(urlparse.urljoin(self.application_uri, 'static'), True))).encode('utf-8')
+                assets=self.js_escape(htmlescape(urljoin(self.application_uri, 'static'), True))).encode('utf-8')
 
 
 class BiosRpcHandler(MachineRpcHandlerBase):
@@ -839,7 +833,7 @@ class SoftwareListsRpcHandler(MachineRpcHandlerBase):
 
 class RomDumpsRpcHandler(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(RomDumpsRpcHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
 
     def __iter__(self):
         if self.environ['PATH_INFO']:
@@ -850,7 +844,7 @@ class RomDumpsRpcHandler(QueryPageHandler):
             return self.error_page(405)
         else:
             try:
-                args = urlparse.parse_qs(self.environ['QUERY_STRING'], keep_blank_values=True, strict_parsing=True)
+                args = urlparsequery(self.environ['QUERY_STRING'], keep_blank_values=True, strict_parsing=True)
                 crc = args.get('crc')
                 sha1 = args.get('sha1')
                 if (len(args) == 2) and (crc is not None) and (len(crc) == 1) and (sha1 is not None) and (len(sha1) == 1):
@@ -896,7 +890,7 @@ class RomDumpsRpcHandler(QueryPageHandler):
 
 class DiskDumpsRpcHandler(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
-        super(DiskDumpsRpcHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        super().__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
 
     def __iter__(self):
         if self.environ['PATH_INFO']:
@@ -907,7 +901,7 @@ class DiskDumpsRpcHandler(QueryPageHandler):
             return self.error_page(405)
         else:
             try:
-                args = urlparse.parse_qs(self.environ['QUERY_STRING'], keep_blank_values=True, strict_parsing=True)
+                args = urlparsequery(self.environ['QUERY_STRING'], keep_blank_values=True, strict_parsing=True)
                 sha1 = args.get('sha1')
                 if (len(args) == 1) and (sha1 is not None) and (len(sha1) == 1):
                     sha1 = sha1[0]
@@ -960,7 +954,7 @@ class MiniMawsApp(object):
             'diskdumps':        DiskDumpsRpcHandler }
 
     def __init__(self, dbfile, **kwargs):
-        super(MiniMawsApp, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.dbconn = dbaccess.QueryConnection(dbfile)
         self.assetsdir = os.path.join(os.path.dirname(inspect.getfile(self.__class__)), 'assets')
         if not mimetypes.inited:
@@ -970,7 +964,7 @@ class MiniMawsApp(object):
         application_uri = wsgiref.util.application_uri(environ)
         if application_uri[-1] != '/':
             application_uri += '/'
-        module = wsgiref.util.shift_path_info(environ)
+        module = shiftpath(environ)
         if module == 'machine':
             return MachineHandler(self, application_uri, environ, start_response)
         elif module == 'sourcefile':
@@ -982,7 +976,7 @@ class MiniMawsApp(object):
         elif module == 'static':
             return AssetHandler(self.assetsdir, self, application_uri, environ, start_response)
         elif module == 'rpc':
-            service = wsgiref.util.shift_path_info(environ)
+            service = shiftpath(environ)
             if not service:
                 return ErrorPageHandler(403, self, application_uri, environ, start_response)
             elif service in self.RPC_SERVICES:

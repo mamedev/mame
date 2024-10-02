@@ -34,7 +34,6 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -73,11 +72,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_update);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -336,21 +335,21 @@ void pockstat_state::set_interrupt_line(uint32_t line, int state)
 	const uint32_t new_irq = m_intc_regs.hold & m_intc_regs.enable & INT_IRQ_MASK;
 	if (new_irq)
 	{
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 	}
 
 	const uint32_t new_fiq = m_intc_regs.hold & m_intc_regs.enable & INT_FIQ_MASK;
 	if (new_fiq)
 	{
-		m_maincpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		m_maincpu->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, CLEAR_LINE);
 	}
 }
 
@@ -934,7 +933,7 @@ void pockstat_state::machine_start()
 
 void pockstat_state::machine_reset()
 {
-	m_maincpu->set_state_int(ARM7_R15, 0x4000000);
+	m_maincpu->set_state_int(arm7_cpu_device::ARM7_R15, 0x4000000);
 
 	m_flash_write_enable_count = 0;
 	m_flash_write_count = 0;

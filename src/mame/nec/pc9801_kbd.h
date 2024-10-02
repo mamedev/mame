@@ -25,7 +25,7 @@ public:
 
 	auto irq_wr_callback() { return m_write_irq.bind(); }
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// I/O operations
 	void tx_w(uint8_t data);
@@ -35,8 +35,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(rx_timer_tick);
 

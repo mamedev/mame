@@ -156,8 +156,8 @@ protected:
 		return add_cartridge_slot<N>(config, prim, false, 0, xtal);
 	}
 	virtual void driver_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void expanded_slot_w(u8 data);
 	u8 expanded_slot_r();
@@ -173,9 +173,9 @@ protected:
 	void psg_port_a_w(u8 data);
 	void psg_port_b_w(u8 data);
 
-	void msx_base_io_map(address_map &map);
-	void msx1_io_map(address_map &map);
-	void memory_map(address_map &map);
+	void msx_base_io_map(address_map &map) ATTR_COLD;
+	void msx1_io_map(address_map &map) ATTR_COLD;
+	void memory_map(address_map &map) ATTR_COLD;
 	void memory_expand_slot(int slot);
 	memory_view::memory_view_entry *get_view(int page, int prim, int sec);
 
@@ -314,7 +314,7 @@ class msx2_base_state : public msx_state
 protected:
 	msx2_base_state(const machine_config &mconfig, device_type type, const char *tag, XTAL main_xtal, int cpu_xtal_divider);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void msx2_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
 	void msx2(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
@@ -328,9 +328,9 @@ protected:
 	void rtc_latch_w(u8 data);
 	u8 switched_r(offs_t offset);
 	void switched_w(offs_t offset, u8 data);
-	void msx2_base_io_map(address_map &map);
-	void msx2_io_map(address_map &map);
-	void msx2_v9958_io_map(address_map &map);
+	void msx2_base_io_map(address_map &map) ATTR_COLD;
+	void msx2_io_map(address_map &map) ATTR_COLD;
+	void msx2_v9958_io_map(address_map &map) ATTR_COLD;
 
 	std::vector<msx_switched_interface *> m_switched;
 
@@ -350,13 +350,14 @@ protected:
 
 	void set_cold_boot_flags(u8 cold_boot_flags) { m_cold_boot_flags = cold_boot_flags; }
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void msx2plus_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
 	void msx2plus_pal_base(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
 	void msx2plus(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
 	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
-	void msx2plus_io_map(address_map &map);
+	void msx2plus_io_map(address_map &map) ATTR_COLD;
 	void msx2plus_add_softlists(machine_config &config);
 	void turbor_add_softlists(machine_config &config);
 	void turbor(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);

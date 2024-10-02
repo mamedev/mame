@@ -249,7 +249,7 @@ void astrocde_state::sparkle_w(int state)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(ebases_state::trackball_r)
+ioport_value ebases_state::trackball_r()
 {
 	return (m_trackball[m_input_select]->read() - m_trackball_last) & 0xff;
 }
@@ -301,7 +301,7 @@ void demndrgn_state::input_select_w(int state)
 	m_input_select = state;
 }
 
-CUSTOM_INPUT_MEMBER(demndrgn_state::trackball_r)
+ioport_value demndrgn_state::trackball_r()
 {
 	return (m_trackball[m_input_select]->read() - m_trackball_last) & 0xff;
 }

@@ -31,11 +31,15 @@ TODO:
 *****************************************************************************/
 
 #include "emu.h"
-#include "debug/debugcon.h"
-#include "debugger.h"
 #include "arm7.h"
+
 #include "arm7core.h"   //include arm7 core
 #include "arm7help.h"
+
+#include "debug/debugcon.h"
+#include "debugger.h"
+
+#include <cassert>
 
 #define LOG_MMU             (1U << 1)
 #define LOG_DSP             (1U << 2)
@@ -83,9 +87,17 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness)
+arm7_cpu_device::arm7_cpu_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag, device_t *owner,
+		uint32_t clock,
+		uint8_t archRev,
+		uint32_t archFlags,
+		endianness_t endianness,
+		address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", endianness, 32, 32, 0)
+	, m_program_config("program", endianness, 32, 32, 0, internal_map)
 	, m_prefetch_word0_shift(endianness == ENDIANNESS_LITTLE ? 0 : 16)
 	, m_prefetch_word1_shift(endianness == ENDIANNESS_LITTLE ? 16 : 0)
 	, m_endian(endianness)
@@ -111,6 +123,10 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type
 	m_insn_prefetch_index = 0;
 	m_tlb_log = 0;
 	m_actual_log = 0;
+}
+
+arm7_cpu_device::~arm7_cpu_device()
+{
 }
 
 
@@ -1154,10 +1170,6 @@ void arm1176jzf_s_cpu_device::device_reset()
 	m_control = 0x00050078;
 }
 
-#define UNEXECUTED() \
-	m_r[eR15] += 4; \
-	m_icount +=2; /* Any unexecuted instruction only takes 1 cycle (page 193) */
-
 void arm7_cpu_device::update_insn_prefetch(uint32_t curr_pc)
 {
 	curr_pc &= ~3;
@@ -1237,6 +1249,8 @@ void arm7_cpu_device::add_ce_kernel_addr(offs_t addr, std::string value)
 
 void arm7_cpu_device::execute_run()
 {
+	auto const UNEXECUTED = [this] { m_r[eR15] += 4; m_icount += 2; }; // Any unexecuted instruction only takes 1 cycle (page 193)
+
 	m_tlb_log = m_actual_log;
 
 	uint32_t insn;
@@ -1446,12 +1460,10 @@ void arm7_cpu_device::execute_run()
 		/* handle Thumb instructions if active */
 		if (T_IS_SET(m_r[eCPSR]))
 		{
-			offs_t raddr;
-
 			pc = m_r[eR15];
 
 			// "In Thumb state, bit [0] is undefined and must be ignored. Bits [31:1] contain the PC."
-			raddr = pc & (~1);
+			offs_t const raddr = pc & ~uint32_t(1);
 
 			if (!insn_fetch_thumb(raddr, insn))
 			{
@@ -1463,12 +1475,10 @@ void arm7_cpu_device::execute_run()
 		}
 		else
 		{
-			offs_t raddr;
-
 			/* load 32 bit instruction */
 
 			// "In ARM state, bits [1:0] of r15 are undefined and must be ignored. Bits [31:2] contain the PC."
-			raddr = pc & (~3);
+			offs_t const raddr = pc & ~uint32_t(3);
 
 			if (!insn_fetch_arm(raddr, insn))
 			{
@@ -1573,27 +1583,46 @@ skip_exec:
 
 void arm7_cpu_device::execute_set_input(int irqline, int state)
 {
-	switch (irqline) {
-	case ARM7_IRQ_LINE: /* IRQ */
-		m_pendingIrq = state ? true : false;
+	switch (irqline)
+	{
+	case ARM7_IRQ_LINE: // IRQ
+		m_pendingIrq = state != 0;
 		break;
 
-	case ARM7_FIRQ_LINE: /* FIRQ */
-		m_pendingFiq = state ? true : false;
+	case ARM7_FIRQ_LINE: // FIQ
+		m_pendingFiq = state != 0;
 		break;
 
 	case ARM7_ABORT_EXCEPTION:
-		m_pendingAbtD = state ? true : false;
+		m_pendingAbtD = state != 0;
 		break;
 	case ARM7_ABORT_PREFETCH_EXCEPTION:
-		m_pendingAbtP = state ? true : false;
+		m_pendingAbtP = state != 0;
 		break;
 
 	case ARM7_UNDEFINE_EXCEPTION:
-		m_pendingUnd = state ? true : false;
+		m_pendingUnd = state != 0;
 		break;
 	}
 
+	update_irq_state();
+	arm7_check_irq_state();
+}
+
+
+void arm7_cpu_device::set_irq(int state)
+{
+	assert((machine().scheduler().currently_executing() == static_cast<device_execute_interface *>(this)) || !machine().scheduler().currently_executing());
+	m_pendingIrq = state != 0;
+	update_irq_state();
+	arm7_check_irq_state();
+}
+
+
+void arm7_cpu_device::set_fiq(int state)
+{
+	assert((machine().scheduler().currently_executing() == static_cast<device_execute_interface *>(this)) || !machine().scheduler().currently_executing());
+	m_pendingFiq = state != 0;
 	update_irq_state();
 	arm7_check_irq_state();
 }

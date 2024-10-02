@@ -35,7 +35,7 @@ public:
 	void init_funnyfm();
 
 	void cupidon(machine_config &config);
-	void cupidon_map(address_map &map);
+	void cupidon_map(address_map &map) ATTR_COLD;
 
 protected:
 	// devices

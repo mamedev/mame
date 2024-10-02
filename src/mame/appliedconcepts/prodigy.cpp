@@ -98,7 +98,7 @@ public:
 	void prodigy(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -114,7 +114,7 @@ private:
 	u8 m_shift_data = 0;
 	u8 m_shift_clock = 0;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();

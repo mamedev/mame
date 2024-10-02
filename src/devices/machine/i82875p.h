@@ -28,18 +28,18 @@ public:
 	virtual uint8_t capptr_r() override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void reset_all_mappings() override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
-	void agp_translation_map(address_map &map);
+	void agp_translation_map(address_map &map) ATTR_COLD;
 
 	int ram_size;
 	required_device<device_memory_interface> cpu;
@@ -100,8 +100,8 @@ public:
 	i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class i82875p_overflow_device : public pci_device {
@@ -124,11 +124,11 @@ private:
 	void dram_controller_mode_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void overflow_map(address_map &map);
+	void overflow_map(address_map &map) ATTR_COLD;
 
 	uint8_t dram_row_boundary[8], dram_row_attribute[4];
 	uint32_t dram_timing, dram_controller_mode;

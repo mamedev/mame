@@ -232,8 +232,8 @@ public:
 	void init_zunkyou();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	int m_segac2_enable_display;
 
@@ -306,8 +306,8 @@ protected:
 	int prot_func_puyopuy2(int in);
 	int prot_func_zunkyou(int in);
 
-	void segac_map(address_map &map);
-	void segac2_map(address_map &map);
+	void segac_map(address_map &map) ATTR_COLD;
+	void segac2_map(address_map &map) ATTR_COLD;
 };
 
 

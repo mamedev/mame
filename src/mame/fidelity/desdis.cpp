@@ -4,33 +4,33 @@
 /*******************************************************************************
 
 Fidelity Designer Display series, 6502 and 68000
-(6502-based displayless Designer is in excel.cpp)
+(6502-based displayless Designer is the same as Par Excellence, see excel.cpp)
 
-********************************************************************************
+================================================================================
 
 Designer 2100 Display (model 6106) overview:
-- 8KB RAM(MS6264L-10), 2*32KB ROM(27C256)
+- PCB label: 510.1130A01
 - WDC W65C02P-6 CPU, 6MHz XTAL
+- 8KB RAM(MS6264L-10), 2*32KB ROM(27C256)
 - 4-digit LCD panel
-- PCB label 510.1130A01
 
 Designer 2000 Display (model 6105): same hardware, no bookrom, 3MHz
 
-********************************************************************************
+================================================================================
 
 Designer Mach III Master 2265 (model 6113) overview:
-- 80KB RAM(2*KM6264AL-10, 2*KM62256AP-10), 64KB ROM(2*WSI 27C256L-12)
+- PCB label: 510.1134A02
 - MC68HC000P12F CPU, 16MHz XTAL
+- 80KB RAM(2*KM6264AL-10, 2*KM62256AP-10), 64KB ROM(2*WSI 27C256L-12)
 - IRQ(IPL2) from 555 timer, 1.67ms low, 6us high
-- PCB label 510.1134A02
 
 ROM address/data lines are scrambled, presumed for easy placement on PCB and not
 for obfuscation. I/O is nearly the same as Designer Display on 6502 hardware.
 
 Designer Mach IV Master 2325 (model 6129) overview:
-- 32KB(4*P5164-70) + 512KB(TC518512PL-80) RAM, 64KB ROM(TMS 27C512-120JL)
+- PCB label: 510.1149A01
 - MC68EC020RP25 CPU, 20MHz XTAL
-- PCB label 510.1149A01
+- 32KB(4*P5164-70) + 512KB(TC518512PL-80) RAM, 64KB ROM(TMS 27C512-120JL)
 - It has a green "Shift" led instead of red, and ROM is not scrambled.
 
 *******************************************************************************/
@@ -78,7 +78,7 @@ public:
 	void init_fdes2100d();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
@@ -92,7 +92,7 @@ protected:
 	u32 m_lcd_data = 0;
 
 	// address maps
-	void fdes2100d_map(address_map &map);
+	void fdes2100d_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_lcd();
@@ -131,8 +131,8 @@ public:
 
 private:
 	// address maps
-	void fdes2265_map(address_map &map);
-	void fdes2325_map(address_map &map);
+	void fdes2265_map(address_map &map) ATTR_COLD;
+	void fdes2325_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers, slightly different (control_w is d0 instead of d7)
 	virtual void control_w(offs_t offset, u8 data) override { desdis_state::control_w(offset, data << 7); }

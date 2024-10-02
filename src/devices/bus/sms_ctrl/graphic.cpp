@@ -73,7 +73,7 @@ public:
 protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(sms_graphic); }
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_ioport m_buttons;

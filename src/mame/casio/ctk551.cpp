@@ -230,7 +230,7 @@ public:
 	void pwm_row_w(int state) { m_pwm->write_my(state); }
 	void pwm_col_w(int state) { m_pwm->write_mx(state ^ 0xff);  }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(lcd_r)   { return m_lcdc->db_r() >> 4; }
+	ioport_value lcd_r()   { return m_lcdc->db_r() >> 4; }
 	void lcd_w(int state)
 	{
 		m_lcd_data = state << 4;
@@ -241,7 +241,7 @@ public:
 	// (and even those don't always have them wired the same way -
 	//  in some cases they're not even all connected to the same port)
 	template <unsigned Bit>
-	DECLARE_CUSTOM_INPUT_MEMBER(lcd_bit_r) { return BIT(m_lcdc->db_r(), Bit); }
+	ioport_value lcd_bit_r() { return BIT(m_lcdc->db_r(), Bit); }
 	template <unsigned Bit>
 	void lcd_bit_w(int state)
 	{
@@ -252,13 +252,13 @@ public:
 	// handle the 4-position mode switch
 	// some models treat this as 3 modes plus power off,
 	// while others have 4 modes and move power to a separate button instead
-	DECLARE_CUSTOM_INPUT_MEMBER(switch_r)  { return m_switch; }
+	ioport_value switch_r()  { return m_switch; }
 	DECLARE_INPUT_CHANGED_MEMBER(switch_w);
 	DECLARE_INPUT_CHANGED_MEMBER(power_w);
 	DECLARE_INPUT_CHANGED_MEMBER(switch_power_w);
 
 	void inputs_w(int state) { m_input_sel = state; }
-	DECLARE_CUSTOM_INPUT_MEMBER(inputs_r);
+	ioport_value inputs_r();
 
 	void dsp_data_w(uint8_t data);
 	void dsp_cmd_w(uint8_t cmd);
@@ -268,10 +268,10 @@ public:
 	void apo_w(int state);
 
 private:
-	void ap10_map(address_map& map);
-	void ctk530_map(address_map& map);
-	void gz70sp_map(address_map& map);
-	void ctk601_map(address_map& map);
+	void ap10_map(address_map &map) ATTR_COLD;
+	void ctk530_map(address_map &map) ATTR_COLD;
+	void gz70sp_map(address_map &map) ATTR_COLD;
+	void ctk601_map(address_map &map) ATTR_COLD;
 
 	virtual void driver_start() override;
 
@@ -331,7 +331,7 @@ INPUT_CHANGED_MEMBER(ctk551_state::switch_power_w)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(ctk551_state::inputs_r)
+ioport_value ctk551_state::inputs_r()
 {
 	uint8_t result = 0xff;
 	for (unsigned i = 0U; i < m_inputs.size(); i++)

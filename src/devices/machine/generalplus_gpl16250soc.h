@@ -70,13 +70,13 @@ public:
 protected:
 	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void device_post_load() override;
 
-	void gcm394_internal_map(address_map &map);
-	void base_internal_map(address_map &map);
+	void gcm394_internal_map(address_map &map) ATTR_COLD;
+	void base_internal_map(address_map &map) ATTR_COLD;
 
 	required_device<screen_device> m_screen;
 	required_device<gcm394_video_device> m_spg_video;
@@ -375,10 +375,10 @@ public:
 	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void gpac800_internal_map(address_map &map);
+	void gpac800_internal_map(address_map &map) ATTR_COLD;
 
-	//virtual void device_start() override;
-	virtual void device_reset() override;
+	//virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void recalculate_calculate_effective_nand_address();
@@ -430,10 +430,10 @@ public:
 	generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void gpspispi_internal_map(address_map &map);
+	void gpspispi_internal_map(address_map &map) ATTR_COLD;
 
-	//virtual void device_start() override;
-	//virtual void device_reset() override;
+	//virtual void device_start() override ATTR_COLD;
+	//virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t spi_unk_7943_r();
@@ -455,10 +455,10 @@ public:
 	generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void gpspi_direct_internal_map(address_map &map);
+	void gpspi_direct_internal_map(address_map &map) ATTR_COLD;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t ramread_r(offs_t offset);

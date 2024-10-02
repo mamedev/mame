@@ -54,7 +54,6 @@ ToDo:
 *********************************************************************************************************************/
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 
 namespace {
 
@@ -67,7 +66,7 @@ public:
 	void sam(machine_config &config);
 
 private:
-	void sam_map(address_map &map);
+	void sam_map(address_map &map) ATTR_COLD;
 };
 
 void sam_state::sam_map(address_map &map)

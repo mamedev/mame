@@ -26,9 +26,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -39,8 +39,8 @@ private:
 	u16 acrtc_r(offs_t offset);
 	void acrtc_w(offs_t offset, u16 data);
 
-	void mem_map(address_map &map);
-	void videoram_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void videoram_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_qgcpu;
 	required_device<idt7201_device> m_fifo;

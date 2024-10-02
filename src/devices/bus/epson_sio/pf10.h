@@ -32,12 +32,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_epson_sio_interface overrides
 	virtual void tx_w(int level) override;
@@ -64,7 +64,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER( serial_clk_tick );
 
-	void cpu_mem(address_map &map);
+	void cpu_mem(address_map &map) ATTR_COLD;
 
 	required_device<hd6303x_cpu_device> m_cpu;
 	required_device<upd765a_device> m_fdc;

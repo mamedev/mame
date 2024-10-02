@@ -330,13 +330,13 @@ public:
 	void init_mace();
 	void init_blitz99();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(blitz_49way_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
+	ioport_value blitz_49way_r();
+	ioport_value i40_r();
+	ioport_value gearshift_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<nvram_device> m_nvram;
@@ -438,13 +438,13 @@ private:
 	void update_widget_irq();
 	void init_common(int config);
 
-	void seattle_cs0_map(address_map &map);
-	void seattle_cs1_map(address_map &map);
-	void seattle_cs2_map(address_map &map);
-	void seattle_cs3_map(address_map &map);
-	void widget_cs3_map(address_map &map);
-	void carnevil_cs3_map(address_map &map);
-	void flagstaff_cs3_map(address_map &map);
+	void seattle_cs0_map(address_map &map) ATTR_COLD;
+	void seattle_cs1_map(address_map &map) ATTR_COLD;
+	void seattle_cs2_map(address_map &map) ATTR_COLD;
+	void seattle_cs3_map(address_map &map) ATTR_COLD;
+	void widget_cs3_map(address_map &map) ATTR_COLD;
+	void carnevil_cs3_map(address_map &map) ATTR_COLD;
+	void flagstaff_cs3_map(address_map &map) ATTR_COLD;
 
 	static void hdd_config(device_t *device);
 };
@@ -770,7 +770,7 @@ const uint8_t seattle_state::translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x
 /*************************************
 * 2 player 49 Way Joystick on Blitz
 *************************************/
-CUSTOM_INPUT_MEMBER(seattle_state::blitz_49way_r)
+ioport_value seattle_state::blitz_49way_r()
 {
 	return  (translate49[m_io_49way_y[1]->read() >> 4] << 12) | (translate49[m_io_49way_x[1]->read() >> 4] << 8) |
 		(translate49[m_io_49way_y[0]->read() >> 4] << 4) | (translate49[m_io_49way_x[0]->read() >> 4] << 0);
@@ -786,7 +786,7 @@ void seattle_state::i40_w(uint32_t data)
 	m_i40_data = data;
 }
 
-CUSTOM_INPUT_MEMBER(seattle_state::i40_r)
+ioport_value seattle_state::i40_r()
 {
 	if (m_io_dips->read() & 0x100) {
 		// 8 way joysticks
@@ -844,7 +844,7 @@ CUSTOM_INPUT_MEMBER(seattle_state::i40_r)
 *  Gearshift (calspeed)
 *
 *************************************/
-DECLARE_CUSTOM_INPUT_MEMBER(seattle_state::gearshift_r)
+ioport_value seattle_state::gearshift_r()
 {
 	// Check for gear change and save gear selection
 	uint32_t gear = m_io_gearshift->read();

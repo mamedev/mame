@@ -46,6 +46,7 @@
         * Convert the audio and video hardware to devices.
 
 ***********************************************************************/
+
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
@@ -93,21 +94,21 @@ protected:
 	static inline constexpr u16 VTOTAL = 264, VBSTART = 240, VBEND = 16;
 
 	// initialization
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	template <typename T>
 	void bombjack_base(machine_config &config, T &&psg_type);
 
 	// main CPU
-	void program_map(address_map &map);
-	void bombjack_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void bombjack_map(address_map &map) ATTR_COLD;
 
 	// audio CPU
 	u8 soundlatch_r();
-	void bombjack_audio_map(address_map &map);
-	void bombjack_audio_portmap(address_map &map);
+	void bombjack_audio_map(address_map &map) ATTR_COLD;
+	void bombjack_audio_portmap(address_map &map) ATTR_COLD;
 
 	// video hardware
 	void videoram_w(offs_t offset, u8 data);
@@ -179,11 +180,11 @@ protected:
 	void calorie_common(machine_config &config);
 
 	// main CPU
-	void calorie_map(address_map &map);
-	void calorie_opcodes_map(address_map &map);
+	void calorie_map(address_map &map) ATTR_COLD;
+	void calorie_opcodes_map(address_map &map) ATTR_COLD;
 
 	// audio CPU
-	void calorie_audio_map(address_map &map);
+	void calorie_audio_map(address_map &map) ATTR_COLD;
 
 	// video hardware
 	void set_bg_tile_info(u8 const attr, u16 &code, u8 &color, bool &flipx, bool &flipy) override;
@@ -201,6 +202,7 @@ protected:
  *  Audio hardware
  *
  *************************************/
+
 u8 bombjack_state::soundlatch_r()
 {
 	// An extra flip-flop is used to clear the LS273 after
@@ -220,6 +222,7 @@ u8 bombjack_state::soundlatch_r()
  *  Video hardware
  *
  *************************************/
+
 void bombjack_state::video_start()
 {
 	save_item(NAME(m_bg_image));
@@ -250,13 +253,13 @@ void bombjack_state::colorram_w(offs_t offset, u8 data)
 
 void bombjack_state::spritectrl_w(offs_t offset, u8 data)
 {
-	data = BIT(data, 0, 4); // four bits, addresses 16 sprites
+	data &= 0x0f; // four bits, addresses 16 sprites
 	m_spritectrl[offset] = data;
 }
 
 void bombjack_state::background_w(u8 data)
 {
-	data = BIT(data, 0, 5); // four address bits + a "KILL" bit
+	data &= 0x1f; // four address bits + a "KILL" bit
 	if (m_bg_image != data)
 	{
 		m_bg_image = data;
@@ -266,8 +269,7 @@ void bombjack_state::background_w(u8 data)
 
 void bombjack_state::flip_w(u8 data)
 {
-	data = BIT(data, 0);
-	m_flip = data;
+	m_flip = BIT(data, 0);
 
 	m_bg_tilemap->set_flip(m_flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	m_fg_tilemap->set_flip(m_flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -289,13 +291,12 @@ void bombjack_state::vblank_nmi(int state)
 
 void bombjack_state::watchdog_w(u8 data)
 {
-	data = BIT(data, 0);
-	m_watchdog->watchdog_enable(data);
+	m_watchdog->watchdog_enable(BIT(data, 0));
 }
 
 void bombjack_state::set_bg_tile_info(u8 const attr, u16 &code, u8 &color, bool &flipx, bool &flipy)
 {
-	color = BIT(attr, 0, 4);
+	color = attr & 0x0f;
 	flipy = BIT(attr, 7);
 }
 
@@ -309,7 +310,7 @@ void calorie_state::set_bg_tile_info(u8 const attr, u16 &code, u8 &color, bool &
 
 TILE_GET_INFO_MEMBER(bombjack_state::get_bg_tile_info)
 {
-	tile_index |= BIT(m_bg_image, 0, 4) << 9;
+	tile_index |= (m_bg_image & 0x0f) << 9;
 
 	u8 const attr = m_bgmaps[tile_index + 0x100];
 	u16 code = m_bgmaps[tile_index];
@@ -318,7 +319,7 @@ TILE_GET_INFO_MEMBER(bombjack_state::get_bg_tile_info)
 
 	set_bg_tile_info(attr, code, color, flipx, flipy);
 	tileinfo.set(1, code, color, (flipx ? TILE_FLIPX : 0) |
-								 (flipy ? TILE_FLIPY : 0));
+			(flipy ? TILE_FLIPY : 0));
 }
 
 void bombjack_state::set_fg_tile_info(u8 const attr, u16 &code, u8 &color, bool &flipx, bool &flipy)
@@ -345,14 +346,13 @@ TILE_GET_INFO_MEMBER(bombjack_state::get_fg_tile_info)
 
 	set_fg_tile_info(attr, code, color, flipx, flipy);
 	tileinfo.set(0, code, color, (flipx ? TILE_FLIPX : 0) |
-								 (flipy ? TILE_FLIPY : 0));
+			(flipy ? TILE_FLIPY : 0));
 }
 
 bool bombjack_state::large_sprite(int const index, u8 const attr)
 {
-	bool const reverse = m_spritectrl[0] > m_spritectrl[1];
-	return (index >  m_spritectrl[reverse ? 1 : 0]) &&
-		   (index <= m_spritectrl[reverse ? 0 : 1]);
+	u8 const rev = (m_spritectrl[0] > m_spritectrl[1]) ? 1 : 0;
+	return (index > m_spritectrl[rev]) && (index <= m_spritectrl[rev ^ 1]);
 }
 
 bool calorie_state::large_sprite(int const index, u8 const attr)
@@ -368,7 +368,7 @@ void bombjack_state::draw_sprites(bitmap_ind16 &bitmap, rectangle const &cliprec
 		int const offs = sprite * 4;
 		int code = m_spriteram[offs];
 		int const attr = m_spriteram[offs + 1];
-		int const color = BIT(attr, 0, 4);
+		int const color = attr & 0x0f;
 		// BIT(attr, 4) - internal tag for bonus objects
 		// BIT(attr, 5) - internal tag for large objects
 		bool flipx = BIT(attr, 6);
@@ -382,7 +382,7 @@ void bombjack_state::draw_sprites(bitmap_ind16 &bitmap, rectangle const &cliprec
 			if (BIT(sprite, 0))
 				continue;
 			else
-				code |= (1 << 6);
+				code |= 0x40;
 		}
 
 		int const vpos = large ? VBSTART - 16 : VBSTART;
@@ -396,7 +396,7 @@ void bombjack_state::draw_sprites(bitmap_ind16 &bitmap, rectangle const &cliprec
 		}
 
 		m_gfxdecode->gfx(large ? 3 : 2)->transpen(bitmap, cliprect,
-			code, color, flipx, flipy, xpos, ypos, 0);
+				code, color, flipx, flipy, xpos, ypos, 0);
 	}
 }
 
@@ -418,6 +418,7 @@ u32 bombjack_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, r
  *  Address maps
  *
  *************************************/
+
 void bombjack_state::program_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share(m_mainram);
@@ -498,6 +499,7 @@ void bombjack_state::bombjack_audio_portmap(address_map &map)
  *  (Bomb Jack)
  *
  *************************************/
+
 static INPUT_PORTS_START( bombjack )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -578,6 +580,7 @@ INPUT_PORTS_END
  *  (Calorie Kun)
  *
  *************************************/
+
 static INPUT_PORTS_START( calorie )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_4WAY
@@ -660,6 +663,7 @@ INPUT_PORTS_END
  *  Graphics definitions
  *
  *************************************/
+
 static gfx_layout const layout_8x8 =
 {
 	8, 8,
@@ -706,6 +710,7 @@ GFXDECODE_END
  *  Machine driver
  *
  *************************************/
+
 void bombjack_state::machine_start()
 {
 	save_item(NAME(m_nmi_on));
@@ -810,6 +815,7 @@ void calorie_state::init_calorieb()
  *  (Bomb Jack)
  *
  *************************************/
+
 ROM_START( bombjack )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "09_j01b.bin", 0x0000, 0x2000, CRC(c668dc30) SHA1(51dd6a2688b42e9f28f0882bd76f75be7ec3222a) )
@@ -944,6 +950,7 @@ ROM_END
  *  (Calorie Kun)
  *
  *************************************/
+
 /*
 Calorie Kun
 Sega, 1986
@@ -1079,5 +1086,5 @@ GAME( 1984, bombjack2,  bombjack, bombjack, bombjack, bombjack_state, empty_init
 GAME( 1984, bombjackt,  bombjack, bombjack, bombjack, bombjack_state, empty_init,    ROT90, "Tehkan (Tecfri license)", "Bomb Jack (Tecfri, Spain)",           MACHINE_SUPPORTS_SAVE ) // official license
 GAME( 1985, bombjackbl, bombjack, bombjack, bombjack, bombjack_state, empty_init,    ROT90, "bootleg",                 "Bomb Jack (bootleg)",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, calorie,    0,        calorie,  calorie,  calorie_state,  empty_init,    ROT0, "Sega",                     "Calorie Kun vs Moguranian",           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, calorieb,   calorie,  calorieb, calorie,  calorie_state,  init_calorieb, ROT0, "bootleg",                  "Calorie Kun vs Moguranian (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, calorie,    0,        calorie,  calorie,  calorie_state,  empty_init,    ROT0,  "Sega",                    "Calorie Kun vs Moguranian",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, calorieb,   calorie,  calorieb, calorie,  calorie_state,  init_calorieb, ROT0,  "bootleg",                 "Calorie Kun vs Moguranian (bootleg)", MACHINE_SUPPORTS_SAVE )

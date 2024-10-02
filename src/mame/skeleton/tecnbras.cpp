@@ -41,16 +41,16 @@ public:
 	void tecnbras(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void set_x_position_w(offs_t offset, uint8_t data);
 	void print_column_w(offs_t offset, uint8_t data);
 
 	//void tecnbras_io_w(uint8_t data);
 	//uint8_t tecnbras_io_r();
-	void i80c31_io(address_map &map);
-	void i80c31_prg(address_map &map);
+	void i80c31_io(address_map &map) ATTR_COLD;
+	void i80c31_prg(address_map &map) ATTR_COLD;
 
 	required_device<i80c31_device> m_maincpu;
 	output_finder<14 * 7> m_dmds;

@@ -62,8 +62,8 @@ public:
 	void wy50(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 pvtc_videoram_r(offs_t offset);
@@ -81,9 +81,9 @@ private:
 	void p1_w(u8 data);
 	u8 p3_r();
 
-	void prg_map(address_map &map);
-	void io_map(address_map &map);
-	void row_buffer_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void row_buffer_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<wy50_keyboard_device> m_keyboard;

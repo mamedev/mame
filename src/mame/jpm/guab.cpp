@@ -82,7 +82,7 @@ public:
 	void guab(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	EF9369_COLOR_UPDATE(ef9369_color_update);
@@ -104,7 +104,7 @@ private:
 
 	static void floppy_formats(format_registration &fr);
 
-	void guab_map(address_map &map);
+	void guab_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34061_device> m_tms34061;

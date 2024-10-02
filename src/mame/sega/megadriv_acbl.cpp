@@ -144,6 +144,12 @@ Sunset Riders info
 
  - title raster effect is broken (bug in Mega Drive code, happens with normal set too)
 
+
+    TODO (barek2mb):
+    - Unknown inputs to Port B of the emulated PIC
+    - MCU clock frequency
+    - There is only a 50 MHz XTAL on the PCB, are the other clocks correct?
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -161,6 +167,14 @@ void md_boot_state::md_bootleg_map(address_map &map)
 	map(0x200000, 0x2023ff).ram(); // Tested
 }
 
+void md_boot_mcu_state::md_boot_mcu_map(address_map &map)
+{
+	md_bootleg_map(map);
+
+	map(0x220000, 0x220001).w(FUNC(md_boot_mcu_state::mcu_w));
+	map(0x330000, 0x330001).r(FUNC(md_boot_mcu_state::mcu_r));
+}
+
 void md_boot_6button_state::ssf2mdb_68k_map(address_map &map)
 {
 	megadriv_68k_map(map);
@@ -168,24 +182,6 @@ void md_boot_6button_state::ssf2mdb_68k_map(address_map &map)
 	map(0x400000, 0x5fffff).rom().region("maincpu", 0x400000).unmapw();
 	map(0x770070, 0x770075).r(FUNC(md_boot_6button_state::dsw_r));
 	map(0xa130f0, 0xa130ff).nopw(); // custom banking is disabled (!)
-}
-
-
-void md_boot_state::megadrvb(machine_config &config)
-{
-	md_ntsc(config);
-
-	ctrl1_3button(config);
-	ctrl2_3button(config);
-
-	m_ioports[2]->set_in_handler(NAME([this] () { return m_io_exp.read_safe(0x3f); }));
-}
-
-void md_boot_state::md_bootleg(machine_config &config)
-{
-	megadrvb(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::md_bootleg_map);
 }
 
 
@@ -250,18 +246,6 @@ uint16_t md_boot_state::jparkmb_r()
 	return 0x0000;
 }
 
-uint16_t md_boot_state::barek2mb_r()
-{
-	if (m_maincpu->pc() == 0xfa40)
-		return 0x0400; // TODO: what's this? Needed or the game doesn't boot
-
-	if (m_maincpu->pc() == 0xfa88)
-		return 0x0ff0; // TODO: fix this, should probably read coin inputs, as is gives 9 credits at start up
-
-	logerror("barek2mb_r : %06x\n", m_maincpu->pc());
-	return 0x0000;
-}
-
 uint16_t md_boot_state::barek3mba_r() // missing PIC dump, simulated for now
 {
 	if (m_maincpu->pc() == 0x4dbc6)
@@ -312,6 +296,83 @@ uint16_t md_boot_state::dsw_r(offs_t offset)
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	return ioport(dswname[offset])->read();
+}
+
+
+/*************************************
+ *
+ *  PIC MCU Emulation
+ *
+ *************************************/
+
+uint16_t md_boot_mcu_state::mcu_r()
+{
+	return (m_mcu_out_latch_msb << 8) | m_mcu_out_latch_lsb;
+}
+
+void md_boot_mcu_state::mcu_w(uint16_t data)
+{
+	m_mcu_in_latch_lsb = data >> 0;
+	m_mcu_in_latch_msb = data >> 8;
+}
+
+void md_boot_mcu_state::mcu_porta_w(uint8_t data)
+{
+	// 3---  select dsw (0) or latches (1)
+	// -2--  latch enable
+	// --1-  select input (0) or output (1) latches
+	// ---0  select lsb or msb latches
+
+	if (BIT(data, 2) == 0)
+	{
+		if (BIT(data, 1) == 1)
+		{
+			if (BIT(data, 0) == 0)
+				m_mcu_out_latch_lsb = m_mcu_portc;
+			else
+				m_mcu_out_latch_msb = m_mcu_portc;
+		}
+	}
+
+	m_mcu_porta = data;
+}
+
+void md_boot_mcu_state::mcu_portb_w(uint8_t data)
+{
+	// 7-------  unused
+	// -6------  cleared on reset
+	// --5-----  toggled on input to b3
+	// ---4----  toggled on input to b2
+	// ----3---  unknown (input)
+	// -----2--  unknown (input)
+	// ------1-  unused (input)
+	// -------0  coin (input)
+}
+
+uint8_t md_boot_mcu_state::mcu_portc_r()
+{
+	// read dip switches
+	if (BIT(m_mcu_porta, 3) == 0)
+		return m_dsw->read();
+
+	// read from latch
+	if (BIT(m_mcu_porta, 1) == 0)
+	{
+		if (BIT(m_mcu_porta, 0) == 0)
+			return m_mcu_in_latch_lsb;
+		else
+			return m_mcu_in_latch_msb;
+	}
+
+	// should never go here
+	logerror("mcu: read from output latch!\n");
+
+	return 0xff;
+}
+
+void md_boot_mcu_state::mcu_portc_w(uint8_t data)
+{
+	m_mcu_portc = data;
 }
 
 
@@ -623,7 +684,7 @@ INPUT_PORTS_START( srmdb )
 	PORT_DIPSETTING(    0x00, "6" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( barekch ) // TODO: identify dips. PCB has 3 x 8-dip banks, but probably most unused
+INPUT_PORTS_START( barekch ) // TODO: identify DIP switches. PCB has 3 x 8-switch banks, but probably most unused
 	PORT_INCLUDE( md_common )
 
 	PORT_MODIFY("PAD1")
@@ -743,8 +804,43 @@ INPUT_PORTS_START( barek2ch )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( barek2 )
-	PORT_INCLUDE( aladmdb )
-	// TODO!
+	PORT_INCLUDE( md_common )
+
+	PORT_START("DSW")
+	PORT_DIPNAME(0x0f, 0x0f, DEF_STR( Coinage ))
+	PORT_DIPSETTING(   0x05, DEF_STR( 6C_1C ))
+	PORT_DIPSETTING(   0x06, DEF_STR( 5C_1C ))
+	PORT_DIPSETTING(   0x07, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(   0x08, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(   0x01, DEF_STR( 8C_3C ))
+	PORT_DIPSETTING(   0x09, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(   0x02, DEF_STR( 5C_3C ))
+	PORT_DIPSETTING(   0x03, DEF_STR( 3C_2C ))
+	PORT_DIPSETTING(   0x0f, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(   0x00, DEF_STR( 1C_1C )) // duplicate
+	PORT_DIPSETTING(   0x04, DEF_STR( 2C_3C ))
+	PORT_DIPSETTING(   0x0e, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(   0x0d, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(   0x0c, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(   0x0b, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(   0x0a, DEF_STR( 1C_6C ))
+	PORT_DIPNAME(0x30, 0x30, DEF_STR( Lives ))
+	PORT_DIPSETTING(   0x30, "1" )
+	PORT_DIPSETTING(   0x20, "2" )
+	PORT_DIPSETTING(   0x10, "3" )
+	PORT_DIPSETTING(   0x00, "4" )
+	PORT_DIPNAME(0xc0, 0xc0, DEF_STR( Difficulty ))
+	PORT_DIPSETTING(    0xc0, DEF_STR( Easy ))
+	PORT_DIPSETTING(    0x80, DEF_STR( Medium ))
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ))
+
+	PORT_START("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( barek3 )
@@ -847,6 +943,37 @@ INPUT_PORTS_END
  *
  *************************************/
 
+void md_boot_state::megadrvb(machine_config &config)
+{
+	md_ntsc(config);
+
+	ctrl1_3button(config);
+	ctrl2_3button(config);
+
+	m_ioports[2]->set_in_handler(NAME([this] () { return m_io_exp.read_safe(0x3f); }));
+}
+
+void md_boot_state::md_bootleg(machine_config &config)
+{
+	megadrvb(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::md_bootleg_map);
+}
+
+void md_boot_mcu_state::md_boot_mcu(machine_config &config)
+{
+	megadrvb(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_mcu_state::md_boot_mcu_map);
+
+	PIC16C57(config, m_mcu, 4'000'000); // unknown clock
+	m_mcu->write_a().set(FUNC(md_boot_mcu_state::mcu_porta_w));
+	m_mcu->read_b().set_ioport("IN0");
+	m_mcu->write_b().set(FUNC(md_boot_mcu_state::mcu_portb_w));
+	m_mcu->read_c().set(FUNC(md_boot_mcu_state::mcu_portc_r));
+	m_mcu->write_c().set(FUNC(md_boot_mcu_state::mcu_portc_w));
+}
+
 void md_boot_6button_state::machine_start()
 {
 	md_boot_state::machine_start();
@@ -867,7 +994,6 @@ void md_boot_6button_state::ssf2mdb(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_6button_state::ssf2mdb_68k_map);
 }
-
 
 
 /*************************************
@@ -967,15 +1093,6 @@ void md_boot_state::init_srmdb()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::dsw_r)));
 
 	init_megadriv();
-}
-
-
-void md_boot_state::init_barek2()
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x220000, 0x220001, write16smo_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x330000, 0x330001, read16smo_delegate(*this, FUNC(md_boot_state::barek2mb_r)));
-
-	init_megadrij();
 }
 
 void md_boot_6button_state::init_barekch()
@@ -1181,8 +1298,7 @@ ROM_START( barek2mb )
 	ROM_LOAD16_BYTE( "m3.bin", 0x100001, 0x080000,  CRC(6ec5af5d) SHA1(9088a2d4cff5e7eb439ebaa91ad3bfff11366127) )
 	ROM_LOAD16_BYTE( "m4.bin", 0x100000, 0x080000,  CRC(d8c61e0d) SHA1(3d06e656f6621bb0741211f80c1ecff1669475ee) )
 
-	// Not hooked up yet
-	ROM_REGION( 0x1000, "pic", ROMREGION_ERASE00 )
+	ROM_REGION( 0x1000, "mcu", 0 )
 	ROM_LOAD( "bk_pic16c57rcp.bin", 0x0000, 0x1000, CRC(434ad1b7) SHA1(9241554793c7375cf58239e762481a4b80a51df6) ) // Unprotected
 ROM_END
 
@@ -1270,7 +1386,7 @@ GAME( 1994, ssf2mdb,   0,        ssf2mdb,      ssf2mdb,   md_boot_6button_state,
 GAME( 1993, srmdb,     0,        megadrvb,     srmdb,     md_boot_state,         init_srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Mega Drive version)",                                          0 )
 GAME( 1993, sonic2mb,  0,        md_bootleg,   sonic2mb,  md_boot_state,         init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Mega Drive version)",                                   0 ) // Flying wires going through the empty PIC space aren't completely understood
 GAME( 1993, sonic3mb,  0,        md_bootleg,   sonic3mb,  md_sonic3bl_state,     init_sonic3mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 3 (bootleg of Mega Drive version)",                                   MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
-GAME( 1994, barek2mb,  0,        md_bootleg,   barek2,    md_boot_state,         init_barek2,   ROT0, "bootleg / Sega",   "Bare Knuckle II (bootleg of Mega Drive version)",                                        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC hook up
+GAME( 1994, barek2mb,  0,        md_boot_mcu,  barek2,    md_boot_mcu_state,     init_megadrij, ROT0, "bootleg / Sega",   "Bare Knuckle II (bootleg of Mega Drive version)",                                        0 ) // PCB labeled "BK-059"
 GAME( 1994, barek3mb,  0,        megadrvb,     barek3,    md_boot_state,         init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Mega Drive version)",                                       0 )
 GAME( 1994, barek3mba, barek3mb, megadrvb,     barek3,    md_boot_state,         init_barek3a,  ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Mega Drive version, protected)",                            MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
 GAME( 1994, bk3ssrmb,  0,        megadrvb_6b,  bk3ssrmb,  md_boot_6button_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (bootleg of Mega Drive versions)",                      MACHINE_NOT_WORKING ) // Currently boots as Bare Knuckle III, mechanism to switch game not found yet

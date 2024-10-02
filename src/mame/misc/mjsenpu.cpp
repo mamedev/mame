@@ -43,10 +43,12 @@
 *********************************************************************/
 
 #include "emu.h"
+
 #include "cpu/e132xs/e132xs.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -72,6 +74,11 @@ public:
 
 	void init_mjsenpu();
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	/* devices */
 	required_device<e132xt_device> m_maincpu;
@@ -80,9 +87,9 @@ private:
 
 	required_shared_ptr<uint32_t> m_mainram;
 //  required_shared_ptr<uint32_t> m_vram;
-	uint8_t m_pal[0x200];
-	uint32_t m_vram0[0x20000 / 4];
-	uint32_t m_vram1[0x20000 / 4];
+	uint8_t m_pal[0x200] = { };
+	uint32_t m_vram0[0x20000 / 4] = { };
+	uint32_t m_vram1[0x20000 / 4] = { };
 	uint8_t m_control = 0;
 	uint8_t m_mux = 0;
 
@@ -102,14 +109,11 @@ private:
 	uint32_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_mjsenpu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<palette_device> m_palette;
-	void mjsenpu_32bit_map(address_map &map);
-	void mjsenpu_io(address_map &map);
+	void mjsenpu_32bit_map(address_map &map) ATTR_COLD;
+	void mjsenpu_io(address_map &map) ATTR_COLD;
 };
 
 
@@ -163,15 +167,15 @@ void mjsenpu_state::control_w(uint8_t data)
 	// bit 0x20 not used?
 
 	// bit 0x10 is the M6295 bank, samples <26 are the same in both banks and so bank switch isn't written for them, not even in sound test.
-	m_oki->set_rom_bank((data&0x10)>>4);
+	m_oki->set_rom_bank(BIT(data, 4));
 
 	// bits 0x08 is used in the alt payout / hopper mode (see dipswitches)
 
 	// 0x04 seem to be hopper/ticket related? different ones get used depending on the dips
-	m_hopper->motor_w(data & 0x04);
+	m_hopper->motor_w(BIT(~data, 2));
 
 	// bit 0x02 could be coin counter?
-	machine().bookkeeping().coin_counter_w(0, data & 0x02 );
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
 
 	// bit 0x01 alternates frequently, using as video buffer, but that's a complete guess
 	m_control = data;
@@ -471,7 +475,7 @@ void mjsenpu_state::mjsenpu(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// more likely coins out?
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

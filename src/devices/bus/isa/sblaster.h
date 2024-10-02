@@ -108,8 +108,8 @@ protected:
 	sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	uint8_t dack_r(int line);
 	void dack_w(int line, uint8_t data);
@@ -154,12 +154,12 @@ class sb8_device : public sb_device,
 public:
 	uint8_t ym3812_16_r(offs_t offset);
 	void ym3812_16_w(offs_t offset, uint8_t data);
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 protected:
 	// construction/destruction
 	sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void drq_w(int state) override;
 	virtual void irq_w(int state, int source) override;
 	virtual uint8_t dack_r(int line) override { return sb_device::dack_r(line); }
@@ -180,10 +180,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	// internal state
@@ -199,10 +199,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class sb16_device : public sb_device,
@@ -213,11 +213,11 @@ public:
 	void mpu401_w(offs_t offset, uint8_t data);
 	uint8_t mixer_r(offs_t offset);
 	void mixer_w(offs_t offset, uint8_t data);
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 protected:
 	// construction/destruction
 	sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual uint16_t dack16_r(int line) override;
 	virtual uint8_t dack_r(int line) override { return sb_device::dack_r(line); }
 	virtual void dack_w(int line, uint8_t data) override { sb_device::dack_w(line, data); }
@@ -240,10 +240,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 };
 

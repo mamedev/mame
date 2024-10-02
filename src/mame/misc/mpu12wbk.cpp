@@ -469,7 +469,7 @@ public:
 	void init_mpu12wbk();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	virtual void machine_start() override { m_lamps.resolve(); }
 
 private:
@@ -489,7 +489,7 @@ private:
 	void crtc_vs(int state);
 
 	uint32_t screen_update_mpu12wbk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void mpu12wbk_map(address_map &map);
+	void mpu12wbk_map(address_map &map) ATTR_COLD;
 	uint32_t m_frames = 0;
 };
 
@@ -962,7 +962,7 @@ void mpu12wbk_state::mpu12wbk(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0);
 
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

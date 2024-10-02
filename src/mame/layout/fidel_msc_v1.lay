@@ -364,8 +364,8 @@ authors:hap
 		<group ref="sb_ui"><bounds x="-12" y="3" width="10" height="80" /></group>
 
 		<!-- chessboard leds -->
-		<element ref="text_lose"><bounds x="88" y="75" width="9.4" height="2.5" /></element>
-		<element ref="text_check"><bounds x="88" y="81.75" width="9.4" height="2.5" /></element>
+		<element ref="text_lose"><bounds x="88" y="75.25" width="9.4" height="2.25" /></element>
+		<element ref="text_check"><bounds x="88" y="82" width="9.4" height="2.25" /></element>
 
 		<element name="0.8" ref="led"><bounds x="91.95" y="78.0" width="1.5" height="1.5" /></element>
 		<element name="1.8" ref="led"><bounds x="91.95" y="84.75" width="1.5" height="1.5" /></element>

@@ -513,11 +513,6 @@ void tmp68301_device::ieir_w(u8 data)
 }
 
 
-u32 tmp68301_device::execute_input_lines() const noexcept
-{
-	return 10;
-}
-
 void tmp68301_device::execute_set_input(int inputnum, int state)
 {
 	int prev_state = (m_external_interrupt_state >> inputnum) & 1;

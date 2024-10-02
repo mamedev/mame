@@ -88,9 +88,9 @@ namespace
 		coco_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 		// optional information overrides
-		virtual const tiny_rom_entry *device_rom_region() const override;
-		virtual void device_add_mconfig(machine_config &config) override;
-		virtual void device_reset() override;
+		virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+		virtual void device_reset() override ATTR_COLD;
 
 		u8 ssc_port_a_r();
 		void ssc_port_b_w(u8 data);
@@ -101,7 +101,7 @@ namespace
 
 	protected:
 		// device-level overrides
-		virtual void device_start() override;
+		virtual void device_start() override ATTR_COLD;
 		u8 ff7d_read(offs_t offset);
 		void ff7d_write(offs_t offset, u8 data);
 		virtual void set_sound_enable(bool sound_enable) override;
@@ -132,7 +132,7 @@ namespace
 
 	protected:
 		// device-level overrides
-		virtual void device_start() override;
+		virtual void device_start() override ATTR_COLD;
 
 		// sound stream update overrides
 		virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;

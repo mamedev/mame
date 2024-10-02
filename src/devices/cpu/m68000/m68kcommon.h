@@ -48,13 +48,12 @@ public:
 	};
 
 	static constexpr u8 autovector(int level) { return 0x18 + level; }
-	void autovectors_map(address_map &map);
+	void autovectors_map(address_map &map) ATTR_COLD;
 
 	void set_cpu_space(int space_id) { m_cpu_space_id = space_id; }
 	void set_interrupt_mixer(bool enable) { m_interrupt_mixer = enable; }
 	auto reset_cb() { return m_reset_cb.bind(); }
 
-	virtual u32 execute_input_lines() const noexcept override { return m_interrupt_mixer ? 8 : 3; } // number of input lines
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return m_interrupt_mixer ? inputnum == M68K_IRQ_7 : false; }
 
 	virtual bool supervisor_mode() const noexcept = 0;

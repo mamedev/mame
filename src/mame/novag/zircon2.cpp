@@ -64,7 +64,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { set_power(true); }
 
 private:
@@ -331,4 +331,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1995, zircon2, 0,      0,      zircon2, zircon2, zircon2_state, empty_init, "Novag Industries", "Zircon II", MACHINE_SUPPORTS_SAVE )
+SYST( 1995, zircon2, 0,      0,      zircon2, zircon2, zircon2_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Zircon II", MACHINE_SUPPORTS_SAVE )

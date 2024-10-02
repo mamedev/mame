@@ -18,7 +18,7 @@ public:
 	template <typename T> void set_addrbank(T &&tag) { m_bank.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
-	void map(address_map& map);
+	void map(address_map &map) ATTR_COLD;
 
 	void set_tilerambase(int tilerambase) { m_tilerambase = tilerambase; }
 
@@ -28,8 +28,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:

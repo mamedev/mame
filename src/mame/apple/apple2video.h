@@ -74,8 +74,8 @@ public:
 protected:
 	a2_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_reset() override;
-	virtual void device_start() override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual uint32_t palette_entries() const noexcept override;
 	void init_palette();
@@ -130,7 +130,7 @@ class a2_video_device_composite : public a2_video_device
 public:
 	a2_video_device_composite(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 // a2_video_device with composite settings plus Video-7 RGB card option
@@ -139,7 +139,7 @@ class a2_video_device_composite_rgb : public a2_video_device
 public:
 	a2_video_device_composite_rgb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 // device type definition

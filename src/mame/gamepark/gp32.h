@@ -4,9 +4,12 @@
 #ifndef MAME_GAMEPARK_GP32_H
 #define MAME_GAMEPARK_GP32_H
 
+#pragma once
+
+#include "machine/nvram.h"
 #include "machine/smartmed.h"
 #include "sound/dac.h"
-#include "machine/nvram.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -115,7 +118,7 @@ public:
 	void gp32(machine_config &config);
 
 private:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_shared_ptr<uint32_t> m_s3c240x_ram;
 	std::unique_ptr<uint8_t[]> m_eeprom_data;
@@ -187,15 +190,15 @@ private:
 	void s3c240x_spi_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t s3c240x_mmc_r(offs_t offset);
 	void s3c240x_mmc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_gp32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(s3c240x_lcd_timer_exp);
 	TIMER_CALLBACK_MEMBER(s3c240x_pwm_timer_exp);
 	TIMER_CALLBACK_MEMBER(s3c240x_dma_timer_exp);
 	TIMER_CALLBACK_MEMBER(s3c240x_iic_timer_exp);
 	TIMER_CALLBACK_MEMBER(s3c240x_iis_timer_exp);
-	void gp32_map(address_map &map);
+	void gp32_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<smartmedia_image_device> m_smartmedia;

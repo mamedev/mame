@@ -91,18 +91,18 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void cpubd_main(address_map &map);
-	void vidbd_main(address_map &map);
-	void vidbd_sub(address_map &map);
-	void vidbd_sub_io(address_map &map);
-	void databd_main(address_map &map);
-	void databd_main_io(address_map &map);
-	void iobd_main(address_map &map);
-	void iobd_main_io(address_map &map);
+	void cpubd_main(address_map &map) ATTR_COLD;
+	void vidbd_main(address_map &map) ATTR_COLD;
+	void vidbd_sub(address_map &map) ATTR_COLD;
+	void vidbd_sub_io(address_map &map) ATTR_COLD;
+	void databd_main(address_map &map) ATTR_COLD;
+	void databd_main_io(address_map &map) ATTR_COLD;
+	void iobd_main(address_map &map) ATTR_COLD;
+	void iobd_main_io(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	optional_device<m68010_device> m_maincpu, m_gfxcpu;
 	optional_device<mcs51_cpu_device> m_gfxsubcpu, m_datacpu, m_iocpu;

@@ -213,7 +213,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_bg1_tile);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_16);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_16);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(floppy_tc_tick);
 	TIMER_CALLBACK_MEMBER(adpcm_drq_tick);
@@ -280,9 +280,9 @@ protected:
 	uint8_t iack4();
 	uint8_t iack5();
 
-	void x68k_base_map(address_map &map);
-	void x68k_map(address_map &map);
-	void cpu_space_map(address_map &map);
+	void x68k_base_map(address_map &map) ATTR_COLD;
+	void x68k_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	inline void plot_pixel(bitmap_rgb32 &bitmap, int x, int y, uint32_t color);
 	bool get_text_pixel(int line, int pixel, uint16_t *pix);
@@ -296,8 +296,8 @@ public:
 	static rgb_t GGGGGRRRRRBBBBBI(uint32_t raw);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
 	bool m_bus_error = false;
 };
@@ -323,7 +323,7 @@ protected:
 
 	required_device<mb89352_device> m_scsictrl;
 
-	void x68kxvi_map(address_map &map);
+	void x68kxvi_map(address_map &map) ATTR_COLD;
 };
 
 class x68030_state : public x68ksupr_state
@@ -339,7 +339,7 @@ public:
 	virtual void driver_start() override;
 
 protected:
-	void x68030_map(address_map &map);
+	void x68030_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SHARP_X68K_H

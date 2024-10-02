@@ -47,7 +47,6 @@ After boot, it copies ROM to RAM, probably to circumvent waitstates on slow ROM.
 
 #include "cpu/m68000/m68030.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 
 // internal artwork
 #include "mephisto_modular_tm.lh"
@@ -61,10 +60,8 @@ public:
 	mmtm_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_rom(*this, "maincpu"),
-		m_mainram(*this, "mainram"),
-		m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG),
-		m_disable_bootrom(*this, "disable_bootrom")
+		m_boot_view(*this, "boot_view"),
+		m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG)
 	{ }
 
 	// machine configs
@@ -74,29 +71,25 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_post_load() override { install_bootrom(m_bootrom_enabled); }
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_region_ptr<u32> m_rom;
-	required_shared_ptr<u32> m_mainram;
+	memory_view m_boot_view;
 	memory_share_creator<u8> m_nvram;
-	required_device<timer_device> m_disable_bootrom;
 
-	bool m_bootrom_enabled = false;
+	emu_timer *m_boot_timer;
 
 	// address maps
-	void mmtm_2m_map(address_map &map);
-	void mmtm_8m_map(address_map &map);
+	void mmtm_2m_map(address_map &map) ATTR_COLD;
+	void mmtm_8m_map(address_map &map) ATTR_COLD;
 
 	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
 	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
 
-	void install_bootrom(bool enable);
-	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
+	TIMER_CALLBACK_MEMBER(disable_bootrom) { m_boot_view.select(1); }
 };
 
 
@@ -107,27 +100,14 @@ private:
 
 void mmtm_state::machine_start()
 {
-	save_item(NAME(m_bootrom_enabled));
+	m_boot_timer = timer_alloc(FUNC(mmtm_state::disable_bootrom), this);
 }
 
 void mmtm_state::machine_reset()
 {
 	// disable bootrom after reset
-	install_bootrom(true);
-	m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(50));
-}
-
-void mmtm_state::install_bootrom(bool enable)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	program.unmap_readwrite(0, std::max(m_rom.bytes(), m_mainram.bytes()) - 1);
-
-	if (enable)
-		program.install_rom(0, m_rom.bytes() - 1, m_rom);
-	else
-		program.install_ram(0, m_mainram.bytes() - 1, m_mainram);
-
-	m_bootrom_enabled = enable;
+	m_boot_view.select(0);
+	m_boot_timer->adjust(m_maincpu->cycles_to_attotime(50));
 }
 
 INPUT_CHANGED_MEMBER(mmtm_state::change_cpu_freq)
@@ -150,7 +130,10 @@ INPUT_CHANGED_MEMBER(mmtm_state::change_cpu_freq)
 
 void mmtm_state::mmtm_2m_map(address_map &map)
 {
-	map(0x00000000, 0x0003ffff).ram().share("mainram");
+	map(0x00000000, 0x0003ffff).view(m_boot_view);
+	m_boot_view[0](0x00000000, 0x0003ffff).rom().region("maincpu", 0);
+	m_boot_view[1](0x00000000, 0x0003ffff).ram();
+
 	map(0x80000000, 0x801fffff).ram();
 	map(0xf0000000, 0xf003ffff).rom().region("maincpu", 0);
 	map(0xfc000000, 0xfc001fff).rw(FUNC(mmtm_state::nvram_r), FUNC(mmtm_state::nvram_w)).umask32(0xffffffff);
@@ -167,9 +150,7 @@ void mmtm_state::mmtm_2m_map(address_map &map)
 void mmtm_state::mmtm_8m_map(address_map &map)
 {
 	mmtm_2m_map(map);
-	map(0x80200000, 0x803fffff).ram();
-	map(0x80400000, 0x805fffff).ram();
-	map(0x80600000, 0x807fffff).ram();
+	map(0x80000000, 0x807fffff).ram();
 }
 
 
@@ -216,8 +197,6 @@ void mmtm_state::mmtm_v(machine_config &config)
 
 	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 0x8000); // through 4060, 375Hz
 	m_maincpu->set_periodic_int(FUNC(mmtm_state::irq3_line_hold), irq_period);
-
-	TIMER(config, "disable_bootrom").configure_generic(FUNC(mmtm_state::disable_bootrom));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

@@ -95,8 +95,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(fkey_hit_cb);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -113,9 +113,9 @@ private:
 	required_device_array<fp1000_exp_slot_device, 2> m_slot;
 	required_device_array<input_merger_device, 4> m_irqs_int;
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	void main_bank_w(u8 data);
 	void irq_mask_w(u8 data);

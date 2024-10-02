@@ -57,13 +57,13 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); };
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 
-	void io_map(address_map &map);
-	void program_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -707,7 +707,7 @@ void jackhouse_state::jackhouse(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jackhouse);
 	config.set_default_layout(layout_jackhouse);
 
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	SPEAKER(config, "speaker").front_center();
 

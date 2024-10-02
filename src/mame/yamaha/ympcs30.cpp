@@ -29,7 +29,7 @@ public:
 	void pcs30(machine_config &config);
 
 private:
-	void pcs30_map(address_map &map);
+	void pcs30_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 };

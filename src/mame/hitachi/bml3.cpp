@@ -1,186 +1,142 @@
-// license:GPL-2.0+
-// copyright-holders:Angelo Salese, Jonathan Edwards, Christopher Edwards,Robbbert
-/**************************************************************************************
+// license: GPL-2.0+
+// copyright-holders: Angelo Salese, Jonathan Edwards, Christopher Edwards, Robbbert
+/**************************************************************************************************
 
-    Basic Master Level 3 (MB-689x) (c) 1980 Hitachi
+Basic Master Level 3 (MB-689x) "Peach" (c) 1980 Hitachi
+ベーシックマスターレベル3
 
-    Driver by Angelo Salese, Jonathan Edwards and Christopher Edwards
+References:
+- http://s-sasaji.ddo.jp/bml3mk5/tech.htm
+- https://www.leadedsolder.com/2023/05/09/hitachi-basic-master-level-iii-mark-ii-cleaning-pickup.html
+- https://github.com/bml3mk5/EmuB-6892/blob/master/src/docs/spec.txt
 
-    TODO:
-    - implement sound as a bml3bus slot device
-    - account for hardware differences between MB-6890, MB-6891 and MB-6892
-      (e.g. custom font support on the MB-6892)
+TODO:
+- keyboard break NMI (as per bmjr);
+- Move keyboard timer logic as 6845 hsync callback, fix logic (would key repeat too fast);
+- Cassette baud rate bump (can switch from 600 to 1200 bauds thru $ffd7);
+- implement sound as a bus slot device;
+- implement RAM expansion as bus slots (RAM3 at 0x8000-0xbfff, RAM4 at 0xc000-0xefff);
+- bml3mk5: BANK REG $ffe8 (applies EMS for the RAM expansion?);
+- Cassettes requires manual press of play button when issuing a LOAD (verify);
 
-**************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
+#include "bml3.h"
 
+#include "bus/bml3/kanji.h"
+#include "bus/bml3/mp1802.h"
+#include "bus/bml3/mp1805.h"
+#include "bus/bml3/rtc.h"
 #include "cpu/m6809/m6809.h"
-#include "imagedev/cassette.h"
 #include "machine/6821pia.h"
-#include "machine/6850acia.h"
 #include "machine/clock.h"
-#include "machine/timer.h"
-#include "sound/spkrdev.h"
-#include "sound/ymopn.h"
-#include "video/mc6845.h"
-#include "emupal.h"
-
-#include "bus/bml3/bml3bus.h"
-#include "bus/bml3/bml3mp1802.h"
-#include "bus/bml3/bml3mp1805.h"
-#include "bus/bml3/bml3kanji.h"
-#include "bus/bml3/bml3rtc.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
-namespace {
-
-// System clock definitions, from the MB-6890 servce manual, p.48:
-
-#define MASTER_CLOCK ( 32.256_MHz_XTAL )   // Master clock crystal (X1) frequency, 32.256 MHz.  "fx" in the manual.
-
-#define D80_CLOCK ( MASTER_CLOCK / 2 )  // Graphics dot clock in 80-column mode. ~16 MHz.
-#define D40_CLOCK ( D80_CLOCK / 2 )     // Graphics dot clock in 40-column mode.  ~8 MHz.
-
-#define CPU_EXT_CLOCK ( D40_CLOCK / 2 ) // IC37, 4.032 MHz signal to EXTAL on the 6809 MPU.
-#define CPU_CLOCK     ( CPU_EXT_CLOCK / 4 ) // Actual MPU clock frequency ("fE" in the manual). The division yielding CPU_CLOCK is done in the 6809 itself.  Also used as the 40-column character clock.
-
-#define C80_CLOCK ( CPU_EXT_CLOCK / 2 ) // 80-column character mode.  IC37, "80CHRCK"; ~2 MHz.
-#define C40_CLOCK ( CPU_CLOCK )         // 40-column character mode; same as MPU clock.  "40CHRCK";       ~1 MHz.
-
-// Video signal clocks from the HD4650SSP CRTC (IC36)
-// In the real hardware, the 80-/40-column Mode switch changes the CRTC character clock input source.  However, it just uses a different divider, so the end result is the same horizontal vsync frequency.
-#define H_CLOCK ( C80_CLOCK / 128 ) // in 80-column mode
-//#define H_CLOCK ( C40_CLOCK / 64 )    // in 40-column mode (either way the frequency is the same: 15.75 kHz)
-#define V_CLOCK ( 2 * H_CLOCK / 525 )   // Vertical refresh rate comes out at exactly 60 Hz.
-
-// TODO: ACIA RS-232C and cassette interface clocks (service manual p.67); perhaps reverse the order and simply divide by 2 from each previous frequency.
-// IC111 (74LS157P) takes 16.128 MHz and 1.008 MHz TTL clock inputs.  The RS/C SW input line determines the mode (high -> RS-232C).
-
-// Frequencies for RS-232C mode:
-// D80_CLOCK / 840.0    // 19200 Hz
-// D80_CLOCK / 420  // 38400 Hz
-// D80_CLOCK / 210  // 76800 Hz
-// D80_CLOCK / 105.0    // 153600 Hz
-
-// Frequencies for cassette mode:
-// / 13440  // 1200
-// / 6720   // 2400
-// / 3360   // 4800
-// / 1680   // 9600
-
-
-class bml3_state : public driver_device
+MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 {
-public:
-	bml3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_p_chargen(*this, "chargen")
-		, m_bml3bus(*this, "bml3bus")
-		, m_crtc(*this, "crtc")
-		, m_cass(*this, "cassette")
-		, m_speaker(*this, "speaker")
-		, m_ym2203(*this, "ym2203")
-		, m_acia(*this, "acia")
-		, m_palette(*this, "palette")
-		, m_rom_view(*this, "rom")
-		, m_banka(*this, "banka")
-		, m_bankc(*this, "bankc")
-		, m_banke(*this, "banke")
-		, m_bankf(*this, "bankf")
-		, m_bankg(*this, "bankg")
-		, m_io_keyboard(*this, "X%u", 0U)
-		{ }
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	// The MB-6890 has a 5-bit colour RAM region.  The meaning of the bits are:
+	// 0: blue
+	// 1: red
+	// 2: green
+	// 3: reverse/inverse video
+	// 4: graphic (not character)
 
-	void bml3mk2(machine_config &config);
-	void bml3mk5(machine_config &config);
-	void bml3(machine_config &config);
-	void bml3_common(machine_config &config);
-	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
+	u8 const interlace = (m_crtc_vreg[8] & 3) ? 1 : 0;
+	bool const lowres = BIT(m_hres_reg, 6);
+	u8 const bgcolor = m_hres_reg & 7;
 
-private:
-	void bml3_mem(address_map &map);
-	void bml3mk2_mem(address_map &map);
-	void bml3mk5_mem(address_map &map);
-	uint8_t mc6845_r(offs_t offset);
-	void mc6845_w(offs_t offset, u8 data);
-	uint8_t keyboard_r();
-	void keyboard_w(u8 data);
-	void hres_reg_w(u8 data);
-	void vres_reg_w(u8 data);
-	uint8_t vram_r(offs_t offset);
-	void vram_w(offs_t offset, u8 data);
-	[[maybe_unused]] uint8_t psg_latch_r();
-	[[maybe_unused]] void psg_latch_w(u8 data);
-	uint8_t vram_attr_r();
-	void vram_attr_w(u8 data);
-	uint8_t beep_r();
-	void beep_w(u8 data);
-	void piaA_w(uint8_t data);
-	uint8_t keyb_nmi_r();
-	void firq_mask_w(u8 data);
-	uint8_t firq_status_r();
-	void relay_w(u8 data);
-	void acia_rts_w(int state);
-	void acia_irq_w(int state);
+	if (interlace)
+	{
+		ra >>= 1;
+		if (y > 0x191) return;
+	}
 
-	MC6845_UPDATE_ROW(crtc_update_row);
+	for(u8 x=0; x<x_count; x++)
+	{
+		u16 mem;
+		if (lowres)
+			mem = (ma + x - 0x400) & 0x3fff;
+		else
+			mem = (ma + x + ra * x_count/40 * 0x400 -0x400) & 0x3fff;
 
-	INTERRUPT_GEN_MEMBER(timer_firq);
-	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
-	[[maybe_unused]] uint8_t ym2203_r();
-	[[maybe_unused]] void ym2203_w(u8 data);
+		u8 const attr = m_aram[mem];
+		u8 const rawbits = m_vram[mem];
+		// HACK: tracer bullet, should be composed in an entirely different way
+		// This will never be hit by regular l3 being a specific feature of mk5,
+		// still expect further headaches for S1 support ...
+		if (get_ig_mode(attr))
+		{
+			for(u8 xi = 0; xi < 8; xi++)
+			{
+				u8 pen = get_ig_dots(rawbits, ra, 7 - xi);
+				bitmap.pix(y, x*8+xi) = palette[pen];
+			}
 
-	u8 m_hres_reg = 0U;
-	u8 m_crtc_vreg[0x100]{};
-	u8 m_psg_latch = 0U;
-	u8 m_attr_latch = 0U;
-	u8 m_vres_reg = 0U;
-	bool m_keyb_interrupt_enabled = 0;
-	bool m_keyb_nmi_disabled = 0; // not used yet
-	bool m_keyb_counter_operation_disabled = 0;
-	u8 m_keyb_empty_scan = 0U;
-	u8 m_keyb_scancode = 0U;
-	u16 m_kbt = 0U;
-	bool m_keyb_capslock_led_on = 0;
-	bool m_keyb_hiragana_led_on = 0;
-	bool m_keyb_katakana_led_on = 0;
-	bool m_cassbit = 0;
-	bool m_cassold = 0;
-	u8 m_cass_data[4]{};
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	void m6845_change_clock(u8 setting);
-	u8 m_crtc_index = 0U;
-	std::unique_ptr<u8[]> m_vram;
-	std::unique_ptr<u8[]> m_aram;
-	u8 m_firq_mask = 0U;
-	u8 m_firq_status = 0U;
-	u8 m_nmi = 0U;
-	required_device<cpu_device> m_maincpu;
-	required_region_ptr<u8> m_p_chargen;
-	required_device<bml3bus_device> m_bml3bus;
-	required_device<mc6845_device> m_crtc;
-	required_device<cassette_image_device> m_cass;
-	required_device<speaker_sound_device> m_speaker;
-	optional_device<ym2203_device> m_ym2203;
-	required_device<acia6850_device> m_acia;
-	required_device<palette_device> m_palette;
-	memory_view m_rom_view;
-	//memory_view m_bank4;
-	memory_view m_banka;
-	memory_view m_bankc;
-	memory_view m_banke;
-	memory_view m_bankf;
-	memory_view m_bankg;
-	required_ioport_array<4> m_io_keyboard;
-};
+			continue;
+		}
+
+		u8 const color = attr & 7;
+		bool const reverse = BIT(attr, 3) ^ (x == cursor_x);
+		bool const graphic = BIT(attr, 4);
+
+
+		u8 dots[2] = { 0, 0 };
+		if (graphic)
+		{
+			if (lowres)
+			{
+				// low-res graphics, each tile has 8 bits arranged as follows:
+				// 4 0
+				// 5 1
+				// 6 2
+				// 7 3
+				dots[0] = dots[1] = (rawbits >> ra/2 & 0x11) * 0xf;
+			}
+			else
+			{
+				dots[0] = dots[1] = rawbits;
+			}
+		}
+		else
+		{
+			// character mode
+			int const tile = rawbits & 0x7f;
+			int const tile_bank = BIT(rawbits, 7);
+			if (interlace)
+			{
+				dots[0] = m_p_chargen[(tile_bank<<11)|(tile<<4)|(ra<<1)];
+				dots[1] = m_p_chargen[(tile_bank<<11)|(tile<<4)|(ra<<1)|tile_bank];
+			}
+			else
+			{
+				dots[0] = dots[1] = m_p_chargen[(tile<<4)|(ra<<1)|tile_bank];
+			}
+		}
+
+		for(u8 hf=0;hf<=interlace;hf++)
+		{
+			for(u8 xi=0;xi<8;xi++)
+			{
+				u8 pen;
+				if(reverse)
+					pen = (dots[hf] >> (7-xi) & 1) ? bgcolor : color;
+				else
+					pen = (dots[hf] >> (7-xi) & 1) ? color : bgcolor;
+
+				bitmap.pix(y, x*8+xi) = palette[pen];
+				// when the mc6845 device gains full interlace&video support, replace the line above with the line below
+				// bitmap.pix(y*(interlace+1)+hf, x*8+xi) = palette[pen];
+			}
+		}
+	}
+}
+
 
 u8 bml3_state::mc6845_r(offs_t offset)
 {
@@ -204,7 +160,7 @@ void bml3_state::mc6845_w(offs_t offset, u8 data)
 	}
 }
 
-u8 bml3_state::keyboard_r()
+u8 bml3_state::kb_sel_r()
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	u8 ret = m_keyb_scancode;
@@ -213,7 +169,8 @@ u8 bml3_state::keyboard_r()
 	return ret;
 }
 
-void bml3_state::keyboard_w(u8 data)
+// KB SEL - Keyboard mode register, interrupt control, keyboard LEDs
+void bml3_state::kb_sel_w(u8 data)
 {
 	m_keyb_katakana_led_on = BIT(data, 0);
 	m_keyb_hiragana_led_on = BIT(data, 1);
@@ -223,52 +180,43 @@ void bml3_state::keyboard_w(u8 data)
 	m_keyb_nmi_disabled = !BIT(data, 7);
 }
 
-void bml3_state::m6845_change_clock(u8 setting)
+void bml3_state::crtc_change_clock()
 {
-	int m6845_clock = CPU_CLOCK.value();    // CRTC and MPU are synchronous by default
-
-	switch(setting & 0x88)
-	{
-		case 0x00: m6845_clock = C40_CLOCK.value(); break; //320 x 200
-		case 0x08: m6845_clock = C40_CLOCK.value(); break; //320 x 200, interlace
-		case 0x80: m6845_clock = C80_CLOCK.value(); break; //640 x 200
-		case 0x88: m6845_clock = C80_CLOCK.value(); break; //640 x 200, interlace
-	}
-
-	m_crtc->set_unscaled_clock(m6845_clock);
+	const u8 width80 = BIT(m_hres_reg, 7);
+	const u8 interlace = BIT(m_vres_reg, 3);
+	// CRTC and MPU are synchronous by default
+	int clock = (width80 ? C80_CLOCK : C40_CLOCK).value() << interlace;
+	m_crtc->set_unscaled_clock(clock);
 }
 
-void bml3_state::hres_reg_w(u8 data)
+/*
+ * MODE_SEL - Graphics mode select
+ * cfr. see service manual p.43
+ * x--- ---- "W" bit: 0 = 40 columns, 1 = 80 columns
+ * -x-- ---- "HR" bit: 0 = high resolution, 1 = normal
+ * --x- ---- "C" bit - ACIA mode: 0 = cassette, 1 = RS-232C
+ * ---- -RGB Background colour
+ */
+void bml3_state::mode_sel_w(u8 data)
 {
-	// MODE SEL register (see service manual p.43).
-	/*
-	x--- ---- "W" bit: 0 = 40 columns, 1 = 80 columns
-	-x-- ---- "HR" bit: 0 = high resolution, 1 = normal
-	--x- ---- "C" bit - ACIA mode: 0 = cassette, 1 = RS-232C
-	---- -RGB Background colour
-	*/
-
 	m_hres_reg = data;
 
-	m6845_change_clock((m_hres_reg & 0x80) | (m_vres_reg & 0x08));
+	crtc_change_clock();
 }
 
-void bml3_state::vres_reg_w(u8 data)
+// INTERLACE_SEL - Interlaced video mode
+void bml3_state::interlace_sel_w(u8 data)
 {
-	// The MB-6890 had an interlaced video mode which was used for displaying Japanese (Hiragana and Katakana) text (8x16 character glyph bitmaps).
-	/*
-	---- x--- Interlace select: 0 = non-interlace, 1 = interlace
-	*/
 	m_vres_reg = data;
 
-	m6845_change_clock((m_hres_reg & 0x80) | (m_vres_reg & 0x08));
+	crtc_change_clock();
 }
 
 
 u8 bml3_state::vram_r(offs_t offset)
 {
 	// Bit 7 masks reading back to the latch
-	if (!BIT(m_attr_latch, 7))
+	if (!BIT(m_attr_latch, 7) && !machine().side_effects_disabled())
 		m_attr_latch = m_aram[offset];
 
 	return m_vram[offset];
@@ -278,7 +226,9 @@ void bml3_state::vram_w(offs_t offset, u8 data)
 {
 	m_vram[offset] = data;
 	// color ram is 5-bit
-	m_aram[offset] = m_attr_latch & 0x1F;
+	// NOTE: will break hiwriter with this, "write enable" only on reads!?
+	//if (!BIT(m_attr_latch, 7))
+	m_aram[offset] = m_attr_latch & get_attr_mask();
 }
 
 u8 bml3_state::psg_latch_r()
@@ -305,49 +255,56 @@ void bml3_state::ym2203_w(u8 data)
 	m_ym2203->write(dev_offs, data);
 }
 
-u8 bml3_state::vram_attr_r()
+/*
+ * C-REG-SELECT register
+ * Reads from a VRAM address copy the corresponding 'colour RAM' address to the
+ * low-order 5 bits of this register as a side-effect
+ */
+u8 bml3_state::c_reg_sel_r()
 {
-	// C-REG-SELECT register
-	// Reads from a VRAM address copy the corresponding 'colour RAM' address to the low-order 5 bits of this register as a side-effect
-	// (unless MK bit indicates 'prohibit write')
 	return m_attr_latch;
 }
 
-void bml3_state::vram_attr_w(u8 data)
+/*
+ * C_REG_SEL - Attribute register (character/video mode and colours)
+ * Writes to a VRAM address copy the low-order 5 bits of this register to the corresponding 'colour RAM' address as a side-effect
+ * x--- ---- "MK" bit: 0 = enable write, 1 = prohibit write
+ * ---x ---- "GC" bit: 0 = character, 1 = graphic
+ * ---- x--- "RV" bit: 0 = normal, 1 - reverse
+ * ---- -RGB Foreground colour
+ *
+ */
+void bml3_state::c_reg_sel_w(u8 data)
 {
-	// C-REG-SELECT register
-	// Writes to a VRAM address copy the low-order 5 bits of this register to the corresponding 'colour RAM' address as a side-effect
-	/*
-	x--- ---- "MK" bit: 0 = enable write, 1 = prohibit write
-	---x ---- "GC" bit: 0 = character, 1 = graphic
-	---- x--- "RV" bit: 0 = normal, 1 - reverse
-	---- -RGB Foreground colour
-	*/
 	m_attr_latch = data;
 }
 
-u8 bml3_state::beep_r()
+u8 bml3_state::music_sel_r()
 {
 	return -1; // BEEP status read?
 }
 
-void bml3_state::beep_w(u8 data)
+// MUSIC SEL - Music select: toggle audio output level when rising
+void bml3_state::music_sel_w(u8 data)
 {
 	m_speaker->level_w(BIT(data, 7));
 }
 
-void bml3_state::relay_w(u8 data)
+// REMOTE - Remote relay control for cassette - bit 7
+void bml3_state::remote_w(u8 data)
 {
-	m_cass->change_state(
-		BIT(data,7) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	m_cassette->change_state(
+		BIT(data, 7) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-u8 bml3_state::keyb_nmi_r()
+// KBNMI - Keyboard "Break" key non-maskable interrupt
+u8 bml3_state::kbnmi_r()
 {
 	return m_nmi; // bit 7 used to signal a BREAK key pressure
 }
 
-void bml3_state::firq_mask_w(u8 data)
+// TIME_MASK - Prohibit timer IRQ
+void bml3_state::time_mask_w(u8 data)
 {
 	m_firq_mask = data & 0x80;
 	if(m_firq_mask)
@@ -357,58 +314,25 @@ void bml3_state::firq_mask_w(u8 data)
 	}
 }
 
-u8 bml3_state::firq_status_r()
+// TIMER - System timer enable
+u8 bml3_state::timer_r()
 {
 	u8 res = m_firq_status << 7;
-	m_firq_status = 0;
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		m_firq_status = 0;
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+	}
 	return res;
 }
 
 
-void bml3_state::bml3_mem(address_map &map)
+void bml3_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
 	map(0x0400, 0x43ff).rw(FUNC(bml3_state::vram_r), FUNC(bml3_state::vram_w));
 	map(0x4400, 0x7fff).ram();
-	map(0xff40, 0xff46).noprw(); // lots of unknown reads and writes
-	map(0xffc0, 0xffc3).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xffc4, 0xffc5).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0xffc6, 0xffc7).rw(FUNC(bml3_state::mc6845_r), FUNC(bml3_state::mc6845_w));
-	// KBNMI - Keyboard "Break" key non-maskable interrupt
-	map(0xffc8, 0xffc8).r(FUNC(bml3_state::keyb_nmi_r)); // keyboard nmi
-	// DIPSW - DIP switches on system mainboard
-	map(0xffc9, 0xffc9).portr("DSW");
-	// TIMER - System timer enable
-	map(0xffca, 0xffca).r(FUNC(bml3_state::firq_status_r)); // timer irq
-	// LPFLG - Light pen interrupt
-//  map(0xffcb, 0xffcb)
-	// MODE_SEL - Graphics mode select
-	map(0xffd0, 0xffd0).w(FUNC(bml3_state::hres_reg_w));
-	// TRACE - Trace counter
-//  map(0xffd1, 0xffd1)
-	// REMOTE - Remote relay control for cassette - bit 7
-	map(0xffd2, 0xffd2).w(FUNC(bml3_state::relay_w));
-	// MUSIC_SEL - Music select: toggle audio output level when rising
-	map(0xffd3, 0xffd3).rw(FUNC(bml3_state::beep_r), FUNC(bml3_state::beep_w));
-	// TIME_MASK - Prohibit timer IRQ
-	map(0xffd4, 0xffd4).w(FUNC(bml3_state::firq_mask_w));
-	// LPENBL - Light pen operation enable
-	map(0xffd5, 0xffd5).noprw();
-	// INTERLACE_SEL - Interlaced video mode (manual has "INTERACE SEL"!)
-	map(0xffd6, 0xffd6).w(FUNC(bml3_state::vres_reg_w));
-//  map(0xffd7, 0xffd7) baud select
-	// C_REG_SEL - Attribute register (character/video mode and colours)
-	map(0xffd8, 0xffd8).rw(FUNC(bml3_state::vram_attr_r), FUNC(bml3_state::vram_attr_w));
-	// KB - Keyboard mode register, interrupt control, keyboard LEDs
-	map(0xffe0, 0xffe0).rw(FUNC(bml3_state::keyboard_r), FUNC(bml3_state::keyboard_w));
-//  map(0xffe8, 0xffe8) bank register
-//  map(0xffe9, 0xffe9) IG mode register
-//  map(0xffea, 0xffea) IG enable register
-	map(0x8000, 0xffff).view(m_rom_view);
-	m_rom_view[0](0xa000, 0xfeff).rom().region("maincpu", 0xa000);
-	m_rom_view[0](0xfff0, 0xffff).rom().region("maincpu", 0xfff0);
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).view(m_banka);
 	m_banka[0](0xa000, 0xbfff).readonly().share("rama");
@@ -425,6 +349,36 @@ void bml3_state::bml3_mem(address_map &map)
 	map(0xfff0, 0xffff).view(m_bankg);
 	m_bankg[0](0xfff0, 0xffff).readonly().share("ramg");
 	map(0xfff0, 0xffff).writeonly().share("ramg");
+	map(0x8000, 0xffff).view(m_rom_view);
+	m_rom_view[0](0xa000, 0xfeff).rom().region("maincpu", 0xa000);
+	m_rom_view[0](0xfff0, 0xffff).rom().region("maincpu", 0xfff0);
+	map(0xff00, 0xffef).m(*this, FUNC(bml3_state::system_io));
+}
+
+// Relative to $ffxx block
+void bml3_state::system_io(address_map &map)
+{
+	map(0x0040, 0x0046).noprw(); // RS-232C
+	map(0x00c0, 0x00c3).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x00c4, 0x00c5).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x00c6, 0x00c7).rw(FUNC(bml3_state::mc6845_r), FUNC(bml3_state::mc6845_w));
+	map(0x00c8, 0x00c8).r(FUNC(bml3_state::kbnmi_r));
+	map(0x00c9, 0x00c9).portr("DIPSW");
+	map(0x00ca, 0x00ca).r(FUNC(bml3_state::timer_r));
+//  map(0x00cb, 0x00cb) LPFLG - Light pen interrupt
+	map(0x00d0, 0x00d0).w(FUNC(bml3_state::mode_sel_w));
+//  map(0x00d1, 0x00d1) TRACE - Trace counter
+	map(0x00d2, 0x00d2).w(FUNC(bml3_state::remote_w));
+	map(0x00d3, 0x00d3).rw(FUNC(bml3_state::music_sel_r), FUNC(bml3_state::music_sel_w));
+	map(0x00d4, 0x00d4).w(FUNC(bml3_state::time_mask_w));
+	map(0x00d5, 0x00d5).noprw(); // L/P ENBL - Light pen operation enable
+	map(0x00d6, 0x00d6).w(FUNC(bml3_state::interlace_sel_w));
+//  map(0x00d7, 0x00d7) BANK SEL - baud select
+	map(0x00d8, 0x00d8).rw(FUNC(bml3_state::c_reg_sel_r), FUNC(bml3_state::c_reg_sel_w));
+	map(0x00e0, 0x00e0).rw(FUNC(bml3_state::kb_sel_r), FUNC(bml3_state::kb_sel_w));
+//  map(0x00e8, 0x00e8) bank register
+//  map(0x00e9, 0x00e9) IG mode register
+//  map(0x00ea, 0x00ea) IG enable register
 
 #if 0
 	map(0xff00, 0xff00).rw(FUNC(bml3_state::ym2203_r), FUNC(bml3_state::ym2203_w));
@@ -432,52 +386,79 @@ void bml3_state::bml3_mem(address_map &map)
 #endif
 }
 
-void bml3_state::bml3mk2_mem(address_map &map)
+void bml3mk5_state::ig_ram_w(offs_t offset, u8 data)
 {
-	bml3_mem(map);
-	// TODO: anything to add here?
-
+	for (int i = 0; i < 3; i++)
+	{
+		if (BIT(m_igen, i))
+			m_ig_ram[offset + 0x800 * i] = data;
+	}
+	m_gfxdecode->gfx(0)->mark_dirty(offset >> 3);
 }
 
-void bml3_state::bml3mk5_mem(address_map &map)
+void bml3mk5_state::main_map(address_map &map)
 {
-	bml3_mem(map);
-	// TODO: anything to add here?
-
+	bml3_state::main_map(map);
+	map(0xa000, 0xa7ff).view(m_ig_view);
+	m_ig_view[0](0xa000, 0xa7ff).writeonly().w(FUNC(bml3mk5_state::ig_ram_w));
 }
 
-/* Input ports */
+void bml3mk5_state::system_io(address_map &map)
+{
+	bml3_state::system_io(map);
+	// IGMODREG
+	map(0x00e9, 0x00e9).lw8(
+		NAME([this] (u8 data) {
+			if (BIT(data, 0))
+				m_ig_view.select(0);
+			else
+				m_ig_view.disable();
+		})
+	);
+	// IGENREG
+	map(0x00ea, 0x00ea).lw8(
+		NAME([this] (u8 data) {
+			m_igen = data & 7;
+		})
+	);
+}
+
+INPUT_CHANGED_MEMBER(bml3_state::nmi_button)
+{
+	// TODO: supposed to actually raise an NMI, just like earlier Basic Master LV1/2
+	m_nmi = newval ? 0x80 : 0;
+}
 
 static INPUT_PORTS_START( bml3 )
 
 	// DIP switches (service manual p.88)
 	// Note the NEWON command reboots with a soft override for the DIP switch
-	PORT_START("DSW")
-	PORT_DIPNAME(     0x01, 0x01, "BASIC/terminal mode")
-		PORT_DIPSETTING(0x00, "Terminal mode")
-		PORT_DIPSETTING(0x01, "BASIC mode")
-	PORT_DIPNAME(     0x02, 0x02, "Interlaced video")
-		PORT_DIPSETTING(0x00, DEF_STR( Off ) )
-		PORT_DIPSETTING(0x02, DEF_STR( On ))
+	PORT_START("DIPSW")
+	PORT_DIPNAME( 0x01, 0x01, "BASIC/terminal mode") PORT_DIPLOCATION("SW:!1")
+	PORT_DIPSETTING(0x00, "Terminal mode")
+	PORT_DIPSETTING(0x01, "BASIC mode")
+	PORT_DIPNAME( 0x02, 0x02, "Interlaced video") PORT_DIPLOCATION("SW:!2")
+	PORT_DIPSETTING(0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(0x02, DEF_STR( On ))
 	// This is overridden by the 'Mode' toggle button
-	PORT_DIPNAME(     0x04, 0x04, "40-/80-column")
-		PORT_DIPSETTING(0x00, "40 chars/line")
-		PORT_DIPSETTING(0x04, "80 chars/line")
-	PORT_DIPNAME(     0x08, 0x00, "Video resolution")
-		PORT_DIPSETTING(0x00, "High")
-		PORT_DIPSETTING(0x08, "Low")
-	PORT_DIPNAME(     0x10, 0x00, "Show PF key content")
-		PORT_DIPSETTING(0x00, DEF_STR ( Off ) )
-		PORT_DIPSETTING(0x10, DEF_STR ( On ))
-	PORT_DIPNAME(     0x20, 0x00, "Terminal duplex")
-		PORT_DIPSETTING(0x00, "Full duplex")
-		PORT_DIPSETTING(0x20, "Half duplex")
-	PORT_DIPNAME(     0x40, 0x00, "Terminal bits")
-		PORT_DIPSETTING(0x00, "8 bits/char")
-		PORT_DIPSETTING(0x40, "7 bits/char")
-	PORT_DIPNAME(     0x80, 0x00, "Hiragana->Katakana")
-		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "40-/80-column") PORT_DIPLOCATION("SW:!3")
+	PORT_DIPSETTING(0x00, "40 chars/line")
+	PORT_DIPSETTING(0x04, "80 chars/line")
+	PORT_DIPNAME( 0x08, 0x00, "Video resolution") PORT_DIPLOCATION("SW:!4")
+	PORT_DIPSETTING(0x00, "High")
+	PORT_DIPSETTING(0x08, "Low")
+	PORT_DIPNAME( 0x10, 0x00, "Show PF key content") PORT_DIPLOCATION("SW:!5")
+	PORT_DIPSETTING(0x00, DEF_STR ( Off ) )
+	PORT_DIPSETTING(0x10, DEF_STR ( On ))
+	PORT_DIPNAME( 0x20, 0x00, "Terminal duplex") PORT_DIPLOCATION("SW:!6")
+	PORT_DIPSETTING(0x00, "Full duplex")
+	PORT_DIPSETTING(0x20, "Half duplex")
+	PORT_DIPNAME( 0x40, 0x00, "Terminal bits") PORT_DIPLOCATION("SW:!7")
+	PORT_DIPSETTING(0x00, "8 bits/char")
+	PORT_DIPSETTING(0x40, "7 bits/char")
+	PORT_DIPNAME( 0x80, 0x00, "Hiragana->Katakana") PORT_DIPLOCATION("SW:!8")
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
 
 // TODO: also model the CS jumper block?
 
@@ -586,96 +567,15 @@ static INPUT_PORTS_START( bml3 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END)) PORT_CHANGED_MEMBER(DEVICE_SELF, bml3_state, nmi_button, 0)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(bml3_state::nmi_button)
-{
-	m_nmi = newval ? 0x80 : 0;
-}
-
-MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
-{
-	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	// The MB-6890 has a 5-bit colour RAM region.  The meaning of the bits are:
-	// 0: blue
-	// 1: red
-	// 2: green
-	// 3: reverse/inverse video
-	// 4: graphic (not character)
-
-	u8 const interlace = (m_crtc_vreg[8] & 3) ? 1 : 0;
-	bool const lowres = BIT(m_hres_reg, 6);
-	u8 const bgcolor = m_hres_reg & 7;
-
-	if (interlace)
-	{
-		ra >>= 1;
-		if (y > 0x191) return;
-	}
-
-	for(u8 x=0; x<x_count; x++)
-	{
-		u16 mem;
-		if (lowres)
-			mem = (ma + x - 0x400) & 0x3fff;
-		else
-			mem = (ma + x + ra * x_count/40 * 0x400 -0x400) & 0x3fff;
-
-		u8 const color = m_aram[mem] & 7;
-		bool const reverse = BIT(m_aram[mem], 3) ^ (x == cursor_x);
-		bool const graphic = BIT(m_aram[mem], 4);
-
-		u8 const rawbits = m_vram[mem];
-
-		u8 dots[2] = { 0, 0 };
-		if (graphic)
-		{
-			if (lowres)
-			{
-				// low-res graphics, each tile has 8 bits arranged as follows:
-				// 4 0
-				// 5 1
-				// 6 2
-				// 7 3
-				dots[0] = dots[1] = (rawbits >> ra/2 & 0x11) * 0xf;
-			}
-			else
-			{
-				dots[0] = dots[1] = rawbits;
-			}
-		}
-		else
-		{
-			// character mode
-			int const tile = rawbits & 0x7f;
-			int const tile_bank = BIT(rawbits, 7);
-			if (interlace)
-			{
-				dots[0] = m_p_chargen[(tile_bank<<11)|(tile<<4)|(ra<<1)];
-				dots[1] = m_p_chargen[(tile_bank<<11)|(tile<<4)|(ra<<1)|tile_bank];
-			}
-			else
-			{
-				dots[0] = dots[1] = m_p_chargen[(tile<<4)|(ra<<1)|tile_bank];
-			}
-		}
-
-		for(u8 hf=0;hf<=interlace;hf++)
-		{
-			for(u8 xi=0;xi<8;xi++)
-			{
-				u8 pen;
-				if(reverse)
-					pen = (dots[hf] >> (7-xi) & 1) ? bgcolor : color;
-				else
-					pen = (dots[hf] >> (7-xi) & 1) ? color : bgcolor;
-
-				bitmap.pix(y, x*8+xi) = palette[pen];
-				// when the mc6845 device gains full interlace&video support, replace the line above with the line below
-				// bitmap.pix(y*(interlace+1)+hf, x*8+xi) = palette[pen];
-			}
-		}
-	}
-}
-
+static INPUT_PORTS_START( bml3mk5 )
+	PORT_INCLUDE( bml3 )
+	// No dipswitches on Mark 5
+	PORT_MODIFY("DIPSW")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
+	// TODO: add MODE front panel button here, in place of dipswitch
+	// On regular bml3 there's an extra button that xor content, that is directly routed here
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 {
@@ -730,7 +630,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::kansas_r )
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	u8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	u8 cass_ws = (m_cassette->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -739,13 +639,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::kansas_r )
 		m_cass_data[1] = 0;
 	}
 }
-
-#if 0
-INTERRUPT_GEN_MEMBER(bml3_state::irq)
-{
-	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-}
-#endif
 
 
 INTERRUPT_GEN_MEMBER(bml3_state::timer_firq)
@@ -762,6 +655,9 @@ void bml3_state::machine_start()
 	m_vram = make_unique_clear<u8[]>(0x4000);
 	m_aram = make_unique_clear<u8[]>(0x4000);
 
+	// TODO: this setup is goofy, and bound to fail if things changes downstream.
+	// Should really overlay the ROM region, not the view itself.
+	// Additionally each slot has separate ROM KIL and EXROM KIL signal controls ...
 	m_bml3bus->map_exrom(m_rom_view[0]);
 	m_bml3bus->map_io(m_maincpu->space(AS_PROGRAM));
 
@@ -819,6 +715,27 @@ void bml3_state::machine_reset()
 	m_cassold = 0;
 	m_nmi = 0;
 	m_kbt = 0;
+
+	// NOTE: bml3 do not bother with CRTC on soft resets (which is physically tied to front panel).
+	//m_hres_reg = 0;
+	//m_vres_reg = 0;
+	//crtc_change_clock();
+}
+
+void bml3mk5_state::machine_start()
+{
+	bml3_state::machine_start();
+	m_ig_ram = make_unique_clear<u8[]>(0x800 * 3);
+	m_gfxdecode->gfx(0)->set_source_and_total(m_ig_ram.get(), 0x100);
+
+	save_pointer(NAME(m_ig_ram), 0x800 * 3);
+}
+
+void bml3mk5_state::machine_reset()
+{
+	bml3_state::machine_reset();
+	m_ig_view.disable();
+	m_igen = 0;
 }
 
 void bml3_state::piaA_w(uint8_t data)
@@ -894,43 +811,43 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::kansas_w )
 	}
 
 	if (m_cassbit)
-		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
+		m_cassette->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
 	else
-		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
+		m_cassette->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
+
+// Debugging only
+static const gfx_layout ig_charlayout =
+{
+	8, 8,
+	0x100,
+	3,
+	{ 0x1000*8, 0x800*8, 0 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	8*8
+};
+
+static GFXDECODE_START( gfx_bml3mk5 )
+	GFXDECODE_ENTRY( nullptr, 0, ig_charlayout, 0, 1 )
+GFXDECODE_END
+
 
 static void bml3_cards(device_slot_interface &device)
 {
-	device.option_add("bml3mp1802", BML3BUS_MP1802); // MP-1802 Floppy Controller Card
-	device.option_add("bml3mp1805", BML3BUS_MP1805); // MP-1805 Floppy Controller Card
-	device.option_add("bml3kanji",  BML3BUS_KANJI);
-	device.option_add("bml3rtc",    BML3BUS_RTC);
+	device.option_add("mp1802", BML3BUS_MP1802);
+	device.option_add("mp1805", BML3BUS_MP1805);
+	device.option_add("kanji",  BML3BUS_KANJI);
+	device.option_add("rtc",    BML3BUS_RTC);
 }
 
-
-void bml3_state::bml3_common(machine_config &config)
+void bml3_state::bml3(machine_config &config)
 {
 	/* basic machine hardware */
 	MC6809(config, m_maincpu, CPU_EXT_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bml3_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bml3_state::timer_firq));
 //  m_maincpu->set_periodic_int(FUNC(bml3_state::firq), attotime::fromhz(45));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2400)); /* Service manual specifies "Raster return period" as 2.4 ms (p.64), although the total vertical non-displaying time seems to be 4 ms. */
-	screen.set_size(640, 400);
-	screen.set_visarea(0, 320-1, 0, 200-1);
-	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
-	PALETTE(config, m_palette, palette_device::BRG_3BIT);
-
-	/* Devices */
-	// CRTC clock should be synchronous with the CPU clock.
-	HD6845S(config, m_crtc, CPU_CLOCK); // HD46505SP
-	m_crtc->set_screen("screen");
-	m_crtc->set_show_border_area(false);
-	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(bml3_state::crtc_update_row));
 
 	// fire once per scan of an individual key
 	// According to the service manual (p.65), the keyboard timer is driven by the horizontal video sync clock.
@@ -946,19 +863,34 @@ void bml3_state::bml3_common(machine_config &config)
 	m_acia->rts_handler().set(FUNC(bml3_state::acia_rts_w));
 	m_acia->irq_handler().set(FUNC(bml3_state::acia_irq_w));
 
-	/* Audio */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 9'600)); // 600 baud x 16(divider) = 9600
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
-	CASSETTE(config, m_cass);
-	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
-	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("bml3_cass");
 
-	/* slot devices */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	// Service manual specifies "Raster return period" as 2.4 ms (p.64),
+	// although the total vertical non-displaying time seems to be 4 ms.
+	// NOTE: D80_CLOCK x 2 as per MAME interlace limitation
+	screen.set_raw(D80_CLOCK * 2, 1024, 0, 640 - 1, 518, 0, 400 - 1);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
+
+	/* Devices */
+	// CRTC clock should be synchronous with the CPU clock.
+	HD6845S(config, m_crtc, CPU_CLOCK); // HD46505SP
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(bml3_state::crtc_update_row));
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+
 	BML3BUS(config, m_bml3bus, 0);
 	m_bml3bus->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_bml3bus->irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
@@ -968,18 +900,15 @@ void bml3_state::bml3_common(machine_config &config)
 	   Or use MP-1802 (5.25" DS/DD).
 	   Note it isn't feasible to use both, as they each place boot ROM at F800.
 	 */
+	// TODO: find actual defaults for each variant (should be no option for at least base model)
 	BML3BUS_SLOT(config, "sl1", m_bml3bus, bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl2", m_bml3bus, bml3_cards, "bml3rtc");
+	BML3BUS_SLOT(config, "sl2", m_bml3bus, bml3_cards, "rtc");
 	BML3BUS_SLOT(config, "sl3", m_bml3bus, bml3_cards, nullptr);
 	BML3BUS_SLOT(config, "sl4", m_bml3bus, bml3_cards, nullptr);
 	BML3BUS_SLOT(config, "sl5", m_bml3bus, bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl6", m_bml3bus, bml3_cards, "bml3kanji");
-}
+	BML3BUS_SLOT(config, "sl6", m_bml3bus, bml3_cards, "kanji");
 
-void bml3_state::bml3(machine_config &config)
-{
-	bml3_common(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bml3_state::bml3_mem);
+	SOFTWARE_LIST(config, "cass_list").set_original("bml3_cass");
 
 #if 0
 	// TODO: slot device for sound card
@@ -993,23 +922,18 @@ void bml3_state::bml3(machine_config &config)
 #endif
 }
 
-void bml3_state::bml3mk2(machine_config &config)
+void bml3mk2_state::bml3mk2(machine_config &config)
 {
-	bml3_common(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bml3_state::bml3mk2_mem);
-
-	// TODO: anything to add here?
+	bml3_state::bml3(config);
+	// TODO: override bus defaults
 }
 
-void bml3_state::bml3mk5(machine_config &config)
+void bml3mk5_state::bml3mk5(machine_config &config)
 {
-	bml3_common(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bml3_state::bml3mk5_mem);
-
-	// TODO: anything to add here?
+	bml3mk2_state::bml3mk2(config);
+	// TODO: override bus defaults
+	GFXDECODE(config, "gfxdecode", "palette", gfx_bml3mk5);
 }
-
-
 
 /* ROM definition */
 // floppy-drive slot devices expect "maincpu" is sized 0x10000.
@@ -1051,12 +975,6 @@ ROM_START( bml3mk5 )
 	ROM_LOAD("font.rom", 0x0000, 0x1000, BAD_DUMP CRC(0b6f2f10) SHA1(dc411b447ca414e94843636d8b5f910c954581fb) ) // handcrafted
 ROM_END
 
-} // anonymous namespace
-
-
-/* Driver */
-
-/*    YEAR  NAME     PARENT COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY    FULLNAME                               FLAGS */
-COMP( 1980, bml3,    0,     0,      bml3,    bml3,  bml3_state, empty_init, "Hitachi", "MB-6890 Basic Master Level 3",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1982, bml3mk2, bml3,  0,      bml3mk2, bml3,  bml3_state, empty_init, "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, bml3mk5, bml3,  0,      bml3mk5, bml3,  bml3_state, empty_init, "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, bml3,    0,     0,      bml3,    bml3,     bml3_state,    empty_init, "Hitachi", "Basic Master Level 3 (MB-6890)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, bml3mk2, bml3,  0,      bml3mk2, bml3,     bml3mk2_state, empty_init, "Hitachi", "Basic Master Level 3 Mark II (MB-6891)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, bml3mk5, bml3,  0,      bml3mk5, bml3mk5,  bml3mk5_state, empty_init, "Hitachi", "Basic Master Level 3 Mark 5 (MB-6892)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

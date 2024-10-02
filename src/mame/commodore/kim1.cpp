@@ -120,8 +120,8 @@ public:
 	void kim1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m6502_device> m_maincpu;
@@ -139,8 +139,8 @@ private:
 	uint8_t m_311_output = 0;
 	uint32_t m_cassette_high_count = 0;
 
-	void mem_map(address_map &map);
-	void sync_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void sync_map(address_map &map) ATTR_COLD;
 
 	uint8_t sync_r(offs_t offset);
 	void sync_w(int state);

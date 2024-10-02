@@ -77,12 +77,12 @@ protected:
 	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask) = 0;
 
 	void astormbl_video(machine_config &config);
-	void astormbl_map(address_map &map);
+	void astormbl_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 
@@ -117,14 +117,14 @@ public:
 	void astormbl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask) override;
 
 private:
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
-	void pcm_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
+	void pcm_map(address_map &map) ATTR_COLD;
 	void soundbank_w(uint8_t data);
 	void astormbl_sound(machine_config &config);
 
@@ -146,14 +146,14 @@ public:
 	void astormb2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask) override;
 
 private:
 	void sys18bl_okibank_w(uint8_t data);
-	void sys18bl_sound_map(address_map &map);
-	void sys18bl_oki_map(address_map &map);
+	void sys18bl_sound_map(address_map &map) ATTR_COLD;
+	void sys18bl_oki_map(address_map &map) ATTR_COLD;
 
 	void astormb2_sound(machine_config &config);
 

@@ -6,7 +6,7 @@ license:CC0-1.0
 <softwarelist name="nes_ntbrom" description="Nintendo Entertainment System - Nantettatte!! Baseball mini-cartridges">
 
 	<software name="ntb_91">
-		<description>Nantettatte!! Baseball '91 Kaimaku Hen (Jpn)</description>
+		<description>Nantettatte!! Baseball '91 Kaimaku Hen (Japan)</description>
 		<year>1991</year>
 		<publisher>Sunsoft</publisher>
 		<info name="release" value="19910531"/>
@@ -20,7 +20,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ntb_ob">
-		<description>Nantettatte!! Baseball OB Allstar Hen (Jpn)</description>
+		<description>Nantettatte!! Baseball OB Allstar Hen (Japan)</description>
 		<year>1991</year>
 		<publisher>Sunsoft</publisher>
 		<info name="release" value="19910228"/>

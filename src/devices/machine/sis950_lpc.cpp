@@ -430,7 +430,7 @@ void sis950_lpc_device::io_map(address_map &map)
 	map(0x0060, 0x0060).rw(m_keybc, FUNC(ps2_keyboard_controller_device::data_r), FUNC(ps2_keyboard_controller_device::data_w));
 	// map(0x0061, 0x0061) NMI Status Register
 	map(0x0061, 0x0061).rw(FUNC(sis950_lpc_device::nmi_status_r), FUNC(sis950_lpc_device::nmi_control_w));
-	// undocumented but read, assume LPC complaint
+	// undocumented but read, assume LPC compliant
 	map(0x0064, 0x0064).rw(m_keybc, FUNC(ps2_keyboard_controller_device::status_r), FUNC(ps2_keyboard_controller_device::command_w));
 	// map(0x0070, 0x0070) CMOS and NMI Mask
 	map(0x0070, 0x0070).w(FUNC(sis950_lpc_device::rtc_index_w));

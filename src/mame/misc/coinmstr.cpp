@@ -170,7 +170,7 @@ public:
 	void init_coinmstr();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -195,14 +195,14 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void coinmstr_map(address_map &map);
-	void jpcoin_io_map(address_map &map);
-	void jpcoin_map(address_map &map);
-	void jpjcoin_io_map(address_map &map);
-	void pokeroul_io_map(address_map &map);
-	void quizmstr_io_map(address_map &map);
-	void supnudg2_io_map(address_map &map);
-	void trailblz_io_map(address_map &map);
+	void coinmstr_map(address_map &map) ATTR_COLD;
+	void jpcoin_io_map(address_map &map) ATTR_COLD;
+	void jpcoin_map(address_map &map) ATTR_COLD;
+	void jpjcoin_io_map(address_map &map) ATTR_COLD;
+	void pokeroul_io_map(address_map &map) ATTR_COLD;
+	void quizmstr_io_map(address_map &map) ATTR_COLD;
+	void supnudg2_io_map(address_map &map) ATTR_COLD;
+	void trailblz_io_map(address_map &map) ATTR_COLD;
 };
 
 

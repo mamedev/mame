@@ -10,7 +10,7 @@ TODO:
   that aren't covered in current dumps;
   \- Specifically they do:
      000C03AB: cmp     word ptr [10h],0h ; wd90c00 == 0x3000
-     000C03B0: 75 09          jne     0C03BBh
+     000C03B0: jne     0C03BBh
      000C03B2: cmp     byte ptr [12h],7Eh ; wd90c00 == 0x00
      000C03B7: jne     0C03BBh
      000C03B9: pop     ds

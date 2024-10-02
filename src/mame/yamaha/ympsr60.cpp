@@ -108,8 +108,8 @@ public:
 	void psr70(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -136,8 +136,8 @@ private:
 	output_finder<RYP4_MAX_TARGETS> m_ryp4_out;
 	required_ioport m_mastervol;
 
-	void psr60_map(address_map &map);
-	void psr60_io_map(address_map &map);
+	void psr60_map(address_map &map) ATTR_COLD;
+	void psr60_io_map(address_map &map) ATTR_COLD;
 
 	u8 ppi_pa_r();
 	void ppi_pb_w(u8 data);
@@ -171,7 +171,7 @@ public:
 	// optional sustain pedal input; if this doesn't change, sustain will not work
 	// if no pedal present, it seems sustain should still work, so toggle the value
 	// here a bit to make the keyboard notice
-	CUSTOM_INPUT_MEMBER(sustain_fuzz) { return (m_sustain_fuzz = !m_sustain_fuzz) ? 8 : 12; }
+	ioport_value sustain_fuzz() { return (m_sustain_fuzz = !m_sustain_fuzz) ? 8 : 12; }
 };
 
 void psr60_state::psr60_map(address_map &map)

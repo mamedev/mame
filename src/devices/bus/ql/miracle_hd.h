@@ -29,11 +29,11 @@ public:
 	miracle_hard_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_ql_rom_cartridge_card_interface overrides
 	virtual uint8_t read(offs_t offset, uint8_t data) override;

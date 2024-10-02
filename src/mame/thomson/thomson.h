@@ -154,7 +154,7 @@ protected:
 	emu_timer* m_mo5_periodic_timer = nullptr;
 	uint8_t m_mo5_reg_cart = 0; /* 0xa7cb bank switch */
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( to7_cartridge );
 
@@ -207,8 +207,8 @@ protected:
 	TIMER_CALLBACK_MEMBER( ans );
 	void thom_palette(palette_device &palette);
 
-	void to7_map(address_map &map);
-	void to770_map(address_map &map);
+	void to7_map(address_map &map) ATTR_COLD;
+	void to770_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
@@ -374,7 +374,7 @@ protected:
 
 	void mo5_palette(palette_device &palette);
 
-	void mo5_map(address_map &map);
+	void mo5_map(address_map &map) ATTR_COLD;
 
 	void mo5_update_cart_bank();
 };
@@ -489,9 +489,9 @@ protected:
 	DECLARE_MACHINE_RESET( to9p );
 	DECLARE_MACHINE_START( to9p );
 
-	void to8_map(address_map &map);
-	void to9_map(address_map &map);
-	void to9p_map(address_map &map);
+	void to8_map(address_map &map) ATTR_COLD;
+	void to9_map(address_map &map) ATTR_COLD;
+	void to9p_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_to9_palette_data[32]{};
 	uint8_t m_to9_palette_idx = 0;
@@ -562,7 +562,7 @@ protected:
 	void mo6_vreg_w(offs_t offset, uint8_t data);
 	void mo6_vcart_lo_w(offs_t offset, uint8_t data);
 	void mo6_vcart_hi_w(offs_t offset, uint8_t data);
-	void mo6_map(address_map &map);
+	void mo6_map(address_map &map) ATTR_COLD;
 	void mo6_update_ram_bank();
 	void mo6_update_cart_bank();
 	void mo6_game_init();
@@ -590,7 +590,7 @@ protected:
 	required_ioport m_nanoreseau_config;
 	memory_view m_extension_view;
 
-	void mo5nr_map(address_map &map);
+	void mo5nr_map(address_map &map) ATTR_COLD;
 
 	void mo5nr_game_init();
 	void mo5nr_game_reset();

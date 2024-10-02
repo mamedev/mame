@@ -111,12 +111,12 @@ public:
 
 	void battlex(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(in0_b4_r);
+	ioport_value in0_b4_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -129,7 +129,7 @@ protected:
 
 	tilemap_t *m_bg_tilemap = nullptr;
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 private:
 	// video-related
@@ -150,7 +150,7 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class dodgeman_state : public battlex_state
@@ -161,12 +161,12 @@ public:
 	void dodgeman(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 void battlex_state::palette_w(offs_t offset, uint8_t data)
@@ -287,7 +287,7 @@ INTERRUPT_GEN_MEMBER(battlex_state::interrupt)
 	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(battlex_state::in0_b4_r)
+ioport_value battlex_state::in0_b4_r()
 {
 	uint32_t ret = m_in0_b4;
 	if (m_in0_b4)

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="bml3_cass" description="Hitachi Basic Master Level 3 cassettes">
+
+	<software name="bmtetris" supported="yes">
+		<description>BM Tetris</description>
+		<year>1990</year>
+		<publisher>Sakn Soft</publisher>
+		<info name="usage" value="LOAD, press play on tape then RUN. Requires bml3mk5 (uses IG)." />
+		<part name="cass" interface="bml3_cass">
+			<dataarea name="cass" size="5106615">
+				<!-- NOTE: the original .wav won't mount on MAME, this .flac does -->
+				<rom name="tetris_all.flac" size="5106615" crc="696ce3a4" sha1="ba94ad716c7ecbf4434b67e1b79cd0e1012caecb"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

@@ -86,7 +86,7 @@ private:
 	using card_vector = std::vector<std::reference_wrapper<device_svi_slot_interface> >;
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	card_vector m_dev;
 
@@ -121,7 +121,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// configuration
 	required_device<svi_slot_bus_device> m_bus;

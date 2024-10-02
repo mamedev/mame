@@ -88,7 +88,7 @@ protected:
 	st2xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram);
 
 	virtual space_config_vector memory_space_config() const override;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual u16 st2xxx_ireq_mask() const = 0;
 	virtual const char *st2xxx_irq_name(int i) const = 0;

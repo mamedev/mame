@@ -139,8 +139,8 @@ protected:
 
 	struct vram_state_data m_vram_state[2];
 
-	void slave_map_program(address_map &map);
-	void asylum_slave_map_program(address_map &map);
+	void slave_map_program(address_map &map) ATTR_COLD;
+	void asylum_slave_map_program(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(leland_delayed_mvram_w);
 
@@ -185,9 +185,9 @@ private:
 	void sound_port_w(u8 data);
 	void gfx_port_w(u8 data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TILEMAP_MAPPER_MEMBER(leland_scan);
 	TILE_GET_INFO_MEMBER(leland_get_tile_info);
@@ -204,10 +204,10 @@ private:
 	void ataxx_init_eeprom(const u16 *data);
 	int keycard_r();
 	void keycard_w(int data);
-	void master_map_io(address_map &map);
-	void master_map_program(address_map &map);
-	void slave_map_io(address_map &map);
-	void slave_small_map_program(address_map &map);
+	void master_map_io(address_map &map) ATTR_COLD;
+	void master_map_program(address_map &map) ATTR_COLD;
+	void slave_map_io(address_map &map) ATTR_COLD;
+	void slave_small_map_program(address_map &map) ATTR_COLD;
 };
 
 
@@ -245,8 +245,8 @@ private:
 	u8 offroad_wheel_3_r();
 	void redline_master_alt_bankswitch_w(u8 data);
 
-	void master_redline_map_io(address_map &map);
-	void slave_large_map_program(address_map &map);
+	void master_redline_map_io(address_map &map) ATTR_COLD;
+	void slave_large_map_program(address_map &map) ATTR_COLD;
 
 	required_device<leland_80186_sound_device> m_sound;
 };
@@ -295,15 +295,15 @@ private:
 
 	void ataxx_bankswitch();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void ataxx_video(machine_config &config);
 
-	void master_map_program_2(address_map &map);
-	void master_map_io_2(address_map &map);
-	void slave_map_io_2(address_map &map);
+	void master_map_program_2(address_map &map) ATTR_COLD;
+	void master_map_io_2(address_map &map) ATTR_COLD;
+	void slave_map_io_2(address_map &map) ATTR_COLD;
 
 	required_device<leland_80186_sound_device> m_sound;
 

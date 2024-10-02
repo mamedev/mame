@@ -30,10 +30,10 @@ public:
 	void age_candy(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void age_candy_map(address_map &map);
+	void age_candy_map(address_map &map) ATTR_COLD;
 	required_device<hpc_device> m_maincpu;
 };
 

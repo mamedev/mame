@@ -113,9 +113,9 @@ public:
 	void fuusen_init();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void konmedal_palette(palette_device &palette) const;
@@ -152,9 +152,9 @@ private:
 	void shuri_irq_w(uint8_t data);
 	void mario_scrollhack_w(uint8_t data);
 
-	void ddboy_main(address_map &map);
-	void medal_main(address_map &map);
-	void shuriboy_main(address_map &map);
+	void ddboy_main(address_map &map) ATTR_COLD;
+	void medal_main(address_map &map) ATTR_COLD;
+	void shuriboy_main(address_map &map) ATTR_COLD;
 
 	void machine_start_common();
 
@@ -832,7 +832,7 @@ void konmedal_state::tsukande(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
 	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
@@ -875,7 +875,7 @@ void konmedal_state::ddboy(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
 	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
@@ -1019,7 +1019,7 @@ void konmedal_state::shuriboy(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 	m_nvram->set_custom_handler(FUNC(konmedal_state::shuriboy_nvram_init));
-	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // everything not verified, just a placeholder

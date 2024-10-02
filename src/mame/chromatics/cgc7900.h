@@ -78,8 +78,8 @@ public:
 	required_device<i8251_device> m_i8251_0;
 	required_device<i8251_device> m_i8251_1;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void cgc7900_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -116,9 +116,9 @@ public:
 
 	void cgc7900(machine_config &config);
 	void cgc7900_video(machine_config &config);
-	void cgc7900_mem(address_map &map);
-	void keyboard_mem(address_map &map);
-	void cpu_space_map(address_map &map);
+	void cgc7900_mem(address_map &map) ATTR_COLD;
+	void keyboard_mem(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 private:
 	u16 kbd_mods = 0U;
 	u8 kbd_data = 0U;

@@ -84,9 +84,9 @@ private:
 	uint8_t p4_r();
 	uint8_t p5_r();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void mt735_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void mt735_map(address_map &map) ATTR_COLD;
 };
 
 mt735_state::mt735_state(const machine_config &mconfig, device_type type, const char *tag) :

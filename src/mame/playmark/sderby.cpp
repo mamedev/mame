@@ -17,6 +17,7 @@
   Super Derby (2 sets),                  1996, Playmark.
   Croupier (Playmark Roulette) (2 sets), 1997, Playmark.
   Magic Touch,                           1998, Playmark.
+  Tropical Fruits                        1999, Playmark.
 
 
 ********************************************************************************************
@@ -26,8 +27,7 @@
 
   Payout / hopper controls not connected
 
-  Roulette appears to have some kind of MCU device
-  between the processor and the hopper
+  Croupier and Magical Touch have a PIC16C74 between the processor and the hopper
 
 
   Working notes: (Relating to SDERBY)
@@ -59,8 +59,8 @@
 
   - figure out the reads from 0x308002.w and 0x30800e.w (see input_r read handler)
   (by default, demo sounds are OFF, so change this in the "test mode");
-  - dump and hook up the MCU for croupier;
-  - almost everything for magictch. To enter gameplay just do PC=29c2 when it enters a loop at 0x29c0
+  - hook up the MCU for croupier, croupiera (needs PIC16C74 core);
+  - dump and hook up the MCU (PIC16C65) for croupierb, magictch, tropfrt;
 
 *******************************************************************************************/
 
@@ -112,7 +112,6 @@ public:
 
 
 	void luckboom(machine_config &config);
-	void magictch(machine_config &config);
 	void pmroulet(machine_config &config);
 	void sderby(machine_config &config);
 	void sderbya(machine_config &config);
@@ -121,9 +120,8 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-private:
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_md_videoram;
 	required_shared_ptr<uint16_t> m_fg_videoram;
@@ -142,6 +140,9 @@ private:
 
 	uint16_t m_scroll[6]{};
 
+	uint8_t m_sprites_x_kludge = 0;
+	uint8_t m_sprites_y_kludge = 0;
+
 	uint16_t input_r(offs_t offset);
 	uint16_t roulette_input_r(offs_t offset);
 	uint16_t rprot_r();
@@ -159,13 +160,28 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pmroulet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void luckboom_map(address_map &map);
-	void magictch_map(address_map &map);
-	void roulette_map(address_map &map);
-	void sderby_map(address_map &map);
-	void sderbya_map(address_map &map);
-	void shinygld_map(address_map &map);
-	void spacewin_map(address_map &map);
+	void luckboom_map(address_map &map) ATTR_COLD;
+	void roulette_map(address_map &map) ATTR_COLD;
+	void sderby_map(address_map &map) ATTR_COLD;
+	void sderbya_map(address_map &map) ATTR_COLD;
+	void shinygld_map(address_map &map) ATTR_COLD;
+	void spacewin_map(address_map &map) ATTR_COLD;
+};
+
+class zw3_state : public sderby_state
+{
+public:
+	using sderby_state::sderby_state;
+
+	void zw3(machine_config &config);
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
+	void zw3_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -207,6 +223,14 @@ TILE_GET_INFO_MEMBER(sderby_state::get_fg_tile_info)
 	tileinfo.set(0, tileno, colour + 32, 0);
 }
 
+TILE_GET_INFO_MEMBER(zw3_state::get_fg_tile_info)
+{
+	int tileno = (m_fg_videoram[tile_index * 2] << 2) | ((m_fg_videoram[tile_index * 2 + 1] & 0xc000) >> 14);
+	int colour = m_fg_videoram[tile_index * 2 + 1] & 0x0f;
+
+	tileinfo.set(0, tileno, colour + 32, 0);
+}
+
 void sderby_state::fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
@@ -225,8 +249,8 @@ void sderby_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		if (sy == 0x2000) return;   // end of list marker
 
 		int flipx = sy & 0x4000;
-		int sx = (m_spriteram[offs + 1] & 0x01ff) - 16 - 7;
-		sy = (256 - 8 - height - sy) & 0xff;
+		int sx = (m_spriteram[offs + 1] & 0x01ff) - 16 - m_sprites_x_kludge;
+		sy = (256 - m_sprites_y_kludge - height - sy) & 0xff;
 		int code = m_spriteram[offs + 2];
 		int color = (m_spriteram[offs + 1] & 0x3e00) >> 9;
 
@@ -249,8 +273,28 @@ void sderby_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sderby_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
+	m_sprites_x_kludge = 0x07;
+	m_sprites_y_kludge = 0x08;
+
 	save_item(NAME(m_scroll));
 }
+
+void zw3_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zw3_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_md_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zw3_state::get_md_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+
+	m_md_tilemap->set_transparent_pen(0);
+
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zw3_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+
+	m_sprites_x_kludge = 0x00;
+	m_sprites_y_kludge = 0x07;
+
+	save_item(NAME(m_scroll));
+}
+
 
 uint32_t sderby_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -338,7 +382,7 @@ uint16_t sderby_state::roulette_input_r(offs_t offset)
 
     Most probably there is a shared RAM there for communication,
     but for now, I temporarily simulated the MCU response till
-    we can get the MCU decapped.
+    we can get the MCU hooked up.
 
 
 ****************************************************************/
@@ -615,17 +659,19 @@ void sderby_state::roulette_map(address_map &map)
 	map(0xffc000, 0xffffff).ram();
 }
 
-void sderby_state::magictch_map(address_map &map) // memory map is very similar to the above roulette_map. TODO: verify if deriving makes sense once everything's figured out
+void zw3_state::zw3_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x440000, 0x440fff).writeonly().share(m_spriteram);
-	map(0x500000, 0x500fff).ram().w(FUNC(sderby_state::bg_videoram_w)).share(m_bg_videoram);
-	map(0x501000, 0x501fff).ram().w(FUNC(sderby_state::md_videoram_w)).share(m_md_videoram);
-	map(0x502000, 0x503fff).ram().w(FUNC(sderby_state::fg_videoram_w)).share(m_fg_videoram);
-	map(0x504000, 0x50400b).ram().w(FUNC(sderby_state::scroll_w));
+	map(0x500000, 0x500fff).ram().w(FUNC(zw3_state::bg_videoram_w)).share(m_bg_videoram);
+	map(0x501000, 0x501fff).ram().w(FUNC(zw3_state::md_videoram_w)).share(m_md_videoram);
+	map(0x502000, 0x503fff).ram().w(FUNC(zw3_state::fg_videoram_w)).share(m_fg_videoram);
+	map(0x504000, 0x50400b).ram().w(FUNC(zw3_state::scroll_w));
 	map(0x50400e, 0x50400f).nopw();
-	map(0x708000, 0x70800d).r(FUNC(sderby_state::input_r));
-	//map(0x708008, 0x708009).w(FUNC(sderby_state::magictch_out_w)); // TODO
+	map(0x708000, 0x708001).portr("IN0");
+	map(0x708002, 0x708003).portr("IN1");
+	map(0x708008, 0x708009).w(FUNC(zw3_state::roulette_out_w));
+	map(0x70800c, 0x70800d).rw(FUNC(zw3_state::rprot_r), FUNC(zw3_state::rprot_w));
 	map(0x70800f, 0x70800f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x780000, 0x780fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xf00000, 0xf007ff).ram().share("nvram");
@@ -766,6 +812,77 @@ static INPUT_PORTS_START( pmroulet )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( croupierb )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) // to cancel bets in 3-button mode
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START1 ) // to turn roulette
+	PORT_SERVICE_NO_TOGGLE(0x1000, IP_ACTIVE_LOW)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // it must be toggled to boot anyway
+	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( magictch )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) // buttons 1-6 have different uses depending on the game selected
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE(0x1000, IP_ACTIVE_LOW)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // it must be toggled to boot anyway
+	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tropfrt )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / Low")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / High")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / Double Up")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Collect")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Bet")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE(0x1000, IP_ACTIVE_LOW)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // it must be toggled to boot anyway
+	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 /****************************
 *     Graphics Layouts      *
@@ -939,27 +1056,14 @@ void sderby_state::pmroulet(machine_config &config)
 	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
-void sderby_state::magictch(machine_config &config)
+void zw3_state::zw3(machine_config &config)
 {
-	M68000(config, m_maincpu, 12_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sderby_state::magictch_map);
-	m_maincpu->set_vblank_int("screen", FUNC(sderby_state::irq2_line_hold));
+	pmroulet(config);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zw3_state::zw3_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sderby_state::irq4_line_hold));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(64*8, 64*8);
-	screen.set_visarea(4*8, 44*8-1, 3*8, 33*8-1);
-	screen.set_screen_update(FUNC(sderby_state::screen_update_pmroulet));
-	screen.set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
-
-	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 verified
+	subdevice<okim6295_device>("oki")->set_clock(1_MHz_XTAL); // pin 7 verified
 }
 
 
@@ -1109,7 +1213,7 @@ Croupier (PlaYMark)
 -------------------
 
 1x MC68000FN12 (U24, QFP)
-1x unknown scratched 40-pin DIP IC (U39)
+1x PIC16C74 (U39, scratched)
 
 1x OKI M6295 (U34, near ROM 1)
 1x Resonator 1000J (Y1)
@@ -1253,7 +1357,7 @@ ROM_END
 /*
 ZW3 PCB with 'MAGIC' sticker
 1x MC68000FN12
-1x scratched off DIP-40 chip near the main CPU
+1x PIC16C65 (scratched)
 1x M48Z02-150PC1 ZEROPOWER RAM
 1x 12 MHz XTAL
 1x 14.318180 MHz XTAL
@@ -1266,6 +1370,9 @@ ROM_START( magictch )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "22.u43", 0x00000, 0x20000, CRC(47f047b1) SHA1(f47ab9734f6bb1dc50baf159bca144fa79eac1a5) ) // TMS27C010A
 	ROM_LOAD16_BYTE( "23.u42", 0x00001, 0x20000, CRC(f63e31bf) SHA1(e96da519a8d6488d600e031ac48f5ce1a8a376f5) ) // TMS27C010A
+
+	ROM_REGION( 0x4008, "pic16c65", 0 )
+	ROM_LOAD( "pic16c65.u28", 0x0000, 0x4008, NO_DUMP )
 
 	ROM_REGION( 0x040000, "oki", 0 )
 	ROM_LOAD( "21.u16", 0x00000, 0x40000, CRC(e06a023f) SHA1(b4cd64f6c97e9c3e50a9658e171d748cb9f1c4ef) ) // ST M27C2001, 1xxxxxxxxxxxxxxxxx = 0xFF
@@ -1281,10 +1388,13 @@ ROM_START( magictch )
 	ROM_LOAD( "gal22cv10-15lnc.u40", 0x000, 0x2e5, NO_DUMP ) // soldered
 ROM_END
 
-ROM_START( croupierb ) // identical PCB as magictch, but with 'ROULETTE' sticker and a Dallas DS1220Y instead of the M48Z02
+ROM_START( croupierb ) // identical PCB to magictch, but with 'ROULETTE' sticker and a Dallas DS1220Y instead of the M48Z02
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "12.u43", 0x00000, 0x20000, CRC(fe6c95f6) SHA1(9a90e15753fab2304a05192202456a3ee7adbc38) ) // TMS27C010A
 	ROM_LOAD16_BYTE( "13.u42", 0x00001, 0x20000, CRC(9e76bd67) SHA1(19951f6a1201feecf8caa79bff6b46508db0f999) ) // TMS27C010A
+
+	ROM_REGION( 0x4008, "pic16c65", 0 )
+	ROM_LOAD( "pic16c65.u28", 0x0000, 0x4008, NO_DUMP )
 
 	ROM_REGION( 0x080000, "oki", 0 )
 	ROM_LOAD( "1.u16", 0x00000, 0x40000, CRC(6673de85) SHA1(df390cd6268efc0e743a9020f19bc0cbeb757cfa) ) // TMS27C020, same as other croupier sets
@@ -1300,6 +1410,31 @@ ROM_START( croupierb ) // identical PCB as magictch, but with 'ROULETTE' sticker
 	ROM_LOAD( "gal22cv10-15lnc.u40", 0x000, 0x2e5, NO_DUMP ) // soldered
 ROM_END
 
+ROM_START( tropfrt ) // identical PCB to magictch, but with 'TROPICAL' sticker and not scratched PIC16C65
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "9.u43",  0x00000, 0x20000, CRC(25c675c7) SHA1(ba89fec39028d96c88a22bed71c82361d50eef12) ) // M27C1001
+	ROM_LOAD16_BYTE( "10.u42", 0x00001, 0x20000, CRC(cd1a533a) SHA1(c611cc26239309d8ea21724f20ed88e8cf076fc5) ) // M27C1001
+
+	ROM_REGION( 0x4008, "pic16c65", 0 )
+	ROM_LOAD( "pic16c65.u28", 0x0000, 0x4008, NO_DUMP )
+
+	ROM_REGION( 0x040000, "oki", 0 )
+	ROM_LOAD( "16.u16", 0x00000, 0x40000, CRC(85acb618) SHA1(b7f1cb288bf155cebd8aa47286d1147b538b27e6) ) // M27C2001, 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0xa0000, "gfx", 0 )
+	ROM_LOAD( "11.u76", 0x000000, 0x20000, CRC(02b8ab49) SHA1(3f63af482ac582c90ea89e9d5c54ac87ff7c1d76) ) // M27C1001
+	ROM_LOAD( "12.u77", 0x020000, 0x20000, CRC(d7e39de0) SHA1(acb5204d611f8a7305d7261700b04093800a3463) ) // M27C1001
+	ROM_LOAD( "13.u78", 0x040000, 0x20000, CRC(e0b9fbeb) SHA1(8c2cc0f28e6f61eca79aa5957f294219d2d95694) ) // M27C1001
+	ROM_LOAD( "14.u79", 0x060000, 0x20000, CRC(5909db4d) SHA1(5258586bd16e31cc20576a68fd701fbcf7c4a53c) ) // M27C1001
+	ROM_LOAD( "15.u80", 0x080000, 0x20000, CRC(46f09c0e) SHA1(1324ce512a5e617bcd47850f5ffcbd85ff1c3e61) ) // M27C1001
+
+	ROM_REGION( 0x800, "nvram", 0)
+	ROM_LOAD( "nvram", 0x000, 0x800, CRC(8278a06f) SHA1(a1e6905250102d8be4be681123585b8e131a4ffd) ) // pre-initialized (game doesn't accept coins without initializing)
+
+	ROM_REGION( 0x300, "plds", 0)
+	ROM_LOAD( "gal22v10b-25lp.u40", 0x000, 0x2e5, NO_DUMP ) // soldered
+ROM_END
+
 } // anonymous namespace
 
 
@@ -1307,13 +1442,14 @@ ROM_END
 *        Game Drivers         *
 ******************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS         INIT        ROT   COMPANY     FULLNAME                                FLAGS                                                LAYOUT
-GAMEL( 1996, sderby,    0,        sderby,   sderby,   sderby_state, empty_init, ROT0, "Playmark", "Super Derby (Playmark, v.07.03)",      0,                                                   layout_sderby   )
-GAMEL( 1996, sderbya,   sderby,   sderbya,  sderbya,  sderby_state, empty_init, ROT0, "Playmark", "Super Derby (Playmark, v.10.04)",      0,                                                   layout_sderby   )
-GAMEL( 1996, spacewin,  0,        spacewin, spacewin, sderby_state, empty_init, ROT0, "Playmark", "Scacco Matto / Space Win",             0,                                                   layout_spacewin )
-GAME(  1996, shinygld,  0,        shinygld, shinygld, sderby_state, empty_init, ROT0, "Playmark", "Shiny Golds",                          0                                                                    )
-GAMEL( 1997, croupier,  0,        pmroulet, pmroulet, sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
-GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet, sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
-GAMEL( 1997, croupierb, croupier, magictch, spacewin, sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.03.09)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS,    layout_pmroulet ) // title screen says Croupier 2 but every string in ROM says Croupier. See magictch below for emulation problems
-GAME(  1996, luckboom,  0,        luckboom, luckboom, sderby_state, empty_init, ROT0, "Playmark", "Lucky Boom",                           0                                                                    )
-GAME(  1998, magictch,  0,        magictch, spacewin, sderby_state, empty_init, ROT0, "Playmark", "Magic Touch",                          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // wrong text layer hook up, stops during boot and needs debugger help to go in game, inputs aren't done, some scroll offsets are wrong
+//     YEAR  NAME       PARENT    MACHINE   INPUT      CLASS         INIT        ROT   COMPANY     FULLNAME                                   FLAGS                                                LAYOUT
+GAMEL( 1996, sderby,    0,        sderby,   sderby,    sderby_state, empty_init, ROT0, "Playmark", "Super Derby (Playmark, v.07.03)",         0,                                                   layout_sderby   )
+GAMEL( 1996, sderbya,   sderby,   sderbya,  sderbya,   sderby_state, empty_init, ROT0, "Playmark", "Super Derby (Playmark, v.10.04)",         0,                                                   layout_sderby   )
+GAMEL( 1996, spacewin,  0,        spacewin, spacewin,  sderby_state, empty_init, ROT0, "Playmark", "Scacco Matto / Space Win",                0,                                                   layout_spacewin )
+GAME(  1996, shinygld,  0,        shinygld, shinygld,  sderby_state, empty_init, ROT0, "Playmark", "Shiny Golds",                             0                                                                    )
+GAMEL( 1997, croupier,  0,        pmroulet, pmroulet,  sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
+GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet,  sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
+GAMEL( 1997, croupierb, croupier, zw3,      croupierb, zw3_state,    empty_init, ROT0, "Playmark", "Croupier II (Playmark Roulette v.03.09)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS, layout_pmroulet ) // title screen says Croupier 2 but every string in ROM says Croupier.
+GAME(  1996, luckboom,  0,        luckboom, luckboom,  sderby_state, empty_init, ROT0, "Playmark", "Lucky Boom",                              0                                                                    )
+GAME(  1998, magictch,  0,        zw3,      magictch,  zw3_state,    empty_init, ROT0, "Playmark", "Magic Touch",                             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // sprite offsets aren't 100% correct, no PIC16C65 emulation, needs proper layout
+GAME(  1999, tropfrt,   0,        zw3,      tropfrt,   zw3_state,    empty_init, ROT0, "Playmark", "Tropical Fruits (V. 24-06.00 Rev. 4.0)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // sprite offsets aren't 100% correct, no PIC16C74 emulation, needs proper layout

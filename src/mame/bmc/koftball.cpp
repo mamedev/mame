@@ -86,8 +86,8 @@ public:
 	void init_koftball();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -118,9 +118,9 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-	void jxzh_mem(address_map &map);
-	void koftball_mem(address_map &map);
-	void ramdac_map(address_map &map);
+	void jxzh_mem(address_map &map) ATTR_COLD;
+	void koftball_mem(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 };
 
 

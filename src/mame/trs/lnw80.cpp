@@ -97,8 +97,8 @@ public:
 	void lnw80(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -107,8 +107,8 @@ private:
 	void lnw80_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void lnw80_io(address_map &map);
-	void lnw80_mem(address_map &map);
+	void lnw80_io(address_map &map) ATTR_COLD;
+	void lnw80_mem(address_map &map) ATTR_COLD;
 
 	u8 m_lnw_mode = 0U;
 	required_shared_ptr<u8> m_p_gfxram;

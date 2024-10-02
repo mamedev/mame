@@ -75,8 +75,8 @@ public:
 	void eacc(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void scan_w(int state);
@@ -85,7 +85,7 @@ private:
 	uint8_t keyboard_r();
 	void digit_w(uint8_t data);
 	void segment_w(uint8_t data);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 	void do_nmi(bool, bool);
 	uint8_t m_digit = 0U;
 	bool m_cb2 = false;

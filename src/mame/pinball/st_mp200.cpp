@@ -104,8 +104,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 u10_a_r();
@@ -120,8 +120,8 @@ private:
 	void u11_ca2_w(int state);
 	void u11_cb2_w(int state);
 
-	void mem_map(address_map &map);
-	void sam4_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void sam4_map(address_map &map) ATTR_COLD;
 
 	u8 m_u10a = 0U;
 	u8 m_u10b = 0U;
@@ -426,7 +426,7 @@ void st_mp200_state::u11_ca2_w(int state)
 			m_s14001a->set_output_gain(0, ((m_u10a >> 3 & 0xf) + 1) / 16.0);
 
 			u8 clock_divisor = 16 - (m_u10a & 0x07);
-			m_s14001a->set_clock(S14001_CLOCK / clock_divisor / 8);
+			m_s14001a->set_unscaled_clock(S14001_CLOCK / clock_divisor / 8);
 		}
 	}
 }

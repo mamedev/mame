@@ -44,8 +44,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -185,8 +185,8 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint8_t read_io0(uint8_t direction);
 	virtual uint8_t read_io1(uint8_t direction);
@@ -213,17 +213,17 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void xavix_map(address_map &map);
+	void xavix_map(address_map &map) ATTR_COLD;
 
-	void xavix_lowbus_map(address_map &map);
-	void xavix_extbus_map(address_map &map);
-	void superxavix_lowbus_map(address_map &map);
+	void xavix_lowbus_map(address_map &map) ATTR_COLD;
+	void xavix_extbus_map(address_map &map) ATTR_COLD;
+	void superxavix_lowbus_map(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void debug_mem_w(offs_t offset, uint8_t data)
 	{
@@ -717,6 +717,7 @@ public:
 	void xavix_cart_popira(machine_config &config);
 	void xavix_cart_ddrfammt(machine_config &config);
 	void xavix_cart_evio(machine_config &config);
+	void xavix_cart_daig(machine_config &config);
 
 protected:
 
@@ -950,6 +951,16 @@ protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 };
 
+class xavix_daig_cart_state : public xavix_cart_state
+{
+public:
+	xavix_daig_cart_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_cart_state(mconfig,type,tag)
+	{ }
+
+protected:
+};
+
 class xavix_ekara_state : public xavix_cart_state
 {
 public:
@@ -993,7 +1004,7 @@ public:
 	int ekara_multi3_r();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_ioport m_extra2;
 	required_ioport m_extra3;

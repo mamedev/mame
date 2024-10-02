@@ -19,8 +19,8 @@ protected:
 
 	ymp21_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	memory_share_creator<u32> m_dsp3_buffer;
@@ -29,7 +29,7 @@ private:
 
 	emu_timer *m_rx_timer[2], *m_tx_timer[2];
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(uart_rx);
 	TIMER_CALLBACK_MEMBER(uart_tx);

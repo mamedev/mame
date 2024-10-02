@@ -70,7 +70,7 @@ public:
 		, m_triggers(*this, "TRIGGERS")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_pos_r);
+	ioport_value lightgun_pos_r();
 	int lightgun_trigger_r();
 	int lightgun_holster_r();
 
@@ -103,11 +103,11 @@ private:
 
 	DECLARE_VIDEO_START(alg);
 
-	void a500_mem(address_map &map);
-	void main_map_picmatic(address_map &map);
-	void main_map_r1(address_map &map);
-	void main_map_r2(address_map &map);
-	void overlay_512kb_map(address_map &map);
+	void a500_mem(address_map &map) ATTR_COLD;
+	void main_map_picmatic(address_map &map) ATTR_COLD;
+	void main_map_r1(address_map &map) ATTR_COLD;
+	void main_map_r2(address_map &map) ATTR_COLD;
+	void overlay_512kb_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -167,7 +167,7 @@ void alg_state::potgo_w(uint16_t data)
 }
 
 
-CUSTOM_INPUT_MEMBER(alg_state::lightgun_pos_r)
+ioport_value alg_state::lightgun_pos_r()
 {
 	int x = 0, y = 0;
 

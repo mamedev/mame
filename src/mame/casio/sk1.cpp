@@ -45,11 +45,11 @@ public:
 	template <ioport_value V> DECLARE_INPUT_CHANGED_MEMBER(sw_function);
 	template <ioport_value V> DECLARE_INPUT_CHANGED_MEMBER(sw_mode);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(function_in) { return m_sw_function; }
-	DECLARE_CUSTOM_INPUT_MEMBER(mode_in) { return m_sw_mode; }
+	ioport_value function_in() { return m_sw_function; }
+	ioport_value mode_in() { return m_sw_mode; }
 
 private:
-	void sk1_memory(address_map &map);
+	void sk1_memory(address_map &map) ATTR_COLD;
 
 	virtual void driver_start() override;
 

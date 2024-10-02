@@ -88,8 +88,8 @@ public:
 	void kcgd(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	//TIMER_CALLBACK_MEMBER(vsync_tick);
 	TIMER_CALLBACK_MEMBER(toggle_500hz);
@@ -124,7 +124,7 @@ private:
 	//emu_timer *m_vsync_on_timer;
 	emu_timer *m_500hz_timer = nullptr;
 
-	void kcgd_mem(address_map &map);
+	void kcgd_mem(address_map &map) ATTR_COLD;
 
 	void draw_scanline(uint16_t *p, uint16_t offset);
 	rectangle m_tmpclip;

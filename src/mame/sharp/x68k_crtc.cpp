@@ -148,8 +148,8 @@ void x68k_crtc_device::refresh_mode()
 	m_vtotal = (m_reg[4] + 1) / m_vmultiple; // default is 567 (568 scanlines)
 	m_hbegin = (m_reg[2] * 8) + 1;
 	m_hend = m_reg[3] * 8;
-	m_vbegin = m_reg[6] / m_vmultiple;
-	m_vend = (m_reg[7] - 1) / m_vmultiple;
+	m_vbegin = (m_reg[6] + 1) / m_vmultiple;
+	m_vend = m_reg[7] / m_vmultiple;
 	m_hsync_end = (m_reg[1]) * 8;
 	m_vsync_end = (m_reg[5]) / m_vmultiple;
 	m_hsyncadjust = m_reg[8];
@@ -278,7 +278,7 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::vblank_irq)
 	if (val == 0)  // V-DISP off
 	{
 		m_vblank = 0;
-		vblank_line = m_vend;
+		vblank_line = m_vend + (gfx_double_scan() ? 2 : 1);
 		if (vblank_line > m_vtotal)
 			vblank_line = m_vtotal;
 		irq_time = screen().time_until_pos(vblank_line, 2);

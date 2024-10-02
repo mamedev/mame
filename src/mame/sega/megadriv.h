@@ -36,7 +36,7 @@ protected:
 	{
 	}
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void md_core_ntsc(machine_config &config);
 	void md_core_pal(machine_config &config);
@@ -118,13 +118,13 @@ protected:
 	void md2_pal(machine_config &config);
 	void md_bootleg(machine_config &config);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void megadriv_68k_base_map(address_map &map);
-	void megadriv_68k_map(address_map &map);
-	void megadriv_z80_io_map(address_map &map);
-	void megadriv_z80_map(address_map &map);
+	void megadriv_68k_base_map(address_map &map) ATTR_COLD;
+	void megadriv_68k_map(address_map &map) ATTR_COLD;
+	void megadriv_z80_io_map(address_map &map) ATTR_COLD;
+	void megadriv_z80_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_z80snd;
 	required_device<ym_generic_device> m_ymsnd;
@@ -166,7 +166,7 @@ protected:
 	void ctrl1_6button(machine_config &config);
 	void ctrl2_6button(machine_config &config);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	template <unsigned N> uint8_t ioport_in_3button();

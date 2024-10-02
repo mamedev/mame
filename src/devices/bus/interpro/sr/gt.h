@@ -17,7 +17,7 @@ class gt_device_base : public device_t
 protected:
 	gt_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool double_buffered, const bool masked_reads);
 
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 
 public:
 	static constexpr u32 GT_MASK_BITS   = 0x80808080; // mask RAM presents on high bit in each pixel/byte
@@ -143,8 +143,8 @@ public:
 	void bsga_float_w(offs_t offset, u32 data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 	u32 buffer_r(const offs_t offset);
@@ -250,7 +250,7 @@ class gt_device : public gt_device_base, public device_cbus_card_interface
 protected:
 	gt_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool double_buffered);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 };
 
 class gtdb_device : public gt_device_base, public device_srx_card_interface
@@ -258,8 +258,8 @@ class gtdb_device : public gt_device_base, public device_srx_card_interface
 protected:
 	gtdb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
-	virtual void map_dynamic(address_map &map);
+	virtual void map(address_map &map) override ATTR_COLD;
+	virtual void map_dynamic(address_map &map) ATTR_COLD;
 
 	void serial_irq(int state);
 	void mouse_status_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -286,8 +286,8 @@ protected:
 	};
 	u32 fifo_control_r() { return m_fifo_control; }
 
-	//virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	//virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual u32 vram_r(offs_t offset, const bool linear = false) const override;
 	virtual void vram_w(offs_t offset, const u32 data, u32 mem_mask, const bool linear = false) const override;
@@ -309,8 +309,8 @@ public:
 	mpcb963_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class mpcba79_device : public gt_device
@@ -319,8 +319,8 @@ public:
 	mpcba79_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 
@@ -330,8 +330,8 @@ public:
 	msmt070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class msmt071_device : public gt_device
@@ -340,8 +340,8 @@ public:
 	msmt071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class msmt081_device : public gt_device
@@ -350,8 +350,8 @@ public:
 	msmt081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class mpcbb68_device : public gtdb_device
@@ -360,8 +360,8 @@ public:
 	mpcbb68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class mpcbb92_device : public gtdb_device
@@ -370,8 +370,8 @@ public:
 	mpcbb92_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 // device type definition

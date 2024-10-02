@@ -126,17 +126,17 @@ public:
 	void hp3478a(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	//virtual void machine_reset() override;    //not needed?
+	virtual void machine_start() override ATTR_COLD;
+	//virtual void machine_reset() override ATTR_COLD;    //not needed?
 
 private:
 	uint8_t p1read();
 	void p2write(uint8_t data);
 	void nvwrite(offs_t offset, uint8_t data);
 
-	void io_bank(address_map &map);
-	void i8039_io(address_map &map);
-	void i8039_map(address_map &map);
+	void io_bank(address_map &map) ATTR_COLD;
+	void i8039_io(address_map &map) ATTR_COLD;
+	void i8039_map(address_map &map) ATTR_COLD;
 
 	required_device<i8039_device> m_maincpu;
 	required_device<nvram_device> m_nvram;

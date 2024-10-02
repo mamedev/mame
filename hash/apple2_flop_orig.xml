@@ -2070,28 +2070,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pop">
-		<description>Prince of Persia</description>
-		<year>1989</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires a 128K Apple //e, //c, or IIgs." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2018-09-14 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="233481">
-				<rom name="prince of persia side a.woz" size="233481" crc="a3820127" sha1="bf7c7c03fcc93b989a8a7e566ec711888553a9de" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="233481">
-				<rom name="prince of persia side b.woz" size="233481" crc="6de94d52" sha1="931e264563390d1e76cef9a7db31492643f45b49" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="radwarr">
 		<description>Rad Warrior</description>
 		<year>1987</year>
@@ -2178,21 +2156,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="240149">
 				<rom name="repton.woz" size="240149" crc="0f2eb4c5" sha1="f8f606c751eb1f86cb60cb1e6b538acd30a66ab9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rescraid">
-		<description>Rescue Raiders</description>
-		<year>1984</year>
-		<publisher>Sir-Tech</publisher>
-		<info name="usage" value="Runs on any Apple II with 64K." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2018-08-16 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="233518">
-				<rom name="rescue raiders.woz" size="233518" crc="f2f5bf46" sha1="4ab4e39d593e35c2b1eebc2b5bd1c51b024ef1fb" />
 			</dataarea>
 		</part>
 	</software>
@@ -4072,30 +4035,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wizrdry3">
-		<description>Wizardry III: Legacy of Llylgamyn (version 4, 20-Aug-1983 update)</description>
-		<year>1983</year>
-		<publisher>Sir-Tech Software</publisher>
-		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<info name="version" value="Version 4, 20-Aug-1983 update" />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2019-04-08. Redumped: 2023-09-12-->
-		<!--roleplaying game-->
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A - Master Scenario disk" />
-			<dataarea name="flop" size="234882">
-				<rom name="wizardry iii side a - master scenario disk.woz" size="234882" crc="57366656" sha1="9d59da2fca6c3c42c89ff2e8988d4d66dd1e0143" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Boot disk" />
-			<dataarea name="flop" size="234871">
-				<rom name="wizardry iii side b - boot.woz" size="234871" crc="4e0b9951" sha1="ed00134fb1006eeb3cd1299449759beae2218061" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="arcalbm1">
 		<description>Arcade Album #1</description>
 		<year>1983</year>
@@ -4892,21 +4831,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="234866">
 				<rom name="the wizard of oz disk d.woz" size="234866" crc="1c0e7e78" sha1="25d7e25b66c475d0881138ba302be722683df6e6" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="queenphb">
-		<description>The Queen of Phobos</description>
-		<year>1982</year>
-		<publisher>Phoenix Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-06-07 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="181581">
-				<rom name="the queen of phobos.woz" size="181581" crc="6c31a42a" sha1="7617ff8f126edaab1daf8954ea7d6cac07bb1e77" />
 			</dataarea>
 		</part>
 	</software>
@@ -5792,21 +5716,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="qsrtnhcl">
-		<description>Return of Heracles</description>
-		<year>1983</year>
-		<publisher>Quality Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-08-02 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="235508">
-				<rom name="return of heracles.woz" size="235508" crc="50be7d16" sha1="24e16ab619a269e8cb47d0a3557aec1cf9c35d98" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="racemdnt">
 		<description>Race For Midnight</description>
 		<year>1981</year>
@@ -5967,70 +5876,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="228079">
 				<rom name="escape.woz" size="228079" crc="27a73b52" sha1="e2af6129e23aad6fb6ff9025b0694c4c9a97007f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizrdry5">
-		<description>Wizardry V: Heart of the Maelstrom</description>
-		<year>1988</year>
-		<publisher>Sir-Tech Software</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-08-03 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="234780">
-				<rom name="wizardry v - heart of the maelstrom - a.woz" size="234780" crc="5c670ca8" sha1="93c05e54ea21596165fb158cfcceaa595ccd38e1" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="234780">
-				<rom name="wizardry v - heart of the maelstrom - b.woz" size="234780" crc="1df4b66f" sha1="5ceb0e45e976111ad9d93a3feb1261ecd207465b" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C" />
-			<dataarea name="flop" size="234780">
-				<rom name="wizardry v - heart of the maelstrom - c.woz" size="234780" crc="60381a85" sha1="68ac614ea0bc52a690d35c9c6a64d425fe775202" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D" />
-			<dataarea name="flop" size="234780">
-				<rom name="wizardry v - heart of the maelstrom - d.woz" size="234780" crc="2219894f" sha1="793a5074867136cfee53877113dcfda0c8590b6b" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E" />
-			<dataarea name="flop" size="234780">
-				<rom name="wizardry v - heart of the maelstrom - e.woz" size="234780" crc="0e3d0d38" sha1="4a8a35ea50bf55da877ada12823971c7bb6779c4" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk F" />
-			<dataarea name="flop" size="234780">
-				<rom name="wizardry v - heart of the maelstrom - f.woz" size="234780" crc="f0b8294f" sha1="fbed529779a7f1dd70a416f83502dd4468c4d014" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk G" />
-			<dataarea name="flop" size="234780">
-				<rom name="wizardry v - heart of the maelstrom - g.woz" size="234780" crc="90979c2d" sha1="a9a115d8f68eefadfe360bb006239fa1773633a8" />
-			</dataarea>
-		</part>
-		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Disk H" />
-			<dataarea name="flop" size="234780">
-				<rom name="wizardry v - heart of the maelstrom - h.woz" size="234780" crc="571539b6" sha1="5db3ef18a7a03c775b16577624af3c3ef0637b97" />
-			</dataarea>
-		</part>
-		<part name="flop9" interface="floppy_5_25">
-			<feature name="part_id" value="Disk I" />
-			<dataarea name="flop" size="234780">
-				<rom name="wizardry v - heart of the maelstrom - i.woz" size="234780" crc="690af2ea" sha1="99fc3ba766182e331f8729672711a27b2bfe1509" />
 			</dataarea>
 		</part>
 	</software>
@@ -8570,21 +8415,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="galattk">
-		<description>Galactic Attack</description>
-		<year>1980</year>
-		<publisher>Sir-Tech</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-12-14 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234790">
-				<rom name="galactic attack.woz" size="234790" crc="013efc71" sha1="68975194ff1b597ed4e2773649bb8880d050a1cd" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="journey">
 		<description>Journey (version 16)</description>
 		<year>1989</year>
@@ -8636,52 +8466,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234863">
 				<rom name="southern command.woz" size="234863" crc="e04bb52c" sha1="bc53a1a66fc347859c17238a28b3bd4a8b178739" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizrdry4">
-		<description>Wizardry IV: The Return of Werdna</description>
-		<year>1987</year>
-		<publisher>Sir-Tech</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-12-14 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234833">
-				<rom name="wizardry iv - the return of werdna side a.woz" size="234833" crc="0c6ac6a0" sha1="f465fb3b88eb38c197e24da1ae1962f6d0a58cd9" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234833">
-				<rom name="wizardry iv - the return of werdna side b.woz" size="234833" crc="179d1324" sha1="7bff6956d76129cc82d5e5ac6ba30d8806054bdf" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Side C" />
-			<dataarea name="flop" size="234833">
-				<rom name="wizardry iv - the return of werdna side c.woz" size="234833" crc="0493f3d5" sha1="22efb911669d42525a8e8ab35b2a34ca5ef2fdbd" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Side D" />
-			<dataarea name="flop" size="234833">
-				<rom name="wizardry iv - the return of werdna side d.woz" size="234833" crc="897eb0dc" sha1="21f4d0bd66d9d3a275678dbfc7cabb0cc023910f" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Side E" />
-			<dataarea name="flop" size="234833">
-				<rom name="wizardry iv - the return of werdna side e.woz" size="234833" crc="0fd25eba" sha1="eb07e89850635da688a5aa1d372eebbc19594c9e" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Side F" />
-			<dataarea name="flop" size="234833">
-				<rom name="wizardry iv - the return of werdna side f.woz" size="234833" crc="3a8a7986" sha1="a2684a58605af6ddbd6554bc99333ab3947dd4e9" />
 			</dataarea>
 		</part>
 	</software>
@@ -9146,67 +8930,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="88341">
 				<rom name="star trek - strategic operations simulator.woz" size="88341" crc="4c47c392" sha1="8ac0afa85358e8d9ab4a58daeb3b92a8b0330a55" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wzdryr21">
-		<description>Wizardry: Proving Grounds of the Mad Overlord (version 2.1)</description>
-		<year>1981</year>
-		<publisher>Sir-Tech</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-01-11 -->
-		<!-- Note: some emulators may have difficulty loading this disk because of its especially timing-sensitive copy protection.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Boot disk" />
-			<dataarea name="flop" size="234829">
-				<rom name="wizardry - proving grounds of the mad overlord v2.1 - boot disk.woz" size="234829" crc="29dfa2a6" sha1="6c0416fb7cb91bde8da05df77ecfc5f7b7c645f1" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Scenario master disk" />
-			<dataarea name="flop" size="234829">
-				<rom name="wizardry - proving grounds of the mad overlord v2.1 - scenario master disk.woz" size="234829" crc="7951ca26" sha1="604a416c50ca6fccb39c11142f8be00d51ce627c" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wzrdry2">
-		<description>Wizardry II: The Knight of Diamonds (version PV3S2V1/10-MAR-82)</description>
-		<year>1982</year>
-		<publisher>Sir-Tech</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-01-11 -->
-		<!-- This is version PV3S2V1 of 10-MAR-82.Some emulators may have difficulty loading this disk because of its especially timing-sensitive copy protection.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Boot disk" />
-			<dataarea name="flop" size="234854">
-				<rom name="wizardry ii - knight of diamonds - boot disk.woz" size="234854" crc="16a794a8" sha1="db098051302810edb8aa5c56c8a3dd7cc9ab0772" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Master scenario disk" />
-			<dataarea name="flop" size="234865">
-				<rom name="wizardry ii - knight of diamonds - master scenario disk.woz" size="234865" crc="ac3a27d9" sha1="59f7c602c6347c732ddd8222d667622bf8749a29" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizipr21">
-		<description>Wiziprint (version 2.1)</description>
-		<year>1982</year>
-		<publisher>Sir-Tech</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-01-13 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234840">
-				<rom name="wiziprint v2.01.woz" size="234840" crc="593dc847" sha1="d8628dbce3441820cbbd2ef4ac5a94421e514226" />
 			</dataarea>
 		</part>
 	</software>
@@ -10480,21 +10203,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wizplus">
-		<description>Wizplus</description>
-		<year>1982</year>
-		<publisher>Datamost</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-03-02 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234768">
-				<rom name="wizplus.woz" size="234768" crc="f60920a3" sha1="a640aec03dc8bddf434b43318ae80f54d5c1ab8c" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="jelwayqb">
 		<description>John Elway's Quarterback</description>
 		<year>1987</year>
@@ -10770,21 +10478,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B - Historical scenarios" />
 			<dataarea name="flop" size="234793">
 				<rom name="kampfgruppe side b - historical senarios.woz" size="234793" crc="43f3a85e" sha1="c045af7378e7dff9a3dac97e26e82543df3da566" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="metinspc">
-		<description>Meteoroids in Space</description>
-		<year>1981</year>
-		<publisher>Quality Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-04-08 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="48405">
-				<rom name="meteoroids in space.woz" size="48405" crc="7beb3c05" sha1="61cdb1028a091a7bd85ac636f1f29087b57b4426" />
 			</dataarea>
 		</part>
 	</software>
@@ -11740,40 +11433,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="scitkp20">
-		<description>Science Toolkit Plus (version 2.0)</description>
-		<year>1989</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-05 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Master module" />
-			<dataarea name="flop" size="241512">
-				<rom name="science toolkit plus v2.0 disk 1 - master module.woz" size="241512" crc="421c7922" sha1="9c4dbbb09ffcf609a4efe34be3fb6f0753c177b9" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Module 1: Speed and motion" />
-			<dataarea name="flop" size="241523">
-				<rom name="science toolkit plus v2.0 disk 2 - module 1- speed and motion.woz" size="241523" crc="1f24f501" sha1="69d51f5d5663a7a73eddadc81f110575adaeff7e" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3 - Module 2: Earthquake lab" />
-			<dataarea name="flop" size="241523">
-				<rom name="science toolkit plus v2.0 disk 3 - module 2- earthquake lab.woz" size="241523" crc="01807b1e" sha1="d0cd79b8649110c16f8051fb552389463c94e18a" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4 - Module 3: Body lab" />
-			<dataarea name="flop" size="241517">
-				<rom name="science toolkit plus v2.0 disk 4 - module 3- body lab.woz" size="241517" crc="7ede15f2" sha1="79f286fb54c3b806718fa21025c0fa10c720e8f7" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tycoon21">
 		<description>Tycoon (version 2.1)</description>
 		<year>1985</year>
@@ -11796,21 +11455,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bgtrck21">
-		<description>Bag of Tricks (version 2.1)</description>
-		<year>1987</year>
-		<publisher>Quality Software</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-06 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="241471">
-				<rom name="bag of tricks v2.1.woz" size="241471" crc="fcac8d4e" sha1="e879a1875a6dc3263bd0d239e130c397458b841e" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="clchess4">
 		<description>Colossus Chess IV</description>
 		<year>1986</year>
@@ -11822,21 +11466,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241413">
 				<rom name="colossus chess iv.woz" size="241413" crc="3d336167" sha1="3b1caa7cca7efef1d5d2da18a1ffd0a62980c4fb" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="astinspc">
-		<description>Asteroids in Space</description>
-		<year>1980</year>
-		<publisher>Quality Software</publisher>
-		<info name="usage" value="Runs on any Apple II with 32K and a 13-sector drive." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-06 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="241425">
-				<rom name="asteroids in space.woz" size="241425" crc="b4e281cb" sha1="a0870556a5e29e79427c4528ff739472a75b6e99" />
 			</dataarea>
 		</part>
 	</software>
@@ -12268,51 +11897,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234907">
 				<rom name="miner's cave.woz" size="234907" crc="8920ad2a" sha1="906bc19a5ac0d273fea0b45aa370276c332691e9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="estqs1">
-		<description>Estimation: Quick Solve I (version 1.0)</description>
-		<year>1990</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-10 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234918">
-				<rom name="estimation- quick solve i.woz" size="234918" crc="62eeefa8" sha1="d9e41383ac91a65db37c52d8b3b720e66b296e89" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="eststrat">
-		<description>Estimation Strategies (version 1.0)</description>
-		<year>1991</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-10 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234836">
-				<rom name="estimation strategies.woz" size="234836" crc="47a12cc6" sha1="7db9cbef26d7bfcdb526018274fc53d55044e2ce" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="estactiv">
-		<description>Estimation Activities (version 1.0)</description>
-		<year>1991</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-10 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234855">
-				<rom name="estimation activities.woz" size="234855" crc="4b1b30c1" sha1="ac9a0acf0dca9f005ab100711ee36ee3608f0bf4" />
 			</dataarea>
 		</part>
 	</software>
@@ -13445,38 +13029,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ttnlahs">
-		<description>The Time Tunnel: American History Series</description>
-		<year>1984</year>
-		<publisher>Focus Media</publisher>
-		<info name="programmer" value="Fred Burggraf and James Gray" />
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-10-08 -->
-		<!--educational game-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="241504">
-				<rom name="the time tunnel- american history series.woz" size="241504" crc="f8108dc8" sha1="e65d7b54cc7397d988ea11533b77244778577854" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ttnlane">
-		<description>The Time Tunnel: A Nation Emerges</description>
-		<year>1984</year>
-		<publisher>Focus Media</publisher>
-		<info name="programmer" value="Fred Burggraf, Rebecca Benton, Linda Pratt, and Jerry Camilleri" />
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-10-09 -->
-		<!--educational game-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234872">
-				<rom name="the time tunnel- a nation emerges.woz" size="234872" crc="34abd88d" sha1="21163d163b379f9198aae8a6792a46a2004a553a" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="beaglbsc">
 		<description>Beagle BASIC</description>
 		<year>1983</year>
@@ -14505,21 +14057,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="batsbelf">
-		<description>Bats in the Belfry</description>
-		<year>1983</year>
-		<publisher>Phoenix Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-12-07 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="121627">
-				<rom name="bats in the belfry.woz" size="121627" crc="b42681ec" sha1="84d8e3a1cc653faee017a319decdd87d353d7c36" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="alnrain">
 		<description>Alien Rain</description>
 		<year>1980</year>
@@ -15051,22 +14588,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pop35">
-		<description>Prince of Persia (800K 3.5")</description>
-		<year>1989</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires an Apple IIgs, Apple //c+, or 128K enhanced Apple //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-06-30 -->
-		<!--"Prince of Persia" is a 1989 action game developed by Jordan Mechner and distributed by Brøderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K enhanced Apple //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1297161">
-				<rom name="prince of persia 800k.woz" size="1297161" crc="e166d56a" sha1="d9558d25a3d3d91542f32abba9e6b0e2f2c75b09" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mcwlybdy">
 		<description>Woolly's Birthday (version 1.0) (800K 3.5")</description>
 		<year>1994</year>
@@ -15191,22 +14712,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1328970">
 				<rom name="return of the dinosaurs 800k.woz" size="1328970" crc="43773390" sha1="b6a6257cb9988576f0eb89daa523cc54258c4280" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bswrtrpl">
-		<description>Bank Street Writer Plus (800K 3.5")</description>
-		<year>1989</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="usage" value="Requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-07-25 redumped: 2021-12-14 to fix incorrect header information -->
-		<!--"Bank Street Writer Plus" is a 1989 productivity program developed by Gordon Riggs and distributed by Brøderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296168">
-				<rom name="bank street writer plus 800k.woz" size="1296168" crc="731364bd" sha1="d7e9d1e9c777b8123c607cee5ec16435d24cec32" />
 			</dataarea>
 		</part>
 	</software>
@@ -16471,22 +15976,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bapmnr11">
-		<description>Beneath Apple Manor (version 1.1)</description>
-		<year>1979</year>
-		<publisher>The Software Factory</publisher>
-		<info name="usage" value="Requires a 32K Apple ][ with Integer BASIC in ROM." />
-		<sharedfeat name="compatibility" value="A2" />
-		<!-- Dump released: 2022-02-18 -->
-		<!--"Beneath Apple Manor" is a 1979 adventure game developed by Don Worth and distributed by The Software Factory. This is version 1.1. It requires a 32K Apple ][ with Integer BASIC in ROM.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234800">
-				<rom name="beneath apple manor.woz" size="234800" crc="95533df3" sha1="5db4eb223f9daca74d1b06cfbe7593023818ac14" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="teleport">
 		<description>Teleport</description>
 		<year>1982</year>
@@ -16782,29 +16271,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cryptmed">
-		<description>Crypt of Medea</description>
-		<year>1983</year>
-		<publisher>Sir-Tech</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-11 -->
-		<!--"Crypt of Medea" is a 1983 adventure game developed by Allan Lamb and Arthur Britto II, and distributed by Sir-Tech Software. It requires a 48K Apple ][+ or later.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234815">
-				<rom name="crypt of medea side a.woz" size="234815" crc="aad35539" sha1="041043080b9c2332b2401a6444cb827bf38da4ad" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234815">
-				<rom name="crypt of medea side b.woz" size="234815" crc="406de5eb" sha1="45f9f6695c6466c770d6b4a27d2e80b75d7b95f9" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="handdand">
 		<description>Handy Dandy</description>
 		<year>1983</year>
@@ -16959,22 +16425,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="240932">
 				<rom name="zodiac castle.woz" size="240932" crc="d8d95723" sha1="e33a9324298fe3125d94b0eb40ed86bba91ee669" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bapmnrse">
-		<description>Beneath Apple Manor: The Special Edition</description>
-		<year>1982</year>
-		<publisher>Quality Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-11 -->
-		<!--"Beneath Apple Manor: The Special Edition" is a 1982 adventure game developed by Don Worth and distributed by Quality Software. It runs on any Apple II with 48K.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234826">
-				<rom name="beneath apple manor- the special edition.woz" size="234826" crc="69ad7676" sha1="15992953d222818d96a8a2e87854ebdf32fd62e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -17468,22 +16918,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234793">
 				<rom name="skybombers ii.woz" size="234793" crc="ae878da8" sha1="73337e05f4f399a7a89551fa542e87ba58c0b493" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bshipcmd">
-		<description>Battleship Commander</description>
-		<year>1980</year>
-		<publisher>Quality Software</publisher>
-		<info name="usage" value="Requires a 13-sector drive but otherwise runs on any Apple II with 48K." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-24 -->
-		<!--"Battleship Commander" is a 1980 strategy game developed by Erik Kilk and Matthew Jew, and distributed by Quality Software. It requires a 13-sector drive but otherwise runs on any Apple II with 48K.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234809">
-				<rom name="battleship commander.woz" size="234809" crc="e0dbe815" sha1="4e72e84cdf56f7d710dd56c21148019ce3ad46f1" />
 			</dataarea>
 		</part>
 	</software>
@@ -18319,54 +17753,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mcestst35">
-		<description>Estimation Strategies (version 1.0) (800K 3.5")</description>
-		<year>1991</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-28 -->
-		<!--"Estimation Strategies" is a 1991 educational program developed by Beth Bell, Charolyn Kapplinger, Jane Peterson, and Shari Zehm, and distributed by MECC. This is version 1.0. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345382">
-				<rom name="estimation strategies 800k.woz" size="1345382" crc="ea9e7753" sha1="40d2863da9809d168e4b69a0a3748ed3a1a8667f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mcesta35">
-		<description>Estimation Activities (version 1.0) (800K 3.5")</description>
-		<year>1991</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-28 -->
-		<!--"Estimation Activities" is a 1991 educational program developed by Beth Bell, Beth Daniels, Mark Hanson, Scott Jensen, Dee Dee Roedel, and Shari Zehm, and distributed by MECC. This is version 1.0. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345401">
-				<rom name="estimation activities 800k.woz" size="1345401" crc="df184f45" sha1="6ee726f99fea190d90a517b1bc190000537cf36e" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mcestqs135">
-		<description>Estimation: Quick Solve I (version 1.0) (800K 3.5")</description>
-		<year>1990</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-28 -->
-		<!--"Estimation: Quick Solve I" is a 1990 educational program developed by Beth Bell, Vincent Erickson, Shari Glenn, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, and Elizabeth Wendland, and distributed by MECC. This is version 1.0. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1345421">
-				<rom name="estimation- quick solve i 800k.woz" size="1345421" crc="682407a0" sha1="793b8cc0164d458de09b10b8f58e05048a215e26" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mcfrmn1035">
 		<description>Fraction Munchers (version 1.0) (800K 3.5")</description>
 		<year>1987</year>
@@ -18904,22 +18290,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bnksw320c35">
-		<description>The Bank Street Writer III (20-Column Version) (800K 3.5")</description>
-		<year>1986</year>
-		<publisher>Scholastic</publisher>
-		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-03-09 -->
-		<!--"The Bank Street Writer III" is a 1986 productivity program developed by Gordon Riggs and distributed by Scholastic. This is the 20 Column Version, with bundled Teacher Tools. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296683">
-				<rom name="the bank street writer iii 800k.woz" size="1296683" crc="c49de32c" sha1="e6617380de897d8f74e0724e004cf5850e697860" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="lsmith50c">
 		<description>Locksmith (version 5.0 Revision C)</description>
 		<year>1983</year>
@@ -19168,52 +18538,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234786">
 				<rom name="columns iie side b.woz" size="234786" crc="5960a425" sha1="1578ecd41c8e3fb8d7a453b18e65fdc0e71101cf" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wzdry0981">
-		<description>Wizardry: Proving Grounds of the Mad Overload (version 05-SEP-81)</description>
-		<year>1981</year>
-		<publisher>Sir-Tech</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-04-02 redump: 2022-05-10 to fix critical data corruption in the saved characters roster that entirely prevented playing.-->
-		<!--"Wizardry: Proving Grounds of the Mad Overload" is a 1981 roleplaying game developed by Andrew Greenberg and Robert Woodhead, and distributed by Sir-Tech. This version is dated 05-SEP-81, the earliest known version. It runs on any Apple ][ with 48K.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A - Scenario disk" />
-			<dataarea name="flop" size="234881">
-				<rom name="wizardry- proving grounds of the mad overlord v05-sep-81 side a - scenario.woz" size="234881" crc="0e955f2e" sha1="47dd791b826c1d952ca78fe209fafd5f6fc30ed8" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Boot disk" />
-			<dataarea name="flop" size="234846">
-				<rom name="wizardry- proving grounds of the mad overlord v05-sep-81 side b - boot.woz" size="234846" crc="a7d80c8c" sha1="1f1ad5cb198a29e1934a744901ae71cccc82e300" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wzdry1281">
-		<description>Wizardry: Proving Grounds of the Mad Overload (version 01-DEC-81)</description>
-		<year>1981</year>
-		<publisher>Sir-Tech</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-04-02 -->
-		<!--"Wizardry: Proving Grounds of the Mad Overload" is a 1981 roleplaying game developed by Andrew Greenberg and Robert Woodhead, and distributed by Sir-Tech. This version is dated 01-DEC-81. It runs on any Apple ][ with 48K.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A - Master scenario disk" />
-			<dataarea name="flop" size="234884">
-				<rom name="wizardry- proving grounds of the mad overlord v01-dec-81 side a - master scenario.woz" size="234884" crc="caae12b7" sha1="78b15dbc13bcf61cf9f44a31d3478a565b010b0f" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Boot disk" />
-			<dataarea name="flop" size="234873">
-				<rom name="wizardry- proving grounds of the mad overlord v01-dec-81 side b - boot.woz" size="234873" crc="0a1eb2ab" sha1="36d42cdb06b5b7452c05ddccf5d6aa8182bdd790" />
 			</dataarea>
 		</part>
 	</software>
@@ -22475,7 +21799,7 @@ license:CC0-1.0
 		<info name="usage" value="Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-03-11 -->
-		<!--"Apple Puck Man" is a 1981 action game developed by Jun Wada and distributed by Broderbund Software.-->
+		<!--"Apple Puck Man" is a 1981 action game developed by Jun Wada and distributed by Brøderbund Software.-->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="95008">
 				<rom name="apple puck man.woz" size="95008" crc="95512329" sha1="45ea4a66805fc7a2cfa07e8268d151ac4991095c" />
@@ -22901,7 +22225,7 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-06-02 -->
-		<!--"Tank Command" is a 1980 action game developed by Don Carlston and distributed by Broderbund Software.-->
+		<!--"Tank Command" is a 1980 action game developed by Don Carlston and distributed by Brøderbund Software.-->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234801">
 				<rom name="tank command.woz" size="234801" crc="ba81bc2a" sha1="0972d2ce56bb08821de2a9fbebd3ab1fa1ab5b80" />
@@ -24062,21 +23386,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="estimation10">
-		<description>Estimation (version 1.0)</description>
-		<year>1984</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-16 -->
-		<!--"Estimation" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234769">
-				<rom name="estimation v1.0.woz" size="234769" crc="75497413" sha1="cb149527c1dfeb0fd29686bb233b186af84a3407" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="expprocs10">
 		<description>Experiencing Procedures (version 1.0)</description>
 		<year>1983</year>
@@ -24088,21 +23397,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234798">
 				<rom name="experiencing procedures v1.0.woz" size="234798" crc="862bf554" sha1="56923d20ba66d317971e52869cd00fc8b9d4866b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="expsorting10">
-		<description>Exploring Sorting Routines (version 1.0)</description>
-		<year>1984</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-16 -->
-		<!--"Exploring Sorting Routines" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234801">
-				<rom name="exploring sorting routines v1.0.woz" size="234801" crc="e58c43d5" sha1="f50914e8726d198db50c76c017c48d96495acb0b" />
 			</dataarea>
 		</part>
 	</software>
@@ -24163,21 +23457,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234794">
 				<rom name="growgins' fractions v1.0.woz" size="234794" crc="623ddf82" sha1="6f956b5df17b37c671bae774af18684326828df9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mastspell13">
-		<description>Master Spell (version 1.3)</description>
-		<year>1984</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-20 -->
-		<!--"Master Spell" is a 1984 educational program developed and distributed by MECC. This is version 1.3.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234787">
-				<rom name="master spell v1.3.woz" size="234787" crc="3161ab8d" sha1="008ae63ec96307253c6e4bf12dd3b1ae971c717d" />
 			</dataarea>
 		</part>
 	</software>
@@ -24253,21 +23532,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234825">
 				<rom name="mecc apple demonstration volume 1 v1.1.woz" size="234825" crc="4f00b238" sha1="b3599d50ce1714cc8bea9d6446e05a1dd55e9594" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mecchires10">
-		<description>MECC Hi-Res Toolkit (version 1.0)</description>
-		<year>1984</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-06-20 -->
-		<!--"MECC Hi-Res Toolkit" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234705">
-				<rom name="mecc hi-res toolkit v1.0.woz" size="234705" crc="ebac8dbd" sha1="1e7c18fdbc6b6762dfcd3a385c07e40716f6bc27" />
 			</dataarea>
 		</part>
 	</software>
@@ -24392,28 +23656,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="studygui15">
-		<description>Study Guide (version 1.5)</description>
-		<year>1984</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Study Guide" is a 1984 educational program developed and distributed by MECC. This is version 1.5.-->
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Program disk" />
-			<dataarea name="flop" size="241442">
-				<rom name="study guide v1.5 disk 1 - program.woz" size="241442" crc="df0ee4ff" sha1="33bded9178a6364841753f6bc32651468bb2e393" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Data master disk" />
-			<dataarea name="flop" size="241442">
-				<rom name="study guide v1.5 disk 2 - data master.woz" size="241442" crc="12ede32a" sha1="78f1f86b7c9d4c2d20047cb3017f05e5f76b35bf" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="markplac10">
 		<description>The Market Place (version 1.0)</description>
 		<year>1984</year>
@@ -24484,21 +23726,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234786">
 				<rom name="equation math v1.0.woz" size="234786" crc="0c7e78eb" sha1="f5fbc707abd3d361d8f2b9b9f513003b80ecc843" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="estqcksolii10">
-		<description>Estimation: Quick Solve II (version 1.0)</description>
-		<year>1990</year>
-		<publisher>MECC</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
-		<!--"Estimation: Quick Solve II" is a 1990 educational program developed by Beth Bell, Vincent Erickson, Shari Glenn, Charolyn Kapplinger, Sherry Luedloff, and Elizabeth Wendland, and distributed by MECC. This is version 1.0.-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234903">
-				<rom name="estimation- quick solve ii v1.0.woz" size="234903" crc="5378dd49" sha1="05ed9d2968c1ad7b237bd8b7caba3a457634e58a" />
 			</dataarea>
 		</part>
 	</software>
@@ -25060,6 +24287,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="weekchng">
+		<description>A Week That Changed The World</description>
+		<year>1986</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="developer" value="Baker Book House"/>
+		<info name="programmer" value="V. Gilbert Beers and Ronald Beers" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-06-18-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234815">
+				<rom name="a week that changed the world side a.woz" size="234815" crc="e33abc2d" sha1="1cae09d816d7d83e01e4499c76a10bad8a61a618" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234848">
+				<rom name="a week that changed the world side b.woz" size="234848" crc="f7b8c847" sha1="cff76d47ced8cd0e92d7e271bbfc010432b18738" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="acedet_525" cloneof="acedet">
 		<description>Ace Detective (version 1987)</description>
 		<year>1987</year>
@@ -25136,6 +24387,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234734">
 				<rom name="advance to boardwalk.woz" size="234734" crc="a7b89d2d" sha1="8cb709d0f8b0f3b6c7a1b6b3c074b944207dda19" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advtime">
+		<description>Adventure in Time</description>
+		<year>1981</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="programmer" value="Paul L. Berker" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-07-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234773">
+				<rom name="adventure in time.woz" size="234773" crc="8d6797b1" sha1="9f5f5f4e4e7435dc836b369a70e89ef07dc78d37" />
 			</dataarea>
 		</part>
 	</software>
@@ -25273,6 +24540,53 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="animate">
+		<description>Animate</description>
+		<year>1986</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Steven Ohmert" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-05-->
+		<!--graphics program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Boot" />
+			<dataarea name="flop" size="234816">
+				<rom name="animate disk 1a - boot.woz" size="234816" crc="64bc3f61" sha1="8097819dc27357be8079f475f2f63917ca3f19c8" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Program" />
+			<dataarea name="flop" size="234819">
+				<rom name="animate disk 1b - program.woz" size="234819" crc="884cb3ee" sha1="44409aaaecd66747aa2550613dec1efcd57b37c0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Animation Library" />
+			<dataarea name="flop" size="234829">
+				<rom name="animate disk 2a - animation library.woz" size="234829" crc="dd72fdfb" sha1="1cf308ffc2c789a2c9662ab790167453fbf04dd4" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Background Library" />
+			<dataarea name="flop" size="234830">
+				<rom name="animate disk 2b - background library.woz" size="234830" crc="fac51096" sha1="306e0a59e9fbd3bd44a4c275b715fad698ff7d51" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A - Demonstration Show Disk" />
+			<dataarea name="flop" size="234835">
+				<rom name="animate disk 3a - demonstration show disk.woz" size="234835" crc="c6edef3d" sha1="c8f707ee43704a4468a3e9987404813efc4f2907" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B - Programmer's Aids" />
+			<dataarea name="flop" size="234829">
+				<rom name="animate disk 3b - programmer's aids.woz" size="234829" crc="9dcc9915" sha1="9188dff8c25e046188fd3bc602e21583eb54ce4a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="arizmix10_525" cloneof="arizmix">
 		<description>Arizona Mix (A-335 version 1.0)</description>
 		<year>1993</year>
@@ -25327,6 +24641,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="233449">
 				<rom name="arkanoid.woz" size="233449" crc="ed2ce549" sha1="421e17ac0441f3a513846eda613b234b4b1d756f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astinspc">
+		<description>Asteroids in Space</description>
+		<year>1980</year>
+		<publisher>Quality Software</publisher>
+		<info name="programmer" value="Bruce Wallace" />
+		<info name="usage" value="Runs on any Apple II with 32K and a 13-sector drive." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-06-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241425">
+				<rom name="asteroids in space.woz" size="241425" crc="b4e281cb" sha1="a0870556a5e29e79427c4528ff739472a75b6e99" />
 			</dataarea>
 		</part>
 	</software>
@@ -25486,6 +24816,72 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bagtrks2v20" cloneof="bagtrks2">
+		<description>Bag of Tricks 2 (version 2.0)</description>
+		<year>1985</year>
+		<publisher>Quality Software</publisher>
+		<info name="programmer" value="Don Worth and Peter Lechner" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="2.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-05-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234837">
+				<rom name="bag of tricks 2.0.woz" size="234837" crc="1f937c7a" sha1="e2e8e2320acd3c2857859a2d42bd9f013e6a479f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bagtrks2">
+		<description>Bag of Tricks 2 (version 2.1)</description>
+		<year>1987</year>
+		<publisher>Quality Software</publisher>
+		<info name="programmer" value="Don Worth and Peter Lechner" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="2.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-06-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241471">
+				<rom name="bag of tricks v2.1.woz" size="241471" crc="fcac8d4e" sha1="e879a1875a6dc3263bd0d239e130c397458b841e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batsblfr">
+		<description>Bats in the Belfry</description>
+		<year>1983</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="programmer" value="Samuel Moore" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-12-07-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="121627">
+				<rom name="bats in the belfry.woz" size="121627" crc="b42681ec" sha1="84d8e3a1cc653faee017a319decdd87d353d7c36" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bshipcmd">
+		<description>Battleship Commander</description>
+		<year>1980</year>
+		<publisher>Quality Software</publisher>
+		<info name="programmer" value="Erik Kilk and Matthew Jew" />
+		<info name="usage" value="Requires a 13-sector drive but otherwise runs on any Apple II with 48K." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-24-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234809">
+				<rom name="battleship commander.woz" size="234809" crc="e0dbe815" sha1="4e72e84cdf56f7d710dd56c21148019ce3ad46f1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="beachlnd">
 		<description>Beach Landing</description>
 		<year>1984</year>
@@ -25530,6 +24926,39 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234760">
 				<rom name="beach-head ii.woz" size="234760" crc="b28bb733" sha1="58b13942ffd570223f755f867cf9ba76fc3c689d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bapmnr">
+		<description>Beneath Apple Manor (version 1.1 30-JUL-1979)</description>
+		<year>1979</year>
+		<publisher>The Software Factory</publisher>
+		<info name="programmer" value="Don Worth" />
+		<info name="usage" value="Requires a 32K Apple ][ with Integer BASIC in ROM." />
+		<info name="version" value="1.1 30-JUL-1979" />
+		<sharedfeat name="compatibility" value="A2" />
+		<!--Dump released: 2022-02-18-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234800">
+				<rom name="beneath apple manor.woz" size="234800" crc="95533df3" sha1="5db4eb223f9daca74d1b06cfbe7593023818ac14" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bapmnrse">
+		<description>Beneath Apple Manor: The Special Edition</description>
+		<year>1982</year>
+		<publisher>Quality Software</publisher>
+		<info name="programmer" value="Don Worth" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-11-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234826">
+				<rom name="beneath apple manor- the special edition.woz" size="234826" crc="69ad7676" sha1="15992953d222818d96a8a2e87854ebdf32fd62e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -27232,6 +26661,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="cryptmed">
+		<description>Crypt of Medea</description>
+		<year>1983</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Allan Lamb and Arthur Britto II" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-11-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234815">
+				<rom name="crypt of medea side a.woz" size="234815" crc="aad35539" sha1="041043080b9c2332b2401a6444cb827bf38da4ad" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234815">
+				<rom name="crypt of medea side b.woz" size="234815" crc="406de5eb" sha1="45f9f6695c6466c770d6b4a27d2e80b75d7b95f9" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cryptqst_525" cloneof="cryptqst">
 		<description>CryptoQuest (A-340 version 1.0)</description>
 		<year>1993</year>
@@ -27689,6 +27141,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="daviddos">
+		<description>David-DOS</description>
+		<year>1982</year>
+		<publisher>David Data</publisher>
+		<info name="programmer" value="David Weston" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-06-->
+		<!--disk utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234821">
+				<rom name="david-dos.woz" size="234821" crc="da182438" sha1="1bff9a48a799eb9528bbda86540b909839eda0b4" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="desktzoo">
 		<description>Desktop Zoo</description>
 		<year>1989</year>
@@ -27875,6 +27343,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ehbible">
+		<description>Early Heroes of the Bible</description>
+		<year>1984</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="developer" value="Baker Book House"/>
+		<info name="programmer" value="V. Gilbert Beers and Ronald Beers" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-06-18-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234811">
+				<rom name="early heroes of the bible side a.woz" size="234811" crc="a0261c5c" sha1="7f14be83ce3ead8ab6d847b38d932657548e0ebf" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234811">
+				<rom name="early heroes of the bible side b.woz" size="234811" crc="f4ac939a" sha1="c6aa85cea8ac3461cd48a988340e979aa7b813dc" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="echelon">
 		<description>Echelon</description>
 		<year>1988</year>
@@ -28021,6 +27513,168 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="estimat">
+		<description>Estimation (A-124 version 1.0)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-124" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-16-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234769">
+				<rom name="estimation v1.0.woz" size="234769" crc="75497413" sha1="cb149527c1dfeb0fd29686bb233b186af84a3407" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="estactiv_525" cloneof="estactiv">
+		<description>Estimation Collection: Estimation Activities (A-296 version 1.0)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-296" />
+		<info name="programmer" value="Beth Bell, Beth Daniels, Mark Hanson, Scott Jensen, Dee Dee Roedel, and Shari Zehm" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-10-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234855">
+				<rom name="estimation activities.woz" size="234855" crc="4b1b30c1" sha1="ac9a0acf0dca9f005ab100711ee36ee3608f0bf4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="estactiv">
+		<description>Estimation Collection: Estimation Activities (A-296 version 1.0) (800K 3.5")</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-296" />
+		<info name="programmer" value="Beth Bell, Beth Daniels, Mark Hanson, Scott Jensen, Dee Dee Roedel, and Shari Zehm" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-28-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345401">
+				<rom name="estimation activities 800k.woz" size="1345401" crc="df184f45" sha1="6ee726f99fea190d90a517b1bc190000537cf36e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eststrat_525" cloneof="eststrat">
+		<description>Estimation Collection: Estimation Strategies (A-295 version 1.0)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-295" />
+		<info name="programmer" value="Beth Bell, Charolyn Kapplinger, Jane Peterson, and Shari Zehm" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-10-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234836">
+				<rom name="estimation strategies.woz" size="234836" crc="47a12cc6" sha1="7db9cbef26d7bfcdb526018274fc53d55044e2ce" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eststrat">
+		<description>Estimation Collection: Estimation Strategies (A-295 version 1.0) (800K 3.5")</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-295" />
+		<info name="programmer" value="Beth Bell, Charolyn Kapplinger, Jane Peterson, and Shari Zehm" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-28-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345382">
+				<rom name="estimation strategies 800k.woz" size="1345382" crc="ea9e7753" sha1="40d2863da9809d168e4b69a0a3748ed3a1a8667f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="estqsi_525" cloneof="estqsi">
+		<description>Estimation Collection: Estimation: Quick Solve I (A-258 version 1.0)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-258" />
+		<info name="programmer" value="Beth Bell, Vincent Erickson, Shari Glenn, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, and Elizabeth Wendland" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-10-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234918">
+				<rom name="estimation- quick solve i.woz" size="234918" crc="62eeefa8" sha1="d9e41383ac91a65db37c52d8b3b720e66b296e89" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="estqsi">
+		<description>Estimation Collection: Estimation: Quick Solve I (A-258 version 1.0) (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-258" />
+		<info name="programmer" value="Beth Bell, Vincent Erickson, Shari Glenn, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, and Elizabeth Wendland" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-28-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345421">
+				<rom name="estimation- quick solve i 800k.woz" size="1345421" crc="682407a0" sha1="793b8cc0164d458de09b10b8f58e05048a215e26" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="estqsii">
+		<description>Estimation Collection: Estimation: Quick Solve II (A-259 version 1.0)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="partno" value="A-259" />
+		<info name="programmer" value="Beth Bell, Vincent Erickson, Shari Glenn, Charolyn Kapplinger, Sherry Luedloff, and Elizabeth Wendland" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234903">
+				<rom name="estimation- quick solve ii v1.0.woz" size="234903" crc="5378dd49" sha1="05ed9d2968c1ad7b237bd8b7caba3a457634e58a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expsortrt10">
+		<description>Exploring Sorting Routines (A-110 version 1.0)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-110" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-16-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234801">
+				<rom name="exploring sorting routines v1.0.woz" size="234801" crc="e58c43d5" sha1="f50914e8726d198db50c76c017c48d96495acb0b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="f15streag">
 		<description>F-15 Strike Eagle (version 1.4)</description>
 		<year>1985</year>
@@ -28066,6 +27720,38 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296174">
 				<rom name="fay- the word hunter 800k.woz" size="1296174" crc="27a0bb82" sha1="299e38511e1f809c28f377d755ebec1aaf747686" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="federat">
+		<description>Federation</description>
+		<year>1982</year>
+		<publisher>Avant-Garde Creations</publisher>
+		<info name="developer" value="Avant-Garde Creations" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-06-04-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241422">
+				<rom name="federation.woz" size="241422" crc="7548b07d" sha1="c345b0eb3f9b47a2a6eea29aa22e000c726579cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galattk">
+		<description>Galactic Attack</description>
+		<year>1980</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Robert J. Woodhead" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-12-14-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234790">
+				<rom name="galactic attack.woz" size="234790" crc="013efc71" sha1="68975194ff1b597ed4e2773649bb8880d050a1cd" />
 			</dataarea>
 		</part>
 	</software>
@@ -28282,6 +27968,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="israelgy">
+		<description>Israel's Golden Years</description>
+		<year>1986</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="developer" value="Baker Book House" />
+		<info name="programmer" value="V. Gilbert Beers and Ronald Beers" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-06-18-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234840">
+				<rom name="israel's golden years side a.woz" size="234840" crc="b3a72fa5" sha1="44d161c3c074d661681c4373f86afecf404e94b5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234839">
+				<rom name="israel's golden years side b.woz" size="234839" crc="fbc40b04" sha1="39846b51f0bf46d53e7d3c79812310b7398f7625" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="itsabttm">
 		<description>It's About Time</description>
 		<year>1989</year>
@@ -28327,6 +28037,24 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296146">
 				<rom name="jumblezzz 800k.woz" size="1296146" crc="2a75cc48" sha1="97256ce15f81da727488dd33fd53c52709c2442b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ksmkbdmast10">
+		<description>Keyboarding Series: MECC Keyboarding Master: Games and Drills (Student Program) (A-131 version 1.0)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="TIES" />
+		<info name="partno" value="A-131" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234775">
+				<rom name="keyboarding master v1.0.woz" size="234775" crc="cb33bd28" sha1="3a1899634a7ba0820058bfb04fa764583a9058c2" />
 			</dataarea>
 		</part>
 	</software>
@@ -28547,6 +28275,24 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 8" />
 			<dataarea name="flop" size="234797">
 				<rom name="marty's reading workout - disk 8.woz" size="234797" crc="610a2d0b" sha1="e24f02ba03c3e6afdae59b2e54df3dbd5f538d9b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mastspell">
+		<description>Master Spell (A-119 version 1.3)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-119" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-20-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234787">
+				<rom name="master spell v1.3.woz" size="234787" crc="3161ab8d" sha1="008ae63ec96307253c6e4bf12dd3b1ae971c717d" />
 			</dataarea>
 		</part>
 	</software>
@@ -28848,6 +28594,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="measecon">
+		<description>Measuring Economic Activity</description>
+		<year>1985</year>
+		<publisher>Focus Media</publisher>
+		<info name="programmer" value="Mark D. Rothman, Ph.D." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-23-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241478">
+				<rom name="measuring economic activities.woz" size="241478" crc="540a5aec" sha1="0f6cc2caf1bce855b77a1534a13df50074ce098d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mdqpres11" cloneof="mdqpres">
 		<description>MECC Dataquest: The Presidents (A-140 version 1.1)</description>
 		<year>1985</year>
@@ -28986,20 +28748,36 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mkeybdmas10">
-		<description>MECC Keyboarding Master: Games and Drills (Student Program) (A-131 version 1.0)</description>
-		<year>1985</year>
+	<software name="mhirestk">
+		<description>MECC Hi-Res Toolkit (A-105 version 1.0)</description>
+		<year>1984</year>
 		<publisher>MECC</publisher>
-		<info name="developer" value="TIES" />
-		<info name="partno" value="A-131" />
-		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-105" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-06-22-->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-20-->
 		<!--educational program-->
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234775">
-				<rom name="keyboarding master v1.0.woz" size="234775" crc="cb33bd28" sha1="3a1899634a7ba0820058bfb04fa764583a9058c2" />
+			<dataarea name="flop" size="234705">
+				<rom name="mecc hi-res toolkit v1.0.woz" size="234705" crc="ebac8dbd" sha1="1e7c18fdbc6b6762dfcd3a385c07e40716f6bc27" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metinspc">
+		<description>Meteoroids in Space</description>
+		<year>1981</year>
+		<publisher>Quality Software</publisher>
+		<info name="programmer" value="Bruce Wallace" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-04-08-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="48405">
+				<rom name="meteoroids in space.woz" size="48405" crc="7beb3c05" sha1="61cdb1028a091a7bd85ac636f1f29087b57b4426" />
 			</dataarea>
 		</part>
 	</software>
@@ -29101,6 +28879,30 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="233476">
 				<rom name="monster smash.woz" size="233476" crc="a2a01373" sha1="a0aeea2f9b66a1ff725fa5e49a3c5398a3be1273" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moseslhp">
+		<description>Moses Leads His People</description>
+		<year>1986</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="developer" value="Baker Book House" />
+		<info name="programmer" value="V. Gilbert Beers and Ronald Beers" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-04-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234808">
+				<rom name="moses leads his people side a.woz" size="234808" crc="37fe4e47" sha1="589c0e20de055605014f1d54edf3b92696fbbd81" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234808">
+				<rom name="moses leads his people side b.woz" size="234808" crc="77c338ad" sha1="25963f6c92f719dd6d67e39e4a2571aca8dfb93d" />
 			</dataarea>
 		</part>
 	</software>
@@ -29263,6 +29065,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="paulmsj">
+		<description>Paul's Missionary Journeys</description>
+		<year>1986</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="developer" value="Baker Book House" />
+		<info name="programmer" value="V. Gilbert Beers and Ronald Beers" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-04-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234844">
+				<rom name="paul's missionary journeys side a.woz" size="234844" crc="344202f1" sha1="d3bfde5d32882c99aa34eaf9b1239cd5c28cb342" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="241468">
+				<rom name="paul's missionary journeys side b.woz" size="241468" crc="8c8339b0" sha1="7b0bfe4d5f3df89163e08af6424f43902ad15e6a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="petshop">
 		<description>Pet Shop (A-347 version 1.0) (800K 3.5")</description>
 		<year>1994</year>
@@ -29317,6 +29143,61 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234796">
 				<rom name="press your luck side b.woz" size="234796" crc="7f400b08" sha1="0f45957be53ff84c9e43ae854d8997c9e8569194" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popd" cloneof="pop">
+		<description>Prince of Persia (interactive demo)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value=" Jordan Mechner" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-04-->
+		<!--action game demo-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234834">
+				<rom name="prince of persia- interactive demo disk.woz" size="234834" crc="7375b848" sha1="c9489252c3b10c5d77df9ea8d5a45e9800e6fb12" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pop_525" cloneof="pop">
+		<description>Prince of Persia</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value=" Jordan Mechner" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-14-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="233481">
+				<rom name="prince of persia side a.woz" size="233481" crc="a3820127" sha1="bf7c7c03fcc93b989a8a7e566ec711888553a9de" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="233481">
+				<rom name="prince of persia side b.woz" size="233481" crc="6de94d52" sha1="931e264563390d1e76cef9a7db31492643f45b49" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pop">
+		<description>Prince of Persia (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value=" Jordan Mechner" />
+		<info name="usage" value="Requires an Apple IIgs, Apple //c+, or 128K enhanced Apple //e with a compatible drive controller card." />
+		<sharedfeat name="compatibility" value="A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-06-30-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1297161">
+				<rom name="prince of persia 800k.woz" size="1297161" crc="e166d56a" sha1="d9558d25a3d3d91542f32abba9e6b0e2f2c75b09" />
 			</dataarea>
 		</part>
 	</software>
@@ -29697,6 +29578,38 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="rescraid">
+		<description>Rescue Raiders</description>
+		<year>1984</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Arthur Britto II and Greg Hale" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-08-16-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="233518">
+				<rom name="rescue raiders.woz" size="233518" crc="f2f5bf46" sha1="4ab4e39d593e35c2b1eebc2b5bd1c51b024ef1fb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rtnheracq">
+		<description>Return of Heracles (Quality Software)</description>
+		<year>1983</year>
+		<publisher>Quality Software</publisher>
+		<info name="programmer" value="Stuart Smith" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-08-02-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235508">
+				<rom name="return of heracles.woz" size="235508" crc="50be7d16" sha1="24e16ab619a269e8cb47d0a3557aec1cf9c35d98" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="runforit">
 		<description>Run For It</description>
 		<year>1984</year>
@@ -29709,6 +29622,78 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234841">
 				<rom name="run for it.woz" size="234841" crc="5ac6ea0d" sha1="b7d99b23bd97a6ca0d54cd387ab60d361844af46" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scitk">
+		<description>Science Toolkit</description>
+		<year>1985</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Lauren Elliott, Scott Shumway, Gene Portwood, and Susan Meyers" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-05-->
+		<!--education program-->
+		<!--Includes master module and all three extension modules (originally sold separately: Speed & Motion, Earthquake Lab, and Body Lab.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Master Module" />
+			<dataarea name="flop" size="221556">
+				<rom name="science toolkit- master module.woz" size="221556" crc="f1b5c545" sha1="265796d74227bc41f1e1f38b43b35173dff9521d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Module 1: Speed &amp; Motion" />
+			<dataarea name="flop" size="234863">
+				<rom name="science toolkit module 1- speed and motion.woz" size="234863" crc="7e906be5" sha1="141579b27d2ca9528b3883b41a4a097828bad1b7" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Module 2: Earthquake Lab" />
+			<dataarea name="flop" size="234863">
+				<rom name="science toolkit module 2- earthquake lab.woz" size="234863" crc="b5fdff05" sha1="a726e4bd793afb2bb78d70b67a23f4d4111d50ae" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Module 3: Body Lab" />
+			<dataarea name="flop" size="234857">
+				<rom name="science toolkit module 3- body lab.woz" size="234857" crc="6aca00f8" sha1="aa1054faf877efa2c5719edef691bd6e235e3be4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scitkp">
+		<description>Science Toolkit Plus (version 2.0)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Lauren Elliott, Scott Shumway, Michael Wise, Gene Portwood, Leigh Pforsich, and Susan Meyers" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="2.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-06-05-->
+		<!--education program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Master module" />
+			<dataarea name="flop" size="241512">
+				<rom name="science toolkit plus v2.0 disk 1 - master module.woz" size="241512" crc="421c7922" sha1="9c4dbbb09ffcf609a4efe34be3fb6f0753c177b9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Module 1: Speed &amp; Motion" />
+			<dataarea name="flop" size="241523">
+				<rom name="science toolkit plus v2.0 disk 2 - module 1- speed and motion.woz" size="241523" crc="1f24f501" sha1="69d51f5d5663a7a73eddadc81f110575adaeff7e" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Module 2: Earthquake Lab" />
+			<dataarea name="flop" size="241523">
+				<rom name="science toolkit plus v2.0 disk 3 - module 2- earthquake lab.woz" size="241523" crc="01807b1e" sha1="d0cd79b8649110c16f8051fb552389463c94e18a" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Module 3: Body Lab" />
+			<dataarea name="flop" size="241517">
+				<rom name="science toolkit plus v2.0 disk 4 - module 3- body lab.woz" size="241517" crc="7ede15f2" sha1="79f286fb54c3b806718fa21025c0fa10c720e8f7" />
 			</dataarea>
 		</part>
 	</software>
@@ -29878,6 +29863,30 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B - Boot Disk" />
 			<dataarea name="flop" size="234855">
 				<rom name="s.a.g.a. 13 - sorcerer of claymorgue castle side b (boot).woz" size="234855" crc="12223084" sha1="54b12aecd5f80b7edc36f925552ec2a2810b5355" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srchking">
+		<description>Searching for a King</description>
+		<year>1984</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="developer" value="Baker Book House" />
+		<info name="programmer" value="V. Gilbert Beers and Ronald Beers" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-06-18-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234838">
+				<rom name="searching for a king side a.woz" size="234838" crc="11c9e72f" sha1="8e2d25a1e32c7f3a27111da2355812d129d51e97" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234838">
+				<rom name="searching for a king side b.woz" size="234838" crc="bfdf9f0f" sha1="4951c4d669723bf2ee61977ff79824ab6c45701b" />
 			</dataarea>
 		</part>
 	</software>
@@ -30545,6 +30554,31 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="studygui">
+		<description>Study Guide (A-126 version 1.5)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="MECC" />
+		<info name="partno" value="A-126" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.5" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-06-22-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program" />
+			<dataarea name="flop" size="241442">
+				<rom name="study guide v1.5 disk 1 - program.woz" size="241442" crc="df0ee4ff" sha1="33bded9178a6364841753f6bc32651468bb2e393" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Data master" />
+			<dataarea name="flop" size="241442">
+				<rom name="study guide v1.5 disk 2 - data master.woz" size="241442" crc="12ede32a" sha1="78f1f86b7c9d4c2d20047cb3017f05e5f76b35bf" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spasswrd">
 		<description>Super Password</description>
 		<year>1988</year>
@@ -30614,6 +30648,461 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bsspell">
+		<description>The Bank Street Speller</description>
+		<year>1984</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Sensible Software" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-13-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program" />
+			<dataarea name="flop" size="128359">
+				<rom name="the bank street speller side a - program.woz" size="128359" crc="6fba23ae" sha1="f1d28ed040f5a25aed3c05f936a10975d9c8d2bc" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Dictionary" />
+			<dataarea name="flop" size="234809">
+				<rom name="the bank street speller side b - dictionary.woz" size="234809" crc="7a00ae9a" sha1="b342c831e56d9414cba2f13dcf14777e3ebbfdad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsw">
+		<description>The Bank Street Writer (version 1.3)</description>
+		<year>1982</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Kusmiak" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later with Applesoft in ROM." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-13-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234847">
+				<rom name="the bank street writer v1.3.woz" size="234847" crc="b5053ea1" sha1="ae135c5473a2bd0e6a6602db850c39520f52ae66" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswtut10" cloneof="bswtut">
+		<description>The Bank Street Writer Tutorial (version 1.0)</description>
+		<year>1982</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Kusmiak" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-13-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234835">
+				<rom name="the bank street writer tutorial v1.0.woz" size="234835" crc="b767b5e1" sha1="52739f6eda3e9b72b13568c8815979e1a5baa562" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswtut">
+		<description>The Bank Street Writer Tutorial (version 1.1 1982-12-13)</description>
+		<year>1982</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Kusmiak" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1 1982-12-13" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-13-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234817">
+				<rom name="the bank street writer tutorial v1.1.woz" size="234817" crc="923f1edd" sha1="a8a78b08d4c2e55891b0e4642b508b66fc221ea8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswenh">
+		<description>The Bank Street Writer Enhanced (version 2.6)</description>
+		<year>1984</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Kusmiak and Gordon Riggs" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="2.6" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-14-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234845">
+				<rom name="the bank street writer enhanced v2.6.woz" size="234845" crc="983e9ba9" sha1="ac6111b22521a52d840cf829cc9cfa3b4a39191f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswenhtutiip">
+		<description>The Bank Street Writer Enhanced Tutorial for ][+</description>
+		<year>1984</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Kusmiak and Gordon Riggs" />
+		<info name="usage" value="Requires a 64K Apple ][+ and intentionally refuses to run on later models." />
+		<sharedfeat name="compatibility" value="A2P" />
+		<!--Dump released: 2024-07-14-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234809">
+				<rom name="the bank street writer enhanced tutorial for ii plus.woz" size="234809" crc="11ebea7b" sha1="0533cc035e8a66ca3c1ccd0008c09e611f824e8a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswenhtutiie">
+		<description>The Bank Street Writer Enhanced Tutorial for IIe</description>
+		<year>1984</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Kusmiak and Gordon Riggs" />
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-14-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234847">
+				<rom name="the bank street writer enhanced tutorial for iie.woz" size="234847" crc="8f14f5e4" sha1="e22901dd06496a43b45332515d701f798fd68e23" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswexp">
+		<description>The Bank Street Writer Expanded (version 2.2)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="original_publisher" value="Brøderbund Software" />
+		<info name="programmer" value="Gene Kusmiak and Gordon Riggs" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="2.2" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-14-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234828">
+				<rom name="the bank street writer expanded v2.2.woz" size="234828" crc="77c628b3" sha1="978b3d578e306643b4922705f017cd4eaac1e125" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswexptut">
+		<description>The Bank Street Writer Expanded Tutorial (version 2.2)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="original_publisher" value="Brøderbund Software" />
+		<info name="programmer" value="Gene Kusmiak and Gordon Riggs" />
+		<info name="usage" value="Requires a 64K Apple //e or later." />
+		<info name="version" value="2.2" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-14-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234815">
+				<rom name="the bank street writer expanded tutorial.woz" size="234815" crc="dedd1081" sha1="666effe8ec65640b4fd91dd09ab810e3c2ed17ab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswiic21r1" cloneof="bswiic">
+		<description>The Bank Street Writer IIc (version 2.1 revision 1)</description>
+		<year>1984</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Kusmiak and Gordon Riggs" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="2.1 revision 1" />
+		<!--Another version 2.1 disk has been found with small code changes.-->
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-13-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234833">
+				<rom name="the bank street writer iic v2.1 rev. 1.woz" size="234833" crc="6369ef79" sha1="201c740331c05151809a73464e62109aca7ae169" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswiic21r2" cloneof="bswiic">
+		<description>The Bank Street Writer IIc (version 2.1 revision 2)</description>
+		<year>1984</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Kusmiak and Gordon Riggs" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="2.1 revision 2" />
+		<!--Another version 2.1 disk has been found with small code changes.-->
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-13-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234857">
+				<rom name="bank street writer iic v2.1 rev. 2.woz" size="234857" crc="7697dcee" sha1="a05c382f50bc90a5d29c07ac2f62b9643f810337" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswiic">
+		<description>The Bank Street Writer IIc (version 2.11)</description>
+		<year>1984</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Kusmiak and Gordon Riggs" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="2.11" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-13-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234808">
+				<rom name="the bank street writer iic v2.11.woz" size="234808" crc="05dbb165" sha1="2807b3ddb091da5c4493f654fd10ffea2411d99f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswiictut">
+		<description>The Bank Street Writer IIc Tutorial (version 1984-06-27)</description>
+		<year>1984</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gene Kusmiak and Gordon Riggs" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1984-06-27" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-13-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234839">
+				<rom name="the bank street writer iic tutorial.woz" size="234839" crc="3eedfd15" sha1="cc7ec6d550112284c1307eb73781784bb5227e9b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswiii11" cloneof="bswiii">
+		<description>The Bank Street Writer III (version 1.1)</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="original_publisher" value="Brøderbund Software" />
+		<info name="programmer" value="Gordon Riggs" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-14-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program (40-80 columns)" />
+			<dataarea name="flop" size="241488">
+				<rom name="the bank street writer iii v1.1 40-80-column program.woz" size="241488" crc="065c22e9" sha1="cc90cc19252405e852431755cc36d94d23f562ff" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Program (20 columns)" />
+			<dataarea name="flop" size="241997">
+				<rom name="the bank street writer iii v1.1 20-column program.woz" size="241997" crc="d92c6733" sha1="b3f08d51b4dadea8cb1bd8d2bf2ff915507b2634" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Teacher Tools" />
+			<dataarea name="flop" size="241481">
+				<rom name="the bank street writer iii v1.1 teacher tools.woz" size="241481" crc="d9fa61b9" sha1="06775ce3d36d71745055ab421912bbe8ca6d68bd" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Dictionary" />
+			<dataarea name="flop" size="208225">
+				<rom name="the bank street writer iii v1.1 dictionary.woz" size="208225" crc="51233670" sha1="0cf80789042ba2715aa693ad353ec0d9b6bb0c4c" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 - Thesaurus" />
+			<dataarea name="flop" size="234848">
+				<rom name="the bank street writer iii v1.1 thesaurus.woz" size="234848" crc="a5bc7bef" sha1="2607a5ae5442a88518f4a9e6d6c78ace01d4c99c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bnksw320c35" cloneof="bswiii">
+		<description>The Bank Street Writer III (20-Column and Teacher Tools) (version 1.21) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="original_publisher" value="Brøderbund Software" />
+		<info name="programmer" value="Gordon Riggs" />
+		<info name="usage" value="Requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card." />
+		<info name="version" value="1.21" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-03-09-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296683">
+				<rom name="the bank street writer iii 800k.woz" size="1296683" crc="c49de32c" sha1="e6617380de897d8f74e0724e004cf5850e697860" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswiii">
+		<description>The Bank Street Writer III (version 1.4)</description>
+		<year>1989</year>
+		<publisher>Scholastic</publisher>
+		<info name="original_publisher" value="Brøderbund Software" />
+		<info name="programmer" value="Gordon Riggs" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.4" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-14-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program (40-80 columns)" />
+			<dataarea name="flop" size="234862">
+				<rom name="the bank street writer iii v1.4 - program (40-80 columns).woz" size="234862" crc="850bbab7" sha1="748f8bc7db9cc1feac19d42e49f9a6ae6eec774f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Program (20 columns)" />
+			<dataarea name="flop" size="234859">
+				<rom name="the bank street writer iii v1.41 - program (20 columns).woz" size="234859" crc="6645c5db" sha1="6659970bfc75ea1d7d7a1740f218bc0e73a3f917" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Teacher Tools" />
+			<dataarea name="flop" size="234852">
+				<rom name="the bank street writer iii v1.4 - teacher tools.woz" size="234852" crc="a0c7cd47" sha1="20e58fdbba3d001517ca03a6cceb0c1ffed7605c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswiiitut11" cloneof="bswiiitut">
+		<description>The Bank Street Writer III Tutorial (version 1.1)</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="original_publisher" value="Brøderbund Software" />
+		<info name="programmer" value="Gordon Riggs" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-14-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241466">
+				<rom name="the bank street writer iii v1.1 tutorial.woz" size="241466" crc="10290939" sha1="bd05197da074f452c0350bb432faa63452e713be" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswiiitut">
+		<description>The Bank Street Writer III Tutorial (version 1.4)</description>
+		<year>1989</year>
+		<publisher>Scholastic</publisher>
+		<info name="original_publisher" value="Brøderbund Software" />
+		<info name="programmer" value="Gordon Riggs" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.4" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-14-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234794">
+				<rom name="the bank street writer iii v1.4 tutorial.woz" size="234794" crc="9859a6a1" sha1="f6832f12019b871da502f8fe874fed7bad0b119d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswplus11" cloneof="bswplus">
+		<description>The Bank Street Writer Plus (version 1.1)</description>
+		<year>1986</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gordon Riggs" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-14-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program" />
+			<dataarea name="flop" size="234829">
+				<rom name="the bank street writer plus v1.1 disk 1 - program.woz" size="234829" crc="2954b510" sha1="d440d2904a1872bad6ca66f6febd58345090155f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Dictionary" />
+			<dataarea name="flop" size="234835">
+				<rom name="the bank street writer plus v1.1 disk 2a - dictionary.woz" size="234835" crc="5efefa9e" sha1="15f092bb6b7bae0b7c0a55b2d21b3aba15c646b8" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Thesaurus" />
+			<dataarea name="flop" size="234831">
+				<rom name="the bank street writer plus v1.1 disk 2b - thesaurus.woz" size="234831" crc="74a27253" sha1="007ec0ad37c06015e7d09abc9ae5971f3f62d116" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswplus14" cloneof="bswplus">
+		<description>The Bank Street Writer Plus (version 1.4)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gordon Riggs" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.4" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-14-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234814">
+				<rom name="the bank street writer plus v1.4.woz" size="234814" crc="1cf8e83d" sha1="3578b3f333fed7de4b7a41df63ce7dcb23cf8817" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswplus">
+		<description>The Bank Street Writer Plus (version 1.4) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gordon Riggs" />
+		<info name="usage" value="Requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card." />
+		<info name="version" value="1.4" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-07-25 Redumped: 2021-12-14 to fix incorrect header information.-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296168">
+				<rom name="bank street writer plus 800k.woz" size="1296168" crc="731364bd" sha1="d7e9d1e9c777b8123c607cee5ec16435d24cec32" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswplustut11" cloneof="bswplustut">
+		<description>The Bank Street Writer Plus Tutorial (version 1.1)</description>
+		<year>1986</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gordon Riggs" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-14-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241476">
+				<rom name="the bank street writer plus v1.1 tutorial.woz" size="241476" crc="03afba56" sha1="ba8d052b7780b706dbda6609d459830a44ca2751" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswplustut">
+		<description>The Bank Street Writer Plus Tutorial (version 1.4)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Gordon Riggs" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.4" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-14-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241479">
+				<rom name="the bank street writer plus v1.4 tutorial.woz" size="241479" crc="9f3b8954" sha1="8843c3fa7822678e0d0e948fea791eca1c56d58d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="banksim">
 		<description>The Banking Simulation</description>
 		<year>1986</year>
@@ -30626,6 +31115,54 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241448">
 				<rom name="the banking simulation.woz" size="241448" crc="630ef150" sha1="224c2ff8aff7f8941f85f1b747d96b0dc988cdb6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boyjesus">
+		<description>The Boy Jesus</description>
+		<year>1984</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="developer" value="Baker Book House" />
+		<info name="programmer" value="V. Gilbert Beers and Ronald Beers" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-04-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234831">
+				<rom name="the boy jesus side a.woz" size="234831" crc="eaff57c2" sha1="33b198cc5b8b47f6f1e6d8ee01c297c24177ba65" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234831">
+				<rom name="the boy jesus side b.woz" size="234831" crc="0a0e0657" sha1="0814bc10625d2ee80cd849207a448f87042758bd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="earlychr">
+		<description>The Early Church</description>
+		<year>1984</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="developer" value="Baker Book House" />
+		<info name="programmer" value="V. Gilbert Beers and Ronald Beers" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-04-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234802">
+				<rom name="the early church side a.woz" size="234802" crc="92f64278" sha1="15afb0283d02c1835d79ca3a8deef16397f39117" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234802">
+				<rom name="the early church side b.woz" size="234802" crc="7159e04e" sha1="f985b18de65fd0f5be56792aea58c4d6584f816c" />
 			</dataarea>
 		</part>
 	</software>
@@ -30649,6 +31186,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234818">
 				<rom name="the institute side b.woz" size="234818" crc="90777e40" sha1="2f7c9d6ca142df55fe2b3c6d447571190fd07d88" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="queenphb">
+		<description>The Queen of Phobos</description>
+		<year>1982</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="programmer" value="William R. Crawford, Paul L. Berker, Dav Holle and Adrian Ferret" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-06-07-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="181581">
+				<rom name="the queen of phobos.woz" size="181581" crc="6c31a42a" sha1="7617ff8f126edaab1daf8954ea7d6cac07bb1e77" />
 			</dataarea>
 		</part>
 	</software>
@@ -30719,6 +31272,116 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234862">
 				<rom name="the stickybear abc.woz" size="234862" crc="b384f0e4" sha1="a191367cdb60a2f96238dbd1bdba8a6325b33450" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttamerh">
+		<description>The Time Tunnel: American History Series</description>
+		<year>1984</year>
+		<publisher>Focus Media</publisher>
+		<info name="programmer" value="Fred Burggraf and James Gray" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-10-08-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241504">
+				<rom name="the time tunnel- american history series.woz" size="241504" crc="f8108dc8" sha1="e65d7b54cc7397d988ea11533b77244778577854" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttsports">
+		<description>The Time Tunnel: Sports Edition</description>
+		<year>1985</year>
+		<publisher>Focus Media</publisher>
+		<info name="programmer" value="Frederick Burggraf and James Gray" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-23-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234813">
+				<rom name="the time tunnel- sports edition.woz" size="234813" crc="51bdced6" sha1="e7caf98a65034aa771aed62dfdae130e325496c9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttnatem">
+		<description>The Time Tunnel: The America Series: A Nation Emerges</description>
+		<year>1984</year>
+		<publisher>Focus Media</publisher>
+		<info name="programmer" value="Fred Burggraf, Rebecca Benton, Linda Pratt, and Jerry Camilleri" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-10-09-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234872">
+				<rom name="the time tunnel- a nation emerges.woz" size="234872" crc="34abd88d" sha1="21163d163b379f9198aae8a6792a46a2004a553a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttearamer">
+		<description>The Time Tunnel: The America Series: Early America</description>
+		<year>1984</year>
+		<publisher>Focus Media</publisher>
+		<info name="programmer" value="Fred Burggraf, Rebecca Benton, Linda Pratt, and Jerry Camilleri" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-23-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234812">
+				<rom name="the time tunnel- early america.woz" size="234812" crc="57e386f3" sha1="38c4aff736a59ee2603e7ef461555320d5dcba45" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttpresid">
+		<description>The Time Tunnel: The America Series: The Presidents</description>
+		<year>1985</year>
+		<publisher>Focus Media</publisher>
+		<info name="programmer" value="Frederick Burggraf and Jerry Camilleri" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-23-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234813">
+				<rom name="the time tunnel- the presidents.woz" size="234813" crc="7aa7a710" sha1="cf4dcfc6b0456c78415bd535bfea9f6f20698b71" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="usconnaf">
+		<description>The U.S. Constitution: Nationalism and Federalism (version 1987)</description>
+		<year>1987</year>
+		<publisher>Focus Media</publisher>
+		<info name="programmer" value="Mark D. Rothman, Scot Robinson, and Andrew Kunkell" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1987" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-07-23-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Development of the Constitution"/>
+			<dataarea name="flop" size="234854">
+				<rom name="the u.s. constitution- nationalism and federalism disk 1 development of the constitution.woz" size="234854" crc="8f15ce5d" sha1="f39adac98097c310f7da8688610740b69b5fb529" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - The creation of the Constution"/>
+			<dataarea name="flop" size="234855">
+				<rom name="the u.s. constitution- nationalism and federalism disk 2 the creation of the constitution.woz" size="234855" crc="7bc35e5f" sha1="a338d1ea712c4794bb0495f3a639e13814026490" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Testing your knowledge of the Constitution"/>
+			<dataarea name="flop" size="234865">
+				<rom name="the u.s. constitution- nationalism and federalism disk 3 testing your knowledge of the constitution.woz" size="234865" crc="3d83f3f1" sha1="0cae4c2262cce80776124de86d4bf06442d3414b" />
 			</dataarea>
 		</part>
 	</software>
@@ -30800,6 +31463,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234789">
 				<rom name="top readers' club- grade 5.woz" size="234789" crc="f7220442" sha1="de62a19842c881a49f96b658a3094f169e811acb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trapshoot">
+		<description>Trapshoot</description>
+		<year>1980</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="programmer" value=" Kieth Yilt" />
+		<info name="usage" value="Requires a 13-sector drive but otherwise runs on any Apple II with 48K." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-06-16-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228128">
+				<rom name="trapshoot.woz" size="228128" crc="2f88ae9a" sha1="7082d68d26baec57ca99b10d23674c0030863fb9" />
 			</dataarea>
 		</part>
 	</software>
@@ -30911,6 +31590,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234765">
 				<rom name="war (adventure international).woz" size="234765" crc="79dbdd18" sha1="059f29a61f8d47a45a16b66c4634eed837860805" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wheeldeal">
+		<description>Wheeler Dealers (DOS 3.3 conversion)</description>
+		<year>1978</year>
+		<publisher>Speakeasy Software</publisher>
+		<info name="programmer" value="Danielle Bunten Berry" />
+		<info name="usage" value="Requires a 48K Apple ][ or later. Shipped with special hardware controllers, but joystick or paddeles can be used by defining directional movement (not button press) to each player." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-05-09-->
+		<!--This is a digitization of the original cassette, and a non-original conversion to a bootable disk.-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="wheeler dealers dos 3.3 conversion.dsk" size="143360" crc="adc3c491" sha1="be1b6cfcb0d39c13d8a945b9746f392a996a5670" />
 			</dataarea>
 		</part>
 	</software>
@@ -31375,6 +32071,262 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="wizrdry1v0981" cloneof="wizrdry1">
+		<description>Wizardry: Proving Grounds of the Mad Overload (version 05-SEP-81)</description>
+		<year>1981</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
+		<info name="usage" value="Requires a 48K Apple ][ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="version" value="05-SEP-81" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-04-02. Redumped: 2022-05-10 to fix critical data corruption in the saved characters roster that entirely prevented playing.-->
+		<!--roleplaying game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Scenario disk" />
+			<dataarea name="flop" size="234881">
+				<rom name="wizardry- proving grounds of the mad overlord v05-sep-81 side a - scenario.woz" size="234881" crc="0e955f2e" sha1="47dd791b826c1d952ca78fe209fafd5f6fc30ed8" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot disk" />
+			<dataarea name="flop" size="234846">
+				<rom name="wizardry- proving grounds of the mad overlord v05-sep-81 side b - boot.woz" size="234846" crc="a7d80c8c" sha1="1f1ad5cb198a29e1934a744901ae71cccc82e300" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizrdry1v1281" cloneof="wizrdry1">
+		<description>Wizardry: Proving Grounds of the Mad Overload (version 01-DEC-81)</description>
+		<year>1981</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
+		<info name="usage" value="Requires a 48K Apple ][ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="version" value="01-DEC-81" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-04-02-->
+		<!--roleplaying game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Master scenario disk" />
+			<dataarea name="flop" size="234884">
+				<rom name="wizardry- proving grounds of the mad overlord v01-dec-81 side a - master scenario.woz" size="234884" crc="caae12b7" sha1="78b15dbc13bcf61cf9f44a31d3478a565b010b0f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot disk" />
+			<dataarea name="flop" size="234873">
+				<rom name="wizardry- proving grounds of the mad overlord v01-dec-81 side b - boot.woz" size="234873" crc="0a1eb2ab" sha1="36d42cdb06b5b7452c05ddccf5d6aa8182bdd790" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizrdry1v20" cloneof="wizrdry1">
+		<description>Wizardry: Proving Grounds of the Mad Overload (version 2.0 01-JAN-82)</description>
+		<year>1981</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
+		<info name="usage" value="Requires a 48K Apple ][ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="version" value="2.0 01-JAN-82" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-06-04-->
+		<!--roleplaying game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Master scenario disk" />
+			<dataarea name="flop" size="234937">
+				<rom name="wizardry- proving grounds of the mad overlord v2.0 01-jan-82 side a - scenario master disk.woz" size="234937" crc="8a92f261" sha1="b90ced6408a7e15cd177c0aaead773d6da417093" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot disk" />
+			<dataarea name="flop" size="234896">
+				<rom name="wizardry- proving grounds of the mad overlord v2.0 01-jan-82 side b - boot disk.woz" size="234896" crc="d9c55106" sha1="60bcd0d81ad3fe4a7f6cae4d94e71d5cb01cf3e7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizrdry1">
+		<description>Wizardry: Proving Grounds of the Mad Overlord (version 2.1)</description>
+		<year>1981</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
+		<info name="usage" value="Requires a 48K Apple ][ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="version" value="2.1" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-01-11-->
+		<!--roleplaying game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Boot disk" />
+			<dataarea name="flop" size="234829">
+				<rom name="wizardry - proving grounds of the mad overlord v2.1 - boot disk.woz" size="234829" crc="29dfa2a6" sha1="6c0416fb7cb91bde8da05df77ecfc5f7b7c645f1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Scenario master disk" />
+			<dataarea name="flop" size="234829">
+				<rom name="wizardry - proving grounds of the mad overlord v2.1 - scenario master disk.woz" size="234829" crc="7951ca26" sha1="604a416c50ca6fccb39c11142f8be00d51ce627c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizrdry2">
+		<description>Wizardry II: The Knight of Diamonds (version PV3S2V1/10-MAR-82)</description>
+		<year>1982</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="PV3S2V1/10-MAR-82" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-01-11-->
+		<!--roleplaying game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Boot disk" />
+			<dataarea name="flop" size="234854">
+				<rom name="wizardry ii - knight of diamonds - boot disk.woz" size="234854" crc="16a794a8" sha1="db098051302810edb8aa5c56c8a3dd7cc9ab0772" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Master scenario disk" />
+			<dataarea name="flop" size="234865">
+				<rom name="wizardry ii - knight of diamonds - master scenario disk.woz" size="234865" crc="ac3a27d9" sha1="59f7c602c6347c732ddd8222d667622bf8749a29" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizrdry3">
+		<description>Wizardry III: Legacy of Llylgamyn (version 4, 20-Aug-1983 update)</description>
+		<year>1983</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="Version 4, 20-Aug-1983 update" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-04-08. Redumped: 2023-09-12. Redumped: 2024-05-19 with a cleaner scenario disk and no deleted characters.-->
+		<!--roleplaying game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Master Scenario disk" />
+			<dataarea name="flop" size="234928">
+				<rom name="wizardry iii side a - master scenario disk.woz" size="234928" crc="30d77894" sha1="64d65a39b24a02d1f127db1666a6f3dcd99176f7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot disk" />
+			<dataarea name="flop" size="234917">
+				<rom name="wizardry iii side b - boot.woz" size="234917" crc="83b4938b" sha1="0191645b5a833042e47c75ca7544225f3b3cdbab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizrdry4">
+		<description>Wizardry IV: The Return of Werdna</description>
+		<year>1987</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Andrew Greenberg, Robert Woodhead, and Roe R. Adams III" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-12-14-->
+		<!--roleplaying game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234833">
+				<rom name="wizardry iv - the return of werdna side a.woz" size="234833" crc="0c6ac6a0" sha1="f465fb3b88eb38c197e24da1ae1962f6d0a58cd9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234833">
+				<rom name="wizardry iv - the return of werdna side b.woz" size="234833" crc="179d1324" sha1="7bff6956d76129cc82d5e5ac6ba30d8806054bdf" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C" />
+			<dataarea name="flop" size="234833">
+				<rom name="wizardry iv - the return of werdna side c.woz" size="234833" crc="0493f3d5" sha1="22efb911669d42525a8e8ab35b2a34ca5ef2fdbd" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D" />
+			<dataarea name="flop" size="234833">
+				<rom name="wizardry iv - the return of werdna side d.woz" size="234833" crc="897eb0dc" sha1="21f4d0bd66d9d3a275678dbfc7cabb0cc023910f" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Side E" />
+			<dataarea name="flop" size="234833">
+				<rom name="wizardry iv - the return of werdna side e.woz" size="234833" crc="0fd25eba" sha1="eb07e89850635da688a5aa1d372eebbc19594c9e" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Side F" />
+			<dataarea name="flop" size="234833">
+				<rom name="wizardry iv - the return of werdna side f.woz" size="234833" crc="3a8a7986" sha1="a2684a58605af6ddbd6554bc99333ab3947dd4e9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizrdry5">
+		<description>Wizardry V: Heart of the Maelstrom</description>
+		<year>1988</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="David W. Bradley and Andrew Greenberg" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-08-03-->
+		<!--roleplaying game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - a.woz" size="234780" crc="5c670ca8" sha1="93c05e54ea21596165fb158cfcceaa595ccd38e1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - b.woz" size="234780" crc="1df4b66f" sha1="5ceb0e45e976111ad9d93a3feb1261ecd207465b" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - c.woz" size="234780" crc="60381a85" sha1="68ac614ea0bc52a690d35c9c6a64d425fe775202" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - d.woz" size="234780" crc="2219894f" sha1="793a5074867136cfee53877113dcfda0c8590b6b" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E" />
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - e.woz" size="234780" crc="0e3d0d38" sha1="4a8a35ea50bf55da877ada12823971c7bb6779c4" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk F" />
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - f.woz" size="234780" crc="f0b8294f" sha1="fbed529779a7f1dd70a416f83502dd4468c4d014" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk G" />
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - g.woz" size="234780" crc="90979c2d" sha1="a9a115d8f68eefadfe360bb006239fa1773633a8" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk H" />
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - h.woz" size="234780" crc="571539b6" sha1="5db3ef18a7a03c775b16577624af3c3ef0637b97" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk I" />
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - i.woz" size="234780" crc="690af2ea" sha1="99fc3ba766182e331f8729672711a27b2bfe1509" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wizcovlad">
 		<description>Wizimore: Catacombs of Vlad</description>
 		<year>1987</year>
@@ -31451,6 +32403,39 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234907">
 				<rom name="wizimore - the scarlet brotherhood of hsi ho.woz" size="234907" crc="c52237ac" sha1="aec32fb58baebb34cb1e0578189781fe958ed9bf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wiziprint">
+		<description>Wiziprint (version 2.01 20-AUG-83)</description>
+		<year>1982</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="2.01 20-AUG-83" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-01-13-->
+		<!--game utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234840">
+				<rom name="wiziprint v2.01.woz" size="234840" crc="593dc847" sha1="d8628dbce3441820cbbd2ef4ac5a94421e514226" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizplus">
+		<description>Wizplus</description>
+		<year>1982</year>
+		<publisher>Datamost</publisher>
+		<info name="programmer" value="Thomas A. Conner" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-03-02-->
+		<!--game utility program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234768">
+				<rom name="wizplus.woz" size="234768" crc="f60920a3" sha1="a640aec03dc8bddf434b43318ae80f54d5c1ab8c" />
 			</dataarea>
 		</part>
 	</software>

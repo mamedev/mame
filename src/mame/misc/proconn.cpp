@@ -62,7 +62,7 @@ public:
 	void init_proconn();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	template <unsigned N> void ay_w(uint8_t data) { m_ay->address_data_w(N, data); }
@@ -133,8 +133,8 @@ private:
 	void pio_5_m_out_pb_w(uint8_t data) { logerror("pio_5_m_out_pb_w %02x (LAMPS1)\n", data); }
 	void pio_5_m_out_brdy_w(int state)  { logerror("pio_5_m_out_brdy_w %02x\n", state); }
 
-	void proconn_map(address_map &map);
-	void proconn_portmap(address_map &map);
+	void proconn_map(address_map &map) ATTR_COLD;
+	void proconn_portmap(address_map &map) ATTR_COLD;
 
 	// devices
 	optional_device<s16lf01_device> m_vfd;

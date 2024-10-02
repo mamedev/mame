@@ -15,11 +15,11 @@ public:
 
 	template <typename... T> pc88va_sgp_device& set_map(T &&... args) { set_addrmap(AS_DATA, std::forward<T>(args)...); return *this; }
 
-	void sgp_io(address_map &map);
+	void sgp_io(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 	virtual space_config_vector memory_space_config() const override;

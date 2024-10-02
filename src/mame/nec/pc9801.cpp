@@ -1246,7 +1246,7 @@ void pc9801vm_state::upd7220_grcg_2_map(address_map &map)
 	map(0x00000, 0x3ffff).rw(FUNC(pc9801vm_state::upd7220_grcg_r), FUNC(pc9801vm_state::upd7220_grcg_w)).share("video_ram_2");
 }
 
-CUSTOM_INPUT_MEMBER(pc98_base_state::system_type_r)
+ioport_value pc98_base_state::system_type_r()
 {
 //  System Type (0x00 stock PC-9801, 0xc0 PC-9801U / PC-98LT, PC-98HA, 0x80 others)
 	return m_sys_type;

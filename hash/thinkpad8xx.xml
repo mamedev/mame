@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="thinkpad8xx" description="IBM ThinkPad Power Series software">
+
+	<!-- Operating systems -->
+
+	<software name="aix_4_1_5" supported="no">
+		<description>AIX 4.1.5</description>
+		<year>1997</year>
+		<publisher>IBM</publisher>
+		<sharedfeat name="compatibility" value="800,820,850" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="AIX 4 Volume 1 of 2" />
+			<diskarea name="cdrom">
+				<disk name="aix_4.1.5_disc_01" sha1="4c49c8190e33c2c7f13a74d7332d384edd6b3042" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="AIX 4 Volume 2 of 2" />
+			<diskarea name="cdrom">
+				<disk name="aix_4.1.5_disc_02" sha1="228afedd90619e89c6b466b4970bda0e5a3e9a13" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Only supported on ThinkPad Series models 820 and 850 -->
+	<software name="os2w_ppc" supported="no">
+		<description>OS/2 Warp PowerPC Edition</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<sharedfeat name="compatibility" value="820,850" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="19H1133"/>
+			<diskarea name="cdrom">
+				<disk name="os2-ppc-cd1-os" sha1="b646fdb3ab5f982304e7cbaf6bd735e20cc66198" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Applications Sampler December, 1995"/>
+			<feature name="part_number" value="19H1134"/>
+			<diskarea name="cdrom">
+				<disk name="os2-ppc-cd2-sampler" sha1="e1fd3631c353b2903d35658a59e8a79b6306c1d2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sol_2_5_1_ppc" supported="no">
+		<description>Solaris 2.5.1 Limited Availability PowerPC Platform Edition</description>
+		<year>1996</year>
+		<publisher>Sun Microsystem</publisher>
+		<sharedfeat name="compatibility" value="800,820,850" />
+		<part name="flop" interface="floppy">
+			<feature name="part_id" value="Solaris MDB Boot 2.5.1 Release PowerPC Platform Edition (IBM Hardware Platform)"/>
+			<feature name="part_number" value="702-4348-06"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="solaris_2_5_1_mdb_boot_ppc_ibm.img" size="1474560" crc="b45832e2" sha1="be9e11364816ab5f3362396ed0f457d4a2e61188" />
+			</dataarea>
+		</part>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="704-5237-06"/>
+			<diskarea name="cdrom">
+				<disk name="solaris_2.5.1_powerpc" sha1="61f003bf259e472673b6f65b18ed9b2629ea396b" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Solaris Desktop 1.1 PowerPC Platform Edition"/>
+			<feature name="part_number" value="704-5507-06"/>
+			<diskarea name="cdrom">
+				<disk name="solaris_desktop_1.1_powerpc" sha1="00502ae94b626f0fc3a080ba1c419397b8aaaae3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win_nt_3_5_ppc" supported="no">
+		<description>Windows NT Workstation 3.5 PowerPC Edition</description>
+		<year>1994</year>
+		<publisher>IBM</publisher>
+		<sharedfeat name="compatibility" value="800,820,850" />
+		<part name="flop" interface="floppy">
+			<feature name="part_id" value="Windows NT ARC Boot Firmware v1.51"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="winnt_arc_151.img" size="1474560" crc="98db8c77" sha1="56be119ce7a0020bf4caabd099d2eae8e249305c" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+		<feature name="part_number" value="11H5926"/>
+			<diskarea name="cdrom">
+				<disk name="windows_nt_3.5_workstation_powerpc" sha1="ea1035d1c7f68d8237926125e9a9ccae83fa3f82" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

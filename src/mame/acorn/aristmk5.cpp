@@ -782,8 +782,8 @@ public:
 	void init_aristmk5();
 
 	INPUT_CHANGED_MEMBER(coin_start);
-	CUSTOM_INPUT_MEMBER(coin_r);
-	CUSTOM_INPUT_MEMBER(coin_usa_r);
+	ioport_value coin_r();
+	ioport_value coin_usa_r();
 	int hopper_r();
 
 private:
@@ -810,15 +810,15 @@ private:
 	void spi_int_ack_w(uint8_t data);
 	uint8_t spi_data_r();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	TIMER_CALLBACK_MEMBER(mk5_2KHz_callback);
 	TIMER_CALLBACK_MEMBER(spi_timer);
 
-	void aristmk5_arm_map(address_map &map);
-	void aristmk5_drame_map(address_map &map);
-	void aristmk5_map(address_map &map);
-	void aristmk5_usa_map(address_map &map);
+	void aristmk5_arm_map(address_map &map) ATTR_COLD;
+	void aristmk5_drame_map(address_map &map) ATTR_COLD;
+	void aristmk5_map(address_map &map) ATTR_COLD;
+	void aristmk5_usa_map(address_map &map) ATTR_COLD;
 
 	required_device<arm_cpu_device> m_maincpu;
 	required_device<acorn_ioc_device> m_ioc;
@@ -1094,7 +1094,7 @@ uint8_t aristmk5_state::ldor_r()
 	if (m_extra_ports->read() & 0x01)
 		m_ldor_shift_reg = 0;   // open the Logic door clears the shift register
 
-	return (m_ldor_shift_reg & 0x80) | 0x60 | ((m_hopper_test && m_hopper->line_r()) ? 0x10 : 0x00);
+	return (m_ldor_shift_reg & 0x80) | 0x60 | ((m_hopper_test && !m_hopper->line_r()) ? 0x10 : 0x00);
 }
 
 void aristmk5_state::ldor_clk_w(uint8_t data)
@@ -1280,10 +1280,10 @@ void aristmk5_state::aristmk5_drame_map(address_map &map)
 
 int aristmk5_state::hopper_r()
 {
-	return (m_hopper_test && m_hopper->line_r()) ? 0 : 1;
+	return (m_hopper_test && !m_hopper->line_r()) ? 0 : 1;
 }
 
-CUSTOM_INPUT_MEMBER(aristmk5_state::coin_usa_r)
+ioport_value aristmk5_state::coin_usa_r()
 {
 	//  ---x  Coin Acceptor
 	//  --x-  Credit Sense
@@ -1313,7 +1313,7 @@ CUSTOM_INPUT_MEMBER(aristmk5_state::coin_usa_r)
 	return data;
 }
 
-CUSTOM_INPUT_MEMBER(aristmk5_state::coin_r)
+ioport_value aristmk5_state::coin_r()
 {
 	uint8_t data = 0x01;
 
@@ -2422,7 +2422,7 @@ void aristmk5_state::aristmk5(machine_config &config)
 
 	DS1302(config, m_rtc, 32.768_kHz_XTAL);
 
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	// some games (jungjuic, penpir2) use the IOC KART interface for debug
 	rs232_port_device &rs232(RS232_PORT(config, "kart", default_rs232_devices, nullptr));

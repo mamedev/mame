@@ -26,7 +26,7 @@ actual speed, overclock V10 and V11 to 230%. This can be done by starting MAME
 with the -cheat option and going to the Slider Controls menu, hold Ctrl and press
 Right to overclock maincpu.
 
-********************************************************************************
+================================================================================
 
 Excel 68000 (model 6094) overview:
 - 16KB RAM(2*SRM2264C-10 @ U8/U9), 64KB ROM(2*AT27C256-15DC @ U6/U7)
@@ -47,7 +47,7 @@ display a ROM checksum.
 fex68km4 continuously tests RAM at boot and displays "512", this is normal.
 To start, hold New Game or Clear.
 
-********************************************************************************
+================================================================================
 
 Elite Avant Garde 2265 (EAG, model 6114)
 ----------------------------------------
@@ -110,7 +110,7 @@ Memory map: (of what is known)
 700002-700003 R lo d7: 74251: keypad row 8
 604000-607FFF: 16KB EEPROM
 
-********************************************************************************
+================================================================================
 
 Elite Avant Garde 2325 (EAG, model 6117)
 ----------------------------------------
@@ -181,7 +181,7 @@ V1x Memory map:
 280000-37FFFF: hashtable SRAM
 B0000x-xxxxxx: see V7, -800000
 
-********************************************************************************
+================================================================================
 
 Elite Premiere (model 6131)
 ---------------------------
@@ -266,8 +266,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(in1_changed) { update_dsr(); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void eag_base(machine_config &config);
 
@@ -286,9 +286,9 @@ protected:
 	u8 m_led_data = 0;
 
 	// address maps
-	void eag_map(address_map &map);
-	void eagv7_map(address_map &map);
-	void eagv10_map(address_map &map);
+	void eag_map(address_map &map) ATTR_COLD;
+	void eagv7_map(address_map &map) ATTR_COLD;
+	void eagv10_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();
@@ -336,8 +336,8 @@ private:
 	required_device<generic_latch_8_device> m_sublatch;
 
 	// address maps
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void reset_subcpu_w(u8 data);
@@ -362,8 +362,8 @@ public:
 	void premiere(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -372,7 +372,7 @@ private:
 	required_memory_bank m_rombank;
 
 	// address maps
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 void premiere_state::machine_start()
@@ -412,10 +412,10 @@ public:
 
 private:
 	// address maps
-	void fex68k_map(address_map &map);
-	void fex68km2_map(address_map &map);
-	void fex68km3_map(address_map &map);
-	void fex68km4_map(address_map &map);
+	void fex68k_map(address_map &map) ATTR_COLD;
+	void fex68km2_map(address_map &map) ATTR_COLD;
+	void fex68km3_map(address_map &map) ATTR_COLD;
+	void fex68km4_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -647,7 +647,7 @@ static INPUT_PORTS_START( excel68k )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Take Back / Bishop")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Hint / Knight")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Move / Pawn")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear")
 INPUT_PORTS_END
 
 // EAG or EAS / Prestige button panel
@@ -665,7 +665,7 @@ static INPUT_PORTS_START( eag_base )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_M) PORT_NAME("DM") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(1) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("New Game") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
 INPUT_PORTS_END
@@ -685,7 +685,7 @@ static INPUT_PORTS_START( eag )
 
 	PORT_MODIFY("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(0) PORT_CODE(KEYCODE_M) PORT_NAME("DM") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(0) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(0) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) HOUSING(0) PORT_CODE(KEYCODE_V) PORT_NAME("RV") PORT_CHANGED_MEMBER(DEVICE_SELF, eag_state, in1_changed, 0)
 
 	PORT_START("IN.2") // factory set (diode)

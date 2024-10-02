@@ -23,13 +23,13 @@ protected:
 	timeplt_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	void filter_w(offs_t offset, uint8_t data);
 	uint8_t portB_r();
 
-	void timeplt_sound_map(address_map &map);
+	void timeplt_sound_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_soundcpu;
 
@@ -51,9 +51,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	void locomotn_sound_map(address_map &map);
+	void locomotn_sound_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(TIMEPLT_AUDIO, timeplt_audio_device)

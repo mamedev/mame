@@ -199,7 +199,7 @@ Pin #11(+) | | R               |
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(lethalj_state::cclownz_paddle)
+ioport_value lethalj_state::cclownz_paddle()
 {
 	int value = m_paddle->read();
 	return ((value << 4) & 0xf00) | (value & 0x00f);
@@ -755,7 +755,7 @@ void lethalj_state::gameroom(machine_config &config)
 	m_maincpu->set_pixels_per_clock(1);
 	m_maincpu->set_scanline_ind16_callback(FUNC(lethalj_state::scanline_update));
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

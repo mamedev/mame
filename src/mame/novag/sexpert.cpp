@@ -87,8 +87,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
@@ -103,15 +103,13 @@ protected:
 	required_ioport_array<8> m_inputs;
 
 	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 	u8 m_lcd_control = 0;
 	u8 m_lcd_data = 0;
 
 	// address maps
-	void sexpert_map(address_map &map);
+	void sexpert_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
-	void update_display();
 	virtual void lcd_control_w(u8 data);
 	virtual void lcd_data_w(u8 data);
 	void leds_w(u8 data);
@@ -127,7 +125,6 @@ void sexpert_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_led_data));
 	save_item(NAME(m_lcd_control));
 	save_item(NAME(m_lcd_data));
 }
@@ -163,13 +160,13 @@ public:
 	void sforteb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	emu_timer *m_beeptimer = nullptr;
 
 	// address maps
-	void sforte_map(address_map &map);
+	void sforte_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	virtual void lcd_control_w(u8 data) override;
@@ -213,13 +210,7 @@ HD44780_PIXEL_UPDATE(sexpert_state::lcd_pixel_update)
 }
 
 
-// TTL/generic
-
-void sexpert_state::update_display()
-{
-	// update leds (lcd is done separately)
-	m_display->matrix(m_inp_mux, m_led_data);
-}
+// common
 
 void sexpert_state::lcd_control_w(u8 data)
 {
@@ -240,8 +231,7 @@ void sexpert_state::lcd_data_w(u8 data)
 void sexpert_state::leds_w(u8 data)
 {
 	// d0-d7: chessboard leds
-	m_led_data = data;
-	update_display();
+	m_display->write_mx(data);
 }
 
 void sexpert_state::mux_w(u8 data)
@@ -250,11 +240,11 @@ void sexpert_state::mux_w(u8 data)
 	m_rombank->set_entry(data & 1);
 
 	// d3: enable beeper
-	m_beeper->set_state(data >> 3 & 1);
+	m_beeper->set_state(BIT(data, 3));
 
 	// d4-d7: 74145 to input mux/led select
 	m_inp_mux = 1 << (data >> 4 & 0xf) & 0xff;
-	update_display();
+	m_display->write_my(m_inp_mux);
 }
 
 u8 sexpert_state::input1_r()
@@ -301,10 +291,10 @@ void sforte_state::lcd_data_w(u8 data)
 	// d0-d2: 74145 to input mux/led select
 	// 74145 D from lcd control d2 (HD44780 E)
 	m_inp_mux = 1 << ((m_lcd_control << 1 & 8) | (data & 7));
+	m_display->write_my(m_inp_mux);
 
 	// d5,d6: led data
-	m_led_data = ~data >> 5 & 3;
-	update_display();
+	m_display->write_mx(~data >> 5 & 3);
 
 	// d7: enable beeper
 	// capacitor for noise filter (sound glitches otherwise)
@@ -341,10 +331,7 @@ void sexpert_state::sexpert_map(address_map &map)
 void sforte_state::sforte_map(address_map &map)
 {
 	sexpert_map(map);
-	map(0x1ff4, 0x1ff4).nopw();
-	map(0x1ff5, 0x1ff5).nopw();
-	map(0x1ff6, 0x1ff6).w(FUNC(sforte_state::lcd_control_w));
-	map(0x1ff7, 0x1ff7).w(FUNC(sforte_state::lcd_data_w));
+	map(0x1ff4, 0x1ff5).nopw();
 }
 
 
@@ -483,6 +470,7 @@ void sforte_state::sforte(machine_config &config)
 
 	m_board->set_type(sensorboard_device::BUTTONS);
 
+	m_display->set_width(2);
 	config.set_default_layout(layout_novag_sforte);
 }
 
@@ -599,17 +587,17 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS          INIT          COMPANY, FULLNAME, FLAGS
-SYST( 1988, sexperta,  0,        0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag Industries", "Super Expert (version A, set 1)", MACHINE_SUPPORTS_SAVE ) // 886
-SYST( 1987, sexperta1, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag Industries", "Super Expert (version A, set 2)", MACHINE_SUPPORTS_SAVE ) // 878
-SYST( 1987, sexperta2, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag Industries", "Super Expert (version A, set 3)", MACHINE_SUPPORTS_SAVE ) // 878
-SYST( 1988, sexpertb,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE ) // 887
-SYST( 1990, sexpertc,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries", "Super Expert (version C, v3.6)", MACHINE_SUPPORTS_SAVE ) // 902
-SYST( 1990, sexpertc1, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries", "Super Expert (version C, v3.0)", MACHINE_SUPPORTS_SAVE ) // 902
-SYST( 1990, sexpertc2, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries", "Super Expert (version C, v1.2)", MACHINE_SUPPORTS_SAVE ) // 902
+SYST( 1988, sexperta,  0,        0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version A, set 1)", MACHINE_SUPPORTS_SAVE ) // 886
+SYST( 1987, sexperta1, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version A, set 2)", MACHINE_SUPPORTS_SAVE ) // 878
+SYST( 1987, sexperta2, sexperta, 0,      sexpert,  sexpert,  sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version A, set 3)", MACHINE_SUPPORTS_SAVE ) // 878
+SYST( 1988, sexpertb,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE ) // 887
+SYST( 1990, sexpertc,  sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version C, v3.6)", MACHINE_SUPPORTS_SAVE ) // 902
+SYST( 1990, sexpertc1, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version C, v3.0)", MACHINE_SUPPORTS_SAVE ) // 902
+SYST( 1990, sexpertc2, sexperta, 0,      sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Expert (version C, v1.2)", MACHINE_SUPPORTS_SAVE ) // 902
 
-SYST( 1987, sfortea,   0,        0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag Industries", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1987, sfortea1,  sfortea,  0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag Industries", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE )
-SYST( 1987, sfortea2,  sfortea,  0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag Industries", "Super Forte (version A, set 3)", MACHINE_SUPPORTS_SAVE )
-SYST( 1988, sforteb,   sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag Industries", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE )
-SYST( 1990, sfortec,   sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag Industries", "Super Forte (version C, v3.6)", MACHINE_SUPPORTS_SAVE )
-SYST( 1990, sfortec1,  sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag Industries", "Super Forte (version C, v1.2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, sfortea,   0,        0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, sfortea1,  sfortea,  0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, sfortea2,  sfortea,  0,      sforte,   sexpert,  sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version A, set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, sforteb,   sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, sfortec,   sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version C, v3.6)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, sfortec1,  sfortea,  0,      sforteb,  sexpertb, sforte_state,  init_sexpert, "Novag Industries / Intelligent Heuristic Programming", "Super Forte (version C, v1.2)", MACHINE_SUPPORTS_SAVE )

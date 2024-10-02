@@ -58,7 +58,7 @@ public:
 	void good(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -75,7 +75,7 @@ private:
 	uint32_t screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void good_map(address_map &map);
+	void good_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -61,8 +61,8 @@ protected:
 	static const int divisors_16X_4_6080MHz[16];
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(fx4_tick);
 	TIMER_CALLBACK_MEMBER(fr_tick);

@@ -33,6 +33,7 @@ class fifo2812_device : public device_t
 public:
 	// standard constructor
 	fifo2812_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	virtual ~fifo2812_device();
 
 	// callbacks
 	auto q_cb() { return m_q_cb.bind(); }
@@ -57,9 +58,9 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	enum { LENGTH = 32 };

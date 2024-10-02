@@ -32,7 +32,7 @@ Note some of the commands are a bit buggy, eg F doesn't fill the last byte
 TODO:
 - Fix floppy. It needs to WAIT the cpu whenever port 0xFC is read, wait
   for either DRQ or INTRQ to assert, then release the cpu and then do the
-  actual port read. Our Z80 cannot do that.
+  actual port read.
 - The only available disks crash MAME when loaded.
 - honor jumper settings
 - CTC signal header
@@ -110,11 +110,11 @@ private:
 	void write_centronics_busy(int state);
 	void write_centronics_select(int state);
 
-	void xor100_io(address_map &map);
-	void xor100_mem(address_map &map);
+	void xor100_io(address_map &map) ATTR_COLD;
+	void xor100_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void bankswitch();
 	void post_load();
@@ -280,7 +280,7 @@ uint8_t xor100_state::fdc_wait_r()
 	{
 		if (!m_fdc_irq && !m_fdc_drq)
 		{
-			m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
+			//m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 		}
 	}
 
@@ -640,7 +640,7 @@ void xor100_state::xor100(machine_config &config)
 
 	// S-100
 	S100_BUS(config, m_s100, 8_MHz_XTAL / 4);
-	m_s100->rdy().set_inputline(m_maincpu, Z80_INPUT_LINE_BOGUSWAIT);
+	//m_s100->rdy().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT);
 	S100_SLOT(config, S100_TAG ":1", xor100_s100_cards, nullptr);
 	S100_SLOT(config, S100_TAG ":2", xor100_s100_cards, nullptr);
 	S100_SLOT(config, S100_TAG ":3", xor100_s100_cards, nullptr);

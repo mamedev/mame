@@ -39,12 +39,12 @@ public:
 	void potgold580(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 
-	void potgold_map(address_map &map);
+	void potgold_map(address_map &map) ATTR_COLD;
 
 	required_device<tms34010_device> m_maincpu;
 };

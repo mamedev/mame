@@ -182,9 +182,9 @@ public:
 private:
 	void drq_w(int state);
 	void intrq_w(int state);
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void machine_reset() override;
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	void port_f1_w(u8 data);
 	u8 m_f1 = 0U;
 

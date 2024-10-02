@@ -69,6 +69,14 @@ void mos6551_device::device_add_mconfig(machine_config &config)
 	m_internal_clock->signal_handler().set(FUNC(mos6551_device::internal_clock));
 }
 
+void mos6551_device::map(address_map &map)
+{
+	map(0, 0).rw(FUNC(mos6551_device::read_rdr), FUNC(mos6551_device::write_tdr));
+	map(1, 1).rw(FUNC(mos6551_device::read_status), FUNC(mos6551_device::write_reset));
+	map(2, 2).rw(FUNC(mos6551_device::read_command), FUNC(mos6551_device::write_command));
+	map(3, 3).rw(FUNC(mos6551_device::read_control), FUNC(mos6551_device::write_control));
+}
+
 
 void mos6551_device::device_start()
 {
@@ -344,12 +352,22 @@ void mos6551_device::write_command(uint8_t data)
 
 	// bit 1
 	m_rx_irq_enable = !((m_command >> 1) & 1) && !m_dtr;
+	if (!m_rx_irq_enable && (m_irq_state & IRQ_RDRF))
+	{
+		m_irq_state &= ~IRQ_RDRF;
+		update_irq();
+	}
 
 	// bits 2-3
 	int transmitter_control = (m_command >> 2) & 3;
 	m_tx_irq_enable = transmitter_controls[transmitter_control][0] && !m_dtr;
 	m_tx_enable = transmitter_controls[transmitter_control][1];
 	m_brk = transmitter_controls[transmitter_control][2];
+	if (!m_tx_irq_enable && (m_irq_state & IRQ_TDRE))
+	{
+		m_irq_state &= ~IRQ_TDRE;
+		update_irq();
+	}
 
 	// bit 4
 	m_echo_mode = (m_command >> 4) & 1;
@@ -477,7 +495,7 @@ void mos6551_device::write_cts(int state)
 	{
 		m_cts = state;
 
-		if (m_cts)
+		if (m_cts && started())
 		{
 			if (m_tx_output == OUTPUT_TXD)
 			{

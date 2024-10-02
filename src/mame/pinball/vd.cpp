@@ -57,15 +57,15 @@ private:
 	void lamp_w(offs_t, u8);
 	void sol_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	bool m_ready = false;
 	u8 m_t_c = 0U;
 	u8 m_game = 0U;
 	u8 m_segment[5]{};
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	output_finder<48> m_digits;
 	output_finder<80> m_io_outputs;   // 16 solenoids + 64 lamps

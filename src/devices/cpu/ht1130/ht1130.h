@@ -41,11 +41,10 @@ public:
 protected:
 	ht1130_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void execute_run() override;
-	virtual u32 execute_input_lines() const noexcept override { return 1; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == HT1130_EXT_WAKEUP_LINE; }
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual u32 execute_max_cycles() const noexcept override { return 2; }
@@ -54,8 +53,8 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 
-	void internal_map(address_map &map);
-	void internal_data_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
+	void internal_data_map(address_map &map) ATTR_COLD;
 
 	void tempram_w(offs_t offset, u8 data);
 	void displayram_w(offs_t offset, u8 data);
@@ -131,11 +130,11 @@ public:
 	ht1190_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual u64 get_segs(u8 coms) override;
 
 private:
-	void internal_data_map_ht1190(address_map &map);
+	void internal_data_map_ht1190(address_map &map) ATTR_COLD;
 };
 
 

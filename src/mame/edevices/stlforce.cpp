@@ -99,8 +99,8 @@ public:
 	void stlforce(machine_config &config);
 	void mortalr(machine_config &config);
 
-	void program_map(address_map &map);
-	void mortalr_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void mortalr_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 
@@ -123,7 +123,7 @@ public:
 	void twinbrat(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_memory_bank m_okibank;
@@ -132,8 +132,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void program_map(address_map &map);
-	void oki_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -591,6 +591,6 @@ GAME( 1994, stlforce,  0,        stlforce, stlforce, stlforce_state, empty_init,
 
 GAME( 1995, mortalr,   0,        mortalr,  stlforce, stlforce_state, empty_init, ROT0, "New Dream Games", "Mortal Race", MACHINE_SUPPORTS_SAVE ) // based on the same rough codebase as Top Driving tch/topdrive.cpp but not the same game, so not a clone
 
-GAME( 1995, twinbrat,  0,        twinbrat, stlforce, twinbrat_state, empty_init, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, twinbrata, twinbrat, twinbrat, stlforce, twinbrat_state, empty_init, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, twinbratb, twinbrat, twinbrat, stlforce, twinbrat_state, empty_init, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, twinbrat,  0,        twinbrat, stlforce, twinbrat_state, empty_init, ROT0, "Elettronica Video-Games", "Twin Brats (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, twinbrata, twinbrat, twinbrat, stlforce, twinbrat_state, empty_init, ROT0, "Elettronica Video-Games", "Twin Brats (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, twinbratb, twinbrat, twinbrat, stlforce, twinbrat_state, empty_init, ROT0, "Elettronica Video-Games", "Twin Brats (set 3)", MACHINE_SUPPORTS_SAVE )

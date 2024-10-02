@@ -65,12 +65,12 @@ public:
 	void base(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_okibank;
 
-	void common_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
 
 private:
 	// devices
@@ -92,7 +92,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	void oki_map(address_map &map);
+	void oki_map(address_map &map) ATTR_COLD;
 };
 
 class blmbycar_state : public base_state
@@ -110,8 +110,8 @@ public:
 	void init_blmbycar();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_ioport m_pot_wheel_io;
@@ -126,7 +126,7 @@ private:
 	uint16_t pot_wheel_r();
 	uint16_t opt_wheel_r();
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 class watrball_state : public base_state
@@ -140,15 +140,15 @@ public:
 	void watrball(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_retvalue = 0;
 
 	uint16_t unk_r();
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 

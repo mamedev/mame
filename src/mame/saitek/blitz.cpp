@@ -41,7 +41,7 @@ TODO:
 
 #include "cpu/h8/h8325.h"
 #include "machine/sensorboard.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
 #include "video/pwm.h"
 
 #include "screen.h"
@@ -72,7 +72,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_off) { m_power = false; }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { m_power = true; }
 
 private:
@@ -81,7 +81,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
-	required_device<speaker_sound_device> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport m_inputs;
 	output_finder<4, 22> m_out_lcd;
 
@@ -115,6 +115,12 @@ private:
 	u8 p6_r();
 	void p6_w(u8 data);
 };
+
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
 
 void blitz_state::machine_start()
 {
@@ -242,7 +248,7 @@ u8 blitz_state::p6_r()
 void blitz_state::p6_w(u8 data)
 {
 	// P62: speaker out
-	m_dac->level_w(BIT(data, 2));
+	m_dac->write(BIT(data, 2));
 
 	// P60: 74164(1) CP
 	// P61: 74164(1) DSB, outputs to input mux / LED data
@@ -280,7 +286,7 @@ static INPUT_PORTS_START( blitz )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 
 	PORT_START("POWER")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, blitz_state, power_off, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, blitz_state, power_off, 0)
 INPUT_PORTS_END
 
 
@@ -331,7 +337,7 @@ void blitz_state::blitz(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 

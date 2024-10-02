@@ -22,9 +22,6 @@ TODO:
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
 
-BTANB:
-- it still has the same AT level bug as sapphire (see sapphire.cpp)
-
 *******************************************************************************/
 
 #include "emu.h"
@@ -62,7 +59,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { set_power(true); }
 
 private:
@@ -322,4 +319,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT     CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1997, emerclp, 0,      0,      emerclp,  emerclp, emerclp_state, empty_init, "Novag Industries", "Emerald Classic Plus", MACHINE_SUPPORTS_SAVE )
+SYST( 1997, emerclp, 0,      0,      emerclp,  emerclp, emerclp_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Emerald Classic Plus", MACHINE_SUPPORTS_SAVE )
