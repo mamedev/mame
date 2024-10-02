@@ -127,6 +127,9 @@ ROM_START(thinkpad600)
 	ROM_REGION(0x00080, "seeprom", 0)
 	ROM_LOAD( "atmel_24c01a.u49",                      0x00000, 0x00080, CRC(9a2e2a18) SHA1(29e2832c97bc93debb4fb09fcbed582335b57efe) )
 
+	ROM_REGION(0x00420, "seeprom2", 0)
+	ROM_LOAD( "at24rf08bt.u99",                        0x00000, 0x00420, CRC(c7ce9600) SHA1(4e6ed66250fed838614c3f1f6044fd9a19a2d0de) )
+
 	ROM_REGION(0x00c39, "plds", 0)
 	ROM_LOAD( "atf1500al-modemboard.u12",              0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
 ROM_END
