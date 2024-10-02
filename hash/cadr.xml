@@ -9,7 +9,7 @@ license:CC0-1.0
 		<description>System 78.48</description>
 		<year>19??</year>
 		<publisher>MIT</publisher>
-		<notes>Hangs after entering date and time</notes>
+		<notes>Expects to run on a single board disk controller. Gives errors about the filesystem.</notes>
 		<part name="hdd" interface="hdd">
 			<diskarea name="harddriv">
 				<disk name="sys78" sha1="8dd933b7a26dd13d01e1fe9573224d21778cf26f" writeable="yes"/>

@@ -4,7 +4,10 @@
 
 CADR disk controller emulation
 
-The disk controller communicates with up to 8 disk drives.
+There were 2 version of the disk controller a single board version which
+connected to 1 hard disk and a 2 board version which coud connect up to 8
+drives.
+
 It retrieves "CCW"s to process from main memory. Reads
 and writes go directly to/from main memory.
 The Command List Pointer contains the number of the physical
@@ -34,7 +37,7 @@ DEFINE_DEVICE_TYPE(CADR_DISK, cadr_disk_device, "cadr_disk", "CADR disk controll
 cadr_disk_device::cadr_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, CADR_DISK, tag, owner, clock)
 	, m_data_space(*this, finder_base::DUMMY_TAG, -1)
-	, m_harddisk(*this, "harddisk%u", 1U)
+	, m_harddisk(*this, "harddisk")
 	, m_irq_cb(*this)
 {
 }
@@ -42,8 +45,7 @@ cadr_disk_device::cadr_disk_device(const machine_config &mconfig, const char *ta
 
 void cadr_disk_device::device_add_mconfig(machine_config &config)
 {
-	for (int i = 0; i < 8; i++)
-		HARDDISK(config, m_harddisk[i]); // T-80 (80MB) or T-300 (300MB)
+	HARDDISK(config, m_harddisk); // T-80 (80MB) or T-300 (300MB)
 }
 
 
@@ -222,10 +224,10 @@ void cadr_disk_device::start_w(u32 data)
 	switch (m_command & 0x3ff)
 	{
 	case 0x000: // 0000 - Read
-		if (m_harddisk[m_unit]->exists())
+		if (m_harddisk->exists())
 		{
 			u32 max_ccws = 0x10000;
-			const auto &info = m_harddisk[m_unit]->get_info();
+			const auto &info = m_harddisk->get_info();
 			u32 sector = (m_cyl * info.heads * info.sectors) + (m_head * info.sectors) + m_block;
 			u8 buffer[1024];
 			do
@@ -233,7 +235,7 @@ void cadr_disk_device::start_w(u32 data)
 				const u32 ccw = m_data_space->read_dword(m_clp);
 				const u16 page = (ccw >> 8) & 0x7fff;
 				LOG("Start read sector %d\n", sector);
-				m_harddisk[m_unit]->read(sector, &buffer[0]);
+				m_harddisk->read(sector, &buffer[0]);
 				// Move data to ram
 				LOG("Write sector data to %08x\n", page << 8);
 				for (int i = 0; i < 1024; i += 4)
@@ -264,6 +266,7 @@ void cadr_disk_device::start_w(u32 data)
 		{
 			m_status |= 0x8200; // The timeout bit is checked for a unit that is not present?
 			m_status |= 1;
+			m_disk_timer->adjust(attotime::from_msec(6));
 		}
 		break;
 
@@ -274,10 +277,10 @@ void cadr_disk_device::start_w(u32 data)
 
 	case 0x009: // 0011 - Write
 		LOG("Start write\n");
-		if (m_harddisk[m_unit]->exists())
+		if (m_harddisk->exists())
 		{
 			u32 max_ccws = 0x10000;
-			const auto &info = m_harddisk[m_unit]->get_info();
+			const auto &info = m_harddisk->get_info();
 			u32 sector = (m_cyl * info.heads * info.sectors) + (m_head * info.sectors) + m_block;
 			u8 buffer[1024];
 			do
@@ -294,7 +297,7 @@ void cadr_disk_device::start_w(u32 data)
 					buffer[(i * 4) + 1] = (data >> 8) & 0xff;
 					buffer[i * 4] = data & 0xff;
 				}
-				m_harddisk[m_unit]->write(sector, &buffer[0]);
+				m_harddisk->write(sector, &buffer[0]);
 				if (BIT(ccw, 0) && max_ccws)
 				{
 					sector++;
@@ -332,6 +335,43 @@ void cadr_disk_device::start_w(u32 data)
 	case 0x004: // 0004 - Seek
 	default:
 		fatalerror("Unknown disk controller command %03x initiated\n", m_command & 0x3ff);
+		break;
+	}
+}
+
+
+u32 cadr_disk_device::read(offs_t offset)
+{
+	switch (offset)
+	{
+	case 0x04:
+		return status_r();
+	case 0x05:
+		return command_list_r();
+	case 0x06:
+		return disk_address_r();
+	case 0x07:
+		return error_correction_r();
+	}
+	return 0xffffffff;
+}
+
+
+void cadr_disk_device::write(offs_t offset, u32 data)
+{
+	switch (offset)
+	{
+	case 0x04:
+		command_w(data);
+		break;
+	case 0x05:
+		command_list_w(data);
+		break;
+	case 0x06:
+		disk_address_w(data);
+		break;
+	case 0x07:
+		start_w(data);
 		break;
 	}
 }

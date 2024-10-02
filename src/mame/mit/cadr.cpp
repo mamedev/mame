@@ -121,16 +121,7 @@ void cadr_state::mem_map(address_map &map)
 
 	// Don't know why but using map is not working
 //	map(0x3dfff8, 0x3dffff).m(m_disk_controller, FUNC(cadr_disk_device::map));
-	// 3dfff9 / 17377771
-	map(0x3dfff9, 0x3dfff9).r(m_disk_controller, FUNC(cadr_disk_device::memory_address_r));
-	// 3dfffc / 17377774
-	map(0x3dfffc, 0x3dfffc).rw(m_disk_controller, FUNC(cadr_disk_device::status_r), FUNC(cadr_disk_device::command_w));
-	// 3dfffd / 17377775
-	map(0x3dfffd, 0x3dfffd).rw(m_disk_controller, FUNC(cadr_disk_device::command_list_r), FUNC(cadr_disk_device::command_list_w));
-	// 3dfffe / 17377776
-	map(0x3dfffe, 0x3dfffe).rw(m_disk_controller, FUNC(cadr_disk_device::disk_address_r), FUNC(cadr_disk_device::disk_address_w));
-	// 3dffff / 17377777
-	map(0x3dffff, 0x3dffff).rw(m_disk_controller, FUNC(cadr_disk_device::error_correction_r), FUNC(cadr_disk_device::start_w));
+	map(0x3dfff8, 0x3dffff).rw(m_disk_controller, FUNC(cadr_disk_device::read), FUNC(cadr_disk_device::write));
 
 
 	// Unibus - 16 bit bus

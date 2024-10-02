@@ -124,8 +124,9 @@ u32 cadr_tv_control_device::tv_control_r(offs_t offset)
 	case 0x01: // DATA
 		return m_sync_ram[m_sync_address & SYNC_RAM_MASK];
 	}
-	return 0;
+	return 0xffffffff;
 }
+
 
 
 void cadr_tv_control_device::tv_control_w(offs_t offset, u32 data)

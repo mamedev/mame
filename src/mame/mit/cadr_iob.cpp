@@ -414,7 +414,7 @@ u16 cadr_iob_device::read(offs_t offset)
 		m_chaos_csr &= ~CHAOSNET_TRANSMIT_DONE;
 		return 0x101;
 	}
-	return 0;
+	return 0xffffffff;
 }
 
 
