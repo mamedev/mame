@@ -52,7 +52,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  atari_cx85_device - constructor
+//  atari_trakball_device - constructor
 //-------------------------------------------------
 
 atari_trakball_device::atari_trakball_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
