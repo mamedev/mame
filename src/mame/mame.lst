@@ -45658,14 +45658,15 @@ tvgogo                          //
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 
 @source:tvgames/spg2xx_wiwi.cpp
-wiwi18                          //
+265games
+ddmmeg12
+ddmsup
 foxsport
+guitrbus
 lexifit
 marc101
 marc250
-guitrbus
-ddmsup
-ddmmeg12
+wiwi18                          //
 
 @source:tvgames/spg2xx_zone.cpp
 wirels60                        // Wireless 60
