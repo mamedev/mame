@@ -2327,11 +2327,7 @@ ROM_END
 
 ROM_START( anpantv )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	// were the address lines incorrectly connected when this was dumped?
-	ROM_LOAD16_WORD_SWAP( "anpanman_tv.bin", 0x000000, 0x200000, CRC(760ea2be) SHA1(0a41b986649431b9357826e1828f90c80fd276a6) )
-	ROM_CONTINUE(0x400000,0x200000)
-	ROM_CONTINUE(0x200000,0x200000)
-	ROM_CONTINUE(0x600000,0x200000)
+	ROM_LOAD16_WORD_SWAP( "anpanman_tv.bin", 0x000000, 0x800000, CRC(5e32dc1a) SHA1(bae260ffc56f5315cdafd5bc40966ec6d31e267f) )
 ROM_END
 
 void spg2xx_game_state::init_crc()
