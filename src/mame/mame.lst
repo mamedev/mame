@@ -16239,6 +16239,9 @@ tascr30g
 @source:chessking/master.cpp
 master
 
+@source:chessking/pmicrodx.cpp
+pmicrodx
+
 @source:chessking/triomphe.cpp
 triomphe
 
@@ -19024,6 +19027,9 @@ newbrainmd                      //
 
 @source:handheld/chessking.cpp
 chesskng                        //
+
+@source:handheld/dbridgec.cpp
+dbridgec
 
 @source:handheld/gameking.cpp
 gamekin3                        //
