@@ -1,10 +1,9 @@
-// license:BSD-3-Clause
-// copyright-holders:Allard van der Bas
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller
 #ifndef MAME_NAMCO_WARPWARP_A_H
 #define MAME_NAMCO_WARPWARP_A_H
 
 #pragma once
-
 
 class warpwarp_sound_device : public device_t, public device_sound_interface
 {
@@ -29,17 +28,17 @@ private:
 	// internal state
 	std::unique_ptr<int16_t[]> m_decay;
 	sound_stream *m_channel;
-	u32 m_clock_16h = 0;
-	u32 m_clock_1v = 0;
+	u32 m_clock_16h;
+	u32 m_clock_1v;
 	int m_sound_latch;
 	int m_music1_latch;
 	int m_music2_latch;
 	int m_sound_signal;
 	int m_sound_volume;
-	emu_timer   *m_sound_volume_timer;
+	emu_timer *m_sound_volume_timer;
 	int m_music_signal;
 	int m_music_volume;
-	emu_timer   *m_music_volume_timer;
+	emu_timer *m_music_volume_timer;
 	int m_noise;
 
 	int m_vcarry;
