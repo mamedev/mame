@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "to_kbd.h"
+
 #include "cpu/m6809/m6809.h"
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
@@ -231,7 +233,7 @@ protected:
 	required_ioport m_io_lightpen_button;
 	required_ioport m_io_config;
 	required_ioport m_io_vconfig;
-	required_ioport_array<10> m_io_keyboard;
+	optional_ioport_array<9> m_io_keyboard;
 	required_memory_bank m_vrambank;
 	optional_memory_bank m_cartbank;
 	optional_memory_bank m_rambank;
@@ -384,6 +386,8 @@ class to9_state : public thomson_state
 public:
 	to9_state(const machine_config &mconfig, device_type type, const char *tag) :
 		thomson_state(mconfig, type, tag),
+		m_to8_kbd(*this, "to8_kbd"),
+		m_to9_kbd(*this, "to9_kbd"),
 		m_centronics(*this, "centronics"),
 		m_cent_data_out(*this, "cent_data_out"),
 		m_syslobank(*this, TO8_SYS_LO),
@@ -400,6 +404,8 @@ public:
 	void to9p(machine_config &config);
 
 protected:
+	optional_device<to8_keyboard_device> m_to8_kbd;
+	optional_device<to9_keyboard_device> m_to9_kbd;
 	optional_device<centronics_device> m_centronics;
 	optional_device<output_latch_device> m_cent_data_out;
 
@@ -411,14 +417,6 @@ protected:
 
 	int m_centronics_busy = 0;
 
-	uint8_t  m_to8_kbd_ack = 0;       /* 1 = cpu inits / accepts transfers */
-	uint16_t m_to8_kbd_data = 0;      /* data to transmit */
-	uint16_t m_to8_kbd_step = 0;      /* transmission automaton state */
-	uint8_t  m_to8_kbd_last_key = 0;  /* last key (for repetition) */
-	uint32_t m_to8_kbd_key_count = 0; /* keypress time (for repetition)  */
-	uint8_t  m_to8_kbd_caps = 0;      /* caps lock */
-	emu_timer* m_to8_kbd_timer = nullptr;   /* bit-send */
-	emu_timer* m_to8_kbd_signal = nullptr;  /* signal from CPU */
 	uint8_t m_to8_data_vpage = 0;
 	uint8_t m_to8_cart_vpage = 0;
 	uint8_t  m_to8_reg_ram = 0;
@@ -430,7 +428,6 @@ protected:
 	uint8_t  m_to8_soft_bank = 0;
 	uint8_t  m_to8_bios_bank = 0;
 
-	TIMER_CALLBACK_MEMBER( to8_kbd_timer_cb );
 	void to8_update_ram_bank_postload();
 	void to8_update_cart_bank_postload();
 	void to8_cartridge_w(offs_t offset, uint8_t data);
@@ -456,12 +453,6 @@ protected:
 	void to8_data_hi_w(offs_t offset, uint8_t data);
 	void to8_vcart_w(offs_t offset, uint8_t data);
 
-	int to8_kbd_ktest();
-	int to8_kbd_get_key();
-	void to8_kbd_timer_func();
-	void to8_kbd_set_ack( int data );
-	void to8_kbd_reset();
-	void to8_kbd_init();
 	void to8_update_ram_bank();
 	void to8_update_cart_bank();
 
@@ -475,9 +466,6 @@ protected:
 	void to9_cartridge_w(offs_t offset, uint8_t data);
 	uint8_t to9_cartridge_r(offs_t offset);
 	void to9_update_ram_bank_postload();
-	uint8_t to9_kbd_r(offs_t offset);
-	void to9_kbd_w(offs_t offset, uint8_t data);
-	TIMER_CALLBACK_MEMBER( to9_kbd_timer_cb );
 	uint8_t to9_sys_porta_in();
 	void to9_sys_porta_out(uint8_t data);
 	void to9_sys_portb_out(uint8_t data);
@@ -496,31 +484,11 @@ protected:
 	uint8_t m_to9_palette_data[32]{};
 	uint8_t m_to9_palette_idx = 0;
 	uint8_t m_to9_soft_bank = 0;
-	uint8_t  m_to9_kbd_parity = 0;  /* 0=even, 1=odd, 2=no parity */
-	uint8_t  m_to9_kbd_intr = 0;    /* interrupt mode */
-	uint8_t  m_to9_kbd_in = 0;      /* data from keyboard */
-	uint8_t  m_to9_kbd_status = 0;  /* status */
-	uint8_t  m_to9_kbd_overrun = 0; /* character lost */
-	uint8_t  m_to9_kbd_periph = 0;     /* peripheral mode */
-	uint8_t  m_to9_kbd_byte_count = 0; /* byte-count in peripheral mode */
-	uint16_t m_to9_mouse_x = 0;
-	uint16_t m_to9_mouse_y = 0;
-	uint8_t  m_to9_kbd_last_key = 0;  /* for key repetition */
-	uint16_t m_to9_kbd_key_count = 0;
-	uint8_t  m_to9_kbd_caps = 0;  /* caps-lock */
-	uint8_t  m_to9_kbd_pad = 0;   /* keypad outputs special codes */
-	emu_timer* m_to9_kbd_timer = nullptr;
 
 	void to9_set_video_mode( uint8_t data, int style );
 	void to9_palette_init();
 	void to9_update_cart_bank();
 	void to9_update_ram_bank();
-	int to9_kbd_ktest();
-	void to9_kbd_update_irq();
-	void to9_kbd_send( uint8_t data, int parity );
-	int to9_kbd_get_key();
-	void to9_kbd_reset();
-	void to9_kbd_init();
 };
 
 class mo6_state : public to9_state

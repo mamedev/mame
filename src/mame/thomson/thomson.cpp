@@ -460,10 +460,6 @@ static INPUT_PORTS_START ( to7_keyboard )
 		KEY ( 6, "7 ' \302\264", 7 )     PORT_CHAR('7') PORT_CHAR('\'')
 		KEY ( 7, "6 &", 6 )              PORT_CHAR('6') PORT_CHAR('&')
 
-		/* unused */
-	PORT_START ( "keyboard.8" )
-	PORT_START ( "keyboard.9" )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( to7 )
@@ -1062,7 +1058,7 @@ void to9_state::to9_map(address_map &map)
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7da, 0xe7dd).rw(FUNC(to9_state::to9_vreg_r), FUNC(to9_state::to9_vreg_w));
-	map(0xe7de, 0xe7df).rw(FUNC(to9_state::to9_kbd_r), FUNC(to9_state::to9_kbd_w));
+	map(0xe7de, 0xe7df).rw(m_to9_kbd, FUNC(to9_keyboard_device::kbd_acia_r), FUNC(to9_keyboard_device::kbd_acia_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to9_gatearray_r), FUNC(to9_state::to9_gatearray_w));
 /*  map(0xe7f0, 0xe7f7).rw(FUNC(to9_state::to9_ieee_r), FUNC(to9_state::to9_ieee_w )); */
 	map(0xe800, 0xffff).rom();       /* system bios  */
@@ -1127,105 +1123,23 @@ ROM_END
 
 /* ------------ inputs   ------------ */
 
-static INPUT_PORTS_START ( to9_keyboard )
-	PORT_START ( "keyboard.0" )
-		KEY ( 0, "F2 F7", F2 )           PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR(UCHAR_MAMEKEY(F7))
-		KEY ( 1, "_ 6", 6 )              PORT_CHAR('_') PORT_CHAR('6')
-		KEY ( 2, "Y", Y )                PORT_CHAR('Y')
-		KEY ( 3, "H \302\250", H )       PORT_CHAR('H')
-		KEY ( 4, UTF8_UP, UP )    PORT_CHAR(UCHAR_MAMEKEY(UP))
-		KEY ( 5, UTF8_RIGHT, RIGHT ) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-		KEY ( 6, "Home Clear", HOME )    PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_CHAR(UCHAR_MAMEKEY(ESC))
-		KEY ( 7, "N", N )                PORT_CHAR('N')
-	PORT_START ( "keyboard.1" )
-		KEY ( 0, "F3 F8", F3 )           PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR(UCHAR_MAMEKEY(F8))
-		KEY ( 1, "( 5", 5 )              PORT_CHAR('(') PORT_CHAR('5')
-		KEY ( 2, "T", T )                PORT_CHAR('T')
-		KEY ( 3, "G", G )                PORT_CHAR('G')
-		KEY ( 4, "= +", EQUALS )         PORT_CHAR('=') PORT_CHAR('+')
-		KEY ( 5, UTF8_LEFT, LEFT )  PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-		KEY ( 6, "Insert", INSERT )      PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-		KEY ( 7, "B \302\264", B )       PORT_CHAR('B')
-	PORT_START ( "keyboard.2" )
-		KEY ( 0, "F4 F9", F4 )           PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CHAR(UCHAR_MAMEKEY(F9))
-		KEY ( 1, "' 4", 4 )              PORT_CHAR('\'') PORT_CHAR('4')
-		KEY ( 2, "R", R )                PORT_CHAR('R')
-		KEY ( 3, "F", F )                PORT_CHAR('F')
-		KEY ( 4, "Accent", END )         PORT_CHAR(UCHAR_MAMEKEY(END))
-		KEY ( 5, "Keypad 1", 1_PAD )     PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-		KEY ( 6, "Delete Backspace", DEL ) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
-		KEY ( 7, "V", V )                PORT_CHAR('V')
-	PORT_START ( "keyboard.3" )
-		KEY ( 0, "F5 F10", F5 )          PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR(UCHAR_MAMEKEY(F10))
-		KEY ( 1, "\" 3", 3 )             PORT_CHAR('"') PORT_CHAR('3')
-		KEY ( 2, "E", E )                PORT_CHAR('E')
-		KEY ( 3, "D", D )                PORT_CHAR('D')
-		KEY ( 4, "Keypad 7", 7_PAD )     PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
-		KEY ( 5, "Keypad 4", 4_PAD )     PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-		KEY ( 6, "Keypad 0", 0_PAD )     PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-		KEY ( 7, "C \136", C )           PORT_CHAR('C')
-	PORT_START ( "keyboard.4" )
-		KEY ( 0, "F1 F6", F1 )           PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR(UCHAR_MAMEKEY(F6))
-		KEY ( 1, "\303\251 2", 2 )       PORT_CHAR( 0xe9 ) PORT_CHAR('2')
-		KEY ( 2, "Z", Z )                PORT_CHAR('Z')
-		KEY ( 3, "S", S )                PORT_CHAR('S')
-		KEY ( 4, "Keypad 8", 8_PAD )     PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-		KEY ( 5, "Keypad 2", 2_PAD )     PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-		KEY ( 6, "Keypad .", DEL_PAD )   PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-		KEY ( 7, "X", X )                PORT_CHAR('X')
-	PORT_START ( "keyboard.5" )
-		KEY ( 0, "# @", TILDE )          PORT_CHAR('#') PORT_CHAR('@')
-		KEY ( 1, "* 1", 1 )              PORT_CHAR('*') PORT_CHAR('1')
-		KEY ( 2, "A \140", A )           PORT_CHAR('A')
-		KEY ( 3, "Q", Q )                PORT_CHAR('Q')
-		KEY ( 4, "[ {", QUOTE )          PORT_CHAR('[') PORT_CHAR('{')
-		KEY ( 5, "Keypad 5", 5_PAD )     PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-		KEY ( 6, "Keypad 6", 6_PAD )     PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-		KEY ( 7, "W", W )                PORT_CHAR('W')
-	PORT_START ( "keyboard.6" )
-		KEY ( 0, "Stop", TAB )           PORT_CHAR(27)
-		KEY ( 1, "\303\250 7", 7 )       PORT_CHAR( 0xe8 ) PORT_CHAR('7')
-		KEY ( 2, "U", U )                PORT_CHAR('U')
-		KEY ( 3, "J", J )                PORT_CHAR('J')
-		KEY ( 4, "Space", SPACE )        PORT_CHAR(' ')
-		KEY ( 5, "Keypad 9", 9_PAD )     PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-		KEY ( 6, "Keypad Enter", ENTER_PAD ) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-		KEY ( 7, ", ?", COMMA )          PORT_CHAR(',') PORT_CHAR('?')
-	PORT_START ( "keyboard.7" )
-		KEY ( 0, "Control", LCONTROL )   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-		KEY ( 1, "! 8", 8 )              PORT_CHAR('!') PORT_CHAR('8')
-		KEY ( 2, "I", I )                PORT_CHAR('I')
-		KEY ( 3, "K", K )                PORT_CHAR('K')
-		KEY ( 4, "$ &", CLOSEBRACE )     PORT_CHAR('$') PORT_CHAR('&')
-		KEY ( 5, UTF8_DOWN, DOWN )  PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-		KEY ( 6, "] }", BACKSLASH )      PORT_CHAR(']') PORT_CHAR('}')
-		KEY ( 7, "; .", STOP )           PORT_CHAR(';') PORT_CHAR('.')
-	PORT_START ( "keyboard.8" )
-		KEY ( 0, "Caps-Lock", CAPSLOCK ) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-		KEY ( 1, "\303\247 9", 9 )       PORT_CHAR( 0xe7 ) PORT_CHAR('9')
-		KEY ( 2, "O", O )                PORT_CHAR('O')
-		KEY ( 3, "L", L )                PORT_CHAR('L')
-		KEY ( 4, "- \\", BACKSPACE )     PORT_CHAR('-') PORT_CHAR('\\')
-		KEY ( 5, "\303\271 %", COLON )   PORT_CHAR( 0xf9 ) PORT_CHAR('%')
-		KEY ( 6, "Enter", ENTER )        PORT_CHAR(13)
-		KEY ( 7, ": /", SLASH )          PORT_CHAR(':') PORT_CHAR('/')
-	PORT_START ( "keyboard.9" )
-		KEY ( 0, "Shift", LSHIFT )  PORT_CODE ( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
-		KEY ( 1, "\303\240 0", 0 )       PORT_CHAR( 0xe0 ) PORT_CHAR('0')
-		KEY ( 2, "P", P )                PORT_CHAR('P')
-		KEY ( 3, "M", M )                PORT_CHAR('M')
-		KEY ( 4, ") \302\260", MINUS )   PORT_CHAR(')') PORT_CHAR( 0xb0 )
-		KEY ( 5, "\342\206\221 \302\250", OPENBRACE )  PORT_CHAR('^') PORT_CHAR( 0xa8 )
-		KEY ( 6, "Keypad 3", 3_PAD )     PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-		KEY ( 7, "> <", BACKSLASH2 )     PORT_CHAR('>') PORT_CHAR('<')
-INPUT_PORTS_END
-
 static INPUT_PORTS_START ( to9 )
 	PORT_INCLUDE ( thom_lightpen )
 	PORT_INCLUDE ( thom_game_port )
-	PORT_INCLUDE ( to9_keyboard )
-	PORT_INCLUDE ( to7_config )
 	PORT_INCLUDE ( to7_vconfig )
+
+	PORT_START ( "config" )
+	PORT_BIT ( 0x01, 0x00, IPT_UNUSED )
+
+	PORT_MODIFY ( "mouse_x" )
+	PORT_BIT ( 0xffff, 0x00, IPT_UNUSED )
+
+	PORT_MODIFY ( "mouse_y" )
+	PORT_BIT ( 0xffff, 0x00, IPT_UNUSED )
+
+	PORT_MODIFY ( "mouse_button" )
+	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 /* ------------ driver ------------ */
@@ -1237,6 +1151,9 @@ void to9_state::to9(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE( to9_state, to9 )
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &to9_state::to9_map);
+
+	TO9_KEYBOARD(config, m_to9_kbd);
+	m_to9_kbd->irq_cb().set(m_mainirq, FUNC(input_merger_device::in_w<4>));
 
 	m_pia_sys->readpa_handler().set(FUNC(to9_state::to9_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
@@ -1412,25 +1329,10 @@ ROM_END
 
 /* ------------ inputs   ------------ */
 
-static INPUT_PORTS_START ( to8_config )
-	PORT_START ( "config" )
-
-	PORT_CONFNAME ( 0x01, 0x00, "Game Port" )
-	PORT_CONFSETTING ( 0x00, DEF_STR( Joystick ) )
-	PORT_CONFSETTING ( 0x01, "Mouse" )
-
-	PORT_CONFNAME ( 0x02, 0x00, "Keyboard" )
-	PORT_CONFSETTING ( 0x00, "Enabled" )
-	PORT_CONFSETTING ( 0x02, "Disabled" )
-
-INPUT_PORTS_END
-
-
 static INPUT_PORTS_START ( to8 )
 	PORT_INCLUDE ( thom_lightpen )
 	PORT_INCLUDE ( thom_game_port )
-	PORT_INCLUDE ( to9_keyboard )
-	PORT_INCLUDE ( to8_config )
+	PORT_INCLUDE ( to7_config )
 	PORT_INCLUDE ( to7_vconfig )
 INPUT_PORTS_END
 
@@ -1449,7 +1351,8 @@ void to9_state::to8(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &to9_state::to8_map);
 
-	//MC6804(config, "kbdmcu", 11_MHz_XTAL);
+	TO8_KEYBOARD(config, m_to8_kbd);
+	m_to8_kbd->data_cb().set(m_mc6846, FUNC(mc6846_device::set_input_cp1));
 
 	m_pia_sys->readpa_handler().set(FUNC(to9_state::to8_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
@@ -1537,7 +1440,7 @@ void to9_state::to9p_map(address_map &map)
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7da, 0xe7dd).rw(FUNC(to9_state::to8_vreg_r), FUNC(to9_state::to8_vreg_w));
-	map(0xe7de, 0xe7df).rw(FUNC(to9_state::to9_kbd_r), FUNC(to9_state::to9_kbd_w));
+	map(0xe7de, 0xe7df).rw(m_to9_kbd, FUNC(to9_keyboard_device::kbd_acia_r), FUNC(to9_keyboard_device::kbd_acia_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to8_gatearray_r), FUNC(to9_state::to8_gatearray_w));
 /*  map(0xe7f0, 0xe7f7).rw(FUNC(to9_state::to9_ieee_r), FUNC(to9_state::to9_ieee_w )); */
 
@@ -1588,7 +1491,6 @@ ROM_END
 static INPUT_PORTS_START ( to9p )
 	PORT_INCLUDE ( thom_lightpen )
 	PORT_INCLUDE ( thom_game_port )
-	PORT_INCLUDE ( to9_keyboard )
 	PORT_INCLUDE ( to7_config )
 	PORT_INCLUDE ( to7_vconfig )
 INPUT_PORTS_END
@@ -1602,6 +1504,9 @@ void to9_state::to9p(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE( to9_state, to9p )
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &to9_state::to9p_map);
+
+	TO9P_KEYBOARD(config, m_to9_kbd);
+	m_to9_kbd->irq_cb().set(m_mainirq, FUNC(input_merger_device::in_w<4>));
 
 	m_pia_sys->readpa_handler().set(FUNC(to9_state::to9_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
@@ -1860,9 +1765,6 @@ static INPUT_PORTS_START ( mo6_keyboard )
 		KEY ( 3, "\342\206\221 \302\250", OPENBRACE ) PORT_CHAR('^') PORT_CHAR( 0xa8 )
 		KEY ( 4, "\303\271 %", COLON )      PORT_CHAR( 0xf9 ) PORT_CHAR('%')
 	PORT_BIT  ( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-		/* unused */
-	PORT_START ( "keyboard.9" )
 
 INPUT_PORTS_END
 
@@ -2168,10 +2070,6 @@ static INPUT_PORTS_START ( mo5nr_keyboard )
 		KEY ( 5, "1 !", 1 )                   PORT_CHAR('1') PORT_CHAR('!')
 		KEY ( 6, "Stop", TAB )                PORT_CHAR(27)
 	PORT_BIT  ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-		/* unused */
-	PORT_START ( "keyboard.8" )
-	PORT_START ( "keyboard.9" )
 
 INPUT_PORTS_END
 
