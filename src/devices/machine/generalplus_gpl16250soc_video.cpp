@@ -39,6 +39,7 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_alt_extrasprite_hack(0),
 	m_alt_tile_addressing(0),
 	m_use_legacy_mode(false),
+	m_disallow_resolution_control(false),
 	m_renderer(*this, "renderer")
 {
 }
@@ -379,16 +380,19 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 	//const uint16_t bgcol = 0x7c1f; // magenta
 //  const uint16_t bgcol = 0x0000; // black
-	bool highres;
-	if (m_707f & 0x0010)
+	bool highres = false;
+	if (!m_disallow_resolution_control)
 	{
-		highres = true;
-		m_screen->set_visible_area(0, 640-1, 0, 480-1);
-	}
-	else
-	{
-		highres = false;
-		m_screen->set_visible_area(0, 320-1, 0, 240-1);
+		if (m_707f & 0x0010)
+		{
+			highres = true;
+			m_screen->set_visible_area(0, 640 - 1, 0, 480 - 1);
+		}
+		else
+		{
+			highres = false;
+			m_screen->set_visible_area(0, 320 - 1, 0, 240 - 1);
+		}
 	}
 
 	address_space &mem = m_cpu->space(AS_PROGRAM);

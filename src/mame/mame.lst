@@ -34742,6 +34742,7 @@ mog_m320
 myarccn
 nubsupmf
 otrail
+pcmx11
 q5_500in1
 rd5_240
 red5mam
@@ -39351,10 +39352,13 @@ vtennis3                        //
 32xj                            //
 aiwamcd                         // 1994 AIWA Mega-CD CSD-G1M (Japan)
 cdx                             // 1994 Sega CDX (USA)
+dcat16                          //
+gen_nomd                        // 1995 Sega Genesis Nomad (USA)
 genesis                         // 1989 Sega Genesis (USA)
 genesis_tmss                    //
 laseract                        // 1993 Pioneer LaserActive (USA)
 laseractj                       // 1993 Pioneer LaserActive (Japan)
+mahg156
 megacd                          // 1993 Sega Mega-CD (Europe)
 megacd2                         // 1993 Sega Mega-CD 2 (Europe)
 megacd2j                        // 1993 Sega Mega-CD 2 (Japan)
@@ -39362,15 +39366,13 @@ megacda                         // 1993 Sega Mega-CD (Asia)
 megacdj                         // 1991 Sega Mega-CD (Japan)
 megadrij                        // 1988 Sega Mega Drive (Japan)
 megadriv                        // 1990 Sega Mega Drive (Europe)
+megajet                         // 1993 Sega Mega Jet (Japan)
 multmega                        // 1994 Sega Multi-Mega (Europe)
 segacd                          // 1992 Sega Sega CD (USA)
 segacd2                         // 1993 Sega Sega CD 2 (USA)
 wmega                           // 1992 Sega Wondermega (Japan)
 wmegam2                         // 1993 Victor Wondermega M2 (Japan)
 xeye                            // 1993 JVC X'eye (USA)
-dcat16                          //
-gen_nomd                        // 1995 Sega Genesis Nomad (USA)
-megajet                         // 1993 Sega Mega Jet (Japan)
 
 @source:sega/megadriv_acbl.cpp
 aladmdb
@@ -39391,6 +39393,8 @@ twinktmb
 @source:sega/megadriv_rad.cpp
 dgunl3227
 mdtvp1j
+mdtvp2j
+mdtvp3j
 msi_sf2
 ra145
 rad_gen1                        // (c)2004 Radica
@@ -42168,6 +42172,9 @@ elzet80p                        //
 
 @source:skeleton/epic14e.cpp
 epic14e                         //
+
+@source:skeleton/epoch_tv_globe.cpp
+eptvglob
 
 @source:skeleton/esprit.cpp
 esprit                          // Hazeltine Esprit
@@ -45441,6 +45448,7 @@ beambox
 
 @source:tvgames/generalplus_gpl16250_rom.cpp
 beijuehh
+gameu50
 gormiti
 imgame
 myac220
@@ -45490,6 +45498,8 @@ jak_ddhp
 jak_prhp
 kidizmb
 kidizmp
+pocketmp
+pocketmr
 zippity
 zippityuk
 
@@ -45541,6 +45551,7 @@ zone3d
 @source:tvgames/spg2xx.cpp
 ablkickb
 abltenni                        //
+anpantv
 comil                           //
 ddr33v
 decathln
@@ -45719,14 +45730,15 @@ tvgogo                          //
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 
 @source:tvgames/spg2xx_wiwi.cpp
-wiwi18                          //
+265games
+ddmmeg12
+ddmsup
 foxsport
+guitrbus
 lexifit
 marc101
 marc250
-guitrbus
-ddmsup
-ddmmeg12
+wiwi18                          //
 
 @source:tvgames/spg2xx_zone.cpp
 wirels60                        // Wireless 60
@@ -45741,17 +45753,20 @@ react
 
 @source:tvgames/st2302u_bbl_rom.cpp
 bbl338
+class200
 dphh8213
 
 @source:tvgames/st2302u_bbl_spi.cpp
-bbl380
-mc_cb203
-rhhc152
-ragc153
-dphh8630
-dgun2953
-supreme
 arcade10
+bbl380
+dgun2953
+dphh8630
+mc_cb203
+pg118
+ragc153
+rhhc152
+supreme
+toumapet
 
 @source:tvgames/titan_soc.cpp
 colecofl
@@ -45771,6 +45786,7 @@ trkfldch                        // (c) 2007 Konami
 tvgame                          // 2011
 
 @source:tvgames/xavix.cpp
+bistro                          //
 ddrfammt                        //
 ekara                           //
 ekaraa                          //
@@ -45788,7 +45804,11 @@ epo_epp2
 epo_epp3                        //
 epo_eppk                        //
 epo_esdx                        //
+epo_esht                        //
 epo_guru                        //
+epo_mms                         //
+epo_mmsp                        //
+epo_quiz                        //
 epo_tenn                        //
 epo_tfp2                        //
 evio                            //
@@ -45834,12 +45854,14 @@ taikodp                         //
 taitons1                        //
 taitons2                        //
 tak_daig
+tak_gin                         //
 tak_geig                        //
 tcarnavi                        //
 tomcpin                         //
 tomshoot                        //
 tomplc                          //
 tvpc_dor
+tvpc_ham
 tvpc_tom
 
 @source:tvgames/xavix2.cpp
@@ -45852,6 +45874,7 @@ duelmast                        //
 epo_ebox                        //
 epo_bowl                        //
 epo_sdb                         //
+tom_dpgm                        //
 ttv_sw                          //
 ttv_lotr                        //
 ttv_mx                          //
