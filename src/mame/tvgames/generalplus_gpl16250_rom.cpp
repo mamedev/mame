@@ -366,6 +366,25 @@ static INPUT_PORTS_START( tkmag220 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( gameu )
+	PORT_START("IN0")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2") // P2 inputs are listed in test mode, but unit has no 2nd set of controls
+	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( beijuehh )
 	PORT_START("IN0")
@@ -667,7 +686,7 @@ void gameu_handheld_game_state::gameu_portd_w(offs_t offset, uint16_t data, uint
 	//int pc = m_maincpu->pc();
 	//if ((pc != 0x2b49) && (pc != 0x2b34) && (pc != 0x2b8b) && (pc != 0x2bc0))
 	{
-		printf("%s: portd write %04x %04x\n", machine().describe_context().c_str(), data, mem_mask);
+		logerror("%s: portd write %04x %04x\n", machine().describe_context(), data, mem_mask);
 
 		m_upperbase = (data & 0xfc00) >> 10;
 		m_upperbase *= 0x40000;
@@ -745,4 +764,4 @@ CONS(2013, gormiti,   0, 0, base, gormiti,  gormiti_game_state, empty_init, "Gio
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
 
 // unit looks a bit like a knock-off Wii-U tablet, but much smaller
-CONS( 201?, gameu50,       0,              0,      gameu, tkmag220, gameu_handheld_game_state, init_gameu, "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, gameu50,       0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu, "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
