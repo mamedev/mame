@@ -230,25 +230,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dmaster">
-		<description>Dungeon Master's Assistant (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Strategic Simulations</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop1" size="143360">
-				<rom name="dungeon master's assistant side a (1988)(ssi)(trex crack)[rdos].dsk" size="143360" crc="14904b40" sha1="9a8953ed45bb36f340b13db1eb6d75a26e498815" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop1" size="143360">
-				<rom name="dungeon master's assistant side b (1988)(ssi)(trex crack)[rdos].dsk" size="143360" crc="fafa454c" sha1="169ec625b5d72f6c624534e4c031915a0e36c82d" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="genesis">
 		<description>Genesis (cleanly cracked)</description>
 		<year>1983</year>
@@ -3582,86 +3563,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="battcmdr">
-		<description>Battalion Commander (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="battalion commander (4am and san inc crack).dsk" size="143360" crc="9bb6a4d2" sha1="f2bb31c76fd954bd384557dd249c06e75f3de6b7" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="batlcrsr">
-		<description>Battle Cruiser (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-27"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="battle cruiser (4am crack) side a.dsk" size="143360" crc="7ce792e8" sha1="f3b00a8f2be27228a16dafccfb26b0223a2d220c" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="battle cruiser (4am crack) side b.dsk" size="143360" crc="8fe6c98c" sha1="3bc19b5abf445cb2362e747a898987ba627377e7" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="batfrnrm">
-		<description>Battle For Normandy (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="battle for normandy (4am and san inc crack).dsk" size="143360" crc="5be154db" sha1="f4ee84b0a54b64ad596814e87a6f502c1f494772" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="batlgrp">
-		<description>Battle Group (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="battle group (4am and san inc crack) side a.dsk" size="143360" crc="1650cf51" sha1="158a6d248004716fd962ae5e40dfa4f602dab533" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="battle group (4am and san inc crack) side b.dsk" size="143360" crc="f3505586" sha1="3b7818a1f76531421da36d2044c009452b4586a8" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="batlantm15">
-		<description>Battle of Antietam (version 1.5) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="battle of antietam v1.5 (4am crack) side a.dsk" size="143360" crc="bf0565ab" sha1="088489190e4db38a637176d5e944af6e8b8a8d73" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="battle of antietam v1.5 (4am crack) side b.dsk" size="143360" crc="9d406c7e" sha1="7b0fd2712180837f2277944a3ca708e83fc1f302" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bcqft">
 		<description>BC's Quest For Tires (cleanly cracked)</description>
 		<year>1983</year>
@@ -3887,19 +3788,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="bolo (4am crack).dsk" size="143360" crc="6494af2c" sha1="0a2c77c0fe3199e4b7eb27774c924ced182479e2" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bombaley">
-		<description>Bomb Alley (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="bomb alley (4am and san inc crack).dsk" size="143360" crc="6c6fc199" sha1="6be0041ec12aa85709d6305f7a86e654d7055a53" />
 			</dataarea>
 		</part>
 	</software>
@@ -4207,32 +4095,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="capitalization v1.5 (4am crack).dsk" size="143360" crc="91700bd8" sha1="ebec31c7aeac632408897faf232cbc04668fcd50" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="carrierf">
-		<description>Carrier Force (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="carrier force (4am and san inc crack).dsk" size="143360" crc="25cfeacf" sha1="7c1798d02b520b577d04e80654a939c07fa9b0e2" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cartels">
-		<description>Cartels and Cutthroats (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="cartels and cutthroats (4am and san inc crack).dsk" size="143360" crc="c60bdd16" sha1="c0c2a3664bfdef8ed036d8ba8fde047fc6dfc5e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -4751,19 +4613,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="coloncqt">
-		<description>Colonial Conquest (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-23"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="colonial conquest (4am crack).dsk" size="143360" crc="5f56187d" sha1="52040bb086d1239624f58245304ebf395b40c039" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="colormes">
 		<description>Color Me (Softsmith) (cleanly cracked)</description>
 		<year>1982</year>
@@ -4960,32 +4809,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cmpairct">
-		<description>Computer Air Combat (version 1.1) (cleanly cracked)</description>
-		<year>1980</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-11-23"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="computer air combat v1.1 (4am and san inc crack).dsk" size="143360" crc="c90ddc0a" sha1="61910011bd88739e2d3c16b9f0d1272202974caa" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cmpambsh">
-		<description>Computer Ambush (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-29"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="computer ambush (4am and san inc crack).dsk" size="143360" crc="8916ce80" sha1="4526f179ce891997e45bfc2d727a3a6559c8d297" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="caalgebb">
 		<description>Computer Assisted Problem Solving for Beginning Algebra (cleanly cracked)</description>
 		<year>1984</year>
@@ -5051,24 +4874,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="computer assisted problem solving for pre-algebra (4am crack) side b.dsk" size="143360" crc="e3a473a7" sha1="3effd8daf1cf79c64e4397fd6b251f8d296aae67" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cmpbaseb">
-		<description>Computer Baseball (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-05"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="computer baseball (4am and san inc crack).dsk" size="143360" crc="1e13b893" sha1="6417e6a78c821c6d6c8ac344f5acd3ce5aaa4e7d" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="computer baseball 1983 teams disk (4am and san inc crack).dsk" size="143360" crc="9d4d81fc" sha1="9343d764c844459f2e6c42a539505619c9d567e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5193,19 +4998,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="computer literacy (4am crack).dsk" size="143360" crc="e3749f2d" sha1="c3ec1163d6ffdc7aded1d51e3cf6ddffb77ece3f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cmpqbse">
-		<description>Computer Quarterback Second Edition (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-29"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="computer quarterback second edition (4am and san inc crack).dsk" size="143360" crc="bffa5b04" sha1="b1e64b47ea375e782333f0943255dbd18f6cac43" />
 			</dataarea>
 		</part>
 	</software>
@@ -6908,19 +6700,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="epidemic">
-		<description>Epidemic (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="epidemic (4am and san inc crack).dsk" size="143360" crc="5851d9eb" sha1="44ecac88bf299f6cd28475bb1641f62506d6f11f" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="epoch">
 		<description>Epoch (cleanly cracked)</description>
 		<year>1981</year>
@@ -7258,65 +7037,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="felony (thunder mountain release) (imperfect 4am crack).dsk" size="143360" crc="ff3a1a1d" sha1="6b5fc4a04b74ad75f9dd249313d9c4db49890c78" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fldofire">
-		<description>Field of Fire (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="field of fire (4am crack) side a.dsk" size="143360" crc="d3e4c252" sha1="89860de4872254fb034f5f91a2c58f3f7fe76b8b" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="field of fire (4am crack) side b.dsk" size="143360" crc="a75578a7" sha1="64db2524da2375767eec272656dc24ba3e50ba61" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="50mcrs11">
-		<description>Fifty Mission Crush (version 1.1) (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="fifty mission crush v1.1 (4am and san inc crack).dsk" size="143360" crc="01e9f083" sha1="28a74d8f98bc262a550d9b591c6d8df18dfb13ee" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="50mcrs12">
-		<description>Fifty Mission Crush (version 1.2) (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="fifty mission crush v1.2 (4am and san inc crack).dsk" size="143360" crc="56078d1b" sha1="2261d4a95ebdba5a9b46c6d108c20d89390d5822" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fcommand">
-		<description>Fighter Command (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="fighter command (4am and san inc crack).dsk" size="143360" crc="c9f6b276" sha1="d83f4b6bfaa1c154845da9f01d8503557eaf5cdf" />
 			</dataarea>
 		</part>
 	</software>
@@ -7845,26 +7565,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="galacadv">
-		<description>Galactic Adventures (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="143360">
-				<rom name="galactic adventures (4am and san inc crack) disk 1.dsk" size="143360" crc="80965f35" sha1="63f76e541b1133dea7c0e786a80ab0203a37ef4b" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="143360">
-				<rom name="galactic adventures (4am and san inc crack) disk 2.dsk" size="143360" crc="a662f54f" sha1="f07350c1acd2d349b65ae98f0b03925c4d4405e1" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="glxygate">
 		<description>Galaxy Gates (cleanly cracked)</description>
 		<year>1981</year>
@@ -8003,19 +7703,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gemswarr">
-		<description>Gemstone Warrior (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2016-12-03"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="gemstone warrior (4am crack).dsk" size="143360" crc="ba9acfd0" sha1="4c47b66f16628bd3e4202923b8c5630f7ee4f29f" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="geoadvus">
 		<description>Geography Adventure USA (cleanly cracked)</description>
 		<year>1983</year>
@@ -8140,26 +7827,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="geopol90">
-		<description>Geopolitique 1990 (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A - Geopol"/>
-			<dataarea name="flop" size="143360">
-				<rom name="geopolitique 1990 (4am and san inc crack) side a - geopol.dsk" size="143360" crc="6e43a875" sha1="8cee72288cca5ebfc573206e0b64489f5263d392" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Geowar"/>
-			<dataarea name="flop" size="143360">
-				<rom name="geopolitique 1990 (4am and san inc crack) side b - geowar.dsk" size="143360" crc="3c19f5c2" sha1="84331f1cfb7f54ce446e88031d85c1ccfc825dae" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="geowhiz">
 		<description>GeoWhiz (cleanly cracked)</description>
 		<year>1990</year>
@@ -8260,26 +7927,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="getting ready to read and add (4am crack).dsk" size="143360" crc="6150a8a8" sha1="b8a8d8e9f6eeeeb70e53c2c21b2409c269933549" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gtysburg">
-		<description>Gettysburg - The Turning Point (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="gettysburg - the turning point (4am crack) side a.dsk" size="143360" crc="26a53290" sha1="309bd7e30750765700b2cab3fe442c48a1d1e190" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="gettysburg - the turning point (4am crack) side b.dsk" size="143360" crc="62372db7" sha1="f5e13ee7ffa10c241f55818371232bf29b05b5e4" />
 			</dataarea>
 		</part>
 	</software>
@@ -9812,32 +9459,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="guacmp10">
-		<description>Guadalcanal Campaign (version 1.0) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="guadalcanal campaign v1.0 (4am and san inc crack).dsk" size="143360" crc="a1912f25" sha1="302dfe3086242aed0e3a3244f88e85413e934996" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="guacmp11">
-		<description>Guadalcanal Campaign (version 1.1) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="guadalcanal campaign v1.1 (4am and san inc crack).dsk" size="143360" crc="3ad69df8" sha1="474e1ff69c7c5cb48f192417beab90f62d210a23" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="guderian">
 		<description>Guderian (cleanly cracked)</description>
 		<year>1986</year>
@@ -9886,19 +9507,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="hacker ii (4am crack).dsk" size="143360" crc="ac7bf24b" sha1="c4251b272bfbacb8962ee2b04d4f6ce5d8384081" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hndbasic">
-		<description>Hands on BASIC Programming (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Edu-Ware</publisher>
-		<info name="release" value="2016-02-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="hands on basic programming (4am crack).dsk" size="143360" crc="73839657" sha1="8c4b61a006fe751b3304fe59c5df2b6a51c4ab9f" />
 			</dataarea>
 		</part>
 	</software>
@@ -10337,26 +9945,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="impgalac">
-		<description>Imperium Galactum (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-05"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A - Scenario and boot"/>
-			<dataarea name="flop" size="143360">
-				<rom name="imperium galactum (4am and san inc crack) side a - scenario (boot).dsk" size="143360" crc="da228929" sha1="119bce687849b6167f98ae6107cfa6950890a23f" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Game"/>
-			<dataarea name="flop" size="143360">
-				<rom name="imperium galactum (4am and san inc crack) side b - game.dsk" size="143360" crc="91a7e59c" sha1="11d28301726fd4b97ef5dbb441808733ba8be2d1" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="impfract">
 		<description>Improper Fractions (cleanly cracked)</description>
 		<year>1990</year>
@@ -10634,26 +10222,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="kampfg11">
-		<description>Kampfgruppe (version 1.1) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Game"/>
-			<dataarea name="flop" size="143360">
-				<rom name="kampfgruppe v1.1 (4am and san inc crack) disk 1 - game.dsk" size="143360" crc="4b7139e3" sha1="1574a899f859d23c0b918176ff8617e65e9b212a" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Scenarios"/>
-			<dataarea name="flop" size="143360">
-				<rom name="kampfgruppe v1.1 (4am and san inc crack) disk 2 - scenarios.dsk" size="143360" crc="1ad1274f" sha1="4b4a87670d3ca608f290a882cca6d383a4358c93" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kchamp">
 		<description>Karate Champ (cleanly cracked)</description>
 		<year>1985</year>
@@ -10865,19 +10433,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 5 Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="king's quest iii (4am and san inc crack) disk 5b.dsk" size="143360" crc="73b6f6f6" sha1="f24f7c5d4fee54b15a9e2707ade60d6911ff4eda" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kngtdt11">
-		<description>Knights of the Desert (version 1.1) (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="knights of the desert v1.1 (4am and san inc crack).dsk" size="143360" crc="40edca9f" sha1="569a58f5e4acaf8db250eba44e23621912102ee0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13362,26 +12917,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mechbr12">
-		<description>Mech Brigade (version 1.2) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Game and boot"/>
-			<dataarea name="flop" size="143360">
-				<rom name="mech brigade v1.2 (4am and san inc crack) disk 1 - game (boot).dsk" size="143360" crc="d980a62d" sha1="d3045577dc03d823c4c20e8195f3ec68cbcd9451" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Scenario"/>
-			<dataarea name="flop" size="143360">
-				<rom name="mech brigade v1.2 (4am and san inc crack) disk 2 - scenario.dsk" size="143360" crc="f115d3cf" sha1="9f4f9b759e236ba6ed6d8092ed6fb78d95301eea" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="meetpres">
 		<description>Meet The Presidents (cleanly cracked)</description>
 		<year>1981</year>
@@ -14841,19 +14376,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="nam">
-		<description>NAM (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-11-23"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="nam (4am crack).dsk" size="143360" crc="7e5a63aa" sha1="1197bee7be8d4dcf8e7cdfd97fc5fce37d349a58" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="nemesis">
 		<description>Nemesis (cleanly cracked)</description>
 		<year>1984</year>
@@ -14931,19 +14453,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="143360">
 				<rom name="nine princes in amber (4am crack) disk d.dsk" size="143360" crc="e691c7f8" sha1="b30de76b1fa5890fd0514cae2a68bf479422ec04" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nthatl86">
-		<description>North Atlantic 86 (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="north atlantic 86 (4am and san inc crack).dsk" size="143360" crc="fb1e63c0" sha1="b33928ead103f906091b6b8ab989be0cbdbf2f79" />
 			</dataarea>
 		</part>
 	</software>
@@ -15229,19 +14738,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="opapoc">
-		<description>Operation Apocalypse (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="operation apocalypse (4am and san inc crack).dsk" size="143360" crc="37d4dd84" sha1="e1bbd5762a0805ae3afb5d1be3889dbeba657d0f" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="opfrog">
 		<description>Operation Frog (cleanly cracked)</description>
 		<year>1984</year>
@@ -15411,19 +14907,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="pandora's box (4am crack).dsk" size="143360" crc="533ae92a" sha1="74b131e139ecde8de8cc1170f41dd029bc6f9041" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="panzgrna">
-		<description>Panzer Grenadier (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-04-23"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="panzer grenadier (4am crack).dsk" size="143360" crc="3cae8a0e" sha1="20a8bc42eafc963194fe773beacff2bc2af00077" />
 			</dataarea>
 		</part>
 	</software>
@@ -16110,32 +15593,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="prelect">
-		<description>President Elect (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="president elect (4am and san inc crack).dsk" size="143360" crc="0cf493c7" sha1="cb6107c8943e07186c8445cf3529a2e596d17c37" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="prelec88">
-		<description>President Elect (1988 Edition) (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>Strategic Simulations (SSI)</publisher>
-		<info name="release" value="2018-03-12"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="president elect 1988 edition (4am crack).dsk" size="143360" crc="e05a85d1" sha1="2dec1842f87e2babd9490d1353bcc73f7f049188" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="prnpasst">
 		<description>Principal's Assistant (cleanly cracked)</description>
 		<year>1987</year>
@@ -16399,19 +15856,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="puzzle tanks (4am crack).dsk" size="143360" crc="3593a3b6" sha1="f5a972a30fba6c8bec4580f5a9eedaeddeef0ea6" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="qohearts">
-		<description>Queen of Hearts (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-11-04"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="queen of hearts (4am and san inc crack).dsk" size="143360" crc="f43b97d1" sha1="734d5be5b71280d381f41b2c6d159305ac242665" />
 			</dataarea>
 		</part>
 	</software>
@@ -17045,26 +16489,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="phaser fire (4am and san inc crack).dsk" size="143360" crc="19f36efe" sha1="0d0d869ed62edc050a3d77d89fd7f97682bcb4ef" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="protgolf">
-		<description>Professional Tour Golf (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2019-06-12"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A - Master Disk"/>
-			<dataarea name="flop" size="143360">
-				<rom name="professional tour golf (4am and san inc crack) side a - master disk.dsk" size="143360" crc="945c18e8" sha1="680d062a0313bd9abc1f42d2742690eb6c5b85e3" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Player Disk"/>
-			<dataarea name="flop" size="143360">
-				<rom name="professional tour golf (4am and san inc crack) side b - player disk.dsk" size="143360" crc="e412e247" sha1="486a79d6a1bde19cd1794971d8cffdf20812c3ad" />
 			</dataarea>
 		</part>
 	</software>
@@ -22282,33 +21706,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rgzilfin">
-		<description>Rings of Zilfin (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2016-08-01"/>
-		<!-- "Rings of Zilfin" is a 1985 adventure game written by Ali Atabeck and distributed by Strategic Simulations, Inc. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="143360">
-				<rom name="rings of zilfin (4am crack) disk 1.dsk" size="143360" crc="afd62ca7" sha1="78687b14aa9aae7627b268c9c8b4807a634c555b" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="143360">
-				<rom name="rings of zilfin (4am crack) disk 2.dsk" size="143360" crc="f518f2c6" sha1="fef8a883a28c203e8ab8242f25e1c45902e63c72" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="143360">
-				<rom name="rings of zilfin (4am crack) disk 3.dsk" size="143360" crc="278af922" sha1="c0717ecbd7b4a6c0eb43efed38645644400982f7" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="spnvrbpr">
 		<description>Spanish Verb Pairs (cleanly cracked)</description>
 		<year>1984</year>
@@ -25087,26 +24484,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rwareuro">
-		<description>Roadwar Europa (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2017-09-02"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="roadwar europa (4am crack) side a.dsk" size="143360" crc="d92c0728" sha1="54409fc98308d05d86b11db1b220bc2bca9297f6" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="roadwar europa (4am crack) side b.dsk" size="143360" crc="ef82f537" sha1="b0d84fc300d114d2b1066137ba362d189e9b69cf" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="stymisms">
 		<description>The Story of Miss Mouse (cleanly cracked)</description>
 		<year>1985</year>
@@ -25136,46 +24513,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="rhyme land (4am crack) side b.dsk" size="143360" crc="cb7bcbba" sha1="412d3022d1d5230e93e101b147a15750c55a3507" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shrdspng">
-		<description>The Shard of Spring (version 1.0) (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2017-09-07"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the shard of spring (4am crack) side a.dsk" size="143360" crc="2fb89106" sha1="f2651db23c99118fa8e115a00c9c5d6e6571e83a" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the shard of spring (4am crack) side b.dsk" size="143360" crc="fb77ba19" sha1="fc7e98f4d8cafac4b46d0cbeffdcb288a332f6da" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ernldg12">
-		<description>The Eternal Dagger (version 1.2) (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2017-09-07"/>
-		<!--"The Eternal Dagger" is a 1987 strategy game by Paul Murray and Victor Penman, and distributed by Strategic Simulations, Inc. This is version 1.2.-->
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the eternal dagger v1.2 (4am crack) side a.dsk" size="143360" crc="f28d4aba" sha1="4e5854098549f3d95bc244964a4fc4665bb2b734" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the eternal dagger v1.2 (4am crack) side b.dsk" size="143360" crc="146f615e" sha1="b401040c5d926b213fa96543d9105791b81a3649" />
 			</dataarea>
 		</part>
 	</software>
@@ -25612,19 +24949,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="shuttle intercept (4am crack).dsk" size="143360" crc="b90be8e9" sha1="0f6b36a57e76272194f292481dc14e546b6b2116" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrship11">
-		<description>Warship (version 1.1) (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2017-10-29"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="warship v1.1 (4am crack).dsk" size="143360" crc="7f3ba69e" sha1="1b93dcba16162e4d7e7efa619aa4c76fd1e12325" />
 			</dataarea>
 		</part>
 	</software>
@@ -27556,66 +26880,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rdwar2k">
-		<description>Roadwar 2000 (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-18"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="roadwar 2000 (4am crack) side a.dsk" size="143360" crc="ed978e93" sha1="980a0c17020dbf181d200362d1f6594e7895e745" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="roadwar 2000 (4am crack) side b.dsk" size="143360" crc="e422b02e" sha1="ca6927807ed6d42158493c30fba86d7d85dc2cd1" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rcchicka">
-		<description>Rebel Charge at Chickamauga (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-18"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="rebel charge at chickamauga (4am crack) side a.dsk" size="143360" crc="4118631c" sha1="004d1d25a4c20a5edbbc201ae4f9b173b7157990" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="rebel charge at chickamauga (4am crack) side b.dsk" size="143360" crc="d1976271" sha1="36860382552e7c383d8c6e94bd150b7fd390d5c9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wsthpac">
-		<description>War in the South Pacific (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-18"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="war in the south pacific (4am crack) side a.dsk" size="143360" crc="28d20b8b" sha1="e954f5092b6567924e63e9a4dc3a3065ad40a672" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="war in the south pacific (4am crack) side b.dsk" size="143360" crc="e12ccbef" sha1="2818a948537af7a00c42ad8745965a06d1c7bb47" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ultima1">
 		<description>Ultima I: The Beginning (cleanly cracked)</description>
 		<year>1986</year>
@@ -27681,26 +26945,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="shilohgt">
-		<description>Shiloh: Grant's Trial in the West (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-22"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="shiloh (4am crack) side a.dsk" size="143360" crc="46f1e68c" sha1="800467ca579dcddf0825af350a54691f358e79a6" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="shiloh (4am crack) side b.dsk" size="143360" crc="453ef851" sha1="63fd8f6e16a3055501556fb4134ddb5f08e6df99" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="advconst">
 		<description>Adventure Construction Set (cleanly cracked)</description>
 		<year>1985</year>
@@ -27762,19 +27006,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="warshp10">
-		<description>Warship (version 1.0) (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-26"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="warship v1.0 (4am crack).dsk" size="143360" crc="0c47a247" sha1="633a0ac41505caad53e77d73a1e59c932cfbb843" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="talisman">
 		<description>Talisman: Challenging the Sands of Time (128K) (cleanly cracked)</description>
 		<year>1987</year>
@@ -27812,91 +27043,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the typewriter (4am crack).dsk" size="143360" crc="8ef13d0d" sha1="f5e592d873097db008a5cb5f84e18955242ec193" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shrdspg1">
-		<description>The Shard of Spring (version 1.1) (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-27"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the shard of spring v1.1 (4am crack) side a.dsk" size="143360" crc="ef82007e" sha1="9b2032f145693e4ccbcf74953e52f61ef91d71fa" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the shard of spring v1.1 (4am crack) side b.dsk" size="143360" crc="6a2c7c76" sha1="bc77d3ea3e402e2c82757fa869ef1f9dfaa4f648" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="railwest">
-		<description>Rails West! (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="rails west (4am and san inc crack).dsk" size="143360" crc="1b18e149" sha1="f9f40dfc1995d751f67c1f8671aef56ae2c927a3" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="btlblg">
-		<description>The Battle of the Bulge: Tigers in the Snow (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="tigers in the snow (4am and san inc crack).dsk" size="143360" crc="0f1f8785" sha1="ee56de1e7bebc07d54d44669420b7ad5d072d7a8" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rngsseat">
-		<description>Ringside Seat (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="ringside seat (4am and san inc crack).dsk" size="143360" crc="623103c4" sha1="32dbc597bb6b4a6b85f20255b52a3efc60807736" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shatalli">
-		<description>The Shattered Alliance (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the shattered alliance (4am and san inc crack).dsk" size="143360" crc="f50ce4ae" sha1="63aef0c4b6d60dc0deef6a9cf6234e6c545cc3ac" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="warpfctr">
-		<description>The Warp Factor (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-09-29"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the warp factor (4am and san inc crack).dsk" size="143360" crc="166d7cf6" sha1="9900c6421984afd5b6025506c7cef87345d2b4d2" />
 			</dataarea>
 		</part>
 	</software>
@@ -28089,19 +27235,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="torpfire">
-		<description>Torpedo Fire (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-07"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="torpedo fire (4am and san inc crack).dsk" size="143360" crc="8a1c21e1" sha1="ea77512fab09e5d7a676bdf40e171dfaec4a17d9" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="planguid">
 		<description>The Planetary Guide (cleanly cracked)</description>
 		<year>1981</year>
@@ -28157,85 +27290,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the elysian fields and other greek myths (4am crack) side b.dsk" size="143360" crc="4ec34824" sha1="ef4ce4e321570670b255e786e63c7ef226f7fec6" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rdwar2k2">
-		<description>Roadwar 2000 (version 1.2) (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-13"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="roadwar 2000 v1.2 (4am crack) side a.dsk" size="143360" crc="ab8817d7" sha1="12c55e34f815593784fcfcbaf2ebef735eb22506" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="roadwar 2000 v1.2 (4am crack) side b.dsk" size="143360" crc="69f2740a" sha1="f30584021385fd44c5b7a38c5a23d05f509f1440" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sthncmnd">
-		<description>Southern Command (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="southern command (4am and san inc crack).dsk" size="143360" crc="e3265f8d" sha1="216fcf8fd4693c11bcdde1eb16e7423539fef0b7" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ssshiloh">
-		<description>The Battle of Shiloh (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the battle of shiloh (4am and san inc crack).dsk" size="143360" crc="2b8e5ba1" sha1="4d92dafe134bb703f242343dcfc7e8d1eb99b34e" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="reforg88">
-		<description>Reforger 88 (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="reforger 88 (4am and san inc crack).dsk" size="143360" crc="6c03e8ed" sha1="2cebfa405934799a71eece6c301612c4c9d8b407" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="usaaf12">
-		<description>U.S.A.A.F. (version 1.2) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2018-10-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Scenario (Boot)"/>
-			<dataarea name="flop" size="143360">
-				<rom name="u.s.a.a.f. v1.2 (4am and san inc crack) disk 1 - scenario (boot).dsk" size="143360" crc="3c071c39" sha1="cedc1f8b60d6671a1d6f5714f3b457deb56b686b" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Game"/>
-			<dataarea name="flop" size="143360">
-				<rom name="u.s.a.a.f. v1.2 (4am and san inc crack) disk 2 - game.dsk" size="143360" crc="3a96f561" sha1="eca97c385f63d69915f97f03dc8d1c424faa0045" />
 			</dataarea>
 		</part>
 	</software>
@@ -29467,45 +28521,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="labyrinth of crete (4am crack).dsk" size="143360" crc="cd12d96c" sha1="dab01261a4c4335acd9add607f6b920cdb15cf35" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cosbalan">
-		<description>The Cosmic Balance (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2019-11-15"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the cosmic balance (4am and san inc crack).dsk" size="143360" crc="af0b221b" sha1="49f46eb5580cbb01fdcfa4ae5bfd39ea459a1b04" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="questron">
-		<description>Questron (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2019-11-16"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Character Disk (Boot disk)"/>
-			<dataarea name="flop" size="143360">
-				<rom name="questron (4am crack) character disk (boot).dsk" size="143360" crc="a5883c8c" sha1="e0808ea101c1211bd8cb072d1452427dfcb0a37b" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Game disk 1"/>
-			<dataarea name="flop" size="143360">
-				<rom name="questron (4am crack) game disk 1.dsk" size="143360" crc="a8655b0b" sha1="cec363e8a31984cf6edc5465244f0a2b15c3c878" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Game disk 2"/>
-			<dataarea name="flop" size="143360">
-				<rom name="questron (4am crack) game disk 2.dsk" size="143360" crc="b7229e6c" sha1="0bcb289ad32930e6e7313f1a73d1ab0c3f4450b9" />
 			</dataarea>
 		</part>
 	</software>
@@ -33820,27 +32835,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="kampfg10">
-		<description>Kampfgruppe (version 1.0) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2021-04-07"/>
-		<!--"Kampfgruppe" is a 1985 strategy game developed and distributed by Strategic Simulations, Inc. This is version 1.0.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Game disk"/>
-			<dataarea name="flop" size="143360">
-				<rom name="kampfgruppe v1.0 (4am and san inc crack) disk 1 - game disk.dsk" size="143360" crc="daa30896" sha1="031d68b8a2beee66421bf042064400fa94b22d2c"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Historical scenarios"/>
-			<dataarea name="flop" size="143360">
-				<rom name="kampfgruppe v1.0 (4am and san inc crack) disk 2 - historical scenarios.dsk" size="143360" crc="a516177e" sha1="5960e7169c9709546931597c969d8b8182e8a93c"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="gato12">
 		<description>GATO (version 1.2) (cleanly cracked)</description>
 		<year>1985</year>
@@ -34574,35 +33568,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cytrmast">
-		<description>Cytron Masters (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2021-04-07"/>
-		<info name="usage" value="Will only run on 2+ and unenhanced 2E models" />
-		<!--"Cytron Masters" is a 1982 strategy game developed by Dan Bunten and distributed by Strategic Simulations, Inc. Due to compatibility issues unrelated to copy protection, it only runs on an Apple ][+ or unenhanced Apple ][e.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="cytron masters (4am and san inc crack).dsk" size="143360" crc="60a49b83" sha1="fbd8a8d6672c0228e10fea064aa64958d55bc90b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sixgunsh">
-		<description>Six-Gun Shootout (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2021-04-07"/>
-		<!--"Six-Gun Shootout" is a 1985 strategy game developed and distributed by Strategic Simulations, Inc.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="six-gun shootout (4am and san inc crack).dsk" size="143360" crc="de053043" sha1="3424be7108be30d5738a04e1cb3580f646f9e86d"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="compuzlr">
 		<description>Compuzzler (cleanly cracked)</description>
 		<year>1984</year>
@@ -34613,39 +33578,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="compuzzler (4am crack).dsk" size="143360" crc="60cda369" sha1="a32614f326e5640ec6dca39f75dd133838ae5e39"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wzcrwn12">
-		<description>Wizard's Crown (version 1.2) (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="release" value="2021-04-10"/>
-		<!--"Wizard's Crown" is a 1986 roleplaying game developed by Paul Murray and Keith Brors, and distributed by Strategic Simulations, Inc. This is version 1.2. It is preserved here for the first time.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side A - Game disk front"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wizard's crown v1.2 (4am crack) disk 1a - game disk front.dsk" size="143360" crc="3198d3fe" sha1="348fdaeb55c447c40e2e9bfefc364ac37210cd59"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side B - Game disk back"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wizard's crown v1.2 (4am crack) disk 1b - game disk back.dsk" size="143360" crc="cb8fee67" sha1="4be497844d0a8a4fcfb70d9629ceddab8c45ea3a"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 Side A - Data disk 1"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wizard's crown v1.2 (4am crack) disk 2a - data disk 1.dsk" size="143360" crc="fcc7fdac" sha1="7afa03981c62de9b0deaedd2a6788baae12a54f6"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 Side A - Data disk 2"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wizard's crown v1.2 (4am crack) disk 2b - data disk 2.dsk" size="143360" crc="8b82a2f5" sha1="6186061a89bbcace9fe4c5a7d55c4740ea15a550"/>
 			</dataarea>
 		</part>
 	</software>
@@ -40917,6 +39849,135 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="battcmdr">
+		<description>Battalion Commander (4am and san inc crack)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="David Hille" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="battalion commander (4am and san inc crack).dsk" size="143360" crc="9bb6a4d2" sha1="f2bb31c76fd954bd384557dd249c06e75f3de6b7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlcrsr">
+		<description>Battlecruiser (version 1.0) (4am crack)</description>
+		<year>1987</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Gary Grigsby" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-27-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - World War I" />
+			<dataarea name="flop" size="143360">
+				<rom name="battle cruiser (4am crack) side a.dsk" size="143360" crc="7ce792e8" sha1="f3b00a8f2be27228a16dafccfb26b0223a2d220c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - World War II" />
+			<dataarea name="flop" size="143360">
+				<rom name="battle cruiser (4am crack) side b.dsk" size="143360" crc="8fe6c98c" sha1="3bc19b5abf445cb2362e747a898987ba627377e7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlgrp">
+		<description>Battle Group (version 1.0) (4am and san inc crack)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Gary Grigsby" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="143360">
+				<rom name="battle group (4am and san inc crack) side a.dsk" size="143360" crc="1650cf51" sha1="158a6d248004716fd962ae5e40dfa4f602dab533" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="143360">
+				<rom name="battle group (4am and san inc crack) side b.dsk" size="143360" crc="f3505586" sha1="3b7818a1f76531421da36d2044c009452b4586a8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batfrnrm">
+		<description>Battle For Normandy (4am and san inc crack)</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="developer" value="Tactical Design Group" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="battle for normandy (4am and san inc crack).dsk" size="143360" crc="5be154db" sha1="f4ee84b0a54b64ad596814e87a6f502c1f494772" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlantm13" cloneof="batlantm">
+		<description>Battle of Antietam (version 1.3) (4am and san inc crack)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="David Landrey and Chuck Kroegel" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-06-12-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="143360">
+				<rom name="battle of antietam v1.3 (4am and san inc crack) side a.dsk" size="143360" crc="525abf7c" sha1="032aaf821cc446af6bad709034d72cc9b4f3e64d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="143360">
+				<rom name="battle of antietam v1.3 (4am and san inc crack) side b.dsk" size="143360" crc="f280a1ae" sha1="d75fa19f398906189b6e5e74eb38153c83e5e8af" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlantm">
+		<description>Battle of Antietam (version 1.5) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="David Landrey and Chuck Kroegel" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.5" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-21-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="143360">
+				<rom name="battle of antietam v1.5 (4am crack) side a.dsk" size="143360" crc="bf0565ab" sha1="088489190e4db38a637176d5e944af6e8b8a8d73" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="143360">
+				<rom name="battle of antietam v1.5 (4am crack) side b.dsk" size="143360" crc="9d406c7e" sha1="7b0fd2712180837f2277944a3ca708e83fc1f302" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="bbugconcr1" cloneof="bbugconc">
 		<description>Battling Bugs and Concentraction (revision 1) (4am crack)</description>
 		<year>1982</year>
@@ -41108,6 +40169,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bomballey">
+		<description>Bomb Alley (4am and san inc crack)</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value=" Gary Grigsby" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-21-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bomb alley (4am and san inc crack).dsk" size="143360" crc="6c6fc199" sha1="6be0041ec12aa85709d6305f7a86e654d7055a53" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bookworm">
 		<description>Book Worm (A-407 version 1.0) (4am crack)</description>
 		<year>1985</year>
@@ -41163,7 +40240,7 @@ license:CC0-1.0
 	<software name="brdsider1" cloneof="brdside">
 		<description>Broadsides (revision 1) (4am crack)</description>
 		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
 		<info name="programmer" value="Wayne Garris" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 1" />
@@ -41180,7 +40257,7 @@ license:CC0-1.0
 	<software name="brdsider2" cloneof="brdside">
 		<description>Broadsides (revision 2) (4am crack)</description>
 		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
 		<info name="programmer" value="Wayne Garris" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 2" />
@@ -41197,7 +40274,7 @@ license:CC0-1.0
 	<software name="brdsider3" cloneof="brdside">
 		<description>Broadsides (revision 3) (4am crack)</description>
 		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
 		<info name="programmer" value="Wayne Garris" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 3" />
@@ -41214,7 +40291,7 @@ license:CC0-1.0
 	<software name="brdside">
 		<description>Broadsides (revision 4) (4am crack)</description>
 		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
 		<info name="programmer" value="Wayne Garris" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 4" />
@@ -41450,6 +40527,38 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Data" />
 			<dataarea name="flop" size="143360">
 				<rom name="career scan iv (4am crack) disk 2 - data disk.dsk" size="143360" crc="f5f89ac2" sha1="35e18659ae26ad449663b5c1a10d7339d9eba819" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carrierf">
+		<description>Carrier Force (4am and san inc crack)</description>
+		<year>1983</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Gary Grigsby" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-21-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="carrier force (4am and san inc crack).dsk" size="143360" crc="25cfeacf" sha1="7c1798d02b520b577d04e80654a939c07fa9b0e2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cartels">
+		<description>Cartels &amp; Cutthroats (4am and san inc crack)</description>
+		<year>1981</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Dan Bunten and Bill Bunten" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="cartels and cutthroats (4am and san inc crack).dsk" size="143360" crc="c60bdd16" sha1="c0c2a3664bfdef8ed036d8ba8fde047fc6dfc5e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -41952,6 +41061,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="coloncqt10">
+		<description>Colonial Conquest (version 1.0) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="developer" value="Strategic Simulations" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-23-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="colonial conquest (4am crack).dsk" size="143360" crc="5f56187d" sha1="52040bb086d1239624f58245304ebf395b40c039" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="commkeys10" cloneof="commkeys">
 		<description>CommuniKeys (A-248 version 1.0) (4am crack)</description>
 		<year>1989</year>
@@ -42021,6 +41147,41 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="cmpairct">
+		<description>Computer Air Combat (version 1.1) (4am and san inc crack)</description>
+		<year>1980</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Charles Merrow and Jack T. Avery" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-11-23-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="computer air combat v1.1 (4am and san inc crack).dsk" size="143360" crc="c90ddc0a" sha1="61910011bd88739e2d3c16b9f0d1272202974caa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmpambsh">
+		<description>Computer Ambush (version 1982) (4am and san inc crack)</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Ed Willinger, Kendall Whitesell, and Larry D. Strawser" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1982" />
+		<!--This version is 1982 and states redeveloped by Kendall Whitesell and Larry D. Strawser.-->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-29-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="computer ambush (4am and san inc crack).dsk" size="143360" crc="8916ce80" sha1="4526f179ce891997e45bfc2d727a3a6559c8d297" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cablkbrdd">
 		<description>Computer Assisted Blackboard demo (4am crack)</description>
 		<year>1983</year>
@@ -42033,6 +41194,39 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="computer assisted blackboard demo (4am crack).dsk" size="143360" crc="692aba74" sha1="40481cdf7c328c4a19be02041eb28690ffbf56c8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmpbaseb">
+		<description>Computer Baseball (4am and san inc crack)</description>
+		<year>1981</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Charlie Merrow and Jack Avery" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-05-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="computer baseball (4am and san inc crack).dsk" size="143360" crc="1e13b893" sha1="6417e6a78c821c6d6c8ac344f5acd3ce5aaa4e7d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmpbaseb83t">
+		<description>Computer Baseball 1983 Teams Disk (4am and san inc crack)</description>
+		<year>1984</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Charlie Merrow and Jack Avery" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<!--This is an add-on to Computer Baseball.  It is bootable but will ask for the game disk after selecting the team.-->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-04-06-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="computer baseball 1983 teams disk (4am and san inc crack).dsk" size="143360" crc="9d4d81fc" sha1="9343d764c844459f2e6c42a539505619c9d567e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42167,6 +41361,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="combism">
+		<description>Computer Bismarck (version 1.1) (4am and san inc crack)</description>
+		<year>1980</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="John Lyon, Joel Billings, and David Cook" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-06-12-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="computer bismarck v1.1 (4am and san inc crack).dsk" size="143360" crc="958fcbb8" sha1="1e40ca6400f704a9a2ee99d47db85318a9bfa80d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cgmm1ps11" cloneof="cgmm1ps">
 		<description>Computer Generated Mathematics Materials Volume 1: Problem Solving (A-757 version 1.1) (4am crack)</description>
 		<year>1982</year>
@@ -42253,6 +41464,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="mecc-a240 computer inspector v1.0 (4am crack).dsk" size="143360" crc="88c9ca53" sha1="6c80cc0a5b451e480abea6066e3536df77d9aa86"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmpqbse">
+		<description>Computer Quarterback Second Edition (4am and san inc crack)</description>
+		<year>1981</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Dan Bunten" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-29-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="computer quarterback second edition (4am and san inc crack).dsk" size="143360" crc="bffa5b04" sha1="b1e64b47ea375e782333f0943255dbd18f6cac43" />
 			</dataarea>
 		</part>
 	</software>
@@ -43321,6 +42548,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="cytrmast">
+		<description>Cytron Masters (4am and san inc crack)</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Dan Bunten" />
+		<info name="usage" value="Requires a 48K Apple ][+ or unenhanced Apple //e." />
+		<sharedfeat name="compatibility" value="A2P,A2E" />
+		<!--Due to compatibility issues unrelated to copy protection, it only runs on an Apple ][+ or unenhanced Apple //e.-->
+		<!--Dump released: 2021-04-07-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="cytron masters (4am and san inc crack).dsk" size="143360" crc="60a49b83" sha1="fbd8a8d6672c0228e10fea064aa64958d55bc90b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dancdino">
 		<description>Dancing Dinos (4am crack)</description>
 		<year>1993</year>
@@ -44133,6 +43377,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dmaster">
+		<description>Dungeon Master's Assistant Volume 1: Encounters (version 1.0) (trex crack)</description>
+		<year>1988</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Paul Murray, Victor Penman, and James Ward" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2016-10-02-->
+		<!--role-playing tool-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop1" size="143360">
+				<rom name="dungeon master's assistant side a (1988)(ssi)(trex crack)[rdos].dsk" size="143360" crc="14904b40" sha1="9a8953ed45bb36f340b13db1eb6d75a26e498815" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop1" size="143360">
+				<rom name="dungeon master's assistant side b (1988)(ssi)(trex crack)[rdos].dsk" size="143360" crc="fafa454c" sha1="169ec625b5d72f6c624534e4c031915a0e36c82d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dynoqst">
 		<description>Dyno-Quest (4am crack)</description>
 		<year>1984</year>
@@ -44503,6 +43771,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="mecc-a401 energy house v1.0 (4am crack).dsk" size="143360" crc="106fc6a2" sha1="e2de2216f405ff9d39a36834b897ed9d70581046"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epidemic">
+		<description>Epidemic (4am and san inc crack)</description>
+		<year>1983</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Steven Faber" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="epidemic (4am and san inc crack).dsk" size="143360" crc="5851d9eb" sha1="44ecac88bf299f6cd28475bb1641f62506d6f11f" />
 			</dataarea>
 		</part>
 	</software>
@@ -44917,6 +44201,83 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="fldofire">
+		<description>Field of Fire (version 1.0) (4am crack)</description>
+		<year>1984</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="developer" value="LDW Software" />
+		<info name="programmer" value="Roger Damon" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-21-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="field of fire (4am crack) side a.dsk" size="143360" crc="d3e4c252" sha1="89860de4872254fb034f5f91a2c58f3f7fe76b8b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="field of fire (4am crack) side b.dsk" size="143360" crc="a75578a7" sha1="64db2524da2375767eec272656dc24ba3e50ba61" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="50miscru11" cloneof="50miscru">
+		<description>Fifty Mission Crush (version 1.1) (4am and san inc crack)</description>
+		<year>1984</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="alt_title" value="50 Mission Crush" />
+		<info name="programmer" value="John Gray" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fifty mission crush v1.1 (4am and san inc crack).dsk" size="143360" crc="01e9f083" sha1="28a74d8f98bc262a550d9b591c6d8df18dfb13ee" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="50miscru">
+		<description>Fifty Mission Crush (version 1.2) (4am and san inc crack)</description>
+		<year>1984</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="alt_title" value="50 Mission Crush" />
+		<info name="programmer" value="John Gray" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fifty mission crush v1.2 (4am and san inc crack).dsk" size="143360" crc="56078d1b" sha1="2261d4a95ebdba5a9b46c6d108c20d89390d5822" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fcommand">
+		<description>Fighter Command (4am and san inc crack)</description>
+		<year>1983</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Charlie Merrow and Jack Avery" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fighter command (4am and san inc crack).dsk" size="143360" crc="c9f6b276" sha1="d83f4b6bfaa1c154845da9f01d8503557eaf5cdf" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fishscal40" cloneof="fishscal">
 		<description>Fish Scales (version 4.0) (4am crack)</description>
 		<year>1984</year>
@@ -45020,7 +44381,7 @@ license:CC0-1.0
 	<software name="fortress">
 		<description>Fortress (revision 2) (4am crack)</description>
 		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
 		<info name="programmer" value="Jim Templeman and Patty Denbrook" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 2" />
@@ -45342,6 +44703,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="galacadv">
+		<description>Galactic Adventures (4am and san inc crack)</description>
+		<year>1983</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Tom Reamy" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="galactic adventures (4am and san inc crack) disk 1.dsk" size="143360" crc="80965f35" sha1="63f76e541b1133dea7c0e786a80ab0203a37ef4b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="galactic adventures (4am and san inc crack) disk 2.dsk" size="143360" crc="a662f54f" sha1="f07350c1acd2d349b65ae98f0b03925c4d4405e1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gamefrm1">
 		<description>Game Frame One (4am crack)</description>
 		<year>1986</year>
@@ -45422,6 +44806,24 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="garfield trivia game (4am crack).dsk" size="143360" crc="78031656" sha1="77d620ceffbdcfc894780531e894cb065792ecde" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gemswarr">
+		<description>Gemstone Warrior (version 1.1) (4am crack)</description>
+		<year>1984</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="developer" value="Paradign Creators" />
+		<info name="programmer" value="Peter W. V. Lount and Trouba Gossen" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2016-12-03-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gemstone warrior (4am crack).dsk" size="143360" crc="ba9acfd0" sha1="4c47b66f16628bd3e4202923b8c5630f7ee4f29f" />
 			</dataarea>
 		</part>
 	</software>
@@ -45541,6 +44943,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="geopol90">
+		<description>Geopolitique 1990 (4am and san inc crack)</description>
+		<year>1983</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Bruce A. Ketchledge" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Geopol"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geopolitique 1990 (4am and san inc crack) side a - geopol.dsk" size="143360" crc="6e43a875" sha1="8cee72288cca5ebfc573206e0b64489f5263d392" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Geowar"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geopolitique 1990 (4am and san inc crack) side b - geowar.dsk" size="143360" crc="3c19f5c2" sha1="84331f1cfb7f54ce446e88031d85c1ccfc825dae" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gervocb">
 		<description>German Vocabulary Builder (4am crack)</description>
 		<year>1982</year>
@@ -45598,6 +45023,30 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="kidwriter (german level i, ii) (4am crack).dsk" size="143360" crc="122e4098" sha1="94a07dd053f198b02cd2dbf6b62964a64d806516" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gtysburg10">
+		<description>Gettysburg: The Turning Point (version 1.0) (4am crack)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="David Landrey and Chuck Kroegel" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="version 1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-21-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="gettysburg - the turning point (4am crack) side a.dsk" size="143360" crc="26a53290" sha1="309bd7e30750765700b2cab3fe442c48a1d1e190" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="gettysburg - the turning point (4am crack) side b.dsk" size="143360" crc="62372db7" sha1="f5e13ee7ffa10c241f55818371232bf29b05b5e4" />
 			</dataarea>
 		</part>
 	</software>
@@ -45919,6 +45368,40 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="guadcmp10" cloneof="guadcmp">
+		<description>Guadalcanal Campaign (version 1.0) (4am and san inc crack)</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Gary Grigsby" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="version 1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="guadalcanal campaign v1.0 (4am and san inc crack).dsk" size="143360" crc="a1912f25" sha1="302dfe3086242aed0e3a3244f88e85413e934996" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guadcmp">
+		<description>Guadalcanal Campaign (version 1.1) (4am and san inc crack)</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Gary Grigsby" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="version 1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="guadalcanal campaign v1.1 (4am and san inc crack).dsk" size="143360" crc="3ad69df8" sha1="474e1ff69c7c5cb48f192417beab90f62d210a23" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="guitarwiz11601" cloneof="guitarwiz">
 		<description>Guitar Wizard (version 11601) (4am crack)</description>
 		<year>1986</year>
@@ -45998,6 +45481,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="half time v2.0 (4am crack).dsk" size="143360" crc="3248b480" sha1="5acdd0a83802350ce7d0f7e144e6310856fcc2a1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hndbasic">
+		<description>Hands on BASIC Programming (version 1.0 25-Feb-83) (4am crack)</description>
+		<year>1983</year>
+		<publisher>Edu-Ware Services</publisher>
+		<info name="programmer" value="Neil Bennett, Ph.D." />
+		<info name="usage" value="Requires an Apple ][ or later." />
+		<info name="version" value="version 1.0 25-Feb-83" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2016-02-21-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="hands on basic programming (4am crack).dsk" size="143360" crc="73839657" sha1="8c4b61a006fe751b3304fe59c5df2b6a51c4ab9f" />
 			</dataarea>
 		</part>
 	</software>
@@ -46133,6 +45633,30 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="143360">
 				<rom name="human body exploration (4am crack) side b.dsk" size="143360" crc="48b2bb27" sha1="d95ad2a965ff9c8527843e7d6972b98a731c13ef" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impgalac">
+		<description>Imperium Galactum (version 1.0) (4am and san inc crack)</description>
+		<year>1984</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Paul Murray and Keith Brors" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-05-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Scenario and boot"/>
+			<dataarea name="flop" size="143360">
+				<rom name="imperium galactum (4am and san inc crack) side a - scenario (boot).dsk" size="143360" crc="da228929" sha1="119bce687849b6167f98ae6107cfa6950890a23f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Game"/>
+			<dataarea name="flop" size="143360">
+				<rom name="imperium galactum (4am and san inc crack) side b - game.dsk" size="143360" crc="91a7e59c" sha1="11d28301726fd4b97ef5dbb441808733ba8be2d1" />
 			</dataarea>
 		</part>
 	</software>
@@ -46358,6 +45882,54 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="jumblezzz (4am crack).dsk" size="143360" crc="f2b174de" sha1="d41085797cea3e9605953e7a1806b0cd45e00eb7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kampfgp10" cloneof="kampfgp">
+		<description>Kampfgruppe (version 1.0) (4am and san inc crack)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Gary Grigsby" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="version 1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-04-07-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Game disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="kampfgruppe v1.0 (4am and san inc crack) disk 1 - game disk.dsk" size="143360" crc="daa30896" sha1="031d68b8a2beee66421bf042064400fa94b22d2c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Historical scenarios"/>
+			<dataarea name="flop" size="143360">
+				<rom name="kampfgruppe v1.0 (4am and san inc crack) disk 2 - historical scenarios.dsk" size="143360" crc="a516177e" sha1="5960e7169c9709546931597c969d8b8182e8a93c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kampfgp">
+		<description>Kampfgruppe (version 1.1) (4am and san inc crack)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Gary Grigsby" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="version 1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-21-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Game disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="kampfgruppe v1.1 (4am and san inc crack) disk 1 - game.dsk" size="143360" crc="4b7139e3" sha1="1574a899f859d23c0b918176ff8617e65e9b212a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Historical scenarios"/>
+			<dataarea name="flop" size="143360">
+				<rom name="kampfgruppe v1.1 (4am and san inc crack) disk 2 - scenarios.dsk" size="143360" crc="1ad1274f" sha1="4b4a87670d3ca608f290a882cca6d383a4358c93" />
 			</dataarea>
 		</part>
 	</software>
@@ -46708,6 +46280,23 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="kittens, kids and a frog - building comprehension i (1989) (4am crack) disk 2.dsk" size="143360" crc="60e76ab4" sha1="ad808d5b117cece0d33794210bfa1c0cc7d28b7b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="knightds">
+		<description>Knights of the Desert (version 1.1) (4am and san inc crack)</description>
+		<year>1983</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="developer" value="Tactical Design Group" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="version 1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-21-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="knights of the desert v1.1 (4am and san inc crack).dsk" size="143360" crc="40edca9f" sha1="569a58f5e4acaf8db250eba44e23621912102ee0" />
 			</dataarea>
 		</part>
 	</software>
@@ -48996,6 +48585,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mechbrig">
+		<description>Mech Brigade (version 1.2) (4am and san inc crack)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="version 1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-21-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Game and boot"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mech brigade v1.2 (4am and san inc crack) disk 1 - game (boot).dsk" size="143360" crc="d980a62d" sha1="d3045577dc03d823c4c20e8195f3ec68cbcd9451" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Scenario"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mech brigade v1.2 (4am and san inc crack) disk 2 - scenario.dsk" size="143360" crc="f115d3cf" sha1="9f4f9b759e236ba6ed6d8092ed6fb78d95301eea" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msblkamer">
 		<description>Medalist Series: Black Americans (version 04.13.84) (4am crack)</description>
 		<year>1983</year>
@@ -49709,6 +49321,39 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="nam">
+		<description>NAM (version 1.0) (4am crack)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Roger Damon, Jeff Johnson, and Marek Popiel" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="version 1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-11-23-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="nam (4am crack).dsk" size="143360" crc="7e5a63aa" sha1="1197bee7be8d4dcf8e7cdfd97fc5fce37d349a58" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nthatl86">
+		<description>North Atlantic 86 (4am and san inc crack)</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Gary Grigsby" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north atlantic 86 (4am and san inc crack).dsk" size="143360" crc="fb1e63c0" sha1="b33928ead103f906091b6b8ab989be0cbdbf2f79" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nmbrbwlg">
 		<description>Number Bowling: Decimals and Fractions (4am crack)</description>
 		<year>1985</year>
@@ -49803,6 +49448,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="opapoc">
+		<description>Operation Apocalypse (4am and san inc crack)</description>
+		<year>1981</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Roger Keating" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-21-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="operation apocalypse (4am and san inc crack).dsk" size="143360" crc="37d4dd84" sha1="e1bbd5762a0805ae3afb5d1be3889dbeba657d0f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="osmoticpr">
 		<description>Osmotic Pressure (version 1.1, 04/1985) (4am crack)</description>
 		<year>1985</year>
@@ -49855,6 +49516,24 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="painter power (4am crack).dsk" size="143360" crc="cfe35717" sha1="707f80b2d67aef1f8eb6af3bad019f67ca4c39fd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panzgrna">
+		<description>Panzer Grenadier (verision 1.0) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="developer" value="LDW Software" />
+		<info name="programmer" value="Roger Damon" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="version 1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-04-23-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="panzer grenadier (4am crack).dsk" size="143360" crc="3cae8a0e" sha1="20a8bc42eafc963194fe773beacff2bc2af00077" />
 			</dataarea>
 		</part>
 	</software>
@@ -50184,7 +49863,7 @@ license:CC0-1.0
 	<software name="phanta">
 		<description>Phantasie (version 1.0) (4am and san inc crack)</description>
 		<year>1984</year>
-		<publisher>Strategic Simulations</publisher>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
 		<info name="programmer" value="Winston Douglas Wood" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<info name="version" value="1.0" />
@@ -50208,7 +49887,7 @@ license:CC0-1.0
 	<software name="phantaii">
 		<description>Phantasie II: Descent Into The Netherworld (version 2/5/86) (4am and san inc crack)</description>
 		<year>1986</year>
-		<publisher>Strategic Simulations</publisher>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
 		<info name="programmer" value="Winston Douglas Wood" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<info name="version" value="2/5/86" />
@@ -50473,6 +50152,39 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="prescriptive math drill (4am crack).dsk" size="143360" crc="0752ab7d" sha1="2b284c179252349bcaa13ee4cbc7afbe841aa32c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prelect">
+		<description>President Elect (4am and san inc crack)</description>
+		<year>1981</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Nelson G. Hernandez, Sr." />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-21-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="president elect (4am and san inc crack).dsk" size="143360" crc="0cf493c7" sha1="cb6107c8943e07186c8445cf3529a2e596d17c37" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prelec88">
+		<description>President Elect 1988 Edition (version 2.0) (4am crack)</description>
+		<year>1987</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Nelson G. Hernandez, Sr." />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="2.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-03-12-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="president elect 1988 edition (4am crack).dsk" size="143360" crc="e05a85d1" sha1="2dec1842f87e2babd9490d1353bcc73f7f049188" />
 			</dataarea>
 		</part>
 	</software>
@@ -50843,6 +50555,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="protgolf">
+		<description>Professional Tour Golf (4am and san inc crack)</description>
+		<year>1983</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Henry L. Richbourg" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-06-12-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Master Disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="professional tour golf (4am and san inc crack) side a - master disk.dsk" size="143360" crc="945c18e8" sha1="680d062a0313bd9abc1f42d2742690eb6c5b85e3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Player Disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="professional tour golf (4am and san inc crack) side b - player disk.dsk" size="143360" crc="e412e247" sha1="486a79d6a1bde19cd1794971d8cffdf20812c3ad" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="projcirc">
 		<description>Projectile and Circular Motion (4am crack)</description>
 		<year>1984</year>
@@ -51054,6 +50789,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="qohearts">
+		<description>Queen of Hearts (4am and san inc crack)</description>
+		<year>1983</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="John Lyon" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-11-04-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="queen of hearts (4am and san inc crack).dsk" size="143360" crc="f43b97d1" sha1="734d5be5b71280d381f41b2c6d159305ac242665" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qpspmanb258" cloneof="qpspman">
 		<description>Questprobe featuring Spider-Man (version B-258) (4am crack)</description>
 		<year>1985</year>
@@ -51122,6 +50873,35 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B - Boot"/>
 			<dataarea name="flop" size="143360">
 				<rom name="questprobe featuring the hulk (4am crack) side b (boot).dsk" size="143360" crc="7dcdb2a3" sha1="654125d4e3a3c41723656d74b63f9ec7d89f02a5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="questron">
+		<description>Questron (4am and san inc crack)</description>
+		<year>1984</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Charles Dougherty and Gerald Wieczorek" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-11-16-->
+		<!--role-playing game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Character Disk (Boot disk)"/>
+			<dataarea name="flop" size="143360">
+				<rom name="questron (4am crack) character disk (boot).dsk" size="143360" crc="a5883c8c" sha1="e0808ea101c1211bd8cb072d1452427dfcb0a37b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Game disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="questron (4am crack) game disk 1.dsk" size="143360" crc="a8655b0b" sha1="cec363e8a31984cf6edc5465244f0a2b15c3c878" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Game disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="questron (4am crack) game disk 2.dsk" size="143360" crc="b7229e6c" sha1="0bcb289ad32930e6e7313f1a73d1ab0c3f4450b9" />
 			</dataarea>
 		</part>
 	</software>
@@ -51232,6 +51012,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="race the clock (4am crack).dsk" size="143360" crc="3f5911f1" sha1="4866942789c05e52f84f92a5857622d87dee5787" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="railwest">
+		<description>Rails West! (4am and san inc crack)</description>
+		<year>1983</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Martin C. Campion" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="rails west (4am and san inc crack).dsk" size="143360" crc="1b18e149" sha1="f9f40dfc1995d751f67c1f8671aef56ae2c927a3" />
 			</dataarea>
 		</part>
 	</software>
@@ -51675,6 +51471,46 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="rcchicka">
+		<description>Rebel Charge at Chickamauga (version 1.0) (4am crack)</description>
+		<year>1987</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="David Landrey, Chuck Kroegel, and Keith Brors" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="version 1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-18-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rebel charge at chickamauga (4am crack) side a.dsk" size="143360" crc="4118631c" sha1="004d1d25a4c20a5edbbc201ae4f9b173b7157990" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rebel charge at chickamauga (4am crack) side b.dsk" size="143360" crc="d1976271" sha1="36860382552e7c383d8c6e94bd150b7fd390d5c9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reforg88">
+		<description>Reforger 88 (4am and san inc crack)</description>
+		<year>1984</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Gary Grigsby" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-21-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="reforger 88 (4am and san inc crack).dsk" size="143360" crc="6c03e8ed" sha1="2cebfa405934799a71eece6c301612c4c9d8b407" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rendrama">
 		<description>Rendezvous with Rama (4am crack)</description>
 		<year>1984</year>
@@ -51980,6 +51816,148 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="mecc-a115 right of way v1.1 (4am crack).dsk" size="143360" crc="e64255e7" sha1="e0a1ebfb396d9f9a5f99177509d9a6fcf46bc0a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rgzilfin">
+		<description>Rings of Zilfin (version 1.0) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Ali Atabeck" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="version 1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2016-08-01-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rings of zilfin (4am crack) disk 1.dsk" size="143360" crc="afd62ca7" sha1="78687b14aa9aae7627b268c9c8b4807a634c555b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rings of zilfin (4am crack) disk 2.dsk" size="143360" crc="f518f2c6" sha1="fef8a883a28c203e8ab8242f25e1c45902e63c72" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rings of zilfin (4am crack) disk 3.dsk" size="143360" crc="278af922" sha1="c0717ecbd7b4a6c0eb43efed38645644400982f7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rngsseat">
+		<description>Ringside Seat (4am and san inc crack)</description>
+		<year>1983</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Carl Saracini and Mark Watts" />
+		<info name="usage" value="Requires an Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--sports game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ringside seat (4am and san inc crack).dsk" size="143360" crc="623103c4" sha1="32dbc597bb6b4a6b85f20255b52a3efc60807736" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadwar2k10" cloneof="roadwar2k">
+		<description>Roadwar 2000 (version 1.0) (4am crack)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Jeff Johnson and Robert Calfee" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-18-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="roadwar 2000 v1.0 (4am crack) side a.dsk" size="143360" crc="ed978e93" sha1="980a0c17020dbf181d200362d1f6594e7895e745" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="roadwar 2000 v1.0 (4am crack) side b.dsk" size="143360" crc="e422b02e" sha1="ca6927807ed6d42158493c30fba86d7d85dc2cd1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadwar2k11" cloneof="roadwar2k">
+		<description>Roadwar 2000 (version 1.1) (4am crack)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Jeff Johnson and Robert Calfee" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-11-15-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="143360">
+				<rom name="roadwar 2000 v1.1 (4am crack) side a.dsk" size="143360" crc="95e5fc48" sha1="637554f6088f0628b7c21d3386f1971e2f5d90ec" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="143360">
+				<rom name="roadwar 2000 v1.1 (4am crack) side b.dsk" size="143360" crc="69f2740a" sha1="f30584021385fd44c5b7a38c5a23d05f509f1440" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadwar2k">
+		<description>Roadwar 2000 (version 1.2) (4am crack)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Jeff Johnson and Robert Calfee" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-13-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="roadwar 2000 v1.2 (4am crack) side a.dsk" size="143360" crc="ab8817d7" sha1="12c55e34f815593784fcfcbaf2ebef735eb22506" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="roadwar 2000 v1.2 (4am crack) side b.dsk" size="143360" crc="69f2740a" sha1="f30584021385fd44c5b7a38c5a23d05f509f1440" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rwareuro">
+		<description>Roadwar Europa (version 1.0) (4am crack)</description>
+		<year>1987</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Jeffrey A. Johnson" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-09-02-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="roadwar europa (4am crack) side a.dsk" size="143360" crc="d92c0728" sha1="54409fc98308d05d86b11db1b220bc2bca9297f6" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="roadwar europa (4am crack) side b.dsk" size="143360" crc="ef82f537" sha1="b0d84fc300d114d2b1066137ba362d189e9b69cf" />
 			</dataarea>
 		</part>
 	</software>
@@ -52597,6 +52575,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="shilohgt">
+		<description>Shiloh: Grant's Trial in the West (version 1.0) (4am crack)</description>
+		<year>1987</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="David Landrey, Chuck Kroegel, and Brian Hermundstad" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-22-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="shiloh (4am crack) side a.dsk" size="143360" crc="46f1e68c" sha1="800467ca579dcddf0825af350a54691f358e79a6" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="shiloh (4am crack) side b.dsk" size="143360" crc="453ef851" sha1="63fd8f6e16a3055501556fb4134ddb5f08e6df99" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shopylp">
 		<description>Shopping with the Yellow Pages (4am crack)</description>
 		<year>1984</year>
@@ -52625,6 +52627,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="shutterbug's pictures (4am crack).dsk" size="143360" crc="ec7753fa" sha1="f592937967570c31171468b3d923cec693c42e98" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sixgunsh">
+		<description>Six-Gun Shootout (version 1.0) (4am and san inc crack)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="developer" value="Strategic Simulations" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-04-07-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="six-gun shootout (4am and san inc crack).dsk" size="143360" crc="de053043" sha1="3424be7108be30d5738a04e1cb3580f646f9e86d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53054,6 +53073,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="143360">
 				<rom name="sound ideas - word attack v5220c (4am crack) disk 6.dsk" size="143360" crc="9169110e" sha1="a21f11e30482daae85c7a0b45b3a475367bdde9e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sthncmnd">
+		<description>Southern Command (4am and san inc crack)</description>
+		<year>1981</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Roger Keating" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-21-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="southern command (4am and san inc crack).dsk" size="143360" crc="e3265f8d" sha1="216fcf8fd4693c11bcdde1eb16e7423539fef0b7" />
 			</dataarea>
 		</part>
 	</software>
@@ -54695,6 +54730,38 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="btlshil">
+		<description>The Battle of Shiloh (4am and san inc crack)</description>
+		<year>1981</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="developer" value="Tactical Design Group" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-21-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the battle of shiloh (4am and san inc crack).dsk" size="143360" crc="2b8e5ba1" sha1="4d92dafe134bb703f242343dcfc7e8d1eb99b34e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlblg">
+		<description>The Battle of the Bulge: Tigers in the Snow (4am and san inc crack)</description>
+		<year>1981</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="developer" value="Tactical Design Group" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="tigers in the snow (4am and san inc crack).dsk" size="143360" crc="0f1f8785" sha1="ee56de1e7bebc07d54d44669420b7ad5d072d7a8" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="boyjesus">
 		<description>The Boy Jesus (4am crack)</description>
 		<year>1984</year>
@@ -54715,6 +54782,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the boy jesus (4am crack) side b.dsk" size="143360" crc="7b549ae0" sha1="d75c8e9301b81b50ec101906016e72692ae83674"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosbalan">
+		<description>The Cosmic Balance (4am and san inc crack)</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Paul Murray" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-11-15-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the cosmic balance (4am and san inc crack).dsk" size="143360" crc="af0b221b" sha1="49f46eb5580cbb01fdcfa4ae5bfd39ea459a1b04" />
 			</dataarea>
 		</part>
 	</software>
@@ -54860,6 +54943,30 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the electric crayon - this land is your land (4am crack).dsk" size="143360" crc="4bc95afb" sha1="3e8745b89f9f0ef0d4f3b20c0ee455dd2b8e6674" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eterndag">
+		<description>The Eternal Dagger (version 1.2) (4am crack)</description>
+		<year>1987</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Paul Murray and Victor Penman" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-09-07-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the eternal dagger v1.2 (4am crack) side a.dsk" size="143360" crc="f28d4aba" sha1="4e5854098549f3d95bc244964a4fc4665bb2b734" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the eternal dagger v1.2 (4am crack) side b.dsk" size="143360" crc="146f615e" sha1="b401040c5d926b213fa96543d9105791b81a3649" />
 			</dataarea>
 		</part>
 	</software>
@@ -55285,6 +55392,70 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="143360">
 				<rom name="the school tool (4am crack) disk 3.dsk" size="143360" crc="8b1b0641" sha1="65b78d70baab3cd4b04089eab8e8f9f21fdc86fe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrdspg10" cloneof="shrdspg">
+		<description>The Shard of Spring (version 1.0) (4am crack)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Craig Roth and David Stark" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-09-07-->
+		<!--role-playing game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the shard of spring (4am crack) side a.dsk" size="143360" crc="2fb89106" sha1="f2651db23c99118fa8e115a00c9c5d6e6571e83a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the shard of spring (4am crack) side b.dsk" size="143360" crc="fb77ba19" sha1="fc7e98f4d8cafac4b46d0cbeffdcb288a332f6da" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrdspg">
+		<description>The Shard of Spring (version 1.1) (4am crack)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Craig Roth and David Stark" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-27-->
+		<!--role-playing game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the shard of spring v1.1 (4am crack) side a.dsk" size="143360" crc="ef82007e" sha1="9b2032f145693e4ccbcf74953e52f61ef91d71fa" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the shard of spring v1.1 (4am crack) side b.dsk" size="143360" crc="6a2c7c76" sha1="bc77d3ea3e402e2c82757fa869ef1f9dfaa4f648" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shatalli">
+		<description>The Shattered Alliance (4am and san inc crack)</description>
+		<year>1981</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="John Lyon" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the shattered alliance (4am and san inc crack).dsk" size="143360" crc="f50ce4ae" sha1="63aef0c4b6d60dc0deef6a9cf6234e6c545cc3ac" />
 			</dataarea>
 		</part>
 	</software>
@@ -55749,6 +55920,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="warpfctr">
+		<description>The Warp Factor (4am and san inc crack)</description>
+		<year>1981</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Paul Murray" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-29-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the warp factor (4am and san inc crack).dsk" size="143360" crc="166d7cf6" sha1="9900c6421984afd5b6025506c7cef87345d2b4d2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="theorems">
 		<description>Theorems and Proofs of Theorems (4am crack)</description>
 		<year>1983</year>
@@ -55982,6 +56169,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="top readers' club- grade 5 (4am crack).dsk" size="143360" crc="85c6d93c" sha1="34813d689eb0f9d41f92d0057d29fa504075154a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="torpfire">
+		<description>Torpedo Fire (4am and san inc crack)</description>
+		<year>1981</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="John Lyonn" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-07-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="torpedo fire (4am and san inc crack).dsk" size="143360" crc="8a1c21e1" sha1="ea77512fab09e5d7a676bdf40e171dfaec4a17d9" />
 			</dataarea>
 		</part>
 	</software>
@@ -56361,6 +56564,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="usaaf">
+		<description>U.S.A.A.F. (version 1.2) (4am and san inc crack)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-10-21-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Scenario (Boot)"/>
+			<dataarea name="flop" size="143360">
+				<rom name="u.s.a.a.f. v1.2 (4am and san inc crack) disk 1 - scenario (boot).dsk" size="143360" crc="3c071c39" sha1="cedc1f8b60d6671a1d6f5714f3b457deb56b686b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Game"/>
+			<dataarea name="flop" size="143360">
+				<rom name="u.s.a.a.f. v1.2 (4am and san inc crack) disk 2 - game.dsk" size="143360" crc="3a96f561" sha1="eca97c385f63d69915f97f03dc8d1c424faa0045" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vaultzur">
 		<description>Vaults of Zurich (4am crack)</description>
 		<year>1982</year>
@@ -56560,6 +56786,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="wsthpac">
+		<description>War in the South Pacific (version 1.0) (4am crack)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-18-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="war in the south pacific (4am crack) side a.dsk" size="143360" crc="28d20b8b" sha1="e954f5092b6567924e63e9a4dc3a3065ad40a672" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="war in the south pacific (4am crack) side b.dsk" size="143360" crc="e12ccbef" sha1="2818a948537af7a00c42ad8745965a06d1c7bb47" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dunzhin">
 		<description>Warrior of RAS Volume One: Dunzhin (4am crack)</description>
 		<year>1982</year>
@@ -56588,6 +56837,40 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="warriors of ras volume iv- ziggurat (4am crack).dsk" size="143360" crc="ee6d693b" sha1="b6a78df0aeb38ed8a4fd3c73628d95c2e967200c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warship10" cloneof="warship">
+		<description>Warship (version 1.0) (4am crack)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Gary Grigsby" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-26-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="warship v1.0 (4am crack).dsk" size="143360" crc="0c47a247" sha1="633a0ac41505caad53e77d73a1e59c932cfbb843" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warship">
+		<description>Warship (version 1.1) (4am crack)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Gary Grigsby" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-10-29-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="warship v1.1 (4am crack).dsk" size="143360" crc="7f3ba69e" sha1="1b93dcba16162e4d7e7efa619aa4c76fd1e12325" />
 			</dataarea>
 		</part>
 	</software>
@@ -57079,6 +57362,42 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="wizard of words (4am crack) side b.dsk" size="143360" crc="1962b2a4" sha1="36c2c587ad9681dde4f0a5e0b663d2be6719325b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizcrown">
+		<description>Wizard's Crown (version 1.2) (4am crack)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Paul Murray and Keith Brors" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-04-10-->
+		<!--role-playing game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Game disk front"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wizard's crown v1.2 (4am crack) disk 1a - game disk front.dsk" size="143360" crc="3198d3fe" sha1="348fdaeb55c447c40e2e9bfefc364ac37210cd59"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Game disk back"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wizard's crown v1.2 (4am crack) disk 1b - game disk back.dsk" size="143360" crc="cb8fee67" sha1="4be497844d0a8a4fcfb70d9629ceddab8c45ea3a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Data disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wizard's crown v1.2 (4am crack) disk 2a - data disk 1.dsk" size="143360" crc="fcc7fdac" sha1="7afa03981c62de9b0deaedd2a6788baae12a54f6"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Data disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wizard's crown v1.2 (4am crack) disk 2b - data disk 2.dsk" size="143360" crc="8b82a2f5" sha1="6186061a89bbcace9fe4c5a7d55c4740ea15a550"/>
 			</dataarea>
 		</part>
 	</software>
