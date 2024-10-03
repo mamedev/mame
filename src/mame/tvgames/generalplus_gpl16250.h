@@ -45,8 +45,6 @@ public:
 
 	void cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4);
 
-	void init_gameu();
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -140,6 +138,32 @@ private:
 	uint16_t m_portb_data = 0U;
 	uint16_t m_portd_data = 0U;
 	uint8_t m_bank = 0U;
+};
+
+
+class gameu_handheld_game_state : public gcm394_game_state
+{
+public:
+	gameu_handheld_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		gcm394_game_state(mconfig, type, tag)
+	{
+	}
+
+	void gameu(machine_config &config);
+
+	void init_gameu();
+
+protected:
+
+	virtual void machine_reset() override;
+
+private:
+
+	void gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint16_t m_portb_data = 0U;
+	uint16_t m_portd_data = 0U;
 };
 
 

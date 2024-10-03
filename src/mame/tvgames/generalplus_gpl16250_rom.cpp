@@ -616,8 +616,15 @@ void beijuehh_game_state::machine_reset()
 
 
 
+void gameu_handheld_game_state::gameu(machine_config &config)
+{
+	gcm394_game_state::base(config);
 
+	m_maincpu->portb_out().set(FUNC(gameu_handheld_game_state::gameu_portb_w));
+	m_maincpu->portd_out().set(FUNC(gameu_handheld_game_state::gameu_portd_w));
 
+	m_screen->set_visarea(0, (160)-1, 0, (120)-1);
+}
 
 void gormiti_game_state::machine_reset()
 {
@@ -625,8 +632,26 @@ void gormiti_game_state::machine_reset()
 	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
+void gameu_handheld_game_state::gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: portb write %04x\n", machine().describe_context().c_str(), data);
+	m_portb_data = data;
+}
 
-void gcm394_game_state::init_gameu()
+
+void gameu_handheld_game_state::gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	printf("%s: portd write %04x\n", machine().describe_context().c_str(), data);
+	m_portd_data = data;
+}
+
+void gameu_handheld_game_state::machine_reset()
+{
+	gcm394_game_state::machine_reset();
+	m_maincpu->set_alt_tile_addressing_hack(1);
+}
+
+void gameu_handheld_game_state::init_gameu()
 {
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -642,6 +667,7 @@ void gcm394_game_state::init_gameu()
 	}
 
 	m_maincpu->set_alt_tile_addressing_hack(0);
+	m_maincpu->set_disallow_resolution_control();
 }
 
 
@@ -672,4 +698,4 @@ CONS(2013, gormiti,   0, 0, base, gormiti,  gormiti_game_state, empty_init, "Gio
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
 
 // unit looks a bit like a knock-off Wii-U tablet, but much smaller
-CONS( 201?, gameu50,       0,              0,      base, smartfp, gcm394_game_state, init_gameu, "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, gameu50,       0,              0,      gameu, tkmag220, gameu_handheld_game_state, init_gameu, "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
