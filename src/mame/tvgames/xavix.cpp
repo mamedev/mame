@@ -2052,6 +2052,11 @@ ROM_START( epo_mms )
 	ROM_LOAD("mmnj-main-4.u4", 0x000000, 0x400000, CRC(22f14ca2) SHA1(122e735eb7c54a22de16f65cd43d2cae788e0102) )
 ROM_END
 
+ROM_START( epo_mmsp )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("mm1j main-00.u1", 0x000000, 0x400000, CRC(65b40a27) SHA1(8f88973122277fe8f31bacb3a070609fde062946) )
+ROM_END
+
 ROM_START( tak_geig )
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("geigeki.bin", 0x000000, 0x400000, CRC(bd0c3576) SHA1(06f614dbec0225ce4ed866b98450912986d72faf) )
@@ -2355,6 +2360,9 @@ CONS( 2003, epo_crok,  0,          0,  xavix_i2c_24lc04, xavix_i2c,xavix_i2c_sta
 
 // ミニモニ。ステージ！ダンスだぴょん！
 CONS( 2002, epo_mms,   0,          0,  xavix_i2c_24c02,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Mini-Moni Stage! Dance Dapyon! (Japan)",  MACHINE_IMPERFECT_SOUND )
+
+// ミニモニ。ステージ！ダンスだぴょん！ぷらすっ
+CONS( 2003, epo_mmsp,  0,          0,  xavix_i2c_24c02,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Mini-Moni Stage! Dance Dapyon! Plus (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 // オールスター感謝祭　超豪華！クイズ決定版～赤坂５丁目体感スタジオ～
 CONS( 2004, epo_quiz,  0,          0,  xavix,            epo_quiz, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "All-Star Thanksgiving Super Luxurious! Definitive Quiz Edition ~ Akasaka 5-Chome Experience Studio", MACHINE_IMPERFECT_SOUND )
