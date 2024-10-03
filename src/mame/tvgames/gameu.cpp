@@ -113,4 +113,5 @@ ROM_END
 
 } // anonymous namespace
 
+// unit looks a bit like a knock-off Wii-U tablet, but much smaller
 CONS( 201?, gameu50,       0,              0,      gameu_handheld, gameu_handheld, gameu_handheld_state, init_gameu, "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)", MACHINE_IS_SKELETON )
