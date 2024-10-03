@@ -272,7 +272,7 @@ uint8_t v25_common_device::scc0_r()
 
 void v25_common_device::scc0_w(uint8_t d)
 {
-	logerror("%06x: SCC0 set to %02x\n", PC(), d & 0x0f);
+	logerror("%06x: SCC0 prescaler set to %d\n", PC(), 2 << (d & 0x0f));
 	m_scc[0] = d & 0x0f;
 }
 
@@ -283,7 +283,7 @@ uint8_t v25_common_device::brg0_r()
 
 void v25_common_device::brg0_w(uint8_t d)
 {
-	logerror("%06x: BRG0 divider set to %d\n", PC(), d + 1);
+	logerror("%06x: BRG0 divider set to %d\n", PC(), d);
 	m_brg[0] = d;
 }
 
@@ -368,7 +368,7 @@ uint8_t v25_common_device::scc1_r()
 
 void v25_common_device::scc1_w(uint8_t d)
 {
-	logerror("%06x: SCC1 set to %02x\n", PC(), d & 0x0f);
+	logerror("%06x: SCC1 prescaler set to %d\n", PC(), 2 << (d & 0x0f));
 	m_scc[1] = d & 0x0f;
 }
 
@@ -379,7 +379,7 @@ uint8_t v25_common_device::brg1_r()
 
 void v25_common_device::brg1_w(uint8_t d)
 {
-	logerror("%06x: BRG1 divider set to %d\n", PC(), d + 1);
+	logerror("%06x: BRG1 divider set to %d\n", PC(), d);
 	m_brg[1] = d;
 }
 
