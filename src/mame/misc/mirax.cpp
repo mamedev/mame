@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, Tomasz Slanina, Olivier Galibert
 /*
 ****************************************************
-Mirax (C)1985 Current Technologies
+Mirax (C)1985 Current Technology, Inc.
 
 driver by
 Tomasz Slanina analog[AT]op[DOT]pl
@@ -96,6 +96,32 @@ Stephh's notes (based on the games Z80 code and some tests) :
         furthermore, for all stages, it's written "UNIT" instead of "CITY"
   - Same ingame bug as in 'mirax' when you reach level 100 (of course, it will display
     "LUXORI UNIT" instead of "MIRAX CITY" on "presentation" screen).
+
+
+Roberto Fresca notes about set 'miraxb'
+
+  - The game starts without a self test.
+
+  Stages:
+
+  stages 01 to 10 : "MIRAX"
+  stages 11 to 20 : "RUTHIN"
+  stages 21 to 30 : "GORGAN"
+  stages 31 to 40 : "PEMBAY"
+  stages 41 to 50 : "URMIA"
+  stages 51 to 60 : "VENLO"
+  stages 61 to 70 : "OHRE"
+  stages 71 to 80 : "DESBOM"
+  stages 81 to 90 : "XELUN"
+  stages 91 to 99 : "MURBO"
+
+  After the stage 99, the game jumps to stage 1 (take as 100), where you reach the city.
+  even displaying the wrong text. Cities appear at stage 1, 11, 21, etc...
+  Once you reach again the stage 99, you'll get the stage 1 again,
+  but the city will displace to the stage 2, 12, 22, etc... Always with wrong text on screen.
+
+  Indeed it's a bug of the game.
+
 
 ************************************************
 */
@@ -572,6 +598,35 @@ ROM_START( miraxa )
 	ROM_LOAD( "mrb3.prm",   0x0020, 0x0020, CRC(e3f3d0f5) SHA1(182b06c9db5bec1e3030f705247763bd2380ba83) )
 ROM_END
 
+ROM_START( miraxb )
+	ROM_REGION( 0xc000, "maincpu", ROMREGION_ERASE00 ) // put decrypted code there
+
+	ROM_REGION( 0xc000, "data_code", 0 ) // encrypted code for the main cpu
+	ROM_LOAD( "10.p5",   0x0000, 0x4000, CRC(680cd519) SHA1(1cf4ef5a3e6907524b1fd874dc5412f95e4b5856) )
+	ROM_LOAD( "11.r5",   0x4000, 0x4000, CRC(a518c8b0) SHA1(e974c5eaba7d8135b5c3d4606ce81f88550eb657) )
+	ROM_LOAD( "12.s5",   0x8000, 0x4000, CRC(ed1f6c30) SHA1(360a46c412c93274a763f35493257f746f79bb43) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "13.r5",   0x0000, 0x2000, CRC(cd2d52dc) SHA1(0d4181dc68beac338f47a2065c7b755008877896) )
+
+	ROM_REGION( 0xc000, "gfx1", 0 )
+	ROM_LOAD( "4.e3",   0x0000, 0x4000, CRC(0cede01f) SHA1(c723dd8ee9dc06c94a7fe5d5b5bccc42e2181af1) )
+	ROM_LOAD( "6.h3",   0x4000, 0x4000, CRC(58221502) SHA1(daf5c508939b44616ca76308fc33f94d364ed587) )
+	ROM_LOAD( "8.k3",   0x8000, 0x4000, CRC(6dbc2961) SHA1(5880c28f1ef704fee2d625a42682c7d65613acc8) )
+
+	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_LOAD( "1.e2",   0x04000, 0x4000, CRC(2cf5d8b7) SHA1(f66bce4d413a48f6ae07974870dc0f31eefa68e9) )
+	ROM_LOAD( "2.f2",   0x0c000, 0x4000, CRC(1f42c7fa) SHA1(33e56c6ddf7676a12f57de87ec740c6b6eb1cc8c) )
+	ROM_LOAD( "3.h2",   0x14000, 0x4000, CRC(cbaff4c6) SHA1(2dc4a1f51b28e98be0cfb5ab7576047c748b6728) )
+	ROM_LOAD( "5.f3",   0x00000, 0x4000, CRC(14b1ca85) SHA1(775a4c81a81b78490d45095af31e24c16886f0a2) )
+	ROM_LOAD( "7.i3",   0x08000, 0x4000, CRC(20fb2099) SHA1(da6bbd5d2218ba49b8ef98e7affdcab912f84ade) )
+	ROM_LOAD( "9.l3",   0x10000, 0x4000, CRC(918487aa) SHA1(47ba6914722a253f65c733b5edff4d15e73ea6c2) )
+
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "mra3.prm",   0x0000, 0x0020, CRC(ae7e1a63) SHA1(f5596db77c1e352ef7845465db3e54e19cd5df9e) )
+	ROM_LOAD( "mrb3.prm",   0x0020, 0x0020, CRC(e3f3d0f5) SHA1(182b06c9db5bec1e3030f705247763bd2380ba83) )
+ROM_END
+
 
 void mirax_state::init_mirax()
 {
@@ -591,5 +646,6 @@ void mirax_state::init_mirax()
 } // anonymous namespace
 
 
-GAME( 1985, mirax,    0,        mirax,    mirax,  mirax_state, init_mirax, ROT90, "Current Technologies", "Mirax (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, miraxa,   mirax,    mirax,    miraxa, mirax_state, init_mirax, ROT90, "Current Technologies", "Mirax (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, mirax,    0,        mirax,    mirax,  mirax_state, init_mirax, ROT90, "Current Technology, Inc.", "Mirax (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, miraxa,   mirax,    mirax,    miraxa, mirax_state, init_mirax, ROT90, "Current Technology, Inc.", "Mirax (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, miraxb,   mirax,    mirax,    miraxa, mirax_state, init_mirax, ROT90, "Current Technology, Inc.", "Mirax (set 3)", MACHINE_SUPPORTS_SAVE )

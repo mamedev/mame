@@ -31028,8 +31028,9 @@ fiches                          //
 fiches12                        //
 
 @source:misc/mirax.cpp
-mirax                           // (c) 1985 Current Technologies
-miraxa                          // (c) 1985 Current Technologies
+mirax                           // (c) 1985 Current Technology, Inc.
+miraxa                          // (c) 1985 Current Technology, Inc.
+miraxb                          // (c) 1985 Current Technology, Inc.
 
 @source:misc/mirderby.cpp
 mirderby                        // (c) 1988 Home Data?
