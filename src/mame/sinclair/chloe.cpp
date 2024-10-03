@@ -9,6 +9,7 @@
 #include "screen_ula.h"
 #include "spec128.h"
 
+#include "machine/8042kbdc.h"
 #include "machine/spi_sdcard.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -55,6 +56,7 @@ public:
 		, m_io_mouse(*this, "mouse_input%u", 1U)
 		, m_ay(*this, "ay%u", 0U)
 		, m_covox(*this, "covox")
+		, m_kbdc(*this, "pc_kbdc")
 	{}
 
 	void chloe(machine_config &config);
@@ -73,6 +75,7 @@ protected:
 	void map_mem(address_map &map) ATTR_COLD;
 	void map_io(address_map &map) ATTR_COLD;
 
+	void irq_keyboard_w(int state);
 	u8 kbd_fe_r(offs_t offset);
 	u8 divmmc_neutral_r(offs_t offset);
 	u8 divmmc_enable_r(offs_t offset);
@@ -110,6 +113,7 @@ private:
 	required_ioport_array<3> m_io_mouse;
 	required_device_array<ay8912_device, 2> m_ay;
 	required_device<dac_byte_interface> m_covox;
+	required_device<kbdc8042_device> m_kbdc;
 
 	u8 m_timex_mmu;
 	u8 m_port_ff_data;
@@ -584,6 +588,21 @@ void chloe_state::map_regs(address_map &map)
 		m_uno_regs_data[0x01] = data;
 		LOGMEM("UnoMapper %d\n", data);
 	}));
+	map(0x04, 0x04).lr8(NAME([this]() // SCANCODE
+	{
+		u8 dat = m_kbdc->data_r(0);
+		if (dat == 0xf0)
+		{
+			dat = 0;
+			m_kbdc->data_r(0);
+		}
+		return dat;
+	}));
+	map(0x05, 0x05).lr8(NAME([this]() // KBSTATUS
+	{
+		return m_uno_regs_data[0x05];
+	}));
+	// 0x07 KEYMAP
 	map(0x0b, 0x0b).lw8(NAME([this](u8 data)
 	{
 		m_uno_regs_data[0x0b] = data;
@@ -595,6 +614,14 @@ void chloe_state::map_regs(address_map &map)
 		raster_irq_adjust();
 	}));
 	map(0xa0, 0xa6).w(FUNC(chloe_state::dma_reg_w));
+}
+
+void chloe_state::irq_keyboard_w(int state)
+{
+	if (state)
+		m_uno_regs_data[0x05] |= 5;
+	else
+		m_uno_regs_data[0x05] &= ~5;
 }
 
 u8 chloe_state::kbd_fe_r(offs_t offset)
@@ -686,16 +713,16 @@ INPUT_PORTS_START(chloe)
 	PORT_BIT(0xe720, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IO_LINE3") /* 0xF7FE */
-	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1   Tab   !")  PORT_CODE(KEYCODE_1)       PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR('1') PORT_CHAR('!')
-																			PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_TAB) PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2   CLk   @")  PORT_CODE(KEYCODE_2)       PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR('2') PORT_CHAR('@')
-																			PORT_CODE(KEYCODE_F2) PORT_CODE(KEYCODE_CAPSLOCK) PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3   PgU   #")  PORT_CODE(KEYCODE_3)       PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR('3') PORT_CHAR('#')
-																			PORT_CODE(KEYCODE_F3) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4   PgD   $")  PORT_CODE(KEYCODE_4)       PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CHAR('4') PORT_CHAR('$')
-																			PORT_CODE(KEYCODE_F4) PORT_CODE(KEYCODE_PGDN) PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5   Lft   %")  PORT_CODE(KEYCODE_5)       PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR('5') PORT_CHAR('%')
-																			PORT_CODE(KEYCODE_F5) PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1   Tab   !")  PORT_CODE(KEYCODE_1)       PORT_CHAR('1') PORT_CHAR('!')
+																			PORT_CODE(KEYCODE_TAB) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2   CLk   @")  PORT_CODE(KEYCODE_2)       PORT_CHAR('2') PORT_CHAR('@')
+																			PORT_CODE(KEYCODE_CAPSLOCK) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3   PgU   #")  PORT_CODE(KEYCODE_3)       PORT_CHAR('3') PORT_CHAR('#')
+																			PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4   PgD   $")  PORT_CODE(KEYCODE_4)       PORT_CHAR('4') PORT_CHAR('$')
+																			PORT_CODE(KEYCODE_PGDN) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5   Lft   %")  PORT_CODE(KEYCODE_5)       PORT_CHAR('5') PORT_CHAR('%')
+																			PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line3")     PORT_CODE(KEYCODE_TAB) PORT_CODE(KEYCODE_CAPSLOCK) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_PGDN) PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line3")
 	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("! (SS+KEY)")   PORT_CODE(KEYCODE_1)
@@ -706,16 +733,16 @@ INPUT_PORTS_START(chloe)
 	PORT_BIT(0xe020, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IO_LINE4") /* 0xEFFE */
-	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0   BSp   _")  PORT_CODE(KEYCODE_0)       PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CHAR('0') PORT_CHAR('_')
-																			PORT_CODE(KEYCODE_F10) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_0_PAD)
-	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9   Ctr   )")  PORT_CODE(KEYCODE_9)       PORT_CHAR(UCHAR_MAMEKEY(F9)) PORT_CHAR('9') PORT_CHAR(')')
-																			PORT_CODE(KEYCODE_F9) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8   Rgt   (")  PORT_CODE(KEYCODE_8)       PORT_CHAR(UCHAR_MAMEKEY(F8)) PORT_CHAR('8') PORT_CHAR('(')
-																			PORT_CODE(KEYCODE_F8) PORT_CODE(KEYCODE_RIGHT) PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7   Up    '")  PORT_CODE(KEYCODE_7)       PORT_CHAR(UCHAR_MAMEKEY(F7)) PORT_CHAR('7') PORT_CHAR('\'')
-																			PORT_CODE(KEYCODE_F7) PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_QUOTE) PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6   Dwn   &")  PORT_CODE(KEYCODE_6)       PORT_CHAR(UCHAR_MAMEKEY(F6)) PORT_CHAR('6') PORT_CHAR('&')
-																			PORT_CODE(KEYCODE_F6) PORT_CODE(KEYCODE_DOWN) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0   BSp   _")  PORT_CODE(KEYCODE_0)       PORT_CHAR('0') PORT_CHAR('_')
+																			PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9   Ctr   )")  PORT_CODE(KEYCODE_9)       PORT_CHAR('9') PORT_CHAR(')')
+																			PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8   Rgt   (")  PORT_CODE(KEYCODE_8)       PORT_CHAR('8') PORT_CHAR('(')
+																			PORT_CODE(KEYCODE_RIGHT) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7   Up    '")  PORT_CODE(KEYCODE_7)       PORT_CHAR('7') PORT_CHAR('\'')
+																			PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_QUOTE) PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6   Dwn   &")  PORT_CODE(KEYCODE_6)       PORT_CHAR('6') PORT_CHAR('&')
+																			PORT_CODE(KEYCODE_DOWN) PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line4")     PORT_CODE(KEYCODE_BACKSPACE)  PORT_CODE(KEYCODE_RIGHT) PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_DOWN) PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line4")     PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("_ (SS+KEY)")   PORT_CODE(KEYCODE_MINUS)
@@ -950,6 +977,15 @@ void chloe_state::chloe(machine_config &config)
 	DAC_8BIT_R2R(config, m_covox, 0)
 		.add_route(ALL_OUTPUTS, "lspeaker", 0.75)
 		.add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+
+	KBDC8042(config, m_kbdc);
+	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
+	m_kbdc->set_interrupt_type(kbdc8042_device::KBDC8042_SINGLE);
+	m_kbdc->input_buffer_full_callback().set(FUNC(chloe_state::irq_keyboard_w));
+	m_kbdc->set_keyboard_tag("at_keyboard");
+
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 2));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
 
 	SOFTWARE_LIST(config, "cass_list_t").set_original("timex_cass");
 }
