@@ -45790,6 +45790,7 @@ tomcpin                         //
 tomshoot                        //
 tomplc                          //
 tvpc_dor
+tvpc_ham
 tvpc_tom
 
 @source:tvgames/xavix2.cpp
