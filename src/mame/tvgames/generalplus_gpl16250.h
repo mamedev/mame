@@ -149,6 +149,8 @@ public:
 	{
 	}
 
+	virtual uint16_t cs0_r(offs_t offset) override;
+
 	void gameu(machine_config &config);
 
 	void init_gameu();
@@ -158,6 +160,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	uint32_t m_upperbase = 0U;
 
 	void gameu_porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

@@ -628,13 +628,18 @@ void gameu_handheld_game_state::gameu(machine_config &config)
 	m_maincpu->portc_out().set(FUNC(gameu_handheld_game_state::gameu_portc_w));
 	m_maincpu->portd_out().set(FUNC(gameu_handheld_game_state::gameu_portd_w));
 
-	m_screen->set_visarea(0, (160)-1, 0, (120)-1);
+	m_screen->set_visarea(0, (160)-1, 0, (128)-1);
 }
 
 void gormiti_game_state::machine_reset()
 {
 	gcm394_game_state::machine_reset();
 	m_maincpu->set_alt_tile_addressing_hack(1);
+}
+
+uint16_t gameu_handheld_game_state::cs0_r(offs_t offset)
+{
+	return m_romregion[(offset & 0x00fffff) + m_upperbase];
 }
 
 void gameu_handheld_game_state::gameu_porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -657,14 +662,24 @@ void gameu_handheld_game_state::gameu_portc_w(offs_t offset, uint16_t data, uint
 
 void gameu_handheld_game_state::gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	logerror("%s: portd write %04x\n", machine().describe_context(), data);
+	// hacky, maybe we need better direction/attribute handling on the ports in the core?
 	m_portd_data = data;
+	//int pc = m_maincpu->pc();
+	//if ((pc != 0x2b49) && (pc != 0x2b34) && (pc != 0x2b8b) && (pc != 0x2bc0))
+	{
+		printf("%s: portd write %04x %04x\n", machine().describe_context().c_str(), data, mem_mask);
+
+		m_upperbase = (data & 0xfc00) >> 10;
+		m_upperbase *= 0x40000;
+	}
+
 }
 
 void gameu_handheld_game_state::machine_reset()
 {
 	gcm394_game_state::machine_reset();
 	m_maincpu->set_alt_tile_addressing_hack(1);
+	m_upperbase = 0;
 }
 
 void gameu_handheld_game_state::init_gameu()
@@ -684,6 +699,22 @@ void gameu_handheld_game_state::init_gameu()
 
 	m_maincpu->set_alt_tile_addressing_hack(0);
 	m_maincpu->set_disallow_resolution_control();
+
+	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
+
+	ROM[0x19c9a / 2] = 0xF165;
+	ROM[0x19c9c / 2] = 0xF165;
+	ROM[0x19c9e / 2] = 0xF165;
+
+	ROM[0x19cb8 / 2] = 0xF165;
+	ROM[0x19cba / 2] = 0xF165;
+	ROM[0x19cbc / 2] = 0xF165;
+
+	ROM[0x19cd4 / 2] = 0xF165;
+	ROM[0x19cd6 / 2] = 0xF165;
+	ROM[0x19cd8 / 2] = 0xF165;
+
+
 }
 
 
