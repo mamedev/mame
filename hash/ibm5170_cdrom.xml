@@ -4712,6 +4712,32 @@ Untested multiplayer options
 		</part>
 	</software>
 
+	<software name="killaton">
+		<description>Duke Nukem 3D: Kill-A-Ton Collection</description>
+		<year>1997</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="3D Realms / Game Wizards / Sunstorm Interactive" />
+		<info name="language" value="English" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Duke Nukem 1 / Duke Nukem 2 / Duke Nukem 3D / Plutonium Pak / Level Editor" />
+			<diskarea name="cdrom">
+				<disk name="duke nukem 3d kill-a-ton collection disc 1" sha1="862ef195e4d1716add9b2f35c798e56d58404abe" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Game Wizards: Interactive Game Guide" />
+			<diskarea name="cdrom">
+				<disk name="duke nukem 3d kill-a-ton collection disc 2" sha1="7c15f635dfb3986aa016700d6db091759db0c0f0" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Duke Windows 95 Themes / Duke It Out In D.C. / Duke Extreme / Duke!Zone II" />
+			<diskarea name="cdrom">
+				<disk name="duke nukem 3d kill-a-ton collection disc 3" sha1="1eeb6bf9bf1f111979c0809fb78dfe1341b8ecc0" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
 	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
 	<software name="kingsq6e">
