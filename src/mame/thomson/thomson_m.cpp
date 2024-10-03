@@ -2221,6 +2221,7 @@ MACHINE_RESET_MEMBER( to9_state, to9 )
 
 MACHINE_START_MEMBER( to9_state, to9 )
 {
+	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* cartmem = &m_cart_rom[0];
 	uint8_t* ram = m_ram->pointer();
 
@@ -2238,7 +2239,8 @@ MACHINE_START_MEMBER( to9_state, to9 )
 	m_thom_vram = ram;
 	m_thom_cart_bank = 0;
 	m_vrambank->configure_entries( 0,  2, m_thom_vram, 0x2000 );
-	m_cartbank->configure_entries( 0, 12, cartmem, 0x4000 );
+	m_cartbank->configure_entries( 0,  4, cartmem, 0x4000 );
+	m_cartbank->configure_entries( 4,  8, mem + 0x10000, 0x4000 );
 	m_basebank->configure_entry( 0,  ram + 0x4000);
 	m_rambank->configure_entries( 0, 10, ram + 0x8000, 0x4000 );
 	m_vrambank->set_entry( 0 );
@@ -3168,7 +3170,7 @@ MACHINE_START_MEMBER( to9_state, to8 )
 	m_vrambank->configure_entries( 0,  2, ram, 0x2000 );
 	m_syslobank->configure_entry( 0,  ram + 0x6000);
 	m_syshibank->configure_entry( 0,  ram + 0x4000);
-	m_biosbank->configure_entries( 0,  2, mem + 0x20800, 0x2000 );
+	m_biosbank->configure_entries( 0,  2, mem + 0x20000, 0x2000 );
 	m_cartbank->set_entry( 0 );
 	m_vrambank->set_entry( 0 );
 	m_syslobank->set_entry( 0 );
@@ -3300,7 +3302,7 @@ MACHINE_START_MEMBER( to9_state, to9p )
 	m_syshibank->configure_entry( 0,  ram + 0x4000 );
 	m_datalobank->configure_entries( 0, 32, ram + 0x2000, 0x4000 );
 	m_datahibank->configure_entries( 0, 32, ram + 0x0000, 0x4000 );
-	m_biosbank->configure_entries( 0,  2, mem + 0x20800, 0x2000 );
+	m_biosbank->configure_entries( 0,  2, mem + 0x20000, 0x2000 );
 	m_cartbank->set_entry( 0 );
 	m_vrambank->set_entry( 0 );
 	m_syslobank->set_entry( 0 );

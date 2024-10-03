@@ -568,6 +568,9 @@ void thomson_state::to7(machine_config &config)
 {
 	to7_base(config, false);
 
+	MC6809(config.replace(), m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::to7_map);
+
 	/* timer */
 	MC6846(config, m_mc6846, 16_MHz_XTAL / 16);
 	m_mc6846->out_port().set(FUNC(thomson_state::to7_timer_port_out));
@@ -1051,6 +1054,7 @@ void to9_state::to9_map(address_map &map)
 	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(FUNC(to9_state::to770_vram_w));
 	map(0x6000, 0x9fff).bankrw(THOM_BASE_BANK); /* 16 KB */
 	map(0xa000, 0xdfff).bankrw(THOM_RAM_BANK);  /* 10 * 16 KB */
+	map(0xe000, 0xe7bf).rom();
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
@@ -1324,13 +1328,14 @@ void to9_state::to8_map(address_map &map)
 	map(0x8000, 0x9fff).bankr(TO8_SYS_HI).w(FUNC(to9_state::to8_sys_hi_w));
 	map(0xa000, 0xbfff).bankr(TO8_DATA_LO).w(FUNC(to9_state::to8_data_lo_w));
 	map(0xc000, 0xdfff).bankr(TO8_DATA_HI).w(FUNC(to9_state::to8_data_hi_w));
+	map(0xe000, 0xffff).bankr(TO8_BIOS_BANK);
+	map(0xe7c0, 0xe7ff).unmaprw();
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7da, 0xe7dd).rw(FUNC(to9_state::to8_vreg_r), FUNC(to9_state::to8_vreg_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to8_gatearray_r), FUNC(to9_state::to8_gatearray_w));
 /*  map(0xe7f0, 0xe7f7).rw(FUNC(to9_state::to9_ieee_r), FUNC(to9_state::to9_ieee_w )); */
-	map(0xe800, 0xffff).bankr(TO8_BIOS_BANK); /* 2 * 6 KB */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB internal software ROM */
@@ -1524,6 +1529,8 @@ void to9_state::to9p_map(address_map &map)
 	map(0x8000, 0x9fff).bankr(TO8_SYS_HI).w(FUNC(to9_state::to8_sys_hi_w));
 	map(0xa000, 0xbfff).bankr(TO8_DATA_LO).w(FUNC(to9_state::to8_data_lo_w));
 	map(0xc000, 0xdfff).bankr(TO8_DATA_HI).w(FUNC(to9_state::to8_data_hi_w));
+	map(0xe000, 0xffff).bankr(TO8_BIOS_BANK);
+	map(0xe7c0, 0xe7ff).unmaprw();
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
@@ -1531,7 +1538,6 @@ void to9_state::to9p_map(address_map &map)
 	map(0xe7de, 0xe7df).rw(FUNC(to9_state::to9_kbd_r), FUNC(to9_state::to9_kbd_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to8_gatearray_r), FUNC(to9_state::to8_gatearray_w));
 /*  map(0xe7f0, 0xe7f7).rw(FUNC(to9_state::to9_ieee_r), FUNC(to9_state::to9_ieee_w )); */
-	map(0xe800, 0xffff).bankr(TO8_BIOS_BANK); /* 2 * 6 KB */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB internal software ROM */
@@ -1595,7 +1601,7 @@ void to9_state::to9p(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &to9_state::to9p_map);
 
-	m_pia_sys->readpa_handler().set(FUNC(to9_state::to8_sys_porta_in));
+	m_pia_sys->readpa_handler().set(FUNC(to9_state::to9_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
 	m_pia_sys->writepa_handler().set(FUNC(to9_state::to9_sys_porta_out));
 	m_pia_sys->writepb_handler().set(FUNC(to9_state::to8_sys_portb_out));
