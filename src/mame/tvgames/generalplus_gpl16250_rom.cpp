@@ -620,7 +620,12 @@ void gameu_handheld_game_state::gameu(machine_config &config)
 {
 	gcm394_game_state::base(config);
 
+//	m_maincpu->portb_out().set(FUNC(gameu_handheld_game_state::gameu_portb_w)); // portb is very busy on startup
+	// portd is very busy on startup
+	
+	m_maincpu->porta_out().set(FUNC(gameu_handheld_game_state::gameu_porta_w));
 	m_maincpu->portb_out().set(FUNC(gameu_handheld_game_state::gameu_portb_w));
+	m_maincpu->portc_out().set(FUNC(gameu_handheld_game_state::gameu_portc_w));
 	m_maincpu->portd_out().set(FUNC(gameu_handheld_game_state::gameu_portd_w));
 
 	m_screen->set_visarea(0, (160)-1, 0, (120)-1);
@@ -632,16 +637,27 @@ void gormiti_game_state::machine_reset()
 	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
+void gameu_handheld_game_state::gameu_porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: porta write %04x\n", machine().describe_context(), data);
+	m_porta_data = data;
+}
+
 void gameu_handheld_game_state::gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	logerror("%s: portb write %04x\n", machine().describe_context().c_str(), data);
+	logerror("%s: portb write %04x\n", machine().describe_context(), data);
 	m_portb_data = data;
 }
 
+void gameu_handheld_game_state::gameu_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: portc write %04x\n", machine().describe_context(), data);
+	m_portc_data = data;
+}
 
 void gameu_handheld_game_state::gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	printf("%s: portd write %04x\n", machine().describe_context().c_str(), data);
+	logerror("%s: portd write %04x\n", machine().describe_context(), data);
 	m_portd_data = data;
 }
 
