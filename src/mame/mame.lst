@@ -45351,9 +45351,6 @@ rad_baskp
 spidtt
 tsbuzz
 
-@source:tvgames/gameu.cpp
-gameu50
-
 @source:tvgames/generalplus_gpl16250_mobigo.cpp
 mobigo
 mobigos
@@ -45382,6 +45379,7 @@ beambox
 
 @source:tvgames/generalplus_gpl16250_rom.cpp
 beijuehh
+gameu50
 gormiti
 imgame
 myac220

@@ -462,6 +462,15 @@ ROM_START( beijuehh )
 	ROM_LOAD16_WORD_SWAP( "beijeu.bin", 0x0000000, 0x8000000, CRC(e7b968af) SHA1(a39a3a70e6e0827e4395e09e55983eb9e9348e4a) ) // some address lines might be swapped
 ROM_END
 
+
+ROM_START( gameu50 )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )
+	// ROM seems to be divided into 2MByte banks, so could be external banking
+	ROM_LOAD16_WORD_SWAP( "gameu.bin", 0x000000, 0x2000000, CRC(13c42bce) SHA1(f769ceabb8ab4e60c0d663dffd5cca91c6aec206) )
+ROM_END
+
+
+
 void tkmag220_game_state::tkmag220(machine_config &config)
 {
 	gcm394_game_state::base(config);
@@ -617,6 +626,26 @@ void gormiti_game_state::machine_reset()
 }
 
 
+void gcm394_game_state::init_gameu()
+{
+	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+
+	for (int i = 0; i < size/2; i++)
+	{
+		ROM[i] = ROM[i] ^ 0x3b90;
+
+		ROM[i] = bitswap<16>(ROM[i], 8, 7, 13,  15,  4,  5,  12,  10,
+									 3,  1,  11,  9,  6,  14,  0, 2);
+
+		ROM[i] = ((ROM[i] & 0xff00) >> 8) | ((ROM[i] & 0x00ff) << 8);
+	}
+
+	m_maincpu->set_alt_tile_addressing_hack(0);
+}
+
+
+
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
 CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -641,3 +670,6 @@ CONS(201?, beijuehh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  em
 CONS(2013, gormiti,   0, 0, base, gormiti,  gormiti_game_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
+
+// unit looks a bit like a knock-off Wii-U tablet, but much smaller
+CONS( 201?, gameu50,       0,              0,      base, smartfp, gcm394_game_state, init_gameu, "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

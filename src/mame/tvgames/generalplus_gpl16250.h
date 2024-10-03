@@ -45,6 +45,8 @@ public:
 
 	void cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4);
 
+	void init_gameu();
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
