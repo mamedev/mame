@@ -647,7 +647,8 @@ void gameu_handheld_game_state::gameu(machine_config &config)
 	m_maincpu->portc_out().set(FUNC(gameu_handheld_game_state::gameu_portc_w));
 	m_maincpu->portd_out().set(FUNC(gameu_handheld_game_state::gameu_portd_w));
 
-	m_screen->set_visarea(0, (160)-1, 0, (128)-1);
+	m_screen->set_refresh_hz(30); // too fast at 60, but maybe it's for other reasons?
+	m_screen->set_visarea(0, (160)-1, 0, (128)-1); // appears to be the correct resolution for the LCD panel
 }
 
 void gormiti_game_state::machine_reset()
