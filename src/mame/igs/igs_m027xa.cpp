@@ -612,7 +612,7 @@ ROM_END
 ROM_START( crzybugsj ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, Oki M6295, 2x 8-dip banks
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "m6.u42", 0x00000, 0x4000, NO_DUMP ) // sticker marked 'M6'
+	ROM_LOAD( "m6.u42", 0x00000, 0x4000, CRC(ae3a0b2a) SHA1(60265c98278625791cdf6af6b242888e45b6b3bb) ) // sticker marked 'M6'
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-103jp.u34", 0x000000, 0x200000, CRC(1e35ed79) SHA1(0e4f8b706cdfcaf2aacdc40eec422df9d865b311) )
@@ -766,8 +766,8 @@ void igs_m027xa_state::init_crzybugs()
 void igs_m027xa_state::init_crzybugsj()
 {
 	crzybugsj_decrypt(machine());
-	//qlgs_gfx_decrypt(machine());
-	pgm_create_dummy_internal_arm_region();
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027xa_state::init_tripfev()
@@ -795,7 +795,7 @@ GAMEL( 2009, crzybugs,  0,        igs_mahjong_xa_xor, crzybugs, igs_m027xa_state
 GAMEL( 2006, crzybugsa, crzybugs, igs_mahjong_xa_xor, crzybugs, igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", 0, layout_crzybugs ) // IGS FOR V100US 2006 3 29 but also V202US string
 GAMEL( 2005, crzybugsb, crzybugs, igs_mahjong_xa_xor, crzybugs, igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", 0, layout_crzybugs ) // FOR V100US 2005 7 20 but also V200US string
 
-GAME(  2007, crzybugsj, crzybugs, igs_mahjong_xa,     crzybugs, igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", MACHINE_NOT_WORKING ) // IGS FOR V101JP 2007 06 08
+GAMEL( 2007, crzybugsj, crzybugs, igs_mahjong_xa_xor, crzybugs, igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", 0, layout_crzybugs ) // IGS FOR V101JP 2007 06 08
 
 GAMEL( 2006, tripfev,   0,        igs_mahjong_xa_xor, tripfev,  igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V108US)", 0, layout_tripfev )
 GAMEL( 2006, tripfeva,  tripfev,  igs_mahjong_xa_xor, tripfev,  igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", 0, layout_tripfev ) // IGS FOR V107US 2006 09 07
