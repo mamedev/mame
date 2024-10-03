@@ -493,6 +493,17 @@ void thomson_state::to7_base(machine_config &config, bool is_mo)
 
 	INPUT_MERGER_ANY_HIGH(config, "mainfirq").output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
+	if (!is_mo)
+	{
+		/* timer */
+		MC6846(config, m_mc6846, 16_MHz_XTAL / 16);
+		m_mc6846->out_port().set(FUNC(thomson_state::to7_timer_port_out));
+		m_mc6846->in_port().set(FUNC(thomson_state::to7_timer_port_in));
+		m_mc6846->cp2().set("buzzer", FUNC(dac_bit_interface::write));
+		m_mc6846->cto().set(FUNC(thomson_state::to7_set_cassette));
+		m_mc6846->irq().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	}
+
 /* video */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(/*50*/ 1./0.019968);
@@ -570,14 +581,6 @@ void thomson_state::to7(machine_config &config)
 
 	MC6809(config.replace(), m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::to7_map);
-
-	/* timer */
-	MC6846(config, m_mc6846, 16_MHz_XTAL / 16);
-	m_mc6846->out_port().set(FUNC(thomson_state::to7_timer_port_out));
-	m_mc6846->in_port().set(FUNC(thomson_state::to7_timer_port_in));
-	m_mc6846->cp2().set("buzzer", FUNC(dac_bit_interface::write));
-	m_mc6846->cto().set(FUNC(thomson_state::to7_set_cassette));
-	m_mc6846->irq().set("mainirq", FUNC(input_merger_device::in_w<0>));
 }
 
 void thomson_state::t9000(machine_config &config)
@@ -742,7 +745,7 @@ INPUT_PORTS_END
 
 void thomson_state::to770(machine_config &config)
 {
-	to7(config);
+	to7_base(config, false);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to770 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to770 )
 
@@ -1229,8 +1232,7 @@ INPUT_PORTS_END
 
 void to9_state::to9(machine_config &config)
 {
-	to7(config);
-
+	to7_base(config, false);
 	MCFG_MACHINE_START_OVERRIDE( to9_state, to9 )
 	MCFG_MACHINE_RESET_OVERRIDE( to9_state, to9 )
 
@@ -1441,7 +1443,7 @@ INPUT_PORTS_END
 
 void to9_state::to8(machine_config &config)
 {
-	to7(config);
+	to7_base(config, false);
 	MCFG_MACHINE_START_OVERRIDE( to9_state, to8 )
 	MCFG_MACHINE_RESET_OVERRIDE( to9_state, to8 )
 
@@ -1595,7 +1597,7 @@ INPUT_PORTS_END
 
 void to9_state::to9p(machine_config &config)
 {
-	to7(config);
+	to7_base(config, false);
 	MCFG_MACHINE_START_OVERRIDE( to9_state, to9p )
 	MCFG_MACHINE_RESET_OVERRIDE( to9_state, to9p )
 
