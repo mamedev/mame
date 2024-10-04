@@ -5,7 +5,9 @@
 IBM ThinkPad 600 series
 
 TODO:
-- Punts to Flash ROM BIOS Programmer thru serial port terminal;
+- Intel e28f004b5t80 flash ROM;
+- RTC (what's the CMOS here?);
+- keyboard (thru H8/3437);
 
 ===================================================================================================
 
@@ -115,14 +117,6 @@ void thinkpad600_state::mcu_map(address_map &map)
 static INPUT_PORTS_START(thinkpad600)
 INPUT_PORTS_END
 
-void thinkpad600_state::thinkpad600_base(machine_config &config)
-{
-	// TODO: move away, maps on MB resource, bump to H83437
-	h83337_device &mcu(H83337(config, "mcu", XTAL(16'000'000))); // Actually an Hitachi HD64F3437TF, unknown clock
-	mcu.set_addrmap(AS_PROGRAM, &thinkpad600_state::mcu_map);
-//	mcu.set_disable();
-}
-
 void thinkpad600_state::superio_config(device_t *device)
 {
 	pc97338_device &fdc = *downcast<pc97338_device *>(device);
@@ -154,6 +148,14 @@ static void isa_com(device_slot_interface &device)
 static void isa_internal_devices(device_slot_interface &device)
 {
 	device.option_add("pc97338", PC97338);
+}
+
+void thinkpad600_state::thinkpad600_base(machine_config &config)
+{
+	// TODO: move away, maps on MB resource, bump to H83437
+	h83337_device &mcu(H83337(config, "mcu", XTAL(16'000'000))); // Actually an Hitachi HD64F3437TF, unknown clock
+	mcu.set_addrmap(AS_PROGRAM, &thinkpad600_state::mcu_map);
+//  mcu.set_disable();
 }
 
 void thinkpad600_state::thinkpad600e(machine_config &config)
@@ -216,8 +218,16 @@ void thinkpad600_state::thinkpad600(machine_config &config)
 
 
 ROM_START(thinkpad600e)
-	ROM_REGION( 0x80000, "pci:07.0", 0 )
-	ROM_LOAD( "e28f004b5t80-10l1056_rev15_h0399m.u60", 0x00000, 0x80000, CRC(fba7567b) SHA1(a84e7d4e5740150e78e5002714c9125705f3356a) ) // BIOS
+	ROM_REGION( 0x80000, "bios", 0 )
+	ROM_LOAD( "e28f004b5t80-10l1056_rev15_h0399m.u60", 0x00000, 0x80000, CRC(fba7567b) SHA1(a84e7d4e5740150e78e5002714c9125705f3356a) )
+
+	ROM_REGION( 0x80000, "pci:07.0", ROMREGION_ERASEFF )
+	// TODO: in linear mapping it will boot to a terminal only Flash ROM BIOS programmer
+	// 0x40000-0x5ffff contains standard x86 startup, this hookup needs confirmation later on.
+	ROM_COPY( "bios", 0x40000, 0x60000, 0x20000 )
+	ROM_COPY( "bios", 0x60000, 0x40000, 0x20000 )
+	ROM_COPY( "bios", 0x00000, 0x20000, 0x20000 )
+	ROM_COPY( "bios", 0x20000, 0x00000, 0x20000 )
 
 	ROM_REGION(0x0f780, "mcu", 0)
 	ROM_LOAD( "hd64f3437tf-10l1057_rev04_h0499m.u39",  0x00000, 0x0f780, CRC(c21c928b) SHA1(33e3e6966f003655ffc2f3ac07772d2d3245740d) )
@@ -234,7 +244,7 @@ ROM_END
 
 ROM_START(thinkpad600)
 	ROM_REGION( 0x80000,  "pci:07.0", 0 )
-	ROM_LOAD( "tms28f004b_18l9949_rev16-i2298m.u76",   0x00000, 0x80000, CRC(00a52b32) SHA1(08db425b8edb3a036f22beb588caa6f050fc8eb2) ) // BIOS
+	ROM_LOAD( "tms28f004b_18l9949_rev16-i2298m.u76",   0x00000, 0x80000, CRC(00a52b32) SHA1(08db425b8edb3a036f22beb588caa6f050fc8eb2) )
 
 	ROM_REGION(0x0f780, "mcu", 0)
 	ROM_LOAD( "hd64f3437tf_10l9950_rev08_i2798m.u32",  0x00000, 0x0f780, CRC(546ec51c) SHA1(5d9b4be590307c4059ff11c434d0901819427649) )
