@@ -376,9 +376,10 @@ void sc16is741a_device::device_post_load()
 inline void sc16is741a_device::update_irq()
 {
 	bool const pending(
-			(IER_LINE_STATUS_INT()  && (m_interrupts & INTERRUPT_LINE_STATUS)) ||
-			(IER_MODEM_STATUS_INT() && (m_interrupts & INTERRUPT_MODEM_STATUS)) ||
-			(IER_RHR_INT()          && (m_interrupts & (INTERRUPT_RX_TIMEOUT | INTERRUPT_RHR))));
+			(IER_LINE_STATUS_INT()              && (m_interrupts & INTERRUPT_LINE_STATUS)) ||
+			(IER_MODEM_STATUS_INT()             && (m_interrupts & INTERRUPT_MODEM_STATUS)) ||
+			(IER_RHR_INT()                      && (m_interrupts & (INTERRUPT_RX_TIMEOUT | INTERRUPT_RHR))) ||
+			((IER_CTS_INT() || IER_RTS_INT())   && (m_interrupts & INTERRUPT_CTS_RTS)));
 	if (pending != (ASSERT_LINE == m_irq))
 	{
 		LOG(pending ? "asserting IRQ\n" : "deasserting IRQ\n");

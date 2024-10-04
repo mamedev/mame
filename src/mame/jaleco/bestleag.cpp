@@ -36,7 +36,7 @@ public:
 		, m_spriteram(*this, "spriteram")
 	{ }
 
-	void bestleag(machine_config &config);
+	void bestleag(machine_config &config) ATTR_COLD;
 
 protected:
 	tilemap_t *m_tx_tilemap = nullptr;
@@ -82,7 +82,7 @@ public:
 	{ }
 
 protected:
-	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override ATTR_COLD;
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 };
 
 
