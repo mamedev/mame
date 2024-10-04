@@ -51,6 +51,7 @@ spectrum_musicmachine_device::spectrum_musicmachine_device(const machine_config 
 
 void spectrum_musicmachine_device::device_start()
 {
+	save_item(NAME(m_irq_select));
 }
 
 //-------------------------------------------------
@@ -75,9 +76,9 @@ u8 spectrum_musicmachine_device::iorq_r(offs_t offset)
 	switch (offset & 0xff)
 	{
 		case 0x7f:
-			if (offset == 0xfc7f)
+			if ((offset & 0x3ff) == 0x27f)
 				data = m_acia->status_r();
-			else
+			else if ((offset & 0x3ff) == 0x37f)
 				data = m_acia->data_r();
 			break;
 		case 0xbf:
@@ -99,9 +100,9 @@ void spectrum_musicmachine_device::iorq_w(offs_t offset, u8 data)
 			m_irq_select = data & 1;
 			break;
 		case 0x7f:
-			if (offset == 0xfc7f)
+			if ((offset & 0x3ff) == 0x07f)
 				m_acia->control_w(data);
-			else
+			else if ((offset & 0x3ff) == 0x17f)
 				m_acia->data_w(data);
 			break;
 		case 0x9f:
