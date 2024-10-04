@@ -41,6 +41,7 @@
 
 #include "logmacro.h"
 
+
 namespace {
 
 constexpr u8 DATA_RESPONSE_OK        = 0x05;
@@ -152,16 +153,17 @@ spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type 
 	write_miso(*this),
 	m_image(*this, "image"),
 	m_preferred_type(SD_TYPE_V2),
-	m_ignore_stop_bit(false),
 	m_blksize(512),
 	m_type(SD_TYPE_V2),
 	m_state(SD_STATE_IDLE),
 	m_ss(0), m_in_bit(0), m_clk_state(0),
 	m_in_latch(0), m_out_latch(0xff), m_cur_bit(0),
 	m_out_delay(0), m_out_count(0), m_out_ptr(0), m_write_ptr(0), m_xferblk(512), m_blknext(0),
+	m_crc_off(true),
 	m_bACMD(false)
 {
 	std::fill(std::begin(m_csd), std::end(m_csd), 0);
+	std::fill(std::begin(m_cmd), std::end(m_cmd), 0xff);
 }
 
 spi_sdcard_device::~spi_sdcard_device()
@@ -187,6 +189,7 @@ void spi_sdcard_device::device_start()
 	save_item(NAME(m_write_ptr));
 	save_item(NAME(m_xferblk));
 	save_item(NAME(m_blknext));
+	save_item(NAME(m_crc_off));
 	save_item(NAME(m_bACMD));
 }
 
@@ -238,6 +241,7 @@ std::error_condition spi_sdcard_device::image_loaded(device_image_interface &ima
 	}
 
 	m_blksize = m_xferblk = info.sectorbytes;
+	m_crc_off = true;
 
 	// set up common CSD fields
 	m_csd[0]  =  0x00;                                       // 127: CSD_STRUCTURE:2 (00b) 0:6
@@ -354,6 +358,26 @@ void spi_sdcard_device::spi_clock_w(int state)
 	m_clk_state = state;
 }
 
+void spi_sdcard_device::spi_ss_w(int state)
+{
+	if (!m_ss && state)
+	{
+		LOGMASKED(LOG_SPI, "SDCARD: selected\n");
+		std::fill(std::begin(m_cmd), std::end(m_cmd), 0xff);
+		m_state = SD_STATE_IDLE;
+		m_in_latch = 0;
+		m_cur_bit = 0;
+		m_out_latch = 0xff;
+		m_out_delay = 0;
+		m_out_count = 0;
+	}
+	else if (m_ss && !state)
+	{
+		LOGMASKED(LOG_SPI, "SDCARD: deselected\n");
+	}
+	m_ss = state;
+}
+
 void spi_sdcard_device::latch_in()
 {
 	m_in_latch &= ~0x01;
@@ -446,7 +470,7 @@ void spi_sdcard_device::shift_out()
 
 void spi_sdcard_device::do_command()
 {
-	if (((m_cmd[0] & 0xc0) == 0x40) && ((m_cmd[5] & 1) || m_ignore_stop_bit))
+	if (((m_cmd[0] & 0xc0) == 0x40) && ((m_cmd[5] & 1) || m_crc_off))
 	{
 		LOGMASKED(LOG_COMMAND, "SDCARD: cmd %02d %02x %02x %02x %02x %02x\n", m_cmd[0] & 0x3f, m_cmd[1], m_cmd[2], m_cmd[3], m_cmd[4], m_cmd[5]);
 		bool clean_cmd = true;
@@ -682,8 +706,8 @@ void spi_sdcard_device::do_command()
 			break;
 
 		case 59: // CMD59 - CRC_ON_OFF
+			m_crc_off = !BIT(m_cmd[4], 0);
 			m_data[0] = 0;
-			// TODO CRC 1-on, 0-off
 			send_data(1, SD_STATE_STBY);
 			break;
 

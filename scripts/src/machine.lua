@@ -3322,6 +3322,17 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/sc16is741.h,MACHINES["SC16IS741"] = true
+---------------------------------------------------
+if (MACHINES["SC16IS741"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sc16is741.cpp",
+		MAME_DIR .. "src/devices/machine/sc16is741.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/scc66470.h,MACHINES["SCC66470"] = true
 ---------------------------------------------------
 if (MACHINES["SCC66470"]~=null) then

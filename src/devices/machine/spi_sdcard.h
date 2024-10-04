@@ -18,12 +18,11 @@ public:
 
 	void set_prefer_sd() { m_preferred_type = SD_TYPE_V2; }
 	void set_prefer_sdhc() { m_preferred_type = SD_TYPE_HC; }
-	void set_ignore_stop_bit(bool ignore) { m_ignore_stop_bit = ignore; }
 
 	// SPI 4-wire interface
 	auto spi_miso_callback() { return write_miso.bind(); }
 	void spi_clock_w(int state);
-	void spi_ss_w(int state) { m_ss = state; }
+	void spi_ss_w(int state);
 	void spi_mosi_w(int state) { m_in_bit = state; }
 
 	bool get_card_present() { return m_image->exists(); }
@@ -62,7 +61,6 @@ private:
 
 	// configuration
 	sd_type m_preferred_type;
-	bool m_ignore_stop_bit;
 
 	// mounted image info
 	std::vector<u8> m_sectorbuf;
@@ -80,6 +78,7 @@ private:
 	u16 m_out_count, m_out_ptr, m_write_ptr;
 	u16 m_xferblk;
 	u32 m_blknext;
+	bool m_crc_off;
 	bool m_bACMD;
 };
 

@@ -19767,6 +19767,9 @@ gsz80                           // Grant Searle's Simple Z-80 Machine
 @source:homebrew/homez80.cpp
 homez80                         //
 
+@source:homebrew/linux4004.cpp
+lnux4004
+
 @source:homebrew/lft_chiptune.cpp
 powernin                        // Power Ninja Action Challenge, by [lft] (2009)
 hwchiptn                        // The Hardware Chiptune Project, by [lft] and kryo (2007)
