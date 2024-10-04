@@ -101,6 +101,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 
 		uint8_t kanji_sel = 0;
 		uint8_t kanji_lr = 0;
+		uint8_t tile_lr = 0;
 
 		uint16_t tile = m_video_ram[0][tile_addr & 0xfff] & 0xff;
 		uint8_t knj_tile = m_video_ram[0][tile_addr & 0xfff] >> 8;
@@ -115,7 +116,12 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 			tile <<= 8;
 			tile |= (knj_tile & 0x7f);
 			kanji_sel = 1;
-			if(((tile & 0x7c00) == 0x0800) || ((tile & 0xfe00) == 0x5600)) // 8x16 charset selector
+			if((tile & 0xfe00) == 0x5600)
+			{
+				tile_lr = knj_tile & 0x80 ? 1 : 0;
+				x_step = 1;
+			}
+			else if((tile & 0x7c00) == 0x0800)  // 8x16 charset selector
 				x_step = 1;
 			else
 				x_step = 2;
@@ -128,7 +134,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 		{
 			/* Rori Rori Rolling definitely uses different colors for brake stop PCG elements,
 			   assume that all attributes are recalculated on different strips */
-			uint8_t attr = (m_video_ram[0][((tile_addr+kanji_lr) & 0xfff) | 0x1000] & 0xff);
+			uint8_t attr = (m_video_ram[0][((tile_addr+kanji_lr+tile_lr) & 0xfff) | 0x1000] & 0xff);
 
 			uint8_t secret = (attr & 1) ^ 1;
 			uint8_t blink = attr & 2;
@@ -193,7 +199,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 							tile_data = ((tile >> gfx_bit) & 1) ? 0xff : 0x00;
 						}
 						else if(kanji_sel)
-							tile_data = (m_kanji_rom[tile*0x20+yi*2+kanji_lr]);
+							tile_data = (m_kanji_rom[tile*0x20+yi*2+kanji_lr+tile_lr]);
 						else
 							tile_data = (m_char_rom[tile*char_size+m_video_ff[FONTSEL_REG]*0x800+yi]);
 					}
