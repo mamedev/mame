@@ -21057,11 +21057,11 @@ Missing [7220] text selector for choices
 		<year>1992</year>
 		<publisher>Ｍ．Ｎ．Ｍ．ソフトウェア (M.N.M. Software)</publisher>
 		<notes><![CDATA[
-Hangs on "Welcome to world of Mick Albart" message, [FDC] copy protection?
-Has a seizure when entering gameplay
+Non-functional in gameplay, random tileset
 ]]></notes>
 		<info name="alt_title" value="ゲイジ" />
 		<info name="release" value="19920925" />
+		<info name="usage" value="On first run boot user maker and a writable blank disk then follow instructions" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Game"/>
 			<dataarea name="flop" size="1281968">
@@ -23586,11 +23586,14 @@ TODO: to install to HDD should be "INST1.BAT B: A:<folder>" but it fails recogni
 		</part>
 	</software>
 
-	<!-- Doesn't recognize disk on disk swap prompt (even if game is actually installed on HDD) -->
 	<software name="headqrt" supported="no">
 		<description>Headquarters - America no Akumu</description>
 		<year>1994</year>
 		<publisher>アルゴラボ 算法研究所 (Algolab)</publisher>
+		<notes><![CDATA[
+Installs fine but then asks for disk inserted in-game, fails to identify (copy protection?)
+Draws garbage GVRAM during install (verify)
+]]></notes>
 		<info name="alt_title" value="ヘッドクォーターズ アメリカの悪夢" />
 		<info name="release" value="19940520" />
 		<part name="flop1" interface="floppy_5_25">
@@ -41281,6 +41284,9 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt
 		<description>Space Invaders</description>
 		<year>1992</year>
 		<publisher>ウィズ (Wiz)</publisher>
+		<notes><![CDATA[
+OPN channel 1 keeps repeating on deaths (verify)
+]]></notes>
 		<info name="alt_title" value="スペースインベーダー" />
 		<info name="release" value="19920131" />
 		<part name="flop1" interface="floppy_5_25">
@@ -41383,7 +41389,6 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt
 	<software name="spcstage">
 		<description>Special Stage - Paris-Dakar Sabaku no Shissou</description>
 		<year>1992</year>
-		<!-- Takeru alt label? -->
 		<publisher>アレックス (Allex)</publisher>
 		<info name="alt_title" value="スペシャルステージ ～パリダカール砂漠の疾走～" />
 		<info name="release" value="19920330" />
@@ -53763,12 +53768,13 @@ Hangs after name entry with illegal opcode 0f 0e at PC=FF2C3
 		</part>
 	</software>
 
-	<software name="molemole" supported="no">
+	<software name="molemole" supported="yes">
 		<description>Mole Mole</description>
 		<year>1985</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<info name="alt_title" value="モールモール" />
 		<info name="release" value="198508xx" />
+		<info name="usage" value="Requires a vanilla or VM class with 2HD floppy drive" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089808">
 				<rom name="mole.nfd" size="1089808" crc="e555b848" sha1="8123c7e10f7e77d7ea1d2e0d6e6d8349833bd0b0" offset="0" />
