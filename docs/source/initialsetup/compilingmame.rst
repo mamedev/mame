@@ -757,7 +757,7 @@ the Microsoft Windows SDK, you must do one of the following:
   Visual Studio project files.  This will set the target Windows version to
   Windows 8 (6.2).  The resulting binaries may not run on earlier versions of
   Windows.
-* Install the DirectX SDK (already included since Windows 8.0 SDK and
+* Install the `DirectX SDK <https://www.microsoft.com/en-US/download/details.aspx?id=6812>`_ (already included since Windows 8.0 SDK and
   automatically installed with Visual Studio 2013 and later).  Configure the
   **osd_windows** project to search the DirectX header/library paths before
   searching the Microsoft Windows SDK paths.
