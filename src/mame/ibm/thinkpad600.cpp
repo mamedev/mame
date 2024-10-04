@@ -1,7 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:
-/*************************************************************************************************************
-Skeleton driver for IBM ThinkPad 600 series.
+// copyright-holders: Angelo Salese
+/**************************************************************************************************
+
+IBM ThinkPad 600 series
+
+TODO:
+- Punts to Flash ROM BIOS Programmer thru serial port terminal;
+
+===================================================================================================
+
 The IBM ThinkPad 600 series was a series of notebook computers introduced in 1998 by IBM as an lighter and
 slimmer alternative to the 770 series. Three models were produced, the 600, 600E, and 600X.
 
@@ -46,9 +53,16 @@ Hardware for the 600 model.
     -TI TCM320AC36C (Voice-Band Audio Processor [VBAPE]).
     -Large BGA chip silkscreened "IPI I8L7360 F27904A".
 
-*************************************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
+
+#include "bus/isa/isa_cards.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/h8/h83337.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
@@ -58,7 +72,7 @@ Hardware for the 600 model.
 #include "machine/i82371eb_ide.h"
 #include "machine/i82371eb_acpi.h"
 #include "machine/i82371eb_usb.h"
-#include "bus/isa/isa_cards.h"
+#include "machine/pc97338.h"
 
 #include "speaker.h"
 
@@ -85,7 +99,7 @@ private:
 	void main_map(address_map &map);
 	void mcu_map(address_map &map);
 
-	//static void superio_config(device_t *device);
+	static void superio_config(device_t *device);
 };
 
 void thinkpad600_state::main_map(address_map &map)
@@ -106,16 +120,41 @@ void thinkpad600_state::thinkpad600_base(machine_config &config)
 	// TODO: move away, maps on MB resource, bump to H83437
 	h83337_device &mcu(H83337(config, "mcu", XTAL(16'000'000))); // Actually an Hitachi HD64F3437TF, unknown clock
 	mcu.set_addrmap(AS_PROGRAM, &thinkpad600_state::mcu_map);
+//	mcu.set_disable();
 }
 
-//void thinkpad600_state::superio_config(device_t *device)
-//{
-//}
+void thinkpad600_state::superio_config(device_t *device)
+{
+	pc97338_device &fdc = *downcast<pc97338_device *>(device);
+//  fdc.set_sysopt_pin(1);
+//  fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+//  fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+}
 
-//static void isa_internal_devices(device_slot_interface &device)
-//{
-//  device.option_add("w83787f", W83787F);
-//}
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+}
+
+static void isa_internal_devices(device_slot_interface &device)
+{
+	device.option_add("pc97338", PC97338);
+}
 
 void thinkpad600_state::thinkpad600e(machine_config &config)
 {
@@ -124,7 +163,7 @@ void thinkpad600_state::thinkpad600e(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 	m_maincpu->smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
 
-	// TODO: PCI config space guessed from a Fujitsu Lifebook
+	// TODO: PCI config space guessed from a Fujitsu Lifebook, confirm me for ThinkPad
 	PCI_ROOT(config, "pci", 0);
 	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu));
@@ -145,7 +184,21 @@ void thinkpad600_state::thinkpad600e(machine_config &config)
 //  TODO: NeoMagic at "pci:14.0" / "pci:14.1" (video & AC'97 integrated sound, likely requires BIOS)
 
 //  TODO: motherboard Super I/O resource here
-//  ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "pc97338", true).set_option_machine_config("pc97338", superio_config);
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "pc97338", true).set_option_machine_config("pc97338", superio_config);
+
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	serport0.rxd_handler().set("board4:pc97338", FUNC(pc97338_device::rxd1_w));
+	serport0.dcd_handler().set("board4:pc97338", FUNC(pc97338_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:pc97338", FUNC(pc97338_device::ndsr1_w));
+	serport0.ri_handler().set("board4:pc97338", FUNC(pc97338_device::nri1_w));
+	serport0.cts_handler().set("board4:pc97338", FUNC(pc97338_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board4:pc97338", FUNC(pc97338_device::rxd2_w));
+	serport1.dcd_handler().set("board4:pc97338", FUNC(pc97338_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:pc97338", FUNC(pc97338_device::ndsr2_w));
+	serport1.ri_handler().set("board4:pc97338", FUNC(pc97338_device::nri2_w));
+	serport1.cts_handler().set("board4:pc97338", FUNC(pc97338_device::ncts2_w));
 
 	thinkpad600_base(config);
 }
@@ -155,7 +208,7 @@ void thinkpad600_state::thinkpad600(machine_config &config)
 	PENTIUM2(config, m_maincpu, 300'000'000); // Intel Pentium II 300 Mobile MMC-1 (PMD30005002AA)
 	m_maincpu->set_disable();
 
-	// TODO: fill me, uses earlier AB
+	// TODO: fill me, uses earlier PIIX4 AB
 	PCI_ROOT(config, "pci", 0);
 
 	thinkpad600_base(config);

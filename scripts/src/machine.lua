@@ -4476,6 +4476,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/pc97338.h,MACHINES["PC97338"] = true
+---------------------------------------------------
+
+if (MACHINES["PC97338"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pc97338.cpp",
+		MAME_DIR .. "src/devices/machine/pc97338.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/w83787f.h,MACHINES["W83787F"] = true
 ---------------------------------------------------
 
