@@ -27724,6 +27724,9 @@ triviayp                        // (c) 1984
 triviaes4                       // (c) 1988 (Maibesa hardware)
 triviaes5                       // (c) 19?? (Maibesa hardware)
 
+@source:midway/cashline.cpp
+cashline                        // (c) 1981 Bally/Sente
+
 @source:midway/gridlee.cpp
 gridlee                         // [1983 Videa] prototype - no copyright notice
 
