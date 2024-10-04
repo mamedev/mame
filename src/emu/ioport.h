@@ -1203,7 +1203,7 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 	configurer.field_set_optional();
 
 #define PORT_GM_NOTE(_id) \
-    configurer.field_set_gm_note(_id);
+	configurer.field_set_gm_note(_id);
 
 // analog settings
 // if this macro is not used, the minimum defaults to 0 and maximum defaults to the mask value
