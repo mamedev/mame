@@ -126,7 +126,7 @@ enum sc16is741a_device::interrupt : u8
 	INTERRUPT_MODEM_STATUS  = 0x08,
 	INTERRUPT_XOFF          = 0x04,
 	INTERRUPT_SPECIAL_CHAR  = 0x02,
-	INTERRUPT_RTS_CTS       = 0x01
+	INTERRUPT_CTS_RTS       = 0x01
 };
 
 
@@ -254,6 +254,11 @@ void sc16is741a_device::cts_w(int state)
 	if (bool(state) != bool(m_cts))
 	{
 		m_interrupts |= INTERRUPT_MODEM_STATUS;
+		if (state && IER_CTS_INT() && !(m_interrupts & INTERRUPT_CTS_RTS))
+		{
+			LOG("CTS deasserted, setting CTS interrupt\n");
+			m_interrupts |= INTERRUPT_CTS_RTS;
+		}
 		update_irq();
 	}
 	m_cts = state ? 1 : 0;
@@ -572,12 +577,20 @@ inline void sc16is741a_device::iir_r(bool first)
 		else if (IER_THR_INT() && (m_interrupts & INTERRUPT_THR))
 		{
 			m_buffer |= 0x02;
+
 			LOG("clearing THR interrupt\n");
 			m_interrupts &= ~INTERRUPT_THR;
 		}
 		else if (IER_MODEM_STATUS_INT() && (m_interrupts & INTERRUPT_MODEM_STATUS))
 		{
 			m_buffer |= 0x00;
+		}
+		else if ((IER_CTS_INT() || IER_RTS_INT()) && (m_interrupts & INTERRUPT_CTS_RTS))
+		{
+			m_buffer |= 0x20;
+
+			LOG("clearing CTS/RTS interrupt\n");
+			m_interrupts &= ~INTERRUPT_CTS_RTS;
 		}
 
 		LOG("read IIR (0x%1$02x)\n", m_buffer);
@@ -1144,12 +1157,24 @@ TIMER_CALLBACK_MEMBER(sc16is741a_device::rx_shift)
 				if (level >= (trigger * 4))
 				{
 					LOG("RX FIFO level %1$u exceeds %2$u*4, deasserting RTS\n", level, trigger);
+					if (IER_RTS_INT() && !(m_interrupts & INTERRUPT_CTS_RTS))
+					{
+						LOG("setting RTS interrupt\n");
+						m_interrupts |= INTERRUPT_CTS_RTS;
+						update_irq();
+					}
 					set_rts(1);
 				}
 			}
 			else
 			{
 				LOG("RHR full, deasserting RTS\n");
+				if (IER_RTS_INT() && !(m_interrupts & INTERRUPT_CTS_RTS))
+				{
+					LOG("setting RTS interrupt\n");
+					m_interrupts |= INTERRUPT_CTS_RTS;
+					update_irq();
+				}
 				set_rts(1);
 			}
 		}

@@ -9,9 +9,9 @@
 #include "bus/bml3/bml3bus.h"
 #include "imagedev/cassette.h"
 #include "machine/6850acia.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "sound/ymopn.h"
-#include "machine/timer.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
