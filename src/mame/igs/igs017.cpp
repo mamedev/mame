@@ -26,6 +26,7 @@ Year + Game                                   PCB        CPU    Sound           
 99  Tarzan (V107)                             NO-0228?   Z180   U6295           IGS031 IGS025 IGS029  Battery
 99  Tarzan (V109C)                            NO-0248-1  Z180   U6295           IGS031 IGS025         Battery
 00  Chaoji Damanguan 2 - Jiaqiang Ban (V100C) NO-0271    68000  K668            IGS031 IGS025         Battery
+00? Jungle King (V103A)                       NO-0230-1  Z180   U6295           IGS031 IGS025 (N9)    Battery
 00? Super Tarzan (V100I)                      NO-0230-1  Z180   K668            IGS031 IGS025         Battery
 00? Happy Skill (V611IT)                      NO-0281    Z180   K668            IGS031 IGS025         Battery
 00? Champion Poker 2 (V100A)                  unreadable Z180   M6295           IGS031 IGS025         Battery
@@ -658,6 +659,7 @@ public:
 	void init_cpoker2();
 	void init_happyskl();
 	void init_iqblocka();
+	void init_jking103a();
 	void init_lhzb2();
 	void init_lhzb2a();
 	void init_mgcs();
@@ -1324,6 +1326,15 @@ void igs017_state::init_starzan()
 	m_igs017_igs031->starzan_decrypt_sprites(0x200000, 0x400000);
 
 //  m_igs_string->dump("starzan_string.key", 0xa86f, 0xa966, false);
+}
+
+void igs017_state::init_jking103a()
+{
+	starzan_decrypt_program_rom();
+	m_igs017_igs031->tarzan_decrypt_tiles(1);
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+
+// m_igs_string->dump("jking103a_string.key", 0xb14d, 0xb244, false);
 }
 
 
@@ -5680,6 +5691,28 @@ ROM_START( tarzanc )
 	ROM_LOAD( "tarzan_string.key", 0x00, 0xec, CRC(595fe40c) SHA1(0b46983400d237d8bde97a72eaa99b718a03387e) )
 ROM_END
 
+// IGS PCB NO-0248
+ROM_START( tarzanb ) // V110 TARZAN C
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "t.z._v110.u19", 0x00000, 0x40000, CRC(16026d12) SHA1(df08641b4bc1437648f0a8cd5f7a8a4786c07041) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", ROMREGION_ERASE00 )
+	ROM_LOAD( "igs_a2103_cg_v100f.u15", 0x000000, 0x200000, CRC(afe56ed5) SHA1(656cee6a59f2930eec9acd11b84b416cc7354e01) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "t.z._text_u5.u5", 0x00000, 0x80000, CRC(1724e039) SHA1(d628499b61f98f7c9034d70b82ee25e002190ece) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102_sp_v102.u14", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
+
+	ROM_REGION( 0x2dd * 2, "plds", ROMREGION_ERASE )
+	ROM_LOAD( "eg.u20", 0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "eg.u21", 0x2dd, 0x2dd, NO_DUMP )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "tarzanb_string.key", 0x00, 0xec, CRC(595fe40c) SHA1(0b46983400d237d8bde97a72eaa99b718a03387e) )
+ROM_END
+
 // sets below are guesswork, assembled from partial dumps...
 
 // IGS NO-0248-1? Mislabeled?
@@ -5727,27 +5760,6 @@ ROM_START( tarzana )
 	ROM_LOAD( "tarzan_string.key", 0x00, 0xec, CRC(595fe40c) SHA1(0b46983400d237d8bde97a72eaa99b718a03387e) )
 ROM_END
 
-// IGS PCB NO-0248
-ROM_START( tarzanb ) // V110 TARZAN C
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "t.z._v110.u19", 0x00000, 0x40000, CRC(16026d12) SHA1(df08641b4bc1437648f0a8cd5f7a8a4786c07041) )
-
-	ROM_REGION( 0x400000, "igs017_igs031:sprites", ROMREGION_ERASE00 )
-	ROM_LOAD( "igs_a2103_cg_v100f.u15", 0x000000, 0x200000, CRC(afe56ed5) SHA1(656cee6a59f2930eec9acd11b84b416cc7354e01) )
-
-	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "t.z._text_u5.u5", 0x00000, 0x80000, CRC(1724e039) SHA1(d628499b61f98f7c9034d70b82ee25e002190ece) )
-
-	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "igs_s2102_sp_v102.u14", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
-
-	ROM_REGION( 0x2dd * 2, "plds", ROMREGION_ERASE )
-	ROM_LOAD( "eg.u20", 0x000, 0x2dd, NO_DUMP )
-	ROM_LOAD( "eg.u21", 0x2dd, 0x2dd, NO_DUMP )
-
-	ROM_REGION( 0xec, "igs_string", 0 )
-	ROM_LOAD( "tarzanb_string.key", 0x00, 0xec, CRC(595fe40c) SHA1(0b46983400d237d8bde97a72eaa99b718a03387e) )
-ROM_END
 
 /***************************************************************************
 
@@ -5820,6 +5832,29 @@ ROM_START( starzan )
 	ROM_LOAD( "starzan_string.key", 0x00, 0xec, CRC(b33f5050) SHA1(900d3c48944dbdd95d9e48d74c355e82e00ac012) )
 ROM_END
 
+// default settings password is all start button
+ROM_START( jking103a )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "jungleking_v103a.u9", 0x00000, 0x40000, CRC(acd23f7e) SHA1(84d487c240d6773c81c04ee12a4aafa7e34affc7) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a2104_cg_v110.u3", 0x00000, 0x400000, CRC(dcbff16f) SHA1(2bf77ef4448c26124c8d8d18bb7ffe4105cfa940) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	// empty u2
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_t2105_cg_v110.u11", 0x00000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102_sp_v102.u8", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
+
+	ROM_REGION( 0x2dd * 2, "plds", ROMREGION_ERASE )
+	ROM_LOAD( "eg.u20", 0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "eg.u21", 0x2dd, 0x2dd, NO_DUMP )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "jking103a_string.key", 0x00, 0xec, BAD_DUMP CRC(8d288f5e) SHA1(19c184600d80838ef04be8ab29c93d91cf3161c9) ) // TODO: check this
+ROM_END
+
 
 /***************************************************************************
 
@@ -5855,18 +5890,17 @@ ROM_START( happyskl )
 ROM_END
 
 
-// PCB was heavily corroded and not working
+// dump confirmed from two PCBs
 ROM_START( cpoker2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "u9.bin", 0x00000, 0x40000, CRC(8d79eb4d) SHA1(9cad09013f83335ec78c3ff78715bc5d9a989eb7) )
+	ROM_LOAD( "champion_2_v100a.u9", 0x00000, 0x40000, CRC(8d79eb4d) SHA1(9cad09013f83335ec78c3ff78715bc5d9a989eb7) )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
-	// the following ROM wasn't readable on this PCB, but it's the same as the one in happyskl. Assuming same contents for now
-	ROM_LOAD( "igs_a2701_cg_v100.u3", 0x00000, 0x400000, BAD_DUMP CRC(f3756a51) SHA1(8dd4677584f309cec4b068be9f9370a7a172a031) ) // FIXED BITS (xxxxxxx0xxxxxxxx) - 1xxxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD( "igs_a2701_cg_v100.u3", 0x00000, 0x400000, CRC(f3756a51) SHA1(8dd4677584f309cec4b068be9f9370a7a172a031) )
 	// U2 (overlay) not populated
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "u11.bin", 0x00000, 0x80000, CRC(34475c83) SHA1(376ff68d89c25471483b074dcf7542f42f954e67) ) // 1xxxxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD( "champion_2_text.u11", 0x00000, 0x80000, CRC(34475c83) SHA1(376ff68d89c25471483b074dcf7542f42f954e67) ) // 1xxxxxxxxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "igs_s2702_sp_v100.u8", 0x00000, 0x80000, CRC(0ec9b1b5) SHA1(b8c7e068ddf6777a184339e6796be33e442a3df4) ) // same as happyskl
@@ -5940,6 +5974,7 @@ GAME ( 1999,  tarzana,  tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzana
 GAME ( 1999,  tarzanb,  tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzanc,  ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V110)",                             0 )
 GAME ( 2000,  sdmg2p,   0,        sdmg2p,   sdmg2p,   igs017_state, init_sdmg2p,   ROT0, "IGS", "Maque Wangchao / Chaoji Damanguan 2 - Jiaqiang Ban (China, V100C)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 麻雀王朝 / 超級大滿貫 2 -加強版 protection kicks in after starting game, hopper isn't hooked up correctly
 GAMEL( 2000?, starzan,  0,        starzan,  starzan,  igs017_state, init_starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                  0, layout_igsslot  )
+GAMEL( 2000?, jking103a,starzan,  starzan,  starzan,  igs017_state, init_jking103a,ROT0, "IGS", "Jungle King (V103A)",                                               0, layout_igsslot )
 GAMEL( 2000?, happyskl, 0,        happyskl, happyskl, igs017_state, init_happyskl, ROT0, "IGS", "Happy Skill (Italy, V611IT)",                                       0, layout_igspoker )
 GAMEL( 2000?, cpoker2,  0,        cpoker2,  cpoker2,  igs017_state, init_cpoker2,  ROT0, "IGS", "Champion Poker 2 (V100A)",                                          0, layout_igspoker )
 GAME ( 2000?, spkrform, spk306us, spkrform, spkrform, igs017_state, init_spkrform, ROT0, "IGS", "Super Poker (V100xD03) / Formosa",                                  MACHINE_UNEMULATED_PROTECTION ) // poker game enabling forced with a patch. Parent spk306us in driver spoker.cpp

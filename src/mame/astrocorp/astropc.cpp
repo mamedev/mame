@@ -309,7 +309,7 @@ ROM_END
 // Astro ROHS (GFX chip?) and 2x LY621024SL RAMs.
 
 
-// main PCB: unmarked with AMD Geode CS5536AD, W83627HG-AW IOC, RTL8100C ethernet controller, big heat-sinked chip,
+// main PCB: unmarked with AMD Geode CS5536AD, W83627HG-AW IOC, RTL8100C ethernet controller, AMD GEODE ALXD800EEXJ2VD (heat-sinked),
 // 4x HY5DU121622CTP SRAM (mounted on SO-DIMM), Realtek ALC203 + Yamaha YDA138-E (mounted on Yamaha_Audio_A riser board)
 // with 24.576 MHz XTAL, Trascend Compact Flash
 ROM_START( carnivac )
@@ -324,8 +324,8 @@ ROM_START( carnivac )
 	ROM_LOAD( "carnival_us.004.d.img", 0x0000, 0xf618000, CRC(566b9fbf) SHA1(14364b05151db60b1882c2230d896ac8c632395b) )
 ROM_END
 
-// main PCB: Astro AS-LX800 A5 with AMD Geode CS5536AD, big heat-sinked chip, 4x HY5DU121622CTP SRAM (directly on PCB),
-// Realtek ALC203 + Yamaha YDA138-E with 24.576 MHz XTAL (directly on PCB), Trascend Compact Flash
+// main PCB: Astro AS-LX800 A5 with AMD Geode CS5536AD, RTL8100C ethernet controller, AMD GEODE ALXD800EEXJ2VD (heat-sinked),
+// 4x HY5DU121622CTP SRAM (directly on PCB), Realtek ALC203 + Yamaha YDA138-E with 24.576 MHz XTAL (directly on PCB), Trascend Compact Flash
 ROM_START( santacl )
 	ROM_REGION32_LE(0x80000, "pci:12.0", 0)
 	ROM_LOAD( "phoenixbios.u30", 0x00000, 0x80000, CRC(4e24ffdb) SHA1(8b4bba02183da5eae27755b86eca830d06fe05ae) )
