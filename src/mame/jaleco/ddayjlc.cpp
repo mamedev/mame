@@ -2,16 +2,14 @@
 // copyright-holders:Pierpaolo Prazzoli, Tomasz Slanina, Angelo Salese
 /*
 
-    D-DAY   (c)Jaleco 1984
+D-DAY   (c)Jaleco 1984
 
-    driver by Pierpaolo Prazzoli, Tomasz Slanina and Angelo Salese
-
-    TODO:
-    - text colors most likely are hardwired but iirc hi score text has a different color? Needs a reference shot;
-    - unused upper sprite color bank;
-    - improve sound comms, sometimes BGM becomes silent;
-    - hookup proper i8257 device;
-    - identify & dump MCU;
+TODO:
+- text colors most likely are hardwired but iirc hi score text has a different color?
+  Needs a reference shot;
+- unused upper sprite color bank;
+- improve sound comms, sometimes BGM becomes silent;
+- identify & dump MCU;
 
 -------------------------------------------------------
 Is it 1984 or 1987 game ?
@@ -62,6 +60,7 @@ $842f = lives
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/i8257.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
@@ -84,7 +83,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_dma(*this, "dma")
 	{ }
 
 	void ddayjlc(machine_config &config);
@@ -109,8 +109,6 @@ private:
 	void bg2_w(uint8_t data);
 	void sound_w(uint8_t data);
 	void flip_screen_w(uint8_t data);
-	void i8257_CH0_w(offs_t offset, uint8_t data);
-	void i8257_LMSR_w(address_space &space, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	void ddayjlc_palette(palette_device &palette) const;
@@ -134,8 +132,6 @@ private:
 	/* misc */
 	bool       m_sound_nmi_enable = false;
 	bool       m_main_nmi_enable = false;
-	int32_t    m_e00x_l[4]{};
-	int32_t    m_e00x_d[4][2]{};
 	uint8_t    m_prot_addr = 0;
 
 	/* devices */
@@ -144,6 +140,14 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<i8257_device> m_dma;
+
+	uint8_t dma_mem_r(offs_t offset);
+	void dma_mem_w(offs_t offset, u8 data);
+	void hrq_w(int state);
+	u8 dma_r();
+	void dma_w(u8 data);
+	u8 m_dma_latch = 0;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_foreground(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -360,35 +364,6 @@ void ddayjlc_state::flip_screen_w(uint8_t data)
 	flip_screen_set(data & 1);
 }
 
-void ddayjlc_state::i8257_CH0_w(offs_t offset, uint8_t data)
-{
-	m_e00x_d[offset][m_e00x_l[offset]] = data;
-	m_e00x_l[offset] ^= 1;
-}
-
-void ddayjlc_state::i8257_LMSR_w(address_space &space, uint8_t data)
-{
-	if (!data)
-	{
-		int32_t src = m_e00x_d[0][1] * 256 + m_e00x_d[0][0];
-		int32_t dst = m_e00x_d[2][1] * 256 + m_e00x_d[2][0];
-		int32_t size = (m_e00x_d[1][1] * 256 + m_e00x_d[1][0]) & 0x3ff;
-		int32_t i;
-
-		size++; //??
-
-		for(i = 0; i < size; i++)
-			space.write_byte(dst++, space.read_byte(src++));
-
-		m_e00x_l[0] = 0;
-		m_e00x_l[1] = 0;
-		m_e00x_l[2] = 0;
-		m_e00x_l[3] = 0;
-	}
-}
-
-
-
 void ddayjlc_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -397,13 +372,16 @@ void ddayjlc_state::main_map(address_map &map)
 	map(0x9400, 0x97ff).ram().w(FUNC(ddayjlc_state::vram_w)).share("videoram");
 	map(0x9800, 0x9fff).ram().w(FUNC(ddayjlc_state::bgvram_w)).share("bgram"); /* 9800-981f - videoregs */
 	map(0xa000, 0xdfff).bankr("bank1").nopw();
-	map(0xe000, 0xe003).w(FUNC(ddayjlc_state::i8257_CH0_w));
-	map(0xe008, 0xe008).nopw(); // i8257 control byte
+	map(0xe000, 0xe008).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0xf000, 0xf000).w(FUNC(ddayjlc_state::sound_w));
 	map(0xf100, 0xf100).nopw(); // sound related (f/f irq trigger?)
 	map(0xf080, 0xf080).portr("P2").w(FUNC(ddayjlc_state::char_bank_w));
 	map(0xf081, 0xf081).w(FUNC(ddayjlc_state::flip_screen_w));
-	map(0xf083, 0xf083).w(FUNC(ddayjlc_state::i8257_LMSR_w));
+	// fn originally marked "LMSR"
+	map(0xf083, 0xf083).lw8(NAME([this] (u8 data) {
+		m_dma->dreq1_w(BIT(data, 0));
+		m_dma->dreq0_w(BIT(data, 0));
+	}));
 	map(0xf084, 0xf084).w(FUNC(ddayjlc_state::bg0_w));
 	map(0xf085, 0xf085).w(FUNC(ddayjlc_state::bg1_w));
 	map(0xf086, 0xf086).w(FUNC(ddayjlc_state::bg2_w));
@@ -543,12 +521,6 @@ void ddayjlc_state::machine_start()
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_main_nmi_enable));
 	save_item(NAME(m_prot_addr));
-
-	save_item(NAME(m_e00x_l));
-	save_item(NAME(m_e00x_d[0]));
-	save_item(NAME(m_e00x_d[1]));
-	save_item(NAME(m_e00x_d[2]));
-	save_item(NAME(m_e00x_d[3]));
 }
 
 void ddayjlc_state::machine_reset()
@@ -558,13 +530,6 @@ void ddayjlc_state::machine_reset()
 	m_sound_nmi_enable = false;
 	m_main_nmi_enable = false;
 	m_prot_addr = 0;
-
-	for (int i = 0; i < 4; i++)
-	{
-		m_e00x_l[i] = 0;
-		m_e00x_d[i][0] = 0;
-		m_e00x_d[i][1] = 0;
-	}
 }
 
 void ddayjlc_state::ddayjlc_palette(palette_device &palette) const
@@ -599,6 +564,38 @@ void ddayjlc_state::ddayjlc_palette(palette_device &palette) const
 	palette.set_pen_color(0x203, rgb_t(0xff, 0xff, 0xff));
 }
 
+uint8_t ddayjlc_state::dma_mem_r(offs_t offset)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	return program.read_byte(offset);
+}
+
+void ddayjlc_state::dma_mem_w(offs_t offset, u8 data)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	program.write_byte(offset, data);
+}
+
+void ddayjlc_state::hrq_w(int state)
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+
+	// TODO: why we need this?
+	m_dma->hlda_w(state);
+}
+
+u8 ddayjlc_state::dma_r()
+{
+	return m_dma_latch;
+}
+
+void ddayjlc_state::dma_w(u8 data)
+{
+	m_dma_latch = data;
+}
+
 void ddayjlc_state::ddayjlc(machine_config &config)
 {
 	/* basic machine hardware */
@@ -609,6 +606,14 @@ void ddayjlc_state::ddayjlc(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ddayjlc_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
+
+	I8257(config, m_dma, 12000000/3);
+	m_dma->out_hrq_cb().set(FUNC(ddayjlc_state::hrq_w));
+	m_dma->in_memr_cb().set(FUNC(ddayjlc_state::dma_mem_r));
+	m_dma->out_memw_cb().set(FUNC(ddayjlc_state::dma_mem_w));
+	m_dma->in_ior_cb<1>().set(FUNC(ddayjlc_state::dma_r));
+	m_dma->out_iow_cb<0>().set(FUNC(ddayjlc_state::dma_w));
+	m_dma->set_reverse_rw_mode(true);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
