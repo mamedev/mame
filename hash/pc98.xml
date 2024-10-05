@@ -54,12 +54,12 @@ TODO:
 	</software>
 
 	<!-- PC-9821Xw System Restore startup disk -->
-	<!-- this is a System Restore startup disk for PC-9821Xw -->
+	<!-- this is a System Restore startup disk for PC-9821Xw (ETA: Xw doesn't exist!? -AS)-->
 	<!-- but not a Windows install source(need more disk?) -->
 	<!-- only have some part of Windows file and a Video driver(CLGD?). -->
 	<software name="sysrest" supported="no">
 		<description>System Restore Disk</description>
-		<year>19??</year>
+		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -4853,12 +4853,15 @@ TODO:
 		</part>
 	</software>
 
-	<!-- Corrupted text and wrong sound effects (they are supposed to have different tones, not just a constant beep). The game is mostly playable, though. -->
 	<software name="ancdragn" supported="partial">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Ancient Dragon</description>
 		<year>1991</year>
 		<publisher>ソフトハウスアラジン (Software House Aladdin)</publisher>
+		<notes><![CDATA[
+Plays sound thru [DAC1BIT] only
+Every kanji character has one line of corruption
+]]></notes>
 		<info name="alt_title" value="エンシェント・ドラゴン" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Game Disk"/>
@@ -7921,21 +7924,6 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<!-- boot OK, DAC1BIT sounds awful on anything, cfr. title screen (tested VM class, RS class and 9821 class) -->
-	<software name="blockouta" cloneof="blockout" supported="partial">
-		<description>Block Out (Patched?)</description>
-		<year>1991</year>
-		<publisher>アクイレムジャパン (Acclaim Japan)</publisher>
-		<info name="alt_title" value="ブロックアウト" />
-		<info name="release" value="19910118" />
-		<info name="usage" value="Mount with MS-DOS and run &quot;JELLY.BAT&quot;" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1281968">
-				<rom name="mainfix.d88" size="1281968" crc="eeb47aff" sha1="96a9d26420bb44ee89e343b3cdc90afc0bd4d4e5" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bquestv">
 		<description>Block Quest V</description>
 		<year>1993</year>
@@ -8143,7 +8131,6 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<!-- boot OK -->
 	<software name="panicbom" supported="yes">
 		<description>Bomberman - Panic Bomber</description>
 		<year>1995</year>
@@ -9558,16 +9545,18 @@ Has a [DAC1BIT] sampling tester on boot, needs +18 [tempo]/low [volume] on RS cl
 		</part>
 	</software>
 
-	<software name="carat">
+	<software name="carat" supported="yes">
 		<description>Carat - Magical Blocks</description>
 		<year>1992</year>
 		<publisher>カスタム (Custom)</publisher>
 		<info name="alt_title" value="キャラット MAGICAL BLOCKS" />
 		<info name="release" value="19920522" />
+		<info name="usage" value="INS key drops to DOS prompt" />
+		<!-- baddump: loads COMMAND.COM 6.22, has '99 dates for CONFIG.SYS and EASY.SCR -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="carat_a.fdi" size="1265664" crc="b5170cdf" sha1="d40bca585a3de046e8c77bf9dd7b62a5364dc5f1" offset="0" />
+				<rom name="carat_a.fdi" size="1265664" crc="b5170cdf" sha1="d40bca585a3de046e8c77bf9dd7b62a5364dc5f1" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -11220,7 +11209,7 @@ Missing [7220] text selector for choices
 		</part>
 	</software>
 
-	<software name="columns">
+	<software name="columns" supported="yes">
 		<description>Columns - Taisen Mode-tsuki</description>
 		<year>1991</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
@@ -11233,7 +11222,7 @@ Missing [7220] text selector for choices
 		</part>
 	</software>
 
-	<software name="commhq">
+	<software name="commhq" supported="yes">
 		<description>Command H.Q.</description>
 		<year>1992</year>
 		<publisher>マイクロプローズジャパン (MicroProse Japan)</publisher>
@@ -11246,11 +11235,13 @@ Missing [7220] text selector for choices
 		</part>
 	</software>
 
-	<!-- The user disk creation process doesn't work correctly. It's not possible to start the game without it. -->
 	<software name="company" supported="no">
 		<description>Company</description>
 		<year>1993</year>
 		<publisher>ジーエーエム (GAM)</publisher>
+		<notes><![CDATA[
+Fails user disk creation (will ask for a disk swap for disk 1 that will fail)
+]]></notes>
 		<info name="alt_title" value="カンパニー" />
 		<info name="release" value="19930411" />
 		<part name="flop1" interface="floppy_5_25">
@@ -11470,7 +11461,7 @@ Missing [7220] text selector for choices
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="344496">
 				<rom name="cranston manor (disk 1).d88" size="344496" crc="35d74464" sha1="4524d7d9f8f8db4929dc6a435c795c1db5de8e85" offset="0" />
 			</dataarea>
@@ -27641,27 +27632,27 @@ Draws garbage GVRAM during install (verify)
 		<info name="alt_title" value="蘭丸" />
 		<info name="release" value="19920424" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk HA?"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="ranmarha.d88" size="1281968" crc="9edd3aff" sha1="50164ecbd3c1f5437006d9b12b2d89800cf5d53e" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk I?"/>
+			<feature name="part_id" value="Disk い (I)"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="ranmari.d88" size="1281968" crc="4f4dd310" sha1="8ad96a80db7cb438744021dc35d9d8761b974fef" offset="0" />
 			</dataarea>
 		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk ろ (RO)"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="ranmarro.d88" size="1281968" crc="a46ee820" sha1="c30b7c1dccbafab1cd05afde077e311518c6bc5c" offset="0" />
+			</dataarea>
+		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk NI?"/>
+			<feature name="part_id" value="Disk に (NI)"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="ranmarni.d88" size="1281968" crc="a31ef04d" sha1="3f4f16b0c53dd809b43090ffe2a02307de55356e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk RO?"/>
+			<feature name="part_id" value="Disk は (HA)"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="ranmarro.d88" size="1281968" crc="a46ee820" sha1="c30b7c1dccbafab1cd05afde077e311518c6bc5c" offset="0" />
+				<rom name="ranmarha.d88" size="1281968" crc="9edd3aff" sha1="50164ecbd3c1f5437006d9b12b2d89800cf5d53e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -27679,7 +27670,7 @@ Draws garbage GVRAM during install (verify)
 		</part>
 	</software>
 
-	<software name="lasersq">
+	<software name="lasersq" supported="yes">
 		<description>Laser Squad - Uchuu Kaiheitai</description>
 		<year>1993</year>
 		<publisher>C^2 Bros</publisher>
@@ -31214,10 +31205,13 @@ Draws garbage GVRAM during install (verify)
 		</part>
 	</software>
 
-	<software name="mightyhd">
+	<software name="mightyhd" supported="no">
 		<description>Mighty Head</description>
 		<year>1986</year>
 		<publisher>アポロテクニカ (Apollo Technica)</publisher>
+		<notes><![CDATA[
+Black screen, wants 2DD dip ON?
+]]></notes>
 		<info name="alt_title" value="マイティーヘッド" />
 		<info name="release" value="198608xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -57065,20 +57059,36 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<!--
-	    MAME fails to mount the image with "Incorrect layout on track 0 head 0, expected_size=166666, current_size=167648"
-	    The game code (BL.EXE and BL2.OVL) is exactly the same between this and the "patched" version, so either both of them are cracked,
-	    or one of them is a rebuilt image.
-	-->
 	<software name="blockout" supported="no">
 		<description>Block Out</description>
 		<year>1991</year>
 		<publisher>アクイレムジャパン (Acclaim Japan)</publisher>
+		<notes><![CDATA[
+"Incorrect layout on track 0 head 0, expected_size=166666, current_size=167648"
+The game code (BL.EXE and BL2.OVL) is exactly the same between this and the "patched" version, so either both of them are cracked, or one of them is a rebuilt image.
+]]></notes>
 		<info name="alt_title" value="ブロックアウト" />
 		<info name="release" value="19910118" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1446908">
 				<rom name="block out (1989)(ldw)(jp).fdd" size="1446908" crc="5ececec6" sha1="c39a23400ed43bfdb9133000e31e48c094a3b897" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blockouta" cloneof="blockout" supported="partial">
+		<description>Block Out (Patched?)</description>
+		<year>1991</year>
+		<publisher>アクイレムジャパン (Acclaim Japan)</publisher>
+		<notes><![CDATA[
+DAC1BIT sounds awful on anything, cfr. title screen (tested VM class, RS class and 9821 class)
+]]></notes>
+		<info name="alt_title" value="ブロックアウト" />
+		<info name="release" value="19910118" />
+		<info name="usage" value="Mount with MS-DOS and run &quot;JELLY.BAT&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1281968">
+				<rom name="mainfix.d88" size="1281968" crc="eeb47aff" sha1="96a9d26420bb44ee89e343b3cdc90afc0bd4d4e5" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -65770,11 +65780,13 @@ Cutoff [kanji] LR right side
 		</part>
 	</software>
 
-	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="bkturb" supported="no">
 		<description>BK Turb</description>
 		<year>199?</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Non-working 3.5" floppy
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="bk turb (bio 100).fdi" size="1478656" crc="d9a66884" sha1="284d4c05fc8fe5df48c09de57bf092717b699d1f" offset="0" />
@@ -65782,7 +65794,7 @@ Cutoff [kanji] LR right side
 		</part>
 	</software>
 
-	<software name="camelzoo">
+	<software name="camelzoo" supported="yes">
 		<description>Camel-Zoo</description>
 		<year>19??</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
@@ -65861,13 +65873,17 @@ Cutoff [kanji] LR right side
 		</part>
 	</software>
 
-	<software name="flixx">
+	<software name="flixx" supported="yes">
 		<description>Flixx - Mogler 2</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Uses [DAC1BIT] only for sound
+]]></notes>
+		<!-- baddump: has `AAAAAAAi` non-default entry in ranking screen -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="flixx - mogler 2.fdi" size="1265664" crc="93277928" sha1="e7bec1b5f720cf4058ad7c4610ba7ac863f0d46f" offset="0" />
+				<rom name="flixx - mogler 2.fdi" size="1265664" crc="93277928" sha1="e7bec1b5f720cf4058ad7c4610ba7ac863f0d46f" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -65931,6 +65947,9 @@ Cutoff [kanji] LR right side
 		<description>Marka I</description>
 		<year>1989</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Uses an OPN driver but no music from [PC9801-26]? (verify)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="marka i (1989)(bio 100).fdi" size="1265664" crc="421d2806" sha1="3085215f87b36ef67ad659fc36d0675d19a66219" offset="0" />
@@ -65938,10 +65957,13 @@ Cutoff [kanji] LR right side
 		</part>
 	</software>
 
-	<software name="markadia">
+	<software name="markadia" supported="partial">
 		<description>Markadia</description>
 		<year>1993</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Takes a very long time to load game, transition from game over to ranking etc. (verify)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="markadia (1993)(bio 100).fdi" size="1261568" crc="00747693" sha1="43c659b4b6e798554ae2356223873831b919da17" offset="0" />
@@ -65949,7 +65971,7 @@ Cutoff [kanji] LR right side
 		</part>
 	</software>
 
-	<software name="markadiaa" cloneof="markadia">
+	<software name="markadiaa" cloneof="markadia" supported="partial">
 		<description>Markadia (alt)</description>
 		<year>1993</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
@@ -65982,10 +66004,13 @@ Cutoff [kanji] LR right side
 		</part>
 	</software>
 
-	<software name="roliroli">
+	<software name="roliroli" supported="partial">
 		<description>Roli Roli Rolling</description>
 		<year>1991</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Fails detecting [PC9801-26], wants bit 6 high by reading $27
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="roliroli rolling (bio 100).fdi" size="1265664" crc="3ee95428" sha1="6f98461901f8e497ff3cee2499f4349f3eb1e595" offset="0" />

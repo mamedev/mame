@@ -978,6 +978,7 @@ template <unsigned port> void pc9801vm_state::fdc_2hd_2dd_ctrl_w(u8 data)
 		m_fdc_2hd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
 	}
 
+	// TODO: this looks awfully similar to pc88va DMA mode, including same bits for trigger and irq mask.
 	if (port == 0 && !prev_trig && cur_trig)
 	{
 		m_fdc_timer->reset();
