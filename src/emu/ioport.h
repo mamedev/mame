@@ -25,9 +25,11 @@
 #include <cstdint>
 #include <cstring>
 #include <ctime>
+#include <iosfwd>
 #include <initializer_list>
 #include <list>
 #include <memory>
+#include <string_view>
 #include <vector>
 
 
@@ -325,7 +327,7 @@ enum
 //**************************************************************************
 
 // constructor function pointer
-typedef void(*ioport_constructor)(device_t &owner, ioport_list &portlist, std::string &errorbuf);
+typedef void(*ioport_constructor)(device_t &owner, ioport_list &portlist, std::ostream &errorbuf);
 
 // I/O port callback function delegates
 typedef device_delegate<ioport_value ()> ioport_field_read_delegate;
@@ -529,7 +531,7 @@ class ioport_diplocation
 {
 public:
 	// construction/destruction
-	ioport_diplocation(const char *name, u8 swnum, bool invert);
+	ioport_diplocation(std::string_view name, u8 swnum, bool invert);
 
 	// getters
 	const char *name() const { return m_name.c_str(); }
@@ -664,7 +666,7 @@ public:
 	void set_user_settings(const user_settings &settings);
 
 private:
-	void expand_diplocation(const char *location, std::string &errorbuf);
+	void expand_diplocation(const char *location, std::ostream &errorbuf);
 
 	// internal state
 	ioport_field *              m_next;             // pointer to next field in sequence
@@ -744,7 +746,7 @@ class ioport_list : public std::map<std::string, std::unique_ptr<ioport_port>>
 public:
 	ioport_list() { }
 
-	void append(device_t &device, std::string &errorbuf);
+	void append(device_t &device, std::ostream &errorbuf);
 };
 
 
@@ -779,13 +781,13 @@ public:
 
 	// other operations
 	ioport_field *field(ioport_value mask) const;
-	void collapse_fields(std::string &errorbuf);
+	void collapse_fields(std::ostream &errorbuf);
 	void frame_update();
 	void init_live_state();
 	void update_defvalue(bool flush_defaults);
 
 private:
-	void insert_field(ioport_field &newfield, ioport_value &disallowedbits, std::string &errorbuf);
+	void insert_field(ioport_field &newfield, ioport_value &disallowedbits, std::ostream &errorbuf);
 
 	// internal state
 	ioport_port *               m_next;         // pointer to next port
@@ -1033,7 +1035,7 @@ class ioport_configurer
 {
 public:
 	// construction/destruction
-	ioport_configurer(device_t &owner, ioport_list &portlist, std::string &errorbuf);
+	ioport_configurer(device_t &owner, ioport_list &portlist, std::ostream &errorbuf);
 
 	// static helpers
 	static const char *string_from_token(const char *string);
@@ -1083,7 +1085,7 @@ private:
 	// internal state
 	device_t &          m_owner;
 	ioport_list &       m_portlist;
-	std::string &       m_errorbuf;
+	std::ostream &      m_errorbuf;
 
 	ioport_port *       m_curport;
 	ioport_field *      m_curfield;
@@ -1123,7 +1125,7 @@ private:
 
 // start of table
 #define INPUT_PORTS_START(_name) \
-ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, std::string &errorbuf) \
+ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, std::ostream &errorbuf) \
 { \
 	ioport_configurer configurer(owner, portlist, errorbuf);
 // end of table
@@ -1132,7 +1134,7 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 
 // aliasing
 #define INPUT_PORTS_EXTERN(_name) \
-	extern void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, std::string &errorbuf)
+	extern void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, std::ostream &errorbuf)
 
 // including
 #define PORT_INCLUDE(_name) \

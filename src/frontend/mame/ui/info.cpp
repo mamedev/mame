@@ -230,7 +230,7 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 	, m_has_analog(false)
 {
 	ioport_list local_ports;
-	std::string sink;
+	std::ostringstream sink;
 	for (device_t &device : device_enumerator(config.root_device()))
 	{
 		// the "no sound hardware" warning doesn't make sense when you plug in a sound card

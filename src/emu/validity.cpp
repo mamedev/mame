@@ -22,6 +22,7 @@
 #include "unicode.h"
 
 #include <cctype>
+#include <sstream>
 #include <type_traits>
 #include <typeinfo>
 
@@ -2495,12 +2496,13 @@ void validity_checker::validate_inputs(device_t &root)
 
 		// allocate the input ports
 		ioport_list portlist;
-		std::string errorbuf;
-		portlist.append(device, errorbuf);
-
-		// report any errors during construction
-		if (!errorbuf.empty())
-			osd_printf_error("I/O port error during construction:\n%s\n", errorbuf);
+		{
+			// report any errors during construction
+			std::ostringstream errorbuf;
+			portlist.append(device, errorbuf);
+			if (errorbuf.tellp())
+				osd_printf_error("I/O port error during construction:\n%s\n", std::move(errorbuf).str());
+		}
 
 		// do a first pass over ports to add their names and find duplicates
 		for (auto &port : portlist)
