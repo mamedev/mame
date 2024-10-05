@@ -11,6 +11,7 @@
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
+struct wl_egl_window;
 
 // EGL pulls X11 crap...
 #if defined(None)
@@ -32,11 +33,12 @@ namespace bgfx { namespace gl
 	struct GlContext
 	{
 		GlContext()
-			: m_current(NULL)
+			: m_eglDll(NULL)
+			, m_current(NULL)
 			, m_context(NULL)
 			, m_display(NULL)
 			, m_surface(NULL)
-#if BX_PLATFORM_LINUX && defined(WL_EGL_PLATFORM)
+#if BX_PLATFORM_LINUX
 			, m_waylandEglLibrary(NULL)
 			, m_egl_window(NULL)
 #endif
@@ -49,7 +51,7 @@ namespace bgfx { namespace gl
 		void resize(uint32_t _width, uint32_t _height, uint32_t _flags);
 
 		uint64_t getCaps() const;
-		SwapChainGL* createSwapChain(void* _nwh);
+		SwapChainGL* createSwapChain(void* _nwh, int _w, int _h);
 		void destroySwapChain(SwapChainGL*  _swapChain);
 		void swap(SwapChainGL* _swapChain = NULL);
 		void makeCurrent(SwapChainGL* _swapChain = NULL);
@@ -67,7 +69,7 @@ namespace bgfx { namespace gl
 		EGLContext m_context;
 		EGLDisplay m_display;
 		EGLSurface m_surface;
-#if BX_PLATFORM_LINUX && defined(WL_EGL_PLATFORM)
+#if BX_PLATFORM_LINUX
 		void *m_waylandEglLibrary;
 		struct wl_egl_window *m_egl_window;
 #endif
