@@ -714,7 +714,7 @@ uint8_t upd765_family_device::fifo_pop(bool internal)
 	if(!fifo_write && !fifo_pos)
 		disable_transfer();
 	int thr = fifocfg & FIF_THR;
-	if(fifo_write && fifo_expected && (fifo_pos <= thr || (fifocfg & FIF_DIS)))
+	if(fifo_write && fifo_expected && (fifo_pos <= thr || (fifocfg & FIF_DIS)) && !tc_done)
 		enable_transfer();
 	return r;
 }
