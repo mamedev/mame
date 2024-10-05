@@ -65,7 +65,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<mipsx_cpu_device> m_maincpu;
 
 	void mem(address_map &map) ATTR_COLD;
 };
@@ -85,7 +85,7 @@ void pap2_state::mem(address_map &map)
 
 void pap2_state::pap2(machine_config &config)
 {
-	MIPSX(config, m_maincpu, 27'000'000);
+	MIPSX(config, m_maincpu, 27_MHz_XTAL * 3); // guessing 3x from ES3880 datasheet
 	m_maincpu->set_addrmap(AS_PROGRAM, &pap2_state::mem);
 }
 
