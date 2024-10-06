@@ -25087,6 +25087,8 @@ poly800mdk                      //
 
 @source:korg/polysix.cpp
 polysix                         //
+
+@source:korg/poly61.cpp
 poly61                          //
 
 @source:kurzweil/krz2000.cpp
