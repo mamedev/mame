@@ -1383,7 +1383,7 @@ RAND USR 16530
 			</dataarea>
 		</part>
 		<part name="cass2" interface="zx81_cass">
-			<feature name="part_id" value="B -  LOAD &quotPENDU&quot"/>
+			<feature name="part_id" value="B -  LOAD &quot;PENDU&quot;"/>
 			<dataarea name="cass" size="12780">
 				<rom name="Casse-briques - Pendu - Side 2.tzx" size="12780" crc="b94c7e1d" sha1="f8f20bd0d9048298e0f4bcf67fa94b54b6d94a3e"/>
 			</dataarea>
