@@ -2568,7 +2568,7 @@ TIMER_CALLBACK_MEMBER(upd765_family_device::run_drive_ready_polling)
 			LOGCOMMAND("polled %d : %d -> %d\n", fid, flopi[fid].ready, ready);
 			flopi[fid].ready = ready;
 			if(!flopi[fid].st0_filled) {
-				flopi[fid].st0 = ST0_ABRT | fid;
+				flopi[fid].st0 = ST0_ABRT | fid | (ready ? 0 : ST0_NR);
 				flopi[fid].st0_filled = true;
 				irq = true;
 			}
