@@ -130,7 +130,7 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		rbase[reverb_pos] = 0;
 
 		for(int ch=0; ch<8; ch++)
-			if(regs[0x22c] & (1<<ch)) {
+			if(BIT(regs[0x22c], ch)) {
 				unsigned char *base1 = regs + 0x20*ch;
 				unsigned char *base2 = regs + 0x200 + 0x2*ch;
 				channel *chan = channels + ch;
@@ -432,11 +432,10 @@ void k054539_device::write(offs_t offset, u8 data)
 
 		case 0x22d:
 			if(rom_addr == 0x80) {
-				int addr = (cur_ptr&0x3fff) | ((cur_ptr&0x10000)>>2);
+				offs_t const addr = (cur_ptr & 0x3fff) | ((cur_ptr & 0x10000) >> 2);
 				ram[addr] = data;
 			}
-			cur_ptr++;
-			cur_ptr &= 0x1ffff;
+			cur_ptr = (cur_ptr + 1) & 0x1ffff;
 		break;
 
 		case 0x22e:
@@ -475,7 +474,6 @@ void k054539_device::write(offs_t offset, u8 data)
 
 void k054539_device::device_post_load()
 {
-
 }
 
 u8 k054539_device::read(offs_t offset)
@@ -483,13 +481,10 @@ u8 k054539_device::read(offs_t offset)
 	switch(offset) {
 	case 0x22d:
 		if(regs[0x22f] & 0x10) {
-			int ram_addr = (cur_ptr&0x3fff) | ((cur_ptr&0x10000)>>2);
-			uint8_t res = (rom_addr == 0x80) ? ram[ram_addr] : read_byte((0x20000*rom_addr)+cur_ptr);
-			if (!machine().side_effects_disabled())
-			{
-				cur_ptr++;
-				cur_ptr &= 0x1ffff;
-			}
+			offs_t const addr = (cur_ptr & 0x3fff) | ((cur_ptr & 0x10000) >> 2);
+			uint8_t res = (rom_addr == 0x80) ? ram[ram_addr] : read_byte((0x20000*rom_addr) + cur_ptr);
+			if(!machine().side_effects_disabled())
+				cur_ptr = (cur_ptr + 1) & 0x1ffff;
 			return res;
 		} else
 			return 0;
