@@ -135,6 +135,20 @@ void cmi01a_device::device_start()
 	save_item(NAME(m_rp));
 	save_item(NAME(m_ws));
 	save_item(NAME(m_dir));
+
+	save_item(NAME(m_ha0));
+	save_item(NAME(m_ha1));
+	save_item(NAME(m_hb0));
+	save_item(NAME(m_hb1));
+	save_item(NAME(m_hc0));
+	save_item(NAME(m_hc1));
+
+	save_item(NAME(m_ka0));
+	save_item(NAME(m_ka1));
+	save_item(NAME(m_ka2));
+	save_item(NAME(m_kb0));
+	save_item(NAME(m_kb1));
+	save_item(NAME(m_kb2));
 }
 
 void cmi01a_device::device_reset()
@@ -175,10 +189,26 @@ void cmi01a_device::device_reset()
 	m_pitch = 0;
 	m_octave = 0;
 
+	m_ha0 = 0;
+	m_ha1 = 0;
+	m_hb0 = 0;
+	m_hb1 = 0;
+	m_hc0 = 0;
+	m_hc1 = 0;
+
+	m_ka0 = 1;
+	m_ka1 = 0;
+	m_ka2 = 0;
+	m_kb0 = 1;
+	m_kb1 = 0;
+	m_kb2 = 0;
+
 	m_bcas_q1_timer->adjust(attotime::from_hz(clock() / 2), 0, attotime::from_hz(clock() / 2));
 	m_zcint_pulse_timer->adjust(attotime::never);
 	m_rstb_pulse_timer->adjust(attotime::never);
 	m_sample_timer->adjust(attotime::never);
+
+	update_filters();
 }
 
 void cmi01a_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
@@ -189,15 +219,26 @@ void cmi01a_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 		for (int sampindex = 0; sampindex < buf.samples(); sampindex++)
 		{
-			const s32 sample = (s32)(s8)(m_current_sample ^ 0x80);
-			const s32 env32 = (s32)m_env;
-			const s32 vol32 = (s32)m_vol_latch;
-			const s16 sample16 = (s16)(u16)((sample * env32 * vol32) >> 8);
-			buf.put_int(sampindex, sample16, 32768);
+			double sample = s8(m_current_sample ^ 0x80); // -128..127
+			double hbn = (sample + 2*m_ha0 + m_ha1 - m_ka1 * m_hb0 - m_ka2 * m_hb1) / m_ka0;
+			double hcn = (hbn + 2*m_hb0 + m_hb1 - m_kb1 * m_hc0 - m_kb2 * m_hc1) / m_kb0; // -128..127
+			m_ha1 = m_ha0;
+			m_ha0 = sample;
+			m_hb1 = m_hb0;
+			m_hb0 = hbn;
+			m_hc1 = m_hc0;
+			m_hc0 = hcn;
+
+			double env = hbn * m_env; // -32768..32767
+			double vol = env * m_vol_latch; // -8388608..8388607
+			buf.put(sampindex, vol / 8388608);
 		}
 	}
 	else
 	{
+		m_ha0 = m_ha1 = 0;
+		m_hb0 = m_hb1 = 0;
+		m_hc0 = m_hc1 = 0;
 		outputs[0].fill(0);
 	}
 }
@@ -224,6 +265,7 @@ void cmi01a_device::pitch_octave_w(u8 data)
 	m_pitch &= 0x0ff;
 	m_pitch |= (data & 3) << 8;
 	m_octave = (data >> 2) & 0x0f;
+	update_filters();
 }
 
 u8 cmi01a_device::pitch_octave_r()
@@ -600,6 +642,52 @@ void cmi01a_device::not_wpe_w(int state)
 	update_upper_wave_addr_load();
 }
 
+void cmi01a_device::update_filters()
+{
+	// Filter ADC input level
+	int fval = (m_octave << 5) + m_flt_latch;
+
+	// Calibrated using the graph page 133 of the CMI Mainframe Service Manual
+	double fc = 6410 * pow(1.02162, fval - 256);
+	// -6dB cutoff frequency
+	double f0 = fc * 0.916;
+
+	// Secondary filter around there for when the first filter is high
+	if(fc > 14000)
+		fc = 14000;
+
+	logerror("Filter latch = %02x, octave=%x, fval=%03x, f0 = %g\n", m_flt_latch, m_octave, fval, f0);
+
+	double w1 = 2*M_PI*fc;
+	double w2 = 2*M_PI*fc*1.22474487139159; // sqrt(c1*c2 / (c3*c4)), the ratio between the two cutoff frequencies in the cmi01 configuration of the SSM2045
+	double a1 = 1.81659021245849; // sqrt(c1*10*c2)/c1
+	double a2 = 1.48323969741913; // sqrt(c3*10*c4)/c3
+
+	// Two stages of order-2 lowpass filters with fixed Q
+
+	// H(s) = 1/(m0 * s**2 + m1 * s + 1)
+
+	double ma0 = a1/w1;
+	double ma1 = 1/(w1*w1);
+	double mb0 = a2/w2;
+	double mb1 = 1/(w2*w2);
+
+	// Convert to z, wrap around f0
+	double zc = 2*M_PI*f0/tan(M_PI*f0/48000);
+	double za0 = ma1 * zc*zc;
+	double za1 = ma0 * zc;
+	double zb0 = mb1 * zc*zc;
+	double zb1 = mb0 * zc;
+
+	// H(z) = (1 + 2 * z-1 + z-2) / (k0 + k1 * z-1 + k2 * z-2)
+	m_ka0 = za0 + za1 + 1;
+	m_ka1 = -2*za0 + 2;
+	m_ka2 = za0 - za1 + 1;
+	m_kb0 = zb0 + zb1 + 1;
+	m_kb1 = -2*zb0 + 2;
+	m_kb2 = zb0 - zb1 + 1;
+}
+
 inline void cmi01a_device::update_upper_wave_addr_load()
 {
 	const bool c10_and_out = (!m_not_wpe && m_gzx);
@@ -725,6 +813,7 @@ void cmi01a_device::write(offs_t offset, u8 data)
 
 		case 0x6:
 			m_flt_latch = data;
+			update_filters();
 			break;
 
 		case 0x8: case 0x9: case 0xa: case 0xb:

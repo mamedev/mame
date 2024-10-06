@@ -117,6 +117,7 @@ private:
 	void set_wave_addr_lsb(const u8 wave_addr_lsb);
 	void set_wave_addr_msb(const u8 wave_addr_msb);
 	void set_wave_addr_msb_clock(const bool wave_addr_msb_clock);
+	void update_filters();
 
 	void set_zx(const bool zx);
 	void update_ptm_c1();
@@ -182,6 +183,20 @@ private:
 	u8          m_rp = 0;
 	u8          m_ws = 0;
 	int         m_dir = 0;
+
+	double      m_ha0 = 0;
+	double      m_ha1 = 0;
+	double      m_hb0 = 0;
+	double      m_hb1 = 0;
+	double      m_hc0 = 0;
+	double      m_hc1 = 0;
+
+	double      m_ka0 = 0;
+	double      m_ka1 = 0;
+	double      m_ka2 = 0;
+	double      m_kb0 = 0;
+	double      m_kb1 = 0;
+	double      m_kb2 = 0;
 };
 
 // device type definition
