@@ -173,20 +173,18 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	uint8_t m_nAyCtrl = 0;
-	uint8_t m_nmi_mask = 0;
-	uint8_t m_flipscreen_x = 0;
-	uint8_t m_flipscreen_y = 0;
+	uint8_t m_ay_addr_latch = 0;
+	bool m_nmi_mask = false;
+	bool m_flipscreen_x = false;
+	bool m_flipscreen_y = false;
 
-	void audio_w(offs_t offset, uint8_t data);
+	void ay_addr_latch_w(offs_t offset, uint8_t data);
 	void nmi_mask_w(int state);
 	void sound_cmd_w(uint8_t data);
-	void coin_counter0_w(int state);
-	void coin_counter1_w(int state);
+	template<unsigned Which> void coin_counter_w(int state);
 	void flip_screen_x_w(int state);
 	void flip_screen_y_w(int state);
-	void ay1_sel(uint8_t data);
-	void ay2_sel(uint8_t data);
+	template<unsigned Which> void ay_data_w(uint8_t data);
 
 	void mirax_palette(palette_device &palette) const;
 
@@ -238,20 +236,26 @@ void mirax_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	{
 		for (int x = 0; x < 32; x++)
 		{
-			int tile = m_videoram[32*y+x];
-			int color = (m_colorram[x*2]<<8) | (m_colorram[(x*2)+1]);
-			int x_scroll = (color & 0xff00)>>8;
-			tile |= ((color & 0xe0)<<3);
+			uint32_t tile = m_videoram[32 * y + x];
+			uint32_t color = (m_colorram[x * 2] << 8) | (m_colorram[(x * 2) + 1]);
+			int const x_scroll = (color & 0xff00) >> 8;
+			tile |= ((color & 0xe0) << 3);
 
-			int const res_x = m_flipscreen_x ? (248 - x*8) : (x*8);
-			int const res_y = m_flipscreen_y ? (248 - y*8 + x_scroll) : (y*8 - x_scroll);
+			int const res_x = m_flipscreen_x ? (248 - x * 8) : (x * 8);
+			int const res_y = m_flipscreen_y ? (248 - y * 8 + x_scroll) : (y * 8 - x_scroll);
 			int const wrapy = m_flipscreen_y ? -256 : 256;
 
 			if ((x <= 1 || x >= 30) ^ draw_flag)
 			{
-				gfx->opaque(bitmap,cliprect,tile,color & 7,(m_flipscreen_x),(m_flipscreen_y),res_x,res_y);
+				gfx->opaque(bitmap, cliprect,
+					tile, color & 7,
+					m_flipscreen_x, m_flipscreen_y,
+					res_x, res_y);
 				// wrap-around
-				gfx->opaque(bitmap,cliprect,tile,color & 7,(m_flipscreen_x),(m_flipscreen_y),res_x,res_y+wrapy);
+				gfx->opaque(bitmap, cliprect,
+					tile, color & 7,
+					m_flipscreen_x, m_flipscreen_y,
+					res_x, res_y + wrapy);
 			}
 		}
 	}
@@ -264,18 +268,21 @@ void mirax_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		if (!m_spriteram[count] || !m_spriteram[count + 3])
 			continue;
 
-		int spr_offs = m_spriteram[count+1] & 0x3f;
-		spr_offs += (m_spriteram[count+2] & 0xe0)<<1;
-		spr_offs += (m_spriteram[count+2] & 0x10)<<5;
+		uint32_t spr_offs = m_spriteram[count + 1] & 0x3f;
+		spr_offs += (m_spriteram[count + 2] & 0xe0) << 1;
+		spr_offs += (m_spriteram[count + 2] & 0x10) << 5;
 
-		int const color = m_spriteram[count+2] & 0x7;
-		int const fx = m_flipscreen_x ^ BIT(m_spriteram[count + 1], 6); //<- guess
-		int const fy = m_flipscreen_y ^ BIT(m_spriteram[count + 1], 7);
+		uint32_t const color = m_spriteram[count + 2] & 0x7;
+		bool const fx = m_flipscreen_x ^ BIT(m_spriteram[count + 1], 6); // guess
+		bool const fy = m_flipscreen_y ^ BIT(m_spriteram[count + 1], 7);
 
 		int const y = m_flipscreen_y ? m_spriteram[count] : 0x100 - m_spriteram[count] - 16;
-		int const x = m_flipscreen_x ? 240 - m_spriteram[count+3] : m_spriteram[count+3];
+		int const x = m_flipscreen_x ? 240 - m_spriteram[count + 3] : m_spriteram[count + 3];
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,spr_offs,color,fx,fy,x,y,0);
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+			spr_offs, color,
+			fx, fy,
+			x, y, 0);
 	}
 }
 
@@ -290,29 +297,22 @@ uint32_t mirax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void mirax_state::machine_start()
 {
-	m_nAyCtrl = 0x00;
-
-	save_item(NAME(m_nAyCtrl));
+	save_item(NAME(m_ay_addr_latch));
 	save_item(NAME(m_nmi_mask));
 	save_item(NAME(m_flipscreen_x));
 	save_item(NAME(m_flipscreen_y));
 }
 
-void mirax_state::audio_w(offs_t offset, uint8_t data)
+void mirax_state::ay_addr_latch_w(offs_t offset, uint8_t data)
 {
-	m_nAyCtrl=offset;
+	m_ay_addr_latch = offset;
 }
 
-void mirax_state::ay1_sel(uint8_t data)
+template<unsigned Which>
+void mirax_state::ay_data_w(uint8_t data)
 {
-	m_ay[0]->address_w(m_nAyCtrl);
-	m_ay[0]->data_w(data);
-}
-
-void mirax_state::ay2_sel(uint8_t data)
-{
-	m_ay[1]->address_w(m_nAyCtrl);
-	m_ay[1]->data_w(data);
+	m_ay[Which]->address_w(m_ay_addr_latch);
+	m_ay[Which]->data_w(data);
 }
 
 void mirax_state::nmi_mask_w(int state)
@@ -328,15 +328,10 @@ void mirax_state::sound_cmd_w(uint8_t data)
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-
-void mirax_state::coin_counter0_w(int state)
+template<unsigned Which> 
+void mirax_state::coin_counter_w(int state)
 {
-	machine().bookkeeping().coin_counter_w(0, state);
-}
-
-void mirax_state::coin_counter1_w(int state)
-{
-	machine().bookkeeping().coin_counter_w(1, state);
+	machine().bookkeeping().coin_counter_w(Which, state);
 }
 
 void mirax_state::flip_screen_x_w(int state)
@@ -353,17 +348,17 @@ void mirax_state::mirax_main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc800, 0xd7ff).ram();
-	map(0xe000, 0xe3ff).ram().share("videoram");
-	map(0xe800, 0xe9ff).ram().share("spriteram");
-	map(0xea00, 0xea3f).ram().share("colorram"); //per-column color + bank bits for the videoram
+	map(0xe000, 0xe3ff).ram().share(m_videoram);
+	map(0xe800, 0xe9ff).ram().share(m_spriteram);
+	map(0xea00, 0xea3f).ram().share(m_colorram); // per-column color + bank bits for the videoram
 	map(0xf000, 0xf000).portr("P1");
 	map(0xf100, 0xf100).portr("P2");
 	map(0xf200, 0xf200).portr("DSW1");
-	map(0xf300, 0xf300).nopr(); //watchdog? value is always read then discarded
+	map(0xf300, 0xf300).nopr(); // watchdog? value is always read then discarded
 	map(0xf400, 0xf400).portr("DSW2");
 	map(0xf500, 0xf507).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xf800, 0xf800).w(FUNC(mirax_state::sound_cmd_w));
-//  map(0xf900, 0xf900) //sound cmd mirror? ack?
+//  map(0xf900, 0xf900) // sound cmd mirror? ack?
 }
 
 void mirax_state::mirax_sound_map(address_map &map)
@@ -374,19 +369,19 @@ void mirax_state::mirax_sound_map(address_map &map)
 
 	map(0xe000, 0xe000).nopw();
 	map(0xe001, 0xe001).nopw();
-	map(0xe003, 0xe003).w(FUNC(mirax_state::ay1_sel)); //1st ay ?
+	map(0xe003, 0xe003).w(FUNC(mirax_state::ay_data_w<0>)); // 1st ay ?
 
 	map(0xe400, 0xe400).nopw();
 	map(0xe401, 0xe401).nopw();
-	map(0xe403, 0xe403).w(FUNC(mirax_state::ay2_sel)); //2nd ay ?
+	map(0xe403, 0xe403).w(FUNC(mirax_state::ay_data_w<1>)); // 2nd ay ?
 
-	map(0xf900, 0xf9ff).w(FUNC(mirax_state::audio_w));
+	map(0xf900, 0xf9ff).w(FUNC(mirax_state::ay_addr_latch_w));
 }
 
 
-/* verified from Z80 code */
+// verified from Z80 code
 static INPUT_PORTS_START( mirax )
-	/* up/down directions are trusted according of the continue screen */
+	// up/down directions are trusted according of the continue screen
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
@@ -428,7 +423,7 @@ static INPUT_PORTS_START( mirax )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x11b5 (2 * 3 * 2 bytes) */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life ) )       // table at 0x11b5 (2 * 3 * 2 bytes)
 	PORT_DIPSETTING(    0x00, "30k 80k 150k" )
 	PORT_DIPSETTING(    0x01, "900k 950k 990k" )
 	PORT_DIPNAME( 0x02, 0x00, "Flags for Extra Life" )
@@ -440,7 +435,7 @@ static INPUT_PORTS_START( mirax )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
-	/* this dip makes the game to behave like attract mode, even if you insert a coin */
+	// this dip makes the game to behave like attract mode, even if you insert a coin
 	PORT_DIPNAME( 0x10, 0x00, "Auto-Play Mode (Debug)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
@@ -451,7 +446,7 @@ static INPUT_PORTS_START( mirax )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
 INPUT_PORTS_END
 
-/* verified from Z80 code */
+// verified from Z80 code
 static INPUT_PORTS_START( miraxa )
 	PORT_INCLUDE( mirax )
 
@@ -468,7 +463,7 @@ static INPUT_PORTS_START( miraxa )
 	PORT_DIPSETTING(    0x30, "6" )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x1276 (2 * 3 * 2 bytes) */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life ) )       // table at 0x1276 (2 * 3 * 2 bytes)
 	PORT_DIPSETTING(    0x00, "30k 80k 150k" )
 	PORT_DIPSETTING(    0x01, "50k 100k 900k" )
 INPUT_PORTS_END
@@ -480,16 +475,14 @@ static const gfx_layout layout16 =
 	RGN_FRAC(1,3),
 	3,
 	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3)},
-	{ 0, 1, 2, 3, 4, 5, 6, 7 ,
-		0+8*8,1+8*8,2+8*8,3+8*8,4+8*8,5+8*8,6+8*8,7+8*8},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	0*8+8*8*2, 1*8+8*8*2, 2*8+8*8*2, 3*8+8*8*2, 4*8+8*8*2, 5*8+8*8*2, 6*8+8*8*2, 7*8+8*8*2},
+	{ STEP8(0,1), STEP8(8*8,1) },
+	{ STEP8(0,8), STEP8(8*8*2,8) },
 	16*16
 };
 
 static GFXDECODE_START( gfx_mirax )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,     0, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout16,             0, 8 )
+	GFXDECODE_ENTRY( "tiles",   0, gfx_8x8x3_planar, 0, 8 )
+	GFXDECODE_ENTRY( "sprites", 0, layout16,         0, 8 )
 GFXDECODE_END
 
 
@@ -509,18 +502,18 @@ void mirax_state::mirax(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(mirax_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // R10
-	mainlatch.q_out_cb<0>().set(FUNC(mirax_state::coin_counter0_w));
+	mainlatch.q_out_cb<0>().set(FUNC(mirax_state::coin_counter_w<0>));
 	mainlatch.q_out_cb<1>().set(FUNC(mirax_state::nmi_mask_w));
-	mainlatch.q_out_cb<2>().set(FUNC(mirax_state::coin_counter1_w)); // only used in 'miraxa' - see notes
+	mainlatch.q_out_cb<2>().set(FUNC(mirax_state::coin_counter_w<1>)); // only used in 'miraxa' - see notes
 	// One address flips X, the other flips Y, but I can't tell which is which
 	// Since the value is the same for the 2 addresses, it doesn't really matter
 	mainlatch.q_out_cb<6>().set(FUNC(mirax_state::flip_screen_x_w));
 	mainlatch.q_out_cb<7>().set(FUNC(mirax_state::flip_screen_y_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(256, 256);
 	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(mirax_state::screen_update));
@@ -550,12 +543,12 @@ ROM_START( mirax )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "mxr2-4v.rom",   0x0000, 0x2000, CRC(cd2d52dc) SHA1(0d4181dc68beac338f47a2065c7b755008877896) )
 
-	ROM_REGION( 0xc000, "gfx1", 0 )
+	ROM_REGION( 0xc000, "tiles", 0 )
 	ROM_LOAD( "mxe3-4v.rom",   0x0000, 0x4000, CRC(0cede01f) SHA1(c723dd8ee9dc06c94a7fe5d5b5bccc42e2181af1) )
 	ROM_LOAD( "mxh3-4v.rom",   0x4000, 0x4000, CRC(58221502) SHA1(daf5c508939b44616ca76308fc33f94d364ed587) )
 	ROM_LOAD( "mxk3-4v.rom",   0x8000, 0x4000, CRC(6dbc2961) SHA1(5880c28f1ef704fee2d625a42682c7d65613acc8) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_REGION( 0x18000, "sprites", 0 )
 	ROM_LOAD( "mxe2-4v.rom",   0x04000, 0x4000, CRC(2cf5d8b7) SHA1(f66bce4d413a48f6ae07974870dc0f31eefa68e9) )
 	ROM_LOAD( "mxf2-4v.rom",   0x0c000, 0x4000, CRC(1f42c7fa) SHA1(33e56c6ddf7676a12f57de87ec740c6b6eb1cc8c) )
 	ROM_LOAD( "mxh2-4v.rom",   0x14000, 0x4000, CRC(cbaff4c6) SHA1(2dc4a1f51b28e98be0cfb5ab7576047c748b6728) )
@@ -580,12 +573,12 @@ ROM_START( miraxa )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "mxr2-4v.rom",   0x0000, 0x2000, CRC(cd2d52dc) SHA1(0d4181dc68beac338f47a2065c7b755008877896) )
 
-	ROM_REGION( 0xc000, "gfx1", 0 )
+	ROM_REGION( 0xc000, "tiles", 0 )
 	ROM_LOAD( "mxe3-4v.rom",   0x0000, 0x4000, CRC(0cede01f) SHA1(c723dd8ee9dc06c94a7fe5d5b5bccc42e2181af1) )
 	ROM_LOAD( "mxh3-4v.rom",   0x4000, 0x4000, CRC(58221502) SHA1(daf5c508939b44616ca76308fc33f94d364ed587) )
 	ROM_LOAD( "mxk3-4v.rom",   0x8000, 0x4000, CRC(6dbc2961) SHA1(5880c28f1ef704fee2d625a42682c7d65613acc8) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_REGION( 0x18000, "sprites", 0 )
 	ROM_LOAD( "mxe2-4v.rom",   0x04000, 0x4000, CRC(2cf5d8b7) SHA1(f66bce4d413a48f6ae07974870dc0f31eefa68e9) )
 	ROM_LOAD( "mxf2-4v.rom",   0x0c000, 0x4000, CRC(1f42c7fa) SHA1(33e56c6ddf7676a12f57de87ec740c6b6eb1cc8c) )
 	ROM_LOAD( "mxh2-4v.rom",   0x14000, 0x4000, CRC(cbaff4c6) SHA1(2dc4a1f51b28e98be0cfb5ab7576047c748b6728) )
@@ -609,12 +602,12 @@ ROM_START( miraxb )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "13.r5",   0x0000, 0x2000, CRC(cd2d52dc) SHA1(0d4181dc68beac338f47a2065c7b755008877896) )
 
-	ROM_REGION( 0xc000, "gfx1", 0 )
+	ROM_REGION( 0xc000, "tiles", 0 )
 	ROM_LOAD( "4.e3",   0x0000, 0x4000, CRC(0cede01f) SHA1(c723dd8ee9dc06c94a7fe5d5b5bccc42e2181af1) )
 	ROM_LOAD( "6.h3",   0x4000, 0x4000, CRC(58221502) SHA1(daf5c508939b44616ca76308fc33f94d364ed587) )
 	ROM_LOAD( "8.k3",   0x8000, 0x4000, CRC(6dbc2961) SHA1(5880c28f1ef704fee2d625a42682c7d65613acc8) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_REGION( 0x18000, "sprites", 0 )
 	ROM_LOAD( "1.e2",   0x04000, 0x4000, CRC(2cf5d8b7) SHA1(f66bce4d413a48f6ae07974870dc0f31eefa68e9) )
 	ROM_LOAD( "2.f2",   0x0c000, 0x4000, CRC(1f42c7fa) SHA1(33e56c6ddf7676a12f57de87ec740c6b6eb1cc8c) )
 	ROM_LOAD( "3.h2",   0x14000, 0x4000, CRC(cbaff4c6) SHA1(2dc4a1f51b28e98be0cfb5ab7576047c748b6728) )
