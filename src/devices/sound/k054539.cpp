@@ -25,7 +25,6 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 	, flags(0)
 	, reverb_pos(0)
 	, cur_ptr(0)
-	, cur_limit(0)
 	, rom_addr(0)
 	, stream(nullptr)
 	, m_timer(nullptr)
@@ -318,11 +317,11 @@ void k054539_device::init_chip()
 	memset(posreg_latch, 0, sizeof(posreg_latch)); //*
 	flags |= UPDATE_AT_KEYON; //* make it default until proven otherwise
 
-	ram = std::make_unique<uint8_t []>(0x4000);
+	ram = std::make_unique<uint8_t []>(0x8000);
 
 	reverb_pos = 0;
 	cur_ptr = 0;
-	memset(&ram[0], 0, 0x4000);
+	memset(&ram[0], 0, 0x8000);
 
 	stream = stream_alloc(0, 2, clock() / 384);
 
@@ -333,10 +332,9 @@ void k054539_device::init_chip()
 	save_item(NAME(flags));
 
 	save_item(NAME(regs));
-	save_pointer(NAME(ram), 0x4000);
+	save_pointer(NAME(ram), 0x8000);
 	save_item(NAME(reverb_pos));
 	save_item(NAME(cur_ptr));
-	save_item(NAME(cur_limit));
 	save_item(NAME(rom_addr));
 
 	save_item(NAME(m_timer_state));
@@ -433,16 +431,16 @@ void k054539_device::write(offs_t offset, u8 data)
 		break;
 
 		case 0x22d:
-			if(rom_addr == 0x80)
-				ram[cur_ptr] = data;
+			if(rom_addr == 0x80) {
+				int addr = (cur_ptr&0x3fff) | ((cur_ptr&0x10000)>>2);
+				ram[addr] = data;
+			}
 			cur_ptr++;
-			if(cur_ptr == cur_limit)
-				cur_ptr = 0;
+			cur_ptr &= 0x1ffff;
 		break;
 
 		case 0x22e:
 			rom_addr = data;
-			cur_limit = rom_addr == 0x80 ? 0x4000 : 0x20000;
 			cur_ptr = 0;
 		break;
 
@@ -477,7 +475,7 @@ void k054539_device::write(offs_t offset, u8 data)
 
 void k054539_device::device_post_load()
 {
-	cur_limit = rom_addr == 0x80 ? 0x4000 : 0x20000;
+
 }
 
 u8 k054539_device::read(offs_t offset)
@@ -485,12 +483,12 @@ u8 k054539_device::read(offs_t offset)
 	switch(offset) {
 	case 0x22d:
 		if(regs[0x22f] & 0x10) {
-			uint8_t res = (rom_addr == 0x80) ? ram[cur_ptr] : read_byte((0x20000*rom_addr)+cur_ptr);
+			int ram_addr = (cur_ptr&0x3fff) | ((cur_ptr&0x10000)>>2);
+			uint8_t res = (rom_addr == 0x80) ? ram[ram_addr] : read_byte((0x20000*rom_addr)+cur_ptr);
 			if (!machine().side_effects_disabled())
 			{
 				cur_ptr++;
-				if(cur_ptr == cur_limit)
-					cur_ptr = 0;
+				cur_ptr &= 0x1ffff;
 			}
 			return res;
 		} else
@@ -550,7 +548,7 @@ void k054539_device::device_reset()
 {
 	regs[0x22c] = 0;
 	regs[0x22f] = 0;
-	memset(&ram[0], 0, 0x4000);
+	memset(&ram[0], 0, 0x8000);
 	m_timer->enable(false);
 }
 
