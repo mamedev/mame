@@ -428,13 +428,13 @@ void hmcs400_cpu_device::reset_io()
 	m_d_mask = m_d = 0x000f;
 	m_write_d(m_d_mask);
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 11; i++)
 	{
 		// R0-R2 and RA are high-voltage
 		u8 mask = (i >= 3 && i <= 9) ? 0xf : 0;
 
 		m_r_mask[i] = m_r[i] = mask;
-		m_write_r[i](i, mask);
+		m_write_r[i](i, mask, 0xf);
 	}
 }
 
@@ -449,7 +449,7 @@ u8 hmcs400_cpu_device::read_r(u8 index)
 	}
 
 	u8 mask = (index == 10) ? 3 : 0xf; // port A is 2-bit
-	u8 inp = m_read_r[index](index);
+	u8 inp = m_read_r[index](index, mask);
 
 	if (m_read_r[index].isunset())
 	{
@@ -495,7 +495,7 @@ void hmcs400_cpu_device::write_r(u8 index, u8 data)
 		out = (out & ~pmr_mask) | (m_r_mask[index] & pmr_mask);
 	}
 
-	m_write_r[index](index, out);
+	m_write_r[index](index, out, 0xf);
 }
 
 int hmcs400_cpu_device::read_d(u8 index)

@@ -136,7 +136,7 @@ private:
 	void mario_sh_tuneselect_w(uint8_t data);
 	void mario_sh3_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	virtual void sound_start() override;
 	virtual void sound_reset() override;
 	void mario_palette(palette_device &palette) const;
@@ -149,12 +149,12 @@ private:
 	void memory_write_byte(offs_t offset, uint8_t data);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_ea(int ea);
-	void mario_io_map(address_map &map);
-	void mario_map(address_map &map);
-	void mario_sound_io_map(address_map &map);
-	void mario_sound_map(address_map &map);
-	void masao_map(address_map &map);
-	void masao_sound_map(address_map &map);
+	void mario_io_map(address_map &map) ATTR_COLD;
+	void mario_map(address_map &map) ATTR_COLD;
+	void mario_sound_io_map(address_map &map) ATTR_COLD;
+	void mario_sound_map(address_map &map) ATTR_COLD;
+	void masao_map(address_map &map) ATTR_COLD;
+	void masao_sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NINTENDO_MARIO_H

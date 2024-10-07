@@ -55,10 +55,10 @@ public:
 	ioport_value sound_status_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	virtual void main_map(address_map &map);
-	virtual void audio_io(address_map &map);
+	virtual void main_map(address_map &map) ATTR_COLD;
+	virtual void audio_io(address_map &map) ATTR_COLD;
 
 	void sound_flags_w(uint8_t data);
 
@@ -81,8 +81,8 @@ private:
 	void key_select_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
-	void audio_map(address_map &map);
-	void tc0091lvc_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void tc0091lvc_map(address_map &map) ATTR_COLD;
 };
 
 class fever13_state : public lastbank_state
@@ -93,8 +93,8 @@ public:
 	{ }
 
 protected:
-	virtual void main_map(address_map &map) override;
-	virtual void audio_io(address_map &map) override;
+	virtual void main_map(address_map &map) override ATTR_COLD;
+	virtual void audio_io(address_map &map) override ATTR_COLD;
 };
 
 

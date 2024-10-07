@@ -372,19 +372,19 @@ private:
 	void text_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	template <unsigned Which> TILE_GET_INFO_MEMBER(get_scr_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int line, int pri);
 	void irqhandler(int state);
 
-	void es5506_bank1_map(address_map &map);
-	void es5506_bank3_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void es5506_bank1_map(address_map &map) ATTR_COLD;
+	void es5506_bank3_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

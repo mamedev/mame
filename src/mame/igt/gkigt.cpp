@@ -2,12 +2,39 @@
 // copyright-holders:David Haywood, R. Belmont, Angelo Salese, Dirk Best
 /*
 
+IGT Gameking 960
+
 TODO:
-- hookup QUART devices, and fix "QUART COUNTER NOT RUNNING" error message;
-- interrupt system;
-- understand what's "netflex" device;
-- ms72c has extra checks?
-- CMOS never get properly initialized?
+- complete QUART devices, and fix "QUART COUNTER NOT RUNNING" error message;
+- interrupt system, wants IAC mode from i960;
+\- ms3/ms72c/bmoonii acks irq0 from quart2 CIR block only;
+- SENET device. Ties a i2c-like bus named netflex for comms with ticket printers, bill acceptors, touch screen ...
+\- bmoonii main board has an Actel A1020B + CY7C128A static RAM;
+\- CMOS never get properly initialized, tied on SENET?
+- all games will eventually print "RTC device: SOFTWARE", expecting an optional device somewhere. Later boards have a RTC62423;
+- bmoonii, ms5, ms14, dblheart, mystjag: crashes in i960 with unhandled 00 after RAM error.
+\- Do they all need NVRAM setchips?
+\- Should probably not get there, the watchdog would kick much earlier ...
+- watchdog (ADM691AAN on bmoonii board, "Telltale");
+\- All games hangs on soft reset;
+- All games are silent;
+\- bmoonii has a YM2413 on main board, tied with a XTAL(3'579'545).
+\- some extra stuff routes thru QUART chips (namely SRESET comes from there)
+\- ymz should require snd roms being hooked up to its internal memory map thru ROM_COPY;
+
+gkigt4 debug hang points:
+bp 8035d58,1,{r8=1;g} ; skip QUART not running (will save to NVRAM afterwards)
+bp 802491c,1,{g4=1;g} ; buffer at $10000308, irq?
+bp 80249f4,1,{g4=1;g} ; ^
+bp 80773f4,1,{g4=0;g} ; irq 2?
+bp 8177f48,1,{ip+=4;g} ; EEPROM CRC error / identification failure
+
+workaround for init crashes:
+`Fatal error: I960: <logged IP>: Unhandled 00`
+bp <logged IP>,1,{ ip|=0x08000000;hardreset } ; the first time around,
+                                              ; will initialize NVRAM stack to valid values
+
+===================================================================================================
 
 Game King board types:
 
@@ -91,16 +118,18 @@ More chips (from eBay auction):
 */
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i960/i960.h"
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
-#include "video/ramdac.h"
 #include "sound/ymz280b.h"
-#include "bus/rs232/rs232.h"
+#include "video/ramdac.h"
+#include "sound/ymopl.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
+#include "tilemap.h"
 
 namespace {
 
@@ -108,122 +137,93 @@ class igt_gameking_state : public driver_device
 {
 public:
 	igt_gameking_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette"),
-		m_screen(*this, "screen"),
-		m_vram(*this, "vram"),
-		m_quart1(*this, "quart1")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
+		, m_vram(*this, "vram")
+		, m_bg_vram(*this, "bg_vram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_quart(*this, "quart%u", 1U)
+		, m_opll(*this, "opll")
 	{ }
 
 	void igt_gameking(machine_config &config);
 	void igt_ms72c(machine_config &config);
 
 private:
-	virtual void video_start() override;
-	uint32_t screen_update_igt_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void video_start() override ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	uint32_t igt_gk_28010008_r()
-	{
-		return machine().rand();  // don't quite understand this one
-	};
-
-	uint32_t uart_status_r();
-	void uart_w(uint32_t data);
-	void irq_enable_w(uint8_t data);
-	void irq_ack_w(uint8_t data);
-	uint8_t irq_vector_r();
-	void unk_w(uint8_t data);
-	uint8_t frame_number_r();
-	void vblank_irq(int state);
-
-	uint8_t timer_r();
-	uint16_t version_r();
-
-	void igt_gameking_map(address_map &map);
-	void igt_ms72c_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void igt_gameking_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint32_t> m_vram;
-	required_device<sc28c94_device> m_quart1;
+	required_shared_ptr<uint32_t> m_bg_vram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device_array<sc28c94_device, 2> m_quart;
+	required_device<ym2413_device> m_opll;
 
-	uint8_t m_irq_enable = 0;
-	uint8_t m_irq_pend = 0;
-	uint8_t m_timer_count = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void bg_vram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 };
+
+
 
 void igt_gameking_state::video_start()
 {
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igt_gameking_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 4, 4, 256, 128);
 }
 
-uint32_t igt_gameking_state::screen_update_igt_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+// TODO: incomplete, several missing bit meanings
+// - for banking bit 19 is trusted by gkigt4, bit 16 for ms3, 18-17 assumed to be linear
+// - bits 15-12 are always 0xf?
+// - bits 23-20 used, unknown purpose (at least 1 bit of extra tile bank)
+TILE_GET_INFO_MEMBER(igt_gameking_state::get_bg_tile_info)
+{
+	const u32 entry = m_bg_vram[tile_index];
+	int const tile = (entry & 0x0fff) | (entry & 0x000f'0000) >> 4;
+	int const color = (entry >> 24) & 0xf;
+
+	tileinfo.set(0, tile, color, 0);
+}
+
+void igt_gameking_state::bg_vram_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_bg_vram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+uint32_t igt_gameking_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	for(int y = 0; y < 480; y++)
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for(int x = 0; x < 640; x+=4)
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=4)
 		{
-			for(int xi=0;xi<4;xi++)
+			const u32 gfx_data = m_vram[(x + y * 1024) / 4];
+
+			for(int xi = 0; xi < 4; xi++)
 			{
-				uint32_t const color = (m_vram[(x+y*1024)/4] >> (xi*8)) & 0xff;
-
-				if(cliprect.contains(x+xi, y))
+				uint32_t const color = (gfx_data >> (xi*8)) & 0xff;
+				if (color)
 					bitmap.pix(y, x+xi) = m_palette->pen(color);
-
 			}
 		}
 	}
 
-
 	return 0;
 }
-
-
-uint32_t igt_gameking_state::uart_status_r()
-{
-	return 0x00040004;
-}
-
-void igt_gameking_state::uart_w(uint32_t data)
-{
-	printf("%c", (data>>16) & 0x7f);
-}
-
-void igt_gameking_state::irq_enable_w(uint8_t data)
-{
-	m_irq_enable = data;
-}
-
-void igt_gameking_state::irq_ack_w(uint8_t data)
-{
-	//logerror("%02x\n",data);
-	m_maincpu->set_input_line(I960_IRQ0,CLEAR_LINE);
-	m_irq_pend = 0;
-}
-
-uint8_t igt_gameking_state::irq_vector_r()
-{
-	return m_irq_pend;
-}
-
-uint8_t igt_gameking_state::frame_number_r()
-{
-	// TODO: likely not right, checked in irq 0
-	return 0;//m_screen->frame_number() & 7;
-}
-
-void igt_gameking_state::unk_w(uint8_t data)
-{
-	// bit 7 toggled, unknown purpose
-}
-
 
 void igt_gameking_state::igt_gameking_map(address_map &map)
 {
@@ -231,124 +231,84 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 	map(0x08000000, 0x081fffff).flags(i960_cpu_device::BURST).rom().region("game", 0);
 	map(0x08200000, 0x083fffff).flags(i960_cpu_device::BURST).rom().region("plx", 0);
 
+//  map(0x0ac00000, 0x0ac0000f) - board identifiers?
+//  map(0x0ae00000, 0x0ae0000f) /
 
-	// it's unclear how much of this is saved and how much total RAM there is.
+	// TODO: fix ranges between CMOS and regular work RAM
+	// - bmoonii PCB has two M48Z128Y (-> 0x20000 x2)
+	// - ms3 maps CMOS ranges at 0x1002'0000-0x1003'ffff only
 	map(0x10000000, 0x1001ffff).flags(i960_cpu_device::BURST).ram().share("nvram");
 	map(0x10020000, 0x17ffffff).flags(i960_cpu_device::BURST).ram();
 
-	map(0x18000000, 0x181fffff).flags(i960_cpu_device::BURST).ram().share("vram"); // igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
+	// igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
+	map(0x18000000, 0x180fffff).flags(i960_cpu_device::BURST).ram().share("vram");
+	map(0x18100000, 0x1811ffff).flags(i960_cpu_device::BURST).ram().w(FUNC(igt_gameking_state::bg_vram_w)).share("bg_vram");
+	map(0x18120000, 0x181fffff).ram();
+
+//  map(0x18200000, 0x18200003) video related?
+	map(0x18200000, 0x18200001).lr16(
+		NAME([this] () {
+			u16 res = m_screen->vpos();
+			if (m_screen->vpos() >= 480)
+				res |= 0x400;
+			return res;
+		}
+	));
+	map(0x18200002, 0x18200003).lr16(
+		NAME([this] () {
+			// TODO: unknown value required, checked at "Cold powerup machine setup" in some games
+			// coming from Xilinx anyway?
+
+			logerror("%s: version read\n", machine().describe_context());
+			return 0x0038;
+		}
+	));
 
 	// 28000000: MEZ2 SEL, also connected to ymz chip select?
+	map(0x28000000, 0x28000003).rw(m_opll, FUNC(ym2413_device::read), FUNC(ym2413_device::write)).umask32(0x00ff00ff);
 	// 28010000: first 28C94 QUART (QRT1 SEL)
+	map(0x28010000, 0x2801007f).rw(m_quart[0], FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
 	// 28020000: SENET SEL
+	map(0x280201fa, 0x280201fa).lrw8(
+		NAME([this] () {
+			logerror("SENET $1fa read\n");
+			return 0;
+		}),
+		NAME([this] (u8 data) {
+			logerror("SENET $1fa write %02x\n", data);
+		})
+	);
+	map(0x280201fc, 0x280201fc).lrw8(
+		NAME([this] () {
+			logerror("SENET $1fc read\n");
+			return 0;
+		}),
+		NAME([this] (u8 data) {
+			logerror("SENET $1fc write %02x\n", data);
+		})
+	);
+//  map(0x28020000, 0x280205ff).flags(i960_cpu_device::BURST).ram();
 	// 28030000: WCHDOG SEL
+	map(0x28030000, 0x28030003).nopr();
 	// 28040000: second 28C94 QUART (QRT2 SEL)
-	// 28050000: SOUND SEL
-	// 28060000: COLOR SEL
-	// 28070000: OUT SEL
-//  map(0x28010000, 0x2801007f).rw("quart1", FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
-	map(0x28010008, 0x2801000b).r(FUNC(igt_gameking_state::uart_status_r));
-	map(0x2801001c, 0x2801001f).nopw();
-	map(0x28010030, 0x28010033).r(FUNC(igt_gameking_state::uart_status_r)); // channel D
-	map(0x28010034, 0x28010037).w(FUNC(igt_gameking_state::uart_w));       // channel D
-	map(0x28020000, 0x280205ff).flags(i960_cpu_device::BURST).ram();       // CMOS?
-//  map(0x28020000, 0x2802007f).r(FUNC(igt_gameking_state::igt_gk_28010008_r)).nopw();
-	map(0x28030000, 0x28030003).portr("IN0");
-//  map(0x28040000, 0x2804007f).rw("quart2", FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
-	map(0x2804000a, 0x2804000a).w(FUNC(igt_gameking_state::unk_w));
-	map(0x28040008, 0x28040008).rw(FUNC(igt_gameking_state::irq_vector_r), FUNC(igt_gameking_state::irq_enable_w));
-	map(0x28040018, 0x2804001b).portr("IN1").nopw();
-	map(0x2804001c, 0x2804001f).portr("IN4").nopw();
-	map(0x28040028, 0x2804002b).nopr();
-	map(0x2804002a, 0x2804002a).w(FUNC(igt_gameking_state::irq_ack_w));
-//  map(0x28040038, 0x2804003b).r(FUNC(igt_gameking_state::timer_r)).umask32(0x00ff0000);
+	map(0x28040000, 0x2804007f).rw(m_quart[1], FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
+	// TODO: these overlays should come from the QUART devices
+	map(0x28010038, 0x2801003b).portr("IN1").nopw();
 	map(0x28040038, 0x2804003b).portr("IN2").nopw();
-	map(0x2804003c, 0x2804003f).portr("IN3").nopw();
-	map(0x28040050, 0x28040050).r(FUNC(igt_gameking_state::frame_number_r));
-	map(0x28040054, 0x28040057).nopw();
-//  map(0x28040054, 0x28040057).w(FUNC(igt_gameking_state::irq_ack_w).umask32(0x000000ff);
-
+	// 28050000: SOUND SEL
 	map(0x28050000, 0x28050003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x00ff00ff);
+	// 28060000: COLOR SEL
 	map(0x28060000, 0x28060000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x28060002, 0x28060002).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x28060004, 0x28060004).w("ramdac", FUNC(ramdac_device::mask_w));
+	// 28070000: OUT SEL
 
 	map(0x3b000000, 0x3b1fffff).flags(i960_cpu_device::BURST).rom().region("snd", 0);
 
 	map(0xa1000000, 0xa1011fff).flags(i960_cpu_device::BURST).ram(); // used by gkkey for restart IAC
 }
 
-uint16_t igt_gameking_state::version_r()
-{
-	// TODO: unknown value required, checked at "Cold powerup machine setup"
-	return 0xf777;
-}
-
-uint8_t igt_gameking_state::timer_r()
-{
-	// TODO: ms72c 8011ab0 "init_io" check, gets printed as "New security latch value = %x"
-	return m_timer_count++;
-}
-
-void igt_gameking_state::igt_ms72c_map(address_map &map)
-{
-	igt_gameking_map(map);
-	map(0x18200000, 0x18200001).r(FUNC(igt_gameking_state::version_r));
-	map(0x2804003a, 0x2804003a).r(FUNC(igt_gameking_state::timer_r));
-}
-
 static INPUT_PORTS_START( igt_gameking )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x010000, 0x010000, "IN0-1" )
-	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x400000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x800000, 0x800000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x800000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x01, "IN1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -425,24 +385,20 @@ static INPUT_PORTS_START( igt_gameking )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x010000, 0x010000, "Door M" ) // Door M
+	PORT_DIPNAME( 0x010000, 0x000000, "Door M" ) // Door M
 	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x020000, 0x020000, "Door C" ) // Door C
+	PORT_DIPNAME( 0x020000, 0x000000, "Door C" ) // Door C
 	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x040000, 0x040000, "Door B" ) // Door B
+	PORT_DIPNAME( 0x040000, 0x000000, "Door B" ) // Door B
 	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x100000, 0x100000, "Attendant key" ) // key switch
-	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x200000, 0x200000, "test switch" ) // test switch
-	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_BIT( 0x100000, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Attendant key")
+	PORT_BIT( 0x200000, IP_ACTIVE_LOW, IPT_SERVICE ) // Test switch
 	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x400000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
@@ -552,23 +508,21 @@ static INPUT_PORTS_START( igt_gameking )
 	PORT_DIPSETTING(    0x800000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
 	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 INPUT_PORTS_END
 
 static const gfx_layout igt_gameking_layout =
 {
-	16,8,
+	4,4,
 	RGN_FRAC(1,1),
 	4,
-	{ 0,1,2,3 },
-	{ 0*4,1*4,2*4,3*4,4*4,5*4,6*4,7*4,8*4,9*4,10*4,11*4,12*4,13*4,14*4,15*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	8*64
+	{ 0, 1, 2, 3 },
+	{ 4, 0, 12, 8 },
+	{ STEP4(0, 4*4) },
+	4*4*4
 };
 
-
 static GFXDECODE_START( gfx_igt_gameking )
-	GFXDECODE_ENTRY( "cg", 0, igt_gameking_layout,   0x0, 1  )
+	GFXDECODE_ENTRY( "cg", 0, igt_gameking_layout,   0x0, 16  )
 GFXDECODE_END
 
 void igt_gameking_state::ramdac_map(address_map &map)
@@ -582,18 +536,7 @@ void igt_gameking_state::machine_start()
 
 void igt_gameking_state::machine_reset()
 {
-	m_timer_count = 0;
-	m_quart1->ip2_w(1); // needs to be high
-}
-
-void igt_gameking_state::vblank_irq(int state)
-{
-	if (state && BIT(m_irq_enable, 3))
-	{
-		m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
-		//machine().debug_break();
-		m_irq_pend = 8;
-	}
+	m_quart[0]->ip2_w(1); // needs to be high
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -610,46 +553,71 @@ void igt_gameking_state::igt_gameking(machine_config &config)
 	I960(config, m_maincpu, XTAL(24'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igt_gameking_state::igt_gameking_map);
 
-	SC28C94(config, m_quart1, XTAL(24'000'000) / 6);
-	m_quart1->d_tx_cb().set("diag", FUNC(rs232_port_device::write_txd));
-
-	sc28c94_device &quart2(SC28C94(config, "quart2", XTAL(24'000'000) / 6));
-	quart2.irq_cb().set_inputline(m_maincpu, I960_IRQ0);
-
-	rs232_port_device &diag(RS232_PORT(config, "diag", default_rs232_devices, nullptr));
-	diag.rxd_handler().set("quart1", FUNC(sc28c94_device::rx_d_w));
-	diag.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
-
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_igt_gameking);
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(1024, 512);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
-	m_screen->set_screen_update(FUNC(igt_gameking_state::screen_update_igt_gameking));
+	m_screen->set_screen_update(FUNC(igt_gameking_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(igt_gameking_state::vblank_irq));
 	// Xilinx used as video chip XTAL(26'666'666) on board
+
+	SC28C94(config, m_quart[0], XTAL(24'000'000) / 6);
+	m_quart[0]->irq_cb().set_inputline(m_maincpu, I960_IRQ3);
+	m_quart[0]->d_tx_cb().set("diag", FUNC(rs232_port_device::write_txd));
+
+	SC28C94(config, m_quart[1], XTAL(24'000'000) / 6);
+	m_quart[1]->irq_cb().set_inputline(m_maincpu, I960_IRQ0);
+
+	rs232_port_device &diag(RS232_PORT(config, "diag", default_rs232_devices, "terminal"));
+	diag.rxd_handler().set(m_quart[0], FUNC(sc28c94_device::rx_d_w));
+	diag.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+
+	// TODO: SENET here
+	// uses I960_IRQ2
 
 	PALETTE(config, m_palette).set_entries(0x100);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &igt_gameking_state::ramdac_map);
 
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igt_gameking);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+
+	YM2413(config, m_opll, XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	YMZ280B(config, "ymz", XTAL(16'934'400)).add_route(ALL_OUTPUTS, "mono", 1.0); // enhanced sound on optional Media-Lite sub board
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 }
 
-void igt_gameking_state::igt_ms72c(machine_config &config)
-{
-	igt_gameking(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &igt_gameking_state::igt_ms72c_map);
-}
+
+// TODO: standardize ROM labels
+// `${socket_name}_${printed_label}.${ROM position}`, ms14 for an example
+
+ROM_START( ms14 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "config_1b5117ax.u8",  0x000000, 0x080000, CRC(0b533749) SHA1(54b37ddcc705dcd92932a9eed5ffb25c55fa0c49) )
+
+	ROM_REGION32_LE( 0x200000, "game", 0 )
+	ROM_LOAD16_BYTE( "gme1_da5017ax.u21", 0x000000, 0x100000, CRC(b7f50a77) SHA1(0f860083b5e354bf904fdfd3c5545650ce5a9ad2) )
+	ROM_LOAD16_BYTE( "gme2_da5017ax.u5",  0x000001, 0x100000, CRC(11974fe5) SHA1(f091458a43303ce147ad79212706ef15921f7cfa) )
+
+	ROM_REGION( 0x100000, "cg", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "cg1_1g5043ax.u48", 0x000000, 0x040000, CRC(4d81e8dd) SHA1(fd9afb1179f863536b65613e9168924247822e63) )
+	ROM_LOAD16_BYTE( "cg2_1g5043ax.u47", 0x000001, 0x040000, CRC(025695be) SHA1(ed846c1a8bf0c23ae710af6281fdd2612ba08c51) )
+
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
+	ROM_LOAD16_BYTE( "px1_1g5043ax.u20", 0x000000, 0x100000, CRC(70829422) SHA1(78e4d40cff86f197334746a68dc08fa2af42a058) )
+	ROM_LOAD16_BYTE( "px2_1g5043ax.u4",  0x000001, 0x100000, CRC(968d70e4) SHA1(a786fb12fa242fa5c3052fbadf897e8f4091c506)
+ )
+
+	ROM_REGION32_LE( 0x200000, "snd", 0 )
+	ROM_LOAD( "snd_1h5005ax.u6",  0x000000, 0x100000, CRC(8cee9699) SHA1(e40daebf15499abf0eface4ff277c8cbdd5f43be)
+ )
+ROM_END
 
 ROM_START( ms3 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -672,6 +640,26 @@ ROM_START( ms3 )
 
 	ROM_REGION( 0x20000, "nvram", 0 )
 	ROM_LOAD( "nvram",        0x000000, 0x020000, CRC(acbbc6d9) SHA1(6e86d24ad3793b41f1f23f80f9bdb22767abc3bf) )
+ROM_END
+
+ROM_START( ms5 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "config_1b5045ba.u8",  0x000000, 0x080000, CRC(c13a579f) SHA1(320c2a34f51db05e79687ffbb3ae740fb634db15) )
+
+	ROM_REGION32_LE( 0x200000, "game", 0 )
+	ROM_LOAD16_BYTE( "gme1_da5017ax.u21", 0x000000, 0x100000, CRC(b7f50a77) SHA1(0f860083b5e354bf904fdfd3c5545650ce5a9ad2) )
+	ROM_LOAD16_BYTE( "gme2_da5017ax.u5",  0x000001, 0x100000, CRC(11974fe5) SHA1(f091458a43303ce147ad79212706ef15921f7cfa) )
+
+	ROM_REGION( 0x100000, "cg", 0 )
+	ROM_LOAD16_BYTE( "cg1_1g5013bx.u48", 0x000000, 0x040000, CRC(6ad179a3) SHA1(645b04873bfb38222c5a80326c8ad9bf897e75a2 ) )
+	ROM_LOAD16_BYTE( "cg2_1g5013bx.u47", 0x000001, 0x040000, CRC(e3a00dc2) SHA1(0afae4ca882f39845fca679187dd9005088a39c2 ) )
+
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
+	ROM_LOAD16_BYTE( "px1_1g5013bx.u20", 0x000000, 0x100000, CRC(d9801616) SHA1(87e449afa454d2ed8a415be648c62a95d36b43e3) )
+	ROM_LOAD16_BYTE( "px2_1g5013bx.u4",  0x000001, 0x100000, CRC(61271927) SHA1(12fd97d11a569cfe6edb476e186edddb55203344) )
+
+	ROM_REGION32_LE( 0x200000, "snd", 0 )
+	ROM_LOAD( "snd_1h5011bx.u6",  0x000000, 0x100000, CRC(79b98d9c) SHA1(e6557eadd53f0fbaa07ced09a6edf6dceeffaa42) )
 ROM_END
 
 ROM_START( ms72c )
@@ -716,6 +704,49 @@ ROM_START( bmoonii )
 	ROM_REGION32_LE( 0x200000, "snd", 0 )
 	ROM_LOAD( "sound-1h5025ax.u6", 0x000000, 0x080000, CRC(2502d6f6) SHA1(efe1177a6c02778df8ed62e52d1083c105ebe2ce) )
 ROM_END
+
+ROM_START( dblheart )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "config_1b5154ax.u8",  0x000000, 0x080000, CRC(53ec9b2b) SHA1(0a2f277a59e9b61df1f38e5c9d7f53bd9d28caf3) )
+
+	ROM_REGION32_LE( 0x200000, "game", 0 )
+	ROM_LOAD16_BYTE( "gme1_ca5017ax.u21", 0x000000, 0x100000, CRC(bab3994f) SHA1(4ec2cbe92e2f2019970d6bb7fa9fbd767b3001b2) )
+	ROM_LOAD16_BYTE( "gme2_ca5017ax.u5",  0x000001, 0x100000, CRC(f1898f14) SHA1(9bcd4ebe09d6f982cb12dc9a6d070cd1195e3320) )
+
+	ROM_REGION( 0x100000, "cg", 0 )
+	ROM_LOAD16_BYTE( "cg1_1g5077ax.u48", 0x000000, 0x040000, CRC(18870d22) SHA1(4ead7a84a2e2d3b2e6141ef6f99a5f586779867b) )
+	ROM_LOAD16_BYTE( "cg2_1g5077ax.u47", 0x000001, 0x040000, CRC(02395605) SHA1(adbc44d8595ad86265df96d1645b18228081146f) )
+
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
+	ROM_LOAD16_BYTE( "px1_1g5077ax.u20", 0x000000, 0x80000, CRC(85598395) SHA1(9b6d09668ff08140a257b75eb41932c6ccca3f4d) )
+	ROM_LOAD16_BYTE( "px2_1g5077ax.u4",  0x000001, 0x80000, CRC(339e2f5e) SHA1(b54076c2775e28c91c76c93ea456ebf52b3fede8) )
+
+	ROM_REGION32_LE( 0x200000, "snd", 0 )
+	ROM_LOAD( "snd_1h5033ax.u6",  0x000000, 0x080000, CRC(daba6d27) SHA1(b6aaf6436e65a5ad7e28c40a93e2d9de5a806885) )
+ROM_END
+
+ROM_START( mystjag )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "config_1b5157ax.u8",  0x000000, 0x080000, CRC(6032a97b) SHA1(6a825d387f972252d574235ed8e461f52088e125) )
+
+	ROM_REGION32_LE( 0x200000, "game", 0 )
+	ROM_LOAD16_BYTE( "gme1_ca5017ax.u21", 0x000000, 0x100000, CRC(bab3994f) SHA1(4ec2cbe92e2f2019970d6bb7fa9fbd767b3001b2) )
+	ROM_LOAD16_BYTE( "gme2_ca5017ax.u5",  0x000001, 0x100000, CRC(f1898f14) SHA1(9bcd4ebe09d6f982cb12dc9a6d070cd1195e3320) )
+
+	ROM_REGION( 0x100000, "cg", 0 )
+	ROM_LOAD16_BYTE( "cg1_2g5116xx.u48", 0x000000, 0x040000, CRC(4a1ebbc5) SHA1(f37f1b141338dd872734ecaca8fdfb2c12bcc2cf) )
+	ROM_LOAD16_BYTE( "cg2_2g5116xx.u47", 0x000001, 0x040000, CRC(d227f254) SHA1(3ec6839c43fe368c1e318037d45d7ea796718dde) )
+
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
+	ROM_LOAD16_BYTE( "px1_2g5116xx.u20", 0x000000, 0x100000, CRC(a40abd1a) SHA1(177b7cbae5c9f7e2063fe1641e203502b4a4c927)
+ )
+	ROM_LOAD16_BYTE( "px2_2g5116xx.u4",  0x000001, 0x100000, CRC(55906b92) SHA1(f4c5d5c0e2b2407b9d4383dba7e28cc8341bafc2)
+ )
+
+	ROM_REGION32_LE( 0x200000, "snd", 0 )
+	ROM_LOAD( "snd_1h5152xx.u6",  0x000000, 0x100000, CRC(e459e0be) SHA1(21089fd03a1ea8e4ca3963988647fa4414390d0c) )
+ROM_END
+
 
 ROM_START( gkigt4 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -864,7 +895,6 @@ ROM_START( gkigt5p )
 	ROM_LOAD( "swc00046 snd2 2 of 2,2-80.rom2", 0x100000, 0x100000, CRC(a7ef9b46) SHA1(031373fb8e39c4ed828a58bb63a9395a205c6b6b) )
 ROM_END
 
-
 ROM_START( igtsc )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "i0000838 base,1-4002.bin", 0x00000, 0x80000, CRC(7b66f0d5) SHA1(a13e7fa4062668ff7acb15e58025eeb401754898) )
@@ -886,7 +916,6 @@ ROM_START( igtsc )
 	// uses a SIMM
 	ROM_LOAD( "dss00076.simm", 0x000000, 0xfd7f81, BAD_DUMP CRC(5dd889b4) SHA1(9a6cb7599d268d110645ac8fe5d41a733cbaadc5) ) // should be 0x1000000
 ROM_END
-
 
 ROM_START( gkkey )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -927,15 +956,19 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1994, ms3,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 3",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1994, ms72c,     0,      igt_ms72c,    igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 7 2c",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, bmoonii,   0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Blue Moon II",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt4,    0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt4ms,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x, MS)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt43,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt43n,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3, NJ)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigtez,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, ms14,      0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 14", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, bmoonii,   0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Blue Moon II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, dblheart,  0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Double Hearts", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, ms3,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, ms5,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 5", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, mystjag,   0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Mystic Jaguar", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, ms72c,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 7 2c", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt4,    0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt4ms,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt43,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt43n,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3, NJ)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigtez,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigtezms, gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt5p,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Triple-Five Play)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, igtsc,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Super Cherry",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // SIMM dumps are bad.
-GAME( 2003, gkkey,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Set Chips)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // only 2 are good dumps
+GAME( 2003, igtsc,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Super Cherry", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // SIMM dumps are bad.
+GAME( 2003, gkkey,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Set Chips)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // only 2 are good dumps

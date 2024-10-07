@@ -100,10 +100,10 @@ public:
 	void init_mgavegas133();
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void mgavegas_map(address_map &map);
+	void mgavegas_map(address_map &map) ATTR_COLD;
 
 	uint8_t start_read();
 

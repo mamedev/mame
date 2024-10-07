@@ -309,8 +309,8 @@ public:
 	void init_solvalou();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -359,12 +359,12 @@ private:
 
 	void configure_c68_namcos21(machine_config &config);
 
-	void common_map(address_map &map);
-	void master_map(address_map &map);
-	void slave_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void master_map(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
 
-	void sound_map(address_map &map);
-	void c140_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void c140_map(address_map &map) ATTR_COLD;
 };
 
 

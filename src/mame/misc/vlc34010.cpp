@@ -70,7 +70,7 @@ public:
 	void base(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void switch_w(u8 data);
@@ -87,8 +87,8 @@ private:
 	required_device_array<mc68681_device, 3> m_duart;
 	memory_view m_boot_view;
 
-	void main_map(address_map &map);
-	void tms_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void tms_map(address_map &map) ATTR_COLD;
 };
 
 

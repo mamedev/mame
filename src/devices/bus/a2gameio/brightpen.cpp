@@ -34,8 +34,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_a2gameio_interface implementation
 	virtual int sw0_r() override;
@@ -126,7 +126,7 @@ int apple2_brightpen_device::sw0_r()
 	}
 
 	// light detected if average brightness is above threshold
-	return (brightness_sum >= BRIGHTNESS_THRESHOLD * pixels_scanned);
+	return brightness_sum >= BRIGHTNESS_THRESHOLD * pixels_scanned;
 }
 
 } // anonymous namespace

@@ -702,23 +702,23 @@ public:
 protected:
 	using unscramble_func = uint16_t (*)(uint16_t);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_resolve_objects() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	void namcos10_base(machine_config &config);
 	void namcos10_exio(machine_config &config);
 	void namcos10_mgexio(machine_config &config);
 	void namcos10_exfinalio(machine_config &config);
 
-	void namcos10_map_inner(address_map &map);
-	void namcos10_map(address_map &map);
+	void namcos10_map_inner(address_map &map) ATTR_COLD;
+	void namcos10_map(address_map &map) ATTR_COLD;
 
-	void namcos10_map_exio_inner(address_map &map);
-	void namcos10_map_exio(address_map &map);
+	void namcos10_map_exio_inner(address_map &map) ATTR_COLD;
+	void namcos10_map_exio(address_map &map) ATTR_COLD;
 
-	void namcos10_map_mgexio_inner(address_map &map);
-	void namcos10_map_mgexio(address_map &map);
+	void namcos10_map_mgexio_inner(address_map &map) ATTR_COLD;
+	void namcos10_map_mgexio(address_map &map) ATTR_COLD;
 
 	required_device<psxcpu_device> m_maincpu;
 	optional_device<ns10_decrypter_device> m_decrypter;
@@ -806,14 +806,14 @@ public:
 	void init_mrdrilr2();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void namcos10_memm(machine_config &config);
 
-	void namcos10_memm_map_inner(address_map &map);
-	void namcos10_memm_map(address_map &map);
+	void namcos10_memm_map_inner(address_map &map) ATTR_COLD;
+	void namcos10_memm_map(address_map &map) ATTR_COLD;
 
 	void memm_driver_init();
 
@@ -873,13 +873,13 @@ public:
 	void memn_driver_init();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void namcos10_memn_base(machine_config &config);
 	void namcos10_memn(machine_config &config);
 
-	void namcos10_memn_map(address_map &map);
+	void namcos10_memn_map(address_map &map) ATTR_COLD;
 
 	void namcos10_nand_k9f2808u0b(machine_config &config, int nand_count);
 	void namcos10_nand_k9f5608u0d(machine_config &config, int nand_count);
@@ -893,7 +893,7 @@ protected:
 	uint8_t m_nand_rnb_state[16];
 
 private:
-	void namcos10_memn_map_inner(address_map &map);
+	void namcos10_memn_map_inner(address_map &map) ATTR_COLD;
 
 	void nand_copy(uint8_t *nand_base, uint16_t *dst, uint32_t address, int len);
 
@@ -932,15 +932,15 @@ public:
 	void ns10_squizchs(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void namcos10_memp3_base(machine_config &config);
 
-	void namcos10_memp3_map_inner(address_map &map);
-	void namcos10_memp3_map(address_map &map);
-	void mcu_map(address_map &map);
+	void namcos10_memp3_map_inner(address_map &map) ATTR_COLD;
+	void namcos10_memp3_map(address_map &map) ATTR_COLD;
+	void mcu_map(address_map &map) ATTR_COLD;
 
 	template <int Port> uint8_t port_read(offs_t offset);
 	template <int Port> void port_write(offs_t offset, uint8_t data);
@@ -1005,12 +1005,12 @@ public:
 	void ns10_ippo2(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void namcos10_memio_base(machine_config &config);
-	void namcos10_memio_map(address_map &map);
-	void namcos10_memio_map_inner(address_map &map);
+	void namcos10_memio_map(address_map &map) ATTR_COLD;
+	void namcos10_memio_map_inner(address_map &map) ATTR_COLD;
 
 	void namcos10_nand_tc58256aft(machine_config &config, int nand_count);
 

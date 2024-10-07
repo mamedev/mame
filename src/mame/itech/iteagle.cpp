@@ -140,8 +140,8 @@ public:
 	required_device<iteagle_fpga_device> m_fpga;
 	required_device<iteagle_eeprom_device> m_eeprom;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void gtfore05(machine_config &config);
 	void gtfore02(machine_config &config);
 	void gtfore03(machine_config &config);

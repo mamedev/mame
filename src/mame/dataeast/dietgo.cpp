@@ -82,9 +82,9 @@ private:
 
 	uint16_t ioprot_r(offs_t offset);
 	void ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void decrypted_opcodes_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

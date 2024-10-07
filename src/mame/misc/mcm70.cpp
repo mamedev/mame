@@ -46,8 +46,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(start);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t status_r(offs_t offset);
@@ -57,8 +57,8 @@ private:
 
 	uint8_t keyboard_r(offs_t offset);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void mcm70_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

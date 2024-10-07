@@ -128,12 +128,12 @@ private:
 	void set_grayscale(int state);
 	void set_vdp_enable(int state);
 
-	void decrypted_opcodes_map(address_map &map);
-	void mcu_io_map(address_map &map);
-	void pcm_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
-	void system18_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void mcu_io_map(address_map &map) ATTR_COLD;
+	void pcm_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
+	void system18_map(address_map &map) ATTR_COLD;
 
 	// rom board types
 	enum segas18_rom_board
@@ -146,9 +146,9 @@ private:
 	};
 
 	// device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// internal helpers
 	TIMER_CALLBACK_MEMBER(initial_boost);

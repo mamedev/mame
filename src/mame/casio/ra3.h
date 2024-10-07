@@ -32,7 +32,7 @@ public:
 protected:
 	casio_ram_cart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, unsigned max_size);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 private:

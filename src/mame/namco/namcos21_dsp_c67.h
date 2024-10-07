@@ -49,10 +49,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	static constexpr unsigned DSP_BUF_MAX = 4096*12;
@@ -143,13 +143,13 @@ private:
 	void slave_XF_output_w(uint16_t data);
 	uint16_t slave_portf_r();
 
-	void master_dsp_data(address_map &map);
-	void master_dsp_io(address_map &map);
-	void master_dsp_program(address_map &map);
+	void master_dsp_data(address_map &map) ATTR_COLD;
+	void master_dsp_io(address_map &map) ATTR_COLD;
+	void master_dsp_program(address_map &map) ATTR_COLD;
 
-	void slave_dsp_data(address_map &map);
-	void slave_dsp_io(address_map &map);
-	void slave_dsp_program(address_map &map);
+	void slave_dsp_data(address_map &map) ATTR_COLD;
+	void slave_dsp_io(address_map &map) ATTR_COLD;
+	void slave_dsp_program(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(NAMCOS21_DSP_C67, namcos21_dsp_c67_device)

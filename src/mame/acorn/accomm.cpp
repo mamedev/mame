@@ -94,9 +94,9 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(scanline_interrupt_check);
 
@@ -113,8 +113,8 @@ private:
 
 	void accomm_palette(palette_device &palette) const;
 
-	void main_map(address_map &map);
-	void saa5240_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void saa5240_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<g65816_device> m_maincpu;

@@ -130,10 +130,10 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// screen updates
@@ -150,8 +150,8 @@ private:
 	void output_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	void marinedt_io(address_map &map);
-	void marinedt_map(address_map &map);
+	void marinedt_io(address_map &map) ATTR_COLD;
+	void marinedt_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

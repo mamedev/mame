@@ -77,8 +77,8 @@ public:
 	void macqd630(machine_config &config);
 	void maclc580(machine_config &config);
 
-	void quadra630_map(address_map &map);
-	void lc580_map(address_map &map);
+	void quadra630_map(address_map &map) ATTR_COLD;
+	void lc580_map(address_map &map) ATTR_COLD;
 
 	void init_macqd630();
 
@@ -91,8 +91,8 @@ private:
 	required_device<cuda_device> m_cuda;
 	required_device<ram_device> m_ram;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void cuda_reset_w(int state)
 	{

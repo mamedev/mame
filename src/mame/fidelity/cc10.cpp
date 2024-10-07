@@ -66,7 +66,7 @@ public:
 	void ccx(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -83,10 +83,10 @@ private:
 	u8 m_7seg_data = 0;
 
 	// address maps
-	void acr_map(address_map &map);
-	void ccx_map(address_map &map);
-	void main_trampoline(address_map &map);
-	void main_io(address_map &map);
+	void acr_map(address_map &map) ATTR_COLD;
+	void ccx_map(address_map &map) ATTR_COLD;
+	void main_trampoline(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	u8 main_trampoline_r(offs_t offset);
 	void main_trampoline_w(offs_t offset, u8 data);

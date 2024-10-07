@@ -56,14 +56,14 @@ private:
 	TILE_GET_INFO_MEMBER(get_fof_bak_tile_info);
 	TILE_GET_INFO_MEMBER(get_fof_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_fof_txt_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_fitfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer );
-	void bbprot_main_map(address_map &map);
-	void fitfight_main_map(address_map &map);
-	void snd_mem(address_map &map);
+	void bbprot_main_map(address_map &map) ATTR_COLD;
+	void fitfight_main_map(address_map &map) ATTR_COLD;
+	void snd_mem(address_map &map) ATTR_COLD;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_fof_100000;

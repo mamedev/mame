@@ -131,12 +131,12 @@ protected:
 
 	void crtc_w(offs_t reg, u16 data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mem(address_map &map);
+	void mem(address_map &map) ATTR_COLD;
 };
 
 class naruto_state : public xavix2_state

@@ -68,8 +68,8 @@ private:
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
-	void hvysmsh_map(address_map &map);
-	void wcvol95_map(address_map &map);
+	void hvysmsh_map(address_map &map) ATTR_COLD;
+	void wcvol95_map(address_map &map) ATTR_COLD;
 
 	/* devices */
 	required_device<arm_cpu_device> m_maincpu;

@@ -37,8 +37,8 @@ private:
 	void drive_size_w(int state);
 	template <unsigned Drive> void drive_sel_w(int state);
 
-	void slicer_io(address_map &map);
-	void slicer_map(address_map &map);
+	void slicer_io(address_map &map) ATTR_COLD;
+	void slicer_map(address_map &map) ATTR_COLD;
 
 	required_device<fd1797_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppies;

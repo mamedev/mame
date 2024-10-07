@@ -21,10 +21,10 @@ public:
 	template<offs_t Num> auto port_out_cb() { return m_out_cb[Num].bind(); }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void internal_update(u64 current_time) override;
 	using m6502_mcu_device_base<m65c02_device>::internal_update;
@@ -56,7 +56,7 @@ protected:
 
 	void irq_update();
 
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 
 	u8 m_irq_pending, m_irq_enable;
 

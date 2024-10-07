@@ -12,8 +12,8 @@ protected:
 	dsp56000_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }

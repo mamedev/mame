@@ -3668,7 +3668,7 @@ private:
 
 	uint8_t opcode_r(offs_t offset);
 
-	void opcodes_map(address_map& map);
+	void opcodes_map(address_map &map) ATTR_COLD;
 };
 
 uint8_t multiwina_state::opcode_r(offs_t offset)
@@ -3704,7 +3704,7 @@ public:
 private:
 	uint8_t jokercrd_opcode_r(offs_t offset);
 
-	void jokercrd_opcodes_map(address_map& map);
+	void jokercrd_opcodes_map(address_map &map) ATTR_COLD;
 };
 
 uint8_t jokercrd_state::jokercrd_opcode_r(offs_t offset)

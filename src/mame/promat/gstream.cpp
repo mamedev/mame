@@ -196,9 +196,9 @@ private:
 	uint32_t gstream_speedup_r();
 	uint32_t x2222_speedup_r();
 	uint32_t x2222_speedup2_r();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect, int map, uint32_t* ram);
 	void drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,gfx_element *gfx2,
@@ -209,10 +209,10 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void gstream_32bit_map(address_map &map);
-	void gstream_io(address_map &map);
-	void x2222_32bit_map(address_map &map);
-	void x2222_io(address_map &map);
+	void gstream_32bit_map(address_map &map) ATTR_COLD;
+	void gstream_io(address_map &map) ATTR_COLD;
+	void x2222_32bit_map(address_map &map) ATTR_COLD;
+	void x2222_io(address_map &map) ATTR_COLD;
 };
 
 int gstream_state::x2222_toggle_r() // or the game hangs when starting, might be a status flag for the sound?

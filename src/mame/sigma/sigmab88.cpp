@@ -30,8 +30,8 @@ public:
 	void sigmab88(machine_config &config);
 
 private:
-	void h16_map(address_map &map);
-	void hd63484_map(address_map &map);
+	void h16_map(address_map &map) ATTR_COLD;
+	void hd63484_map(address_map &map) ATTR_COLD;
 
 	required_device<hd641016_device> m_maincpu;
 	required_device<palette_device> m_palette;

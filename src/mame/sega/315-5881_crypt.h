@@ -25,8 +25,8 @@ public:
 	uint16_t decrypt_le_r();
 	uint16_t decrypt_be_r();
 
-	void iomap_64be(address_map &map);
-	void iomap_le(address_map &map);
+	void iomap_64be(address_map &map) ATTR_COLD;
+	void iomap_le(address_map &map) ATTR_COLD;
 
 	uint16_t do_decrypt(uint8_t *&base);
 	void set_addr_low(uint16_t data);
@@ -38,8 +38,8 @@ public:
 	template <typename... T> void set_read_cb(T &&... args) { m_read.set(std::forward<T>(args)...); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 

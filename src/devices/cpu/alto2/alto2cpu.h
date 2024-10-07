@@ -207,9 +207,9 @@ public:
 
 protected:
 	//! device-level override for start
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	//! device-level override for reset
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	//! device-level override for post reset
 	void interface_post_reset() override;
@@ -224,7 +224,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	//! device (P)ROMs
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	//! device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
@@ -252,9 +252,9 @@ private:
 	std::unique_ptr<uint32_t[]> m_ucode_cram;
 	std::unique_ptr<uint16_t[]> m_const_data;
 
-	void ucode_map(address_map &map);
-	void const_map(address_map &map);
-	void iomem_map(address_map &map);
+	void ucode_map(address_map &map) ATTR_COLD;
+	void const_map(address_map &map) ATTR_COLD;
+	void iomem_map(address_map &map) ATTR_COLD;
 
 	//! read microcode CROM or CRAM, depending on m_ucode_ram_base
 	uint32_t crom_cram_r(offs_t offset);

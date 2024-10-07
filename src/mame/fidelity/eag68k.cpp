@@ -266,8 +266,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(in1_changed) { update_dsr(); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void eag_base(machine_config &config);
 
@@ -286,9 +286,9 @@ protected:
 	u8 m_led_data = 0;
 
 	// address maps
-	void eag_map(address_map &map);
-	void eagv7_map(address_map &map);
-	void eagv10_map(address_map &map);
+	void eag_map(address_map &map) ATTR_COLD;
+	void eagv7_map(address_map &map) ATTR_COLD;
+	void eagv10_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();
@@ -336,8 +336,8 @@ private:
 	required_device<generic_latch_8_device> m_sublatch;
 
 	// address maps
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void reset_subcpu_w(u8 data);
@@ -362,8 +362,8 @@ public:
 	void premiere(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -372,7 +372,7 @@ private:
 	required_memory_bank m_rombank;
 
 	// address maps
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 void premiere_state::machine_start()
@@ -412,10 +412,10 @@ public:
 
 private:
 	// address maps
-	void fex68k_map(address_map &map);
-	void fex68km2_map(address_map &map);
-	void fex68km3_map(address_map &map);
-	void fex68km4_map(address_map &map);
+	void fex68k_map(address_map &map) ATTR_COLD;
+	void fex68km2_map(address_map &map) ATTR_COLD;
+	void fex68km3_map(address_map &map) ATTR_COLD;
+	void fex68km4_map(address_map &map) ATTR_COLD;
 };
 
 

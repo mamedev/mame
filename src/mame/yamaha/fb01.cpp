@@ -41,8 +41,8 @@ public:
 	void fb01(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void ym2164_irq_w(int state);
@@ -52,8 +52,8 @@ private:
 	void fb01_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(fb01_pixel_update);
 
-	void fb01_io(address_map &map);
-	void fb01_mem(address_map &map);
+	void fb01_io(address_map &map) ATTR_COLD;
+	void fb01_mem(address_map &map) ATTR_COLD;
 
 	void update_int();
 

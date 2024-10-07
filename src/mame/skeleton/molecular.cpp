@@ -73,9 +73,9 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -106,10 +106,10 @@ private:
 
 	void molecula_palette(palette_device &palette) const;
 
-	void molecula_app_io(address_map &map);
-	void molecula_app_map(address_map &map);
-	void molecula_file_io(address_map &map);
-	void molecula_file_map(address_map &map);
+	void molecula_app_io(address_map &map) ATTR_COLD;
+	void molecula_app_map(address_map &map) ATTR_COLD;
+	void molecula_file_io(address_map &map) ATTR_COLD;
+	void molecula_file_map(address_map &map) ATTR_COLD;
 };
 
 void molecula_state::video_start()

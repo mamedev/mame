@@ -94,8 +94,8 @@ protected:
 	virtual void init();
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual bool cpu_is_interruptible() const override { return true; }

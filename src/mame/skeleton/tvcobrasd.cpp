@@ -94,9 +94,9 @@ private:
 
 	void cobrasd(machine_config &config);
 
-	void program_map(address_map &map);
-	void io_map(address_map &map);
-	void data_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 };
 
 

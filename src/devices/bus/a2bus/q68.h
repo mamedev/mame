@@ -35,9 +35,9 @@ class a2bus_68k_device:
 protected:
 	a2bus_68k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
@@ -59,10 +59,10 @@ public:
 	a2bus_q68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	void m68008_mem(address_map &map);
+	void m68008_mem(address_map &map) ATTR_COLD;
 };
 
 class a2bus_q68plus_device : public a2bus_68k_device
@@ -73,10 +73,10 @@ public:
 	static auto parent_rom_device_type() { return &A2BUS_Q68; }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	void m68008_mem(address_map &map);
+	void m68008_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_BUS_A2BUS_Q68_H

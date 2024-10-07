@@ -7821,28 +7821,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rdwr2k11">
-		<description>Roadwar 2000 (version 1.1)</description>
-		<year>1986</year>
-		<publisher>Strategic Simulations, Inc</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-11-15 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="242138">
-				<rom name="roadwar 2000 v1.1 side a.woz" size="242138" crc="b736b731" sha1="209f6e08fc2ea20f496668dab3e3f42b70dcc39b" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="241455">
-				<rom name="roadwar 2000 v1.1 side b.woz" size="241455" crc="c01131ed" sha1="917e8ace92e9422641a78ad088e1d7990c329c56" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="a2fs1">
 		<description>Flight Simulator I (A2-FS1)</description>
 		<year>1980</year>
@@ -8451,21 +8429,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side 5" />
 			<dataarea name="flop" size="234863">
 				<rom name="journey side 5.woz" size="234863" crc="7d133bcb" sha1="ea92c49226e060015a941debe86dbc51386508c3" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sthcmnd">
-		<description>Southern Command</description>
-		<year>1981</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-12-14 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234863">
-				<rom name="southern command.woz" size="234863" crc="e04bb52c" sha1="bc53a1a66fc347859c17238a28b3bd4a8b178739" />
 			</dataarea>
 		</part>
 	</software>
@@ -10396,40 +10359,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="typhstl">
-		<description>Typhoon of Steel (version 1.0)</description>
-		<year>1988</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-04-01 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Asia disk" />
-			<dataarea name="flop" size="234760">
-				<rom name="typhoon of steel - asia.woz" size="234760" crc="64f4fae2" sha1="2162afa7fc92e029ea45de9547cb9ec2244d7a2a" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Europe disk" />
-			<dataarea name="flop" size="234762">
-				<rom name="typhoon of steel - europe.woz" size="234762" crc="6c8b2f21" sha1="62212483a0845f019ce6526020614fdea2adec16" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Pacific disk" />
-			<dataarea name="flop" size="234763">
-				<rom name="typhoon of steel - pacific.woz" size="234763" crc="f4f9ccc8" sha1="40fe14d68b358802dc32459b95ac6cb81a4a6728" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Scenarios disk" />
-			<dataarea name="flop" size="234765">
-				<rom name="typhoon of steel - scenarios.woz" size="234765" crc="711b5ff8" sha1="6b505829f62dd39a3e558bdeaf655f796d41ec5b" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="alnmunch">
 		<description>Alien Munchies</description>
 		<year>1983</year>
@@ -10456,28 +10385,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234784">
 				<rom name="merlin's castle.woz" size="234784" crc="cc70b746" sha1="27dc19d8bee980679ec46257fd7ce836a0ce13ff" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kmpfgp10">
-		<description>Kampfgruppe (version 1.0)</description>
-		<year>1985</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-04-07 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A - Game disk" />
-			<dataarea name="flop" size="234782">
-				<rom name="kampfgruppe side a - game disk.woz" size="234782" crc="cade1355" sha1="191f53083835e2fe77b50d293391fcf85130ed66" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Historical scenarios" />
-			<dataarea name="flop" size="234793">
-				<rom name="kampfgruppe side b - historical senarios.woz" size="234793" crc="43f3a85e" sha1="c045af7378e7dff9a3dac97e26e82543df3da566" />
 			</dataarea>
 		</part>
 	</software>
@@ -12347,40 +12254,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="panzstrk">
-		<description>Panzer Strike! (version 1.0)</description>
-		<year>1987</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-08-26 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side A - West" />
-			<dataarea name="flop" size="234815">
-				<rom name="panzer strike disk 1a - west.woz" size="234815" crc="b0e546b0" sha1="fde7cfaa28cbd480a70d4a37a9ff54b3cb2761dc" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side B - East" />
-			<dataarea name="flop" size="234815">
-				<rom name="panzer strike disk 1b - east.woz" size="234815" crc="e2731f0e" sha1="6413c2e15da56afab5d89c5bee62caddbbad4d74" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 Side A - Africa" />
-			<dataarea name="flop" size="234817">
-				<rom name="panzer strike disk 2a - africa.woz" size="234817" crc="16f4c98f" sha1="4969af2b1bd8475121190badddb135ef3ac6a20e" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 Side B - Scenarios" />
-			<dataarea name="flop" size="234820">
-				<rom name="panzer strike disk 2b - scenarios.woz" size="234820" crc="84882a5f" sha1="1ad24f21431dbb1da0bfcd4a8f0cc8ad3616cda2" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="polquest">
 		<description>Police Quest</description>
 		<year>1987</year>
@@ -13535,21 +13408,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234790">
 				<rom name="i.o. silver.woz" size="234790" crc="b6356107" sha1="b31b227a08ab2d7631cb9e411a8c6d99044f3d37" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="g1985v2">
-		<description>Germany 1985 (version 2.0)</description>
-		<year>1982</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-10-29 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234775">
-				<rom name="germany 1985 v2.0.woz" size="234775" crc="85a4ff9d" sha1="daf67f5de2cce689f9692b3d92c5e80dc6668a12" />
 			</dataarea>
 		</part>
 	</software>
@@ -16136,22 +15994,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="grafspee">
-		<description>Pursuit of the Graf Spee</description>
-		<year>1982</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-09 redumped: 2022-03-24 because the previous disk we obtained proved to be a fake. -->
-		<!--"Pursuit of the Graf Spee" is a 1982 strategy game developed by Joel Billings and distributed by Strategic Simulations. It requires a 48K Apple ][+ or later.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="254799">
-				<rom name="pursuit of the graf spee.woz" size="254799" crc="18221871" sha1="f400d38bfe73a768d8db4fd9cf7ab4c37282f8ed" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bezare">
 		<description>Bezare</description>
 		<year>1982</year>
@@ -16537,29 +16379,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234790">
 				<rom name="death race '82.woz" size="234790" crc="26f894dc" sha1="865a593d599ab5fdbf60aff58765b1590f204607" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gemsthll12">
-		<description>Gemstone Healer (version 1.2)</description>
-		<year>1986</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-19 -->
-		<!--"Gemstone Healer" is a 1986 strategy game developed by Peter Lount, Trouba Gossen, and Kevin Pickell, and distributed by Strategic Simulations, Inc. This is version 1.2. It requires a 64K Apple ][+ or later.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234826">
-				<rom name="gemstone healer v1.2 side a.woz" size="234826" crc="e8812105" sha1="33ce745ec584cf5d3969519d188eeaa649f7428e" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234826">
-				<rom name="gemstone healer v1.2 side b.woz" size="234826" crc="80116114" sha1="59064735ffaae9b5f566556f1d4199d36285fb54" />
 			</dataarea>
 		</part>
 	</software>
@@ -20336,61 +20155,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="240715">
 				<rom name="the games- winter edition disk c.woz" size="240715" crc="2504841a" sha1="fccbd849196558aa7c2ab2d59264f9af31c5b19a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sixgunsh">
-		<description>Six-Gun Shootout</description>
-		<year>1985</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-09-03 -->
-		<!--"Six-Gun Shootout" is a 1985 strategy game distributed by Strategic Simulations, Inc. It requires a 48K Apple ][+ or later.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="241423">
-				<rom name="six-gun shootout.woz" size="241423" crc="2c9a94e1" sha1="9a9a6bbdcf104b316dcaeb5fba3f4cec6e41f948" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="roadgtbg">
-		<description>The Road to Gettysburg</description>
-		<year>1982</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-09-03 -->
-		<!--"The Road to Gettysburg" is a 1982 strategy game developed by Paul Murray and distributed by Strategic Simulations, Inc. It requires a 48K Apple ][+ or later.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="248095">
-				<rom name="the road to gettysburg.woz" size="248095" crc="e401ad48" sha1="43d5c9005cc820a43b3faf8cc48ac98aca0744a9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gtysburg">
-		<description>Gettysburg: The Turning Point (version 1.2)</description>
-		<year>1986</year>
-		<publisher>Strategic Simulations</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-09-03 -->
-		<!--"Gettysburg: The Turning Point" is a 1986 strategy game developed by David Landrey and Chuck Kroegel, and distributed by Strategic Simulations, Inc. This is version 1.2. It requires a 64K Apple ][+ or later.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234818">
-				<rom name="gettysburg- the turning point v1.2 side a.woz" size="234818" crc="cce30de8" sha1="83ef10b30dc2eea1f47f9c6e5d0da555a7d97bef" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="234818">
-				<rom name="gettysburg- the turning point v1.2 side b.woz" size="234818" crc="87dee9e8" sha1="bdc23502c510695d46cfecc730e28928fc02bea4" />
 			</dataarea>
 		</part>
 	</software>
@@ -24745,6 +24509,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="b24">
+		<description>B-24 (version 1.0)</description>
+		<year>1987</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="John Gray and Peter Schmitt" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-04-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="b-24 v1.0.woz" size="234789" crc="008eae81" sha1="3268c779e978260aff06acd875c3c243463bd797" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="backitup3v34" cloneof="backitup3">
 		<description>Back It Up III (version 3.4)</description>
 		<year>1983</year>
@@ -24850,6 +24631,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="balt1985">
+		<description>Baltic 1985: Corridor to Berlin (version 1.0)</description>
+		<year>1984</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Phillip Bradley" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-04-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234832">
+				<rom name="baltic 1985.woz" size="234832" crc="fc186a5b" sha1="4595042f17a46439398c3a345e0c53ebfacb956d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="batsblfr">
 		<description>Bats in the Belfry</description>
 		<year>1983</year>
@@ -24862,6 +24660,131 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="121627">
 				<rom name="bats in the belfry.woz" size="121627" crc="b42681ec" sha1="84d8e3a1cc653faee017a319decdd87d353d7c36" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battcmdr">
+		<description>Battalion Commander (version 1.0)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="David Hille" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-07-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="229705">
+				<rom name="battalion commander.woz" size="229705" crc="946c3af0" sha1="0a6b79a9fabdd8e15365151cde8638a17e04e237" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlantm13" cloneof="batlantm">
+		<description>Battle of Antietam (version 1.3)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="David Landrey and Chuck Kroegel" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-04-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="221526">
+				<rom name="battle of antietam v1.3 side a.woz" size="221526" crc="1f65175b" sha1="970b62bcdc86d4da591f7b33cff9c5c71dd1af4c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234838">
+				<rom name="battle of antietam v1.3 side b.woz" size="234838" crc="aeb2d1f0" sha1="7e8314d8f4660d69a0ad87c561078977a0bc498d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlantm">
+		<description>Battle of Antietam (version 1.5)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="David Landrey and Chuck Kroegel" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.5" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-05-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="241490">
+				<rom name="battle of antietam v1.5 side a.woz" size="241490" crc="4fe44cfb" sha1="cac38a73ce13f2b31abe7eb710d874a3816cd5d1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="240466">
+				<rom name="battle of antietam v1.5 side b.woz" size="240466" crc="c07dff1e" sha1="1b1e8a4934696a21c4ab4804cf064a0905eb32cf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlcrsr">
+		<description>Battlecruiser (version 1.0)</description>
+		<year>1987</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Gary Grigsby" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-05-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - World War I" />
+			<dataarea name="flop" size="234836">
+				<rom name="battlecruiser - world war i.woz" size="234836" crc="ccbba242" sha1="0f649587feece0280b4a2f3e070dff72ac20272f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - World War II" />
+			<dataarea name="flop" size="234837">
+				<rom name="battlecruiser - world war ii.woz" size="234837" crc="331e5100" sha1="e0b1a32c8edb5a5bc0b62be0f72e811d2fe241d5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlnapo">
+		<description>Battles of Napoleon (version 1.0)</description>
+		<year>1987</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="David Landrey and Chuck Kroegel" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-05-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Game" />
+			<dataarea name="flop" size="241491">
+				<rom name="battles of napoleon - game disk, side a.woz" size="241491" crc="42ceaa38" sha1="185b0d81b0b154de1f5650599937bd8c6f829804" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Game" />
+			<dataarea name="flop" size="241490">
+				<rom name="battles of napoleon - game disk, side b.woz" size="241490" crc="f14e14d8" sha1="1db9f38e18756b394753f39c08f8786953881ab4" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Scenario (Boot)" />
+			<dataarea name="flop" size="241495">
+				<rom name="battles of napoleon - scenario disk, side a (boot).woz" size="241495" crc="0f2650d9" sha1="27889513a40dcb475e9133b8e4408f35dcd294a0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Scenario" />
+			<dataarea name="flop" size="241494">
+				<rom name="battles of napoleon - scenario disk, side b.woz" size="241494" crc="0bd0319c" sha1="3a95e975e6bed52214b944fcf7e5c545bba328f9" />
 			</dataarea>
 		</part>
 	</software>
@@ -24994,6 +24917,47 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234869">
 				<rom name="bluegrass bluff.woz" size="234869" crc="ccef05ca" sha1="4cf9cbf571e3de33af0cb70101f099f3aa55aa4b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bomballey">
+		<description>Bomb Alley (version 1.0)</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value=" Gary Grigsby" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-07-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="bomb alley.woz" size="234788" crc="f53fcc59" sha1="fcedc2cf1bf2b0532e80dbeb95905c23699be036" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brkarden">
+		<description>Breakthrough in the Ardennes (version 1.1)</description>
+		<year>1984</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="David Landrey and Chuck Kroegel" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-05-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="260956">
+				<rom name="breakthrough in the ardennes v1.1 side a.woz" size="260956" crc="01d0ac87" sha1="af8968c9c155ca7c3b2a1bbf105411e4231b6935" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="260956">
+				<rom name="breakthrough in the ardennes v1.1 side b.woz" size="260956" crc="aecd562e" sha1="a0b548253b546c95ab247027d7d3242aabba0841" />
 			</dataarea>
 		</part>
 	</software>
@@ -25135,6 +25099,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="carrierf">
+		<description>Carrier Force (version 1.0)</description>
+		<year>1983</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Gary Grigsby" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-07-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234818">
+				<rom name="carrier force.woz" size="234818" crc="e0f12291" sha1="8520e03b982a9834611f262d5b3709abf015bc82" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cseffwmih">
 		<description>Cause and Effect: What Makes It Happen</description>
 		<year>1988</year>
@@ -25165,6 +25146,114 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241539">
 				<rom name="cavity busters.woz" size="241539" crc="6cd640b3" sha1="fb7432c0dd5a894c7daef8811acdb8ba74be0b42" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chkrynn10" cloneof="chkrynn">
+		<description>Champions of Krynn (version 1.0)</description>
+		<year>1990</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Jim Jennings, Dave Shelley, Michael Mancuso, Ken Humphries, Susan Manley, Fred Butts, Mike Provenza, Mark Johnson, Cyrus Lum, Tom Wahl, and Dave Warhol" />
+		<info name="usage" value="Requires a 128K enhanced Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-27-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Boot" />
+			<dataarea name="flop" size="234959">
+				<rom name="champions of krynn v1.0 - boot disk.woz" size="234959" crc="851f9390" sha1="937e3611d2b7bf32a3952b7bbf00d80776f545d4" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234956">
+				<rom name="champions of krynn v1.0 - side a.woz" size="234956" crc="fa5224fa" sha1="d35caa08bf950e651d1e7b1cc16fd5edcb6e1584" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234956">
+				<rom name="champions of krynn v1.0 - side b.woz" size="234956" crc="30b9883d" sha1="8d6c86a45b7ba82b5ad21ff73ffaf92e82570b5e" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side C" />
+			<dataarea name="flop" size="234956">
+				<rom name="champions of krynn v1.0 - side c.woz" size="234956" crc="609be0c4" sha1="628b1d774a041d71fdfcdc2d42b5e5fa803aba29" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Side D" />
+			<dataarea name="flop" size="234956">
+				<rom name="champions of krynn v1.0 - side d.woz" size="234956" crc="31c3c9e6" sha1="2cd860e0dcd40ed78d849fab580005e698532a3f" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Side E" />
+			<dataarea name="flop" size="234956">
+				<rom name="champions of krynn v1.0 - side e.woz" size="234956" crc="232d4c48" sha1="f2eb615e87a59abbc9e13f29e80a62a923cdcb2d" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Side F" />
+			<dataarea name="flop" size="234956">
+				<rom name="champions of krynn v1.0 - side f.woz" size="234956" crc="b8c9e35f" sha1="5fa294c704541afa8018bd5df1fded18b7d40400" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chkrynn">
+		<description>Champions of Krynn (version 1.1)</description>
+		<year>1990</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Jim Jennings, Dave Shelley, Michael Mancuso, Ken Humphries, Susan Manley, Fred Butts, Mike Provenza, Mark Johnson, Cyrus Lum, Tom Wahl, and Dave Warhol" />
+		<info name="usage" value="Requires a 128K enhanced Apple //e or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-27-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Boot" />
+			<dataarea name="flop" size="234932">
+				<rom name="champions of krynn v1.1 - boot disk.woz" size="234932" crc="31dfafba" sha1="6d7adbe27c4a33ba2b865845280efe9aa2ea1402" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234929">
+				<rom name="champions of krynn v1.1 - side a.woz" size="234929" crc="2d84ec45" sha1="39c90b534e750fc21b057fa19a66db9e20aa8c95" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234929">
+				<rom name="champions of krynn v1.1 - side b.woz" size="234929" crc="01da00f5" sha1="9cd679f0c3ab9d9408595a790450c153ba074bc1" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side C" />
+			<dataarea name="flop" size="234929">
+				<rom name="champions of krynn v1.1 - side c.woz" size="234929" crc="7ec8c260" sha1="1f77e6cf41defdfc4c2319e4f9117561630ece33" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Side D" />
+			<dataarea name="flop" size="234929">
+				<rom name="champions of krynn v1.1 - side d.woz" size="234929" crc="e8130749" sha1="a9b620d8ec67b04f7a18645b07197df5bbfab2a3" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Side E" />
+			<dataarea name="flop" size="234929">
+				<rom name="champions of krynn v1.1 - side e.woz" size="234929" crc="069d1f35" sha1="45e97175032081e90f7f8f3ce10b6beb6fcd5ac6" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Side F" />
+			<dataarea name="flop" size="234929">
+				<rom name="champions of krynn v1.1 - side f.woz" size="234929" crc="bf6ef76b" sha1="4ba7506f2ddbbb8d5ffcd559f27e3606b666f303" />
 			</dataarea>
 		</part>
 	</software>
@@ -25353,6 +25442,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="coloncqt">
+		<description>Colonial Conquest (version 1.1)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="developer" value="Strategic Simulations" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-05-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241424">
+				<rom name="colonial conquest v1.1.woz" size="241424" crc="ca135219" sha1="8a1b3166c6eed95e8a22df95290a03af15c46208" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="commkeys10" cloneof="commkeys">
 		<description>CommuniKeys (A-248 version 1.0)</description>
 		<year>1989</year>
@@ -25403,6 +25509,76 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1345423">
 				<rom name="communikeys 800k.woz" size="1345423" crc="16374785" sha1="207c41b559050d4f96f833077574cae8be669362" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmpairct10" cloneof="cmpairct">
+		<description>Computer Air Combat (version 1.0)</description>
+		<year>1980</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Charles Merrow and Jack T. Avery" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later with a 13-sector drive and Applesoft in ROM." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-30-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234834">
+				<rom name="computer air combat v1.0.woz" size="234834" crc="6e9b137e" sha1="659fcecb8767fe25f590fdbc18c9dc4c0ac34279" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmpairct">
+		<description>Computer Air Combat (version 1.1)</description>
+		<year>1980</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Charles Merrow and Jack T. Avery" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-27-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234836">
+				<rom name="computer air combat v1.1.woz" size="234836" crc="26a00f65" sha1="96db3b6b3612b6d9be70ad7d79d0173d17c75be2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmpambsh10r1" cloneof="cmpambsh10r2">
+		<description>Computer Ambush (version 1.0 revision 1)</description>
+		<year>1980</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Ed Willinger" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0 revision 1" />
+		<!--There is a 1982 version redeveloped by Kendall Whitesell and Larry D. Strawser.-->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-27-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234822">
+				<rom name="computer ambush v1.0 rev. 1.woz" size="234822" crc="24f0fcde" sha1="867abf82bb6435d60d577d1dfb1460491bcd4b87" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmpambsh10r2">
+		<description>Computer Ambush (version 1.0 revision 2)</description>
+		<year>1980</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Ed Willinger" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0 revision 2" />
+		<!--There is a 1982 version redeveloped by Kendall Whitesell and Larry D. Strawser.-->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-28-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234822">
+				<rom name="computer ambush v1.0 rev. 2.woz" size="234822" crc="b15b313e" sha1="044593fda9eef3fb596cd37707e338ec12e67f07" />
 			</dataarea>
 		</part>
 	</software>
@@ -27314,6 +27490,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="eagles">
+		<description>Eagles (version 1.0)</description>
+		<year>1983</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Robert Raymond and Keith Brors" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-07-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234852">
+				<rom name="eagles.woz" size="234852" crc="ad19d3ca" sha1="b240acce07a48125d13f576a9361dbaa729ebaf4" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="earlwvbb">
 		<description>Earl Weaver Baseball</description>
 		<year>1989</year>
@@ -27740,6 +27933,59 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="50miscru11" cloneof="50miscru">
+		<description>Fifty Mission Crush (version 1.1)</description>
+		<year>1984</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="alt_title" value="50 Mission Crush" />
+		<info name="programmer" value="John Gray" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-04-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234803">
+				<rom name="50 mission crush v1.1.woz" size="234803" crc="8138c45e" sha1="387263b4c536c8e023afad5a9be7a69955a81fa0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="50miscru">
+		<description>Fifty Mission Crush (version 1.2)</description>
+		<year>1984</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="alt_title" value="50 Mission Crush" />
+		<info name="programmer" value="John Gray" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-04-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234818">
+				<rom name="50 mission crush v1.2.woz" size="234818" crc="9c1161e5" sha1="0da45802be3fbd2f183374680b4537c01f4cde58" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fcommand">
+		<description>Fighter Command (version 1.0)</description>
+		<year>1983</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Charlie Merrow and Jack Avery" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2024-08-07-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234861">
+				<rom name="fighter command.woz" size="234861" crc="adb8468a" sha1="3c0d7b61f10de6a2f2c1cc137f98a917c6f23e2e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="galattk">
 		<description>Galactic Attack</description>
 		<year>1980</year>
@@ -27759,7 +28005,7 @@ license:CC0-1.0
 	<software name="galglad">
 		<description>Galactic Gladiators</description>
 		<year>1983</year>
-		<publisher>Strategic Simulations</publisher>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
 		<info name="programmer" value="Tom Reamy" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -27788,6 +28034,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="gemsthl">
+		<description>Gemstone Healer (version 1.2)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Peter Lount, Trouba Gossen, and Kevin Pickell" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-19-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234826">
+				<rom name="gemstone healer v1.2 side a.woz" size="234826" crc="e8812105" sha1="33ce745ec584cf5d3969519d188eeaa649f7428e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234826">
+				<rom name="gemstone healer v1.2 side b.woz" size="234826" crc="80116114" sha1="59064735ffaae9b5f566556f1d4199d36285fb54" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="genesis">
 		<description>Genesis</description>
 		<year>1983</year>
@@ -27800,6 +28070,47 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="88367">
 				<rom name="genesis.woz" size="88367" crc="21107442" sha1="f3061301b932789a3fbba20f9184fa41527694d6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="germ1985">
+		<description>Germany 1985 (version 2.0)</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Roger Keating" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="version 2.0" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-10-29-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234775">
+				<rom name="germany 1985 v2.0.woz" size="234775" crc="85a4ff9d" sha1="daf67f5de2cce689f9692b3d92c5e80dc6668a12" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gtysburg">
+		<description>Gettysburg: The Turning Point (version 1.2)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="David Landrey and Chuck Kroegel" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="version 1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-09-03-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234818">
+				<rom name="gettysburg- the turning point v1.2 side a.woz" size="234818" crc="cce30de8" sha1="83ef10b30dc2eea1f47f9c6e5d0da555a7d97bef" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234818">
+				<rom name="gettysburg- the turning point v1.2 side b.woz" size="234818" crc="87dee9e8" sha1="bdc23502c510695d46cfecc730e28928fc02bea4" />
 			</dataarea>
 		</part>
 	</software>
@@ -28037,6 +28348,30 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296146">
 				<rom name="jumblezzz 800k.woz" size="1296146" crc="2a75cc48" sha1="97256ce15f81da727488dd33fd53c52709c2442b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kampfgp10">
+		<description>Kampfgruppe (version 1.0)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Gary Grigsby" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="version 1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-04-07-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Game disk" />
+			<dataarea name="flop" size="234782">
+				<rom name="kampfgruppe side a - game disk.woz" size="234782" crc="cade1355" sha1="191f53083835e2fe77b50d293391fcf85130ed66" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Historical scenarios" />
+			<dataarea name="flop" size="234793">
+				<rom name="kampfgruppe side b - historical senarios.woz" size="234793" crc="43f3a85e" sha1="c045af7378e7dff9a3dac97e26e82543df3da566" />
 			</dataarea>
 		</part>
 	</software>
@@ -29065,6 +29400,42 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="panzstrk">
+		<description>Panzer Strike! (version 1.0)</description>
+		<year>1987</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Gary Grigsby" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="version 1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-08-26-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - West" />
+			<dataarea name="flop" size="234815">
+				<rom name="panzer strike disk 1a - west.woz" size="234815" crc="b0e546b0" sha1="fde7cfaa28cbd480a70d4a37a9ff54b3cb2761dc" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - East" />
+			<dataarea name="flop" size="234815">
+				<rom name="panzer strike disk 1b - east.woz" size="234815" crc="e2731f0e" sha1="6413c2e15da56afab5d89c5bee62caddbbad4d74" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Africa" />
+			<dataarea name="flop" size="234817">
+				<rom name="panzer strike disk 2a - africa.woz" size="234817" crc="16f4c98f" sha1="4969af2b1bd8475121190badddb135ef3ac6a20e" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Scenarios" />
+			<dataarea name="flop" size="234820">
+				<rom name="panzer strike disk 2b - scenarios.woz" size="234820" crc="84882a5f" sha1="1ad24f21431dbb1da0bfcd4a8f0cc8ad3616cda2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="paulmsj">
 		<description>Paul's Missionary Journeys</description>
 		<year>1986</year>
@@ -29232,6 +29603,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="235489">
 				<rom name="punctuation - building better language skills.woz" size="235489" crc="0c41a2e0" sha1="dca8d539917b8c6f17bd5e9632828fb31044be9b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grafspee">
+		<description>Pursuit of the Graf Spee</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Joel Billings" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-02-09 Redumped: 2022-03-24 because the previous disk proved to be a fake.-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="254799">
+				<rom name="pursuit of the graf spee.woz" size="254799" crc="18221871" sha1="f400d38bfe73a768d8db4fd9cf7ab4c37282f8ed" />
 			</dataarea>
 		</part>
 	</software>
@@ -29610,6 +29997,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="roadwar2k11">
+		<description>Roadwar 2000 (version 1.1)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Jeff Johnson and Robert Calfee" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-11-15-->
+		<!--simulation game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="242138">
+				<rom name="roadwar 2000 v1.1 side a.woz" size="242138" crc="b736b731" sha1="209f6e08fc2ea20f496668dab3e3f42b70dcc39b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="241455">
+				<rom name="roadwar 2000 v1.1 side b.woz" size="241455" crc="c01131ed" sha1="917e8ace92e9422641a78ad088e1d7990c329c56" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="runforit">
 		<description>Run For It</description>
 		<year>1984</year>
@@ -29972,6 +30383,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="sixgunsh">
+		<description>Six-Gun Shootout (version 1.0)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="developer" value="Strategic Simulations" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-09-03-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241423">
+				<rom name="six-gun shootout.woz" size="241423" crc="2c9a94e1" sha1="9a9a6bbdcf104b316dcaeb5fba3f4cec6e41f948" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stgranpt">
 		<description>Snooper Troops 1: The case of: The Granite Point Ghost</description>
 		<year>1982</year>
@@ -29986,6 +30414,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234901">
 				<rom name="snooper troops and the case of the granite point ghost.woz" size="234901" crc="44a4ba15" sha1="514640d732c708a0956015e3129ea3de3e1bdc4a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sthncmnd">
+		<description>Southern Command</description>
+		<year>1981</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Roger Keating" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2019-12-14-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234863">
+				<rom name="southern command.woz" size="234863" crc="e04bb52c" sha1="bc53a1a66fc347859c17238a28b3bd4a8b178739" />
 			</dataarea>
 		</part>
 	</software>
@@ -31206,6 +31650,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="roadgtbg">
+		<description>The Road to Gettysburg</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="programmer" value="Paul Murray" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2022-09-03-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="248095">
+				<rom name="the road to gettysburg.woz" size="248095" crc="e401ad48" sha1="43d5c9005cc820a43b3faf8cc48ac98aca0744a9" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thescoop">
 		<description>The Scoop</description>
 		<year>1989</year>
@@ -31495,6 +31955,41 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296307">
 				<rom name="troll sports math 800k.woz" size="1296307" crc="66c531ac" sha1="4313b2cecab98701fac6c6724013fd2cc3908a06" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typhstl">
+		<description>Typhoon of Steel (version 1.0)</description>
+		<year>1988</year>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-04-01-->
+		<!--strategy game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Asia disk" />
+			<dataarea name="flop" size="234760">
+				<rom name="typhoon of steel - asia.woz" size="234760" crc="64f4fae2" sha1="2162afa7fc92e029ea45de9547cb9ec2244d7a2a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Europe disk" />
+			<dataarea name="flop" size="234762">
+				<rom name="typhoon of steel - europe.woz" size="234762" crc="6c8b2f21" sha1="62212483a0845f019ce6526020614fdea2adec16" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Pacific disk" />
+			<dataarea name="flop" size="234763">
+				<rom name="typhoon of steel - pacific.woz" size="234763" crc="f4f9ccc8" sha1="40fe14d68b358802dc32459b95ac6cb81a4a6728" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Scenarios disk" />
+			<dataarea name="flop" size="234765">
+				<rom name="typhoon of steel - scenarios.woz" size="234765" crc="711b5ff8" sha1="6b505829f62dd39a3e558bdeaf655f796d41ec5b" />
 			</dataarea>
 		</part>
 	</software>

@@ -169,10 +169,10 @@ public:
 	void macpb180(machine_config &config);
 	void macpb180c(machine_config &config);
 	void macpd210(machine_config &config);
-	void macpb140_map(address_map &map);
-	void macpb160_map(address_map &map);
-	void macpb165c_map(address_map &map);
-	void macpd210_map(address_map &map);
+	void macpb140_map(address_map &map) ATTR_COLD;
+	void macpb160_map(address_map &map) ATTR_COLD;
+	void macpb165c_map(address_map &map) ATTR_COLD;
+	void macpd210_map(address_map &map) ATTR_COLD;
 
 	void init_macpb140();
 	void init_macpb160();
@@ -196,8 +196,8 @@ private:
 	optional_shared_ptr<u32> m_vram;
 	optional_device<wd90c26_vga_device> m_vga;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u32 screen_update_macpb140(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_macpb160(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

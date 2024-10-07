@@ -69,11 +69,11 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	// machine config
 	void common(machine_config &config);
@@ -156,9 +156,9 @@ public:
 	void nws3260(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void nws3260_map(address_map &map);
+	void nws3260_map(address_map &map) ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
 	required_device<screen_device> m_lcd;
@@ -182,7 +182,7 @@ public:
 	void nws3720(machine_config &config);
 
 protected:
-	void desktop_cpu_map(address_map &map);
+	void desktop_cpu_map(address_map &map) ATTR_COLD;
 };
 
 void nws3260_state::machine_start()

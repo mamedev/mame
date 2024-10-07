@@ -34,7 +34,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
@@ -67,8 +67,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// ROM device overrides
 	virtual void rom_bank_pre_change() override;
@@ -107,7 +107,7 @@ protected:
 	using parent::update_streams;
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// memory space configuration
 	virtual space_config_vector memory_space_config() const override;

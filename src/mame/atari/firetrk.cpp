@@ -67,9 +67,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(gear_changed);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -136,7 +136,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 class montecar_state : public firetrk_state
@@ -147,7 +147,7 @@ public:
 	void montecar(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void output_1_w(uint8_t data);
@@ -165,7 +165,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 class superbug_state : public firetrk_state
@@ -176,7 +176,7 @@ public:
 	void superbug(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void output_w(offs_t offset, uint8_t data);
@@ -187,7 +187,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 

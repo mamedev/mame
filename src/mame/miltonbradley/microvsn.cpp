@@ -68,7 +68,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(conf_changed) { apply_settings(); }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { apply_settings(); }
 	virtual void device_post_load() override { apply_settings(); }
 

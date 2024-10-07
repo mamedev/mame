@@ -72,13 +72,13 @@ public:
 	ioport_value link_data_r() { return m_link_data; }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void main_map(address_map &map);
-	void io_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	required_device<i8039_device> m_maincpu;
 	required_device<cf61909_device> m_devo;

@@ -2,7 +2,7 @@
 // copyright-holders:Juergen Buchmueller
 /****************************************************************************
  *
- * warpwarp.cpp
+ * warpwarp_a.cpp
  *
  * sound driver
  * juergen buchmueller <pullmoll@t-online.de>, jan 2000
@@ -15,28 +15,23 @@
 
 DEFINE_DEVICE_TYPE(WARPWARP_SOUND, warpwarp_sound_device, "warpwarp_sound", "Warp Warp Custom Sound")
 
-warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, WARPWARP_SOUND, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_decay(nullptr),
-		m_channel(nullptr),
-		m_sound_latch(0),
-		m_music1_latch(0),
-		m_music2_latch(0),
-		m_sound_signal(0),
-		m_sound_volume(0),
-		m_sound_volume_timer(nullptr),
-		m_music_signal(0),
-		m_music_volume(0),
-		m_music_volume_timer(nullptr),
-		m_noise(0),
-		m_vcarry(0),
-		m_vcount(0),
-		m_mcarry(0),
-		m_mcount(0)
+warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, WARPWARP_SOUND, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_sound_latch(0),
+	m_music1_latch(0),
+	m_music2_latch(0),
+	m_sound_signal(0),
+	m_sound_volume(0),
+	m_music_signal(0),
+	m_music_volume(0),
+	m_noise(0),
+	m_vcarry(0),
+	m_vcount(0),
+	m_mcarry(0),
+	m_mcount(0)
 {
 }
-
 
 
 //-------------------------------------------------
@@ -73,25 +68,31 @@ void warpwarp_sound_device::device_start()
 
 TIMER_CALLBACK_MEMBER(warpwarp_sound_device::sound_decay_tick)
 {
-	if (--m_sound_volume < 0)
-		m_sound_volume = 0;
+	if (m_sound_volume > 0)
+	{
+		m_channel->update();
+		m_sound_volume--;
+	}
 }
 
 TIMER_CALLBACK_MEMBER(warpwarp_sound_device::music_decay_tick)
 {
-	if (--m_music_volume < 0)
-		m_music_volume = 0;
+	if (m_music_volume > 0)
+	{
+		m_channel->update();
+		m_music_volume--;
+	}
 }
 
 void warpwarp_sound_device::sound_w(u8 data)
 {
 	m_channel->update();
 	m_sound_latch = data & 0x0f;
-	m_sound_volume = 0x7fff; /* set sound_volume */
-	m_noise = 0x0000;  /* reset noise shifter */
+	m_sound_volume = 0x7fff; // set sound_volume
+	m_noise = 0x0000; // reset noise shifter
 
-	/* faster decay enabled? */
-	if( m_sound_latch & 8 )
+	// faster decay enabled?
+	if (m_sound_latch & 8)
 	{
 		/*
 		 * R85(?) is 10k, Rb is 0, C92 is 1uF
@@ -131,8 +132,9 @@ void warpwarp_sound_device::music2_w(u8 data)
 	m_channel->update();
 	m_music2_latch = data & 0x3f;
 	m_music_volume = 0x7fff;
-	/* fast decay enabled? */
-	if( m_music2_latch & 0x10 )
+
+	// fast decay enabled?
+	if (m_music2_latch & 0x10)
 	{
 		/*
 		 * Ra (R83?) is 10k, Rb is 0, C92 is 1uF
@@ -161,6 +163,7 @@ void warpwarp_sound_device::music2_w(u8 data)
 
 }
 
+
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
@@ -186,29 +189,29 @@ void warpwarp_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 		 * ...
 		 * 63 =   4 steps -> 48 kHz
 		 */
-
 		m_mcarry -= m_clock_16h / (4 * (64 - m_music1_latch));
-		while( m_mcarry < 0 )
+		while (m_mcarry < 0)
 		{
 			m_mcarry += m_clock_16h;
 			m_mcount++;
 			m_music_signal = (m_mcount & ~m_music2_latch & 15) ? m_decay[m_music_volume] : 0;
-			/* override by noise gate? */
-			if( (m_music2_latch & 32) && (m_noise & 0x8000) )
+
+			// override by noise gate?
+			if ((m_music2_latch & 32) && (m_noise & 0x8000))
 				m_music_signal = m_decay[m_music_volume];
 		}
 
-		/* clock 1V = 8kHz */
+		// clock 1V = 8kHz
 		m_vcarry -= m_clock_1v;
 		while (m_vcarry < 0)
 		{
 			m_vcarry += m_clock_16h;
 			m_vcount++;
 
-			/* noise is clocked with raising edge of 2V */
+			// noise is clocked with rising edge of 2V
 			if ((m_vcount & 3) == 2)
 			{
-				/* bit0 = bit0 ^ !bit10 */
+				// bit0 = bit0 ^ !bit10
 				if ((m_noise & 1) == ((m_noise >> 10) & 1))
 					m_noise = (m_noise << 1) | 1;
 				else
@@ -217,32 +220,32 @@ void warpwarp_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 
 			switch (m_sound_latch & 7)
 			{
-			case 0: /* 4V */
+			case 0: // 4V
 				m_sound_signal = (m_vcount & 0x04) ? m_decay[m_sound_volume] : 0;
 				break;
-			case 1: /* 8V */
+			case 1: // 8V
 				m_sound_signal = (m_vcount & 0x08) ? m_decay[m_sound_volume] : 0;
 				break;
-			case 2: /* 16V */
+			case 2: // 16V
 				m_sound_signal = (m_vcount & 0x10) ? m_decay[m_sound_volume] : 0;
 				break;
-			case 3: /* 32V */
+			case 3: // 32V
 				m_sound_signal = (m_vcount & 0x20) ? m_decay[m_sound_volume] : 0;
 				break;
-			case 4: /* TONE1 */
+			case 4: // TONE1
 				m_sound_signal = !(m_vcount & 0x01) && !(m_vcount & 0x10) ? m_decay[m_sound_volume] : 0;
 				break;
-			case 5: /* TONE2 */
+			case 5: // TONE2
 				m_sound_signal = !(m_vcount & 0x02) && !(m_vcount & 0x20) ? m_decay[m_sound_volume] : 0;
 				break;
-			case 6: /* TONE3 */
+			case 6: // TONE3
 				m_sound_signal = !(m_vcount & 0x04) && !(m_vcount & 0x40) ? m_decay[m_sound_volume] : 0;
 				break;
-			default: /* NOISE */
-				/* QH of 74164 #4V */
+			default: // NOISE
+				// QH of 74164 #4V
 				m_sound_signal = (m_noise & 0x8000) ? m_decay[m_sound_volume] : 0;
+				break;
 			}
-
 		}
 	}
 }

@@ -28,7 +28,7 @@ public:
 protected:
 	base_28fxxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 size, u8 manufacturer_code, u8 device_code);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;

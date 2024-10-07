@@ -48,8 +48,8 @@ public:
 	void marc101(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t porta_r();
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
@@ -107,8 +107,8 @@ public:
 	void init_m527();
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t porta_r() override;
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;

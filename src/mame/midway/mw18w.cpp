@@ -45,8 +45,8 @@ private:
 	void mw18w_lamps_w(uint8_t data);
 	void mw18w_led_display_w(uint8_t data);
 	void mw18w_irq0_clear_w(uint8_t data);
-	void mw18w_map(address_map &map);
-	void mw18w_portmap(address_map &map);
+	void mw18w_map(address_map &map) ATTR_COLD;
+	void mw18w_portmap(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_digits.resolve(); m_lamps.resolve(); }
 	required_device<cpu_device> m_maincpu;

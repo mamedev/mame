@@ -231,14 +231,14 @@ private:
 	required_device<m68340_cpu_device> m_maincpu;
 	required_device<esqpanel2x40_vfx_device> m_panel;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void esq5506_otto_irq(int state);
 	u16 esq5506_read_adc();
 	void duart_tx_a(int state);
 	void duart_tx_b(int state);
 
-	void mr_map(address_map &map);
+	void mr_map(address_map &map) ATTR_COLD;
 };
 
 void esqmr_state::machine_reset()

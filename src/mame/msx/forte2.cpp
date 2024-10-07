@@ -63,7 +63,7 @@ public:
 	void pesadelo(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -74,8 +74,8 @@ private:
 	u8 input_r();
 	void input_mask_w(u8 data);
 
-	void io_mem(address_map &map);
-	void program_mem(address_map &map);
+	void io_mem(address_map &map) ATTR_COLD;
+	void program_mem(address_map &map) ATTR_COLD;
 };
 
 

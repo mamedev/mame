@@ -54,8 +54,8 @@ protected:
 			u32 clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void set_cursor_state(offs_t offset, bool state);
 	virtual u16 translate(u8 digit, bool cursor) const = 0;
@@ -93,7 +93,7 @@ protected:
 			u32 clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	bool cu_in() const { return m_cu_in; }
 

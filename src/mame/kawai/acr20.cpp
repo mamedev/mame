@@ -23,7 +23,7 @@ public:
 	void acr20(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<tmp96c141_device> m_maincpu;
 };

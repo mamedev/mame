@@ -57,13 +57,13 @@ private:
 	bool m_flipscreen = 0;
 	uint8_t m_last = 0U;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
-	void rotaryf_io_map(address_map &map);
-	void rotaryf_map(address_map &map);
+	void rotaryf_io_map(address_map &map) ATTR_COLD;
+	void rotaryf_map(address_map &map) ATTR_COLD;
 };
 
 

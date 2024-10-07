@@ -75,10 +75,10 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override;
@@ -355,7 +355,7 @@ protected:
 	uint8_t m_io_buffer;  /* last value written to the PSG, timer, and interrupt pages */
 
 	// internal registers
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 	uint8_t irq_status_r(offs_t offset);
 	void irq_status_w(offs_t offset, uint8_t data);
 

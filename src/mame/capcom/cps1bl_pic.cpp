@@ -84,8 +84,8 @@ private:
 	void slampic_layer_w(offs_t offset, uint16_t data);
 	void slampic_layer2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void punipic_map(address_map &map);
-	void slampic_map(address_map &map);
+	void punipic_map(address_map &map) ATTR_COLD;
+	void slampic_map(address_map &map) ATTR_COLD;
 };
 
 class slampic2_state : public fcrash_state
@@ -103,7 +103,7 @@ private:
 	uint16_t slampic2_cps_a_r(offs_t offset);
 	void slampic2_sound_w(uint16_t data);
 	void slampic2_sound2_w(uint16_t data);
-	void slampic2_map(address_map &map);
+	void slampic2_map(address_map &map) ATTR_COLD;
 	void bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 };
 
@@ -119,7 +119,7 @@ public:
 private:
 	void dinopic_layer2_w(uint16_t data);
 	DECLARE_MACHINE_START(dinopic);
-	void dinopic_map(address_map &map);
+	void dinopic_map(address_map &map) ATTR_COLD;
 	void bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 };
 
@@ -138,7 +138,7 @@ private:
 	void wofpic_layer2_w(uint16_t data);
 	void wofpic_spr_base_w(uint16_t data);
 	DECLARE_MACHINE_START(wofpic);
-	void wofpic_map(address_map &map);
+	void wofpic_map(address_map &map) ATTR_COLD;
 };
 
 

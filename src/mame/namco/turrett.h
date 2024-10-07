@@ -93,12 +93,12 @@ private:
 	uint8_t   m_frame = 0;
 	uint8_t   m_adc = 0;
 
-	void cpu_map(address_map &map);
-	void turrett_sound_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void turrett_sound_map(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 
@@ -117,8 +117,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;

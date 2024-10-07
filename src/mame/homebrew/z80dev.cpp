@@ -42,10 +42,10 @@ private:
 	void display_w(offs_t offset, uint8_t data);
 	uint8_t test_r();
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	output_finder<6> m_digits;

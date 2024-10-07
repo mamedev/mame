@@ -82,13 +82,13 @@ public:
 	ioport_value cassette_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void cz230s_map(address_map &map);
-	void cz230s_pcm_map(address_map &map);
-	void sz1_map(address_map &map);
+	void cz230s_map(address_map &map) ATTR_COLD;
+	void cz230s_pcm_map(address_map &map) ATTR_COLD;
+	void sz1_map(address_map &map) ATTR_COLD;
 
 	void pcm_w(offs_t offset, u8 data);
 	template <int Num> void led_w(u8 data);

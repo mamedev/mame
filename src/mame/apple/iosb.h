@@ -37,7 +37,7 @@ public:
 	auto read_pa4()  { return m_pa4.bind(); }
 	auto read_pa6()  { return m_pa6.bind(); }
 
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 	template <typename... T> void set_scsi_tag(T &&... args) { m_ncr.set_tag(std::forward<T>(args)...); }
@@ -61,9 +61,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual uint8_t via_in_b();
 	virtual void via_out_b(uint8_t data);
@@ -133,7 +133,7 @@ public:
 	iosb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual uint8_t via_in_b() override;
 	virtual void via_out_b(uint8_t data) override;
@@ -170,12 +170,12 @@ public:
 	// construction/destruction
 	primetimeii_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 	void ata_irq_w(int state);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	u16 ata_regs_r(offs_t offset);

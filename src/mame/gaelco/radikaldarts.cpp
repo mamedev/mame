@@ -37,7 +37,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void radikaldarts_map(address_map &map);
+	void radikaldarts_map(address_map &map) ATTR_COLD;
 };
 
 void radikaldarts_state::radikaldarts_map(address_map &map)

@@ -2854,8 +2854,12 @@ license:CC0-1.0
 		<description>Giten Megami Tensei - Tokyo Mokushiroku</description>
 		<year>1997</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
+]]></notes>
 		<info name="alt_title" value="偽典・女神転生 東京黙示録" />
 		<info name="release" value="19970404" />
+		<info name="usage" value="Before starting to install prepare a writable DOS boot floppy (msdos62:flop8). Game needs a memory manager, SMARTDRV.EXE and MOUSE.COM loaded there" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="giten megami tensei - tokyo mokushiroku (japan)" sha1="5ec487543a5e2b6dbf0d8e2b78c7d36307d60599" />

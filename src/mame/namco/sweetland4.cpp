@@ -55,7 +55,7 @@ private:
 
 	void lcdc_w(u8 data);
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 

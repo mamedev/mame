@@ -149,8 +149,8 @@ private:
 	uint16_t rtc_r(offs_t offset);
 	void rtc_w(offs_t offset, uint16_t data);
 
-	void tmaster_map(address_map &map);
-	void cpu_space_map(address_map &map);
+	void tmaster_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

@@ -90,8 +90,8 @@ protected:
 	typedef device_delegate<uint32_t (bool)> a20_cb;
 
 	virtual void execute_run() override;
-	virtual void device_reset() override;
-	virtual void device_start() override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;

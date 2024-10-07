@@ -113,8 +113,8 @@ private:
 	required_ioport m_sw;
 	output_finder<> m_led_diagnostic;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void select_drive();
 	void check_level1_interrupts();
@@ -191,8 +191,8 @@ private:
 	void on_disk1_load(floppy_image_device *image);
 	void on_disk1_unload(floppy_image_device *image);
 
-	void wangpc_io(address_map &map);
-	void wangpc_mem(address_map &map);
+	void wangpc_io(address_map &map) ATTR_COLD;
+	void wangpc_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_dma_page[4];
 	int m_dack;

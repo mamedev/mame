@@ -45,8 +45,8 @@ protected:
 	i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_data_width, int program_addr_width, int io_data_width);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_debug_setup() override;
 
 	// device_execute_interface overrides
@@ -1596,8 +1596,8 @@ public:
 protected:
 	i486_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class i486dx4_device : public i486_device
@@ -1607,7 +1607,7 @@ public:
 	i486dx4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -1624,8 +1624,8 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
 	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -1636,8 +1636,8 @@ public:
 	pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -1648,8 +1648,8 @@ public:
 	mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -1664,8 +1664,8 @@ protected:
 
 	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
 	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -1676,8 +1676,8 @@ public:
 	pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -1688,8 +1688,8 @@ public:
 	pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void opcode_cpuid() override;
 };
@@ -1704,8 +1704,8 @@ public:
 protected:
 	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
 	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 

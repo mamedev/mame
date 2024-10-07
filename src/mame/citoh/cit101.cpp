@@ -91,7 +91,7 @@ public:
 	void cit101e(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void draw_line(uint32_t *pixptr, int minx, int maxx, int line, bool last_line, u16 rowaddr, u16 rowattr, u8 scrattr);
@@ -114,10 +114,10 @@ private:
 	void nvr_address_w(u8 data);
 	void nvr_control_w(u8 data);
 
-	void mem_map(address_map &map);
-	void mem_map_101e(address_map &map);
-	void io_map(address_map &map);
-	void io_map_101e(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void mem_map_101e(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void io_map_101e(address_map &map) ATTR_COLD;
 
 	u8 m_e0_latch;
 

@@ -1342,7 +1342,7 @@ public:
 protected:
 	void set_tilemaps_flip(int val) { m_tilemaps_flip = val; }
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -1397,39 +1397,39 @@ protected:
 	void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size);
 	void pit_out0(int state);
 
-	void atehate_map(address_map &map);
-	void blandia_map(address_map &map);
-	void blandia_x1_map(address_map &map);
-	void blandiap_map(address_map &map);
-	void blockcar_map(address_map &map);
-	void blockcarb_map(address_map &map);
-	void blockcarb_sound_map(address_map &map);
-	void daioh_map(address_map &map);
-	void daiohp_map(address_map &map);
-	void drgnunit_map(address_map &map);
-	void extdwnhl_map(address_map &map);
-	void jjsquawb_map(address_map &map);
-	void kamenrid_map(address_map &map);
-	void krzybowl_map(address_map &map);
-	void madshark_map(address_map &map);
-	void madsharkbl_map(address_map &map);
-	void madsharkbl_oki_map(address_map &map);
-	void msgundam_map(address_map &map);
-	void msgundamb_map(address_map &map);
-	void oisipuzl_map(address_map &map);
-	void orbs_map(address_map &map);
-	void rezon_map(address_map &map);
-	void triplfun_map(address_map &map);
-	void umanclub_map(address_map &map);
-	void utoukond_map(address_map &map);
-	void utoukond_sound_io_map(address_map &map);
-	void utoukond_sound_map(address_map &map);
-	void wiggie_map(address_map &map);
-	void wiggie_sound_map(address_map &map);
-	void wits_map(address_map &map);
-	void wrofaero_map(address_map &map);
-	void zingzip_map(address_map &map);
-	void zingzipbl_map(address_map &map);
+	void atehate_map(address_map &map) ATTR_COLD;
+	void blandia_map(address_map &map) ATTR_COLD;
+	void blandia_x1_map(address_map &map) ATTR_COLD;
+	void blandiap_map(address_map &map) ATTR_COLD;
+	void blockcar_map(address_map &map) ATTR_COLD;
+	void blockcarb_map(address_map &map) ATTR_COLD;
+	void blockcarb_sound_map(address_map &map) ATTR_COLD;
+	void daioh_map(address_map &map) ATTR_COLD;
+	void daiohp_map(address_map &map) ATTR_COLD;
+	void drgnunit_map(address_map &map) ATTR_COLD;
+	void extdwnhl_map(address_map &map) ATTR_COLD;
+	void jjsquawb_map(address_map &map) ATTR_COLD;
+	void kamenrid_map(address_map &map) ATTR_COLD;
+	void krzybowl_map(address_map &map) ATTR_COLD;
+	void madshark_map(address_map &map) ATTR_COLD;
+	void madsharkbl_map(address_map &map) ATTR_COLD;
+	void madsharkbl_oki_map(address_map &map) ATTR_COLD;
+	void msgundam_map(address_map &map) ATTR_COLD;
+	void msgundamb_map(address_map &map) ATTR_COLD;
+	void oisipuzl_map(address_map &map) ATTR_COLD;
+	void orbs_map(address_map &map) ATTR_COLD;
+	void rezon_map(address_map &map) ATTR_COLD;
+	void triplfun_map(address_map &map) ATTR_COLD;
+	void umanclub_map(address_map &map) ATTR_COLD;
+	void utoukond_map(address_map &map) ATTR_COLD;
+	void utoukond_sound_io_map(address_map &map) ATTR_COLD;
+	void utoukond_sound_map(address_map &map) ATTR_COLD;
+	void wiggie_map(address_map &map) ATTR_COLD;
+	void wiggie_sound_map(address_map &map) ATTR_COLD;
+	void wits_map(address_map &map) ATTR_COLD;
+	void wrofaero_map(address_map &map) ATTR_COLD;
+	void zingzip_map(address_map &map) ATTR_COLD;
+	void zingzipbl_map(address_map &map) ATTR_COLD;
 };
 
 class thunderl_state : public seta_state
@@ -1446,12 +1446,12 @@ protected:
 	u16 thunderl_protection_r();
 	void thunderl_protection_w(offs_t offset, u16 data);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void thunderl_map(address_map &map);
-	void thunderlbl_map(address_map &map);
-	void thunderlbl_sound_map(address_map &map);
-	void thunderlbl_sound_portmap(address_map &map);
+	void thunderl_map(address_map &map) ATTR_COLD;
+	void thunderlbl_map(address_map &map) ATTR_COLD;
+	void thunderlbl_sound_map(address_map &map) ATTR_COLD;
+	void thunderlbl_sound_portmap(address_map &map) ATTR_COLD;
 
 private:
 	u8 m_thunderl_protection_reg = 0;
@@ -1468,12 +1468,12 @@ public:
 	void magspeed(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void lights_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	void magspeed_map(address_map &map);
+	void magspeed_map(address_map &map) ATTR_COLD;
 
 	output_finder<48> m_leds;
 
@@ -1491,7 +1491,7 @@ public:
 	void keroppi(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u16 protection_r();
@@ -1500,7 +1500,7 @@ private:
 	void prize_w(u16 data);
 	TIMER_CALLBACK_MEMBER(prize_hop_callback);
 
-	void keroppi_map(address_map &map);
+	void keroppi_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_coins;
 
@@ -1524,15 +1524,15 @@ public:
 	void init_zombraid();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	double adc_cb(u8 input);
 	u16 gun_r();
 	void gun_w(u16 data);
 
-	void zombraid_map(address_map &map);
-	void zombraid_x1_map(address_map &map);
+	void zombraid_map(address_map &map) ATTR_COLD;
+	void zombraid_x1_map(address_map &map) ATTR_COLD;
 
 	required_device<adc083x_device> m_adc;
 	required_ioport_array<4> m_gun_inputs;
@@ -1559,8 +1559,8 @@ public:
 	void screen_vblank(int state);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void rtc_w(u16 data);
@@ -1584,7 +1584,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void setaroul_map(address_map &map);
+	void setaroul_map(address_map &map) ATTR_COLD;
 
 	required_device<upd4992_device> m_rtc;  // ! Actually D4911C !
 	required_device<ticket_dispenser_device> m_hopper;
@@ -1610,13 +1610,13 @@ public:
 	void pairlove(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 protected:
 	u16 prot_r(offs_t offset);
 	void prot_w(offs_t offset, u16 data);
 
-	void pairlove_map(address_map &map);
+	void pairlove_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<u16 []> m_protram;
 	std::unique_ptr<u16 []> m_protram_old;
@@ -1636,7 +1636,7 @@ private:
 	void coin_counter_w(u8 data);
 	void outputs_w(u8 data);
 
-	void crazyfgt_map(address_map &map);
+	void crazyfgt_map(address_map &map) ATTR_COLD;
 
 	required_device<ds2430a_device> m_eeprom;
 };
@@ -1689,8 +1689,8 @@ private:
 	void inttoote_out_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 inttoote_700000_r(offs_t offset);
 
-	void inttoote_map(address_map &map);
-	void jockeyc_map(address_map &map);
+	void inttoote_map(address_map &map) ATTR_COLD;
+	void jockeyc_map(address_map &map) ATTR_COLD;
 
 	required_device<upd4992_device> m_rtc;  // ! Actually D4911C !
 	required_device<ticket_dispenser_device> m_hopper1, m_hopper2; // the 2nd hopper is optional

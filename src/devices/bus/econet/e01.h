@@ -41,13 +41,13 @@ protected:
 	econet_e01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_econet_interface overrides
 	virtual void econet_data(int state) override;
@@ -100,7 +100,7 @@ private:
 	inline void network_irq_enable(int enabled);
 	inline void hdc_irq_enable(int enabled);
 
-	void e01_mem(address_map &map);
+	void e01_mem(address_map &map) ATTR_COLD;
 
 	// interrupt state
 	int m_adlc_ie;

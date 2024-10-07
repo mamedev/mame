@@ -37,7 +37,7 @@ public:
 	void cd100b(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 ccc_in_r();
@@ -49,9 +49,9 @@ private:
 	void mech_p2_w(u8 data);
 	void mech_latch_w(u8 data);
 
-	void ccc_mem_map(address_map &map);
-	void ccc_io_map(address_map &map);
-	void mc6803_map(address_map &map);
+	void ccc_mem_map(address_map &map) ATTR_COLD;
+	void ccc_io_map(address_map &map) ATTR_COLD;
+	void mc6803_map(address_map &map) ATTR_COLD;
 
 	required_device<z180_device> m_maincpu;
 	required_device<m6803_cpu_device> m_mechcpu;

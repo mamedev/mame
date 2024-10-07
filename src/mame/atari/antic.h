@@ -46,8 +46,8 @@ public:
 	antic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	template <typename T> void set_gtia_tag(T &&tag) { m_gtia.set_tag(std::forward<T>(tag)); }
 

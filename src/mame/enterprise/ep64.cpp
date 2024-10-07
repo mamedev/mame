@@ -214,8 +214,8 @@ private:
 	required_memory_region m_rom;
 	required_ioport_array<10> m_y;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t rd0_r();
 	void wr0_w(uint8_t data);
@@ -226,11 +226,11 @@ private:
 
 	void write_centronics_busy(int state);
 	int m_centronics_busy;
-	void dave_128k_mem(address_map &map);
-	void dave_64k_mem(address_map &map);
-	void dave_io(address_map &map);
-	void ep64_io(address_map &map);
-	void ep64_mem(address_map &map);
+	void dave_128k_mem(address_map &map) ATTR_COLD;
+	void dave_64k_mem(address_map &map) ATTR_COLD;
+	void dave_io(address_map &map) ATTR_COLD;
+	void ep64_io(address_map &map) ATTR_COLD;
+	void ep64_mem(address_map &map) ATTR_COLD;
 };
 
 

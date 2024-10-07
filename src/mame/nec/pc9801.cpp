@@ -680,26 +680,25 @@ uint8_t pc9801vm_state::pc9801rs_knjram_r(offs_t offset)
 {
 	uint32_t pcg_offset;
 
-	pcg_offset = (m_font_addr & 0x7fff) << 5;
-	pcg_offset|= offset & 0x1e;
-	pcg_offset|= m_font_lr;
-
 	if(!(m_font_addr & 0xff))
 	{
 		int char_size = m_video_ff[FONTSEL_REG];
 		return m_char_rom[(m_font_addr >> 8) * (8 << char_size) + (char_size * 0x800) + ((offset >> 1) & 0xf)];
 	}
 
-	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
+	pcg_offset = (m_font_addr & 0x7fff) << 5;
+	pcg_offset|= offset & 0x1e;
+
+	// 8x16 charset selector
+	// telenetm defintely mirrors offset & 1 for 8x16 romaji title songs, would otherwise blank them out
+	if((m_font_addr & 0x7c00) == 0x0800)
 		return m_kanji_rom[pcg_offset];
 
-	// TODO: do we really need to recalculate?
-	pcg_offset = (m_font_addr & 0x7fff) << 5;
-	pcg_offset|= (offset & 0x1e);
-	// telenetm defintely needs this for 8x16 romaji title songs, otherwise it blanks them out
-	// (pc9801vm never reads this area btw)
-	pcg_offset|= (offset & m_font_lr) & 1;
-//  pcg_offset|= (m_font_lr);
+	// mezaset2 don't bother with LR setting, implying it just read this linearly
+	pcg_offset|= offset & 1;
+
+	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
+		return m_kanji_rom[pcg_offset];
 
 	return m_kanji_rom[pcg_offset];
 }
@@ -978,6 +977,7 @@ template <unsigned port> void pc9801vm_state::fdc_2hd_2dd_ctrl_w(u8 data)
 		m_fdc_2hd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
 	}
 
+	// TODO: this looks awfully similar to pc88va DMA mode, including same bits for trigger and irq mask.
 	if (port == 0 && !prev_trig && cur_trig)
 	{
 		m_fdc_timer->reset();

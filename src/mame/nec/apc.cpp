@@ -173,16 +173,16 @@ private:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
-	void apc_io(address_map &map);
-	void apc_map(address_map &map);
-	void upd7220_1_map(address_map &map);
-	void upd7220_2_map(address_map &map);
+	void apc_io(address_map &map) ATTR_COLD;
+	void apc_map(address_map &map) ATTR_COLD;
+	void upd7220_1_map(address_map &map) ATTR_COLD;
+	void upd7220_2_map(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	inline void set_dma_channel(int channel, int state);
 };
 

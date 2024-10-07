@@ -29,15 +29,15 @@ public:
 	// construction/destruction
 	bml3bus_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t bml3_rtc_r(offs_t offset);
-	void bml3_rtc_w(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void map_io(address_space_installer &space) override;
 

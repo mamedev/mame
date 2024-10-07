@@ -16,7 +16,7 @@ public:
 	void write(uint8_t data);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	devcb_write_line::array<8> m_bit_handlers;

@@ -58,8 +58,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 u10_a_r();
@@ -73,7 +73,7 @@ private:
 	void u10_cb2_w(int state);
 	void u11_ca2_w(int state);
 	void u11_cb2_w(int state);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_u10a = 0U;
 	u8 m_u10b = 0U;

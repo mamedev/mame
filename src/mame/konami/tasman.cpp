@@ -62,7 +62,7 @@ public:
 
 protected:
 	virtual void machine_reset() override { m_irq_mask = 0; };
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -92,8 +92,8 @@ private:
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 
-	void kongamaud_map(address_map &map);
-	void kongambl_map(address_map &map);
+	void kongamaud_map(address_map &map) ATTR_COLD;
+	void kongambl_map(address_map &map) ATTR_COLD;
 };
 
 

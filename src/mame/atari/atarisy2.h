@@ -62,9 +62,9 @@ public:
 	void csprint(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void update_interrupts();
@@ -153,6 +153,6 @@ private:
 	static rgb_t RRRRGGGGBBBBIIII(uint32_t raw);
 
 	static const atari_motion_objects_config s_mob_config;
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };

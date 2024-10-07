@@ -132,15 +132,15 @@ protected:
 	virtual void driver_start() override;
 	virtual void driver_reset() override;
 
-	void intellec4_program_banks(address_map &map);
-	void intellec4_rom_port_banks(address_map &map);
+	void intellec4_program_banks(address_map &map) ATTR_COLD;
+	void intellec4_rom_port_banks(address_map &map) ATTR_COLD;
 
-	void intellec4_rom(address_map &map);
-	void intellec4_ram_memory(address_map &map);
-	void intellec4_rom_ports(address_map &map);
-	void intellec4_ram_status(address_map &map);
-	void intellec4_ram_ports(address_map &map);
-	void intellec4_program_memory(address_map &map);
+	void intellec4_rom(address_map &map) ATTR_COLD;
+	void intellec4_ram_memory(address_map &map) ATTR_COLD;
+	void intellec4_rom_ports(address_map &map) ATTR_COLD;
+	void intellec4_ram_status(address_map &map) ATTR_COLD;
+	void intellec4_ram_ports(address_map &map) ATTR_COLD;
+	void intellec4_program_memory(address_map &map) ATTR_COLD;
 
 	void intellec4(machine_config &config);
 

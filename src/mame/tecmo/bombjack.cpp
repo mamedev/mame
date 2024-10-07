@@ -94,21 +94,21 @@ protected:
 	static inline constexpr u16 VTOTAL = 264, VBSTART = 240, VBEND = 16;
 
 	// initialization
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	template <typename T>
 	void bombjack_base(machine_config &config, T &&psg_type);
 
 	// main CPU
-	void program_map(address_map &map);
-	void bombjack_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void bombjack_map(address_map &map) ATTR_COLD;
 
 	// audio CPU
 	u8 soundlatch_r();
-	void bombjack_audio_map(address_map &map);
-	void bombjack_audio_portmap(address_map &map);
+	void bombjack_audio_map(address_map &map) ATTR_COLD;
+	void bombjack_audio_portmap(address_map &map) ATTR_COLD;
 
 	// video hardware
 	void videoram_w(offs_t offset, u8 data);
@@ -180,11 +180,11 @@ protected:
 	void calorie_common(machine_config &config);
 
 	// main CPU
-	void calorie_map(address_map &map);
-	void calorie_opcodes_map(address_map &map);
+	void calorie_map(address_map &map) ATTR_COLD;
+	void calorie_opcodes_map(address_map &map) ATTR_COLD;
 
 	// audio CPU
-	void calorie_audio_map(address_map &map);
+	void calorie_audio_map(address_map &map) ATTR_COLD;
 
 	// video hardware
 	void set_bg_tile_info(u8 const attr, u16 &code, u8 &color, bool &flipx, bool &flipy) override;

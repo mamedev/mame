@@ -180,11 +180,11 @@ public:
 	void nomcu(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void nomcu_main_io_map(address_map &map);
+	void nomcu_main_io_map(address_map &map) ATTR_COLD;
 
 private:
 	// memory pointers
@@ -234,8 +234,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_prg_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_prg_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class blktiger_mcu_state : public blktiger_state
@@ -249,8 +249,8 @@ public:
 	void mcu(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// MCU-related
@@ -265,7 +265,7 @@ private:
 	uint8_t from_main_r();
 	void to_main_w(uint8_t data);
 
-	void mcu_main_io_map(address_map &map);
+	void mcu_main_io_map(address_map &map) ATTR_COLD;
 };
 
 

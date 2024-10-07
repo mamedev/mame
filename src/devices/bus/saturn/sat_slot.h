@@ -103,7 +103,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	device_sat_cart_interface*       m_cart;

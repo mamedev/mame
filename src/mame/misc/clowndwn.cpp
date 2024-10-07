@@ -25,12 +25,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	void clowndwn(machine_config &config);
-	void clowndwn_map(address_map &map);
+	void clowndwn_map(address_map &map) ATTR_COLD;
 };
 
 void clowndwn_state::clowndwn_map(address_map &map)

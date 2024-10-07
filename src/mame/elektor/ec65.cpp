@@ -70,8 +70,8 @@ public:
 	void ec65(machine_config &config);
 
 private:
-	void machine_reset() override;
-	void ec65_mem(address_map &map);
+	void machine_reset() override ATTR_COLD;
+	void ec65_mem(address_map &map) ATTR_COLD;
 	void kbd_put(u8 data);
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
@@ -90,7 +90,7 @@ public:
 	void ec65k(machine_config &config);
 
 private:
-	void ec65k_mem(address_map &map);
+	void ec65k_mem(address_map &map) ATTR_COLD;
 	void kbd_put(u8 data);
 	required_device<mc146818_device> m_rtc;
 	required_device<pia6821_device> m_pia0;

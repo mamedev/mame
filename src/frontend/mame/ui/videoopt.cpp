@@ -403,6 +403,12 @@ bool menu_video_options::handle(event const *ev)
 				ui().set_hide_inactive_pointers(m_target.index(), !ui().hide_inactive_pointers(m_target.index()));
 				changed = true;
 				break;
+
+			// restore initial setting
+			case IPT_UI_CLEAR:
+				ui().restore_initial_pointer_options(m_target.index());
+				changed = true;
+				break;
 			}
 			break;
 

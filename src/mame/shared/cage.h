@@ -42,13 +42,13 @@ public:
 
 	TIMER_CALLBACK_MEMBER( cage_deferred_w );
 
-	void cage_map(address_map &map);
+	void cage_map(address_map &map) ATTR_COLD;
 protected:
 	atari_cage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
 	TIMER_DEVICE_CALLBACK_MEMBER( cage_timer_callback );
@@ -113,10 +113,10 @@ public:
 	// construction/destruction
 	atari_cage_seattle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void cage_map_seattle(address_map &map);
+	void cage_map_seattle(address_map &map) ATTR_COLD;
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 };
 

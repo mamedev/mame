@@ -30,11 +30,11 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 
-	void tc0180vcu_memrw(address_map &map);
+	void tc0180vcu_memrw(address_map &map) ATTR_COLD;
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_intl);
 

@@ -13,23 +13,23 @@ class cirrus_gd5465_laguna3d_device :  public pci_card_device
 public:
 	cirrus_gd5465_laguna3d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void legacy_memory_map(address_map &map);
-	void legacy_io_map(address_map &map);
+	void legacy_memory_map(address_map &map) ATTR_COLD;
+	void legacy_io_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
-	virtual void mmio_map(address_map &map);
-	virtual void vram_aperture_map(address_map &map);
+	virtual void mmio_map(address_map &map) ATTR_COLD;
+	virtual void vram_aperture_map(address_map &map) ATTR_COLD;
 private:
 	required_device<cirrus_gd5446_vga_device> m_vga;
 	required_memory_region m_vga_rom;

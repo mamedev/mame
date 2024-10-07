@@ -284,7 +284,7 @@ void tsconf_state::tsconf(machine_config &config)
 
 	GLUKRS(config, m_glukrs);
 
-	TSCONF_DMA(config, m_dma, 14_MHz_XTAL * 2);
+	TSCONF_DMA(config, m_dma, 28_MHz_XTAL);
 	m_dma->in_mreq_callback().set(FUNC(tsconf_state::ram_read16));
 	m_dma->out_mreq_callback().set(FUNC(tsconf_state::ram_write16));
 	m_dma->in_spireq_callback().set(FUNC(tsconf_state::spi_read16));
@@ -294,6 +294,7 @@ void tsconf_state::tsconf(machine_config &config)
 
 	BETA_DISK(config, m_beta, 0);
 	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(tsconf_state::tsconf_spi_miso_w));
 
 	SPEAKER(config, "lspeaker").front_left();

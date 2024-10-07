@@ -39,8 +39,8 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// configuration
 	required_device<gio64_device> m_gio64;
@@ -116,7 +116,7 @@ protected:
 	gio64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// internal state
 	device_gio64_card_interface *m_device_list[3];

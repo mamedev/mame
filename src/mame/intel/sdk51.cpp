@@ -38,15 +38,15 @@ public:
 	void sdk51(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void psen_map(address_map &map);
-	void movx_map(address_map &map);
-	void progmem_map(address_map &map);
-	void datamem_map(address_map &map);
-	void mem0_map(address_map &map);
+	void psen_map(address_map &map) ATTR_COLD;
+	void movx_map(address_map &map) ATTR_COLD;
+	void progmem_map(address_map &map) ATTR_COLD;
+	void datamem_map(address_map &map) ATTR_COLD;
+	void mem0_map(address_map &map) ATTR_COLD;
 
 	u8 psen_r(offs_t offset);
 	u8 datamem_r(offs_t offset);

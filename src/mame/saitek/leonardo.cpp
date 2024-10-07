@@ -101,8 +101,8 @@ public:
 	void galileo(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -120,7 +120,7 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_led_data[2] = { };
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void update_display();
 	void mux_w(u8 data);

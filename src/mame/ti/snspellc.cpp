@@ -205,8 +205,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_on);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<tms1100_cpu_device> m_maincpu;
@@ -255,7 +255,7 @@ public:
 	void init_tntell();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	virtual u8 read_k() override;
 

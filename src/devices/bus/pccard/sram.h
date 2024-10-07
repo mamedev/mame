@@ -36,8 +36,8 @@ protected:
 	pccard_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -91,7 +91,7 @@ public:
 	pccard_mitsubishi_mf31m1_lycat01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 private:
-	void memory_map(address_map &map);
+	void memory_map(address_map &map) ATTR_COLD;
 };
 
 class pccard_centennial_sram_device : public pccard_sram_device
@@ -119,11 +119,11 @@ public:
 
 protected:
 	// device_t overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	void memory_map(address_map &map);
-	void attribute_map(address_map &map);
+	void memory_map(address_map &map) ATTR_COLD;
+	void attribute_map(address_map &map) ATTR_COLD;
 };
 
 class pccard_centennial_sl02m_15_11194_device : public pccard_centennial_sram_device
@@ -134,11 +134,11 @@ public:
 
 protected:
 	// device_t overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	void memory_map(address_map &map);
-	void attribute_map(address_map &map);
+	void memory_map(address_map &map) ATTR_COLD;
+	void attribute_map(address_map &map) ATTR_COLD;
 };
 
 class pccard_centennial_sl04m_15_11194_device : public pccard_centennial_sram_device
@@ -149,11 +149,11 @@ public:
 
 protected:
 	// device_t overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	void memory_map(address_map &map);
-	void attribute_map(address_map &map);
+	void memory_map(address_map &map) ATTR_COLD;
+	void attribute_map(address_map &map) ATTR_COLD;
 };
 
 // device type definition

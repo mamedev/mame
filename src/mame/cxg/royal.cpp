@@ -18,8 +18,8 @@ Hardware notes:
 - chessboard buttons, 16+4 LEDs, piezo
 
 Royal has 2 LCD panels, Supra has 1 (D12 pin is low), Granada and others have 0.
-The LCD panel has 4 7segs and 2 unused segments: an x in the middle, and a white
-square under the first digit.
+The LCD panel has 4 7segs (no DP) and 2 unused segments: an x in the middle, and
+a white square under the first digit.
 
 The 1992 versions by National Telecommunications System Ltd (Granada CXG-347,
 Sierra, Seville) have a lower-speed 3.58MHz XTAL, but since none of them have
@@ -76,7 +76,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(supra_on_button);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -203,7 +203,8 @@ template<int N>
 void royal_state::input_w(u8 data)
 {
 	// R3x,R4x: input mux, LED data
-	m_inp_mux = (m_inp_mux & ~(0xf << (N*4))) | (data << (N*4));
+	const u8 shift = 4 * N;
+	m_inp_mux = (m_inp_mux & ~(0xf << shift)) | (data << shift);
 	m_led_pwm->write_mx(~m_inp_mux);
 }
 
@@ -292,15 +293,15 @@ void royal_state::royal(machine_config &config)
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->stop_cb().set(m_maincpu, FUNC(hmcs400_cpu_device::nvram_set_battery));
 	m_maincpu->stop_cb().append(FUNC(royal_state::stop_mode));
-	m_maincpu->write_r<0>().set(FUNC(royal_state::lcd_segs_w<0>));
-	m_maincpu->read_r<1>().set(FUNC(royal_state::board_r<0>));
-	m_maincpu->read_r<2>().set(FUNC(royal_state::board_r<1>));
-	m_maincpu->write_r<3>().set(FUNC(royal_state::input_w<0>));
-	m_maincpu->write_r<4>().set(FUNC(royal_state::input_w<1>));
-	m_maincpu->write_r<5>().set(FUNC(royal_state::lcd_com_w));
-	m_maincpu->write_r<6>().set(FUNC(royal_state::lcd_segs_w<3>));
-	m_maincpu->write_r<7>().set(FUNC(royal_state::lcd_segs_w<2>));
-	m_maincpu->write_r<8>().set(FUNC(royal_state::lcd_segs_w<1>));
+	m_maincpu->write_r<0x0>().set(FUNC(royal_state::lcd_segs_w<0>));
+	m_maincpu->read_r<0x1>().set(FUNC(royal_state::board_r<0>));
+	m_maincpu->read_r<0x2>().set(FUNC(royal_state::board_r<1>));
+	m_maincpu->write_r<0x3>().set(FUNC(royal_state::input_w<0>));
+	m_maincpu->write_r<0x4>().set(FUNC(royal_state::input_w<1>));
+	m_maincpu->write_r<0x5>().set(FUNC(royal_state::lcd_com_w));
+	m_maincpu->write_r<0x6>().set(FUNC(royal_state::lcd_segs_w<3>));
+	m_maincpu->write_r<0x7>().set(FUNC(royal_state::lcd_segs_w<2>));
+	m_maincpu->write_r<0x8>().set(FUNC(royal_state::lcd_segs_w<1>));
 	m_maincpu->write_d().set(FUNC(royal_state::control_w));
 	m_maincpu->read_d().set(FUNC(royal_state::input_r));
 

@@ -73,10 +73,10 @@ public:
 protected:
 	ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	void timer0_int(int state);
 	void timer1_int(int state);
@@ -125,7 +125,7 @@ protected:
 	void timer_int_clear_w(u8 data);
 	u8 error_status_r();
 
-	void base_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
 
 	enum
 	{
@@ -203,7 +203,7 @@ public:
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -222,8 +222,8 @@ public:
 
 	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void map(address_map &map);
-	void int2_map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
+	void int2_map(address_map &map) ATTR_COLD;
 
 protected:
 	uint8_t get_system_id() override { return 0x11; }

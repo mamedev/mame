@@ -89,8 +89,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_special );
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -103,9 +103,9 @@ private:
 	required_ioport m_special;
 	output_finder<2> m_leds;
 
-	void mpf1_io_map(address_map &map);
-	void mpf1_map(address_map &map);
-	void mpf1_step(address_map &map);
+	void mpf1_io_map(address_map &map) ATTR_COLD;
+	void mpf1_map(address_map &map) ATTR_COLD;
+	void mpf1_step(address_map &map) ATTR_COLD;
 
 	uint8_t rom_r(offs_t offset);
 	uint8_t step_r(offs_t offset);

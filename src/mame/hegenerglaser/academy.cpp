@@ -59,7 +59,7 @@ private:
 	required_device<hc259_device> m_outlatch;
 	required_ioport m_keys;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void led_w(u8 data);
 	u8 input_r();

@@ -53,8 +53,8 @@ public:
 	void wackygtr(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void adpcm_int(int state);
 	void sample_ctrl_w(uint8_t data);
@@ -76,7 +76,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;

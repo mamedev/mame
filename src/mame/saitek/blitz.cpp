@@ -72,7 +72,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_off) { m_power = false; }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { m_power = true; }
 
 private:

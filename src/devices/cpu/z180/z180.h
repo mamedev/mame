@@ -135,9 +135,9 @@ protected:
 	z180_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool extended_io, address_map_constructor internal_map);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_execute_interface implementation
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
@@ -1833,10 +1833,10 @@ protected:
 	z8s180_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_execute_interface implementation
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return BIT(m_cmr, 7) ? (clocks * 2) : BIT(m_ccr, 7) ? clocks : (clocks + 2 - 1) / 2; }

@@ -66,9 +66,9 @@ public:
 
 protected:
 	virtual uint8_t switches_r(offs_t offset);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void irq_ack_w(uint8_t data);
@@ -89,7 +89,7 @@ private:
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	TIMER_CALLBACK_MEMBER(pot_trigger_callback);
 	void update_nmi_state();
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	emu_timer *m_scanline_timer = nullptr;

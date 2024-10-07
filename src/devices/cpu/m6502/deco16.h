@@ -28,7 +28,7 @@ protected:
 	address_space_config io_config;
 
 	virtual space_config_vector memory_space_config() const override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 #define O(o) void o ## _full(); void o ## _partial()
 

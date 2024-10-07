@@ -48,7 +48,7 @@ public:
 	};
 
 	static constexpr u8 autovector(int level) { return 0x18 + level; }
-	void autovectors_map(address_map &map);
+	void autovectors_map(address_map &map) ATTR_COLD;
 
 	void set_cpu_space(int space_id) { m_cpu_space_id = space_id; }
 	void set_interrupt_mixer(bool enable) { m_interrupt_mixer = enable; }

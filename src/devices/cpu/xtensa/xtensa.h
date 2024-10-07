@@ -41,8 +41,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual void execute_run() override;
@@ -135,7 +135,7 @@ private:
 	void set_callinc(u8 val);
 	u8 get_callinc();
 
-	void ext_regs(address_map &map);
+	void ext_regs(address_map &map) ATTR_COLD;
 
 	bool handle_bz(u32 inst);
 	void handle_retw();

@@ -53,14 +53,14 @@ private:
 	void disp_2_w(uint8_t data);
 	void seg_w(uint8_t data);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_disp_1 = 0U;
 	uint8_t m_disp_2 = 0U;
 	u8 m_digit = 0U;
 	[[maybe_unused]] uint8_t bit_to_dec(uint8_t val);
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<8> m_io_keyboard;
 	output_finder<16> m_digits;

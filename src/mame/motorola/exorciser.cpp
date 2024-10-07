@@ -178,12 +178,12 @@ public:
 	void abort_key_w(int state);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void dbg_map(address_map &map);
-	void mem_map(address_map &map);
+	void dbg_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void irq_line_w(int state);
 	u8 m_irq;

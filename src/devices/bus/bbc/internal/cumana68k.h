@@ -42,12 +42,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void irq6502_w(int state) override;
 
@@ -64,7 +64,7 @@ private:
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<nscsi_callback_device> m_sasi;
 
-	void cumana68k_mem(address_map &map);
+	void cumana68k_mem(address_map &map) ATTR_COLD;
 
 	void fsel_w(offs_t offset, uint8_t data);
 

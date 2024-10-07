@@ -57,7 +57,7 @@ public:
 	void elwro800(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	/* NR signal */
@@ -71,9 +71,9 @@ private:
 	void i8255_port_c_w(uint8_t data);
 	void write_centronics_ack(int state);
 
-	void elwro800_io(address_map &map);
-	void elwro800_m1(address_map &map);
-	void elwro800_mem(address_map &map);
+	void elwro800_io(address_map &map) ATTR_COLD;
+	void elwro800_m1(address_map &map) ATTR_COLD;
+	void elwro800_mem(address_map &map) ATTR_COLD;
 
 	required_device<i8251_device> m_i8251;
 	required_device<i8255_device> m_i8255;

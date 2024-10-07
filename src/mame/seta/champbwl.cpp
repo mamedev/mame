@@ -178,7 +178,7 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<x1_001_device> m_spritegen;
@@ -201,8 +201,8 @@ public:
 	void champbwl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t trackball_r();
@@ -211,7 +211,7 @@ private:
 
 	void screen_vblank(int state);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<2> m_inputs;
 	required_ioport_array<2> m_fakex;
@@ -238,7 +238,7 @@ private:
 
 	void screen_vblank(int state);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 

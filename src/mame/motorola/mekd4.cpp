@@ -338,8 +338,8 @@ private:
 	int stop_pia_cb1_r();
 	void stop_pia_cb2_w(int state);
 
-	void mekd4_stop_mem(address_map &map);
-	void mekd4_mem(address_map &map);
+	void mekd4_stop_mem(address_map &map) ATTR_COLD;
+	void mekd4_mem(address_map &map) ATTR_COLD;
 
 	address_space *m_banked_space;
 
@@ -351,8 +351,8 @@ private:
 	uint8_t m_ram_page; // aka RAP0, RAP1, RAP2
 	uint8_t m_segment;
 	uint8_t m_digit;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<pia6821_device> m_stop_pia;

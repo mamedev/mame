@@ -94,9 +94,9 @@ public:
 	void pc100(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
@@ -156,8 +156,8 @@ private:
 	void rtc_portc_2_w(int state) { m_rtc_portc = (m_rtc_portc & ~(1 << 2)) | ((state & 1) << 2); }
 	void rtc_portc_3_w(int state) { m_rtc_portc = (m_rtc_portc & ~(1 << 3)) | ((state & 1) << 3); }
 	uint8_t m_rtc_portc;
-	void pc100_io(address_map &map);
-	void pc100_map(address_map &map);
+	void pc100_io(address_map &map) ATTR_COLD;
+	void pc100_map(address_map &map) ATTR_COLD;
 };
 
 void pc100_state::video_start()

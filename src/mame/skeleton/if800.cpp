@@ -33,14 +33,14 @@ private:
 	required_device<upd7220_device> m_hgdc;
 
 	required_shared_ptr<uint16_t> m_video_ram;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	void if800_io(address_map &map);
-	void if800_map(address_map &map);
-	void upd7220_map(address_map &map);
+	void if800_io(address_map &map) ATTR_COLD;
+	void if800_map(address_map &map) ATTR_COLD;
+	void upd7220_map(address_map &map) ATTR_COLD;
 };
 
 UPD7220_DISPLAY_PIXELS_MEMBER( if800_state::hgdc_display_pixels )

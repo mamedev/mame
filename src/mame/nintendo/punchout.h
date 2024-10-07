@@ -88,7 +88,7 @@ private:
 	TILE_GET_INFO_MEMBER(armwrest_fg_get_info);
 	TILEMAP_MAPPER_MEMBER(armwrest_bs1_scan);
 	TILEMAP_MAPPER_MEMBER(armwrest_bs1_scan_flipx);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	DECLARE_VIDEO_START(armwrest);
 	DECLARE_MACHINE_RESET(spnchout);
 	uint32_t screen_update_punchout_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -101,12 +101,12 @@ private:
 	void drawbs2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void punchout_copy_top_palette(int bank);
 	void punchout_copy_bot_palette(int bank);
-	void armwrest_map(address_map &map);
-	void punchout_io_map(address_map &map);
-	void punchout_map(address_map &map);
-	void punchout_sound_map(address_map &map);
-	void punchout_vlm_map(address_map &map);
-	void spnchout_io_map(address_map &map);
+	void armwrest_map(address_map &map) ATTR_COLD;
+	void punchout_io_map(address_map &map) ATTR_COLD;
+	void punchout_map(address_map &map) ATTR_COLD;
+	void punchout_sound_map(address_map &map) ATTR_COLD;
+	void punchout_vlm_map(address_map &map) ATTR_COLD;
+	void spnchout_io_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NINTENDO_PUNCHOUT_H

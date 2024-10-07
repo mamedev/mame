@@ -88,13 +88,13 @@ known chips:
  *A13     HD44840  1982, CXG Computachess II
  *A14     HD44840  1982, CXG Computachess II / Advanced Portachess
 
- *B29     HD44860  1987, Diamond Bridge Computer (M1011)
+  B29     HD44860  1987, Diamond Bridge Computer -> handheld/dbridgec.cpp
  *B55     HD44860  1987, Saitek Pro Bridge 100
 
  *A04     HD44868  1984, SciSys Rapier
- *A07     HD44868  1984, Chess King Pocket Micro Deluxe / Mephisto Teufelchen
+  A07     HD44868  1984, Chess King Pocket Micro De-Luxe -> chessking/pmicrodx.cpp
  *A12     HD44868  1985, SciSys Travel Mate II / Pocket Chess / MK 10 / Electronic Trio
- *A14     HD44868  1985, SciSys Kasparov Plus
+ *A14     HD44868  1985, SciSys Kasparov Plus / MK 12
  *A16     HD44868  1988, Saitek Pocket Checkers
 
   (* means undumped unless noted, @ denotes it's in this driver)
@@ -167,8 +167,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<hmcs40_cpu_device> m_maincpu;
@@ -2430,7 +2430,7 @@ public:
 	void cdkong(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<filter_volume_device> m_volume;
@@ -3353,7 +3353,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(game_speed);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cop411_cpu_device> m_audiocpu;
 

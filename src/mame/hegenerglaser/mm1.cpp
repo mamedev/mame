@@ -75,7 +75,7 @@ public:
 	void mm1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { m_reset = true; }
 
 private:
@@ -89,9 +89,9 @@ private:
 	u8 m_kp_mux = 0;
 
 	// address maps
-	void mirage_map(address_map &map);
-	void mm1_map(address_map &map);
-	void mm1_io(address_map &map);
+	void mirage_map(address_map &map) ATTR_COLD;
+	void mm1_map(address_map &map) ATTR_COLD;
+	void mm1_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();

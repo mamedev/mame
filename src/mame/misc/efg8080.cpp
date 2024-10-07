@@ -55,7 +55,7 @@ public:
 	void blackhol(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -70,10 +70,10 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void foolrace_map(address_map &map);
-	void foolrace_io(address_map &map);
-	void blackhol_map(address_map &map);
-	void blackhol_io(address_map &map);
+	void foolrace_map(address_map &map) ATTR_COLD;
+	void foolrace_io(address_map &map) ATTR_COLD;
+	void blackhol_map(address_map &map) ATTR_COLD;
+	void blackhol_io(address_map &map) ATTR_COLD;
 };
 
 

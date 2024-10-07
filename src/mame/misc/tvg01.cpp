@@ -79,7 +79,7 @@ public:
 	void theboat(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	template <int P> void input_select_w(u8 data);
@@ -87,8 +87,8 @@ private:
 	void bank_select_w(u8 data);
 	u8 bank_r(offs_t offset);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<6> m_player_inputs[2];
 	required_region_ptr<u8> m_banked_rom;

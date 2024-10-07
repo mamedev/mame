@@ -14,9 +14,6 @@
 #pragma once
 
 #include "debugvw.h"
-#include "debugbuf.h"
-
-#include "vecstream.h"
 
 
 //**************************************************************************
@@ -37,6 +34,9 @@ enum disasm_right_column
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+// forward declaration
+class debug_disasm_buffer;
 
 // a disassembly view_source
 class debug_view_disasm_source : public debug_view_source

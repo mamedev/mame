@@ -184,16 +184,16 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t test_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void neptunp2_io(address_map &map);
-	void neptunp2_video_map(address_map &map);
-	void neptunp2_no_video_map(address_map &map);
+	void neptunp2_io(address_map &map) ATTR_COLD;
+	void neptunp2_video_map(address_map &map) ATTR_COLD;
+	void neptunp2_no_video_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

@@ -55,7 +55,7 @@ public:
 	void jtc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void p2_w(u8 data);
 	u8 p3_r();
 	void p3_w(u8 data);
@@ -71,7 +71,7 @@ protected:
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void jtc_mem(address_map &map);
+	void jtc_mem(address_map &map) ATTR_COLD;
 };
 
 class jtces88_state : public jtc_state
@@ -89,7 +89,7 @@ public:
 	void jtces23(machine_config &config);
 private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void jtc_es23_mem(address_map &map);
+	void jtc_es23_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -105,7 +105,7 @@ public:
 	{ }
 	void jtces40(machine_config &config);
 private:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u8 videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, u8 data);
@@ -116,7 +116,7 @@ private:
 	memory_share_creator<uint8_t> m_color_ram_r;
 	memory_share_creator<uint8_t> m_color_ram_g;
 	memory_share_creator<uint8_t> m_color_ram_b;
-	void jtc_es40_mem(address_map &map);
+	void jtc_es40_mem(address_map &map) ATTR_COLD;
 	void es40_palette(palette_device &palette) const;
 };
 

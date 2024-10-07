@@ -32,16 +32,16 @@ public:
 	// construction/destruction
 	bml3bus_mp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t bml3_mp1802_r();
-	void bml3_mp1802_w(uint8_t data);
+	uint8_t read();
+	void write(uint8_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void map_exrom(address_space_installer &space) override;
 	virtual void map_io(address_space_installer &space) override;

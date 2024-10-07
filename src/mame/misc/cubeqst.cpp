@@ -50,9 +50,9 @@ public:
 	void cubeqst(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<simutrek_special_device> m_laserdisc;
@@ -90,9 +90,9 @@ private:
 	void vblank_irq(int state);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
 	void swap_linecpu_banks();
-	void line_sound_map(address_map &map);
-	void m68k_program_map(address_map &map);
-	void rotate_map(address_map &map);
+	void line_sound_map(address_map &map) ATTR_COLD;
+	void m68k_program_map(address_map &map) ATTR_COLD;
+	void rotate_map(address_map &map) ATTR_COLD;
 };
 
 

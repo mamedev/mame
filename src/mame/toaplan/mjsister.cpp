@@ -41,8 +41,8 @@ public:
 	void mjsister(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	/* video-related */
@@ -87,8 +87,8 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mjsister_io_map(address_map &map);
-	void mjsister_map(address_map &map);
+	void mjsister_io_map(address_map &map) ATTR_COLD;
+	void mjsister_map(address_map &map) ATTR_COLD;
 
 	emu_timer *m_dac_timer;
 

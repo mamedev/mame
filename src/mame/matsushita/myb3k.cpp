@@ -114,11 +114,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void myb3k_io(address_map &map);
-	void myb3k_map(address_map &map);
+	void myb3k_io(address_map &map) ATTR_COLD;
+	void myb3k_map(address_map &map) ATTR_COLD;
 
 	/* Interrupt controller */
 	void pic_int_w(int state);

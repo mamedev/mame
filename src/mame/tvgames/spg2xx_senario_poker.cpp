@@ -48,7 +48,7 @@ public:
 	void init_sentx6puk();
 	void init_sentx6pd();
 
-	void mem_map_2m_texas(address_map &map);
+	void mem_map_2m_texas(address_map &map) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(ok_latch)
 	{
@@ -69,8 +69,8 @@ public:
 	}
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t sentx_porta_r();

@@ -88,14 +88,14 @@ private:
 	required_device<nvram_device>   m_nvram;
 	optional_ioport_array<15> m_input;
 	required_device<rs232_port_device> m_debug_serial;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cybiko);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cybikoxt);
 
-	void cybikov1_mem(address_map &map);
-	void cybikov2_mem(address_map &map);
-	void cybikoxt_mem(address_map &map);
+	void cybikov1_mem(address_map &map) ATTR_COLD;
+	void cybikov2_mem(address_map &map) ATTR_COLD;
+	void cybikoxt_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_CYBIKO_CYBIKO_H

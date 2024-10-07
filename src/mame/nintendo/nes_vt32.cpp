@@ -31,14 +31,14 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint8_t in0_r();
 	virtual uint8_t in1_r();
 	virtual void in0_w(uint8_t data);
 
-	void nes_vt32_map(address_map& map);
+	void nes_vt32_map(address_map &map) ATTR_COLD;
 
 	optional_ioport m_io0;
 	optional_ioport m_io1;
@@ -80,7 +80,7 @@ public:
 		m_soc(*this, "soc")
 	{ }
 
-	void vt_external_space_map_32mbyte(address_map& map);
+	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<nes_vt02_vt03_soc_device> m_soc;
@@ -101,7 +101,7 @@ public:
 
 private:
 	uint8_t vt_rom_banked_r(offs_t offset);
-	void vt_external_space_map_fp_2x32mbyte(address_map& map);
+	void vt_external_space_map_fp_2x32mbyte(address_map &map) ATTR_COLD;
 
 	uint8_t fcpocket_412d_r();
 	void fcpocket_412c_w(uint8_t data);

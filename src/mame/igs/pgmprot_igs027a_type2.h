@@ -53,8 +53,8 @@ private:
 	void kov2p_arm_region_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 ddp2_speedup_r(address_space &space);
 	u16 ddp2_main_speedup_r();
-	void _55857F_arm7_map(address_map &map);
-	void kov2_mem(address_map &map);
+	void _55857F_arm7_map(address_map &map) ATTR_COLD;
+	void kov2_mem(address_map &map) ATTR_COLD;
 };
 
 /* simulations (or missing) */

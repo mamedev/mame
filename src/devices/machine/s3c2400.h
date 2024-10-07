@@ -135,8 +135,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// FIXME: a bunch of this stuff needs to be public, or used from an internal memory map, but since nothing uses it yet, it's impossible to know what
 	// However, the previous situation where all internal state was public is clearly undesirable

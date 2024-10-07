@@ -21,9 +21,9 @@ public:
 protected:
 	msx_slot_rs232_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void irq_mask_w(offs_t offset, u8 data);
 	virtual u8 status_r(offs_t offset) { return 0; }
@@ -57,7 +57,7 @@ public:
 	msx_slot_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual u8 status_r(offs_t offset) override;
 	virtual void update_irq_state() override;
@@ -70,8 +70,8 @@ public:
 	msx_slot_rs232_mitsubishi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual u8 status_r(offs_t offset) override;
 	virtual void update_irq_state() override;
@@ -86,8 +86,8 @@ public:
 	msx_slot_rs232_sony_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual uint8_t status_r(offs_t offset) override;
 	virtual void update_irq_state() override;
@@ -105,7 +105,7 @@ public:
 	msx_slot_rs232_svi738_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual u8 status_r(offs_t offset) override;
 	virtual void update_irq_state() override;
@@ -118,8 +118,8 @@ public:
 	msx_slot_rs232_toshiba_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual uint8_t status_r(offs_t offset) override;
 	virtual void update_irq_state() override;
@@ -136,10 +136,10 @@ public:
 protected:
 	static constexpr size_t SRAM_SIZE = 0x800;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual uint8_t status_r(offs_t offset) override;
 	virtual void update_irq_state() override;

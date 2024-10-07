@@ -38,7 +38,7 @@ public:
 private:
 	u16 palette_callback_straight(u16 bgr) const;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	void palram_w(offs_t offset, u8 data);
 	u8 input_port_r(offs_t offset);
@@ -76,9 +76,9 @@ public:
 	void tjsb_decrypt_sprites();
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 

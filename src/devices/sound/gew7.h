@@ -19,7 +19,7 @@ public:
 	uint8_t read_hi(offs_t offset);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	void init_sample(sample_t& sample, uint32_t index);

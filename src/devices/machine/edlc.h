@@ -22,7 +22,7 @@ public:
 	seeq8003_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	// register interface
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 	virtual u8 read(offs_t offset);
 	virtual void write(offs_t offset, u8 data);
 
@@ -39,8 +39,8 @@ protected:
 	seeq8003_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock = 0);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_network_interface implementation
 	virtual int recv_start_cb(u8 *buf, int length) override;
@@ -146,21 +146,21 @@ public:
 	seeq80c03_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	// register interface
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 	virtual u8 read(offs_t offset) override;
 	virtual void write(offs_t offset, u8 data) override;
 
 protected:
 	// device_t overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_network_interface overrides
 	virtual void send_complete_cb(int result) override;
 
 	// banked register map
-	void map_reg(address_map &map);
+	void map_reg(address_map &map) ATTR_COLD;
 
 	// register read handlers
 	u8 tx_ccl_r() { return u8(m_tx_cc >> 0); }

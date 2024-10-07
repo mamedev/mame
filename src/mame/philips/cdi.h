@@ -61,13 +61,13 @@ protected:
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void cdimono1_mem(address_map &map);
+	void cdimono1_mem(address_map &map) ATTR_COLD;
 
-	void cdi910_mem(address_map &map);
-	void cdimono2_mem(address_map &map);
-	void cdi070_cpuspace(address_map &map);
+	void cdi910_mem(address_map &map) ATTR_COLD;
+	void cdimono2_mem(address_map &map) ATTR_COLD;
+	void cdi070_cpuspace(address_map &map) ATTR_COLD;
 
 	template<int Channel> uint16_t plane_r(offs_t offset, uint16_t mem_mask = ~0);
 	template<int Channel> void plane_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -94,8 +94,8 @@ public:
 	void quizard(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void tra_callback() override;
 	virtual void rcv_complete() override;

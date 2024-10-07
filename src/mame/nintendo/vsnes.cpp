@@ -184,8 +184,8 @@ protected:
 	{
 	}
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	template <u8 Side> void vsnes_coin_counter_w(offs_t offset, u8 data);
 	template <u8 Side> u8 vsnes_coin_counter_r(offs_t offset);
@@ -193,10 +193,10 @@ protected:
 	template <u8 Side> u8 vsnes_in0_r();
 	template <u8 Side> u8 vsnes_in1_r();
 
-	void vsnes_cpu1_map(address_map &map);
-	void vsnes_cpu2_map(address_map &map);
-	void vsnes_ppu1_map(address_map &map);
-	void vsnes_ppu2_map(address_map &map);
+	void vsnes_cpu1_map(address_map &map) ATTR_COLD;
+	void vsnes_cpu2_map(address_map &map) ATTR_COLD;
+	void vsnes_ppu1_map(address_map &map) ATTR_COLD;
+	void vsnes_ppu2_map(address_map &map) ATTR_COLD;
 
 	void init_prg_banking();
 	void prg32(int bank);
@@ -267,7 +267,7 @@ public:
 	void init_rbibb();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void vsnormal_vrom_banking_w(u8 data);
@@ -310,7 +310,7 @@ public:
 	void init_vsdual();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	template <u8 Side> void vsdual_vrom_banking_w(u8 data);
@@ -329,7 +329,7 @@ public:
 	void vs_smbbl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void smbbl_6502_sn_w(offs_t offset, u8 data);
@@ -339,9 +339,9 @@ private:
 	void smbbl_scanline_cb(int scanline, bool vblank, bool blanked);
 	u8 smbbl_ppu_data_r();
 
-	void smbbl_6502_map(address_map &map);
-	void smbbl_z80_map(address_map &map);
-	void smbbl_ppu_map(address_map &map);
+	void smbbl_6502_map(address_map &map) ATTR_COLD;
+	void smbbl_z80_map(address_map &map) ATTR_COLD;
+	void smbbl_ppu_map(address_map &map) ATTR_COLD;
 
 	required_device<sn76489_device> m_sn1;
 	required_device<sn76489_device> m_sn2;

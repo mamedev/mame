@@ -520,15 +520,15 @@ public:
 
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	memory_share_creator<uint8_t> m_data_ram;
 
 private:
-	void audio_program_map(address_map &map);
-	void audio_io_map(address_map &map);
-	void main_program_map(address_map &map);
-	void main_io_map(address_map &map);
+	void audio_program_map(address_map &map) ATTR_COLD;
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void main_program_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
 
 	// Main MCU Interface
 	u8 main_io_r(offs_t offset);

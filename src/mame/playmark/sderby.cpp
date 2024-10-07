@@ -120,7 +120,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_md_videoram;
@@ -160,12 +160,12 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pmroulet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void luckboom_map(address_map &map);
-	void roulette_map(address_map &map);
-	void sderby_map(address_map &map);
-	void sderbya_map(address_map &map);
-	void shinygld_map(address_map &map);
-	void spacewin_map(address_map &map);
+	void luckboom_map(address_map &map) ATTR_COLD;
+	void roulette_map(address_map &map) ATTR_COLD;
+	void sderby_map(address_map &map) ATTR_COLD;
+	void sderbya_map(address_map &map) ATTR_COLD;
+	void shinygld_map(address_map &map) ATTR_COLD;
+	void spacewin_map(address_map &map) ATTR_COLD;
 };
 
 class zw3_state : public sderby_state
@@ -176,12 +176,12 @@ public:
 	void zw3(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	void zw3_map(address_map &map);
+	void zw3_map(address_map &map) ATTR_COLD;
 };
 
 

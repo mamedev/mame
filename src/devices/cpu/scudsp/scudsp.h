@@ -59,12 +59,12 @@ public:
 	uint32_t ram_address_r();
 	void ram_address_w(uint32_t data);
 
-	void data_map(address_map &map);
-	void program_map(address_map &map);
+	void data_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }

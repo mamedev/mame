@@ -43,10 +43,10 @@ public:
 	void pmc(machine_config &config);
 
 private:
-	void rom_map(address_map &map);
-	void rom_ports_map(address_map &map);
-	void ram_map(address_map &map);
-	void ram_status_map(address_map &map);
+	void rom_map(address_map &map) ATTR_COLD;
+	void rom_ports_map(address_map &map) ATTR_COLD;
+	void ram_map(address_map &map) ATTR_COLD;
+	void ram_status_map(address_map &map) ATTR_COLD;
 };
 
 

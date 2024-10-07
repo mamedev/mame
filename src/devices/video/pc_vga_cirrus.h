@@ -27,12 +27,12 @@ protected:
 	cirrus_gd5428_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual uint16_t offset() override;
 	virtual uint32_t latch_start_addr() override;
 
-	virtual void io_3cx_map(address_map &map) override;
+	virtual void io_3cx_map(address_map &map) override ATTR_COLD;
 
 	u8 ramdac_hidden_mask_r(offs_t offset);
 	void ramdac_hidden_mask_w(offs_t offset, u8 data);
@@ -90,9 +90,9 @@ protected:
 
 	virtual uint8_t vga_latch_write(int offs, uint8_t data) override;
 
-	virtual void crtc_map(address_map &map) override;
-	virtual void gc_map(address_map &map) override;
-	virtual void sequencer_map(address_map &map) override;
+	virtual void crtc_map(address_map &map) override ATTR_COLD;
+	virtual void gc_map(address_map &map) override ATTR_COLD;
+	virtual void sequencer_map(address_map &map) override ATTR_COLD;
 
 	virtual bool get_interlace_mode() override { return BIT(m_cr1a, 0); }
 
@@ -117,11 +117,11 @@ public:
 protected:
 	cirrus_gd5430_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
-	virtual void crtc_map(address_map &map) override;
-	virtual void gc_map(address_map &map) override;
-	virtual void sequencer_map(address_map &map) override;
+	virtual void crtc_map(address_map &map) override ATTR_COLD;
+	virtual void gc_map(address_map &map) override ATTR_COLD;
+	virtual void sequencer_map(address_map &map) override ATTR_COLD;
 private:
 	uint8_t m_cr1d = 0;
 };
@@ -132,11 +132,11 @@ public:
 	cirrus_gd5446_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
-	virtual void crtc_map(address_map &map) override;
-	virtual void gc_map(address_map &map) override;
-	virtual void sequencer_map(address_map &map) override;
+	virtual void crtc_map(address_map &map) override ATTR_COLD;
+	virtual void gc_map(address_map &map) override ATTR_COLD;
+	virtual void sequencer_map(address_map &map) override ATTR_COLD;
 };
 
 

@@ -75,8 +75,8 @@ public:
 	void fdc_config(device_t *device);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device>  m_maincpu;
@@ -116,8 +116,8 @@ private:
 	void mc1502_kppi_portb_w(uint8_t data);
 	void mc1502_kppi_portc_w(uint8_t data);
 
-	void mc1502_io(address_map &map);
-	void mc1502_map(address_map &map);
+	void mc1502_io(address_map &map) ATTR_COLD;
+	void mc1502_map(address_map &map) ATTR_COLD;
 
 	int m_pit_out2 = 0;
 };

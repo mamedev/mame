@@ -160,8 +160,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -210,9 +210,9 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void renegade_map(address_map &map);
-	void renegade_nomcu_map(address_map &map);
-	void renegade_sound_map(address_map &map);
+	void renegade_map(address_map &map) ATTR_COLD;
+	void renegade_nomcu_map(address_map &map) ATTR_COLD;
+	void renegade_sound_map(address_map &map) ATTR_COLD;
 };
 
 

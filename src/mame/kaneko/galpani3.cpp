@@ -119,11 +119,11 @@ private:
 	void galpani3_priority_buffer_scrollx_w(uint16_t data);
 	void galpani3_priority_buffer_scrolly_w(uint16_t data);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
-	void galpani3_map(address_map &map);
+	void galpani3_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -256,8 +256,8 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<elan_eu3a05sys_device> m_sys;
 	required_device<elan_eu3a05gpio_device> m_gpio;
@@ -274,12 +274,12 @@ private:
 	// for callback
 	uint8_t read_full_space(offs_t offset);
 
-	void elan_eu3a05_bank_map(address_map &map);
-	void elan_eu3a05_map(address_map &map);
-	void elan_sudoku_map(address_map &map);
+	void elan_eu3a05_bank_map(address_map &map) ATTR_COLD;
+	void elan_eu3a05_map(address_map &map) ATTR_COLD;
+	void elan_sudoku_map(address_map &map) ATTR_COLD;
 
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_ram;
 	required_device<elan_eu3a05_sound_device> m_sound;
@@ -308,7 +308,7 @@ public:
 	void elan_buzztime(machine_config& config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	//uint8_t random_r() { return machine().rand(); }

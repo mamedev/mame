@@ -76,9 +76,9 @@ public:
 	void smc777(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void mc6845_w(offs_t offset, uint8_t data);
@@ -126,8 +126,8 @@ private:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	void smc777_io(address_map &map);
-	void smc777_mem(address_map &map);
+	void smc777_io(address_map &map) ATTR_COLD;
+	void smc777_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

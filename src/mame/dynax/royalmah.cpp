@@ -6195,7 +6195,7 @@ GAME( 1983,  seljan,   0,        seljan,   seljan,   royalmah_state,         emp
 GAME( 1983,  janyoup2, royalmj,  janyoup2, janyoup2, royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1985,  tahjong,  royalmj,  tahjong,  tahjong,  royalmah_prgbank_state, init_tahjong,  ROT0,   "Bally Pond / Nasco",         "Tahjong Yakitori (ver. 2-1)",           0 ) // 1985 Jun. 17
 GAME( 1981,  janputer, 0,        royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong)", 0 ) // MT #05392
-GAME( 1981,  akamj,    0,        ippatsu,  ippatsu,  royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd.)", "Aka Mahjong (Double Bet)",          0 )
+GAME( 1990,  akamj,    0,        ippatsu,  ippatsu,  royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Electronics)", "Aka Mahjong (Double Bet, ver 1 16)", 0 )
 GAME( 1984,  rkjanoh2, 0,        rkjanoh2, royalmah, royalmah_prgbank_state, init_chalgirl, ROT0,   "SNK / Dyna Corp",            "Royal King Jang Oh 2 (v4.00 1984 Jun 10th)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // never seems to set the palette bank?
 GAME( 1984,  janoh,    0,        janoh,    royalmah, royalmah_state,         empty_init,    ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        MACHINE_NOT_WORKING )
 GAME( 1984,  janoha,   janoh,    janoha,   royalmah, royalmah_state,         empty_init,    ROT0,   "Toaplan",                    "Jan Oh (set 2)",                        MACHINE_NOT_WORKING ) // this one is complete?

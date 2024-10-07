@@ -108,10 +108,10 @@ private:
 	u8 pc_r();
 	void update_contrast();
 
-	void mu50_map(address_map &map);
+	void mu50_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 void mu50_state::machine_start()

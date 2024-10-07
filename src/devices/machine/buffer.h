@@ -20,7 +20,7 @@ public:
 	void write_bit7(int state) { if (state) m_input_data |= 0x80; else m_input_data &= ~0x80; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	uint8_t m_input_data;
 };

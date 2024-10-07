@@ -37,8 +37,8 @@ public:
 protected:
 	sh7604_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal_map, int addrlines);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void sh2_exception(const char *message, int irqline) override;
 
@@ -55,7 +55,7 @@ private:
 		CCLRA = 0x01
 	};
 
-	void sh7604_map(address_map &map);
+	void sh7604_map(address_map &map) ATTR_COLD;
 
 	uint32_t sh2_internal_a5();
 

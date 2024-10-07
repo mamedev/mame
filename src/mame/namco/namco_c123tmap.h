@@ -44,7 +44,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	template<int Offset> TILE_GET_INFO_MEMBER(get_tile_info);

@@ -32,7 +32,7 @@ public:
 
 	void patinho_feio(machine_config &config);
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void load_tape(const char* name);
 	void load_raw_data(const char* name, unsigned int start_address, unsigned int data_length);

@@ -86,7 +86,7 @@ public:
 	void v2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -107,8 +107,8 @@ private:
 
 	bool m_altboard = false;
 
-	void main_map(address_map &map);
-	void v2_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void v2_map(address_map &map) ATTR_COLD;
 
 	void init_board(u8 data);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);

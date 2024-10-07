@@ -62,9 +62,9 @@ public:
 protected:
 	psion_asic9_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -73,8 +73,8 @@ private:
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	static constexpr int AS_A9_RAM = AS_OPCODES + 1;
 	static constexpr int AS_A9_ROM = AS_OPCODES + 2;

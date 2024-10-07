@@ -53,13 +53,13 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::PRINTER; }
 
 protected:
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
@@ -94,7 +94,7 @@ private:
 	u8 m_color_mode = 0U;
 	u8 m_tile_latch = 0U;
 	u8 m_screen_mode = 0U;
-	void mp1710_map(address_map &map);
+	void mp1710_map(address_map &map) ATTR_COLD;
 	void screen_mode_w(u8 data);
 	void screen_reverse_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

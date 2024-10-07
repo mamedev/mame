@@ -88,9 +88,9 @@ public:
 	void dderby(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	virtual void main_map(address_map &map);
+	virtual void main_map(address_map &map) ATTR_COLD;
 	virtual void ca00_w(offs_t offset, u8 data);
 
 private:
@@ -118,7 +118,7 @@ private:
 
 	void output_w(offs_t offset, uint8_t data);
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class dmndrby_quinella_state : public dmndrby_state
@@ -129,7 +129,7 @@ public:
 	{ }
 
 protected:
-	virtual void main_map(address_map &map) override;
+	virtual void main_map(address_map &map) override ATTR_COLD;
 private:
 	// FIXME: should really use IPT_OUTPUT instead of subclassing
 	virtual void ca00_w(offs_t offset, u8 data) override;

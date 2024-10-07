@@ -86,7 +86,7 @@ private:
 	void nvram_recall_w(uint16_t data);
 	uint8_t input_1_r(offs_t offset);
 	uint8_t input_2_r(offs_t offset);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<avg_quantum_device> m_avg;

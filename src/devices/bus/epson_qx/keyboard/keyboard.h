@@ -49,8 +49,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	keyboard_device *m_kbd;
@@ -67,9 +67,9 @@ public:
 
 protected:
 	keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	void mcu_p1_w(uint8_t data);
 	void mcu_p2_w(uint8_t data);
 
@@ -89,7 +89,7 @@ class qx10_keyboard_hasci : public keyboard_device
 {
 public:
 	qx10_keyboard_hasci(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual const internal_layout &layout() const override;
 };
 
@@ -97,7 +97,7 @@ class qx10_keyboard_ascii : public keyboard_device
 {
 public:
 	qx10_keyboard_ascii(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual const internal_layout &layout() const override;
 };
 

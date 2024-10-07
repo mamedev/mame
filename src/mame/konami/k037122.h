@@ -26,8 +26,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_palette_interface impleemntations
 	virtual uint32_t palette_entries() const noexcept override { return 8192; }

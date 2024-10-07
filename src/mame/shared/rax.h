@@ -33,10 +33,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	void adsp_sound_tx_callback(offs_t offset, uint32_t data);
@@ -53,9 +53,9 @@ private:
 	uint16_t host_r();
 	void host_w(uint16_t data);
 
-	void adsp_data_map(address_map &map);
-	void adsp_io_map(address_map &map);
-	void adsp_program_map(address_map &map);
+	void adsp_data_map(address_map &map) ATTR_COLD;
+	void adsp_io_map(address_map &map) ATTR_COLD;
+	void adsp_program_map(address_map &map) ATTR_COLD;
 
 	required_device<adsp2181_device>    m_cpu;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;

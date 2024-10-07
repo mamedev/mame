@@ -27,7 +27,7 @@ public:
 	virtual void write_40xx(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<a78_cart_slot_device> m_hscslot;
 };

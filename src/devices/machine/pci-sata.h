@@ -17,16 +17,16 @@ public:
 	sata_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void primary_command_map(address_map &map);
-	void primary_control_map(address_map &map);
-	void secondary_command_map(address_map &map);
-	void secondary_control_map(address_map &map);
-	void bus_master_map(address_map &map);
-	void ide_command_posting_map(address_map &map);
+	void primary_command_map(address_map &map) ATTR_COLD;
+	void primary_control_map(address_map &map) ATTR_COLD;
+	void secondary_command_map(address_map &map) ATTR_COLD;
+	void secondary_control_map(address_map &map) ATTR_COLD;
+	void bus_master_map(address_map &map) ATTR_COLD;
+	void ide_command_posting_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(SATA, sata_device)

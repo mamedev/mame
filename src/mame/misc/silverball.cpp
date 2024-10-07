@@ -62,8 +62,8 @@ public:
 	void silverball_i440zx(machine_config &config);
 
 private:
-	void silverball_map(address_map &map);
-	void silverball_io(address_map &map);
+	void silverball_map(address_map &map) ATTR_COLD;
+	void silverball_io(address_map &map) ATTR_COLD;
 
 	required_device<pentium_device> m_maincpu;
 

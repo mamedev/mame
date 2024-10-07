@@ -97,9 +97,9 @@ public:
 	void lastfght(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory */
@@ -120,8 +120,8 @@ private:
 	void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void lastfght_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void lastfght_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 	/* video-related */
 	bitmap_ind16 m_bitmap[2];

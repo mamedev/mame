@@ -55,7 +55,7 @@ public:
 	void nmi_w(int state);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void m1_ack_w(u8 data);
@@ -64,8 +64,8 @@ private:
 	u16 port9c_r();
 	void kbd_put(u8 data);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_term_data = 0U;
 	required_device<cpu_device> m_maincpu;

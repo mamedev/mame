@@ -510,39 +510,39 @@ inline void mcs40_cpu_device_base::set_rc(u8 val)
 
 inline u8 mcs40_cpu_device_base::read_memory()
 {
-	return m_spaces[AS_RAM_MEMORY]->read_byte((u16(m_cr & 0x7U) << 8) | m_latched_rc) & 0x0fU;
+	return m_spaces[AS_RAM_MEMORY]->read_byte((u16(m_cr & 0x7U) << 8) | m_latched_rc, 0x0fU) & 0x0fU;
 }
 
 inline void mcs40_cpu_device_base::write_memory(u8 val)
 {
-	m_spaces[AS_RAM_MEMORY]->write_byte((u16(m_cr & 0x7U) << 8) | m_latched_rc, val & 0x0fU);
+	m_spaces[AS_RAM_MEMORY]->write_byte((u16(m_cr & 0x7U) << 8) | m_latched_rc, val & 0x0fU, 0x0fU);
 }
 
 inline u8 mcs40_cpu_device_base::read_status()
 {
 	u16 const addr((((u16(m_cr) << 6) | (m_latched_rc >> 2)) & 0x01fcU) | (m_opa & 0x0003U));
-	return m_spaces[AS_RAM_STATUS]->read_byte(addr) & 0x0fU;
+	return m_spaces[AS_RAM_STATUS]->read_byte(addr, 0x0fU) & 0x0fU;
 }
 
 inline void mcs40_cpu_device_base::write_status(u8 val)
 {
 	u16 const addr((((u16(m_cr) << 6) | (m_latched_rc >> 2)) & 0x01fcU) | (m_opa & 0x0003U));
-	m_spaces[AS_RAM_STATUS]->write_byte(addr, val & 0x0fU);
+	m_spaces[AS_RAM_STATUS]->write_byte(addr, val & 0x0fU, 0x0fU);
 }
 
 inline u8 mcs40_cpu_device_base::read_rom_port()
 {
-	return m_spaces[AS_ROM_PORTS]->read_byte((u16(m_cr) << 8) | m_latched_rc) & 0x0fU;
+	return m_spaces[AS_ROM_PORTS]->read_byte((u16(m_cr) << 8) | m_latched_rc, 0x0fU) & 0x0fU;
 }
 
 inline void mcs40_cpu_device_base::write_rom_port(u8 val)
 {
-	m_spaces[AS_ROM_PORTS]->write_byte((u16(m_cr) << 8) | m_latched_rc, val & 0x0fU);
+	m_spaces[AS_ROM_PORTS]->write_byte((u16(m_cr) << 8) | m_latched_rc, val & 0x0fU, 0x0fU);
 }
 
 inline void mcs40_cpu_device_base::write_memory_port(u8 val)
 {
-	m_spaces[AS_RAM_PORTS]->write_byte(((m_cr << 2) & 0x1cU) | (m_latched_rc >> 6), val & 0x0fU);
+	m_spaces[AS_RAM_PORTS]->write_byte(((m_cr << 2) & 0x1cU) | (m_latched_rc >> 6), val & 0x0fU, 0x0fU);
 }
 
 
@@ -812,6 +812,10 @@ i4004_cpu_device::i4004_cpu_device(machine_config const &mconfig, char const *ta
 {
 }
 
+i4004_cpu_device::~i4004_cpu_device()
+{
+}
+
 
 /***********************************************************************
     device_execute_interface implementation
@@ -858,10 +862,9 @@ i4004_cpu_device::cycle i4004_cpu_device::do_cycle1(u8 opr, u8 opa, pmem &progra
 	case 0x0:
 		switch (opa)
 		{
+		default: // in practice, the 4004 treats these as aliases for NOP
 		case 0x0: // NOP
 			return cycle::OP;
-		default:
-			break;
 		}
 		break;
 
@@ -1117,6 +1120,10 @@ i4040_cpu_device::i4040_cpu_device(machine_config const &mconfig, char const *ta
 {
 }
 
+i4040_cpu_device::~i4040_cpu_device()
+{
+}
+
 
 /***********************************************************************
     device_execute_interface implementation
@@ -1156,6 +1163,8 @@ i4040_cpu_device::cycle i4040_cpu_device::do_cycle1(u8 opr, u8 opa, pmem &progra
 	case 0x0:
 		switch (opa)
 		{
+		case 0x0: // NOP
+			return cycle::OP;
 		case 0x1: // HLT
 			halt_decoded();
 			return cycle::OP;
@@ -1182,7 +1191,8 @@ i4040_cpu_device::cycle i4040_cpu_device::do_cycle1(u8 opr, u8 opa, pmem &progra
 			program_op = pmem::READ;
 			return cycle::OP;
 		default:
-			break;
+			logerror("MCS-40: unhandled instruction OPR=%X OPA=%X\n", opr, opa);
+			return cycle::OP;
 		}
 		break;
 	default:

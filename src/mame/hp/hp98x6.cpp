@@ -143,11 +143,11 @@ protected:
 	{
 	}
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void hp98x6_base(machine_config &mconfig, unsigned dot_clock, int char_width);
-	virtual void cpu_mem_map(address_map &map);
+	virtual void cpu_mem_map(address_map &map) ATTR_COLD;
 	void diag_led_w(uint8_t data);
 	virtual void cpu_reset_w(int state);
 	void hpib_irq_w(int state);
@@ -319,8 +319,8 @@ public:
 	void hp9816(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<ins8250_device> m_uart;
 	required_device<rs232_port_device> m_rs232;
@@ -331,7 +331,7 @@ private:
 	static inline constexpr unsigned TEXT_VRAM_SIZE = 2048;
 	static inline constexpr unsigned GRAPHIC_VRAM_SIZE = 16384;
 
-	virtual void cpu_mem_map(address_map &map) override;
+	virtual void cpu_mem_map(address_map &map) override ATTR_COLD;
 	uint16_t text_r(offs_t offset);
 	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t graphic_r(offs_t offset, uint16_t mem_mask);
@@ -857,14 +857,14 @@ protected:
 	static inline constexpr unsigned FC_SIDE_SEL_BIT = 2;
 	static inline constexpr unsigned FC_DRIVE_EN_BIT = 0;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(fdc_ram_io);
 
 	void hp9826_36(machine_config &mconfig, unsigned dot_clock, int char_width);
-	virtual void cpu_mem_map(address_map &map) override;
+	virtual void cpu_mem_map(address_map &map) override ATTR_COLD;
 	virtual void cpu_reset_w(int state) override;
 	unsigned get_sel_floppy() const;
 	floppy_image_device *get_drive(unsigned idx) const;
@@ -1272,13 +1272,13 @@ public:
 	void hp9826(machine_config &mconfig);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	static inline constexpr unsigned TEXT_VRAM_SIZE = 2048;
 	static inline constexpr unsigned GRAPHIC_VRAM_SIZE = 16384;
 
-	virtual void cpu_mem_map(address_map &map) override;
+	virtual void cpu_mem_map(address_map &map) override ATTR_COLD;
 	uint16_t text_r(offs_t offset, uint16_t mem_mask);
 	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t graphic_r(offs_t offset, uint16_t mem_mask);
@@ -1451,13 +1451,13 @@ public:
 	void hp9836(machine_config &mconfig);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	static inline constexpr unsigned TEXT_VRAM_SIZE = 2048;
 	static inline constexpr unsigned GRAPHIC_VRAM_SIZE = 16384;
 
-	virtual void cpu_mem_map(address_map &map) override;
+	virtual void cpu_mem_map(address_map &map) override ATTR_COLD;
 	uint16_t text_r(offs_t offset, uint16_t mem_mask);
 	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t graphic_r(offs_t offset, uint16_t mem_mask);
@@ -1803,13 +1803,13 @@ public:
 	void hp9836c(machine_config &mconfig);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	static inline constexpr unsigned TEXT_VRAM_SIZE = 2048;
 	static inline constexpr unsigned GRAPHIC_VRAM_SIZE = 131072;
 
-	virtual void cpu_mem_map(address_map &map) override;
+	virtual void cpu_mem_map(address_map &map) override ATTR_COLD;
 	uint16_t text_r(offs_t offset, uint16_t mem_mask);
 	void text_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t graphic_r(offs_t offset, uint16_t mem_mask);

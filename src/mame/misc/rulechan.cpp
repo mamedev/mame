@@ -219,7 +219,7 @@ public:
 	void rulechan_init();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void port0_w(uint8_t data);
@@ -257,8 +257,8 @@ private:
 	required_ioport m_dsw;
 	required_ioport_array<6> m_keymx;
 
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 	void sound_sort();
 	void sound_off();
 

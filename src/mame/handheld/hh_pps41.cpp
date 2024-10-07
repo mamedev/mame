@@ -57,7 +57,7 @@ public:
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { update_int(); }
 	virtual void device_post_load() override { update_int(); }
 

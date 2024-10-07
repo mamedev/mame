@@ -61,9 +61,9 @@ public:
 	void ssrj(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -89,7 +89,7 @@ private:
 	void screen_vblank(int state);
 	void draw_objects(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 

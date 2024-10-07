@@ -23,8 +23,8 @@ public:
 protected:
 	r65c19_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void do_exec_full() override;
@@ -114,8 +114,8 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u8 pbs_r();
 	void pbs_w(u8 data);
@@ -156,7 +156,7 @@ public:
 	l2800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 private:
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(R65C19, r65c19_device)

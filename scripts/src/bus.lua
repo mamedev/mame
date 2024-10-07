@@ -2701,6 +2701,8 @@ if (BUSES["VCS_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/mouse.h",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/paddles.cpp",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/paddles.h",
+		MAME_DIR .. "src/devices/bus/vcs_ctrl/trakball.cpp",
+		MAME_DIR .. "src/devices/bus/vcs_ctrl/trakball.h",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/wheel.cpp",
 		MAME_DIR .. "src/devices/bus/vcs_ctrl/wheel.h",
 	}
@@ -4842,6 +4844,8 @@ if (BUSES["SPECTRUM"]~=null) then
 		MAME_DIR .. "src/devices/bus/spectrum/mikroplus.h",
 		MAME_DIR .. "src/devices/bus/spectrum/mpoker.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/mpoker.h",
+		MAME_DIR .. "src/devices/bus/spectrum/musicmachine.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/musicmachine.h",
 		MAME_DIR .. "src/devices/bus/spectrum/opus.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/opus.h",
 		MAME_DIR .. "src/devices/bus/spectrum/plus2test.cpp",

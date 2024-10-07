@@ -37,9 +37,9 @@ private:
 	uint8_t vic_videoram_r(offs_t offset);
 	uint8_t vic_colorram_r(offs_t offset);
 
-	void cpu_map(address_map &map);
-	void vic_colorram_map(address_map &map);
-	void vic_videoram_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void vic_colorram_map(address_map &map) ATTR_COLD;
+	void vic_videoram_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };

@@ -136,8 +136,8 @@ public:
 
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i8086_cpu_device> m_maincpu;
@@ -204,8 +204,8 @@ private:
 	bool m_pc4;
 	bool m_pc5;
 
-	void epc_map(address_map &map);
-	void epc_io(address_map &map);
+	void epc_map(address_map &map) ATTR_COLD;
+	void epc_io(address_map &map) ATTR_COLD;
 
 	// FDC
 	void check_fdc_irq();

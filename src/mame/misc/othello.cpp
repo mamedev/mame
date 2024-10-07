@@ -73,8 +73,8 @@ public:
 	void othello(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -122,10 +122,10 @@ private:
 	void othello_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void audio_map(address_map &map);
-	void audio_portmap(address_map &map);
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void audio_portmap(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
 };
 
 

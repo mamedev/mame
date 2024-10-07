@@ -64,12 +64,12 @@ public:
 
 	void tmc1800(machine_config &config);
 	void tmc1800_video(machine_config &config);
-	void tmc1800_io_map(address_map &map);
-	void tmc1800_map(address_map &map);
+	void tmc1800_io_map(address_map &map) ATTR_COLD;
+	void tmc1800_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cdp1861_device> m_vdc;
 	/* keyboard state */
@@ -94,12 +94,12 @@ public:
 
 	void osc1000b(machine_config &config);
 	void osc1000b_video(machine_config &config);
-	void osc1000b_io_map(address_map &map);
-	void osc1000b_map(address_map &map);
+	void osc1000b_io_map(address_map &map) ATTR_COLD;
+	void osc1000b_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	/* keyboard state */
 	int m_keylatch = 0;
@@ -132,12 +132,12 @@ public:
 
 	void tmc2000(machine_config &config);
 	void tmc2000_video(machine_config &config);
-	void tmc2000_io_map(address_map &map);
-	void tmc2000_map(address_map &map);
+	void tmc2000_io_map(address_map &map) ATTR_COLD;
+	void tmc2000_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cdp1864_device> m_cti;
 	memory_share_creator<uint8_t> m_colorram;
@@ -178,12 +178,12 @@ public:
 
 	void nano(machine_config &config);
 	void nano_video(machine_config &config);
-	void nano_io_map(address_map &map);
-	void nano_map(address_map &map);
+	void nano_io_map(address_map &map) ATTR_COLD;
+	void nano_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(assert_ef4);
 

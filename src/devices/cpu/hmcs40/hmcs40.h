@@ -106,8 +106,8 @@ protected:
 	hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, u16 polarity, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
@@ -125,10 +125,11 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// memory maps
-	void program_1k(address_map &map);
-	void program_2k(address_map &map);
-	void data_160x4(address_map &map);
-	void data_80x4(address_map &map);
+	void program_1k(address_map &map) ATTR_COLD;
+	void program_2k(address_map &map) ATTR_COLD;
+	void data_80x4(address_map &map) ATTR_COLD;
+	void data_160x4(address_map &map) ATTR_COLD;
+	void data_256x4(address_map &map) ATTR_COLD;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -159,7 +160,7 @@ protected:
 
 	u16 m_pc;                 // program counter
 	u16 m_prev_pc;
-	u8 m_page;                // LPU prepared page
+	u8 m_pc_upper;            // LPU prepared upper bits of PC
 	u8 m_a;                   // 4-bit accumulator
 	u8 m_b;                   // 4-bit B register
 	u8 m_x;                   // 1/3/4-bit X register
@@ -188,6 +189,7 @@ protected:
 
 	// misc internal helpers
 	void increment_pc();
+	void cycle();
 
 	u8 ram_r();
 	void ram_w(u8 data);
@@ -200,9 +202,9 @@ protected:
 	virtual int read_d(u8 index);
 	virtual void write_d(u8 index, int state);
 
-	void cycle();
-	void increment_tc();
 	void take_interrupt();
+	void clock_timer();
+	void clock_prescaler();
 
 	// opcode handlers
 	void op_illegal();
@@ -409,6 +411,57 @@ public:
 };
 
 
+class hmcs46_cpu_device : public hmcs40_cpu_device
+{
+protected:
+	hmcs46_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity);
+
+	// overrides
+	virtual u8 read_r(u8 index) override;
+	virtual void write_r(u8 index, u8 data) override;
+};
+
+class hd44840_device : public hmcs46_cpu_device
+{
+public:
+	hd44840_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd44848_device : public hmcs46_cpu_device
+{
+public:
+	hd44848_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
+class hmcs47_cpu_device : public hmcs40_cpu_device
+{
+protected:
+	hmcs47_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity);
+
+	// overrides
+	virtual u8 read_r(u8 index) override;
+};
+
+class hd38870_device : public hmcs47_cpu_device
+{
+public:
+	hd38870_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd44860_device : public hmcs47_cpu_device
+{
+public:
+	hd44860_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd44868_device : public hmcs47_cpu_device
+{
+public:
+	hd44868_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
 DECLARE_DEVICE_TYPE(HD38750, hd38750_device)
 DECLARE_DEVICE_TYPE(HD38755, hd38755_device)
 DECLARE_DEVICE_TYPE(HD44750, hd44750_device)
@@ -423,5 +476,13 @@ DECLARE_DEVICE_TYPE(HD38820, hd38820_device)
 DECLARE_DEVICE_TYPE(HD38825, hd38825_device)
 DECLARE_DEVICE_TYPE(HD44820, hd44820_device)
 DECLARE_DEVICE_TYPE(HD44828, hd44828_device)
+
+DECLARE_DEVICE_TYPE(HD44840, hd44840_device)
+DECLARE_DEVICE_TYPE(HD44848, hd44848_device)
+
+DECLARE_DEVICE_TYPE(HD38870, hd38870_device)
+DECLARE_DEVICE_TYPE(HD44860, hd44860_device)
+DECLARE_DEVICE_TYPE(HD44868, hd44868_device)
+
 
 #endif // MAME_CPU_HMCS40_HMCS40_H

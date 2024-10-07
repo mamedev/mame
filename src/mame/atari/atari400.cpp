@@ -290,11 +290,11 @@ protected:
 	void atari_common_nodac(machine_config &config);
 	void atari_common(machine_config &config);
 
-	void a400_mem(address_map &map);
+	void a400_mem(address_map &map) ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(a400_interrupt);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// TODO: these two should really be inside ram_device instead
 	template <unsigned StartBase> uint8_t ram_r(address_space &space, offs_t offset)
@@ -337,14 +337,14 @@ protected:
 	memory_view m_cart_rd4_view, m_cart_rd5_view;
 	optional_device_array<vcs_control_port_device, 4> m_ctrl;
 
-	void hw_iomap(address_map &map);
+	void hw_iomap(address_map &map) ATTR_COLD;
 
 	int m_cart_rd4_enabled = 0, m_cart_rd5_enabled = 0;
 	void cart_rd4_w( int state );
 	void cart_rd5_w( int state );
 
-	virtual void area_8000_map(address_map &map);
-	virtual void area_a000_map(address_map &map);
+	virtual void area_8000_map(address_map &map) ATTR_COLD;
+	virtual void area_a000_map(address_map &map) ATTR_COLD;
 };
 
 class a800_state : public a400_state
@@ -359,13 +359,13 @@ public:
 	void a800pal(machine_config &config);
 
 protected:
-//  virtual void machine_start() override;
-	virtual void machine_reset() override;
+//  virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<a800_cart_slot_device> m_cartright;
 
-	void a800_mem(address_map &map);
+	void a800_mem(address_map &map) ATTR_COLD;
 };
 
 class a1200xl_state : public a400_state
@@ -382,10 +382,10 @@ public:
 protected:
 	void atari_xl_common(machine_config &config);
 
-	void a1200xl_mem(address_map &map);
+	void a1200xl_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(xl_interrupt);
 
@@ -414,13 +414,13 @@ public:
 	void a800xlpal(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void portb_cb(uint8_t data) override;
 
-	void a800xl_mem(address_map &map);
+	void a800xl_mem(address_map &map) ATTR_COLD;
 
-	virtual void area_a000_map(address_map &map) override;
+	virtual void area_a000_map(address_map &map) override ATTR_COLD;
 
 	memory_view m_basic_view;
 };
@@ -447,16 +447,16 @@ public:
 	void a130xe(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void a130xe_mem(address_map &map);
+	void a130xe_mem(address_map &map) ATTR_COLD;
 
 	virtual void portb_cb(uint8_t data) override;
 
 	memory_view m_ext_view;
 	required_device<address_map_bank_device> m_ext_bank;
 
-	void extram_map(address_map &map);
+	void extram_map(address_map &map) ATTR_COLD;
 
 };
 
@@ -471,14 +471,14 @@ public:
 	void xegs(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void portb_cb(uint8_t data) override;
 
 	required_memory_bank m_bank;
 
-	void xegs_mem(address_map &map);
+	void xegs_mem(address_map &map) ATTR_COLD;
 };
 
 class a5200_state : public a400_state
@@ -493,14 +493,14 @@ public:
 	void a5200a(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<a5200_cart_slot_device> m_cart;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(a5200_interrupt);
 
-	void a5200_mem(address_map &map);
+	void a5200_mem(address_map &map) ATTR_COLD;
 };
 
 /**************************************************************

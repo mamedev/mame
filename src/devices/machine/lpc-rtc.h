@@ -18,12 +18,12 @@ public:
 									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space);
 
 protected:
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 private:
-	void map(address_map &map);
-	void extmap(address_map &map);
+	void map(address_map &map) ATTR_COLD;
+	void extmap(address_map &map) ATTR_COLD;
 
 	uint8_t cur_index, cur_extindex;
 	uint8_t ram[256];

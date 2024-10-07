@@ -8482,6 +8482,148 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dgolf">
+		<description>NESert Golfing (v1.5)</description>
+		<year>2022</year>
+		<publisher>rainwarrior</publisher>
+		<info name="release" value="20221015" /> <!-- From NESertGolfing Git tag -->
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="dgolf prg" size="32768" crc="1629e5e2" sha1="9a77fbc6176099cbd86aa14141b340faba793f63" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192" />
+		</part>
+	</software>
+
+	<!-- dgolf versions 1.0-1.4 rebuilt from Git using cc65 commit
+	     80a43d732dc9551ad84343ea9644d8fab7ec0bd9.  A byte-identical copy of 1.5 was reproduced with
+	     this toolchain, giving high confidence that the rebuilds are the same as what was released.
+	     Without exitant online copies, however, this cannot be verified.
+	-->
+	<software name="dgolf14te" cloneof="dgolf">
+		<description>NESert Golfing Tournament Edition (v1.4)</description>
+		<year>2019</year>
+		<publisher>rainwarrior</publisher>
+		<notes><![CDATA[
+		An original download should be located to verify and/or update the hash.
+		]]></notes>
+		<info name="release" value="20191124" /> <!-- From NESertGolfing Git tag -->
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="dgolf_te prg" size="32768" crc="3ec19565" sha1="24c243f3edd8f1ba9c7f55ef45a1b4110e68ba1a" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192" />
+		</part>
+	</software>
+
+	<software name="dgolf14" cloneof="dgolf">
+		<description>NESert Golfing (v1.4)</description>
+		<year>2019</year>
+		<publisher>rainwarrior</publisher>
+		<notes><![CDATA[
+		An original download should be located to verify and/or update the hash.
+		]]></notes>
+		<info name="release" value="20191006" /> <!-- From NESertGolfing Git tag -->
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="dgolf 1.4 prg" size="32768" crc="2eaadd18" sha1="c221ad67730e84728beb11ae841d6d7498066c19" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192" />
+		</part>
+	</software>
+
+	<software name="dgolf13" cloneof="dgolf">
+		<description>NESert Golfing (v1.3)</description>
+		<year>2019</year>
+		<publisher>rainwarrior</publisher>
+		<notes><![CDATA[
+		An original download should be located to verify and/or update the hash.
+		]]></notes>
+		<info name="release" value="20190208" /> <!-- From NESertGolfing Git tag -->
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="dgolf 1.3 prg" size="32768" crc="2e0b16d5" sha1="e47620104ffde304c5c636218f6d998813a52c50" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192" />
+		</part>
+	</software>
+
+	<software name="dgolf12" cloneof="dgolf">
+		<description>NESert Golfing (v1.2)</description>
+		<year>2019</year>
+		<publisher>rainwarrior</publisher>
+		<notes><![CDATA[
+		An original download should be located to verify and/or update the hash.
+		]]></notes>
+		<info name="release" value="20190202" /> <!-- From NESertGolfing Git tag -->
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="dgolf 1.2 prg" size="32768" crc="7cce6964" sha1="6521da1d3d5e6526ad7979513226770d24dfceda" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192" />
+		</part>
+	</software>
+
+	<software name="dgolf11" cloneof="dgolf">
+		<description>NESert Golfing (v1.1)</description>
+		<year>2019</year>
+		<publisher>rainwarrior</publisher>
+		<notes><![CDATA[
+		An original download should be located to verify and/or update the hash.
+		]]></notes>
+		<info name="release" value="20190202" /> <!-- From NESertGolfing Git tag -->
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="dgolf 1.1 prg" size="32768" crc="a175cd8d" sha1="5b5dca5d093a3f396e2e7332597279b9458d8e11" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192" />
+		</part>
+	</software>
+
+	<software name="dgolf10" cloneof="dgolf">
+		<description>NESert Golfing (v1.0)</description>
+		<year>2019</year>
+		<publisher>rainwarrior</publisher>
+		<notes><![CDATA[
+		An original download should be located to verify and/or update the hash.
+		]]></notes>
+		<info name="release" value="20190201" /> <!-- From NESertGolfing Git tag -->
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="dgolf 1.0 prg" size="32768" crc="7b26bea4" sha1="67261747d51202535423eeed437a5186c72cea42" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192" />
+		</part>
+	</software>
+
 	<software name="dicktr">
 		<description>Dick Tracy (USA)</description>
 		<year>1990</year>

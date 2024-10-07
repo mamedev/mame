@@ -29,10 +29,10 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -58,8 +58,8 @@ private:
 	void mpeg_stereo_w(uint8_t data);
 	uint8_t mpeg_pos_r(offs_t offset);
 
-	void dsbz80_map(address_map &map);
-	void dsbz80io_map(address_map &map);
+	void dsbz80_map(address_map &map) ATTR_COLD;
+	void dsbz80io_map(address_map &map) ATTR_COLD;
 };
 
 

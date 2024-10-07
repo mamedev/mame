@@ -123,8 +123,8 @@ public:
 	void ts(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m68000_base_device> m_maincpu;
@@ -146,8 +146,8 @@ private:
 	void esq5506_otto_irq(int state);
 	u16 esq5506_read_adc();
 	void es5506_clock_changed(u32 data);
-	void kt_map(address_map &map);
-	void ts_map(address_map &map);
+	void kt_map(address_map &map) ATTR_COLD;
+	void ts_map(address_map &map) ATTR_COLD;
 };
 
 void esqkt_state::machine_start()

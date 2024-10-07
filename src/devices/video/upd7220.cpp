@@ -1180,6 +1180,11 @@ void upd7220_device::process_fifo()
 			m_ra[3] = 0x19;
 			m_ead = 0;
 			m_mask = 0;
+			// FIFO, Command Processor and internal counters are cleared by this
+			// - pc9801rs BIOS starts up a DMAW command that spindiz2 will dislike during its boot sequences
+			m_sr &= ~UPD7220_SR_DRAWING_IN_PROGRESS;
+			fifo_clear();
+			stop_dma();
 			break;
 
 		case 9:

@@ -45,11 +45,11 @@ public:
 	template <typename T> void set_pcihost_tag(int idx, T &&tag) { m_pcihost[idx].set_tag(std::forward<T>(tag)); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void register_map(address_map &map);
+	void register_map(address_map &map) ATTR_COLD;
 
 	// internal register cpu interface
 	uint32_t cpu_config_r(offs_t offset, uint32_t mem_mask);
@@ -256,8 +256,8 @@ public:
 	void mem_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;

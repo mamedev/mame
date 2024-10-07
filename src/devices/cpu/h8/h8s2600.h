@@ -24,8 +24,8 @@ protected:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;

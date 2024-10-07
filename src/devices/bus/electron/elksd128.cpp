@@ -14,12 +14,56 @@
 #include "emu.h"
 #include "elksd128.h"
 
+#include "machine/spi_sdcard.h"
+
+
+namespace {
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ELECTRON_ELKSD128, electron_elksd128_device, "electron_elksd128", "ElkSD128 Electron SD Interface")
+class electron_elksd128_device:
+	public device_t,
+	public device_electron_expansion_interface
+{
+public:
+	// construction/destruction
+	electron_elksd128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	// device_electron_expansion_interface implementation
+	virtual uint8_t expbus_r(offs_t offset) override;
+	virtual void expbus_w(offs_t offset, uint8_t data) override;
+
+private:
+	required_memory_region m_flash;
+	required_device<spi_sdcard_device> m_sdcard;
+	required_ioport m_joy;
+
+	uint8_t m_romsel;
+	uint8_t m_adc_channel;
+	uint8_t m_swr_lock;
+
+	TIMER_CALLBACK_MEMBER(spi_clock);
+
+	emu_timer *m_spi_clock;
+	bool m_spi_clock_state;
+	bool m_spi_clock_sysclk;
+	int m_spi_clock_cycles;
+	int m_in_bit;
+	uint8_t m_in_latch;
+	uint8_t m_out_latch;
+
+	std::unique_ptr<uint8_t[]> m_ram;
+};
 
 
 static INPUT_PORTS_START( elksd128 )
@@ -58,6 +102,7 @@ ROM_END
 void electron_elksd128_device::device_add_mconfig(machine_config &config)
 {
 	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set([this](int state) { m_in_bit = state; });
 }
 
@@ -316,3 +361,12 @@ TIMER_CALLBACK_MEMBER(electron_elksd128_device::spi_clock)
 		m_spi_clock->adjust(attotime::never);
 	}
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(ELECTRON_ELKSD128, device_electron_expansion_interface, electron_elksd128_device, "electron_elksd128", "ElkSD128 Electron SD Interface")

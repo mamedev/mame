@@ -84,7 +84,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<cassette_image_device> m_cass;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void seg_w(u8 data);

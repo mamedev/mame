@@ -78,8 +78,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(set_screensize);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i8048_device> m_maincpu;
@@ -107,8 +107,8 @@ private:
 	u16 m_rambank = 0;
 	u8 m_sound_cmd = 0;
 
-	void io_map(address_map &map);
-	void program_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void av_control_w(u8 data);

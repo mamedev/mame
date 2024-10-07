@@ -50,31 +50,31 @@ public:
 		m_mainrom(*this, "mainrom")
 	{ }
 
-	void init_kov2nl();
-	void init_orleg2();
-	void init_ddpdojt();
-	void init_kov3();
-	void init_kov3_104();
-	void init_kov3_102();
-	void init_kov3_101();
-	void init_kov3_100();
-	void init_kof98umh();
-	void init_bubucar();
+	void init_kov2nl() ATTR_COLD;
+	void init_orleg2() ATTR_COLD;
+	void init_ddpdojt() ATTR_COLD;
+	void init_kov3() ATTR_COLD;
+	void init_kov3_104() ATTR_COLD;
+	void init_kov3_102() ATTR_COLD;
+	void init_kov3_101() ATTR_COLD;
+	void init_kov3_100() ATTR_COLD;
+	void init_kof98umh() ATTR_COLD;
+	void init_bubucar() ATTR_COLD;
 
-	void pgm2_ramrom(machine_config &config);
-	void pgm2_lores(machine_config &config);
-	void pgm2(machine_config &config);
-	void pgm2_hires(machine_config &config);
-	void pgm2_map(address_map &map);
-	void pgm2_module_rom_map(address_map &map);
-	void pgm2_ram_rom_map(address_map &map);
-	void pgm2_rom_map(address_map &map);
+	void pgm2_ramrom(machine_config &config) ATTR_COLD;
+	void pgm2_lores(machine_config &config) ATTR_COLD;
+	void pgm2(machine_config &config) ATTR_COLD;
+	void pgm2_hires(machine_config &config) ATTR_COLD;
+	void pgm2_map(address_map &map) ATTR_COLD;
+	void pgm2_module_rom_map(address_map &map) ATTR_COLD;
+	void pgm2_ram_rom_map(address_map &map) ATTR_COLD;
+	void pgm2_rom_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_post_load() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 private:
 	struct kov3_module_key

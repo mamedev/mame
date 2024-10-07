@@ -14,12 +14,12 @@ public:
 	psx_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_stop() override { device_psx_controller_interface::m_owner->disable_card(false); }
 	virtual void device_reset() override { device_psx_controller_interface::m_owner->disable_card(true); }
 	virtual void interface_pre_reset() override;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	virtual bool get_pad(int count, uint8_t *odata, uint8_t idata) override;

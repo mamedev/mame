@@ -68,11 +68,11 @@ public:
 	void gpworld(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void driver_start() override;
 
-	void mainmem(address_map &map);
-	void mainport(address_map &map);
+	void mainmem(address_map &map) ATTR_COLD;
+	void mainport(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_stop);
 

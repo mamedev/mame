@@ -55,7 +55,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_pa(); }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -68,8 +68,8 @@ private:
 
 	u8 m_inp_mux = 0;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	template <int N> void update_digits(offs_t offset, u16 data);
 

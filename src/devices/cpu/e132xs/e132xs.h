@@ -128,12 +128,12 @@ public:
 	void compute_tr();
 	void adjust_timer_interrupt();
 
-	void e116_16k_iram_map(address_map &map);
-	void e116_4k_iram_map(address_map &map);
-	void e116_8k_iram_map(address_map &map);
-	void e132_16k_iram_map(address_map &map);
-	void e132_4k_iram_map(address_map &map);
-	void e132_8k_iram_map(address_map &map);
+	void e116_16k_iram_map(address_map &map) ATTR_COLD;
+	void e116_4k_iram_map(address_map &map) ATTR_COLD;
+	void e116_8k_iram_map(address_map &map) ATTR_COLD;
+	void e132_16k_iram_map(address_map &map) ATTR_COLD;
+	void e132_4k_iram_map(address_map &map) ATTR_COLD;
+	void e132_8k_iram_map(address_map &map) ATTR_COLD;
 
 	static uint32_t imm_length(uint16_t op);
 
@@ -279,9 +279,9 @@ protected:
 	void init(int scale_mask);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override;
@@ -619,7 +619,7 @@ public:
 	e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
@@ -632,7 +632,7 @@ public:
 	e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
@@ -645,7 +645,7 @@ public:
 	e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
@@ -658,7 +658,7 @@ public:
 	e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
@@ -671,7 +671,7 @@ public:
 	e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
@@ -684,7 +684,7 @@ public:
 	e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
@@ -697,7 +697,7 @@ public:
 	e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
@@ -710,7 +710,7 @@ public:
 	e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
@@ -723,7 +723,7 @@ public:
 	e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
@@ -736,7 +736,7 @@ public:
 	e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
@@ -749,7 +749,7 @@ public:
 	gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
@@ -762,7 +762,7 @@ public:
 	gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
@@ -775,7 +775,7 @@ public:
 	gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
@@ -788,7 +788,7 @@ public:
 	gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 

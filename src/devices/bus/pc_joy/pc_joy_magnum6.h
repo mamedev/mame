@@ -16,7 +16,7 @@ public:
 	virtual uint8_t x2(int delta) override { return BIT(m_btn->read(), 4); }
 	virtual uint8_t y2(int delta) override { return BIT(m_btn->read(), 5); }
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(PC_MAGNUM6_PAD, pc_joy_magnum6_device)

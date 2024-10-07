@@ -31,7 +31,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	void caprcyc(machine_config &config);
-	void caprcyc_map(address_map &map);
+	void caprcyc_map(address_map &map) ATTR_COLD;
 };
 
 

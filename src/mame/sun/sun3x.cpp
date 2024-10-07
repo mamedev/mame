@@ -186,7 +186,7 @@ private:
 	optional_device<ncr53c90_device> m_esp;
 	optional_device<n82077aa_device> m_fdc;
 	optional_device<floppy_connector> m_floppy_connector;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_shared_ptr<uint32_t> m_p_ram;
 	optional_shared_ptr<uint32_t> m_bw2_vram;
@@ -219,8 +219,8 @@ private:
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void sun3_460_mem(address_map &map);
-	void sun3_80_mem(address_map &map);
+	void sun3_460_mem(address_map &map) ATTR_COLD;
+	void sun3_80_mem(address_map &map) ATTR_COLD;
 
 	uint32_t m_enable = 0, m_buserr = 0, m_diag = 0, m_printer = 0, m_irqctrl = 0, m_memreg = 0, m_memerraddr = 0;
 	uint32_t m_iommu[0x800]{};

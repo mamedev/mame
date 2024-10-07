@@ -153,7 +153,7 @@ public:
 	void cloak(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -188,8 +188,8 @@ private:
 	void set_pen(int i);
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void master_map(address_map &map);
-	void slave_map(address_map &map);
+	void master_map(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
 };
 
 

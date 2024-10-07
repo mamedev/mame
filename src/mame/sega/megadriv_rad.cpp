@@ -39,9 +39,9 @@ protected:
 	uint16_t read(offs_t offset);
 	uint16_t read_a13(offs_t offset);
 
-	void megadriv_radica_map(address_map &map);
+	void megadriv_radica_map(address_map &map) ATTR_COLD;
 
-	void radica_base_map(address_map &map);
+	void radica_base_map(address_map &map) ATTR_COLD;
 
 	int m_bank;
 	int m_romsize;
@@ -65,8 +65,8 @@ public:
 	void megadriv_radica_6button_pal(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 
@@ -82,7 +82,7 @@ public:
 	void init_dgunl3227();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint16_t m_a1630a = 0;
 
@@ -91,7 +91,7 @@ private:
 	uint16_t read_a16302(offs_t offset, uint16_t mem_mask);
 	virtual void write_a1630a(offs_t offset, uint16_t data, uint16_t mem_mask);
 
-	void megadriv_dgunl_map(address_map &map);
+	void megadriv_dgunl_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -107,7 +107,7 @@ public:
 	void init_ra145();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	virtual void write_a1630a(offs_t offset, uint16_t data, uint16_t mem_mask) override;

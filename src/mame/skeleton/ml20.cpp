@@ -81,7 +81,7 @@ public:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 private:
 	required_device<v25_device> m_maincpu;
@@ -90,8 +90,8 @@ private:
 	required_ioport_array<4> m_keys;
 	required_ioport m_dsw;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint8_t p0_r();
 	uint8_t p1_r();

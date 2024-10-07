@@ -37,7 +37,7 @@ public:
 	void tv955(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
@@ -45,9 +45,9 @@ private:
 	void control_latch_w(u8 data);
 	void system_reset_w(int state);
 
-	void mem_map(address_map &map);
-	void char_map(address_map &map);
-	void attr_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void char_map(address_map &map) ATTR_COLD;
+	void attr_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<scn2674_device> m_crtc;

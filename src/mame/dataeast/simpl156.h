@@ -43,7 +43,7 @@ public:
 	void init_chainrec();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
@@ -65,12 +65,12 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_interrupt(int state);
 
-	void base_map(address_map &map);
-	void chainrec_map(address_map &map);
-	void joemacr_map(address_map &map);
-	void magdrop_map(address_map &map);
-	void magdropp_map(address_map &map);
-	void mitchell156_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
+	void chainrec_map(address_map &map) ATTR_COLD;
+	void joemacr_map(address_map &map) ATTR_COLD;
+	void magdrop_map(address_map &map) ATTR_COLD;
+	void magdropp_map(address_map &map) ATTR_COLD;
+	void mitchell156_map(address_map &map) ATTR_COLD;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

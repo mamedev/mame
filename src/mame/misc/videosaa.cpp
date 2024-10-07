@@ -74,8 +74,8 @@ public:
 	void videosaa(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m68hc705c8a_device> m_maincpu;

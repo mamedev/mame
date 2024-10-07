@@ -138,14 +138,14 @@ public:
 	void init_pbaction2();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void sound_irq_clear(int state);
 
-	void alt_sound_map(address_map &map);
-	void sound_io_map(address_map &map);
+	void alt_sound_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80_device> m_audiocpu;
@@ -187,9 +187,9 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void decrypted_opcodes_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class pbaction_tecfri_state : public pbaction_state
@@ -207,12 +207,12 @@ public:
 	void pbactiont(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void sub_map(address_map &map);
-	void sub_io_map(address_map &map);
-	void main_io_map(address_map &map);
+	void sub_map(address_map &map) ATTR_COLD;
+	void sub_io_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sub_trigger);
 	emu_timer *m_subcommand_timer = nullptr;

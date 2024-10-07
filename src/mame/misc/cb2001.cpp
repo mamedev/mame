@@ -90,8 +90,8 @@ public:
 	void init_smaller_proms();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint16_t> m_vram_fg;
@@ -119,9 +119,9 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	uint8_t irq_ack_r();
-	void io_map(address_map &map);
-	void cb5_io_map(address_map &map);
-	void program_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void cb5_io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 

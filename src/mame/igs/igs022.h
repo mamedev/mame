@@ -13,8 +13,8 @@ public:
 	void handle_command();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static constexpr u16 NUM_REGS = 0x300, STACK_SIZE = 0x100;

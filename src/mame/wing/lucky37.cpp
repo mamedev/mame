@@ -74,8 +74,8 @@ public:
 	void lucky37(machine_config &config);
 
 private:
-	void mcu_mem_map(address_map &map);
-	void mcu_io_map(address_map &map);
+	void mcu_mem_map(address_map &map) ATTR_COLD;
+	void mcu_io_map(address_map &map) ATTR_COLD;
 };
 
 void lucky37_state::mcu_mem_map(address_map &map)

@@ -184,15 +184,15 @@ protected:
 	void save_state();
 
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
 	void Scorpion1_SetSwitchState(int strobe, int data, int state);
 	int sc1_find_project_string();
 
-	void sc1_adder2(address_map &map);
-	void sc1_base(address_map &map);
-	void sc1_viper(address_map &map);
+	void sc1_adder2(address_map &map) ATTR_COLD;
+	void sc1_base(address_map &map) ATTR_COLD;
+	void sc1_viper(address_map &map) ATTR_COLD;
 
 private:
 	int m_mmtr_latch = 0;

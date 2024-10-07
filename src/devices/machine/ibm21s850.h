@@ -28,8 +28,8 @@ protected:
 	ibm21s85x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(reset_tick);
 
@@ -146,7 +146,7 @@ public:
 	ibm21s850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 private:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	enum : uint32_t
 	{
@@ -164,7 +164,7 @@ public:
 	ibm21s851_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 private:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	enum : uint32_t
 	{

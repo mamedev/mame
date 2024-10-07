@@ -88,7 +88,7 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void bank_w(uint8_t data);
@@ -105,7 +105,7 @@ private:
 	void scanline_irq(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
-	void wpc_s_map(address_map &map);
+	void wpc_s_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

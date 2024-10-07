@@ -51,8 +51,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void laser_fdc_w(offs_t offset, uint8_t data);
@@ -69,11 +69,11 @@ private:
 	void laser_get_track();
 	void laser_put_track();
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void m_map350(address_map &map);
-	void m_map500(address_map &map);
-	void m_map700(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void m_map350(address_map &map) ATTR_COLD;
+	void m_map500(address_map &map) ATTR_COLD;
+	void m_map700(address_map &map) ATTR_COLD;
 
 	void init_waitstates();
 

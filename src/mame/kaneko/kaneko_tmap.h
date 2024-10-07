@@ -51,7 +51,7 @@ public:
 
 
 	// access
-	void vram_map(address_map &map);
+	void vram_map(address_map &map) ATTR_COLD;
 
 	u16 regs_r(offs_t offset);
 	void regs_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
@@ -71,8 +71,8 @@ public:
 	void mark_layer_dirty(u8 Layer);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);

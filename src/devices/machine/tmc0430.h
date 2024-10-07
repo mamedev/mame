@@ -59,8 +59,8 @@ public:
 	bool idle() { return (m_phase == 0 && m_current_clock_level==CLEAR_LINE); }
 
 protected:
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 private:
 	// Ready callback. This line is usually connected to the READY pin of the CPU.

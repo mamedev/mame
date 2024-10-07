@@ -22,8 +22,8 @@ public:
 	void write(offs_t offset, u8 data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	virtual bool rtc_feature_leap_year() const override { return true; }

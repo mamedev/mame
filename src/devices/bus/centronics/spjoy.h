@@ -22,8 +22,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void input_data0(int state) override { if (state) m_data |= 0x01; else m_data &= ~0x01; update_busy_ack(); }
 	virtual void input_data1(int state) override { if (state) m_data |= 0x02; else m_data &= ~0x02; update_busy_ack(); }

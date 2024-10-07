@@ -17,8 +17,8 @@ public:
 	void IGS028_handle(void);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	uint32_t olds_prot_addr(uint16_t addr);
 	uint32_t olds_read_reg(uint16_t addr);

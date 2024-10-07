@@ -71,8 +71,8 @@ public:
 	uint8_t pfdr_r();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	devcb_read16 m_port_a_read_cb;

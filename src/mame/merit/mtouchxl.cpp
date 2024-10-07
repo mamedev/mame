@@ -82,17 +82,17 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_iocard;
 	optional_device<ds1205_device> m_multikey;
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	uint8_t coin_r();
 	void bank_w(uint8_t data);
 	uint8_t key_r();
 	void key_w(uint8_t data);
 	static void cdrom(device_t *device);
 	static void hdd(device_t *device);
-	void at32_io(address_map &map);
-	void at32_map(address_map &map);
-	void dbank_map(address_map &map);
+	void at32_io(address_map &map) ATTR_COLD;
+	void at32_map(address_map &map) ATTR_COLD;
+	void dbank_map(address_map &map) ATTR_COLD;
 };
 
 void mtxl_state::bank_w(uint8_t data)

@@ -18,16 +18,16 @@ public:
 protected:
 	ncr53c825_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
-	void io_map(address_map &map);
-	void scripts_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void scripts_map(address_map &map) ATTR_COLD;
 
 	required_memory_region m_scsi_rom;
 private:

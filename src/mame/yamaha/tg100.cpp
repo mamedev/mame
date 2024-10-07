@@ -51,8 +51,8 @@ public:
 private:
 	required_device<h8520_device> m_maincpu;
 	required_device<multipcm_device> m_ymw258;
-	void tg100_map(address_map &map);
-	void ymw258_map(address_map &map);
+	void tg100_map(address_map &map) ATTR_COLD;
+	void ymw258_map(address_map &map) ATTR_COLD;
 };
 
 /* all memory accesses are decoded by the gate array... */

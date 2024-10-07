@@ -98,8 +98,8 @@ public:
 	ioport_value overlay_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -121,7 +121,7 @@ private:
 	bool m_extram_enabled = false;
 	u8 m_overlay = 0;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void update_reset(ioport_value state);
 	void update_overlay();

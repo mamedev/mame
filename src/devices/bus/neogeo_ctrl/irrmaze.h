@@ -27,8 +27,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_neogeo_control_port_interface overrides
 	virtual uint8_t in0_r() override;

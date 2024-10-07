@@ -96,13 +96,13 @@ private:
 	void serial_io_w(u8 data);
 	void out_w(u8 data);
 
-	void common_map(address_map &map);
-	void quickpick5_main(address_map &map);
-	void waijockey_main(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void quickpick5_main(address_map &map) ATTR_COLD;
+	void waijockey_main(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;

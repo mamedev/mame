@@ -42,8 +42,8 @@ protected:
 	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, bool preprogrammed);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 6; }
@@ -64,9 +64,9 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	void program_map(address_map &map);
-	void preprogrammed_map(address_map &map);
-	void register_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void preprogrammed_map(address_map &map) ATTR_COLD;
+	void register_map(address_map &map) ATTR_COLD;
 
 private:
 	address_space_config m_program_config;

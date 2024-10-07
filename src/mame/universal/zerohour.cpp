@@ -78,8 +78,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void videoram_w(offs_t offset, u8 data);
 	void irqack_w(u8 data) { m_maincpu->set_input_line(0, CLEAR_LINE); }
@@ -94,7 +94,7 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void zerohour_map(address_map &map);
+	void zerohour_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<u8> m_videoram;
 	required_shared_ptr<u8> m_spriteram;
@@ -128,7 +128,7 @@ public:
 	void redclash(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
@@ -140,7 +140,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beep_clock->set_period(attotime::never); }
 
-	void redclash_map(address_map &map);
+	void redclash_map(address_map &map) ATTR_COLD;
 
 	required_device<clock_device> m_beep_clock;
 	required_device<timer_device> m_beep_trigger;

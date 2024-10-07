@@ -31,10 +31,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_tiki100bus_card_interface overrides
 	virtual uint8_t iorq_r(offs_t offset, uint8_t data) override;
@@ -48,8 +48,8 @@ private:
 	uint8_t read();
 	void write(uint8_t data);
 
-	void i8088_io(address_map &map);
-	void i8088_mem(address_map &map);
+	void i8088_io(address_map &map) ATTR_COLD;
+	void i8088_mem(address_map &map) ATTR_COLD;
 };
 
 

@@ -214,7 +214,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(start_scan);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void brc_base(machine_config &config);
@@ -233,8 +233,8 @@ private:
 	u8 m_inp_mux = 0;
 
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(barcode_shift) { m_barcode >>= 1; }
 

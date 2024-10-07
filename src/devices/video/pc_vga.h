@@ -34,7 +34,7 @@ public:
 	virtual void zero();
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	virtual uint8_t mem_r(offs_t offset);
 	virtual void mem_w(offs_t offset, uint8_t data);
@@ -67,9 +67,9 @@ protected:
 	TIMER_CALLBACK_MEMBER(vblank_timer_cb);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_palette_interface overrides
 	virtual uint32_t palette_entries() const noexcept override { return 0x100; }
@@ -86,7 +86,7 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 
-	virtual void io_3bx_3dx_map(address_map &map);
+	virtual void io_3bx_3dx_map(address_map &map) ATTR_COLD;
 
 	u8 crtc_address_r(offs_t offset);
 	void crtc_address_w(offs_t offset, u8 data);
@@ -95,7 +95,7 @@ protected:
 	u8 input_status_1_r(offs_t offset);
 	void feature_control_w(offs_t offset, u8 data);
 
-	virtual void io_3cx_map(address_map &map);
+	virtual void io_3cx_map(address_map &map) ATTR_COLD;
 
 	u8 atc_address_r(offs_t offset);
 	void atc_address_data_w(offs_t offset, u8 data);
@@ -121,10 +121,10 @@ protected:
 	virtual u8 gc_data_r(offs_t offset);
 	virtual void gc_data_w(offs_t offset, u8 data);
 
-	virtual void crtc_map(address_map &map);
-	virtual void sequencer_map(address_map &map);
-	virtual void gc_map(address_map &map);
-	virtual void attribute_map(address_map &map);
+	virtual void crtc_map(address_map &map) ATTR_COLD;
+	virtual void sequencer_map(address_map &map) ATTR_COLD;
+	virtual void gc_map(address_map &map) ATTR_COLD;
+	virtual void attribute_map(address_map &map) ATTR_COLD;
 
 	// NOTE: do not use the subclassed result when determining pitch in SVGA modes.
 	// dw & word mode should apply to normal VGA modes only.
@@ -326,7 +326,7 @@ protected:
 	void svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual uint8_t pc_vga_choosevideomode() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual u16 line_compare_mask();
 	struct
 	{

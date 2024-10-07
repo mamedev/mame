@@ -39,11 +39,11 @@ public:
 	void set_external_clock_period(const attotime &_period);
 	void set_send_full_data_transmit_on_sync_hack(bool enabled);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void rcv_complete() override;
 

@@ -112,10 +112,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_irq) { m_isa->irq7_w(ASSERT_LINE); };
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	required_memory_region m_program_rom;
@@ -126,7 +126,7 @@ private:
 	required_ioport m_eepromin;
 	required_ioport m_eepromout;
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	u8 m_program_bank = 0;
 	u8 m_program_select = 0;
@@ -136,7 +136,7 @@ private:
 
 	void remap(int space_id, offs_t start, offs_t end) override;
 
-	void bankdev_map(address_map &map);
+	void bankdev_map(address_map &map) ATTR_COLD;
 
 	void nio3_w(u8 data);
 	void nio4_w(u8 data);
@@ -386,14 +386,14 @@ public:
 	required_device<kbdc8042_device> m_kbdc;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	void remap(int space_id, offs_t start, offs_t end) override;
 
-	void device_map(address_map &map);
+	void device_map(address_map &map) ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(ISA16_P5TXLA_MB, isa16_p5txla_mb, "isa16_p5txla_mb", "ISA16 P5TX-LA Virtual MB resources")
@@ -463,8 +463,8 @@ protected:
 	required_device<pentium_mmx_device> m_maincpu;
 
 private:
-	void p5txla_io(address_map &map);
-	void p5txla_map(address_map &map);
+	void p5txla_io(address_map &map) ATTR_COLD;
+	void p5txla_map(address_map &map) ATTR_COLD;
 
 //  static void winbond_superio_config(device_t *device);
 };

@@ -68,8 +68,8 @@ public:
 	void tk2000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -118,8 +118,8 @@ private:
 	uint8_t c100_r(offs_t offset);
 	void c100_w(offs_t offset, uint8_t data);
 
-	void apple2_map(address_map &map);
-	void inhbank_map(address_map &map);
+	void apple2_map(address_map &map) ATTR_COLD;
+	void inhbank_map(address_map &map) ATTR_COLD;
 
 	uint8_t read_floatingbus();
 };

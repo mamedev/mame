@@ -14,7 +14,7 @@ protected:
 	h8510_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 private:
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 };
 
 class hd6415108_device : public h8510_device

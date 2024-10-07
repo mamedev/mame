@@ -31,8 +31,8 @@ protected:
 	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type, address_map_constructor internal_port_map = address_map_constructor());
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
@@ -690,7 +690,7 @@ protected:
 	// device_memory_interface overrides
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
-	void v33_internal_port_map(address_map &map);
+	void v33_internal_port_map(address_map &map) ATTR_COLD;
 	uint16_t xam_r();
 };
 

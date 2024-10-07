@@ -41,8 +41,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -51,8 +51,8 @@ protected:
 	virtual void execute_one() override;
 	virtual bool op_argument() override;
 
-	void data_map(address_map &map);
-	void program_map(address_map &map);
+	void data_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 
 	// opcode helpers
 	u8 ram_r();

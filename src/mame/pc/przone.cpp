@@ -49,13 +49,13 @@ class isa16_przone_jamma_if : public device_t, public device_isa16_card_interfac
 public:
 	// construction/destruction
 	isa16_przone_jamma_if(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
@@ -64,8 +64,8 @@ private:
 	//required_ioport_array<5> m_iocard;
 	required_ioport m_iocard;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint16_t iocard_r();
 	uint8_t nvram_r(offs_t offset);
@@ -188,8 +188,8 @@ public:
 	void przone(machine_config &config);
 
 private:
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	static void smc_superio_config(device_t *device);
 };

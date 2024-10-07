@@ -56,7 +56,7 @@ public:
 	void sag(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	optional_device<hmcs40_cpu_device> m_hmcs40_cpu;

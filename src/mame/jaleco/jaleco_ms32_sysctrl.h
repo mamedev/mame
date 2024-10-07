@@ -34,7 +34,7 @@ public:
 	jaleco_ms32_sysctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// I/O operations
-	void amap(address_map &map);
+	void amap(address_map &map) ATTR_COLD;
 	auto flip_screen_cb() { return m_flip_screen_cb.bind(); }
 	auto vblank_cb() { return m_vblank_cb.bind(); }
 	auto field_cb() { return m_field_cb.bind(); }
@@ -47,9 +47,9 @@ public:
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(prg_timer_tick);
 

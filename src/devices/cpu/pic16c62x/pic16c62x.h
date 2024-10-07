@@ -67,8 +67,8 @@ protected:
 	pic16c62x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, address_map_constructor ram_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
@@ -240,14 +240,14 @@ private:
 	void pic16c62x_update_timer(int counts);
 
 protected:
-	void core_regs(address_map &map);
-	void pic16c620_ram(address_map &map);
-	void pic16c622_ram(address_map &map);
-	void pic16c62x_rom_10(address_map &map);
-	void pic16c62x_rom_11(address_map &map);
-	void pic16c62x_rom_9(address_map &map);
-	void pic16c620a_ram(address_map &map);
-	void pic16c622a_ram(address_map &map);
+	void core_regs(address_map &map) ATTR_COLD;
+	void pic16c620_ram(address_map &map) ATTR_COLD;
+	void pic16c622_ram(address_map &map) ATTR_COLD;
+	void pic16c62x_rom_10(address_map &map) ATTR_COLD;
+	void pic16c62x_rom_11(address_map &map) ATTR_COLD;
+	void pic16c62x_rom_9(address_map &map) ATTR_COLD;
+	void pic16c620a_ram(address_map &map) ATTR_COLD;
+	void pic16c622a_ram(address_map &map) ATTR_COLD;
 };
 
 

@@ -79,10 +79,10 @@ private:
 	void tomcat_nvram_w(offs_t offset, uint8_t data);
 	int dsp_bio_r();
 	void soundlatches_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override;
-	void dsp_map(address_map &map);
-	void sound_map(address_map &map);
-	void tomcat_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	void dsp_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void tomcat_map(address_map &map) ATTR_COLD;
 
 	required_device<tms5220_device> m_tms;
 	required_shared_ptr<uint16_t> m_shared_ram;

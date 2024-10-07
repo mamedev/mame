@@ -58,8 +58,8 @@ public:
 
 protected:
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual void tlcs900_check_hdma() override;
@@ -158,7 +158,7 @@ private:
 	void dadrv_w(uint8_t data);
 	void dareg_w(offs_t offset, uint8_t data);
 
-	void internal_mem(address_map &map);
+	void internal_mem(address_map &map) ATTR_COLD;
 
 	// analogue inputs, sampled at 10 bits
 	devcb_read16::array<8> m_an_read;

@@ -331,8 +331,8 @@ public:
 	int game_over_flag_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_bioscpu;
@@ -362,10 +362,10 @@ private:
 	void port_07_w(uint8_t data);
 
 	void nss_vblank_irq(int state);
-	void bios_io_map(address_map &map);
-	void bios_map(address_map &map);
-	void snes_map(address_map &map);
-	void spc_map(address_map &map);
+	void bios_io_map(address_map &map) ATTR_COLD;
+	void bios_map(address_map &map) ATTR_COLD;
+	void snes_map(address_map &map) ATTR_COLD;
+	void spc_map(address_map &map) ATTR_COLD;
 };
 
 

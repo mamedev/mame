@@ -29,8 +29,8 @@ protected:
 	bbc_joystick_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual uint8_t ch_r(int channel) override;
 	virtual uint8_t pb_r() override;
@@ -45,7 +45,7 @@ class bbc_acornjoy_device : public bbc_joystick_device
 public:
 	bbc_acornjoy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 class bbc_voltmace3b_device : public bbc_joystick_device
@@ -53,7 +53,7 @@ class bbc_voltmace3b_device : public bbc_joystick_device
 public:
 	bbc_voltmace3b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 

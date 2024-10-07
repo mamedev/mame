@@ -34,9 +34,9 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(check_cassette_wave);
 	TIMER_DEVICE_CALLBACK_MEMBER(pulse_cassette_clock);

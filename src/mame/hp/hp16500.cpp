@@ -76,7 +76,7 @@ public:
 	void hp1650(machine_config &config);
 
 private:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	[[maybe_unused]] uint32_t screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -108,10 +108,10 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_1650);
 
-	void hp16500_map(address_map &map);
-	void hp16500a_map(address_map &map);
-	void hp1650_map(address_map &map);
-	void hp1651_map(address_map &map);
+	void hp16500_map(address_map &map) ATTR_COLD;
+	void hp16500a_map(address_map &map) ATTR_COLD;
+	void hp1650_map(address_map &map) ATTR_COLD;
+	void hp1651_map(address_map &map) ATTR_COLD;
 
 	uint32_t m_palette[256]{}, m_colors[3]{}, m_count = 0, m_clutoffs = 0;
 };

@@ -5,179 +5,94 @@ authors:hap
 -->
 <mamelayout version="2">
 
-<!-- define elements -->
+<!-- display -->
 
-	<element name="text_gin" defstate="0">
-		<text state="1" string="GIN!"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_33" defstate="0">
-		<text state="1" string="33"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_score" defstate="0">
-		<text state="1" string="Score:"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_knock" defstate="0">
-		<text state="1" string="Knock"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_draw" defstate="0">
-		<text state="1" string="Go Draw"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_card" defstate="0">
-		<text state="1" string="My cards:"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_no" defstate="0">
-		<text state="1" string="No"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_thanks" defstate="0">
-		<text state="1" string="Thanks"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_note" defstate="0">
-		<text state="1" string="&#x266a;"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_star" defstate="0">
-		<text state="1" string="*"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
+	<element name="lcd_bg"><rect><color red="0.7" green="0.71" blue="0.72" /></rect></element>
+	<element name="lcd_red"><rect><color red="0.74" green="0.60" blue="0.62" /></rect></element>
 
-	<element name="white" defstate="0">
-		<rect state="0"><color red="0.0" green="0.0" blue="0.0" /></rect>
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
+	<element name="text_gin" defstate="0"><text state="1" string="GIN!"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="text_33" defstate="0"><text state="1" string="33"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="text_score" defstate="0"><text state="1" string="Score:"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="text_knock" defstate="0"><text state="1" string="Knock"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="text_draw" defstate="0"><text state="1" string="Go Draw"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="text_card" defstate="0"><text state="1" string="My cards:"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="text_no" defstate="0"><text state="1" string="No"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="text_thanks" defstate="0"><text state="1" string="Thanks"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="text_note" defstate="0"><text state="1" string="&#x266a;"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="text_star" defstate="0"><text state="1" string="*"><color red="0.8" green="0.15" blue="0.2" /></text></element>
 
-	<element name="cba" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="A"><color red="0.1" green="0.1" blue="0.1" /></text>
+	<element name="cb" defstate="0">
+		<rect state="0">
+			<bounds xc="0" yc="0" width="2.6" height="3.6" />
+			<color alpha="0" />
+		</rect>
+		<rect state="1">
+			<bounds xc="0" yc="0" width="2.6" height="3.6" />
+			<color red="0.15" green="0.15" blue="0.15" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="2.3" height="3.3" />
+			<color red="0.7" green="0.71" blue="0.72" />
+		</rect>
 	</element>
-	<element name="cb2" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="2"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb3" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="3"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb4" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="4"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb5" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="5"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb6" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="6"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb7" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="7"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb8" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="8"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb9" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="9"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cb0" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="10"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cbj" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="J"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cbq" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="Q"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cbk" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="K"><color red="0.1" green="0.1" blue="0.1" /></text>
+	<element name="cr" defstate="0">
+		<rect state="0">
+			<bounds xc="0" yc="0" width="2.6" height="3.6" />
+			<color alpha="0" />
+		</rect>
+		<rect state="1">
+			<bounds xc="0" yc="0" width="2.6" height="3.6" />
+			<color red="0.8" green="0.15" blue="0.2" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="2.3" height="3.3" />
+			<color red="0.74" green="0.60" blue="0.62" />
+		</rect>
 	</element>
 
-	<element name="cra" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="A"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr2" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="2"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr3" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="3"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr4" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="4"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr5" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="5"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr6" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="6"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr7" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="7"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr8" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="8"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr9" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="9"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="cr0" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="10"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="crj" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="J"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="crq" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="Q"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="crk" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="K"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
+	<element name="cba" defstate="0"><text state="1" align="1" string="A"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="cb2" defstate="0"><text state="1" align="1" string="2"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="cb3" defstate="0"><text state="1" align="1" string="3"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="cb4" defstate="0"><text state="1" align="1" string="4"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="cb5" defstate="0"><text state="1" align="1" string="5"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="cb6" defstate="0"><text state="1" align="1" string="6"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="cb7" defstate="0"><text state="1" align="1" string="7"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="cb8" defstate="0"><text state="1" align="1" string="8"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="cb9" defstate="0"><text state="1" align="1" string="9"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="cb0" defstate="0"><text state="1" align="1" string="10"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="cbj" defstate="0"><text state="1" align="1" string="J"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="cbq" defstate="0"><text state="1" align="1" string="Q"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="cbk" defstate="0"><text state="1" align="1" string="K"><color red="0.15" green="0.15" blue="0.15" /></text></element>
 
-	<element name="sym_heart" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" align="2" string="&#x2665;"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="sym_diamond" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" align="2" string="&#x2666;"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="sym_club" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" align="2" string="&#x2663;"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="sym_spade" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" align="2" string="&#x2660;"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="crx" defstate="0">
-		<rect state="1"><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<text state="1" string="?"><color red="0.8" green="0.1" blue="0.1" /></text>
-	</element>
+	<element name="cra" defstate="0"><text state="1" align="1" string="A"><color red="0.8" green="0.15" blue="0.2" /></text></element>
+	<element name="cr2" defstate="0"><text state="1" align="1" string="2"><color red="0.8" green="0.15" blue="0.2" /></text></element>
+	<element name="cr3" defstate="0"><text state="1" align="1" string="3"><color red="0.8" green="0.15" blue="0.2" /></text></element>
+	<element name="cr4" defstate="0"><text state="1" align="1" string="4"><color red="0.8" green="0.15" blue="0.2" /></text></element>
+	<element name="cr5" defstate="0"><text state="1" align="1" string="5"><color red="0.8" green="0.15" blue="0.2" /></text></element>
+	<element name="cr6" defstate="0"><text state="1" align="1" string="6"><color red="0.8" green="0.15" blue="0.2" /></text></element>
+	<element name="cr7" defstate="0"><text state="1" align="1" string="7"><color red="0.8" green="0.15" blue="0.2" /></text></element>
+	<element name="cr8" defstate="0"><text state="1" align="1" string="8"><color red="0.8" green="0.15" blue="0.2" /></text></element>
+	<element name="cr9" defstate="0"><text state="1" align="1" string="9"><color red="0.8" green="0.15" blue="0.2" /></text></element>
+	<element name="cr0" defstate="0"><text state="1" align="1" string="10"><color red="0.8" green="0.15" blue="0.2" /></text></element>
+	<element name="crj" defstate="0"><text state="1" align="1" string="J"><color red="0.8" green="0.15" blue="0.2" /></text></element>
+	<element name="crq" defstate="0"><text state="1" align="1" string="Q"><color red="0.8" green="0.15" blue="0.2" /></text></element>
+	<element name="crk" defstate="0"><text state="1" align="1" string="K"><color red="0.8" green="0.15" blue="0.2" /></text></element>
 
+	<element name="sym_heart" defstate="0"><text state="1" align="2" string="&#x2665;"><color red="0.8" green="0.15" blue="0.2" /></text></element>
+	<element name="sym_diamond" defstate="0"><text state="1" align="2" string="&#x2666;"><color red="0.8" green="0.15" blue="0.2" /></text></element>
+	<element name="sym_club" defstate="0"><text state="1" align="2" string="&#x2663;"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="sym_spade" defstate="0"><text state="1" align="2" string="&#x2660;"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="sym_q" defstate="0"><text state="1" string="?"><color red="0.8" green="0.15" blue="0.2" /></text></element>
 
-<!-- build screen -->
+	<group name="display">
+		<bounds x="4.2" y="6.7" width="45.5" height="20.0" />
 
-	<view name="Internal Layout">
-		<bounds left="4.2" right="49.2" top="6.7" bottom="26.2" />
+		<element ref="lcd_bg"><bounds x="4.2" y="6.7" width="45.5" height="20.0" /></element>
+		<element ref="lcd_red"><bounds x="4.2" y="13.8" width="45.5" height="8" /></element>
 
 		<element name="3.23" ref="text_gin"><bounds x="3.5" y="10.55" width="7" height="2.5" /></element>
-		<element name="2.23" ref="crx"><bounds x="5.5" y="14" width="2.6" height="3.6" /></element>
+		<element name="2.23" ref="cr"><bounds x="5.5" y="14" width="2.6" height="3.6" /></element>
+		<element name="2.23" ref="sym_q"><bounds x="5.5" y="14" width="2.6" height="3.6" /></element>
 		<element name="1.23" ref="text_star"><bounds x="5.5" y="18.5" width="2.6" height="3.6" /></element>
 		<element name="0.23" ref="text_note"><bounds x="3.5" y="22" width="7" height="3.6" /></element>
 
@@ -190,164 +105,232 @@ authors:hap
 		<element name="4.12" ref="text_card"><bounds x="40" y="7" width="9" height="2.5" /></element>
 
 		<!-- cards -->
-		<element name="3.22" ref="white"><bounds x="10" y="10" width="2.6" height="3.6" /></element>
-		<element name="3.21" ref="white"><bounds x="13" y="10" width="2.6" height="3.6" /></element>
-		<element name="3.20" ref="white"><bounds x="16" y="10" width="2.6" height="3.6" /></element>
-		<element name="3.19" ref="white"><bounds x="19" y="10" width="2.6" height="3.6" /></element>
-		<element name="3.18" ref="white"><bounds x="22" y="10" width="2.6" height="3.6" /></element>
-		<element name="3.17" ref="white"><bounds x="25" y="10" width="2.6" height="3.6" /></element>
-		<element name="3.16" ref="white"><bounds x="28" y="10" width="2.6" height="3.6" /></element>
-		<element name="3.15" ref="white"><bounds x="31" y="10" width="2.6" height="3.6" /></element>
-		<element name="3.14" ref="white"><bounds x="34" y="10" width="2.6" height="3.6" /></element>
-		<element name="3.13" ref="white"><bounds x="37" y="10" width="2.6" height="3.6" /></element>
-		<element name="3.12" ref="white"><bounds x="40" y="10" width="2.6" height="3.6" /></element>
-		<element name="3.11" ref="white"><bounds x="43" y="10" width="2.6" height="3.6" /></element>
-		<element name="3.10" ref="white"><bounds x="46" y="10" width="2.6" height="3.6" /></element>
-		<element name="2.22" ref="white"><bounds x="10" y="14" width="2.6" height="3.6" /></element>
-		<element name="2.21" ref="white"><bounds x="13" y="14" width="2.6" height="3.6" /></element>
-		<element name="2.20" ref="white"><bounds x="16" y="14" width="2.6" height="3.6" /></element>
-		<element name="2.19" ref="white"><bounds x="19" y="14" width="2.6" height="3.6" /></element>
-		<element name="2.18" ref="white"><bounds x="22" y="14" width="2.6" height="3.6" /></element>
-		<element name="2.17" ref="white"><bounds x="25" y="14" width="2.6" height="3.6" /></element>
-		<element name="2.16" ref="white"><bounds x="28" y="14" width="2.6" height="3.6" /></element>
-		<element name="2.15" ref="white"><bounds x="31" y="14" width="2.6" height="3.6" /></element>
-		<element name="2.14" ref="white"><bounds x="34" y="14" width="2.6" height="3.6" /></element>
-		<element name="2.13" ref="white"><bounds x="37" y="14" width="2.6" height="3.6" /></element>
-		<element name="2.12" ref="white"><bounds x="40" y="14" width="2.6" height="3.6" /></element>
-		<element name="2.11" ref="white"><bounds x="43" y="14" width="2.6" height="3.6" /></element>
-		<element name="2.10" ref="white"><bounds x="46" y="14" width="2.6" height="3.6" /></element>
-		<element name="1.22" ref="white"><bounds x="10" y="18" width="2.6" height="3.6" /></element>
-		<element name="1.21" ref="white"><bounds x="13" y="18" width="2.6" height="3.6" /></element>
-		<element name="1.20" ref="white"><bounds x="16" y="18" width="2.6" height="3.6" /></element>
-		<element name="1.19" ref="white"><bounds x="19" y="18" width="2.6" height="3.6" /></element>
-		<element name="1.18" ref="white"><bounds x="22" y="18" width="2.6" height="3.6" /></element>
-		<element name="1.17" ref="white"><bounds x="25" y="18" width="2.6" height="3.6" /></element>
-		<element name="1.16" ref="white"><bounds x="28" y="18" width="2.6" height="3.6" /></element>
-		<element name="1.15" ref="white"><bounds x="31" y="18" width="2.6" height="3.6" /></element>
-		<element name="1.14" ref="white"><bounds x="34" y="18" width="2.6" height="3.6" /></element>
-		<element name="1.13" ref="white"><bounds x="37" y="18" width="2.6" height="3.6" /></element>
-		<element name="1.12" ref="white"><bounds x="40" y="18" width="2.6" height="3.6" /></element>
-		<element name="1.11" ref="white"><bounds x="43" y="18" width="2.6" height="3.6" /></element>
-		<element name="1.10" ref="white"><bounds x="46" y="18" width="2.6" height="3.6" /></element>
-		<element name="0.22" ref="white"><bounds x="10" y="22" width="2.6" height="3.6" /></element>
-		<element name="0.21" ref="white"><bounds x="13" y="22" width="2.6" height="3.6" /></element>
-		<element name="0.20" ref="white"><bounds x="16" y="22" width="2.6" height="3.6" /></element>
-		<element name="0.19" ref="white"><bounds x="19" y="22" width="2.6" height="3.6" /></element>
-		<element name="0.18" ref="white"><bounds x="22" y="22" width="2.6" height="3.6" /></element>
-		<element name="0.17" ref="white"><bounds x="25" y="22" width="2.6" height="3.6" /></element>
-		<element name="0.16" ref="white"><bounds x="28" y="22" width="2.6" height="3.6" /></element>
-		<element name="0.15" ref="white"><bounds x="31" y="22" width="2.6" height="3.6" /></element>
-		<element name="0.14" ref="white"><bounds x="34" y="22" width="2.6" height="3.6" /></element>
-		<element name="0.13" ref="white"><bounds x="37" y="22" width="2.6" height="3.6" /></element>
-		<element name="0.12" ref="white"><bounds x="40" y="22" width="2.6" height="3.6" /></element>
-		<element name="0.11" ref="white"><bounds x="43" y="22" width="2.6" height="3.6" /></element>
-		<element name="0.10" ref="white"><bounds x="46" y="22" width="2.6" height="3.6" /></element>
+		<element name="3.22" ref="cb"><bounds x="10" y="10" width="2.6" height="3.6" /></element>
+		<element name="3.21" ref="cb"><bounds x="13" y="10" width="2.6" height="3.6" /></element>
+		<element name="3.20" ref="cb"><bounds x="16" y="10" width="2.6" height="3.6" /></element>
+		<element name="3.19" ref="cb"><bounds x="19" y="10" width="2.6" height="3.6" /></element>
+		<element name="3.18" ref="cb"><bounds x="22" y="10" width="2.6" height="3.6" /></element>
+		<element name="3.17" ref="cb"><bounds x="25" y="10" width="2.6" height="3.6" /></element>
+		<element name="3.16" ref="cb"><bounds x="28" y="10" width="2.6" height="3.6" /></element>
+		<element name="3.15" ref="cb"><bounds x="31" y="10" width="2.6" height="3.6" /></element>
+		<element name="3.14" ref="cb"><bounds x="34" y="10" width="2.6" height="3.6" /></element>
+		<element name="3.13" ref="cb"><bounds x="37" y="10" width="2.6" height="3.6" /></element>
+		<element name="3.12" ref="cb"><bounds x="40" y="10" width="2.6" height="3.6" /></element>
+		<element name="3.11" ref="cb"><bounds x="43" y="10" width="2.6" height="3.6" /></element>
+		<element name="3.10" ref="cb"><bounds x="46" y="10" width="2.6" height="3.6" /></element>
+		<element name="2.22" ref="cr"><bounds x="10" y="14" width="2.6" height="3.6" /></element>
+		<element name="2.21" ref="cr"><bounds x="13" y="14" width="2.6" height="3.6" /></element>
+		<element name="2.20" ref="cr"><bounds x="16" y="14" width="2.6" height="3.6" /></element>
+		<element name="2.19" ref="cr"><bounds x="19" y="14" width="2.6" height="3.6" /></element>
+		<element name="2.18" ref="cr"><bounds x="22" y="14" width="2.6" height="3.6" /></element>
+		<element name="2.17" ref="cr"><bounds x="25" y="14" width="2.6" height="3.6" /></element>
+		<element name="2.16" ref="cr"><bounds x="28" y="14" width="2.6" height="3.6" /></element>
+		<element name="2.15" ref="cr"><bounds x="31" y="14" width="2.6" height="3.6" /></element>
+		<element name="2.14" ref="cr"><bounds x="34" y="14" width="2.6" height="3.6" /></element>
+		<element name="2.13" ref="cr"><bounds x="37" y="14" width="2.6" height="3.6" /></element>
+		<element name="2.12" ref="cr"><bounds x="40" y="14" width="2.6" height="3.6" /></element>
+		<element name="2.11" ref="cr"><bounds x="43" y="14" width="2.6" height="3.6" /></element>
+		<element name="2.10" ref="cr"><bounds x="46" y="14" width="2.6" height="3.6" /></element>
+		<element name="1.22" ref="cr"><bounds x="10" y="18" width="2.6" height="3.6" /></element>
+		<element name="1.21" ref="cr"><bounds x="13" y="18" width="2.6" height="3.6" /></element>
+		<element name="1.20" ref="cr"><bounds x="16" y="18" width="2.6" height="3.6" /></element>
+		<element name="1.19" ref="cr"><bounds x="19" y="18" width="2.6" height="3.6" /></element>
+		<element name="1.18" ref="cr"><bounds x="22" y="18" width="2.6" height="3.6" /></element>
+		<element name="1.17" ref="cr"><bounds x="25" y="18" width="2.6" height="3.6" /></element>
+		<element name="1.16" ref="cr"><bounds x="28" y="18" width="2.6" height="3.6" /></element>
+		<element name="1.15" ref="cr"><bounds x="31" y="18" width="2.6" height="3.6" /></element>
+		<element name="1.14" ref="cr"><bounds x="34" y="18" width="2.6" height="3.6" /></element>
+		<element name="1.13" ref="cr"><bounds x="37" y="18" width="2.6" height="3.6" /></element>
+		<element name="1.12" ref="cr"><bounds x="40" y="18" width="2.6" height="3.6" /></element>
+		<element name="1.11" ref="cr"><bounds x="43" y="18" width="2.6" height="3.6" /></element>
+		<element name="1.10" ref="cr"><bounds x="46" y="18" width="2.6" height="3.6" /></element>
+		<element name="0.22" ref="cb"><bounds x="10" y="22" width="2.6" height="3.6" /></element>
+		<element name="0.21" ref="cb"><bounds x="13" y="22" width="2.6" height="3.6" /></element>
+		<element name="0.20" ref="cb"><bounds x="16" y="22" width="2.6" height="3.6" /></element>
+		<element name="0.19" ref="cb"><bounds x="19" y="22" width="2.6" height="3.6" /></element>
+		<element name="0.18" ref="cb"><bounds x="22" y="22" width="2.6" height="3.6" /></element>
+		<element name="0.17" ref="cb"><bounds x="25" y="22" width="2.6" height="3.6" /></element>
+		<element name="0.16" ref="cb"><bounds x="28" y="22" width="2.6" height="3.6" /></element>
+		<element name="0.15" ref="cb"><bounds x="31" y="22" width="2.6" height="3.6" /></element>
+		<element name="0.14" ref="cb"><bounds x="34" y="22" width="2.6" height="3.6" /></element>
+		<element name="0.13" ref="cb"><bounds x="37" y="22" width="2.6" height="3.6" /></element>
+		<element name="0.12" ref="cb"><bounds x="40" y="22" width="2.6" height="3.6" /></element>
+		<element name="0.11" ref="cb"><bounds x="43" y="22" width="2.6" height="3.6" /></element>
+		<element name="0.10" ref="cb"><bounds x="46" y="22" width="2.6" height="3.6" /></element>
 
-		<element name="3.22" ref="cba"><bounds x="10" y="10" width="1.6" height="2.0" /></element>
-		<element name="3.21" ref="cb2"><bounds x="13" y="10" width="1.6" height="2.0" /></element>
-		<element name="3.20" ref="cb3"><bounds x="16" y="10" width="1.6" height="2.0" /></element>
-		<element name="3.19" ref="cb4"><bounds x="19" y="10" width="1.6" height="2.0" /></element>
-		<element name="3.18" ref="cb5"><bounds x="22" y="10" width="1.6" height="2.0" /></element>
-		<element name="3.17" ref="cb6"><bounds x="25" y="10" width="1.6" height="2.0" /></element>
-		<element name="3.16" ref="cb7"><bounds x="28" y="10" width="1.6" height="2.0" /></element>
-		<element name="3.15" ref="cb8"><bounds x="31" y="10" width="1.6" height="2.0" /></element>
-		<element name="3.14" ref="cb9"><bounds x="34" y="10" width="1.6" height="2.0" /></element>
-		<element name="3.13" ref="cb0"><bounds x="37" y="10" width="1.8" height="2.0" /></element>
-		<element name="3.12" ref="cbj"><bounds x="40" y="10" width="1.6" height="2.0" /></element>
-		<element name="3.11" ref="cbq"><bounds x="43" y="10" width="1.6" height="2.0" /></element>
-		<element name="3.10" ref="cbk"><bounds x="46" y="10" width="1.6" height="2.0" /></element>
-		<element name="2.22" ref="cra"><bounds x="10" y="14" width="1.6" height="2.0" /></element>
-		<element name="2.21" ref="cr2"><bounds x="13" y="14" width="1.6" height="2.0" /></element>
-		<element name="2.20" ref="cr3"><bounds x="16" y="14" width="1.6" height="2.0" /></element>
-		<element name="2.19" ref="cr4"><bounds x="19" y="14" width="1.6" height="2.0" /></element>
-		<element name="2.18" ref="cr5"><bounds x="22" y="14" width="1.6" height="2.0" /></element>
-		<element name="2.17" ref="cr6"><bounds x="25" y="14" width="1.6" height="2.0" /></element>
-		<element name="2.16" ref="cr7"><bounds x="28" y="14" width="1.6" height="2.0" /></element>
-		<element name="2.15" ref="cr8"><bounds x="31" y="14" width="1.6" height="2.0" /></element>
-		<element name="2.14" ref="cr9"><bounds x="34" y="14" width="1.6" height="2.0" /></element>
-		<element name="2.13" ref="cr0"><bounds x="37" y="14" width="1.8" height="2.0" /></element>
-		<element name="2.12" ref="crj"><bounds x="40" y="14" width="1.6" height="2.0" /></element>
-		<element name="2.11" ref="crq"><bounds x="43" y="14" width="1.6" height="2.0" /></element>
-		<element name="2.10" ref="crk"><bounds x="46" y="14" width="1.6" height="2.0" /></element>
-		<element name="1.22" ref="cra"><bounds x="10" y="18" width="1.6" height="2.0" /></element>
-		<element name="1.21" ref="cr2"><bounds x="13" y="18" width="1.6" height="2.0" /></element>
-		<element name="1.20" ref="cr3"><bounds x="16" y="18" width="1.6" height="2.0" /></element>
-		<element name="1.19" ref="cr4"><bounds x="19" y="18" width="1.6" height="2.0" /></element>
-		<element name="1.18" ref="cr5"><bounds x="22" y="18" width="1.6" height="2.0" /></element>
-		<element name="1.17" ref="cr6"><bounds x="25" y="18" width="1.6" height="2.0" /></element>
-		<element name="1.16" ref="cr7"><bounds x="28" y="18" width="1.6" height="2.0" /></element>
-		<element name="1.15" ref="cr8"><bounds x="31" y="18" width="1.6" height="2.0" /></element>
-		<element name="1.14" ref="cr9"><bounds x="34" y="18" width="1.6" height="2.0" /></element>
-		<element name="1.13" ref="cr0"><bounds x="37" y="18" width="1.8" height="2.0" /></element>
-		<element name="1.12" ref="crj"><bounds x="40" y="18" width="1.6" height="2.0" /></element>
-		<element name="1.11" ref="crq"><bounds x="43" y="18" width="1.6" height="2.0" /></element>
-		<element name="1.10" ref="crk"><bounds x="46" y="18" width="1.6" height="2.0" /></element>
-		<element name="0.22" ref="cba"><bounds x="10" y="22" width="1.6" height="2.0" /></element>
-		<element name="0.21" ref="cb2"><bounds x="13" y="22" width="1.6" height="2.0" /></element>
-		<element name="0.20" ref="cb3"><bounds x="16" y="22" width="1.6" height="2.0" /></element>
-		<element name="0.19" ref="cb4"><bounds x="19" y="22" width="1.6" height="2.0" /></element>
-		<element name="0.18" ref="cb5"><bounds x="22" y="22" width="1.6" height="2.0" /></element>
-		<element name="0.17" ref="cb6"><bounds x="25" y="22" width="1.6" height="2.0" /></element>
-		<element name="0.16" ref="cb7"><bounds x="28" y="22" width="1.6" height="2.0" /></element>
-		<element name="0.15" ref="cb8"><bounds x="31" y="22" width="1.6" height="2.0" /></element>
-		<element name="0.14" ref="cb9"><bounds x="34" y="22" width="1.6" height="2.0" /></element>
-		<element name="0.13" ref="cb0"><bounds x="37" y="22" width="1.8" height="2.0" /></element>
-		<element name="0.12" ref="cbj"><bounds x="40" y="22" width="1.6" height="2.0" /></element>
-		<element name="0.11" ref="cbq"><bounds x="43" y="22" width="1.6" height="2.0" /></element>
-		<element name="0.10" ref="cbk"><bounds x="46" y="22" width="1.6" height="2.0" /></element>
+		<element name="3.22" ref="cba"><bounds x="10.3" y="10" width="1.4" height="2.0" /></element>
+		<element name="3.21" ref="cb2"><bounds x="13.3" y="10" width="1.4" height="2.0" /></element>
+		<element name="3.20" ref="cb3"><bounds x="16.3" y="10" width="1.4" height="2.0" /></element>
+		<element name="3.19" ref="cb4"><bounds x="19.3" y="10" width="1.4" height="2.0" /></element>
+		<element name="3.18" ref="cb5"><bounds x="22.3" y="10" width="1.4" height="2.0" /></element>
+		<element name="3.17" ref="cb6"><bounds x="25.3" y="10" width="1.4" height="2.0" /></element>
+		<element name="3.16" ref="cb7"><bounds x="28.3" y="10" width="1.4" height="2.0" /></element>
+		<element name="3.15" ref="cb8"><bounds x="31.3" y="10" width="1.4" height="2.0" /></element>
+		<element name="3.14" ref="cb9"><bounds x="34.3" y="10" width="1.4" height="2.0" /></element>
+		<element name="3.13" ref="cb0"><bounds x="37.3" y="10" width="1.4" height="2.0" /></element>
+		<element name="3.12" ref="cbj"><bounds x="40.3" y="10" width="1.4" height="2.0" /></element>
+		<element name="3.11" ref="cbq"><bounds x="43.3" y="10" width="1.4" height="2.0" /></element>
+		<element name="3.10" ref="cbk"><bounds x="46.3" y="10" width="1.4" height="2.0" /></element>
+		<element name="2.22" ref="cra"><bounds x="10.3" y="14" width="1.4" height="2.0" /></element>
+		<element name="2.21" ref="cr2"><bounds x="13.3" y="14" width="1.4" height="2.0" /></element>
+		<element name="2.20" ref="cr3"><bounds x="16.3" y="14" width="1.4" height="2.0" /></element>
+		<element name="2.19" ref="cr4"><bounds x="19.3" y="14" width="1.4" height="2.0" /></element>
+		<element name="2.18" ref="cr5"><bounds x="22.3" y="14" width="1.4" height="2.0" /></element>
+		<element name="2.17" ref="cr6"><bounds x="25.3" y="14" width="1.4" height="2.0" /></element>
+		<element name="2.16" ref="cr7"><bounds x="28.3" y="14" width="1.4" height="2.0" /></element>
+		<element name="2.15" ref="cr8"><bounds x="31.3" y="14" width="1.4" height="2.0" /></element>
+		<element name="2.14" ref="cr9"><bounds x="34.3" y="14" width="1.4" height="2.0" /></element>
+		<element name="2.13" ref="cr0"><bounds x="37.3" y="14" width="1.4" height="2.0" /></element>
+		<element name="2.12" ref="crj"><bounds x="40.3" y="14" width="1.4" height="2.0" /></element>
+		<element name="2.11" ref="crq"><bounds x="43.3" y="14" width="1.4" height="2.0" /></element>
+		<element name="2.10" ref="crk"><bounds x="46.3" y="14" width="1.4" height="2.0" /></element>
+		<element name="1.22" ref="cra"><bounds x="10.3" y="18" width="1.4" height="2.0" /></element>
+		<element name="1.21" ref="cr2"><bounds x="13.3" y="18" width="1.4" height="2.0" /></element>
+		<element name="1.20" ref="cr3"><bounds x="16.3" y="18" width="1.4" height="2.0" /></element>
+		<element name="1.19" ref="cr4"><bounds x="19.3" y="18" width="1.4" height="2.0" /></element>
+		<element name="1.18" ref="cr5"><bounds x="22.3" y="18" width="1.4" height="2.0" /></element>
+		<element name="1.17" ref="cr6"><bounds x="25.3" y="18" width="1.4" height="2.0" /></element>
+		<element name="1.16" ref="cr7"><bounds x="28.3" y="18" width="1.4" height="2.0" /></element>
+		<element name="1.15" ref="cr8"><bounds x="31.3" y="18" width="1.4" height="2.0" /></element>
+		<element name="1.14" ref="cr9"><bounds x="34.3" y="18" width="1.4" height="2.0" /></element>
+		<element name="1.13" ref="cr0"><bounds x="37.3" y="18" width="1.4" height="2.0" /></element>
+		<element name="1.12" ref="crj"><bounds x="40.3" y="18" width="1.4" height="2.0" /></element>
+		<element name="1.11" ref="crq"><bounds x="43.3" y="18" width="1.4" height="2.0" /></element>
+		<element name="1.10" ref="crk"><bounds x="46.3" y="18" width="1.4" height="2.0" /></element>
+		<element name="0.22" ref="cba"><bounds x="10.3" y="22" width="1.4" height="2.0" /></element>
+		<element name="0.21" ref="cb2"><bounds x="13.3" y="22" width="1.4" height="2.0" /></element>
+		<element name="0.20" ref="cb3"><bounds x="16.3" y="22" width="1.4" height="2.0" /></element>
+		<element name="0.19" ref="cb4"><bounds x="19.3" y="22" width="1.4" height="2.0" /></element>
+		<element name="0.18" ref="cb5"><bounds x="22.3" y="22" width="1.4" height="2.0" /></element>
+		<element name="0.17" ref="cb6"><bounds x="25.3" y="22" width="1.4" height="2.0" /></element>
+		<element name="0.16" ref="cb7"><bounds x="28.3" y="22" width="1.4" height="2.0" /></element>
+		<element name="0.15" ref="cb8"><bounds x="31.3" y="22" width="1.4" height="2.0" /></element>
+		<element name="0.14" ref="cb9"><bounds x="34.3" y="22" width="1.4" height="2.0" /></element>
+		<element name="0.13" ref="cb0"><bounds x="37.3" y="22" width="1.4" height="2.0" /></element>
+		<element name="0.12" ref="cbj"><bounds x="40.3" y="22" width="1.4" height="2.0" /></element>
+		<element name="0.11" ref="cbq"><bounds x="43.3" y="22" width="1.4" height="2.0" /></element>
+		<element name="0.10" ref="cbk"><bounds x="46.3" y="22" width="1.4" height="2.0" /></element>
 
-		<element name="3.22" ref="sym_spade"><bounds x="10" y="12" width="2.5" height="1.58" /></element>
-		<element name="3.21" ref="sym_spade"><bounds x="13" y="12" width="2.5" height="1.58" /></element>
-		<element name="3.20" ref="sym_spade"><bounds x="16" y="12" width="2.5" height="1.58" /></element>
-		<element name="3.19" ref="sym_spade"><bounds x="19" y="12" width="2.5" height="1.58" /></element>
-		<element name="3.18" ref="sym_spade"><bounds x="22" y="12" width="2.5" height="1.58" /></element>
-		<element name="3.17" ref="sym_spade"><bounds x="25" y="12" width="2.5" height="1.58" /></element>
-		<element name="3.16" ref="sym_spade"><bounds x="28" y="12" width="2.5" height="1.58" /></element>
-		<element name="3.15" ref="sym_spade"><bounds x="31" y="12" width="2.5" height="1.58" /></element>
-		<element name="3.14" ref="sym_spade"><bounds x="34" y="12" width="2.5" height="1.58" /></element>
-		<element name="3.13" ref="sym_spade"><bounds x="37" y="12" width="2.5" height="1.58" /></element>
-		<element name="3.12" ref="sym_spade"><bounds x="40" y="12" width="2.5" height="1.58" /></element>
-		<element name="3.11" ref="sym_spade"><bounds x="43" y="12" width="2.5" height="1.58" /></element>
-		<element name="3.10" ref="sym_spade"><bounds x="46" y="12" width="2.5" height="1.58" /></element>
-		<element name="2.22" ref="sym_heart"><bounds x="10" y="16" width="2.5" height="1.58" /></element>
-		<element name="2.21" ref="sym_heart"><bounds x="13" y="16" width="2.5" height="1.58" /></element>
-		<element name="2.20" ref="sym_heart"><bounds x="16" y="16" width="2.5" height="1.58" /></element>
-		<element name="2.19" ref="sym_heart"><bounds x="19" y="16" width="2.5" height="1.58" /></element>
-		<element name="2.18" ref="sym_heart"><bounds x="22" y="16" width="2.5" height="1.58" /></element>
-		<element name="2.17" ref="sym_heart"><bounds x="25" y="16" width="2.5" height="1.58" /></element>
-		<element name="2.16" ref="sym_heart"><bounds x="28" y="16" width="2.5" height="1.58" /></element>
-		<element name="2.15" ref="sym_heart"><bounds x="31" y="16" width="2.5" height="1.58" /></element>
-		<element name="2.14" ref="sym_heart"><bounds x="34" y="16" width="2.5" height="1.58" /></element>
-		<element name="2.13" ref="sym_heart"><bounds x="37" y="16" width="2.5" height="1.58" /></element>
-		<element name="2.12" ref="sym_heart"><bounds x="40" y="16" width="2.5" height="1.58" /></element>
-		<element name="2.11" ref="sym_heart"><bounds x="43" y="16" width="2.5" height="1.58" /></element>
-		<element name="2.10" ref="sym_heart"><bounds x="46" y="16" width="2.5" height="1.58" /></element>
-		<element name="1.22" ref="sym_diamond"><bounds x="10" y="20" width="2.5" height="1.58" /></element>
-		<element name="1.21" ref="sym_diamond"><bounds x="13" y="20" width="2.5" height="1.58" /></element>
-		<element name="1.20" ref="sym_diamond"><bounds x="16" y="20" width="2.5" height="1.58" /></element>
-		<element name="1.19" ref="sym_diamond"><bounds x="19" y="20" width="2.5" height="1.58" /></element>
-		<element name="1.18" ref="sym_diamond"><bounds x="22" y="20" width="2.5" height="1.58" /></element>
-		<element name="1.17" ref="sym_diamond"><bounds x="25" y="20" width="2.5" height="1.58" /></element>
-		<element name="1.16" ref="sym_diamond"><bounds x="28" y="20" width="2.5" height="1.58" /></element>
-		<element name="1.15" ref="sym_diamond"><bounds x="31" y="20" width="2.5" height="1.58" /></element>
-		<element name="1.14" ref="sym_diamond"><bounds x="34" y="20" width="2.5" height="1.58" /></element>
-		<element name="1.13" ref="sym_diamond"><bounds x="37" y="20" width="2.5" height="1.58" /></element>
-		<element name="1.12" ref="sym_diamond"><bounds x="40" y="20" width="2.5" height="1.58" /></element>
-		<element name="1.11" ref="sym_diamond"><bounds x="43" y="20" width="2.5" height="1.58" /></element>
-		<element name="1.10" ref="sym_diamond"><bounds x="46" y="20" width="2.5" height="1.58" /></element>
-		<element name="0.22" ref="sym_club"><bounds x="10" y="24" width="2.5" height="1.58" /></element>
-		<element name="0.21" ref="sym_club"><bounds x="13" y="24" width="2.5" height="1.58" /></element>
-		<element name="0.20" ref="sym_club"><bounds x="16" y="24" width="2.5" height="1.58" /></element>
-		<element name="0.19" ref="sym_club"><bounds x="19" y="24" width="2.5" height="1.58" /></element>
-		<element name="0.18" ref="sym_club"><bounds x="22" y="24" width="2.5" height="1.58" /></element>
-		<element name="0.17" ref="sym_club"><bounds x="25" y="24" width="2.5" height="1.58" /></element>
-		<element name="0.16" ref="sym_club"><bounds x="28" y="24" width="2.5" height="1.58" /></element>
-		<element name="0.15" ref="sym_club"><bounds x="31" y="24" width="2.5" height="1.58" /></element>
-		<element name="0.14" ref="sym_club"><bounds x="34" y="24" width="2.5" height="1.58" /></element>
-		<element name="0.13" ref="sym_club"><bounds x="37" y="24" width="2.5" height="1.58" /></element>
-		<element name="0.12" ref="sym_club"><bounds x="40" y="24" width="2.5" height="1.58" /></element>
-		<element name="0.11" ref="sym_club"><bounds x="43" y="24" width="2.5" height="1.58" /></element>
-		<element name="0.10" ref="sym_club"><bounds x="46" y="24" width="2.5" height="1.58" /></element>
+		<element name="3.22" ref="sym_spade"><bounds x="10" y="12" width="2.4" height="1.58" /></element>
+		<element name="3.21" ref="sym_spade"><bounds x="13" y="12" width="2.4" height="1.58" /></element>
+		<element name="3.20" ref="sym_spade"><bounds x="16" y="12" width="2.4" height="1.58" /></element>
+		<element name="3.19" ref="sym_spade"><bounds x="19" y="12" width="2.4" height="1.58" /></element>
+		<element name="3.18" ref="sym_spade"><bounds x="22" y="12" width="2.4" height="1.58" /></element>
+		<element name="3.17" ref="sym_spade"><bounds x="25" y="12" width="2.4" height="1.58" /></element>
+		<element name="3.16" ref="sym_spade"><bounds x="28" y="12" width="2.4" height="1.58" /></element>
+		<element name="3.15" ref="sym_spade"><bounds x="31" y="12" width="2.4" height="1.58" /></element>
+		<element name="3.14" ref="sym_spade"><bounds x="34" y="12" width="2.4" height="1.58" /></element>
+		<element name="3.13" ref="sym_spade"><bounds x="37" y="12" width="2.4" height="1.58" /></element>
+		<element name="3.12" ref="sym_spade"><bounds x="40" y="12" width="2.4" height="1.58" /></element>
+		<element name="3.11" ref="sym_spade"><bounds x="43" y="12" width="2.4" height="1.58" /></element>
+		<element name="3.10" ref="sym_spade"><bounds x="46" y="12" width="2.4" height="1.58" /></element>
+		<element name="2.22" ref="sym_heart"><bounds x="10" y="16" width="2.4" height="1.58" /></element>
+		<element name="2.21" ref="sym_heart"><bounds x="13" y="16" width="2.4" height="1.58" /></element>
+		<element name="2.20" ref="sym_heart"><bounds x="16" y="16" width="2.4" height="1.58" /></element>
+		<element name="2.19" ref="sym_heart"><bounds x="19" y="16" width="2.4" height="1.58" /></element>
+		<element name="2.18" ref="sym_heart"><bounds x="22" y="16" width="2.4" height="1.58" /></element>
+		<element name="2.17" ref="sym_heart"><bounds x="25" y="16" width="2.4" height="1.58" /></element>
+		<element name="2.16" ref="sym_heart"><bounds x="28" y="16" width="2.4" height="1.58" /></element>
+		<element name="2.15" ref="sym_heart"><bounds x="31" y="16" width="2.4" height="1.58" /></element>
+		<element name="2.14" ref="sym_heart"><bounds x="34" y="16" width="2.4" height="1.58" /></element>
+		<element name="2.13" ref="sym_heart"><bounds x="37" y="16" width="2.4" height="1.58" /></element>
+		<element name="2.12" ref="sym_heart"><bounds x="40" y="16" width="2.4" height="1.58" /></element>
+		<element name="2.11" ref="sym_heart"><bounds x="43" y="16" width="2.4" height="1.58" /></element>
+		<element name="2.10" ref="sym_heart"><bounds x="46" y="16" width="2.4" height="1.58" /></element>
+		<element name="1.22" ref="sym_diamond"><bounds x="10" y="20" width="2.4" height="1.58" /></element>
+		<element name="1.21" ref="sym_diamond"><bounds x="13" y="20" width="2.4" height="1.58" /></element>
+		<element name="1.20" ref="sym_diamond"><bounds x="16" y="20" width="2.4" height="1.58" /></element>
+		<element name="1.19" ref="sym_diamond"><bounds x="19" y="20" width="2.4" height="1.58" /></element>
+		<element name="1.18" ref="sym_diamond"><bounds x="22" y="20" width="2.4" height="1.58" /></element>
+		<element name="1.17" ref="sym_diamond"><bounds x="25" y="20" width="2.4" height="1.58" /></element>
+		<element name="1.16" ref="sym_diamond"><bounds x="28" y="20" width="2.4" height="1.58" /></element>
+		<element name="1.15" ref="sym_diamond"><bounds x="31" y="20" width="2.4" height="1.58" /></element>
+		<element name="1.14" ref="sym_diamond"><bounds x="34" y="20" width="2.4" height="1.58" /></element>
+		<element name="1.13" ref="sym_diamond"><bounds x="37" y="20" width="2.4" height="1.58" /></element>
+		<element name="1.12" ref="sym_diamond"><bounds x="40" y="20" width="2.4" height="1.58" /></element>
+		<element name="1.11" ref="sym_diamond"><bounds x="43" y="20" width="2.4" height="1.58" /></element>
+		<element name="1.10" ref="sym_diamond"><bounds x="46" y="20" width="2.4" height="1.58" /></element>
+		<element name="0.22" ref="sym_club"><bounds x="10" y="24" width="2.4" height="1.58" /></element>
+		<element name="0.21" ref="sym_club"><bounds x="13" y="24" width="2.4" height="1.58" /></element>
+		<element name="0.20" ref="sym_club"><bounds x="16" y="24" width="2.4" height="1.58" /></element>
+		<element name="0.19" ref="sym_club"><bounds x="19" y="24" width="2.4" height="1.58" /></element>
+		<element name="0.18" ref="sym_club"><bounds x="22" y="24" width="2.4" height="1.58" /></element>
+		<element name="0.17" ref="sym_club"><bounds x="25" y="24" width="2.4" height="1.58" /></element>
+		<element name="0.16" ref="sym_club"><bounds x="28" y="24" width="2.4" height="1.58" /></element>
+		<element name="0.15" ref="sym_club"><bounds x="31" y="24" width="2.4" height="1.58" /></element>
+		<element name="0.14" ref="sym_club"><bounds x="34" y="24" width="2.4" height="1.58" /></element>
+		<element name="0.13" ref="sym_club"><bounds x="37" y="24" width="2.4" height="1.58" /></element>
+		<element name="0.12" ref="sym_club"><bounds x="40" y="24" width="2.4" height="1.58" /></element>
+		<element name="0.11" ref="sym_club"><bounds x="43" y="24" width="2.4" height="1.58" /></element>
+		<element name="0.10" ref="sym_club"><bounds x="46" y="24" width="2.4" height="1.58" /></element>
+	</group>
 
+
+<!-- buttons -->
+
+	<element name="white"><rect><color red="0.95" green="0.95" blue="0.95" /></rect></element>
+	<element name="gray"><rect><color red="0.5" green="0.5" blue="0.5" /></rect></element>
+	<element name="yellow"><rect><color red="0.85" green="0.65" blue="0.1" /></rect></element>
+	<element name="red"><rect><color red="0.85" green="0.25" blue="0.1" /></rect></element>
+
+	<element name="text_l1"><text string="DRAW"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_l2"><text string="SELECT"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_l3"><text string="DISCARD"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_l4"><text string="DEAL"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_l4a"><text string="GIN"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_l5"><text string="COMP."><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_l6"><text string="SCORE"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+
+	<element name="hlb" defstate="0"><rect state="1"><color red="0" green="0" blue="0" /></rect></element>
+
+	<group name="buttons">
+		<bounds x="0" y="0" width="40" height="40" />
+
+		<element ref="white"><bounds xc="10" yc="10" width="4.5" height="3.5" /></element>
+		<element ref="white"><bounds xc="18" yc="10" width="4.5" height="3.5" /></element>
+		<element ref="white"><bounds xc="26" yc="10" width="4.5" height="3.5" /></element>
+		<element ref="white"><bounds xc="10" yc="19" width="4.5" height="3.5" /></element>
+		<element ref="white"><bounds xc="18" yc="19" width="4.5" height="3.5" /></element>
+		<element ref="white"><bounds xc="26" yc="19" width="4.5" height="3.5" /></element>
+
+		<element ref="gray"><bounds xc="10" yc="10" width="4" height="3" /></element>
+		<element ref="gray"><bounds xc="18" yc="10" width="4" height="3" /></element>
+		<element ref="yellow"><bounds xc="26" yc="10" width="4" height="3" /></element>
+		<element ref="gray"><bounds xc="10" yc="19" width="4" height="3" /></element>
+		<element ref="gray"><bounds xc="18" yc="19" width="4" height="3" /></element>
+		<element ref="red"><bounds xc="26" yc="19" width="4" height="3" /></element>
+
+		<element ref="text_l1"><bounds xc="10" yc="6.7" width="10" height="2.2" /></element>
+		<element ref="text_l2"><bounds xc="18" yc="6.7" width="10" height="2.2" /></element>
+		<element ref="text_l3"><bounds xc="26" yc="6.7" width="10" height="2.2" /></element>
+		<element ref="text_l4"><bounds xc="10" yc="15.7" width="10" height="2.2" /></element>
+		<element ref="text_l5"><bounds xc="18" yc="15.7" width="10" height="2.2" /></element>
+		<element ref="text_l6"><bounds xc="26" yc="15.7" width="10" height="2.2" /></element>
+		<element ref="text_l4a"><bounds xc="10" yc="22.2" width="10" height="2.2" /></element>
+
+		<element ref="hlb" inputtag="IN.0" inputmask="0x08"><bounds xc="10" yc="10" width="4" height="3" /><color alpha="0.25" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds xc="18" yc="10" width="4" height="3" /><color alpha="0.25" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x04"><bounds xc="26" yc="10" width="4" height="3" /><color alpha="0.25" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds xc="10" yc="19" width="4" height="3" /><color alpha="0.25" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x01"><bounds xc="18" yc="19" width="4" height="3" /><color alpha="0.25" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x02"><bounds xc="26" yc="19" width="4" height="3" /><color alpha="0.25" /></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout (Full)">
+		<bounds left="-0.5" right="77.5" top="-0.5" bottom="20.5" />
+
+		<element ref="white"><bounds x="-0.5" y="-0.5" width="46.5" height="21.0" /></element>
+		<group ref="display"><bounds x="0" y="0" width="45.5" height="20.0" /></group>
+
+		<group ref="buttons"><bounds x="41.5" y="-6.3" width="45" height="45" /></group>
 	</view>
+
+	<view name="Internal Layout (Screen)">
+		<bounds x="0" y="0" width="45.5" height="20.0" />
+		<group ref="display"><bounds x="0" y="0" width="45.5" height="20.0" /></group>
+	</view>
+
 </mamelayout>

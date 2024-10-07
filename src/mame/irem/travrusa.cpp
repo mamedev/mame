@@ -86,8 +86,8 @@ public:
 	void init_shtridrb();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -114,8 +114,8 @@ private:
 	void set_scroll();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void program_map(address_map &map);
-	void shtriderb_io_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void shtriderb_io_map(address_map &map) ATTR_COLD;
 };
 
 

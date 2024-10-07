@@ -117,8 +117,8 @@ public:
 	void cgang(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -165,8 +165,8 @@ private:
 	TIMER_CALLBACK_MEMBER(output_sol) { m_en_sol[param >> 1] = param & 1; }
 
 	// address maps
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void main_irq_w(int state);

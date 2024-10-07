@@ -78,12 +78,12 @@ private:
 	[[maybe_unused]]u8 bic_r(offs_t offset);
 	[[maybe_unused]]void bic_w(offs_t offset, u8 data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void recel_map(address_map &map);
-	void recel_data(address_map &map);
-	void recel_io(address_map &map);
+	void recel_map(address_map &map) ATTR_COLD;
+	void recel_data(address_map &map) ATTR_COLD;
+	void recel_io(address_map &map) ATTR_COLD;
 
 	required_device<pps4_2_device> m_maincpu;
 	required_region_ptr<u8> m_pm;

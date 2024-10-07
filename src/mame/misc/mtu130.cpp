@@ -53,7 +53,7 @@ public:
 	virtual const char *file_extensions() const noexcept override { return "rom,bin"; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
@@ -108,9 +108,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(break_w);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	class memory_interface : public m6502_device::memory_interface {
@@ -188,7 +188,7 @@ private:
 	bool m_fdc_irq_enabled;
 
 	static void floppies(device_slot_interface &device);
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	void extension_board(machine_config &config, int slot_id, const char *tag, const char *def);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

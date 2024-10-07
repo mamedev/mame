@@ -26,10 +26,12 @@ Year + Game                                   PCB        CPU    Sound           
 99  Tarzan (V107)                             NO-0228?   Z180   U6295           IGS031 IGS025 IGS029  Battery
 99  Tarzan (V109C)                            NO-0248-1  Z180   U6295           IGS031 IGS025         Battery
 00  Chaoji Damanguan 2 - Jiaqiang Ban (V100C) NO-0271    68000  K668            IGS031 IGS025         Battery
+00? Jungle King (V103A)                       NO-0230-1  Z180   U6295           IGS031 IGS025 (N9)    Battery
 00? Super Tarzan (V100I)                      NO-0230-1  Z180   K668            IGS031 IGS025         Battery
 00? Happy Skill (V611IT)                      NO-0281    Z180   K668            IGS031 IGS025         Battery
 00? Champion Poker 2 (V100A)                  unreadable Z180   M6295           IGS031 IGS025         Battery
 00? Super Poker (V100xD03) / Formosa          NO-0187    Z180   K668    U3567   IGS017 IGS025         Battery
+00? Jungle King (V302US)                      NO-0214-7  68000  K668            IGS031 IGS025 IGS029  Battery
 -------------------------------------------------------------------------------------------------------------
                                                                          not present in another set *
 To Do:
@@ -37,6 +39,7 @@ To Do:
 - Protection emulation in some games, instead of patching the roms.
 - NVRAM.
 - mgcs: Finish IGS029 protection simulation.
+- jking302us: IGS025 and IGS029 protection simulation.
 
 Notes:
 
@@ -104,8 +107,8 @@ public:
 	u8 data_r();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -172,8 +175,8 @@ public:
 	void dump(const char *filename, u32 string_addr, u32 xor_addr, bool is_16bits) const;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_memory_region m_region_key;
@@ -321,8 +324,8 @@ public:
 	void set_val_xor(u16 val_xor);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u8 m_m3 = 0, m_mf = 0;
@@ -486,8 +489,8 @@ public:
 	void dec_w(u8 data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u8 m_val = 0;
@@ -554,8 +557,8 @@ public:
 	void inc_w(u8 data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u8 m_val = 0;
@@ -644,6 +647,7 @@ public:
 	void tarzan(machine_config &config);
 	void tjsb(machine_config &config);
 	// 68000
+	void jking302us(machine_config &config);
 	void lhzb2(machine_config &config);
 	void lhzb2a(machine_config &config);
 	void mgcs(machine_config &config);
@@ -658,6 +662,8 @@ public:
 	void init_cpoker2();
 	void init_happyskl();
 	void init_iqblocka();
+	void init_jking103a();
+	void init_jking302us();
 	void init_lhzb2();
 	void init_lhzb2a();
 	void init_mgcs();
@@ -675,9 +681,9 @@ public:
 	void init_tjsb();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	int m_remap_addr;
@@ -851,46 +857,48 @@ private:
 	void spkrform_patch_rom();
 
 	// Memory maps
-	void decrypted_opcodes_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
-	void igs_bitswap_mux_map(address_map &map);
-	void igs_fixed_data_mux_map(address_map &map);
-	void igs_string_mux_map(address_map &map);
+	void igs_bitswap_mux_map(address_map &map) ATTR_COLD;
+	void igs_fixed_data_mux_map(address_map &map) ATTR_COLD;
+	void igs_string_mux_map(address_map &map) ATTR_COLD;
 
-	void cpoker2_io(address_map &map);
-	void cpoker2_map(address_map &map);
-	void cpoker2_mux_map(address_map &map);
-	void happyskl_io(address_map &map);
-	void happyskl_mux_map(address_map &map);
-	void iqblocka_io(address_map &map);
-	void iqblocka_map(address_map &map);
-	void iqblocka_mux_map(address_map &map);
-	void iqblockf_mux_map(address_map &map);
-	void lhzb2_map(address_map &map);
-	void lhzb2_mux_map(address_map &map);
-	void lhzb2a_map(address_map &map);
-	void lhzb2a_mux_map(address_map &map);
-	void mgcs_map(address_map &map);
-	void mgcs_mux_map(address_map &map);
-	void mgcsa_map(address_map &map);
-	void mgdh_mux_map(address_map &map);
-	void mgdh_map(address_map &map);
-	void mgdha_mux_map(address_map &map);
-	void sdmg2_map(address_map &map);
-	void sdmg2_mux_map(address_map &map);
-	void sdmg2p_map(address_map &map);
-	void sdmg2p_mux_map(address_map &map);
-	void slqz2_map(address_map &map);
-	void slqz2_mux_map(address_map &map);
-	void spkrform_io(address_map &map);
-	void spkrform_mux_map(address_map &map);
-	void starzan_io(address_map &map);
-	void starzan_mux_map(address_map &map);
-	void tarzan_io(address_map &map);
-	void tarzan_mux_map(address_map &map);
-	void tjsb_io(address_map &map);
-	void tjsb_map(address_map &map);
-	void tjsb_mux_map(address_map &map);
+	void cpoker2_io(address_map &map) ATTR_COLD;
+	void cpoker2_map(address_map &map) ATTR_COLD;
+	void cpoker2_mux_map(address_map &map) ATTR_COLD;
+	void happyskl_io(address_map &map) ATTR_COLD;
+	void happyskl_mux_map(address_map &map) ATTR_COLD;
+	void iqblocka_io(address_map &map) ATTR_COLD;
+	void iqblocka_map(address_map &map) ATTR_COLD;
+	void iqblocka_mux_map(address_map &map) ATTR_COLD;
+	void iqblockf_mux_map(address_map &map) ATTR_COLD;
+	void jking302us_map(address_map &map) ATTR_COLD;
+	void jking302us_mux_map(address_map &map) ATTR_COLD;
+	void lhzb2_map(address_map &map) ATTR_COLD;
+	void lhzb2_mux_map(address_map &map) ATTR_COLD;
+	void lhzb2a_map(address_map &map) ATTR_COLD;
+	void lhzb2a_mux_map(address_map &map) ATTR_COLD;
+	void mgcs_map(address_map &map) ATTR_COLD;
+	void mgcs_mux_map(address_map &map) ATTR_COLD;
+	void mgcsa_map(address_map &map) ATTR_COLD;
+	void mgdh_mux_map(address_map &map) ATTR_COLD;
+	void mgdh_map(address_map &map) ATTR_COLD;
+	void mgdha_mux_map(address_map &map) ATTR_COLD;
+	void sdmg2_map(address_map &map) ATTR_COLD;
+	void sdmg2_mux_map(address_map &map) ATTR_COLD;
+	void sdmg2p_map(address_map &map) ATTR_COLD;
+	void sdmg2p_mux_map(address_map &map) ATTR_COLD;
+	void slqz2_map(address_map &map) ATTR_COLD;
+	void slqz2_mux_map(address_map &map) ATTR_COLD;
+	void spkrform_io(address_map &map) ATTR_COLD;
+	void spkrform_mux_map(address_map &map) ATTR_COLD;
+	void starzan_io(address_map &map) ATTR_COLD;
+	void starzan_mux_map(address_map &map) ATTR_COLD;
+	void tarzan_io(address_map &map) ATTR_COLD;
+	void tarzan_mux_map(address_map &map) ATTR_COLD;
+	void tjsb_io(address_map &map) ATTR_COLD;
+	void tjsb_map(address_map &map) ATTR_COLD;
+	void tjsb_mux_map(address_map &map) ATTR_COLD;
 };
 
 void igs017_state::machine_start()
@@ -1324,6 +1332,15 @@ void igs017_state::init_starzan()
 	m_igs017_igs031->starzan_decrypt_sprites(0x200000, 0x400000);
 
 //  m_igs_string->dump("starzan_string.key", 0xa86f, 0xa966, false);
+}
+
+void igs017_state::init_jking103a()
+{
+	starzan_decrypt_program_rom();
+	m_igs017_igs031->tarzan_decrypt_tiles(1);
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+
+// m_igs_string->dump("jking103a_string.key", 0xb14d, 0xb244, false);
 }
 
 
@@ -1813,6 +1830,72 @@ void igs017_state::init_spkrform()
 	spkrform_patch_rom();
 
 //  m_igs_string->dump("spkrform_string.key", 0x9dec, 0x9d00, false);
+}
+
+
+void igs017_state::init_jking302us()
+{
+	const int rom_size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = rom[i];
+
+		// bit 0 xor layer
+
+		if (i & 0x0020 / 2)
+			if (i & 0x0002/ 2)
+				x ^= 0x0001;
+
+		if (!(i & 0x4000 / 2))
+			if (!(i & 0x0300 / 2))
+				x ^= 0x0001;
+
+		// bit 9 xor layer
+
+		if (i & 0x1000 / 2)
+		{
+			if (i & 0x0400 / 2)
+				if (i & 0x0008 / 2)
+					x ^= 0x0200;
+		}
+		else
+		{
+			if (i & 0x4000 / 2)
+			{
+				if (i & 0x0080 / 2)
+					x ^= 0x0200;
+				else
+				{
+					if (i & 0x0400 / 2)
+						if (i & 0x0008 / 2)
+							x ^= 0x0200;
+				}
+			}
+			else
+			{
+				if (!(i & 0x0400 / 2))
+				{
+					if (i & 0x0080 / 2)
+						if (i & 0x0004/ 2)
+							x ^= 0x0200;
+				}
+				else
+				{
+					if ((i & 0x0008 / 2) || ((i & 0x008c / 2) == 0x0084 /2))
+						x ^= 0x0200;
+				}
+			}
+		}
+
+		rom[i] = x;
+	}
+
+	m_igs017_igs031->tarzan_decrypt_tiles(1); // TODO: verify once it works
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0); // TODO: verify once it works
+
+// m_igs_string->dump("jking103a_string.key", 0xb14d, 0xb244, false); // TODO
 }
 
 /***************************************************************************
@@ -2801,6 +2884,31 @@ void igs017_state::slqz2_mux_map(address_map &map)
 	map(0x01, 0x01).portr("PLAYER1").w(NAME((&igs017_state::igs022_execute_w<6, 0xbf>)));
 	map(0x02, 0x02).r(FUNC(igs017_state::slqz2_scramble_data_r));
 	map(0x03, 0x03).w(FUNC(igs017_state::mgcs_scramble_data_w));
+
+	igs_string_mux_map(map); // 0x05 r, 0x20 - 0x27 w, 0x40 r
+}
+
+
+// jking302us
+
+void igs017_state::jking302us_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x103fff).ram();
+
+	map(0x638000, 0x638001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
+	map(0x638002, 0x638003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
+
+	map(0xb00000, 0xb0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
+
+	// map(0x912001, 0x912001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // TODO
+
+	// map(0xfff000, 0xf00003).rw(); // TODO
+}
+
+void igs017_state::jking302us_mux_map(address_map &map)
+{
+	// TODO
 
 	igs_string_mux_map(map); // 0x05 r, 0x20 - 0x27 w, 0x40 r
 }
@@ -4831,6 +4939,22 @@ void igs017_state::sdmg2p(machine_config &config)
 	IGS_STRING(config, m_igs_string, 0);
 }
 
+void igs017_state::jking302us(machine_config &config)
+{
+	base_machine_oki(config, 22_MHz_XTAL / 22);
+
+	M68000(config, m_maincpu, 22_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::jking302us_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgdh_interrupt), "screen", 0, 1);
+
+	// i/o
+	m_igs_mux->set_addrmap(0, &igs017_state::jking302us_mux_map);
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
+
+	IGS_STRING(config, m_igs_string, 0);
+}
+
 
 /***************************************************************************
                                 ROMs Loading
@@ -5680,6 +5804,28 @@ ROM_START( tarzanc )
 	ROM_LOAD( "tarzan_string.key", 0x00, 0xec, CRC(595fe40c) SHA1(0b46983400d237d8bde97a72eaa99b718a03387e) )
 ROM_END
 
+// IGS PCB NO-0248
+ROM_START( tarzanb ) // V110 TARZAN C
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "t.z._v110.u19", 0x00000, 0x40000, CRC(16026d12) SHA1(df08641b4bc1437648f0a8cd5f7a8a4786c07041) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", ROMREGION_ERASE00 )
+	ROM_LOAD( "igs_a2103_cg_v100f.u15", 0x000000, 0x200000, CRC(afe56ed5) SHA1(656cee6a59f2930eec9acd11b84b416cc7354e01) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "t.z._text_u5.u5", 0x00000, 0x80000, CRC(1724e039) SHA1(d628499b61f98f7c9034d70b82ee25e002190ece) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102_sp_v102.u14", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
+
+	ROM_REGION( 0x2dd * 2, "plds", ROMREGION_ERASE )
+	ROM_LOAD( "eg.u20", 0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "eg.u21", 0x2dd, 0x2dd, NO_DUMP )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "tarzanb_string.key", 0x00, 0xec, CRC(595fe40c) SHA1(0b46983400d237d8bde97a72eaa99b718a03387e) )
+ROM_END
+
 // sets below are guesswork, assembled from partial dumps...
 
 // IGS NO-0248-1? Mislabeled?
@@ -5727,27 +5873,6 @@ ROM_START( tarzana )
 	ROM_LOAD( "tarzan_string.key", 0x00, 0xec, CRC(595fe40c) SHA1(0b46983400d237d8bde97a72eaa99b718a03387e) )
 ROM_END
 
-// IGS PCB NO-0248
-ROM_START( tarzanb ) // V110 TARZAN C
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "t.z._v110.u19", 0x00000, 0x40000, CRC(16026d12) SHA1(df08641b4bc1437648f0a8cd5f7a8a4786c07041) )
-
-	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
-	ROM_LOAD( "igs_a2103_cg_v100f.u15", 0x00000, 0x400000, BAD_DUMP CRC(dcbff16f) SHA1(2bf77ef4448c26124c8d8d18bb7ffe4105cfa940) ) // using tarzanc's one for now, but versions differ
-
-	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "t.z._text_u5.u5", 0x00000, 0x80000, CRC(1724e039) SHA1(d628499b61f98f7c9034d70b82ee25e002190ece) )
-
-	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "igs_s2102_sp_v102.u14", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) ) // not dumped for this set, but same markings as tarzanc's one
-
-	ROM_REGION( 0x2dd * 2, "plds", ROMREGION_ERASE )
-	ROM_LOAD( "eg.u20", 0x000, 0x2dd, NO_DUMP )
-	ROM_LOAD( "eg.u21", 0x2dd, 0x2dd, NO_DUMP )
-
-	ROM_REGION( 0xec, "igs_string", 0 )
-	ROM_LOAD( "tarzanb_string.key", 0x00, 0xec, CRC(595fe40c) SHA1(0b46983400d237d8bde97a72eaa99b718a03387e) )
-ROM_END
 
 /***************************************************************************
 
@@ -5820,6 +5945,29 @@ ROM_START( starzan )
 	ROM_LOAD( "starzan_string.key", 0x00, 0xec, CRC(b33f5050) SHA1(900d3c48944dbdd95d9e48d74c355e82e00ac012) )
 ROM_END
 
+// default settings password is all start button
+ROM_START( jking103a )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "jungleking_v103a.u9", 0x00000, 0x40000, CRC(acd23f7e) SHA1(84d487c240d6773c81c04ee12a4aafa7e34affc7) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a2104_cg_v110.u3", 0x00000, 0x400000, CRC(dcbff16f) SHA1(2bf77ef4448c26124c8d8d18bb7ffe4105cfa940) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	// empty u2
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_t2105_cg_v110.u11", 0x00000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102_sp_v102.u8", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
+
+	ROM_REGION( 0x2dd * 2, "plds", ROMREGION_ERASE )
+	ROM_LOAD( "eg.u20", 0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "eg.u21", 0x2dd, 0x2dd, NO_DUMP )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "jking103a_string.key", 0x00, 0xec, BAD_DUMP CRC(8d288f5e) SHA1(19c184600d80838ef04be8ab29c93d91cf3161c9) ) // TODO: check this
+ROM_END
+
 
 /***************************************************************************
 
@@ -5855,18 +6003,17 @@ ROM_START( happyskl )
 ROM_END
 
 
-// PCB was heavily corroded and not working
+// dump confirmed from two PCBs
 ROM_START( cpoker2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "u9.bin", 0x00000, 0x40000, CRC(8d79eb4d) SHA1(9cad09013f83335ec78c3ff78715bc5d9a989eb7) )
+	ROM_LOAD( "champion_2_v100a.u9", 0x00000, 0x40000, CRC(8d79eb4d) SHA1(9cad09013f83335ec78c3ff78715bc5d9a989eb7) )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
-	// the following ROM wasn't readable on this PCB, but it's the same as the one in happyskl. Assuming same contents for now
-	ROM_LOAD( "igs_a2701_cg_v100.u3", 0x00000, 0x400000, BAD_DUMP CRC(f3756a51) SHA1(8dd4677584f309cec4b068be9f9370a7a172a031) ) // FIXED BITS (xxxxxxx0xxxxxxxx) - 1xxxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD( "igs_a2701_cg_v100.u3", 0x00000, 0x400000, CRC(f3756a51) SHA1(8dd4677584f309cec4b068be9f9370a7a172a031) )
 	// U2 (overlay) not populated
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "u11.bin", 0x00000, 0x80000, CRC(34475c83) SHA1(376ff68d89c25471483b074dcf7542f42f954e67) ) // 1xxxxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD( "champion_2_text.u11", 0x00000, 0x80000, CRC(34475c83) SHA1(376ff68d89c25471483b074dcf7542f42f954e67) ) // 1xxxxxxxxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "igs_s2702_sp_v100.u8", 0x00000, 0x80000, CRC(0ec9b1b5) SHA1(b8c7e068ddf6777a184339e6796be33e442a3df4) ) // same as happyskl
@@ -5917,29 +6064,55 @@ ROM_START( spkrform )
 	ROM_LOAD( "spkrform_string.key", 0x00, 0xec, CRC(17a9021a) SHA1(41943e08f9c9be49fc3705e6f2702d504ec6d078) )
 ROM_END
 
+// MADE IN TAIWAN IGS PCB NO-0214-7 (difficult to read due to corrosion, small chance it isn't 100% correct)
+// MC68HC000FN10 with 22 MHz XTAL, IGS031, IGS025 (stickered V9 and JK V302US), IGS029 with 8 MHz XTAL, K668, 2x 8_DIP bank, 11.0592 MHz XTAL
+ROM_START( jking302us )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "jungleking.u28", 0x00000, 0x80000, CRC(d926252e) SHA1(03a3e52cba5e5986b74f57a8798a55b53d73bfd3) )
+
+	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "jungleking_cg_.u22", 0x000000, 0x200000, CRC(4a92fc0e) SHA1(25bdd0b240a1cc80ac737893c417cfe9561623cd) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "jungeking_text.u26", 0x00000, 0x80000, CRC(45d22af4) SHA1(1dca31c5049a07b234b0266590e4869685bb6e76) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102_sp_v102.u14", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) ) // same as the earlier sets with Z180 CPU
+
+	ROM_REGION( 0x600, "plds", ROMREGION_ERASE00 ) // actually chip types unknown
+	ROM_LOAD( "dr_u6.u6",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "dr_u7.u7",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "dr_u18.u18", 0x000, 0x117, NO_DUMP )
+
+	ROM_REGION( 0xec, "igs_string", ROMREGION_ERASE00 )
+	//ROM_LOAD( "jking302us_string.key", 0x00, 0xec, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
-GAME ( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, init_iqblocka, ROT0, "IGS", "Shuzi Leyuan (China, V127M, gambling)",                             0 ) // 數字樂園
-GAME ( 1997,  iqblockf, iqblock,  iqblockf, iqblockf, igs017_state, init_iqblocka, ROT0, "IGS", "IQ Block (V113FR, gambling)",                                       0 )
-GAME ( 1997,  mgdh,     0,        mgdh,     mgdh,     igs017_state, init_mgdh,     ROT0, "IGS", "Manguan Daheng (Taiwan, V125T1)",                                   MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION) // 滿貫大亨, wrong colors in betting screen, game id check (patched out)
-GAME ( 1997,  mgdha,    mgdh,     mgdha,    mgdh,     igs017_state, init_mgdha,    ROT0, "IGS", "Manguan Daheng (Taiwan, V123T1)",                                   0 ) // 滿貫大亨
-GAME ( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, init_sdmg2,    ROT0, "IGS", "Chaoji Damanguan II (China, V754C)",                                0 ) // 超級大滿貫II
-GAME ( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, init_tjsb,     ROT0, "IGS", "Tian Jiang Shen Bing (China, V137C)",                               MACHINE_UNEMULATED_PROTECTION ) // 天將神兵, fails the bonus round protection check (if enabled via DSW), see e.g. demo mode
-GAME ( 1998,  genius6,  0,        genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS", "Genius 6 (V110F)",                                                  0 ) // shows Chinese text in puzzle game
-GAME ( 1997,  genius6a, genius6,  genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS", "Genius 6 (V133F)",                                                  0 ) // clone because it has older copyright year
-GAME ( 1997,  genius6b, genius6,  genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS", "Genius 6 (V132F)",                                                  0 ) // "
-GAME ( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, init_mgcs,     ROT0, "IGS", "Manguan Caishen (China, V103CS)",                                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
-GAME ( 1998,  mgcsa,    mgcs,     mgcsa,    mgcs,     igs017_state, init_mgcsa,    ROT0, "IGS", "Manguan Caishen (China, V106CS)",                                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
-GAME ( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, init_lhzb2,    ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                  MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
-GAME ( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, init_lhzb2a,   ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                 0 ) // 龙虎争霸2
-GAME ( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, init_slqz2,    ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",                        MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
-GAME ( 1998,  slqz2a,   slqz2,    slqz2,    slqz2,    igs017_state, init_slqz2,    ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, set 2)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
-GAME ( 1999,  tarzanc,  0,        tarzan,   tarzan,   igs017_state, init_tarzanc,  ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",                     0 ) // 泰山闯天关
-GAME ( 1999,  tarzan,   tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzan,   ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",                     MACHINE_NOT_WORKING ) // missing sprites and sound rom, imperfect tiles decryption
-GAME ( 1999,  tarzana,  tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzana,  ROT0, "IGS", "Tarzan (V107)",                                                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom
-GAME ( 1999,  tarzanb,  tarzanc,  tarzan,   tarzan,   igs017_state, init_tarzanc,  ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V110)",                             0 )
-GAME ( 2000,  sdmg2p,   0,        sdmg2p,   sdmg2p,   igs017_state, init_sdmg2p,   ROT0, "IGS", "Maque Wangchao / Chaoji Damanguan 2 - Jiaqiang Ban (China, V100C)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 麻雀王朝 / 超級大滿貫 2 -加強版 protection kicks in after starting game, hopper isn't hooked up correctly
-GAMEL( 2000?, starzan,  0,        starzan,  starzan,  igs017_state, init_starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                  0, layout_igsslot  )
-GAMEL( 2000?, happyskl, 0,        happyskl, happyskl, igs017_state, init_happyskl, ROT0, "IGS", "Happy Skill (Italy, V611IT)",                                       0, layout_igspoker )
-GAMEL( 2000?, cpoker2,  0,        cpoker2,  cpoker2,  igs017_state, init_cpoker2,  ROT0, "IGS", "Champion Poker 2 (V100A)",                                          0, layout_igspoker )
-GAME ( 2000?, spkrform, spk306us, spkrform, spkrform, igs017_state, init_spkrform, ROT0, "IGS", "Super Poker (V100xD03) / Formosa",                                  MACHINE_UNEMULATED_PROTECTION ) // poker game enabling forced with a patch. Parent spk306us in driver spoker.cpp
+GAME ( 1996,  iqblocka,   iqblock,  iqblocka,   iqblocka, igs017_state, init_iqblocka,   ROT0, "IGS", "Shuzi Leyuan (China, V127M, gambling)",                             0 ) // 數字樂園
+GAME ( 1997,  iqblockf,   iqblock,  iqblockf,   iqblockf, igs017_state, init_iqblocka,   ROT0, "IGS", "IQ Block (V113FR, gambling)",                                       0 )
+GAME ( 1997,  mgdh,       0,        mgdh,       mgdh,     igs017_state, init_mgdh,       ROT0, "IGS", "Manguan Daheng (Taiwan, V125T1)",                                   MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION) // 滿貫大亨, wrong colors in betting screen, game id check (patched out)
+GAME ( 1997,  mgdha,      mgdh,     mgdha,      mgdh,     igs017_state, init_mgdha,      ROT0, "IGS", "Manguan Daheng (Taiwan, V123T1)",                                   0 ) // 滿貫大亨
+GAME ( 1997,  sdmg2,      0,        sdmg2,      sdmg2,    igs017_state, init_sdmg2,      ROT0, "IGS", "Chaoji Damanguan II (China, V754C)",                                0 ) // 超級大滿貫II
+GAME ( 1997,  tjsb,       0,        tjsb,       tjsb,     igs017_state, init_tjsb,       ROT0, "IGS", "Tian Jiang Shen Bing (China, V137C)",                               MACHINE_UNEMULATED_PROTECTION ) // 天將神兵, fails the bonus round protection check (if enabled via DSW), see e.g. demo mode
+GAME ( 1998,  genius6,    0,        genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V110F)",                                                  0 ) // shows Chinese text in puzzle game
+GAME ( 1997,  genius6a,   genius6,  genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V133F)",                                                  0 ) // clone because it has older copyright year
+GAME ( 1997,  genius6b,   genius6,  genius6,    genius6,  igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V132F)",                                                  0 ) // "
+GAME ( 1998,  mgcs,       0,        mgcs,       mgcs,     igs017_state, init_mgcs,       ROT0, "IGS", "Manguan Caishen (China, V103CS)",                                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
+GAME ( 1998,  mgcsa,      mgcs,     mgcsa,      mgcs,     igs017_state, init_mgcsa,      ROT0, "IGS", "Manguan Caishen (China, V106CS)",                                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
+GAME ( 1998,  lhzb2,      0,        lhzb2,      lhzb2,    igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                  MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
+GAME ( 1998,  lhzb2a,     lhzb2,    lhzb2a,     lhzb2a,   igs017_state, init_lhzb2a,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                 0 ) // 龙虎争霸2
+GAME ( 1998,  slqz2,      0,        slqz2,      slqz2,    igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",                        MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
+GAME ( 1998,  slqz2a,     slqz2,    slqz2,      slqz2,    igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, set 2)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
+GAME ( 1999,  tarzanc,    0,        tarzan,     tarzan,   igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",                     0 ) // 泰山闯天关
+GAME ( 1999,  tarzan,     tarzanc,  tarzan,     tarzan,   igs017_state, init_tarzan,     ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",                     MACHINE_NOT_WORKING ) // missing sprites and sound rom, imperfect tiles decryption
+GAME ( 1999,  tarzana,    tarzanc,  tarzan,     tarzan,   igs017_state, init_tarzana,    ROT0, "IGS", "Tarzan (V107)",                                                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom
+GAME ( 1999,  tarzanb,    tarzanc,  tarzan,     tarzan,   igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V110)",                             0 )
+GAME ( 2000,  sdmg2p,     0,        sdmg2p,     sdmg2p,   igs017_state, init_sdmg2p,     ROT0, "IGS", "Maque Wangchao / Chaoji Damanguan 2 - Jiaqiang Ban (China, V100C)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 麻雀王朝 / 超級大滿貫 2 -加強版 protection kicks in after starting game, hopper isn't hooked up correctly
+GAMEL( 2000?, starzan,    0,        starzan,    starzan,  igs017_state, init_starzan,    ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                  0, layout_igsslot  )
+GAMEL( 2000?, jking103a,  starzan,  starzan,    starzan,  igs017_state, init_jking103a,  ROT0, "IGS", "Jungle King (V103A)",                                               0, layout_igsslot )
+GAMEL( 2000?, happyskl,   0,        happyskl,   happyskl, igs017_state, init_happyskl,   ROT0, "IGS", "Happy Skill (Italy, V611IT)",                                       0, layout_igspoker )
+GAMEL( 2000?, cpoker2,    0,        cpoker2,    cpoker2,  igs017_state, init_cpoker2,    ROT0, "IGS", "Champion Poker 2 (V100A)",                                          0, layout_igspoker )
+GAME ( 2000?, spkrform,   spk306us, spkrform,   spkrform, igs017_state, init_spkrform,   ROT0, "IGS", "Super Poker (V100xD03) / Formosa",                                  MACHINE_UNEMULATED_PROTECTION ) // poker game enabling forced with a patch. Parent spk306us in driver spoker.cpp
+GAME ( 2000?, jking302us, 0,        jking302us, starzan,  igs017_state, init_jking302us, ROT0, "IGS", "Jungle King (V302US)",                                              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS025 and IGS029 protection

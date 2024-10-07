@@ -79,13 +79,13 @@ private:
 	TILE_GET_INFO_MEMBER(get_igrosoft_gamble_tile_info);
 	TILE_GET_INFO_MEMBER(get_igrosoft_gamble_reel_tile_info);
 	uint32_t screen_update_igrosoft_gamble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void igrosoft_gamble_map(address_map &map);
-	void igrosoft_gamble_portmap(address_map &map);
-	void rollfr_portmap(address_map &map);
+	void igrosoft_gamble_map(address_map &map) ATTR_COLD;
+	void igrosoft_gamble_portmap(address_map &map) ATTR_COLD;
+	void rollfr_portmap(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	/* Video related */
 

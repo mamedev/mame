@@ -61,7 +61,7 @@ public:
 	void mmonty(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -73,9 +73,9 @@ private:
 	int m_lcd_cs = 0;
 	int m_halt = 0;
 
-	void monty_mem(address_map &map);
-	void mmonty_mem(address_map &map);
-	void monty_io(address_map &map);
+	void monty_mem(address_map &map) ATTR_COLD;
+	void mmonty_mem(address_map &map) ATTR_COLD;
+	void monty_io(address_map &map) ATTR_COLD;
 
 	template<int N> void lcd_output_w(offs_t offset, u64 data) { m_lcd_data[N << 4 | offset] = data; } // buffer for screen_update
 	u32 screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);

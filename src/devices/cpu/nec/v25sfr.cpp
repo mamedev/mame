@@ -31,11 +31,19 @@ void v25_common_device::ida_sfr_map(address_map &map)
 	map(0x14e, 0x14e).rw(FUNC(v25_common_device::exic2_r), FUNC(v25_common_device::exic2_w));
 	map(0x165, 0x165).rw(FUNC(v25_common_device::srms0_r), FUNC(v25_common_device::srms0_w));
 	map(0x166, 0x166).rw(FUNC(v25_common_device::stms0_r), FUNC(v25_common_device::stms0_w));
+	map(0x168, 0x168).rw(FUNC(v25_common_device::scm0_r), FUNC(v25_common_device::scm0_w));
+	map(0x169, 0x169).rw(FUNC(v25_common_device::scc0_r), FUNC(v25_common_device::scc0_w));
+	map(0x16a, 0x16a).rw(FUNC(v25_common_device::brg0_r), FUNC(v25_common_device::brg0_w));
+	map(0x16b, 0x16b).r(FUNC(v25_common_device::sce0_r));
 	map(0x16c, 0x16c).rw(FUNC(v25_common_device::seic0_r), FUNC(v25_common_device::seic0_w));
 	map(0x16d, 0x16d).rw(FUNC(v25_common_device::sric0_r), FUNC(v25_common_device::sric0_w));
 	map(0x16e, 0x16e).rw(FUNC(v25_common_device::stic0_r), FUNC(v25_common_device::stic0_w));
 	map(0x175, 0x175).rw(FUNC(v25_common_device::srms1_r), FUNC(v25_common_device::srms1_w));
 	map(0x176, 0x176).rw(FUNC(v25_common_device::stms1_r), FUNC(v25_common_device::stms1_w));
+	map(0x178, 0x178).rw(FUNC(v25_common_device::scm1_r), FUNC(v25_common_device::scm1_w));
+	map(0x179, 0x179).rw(FUNC(v25_common_device::scc1_r), FUNC(v25_common_device::scc1_w));
+	map(0x17a, 0x17a).rw(FUNC(v25_common_device::brg1_r), FUNC(v25_common_device::brg1_w));
+	map(0x17b, 0x17b).r(FUNC(v25_common_device::sce1_r));
 	map(0x17c, 0x17c).rw(FUNC(v25_common_device::seic1_r), FUNC(v25_common_device::seic1_w));
 	map(0x17d, 0x17d).rw(FUNC(v25_common_device::sric1_r), FUNC(v25_common_device::sric1_w));
 	map(0x17e, 0x17e).rw(FUNC(v25_common_device::stic1_r), FUNC(v25_common_device::stic1_w));
@@ -246,6 +254,46 @@ void v25_common_device::stms0_w(uint8_t d)
 	m_stms[0] = d & 0xf7;
 }
 
+uint8_t v25_common_device::scm0_r()
+{
+	return m_scm[0];
+}
+
+void v25_common_device::scm0_w(uint8_t d)
+{
+	logerror("%06x: SCM0 set to %02x\n", PC(), d);
+	m_scm[0] = d;
+}
+
+uint8_t v25_common_device::scc0_r()
+{
+	return m_scc[0];
+}
+
+void v25_common_device::scc0_w(uint8_t d)
+{
+	logerror("%06x: SCC0 prescaler set to %d\n", PC(), 2 << (d & 0x0f));
+	m_scc[0] = d & 0x0f;
+}
+
+uint8_t v25_common_device::brg0_r()
+{
+	return m_brg[0];
+}
+
+void v25_common_device::brg0_w(uint8_t d)
+{
+	logerror("%06x: BRG0 divider set to %d\n", PC(), d);
+	m_brg[0] = d;
+}
+
+uint8_t v25_common_device::sce0_r()
+{
+	if (!machine().side_effects_disabled())
+		logerror("%06x: Warning: read back SCE0\n",PC());
+	return m_sce[0];
+}
+
 uint8_t v25_common_device::seic0_r()
 {
 	return read_irqcontrol(INTSER0, m_priority_ints0);
@@ -300,6 +348,46 @@ void v25_common_device::stms1_w(uint8_t d)
 {
 	logerror("%06x: STMS1 set to %02x\n", PC(), d & 0xf7);
 	m_stms[1] = d & 0xf7;
+}
+
+uint8_t v25_common_device::scm1_r()
+{
+	return m_scm[1];
+}
+
+void v25_common_device::scm1_w(uint8_t d)
+{
+	logerror("%06x: SCM1 set to %02x\n", PC(), d);
+	m_scm[1] = d;
+}
+
+uint8_t v25_common_device::scc1_r()
+{
+	return m_scc[1];
+}
+
+void v25_common_device::scc1_w(uint8_t d)
+{
+	logerror("%06x: SCC1 prescaler set to %d\n", PC(), 2 << (d & 0x0f));
+	m_scc[1] = d & 0x0f;
+}
+
+uint8_t v25_common_device::brg1_r()
+{
+	return m_brg[1];
+}
+
+void v25_common_device::brg1_w(uint8_t d)
+{
+	logerror("%06x: BRG1 divider set to %d\n", PC(), d);
+	m_brg[1] = d;
+}
+
+uint8_t v25_common_device::sce1_r()
+{
+	if (!machine().side_effects_disabled())
+		logerror("%06x: Warning: read back SCE1\n",PC());
+	return m_sce[1];
 }
 
 uint8_t v25_common_device::seic1_r()

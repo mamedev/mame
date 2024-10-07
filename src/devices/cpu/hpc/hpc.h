@@ -25,8 +25,8 @@ protected:
 	hpc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual void execute_run() override;
@@ -63,7 +63,7 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 };
 
 class hpc46104_device : public hpc_device
@@ -77,7 +77,7 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 };
 
 

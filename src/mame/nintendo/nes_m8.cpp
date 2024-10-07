@@ -68,8 +68,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(m8_game_select);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<rp2a03_device> m_maincpu;
@@ -99,8 +99,8 @@ private:
 	void m8_set_mirroring();
 	void m8_romswitch();
 	void m8_reset();
-	void m8_map(address_map &map);
-	void m8_ppu_map(address_map &map);
+	void m8_map(address_map &map) ATTR_COLD;
+	void m8_ppu_map(address_map &map) ATTR_COLD;
 };
 
 

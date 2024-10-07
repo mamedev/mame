@@ -57,13 +57,13 @@ public:
 
 protected:
 	// driver_device implementation
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void cpu_pgm_map(address_map &map);
-	virtual void cpu_rws_map(address_map &map);
-	virtual void cpu_ioc_map(address_map &map);
-	virtual void cpu_iod_map(address_map &map);
+	virtual void cpu_pgm_map(address_map &map) ATTR_COLD;
+	virtual void cpu_rws_map(address_map &map) ATTR_COLD;
+	virtual void cpu_ioc_map(address_map &map) ATTR_COLD;
+	virtual void cpu_iod_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
@@ -117,11 +117,11 @@ public:
 	void ibm5110(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void cpu_pgm_map(address_map &map) override;
-	virtual void cpu_ioc_map(address_map &map) override;
+	virtual void cpu_pgm_map(address_map &map) override ATTR_COLD;
+	virtual void cpu_ioc_map(address_map &map) override ATTR_COLD;
 
 	virtual void da0_ctl_w(u8 data) override;
 

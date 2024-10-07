@@ -31,10 +31,10 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual uint8_t data_r() override { return m_ssd->data_r(); }
 	virtual void data_w(uint16_t data) override { m_ssd->data_w(data); }

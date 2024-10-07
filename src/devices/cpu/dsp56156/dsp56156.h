@@ -211,8 +211,8 @@ public:
 	void host_interface_write(uint8_t offset, uint8_t data);
 	uint8_t host_interface_read(uint8_t offset);
 
-	void dsp56156_program_map(address_map &map);
-	void dsp56156_x_data_map(address_map &map);
+	void dsp56156_program_map(address_map &map) ATTR_COLD;
+	void dsp56156_x_data_map(address_map &map) ATTR_COLD;
 
 	auto portc_cb() { return portC_cb.bind(); }
 
@@ -220,8 +220,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return clocks; }

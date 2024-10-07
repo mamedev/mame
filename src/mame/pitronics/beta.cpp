@@ -71,7 +71,7 @@ public:
 	void beta(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t riot_pa_r();
 	void riot_pa_w(uint8_t data);
@@ -83,7 +83,7 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(led_refresh);
 
-	void beta_mem(address_map &map);
+	void beta_mem(address_map &map) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

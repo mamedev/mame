@@ -35,7 +35,7 @@ public:
 	auto irq_changed_callback() { return m_irq_changed_cb.bind(); }
 	template <typename T> void set_rainbow_tag(T &&tag) { m_huc6271.set_tag(std::forward<T>(tag)); }
 
-	void amap(address_map &map);
+	void amap(address_map &map) ATTR_COLD;
 
 	// ADPCM operations
 	uint8_t adpcm_update_0();
@@ -49,9 +49,9 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -126,9 +126,9 @@ private:
 	uint8_t adpcm_update(int chan);
 	void interrupt_update();
 
-	void io_map(address_map &map);
-	void kram_map(address_map &map);
-	void microprg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void kram_map(address_map &map) ATTR_COLD;
+	void microprg_map(address_map &map) ATTR_COLD;
 
 //  void write(offs_t offset, uint32_t data);
 	// host interface

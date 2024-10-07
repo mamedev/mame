@@ -58,9 +58,9 @@ public:
 
 protected:
 	/* Constructor */
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 	void device_stop() override;
-	void device_reset() override;
+	void device_reset() override ATTR_COLD;
 	ioport_constructor device_input_ports() const override;
 
 private:

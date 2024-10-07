@@ -17,7 +17,7 @@ public:
 	void force_start_address(u16 start) { m_start_address = start; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	std::unique_ptr<u8[]> m_ram;
