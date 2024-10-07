@@ -24,29 +24,4 @@ private:
 	uint8_t sdb_anport3_r() { return m_mouse1y->read()^0x7f; }
 };
 
-class xavix_i2c_lotr_state : public xavix_i2c_state
-{
-public:
-	xavix_i2c_lotr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
-	{ }
-
-	int camera_r();
-
-protected:
-	//virtual void write_io1(uint8_t data, uint8_t direction) override;
-};
-
-class xavix_duelmast_state : public xavix_i2c_state
-{
-public:
-	xavix_duelmast_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
-	{ }
-
-protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
-};
-
-
 #endif // MAME_TVGAMES_XAVIX_2000_H

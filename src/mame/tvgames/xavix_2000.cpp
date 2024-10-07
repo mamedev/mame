@@ -200,11 +200,6 @@ static INPUT_PORTS_START( ttv_mx )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Motion Right")
 INPUT_PORTS_END
 
-int xavix_i2c_lotr_state::camera_r() // seems to be some kind of camera status bits
-{
-	return machine().rand();
-}
-
 void xavix_state::xavix2000(machine_config &config)
 {
 	xavix(config);
