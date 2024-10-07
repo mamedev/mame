@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Joseph Khilfeh
+// copyright-holders:Joseph Khilfeh
 
 /*
 
@@ -94,7 +94,8 @@ INPUT_PORTS_END
 
 ROM_START(pap2)
 	ROM_REGION32_BE(0x100000, "maincpu", 0 )
-	ROM_LOAD("linksys-pap2-2.0.12-ls_rom dump of pap2 flash chip.rom", 0x000000, 0x100000, BAD_DUMP CRC(4d0f1e5d) SHA1(73b163b00a3709a14f7419283c8515dd91009598) )
+	ROM_LOAD("linksys-pap2-2.0.12-ls.u51", 0x000000, 0x100000, BAD_DUMP CRC(4d0f1e5d) SHA1(73b163b00a3709a14f7419283c8515dd91009598) )
+	// Original ROM label is unknown, if it had one. S/N FH900DC35989, MAC 00:12:17:FB:70:DC
 ROM_END
 
 }
