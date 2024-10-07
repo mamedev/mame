@@ -639,6 +639,30 @@ protected:
 	required_device<i2cmem_device> m_i2cmem;
 };
 
+class xavix_i2c_lotr_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_lotr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+	int camera_r();
+
+protected:
+	//virtual void write_io1(uint8_t data, uint8_t direction) override;
+};
+
+class xavix_duelmast_state : public xavix_i2c_state
+{
+public:
+	xavix_duelmast_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual uint8_t read_io1(uint8_t direction) override;
+};
+
 class xavix_i2c_tomshoot_state : public xavix_i2c_state
 {
 public:
