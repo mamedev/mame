@@ -722,19 +722,17 @@ void gameu_handheld_game_state::init_gameu()
 
 	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
 
-	ROM[0x19c9a / 2] = 0xF165;
-	ROM[0x19c9c / 2] = 0xF165;
-	ROM[0x19c9e / 2] = 0xF165;
+	ROM[0x19c9a / 2] = 0xf165;
+	ROM[0x19c9c / 2] = 0xf165;
+	ROM[0x19c9e / 2] = 0xf165;
 
-	ROM[0x19cb8 / 2] = 0xF165;
-	ROM[0x19cba / 2] = 0xF165;
-	ROM[0x19cbc / 2] = 0xF165;
+	ROM[0x19cb8 / 2] = 0xf165;
+	ROM[0x19cba / 2] = 0xf165;
+	ROM[0x19cbc / 2] = 0xf165;
 
-	ROM[0x19cd4 / 2] = 0xF165;
-	ROM[0x19cd6 / 2] = 0xF165;
-	ROM[0x19cd8 / 2] = 0xF165;
-
-
+	ROM[0x19cd4 / 2] = 0xf165;
+	ROM[0x19cd6 / 2] = 0xf165;
+	ROM[0x19cd8 / 2] = 0xf165;
 }
 
 
