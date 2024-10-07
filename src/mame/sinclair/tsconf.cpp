@@ -284,7 +284,7 @@ void tsconf_state::tsconf(machine_config &config)
 
 	GLUKRS(config, m_glukrs);
 
-	TSCONF_DMA(config, m_dma, 14_MHz_XTAL * 2);
+	TSCONF_DMA(config, m_dma, 28_MHz_XTAL);
 	m_dma->in_mreq_callback().set(FUNC(tsconf_state::ram_read16));
 	m_dma->out_mreq_callback().set(FUNC(tsconf_state::ram_write16));
 	m_dma->in_spireq_callback().set(FUNC(tsconf_state::spi_read16));
