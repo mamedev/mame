@@ -689,8 +689,8 @@ void gameu_handheld_game_state::gameu_portd_w(offs_t offset, uint16_t data, uint
 	{
 		logerror("%s: portd write %04x %04x\n", machine().describe_context(), data, mem_mask);
 
-		m_upperbase = (data & 0xfc00) >> 10;
-		m_upperbase *= 0x40000;
+		uint8_t bank = (data & 0xfc00) >> 10;
+		m_upperbase = bank * 0x40000;
 	}
 
 }
