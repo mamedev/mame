@@ -2342,14 +2342,14 @@ CONS( 2001, rad_bassp, rad_bass,   0,  xavixp,           rad_bassp,xavix_state, 
 CONS( 2001, rad_snow,  0,          0,  xavix_nv,         rad_snow, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IMPERFECT_SOUND )
 CONS( 2001, rad_snowp, rad_snow,   0,  xavixp_nv,        rad_snowp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2003, rad_madf,  0,          0,  xavix_madfb,      rad_fb,   xavix_madfb_state,    init_xavix,    "Radica / Electronics Arts / SSD Company LTD",  "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // no Play TV branding, USA only release?
+CONS( 2003, rad_madf,  0,          0,  xavix_madfb,      rad_fb,   xavix_madfb_state,    init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // no Play TV branding, USA only release?
 
 CONS( 200?, rad_fb,    0,          0,  xavix_madfb,      rad_fb,   xavix_madfb_state,    init_xavix,    "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // USA only release? doesn't change logo for PAL.
 
 CONS( 200?, rad_rh,    0,          0,  xavix,            rad_rh,   xavix_state,          init_xavix,    "Radica / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2004, rad_ssx,   0,          0,  xavix,            rad_snow, xavix_state,          init_xavix,    "Radica / Electronics Arts / SSD Company LTD",  "Play TV SSX Snowboarder (NTSC)", MACHINE_IMPERFECT_SOUND )
-CONS( 2004, rad_ssxp,  rad_ssx,    0,  xavixp,           rad_snowp,xavix_state,          init_xavix,    "Radica / Electronics Arts / SSD Company LTD",  "ConnecTV SSX Snowboarder (PAL)", MACHINE_IMPERFECT_SOUND )
+CONS( 2004, rad_ssx,   0,          0,  xavix,            rad_snow, xavix_state,          init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "Play TV SSX Snowboarder (NTSC)", MACHINE_IMPERFECT_SOUND )
+CONS( 2004, rad_ssxp,  rad_ssx,    0,  xavixp,           rad_snowp,xavix_state,          init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "ConnecTV SSX Snowboarder (PAL)", MACHINE_IMPERFECT_SOUND )
 
 // basically a reissue of SSX but without the license
 CONS( 2006, rad_sbw,   0,          0,  xavix,            rad_snow, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (White) (NTSC)", MACHINE_IMPERFECT_SOUND )
