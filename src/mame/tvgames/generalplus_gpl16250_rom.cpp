@@ -484,7 +484,6 @@ ROM_END
 
 ROM_START( gameu50 )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )
-	// ROM seems to be divided into 2MByte banks, so could be external banking
 	ROM_LOAD16_WORD_SWAP( "gameu.bin", 0x000000, 0x2000000, CRC(13c42bce) SHA1(f769ceabb8ab4e60c0d663dffd5cca91c6aec206) )
 ROM_END
 
@@ -524,7 +523,6 @@ uint16_t tkmag220_game_state::cs0_r(offs_t offset)
 	// [:] installing cs0 handler start_address 00000000 end_address 007fffff
 	return m_romregion[(offset & 0x07fffff) + m_upperbase];
 }
-
 
 void tkmag220_game_state::machine_reset()
 {
@@ -639,9 +637,6 @@ void gameu_handheld_game_state::gameu(machine_config &config)
 {
 	gcm394_game_state::base(config);
 
-//  m_maincpu->portb_out().set(FUNC(gameu_handheld_game_state::gameu_portb_w)); // portb is very busy on startup
-	// portd is very busy on startup
-
 	m_maincpu->porta_out().set(FUNC(gameu_handheld_game_state::gameu_porta_w));
 	m_maincpu->portb_out().set(FUNC(gameu_handheld_game_state::gameu_portb_w));
 	m_maincpu->portc_out().set(FUNC(gameu_handheld_game_state::gameu_portc_w));
@@ -694,6 +689,20 @@ void gameu_handheld_game_state::gameu_portd_w(offs_t offset, uint16_t data, uint
 	}
 
 }
+void gameu_handheld_game_state::machine_start()
+{
+	m_upperbase = 0;
+	m_porta_data = 0;
+	m_portb_data = 0;
+	m_portc_data = 0;
+	m_portd_data = 0;
+
+	save_item(NAME(m_upperbase));
+	save_item(NAME(m_porta_data));
+	save_item(NAME(m_portb_data));
+	save_item(NAME(m_portc_data));
+	save_item(NAME(m_portd_data));
+}
 
 void gameu_handheld_game_state::machine_reset()
 {
@@ -711,10 +720,8 @@ void gameu_handheld_game_state::init_gameu()
 	{
 		ROM[i] = ROM[i] ^ 0x3b90;
 
-		ROM[i] = bitswap<16>(ROM[i], 8, 7, 13,  15,  4,  5,  12,  10,
-									 3,  1,  11,  9,  6,  14,  0, 2);
-
-		ROM[i] = ((ROM[i] & 0xff00) >> 8) | ((ROM[i] & 0x00ff) << 8);
+		ROM[i] = bitswap<16>(ROM[i], 3, 1, 11, 9,  6, 14, 0,  2,
+									 8, 7, 13, 15, 4, 5,  12, 10);
 	}
 
 	m_maincpu->set_alt_tile_addressing_hack(0);

@@ -157,20 +157,20 @@ public:
 
 protected:
 
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
-	uint32_t m_upperbase = 0U;
-
 	void gameu_porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gameu_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint16_t m_porta_data = 0U;
-	uint16_t m_portb_data = 0U;
-	uint16_t m_portc_data = 0U;
-	uint16_t m_portd_data = 0U;
+	uint32_t m_upperbase;
+	uint16_t m_porta_data;
+	uint16_t m_portb_data;
+	uint16_t m_portc_data;
+	uint16_t m_portd_data;
 };
 
 
