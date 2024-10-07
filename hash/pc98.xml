@@ -15775,6 +15775,7 @@ Fails user disk creation (will ask for a disk swap for disk 1 that will fail)
 	</software>
 
 	<software name="twinkstr">
+		<!-- Bunretsu Shugoshin Twinkle Star -->
 		<description>Division Guardian Twinkle-Star</description>
 		<year>1993</year>
 		<publisher>スタジオ・トゥインクル (Studio Twinkle)</publisher>
@@ -31234,10 +31235,62 @@ Black screen, wants 2DD dip ON?
 		</part>
 	</software>
 
+	<software name="mime">
+		<description>Mime</description>
+		<year>1995</year>
+		<publisher>スタジオ・トゥインクル (Studio Twinkle)</publisher>
+		<info name="alt_title" value="舞夢" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mime (disk a).hdm" size="1261568" crc="0706d46b" sha1="e887417c4ddd458e33d2a19d3b9d765ac76e27dc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mime (disk b).hdm" size="1261568" crc="f4e8fe2e" sha1="28dfe34aab0b259ae47ece827a1034a2c668814e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mime (disk c).hdm" size="1261568" crc="27af1403" sha1="7d2690cba2bd0f28f06fd0d4d68142f899060fb9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mime (disk d).hdm" size="1261568" crc="b81cb101" sha1="92c3cd583a537067751389c146aa3d0756ad4008" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mime (disk e).hdm" size="1261568" crc="a45a8450" sha1="792cf1c3d3e655a4c17770b336c6b21211383392" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk F"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mime (disk f).hdm" size="1261568" crc="a58d520d" sha1="c33a1f2a1f10def579d77fc67b34dc9514538df3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk G"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mime (disk g).hdm" size="1261568" crc="ed0c9f98" sha1="bb33eab185e649ff3fb14e9d0f9d114fb4fea0d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mimesp">
 		<description>Mime Special Disk</description>
 		<year>1996</year>
 		<publisher>スタジオ・トゥインクル (Studio Twinkle)</publisher>
+		<notes><![CDATA[
+Data disk for mime
+]]></notes>
 		<info name="alt_title" value="舞夢スペシャルディスク" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -31356,6 +31409,31 @@ Black screen, wants 2DD dip ON?
 			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="disk_5.d88" size="1281968" crc="926601e4" sha1="06cc4b008efd13d6e0e9d7eef049fa633effc948" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mirror">
+		<description>Mirror</description>
+		<year>1992</year>
+		<publisher>スタジオ・トゥインクル (Studio Twinkle)</publisher>
+		<info name="alt_title" value="鏡" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mirror (disk a).hdm" size="1261568" crc="ceaa9422" sha1="99531620f79806f13a304fd57449f5f84f1ea3ce" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mirror (disk b).hdm" size="1261568" crc="3c29ee6f" sha1="bc627ab5fdc908f6935d765b478851995d3cc486" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mirror (disk c).hdm" size="1261568" crc="93867bf7" sha1="77bd2aa84aadc01778a24ad15f7d694ba5f09ed8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -45371,6 +45449,41 @@ Abuses of [7220] pitch on title screen for a TV white noise effect
 		</part>
 	</software>
 
+	<software name="twilight" supported="no">
+		<description>Twilight</description>
+		<year>1994</year>
+		<publisher>スタジオ・トゥインクル (Studio Twinkle)</publisher>
+		<notes><![CDATA[
+Hangs after name entry, regardless of selecting opening or game
+Accesses [OPN] at $288?
+]]></notes>
+		<info name="alt_title" value="トワイライト" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="twilight (disk a).hdm" size="1261568" crc="8ac92541" sha1="7dea4d9506bdb83e0bfdfc7eab79e2ff65d9e57c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="twilight (disk b).hdm" size="1261568" crc="c0721fdb" sha1="bf10ace3526e5562bba08e8355c72f1397c50e9f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="twilight (disk c).hdm" size="1261568" crc="2c020cd7" sha1="ebf2275a52a81e5b5c20b32fe7890166369b480e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="twilight (disk d).hdm" size="1261568" crc="333833f8" sha1="1ec40405b6fc552663c23684aff75180d9825bf0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- 2dd images, attempt to map them on 9801F (in drive 2 + BIOS enabled in Machine Config) causes access violation -->
 	<software name="twiligh3" supported="no">
 		<description>Twilight Zone III - Nagakute Amai Yoru</description>
@@ -47002,6 +47115,38 @@ Abuses of [7220] pitch on title screen for a TV white noise effect
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk.fdi" size="1265664" crc="b18e02c8" sha1="2d3bf3d770c313be529eb83f55699cbf55b438ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wakuouji">
+		<description>Wakusei Omega no Q Ouji</description>
+		<year>1996</year>
+		<publisher>スタジオ・トゥインクル (Studio Twinkle)</publisher>
+		<info name="alt_title" value="惑星ΩのQ王子" />
+		<info name="usage" value="Requires HDD DOS install, boot floppy can be created thru STMBD.COM" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="wakusei omega no q ouji (disk a).hdm" size="1261568" crc="2403d623" sha1="f07935e068aa51a07250cc6cc00d8f5103005cd5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="wakusei omega no q ouji (disk b).hdm" size="1261568" crc="dff4bb8d" sha1="4bec5afceaf7d2caf9b7bf703d3f1850e767e438" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="wakusei omega no q ouji (disk c).hdm" size="1261568" crc="6cf42807" sha1="858a028455611d610808c8b64fa98b62daf69902" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="wakusei omega no q ouji (disk d).hdm" size="1261568" crc="fc2cb501" sha1="3fb232e837bb7f1be90486224221340d8e8a4d4b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -50538,25 +50683,25 @@ Hangs after name entry with illegal opcode 0f 0e at PC=FF2C3
 		<info name="alt_title" value="超·爆" />
 		<info name="release" value="19930731" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="chou-baku (disk 1).hdm" size="1261568" crc="90b33778" sha1="85498dc3a4f789d111476b5410833169df8c998f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="chou-baku (disk 2).hdm" size="1261568" crc="a4d91eae" sha1="744b2cce07f4202553a22b540401efb4a3521bcc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="chou-baku (disk 3).hdm" size="1261568" crc="7dfbbfb5" sha1="95b3fd28b5118d5d442ae9638b2885da7dff501e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="chou-baku (disk 4).hdm" size="1261568" crc="90a05adb" sha1="5d5f398b0ab289825fcd4ed51bb2e5c4ffb7dcdd" offset="0" />
 			</dataarea>
