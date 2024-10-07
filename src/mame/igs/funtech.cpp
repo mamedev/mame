@@ -18,7 +18,7 @@ palette addresses are the same as unkch in goldstar.cpp, but the I/O stuff is de
 board has an M5255 for sound
 and an unpopulated position for a YM2413 or UM3567
 
-fts2ina runs on a simplified PCB (83330 13 P2IN1 - 1994 © FUN TECH), with no reels support.
+poker21 runs on a simplified PCB (83330 13 P2IN1 - 1994 © FUN TECH), with no reels support.
 It has a K-665 (Oki M6295 clone) instead of the unpopulated YM2413 / UM3567 and a WF19054 instead of the
 equivalent M5255. Moreover, it has a 12 MHz XTAL instead of 10 MHz.
 */
