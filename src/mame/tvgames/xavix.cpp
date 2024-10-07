@@ -2359,7 +2359,7 @@ CONS( 2002, rad_bdp,   0,          0,  xavix,            rad_bdp,  xavix_state, 
 
 CONS( 2002, rad_socr,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Radica / Epoch / SSD Company LTD",             "Play TV Soccer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // ゴール決めるぜ！ エキサイトストライカー
-CONS( 2001, epo_strk,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Excite Striker (Japan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001, epo_strk,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Excite Striker (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // A UK branded Epoch version (no Radica involvement) also exists, but so far all units seen have been 'no TSOP pads' cases
 
 CONS( 2002, rad_jcon,  0,          0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Radica / Takara / SSD Company LTD",            "Play TV Jr. Construction", MACHINE_IMPERFECT_SOUND )
