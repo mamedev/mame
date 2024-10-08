@@ -426,19 +426,22 @@ void timekeeper_device::write(offs_t offset, u8 data)
 u8 timekeeper_device::read(offs_t offset)
 {
 	u8 result = m_data[offset];
-	if (offset == m_offset_date && type() == M48T58)
+	if (!machine().side_effects_disabled())
 	{
-		result &= ~DATE_BL;
+		if (offset == m_offset_date && type() == M48T58)
+		{
+			result &= ~DATE_BL;
+		}
+		else if (offset == m_offset_flags && type() == M48T37)
+		{
+			// Clear the watchdog flag
+			m_data[m_offset_flags] &= ~FLAGS_WDF;
+			// Clear callbacks
+			m_reset_cb(CLEAR_LINE);
+			m_irq_cb(CLEAR_LINE);
+		}
+		LOG("timekeeper_device::read: %04x (%02x)\n", offset, result);
 	}
-	else if (offset == m_offset_flags && type() == M48T37)
-	{
-		// Clear the watchdog flag
-		m_data[m_offset_flags] &= ~FLAGS_WDF;
-		// Clear callbacks
-		m_reset_cb(CLEAR_LINE);
-		m_irq_cb(CLEAR_LINE);
-	}
-	LOG("timekeeper_device::read: %04x (%02x)\n", offset, result);
 	return result;
 }
 
