@@ -2559,22 +2559,12 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<!-- Also distributed by Timex in the US market -->
 	<software name="flsimul">
 		<description>Flight Simulation</description>
 		<year>1982</year>
 		<publisher>Sinclair Research</publisher>
-		<info name="usage" value="16K" />
-		<part name="cass1" interface="zx81_cass">
-			<dataarea name="cass" size="13855">
-				<rom name="FlightSimulation.tzx" size="13855" crc="945da3c1" sha1="de020d7531c0904a8a152193e7b3d5203e5c1017"/>
-			</dataarea>
-		</part>
-	</software>
-	<!--
-	<software name="flsimultx" cloneof="flsimul">
-		<description>The Flight Simulator (Timex)</description>
-		<year>1982</year>
-		<publisher>Timex</publisher>
+		<info name="alt_title" value="Flug-Simulation" />
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="13855">
@@ -2583,18 +2573,6 @@ RAND USR 16530
 		</part>
 	</software>
 
-	<software name="flugsim" cloneof="flsimul">
-		<description>Flug-Simulation</description>
-		<year>1982</year>
-		<publisher>Sinclair Research</publisher>
-		<info name="usage" value="16K" />
-		<part name="cass1" interface="zx81_cass">
-			<dataarea name="cass" size="13855">
-				<rom name="FlightSimulation.tzx" size="13855" crc="945da3c1" sha1="de020d7531c0904a8a152193e7b3d5203e5c1017"/>
-			</dataarea>
-		</part>
-	</software>
-	-->
 	<software name="simulvoo" cloneof="flsimul">
 		<description>Simulador de Voo (Timex Portugal)</description>
 		<year>1982</year>
