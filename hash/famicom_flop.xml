@@ -524,7 +524,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<!-- Rebuilt from Git using cc65 commit 80a43d732dc9551ad84343ea9644d8fab7ec0bd9.  A
 	     byte-identical copy of 1.5 was reproduced with this toolchain, giving high confidence that
-	     the 1.4 rebuild is the same as what was released.  Without an exitant online copy, however,
+	     the 1.4 rebuild is the same as what was released.  Without an existent online copy, however,
 	     this cannot be verified.
 	-->
 	<software name="dgolf14" cloneof="dgolf">
