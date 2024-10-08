@@ -22,9 +22,9 @@ TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 		REQUIRE(::__isfinitef(u.f) == bx::isFinite(u.f) );
 		REQUIRE(::__isinff(u.f)    == bx::isInfinite(u.f) );
 #elif BX_COMPILER_MSVC
-		REQUIRE(!!::isnan(u.f)    == bx::isNan(u.f));
-		REQUIRE(!!::isfinite(u.f) == bx::isFinite(u.f));
-		REQUIRE(!!::isinf(u.f)    == bx::isInfinite(u.f));
+		REQUIRE(!!::isnan(u.f)    == bx::isNan(u.f) );
+		REQUIRE(!!::isfinite(u.f) == bx::isFinite(u.f) );
+		REQUIRE(!!::isinf(u.f)    == bx::isInfinite(u.f) );
 #else
 		REQUIRE(::isnanf(u.f)  == bx::isNan(u.f) );
 		REQUIRE(::finitef(u.f) == bx::isFinite(u.f) );
@@ -148,7 +148,7 @@ TEST_CASE("floorLog2", "[math]")
 	}
 }
 
-TEST_CASE("ceil/floorLog2", "[math]")
+TEST_CASE("ceilLog2 & floorLog2", "[math]")
 {
 	{
 		uint32_t prev = 0;
@@ -234,40 +234,56 @@ TEST_CASE("findFirstSet", "[math]")
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4723) // potential divide by 0
 
+TEST_CASE("rcp", "[math][libm]")
+{
+	REQUIRE(1.0f == bx::rcp(1.0f) );
+	REQUIRE(2.0f == bx::rcp(0.5f) );
+	REQUIRE(bx::isInfinite(bx::rcp( 0.0f) ) );
+	REQUIRE(bx::isInfinite(bx::rcp(-0.0f) ) );
+}
+
+TEST_CASE("rcpSafe", "[math][libm]")
+{
+	REQUIRE(1.0f == bx::rcpSafe(1.0f) );
+	REQUIRE(2.0f == bx::rcpSafe(0.5f) );
+	REQUIRE(!bx::isInfinite(bx::rcpSafe( 0.0f) ) );
+	REQUIRE(!bx::isInfinite(bx::rcpSafe(-0.0f) ) );
+}
+
 TEST_CASE("rsqrt", "[math][libm]")
 {
 	bx::WriterI* writer = bx::getNullOut();
 	bx::Error err;
 
 	// rsqrtRef
-	REQUIRE(bx::isInfinite(bx::rsqrtRef(0.0f)));
+	REQUIRE(bx::isInfinite(bx::rsqrtRef(0.0f) ) );
 
 	for (float xx = bx::kNearZero; xx < 100.0f; xx += 0.1f)
 	{
-		bx::write(writer, &err, "rsqrtRef(%f) == %f (expected: %f)\n", xx, bx::rsqrtRef(xx), 1.0f / ::sqrtf(xx));
-		REQUIRE(err.isOk());
-		REQUIRE(bx::isEqual(bx::rsqrtRef(xx), 1.0f / ::sqrtf(xx), 0.00001f));
+		bx::write(writer, &err, "rsqrtRef(%f) == %f (expected: %f)\n", xx, bx::rsqrtRef(xx), 1.0f / ::sqrtf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::rsqrtRef(xx), 1.0f / ::sqrtf(xx), 0.00001f) );
 	}
 
 	// rsqrtSimd
-	REQUIRE(bx::isInfinite(bx::rsqrtSimd(0.0f)));
+	REQUIRE(bx::isInfinite(bx::rsqrtSimd(0.0f) ) );
 
 	for (float xx = bx::kNearZero; xx < 100.0f; xx += 0.1f)
 	{
-		bx::write(writer, &err, "rsqrtSimd(%f) == %f (expected: %f)\n", xx, bx::rsqrtSimd(xx), 1.0f / ::sqrtf(xx));
-		REQUIRE(err.isOk());
-		REQUIRE(bx::isEqual(bx::rsqrtSimd(xx), 1.0f / ::sqrtf(xx), 0.00001f));
+		bx::write(writer, &err, "rsqrtSimd(%f) == %f (expected: %f)\n", xx, bx::rsqrtSimd(xx), 1.0f / ::sqrtf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::rsqrtSimd(xx), 1.0f / ::sqrtf(xx), 0.00001f) );
 	}
 
 	// rsqrt
-	REQUIRE(bx::isInfinite(1.0f / ::sqrtf(0.0f)));
-	REQUIRE(bx::isInfinite(bx::rsqrt(0.0f)));
+	REQUIRE(bx::isInfinite(1.0f / ::sqrtf(0.0f) ) );
+	REQUIRE(bx::isInfinite(bx::rsqrt(0.0f) ) );
 
 	for (float xx = bx::kNearZero; xx < 100.0f; xx += 0.1f)
 	{
-		bx::write(writer, &err, "rsqrt(%f) == %f (expected: %f)\n", xx, bx::rsqrt(xx), 1.0f / ::sqrtf(xx));
-		REQUIRE(err.isOk());
-		REQUIRE(bx::isEqual(bx::rsqrt(xx), 1.0f / ::sqrtf(xx), 0.00001f));
+		bx::write(writer, &err, "rsqrt(%f) == %f (expected: %f)\n", xx, bx::rsqrt(xx), 1.0f / ::sqrtf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::rsqrt(xx), 1.0f / ::sqrtf(xx), 0.00001f) );
 	}
 }
 
@@ -277,54 +293,54 @@ TEST_CASE("sqrt", "[math][libm]")
 	bx::Error err;
 
 	// sqrtRef
-	REQUIRE(bx::isNan(bx::sqrtRef(-1.0f)));
-	REQUIRE(bx::isEqual(bx::sqrtRef(0.0f), ::sqrtf(0.0f), 0.0f));
-	REQUIRE(bx::isEqual(bx::sqrtRef(1.0f), ::sqrtf(1.0f), 0.0f));
+	REQUIRE(bx::isNan(bx::sqrtRef(-1.0f) ) );
+	REQUIRE(bx::isEqual(bx::sqrtRef(0.0f), ::sqrtf(0.0f), 0.0f) );
+	REQUIRE(bx::isEqual(bx::sqrtRef(1.0f), ::sqrtf(1.0f), 0.0f) );
 
 	for (float xx = 0.0f; xx < 1000000.0f; xx += 1000.f)
 	{
-		bx::write(writer, &err, "sqrtRef(%f) == %f (expected: %f)\n", xx, bx::sqrtRef(xx), ::sqrtf(xx));
-		REQUIRE(err.isOk());
-		REQUIRE(bx::isEqual(bx::sqrtRef(xx), ::sqrtf(xx), 0.00001f));
+		bx::write(writer, &err, "sqrtRef(%f) == %f (expected: %f)\n", xx, bx::sqrtRef(xx), ::sqrtf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::sqrtRef(xx), ::sqrtf(xx), 0.00001f) );
 	}
 
 	// sqrtSimd
-	REQUIRE(bx::isNan(bx::sqrtSimd(-1.0f)));
-	REQUIRE(bx::isEqual(bx::sqrtSimd(0.0f), ::sqrtf(0.0f), 0.0f));
-	REQUIRE(bx::isEqual(bx::sqrtSimd(1.0f), ::sqrtf(1.0f), 0.0f));
+	REQUIRE(bx::isNan(bx::sqrtSimd(-1.0f) ) );
+	REQUIRE(bx::isEqual(bx::sqrtSimd(0.0f), ::sqrtf(0.0f), 0.0f) );
+	REQUIRE(bx::isEqual(bx::sqrtSimd(1.0f), ::sqrtf(1.0f), 0.0f) );
 
 	for (float xx = 0.0f; xx < 1000000.0f; xx += 1000.f)
 	{
-		bx::write(writer, &err, "sqrtSimd(%f) == %f (expected: %f)\n", xx, bx::sqrtSimd(xx), ::sqrtf(xx));
-		REQUIRE(err.isOk());
-		REQUIRE(bx::isEqual(bx::sqrtSimd(xx), ::sqrtf(xx), 0.00001f));
+		bx::write(writer, &err, "sqrtSimd(%f) == %f (expected: %f)\n", xx, bx::sqrtSimd(xx), ::sqrtf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::sqrtSimd(xx), ::sqrtf(xx), 0.00001f) );
 	}
 
 	for (float xx = 0.0f; xx < 100.0f; xx += 0.1f)
 	{
-		bx::write(writer, &err, "sqrt(%f) == %f (expected: %f)\n", xx, bx::sqrt(xx), ::sqrtf(xx));
-		REQUIRE(err.isOk());
-		REQUIRE(bx::isEqual(bx::sqrt(xx), ::sqrtf(xx), 0.00001f));
+		bx::write(writer, &err, "sqrt(%f) == %f (expected: %f)\n", xx, bx::sqrt(xx), ::sqrtf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::sqrt(xx), ::sqrtf(xx), 0.00001f) );
 	}
 
 	// sqrt
-	REQUIRE(bx::isNan(::sqrtf(-1.0f)));
-	REQUIRE(bx::isNan(bx::sqrt(-1.0f)));
-	REQUIRE(bx::isEqual(bx::sqrt(0.0f), ::sqrtf(0.0f), 0.0f));
-	REQUIRE(bx::isEqual(bx::sqrt(1.0f), ::sqrtf(1.0f), 0.0f));
+	REQUIRE(bx::isNan(::sqrtf(-1.0f) ) );
+	REQUIRE(bx::isNan(bx::sqrt(-1.0f) ) );
+	REQUIRE(bx::isEqual(bx::sqrt(0.0f), ::sqrtf(0.0f), 0.0f) );
+	REQUIRE(bx::isEqual(bx::sqrt(1.0f), ::sqrtf(1.0f), 0.0f) );
 
 	for (float xx = 0.0f; xx < 1000000.0f; xx += 1000.f)
 	{
-		bx::write(writer, &err, "sqrt(%f) == %f (expected: %f)\n", xx, bx::sqrt(xx), ::sqrtf(xx));
-		REQUIRE(err.isOk());
-		REQUIRE(bx::isEqual(bx::sqrt(xx), ::sqrtf(xx), 0.00001f));
+		bx::write(writer, &err, "sqrt(%f) == %f (expected: %f)\n", xx, bx::sqrt(xx), ::sqrtf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::sqrt(xx), ::sqrtf(xx), 0.00001f) );
 	}
 
 	for (float xx = 0.0f; xx < 100.0f; xx += 0.1f)
 	{
-		bx::write(writer, &err, "sqrt(%f) == %f (expected: %f)\n", xx, bx::sqrt(xx), ::sqrtf(xx));
-		REQUIRE(err.isOk());
-		REQUIRE(bx::isEqual(bx::sqrt(xx), ::sqrtf(xx), 0.00001f));
+		bx::write(writer, &err, "sqrt(%f) == %f (expected: %f)\n", xx, bx::sqrt(xx), ::sqrtf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::sqrt(xx), ::sqrtf(xx), 0.00001f) );
 	}
 }
 
@@ -341,6 +357,10 @@ TEST_CASE("abs", "[math][libm]")
 TEST_CASE("mod", "[math][libm]")
 {
 	REQUIRE(389.0f == bx::mod(1389.0f, 1000.0f) );
+	REQUIRE( 89.0f == bx::mod(1389.0f, 100.0f) );
+	REQUIRE(  9.0f == bx::mod(1389.0f, 10.0f) );
+	REQUIRE(  4.0f == bx::mod(1389.0f, 5.0f) );
+	REQUIRE(  1.0f == bx::mod(1389.0f, 2.0f) );
 }
 
 TEST_CASE("floor", "[math][libm]")
@@ -760,4 +780,7 @@ TEST_CASE("limits", "[math]")
 
 	STATIC_REQUIRE(bx::LimitsT<double>::min == std::numeric_limits<double>::lowest() );
 	STATIC_REQUIRE(bx::LimitsT<double>::max == std::numeric_limits<double>::max() );
+
+	STATIC_REQUIRE(bx::kFloatSmallest  == std::numeric_limits<float>::min() );
+	STATIC_REQUIRE(bx::kDoubleSmallest == std::numeric_limits<double>::min() );
 }

@@ -355,6 +355,10 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float rcp(float _a);
 
+	/// Returns reciprocal of _a.
+	///
+	BX_CONSTEXPR_FUNC float rcpSafe(float _a);
+
 	/// Returns the floating-point remainder of the division operation _a/_b.
 	///
 	BX_CONSTEXPR_FUNC float mod(float _a, float _b);
@@ -432,7 +436,13 @@ namespace bx
 	BX_CONSTEXPR_FUNC Vec3 div(const Vec3 _a, const Vec3 _b);
 
 	///
+	BX_CONSTEXPR_FUNC Vec3 divSafe(const Vec3 _a, const Vec3 _b);
+
+	///
 	BX_CONSTEXPR_FUNC Vec3 div(const Vec3 _a, float _b);
+
+	///
+	BX_CONSTEXPR_FUNC Vec3 divSafe(const Vec3 _a, float _b);
 
 	/// Returns result of negated multiply-sub operation -(_a * _b - _c) -> _c - _a * _b.
 	///
@@ -481,6 +491,10 @@ namespace bx
 	/// Returns component wise reciprocal of _a.
 	///
 	BX_CONSTEXPR_FUNC Vec3 rcp(const Vec3 _a);
+
+	/// Returns component wise reciprocal of _a.
+	///
+	BX_CONSTEXPR_FUNC Vec3 rcpSafe(const Vec3 _a);
 
 	///
 	BX_CONSTEXPR_FUNC bool isEqual(const Vec3 _a, const Vec3 _b, float _epsilon);

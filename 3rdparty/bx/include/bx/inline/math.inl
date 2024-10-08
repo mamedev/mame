@@ -411,7 +411,7 @@ namespace bx
 
 	inline BX_CONST_FUNC float rsqrtRef(float _a)
 	{
-		if (_a < kNearZero)
+		if (_a < kFloatSmallest)
 		{
 			return kFloatInfinity;
 		}
@@ -421,7 +421,7 @@ namespace bx
 
 	inline BX_CONST_FUNC float rsqrtSimd(float _a)
 	{
-		if (_a < kNearZero)
+		if (_a < kFloatSmallest)
 		{
 			return kFloatInfinity;
 		}
@@ -441,7 +441,7 @@ namespace bx
 
 	inline BX_CONST_FUNC float sqrtRef(float _a)
 	{
-		if (_a < 0.0F)
+		if (_a < 0.0f)
 		{
 			return bitsToFloat(kFloatExponentMask | kFloatMantissaMask);
 		}
@@ -451,11 +451,11 @@ namespace bx
 
 	inline BX_CONST_FUNC float sqrtSimd(float _a)
 	{
-		if (_a < 0.0F)
+		if (_a < 0.0f)
 		{
 			return bitsToFloat(kFloatExponentMask | kFloatMantissaMask);
 		}
-		else if (_a < kNearZero)
+		else if (_a < kFloatSmallest)
 		{
 			return 0.0f;
 		}
@@ -527,9 +527,14 @@ namespace bx
 		return 1.0f / _a;
 	}
 
+	inline BX_CONSTEXPR_FUNC float rcpSafe(float _a)
+	{
+		return rcp(copySign(max(kFloatSmallest, abs(_a) ), _a) );
+	}
+
 	inline BX_CONSTEXPR_FUNC float mod(float _a, float _b)
 	{
-		return _a - _b * floor(_a / _b);
+		return _a - _b * floor(mul(_a, rcp(_b) ) );
 	}
 
 	inline BX_CONSTEXPR_FUNC bool isEqual(float _a, float _b, float _epsilon)
@@ -803,9 +808,19 @@ namespace bx
 		return mul(_a, rcp(_b) );
 	}
 
+	inline BX_CONSTEXPR_FUNC Vec3 divSafe(const Vec3 _a, const Vec3 _b)
+	{
+		return mul(_a, rcpSafe(_b) );
+	}
+
 	inline BX_CONSTEXPR_FUNC Vec3 div(const Vec3 _a, float _b)
 	{
 		return mul(_a, rcp(_b) );
+	}
+
+	inline BX_CONSTEXPR_FUNC Vec3 divSafe(const Vec3 _a, float _b)
+	{
+		return mul(_a, rcpSafe(_b) );
 	}
 
 	inline BX_CONSTEXPR_FUNC Vec3 nms(const Vec3 _a, const float _b, const Vec3 _c)
@@ -910,9 +925,19 @@ namespace bx
 	{
 		return
 		{
-			1.0f / _a.x,
-			1.0f / _a.y,
-			1.0f / _a.z,
+			rcp(_a.x),
+			rcp(_a.y),
+			rcp(_a.z),
+		};
+	}
+
+	inline BX_CONSTEXPR_FUNC Vec3 rcpSafe(const Vec3 _a)
+	{
+		return
+		{
+			rcpSafe(_a.x),
+			rcpSafe(_a.y),
+			rcpSafe(_a.z),
 		};
 	}
 
