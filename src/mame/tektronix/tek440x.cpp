@@ -820,9 +820,10 @@ void tek440x_state::mapcntl_w(u8 data)
 		LOG("mapcntl_w pte PID      %2d\n", data & 15);
 		
 		if (BIT(data, MAP_VM_ENABLE) && (data & 15))
-		for(uint32_t i=0; i<0x08; i++)
+		for(uint32_t i=0; i<2048; i++)
 		{
-			LOG("mapcntl_w: %08x -> paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
+			if (m_map[i])
+			LOG("XXXmapcntl_w: %08x -> paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
 				OFF16_TO_OFF8(i << 11), OFF16_TO_OFF8(BIT(m_map[i], 0, 11)<<11),
 				BIT(m_map[i], 11, 3), m_map[i] & 0x8000 ? 1 : 0, m_map[i] & 0x4000 ? 1 : 0);
 		}
