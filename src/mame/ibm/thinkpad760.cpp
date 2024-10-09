@@ -2,7 +2,7 @@
 // copyright-holders:
 /*************************************************************************************************************
 Skeleton driver for IBM ThinkPad 760 series.
-BM ThinkPad 760 was a notebook computer introduced in 1995 by IBM as part of the ThinkPad 700-series.
+IBM ThinkPad 760 was a notebook computer introduced in 1995 by IBM as part of the ThinkPad 700-series.
 Eleven models were produced: 760C, 760CD, 760L, 760LD, 760E, 760ED, 760EL, 760ELD, 760XL, 760XD, and 760D/L.
 
 Hardware for the 760XD model.
