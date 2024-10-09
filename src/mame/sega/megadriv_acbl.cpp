@@ -4,21 +4,26 @@
 
     Sega Mega Drive/Genesis-based bootlegs
 
-    Games supported:
+    Games supported (with PIC protection):
         * Aladdin
         * Bare Knuckle II
         * Bare Knuckle III
-        * Bare Knuckle III / Sunset Riders
         * Jurassic Park
-        * Mortal Kombat 3
         * Sonic The Hedgehog 2
         * Sonic The Hedgehog 3
-        * Super Street Fighter II - The New Challengers
-        * Sunset Riders
         * Twinkle Tale
 
+    Games supported (with Actel scrambling/protection)
+        * Bare Knuckle
+        * Bare Knuckle II
+        * Bare Knuckle III
+        * Mortal Kombat 3
+        * Sunset Riders
+        * Super Street Fighter II
+        * Sunset Riders / Bare Knuckle III (2 in 1)
+        * Sunset Riders / Super Street Fighter II (2 in 1)
 
-Aladdin PCB info
+PIC Style PCB info
 ================
 
 CPU
@@ -29,10 +34,9 @@ Sound RAM 8kB (76c88-6264 x1)
 Sound IC YM2612 (identified by pins,code was been erased.Named on board as TA07)
 
 Other ICs
-Microchip PIC16C57 (probably it contains the MD modified bios)
+Microchip PIC16C57 (usually used for coin handling and/or protection)
 Osc 50 MHz
-There are present 3 flat-pack chips with code erased again and named TA04,TA05,TA06 on board,which i have
-identified (generically) by looking the PCB as:
+There are present 3 flat-pack chips, common bootleg MD chipset
 TA04-Intercommunication and sync generator chip
 TA05-Input controller
 TA06-VDP (probably MD clone) Uses 2x D41264 SIL package as video RAM
@@ -42,8 +46,9 @@ ROMs
 M3,M4 main program
 M1,M2 graphics
 All EPROMs are 27C040
+barek3mba is basically the same but with 2 extra ROM slots
 
-Notes:
+aladmdb Notes:
 
 Dip-switch 8 x1
 
@@ -1175,6 +1180,35 @@ void md_boot_6button_state::init_bk3ssrmb()
 	init_megadrij();
 }
 
+void md_boot_6button_state::init_srssf2mb()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int x = 0x00001; x < 0x100000; x += 2)
+	{
+		rom[x] = bitswap<8>(rom[x] ^ 0xff, 3, 1, 6, 4, 7, 0, 2, 5);
+	}
+
+	for (int x = 0x100001; x < 0x180000; x += 2)
+	{
+		rom[x] = bitswap<8>(rom[x] ^ 0xff, 2, 4, 0, 7, 1, 3, 5, 6);
+	}
+
+	for (int x = 0x180001; x < 0x200000; x += 2)
+	{
+		rom[x] = bitswap<8>(rom[x], 3, 7, 0, 5, 1, 6, 2, 4);
+	}
+
+	for (int x = 0x200001; x < 0x700000; x += 2)
+	{
+		rom[x] = bitswap<8>(rom[x], 1, 7, 6, 4, 5, 2, 3, 0);
+	}
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_6button_state::dsw_r)));
+
+	init_megadrij();
+}
+
 void md_boot_state::init_sonic2mb()
 {
 	// 100000 = writes to unpopulated MCU?
@@ -1337,6 +1371,17 @@ ROM_START( bk3ssrmb )
 	ROM_LOAD16_BYTE( "8.u8",  0x300001, 0x040000,  CRC(32ee1048) SHA1(1b135c200b4440e95a7d1766b4b404ddd238872d) )
 ROM_END
 
+ROM_START( srssf2mb ) // TODO: identify correct order
+	ROM_REGION( 0x700000, "maincpu", 0 )
+	ROM_LOAD16_BYTE(      "1.u15",       0x000000, 0x040000,  CRC(b40982ca) SHA1(fa7b266d346e2a79936984b2b989f3e8b6a90223) ) // these are the first 0x80000 of SSF2, with differences
+	ROM_LOAD16_BYTE(      "3.u14",       0x000001, 0x040000,  CRC(81ac9700) SHA1(cdc7d49d75b8d4a5ff41181a063e1917483afd75) )
+	ROM_LOAD16_BYTE(      "2.u13",       0x080000, 0x040000,  CRC(e5f1ab97) SHA1(0f4c527043f1272e75a996f4f7270c6ea4ed3c4d) ) // these are Sunset Riders
+	ROM_LOAD16_BYTE(      "4.u12",       0x080001, 0x040000,  CRC(32ee1048) SHA1(1b135c200b4440e95a7d1766b4b404ddd238872d) )
+	ROM_LOAD16_WORD_SWAP( "ys104-01.u5", 0x100000, 0x200000,  CRC(055dea8b) SHA1(663005c6c87046e955c6295bf25379d258dd4066) ) // from here there is a version of SSF2 very similar to ssf2mdb
+	ROM_LOAD16_WORD_SWAP( "ys104-02.u6", 0x300000, 0x200000,  CRC(6fcf8db5) SHA1(319f320110966058ccec8da640877e8a82c3e4b4) )
+	ROM_LOAD16_WORD_SWAP( "ys104-03.u7", 0x500000, 0x200000,  CRC(0771d570) SHA1(6bb93a1fd8f0f2a1a12e9cd3eec762ac46912632) ) // 1ST AND 2ND HALF IDENTICAL
+ROM_END
+
 ROM_START( twinktmb ) // Same PCB as sonic2mb, but in this one the PIC is populated
 	ROM_REGION( 0x400000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "m2.bin", 0x000000, 0x080000,  CRC(44424f8f) SHA1(e16318bfdf869765c821c264cf9a7e6c728f7073) )
@@ -1380,19 +1425,21 @@ ROM_END
  *
  *************************************/
 
-GAME( 1993, aladmdb,   0,        megadrvb,     aladmdb,   md_boot_state,         init_aladmdb,  ROT0, "bootleg / Sega",   "Aladdin (bootleg of Japanese Mega Drive version)",                                       0 )
-GAME( 1996, mk3mdb,    0,        megadrvb_6b,  mk3mdb,    md_boot_6button_state, init_mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Mega Drive version)",                                        0 )
-GAME( 1994, ssf2mdb,   0,        ssf2mdb,      ssf2mdb,   md_boot_6button_state, init_megadrij, ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese Mega Drive version)", 0 )
-GAME( 1993, srmdb,     0,        megadrvb,     srmdb,     md_boot_state,         init_srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Mega Drive version)",                                          0 )
+// PIC protected hardware with Mega Drive bootleg chipset marked TA-04, TA-05 and TA-06.
+GAME( 1993, aladmdb,   0,        megadrvb,     aladmdb,   md_boot_state,         init_aladmdb,  ROT0, "bootleg / Sega",   "Aladdin (bootleg of Mega Drive version)",                                       0 )
 GAME( 1993, sonic2mb,  0,        md_bootleg,   sonic2mb,  md_boot_state,         init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Mega Drive version)",                                   0 ) // Flying wires going through the empty PIC space aren't completely understood
 GAME( 1993, sonic3mb,  0,        md_bootleg,   sonic3mb,  md_sonic3bl_state,     init_sonic3mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 3 (bootleg of Mega Drive version)",                                   MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
 GAME( 1994, barek2mb,  0,        md_boot_mcu,  barek2,    md_boot_mcu_state,     init_megadrij, ROT0, "bootleg / Sega",   "Bare Knuckle II (bootleg of Mega Drive version)",                                        0 ) // PCB labeled "BK-059"
-GAME( 1994, barek3mb,  0,        megadrvb,     barek3,    md_boot_state,         init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Mega Drive version)",                                       0 )
-GAME( 1994, barek3mba, barek3mb, megadrvb,     barek3,    md_boot_state,         init_barek3a,  ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Mega Drive version, protected)",                            MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
-GAME( 1994, bk3ssrmb,  0,        megadrvb_6b,  bk3ssrmb,  md_boot_6button_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (bootleg of Mega Drive versions)",                      MACHINE_NOT_WORKING ) // Currently boots as Bare Knuckle III, mechanism to switch game not found yet
+GAME( 1994, barek3mba, barek3mb, megadrvb,     barek3,    md_boot_state,         init_barek3a,  ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Mega Drive version)",                            MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
 GAME( 1993, twinktmb,  0,        md_bootleg,   twinktmb,  md_boot_state,         init_twinktmb, ROT0, "bootleg / Sega",   "Twinkle Tale (bootleg of Mega Drive version)",                                           MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation
 GAME( 1993, jparkmb,   0,        md_bootleg,   twinktmb,  md_boot_state,         init_jparkmb,  ROT0, "bootleg / Sega",   "Jurassic Park (bootleg of Mega Drive version)",                                          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation
 
-// Chinese bootlegs. Very clean looking with custom chips marked TA-04, TA-05 and TA-06.
-GAME( 1994, barekch,   0,        megadrvb_6b,  barekch,   md_boot_6button_state, init_barekch,  ROT0, "bootleg",          "Bare Knuckle (Chinese bootleg of Mega Drive version)",                                   0 )
-GAME( 1994, barek2ch,  0,        md_bootleg,   barek2ch,  md_boot_state,         init_barek2ch, ROT0, "bootleg",          "Bare Knuckle II (Chinese bootleg of Mega Drive version)",                                0 )
+// Scrambled bootlegs with Actel for scrambling and Mega Drive bootleg chipset marked TA-04, TA-05 and TA-06.
+GAME( 1994, barekch,   0,        megadrvb_6b,  barekch,   md_boot_6button_state, init_barekch,  ROT0, "bootleg",          "Bare Knuckle (scrambled bootleg of Mega Drive version)",                                   0 )
+GAME( 1994, barek2ch,  0,        md_bootleg,   barek2ch,  md_boot_state,         init_barek2ch, ROT0, "bootleg",          "Bare Knuckle II (scrambled bootleg of Mega Drive version)",                                0 )
+GAME( 1994, barek3mb,  0,        megadrvb,     barek3,    md_boot_state,         init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (scrambled bootleg of Mega Drive version)",                                       0 )
+GAME( 1994, bk3ssrmb,  0,        megadrvb_6b,  bk3ssrmb,  md_boot_6button_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (scrambled bootleg of Mega Drive versions)",                      MACHINE_NOT_WORKING ) // Currently boots as Bare Knuckle III, mechanism to switch game not emulated yet
+GAME( 1994, srssf2mb,  0,        megadrvb_6b,  bk3ssrmb,  md_boot_6button_state, init_srssf2mb, ROT0, "bootleg / Sega",   "Sunset Riders / Super Street Fighter II - The New Challengers (scrambled bootleg of Mega Drive versions)", MACHINE_NOT_WORKING )
+GAME( 1996, mk3mdb,    0,        megadrvb_6b,  mk3mdb,    md_boot_6button_state, init_mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (scrambled bootleg of Mega Drive version)",                                        0 )
+GAME( 1994, ssf2mdb,   0,        ssf2mdb,      ssf2mdb,   md_boot_6button_state, init_megadrij, ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (scrambled bootleg of Mega Drive version)", 0 )
+GAME( 1993, srmdb,     0,        megadrvb,     srmdb,     md_boot_state,         init_srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (scrambled bootleg of Mega Drive version)",                                          0 )
