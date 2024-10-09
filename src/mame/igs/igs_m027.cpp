@@ -2700,6 +2700,7 @@ ROM_START( cjddz )
 	ROM_LOAD( "ddz_sp.u4", 0x00000, 0x200000, CRC(7ef65d95) SHA1(345c587cd449d6d06908e9687480be76b2cb2d28) )
 ROM_END
 
+// 超级斗地主加强版 (Chāojí Dòu Dìzhǔ Jiāqiáng Bǎn)
 ROM_START( cjddzp )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
@@ -3016,7 +3017,7 @@ GAMEL( 1999, oceanpara, oceanpar, oceanpar,     oceanpara,igs_m027_state, init_o
 GAMEL( 1999, fruitpar,  0,        oceanpar,     oceanpar, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)",   0, layout_oceanpar )
 GAMEL( 1999, fruitpara, fruitpar, oceanpar,     fruitpara,igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", 0, layout_oceanpar )
 GAME(  200?, cjddz,     0,        cjddz,        cjddz,    igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu", 0 )
-GAME(  200?, cjddzp,    0,        cjddz,        cjddz,    igs_m027_state, init_cjddzp,   ROT0, "IGS", "Chaoji Dou Dizhu Plus (S300CN)", 0 ) // 超级斗地主加强版 
+GAME(  200?, cjddzp,    0,        cjddz,        cjddz,    igs_m027_state, init_cjddzp,   ROT0, "IGS", "Chaoji Dou Dizhu Jiaqiang Ban (S300CN)", 0 )
 GAMEL( 2007, tripslot,  0,        tripslot,     tripslot, igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
 // this has a 2nd 8255
 GAME(  2001, extradrw,  0,        extradrw,     base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
