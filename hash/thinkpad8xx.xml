@@ -15,14 +15,14 @@ license:CC0-1.0
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="AIX 4 Volume 1 of 2" />
 			<feature name="form" value="LK2T0241" /> <!-- FORM on internal .Version -->
-			<feature name="date" value="970227070036" /> <!-- September 29, 2000, on internal .Version -->
+			<feature name="date" value="970227070036" /> <!-- 1997-02-27, on internal .Version -->
 			<diskarea name="cdrom">
 				<disk name="aix_4.1.5_disc_01" sha1="4c49c8190e33c2c7f13a74d7332d384edd6b3042" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="AIX 4 Volume 2 of 2" />
-			<feature name="date" value="970331130110" /> <!-- September 30, 2000, on internal .Version  -->
+			<feature name="date" value="970331130110" /> <!-- 1997-03-31, on internal .Version  -->
 			<diskarea name="cdrom">
 				<disk name="aix_4.1.5_disc_02" sha1="228afedd90619e89c6b466b4970bda0e5a3e9a13" />
 			</diskarea>
@@ -39,7 +39,7 @@ license:CC0-1.0
 			<feature name="part_number" value="40H1045" /> <!-- PN on CD cover -->
 			<feature name="part" value="11H6464" /> <!-- PART on internal .Version -->
 			<feature name="form" value="Power Desktop" /> <!-- FORM on internal .Version -->
-			<feature name="date" value="951031114200" /> <!-- February 20, 2000 -->
+			<feature name="date" value="951031114200" /> <!-- 1995-10-31, on internal .Version -->
 			<diskarea name="cdrom">
 				<disk name="aix-v4-cd1" sha1="f4a123d7a05de29a43d72b96cbf724ef07855529" />
 			</diskarea>
@@ -47,7 +47,7 @@ license:CC0-1.0
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="AIX Version 4 for Clients, Ultimedia Services for AIX and Softwindows Volume 2 of 2" />
 			<feature name="part_number" value="40H1045" /> <!-- PN on CD cover -->
-			<feature name="date" value="951101095254" /> <!-- February 21, 2000, on internal .Version -->
+			<feature name="date" value="951101095254" /> <!-- 1995-11-01, on internal .Version -->
 			<diskarea name="cdrom">
 				<disk name="aix-v4-cd2" sha1="4e02e0ab831031972774bc7c915bed9af9be2d63" />
 			</diskarea>
@@ -55,7 +55,7 @@ license:CC0-1.0
 		<part name="cdrom3" interface="cdrom">
 			<feature name="part_id" value="Personal Conferencing for AIX" />
 			<feature name="part_number" value="29H8218" /> <!-- PN on CD cover -->
-			<feature name="date" value="950626105428" /> <!-- February 15, 2000, on internal .Version -->
+			<feature name="date" value="950626105428" /> <!-- 1995-06-26, on internal .Version -->
 			<diskarea name="cdrom">
 				<disk name="pers-conf-cd" sha1="a04abd5319b493bd80be4b7c9cdcf6955d93f655" />
 			</diskarea>
@@ -70,7 +70,7 @@ license:CC0-1.0
 		<part name="cdrom5" interface="cdrom">
 			<feature name="part_id" value="IBM VoiceType technology for AIX on IBM's Power Series Systems" />
 			<feature name="part_number" value="40H1047" /> <!-- PN on CD cover -->
-			<feature name="date" value="951027081410" /> <!-- February 20, 2000, on internal .Version -->
+			<feature name="date" value="951027081410" /> <!-- 1995-10-27, on internal .Version -->
 			<diskarea name="cdrom">
 				<disk name="voicetype-aix-cd" sha1="117ca460aa35d7000072ce2bb4ea6647c9b5c8eb" />
 			</diskarea>
