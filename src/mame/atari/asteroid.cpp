@@ -838,7 +838,7 @@ void asteroid_state::asteroid_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &asteroid_state::asteroid_map);
 	m_maincpu->set_periodic_int(FUNC(asteroid_state::asteroid_interrupt), attotime::from_hz(CLOCK_3KHZ/12));
 
-	WATCHDOG_TIMER(config, "watchdog");
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(CLOCK_3KHZ / 256));
 
 	TTL153(config, m_dsw_sel);
 
