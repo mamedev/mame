@@ -19996,6 +19996,9 @@ rtpca25                         // IBM RT PC Model A25
 thinkpad600                     // IBM Thinkpad 600
 thinkpad600e                    // IBM Thinkpad 600E
 
+@source:ibm/thinkpad760.cpp
+thinkpad760xd                   // IBM Thinkpad 760XD
+
 @source:ibm/thinkpad8xx.cpp
 thinkpad850                     // IBM Thinkpad 850
 
