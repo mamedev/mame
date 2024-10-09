@@ -14,14 +14,65 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="800,820,850" />
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="AIX 4 Volume 1 of 2" />
+			<feature name="form" value="LK2T0241" /> <!-- FORM on internal .Version -->
+			<feature name="date" value="970227070036" /> <!-- 1997-02-27, on internal .Version -->
 			<diskarea name="cdrom">
 				<disk name="aix_4.1.5_disc_01" sha1="4c49c8190e33c2c7f13a74d7332d384edd6b3042" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="AIX 4 Volume 2 of 2" />
+			<feature name="date" value="970331130110" /> <!-- 1997-03-31, on internal .Version  -->
 			<diskarea name="cdrom">
 				<disk name="aix_4.1.5_disc_02" sha1="228afedd90619e89c6b466b4970bda0e5a3e9a13" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="aix_4" supported="no">
+		<description>AIX 4</description>
+		<year>1995</year> <!-- Printed on first AIX CD cover -->
+		<publisher>IBM</publisher>
+		<sharedfeat name="compatibility" value="800,820,850" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="AIX Version 4 for Clients, Ultimedia Services for AIX and Softwindows Volume 1 of 2" />
+			<feature name="part_number" value="40H1045" /> <!-- PN on CD cover -->
+			<feature name="part" value="11H6464" /> <!-- PART on internal .Version -->
+			<feature name="form" value="Power Desktop" /> <!-- FORM on internal .Version -->
+			<feature name="date" value="951031114200" /> <!-- 1995-10-31, on internal .Version -->
+			<diskarea name="cdrom">
+				<disk name="aix-v4-cd1" sha1="f4a123d7a05de29a43d72b96cbf724ef07855529" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="AIX Version 4 for Clients, Ultimedia Services for AIX and Softwindows Volume 2 of 2" />
+			<feature name="part_number" value="40H1045" /> <!-- PN on CD cover -->
+			<feature name="date" value="951101095254" /> <!-- 1995-11-01, on internal .Version -->
+			<diskarea name="cdrom">
+				<disk name="aix-v4-cd2" sha1="4e02e0ab831031972774bc7c915bed9af9be2d63" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Personal Conferencing for AIX" />
+			<feature name="part_number" value="29H8218" /> <!-- PN on CD cover -->
+			<feature name="date" value="950626105428" /> <!-- 1995-06-26, on internal .Version -->
+			<diskarea name="cdrom">
+				<disk name="pers-conf-cd" sha1="a04abd5319b493bd80be4b7c9cdcf6955d93f655" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_id" value="ThinkPad Power Series 850 Program Pack" /> <!-- Contains documents, drivers, and utilities for AIX and Windows NT -->
+			<feature name="part_number" value="41H6500" /> <!-- PN on CD cover -->
+			<diskarea name="cdrom">
+				<disk name="prog-pack-cd" sha1="e0b3c31db2bb6f62a23ba557a882a1c64e46a0cf" />
+			</diskarea>
+		</part>
+		<part name="cdrom5" interface="cdrom">
+			<feature name="part_id" value="IBM VoiceType technology for AIX on IBM's Power Series Systems" />
+			<feature name="part_number" value="40H1047" /> <!-- PN on CD cover -->
+			<feature name="date" value="951027081410" /> <!-- 1995-10-27, on internal .Version -->
+			<diskarea name="cdrom">
+				<disk name="voicetype-aix-cd" sha1="117ca460aa35d7000072ce2bb4ea6647c9b5c8eb" />
 			</diskarea>
 		</part>
 	</software>
@@ -33,14 +84,14 @@ license:CC0-1.0
 		<publisher>IBM</publisher>
 		<sharedfeat name="compatibility" value="820,850" />
 		<part name="cdrom1" interface="cdrom">
-			<feature name="part_number" value="19H1133"/>
+			<feature name="part_number" value="19H1133" />
 			<diskarea name="cdrom">
 				<disk name="os2-ppc-cd1-os" sha1="b646fdb3ab5f982304e7cbaf6bd735e20cc66198" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
-			<feature name="part_id" value="Applications Sampler December, 1995"/>
-			<feature name="part_number" value="19H1134"/>
+			<feature name="part_id" value="Applications Sampler December, 1995" />
+			<feature name="part_number" value="19H1134" />
 			<diskarea name="cdrom">
 				<disk name="os2-ppc-cd2-sampler" sha1="e1fd3631c353b2903d35658a59e8a79b6306c1d2" />
 			</diskarea>
@@ -53,21 +104,21 @@ license:CC0-1.0
 		<publisher>Sun Microsystem</publisher>
 		<sharedfeat name="compatibility" value="800,820,850" />
 		<part name="flop" interface="floppy">
-			<feature name="part_id" value="Solaris MDB Boot 2.5.1 Release PowerPC Platform Edition (IBM Hardware Platform)"/>
-			<feature name="part_number" value="702-4348-06"/>
+			<feature name="part_id" value="Solaris MDB Boot 2.5.1 Release PowerPC Platform Edition (IBM Hardware Platform)" />
+			<feature name="part_number" value="702-4348-06" />
 			<dataarea name="flop" size="1474560">
 				<rom name="solaris_2_5_1_mdb_boot_ppc_ibm.img" size="1474560" crc="b45832e2" sha1="be9e11364816ab5f3362396ed0f457d4a2e61188" />
 			</dataarea>
 		</part>
 		<part name="cdrom1" interface="cdrom">
-			<feature name="part_number" value="704-5237-06"/>
+			<feature name="part_number" value="704-5237-06" />
 			<diskarea name="cdrom">
 				<disk name="solaris_2.5.1_powerpc" sha1="61f003bf259e472673b6f65b18ed9b2629ea396b" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
-			<feature name="part_id" value="Solaris Desktop 1.1 PowerPC Platform Edition"/>
-			<feature name="part_number" value="704-5507-06"/>
+			<feature name="part_id" value="Solaris Desktop 1.1 PowerPC Platform Edition" />
+			<feature name="part_number" value="704-5507-06" />
 			<diskarea name="cdrom">
 				<disk name="solaris_desktop_1.1_powerpc" sha1="00502ae94b626f0fc3a080ba1c419397b8aaaae3" />
 			</diskarea>
@@ -80,13 +131,13 @@ license:CC0-1.0
 		<publisher>IBM</publisher>
 		<sharedfeat name="compatibility" value="800,820,850" />
 		<part name="flop" interface="floppy">
-			<feature name="part_id" value="Windows NT ARC Boot Firmware v1.51"/>
+			<feature name="part_id" value="Windows NT ARC Boot Firmware v1.51" />
 			<dataarea name="flop" size="1474560">
 				<rom name="winnt_arc_151.img" size="1474560" crc="98db8c77" sha1="56be119ce7a0020bf4caabd099d2eae8e249305c" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
-		<feature name="part_number" value="11H5926"/>
+		<feature name="part_number" value="11H5926" />
 			<diskarea name="cdrom">
 				<disk name="windows_nt_3.5_workstation_powerpc" sha1="ea1035d1c7f68d8237926125e9a9ccae83fa3f82" />
 			</diskarea>
