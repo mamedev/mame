@@ -83,7 +83,7 @@ void thinkpad760_state::thinkpad760(machine_config &config)
 	PCI_ROOT(config, "pci", 0);
 	// ...
 
-	H83337(config, "mcu", 16'000'000); // Actually an Hitachi HD6433436A18F, unknown clock
+	H83337(config, "mcu", 10_MHz_XTAL); // Actually an Hitachi HD6433436A18F
 
 	DS17485(config, "rtc", 16'000'000); // Dallas DS17485S-5, unknown clock
 
