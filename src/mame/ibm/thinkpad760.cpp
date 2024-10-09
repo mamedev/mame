@@ -31,7 +31,7 @@ Hardware for the 760XD model.
     -Texas Instruments PCIbus PCI1130PDV.
     -Texas Instruments 90G9510.
     -Intel Flash E28F004 (BIOS).
-    -LVSI VY06784B (near a 36.864 MHz xtal).
+    -VLSI VY06784B (near a 36.864 MHz xtal).
   Video PCB:
     -NEC 53G9037.
     -IBM 20H2929.
