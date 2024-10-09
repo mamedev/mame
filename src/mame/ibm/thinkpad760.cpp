@@ -31,15 +31,17 @@ Hardware for the 760XD model.
     -Texas Instruments PCIbus PCI1130PDV.
     -Texas Instruments 90G9510.
     -Intel Flash E28F004 (BIOS).
+    -LVSI VY06784B (near a 36.864 MHz xtal).
   Video PCB:
     -NEC 53G9037.
     -IBM 20H2929.
-    -IBM 03H9515.
+    -IBM 03H9515 (near a 40.000 MHz xtal).
     -Trident Cyber9385T.
     -Two National Semiconductor DS90CF561MTD (LVDS 18-Bit Color Flat Panel Display [FPD] Link).
     -Six KM416V256DT-L6 (256K x 16Bit CMOS Dynamic RAM with Fast Page Mode).
     -AD722JR (RGB to NTSC/PAL Encoder).
-    -Philips SAA7110A WP.
+    -Philips SAA7110A WP (near a 26.800 MHz xtal).
+    -Other xtals (besides the earlier noted 40.000 and 26.800 MHz): 35.468 MHz, 27.000 MHz, and 28.636 MHz.
   Sound PCB:
     -HM62W4032HFP25.
     -Crystal CS4218-KQ.
