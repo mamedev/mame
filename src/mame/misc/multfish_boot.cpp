@@ -61,7 +61,7 @@ keksb     1,1 1,3 1,5 1,7  3,3  3,4
 
 ROM_START( mfish_3a ) // 021124 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "bootleg_mf021124a.rom", 0x00000, 0x40000, CRC(31344b4e) SHA1(33c7f30b55d22c087a02e840456d475177df8bf1) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_mf021124a.rom", 0x00000, 0x40000, CRC(31344b4e) SHA1(33c7f30b55d22c087a02e840456d475177df8bf1) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "multi_fish.001", 0x000000, 0x80000, CRC(2f2a7367) SHA1(ce7ee9ca4f374ec61edc3b89d4752f0edb64a910) )
@@ -79,7 +79,7 @@ ROM_END
 
 ROM_START( mfish_12a ) // 040308 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "bootleg_mf040308a.rom", 0x00000, 0x40000, CRC(44537648) SHA1(7bce6085778ff0b21c052ae91703de3b78b8eed0) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_mf040308a.rom", 0x00000, 0x40000, CRC(44537648) SHA1(7bce6085778ff0b21c052ae91703de3b78b8eed0) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "multi_fish.001", 0x000000, 0x80000, CRC(2f2a7367) SHA1(ce7ee9ca4f374ec61edc3b89d4752f0edb64a910) )
@@ -99,7 +99,7 @@ ROM_END
 
 ROM_START( czmon_7a ) // 031110 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_cm_m_031110a.rom", 0x00000, 0x40000, CRC(80666246) SHA1(e15a210b11ba769ca4fd637c962932417555dc0e) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_cm_m_031110a.rom", 0x00000, 0x40000, CRC(80666246) SHA1(e15a210b11ba769ca4fd637c962932417555dc0e) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "crazymonkey_m.001", 0x000000, 0x80000, CRC(683f2be3) SHA1(6fdba4ec07752bf049787a11638895352e9d5f10) )
@@ -117,7 +117,7 @@ ROM_END
 
 ROM_START( czmon_7b ) // 031110 backdoor 1,5 5,5 1,7 3,2  3,3  3,4
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_cm_m_031110b.rom", 0x00000, 0x40000, CRC(bb6f4f85) SHA1(a2f44632f857392eb422412b55a19decae4c8620) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_cm_m_031110b.rom", 0x00000, 0x40000, CRC(bb6f4f85) SHA1(a2f44632f857392eb422412b55a19decae4c8620) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "crazymonkey_m.001", 0x000000, 0x80000, CRC(683f2be3) SHA1(6fdba4ec07752bf049787a11638895352e9d5f10) )
@@ -135,7 +135,7 @@ ROM_END
 
 ROM_START( czmon_8a ) // 050120 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_cm_m_050120a.rom", 0x00000, 0x40000, CRC(e20a6997) SHA1(50e0f0f354dd6db2be64d42e36b4043915c4276b) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_cm_m_050120a.rom", 0x00000, 0x40000, CRC(e20a6997) SHA1(50e0f0f354dd6db2be64d42e36b4043915c4276b) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "crazymonkey_m.001", 0x000000, 0x80000, CRC(683f2be3) SHA1(6fdba4ec07752bf049787a11638895352e9d5f10) )
@@ -153,7 +153,7 @@ ROM_END
 
 ROM_START( czmon_8b ) // 050120 changed version text to 070315
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_cm_m_050120b.rom", 0x00000, 0x40000, CRC(9350d184) SHA1(ccb79bb6c5e9025d64fe07c02334c43d75ee3334) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_cm_m_050120b.rom", 0x00000, 0x40000, CRC(9350d184) SHA1(ccb79bb6c5e9025d64fe07c02334c43d75ee3334) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "crazymonkey_m.001", 0x000000, 0x80000, CRC(683f2be3) SHA1(6fdba4ec07752bf049787a11638895352e9d5f10) )
@@ -171,7 +171,7 @@ ROM_END
 
 ROM_START( czmon_8c ) // 050120 custom alteras, modified graphics, changed version text to "VIDEO GAME-1 CM01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_cm_m_050120c.rom", 0x00000, 0x40000, CRC(231008a7) SHA1(81f77644ba971946cfdf40e6f886652550b10bae) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_cm_m_050120c.rom", 0x00000, 0x40000, CRC(231008a7) SHA1(81f77644ba971946cfdf40e6f886652550b10bae) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1b", 0x000000, 0x80000, CRC(6595a293) SHA1(87b6adc837ca7540dd1ae10b544bd753abc95c38) )
@@ -189,7 +189,7 @@ ROM_END
 
 ROM_START( czmon_8d ) // 050120 modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_cm_m_050120d.rom", 0x00000, 0x40000, CRC(ad37f261) SHA1(0e03bf6134b59340cb43b7d3bdd0e746ebfb112a) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_cm_m_050120d.rom", 0x00000, 0x40000, CRC(ad37f261) SHA1(0e03bf6134b59340cb43b7d3bdd0e746ebfb112a) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1e", 0x000000, 0x80000, CRC(0a087fce) SHA1(32bb353a45ea39e16fafb78bb10dbd3d330365a6) )
@@ -207,7 +207,7 @@ ROM_END
 
 ROM_START( czmon_8e ) // 050120 modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-CM2"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_cm_m_050120e.rom", 0x00000, 0x40000, CRC(b4b79f13) SHA1(7efb67eb66e18885760422a239f2f56052aa7aa2) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_cm_m_050120e.rom", 0x00000, 0x40000, CRC(b4b79f13) SHA1(7efb67eb66e18885760422a239f2f56052aa7aa2) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1f", 0x000000, 0x80000, CRC(a2825411) SHA1(ad2d8bdd7b8031e69d3357911b4be7913cdde668) )
@@ -225,7 +225,7 @@ ROM_END
 
 ROM_START( czmon_8f ) // 050120 custom_alteras, modified graphics, many texts changed, changed version text to "LOTOS CM01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_cm_m_050120f.rom", 0x00000, 0x40000, CRC(1ea2e07e) SHA1(964b7381573918880b1b537ab5f8006702d2eedb) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_cm_m_050120f.rom", 0x00000, 0x40000, CRC(1ea2e07e) SHA1(964b7381573918880b1b537ab5f8006702d2eedb) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1g", 0x000000, 0x80000, CRC(88ef6dfb) SHA1(a8e323b363f30f8b3ec1f57dbffbedd0a868dc91) )
@@ -244,7 +244,7 @@ ROM_END
 
 ROM_START( czmon_9a ) // 070315 custom alteras, modified graphics, changed version text to "VIDEO GAME-1 O01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_cm_070315a.rom", 0x00000, 0x40000, CRC(1c4ea4ac) SHA1(ffbc5345170afdca9154a8a53c2887439b04b489) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_cm_070315a.rom", 0x00000, 0x40000, CRC(1c4ea4ac) SHA1(ffbc5345170afdca9154a8a53c2887439b04b489) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1c", 0x000000, 0x80000, CRC(449253a7) SHA1(766e3b9b9585ee8c3b952033e5fb78c256075925) )
@@ -262,7 +262,7 @@ ROM_END
 
 ROM_START( czmon_9b ) // 070315 modified graphics, changed version text to "VIDEO GAME-1 O01" (czmon_9a, decoded gfx)
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_cm_070315a.rom", 0x00000, 0x40000, CRC(1c4ea4ac) SHA1(ffbc5345170afdca9154a8a53c2887439b04b489) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_cm_070315a.rom", 0x00000, 0x40000, CRC(1c4ea4ac) SHA1(ffbc5345170afdca9154a8a53c2887439b04b489) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1d", 0x000000, 0x80000, CRC(19e03366) SHA1(0050d54f816a10f03b3e76b8472038d39ebe6fc7) )
@@ -280,7 +280,7 @@ ROM_END
 
 ROM_START( czmon_9c ) // 070315 payout percentage 70%
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_cm_070315b.rom", 0x00000, 0x40000, CRC(d49d3d36) SHA1(00c1ddac53ada6905fe1a8c450158c87c87f33d6) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_cm_070315b.rom", 0x00000, 0x40000, CRC(d49d3d36) SHA1(00c1ddac53ada6905fe1a8c450158c87c87f33d6) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "crazymonkey.001", 0x000000, 0x80000, CRC(665ae6a1) SHA1(2ef2d657918d66d303d45d2d82430d13108f3fad) )
@@ -300,7 +300,7 @@ ROM_END
 
 ROM_START( fcockt_6a ) // 040216 bank F8
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc_m_040216a.rom", 0x00000, 0x40000, CRC(58e7a0c6) SHA1(8022f92af05e9ff6999ff936bad6048d6c264086) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc_m_040216a.rom", 0x00000, 0x40000, CRC(58e7a0c6) SHA1(8022f92af05e9ff6999ff936bad6048d6c264086) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "fruitcocktail_m.001", 0x000000, 0x80000, CRC(da72c0bb) SHA1(41c9eebccce82520dfe41d6a3a574b2890945ffa) )
@@ -318,7 +318,7 @@ ROM_END
 
 ROM_START( fcockt_6b ) // 040216 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc_m_040216b.rom", 0x00000, 0x40000, CRC(0f6bcf03) SHA1(6c8765f836f1d899aec3be9c842d5064fd70a435) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc_m_040216b.rom", 0x00000, 0x40000, CRC(0f6bcf03) SHA1(6c8765f836f1d899aec3be9c842d5064fd70a435) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "fruitcocktail_m.001", 0x000000, 0x80000, CRC(da72c0bb) SHA1(41c9eebccce82520dfe41d6a3a574b2890945ffa) )
@@ -336,7 +336,7 @@ ROM_END
 
 ROM_START( fcockt_6c ) // 040216 modified graphics, some code changes, description says "for Lat-02 terminals", older set
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc_m_040216c.rom", 0x00000, 0x40000, CRC(890940db) SHA1(5180d711fb3222e3d86c691cb8a23eed6ea0030e) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc_m_040216c.rom", 0x00000, 0x40000, CRC(890940db) SHA1(5180d711fb3222e3d86c691cb8a23eed6ea0030e) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1c", 0x000000, 0x80000, CRC(3ac27b83) SHA1(72a06f217158367e97d226b3479896319aa3e089) )
@@ -354,7 +354,7 @@ ROM_END
 
 ROM_START( fcockt_6d ) // 040216 modified graphics, some code changes, changed version text to "VIDEO GAME-1 FR01", description says "for Lat-02 terminals", newer set
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc_m_040216d.rom", 0x00000, 0x40000, CRC(c1db9659) SHA1(ff01794b7007b5b0c5e77f9a40d87fb6b125143c) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc_m_040216d.rom", 0x00000, 0x40000, CRC(c1db9659) SHA1(ff01794b7007b5b0c5e77f9a40d87fb6b125143c) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1d", 0x000000, 0x80000, CRC(72ce6a0c) SHA1(e9a6adc9e077fd2a6242282af3d2edc2d3db2a68) )
@@ -372,7 +372,7 @@ ROM_END
 
 ROM_START( fcockt_7a ) // 050118 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc_m_050118a.rom", 0x00000, 0x40000, CRC(eb2bd908) SHA1(b8e9ef469767fb9e95ff181876ffeaee4b7b9361) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc_m_050118a.rom", 0x00000, 0x40000, CRC(eb2bd908) SHA1(b8e9ef469767fb9e95ff181876ffeaee4b7b9361) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "fruitcocktail_m.001", 0x000000, 0x80000, CRC(da72c0bb) SHA1(41c9eebccce82520dfe41d6a3a574b2890945ffa) )
@@ -390,7 +390,7 @@ ROM_END
 
 ROM_START( fcockt_7b ) // 050118 custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 FR01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc_m_050118b.rom", 0x00000, 0x40000, CRC(5f3067f9) SHA1(db5eb951e481ac169b1b0c2439e6553cd7845383) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc_m_050118b.rom", 0x00000, 0x40000, CRC(5f3067f9) SHA1(db5eb951e481ac169b1b0c2439e6553cd7845383) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1e", 0x000000, 0x80000, CRC(8d8d246a) SHA1(c422a7fb06bf4e94c0fec9de5e6f07ad756c9f02) )
@@ -408,7 +408,7 @@ ROM_END
 
 ROM_START( fcockt_7c ) // 050118 payout percentage 40%
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc_m_050118c.rom", 0x00000, 0x40000, CRC(65ce8d61) SHA1(f8b63d0cc5ad314013dad4d566a08c87430817d7) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc_m_050118c.rom", 0x00000, 0x40000, CRC(65ce8d61) SHA1(f8b63d0cc5ad314013dad4d566a08c87430817d7) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "fruitcocktail_m.001", 0x000000, 0x80000, CRC(da72c0bb) SHA1(41c9eebccce82520dfe41d6a3a574b2890945ffa) )
@@ -426,7 +426,7 @@ ROM_END
 
 ROM_START( fcockt_7d ) // 050118 payout percentage 60%
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc_m_050118d.rom", 0x00000, 0x40000, CRC(f13165ce) SHA1(5340be60a1f1d530b164eddf9d2717ac752253b9) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc_m_050118d.rom", 0x00000, 0x40000, CRC(f13165ce) SHA1(5340be60a1f1d530b164eddf9d2717ac752253b9) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "fruitcocktail_m.001", 0x000000, 0x80000, CRC(da72c0bb) SHA1(41c9eebccce82520dfe41d6a3a574b2890945ffa) )
@@ -444,7 +444,7 @@ ROM_END
 
 ROM_START( fcockt_7e ) // 050118 payout percentage 70%
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc_m_050118e.rom", 0x00000, 0x40000, CRC(0f25d1d3) SHA1(2b16a06f6126d110f8664d0874476b687265bb91) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc_m_050118e.rom", 0x00000, 0x40000, CRC(0f25d1d3) SHA1(2b16a06f6126d110f8664d0874476b687265bb91) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "fruitcocktail_m.001", 0x000000, 0x80000, CRC(da72c0bb) SHA1(41c9eebccce82520dfe41d6a3a574b2890945ffa) )
@@ -462,7 +462,7 @@ ROM_END
 
 ROM_START( fcockt_7f ) // 050118 changed version text to 070305
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc_m_050118f.rom", 0x00000, 0x40000, CRC(a6be3c68) SHA1(53cd6d4d2860ba75c95fa1609efa9ff8ea5e2048) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc_m_050118f.rom", 0x00000, 0x40000, CRC(a6be3c68) SHA1(53cd6d4d2860ba75c95fa1609efa9ff8ea5e2048) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "fruitcocktail_m.001", 0x000000, 0x80000, CRC(da72c0bb) SHA1(41c9eebccce82520dfe41d6a3a574b2890945ffa) )
@@ -480,7 +480,7 @@ ROM_END
 
 ROM_START( fcockt_7g ) // 050118 modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-FC2"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc_m_050118g.rom", 0x00000, 0x40000, CRC(e9d1b425) SHA1(caf76dda7bf2383ce44b81c560d91dbde4d7421e) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc_m_050118g.rom", 0x00000, 0x40000, CRC(e9d1b425) SHA1(caf76dda7bf2383ce44b81c560d91dbde4d7421e) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1h", 0x000000, 0x80000, CRC(5144f9a3) SHA1(e530bb6e1e7c44f7378d6923286f78a74ac34ad4) )
@@ -498,7 +498,7 @@ ROM_END
 
 ROM_START( fcockt_7h ) // 050118 modified graphics, many texts changed, changed version text to "LOTOS FR01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc_m_050118h.rom", 0x00000, 0x40000, CRC(fb191121) SHA1(e08587ac260bc57b16fbb7c7022ae7849946565b) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc_m_050118h.rom", 0x00000, 0x40000, CRC(fb191121) SHA1(e08587ac260bc57b16fbb7c7022ae7849946565b) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1i", 0x000000, 0x80000, CRC(5186689f) SHA1(afaacaaff8b4ba37bba4c0fb800c953fa1a37b04) )
@@ -516,7 +516,7 @@ ROM_END
 
 ROM_START( fcockt_8a ) // 060111 modified graphics, many texts changed, changed version text to "LOTO COCKTAIL V01-0001"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc_m_060111a.rom", 0x00000, 0x40000, CRC(d594f40a) SHA1(291c4a84ba90df5a50205c67874f69efb3346194) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc_m_060111a.rom", 0x00000, 0x40000, CRC(d594f40a) SHA1(291c4a84ba90df5a50205c67874f69efb3346194) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1f", 0x000000, 0x80000, CRC(4e905563) SHA1(63f2e74947fd4918d0fa744db85ca646686bd459) )
@@ -534,7 +534,7 @@ ROM_END
 
 ROM_START( fcockt_8b ) // 060111 modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc_m_060111b.rom", 0x00000, 0x40000, CRC(71796ce6) SHA1(e4f4140cce3dbe7735c13b23682e23c9e1331f3a) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc_m_060111b.rom", 0x00000, 0x40000, CRC(71796ce6) SHA1(e4f4140cce3dbe7735c13b23682e23c9e1331f3a) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1g", 0x000000, 0x80000, CRC(5b658094) SHA1(13801c3267772cecb22578fa6f01c20fe5da687d) )
@@ -554,7 +554,7 @@ ROM_END
 
 ROM_START( lhaunt_4a ) // 031111 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_lh_m_031111a.rom", 0x00000, 0x40000, CRC(83d487c9) SHA1(5b88745d06acba542e2d0660298c9058f2bdfa3f) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_lh_m_031111a.rom", 0x00000, 0x40000, CRC(83d487c9) SHA1(5b88745d06acba542e2d0660298c9058f2bdfa3f) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "luckyhaunter_m.001", 0x000000, 0x80000, CRC(5f1000c6) SHA1(05154d786caf7f5fb9ed90c7d3391cec42e871f8) )
@@ -572,7 +572,7 @@ ROM_END
 
 ROM_START( lhaunt_5a ) // 040216 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_lh_m_040216a.rom", 0x00000, 0x40000, CRC(2a6c7ff9) SHA1(4a0137c7df5003e8fd843d5489d416d15f001f46) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_lh_m_040216a.rom", 0x00000, 0x40000, CRC(2a6c7ff9) SHA1(4a0137c7df5003e8fd843d5489d416d15f001f46) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "luckyhaunter_m.001", 0x000000, 0x80000, CRC(5f1000c6) SHA1(05154d786caf7f5fb9ed90c7d3391cec42e871f8) )
@@ -590,7 +590,7 @@ ROM_END
 
 ROM_START( lhaunt_6a ) // 040825 backdoor 1,5 9,1 5,1 1,5  3,3  3,4
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_lh_m_040825a.rom", 0x00000, 0x40000, CRC(18ba5704) SHA1(3c77ed129db0e5181217167b76292f8e4ee78728) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_lh_m_040825a.rom", 0x00000, 0x40000, CRC(18ba5704) SHA1(3c77ed129db0e5181217167b76292f8e4ee78728) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "luckyhaunter_m.001", 0x000000, 0x80000, CRC(5f1000c6) SHA1(05154d786caf7f5fb9ed90c7d3391cec42e871f8) )
@@ -608,7 +608,7 @@ ROM_END
 
 ROM_START( lhaunt_6b ) // 040825 custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 PB01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_lh_m_040825b.rom", 0x00000, 0x40000, CRC(71bc9811) SHA1(64dc0d81aec657b8c722e530ad5858d831ab7d51) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_lh_m_040825b.rom", 0x00000, 0x40000, CRC(71bc9811) SHA1(64dc0d81aec657b8c722e530ad5858d831ab7d51) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1b", 0x000000, 0x80000, CRC(82e0dd1a) SHA1(7f99fe1e5d304fadae9f1f46ebe8680787c9175b) )
@@ -626,7 +626,7 @@ ROM_END
 
 ROM_START( lhaunt_6c ) // 040825 changed version text to 070604
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_lh_m_040825c.rom", 0x00000, 0x40000, CRC(b2b027c2) SHA1(18e5d7b396103a7301b2a6641ca3d85ab2091d2e) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_lh_m_040825c.rom", 0x00000, 0x40000, CRC(b2b027c2) SHA1(18e5d7b396103a7301b2a6641ca3d85ab2091d2e) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "luckyhaunter_m.001", 0x000000, 0x80000, CRC(5f1000c6) SHA1(05154d786caf7f5fb9ed90c7d3391cec42e871f8) )
@@ -644,7 +644,7 @@ ROM_END
 
 ROM_START( lhaunt_6d ) // 040825 modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_lh_m_040825d.rom", 0x00000, 0x40000, CRC(bf442051) SHA1(0c96b5cbf24dc8786feae658f23518bef6c0d589) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_lh_m_040825d.rom", 0x00000, 0x40000, CRC(bf442051) SHA1(0c96b5cbf24dc8786feae658f23518bef6c0d589) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1c", 0x000000, 0x80000, CRC(9ff7618e) SHA1(1c191a211f2391f5aa5786c2071dc34d909bbe46) )
@@ -662,7 +662,7 @@ ROM_END
 
 ROM_START( lhaunt_6e ) // 040825 modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-LH2"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_lh_m_040825e.rom", 0x00000, 0x40000, CRC(087d4172) SHA1(ec9ca4192031d8b8e3cbaf809e8d1643978481f3) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_lh_m_040825e.rom", 0x00000, 0x40000, CRC(087d4172) SHA1(ec9ca4192031d8b8e3cbaf809e8d1643978481f3) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1d", 0x000000, 0x80000, CRC(41e22133) SHA1(b3d88b62fed9aa4ea5bbdff3f92a4120a239cfb0) )
@@ -680,7 +680,7 @@ ROM_END
 
 ROM_START( lhaunt_6f ) // 040825 custom alteras, modified graphics, many texts changed, changed version text to "LOTOS PB01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_lh_m_040825f.rom", 0x00000, 0x40000, CRC(7033af62) SHA1(c6b859672816f650eb88bc363e6f6d3a197eb99c) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_lh_m_040825f.rom", 0x00000, 0x40000, CRC(7033af62) SHA1(c6b859672816f650eb88bc363e6f6d3a197eb99c) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1e", 0x000000, 0x80000, CRC(c7b0191a) SHA1(d33ababbefcb39f4e6b063f448b8a08b015d6f24) )
@@ -700,7 +700,7 @@ ROM_END
 
 ROM_START( garage_4a ) // 040219 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gg_m_040219a.rom", 0x00000, 0x40000, CRC(e16b213a) SHA1(af0d78116d985efe5f09eb86eb67df2535765527) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gg_m_040219a.rom", 0x00000, 0x40000, CRC(e16b213a) SHA1(af0d78116d985efe5f09eb86eb67df2535765527) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "garage_m.001", 0x000000, 0x80000, CRC(57acd4bc) SHA1(8796f463787c359cce6ac09c1b6895f871bbb7c9) )
@@ -718,7 +718,7 @@ ROM_END
 
 ROM_START( garage_4b ) // 040219 changed version text to 070329
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gg_m_040219b.rom", 0x00000, 0x40000, CRC(b8ebf3b6) SHA1(14c5263571123d251125723b32861bef578de67b) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gg_m_040219b.rom", 0x00000, 0x40000, CRC(b8ebf3b6) SHA1(14c5263571123d251125723b32861bef578de67b) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "garage_m.001", 0x000000, 0x80000, CRC(57acd4bc) SHA1(8796f463787c359cce6ac09c1b6895f871bbb7c9) )
@@ -736,7 +736,7 @@ ROM_END
 
 ROM_START( garage_4c ) // 040219 modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-GG2"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gg_m_040219c.rom", 0x00000, 0x40000, CRC(2e0ee194) SHA1(2dab6f80cd81b34792c1d347e17c2410bf22a48b) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gg_m_040219c.rom", 0x00000, 0x40000, CRC(2e0ee194) SHA1(2dab6f80cd81b34792c1d347e17c2410bf22a48b) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1d", 0x000000, 0x80000, CRC(63cf83f8) SHA1(ac96acd353049e77855cee618521fdba17e1b3f1) )
@@ -754,7 +754,7 @@ ROM_END
 
 ROM_START( garage_5a ) // 050311 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gg_m_050311a.rom", 0x00000, 0x40000, CRC(874a2c27) SHA1(9bf586314f375c2c6f7d79557cc777ac3559cb64) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gg_m_050311a.rom", 0x00000, 0x40000, CRC(874a2c27) SHA1(9bf586314f375c2c6f7d79557cc777ac3559cb64) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "garage_m.001", 0x000000, 0x80000, CRC(57acd4bc) SHA1(8796f463787c359cce6ac09c1b6895f871bbb7c9) )
@@ -772,7 +772,7 @@ ROM_END
 
 ROM_START( garage_5b ) // 050311 custom alteras, modified graphics, changed version text to "VIDEO GAME-1 GA01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gg_m_050311b.rom", 0x00000, 0x40000, CRC(79f9a8e7) SHA1(f6ddd586b72ca004ac18284a0394d5a9d56fbc19) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gg_m_050311b.rom", 0x00000, 0x40000, CRC(79f9a8e7) SHA1(f6ddd586b72ca004ac18284a0394d5a9d56fbc19) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1b", 0x000000, 0x80000, CRC(df71e54b) SHA1(e5899151aea13b527e4f0819609be6d9ee8cc1b2) )
@@ -790,7 +790,7 @@ ROM_END
 
 ROM_START( garage_5c ) // 050311 payout percentage 70%
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gg_m_050311c.rom", 0x00000, 0x40000, CRC(039af644) SHA1(548e2990f15d6f7f68758a91aae5bf297a220698) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gg_m_050311c.rom", 0x00000, 0x40000, CRC(039af644) SHA1(548e2990f15d6f7f68758a91aae5bf297a220698) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "garage_m.001", 0x000000, 0x80000, CRC(57acd4bc) SHA1(8796f463787c359cce6ac09c1b6895f871bbb7c9) )
@@ -808,7 +808,7 @@ ROM_END
 
 ROM_START( garage_5d ) // 050311 modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gg_m_050311d.rom", 0x00000, 0x40000, CRC(00db1210) SHA1(90eb11d6055b464546657233b44a6783c34161ae) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gg_m_050311d.rom", 0x00000, 0x40000, CRC(00db1210) SHA1(90eb11d6055b464546657233b44a6783c34161ae) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1c", 0x000000, 0x80000, CRC(e3deb6f3) SHA1(a1fe01040bd8f4b08268e2b99cfa240e50dce00b) )
@@ -826,7 +826,7 @@ ROM_END
 
 ROM_START( garage_5e ) // 050311 custom alteras, modified graphics, many texts changed, changed version text to "LOTOS GA01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gg_m_050311e.rom", 0x00000, 0x40000, CRC(2c7971ba) SHA1(512c6a76d22ba46c9bbb6cc1255f156a8d20befe) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gg_m_050311e.rom", 0x00000, 0x40000, CRC(2c7971ba) SHA1(512c6a76d22ba46c9bbb6cc1255f156a8d20befe) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1e", 0x000000, 0x80000, CRC(c89cc739) SHA1(31e62dd6ef841dc3f2a3da3e89649b7250cc3a6d) )
@@ -846,7 +846,7 @@ ROM_END
 
 ROM_START( rclimb_3a ) // 040827 backdoor 1,5 9,1 5,1 1,5  3,3  3,4
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_rc_m_040827a.rom", 0x00000, 0x40000, CRC(6420f8b4) SHA1(64e4018dbea245ddc06a65fb2f8cf38e77f60999) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_rc_m_040827a.rom", 0x00000, 0x40000, CRC(6420f8b4) SHA1(64e4018dbea245ddc06a65fb2f8cf38e77f60999) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "rockclimber_m.001", 0x000000, 0x80000, CRC(934f18c7) SHA1(da3a7cddc68e104d415d947e89c0e7f0d067c056) )
@@ -864,7 +864,7 @@ ROM_END
 
 ROM_START( rclimb_3b ) // 040827 - new service menu
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_rc_m_040827.rom", 0x00000, 0x40000, CRC(3ba55647) SHA1(56e96be0d9782da4b3d5d911ea67962257626ae0) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_rc_m_040827.rom", 0x00000, 0x40000, CRC(3ba55647) SHA1(56e96be0d9782da4b3d5d911ea67962257626ae0) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_rc1_.bin", 0x000000, 0x80000, CRC(4bc00c66) SHA1(e4d89c2b188f253b642ae341a1a4c04af33024c8) )
@@ -882,7 +882,7 @@ ROM_END
 
 ROM_START( rclimb_3c ) // 040827 custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 SK01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_rc_m_040827c.rom", 0x00000, 0x40000, CRC(4b8b3e0e) SHA1(6554073d589de67807c3b3779c1f2fa610aa03df) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_rc_m_040827c.rom", 0x00000, 0x40000, CRC(4b8b3e0e) SHA1(6554073d589de67807c3b3779c1f2fa610aa03df) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1b", 0x000000, 0x80000, CRC(a66e718a) SHA1(84493efde5a70032e709ebde5635ed50e151d2ab) )
@@ -900,7 +900,7 @@ ROM_END
 
 ROM_START( rclimb_3d ) // 040827 modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_rc_m_040827d.rom", 0x00000, 0x40000, CRC(b7796cff) SHA1(a180397d8827adbc161e282a4ee6d064d4837199) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_rc_m_040827d.rom", 0x00000, 0x40000, CRC(b7796cff) SHA1(a180397d8827adbc161e282a4ee6d064d4837199) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1c", 0x000000, 0x80000, CRC(b846d5c8) SHA1(235ebe08ef89b308dd9642ebb8ce0eb102ffaf7d) )
@@ -918,7 +918,7 @@ ROM_END
 
 ROM_START( rclimb_3e ) // 040827 custom alteras, modified graphics, many texts changed, changed version text to "LOTOS SK01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_rc_m_040827e.rom", 0x00000, 0x40000, CRC(0ae53856) SHA1(af6b744addc8fb429464e5dbe28c8ebcd2925dec) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_rc_m_040827e.rom", 0x00000, 0x40000, CRC(0ae53856) SHA1(af6b744addc8fb429464e5dbe28c8ebcd2925dec) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1d", 0x000000, 0x80000, CRC(085caab6) SHA1(32a6a9160f9a175ba74ef60d36e1715efe7599b4) )
@@ -938,7 +938,7 @@ ROM_END
 
 ROM_START( sweetla ) // 041220 backdoor 1,5 9,1 5,3 1,5  3,3  3,4
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_sl_m_041220a.rom", 0x00000, 0x40000, CRC(920fd9fe) SHA1(0b5ad099ae4c8e3ba0f99baf8fc9322cae24e9d2) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_sl_m_041220a.rom", 0x00000, 0x40000, CRC(920fd9fe) SHA1(0b5ad099ae4c8e3ba0f99baf8fc9322cae24e9d2) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "sweetlife.001", 0x000000, 0x80000, CRC(a096c786) SHA1(81f6b083cb089e9412a8506889196354c670d945) )
@@ -956,7 +956,7 @@ ROM_END
 
 ROM_START( sweetlb ) // 041220 bank F9, changed version text to 070412
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_sl_m_041220b.rom", 0x00000, 0x40000, CRC(53f1a0e1) SHA1(a00a8e8d95bd2be27313c1421d40120ee79ff29d) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_sl_m_041220b.rom", 0x00000, 0x40000, CRC(53f1a0e1) SHA1(a00a8e8d95bd2be27313c1421d40120ee79ff29d) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "sweetlife.001", 0x000000, 0x80000, CRC(a096c786) SHA1(81f6b083cb089e9412a8506889196354c670d945) )
@@ -975,7 +975,7 @@ ROM_END
 
 ROM_START( sweetl2_2a ) // 080320 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_sl2_m_080320a.rom", 0x00000, 0x40000, CRC(425066e9) SHA1(f2b11c3c6e08cb59c7c6841ee3575503ed4abb80) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_sl2_m_080320a.rom", 0x00000, 0x40000, CRC(425066e9) SHA1(f2b11c3c6e08cb59c7c6841ee3575503ed4abb80) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "sweetlife2.001", 0x000000, 0x80000, CRC(b1e6157c) SHA1(e042aaaf85b13865d56d1709be280f5a3d5c95e3) )
@@ -993,7 +993,7 @@ ROM_END
 
 ROM_START( sweetl2_2b ) // 080320 bank F9, some fixes
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_sl2_m_080320b.rom", 0x00000, 0x40000, CRC(faffe8c3) SHA1(66a8247fc4bc6d7fb2eefcec37d56eabb1fbca57) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_sl2_m_080320b.rom", 0x00000, 0x40000, CRC(faffe8c3) SHA1(66a8247fc4bc6d7fb2eefcec37d56eabb1fbca57) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "sweetlife2.001", 0x000000, 0x80000, CRC(b1e6157c) SHA1(e042aaaf85b13865d56d1709be280f5a3d5c95e3) )
@@ -1011,7 +1011,7 @@ ROM_END
 
 ROM_START( sweetl2_2c ) // 080320 modified graphics, bank F9, changed version text to "VIDEO GAME-1 MD01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_sl2_m_080320c.rom", 0x00000, 0x40000, CRC(d31d682d) SHA1(a8addbed8373f06d90648c01dc6fda584789f25c) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_sl2_m_080320c.rom", 0x00000, 0x40000, CRC(d31d682d) SHA1(a8addbed8373f06d90648c01dc6fda584789f25c) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1a", 0x000000, 0x80000, CRC(aa9e41f4) SHA1(50c4078581e902aab0dfd902c5ae82ba50f03e39) )
@@ -1029,7 +1029,7 @@ ROM_END
 
 ROM_START( sweetl2_2d ) // 080320 bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_sl2_m_080320d.rom", 0x00000, 0x40000, CRC(03b26c85) SHA1(9c05e48f8d2e467da8b267021560b121538b8c3e) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_sl2_m_080320d.rom", 0x00000, 0x40000, CRC(03b26c85) SHA1(9c05e48f8d2e467da8b267021560b121538b8c3e) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1b", 0x000000, 0x80000, CRC(a5119aca) SHA1(ed59477438ba2b5f17f7c3ab9fa769f5aa28ed69) )
@@ -1049,7 +1049,7 @@ ROM_END
 
 ROM_START( resdnt_2a ) // 040513 backdoor 1,5 9,1 5,1 1,5  3,3  3,4
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_rs_m_040513a.rom", 0x00000, 0x40000, CRC(5b6480d7) SHA1(e54ddc822819136687d613ce4f38dd98f3e01bb5) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_rs_m_040513a.rom", 0x00000, 0x40000, CRC(5b6480d7) SHA1(e54ddc822819136687d613ce4f38dd98f3e01bb5) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "resident_m.001", 0x000000, 0x80000, CRC(e0645da6) SHA1(dd72f4830d8011f603aa6d430f34ac2598005281) )
@@ -1067,7 +1067,7 @@ ROM_END
 
 ROM_START( resdnt_2b ) // 040513 custom alteras, modified graphics, changed version text to "VIDEO GAME-1 SE01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_rs_m_040513b.rom", 0x00000, 0x40000, CRC(2f8b2249) SHA1(4fb34888a99946937791fdba4659d256e862598b) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_rs_m_040513b.rom", 0x00000, 0x40000, CRC(2f8b2249) SHA1(4fb34888a99946937791fdba4659d256e862598b) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1b", 0x000000, 0x80000, CRC(529ac635) SHA1(76cb5b04d61a1e5cb358b55a1b8a5602edd2841a) )
@@ -1085,7 +1085,7 @@ ROM_END
 
 ROM_START( resdnt_2c ) // 040513 custom alteras, modified graphics, changed version text to "VIDEO GAME-1 SE01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_rs_m_040513b.rom", 0x00000, 0x40000, CRC(2f8b2249) SHA1(4fb34888a99946937791fdba4659d256e862598b) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_rs_m_040513b.rom", 0x00000, 0x40000, CRC(2f8b2249) SHA1(4fb34888a99946937791fdba4659d256e862598b) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1c", 0x000000, 0x80000, CRC(31bdf1c6) SHA1(b4c1555cd1cd1eaec5e39ed5879a99633fca5c46) )
@@ -1103,7 +1103,7 @@ ROM_END
 
 ROM_START( resdnt_2d ) // 040513 custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 SE01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_rs_m_040513d.rom", 0x00000, 0x40000, CRC(3481a7b0) SHA1(fb9fa5aea082c80a232d09a938c8b0007e582cc7) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_rs_m_040513d.rom", 0x00000, 0x40000, CRC(3481a7b0) SHA1(fb9fa5aea082c80a232d09a938c8b0007e582cc7) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1d", 0x000000, 0x80000, CRC(e13336d0) SHA1(a427a3eeecf29d7760ffb0955719f282b6688f79) )
@@ -1121,7 +1121,7 @@ ROM_END
 
 ROM_START( resdnt_2e ) // 040513 modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_rs_m_040513e.rom", 0x00000, 0x40000, CRC(83fb15e2) SHA1(59b2fbc218802787bc4c7a6324248d1c4bea459b) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_rs_m_040513e.rom", 0x00000, 0x40000, CRC(83fb15e2) SHA1(59b2fbc218802787bc4c7a6324248d1c4bea459b) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1e", 0x000000, 0x80000, CRC(7e9cb8a1) SHA1(5d089b41897dbb90b8209e60c0746196033b8945) )
@@ -1139,7 +1139,7 @@ ROM_END
 
 ROM_START( resdnt_2f ) // 040513 modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-RS2"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_rs_m_040513f.rom", 0x00000, 0x40000, CRC(2f711769) SHA1(07333d5837484107681561a2434c8668ec77a7f4) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_rs_m_040513f.rom", 0x00000, 0x40000, CRC(2f711769) SHA1(07333d5837484107681561a2434c8668ec77a7f4) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1f", 0x000000, 0x80000, CRC(8cefec30) SHA1(3bf400bdff230e2af83c377617e162818a8c70a4) )
@@ -1157,7 +1157,7 @@ ROM_END
 
 ROM_START( resdnt_2g ) // 040513 custom alteras, modified graphics, many texts changed, changed version text to "LOTOS SE01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_rs_m_040513g.rom", 0x00000, 0x40000, CRC(3c061c32) SHA1(c71376da261f1f69cfa78a243444ea9963f9000e) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_rs_m_040513g.rom", 0x00000, 0x40000, CRC(3c061c32) SHA1(c71376da261f1f69cfa78a243444ea9963f9000e) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1g", 0x000000, 0x80000, CRC(f98cda01) SHA1(c8bb11230d4659ae57429ed3ec56dd26af2a6332) )
@@ -1177,7 +1177,7 @@ ROM_END
 
 ROM_START( islanda ) // 050713 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_is_m_050713a.rom", 0x00000, 0x40000, CRC(d3d62cb3) SHA1(2ceb83ac9d59a570435220f06e8317057bb46608) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_is_m_050713a.rom", 0x00000, 0x40000, CRC(d3d62cb3) SHA1(2ceb83ac9d59a570435220f06e8317057bb46608) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "island.001", 0x000000, 0x80000, CRC(dbe8cdda) SHA1(4747cf0d85afdef22d3ba9fa5e75b39548725745) )
@@ -1195,7 +1195,7 @@ ROM_END
 
 ROM_START( islandb ) // 050713 custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 OS01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_is_m_050713b.rom", 0x00000, 0x40000, CRC(535d4283) SHA1(d4823b1487aa9c7f07e84968de563a8c18f3e770) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_is_m_050713b.rom", 0x00000, 0x40000, CRC(535d4283) SHA1(d4823b1487aa9c7f07e84968de563a8c18f3e770) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1a", 0x000000, 0x80000, CRC(95195fdc) SHA1(4ef22f9d6e539555303f042e53c42acf658a6027) )
@@ -1213,7 +1213,7 @@ ROM_END
 
 ROM_START( islandc ) // 050713 custom alteras, modified graphics, many texts changed, changed version text to "LOTOS OS01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_is_m_050713c.rom", 0x00000, 0x40000, CRC(c879a78e) SHA1(61bf87f50cbf4105330e57e1af7802100286d888) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_is_m_050713c.rom", 0x00000, 0x40000, CRC(c879a78e) SHA1(61bf87f50cbf4105330e57e1af7802100286d888) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1b", 0x000000, 0x80000, CRC(eccf5648) SHA1(7b9dc15e8fac9dcc8a14bda52df4d03462a242d0) )
@@ -1233,7 +1233,7 @@ ROM_END
 
 ROM_START( island2a ) // 060529 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_is2_m_060529a.rom", 0x00000, 0x40000, CRC(4341d65c) SHA1(e7120c805d7dbf0fee5d18243ddf2cfa19a0d88c) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_is2_m_060529a.rom", 0x00000, 0x40000, CRC(4341d65c) SHA1(e7120c805d7dbf0fee5d18243ddf2cfa19a0d88c) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "island2.001", 0x000000, 0x80000, CRC(f8dd9fe9) SHA1(0cf67fbca107b255011fded6390507d12cbac514) )
@@ -1251,7 +1251,7 @@ ROM_END
 
 ROM_START( island2b ) // 060529 bank F9, changed version text to 070205, skip some start tests
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_is2_m_060529b.rom", 0x00000, 0x40000, CRC(617d9a35) SHA1(96947342216872984e13e9997552f8411b268467) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_is2_m_060529b.rom", 0x00000, 0x40000, CRC(617d9a35) SHA1(96947342216872984e13e9997552f8411b268467) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "island2.001", 0x000000, 0x80000, CRC(f8dd9fe9) SHA1(0cf67fbca107b255011fded6390507d12cbac514) )
@@ -1269,7 +1269,7 @@ ROM_END
 
 ROM_START( island2c ) // 060529 bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_is2_m_060529c.rom", 0x00000, 0x40000, CRC(cbf1ec14) SHA1(ec6dc40deacc1a1e0bbe2778d834fb5eb392ca04) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_is2_m_060529c.rom", 0x00000, 0x40000, CRC(cbf1ec14) SHA1(ec6dc40deacc1a1e0bbe2778d834fb5eb392ca04) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1b", 0x000000, 0x80000, CRC(4ee179af) SHA1(77e48ff2a45bb4eb8f68b92044791f6f4fad09f5) )
@@ -1287,7 +1287,7 @@ ROM_END
 
 ROM_START( island2_3a ) // 061218 bank F9, modified graphics, changed version text to "VIDEO GAME-1 OS2-01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_is2_m_061218a.rom", 0x00000, 0x40000, CRC(f190c856) SHA1(c3b762c8b2e24a75b91e93a6c058d8a4a86de60e) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_is2_m_061218a.rom", 0x00000, 0x40000, CRC(f190c856) SHA1(c3b762c8b2e24a75b91e93a6c058d8a4a86de60e) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1a", 0x000000, 0x80000, CRC(ea6c4724) SHA1(f0054dc2e0d7c49e5ca96ce5aaf4c08ddb9d56d9) )
@@ -1305,7 +1305,7 @@ ROM_END
 
 ROM_START( island2_4a ) // 070205 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_is2_070205a.rom", 0x00000, 0x40000, CRC(9bafe560) SHA1(c7238f822d26645207953798c87e67127de1b443) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_is2_070205a.rom", 0x00000, 0x40000, CRC(9bafe560) SHA1(c7238f822d26645207953798c87e67127de1b443) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "island2.001", 0x000000, 0x80000, CRC(f8dd9fe9) SHA1(0cf67fbca107b255011fded6390507d12cbac514) )
@@ -1325,7 +1325,7 @@ ROM_END
 
 ROM_START( pirate2a ) // 061005 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_pr2_m_061005a.rom", 0x00000, 0x40000, CRC(2271eb23) SHA1(6a3e01b59df08a23e5f53ee9b9e473b9f5f5e3b6) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_pr2_m_061005a.rom", 0x00000, 0x40000, CRC(2271eb23) SHA1(6a3e01b59df08a23e5f53ee9b9e473b9f5f5e3b6) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "pirate2.001", 0x000000, 0x80000, CRC(106e7cba) SHA1(289a3ae38b895c83600c920bee0c2dd46e941eac) )
@@ -1343,7 +1343,7 @@ ROM_END
 
 ROM_START( pirate2b ) // 061005 bank F9, skip raster beam position check
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_pr2_m_061005b.rom", 0x00000, 0x40000, CRC(379f890e) SHA1(0fd05c1bf08fd3e6694f18ffe2ea9741cf465617) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_pr2_m_061005b.rom", 0x00000, 0x40000, CRC(379f890e) SHA1(0fd05c1bf08fd3e6694f18ffe2ea9741cf465617) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "pirate2.001", 0x000000, 0x80000, CRC(106e7cba) SHA1(289a3ae38b895c83600c920bee0c2dd46e941eac) )
@@ -1361,7 +1361,7 @@ ROM_END
 
 ROM_START( pirate2c ) // 061005 bank F9, changed version text to 070126
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_pr2_m_061005c.rom", 0x00000, 0x40000, CRC(7c4339df) SHA1(80e2f97629bc963f044c1697c65777a3fd038edc) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_pr2_m_061005c.rom", 0x00000, 0x40000, CRC(7c4339df) SHA1(80e2f97629bc963f044c1697c65777a3fd038edc) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "pirate2.001", 0x000000, 0x80000, CRC(106e7cba) SHA1(289a3ae38b895c83600c920bee0c2dd46e941eac) )
@@ -1379,7 +1379,7 @@ ROM_END
 
 ROM_START( pirate2d ) // 061005 bank F9, changed version text to 070126
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_pr2_m_061005d.rom", 0x00000, 0x40000, CRC(16620bb2) SHA1(bf3a26b06595e51fa37f2f8099a12e906a6ca439) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_pr2_m_061005d.rom", 0x00000, 0x40000, CRC(16620bb2) SHA1(bf3a26b06595e51fa37f2f8099a12e906a6ca439) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "pirate2.001", 0x000000, 0x80000, CRC(106e7cba) SHA1(289a3ae38b895c83600c920bee0c2dd46e941eac) )
@@ -1397,7 +1397,7 @@ ROM_END
 
 ROM_START( pirate2e ) // 061005 bank F9, changed version text to 070126, skip some start tests
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_pr2_m_061005e.rom", 0x00000, 0x40000, CRC(f36edf02) SHA1(25ff61eb80b54298037b4a90d7fc93e8530e0815) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_pr2_m_061005e.rom", 0x00000, 0x40000, CRC(f36edf02) SHA1(25ff61eb80b54298037b4a90d7fc93e8530e0815) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "pirate2.001", 0x000000, 0x80000, CRC(106e7cba) SHA1(289a3ae38b895c83600c920bee0c2dd46e941eac) )
@@ -1415,7 +1415,7 @@ ROM_END
 
 ROM_START( pirate2f ) // 061005 custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 PR01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_pr2_m_061005f.rom", 0x00000, 0x40000, CRC(99960a9f) SHA1(0facd5d1f297d4433d6abefc61cfa2867826e90c) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_pr2_m_061005f.rom", 0x00000, 0x40000, CRC(99960a9f) SHA1(0facd5d1f297d4433d6abefc61cfa2867826e90c) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1a", 0x000000, 0x80000, CRC(011522da) SHA1(c1ce09208b3144cbc38d4afa922a049043a93df6) )
@@ -1433,7 +1433,7 @@ ROM_END
 
 ROM_START( pirate2g ) // 061005 bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_pr2_m_061005g.rom", 0x00000, 0x40000, CRC(60170053) SHA1(4aca8fd8466199467a5c0020cdbb4379ae38cee4) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_pr2_m_061005g.rom", 0x00000, 0x40000, CRC(60170053) SHA1(4aca8fd8466199467a5c0020cdbb4379ae38cee4) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1b", 0x000000, 0x80000, CRC(76d3bc6f) SHA1(a748f5d1219fe3f332cebbf1dfb8014a15800135) )
@@ -1451,7 +1451,7 @@ ROM_END
 
 ROM_START( pirate2h ) // 061005 custom alteras, modified graphics, many texts changed, changed version text to "LOTOS PR01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_pr2_m_061005h.rom", 0x00000, 0x40000, CRC(6dadb485) SHA1(9b61ad0f117dc84af8b7b3523275e5cb48c521e5) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_pr2_m_061005h.rom", 0x00000, 0x40000, CRC(6dadb485) SHA1(9b61ad0f117dc84af8b7b3523275e5cb48c521e5) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1d", 0x000000, 0x80000, CRC(d830ed6d) SHA1(4cdde127912d250201665534e6371dcfc500dc10) )
@@ -1469,7 +1469,7 @@ ROM_END
 
 ROM_START( pirate2_2a ) // 070126 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_pr2_070126a.rom", 0x00000, 0x40000, CRC(7131239b) SHA1(8210defd0987951a0dfe5b3ca6fcee580257475e) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_pr2_070126a.rom", 0x00000, 0x40000, CRC(7131239b) SHA1(8210defd0987951a0dfe5b3ca6fcee580257475e) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "pirate2.001", 0x000000, 0x80000, CRC(106e7cba) SHA1(289a3ae38b895c83600c920bee0c2dd46e941eac) )
@@ -1489,7 +1489,7 @@ ROM_END
 
 ROM_START( keksa ) // 060328 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_ks_m_060328a.rom", 0x00000, 0x40000, CRC(7b387386) SHA1(d6bfc3b0d1f74723902d96dbcb69865cb5274cd0) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_ks_m_060328a.rom", 0x00000, 0x40000, CRC(7b387386) SHA1(d6bfc3b0d1f74723902d96dbcb69865cb5274cd0) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "keks_m.001", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
@@ -1507,7 +1507,7 @@ ROM_END
 
 ROM_START( keksb ) // 060328 backdoor 1,1 1,3 1,5 1,7  3,3  3,4
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_ks_m_060328b.rom", 0x00000, 0x40000, CRC(661c7ee9) SHA1(f07902c4a3ba5fce5bc7fe666d90deb852e40b4c) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_ks_m_060328b.rom", 0x00000, 0x40000, CRC(661c7ee9) SHA1(f07902c4a3ba5fce5bc7fe666d90deb852e40b4c) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "keks_m.001", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
@@ -1525,7 +1525,7 @@ ROM_END
 
 ROM_START( keksc ) // 060328 bank F9, changed version text to 070119
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_ks_m_060328c.rom", 0x00000, 0x40000, CRC(fc70d26e) SHA1(0430ad20b797412967c2e82779eb7f0e9170f77c) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_ks_m_060328c.rom", 0x00000, 0x40000, CRC(fc70d26e) SHA1(0430ad20b797412967c2e82779eb7f0e9170f77c) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "keks_m.001", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
@@ -1543,7 +1543,7 @@ ROM_END
 
 ROM_START( keks_2a ) // 060403 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_ks_m_060403a.rom", 0x00000, 0x40000, CRC(bd749f63) SHA1(dc3ba624b186370896d3ecf5968a82a17aa019d0) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_ks_m_060403a.rom", 0x00000, 0x40000, CRC(bd749f63) SHA1(dc3ba624b186370896d3ecf5968a82a17aa019d0) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "keks_m.001", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
@@ -1561,7 +1561,7 @@ ROM_END
 
 ROM_START( keks_2b ) // 060403 bank F9, changed version text to 070119
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_ks_m_060403b.rom", 0x00000, 0x40000, CRC(d089de90) SHA1(9208f411cd97fef89b52019f9655e7d006f91303) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_ks_m_060403b.rom", 0x00000, 0x40000, CRC(d089de90) SHA1(9208f411cd97fef89b52019f9655e7d006f91303) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "keks_m.001", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
@@ -1579,7 +1579,7 @@ ROM_END
 
 ROM_START( keks_2c ) // 060403 custom alteras, modified graphics, bank F9, changed version text to "VIDEO GAME-1 KS01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_ks_m_060403c.rom", 0x00000, 0x40000, CRC(ba7f429a) SHA1(6ad7a345b292f2081e49081374c74afc7430bd14) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_ks_m_060403c.rom", 0x00000, 0x40000, CRC(ba7f429a) SHA1(6ad7a345b292f2081e49081374c74afc7430bd14) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1b", 0x000000, 0x80000, CRC(2844b89e) SHA1(75b59e6272ef42438a3734e45f131f449ed0aa46) )
@@ -1597,7 +1597,7 @@ ROM_END
 
 ROM_START( keks_2d ) // 060403 modified graphics, bank F9, changed version text to "VIDEO GAME-1 KS01" (keks_2c, decoded gfx)
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_ks_m_060403c.rom", 0x00000, 0x40000, CRC(ba7f429a) SHA1(6ad7a345b292f2081e49081374c74afc7430bd14) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_ks_m_060403c.rom", 0x00000, 0x40000, CRC(ba7f429a) SHA1(6ad7a345b292f2081e49081374c74afc7430bd14) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1c", 0x000000, 0x80000, CRC(04ad2c2f) SHA1(ea0819dad0971629056ba0e6cb599415f1d34ad6) )
@@ -1615,7 +1615,7 @@ ROM_END
 
 ROM_START( keks_2e ) // 060403 bank F9, payout percentage 60%
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_ks_m_060403d.rom", 0x00000, 0x40000, CRC(358e5b48) SHA1(6a91d9ee515401ebe7a8dd7d95f43c4df1c13677) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_ks_m_060403d.rom", 0x00000, 0x40000, CRC(358e5b48) SHA1(6a91d9ee515401ebe7a8dd7d95f43c4df1c13677) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "keks_m.001", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
@@ -1633,7 +1633,7 @@ ROM_END
 
 ROM_START( keks_2f ) // 060403 bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_ks_m_060403e.rom", 0x00000, 0x40000, CRC(80882337) SHA1(af942e27247b0d492799013a623080c02e7213cb) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_ks_m_060403e.rom", 0x00000, 0x40000, CRC(80882337) SHA1(af942e27247b0d492799013a623080c02e7213cb) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1d", 0x000000, 0x80000, CRC(82c5f8e9) SHA1(0fbc1b314e15f93c62c3cd79ece453086c506878) )
@@ -1651,7 +1651,7 @@ ROM_END
 
 ROM_START( keks_2g ) // 060403 custom alteras, modified graphics, bank F9, many texts changed, changed version text to "LOTOS KS01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_ks_m_060403f.rom", 0x00000, 0x40000, CRC(9fd765ab) SHA1(ff061fe3d5d547c25d4ca830ec1f94025ab4e7f5) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_ks_m_060403f.rom", 0x00000, 0x40000, CRC(9fd765ab) SHA1(ff061fe3d5d547c25d4ca830ec1f94025ab4e7f5) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1f", 0x000000, 0x80000, CRC(6c9bf198) SHA1(40155c3574f9968e272c6f1af90d663d2a686511) )
@@ -1669,7 +1669,7 @@ ROM_END
 
 ROM_START( keks_3a ) // 070119 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_ks_070119a.rom", 0x00000, 0x40000, CRC(9325fea5) SHA1(1d396e63d51a81eae75df1ae2646cacac7f49f66) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_ks_070119a.rom", 0x00000, 0x40000, CRC(9325fea5) SHA1(1d396e63d51a81eae75df1ae2646cacac7f49f66) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "keks.001", 0x000000, 0x80000, CRC(fc399595) SHA1(037afd4a613cd58d4a28627b9e395d48c3fa866a) )
@@ -1687,7 +1687,7 @@ ROM_END
 
 ROM_START( keks_3b ) // 070119 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_ks_070119b.rom", 0x00000, 0x40000, CRC(13fcf022) SHA1(885e5097e5cb5805f2172adc41f2f20d109b2d10) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_ks_070119b.rom", 0x00000, 0x40000, CRC(13fcf022) SHA1(885e5097e5cb5805f2172adc41f2f20d109b2d10) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "keks.001", 0x000000, 0x80000, CRC(fc399595) SHA1(037afd4a613cd58d4a28627b9e395d48c3fa866a) )
@@ -1707,7 +1707,7 @@ ROM_END
 
 ROM_START( gnomea ) // 070906 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gn_070906a.rom", 0x00000, 0x40000, CRC(5e7f1d53) SHA1(0548db91e8b1cd2f4f292095b4aad3b59cc25fb8) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gn_070906a.rom", 0x00000, 0x40000, CRC(5e7f1d53) SHA1(0548db91e8b1cd2f4f292095b4aad3b59cc25fb8) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "gnome.001", 0x000000, 0x80000, CRC(6ed866d7) SHA1(68d75d24d98e6d533cb26ceac0a680203cb26069) )
@@ -1725,7 +1725,7 @@ ROM_END
 
 ROM_START( gnomeb ) // 070906 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gn_070906b.rom", 0x00000, 0x40000, CRC(0baeb2f7) SHA1(799576a1cf49681d81967678643c17dc0e09be78) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gn_070906b.rom", 0x00000, 0x40000, CRC(0baeb2f7) SHA1(799576a1cf49681d81967678643c17dc0e09be78) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "gnome.001", 0x000000, 0x80000, CRC(6ed866d7) SHA1(68d75d24d98e6d533cb26ceac0a680203cb26069) )
@@ -1743,7 +1743,7 @@ ROM_END
 
 ROM_START( gnomec ) // 070906 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gn_070906c.rom", 0x00000, 0x40000, CRC(37b4a5e2) SHA1(baffba15c5ba0f139b74e3dedd1d68e14fc7b370) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gn_070906c.rom", 0x00000, 0x40000, CRC(37b4a5e2) SHA1(baffba15c5ba0f139b74e3dedd1d68e14fc7b370) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "gnome.001", 0x000000, 0x80000, CRC(6ed866d7) SHA1(68d75d24d98e6d533cb26ceac0a680203cb26069) )
@@ -1761,7 +1761,7 @@ ROM_END
 
 ROM_START( gnomed ) // 070906 custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 GN01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gn_070906d.rom", 0x00000, 0x40000, CRC(12682805) SHA1(58a5c365e56ce3d679fe88f2930471ac63549d85) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gn_070906d.rom", 0x00000, 0x40000, CRC(12682805) SHA1(58a5c365e56ce3d679fe88f2930471ac63549d85) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1a", 0x000000, 0x80000, CRC(55a8b1ba) SHA1(0b6c906435e260178292014a9e160a364bbcd6ad) )
@@ -1779,7 +1779,7 @@ ROM_END
 
 ROM_START( gnomee ) // 070906 custom alteras, modified graphics, bank F9, many texts changed, changed version text to "LOTOS GN01"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gn_070906e.rom", 0x00000, 0x40000, CRC(33fbae84) SHA1(4b8fde65042de38b24c77665b76782db4efccf0f) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gn_070906e.rom", 0x00000, 0x40000, CRC(33fbae84) SHA1(4b8fde65042de38b24c77665b76782db4efccf0f) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1b", 0x000000, 0x80000, CRC(414b537c) SHA1(65cc2a3bca8792387a83323f51b7345ee1be1125) )
@@ -1797,7 +1797,7 @@ ROM_END
 
 ROM_START( gnome_2a ) // 071115 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gn_071115a.rom", 0x00000, 0x40000, CRC(97e74228) SHA1(6b4d108c6c59ec335c14f0e5ab990cc8782ed236) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gn_071115a.rom", 0x00000, 0x40000, CRC(97e74228) SHA1(6b4d108c6c59ec335c14f0e5ab990cc8782ed236) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "gnome.001", 0x000000, 0x80000, CRC(6ed866d7) SHA1(68d75d24d98e6d533cb26ceac0a680203cb26069) )
@@ -1816,7 +1816,7 @@ ROM_END
 
 ROM_START( gnome_3a ) // 080303 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gn_m_080303a.rom", 0x00000, 0x40000, CRC(86e3f741) SHA1(e5d9f897daa6cf58a7fb426c42810d71bf839294) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gn_m_080303a.rom", 0x00000, 0x40000, CRC(86e3f741) SHA1(e5d9f897daa6cf58a7fb426c42810d71bf839294) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "gnome.001", 0x000000, 0x80000, CRC(6ed866d7) SHA1(68d75d24d98e6d533cb26ceac0a680203cb26069) )
@@ -1834,7 +1834,7 @@ ROM_END
 
 ROM_START( gnome_3b ) // 080303 bank F9, payout percentage 45%
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gn_m_080303b.rom", 0x00000, 0x40000, CRC(c01d2d38) SHA1(7743d46e2ebce24d88961e52b67a928b29a3aa0d) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gn_m_080303b.rom", 0x00000, 0x40000, CRC(c01d2d38) SHA1(7743d46e2ebce24d88961e52b67a928b29a3aa0d) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "gnome.001", 0x000000, 0x80000, CRC(6ed866d7) SHA1(68d75d24d98e6d533cb26ceac0a680203cb26069) )
@@ -1852,7 +1852,7 @@ ROM_END
 
 ROM_START( gnome_3c ) // 080303 bank F9, payout percentage 60%
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gn_m_080303c.rom", 0x00000, 0x40000, CRC(a7479ddb) SHA1(d64be81ff20548373e08ccae58d00f5cb2a335da) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gn_m_080303c.rom", 0x00000, 0x40000, CRC(a7479ddb) SHA1(d64be81ff20548373e08ccae58d00f5cb2a335da) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "gnome.001", 0x000000, 0x80000, CRC(6ed866d7) SHA1(68d75d24d98e6d533cb26ceac0a680203cb26069) )
@@ -1870,7 +1870,7 @@ ROM_END
 
 ROM_START( gnome_5a ) // 090406 bank F9, payout percentage 70%
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gn_m_090406a.rom", 0x00000, 0x40000, CRC(51558b99) SHA1(ec9788698f93b96ad26f2f4128733702ac6c2d2e) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gn_m_090406a.rom", 0x00000, 0x40000, CRC(51558b99) SHA1(ec9788698f93b96ad26f2f4128733702ac6c2d2e) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "gnome.001", 0x000000, 0x80000, CRC(6ed866d7) SHA1(68d75d24d98e6d533cb26ceac0a680203cb26069) )
@@ -1888,7 +1888,7 @@ ROM_END
 
 ROM_START( gnome_5b ) // 090406 bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_gn_m_090406b.rom", 0x00000, 0x40000, CRC(f7b55e2f) SHA1(e7043433acea5387bc9c67f94e09ab3dae0b8ccf) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_gn_m_090406b.rom", 0x00000, 0x40000, CRC(f7b55e2f) SHA1(e7043433acea5387bc9c67f94e09ab3dae0b8ccf) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1c", 0x000000, 0x80000, CRC(a52efb59) SHA1(724094b057dbf0b29e98c2c6c1bde7fac5534969) )
@@ -1907,7 +1907,7 @@ ROM_END
 
 ROM_START( fcockt2a ) // 080707 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc2_080707a.rom", 0x00000, 0x40000, CRC(c4840b3c) SHA1(518079207bb3d13e492003b382d28a8cf3647f63) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc2_080707a.rom", 0x00000, 0x40000, CRC(c4840b3c) SHA1(518079207bb3d13e492003b382d28a8cf3647f63) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "fruitcocktail2.001",  0x000000, 0x80000, CRC(d1b9416d) SHA1(4d3cb0a6dbcf02bbd20d5c43df358882b2ad794d) )
@@ -1925,7 +1925,7 @@ ROM_END
 
 ROM_START( fcockt2_4a ) // 081105 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc2_m_081105a.rom", 0x00000, 0x40000,  CRC(411ad706) SHA1(4d29a6b1927241efdcdb3224b9ebe0eb6af92533) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc2_m_081105a.rom", 0x00000, 0x40000,  CRC(411ad706) SHA1(4d29a6b1927241efdcdb3224b9ebe0eb6af92533) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "fruitcocktail2.001", 0x000000, 0x80000, CRC(d1b9416d) SHA1(4d3cb0a6dbcf02bbd20d5c43df358882b2ad794d) )
@@ -1943,7 +1943,7 @@ ROM_END
 
 ROM_START( fcockt2_4b ) // 081105 bank F9, no credit limit, "MaxVin" signature
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc2_m_081105_cm.rom", 0x00000, 0x40000,  CRC(f0c702b9) SHA1(89121ddd325aac567ebd443eb443c4db0549236c) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc2_m_081105_cm.rom", 0x00000, 0x40000,  CRC(f0c702b9) SHA1(89121ddd325aac567ebd443eb443c4db0549236c) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "fruitcocktail2.001", 0x000000, 0x80000, CRC(d1b9416d) SHA1(4d3cb0a6dbcf02bbd20d5c43df358882b2ad794d) )
@@ -1961,7 +1961,7 @@ ROM_END
 
 ROM_START( fcockt2_4c ) // 081105 custom alteras, modified graphics, bank F9, many texts changed, changed version text to "VIDEO GAME-1 FR02"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc2_m_081105b.rom", 0x00000, 0x40000,  CRC(b627f7d6) SHA1(0bcdb1cd808055d0a9e965f2c6ff522ac3fe6949) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc2_m_081105b.rom", 0x00000, 0x40000,  CRC(b627f7d6) SHA1(0bcdb1cd808055d0a9e965f2c6ff522ac3fe6949) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1b", 0x000000, 0x80000, CRC(68b62355) SHA1(387da330fddaa685cb7aca32bf861e44d5cdbe58) )
@@ -1979,7 +1979,7 @@ ROM_END
 
 ROM_START( fcockt2_4d ) // 081105 bank F9, no credit limit, "MaxVin" signature, payout percentage 70%
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc2_m_081105c.rom", 0x00000, 0x40000,  CRC(b6d88fcc) SHA1(337a59accfbc229be05aff84ba70fc135fde09de) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc2_m_081105c.rom", 0x00000, 0x40000,  CRC(b6d88fcc) SHA1(337a59accfbc229be05aff84ba70fc135fde09de) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "fruitcocktail2.001", 0x000000, 0x80000, CRC(d1b9416d) SHA1(4d3cb0a6dbcf02bbd20d5c43df358882b2ad794d) )
@@ -1997,7 +1997,7 @@ ROM_END
 
 ROM_START( fcockt2_4e ) // 081105 bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc2_m_081105d.rom", 0x00000, 0x40000,  CRC(37b1a159) SHA1(52c8e825ebb85a59803a6d14c766892e56a72c9e) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc2_m_081105d.rom", 0x00000, 0x40000,  CRC(37b1a159) SHA1(52c8e825ebb85a59803a6d14c766892e56a72c9e) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1c", 0x000000, 0x80000, CRC(9fe02e19) SHA1(dec48a0990d2341ae86a3a4acd5972844b93fccb) )
@@ -2015,7 +2015,7 @@ ROM_END
 
 ROM_START( fcockt2_4f ) // 081105 custom alteras, modified graphics, bank F9, many texts changed, changed version text to "LOTOS FR02"
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "bootleg_fc2_m_081105f.rom", 0x00000, 0x40000,  CRC(b4fa0663) SHA1(aee3cb980fc7d9fbba1a4e9fe80e6be8df58bb3b) ) /* Not officially listed on Igrosoft's web site hash page */
+	ROM_LOAD( "bootleg_fc2_m_081105f.rom", 0x00000, 0x40000,  CRC(b4fa0663) SHA1(aee3cb980fc7d9fbba1a4e9fe80e6be8df58bb3b) ) // Not officially listed on Igrosoft's web site hash page
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "bootleg_1e", 0x000000, 0x80000, CRC(3c72a5e2) SHA1(15e07d64a0d633ccdadea9eb55556e6aa239c0e5) )
@@ -2177,7 +2177,7 @@ ROM_START( igromult )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "10games.320.bin", 0x0000, 0x400000, CRC(94e5b2e1) SHA1(62544a5b3de02b5f323478dbae19ef2409af2529) )
 
-	ROM_REGION( 0x4000000, "gfx", 0 ) /* There should be 64MB worth of FLASH ROM for the gfx, the menu GFX are unique at least (not in any Igrosoft set) */
+	ROM_REGION( 0x4000000, "gfx", 0 ) // There should be 64MB worth of FLASH ROM for the gfx, the menu GFX are unique at least (not in any Igrosoft set)
 	ROM_LOAD( "10games.gfx", 0x000000, 0x4000000, NO_DUMP )
 ROM_END
 
@@ -2203,7 +2203,7 @@ ROM_START( igromula )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "15games.320.bin", 0x0000, 0x400000, CRC(1cfd520d) SHA1(7316b883a13ff98fc7c3ff05aa085f1fb8e0bdcd) )
 
-	ROM_REGION( 0x4000000, "gfx", 0 ) /* There should be 64MB worth of FLASH ROM for the gfx, the menu GFX are unique at least (not in any Igrosoft set) */
+	ROM_REGION( 0x4000000, "gfx", 0 ) // There should be 64MB worth of FLASH ROM for the gfx, the menu GFX are unique at least (not in any Igrosoft set)
 	ROM_LOAD( "15games.gfx", 0x000000, 0x4000000, NO_DUMP )
 ROM_END
 
