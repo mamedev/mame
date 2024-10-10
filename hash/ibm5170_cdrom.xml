@@ -4368,8 +4368,8 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 CD-ROM 1: "Catacomb 3-D", "Commander Keen: Invasion of the Vorticons", "Commander Keen: Goodbye Galaxy", "Commander Keen: Aliens Ate My Babysitter!", "Commander Keen: Keen Dreams",
 		  "Dangerous Dave", "Hover Tank 3D", "Rescue Rover", "Rescue Rover 2", "Shadow Knights", "Slordax: The Unknown Enemy", "Spear of Destiny", "The Catacomb", "Wolfenstein 3D"
 CD-ROM 2: "DOOM II: Hell on Earth", "Final DOOM", "Master Levels for DOOM II", "The Ultimate DOOM"
-CD-ROM 3: "Quake"
-CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenstein 3D"
+CD-ROM 3: "Quake" (see "quake" -- identical disc to the standalone 1.06 release)
+CD-ROM 4 (mac_cdrom.xml): "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenstein 3D"
 ]]></notes>
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
@@ -4385,18 +4385,6 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 			<feature name="part_id" value="DOOM"/>
 			<diskarea name="cdrom">
 				<disk name="id Anthology (USA) (Disc 2) (Doom) (Rev 1)" sha1="0cc44f09c53368ac0a5360db9b16d5d1ddf4380b" />
-			</diskarea>
-		</part>
-		<part name="cdrom3" interface="cdrom">
-			<feature name="part_id" value="Quake"/>
-			<diskarea name="cdrom">
-				<disk name="id Anthology (USA) (Disc 3) (Quake)" status="nodump" />
-			</diskarea>
-		</part>
-		<part name="cdrom4" interface="cdrom">
-			<feature name="part_id" value="Mac"/>
-			<diskarea name="cdrom">
-				<disk name="id Anthology (USA) (Disc 4) (Mac)" status="nodump" />
 			</diskarea>
 		</part>
 	</software>
@@ -4415,8 +4403,8 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 CD-ROM 1: "Catacomb 3-D", "Commander Keen: Invasion of the Vorticons", "Commander Keen: Goodbye Galaxy", "Commander Keen: Aliens Ate My Babysitter!", "Commander Keen: Keen Dreams",
 		  "Dangerous Dave", "Hover Tank 3D", "Rescue Rover", "Rescue Rover 2", "Shadow Knights", "Slordax: The Unknown Enemy", "Spear of Destiny", "The Catacomb", "Wolfenstein 3D"
 CD-ROM 2: "DOOM II: Hell on Earth", "Final DOOM", "Master Levels for DOOM II", "The Ultimate DOOM"
-CD-ROM 3: "Quake"
-CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenstein 3D"
+CD-ROM 3: "Quake" (see "quake" -- identical disc to the standalone 1.06 release)
+CD-ROM 4 (mac_cdrom.xml): "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenstein 3D"
 ]]></notes>
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
@@ -4430,16 +4418,6 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		<part name="cdrom2" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="id Anthology (USA) (Disc 2) (Doom)" sha1="b32a547d78a19d2e0a47fdfc64e270b2ecfa000e" />
-			</diskarea>
-		</part>
-		<part name="cdrom3" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="id Anthology (USA) (Disc 3) (Quake)" status="nodump" />
-			</diskarea>
-		</part>
-		<part name="cdrom4" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="id Anthology (USA) (Disc 4) (Mac)" status="nodump" />
 			</diskarea>
 		</part>
 	</software>
@@ -5699,16 +5677,91 @@ https://www.pcgamingwiki.com/wiki/Primal_Rage
 	<!-- DOS 5.0 / Windows 95/98 -->
 	<!-- Pentium class 75 MHz -->
 	<software name="quake" supported="partial">
-		<description>Quake (shareware v1.01)</description>
+		<description>Quake 1.06 (DOS, Windows)</description>
 		<year>1996</year>
-		<publisher>id Software</publisher>
+		<publisher>GT Interactive</publisher>
 		<notes><![CDATA[
 Untested multiplayer options
 Looks too dark on s3_764 (verify)
 ]]></notes>
+		<info name="developer" value="id Software" />
+		<info name="language" value="English" />
+		<info name="version" value="1.06" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="quake" sha1="b32fa2c83512819f3c36d052d591cc2f26a0fdeb" />
+				<disk name="quake 1.06" sha1="9081be6cbb0de71807057092e686875f6c3237a0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="quakewin" cloneof="quake" supported="partial">
+		<description>Quake 1.09 (Windows)</description>
+		<year>2001</year>
+		<publisher>Activision</publisher>
+		<notes><![CDATA[
+		Newer version, without a DOS installer, but it does have DOS 1.08 binaries.
+		Part of the Ultimate Quake trilogy box set.
+		]]></notes>
+		<info name="developer" value="id Software" />
+		<info name="language" value="English" />
+		<info name="version" value="1.09" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="quake 1.09" sha1="f5dbf6f9bbd3e0735cf3ffeb7a9d22c07a3e8a8a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="quake_sw" cloneof="quake" supported="partial">
+		<description>Quake Shareware 1.01</description>
+		<year>1996</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="id Software" />
+		<info name="language" value="English" />
+		<info name="version" value="1.01" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="quake shareware 1.01" sha1="66584b046e2b170a55077ff0b9064702e3743fe0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="quake_sw2" cloneof="quake" supported="partial">
+		<description>Quake Shareware 1.01 (TestDrive)</description>
+		<year>1996</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="id Software" />
+		<info name="language" value="English" />
+		<info name="version" value="1.01" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="quake shareware testdrive 1.01" sha1="8362d3b2e5ba2c2513718554aa4aa5983e3923c5" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="quakemp1" supported="partial">
+		<description>Quake Mission Pack 1: Scourge of Armagon</description>
+		<year>1997</year>
+		<publisher>Activision</publisher>
+		<info name="developer" value="Hipnotic Interactive" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="quake scourge of armagon" sha1="bffd6be311f131c38f59f2ad0a5f700c5e8814ee" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="quakemp2" supported="partial">
+		<description>Quake Mission Pack 2: Dissolution of Eternity</description>
+		<year>1997</year>
+		<publisher>Activision</publisher>
+		<info name="developer" value="Rogue Entertainment" />
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="quake dissolution of eternity" sha1="bc85a56fff50c7ec87925f50ef00b4d930ad0988" />
 			</diskarea>
 		</part>
 	</software>
