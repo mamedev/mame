@@ -87,7 +87,7 @@
 // have m_readXX / m_writeXX use MMU translation
 // OR
 // do MMU translation inside memory_r / memory_w
-#define USE_MMU
+#define USE_MMUxx
 
 class m68010_tekmmu_device : public m68010_device
 {
@@ -127,15 +127,17 @@ class m68010_tekmmu_device : public m68010_device
 		return true;
 	}
 
-	u32 mmu_translate_address(offs_t address, u8 rw)
+	u32 mmu_translate_address(offs_t address, u8 rw, u8 fc, u8 sz)
 	{
-	
-		if (*m_map_control & (1 << MAP_BLOCK_ACCESS))
+		m_mmu_tmp_rw = rw;
+		m_mmu_tmp_fc = fc;
+		m_mmu_tmp_sz = sz;
+
 		if (!m_mmu_tmp_buserror_occurred)
-		if ((get_fc() & 4) == 0)				// only in User mode
+		if ((fc & 4) == 0)				// only in User mode
 		if (BIT(*m_map_control, MAP_VM_ENABLE))
 		{
-			LOG("mmu_translate_address: map %08x => paddr(%08x) fc(%d) pc(%08x)\n",(address), BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12), get_fc(), pc());
+			LOG("mmu_translate_address: map %08x => paddr(%08x) fc(%d) pc(%08x)\n",(address), BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12), fc, pc());
 
 			if (rw)
 			{
@@ -153,8 +155,9 @@ class m68010_tekmmu_device : public m68010_device
 			{
 				*m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
 
-				LOG("mmu_translate_address: bus error: PID(%d) != %d %08x fc(%d) pc(%08x)\n", BIT(m_map[address >> 12], 11, 3), (*m_map_control & 7), address, get_fc(), pc());
-				set_buserror_details(address, rw, get_fc(), true);
+				LOG("mmu_translate_address: bus error: PID(%d) != %d %08x fc(%d) pc(%08x)\n", BIT(m_map[address >> 12], 11, 3), (*m_map_control & 7), address, fc, pc());
+				set_buserror_details(address, rw, fc, true);
+				m_restart_instruction = true;
 				set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 				set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 				return address;
@@ -169,14 +172,30 @@ class m68010_tekmmu_device : public m68010_device
 			{
 				*m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
 
-				LOG("mmu_translate_address: bus error: %08x fc(%d) pc(%08x)\n",(address), get_fc(), pc());
-				set_buserror_details(address, rw, get_fc(), true);
+				LOG("mmu_translate_address: bus error: READONLY %08x fc(%d) pc(%08x)\n",(address), fc, pc());
+				set_buserror_details(address, rw, fc, false);
 				set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 				set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 				return address;
 			}
-		
+
+			// mark page dirty
+			if (rw==0)
+			{
+				m_map[address >> 12] |= 0x8000;
+				LOG("mmu_translate_address: DIRTY m_map(0x%04x) m_map_control(%02x)\n", m_map[address >> 12], m_map_control);
+			}
+
 			address = BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12);
+		}
+
+		// is there memory here?
+		if (address >= MAXRAM && address < 0x600000)
+		{
+			LOG("mmu_translate_address: bus error: NOMEM %08x fc(%d)\n", address, fc);
+			set_buserror_details(address, rw, fc,false);
+			set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+			set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		}
 
 		return address;
@@ -188,7 +207,7 @@ u16 PTEread(offs_t address)
 	if (!BIT(*m_map_control, MAP_SYS_WR_ENABLE))
 	{
 			LOG("PTEread: bus error: PID(%d) %08x fc(%d) pc(%08x)\n", BIT(m_map[(address >> 12) & 0x7ff], 11, 3), (address), get_fc(), pc());
-			set_buserror_details(address, 1, get_fc(), true);
+			set_buserror_details(address, 1, get_fc(), false);
 			set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			return 0;
@@ -227,14 +246,14 @@ void PTEwrite(offs_t address, u16 data)
 				return PTEread(address);		// needed?
 			else
 			{
-				u32 address0 = mmu_translate_address(address, 1);
+				u32 address0 = mmu_translate_address(address, 1, get_fc(), M68K_SZ_WORD);
 				if (m_mmu_tmp_buserror_occurred)
 					return ~0;
 				return m_oprogram16.read_word(address0);
 			}
 		};
 		m_read8   = [this](offs_t address) -> u8     {
-			u32 address0 = mmu_translate_address(address, 1);
+			u32 address0 = mmu_translate_address(address, 1, get_fc(), M68K_SZ_BYTE);
 			if (m_mmu_tmp_buserror_occurred)
 				return ~0;
 			return m_program16.read_byte(address0);
@@ -244,21 +263,21 @@ void PTEwrite(offs_t address, u16 data)
 				return PTEread(address);
 			else
 			{
-				u32 address0 = mmu_translate_address(address, 1);
+				u32 address0 = mmu_translate_address(address, 1, get_fc(), M68K_SZ_WORD);
 				if (m_mmu_tmp_buserror_occurred)
 					return ~0;
 				return m_program16.read_word(address0);
 			}
 		};
 		m_read32  = [this](offs_t address) -> u32    {
-			u32 address0 = mmu_translate_address(address, 1);
+			u32 address0 = mmu_translate_address(address, 1, get_fc(), M68K_SZ_LONG);
 			if (m_mmu_tmp_buserror_occurred)
 				return ~0;
 			return m_program16.read_dword(address0);
 		};
 		
 		m_write8  = [this](offs_t address, u8 data)  {
-			u32 address0 = mmu_translate_address(address, 0);
+			u32 address0 = mmu_translate_address(address, 0, get_fc(), M68K_SZ_BYTE);
 			if (m_mmu_tmp_buserror_occurred)
 				return;
 			m_program16.write_word(address0 & ~1, data | (data << 8), address0 & 1 ? 0x00ff : 0xff00);
@@ -268,7 +287,7 @@ void PTEwrite(offs_t address, u16 data)
 				PTEwrite(address, data);
 			else
 			{
-				u32 address0 = mmu_translate_address(address, 0);
+				u32 address0 = mmu_translate_address(address, 0, get_fc(), M68K_SZ_WORD);
 				if (m_mmu_tmp_buserror_occurred)
 					return;
 				m_program16.write_word(address0, data);
@@ -279,7 +298,7 @@ void PTEwrite(offs_t address, u16 data)
 				LOG("m_write32 to PTE!!!!!\n");
 			else
 			{
-				u32 address0 = mmu_translate_address(address, 0);
+				u32 address0 = mmu_translate_address(address, 0, get_fc(), M68K_SZ_LONG);
 				if (m_mmu_tmp_buserror_occurred)
 					return;
 				m_program16.write_dword(address0, data);
@@ -647,9 +666,9 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 #endif
 
 		// NB byte memory limit, offset is *word* offset
-		if (offset < OFF8_TO_OFF16(0x600000) && offset >= OFF8_TO_OFF16(MAXRAM))
+		if (offset >= OFF8_TO_OFF16(MAXRAM) && offset < OFF8_TO_OFF16(0x600000))
 		{
-			LOG("memory_r: bus error: %08x fc(%d) pc(%08x)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
+			LOG("memory_r: bus error: NOMEM %08x fc(%d) pc(%08x)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), 1, m_maincpu->get_fc());
@@ -731,9 +750,9 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 #endif
 
 	// NB byte memory limit, offset is *word* offset
-	if (offset < OFF8_TO_OFF16(0x600000) && offset >= OFF8_TO_OFF16(MAXRAM) && !machine().side_effects_disabled())
+	if (offset >= OFF8_TO_OFF16(MAXRAM) && offset < OFF8_TO_OFF16(0x600000) && !machine().side_effects_disabled())
 	{
-		LOG("memory_w: bus error: %08x fc(%d)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
+		LOG("memory_w: bus error: NOMEM %08x fc(%d)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), 0, m_maincpu->get_fc());
