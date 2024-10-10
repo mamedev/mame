@@ -15,7 +15,7 @@
 #define LOG_DATA_SENT   (1U << 5)
 
 //#define VERBOSE (LOG_GENERAL | LOG_STATE | LOG_CONTROL | LOG_DATA)
-#define VERBOSE (LOG_UNSUPPORTED)
+//#define VERBOSE (LOG_UNSUPPORTED)
 
 #include "logmacro.h"
 
@@ -80,16 +80,16 @@ void nscsi_bus_device::regen_ctrl(int refid)
 					data);
 		for(int i=0; i<devcnt; i++)
 			if(dev[i].ctrl) {
-				LOGMASKED(LOG_CONTROL, "%d=%s%s%s%s%s%s%s%s%s\n", i,
+				LOGMASKED(LOG_CONTROL, "dev%d=%s%s%s%s%s%s%s%s%s\n", i,
 							dev[i].ctrl & nscsi_device::S_RST ? "R" : "",
 							dev[i].ctrl & nscsi_device::S_ATN ? "A" : "",
 							dev[i].ctrl & nscsi_device::S_ACK ? "K" : "",
 							dev[i].ctrl & nscsi_device::S_REQ ? "Q" : "",
-							dev[i].ctrl & nscsi_device::S_MSG ? "M" : "",
-							dev[i].ctrl & nscsi_device::S_INP ? "I" : "",
-							dev[i].ctrl & nscsi_device::S_CTL ? "C" : "",
 							dev[i].ctrl & nscsi_device::S_SEL ? "S" : "",
-							dev[i].ctrl & nscsi_device::S_BSY ? "B" : "");
+							dev[i].ctrl & nscsi_device::S_BSY ? "B" : "",
+							dev[i].ctrl & nscsi_device::S_MSG ? "M" : "",
+							dev[i].ctrl & nscsi_device::S_CTL ? "C" : "",
+							dev[i].ctrl & nscsi_device::S_INP ? "I" : "");
 			}
 	}
 
