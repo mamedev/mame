@@ -171,7 +171,7 @@ protected:
 	bool m_pmmu_enabled; /* Indicates if the PMMU is enabled */
 	int m_hmmu_enabled;  /* Indicates if the HMMU is enabled */
 	bool m_emmu_enabled; /* Indicates if external MMU is enabled */
-	bool m_instruction_restart; /* Save DA regs for potential instruction restart */
+	bool m_can_instruction_restart; /* Save DA regs for potential instruction restart */
 	bool m_fpu_just_reset; /* Indicates the FPU was just reset */
 	bool m_restart_instruction; /* Indicates the instruction should be restarted */
 

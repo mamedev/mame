@@ -20216,7 +20216,7 @@ void m68000_musashi_device::x4e7b_movec_l_4()
 			{
 				m_pmmu_enabled = 0;
 			}
-			m_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
+			m_can_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
 			break;
 		case 0x004:         /* ITT0 */
 			m_mmu_itt0 = REG_DA()[(word2 >> 12) & 15];

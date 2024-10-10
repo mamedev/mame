@@ -901,7 +901,7 @@ void m68000_musashi_device::execute_run()
 
 			try
 			{
-			if (!m_instruction_restart)
+			if (!m_can_instruction_restart)
 			{
 				m_run_mode = RUN_MODE_NORMAL;
 				/* Read an instruction and call its handler */
@@ -1038,7 +1038,7 @@ void m68000_musashi_device::init_cpu_common(void)
 	m_pmmu_enabled     = false;
 	m_hmmu_enabled     = 0;
 	m_emmu_enabled     = false;
-	m_instruction_restart = false;
+	m_can_instruction_restart = false;
 
 	/* The first call to this function initializes the opcode handler jump table */
 	if(!emulation_initialized)
@@ -1073,7 +1073,7 @@ void m68000_musashi_device::init_cpu_common(void)
 	save_item(NAME(m_pmmu_enabled));
 	save_item(NAME(m_hmmu_enabled));
 	save_item(NAME(m_emmu_enabled));
-	save_item(NAME(m_instruction_restart));
+	save_item(NAME(m_can_instruction_restart));
 	save_item(NAME(m_restart_instruction));
 
 	save_item(NAME(m_mmu_crp_aptr));
@@ -1112,7 +1112,7 @@ void m68000_musashi_device::device_reset()
 	m_pmmu_enabled = false;
 	m_hmmu_enabled = 0;
 	m_emmu_enabled = false;
-	m_instruction_restart = false;
+	m_can_instruction_restart = false;
 
 	m_mmu_tc = 0;
 	m_mmu_tt0 = 0;
@@ -1316,7 +1316,7 @@ void m68000_musashi_device::set_hmmu_enable(int enable)
 void m68000_musashi_device::set_emmu_enable(bool enable)
 {
 	m_emmu_enabled = enable;
-	m_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
+	m_can_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
 }
 
 void m68000_musashi_device::set_fpu_enable(bool enable)
@@ -1688,7 +1688,7 @@ void m68000_musashi_device::init32hmmu(address_space &space, address_space &ospa
 //         do not call set_input_line(M68K_LINE_BUSERROR) when using rerun flag
 void m68000_musashi_device::set_buserror_details(u32 fault_addr, u8 rw, u8 fc, bool rerun)
 {
-	if (m_instruction_restart && rerun) m_mmu_tmp_buserror_occurred = true; // hack for external MMU
+	if (m_can_instruction_restart && rerun) m_mmu_tmp_buserror_occurred = true; // hack for external MMU
 
 	// save values for 68000 specific bus error
 	m_aerr_address = fault_addr;
@@ -2337,7 +2337,7 @@ void m68000_musashi_device::clear_all()
 	m_pmmu_enabled= false;
 	m_hmmu_enabled= 0;
 	m_emmu_enabled= false;
-	m_instruction_restart= false;
+	m_can_instruction_restart= false;
 	m_has_fpu= 0;
 	m_fpu_just_reset= 0;
 
