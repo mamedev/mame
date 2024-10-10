@@ -200,7 +200,6 @@ static INPUT_PORTS_START( ttv_mx )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Motion Right")
 INPUT_PORTS_END
 
-
 void xavix_state::xavix2000(machine_config &config)
 {
 	xavix(config);
@@ -296,6 +295,10 @@ ROM_START( duelmast )
 	ROM_LOAD("duelmasters.u4", 0x000000, 0x200000, CRC(2f11fcd7) SHA1(d8849c74833e77b8b309e845523f2cdc7ac68054) )
 ROM_END
 
+ROM_START( tom_dpgm )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("disney.bin", 0x000000, 0x400000, CRC(1dc181b3) SHA1(fa30069d17705f27e4ff45e7f6ccf06986e138f3) )
+ROM_END
 
 // doesn't use extra opcodes?
 CONS( 2002, epo_ebox, 0, 0, xavix2000_nv,        epo_ebox,    xavix_state,             init_xavix, "Epoch / SSD Company LTD",       "Excite Boxing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // doesn't use XaviX2000 extra opcodes, but had that type of CPU
@@ -316,3 +319,6 @@ CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_sta
 
 // hangs after starting a game, check why
 CONS( 2004, ban_onep, 0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Bandai / SSD Company LTD",         "Let's! TV Play One Piece Punch Battle (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// ディズニープリンセス　キラキラ魔法のレッスン
+CONS( 2004, tom_dpgm, 0, 0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tomy / SSD Company LTD",         "Disney Princess Kirakira Mahou no Lesson (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

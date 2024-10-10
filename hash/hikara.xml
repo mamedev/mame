@@ -57,10 +57,11 @@ license:CC0-1.0
 
 	        * Pocket Monsters Special                       -none-      Yellow
 	        * Ciao Special                                  CC0907001   Translucent Pink - came with the 2009/06 issue of the Ciao (ちゃお) manga
+	        * PIZZA-LA                                      PZ0909001   Translucent Pink
 
 	        4 User Cartridge (5 Capacity)                   n/a         Translucent Grey/White
 	        2 User Cartridge (10 Capacity)                  n/a         Translucent Pink
-	        2 User Cartridge (20 Capacity)                  n/a         Translucent Blue
+	        3 User Cartridge (20 Capacity)                  n/a         Translucent Blue
 	-->
 
 	<!-- this one has some songs programmed into it:
@@ -169,6 +170,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="user20" supported="no">
+		<description>Hi-kara 20-song capacity user cartridge (blank) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="hikara_usercart20.u1" size="0x200000" crc="70147ead" sha1="d7274312700cf90e54135695d10b6a5108a980ab"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- this one has some songs programmed into it:
 	    一番綺麗な私を                  中島美嘉                        Ichiban Kireina Watashi o       Nakajima Mika
 	    わかれうた                      中島みゆき                      Wakareuta                       Nakajima Miyuki
@@ -190,7 +202,7 @@ license:CC0-1.0
 	    天体観測                        BUMP OF CHICKEN                 Tentai Kansoku                  BUMP OF CHICKEN
 	    情熱の薔薇                      THE BLUE HEARTS                 Jōnetsu no Bara                 THE BLUE HEARTS
 	    ありがとう                      いきものがかり                  Arigatō                         Ikimonogakari -->
-	<software name="user20" supported="no">
+	<software name="user20a" cloneof="user20" supported="no">
 		<description>Hi-kara 20-song capacity user cartridge (used, with 20 songs, set 1) (Japan)</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
@@ -222,7 +234,7 @@ license:CC0-1.0
 	    炎神戦隊ゴーオンジャー                  高橋秀幸(Project.R)             ENGINE SENTAI GO-ONGER                      Takahashi Hideyuki
 	    いつも何度でも                          木村弓                          Itsumo Nandodemo                            Kimura Yumi
 	    ニホンノミカタ-ネバダカラキマシタ-      矢島美容室                      Nihon no Mikata -Nevada kara Kimashita-     Yajima Biyōshitsu -->
-	<software name="user20a" cloneof="user20" supported="no">
+	<software name="user20b" cloneof="user20" supported="no">
 		<description>Hi-kara 20-song capacity user cartridge (used, with 20 songs, set 2) (Japan)</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
@@ -349,6 +361,19 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="cc0907001.u1" size="0x200000" crc="45f6b2a3" sha1="b3b1b3f269b128a2b09aa932f77d53da53f6130f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- the presentation on this is almost the same as a 10 song user cartridge, but it's a standalone, non-reprogrammable release -->
+	<!-- 2009 date is from cart label, shows 2008 when running -->
+	<software name="pizzala" supported="no">
+		<description>Hi-kara PIZZA-LA</description>
+		<year>2009</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="pz0909001.u1" size="0x200000" crc="1c759eaf" sha1="bcab1f0b16c2866501c9cdeea9df7b9878bbda2a"/>
 			</dataarea>
 		</part>
 	</software>
