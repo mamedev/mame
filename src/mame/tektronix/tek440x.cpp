@@ -87,14 +87,12 @@
 // have m_readXX / m_writeXX use MMU translation
 // OR
 // do MMU translation inside memory_r / memory_w
-#define USE_MMUxx
+#define USE_MMU
 
 class m68010_tekmmu_device : public m68010_device
 {
 	using m68010_device::m68010_device;
 
-	bool buserror_occurred = false;
-	
 	// HACK
 	u8 *m_map_control = nullptr;
 	u16 *m_map = nullptr;
@@ -132,8 +130,8 @@ class m68010_tekmmu_device : public m68010_device
 	u32 mmu_translate_address(offs_t address, u8 rw)
 	{
 	
-		if (!buserror_occurred)
 		if (*m_map_control & (1 << MAP_BLOCK_ACCESS))
+		if (!m_mmu_tmp_buserror_occurred)
 		if ((get_fc() & 4) == 0)				// only in User mode
 		if (BIT(*m_map_control, MAP_VM_ENABLE))
 		{
@@ -156,8 +154,9 @@ class m68010_tekmmu_device : public m68010_device
 				*m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
 
 				LOG("mmu_translate_address: bus error: PID(%d) != %d %08x fc(%d) pc(%08x)\n", BIT(m_map[address >> 12], 11, 3), (*m_map_control & 7), address, get_fc(), pc());
-				buserror_occurred = true;
 				set_buserror_details(address, rw, get_fc(), true);
+				set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+				set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 				return address;
 			}
 			else
@@ -171,15 +170,14 @@ class m68010_tekmmu_device : public m68010_device
 				*m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
 
 				LOG("mmu_translate_address: bus error: %08x fc(%d) pc(%08x)\n",(address), get_fc(), pc());
-				buserror_occurred = true;
 				set_buserror_details(address, rw, get_fc(), true);
+				set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+				set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 				return address;
 			}
 		
 			address = BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12);
 		}
-
-		buserror_occurred = false;
 
 		return address;
 	}
@@ -190,8 +188,9 @@ u16 PTEread(offs_t address)
 	if (!BIT(*m_map_control, MAP_SYS_WR_ENABLE))
 	{
 			LOG("PTEread: bus error: PID(%d) %08x fc(%d) pc(%08x)\n", BIT(m_map[(address >> 12) & 0x7ff], 11, 3), (address), get_fc(), pc());
-			buserror_occurred = true;
 			set_buserror_details(address, 1, get_fc(), true);
+			set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+			set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 			return 0;
 	}
 
@@ -203,7 +202,7 @@ void PTEwrite(offs_t address, u16 data)
 	if (((address>>12) & 0x7ff) < 20)
 		LOG("PTEwrite: %08x  <= %04x paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
 		(address>>12) & 0x7ff, data,
-		(BIT(data, 0, 12)<<12), BIT(data, 11, 3), data & 0x8000 ? 1 : 0, data & 0x4000 ? 1 : 0);
+		(BIT(data, 0, 11)<<12), BIT(data, 11, 3), data & 0x8000 ? 1 : 0, data & 0x4000 ? 1 : 0);
 
 	if (BIT(*m_map_control, MAP_SYS_WR_ENABLE))
 	{
@@ -225,7 +224,7 @@ void PTEwrite(offs_t address, u16 data)
 
 		m_readimm16 = [this](offs_t address) -> u16  {
 			if (address & 0x800000)
-				return PTEread(address);
+				return PTEread(address);		// needed?
 			else
 			{
 				u32 address0 = mmu_translate_address(address, 1);
@@ -321,7 +320,7 @@ void PTEwrite(offs_t address, u16 data)
 		init_cpu_m68010();
 		
 		LOG("m68010_tekmmu_device::device_start: setting emmu\n");
-		set_emmu_enable(true);
+		set_emmu_enable(true);		// sets m_instruction_restart=true
 	}
 
 public:
@@ -1146,8 +1145,10 @@ void tek440x_state::logical_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rw(FUNC(tek440x_state::memory_r), FUNC(tek440x_state::memory_w));
 
+#ifndef USE_MMU
 	// NB we mask in handlers because I do not understand .mirror()!
 	map(0x800000, 0xffffff).rw(FUNC(tek440x_state::map_r), FUNC(tek440x_state::map_w));
+#endif
 }
 
 void tek440x_state::physical_map(address_map &map)
