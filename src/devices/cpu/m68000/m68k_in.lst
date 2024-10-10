@@ -5063,7 +5063,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 			{
 				m_pmmu_enabled = 0;
 			}
-			m_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
+			m_can_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
 			break;
 		case 0x004:         /* ITT0 */
 			m_mmu_itt0 = REG_DA()[(word2 >> 12) & 15];
